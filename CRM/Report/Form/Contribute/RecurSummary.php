@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
 
@@ -86,7 +84,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
       if (array_key_exists('group_bys', $table)) {
         foreach ($table['group_bys'] as $fieldName => $field) {
           if (!empty($this->_params['group_bys'][$fieldName])) {
-            switch (CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])) {
+            switch ($this->_params['group_bys_freq'][$fieldName] ?? NULL) {
               case 'YEARWEEK':
                 $select[] = "DATE_SUB({$field['dbAlias']}, INTERVAL WEEKDAY({$field['dbAlias']}) DAY) AS {$tableName}_{$fieldName}_start";
                 $select[] = "YEARWEEK({$field['dbAlias']}) AS {$tableName}_{$fieldName}_subtotal";
@@ -227,10 +225,10 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
     $startDateRelative = $this->_params["start_date_relative"] ?? NULL;
 
     $startedDateSql = $this->dateClause('start_date', $startDateRelative, $startDateFrom, $startDateTo);
-    $startedDateSql = $startedDateSql ? $startedDateSql : " ( 1 ) ";
+    $startedDateSql = $startedDateSql ?: " ( 1 ) ";
 
     $cancelledDateSql = $this->dateClause('cancel_date', $startDateRelative, $startDateFrom, $startDateTo);
-    $cancelledDateSql = $cancelledDateSql ? $cancelledDateSql : " ( cancel_date IS NOT NULL ) ";
+    $cancelledDateSql = $cancelledDateSql ?: " ( cancel_date IS NOT NULL ) ";
 
     $started = $cancelled = $active = $total = 0;
 
@@ -284,7 +282,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
       $amountSql = "
   SELECT SUM(cc.total_amount) as amount FROM `civicrm_contribution` cc
   INNER JOIN civicrm_contribution_recur cr ON (cr.id = cc.contribution_recur_id AND cr.payment_instrument_id = {$paymentInstrumentId})
-  WHERE cc.contribution_status_id = 1 AND cc.is_test = 0 AND ";
+  WHERE cc.contribution_status_id = 1 AND cc.is_test = 0 AND cc.is_template = 0 AND ";
       $amountSql .= str_replace("start_date", "cc.`receive_date`", $startedDateSql);
       $amountDao = CRM_Core_DAO::executeQuery($amountSql);
       $amountDao->fetch();
@@ -297,7 +295,8 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
       $total = $total + $amountDao->amount;
 
       // handle payment instrument id
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_payment_instrument_id', $row)) {
+      $value = $row['civicrm_contribution_recur_payment_instrument_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_recur_payment_instrument_id'] = $paymentInstruments[$value];
         $entryFound = TRUE;
       }

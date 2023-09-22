@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -28,35 +26,47 @@ class CRM_Upgrade_Incremental_General {
    * The point release will be dropped in recommendations unless it's .1 or
    * higher.
    */
-  const RECOMMENDED_PHP_VER = '7.3.0';
+  const RECOMMENDED_PHP_VER = '8.1.0';
 
   /**
    * The minimum recommended PHP version.
    *
    * A site running an earlier version will be told to upgrade.
    */
-  const MIN_RECOMMENDED_PHP_VER = '7.2.0';
+  const MIN_RECOMMENDED_PHP_VER = '8.0.0';
 
   /**
    * The minimum PHP version required to install Civi.
    *
    * @see install/index.php
    */
-  const MIN_INSTALL_PHP_VER = '7.1.0';
+  const MIN_INSTALL_PHP_VER = '7.3.0';
 
   /**
-   * The minimum recommended MySQL/MariaDB version.
+   * The minimum recommended MySQL version.
    *
-   * A site running an earlier version will be told to upgrade.
+   * A site running an earlier version will be encouraged to upgrade.
    */
   const MIN_RECOMMENDED_MYSQL_VER = '5.7';
 
   /**
-   * The minimum MySQL/MariaDB version required to install Civi.
+   * The minimum MySQL version required to install Civi.
    *
    * @see install/index.php
    */
-  const MIN_INSTALL_MYSQL_VER = '5.6.5';
+  const MIN_INSTALL_MYSQL_VER = '5.7';
+
+  /**
+   * The minimum recommended MariaDB version.
+   *
+   * A site running an earlier version will be encouraged to upgrade.
+   */
+  const MIN_RECOMMENDED_MARIADB_VER = '10.4';
+
+  /**
+   * The minimum MariaDB version required to install Civi.
+   */
+  const MIN_INSTALL_MARIADB_VER = '10.2';
 
   /**
    * Compute any messages which should be displayed before upgrade.
@@ -84,7 +94,7 @@ class CRM_Upgrade_Incremental_General {
       $preUpgradeMessage .= ts('This system uses MySQL/MariaDB v%5. You may proceed with the upgrade, and CiviCRM v%1 will continue working normally. However, CiviCRM v%4 will require MySQL v%2 or MariaDB v%3.', [
         1 => $latestVer,
         2 => self::MIN_RECOMMENDED_MYSQL_VER . '+',
-        3 => '10.1' . '+',
+        3 => self::MIN_RECOMMENDED_MARIADB_VER . '+',
         4 => '5.34' . '+',
         5 => CRM_Utils_SQL::getDatabaseVersion(),
       ]);
@@ -124,12 +134,29 @@ class CRM_Upgrade_Incremental_General {
     }
 
     $ftAclSetting = Civi::settings()->get('acl_financial_type');
-    $financialAclExtension = civicrm_api3('extension', 'get', ['key' => 'biz.jmaconsulting.financialaclreport']);
-    if ($ftAclSetting && (($financialAclExtension['count'] == 1 && $financialAclExtension['status'] != 'Installed') || $financialAclExtension['count'] !== 1)) {
+    $financialAclExtension = civicrm_api3('extension', 'get', ['key' => 'biz.jmaconsulting.financialaclreport', 'sequential' => 1]);
+    if ($ftAclSetting && (($financialAclExtension['count'] == 1 && $financialAclExtension['values'][0]['status'] != 'Installed') || $financialAclExtension['count'] !== 1)) {
       $preUpgradeMessage .= '<br />' . ts('CiviCRM will in the future require the extension %1 for CiviCRM Reports to work correctly with the Financial Type ACLs. The extension can be downloaded <a href="%2">here</a>', [
         1 => 'biz.jmaconsulting.financialaclreport',
         2 => 'https://github.com/JMAConsulting/biz.jmaconsulting.financialaclreport',
       ]);
+    }
+
+    $snapshotIssues = CRM_Upgrade_Snapshot::getActivationIssues();
+    if ($snapshotIssues) {
+      $preUpgradeMessage .= '<details>';
+      $preUpgradeMessage .= '<summary>' . ts('This upgrade will NOT use automatic snapshots.') . '</summary>';
+      $preUpgradeMessage .= '<p>' . ts('If an upgrade problem is discovered in the future, automatic snapshots may help recover. However, they also require additional storage and may not be available or appropriate in all configurations.') . '</p>';
+      $preUpgradeMessage .= ts('Here are the reasons why automatic snapshots are disabled:');
+      $preUpgradeMessage .= '<ul>' . implode("", array_map(
+          function($issue) {
+            return sprintf('<li>%s</li>', $issue);
+          }, $snapshotIssues)) . '</ul>';
+      $preUpgradeMessage .= '<p>' . ts('You may enable snapshots in "<code>%1</code>" by setting the experimental option "<code>%2</code>".', [
+        1 => 'civicrm.settings.php',
+        2 => htmlentities('define(\'CIVICRM_UPGRADE_SNAPSHOT\', TRUE)'),
+      ]) . '</p>';
+      $preUpgradeMessage .= '</details>';
     }
   }
 
@@ -151,88 +178,11 @@ class CRM_Upgrade_Incremental_General {
       return sprintf("<li><em>%s</em> - %s</li>", htmlentities($k), htmlentities($v));
     }, array_keys($messages), $messages);
 
-    $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", [
-      1 => 'https://docs.civicrm.org/user/en/latest/email/message-templates/#modifying-system-workflow-message-templates',
-      2 => '<ul>' . implode('', $messagesHtml) . '</ul>',
-    ]);
+    $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a %1>View detailed instructions</a>.", [
+      1 => 'href="https://docs.civicrm.org/user/en/latest/email/message-templates/#modifying-system-workflow-message-templates" target="_blank"',
+    ]) . '<ul>' . implode('', $messagesHtml) . '</ul>';
 
     $messageObj->updateTemplates();
-  }
-
-  /**
-   * @param $message
-   * @param $latestVer
-   * @param $currentVer
-   */
-  public static function checkMessageTemplate(&$message, $latestVer, $currentVer) {
-    if (version_compare($currentVer, 5.0, '>')) {
-      return;
-    }
-    $sql = "SELECT orig.workflow_id as workflow_id,
-             orig.msg_title as title
-            FROM civicrm_msg_template diverted JOIN civicrm_msg_template orig ON (
-                diverted.workflow_id = orig.workflow_id AND
-                orig.is_reserved = 1                    AND (
-                    diverted.msg_subject != orig.msg_subject OR
-                    diverted.msg_text    != orig.msg_text    OR
-                    diverted.msg_html    != orig.msg_html
-                )
-            )";
-
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    while ($dao->fetch()) {
-      $workflows[$dao->workflow_id] = $dao->title;
-    }
-
-    if (empty($workflows)) {
-      return;
-    }
-
-    $html = NULL;
-    $pathName = dirname(dirname(__FILE__));
-    $flag = FALSE;
-    foreach ($workflows as $workflow => $title) {
-      $name = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
-        $workflow,
-        'name',
-        'id'
-      );
-
-      // check if file exists locally
-      $textFileName = implode(DIRECTORY_SEPARATOR,
-        [
-          $pathName,
-          "{$latestVer}.msg_template",
-          'message_templates',
-          "{$name}_text.tpl",
-        ]
-      );
-
-      $htmlFileName = implode(DIRECTORY_SEPARATOR,
-        [
-          $pathName,
-          "{$latestVer}.msg_template",
-          'message_templates',
-          "{$name}_html.tpl",
-        ]
-      );
-
-      if (file_exists($textFileName) ||
-        file_exists($htmlFileName)
-      ) {
-        $flag = TRUE;
-        $html .= "<li>{$title}</li>";
-      }
-    }
-
-    if ($flag == TRUE) {
-      $html = "<ul>" . $html . "<ul>";
-
-      $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", [
-        1 => 'https://docs.civicrm.org/user/en/latest/email/message-templates/#modifying-system-workflow-message-templates',
-        2 => $html,
-      ]);
-    }
   }
 
 }

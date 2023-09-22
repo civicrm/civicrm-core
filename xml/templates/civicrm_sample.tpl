@@ -14,10 +14,10 @@ SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 
 -- Sample Extended Property Group and Fields
 
-INSERT INTO `civicrm_price_set` (`name`,`title`,`is_active`,`extends`,`is_quick_config`)
-VALUES ('help_support_civicrm_amount', 'Help Support CiviCRM!', 1, 2, 1);
+INSERT INTO `civicrm_price_set` (`name`,`title`,`is_active`,`extends`,`is_quick_config`, `financial_type_id`)
+VALUES ('help_support_civicrm_amount', 'Help Support CiviCRM!', 1, '2', 0, 1);
 
-SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `is_quick_config` = 1 and name = 'help_support_civicrm_amount';
+SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE name = 'help_support_civicrm_amount';
 
 INSERT INTO `civicrm_price_field` (`price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `visibility_id`)
 VALUES ( @priceSetId, 'contribution_amount', 'Contribution Amount', 'Radio', 0, 2, 1, 1, 1, 0, 1),
@@ -44,11 +44,11 @@ VALUES
      (@priceFieldID, 'other_amount', 'Other Amount', 1, 3, 1, 0, 1);
 
 INSERT INTO civicrm_contribution_page
-  (title,intro_text,financial_type_id,is_monetary,is_allow_other_amount,default_amount_id,min_amount,max_amount,goal_amount,thankyou_title,thankyou_text,thankyou_footer,receipt_from_name,receipt_from_email,cc_receipt,bcc_receipt,receipt_text,is_active,footer_text,amount_block_is_active,currency,is_email_receipt)
+  (title,frontend_title, name,intro_text,financial_type_id,is_monetary,is_allow_other_amount,default_amount_id,min_amount,max_amount,goal_amount,thankyou_title,thankyou_text,thankyou_footer,receipt_from_name,receipt_from_email,cc_receipt,bcc_receipt,receipt_text,is_active,footer_text,amount_block_is_active,currency,is_email_receipt)
 VALUES
-  ('Help Support CiviCRM!','Do you love CiviCRM? Do you use CiviCRM? Then please support CiviCRM and Contribute NOW by trying out our new online contribution features!',1,1,1,137,'10.00','10000.00','100000.00','Thanks for Your Support!','<p>Thank you for your support. Your contribution will help us build even better tools.</p><p>Please tell your friends and colleagues about CiviCRM!</p>','<p><a href=https://civicrm.org>Back to CiviCRM Home Page</a></p>','CiviCRM Fundraising Dept.','donationFake@civicrm.org','receipt@example.com','bcc@example.com','Your donation is tax deductible under IRS 501(c)(3) regulation. Our tax identification number is: 93-123-4567',1, NULL, 1, 'USD', 1),
-  ('Member Signup and Renewal', 'Members are the life-blood of our organization. If you''re not already a member - please consider signing up today. You can select the membership level the fits your budget and needs below.', 2, 1, NULL, NULL, NULL, NULL, NULL, 'Thanks for Your Support!', 'Thanks for supporting our organization with your membership. You can learn more about membership benefits from our members only page.', NULL, 'Membership Department', 'memberships@civicrm.org', NULL, NULL, 'Thanks for supporting our organization with your membership. You can learn more about membership benefits from our members only page.\r\n\r\nKeep this receipt for your records.', 1, NULL, 0, 'USD', 1),
-  ('Pledge for CiviCRM!','Do you love CiviCRM? Do you use CiviCRM? Then please support CiviCRM and Pledge NOW by trying out our online contribution features!',1,1,1,NULL,'10.00','10000.00','100000.00','Thanks for Your Support!','<p>Thank you for your support. Your contribution will help us build even better tools like Pledge.</p><p>Please tell your friends and colleagues about CiviPledge!</p>','<p><a href=https://civicrm.org>Back to CiviCRM Home Page</a></p>','CiviCRM Fundraising Dept.','donationFake@civicrm.org','receipt@example.com','bcc@example.com','Your donation is tax deductible under IRS 501(c)(3) regulation. Our tax identification number is: 93-123-4567',1, NULL, 1, 'USD', 1);
+  ('Donate page', 'Help Support CiviCRM!','donate', 'Do you love CiviCRM? Do you use CiviCRM? Then please support CiviCRM and Contribute NOW by trying out our new online contribution features!',1,1,1,137,'10.00','10000.00','100000.00','Thanks for Your Support!','<p>Thank you for your support. Your contribution will help us build even better tools.</p><p>Please tell your friends and colleagues about CiviCRM!</p>','<p><a href=https://civicrm.org>Back to CiviCRM Home Page</a></p>','CiviCRM Fundraising Dept.','donationFake@civicrm.org','receipt@example.com','bcc@example.com','Your donation is tax deductible under IRS 501(c)(3) regulation. Our tax identification number is: 93-123-4567',1, NULL, 1, 'USD', 1),
+  ('Membership page','Member Signup and Renewal', 'membership','Members are the life-blood of our organization. If you''re not already a member - please consider signing up today. You can select the membership level the fits your budget and needs below.', 2, 1, 0, NULL, NULL, NULL, NULL, 'Thanks for Your Support!', 'Thanks for supporting our organization with your membership. You can learn more about membership benefits from our members only page.', NULL, 'Membership Department', 'memberships@civicrm.org', NULL, NULL, 'Thanks for supporting our organization with your membership. You can learn more about membership benefits from our members only page.\r\n\r\nKeep this receipt for your records.', 1, NULL, 0, 'USD', 1),
+  ('Pledge page', 'Pledge for CiviCRM!','pledge', 'Do you love CiviCRM? Do you use CiviCRM? Then please support CiviCRM and Pledge NOW by trying out our online contribution features!',1,1,1,NULL,'10.00','10000.00','100000.00','Thanks for Your Support!','<p>Thank you for your support. Your contribution will help us build even better tools like Pledge.</p><p>Please tell your friends and colleagues about CiviPledge!</p>','<p><a href=https://civicrm.org>Back to CiviCRM Home Page</a></p>','CiviCRM Fundraising Dept.','donationFake@civicrm.org','receipt@example.com','bcc@example.com','Your donation is tax deductible under IRS 501(c)(3) regulation. Our tax identification number is: 93-123-4567',1, NULL, 1, 'USD', 1);
 
 INSERT INTO `civicrm_tell_friend`
     (`entity_table`, `entity_id`, `title`, `intro`, `suggested_message`, `general_link`, `thankyou_title`, `thankyou_text`, `is_active`)
@@ -96,13 +96,13 @@ VALUES
    (@option_group_id_act, 'Interview', (SELECT @option_value_max_val := @option_value_max_val + 1), 'Interview',  NULL, 0, NULL, @option_value_max_val, 'Conduct a phone or in person interview.', 0, 0, 1, 'fa-comment-o');
 
 INSERT INTO `civicrm_contact_type`
-  ( `name`, `label`,`image_URL`, `parent_id`, `is_active`,`is_reserved`)
+  ( `name`, `label`,`image_URL`, `parent_id`, `is_active`, `is_reserved`, `icon`)
  VALUES
-  ( 'Student'     , '{ts escape="sql"}Student{/ts}'     , NULL, 1, 1, 0),
-  ( 'Parent'      , '{ts escape="sql"}Parent{/ts}'      , NULL, 1, 1, 0),
-  ( 'Staff'       , '{ts escape="sql"}Staff{/ts}'       , NULL, 1, 1, 0),
-  ( 'Team'        , '{ts escape="sql"}Team{/ts}'        , NULL, 3, 1, 0),
-  ( 'Sponsor'     , '{ts escape="sql"}Sponsor{/ts}'     , NULL, 3, 1, 0);
+  ( 'Student'     , '{ts escape="sql"}Student{/ts}'     , NULL, 1, 1, 0, 'fa-graduation-cap'),
+  ( 'Parent'      , '{ts escape="sql"}Parent{/ts}'      , NULL, 1, 1, 0, 'fa-user-circle-o'),
+  ( 'Staff'       , '{ts escape="sql"}Staff{/ts}'       , NULL, 1, 1, 0, 'fa-id-badge'),
+  ( 'Team'        , '{ts escape="sql"}Team{/ts}'        , NULL, 3, 1, 0, 'fa-users'),
+  ( 'Sponsor'     , '{ts escape="sql"}Sponsor{/ts}'     , NULL, 3, 1, 0, 'fa-leaf');
 
     SELECT @domain_id   := min(id) FROM civicrm_domain;
     SELECT @nav_indi    := id FROM civicrm_navigation WHERE name = 'New Individual';
@@ -141,10 +141,10 @@ SELECT @priceFieldId, LOWER(name), name, description, minimum_fee, id as weight,
 
 
 INSERT INTO `civicrm_price_set` (`name`,`title`,`is_active`,`extends`, `financial_type_id`, `is_quick_config`)
-VALUES ('member_signup_and_renewal', 'Member Signup and Renewal', 1, 3, @financial_type_id, 1),
+VALUES ('member_signup_and_renewal', 'Member Signup and Renewal', 1, '3', @financial_type_id, 1),
        ('pledge_for_civicrm', 'Pledge for CiviCRM!',1,2,null,1);
 
-SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `is_quick_config` = 1 and name = 'member_signup_and_renewal';
+SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE name = 'member_signup_and_renewal';
 
 INSERT INTO `civicrm_price_field` (`price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `visibility_id`) VALUES ( @priceSetId, 'membership_amount', 'Membership', 'Radio', 0, 1, 1, 1, 1, 1, 1);
 
@@ -162,7 +162,7 @@ VALUES
     (@priceFieldID,'General','General','100.00', 1, @membershipIdG, 1, 1, @financial_type_id),
     (@priceFieldID,'Student','Student','50.00', 1, @membershipIdS , 1, 0, @financial_type_id);
 
-SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `is_quick_config` = 1 AND `name` = 'pledge_for_civicrm';
+SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `name` = 'pledge_for_civicrm';
 
 INSERT INTO `civicrm_price_field` (`price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `visibility_id`)
 VALUES ( @priceSetId, 'other_amount', 'Contribution Amount', 'Text', 0, 3, 0, 1, 1, 1, 1);
@@ -180,12 +180,12 @@ VALUES
 
 -- Insert sample data for event
 
-INSERT INTO `civicrm_price_set` (`name`,`title`,`is_active`,`extends`, `is_quick_config`)
-VALUES ('rain_forest_cup_youth_soccer_tournament', 'Rain-forest Cup Youth Soccer Tournament', 1, 1, 1),
-       ('fall_fundraiser_dinner', 'Fall Fundraiser Dinner', 1, 1, 1),
-       ('summer_solstice_festival_day_concert', 'Summer Solstice Festival Day Concert',1,1,1);
+INSERT INTO `civicrm_price_set` (`name`,`title`,`is_active`,`extends`, `is_quick_config`, `financial_type_id`)
+VALUES ('rain_forest_cup_youth_soccer_tournament', 'Rain-forest Cup Youth Soccer Tournament', 1, '1', 1, 3),
+       ('fall_fundraiser_dinner', 'Fall Fundraiser Dinner', 1, '1', 1, 3),
+       ('summer_solstice_festival_day_concert', 'Summer Solstice Festival Day Concert', 1, '1', 0, 3);
 
-SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `is_quick_config` = 1 AND `name` = 'rain_forest_cup_youth_soccer_tournament';
+SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `name` = 'rain_forest_cup_youth_soccer_tournament';
 
 INSERT INTO `civicrm_price_field` (`price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `visibility_id`)
 VALUES ( @priceSetId, 'tournament_fees', 'Tournament Fees', 'Radio', 0, 1, 1, 1, 1, 1, 1);
@@ -202,7 +202,7 @@ VALUES
     (@priceFieldID,'junior_Stars__ages_9_12_','Junior Stars (ages 9-12)','1000',2,1,0,4),
     (@priceFieldID,'super_Stars__ages_13_18_','Super Stars (ages 13-18)','1500',3,1,0,4);
 
-SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `is_quick_config` = 1 AND `name` = 'fall_fundraiser_dinner';
+SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `name` = 'fall_fundraiser_dinner';
 
 INSERT INTO `civicrm_price_field` (`price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `visibility_id`)
 VALUES ( @priceSetId, 'dinner_contribution', 'Dinner Contribution', 'Radio', 0, 1, 1, 1, 1, 1, 1);
@@ -219,7 +219,7 @@ VALUES
     (@priceFieldID,'couple','Couple','100',2,1,0,4),
     (@priceFieldID,'family','Family','200',3,1,0,4);
 
-SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `is_quick_config` = 1 AND `name` = 'summer_solstice_festival_day_concert';
+SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE `name` = 'summer_solstice_festival_day_concert';
 
 INSERT INTO `civicrm_price_field` (`price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `visibility_id`)
 VALUES ( @priceSetId, 'festival_fee', 'Festival Fee', 'Radio', 0, 1, 1, 1, 1, 1, 1);

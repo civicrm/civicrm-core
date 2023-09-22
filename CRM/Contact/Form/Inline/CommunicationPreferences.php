@@ -42,17 +42,8 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
       $defaults['preferred_language'] = CRM_Utils_Array::key($defaults['preferred_language'], $languages);
     }
 
-    // CRM-7119: set preferred_language to default if unset
-    if (empty($defaults['preferred_language'])) {
-      $config = CRM_Core_Config::singleton();
-      $defaults['preferred_language'] = $config->lcMessages;
-    }
-
     // CRM-19135: where CRM_Core_BAO_Contact::getValues() set label as a default value instead of reserved 'value',
     // the code is to ensure we always set default to value instead of label
-    if (!empty($defaults['preferred_mail_format'])) {
-      $defaults['preferred_mail_format'] = array_search($defaults['preferred_mail_format'], CRM_Core_SelectValues::pmf());
-    }
 
     if (empty($defaults['communication_style_id'])) {
       $defaults['communication_style_id'] = array_pop(CRM_Core_OptionGroup::values('communication_style', TRUE, NULL, NULL, 'AND is_default = 1'));

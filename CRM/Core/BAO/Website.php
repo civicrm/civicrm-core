@@ -19,40 +19,30 @@
  * This class contain function for Website handling.
  */
 class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
+  use CRM_Contact_AccessTrait;
 
   /**
-   * Create or update Website record.
+   * @deprecated
    *
    * @param array $params
    * @return CRM_Core_DAO_Website
+   * @throws CRM_Core_Exception
    */
-  public static function add($params) {
+  public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
   /**
-   * Create website.
-   *
-   * If called in a legacy manner this, temporarily, fails back to calling the legacy function.
+   * @deprecated
    *
    * @param array $params
-   * @param int $contactID
-   * @param bool $skipDelete
-   *
-   * @return bool|CRM_Core_BAO_Website
+   * @return CRM_Core_DAO_Website
+   * @throws CRM_Core_Exception
    */
-  public static function create($params, $contactID = NULL, $skipDelete = NULL) {
-    if ($skipDelete !== NULL || ($contactID && !is_array($contactID))) {
-      \Civi::log()->warning(ts('Calling website:create with vars other than $params is deprecated. Use process'), ['civi.tag' => 'deprecated']);
-      return self::process($params, $contactID, $skipDelete);
-    }
-    foreach ($params as $key => $value) {
-      if (is_numeric($key)) {
-        \Civi::log()->warning(ts('Calling website:create for multiple websites $params is deprecated. Use process'), ['civi.tag' => 'deprecated']);
-        return self::process($params, $contactID, $skipDelete);
-      }
-    }
-    return self::add($params);
+  public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
@@ -65,6 +55,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param bool $skipDelete
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public static function process($params, $contactID, $skipDelete) {
     if (empty($params)) {
@@ -87,10 +78,10 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
       }
       if (!empty($values['url'])) {
         $values['contact_id'] = $contactID;
-        self::add($values);
+        self::writeRecord($values);
       }
       elseif ($skipDelete && !empty($values['id'])) {
-        self::del($values['id']);
+        static::deleteRecord($values);
       }
     }
   }
@@ -101,21 +92,12 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param int $id
    *
    * @return bool
+   *
+   * @deprecated
    */
   public static function del($id) {
-    $obj = new self();
-    $obj->id = $id;
-    $obj->find();
-    if ($obj->fetch()) {
-      $params = [];
-      CRM_Utils_Hook::pre('delete', 'Website', $id, $params);
-      $obj->delete();
-    }
-    else {
-      return FALSE;
-    }
-    CRM_Utils_Hook::post('delete', 'Website', $id, $obj);
-    return TRUE;
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return (bool) static::deleteRecord(['id' => $id]);
   }
 
   /**
@@ -125,9 +107,9 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param array $params
    * @param $values
    *
-   * @return bool
+   * @return array
    */
-  public static function &getValues(&$params = [], &$values = []) {
+  public static function &getValues($params = [], &$values = []) {
     $websites = [];
     $website = new CRM_Core_DAO_Website();
     $website->contact_id = $params['contact_id'];

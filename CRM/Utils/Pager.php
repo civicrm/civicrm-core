@@ -32,7 +32,13 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * Constants for static parameters of the pager
    */
-  const ROWCOUNT = 50, PAGE_ID = 'crmPID', PAGE_ID_TOP = 'crmPID', PAGE_ID_BOTTOM = 'crmPID_B', PAGE_ROWCOUNT = 'crmRowCount';
+  const PAGE_ID = 'crmPID', PAGE_ID_TOP = 'crmPID', PAGE_ID_BOTTOM = 'crmPID_B', PAGE_ROWCOUNT = 'crmRowCount';
+
+  /**
+   * Deprecated constants that might still be used by extensions but no longer by core
+   * @deprecated
+   */
+  const ROWCOUNT = 50;
 
   /**
    * The output of the pager. This is a name/value array with various keys
@@ -171,12 +177,12 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * @return int
    *   new pageId to display to the user
    */
-  public function getPageID($defaultPageId = 1, &$params) {
+  public function getPageID($defaultPageId, &$params) {
     // POST has higher priority than GET vars
     // else if a value is set that has higher priority and finally the GET var
     $currentPage = $defaultPageId;
     if (!empty($_POST)) {
-      if (isset($_POST[CRM_Utils_Array::value('buttonTop', $params)]) && isset($_POST[self::PAGE_ID])) {
+      if (isset($_POST[$params['buttonTop']]) && isset($_POST[self::PAGE_ID])) {
         $currentPage = max((int ) @$_POST[self::PAGE_ID], 1);
       }
       elseif (isset($_POST[$params['buttonBottom']]) && isset($_POST[self::PAGE_ID_BOTTOM])) {
@@ -186,7 +192,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
         $currentPage = max((int ) @$_POST[self::PAGE_ID], 1);
       }
       elseif (isset($_POST[self::PAGE_ID_BOTTOM])) {
-        $currentPage = max((int ) @$_POST[self::PAGE_ID_BOTTOM]);
+        $currentPage = max((int ) @$_POST[self::PAGE_ID_BOTTOM], 1);
       }
     }
     elseif (isset($_GET[self::PAGE_ID])) {
@@ -198,13 +204,13 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * Get the number of rows to display from either a GET / POST variable
    *
-   * @param int $defaultPageRowCount
+   * @param int|null $defaultPageRowCount
    *   The default value if not set.
    *
    * @return int
    *   the rowCount value to use
    */
-  public function getPageRowCount($defaultPageRowCount = self::ROWCOUNT) {
+  public function getPageRowCount($defaultPageRowCount = NULL) {
     // POST has higher priority than GET vars
     if (isset($_POST[self::PAGE_ROWCOUNT])) {
       $rowCount = max((int ) @$_POST[self::PAGE_ROWCOUNT], 1);
@@ -213,7 +219,12 @@ class CRM_Utils_Pager extends Pager_Sliding {
       $rowCount = max((int ) @$_GET[self::PAGE_ROWCOUNT], 1);
     }
     else {
-      $rowCount = $defaultPageRowCount;
+      if (empty($defaultPageRowCount)) {
+        $rowCount = Civi::settings()->get('default_pager_size');
+      }
+      else {
+        $rowCount = $defaultPageRowCount;
+      }
     }
     return $rowCount;
   }

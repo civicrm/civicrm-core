@@ -117,7 +117,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
   }
 
   /**
-   * @param $tabs
+   * @param array $tabs
    *
    * @return int|string
    */
@@ -137,12 +137,12 @@ class CRM_Campaign_Form_Survey_TabHeader {
       }
     }
 
-    $current = $current ? $current : 'main';
+    $current = $current ?: 'main';
     return $current;
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return int|string
    */
@@ -166,7 +166,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
       }
     }
 
-    $next = $next ? $next : 'main';
+    $next = $next ?: 'main';
     return $next;
   }
 

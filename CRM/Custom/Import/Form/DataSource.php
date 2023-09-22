@@ -13,66 +13,116 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
+
+use Civi\Api4\CustomGroup;
 
 /**
  * This class gets the name of the file to upload
  */
 class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
-  const PATH = 'civicrm/import/custom';
+  /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    return 'custom_field_import';
+  }
 
-  const IMPORT_ENTITY = 'Multi value custom data';
+  /**
+   * Multiple field custom groups.
+   *
+   * @var array
+   */
+  protected $customFieldGroups;
+
+  /**
+   * Get multi-field custom groups.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getCustomGroups(): array {
+    if (isset($this->customFieldGroups)) {
+      return $this->customFieldGroups;
+    }
+    $this->customFieldGroups = [];
+    // If we make the permission TRUE is it too restrictive?
+    $fields = CustomGroup::get(FALSE)->addSelect('id', 'title')
+      ->addWhere('is_multiple', '=', TRUE)
+      ->addWhere('is_active', '=', TRUE)->execute();
+    foreach ($fields as $field) {
+      $this->customFieldGroups[$field['id']] = $field['title'];
+    }
+    return $this->customFieldGroups;
+  }
+
+  /**
+   * Get an error message to assign to the template.
+   *
+   * @return string
+   */
+  protected function getErrorMessage(): string {
+    return empty($this->getCustomGroups()) ? ts('This import screen cannot be used because there are no Multi-value custom data groups.') : '';
+  }
+
+  /**
+   * Get the import entity (translated).
+   *
+   * Used for template layer text.
+   *
+   * @return string
+   */
+  protected function getTranslatedEntity(): string {
+    return ts('Multi-value Custom Data');
+  }
+
+  /**
+   * Get the import entity plural (translated).
+   *
+   * Used for template layer text.
+   *
+   * @return string
+   */
+  protected function getTranslatedEntities(): string {
+    return ts('multi-value custom data records');
+  }
 
   /**
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  public function setDefaultValues() {
-    $config = CRM_Core_Config::singleton();
-    $defaults = [
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
-      'fieldSeparator' => $config->fieldSeparator,
-      'multipleCustomData' => $this->_id,
-    ];
-
-    if ($loadeMapping = $this->get('loadedMapping')) {
-      $this->assign('loadedMapping', $loadeMapping);
-      $defaults['savedMapping'] = $loadeMapping;
-    }
-
-    return $defaults;
+  public function setDefaultValues(): array {
+    return array_merge(parent::setDefaultValues(), [
+      'contactType' => 'Individual',
+      // Perhaps never used, but permits url passing of the group.
+      'multipleCustomData' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
+    ]);
   }
 
   /**
    * Build the form object.
    *
-   * @return void
+   * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     parent::buildQuickForm();
-
-    $multipleCustomData = CRM_Core_BAO_CustomGroup::getMultipleFieldGroup();
-    $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), ['' => ts('- select -')] + $multipleCustomData, TRUE);
-
+    $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), ['' => ts('- select -')] + $this->getCustomGroups(), TRUE);
     $this->addContactTypeSelector();
   }
 
   /**
-   * Process the uploaded file.
-   *
-   * @return void
+   * @return CRM_Custom_Import_Parser_Api
    */
-  public function postProcess() {
-    $this->storeFormValues([
-      'contactType',
-      'dateFormats',
-      'savedMapping',
-      'multipleCustomData',
-    ]);
-
-    $this->submitFileForMapping('CRM_Custom_Import_Parser_Api', 'multipleCustomData');
+  protected function getParser(): CRM_Custom_Import_Parser_Api {
+    if (!$this->parser) {
+      $this->parser = new CRM_Custom_Import_Parser_Api();
+      $this->parser->setUserJobID($this->getUserJobID());
+      $this->parser->init();
+    }
+    return $this->parser;
   }
 
 }

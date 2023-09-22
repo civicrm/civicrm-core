@@ -16,12 +16,31 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionAVG extends SqlFunction {
 
-  protected static $params = [
-    [
-      'prefix' => ['', 'DISTINCT', 'ALL'],
-      'expr' => 1,
-      'must_be' => ['SqlField'],
-    ],
-  ];
+  protected static $category = self::CATEGORY_AGGREGATE;
+
+  protected static $dataType = 'Float';
+
+  protected static function params(): array {
+    return [
+      [
+        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct')],
+        'must_be' => ['SqlField'],
+      ],
+    ];
+  }
+
+  /**
+   * @return string
+   */
+  public static function getTitle(): string {
+    return ts('Average');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The mean of all values in the grouping.');
+  }
 
 }

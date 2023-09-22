@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -96,7 +94,8 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     }
     // format the addresses according to CIVICRM_ADDRESS_FORMAT (CRM-1327)
     foreach ((array) $rows as $id => $row) {
-      if ($commMethods = CRM_Utils_Array::value('preferred_communication_method', $row)) {
+      $commMethods = $row['preferred_communication_method'] ?? NULL;
+      if ($commMethods) {
         $val = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
         $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
         $temp = [];
@@ -106,7 +105,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
         $row['preferred_communication_method'] = implode(', ', $temp);
       }
       $row['id'] = $id;
-      $formatted = CRM_Utils_Address::format($row, 'mailing_format', FALSE, TRUE, $tokenFields);
+      $formatted = CRM_Utils_Address::formatMailingLabel($row, 'mailing_format', FALSE, TRUE, $tokenFields);
       $rows[$id] = [$formatted];
     }
     if ($isPerMembership) {
@@ -114,6 +113,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       $memberships = civicrm_api3('membership', 'get', [
         'id' => ['IN' => $this->_memberIds],
         'return' => 'contact_id',
+        'options' => ['limit' => 0],
       ]);
       foreach ($memberships['values'] as $id => $membership) {
         if (isset($rows[$membership['contact_id']])) {

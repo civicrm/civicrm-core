@@ -35,10 +35,8 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
    * The functionality for group filtering has been improved but not
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
-   *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = FALSE;
 
@@ -81,11 +79,11 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'no_repeat' => TRUE,
           ],
           'membership_start_date' => [
-            'title' => ts('Start Date'),
+            'title' => ts('Membership Start Date'),
             'default' => TRUE,
           ],
           'membership_end_date' => [
-            'title' => ts('End Date'),
+            'title' => ts('Membership Expiration Date'),
             'default' => TRUE,
           ],
           'owner_membership_id' => [
@@ -93,10 +91,10 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'default' => TRUE,
           ],
           'join_date' => [
-            'title' => ts('Join Date'),
+            'title' => ts('Member Since'),
             'default' => TRUE,
           ],
-          'source' => ['title' => ts('Source')],
+          'source' => ['title' => ts('Membership Source')],
         ],
         'filters' => [
           'membership_join_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
@@ -120,6 +118,18 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'default' => '0',
             'default_weight' => '1',
             'default_order' => 'ASC',
+          ],
+          'status_id' => [
+            'title' => ts('Membership Status'),
+          ],
+          'membership_start_date' => [
+            'title' => ts('Membership Start Date'),
+          ],
+          'membership_end_date' => [
+            'title' => ts('Membership End Date'),
+          ],
+          'contribution_recur_id' => [
+            'title' => ts('Auto-renew'),
           ],
         ],
         'grouping' => 'member-fields',
@@ -180,10 +190,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           'receipt_date' => NULL,
           'fee_amount' => NULL,
           'net_amount' => NULL,
-          'total_amount' => [
-            'title' => ts('Payment Amount (most recent)'),
-            'statistics' => ['sum' => ts('Amount')],
-          ],
+          'total_amount' => NULL,
         ],
         'filters' => [
           'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
@@ -216,12 +223,37 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         ],
         'order_bys' => [
           'receive_date' => [
-            'title' => ts('Date Received'),
+            'title' => ts('Contribution Date'),
             'default_weight' => '2',
             'default_order' => 'DESC',
           ],
         ],
         'grouping' => 'contri-fields',
+      ],
+      'civicrm_contribution_recur' => [
+        'dao' => 'CRM_Contribute_DAO_ContributionRecur',
+        'fields' => [
+          'autorenew_status_id' => [
+            'name' => 'contribution_status_id',
+            'title' => ts('Auto-Renew Subscription Status'),
+          ],
+        ],
+        'filters' => [
+          'autorenew_status_id' => [
+            'name' => 'contribution_status_id',
+            'title' => ts('Auto-Renew Subscription Status?'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => [0 => ts('None'), -1 => ts('Ended')] + CRM_Contribute_BAO_ContributionRecur::buildOptions('contribution_status_id', 'search'),
+            'type' => CRM_Utils_Type::T_INT,
+          ],
+        ],
+        'order_bys' => [
+          'autorenew_status_id' => [
+            'name' => 'contribution_status_id',
+            'title' => ts('Auto-Renew Subscription Status'),
+          ],
+        ],
+        'grouping' => 'member-fields',
       ],
     ] + $this->getAddressColumns([
       // These options are only excluded because they were not previously present.
@@ -243,7 +275,24 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     parent::preProcess();
   }
 
-  public function from() {
+  public function select() {
+    parent::select();
+    if (in_array('civicrm_contribution_recur_autorenew_status_id', $this->_selectAliases)) {
+      // If we're getting auto-renew status we'll want to know if auto-renew has
+      // ended.
+      $this->_selectClauses[] = "{$this->_aliases['civicrm_contribution_recur']}.end_date as civicrm_contribution_recur_end_date";
+      $this->_selectAliases[] = 'civicrm_contribution_recur_end_date';
+      // Regenerate SELECT part of query
+      $this->_select = "SELECT " . implode(', ', $this->_selectClauses) . " ";
+      $this->_columnHeaders["civicrm_contribution_recur_end_date"] = [
+        'title' => NULL,
+        'type' => NULL,
+        'no_display' => TRUE,
+      ];
+    }
+  }
+
+  public function from(): void {
     $this->setFromBase('civicrm_contact');
     $this->_from .= "
          {$this->_aclFrom}
@@ -260,26 +309,101 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
 
     //used when contribution field is selected.
     if ($this->isTableSelected('civicrm_contribution')) {
+      // if we're grouping (by membership), we need to make sure the inner join picks the most recent contribution.
+      $groupedBy = !empty($this->_params['group_bys']['id']);
       $this->_from .= "
              LEFT JOIN civicrm_membership_payment cmp
-                 ON {$this->_aliases['civicrm_membership']}.id = cmp.membership_id
+                 ON ({$this->_aliases['civicrm_membership']}.id = cmp.membership_id";
+      $this->_from .= $groupedBy ? "
+                 AND cmp.id = (SELECT MAX(id) FROM civicrm_membership_payment WHERE civicrm_membership_payment.membership_id = {$this->_aliases['civicrm_membership']}.id))"
+                 : ")";
+      $this->_from .= "
              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                  ON cmp.contribution_id={$this->_aliases['civicrm_contribution']}.id\n";
     }
+    if ($this->isTableSelected('civicrm_contribution_recur')) {
+      $this->_from .= <<<HERESQL
+            LEFT JOIN civicrm_contribution_recur {$this->_aliases['civicrm_contribution_recur']}
+                ON {$this->_aliases['civicrm_membership']}.contribution_recur_id = {$this->_aliases['civicrm_contribution_recur']}.id
+HERESQL;
+    }
   }
 
-  public function getOperationPair($type = "string", $fieldName = NULL) {
+  /**
+   * Override to add handling for autorenew status.
+   */
+  public function whereClause(&$field, $op, $value, $min, $max) {
+    if ($field['dbAlias'] === "{$this->_aliases['civicrm_contribution_recur']}.contribution_status_id") {
+      $clauseParts = [];
+      switch ($op) {
+        case 'in':
+          if ($value !== NULL && is_array($value) && count($value) > 0) {
+            $regularOptions = implode(', ', array_diff($value, [0, -1]));
+            // None: is null
+            if (in_array(0, $value)) {
+              $clauseParts[] = "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL";
+            }
+            // Ended: not null, end_date in past
+            if (in_array(-1, $value)) {
+              $clauseParts[] = <<<HERESQL
+                {$this->_aliases['civicrm_membership']}.contribution_recur_id IS NOT NULL
+                  AND {$this->_aliases['civicrm_contribution_recur']}.end_date < NOW()
+HERESQL;
+            }
+            // Normal statuses: IN()
+            if (!empty($regularOptions)) {
+              $clauseParts[] = "{$this->_aliases['civicrm_contribution_recur']}.contribution_status_id IN ($regularOptions)";
+            }
+            // Double parentheses b/c ORs should be treated as a group
+            return '((' . implode(') OR (', $clauseParts) . '))';
+          }
+          return;
+
+        case 'notin':
+          if ($value !== NULL && is_array($value) && count($value) > 0) {
+            $regularOptions = implode(', ', array_diff($value, [0, -1]));
+            // None: is not null
+            if (in_array(0, $value)) {
+              $clauseParts[] = "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NOT NULL";
+            }
+            // Ended: null or end_date in future
+            if (in_array(-1, $value)) {
+              $clauseParts[] = <<<HERESQL
+                {$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL
+                  OR {$this->_aliases['civicrm_contribution_recur']}.end_date >= NOW()
+                  OR {$this->_aliases['civicrm_contribution_recur']}.end_date IS NULL
+HERESQL;
+            }
+            // Normal statuses: null or NOT IN()
+            if (!empty($regularOptions)) {
+              $clauseParts[] = <<<HERESQL
+                {$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL
+                  OR {$this->_aliases['civicrm_contribution_recur']}.contribution_status_id NOT IN ($regularOptions)
+HERESQL;
+            }
+            return '(' . implode(') AND (', $clauseParts) . ')';
+          }
+          return;
+
+        case 'nll':
+          return "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL";
+
+        case 'nnll':
+          return "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NOT NULL";
+      }
+    }
+    else {
+      return parent::whereClause($field, $op, $value, $min, $max);
+    }
+  }
+
+  public function getOperationPair($type = 'string', $fieldName = NULL) {
     //re-name IS NULL/IS NOT NULL for clarity
-    if ($fieldName == 'owner_membership_id') {
+    if ($fieldName === 'owner_membership_id') {
       $result = [];
+      $result[''] = ts('Any');
       $result['nll'] = ts('Primary members only');
       $result['nnll'] = ts('Non-primary members only');
-      $options = parent::getOperationPair($type, $fieldName);
-      foreach ($options as $key => $label) {
-        if (!array_key_exists($key, $result)) {
-          $result[$key] = $label;
-        }
-      }
     }
     else {
       $result = parent::getOperationPair($type, $fieldName);
@@ -296,13 +420,9 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
    * @param array $rows
    *   Rows generated by SQL, with an array for each row.
    */
-  public function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows): void {
     $entryFound = FALSE;
     $checkList = [];
-
-    $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
-    $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     $repeatFound = FALSE;
     foreach ($rows as $rowNum => $row) {
@@ -312,7 +432,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         unset($checkList);
         $checkList = [];
       }
-      if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
+      if (!empty($this->_noRepeats) && $this->_outputMode !== 'csv') {
         // not repeat contact display names if it matches with the one
         // in previous row
         foreach ($row as $colName => $colVal) {
@@ -323,10 +443,10 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
               (!empty($checkList[$colName]) &&
               in_array($colVal, $checkList[$colName]))
               ) {
-              $rows[$rowNum][$colName] = "";
+              $rows[$rowNum][$colName] = '';
               // CRM-15917: Don't blank the name if it's a different contact
-              if ($colName == 'civicrm_contact_exposed_id') {
-                $rows[$rowNum]['civicrm_contact_sort_name'] = "";
+              if ($colName === 'civicrm_contact_exposed_id') {
+                $rows[$rowNum]['civicrm_contact_sort_name'] = '';
               }
               $repeatFound = $rowNum;
             }
@@ -357,16 +477,28 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_financial_type_id', $row)) {
-        $rows[$rowNum]['civicrm_contribution_financial_type_id'] = $contributionTypes[$value];
+      $value = $row['civicrm_contribution_financial_type_id'] ?? NULL;
+      if ($value) {
+        $rows[$rowNum]['civicrm_contribution_financial_type_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'financial_type_id', $value);
         $entryFound = TRUE;
       }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
-        $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatus[$value];
+      $value = $row['civicrm_contribution_contribution_status_id'] ?? NULL;
+      if ($value) {
+        $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $value);
         $entryFound = TRUE;
       }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_payment_instrument_id', $row)) {
-        $rows[$rowNum]['civicrm_contribution_payment_instrument_id'] = $paymentInstruments[$value];
+      $value = $row['civicrm_contribution_payment_instrument_id'] ?? NULL;
+      if ($value) {
+        $rows[$rowNum]['civicrm_contribution_payment_instrument_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $value);
+        $entryFound = TRUE;
+      }
+      if ($value = $row['civicrm_contribution_recur_autorenew_status_id'] ?? NULL) {
+        $rows[$rowNum]['civicrm_contribution_recur_autorenew_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $value);
+        if (!empty($row['civicrm_contribution_recur_end_date'])
+          && strtotime($row['civicrm_contribution_recur_end_date']) < time()) {
+          $ended = ts('ended');
+          $rows[$rowNum]['civicrm_contribution_recur_autorenew_status_id'] .= " ($ended)";
+        }
         $entryFound = TRUE;
       }
 

@@ -10,7 +10,8 @@
  */
 
 /**
- * Upgrade logic for FiveTwentySix */
+ * Upgrade logic for FiveTwentySix
+ */
 class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_Base {
 
   /**
@@ -55,12 +56,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_
     }
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
-
   /**
    * Upgrade function.
    *
@@ -81,7 +76,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_
   /**
    * Update workflow_name based on workflow_id values.
    */
-  public function populateWorkflowName() {
+  public static function populateWorkflowName() {
     CRM_Core_DAO::executeQuery('UPDATE civicrm_msg_template
       LEFT JOIN  civicrm_option_value ov ON ov.id = workflow_id
       SET workflow_name = ov.name'

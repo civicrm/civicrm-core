@@ -12,6 +12,9 @@
     <title>Extension ID</title>
     <required>true</required>
     <comment>Local Extension ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.2</add>
   </field>
   <primaryKey>
@@ -95,6 +98,10 @@
     <type>boolean</type>
     <title>Extension is Active?</title>
     <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Is this extension active?</comment>
     <add>4.2</add>
   </field>

@@ -6,20 +6,16 @@
  */
 class CRM_Utils_AddressTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function testAddressFormat() {
-    $contact = $this->callAPISuccess('contact', 'create', [
+  public function testAddressFormat(): void {
+    $contact = $this->callAPISuccess('Contact', 'create', [
       'first_name' => 'Micky',
       'last_name' => 'mouse',
       'contact_type' => 'Individual',
     ]);
-    $address = $this->callAPISuccess('address', 'create', [
+    $address = $this->callAPISuccess('Address', 'create', [
       'street_address' => '1 Happy Place',
       'city' => 'Miami',
-      'state_province' => 'Flordia',
+      'state_province' => 'Florida',
       'country' => 'United States',
       'postal_code' => 33101,
       'contact_id' => $contact['id'],
@@ -29,7 +25,7 @@ class CRM_Utils_AddressTest extends CiviUnitTestCase {
     $addressDetails = $address['values'][$address['id']];
     $countries = CRM_Core_PseudoConstant::country();
     $addressDetails['country'] = $countries[$addressDetails['country_id']];
-    $formatted_address = CRM_Utils_Address::format($addressDetails, 'mailing_format', FALSE, TRUE);
+    $formatted_address = CRM_Utils_Address::formatMailingLabel($addressDetails);
     $this->assertTrue((bool) strstr($formatted_address, 'UNITED STATES'));
   }
 
@@ -37,7 +33,7 @@ class CRM_Utils_AddressTest extends CiviUnitTestCase {
    * Test state/province field's state_province_name token on getFormattedBillingAddressFieldsFromParameters
    * and test using alternate names for state_province field
    */
-  public function testStateProvinceFormattedBillingAddress() {
+  public function testStateProvinceFormattedBillingAddress(): void {
     $params = [
       'billing_street_address-99' => '123 Happy Place',
       'billing_city-99' => 'Miami',
@@ -47,25 +43,25 @@ class CRM_Utils_AddressTest extends CiviUnitTestCase {
       'country-99' => 'United States',
     ];
 
-    // set address_format (we are only interested in state_province & state_province_name)
+    // Set address_format (we are only interested in state_province & state_province_name).
     $addFormat = '{contact.state_province}';
     Civi::settings()->set('address_format', $addFormat);
     $formatted_address = CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params, '99');
-    $this->assertTrue((bool) $formatted_address == 'AL');
+    $this->assertEquals("AL\n", $formatted_address);
 
     $addFormat = '{contact.state_province_name}';
     Civi::settings()->set('address_format', $addFormat);
     $formatted_address = CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params, '99');
-    $this->assertTrue((bool) $formatted_address == 'Alabama');
+    $this->assertEquals("Alabama\n", $formatted_address);
 
-    // test using alternate names for state/province field
+    // Test using alternate names for state/province field.
     unset($params['state_province-99']);
-    // alternate name 1
+    // Alternate name 1.
     $params['billing_state_province-99'] = '1000';
     $addFormat = '{contact.state_province_name}';
     Civi::settings()->set('address_format', $addFormat);
     $formatted_address = CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params, '99');
-    $this->assertTrue((bool) $formatted_address == 'Alabama');
+    $this->assertEquals("Alabama\n", $formatted_address);
 
     unset($params['state_province-99']);
     // alternate name 2
@@ -73,7 +69,7 @@ class CRM_Utils_AddressTest extends CiviUnitTestCase {
     $addFormat = '{contact.state_province_name}';
     Civi::settings()->set('address_format', $addFormat);
     $formatted_address = CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params, '99');
-    $this->assertTrue((bool) $formatted_address == 'Alabama');
+    $this->assertEquals("Alabama\n", $formatted_address);
   }
 
 }

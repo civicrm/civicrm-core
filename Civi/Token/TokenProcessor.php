@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Token;
 
+use Brick\Money\Money;
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenRenderEvent;
 use Civi\Token\Event\TokenValueEvent;
@@ -49,12 +50,15 @@ class TokenProcessor {
    *
    *   - controller: string, the class which is managing the mail-merge.
    *   - smarty: bool, whether to enable smarty support.
+   *   - smartyTokenAlias: array, Define Smarty variables that are populated
+   *      based on token-content. Ex: ['theInvoiceId' => 'contribution.invoice_id']
    *   - contactId: int, the main person/org discussed in the message.
    *   - contact: array, the main person/org discussed in the message.
    *     (Optional for performance tweaking; if omitted, will load
    *     automatically from contactId.)
    *   - actionSchedule: DAO, the rule which triggered the mailing
    *     [for CRM_Core_BAO_ActionScheduler].
+   *   - locale: string, the name of a locale (eg 'fr_CA') to use for {ts} strings in the view.
    *   - schema: array, a list of fields that will be provided for each row.
    *     This is automatically populated with any general context
    *     keys, but you may need to add extra keys for token-row data.
@@ -112,7 +116,7 @@ class TokenProcessor {
   protected $next = 0;
 
   /**
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @param \Civi\Core\CiviEventDispatcher $dispatcher
    * @param array $context
    */
   public function __construct($dispatcher, $context) {
@@ -121,6 +125,17 @@ class TokenProcessor {
       : array_keys($context);
     $this->dispatcher = $dispatcher;
     $this->context = $context;
+  }
+
+  /**
+   * Add new elements to the field schema.
+   *
+   * @param string|string[] $fieldNames
+   * @return TokenProcessor
+   */
+  public function addSchema($fieldNames) {
+    $this->context['schema'] = array_unique(array_merge($this->context['schema'], (array) $fieldNames));
+    return $this;
   }
 
   /**
@@ -135,10 +150,14 @@ class TokenProcessor {
    * @return TokenProcessor
    */
   public function addMessage($name, $value, $format) {
+    $tokens = [];
+    $this->visitTokens($value ?: '', function (?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use (&$tokens) {
+      $tokens[$entity][] = $field;
+    });
     $this->messages[$name] = [
       'string' => $value,
       'format' => $format,
-      'tokens' => \CRM_Utils_Token::getTokens($value),
+      'tokens' => $tokens,
     ];
     return $this;
   }
@@ -146,7 +165,7 @@ class TokenProcessor {
   /**
    * Add a row of data.
    *
-   * @param array|NULL $context
+   * @param array|null $context
    *   Optionally, initialize the context for this row.
    *   Ex: ['contact_id' => 123].
    * @return TokenRow
@@ -255,7 +274,7 @@ class TokenProcessor {
    *   Each row is presented with a fluent, OOP facade.
    */
   public function getRows() {
-    return new TokenRowIterator($this, new \ArrayIterator($this->rowContexts));
+    return new TokenRowIterator($this, new \ArrayIterator($this->rowContexts ?: []));
   }
 
   /**
@@ -264,7 +283,7 @@ class TokenProcessor {
    *
    * @param string $field
    *   Ex: 'contactId'.
-   * @param string|NULL $subfield
+   * @param string|null $subfield
    * @return array
    *   Ex: [12, 34, 56].
    */
@@ -351,34 +370,145 @@ class TokenProcessor {
       $row = $this->getRow($row);
     }
 
+    $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
+
     $message = $this->getMessage($name);
     $row->fill($message['format']);
     $useSmarty = !empty($row->context['smarty']);
 
-    /**
-     *@FIXME preg_callback.
-     */
     $tokens = $this->rowValues[$row->tokenRow][$message['format']];
-    $flatTokens = [];
-    \CRM_Utils_Array::flatten($tokens, $flatTokens, '', '.');
-    $filteredTokens = [];
-    foreach ($flatTokens as $k => $v) {
-      $filteredTokens['{' . $k . '}'] = ($useSmarty ? \CRM_Utils_Token::tokenEscapeSmarty($v) : $v);
-    }
+    $getToken = function(?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use ($tokens, $useSmarty, $row, $message) {
+      if (isset($tokens[$entity][$field])) {
+        $v = $tokens[$entity][$field];
+        $v = $this->filterTokenValue($v, $modifier, $row, $message['format']);
+        if ($useSmarty) {
+          $v = \CRM_Utils_Token::tokenEscapeSmarty($v);
+        }
+        return $v;
+      }
+      return $fullToken;
+    };
 
     $event = new TokenRenderEvent($this);
     $event->message = $message;
     $event->context = $row->context;
     $event->row = $row;
-    $event->string = strtr($message['string'], $filteredTokens);
+    $event->string = $this->visitTokens($message['string'] ?? '', $getToken);
     $this->dispatcher->dispatch('civi.token.render', $event);
     return $event->string;
+  }
+
+  /**
+   * Examine a token string and filter each token expression.
+   *
+   * @internal
+   *   This function is only intended for use within civicrm-core. The name/location/callback-signature may change.
+   * @param string $expression
+   *   Ex: 'Hello {foo.bar} and {whiz.bang|filter:"arg"}!'
+   * @param callable $callback
+   *   A function which visits (and substitutes) each token.
+   *   function(?string $fullToken, ?string $entity, ?string $field, ?array $modifier)
+   * @return string
+   */
+  public function visitTokens(string $expression, callable $callback): string {
+    // Regex examples: '{foo.bar}', '{foo.bar|whiz}', '{foo.bar|whiz:"bang"}', '{foo.bar|whiz:"bang":"bang"}'
+    // Regex counter-examples: '{foobar}', '{foo bar}', '{$foo.bar}', '{$foo.bar|whiz}', '{foo.bar|whiz{bang}}'
+    // Key observations: Civi tokens MUST have a `.` and MUST NOT have a `$`. Civi filters MUST NOT have `{}`s or `$`s.
+
+    static $fullRegex = NULL;
+    if ($fullRegex === NULL) {
+      // The regex is a bit complicated, we so break it down into fragments.
+      // Consider the example '{foo.bar|whiz:"bang":"bang"}'. Each fragment matches the following:
+
+      $tokenRegex = '([\w]+)\.([\w:\.]+)'; /* MATCHES: 'foo.bar' */
+      $filterArgRegex = ':[\w": %\-_()\[\]\+/#@!,\.\?]*'; /* MATCHES: ':"bang":"bang"' */
+      // Key rule of filterArgRegex is to prohibit '{}'s because they may parse ambiguously. So you *might* relax it to:
+      // $filterArgRegex = ':[^{}\n]*'; /* MATCHES: ':"bang":"bang"' */
+      $filterNameRegex = "\w+"; /* MATCHES: 'whiz' */
+      $filterRegex = "\|($filterNameRegex(?:$filterArgRegex)?)"; /* MATCHES: '|whiz:"bang":"bang"' */
+      $fullRegex = ";\{$tokenRegex(?:$filterRegex)?\};";
+    }
+    return preg_replace_callback($fullRegex, function($m) use ($callback) {
+      $filterParts = NULL;
+      if (isset($m[3])) {
+        $filterParts = [];
+        $enqueue = function($m) use (&$filterParts) {
+          $filterParts[] = $m[1];
+          return '';
+        };
+        $unmatched = preg_replace_callback_array([
+          '/^(\w+)/' => $enqueue,
+          '/:"([^"]+)"/' => $enqueue,
+        ], $m[3]);
+        if ($unmatched) {
+          throw new \CRM_Core_Exception('Malformed token parameters (' . $m[0] . ')');
+        }
+      }
+      return $callback($m[0] ?? NULL, $m[1] ?? NULL, $m[2] ?? NULL, $filterParts);
+    }, $expression);
+  }
+
+  /**
+   * Given a token value, run it through any filters.
+   *
+   * @param mixed $value
+   *   Raw token value (e.g. from `$row->tokens['foo']['bar']`).
+   * @param array|null $filter
+   * @param TokenRow $row
+   *   The current target/row.
+   * @param string $messageFormat
+   *   Ex: 'text/plain' or 'text/html'
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private function filterTokenValue($value, ?array $filter, TokenRow $row, string $messageFormat) {
+    // KISS demonstration. This should change... e.g. provide a filter-registry or reuse Smarty's registry...
+
+    if ($value instanceof \DateTime && $filter === NULL) {
+      $filter = ['crmDate'];
+      if ($value->format('His') === '000000') {
+        // if time is 'midnight' default to just date.
+        $filter[1] = 'Full';
+      }
+    }
+
+    // TODO: Move this to StandardFilters
+    if ($value instanceof Money) {
+      switch ($filter[0] ?? NULL) {
+        case NULL:
+        case 'crmMoney':
+          return \Civi::format()->money($value->getAmount(), $value->getCurrency(), $filter[1] ?? NULL);
+
+        case 'boolean':
+          // We resolve boolean to 0 or 1 or smarty chokes on FALSE.
+          return (int) $value->getAmount()->isGreaterThan(0);
+
+        case 'raw':
+          return $value->getAmount();
+
+        default:
+          throw new \CRM_Core_Exception('Invalid token filter: ' . json_encode($filter, JSON_UNESCAPED_SLASHES));
+      }
+    }
+
+    if (!isset($filter[0])) {
+      return $value;
+    }
+    elseif (is_callable([StandardFilters::class, $filter[0]])) {
+      return call_user_func([StandardFilters::class, $filter[0]], $value, $filter, $messageFormat);
+    }
+    else {
+      throw new \CRM_Core_Exception('Invalid token filter: ' . json_encode($filter, JSON_UNESCAPED_SLASHES));
+    }
   }
 
 }
 
 class TokenRowIterator extends \IteratorIterator {
 
+  /**
+   * @var \Civi\Token\TokenProcessor
+   */
   protected $tokenProcessor;
 
   /**
@@ -391,6 +521,7 @@ class TokenRowIterator extends \IteratorIterator {
     $this->tokenProcessor = $tokenProcessor;
   }
 
+  #[\ReturnTypeWillChange]
   public function current() {
     return new TokenRow($this->tokenProcessor, parent::key());
   }

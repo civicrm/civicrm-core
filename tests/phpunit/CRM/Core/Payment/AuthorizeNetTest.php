@@ -17,38 +17,37 @@ use Civi\Payment\PropertyBag;
  */
 class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
-  use \Civi\Test\GuzzleTestTrait;
+  use CRM_Core_Payment_AuthorizeNetTrait;
 
   /**
-   * @var \CRM_Core_Payment_AuthorizeNet
+   * @var int
    */
-  protected $processor;
+  protected $paymentProcessorID;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
-    $this->_paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate();
+    $this->paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate();
 
-    $this->processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
-    $this->_financialTypeId = 1;
+    $this->processor = Civi\Payment\System::singleton()->getById($this->paymentProcessorID);
 
     // for some strange unknown reason, in batch mode this value gets set to null
     // so crude hack here to avoid an exception and hence an error
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = [];
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**
    * Test doing a one-off payment.
    *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
+   * @throws \CRM_Core_Exception
    */
-  public function testSinglePayment() {
-    $this->createMockHandler([$this->getExpectedSinglePaymentResponse()]);
-    $this->setUpClientWithHistoryContainer();
-    $this->processor->setGuzzleClient($this->getGuzzleClient());
+  public function testSinglePayment(): void {
+    $this->setupMockHandler();
     $params = $this->getBillingParams();
     $params['amount'] = 5.24;
     $this->processor->doPayment($params);
@@ -56,32 +55,13 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   }
 
   /**
-   * Get the expected response from Authorize.net.
-   *
-   * @return string
-   */
-  public function getExpectedSinglePaymentResponse() {
-    return '"1","1","1","(TESTMODE) This transaction has been approved.","000000","P","0","","","5.24","CC","auth_capture","","John","O&#39;Connor","","","","","","","","","","","","","","","","","","","","","","","",""';
-  }
-
-  /**
-   *  Get the expected request from Authorize.net.
-   *
-   * @return string
-   */
-  public function getExpectedSinglePaymentRequest() {
-    return 'x_login=4y5BfuW7jm&x_tran_key=4cAmW927n8uLf5J8&x_email_customer=&x_first_name=John&x_last_name=O%27Connor&x_address=&x_city=&x_state=&x_zip=&x_country=&x_customer_ip=&x_email=&x_invoice_num=&x_amount=5.24&x_currency_code=&x_description=&x_cust_id=&x_relay_response=FALSE&x_delim_data=TRUE&x_delim_char=%2C&x_encap_char=%22&x_card_num=4444333322221111&x_card_code=123&x_exp_date=10%2F2022&x_test_request=TRUE';
-  }
-
-  /**
    * Create a single post dated payment as a recurring transaction.
    *
    * Test works but not both due to some form of caching going on in the SmartySingleton
    */
-  public function testCreateSingleNowDated() {
-    $this->createMockHandler([$this->getExpectedResponse()]);
-    $this->setUpClientWithHistoryContainer();
-    $this->processor->setGuzzleClient($this->getGuzzleClient());
+  public function testCreateSingleNowDated(): void {
+    $this->isRecur = TRUE;
+    $this->setupMockHandler();
     $firstName = 'John';
     $lastName = "O\'Connor";
     $nameParams = ['first_name' => 'John', 'last_name' => $lastName];
@@ -102,7 +82,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'invoice_id' => $invoiceID,
       'contribution_status_id' => 2,
       'is_test' => 1,
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->paymentProcessorID,
     ]);
 
     $contribution = $this->callAPISuccess('Contribution', 'create', [
@@ -121,17 +101,16 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     $params = array_merge($billingParams, [
       'qfKey' => '08ed21c7ca00a1f7d32fff2488596ef7_4454',
-      'hidden_CreditCard' => 1,
       'is_recur' => 1,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => 12,
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => 1,
       'is_email_receipt' => 1,
       'from_email_address' => 'john.smith@example.com',
       'receive_date' => date('Ymd'),
       'receipt_date_time' => '',
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->paymentProcessorID,
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',
@@ -172,7 +151,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'email' => 'john.smith@example.com',
       'contactID' => $contactId,
       'contributionID' => $contribution['id'],
-      'contributionTypeID' => $this->_financialTypeId,
       'contributionRecurID' => $recur['id'],
     ]);
 
@@ -202,10 +180,9 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   /**
    * Create a single post dated payment as a recurring transaction.
    */
-  public function testCreateSinglePostDated() {
-    $this->createMockHandler([$this->getExpectedResponse()]);
-    $this->setUpClientWithHistoryContainer();
-    $this->processor->setGuzzleClient($this->getGuzzleClient());
+  public function testCreateSinglePostDated(): void {
+    $this->isRecur = TRUE;
+    $this->setupMockHandler();
     $start_date = date('Ymd', strtotime('+ 1 week'));
 
     $firstName = 'John';
@@ -228,13 +205,13 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'invoice_id' => $invoiceID,
       'contribution_status_id' => '',
       'is_test' => 1,
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->paymentProcessorID,
     ];
     $recur = $this->callAPISuccess('ContributionRecur', 'create', $contributionRecurParams);
 
     $contributionParams = [
       'contact_id' => $contactId,
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => 1,
       'receive_date' => $start_date,
       'total_amount' => $amount,
       'invoice_id' => $invoiceID,
@@ -248,7 +225,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     $params = [
       'qfKey' => '00ed21c7ca00a1f7d555555596ef7_4454',
-      'hidden_CreditCard' => 1,
       'billing_first_name' => $firstName,
       'billing_middle_name' => '',
       'billing_last_name' => $lastName,
@@ -268,12 +244,12 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => 3,
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => 1,
       'is_email_receipt' => 1,
       'from_email_address' => "{$firstName}.{$lastName}@example.com",
       'receive_date' => $start_date,
       'receipt_date_time' => '',
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => $this->paymentProcessorID,
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',
@@ -329,7 +305,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     );
 
     $response = $this->getResponseBodies();
-    $this->assertEquals($this->getExpectedResponse(), $response[0], 3);
+    $this->assertEquals($this->getExpectedRecurResponse(), $response[0], 3);
     $requests = $this->getRequestBodies();
     $this->assertEquals($this->getExpectedRequest($contactId, date('Y-m-d', strtotime($start_date)), 70.23, 3, 4007000000027, '2022-10'), $requests[0]);
   }
@@ -393,15 +369,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   }
 
   /**
-   * Get a successful response to setting up a recurring.
-   *
-   * @return string
-   */
-  public function getExpectedResponse() {
-    return '﻿<?xml version="1.0" encoding="utf-8"?><ARBCreateSubscriptionResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd"><refId>8d468ca1b1dd5c2b56c7</refId><messages><resultCode>Ok</resultCode><message><code>I00001</code><text>Successful.</text></message></messages><subscriptionId>6632052</subscriptionId><profile><customerProfileId>1512023280</customerProfileId><customerPaymentProfileId>1512027350</customerPaymentProfileId></profile></ARBCreateSubscriptionResponse>';
-  }
-
-  /**
    * Get some basic billing parameters.
    *
    * @return array
@@ -431,7 +398,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   /**
    * Test the update billing function.
    */
-  public function testUpdateBilling() {
+  public function testUpdateBilling(): void {
     $this->setUpClient($this->getExpectedUpdateResponse());
     $params = [
       'qfKey' => '52e3078a34158a80b18d0e3c690c5b9f_2369',
@@ -468,7 +435,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function testChangeSubscription() {
+  public function testChangeSubscription(): void {
     $this->setUpClient($this->getExpectedUpdateResponse());
     $params = [
       'hidden_custom' => '1',
@@ -610,7 +577,7 @@ Content-Length: 492
   /**
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function testCancelRecurring() {
+  public function testCancelRecurring(): void {
     $this->setUpClient($this->getExpectedCancelResponse());
     $propertyBag = new PropertyBag();
     $propertyBag->setContributionRecurID(9);

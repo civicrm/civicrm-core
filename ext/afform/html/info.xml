@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<extension key="org.civicrm.afform-html" type="module">
+  <file>afform_html</file>
+  <name>Form Code Editor</name>
+  <description>Tool for developers to edit afform html code</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Tim Otten</author>
+    <email>totten@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/dev-afform</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2020-01-09</releaseDate>
+  <version>5.67.alpha1</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>5.67</ver>
+  </compatibility>
+  <requires>
+    <ext>org.civicrm.afform</ext>
+  </requires>
+  <comments>This extension is experimental and has limited functionality.</comments>
+  <mixins>
+    <mixin>ang-php@1.0.0</mixin>
+  </mixins>
+  <civix>
+    <namespace>CRM/AfformHtml</namespace>
+    <format>22.10.0</format>
+  </civix>
+</extension>

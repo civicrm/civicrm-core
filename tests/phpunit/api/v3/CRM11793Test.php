@@ -18,7 +18,7 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->individualCreate();
@@ -26,7 +26,7 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
     $this->organizationCreate();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
   }
 
@@ -36,15 +36,15 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
    * Verify that attempt to create individual contact with only
    * first and last names succeeds
    */
-  public function testCRM11793Organization() {
+  public function testCRM11793Organization(): void {
     $this->_testCRM11793ContactType('Organization');
   }
 
-  public function testCRM11793Household() {
+  public function testCRM11793Household(): void {
     $this->_testCRM11793ContactType('Household');
   }
 
-  public function testCRM11793Individual() {
+  public function testCRM11793Individual(): void {
     $this->_testCRM11793ContactType('Individual');
   }
 

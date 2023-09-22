@@ -10,16 +10,17 @@
 {if empty($tagsetType)}
   {assign var="tagsetType" value="contact"}
 {/if}
-{if $tableLayout}
+{if !empty($tableLayout)}
   <td colspan="2" class="crm-content-block">
     <table>
 {/if}
+   {if !empty($tagsetInfo)}
     {foreach from=$tagsetInfo.$tagsetType item=tagset}
       {assign var="elemName" value=$tagset.tagsetElementName}
       {if empty($tagsetElementName) or $tagsetElementName eq $elemName}
         {assign var="parID" value=$tagset.parentID}
         {assign var="skipEntityAction" value=$tagset.skipEntityAction}
-        {if $tableLayout}
+        {if !empty($tableLayout)}
           <tr>
             <td class="label">
               {$form.$elemName.$parID.label}
@@ -38,12 +39,13 @@
         {/if}
       {/if}
     {/foreach}
-{if $tableLayout}
+    {/if}
+{if !empty($tableLayout)}
     </table>
   </td>
 {/if}
 
-{if !$skipEntityAction and empty($form.frozen)}
+{if !empty($tagsetInfo) and empty($skipEntityAction) and empty($form.frozen)}
   <script type="text/javascript">
     {* Add/remove entity tags via ajax api *}
     {literal}

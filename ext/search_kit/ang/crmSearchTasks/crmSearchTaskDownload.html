@@ -1,0 +1,27 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form ng-controller="crmSearchTaskDownload as $ctrl">
+    <p>
+      <strong ng-if="$ctrl.ids.length">{{:: ts('Download %1 %2', {1: $ctrl.ids.length, 2: $ctrl.entityTitle}) }}</strong>
+      <strong ng-if="!$ctrl.ids.length">{{:: ts('Download %1 %2', {1: $ctrl.taskManager.getRowCount(), 2: $ctrl.entityTitle}) }}</strong>
+    </p>
+    <div class="form-inline">
+      <label for="crmSearchTaskDownload-format">{{:: ts('Format') }}</label>
+      <select id="crmSearchTaskDownload-format" class="form-control" ng-model="$ctrl.format">
+        <option value="csv">{{:: ts('Generic Spreadsheet (.csv)') }}</option>
+        <option value="xlsx">{{:: ts('Microsoft Excel (.xlsx)') }}</option>
+        <option value="ods">{{:: ts('OpenDocument Spreadsheet (.ods)') }}</option>
+        <option value="pdf">{{:: ts('PDF Document (.pdf)') }}</option>
+      </select>
+    </div>
+    <hr />
+    <div ng-if="$ctrl.progress !== null" class="crm-search-task-progress">
+      <h5>{{:: ts('Downloading...') }}</h5>
+      <div class="progress">
+        <div class="progress-bar progress-bar-striped active" role="progressbar" ng-style="{width: '' + $ctrl.progress + '%'}"></div>
+      </div>
+    </div>
+
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" ></crm-dialog-button>
+    <crm-dialog-button text="ts('Download')" icons="{primary: $ctrl.run ? 'fa-spin fa-spinner' : 'fa-download'}" on-click="$ctrl.download()" disabled="$ctrl.run" ></crm-dialog-button>
+  </form>
+</div>

@@ -44,17 +44,17 @@
         </tr>
         </thead>
         {foreach from=$rows item=row}
-        <tr id="relationship_type-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if} crm-relationship">
+        <tr id="relationship_type-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if} crm-relationship">
             <td class="crm-relationship-label_a_b crm-editable" data-field="label_a_b">{$row.label_a_b}</td>
             <td class="crm-relationship-label_b_a crm-editable" data-field="label_b_a">{$row.label_b_a}</td>
             <td class="crm-relationship-contact_type_a_display">
                 {if $row.contact_type_a_display} {$row.contact_type_a_display}
-                {if $row.contact_sub_type_a} - {$row.contact_sub_type_a} {/if}{else} {ts}All Contacts{/ts} {/if} </td>
+                {if !empty($row.contact_sub_type_a)} - {$row.contact_sub_type_a} {/if}{else} {ts}All Contacts{/ts} {/if} </td>
             <td class="crm-relationship-contact_type_b_display">
                 {if $row.contact_type_b_display} {$row.contact_type_b_display}
-                {if $row.contact_sub_type_b} - {$row.contact_sub_type_b}{/if} {else} {ts}All Contacts{/ts} {/if} </td>
+                {if !empty($row.contact_sub_type_b)} - {$row.contact_sub_type_b}{/if} {else} {ts}All Contacts{/ts} {/if} </td>
             <td class="crm-relationship-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td>{$row.action|replace:'xx':$row.id}</td>
+            <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </table>

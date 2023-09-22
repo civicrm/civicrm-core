@@ -20,6 +20,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   protected $_phoneField = FALSE;
   protected $_tempTableName;
   protected $_tempDurationSumTableName;
+  protected $totalRows;
 
   /**
    * This report has not been optimised for group filtering.
@@ -28,9 +29,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -363,7 +363,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+          if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
@@ -427,6 +427,10 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       }
       $this->_select .= ", $clause ";
     }
+
+    CRM_Core_DAO::disableFullGroupByMode();
+    $this->totalRows = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM ({$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy}) temp");
+    CRM_Core_DAO::reenableFullGroupByMode();
 
     if ($applyLimit && empty($this->_params['charts'])) {
       $this->limit();
@@ -496,6 +500,17 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   }
 
   /**
+   * Set pager.
+   *
+   * @param int|null $rowCount
+   */
+  public function setPager($rowCount = NULL) {
+    $rowCount = $rowCount ?? $this->getRowCount();
+    $this->_rowsFound = $this->totalRows;
+    parent::setPager($rowCount);
+  }
+
+  /**
    * Group the fields.
    *
    * @param bool $includeSelectCol
@@ -546,7 +561,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */
@@ -587,7 +602,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */

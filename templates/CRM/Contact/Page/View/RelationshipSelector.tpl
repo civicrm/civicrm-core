@@ -8,8 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* entity selector *}
-{crmRegion name="crm-contact-relationshipselector-pre"}
-{/crmRegion}
+{crmRegion name="crm-contact-relationshipselector-pre"}{/crmRegion}
 <div class="crm-contact-{$entityInClassFormat}-{$context}">
   <table
     class="crm-contact-{$entityInClassFormat}-selector-{$context} crm-ajax-table"

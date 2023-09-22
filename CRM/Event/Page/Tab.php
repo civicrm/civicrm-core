@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Event_Page_Tab extends CRM_Core_Page {
 
@@ -120,11 +118,11 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
-    if ($context == 'standalone') {
+    if (($context == 'standalone' || $context === 'search') && ($this->_action !== CRM_Core_Action::VIEW && $this->_action !== CRM_Core_Action::UPDATE)) {
       $this->_action = CRM_Core_Action::ADD;
     }
     else {
-      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
       $this->assign('contactId', $this->_contactId);
 
       // check logged in url permission
@@ -289,7 +287,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
       );
       $controller->setEmbedded(TRUE);
       $controller->set('force', 1);
-      $controller->set('cid', $this->_contactId);
+      $controller->set('skip_cid', TRUE);
       $controller->set('participantId', $this->_id);
       $controller->set('context', 'contribution');
       $controller->process();

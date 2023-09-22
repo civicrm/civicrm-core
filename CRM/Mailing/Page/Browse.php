@@ -17,7 +17,7 @@
 
 /**
  * This implements the profile page for all contacts. It uses a selector
- * object to do the actual dispay. The fields displayd are controlled by
+ * object to do the actual display. The fields displayed are controlled by
  * the admin
  */
 class CRM_Mailing_Page_Browse extends CRM_Core_Page {
@@ -105,45 +105,36 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     if (CRM_Core_Permission::check('access CiviMail')) {
       $archiveLinks = TRUE;
     }
-    if ($archiveLinks == TRUE) {
-      $this->assign('archiveLinks', $archiveLinks);
-    }
+    $this->assign('archiveLinks', $archiveLinks ?? FALSE);
   }
 
   /**
    * Run this page (figure out the action needed and perform it).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function run() {
     $this->preProcess();
 
-    $newArgs = func_get_args();
-    // since we want only first function argument
-    $newArgs = $newArgs[0];
-    $this->_isArchived = $this->isArchived($newArgs);
-    if (isset($_GET['runJobs']) || CRM_Utils_Array::value('2', $newArgs) == 'queue') {
-      $mailerJobSize = Civi::settings()->get('mailerJobSize');
-      CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize);
-      CRM_Mailing_BAO_MailingJob::runJobs();
-      CRM_Mailing_BAO_MailingJob::runJobs_post();
-    }
+    $newArgs = func_get_args()[0];
 
     $this->_sortByCharacter
       = CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
 
-    // CRM-11920 all should set sortByCharacter to null, not empty string
-    if (strtolower($this->_sortByCharacter) == 'all' || !empty($_POST)) {
+    // CRM-11920 "all" should set sortByCharacter to null, not empty string
+    if (strtolower($this->_sortByCharacter ?: '') === 'all' || !empty($_POST)) {
       $this->_sortByCharacter = NULL;
       $this->set('sortByCharacter', NULL);
     }
 
-    if (CRM_Utils_Array::value(3, $newArgs) == 'unscheduled') {
+    if (($newArgs[3] ?? NULL) === 'unscheduled') {
       $this->_unscheduled = TRUE;
     }
     $this->set('unscheduled', $this->_unscheduled);
 
     $this->set('archived', $this->isArchived($newArgs));
 
-    if (CRM_Utils_Array::value(3, $newArgs) == 'scheduled') {
+    if (($newArgs[3] ?? NULL) === 'scheduled') {
       $this->_scheduled = TRUE;
     }
     $this->set('scheduled', $this->_scheduled);
@@ -199,7 +190,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
           CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
         }
 
-        CRM_Mailing_BAO_Mailing::del($this->_mailingId);
+        CRM_Mailing_BAO_Mailing::deleteRecord(['id' => $this->_mailingId]);
+        CRM_Core_Session::setStatus(ts('Selected mailing has been deleted.'), ts('Deleted'), 'success');
         CRM_Utils_System::redirect($context);
       }
       else {
@@ -243,17 +235,15 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $controller->setEmbedded(TRUE);
     $controller->run();
 
-    // hack to display results as per search
-    $rows = $controller->getRows($controller);
-
-    $this->assign('rows', $rows);
+    $this->assign('unscheduled', FALSE);
+    $this->assign('archived', FALSE);
 
     $urlParams = 'reset=1';
     $urlString = 'civicrm/mailing/browse';
     if ($this->get('sms')) {
       $urlParams .= '&sms=1';
     }
-    if (CRM_Utils_Array::value(3, $newArgs) == 'unscheduled') {
+    if (($newArgs[3] ?? NULL) === 'unscheduled') {
       $urlString .= '/unscheduled';
       $urlParams .= '&scheduled=false';
       $this->assign('unscheduled', TRUE);
@@ -263,7 +253,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       $urlString .= '/archived';
       $this->assign('archived', TRUE);
     }
-    elseif (CRM_Utils_Array::value(3, $newArgs) == 'scheduled') {
+    elseif (($newArgs[3] ?? NULL) == 'scheduled') {
       $urlString .= '/scheduled';
       $urlParams .= '&scheduled=true';
     }
@@ -288,7 +278,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $url = CRM_Utils_System::url($urlString, $urlParams);
     $session->pushUserContext($url);
 
-    // CRM-6862 -run form cotroller after
+    // CRM-6862 -run form controller after
     // selector, since it erase $_POST
     $this->search();
 
@@ -320,11 +310,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * @return string
    */
   public function whereClause(&$params, $sortBy = TRUE) {
-    $values = [];
-
     $clauses = [];
     $title = $this->get('mailing_name');
-    // echo " name=$title  ";
     if ($title) {
       $clauses[] = 'name LIKE %1';
       if (strpos($title, '%') !== FALSE) {
@@ -341,12 +328,12 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       $clauses[] = "name LIKE '" . strtolower(CRM_Core_DAO::escapeWildCardString($this->_sortByCharacter)) . "%'";
     }
 
-    $campainIds = $this->get('campaign_id');
-    if (!CRM_Utils_System::isNull($campainIds)) {
-      if (!is_array($campainIds)) {
+    $campaignIds = $this->get('campaign_id');
+    if (!CRM_Utils_System::isNull($campaignIds)) {
+      if (!is_array($campaignIds)) {
         $campaignIds = [$campaignIds];
       }
-      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
+      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campaignIds)) . ' ) )';
     }
 
     return implode(' AND ', $clauses);

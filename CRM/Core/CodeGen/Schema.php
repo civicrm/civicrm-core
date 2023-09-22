@@ -5,6 +5,8 @@
  */
 class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
 
+  public $locales;
+
   /**
    * CRM_Core_CodeGen_Schema constructor.
    *
@@ -65,6 +67,7 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
     $dropOrder = array_reverse(array_keys($this->tables));
     $template = new CRM_Core_CodeGen_Util_Template('sql');
     $template->assign('dropOrder', $dropOrder);
+    $template->assign('isOutputLicense', TRUE);
     return ['civicrm_drop.mysql' => $template->fetch('drop.tpl')];
   }
 

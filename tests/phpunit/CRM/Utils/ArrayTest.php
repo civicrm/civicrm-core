@@ -6,7 +6,46 @@
  */
 class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
-  public function testIndexArray() {
+  /**
+   * Set up for tests.
+   */
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
+  public function testAsColumns(): void {
+    $rowsNum = [
+      ['a' => 10, 'b' => 11],
+      ['a' => 20, 'b' => 21],
+      ['a' => 20, 'b' => 29],
+    ];
+
+    $rowsAssoc = [
+      '!' => ['a' => 10, 'b' => 11],
+      '@' => ['a' => 20, 'b' => 21],
+      '#' => ['a' => 20, 'b' => 29],
+    ];
+
+    $this->assertEquals(
+      ['a' => [10, 20, 20], 'b' => [11, 21, 29]],
+      CRM_Utils_Array::asColumns($rowsNum)
+    );
+    $this->assertEquals(
+      ['a' => [10, 20], 'b' => [11, 21, 29]],
+      CRM_Utils_Array::asColumns($rowsNum, TRUE)
+    );
+    $this->assertEquals(
+      ['a' => ['!' => 10, '@' => 20, '#' => 20], 'b' => ['!' => 11, '@' => 21, '#' => 29]],
+      CRM_Utils_Array::asColumns($rowsAssoc)
+    );
+    $this->assertEquals(
+      ['a' => [10, 20], 'b' => [11, 21, 29]],
+      CRM_Utils_Array::asColumns($rowsAssoc, TRUE)
+    );
+  }
+
+  public function testIndexArray(): void {
     $inputs = [];
     $inputs[] = [
       'lang' => 'en',
@@ -49,7 +88,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($inputs[5], $byLangMsgid[NULL]['greeting']);
   }
 
-  public function testCollect() {
+  public function testCollect(): void {
     $arr = [
       ['catWord' => 'cat', 'dogWord' => 'dog'],
       ['catWord' => 'chat', 'dogWord' => 'chien'],
@@ -66,7 +105,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($expected, CRM_Utils_Array::collect('catWord', $arr));
   }
 
-  public function testProduct0() {
+  public function testProduct0(): void {
     $actual = CRM_Utils_Array::product(
       [],
       ['base data' => 1]
@@ -76,7 +115,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ], $actual);
   }
 
-  public function testProduct1() {
+  public function testProduct1(): void {
     $actual = CRM_Utils_Array::product(
       ['dim1' => ['a', 'b']],
       ['base data' => 1]
@@ -87,7 +126,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ], $actual);
   }
 
-  public function testProduct3() {
+  public function testProduct3(): void {
     $actual = CRM_Utils_Array::product(
       ['dim1' => ['a', 'b'], 'dim2' => ['alpha', 'beta'], 'dim3' => ['one', 'two']],
       ['base data' => 1]
@@ -104,7 +143,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ], $actual);
   }
 
-  public function testIsSubset() {
+  public function testIsSubset(): void {
     $this->assertTrue(CRM_Utils_Array::isSubset([], []));
     $this->assertTrue(CRM_Utils_Array::isSubset(['a'], ['a']));
     $this->assertTrue(CRM_Utils_Array::isSubset(['a'], ['b', 'a', 'c']));
@@ -114,7 +153,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertFalse(CRM_Utils_Array::isSubset(['a'], ['b', 'c', 'd']));
   }
 
-  public function testRemove() {
+  public function testRemove(): void {
     $data = [
       'one' => 1,
       'two' => 2,
@@ -127,11 +166,15 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($data, ['six' => 6]);
   }
 
-  public function testGetSetPathParts() {
-    $arr = [
+  public function testGetSetPathParts(): void {
+    $arr = $arrOrig = [
       'one' => '1',
       'two' => [
         'half' => 2,
+      ],
+      'three' => [
+        'first-third' => '1/3',
+        'second-third' => '2/3',
       ],
     ];
     $this->assertEquals('1', CRM_Utils_Array::pathGet($arr, ['one']));
@@ -140,6 +183,60 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     CRM_Utils_Array::pathSet($arr, ['zoo', 'half'], '3');
     $this->assertEquals(3, CRM_Utils_Array::pathGet($arr, ['zoo', 'half']));
     $this->assertEquals(3, $arr['zoo']['half']);
+
+    $arrCopy = $arr;
+    $this->assertEquals(FALSE, CRM_Utils_Array::pathUnset($arr, ['does-not-exist']));
+    $this->assertEquals($arrCopy, $arr);
+
+    $this->assertEquals(TRUE, CRM_Utils_Array::pathUnset($arr, ['two', 'half'], FALSE));
+    $this->assertEquals([], $arr['two']);
+    $this->assertTrue(array_key_exists('two', $arr));
+
+    CRM_Utils_Array::pathUnset($arr, ['three', 'first-third'], TRUE);
+    $this->assertEquals(['second-third' => '2/3'], $arr['three']);
+    CRM_Utils_Array::pathUnset($arr, ['three', 'second-third'], TRUE);
+    $this->assertFalse(array_key_exists('three', $arr));
+
+    // pathMove(): Change location of an item
+    $arr = $arrOrig;
+    $this->assertEquals(2, $arr['two']['half']);
+    $this->assertTrue(!isset($arr['verb']['double']['half']));
+    $this->assertEquals(1, CRM_Utils_Array::pathMove($arr, ['two'], ['verb', 'double']));
+    $this->assertEquals(2, $arr['verb']['double']['half']);
+    $this->assertTrue(!isset($arr['two']['half']));
+
+    // pathMove(): If item doesn't exist, return 0.
+    $arr = $arrOrig;
+    $this->assertTrue(!isset($arr['not-a-src']));
+    $this->assertTrue(!isset($arr['not-a-dest']));
+    $this->assertEquals(0, CRM_Utils_Array::pathMove($arr, ['not-a-src'], ['not-a-dest']));
+    $this->assertTrue(!isset($arr['not-a-src']));
+    $this->assertTrue(!isset($arr['not-a-dest']));
+
+  }
+
+  public function testGetSet_EmptyPath(): void {
+    $emptyPath = [];
+
+    $x = 'hello';
+    $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertEquals('hello', CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertEquals('hello', $x);
+
+    CRM_Utils_Array::pathSet($x, $emptyPath, 'bon jour');
+    $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertEquals('bon jour', CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertEquals('bon jour', $x);
+
+    CRM_Utils_Array::pathUnset($x, $emptyPath);
+    $this->assertEquals(FALSE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertEquals(NULL, CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertEquals(NULL, $x);
+
+    CRM_Utils_Array::pathSet($x, $emptyPath, 'buenos dias');
+    $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertEquals('buenos dias', CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertEquals('buenos dias', $x);
   }
 
   public function getSortExamples() {
@@ -333,7 +430,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
   /**
    * Test the flatten function
    */
-  public function testFlatten() {
+  public function testFlatten(): void {
     $data = [
       'my_array' => [
         '0' => 'bar',
@@ -367,6 +464,53 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $flat = [];
     CRM_Utils_Array::flatten($data, $flat);
     $this->assertEquals($flat, $expected);
+  }
+
+  public function testSingle(): void {
+    $okExamples = [
+      ['abc'],
+      [123],
+      [TRUE],
+      [FALSE],
+      [''],
+      [[]],
+      [[1, 2, 3]],
+      ['a' => 'b'],
+      (function () {
+        yield 'abc';
+      })(),
+    ];
+    $badExamples = [
+      [],
+      [1, 2],
+      ['a' => 'b', 'c' => 'd'],
+      [[], []],
+      (function () {
+        yield from [];
+      })(),
+      (function () {
+        yield 1;
+        yield 2;
+      })(),
+    ];
+
+    $todoCount = count($okExamples) + count($badExamples);
+    foreach ($okExamples as $i => $okExample) {
+      $this->assertTrue(CRM_Utils_Array::single($okExample) !== NULL, "Expect to get a result from example ($i)");
+      $todoCount--;
+    }
+
+    foreach ($badExamples as $i => $badExample) {
+      try {
+        CRM_Utils_Array::single($badExample);
+        $this->fail("Expected exception for bad example ($i)");
+      }
+      catch (CRM_Core_Exception $e) {
+        $todoCount--;
+      }
+    }
+
+    $this->assertEquals(0, $todoCount);
   }
 
 }

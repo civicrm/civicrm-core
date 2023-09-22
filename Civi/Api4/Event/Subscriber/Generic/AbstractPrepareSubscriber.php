@@ -10,21 +10,12 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Event\Subscriber\Generic;
 
 use Civi\API\Event\PrepareEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-abstract class AbstractPrepareSubscriber implements EventSubscriberInterface {
+abstract class AbstractPrepareSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
   /**
    * @return array

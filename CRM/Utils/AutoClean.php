@@ -27,6 +27,13 @@ class CRM_Utils_AutoClean {
   protected $args;
 
   /**
+   * Have we run this cleanup method yet?
+   *
+   * @var bool
+   */
+  protected $isDone = FALSE;
+
+  /**
    * Call a cleanup function when the current context shuts down.
    *
    * ```
@@ -46,6 +53,67 @@ class CRM_Utils_AutoClean {
     $ac->args = func_get_args();
     $ac->callback = array_shift($ac->args);
     return $ac;
+  }
+
+  /**
+   * Temporarily set the active locale. Cleanup locale when the autoclean handle disappears.
+   *
+   * @param string|null $newLocale
+   *   Ex: 'fr_CA'
+   * @return \CRM_Utils_AutoClean|null
+   */
+  public static function swapLocale(?string $newLocale) {
+    $oldLocale = $GLOBALS['tsLocale'] ?? NULL;
+    if ($oldLocale === $newLocale) {
+      return NULL;
+    }
+
+    $i18n = \CRM_Core_I18n::singleton();
+    $i18n->setLocale($newLocale);
+    return static::with(function() use ($i18n, $oldLocale) {
+      $i18n->setLocale($oldLocale);
+    });
+  }
+
+  /**
+   * Temporarily override the values for system settings.
+   *
+   * Note: This was written for use with unit-tests. Give a hard think before using it at runtime.
+   *
+   * @param array $newSettings
+   *   List of new settings (key-value pairs).
+   * @return \CRM_Utils_AutoClean
+   */
+  public static function swapSettings(array $newSettings): CRM_Utils_AutoClean {
+    // Overwrite the `civicrm_setting` and (later on) rewrite the original values to `civicrm_setting`.
+    // This process could be simpler if SettingsBag::$mandatory supported multiple layers of overrides.
+    $settings = \Civi::settings();
+
+    // Backup the old settings
+    $oldExplicitSettings = [];
+    foreach ($newSettings as $name => $newSetting) {
+      if ($settings->hasExplict($name)) {
+        $oldExplicitSettings[$name] = $settings->getExplicit($name);
+      }
+      if ($settings->getMandatory($name) !== NULL) {
+        throw new \CRM_Core_Exception("Cannot override mandatory setting ($name)");
+      }
+    }
+
+    // Apply the new settings
+    $settings->add($newSettings);
+
+    // Auto-restore the original settings
+    return CRM_Utils_AutoClean::with(function() use ($newSettings, $oldExplicitSettings) {
+      $settings = \Civi::settings();
+      // Restoring may mean `revert()` or `add()` (depending on the original disposition of the setting).
+      foreach ($newSettings as $name => $newSetting) {
+        if (!array_key_exists($name, $oldExplicitSettings)) {
+          \Civi::settings()->revert($name);
+        }
+      }
+      $settings->add($oldExplicitSettings);
+    });
   }
 
   /**
@@ -83,6 +151,21 @@ class CRM_Utils_AutoClean {
   }
 
   public function __destruct() {
+    $this->cleanup();
+  }
+
+  /**
+   * Explicitly apply the cleanup.
+   *
+   * Use this if you want to do the cleanup work immediately.
+   *
+   * @return void
+   */
+  public function cleanup(): void {
+    if ($this->isDone) {
+      return;
+    }
+    $this->isDone = TRUE;
     \Civi\Core\Resolver::singleton()->call($this->callback, $this->args);
   }
 

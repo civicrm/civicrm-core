@@ -34,7 +34,7 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
     $privacyOptions = CRM_Core_SelectValues::privacy();
 
     foreach ($privacyOptions as $prefID => $prefName) {
-      $this->_prefElement = &$this->addElement('checkbox', "pref[$prefID]", NULL, $prefName);
+      $this->addElement('checkbox', "pref[$prefID]", NULL, $prefName);
     }
 
     $this->addDefaultButtons(ts('Set Privacy Options'));

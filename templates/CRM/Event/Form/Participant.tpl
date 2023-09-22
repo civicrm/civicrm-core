@@ -9,166 +9,13 @@
 *}
 {* This template is used for adding/editing/deleting offline Event Registrations *}
 
-{* Ajax callback for showing event fee snippet *}
+{* Ajax callback for showing event fee snippet  - to be moved to separate form *}
 {if $showFeeBlock}
-  {if $priceSet}
-  <div id='validate_pricefield' class='messages crm-error hiddenElement'></div>
-    {literal}
-    <script type="text/javascript">
-
-    var fieldOptionsFull = [];
-    {/literal}
-    {foreach from=$priceSet.fields item=fldElement key=fldId}
-      {if $fldElement.options}
-        {foreach from=$fldElement.options item=fldOptions key=opId}
-          {if $fldOptions.is_full}
-            {literal}
-              fieldOptionsFull[{/literal}{$fldId}{literal}] = [];
-            fieldOptionsFull[{/literal}{$fldId}{literal}][{/literal}{$opId}{literal}] = 1;
-          {/literal}
-          {/if}
-        {/foreach}
-      {/if}
-    {/foreach}
-    {literal}
-
-    if ( fieldOptionsFull.length > 0 ) {
-      CRM.$(function($) {
-        $("input,#priceset select,#priceset").each(function () {
-          if ( $(this).attr('price') ) {
-            switch( $(this).attr('type') ) {
-              case 'checkbox':
-              case 'radio':
-                $(this).click( function() {
-                  validatePriceField(this);
-                });
-                break;
-
-              case 'select-one':
-                $(this).change( function() {
-                  validatePriceField(this);
-                });
-                break;
-              case 'text':
-                $(this).bind( 'keyup', function() { validatePriceField(this) });
-                break;
-            }
-          }
-        });
-      });
-
-      function validatePriceField( obj ) {
-        var namePart =  cj(obj).attr('name').split('_');
-        var fldVal  =  cj(obj).val();
-        if ( cj(obj).attr('type') == 'checkbox') {
-          var eleIdpart = namePart[1].split('[');
-          var eleId = eleIdpart[0];
-        }
-        else {
-          var eleId  = namePart[1];
-        }
-        var showError = false;
-
-        switch( cj(obj).attr('type') ) {
-          case 'text':
-            if ( fieldOptionsFull[eleId] && fldVal ) {
-              showError = true;
-              cj(obj).parent( ).parent( ).children('.label').addClass('crm-error');
-            }
-            else {
-              cj(obj).parent( ).parent( ).children('.label').removeClass('crm-error');
-              cj('#validate_pricefield').hide( ).html('');
-            }
-            break;
-
-          case 'checkbox':
-            var checkBoxValue = eleIdpart[1].split(']');
-            if ( cj(obj).prop("checked") == true &&
-              fieldOptionsFull[eleId] &&
-              fieldOptionsFull[eleId][checkBoxValue[0]]) {
-              showError = true;
-              cj(obj).parent( ).addClass('crm-error');
-            }
-            else {
-              cj(obj).parent( ).removeClass('crm-error');
-            }
-            break;
-
-          default:
-            if ( fieldOptionsFull[eleId] &&
-              fieldOptionsFull[eleId][fldVal]  ) {
-              showError = true;
-              cj(obj).parent( ).addClass('crm-error');
-            }
-            else {
-              cj(obj).parent( ).removeClass('crm-error');
-            }
-          }
-
-        if ( showError ) {
-          cj('#validate_pricefield').show().html('<i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>{/literal} {ts escape='js'}This Option is already full for this event.{/ts}{literal}');
-        }
-        else {
-          cj('#validate_pricefield').hide( ).html('');
-        }
-      }
-    }
-
-  // change the status to default 'partially paid' for partial payments
-  var feeAmount, userModifiedAmount;
-  var partiallyPaidStatusId = {/literal}{$partiallyPaidStatusId}{literal};
-
-  cj('#total_amount')
-   .focus(
-     function() {
-       feeAmount = cj(this).val();
-       feeAmount = Number(feeAmount.replace(/[^0-9\.]+/g,""));
-     }
-   )
-   .change(
-    function() {
-      userModifiedAmount = cj(this).val();
-      userModifiedAmount = Number(userModifiedAmount.replace(/[^0-9\.]+/g,""));
-      if (userModifiedAmount < feeAmount) {
-        cj('#status_id').val(partiallyPaidStatusId).change();
-      }
-    }
-  );
-
-  cj('form[name=Participant]').on("click", '.validate',
-    function(e) {
-      if (CRM.$('#total_amount').length == 0) {
-        var $balance = CRM.$('#payment-info-balance');
-        if ($balance.length > 0 && parseFloat($balance.attr('data-balance')) == 0) {
-          return true;
-        }
-      }
-      var userSubmittedStatus = cj('#status_id').val();
-      var statusLabel = cj('#status_id option:selected').text();
-      if (userModifiedAmount < feeAmount && userSubmittedStatus != partiallyPaidStatusId) {
-        var msg = "{/literal}{ts escape="js" 1="%1"}Payment amount is less than the amount owed. Expected participant status is 'Partially paid'. Are you sure you want to set the participant status to %1? Click OK to continue, Cancel to change your entries.{/ts}{literal}";
-        var result = confirm(ts(msg, {1: statusLabel}));
-        if (result == false) {
-          return false;
-        }
-      }
-    }
-  );
-  </script>
-  {/literal}
-  {/if}
-
-  {include file="CRM/Event/Form/EventFees.tpl"}
-
+  {include file="CRM/Event/Form/FeeBlock.tpl"}
 {* Main event form template *}
 {else}
-  {if $participantMode == 'test' }
-    {assign var=registerMode value="TEST"}
-    {elseif $participantMode == 'live'}
-    {assign var=registerMode value="LIVE"}
-  {/if}
   <div class="crm-block crm-form-block crm-participant-form-block">
-    {if $newCredit AND $action EQ 1 AND $participantMode EQ null}
+    {if $action EQ 1 AND ($context EQ 'participant' OR $context EQ 'standalone') AND $newCredit AND $participantMode EQ null}
       <div class="action-link css_right crm-link-credit-card-mode">
         {if $contactId}
           {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
@@ -179,24 +26,17 @@
       </div>
     {/if}
     <div class="view-content">
-      {if $participantMode}
+      {if !empty($participantMode)}
         <div class="help">
-          {ts 1=$displayName 2=$registerMode}Use this form to submit an event registration on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+          {ts 1=$displayName 2=$participantMode|crmUpper}Use this form to submit an event registration on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
         </div>
       {/if}
       <div id="eventFullMsg" class="messages status no-popup" style="display:none;"></div>
 
-
-      {if $action eq 1 AND $paid}
-        <div class="help">
-          {ts}If you are accepting offline payment from this participant, check <strong>Record Payment</strong>. You will be able to fill in the payment information, and optionally send a receipt.{/ts}
-        </div>
-      {/if}
-
       {if $action eq 8} {* If action is Delete *}
         <div class="crm-participant-form-block-delete messages status no-popup">
           <div class="crm-content">
-            <div class="icon inform-icon"></div> &nbsp;
+            {icon icon="fa-info-circle"}{/icon}
             {ts}WARNING: Deleting this registration will result in the loss of related payment records (if any).{/ts} {ts}Do you want to continue?{/ts}
           </div>
           {if $additionalParticipant}
@@ -209,12 +49,13 @@
           {$form.delete_participant.html}
         {/if}
         {else} {* If action is other than Delete *}
-        <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout-compressed">
-          <tr class="crm-participant-form-contact-id">
-            <td class="label">{$form.contact_id.label}</td>
-            <td>{$form.contact_id.html}</td>
-          </tr>
+          {if $context EQ 'standalone' OR $context EQ 'participant' OR $action EQ 2}
+            <tr class="crm-participant-form-contact-id">
+              <td class="label">{$form.contact_id.label}</td>
+              <td>{$form.contact_id.html}</td>
+            </tr>
+          {/if}
           {if $action EQ 2}
             {if $additionalParticipants} {* Display others registered by this participant *}
               <tr class="crm-participant-form-block-additionalParticipants">
@@ -238,12 +79,7 @@
           {/if}
           <tr class="crm-participant-form-block-event_id">
             <td class="label">{$form.event_id.label}</td>
-            <td class="view-value">
-              {$form.event_id.html}
-              {if $is_test}
-                {ts}(test){/ts}
-              {/if}
-            </td>
+            <td class="view-value">{$form.event_id.html}</td>
           </tr>
 
         {* CRM-7362 --add campaign *}
@@ -264,8 +100,7 @@
             </td>
           </tr>
           <tr class="crm-participant-form-block-source">
-            <td class="label">{$form.source.label}</td><td>{$form.source.html|crmAddClass:huge}<br />
-            <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
+            <td class="label">{$form.source.label}</td><td>{$form.source.html|crmAddClass:huge}</td>
           </tr>
           {if $participantMode}
             <tr class="crm-participant-form-block-payment_processor_id">
@@ -301,7 +136,7 @@
         </div>
       {/if}
 
-      {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
+      {if $action eq 2 and $accessContribution and $rows.0.contribution_id}
       {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
       {/if}
 
@@ -315,7 +150,7 @@
     {/if}
 
     {*include custom data js file*}
-    {include file="CRM/common/customData.tpl"}
+    {include file="CRM/common/customData.tpl" groupID=''}
 
     <script type="text/javascript">
       {literal}
@@ -427,25 +262,25 @@
 
   {/if}
 
+  {if $action NEQ 8}
+  <script type="text/javascript">
+    {literal}
 
-<script type="text/javascript">
-  {literal}
-
-  sendNotification();
-  function sendNotification() {
-    var notificationStatusIds = {/literal}"{$notificationStatusIds}"{literal};
-    notificationStatusIds = notificationStatusIds.split(',');
-    if (cj.inArray(cj('select#status_id option:selected').val(), notificationStatusIds) > -1) {
-      cj("#notify").show();
-      cj("#is_notify").prop('checked', true);
+    sendNotification();
+    function sendNotification() {
+      var notificationStatusIds = {/literal}"{$notificationStatusIds}"{literal};
+      notificationStatusIds = notificationStatusIds.split(',');
+      if (cj.inArray(cj('.crm-participant-form-block-status_id select#status_id option:selected').val(), notificationStatusIds) > -1) {
+        cj("#notify").show();
+      }
+      else {
+        cj("#notify").hide();
+        cj("#is_notify").prop('checked', false);
+      }
     }
-    else {
-      cj("#notify").hide();
-      cj("#is_notify").prop('checked', false);
-    }
-  }
 
-  {/literal}
-</script>
+    {/literal}
+  </script>
+  {/if}
 
 {/if} {* end of main event block*}

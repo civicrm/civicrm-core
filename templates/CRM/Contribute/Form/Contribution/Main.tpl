@@ -46,37 +46,38 @@
   </script>
 {/literal}
 
-  {if $action & 1024}
+  {if ($action & 1024) or $dummyTitle}
     {include file="CRM/Contribute/Form/Contribution/PreviewHeader.tpl"}
   {/if}
 
-  {if $displayCaptchaWarning}
-    <div class="messages status no-popup">
-      {ts}To display reCAPTCHA on form you must get an API key from<br /> <a href='https://www.google.com/recaptcha/admin/create'>https://www.google.com/recaptcha/admin/create</a>{/ts}
-    </div>
+  {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
+    {capture assign="buttonTitle"}{ts}Configure Contribution Page{/ts}{/capture}
+    {crmButton target="_blank" p="civicrm/admin/contribute/settings" q="reset=1&action=update&id=`$contributionPageID`" fb=1 title="$buttonTitle" icon="fa-wrench"}{ts}Configure{/ts}{/crmButton}
+    <div class='clear'></div>
   {/if}
 
-  {include file="CRM/common/TrackingFields.tpl"}
+  <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block" data-page-id="{$contributionPageID}" data-page-template="main">
 
-  <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block">
-
+    {crmRegion name='contribution-main-not-you-block'}
     {if $contact_id && !$ccid}
       <div class="messages status no-popup crm-not-you-message">
         {ts 1=$display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/contribute/transact' q="cid=0&reset=1&id=`$contributionPageID`"}" title="{ts}Click here to do this for a different person.{/ts}">{ts 1=$display_name}Not %1, or want to do this for a different person{/ts}</a>?)
       </div>
     {/if}
+    {/crmRegion}
 
     <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
       {$intro_text}
     </div>
     {include file="CRM/common/cidzero.tpl"}
+
     {if $islifetime or $ispricelifetime}
       <div class="help">{ts}You have a current Lifetime Membership which does not need to be renewed.{/ts}</div>
     {/if}
 
-    {if !empty($useForMember) && !$ccid}
+    {if $isShowMembershipBlock && !$ccid}
       <div class="crm-public-form-item crm-section">
-        {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="makeContribution"}
+        {include file="CRM/Contribute/Form/Contribution/MainMembershipBlock.tpl"}
       </div>
     {elseif !empty($ccid)}
       {if $lineItem && $priceSetID && !$is_quick_config}
@@ -88,19 +89,19 @@
       {else}
         <div class="display-block">
           <td class="label">{$form.total_amount.label}</td>
-          <td><span>{$form.total_amount.html|crmMoney}&nbsp;&nbsp;{if $taxAmount}{ts 1=$taxTerm 2=$taxAmount|crmMoney}(includes %1 of %2){/ts}{/if}</span></td>
+          <td><span>{$form.total_amount.html}&nbsp;&nbsp;{if $taxAmount}{ts 1=$taxTerm 2=$taxAmount|crmMoney}(includes %1 of %2){/ts}{/if}</span></td>
         </div>
       {/if}
     {else}
       <div id="priceset-div">
-        {include file="CRM/Price/Form/PriceSet.tpl" extends="Contribution"}
+        {include file="CRM/Price/Form/PriceSet.tpl" extends="Contribution" hideTotal=$quickConfig}
       </div>
     {/if}
 
     {if !$ccid}
       {crmRegion name='contribution-main-pledge-block'}
       {if $pledgeBlock}
-        {if $is_pledge_payment}
+        {if array_key_exists('pledge_amount', $form)}
           <div class="crm-public-form-item crm-section {$form.pledge_amount.name}-section">
             <div class="label">{$form.pledge_amount.label}&nbsp;<span class="crm-marker">*</span></div>
             <div class="content">{$form.pledge_amount.html}</div>
@@ -111,7 +112,7 @@
             <div class="label">&nbsp;</div>
             <div class="content">
               {$form.is_pledge.html}&nbsp;
-              {if $is_pledge_interval}
+              {if array_key_exists('pledge_frequency_interval', $form)}
                 {$form.pledge_frequency_interval.html}&nbsp;
               {/if}
               {$form.pledge_frequency_unit.html}<span id="pledge_installments_num">&nbsp;{ts}for{/ts}&nbsp;{$form.pledge_installments.html}&nbsp;{ts}installments.{/ts}</span>
@@ -125,7 +126,7 @@
               {/if}
             {else}
               <div class="label">{$form.start_date.label}</div>
-              <div class="content">{$start_date_display|date_format}</div>
+              <div class="content">{$start_date_display|crmDate:'%b %e, %Y'}</div>
             {/if}
             <div class="clear"></div>
           </div>
@@ -133,18 +134,20 @@
       {/if}
       {/crmRegion}
 
-      {if $form.is_recur}
+      {if !empty($form.is_recur)}
         <div class="crm-public-form-item crm-section {$form.is_recur.name}-section">
           <div class="label">&nbsp;</div>
           <div class="content">
-            {$form.is_recur.html} {$form.is_recur.label} {ts}every{/ts}
+            {$form.is_recur.html} {$form.is_recur.label}
             {if $is_recur_interval}
               {$form.frequency_interval.html}
             {/if}
-            {if $one_frequency_unit}
-              {$frequency_unit}
-            {else}
-              {$form.frequency_unit.html}
+            {if !$all_text_recur}
+              {if $one_frequency_unit}
+                {$form.frequency_interval.label}
+              {else}
+                {$form.frequency_unit.html}
+              {/if}
             {/if}
             {if $is_recur_installments}
               <span id="recur_installments_num">
@@ -195,7 +198,7 @@
             <div class="crm-public-form-item crm-section honor_block_text-section">
               {$honor_block_text}
             </div>
-          {if $form.soft_credit_type_id.html}
+          {if !empty($form.soft_credit_type_id.html)}
             <div class="crm-public-form-item crm-section {$form.soft_credit_type_id.name}-section">
               <div class="content" >
                 {$form.soft_credit_type_id.html}
@@ -205,16 +208,16 @@
           {/if}
           {/crmRegion}
           <div id="honorType" class="honoree-name-email-section">
-            {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
+            {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor' hideFieldset=true}
           </div>
         </fieldset>
       {/if}
 
       <div class="crm-public-form-item crm-group custom_pre_profile-group">
-        {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+        {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false hideFieldset=false}
       </div>
 
-      {if $isHonor}
+      {if array_key_exists('pcp_display_in_roll', $form)}
         <fieldset class="crm-public-form-item crm-group pcp-group">
           <div class="crm-public-form-item crm-section pcp-section">
             <div class="crm-public-form-item crm-section display_in_roll-section">
@@ -252,7 +255,7 @@
       {* end of ccid loop *}
     {/if}
 
-    {if $form.payment_processor_id.label}
+    {if !empty($form.payment_processor_id.label)}
       {* PP selection only works with JS enabled, so we hide it initially *}
       <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
         <legend>{ts}Payment Options{/ts}</legend>
@@ -280,21 +283,9 @@
     {include file="CRM/Core/BillingBlockWrapper.tpl"}
 
     <div class="crm-public-form-item crm-group custom_post_profile-group">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}
     </div>
 
-    {if $is_monetary and $form.bank_account_number}
-      <div id="payment_notice">
-        <fieldset class="crm-public-form-item crm-group payment_notice-group">
-          <legend>{ts}Agreement{/ts}</legend>
-          {ts}Your account data will be used to charge your bank account via direct debit. While submitting this form you agree to the charging of your bank account via direct debit.{/ts}
-        </fieldset>
-      </div>
-    {/if}
-
-    {if $isCaptcha}
-      {include file='CRM/common/ReCAPTCHA.tpl'}
-    {/if}
     <div id="crm-submit-buttons" class="crm-submit-buttons">
       {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
@@ -305,8 +296,8 @@
     {/if}
   </div>
   <script type="text/javascript">
-    {if $isHonor}
-    pcpAnonymous();
+    {if array_key_exists('pcp_display_in_roll', $form)}
+      pcpAnonymous();
     {/if}
 
     {literal}
@@ -332,16 +323,28 @@
     function toggleRecur() {
       var isRecur = cj('input[id="is_recur"]:checked');
       var allowAutoRenew = {/literal}'{$allowAutoRenewMembership}'{literal};
-      var quickConfig = {/literal}{$quickConfig}{literal};
-      if ( allowAutoRenew && cj("#auto_renew") && quickConfig) {
+      var quickConfig = {/literal}'{$quickConfig}'{literal};
+      if (allowAutoRenew && cj("#auto_renew") && quickConfig) {
         showHideAutoRenew(null);
       }
+
+      var frequencyUnit = cj('#frequency_unit');
+      var frequencyInerval = cj('#frequency_interval');
+      var installments = cj('#installments');
+      isDisabled = false;
+
       if (isRecur.val() > 0) {
         cj('#recurHelp').show();
-        cj('#amount_sum_label').text('{/literal}{ts escape='js'}Regular amount{/ts}{literal}');
+        frequencyUnit.prop('disabled', false).addClass('required');
+        frequencyInerval.prop('disabled', false).addClass('required');
+        installments.prop('disabled', false);
+        cj('#amount_sum_label').text('{/literal}{ts escape='js'}Regular Amount{/ts}{literal}');
       }
       else {
         cj('#recurHelp').hide();
+        frequencyUnit.prop('disabled', true).removeClass('required');
+        frequencyInerval.prop('disabled', true).removeClass('required');
+        installments.prop('disabled', true);
         cj('#amount_sum_label').text('{/literal}{ts escape='js'}Total Amount{/ts}{literal}');
       }
     }

@@ -54,18 +54,28 @@ abstract class AbstractSettingAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param int $domain
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function validateSettings($domain) {
     $meta = \Civi\Core\SettingsMetadata::getMetadata([], $domain);
-    $names = isset($this->values) ? array_keys($this->values) : $this->select;
+    $names = array_map(function($name) {
+      return explode(':', $name)[0];
+    }, isset($this->values) ? array_keys($this->values) : $this->select);
     $invalid = array_diff($names, array_keys($meta));
     if ($invalid) {
-      throw new \API_Exception("Unknown settings for domain $domain: " . implode(', ', $invalid));
+      throw new \CRM_Core_Exception("Unknown settings for domain $domain: " . implode(', ', $invalid));
     }
     if (isset($this->values)) {
-      foreach ($this->values as $name => &$value) {
-        \CRM_Core_BAO_Setting::validateSetting($value, $meta[$name]);
+      foreach ($this->values as $name => $value) {
+        [$name, $suffix] = array_pad(explode(':', $name), 2, NULL);
+        // Replace pseudoconstants in values array
+        if ($suffix) {
+          $value = $this->matchPseudoconstant($name, $value, $suffix, 'id', $domain);
+          unset($this->values["$name:$suffix"]);
+          $this->values[$name] = $value;
+        }
+        \CRM_Core_BAO_Setting::validateSetting($this->values[$name], $meta[$name], FALSE);
+
       }
     }
     return $meta;
@@ -73,19 +83,49 @@ abstract class AbstractSettingAction extends \Civi\Api4\Generic\AbstractAction {
 
   protected function findDomains() {
     if ($this->domainId == 'all') {
-      $this->domainId = Domain::get()->setCheckPermissions(FALSE)->addSelect('id')->execute()->column('id');
+      $this->domainId = Domain::get(FALSE)->addSelect('id')->execute()->column('id');
     }
     elseif ($this->domainId) {
       $this->domainId = (array) $this->domainId;
-      $domains = Domain::get()->setCheckPermissions(FALSE)->addSelect('id')->execute()->column('id');
+      $domains = Domain::get(FALSE)->addSelect('id')->execute()->column('id');
       $invalid = array_diff($this->domainId, $domains);
       if ($invalid) {
-        throw new \API_Exception('Invalid domain id: ' . implode(', ', $invalid));
+        throw new \CRM_Core_Exception('Invalid domain id: ' . implode(', ', $invalid));
       }
     }
     else {
       $this->domainId = [\CRM_Core_Config::domainID()];
     }
+  }
+
+  /**
+   * @param string $name
+   * @param mixed $value
+   * @param string $from
+   * @param string $to
+   * @param int $domain
+   * @return mixed
+   */
+  protected function matchPseudoconstant(string $name, $value, $from, $to, $domain) {
+    if ($value === NULL) {
+      return NULL;
+    }
+    if ($from === $to) {
+      return $value;
+    }
+    $meta = \Civi\Core\SettingsMetadata::getMetadata(['name' => [$name]], $domain, [$from, $to]);
+    $options = $meta[$name]['options'] ?? [];
+    $map = array_column($options, $to, $from);
+    $translated = [];
+    foreach ((array) $value as $key) {
+      if (isset($map[$key])) {
+        $translated[] = $map[$key];
+      }
+    }
+    if (!is_array($value)) {
+      return \CRM_Utils_Array::first($translated);
+    }
+    return $translated;
   }
 
 }

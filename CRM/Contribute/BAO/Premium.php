@@ -24,44 +24,26 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   private static $productInfo;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_DAO_Product
+   * @return CRM_Contribute_DAO_Product|NULL
    */
-  public static function retrieve(&$params, &$defaults) {
-    $premium = new CRM_Contribute_DAO_Product();
-    $premium->copyValues($params);
-    if ($premium->find(TRUE)) {
-      CRM_Core_DAO::storeValues($premium, $defaults);
-      return $premium;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve('CRM_Contribute_DAO_Product', $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Premium', $id, 'premiums_active ', $is_active);
   }
 
@@ -69,11 +51,12 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * Delete financial Types.
    *
    * @param int $premiumID
+   *
+   * @deprecated
    */
   public static function del($premiumID) {
-    $premium = new CRM_Contribute_DAO_Premium();
-    $premium->id = $premiumID;
-    $premium->delete();
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return static::deleteRecord(['id' => $premiumID]);
   }
 
   /**
@@ -151,27 +134,24 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Build Premium B im Contribution Pages.
+   * Build Premium Preview block for Contribution Pages.
    *
    * @param CRM_Core_Form $form
-   * @param int $productID
-   * @param int $premiumProductID
+   * @param int|null $productID
+   *
+   * @return void
    */
-  public function buildPremiumPreviewBlock($form, $productID, $premiumProductID = NULL) {
-    if ($premiumProductID) {
-      $dao = new CRM_Contribute_DAO_PremiumsProduct();
-      $dao->id = $premiumProductID;
-      $dao->find(TRUE);
-      $productID = $dao->product_id;
-    }
+  public static function buildPremiumPreviewBlock($form, $productID) {
     $productDAO = new CRM_Contribute_DAO_Product();
     $productDAO->id = $productID;
     $productDAO->is_active = 1;
+    $products = [];
+
     if ($productDAO->find(TRUE)) {
       CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
     }
 
-    $radio[$productDAO->id] = $form->createElement('radio', NULL, NULL, NULL, $productDAO->id, NULL);
+    $radio[$productDAO->id] = NULL;
     $options = $temp = [];
     $temp = explode(',', $productDAO->options);
     foreach ($temp as $value) {
@@ -181,7 +161,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
       $form->add('select', 'options_' . $productDAO->id, NULL, $options);
     }
 
-    $form->addGroup($radio, 'selectProduct', NULL);
+    $form->addRadio('selectProduct', NULL, $radio);
 
     $form->assign('showRadio', TRUE);
     $form->assign('showSelectOptions', TRUE);

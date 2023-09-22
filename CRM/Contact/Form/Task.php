@@ -78,7 +78,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
   /**
    * Common pre-processing function.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Core_Form_Task $form
    *
    * @throws \CRM_Core_Exception
    */
@@ -86,9 +86,9 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $form->_contactIds = [];
     $form->_contactTypes = [];
 
-    $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath);
+    $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath) || in_array('map', $form->urlPath);
     if ($isStandAlone) {
-      list($form->_task, $title) = CRM_Contact_Task::getTaskAndTitleByClass(get_class($form));
+      [$form->_task, $title] = CRM_Contact_Task::getTaskAndTitleByClass(get_class($form));
       if (!array_key_exists($form->_task, CRM_Contact_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()))) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
@@ -103,19 +103,16 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     // we'll need to get fv from either search or adv search in the future
     $fragment = 'search';
     if ($form->_action == CRM_Core_Action::ADVANCED) {
-      self::$_searchFormValues = $form->controller->exportValues('Advanced');
       $fragment .= '/advanced';
     }
     elseif ($form->_action == CRM_Core_Action::PROFILE) {
-      self::$_searchFormValues = $form->controller->exportValues('Builder');
       $fragment .= '/builder';
     }
     elseif ($form->_action == CRM_Core_Action::COPY) {
-      self::$_searchFormValues = $form->controller->exportValues('Custom');
       $fragment .= '/custom';
     }
-    elseif (!$isStandAlone) {
-      self::$_searchFormValues = $form->controller->exportValues('Basic');
+    if (!$isStandAlone) {
+      self::$_searchFormValues = $form->getSearchFormValues();
     }
 
     //set the user context for redirection of task actions
@@ -125,24 +122,24 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       $urlParams .= "&qfKey=$qfKey";
     }
 
-    $cacheKey = "civicrm search {$qfKey}";
-
     $url = CRM_Utils_System::url('civicrm/contact/' . $fragment, $urlParams);
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext($url);
 
-    $form->_task = self::$_searchFormValues['task'] ?? NULL;
-    $crmContactTaskTasks = CRM_Contact_Task::taskTitles();
-    $form->assign('taskName', CRM_Utils_Array::value($form->_task, $crmContactTaskTasks));
+    $cacheKey = "civicrm search {$qfKey}";
 
+    $form->_task = self::$_searchFormValues['task'] ?? NULL;
+
+    $isSelectedContacts = (self::$_searchFormValues['radio_ts'] ?? NULL) === 'ts_sel';
+    $form->assign('isSelectedContacts', $isSelectedContacts);
     // all contacts or action = save a search
-    if ((CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_all') ||
+    if (((self::$_searchFormValues['radio_ts'] ?? NULL) == 'ts_all') ||
       ($form->_task == CRM_Contact_Task::SAVE_SEARCH)
     ) {
       // since we don't store all contacts in prevnextcache, when user selects "all" use query to retrieve contacts
       // rather than prevnext cache table for most of the task actions except export where we rebuild query to fetch
       // final result set
-      $allCids[$cacheKey] = self::getContactIds($form);
+      $allCids[$cacheKey] = self::legacyGetContactIds($form);
 
       $form->_contactIds = [];
       if (empty($form->_contactIds)) {
@@ -157,7 +154,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
         }
       }
     }
-    elseif (CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_sel') {
+    elseif ($isSelectedContacts) {
       // selected contacts only
       // need to perform action on only selected contacts
       $insertString = [];
@@ -189,7 +186,8 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
 
     //contact type for pick up profiles as per selected contact types with subtypes
     //CRM-5521
-    if ($selectedTypes = CRM_Utils_Array::value('contact_type', self::$_searchFormValues)) {
+    $selectedTypes = self::$_searchFormValues['contact_type'] ?? NULL;
+    if ($selectedTypes) {
       if (!is_array($selectedTypes)) {
         $selectedTypes = explode(' ', $selectedTypes);
       }
@@ -204,13 +202,11 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       }
     }
 
-    if (CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_sel'
+    if ($isSelectedContacts
       && ($form->_action != CRM_Core_Action::COPY)
     ) {
-      $sel = self::$_searchFormValues['radio_ts'] ?? NULL;
-      $form->assign('searchtype', $sel);
       $result = self::getSelectedContactNames();
-      $form->assign("value", $result);
+      $form->assign('value', $result);
     }
 
     if (!empty($form->_contactIds)) {
@@ -227,11 +223,16 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    *   - custom search (FIXME: does this still apply to custom search?).
    * When we call this function we are not using the prev/next cache
    *
-   * @param $form CRM_Core_Form
+   * We've started to try to move away from these functions
+   * being static. Probably we need to convert the export forms
+   * to use a trait based approach. For now this is renamed to
+   * permit the use of a non-static function with this name
+   *
+   * @param CRM_Core_Form_Task $form
    *
    * @return array $contactIds
    */
-  public static function getContactIds($form) {
+  protected static function legacyGetContactIds($form) {
     // need to perform action on all contacts
     // fire the query again and get the contact id's + display name
     $sortID = NULL;
@@ -334,7 +335,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
   /**
    * Replace ids of household members in $this->_contactIds with the id of their household.
    *
-   * CRM-8338
+   * @see https://issues.civicrm.org/jira/browse/CRM-8338
    */
   public function mergeContactIdsByHousehold() {
     if (empty($this->_contactIds)) {

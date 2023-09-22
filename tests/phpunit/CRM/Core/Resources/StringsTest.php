@@ -12,24 +12,25 @@
 /**
  * Tests for parsing translatable strings in HTML content.
  * @group headless
+ * @group resources
  */
 class CRM_Core_Resources_StringsTest extends CiviUnitTestCase {
 
   /**
    * Get strings from files.
    */
-  public function testGet() {
+  public function testGet(): void {
     $basedir = $this->createExamples();
     $strings = new CRM_Core_Resources_Strings(
-      new CRM_Utils_Cache_Arraycache(NULL)
+      new CRM_Utils_Cache_ArrayCache(NULL)
     );
     $this->assertEquals(
       ['Hello from Javascript'],
-      $strings->get('example', "$basedir/hello.js", "text/javascript")
+      $strings->get('example', "$basedir/hello.js", 'text/javascript')
     );
     $this->assertEquals(
       ['Hello from HTML'],
-      $strings->get('example', "$basedir/hello.html", "text/html")
+      $strings->get('example', "$basedir/hello.html", 'text/html')
     );
   }
 

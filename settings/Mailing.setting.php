@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 /*
  * Settings metadata file
@@ -34,6 +32,22 @@ return [
     'is_contact' => 0,
     'description' => ts('When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.'),
     'help_text' => NULL,
+  ],
+  'no_reply_email_address' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'no_reply_email_address',
+    'type' => 'String',
+    'html_type' => 'text',
+    'default' => NULL,
+    'add' => '5.63',
+    'title' => ts('No-Reply Address'),
+    'validate_callback' => 'CRM_Utils_Rule::email',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => '',
+    'help_text' => NULL,
+    'help' => ['id' => 'no_reply_email_address'],
   ],
   'track_civimail_replies' => [
     'group_name' => 'Mailing Preferences',
@@ -313,6 +327,7 @@ return [
     'is_contact' => 0,
     'description' => ts('The number of emails sendable via simple mail. Make sure you understand the implications for your spam reputation and legal requirements for bulk emails before editing. As there is some risk both to your spam reputation and the products if this is misused it is a hidden setting.'),
     'help_text' => 'CiviCRM forces users sending more than this number of mails to use CiviMails. CiviMails have additional precautions: not sending to contacts who do not want bulk mail, adding domain name and opt out links. You should familiarise yourself with the law relevant to you on bulk mailings if changing this setting. For the US https://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003 is a good place to start.',
+    'add' => '4.7.25',
   ],
   'auto_recipient_rebuild' => [
     'group_name' => 'Mailing Preferences',
@@ -327,6 +342,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Enable this setting to rebuild recipient list automatically during composing mail. Disable will allow you to rebuild recipient manually.'),
     'help_text' => ts('CiviMail automatically fetches recipient list and count whenever mailing groups are included or excluded while composing bulk mail. This phenomena may degrade performance for large sites, so disable this setting to build and fetch recipients for selected groups, manually.'),
+    'add' => '4.7.30',
   ],
   'allow_mail_from_logged_in_contact' => [
     'group_name' => 'Mailing Preferences',
@@ -340,6 +356,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Allow sending email from the logged in contact\'s email address.'),
     'help_text' => 'CiviCRM allows you to send email from the domain from email addresses and the logged in contact id addresses by default. Disable this if you only want to allow the domain from addresses to be used.',
+    'add' => '4.7.31',
   ],
   'url_tracking_default' => [
     'group_name' => 'Mailing Preferences',
@@ -354,6 +371,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If checked, mailings will have click-through tracking enabled by default.'),
     'help_text' => NULL,
+    'add' => '5.27.0',
   ],
   'open_tracking_default' => [
     'group_name' => 'Mailing Preferences',
@@ -367,6 +385,42 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('If checked, mailings will have open tracking enabled by default.'),
+    'help_text' => NULL,
+    'add' => '5.27.0',
+  ],
+  // dev/cor#1768 Allow mailer sync interval to be configured by the
+  // adminstrator.
+  'civimail_sync_interval' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'civimail_sync_interval',
+    'type' => 'Integer',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
+    'html_attributes' => [
+      'size' => 4,
+      'maxlength' => 8,
+    ],
+    'default' => 10,
+    'title' => ts('Database Update Frequency'),
+    'add' => '5.28',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('The frequency that CiviMail updates its sent mail database.'),
+    'help_text' => NULL,
+  ],
+  'scheduled_reminder_smarty' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'scheduled_reminder_smarty',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
+    'default' => 0,
+    'title' => ts('Use Smarty in scheduled reminders'),
+    'add' => '5.60',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Controls whether scheduled reminders will attempt to process smarty tokens.'),
     'help_text' => NULL,
   ],
 ];

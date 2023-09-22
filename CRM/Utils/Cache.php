@@ -65,7 +65,7 @@ class CRM_Utils_Cache {
   /**
    * Get cache relevant settings.
    *
-   * @param $cachePlugin
+   * @param string $cachePlugin
    *
    * @return array
    *   associative array of settings for the cache
@@ -124,6 +124,7 @@ class CRM_Utils_Cache {
         break;
 
       case 'APCcache':
+      case 'APCucache':
         $defaults = [];
         if (defined('CIVICRM_DB_CACHE_TIMEOUT')) {
           $defaults['timeout'] = CIVICRM_DB_CACHE_TIMEOUT;

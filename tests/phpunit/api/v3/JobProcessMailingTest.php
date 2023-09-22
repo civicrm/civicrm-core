@@ -16,7 +16,6 @@
  * @subpackage API_Job
  *
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
 
@@ -28,7 +27,6 @@
 class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
-  public $DBResetRequired = FALSE;
   public $_entity = 'Job';
   public $_params = [];
   private $_groupID;
@@ -41,8 +39,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    */
   private $_mut;
 
-  public function setUp() {
-    $this->cleanupMailingTest();
+  public function setUp(): void {
     parent::setUp();
     // DGW
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
@@ -82,17 +79,15 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
 
   /**
    */
-  public function tearDown() {
-    //$this->_mut->clearMessages();
+  public function tearDown(): void {
     $this->_mut->stop();
     CRM_Utils_Hook::singleton()->reset();
-    // DGW
+    $this->cleanupMailingTest();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
-    //$this->cleanupMailingTest();
     parent::tearDown();
   }
 
-  public function testBasic() {
+  public function testBasic(): void {
     $this->createContactsInGroup(10, $this->_groupID);
     Civi::settings()->add([
       'mailerBatchLimit' => 2,
@@ -104,9 +99,22 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that a contact deleted after the mailing is queued is not emailed.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testDeletedRecipient(): void {
+    $this->createContactsInGroup(2, $this->_groupID);
+    $this->callAPISuccess('Mailing', 'create', $this->_params);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $this->callAPISuccessGetValue('GroupContact', ['return' => 'contact_id', 'options' => ['limit' => 1, 'sort' => 'id DESC']])]);
+    $this->callAPISuccess('job', 'process_mailing');
+    $this->_mut->assertRecipients($this->getRecipients(1, 1));
+  }
+
+  /**
    * Test what happens when a contact is set to decesaed
    */
-  public function testDecesasedRecepient() {
+  public function testDeceasedRecipient(): void {
     $contactID = $this->individualCreate(['first_name' => 'test dead recipeint', 'email' => 'mailtestdead@civicrm.org']);
     $this->callAPISuccess('group_contact', 'create', [
       'contact_id' => $contactID,
@@ -130,7 +138,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   /**
    * Test that "multiple bulk email recipients" setting is respected.
    */
-  public function testMultipleBulkRecipients() {
+  public function testMultipleBulkRecipients(): void {
     Civi::settings()->add([
       'civimail_multiple_bulk_emails' => 1,
     ]);
@@ -162,7 +170,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   /**
    * Test pause and resume on Mailing.
    */
-  public function testPauseAndResumeMailing() {
+  public function testPauseAndResumeMailing(): void {
     $this->createContactsInGroup(10, $this->_groupID);
     Civi::settings()->add([
       'mailerBatchLimit' => 2,
@@ -205,7 +213,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    * Test mail when in non-production environment.
    *
    */
-  public function testMailNonProductionRun() {
+  public function testMailNonProductionRun(): void {
     // Test in non-production mode.
     $params = [
       'environment' => 'Staging',
@@ -471,6 +479,56 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check that the earlier iterations's activity targets on the recorded
+   * BulkEmail activity don't get wiped out by subsequent iterations when
+   * using batches.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isBulk
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testBatchActivityTargets($isBulk) {
+    $loggedInUserId = $this->createLoggedInUser();
+
+    \Civi::settings()->set('mailerBatchLimit', 2);
+    \Civi::settings()->set('civimail_multiple_bulk_emails', $isBulk);
+
+    // We have such small batches we need to lower this interval to get it
+    // to create the activity.
+    $old_sync_interval = \Civi::settings()->get('civimail_sync_interval');
+    \Civi::settings()->set('civimail_sync_interval', 1);
+
+    $this->createContactsInGroup(6, $this->_groupID);
+    $mailing = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_id' => $loggedInUserId]);
+    $this->callAPISuccess('job', 'process_mailing', []);
+    $bulkEmailActivity = $this->callAPISuccess('Activity', 'getsingle', [
+      'source_record_id' => $mailing['id'],
+      'activity_type_id' => 'Bulk Email',
+      'return' => ['target_contact_id'],
+    ]);
+    // After first batch, should have two targets
+    $this->assertCount(2, $bulkEmailActivity['target_contact_id']);
+
+    // Because we're running in script mode need to reset this static
+    // to get it to process the other batches.
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+
+    $this->callAPISuccess('job', 'process_mailing', []);
+    $bulkEmailActivity = $this->callAPISuccess('Activity', 'getsingle', [
+      'source_record_id' => $mailing['id'],
+      'activity_type_id' => 'Bulk Email',
+      'return' => ['target_contact_id'],
+    ]);
+    // After second batch, should have four targets
+    $this->assertCount(4, $bulkEmailActivity['target_contact_id']);
+
+    // restore setting
+    \Civi::settings()->set('civimail_sync_interval', $old_sync_interval);
+  }
+
+  /**
    * Create contacts in group.
    *
    * @param int $count
@@ -521,7 +579,10 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'civicrm_group',
       'civicrm_group_contact',
       'civicrm_contact',
+      'civicrm_activity_contact',
+      'civicrm_activity',
     ]);
+    Civi::settings()->set('mailerBatchLimit', 0);
   }
 
   /**

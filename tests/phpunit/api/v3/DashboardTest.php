@@ -38,7 +38,7 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file
    */
-  public function setUp() {
+  public function setUp(): void {
     //  Connect to the database
     parent::setUp();
     $this->useTransaction(TRUE);

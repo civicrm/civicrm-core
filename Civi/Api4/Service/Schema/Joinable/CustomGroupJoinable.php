@@ -10,18 +10,10 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Service\Schema\Joinable;
 
 use Civi\Api4\CustomField;
+use Civi\Api4\Utils\CoreUtil;
 
 class CustomGroupJoinable extends Joinable {
 
@@ -58,17 +50,20 @@ class CustomGroupJoinable extends Joinable {
    * @inheritDoc
    */
   public function getEntityFields() {
-    if (!$this->entityFields) {
-      $fields = CustomField::get()
-        ->setCheckPermissions(FALSE)
-        ->setSelect(['custom_group.name', 'custom_group.extends', 'custom_group.table_name', '*'])
-        ->addWhere('custom_group.table_name', '=', $this->getTargetTable())
+    $cacheKey = 'APIv4_CustomGroupJoinable-' . $this->getTargetTable();
+    $entityFields = (array) \Civi::cache('metadata')->get($cacheKey);
+    if (!$entityFields) {
+      $baseEntity = CoreUtil::getApiNameFromTableName($this->getBaseTable());
+      $fields = CustomField::get(FALSE)
+        ->setSelect(['custom_group_id.name', 'custom_group_id.extends', 'custom_group_id.table_name', 'custom_group_id.title', '*'])
+        ->addWhere('custom_group_id.table_name', '=', $this->getTargetTable())
         ->execute();
       foreach ($fields as $field) {
-        $this->entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, $this->getEntityFromExtends($field['custom_group.extends']));
+        $entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, $baseEntity);
       }
+      \Civi::cache('metadata')->set($cacheKey, $entityFields);
     }
-    return $this->entityFields;
+    return $entityFields;
   }
 
   /**
@@ -102,10 +97,10 @@ class CustomGroupJoinable extends Joinable {
    *
    * @param $extends
    * @return string
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private function getEntityFromExtends($extends) {
+  public static function getEntityFromExtends($extends) {
     if (strpos($extends, 'Participant') === 0) {
       return 'Participant';
     }

@@ -27,12 +27,15 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   protected $_currentParentID = NULL;
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-
-    $this->setPageTitle(ts('Menu Item'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -55,9 +58,13 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
     $this->add('text', 'icon', ts('Icon'), ['class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE]);
 
+    $getPerms = (array) \Civi\Api4\Permission::get(0)
+      ->addWhere('group', 'IN', ['civicrm', 'cms', 'const'])
+      ->setOrderBy(['title' => 'ASC'])
+      ->execute();
     $permissions = [];
-    foreach (CRM_Core_Permission::basicPermissions(TRUE, TRUE) as $id => $vals) {
-      $permissions[] = ['id' => $id, 'text' => $vals[0], 'description' => (array) CRM_Utils_Array::value(1, $vals)];
+    foreach ($getPerms as $perm) {
+      $permissions[] = ['id' => $perm['name'], 'text' => $perm['title'], 'description' => $perm['description'] ?? ''];
     }
     $this->add('select2', 'permission', ts('Permission'), $permissions, FALSE,
       ['placeholder' => ts('Unrestricted'), 'class' => 'huge', 'multiple' => TRUE]
@@ -68,11 +75,11 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
     //make separator location configurable
     $separator = CRM_Core_SelectValues::navigationMenuSeparator();
-    $this->add('select', 'has_separator', ts('Separator'), $separator);
+    $this->add('select', 'has_separator', ts('Separator'), $separator, FALSE, ['class' => 'crm-select2']);
 
     $active = $this->add('advcheckbox', 'is_active', ts('Enabled'));
 
-    if (CRM_Utils_Array::value('name', $this->_defaults) == 'Home') {
+    if (($this->_defaults['name'] ?? NULL) == 'Home') {
       $active->freeze();
     }
     else {
@@ -86,7 +93,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
       $homeMenuId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Home', 'id', 'name');
       unset($parentMenu[$homeMenuId]);
 
-      $this->add('select', 'parent_id', ts('Parent'), ['' => ts('Top level')] + $parentMenu, FALSE, ['class' => 'crm-select2']);
+      $this->add('select', 'parent_id', ts('Parent'), ['' => ts('Top level')] + $parentMenu, FALSE, ['class' => 'crm-select2 huge']);
     }
   }
 

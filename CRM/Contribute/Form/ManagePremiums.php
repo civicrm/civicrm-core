@@ -15,16 +15,20 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Product;
+
 /**
  * This class generates form components for Premiums.
  */
 class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
   /**
-   * Pre process the form.
+   * Classes extending CRM_Core_Form should implement this method.
+   *
+   * @return string
    */
-  public function preProcess() {
-    parent::preProcess();
+  public function getDefaultEntity() {
+    return 'Product';
   }
 
   /**
@@ -33,8 +37,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if ($this->_id) {
-      $params = ['id' => $this->_id];
-      CRM_Contribute_BAO_Product::retrieve($params, $tempDefaults);
+      $tempDefaults = Product::get()->addWhere('id', '=', $this->_id)->execute()->first();
       if (isset($tempDefaults['image']) && isset($tempDefaults['thumbnail'])) {
         $defaults['imageUrl'] = $tempDefaults['image'];
         $defaults['thumbnailUrl'] = $tempDefaults['thumbnail'];
@@ -59,6 +62,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -81,20 +86,24 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     ]);
     $this->add('text', 'sku', ts('SKU'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'sku'));
 
-    $this->add('textarea', 'description', ts('Description'), 'rows=3, cols=60');
+    $this->add('textarea', 'description', ts('Description'), ['cols' => 60, 'rows' => 3]);
+    $imageJS = [];
+    $image['image'] = ts('Upload from my computer');
+    $imageJS['image'] = ['onclick' => 'add_upload_file_block(\'image\');', 'class' => 'required'];
+    $image['thumbnail'] = ts('Display image and thumbnail from these locations on the web:');
+    $imageJS['thumbnail'] = ['onclick' => 'add_upload_file_block(\'thumbnail\');', 'class' => 'required'];
+    $image['default_image'] = ts('Use default image');
+    $imageJS['default_image'] = ['onclick' => 'add_upload_file_block(\'default\');', 'class' => 'required'];
+    $image['noImage'] = ts('Do not display an image');
+    $imageJS['noImage'] = ['onclick' => 'add_upload_file_block(\'noImage\');', 'class' => 'required'];
 
-    $image['image'] = $this->createElement('radio', NULL, NULL, ts('Upload from my computer'), 'image', 'onclick="add_upload_file_block(\'image\');');
-    $image['thumbnail'] = $this->createElement('radio', NULL, NULL, ts('Display image and thumbnail from these locations on the web:'), 'thumbnail', 'onclick="add_upload_file_block(\'thumbnail\');');
-    $image['default_image'] = $this->createElement('radio', NULL, NULL, ts('Use default image'), 'default_image', 'onclick="add_upload_file_block(\'default\');');
-    $image['noImage'] = $this->createElement('radio', NULL, NULL, ts('Do not display an image'), 'noImage', 'onclick="add_upload_file_block(\'noImage\');');
-
-    $this->addGroup($image, 'imageOption', ts('Premium Image'));
+    $this->addRadio('imageOption', ts('Premium Image'), $image, [], NULL, FALSE, $imageJS);
     $this->addRule('imageOption', ts('Please select an option for the premium image.'), 'required');
 
     $this->addElement('text', 'imageUrl', ts('Image URL'));
     $this->addElement('text', 'thumbnailUrl', ts('Thumbnail URL'));
 
-    $this->add('file', 'uploadFile', ts('Image File Name'), 'onChange="select_option();"');
+    $this->add('file', 'uploadFile', ts('Image File Name'), ['onChange' => 'select_option();']);
 
     $this->add('text', 'price', ts('Market Value'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'price'), TRUE);
     $this->addRule('price', ts('Please enter the Market Value for this product.'), 'money');
@@ -105,22 +114,15 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->add('text', 'min_contribution', ts('Minimum Contribution Amount'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'min_contribution'), TRUE);
     $this->addRule('min_contribution', ts('Please enter a monetary value for the Minimum Contribution Amount.'), 'money');
 
-    $this->add('textarea', 'options', ts('Options'), 'rows=3, cols=60');
+    $this->add('textarea', 'options', ts('Options'), ['cols' => 60, 'rows' => 3]);
 
-    $this->add('select', 'period_type', ts('Period Type'), [
-      '' => '- select -',
-      'rolling' => 'Rolling',
-      'fixed' => 'Fixed',
-    ]);
+    $this->add('select', 'period_type', ts('Period Type'), CRM_Core_SelectValues::periodType(), FALSE, ['placeholder' => TRUE]);
 
     $this->add('text', 'fixed_period_start_day', ts('Fixed Period Start Day'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'fixed_period_start_day'));
 
-    $this->add('Select', 'duration_unit', ts('Duration Unit'), ['' => '- select period -'] + CRM_Core_SelectValues::getPremiumUnits());
-
+    $this->addField('duration_unit', ['placeholder' => ts('- select period -')], FALSE);
     $this->add('text', 'duration_interval', ts('Duration'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'duration_interval'));
-
-    $this->add('Select', 'frequency_unit', ts('Frequency Unit'), ['' => '- select period -'] + CRM_Core_SelectValues::getPremiumUnits());
-
+    $this->addField('frequency_unit', ['placeholder' => ts('- select period -')], FALSE);
     $this->add('text', 'frequency_interval', ts('Frequency'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'frequency_interval'));
 
     //Financial Type CRM-11106
@@ -157,7 +159,9 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       'select',
       'financial_type_id',
       ts('Financial Type'),
-      ['' => ts('- select -')] + $financialType
+      $financialType,
+      FALSE,
+      ['placeholder' => TRUE]
     );
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
@@ -191,14 +195,14 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   public static function formRule($params, $files) {
 
     // If choosing to upload an image, then an image must be provided
-    if (CRM_Utils_Array::value('imageOption', $params) == 'image'
+    if (($params['imageOption'] ?? NULL) == 'image'
       && empty($files['uploadFile']['name'])
     ) {
       $errors['uploadFile'] = ts('A file must be selected');
     }
 
     // If choosing to use image URLs, then both URLs must be present
-    if (CRM_Utils_Array::value('imageOption', $params) == 'thumbnail') {
+    if (($params['imageOption'] ?? NULL) == 'thumbnail') {
       if (!$params['imageUrl']) {
         $errors['imageUrl'] = ts('Image URL is Required');
       }
@@ -255,7 +259,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     // If deleting, then only delete and skip the rest of the post-processing
     if ($this->_action & CRM_Core_Action::DELETE) {
       try {
-        CRM_Contribute_BAO_Product::del($this->_id);
+        CRM_Contribute_BAO_Product::deleteRecord(['id' => $this->_id]);
       }
       catch (CRM_Core_Exception $e) {
         $message = ts("This Premium is linked to an <a href='%1'>Online Contribution page</a>. Please remove it before deleting this Premium.", [1 => CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1')]);
@@ -285,10 +289,10 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->_processImages($params);
 
     // Save the premium product to database
-    $premium = CRM_Contribute_BAO_Product::create($params);
+    $premium = Product::save()->addRecord($params)->execute()->first();
 
     CRM_Core_Session::setStatus(
-      ts("The Premium '%1' has been saved.", [1 => $premium->name]),
+      ts("The Premium '%1' has been saved.", [1 => $premium['name']]),
       ts('Saved'), 'success');
   }
 

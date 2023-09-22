@@ -1,0 +1,26 @@
+<div class="crm-flex-1 input-group" >
+  <input type="text" class="form-control" ng-if="!$ctrl.link.action && !$ctrl.link.task" ng-model="$ctrl.link.path" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.onChange({newLink: $ctrl.link})">
+  <div class="input-group-btn" style="{{ $ctrl.link.action || $ctrl.link.task ? '' : 'width:27px' }}">
+    <button type="button" ng-click="$ctrl.menuOpen = true;" class="btn btn-sm btn-secondary-outline dropdown-toggle crm-search-admin-combo-button" ng-if="$ctrl.link.action || $ctrl.link.task" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      {{ $ctrl.getLink().text }}
+    </button>
+    <button type="button" ng-click="$ctrl.menuOpen = true;" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu {{ $ctrl.link.action || $ctrl.link.task ? '' : 'dropdown-menu-right' }}" style="min-width: 223px;">
+      <li ng-repeat="link in $ctrl.links" ng-class="{disabled: link === $ctrl.getLink()}">
+        <a href ng-click="$ctrl.setValue(link)">
+          <i class="crm-i {{:: link.icon }}"></i>
+          {{:: link.text }}
+        </a>
+      </li>
+      <li ng-class="{disabled: !$ctrl.link.action && !$ctrl.link.task}">
+        <a href ng-click="$ctrl.setValue({path: 'civicrm/'})">
+          <i class="crm-i fa-terminal"></i>
+          {{:: ts('Other...') }}
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+<crm-search-admin-token-select ng-if="!$ctrl.link.action && !$ctrl.link.task" model="$ctrl.link" field="path"></crm-search-admin-token-select>

@@ -21,41 +21,11 @@
 class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
   /**
-   * The id of the object being viewed (note/relationship etc).
+   * Custom group id.
    *
    * @var int
    */
   public $_groupId;
-
-  /**
-   * Class constructor.
-   *
-   * @return CRM_Contact_Page_View_CustomData
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Add a few specific things to view contact.
-   */
-  public function preProcess() {
-    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $this->assign('contactId', $this->_contactId);
-
-    // check logged in url permission
-    CRM_Contact_Page_View::checkUserPermission($this);
-
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->assign('action', $this->_action);
-
-    $this->_groupId = CRM_Utils_Request::retrieve('gid', 'Positive', $this, TRUE);
-    $this->assign('groupId', $this->_groupId);
-
-    $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this, FALSE);
-    $this->_cgcount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE);
-    $this->_recId = CRM_Utils_Request::retrieve('recId', 'Positive', $this, FALSE);
-  }
 
   /**
    * Run the page.
@@ -64,25 +34,42 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
    * type of action and executes that action.
    */
   public function run() {
-    $this->preProcess();
+    $this->_groupId = CRM_Utils_Request::retrieve('gid', 'Positive', $this, TRUE);
+    $this->assign('groupId', $this->_groupId);
+
+    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->_recId = CRM_Utils_Request::retrieve('recId', 'Positive', $this);
+
+    // If no cid supplied, look it up
+    if (!$this->_contactId && $this->_recId) {
+      $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_groupId, 'table_name');
+      if ($tableName) {
+        $this->_contactId = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `$tableName` WHERE id = %1", [1 => [$this->_recId, 'Integer']]);
+      }
+    }
+    if (!$this->_contactId) {
+      throw new CRM_Core_Exception(ts('Could not find valid value for %1', [1 => 'cid']));
+    }
+
+    $this->assign('contactId', $this->_contactId);
+
+    // check logged in url permission
+    CRM_Contact_Page_View::checkUserPermission($this);
+
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
+    $this->assign('action', $this->_action);
+
+    $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this, FALSE);
+    $this->_cgcount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE);
 
     //set the userContext stack
     $doneURL = 'civicrm/contact/view';
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url($doneURL, 'action=browse&selectedChild=custom_' . $this->_groupId), FALSE);
 
-    // Get permission detail - view or edit.
-    // use a contact id specific function which gives us much better granularity
-    // CRM-12646
-    $editCustomData = CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT);
-    $this->assign('editCustomData', $editCustomData);
-
-    // Allow to edit own custom data CRM-5518.
-    $editOwnCustomData = FALSE;
-    if ($session->get('userID') == $this->_contactId) {
-      $editOwnCustomData = TRUE;
-    }
-    $this->assign('editOwnCustomData', $editOwnCustomData);
+    // Check permission to edit this contact
+    $editPermission = CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT);
+    $this->assign('editPermission', $editPermission);
 
     if ($this->_action == CRM_Core_Action::BROWSE) {
 
@@ -93,8 +80,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
       if ($this->_multiRecordDisplay != 'single') {
         $id = "custom_{$this->_groupId}";
-        $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_groupId, 'table_name');
-        $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $tableName);
+        $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId);
       }
 
       if ($displayStyle === 'Tab with table' && $this->_multiRecordDisplay != 'single') {
@@ -125,7 +111,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
           $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupId);
           CRM_Utils_System::setTitle(ts('View %1 Record', [1 => $groupTitle]));
           $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, NULL, $this->_contactId,
-            $this->_groupId, $entitySubType, NULL, TRUE, NULL, FALSE, TRUE, $this->_cgcount
+            $this->_groupId, $entitySubType, NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW, $this->_cgcount
           );
 
           $recId = $this->_recId;
@@ -134,10 +120,10 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
         }
         else {
           $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, NULL, $this->_contactId,
-            $this->_groupId, $entitySubType
+            $this->_groupId, $entitySubType, NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW
           );
         }
-        CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, $recId, $this->_contactId);
+        CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, $recId, $this->_contactId, TRUE);
       }
     }
     else {

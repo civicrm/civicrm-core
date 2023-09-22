@@ -19,7 +19,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
   /**
    * Setup function.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->createLoggedInUser();
 
@@ -28,19 +28,23 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_note', 'civicrm_uf_match', 'civicrm_address']);
+    parent::tearDown();
   }
 
   /**
    * Test the submit function of payment edit form.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function testSubmitOnPaymentInstrumentChange() {
+  public function testSubmitOnPaymentInstrumentChange(): void {
     // First create a contribution using 'Check' as payment instrument
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->testSubmit([
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => 50,
       'receive_date' => '2015-04-21 23:27:00',
       'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
@@ -48,8 +52,9 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'check_number' => '123XA',
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-    ],
-      CRM_Core_Action::ADD);
+    ]);
+    $form->buildForm();
+    $form->postProcess();
     // fetch the financial trxn record later used in setting default values of payment edit form
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualID]);
     $payments = CRM_Contribute_BAO_Contribution::getPaymentInfo($contribution['id'], 'contribute', TRUE);
@@ -61,7 +66,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit Card'),
       'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', 'Visa'),
       'pan_truncation' => 1111,
-      'trnx_id' => 'txn_12AAAA',
+      'trxn_id' => 'txn_12',
       'trxn_date' => date('Y-m-d H:i:s'),
       'contribution_id' => $contribution['id'],
     ];
@@ -81,7 +86,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
         'total_amount' => -50.00,
         'financial_type' => 'Donation',
         'payment_instrument' => 'Check',
-        'status' => 'Completed',
+        'status' => 'Refunded Label**',
         'receive_date' => $params['trxn_date'],
         'check_number' => '123XA',
       ],
@@ -105,21 +110,21 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
    * Test to ensure that multiple check_numbers are concatenated
    *  and stored in related contribution's check_number
    */
-  public function testSubmitOnCheckNumberChange() {
+  public function testSubmitOnCheckNumberChange(): void {
     // CASE 1: Submit contribution using Check as payment instrument and check_number as '123XA'
     $checkNumber1 = '123XA';
     $checkPaymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     // First create a contribution using 'Check' as payment instrument
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->testSubmit([
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => 50,
       'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
       'contact_id' => $this->_individualID,
       'payment_instrument_id' => $checkPaymentInstrumentID,
       'check_number' => $checkNumber1,
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-    ],
-      CRM_Core_Action::ADD);
+    ]);
+    $form->buildForm();
+    $form->postProcess();
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualID]);
     $payments = CRM_Contribute_BAO_Contribution::getPaymentInfo($contribution['id'], 'contribute', TRUE);
     $financialTrxnInfo = $payments['transaction'][0];

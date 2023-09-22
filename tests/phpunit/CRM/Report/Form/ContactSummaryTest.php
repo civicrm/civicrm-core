@@ -22,19 +22,15 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
     'civicrm_address',
   ];
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->quickCleanup($this->_tablesToTruncate);
-  }
-
-  public function tearDown() {
-    parent::tearDown();
   }
 
   /**
    * Ensure the new Odd/Event street number sort column works correctly
    */
-  public function testOddEvenStreetNumber() {
+  public function testOddEvenStreetNumber(): void {
     $customLocationType = $this->callAPISuccess('LocationType', 'create', [
       'name' => 'Custom Location Type',
       'display_name' => 'CiviTest Custom Location Type',
@@ -199,9 +195,9 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
   }
 
   /**
-   * Test that Loation Type prints out a sensible piece of data
+   * Test that Location Type prints out a sensible piece of data
    */
-  public function testLocationTypeIdHandling() {
+  public function testLocationTypeIdHandling(): void {
     $customLocationType = $this->callAPISuccess('LocationType', 'create', [
       'name' => 'Custom Location Type',
       'display_name' => 'CiviTest Custom Location Type',

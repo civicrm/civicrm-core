@@ -23,8 +23,7 @@
     max-height: 50em;
   }
   pre#api-result,
-  div#doc-result,
-  pre#example-result {
+  div#doc-result {
     padding:1em;
     border: 1px solid lightgrey;
     margin-top: 1em;
@@ -203,17 +202,36 @@
     text-align: right;
     font-style: italic;
   }
+  .crm-container .api-rest-params pre {
+    display: inline-block;
+  }
+  .crm-container .api-rest-params tr td:first-child {
+    text-align: right;
+  }
+  .crm-container .api-rest-params tr td:first-child + td {
+    text-align: center;
+    width: 1em;
+  }
+  .crm-container .api-rest-params tr td:first-child + td + td {
+    text-align: left;
+  }
   {/literal}
 </style>
-
+<div class="messages status no-popup">
+  <p>
+    {icon icon="fa-info-circle"}{/icon}
+    <strong>{ts}Deprecation Notice{/ts}</strong>
+  </p>
+  <p>
+    {ts}APIv3 is the legacy version of CiviCRM's API. While still supported, it is not recommended for use in new projects.{/ts}
+    <a href="{crmURL p='civicrm/api4'}">{icon icon="fa-hand-o-right"}{/icon} {ts}Switch to APIv4{/ts}</a>
+  </p>
+</div>
 <div class="crm-block crm-content-block">
 <div id="mainTabContainer">
   <ul>
     <li class="ui-corner-all" title="GUI to build and execute API calls">
       <a href="#explorer-tab"><i class="crm-i fa-search" aria-hidden="true"></i> {ts}Explorer{/ts}</a>
-    </li>
-    <li class="ui-corner-all" title="Auto-generated examples from the test suite">
-      <a href="#examples-tab"><i class="crm-i fa-book" aria-hidden="true"></i> {ts}Examples{/ts}</a>
     </li>
     <li class="ui-corner-all" title="API source-code and code-level documentation">
       <a href="#docs-tab"><i class="crm-i fa-code" aria-hidden="true"></i> {ts}Code Docs{/ts}</a>
@@ -271,7 +289,7 @@
       <div id="api-generated-wraper">
         <table id="api-generated" border=1>
           <caption>{ts}Code{/ts}</caption>
-          <tr><td>Rest</td><td><pre id="api-rest"></pre></td></tr>
+          <tr><td>Rest</td><td><div id="api-rest"></div></td></tr>
           <tr><td>Smarty</td><td><pre class="linenums" id="api-smarty" title='smarty syntax (for get actions)'></pre></td></tr>
           <tr><td>Php</td><td><pre class="linenums" id="api-php" title='php syntax'></pre></td></tr>
           <tr><td>Javascript</td><td><pre class="linenums" id="api-json" title='javascript syntax'></pre></td></tr>
@@ -282,39 +300,16 @@
           {if $config->userSystem->is_wordpress}
             <tr><td><a href="http://wp-cli.org/" target="_blank">wp-cli</a></td><td><pre id="api-wpcli" title='wp-cli syntax'></pre></td></tr>
           {/if}
+          <tr><td><a href="https://curl.se/">curl</a></td><td><pre id="api-curl"></pre></td></tr>
         </table>
       </div>
       <div class="crm-submit-buttons">
-        <span class="crm-button crm-i-button">
-          <i class="crm-i fa-bolt" aria-hidden="true"></i><input type="submit" value="{ts}Execute{/ts}" class="crm-form-submit" accesskey="S" title="{ts}Execute API call and display results{/ts}"/>
-        </span>
+        <button type="submit" class="crm-button crm-form-submit" accesskey="S" title="{ts}Execute API call and display results{/ts}">
+          <i class="crm-i fa-bolt" aria-hidden="true"></i> {ts}Execute{/ts}
+        </button>
       </div>
 
 <pre id="api-result" class="linenums">
-{ts}Results are displayed here.{/ts}
-</pre>
-    </form>
-  </div>
-  </div>
-
-  <div id="examples-tab">
-    <div class="crm-block crm-form-block">
-    <form id="api-examples">
-      <label for="example-entity">{ts}Entity{/ts}:</label>
-      <select class="crm-form-select big required" id="example-entity" name="entity">
-        <option value="" selected="selected">{ts}Choose{/ts}...</option>
-        {foreach from=$examples item=entity}
-          <option value="{$entity}" {if !empty($entities.deprecated) && in_array($entity, $entities.deprecated)}class="strikethrough"{/if}>
-            {$entity}
-          </option>
-        {/foreach}
-      </select>
-      &nbsp;&nbsp;
-      <label for="example-action">{ts}Example{/ts}:</label>
-      <select class="crm-form-select big crm-select2" id="example-action" name="action">
-        <option value="" selected="selected">{ts}Choose{/ts}...</option>
-      </select>
-<pre id="example-result" class="linenums lang-php" placeholder="{ts escape='html'}Results are displayed here.{/ts}">
 {ts}Results are displayed here.{/ts}
 </pre>
     </form>
@@ -347,6 +342,19 @@
 </div>
 </div>
 {strip}
+<script type="text/template" id="api-rest-tpl">
+  <pre class="api-rest-url"><%- method %> <%- url %></pre>
+  <table class="api-rest-params"><tbody>{literal}
+    <% _.forEach(query, function(value, field){ %>
+    <tr>
+      <td><pre><%- field %></pre></td>
+      <td>=</td>
+      <td><pre><%- value %></pre></td>
+    </tr>
+    <% }); %>
+  {/literal}</table>
+</script>
+
 <script type="text/template" id="api-param-tpl">
   <tr class="api-param-row">
     <td>

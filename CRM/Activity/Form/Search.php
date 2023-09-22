@@ -21,6 +21,11 @@
 class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * The params that are sent to the query.
    *
    * @var array
@@ -48,16 +53,9 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   protected $_prefix = 'activity_';
 
   /**
-   * The saved search ID retrieved from the GET vars.
-   *
-   * @var int
-   */
-  protected $_ssID;
-
-  /**
    * @return string
    */
-  public function getDefaultEntity() {
+  public function getDefaultEntity(): string {
     return 'Activity';
   }
 
@@ -65,9 +63,8 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  public function preProcess() {
+  public function preProcess(): void {
     $this->set('searchFormName', 'Search');
 
     // set the button names
@@ -78,10 +75,8 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     parent::preProcess();
 
-    if (empty($this->_formValues)) {
-      if (isset($this->_ssID)) {
-        $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
-      }
+    if (empty($this->_formValues) && isset($this->_ssID)) {
+      $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
@@ -93,7 +88,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $this->_context
     );
     $prefix = NULL;
-    if ($this->_context == 'user') {
+    if ($this->_context === 'user') {
       $prefix = $this->_prefix;
     }
 
@@ -118,9 +113,8 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     parent::buildQuickForm();
     $this->addSortNameField();
 
@@ -152,7 +146,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    *
    * @throws \CRM_Core_Exception
    */
-  public function postProcess() {
+  public function postProcess(): void {
     if ($this->_done) {
       return;
     }
@@ -176,13 +170,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       // if we are editing / running a saved search and the form has not been posted
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
     }
-
-    // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['activity_test']) && $this->_force) {
-      $this->_formValues["activity_test"] = 0;
-    }
-
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
@@ -283,7 +270,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     // use getEntity Defaults
     $requestParams = CRM_Utils_Request::exportValues();
     foreach (array_keys($requestParams) as $key) {
-      if (substr($key, 0, 7) != 'custom_') {
+      if (substr($key, 0, 7) !== 'custom_') {
         continue;
       }
       elseif (empty($requestParams[$key])) {
@@ -315,7 +302,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function getEntityMetadata() {
     return CRM_Activity_BAO_Query::getSearchFieldMetadata();

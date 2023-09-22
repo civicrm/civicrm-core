@@ -252,7 +252,7 @@ class CRM_Omnimail_BAO_MailingProviderData extends CRM_Omnimail_DAO_MailingProvi
  *
  * @param array $params
  * @return array API result descriptor
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_mailing_provider_data_get($params) {
   $sql = CRM_Utils_SQL_Select::fragment();
@@ -265,7 +265,7 @@ function civicrm_api3_mailing_provider_data_get($params) {
  *
  * @param array $params
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function _civicrm_api3_mailing_provider_data_get_spec(&$params) {
   $params['mailing_identifier']['FKClassName'] = 'CRM_Mailing_BAO_Mailing';
@@ -278,7 +278,7 @@ function _civicrm_api3_mailing_provider_data_get_spec(&$params) {
  *
  * @param array $params
  * @return array API result descriptor
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_mailing_provider_data_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);

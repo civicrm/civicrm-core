@@ -14,78 +14,96 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace api\v4\Query;
 
+use Civi\API\Request;
 use Civi\Api4\Query\Api4SelectQuery;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class Api4SelectQueryTest extends UnitTestCase {
+class Api4SelectQueryTest extends Api4TestBase {
 
-  public function setUpHeadless() {
-    $relatedTables = [
-      'civicrm_address',
-      'civicrm_email',
-      'civicrm_phone',
-      'civicrm_openid',
-      'civicrm_im',
-      'civicrm_website',
-      'civicrm_activity',
-      'civicrm_activity_contact',
-    ];
-    $this->cleanup(['tablesToTruncate' => $relatedTables]);
-    $this->loadDataSet('DefaultDataSet');
-    $displayNameFormat = '{contact.first_name}{ }{contact.last_name}';
-    \Civi::settings()->set('display_name_format', $displayNameFormat);
+  public function testManyToOneJoin(): void {
+    $contact = $this->createTestRecord('Contact', [
+      'first_name' => uniqid(),
+      'last_name' => uniqid(),
+    ]);
+    $phone = $this->createTestRecord('Phone', [
+      'contact_id' => $contact['id'],
+      'phone' => uniqid(),
+    ]);
 
-    return parent::setUpHeadless();
-  }
+    $phoneNum = $phone['phone'];
 
-  public function testManyToOneJoin() {
-    $phoneNum = $this->getReference('test_phone_1')['phone'];
-    $contact = $this->getReference('test_contact_1');
-
-    $api = \Civi\API\Request::create('Phone', 'get', ['version' => 4, 'checkPermissions' => FALSE]);
+    $api = Request::create('Phone', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['id', 'phone', 'contact_id.display_name', 'contact_id.first_name'],
+      'where' => [['phone', '=', $phoneNum]],
+    ]);
     $query = new Api4SelectQuery($api);
-    $query->select[] = 'id';
-    $query->select[] = 'phone';
-    $query->select[] = 'contact.display_name';
-    $query->select[] = 'contact.first_name';
-    $query->where[] = ['phone', '=', $phoneNum];
     $results = $query->run();
 
     $this->assertCount(1, $results);
     $firstResult = array_shift($results);
-    $this->assertEquals($contact['display_name'], $firstResult['contact.display_name']);
+    $this->assertEquals($contact['display_name'], $firstResult['contact_id.display_name']);
   }
 
-  public function testInvaidSort() {
-    $api = \Civi\API\Request::create('Contact', 'get', ['version' => 4, 'checkPermissions' => FALSE]);
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  public function testAggregateNoGroupBy(): void {
+    $api = Request::create('Pledge', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['SUM(amount) AS SUM_amount'],
+    ]);
     $query = new Api4SelectQuery($api);
-    $query->select[] = 'id';
-    $query->select[] = 'first_name';
-    $query->select[] = 'phones.phone';
-    $query->where[] = ['first_name', '=', 'Phoney'];
-    $query->orderBy = ['first_name' => 'sleep(1)'];
+    $this->assertEquals(
+      'SELECT SUM(`a`.`amount`) AS `SUM_amount`
+FROM civicrm_pledge a',
+      trim($query->getSql())
+    );
+  }
+
+  /**
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  public function testInvalidSort(): void {
+    $api = Request::create('Contact', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['id', 'display_name'],
+      'where' => [['first_name', '=', 'phoney']],
+      'orderBy' => ['first_name' => 'sleep(1)'],
+    ]);
+    $query = new Api4SelectQuery($api);
     try {
-      $results = $query->run();
+      $query->run();
       $this->fail('An Exception Should have been raised');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
     }
-    $query->orderBy = ['sleep(1)', 'ASC'];
+
+    $api = Request::create('Contact', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['id', 'display_name'],
+      'where' => [['first_name', '=', 'phoney']],
+      'orderBy' => ['sleep(1)' => 'ASC'],
+    ]);
+    $query = new Api4SelectQuery($api);
     try {
-      $results = $query->run();
+      $query->run();
       $this->fail('An Exception Should have been raised');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
     }
   }
 

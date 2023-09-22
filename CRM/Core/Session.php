@@ -42,19 +42,12 @@ class CRM_Core_Session {
   protected $_session = NULL;
 
   /**
-   * Current php Session ID : needed to detect if the session is changed
-   *
-   * @var string
-   */
-  protected $sessionID;
-
-  /**
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
-   * @var object
+   * @var \CRM_Core_Session
    */
-  static private $_singleton = NULL;
+  static private $_singleton;
 
   /**
    * Constructor.
@@ -87,6 +80,39 @@ class CRM_Core_Session {
   }
 
   /**
+   * Replace the session object with a fake session.
+   */
+  public static function useFakeSession() {
+    self::$_singleton = new class() extends CRM_Core_Session {
+
+      public function initialize($isRead = FALSE) {
+        if ($isRead) {
+          return;
+        }
+
+        if (!isset($this->_session)) {
+          $this->_session = [];
+        }
+
+        if (!isset($this->_session[$this->_key]) || !is_array($this->_session[$this->_key])) {
+          $this->_session[$this->_key] = [];
+        }
+      }
+
+      public function isEmpty() {
+        return empty($this->_session);
+      }
+
+    };
+    self::$_singleton->_session = NULL;
+    // This is not a revocable proposition. Should survive, even with things 'System.flush'.
+    if (!defined('_CIVICRM_FAKE_SESSION')) {
+      define('_CIVICRM_FAKE_SESSION', TRUE);
+    }
+    return self::$_singleton;
+  }
+
+  /**
    * Creates an array in the session.
    *
    * All variables now will be stored under this array.
@@ -95,10 +121,9 @@ class CRM_Core_Session {
    *   Is this a read operation, in this case, the session will not be touched.
    */
   public function initialize($isRead = FALSE) {
-    // remove $_SESSION reference if session is changed
-    if (($sid = session_id()) !== $this->sessionID) {
-      $this->_session = NULL;
-      $this->sessionID = $sid;
+    // reset $this->_session in case if it is no longer a reference to $_SESSION;
+    if (isset($_SESSION) && isset($this->_session) && $_SESSION !== $this->_session) {
+      unset($this->_session);
     }
     // lets initialize the _session variable just before we need it
     // hopefully any bootstrapping code will actually load the session from the CMS
@@ -138,9 +163,9 @@ class CRM_Core_Session {
       unset($this->_session[$this->_key]);
     }
     else {
-      $this->_session = [];
+      $this->_session[$this->_key] = [];
+      unset($this->_session);
     }
-
   }
 
   /**
@@ -182,18 +207,18 @@ class CRM_Core_Session {
   }
 
   /**
-   * Store the variable with the value in the session scope.
-   *
-   * This function takes a name, value pair and stores this
-   * in the session scope. Not sure what happens if we try
-   * to store complex objects in the session. I suspect it
-   * is supported but we need to verify this
-   *
+   * Store a name-value pair in the session scope.
    *
    * @param string $name
    *   Name of the variable.
    * @param mixed $value
-   *   Value of the variable.
+   *   Value of the variable. It is safe to use scalar values here, as well as
+   *   arrays whose leaf nodes are scalar values. Instances of built-in classes
+   *   like DateTime may be safe, although the retrieved objects will be copies
+   *   of the ones saved here. Instances of custom classes (such as those
+   *   defined in CiviCRM core or extension code) will probably not be rebuilt
+   *   correctly on retrieval. Resources and other special variable types are
+   *   not safe to use. References will be dereferenced.
    * @param string $prefix
    *   A string to prefix the keys in the session with.
    */
@@ -300,7 +325,7 @@ class CRM_Core_Session {
     $ts = $this->get($name, 'timer');
     if (!$ts || $ts < time() - $expire) {
       $this->set($name, time(), 'timer');
-      return $ts ? $ts : 'not set';
+      return $ts ?: 'not set';
     }
     return FALSE;
   }
@@ -406,13 +431,13 @@ class CRM_Core_Session {
    * @param bool $reset
    *   Should we reset the status variable?.
    *
-   * @return string
+   * @return array
    *   the status message if any
    */
-  public function getStatus($reset = FALSE) {
+  public function getStatus($reset = FALSE) : array {
     $this->initialize();
 
-    $status = NULL;
+    $status = [];
     if (array_key_exists('status', $this->_session[$this->_key])) {
       $status = $this->_session[$this->_key]['status'];
     }
@@ -477,7 +502,7 @@ class CRM_Core_Session {
         'text' => $text,
         'title' => $title,
         'type' => $type,
-        'options' => $options ? $options : NULL,
+        'options' => $options ?: NULL,
       ];
     }
   }
@@ -530,7 +555,7 @@ class CRM_Core_Session {
     if (!is_numeric($session->get('userID'))) {
       return NULL;
     }
-    return $session->get('userID');
+    return (int) $session->get('userID');
   }
 
   /**
@@ -538,7 +563,7 @@ class CRM_Core_Session {
    *
    * @return string
    *
-   * @throws CiviCRM_API3_Exception
+   * @throws CRM_Core_Exception
    */
   public function getLoggedInContactDisplayName() {
     $userContactID = CRM_Core_Session::getLoggedInContactID();

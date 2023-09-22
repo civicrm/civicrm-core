@@ -10,7 +10,7 @@
 {* Confirmation of Export Batch(s)  *}
 <h3>{ts}Export Batch{/ts}</h3>
 <div class="messages status">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
   {ts}Warning: You will not be able to reopen or change the batch after it is exported. Are you sure you want to export?{/ts}
 </div>
 <div class="crm-block crm-form-block crm-export_batch-form-block">
@@ -40,7 +40,8 @@
     $('input[name="export_format"]').filter('[value=IIF]').prop('checked', true);
     $('#_qf_Export_next').click(function(){
       $(this).hide();
-      $('#_qf_Export_cancel').val('{/literal}{ts}Done{/ts}{literal}');
+      {/literal}{capture assign=tsdone}{ts}Done{/ts}{/capture}{literal}
+      $('#_qf_Export_cancel').html('<i aria-hidden="true" class="crm-i fa-check"></i> {/literal}{$tsdone|escape}{literal}');
     });
   });
 </script>

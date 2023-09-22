@@ -7,12 +7,11 @@
 <body>
 
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
-{capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
-{capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
-{capture assign=emptyBlockStyle }style="padding: 10px; border-bottom: 1px solid #999;background-color: #f7f7f7;"{/capture}
-{capture assign=emptyBlockValueStyle }style="padding: 10px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=labelStyle}style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
+{capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=emptyBlockStyle}style="padding: 10px; border-bottom: 1px solid #999;background-color: #f7f7f7;"{/capture}
+{capture assign=emptyBlockValueStyle}style="padding: 10px; border-bottom: 1px solid #999;"{/capture}
 
-<center>
  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
@@ -22,7 +21,7 @@
   <!-- BEGIN CONTENT -->
   <tr>
     <td>
-      {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+      {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
       {if $isRefund}
         <p>{ts}A refund has been issued based on changes in your registration selections.{/ts}</p>
       {else}
@@ -45,7 +44,7 @@
         {ts}This Refund Amount{/ts}
         </td>
         <td {$valueStyle}>
-        {$refundAmount|crmMoney}
+        {$refundAmount|crmMoney:$currency}
         </td>
       </tr>
     {else}
@@ -57,7 +56,7 @@
         {ts}This Payment Amount{/ts}
         </td>
         <td {$valueStyle}>
-        {$paymentAmount|crmMoney}
+        {$paymentAmount|crmMoney:$currency}
         </td>
       </tr>
     {/if}
@@ -71,7 +70,7 @@
         </td>
       </tr>
     {/if}
-    {if $trxn_id}
+    {if !empty($trxn_id)}
       <tr>
         <td {$labelStyle}>
         {ts}Transaction #{/ts}
@@ -81,7 +80,7 @@
         </td>
       </tr>
     {/if}
-    {if $paidBy}
+    {if !empty($paidBy)}
       <tr>
         <td {$labelStyle}>
         {ts}Paid By{/ts}
@@ -91,7 +90,7 @@
         </td>
       </tr>
     {/if}
-    {if $checkNumber}
+    {if !empty($checkNumber)}
       <tr>
         <td {$labelStyle}>
         {ts}Check Number{/ts}
@@ -105,30 +104,36 @@
   <tr>
     <th {$headerStyle}>{ts}Contribution Details{/ts}</th>
   </tr>
+  {if $totalAmount}
   <tr>
     <td {$labelStyle}>
       {ts}Total Fee{/ts}
     </td>
     <td {$valueStyle}>
-      {$totalAmount|crmMoney}
+      {$totalAmount|crmMoney:$currency}
     </td>
   </tr>
+  {/if}
+  {if $totalPaid}
   <tr>
     <td {$labelStyle}>
       {ts}Total Paid{/ts}
     </td>
     <td {$valueStyle}>
-      {$totalPaid|crmMoney}
+      {$totalPaid|crmMoney:$currency}
     </td>
   </tr>
+  {/if}
+  {if $amountOwed}
   <tr>
     <td {$labelStyle}>
       {ts}Balance Owed{/ts}
     </td>
     <td {$valueStyle}>
-      {$amountOwed|crmMoney}
+      {$amountOwed|crmMoney:$currency}
     </td> {* This will be zero after final payment. *}
   </tr>
+  {/if}
   </table>
 
   </td>
@@ -136,7 +141,7 @@
     <tr>
       <td>
   <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
-    {if $billingName || $address}
+    {if !empty($billingName) || !empty($address)}
           <tr>
             <th {$headerStyle}>
         {ts}Billing Name and Address{/ts}
@@ -144,12 +149,12 @@
           </tr>
           <tr>
             <td colspan="2" {$valueStyle}>
-        {$billingName}<br />
-        {$address|nl2br}
+        {if !empty($billingName)}{$billingName}{/if}<br />
+        {if !empty($address)}{$address|nl2br}{/if}
             </td>
           </tr>
     {/if}
-    {if $credit_card_number}
+    {if !empty($credit_card_number)}
           <tr>
             <th {$headerStyle}>
         {ts}Credit Card Information{/ts}
@@ -172,11 +177,11 @@
     <tr>
       <td colspan="2" {$valueStyle}>
          {$event.event_title}<br />
-        {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+        {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
       </td>
     </tr>
 
-    {if $event.participant_role}
+    {if !empty($event.participant_role)}
     <tr>
       <td {$labelStyle}>
         {ts}Participant Role{/ts}
@@ -187,7 +192,7 @@
     </tr>
     {/if}
 
-    {if $isShowLocation}
+    {if !empty($isShowLocation)}
     <tr>
       <td colspan="2" {$valueStyle}>
         {$location.address.1.display|nl2br}
@@ -195,7 +200,7 @@
     </tr>
     {/if}
 
-    {if $location.phone.1.phone || $location.email.1.email}
+    {if !empty($location.phone.1.phone) || !empty($location.email.1.email)}
     <tr>
       <td colspan="2" {$labelStyle}>
         {ts}Event Contacts:{/ts}
@@ -236,7 +241,6 @@
     </tr>
 
     </table>
-  </center>
 
  </body>
 </html>

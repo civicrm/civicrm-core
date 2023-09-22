@@ -145,32 +145,6 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
 }
 
 var submitcount = 0;
-/**
- * Old submit-once function. Will be removed soon.
- * @deprecated
- */
-function submitOnce(obj, formId, procText) {
-  // if named button clicked, change text
-  if (obj.value != null) {
-    cj('input[name=' + obj.name + ']').val(procText + " ...");
-  }
-  cj(obj).closest('form').attr('data-warn-changes', 'false');
-  if (document.getElementById) { // disable submit button for newer browsers
-    cj('input[name=' + obj.name + ']').attr("disabled", true);
-    document.getElementById(formId).submit();
-    return true;
-  }
-  else { // for older browsers
-    if (submitcount == 0) {
-      submitcount++;
-      return true;
-    }
-    else {
-      alert("Your request is currently being processed ... Please wait.");
-      return false;
-    }
-  }
-}
 
 /**
  * Function to show / hide the row in optionFields
@@ -211,14 +185,14 @@ if (!CRM.vars) CRM.vars = {};
 
   // Workaround for https://github.com/ivaynberg/select2/issues/1246
   $.ui.dialog.prototype._allowInteraction = function(e) {
-    return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .cke_dialog, #civicrm-menu').length;
+    return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .cke_dialog, .ck-balloon-panel, #civicrm-menu').length;
   };
 
   // Implements jQuery hook.prop
   $.propHooks.disabled = {
     set: function (el, value, name) {
       // Sync button enabled status with wrapper css
-      if ($(el).is('span.crm-button > input.crm-form-submit')) {
+      if ($(el).is('.crm-button.crm-form-submit')) {
         $(el).parent().toggleClass('crm-button-disabled', !!value);
       }
       // Sync button enabled status with dialog button
@@ -275,6 +249,11 @@ if (!CRM.vars) CRM.vars = {};
         opts = placeholder || placeholder === '' ? '' : '[value!=""]';
       $elect.find('option' + opts).remove();
       var newOptions = CRM.utils.renderOptions(options, val);
+      if (options.length == 0) {
+        $elect.removeClass('required');
+      } else if ($elect.hasClass('crm-field-required') && !$elect.hasClass('required')) {
+        $elect.addClass('required');
+      }
       if (typeof placeholder === 'string') {
         if ($elect.is('[multiple]')) {
           select.attr('placeholder', placeholder);
@@ -313,6 +292,17 @@ if (!CRM.vars) CRM.vars = {};
       }
     });
     return rendered;
+  };
+
+  CRM.utils.getOptions = function(select) {
+    var options = [];
+    $('option', select).each(function() {
+      var option = {key: $(this).attr('value'), value: $(this).text()};
+      if (option.key !== '') {
+        options.push(option);
+      }
+    });
+    return options;
   };
 
   function chainSelect() {
@@ -361,7 +351,7 @@ if (!CRM.vars) CRM.vars = {};
    * @returns {*}
    */
   CRM.utils.adjustDialogDefaults = function(settings) {
-    settings = $.extend({width: '65%', height: '65%', modal: true}, settings || {});
+    settings = $.extend({width: '65%', height: '40%', modal: true}, settings || {});
     // Support relative height
     if (typeof settings.height === 'string' && settings.height.indexOf('%') > 0) {
       settings.height = parseInt($(window).height() * (parseFloat(settings.height)/100), 10);
@@ -377,6 +367,9 @@ if (!CRM.vars) CRM.vars = {};
       else if (screenWidth < 1400) {
         settings.width = '' + parseInt(percentage+gap-((screenWidth - 700)/7*(gap)/100), 10) + '%';
       }
+    }
+    if (settings.dialogClass && !_.includes(settings.dialogClass, 'crm-container')) {
+      settings.dialogClass += ' crm-container';
     }
     return settings;
   };
@@ -446,11 +439,26 @@ if (!CRM.vars) CRM.vars = {};
           formatResult: formatCrmSelect2,
           formatSelection: formatCrmSelect2
         };
+
       // quickform doesn't support optgroups so here's a hack :(
+      // Instead of using wrapAll or similar that repeatedly appends options to the group and redraw the page (=> very slow on large lists),
+      // build bulk HTML and insert in single shot
+      var optGroups = {};
       $('option[value^=crm_optgroup]', this).each(function () {
-        $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
+        var groupHtml = '';
+          $(this).nextUntil('option[value^=crm_optgroup]').each(function () {
+          groupHtml += this.outerHTML;
+        });
+        optGroups[$(this).text()] = groupHtml;
         $(this).remove();
       });
+      var replacedHtml = '';
+      for (var groupLabel in optGroups) {
+        replacedHtml += '<optgroup label="' + groupLabel + '">' + optGroups[groupLabel] + '</optgroup>';
+      }
+      if (replacedHtml) {
+        $el.html(replacedHtml);
+      }
 
       // quickform does not support disabled option, so yet another hack to
       // add disabled property for option values
@@ -469,12 +477,37 @@ if (!CRM.vars) CRM.vars = {};
         };
       }
 
-      // Use description as title for each option
-      $el.on('select2-loaded.crmSelect2', function() {
-        $('.crm-select2-row-description', '#select2-drop').each(function() {
-          $(this).closest('.select2-result-label').attr('title', $(this).text());
+      $el
+        .off('.crmSelect2')
+        .on('select2-loaded.crmSelect2', function() {
+          // Use description as title for each option
+          $('.crm-select2-row-description', '#select2-drop').each(function() {
+            $(this).closest('.select2-result-label').attr('title', $(this).text());
+          });
+          // Collapsible optgroups should be expanded when searching (searching happens within select2-drop for single selects, but within the element for multiselects; this handles both)
+          if ($('#select2-drop.collapsible-optgroups-enabled .select2-search input.select2-input, .select2-dropdown-open.collapsible-optgroups .select2-search-field input.select2-input').val()) {
+            $('#select2-drop.collapsible-optgroups-enabled li.select2-result-with-children')
+              .addClass('optgroup-expanded');
+          }
+        })
+        // Handle collapsible optgroups
+        .on('select2-open', function(e) {
+          var isCollapsible = $(e.target).hasClass('collapsible-optgroups');
+          $('#select2-drop')
+            .off('.collapseOptionGroup')
+            .toggleClass('collapsible-optgroups-enabled', isCollapsible);
+          if (isCollapsible) {
+            $('#select2-drop')
+              .on('click.collapseOptionGroup', '.select2-result-with-children > .select2-result-label', function() {
+                $(this).parent().toggleClass('optgroup-expanded');
+              })
+              // If the first item in the list is an optgroup, expand it
+              .find('li.select2-result-with-children:first-child').addClass('optgroup-expanded');
+          }
+        })
+        .on('select2-close', function() {
+          $('#select2-drop').off('.collapseOptionGroup').removeClass('collapsible-optgroups-enabled');
         });
-      });
 
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
@@ -488,6 +521,115 @@ if (!CRM.vars) CRM.vars = {};
         $el.addClass('crm-ajax-select');
       }
       $el.select2(settings);
+    });
+  };
+
+  function getStaticOptions(staticItems) {
+    var staticPresets = {
+      user_contact_id: {
+        id: 'user_contact_id',
+        label: ts('Select Current User'),
+        icon: 'fa-user-circle-o'
+      }
+    };
+
+    return _.transform(staticItems || [], function(staticItems, option) {
+      staticItems.push(_.isString(option) ? staticPresets[option] : option);
+    });
+  }
+
+  function getStaticOptionMarkup(staticItems) {
+    if (!staticItems.length) {
+      return '';
+    }
+    var markup = '<div class="crm-entityref-links crm-entityref-links-static">';
+    _.each(staticItems, function(link) {
+      markup += ' <a class="crm-hover-button" href="#' + _.escape(link.id) + '">' +
+        '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
+        _.escape(link.label) + '</a>';
+    });
+    markup += '</div>';
+    return markup;
+  }
+
+  // Autocomplete based on APIv4 and Select2.
+  $.fn.crmAutocomplete = function(entityName, apiParams, select2Options) {
+    if (entityName === 'destroy') {
+      return $(this).off('.crmEntity').crmSelect2('destroy');
+    }
+    select2Options = select2Options || {};
+    return $(this).each(function() {
+      var $el = $(this).off('.crmEntity'),
+        staticItems = getStaticOptions(select2Options.static),
+        multiple = !!select2Options.multiple;
+
+      $el.crmSelect2(_.extend({
+        ajax: {
+          quietMillis: 250,
+          url: CRM.url('civicrm/ajax/api4/' + entityName + '/autocomplete'),
+          data: function (input, pageNum) {
+            return {params: JSON.stringify(_.assign({
+              input: input,
+              page: pageNum || 1
+            }, apiParams))};
+          },
+          results: function(data) {
+            return {
+              results: data.values,
+              more: data.count > data.countFetched
+            };
+          },
+        },
+        minimumInputLength: 1,
+        formatResult: CRM.utils.formatSelect2Result,
+        formatSelection: formatEntityRefSelection,
+        escapeMarkup: _.identity,
+        initSelection: function($el, callback) {
+          var val = $el.val();
+          if (val === '') {
+            return;
+          }
+          var idsNeeded = _.difference(val.split(','), _.pluck(staticItems, 'id')),
+            existing = _.filter(staticItems, function(item) {
+              return _.includes(val.split(','), item.id);
+            });
+          // If we already have the data, just return it
+          if (!idsNeeded.length) {
+            callback(multiple ? existing : existing[0]);
+          } else {
+            var params = $.extend({}, apiParams || {}, {ids: idsNeeded});
+            CRM.api4(entityName, 'autocomplete', params).then(function (result) {
+              callback(multiple ? result.concat(existing) : result[0]);
+            });
+          }
+        },
+        formatInputTooShort: function() {
+          var txt = _.escape($.fn.select2.defaults.formatInputTooShort.call(this));
+          txt += getStaticOptionMarkup(staticItems);
+          return txt;
+        }
+      }, select2Options));
+
+      $el.on('select2-open.crmEntity', function() {
+        var $el = $(this);
+        $('#select2-drop')
+          .off('.crmEntity')
+          .on('click.crmEntity', '.crm-entityref-links-static a', function(e) {
+            var id = $(this).attr('href').substr(1),
+              item = _.findWhere(staticItems, {id: id});
+            $el.select2('close');
+            if (multiple) {
+              var selection = $el.select2('data');
+              if (!_.findWhere(selection, {id: id})) {
+                selection.push(item);
+                $el.select2('data', selection, true);
+              }
+            } else {
+              $el.select2('data', item, true);
+            }
+            return false;
+          });
+      });
     });
   };
 
@@ -520,6 +662,7 @@ if (!CRM.vars) CRM.vars = {};
       $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
       $el.data('api-params', $.extend(true, {}, $el.data('api-params') || {}, options.api));
       $el.data('create-links', options.create || $el.data('create-links'));
+
       $el.addClass('crm-form-entityref crm-' + _.kebabCase(entity) + '-ref');
       var settings = {
         // Use select2 ajax helper instead of CRM.api3 because it provides more value
@@ -552,13 +695,17 @@ if (!CRM.vars) CRM.vars = {};
           if (val === '') {
             return;
           }
+          var idsNeeded = _.difference(val.split(','), _.pluck(stored, 'id'));
+          var existing = _.remove(stored, function(item) {
+            return _.includes(val.split(','), item.id);
+          });
           // If we already have this data, just return it
-          if (!_.xor(val.split(','), _.pluck(stored, 'id')).length) {
-            callback(multiple ? stored : stored[0]);
+          if (!idsNeeded.length) {
+            callback(multiple ? existing : existing[0]);
           } else {
-            var params = $.extend({}, $el.data('api-params') || {}, {id: val});
+            var params = $.extend({}, $el.data('api-params') || {}, {id: idsNeeded.join(',')});
             CRM.api3($el.data('api-entity'), 'getlist', params).done(function(result) {
-              callback(multiple ? result.values : result.values[0]);
+              callback(multiple ? result.values.concat(existing) : result.values[0]);
               // Trigger change (store data to avoid an infinite loop of lookups)
               $el.data('entity-value', result.values).trigger('change');
             });
@@ -598,12 +745,12 @@ if (!CRM.vars) CRM.vars = {};
       }
       else {
         selectParams.formatInputTooShort = function() {
-          var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
+          var txt = _.escape($el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this));
           txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
         selectParams.formatNoMatches = function() {
-          var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
+          var txt = _.escape($el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches);
           txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
@@ -644,7 +791,7 @@ if (!CRM.vars) CRM.vars = {};
                 $el.select2('close');
                 $el.select2('open');
               } else {
-                $('.crm-entityref-links', '#select2-drop').replaceWith(renderEntityRefCreateLinks($el));
+                $('.crm-entityref-links-create', '#select2-drop').replaceWith(renderEntityRefCreateLinks($el));
               }
             })
             .on('change.crmEntity', 'select.crm-entityref-filter-key', function() {
@@ -697,13 +844,14 @@ if (!CRM.vars) CRM.vars = {};
   CRM.utils.formatSelect2Result = function (row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
-      markup += '<div class="crm-select2-image"><img src="' + row.image + '"/></div>';
+      markup += '<div class="crm-select2-image"><img src="' + _.escape(row.image) + '"/></div>';
     }
     else if (row.icon_class) {
-      markup += '<div class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></div>';
+      markup += '<div class="crm-select2-icon"><div class="crm-icon ' + _.escape(row.icon_class) + '-icon"></div></div>';
     }
-    markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' +
-      (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
+    markup += '<div><div class="crm-select2-row-label ' + _.escape(row.label_class || '') + '">' +
+      (row.color ? '<span class="crm-select-item-color" style="background-color: ' + _.escape(row.color) + '"></span> ' : '') +
+      (row.icon ? '<i class="crm-i ' + _.escape(row.icon) + '" aria-hidden="true"></i> ' : '') +
       _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '')) +
       '</div>' +
       '<div class="crm-select2-row-description">';
@@ -715,7 +863,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   function formatEntityRefSelection(row) {
-    return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
+    return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + _.escape(row.color) + '"></span> ' : '') +
       _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : ''));
   }
 
@@ -724,16 +872,29 @@ if (!CRM.vars) CRM.vars = {};
       createLinks = $el.data('create-links'),
       params = getEntityRefApiParams($el).params,
       entity = $el.data('api-entity'),
-      markup = '<div class="crm-entityref-links">';
+      markup = '<div class="crm-entityref-links crm-entityref-links-create">';
     if (!createLinks || (createLinks === true && !CRM.config.entityRef.links[entity])) {
       return '';
     }
     if (createLinks === true) {
-      createLinks = params.contact_type ? _.where(CRM.config.entityRef.links[entity], {type: params.contact_type}) : CRM.config.entityRef.links[entity];
+      if (!params.contact_type) {
+        createLinks = CRM.config.entityRef.links[entity];
+      }
+      else if (typeof params.contact_type === 'string') {
+        createLinks = _.where(CRM.config.entityRef.links[entity], {type: params.contact_type});
+      } else {
+        // lets assume it's an array with filters such as IN etc
+        createLinks = [];
+        _.each(params.contact_type, function(types) {
+          _.each(types, function(type) {
+            createLinks.push(_.findWhere(CRM.config.entityRef.links[entity], {type: type}));
+          });
+        });
+      }
     }
     _.each(createLinks, function(link) {
-      markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">' +
-        '<i class="crm-i ' + (link.icon || 'fa-plus-circle') + '" aria-hidden="true"></i> ' +
+      markup += ' <a class="crm-add-entity crm-hover-button" href="' + _.escape(link.url) + '">' +
+        '<i class="crm-i ' + _.escape(link.icon || 'fa-plus-circle') + '" aria-hidden="true"></i> ' +
         _.escape(link.label) + '</a>';
     });
     markup += '</div>';
@@ -883,7 +1044,7 @@ if (!CRM.vars) CRM.vars = {};
       var that = this;
       validator.settings = $.extend({}, validator.settings, CRM.validate._defaults, CRM.validate.params);
       // Call our custom validation handler.
-      $(validator.currentForm).on("invalid-form.validate", validator.settings.invalidHandler );
+      $(validator.currentForm).on("invalid-form.validate", validator.settings.invalidHandler);
       // Call any post-initialization callbacks
       if (CRM.validate.functions && CRM.validate.functions.length) {
         $.each(CRM.validate.functions, function(i, func) {
@@ -967,11 +1128,14 @@ if (!CRM.vars) CRM.vars = {};
           });
         }
       });
-      if ($("input:radio[name=radio_ts]").size() == 1) {
+      if ($("input:radio[name=radio_ts]").length == 1) {
         $("input:radio[name=radio_ts]").prop("checked", true);
       }
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
+      $('.crm-form-autocomplete:not(.select2-offscreen, .select2-container)[data-api-entity]', e.target).each(function() {
+        $(this).crmAutocomplete($(this).data('apiEntity'), $(this).data('apiParams'), $(this).data('selectParams'));
+      });
       $('select.crm-chain-select-control', e.target).off('.chainSelect').on('change.chainSelect', chainSelect);
       $('.crm-form-text[data-crm-datepicker]', e.target).each(function() {
         $(this).crmDatepicker($(this).data('crmDatepicker'));
@@ -997,7 +1161,7 @@ if (!CRM.vars) CRM.vars = {};
       $('form[data-submit-once]', e.target)
         .submit(submitOnceForm)
         .on('invalid-form', submitFormInvalid);
-      $('form[data-submit-once] input[type=submit]', e.target).click(function(e) {
+      $('form[data-submit-once] button[type=submit]', e.target).click(function(e) {
         submitButton = e.target;
       });
     })
@@ -1058,6 +1222,8 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   $.fn.crmtooltip = function () {
+    var TOOLTIP_HIDE_DELAY = 300;
+
     $(document)
       .on('mouseover', 'a.crm-summary-link:not(.crm-processed)', function (e) {
         $(this).addClass('crm-processed crm-tooltip-active');
@@ -1066,14 +1232,20 @@ if (!CRM.vars) CRM.vars = {};
           $(this).addClass('crm-tooltip-down');
         }
         if (!$(this).children('.crm-tooltip-wrapper').length) {
+          var tooltipContents = $(this)[0].hasAttribute('data-tooltip-url') ? $(this).attr('data-tooltip-url') : this.href;
           $(this).append('<div class="crm-tooltip-wrapper"><div class="crm-tooltip"></div></div>');
           $(this).children().children('.crm-tooltip')
             .html('<div class="crm-loading-element"></div>')
-            .load(this.href);
+            .load(tooltipContents);
         }
       })
-      .on('mouseout', 'a.crm-summary-link', function () {
-        $(this).removeClass('crm-processed crm-tooltip-active crm-tooltip-down');
+      .on('mouseleave', 'a.crm-summary-link', function () {
+        var tooltipLink = $(this);
+        setTimeout(function () {
+          if (tooltipLink.filter(':hover').length === 0) {
+            tooltipLink.removeClass('crm-processed crm-tooltip-active crm-tooltip-down');
+          }
+        }, TOOLTIP_HIDE_DELAY);
       })
       .on('click', 'a.crm-summary-link', false);
   };
@@ -1116,7 +1288,7 @@ if (!CRM.vars) CRM.vars = {};
     }
   };
   /**
-   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#notifications-and-confirmations
    */
   CRM.status = function(options, deferred) {
     // For simple usage without async operations you can pass in a string. 2nd param is optional string 'error' if this is not a success msg.
@@ -1180,7 +1352,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#notifications-and-confirmations
    */
   CRM.alert = function (text, title, type, options) {
     type = type || 'alert';
@@ -1228,7 +1400,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#notifications-and-confirmations
    */
   CRM.confirm = function (options) {
     var dialog, url, msg, buttons = [], settings = {
@@ -1306,7 +1478,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#notifications-and-confirmations
    */
   $.fn.crmError = function (text, title, options) {
     title = title || '';
@@ -1315,10 +1487,10 @@ if (!CRM.vars) CRM.vars = {};
 
     var extra = {
       expires: 0
-    };
+    }, label;
     if ($(this).length) {
       if (title === '') {
-        var label = $('label[for="' + $(this).attr('name') + '"], label[for="' + $(this).attr('id') + '"]').not('[generated=true]');
+        label = $('label[for="' + $(this).attr('name') + '"], label[for="' + $(this).attr('id') + '"]').not('[generated=true]');
         if (label.length) {
           label.addClass('crm-error');
           var $label = label.clone();
@@ -1337,8 +1509,10 @@ if (!CRM.vars) CRM.vars = {};
       setTimeout(function () {
         ele.one('change', function () {
           if (msg && msg.close) msg.close();
-          ele.removeClass('error');
-          label.removeClass('crm-error');
+          ele.removeClass('crm-error');
+          if (label) {
+            label.removeClass('crm-error');
+          }
         });
       }, 1000);
     }
@@ -1615,7 +1789,11 @@ if (!CRM.vars) CRM.vars = {};
     return Math.round(n / scale) * scale;
   };
 
-  // Create a js Date object from a unix timestamp or a yyyy-mm-dd string
+  /**
+   * Create a js Date object from a unix timestamp or a yyyy-mm-dd string
+   * @param input
+   * @returns {Date}
+   */
   CRM.utils.makeDate = function(input) {
     switch (typeof input) {
       case 'object':
@@ -1624,10 +1802,16 @@ if (!CRM.vars) CRM.vars = {};
 
       case 'string':
         // convert iso format with or without dashes
-        if (input.indexOf('-') > 0) {
-          return $.datepicker.parseDate('yy-mm-dd', input.substr(0, 10));
+        input = input.replace(/[- :]/g, '');
+        var output = $.datepicker.parseDate('yymmdd', input.substr(0, 8));
+        if (input.length === 14) {
+          output.setHours(
+            parseInt(input.substr(8, 2), 10),
+            parseInt(input.substr(10, 2), 10),
+            parseInt(input.substr(12, 2), 10)
+          );
         }
-        return $.datepicker.parseDate('yymmdd', input.substr(0, 8));
+        return output;
 
       case 'number':
         // convert unix timestamp
@@ -1636,10 +1820,39 @@ if (!CRM.vars) CRM.vars = {};
     throw 'Invalid input passed to CRM.utils.makeDate';
   };
 
-  // Format a date for output to the user
-  // Input may be a js Date object, a unix timestamp or a yyyy-mm-dd string
-  CRM.utils.formatDate = function(input, outputFormat) {
-    return input ? $.datepicker.formatDate(outputFormat || CRM.config.dateInputFormat, CRM.utils.makeDate(input)) : '';
+  /**
+   * Format a date (and optionally time) for output to the user
+   *
+   * @param {string|int|Date} input
+   *   Input may be a js Date object, a unix timestamp or a 'yyyy-mm-dd' string
+   * @param {string|null} dateFormat
+   *   A string like 'yy-mm-dd' or null to use the system default
+   * @param {int|bool} timeFormat
+   *   Leave empty to omit time from the output (default)
+   *   Or pass 12, 24, or true to use the system default for 12/24hr format
+   * @returns {string}
+   */
+  CRM.utils.formatDate = function(input, dateFormat, timeFormat) {
+    if (!input) {
+      return '';
+    }
+    var date = CRM.utils.makeDate(input),
+      output = $.datepicker.formatDate(dateFormat || CRM.config.dateInputFormat, date);
+    if (timeFormat) {
+      var hour = date.getHours(),
+        min = date.getMinutes(),
+        suf = '';
+      if (timeFormat === 12 || (timeFormat === true && !CRM.config.timeIs24Hr)) {
+        suf = ' ' + (hour < 12 ? ts('AM') : ts('PM'));
+        if (hour === 0 || hour > 12) {
+          hour = Math.abs(hour - 12);
+        }
+      } else if (hour < 10) {
+        hour = '0' + hour;
+      }
+      output += ' ' + hour + ':' + (min < 10 ? '0' : '') + min + suf;
+    }
+    return output;
   };
 
   // Used to set appropriate text color for a given background
@@ -1658,5 +1871,93 @@ if (!CRM.vars) CRM.vars = {};
       s.contents.script = false;
     }
   });
+
+  // CVE-2020-11022 and CVE-2020-11023  Passing HTML from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code.
+  $.htmlPrefilter = function(html) {
+    // Prior to jQuery 3.5, jQuery converted XHTML-style self-closing tags to
+    // their XML equivalent: e.g., "<div />" to "<div></div>". This is
+    // problematic for several reasons, including that it's vulnerable to XSS
+    // attacks. However, since this was jQuery's behavior for many years, many
+    // Drupal modules and jQuery plugins may be relying on it. Therefore, we
+    // preserve that behavior, but for a limited set of tags only, that we believe
+    // to not be vulnerable. This is the set of HTML tags that satisfy all of the
+    // following conditions:
+    // - In DOMPurify's list of HTML tags. If an HTML tag isn't safe enough to
+    //   appear in that list, then we don't want to mess with it here either.
+    //   @see https://github.com/cure53/DOMPurify/blob/2.0.11/dist/purify.js#L128
+    // - A normal element (not a void, template, text, or foreign element).
+    //   @see https://html.spec.whatwg.org/multipage/syntax.html#elements-2
+    // - An element that is still defined by the current HTML specification
+    //   (not a deprecated element), because we do not want to rely on how
+    //   browsers parse deprecated elements.
+    //   @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element
+    // - Not 'html', 'head', or 'body', because this pseudo-XHTML expansion is
+    //   designed for fragments, not entire documents.
+    // - Not 'colgroup', because due to an idiosyncrasy of jQuery's original
+    //   regular expression, it didn't match on colgroup, and we don't want to
+    //   introduce a behavior change for that.
+    var selfClosingTagsToReplace = [
+      'a', 'abbr', 'address', 'article', 'aside', 'audio', 'b', 'bdi', 'bdo',
+      'blockquote', 'button', 'canvas', 'caption', 'cite', 'code', 'data',
+      'datalist', 'dd', 'del', 'details', 'dfn', 'div', 'dl', 'dt', 'em',
+      'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3',
+      'h4', 'h5', 'h6', 'header', 'hgroup', 'i', 'ins', 'kbd', 'label', 'legend',
+      'li', 'main', 'map', 'mark', 'menu', 'meter', 'nav', 'ol', 'optgroup',
+      'option', 'output', 'p', 'picture', 'pre', 'progress', 'q', 'rp', 'rt',
+      'ruby', 's', 'samp', 'section', 'select', 'small', 'source', 'span',
+      'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'tfoot', 'th',
+      'thead', 'time', 'tr', 'u', 'ul', 'var', 'video'
+    ];
+
+    // Define regular expressions for <TAG/> and <TAG ATTRIBUTES/>. Doing this as
+    // two expressions makes it easier to target <a/> without also targeting
+    // every tag that starts with "a".
+    var xhtmlRegExpGroup = '(' + selfClosingTagsToReplace.join('|') + ')';
+    var whitespace = '[\\x20\\t\\r\\n\\f]';
+    var rxhtmlTagWithoutSpaceOrAttributes = new RegExp('<' + xhtmlRegExpGroup + '\\/>', 'gi');
+    var rxhtmlTagWithSpaceAndMaybeAttributes = new RegExp('<' + xhtmlRegExpGroup + '(' + whitespace + '[^>]*)\\/>', 'gi');
+
+    // jQuery 3.5 also fixed a vulnerability for when </select> appears within
+    // an <option> or <optgroup>, but it did that in local code that we can't
+    // backport directly. Instead, we filter such cases out. To do so, we need to
+    // determine when jQuery would otherwise invoke the vulnerable code, which it
+    // uses this regular expression to determine. The regular expression changed
+    // for version 3.0.0 and changed again for 3.4.0.
+    // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L4958
+    // @see https://github.com/jquery/jquery/blob/3.0.0/dist/jquery.js#L4584
+    // @see https://github.com/jquery/jquery/blob/3.4.0/dist/jquery.js#L4712
+    var rtagName = /<([\w:]+)/;
+
+    // The regular expression that jQuery uses to determine which self-closing
+    // tags to expand to open and close tags. This is vulnerable, because it
+    // matches all tag names except the few excluded ones. We only use this
+    // expression for determining vulnerability. The expression changed for
+    // version 3, but we only need to check for vulnerability in versions 1 and 2,
+    // so we use the expression from those versions.
+    // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L4957
+    var rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi;
+
+    // This is how jQuery determines the first tag in the HTML.
+    // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L5521
+    var tag = ( rtagName.exec( html ) || [ "", "" ] )[ 1 ].toLowerCase();
+
+    // It is not valid HTML for <option> or <optgroup> to have <select> as
+    // either a descendant or sibling, and attempts to inject one can cause
+    // XSS on jQuery versions before 3.5. Since this is invalid HTML and a
+    // possible XSS attack, reject the entire string.
+    // @see https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-11023
+    if ((tag === 'option' || tag === 'optgroup') && html.match(/<\/?select/i)) {
+      html = '';
+    }
+
+    // Retain jQuery's prior to 3.5 conversion of pseudo-XHTML, but for only
+    // the tags in the `selfClosingTagsToReplace` list defined above.
+    // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L5518
+    // @see https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-11022
+    html = html.replace(rxhtmlTagWithoutSpaceOrAttributes, "<$1></$1>");
+    html = html.replace(rxhtmlTagWithSpaceAndMaybeAttributes, "<$1$2></$1>");
+
+    return html;
+  };
 
 })(jQuery, _);

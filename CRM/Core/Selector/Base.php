@@ -17,8 +17,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Core_Selector_Base {
 
@@ -42,27 +40,6 @@ class CRM_Core_Selector_Base {
    * @var string
    */
   protected $_key;
-
-  /**
-   * This function gets the attribute for the action that.
-   * it matches.
-   *
-   * @param string $match the action to match against
-   * @param string $attribute the attribute to return ( name, link, title )
-   *
-   * @return string
-   *   the attribute that matches the action if any
-   */
-  public function getActionAttribute($match, $attribute = 'name') {
-    $links = &$this->links();
-
-    foreach ($link as $action => $item) {
-      if ($match & $action) {
-        return $item[$attribute];
-      }
-    }
-    return NULL;
-  }
 
   /**
    * This is a static virtual function returning reference on links array. Each

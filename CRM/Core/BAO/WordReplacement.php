@@ -18,62 +18,29 @@
 /**
  * Class CRM_Core_BAO_WordReplacement.
  */
-class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
+class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implements \Civi\Core\HookInterface {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Function that must have never worked & should be removed.
-   *
-   * Retrieve DB object based on input parameters.
-   *
-   * It also stores all the retrieved values in the default array.
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
-   *
-   * @return CRM_Core_DAO_WordReplacement
+   * @return self|null
    */
-  public static function retrieve(&$params, &$defaults) {
-    return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_WordRepalcement', $params, $defaults);
+  public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Get the domain BAO.
+   * Deprecated update function.
    *
-   * @param null $reset
-   *
-   * @return null|CRM_Core_BAO_WordReplacement
-   * @throws CRM_Core_Exception
-   */
-  public static function getWordReplacement($reset = NULL) {
-    static $wordReplacement = NULL;
-    if (!$wordReplacement || $reset) {
-      $wordReplacement = new CRM_Core_BAO_WordReplacement();
-      $wordReplacement->id = CRM_Core_Config::wordReplacementID();
-      if (!$wordReplacement->find(TRUE)) {
-        throw new CRM_Core_Exception('Unable to find word replacement');
-      }
-    }
-    return $wordReplacement;
-  }
-
-  /**
-   * Save the values of a WordReplacement.
-   *
+   * @deprecated
    * @param array $params
    * @param int $id
-   *
    * @return array
    */
   public static function edit(&$params, &$id) {
+    CRM_Core_Error::deprecatedWarning('APIv4');
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
     $wordReplacement->id = $id;
     $wordReplacement->copyValues($params);
@@ -85,13 +52,14 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   }
 
   /**
-   * Create a new WordReplacement.
+   * Deprecated create function.
    *
+   * @deprecated
    * @param array $params
-   *
    * @return array
    */
   public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if (array_key_exists("domain_id", $params) === FALSE) {
       $params["domain_id"] = CRM_Core_Config::domainID();
     }
@@ -105,21 +73,38 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   }
 
   /**
-   * Delete website.
+   * Deprecated delete function
    *
+   * @deprecated
    * @param int $id
-   *   WordReplacement id.
-   *
-   * @return object
+   * @return CRM_Core_DAO_WordReplacement
    */
   public static function del($id) {
-    $dao = new CRM_Core_DAO_WordReplacement();
-    $dao->id = $id;
-    $dao->delete();
-    if (!isset($params['options']) || CRM_Utils_Array::value('wp-rebuild', $params['options'], TRUE)) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return static::deleteRecord(['id' => $id]);
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'delete') {
       self::rebuild();
     }
-    return $dao;
+  }
+
+  /**
+   * Efficient function to write multiple records then rebuild at the end
+   *
+   * @param array[] $records
+   * @return CRM_Core_DAO_WordReplacement[]
+   * @throws CRM_Core_Exception
+   */
+  public static function writeRecords(array $records): array {
+    $records = parent::writeRecords($records);
+    self::rebuild();
+    return $records;
   }
 
   /**
@@ -152,8 +137,6 @@ WHERE  domain_id = %1
       }
     }
     $config = CRM_Core_Config::singleton();
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
 
     // So. Weird. Some bizarre/probably-broken multi-lingual thing where
     // data isn't really stored in civicrm_word_replacements. Probably

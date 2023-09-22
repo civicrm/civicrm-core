@@ -1,0 +1,13 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form ng-controller="crmSearchTaskApiBatch as $ctrl">
+    <p><strong ng-if="model.apiBatch.confirmMsg">{{:: ts(model.apiBatch.confirmMsg, {1: model.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
+    <hr />
+    <div ng-if="$ctrl.run" class="crm-search-task-progress">
+      <h5>{{:: ts(model.apiBatch.runMsg, {1: model.ids.length, 2: $ctrl.entityTitle}) }}</h5>
+      <crm-search-batch-runner entity="model.entity" action="{{:: model.apiBatch.action }}" params="$ctrl.run" ids="model.ids" success="$ctrl.onSuccess(result)" error="$ctrl.onError()" id-field="{{:: $ctrl.entityInfo.primary_key[0] }}"></crm-search-batch-runner>
+    </div>
+
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" ></crm-dialog-button>
+    <crm-dialog-button ng-if="model.apiBatch.confirmMsg" text="model.taskTitle" icons="{primary: $ctrl.run ? 'fa-spin fa-spinner' : 'fa-check'}" on-click="$ctrl.start(model.apiBatch.params)" disabled="$ctrl.run" ></crm-dialog-button>
+  </form>
+</div>

@@ -26,12 +26,12 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
    */
   protected $b;
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->a = $this->b = NULL;
   }
 
-  protected function tearDown() {
+  protected function tearDown(): void {
     parent::tearDown();
     if ($this->a) {
       $this->a->clear();
@@ -108,7 +108,7 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
    * @dataProvider getTwoGenerators
    */
   public function testDiff_clearA($cacheA, $cacheB) {
-    list($a, $b) = $this->createTwoCaches($cacheA, $cacheB);
+    [$a, $b] = $this->createTwoCaches($cacheA, $cacheB);
     $a->set('foo', 1234);
     $b->set('foo', 5678);
     $this->assertEquals(1234, $a->get('foo'), 'Check value A after initial setup');
@@ -129,7 +129,7 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
    * @dataProvider getTwoGenerators
    */
   public function testDiff_clearB($cacheA, $cacheB) {
-    list($a, $b) = $this->createTwoCaches($cacheA, $cacheB);
+    [$a, $b] = $this->createTwoCaches($cacheA, $cacheB);
     $a->set('foo', 1234);
     $b->set('foo', 5678);
     $this->assertEquals(1234, $a->get('foo'), 'Check value A after initial setup');
@@ -150,13 +150,13 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
    * @dataProvider getTwoGenerators
    */
   public function testDiff_reload($cacheA, $cacheB) {
-    list($a, $b) = $this->createTwoCaches($cacheA, $cacheB);
+    [$a, $b] = $this->createTwoCaches($cacheA, $cacheB);
     $a->set('foo', 1234);
     $b->set('foo', 5678);
     $this->assertEquals(1234, $a->get('foo'), 'Check value A after initial setup');
     $this->assertEquals(5678, $b->get('foo'), 'Check value B after initial setup');
 
-    list($a, $b) = $this->createTwoCaches($cacheA, $cacheB);
+    [$a, $b] = $this->createTwoCaches($cacheA, $cacheB);
     $this->assertEquals(1234, $a->get('foo'), 'Check value A after initial setup');
     $this->assertEquals(5678, $b->get('foo'), 'Check value B after initial setup');
   }

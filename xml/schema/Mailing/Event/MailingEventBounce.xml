@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing/Event</base>
+  <class>MailingEventBounce</class>
+  <name>civicrm_mailing_event_bounce</name>
+  <comment>Tracks when and why an email bounced.</comment>
+  <archive>true</archive>
+  <component>CiviMail</component>
+  <title>Mailing Bounce</title>
+  <description>Mailings that failed to reach the inbox of the recipient.</description>
+  <field>
+    <name>id</name>
+    <title>Bounce ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <html>
+      <label>ID</label>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>event_queue_id</name>
+    <title>Event Queue ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to EventQueue</comment>
+    <html>
+      <label>Recipient</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>event_queue_id</name>
+    <table>civicrm_mailing_event_queue</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>bounce_type_id</name>
+    <title>Bounce Type ID</title>
+    <type>int unsigned</type>
+    <comment>What type of bounce was it?</comment>
+    <pseudoconstant>
+      <table>civicrm_mailing_bounce_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <label>Bounce Type</label>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>bounce_reason</name>
+    <title>Bounce Reason</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>The reason the email bounced.</comment>
+  </field>
+  <field>
+    <name>time_stamp</name>
+    <title>Timestamp</title>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
+    <required>true</required>
+    <comment>When this bounce event occurred.</comment>
+  </field>
+</table>

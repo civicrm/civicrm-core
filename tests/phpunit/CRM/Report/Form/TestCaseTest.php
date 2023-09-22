@@ -9,7 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviReportTestCase.php';
+use Civi\Test\Invasive;
 
 /**
  * Verify that the CiviReportTestCase provides a working set of
@@ -31,9 +31,18 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
   ];
 
   /**
+   * Financial data used in these tests is invalid - do not validate.
+   *
+   * Note ideally it would be fixed and we would always use valid data.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = FALSE;
+
+  /**
    * @return array
    */
-  public function dataProvider() {
+  public function dataProvider(): array {
     $testCaseA = [
       'CRM_Report_Form_Contribute_Detail',
       [
@@ -67,7 +76,7 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
   /**
    * @return array
    */
-  public function badDataProvider() {
+  public function badDataProvider(): array {
     return [
       // This test-case is bad because the dataset-ascii.sql does not match the
       // report.csv (due to differences in international chars)
@@ -113,7 +122,10 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     ];
   }
 
-  public function setUp() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function setUp(): void {
     parent::setUp();
     $this->quickCleanup($this->_tablesToTruncate);
   }
@@ -126,67 +138,54 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
    * @param $expectedOutputCsvFile
    * @throws \Exception
    */
-  public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
+  public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile): void {
     $config = CRM_Core_Config::singleton();
-    CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
+    CRM_Utils_File::sourceSQLFile($config->dsn, __DIR__ . "/$dataSet");
 
     $reportCsvFile = $this->getReportOutputAsCsv($reportClass, $inputParams);
     $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
 
-    $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
+    $expectedOutputCsvArray = $this->getArrayFromCsv(__DIR__ . "/$expectedOutputCsvFile");
     $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
   }
 
   /**
    * @dataProvider badDataProvider
+   *
    * @param $reportClass
    * @param $inputParams
    * @param $dataSet
    * @param $expectedOutputCsvFile
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testBadReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
-    $config = CRM_Core_Config::singleton();
-    CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
+  public function testBadReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile): void {
+    CRM_Utils_File::sourceSQLFile(CIVICRM_DSN, __DIR__ . "/$dataSet");
 
     $reportCsvFile = $this->getReportOutputAsCsv($reportClass, $inputParams);
     $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
 
-    $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
-    try {
-      $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
-    }
-    catch (PHPUnit\Framework\AssertionFailedError $e) {
-      /* OK */
-    }
-    catch (PHPUnit_Framework_AssertionFailedError $e) {
-      /* OK */
-    }
+    $expectedOutputCsvArray = $this->getArrayFromCsv(__DIR__ . "/$expectedOutputCsvFile");
+    $this->assertNotEquals($expectedOutputCsvArray[1], $reportCsvArray[1]);
   }
 
   /**
    * Test processReportMode() Function in Reports
    */
-  public function testOutputMode() {
-    $clazz = new ReflectionClass('CRM_Report_Form');
+  public function testOutputMode(): void {
     $reportForm = new CRM_Report_Form();
 
-    $params = $clazz->getProperty('_params');
-    $params->setAccessible(TRUE);
-    $outputMode = $clazz->getProperty('_outputMode');
-    $outputMode->setAccessible(TRUE);
-
-    $params->setValue($reportForm, ['groups' => 4]);
+    Invasive::set([$reportForm, '_params'], ['groups' => 4]);
     $reportForm->processReportMode();
-    $this->assertEquals('group', $outputMode->getValue($reportForm));
+    $this->assertEquals('group', Invasive::get([$reportForm, '_outputMode']));
 
-    $params->setValue($reportForm, ['task' => 'copy']);
+    Invasive::set([$reportForm, '_params'], ['task' => 'copy']);
     $reportForm->processReportMode();
-    $this->assertEquals('copy', $outputMode->getValue($reportForm));
+    $this->assertEquals('copy', Invasive::get([$reportForm, '_outputMode']));
 
-    $params->setValue($reportForm, ['task' => 'print']);
+    Invasive::set([$reportForm, '_params'], ['task' => 'print']);
     $reportForm->processReportMode();
-    $this->assertEquals('print', $outputMode->getValue($reportForm));
+    $this->assertEquals('print', Invasive::get([$reportForm, '_outputMode']));
   }
 
 }

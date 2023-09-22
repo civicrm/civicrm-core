@@ -22,7 +22,7 @@ class CRM_Report_Page_TemplateList extends CRM_Core_Page {
 
   /**
    * @param int $compID
-   * @param null $grouping
+   * @param string|null $grouping
    *
    * @return array
    */
@@ -68,21 +68,19 @@ LEFT  JOIN civicrm_component comp
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     $rows = [];
-    $config = CRM_Core_Config::singleton();
     while ($dao->fetch()) {
       if ($dao->component_name != 'Contact' && $dao->component_name != $dao->grouping &&
-        !in_array("Civi{$dao->component_name}", $config->enableComponents)
+        !CRM_Core_Component::isEnabled("Civi{$dao->component_name}")
       ) {
         continue;
       }
-      $rows[$dao->component_name][$dao->value]['title'] = ts($dao->label);
-      $rows[$dao->component_name][$dao->value]['description'] = ts($dao->description);
+      $rows[$dao->component_name][$dao->value]['title'] = _ts($dao->label);
+      $rows[$dao->component_name][$dao->value]['description'] = _ts($dao->description);
       $rows[$dao->component_name][$dao->value]['url'] = CRM_Utils_System::url('civicrm/report/' . trim($dao->value, '/'), 'reset=1');
-      if ($dao->instance_id) {
-        $rows[$dao->component_name][$dao->value]['instanceUrl'] = CRM_Utils_System::url('civicrm/report/list',
-          "reset=1&ovid={$dao->id}"
-        );
-      }
+      $rows[$dao->component_name][$dao->value]['instanceUrl'] = $dao->instance_id ? CRM_Utils_System::url(
+        'civicrm/report/list',
+        "reset=1&ovid=$dao->id"
+      ) : '';
     }
 
     return $rows;

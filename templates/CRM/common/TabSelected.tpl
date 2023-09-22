@@ -1,3 +1,4 @@
+{* DEPRECATED script, should be refactored out and removed *}
 <script type='text/javascript'>
   var selectedTab = '{$defaultTab}';
   var tabContainer = '#mainTabContainer';

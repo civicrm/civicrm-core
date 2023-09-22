@@ -183,7 +183,7 @@ class CiviContributeProcessor {
               CRM_Core_Error::debug_log_message("Skipped - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
             }
           }
-          catch (CiviCRM_API3_Exception $e) {
+          catch (CRM_Core_Exception $e) {
             CRM_Core_Error::debug_log_message("Skipped - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
           }
         }
@@ -353,7 +353,7 @@ class CiviContributeProcessor {
         $params += $transaction;
       }
 
-      CRM_Contribute_BAO_Contribution_Utils::_fillCommonParams($params, $type);
+      self::_fillCommonParams($params, $type);
 
       return $params;
     }
@@ -383,7 +383,7 @@ class CiviContributeProcessor {
         $params += $transaction;
       }
 
-      CRM_Contribute_BAO_Contribution_Utils::_fillCommonParams($params, $type);
+      self::_fillCommonParams($params, $type);
 
       return $params;
     }
@@ -457,6 +457,78 @@ class CiviContributeProcessor {
     return TRUE;
   }
 
+  /**
+   * @param array $params
+   * @param string $type
+   *
+   * @return bool
+   */
+  public static function _fillCommonParams(&$params, $type = 'paypal') {
+    if (array_key_exists('transaction', $params)) {
+      $transaction = &$params['transaction'];
+    }
+    else {
+      $transaction = &$params;
+    }
+
+    $params['contact_type'] = 'Individual';
+
+    $billingLocTypeId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', 'Billing', 'id', 'name');
+    if (!$billingLocTypeId) {
+      $billingLocTypeId = 1;
+    }
+    if (!CRM_Utils_System::isNull($params['address'])) {
+      $params['address'][1]['is_primary'] = 1;
+      $params['address'][1]['location_type_id'] = $billingLocTypeId;
+    }
+    if (!CRM_Utils_System::isNull($params['email'])) {
+      $params['email'] = [
+        1 => [
+          'email' => $params['email'],
+          'location_type_id' => $billingLocTypeId,
+        ],
+      ];
+    }
+
+    if (isset($transaction['trxn_id'])) {
+      // set error message if transaction has already been processed.
+      $contribution = new CRM_Contribute_DAO_Contribution();
+      $contribution->trxn_id = $transaction['trxn_id'];
+      if ($contribution->find(TRUE)) {
+        $params['error'][] = ts('transaction already processed.');
+      }
+    }
+    else {
+      // generate a new transaction id, if not already exist
+      $transaction['trxn_id'] = md5(uniqid(rand(), TRUE));
+    }
+
+    if (!isset($transaction['financial_type_id'])) {
+      $contributionTypes = array_keys(CRM_Contribute_PseudoConstant::financialType());
+      $transaction['financial_type_id'] = $contributionTypes[0];
+    }
+
+    if (($type == 'paypal') && (!isset($transaction['net_amount']))) {
+      $transaction['net_amount'] = $transaction['total_amount'] - CRM_Utils_Array::value('fee_amount', $transaction, 0);
+    }
+
+    if (!isset($transaction['invoice_id'])) {
+      $transaction['invoice_id'] = $transaction['trxn_id'];
+    }
+
+    $source = ts('ContributionProcessor: %1 API',
+      [1 => ucfirst($type)]
+    );
+    if (isset($transaction['source'])) {
+      $transaction['source'] = $source . ':: ' . $transaction['source'];
+    }
+    else {
+      $transaction['source'] = $source;
+    }
+
+    return TRUE;
+  }
+
 }
 
 // bootstrap the environment and run the processor
@@ -473,10 +545,7 @@ CRM_Core_Error::debug_log_message('ContributionProcessor.php');
 $lock = Civi::lockManager()->acquire('worker.contribute.CiviContributeProcessor');
 
 if ($lock->isAcquired()) {
-  // try to unset any time limits
-  if (!ini_get('safe_mode')) {
-    set_time_limit(0);
-  }
+  set_time_limit(0);
 
   CiviContributeProcessor::process();
 }

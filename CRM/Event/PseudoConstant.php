@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -72,14 +70,14 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $pcPage;
 
   /**
-   * Get all the n events
+   * Get all events
    *
-   *
-   * @param int $id
+   * @param int|null $id
    * @param bool $all
-   * @param null $condition
+   * @param string|null $condition
+   *   Optional SQL where condition
    *
-   * @return array
+   * @return array|string|null
    *   array of all events if any
    */
   public static function event($id = NULL, $all = FALSE, $condition = NULL) {
@@ -108,23 +106,25 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the n participant statuses.
+   * Get all the event participant statuses.
    *
    *
-   * @param int $id
-   * @param null $cond
+   * @param int|null $id
+   *   Return the specified participant status, or null to return all
+   * @param string|null $cond
+   *   Optional SQL where condition
    * @param string $retColumn
    *   Tells populate() whether to return 'name' (default) or 'label' values.
    *
-   * @return array
-   *   array reference of all participant statuses if any
+   * @return array|string
+   *   array reference of all participant statuses if any, or single value if $id was passed
    */
   public static function &participantStatus($id = NULL, $cond = NULL, $retColumn = 'name') {
     if (self::$participantStatus === NULL) {
       self::$participantStatus = [];
     }
 
-    $index = $cond ? $cond : 'No Condition';
+    $index = $cond ?: 'No Condition';
     $index = "{$index}_{$retColumn}";
     if (empty(self::$participantStatus[$index])) {
       self::$participantStatus[$index] = [];
@@ -176,13 +176,14 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    *
    * @param int $id
-   * @param null $cond
+   * @param string|null $cond
+   *   Optional SQL where condition
    *
    * @return array|string
    *   array reference of all participant roles if any
    */
   public static function &participantRole($id = NULL, $cond = NULL) {
-    $index = $cond ? $cond : 'No Condition';
+    $index = $cond ?: 'No Condition';
     if (empty(self::$participantRole[$index])) {
       self::$participantRole[$index] = [];
 
@@ -253,8 +254,11 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @return array
    *   Array of event id → template title pairs
+   *
+   * @deprecated Use the API instead
    */
   public static function &eventTemplates($id = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use the api');
     if (!self::$eventTemplates) {
       CRM_Core_PseudoConstant::populate(self::$eventTemplates,
         'CRM_Event_DAO_Event',
@@ -272,7 +276,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
    * Flush given pseudoconstant so it can be reread from db
-   * nex time it's requested.
+   * next time it's requested.
    *
    *
    * @param bool|string $name pseudoconstant to be flushed

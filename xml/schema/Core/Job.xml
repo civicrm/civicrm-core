@@ -7,12 +7,21 @@
   <comment>Scheduled job.</comment>
   <add>4.1</add>
   <log>false</log>
+  <paths>
+    <add>civicrm/admin/job/add?reset=1&amp;action=add</add>
+    <delete>civicrm/admin/job/edit?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <update>civicrm/admin/job/edit?reset=1&amp;action=update&amp;id=[id]</update>
+    <browse>civicrm/admin/job</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>Job ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Job Id</comment>
+    <comment>Job ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.1</add>
   </field>
   <primaryKey>
@@ -21,7 +30,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Job Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -30,6 +39,10 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this scheduled job for</comment>
+    <html>
+      <label>Domain</label>
+      <type>Select</type>
+    </html>
     <add>4.1</add>
   </field>
   <foreignKey>
@@ -59,6 +72,9 @@
     <default>NULL</default>
     <required>false</required>
     <comment>When was this cron entry last run</comment>
+    <html>
+      <label>Last Run</label>
+    </html>
     <add>4.1</add>
   </field>
   <field>
@@ -67,6 +83,9 @@
     <default>NULL</default>
     <required>false</required>
     <comment>When is this cron entry scheduled to run</comment>
+    <html>
+      <label>Scheduled Run Date</label>
+    </html>
     <add>4.7</add>
   </field>
   <field>
@@ -76,6 +95,9 @@
     <length>255</length>
     <comment>Title of the job</comment>
     <add>4.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>description</name>
@@ -84,15 +106,11 @@
     <length>255</length>
     <comment>Description of the job</comment>
     <add>4.1</add>
-  </field>
-  <field>
-    <name>api_prefix</name>
-    <type>varchar</type>
-    <length>255</length>
-    <default>"civicrm_api3"</default>
-    <comment>Prefix of the job api call</comment>
-    <add>4.1</add>
-    <drop>4.3</drop>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
+    </html>
   </field>
   <field>
     <name>api_entity</name>
@@ -127,6 +145,12 @@
     <title>Job Is Active?</title>
     <type>boolean</type>
     <comment>Is this job active?</comment>
+    <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <required>true</required>
     <add>4.1</add>
   </field>
 </table>

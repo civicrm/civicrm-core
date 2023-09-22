@@ -31,9 +31,9 @@
 class api_v3_SurveyTest extends CiviUnitTestCase {
   protected $params;
   protected $entity = 'survey';
-  public $DBResetRequired = FALSE;
 
-  public function setUp() {
+  public function setUp(): void {
+    parent::setUp();
     $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', [
       'label' => 'PhoneBank',
       'return' => 'value',
@@ -41,19 +41,18 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
     $this->useTransaction();
     $this->enableCiviCampaign();
     $this->params = [
-      'title' => "survey title",
+      'title' => 'survey title',
       'activity_type_id' => $phoneBankActivityTypeID,
       'max_number_of_contacts' => 12,
-      'instructions' => "Call people, ask for money",
+      'instructions' => 'Call people, ask for money',
     ];
-    parent::setUp();
   }
 
   /**
    * Test create function succeeds.
    */
-  public function testCreateSurvey() {
-    $result = $this->callAPIAndDocument('survey', 'create', $this->params, __FUNCTION__, __FILE__);
+  public function testCreateSurvey(): void {
+    $result = $this->callAPISuccess('Survey', 'create', $this->params);
     $this->getAndCheck($this->params, $result['id'], $this->entity);
   }
 
@@ -64,9 +63,9 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
    * action on create. Add extra checks for any 'special' return values or
    * behaviours
    */
-  public function testGetSurvey() {
-    $this->createTestEntity();
-    $result = $this->callAPIAndDocument('survey', 'get', $this->params, __FUNCTION__, __FILE__);
+  public function testGetSurvey(): void {
+    $this->createTestEntity('Survey', $this->params);
+    $result = $this->callAPISuccess('Survey', 'get', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
@@ -74,29 +73,23 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   /**
    * Check the delete function succeeds.
    */
-  public function testDeleteSurvey() {
-    $entity = $this->createTestEntity();
-    $result = $this->callAPIAndDocument('survey', 'delete', ['id' => $entity['id']], __FUNCTION__, __FILE__);
+  public function testDeleteSurvey(): void {
+    $entity = $this->createTestEntity('Survey', $this->params);
+    $this->callAPISuccess('survey', 'delete', ['id' => $entity['id']]);
     $checkDeleted = $this->callAPISuccess($this->entity, 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
   /**
-   * Test & document chained delete pattern.
-   *
-   * Note that explanation of the pattern
-   * is best put in the $description variable as it will then be displayed in the
-   * test generated examples. (these are to be found in the api/examples folder).
+   * Test chained delete pattern.
    */
-  public function testGetSurveyChainDelete() {
-    $description = "Demonstrates get + delete in the same call.";
-    $subfile = 'ChainedGetDelete';
+  public function testGetSurveyChainDelete(): void {
     $params = [
-      'title' => "survey title",
+      'title' => 'survey title',
       'api.survey.delete' => 1,
     ];
-    $result = $this->callAPISuccess('survey', 'create', $this->params);
-    $result = $this->callAPIAndDocument('survey', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $this->callAPISuccess('Survey', 'create', $this->params);
+    $this->callAPISuccess('Survey', 'get', $params);
     $this->assertEquals(0, $this->callAPISuccess('survey', 'getcount', []));
   }
 

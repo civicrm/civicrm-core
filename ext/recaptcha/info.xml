@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<extension key="recaptcha" type="module">
+  <file>recaptcha</file>
+  <name>reCAPTCHA</name>
+  <description>Uses the Google reCAPTCHA web service to improve the CAPTCHA system. It is tough on bots and easy on humans.</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>CiviCRM</author>
+    <email>info@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">https://github.com/civicrm/civicrm-core/tree/master/ext/recaptcha</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2021-04-03</releaseDate>
+  <version>5.67.alpha1</version>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
+  <develStage>stable</develStage>
+  <compatibility>
+    <ver>5.67</ver>
+  </compatibility>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
+    <mixin>setting-php@1.0.0</mixin>
+    <mixin>ang-php@1.0.0</mixin>
+    <mixin>scan-classes@1.0.0</mixin>
+    <mixin>smarty-v2@1.0.0</mixin>
+  </mixins>
+  <civix>
+    <namespace>CRM/Recaptcha</namespace>
+    <format>23.02.0</format>
+  </civix>
+</extension>

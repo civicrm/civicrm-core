@@ -18,27 +18,10 @@
 class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestCase {
 
   /**
-   * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   *
-   * This method is called after a test is executed.
-   */
-  protected function tearDown() {
-    parent::tearDown();
-  }
-
-  /**
    * Test that the list of the contact's joined groups, on the Contact Dashboard,
    * contains the correct groups.
    */
-  public function testBrowseDisplaysCorrectListOfAddedGroups() {
+  public function testBrowseDisplaysCorrectListOfAddedGroups(): void {
     // create admin-only non-smart group
     $adminStdGroupTitle = 'The Admin-only Std Group';
     $adminStdGroup = $this->callAPISuccess('Group', 'create', [
@@ -113,7 +96,7 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
    * Test that the select list of available groups, on the Contact Dashboard,
    * contains the correct groups.
    */
-  public function testBrowseDisplaysCorrectListOfAVailableGroups() {
+  public function testBrowseDisplaysCorrectListOfAVailableGroups(): void {
 
     // create admin-only non-smart group
     $adminStdGroupTitle = 'The Admin-only Std Group' . uniqid();
@@ -175,10 +158,10 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
 
     $form = CRM_Core_Smarty::singleton()->get_template_vars('form');
     $group_id_field_html = $form['group_id']['html'];
-    $this->assertContains($publicSmartGroupTitle, $group_id_field_html, "Group '$publicSmartGroupTitle' should be in listed available groups, but is not.");
-    $this->assertContains($publicStdGroupTitle, $group_id_field_html, "Group '$publicStdGroupTitle' should be in listed available groups, but is not.");
-    $this->assertNotContains($adminSmartGroupTitle, $group_id_field_html, "Group '$adminSmartGroupTitle' should not be in listed available groups, but is.");
-    $this->assertNotContains($adminStdGroupTitle, $group_id_field_html, "Group '$adminStdGroupTitle' should not be in listed available groups, but is.");
+    $this->assertStringContainsString($publicSmartGroupTitle, $group_id_field_html, "Group '$publicSmartGroupTitle' should be in listed available groups, but is not.");
+    $this->assertStringContainsString($publicStdGroupTitle, $group_id_field_html, "Group '$publicStdGroupTitle' should be in listed available groups, but is not.");
+    $this->assertStringNotContainsString('* ' . $adminSmartGroupTitle, $group_id_field_html, "Group '$adminSmartGroupTitle' should not be in listed available groups, but is.");
+    $this->assertStringNotContainsString($adminStdGroupTitle, $group_id_field_html, "Group '$adminStdGroupTitle' should not be in listed available groups, but is.");
 
     // Add current user to the test groups.
     $publicSmartGroup = $this->callAPISuccess('Contact', 'create', [
@@ -199,10 +182,10 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
 
     $form = CRM_Core_Smarty::singleton()->get_template_vars('form');
     $group_id_field_html = $form['group_id']['html'];
-    $this->assertNotContains($publicSmartGroupTitle, $group_id_field_html, "Group '$publicSmartGroupTitle' should not be in listed available groups, but is.");
-    $this->assertNotContains($publicStdGroupTitle, $group_id_field_html, "Group '$publicStdGroupTitle' should not be in listed available groups, but is.");
-    $this->assertNotContains($adminSmartGroupTitle, $group_id_field_html, "Group '$adminSmartGroupTitle' should not be in listed available groups, but is.");
-    $this->assertNotContains($adminStdGroupTitle, $group_id_field_html, "Group '$adminStdGroupTitle' should not be in listed available groups, but is.");
+    $this->assertStringNotContainsString('* ' . $publicSmartGroupTitle, $group_id_field_html, "Group '$publicSmartGroupTitle' should not be in listed available groups, but is.");
+    $this->assertStringNotContainsString($publicStdGroupTitle, $group_id_field_html, "Group '$publicStdGroupTitle' should not be in listed available groups, but is.");
+    $this->assertStringNotContainsString('* ' . $adminSmartGroupTitle, $group_id_field_html, "Group '$adminSmartGroupTitle' should not be in listed available groups, but is.");
+    $this->assertStringNotContainsString($adminStdGroupTitle, $group_id_field_html, "Group '$adminStdGroupTitle' should not be in listed available groups, but is.");
   }
 
 }

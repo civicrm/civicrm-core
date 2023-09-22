@@ -10,7 +10,7 @@
 <div class='spacer'></div>
 <div class="form-item">
     <p>
-    {include file="CRM/common/formButtons.tpl"}
+    {include file="CRM/common/formButtons.tpl" location=''}
     </p>
 </div>
 

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <add>5.39</add>
+  <base>CRM/Core</base>
+  <class>Translation</class>
+  <name>civicrm_translation</name>
+  <title>Translated String</title>
+  <titlePlural>Translated Strings</titlePlural>
+  <comment>Each string record is an alternate translation of some displayable string in the database.</comment>
+  <log>true</log>
+
+  <field>
+    <add>5.39</add>
+    <name>id</name>
+    <title>Translated String ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique String ID</comment>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <add>5.39</add>
+    <name>entity_table</name>
+    <title>Translated Entity</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_Translation::getEntityTables</callback>
+    </pseudoconstant>
+    <comment>Table where referenced item is stored</comment>
+  </field>
+
+  <field>
+    <add>5.39</add>
+    <name>entity_field</name>
+    <title>Translated Field</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_Translation::getEntityFields</callback>
+    </pseudoconstant>
+    <comment>Field where referenced item is stored</comment>
+  </field>
+
+  <field>
+    <add>5.39</add>
+    <name>entity_id</name>
+    <title>Translated Entity ID</title>
+    <type>int</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>ID of the relevant entity.</comment>
+  </field>
+
+  <field>
+    <add>5.39</add>
+    <name>language</name>
+    <title>Language</title>
+    <type>varchar</type>
+    <length>5</length>
+    <required>true</required>
+    <comment>Relevant language</comment>
+    <html>
+      <type>Select</type>
+    </html>
+    <pseudoconstant>
+      <optionGroupName>languages</optionGroupName>
+      <keyColumn>name</keyColumn>
+      <optionEditPath>civicrm/admin/options/languages</optionEditPath>
+    </pseudoconstant>
+  </field>
+
+  <field>
+    <add>5.39</add>
+    <name>status_id</name>
+    <type>tinyint</type>
+    <title>Status</title>
+    <length>3</length>
+    <default>1</default>
+    <required>true</required>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_Translation::getStatuses</callback>
+    </pseudoconstant>
+    <comment>Specify whether the string is active, draft, etc</comment>
+  </field>
+
+  <field>
+    <add>5.39</add>
+    <title>Translated String</title>
+    <name>string</name>
+    <type>longtext</type>
+    <required>true</required>
+    <comment>Translated string</comment>
+  </field>
+
+  <dynamicForeignKey>
+    <add>5.39</add>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+  </dynamicForeignKey>
+
+  <index>
+    <add>5.39</add>
+    <!-- Expected queries:
+      "Admin UI: I'm editing a record. Show me all relevant translations."
+      "Public UI: I'm browsing a list of records. Show this page-worth of records in my preferred language."
+    -->
+    <name>index_entity_lang</name>
+    <!-- Prediction: In a large DB with many events/contribution-pages/groups/mailings/etc, entity ID will have best selectivity. -->
+    <!-- Prediction: Over diverse set of deployments, the selectivity of 'table' and 'language' will be similar. -->
+    <fieldName>entity_id</fieldName>
+    <fieldName>entity_table</fieldName>
+    <fieldName>language</fieldName>
+  </index>
+</table>

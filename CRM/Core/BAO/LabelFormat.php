@@ -1,28 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright (C) 2011 Marty Wright                                    |
- | Licensed to CiviCRM under the Academic Free License version 3.0.   |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -203,13 +186,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * @return array
    *   array of measurement units
    */
-  public static function getUnits() {
-    return [
-      'in' => ts('Inches'),
-      'cm' => ts('Centimeters'),
-      'mm' => ts('Millimeters'),
-      'pt' => ts('Points'),
-    ];
+  public static function getUnits(): array {
+    return CRM_Core_SelectValues::getLayoutUnits();
   }
 
   /**

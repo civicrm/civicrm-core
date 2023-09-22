@@ -1,0 +1,7 @@
+<div ng-if="!routeParams.name">
+  <af-html-list></af-html-list>
+</div>
+
+<div ng-if="routeParams.name">
+  <af-html-editor options="{name: routeParams.name}"></af-html-editor>
+</div>

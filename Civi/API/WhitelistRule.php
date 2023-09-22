@@ -220,7 +220,7 @@ class WhitelistRule {
    *   API result.
    * @return array
    *   Modified API result.
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function filter($apiRequest, $apiResult) {
     if ($this->fields === '*') {
@@ -238,7 +238,7 @@ class WhitelistRule {
         return $apiResult;
       }
     }
-    throw new \API_Exception(sprintf('Filtering failed for %s.%s. Unrecognized result format.', $apiRequest['entity'], $apiRequest['action']));
+    throw new \CRM_Core_Exception(sprintf('Filtering failed for %s.%s. Unrecognized result format.', $apiRequest['entity'], $apiRequest['action']));
   }
 
   /**

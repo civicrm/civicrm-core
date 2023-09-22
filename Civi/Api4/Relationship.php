@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -9,32 +8,38 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4;
 
 /**
  * Relationship entity.
  *
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/relationships/
- *
+ * @searchable none
+ * @searchFields contact_id_a.sort_name,relationship_type_id.label_a_b,contact_id_b.sort_name
+ * @since 5.19
  * @package Civi\Api4
  */
 class Relationship extends Generic\DAOEntity {
 
   /**
-   * @return \Civi\Api4\Action\Relationship\Get
+   * @param bool $checkPermissions
+   * @return Action\Relationship\Get
    */
-  public static function get() {
-    return new \Civi\Api4\Action\Relationship\Get(static::class, __FUNCTION__);
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\Relationship\Get(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @return array
+   */
+  public static function permissions(): array {
+    return [
+      'meta' => ['access CiviCRM'],
+      // get managed by CRM_Core_BAO::addSelectWhereClause
+      // create/update/delete managed by CRM_Contact_BAO_Relationship::_checkAccess
+      'default' => [],
+    ];
   }
 
 }

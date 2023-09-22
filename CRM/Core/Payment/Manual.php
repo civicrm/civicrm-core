@@ -111,8 +111,18 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doPayment(&$params, $component = 'contribute') {
-    $params['payment_status_id'] = $this->getResult();
-    return $params;
+    $result['payment_status_id'] = $this->getResult();
+    if ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
+      $result = $this->setStatusPaymentPending($result);
+    }
+    elseif ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
+      $result = $this->setStatusPaymentCompleted($result);
+    }
+    else {
+      throw new \Civi\Payment\Exception\PaymentProcessorException('Result from doPayment MUST be one of Completed|Pending');
+    }
+
+    return $result;
   }
 
   /**
@@ -239,25 +249,6 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   }
 
   /**
-   * Submit a manual payment.
-   *
-   * @param array $params
-   *   Assoc array of input parameters for this transaction.
-   *
-   * @return array
-   */
-  public function doDirectPayment(&$params) {
-    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
-    if ($params['is_pay_later']) {
-      $result['payment_status_id'] = array_search('Pending', $statuses);
-    }
-    else {
-      $result['payment_status_id'] = array_search('Completed', $statuses);
-    }
-    return $result;
-  }
-
-  /**
    * Should a receipt be sent out for a pending payment.
    *
    * e.g for traditional pay later & ones with a delayed settlement a pending receipt makes sense.
@@ -289,7 +280,28 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
         }
         return ts('To complete your contribution, click the <strong>Continue</strong> button below.');
 
+      default:
+        return parent::getText($context, $params);
     }
   }
+
+  /**
+   * Does this processor support cancelling recurring contributions through code.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurring() {
+    return TRUE;
+  }
+
+  /**
+   * Override default payment instrument validation, as recommended.
+   *
+   * We have nothing to validate here.
+   *
+   * @param array $values
+   * @param array $errors
+   */
+  public function validatePaymentInstrument($values, &$errors): void {}
 
 }

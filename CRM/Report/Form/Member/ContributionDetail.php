@@ -22,6 +22,9 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     'Contribution',
     'Membership',
     'Contact',
+    'Individual',
+    'Household',
+    'Organization',
   ];
 
   /**
@@ -31,9 +34,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -282,8 +284,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => [
-              0 => 'First by Contributor',
-              1 => 'Second or Later by Contributor',
+              0 => ts('First by Contributor'),
+              1 => ts('Second or Later by Contributor'),
             ],
           ],
         ],
@@ -297,15 +299,15 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
             'no_repeat' => TRUE,
           ],
           'membership_start_date' => [
-            'title' => ts('Start Date'),
+            'title' => ts('Membership Start Date'),
             'default' => TRUE,
           ],
           'membership_end_date' => [
-            'title' => ts('End Date'),
+            'title' => ts('Membership Expiration Date'),
             'default' => TRUE,
           ],
           'join_date' => [
-            'title' => ts('Join Date'),
+            'title' => ts('Member Since'),
             'default' => TRUE,
           ],
           'source' => ['title' => ts('Membership Source')],
@@ -516,8 +518,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           SELECT contribution.id, {$this->_aliases['civicrm_contact']}.id, m.id
           FROM civicrm_contribution contribution
           INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                ON {$this->_aliases['civicrm_contact']}.id = contribution.contact_id AND contribution.is_test = 0
-          {$this->_aclFrom}
+                ON {$this->_aliases['civicrm_contact']}.id = contribution.contact_id AND contribution.is_test = 0 AND contribution.is_template = 0
           LEFT JOIN civicrm_membership_payment mp
                 ON contribution.id = mp.contribution_id
           LEFT JOIN civicrm_membership m
@@ -575,7 +576,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
@@ -638,7 +639,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    */
   public function alterDisplay(&$rows) {
     // custom code to alter rows
@@ -750,15 +751,18 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts('View Contact Summary for this Contact.');
       }
 
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_financial_type_id', $row)) {
+      $value = $row['civicrm_contribution_financial_type_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_financial_type_id'] = $contributionTypes[$value];
         $entryFound = TRUE;
       }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
+      $value = $row['civicrm_contribution_contribution_status_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatus[$value];
         $entryFound = TRUE;
       }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_payment_instrument_id', $row)) {
+      $value = $row['civicrm_contribution_payment_instrument_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_payment_instrument_id'] = $paymentInstruments[$value];
         $entryFound = TRUE;
       }

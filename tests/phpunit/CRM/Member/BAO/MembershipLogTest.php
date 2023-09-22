@@ -24,6 +24,8 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\MembershipType;
+
 /**
  *  Test CRM/Member/BAO Membership Log add , delete functions
  *
@@ -61,9 +63,8 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    * Set up for test.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $params = [
@@ -91,8 +92,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'visibility' => 'Public',
       'is_active' => 1,
     ];
-    $membershipType = CRM_Member_BAO_MembershipType::add($params);
-    $this->membershipTypeID = $membershipType->id;
+    $this->membershipTypeID = MembershipType::create()->setValues($params)->execute()->first()['id'];
     $this->membershipStatusID = $this->membershipStatusCreate('test status');
   }
 
@@ -101,7 +101,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->relationshipTypeDelete($this->relationshipTypeID);
     $this->quickCleanUpFinancialEntities();
     $this->restoreMembershipTypes();
@@ -113,11 +113,10 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *  Test del function.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  public function testDel() {
+  public function testDel(): void {
     list($contactID, $membershipID) = $this->setupMembership();
-    CRM_Member_BAO_MembershipLog::del($membershipID);
+    CRM_Member_BAO_MembershipLog::deleteRecord(['id' => $membershipID]);
     $this->assertDBNull('CRM_Member_BAO_MembershipLog', $membershipID, 'membership_id',
       'id', 'Database check for deleted membership log.'
     );
@@ -131,7 +130,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testResetModifiedID() {
+  public function testResetModifiedID(): void {
     list($contactID, $membershipID) = $this->setupMembership();
     CRM_Member_BAO_MembershipLog::resetModifiedID($contactID);
     $this->assertDBNull('CRM_Member_BAO_MembershipLog', $contactID, 'modified_id',
@@ -147,7 +146,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreateMembershipWithPassedInModifiedID() {
+  public function testCreateMembershipWithPassedInModifiedID(): void {
     $modifier = $this->individualCreate();
     $membershipID = $this->setupMembership($modifier)[1];
     $this->assertEquals($modifier, $this->callAPISuccessGetValue('MembershipLog', ['membership_id' => $membershipID, 'return' => 'modified_id']));

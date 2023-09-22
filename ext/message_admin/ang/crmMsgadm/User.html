@@ -1,0 +1,40 @@
+<div id="bootstrap-theme">
+  <div crm-ui-debug="$ctrl"></div>
+
+  <div ng-include="'~/crmMsgadm/ListNav.html'"></div>
+
+  <div class="form-inline">
+    <label for="msgtpl-filter-text">{{:: ts('Filter') }}</label>
+    <input class="form-control" type="search" id="msgtpl-filter-text" ng-model="filters.text">
+
+    <a class="btn btn-primary pull-right" ng-href="{{crmUrl('civicrm/admin/messageTemplates/add', 'action=add&reset=1')}}">
+      <i class="crm-i fa-plus"></i>
+      {{:: ts('Add Message Template') }}
+    </a>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>{{:: ts('Title') }}</th>
+      <th>{{:: ts('Subject') }}</th>
+      <th>{{:: ts('Enabled?') }}</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="record in $ctrl.records | filter:filters.text">
+      <td>{{record.msg_title}}</td>
+      <td>{{record.msg_subject}}</td>
+      <td>{{record.is_active ? ts('Yes') : ts('No')}}</td>
+      <td class="text-right">
+        <a class="btn btn-xs btn-default" ng-href="{{$ctrl.editUrl(record, 'legacy')}}">{{:: ts('Edit') }}</a>
+        <a class="btn btn-xs btn-default" ng-click="$ctrl.toggle(record)" ng-if="!!record.is_active">{{:: ts('Disable') }}</a>
+        <a class="btn btn-xs btn-default" ng-click="$ctrl.toggle(record)" ng-if="!record.is_active">{{:: ts('Enable') }}</a>
+        <a class="btn btn-xs btn-danger" crm-confirm="{type: 'delete', obj: record}" on-yes="$ctrl.delete(record)">{{:: ts('Delete') }}</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>

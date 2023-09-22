@@ -6,12 +6,16 @@
   <name>civicrm_line_item</name>
   <add>1.7</add>
   <log>true</log>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <title>Line Item ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Line Item</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.7</add>
   </field>
   <primaryKey>
@@ -24,7 +28,10 @@
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
-    <comment>table which has the transaction</comment>
+    <pseudoconstant>
+      <callback>CRM_Price_BAO_LineItem::entityTables</callback>
+    </pseudoconstant>
+    <comment>May contain civicrm_contribution, civicrm_participant or civicrm_membership</comment>
     <add>1.7</add>
   </field>
   <field>
@@ -42,9 +49,13 @@
   </dynamicForeignKey>
   <field>
     <name>contribution_id</name>
-    <title>Line Item Contribution</title>
+    <title>Contribution ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contribution</comment>
+    <html>
+      <label>Contribution</label>
+      <type>EntityRef</type>
+    </html>
     <add>4.5</add>
   </field>
   <foreignKey>
@@ -55,10 +66,20 @@
   </foreignKey>
   <field>
     <name>price_field_id</name>
-    <title>Line Item Price Field</title>
+    <title>Price Field ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_price_field</comment>
+    <pseudoconstant>
+      <table>civicrm_price_field</table>
+      <keyColumn>id</keyColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>label</labelColumn>
+    </pseudoconstant>
     <!-- changed to not required in 4.3 in order to change ON DELETE CASCADE FK constraint to SET NULL -->
+    <html>
+      <label>Price Field</label>
+      <type>Select</type>
+    </html>
     <add>1.7</add>
   </field>
   <foreignKey>
@@ -67,15 +88,6 @@
     <key>id</key>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
-  <field>
-    <name>option_group_id</name>
-    <title>Line Item Option Group</title>
-    <type>int unsigned</type>
-    <required>true</required>
-    <comment>FK to option group</comment>
-    <add>1.7</add>
-    <drop>3.3</drop>
-  </field>
   <field>
     <name>label</name>
     <title>Line Item Label</title>
@@ -108,6 +120,7 @@
     <add>1.7</add>
     <html>
       <type>Text</type>
+      <label>Unit Price</label>
     </html>
   </field>
   <field>
@@ -130,16 +143,10 @@
     <add>3.2</add>
 
   </field>
-  <index>
-    <name>index_entity</name>
-    <fieldName>entity_table</fieldName>
-    <fieldName>entity_id</fieldName>
-    <add>1.7</add>
-  </index>
-  <index>
+   <index>
     <name>UI_line_item_value</name>
-    <fieldName>entity_table</fieldName>
     <fieldName>entity_id</fieldName>
+    <fieldName>entity_table</fieldName>
     <fieldName>contribution_id</fieldName>
     <fieldName>price_field_value_id</fieldName>
     <fieldName>price_field_id</fieldName>
@@ -150,10 +157,19 @@
   </index>
   <field>
     <name>price_field_value_id</name>
-    <title>Line Item Option</title>
+    <title>Option ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to civicrm_price_field_value</comment>
+    <pseudoconstant>
+      <table>civicrm_price_field_value</table>
+      <keyColumn>id</keyColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>label</labelColumn>
+    </pseudoconstant>
+    <html>
+      <label>Option</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -164,7 +180,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <pseudoconstant>
@@ -176,6 +192,7 @@
     <add>4.3</add>
     <html>
       <type>Select</type>
+      <label>Financial Type</label>
     </html>
   </field>
   <foreignKey>
@@ -207,10 +224,19 @@
     <headerPattern>/tax(.?am(ou)?nt)?/i</headerPattern>
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <comment>tax of each item</comment>
+    <default>0</default>
+    <required>true</required>
     <add>4.6</add>
     <html>
      <type>Text</type>
    </html>
   </field>
+  <field>
+    <name>membership_num_terms</name>
+    <title>Number of membership terms purchased</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Number of terms for this membership (only supported in Order->Payment flow). If the field is NULL it means unknown and it will be assumed to be 1 during payment.create if entity_table is civicrm_membership</comment>
+    <add>5.40</add>
+  </field>
 </table>
-

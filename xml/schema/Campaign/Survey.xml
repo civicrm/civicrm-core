@@ -6,12 +6,17 @@
   <comment>Campaign Survey Details.</comment>
   <add>3.2</add>
   <icon>fa-clipboard</icon>
+  <labelField>title</labelField>
+  <component>CiviCampaign</component>
   <field>
     <name>id</name>
     <title>Survey ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Survey id.</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>
@@ -27,22 +32,30 @@
       <required>true</required>
       <localizable>true</localizable>
       <comment>Title of the Survey.</comment>
+      <html>
+        <type>Text</type>
+      </html>
       <import>true</import>
       <add>3.3</add>
   </field>
 
   <field>
     <name>campaign_id</name>
-    <title>Survey Campaign ID</title>
+    <title>Campaign ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Foreign key to the Campaign.</comment>
+    <html>
+      <type>EntityRef</type>
+      <label>Campaign</label>
+    </html>
+    <add>3.3</add>
     <pseudoconstant>
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
-    <add>3.3</add>
   </field>
   <foreignKey>
     <name>campaign_id</name>
@@ -78,12 +91,8 @@
     <title>Follow up Interval</title>
     <type>text</type>
     <comment>Recontact intervals for each status.</comment>
-    <html>
-      <type>TextArea</type>
-      <rows>20</rows>
-      <cols>80</cols>
-    </html>
     <add>3.3</add>
+    <drop>5.66</drop>
   </field>
 
   <field>
@@ -93,7 +102,7 @@
     <localizable>true</localizable>
     <comment>Script instructions for volunteers to use for the survey.</comment>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>20</rows>
       <cols>80</cols>
     </html>
@@ -132,6 +141,11 @@
     <title>Survey Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Is this survey enabled or disabled/cancelled?</comment>
     <add>3.3</add>
   </field>
@@ -141,15 +155,23 @@
     <title>Is Default Survey</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Default</label>
+    </html>
     <comment>Is this default survey?</comment>
     <add>3.3</add>
   </field>
 
   <field>
     <name>created_id</name>
-    <title>Survey Created By</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this Survey.</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -170,9 +192,12 @@
 
   <field>
     <name>last_modified_id</name>
-    <title>Survey Modified</title>
+    <title>Modified By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who recently edited this Survey.</comment>
+    <html>
+      <label>Modified By</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -198,12 +223,20 @@
     <default>NULL</default>
     <comment>Used to store option group id.</comment>
     <add>3.3</add>
+    <pseudoconstant>
+      <table>civicrm_option_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+      <nameColumn>name</nameColumn>
+      <condition>name LIKE "civicrm_survey_%"</condition>
+    </pseudoconstant>
   </field>
   <field>
     <name>bypass_confirm</name>
     <title>No Email Verification</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Bypass the email verification.</comment>
     <add>4.2</add>
   </field>
@@ -234,6 +267,7 @@
     <title>Is shared through social media</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Can people share the petition through social media?</comment>
     <add>4.4</add>
   </field>

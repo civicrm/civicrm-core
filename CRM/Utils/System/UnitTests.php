@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -27,6 +25,24 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
   public function __construct() {
     $this->is_drupal = FALSE;
     $this->supports_form_extensions = FALSE;
+  }
+
+  public function initialize() {
+    parent::initialize();
+    $test = $GLOBALS['CIVICRM_TEST_CASE'] ?? NULL;
+    if ($test && $test instanceof \Civi\Test\HeadlessInterface) {
+      $listenerMap = \Civi\Core\Event\EventScanner::findListeners($test);
+      \Civi::dispatcher()->addListenerMap($test, $listenerMap);
+    }
+    \Civi\Test::eventChecker()->addListeners();
+  }
+
+  /**
+   * @internal
+   * @return bool
+   */
+  public function isLoaded(): bool {
+    return TRUE;
   }
 
   /**
@@ -53,6 +69,22 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritdoc
+   */
+  public function getCiviSourceStorage(): array {
+    global $civicrm_root;
+
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+
+    return [
+      'url' => CRM_Utils_File::addTrailingSlash('', '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+    ];
+  }
+
+  /**
    * @inheritDoc
    */
   public function mapConfigToSSL() {
@@ -75,7 +107,6 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
@@ -92,19 +123,17 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     }
     $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
 
-    $separator = $htmlize ? '&amp;' : '&';
-
     if (!$config->cleanURL) {
-      if (isset($path)) {
-        if (isset($query)) {
-          return $base . $script . '?q=' . $path . $separator . $query . $fragment;
+      if ($path !== NULL && $path !== '' && $path !== FALSE) {
+        if ($query !== NULL && $query !== '' && $query !== FALSE) {
+          return $base . $script . '?q=' . $path . '&' . $query . $fragment;
         }
         else {
           return $base . $script . '?q=' . $path . $fragment;
         }
       }
       else {
-        if (isset($query)) {
+        if ($query !== NULL && $query !== '' && $query !== FALSE) {
           return $base . $script . '?' . $query . $fragment;
         }
         else {

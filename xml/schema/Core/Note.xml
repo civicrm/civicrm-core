@@ -14,6 +14,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Note ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -27,8 +30,12 @@
     <length>64</length>
     <required>true</required>
     <comment>Name of table where item being referenced is stored.</comment>
+    <html>
+      <label>Reference Type</label>
+      <type>Select</type>
+    </html>
     <pseudoconstant>
-      <callback>CRM_Core_BAO_Note::entityTables</callback>
+      <optionGroupName>note_used_for</optionGroupName>
     </pseudoconstant>
     <add>1.1</add>
   </field>
@@ -36,6 +43,10 @@
     <name>entity_id</name>
     <title>Note Entity ID</title>
     <type>int unsigned</type>
+    <html>
+      <label>Reference Item</label>
+      <type>EntityRef</type>
+    </html>
     <required>true</required>
     <comment>Foreign key to the referenced item.</comment>
     <add>1.1</add>
@@ -68,9 +79,13 @@
   </field>
   <field>
     <name>contact_id</name>
-    <title>Note Created By</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID creator</comment>
+    <html>
+      <label>Created By</label>
+      <type>EntityRef</type>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>
@@ -81,12 +96,43 @@
     <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
+    <name>note_date</name>
+    <title>Note Date</title>
+    <type>timestamp</type>
+    <add>5.36</add>
+    <default>CURRENT_TIMESTAMP</default>
+    <comment>Date attached to the note</comment>
+    <html>
+     <type>Select Date</type>
+     <formatType>activityDateTime</formatType>
+   </html>
+  </field>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <comment>When the note was created.</comment>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
+    <add>5.36</add>
+    <readonly>true</readonly>
+  </field>
+  <field>
     <name>modified_date</name>
-    <title>Note Modified By</title>
+    <title>Note Modified Date</title>
     <type>timestamp</type>
     <comment>When was this note last modified/edited</comment>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <html>
+      <label>Modified Date</label>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
     <add>1.1</add>
+    <readonly>true</readonly>
   </field>
   <field>
     <name>subject</name>
@@ -107,6 +153,8 @@
     <length>255</length>
     <comment>Foreign Key to Note Privacy Level (which is an option value pair and hence an implicit FK)</comment>
     <add>3.3</add>
+    <required>true</required>
+    <default>0</default>
     <html>
       <type>Select</type>
     </html>

@@ -19,6 +19,7 @@
     chainTpl = _.template($('#api-chain-tpl').html()),
     docCodeTpl = _.template($('#doc-code-tpl').html()),
     joinTpl = _.template($('#join-tpl').html()),
+    restTpl = _.template($('#api-rest-tpl').html()),
 
     // The following apis do not use Api3SelectQuery so do not support advanced features like joins or OR
     NO_JOINS = ['Contact', 'Contribution', 'Pledge', 'Participant'],
@@ -699,6 +700,11 @@
    * Render the api request in various formats
    */
   function formatQuery() {
+    var http = {
+      url: CRM.config.resourceBase + "extern/rest.php",
+      method:  action.startsWith('get') ? 'GET' : 'POST',
+      query: {entity: entity, action: action, json: JSON.stringify(params), api_key: 'FIXME_USER_KEY', key: 'FIXME_SITE_KEY'}
+    };
     var i = 0, q = {
       smarty: "{crmAPI var='result' entity='" + entity + "' action='" + action + "'" + (params.sequential ? '' : ' sequential=0'),
       php: "$result = civicrm_api3('" + entity + "', '" + action + "'",
@@ -706,7 +712,9 @@
       cv: "cv api " + entity + '.' + action + ' ',
       drush: "drush cvapi " + entity + '.' + action + ' ',
       wpcli: "wp cv api " + entity + '.' + action + ' ',
-      rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&api_key=userkey&key=sitekey&json=" + JSON.stringify(params)
+      curl: http.method === 'GET' ?
+        "curl '" + http.url + "?" + $.param(http.query) + "'"
+        : "curl -X " + http.method + " -d '" + $.param(http.query) +"' \\\n  '" + http.url + "'"
     };
     smartyPhp = [];
     $.each(params, function(key, value) {
@@ -743,6 +751,7 @@
     } else if (smartyPhp.length) {
       q.smarty = "{php}\n  " + smartyPhp.join("\n  ") + "\n{/php}\n" + q.smarty;
     }
+    $('#api-rest').html(restTpl(http));
     $.each(q, function(type, val) {
       $('#api-' + type).text(val);
     });
@@ -797,36 +806,6 @@
         $('#api-result').append(footer);
       }
     });
-  }
-
-  /**
-   * Fetch list of example files for a given entity
-   */
-  function getExamples() {
-    CRM.utils.setOptions($('#example-action').prop('disabled', true).addClass('loading'), []);
-    $.getJSON(CRM.url('civicrm/ajax/apiexample', {entity: $(this).val()}))
-      .then(function(result) {
-        CRM.utils.setOptions($('#example-action').prop('disabled', false).removeClass('loading'), result);
-      });
-  }
-
-  /**
-   * Fetch and display an example file
-   */
-  function getExample() {
-    var
-      entity = $('#example-entity').val(),
-      action = $('#example-action').val();
-    if (entity && action) {
-      $('#example-result').block();
-      $.get(CRM.url('civicrm/ajax/apiexample', {file: entity + '/' + action}))
-        .then(function(result) {
-          $('#example-result').unblock().text(result);
-          prettyPrint('#example-result');
-        });
-    } else {
-      $('#example-result').text($('#example-result').attr('placeholder'));
-    }
   }
 
   /**
@@ -993,7 +972,7 @@
     });
 
     // Initialize widgets
-    $('#api-entity, #example-entity, #doc-entity').crmSelect2({
+    $('#api-entity, #doc-entity').crmSelect2({
       // Add strikethough class to selection to indicate deprecated apis
       formatSelection: function(option) {
         return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + option.text + '</span>' : option.text;
@@ -1042,8 +1021,6 @@
         items: '.api-chain-row, .api-param-row'
       });
     $('#api-join').on('change', 'input', onSelectJoin);
-    $('#example-entity').on('change', getExamples);
-    $('#example-action').on('change', getExample);
     $('#doc-entity').on('change', getDocEntity);
     $('#doc-action').on('change', getDocAction);
     $('#api-params-add').on('click', function(e) {

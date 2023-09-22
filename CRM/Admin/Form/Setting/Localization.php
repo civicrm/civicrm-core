@@ -15,6 +15,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\OptionGroup;
+use Civi\Api4\OptionValue;
+
 /**
  * This class generates form components for Localization.
  */
@@ -25,16 +28,18 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     'countryLimit' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'customTranslateFunction' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'defaultContactCountry' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'pinnedContactCountries' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'defaultContactStateProvince' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'defaultCurrency' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'fieldSeparator' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'inheritLocale' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'lcMessages' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'legacyEncoding' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'partial_locales' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'format_locale' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'monetaryThousandSeparator' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'monetaryDecimalPoint' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'moneyformat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-    'moneyvalueformat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'provinceLimit' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'uiLanguages' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
   ];
@@ -43,11 +48,9 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $config = CRM_Core_Config::singleton();
+    $this->setTitle(ts('Settings - Localization'));
 
-    CRM_Utils_System::setTitle(ts('Settings - Localization'));
-
-    $warningTitle = json_encode(ts("Warning"));
+    $warningTitle = json_encode(ts('Warning'));
     $defaultLocaleOptions = CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions();
 
     if (CRM_Core_I18n::isMultiLingual()) {
@@ -98,13 +101,13 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * @param $fields
+   * @param array $fields
    *
    * @return array|bool
    */
   public static function formRule($fields) {
     $errors = [];
-    if (CRM_Utils_Array::value('monetaryThousandSeparator', $fields) ==
+    if (($fields['monetaryThousandSeparator'] ?? NULL) ==
       CRM_Utils_Array::value('monetaryDecimalPoint', $fields)
     ) {
       $errors['monetaryThousandSeparator'] = ts('Thousands Separator and Decimal Delimiter can not be the same.');
@@ -181,9 +184,8 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     // add a new db locale if the requested language is not yet supported by the db
     if (empty($values['makeSinglelingual']) && !empty($values['addLanguage'])) {
-      $domain = new CRM_Core_DAO_Domain();
-      $domain->find(TRUE);
-      if (!substr_count($domain->locales, $values['addLanguage'])) {
+      $locales = CRM_Core_I18n::getMultilingual();
+      if (!in_array($values['addLanguage'], $locales)) {
         CRM_Core_I18n_Schema::addLocale($values['addLanguage'], $values['lcMessages']);
       }
       $values['languageLimit'][$values['addLanguage']] = 1;
@@ -231,31 +233,47 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   /**
    * Replace available currencies by the ones provided
    *
-   * @param $currencies array of currencies ['USD', 'CAD']
-   * @param $default default currency
+   * @param string[] $currencies array of currencies ['USD', 'CAD']
+   * @param string $default default currency
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function updateEnabledCurrencies($currencies, $default) {
+  public static function updateEnabledCurrencies(array $currencies, string $default): void {
 
     // sort so that when we display drop down, weights have right value
     sort($currencies);
-
     // get labels for all the currencies
     $options = [];
 
     $currencySymbols = CRM_Admin_Form_Setting_Localization::getCurrencySymbols();
-    for ($i = 0; $i < count($currencies); $i++) {
+    foreach ($currencies as $i => $currency) {
       $options[] = [
-        'label' => $currencySymbols[$currencies[$i]],
-        'value' => $currencies[$i],
+        'label' => $currencySymbols[$currency],
+        'value' => $currency,
         'weight' => $i + 1,
         'is_active' => 1,
-        'is_default' => $currencies[$i] == $default,
+        'is_default' => $currency === $default,
       ];
     }
+    $optionGroupID = OptionGroup::get(FALSE)->addSelect('id')
+      ->addWhere('name', '=', 'currencies_enabled')
+      ->execute()->first()['id'];
+    // @TODO: This causes a problem in multilingual
+    // (https://github.com/civicrm/civicrm-core/pull/17228), but is needed in
+    // order to be able to remove currencies once added.
+    if (!CRM_Core_I18n::isMultiLingual()) {
+      CRM_Core_DAO::executeQuery("
+        DELETE
+        FROM civicrm_option_value
+        WHERE option_group_id = $optionGroupID
+      ");
+    }
 
-    $dontCare = NULL;
-    CRM_Core_OptionGroup::createAssoc('currencies_enabled', $options, $dontCare);
-
+    OptionValue::save(FALSE)
+      ->setRecords($options)
+      ->setDefaults(['is_active' => 1, 'option_group_id' => $optionGroupID])
+      ->setMatch(['option_group_id', 'value'])
+      ->execute();
   }
 
   /**
@@ -276,22 +294,15 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    * @return array
    */
   public static function getDefaultLocaleOptions() {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $locales = CRM_Core_I18n::languages();
-    if ($domain->locales) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    $languages = CRM_Core_I18n::languages();
+    if ($locales) {
       // for multi-lingual sites, populate default language drop-down with available languages
-      $defaultLocaleOptions = [];
-      foreach ($locales as $loc => $lang) {
-        if (substr_count($domain->locales, $loc)) {
-          $defaultLocaleOptions[$loc] = $lang;
-        }
-      }
+      return array_intersect_key($languages, array_flip($locales));
     }
     else {
-      $defaultLocaleOptions = $locales;
+      return $languages;
     }
-    return $defaultLocaleOptions;
   }
 
   /**
@@ -333,8 +344,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
       $ufm = new CRM_Core_DAO_UFMatch();
       $ufm->contact_id = $session->get('userID');
       if ($newLocale && $ufm->find(TRUE)) {
-        $ufm->language = $newLocale;
-        $ufm->save();
         $session->set('lcMessages', $newLocale);
       }
     }
@@ -349,7 +358,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     $currencies = array_keys(CRM_Core_OptionGroup::values('currencies_enabled'));
     if (!in_array($newCurrency, $currencies)) {
       if (empty($currencies)) {
-        $currencies = [$values['defaultCurrency']];
+        $currencies = [$newCurrency];
       }
       else {
         $currencies[] = $newCurrency;
@@ -364,11 +373,13 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    * @return array
    */
   public static function getDefaultLanguageOptions() {
-    return [
+    $availableOptions = [
       '*default*' => ts('Use default site language'),
       'undefined' => ts('Leave undefined'),
       'current_site_language' => ts('Use language in use at the time'),
     ];
+    $availableLanguages = array_merge($availableOptions, CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions());
+    return $availableLanguages;
   }
 
 }

@@ -19,7 +19,7 @@
     {if $multiRecordDisplay neq 'single'}
     <table class="no-border">
       {assign var='index' value=$groupId|cat:"_$cvID"}
-      {if ($showEdit && $cd_edit.editable && $groupId) && ($editOwnCustomData or $editCustomData)}
+      {if $showEdit && $cd_edit.editable && $groupId && $editPermission}
         <tr>
           <td>
             <a
@@ -31,14 +31,14 @@
       {assign var="showEdit" value=0}
       <tr>
         <td id="{$cd_edit.name}_{$index}" class="section-shown form-item">
-          <div class="crm-accordion-wrapper {if $cd_edit.collapse_display eq 0 or $skipTitle} {else}collapsed{/if}">
+          <div class="crm-accordion-wrapper{if !empty($cd_edit.collapse_display) && empty($skipTitle)} collapsed{/if}">
             {if !$skipTitle}
               <div class="crm-accordion-header">
                 {$cd_edit.title}
               </div>
             {/if}
             <div class="crm-accordion-body">
-              {if $groupId and $cvID and $editCustomData and $cd_edit.editable}
+              {if $groupId and $cvID and $editPermission and $cd_edit.editable}
                 <div class="crm-submit-buttons">
                   <a href="#" class="crm-hover-button crm-custom-value-del"
                      data-post='{ldelim}"valueID": "{$cvID}", "groupID": "{$customGroupId}", "contactId": "{$contactId}", "key": "{crmKey name='civicrm/ajax/customvalue'}"{rdelim}'
@@ -47,45 +47,38 @@
                   </a>
                 </div>
               {/if}
-              {foreach from=$cd_edit.fields item=element key=field_id}
+              {if !empty($cd_edit.fields)}
                 <table class="crm-info-panel">
-                  <tr>
-                    {if $element.options_per_line != 0}
+                  {foreach from=$cd_edit.fields item=element key=field_id}
+                    <tr>
                       <td class="label">{$element.field_title}</td>
                       <td class="html-adjust">
-                        {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                        {foreach from=$element.field_value item=val}
-                          {$val}
-                          <br/>
-                        {/foreach}
-                      </td>
-                    {else}
-                      <td class="label">{$element.field_title}</td>
-                      {if $element.field_data_type == 'Money'}
-                        {if $element.field_type == 'Text'}
-                          <td class="html-adjust">{$element.field_value|crmMoney}</td>
+                        {if $element.options_per_line != 0}
+                          {* sort by fails for option per line. Added a variable to iterate through the element array*}
+                          {foreach from=$element.field_value item=val}
+                            {$val}
+                            <br/>
+                          {/foreach}
                         {else}
-                          <td class="html-adjust">{$element.field_value}</td>
-                        {/if}
-                      {else}
-                        <td class="html-adjust">
-                          {if $element.contact_ref_id}
-                            <a href='{crmURL p="civicrm/contact/view" q="reset=1&cid=`$element.contact_ref_id`"}'>
-                          {/if}
-                          {if $element.field_data_type == 'Memo'}
-                            {$element.field_value|nl2br}
+                          {if $element.field_data_type == 'Money'}
+                            {if $element.field_type == 'Text'}
+                              {$element.data|crmMoney}
+                            {else}
+                              {$element.field_value}
+                            {/if}
                           {else}
-                            {$element.field_value}
+                            {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
+                              {', '|implode:$element.contact_ref_links}
+                            {else}
+                              {$element.field_value}
+                            {/if}
                           {/if}
-                          {if $element.contact_ref_id}
-                            </a>
-                          {/if}
-                        </td>
-                      {/if}
-                    {/if}
-                  </tr>
+                        {/if}
+                      </td>
+                    </tr>
+                  {/foreach}
                 </table>
-              {/foreach}
+              {/if}
               {assign var="rowCount" value=$rowCount+1}
             </div>
             <!-- end of body -->
@@ -126,16 +119,10 @@
                   {/if}
                 {else}
                   <div class="content">
-                    {if $element.contact_ref_id}
-                      <a href='{crmURL p="civicrm/contact/view" q="reset=1&cid=`$element.contact_ref_id`"}'>
-                    {/if}
-                    {if $element.field_data_type == 'Memo'}
-                      {if $element.field_value}{$element.field_value|nl2br}{else}<br/>{/if}
+                    {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
+                      {', '|implode:$element.contact_ref_links}
                     {else}
                       {if $element.field_value}{$element.field_value} {else}<br/>{/if}
-                    {/if}
-                    {if $element.contact_ref_id}
-                      </a>
                     {/if}
                   </div>
                 {/if}

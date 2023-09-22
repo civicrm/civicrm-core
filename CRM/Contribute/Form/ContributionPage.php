@@ -142,7 +142,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
     // Preload libraries required by the "Profiles" tab
     $schemas = ['IndividualModel', 'OrganizationModel', 'ContributionModel'];
-    if (in_array('CiviMember', CRM_Core_Config::singleton()->enableComponents)) {
+    if (CRM_Core_Component::isEnabled('CiviMember')) {
       $schemas[] = 'MembershipModel';
     }
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
@@ -219,11 +219,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     }
 
     $session->replaceUserContext($this->_cancelURL);
-    // views are implemented as frozen form
-    if ($this->_action & CRM_Core_Action::VIEW) {
-      $this->freeze();
-      $this->addElement('button', 'done', ts('Done'), ['onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'"]);
-    }
 
     // don't show option for contribution amounts section if membership price set
     // this flag is sent to template
@@ -265,14 +260,16 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       $this->set('values', $this->_values);
     }
     $defaults = $this->_values;
+    // These fields are not exposed on the form and 'name' is exposed on amount, with a different meaning.
+    // see https://lab.civicrm.org/dev/core/-/issues/4453.
+    unset($defaults['name'], $defaults['created_id'], $defaults['created_date']);
 
-    $config = CRM_Core_Config::singleton();
     if (isset($this->_id)) {
 
       //set defaults for pledgeBlock values.
       $pledgeBlockParams = [
         'entity_id' => $this->_id,
-        'entity_table' => ts('civicrm_contribution_page'),
+        'entity_table' => 'civicrm_contribution_page',
       ];
       $pledgeBlockDefaults = [];
       CRM_Pledge_BAO_PledgeBlock::retrieve($pledgeBlockParams, $pledgeBlockDefaults);
@@ -290,7 +287,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       ];
       foreach ($pledgeBlock as $key) {
         $defaults[$key] = $pledgeBlockDefaults[$key] ?? NULL;
-        if ($key == 'pledge_start_date' && !empty($pledgeBlockDefaults[$key])) {
+        if ($key === 'pledge_start_date' && !empty($pledgeBlockDefaults[$key])) {
           $defaultPledgeDate = (array) json_decode($pledgeBlockDefaults['pledge_start_date']);
           $pledgeDateFields = [
             'pledge_calendar_date' => 'calendar_date',
@@ -313,7 +310,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
       // fix the display of the monetary value, CRM-4038
       if (isset($defaults['goal_amount'])) {
-        $defaults['goal_amount'] = CRM_Utils_Money::format($defaults['goal_amount'], NULL, '%a');
+        $defaults['goal_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['goal_amount']);
       }
 
       // get price set of type contributions

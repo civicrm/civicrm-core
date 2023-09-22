@@ -76,9 +76,9 @@ class CRM_Utils_Migrate_Import {
 
   /**
    * @param CRM_Core_DAO $dao
-   * @param $xml
+   * @param SimpleXMLElement $xml
    * @param bool $save
-   * @param null $keyName
+   * @param string $keyName
    *
    * @return bool
    */
@@ -117,8 +117,8 @@ class CRM_Utils_Migrate_Import {
   }
 
   /**
-   * @param $xml
-   * @param $idMap
+   * @param SimpleXMLElement $xml
+   * @param array $idMap
    */
   public function optionGroups(&$xml, &$idMap) {
     foreach ($xml->OptionGroups as $optionGroupsXML) {
@@ -131,8 +131,8 @@ class CRM_Utils_Migrate_Import {
   }
 
   /**
-   * @param $xml
-   * @param $idMap
+   * @param SimpleXMLElement $xml
+   * @param array $idMap
    */
   public function optionValues(&$xml, &$idMap) {
     foreach ($xml->OptionValues as $optionValuesXML) {
@@ -159,7 +159,7 @@ WHERE      v.option_group_id = %1
   }
 
   /**
-   * @param $xml
+   * @param SimpleXMLElement $xml
    */
   public function relationshipTypes(&$xml) {
 
@@ -172,7 +172,7 @@ WHERE      v.option_group_id = %1
   }
 
   /**
-   * @param $xml
+   * @param SimpleXMLElement $xml
    */
   public function contributionTypes(&$xml) {
 
@@ -185,8 +185,8 @@ WHERE      v.option_group_id = %1
   }
 
   /**
-   * @param $xml
-   * @param $idMap
+   * @param SimpleXMLElement $xml
+   * @param array $idMap
    */
   public function customGroups(&$xml, &$idMap) {
     foreach ($xml->CustomGroups as $customGroupsXML) {
@@ -221,7 +221,7 @@ WHERE      v.option_group_id = %1
                 $valueIDs[] = $relTypeId;
               }
             }
-            elseif (in_array($customGroup->extends, ['Individual', 'Organization', 'Household'])) {
+            elseif (in_array($customGroup->extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
               $valueIDs = $optionValues;
             }
             elseif (in_array($customGroup->extends, ['Contribution', 'ContributionRecur'])) {
@@ -295,7 +295,7 @@ AND        v.name = %1
 
               case 2:
                 // ParticipantEventName
-                $condition = "( is_template IS NULL OR is_template != 1 ) AND title IN( '{$optValues}' )";
+                $condition = "is_template = 0 AND title IN( '{$optValues}' )";
                 $optionIDs = CRM_Event_PseudoConstant::event(NULL, FALSE, $condition);
                 break;
 
@@ -327,8 +327,8 @@ AND        v.name = %1
   }
 
   /**
-   * @param $xml
-   * @param $idMap
+   * @param SimpleXMLElement $xml
+   * @param array $idMap
    */
   public function customFields(&$xml, &$idMap) {
     // Re-index by group id so we can build out the custom fields one table
@@ -349,8 +349,7 @@ AND        v.name = %1
     }
 
     foreach ($fields_indexed_by_group_id as $group_id => $fields) {
-      \Civi\Api4\CustomField::save()
-        ->setCheckPermissions(FALSE)
+      \Civi\Api4\CustomField::save(FALSE)
         ->setDefaults(['custom_group_id' => $group_id])
         ->setRecords(json_decode(json_encode($fields), TRUE))
         ->execute();
@@ -363,7 +362,7 @@ AND        v.name = %1
    * Returns an option group's ID, given its name.
    *
    * @param $groupName
-   * @param $idMap
+   * @param array $idMap
    *
    * @return int|null
    */
@@ -380,8 +379,8 @@ AND        v.name = %1
   }
 
   /**
-   * @param $xml
-   * @param $idMap
+   * @param SimpleXMLElement $xml
+   * @param array $idMap
    */
   public function profileGroups(&$xml, &$idMap) {
     foreach ($xml->ProfileGroups as $profileGroupsXML) {
@@ -395,8 +394,8 @@ AND        v.name = %1
   }
 
   /**
-   * @param $xml
-   * @param $idMap
+   * @param SimpleXMLElement $xml
+   * @param array $idMap
    *
    * @throws CRM_Core_Exception
    */
@@ -439,8 +438,8 @@ AND        f.column_name = %2
   }
 
   /**
-   * @param $xml
-   * @param $idMap
+   * @param SimpleXMLElement $xml
+   * @param array $idMap
    */
   public function profileJoins(&$xml, &$idMap) {
     foreach ($xml->ProfileJoins as $profileJoinsXML) {

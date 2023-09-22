@@ -9,7 +9,7 @@
 *}
 
 <tr>
-{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="pledge_payment_scheduled_date" colspan="2"}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="pledge_payment_scheduled_date" to='' from='' colspan="2" class='' hideRelativeLabel=0}
 </tr>
 <tr>
   <td colspan="2">
@@ -29,13 +29,13 @@
   </td>
 </tr>
 <tr>
-{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="pledge_create_date" colspan="2"}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="pledge_create_date" to='' from='' colspan="2" class='' hideRelativeLabel=0}
 </tr>
 <tr>
-{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="pledge_start_date" colspan="2"}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="pledge_start_date" to='' from='' colspan="2" class='' hideRelativeLabel=0}
 </tr>
 <tr>
-{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="pledge_end_date" colspan="2"}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="pledge_end_date" to='' from='' colspan="2" class='' hideRelativeLabel=0}
 </tr>
 <tr>
   <td>
@@ -77,10 +77,10 @@
 </tr>
 
 {* campaign in pledge search *}
-{include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
-campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
+{include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
+campaignTrClass='' campaignTdClass=''}
 
-{if $pledgeGroupTree}
+{if !empty($pledgeGroupTree)}
 <tr>
   <td colspan="2">
   {include file="CRM/Custom/Form/Search.tpl" groupTree=$pledgeGroupTree showHideLinks=false}

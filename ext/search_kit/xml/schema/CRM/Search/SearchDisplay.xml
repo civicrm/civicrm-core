@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Search</base>
+  <class>SearchDisplay</class>
+  <name>civicrm_search_display</name>
+  <comment>SearchKit - saved search displays</comment>
+  <log>true</log>
+  <icon>fa-clone</icon>
+  <labelField>label</labelField>
+
+  <field>
+    <name>id</name>
+    <title>Search Display ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique SearchDisplay ID</comment>
+    <add>1.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+    <add>1.0</add>
+  </primaryKey>
+
+  <field>
+    <name>name</name>
+    <title>Search Display Name</title>
+    <comment>Unique name for identifying search display</comment>
+    <required>true</required>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>1.0</add>
+  </field>
+
+  <field>
+    <name>label</name>
+    <title>Search Display Label</title>
+    <comment>Label for identifying search display to administrators</comment>
+    <required>true</required>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>1.0</add>
+  </field>
+
+  <field>
+    <name>saved_search_id</name>
+    <type>int unsigned</type>
+    <title>Saved Search ID</title>
+    <comment>FK to saved search table.</comment>
+    <required>true</required>
+    <add>1.0</add>
+  </field>
+  <foreignKey>
+    <name>saved_search_id</name>
+    <table>civicrm_saved_search</table>
+    <key>id</key>
+    <add>1.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <index>
+    <name>UI_saved_search__id_name</name>
+    <fieldName>saved_search_id</fieldName>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>1.0</add>
+  </index>
+
+  <field>
+    <name>type</name>
+    <title>Search Display Type</title>
+    <required>true</required>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Type of display</comment>
+    <pseudoconstant>
+      <optionGroupName>search_display_type</optionGroupName>
+    </pseudoconstant>
+    <add>1.0</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+
+  <field>
+    <name>settings</name>
+    <type>text</type>
+    <title>Search Display Settings</title>
+    <comment>Configuration data for the search display</comment>
+    <serialize>JSON</serialize>
+    <default>NULL</default>
+    <add>1.0</add>
+  </field>
+
+  <field>
+    <name>acl_bypass</name>
+    <title>Bypass ACL Permissions</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Skip permission checks and ACLs when running this display.</comment>
+    <add>5.40</add>
+    <html>
+      <type>Checkbox</type>
+    </html>
+  </field>
+
+</table>

@@ -72,7 +72,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
       throw new CRM_Core_Exception('ufGroupId is missing');
     }
     $this->_title = ts('Update multiple contributions') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
-    CRM_Utils_System::setTitle($this->_title);
+    $this->setTitle($this->_title);
 
     $this->addDefaultButtons(ts('Save'));
     $this->_fields = [];
@@ -143,7 +143,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
           }
 
           if (!empty($entityColumnValue[$typeId]) ||
-            CRM_Utils_System::isNull(CRM_Utils_Array::value($typeId, $entityColumnValue))
+            CRM_Utils_System::isNull($entityColumnValue[$typeId] ?? NULL)
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $contributionId);
           }
@@ -208,14 +208,16 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
         $contribution = civicrm_api3('Contribution', 'create', $value);
         $contribution = $contribution['values'][$contributionID];
 
-        // @todo add check as to whether the status is updated.
-        if (!empty($value['contribution_status_id'])) {
+        $currentStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $value['contribution_status_id'] ?? NULL);
+        $previousStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->_defaultValues["field[{$contributionID}][contribution_status_id]"] ?? NULL);
+
+        if ('Completed' === $currentStatus &&
+          in_array($previousStatus, ['Pending', 'Partially paid'], TRUE)) {
           // @todo - use completeorder api or make api call do this.
-          CRM_Contribute_BAO_Contribution::transitionComponentWithReturnMessage($contribution['id'],
-            $value['contribution_status_id'],
-            CRM_Utils_Array::value("field[{$contributionID}][contribution_status_id]", $this->_defaultValues),
-            $contribution['receive_date']
-          );
+          CRM_Contribute_BAO_Contribution::transitionComponents([
+            'contribution_id' => $contribution['id'],
+            'receive_date' => $contribution['receive_date'],
+          ]);
         }
       }
       CRM_Core_Session::setStatus(ts("Your updates have been saved."), ts('Saved'), 'success');

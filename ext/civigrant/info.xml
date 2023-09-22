@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<extension key="civigrant" type="module">
+  <file>civigrant</file>
+  <name>CiviGrant</name>
+  <description>Track grant distribution.</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Coleman Watts</author>
+    <email>coleman@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Documentation">https://docs.civicrm.org/user/en/latest/grants/what-is-civigrant/</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2021-11-11</releaseDate>
+  <version>5.67.alpha1</version>
+  <develStage>stable</develStage>
+  <compatibility>
+    <ver>5.67</ver>
+  </compatibility>
+  <comments>CiviGrant was originally a core component before migrating to an extension</comments>
+  <requires>
+    <ext>org.civicrm.afform</ext>
+    <ext>org.civicrm.search_kit</ext>
+  </requires>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <upgrader>CRM_Grant_Upgrader</upgrader>
+  <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
+    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>afform-entity-php@1.0.0</mixin>
+    <mixin>smarty-v2@1.0.1</mixin>
+    <mixin>entity-types-php@1.0.0</mixin>
+    <mixin>scan-classes@1.0.0</mixin>
+  </mixins>
+  <civix>
+    <namespace>CRM/Grant</namespace>
+    <format>23.02.1</format>
+  </civix>
+</extension>

@@ -14,12 +14,20 @@
 
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
  {include file="CRM/common/WizardHeader.tpl"}
-<div class="help">
-    <p>
-    {ts}<strong>Import has completed successfully.</strong> The information below summarizes the results.{/ts}
-    </p>
+ <div class="help">
+   <p>
+     {if $unprocessedRowCount}
+       <strong>{ts}The import is still processing.{/ts}</strong>
+     {else}
+       <strong>{ts}Import has completed successfully.{/ts}</strong>
+     {/if}
+   </p>
+   {if $templateURL}
+     <p>
+       {ts 1=$templateURL|smarty:nodefaults}You can re-use this import configuration <a href="%1">here</a>{/ts}</p>
+   {/if}
 
-   {if $unMatchCount }
+   {if $unMatchCount}
         <p class="error">
         {ts count=$unMatchCount plural='CiviCRM has detected mismatched contact IDs. These records have not been updated.'}CiviCRM has detected mismatched contact ID. This record has not been updated.{/ts}
         </p>
@@ -33,16 +41,7 @@
         {ts count=$invalidRowCount plural='CiviCRM has detected invalid data and/or formatting errors in %count records. These records have not been imported.'}CiviCRM has detected invalid data and/or formatting errors in one record. This record has not been imported.{/ts}
         </p>
         <p class="error">
-        {ts 1=$downloadErrorRecordsUrl}You can <a href='%1'>Download Errors</a>. You may then correct them, and import the new file with the corrected data.{/ts}
-        </p>
-    {/if}
-
-    {if $conflictRowCount}
-        <p class="error">
-        {ts count=$conflictRowCount plural='CiviCRM has detected %count records with conflicting email addresses within this data file or relative to existing contact records. These records have not been imported.'}CiviCRM has detected one record with conflicting email addresses within this data file or relative to existing contact records. This record has not been imported.{/ts} {ts}CiviCRM does not allow multiple contact records to have the same primary email address.{/ts}
-        </p>
-        <p class="error">
-        {ts 1=$downloadConflictRecordsUrl}You can <a href='%1'>Download Conflicts</a>. You may then review these records to determine if they are actually conflicts, and correct the email addresses for those that are not.{/ts}
+        {ts 1=$downloadErrorRecordsUrl|smarty:nodefaults}You can <a href='%1'>See the errors</a>. You may then correct them, and re-import with the corrected data.{/ts}
         </p>
     {/if}
 
@@ -56,68 +55,65 @@
     {/if}
 
     {if $unparsedAddressCount}
-        <p class="error">{$unparsedStreetAddressString}</p>
+        <p class="error">{ts}Records imported successfully but unable to parse some of the street addresses{/ts}</p>
         <p class="error">
         {ts 1=$downloadAddressRecordsUrl}You can <a href='%1'>Download Street Address Records </a>. You may then edit those contact records and update the street address accordingly.{/ts}
         </p>
     {/if}
- </div>
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
- {* Summary of Import Results (record counts) *}
- <table id="summary-counts" class="report">
+  </div>
+  {if !$outputUnavailable}
+  {* Summary of Import Results (record counts) *}
+  <table id="summary-counts" class="report">
     <tr><td class="label crm-grid-cell">{ts}Total Rows{/ts}</td>
-        <td class="data">{$totalRowCount}</td>
-        <td class="explanation">{ts}Total number of rows in the imported data.{/ts}</td>
+      <td class="data">{if $allRowsUrl} <a href="{$allRowsUrl}" target="_blank" rel="noopener noreferrer">{$totalRowCount}</a>{else}{$totalRowCount}{/if}</td>
+      <td class="explanation">{ts}Total number of rows in the imported data.{/ts}</td>
     </tr>
+    {if $unprocessedRowCount}
+      <tr><td class="label crm-grid-cell">{ts}Rows Still processing{/ts}</td>
+        <td class="data">{$unprocessedRowCount}</td>
+        <td class="explanation">{ts}Rows still being processed.{/ts}</td>
+      </tr>
+    {/if}
 
-    {if $invalidRowCount }
-    <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
+    {if $invalidRowCount}
+      <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields (for example, invalid email address formatting). These rows will be skipped (not imported).{/ts}
-            {if $invalidRowCount}
-                <div class="action-link"><a href="{$downloadErrorRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Errors{/ts}</a></div>
-            {/if}
+          <div class="action-link"><a href="{$downloadErrorRecordsUrl|smarty:nodefaults}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}See Errors{/ts}</a></div>
         </td>
-    </tr>
+      </tr>
     {/if}
 
-    {if $unMatchCount }
-    <tr class="error"><td class="label crm-grid-cell">{ts}Mismatched Rows (skipped){/ts}</td>
+    {if $unMatchCount}
+      <tr class="error"><td class="label crm-grid-cell">{ts}Mismatched Rows (skipped){/ts}</td>
         <td class="data">{$unMatchCount}</td>
         <td class="explanation">{ts}Rows with mismatched contact IDs... (NOT updated).{/ts}
-            {if $unMatchCount}
-                <<div class="action-link"><a href="{$downloadMismatchRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Mismatched Contacts{/ts}</a></div>
-            {/if}
+          <div class="action-link"><a href="{$downloadMismatchRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Mismatched Contacts{/ts}</a></div>
         </td>
-    </tr>
-    {/if}
-
-    {if $conflictRowCount}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Conflicting Rows (skipped){/ts}</td>
-        <td class="data">{$conflictRowCount}</td>
-        <td class="explanation">{ts}Rows with conflicting email addresses (NOT imported).{/ts}
-            {if $conflictRowCount}
-                <div class="action-link"><a href="{$downloadConflictRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Conflicts{/ts}</a></div>
-            {/if}
-        </td>
-    </tr>
+      </tr>
     {/if}
 
     {if $duplicateRowCount && $dupeError}
-    <tr class="error"><td class="label crm-grid-cell">{ts}Duplicate Rows{/ts}</td>
+      <tr class="error"><td class="label crm-grid-cell">{ts}Duplicate Rows{/ts}</td>
         <td class="data">{$duplicateRowCount}</td>
         <td class="explanation">{ts}Rows which are duplicates of existing CiviCRM contact records.{/ts} {$dupeActionString}
-            {if $duplicateRowCount}
-                <div class="action-link"><a href="{$downloadDuplicateRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Duplicates{/ts}</a></div>
-            {/if}
+          <div class="action-link"><a href="{$downloadDuplicateRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Duplicates{/ts}</a></div>
         </td>
     </tr>
     {/if}
 
-    <tr><td class="label crm-grid-cell">{ts}Total Contacts{/ts}</td>
-        <td class="data">{$validRowCount}</td>
-        <td class="explanation">{ts}Total number of contact records created or modified during the import.{/ts}</td>
+    <tr>
+      <td class="label crm-grid-cell">{ts}Total Rows Imported{/ts}</td>
+      <td class="data">{if $importedRowsUrl} <a href="{$importedRowsUrl}" target="_blank" rel="noopener noreferrer">{$importedRowCount}</a>{else}{$importedRowCount}{/if}</td>
+      <td class="explanation">{ts}Total number of primary records created or modified during the import.{/ts}</td>
     </tr>
+    {foreach from=$trackingSummary item="summaryRow"}
+      <tr>
+        <td class="label crm-grid-cell"></td>
+        <td class="data">{$summaryRow.value}</td>
+        <td class="explanation">{$summaryRow.description}</td>
+      </tr>
+    {/foreach}
 
     {if $groupAdditions}
     <tr><td class="label crm-grid-cell">{ts}Import to Groups{/ts}</td>
@@ -148,6 +144,6 @@
     {/if}
 
  </table>
+  {/if}
 
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

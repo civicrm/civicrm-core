@@ -162,8 +162,7 @@ class CRM_Core_PseudoConstant {
    * @param string $fieldName
    * @param array $params
    * - name       string  name of the option group
-   * - flip       boolean results are return in id => label format if false
-   *                            if true, the results are reversed
+   * - flip       DEPRECATED
    * - grouping   boolean if true, return the value in 'grouping' column (currently unsupported for tables other than option_value)
    * - localize   boolean if true, localize the results before returning
    * - condition  string|array add condition(s) to the sql query - will be concatenated using 'AND'
@@ -193,6 +192,8 @@ class CRM_Core_PseudoConstant {
       'onlyActive' => !($context == 'validate' || $context == 'get'),
       'fresh' => FALSE,
       'context' => $context,
+      'condition' => [],
+      'values' => [],
     ];
     $entity = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
 
@@ -208,8 +209,10 @@ class CRM_Core_PseudoConstant {
     }
 
     // Core field: load schema
-    $dao = new $daoName();
-    $fieldSpec = $dao->getFieldSpec($fieldName);
+    if (class_exists($daoName)) {
+      $dao = new $daoName();
+      $fieldSpec = $dao->getFieldSpec($fieldName);
+    }
 
     // Return false if field doesn't exist.
     if (empty($fieldSpec)) {
@@ -224,7 +227,8 @@ class CRM_Core_PseudoConstant {
 
       // if callback is specified..
       if (!empty($pseudoconstant['callback'])) {
-        $fieldOptions = call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']), $context);
+        $fieldOptions = call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']), $fieldName, $params);
+        $fieldOptions = self::formatArrayOptions($context, $fieldOptions);
         //CRM-18223: Allow additions to field options via hook.
         CRM_Utils_Hook::fieldOptions($entity, $fieldName, $fieldOptions, $params);
         return $fieldOptions;
@@ -232,10 +236,12 @@ class CRM_Core_PseudoConstant {
 
       // Merge params with schema defaults
       $params += [
-        'condition' => $pseudoconstant['condition'] ?? [],
         'keyColumn' => $pseudoconstant['keyColumn'] ?? NULL,
         'labelColumn' => $pseudoconstant['labelColumn'] ?? NULL,
       ];
+      if (!empty($pseudoconstant['condition'])) {
+        $params['condition'] = array_merge((array) $pseudoconstant['condition'], (array) $params['condition']);
+      }
 
       // Fetch option group from option_value table
       if (!empty($pseudoconstant['optionGroupName'])) {
@@ -252,10 +258,10 @@ class CRM_Core_PseudoConstant {
           $params['grouping'],
           $params['localize'],
           $params['condition'] ? ' AND ' . implode(' AND ', (array) $params['condition']) : NULL,
-          $params['labelColumn'] ? $params['labelColumn'] : 'label',
+          $params['labelColumn'] ?: 'label',
           $params['onlyActive'],
           $params['fresh'],
-          $params['keyColumn'] ? $params['keyColumn'] : 'value',
+          $params['keyColumn'] ?: 'value',
           !empty($params['orderColumn']) ? $params['orderColumn'] : 'weight'
         );
         CRM_Utils_Hook::fieldOptions($entity, $fieldName, $options, $params);
@@ -282,7 +288,7 @@ class CRM_Core_PseudoConstant {
     }
 
     // Return "Yes" and "No" for boolean fields
-    elseif (CRM_Utils_Array::value('type', $fieldSpec) === CRM_Utils_Type::T_BOOLEAN) {
+    elseif (($fieldSpec['type'] ?? NULL) === CRM_Utils_Type::T_BOOLEAN) {
       $output = $context == 'validate' ? [0, 1] : CRM_Core_SelectValues::boolean();
       CRM_Utils_Hook::fieldOptions($entity, $fieldName, $output, $params);
       return $flip ? array_flip($output) : $output;
@@ -370,7 +376,7 @@ class CRM_Core_PseudoConstant {
         return NULL;
       }
       // We don't have good mapping so have to do a bit of guesswork from the menu
-      list(, $parent, , $child) = explode('_', $daoName);
+      [, $parent, , $child] = explode('_', $daoName);
       $sql = "SELECT path FROM civicrm_menu
         WHERE page_callback LIKE '%CRM_Admin_Page_$child%' OR page_callback LIKE '%CRM_{$parent}_Page_$child%'
         ORDER BY page_callback
@@ -426,7 +432,7 @@ class CRM_Core_PseudoConstant {
       return $var;
     }
 
-    /* @var CRM_Core_DAO $object */
+    /** @var CRM_Core_DAO $object */
     $object = new $name();
 
     $object->selectAdd();
@@ -732,25 +738,7 @@ WHERE  id = %1";
 
       self::populate(self::$country, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active', $whereClause);
 
-      // if default country is set, percolate it to the top
-      if (CRM_Core_BAO_Country::defaultContactCountry()) {
-        $countryIsoCodes = self::countryIsoCode();
-        $defaultID = array_search(CRM_Core_BAO_Country::defaultContactCountry(), $countryIsoCodes);
-        if ($defaultID !== FALSE) {
-          $default[$defaultID] = self::$country[$defaultID] ?? NULL;
-          self::$country = $default + self::$country;
-        }
-      }
-
-      // localise the country names if in an non-en_US locale
-      $tsLocale = CRM_Core_I18n::getLocale();
-      if ($tsLocale != '' and $tsLocale != 'en_US') {
-        $i18n = CRM_Core_I18n::singleton();
-        $i18n->localizeArray(self::$country, [
-          'context' => 'country',
-        ]);
-        self::$country = CRM_Utils_Array::asort(self::$country);
-      }
+      self::$country = CRM_Core_BAO_Country::_defaultContactCountries(self::$country);
     }
     if ($id) {
       if (array_key_exists($id, self::$country)) {
@@ -814,13 +802,8 @@ WHERE  id = %1";
    *   array reference of all groups.
    */
   public static function allGroup($groupType = NULL, $excludeHidden = TRUE) {
-    if ($groupType === 'validate') {
-      // validate gets passed through from getoptions. Handle in the deprecated
-      // fn rather than change the new pattern.
-      $groupType = NULL;
-    }
     $condition = CRM_Contact_BAO_Group::groupTypeCondition($groupType, $excludeHidden);
-    $groupKey = ($groupType ? $groupType : 'null') . !empty($excludeHidden);
+    $groupKey = ($groupType ?: 'null') . !empty($excludeHidden);
 
     if (!isset(Civi::$statics[__CLASS__]['groups']['allGroup'][$groupKey])) {
       self::populate(Civi::$statics[__CLASS__]['groups']['allGroup'][$groupKey], 'CRM_Contact_DAO_Group', FALSE, 'title', 'is_active', $condition);
@@ -857,7 +840,7 @@ WHERE  id = %1";
    * @param bool $excludeHidden
    * @return array
    */
-  public static function nestedGroup($checkPermissions = TRUE, $groupType = NULL, $excludeHidden = TRUE) {
+  public static function nestedGroup(bool $checkPermissions = TRUE, $groupType = NULL, bool $excludeHidden = TRUE) {
     $groups = $checkPermissions ? self::group($groupType, $excludeHidden) : self::allGroup($groupType, $excludeHidden);
     return CRM_Contact_BAO_Group::getGroupsHierarchy($groups, NULL, '&nbsp;&nbsp;', TRUE);
   }
@@ -950,6 +933,23 @@ WHERE  id = %1";
     }
 
     return self::$relationshipType[$cacheKey];
+  }
+
+  /**
+   * Name => Label pairs for all relationship types
+   *
+   * @return array
+   */
+  public static function relationshipTypeOptions() {
+    $relationshipTypes = [];
+    $relationshipLabels = self::relationshipType();
+    foreach (self::relationshipType('name') as $id => $type) {
+      $relationshipTypes[$type['name_a_b']] = $relationshipLabels[$id]['label_a_b'];
+      if ($type['name_b_a'] && $type['name_b_a'] != $type['name_a_b']) {
+        $relationshipTypes[$type['name_b_a']] = $relationshipLabels[$id]['label_b_a'];
+      }
+    }
+    return $relationshipTypes;
   }
 
   /**
@@ -1376,19 +1376,21 @@ WHERE  id = %1
    * The static array option values is returned
    *
    *
-   * @param bool $optionGroupName
-   *   Get All Option Group values- default is to get only active ones.
+   * @param string $optionGroupName
+   *   Name of option group
    *
    * @param int $id
-   * @param null $condition
+   * @param string $condition
+   * @param string $column
+   *   Whether to return 'name' or 'label'
    *
    * @return array
-   *   array reference of all Option Group Name
+   *   array reference of all Option Values
    */
-  public static function accountOptionValues($optionGroupName, $id = NULL, $condition = NULL) {
-    $cacheKey = $optionGroupName . '_' . $condition;
+  public static function accountOptionValues($optionGroupName, $id = NULL, $condition = NULL, $column = 'label') {
+    $cacheKey = $optionGroupName . '_' . $condition . '_' . $column;
     if (empty(self::$accountOptionValues[$cacheKey])) {
-      self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, FALSE, FALSE, FALSE, $condition);
+      self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, FALSE, FALSE, FALSE, $condition, $column);
     }
     if ($id) {
       return self::$accountOptionValues[$cacheKey][$id] ?? NULL;
@@ -1488,7 +1490,7 @@ WHERE  id = %1
       return FALSE;
     }
     // Get list of fields for the option table
-    /* @var CRM_Core_DAO $dao * */
+    /** @var CRM_Core_DAO $dao * */
     $dao = new $daoName();
     $availableFields = array_keys($dao->fieldKeys());
 
@@ -1496,6 +1498,10 @@ WHERE  id = %1
     $from = 'FROM %3';
     $wheres = [];
     $order = 'ORDER BY %2';
+    if (in_array('id', $availableFields, TRUE)) {
+      // Example: 'ORDER BY abbreviation, id' because `abbreviation`s are not unique.
+      $order .= ', id';
+    }
 
     // Use machine name in certain contexts
     if ($context === 'validate' || $context === 'match') {
@@ -1509,8 +1515,8 @@ WHERE  id = %1
     }
 
     // Use abbrColum if context is abbreviate
-    if ($context === 'abbreviate' && (in_array('abbreviation', $availableFields) || !empty($pseudoconstant['abbrColumn']))) {
-      $params['labelColumn'] = $pseudoconstant['abbrColumn'] ?? 'abbreviation';
+    if ($context === 'abbreviate' && !empty($pseudoconstant['abbrColumn'])) {
+      $params['labelColumn'] = $pseudoconstant['abbrColumn'];
     }
 
     // Condition param can be passed as an sql clause string or an array of clauses
@@ -1527,16 +1533,16 @@ WHERE  id = %1
     }
     // Filter domain specific options
     if (in_array('domain_id', $availableFields)) {
-      $wheres[] = 'domain_id = ' . CRM_Core_Config::domainID() . ' OR  domain_id is NULL';
+      $wheres[] = '(domain_id = ' . CRM_Core_Config::domainID() . ' OR  domain_id is NULL)';
     }
     $queryParams = [
-      1 => [$params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
-      2 => [$params['labelColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
-      3 => [$pseudoconstant['table'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
+      1 => [$params['keyColumn'], 'MysqlColumnNameOrAlias'],
+      2 => [$params['labelColumn'], 'MysqlColumnNameOrAlias'],
+      3 => [$pseudoconstant['table'], 'MysqlColumnNameOrAlias'],
     ];
     // Add orderColumn param
     if (!empty($params['orderColumn'])) {
-      $queryParams[4] = [$params['orderColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES];
+      $queryParams[4] = [$params['orderColumn'], 'MysqlOrderBy'];
       $order = 'ORDER BY %4';
     }
     // Support no sorting if $params[orderColumn] is FALSE
@@ -1560,12 +1566,19 @@ WHERE  id = %1
     }
     // Localize results
     if (!empty($params['localize']) || $pseudoconstant['table'] === 'civicrm_country' || $pseudoconstant['table'] === 'civicrm_state_province') {
-      $I18nParams = [];
-      if ($localizeContext) {
-        $I18nParams['context'] = $localizeContext;
+      if ($pseudoconstant['table'] === 'civicrm_country') {
+        $output = CRM_Core_BAO_Country::_defaultContactCountries($output);
+        // avoid further sorting
+        $order = '';
       }
-      $i18n = CRM_Core_I18n::singleton();
-      $i18n->localizeArray($output, $I18nParams);
+      else {
+        $I18nParams = [];
+        if ($localizeContext) {
+          $I18nParams['context'] = $localizeContext;
+        }
+        $i18n = CRM_Core_I18n::singleton();
+        $i18n->localizeArray($output, $I18nParams);
+      }
       // Maintain sort by label
       if ($order === 'ORDER BY %2') {
         $output = CRM_Utils_Array::asort($output);
@@ -1573,6 +1586,38 @@ WHERE  id = %1
     }
 
     return $output;
+  }
+
+  /**
+   * Convert multidimensional option list to flat array, if necessary
+   *
+   * Detect if an array of options is simple key/value pairs or a multidimensional array.
+   * If the latter, convert to a flat array, as determined by $context.
+   *
+   * @param string|null $context
+   *   See https://docs.civicrm.org/dev/en/latest/framework/pseudoconstant/#context
+   * @param array $options
+   *   List of options, each as a record of id+name+label.
+   *   Ex: [['id' => 123, 'name' => 'foo_bar', 'label' => 'Foo Bar']]
+   */
+  public static function formatArrayOptions($context, array &$options) {
+    // Already flat; return keys/values according to context
+    if (!isset($options[0]) || !is_array($options[0])) {
+      // For validate context, machine names are expected in place of labels.
+      // A flat array has no names so use the ids for both key and value.
+      return $context === 'validate' ?
+        array_combine(array_keys($options), array_keys($options)) :
+        $options;
+    }
+    $result = [];
+    $key = ($context === 'match') ? 'name' : 'id';
+    $value = ($context === 'validate') ? 'name' : (($context === 'abbreviate') ? 'abbr' : 'label');
+    foreach ($options as $option) {
+      // Some fallbacks in case the array is missing a 'name' or 'label' or 'abbr'
+      $id = $option[$key] ?? $option['id'] ?? $option['name'];
+      $result[$id] = $option[$value] ?? $option['label'] ?? $option['name'];
+    }
+    return $result;
   }
 
 }

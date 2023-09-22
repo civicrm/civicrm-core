@@ -52,28 +52,33 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/financial/financialType/accounts',
           'qs' => 'reset=1&action=browse&aid=%%id%%',
           'title' => ts('Accounts'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/financial/financialType',
+          'url' => 'civicrm/admin/financial/financialType/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Financial Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Financial Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Financial Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/financial/financialType',
+          'url' => 'civicrm/admin/financial/financialType/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Financial Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -84,12 +89,6 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    * Browse all financial types.
    */
   public function browse() {
-    // Check permission for Financial Type when ACL-FT is enabled
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-      && !CRM_Core_Permission::check('administer CiviCRM Financial Types')
-    ) {
-      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-    }
     // get all financial types sorted by weight
     $financialType = [];
     $dao = new CRM_Financial_DAO_FinancialType();
@@ -106,7 +105,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       $params['entity_id'] = $dao->id;
       $params['entity_table'] = 'civicrm_financial_type';
       $null = [];
-      CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $null, $financialAccountIds);
+      CRM_Financial_BAO_EntityFinancialAccount::retrieve($params, $null, $financialAccountIds);
 
       foreach ($financialAccountIds as $key => $values) {
         if (!empty($financialAccounts[$values['financial_account_id']])) {

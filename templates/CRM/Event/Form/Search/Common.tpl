@@ -17,9 +17,9 @@
   <td class="crm-event-form-block-event_type_id"> {$form.event_type_id.label}<br />{$form.event_type_id.html} </td>
 </tr>
 <tr>
-    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="event" colspan="2"}</tr>
+    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="event" to='' from='' colspan="2" class='' hideRelativeLabel=0}</tr>
 <tr>
-  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="participant_register_date" colspan="2"}
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="participant_register_date" to='' from='' colspan="2" class='' hideRelativeLabel=0}
 </tr>
 <tr>
   <td class="crm-event-form-block-participant_status"><label>{$form.participant_status_id.label}</label>
@@ -50,12 +50,15 @@
     {$form.participant_fee_amount_high.label} &nbsp; {$form.participant_fee_amount_high.html}
   </td>
 </tr>
+<tr>
+  <td colspan="2"><label>{$form.participant_id.label}</label> {$form.participant_id.html}</td>
+</tr>
 
 {* campaign in contribution search *}
-{include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
+{include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
 campaignTrClass='' campaignTdClass='crm-event-form-block-participant_campaign_id'}
 
-{if $participantGroupTree }
+{if $participantGroupTree}
 <tr>
   <td colspan="4">
   {include file="CRM/Custom/Form/Search.tpl" groupTree=$participantGroupTree showHideLinks=false}

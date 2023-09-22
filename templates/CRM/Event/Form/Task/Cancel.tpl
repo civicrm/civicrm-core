@@ -10,7 +10,7 @@
 {* Confirmation of Cancel Registration *}
 <div class="crm-block crm-form-block crm-event-cancel-form-block">
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
   <div>
       <p>{ts}Are you sure you want to set status to Cancelled for the selected participants?{/ts}</p>
       <p>{include file="CRM/Event/Form/Task.tpl"}</p>

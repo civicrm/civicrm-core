@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ContributionRecur;
+use Civi\Api4\ContributionSoft;
+
 /**
  * Test class for CRM_Contact_Page_View_UserDashBoard
  *
@@ -36,7 +39,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Prepare for test
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->contactID = $this->createLoggedInUser();
     $this->listenForPageContent();
@@ -45,19 +48,20 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Clean up after each test.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_uf_match']);
     CRM_Utils_Hook::singleton()->reset();
     CRM_Core_Session::singleton()->reset();
     CRM_Core_Smarty::singleton()->clearTemplateVars();
     $this->callAPISuccess('Contact', 'delete', ['id' => $this->contactID]);
+    parent::tearDown();
   }
 
   /**
    * Test the content of the dashboard.
    */
-  public function testDashboardContentEmptyContact() {
+  public function testDashboardContentEmptyContact(): void {
     $this->runUserDashboard();
     $expectedStrings = [
       'You are not currently subscribed to any Groups',
@@ -73,7 +77,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Test the content of the dashboard.
    */
-  public function testDashboardContentContributionsWithInvoicingEnabled() {
+  public function testDashboardContentContributionsWithInvoicingEnabled(): void {
     $this->contributions[] = $this->contributionCreate([
       'contact_id' => $this->contactID,
       'receive_date' => '2018-11-21',
@@ -113,18 +117,18 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $this->runUserDashboard();
     $expectedStrings = [
       'Your Contribution(s)',
-      '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Status</th><th></th>',
-      '<td>Completed</td><td><a class="button no-popup nowrap"href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=1&amp;cid=' . $this->contactID . '"><i class="crm-i fa-print" aria-hidden="true"></i><span>Print Invoice</span></a></td></tr><tr id=\'rowid2\'',
+      '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Contribution Date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th><th></th>',
+      '<td>Completed</td><td><a class="button no-popup nowrap"href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=2&amp;cid=' . $this->contactID . '"><i class="crm-i fa-download" aria-hidden="true"></i><span>Download Invoice</span></a></td></tr><tr id=\'rowid1\'',
       'Pay Now',
     ];
 
     $this->assertPageContains($expectedStrings);
-    $this->assertSmartyVariableArrayIncludes('contribute_rows', 1, [
+    $this->assertSmartyVariableArrayIncludes('contribute_rows', 2, [
       'contact_id' => $this->contactID,
       'contribution_id' => '1',
       'total_amount' => '100.00',
       'financial_type' => 'Donation',
-      'contribution_source' => 'SSF',
+      'source' => 'SSF',
       'receive_date' => '2018-11-21 00:00:00',
       'contribution_status' => 'Completed',
       'currency' => 'USD',
@@ -137,10 +141,16 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
    * Test the content of the dashboard.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  public function testDashboardContentContributions() {
-    $this->contributionCreate(['contact_id' => $this->contactID]);
+  public function testDashboardContentContributions(): void {
+    $contributionRecurID = ContributionRecur::create()->setValues([
+      'amount' => 66,
+      'contact_id' => $this->contactID,
+      'frequency_unit' => 'month',
+      'frequency_interval' => 2,
+      'payment_processor_id' => $this->dummyProcessorCreate()->getID(),
+    ])->execute()->first()['id'];
+    $this->contributionCreate(['contact_id' => $this->contactID, 'contribution_recur_id' => $contributionRecurID]);
     $this->contributions[] = civicrm_api3('Contribution', 'get', [
       'contact_id' => $this->contactID,
       'options' => ['limit' => 12, 'sort' => 'receive_date DESC'],
@@ -149,22 +159,129 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $this->runUserDashboard();
     $expectedStrings = [
       'Your Contribution(s)',
-      '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Status</th>',
-      '<td>$ 100.00 </td><td>Donation</td>',
+      '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Contribution Date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th>',
+      '<td>$100.00 <br/>(Recurring Contribution)</td><td>Donation</td>',
       '<td>Completed</td>',
+      '(Recurring Contribution)',
+      '<tr class="even-row"><td><label>$66.00</label>every 2 month for  installments</td><td>In Progress</td>',
+    ];
+    $this->assertPageContains($expectedStrings);
+  }
+
+  /**
+   * Create honor-contact method.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testUserDashboardHonorContact(): void {
+    $honoreeContactID = $this->individualCreate([
+      'first_name' => 'John',
+      'last_name' => 'Smith',
+      'email' => 'john.smith@example.com',
+    ]);
+    // Create contribution on behalf of.
+    $contactID = $this->individualCreate(['first_name' => 'John', 'last_name' => 'Doe']);
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $contactID,
+      'currency' => 'USD',
+      'financial_type_id' => 4,
+      'contribution_status_id' => 1,
+      'receive_date' => 'now',
+      'total_amount' => 66,
+      'sequential' => 1,
+    ])['values'][0];
+    $id = $contribution['id'];
+    ContributionSoft::create()->setValues([
+      'contact_id' => $honoreeContactID,
+      'contribution_id' => $contribution['id'],
+      'currency' => $contribution['currency'],
+      'amount' => $contribution['total_amount'],
+      'soft_credit_type_id' => 1,
+    ])->execute();
+
+    $this->runUserDashboard($honoreeContactID);
+    $this->assertPageContains([
+      'Mr. John Doe II</a></td><td>$66.00</td><td>In Honor of</td><td>Event Fee</td><td>',
+    ]);
+    // Get annual contribution information.
+    $annual = CRM_Contribute_BAO_Contribution::annual($contactID);
+
+    $currencySymbol = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency', CRM_Core_Config::singleton()->defaultCurrency, 'symbol', 'name');
+    $this->assertDBCompareValue('CRM_Contribute_DAO_Contribution', $id, 'total_amount',
+      'id', ltrim($annual[2], $currencySymbol), 'Check DB for total amount of the contribution'
+    );
+  }
+
+  /**
+   * Test the presence of a "Pay Now" button on partial payments
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testDashboardPartialPayments(): void {
+    $contributionId = $this->contributionCreate([
+      'contact_id' => $this->contactID,
+      'contribution_status_id' => 'Pending',
+      'total_amount' => 25,
+    ]);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contributionId,
+      'total_amount' => 11,
+      'trxn_date' => '2021-05-11',
+    ]);
+    $this->contributions[] = civicrm_api3('Contribution', 'get', [
+      'contact_id' => $this->contactID,
+      'options' => ['limit' => 12, 'sort' => 'receive_date DESC'],
+      'sequential' => 1,
+    ])['values'];
+    $this->runUserDashboard();
+    $expectedStrings = [
+      'Your Contribution(s)',
+      '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Contribution Date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th>',
+      '<td>$25.00 </td><td>Donation</td>',
+      '<td>$14.00</td><td>Partially paid</td>',
+      'Pay Now',
     ];
     $this->assertPageContains($expectedStrings);
   }
 
   /**
    * Run the user dashboard.
+   *
+   * @param int|null $contactID
    */
-  protected function runUserDashboard() {
-    $_REQUEST = ['reset' => 1, 'id' => $this->contactID];
+  protected function runUserDashboard(?int $contactID = NULL): void {
+    $_REQUEST = ['reset' => 1, 'id' => $contactID ?? $this->contactID];
     $dashboard = new CRM_Contact_Page_View_UserDashBoard();
     $dashboard->_contactId = $this->contactID;
+    $dashboard->assign('formTpl');
+    $dashboard->assign('action', CRM_Core_Action::VIEW);
     $dashboard->run();
     $_REQUEST = [];
+  }
+
+  /**
+   * Tests the event dashboard as a minimally permissioned user.
+   */
+  public function testEventDashboard(): void {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'register for events',
+      'access Contact Dashboard',
+    ];
+
+    $params['contact_id'] = $this->contactID;
+    $params['event_id'] = $this->eventCreateUnpaid()['id'];
+    $this->participantCreate($params);
+    $params['event_id'] = $this->eventCreateUnpaid(['title' => 'Social Distancing Meetup Group'], 'event_2')['id'];
+    $this->participantCreate($params);
+    $this->runUserDashboard();
+    $expectedStrings = [
+      '<div class="header-dark">Your Event(s)</div>',
+      '<td class="crm-participant-event-id_1"><a href="/index.php?q=civicrm/event/info&amp;reset=1&amp;id=1&amp;context=dashboard">Annual CiviCRM meet</a></td>',
+      '<td class="crm-participant-event-id_2"><a href="/index.php?q=civicrm/event/info&amp;reset=1&amp;id=2&amp;context=dashboard">Social Distancing Meetup Group</a></td>',
+    ];
+    $this->assertPageContains($expectedStrings);
+    $this->individualCreate();
   }
 
 }

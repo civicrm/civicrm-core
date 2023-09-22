@@ -26,11 +26,11 @@ class PrepareEvent extends Event {
   /**
    * @param array $apiRequest
    *   The full description of the API request.
-   * @return PrepareEvent
+   * @return static
    */
   public function setApiRequest($apiRequest) {
-    $this->apiRequest = $apiRequest;
-    return $this;
+    // Elevate from 'protected' to 'public'.
+    return parent::setApiRequest($apiRequest);
   }
 
   /**

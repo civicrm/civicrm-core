@@ -35,7 +35,6 @@ $data = array(
   'git' => array(
     'civicrm-backdrop@1.x' => repo("$DM_SOURCEDIR/backdrop", getenv('DM_REF_BACKDROP')),
     'civicrm-core' => repo("$DM_SOURCEDIR", getenv('DM_REF_CORE')),
-    'civicrm-drupal@6.x' => repo("$DM_SOURCEDIR/drupal", getenv('DM_REF_DRUPAL6')),
     'civicrm-drupal@7.x' => repo("$DM_SOURCEDIR/drupal", getenv('DM_REF_DRUPAL')),
     'civicrm-drupal-8' => repo("$DM_SOURCEDIR/drupal-8", getenv('DM_REF_DRUPAL8')),
     'civicrm-joomla' => repo("$DM_SOURCEDIR/joomla", getenv('DM_REF_JOOMLA')),
@@ -50,13 +49,10 @@ if (getenv('BPACK')) {
 if (getenv('J5PACK')) {
   $data['tar']['Joomla'] = "civicrm-$DM_VERSION-joomla.zip";
 }
-if (getenv('D56PACK')) {
-  $data['tar']['Drupal6'] = "civicrm-$DM_VERSION-drupal6.tar.gz";
-}
 if (getenv('D5PACK')) {
   $data['tar']['Drupal'] = "civicrm-$DM_VERSION-drupal.tar.gz";
 }
-if (getenv('WPPACK')) {
+if (getenv('WP5PACK')) {
   $data['tar']['WordPress'] = "civicrm-$DM_VERSION-wordpress.zip";
 }
 if (getenv('L10NPACK')) {

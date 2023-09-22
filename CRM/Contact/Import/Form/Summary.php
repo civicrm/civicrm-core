@@ -15,106 +15,102 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\UserJob;
+
 /**
  * This class summarizes the import results.
  */
-class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
+class CRM_Contact_Import_Form_Summary extends CRM_Import_Forms {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function preProcess() {
-    // set the error message path to display
-    $this->assign('errorFile', $this->get('errorFile'));
-
-    $totalRowCount = $this->get('totalRowCount');
-    $relatedCount = $this->get('relatedCount');
-    $totalRowCount += $relatedCount;
-
-    $invalidRowCount = $this->get('invalidRowCount');
-    $conflictRowCount = $this->get('conflictRowCount');
-    $duplicateRowCount = $this->get('duplicateRowCount');
-    $onDuplicate = $this->get('onDuplicate');
-    $mismatchCount = $this->get('unMatchCount');
-    $unparsedAddressCount = $this->get('unparsedAddressCount');
-    if ($duplicateRowCount > 0) {
-      $urlParams = 'type=' . CRM_Import_Parser::DUPLICATE . '&parser=CRM_Contact_Import_Parser';
-      $this->set('downloadDuplicateRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-    }
-    elseif ($mismatchCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Contact_Import_Parser';
-      $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-    }
-    else {
-      $duplicateRowCount = 0;
-      $this->set('duplicateRowCount', $duplicateRowCount);
-    }
-    if ($unparsedAddressCount) {
-      $urlParams = 'type=' . CRM_Import_Parser::UNPARSED_ADDRESS_WARNING . '&parser=CRM_Contact_Import_Parser';
-      $this->assign('downloadAddressRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
-      $unparsedStreetAddressString = ts('Records imported successfully but unable to parse some of the street addresses');
-      $this->assign('unparsedStreetAddressString', $unparsedStreetAddressString);
-    }
+  public function preProcess(): void {
+    $userJobID = CRM_Utils_Request::retrieve('user_job_id', 'String', $this, TRUE);
+    $userJob = UserJob::get(TRUE)->addWhere('id', '=', $userJobID)->addSelect('metadata', 'job_type:label')->execute()->first();
+    $this->setTitle($userJob['job_type:label']);
+    $onDuplicate = $userJob['metadata']['submitted_values']['onDuplicate'];
     $this->assign('dupeError', FALSE);
+    $importBaseURL = $this->getUserJobInfo()['url'] ?? NULL;
+    $this->assign('templateURL', ($importBaseURL && $this->getTemplateID()) ? CRM_Utils_System::url($importBaseURL, ['template_id' => $this->getTemplateID(), 'reset' => 1]) : '');
+    // This can be overridden by Civi-Import so that the Download url
+    // links that go to SearchKit open in a new tab.
+    $this->assign('isOpenResultsInNewTab');
+    $this->assign('allRowsUrl');
+    $this->assign('importedRowsUrl');
 
-    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
-      $dupeActionString = ts('These records have been updated with the imported data.');
+    if ($onDuplicate === CRM_Import_Parser::DUPLICATE_UPDATE) {
+      $this->assign('dupeActionString', ts('These records have been updated with the imported data.'));
     }
-    elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_REPLACE) {
-      $dupeActionString = ts('These records have been replaced with the imported data.');
-    }
-    elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
-      $dupeActionString = ts('These records have been filled in with the imported data.');
+    elseif ($onDuplicate === CRM_Import_Parser::DUPLICATE_FILL) {
+      $this->assign('dupeActionString', ts('These records have been filled in with the imported data.'));
     }
     else {
       /* Skip by default */
-
-      $dupeActionString = ts('These records have not been imported.');
-
+      $this->assign('dupeActionString', ts('These records have not been imported.'));
       $this->assign('dupeError', TRUE);
     }
-    //now we also create relative contact in update and fill mode
-    $this->set('validRowCount', $totalRowCount - $invalidRowCount -
-      $conflictRowCount - $duplicateRowCount - $mismatchCount
-    );
 
-    $this->assign('dupeActionString', $dupeActionString);
-
-    $properties = [
-      'totalRowCount',
-      'validRowCount',
-      'invalidRowCount',
-      'conflictRowCount',
-      'downloadConflictRecordsUrl',
-      'downloadErrorRecordsUrl',
-      'duplicateRowCount',
-      'downloadDuplicateRecordsUrl',
-      'downloadMismatchRecordsUrl',
-      'groupAdditions',
-      'tagAdditions',
-      'unMatchCount',
-      'unparsedAddressCount',
-    ];
-    foreach ($properties as $property) {
-      $this->assign($property, $this->get($property));
-    }
-
+    $this->assign('groupAdditions', $this->getUserJob()['metadata']['summary_info']['groups'] ?? []);
+    $this->assign('tagAdditions', $this->getUserJob()['metadata']['summary_info']['tags'] ?? []);
+    $this->assignOutputURLs();
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/import/contact', 'reset=1'));
   }
 
   /**
-   * Clean up the import table we used.
+   * Assign the relevant smarty variables.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function postProcess() {
-    $dao = new CRM_Core_DAO();
-    $db = $dao->getDatabaseConnection();
+  protected function assignOutputURLs(): void {
+    $this->assign('outputUnavailable', FALSE);
+    try {
+      $this->assign('totalRowCount', $this->getRowCount());
+      $this->assign('unprocessedRowCount', $this->getRowCount() - $this->getRowCount('imported') - $this->getRowCount(CRM_Import_Parser::ERROR) - $this->getRowCount(CRM_Import_Parser::DUPLICATE));
+      $this->assign('importedRowCount', $this->getRowCount('imported'));
+      $this->assign('invalidRowCount', $this->getRowCount(CRM_Import_Parser::ERROR));
+      $this->assign('duplicateRowCount', $this->getRowCount(CRM_Import_Parser::DUPLICATE));
+      $this->assign('unMatchCount', $this->getRowCount(CRM_Import_Parser::NO_MATCH));
+      $this->assign('validSoftCreditRowCount', $this->getRowCount(CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT));
+      $this->assign('invalidSoftCreditRowCount', $this->getRowCount(CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT_ERROR));
+      $this->assign('validPledgePaymentRowCount', $this->getRowCount(CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT));
+      $this->assign('invalidPledgePaymentRowCount', $this->getRowCount(CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT_ERROR));
+      $this->assign('unparsedAddressCount', $this->getRowCount(CRM_Import_Parser::UNPARSED_ADDRESS_WARNING));
+      $this->assign('downloadDuplicateRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::DUPLICATE));
+      $this->assign('downloadErrorRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::ERROR));
+      $this->assign('downloadMismatchRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::NO_MATCH));
+      $this->assign('downloadAddressRecordsUrl', $this->getDownloadURL(CRM_Import_Parser::UNPARSED_ADDRESS_WARNING));
+      $this->assign('downloadPledgePaymentErrorRecordsUrl', $this->getDownloadURL(CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT_ERROR));
+      $this->assign('downloadSoftCreditErrorRecordsUrl', $this->getDownloadURL(CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT_ERROR));
+      $this->assign('trackingSummary', $this->getTrackingSummary());
 
-    $importTableName = $this->get('importTableName');
-    // do a basic sanity check here
-    if (strpos($importTableName, 'civicrm_import_job_') === 0) {
-      $query = "DROP TABLE IF EXISTS $importTableName";
-      $db->query($query);
+      $userJobID = CRM_Utils_Request::retrieve('user_job_id', 'String', $this, TRUE);
+      $userJob = UserJob::get(TRUE)
+        ->addWhere('id', '=', $userJobID)
+        ->execute()
+        ->first();
+      $onDuplicate = (int) $userJob['metadata']['submitted_values']['onDuplicate'];
+      $this->assign('dupeError', FALSE);
+      if ($onDuplicate === CRM_Import_Parser::DUPLICATE_UPDATE) {
+        $dupeActionString = ts('These records have been updated with the imported data.');
+      }
+      elseif ($onDuplicate === CRM_Import_Parser::DUPLICATE_FILL) {
+        $dupeActionString = ts('These records have been filled in with the imported data.');
+      }
+      else {
+        // Skip by default.
+        $dupeActionString = ts('These records have not been imported.');
+        $this->assign('dupeError', TRUE);
+      }
+      $this->assign('dupeActionString', $dupeActionString);
+    }
+    // @todo - remove this - it is never thrown.
+    catch (CRM_Import_Exception_ImportTableUnavailable $e) {
+      $this->assign('outputUnavailable', TRUE);
     }
   }
 

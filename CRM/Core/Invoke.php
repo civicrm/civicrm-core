@@ -55,7 +55,7 @@ class CRM_Core_Invoke {
       return NULL;
     }
     // CRM-15901: Turn off PHP errors display for all ajax calls
-    if (CRM_Utils_Array::value(1, $args) == 'ajax' || !empty($_REQUEST['snippet'])) {
+    if (($args[1] ?? NULL) == 'ajax' || !empty($_REQUEST['snippet'])) {
       ini_set('display_errors', 0);
     }
 
@@ -64,6 +64,7 @@ class CRM_Core_Invoke {
       // may exit
       self::hackMenuRebuild($args);
       self::init($args);
+      Civi::dispatcher()->dispatch('civi.invoke.auth', \Civi\Core\Event\GenericHookEvent::create(['args' => $args]));
       $item = self::getItem($args);
       return self::runItem($item);
     }
@@ -102,7 +103,7 @@ class CRM_Core_Invoke {
         return CRM_Utils_System::redirect();
       }
       else {
-        CRM_Core_Error::statusBounce('You do not have permission to execute this url');
+        CRM_Core_Error::statusBounce(ts('You do not have permission to execute this url'));
       }
     }
   }
@@ -206,6 +207,9 @@ class CRM_Core_Invoke {
     self::registerPharHandler();
 
     $config = CRM_Core_Config::singleton();
+
+    // WISHLIST: if $item is a web-service route, swap prepend to $civicrm_url_defaults
+
     if ($config->userFramework == 'Joomla' && $item) {
       $config->userFrameworkURLVar = 'task';
 
@@ -219,6 +223,12 @@ class CRM_Core_Invoke {
     $template = CRM_Core_Smarty::singleton();
     $template->assign('activeComponent', 'CiviCRM');
     $template->assign('formTpl', 'default');
+    // Ensure template variables have 'something' assigned for e-notice
+    // prevention. These are ones that are included very often
+    // and not tied to a specific form.
+    // jsortable.tpl (datatables)
+    $template->assign('sourceUrl');
+    $template->assign('useAjax', 0);
 
     if ($item) {
 
@@ -242,7 +252,7 @@ class CRM_Core_Invoke {
         CRM_Utils_System::setTitle($item['title']);
       }
 
-      if (isset($item['breadcrumb']) && !isset($item['is_public'])) {
+      if (!CRM_Core_Config::isUpgradeMode() && isset($item['breadcrumb']) && empty($item['is_public'])) {
         CRM_Utils_System::appendBreadCrumb($item['breadcrumb']);
       }
 
@@ -277,11 +287,11 @@ class CRM_Core_Invoke {
       if (is_array($item['page_callback']) || strpos($item['page_callback'], ':')) {
         $result = call_user_func(Civi\Core\Resolver::singleton()->get($item['page_callback']));
       }
-      elseif (strstr($item['page_callback'], '_Form')) {
+      elseif (strpos($item['page_callback'], '_Form') !== FALSE) {
         $wrapper = new CRM_Utils_Wrapper();
         $result = $wrapper->run(
-          CRM_Utils_Array::value('page_callback', $item),
-          CRM_Utils_Array::value('title', $item),
+          $item['page_callback'] ?? NULL,
+          $item['title'] ?? NULL,
           $pageArgs ?? NULL
         );
       }
@@ -324,13 +334,17 @@ class CRM_Core_Invoke {
   /**
    * This function contains the default action.
    *
+   * Unused function.
+   *
    * @param $action
    *
    * @param $contact_type
    * @param $contact_sub_type
    *
+   * @Deprecated
    */
   public static function form($action, $contact_type, $contact_sub_type) {
+    CRM_Core_Error::deprecatedWarning('unused');
     CRM_Utils_System::setUserContext(['civicrm/contact/search/basic', 'civicrm/contact/view']);
     $wrapper = new CRM_Utils_Wrapper();
 
@@ -364,9 +378,13 @@ class CRM_Core_Invoke {
    *
    * @throws Exception
    */
-  public static function rebuildMenuAndCaches($triggerRebuild = FALSE, $sessionReset = FALSE) {
+  public static function rebuildMenuAndCaches(bool $triggerRebuild = FALSE, bool $sessionReset = FALSE): void {
     $config = CRM_Core_Config::singleton();
     $config->clearModuleList();
+
+    // dev/core#3660 - Activate any new classloaders/mixins/etc before re-hydrating any data-structures.
+    CRM_Extension_System::singleton()->getClassLoader()->refresh();
+    CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
 
     // also cleanup all caches
     $config->cleanupCaches($sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
@@ -392,9 +410,13 @@ class CRM_Core_Invoke {
       $triggerRebuild ||
       CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET')
     ) {
-      CRM_Core_DAO::triggerRebuild();
+      Civi::service('sql_triggers')->rebuild();
+      // Rebuild Drupal 8/9/10 route cache only if "triggerRebuild" is set to TRUE as it's
+      // computationally very expensive and only needs to be done when routes change on the Civi-side.
+      // For example - when uninstalling an extension. We already set "triggerRebuild" to true for these operations.
+      $config->userSystem->invalidateRouteCache();
     }
-    CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
+
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 

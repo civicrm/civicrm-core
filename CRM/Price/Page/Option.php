@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -26,6 +24,8 @@
  *
  */
 class CRM_Price_Page_Option extends CRM_Core_Page {
+
+  use CRM_Financial_Form_SalesTaxTrait;
 
   public $useLivePageJS = TRUE;
 
@@ -68,13 +68,13 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       self::$_actionLinks = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit Option'),
-          'url' => 'civicrm/admin/price/field/option',
+          'url' => 'civicrm/admin/price/field/option/edit',
           'qs' => 'reset=1&action=update&oid=%%oid%%&fid=%%fid%%&sid=%%sid%%',
           'title' => ts('Edit Price Option'),
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('View'),
-          'url' => 'civicrm/admin/price/field/option',
+          'url' => 'civicrm/admin/price/field/option/edit',
           'qs' => 'action=view&oid=%%oid%%',
           'title' => ts('View Price Option'),
         ],
@@ -90,7 +90,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/price/field/option',
+          'url' => 'civicrm/admin/price/field/option/edit',
           'qs' => 'action=delete&oid=%%oid%%',
           'title' => ts('Disable Price Option'),
         ],
@@ -104,7 +104,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    *
    * @return void
    */
-  public function browse() {
+  public function browse(): void {
     $priceOptions = civicrm_api3('PriceFieldValue', 'get', [
       'price_field_id' => $this->_fid,
          // Explicitly do not check permissions so we are not
@@ -126,12 +126,8 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       $isEvent = TRUE;
     }
 
-    $config = CRM_Core_Config::singleton();
     $taxRate = CRM_Core_PseudoConstant::getTaxRates();
-    // display taxTerm for priceFields
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $taxTerm = Civi::settings()->get('tax_term');
-    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
+
     $getTaxDetails = FALSE;
     foreach ($customOption as $id => $values) {
       $action = array_sum(array_keys(self::actionLinks()));
@@ -139,7 +135,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       if (isset($taxRate[$values['financial_type_id']])) {
         // Cast to float so trailing zero decimals are removed
         $customOption[$id]['tax_rate'] = (float) $taxRate[$values['financial_type_id']];
-        if ($invoicing && isset($customOption[$id]['tax_rate'])) {
+        if (Civi::settings()->get('invoicing') && isset($customOption[$id]['tax_rate'])) {
           $getTaxDetails = TRUE;
         }
         $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($customOption[$id]['amount'], $customOption[$id]['tax_rate']);
@@ -181,11 +177,11 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       'id', $returnURL, $filter
     );
 
-    $this->assign('taxTerm', $taxTerm);
     $this->assign('getTaxDetails', $getTaxDetails);
     $this->assign('customOption', $customOption);
     $this->assign('sid', $this->_sid);
     $this->assign('isEvent', $isEvent);
+    $this->assignSalesTaxTermToTemplate();
   }
 
   /**
@@ -230,8 +226,8 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       $this->assign('usedPriceSetTitle', CRM_Price_BAO_PriceFieldValue::getOptionLabel($oid));
       $this->assign('usedBy', $usedBy);
       $comps = [
-        "Event" => "civicrm_event",
-        "Contribution" => "civicrm_contribution_page",
+        'Event' => 'civicrm_event',
+        'Contribution' => 'civicrm_contribution_page',
       ];
       $priceSetContexts = [];
       foreach ($comps as $name => $table) {

@@ -1,0 +1,53 @@
+<div class="form-inline">
+  <label>
+    <input type="checkbox" checked="checked" ng-click="$ctrl.parent.toggleImage(col)" >
+    {{:: ts('Image') }}
+  </label>
+  <div class="crm-search-admin-flex-row">
+    <label>{{:: ts('Width') }}</label>
+    <input type="number" min="1" class="form-control crm-flex-1" placeholder="Auto" ng-model="col.image.width">
+    <label>{{:: ts('Height') }}</label>
+    <input type="number" min="1" class="form-control crm-flex-1" placeholder="Auto" ng-model="col.image.height">
+    <label>{{:: ts('Alt Text') }}</label>
+    <input type="text" class="form-control crm-flex-2" ng-model="col.image.alt">
+    <crm-search-admin-token-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="col.image" field="alt"></crm-search-admin-token-select>
+  </div>
+</div>
+<div class="form-inline crm-search-admin-flex-row" >
+  <label title="{{:: ts('Display as clickable link') }}" >
+    <input type="checkbox" ng-checked="col.link" ng-click="$ctrl.parent.toggleLink(col)" >
+    {{:: ts('Link') }}
+  </label>
+  <select class="form-control" ng-model="col.link.target" ng-if="col.link">
+    <option value>{{:: ts('Open normally') }}</option>
+    <option value="_blank">{{:: ts('New tab') }}</option>
+    <option value="crm-popup">{{:: ts('Popup dialog') }}</option>
+  </select>
+  <crm-search-admin-link-select ng-if="col.link" link="col.link" on-change="$ctrl.parent.onChangeLink(col, newLink)" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" links=":: $ctrl.parent.getLinks(col.key)">
+  </crm-search-admin-link-select>
+</div>
+<div class="form-inline crm-search-admin-flex-row">
+  <label>
+    <input type="checkbox" ng-checked="col.title" ng-click="col.title = col.title ? null : $ctrl.parent.getFieldLabel(col.key)" >
+    {{:: ts('Tooltip') }}
+  </label>
+  <input type="text" class="form-control crm-flex-1" ng-model="col.title" ng-if="col.title" ng-model-options="{updateOn: 'blur'}" />
+  <crm-search-admin-token-select ng-if="col.title" model="col" field="title" suffix=":label"></crm-search-admin-token-select>
+</div>
+<div class="form-inline crm-search-admin-flex-row">
+  <label title="{{:: ts('Image to display if the field contents are empty.') }}">
+    <input type="checkbox" ng-checked="col.empty_value" ng-click="$ctrl.parent.toggleEmptyVal(col)" >
+    {{:: ts('Alternate image') }}
+  </label>
+  <textarea rows="2" class="form-control crm-flex-1" ng-if="col.empty_value" ng-model="col.empty_value" ng-model-options="{updateOn: 'blur'}"></textarea>
+  <crm-search-admin-token-select ng-if="col.empty_value" model="col" field="empty_value" suffix=":label"></crm-search-admin-token-select>
+</div>
+<div class="form-inline crm-search-admin-flex-row">
+  <label title="{{:: ts('Specify url path to this image.') }}">
+    <input type="checkbox" ng-checked="col.rewrite" ng-click="$ctrl.parent.toggleRewrite(col)" >
+    {{:: ts('Custom image url') }}
+  </label>
+  <textarea rows="2" class="form-control crm-flex-1" ng-if="col.rewrite" ng-model="col.rewrite" ng-model-options="{updateOn: 'blur'}"></textarea>
+  <crm-search-admin-token-select ng-if="col.rewrite" model="col" field="rewrite" suffix=":label"></crm-search-admin-token-select>
+</div>
+<search-admin-css-rules label="{{:: ts('Style') }}" item="col" default="col.key"></search-admin-css-rules>

@@ -17,37 +17,14 @@
 class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
 
   /**
-   * Static holder for the default LT.
-   * @var string
-   */
-  public static $_defaultPreferencesDate = NULL;
-
-  /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Fetch object based on array of properties.
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
-   *
-   * @return CRM_Core_BAO_PreferencesDate|null
-   *   object on success, null otherwise
+   * @return self|null
    */
-  public static function retrieve(&$params, &$defaults) {
-    $dao = new CRM_Core_DAO_PreferencesDate();
-    $dao->copyValues($params);
-    if ($dao->find(TRUE)) {
-      CRM_Core_DAO::storeValues($dao, $defaults);
-      return $dao;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -68,9 +45,12 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    *
    * @param int $id
    * @throws CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function del($id) {
     throw new CRM_Core_Exception('Cannot call del function');
+    // Stop this showing up when we're looking for undeprecated del's by keeping this: static::deleteRecord(
   }
 
   /**

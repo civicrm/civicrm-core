@@ -2,8 +2,9 @@
 
 namespace Civi\Core;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
+use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Event\HookStyleListener;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class CiviEventDispatcher
@@ -15,9 +16,14 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * @see \CRM_Utils_Hook
  */
-class CiviEventDispatcher extends EventDispatcher {
+class CiviEventDispatcher implements CiviEventDispatcherInterface {
 
   const DEFAULT_HOOK_PRIORITY = -100;
+
+  /**
+   * @var \Symfony\Component\EventDispatcher\EventDispatcher
+   */
+  private $dispatcher;
 
   /**
    * Track the list of hook-events for which we have autoregistered
@@ -51,6 +57,20 @@ class CiviEventDispatcher extends EventDispatcher {
   private $dispatchPolicyRegex = NULL;
 
   /**
+   * Constructor
+   */
+  public function __construct() {
+    $this->dispatcher = new UnoptimizedEventDispatcher();
+  }
+
+  /**
+   * Get Event Dispatcher
+   */
+  public function getDispatcher() {
+    return $this->dispatcher;
+  }
+
+  /**
    * Determine whether $eventName should delegate to the CMS hook system.
    *
    * @param string $eventName
@@ -59,6 +79,101 @@ class CiviEventDispatcher extends EventDispatcher {
    */
   protected function isHookEvent($eventName) {
     return (substr($eventName, 0, 5) === 'hook_') && (strpos($eventName, '::') === FALSE);
+  }
+
+  /**
+   * Adds a series of event listeners from a subscriber object.
+   *
+   * This is particularly useful if you want to register the subscriber without
+   * materializing the subscriber object.
+   *
+   * @param string $subscriber
+   *   Service ID of the subscriber.
+   * @param array $events
+   *   List of events/methods/priorities.
+   * @see \Symfony\Component\EventDispatcher\EventSubscriberInterface::getSubscribedEvents()
+   */
+  public function addSubscriberServiceMap(string $subscriber, array $events) {
+    foreach ($events as $eventName => $params) {
+      if (\is_string($params)) {
+        $this->addListenerService($eventName, [$subscriber, $params]);
+      }
+      elseif (\is_string($params[0])) {
+        $this->addListenerService($eventName, [$subscriber, $params[0]], isset($params[1]) ? $params[1] : 0);
+      }
+      else {
+        foreach ($params as $listener) {
+          $this->addListenerService($eventName, [$subscriber, $listener[0]], isset($listener[1]) ? $listener[1] : 0);
+        }
+      }
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function addSubscriber(EventSubscriberInterface $subscriber) {
+    return $this->dispatcher->addSubscriber($subscriber);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeSubscriber(EventSubscriberInterface $subscriber) {
+    return $this->dispatcher->removeSubscriber($subscriber);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getListenerPriority($eventName, $listener) {
+    return $this->dispatcher->getListenerPriority($eventName, $listener);
+  }
+
+  /**
+   * Add a test listener.
+   *
+   * @param string $eventName
+   *   Ex: 'civi.internal.event'
+   *   Ex: 'hook_civicrm_publicEvent'
+   *   Ex: '&hook_civicrm_publicEvent' (an alias for 'hook_civicrm_publicEvent' in which the listener abides hook-style ordered parameters).
+   *        This notation is handy when attaching via listener-maps (e.g. `getSubscribedEvents()`).
+   * @param callable|HookStyleListener $listener
+   * @param int $priority
+   */
+  public function addListener($eventName, $listener, $priority = 0) {
+    if ($eventName[0] === '&') {
+      $eventName = substr($eventName, 1);
+      $listener = new HookStyleListener($listener);
+    }
+    $this->dispatcher->addListener($eventName, $listener, $priority);
+  }
+
+  /**
+   * Adds a series of event listeners from methods in a class.
+   *
+   * @param string|object $target
+   *   The object/class which will receive the notifications.
+   *   Use a string (class-name) if the listeners are static methods.
+   *   Use an object-instance if the listeners are regular methods.
+   * @param array $events
+   *   List of events/methods/priorities.
+   * @see \Symfony\Component\EventDispatcher\EventSubscriberInterface::getSubscribedEvents()
+   */
+  public function addListenerMap($target, array $events) {
+    foreach ($events as $eventName => $params) {
+      if (\is_string($params)) {
+        $this->addListener($eventName, [$target, $params]);
+      }
+      elseif (\is_string($params[0])) {
+        $this->addListener($eventName, [$target, $params[0]], isset($params[1]) ? $params[1] : 0);
+      }
+      else {
+        foreach ($params as $listener) {
+          $this->addListener($eventName, [$target, $listener[0]], isset($listener[1]) ? $listener[1] : 0);
+        }
+      }
+    }
   }
 
   /**
@@ -80,19 +195,21 @@ class CiviEventDispatcher extends EventDispatcher {
       throw new \InvalidArgumentException('Expected an array("service", "method") argument');
     }
 
-    $this->addListener($eventName, function($event) use ($callback) {
-      static $svc;
-      if ($svc === NULL) {
-        $svc = \Civi::container()->get($callback[0]);
-      }
-      return call_user_func([$svc, $callback[1]], $event);
-    }, $priority);
+    if ($eventName[0] === '&') {
+      $eventName = substr($eventName, 1);
+      $listener = new \Civi\Core\Event\HookStyleServiceListener($callback);
+    }
+    else {
+      $listener = new \Civi\Core\Event\ServiceListener($callback);
+    }
+
+    $this->addListener($eventName, $listener, $priority);
   }
 
   /**
    * @inheritDoc
    */
-  public function dispatch($eventName, Event $event = NULL) {
+  public function dispatch($eventName, $event = NULL) {
     // Dispatch policies add systemic overhead and (normally) should not be evaluated. JNZ.
     if ($this->dispatchPolicyRegex !== NULL) {
       switch ($mode = $this->checkDispatchPolicy($eventName)) {
@@ -117,13 +234,33 @@ class CiviEventDispatcher extends EventDispatcher {
         case 'fail':
           throw new \RuntimeException("The dispatch policy prohibits event \"$eventName\".");
 
+        case 'not-ready':
+          // The system is not ready to run hooks -- eg it has not finished loading the extension main-files.
+          // If you fire a hook at this point, it will not be received by the intended listeners.
+          // In practice, many hooks involve cached data-structures, so a premature hook is liable to have spooky side-effects.
+          // This condition indicates a structural problem and merits a consistent failure-mode.
+          // If you believe some special case merits an exemption, then you could add it to `$bootDispatchPolicy`.
+
+          // An `Exception` would be ideal for preventing new bugs, but it can be too noisy for systems with pre-existing bugs.
+          // throw new \RuntimeException("The event \"$eventName\" attempted to fire before CiviCRM was fully loaded. Skipping.");
+          // Complain to web-user and sysadmin. Log a backtrace. We're pre-boot, so don't use high-level services.
+          error_log("The event \"$eventName\" attempted to fire before CiviCRM was fully loaded. Skipping.\n" . \CRM_Core_Error::formatBacktrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), FALSE));
+          trigger_error("The event \"$eventName\" attempted to fire before CiviCRM was fully loaded. Skipping.", E_USER_WARNING);
+          return $event;
+
         default:
           throw new \RuntimeException("The dispatch policy for \"$eventName\" is unrecognized ($mode).");
 
       }
     }
+    if (is_a($event, '\\Symfony\\Component\\EventDispatcher\\Event')) {
+      \CRM_Core_Error::deprecatedWarning('\\Symfony\\Component\\EventDispatcher\\Event is deprecated. Consider using \\Civi\\Core\\Event\\GenericHookEvent. For more information see ' . \CRM_Utils_System::docURL2('dev/hooks/usage/symfony/#events', TRUE));
+    }
     $this->bindPatterns($eventName);
-    return parent::dispatch($eventName, $event);
+    if ($event === NULL) {
+      $event = GenericHookEvent::create([]);
+    }
+    return $this->dispatcher->dispatch($event, $eventName);
   }
 
   /**
@@ -131,7 +268,14 @@ class CiviEventDispatcher extends EventDispatcher {
    */
   public function getListeners($eventName = NULL) {
     $this->bindPatterns($eventName);
-    return parent::getListeners($eventName);
+    return $this->dispatcher->getListeners($eventName);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeListener($eventName, $listener) {
+    return $this->dispatcher->removeListener($eventName, $listener);
   }
 
   /**
@@ -140,7 +284,7 @@ class CiviEventDispatcher extends EventDispatcher {
   public function hasListeners($eventName = NULL) {
     // All hook_* events have default listeners, so hasListeners(NULL) is a truism.
     return ($eventName === NULL || $this->isHookEvent($eventName))
-      ? TRUE : parent::hasListeners($eventName);
+      ? TRUE : $this->dispatcher->hasListeners($eventName);
   }
 
   /**
@@ -155,30 +299,31 @@ class CiviEventDispatcher extends EventDispatcher {
     $hooks = \CRM_Utils_Hook::singleton();
     $params = $event->getHookValues();
     $count = count($params);
+    $null = NULL;
 
     switch ($count) {
       case 0:
-        $fResult = $hooks->invokeViaUF($count, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, $hookName);
+        $fResult = $hooks->invokeViaUF($count, $null, $null, $null, $null, $null, $null, $hookName);
         break;
 
       case 1:
-        $fResult = $hooks->invokeViaUF($count, $params[0], \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, $hookName);
+        $fResult = $hooks->invokeViaUF($count, $params[0], $null, $null, $null, $null, $null, $hookName);
         break;
 
       case 2:
-        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, $hookName);
+        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $null, $null, $null, $null, $hookName);
         break;
 
       case 3:
-        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $params[2], \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, $hookName);
+        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $params[2], $null, $null, $null, $hookName);
         break;
 
       case 4:
-        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $params[2], $params[3], \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, $hookName);
+        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $params[2], $params[3], $null, $null, $hookName);
         break;
 
       case 5:
-        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $params[2], $params[3], $params[4], \CRM_Utils_Hook::$_nullObject, $hookName);
+        $fResult = $hooks->invokeViaUF($count, $params[0], $params[1], $params[2], $params[3], $params[4], $null, $hookName);
         break;
 
       case 6:
@@ -251,12 +396,12 @@ class CiviEventDispatcher extends EventDispatcher {
     return $this;
   }
 
-  //  /**
-  //   * @return array|NULL
-  //   */
-  //  public function getDispatchPolicy() {
-  //    return  $this->dispatchPolicyRegex === NULL ? NULL : array_merge($this->dispatchPolicyExact, $this->dispatchPolicyRegex);
-  //  }
+  /**
+   * @return array|NULL
+   */
+  public function getDispatchPolicy() {
+    return $this->dispatchPolicyRegex === NULL ? NULL : array_merge($this->dispatchPolicyExact, $this->dispatchPolicyRegex);
+  }
 
   /**
    * Determine whether the dispatch policy applies to a given event.

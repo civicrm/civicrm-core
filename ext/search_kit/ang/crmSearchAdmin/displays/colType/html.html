@@ -1,0 +1,33 @@
+<div class="form-inline">
+  <label>
+    <input type="checkbox" checked ng-click="$ctrl.parent.toggleHtml(col)" >
+    {{:: ts('Allow HTML') }}
+  </label>
+</div>
+<div class="form-inline crm-search-admin-flex-row">
+  <label>
+    <input type="checkbox" ng-checked="col.title" ng-click="col.title = col.title ? null : $ctrl.parent.getFieldLabel(col.key)" >
+    {{:: ts('Tooltip') }}
+  </label>
+  <input type="text" class="form-control crm-flex-1" ng-model="col.title" ng-if="col.title" ng-model-options="{updateOn: 'blur'}" />
+  <crm-search-admin-token-select ng-if="col.title" model="col" field="title" suffix=":label"></crm-search-admin-token-select>
+</div>
+<div class="form-inline crm-search-admin-flex-row">
+  <label title="{{:: ts('HTML to display if the field contents are empty.') }}">
+    <input type="checkbox" ng-checked="col.empty_value" ng-click="$ctrl.parent.toggleEmptyVal(col)" >
+    {{:: ts('Empty placeholder') }}
+  </label>
+  <a crm-ui-help="hs({id: 'empty', title: ts('Empty placeholder')})"></a>
+  <textarea rows="2" class="form-control crm-flex-1" ng-if="col.empty_value" ng-model="col.empty_value" ng-model-options="{updateOn: 'blur'}"></textarea>
+  <crm-search-admin-token-select ng-if="col.empty_value" model="col" field="empty_value" suffix=":label"></crm-search-admin-token-select>
+</div>
+<div class="form-inline crm-search-admin-flex-row">
+  <label title="{{:: ts('Change the contents of this field, or combine multiple field values.') }}">
+    <input type="checkbox" ng-checked="col.rewrite" ng-click="$ctrl.parent.toggleRewrite(col)" >
+    {{:: ts('Rewrite HTML') }}
+  </label>
+  <a crm-ui-help="hs({id: 'rewrite', title: ts('Rewrite HTML')})"></a>
+  <textarea rows="2" class="form-control crm-flex-1" ng-if="col.rewrite" ng-model="col.rewrite" ng-model-options="{updateOn: 'blur'}"></textarea>
+  <crm-search-admin-token-select ng-if="col.rewrite" model="col" field="rewrite" suffix=":label"></crm-search-admin-token-select>
+</div>
+<search-admin-css-rules label="{{:: ts('Style') }}" item="col" default="col.key"></search-admin-css-rules>

@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Event_Page_ParticipantListing_Simple extends CRM_Core_Page {
 
@@ -24,6 +22,9 @@ class CRM_Event_Page_ParticipantListing_Simple extends CRM_Core_Page {
 
   protected $_eventTitle;
 
+  /**
+   * @var CRM_Utils_Pager
+   */
   protected $_pager;
 
   public function preProcess() {
@@ -106,7 +107,7 @@ LIMIT    $offset, $rowCount";
     $params['buttonBottom'] = 'PagerBottomButton';
     $params['rowCount'] = $this->get(CRM_Utils_Pager::PAGE_ROWCOUNT);
     if (!$params['rowCount']) {
-      $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
+      $params['rowCount'] = Civi::settings()->get('default_pager_size');
     }
 
     $query = "

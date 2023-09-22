@@ -26,7 +26,6 @@ if (!defined('CIVI_SETUP')) {
         'CiviPledge' => ts('Accept pledges'),
         'CiviReport' => ts('Generate reports'),
         'CiviCampaign' => ts('Organize campaigns, surveys, and petitions'),
-        'CiviGrant' => ts('Receive grant applications'),
       ),
     );
 

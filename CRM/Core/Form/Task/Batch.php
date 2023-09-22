@@ -89,7 +89,7 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
       throw new InvalidArgumentException('ufGroupId is missing');
     }
     $this->_title = ts("Update multiple %1s", [1 => $this::$entityShortname]) . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
-    CRM_Utils_System::setTitle($this->_title);
+    $this->setTitle($this->_title);
 
     $this->addDefaultButtons(ts('Save'));
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($ufGroupId, FALSE, CRM_Core_Action::VIEW);

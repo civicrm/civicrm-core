@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -35,18 +33,18 @@ class MockEntityDataStorage {
   }
 
   public static function write($record) {
-    if (empty($record['id'])) {
-      $record['id'] = self::$nextId++;
-      self::$data[$record['id']] = $record;
+    if (empty($record['identifier'])) {
+      $record['identifier'] = self::$nextId++;
+      self::$data[$record['identifier']] = $record;
     }
     else {
-      self::$data[$record['id']] = $record + self::$data[$record['id']];
+      self::$data[$record['identifier']] = $record + self::$data[$record['identifier']];
     }
     return $record;
   }
 
   public static function delete($record) {
-    unset(self::$data[$record['id']]);
+    unset(self::$data[$record['identifier']]);
     return $record;
   }
 

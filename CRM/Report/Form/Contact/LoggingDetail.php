@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Form_Contact_LoggingDetail extends CRM_Logging_ReportDetail {
 

@@ -64,8 +64,8 @@ class CRM_Utils_Verp {
     $sdomain = $match[2];
 
     preg_match('/(.+)\@([^\@]+)$/', $recipient, $match);
-    $rlocal = $match[1] ?? NULL;
-    $rdomain = $match[2] ?? NULL;
+    $rlocal = $match[1] ?? '';
+    $rdomain = $match[2] ?? '';
 
     foreach (self::$encodeMap as $char => $code) {
       $rlocal = preg_replace('/' . preg_quote($char) . '/i', "+$code", $rlocal);

@@ -10,14 +10,11 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
 namespace Civi\Api4\Generic;
+
+use Civi\Api4\Event\ValidateValuesEvent;
+use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Base class for all `Create` api actions.
@@ -29,6 +26,8 @@ namespace Civi\Api4\Generic;
  */
 abstract class AbstractCreateAction extends AbstractAction {
 
+  use Traits\GetSetValueTrait;
+
   /**
    * Field values to set for the new $ENTITY.
    *
@@ -37,31 +36,26 @@ abstract class AbstractCreateAction extends AbstractAction {
   protected $values = [];
 
   /**
-   * @param string $fieldName
-   * @return mixed|null
-   */
-  public function getValue(string $fieldName) {
-    return $this->values[$fieldName] ?? NULL;
-  }
-
-  /**
-   * Add a field value.
-   * @param string $fieldName
-   * @param mixed $value
-   * @return $this
-   */
-  public function addValue(string $fieldName, $value) {
-    $this->values[$fieldName] = $value;
-    return $this;
-  }
-
-  /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function validateValues() {
+    // FIXME: There should be a protocol to report a full list of errors... Perhaps a subclass of CRM_Core_Exception?
     $unmatched = $this->checkRequiredFields($this->getValues());
     if ($unmatched) {
-      throw new \API_Exception("Mandatory values missing from Api4 {$this->getEntityName()}::{$this->getActionName()}: " . implode(", ", $unmatched), "mandatory_missing", ["fields" => $unmatched]);
+      throw new \CRM_Core_Exception("Mandatory values missing from Api4 {$this->getEntityName()}::{$this->getActionName()}: " . implode(", ", $unmatched), "mandatory_missing", ["fields" => $unmatched]);
+    }
+
+    if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $this->getValues(), \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
+      throw new UnauthorizedException("ACL check failed");
+    }
+
+    $e = new ValidateValuesEvent($this, [$this->getValues()], new \CRM_Utils_LazyArray(function () {
+      return [['old' => NULL, 'new' => $this->getValues()]];
+    }));
+    \Civi::dispatcher()->dispatch('civi.api4.validate', $e);
+    if (!empty($e->errors)) {
+      throw $e->toException();
     }
   }
 

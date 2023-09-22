@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/ACL</base>
+  <class>ACLEntityRole</class>
+  <name>civicrm_acl_entity_role</name>
+  <comment>Join table for Contacts and Groups to ACL Roles</comment>
+  <add>1.6</add>
+  <title>ACL Role Assignment</title>
+  <titlePlural>ACL Role Assignments</titlePlural>
+  <paths>
+    <add>civicrm/acl/entityrole/edit?reset=1&amp;action=add</add>
+    <delete>civicrm/acl/entityrole/edit?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <update>civicrm/acl/entityrole/edit?reset=1&amp;action=update&amp;id=[id]</update>
+    <browse>civicrm/acl/entityrole</browse>
+  </paths>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Entity Role</title>
+    <required>true</required>
+    <comment>Unique table ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+    <add>1.6</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>acl_role_id</name>
+    <title>ACL Role ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <pseudoconstant>
+      <optionGroupName>acl_role</optionGroupName>
+    </pseudoconstant>
+    <comment>Foreign Key to ACL Role (which is an option value pair and hence an implicit FK)</comment>
+    <add>1.6</add>
+  </field>
+  <field>
+    <name>entity_table</name>
+    <title>Entity Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <pseudoconstant>
+      <callback>CRM_ACL_BAO_ACLEntityRole::entityTables</callback>
+    </pseudoconstant>
+    <comment>Table of the object joined to the ACL Role (Contact or Group)</comment>
+    <add>1.6</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>ACL Entity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>ID of the group/contact object being joined</comment>
+    <add>1.6</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>1.6</add>
+  </dynamicForeignKey>
+  <field>
+    <name>is_active</name>
+    <title>ACL Entity Role is Active</title>
+    <type>boolean</type>
+    <comment>Is this property active?</comment>
+    <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <add>1.6</add>
+  </field>
+  <index>
+    <name>index_role</name>
+    <fieldName>acl_role_id</fieldName>
+    <add>1.6</add>
+  </index>
+  <index>
+    <name>index_entity</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <add>1.6</add>
+  </index>
+</table>

@@ -18,36 +18,42 @@
  */
 class api_v3_OpenIDTest extends CiviUnitTestCase {
 
-  protected $_apiversion = 3;
+  /**
+   * Should location types be checked to ensure primary addresses are correctly assigned after each test.
+   *
+   * @var bool
+   */
+  protected $isLocationTypesOnPostAssert = TRUE;
+
   protected $_params;
   protected $id;
   protected $_entity;
 
-  public $DBResetRequired = FALSE;
-
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
-    $this->useTransaction(TRUE);
+    $this->useTransaction();
 
     $this->_entity = 'OpenID';
-    $this->_contactID = $this->organizationCreate();
     $this->_params = [
-      'contact_id' => $this->_contactID,
+      'contact_id' => $this->organizationCreate(),
       'openid' => 'My OpenID handle',
       'location_type_id' => 1,
+      'sequential' => 1,
     ];
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateOpenID($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->getAndCheck($this->_params, $result['id'], $this->_entity);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->_params)['values'];
+    $this->assertCount(1, $result);
+    unset($this->_params['sequential']);
+    $this->getAndCheck($this->_params, $result[0]['id'], $this->_entity);
   }
 
   /**
@@ -55,54 +61,62 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
    * the LocationType default
    *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateOpenIDDefaultLocation($version) {
     $this->_apiversion = $version;
     $params = $this->_params;
     unset($params['location_type_id']);
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals(CRM_Core_BAO_LocationType::getDefault()->id, $result['values'][$result['id']]['location_type_id']);
-    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params)['values'];
+    $this->assertEquals(CRM_Core_BAO_LocationType::getDefault()->id, $result[0]['location_type_id']);
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result[0]['id']]);
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetOpenID($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $result = $this->callAPIAndDocument($this->_entity, 'get', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
-    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
+    $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $result = $this->callAPISuccess($this->_entity, 'get', $this->_params)['values'];
+    $this->assertCount(1, $result);
+    $this->assertNotNull($result[0]['id']);
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result[0]['id']]);
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testDeleteOpenID($version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $deleteParams = ['id' => $result['id']];
-    $result = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
-    $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
+    $this->callAPISuccess($this->_entity, 'delete', $deleteParams);
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get');
+    $this->assertEquals(0, $checkDeleted['count']);
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testDeleteOpenIDInvalid($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $deleteParams = ['id' => 600];
-    $result = $this->callAPIFailure($this->_entity, 'delete', $deleteParams);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
-    $this->assertEquals(1, $checkDeleted['count'], 'In line ' . __LINE__);
+    $this->callAPIFailure($this->_entity, 'delete', $deleteParams);
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get');
+    $this->assertEquals(1, $checkDeleted['count']);
   }
 
 }

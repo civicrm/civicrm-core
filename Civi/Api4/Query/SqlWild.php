@@ -19,8 +19,8 @@ class SqlWild extends SqlExpression {
   protected function initialize() {
   }
 
-  public function render(array $fieldList): string {
-    return '*';
+  public static function getTitle(): string {
+    return ts('Wild');
   }
 
 }

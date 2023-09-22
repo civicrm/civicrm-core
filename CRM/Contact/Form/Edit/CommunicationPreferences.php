@@ -68,8 +68,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     //using for display purpose.
     $form->assign('commPreference', $commPreference);
 
-    $form->addField('preferred_mail_format', ['entity' => 'contact', 'label' => ts('Email Format')]);
-
     $form->addField('is_opt_out', ['entity' => 'contact', 'label' => ts('NO BULK EMAILS (User Opt Out)')]);
 
     $form->addField('communication_style_id', ['entity' => 'contact', 'type' => 'RadioGroup']);
@@ -82,8 +80,30 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
         'greeting_type' => $greeting,
       ];
 
-      //add addressee in Contact form
+      // Add addressee in Contact form.
       $greetingTokens = CRM_Core_PseudoConstant::greeting($filter);
+
+      // Instead of showing smarty token with/o conditional logic in Drop down
+      // list, show processed token (Only in Contact Edit mode).
+      // Get Description of each greeting.
+      $greetingTokensDescription = CRM_Core_PseudoConstant::greeting($filter, 'description');
+      if ($form->_contactId) {
+        $renderedGreetingTokens = CRM_Core_TokenSmarty::render($greetingTokens,
+          [
+            'contactId' => $form->_contactId,
+          ]
+        );
+        foreach ($greetingTokens as $key => &$emailGreetingString) {
+          if ($emailGreetingString) {
+            $emailGreetingString = $renderedGreetingTokens[$key];
+            $emailGreetingString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($emailGreetingString));
+            if (!empty($greetingTokensDescription[$key])) {
+              // Append description to processed greeting.
+              $emailGreetingString .= ' ( ' . $greetingTokensDescription[$key] . ' )';
+            }
+          }
+        }
+      }
       if (!empty($greetingTokens)) {
         $form->addElement('select', $fields['field'], $fields['label'],
           [
@@ -116,16 +136,13 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     $greetings = self::getGreetingFields($self->_contactType);
     foreach ($greetings as $greeting => $details) {
       $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $details['field'], 'Customized');
-      if (CRM_Utils_Array::value($details['field'], $fields) == $customizedValue && empty($fields[$details['customField']])) {
+      if (($fields[$details['field']] ?? NULL) == $customizedValue && empty($fields[$details['customField']])) {
         $errors[$details['customField']] = ts('Custom  %1 is a required field if %1 is of type Customized.',
           [1 => $details['label']]
         );
       }
     }
 
-    if (array_key_exists('preferred_mail_format', $fields) && empty($fields['preferred_mail_format'])) {
-      $errors['preferred_mail_format'] = ts('Please select an email format preferred by this contact.');
-    }
     return empty($errors) ? TRUE : $errors;
   }
 
@@ -144,20 +161,15 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
 
     // CRM-7119: set preferred_language to default if unset
     if (empty($defaults['preferred_language'])) {
-      $config = CRM_Core_Config::singleton();
-      $defaults['preferred_language'] = $config->lcMessages;
+      if ($form->_action == CRM_Core_Action::ADD) {
+        if (($defContactLanguage = CRM_Core_I18n::getContactDefaultLanguage()) != FALSE) {
+          $defaults['preferred_language'] = $defContactLanguage;
+        }
+      }
     }
 
     if (empty($defaults['communication_style_id'])) {
       $defaults['communication_style_id'] = array_pop(CRM_Core_OptionGroup::values('communication_style', TRUE, NULL, NULL, 'AND is_default = 1'));
-    }
-
-    // CRM-17778 -- set preferred_mail_format to default if unset
-    if (empty($defaults['preferred_mail_format'])) {
-      $defaults['preferred_mail_format'] = 'Both';
-    }
-    else {
-      $defaults['preferred_mail_format'] = array_search($defaults['preferred_mail_format'], CRM_Core_SelectValues::pmf());
     }
 
     //set default from greeting types CRM-4575, CRM-9739

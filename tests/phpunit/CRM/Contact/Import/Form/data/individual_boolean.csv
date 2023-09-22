@@ -1,0 +1,11 @@
+first_name,Last Name,Street Address,Do Not Email,Contact Custom Field, Address Custom Field
+Joe,1,Main Street,0,0,0
+Joe,2,Main Street,FALSE,FALSE,FALSE
+Joe,3,Main Street,false,false,false
+Joe,4,Main st,no,no,no
+Joe,5,Main Street,NO,NO,NO
+Betty,1,Main Street,1,1,1
+Betty,2,Main Street,TRUE,TRUE,TRUE
+Betty,3,Main Street,true,true,true
+Betty,4,Main Street,yes,yes,yes
+Betty,5,Main Street,YES,YES,YES

@@ -37,10 +37,12 @@
   <xi:include href="StateProvince.xml"        parse="xml" />
   <xi:include href="SystemLog.xml"            parse="xml" />
   <xi:include href="Tag.xml"                  parse="xml" />
+  <xi:include href="Translation.xml"          parse="xml" />
   <xi:include href="UFGroup.xml"              parse="xml" />
   <xi:include href="UFField.xml"              parse="xml" />
   <xi:include href="UFMatch.xml"              parse="xml" />
   <xi:include href="UFJoin.xml"               parse="xml" />
+  <xi:include href="UserJob.xml"              parse="xml" />
   <xi:include href="Timezone.xml"             parse="xml" />
   <xi:include href="Worldregion.xml"          parse="xml" />
   <xi:include href="OpenID.xml"               parse="xml" />

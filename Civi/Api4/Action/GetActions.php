@@ -14,6 +14,7 @@ namespace Civi\Api4\Action;
 
 use Civi\API\Exception\NotImplementedException;
 use Civi\Api4\Generic\BasicGetAction;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
 
 /**
@@ -30,37 +31,40 @@ class GetActions extends BasicGetAction {
   protected function getRecords() {
     $this->_actionsToGet = $this->_itemsToGet('name');
 
-    $entityReflection = new \ReflectionClass('\Civi\Api4\\' . $this->_entityName);
+    $className = CoreUtil::getApiClass($this->_entityName);
+    $entityReflection = new \ReflectionClass($className);
     foreach ($entityReflection->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC) as $method) {
       $actionName = $method->getName();
-      if ($actionName != 'permissions' && $actionName != 'getInfo' && $actionName[0] != '_') {
+      if (!in_array($actionName, ['permissions', 'getInfo', 'getEntityName'], TRUE) && !str_starts_with($actionName, '_')) {
         $this->loadAction($actionName, $method);
       }
     }
     if (!$this->_actionsToGet || count($this->_actionsToGet) > count($this->_actions)) {
       // Search for entity-specific actions in extensions
+      $nameSpace = str_replace('Civi\Api4\\', 'Civi\Api4\Action\\', $className);
       foreach (\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
         $dir = \CRM_Utils_File::addTrailingSlash(dirname($ext['filePath']));
-        $this->scanDir($dir . 'Civi/Api4/Action/' . $this->_entityName);
+        $this->scanDir($dir, $nameSpace);
       }
       // Search for entity-specific actions in core
-      $this->scanDir(\CRM_Utils_File::addTrailingSlash(__DIR__) . $this->_entityName);
+      global $civicrm_root;
+      $this->scanDir(\CRM_Utils_File::addTrailingSlash($civicrm_root), $nameSpace);
     }
     ksort($this->_actions);
     return $this->_actions;
   }
 
   /**
-   * @param $dir
+   * @param string $dir
+   * @param string $nameSpace
    */
-  private function scanDir($dir) {
+  private function scanDir($dir, $nameSpace) {
+    $dir .= str_replace('\\', '/', $nameSpace);
     if (is_dir($dir)) {
       foreach (glob("$dir/*.php") as $file) {
-        $matches = [];
-        preg_match('/(\w*)\.php$/', $file, $matches);
-        $actionName = array_pop($matches);
-        $actionClass = new \ReflectionClass('\\Civi\\Api4\\Action\\' . $this->_entityName . '\\' . $actionName);
-        if ($actionClass->isInstantiable() && $actionClass->isSubclassOf('\\Civi\\Api4\\Generic\\AbstractAction')) {
+        $actionName = basename($file, '.php');
+        $actionClass = new \ReflectionClass($nameSpace . '\\' . $actionName);
+        if ($actionClass->isInstantiable() && $actionClass->isSubclassOf('\Civi\Api4\Generic\AbstractAction')) {
           $this->loadAction(lcfirst($actionName));
         }
       }
@@ -75,7 +79,8 @@ class GetActions extends BasicGetAction {
     try {
       if (!isset($this->_actions[$actionName]) && (!$this->_actionsToGet || in_array($actionName, $this->_actionsToGet))) {
         $action = \Civi\API\Request::create($this->getEntityName(), $actionName, ['version' => 4]);
-        if (is_object($action) && (!$this->checkPermissions || $action->isAuthorized())) {
+        $authorized = !$this->checkPermissions || \Civi::service('civi_api_kernel')->runAuthorize($this->getEntityName(), $actionName, ['version' => 4]);
+        if (is_object($action) && $authorized) {
           $this->_actions[$actionName] = ['name' => $actionName];
           if ($this->_isFieldSelected('description', 'comment', 'see')) {
             $vars = ['entity' => $this->getEntityName(), 'action' => $actionName];
@@ -89,20 +94,12 @@ class GetActions extends BasicGetAction {
               if (strpos($method->getDocComment(), '@inheritDoc') !== FALSE && !empty($methodDocs['comment']) && !empty($actionDocs['comment'])) {
                 $methodDocs['comment'] .= "\n\n" . $actionDocs['comment'];
               }
-              $actionDocs = array_filter($methodDocs) + $actionDocs;
+              $actionDocs = array_filter($methodDocs) + $actionDocs + ['deprecated' => FALSE];
             }
             $this->_actions[$actionName] += $actionDocs;
           }
           if ($this->_isFieldSelected('params')) {
             $this->_actions[$actionName]['params'] = $action->getParamInfo();
-            // Language param is only relevant on multilingual sites
-            $languageLimit = (array) \Civi::settings()->get('languageLimit');
-            if (count($languageLimit) < 2) {
-              unset($this->_actions[$actionName]['params']['language']);
-            }
-            elseif (isset($this->_actions[$actionName]['params']['language'])) {
-              $this->_actions[$actionName]['params']['language']['options'] = array_keys($languageLimit);
-            }
           }
         }
       }
@@ -134,6 +131,10 @@ class GetActions extends BasicGetAction {
         'name' => 'params',
         'description' => 'List of all accepted parameters',
         'data_type' => 'Array',
+      ],
+      [
+        'name' => 'deprecated',
+        'data_type' => 'Boolean',
       ],
     ];
   }

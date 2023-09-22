@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Group_StateMachine extends CRM_Core_StateMachine {
 
@@ -34,7 +32,7 @@ class CRM_Group_StateMachine extends CRM_Core_StateMachine {
       'CRM_Contact_Form_Task_Result' => NULL,
     ];
 
-    $this->addSequentialPages($this->_pages, $action);
+    $this->addSequentialPages($this->_pages);
   }
 
   /**

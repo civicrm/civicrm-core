@@ -17,7 +17,7 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
     $phoneBankActivity = $this->callAPISuccess('Option_value', 'Get', ['label' => 'PhoneBank', 'sequential' => 1]);
@@ -38,8 +38,8 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   /**
    * Test survey respondent get.
    */
-  public function testGetSurveyRespondants() {
-    $result = $this->callAPIAndDocument("SurveyRespondant", "get", $this->params, __FUNCTION__, __FILE__);
+  public function testGetSurveyRespondants(): void {
+    $result = $this->callAPISuccess("SurveyRespondant", "get", $this->params);
   }
 
 }

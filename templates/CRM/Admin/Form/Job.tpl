@@ -7,22 +7,24 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{* This template is used for adding/configuring Scheduled Jobs.  *}
-<h3>{if $action eq 1}{ts}New Scheduled Job{/ts}{elseif $action eq 2}{ts}Edit Scheduled Job{/ts}{elseif $action eq 4}{ts}Execute Scheduled Job{/ts}{else}{ts}Delete Scheduled Job{/ts}{/if}</h3>
+{* Edit/Run Scheduled Jobs *}
 <div class="crm-block crm-form-block crm-job-form-block">
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 
 {if $action eq 8}
   <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
         {ts}WARNING: Deleting this Scheduled Job will cause some important site functionality to stop working.{/ts} {ts}Do you want to continue?{/ts}
   </div>
 {elseif $action eq 4}
   <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
-        {ts 1=$jobName}Are you sure you would like to execute %1 job?{/ts}
+      {icon icon="fa-info-circle"}{/icon}
+        {ts 1=$jobName|escape:html}Are you sure you would like to execute %1 job?{/ts}
   </div>
 {else}
+  <div class="help">
+    {capture assign=docUrlText}{ts}Job parameters and command line syntax documentation{/ts}{/capture}
+    {docURL page="user/initial-set-up/scheduled-jobs" text=$docUrlText}
+  </div>
   <table class="form-layout-compressed">
     <tr class="crm-job-form-block-name">
         <td class="label">{$form.name.label}</td><td>{$form.name.html}</td>
@@ -92,7 +94,7 @@ CRM.$(function($) {
     <tr class="crm-job-form-block-scheduled-run-date">
         <td class="label">{$form.scheduled_run_date.label}</td>
         <td>{$form.scheduled_run_date.html}<br />
-            <div dlass="description">{ts}Do not run this job before this date / time. The run frequency selected above will apply thereafter.{/ts}<br />
+            <div class="description">{ts}Do not run this job before this date / time. The run frequency selected above will apply thereafter.{/ts}<br />
               {if $action eq 1}{ts}Leave blank to run as soon as possible.{/ts}{else}{ts}Leave blank to run at next run frequency.{/ts}{/if}
             </div>
         </td>

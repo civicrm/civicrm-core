@@ -45,16 +45,16 @@
           <th></th>
         </thead>
         {foreach from=$rows item=row}
-        <tr id="financial_account-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+        <tr id="financial_account-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {if !empty($row.class)}{$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
           <td class="crm-editable" data-field="name">{$row.name}</td>
-          <td class="crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
+          <td class="crm-editable" data-field="description" data-type="textarea">{if !empty($row.description)}{$row.description}{/if}</td>
           <td class="crm-editable" data-field="accounting_code">{$row.accounting_code}</td>
           <td>{$row.financial_account_type_id}{if $row.account_type_code} ({$row.account_type_code}){/if}</td>
           <td>{if $row.is_deductible eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{icon condition=$row.is_default}{ts}Default{/ts}{/icon}</td>
           <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
       </table>
@@ -69,7 +69,7 @@
     </div>
   {else}
     <div class="messages status">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {capture assign=crmURL}{crmURL q="action=add&reset=1"}{/capture}
       {ts 1=$crmURL}There are no Financial Account entered. You can <a href='%1'>add one</a>.{/ts}
     </div>

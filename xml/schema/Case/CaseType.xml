@@ -6,12 +6,16 @@
   <comment>Case type definition</comment>
   <add>4.5</add>
   <log>true</log>
+  <component>CiviCase</component>
   <field>
     <name>id</name>
     <title>Case Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Autoincremented type id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.5</add>
   </field>
   <primaryKey>
@@ -25,6 +29,9 @@
     <length>64</length>
     <required>true</required>
     <comment>Machine name for Case Type</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>4.5</add>
   </field>
   <index>
@@ -41,6 +48,9 @@
     <required>true</required>
     <localizable>true</localizable>
     <comment>Natural language name for Case Type</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>4.5</add>
   </field>
   <field>
@@ -50,20 +60,34 @@
     <length>255</length>
     <localizable>true</localizable>
     <comment>Description of the Case Type</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>4.5</add>
   </field>
   <field>
     <name>is_active</name>
     <title>Case Type Is Active</title>
     <type>boolean</type>
-    <comment>Is this entry active?</comment>
+    <comment>Is this case type enabled?</comment>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <default>1</default>
+    <required>true</required>
     <add>4.5</add>
   </field>
   <field>
     <name>is_reserved</name>
     <title>Case Type Is Reserved</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>Is this case type a predefined system type?</comment>
+    <html>
+      <type>CheckBox</type>
+    </html>
     <add>4.5</add>
   </field>
   <field>
@@ -73,6 +97,9 @@
     <required>true</required>
     <default>1</default>
     <comment>Ordering of the case types</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.5</add>
   </field>
   <field>

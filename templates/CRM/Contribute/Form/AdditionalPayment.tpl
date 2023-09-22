@@ -11,7 +11,7 @@
   {include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}
   {if !$suppressPaymentFormButtons}
     <div class="crm-submit-buttons">
-       {include file="CRM/common/formButtons.tpl"}
+       {include file="CRM/common/formButtons.tpl" location=''}
     </div>
   {/if}
 {else}
@@ -20,7 +20,12 @@
 
   {if !$email}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
+      {icon icon="fa-info-circle"}{/icon}{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
+    </div>
+  {/if}
+  {if $paymentType EQ 'refund'}
+    <div class="messages status no-popup">
+      {icon icon="fa-info-circle"}{/icon} {ts}Use this form to record a manual refund. If a payment processor was used to make payment it will not be notified.{/ts}
     </div>
   {/if}
   {if $newCredit AND $contributionMode EQ null}
@@ -34,11 +39,11 @@
     {/if}
   {/if}
   <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl"}
+    {include file="CRM/common/formButtons.tpl" location=''}
   </div>
   <table class="form-layout-compressed">
     <tr>
-      <td class="font-size12pt label"><strong>{if $component eq 'event'}{ts}Participant{/ts}{else}{ts}Contact{/ts}{/if}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
+      <td class="label"><strong>{if $component eq 'event'}{ts}Participant{/ts}{else}{ts}Contact{/ts}{/if}</strong></td><td><strong>{$displayName}</strong></td>
     </tr>
     {if $eventName}
       <tr>
@@ -48,20 +53,20 @@
     <tr class="crm-payment-form-block-total_amount">
       <td class="label">{$form.total_amount.label}</td>
       <td>
-        <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>&nbsp; <span class="status">{if $paymentType EQ 'refund' || $paymentAmt < 0}{ts}Refund Due :&nbsp;{$absolutePaymentAmount|crmMoney} {/ts}{else}{ts}Balance Owed{/ts} :&nbsp;{$paymentAmt|crmMoney}{/if}</span>
+        <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>&nbsp; <span class="status">{if $paymentAmt < 0}{ts}Refund Due :&nbsp;{$absolutePaymentAmount|crmMoney} {/ts}{else}{ts}Balance Owed{/ts} :&nbsp;{$paymentAmt|crmMoney}{/if}</span>
       </td>
       {if $email and $outBound_option != 2}
         <tr class="crm-payment-form-block-is_email_receipt">
           <td class="label">
             {$form.is_email_receipt.label}
           </td>
-          <td>{$form.is_email_receipt.html}&nbsp;
+          <td>{$form.is_email_receipt.html}
               <span class="description">{ts 1=$email}Automatically email a receipt to %1?{/ts}</span>
           </td>
         </tr>
         <tr id="fromEmail" class="crm-payment-form-block-from_email_address" style="display:none;">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         </tr>
       {/if}
       {if $contributionMode}
@@ -79,9 +84,7 @@
         <table class="form-layout-compressed" >
           <tr class="crm-payment-form-block-trxn_date">
             <td class="label">{$form.trxn_date.label}</td>
-            <td>{$form.trxn_date.html}<br />
-              <span class="description">{ts}The date this payment was received.{/ts}</span>
-            </td>
+            <td>{$form.trxn_date.html}</td>
           </tr>
           <tr class="crm-payment-form-block-payment_instrument_id">
             <td class="label">{$form.payment_instrument_id.label}</td>
@@ -92,8 +95,10 @@
             <td class="label">{$form.trxn_id.label}</td>
             <td>{$form.trxn_id.html} {help id="id-trans_id"}</td>
           </tr>
-          <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html}<br />
-            <span class="description">{ts}Processing fee for this transaction (if applicable).{/ts}</span></td></tr>
+          <tr class="crm-payment-form-block-fee_amount">
+            <td class="label">{$form.fee_amount.label}</td>
+            <td{$valueStyle}>{$form.fee_amount.html}</td>
+          </tr>
         </table>
       </div>
       {/if}

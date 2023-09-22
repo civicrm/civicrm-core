@@ -12,11 +12,11 @@ use Civi\Setup\Event\UninstallDatabaseEvent;
 use Civi\Setup\Event\UninstallFilesEvent;
 use Civi\Setup\Exception\InitException;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Civi\Core\CiviEventDispatcher;
 
 class Setup {
 
-  const PROTOCOL = '1.0';
+  const PROTOCOL = '1.1';
 
   const PRIORITY_START = 2000;
   const PRIORITY_PREPARE = 1000;
@@ -54,7 +54,8 @@ class Setup {
    *
    * @param array $modelValues
    *   List of default configuration options.
-   *   Recommended fields: 'srcPath', 'cms'
+   *   - cms: string name
+   *   - srcPath: Path to CiviCRM-core source tree, i.e. .../vendor/civicrm/civicrm-core/
    * @param callable $pluginCallback
    *   Function which manipulates the list of plugin files.
    *   Use this to add, remove, or re-order callbacks.
@@ -70,8 +71,13 @@ class Setup {
     self::$instance = new Setup();
     self::$instance->model = new \Civi\Setup\Model();
     self::$instance->model->setValues($modelValues);
-    self::$instance->dispatcher = new EventDispatcher();
-    self::$instance->log = $log ? $log : new NullLogger();
+    self::$instance->dispatcher = new CiviEventDispatcher();
+    self::$instance->dispatcher->setDispatchPolicy([
+      '/^civi\.setup\./' => 'run',
+      '/^civi\.setupui\./' => 'run',
+      '/./' => 'fail',
+    ]);
+    self::$instance->log = $log ?: new NullLogger();
 
     $pluginDir = dirname(__DIR__) . '/plugins';
     $pluginFiles = array();

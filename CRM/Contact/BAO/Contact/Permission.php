@@ -18,12 +18,16 @@ class CRM_Contact_BAO_Contact_Permission {
 
   /**
    * @var bool
+   *
+   * @deprecated
    */
-  public static $useTempTable = TRUE;
+  public static $useTempTable = FALSE;
 
   /**
    * Set whether to use a temporary table or not when building ACL Cache
    * @param bool $useTemporaryTable
+   *
+   * @deprecated
    */
   public static function setUseTemporaryTable($useTemporaryTable = TRUE) {
     self::$useTempTable = $useTemporaryTable;
@@ -31,7 +35,10 @@ class CRM_Contact_BAO_Contact_Permission {
 
   /**
    * Get variable for determining if we should use Temporary Table or not
+   *
    * @return bool
+   *
+   * @deprecated
    */
   public static function getUseTemporaryTable() {
     return self::$useTempTable;
@@ -136,37 +143,39 @@ WHERE contact_id IN ({$contact_id_list})
    * @param int $id
    *   Contact id.
    * @param int|string $type the type of operation (view|edit)
+   * @param int $userID
+   *   Contact id of user to check (defaults to current logged-in user)
    *
    * @return bool
    *   true if the user has permission, false otherwise
    */
-  public static function allow($id, $type = CRM_Core_Permission::VIEW) {
-    // get logged in user
-    $contactID = CRM_Core_Session::getLoggedInContactID();
+  public static function allow($id, $type = CRM_Core_Permission::VIEW, $userID = NULL) {
+    // Default to logged in user if not supplied
+    $userID = $userID ?? CRM_Core_Session::getLoggedInContactID();
 
     // first: check if contact is trying to view own contact
-    if ($contactID == $id && ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')
-     || $type == CRM_Core_Permission::EDIT && CRM_Core_Permission::check('edit my contact'))
+    if ($userID == $id && ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')
+     || $type == CRM_Core_Permission::EDIT && CRM_Core_Permission::check('edit my contact', $userID))
       ) {
       return TRUE;
     }
 
     // FIXME: push this somewhere below, to not give this permission so many rights
     $isDeleted = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'is_deleted');
-    if (CRM_Core_Permission::check('access deleted contacts') && $isDeleted) {
+    if (CRM_Core_Permission::check('access deleted contacts', $userID) && $isDeleted) {
       return TRUE;
     }
 
     // short circuit for admin rights here so we avoid unneeeded queries
     // some duplication of code, but we skip 3-5 queries
-    if (CRM_Core_Permission::check('edit all contacts') ||
-      ($type == CRM_ACL_API::VIEW && CRM_Core_Permission::check('view all contacts'))
+    if (CRM_Core_Permission::check('edit all contacts', $userID) ||
+      ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view all contacts', $userID))
     ) {
       return TRUE;
     }
 
     // check permission based on relationship, CRM-2963
-    if (self::relationshipList([$id], $type)) {
+    if (self::relationshipList([$id], $type, $userID)) {
       return TRUE;
     }
 
@@ -175,7 +184,7 @@ WHERE contact_id IN ({$contact_id_list})
     $tables = [];
     $whereTables = [];
 
-    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, NULL, FALSE, FALSE, TRUE);
+    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, $userID, FALSE, FALSE, TRUE);
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
 
     $query = "
@@ -185,10 +194,7 @@ WHERE contact_a.id = %1 AND $permission
   LIMIT 1
 ";
 
-    if (CRM_Core_DAO::singleValueQuery($query, [1 => [$id, 'Integer']])) {
-      return TRUE;
-    }
-    return FALSE;
+    return (bool) CRM_Core_DAO::singleValueQuery($query, [1 => [$id, 'Integer']]);
   }
 
   /**
@@ -196,7 +202,7 @@ WHERE contact_a.id = %1 AND $permission
    *
    * @param int $userID - contact_id of the ACLed user
    * @param int|string $type the type of operation (view|edit)
-   * @param bool $force - Should we force a recompute.
+   * @param bool $force - Should we force a recompute (only used for unit tests)
    *
    */
   public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
@@ -224,10 +230,29 @@ WHERE contact_a.id = %1 AND $permission
     if (!$force) {
       // skip if already calculated
       if (!empty(Civi::$statics[__CLASS__]['processed'][$type][$userID])) {
+        // \Civi::log()->debug("CRM_Contact_BAO_Contact_Permission::cache already called. Operation: $operation; UserID: $userID");
         return;
       }
+    }
 
-      // run a query to see if the cache is filled
+    // grab a lock so other processes don't compete and do the same query
+    $lock = Civi::lockManager()->acquire("data.core.aclcontact.{$userID}");
+    if (!$lock->isAcquired()) {
+      // this can cause inconsistent results since we don"t know if the other process
+      // will fill up the cache before our calling routine needs it.
+      // The default 3 second timeout should be enough for the other process to finish.
+      // However this routine does not return the status either, so basically
+      // its a "lets return and hope for the best"
+      // \Civi::log()->debug("cache: aclcontact lock not acquired for user: $userID");
+      return;
+    }
+
+    if (!$force) {
+      // Check if the cache has already been built for this userID
+      // The lock guards against simultaneous building of the cache but we don't clear individual userIDs from the cache,
+      //   instead we truncate the whole table before calling cache() which may then be called multiple times.
+      // The only way we get to this point with the cache already filled is if two processes call cache() almost simultaneously
+      //   and the lock completes before the next process reaches the "get lock" call.
       $sql = "
 SELECT count(*)
 FROM   civicrm_acl_contact_cache
@@ -237,20 +262,13 @@ AND    $operationClause
       $count = CRM_Core_DAO::singleValueQuery($sql, $queryParams);
       if ($count > 0) {
         Civi::$statics[__CLASS__]['processed'][$type][$userID] = 1;
+        $lock->release();
+        // \Civi::log()->debug("CRM_Contact_BAO_Contact_Permission::cache already called via check query. Operation: $operation; UserID: $userID");
         return;
       }
     }
 
-    // grab a lock so other processes don't compete and do the same query
-    $lock = Civi::lockManager()->acquire("data.core.aclcontact.{$userID}");
-    if (!$lock->isAcquired()) {
-      // this can cause inconsistent results since we don't know if the other process
-      // will fill up the cache before our calling routine needs it.
-      // The default 3 second timeout should be enough for the other process to finish.
-      // However this routine does not return the status either, so basically
-      // its a "lets return and hope for the best"
-      return;
-    }
+    // \Civi::log()->debug("cache: building for $userID; operation=$operation; force=$force");
 
     $tables = [];
     $whereTables = [];
@@ -271,19 +289,8 @@ AND    $operationClause
     AND ac.user_id IS NULL
     ";*/
     $sql = " $from WHERE    $permission";
-    $useTempTable = self::getUseTemporaryTable();
-    if ($useTempTable) {
-      $aclContactsTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('aclccache')->setMemory();
-      $tempTable = $aclContactsTempTable->getName();
-      $aclContactsTempTable->createWithColumns('contact_id int, UNIQUE INDEX UI_contact (contact_id)');
-      CRM_Core_DAO::executeQuery("INSERT INTO {$tempTable} (contact_id) SELECT DISTINCT contact_a.id {$sql}");
-      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) SELECT {$userID}, contact_id, '{$operation}' FROM {$tempTable}");
-      $aclContactsTempTable->drop();
-    }
-    else {
-      $sql = "SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation" . $sql;
-      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) {$sql}");
-    }
+    $sql = "SELECT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation" . $sql . ' GROUP BY contact_a.id';
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache (user_id, contact_id, operation) {$sql}");
 
     // Add in a row for the logged in contact. Do not try to combine with the above query or an ugly OR will appear in
     // the permission clause.
@@ -291,7 +298,7 @@ AND    $operationClause
       ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact'))) {
       if (!CRM_Core_DAO::singleValueQuery("
         SELECT count(*) FROM civicrm_acl_contact_cache WHERE user_id = %1 AND contact_id = %1 AND operation = '{$operation}' LIMIT 1", $queryParams)) {
-        CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache ( user_id, contact_id, operation ) VALUES(%1, %1, '{$operation}')", $queryParams);
+        CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation ) VALUES(%1, %1, '{$operation}')", $queryParams);
       }
     }
     Civi::$statics[__CLASS__]['processed'][$type][$userID] = 1;
@@ -299,7 +306,7 @@ AND    $operationClause
   }
 
   /**
-   * @param string $contactAlias
+   * @param string[]|string $contactAlias
    *
    * @return array
    */
@@ -307,17 +314,16 @@ AND    $operationClause
     if (CRM_Core_Permission::check('view all contacts') ||
       CRM_Core_Permission::check('edit all contacts')
     ) {
-      if (is_array($contactAlias)) {
+      if (!CRM_Core_Permission::check('access deleted contacts')) {
         $wheres = [];
-        foreach ($contactAlias as $alias) {
+        foreach ((array) $contactAlias as $alias) {
           // CRM-6181
           $wheres[] = "$alias.is_deleted = 0";
         }
         return [NULL, '(' . implode(' AND ', $wheres) . ')'];
       }
       else {
-        // CRM-6181
-        return [NULL, "$contactAlias.is_deleted = 0"];
+        return [NULL, '( 1 )'];
       }
     }
 
@@ -332,14 +338,17 @@ AND    $operationClause
       }
 
       $fromClause = implode(" ", $clauses);
-      $whereClase = NULL;
+      $whereClause = NULL;
     }
     else {
       $fromClause = " INNER JOIN civicrm_acl_contact_cache aclContactCache ON {$contactAlias}.id = aclContactCache.contact_id ";
-      $whereClase = " aclContactCache.user_id = $contactID AND $contactAlias.is_deleted = 0";
+      $whereClause = " aclContactCache.user_id = $contactID";
+      if (!CRM_Core_Permission::check('access deleted contacts')) {
+        $whereClause .= " AND $contactAlias.is_deleted = 0";
+      }
     }
 
-    return [$fromClause, $whereClase];
+    return [$fromClause, $whereClause];
   }
 
   /**
@@ -360,18 +369,18 @@ AND    $operationClause
 
   /**
    * Filter a list of contact_ids by the ones that the
-   *  currently active user as a permissioned relationship with
+   * user as a permissioned relationship with
    *
    * @param array $contact_ids
    *   List of contact IDs to be filtered
-   *
    * @param int $type
    *   access type CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT
+   * @param int $userID
    *
    * @return array
    *   List of contact IDs that the user has permissions for
    */
-  public static function relationshipList($contact_ids, $type) {
+  public static function relationshipList($contact_ids, $type, $userID = NULL) {
     $result_set = [];
 
     // no processing empty lists (avoid SQL errors as well)
@@ -379,9 +388,9 @@ AND    $operationClause
       return [];
     }
 
-    // get the currently logged in user
-    $contactID = CRM_Core_Session::getLoggedInContactID();
-    if (empty($contactID)) {
+    // Default to currently logged in user
+    $userID = $userID ?? CRM_Core_Session::getLoggedInContactID();
+    if (empty($userID)) {
       return [];
     }
 
@@ -416,7 +425,7 @@ AND    $operationClause
 SELECT civicrm_relationship.{$contact_id_column} AS contact_id
   FROM civicrm_relationship
   {$LEFT_JOIN_DELETED}
- WHERE civicrm_relationship.{$user_id_column} = {$contactID}
+ WHERE civicrm_relationship.{$user_id_column} = {$userID}
    AND civicrm_relationship.{$contact_id_column} IN ({$contact_id_list})
    AND civicrm_relationship.is_active = 1
    AND civicrm_relationship.is_permission_{$direction['from']}_{$direction['to']} {$is_perm_condition}
@@ -442,7 +451,7 @@ SELECT second_degree_relationship.contact_id_{$second_direction['to']} AS contac
   FROM civicrm_relationship first_degree_relationship
   LEFT JOIN civicrm_relationship second_degree_relationship ON first_degree_relationship.contact_id_{$first_direction['to']} = second_degree_relationship.contact_id_{$second_direction['from']}
   {$LEFT_JOIN_DELETED}
- WHERE first_degree_relationship.contact_id_{$first_direction['from']} = {$contactID}
+ WHERE first_degree_relationship.contact_id_{$first_direction['from']} = {$userID}
    AND second_degree_relationship.contact_id_{$second_direction['to']} IN ({$contact_id_list})
    AND first_degree_relationship.is_active = 1
    AND first_degree_relationship.is_permission_{$first_direction['from']}_{$first_direction['to']} {$is_perm_condition}
@@ -503,7 +512,7 @@ SELECT second_degree_relationship.contact_id_{$second_direction['to']} AS contac
 
   /**
    * @param bool $checkSumValidationResult
-   * @param null $form
+   * @param CRM_Core_Form|null $form
    */
   public static function initChecksumAuthSrc($checkSumValidationResult = FALSE, $form = NULL) {
     $session = CRM_Core_Session::singleton();

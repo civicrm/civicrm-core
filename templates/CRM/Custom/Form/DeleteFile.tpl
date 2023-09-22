@@ -11,7 +11,7 @@
 <fieldset><legend>{ts}Delete Attached File{/ts}</legend>
     <div class="status">
       <dl>
-        <dt><div class="icon inform-icon"></div></dt>
+        <dt>{icon icon="fa-info-circle"}{/icon}</dt>
         <dd>
           {ts}WARNING: Are you sure you want to delete the attached file?{/ts}
         </dd>

@@ -1,0 +1,32 @@
+<div oauth-util-import="CRM.oauthUtil.redirectUrl" to="redirectUrl"></div>
+<div class="help">
+  <p>{{ts('Please register with your web-service provider first. Be sure to:')}}</p>
+  <ul>
+    <li>
+      <p>
+        {{ts('Configure the "Redirect URL":')}}
+      </p>
+      <pre>{{redirectUrl}}</pre>
+      <div ng-if="redirectUrl.startsWith('http:/') &amp;&amp; !redirectUrl.match('//(localhost|127\.0\.0\.1)')">
+        <p>
+          {{ts('WARNING: Most web-service providers require "https://" URLs. Alternatively, "http://" may be accepted for strictly local URLs ("localhost" or "127.0.0.1").')}}
+        </p>
+        <p>
+          {{ts('If you are doing development or testing on a local HTTP virtual-host, then consider a work-around like "bin/local-redir.sh".')}}
+        </p>
+      </div>
+    </li>
+
+    <li ng-if="options.provider.options.scopes.length">
+      <p>
+        {{ts('Configure the scopes:')}}
+      </p>
+      <pre>{{options.provider.options.scopes.join("\n")}}</pre>
+    </li>
+
+    <li>
+      {{ts('Determine the client credentials, including a client ID and secret.')}}
+    </li>
+  </ul>
+  <p>{{ts('Finally, enter the client credentials below.')}}</p>
+</div>

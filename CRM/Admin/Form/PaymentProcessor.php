@@ -21,6 +21,16 @@
 class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   use CRM_Core_Form_EntityFormTrait;
 
+  /**
+   * @var int
+   * Test Payment Processor ID
+   */
+  protected $_testID;
+
+  /**
+   * @var \CRM_Financial_DAO_PaymentProcessorType
+   * Payment Processor DAO Object
+   */
   protected $_paymentProcessorDAO;
 
   /**
@@ -30,39 +40,26 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   protected $_paymentProcessorType;
 
   /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * Fields may have keys
-   *  - name (required to show in tpl from the array)
-   *  - description (optional, will appear below the field)
-   *     Auto-added by setEntityFieldsMetadata unless specified here (use description => '' to hide)
-   *  - not-auto-addable - this class will not attempt to add the field using addField.
-   *    (this will be automatically set if the field does not have html in it's metadata
-   *    or is not a core field on the form's entity).
-   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
-   *  - template - use a field specific template to render this field
-   *  - required
-   *  - is_freeze (field should be frozen).
-   *
-   * @var array
+   * @var array|array[]
    */
-  protected $entityFields = [];
+  private $_fields;
 
   /**
    * Set entity fields to be assigned to the form.
    */
-  protected function setEntityFields() {
+  protected function setEntityFields(): void {
     $this->entityFields = [
       'payment_processor_type_id' => [
         'name' => 'payment_processor_type_id',
         'required' => TRUE,
       ],
-      'name' => [
-        'name' => 'name',
-        'required' => TRUE,
-      ],
       'title' => [
         'name' => 'title',
+        'required' => TRUE,
+      ],
+      'frontend_title' => [
+        'name' => 'frontend_title',
+        'required' => TRUE,
       ],
       'description' => [
         'name' => 'description',
@@ -90,57 +87,21 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $this->deleteMessage = ts('Deleting this Payment Processor may result in some transaction pages being rendered inactive.') . ' ' . ts('Do you want to continue?');
   }
 
+  /**
+   * Preprocess the form.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function preProcess() {
     parent::preProcess();
+    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/paymentProcessor', ['reset' => 1], FALSE, NULL, FALSE));
 
-    if ($this->_id) {
-      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, NULL);
-      if (!$this->_paymentProcessorType) {
-        $this->_paymentProcessorType = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
-          $this->_id,
-          'payment_processor_type_id'
-        );
-      }
-      $this->set('pp', $this->_paymentProcessorType);
-    }
-    else {
-      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, TRUE, NULL);
-    }
-
+    $this->setPaymentProcessorTypeID();
+    $this->setPaymentProcessor();
     $this->assign('ppType', $this->_paymentProcessorType);
-    $ppTypeName = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
-      $this->_paymentProcessorType,
-      'name'
-    );
-    $this->assign('ppTypeName', $ppTypeName);
+    $this->assign('ppTypeName', $this->_paymentProcessorDAO->name);
 
-    $this->_paymentProcessorDAO = new CRM_Financial_DAO_PaymentProcessorType();
-    $this->_paymentProcessorDAO->id = $this->_paymentProcessorType;
-
-    $this->_paymentProcessorDAO->find(TRUE);
-
-    if ($this->_id) {
-      $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor',
-        "reset=1&action=update&id={$this->_id}",
-        FALSE, NULL, FALSE
-      );
-    }
-    else {
-      $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor',
-        "reset=1&action=add",
-        FALSE, NULL, FALSE
-      );
-    }
-
-    //CRM-4129
-    $destination = CRM_Utils_Request::retrieve('civicrmDestination', 'String', $this);
-    if ($destination) {
-      $destination = urlencode($destination);
-      $refreshURL .= "&civicrmDestination=$destination";
-    }
-
-    $this->refreshURL = $refreshURL;
-    $this->assign('refreshURL', $refreshURL);
+    $this->assign('refreshURL', $this->getRefreshURL());
 
     $this->assign('is_recur', $this->_paymentProcessorDAO->is_recur);
 
@@ -201,6 +162,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * Build the form object.
    *
    * @param bool $check
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm($check = FALSE) {
     $this->buildQuickEntityForm();
@@ -211,20 +174,12 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_PaymentProcessor');
 
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
-      'CRM_Financial_DAO_PaymentProcessor',
-      $this->_id,
-      'name',
-      CRM_Core_Config::domainID(),
-    ]);
-
     // @todo - remove this & let the entityForm do it - need to make sure we are handling the js though.
     $this->add('select',
       'payment_processor_type_id',
       ts('Payment Processor Type'),
       CRM_Financial_BAO_PaymentProcessor::buildOptions('payment_processor_type_id'),
-      TRUE,
-      ['onchange' => "reload(true)"]
+      TRUE
     );
 
     // Financial Account of account type asset CRM-11515
@@ -275,7 +230,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   }
 
   /**
-   * @param $fields
+   * @param array $fields
    *
    * @return array|bool
    */
@@ -293,21 +248,17 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $errors['_qf_default'] = ts('You must have at least the test or live section filled');
     }
 
-    if (!empty($errors)) {
-      return $errors;
-    }
-
     return empty($errors) ? TRUE : $errors;
   }
 
   /**
-   * @param $fields
-   * @param $errors
-   * @param null $section
+   * @param array $fields
+   * @param array $errors
+   * @param string|null $section
    *
    * @return bool
    */
-  public static function checkSection(&$fields, &$errors, $section = NULL) {
+  public static function checkSection(&$fields, &$errors, $section = NULL): bool {
     $names = ['user_name'];
 
     $present = FALSE;
@@ -373,7 +324,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $defaults['payment_processor_type_id'] = $this->_paymentProcessorType;
     }
     else {
-      CRM_Core_Session::setStatus('Payment Processor Type (ID=' . $this->_paymentProcessorType . ') not found. Did you disable the payment processor extension?', 'Missing Payment Processor', 'alert');
+      CRM_Core_Session::setStatus(ts('Payment Processor Type (ID=%1) not found. Did you disable the payment processor extension?', [1 => $this->_paymentProcessorType]), ts('Missing Payment Processor'), 'alert');
     }
 
     $cards = json_decode(CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
@@ -409,13 +360,12 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   /**
    * Process the form submission.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function postProcess() {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Financial_BAO_PaymentProcessor::del($this->_id);
+      CRM_Financial_BAO_PaymentProcessor::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus("", ts('Payment Processor Deleted.'), "success");
       return NULL;
     }
@@ -435,18 +385,19 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $this->_paymentProcessorDAO->id = $values['payment_processor_type_id'];
       $this->_paymentProcessorDAO->find(TRUE);
     }
-    $this->updatePaymentProcessor($values, $domainID, FALSE);
     $this->updatePaymentProcessor($values, $domainID, TRUE);
-
-    $processor = civicrm_api3('payment_processor', 'getsingle', ['name' => $values['name'], 'is_test' => 0]);
-    $errors = Civi\Payment\System::singleton()->checkProcessorConfig($processor);
+    $paymentProcessorID = $this->updatePaymentProcessor($values, $domainID, FALSE);
+    // Set the ID so that if it fails checkConfig the refreshUrl takes it into account.
+    $this->_id = $paymentProcessorID;
+    $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
+    $errors = $processor->checkConfig();
     if ($errors) {
-      CRM_Core_Session::setStatus($errors, 'Payment processor configuration invalid', 'error');
+      CRM_Core_Session::setStatus($errors, ts('Payment processor configuration invalid'), 'error');
       Civi::log()->error('Payment processor configuration invalid: ' . $errors);
-      CRM_Core_Session::singleton()->pushUserContext($this->refreshURL);
+      CRM_Core_Session::singleton()->pushUserContext($this->getRefreshURL());
     }
     else {
-      CRM_Core_Session::setStatus(ts('Payment processor %1 has been saved.', [1 => "<em>{$values['name']}</em>"]), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('Payment processor %1 has been saved.', [1 => "<em>{$values['title']}</em>"]), ts('Saved'), 'success');
     }
   }
 
@@ -457,9 +408,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @param int $domainID
    * @param bool $test
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
-  public function updatePaymentProcessor(&$values, $domainID, $test) {
+  public function updatePaymentProcessor($values, $domainID, $test) {
     if ($test) {
       foreach (['user_name', 'password', 'signature', 'url_site', 'url_recur', 'url_api', 'url_button', 'subject'] as $field) {
         $values[$field] = empty($values["test_{$field}"]) ? CRM_Utils_Array::value($field, $values) : $values["test_{$field}"];
@@ -474,11 +425,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
           $creditCards[$type] = $creditCardTypes[$type];
         }
       }
-      $creditCards = json_encode($creditCards);
     }
-    else {
-      $creditCards = "NULL";
-    }
+
     $params = array_merge([
       'id' => $test ? $this->_testID : $this->_id,
       'domain_id' => $domainID,
@@ -491,10 +439,82 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       'payment_type' => $this->_paymentProcessorDAO->payment_type,
       'payment_instrument_id' => $this->_paymentProcessorDAO->payment_instrument_id,
       'financial_account_id' => $values['financial_account_id'],
-      'accepted_credit_cards' => $creditCards,
+      'accepted_credit_cards' => $creditCards ?? NULL,
     ], $values);
 
-    civicrm_api3('PaymentProcessor', 'create', $params);
+    return civicrm_api4('PaymentProcessor', 'save', [
+      'records' => [$params],
+    ])->first()['id'];
+  }
+
+  /**
+   * Set the payment processor type id as a form property
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function setPaymentProcessorTypeID(): void {
+    if ($this->_id) {
+      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, NULL);
+      if (!$this->_paymentProcessorType) {
+        $this->_paymentProcessorType = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
+          $this->_id,
+          'payment_processor_type_id'
+        );
+      }
+      $this->set('pp', $this->_paymentProcessorType);
+    }
+    else {
+      $paymentProcessorTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', [
+        'labelColumn' => 'name',
+        'flip' => 1,
+      ]);
+      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, $paymentProcessorTypes['PayPal']);
+    }
+  }
+
+  /**
+   * Get the relevant payment processor type id.
+   *
+   * @return int
+   */
+  protected function getPaymentProcessorTypeID(): int {
+    return (int) $this->_paymentProcessorType;
+  }
+
+  /**
+   * Set the payment processor as a form property.
+   */
+  protected function setPaymentProcessor(): void {
+    $this->_paymentProcessorDAO = new CRM_Financial_DAO_PaymentProcessorType();
+    $this->_paymentProcessorDAO->id = $this->getPaymentProcessorTypeID();
+    $this->_paymentProcessorDAO->find(TRUE);
+  }
+
+  /**
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private function getRefreshURL(): string {
+    if ($this->_id) {
+      $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor/edit',
+        "reset=1&action=update&id={$this->_id}",
+        FALSE, NULL, FALSE
+      );
+    }
+    else {
+      $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor/edit',
+        'reset=1&action=add',
+        FALSE, NULL, FALSE
+      );
+    }
+
+    //CRM-4129
+    $destination = CRM_Utils_Request::retrieve('civicrmDestination', 'String', $this);
+    if ($destination) {
+      $destination = urlencode($destination);
+      $refreshURL .= "&civicrmDestination=$destination";
+    }
+    return $refreshURL;
   }
 
 }

@@ -1,0 +1,39 @@
+<div af-api4-ctrl="tokens" af-api4="['OAuthSysToken', 'get', {'where': [['client_id', '=', options.clientId]]}]">
+</div>
+<div ng-if="tokens.result.length == 0">
+  {{ts('No tokens found')}}
+</div>
+
+<table class="table" ng-if="tokens.result.length > 0">
+  <tr>
+    <th>{{ts('ID')}}</th>
+    <th>{{ts('Tag')}}</th>
+    <th>{{ts('On Behalf Of')}}</th>
+    <th>{{ts('Scopes')}}</th>
+    <th>{{ts('Created Date')}}</th>
+    <th>{{ts('Actions')}}</th>
+  </tr>
+  <tr ng-repeat="token in tokens.result">
+    <td>{{token.id}}</td>
+    <td>{{token.tag}}</td>
+    <td>{{token.resource_owner_name}}</td>
+    <td>{{token.scopes.join(" ")}}</td>
+    <td>{{token.created_date}}</td>
+    <td>
+      <div class="btn-group">
+        <a class="btn btn-default"
+           ng-if="token.access_token"
+           ng-href="{{crmUrl('civicrm/admin/oauth-jwt-debug#!/', {id: token.id})}}"
+           target="_blank"
+        >{{ts('Inspect')}}</a>
+
+        <a class="btn btn-danger"
+           af-api4-action="['OAuthSysToken', 'delete', {where: [['id', '=', token.id]]}]"
+           af-api4-start-msg="ts('Deleting...')"
+           af-api4-success-msg="ts('Deleted')"
+           af-api4-success="tokens.refresh()"
+        >{{ts('Delete')}}</a>
+      </div>
+    </td>
+  </tr>
+</table>

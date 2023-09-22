@@ -6,8 +6,12 @@
  */
 class CRM_Utils_RuleTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  /**
+   * Set up for tests.
+   */
+  public function setUp(): void {
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**
@@ -15,7 +19,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @param $inputData
    * @param $expectedResult
    */
-  public function testInteger($inputData, $expectedResult) {
+  public function testInteger($inputData, $expectedResult): void {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::integer($inputData));
   }
 
@@ -38,7 +42,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @param $inputData
    * @param $expectedResult
    */
-  public function testPositive($inputData, $expectedResult) {
+  public function testPositive($inputData, $expectedResult): void {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::positiveInteger($inputData));
   }
 
@@ -61,7 +65,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @param $inputData
    * @param $expectedResult
    */
-  public function testNumeric($inputData, $expectedResult) {
+  public function testNumeric($inputData, $expectedResult): void {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::numeric($inputData));
   }
 
@@ -80,14 +84,37 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   }
 
   /**
+   * @dataProvider booleanDataProvider
+   * @param $inputData
+   * @param $expectedResult
+   */
+  public function testBoolean($inputData, $expectedResult): void {
+    $this->assertEquals($expectedResult, CRM_Utils_Rule::boolean($inputData));
+  }
+
+  /**
+   * @return array
+   */
+  public function booleanDataProvider() {
+    return [
+      [TRUE, TRUE],
+      ['TRUE', TRUE],
+      [FALSE, TRUE],
+      ['false', TRUE],
+      ['banana', FALSE],
+    ];
+  }
+
+  /**
    * @dataProvider moneyDataProvider
    * @param $inputData
    * @param $decimalPoint
    * @param $thousandSeparator
    * @param $currency
    * @param $expectedResult
+   * @group locale
    */
-  public function testMoney($inputData, $decimalPoint, $thousandSeparator, $currency, $expectedResult) {
+  public function testMoney($inputData, $decimalPoint, $thousandSeparator, $currency, $expectedResult): void {
     $this->setDefaultCurrency($currency);
     $this->setMonetaryDecimalPoint($decimalPoint);
     $this->setMonetaryThousandSeparator($thousandSeparator);
@@ -167,7 +194,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @param $inputData
    * @param $expectedResult
    */
-  public function testColor($inputData, $expectedResult) {
+  public function testColor($inputData, $expectedResult): void {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::color($inputData));
   }
 
@@ -208,7 +235,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @param $expectedResult
    * @dataProvider extenionKeyTests
    */
-  public function testExtenionKeyValid($key, $expectedResult) {
+  public function testExtenionKeyValid($key, $expectedResult): void {
     $this->assertEquals($expectedResult, CRM_Utils_Rule::checkExtensionKeyIsValid($key));
   }
 
@@ -254,8 +281,123 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @param $value
    * @param $expected
    */
-  public function testAlphanumeric($value, $expected) {
+  public function testAlphanumeric($value, $expected): void {
     $this->assertEquals($expected, CRM_Utils_Rule::alphanumeric($value));
+  }
+
+  /**
+   * Test Credit Cards
+   * @return array
+   */
+  public static function creditCards(): array {
+    $cases = [];
+    $cases[] = ['4111 1111 1111 1111', 'VISA'];
+    $cases[] = ['4111-1111-1111-1111', 'VISA'];
+    $cases[] = ['4111111111111111', 'VISA'];
+    $cases[] = ['5500 0000 0000 0004', 'MasterCard'];
+    $cases[] = ['2223000048400011', 'MasterCard'];
+    $cases[] = ['3400 0000 0000 009', 'AMEX'];
+    $cases[] = ['3088 0000 0000 0009', 'JCB'];
+    $cases[] = ['2014 0000 0000 009', 'ENROUTE'];
+    $cases[] = ['6011 0000 0000 0004', 'DISCOVER'];
+    $cases[] = ['3000 0000 0000 04', 'DINERSCLUB'];
+    return $cases;
+  }
+
+  /**
+   * Test Credit Card Validation
+   * @param string $number CreditCard number for testing
+   * @param string $type CreditCard type to match against.
+   * @dataProvider creditCards
+   */
+  public function testCreditCardValidation($number, $type): void {
+    $this->assertTrue(CRM_Utils_Rule::creditCardNumber($number, $type));
+  }
+
+  /**
+   * Test cvvs.
+   *
+   * @return array
+   */
+  public static function cvvs(): array {
+    $cases = [];
+    $cases[] = ['1', 'visa', FALSE];
+    $cases[] = ['23', 'visa', FALSE];
+    $cases[] = ['111', 'visa', TRUE];
+    $cases[] = ['123', 'visa', TRUE];
+    $cases[] = ['13', 'visa', FALSE];
+    $cases[] = ['1234', 'visa', FALSE];
+    $cases[] = ['897', 'mastercard', TRUE];
+    $cases[] = ['123', 'jcb', FALSE];
+    $cases[] = ['8765', 'jcb', FALSE];
+    $cases[] = ['8765', '', FALSE];
+    $cases[] = ['1234', 'amex', TRUE];
+    $cases[] = ['465', 'amex', FALSE];
+    $cases[] = ['10O7', 'amex', FALSE];
+    $cases[] = ['abc', 'visa', FALSE];
+    $cases[] = ['123.0', 'visa', FALSE];
+    $cases[] = ['1.2', 'visa', FALSE];
+    $cases[] = ['123', 'discover', TRUE];
+    $cases[] = ['4429', 'discover', FALSE];
+    return $cases;
+  }
+
+  /**
+   * Test CVV rule
+   * @param string $cvv cvv for testing
+   * @param string $type card type for testing
+   * @param bool $expected expected outcome of the rule validation
+   * @dataProvider cvvs
+   */
+  public function testCvvRule($cvv, $type, $expected): void {
+    $this->assertEquals($expected, CRM_Utils_Rule::cvv($cvv, $type));
+  }
+
+  /**
+   * Test Email rule
+   *
+   * @param string $email
+   * @param bool $expected expected outcome of the rule validation
+   *
+   * @dataProvider emails
+   */
+  public function testEmailRule(string $email, bool $expected): void {
+    $this->assertEquals($expected, CRM_Utils_Rule::email($email));
+  }
+
+  /**
+   * Test emails.
+   *
+   * @return array
+   */
+  public static function emails(): array {
+    $cases = [];
+    $cases['name.-o-.i.10@example.com'] = ['name.-o-.i.10@example.com', TRUE];
+    $cases['test@ēxāmplē.co.nz'] = ['test@ēxāmplē.co.nz', TRUE];
+    $cases['test@localhost'] = ['test@localhost', TRUE];
+    $cases['test@ēxāmplē.co'] = ['test@exāmple', FALSE];
+    return $cases;
+  }
+
+  public static function urls(): array {
+    $urls = [];
+    $urls[] = ['https://mysite.org/index.php/apps/files/?dir=/Talk/Test%20Folder1/Test%20Folder%202&fileid=597195', TRUE];
+    $urls[] = ['http://täst.de', TRUE];
+    $urls[] = ['https://الاردن.jo', TRUE];
+    $urls[] = ['I didn\'t say Simon Says', FALSE];
+    return $urls;
+  }
+
+  /**
+   * Test URL rule
+   *
+   * @param string $url
+   * @param bool $expected expected outcome of the rule validation
+   *
+   * @dataProvider urls
+   */
+  public function testUrlRule(string $url, bool $expected): void {
+    $this->assertEquals($expected, CRM_Utils_Rule::url($url));
   }
 
 }

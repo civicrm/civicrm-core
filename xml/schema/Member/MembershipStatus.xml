@@ -7,13 +7,23 @@
   <comment>Membership Status stores admin configurable rules for assigning status to memberships.</comment>
   <add>1.5</add>
   <log>true</log>
+  <component>CiviMember</component>
+  <labelField>label</labelField>
+  <paths>
+    <add>civicrm/admin/member/membershipStatus?action=add&amp;reset=1</add>
+    <update>civicrm/admin/member/membershipStatus?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/member/membershipStatus?action=delete&amp;id=[id]&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Membership Status ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Membership Id</comment>
+    <comment>Membership ID</comment>
     <add>1.5</add>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -26,6 +36,7 @@
     <type>varchar</type>
     <import>true</import>
     <length>128</length>
+    <required>true</required>
     <comment>Name for Membership Status</comment>
     <add>1.5</add>
   </field>
@@ -52,6 +63,7 @@
     <add>1.5</add>
     <html>
       <type>Select</type>
+      <label>Start Event</label>
     </html>
   </field>
   <field>
@@ -65,12 +77,16 @@
     <add>1.5</add>
     <html>
       <type>Select</type>
+      <label>Start Event Adjust Unit</label>
     </html>
   </field>
   <field>
     <name>start_event_adjust_interval</name>
     <type>int</type>
     <comment>Status range begins this many units from start_event.</comment>
+    <html>
+      <label>Start Event Adjust Interval</label>
+    </html>
     <add>1.5</add>
   </field>
   <field>
@@ -84,6 +100,7 @@
     <add>1.5</add>
     <html>
       <type>Select</type>
+      <label>End Event</label>
     </html>
   </field>
   <field>
@@ -97,18 +114,24 @@
     <add>1.5</add>
     <html>
       <type>Select</type>
+      <label>End Event Adjust Unit</label>
     </html>
   </field>
   <field>
     <name>end_event_adjust_interval</name>
     <type>int</type>
     <comment>Status range ends this many units from end_event.</comment>
+    <html>
+      <label>End Event Adjust Interval</label>
+    </html>
     <add>1.5</add>
   </field>
   <field>
     <name>is_current_member</name>
     <title>Current Membership?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>Does this status aggregate to current members (e.g. New, Renewed, Grace might all be TRUE... while Unrenewed, Lapsed, Inactive would be FALSE).</comment>
     <add>1.5</add>
   </field>
@@ -120,6 +143,8 @@
     <html>
       <type>CheckBox</type>
     </html>
+    <default>0</default>
+    <required>true</required>
     <add>1.5</add>
   </field>
   <field>
@@ -132,8 +157,11 @@
     <name>is_default</name>
     <title>Default Status?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <html>
       <type>CheckBox</type>
+      <label>Default</label>
     </html>
     <comment>Assign this status to a membership record if no other status match is found.</comment>
     <add>1.5</add>
@@ -143,8 +171,10 @@
     <title>Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
     <comment>Is this membership_status enabled.</comment>
     <add>1.5</add>
@@ -154,6 +184,7 @@
     <title>Is Reserved</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <html>
       <type>CheckBox</type>
     </html>

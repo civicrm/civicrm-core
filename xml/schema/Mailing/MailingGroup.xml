@@ -6,11 +6,15 @@
   <name>civicrm_mailing_group</name>
   <comment>Stores information about the groups that participate in this mailing..</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Mailing Group ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -18,10 +22,13 @@
   </primaryKey>
   <field>
     <name>mailing_id</name>
-    <title>Mailing</title>
+    <title>Mailing ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>The ID of a previous mailing to include/exclude recipients.</comment>
+    <html>
+      <label>Mailing</label>
+    </html>
   </field>
   <foreignKey>
     <name>mailing_id</name>

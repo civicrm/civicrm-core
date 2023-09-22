@@ -10,7 +10,7 @@
 {* this template is used for displaying PCP information *}
 {if $owner}
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
   <p><strong>{ts}Personal Campaign Preview{/ts}</strong> - {ts}This is a preview of your Personal Campaign Page in support of{/ts} <a href="{$parentURL}"><strong>{$pageName}</strong></a>.</p>
         {ts}The current status of your page is{/ts}: <strong {if $pcp.status_id NEQ 2}class=disabled {/if}>{$owner.status}</strong>.
         {if $pcp.status_id NEQ 2}<br /><span class="description">{ts}You will receive an email notification when your page is Approved and you can begin promoting your campaign.{/ts}</span>{/if}
@@ -38,7 +38,7 @@
 <div class="campaign">
 {crmRegion name="pcp-page-pcpinfo"}
     <div class="pcp-intro-text">
-      {$pcp.intro_text}
+      {$pcp.intro_text|purify}
   </div>
     {if $image}
     <div class="pcp-image">
@@ -50,7 +50,7 @@
       {if $pcp.is_thermometer}
       <div class="thermometer-wrapper">
           <div class="pcp-amount-goal">
-            {ts}Goal{/ts} <span class="goal-amount crmMoney">{$pcp.goal_amount|crmMoney}</span>
+            {ts}Goal{/ts} <span class="goal-amount crmMoney">{$pcp.goal_amount|crmMoney:$currency}</span>
         </div>
         <div class="thermometer-fill-wrapper">
             <div style="height: {$achieved}%;" class="thermometer-fill">
@@ -58,7 +58,7 @@
             </div><!-- /.thermometer-fill -->
         </div><!-- /.thermometer-fill-wrapper -->
         <div class="pcp-amount-raised">
-             <span class="raised-amount crmMoney">{$total|crmMoney}</span> {ts}raised{/ts}
+             <span class="raised-amount crmMoney">{$total|crmMoney:$currency}</span> {ts}raised{/ts}
         </div>
     </div>
       {/if}
@@ -77,7 +77,7 @@
               </marquee>
           </div>
           <div class="description">
-              [<a href="#" onclick="roll_start_stop(); return false;" id="roll" title="Stop scrolling">{ts}Stop{/ts}</a>]
+              [<a href="#" onclick="roll_start_stop(); return false;" id="roll" title="{ts}Stop scrolling{/ts}">{ts}Stop{/ts}</a>]
           </div>
         </div>
      {/if}

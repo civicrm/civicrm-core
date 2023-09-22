@@ -10,7 +10,7 @@
  */
 
 /**
- * Class CRM_Contribute_Form_Tasktest
+ * Class CRM_Contribute_Form_TaskTest
  */
 class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
 
@@ -18,10 +18,12 @@ class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
-    CRM_Utils_Hook::singleton()->reset();
+    parent::tearDown();
   }
 
   /**
@@ -30,12 +32,13 @@ class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testPreProcessCommonAfterSorting() {
+  public function testPreProcessCommonAfterSorting(): void {
     $fields = [
       'source' => 'contribution_source',
       'status' => 'contribution_status',
       'financialTypes' => 'financial_type',
     ];
+    $contributionIds = [];
     $financialTypes = ['Member Dues', 'Event Fee', 'Donation'];
     $status = ['Completed', 'Partially paid', 'Pending'];
     $source = ['test source text', 'check source text', 'source text'];
@@ -65,10 +68,10 @@ class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
       $expectedValues[$fld] = $sortedFields;
     }
 
-    // Assert contribIds are returned in a sorted order.
-    $form = new CRM_Contribute_Form_Task();
-    $form->controller = new CRM_Core_Controller();
     foreach ($fields as $val) {
+      // Assert contribIds are returned in a sorted order.
+      /** @var CRM_Contribute_Form_Task $form */
+      $form = $this->getSearchFormObject('CRM_Contribute_Form_Task', ['radio_ts' => 'ts_all'], 'Search');
       $form->set(CRM_Utils_Sort::SORT_ORDER, "`{$val}` asc");
       CRM_Contribute_Form_Task::preProcessCommon($form);
 

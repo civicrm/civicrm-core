@@ -7,9 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{* this template is used for adding/editing location type  *}
+{* this template is used for editing Date Preferences *}
 <div class="crm-block crm-form-block crm-preferences-date-form-block">
-        <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class='form-layout-compressed'>
             <tr class="crm-preferences-date-form-block-name">
                 <td class="label">{$form.name.label}</td><td>{$form.name.html}</td>
@@ -20,7 +19,7 @@
             <tr class="crm-preferences-date-form-block-date_format">
                 <td class="label">{$form.date_format.label}</td><td>{$form.date_format.html}</td>
             </tr>
-            {if $form.time_format.label}
+            {if !empty($form.time_format.label)}
             <tr class="crm-preferences-date-form-block-time_format">
                 <td class="label">{$form.time_format.label}</td><td>{$form.time_format.html}</td>
             </tr>

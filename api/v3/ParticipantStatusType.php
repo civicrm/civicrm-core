@@ -53,12 +53,12 @@ function civicrm_api3_participant_status_type_get($params) {
  * @param array $params
  *   [id]
  * @return array api result array
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_participant_status_type_delete($params) {
   if (CRM_Event_BAO_ParticipantStatusType::deleteParticipantStatusType($params['id'])) {
     return civicrm_api3_create_success(TRUE);
   }
 
-  throw new API_Exception('Could not delete participant status type id ' . $params['id']);
+  throw new CRM_Core_Exception('Could not delete participant status type id ' . $params['id']);
 }

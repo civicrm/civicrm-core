@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -43,8 +41,40 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
     if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
       return TRUE;
     }
-    $acct = $userId ? \Drupal\user\Entity\User::load($userId) : \Drupal::currentUser();
+    $acct = ($userId === 0 ? \Drupal\user\Entity\User::getAnonymousUser() : ($userId ? \Drupal\user\Entity\User::load($userId) : \Drupal::currentUser()));
     return $acct->hasPermission($str);
+  }
+
+  /**
+   * Get the palette of available permissions in the CMS's user-management system.
+   *
+   * @return array
+   *   List of permissions, keyed by symbolic name. Each item may have fields:
+   *     - title: string
+   *     - description: string
+   */
+  public function getAvailablePermissions() {
+    // We want to list *only* Drupal perms, so we'll *skip* Civi perms.
+    $allCorePerms = \CRM_Core_Permission::basicPermissions(TRUE);
+
+    $dperms = \Drupal::service('user.permissions')->getPermissions();
+    $modules = \Drupal::service('extension.list.module')->getAllInstalledInfo();
+
+    $permissions = [];
+    foreach ($dperms as $permName => $dperm) {
+      if (isset($allCorePerms[$permName])) {
+        continue;
+      }
+
+      $module = $modules[$dperm['provider']] ?? [];
+      $prefix = isset($module['name']) ? ($module['name'] . ': ') : '';
+      $permissions["Drupal:$permName"] = [
+        'title' => $prefix . strip_tags($dperm['title']),
+        'description' => $perm['description'] ?? NULL,
+      ];
+    }
+
+    return $permissions;
   }
 
   /**
@@ -79,6 +109,7 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
    * @inheritDoc
    */
   public function upgradePermissions($permissions) {
+    // @todo - this should probably call getCoreAndComponentPermissions.
     $civicrm_perms = array_keys(CRM_Core_Permission::getCorePermissions());
     if (empty($civicrm_perms)) {
       throw new CRM_Core_Exception("Cannot upgrade permissions: permission list missing");

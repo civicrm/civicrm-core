@@ -30,8 +30,8 @@
  * @return array
  *   API Result Array
  *
- * @throws \CiviCRM_API3_Exception
- * @throws API_Exception
+ * @throws \CRM_Core_Exception
+ * @throws CRM_Core_Exception
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_create($params) {
@@ -44,7 +44,7 @@ function civicrm_api3_contact_create($params) {
   if (!empty($params['dupe_check'])) {
     $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised', [], $params['check_permission']);
     if (count($ids) > 0) {
-      throw new API_Exception("Found matching contacts: " . implode(',', $ids), "duplicate", ["ids" => $ids]);
+      throw new CRM_Core_Exception("Found matching contacts: " . implode(',', $ids), "duplicate", ["ids" => $ids]);
     }
   }
 
@@ -84,7 +84,7 @@ function civicrm_api3_contact_create($params) {
   if (empty($params['contact_type']) && $contactID) {
     $params['contact_type'] = CRM_Contact_BAO_Contact::getContactType($contactID);
     if (!$params['contact_type']) {
-      throw new API_Exception('Contact id ' . $contactID . ' not found.');
+      throw new CRM_Core_Exception('Contact id ' . $contactID . ' not found.');
     }
   }
 
@@ -99,7 +99,7 @@ function civicrm_api3_contact_create($params) {
   $contact = _civicrm_api3_contact_update($params, $contactID);
 
   if (is_a($contact, 'CRM_Core_Error')) {
-    throw new API_Exception($contact->_errors[0]['message']);
+    throw new CRM_Core_Exception($contact->_errors[0]['message']);
   }
   else {
     $values = [];
@@ -153,8 +153,7 @@ function _civicrm_api3_contact_create_spec(&$params) {
  * @return array
  *   API Result Array
  *
- * @throws \API_Exception
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_get($params) {
   $options = [];
@@ -172,7 +171,7 @@ function civicrm_api3_contact_get($params) {
  * @param array $params
  *
  * @return int
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_getcount($params) {
   $options = [];
@@ -451,7 +450,6 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
  * @return array
  *   API Result Array
  * @throws \CRM_Core_Exception
- * @throws \CiviCRM_API3_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_contact_delete($params) {
@@ -462,7 +460,7 @@ function civicrm_api3_contact_delete($params) {
   }
 
   if ($contactID == CRM_Core_Session::getLoggedInContactID()) {
-    throw new API_Exception('This contact record is linked to the currently logged in user account - and cannot be deleted.');
+    throw new CRM_Core_Exception('This contact record is linked to the currently logged in user account - and cannot be deleted.');
   }
   $restore = !empty($params['restore']);
   $skipUndelete = !empty($params['skip_undelete']);
@@ -471,13 +469,13 @@ function civicrm_api3_contact_delete($params) {
   // restrict permanent delete if a contact has financial trxn associated with it
   $error = NULL;
   if ($skipUndelete && CRM_Financial_BAO_FinancialItem::checkContactPresent([$contactID], $error)) {
-    throw new API_Exception($error['_qf_default']);
+    throw new CRM_Core_Exception($error['_qf_default']);
   }
   if (CRM_Contact_BAO_Contact::deleteContact($contactID, $restore, $skipUndelete,
     CRM_Utils_Array::value('check_permissions', $params))) {
     return civicrm_api3_create_success();
   }
-  throw new CiviCRM_API3_Exception('Could not delete contact');
+  throw new CRM_Core_Exception('Could not delete contact');
 }
 
 /**
@@ -488,12 +486,12 @@ function civicrm_api3_contact_delete($params) {
  * @param array $params
  *
  * @return null
- * @throws API_Exception
- * @throws CiviCRM_API3_Exception
+ * @throws CRM_Core_Exception
+ * @throws CRM_Core_Exception
  */
 function _civicrm_api3_contact_check_params(&$params) {
 
-  switch (strtolower(CRM_Utils_Array::value('contact_type', $params))) {
+  switch (strtolower($params['contact_type'] ?? '')) {
     case 'household':
       civicrm_api3_verify_mandatory($params, NULL, ['household_name']);
       break;
@@ -514,7 +512,7 @@ function _civicrm_api3_contact_check_params(&$params) {
 
   if (!empty($params['contact_sub_type']) && !empty($params['contact_type'])) {
     if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type']))) {
-      throw new API_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array) $params['contact_sub_type']));
+      throw new CRM_Core_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array) $params['contact_sub_type']));
     }
   }
 
@@ -528,12 +526,12 @@ function _civicrm_api3_contact_check_params(&$params) {
 
     // check for mismatch employer name and id
     if (!empty($params['employer_id']) && !in_array($params['employer_id'], $dupeIds)) {
-      throw new API_Exception('Employer name and Employer id Mismatch');
+      throw new CRM_Core_Exception('Employer name and Employer id Mismatch');
     }
 
     // show error if multiple organisation with same name exist
     if (empty($params['employer_id']) && (count($dupeIds) > 1)) {
-      throw new API_Exception('Found more than one Organisation with same Name.');
+      throw new CRM_Core_Exception('Found more than one Organisation with same Name.');
     }
 
     if ($dupeIds) {
@@ -562,7 +560,6 @@ function _civicrm_api3_contact_check_params(&$params) {
  * @return CRM_Contact_BAO_Contact|CRM_Core_Error
  *
  * @throws \CRM_Core_Exception
- * @throws \CiviCRM_API3_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function _civicrm_api3_contact_update($params, $contactID = NULL) {
@@ -580,7 +577,7 @@ function _civicrm_api3_contact_update($params, $contactID = NULL) {
  * @param array $params
  *   Array per getfields metadata.
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_greeting_format_params($params) {
@@ -626,7 +623,7 @@ function _civicrm_api3_greeting_format_params($params) {
     if ($customGreeting && $greetingId &&
       ($greetingId != array_search('Customized', $greetings))
     ) {
-      throw new API_Exception(ts('Provide either %1 greeting id and/or %1 greeting or custom %1 greeting',
+      throw new CRM_Core_Exception(ts('Provide either %1 greeting id and/or %1 greeting or custom %1 greeting',
         [1 => $key]
       ));
     }
@@ -634,14 +631,14 @@ function _civicrm_api3_greeting_format_params($params) {
     if ($greetingVal && $greetingId &&
       ($greetingId != CRM_Utils_Array::key($greetingVal, $greetings))
     ) {
-      throw new API_Exception(ts('Mismatch in %1 greeting id and %1 greeting',
+      throw new CRM_Core_Exception(ts('Mismatch in %1 greeting id and %1 greeting',
         [1 => $key]
       ));
     }
 
     if ($greetingId) {
       if (!$customGreeting && ($greetingId == array_search('Customized', $greetings))) {
-        throw new API_Exception(ts('Please provide a custom value for %1 greeting',
+        throw new CRM_Core_Exception(ts('Please provide a custom value for %1 greeting',
           [1 => $key]
         ));
       }
@@ -649,7 +646,7 @@ function _civicrm_api3_greeting_format_params($params) {
     elseif ($greetingVal) {
 
       if (!in_array($greetingVal, $greetings)) {
-        throw new API_Exception(ts('Invalid %1 greeting', [1 => $key]));
+        throw new CRM_Core_Exception(ts('Invalid %1 greeting', [1 => $key]));
       }
 
       $greetingId = CRM_Utils_Array::key($greetingVal, $greetings);
@@ -692,397 +689,6 @@ function _civicrm_api3_greeting_format_params($params) {
       unset($params["{$key}{$greeting}"]);
     }
   }
-}
-
-/**
- * Adjust Metadata for Get action.
- *
- * @param array $params
- *   Array of parameters determined by getfields.
- */
-function _civicrm_api3_contact_getquick_spec(&$params) {
-  $params['name']['api.required'] = TRUE;
-  $params['name']['title'] = ts('String to search on');
-  $params['name']['type'] = CRM_Utils_Type::T_STRING;
-  $params['field']['type'] = CRM_Utils_Type::T_STRING;
-  $params['field']['title'] = ts('Field to search on');
-  $params['field']['options'] = [
-    '',
-    'id',
-    'contact_id',
-    'external_identifier',
-    'first_name',
-    'last_name',
-    'job_title',
-    'postal_code',
-    'street_address',
-    'email',
-    'city',
-    'phone_numeric',
-  ];
-  $params['table_name']['type'] = CRM_Utils_Type::T_STRING;
-  $params['table_name']['title'] = ts('Table alias to search on');
-  $params['table_name']['api.default'] = 'cc';
-}
-
-/**
- * Old Contact quick search api.
- *
- * @deprecated
- *
- * @param array $params
- *
- * @return array
- * @throws \API_Exception
- */
-function civicrm_api3_contact_getquick($params) {
-  $name = CRM_Utils_Type::escape(CRM_Utils_Array::value('name', $params), 'String');
-  $table_name = CRM_Utils_String::munge($params['table_name']);
-  // get the autocomplete options from settings
-  $acpref = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-    CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'contact_autocomplete_options'
-    )
-  );
-
-  $table_names = [
-    'email' => 'eml',
-    'phone_numeric' => 'phe',
-    'street_address' => 'sts',
-    'city' => 'sts',
-    'postal_code' => 'sts',
-  ];
-
-  // get the option values for contact autocomplete
-  $acOptions = CRM_Core_OptionGroup::values('contact_autocomplete_options', FALSE, FALSE, FALSE, NULL, 'name');
-
-  $list = $from = [];
-  foreach ($acpref as $value) {
-    if ($value && !empty($acOptions[$value])) {
-      $list[$value] = $acOptions[$value];
-    }
-  }
-  // If we are doing quicksearch by a field other than name, make sure that field is added to results
-  if (!empty($params['field_name'])) {
-    $field_name = CRM_Utils_String::munge($params['field_name']);
-    // there is no good reason to request api_key via getquick
-    if ($field_name == 'api_key') {
-      throw new API_Exception('Illegal value "api_key" for parameter "field_name"');
-    }
-    // Unique name contact_id = id
-    if ($field_name == 'contact_id') {
-      $field_name = 'id';
-    }
-    // core#1420 : trim non-numeric character from phone search string
-    elseif ($field_name == 'phone_numeric') {
-      $name = preg_replace('/[^\d]/', '', $name);
-    }
-    if (isset($table_names[$field_name])) {
-      $table_name = $table_names[$field_name];
-    }
-    elseif (strpos($field_name, 'custom_') === 0) {
-      $customField = civicrm_api3('CustomField', 'getsingle', [
-        'id' => substr($field_name, 7),
-        'return' => [
-          'custom_group_id.table_name',
-          'column_name',
-          'data_type',
-          'option_group_id',
-          'html_type',
-        ],
-      ]);
-      $field_name = $customField['column_name'];
-      $table_name = CRM_Utils_String::munge($customField['custom_group_id.table_name']);
-      $from[$field_name] = "LEFT JOIN `$table_name` ON cc.id = `$table_name`.entity_id";
-      if (CRM_Core_BAO_CustomField::hasOptions($customField)) {
-        $customOptionsWhere = [];
-        $customFieldOptions = CRM_Contact_BAO_Contact::buildOptions('custom_' . $customField['id'], 'search');
-        $isMultivalueField = CRM_Core_BAO_CustomField::isSerialized($customField);
-        $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-        foreach ($customFieldOptions as $optionKey => $optionLabel) {
-          if (mb_stripos($optionLabel, $name) !== FALSE) {
-            $customOptionsWhere[$optionKey] = "$table_name.$field_name " . ($isMultivalueField ? "LIKE '%{$sep}{$optionKey}{$sep}%'" : "= '$optionKey'");
-          }
-        }
-      }
-    }
-    // phone_numeric should be phone
-    $searchField = str_replace('_numeric', '', $field_name);
-    if (!in_array($searchField, $list)) {
-      $list[] = $searchField;
-    }
-  }
-  else {
-    // Set field name to first name for exact match checking.
-    $field_name = 'sort_name';
-  }
-
-  $select = $actualSelectElements = ['sort_name'];
-  $where = '';
-  foreach ($list as $value) {
-    $suffix = substr($value, 0, 2) . substr($value, -1);
-    switch ($value) {
-      case 'street_address':
-      case 'city':
-      case 'postal_code':
-        $selectText = $value;
-        $value = "address";
-        $suffix = 'sts';
-      case 'phone':
-      case 'email':
-        $actualSelectElements[] = $select[] = ($value == 'address') ? $selectText : $value;
-        if ($value == 'phone') {
-          $actualSelectElements[] = $select[] = 'phone_ext';
-        }
-        $from[$value] = "LEFT JOIN civicrm_{$value} {$suffix} ON ( cc.id = {$suffix}.contact_id AND {$suffix}.is_primary = 1 ) ";
-        break;
-
-      case 'country':
-      case 'state_province':
-        $select[] = "{$suffix}.name as {$value}";
-        $actualSelectElements[] = "{$suffix}.name";
-        if (!in_array('address', $from)) {
-          $from['address'] = 'LEFT JOIN civicrm_address sts ON ( cc.id = sts.contact_id AND sts.is_primary = 1) ';
-        }
-        $from[$value] = " LEFT JOIN civicrm_{$value} {$suffix} ON ( sts.{$value}_id = {$suffix}.id  ) ";
-        break;
-
-      default:
-        if ($value == 'id') {
-          $actualSelectElements[] = 'cc.id';
-        }
-        elseif ($value != 'sort_name') {
-          $suffix = 'cc';
-          if ($field_name == $value) {
-            $suffix = $table_name;
-          }
-          $actualSelectElements[] = $select[] = $suffix . '.' . $value;
-        }
-        break;
-    }
-  }
-
-  $config = CRM_Core_Config::singleton();
-  $as = $select;
-  $select = implode(', ', $select);
-  if (!empty($select)) {
-    $select = ", $select";
-  }
-  $actualSelectElements = implode(', ', $actualSelectElements);
-  $from = implode(' ', $from);
-  $limit = (int) ($params['limit'] ?? 0);
-  $limit = $limit > 0 ? $limit : Civi::settings()->get('search_autocomplete_count');
-
-  // add acl clause here
-  list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
-
-  if ($aclWhere) {
-    $where .= " AND $aclWhere ";
-  }
-  $isPrependWildcard = \Civi::settings()->get('includeWildCardInName');
-
-  if (!empty($params['org'])) {
-    $where .= " AND contact_type = \"Organization\"";
-
-    // CRM-7157, hack: get current employer details when
-    // employee_id is present.
-    $currEmpDetails = [];
-    if (!empty($params['employee_id'])) {
-      if ($currentEmployer = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        (int) $params['employee_id'],
-        'employer_id'
-      )) {
-        if ($isPrependWildcard) {
-          $strSearch = "%$name%";
-        }
-        else {
-          $strSearch = "$name%";
-        }
-
-        // get current employer details
-        $dao = CRM_Core_DAO::executeQuery("SELECT cc.id as id, CONCAT_WS( ' :: ', {$actualSelectElements} ) as data, sort_name
-                    FROM civicrm_contact cc {$from} WHERE cc.contact_type = \"Organization\" AND cc.id = {$currentEmployer} AND cc.sort_name LIKE '$strSearch'");
-        if ($dao->fetch()) {
-          $currEmpDetails = [
-            'id' => $dao->id,
-            'data' => $dao->data,
-          ];
-        }
-      }
-    }
-  }
-
-  if (!empty($params['contact_sub_type'])) {
-    $contactSubType = CRM_Utils_Type::escape($params['contact_sub_type'], 'String');
-    $where .= " AND cc.contact_sub_type = '{$contactSubType}'";
-  }
-
-  if (!empty($params['contact_type'])) {
-    $contactType = CRM_Utils_Type::escape($params['contact_type'], 'String');
-    $where .= " AND cc.contact_type LIKE '{$contactType}'";
-  }
-
-  // Set default for current_employer or return contact with particular id
-  if (!empty($params['id'])) {
-    $where .= " AND cc.id = " . (int) $params['id'];
-  }
-
-  if (!empty($params['cid'])) {
-    $where .= " AND cc.id <> " . (int) $params['cid'];
-  }
-
-  // Contact's based of relationhip type
-  $relType = NULL;
-  if (!empty($params['rel'])) {
-    $relation = explode('_', $params['rel']);
-    $relType = CRM_Utils_Type::escape($relation[0], 'Integer');
-    $rel = CRM_Utils_Type::escape($relation[2], 'String');
-  }
-
-  if ($isPrependWildcard) {
-    $strSearch = "%$name%";
-  }
-  else {
-    $strSearch = "$name%";
-  }
-  $includeEmailFrom = $includeNickName = '';
-  if ($config->includeNickNameInName) {
-    $includeNickName = " OR nick_name LIKE '$strSearch'";
-  }
-
-  if (isset($customOptionsWhere)) {
-    $customOptionsWhere = $customOptionsWhere ?: [0];
-    $whereClause = " WHERE (" . implode(' OR ', $customOptionsWhere) . ") $where";
-  }
-  elseif (!empty($params['field_name']) && !empty($params['table_name']) && $params['field_name'] != 'sort_name') {
-    $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch') {$where}";
-    // Search by id should be exact
-    if ($field_name == 'id' || $field_name == 'external_identifier') {
-      $whereClause = " WHERE ( $table_name.$field_name = '$name') {$where}";
-    }
-  }
-  else {
-    $whereClause = " WHERE ( sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
-    if ($config->includeEmailInName) {
-      if (!in_array('email', $list)) {
-        $includeEmailFrom = "LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id AND eml.is_primary = 1 )";
-      }
-      $emailWhere = " WHERE email LIKE '$strSearch'";
-    }
-  }
-
-  $additionalFrom = '';
-  if ($relType) {
-    $additionalFrom = "
-            INNER JOIN civicrm_relationship_type r ON (
-                r.id = {$relType}
-                AND ( cc.contact_type = r.contact_type_{$rel} OR r.contact_type_{$rel} IS NULL )
-                AND ( cc.contact_sub_type = r.contact_sub_type_{$rel} OR r.contact_sub_type_{$rel} IS NULL )
-            )";
-  }
-
-  // check if only CMS users are requested
-  if (!empty($params['cmsuser'])) {
-    $additionalFrom = "
-      INNER JOIN civicrm_uf_match um ON (um.contact_id=cc.id)
-      ";
-  }
-  $orderBy = _civicrm_api3_quicksearch_get_order_by($name, $isPrependWildcard, $field_name);
-
-  //CRM-5954
-  $query = "
-        SELECT DISTINCT(id), data, sort_name, exactFirst
-        FROM   (
-            ( SELECT IF($table_name.$field_name = '{$name}', 0, 1) as exactFirst, cc.id as id, CONCAT_WS( ' :: ',
-            {$actualSelectElements} )
-             as data
-            {$select}
-            FROM   civicrm_contact cc {$from}
-    {$aclFrom}
-    {$additionalFrom}
-    {$whereClause}
-    {$orderBy}
-    LIMIT 0, {$limit} )
-    ";
-
-  if (!empty($emailWhere)) {
-    $query .= "
-      UNION (
-        SELECT IF($table_name.$field_name = '{$name}', 0, 1) as exactFirst, cc.id as id, CONCAT_WS( ' :: ',
-          {$actualSelectElements} )
-          as data
-          {$select}
-          FROM   civicrm_contact cc {$from}
-        {$aclFrom}
-        {$additionalFrom} {$includeEmailFrom}
-        {$emailWhere} AND cc.is_deleted = 0 " . ($aclWhere ? " AND $aclWhere " : '') . "
-        {$orderBy}
-      LIMIT 0, {$limit}
-      )
-    ";
-  }
-  $query .= ") t
-    {$orderBy}
-    LIMIT    0, {$limit}
-  ";
-
-  // send query to hook to be modified if needed
-  CRM_Utils_Hook::contactListQuery($query,
-    $name,
-    empty($params['context']) ? NULL : CRM_Utils_Type::escape($params['context'], 'String'),
-    empty($params['id']) ? NULL : $params['id']
-  );
-
-  $dao = CRM_Core_DAO::executeQuery($query);
-
-  $contactList = [];
-  $listCurrentEmployer = TRUE;
-  while ($dao->fetch()) {
-    $t = ['id' => $dao->id];
-    foreach ($as as $k) {
-      $t[$k] = $dao->$k ?? '';
-    }
-    $t['data'] = $dao->data;
-    // Replace keys with values when displaying fields from an option list
-    if (!empty($customOptionsWhere)) {
-      $data = explode(' :: ', $dao->data);
-      $pos = count($data) - 1;
-      $customValue = array_intersect(CRM_Utils_Array::explodePadded($data[$pos]), array_keys($customOptionsWhere));
-      $data[$pos] = implode(', ', array_intersect_key($customFieldOptions, array_flip($customValue)));
-      $t['data'] = implode(' :: ', $data);
-    }
-    $contactList[] = $t;
-    if (!empty($params['org']) &&
-      !empty($currEmpDetails) &&
-      $dao->id == $currEmpDetails['id']
-    ) {
-      $listCurrentEmployer = FALSE;
-    }
-  }
-
-  //return organization name if doesn't exist in db
-  if (empty($contactList)) {
-    if (!empty($params['org'])) {
-      if ($listCurrentEmployer && !empty($currEmpDetails)) {
-        $contactList = [
-          [
-            'data' => $currEmpDetails['data'],
-            'id' => $currEmpDetails['id'],
-          ],
-        ];
-      }
-      else {
-        $contactList = [
-          [
-            'data' => $name,
-            'id' => $name,
-          ],
-        ];
-      }
-    }
-  }
-
-  return civicrm_api3_create_success($contactList, $params, 'Contact', 'getquick');
 }
 
 /**
@@ -1138,30 +744,17 @@ function _civicrm_api3_quicksearch_get_order_by($name, $isPrependWildcard, $fiel
 }
 
 /**
- * Declare deprecated api functions.
- *
- * @deprecated api notice
- * @return array
- *   Array of deprecated actions
- */
-function _civicrm_api3_contact_deprecation() {
-  return ['getquick' => 'The "getquick" action is deprecated in favor of "getlist".'];
-}
-
-/**
  * Merges given pair of duplicate contacts.
  *
  * @param array $params
  *   Allowed array keys are:
- *   -int main_id: main contact id with whom merge has to happen
- *   -int other_id: duplicate contact which would be deleted after merge operation
+ *   -int to_keep_id: main contact id with whom merge has to happen
+ *   -int to_remove_id: duplicate contact which would be deleted after merge operation
  *   -string mode: "safe" skips the merge if there are no conflicts. Does a force merge otherwise.
  *
  * @return array
  *   API Result Array
  *
- * @throws API_Exception
- * @throws \CiviCRM_API3_Exception
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_merge($params) {
@@ -1175,7 +768,7 @@ function civicrm_api3_contact_merge($params) {
 
     return civicrm_api3_create_success($result, $params);
   }
-  throw new API_Exception('Merge failed');
+  throw new CRM_Core_Exception('Merge failed');
 }
 
 /**
@@ -1219,8 +812,7 @@ function _civicrm_api3_contact_merge_spec(&$params) {
  *   API Result Array
  *
  * @throws \CRM_Core_Exception
- * @throws \CiviCRM_API3_Exception
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_get_merge_conflicts($params) {
   $migrationInfo = [];
@@ -1228,7 +820,7 @@ function civicrm_api3_contact_get_merge_conflicts($params) {
   foreach ((array) $params['mode'] as $mode) {
     $result[$mode] = CRM_Dedupe_Merger::getConflicts(
       $migrationInfo,
-      $params['to_remove_id'], $params['to_keep_id'],
+      (int) $params['to_remove_id'], (int) $params['to_keep_id'],
       $mode
     );
   }
@@ -1266,7 +858,7 @@ function _civicrm_api3_contact_get_merge_conflicts_spec(&$params) {
  * @return array
  *   API Result Array
  *
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_getmergedto($params) {
   $contactID = _civicrm_api3_contact_getmergedto($params);
@@ -1290,7 +882,7 @@ function civicrm_api3_contact_getmergedto($params) {
  *
  * @return int|false
  *
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_contact_getmergedto($params) {
   $contactID = FALSE;
@@ -1343,7 +935,7 @@ function _civicrm_api3_contact_getmergedto_spec(&$params) {
  * @return array
  *   API Result Array
  *
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_getmergedfrom($params) {
   $contacts = _civicrm_api3_contact_getmergedfrom($params);
@@ -1357,7 +949,7 @@ function civicrm_api3_contact_getmergedfrom($params) {
  *
  * @return array
  *
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_contact_getmergedfrom($params) {
   $activities = [];
@@ -1452,7 +1044,7 @@ function civicrm_api3_contact_proximity($params) {
     !CRM_Utils_Rule::numeric($longitude) ||
     !CRM_Utils_Rule::numeric($distance)
   ) {
-    throw new API_Exception(ts('Latitude, Longitude and Distance should exist and be numeric'));
+    throw new CRM_Core_Exception(ts('Latitude, Longitude and Distance should exist and be numeric'));
   }
 
   if ($unit === 'mile') {
@@ -1599,13 +1191,19 @@ function _civicrm_api3_contact_getlist_output($result, $request) {
  * @return array
  *   API formatted array
  *
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_duplicatecheck($params) {
+  if (!isset($params['match']) || !is_array($params['match'])) {
+    throw new \CRM_Core_Exception('Duplicate check must include criteria to check against (missing or invalid $params[\'match\']).');
+  }
+  if (!isset($params['match']['contact_type']) || !is_string($params['match']['contact_type'])) {
+    throw new \CRM_Core_Exception('Duplicate check must include a contact type. (missing or invalid $params[\'match\'][\'contact_type\'])');
+  }
   $dupes = CRM_Contact_BAO_Contact::getDuplicateContacts(
     $params['match'],
     $params['match']['contact_type'],
-    $params['rule_type'],
+    $params['rule_type'] ?? '',
     CRM_Utils_Array::value('exclude', $params, []),
     CRM_Utils_Array::value('check_permissions', $params),
     CRM_Utils_Array::value('dedupe_rule_id', $params)

@@ -46,7 +46,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    *
    * @var string
    */
-  protected $_permission;
+  public $_permission;
 
   /**
    * Heart of the viewing process.
@@ -143,9 +143,8 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     $path = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $this->_contactId);
     CRM_Utils_System::appendBreadCrumb([['title' => ts('View Contact'), 'url' => $path]]);
 
-    if ($image_URL = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'image_URL')) {
-      $this->assign("imageURL", CRM_Utils_File::getImageURL($image_URL));
-    }
+    $image_URL = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'image_URL');
+    $this->assign('imageURL', $image_URL ? CRM_Utils_File::getImageURL($image_URL) : '');
 
     // also store in session for future use
     $session = CRM_Core_Session::singleton();
@@ -157,21 +156,20 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // check logged in user permission
     self::checkUserPermission($this);
 
-    list($displayName, $contactImage, $contactType, $contactSubtype, $contactImageUrl) = self::getContactDetails($this->_contactId);
+    [$displayName, $contactImage, $contactType, $contactSubtype, $contactImageUrl] = self::getContactDetails($this->_contactId);
     $this->assign('displayName', $displayName);
 
     $this->set('contactType', $contactType);
 
     // note: there could still be multiple subtypes. We just trimming the outer separator.
-    $this->set('contactSubtype', trim($contactSubtype, CRM_Core_DAO::VALUE_SEPARATOR));
+    $this->set('contactSubtype', trim(($contactSubtype ?? ''), CRM_Core_DAO::VALUE_SEPARATOR));
 
     // add to recently viewed block
     $isDeleted = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'is_deleted');
 
     $recentOther = [
       'imageUrl' => $contactImageUrl,
-      'subtype' => $contactSubtype,
-      'isDeleted' => $isDeleted,
+      'is_deleted' => $isDeleted,
     ];
 
     if (CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
@@ -187,7 +185,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     CRM_Utils_Recent::add($displayName,
       CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_contactId}"),
       $this->_contactId,
-      $contactType,
+      'Contact',
       $this->_contactId,
       $displayName,
       $recentOther
@@ -208,19 +206,10 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
 
     // Add links for actions menu
     self::addUrls($this, $this->_contactId);
+    $this->assign('groupOrganizationUrl', $this->getGroupOrganizationUrl($contactType));
 
-    if ($contactType == 'Organization' &&
-      CRM_Core_Permission::check('administer Multiple Organizations') &&
-      Civi::settings()->get('is_enabled')) {
-      //check is any relationship between the organization and groups
-      $groupOrg = CRM_Contact_BAO_GroupOrganization::hasGroupAssociated($this->_contactId);
-      if ($groupOrg) {
-        $groupOrganizationUrl = CRM_Utils_System::url('civicrm/group',
-          "reset=1&oid={$this->_contactId}"
-        );
-        $this->assign('groupOrganizationUrl', $groupOrganizationUrl);
-      }
-    }
+    // Assign deleteURL variable, used as part of ContactImage.tpl
+    self::$_template->ensureVariablesAreAssigned(['deleteURL']);
   }
 
   /**
@@ -244,7 +233,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   }
 
   /**
-   * @param $page
+   * @param CRM_Core_Page $page
    * @param int $contactID
    */
   public static function checkUserPermission($page, $contactID = NULL) {
@@ -255,7 +244,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       $contactID = $page->_contactId;
     }
 
-    // automatically grant permissin for users on their own record. makes
+    // automatically grant permission for users on their own record. makes
     // things easier in dashboard
     $session = CRM_Core_Session::singleton();
 
@@ -292,7 +281,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     static $contactDetails;
     $contactImage = NULL;
     if (!isset($contactDetails[$contactId])) {
-      list($displayName, $contactImage) = self::getContactDetails($contactId);
+      [$displayName, $contactImage] = self::getContactDetails($contactId);
       $contactDetails[$contactId] = [
         'displayName' => $displayName,
         'contactImage' => $contactImage,
@@ -311,7 +300,13 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     }
     if ($isDeleted) {
       $title = "<del>{$title}</del>";
-      $mergedTo = civicrm_api3('Contact', 'getmergedto', ['contact_id' => $contactId, 'api.Contact.get' => ['return' => 'display_name']]);
+      try {
+        $mergedTo = civicrm_api3('Contact', 'getmergedto', ['contact_id' => $contactId, 'api.Contact.get' => ['return' => 'display_name']]);
+      }
+      catch (CRM_Core_Exception $e) {
+        CRM_Core_Session::singleton()->setStatus(ts('This contact was deleted during a merge operation. The contact it was merged into cannot be found and may have been deleted.'));
+        $mergedTo = ['count' => 0];
+      }
       if ($mergedTo['count']) {
         $mergedToContactID = $mergedTo['id'];
         $mergedToDisplayName = $mergedTo['values'][$mergedToContactID]['api.Contact.get']['values'][0]['display_name'];
@@ -335,16 +330,16 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    */
   public static function addUrls(&$obj, $cid) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
-
+    $obj->assign('userRecordId', $uid);
+    $userRecordUrl = '';
     if ($uid) {
       $userRecordUrl = CRM_Core_Config::singleton()->userSystem->getUserRecordUrl($cid);
-      $obj->assign('userRecordUrl', $userRecordUrl);
-      $obj->assign('userRecordId', $uid);
     }
     elseif (CRM_Core_Config::singleton()->userSystem->checkPermissionAddUser()) {
       $userAddUrl = CRM_Utils_System::url('civicrm/contact/view/useradd', 'reset=1&action=add&cid=' . $cid);
       $obj->assign('userAddUrl', $userAddUrl);
     }
+    $obj->assign('userRecordUrl', $userRecordUrl);
 
     if (CRM_Core_Permission::check('access Contact Dashboard')) {
       $dashboardURL = CRM_Utils_System::url('civicrm/user',
@@ -363,6 +358,21 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     if (is_array($hookLinks)) {
       $obj->assign('hookLinks', $hookLinks);
     }
+  }
+
+  /**
+   * @param string $contactType
+   *
+   * @return string
+   */
+  protected function getGroupOrganizationUrl(string $contactType): string {
+    if ($contactType !== 'Organization' || !CRM_Core_Permission::check('administer Multiple Organizations')
+      || !CRM_Contact_BAO_GroupOrganization::hasGroupAssociated($this->_contactId)
+      || !Civi::settings()->get('is_enabled')
+    ) {
+      return '';
+    }
+    return CRM_Utils_System::url('civicrm/group', "reset=1&oid={$this->_contactId}");
   }
 
 }

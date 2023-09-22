@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {*common template for compose PDF letters*}
-{if $form.template.html}
+{if !empty($form.template.html)}
 <table class="form-layout-compressed">
     <tr>
       <td class="label-left">
@@ -23,7 +23,7 @@
       <td class="label-left">{$form.subject.label}</td>
       <td>{$form.subject.html}</td>
     </tr>
-    {if $form.campaign_id}
+    {if !empty($form.campaign_id)}
     <tr>
       <td class="label-left">{$form.campaign_id.label}</td>
       <td>{$form.campaign_id.html}</td>
@@ -34,7 +34,7 @@
 
 <div class="crm-accordion-wrapper collapsed crm-pdf-format-accordion">
     <div class="crm-accordion-header">
-        {$form.pdf_format_header.html}
+      {ts}Page Format:{/ts} <span class="pdf-format-header-label"></span>
     </div>
     <div class="crm-accordion-body">
       <div class="crm-block crm-form-block">
@@ -52,7 +52,7 @@
         <td colspan="2">&nbsp;</td>
       </tr>
       <tr>
-        <td>{$form.paper_dimensions.html}</td><td id="paper_dimensions">&nbsp;</td>
+        <td>{ts}Width x Height{/ts}</td><td id="paper_dimensions">&nbsp;</td>
         <td colspan="2">&nbsp;</td>
       </tr>
       <tr>
@@ -92,7 +92,7 @@
  <div class="crm-accordion-body">
    <div class="helpIcon" id="helphtml">
      <input class="crm-token-selector big" data-field="html_message" />
-     {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
+     {help id="id-token-html" file="CRM/Contact/Form/Task/Email.hlp"}
    </div>
     <div class="clear"></div>
     <div class='html'>
@@ -233,7 +233,7 @@ function selectFormat( val, bind ) {
     bind = false;
   }
 
-  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/pdfFormat' h=0 }"{literal};
+  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/pdfFormat' h=0}"{literal};
   cj.post( dataUrl, {formatId: val}, function( data ) {
     fillFormatInfo(data, bind);
   }, 'json');
@@ -241,7 +241,7 @@ function selectFormat( val, bind ) {
 
 function selectPaper( val )
 {
-    dataUrl = {/literal}"{crmURL p='civicrm/ajax/paperSize' h=0 }"{literal};
+    dataUrl = {/literal}"{crmURL p='civicrm/ajax/paperSize' h=0}"{literal};
     cj.post( dataUrl, {paperSizeName: val}, function( data ) {
         cj("#paper_size").val( data.name );
         metric = document.getElementById('metric').value;

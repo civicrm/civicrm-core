@@ -79,7 +79,6 @@
 </script>
 {/literal}
 <div class="crm-block crm-form-block crm-price-field-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout">
     <tr class="crm-price-field-form-block-label">
       <td class="label">{$form.label.label}</td>
@@ -156,7 +155,7 @@
       <td class="label">{$form.is_display_amounts.label}</td>
       <td>{$form.is_display_amounts.html}
       {if $action neq 4}
-        <div class="description">{ts}Display amount next to each option? If no, then the amount should be in the option description.{/ts}</div>
+        <div class="description">{ts}Display amount next to each option?{/ts}</div>
       {/if}
       </td>
     </tr>
@@ -244,7 +243,7 @@
 {/literal}
 
 {* Give link to view/edit choice options if in edit mode and html_type is one of the multiple choice types *}
-{if $action eq 2 AND ($form.data_type.value.1.0 eq 'CheckBox' OR $form.data_type.value.1.0 eq 'Radio' OR $form.data_type.value.1.0 eq 'Select') }
+{if $action eq 2 AND ($form.data_type.value.1.0 eq 'CheckBox' OR $form.data_type.value.1.0 eq 'Radio' OR $form.data_type.value.1.0 eq 'Select')}
 <div class="action-link">
   <a href="{crmURL p="civicrm/admin/event/field/option" q="reset=1&action=browse&fid=`$fid`"}" class="button"><span>{ts}Multiple Choice Options{/ts}</span></a>
 </div>

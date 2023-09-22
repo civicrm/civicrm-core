@@ -38,7 +38,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
    */
   public function view() {
     if (empty($this->getEntityId())) {
-      CRM_Core_Error::statusBounce('Recurring contribution not found');
+      CRM_Core_Error::statusBounce(ts('Recurring contribution not found'));
     }
 
     try {
@@ -47,7 +47,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       ]);
     }
     catch (Exception $e) {
-      CRM_Core_Error::statusBounce('Recurring contribution not found (ID: ' . $this->getEntityId());
+      CRM_Core_Error::statusBounce(ts('Recurring contribution not found (ID: %1)', [1 => $this->getEntityId()]));
     }
 
     $contributionRecur['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName(
@@ -70,10 +70,25 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       $contributionRecur['membership_name'] = $membershipDetails['membership_name'];
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('ContributionRecur', NULL, $contributionRecur['id']);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('ContributionRecur', NULL, $contributionRecur['id'], NULL, [],
+      NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $contributionRecur['id']);
 
+    if (isset($contributionRecur['trxn_id']) && ($contributionRecur['processor_id'] === $contributionRecur['trxn_id'])) {
+      unset($contributionRecur['trxn_id']);
+    }
     $this->assign('recur', $contributionRecur);
+
+    $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($this->getEntityId());
+
+    $lineItems = [];
+    $displayLineItems = FALSE;
+    if (!empty($templateContribution['id'])) {
+      $lineItems = [CRM_Price_BAO_LineItem::getLineItemsByContributionID(($templateContribution['id']))];
+      $displayLineItems = TRUE;
+    }
+    $this->assign('lineItem', $lineItems);
+    $this->assign('displayLineItems', $displayLineItems);
 
     $displayName = CRM_Contact_BAO_Contact::displayName($contributionRecur['contact_id']);
     $this->assign('displayName', $displayName);
@@ -99,7 +114,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
    */
   public function run() {
     $this->preProcess();
-
+    $this->assign('hasAccessCiviContributePermission', CRM_Core_Permission::check('access CiviContribute'));
     if ($this->isViewContext()) {
       $this->view();
     }

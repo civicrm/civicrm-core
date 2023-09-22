@@ -57,7 +57,8 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
         return CRM_Utils_Rule::boolean($value);
 
       case 'ContactReference':
-        return CRM_Utils_Rule::validContact($value);
+      case 'EntityReference':
+        return CRM_Utils_Rule::positiveInteger($value);
 
       case 'StateProvince':
 
@@ -175,6 +176,9 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
       ) {
         $formValues[$key] = ['LIKE' => $formValues[$key]];
       }
+      elseif ($htmlType == 'Autocomplete-Select' && !empty($formValues[$key]) && is_string($formValues[$key]) && (strpos($formValues[$key], ',') != FALSE)) {
+        $formValues[$key] = ['IN' => explode(',', $formValues[$key])];
+      }
     }
   }
 
@@ -191,7 +195,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupID, 'table_name');
 
     // Retrieve the $entityId so we can pass that to the hook.
-    $entityID = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM {$tableName} WHERE id = %1", [
+    $entityID = (int) CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM {$tableName} WHERE id = %1", [
       1 => [$customValueID, 'Integer'],
     ]);
 
@@ -200,7 +204,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     CRM_Core_DAO::executeQuery($sql);
 
     CRM_Utils_Hook::custom('delete',
-      $customGroupID,
+      (int) $customGroupID,
       $entityID,
       $customValueID
     );
@@ -208,14 +212,72 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
 
   /**
    * ACL clause for an APIv4 custom pseudo-entity (aka multi-record custom group extending Contact).
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
    * @return array
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+    // To-date, custom-value-based entities are only supported for contacts.
+    // If this changes, $entityName variable contains the name of this custom group,
+    // and could be used to lookup the type of entity this custom group joins to.
     $clauses = [
       'entity_id' => CRM_Utils_SQL::mergeSubquery('Contact'),
     ];
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($entityName ?? $this, $clauses);
     return $clauses;
+  }
+
+  /**
+   * Special checkAccess function for multi-record custom pseudo-entities
+   *
+   * @param string $entityName
+   *   Ex: 'Contact' or 'Custom_Foobar'
+   * @param string $action
+   * @param array $record
+   * @param int $userID
+   *   Contact ID of the active user (whose access we must check). 0 for anonymous.
+   * @return bool
+   *   TRUE if granted. FALSE if prohibited. NULL if indeterminate.
+   */
+  public static function _checkAccess(string $entityName, string $action, array $record, int $userID): ?bool {
+    // This check implements two rules: you must have access to the specific custom-data-group - and to the underlying record (e.g. Contact).
+
+    $groupName = substr($entityName, 0, 7) === 'Custom_' ? substr($entityName, 7) : NULL;
+    $extends = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupName, 'extends', 'name');
+    $id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupName, 'id', 'name');
+    if (!$groupName) {
+      // $groupName is required but the function signature has to match the parent.
+      throw new CRM_Core_Exception('Missing required group-name in CustomValue::checkAccess');
+    }
+
+    if (empty($extends) || empty($id)) {
+      throw new CRM_Core_Exception('Received invalid group-name in CustomValue::checkAccess');
+    }
+
+    $actionType = $action === 'get' ? CRM_Core_Permission::VIEW : CRM_Core_Permission::EDIT;
+    if (!\CRM_Core_BAO_CustomGroup::checkGroupAccess($id, $actionType, $userID)) {
+      return FALSE;
+    }
+
+    $eid = $record['entity_id'] ?? NULL;
+    if (!$eid) {
+      $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupName, 'table_name', 'name');
+      $eid = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `$tableName` WHERE id = " . (int) $record['id']);
+    }
+
+    // Do we have access to the target record?
+    if ($extends === 'Contact' || in_array($extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
+      return \Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', 'update', ['id' => $eid], $userID);
+    }
+    elseif (\Civi\Api4\Utils\CoreUtil::getApiClass($extends)) {
+      // For most entities (Activity, Relationship, Contribution, ad nauseum), we acn just use an eponymous API.
+      return \Civi\Api4\Utils\CoreUtil::checkAccessDelegated($extends, 'update', ['id' => $eid], $userID);
+    }
+    else {
+      // Do you need to add a special case for some oddball custom-group type?
+      throw new CRM_Core_Exception("Cannot assess delegated permissions for group {$groupName}.");
+    }
   }
 
 }

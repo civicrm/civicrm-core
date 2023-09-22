@@ -13,6 +13,9 @@
     <title>Activity Contact ID</title>
     <required>true</required>
     <comment>Activity contact id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.4</add>
   </field>
   <primaryKey>
@@ -25,6 +28,9 @@
     <title>Activity ID</title>
     <required>true</required>
     <comment>Foreign key to the activity for this record.</comment>
+    <html>
+      <label>Activity</label>
+    </html>
     <add>4.4</add>
    </field>
    <foreignKey>
@@ -36,11 +42,14 @@
   </foreignKey>
    <field>
     <name>contact_id</name>
-    <title>Contact ID (match to contact)</title>
+    <title>Contact ID</title>
     <import>true</import>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to the contact for this record.</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>4.4</add>
    </field>
    <foreignKey>
@@ -53,13 +62,14 @@
   <field>
     <name>record_type_id</name>
     <type>int unsigned</type>
-    <title>Record Type ID</title>
-    <comment>Nature of this contact's role in the activity: 1 assignee, 2 creator, 3 focus or target.</comment>
+    <title>Activity Contact Type</title>
+    <comment>Determines the contact's role in the activity (source, target, or assignee).</comment>
     <pseudoconstant>
       <optionGroupName>activity_contacts</optionGroupName>
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Contact Role</label>
     </html>
     <add>4.4</add>
   </field>

@@ -164,7 +164,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     $details = CRM_Case_PseudoConstant::caseActivityType(FALSE);
 
-    CRM_Utils_System::setTitle($details[$this->_activityTypeId]['label']);
+    $this->setTitle($details[$this->_activityTypeId]['label']);
     $this->assign('activityType', $details[$this->_activityTypeId]['label']);
     $this->assign('activityTypeDescription', $details[$this->_activityTypeId]['description']);
 
@@ -174,8 +174,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       if (!$contact->find(TRUE)) {
         CRM_Core_Error::statusBounce(ts('Client contact does not exist: %1', [1 => $this->_currentlyViewedContactId]));
       }
-      $this->assign('clientName', $contact->display_name);
     }
+    $this->assign('clientName', isset($this->_currentlyViewedContactId) ? $contact->display_name : NULL);
 
     $session = CRM_Core_Session::singleton();
     $this->_currentUserId = $session->get('userID');
@@ -198,9 +198,9 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   /**
    * Set default values for the form.
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
-      return TRUE;
+      return [];
     }
     $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
     $defaults = $className::setDefaultValues($this);
@@ -389,12 +389,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     // 3. format activity custom data
     if (!empty($params['hidden_custom'])) {
-      $customFields = CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE, $this->_activityTypeId);
-      $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
-        CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE,
-          NULL, NULL, TRUE
-        )
-      );
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
         $this->_activityId,
         'Activity'

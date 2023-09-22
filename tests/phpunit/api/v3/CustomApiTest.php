@@ -19,12 +19,12 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
 
   protected $_apiversion = 3;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->installApi();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     CRM_Core_DAO::executeQuery('DROP TABLE civicrm_mailing_provider_data');
   }
@@ -35,7 +35,7 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
    * This api is a bit 'special' in that it has a composite primary key rather
    * than using 'id', make sure that works too....
    */
-  public function testCustomApi() {
+  public function testCustomApi(): void {
     $this->installApi();
     $this->callAPISuccess('MailingProviderData', 'create', [
       'contact_identifier' => 'xyz',
@@ -69,10 +69,10 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
   /**
    * Install the custom api.
    */
-  public function installApi() {
+  public function installApi(): void {
     require_once __DIR__ . '/custom_api/MailingProviderData.php';
     $this->hookClass->setHook('civicrm_entityTypes', [$this, 'hookEntityTypes']);
-    CRM_Core_DAO_AllCoreTables::init(TRUE);
+    CRM_Core_DAO_AllCoreTables::flush();
     CRM_Core_DAO::executeQuery(
       "CREATE TABLE IF NOT EXISTS `civicrm_mailing_provider_data` (
     `contact_identifier` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',

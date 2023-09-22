@@ -11,8 +11,6 @@
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
 {/if}
 
-{include file="CRM/common/TrackingFields.tpl"}
-
 <div class="crm-event-id-{$event.id} crm-block crm-event-thankyou-form-block">
     {* Don't use "normal" thank-you message for Waitlist and Approval Required registrations - since it will probably not make sense for those situations. dgg *}
     {if $event.thankyou_text AND (not $isOnWaitlist AND not $isRequireApproval)}
@@ -99,7 +97,7 @@
                 {/if}
                 {if $totalAmount}
                  <div class="crm-section no-label total-amount-section">
-                    <div class="content bold">{ts}Event Total{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>
+                    <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>
                     <div class="clear"></div>
                   </div>
 
@@ -156,7 +154,7 @@
     {/if}
 
     {include file="CRM/Event/Form/Registration/DisplayProfile.tpl"}
-    {if $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $paidEvent and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+    {if $billingName or $address}
         <div class="crm-group billing_name_address-group">
             <div class="header-dark">
                 {ts}Billing Name and Address{/ts}
@@ -198,7 +196,7 @@
         <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts 1=$event.event_title}Back to "%1" event information{/ts}</a>
     </div>
 
-    {if $event.is_public }
+    {if $event.is_public}
       <div class="action-link section iCal_links-section">
         {include file="CRM/Event/Page/iCalLinks.tpl"}
       </div>

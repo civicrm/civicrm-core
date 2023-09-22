@@ -30,7 +30,7 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
    */
   public $calls;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->calls = [
       'civicrm_alterMailer' => 0,
       'send' => 0,
@@ -38,7 +38,7 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  public function testHookAlterMailer() {
+  public function testHookAlterMailer(): void {
     $test = $this;
     $mockMailer = new CRM_Utils_FakeObject([
       'send' => function ($recipients, $headers, $body) use ($test) {

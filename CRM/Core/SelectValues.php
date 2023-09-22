@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  * One place to store frequently used values in Select Elements. Note that
  * some of the below elements will be dynamic, so we'll probably have a
@@ -16,8 +18,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Core_SelectValues {
 
@@ -156,9 +156,9 @@ class CRM_Core_SelectValues {
    */
   public static function eventDate() {
     return [
-      'start_date' => ts('start date'),
-      'end_date' => ts('end date'),
-      'join_date' => ts('member since'),
+      'start_date' => ts('Membership Start Date'),
+      'end_date' => ts('Membership Expiration Date'),
+      'join_date' => ts('Member Since'),
     ];
   }
 
@@ -169,51 +169,71 @@ class CRM_Core_SelectValues {
    */
   public static function customHtmlType() {
     return [
-      'Text' => ts('Single-line input field (text or numeric)'),
-      'TextArea' => ts('Multi-line text box (textarea)'),
-      'Select' => ts('Drop-down (select list)'),
-      'Radio' => ts('Radio buttons'),
-      'CheckBox' => ts('Checkbox(es)'),
-      'Select Date' => ts('Select Date'),
-      'File' => ts('File'),
-      'Select State/Province' => ts('Select State/Province'),
-      'Select Country' => ts('Select Country'),
-      'RichTextEditor' => ts('Rich Text Editor'),
-      'Autocomplete-Select' => ts('Autocomplete-Select'),
-      'Link' => ts('Link'),
-      'ContactReference' => ts('Autocomplete-Select'),
+      [
+        'id' => 'Text',
+        'name' => 'Single-line input field (text or numeric)',
+        'label' => ts('Single-line input field (text or numeric)'),
+      ],
+      [
+        'id' => 'TextArea',
+        'name' => 'Multi-line text box (textarea)',
+        'label' => ts('Multi-line text box (textarea)'),
+      ],
+      [
+        'id' => 'Select',
+        'name' => 'Drop-down (select list)',
+        'label' => ts('Drop-down (select list)'),
+      ],
+      [
+        'id' => 'Radio',
+        'name' => 'Radio buttons',
+        'label' => ts('Radio buttons'),
+      ],
+      [
+        'id' => 'CheckBox',
+        'name' => 'Checkbox(es)',
+        'label' => ts('Checkbox(es)'),
+      ],
+      [
+        'id' => 'Select Date',
+        'name' => 'Select Date',
+        'label' => ts('Select Date'),
+      ],
+      [
+        'id' => 'File',
+        'name' => 'File',
+        'label' => ts('File'),
+      ],
+      [
+        'id' => 'RichTextEditor',
+        'name' => 'Rich Text Editor',
+        'label' => ts('Rich Text Editor'),
+      ],
+      [
+        'id' => 'Autocomplete-Select',
+        'name' => 'Autocomplete-Select',
+        'label' => ts('Autocomplete-Select'),
+      ],
+      [
+        'id' => 'Link',
+        'name' => 'Link',
+        'label' => ts('Link'),
+      ],
     ];
   }
 
   /**
-   * Various pre defined extensions for dynamic properties and groups.
+   * List of entities to present on the Custom Group form.
+   *
+   * Includes pseudo-entities for Participant, in order to present sub-types on the form.
    *
    * @return array
-   *
    */
   public static function customGroupExtends() {
-    $customGroupExtends = [
-      'Activity' => ts('Activities'),
-      'Relationship' => ts('Relationships'),
-      'Contribution' => ts('Contributions'),
-      'ContributionRecur' => ts('Recurring Contributions'),
-      'Group' => ts('Groups'),
-      'Membership' => ts('Memberships'),
-      'Event' => ts('Events'),
-      'Participant' => ts('Participants'),
-      'ParticipantRole' => ts('Participants (Role)'),
-      'ParticipantEventName' => ts('Participants (Event Name)'),
-      'ParticipantEventType' => ts('Participants (Event Type)'),
-      'Pledge' => ts('Pledges'),
-      'Grant' => ts('Grants'),
-      'Address' => ts('Addresses'),
-      'Campaign' => ts('Campaigns'),
-    ];
-    $contactTypes = self::contactType();
-    $contactTypes = !empty($contactTypes) ? ['Contact' => 'Contacts'] + $contactTypes : [];
-    $extendObjs = CRM_Core_OptionGroup::values('cg_extend_objects');
-    $customGroupExtends = array_merge($contactTypes, $customGroupExtends, $extendObjs);
-    return $customGroupExtends;
+    $customGroupExtends = array_column(CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), 'label', 'id');
+    // ParticipantRole, ParticipantEventName, etc.
+    $pseudoSelectors = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+    return array_merge($customGroupExtends, $pseudoSelectors);
   }
 
   /**
@@ -241,10 +261,7 @@ class CRM_Core_SelectValues {
     ];
 
     if (CRM_Core_Config::singleton()->userSystem->supports_form_extensions) {
-      $ufGroupType += [
-        'User Registration' => ts('Drupal User Registration'),
-        'User Account' => ts('View/Edit Drupal User Account'),
-      ];
+      $ufGroupType += CRM_Core_Config::singleton()->userSystem->getUfGroupTypes();
     }
     return $ufGroupType;
   }
@@ -417,7 +434,7 @@ class CRM_Core_SelectValues {
   public static function mapProvider() {
     static $map = NULL;
     if (!$map) {
-      $map = ['' => '- select -'] + CRM_Utils_System::getPluginList('templates/CRM/Contact/Form/Task/Map', ".tpl");
+      $map = ['' => ts('- select -')] + CRM_Utils_System::getPluginList('templates/CRM/Contact/Form/Task/Map', ".tpl");
     }
     return $map;
   }
@@ -431,7 +448,7 @@ class CRM_Core_SelectValues {
   public static function geoProvider() {
     static $geo = NULL;
     if (!$geo) {
-      $geo = ['' => '- select -'] + CRM_Utils_System::getPluginList('CRM/Utils/Geocode');
+      $geo = ['' => ts('- select -')] + CRM_Utils_System::getPluginList('CRM/Utils/Geocode');
     }
     return $geo;
   }
@@ -443,7 +460,7 @@ class CRM_Core_SelectValues {
    *
    * @throws \CRM_Core_Exception
    */
-  public function taxDisplayOptions() {
+  public static function taxDisplayOptions() {
     return [
       'Do_not_show' => ts('Do not show breakdown, only show total - i.e %1', [
         1 => CRM_Utils_Money::format(120),
@@ -466,9 +483,22 @@ class CRM_Core_SelectValues {
   public static function addressProvider() {
     static $addr = NULL;
     if (!$addr) {
-      $addr = array_merge(['' => '- select -'], CRM_Utils_System::getPluginList('CRM/Utils/Address', '.php', ['BatchUpdate']));
+      $addr = array_merge(['' => ts('- select -')], CRM_Utils_System::getPluginList('CRM/Utils/Address', '.php', ['BatchUpdate']));
     }
     return $addr;
+  }
+
+  public static function smsProvider(): array {
+    $providers = CRM_SMS_BAO_Provider::getProviders(NULL, NULL, TRUE, 'is_default desc, title');
+    $result = [];
+    foreach ($providers as $provider) {
+      $result[] = [
+        'id' => $provider['id'],
+        'name' => $provider['name'],
+        'label' => $provider['title'],
+      ];
+    }
+    return $result;
   }
 
   /**
@@ -498,14 +528,12 @@ class CRM_Core_SelectValues {
    * Domain tokens
    *
    * @return array
+   *
+   * @deprecated
    */
   public static function domainTokens() {
-    return [
-      '{domain.name}' => ts('Domain name'),
-      '{domain.address}' => ts('Domain (organization) address'),
-      '{domain.phone}' => ts('Domain (organization) phone'),
-      '{domain.email}' => ts('Domain (organization) email'),
-    ];
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), []);
+    return $tokenProcessor->listTokens();
   }
 
   /**
@@ -525,16 +553,19 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Membership Tokens.
    *
+   * @deprecated
+   *
    * @return array
    */
-  public static function membershipTokens() {
+  public static function membershipTokens(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     return [
       '{membership.id}' => ts('Membership ID'),
-      '{membership.status}' => ts('Membership Status'),
-      '{membership.type}' => ts('Membership Type'),
+      '{membership.status_id:label}' => ts('Status'),
+      '{membership.membership_type_id:label}' => ts('Membership Type'),
       '{membership.start_date}' => ts('Membership Start Date'),
-      '{membership.join_date}' => ts('Membership Join Date'),
-      '{membership.end_date}' => ts('Membership End Date'),
+      '{membership.join_date}' => ts('Member Since'),
+      '{membership.end_date}' => ts('Membership Expiration Date'),
       '{membership.fee}' => ts('Membership Fee'),
     ];
   }
@@ -542,176 +573,75 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Event Tokens.
    *
-   * @return array
-   */
-  public static function eventTokens() {
-    return [
-      '{event.event_id}' => ts('Event ID'),
-      '{event.title}' => ts('Event Title'),
-      '{event.start_date}' => ts('Event Start Date'),
-      '{event.end_date}' => ts('Event End Date'),
-      '{event.event_type}' => ts('Event Type'),
-      '{event.summary}' => ts('Event Summary'),
-      '{event.contact_email}' => ts('Event Contact Email'),
-      '{event.contact_phone}' => ts('Event Contact Phone'),
-      '{event.description}' => ts('Event Description'),
-      '{event.location}' => ts('Event Location'),
-      '{event.fee_amount}' => ts('Event Fees'),
-      '{event.info_url}' => ts('Event Info URL'),
-      '{event.registration_url}' => ts('Event Registration URL'),
-      '{event.balance}' => ts('Event Balance'),
-    ];
-  }
-
-  /**
-   * Different type of Event Tokens.
+   * @deprecated
    *
    * @return array
    */
-  public static function contributionTokens() {
-    return array_merge([
-      '{contribution.contribution_id}' => ts('Contribution ID'),
-      '{contribution.total_amount}' => ts('Total Amount'),
-      '{contribution.fee_amount}' => ts('Fee Amount'),
-      '{contribution.net_amount}' => ts('Net Amount'),
-      '{contribution.non_deductible_amount}' => ts('Non-deductible Amount'),
-      '{contribution.receive_date}' => ts('Contribution Date Received'),
-      '{contribution.payment_instrument}' => ts('Payment Method'),
-      '{contribution.trxn_id}' => ts('Transaction ID'),
-      '{contribution.invoice_id}' => ts('Invoice ID'),
-      '{contribution.currency}' => ts('Currency'),
-      '{contribution.cancel_date}' => ts('Contribution Cancel Date'),
-      '{contribution.cancel_reason}' => ts('Contribution Cancel Reason'),
-      '{contribution.receipt_date}' => ts('Receipt Date'),
-      '{contribution.thankyou_date}' => ts('Thank You Date'),
-      '{contribution.contribution_source}' => ts('Contribution Source'),
-      '{contribution.amount_level}' => ts('Amount Level'),
-      //'{contribution.contribution_recur_id}' => ts('Contribution Recurring ID'),
-      //'{contribution.honor_contact_id}' => ts('Honor Contact ID'),
-      '{contribution.contribution_status_id}' => ts('Contribution Status'),
-      //'{contribution.honor_type_id}' => ts('Honor Type ID'),
-      //'{contribution.address_id}' => ts('Address ID'),
-      '{contribution.check_number}' => ts('Check Number'),
-      '{contribution.campaign}' => ts('Contribution Campaign'),
-    ], CRM_Utils_Token::getCustomFieldTokens('contribution', TRUE));
+  public static function eventTokens(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['eventId']]);
+    $allTokens = $tokenProcessor->listTokens();
+    foreach (array_keys($allTokens) as $token) {
+      if (strpos($token, '{domain.') === 0) {
+        unset($allTokens[$token]);
+      }
+    }
+    return $allTokens;
+  }
+
+  /**
+   * Different type of Contribution Tokens.
+   *
+   * @deprecated
+   *
+   * @return array
+   */
+  public static function contributionTokens(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contributionId']]);
+    $allTokens = $tokenProcessor->listTokens();
+    foreach (array_keys($allTokens) as $token) {
+      if (strpos($token, '{domain.') === 0) {
+        unset($allTokens[$token]);
+      }
+    }
+    return $allTokens;
   }
 
   /**
    * Different type of Contact Tokens.
    *
+   * @deprecated
+   *
    * @return array
    */
-  public static function contactTokens() {
-    static $tokens = NULL;
-    if (!$tokens) {
-      $additionalFields = [
-        'checksum' => ['title' => ts('Checksum')],
-        'contact_id' => ['title' => ts('Internal Contact ID')],
-      ];
-      $exportFields = array_merge(CRM_Contact_BAO_Contact::exportableFields(), $additionalFields);
-
-      $values = array_merge(array_keys($exportFields));
-      unset($values[0]);
-
-      //FIXME:skipping some tokens for time being.
-      $skipTokens = [
-        'is_bulkmail',
-        'group',
-        'tag',
-        'contact_sub_type',
-        'note',
-        'is_deceased',
-        'deceased_date',
-        'legal_identifier',
-        'contact_sub_type',
-        'user_unique_id',
-      ];
-
-      $customFields = CRM_Core_BAO_CustomField::getFields(['Individual', 'Address']);
-      $legacyTokenNames = array_flip(CRM_Utils_Token::legacyContactTokens());
-
-      foreach ($values as $val) {
-        if (in_array($val, $skipTokens)) {
-          continue;
-        }
-        //keys for $tokens should be constant. $token Values are changed for Custom Fields. CRM-3734
-        $customFieldId = CRM_Core_BAO_CustomField::getKeyID($val);
-        if ($customFieldId) {
-          // CRM-15191 - if key is not in $customFields then the field is disabled and should be ignored
-          if (!empty($customFields[$customFieldId])) {
-            $tokens["{contact.$val}"] = $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'];
-          }
-        }
-        else {
-          // Support legacy token names
-          $tokenName = CRM_Utils_Array::value($val, $legacyTokenNames, $val);
-          $tokens["{contact.$tokenName}"] = $exportFields[$val]['title'];
-        }
-      }
-
-      // Get all the hook tokens too
-      $hookTokens = [];
-      CRM_Utils_Hook::tokens($hookTokens);
-      foreach ($hookTokens as $tokenValues) {
-        foreach ($tokenValues as $key => $value) {
-          if (is_numeric($key)) {
-            $key = $value;
-          }
-          if (!preg_match('/^\{[^\}]+\}$/', $key)) {
-            $key = '{' . $key . '}';
-          }
-          if (preg_match('/^\{([^\}]+)\}$/', $value, $matches)) {
-            $value = $matches[1];
-          }
-          $tokens[$key] = $value;
-        }
+  public static function contactTokens(): array {
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contactId']]);
+    $allTokens = $tokenProcessor->listTokens();
+    foreach (array_keys($allTokens) as $token) {
+      if (strpos($token, '{domain.') === 0) {
+        unset($allTokens[$token]);
       }
     }
-
-    return $tokens;
+    return $allTokens;
   }
 
   /**
    * Different type of Participant Tokens.
    *
+   * @deprecated
+   *
    * @return array
    */
-  public static function participantTokens() {
-    static $tokens = NULL;
-    if (!$tokens) {
-      $exportFields = CRM_Event_BAO_Participant::exportableFields();
-
-      $values = array_merge(array_keys($exportFields));
-      unset($values[0]);
-
-      // skipping some tokens for time being.
-      $skipTokens = [
-        'event_id',
-        'participant_is_pay_later',
-        'participant_is_test',
-        'participant_contact_id',
-        'participant_fee_currency',
-        'participant_campaign_id',
-        'participant_status',
-        'participant_discount_name',
-      ];
-
-      $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
-
-      foreach ($values as $key => $val) {
-        if (in_array($val, $skipTokens)) {
-          continue;
-        }
-        //keys for $tokens should be constant. $token Values are changed for Custom Fields. CRM-3734
-        if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($val)) {
-          $tokens["{participant.$val}"] = !empty($customFields[$customFieldId]) ? $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'] : '';
-        }
-        else {
-          $tokens["{participant.$val}"] = $exportFields[$val]['title'];
-        }
+  public static function participantTokens(): array {
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['participantId']]);
+    $allTokens = $tokenProcessor->listTokens();
+    foreach (array_keys($allTokens) as $token) {
+      if (strpos($token, '{domain.') === 0 || strpos($token, '{event.') === 0) {
+        unset($allTokens[$token]);
       }
     }
-    return $tokens;
+    return $allTokens;
   }
 
   /**
@@ -719,16 +649,22 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function caseTokens($caseTypeId = NULL) {
-    static $tokens = NULL;
-    if (!$tokens) {
-      foreach (CRM_Case_BAO_Case::fields() as $field) {
-        $tokens["{case.{$field['name']}}"] = $field['title'];
-      }
+    $tokens = [
+      '{case.id}' => ts('Case ID'),
+      '{case.case_type_id:label}' => ts('Case Type'),
+      '{case.subject}' => ts('Case Subject'),
+      '{case.start_date}' => ts('Case Start Date'),
+      '{case.end_date}' => ts('Case End Date'),
+      '{case.details}' => ts('Details'),
+      '{case.status_id:label}' => ts('Case Status'),
+      '{case.is_deleted:label}' => ts('Case is in the Trash'),
+      '{case.created_date}' => ts('Created Date'),
+      '{case.modified_date}' => ts('Modified Date'),
+    ];
 
-      $customFields = CRM_Core_BAO_CustomField::getFields('Case', FALSE, FALSE, $caseTypeId);
-      foreach ($customFields as $id => $field) {
-        $tokens["{case.custom_$id}"] = "{$field['label']} :: {$field['groupTitle']}";
-      }
+    $customFields = CRM_Core_BAO_CustomField::getFields('Case', FALSE, FALSE, $caseTypeId);
+    foreach ($customFields as $id => $field) {
+      $tokens["{case.custom_$id}"] = "{$field['label']} :: {$field['groupTitle']}";
     }
     return $tokens;
   }
@@ -848,6 +784,22 @@ class CRM_Core_SelectValues {
       'week' => ts('Week'),
       'month' => ts('Month'),
       'year' => ts('Year'),
+    ];
+  }
+
+  /**
+   * Get measurement units recognized by the TCPDF package used to create PDF labels.
+   *
+   * @return array
+   *   array of measurement units
+   */
+  public static function getLayoutUnits(): array {
+    return [
+      'in' => ts('Inches'),
+      'cm' => ts('Centimeters'),
+      'mm' => ts('Millimeters'),
+      'pt' => ts('Points'),
+      'px' => ts('Pixels'),
     ];
   }
 
@@ -974,9 +926,21 @@ class CRM_Core_SelectValues {
    */
   public static function billingMode() {
     return [
-      CRM_Core_Payment::BILLING_MODE_FORM => 'form',
-      CRM_Core_Payment::BILLING_MODE_BUTTON => 'button',
-      CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
+      [
+        'id' => CRM_Core_Payment::BILLING_MODE_FORM,
+        'name' => 'form',
+        'label' => 'form',
+      ],
+      [
+        'id' => CRM_Core_Payment::BILLING_MODE_BUTTON,
+        'name' => 'button',
+        'label' => 'button',
+      ],
+      [
+        'id' => CRM_Core_Payment::BILLING_MODE_NOTIFY,
+        'name' => 'notify',
+        'label' => 'notify',
+      ],
     ];
   }
 
@@ -985,9 +949,21 @@ class CRM_Core_SelectValues {
    */
   public static function contributeMode() {
     return [
-      CRM_Core_Payment::BILLING_MODE_FORM => 'direct',
-      CRM_Core_Payment::BILLING_MODE_BUTTON => 'directIPN',
-      CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
+      [
+        'id' => CRM_Core_Payment::BILLING_MODE_FORM,
+        'name' => 'direct',
+        'label' => 'direct',
+      ],
+      [
+        'id' => CRM_Core_Payment::BILLING_MODE_BUTTON,
+        'name' => 'directIPN',
+        'label' => 'directIPN',
+      ],
+      [
+        'id' => CRM_Core_Payment::BILLING_MODE_NOTIFY,
+        'name' => 'notify',
+        'label' => 'notify',
+      ],
     ];
   }
 
@@ -1003,6 +979,7 @@ class CRM_Core_SelectValues {
     // is for recurring payments and probably not good to re-use for recurring entities.
     // If something other than a hard-coded list is desired, add a new option_group.
     return [
+      'minute' => ts('minute', ['plural' => 'minutes', 'count' => $count]),
       'hour' => ts('hour', ['plural' => 'hours', 'count' => $count]),
       'day' => ts('day', ['plural' => 'days', 'count' => $count]),
       'week' => ts('week', ['plural' => 'weeks', 'count' => $count]),
@@ -1098,9 +1075,21 @@ class CRM_Core_SelectValues {
    */
   public static function getPermissionedRelationshipOptions() {
     return [
-      CRM_Contact_BAO_Relationship::NONE => ts('None'),
-      CRM_Contact_BAO_Relationship::VIEW => ts('View only'),
-      CRM_Contact_BAO_Relationship::EDIT => ts('View and update'),
+      [
+        'id' => CRM_Contact_BAO_Relationship::NONE,
+        'name' => 'None',
+        'label' => ts('None'),
+      ],
+      [
+        'id' => CRM_Contact_BAO_Relationship::VIEW,
+        'name' => 'View only',
+        'label' => ts('View only'),
+      ],
+      [
+        'id' => CRM_Contact_BAO_Relationship::EDIT,
+        'name' => 'View and update',
+        'label' => ts('View and update'),
+      ],
     ];
   }
 
@@ -1123,34 +1112,40 @@ class CRM_Core_SelectValues {
    * Dropdown options for quicksearch in the menu
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function quicksearchOptions() {
     $includeEmail = civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']);
     $options = [
       'sort_name' => $includeEmail ? ts('Name/Email') : ts('Name'),
-      'contact_id' => ts('Contact ID'),
+      'id' => ts('Contact ID'),
       'external_identifier' => ts('External ID'),
       'first_name' => ts('First Name'),
       'last_name' => ts('Last Name'),
-      'email' => ts('Email'),
-      'phone_numeric' => ts('Phone'),
-      'street_address' => ts('Street Address'),
-      'city' => ts('City'),
-      'postal_code' => ts('Postal Code'),
+      'email_primary.email' => ts('Email'),
+      'phone_primary.phone_numeric' => ts('Phone'),
+      'address_primary.street_address' => ts('Street Address'),
+      'address_primary.city' => ts('City'),
+      'address_primary.postal_code' => ts('Postal Code'),
       'job_title' => ts('Job Title'),
     ];
-    $custom = civicrm_api3('CustomField', 'get', [
-      'return' => ['name', 'label', 'custom_group_id.title'],
-      'custom_group_id.extends' => ['IN' => ['Contact', 'Individual', 'Organization', 'Household']],
-      'data_type' => ['NOT IN' => ['ContactReference', 'Date', 'File']],
-      'custom_group_id.is_active' => 1,
-      'is_active' => 1,
-      'is_searchable' => 1,
-      'options' => ['sort' => ['custom_group_id.weight', 'weight'], 'limit' => 0],
+    $custom = civicrm_api4('CustomField', 'get', [
+      'checkPermissions' => FALSE,
+      'select' => ['name', 'label', 'custom_group_id.name', 'custom_group_id.title', 'option_group_id'],
+      'where' => [
+        ['custom_group_id.extends', 'IN', array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes())],
+        ['data_type', 'NOT IN', ['ContactReference', 'Date', 'File']],
+        ['custom_group_id.is_active', '=', TRUE],
+        ['is_active', '=', TRUE],
+        ['is_searchable', '=', TRUE],
+      ],
+      'orderBy' => [
+        'custom_group_id.weight' => 'ASC',
+        'weight' => 'ASC',
+      ],
     ]);
-    foreach ($custom['values'] as $field) {
-      $options['custom_' . $field['name']] = $field['custom_group_id.title'] . ': ' . $field['label'];
+    foreach ($custom as $field) {
+      $options[$field['custom_group_id.name'] . '.' . $field['name'] . ($field['option_group_id'] ? ':label' : '')] = $field['custom_group_id.title'] . ': ' . $field['label'];
     }
     return $options;
   }
@@ -1177,6 +1172,7 @@ class CRM_Core_SelectValues {
    */
   public static function fieldSerialization() {
     return [
+      CRM_Core_DAO::SERIALIZE_NONE => 'none',
       CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND => 'separator_bookend',
       CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED => 'separator_trimmed',
       CRM_Core_DAO::SERIALIZE_JSON => 'json',
@@ -1194,6 +1190,69 @@ class CRM_Core_SelectValues {
       ts('After menu element'),
       ts('Before menu element'),
     ];
+  }
+
+  /**
+   * @return array
+   */
+  public static function relationshipOrientation() {
+    return [
+      'a_b' => ts('A to B'),
+      'b_a' => ts('B to A'),
+    ];
+  }
+
+  /**
+   * @return array
+   */
+  public static function andOr() {
+    return [
+      'AND' => ts('And'),
+      'OR' => ts('Or'),
+    ];
+  }
+
+  public static function beforeAfter() {
+    return [
+      'before' => ts('Before'),
+      'after' => ts('After'),
+    ];
+  }
+
+  /**
+   * Columns from the option_value table which may or may not be used by each option_group.
+   *
+   * Note: Value is not listed here as it is not optional.
+   *
+   * @return string[]
+   */
+  public static function optionValueFields() {
+    return [
+      'name' => 'name',
+      'label' => 'label',
+      'description' => 'description',
+      'icon' => 'icon',
+      'color' => 'color',
+    ];
+  }
+
+  /**
+   * Callback for Role.permissions pseudoconstant values.
+   *
+   * Permissions for Civi Standalone, not used by CMS-based systems.
+   *
+   * @return array
+   */
+  public static function permissions() {
+    $perms = $options = [];
+    \CRM_Utils_Hook::permissionList($perms);
+
+    foreach ($perms as $machineName => $details) {
+      if (!empty($details['is_active'])) {
+        $options[$machineName] = $details['title'];
+      }
+    }
+    return $options;
   }
 
 }

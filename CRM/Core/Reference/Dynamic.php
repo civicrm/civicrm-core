@@ -13,7 +13,22 @@ class CRM_Core_Reference_Dynamic extends CRM_Core_Reference_Basic {
    * @return bool
    */
   public function matchesTargetTable($tableName) {
+    // FIXME: Shouldn't this check against keys returned by getTargetEntities?
     return TRUE;
+  }
+
+  /**
+   * @return array
+   *   [table_name => EntityName]
+   */
+  public function getTargetEntities(): array {
+    $targetEntities = [];
+    $bao = CRM_Core_DAO_AllCoreTables::getClassForTable($this->refTable);
+    $targetTables = $bao::buildOptions($this->refTypeColumn) ?: [];
+    foreach ($targetTables as $table => $label) {
+      $targetEntities[$table] = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table);
+    }
+    return $targetEntities;
   }
 
   /**

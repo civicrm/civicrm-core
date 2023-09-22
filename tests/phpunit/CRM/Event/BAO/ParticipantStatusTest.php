@@ -18,24 +18,9 @@
 class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
 
   /**
-   * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   */
-  protected function tearDown() {
-  }
-
-  /**
    *  create() and deleteParticipantStatusType() method
    */
-  public function testCreateAndDelete() {
+  public function testCreateAndDelete(): void {
 
     // create using required params
     $params = [
@@ -62,7 +47,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   /**
    *  add() method (add and edit modes of participant status type)
    */
-  public function testAddStatusType() {
+  public function testAddStatusType(): void {
 
     $params = [
       'name' => 'testStatus',
@@ -101,7 +86,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   /**
    * Retrieve() method of participant status type
    */
-  public function testRetrieveStatusType() {
+  public function testRetrieveStatusType(): void {
 
     $params = [
       'name' => 'testStatus',
@@ -124,33 +109,6 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
     foreach ($params as $param => $value) {
       $this->assertEquals($value, $retrieveStatusType->$param);
     }
-  }
-
-  /**
-   * SetIsActive() method of participant status type
-   */
-  public function testSetIsActiveStatusType() {
-
-    $params = [
-      'name' => 'testStatus',
-      'label' => 'testParticipant',
-      'class' => 'Positive',
-      'is_active' => 0,
-      'is_counted' => 1,
-      'weight' => 15,
-      'visibility_id' => 1,
-    ];
-
-    $statusType = CRM_Event_BAO_ParticipantStatusType::create($params);
-    $isActive = 1;
-
-    // set participant status type active
-    CRM_Event_BAO_ParticipantStatusType::setIsActive($statusType->id, $isActive);
-
-    // compare expected value in db
-    $this->assertDBCompareValue('CRM_Event_DAO_ParticipantStatusType', $statusType->id, 'is_Active',
-      'id', $isActive, 'Check DB for is_Active value'
-    );
   }
 
 }

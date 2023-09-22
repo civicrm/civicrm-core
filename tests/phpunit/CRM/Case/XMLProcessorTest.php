@@ -7,7 +7,12 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  */
 class CRM_Case_XMLProcessorTest extends CiviCaseTestCase {
 
-  public function setUp() {
+  /**
+   * @var CRM_Case_XMLProcessor
+   */
+  private $processor;
+
+  public function setUp(): void {
     parent::setUp();
 
     $this->processor = new CRM_Case_XMLProcessor();
@@ -17,7 +22,7 @@ class CRM_Case_XMLProcessorTest extends CiviCaseTestCase {
    * Test that allRelationshipTypes() doesn't have name and label mixed up
    * and that is has the right directions.
    */
-  public function testAllRelationshipTypes() {
+  public function testAllRelationshipTypes(): void {
 
     // Add a relationship type to test against.
     $params = [

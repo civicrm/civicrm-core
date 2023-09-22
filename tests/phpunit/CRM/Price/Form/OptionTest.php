@@ -12,7 +12,7 @@ class CRM_Price_Form_OptionTest extends CiviUnitTestCase {
 
   protected $adminValue;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->visibilityOptions = CRM_Core_PseudoConstant::get('CRM_Price_BAO_PriceFieldValue', 'visibility_id', [
@@ -24,7 +24,12 @@ class CRM_Price_Form_OptionTest extends CiviUnitTestCase {
     ]);
   }
 
-  public function testChangingUniquePublicOptionOnPublicFieldIsNotAllowed() {
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
+
+  public function testChangingUniquePublicOptionOnPublicFieldIsNotAllowed(): void {
     $this->setUpPriceSet([
       'html_type' => 'Select',
       'visibility_id' => $this->visibilityOptionsKeys['public'],
@@ -47,11 +52,11 @@ class CRM_Price_Form_OptionTest extends CiviUnitTestCase {
     $files = [];
 
     $validationResult = $form->formRule($params, $files, $form);
-    $this->assertType('array', $validationResult);
+    $this->assertIsArray($validationResult);
     $this->assertTrue(array_key_exists('visibility_id', $validationResult));
   }
 
-  public function testAddingPublicOptionToAdminFieldIsNotAllowed() {
+  public function testAddingPublicOptionToAdminFieldIsNotAllowed(): void {
     $this->setUpPriceSet([
       'html_type' => 'Select',
       'visibility_id' => $this->visibilityOptionsKeys['admin'],
@@ -74,7 +79,7 @@ class CRM_Price_Form_OptionTest extends CiviUnitTestCase {
     $files = [];
 
     $validationResult = $form->formRule($params, $files, $form);
-    $this->assertType('array', $validationResult);
+    $this->assertIsArray($validationResult);
     $this->assertTrue(array_key_exists('visibility_id', $validationResult));
   }
 

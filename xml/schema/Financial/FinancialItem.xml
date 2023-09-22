@@ -7,6 +7,7 @@
   <add>4.3</add>
   <comment>Financial data for civicrm_line_item, etc.</comment>
   <log>true</log>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <type>int unsigned</type>
@@ -14,6 +15,9 @@
     <length>10</length>
     <required>true</required>
     <comment></comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.3</add>
   </field>
   <primaryKey>
@@ -40,10 +44,13 @@
   <field>
     <name>contact_id</name>
     <type>int unsigned</type>
-    <title>Financial Item Contact ID</title>
+    <title>Contact ID</title>
     <required>true</required>
     <export>true</export>
     <comment>FK to Contact ID of contact the item is from</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>
@@ -104,6 +111,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Financial Account</label>
     </html>
   </field>
   <foreignKey>
@@ -131,7 +139,10 @@
     <type>varchar</type>
     <title>Entity Table</title>
     <length>64</length>
-    <comment>The table providing the source of this item such as civicrm_line_item</comment>
+    <pseudoconstant>
+      <callback>CRM_Financial_BAO_FinancialItem::entityTables</callback>
+    </pseudoconstant>
+    <comment>May contain civicrm_line_item, civicrm_financial_trxn etc</comment>
     <add>4.3</add>
   </field>
   <field>

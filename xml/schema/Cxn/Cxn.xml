@@ -9,6 +9,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Connection ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.6</add>
   </field>
   <primaryKey>
@@ -41,7 +44,7 @@
   </field>
 
   <!-- Connection details -->
-  
+
   <field>
     <name>cxn_guid</name>
     <title>Connection GUID</title>
@@ -60,12 +63,18 @@
     <name>secret</name>
     <type>text</type>
     <comment>Shared secret</comment>
+    <html>
+      <label>Secret</label>
+    </html>
     <add>4.6</add>
   </field>
   <field>
     <name>perm</name>
     <type>text</type>
     <comment>Permissions approved for the service (JSON)</comment>
+    <html>
+      <label>Permissions</label>
+    </html>
     <add>4.6</add>
   </field>
   <field>
@@ -73,16 +82,24 @@
     <type>text</type>
     <comment>Options for the service (JSON)</comment>
     <serialize>JSON</serialize>
+    <html>
+      <label>Options</label>
+    </html>
     <add>4.6</add>
   </field>
-  
+
   <!-- Connection lifecycle -->
-  
+
   <field>
     <name>is_active</name>
     <title>Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Is connection currently enabled?</comment>
     <add>4.6</add>
   </field>
@@ -92,6 +109,9 @@
     <comment>When was the connection was created.</comment>
     <required>false</required>
     <default>NULL</default>
+    <html>
+      <label>Created Date</label>
+    </html>
     <add>4.6</add>
   </field>
   <field>
@@ -100,7 +120,11 @@
     <comment>When the connection was created or modified.</comment>
     <required>false</required>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <html>
+      <label>Modified Date</label>
+    </html>
     <add>4.6</add>
+    <readonly>true</readonly>
   </field>
   <field>
     <name>fetched_date</name>
@@ -108,6 +132,9 @@
     <comment>The last time the application metadata was fetched.</comment>
     <required>false</required>
     <default>NULL</default>
+    <html>
+      <label>Fetched Date</label>
+    </html>
     <add>4.6</add>
   </field>
 </table>

@@ -72,13 +72,13 @@
           <div>{$form.location_type.label} {help id="location_type" title=$form.location_type.label}</div>
           {$form.location_type.html}
         </div>
-        {if $form.address_name.html}
+        {if !empty($form.address_name.html)}
           <div class="crm-field-wrapper">
             {$form.address_name.label}<br />
             {$form.address_name.html}
           </div>
         {/if}
-        {if $form.postal_code.html}
+        {if !empty($form.postal_code.html)}
           <div class="crm-field-wrapper">
             {$form.postal_code.label}
             <input type="checkbox" id="postal-code-range-toggle" value="1"/>
@@ -109,7 +109,7 @@
             {/literal}
           </script>
         {/if}
-        {if $form.prox_distance.html}
+        {if !empty($form.prox_distance.html)}
           <div class="crm-field-wrapper">
             {$form.prox_distance.label}<br />
             {$form.prox_distance.html}&nbsp;{$form.prox_distance_unit.html}
@@ -118,7 +118,7 @@
       </td>
     </tr>
 
-    {if $addressGroupTree}
+    {if !empty($addressGroupTree)}
       <tr>
         <td colspan="2">
           {include file="CRM/Custom/Form/Search.tpl" groupTree=$addressGroupTree showHideLinks=false}

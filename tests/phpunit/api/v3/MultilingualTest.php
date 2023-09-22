@@ -14,23 +14,23 @@
  *
  * @package CiviCRM
  * @group headless
+ * @group locale
  */
 class api_v3_MultilingualTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  public $DBResetRequired = FALSE;
 
   /**
    * Sets up the fixture, for example, opens a network connection.
    *
    * This method is called before a test is executed.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
   }
 
-  public function tearDown() {
-    CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+  public function tearDown(): void {
+    $this->disableMultilingual();
     parent::tearDown();
   }
 
@@ -38,17 +38,8 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
    * @dataProvider versionThreeAndFour
    */
   public function testOptionLanguage($version) {
-    $this->enableMultilingual();
     $this->_apiversion = $version;
-
-    CRM_Core_I18n_Schema::addLocale('fr_CA', 'en_US');
-
-    $this->callAPISuccess('Setting', 'create', [
-      'languageLimit' => [
-        'en_US' => 1,
-        'fr_CA' => 1,
-      ],
-    ]);
+    $this->enableMultilingual(['en_US' => 'fr_CA']);
 
     // Take a semi-random OptionGroup and test manually changing its label
     // in one language, while making sure it stays the same in English.
@@ -88,7 +79,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
    * CRM-19677: Ensure that entity apis are not affected on Multilingual setup
    *  with check_permissions = TRUE
    */
-  public function testAllEntities() {
+  public function testAllEntities(): void {
     $this->enableMultilingual();
 
     // list of entities which has mandatory attributes
@@ -101,6 +92,8 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
     ];
     // deprecated or API.Get is not supported/implemented
     $skippableEntities = [
+      'Cxn',
+      'CxnApp',
       'Logging',
       'MailingEventConfirm',
       'MailingEventResubscribe',

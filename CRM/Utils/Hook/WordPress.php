@@ -80,20 +80,20 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
     // are incompatible with the WordPress Plugin API:
     //
     // civicrm_upgrade
-    // http://wiki.civicrm.org/confluence/display/CRMDOC43/hook_civicrm_upgrade
+    // https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade/
     //
     // civicrm_caseSummary
-    // http://wiki.civicrm.org/confluence/display/CRMDOC43/hook_civicrm_caseSummary
+    // https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_caseSummary/
     //
     // civicrm_dashboard
-    // http://wiki.civicrm.org/confluence/display/CRMDOC43/hook_civicrm_dashboard
+    // https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_dashboard/
 
     // distinguish between types of hook
     if (!in_array($fnSuffix, $this->hooksThatReturn)) {
 
       // only pass the arguments that have values
       $args = array_slice(
-        array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6),
+        [&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6],
         0,
         $numParams
       );
@@ -149,8 +149,6 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
    *
    * We need to do this to preserve the CiviCRM hook signatures for hooks that require
    * a return value, since the WordPress Plugin API seems to be incompatible with them.
-   *
-   * Copied and adapted from: CRM/Utils/Hook/Drupal6.php
    */
   public function buildModuleList() {
     if ($this->isBuilt === FALSE) {

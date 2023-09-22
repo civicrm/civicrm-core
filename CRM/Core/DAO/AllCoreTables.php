@@ -24,13 +24,16 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * Initialise.
    *
-   * @param bool $fresh
+   * @param bool $fresh Deprecated parameter, use flush() to flush.
    */
-  public static function init($fresh = FALSE) {
-    static $init = FALSE;
-    if ($init && !$fresh) {
+  public static function init(bool $fresh = FALSE): void {
+    if (!empty(Civi::$statics[__CLASS__]['initialised']) && !$fresh) {
       return;
     }
+    if ($fresh) {
+      CRM_Core_Error::deprecatedWarning('Use CRM_Core_DAO_AllCoreTables::flush()');
+    }
+
     Civi::$statics[__CLASS__] = [];
 
     $file = preg_replace('/\.php$/', '.data.php', __FILE__);
@@ -50,23 +53,30 @@ class CRM_Core_DAO_AllCoreTables {
       );
     }
 
-    $init = TRUE;
+    Civi::$statics[__CLASS__]['initialised'] = TRUE;
+  }
+
+  /**
+   * Flush class cache.
+   */
+  public static function flush(): void {
+    Civi::$statics[__CLASS__]['initialised'] = FALSE;
   }
 
   /**
    * (Quasi-Private) Do not call externally (except for unit-testing)
    *
-   * @param string $daoName
+   * @param string $briefName
    * @param string $className
    * @param string $tableName
    * @param string $fields_callback
    * @param string $links_callback
    */
-  public static function registerEntityType($daoName, $className, $tableName, $fields_callback = NULL, $links_callback = NULL) {
-    self::$daoToClass[$daoName] = $className;
+  public static function registerEntityType($briefName, $className, $tableName, $fields_callback = NULL, $links_callback = NULL) {
+    self::$daoToClass[$briefName] = $className;
     self::$tables[$tableName] = $className;
-    self::$entityTypes[$className] = [
-      'name' => $daoName,
+    self::$entityTypes[$briefName] = [
+      'name' => $briefName,
       'class' => $className,
       'table' => $tableName,
       'fields_callback' => $fields_callback,
@@ -76,7 +86,7 @@ class CRM_Core_DAO_AllCoreTables {
 
   /**
    * @return array
-   *   Ex: $result['CRM_Contact_DAO_Contact']['table'] == 'civicrm_contact';
+   *   Ex: $result['Contact']['table'] == 'civicrm_contact';
    */
   public static function get() {
     self::init();
@@ -117,10 +127,8 @@ class CRM_Core_DAO_AllCoreTables {
    *   index definitions after localization
    */
   public static function multilingualize($class, $originalIndices) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
-    if (CRM_Utils_System::isNull($locales)) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    if (!$locales) {
       return $originalIndices;
     }
     $classFields = $class::fields();
@@ -190,10 +198,10 @@ class CRM_Core_DAO_AllCoreTables {
    *
    * @param string $baoName
    *
-   * @return string|CRM_Core_DAO
+   * @return string
    */
   public static function getCanonicalClassName($baoName) {
-    return str_replace('_BAO_', '_DAO_', $baoName);
+    return str_replace('_BAO_', '_DAO_', ($baoName ?? ''));
   }
 
   /**
@@ -205,7 +213,7 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function getBAOClassName($daoName) {
     $baoName = str_replace('_DAO_', '_BAO_', $daoName);
-    return class_exists($baoName) ? $baoName : $daoName;
+    return $daoName === $baoName || class_exists($baoName) ? $baoName : $daoName;
   }
 
   /**
@@ -220,12 +228,11 @@ class CRM_Core_DAO_AllCoreTables {
     // This map only applies to APIv3
     $map = [
       'acl' => 'Acl',
-      'ACL' => 'Acl',
       'im' => 'Im',
-      'IM' => 'Im',
+      'pcp' => 'Pcp',
     ];
-    if ($legacyV3 && isset($map[$name])) {
-      return $map[$name];
+    if ($legacyV3 && isset($map[strtolower($name)])) {
+      return $map[strtolower($name)];
     }
 
     $fragments = explode('_', $name);
@@ -236,9 +243,10 @@ class CRM_Core_DAO_AllCoreTables {
         $fragment = 'UF' . ucfirst(substr($fragment, 2));
       }
     }
-    // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in underscore-separated)
-    if ($fragments[0] === 'Uf') {
-      $fragments[0] = 'UF';
+    // Exceptions to CamelCase: UFGroup, UFJoin, UFMatch, UFField, ACL, IM, PCP
+    $exceptions = ['Uf', 'Acl', 'Im', 'Pcp'];
+    if (in_array($fragments[0], $exceptions)) {
+      $fragments[0] = strtoupper($fragments[0]);
     }
     return implode('', $fragments);
   }
@@ -279,30 +287,48 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
+   * Get a list of all extant BAO classes.
+   *
+   * @return array
+   *   Ex: ['Contact' => 'CRM_Contact_BAO_Contact']
+   */
+  public static function getBaoClasses() {
+    $r = [];
+    foreach (\CRM_Core_DAO_AllCoreTables::daoToClass() as $entity => $daoClass) {
+      $baoClass = str_replace('_DAO_', '_BAO_', $daoClass);
+      if (class_exists($baoClass)) {
+        $r[$entity] = $baoClass;
+      }
+    }
+    return $r;
+  }
+
+  /**
    * Get the classname for the table.
    *
    * @param string $tableName
-   * @return string
+   * @return string|CRM_Core_DAO|NULL
    */
-  public static function getClassForTable($tableName) {
+  public static function getClassForTable(string $tableName) {
     //CRM-19677: on multilingual setup, trim locale from $tableName to fetch class name
     if (CRM_Core_I18n::isMultilingual()) {
       global $dbLocale;
       $tableName = str_replace($dbLocale, '', $tableName);
     }
-    return CRM_Utils_Array::value($tableName, self::tables());
+    return self::tables()[$tableName] ?? NULL;
   }
 
   /**
    * Given a brief-name, determine the full class-name.
    *
-   * @param string $daoName
+   * @param string $briefName
    *   Ex: 'Contact'.
-   * @return CRM_Core_DAO|NULL
+   * @return string|CRM_Core_DAO|NULL
    *   Ex: 'CRM_Contact_DAO_Contact'.
    */
-  public static function getFullName($daoName) {
-    return CRM_Utils_Array::value($daoName, self::daoToClass());
+  public static function getFullName($briefName) {
+    self::init();
+    return self::$entityTypes[$briefName]['class'] ?? NULL;
   }
 
   /**
@@ -330,21 +356,40 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * Convert the entity name into a table name.
    *
-   * @param string $entityBriefName
+   * @param string $briefName
    *
    * @return FALSE|string
    */
-  public static function getTableForEntityName($entityBriefName) {
-    return self::getTableForClass(self::getFullName($entityBriefName));
+  public static function getTableForEntityName($briefName): string {
+    self::init();
+    return self::$entityTypes[$briefName]['table'];
+  }
+
+  /**
+   * Convert table name to brief entity name.
+   *
+   * @param string $tableName
+   *
+   * @return FALSE|string
+   */
+  public static function getEntityNameForTable(string $tableName) {
+    self::init();
+    // CRM-19677: on multilingual setup, trim locale from $tableName to fetch class name
+    if (CRM_Core_I18n::isMultilingual()) {
+      global $dbLocale;
+      $tableName = str_replace($dbLocale, '', $tableName);
+    }
+    $matches = CRM_Utils_Array::findAll(self::$entityTypes, ['table' => $tableName]);
+    return $matches ? $matches[0]['name'] : NULL;
   }
 
   /**
    * Reinitialise cache.
    *
-   * @param bool $fresh
+   * @deprecated
    */
-  public static function reinitializeCache($fresh = FALSE) {
-    self::init($fresh);
+  public static function reinitializeCache(): void {
+    self::flush();
   }
 
   /**
@@ -432,14 +477,18 @@ class CRM_Core_DAO_AllCoreTables {
    *
    * Apply any third-party alterations to the `fields()`.
    *
+   * TODO: This function should probably take briefName as the key instead of className
+   * because the latter is not always unique (e.g. virtual entities)
+   *
    * @param string $className
    * @param string $event
    * @param mixed $values
    */
   public static function invoke($className, $event, &$values) {
     self::init();
-    if (isset(self::$entityTypes[$className][$event])) {
-      foreach (self::$entityTypes[$className][$event] as $filter) {
+    $briefName = self::getBriefName($className);
+    if (isset(self::$entityTypes[$briefName][$event])) {
+      foreach (self::$entityTypes[$briefName][$event] as $filter) {
         $args = [$className, &$values];
         \Civi\Core\Resolver::singleton()->call($filter, $args);
       }

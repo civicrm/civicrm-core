@@ -1,0 +1,32 @@
+<af-form ctrl="modelListCtrl">
+  <!-- FIXME: Distinguish "Individual"s from "Household"s -->
+  <af-entity type="Contact" name="parent" label="Parent" api4-params="{where: ['id','=', routeParams.cid]}" />
+  <af-entity type="Contact" name="spouse" label="Spouse" contact-relationship="['Spouse of', 'parent']" />
+  <af-entity type="Contact" name="home" label="Home" />
+
+  <!-- "parent" and "spouse" should be exported as variables in this scope -->
+
+  <div af-fieldset="parent">
+    <af-block-contact-name label="My Name" />
+    <af-block-contact-email label="My Email" />
+    <af-field name="do_not_email" />
+  </div>
+
+  <div af-fieldset="spouse">
+    <af-block-contact-name label="Spouse Name" />
+    <af-block-contact-email label="Spouse Email" only-primary="true" />
+    <af-field name="do_not_email" defn="{type: 'checkbox', default: 1}" />
+  </div>
+
+  <div af-fieldset="home">
+    <af-block-contact-name label="Home Name" />
+  </div>
+
+  <div af-fieldset="parent">
+    <af-block-contact-address label="My Address" />
+  </div>
+
+  <!-- General elements: FIELDSET, UL, BUTTON, P, H1 should work anywhere -->
+  <button ng-click="modelListCtrl.submit()">Submit</button>
+
+</af-form>

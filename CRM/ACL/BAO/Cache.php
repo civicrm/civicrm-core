@@ -24,9 +24,11 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_ACLCache {
 
   /**
    * Build an array of ACLs for a specific ACLed user
+   *
    * @param int $id - contact_id of the ACLed user
    *
    * @return mixed
+   * @throws \CRM_Core_Exception
    */
   public static function &build($id) {
     if (!self::$_cache) {
@@ -44,7 +46,7 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_ACLCache {
       return self::$_cache[$id];
     }
 
-    self::$_cache[$id] = CRM_ACL_BAO_ACL::getAllByContact($id);
+    self::$_cache[$id] = CRM_ACL_BAO_ACL::getAllByContact((int) $id);
     self::store($id, self::$_cache[$id]);
     return self::$_cache[$id];
   }
@@ -54,7 +56,7 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_ACLCache {
    *
    * @return array
    */
-  public static function retrieve($id) {
+  protected static function retrieve($id) {
     $query = "
 SELECT acl_id
   FROM civicrm_acl_cache
@@ -81,7 +83,7 @@ SELECT acl_id
    * @param array $cache - key civicrm_acl.id - values is the details of the ACL.
    *
    */
-  public static function store($id, &$cache) {
+  protected static function store($id, &$cache) {
     foreach ($cache as $aclID => $data) {
       $dao = new CRM_ACL_BAO_Cache();
       if ($id) {
@@ -116,9 +118,22 @@ WHERE contact_id = %1
   }
 
   /**
+   * Do an opportunistic cache refresh if the site is configured for these.
+   *
+   * Sites that use acls and do not run the acl cache clearing cron job should
+   * refresh the caches on demand. The user session will be forced to wait
+   * and this is a common source of deadlocks, so it is less ideal.
+   */
+  public static function opportunisticCacheFlush(): void {
+    if (Civi::settings()->get('acl_cache_refresh_mode') === 'opportunistic') {
+      self::resetCache();
+    }
+  }
+
+  /**
    * Deletes all the cache entries.
    */
-  public static function resetCache() {
+  public static function resetCache(): void {
     if (!CRM_Core_Config::isPermitCacheFlushMode()) {
       return;
     }
@@ -138,17 +153,7 @@ WHERE  modified_date IS NULL
       ],
     ];
     CRM_Core_DAO::singleValueQuery($query, $params);
-
-    // CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache"); // No, force-commits transaction
-    // CRM_Core_DAO::singleValueQuery("DELETE FROM civicrm_acl_contact_cache"); // Transaction-safe
-    if (CRM_Core_Transaction::isActive()) {
-      CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, function () {
-        CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
-      });
-    }
-    else {
-      CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
-    }
+    self::flushACLContactCache();
   }
 
   /**
@@ -158,6 +163,23 @@ WHERE  modified_date IS NULL
    */
   public static function deleteContactCacheEntry($userID) {
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_acl_contact_cache WHERE user_id = %1", [1 => [$userID, 'Positive']]);
+  }
+
+  /**
+   * Flush the contents of the acl contact cache.
+   */
+  protected static function flushACLContactCache(): void {
+    unset(Civi::$statics['CRM_ACL_API']);
+    // CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache"); // No, force-commits transaction
+    // CRM_Core_DAO::singleValueQuery("DELETE FROM civicrm_acl_contact_cache"); // Transaction-safe
+    if (CRM_Core_Transaction::isActive()) {
+      CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, function () {
+        CRM_Core_DAO::singleValueQuery('TRUNCATE TABLE civicrm_acl_contact_cache');
+      });
+    }
+    else {
+      CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
+    }
   }
 
 }

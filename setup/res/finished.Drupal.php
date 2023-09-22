@@ -1,22 +1,12 @@
 <?php \Civi\Setup::assertRunning(); ?>
 <?php
-throw new \Exception("A draft copy of this file is available but has not been tested. Please edit " . __FILE__);
-
 $drupalPermissionsURL = url('admin/people/permissions');
 $drupalURL = url('civicrm/admin/configtask', array(
   'query' => array(
     'reset' => 1,
   ),
 ));
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-  <title><?php echo ts('CiviCRM Installed'); ?></title>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <link rel="stylesheet" type="text/css" href="template.css"/>
-</head>
-<body>
+?>
 <div style="padding: 1em;">
   <h1><?php echo ts('CiviCRM Installed'); ?></h1>
   <p class="good"><?php echo ts('CiviCRM has been successfully installed'); ?></p>
@@ -29,5 +19,3 @@ $drupalURL = url('civicrm/admin/configtask', array(
     <?php include 'finished.Common.php'; ?>
   </ul>
 </div>
-</body>
-</html>

@@ -1,0 +1,26 @@
+<i ng-if=":: $ctrl.settings.draggable" class="crm-i fa-sort-amount-asc" title="{{:: ts('Drag columns to reposition') }}"></i>
+<div class="btn-group" ng-if=":: $ctrl.settings.actions">
+  <button type="button" class="btn btn-secondary-outline" ng-click="$ctrl.toggleAllRows()" ng-disabled="$ctrl.loading || !$ctrl.results.length" title="{{ $ctrl.selectedRows.length ? ts('Select none') : ts('Select all') }}">
+    <i class="crm-i" ng-class="{'fa-square-o': !$ctrl.selectedRows.length, 'fa-minus-square-o': !$ctrl.allRowsSelected && $ctrl.selectedRows.length, 'fa-check-square-o': $ctrl.allRowsSelected}"></i>
+  </button>
+  <button type="button" class="btn btn-secondary-outline dropdown-toggle" ng-click="$ctrl.selectAllMenuOpen = true;" ng-disabled="$ctrl.loading || !$ctrl.results.length" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" ng-if="$ctrl.selectAllMenuOpen">
+    <li ng-if="$ctrl.rowCount > $ctrl.results.length">
+      <a href ng-click="$ctrl.selectAllPages()">
+        {{:: ts('All') }}
+      </a>
+    </li>
+    <li>
+      <a href ng-click="$ctrl.selectPage()">
+        {{ $ctrl.rowCount > $ctrl.results.length ? ts('This Page') : ts('All') }}
+      </a>
+    </li>
+    <li>
+      <a href ng-click="$ctrl.selectNone()">
+        {{:: ts('None') }}
+      </a>
+    </li>
+  </ul>
+</div>

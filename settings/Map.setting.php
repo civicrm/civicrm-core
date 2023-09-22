@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  * Settings metadata file
  */
 return [
@@ -53,6 +51,9 @@ return [
     ],
     'pseudoconstant' => [
       'callback' => 'CRM_Core_SelectValues::geoProvider',
+    ],
+    'on_change' => [
+      'CRM_Utils_GeocodeProvider::reset',
     ],
     'default' => NULL,
     'title' => ts('Geocoding Provider'),

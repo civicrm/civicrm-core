@@ -7,10 +7,43 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  */
 class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
 
-  public function setUp() {
-    parent::setUp();
+  /**
+   * @var array
+   */
+  private $defaultAssigneeOptionsValues = [];
 
-    $this->defaultAssigneeOptionsValues = [];
+  /**
+   * @var array
+   */
+  private $contacts = [];
+
+  /**
+   * @var array
+   */
+  private $relationships = [];
+
+  /**
+   * @var array
+   */
+  private $moreRelationshipTypes = [];
+
+  /**
+   * @var SimpleXMLElement
+   */
+  private $activityTypeXml;
+
+  /**
+   * @var array
+   */
+  private $activityParams = [];
+
+  /**
+   * @var CRM_Case_XMLProcessor_Process
+   */
+  private $process;
+
+  public function setUp(): void {
+    parent::setUp();
 
     $this->setupContacts();
     $this->setupDefaultAssigneeOptions();
@@ -21,7 +54,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->process = new CRM_Case_XMLProcessor_Process();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->deleteMoreRelationshipTypes();
 
     parent::tearDown();
@@ -178,9 +211,10 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->activityTypeXml = new SimpleXMLElement($activityTypeXml);
     $this->activityParams = [
       'activity_date_time' => date('Ymd'),
+      // @todo This seems wrong, it just happens to work out because both caseId and caseTypeId equal 1 in the stock setup here.
       'caseID' => $this->caseTypeId,
       'clientID' => $this->contacts['ana'],
-      'creatorID' => $this->_loggedInUser,
+      'creatorID' => $this->getLoggedInUser(),
     ];
   }
 
@@ -188,7 +222,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    * Tests the creation of activities where the default assignee should be the
    * target contact's instructor. Beto is the instructor for Ana.
    */
-  public function testCreateActivityWithDefaultContactByRelationship() {
+  public function testCreateActivityWithDefaultContactByRelationship(): void {
     $relationship = $this->relationships['ana_is_pupil_of_beto'];
     $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['BY_RELATIONSHIP'];
     $this->activityTypeXml->default_assignee_relationship = "{$relationship['type_id']}_b_a";
@@ -198,10 +232,101 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
   }
 
   /**
+   * Test the creation of activities where the default assignee should not
+   * end up being a contact from another case where it has the same client
+   * and relationship.
+   */
+  public function testCreateActivityWithDefaultContactByRelationshipTwoCases(): void {
+    /*
+    At this point the stock setup looks like this:
+    Case 1: no roles assigned
+    Non-case relationship with ana as pupil of beto
+    Non-case relationship with ana as spouse of carlos
+
+    So we want to:
+    Make another case for the same client ana.
+    Add a pupil role on that new case with some other person.
+    Make an activity on the first case.
+
+    Since there is a non-case relationship of that type for the
+    right person we do want it to take that one even though there is no role
+    on the first case, i.e. it SHOULD fall back to non-case relationships.
+    So this is test 1.
+
+    Then we want to get rid of the non-case relationship and try again. In
+    this situation it should not make any assignment, i.e. it should not
+    take the other person from the other case. The original bug was that it
+    would assign the activity to that other person from the other case. This
+    is test 2.
+     */
+
+    $relationship = $this->relationships['ana_is_pupil_of_beto'];
+
+    // Make another case and add a case role with the same relationship we
+    // want, but a different person.
+    $caseObj = $this->createCase($this->contacts['ana'], $this->getLoggedInUser());
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $this->contacts['ana'],
+      'contact_id_b' => $this->contacts['carlos'],
+      'relationship_type_id' => $relationship['type_id'],
+      'case_id' => $caseObj->id,
+    ]);
+
+    $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['BY_RELATIONSHIP'];
+    $this->activityTypeXml->default_assignee_relationship = "{$relationship['type_id']}_b_a";
+
+    $this->process->createActivity($this->activityTypeXml, $this->activityParams);
+
+    // We can't use assertActivityAssignedToContactExists because it assumes
+    // there's only one activity in the database, but we have several from the
+    // second case. We want the one we just created on the first case.
+    $result = $this->callAPISuccess('Activity', 'get', [
+      'case_id' => $this->activityParams['caseID'],
+      'return' => ['assignee_contact_id'],
+    ])['values'];
+    $this->assertCount(1, $result);
+    foreach ($result as $activity) {
+      // Note the first parameter is turned into an array to match the second.
+      $this->assertEquals([$this->contacts['beto']], $activity['assignee_contact_id']);
+    }
+
+    // Now remove the non-case relationship.
+    $result = $this->callAPISuccess('Relationship', 'get', [
+      'case_id' => ['IS NULL' => 1],
+      'relationship_type_id' => $relationship['type_id'],
+      'contact_id_a' => $this->contacts['ana'],
+      'contact_id_b' => $this->contacts['beto'],
+    ])['values'];
+    $this->assertCount(1, $result);
+    foreach ($result as $activity) {
+      $result = $this->callAPISuccess('Relationship', 'delete', ['id' => $activity['id']]);
+    }
+
+    // Create another activity on the first case. Make it a different activity
+    // type so we can find it better.
+    $activityXml = '<activity-type><name>Follow up</name></activity-type>';
+    $activityXmlElement = new SimpleXMLElement($activityXml);
+    $activityXmlElement->default_assignee_type = $this->defaultAssigneeOptionsValues['BY_RELATIONSHIP'];
+    $activityXmlElement->default_assignee_relationship = "{$relationship['type_id']}_b_a";
+    $this->process->createActivity($activityXmlElement, $this->activityParams);
+
+    $result = $this->callAPISuccess('Activity', 'get', [
+      'case_id' => $this->activityParams['caseID'],
+      'activity_type_id' => 'Follow up',
+      'return' => ['assignee_contact_id'],
+    ])['values'];
+    $this->assertCount(1, $result);
+    foreach ($result as $activity) {
+      // It should be empty, not the contact from the second case.
+      $this->assertEmpty($activity['assignee_contact_id']);
+    }
+  }
+
+  /**
    * Tests when the default assignee relationship exists, but in the other direction only.
    * Ana is a pupil, but has no pupils related to her.
    */
-  public function testCreateActivityWithDefaultContactByRelationshipMissing() {
+  public function testCreateActivityWithDefaultContactByRelationshipMissing(): void {
     $relationship = $this->relationships['ana_is_pupil_of_beto'];
     $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['BY_RELATIONSHIP'];
     $this->activityTypeXml->default_assignee_relationship = "{$relationship['type_id']}_a_b";
@@ -214,7 +339,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    * Tests when the the default assignee relationship exists and is a bidirectional
    * relationship. Ana and Carlos are spouses.
    */
-  public function testCreateActivityWithDefaultContactByRelationshipBidirectional() {
+  public function testCreateActivityWithDefaultContactByRelationshipBidirectional(): void {
     $relationship = $this->relationships['ana_is_spouse_of_carlos'];
     $this->activityParams['clientID'] = $this->contacts['carlos'];
     $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['BY_RELATIONSHIP'];
@@ -228,7 +353,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    * Tests when the default assignee relationship does not exist. Ana is not an
    * employee for anyone.
    */
-  public function testCreateActivityWithDefaultContactByRelationButTheresNoRelationship() {
+  public function testCreateActivityWithDefaultContactByRelationButTheresNoRelationship(): void {
     $relationship = $this->relationships['unassigned_employee'];
     $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['BY_RELATIONSHIP'];
     $this->activityTypeXml->default_assignee_relationship = "{$relationship['type_id']}_b_a";
@@ -240,7 +365,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
   /**
    * Tests the creation of activities with default assignee set to a specific contact.
    */
-  public function testCreateActivityAssignedToSpecificContact() {
+  public function testCreateActivityAssignedToSpecificContact(): void {
     $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['SPECIFIC_CONTACT'];
     $this->activityTypeXml->default_assignee_contact = $this->contacts['carlos'];
 
@@ -252,7 +377,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    * Tests the creation of activities with default assignee set to a specific contact,
    * but the contact does not exist.
    */
-  public function testCreateActivityAssignedToNonExistantSpecificContact() {
+  public function testCreateActivityAssignedToNonExistantSpecificContact(): void {
     $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['SPECIFIC_CONTACT'];
     $this->activityTypeXml->default_assignee_contact = 987456321;
 
@@ -264,17 +389,17 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    * Tests the creation of activities with the default assignee being the one
    * creating the case's activity.
    */
-  public function testCreateActivityAssignedToUserCreatingTheCase() {
+  public function testCreateActivityAssignedToUserCreatingTheCase(): void {
     $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['USER_CREATING_THE_CASE'];
 
     $this->process->createActivity($this->activityTypeXml, $this->activityParams);
-    $this->assertActivityAssignedToContactExists($this->_loggedInUser);
+    $this->assertActivityAssignedToContactExists($this->getLoggedInUser());
   }
 
   /**
    * Tests the creation of activities when the default assignee is set to NONE.
    */
-  public function testCreateActivityAssignedNoUser() {
+  public function testCreateActivityAssignedNoUser(): void {
     $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['NONE'];
 
     $this->process->createActivity($this->activityTypeXml, $this->activityParams);
@@ -284,7 +409,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
   /**
    * Tests the creation of activities when the default assignee is set to NONE.
    */
-  public function testCreateActivityWithNoDefaultAssigneeOption() {
+  public function testCreateActivityWithNoDefaultAssigneeOption(): void {
     $this->process->createActivity($this->activityTypeXml, $this->activityParams);
     $this->assertActivityAssignedToContactExists(NULL);
   }
@@ -315,8 +440,8 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    *   unique for each entry in the dataprovider since want to test a given
    *   relationship type against multiple xml strings. It's not a test
    *   identifier, it's an array key to use to look up something.
-   * @param $xmlString string
-   * @param $expected array
+   * @param string $xmlString
+   * @param array $expected
    * @param $dontcare array We're re-using the data provider for two tests and
    *   we don't care about those expected values.
    *
@@ -339,10 +464,10 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    *   unique for each entry in the dataprovider since want to test a given
    *   relationship type against multiple xml strings. It's not a test
    *   identifier, it's an array key to use to look up something.
-   * @param $xmlString string
+   * @param string $xmlString
    * @param $dontcare array We're re-using the data provider for two tests and
    *   we don't care about those expected values.
-   * @param $expected array
+   * @param array $expected
    *
    * @dataProvider xmlCaseRoleDataProvider
    */
@@ -430,7 +555,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
   /**
    * Test XMLProcessor activityTypes()
    */
-  public function testXmlProcessorActivityTypes() {
+  public function testXmlProcessorActivityTypes(): void {
     // First change an activity's label since we also test getting the labels.
     // @todo Having a brain freeze or something - can't do this in one step?
     $activity_type_id = $this->callApiSuccess('OptionValue', 'get', [
@@ -450,11 +575,11 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->assertEquals(
       [
         13 => 'Open Case',
-        55 => 'Medical evaluation',
-        56 => 'Mental health evaluation',
-        57 => 'Secure temporary housing',
-        60 => 'Income and benefits stabilization',
-        58 => 'Long-term housing plan',
+        56 => 'Medical evaluation',
+        57 => 'Mental health evaluation',
+        58 => 'Secure temporary housing',
+        61 => 'Income and benefits stabilization',
+        59 => 'Long-term housing plan',
         14 => 'Follow up',
         15 => 'Change Case Type',
         16 => 'Change Case Status',
@@ -486,11 +611,11 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->assertEquals(
       [
         13 => 'Open Case',
-        55 => 'Medical evaluation changed',
-        56 => 'Mental health evaluation',
-        57 => 'Secure temporary housing',
-        60 => 'Income and benefits stabilization',
-        58 => 'Long-term housing plan',
+        56 => 'Medical evaluation changed',
+        57 => 'Mental health evaluation',
+        58 => 'Secure temporary housing',
+        61 => 'Income and benefits stabilization',
+        59 => 'Long-term housing plan',
         14 => 'Follow up',
         15 => 'Change Case Type',
         16 => 'Change Case Status',

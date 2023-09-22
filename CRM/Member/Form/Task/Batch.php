@@ -74,10 +74,10 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     $ufGroupId = $this->get('ufGroupId');
 
     if (!$ufGroupId) {
-      CRM_Core_Error::statusBounce('ufGroupId is missing');
+      CRM_Core_Error::statusBounce(ts('ufGroupId is missing'));
     }
     $this->_title = ts('Update multiple memberships') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
-    CRM_Utils_System::setTitle($this->_title);
+    $this->setTitle($this->_title);
 
     $this->addDefaultButtons(ts('Save'));
     $this->_fields = [];
@@ -141,7 +141,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
             );
           }
           if ((CRM_Utils_Array::value($typeId, $entityColumnValue)) ||
-            CRM_Utils_System::isNull($entityColumnValue[$typeId])
+            CRM_Utils_System::isNull($entityColumnValue[$typeId] ?? NULL)
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $memberId);
           }
@@ -188,7 +188,6 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    * Process the form after the input has been submitted and validated.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -206,7 +205,6 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    *
    * @return mixed
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function submit(array $params) {
     $dates = [

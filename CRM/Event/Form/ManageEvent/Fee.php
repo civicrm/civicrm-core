@@ -84,7 +84,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
             $countRow = 0;
             foreach ($options as $optionId => $optionValue) {
               $countRow++;
-              $defaults['value'][$countRow] = CRM_Utils_Money::format($optionValue['amount'], NULL, '%a');
+              $defaults['value'][$countRow] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($optionValue['amount']);
               $defaults['label'][$countRow] = $optionValue['label'];
               $defaults['name'][$countRow] = $optionValue['name'];
               $defaults['weight'][$countRow] = $optionValue['weight'];
@@ -124,7 +124,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
         foreach ($discountFields['options'] as $discountFieldsval) {
           $defaults['discounted_label'][$discountFieldsval['weight']] = $discountFieldsval['label'];
-          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] = CRM_Utils_Money::format($discountFieldsval['amount'], NULL, '%a');
+          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($discountFieldsval['amount']);
           $defaults['discount_option_id'][$rowCount][$discountFieldsval['weight']] = $discountFieldsval['id'];
           if (!empty($discountFieldsval['is_default'])) {
             $defaults['discounted_default'] = $discountFieldsval['weight'];
@@ -255,7 +255,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $this->addSelect('financial_type_id', ['context' => 'search', 'options' => $financialTypes]);
     }
     // add pay later options
-    $this->addElement('checkbox', 'is_pay_later', ts('Enable Pay Later option?'), NULL,
+    $this->addElement('checkbox', 'is_pay_later', ts('Pay later option'), NULL,
       ['onclick' => "return showHideByValue('is_pay_later','','payLaterOptions','block','radio',false);"]
     );
     $this->addElement('textarea', 'pay_later_text', ts('Pay Later Label'),
@@ -274,13 +274,15 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     else {
       $this->assign('price', TRUE);
     }
-    $this->addField('price_set_id', [
+    $this->addSelect('price_set_id', [
       'entity' => 'PriceSet',
+      'option_url' => 'civicrm/admin/price',
       'options' => $price,
+      'label' => ts('Price Set'),
       'onchange' => "return showHideByValue('price_set_id', '', 'map-field', 'block', 'select', false);",
     ]);
 
-    $default = [$this->createElement('radio', NULL, NULL, NULL, 0)];
+    $default = [0 => NULL];
     $this->add('hidden', 'price_field_id', '', ['id' => 'price_field_id']);
     for ($i = 1; $i <= self::NUM_OPTION; $i++) {
       // label
@@ -289,13 +291,13 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
       // value
       $this->add('text', "value[$i]", ts('Value'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'));
-      $this->addRule("value[$i]", ts('Please enter a valid money value for this field (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+      $this->addRule("value[$i]", ts('Please enter a valid money value for this field (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
       // default
-      $default[] = $this->createElement('radio', NULL, NULL, NULL, $i);
+      $default[$i] = NULL;
     }
 
-    $this->addGroup($default, 'default');
+    $this->addRadio('default', '', $default);
 
     $this->addElement('checkbox', 'is_discount', ts('Discounts by Signup Date?'), NULL,
       ['onclick' => "warnDiscountDel(); return showHideByValue('is_discount','','discount','block','radio',false);"]
@@ -306,7 +308,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
     // form fields of Discount sets
     $defaultOption = [];
-    $_showHide = new CRM_Core_ShowHideBlocks('', '');
+    $_showHide = new CRM_Core_ShowHideBlocks();
 
     for ($i = 1; $i <= self::NUM_DISCOUNT; $i++) {
       //the show hide blocks
@@ -355,13 +357,14 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $this->add('datepicker', 'discount_end_date[' . $i . ']', ts('Discount End Date'), [], FALSE, ['time' => FALSE]);
     }
     $_showHide->addToTemplate();
-    $this->addElement('submit', $this->getButtonName('submit'), ts('Add Discount Set to Fee Table'),
-      ['class' => 'crm-form-submit cancel']
+    $this->addElement('xbutton', $this->getButtonName('submit'), ts('Add Discount Set to Fee Table'),
+      [
+        'type' => 'submit',
+        'class' => 'crm-form-submit cancel',
+        'value' => 1,
+      ]
     );
-    if (Civi::settings()->get('deferred_revenue_enabled')) {
-      $deferredFinancialType = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
-      $this->assign('deferredFinancialType', array_keys($deferredFinancialType));
-    }
+    $this->assign('deferredFinancialType', Civi::settings()->get('deferred_revenue_enabled') ? array_keys(CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType()) : NULL);
     $this->buildAmountLabel();
     parent::buildQuickForm();
   }
@@ -515,14 +518,14 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       // value
       for ($j = 1; $j <= self::NUM_DISCOUNT; $j++) {
         $this->add('text', "discounted_value[$i][$j]", ts('Value'), ['size' => 10]);
-        $this->addRule("discounted_value[$i][$j]", ts('Please enter a valid money value for this field (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+        $this->addRule("discounted_value[$i][$j]", ts('Please enter a valid money value for this field (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
       }
 
       // default
-      $default[] = $this->createElement('radio', NULL, NULL, NULL, $i);
+      $default[$i] = NULL;
     }
 
-    $this->addGroup($default, 'discounted_default');
+    $this->addRadio('discounted_default', NULL, $default);
   }
 
   /**
@@ -541,7 +544,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     }
 
     if (!empty($params['payment_processor'])) {
-      $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($params['payment_processor']));
+      $params['payment_processor'] = array_keys($params['payment_processor']);
     }
     else {
       $params['payment_processor'] = 'null';
@@ -651,7 +654,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
         $discountPriceSets = !empty($this->_defaultValues['discount_price_set']) ? $this->_defaultValues['discount_price_set'] : [];
         $discountFieldIDs = !empty($this->_defaultValues['discount_option_id']) ? $this->_defaultValues['discount_option_id'] : [];
-        if (CRM_Utils_Array::value('is_discount', $params) == 1) {
+        if (($params['is_discount'] ?? NULL) == 1) {
           // if there are discounted set of label / values,
           // create custom options for them
           $labels = $params['discounted_label'] ?? NULL;
@@ -663,7 +666,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
               $discountOptions = [];
               for ($i = 1; $i < self::NUM_OPTION; $i++) {
                 if (!empty($labels[$i]) &&
-                  !CRM_Utils_System::isNull(CRM_Utils_Array::value($j, $values[$i]))
+                  !CRM_Utils_System::isNull($values[$i][$j] ?? NULL)
                 ) {
                   $discountOptions[] = [
                     'label' => trim($labels[$i]),
@@ -810,7 +813,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         $params['value'][$index] = CRM_Utils_Rule::cleanMoney(trim($value));
       }
     }
-    foreach ($params['discounted_value'] as $index => $discountedValueSet) {
+    foreach ($params['discounted_value'] ?? [] as $index => $discountedValueSet) {
       foreach ($discountedValueSet as $innerIndex => $value) {
         if (CRM_Utils_System::isNull($value)) {
           unset($params['discounted_value'][$index][$innerIndex]);

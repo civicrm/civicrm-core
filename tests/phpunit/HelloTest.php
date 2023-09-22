@@ -34,21 +34,14 @@ class HelloTest extends PHPUnit\Framework\TestCase {
   public $abc;
 
   /**
-   * @param string|null $name
-   */
-  public function __construct($name = NULL) {
-    parent::__construct($name);
-  }
-
-  /**
    * Called before the test functions will be executed.
    * this function is defined in PHPUnit_TestCase and overwritten
    * here
    */
-  public function setUp() {
+  public function setUp(): void {
     // create a new instance of String with the
     // string 'abc'
-    $this->abc = "hello";
+    $this->abc = 'hello';
   }
 
   /**
@@ -56,7 +49,7 @@ class HelloTest extends PHPUnit\Framework\TestCase {
    * this function is defined in PHPUnit_TestCase and overwritten
    * here.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     // delete your instance
     unset($this->abc);
   }
@@ -64,10 +57,9 @@ class HelloTest extends PHPUnit\Framework\TestCase {
   /**
    * test the toString function.
    */
-  public function testHello() {
+  public function testHello(): void {
     $result = $this->abc;
-    $expected = 'hello';
-    $this->assertEquals($result, $expected);
+    $this->assertEquals('hello', $result);
   }
 
 }

@@ -9,7 +9,7 @@
 *}
 <p>
 
-{if $rows }
+{if $rows}
 <div class="crm-submit-buttons">
      <span class="element-right">{include file="CRM/common/formButtons.tpl" location="top"}</span>
 </div>
@@ -43,7 +43,7 @@
         {/if}
         <td class="crm-event-print-event_participant_fee_amount">{$row.participant_fee_amount|crmMoney}</td>
         <td class="crm-event-print-event_date">{$row.event_start_date|truncate:10:''|crmDate}
-          {if $row.event_end_date && $row.event_end_date|date_format:"%Y%m%d" NEQ $row.event_start_date|date_format:"%Y%m%d"}
+          {if $row.event_end_date && $row.event_end_date|crmDate:"%Y%m%d" NEQ $row.event_start_date|crmDate:"%Y%m%d"}
               <br/>- {$row.event_end_date|truncate:10:''|crmDate}
           {/if}
         </td>
@@ -54,11 +54,11 @@
 </table>
 
 <div class="form-item">
-     <span class="element-right">{include file="CRM/common/formButtons.tpl"}</span>
+     <span class="element-right">{include file="CRM/common/formButtons.tpl" location=''}</span>
 </div>
 
 {else}
 <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>&nbsp;{ts}There are no records selected for Print.{/ts}
+    {icon icon="fa-info-circle"}{/icon}{ts}There are no records selected for Print.{/ts}
 </div>
 {/if}

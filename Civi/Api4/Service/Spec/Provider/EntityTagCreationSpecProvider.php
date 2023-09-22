@@ -10,20 +10,15 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-class EntityTagCreationSpecProvider implements Generic\SpecProviderInterface {
+/**
+ * @service
+ * @internal
+ */
+class EntityTagCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec

@@ -61,10 +61,26 @@ class CRM_Utils_Check {
   }
 
   /**
+   * @return array[]
+   */
+  public static function getSeverityOptions() {
+    return [
+      ['id' => 0, 'name' => \Psr\Log\LogLevel::DEBUG, 'label' => ts('Debug')],
+      ['id' => 1, 'name' => \Psr\Log\LogLevel::INFO, 'label' => ts('Info')],
+      ['id' => 2, 'name' => \Psr\Log\LogLevel::NOTICE, 'label' => ts('Notice')],
+      ['id' => 3, 'name' => \Psr\Log\LogLevel::WARNING, 'label' => ts('Warning')],
+      ['id' => 4, 'name' => \Psr\Log\LogLevel::ERROR, 'label' => ts('Error')],
+      ['id' => 5, 'name' => \Psr\Log\LogLevel::CRITICAL, 'label' => ts('Critical')],
+      ['id' => 6, 'name' => \Psr\Log\LogLevel::ALERT, 'label' => ts('Alert')],
+      ['id' => 7, 'name' => \Psr\Log\LogLevel::EMERGENCY, 'label' => ts('Emergency')],
+    ];
+  }
+
+  /**
    * Display daily system status alerts (admin only).
    */
   public function showPeriodicAlerts() {
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
+    if (CRM_Core_Permission::check('administer CiviCRM system')) {
       $session = CRM_Core_Session::singleton();
       if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
 
@@ -101,23 +117,6 @@ class CRM_Utils_Check {
   }
 
   /**
-   * Sort messages based upon severity
-   *
-   * @param CRM_Utils_Check_Message $a
-   * @param CRM_Utils_Check_Message $b
-   * @return int
-   */
-  public static function severitySort($a, $b) {
-    $aSeverity = $a->getLevel();
-    $bSeverity = $b->getLevel();
-    if ($aSeverity == $bSeverity) {
-      return strcmp($a->getName(), $b->getName());
-    }
-    // The Message constructor guarantees that these will always be integers.
-    return ($aSeverity < $bSeverity);
-  }
-
-  /**
    * Get the integer value (useful for thresholds) of the severity.
    *
    * @param int|string $severity
@@ -146,7 +145,7 @@ class CRM_Utils_Check {
   /**
    * Throw an exception if any of the checks fail.
    *
-   * @param array|NULL $messages
+   * @param array|null $messages
    *   [CRM_Utils_Check_Message]
    * @param string $threshold
    *
@@ -170,41 +169,26 @@ class CRM_Utils_Check {
   }
 
   /**
-   * Run all system checks.
+   * Run all enabled system checks.
    *
    * This functon is wrapped by the System.check api.
    *
    * Calls hook_civicrm_check() for extensions to add or modify messages.
-   * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_check
+   * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_check/
    *
    * @param bool $max
    *   Whether to return just the maximum non-hushed severity
    *
-   * @return array
-   *   Array of CRM_Utils_Check_Message objects
+   * @return CRM_Utils_Check_Message[]
    */
   public static function checkAll($max = FALSE) {
-    $messages = [];
-    foreach (glob(__DIR__ . '/Check/Component/*.php') as $filePath) {
-      $className = 'CRM_Utils_Check_Component_' . basename($filePath, '.php');
-      /* @var CRM_Utils_Check_Component $check */
-      $check = new $className();
-      if ($check->isEnabled()) {
-        $messages = array_merge($messages, $check->checkAll());
-      }
-    }
-
-    CRM_Utils_Hook::check($messages);
-
-    uasort($messages, [__CLASS__, 'severitySort']);
+    $messages = self::checkStatus();
 
     $maxSeverity = 1;
     foreach ($messages as $message) {
-      if (!$message->isVisible()) {
-        continue;
+      if ($message->isVisible()) {
+        $maxSeverity = max($maxSeverity, $message->getLevel());
       }
-      $maxSeverity = max(1, $message->getLevel());
-      break;
     }
 
     Civi::cache('checks')->set('systemStatusCheckResult', $maxSeverity);
@@ -213,32 +197,47 @@ class CRM_Utils_Check {
   }
 
   /**
+   * @param array $statusNames
+   *   Optionally specify the names of specific checks to run, or leave empty to run all
+   * @param bool $includeDisabled
+   *   Run checks that have been explicitly disabled (default false)
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public static function checkStatus($statusNames = [], $includeDisabled = FALSE) {
+    $messages = [];
+    $checksNeeded = $statusNames;
+    foreach (glob(__DIR__ . '/Check/Component/*.php') as $filePath) {
+      $className = 'CRM_Utils_Check_Component_' . basename($filePath, '.php');
+      /** @var CRM_Utils_Check_Component $component */
+      $component = new $className();
+      if ($includeDisabled || $component->isEnabled()) {
+        $messages = array_merge($messages, $component->checkAll($statusNames, $includeDisabled));
+      }
+      if ($statusNames) {
+        // Early return if we have already run (or skipped) all the requested checks.
+        $checksNeeded = array_diff($checksNeeded, $component->getAllChecks());
+        if (!$checksNeeded) {
+          return $messages;
+        }
+      }
+    }
+
+    CRM_Utils_Hook::check($messages, $statusNames, $includeDisabled);
+
+    return $messages;
+  }
+
+  /**
    * @param int $level
    * @return string
    */
   public static function toStatusLabel($level) {
-    switch ($level) {
-      case 7:
-        return ts('System Status: Emergency');
-
-      case 6:
-        return ts('System Status: Alert');
-
-      case 5:
-        return ts('System Status: Critical');
-
-      case 4:
-        return ts('System Status: Error');
-
-      case 3:
-        return ts('System Status: Warning');
-
-      case 2:
-        return ts('System Status: Notice');
-
-      default:
-        return ts('System Status: Ok');
+    if ($level > 1) {
+      $options = array_column(self::getSeverityOptions(), 'label', 'id');
+      return ts('System Status: %1', [1 => $options[$level]]);
     }
+    return ts('System Status: Ok');
   }
 
 }

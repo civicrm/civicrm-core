@@ -1,0 +1,20 @@
+<div class="af-gui-bar">
+  <div class="form-inline">
+    <span>{{:: $ctrl.display['saved_search_id.label'] }}: {{:: $ctrl.display.label }}</span>
+    <div class="btn-group pull-right" af-gui-menu>
+      <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
+        <span><i class="crm-i fa-gear"></i></span>
+      </button>
+      <ul class="dropdown-menu" ng-if="menu.open">
+        <li>
+          <a target="_blank" ng-href="{{:: $ctrl.editUrl }}">
+            <i class="crm-i fa-external-link"></i> {{:: ts('Edit Saved Search') }}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<p class="text-center af-gui-search-display">
+  <i class="crm-i fa-3x {{:: $ctrl.display['type:icon'] }}"></i>
+</p>

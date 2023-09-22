@@ -12,7 +12,7 @@
 {crmRegion name=profile-search-`$ufGroupName`}
 
 {* make sure there are some fields in the selector *}
-{if ! empty( $columnHeaders ) || $isReset }
+{if ! empty($columnHeaders) || $isReset}
 
 {if $search}
 <div class="crm-block crm-form-block">
@@ -77,7 +77,7 @@
 
 {else}
     <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
+        {icon icon="fa-info-circle"}{/icon}
         {ts}No fields in this Profile have been configured to display as a result column in the search results table. Ask the site administrator to check the Profile setup.{/ts}
     </div>
 {/if}

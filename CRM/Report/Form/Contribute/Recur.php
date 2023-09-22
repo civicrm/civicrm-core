@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
 
@@ -25,9 +23,8 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -188,7 +185,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
           'financial_type_id' => [
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search'),
             'type' => CRM_Utils_Type::T_INT,
           ],
           'frequency_unit' => [
@@ -375,11 +372,13 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
       }
 
       // handle contribution status id
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_contribution_status_id', $row)) {
+      $value = $row['civicrm_contribution_recur_contribution_status_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_recur_contribution_status_id'] = $contributionStatus[$value];
       }
 
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_amount', $row)) {
+      $value = $row['civicrm_contribution_recur_amount'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_recur_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_contribution_recur_amount'], $rows[$rowNum]['civicrm_contribution_recur_currency']);
       }
 

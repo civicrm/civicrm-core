@@ -10,128 +10,300 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Event;
+use Civi\Token\TokenRow;
+
 /**
  * Class CRM_Event_Tokens
  *
  * Generate "event.*" tokens.
- *
- * This TokenSubscriber was produced by refactoring the code from the
- * scheduled-reminder system with the goal of making that system
- * more flexible. The current implementation is still coupled to
- * scheduled-reminders. It would be good to figure out a more generic
- * implementation which is not tied to scheduled reminders, although
- * that is outside the current scope.
  */
-class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
+class CRM_Event_Tokens extends CRM_Core_EntityTokens {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct('event', array_merge(
-      [
-        'event_type' => ts('Event Type'),
-        'title' => ts('Event Title'),
-        'event_id' => ts('Event ID'),
-        'start_date' => ts('Event Start Date'),
-        'end_date' => ts('Event End Date'),
-        'summary' => ts('Event Summary'),
-        'description' => ts('Event Description'),
-        'location' => ts('Event Location'),
-        'info_url' => ts('Event Info URL'),
-        'registration_url' => ts('Event Registration URL'),
-        'fee_amount' => ts('Event Fee'),
-        'contact_email' => ts('Event Contact (Email)'),
-        'contact_phone' => ts('Event Contact (Phone)'),
-        'balance' => ts('Event Balance'),
-      ],
-      CRM_Utils_Token::getCustomFieldTokens('Event')
-    ));
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function checkActive(\Civi\Token\TokenProcessor $processor) {
-    // Extracted from scheduled-reminders code. See the class description.
-    return !empty($processor->context['actionMapping'])
-      && $processor->context['actionMapping']->getEntity() === 'civicrm_participant';
-  }
-
-  /**
-   * Alter action schedule query.
+   * Get the entity name for api v4 calls.
    *
-   * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
+   * @return string
    */
-  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
-    if ($e->mapping->getEntity() !== 'civicrm_participant') {
-      return;
-    }
+  protected function getApiEntityName(): string {
+    return 'Event';
+  }
 
-    // FIXME: seems too broad.
-    $e->query->select('e.*');
-    $e->query->select('ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone');
-    $e->query->join('participant_stuff', "
-!casMailingJoinType civicrm_event ev ON e.event_id = ev.id
-!casMailingJoinType civicrm_option_group og ON og.name = 'event_type'
-!casMailingJoinType civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
-LEFT JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id
-LEFT JOIN civicrm_address address ON address.id = lb.address_id
-LEFT JOIN civicrm_email email ON email.id = lb.email_id
-LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
-");
+  /**
+   * Get all tokens.
+   *
+   * This function will be removed once the parent class can determine it.
+   */
+  protected function getBespokeTokens(): array {
+    return [
+      'location' => [
+        'title' => ts('Event Location'),
+        'name' => 'location',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'user',
+      ],
+      'info_url' => [
+        'title' => ts('Event Info URL'),
+        'name' => 'info_url',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'user',
+      ],
+      'registration_url' => [
+        'title' => ts('Event Registration URL'),
+        'name' => 'registration_url',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'user',
+      ],
+      'loc_block_id.email_id.email' => [
+        'title' => ts('Event Contact Email'),
+        'name' => 'loc_block_id.email_id.email',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'user',
+      ],
+      'loc_block_id.email_2_id.email' => [
+        'title' => ts('Event Contact Email 2'),
+        'name' => 'loc_block_id.email_2_id.email',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_id.phone' => [
+        'title' => ts('Event Contact Phone'),
+        'name' => 'loc_block_id.phone_id.phone',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => '',
+        'audience' => 'user',
+      ],
+      'loc_block_id.phone_id.phone_type_id' => [
+        'title' => ts('Event Contact Phone'),
+        'name' => 'loc_block_id.phone_id.phone_type_id',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'Int',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_id.phone_type_id:label' => [
+        'title' => ts('Event Contact Phone'),
+        'name' => 'loc_block_id.phone_id.phone_type_id:label',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_id.phone_ext' => [
+        'title' => ts('Event Contact Phone Extension'),
+        'name' => 'loc_block_id.phone_id.phone_ext',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_2_id.phone' => [
+        'title' => ts('Event Contact Phone 2'),
+        'name' => 'loc_block_id.phone_2_id.phone',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => '',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_2_id.phone_type_id' => [
+        'title' => ts('Event Contact Phone'),
+        'name' => 'loc_block_id.phone_2_id.phone_type_id',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'Int',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_2_id.phone_type_id:label' => [
+        'title' => ts('Event Contact Phone 2'),
+        'name' => 'loc_block_id.phone_2_id.phone_type_id:label',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
+      ],
+      'loc_block_id.phone_2_id.phone_ext' => [
+        'title' => ts('Event Contact Phone 2 Extension'),
+        'name' => 'loc_block_id.phone_2_id.phone_ext',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
+      ],
+    ];
   }
 
   /**
    * @inheritDoc
+   * @throws \CRM_Core_Exception
    */
-  public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $actionSearchResult = $row->context['actionSearchResult'];
+  public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
+    $eventID = (int) $this->getFieldValue($row, 'id');
+    if (array_key_exists($field, $this->getEventTokenValues($eventID))) {
+      foreach ($this->getEventTokenValues($eventID)[$field] as $format => $value) {
+        $row->format($format)->tokens($entity, $field, $value ?? '');
+      }
+    }
+  }
 
-    if ($field == 'location') {
-      $loc = [];
-      $stateProvince = \CRM_Core_PseudoConstant::stateProvince();
-      $loc['street_address'] = $actionSearchResult->street_address;
-      $loc['city'] = $actionSearchResult->city;
-      $loc['state_province'] = $stateProvince[$actionSearchResult->state_province_id] ?? NULL;
-      $loc['postal_code'] = $actionSearchResult->postal_code;
-      //$entityTokenParams[$tokenEntity][$field] = \CRM_Utils_Address::format($loc);
-      $row->tokens($entity, $field, \CRM_Utils_Address::format($loc));
+  /**
+   * Get the tokens available for the event.
+   *
+   * Cache by event as it's l
+   *
+   * @param int|null $eventID
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @internal
+   */
+  protected function getEventTokenValues(int $eventID = NULL): array {
+    $cacheKey = __CLASS__ . 'event_tokens' . $eventID . '_' . CRM_Core_I18n::getLocale();
+    if ($this->checkPermissions) {
+      $cacheKey .= '__' . CRM_Core_Session::getLoggedInContactID();
     }
-    elseif ($field == 'info_url') {
-      $row
-        ->tokens($entity, $field, \CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $actionSearchResult->event_id, TRUE, NULL, FALSE));
-    }
-    elseif ($field == 'registration_url') {
-      $row
-        ->tokens($entity, $field, \CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $actionSearchResult->event_id, TRUE, NULL, FALSE));
-    }
-    elseif (in_array($field, ['start_date', 'end_date'])) {
-      $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($actionSearchResult->$field));
-    }
-    elseif ($field == 'balance') {
-      if ($actionSearchResult->entityTable == 'civicrm_contact') {
-        $balancePay = 'N/A';
+    if (!Civi::cache('metadata')->has($cacheKey)) {
+      $event = Event::get($this->checkPermissions)->addWhere('id', '=', $eventID)
+        ->setSelect(array_merge([
+          'loc_block_id.address_id.street_address',
+          'loc_block_id.address_id.city',
+          'loc_block_id.address_id.state_province_id:label',
+          'loc_block_id.address_id.postal_code',
+          'loc_block_id.email_id.email',
+          'loc_block_id.email_2_id.email',
+          'loc_block_id.phone_id.phone',
+          'loc_block_id.phone_id.phone_type_id',
+          'loc_block_id.phone_id.phone_ext',
+          'loc_block_id.phone_id.phone_type_id:label',
+          'loc_block_id.phone_2_id.phone',
+          'loc_block_id.phone_2_id.phone_type_id',
+          'loc_block_id.phone_2_id.phone_ext',
+          'loc_block_id.phone_2_id.phone_type_id:label',
+          'is_show_location:label',
+          'is_public:label',
+          'is_share',
+          'is_share:label',
+          'requires_approval',
+          'requires_approval:label',
+          'is_monetary:label',
+          'event_type_id:name',
+          'pay_later_text',
+          'pay_later_receipt',
+          'fee_label',
+          'custom.*',
+        ], $this->getExposedFields()))
+        ->execute()->first();
+      $tokens['location']['text/plain'] = \CRM_Utils_Address::format([
+        'street_address' => $event['loc_block_id.address_id.street_address'],
+        'city' => $event['loc_block_id.address_id.city'],
+        'state_province' => $event['loc_block_id.address_id.state_province_id:label'],
+        'postal_code' => $event['loc_block_id.address_id.postal_code'],
+      ]);
+      $tokens['info_url']['text/html'] = \CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $eventID, TRUE, NULL, FALSE, TRUE);
+      $tokens['registration_url']['text/html'] = \CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $eventID, TRUE, NULL, FALSE, TRUE);
+      $tokens['start_date']['text/html'] = !empty($event['start_date']) ? new DateTime($event['start_date']) : '';
+      $tokens['end_date']['text/html'] = !empty($event['end_date']) ? new DateTime($event['end_date']) : '';
+      $tokens['contact_email']['text/html'] = $event['loc_block_id.email_id.email'];
+      $tokens['contact_phone']['text/html'] = $event['loc_block_id.phone_id.phone'];
+
+      foreach ($this->getTokenMetadata() as $fieldName => $fieldSpec) {
+        if (!isset($tokens[$fieldName])) {
+          if ($fieldSpec['type'] === 'Custom') {
+            $this->prefetch[$eventID] = $event;
+            $value = $event[$fieldSpec['name']];
+            $tokens[$fieldName]['text/html'] = CRM_Core_BAO_CustomField::displayValue($value, $fieldSpec['custom_field_id']);
+          }
+          else {
+            if ($this->isHTMLTextField($fieldName)) {
+              $tokens[$fieldName]['text/html'] = $event[$fieldName];
+            }
+            else {
+              $tokens[$fieldName]['text/plain'] = $event[$fieldName];
+            }
+          }
+        }
       }
-      elseif (!empty($actionSearchResult->entityID)) {
-        $info = \CRM_Contribute_BAO_Contribution::getPaymentInfo($actionSearchResult->entityID, 'event');
-        $balancePay = $info['balance'] ?? NULL;
-        $balancePay = \CRM_Utils_Money::format($balancePay);
-      }
-      $row->tokens($entity, $field, $balancePay);
+      Civi::cache('metadata')->set($cacheKey, $tokens);
     }
-    elseif ($field == 'fee_amount') {
-      $row->tokens($entity, $field, \CRM_Utils_Money::format($actionSearchResult->$field));
-    }
-    elseif (isset($actionSearchResult->$field)) {
-      $row->tokens($entity, $field, $actionSearchResult->$field);
-    }
-    elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
-      $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
-    }
-    else {
-      $row->tokens($entity, $field, '');
-    }
+    return Civi::cache('metadata')->get($cacheKey);
+  }
+
+  /**
+   * Get entity fields that should be exposed as tokens.
+   *
+   * Event has traditionally exposed very few fields. This is probably because
+   * a) there are a tonne of weird fields so an opt out approach doesn't work and
+   * b) so people just added what they needed at the time...
+   *
+   * @return string[]
+   *
+   */
+  protected function getExposedFields(): array {
+    return [
+      'event_type_id',
+      'event_type_id:label',
+      'title',
+      'id',
+      'pay_later_receipt',
+      'start_date',
+      'end_date',
+      'summary',
+      'description',
+      'is_show_location',
+      'is_public',
+      'confirm_email_text',
+      'is_monetary',
+      'fee_label',
+    ];
+  }
+
+  /**
+   * Get any overrides for token metadata.
+   *
+   * This is most obviously used for setting the audience, which
+   * will affect widget-presence.
+   *
+   * Changing the audience is done in order to simplify the
+   * UI for more general users.
+   *
+   * @return \string[][]
+   */
+  protected function getTokenMetadataOverrides(): array {
+    return [
+      'is_public' => ['audience' => 'sysadmin'],
+      'is_show_location' => ['audience' => 'sysadmin'],
+      'is_monetary' => ['audience' => 'sysadmin'],
+    ];
+  }
+
+  /**
+   * These tokens still work but we don't advertise them.
+   *
+   * We will actively remove from the following places
+   * - scheduled reminders
+   * - add to 'blocked' on pdf letter & email
+   *
+   * & then at some point start issuing warnings for them.
+   *
+   * @return string[]
+   */
+  protected function getDeprecatedTokens(): array {
+    return [
+      'contact_phone' => 'loc_block_id.phone_id.phone',
+      'contact_email' => 'loc_block_id.email_id.email',
+    ];
   }
 
 }

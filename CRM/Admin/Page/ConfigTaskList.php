@@ -50,6 +50,14 @@ class CRM_Admin_Page_ConfigTaskList extends CRM_Core_Page {
     foreach ($result['values'][0]['enable_components'] as $component) {
       $enabled[$component] = 1;
     }
+
+    // Create an array of translated Component titles to use as part of links on the page.
+    $translatedComponents = CRM_Core_Component::getNames(TRUE);
+    $translatedTitles = [];
+    foreach (CRM_Core_Component::getNames() as $key => $component) {
+      $translatedTitles[$component] = $translatedComponents[$key];
+    }
+    $this->assign('componentTitles', $translatedTitles);
     $this->assign('enabledComponents', $enabled);
 
     return parent::run();

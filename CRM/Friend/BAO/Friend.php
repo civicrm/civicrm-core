@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 /**
@@ -28,12 +27,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @var int
    */
   public $_friendId;
-
-  /**
-   */
-  public function __construct() {
-    parent::__construct();
-  }
 
   /**
    * Takes an associative array and creates a friend object.
@@ -52,23 +45,13 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * Given the list of params in the params array, fetch the object
-   * and store the values in the values array
-   *
+   * @deprecated
    * @param array $params
-   *   Input parameters to find object.
-   * @param array $values
-   *   Output values of the object.
-   *
-   * @return array
-   *   values
+   * @param array $defaults
+   * @return self|null
    */
-  public static function retrieve(&$params, &$values) {
-    $friend = new CRM_Friend_DAO_Friend();
-    $friend->copyValues($params);
-    $friend->find(TRUE);
-    CRM_Core_DAO::storeValues($friend, $values);
-    return $values;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -299,7 +282,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
     $templateParams = [
       'groupName' => 'msg_tpl_workflow_friend',
-      'valueName' => 'friend',
+      'workflow' => 'friend',
       'contactId' => $contactID,
       'tplParams' => [
         $values['module'] => $values['module'],

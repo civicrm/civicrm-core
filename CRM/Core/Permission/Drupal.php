@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -69,7 +67,7 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
     }
     if (function_exists('user_access')) {
       $account = NULL;
-      if ($userId) {
+      if ($userId || $userId === 0) {
         $account = user_load($userId);
       }
       return user_access($str, $account);
@@ -97,6 +95,31 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getAvailablePermissions() {
+    // We want to list *only* Drupal perms, so we'll *skip* Civi perms.
+    $allCorePerms = \CRM_Core_Permission::basicPermissions(TRUE);
+
+    $permissions = [];
+    $modules = system_get_info('module');
+    foreach ($modules as $moduleName => $module) {
+      $prefix = isset($module['name']) ? ($module['name'] . ': ') : '';
+      foreach (module_invoke($moduleName, 'permission') ?? [] as $permName => $perm) {
+        if (isset($allCorePerms[$permName])) {
+          continue;
+        }
+
+        $permissions["Drupal:$permName"] = [
+          'title' => $prefix . strip_tags($perm['title']),
+          'description' => $perm['description'] ?? NULL,
+        ];
+      }
+    }
+    return $permissions;
   }
 
   /**

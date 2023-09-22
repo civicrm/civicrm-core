@@ -23,7 +23,7 @@ class LogObserver extends \Log_observer {
    * @param array $event
    */
   public function notify($event) {
-    $levels = \Civi::log()->map;
+    $levels = \CRM_Core_Error_Log::getMap();
     $event['level'] = array_search($event['priority'], $levels);
     // Extract [civi.tag] from message string
     // As noted in \CRM_Core_Error_Log::log() the $context array gets prematurely converted to string with print_r() so we have to un-flatten it here

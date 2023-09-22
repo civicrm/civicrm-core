@@ -8,8 +8,9 @@
  */
 class CRM_Utils_TypeTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**
@@ -131,7 +132,111 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       ['field(contribution_status_id,4,5,6) asc, contact_id asc', 'MysqlOrderBy', 'field(`contribution_status_id`,4,5,6) asc, `contact_id` asc'],
       ['table.civicrm_column_name desc,other_column,another_column desc', 'MysqlOrderBy', '`table`.`civicrm_column_name` desc, `other_column`, `another_column` desc'],
       ['table.`Home-street_address` asc, `table-alias`.`Home-street_address` desc,`table-alias`.column', 'MysqlOrderBy', '`table`.`Home-street_address` asc, `table-alias`.`Home-street_address` desc, `table-alias`.`column`'],
+      [TRUE, 'Boolean', TRUE],
+      [FALSE, 'Boolean', FALSE],
+      ['TRUE', 'Boolean', 'TRUE'],
+      ['false', 'Boolean', 'false'],
+      ['banana', 'Boolean', NULL],
     ];
+  }
+
+  public function getPhpTypeExamples() {
+    $es = [];
+    $es['int_ok'] = [['int'], 1, 'strictly'];
+    $es['int_lax'] = [['int'], '1', 'lackadaisically'];
+    $es['int_badstr'] = [['int'], 'one', 'never'];
+
+    $es['float_ok'] = ['float', 1.2, 'strictly'];
+    $es['float_lax_int'] = ['float', 123, 'lackadaisically'];
+    $es['float_lax_str'] = ['float', '1.2', 'lackadaisically'];
+    $es['float_badstr'] = ['float', 'one point two', 'never'];
+
+    $es['double_ok'] = ['double', 1.2, 'strictly'];
+    $es['double_lax'] = ['double', '1.2', 'lackadaisically'];
+    $es['double_badstr'] = [['double'], 'one point two', 'never'];
+
+    $es['bool_ok'] = ['bool', TRUE, 'strictly'];
+    $es['bool_lax_int'] = ['bool', 0, 'lackadaisically'];
+    $es['bool_lax_strint'] = ['bool', '1', 'lackadaisically'];
+    $es['bool_bad_null'] = ['bool', NULL, 'never'];
+    $es['bool_bad_empty'] = ['bool', '', 'never'];
+    $es['bool_bad_str'] = ['bool', '1.2', 'never'];
+
+    $es['string_ok'] = [['string'], 'one', 'strictly'];
+    $es['string_ok'] = [['string'], 123, 'lackadaisically'];
+    $es['string_badarr'] = [['string'], ['a', 'b', 'c'], 'never'];
+    $es['string_badobj'] = [['string'], new \stdClass(), 'never'];
+
+    $es['array_ok'] = ['array', [1, 2, 3], 'strictly'];
+    $es['array_null_req'] = ['array', NULL, 'never'];
+
+    $es['int[]_ok'] = [['int[]'], [1, 2, 3], 'strictly'];
+    $es['int[]_lax'] = [['int[]'], [1, '22', 3], 'lackadaisically'];
+    $es['int[]_obj'] = [['int[]'], [1, 2, new \stdClass()], 'never'];
+    $es['int[]_single'] = [['int[]'], 1, 'never'];
+    $es['int[]_null_req'] = [['int[]'], NULL, 'never'];
+    $es['string[]_ok'] = [['string[]'], ['a', 'b', 'c'], 'strictly'];
+    $es['string[]_obj'] = [['string[]'], ['a', 'b', new \stdClass()], 'never'];
+    $es['string[]_single'] = [['string[]'], 'a', 'never'];
+    $es['string[]_null_opt'] = [['string[]'], NULL, 'never'];
+
+    $es['int|null_1'] = ['int|NULL', 1, 'strictly'];
+    $es['int|null_null'] = ['int|NULL', NULL, 'strictly'];
+
+    $es['int[]|null_ok'] = ['int[]|NULL', [1, 2, 3], 'strictly'];
+    $es['int[]|null_single'] = ['int[]|NULL', 1, 'never'];
+    $es['int[]|null_badstr'] = ['int[]|NULL', 'abc', 'never'];
+
+    $es['array|null_ok'] = ['array|NULL', [1, 2, 3], 'strictly'];
+    $es['array|null_null'] = ['array|NULL', NULL, 'strictly'];
+
+    $es['DateTimeZone|DateTime_ok_date'] = ['DateTimeZone|DateTime', new \DateTimeZone('UTC'), 'strictly'];
+    $es['DateTimeZone|DateTime_ok_datetime'] = ['Date|DateTime', new \DateTime(), 'strictly'];
+    $es['DateTimeZone|DateTime_bad_arr'] = ['DateTimeZone|DateTime', [], 'never'];
+    $es['DateTimeZone|DateTime_bad_obj'] = ['DateTimeZone|DateTime', new \stdClass(), 'never'];
+
+    $es['Throwable_ok'] = ['Throwable', new \Exception('Somethingsomething'), 'strictly'];
+    $es['Throwable|NotReallyAClass_ok'] = ['Throwable|NotReallyAClass', new \Exception('Somethingsomething'), 'strictly'];
+    $es['Throwable|NotReallyAClass_bad'] = ['Throwable|NotReallyAClass', 2, 'never'];
+
+    $es['string|false_ok_str'] = ['string|false', 'one', 'strictly'];
+    $es['string|false_ok_false'] = ['string|false', FALSE, 'strictly'];
+    $es['string|false_bad_true'] = ['string|false', TRUE, 'never'];
+    $es['string|false_lax_0'] = ['string|false', 0, 'lackadaisically' /* via string */];
+    $es['string|TRUE_ok_true'] = ['string|TRUE', TRUE, 'strictly'];
+
+    return $es;
+  }
+
+  public function testValidatePhpType(): void {
+
+    // This test runs much faster as one test-func rather than data-provider func.
+    foreach ($this->getPhpTypeExamples() as $exampleId => $example) {
+      [$types, $value, $expectMatches] = $example;
+
+      $strictMatch = CRM_Utils_Type::validatePhpType($value, $types, TRUE);
+      $relaxedMatch = CRM_Utils_Type::validatePhpType($value, $types, FALSE);
+
+      switch ($expectMatches) {
+        case 'strictly':
+          $this->assertEquals(TRUE, $strictMatch, sprintf('(%s) Expect value %s to strictly match type %s', $exampleId, json_encode($value), json_encode($types)));
+          $this->assertEquals(TRUE, $relaxedMatch, sprintf('(%s) Expect value %s to laxly match type %s', $exampleId, json_encode($value), json_encode($types)));
+          break;
+
+        case 'lackadaisically':
+          $this->assertEquals(FALSE, $strictMatch, sprintf('(%s) Expect value %s to strictly NOT match type %s', $exampleId, json_encode($value), json_encode($types)));
+          $this->assertEquals(TRUE, $relaxedMatch, sprintf('(%s) Expect value %s to laxly match type %s', $exampleId, json_encode($value), json_encode($types)));
+          break;
+
+        case 'never':
+          $this->assertEquals(FALSE, $strictMatch, sprintf('(%s) Expect value %s to strictly NOT match type %s', $exampleId, json_encode($value), json_encode($types)));
+          $this->assertEquals(FALSE, $relaxedMatch, sprintf('(%s) Expect value %s to laxly NOT match type %s', $exampleId, json_encode($value), json_encode($types)));
+          break;
+
+        default:
+          throw new \RuntimeException("Unrecognized option: $expectMatches");
+      }
+    }
   }
 
 }

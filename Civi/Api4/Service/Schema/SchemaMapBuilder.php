@@ -10,28 +10,23 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Service\Schema;
 
 use Civi\Api4\Entity;
-use Civi\Api4\Event\Events;
 use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Civi\Core\Service\AutoService;
+use Civi\Core\CiviEventDispatcherInterface;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
-class SchemaMapBuilder {
+/**
+ * @service schema_map_builder
+ */
+class SchemaMapBuilder extends AutoService {
+
   /**
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @var \Civi\Core\CiviEventDispatcherInterface
    */
   protected $dispatcher;
   /**
@@ -40,11 +35,12 @@ class SchemaMapBuilder {
   protected $apiEntities;
 
   /**
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @inject dispatcher
+   * @param \Civi\Core\CiviEventDispatcherInterface $dispatcher
    */
-  public function __construct(EventDispatcherInterface $dispatcher) {
+  public function __construct(CiviEventDispatcherInterface $dispatcher) {
     $this->dispatcher = $dispatcher;
-    $this->apiEntities = array_keys((array) Entity::get()->setCheckPermissions(FALSE)->addSelect('name')->execute()->indexBy('name'));
+    $this->apiEntities = array_keys((array) Entity::get(FALSE)->addSelect('name')->execute()->indexBy('name'));
   }
 
   /**
@@ -55,7 +51,7 @@ class SchemaMapBuilder {
     $this->loadTables($map);
 
     $event = new SchemaMapBuildEvent($map);
-    $this->dispatcher->dispatch(Events::SCHEMA_MAP_BUILD, $event);
+    $this->dispatcher->dispatch('api.schema_map.build', $event);
 
     return $map;
   }
@@ -67,9 +63,9 @@ class SchemaMapBuilder {
    */
   private function loadTables(SchemaMap $map) {
     /** @var \CRM_Core_DAO $daoName */
-    foreach (AllCoreTables::get() as $daoName => $data) {
+    foreach (AllCoreTables::get() as $data) {
       $table = new Table($data['table']);
-      foreach ($daoName::fields() as $fieldData) {
+      foreach ($data['class']::fields() as $fieldData) {
         $this->addJoins($table, $fieldData['name'], $fieldData);
       }
       $map->addTable($table);
@@ -77,8 +73,6 @@ class SchemaMapBuilder {
         $this->addCustomFields($map, $table, $data['name']);
       }
     }
-
-    $this->addBackReferences($map);
   }
 
   /**
@@ -93,74 +87,33 @@ class SchemaMapBuilder {
     if ($fkClass) {
       $tableName = AllCoreTables::getTableForClass($fkClass);
       $fkKey = $data['FKKeyColumn'] ?? 'id';
-      $alias = str_replace('_id', '', $field);
-      $joinable = new Joinable($tableName, $fkKey, $alias);
+      $joinable = new Joinable($tableName, $fkKey, $field);
       $joinable->setJoinType($joinable::JOIN_TYPE_MANY_TO_ONE);
       $table->addTableLink($field, $joinable);
     }
   }
 
   /**
-   * Loop through existing links and provide link from the other side
-   *
-   * @param SchemaMap $map
-   */
-  private function addBackReferences(SchemaMap $map) {
-    foreach ($map->getTables() as $table) {
-      foreach ($table->getTableLinks() as $link) {
-        $target = $map->getTableByName($link->getTargetTable());
-        $tableName = $link->getBaseTable();
-        // Exclude custom field tables
-        if (strpos($link->getTargetTable(), 'civicrm_value_') !== 0 && strpos($link->getBaseTable(), 'civicrm_value_') !== 0) {
-          $plural = str_replace('civicrm_', '', $this->getPlural($tableName));
-          $joinable = new Joinable($tableName, $link->getBaseColumn(), $plural);
-          $joinable->setJoinType($joinable::JOIN_TYPE_ONE_TO_MANY);
-          $target->addTableLink($link->getTargetColumn(), $joinable);
-        }
-      }
-    }
-  }
-
-  /**
-   * Simple implementation of pluralization.
-   * Could be replaced with symfony/inflector
-   *
-   * @param string $singular
-   *
-   * @return string
-   */
-  private function getPlural($singular) {
-    $last_letter = substr($singular, -1);
-    switch ($last_letter) {
-      case 'y':
-        return substr($singular, 0, -1) . 'ies';
-
-      case 's':
-        return $singular . 'es';
-
-      default:
-        return $singular . 's';
-    }
-  }
-
-  /**
    * @param \Civi\Api4\Service\Schema\SchemaMap $map
    * @param \Civi\Api4\Service\Schema\Table $baseTable
-   * @param string $entity
+   * @param string $entityName
    */
-  private function addCustomFields(SchemaMap $map, Table $baseTable, $entity) {
+  private function addCustomFields(SchemaMap $map, Table $baseTable, string $entityName) {
+    $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entityName);
     // Don't be silly
-    if (!array_key_exists($entity, \CRM_Core_SelectValues::customGroupExtends())) {
+    if (!$customInfo) {
       return;
     }
-    $queryEntity = (array) $entity;
-    if ($entity == 'Contact') {
-      $queryEntity = ['Contact', 'Individual', 'Organization', 'Household'];
-    }
+    $select = ['f.name', 'f.data_type', 'f.label', 'f.column_name', 'f.option_group_id', 'f.serialize', 'f.fk_entity'];
+    // Prevent errors during upgrade by only selecting fields supported by the current version
+    $supportedFields = \CRM_Utils_Array::prefixKeys(\CRM_Core_BAO_CustomField::getSupportedFields(), 'f.');
+    $select = array_intersect($select, array_keys($supportedFields));
+    // Also select fields from the custom_group table (these fields are so old we don't have to worry about upgrade issues)
+    $select = array_merge(['g.name as custom_group_name', 'g.table_name', 'g.is_multiple'], $select);
     $fieldData = \CRM_Utils_SQL_Select::from('civicrm_custom_field f')
       ->join('custom_group', 'INNER JOIN civicrm_custom_group g ON g.id = f.custom_group_id')
-      ->select(['g.name as custom_group_name', 'g.table_name', 'g.is_multiple', 'f.name', 'label', 'column_name', 'option_group_id'])
-      ->where('g.extends IN (@entity)', ['@entity' => $queryEntity])
+      ->select($select)
+      ->where('g.extends IN (@entity)', ['@entity' => $customInfo['extends']])
       ->where('g.is_active')
       ->where('f.is_active')
       ->execute();
@@ -184,14 +137,28 @@ class SchemaMapBuilder {
 
       // Add backreference
       if (!empty($fieldData->is_multiple)) {
-        $joinable = new Joinable($baseTable->getName(), 'id', AllCoreTables::convertEntityNameToLower($entity));
+        $joinable = new Joinable($baseTable->getName(), $customInfo['column'], AllCoreTables::convertEntityNameToLower($entityName));
         $customTable->addTableLink('entity_id', $joinable);
+      }
+
+      if ($fieldData->data_type === 'EntityReference' && isset($fieldData->fk_entity)) {
+        $targetTable = AllCoreTables::getTableForEntityName($fieldData->fk_entity);
+        $joinable = new Joinable($targetTable, 'id', $fieldData->name);
+        $customTable->addTableLink($fieldData->column_name, $joinable);
+      }
+
+      if ($fieldData->data_type === 'ContactReference') {
+        $joinable = new Joinable('civicrm_contact', 'id', $fieldData->name);
+        if ($fieldData->serialize) {
+          $joinable->setSerialize((int) $fieldData->serialize);
+        }
+        $customTable->addTableLink($fieldData->column_name, $joinable);
       }
     }
 
     foreach ($links as $alias => $link) {
       $joinable = new CustomGroupJoinable($link['tableName'], $alias, $link['isMultiple'], $link['columns']);
-      $baseTable->addTableLink('id', $joinable);
+      $baseTable->addTableLink($customInfo['column'], $joinable);
     }
   }
 

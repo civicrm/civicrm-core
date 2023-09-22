@@ -12,7 +12,7 @@
 /**
  *
  * @package CRM
- * @author Andrew Hunt, AGH Strategies
+ * @author Andie Hunt, AGH Strategies
  */
 
 /**

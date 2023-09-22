@@ -63,7 +63,7 @@ abstract class CRM_Core_Component_Info {
   /**
    * Component settings as key/value pairs.
    *
-   * @var array
+   * @var array{name: string, translatedName: string, title: string, search: bool, showActivitiesInCore: bool, url: string}
    */
   public $info;
 
@@ -73,6 +73,27 @@ abstract class CRM_Core_Component_Info {
    * @var string
    */
   protected $keyword;
+
+  /**
+   * Component Name.
+   *
+   * @var string
+   */
+  public $name;
+
+  /**
+   * Component namespace.
+   * e.g. CRM_Contribute.
+   *
+   * @var string
+   */
+  public $namespace;
+
+  /**
+   * Component ID
+   * @var int
+   */
+  public $componentID;
 
   /**
    * @param string $name
@@ -101,6 +122,14 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
+   * Name of the module-extension coupled with this component
+   * @return string
+   */
+  public function getExtensionName(): string {
+    return CRM_Utils_String::convertStringToSnakeCase($this->name);
+  }
+
+  /**
    * Provides base information about the component.
    * Needs to be implemented in component's information
    * class.
@@ -109,17 +138,6 @@ abstract class CRM_Core_Component_Info {
    *   collection of required component settings
    */
   abstract public function getInfo();
-
-  /**
-   * Get a list of entities to register via API.
-   *
-   * @return array
-   *   list of entities; same format as CRM_Utils_Hook::managedEntities(&$entities)
-   * @see CRM_Utils_Hook::managedEntities
-   */
-  public function getManagedEntities() {
-    return [];
-  }
 
   /**
    * Provides permissions that are unwise for Anonymous Roles to have.
@@ -220,21 +238,7 @@ abstract class CRM_Core_Component_Info {
    *   true if component is enabled, false if not
    */
   public function isEnabled() {
-    $config = CRM_Core_Config::singleton();
-    if (in_array($this->info['name'], $config->enableComponents)) {
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
-   * Provides component's menu definition object.
-   *
-   * @return mixed
-   *   component's menu definition object
-   */
-  public function getMenuObject() {
-    return $this->_instantiate(self::COMPONENT_MENU_CLASS);
+    return CRM_Core_Component::isEnabled($this->info['name']);
   }
 
   /**
@@ -345,14 +349,13 @@ abstract class CRM_Core_Component_Info {
   /**
    * Helper for instantiating component's elements.
    *
-   * @param $cl
+   * @param string $cl
    *
    * @return mixed
    *   component's element as class instance
    */
   private function _instantiate($cl) {
     $className = $this->namespace . '_' . $cl;
-    require_once str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
     return new $className();
   }
 

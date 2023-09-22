@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -9,14 +8,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
 namespace Civi\Api4;
 
 /**
@@ -37,85 +28,129 @@ class CustomValue {
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Get
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function get($customGroup) {
-    return new Action\CustomValue\Get($customGroup, __FUNCTION__);
+  public static function get($customGroup, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\Get($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\GetFields
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function getFields($customGroup = NULL) {
-    return new Action\CustomValue\GetFields($customGroup, __FUNCTION__);
+  public static function getFields($customGroup = NULL, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\GetFields($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Save
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function save($customGroup) {
-    return new Action\CustomValue\Save($customGroup, __FUNCTION__);
+  public static function save($customGroup, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\Save($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Create
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function create($customGroup) {
-    return new Action\CustomValue\Create($customGroup, __FUNCTION__);
+  public static function create($customGroup, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\Create($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Update
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function update($customGroup) {
-    return new Action\CustomValue\Update($customGroup, __FUNCTION__);
+  public static function update($customGroup, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\Update($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Delete
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function delete($customGroup) {
-    return new Action\CustomValue\Delete($customGroup, __FUNCTION__);
+  public static function delete($customGroup, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\Delete($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
-   * @return Action\CustomValue\Replace
-   * @throws \API_Exception
+   * @param bool $checkPermissions
+   * @return Generic\BasicReplaceAction
+   * @throws \CRM_Core_Exception
    */
-  public static function replace($customGroup) {
-    return new Action\CustomValue\Replace($customGroup, __FUNCTION__);
+  public static function replace($customGroup, $checkPermissions = TRUE) {
+    return (new Generic\BasicReplaceAction("Custom_$customGroup", __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
-   * @return Action\CustomValue\GetActions
-   * @throws \API_Exception
+   * @param bool $checkPermissions
+   * @return Action\GetActions
+   * @throws \CRM_Core_Exception
    */
-  public static function getActions($customGroup = NULL) {
-    return new Action\CustomValue\GetActions($customGroup, __FUNCTION__);
+  public static function getActions($customGroup = NULL, $checkPermissions = TRUE) {
+    return (new Action\GetActions("Custom_$customGroup", __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
-   * @inheritDoc
+   * @return \Civi\Api4\Generic\CheckAccessAction
+   */
+  public static function checkAccess($customGroup) {
+    return new Generic\CheckAccessAction("Custom_$customGroup", __FUNCTION__);
+  }
+
+  /**
+   * @see \Civi\Api4\Generic\AbstractEntity::permissions()
+   * @return array
    */
   public static function permissions() {
-    $entity = 'contact';
-    $permissions = \CRM_Core_Permission::getEntityActionPermissions();
+    // Permissions are managed by ACLs
+    return [
+      'create' => [],
+      'update' => [],
+      'delete' => [],
+      'get' => [],
+    ];
+  }
 
-    // Merge permissions for this entity with the defaults
-    return \CRM_Utils_Array::value($entity, $permissions, []) + $permissions['default'];
+  /**
+   * @see \Civi\Api4\Generic\AbstractEntity::getInfo()
+   * @return array
+   */
+  public static function getInfo() {
+    return [
+      'class' => __CLASS__,
+      'type' => ['CustomValue', 'DAOEntity'],
+      'searchable' => 'secondary',
+      'primary_key' => ['id'],
+      'dao' => 'CRM_Core_BAO_CustomValue',
+      'see' => [
+        'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
+        '\Civi\Api4\CustomGroup',
+      ],
+    ];
   }
 
 }

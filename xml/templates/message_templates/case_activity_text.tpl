@@ -1,28 +1,29 @@
 ===========================================================
 {ts}Activity Summary{/ts} - {$activityTypeName}
 ===========================================================
-{if $isCaseActivity}
-{ts}Your Case Role(s){/ts} : {$contact.role}
-{if $manageCaseURL}
+{if !empty($isCaseActivity)}
+{ts}Your Case Role(s){/ts} : {$contact.role|default:''}
+{if !empty($manageCaseURL)}
 {ts}Manage Case{/ts} : {$manageCaseURL}
 {/if}
 {/if}
 
-{if $editActURL}
+{if !empty($editActURL)}
 {ts}Edit activity{/ts} : {$editActURL}
 {/if}
-{if $viewActURL}
+{if !empty($viewActURL)}
 {ts}View activity{/ts} : {$viewActURL}
 {/if}
 
 {foreach from=$activity.fields item=field}
 {if $field.type eq 'Date'}
-{$field.label}{if $field.category}({$field.category}){/if} : {$field.value|crmDate:$config->dateformatDatetime}
+{$field.label} : {$field.value|crmDate:$config->dateformatDatetime}
 {else}
-{$field.label}{if $field.category}({$field.category}){/if} : {$field.value}
+{$field.label} : {$field.value}
 {/if}
 {/foreach}
 
+{if !empty($activity.customGroups)}
 {foreach from=$activity.customGroups key=customGroupName item=customGroup}
 ==========================================================
 {$customGroupName}
@@ -36,3 +37,4 @@
 {/foreach}
 
 {/foreach}
+{/if}

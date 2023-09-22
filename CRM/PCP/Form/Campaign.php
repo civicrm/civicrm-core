@@ -44,7 +44,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $title = ts('Edit Your Personal Campaign Page');
     }
 
-    CRM_Utils_System::setTitle($title);
+    $this->setTitle($title);
     parent::preProcess();
   }
 
@@ -65,7 +65,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       }
       // fix the display of the monetary value, CRM-4038
       if (isset($defaults['goal_amount'])) {
-        $defaults['goal_amount'] = CRM_Utils_Money::format($defaults['goal_amount'], NULL, '%a');
+        $defaults['goal_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['goal_amount']);
       }
 
       $defaults['pcp_title'] = $defaults['title'] ?? NULL;
@@ -109,7 +109,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     }
 
     $attrib = ['rows' => 8, 'cols' => 60];
-    $this->add('textarea', 'page_text', ts('Your Message'), NULL, FALSE);
+    $this->add('wysiwyg', 'page_text', ts('Your Message'), NULL, FALSE);
 
     $maxAttachments = 1;
     CRM_Core_BAO_File::buildAttachment($this, 'civicrm_pcp', $this->_pageId, $maxAttachments);
@@ -157,7 +157,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param self $self
    *
    *
    * @return bool|array
@@ -227,7 +227,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
     $params['id'] = $this->_pageId;
 
-    $pcp = CRM_PCP_BAO_PCP::create($params);
+    $pcp = CRM_PCP_BAO_PCP::writeRecord($params);
 
     // add attachments as needed
     CRM_Core_BAO_File::formatAttachment($params,
@@ -262,7 +262,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $supporterUrl = CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$pcp->contact_id}",
         TRUE, NULL, FALSE,
-        FALSE
+        FALSE, TRUE
       );
       $this->assign('supporterUrl', $supporterUrl);
       $supporterName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $pcp->contact_id, 'display_name');
@@ -315,7 +315,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
           'groupName' => 'msg_tpl_workflow_contribution',
-          'valueName' => 'pcp_notify',
+          'workflow' => 'pcp_notify',
           'contactId' => $contactID,
           'from' => "$domainEmailName <$domainEmailAddress>",
           'toEmail' => $to,
@@ -333,7 +333,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     // send email notification to supporter, if initial setup / add mode.
     if (!$this->_pageId) {
       CRM_PCP_BAO_PCP::sendStatusUpdate($pcp->id, $statusId, TRUE, $this->_component);
-      if ($approvalMessage && CRM_Utils_Array::value('status_id', $params) == 1) {
+      if ($approvalMessage && ($params['status_id'] ?? NULL) == 1) {
         $notifyStatus .= ts(' You will receive a second email as soon as the review process is complete.');
       }
     }

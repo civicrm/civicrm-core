@@ -1,0 +1,30 @@
+<form id="bootstrap-theme">
+  <div ng-controller="afGuiSaveBlock">
+    <div class="alert alert-info">
+      {{:: ts('Saving a container as a block allows it to be reused across forms.') }}
+    </div>
+    <div>
+      <label for="af-gui-save-block-title">{{:: ts('Title:') }} <span class="crm-marker">*</span></label>
+      <input id="af-gui-save-block-title" class="form-control" ng-model="model.title" required>
+    </div>
+    <div class="form-inline" ng-if="original.name">
+      <label>
+        <input type="radio" name="save-as" ng-value="original.name" ng-model="model.name" />
+        {{ ts('Update %1', {1: original.title}) }}
+      </label>
+      &nbsp;
+      <label>
+        <input type="radio" name="save-as" ng-value="null" ng-model="model.name" />
+        {{:: ts('Save New Block') }}
+      </label>
+    </div>
+    <div class="alert alert-warning" ng-show="model.name">
+      {{:: ts('Affects every form that uses this block, system-wide.') }}
+    </div>
+    <hr />
+    <div class="buttons pull-right">
+      <button type="submit" ng-click="save()" class="btn btn-primary" ng-disabled="!model.title">{{:: ts('Save') }}</button>
+      <button type="button" ng-click="cancel()" class="btn btn-danger">{{:: ts('Cancel') }}</button>
+    </div>
+  </div>
+</form>

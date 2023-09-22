@@ -1,0 +1,10 @@
+<div class="crm-dashlet-header" ng-if="!$ctrl.isFullscreen">
+  <a href class="crm-i fa-times" title="{{:: ts('Remove from dashboard') }}" aria-hidden="true" ng-click="$ctrl.remove()"></a>
+  <a href class="crm-i fa-expand" title="{{:: ts('View fullscreen') }}" aria-hidden="true" ng-click="$ctrl.fullscreen()"></a>
+  <a href class="crm-i fa-refresh" title="{{:: ts('Refresh') }}" aria-hidden="true" ng-click="$ctrl.forceRefresh()"></a>
+  <a href class="crm-dashlet-collapse crm-i fa-caret-{{ $ctrl.collapsed ? 'right' : 'down' }}" title="{{ $ctrl.collapsed ? ts('Expand') : ts('Collapse') }}" aria-hidden="true" ng-click="$ctrl.toggleCollapse()"></a>
+  <h3>{{:: $ctrl.dashlet.label }}</h3>
+</div>
+<div class="crm-dashlet-content" ng-show="!$ctrl.collapsed">
+  <div ng-if="$ctrl.dashlet.directive" ng-include="'~/crmDashboard/directives/' + $ctrl.dashlet.directive + '.html'"></div>
+</div>

@@ -10,18 +10,10 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Generic;
 
-use Civi\Api4\Service\Spec\SpecFormatter;
+use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\Utils\FormattingUtil;
 
 /**
  * @inheritDoc
@@ -30,31 +22,111 @@ use Civi\Api4\Service\Spec\SpecFormatter;
 class DAOGetFieldsAction extends BasicGetFieldsAction {
 
   /**
-   * Include custom fields for this entity, or only core fields?
-   *
-   * @var bool
-   */
-  protected $includeCustom = TRUE;
-
-  /**
    * Get fields for a DAO-based entity.
    *
    * @return array
    */
   protected function getRecords() {
-    $fields = $this->_itemsToGet('name');
+    $fieldsToGet = $this->_itemsToGet('name');
+    $typesToGet = $this->_itemsToGet('type');
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
-    // Any fields name with a dot in it is custom
-    if ($fields) {
-      $this->includeCustom = strpos(implode('', $fields), '.') !== FALSE;
+    $includeCustom = TRUE;
+    if ($typesToGet) {
+      $includeCustom = in_array('Custom', $typesToGet, TRUE);
     }
-    $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $this->includeCustom, $this->values);
-    return SpecFormatter::specToArray($spec->getFields($fields), $this->loadOptions, $this->values);
+    elseif ($fieldsToGet) {
+      // Any fields name with a dot in it is either custom or an implicit join
+      $includeCustom = strpos(implode('', $fieldsToGet), '.') !== FALSE;
+    }
+    $this->formatValues();
+    $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $includeCustom, $this->values, $this->checkPermissions);
+    $fields = $this->specToArray($spec->getFields($fieldsToGet));
+    foreach ($fieldsToGet ?? [] as $fieldName) {
+      if (empty($fields[$fieldName]) && strpos($fieldName, '.') !== FALSE) {
+        $fkField = $this->getFkFieldSpec($fieldName, $fields);
+        if ($fkField) {
+          $fkField['name'] = $fieldName;
+          $fields[] = $fkField;
+        }
+      }
+    }
+    return $fields;
+  }
+
+  /**
+   * @param \Civi\Api4\Service\Spec\FieldSpec[] $fields
+   *
+   * @return array
+   */
+  protected function specToArray($fields) {
+    $fieldArray = [];
+
+    foreach ($fields as $field) {
+      if ($this->loadOptions) {
+        $field->getOptions($this->values, $this->loadOptions, $this->checkPermissions);
+      }
+      $fieldArray[$field->getName()] = $field->toArray();
+    }
+
+    return $fieldArray;
+  }
+
+  /**
+   * @param string $fieldName
+   * @param array $fields
+   * @return array|null
+   * @throws \CRM_Core_Exception
+   */
+  private function getFkFieldSpec($fieldName, $fields) {
+    $fieldPath = explode('.', $fieldName);
+    // Search for the first segment alone plus the first and second
+    // No field in the schema contains more than one dot in its name.
+    $searchPaths = [$fieldPath[0], $fieldPath[0] . '.' . $fieldPath[1]];
+    $fkFieldName = array_intersect($searchPaths, array_keys($fields))[0] ?? NULL;
+    if ($fkFieldName && !empty($fields[$fkFieldName]['fk_entity'])) {
+      $newFieldName = substr($fieldName, 1 + strlen($fkFieldName));
+      return civicrm_api4($fields[$fkFieldName]['fk_entity'], 'getFields', [
+        'checkPermissions' => $this->checkPermissions,
+        'where' => [['name', '=', $newFieldName]],
+        'loadOptions' => $this->loadOptions,
+        'action' => $this->action,
+      ])->first();
+    }
+  }
+
+  /**
+   * Special handling for pseudoconstant replacements.
+   *
+   * Normally this would involve calling getFields... but this IS getFields.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function formatValues() {
+    foreach (array_keys($this->values) as $key) {
+      if (strpos($key, ':')) {
+        if (isset($this->values[$key]) && $this->values[$key] !== '') {
+          [$fieldName, $suffix] = explode(':', $key);
+          $context = FormattingUtil::$pseudoConstantContexts[$suffix] ?? NULL;
+          // This only works for basic pseudoconstants like :name :label and :abbr. Skip others.
+          if ($context) {
+            $baoName = CoreUtil::getBAOFromApiName($this->getEntityName());
+            $options = $baoName::buildOptions($fieldName, $context) ?: [];
+            $this->values[$fieldName] = FormattingUtil::replacePseudoconstant($options, $this->values[$key], TRUE);
+          }
+        }
+        unset($this->values[$key]);
+      }
+    }
   }
 
   public function fields() {
     $fields = parent::fields();
+    $fields[] = [
+      'name' => 'dfk_entities',
+      'description' => 'List of possible entity types this field could be referencing.',
+      'data_type' => 'Array',
+    ];
     $fields[] = [
       'name' => 'help_pre',
       'data_type' => 'String',
@@ -72,8 +144,14 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
       'data_type' => 'Integer',
     ];
     $fields[] = [
-      'name' => 'custom_group_id',
-      'data_type' => 'Integer',
+      'name' => 'sql_filters',
+      'data_type' => 'Array',
+      '@internal' => TRUE,
+    ];
+    $fields[] = [
+      'name' => 'sql_renderer',
+      'data_type' => 'Array',
+      '@internal' => TRUE,
     ];
     return $fields;
   }

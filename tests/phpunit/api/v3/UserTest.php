@@ -22,9 +22,7 @@ class api_v3_UserTest extends CiviUnitTestCase {
   protected $_entity = 'User';
   protected $contactID;
 
-  public $DBResetRequired = FALSE;
-
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->contactID = $this->createLoggedInUser();
     $this->params = [
@@ -33,8 +31,8 @@ class api_v3_UserTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testUserGet() {
-    $result = $this->callAPIAndDocument($this->_entity, 'get', $this->params, __FUNCTION__, __FILE__);
+  public function testUserGet(): void {
+    $result = $this->callAPISuccess($this->_entity, 'get', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals($this->contactID, $result['values'][0]['contact_id']);
     $this->assertEquals(6, $result['values'][0]['id']);
@@ -44,8 +42,8 @@ class api_v3_UserTest extends CiviUnitTestCase {
   /**
    * Test retrieval of label metadata.
    */
-  public function testGetFields() {
-    $result = $this->callAPIAndDocument($this->_entity, 'getfields', ['action' => 'get'], __FUNCTION__, __FILE__);
+  public function testGetFields(): void {
+    $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'get']);
     $this->assertArrayKeyExists('name', $result['values']);
   }
 

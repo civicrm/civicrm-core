@@ -14,7 +14,6 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  * @copyright David Strauss <david@fourkitchens.com> (c) 2007
- * $Id$
  *
  * (Note: This has been considerably rewritten; the interface is preserved
  * for backward compatibility.)
@@ -160,8 +159,8 @@ class CRM_Core_Transaction {
    * After calling run(), the CRM_Core_Transaction object is "used up"; do not
    * use it again.
    *
-   * @param string $callable
-   *   Should exception one parameter (CRM_Core_Transaction $tx).
+   * @param callable $callable
+   *   Should expect one parameter (CRM_Core_Transaction).
    * @return CRM_Core_Transaction
    * @throws Exception
    */
@@ -224,12 +223,12 @@ class CRM_Core_Transaction {
    *
    * @param int $phase
    *   A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}.
-   * @param string $callback
+   * @param callable $callback
    *   A PHP callback.
    * @param mixed $params
    *   Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
-   * @param int $id
+   * @param string|int|null $id
    */
   public static function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getBaseFrame();

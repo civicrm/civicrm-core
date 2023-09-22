@@ -37,7 +37,7 @@
   };
 
   /**
-   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Structure+convention+for+automagic+edit+in+place
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#in-place-field-editing
    */
   $.fn.crmEditable = function(options) {
     function checkable() {

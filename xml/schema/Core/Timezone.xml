@@ -10,7 +10,10 @@
     <title>Timezone ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Timezone Id</comment>
+    <comment>Timezone ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>
@@ -50,10 +53,13 @@
   </field>
   <field>
     <name>country_id</name>
-    <title>Country</title>
+    <title>Country ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Country Id</comment>
+    <comment>Country ID</comment>
+    <html>
+      <label>Country</label>
+    </html>
     <add>1.8</add>
   </field>
   <foreignKey>

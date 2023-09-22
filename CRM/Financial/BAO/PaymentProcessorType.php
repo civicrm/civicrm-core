@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentProcessorType {
+class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentProcessorType implements \Civi\Core\HookInterface {
 
   /**
    * Static holder for the default payment processor.
@@ -23,43 +23,20 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   public static $_defaultPaymentProcessorType = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Fetch object based on array of properties.
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
-   *
-   * @return CRM_Core_BAO_LocationType|null
-   *   object on success, null otherwise
+   * @return self|null
    */
-  public static function retrieve(&$params, &$defaults) {
-    $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
-    $paymentProcessorType->copyValues($params);
-    if ($paymentProcessorType->find(TRUE)) {
-      CRM_Core_DAO::storeValues($paymentProcessorType, $defaults);
-      return $paymentProcessorType;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_PaymentProcessorType', $id, 'is_active', $is_active);
@@ -153,34 +130,45 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * Delete payment processor.
    *
    * @param int $paymentProcessorTypeId
-   *   ID of the processor to be deleted.
-   *
+   * @deprecated
    * @return bool|NULL
    */
   public static function del($paymentProcessorTypeId) {
-    $query = "
-SELECT pp.id processor_id
-FROM civicrm_payment_processor pp, civicrm_payment_processor_type ppt
-WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
-
-    $params = [1 => [$paymentProcessorTypeId, 'Integer']];
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-
-    if ($dao->fetch()) {
-      CRM_Core_Session::setStatus(ts('There is a Payment Processor associated with selected Payment Processor type, hence it can not be deleted.'), ts('Deletion Error'), 'error');
-      return NULL;
-    }
-
-    $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
-    $paymentProcessorType->id = $paymentProcessorTypeId;
-    if ($paymentProcessorType->delete()) {
+    try {
+      static::deleteRecord(['id' => $paymentProcessorTypeId]);
+      // This message is bad on so many levels
       CRM_Core_Session::setStatus(ts('Selected Payment Processor type has been deleted.<br/>'), '', 'success');
       return TRUE;
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Session::setStatus($e->getMessage(), ts('Deletion Error'), 'error');
+      return NULL;
     }
   }
 
   /**
-   * @param $attr
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete') {
+      $query = "
+SELECT pp.id processor_id
+FROM civicrm_payment_processor pp, civicrm_payment_processor_type ppt
+WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
+
+      $params = [1 => [$event->id, 'Integer']];
+      $dao = CRM_Core_DAO::executeQuery($query, $params);
+
+      if ($dao->fetch()) {
+        throw new CRM_Core_Exception(ts('There is a Payment Processor associated with selected Payment Processor type, hence it can not be deleted.'));
+      }
+    }
+  }
+
+  /**
+   * @param string $attr
    *
    * @return array
    */

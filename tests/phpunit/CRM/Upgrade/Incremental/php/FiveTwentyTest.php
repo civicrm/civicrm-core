@@ -7,15 +7,11 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  */
 class CRM_Upgrade_Incremental_php_FiveTwentyTest extends CiviCaseTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Test that the upgrade task changes the direction but only
    * for bidirectional relationship types that are b_a.
    */
-  public function testChangeCaseTypeAutoassignee() {
+  public function testChangeCaseTypeAutoassignee(): void {
 
     // We don't know what the ids are for the relationship types since it
     // seems to depend what ran before us, so retrieve them first and go by
@@ -195,7 +191,7 @@ ENDXML;
    * Test that the upgrade task converts case role <name>'s that
    * are labels to their name.
    */
-  public function testConvertRoleLabelsToNames() {
+  public function testConvertRoleLabelsToNames(): void {
 
     // We don't know what the ids are for the relationship types since it
     // seems to depend what ran before us, so retrieve them first and go by
@@ -332,8 +328,8 @@ ENDXML;
   /**
    * Set up some original and expected xml pairs.
    *
-   * @param $relationshipTypeNames array
-   * @param $stage int
+   * @param array $relationshipTypeNames
+   * @param int $stage
    *   We run it in a couple passes because we want to test with and without
    *   warning messages.
    * @return array
@@ -923,8 +919,8 @@ ENDXMLDIFFNAMEEXPECTED;
   /**
    * Helper to add a case type to the database.
    *
-   * @param $name string
-   * @param $xml string
+   * @param string $name
+   * @param string $xml
    *
    * @return int
    */

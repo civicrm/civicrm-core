@@ -21,22 +21,22 @@ namespace api\v4\Action;
 
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class NullValueTest extends UnitTestCase {
+class NullValueTest extends Api4TestBase implements TransactionalInterface {
 
-  public function setUpHeadless() {
+  public function setUp(): void {
     $format = '{contact.first_name}{ }{contact.last_name}';
     \Civi::settings()->set('display_name_format', $format);
-    return parent::setUpHeadless();
+    parent::setUp();
   }
 
-  public function testStringNull() {
-    $contact = Contact::create()
-      ->setCheckPermissions(FALSE)
+  public function testStringNull(): void {
+    $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Joseph')
       ->addValue('last_name', 'null')
       ->addValue('contact_type', 'Individual')
@@ -47,9 +47,8 @@ class NullValueTest extends UnitTestCase {
     $this->assertSame('Joseph Null', $contact['display_name']);
   }
 
-  public function testSettingToNull() {
-    $contact = Contact::create()
-      ->setCheckPermissions(FALSE)
+  public function testSettingToNull(): void {
+    $contact = Contact::create(FALSE)
       ->addValue('first_name', 'ILoveMy')
       ->addValue('last_name', 'LastName')
       ->addValue('contact_type', 'Individual')
@@ -59,8 +58,7 @@ class NullValueTest extends UnitTestCase {
     $this->assertSame('ILoveMy LastName', $contact['display_name']);
     $contactId = $contact['id'];
 
-    $contact = Contact::update()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::update(FALSE)
       ->addWhere('id', '=', $contactId)
       ->addValue('last_name', NULL)
       ->execute()
@@ -70,16 +68,14 @@ class NullValueTest extends UnitTestCase {
     $this->assertSame('ILoveMy', $contact['display_name']);
   }
 
-  public function testSaveWithReload() {
-    $contact = Contact::create()
-      ->setCheckPermissions(FALSE)
+  public function testSaveWithReload(): void {
+    $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Firsty')
       ->addValue('last_name', 'Lasty')
       ->execute()
       ->first();
 
-    $activity = Activity::create()
-      ->setCheckPermissions(FALSE)
+    $activity = Activity::create(FALSE)
       ->addValue('source_contact_id', $contact['id'])
       ->addValue('activity_type_id', 1)
       ->addValue('subject', 'hello')
@@ -88,8 +84,7 @@ class NullValueTest extends UnitTestCase {
 
     $this->assertEquals('hello', $activity['subject']);
 
-    $saved = Activity::save()
-      ->setCheckPermissions(FALSE)
+    $saved = Activity::save(FALSE)
       ->addRecord(['id' => $activity['id'], 'subject' => NULL])
       ->execute()
       ->first();
@@ -97,8 +92,7 @@ class NullValueTest extends UnitTestCase {
     $this->assertNull($saved['subject']);
     $this->assertArrayNotHasKey('activity_date_time', $saved);
 
-    $saved = Activity::save()
-      ->setCheckPermissions(FALSE)
+    $saved = Activity::save(FALSE)
       ->addRecord(['id' => $activity['id'], 'subject' => NULL])
       ->setReload(TRUE)
       ->execute()

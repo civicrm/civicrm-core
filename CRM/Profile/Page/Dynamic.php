@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Email;
+
 /**
  *
  * @package CRM
@@ -79,6 +81,13 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   protected $_recordId = NULL;
 
   /**
+   * Should the primary email be converted into a link, if emailabe.
+   *
+   * @var bool
+   */
+  protected $isShowEmailTaskLink = FALSE;
+
+  /**
    *
    * fetch multirecord as well as non-multirecord fields
    * @var int
@@ -95,17 +104,20 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    *
    * @param $restrict
    * @param bool $skipPermission
-   * @param null $profileIds
+   * @param int[]|null $profileIds
    *
-   * @return \CRM_Profile_Page_Dynamic
+   * @param bool $isShowEmailTaskLink
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
+  public function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL, $isShowEmailTaskLink = FALSE) {
     parent::__construct();
 
     $this->_id = $id;
     $this->_gid = $gid;
     $this->_restrict = $restrict;
     $this->_skipPermission = $skipPermission;
+    $this->isShowEmailTaskLink = $isShowEmailTaskLink;
 
     if (!array_key_exists('multiRecord', $_GET)) {
       $this->set('multiRecord', NULL);
@@ -244,7 +256,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       //reformat fields array
       foreach ($fields as $name => $field) {
         // also eliminate all formatting fields
-        if (CRM_Utils_Array::value('field_type', $field) == 'Formatting') {
+        if (($field['field_type'] ?? NULL) == 'Formatting') {
           unset($fields[$name]);
         }
 
@@ -258,7 +270,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         $contactFields = $activityFields = [];
 
         foreach ($fields as $fieldName => $field) {
-          if (CRM_Utils_Array::value('field_type', $field) == 'Activity') {
+          if (($field['field_type'] ?? NULL) == 'Activity') {
             $activityFields[$fieldName] = $field;
           }
           else {
@@ -315,6 +327,11 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         $labels[$index] = preg_replace('/\s+|\W+/', '_', $name);
       }
 
+      if ($this->isShowEmailTaskLink) {
+        foreach ($this->getEmailFields($fields) as $fieldName) {
+          $values[$fields[$fieldName]['title']] = $this->getLinkedEmail($values[$fields[$fieldName]['title']]);
+        }
+      }
       foreach ($values as $title => $value) {
         $profileFields[$labels[$title]] = [
           'label' => $title,
@@ -330,9 +347,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     $this->assign('ufGroupName', $name);
     CRM_Utils_Hook::viewProfile($name);
 
-    if (strtolower($name) == 'summary_overlay') {
-      $template->assign('overlayProfile', TRUE);
-    }
+    $template->assign('overlayProfile', (strtolower($name) === 'summary_overlay'));
 
     if (($this->_multiRecord & CRM_Core_Action::VIEW) && $this->_recordId && !$this->_allFields) {
       $fieldDetail = reset($fields);
@@ -371,11 +386,14 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   }
 
   /**
-   * @param string $suffix
+   * Check template file exists.
    *
-   * @return null|string
+   * @param string|null $suffix
+   *
+   * @return string|null
+   *   Template file path, else null
    */
-  public function checkTemplateFileExists($suffix = '') {
+  public function checkTemplateFileExists($suffix = NULL) {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Dynamic.{$suffix}tpl";
       $template = CRM_Core_Page::getTemplate();
@@ -402,7 +420,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    */
   public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
-    return $fileName ? $fileName : parent::getTemplateFileName();
+    return $fileName ?: parent::getTemplateFileName();
   }
 
   /**
@@ -413,7 +431,50 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    */
   public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
-    return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
+    return $fileName ?: parent::overrideExtraTemplateFileName();
+  }
+
+  /**
+   * Get the email field as a task link, if not on hold or set to do_not_email.
+   *
+   * @param string $email
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function getLinkedEmail($email): string {
+    if (!$email) {
+      return '';
+    }
+    $emailID = Email::get()->setOrderBy(['is_primary' => 'DESC'])->setWhere([['contact_id', '=', $this->_id], ['email', '=', $email], ['on_hold', '=', FALSE], ['contact_id.is_deceased', '=', FALSE], ['contact_id.is_deleted', '=', FALSE], ['contact_id.do_not_email', '=', FALSE]])->execute()->first()['id'];
+    if (!$emailID) {
+      return $email;
+    }
+    $emailPopupUrl = CRM_Utils_System::url('civicrm/activity/email/add', [
+      'action' => 'add',
+      'reset' => '1',
+      'email_id' => $emailID,
+    ], TRUE);
+
+    return '<a class="crm-popup" href="' . $emailPopupUrl . '">' . $email . '</a>';
+  }
+
+  /**
+   * Get the email fields from within the fields array.
+   *
+   * @param array $fields
+   */
+  protected function getEmailFields(array $fields): array {
+    $emailFields = [];
+    foreach (array_keys($fields) as $fieldName) {
+      if (substr($fieldName, 0, 6) === 'email-'
+          && (is_numeric(substr($fieldName, 6)) || substr($fieldName, 6) ===
+        'Primary')) {
+        $emailFields[] = $fieldName;
+      }
+    }
+    return $emailFields;
   }
 
 }

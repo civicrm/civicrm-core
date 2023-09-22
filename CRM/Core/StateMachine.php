@@ -257,14 +257,9 @@ class CRM_Core_StateMachine {
     }
 
     $i = 0;
-    foreach ($pages as $tempName => $value) {
+    foreach ($pages as $dontCareWeJustNeededToCalculatePageNamesFirst) {
       $name = $this->_pageNames[$i];
 
-      $className = CRM_Utils_Array::value('className',
-        $value,
-        $tempName
-      );
-      $classPath = str_replace('_', '/', $className) . '.php';
       if ($numPages == 1) {
         $prev = $next = NULL;
         $type = CRM_Core_State::START | CRM_Core_State::FINISH;

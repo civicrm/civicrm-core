@@ -12,6 +12,9 @@
     <title>Mapping Field ID</title>
     <required>true</required>
     <comment>Mapping Field ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.2</add>
   </field>
   <primaryKey>
@@ -25,6 +28,9 @@
     <title>Mapping ID</title>
     <required>true</required>
     <comment>Mapping to which this field belongs</comment>
+    <html>
+      <label>Mapping</label>
+    </html>
     <add>1.2</add>
   </field>
   <foreignKey>
@@ -32,6 +38,7 @@
     <table>civicrm_mapping</table>
     <key>id</key>
     <add>1.2</add>
+    <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
     <name>name</name>
@@ -65,6 +72,10 @@
     <type>int unsigned</type>
     <title>Location type ID</title>
     <comment>Location type of this mapping, if required</comment>
+    <html>
+      <label>Location type</label>
+      <type>Select</type>
+    </html>
     <add>1.2</add>
     <pseudoconstant>
       <table>civicrm_location_type</table>
@@ -79,18 +90,9 @@
     <add>1.2</add>
   </foreignKey>
   <field>
-    <name>phone_type</name>
-    <type>varchar</type>
-    <length>64</length>
-    <comment>Phone type, if required</comment>
-    <add>1.2</add>
-    <drop>2.2</drop>
-  </field>
-  <field>
     <name>phone_type_id</name>
-    <title>Phone Type</title>
-    <type>int unsigned</type>
     <title>Phone type ID</title>
+    <type>int unsigned</type>
     <comment>Which type of phone does this number belongs.</comment>
     <add>2.2</add>
   </field>
@@ -125,6 +127,9 @@
     <type>int unsigned</type>
     <title>Relationship type ID</title>
     <comment>Relationship type, if required</comment>
+    <html>
+      <label>Relationship type</label>
+    </html>
     <add>1.2</add>
   </field>
   <foreignKey>

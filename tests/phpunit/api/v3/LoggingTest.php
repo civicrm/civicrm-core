@@ -22,17 +22,20 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    *
    * This method is called before a test is executed.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     $this->ensureTempColIsCleanedUp();
     parent::setUp();
   }
 
   /**
    * Clean up log tables.
+   *
+   * @throws \CRM_Core_Exception
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     $this->quickCleanup(['civicrm_email', 'civicrm_address']);
     parent::tearDown();
+    Civi::settings()->set('logging_no_trigger_permission', FALSE);
     $this->callAPISuccess('Setting', 'create', ['logging' => FALSE]);
     $schema = new CRM_Logging_Schema();
     $schema->dropAllLogTables();
@@ -41,8 +44,10 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
 
   /**
    * Test that logging is successfully enabled and disabled.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testEnableDisableLogging() {
+  public function testEnableDisableLogging(): void {
     $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', ['name' => 'logging']));
     $this->assertLoggingEnabled(FALSE);
 
@@ -67,7 +72,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test that logging is successfully enabled and disabled.
    */
-  public function testEnableDisableLoggingWithTriggerHook() {
+  public function testEnableDisableLoggingWithTriggerHook(): void {
     $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'innodbLogTableSpec']);
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->checkINNODBLogTableCreated();
@@ -87,7 +92,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    *
    * The settings for unique id will not be set.
    */
-  public function testEnableLoggingLegacyLogTableExists() {
+  public function testEnableLoggingLegacyLogTableExists(): void {
     $this->createLegacyStyleContactLogTable();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->checkTriggersCreated(FALSE);
@@ -98,7 +103,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Check we can update legacy log tables using the api function.
    */
-  public function testUpdateLegacyLogTable() {
+  public function testUpdateLegacyLogTable(): void {
     $this->createLegacyStyleContactLogTable();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->callAPISuccess('System', 'updatelogtables', []);
@@ -114,7 +119,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Check if we can create missing log tables using api.
    */
-  public function testCreateMissingLogTables() {
+  public function testCreateMissingLogTables(): void {
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     CRM_Core_DAO::executeQuery("DROP TABLE log_civicrm_contact");
     $this->callAPISuccess('System', 'createmissinglogtables', []);
@@ -126,7 +131,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Check we can update legacy log tables using the api function.
    */
-  public function testUpdateLogTableHookINNODB() {
+  public function testUpdateLogTableHookINNODB(): void {
     $this->createLegacyStyleContactLogTable();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'innodbLogTableSpec']);
@@ -145,31 +150,35 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'innodbLogTableSpecNewIndex']);
     $this->callAPISuccess('System', 'updatelogtables', []);
     $this->checkINNODBLogTableCreated();
-    $this->assertContains('KEY `index_log_user_id` (`log_user_id`)', $this->checkLogTableCreated());
+    $this->assertStringContainsString('KEY `index_log_user_id` (`log_user_id`)', $this->checkLogTableCreated());
   }
 
   /**
    * Check that if a field is added then the trigger is updated on refresh.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testRebuildTriggerAfterSchemaChange() {
+  public function testRebuildTriggerAfterSchemaChange(): void {
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $tables = ['civicrm_acl', 'civicrm_website'];
     foreach ($tables as $table) {
       CRM_Core_DAO::executeQuery("ALTER TABLE $table ADD column temp_col INT(10)");
     }
+    unset(\Civi::$statics['CRM_Logging_Schema']);
 
     $schema = new CRM_Logging_Schema();
-    $schema->fixSchemaDifferencesForAll(TRUE);
+    $schema->fixSchemaDifferencesForAll();
+    Civi::service('sql_triggers')->rebuild();
 
     foreach ($tables as $table) {
       $this->assertTrue($this->checkColumnExistsInTable('log_' . $table, 'temp_col'), 'log_' . $table . ' has temp_col');
       $dao = CRM_Core_DAO::executeQuery("SHOW TRIGGERS LIKE '{$table}'");
       while ($dao->fetch()) {
-        $this->assertContains('temp_col', $dao->Statement);
+        $this->assertStringContainsString('temp_col', $dao->Statement);
       }
     }
-    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_acl DROP column temp_col");
-    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_website DROP column temp_col");
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_acl DROP column temp_col');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_website DROP column temp_col');
   }
 
   /**
@@ -216,8 +225,8 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $dao->fetch();
     $this->assertEquals('log_civicrm_contact', $dao->Table);
     $tableField = 'Create_Table';
-    $this->assertContains('`log_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,', $dao->$tableField);
-    $this->assertContains('`log_conn_id` varchar(17)', $dao->$tableField);
+    $this->assertStringContainsString('`log_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,', $dao->$tableField);
+    $this->assertStringContainsString('`log_conn_id` varchar(17)', $dao->$tableField);
     return $dao->$tableField;
   }
 
@@ -226,9 +235,9 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    */
   protected function checkINNODBLogTableCreated() {
     $createTableString = $this->checkLogTableCreated();
-    $this->assertContains('ENGINE=InnoDB', $createTableString);
-    $this->assertContains('ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4', $createTableString);
-    $this->assertContains('KEY `index_id` (`id`),', $createTableString);
+    $this->assertStringContainsString('ENGINE=InnoDB', $createTableString);
+    $this->assertStringContainsString('ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4', $createTableString);
+    $this->assertStringContainsString('KEY `index_id` (`id`),', $createTableString);
   }
 
   /**
@@ -242,10 +251,10 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     while ($dao->fetch()) {
       if ($dao->Timing == 'After') {
         if ($unique) {
-          $this->assertContains('@uniqueID', $dao->Statement);
+          $this->assertStringContainsString('@uniqueID', $dao->Statement);
         }
         else {
-          $this->assertContains('CONNECTION_ID()', $dao->Statement);
+          $this->assertStringContainsString('CONNECTION_ID()', $dao->Statement);
         }
       }
     }
@@ -278,7 +287,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test changes can be reverted.
    */
-  public function testRevert() {
+  public function testRevert(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     // Pause for one second here to ensure the timestamps between the first create action
@@ -293,15 +302,14 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     ]
     );
     $email = $this->callAPISuccessGetSingle('email', ['email' => 'dopey@mail.com']);
-    $this->callAPIAndDocument('Logging', 'revert', ['log_conn_id' => 'woot', 'log_date' => $timeStamp], __FILE__, 'Revert');
-    $this->assertEquals('Anthony', $this->callAPISuccessGetValue('contact', ['id' => $contactId, 'return' => 'first_name']));
+    $this->callAPISuccess('Logging', 'revert', ['log_conn_id' => 'woot', 'log_date' => $timeStamp]);
     $this->callAPISuccessGetCount('Email', ['id' => $email['id']], 0);
   }
 
   /**
    * Test changes can be reverted.
    */
-  public function testRevertNoDate() {
+  public function testRevertNoDate(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     // Pause for one second here to ensure the timestamps between the first create action
@@ -327,7 +335,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testRevertRestrictedTables() {
+  public function testRevertRestrictedTables(): void {
 
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'temp name'");
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
@@ -372,7 +380,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test changes can be reverted.
    */
-  public function testRevertNoDateNotUnique() {
+  public function testRevertNoDateNotUnique(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'Wopity woot'");
@@ -394,7 +402,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test changes can be retrieved.
    */
-  public function testGet() {
+  public function testGet(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty woot'");
@@ -417,7 +425,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test changes can be retrieved without log_date being required.
    */
-  public function testGetNoDate() {
+  public function testGetNoDate(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty wop wop'");
@@ -431,7 +439,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
       'api.email.create' => ['email' => 'dopey@mail.com'],
     ]);
     $this->callAPISuccessGetSingle('email', ['email' => 'dopey@mail.com']);
-    $diffs = $this->callAPIAndDocument('Logging', 'get', ['log_conn_id' => 'wooty wop wop'], __FUNCTION__, __FILE__);
+    $diffs = $this->callAPISuccess('Logging', 'get', ['log_conn_id' => 'wooty wop wop']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'Dwarf, Dopey']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'Mr. Dopey Dwarf II', 'table' => 'civicrm_contact', 'action' => 'Update', 'field' => 'display_name']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'dopey@mail.com', 'table' => 'civicrm_email', 'action' => 'Insert', 'field' => 'email']);
@@ -480,6 +488,43 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_acl DROP Column temp_col");
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_website DROP Column temp_col");
     }
+  }
+
+  /**
+   * Test the output under logging_no_trigger_permission.
+   *
+   * The logging_no_trigger_permission setting causes the trigger sql
+   * to be output to a file rather than run. It is for situations
+   * where the db user does not have adequate permissions (Super permission
+   * is required when replication is enabled.
+   *
+   * This tests the output of that file.
+   */
+  public function testTriggerOutput(): void {
+    Civi::settings()->set('logging_no_trigger_permission', TRUE);
+    Civi::settings()->set('logging', TRUE);
+    /** @var \Civi\Core\SqlTriggers $sqlTriggers */
+    $sqlTriggers = Civi::service('sql_triggers');
+    $fileName = $sqlTriggers->getFile();
+    $triggerOutPut = file_get_contents($fileName);
+    $this->assertStringStartsWith('DELIMITER //
+DROP FUNCTION', $triggerOutPut);
+    $this->assertStringContainsString('DROP TRIGGER IF EXISTS civicrm_activity_before_insert //
+DROP TRIGGER IF EXISTS civicrm_activity_before_update //
+DROP TRIGGER IF EXISTS civicrm_activity_before_delete //
+DROP TRIGGER IF EXISTS civicrm_activity_after_insert //
+DROP TRIGGER IF EXISTS civicrm_activity_after_update //
+DROP TRIGGER IF EXISTS civicrm_activity_after_delete //
+DROP TRIGGER IF EXISTS civicrm_activity_contact_before_insert //
+DROP TRIGGER IF EXISTS civicrm_activity_contact_before_update //
+DROP TRIGGER IF EXISTS civicrm_activity_contact_before_delete //
+DROP TRIGGER IF EXISTS civicrm_activity_contact_after_insert //
+DROP TRIGGER IF EXISTS civicrm_activity_contact_after_update //
+DROP TRIGGER IF EXISTS civicrm_activity_contact_after_delete //', $triggerOutPut);
+
+    $this->assertStringEndsWith('END //
+DELIMITER ;
+', $triggerOutPut);
   }
 
 }

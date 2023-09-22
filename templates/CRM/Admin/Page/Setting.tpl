@@ -7,7 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{capture assign=docLink}{docURL page="user/initial-set-up/customizing-the-user-interface" text="Administration Documentation"}{/capture}
+{capture assign=docUrlText}{ts}Administration Documentation{/ts}{/capture}
+{capture assign=docLink}{docURL page="user/initial-set-up/customizing-the-user-interface" text=$docUrlText}{/capture}
 <div class="help">
     {ts 1=$docLink}Use the links below to configure or modify the global settings for CiviCRM for this site. Refer to the %1 for details on settings and options.{/ts}
 </div>
@@ -74,7 +75,7 @@
 
 <tr>
     <td class="nowrap"><a href="{crmURL p='civicrm/admin/setting/misc' q='reset=1'}" id="idMisc"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Miscellaneous Settings{/ts}</a></td>
-    <td>{ts}Dashboard caching time, move to trash / undelete, change logging, version checking and reCAPTCHA (prevents automated abuse of public forms).{/ts}</td>
+    <td>{ts}Dashboard caching time, move to trash / undelete, change logging and version checking.{/ts}</td>
 </tr>
 
 <tr>

@@ -7,7 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-
 <div class="crm-block crm-form-block crm-move-field-block">
     <table class="form-layout-compressed">
         <tr><td class="label">{$form.dst_group_id.label}</td>
@@ -15,7 +14,6 @@
                 <span class="description">{ts}Select a different Custom Data Set for this field.{/ts}
             </td>
         </tr>
-        <tr><td class="label">{$form.is_copy.label}</td><td>{$form.is_copy.html}</td></tr>
     </table>
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

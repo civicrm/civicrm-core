@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -9,22 +8,17 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
 namespace Civi\Api4;
 
 /**
  * UFJoin entity - links profiles to the components/extensions they are used for.
  *
  * @see \Civi\Api4\UFGroup
+ * @searchable secondary
+ * @since 5.19
  * @package Civi\Api4
  */
 class UFJoin extends Generic\DAOEntity {
+  use Generic\Traits\EntityBridge;
 
 }

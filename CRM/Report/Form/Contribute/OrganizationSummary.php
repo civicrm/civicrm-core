@@ -33,6 +33,16 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
   protected $otherContact;
 
   /**
+   * @var int
+   */
+  protected $relationshipId;
+
+  /**
+   * @var array
+   */
+  protected $relationTypes = [];
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -168,6 +178,14 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
       'civicrm_email' => [
         'dao' => 'CRM_Core_DAO_Email',
         'fields' => ['email' => NULL],
+        'filters' => [
+          'on_hold' => [
+            'title' => ts('On Hold'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => ['' => ts('Any')] + CRM_Core_PseudoConstant::emailOnHoldOptions(),
+          ],
+        ],
         'grouping' => 'contact-fields',
       ],
       'civicrm_financial_trxn' => [
@@ -242,7 +260,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
                       ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_relationship']}.$this->otherContact )
             {$this->_aclFrom}
             INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} ON
-                      ({$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_relationship']}.$this->otherContact ) AND {$this->_aliases['civicrm_contribution']}.is_test = 0  ";
+                      ({$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_relationship']}.$this->otherContact ) AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0 ";
 
     $this->joinAddressFromContact();
     $this->joinEmailFromContact();
@@ -257,7 +275,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+          if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
@@ -315,7 +333,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */

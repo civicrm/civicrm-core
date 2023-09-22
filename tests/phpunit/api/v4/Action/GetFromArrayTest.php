@@ -14,32 +14,33 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\MockArrayEntity;
 
 /**
  * @group headless
  */
-class GetFromArrayTest extends UnitTestCase {
+class GetFromArrayTest extends Api4TestBase {
 
-  public function testArrayGetWithLimit() {
+  public function testArrayGetWithLimit(): void {
     $result = MockArrayEntity::get()
       ->setOffset(2)
       ->setLimit(2)
       ->execute();
     $this->assertEquals(3, $result[0]['field1']);
     $this->assertEquals(4, $result[1]['field1']);
-    $this->assertEquals(2, count($result));
+
+    // The object's count() method will account for all results, ignoring limit, while the array results are limited
+    $this->assertCount(2, (array) $result);
+    $this->assertCount(5, $result);
   }
 
-  public function testArrayGetWithSort() {
+  public function testArrayGetWithSort(): void {
     $result = MockArrayEntity::get()
       ->addOrderBy('field1', 'DESC')
       ->execute();
@@ -58,7 +59,7 @@ class GetFromArrayTest extends UnitTestCase {
     $this->assertEquals([3, 1, 2, 5, 4], array_column((array) $result, 'field1'));
   }
 
-  public function testArrayGetWithSelect() {
+  public function testArrayGetWithSelect(): void {
     $result = MockArrayEntity::get()
       ->addSelect('field1')
       ->addSelect('f*3')
@@ -75,6 +76,7 @@ class GetFromArrayTest extends UnitTestCase {
       ],
       [
         'field1' => 3,
+        'field3' => NULL,
       ],
       [
         'field1' => 4,
@@ -83,7 +85,7 @@ class GetFromArrayTest extends UnitTestCase {
     ], (array) $result);
   }
 
-  public function testArrayGetWithWhere() {
+  public function testArrayGetWithWhere(): void {
     $result = MockArrayEntity::get()
       ->addWhere('field2', '=', 'yack')
       ->execute();
@@ -109,6 +111,16 @@ class GetFromArrayTest extends UnitTestCase {
       ->addWhere('field2', 'LIKE', '%ra%')
       ->execute();
     $this->assertEquals([1, 3], array_column((array) $result, 'field1'));
+
+    $result = MockArrayEntity::get()
+      ->addWhere('field2', 'REGEXP', '(zebra|yac[a-z]|something/else)')
+      ->execute();
+    $this->assertEquals([1, 2], array_column((array) $result, 'field1'));
+
+    $result = MockArrayEntity::get()
+      ->addWhere('field2', 'NOT REGEXP', '^[x|y|z]')
+      ->execute();
+    $this->assertEquals([4, 5], array_column((array) $result, 'field1'));
 
     $result = MockArrayEntity::get()
       ->addWhere('field3', 'IS NULL')
@@ -156,7 +168,7 @@ class GetFromArrayTest extends UnitTestCase {
     $this->assertEquals([1, 2, 5], array_column((array) $result, 'field1'));
   }
 
-  public function testArrayGetWithNestedWhereClauses() {
+  public function testArrayGetWithNestedWhereClauses(): void {
     $result = MockArrayEntity::get()
       ->addClause('OR', ['field2', 'LIKE', '%ra'], ['field2', 'LIKE', 'x ray'])
       ->execute();

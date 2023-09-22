@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\MessageTemplate;
+use Civi\Token\TokenProcessor;
 
 /**
  *
@@ -36,9 +37,13 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
   protected $_is_document = FALSE;
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * PreProcess form - load existing values.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -104,7 +109,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
     else {
       $this->_workflow_id = $this->_values['workflow_id'] ?? NULL;
       $this->checkUserPermission($this->_workflow_id);
-      $this->assign('workflow_id', $this->_workflow_id);
+      $this->assign('isWorkflow', (bool) ($this->_values['workflow_id'] ?? NULL));
 
       if ($this->_workflow_id) {
         $selectedChild = 'workflow';
@@ -122,7 +127,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
       ];
       if (!($this->_action & CRM_Core_Action::DELETE)) {
         $buttons[] = [
-          'type' => 'submit',
+          'type' => 'upload',
           'name' => ts('Save and Done'),
           'subName' => 'done',
         ];
@@ -165,9 +170,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_MessageTemplate', 'msg_subject')
     );
 
-    //get the tokens.
-    $tokens = CRM_Core_SelectValues::contactTokens();
-    $tokens = array_merge($tokens, CRM_Core_SelectValues::domainTokens());
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contactId']]);
+    $tokens = $tokenProcessor->listTokens();
 
     $this->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
@@ -179,7 +183,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
       )
     ) {
       $this->add('textarea', 'msg_html', ts('HTML Message'),
-        "cols=50 rows=6"
+        ['cols' => 50, 'rows' => 6]
       );
     }
     else {
@@ -194,7 +198,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
     }
 
     $this->add('textarea', 'msg_text', ts('Text Message'),
-      "cols=50 rows=6"
+      ['cols' => 50, 'rows' => 6]
     );
 
     $this->add('select', 'pdf_format_id', ts('PDF Page Format'),
@@ -208,7 +212,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      CRM_Utils_System::setTitle(ts('View System Default Message Template'));
+      $this->setTitle(ts('View System Default Message Template'));
     }
   }
 
@@ -239,7 +243,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param array $self
+   * @param self $self
    *
    * @return array
    *   array of errors
@@ -263,13 +267,15 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
   /**
    * Process the form submission.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Core_BAO_MessageTemplate::del($this->_id);
+      CRM_Core_BAO_MessageTemplate::deleteRecord(['id' => $this->_id]);
+      CRM_Core_Session::setStatus(ts('Selected message template has been deleted.'), ts('Deleted'), 'success');
+
+      $this->postProcessHook();
     }
     elseif ($this->_action & CRM_Core_Action::VIEW) {
       // currently, the above action is used solely for previewing default workflow templates
@@ -309,6 +315,11 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
       }
 
       $messageTemplate = MessageTemplate::save()->setDefaults($params)->setRecords([['id' => $this->_id]])->execute()->first();
+
+      // set the id on save, so it can be used in a extension using the posProcess hook
+      $this->_id = $messageTemplate['id'];
+      $this->postProcessHook();
+
       CRM_Core_Session::setStatus(ts('The Message Template \'%1\' has been saved.', [1 => $messageTemplate['msg_title']]), ts('Saved'), 'success');
 
       if (isset($this->_submitValues['_qf_MessageTemplates_upload'])) {

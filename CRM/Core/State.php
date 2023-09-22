@@ -83,14 +83,10 @@ class CRM_Core_State {
     $this->_stateMachine = &$stateMachine;
   }
 
-  public function debugPrint() {
-    CRM_Core_Error::debug("{$this->_name}, {$this->_type}", "{$this->_back}, {$this->_next}");
-  }
-
   /**
    * Given an CRM Form, jump to the previous page.
    *
-   * @param CRM_Core_Page $page
+   * @param CRM_Core_Form $page
    *
    * @return mixed
    *   does a jump to the back state
@@ -108,7 +104,7 @@ class CRM_Core_State {
   /**
    * Given an CRM Form, jump to the next page.
    *
-   * @param CRM_Core_Page $page
+   * @param CRM_Core_Form $page
    *
    * @return mixed
    *   Does a jump to the nextstate
@@ -120,23 +116,6 @@ class CRM_Core_State {
     else {
       $next = &$page->controller->getPage($this->_next);
       return $next->handle('jump');
-    }
-  }
-
-  /**
-   * Determine the name of the next state.
-   *
-   * This is useful when we want to display the navigation labels or potential path.
-   *
-   * @return string
-   */
-  public function getNextState() {
-    if ($this->_type & self::FINISH) {
-      return NULL;
-    }
-    else {
-      $next = &$page->controller->getPage($this->_next);
-      return $next;
     }
   }
 

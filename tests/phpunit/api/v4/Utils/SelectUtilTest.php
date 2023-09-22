@@ -14,20 +14,18 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace api\v4\Utils;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Utils\SelectUtil;
 
 /**
  * @group headless
  */
-class SelectUtilTest extends UnitTestCase {
+class SelectUtilTest extends Api4TestBase {
 
   private $emailFieldNames = [
     'id',
@@ -42,12 +40,12 @@ class SelectUtilTest extends UnitTestCase {
     'reset_date',
     'signature_text',
     'signature_html',
-    'contact.id',
-    'contact.display_name',
-    'contact.sort_name',
-    'contact.phone.id',
-    'contact.phone.phone',
-    'contact.phone.phone_type_id',
+    'contact_id.id',
+    'contact_id.display_name',
+    'contact_id.sort_name',
+    'contact_id.phone.id',
+    'contact_id.phone.phone',
+    'contact_id.phone.phone_type_id',
   ];
 
   public function getSelectExamples() {
@@ -83,10 +81,10 @@ class SelectUtilTest extends UnitTestCase {
       [['contact_id'], 'con*_id'],
       [['is_primary', 'is_billing', 'is_bulkmail'], 'is_*'],
       [['is_billing', 'is_bulkmail'], 'is_*l*'],
-      [['contact.id', 'contact.display_name', 'contact.sort_name'], 'contact.*'],
-      [['contact.display_name', 'contact.sort_name'], 'contact.*_name'],
-      [['contact.phone.id', 'contact.phone.phone', 'contact.phone.phone_type_id'], 'contact.phone.*'],
-      [['contact.phone.phone', 'contact.phone.phone_type_id'], 'contact.phone.phone*'],
+      [['contact_id.id', 'contact_id.display_name', 'contact_id.sort_name'], 'contact_id.*'],
+      [['contact_id.display_name', 'contact_id.sort_name'], 'contact_id.*_name'],
+      [['contact_id.phone.id', 'contact_id.phone.phone', 'contact_id.phone.phone_type_id'], 'contact_id.phone.*'],
+      [['contact_id.phone.phone', 'contact_id.phone.phone_type_id'], 'contact_id.phone.phone*'],
     ];
   }
 

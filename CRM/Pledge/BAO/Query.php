@@ -497,7 +497,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * Get the metadata for fields to be included on the grant search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
@@ -513,7 +513,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * Get the metadata for fields to be included on the grant search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getPledgePaymentSearchFieldMetadata() {
     $fields = [
@@ -529,7 +529,6 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
    * @param CRM_Pledge_Form_Search|\CRM_Contact_Form_Search_Advanced $form
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
     // pledge related dates
@@ -539,10 +538,10 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
 
     $form->addYesNo('pledge_test', ts('Pledge is a Test?'), TRUE);
     $form->add('text', 'pledge_amount_low', ts('From'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('pledge_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('9.99', ' ')]), 'money');
+    $form->addRule('pledge_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('9.99')]), 'money');
 
     $form->add('text', 'pledge_amount_high', ts('To'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('pledge_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+    $form->addRule('pledge_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
     $form->addYesNo('pledge_acknowledge_date_is_not_null', ts('Acknowledgement sent?'), TRUE);
 

@@ -10,10 +10,16 @@ body {
   background-color: #fff;
   font: 76% Verdana, Arial, Helvetica, sans-serif;
 }
-tr.dark td, tr.light td {
+tr.dark td,
+tr.light td {
   padding: 0.3em;
 }
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin-bottom: 0.5em;
 }
 h1 {
@@ -22,7 +28,10 @@ h1 {
 h2 {
   font-size: 1.2em;
 }
-h3, h4, h5, h6 {
+h3,
+h4,
+h5,
+h6 {
   font-size: 1.1em;
 }
 p {
@@ -74,7 +83,8 @@ table {
 /*
 ** Page layout blocks / IDs
 */
-#header, #content {
+#header,
+#content {
   width: 100%;
 }
 #header {
@@ -112,7 +122,8 @@ table {
   font-weight: bold;
   color: #9cf;
 }
-#search .form-text, #search .crm-form-submit {
+#search .form-text,
+#search .crm-form-submit {
   border: 1px solid #369;
   font-size: 1.1em;
 }
@@ -130,7 +141,8 @@ table {
   padding: 1.5em 2em;
   color: #fff;
 }
-#mission a, #mission a:visited {
+#mission a,
+#mission a:visited {
   color: #9cf;
   font-weight: bold;
 }
@@ -139,7 +151,8 @@ table {
   padding: 0em;
   font-size: 2em;
 }
-.site-name a:link, .site-name a:visited {
+.site-name a:link,
+.site-name a:visited {
   color: #fff;
 }
 .site-name a:hover {
@@ -158,7 +171,9 @@ table {
   /* padding in px not ex because IE messes up 100% width tables otherwise */
   padding: 10px;
 }
-#mission, .node .content, .comment .content {
+#mission,
+.node .content,
+.comment .content {
   line-height: 1.4;
 }
 #help {
@@ -177,7 +192,8 @@ table {
 .error {
   border-color: red;
 }
-#sidebar-left, #sidebar-right {
+#sidebar-left,
+#sidebar-right {
   background-color: #ddd;
   width: 16em;
   /* padding in px not ex because IE messes up 100% width tables otherwise */
@@ -196,7 +212,8 @@ table {
 ** additional rules /with only the differing properties!/ to .parent .class.
 ** See .comment .title for an example.
 */
-.title, .title a {
+.title,
+.title a {
   font-weight: bold;
   font-size: 1.3em;
   color: #777;
@@ -212,7 +229,8 @@ table {
 .links a {
   font-weight: bold;
 }
-.block, .box {
+.block,
+.box {
   padding: 0 0 1.5em 0;
 }
 .block {
@@ -234,7 +252,8 @@ table {
   background-color: #eee;
   border: solid 1px #ddd;
 }
-.node .content, .comment .content {
+.node .content,
+.comment .content {
   margin: .5em 0 .5em 0;
 }
 .node .taxonomy {
@@ -278,7 +297,10 @@ table {
   padding: 1em;
   margin: 1em 0 1em 0;
 }
-#aggregator .news-item .source, #aggregator .news-item .categories, #aggregator .source, #aggregator .age {
+#aggregator .news-item .source,
+#aggregator .news-item .categories,
+#aggregator .source,
+#aggregator .age {
   color: #999;
   font-style: italic;
   font-size: 0.9em;
@@ -296,10 +318,12 @@ table {
 #forum td {
   padding: 0.5em 0.5em 0.5em 0.5em;
 }
-#forum td.forum, #forum td.posts {
+#forum td.forum,
+#forum td.posts {
   background-color: #eee;
 }
-#forum td.topics, #forum td.last-reply {
+#forum td.topics,
+#forum td.last-reply {
   background-color: #ddd;
 }
 #forum td.container {
@@ -308,7 +332,9 @@ table {
 #forum td.container a {
   color: #555;
 }
-#forum td.statistics, #forum td.settings, #forum td.pager {
+#forum td.statistics,
+#forum td.settings,
+#forum td.pager {
   height: 1.5em;
   border: 1px solid #bbb;
 }
@@ -334,7 +360,8 @@ table {
 .calendar a {
   text-decoration: none;
 }
-.calendar td, .calendar th {
+.calendar td,
+.calendar th {
   padding: 0.4em 0;
   border-color: #888;
 }
@@ -355,5 +382,6 @@ table {
   background-color: #ccc;
 }
 .calendar .row-week td a:hover {
-  background-color: #fff; color: #000;
+  background-color: #fff;
+  color: #000;
 }

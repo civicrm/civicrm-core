@@ -47,7 +47,7 @@ class CRM_Core_IDS {
     }
 
     // lets bypass a few civicrm urls from this check
-    $skip = ['civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates'];
+    $skip = ['civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates', 'civicrm/ajax/api4'];
     CRM_Utils_Hook::idsException($skip);
     $this->path = $route['path'];
     if (in_array($this->path, $skip)) {
@@ -110,7 +110,8 @@ class CRM_Core_IDS {
         'filter_type' => 'xml',
         'filter_path' => "{$pkgs}/IDS/default_filter.xml",
         'tmp_path' => $tmpDir,
-        'HTML_Purifier_Path' => $pkgs . '/IDS/vendors/htmlpurifier/HTMLPurifier.auto.php',
+        // Ignored, uses autoloader
+        'HTML_Purifier_Path' => TRUE,
         'HTML_Purifier_Cache' => $tmpDir,
         'scan_keys' => '',
         'exceptions' => ['__utmz', '__utmc'],
@@ -225,24 +226,25 @@ class CRM_Core_IDS {
   /**
    * This function writes an entry about the intrusion to the database.
    *
-   * @param array $result
+   * @param IDS_Report $result
    * @param int $reaction
    *
    * @return bool
    */
   private function log($result, $reaction = 0) {
     // Include X_FORWARD_FOR ip address if set as per IDS patten.
-    $ip = $_SERVER['REMOTE_ADDR'] . (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? ' (' . $_SERVER['HTTP_X_FORWARDED_FOR'] . ')' : '');
+    $ip = CRM_Utils_System::ipAddress() . (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? ' (' . $_SERVER['HTTP_X_FORWARDED_FOR'] . ')' : '');
 
     $data = [];
     $session = CRM_Core_Session::singleton();
+    $session_id = CRM_Core_Config::singleton()->userSystem->getSessionId() ? CRM_Core_Config::singleton()->userSystem->getSessionId() : '0';
     foreach ($result as $event) {
       $data[] = [
         'name' => $event->getName(),
         'value' => stripslashes($event->getValue()),
         'page' => $_SERVER['REQUEST_URI'],
         'userid' => $session->get('userID'),
-        'session' => session_id() ? session_id() : '0',
+        'session' => $session_id,
         'ip' => $ip,
         'reaction' => $reaction,
         'impact' => $result->getImpact(),
@@ -283,7 +285,7 @@ class CRM_Core_IDS {
       $error = civicrm_api3_create_error(
         $msg,
         [
-          'IP' => $_SERVER['REMOTE_ADDR'],
+          'IP' => CRM_Utils_System::ipAddress(),
           'error_code' => 'IDS_KICK',
           'level' => 'security',
           'referer' => $_SERVER['HTTP_REFERER'],

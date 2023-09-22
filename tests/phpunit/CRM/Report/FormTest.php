@@ -26,16 +26,6 @@
  */
 class CRM_Report_FormTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    // There are only unit tests here at present, we can skip database loading.
-    return TRUE;
-  }
-
-  public function tearDown() {
-    // There are only unit tests here at present, we can skip database loading.
-    return TRUE;
-  }
-
   /**
    * Used by testGetFromTo
    */
@@ -74,13 +64,119 @@ class CRM_Report_FormTest extends CiviUnitTestCase {
   /**
    * Test that getFromTo returns the correct dates.
    */
-  public function testGetFromTo() {
+  public function testGetFromTo(): void {
     $cases = $this->fromToData();
     foreach ($cases as $caseDescription => $case) {
       $obj = new CRM_Report_Form();
       list($calculatedFrom, $calculatedTo) = $obj->getFromTo($case['relative'], $case['from'], $case['to']);
       $this->assertEquals([$case['expectedFrom'], $case['expectedTo']], [$calculatedFrom, $calculatedTo], "fail on data set '{$caseDescription}'. Local php time is " . date('Y-m-d H:i:s') . ' and mysql time is ' . CRM_Core_DAO::singleValueQuery('SELECT NOW()'));
     }
+  }
+
+  /**
+   * Test the processReportMode function.
+   *
+   * @dataProvider reportModeProvider
+   *
+   * @param array $input
+   * @param array $expected
+   */
+  public function testProcessReportMode($input, $expected) {
+    // This is a helper in the tests tree, not a real class in the main tree.
+    $form = new CRM_Report_Form_SampleForm();
+
+    $_REQUEST['output'] = $input['format'];
+    $_REQUEST['sendmail'] = $input['sendmail'];
+
+    $form->processReportMode();
+
+    unset($_REQUEST['output']);
+    unset($_REQUEST['sendmail']);
+
+    $this->assertEquals($expected, [
+      $form->getOutputMode(),
+      $form->getAddPaging(),
+      $form->printOnly,
+      $form->_absoluteUrl,
+    ]);
+  }
+
+  /**
+   * dataprovider for testProcessReportMode
+   *
+   * @return array
+   */
+  public function reportModeProvider() {
+    return [
+      'print no mail' => [
+        [
+          'format' => 'report_instance.print',
+          'sendmail' => NULL,
+        ],
+        [
+          // _outputMode
+          'print',
+          // addPaging
+          FALSE,
+          // printOnly
+          TRUE,
+          // _absoluteUrl
+          FALSE,
+        ],
+      ],
+      'print and mail' => [
+        [
+          'format' => 'report_instance.print',
+          'sendmail' => '1',
+        ],
+        ['print', FALSE, TRUE, TRUE],
+      ],
+      'csv no mail' => [
+        [
+          'format' => 'report_instance.csv',
+          'sendmail' => NULL,
+        ],
+        ['csv', FALSE, TRUE, TRUE],
+      ],
+      'csv and mail' => [
+        [
+          'format' => 'report_instance.csv',
+          'sendmail' => '1',
+        ],
+        ['csv', FALSE, TRUE, TRUE],
+      ],
+      'pdf no mail' => [
+        [
+          'format' => 'report_instance.pdf',
+          'sendmail' => NULL,
+        ],
+        ['pdf', FALSE, TRUE, TRUE],
+      ],
+      'pdf and mail' => [
+        [
+          'format' => 'report_instance.pdf',
+          'sendmail' => '1',
+        ],
+        ['pdf', FALSE, TRUE, TRUE],
+      ],
+      'unknown format no mail' => [
+        [
+          'format' => NULL,
+          'sendmail' => NULL,
+        ],
+        [NULL, TRUE, FALSE, FALSE],
+      ],
+      'unknown format and mail' => [
+        [
+          'format' => NULL,
+          'sendmail' => '1',
+        ],
+        // This is a bit inconsistent with the mail_report job which defaults
+        // to pdf when you don't specify a format. But for now this is what
+        // processReportMode does.
+        ['print', FALSE, TRUE, TRUE],
+      ],
+    ];
   }
 
 }

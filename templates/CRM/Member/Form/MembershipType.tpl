@@ -12,9 +12,7 @@
   {include file="CRM/Core/Form/EntityForm.tpl"}
 {else}
 <div class="crm-block crm-form-block crm-membership-type-form-block">
-
   <div class="form-item" id="membership_type_form">
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
       {foreach from=$tpl_standardised_fields item=fieldName}
        {assign var=fieldSpec value=$entityFields.$fieldName}
@@ -69,13 +67,11 @@
       <tr class="crm-membership-type-form-block-relationship_type_id">
         <td class="label">{$form.relationship_type_id.label}</td>
         <td>
-          {if !$membershipRecordsExists}
-            {$form.relationship_type_id.html}
-            <br />
-            {else}
-            {$form.relationship_type_id.html}<div class="status message">{ts}You cannot modify relationship type because there are membership records associated with this membership type.{/ts}</div>
-          {/if}
+          {$form.relationship_type_id.html}<br />
           <span class="description">{ts}Memberships can be automatically granted to related contacts by selecting a Relationship Type.{/ts} {help id="rel-type" file="CRM/Member/Page/MembershipType.hlp"}</span>
+          {if $membershipRecordsExists}
+            <div class="status message">{ts}There are membership records associated with this membership type. Changing this setting will not automatically update existing memberships (and those that would inherit a membership), which may cause inconsistent results.{/ts}</div>
+          {/if}
         </td>
       </tr>
       <tr id="maxRelated" class="crm-membership-type-form-block-max_related">
@@ -104,13 +100,12 @@
     <fieldset><legend>{ts}Renewal Reminders{/ts}</legend>
       <div class="help">
         {capture assign=reminderLink}{crmURL p='civicrm/admin/scheduleReminders' q='reset=1'}{/capture}
-        <div class="icon inform-icon"></div>&nbsp;
+        {icon icon="fa-info-circle"}{/icon}
         {ts 1=$reminderLink}Configure membership renewal reminders using <a href="%1">Schedule Reminders</a>. If you have previously configured renewal reminder templates, you can re-use them with your new scheduled reminders.{/ts} {docURL page="user/email/scheduled-reminders"}
       </div>
     </fieldset>
 
-    {include file="CRM/common/customDataBlock.tpl"}
-
+    {include file="CRM/common/customDataBlock.tpl" customDataType='MembershipType' customDataSubType=false cid=false groupID=false}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {/if}
     <div class="spacer"></div>
@@ -174,27 +169,6 @@ function showHidePeriodSettings() {
     cj("#fixed_period_rollover_day_M, #fixed_period_rollover_day_d").val("");
     cj("#month_fixed_rollover_day_row").val("");
   }
-}
-
-//load the auto renew msg if recur allow.
-{/literal}{if $authorize and $allowAutoRenewMsg}{literal}
-CRM.$(function($) {
-  setReminder( null );
-});
-{/literal}{/if}{literal}
-
-function setReminder( autoRenewOpt ) {
-  //don't process.
-  var allowToProcess = {/literal}'{$allowAutoRenewMsg}'{literal};
-  if ( !allowToProcess ) {
-    return;
-  }
-  if ( !autoRenewOpt ) {
-    autoRenewOpt = cj( 'input:radio[name="auto_renew"]:checked').val();
-  }
-  funName = 'hide();';
-  if ( autoRenewOpt == 1 || autoRenewOpt == 2 ) funName = 'show();';
-  eval( "cj('#autoRenewalMsgId')." + funName );
 }
 
 function showHideMaxRelated(relTypeId) {

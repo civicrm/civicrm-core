@@ -169,7 +169,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
     }
 
     // save address changes
-    $address = CRM_Core_BAO_Address::create($params, TRUE);
+    $address = CRM_Core_BAO_Address::legacyCreate($params, TRUE);
 
     $this->log();
     $this->ajaxResponse['addressId'] = $address[0]->id;

@@ -1,0 +1,47 @@
+/* The title of this file is menubar-standalone, but the CSS is more general than that. @todo fixme */
+@media (min-width: $breakMin) {
+
+  body.crm-menubar-visible.crm-menubar-over-cms-menu {
+    border-top: 0 none !important;
+    margin-top: $menubarHeight;
+  }
+  body.crm-menubar-visible.crm-menubar-over-cms-menu.crm-menubar-wrapped {
+    margin-top: calc($menubarHeight * 2);
+  }
+  body.crm-menubar-visible.crm-menubar-over-cms-menu #admin-bar {
+    visibility: hidden;
+  }
+
+}
+@media (max-width: $breakMax) {
+
+  body #civicrm-menu-nav .crm-menubar-toggle-btn {
+    position: absolute;
+    right: 3px;
+    top: 0;
+    margin-top: 3px;
+  }
+
+}
+
+.breadcrumb ol li {
+  display: inline;
+  list-style-type: none;
+}
+.breadcrumb ol li:not(:first-child)::before {
+  content: " \BB ";
+}
+
+.standalone-errors {
+  background: #ffe8e4;
+  color: #422;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.standalone-errors code {
+  color: #004e81;
+}
+.standalone-errors .backtrace {
+  font-size: 0.825rem;
+}

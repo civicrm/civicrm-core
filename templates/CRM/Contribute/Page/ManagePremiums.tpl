@@ -43,7 +43,7 @@
            </tr>
           </thead>
         {foreach from=$rows item=row}
-        <tr id="product-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+        <tr id="product-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
           <td class="crm-contribution-form-block-name crm-editable" data-field="name">{$row.name}</td>
           <td class="crm-contribution-form-block-sku crm-editable" data-field="sku">{$row.sku}</td>
           <td class="crm-contribution-form-block-price">{$row.price|crmMoney}</td>
@@ -51,7 +51,7 @@
           <td class="crm-contribution-form-block-cost">{$row.cost|crmMoney}</td>
           <td class="crm-contribution-form-block-financial_type">{$row.financial_type}</td>
           <td id="row_{$row.id}_status" >{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td id={$row.id}>{$row.action|replace:'xx':$row.id}</td>
+          <td id={$row.id}>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </table>

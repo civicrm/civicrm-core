@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
 
@@ -29,7 +27,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this, TRUE);
 
-    // ensure that there is a particpant type for this
+    // ensure that there is a participant type for this
     $this->_participantListingID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
       $this->_id,
       'participant_listing_id'
@@ -43,7 +41,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
       $this->_id,
       'title'
     );
-    CRM_Utils_System::setTitle(ts('%1 - Participants', array(1 => $this->_eventTitle)));
+    CRM_Utils_System::setTitle(ts('%1 - Participants', [1 => $this->_eventTitle]));
 
     // we do not want to display recently viewed contacts since this is potentially a public page
     $this->assign('displayRecent', FALSE);
@@ -67,7 +65,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
     );
     if ($className == 'CRM_Event_Page_ParticipantListing') {
       CRM_Core_Error::statusBounce(ts("Participant listing code file cannot be '%1'",
-        array(1 => $className)
+        [1 => $className]
       ));
     }
 
@@ -77,7 +75,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
       ) . '.php';
     $error = include_once $classFile;
     if ($error == FALSE) {
-      CRM_Core_Error::statusBounce('Participant listing code file: ' . $classFile . ' does not exist. Please verify your custom particpant listing settings in CiviCRM administrative panel.');
+      CRM_Core_Error::statusBounce(ts('Participant listing code file: %1 does not exist. Please verify your custom participant listing settings in CiviCRM administrative panel.', [1 => $classFile]));
     }
 
     $participantListingClass = new $className();

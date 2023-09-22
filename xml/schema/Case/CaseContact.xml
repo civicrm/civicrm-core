@@ -6,12 +6,16 @@
   <comment>Joining table for case-contact associations.</comment>
   <add>2.1</add>
   <log>true</log>
+  <component>CiviCase</component>
   <field>
     <name>id</name>
     <title>Case Contact ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique case-contact association id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.1</add>
   </field>
   <primaryKey>
@@ -20,10 +24,13 @@
   </primaryKey>
   <field>
     <name>case_id</name>
-    <title>Case</title>
+    <title>Case ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Case ID of case-contact association.</comment>
+    <html>
+      <label>Case</label>
+    </html>
     <add>2.1</add>
   </field>
   <foreignKey>
@@ -41,6 +48,7 @@
     <comment>Contact ID of contact record given case belongs to.</comment>
     <html>
       <type>EntityRef</type>
+      <label>Contact</label>
     </html>
     <add>2.1</add>
   </field>

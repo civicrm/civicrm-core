@@ -10,7 +10,8 @@
  */
 
 /**
- * Upgrade logic for FiveTwentyEight */
+ * Upgrade logic for FiveTwentyEight
+ */
 class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incremental_Base {
 
   /**
@@ -26,9 +27,9 @@ class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incrementa
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     // Example: Generate a pre-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
-    // }
+    if ($rev == '5.28.alpha1') {
+      $preUpgradeMessage .= CRM_Upgrade_Incremental_php_FiveTwentyEight::createWpFilesMessage();
+    }
   }
 
   /**
@@ -40,17 +41,38 @@ class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incrementa
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
+    // Example: Generate a pre-upgrade message.
+    if ($rev == '5.28.alpha1') {
+      $postUpgradeMessage .= CRM_Upgrade_Incremental_php_FiveTwentyEight::createWpFilesMessage();
+    }
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
+  public static function createWpFilesMessage() {
+    if (!function_exists('civi_wp')) {
+      return '';
+    }
+
+    if (isset($GLOBALS['civicrm_paths']['civicrm.files']['path'])) {
+      // They've explicitly chosen to use a non-default path.
+      return '';
+    }
+
+    $table = '<table><tbody>'
+      . sprintf('<tr><th colspan="2">%s</th></tr>', ts('<b>[civicrm.files]</b> Path'))
+      . sprintf('<tr><td>%s</td><td><code>%s</code></td></tr>', ts('5.29 Default value:'), wp_upload_dir()['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR)
+      . sprintf('<tr><td>%s</td><td><code>%s</code></td></tr>', ts('5.28 Default value:'), CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage()['path'])
+      . sprintf('<tr><td>%s</td><td><code>%s</code></td></tr>', ts('Active Value:'), Civi::paths()->getVariable('civicrm.files', 'path'))
+      . sprintf('<tr><th colspan="2">%s</th></tr>', ts('<b>[civicrm.files]</b> URL'))
+      . sprintf('<tr><td>%s</td><td><code>%s</code></td></tr>', ts('5.29 Default value:'), wp_upload_dir()['baseurl'] . '/civicrm/')
+      . sprintf('<tr><td>%s</td><td><code>%s</code></td></tr>', ts('5.28 Default value:'), CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage()['url'])
+      . sprintf('<tr><td>%s</td><td><code>%s</code></td></tr>', ts('Active Value:'), Civi::paths()->getVariable('civicrm.files', 'url'))
+      . '</tbody></table>';
+
+    return '<p>' . ts('Starting with version 5.29.0, CiviCRM on WordPress may make a subtle change in the calculation of <code>[civicrm.files]</code>. To ensure a smooth upgrade, please review the following table. All paths and URLs should appear the same. If there is <strong><em>any</em></strong> discrepancy, then consult <a %1>the upgrade documentation</a>.', [
+      1 => 'href="https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/#civicrm-5.29" target="_blank"',
+      2 => '...wp-content/uploads/civicrm',
+    ]) . '</p>' . $table;
+  }
 
   /**
    * Upgrade function.
@@ -58,15 +80,15 @@ class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incrementa
    * @param string $rev
    */
   public function upgrade_5_28_alpha1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Populate missing Contact Type name fields', 'populateMissingContactTypeName');
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add icon column to civicrm_custom_group', 'addColumn',
       'civicrm_custom_group', 'icon', "varchar(255) COMMENT 'crm-i icon class' DEFAULT NULL");
+    $this->addTask('Remove index on medium_id from civicrm_activity', 'dropIndex', 'civicrm_activity', 'index_medium_id');
   }
 
   public static function populateMissingContactTypeName() {
-    $contactTypes = \Civi\Api4\ContactType::get()
-      ->setCheckPermissions(FALSE)
+    $contactTypes = \Civi\Api4\ContactType::get(FALSE)
       ->execute();
     foreach ($contactTypes as $contactType) {
       if (empty($contactType['name'])) {

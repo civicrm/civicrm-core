@@ -109,9 +109,6 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
 
     $dao->save();
 
-    // Update dynamic js to reflect new date settings
-    CRM_Core_Resources::singleton()->resetCacheCode();
-
     CRM_Core_Session::setStatus(ts("The date type '%1' has been saved.",
       [1 => $params['name']]
     ), ts('Saved'), 'success');

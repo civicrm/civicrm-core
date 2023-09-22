@@ -63,14 +63,6 @@ class CRM_Core_BAO_CustomQuery {
   public $_qill;
 
   /**
-   * No longer needed due to CRM-17646 refactoring, but still used in some places
-   *
-   * @var array
-   * @deprecated
-   */
-  public $_options;
-
-  /**
    * The custom fields information.
    *
    * @var array
@@ -141,52 +133,9 @@ class CRM_Core_BAO_CustomQuery {
     $this->_whereTables = [];
     $this->_where = [];
     $this->_qill = [];
-    $this->_options = [];
 
     $this->_contactSearch = $contactSearch;
     $this->_fields = CRM_Core_BAO_CustomField::getFields('ANY', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE);
-
-    if (empty($this->_ids)) {
-      return;
-    }
-
-    // initialize the field array
-    $tmpArray = array_keys($this->_ids);
-    $idString = implode(',', $tmpArray);
-    $query = "
-SELECT f.id, f.label, f.data_type,
-       f.html_type, f.is_search_range,
-       f.option_group_id, f.custom_group_id,
-       f.column_name, g.table_name,
-       f.date_format,f.time_format
-  FROM civicrm_custom_field f,
-       civicrm_custom_group g
- WHERE f.custom_group_id = g.id
-   AND g.is_active = 1
-   AND f.is_active = 1
-   AND f.id IN ( $idString )";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      // Deprecated (and poorly named) cache of field attributes
-      $this->_options[$dao->id] = [
-        'attributes' => [
-          'label' => $dao->label,
-          'data_type' => $dao->data_type,
-          'html_type' => $dao->html_type,
-        ],
-      ];
-
-      $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $dao->id, [], 'search');
-      if ($options) {
-        $this->_options[$dao->id] += $options;
-      }
-
-      if ($dao->html_type == 'Select Date') {
-        $this->_options[$dao->id]['attributes']['date_format'] = $dao->date_format;
-        $this->_options[$dao->id]['attributes']['time_format'] = $dao->time_format;
-      }
-    }
   }
 
   /**
@@ -228,14 +177,12 @@ SELECT f.id, f.label, f.data_type,
     foreach ($this->_ids as $id => $values) {
 
       // Fixed for Issue CRM 607
-      if (CRM_Utils_Array::value($id, $this->_fields) === NULL ||
-        !$values
-      ) {
+      if (!isset($this->_fields[$id]) || !$values) {
         continue;
       }
 
       foreach ($values as $tuple) {
-        list($name, $op, $value, $grouping, $wildcard) = $tuple;
+        [$name, $op, $value, $grouping, $wildcard] = $tuple;
 
         $field = $this->_fields[$id];
 
@@ -246,8 +193,8 @@ SELECT f.id, f.label, f.data_type,
         // fix $value here to escape sql injection attacks
         $qillValue = NULL;
         if (!is_array($value)) {
-          $value = CRM_Core_DAO::escapeString(trim($value));
-          $qillValue = CRM_Core_BAO_CustomField::displayValue($value, $id);
+          $escapedValue = CRM_Core_DAO::escapeString(trim($value));
+          $qillValue = CRM_Core_BAO_CustomField::displayValue($escapedValue, $id);
         }
         elseif (count($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $op = key($value);
@@ -258,7 +205,7 @@ SELECT f.id, f.label, f.data_type,
           $qillValue = CRM_Core_BAO_CustomField::displayValue($value, $id);
         }
 
-        $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
+        $qillOp = CRM_Core_SelectValues::getSearchBuilderOperators()[$op] ?? $op;
 
         // Ensure the table is joined in (eg if in where but not select).
         $this->joinCustomTableForField($field);
@@ -266,6 +213,7 @@ SELECT f.id, f.label, f.data_type,
           case 'String':
           case 'StateProvince':
           case 'Country':
+          case 'ContactReference':
 
             if ($field['is_search_range'] && is_array($value)) {
               //didn't found any field under any of these three data-types as searchable by range
@@ -273,7 +221,7 @@ SELECT f.id, f.label, f.data_type,
             else {
               // fix $value here to escape sql injection attacks
               if (!is_array($value)) {
-                if ($field['data_type'] == 'String') {
+                if ($field['data_type'] === 'String') {
                   $value = CRM_Utils_Type::escape($value, 'String');
                 }
                 elseif ($value) {
@@ -292,7 +240,7 @@ SELECT f.id, f.label, f.data_type,
                 foreach ($value as $key => $val) {
                   $value[$key] = str_replace(['[', ']', ','], ['\[', '\]', '[:comma:]'], $val);
                   $value[$key] = str_replace('|', '[:separator:]', $value[$key]);
-                  if ($field['data_type'] == 'String') {
+                  if ($field['data_type'] === 'String') {
                     $value[$key] = CRM_Utils_Type::escape($value[$key], 'String');
                   }
                   elseif ($value) {
@@ -323,26 +271,20 @@ SELECT f.id, f.label, f.data_type,
               }
               else {
                 //FIX for custom data query fired against no value(NULL/NOT NULL)
-                $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
+                $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String', TRUE);
               }
               $this->_qill[$grouping][] = $field['label'] . " $qillOp $qillValue";
             }
             break;
 
-          case 'ContactReference':
-            $label = $value ? CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'sort_name') : '';
-            $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-            $this->_qill[$grouping][] = $field['label'] . " $qillOp $label";
-            break;
-
           case 'Int':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
-            $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
+            $this->_qill[$grouping][] = ts('%1 %2 %3', [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
             break;
 
           case 'Boolean':
             if (!is_array($value)) {
-              if (strtolower($value) == 'yes' || strtolower($value) == strtolower(ts('Yes'))) {
+              if (mb_strtolower($value) === 'yes' || mb_strtolower($value) === mb_strtolower(ts('Yes'))) {
                 $value = 1;
               }
               else {
@@ -389,7 +331,7 @@ SELECT f.id, f.label, f.data_type,
               && substr($name, -5, 5) !== '_high') {
               // Relative dates are handled in the buildRelativeDateQuery function.
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
-              list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);
+              [$qillOp, $qillVal] = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);
               $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
             }
             break;
@@ -463,7 +405,7 @@ SELECT f.id, f.label, f.data_type,
       $joinTableAlias = $joinTable;
       // Set location-specific query
       if (isset($this->_locationSpecificCustomFields[$field['id']])) {
-        list($locationType, $locationTypeId) = $this->_locationSpecificCustomFields[$field['id']];
+        [$locationType, $locationTypeId] = $this->_locationSpecificCustomFields[$field['id']];
         $joinTableAlias = "$locationType-address";
         $joinClause = "\nLEFT JOIN $joinTable `$locationType-address` ON (`$locationType-address`.contact_id = contact_a.id AND `$locationType-address`.location_type_id = $locationTypeId)";
       }

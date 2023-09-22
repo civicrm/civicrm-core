@@ -23,7 +23,7 @@
  *
  * @return array
  *   API result array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_state_province_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_DAO(__FUNCTION__), $params, 'StateProvince');

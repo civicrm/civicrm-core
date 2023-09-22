@@ -19,7 +19,7 @@
       {foreach from=$list item=rows key=report}
         <div class="crm-accordion-wrapper crm-accordion_{$report}-accordion ">
           <div class="crm-accordion-header">
-            {if $report}{if $report EQ 'Contribute'}{ts}Contribution{/ts}{else}{$report}{/if}{else}Contact{/if} Report Templates
+            {if $report}{if $report EQ 'Contribute'}{ts}Contribution{/ts}{else}{$report}{/if}{else}{ts}Contact{/ts}{/if} Report Templates
           </div><!-- /.crm-accordion-header -->
           <div class="crm-accordion-body">
             <div id="{$report}" class="boxBlock">
@@ -28,7 +28,7 @@
                   <tr id="row_{counter}" class="crm-report-templateList">
                     <td class="crm-report-templateList-title" style="width:35%;">
                       <a href="{$row.url}" title="{ts}Create report from this template{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> <strong>{$row.title}</strong></a>
-                      {if $row.instanceUrl}
+                      {if !empty($row.instanceUrl)}
                         <div style="font-size:10px;text-align:right;margin-top:3px;">
                           <a href="{$row.instanceUrl}">{ts}Existing Report(s){/ts}</a>
                         </div>
@@ -46,7 +46,7 @@
       {/foreach}
     {else}
       <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>&nbsp; {ts}There are currently no Report Templates.{/ts}
+        {icon icon="fa-info-circle"}{/icon} {ts}There are currently no Report Templates.{/ts}
       </div>
     {/if}
   {/strip}

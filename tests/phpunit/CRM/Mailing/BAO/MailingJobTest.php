@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Test\Invasive;
+
 /**
  * Class CRM_Mailing_BAO_MailingTest
  * @group headless
@@ -16,19 +18,9 @@
 class CRM_Mailing_BAO_MailingJobTest extends CiviUnitTestCase {
 
   /**
-   * Calls a protected method.
-   */
-  public static function callMethod($obj, $name, $args) {
-    $class = new ReflectionClass($obj);
-    $method = $class->getMethod($name);
-    $method->setAccessible(TRUE);
-    return $method->invokeArgs($obj, $args);
-  }
-
-  /**
    * Tests CRM_Mailing_BAO_MailingJob::isTemporaryError() method.
    */
-  public function testIsTemporaryError() {
+  public function testIsTemporaryError(): void {
     $testcases[] = ['return' => TRUE, 'message' => 'Failed to set sender: test@example.org [SMTP: Invalid response code received from SMTP server while sending email. This is often caused by a misconfiguration in Outbound Email settings. Please verify the settings at Administer CiviCRM >> Global Settings >> Outbound Email (SMTP). (code: 421, response: Timeout waiting for data from client.)]'];
     $testcases[] = ['return' => TRUE, 'message' => 'Failed to send data [SMTP: Invalid response code received from SMTP server while sending email. This is often caused by a misconfiguration in Outbound Email settings. Please verify the settings at Administer CiviCRM >> Global Settings >> Outbound Email (SMTP). (code: 454, response: Throttling failure: Maximum sending rate exceeded.)]'];
     $testcases[] = ['return' => TRUE, 'message' => 'Failed to set sender: test@example.org [SMTP: Failed to write to socket: not connected (code: -1, response: )]'];
@@ -38,7 +30,7 @@ class CRM_Mailing_BAO_MailingJobTest extends CiviUnitTestCase {
     $testcases[] = ['return' => FALSE, 'message' => 'authentication failure [SMTP: Invalid response code received from SMTP server while sending email.  This is often caused by a misconfiguration in Outbound Email settings. Please verify the settings at Administer CiviCRM >> Global Settings >> Outbound Email (SMTP). (code: 454, response: Temporary authentication failure)]'];
     $object = new CRM_Mailing_BAO_MailingJob();
     foreach ($testcases as $testcase) {
-      $isTemporaryError = self::callMethod($object, 'isTemporaryError', [$testcase['message']]);
+      $isTemporaryError = Invasive::call([$object, 'isTemporaryError'], [$testcase['message']]);
       if ($testcase['return']) {
         $this->assertTrue($isTemporaryError);
       }

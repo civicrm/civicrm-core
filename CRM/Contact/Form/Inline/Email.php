@@ -49,7 +49,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     $email = new CRM_Core_BAO_Email();
     $email->contact_id = $this->_contactId;
 
-    $this->_emails = CRM_Core_BAO_Block::retrieveBlock($email, NULL);
+    $this->_emails = CRM_Core_BAO_Block::retrieveBlock($email);
 
     // Check if this contact has a first/last/organization/household name
     if ($this->_contactType == 'Individual') {
@@ -170,17 +170,9 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     }
     CRM_Core_BAO_Block::create('email', $params);
 
-    // If contact has no name, set primary email as display name
-    // TODO: This should be handled in the BAO for the benefit of the api, etc.
+    // Changing email might change a contact's display_name so refresh name block content
     if (!$this->contactHasName) {
-      foreach ($params['email'] as $email) {
-        if ($email['is_primary']) {
-          CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'display_name', $email['email']);
-          CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'sort_name', $email['email']);
-          $this->ajaxResponse['reloadBlocks'] = ['#crm-contactname-content'];
-          break;
-        }
-      }
+      $this->ajaxResponse['reloadBlocks'] = ['#crm-contactname-content'];
     }
 
     $this->log();

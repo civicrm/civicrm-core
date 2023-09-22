@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Group;
+use Civi\Api4\SavedSearch;
+
 /**
  * Test class for CRM_Contact_BAO_Group BAO
  *
@@ -18,27 +21,19 @@
 class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
 
   /**
-   * Sets up the fixture, for example, opens a network connection.
-   *
-   * This method is called before a test is executed.
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
-
-  /**
    * Tears down the fixture, for example, closes a network connection.
    *
    * This method is called after a test is executed.
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     $this->quickCleanup(['civicrm_mapping_field', 'civicrm_mapping', 'civicrm_group', 'civicrm_saved_search']);
+    parent::tearDown();
   }
 
   /**
    * Test case for add( ).
    */
-  public function testAddSimple() {
+  public function testAddSimple(): void {
 
     $checkParams = $params = [
       'title' => 'Group Uno',
@@ -60,13 +55,13 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    * Test case to ensure child group is present in the hierarchy
    *  if it has multiple parent groups and not all are disabled.
    */
-  public function testGroupHirearchy() {
+  public function testGroupHirearchy(): void {
     // Use-case :
     // 1. Create two parent group A and B and disable B
     // 2. Create a child group C
     // 3. Ensure that Group C is present in the group hierarchy
     $params = [
-      'name' => uniqid(),
+      'name' => 'parent group a',
       'title' => 'Parent Group A',
       'description' => 'Parent Group One',
       'visibility' => 'User and User Admin Only',
@@ -75,7 +70,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     $group1 = CRM_Contact_BAO_Group::create($params);
 
     $params = array_merge($params, [
-      'name' => uniqid(),
+      'name' => 'parent group b',
       'title' => 'Parent Group B',
       'description' => 'Parent Group Two',
       // disable
@@ -84,7 +79,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     $group2 = CRM_Contact_BAO_Group::create($params);
 
     $params = array_merge($params, [
-      'name' => uniqid(),
+      'name' => 'parent group c',
       'title' => 'Child Group C',
       'description' => 'Child Group C',
       'parents' => [
@@ -110,9 +105,88 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test nestedGroup pseudoconstant
+   */
+  public function testNestedGroup(): void {
+    $params = [
+      'name' => 'group a',
+      'title' => 'Parent Group A',
+      'description' => 'Parent Group One',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+      // mailing group
+      'group_type' => ['2' => 1],
+    ];
+    $group1 = CRM_Contact_BAO_Group::create($params);
+
+    $params = [
+      'name' => 'group b',
+      'title' => 'Parent Group B',
+      'description' => 'Parent Group Two',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+    ];
+    $group2 = CRM_Contact_BAO_Group::create($params);
+
+    $params = [
+      'name' => 'group c',
+      'title' => 'Child Group C',
+      'description' => 'Child Group C',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+      'parents' => [
+        $group2->id => 1,
+      ],
+      'group_type' => ['2' => 1],
+    ];
+    $group3 = CRM_Contact_BAO_Group::create($params);
+
+    unset(Civi::$statics['CRM_Core_Permission_Base']);
+    // Check with no group type restriction
+    $nestedGroup = CRM_Core_PseudoConstant::nestedGroup();
+    $this->assertEquals([
+      $group1->id => 'Parent Group A',
+      $group2->id => 'Parent Group B',
+      $group3->id => '&nbsp;&nbsp;Child Group C',
+    ], $nestedGroup);
+
+    // Check restrict to mailing groups
+    $nestedGroup = CRM_Core_PseudoConstant::nestedGroup(TRUE, 'Mailing');
+    $this->assertSame([
+      $group1->id => 'Parent Group A',
+      $group3->id => '&nbsp;&nbsp;Child Group C',
+    ], $nestedGroup);
+  }
+
+  /**
+   * Test that parents as criteria don't cause loops.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGroupWithParentInCriteria(): void {
+    $parentGroupID = Group::create()->setValues([
+      'name' => 'Parent',
+      'title' => 'Parent',
+    ])->execute()->first()['id'];
+    $savedSearchID = SavedSearch::create()->setValues([
+      'form_values' => [
+        ['group', '=', ['IN' => [$parentGroupID]], 0, 0],
+      ],
+      'name' => 'child',
+    ])->execute()->first()['id'];
+    $childGroupID = Group::create()->setValues([
+      'name' => 'Child',
+      'title' => 'Child',
+      'saved_search_id' => $savedSearchID,
+      'parents' => [$parentGroupID],
+    ])->execute()->first()['id'];
+    $this->callAPISuccess('Contact', 'get', ['group' => $childGroupID]);
+  }
+
+  /**
    * Test adding a smart group.
    */
-  public function testAddSmart() {
+  public function testAddSmart(): void {
 
     $checkParams = $params = [
       'title' => 'Group Dos',
@@ -173,21 +247,21 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    *  Copy the output to a single sql file and place in the SavedSearchDataSets folder - use the group number as the prefix.
    *  Try to keep as much of the real world irregular glory as you can! Don't change the table ids to be number 1 as this can hide errors
    */
-  public function testGroupData() {
+  public function testGroupData(): void {
     $groups = $this->dataProviderSavedSearch();
     foreach ($groups[0] as $groupID) {
       $group = new CRM_Contact_BAO_Group();
       $group->id = $groupID;
       $group->find(TRUE);
 
-      CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+      CRM_Contact_BAO_GroupContactCache::load($group);
     }
   }
 
   /**
    * Ensure that when updating a group with a linked organisation record even tho that record's id doesn't match the group id no db error is produced
    */
-  public function testGroupUpdateWithOrganization() {
+  public function testGroupUpdateWithOrganization(): void {
     $params = [
       'name' => uniqid(),
       'title' => 'Group A',
@@ -225,7 +299,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Ensure that when hidden smart group is created, wildcard string value is not ignored
    */
-  public function testHiddenSmartGroup() {
+  public function testHiddenSmartGroup(): void {
     $customGroup = $this->customGroupCreate();
     $fields = [
       'label' => 'testFld',
@@ -244,7 +318,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'search_custom_id' => NULL,
       'search_context' => 'advanced',
     ];
-    list($smartGroupID, $savedSearchID) = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
+    [$smartGroupID, $savedSearchID] = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
 
     $mailingID = $this->callAPISuccess('Mailing', 'create', [])['id'];
     $this->callAPISuccess('MailingGroup', 'create', [
@@ -263,7 +337,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    * Test updating a group with just description and check the recent items
    * list has the right title.
    */
-  public function testGroupUpdateDescription() {
+  public function testGroupUpdateDescription(): void {
     // Create a group. Copied from $this->testAddSimple().
     // Note we need $checkParams because the function call changes $params.
     $checkParams = $params = [

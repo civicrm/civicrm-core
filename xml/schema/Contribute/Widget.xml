@@ -7,12 +7,16 @@
   <comment>A Widget object to store meta information about a single customized contribution widget</comment>
   <add>2.0</add>
   <log>true</log>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <title>Widget ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Contribution Id</comment>
+    <comment>Contribution ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.0</add>
   </field>
   <primaryKey>
@@ -21,9 +25,12 @@
   </primaryKey>
   <field>
     <name>contribution_page_id</name>
-    <title>Contribution Page</title>
+    <title>Contribution Page ID</title>
     <type>int unsigned</type>
     <comment>The Contribution Page which triggered this contribution</comment>
+    <html>
+      <label>Contribution Page</label>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>
@@ -36,6 +43,12 @@
     <name>is_active</name>
     <title>Enabled?</title>
     <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Is this property active?</comment>
     <add>2.0</add>
   </field>

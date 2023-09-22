@@ -14,7 +14,7 @@
   <h3 class="crm-table-title">{ts}Activities{/ts}</h3>
   {/if}
 {if $rows}
-  <form title="activity_pager" action="{crmURL}" method="post">
+  <form action="{crmURL}" method="post">
   {include file="CRM/common/pager.tpl" location="top"}
 
   {strip}
@@ -34,7 +34,7 @@
 
       {counter start=0 skip=1 print=false}
       {foreach from=$rows item=row}
-      <tr class="{cycle values="odd-row,even-row"} {$row.class} crm-activity crm-activity_status-{$row.activity_status_id} crm-activity-type_{$row.activity_type_id}" id="crm-activity_{$row.activity_id}">
+      <tr class="{cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if} crm-activity crm-activity_status-{$row.activity_status_id} crm-activity-type_{$row.activity_type_id}" id="crm-activity_{$row.activity_id}">
         <td class="crm-activity-type crm-activity-type_{$row.activity_type_id}">{$row.activity_type}</td>
         <td class="crm-activity-subject">{$row.subject}</td>
         <td class="crm-activity-source_contact_name">
@@ -83,7 +83,7 @@
 
         <td class="crm-activity-date_time">{$row.activity_date_time|crmDate}</td>
         <td class="crm-activity-status crm-activity-status_{$row.status_id}">{$row.status}</td>
-        <td>{$row.action|replace:'xx':$row.id}</td>
+        <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
       </tr>
       {/foreach}
 
@@ -97,9 +97,7 @@
 {else}
 
   <div class="messages status no-popup">
-    {if isset($caseview) and $caseview}
-      {ts}There are no Activities attached to this case record.{/ts}{if $permission EQ 'edit'} {ts}You can go to the Activities tab to create or attach activity records.{/ts}{/if}
-    {elseif $context eq 'home'}
+    {if $context eq 'home'}
       {ts}There are no Activities to display.{/ts}
     {else}
       {ts}There are no Activities to display.{/ts}{if $permission EQ 'edit'} {ts}You can use the links above to schedule or record an activity.{/ts}{/if}

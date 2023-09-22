@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Standaloneusers</base>
+  <class>User</class>
+  <name>civicrm_user</name>
+  <comment>A standalone user account</comment>
+  <labelField>username</labelField>
+  <searchField>username</searchField>
+  <descriptionField>email</descriptionField>
+  <log>true</log>
+  <paths>
+    <add>civicrm/user</add>
+    <update>civicrm/user/#?User1=[id]</update>
+  </paths>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique User ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Contact - possibly redundant</comment>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <label>Username</label>
+    <name>username</name>
+    <required>true</required>
+    <type>varchar</type>
+    <length>60</length>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <index>
+    <name>UI_username</name>
+    <fieldName>username</fieldName>
+    <unique>true</unique>
+  </index>
+
+  <field>
+    <name>password</name>
+    <type>varchar</type>
+    <required>true</required>
+    <length>128</length>
+    <comment>Hashed password</comment>
+  </field>
+
+  <field>
+    <name>email</name>
+    <type>varchar</type>
+    <required>true</required>
+    <length>255</length>
+    <comment>Email (e.g. for password resets)</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>roles</name>
+    <type>varchar</type>
+    <title>Roles</title>
+    <length>128</length>
+    <comment>FK to Role</comment>
+    <pseudoconstant>
+      <table>civicrm_role</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>label</labelColumn>
+      <nameColumn>name</nameColumn>
+      <condition>name != "everyone"</condition>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
+  </field>
+
+  <field>
+    <name>when_created</name>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
+  </field>
+
+  <field>
+    <name>when_last_accessed</name>
+    <type>timestamp</type>
+    <required>false</required>
+  </field>
+
+  <field>
+    <name>when_updated</name>
+    <type>timestamp</type>
+    <required>false</required>
+  </field>
+
+  <field>
+    <name>is_active</name>
+    <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+
+  <field>
+    <name>timezone</name>
+    <type>varchar</type>
+    <length>32</length>
+    <required>false</required>
+    <comment>User's timezone</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>language</name>
+    <type>int unsigned</type>
+    <title>Language</title>
+    <pseudoconstant>
+      <optionGroupName>languages</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <comment>The language for the user.</comment>
+  </field>
+
+</table>

@@ -74,9 +74,10 @@ class CRM_Utils_VersionCheck {
   /**
    * Self-populates version info
    *
-   * @throws \Exception
+   * @param bool $force
+   * @throws Exception
    */
-  public function initialize() {
+  public function initialize($force = FALSE) {
     $this->getJob();
 
     // Populate remote $versionInfo from cache file
@@ -84,9 +85,9 @@ class CRM_Utils_VersionCheck {
 
     // Fallback if scheduled job is enabled but has failed to run.
     $expiryTime = time() - self::CACHEFILE_EXPIRE;
-    if (!empty($this->cronJob['is_active']) &&
+    if ($force || (!empty($this->cronJob['is_active']) &&
       (!$this->isInfoAvailable || filemtime($this->cacheFile) < $expiryTime)
-    ) {
+    )) {
       // First try updating the files modification time, for 2 reasons:
       //  - if the file is not writeable, this saves the trouble of pinging back
       //  - if the remote server is down, this will prevent an immediate retry
@@ -138,8 +139,11 @@ class CRM_Utils_VersionCheck {
     // Non-alpha versions get the full treatment
     if ($this->localVersion && !strpos($this->localVersion, 'alpha')) {
       $this->stats += [
+        // Remove the hash after 2024-09-01 to allow the transition to sid
         'hash' => md5($siteKey . $config->userFrameworkBaseURL),
+        'sid' => Civi::settings()->get('site_id'),
         'uf' => $config->userFramework,
+        'environment' => CRM_Core_Config::environment(),
         'lang' => $config->lcMessages,
         'co' => $config->defaultContactCountry,
         'ufv' => $config->userSystem->getVersion(),
@@ -177,6 +181,7 @@ class CRM_Utils_VersionCheck {
    * Add info to the 'entities' array
    */
   private function getEntityStats() {
+    // FIXME hardcoded list = bad
     $tables = [
       'CRM_Activity_DAO_Activity' => 'is_test = 0',
       'CRM_Case_DAO_Case' => 'is_deleted = 0',
@@ -199,18 +204,23 @@ class CRM_Utils_VersionCheck {
       'CRM_Member_DAO_MembershipBlock' => 'is_active = 1',
       'CRM_Pledge_DAO_Pledge' => 'is_test = 0',
       'CRM_Pledge_DAO_PledgeBlock' => NULL,
-      'CRM_Mailing_Event_DAO_Delivered' => NULL,
+      'CRM_Mailing_Event_DAO_MailingEventDelivered' => NULL,
     ];
+    // Provide continuity in wire format.
+    $compat = ['MailingEventDelivered' => 'Delivered'];
     foreach ($tables as $daoName => $where) {
-      $dao = new $daoName();
-      if ($where) {
-        $dao->whereAdd($where);
+      if (class_exists($daoName)) {
+        /** @var \CRM_Core_DAO $dao */
+        $dao = new $daoName();
+        if ($where) {
+          $dao->whereAdd($where);
+        }
+        $short_name = substr($daoName, strrpos($daoName, '_') + 1);
+        $this->stats['entities'][] = [
+          'name' => $compat[$short_name] ?? $short_name,
+          'size' => $dao->count(),
+        ];
       }
-      $short_name = substr($daoName, strrpos($daoName, '_') + 1);
-      $this->stats['entities'][] = [
-        'name' => $short_name,
-        'size' => $dao->count(),
-      ];
     }
   }
 
@@ -220,8 +230,7 @@ class CRM_Utils_VersionCheck {
    */
   private function getExtensionStats() {
     // Core components
-    $config = CRM_Core_Config::singleton();
-    foreach ($config->enableComponents as $comp) {
+    foreach (Civi::settings()->get('enable_components') as $comp) {
       $this->stats['extensions'][] = [
         'name' => 'org.civicrm.component.' . strtolower($comp),
         'enabled' => 1,

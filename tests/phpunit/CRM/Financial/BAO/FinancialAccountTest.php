@@ -9,29 +9,31 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\FinancialAccount;
+use Civi\Api4\FinancialType;
+
 /**
  * Class CRM_Financial_BAO_FinancialAccountTest
  * @group headless
  */
 class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    $this->useTransaction(TRUE);
+  public function setUp(): void {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->organizationCreate();
   }
 
   /**
    * Check method add()
    */
-  public function testAdd() {
+  public function testAdd(): void {
     $params = [
       'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
     ];
-    $ids = [];
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($params);
 
     $result = $this->assertDBNotNull(
       'CRM_Financial_BAO_FinancialAccount',
@@ -47,14 +49,14 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   /**
    * Check method retrive()
    */
-  public function testRetrieve() {
+  public function testRetrieve(): void {
     $params = [
       'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
     ];
-    $ids = $defaults = [];
-    CRM_Financial_BAO_FinancialAccount::add($params);
+    $defaults = [];
+    CRM_Financial_BAO_FinancialAccount::writeRecord($params);
 
     $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
 
@@ -62,41 +64,17 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method setIsActive()
-   */
-  public function testSetIsActive() {
-    $params = [
-      'name' => 'Donations',
-      'is_deductible' => 0,
-      'is_active' => 1,
-    ];
-    $ids = [];
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
-    $result = CRM_Financial_BAO_FinancialAccount::setIsActive($financialAccount->id, 0);
-    $this->assertEquals($result, TRUE, 'Verify financial account record updation for is_active.');
-
-    $isActive = $this->assertDBNotNull(
-      'CRM_Financial_BAO_FinancialAccount',
-      $financialAccount->id,
-      'is_active',
-      'id',
-      'Database check on updated for financial account is_active.'
-    );
-    $this->assertEquals($isActive, 0, 'Verify financial account is_active.');
-  }
-
-  /**
    * Check method del()
    *
    * @throws \CRM_Core_Exception
    */
-  public function testDel() {
+  public function testDel(): void {
     $params = [
       'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
     ];
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($params);
 
     CRM_Financial_BAO_FinancialAccount::del($financialAccount->id);
     $params = ['id' => $financialAccount->id];
@@ -105,50 +83,48 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method del()
+   * Check delete fails if a related contribution exists.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testdelIfHasContribution() {
-    $params = [
+  public function testDeleteIfHasContribution(): void {
+    $financialType = FinancialType::create(FALSE)->setValues([
       'name' => 'Donation Test',
-      'is_active' => 1,
-      'is_deductible' => 1,
       'is_reserved' => 1,
-    ];
-    $financialType = CRM_Financial_BAO_FinancialType::add($params);
-    $defaults = [];
-    $params = [
-      'name' => 'Donation Test',
-      'is_active' => 1,
-    ];
-    $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
+    ])->execute()->first();
+
+    $financialAccount = FinancialAccount::get(FALSE)->setWhere([
+      ['name', '=', 'Donation Test'],
+      ['is_active', '=', TRUE],
+    ])->setSelect(['id'])->execute()->first();
 
     $contactId = $this->individualCreate();
     $contributionParams = [
       'total_amount' => 300,
       'currency' => 'USD',
       'contact_id' => $contactId,
-      'financial_type_id' => $financialType->id,
+      'financial_type_id' => $financialType['id'],
       'contribution_status_id' => 1,
     ];
     $this->callAPISuccess('Contribution', 'create', $contributionParams);
-    CRM_Financial_BAO_FinancialAccount::del($result->id);
-    $params = ['id' => $result->id];
-    $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
-    $this->assertEquals(empty($result), FALSE, 'Verify financial account record deletion.');
+    CRM_Financial_BAO_FinancialAccount::del($financialAccount['id']);
+
+    $this->assertCount(1, FinancialAccount::get(FALSE)->setWhere([
+      ['id', '=', $financialAccount['id']],
+    ])->selectRowCount()->execute(), 'Financial account should not be deleted as it is in use.');
   }
 
   /**
    * Check method getAccountingCode()
    */
-  public function testGetAccountingCode() {
+  public function testGetAccountingCode(): void {
     $params = [
       'name' => 'Donations',
       'is_active' => 1,
       'is_reserved' => 0,
     ];
 
-    $ids = [];
-    $financialType = CRM_Financial_BAO_FinancialType::add($params, $ids);
+    $financialType = CRM_Financial_BAO_FinancialType::writeRecord($params);
     $financialAccountid = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', 'Donations', 'id', 'name');
     CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountid, 'accounting_code', '4800');
     $accountingCode = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialType->id);
@@ -158,28 +134,94 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   /**
    * Test getting financial account for a given financial Type with a particular relationship.
    */
-  public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltIn() {
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Income Account Is'));
+  public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltIn(): void {
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Income Account is'));
+  }
+
+  /**
+   * Test getting financial account for a given financial Type with a particular relationship with label changed.
+   */
+  public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInLabel(): void {
+    // change the label
+    $optionValue = $this->callAPISuccess('OptionValue', 'get', [
+      'option_group_id' => 'account_relationship',
+      'name' => 'Income Account is',
+    ]);
+    $this->callAPISuccess('OptionValue', 'create', [
+      'id' => $optionValue['id'],
+      'label' => 'Changed label',
+    ]);
+    // run test
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Income Account is'));
+    // restore label
+    $this->callAPISuccess('OptionValue', 'create', [
+      'id' => $optionValue['id'],
+      'label' => 'Income Account is',
+    ]);
   }
 
   /**
    * Test getting financial account for a given financial Type with a particular relationship.
    */
-  public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInRefunded() {
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Credit/Contra Revenue Account Is'));
+  public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInRefunded(): void {
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Credit/Contra Revenue Account is'));
+  }
+
+  /**
+   * Test getting financial account for a given financial Type with a particular relationship with label changed.
+   */
+  public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInRefundedLabel(): void {
+    // change the label
+    $optionValue = $this->callAPISuccess('OptionValue', 'get', [
+      'option_group_id' => 'account_relationship',
+      'name' => 'Credit/Contra Revenue Account is',
+    ]);
+    $this->callAPISuccess('OptionValue', 'create', [
+      'id' => $optionValue['id'],
+      'label' => 'Changed label',
+    ]);
+    // run test
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Credit/Contra Revenue Account is'));
+    // restore label
+    $this->callAPISuccess('OptionValue', 'create', [
+      'id' => $optionValue['id'],
+      'label' => 'Credit/Contra Revenue Account is',
+    ]);
   }
 
   /**
    * Test getting financial account for a given financial Type with a particular relationship.
    */
-  public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInChargeBack() {
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Chargeback Account Is'));
+  public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInChargeBack(): void {
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Chargeback Account is'));
+  }
+
+  /**
+   * Test getting financial account for a given financial Type with a particular relationship with label changed.
+   */
+  public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInChargeBackLabel(): void {
+    // change the label
+    $optionValue = $this->callAPISuccess('OptionValue', 'get', [
+      'option_group_id' => 'account_relationship',
+      'name' => 'Chargeback Account is',
+    ]);
+    $this->callAPISuccess('OptionValue', 'create', [
+      'id' => $optionValue['id'],
+      'label' => 'Changed label',
+    ]);
+    // run test
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Chargeback Account is'));
+    // restore label
+    $this->callAPISuccess('OptionValue', 'create', [
+      'id' => $optionValue['id'],
+      'label' => 'Chargeback Account is',
+    ]);
   }
 
   /**
    * Test getting financial account for a given financial Type with a particular relationship.
    */
-  public function testGetFinancialAccountByFinancialTypeAndRelationshipCustomAddedRefunded() {
+  public function testGetFinancialAccountByFinancialTypeAndRelationshipCustomAddedRefunded(): void {
     $financialAccount = $this->callAPISuccess('FinancialAccount', 'create', [
       'name' => 'Refund Account',
       'is_active' => TRUE,
@@ -198,7 +240,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   /**
    * Test getting financial account relations for a given financial type.
    */
-  public function testGetFinancialAccountRelations() {
+  public function testGetFinancialAccountRelations(): void {
     $fAccounts = $rAccounts = [];
     $relations = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
     $links = [
@@ -235,7 +277,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   /**
    * Test getting deferred financial type.
    */
-  public function testGetDeferredFinancialType() {
+  public function testGetDeferredFinancialType(): void {
     $result = $this->_createDeferredFinancialAccount();
     $financialTypes = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
     $this->assertTrue(array_key_exists($result, $financialTypes), "The financial type created does not have a deferred account relationship");
@@ -244,7 +286,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   /**
    * Test getting financial account for a given financial Type with a particular relationship.
    */
-  public function testValidateFinancialAccount() {
+  public function testValidateFinancialAccount(): void {
     // Create a record with financial item having financial account as Event Fee.
     $this->createPartiallyPaidParticipantOrder();
     $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount();
@@ -261,7 +303,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testcheckFinancialTypeHasDeferred() {
+  public function testcheckFinancialTypeHasDeferred(): void {
     Civi::settings()->set('deferred_revenue_enabled', TRUE);
     $params = [];
     $valid = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params);
@@ -325,7 +367,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   /**
    * Test testGetAllDeferredFinancialAccount.
    */
-  public function testGetAllDeferredFinancialAccount() {
+  public function testGetAllDeferredFinancialAccount(): void {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::getAllDeferredFinancialAccount();
     // The two deferred financial accounts which are created by default.
     $expected = [
@@ -342,7 +384,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   /**
    * CRM-20037: Test balance due amount, if contribution is done using deferred Financial Type
    */
-  public function testBalanceDueIfDeferredRevenueEnabled() {
+  public function testBalanceDueIfDeferredRevenueEnabled(): void {
     Civi::settings()->set('deferred_revenue_enabled', TRUE);
     $deferredFinancialTypeID = $this->_createDeferredFinancialAccount();
 

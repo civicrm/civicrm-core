@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  * CRM_Utils_Cache_Interface is a long-standing interface used within CiviCRM
  * for interacting with a cache service. In style and substance, it is extremely
  * similar to PHP-FIG's SimpleCache interface (PSR-16). Consequently, beginning

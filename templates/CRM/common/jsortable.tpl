@@ -27,14 +27,14 @@
     }
 
     // for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC/Sorting+Date+Fields+in+dataTables+Widget
-    var useAjax = {/literal}{if $useAjax}1{else}0{/if}{literal},
+    var useAjax = {/literal}{$useAjax}{literal},
       sourceUrl = '',
       useClass  = 'display',
       tcount = 1,
       tableId = [];
 
     if ( useAjax ) {
-      {/literal}{if isset($sourceUrl)}sourceUrl = "{$sourceUrl}";{/if}{literal}
+      {/literal}{if $sourceUrl}sourceUrl = "{$sourceUrl}";{/if}{literal}
       useClass = 'pagerDisplay';
       tcount = 5;
     }

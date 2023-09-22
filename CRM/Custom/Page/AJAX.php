@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 /**
@@ -93,13 +92,18 @@ class CRM_Custom_Page_AJAX {
 
   /**
    * Get list of Multi Record Fields.
-   *
    */
-  public static function getMultiRecordFieldList() {
+  public static function getMultiRecordFieldList(): void {
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams(0, 10);
     $params['cid'] = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
     $params['cgid'] = CRM_Utils_Type::escape($_GET['cgid'], 'Integer');
+
+    if (!CRM_Core_BAO_CustomGroup::checkGroupAccess($params['cgid'], CRM_Core_Permission::VIEW) ||
+      !CRM_Contact_BAO_Contact_Permission::allow($params['cid'], CRM_Core_Permission::VIEW)
+    ) {
+      CRM_Utils_System::permissionDenied();
+    }
 
     $contactType = CRM_Contact_BAO_Contact::getContactType($params['cid']);
 
@@ -114,12 +118,11 @@ class CRM_Custom_Page_AJAX {
       $obj->_DTparams['sort'] = $params['sortBy'];
     }
 
-    list($fields, $attributes) = $obj->browse();
+    [$fields, $attributes] = $obj->browse();
 
     // format params and add class attributes
     $fieldList = [];
     foreach ($fields as $id => $value) {
-      $field = [];
       foreach ($value as $fieldId => &$fieldName) {
         if (!empty($attributes[$fieldId][$id]['class'])) {
           $fieldName = ['data' => $fieldName, 'cellClass' => $attributes[$fieldId][$id]['class']];
@@ -129,8 +132,7 @@ class CRM_Custom_Page_AJAX {
           CRM_Utils_Array::crmReplaceKey($value, $fieldId, $fName);
         }
       }
-      $field = $value;
-      array_push($fieldList, $field);
+      array_push($fieldList, $value);
     }
     $totalRecords = !empty($obj->_total) ? $obj->_total : 0;
 
@@ -138,10 +140,6 @@ class CRM_Custom_Page_AJAX {
     $multiRecordFields['data'] = $fieldList;
     $multiRecordFields['recordsTotal'] = $totalRecords;
     $multiRecordFields['recordsFiltered'] = $totalRecords;
-
-    if (!empty($_GET['is_unit_test'])) {
-      return $multiRecordFields;
-    }
 
     CRM_Utils_JSON::output($multiRecordFields);
   }

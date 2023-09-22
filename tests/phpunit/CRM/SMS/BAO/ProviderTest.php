@@ -19,26 +19,33 @@
 class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
 
   /**
+   * Reference to option value in sms_provider_name group.
+   *
+   * @var int
+   */
+  private $optionValueID;
+
+  /**
    * Set Up Funtion
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $option = $this->callAPISuccess('option_value', 'create', ['option_group_id' => 'sms_provider_name', 'name' => 'test_provider_name', 'label' => 'test_provider_name', 'value' => 1]);
-    $this->option_value = $option['id'];
+    $this->optionValueID = $option['id'];
   }
 
   /**
    * Clean up after each test.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
-    $this->callAPISuccess('option_value', 'delete', ['id' => $this->option_value]);
+    $this->callAPISuccess('option_value', 'delete', ['id' => $this->optionValueID]);
   }
 
   /**
    * CRM-19961 Check that when saving and updating a SMS provider with domain as NULL that it stays null
    */
-  public function testCreateAndUpdateProvider() {
+  public function testCreateAndUpdateProvider(): void {
     $values = [
       'domain_id' => NULL,
       'title' => 'test SMS provider',
@@ -62,10 +69,10 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-20989
+   * @see https://issues.civicrm.org/jira/browse/CRM-20989
    * Add unit test to ensure that filtering by domain works in get Active Providers
    */
-  public function testActiveProviderCount() {
+  public function testActiveProviderCount(): void {
     $values = [
       'domain_id' => NULL,
       'title' => 'test SMS provider',
@@ -90,7 +97,7 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
   /**
    * CRM-19961 Check that when a domain is not passed when saving it defaults to current domain when create
    */
-  public function testCreateWithoutDomain() {
+  public function testCreateWithoutDomain(): void {
     $values = [
       'title' => 'test SMS provider',
       'username' => 'test',

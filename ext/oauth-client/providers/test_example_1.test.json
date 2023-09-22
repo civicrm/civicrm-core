@@ -1,0 +1,9 @@
+{
+  "title": "First Test Example",
+  "options": {
+    "urlAuthorize": "https://example.com/one/auth",
+    "urlAccessToken": "https://example.com/one/token",
+    "urlResourceOwnerDetails": "https://example.com/one/owner",
+    "scopes": ["scope-1-foo", "scope-1-bar"]
+  }
+}

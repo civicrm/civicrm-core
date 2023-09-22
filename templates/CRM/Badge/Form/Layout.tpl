@@ -10,10 +10,9 @@
 {* this template is used for adding/editing badge layouts *}
 <h3>{if $action eq 1}{ts}New Badge Layout{/ts}{elseif $action eq 2}{ts}Edit Badge Layout{/ts}{else}{ts}Delete Badge Layout{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-badge-layout-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
     </div>
   {else}
@@ -24,7 +23,7 @@
       </tr>
       <tr class="crm-badge-layout-form-block-label_format_name">
         <td class="label">{$form.label_format_name.label}</td>
-        <td>{$form.label_format_name.html} {help id="id-label_format"}</td>
+        <td>{$form.label_format_name.html} {help id="id-label_format" file="CRM/Badge/Form/Layout.hlp"}</td>
       </tr>
       <tr class="crm-badge-layout-form-block-description">
         <td class="label">{$form.description.label}</td>
@@ -44,7 +43,7 @@
              {$form.width_image_1.html}<br/>{$form.width_image_1.label}
             </td>
            <td>
-              {$form.height_image_1.html}</br>{$form.height_image_1.label}
+              {$form.height_image_1.html}<br/>{$form.height_image_1.label}
             </td>
            </tr>
          </table>
@@ -83,10 +82,10 @@
              {$form.width_participant_image.html}<br/>{$form.width_participant_image.label}
             </td>
            <td>
-              {$form.height_participant_image.html}</br>{$form.height_participant_image.label}
+              {$form.height_participant_image.html}<br/>{$form.height_participant_image.label}
             </td>
            <td>
-              {$form.alignment_participant_image.html}</br>{$form.alignment_participant_image.label}
+              {$form.alignment_participant_image.html}<br/>{$form.alignment_participant_image.label}
             </td>
            </tr>
          </table>

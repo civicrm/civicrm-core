@@ -10,7 +10,7 @@
 
 {capture assign=reminderLink}{crmURL p='civicrm/admin/scheduleReminders' q='reset=1'}{/capture}
 <div class="help">
-  <p><div class="icon inform-icon"></div>&nbsp;{ts}Membership types are used to categorize memberships. You can define an unlimited number of types. Each type incorporates a 'name' (Gold Member, Honor Society Member...), a description, a minimum fee (can be $0), and a duration (can be 'lifetime'). Each member type is specifically linked to the membership entity (organization) - e.g. Bay Area Chapter.{/ts} {docURL page="user/membership/defining-memberships/"}</p>
+  <p>{icon icon="fa-info-circle"}{/icon}{ts}Membership types are used to categorize memberships. You can define an unlimited number of types. Each type incorporates a 'name' (Gold Member, Honor Society Member...), a description, a minimum fee (can be $0), and a duration (can be 'lifetime'). Each member type is specifically linked to the membership entity (organization) - e.g. Bay Area Chapter.{/ts} {docURL page="user/membership/defining-memberships/"}</p>
   <p>{ts 1=$reminderLink}Configure membership renewal reminders using <a href="%1">Schedule Reminders</a>.{/ts} {docURL page="user/email/scheduled-reminders"}</p>
 </div>
 
@@ -37,7 +37,7 @@
       </tr>
       </thead>
       {foreach from=$rows item=row}
-        <tr id="membership_type-{$row.id}" class="crm-entity {cycle values='odd-row,even-row'} {$row.class} crm-membership-type {if NOT $row.is_active} disabled{/if}">
+        <tr id="membership_type-{$row.id}" class="crm-entity {cycle values='odd-row,even-row'} crm-membership-type {if NOT $row.is_active} disabled{/if}">
           <td class="crmf-name crm-editable" data-field="name">{$row.name}</td>
           <td class="crmf-period_type crm-editable" data-type="select">{$row.period_type}</td>
           <td class="crmf-fixed_period_start_day">{$row.fixed_period_start_day}</td>
@@ -45,11 +45,11 @@
           <td class="crmf-duration_interval_unit">{$row.duration_interval} {$row.duration_unit}</td>
           <td class="crmf-auto_renew">{if $row.auto_renew EQ 2}{ts}Required{/ts}{elseif $row.auto_renew EQ 1}{ts}Optional{/ts}{else}{ts}No{/ts}{/if}</td>
           <td class="crmf-relationship_type">{$row.relationshipTypeName}</td>
-          <td class="crmf-max_related" align="right">{$row.maxRelated}</td>
+          <td class="crmf-max_related" align="right">{$row.max_related}</td>
           <td class="crmf-visibility crm-editable" data-type="select">{$row.visibility}</td>
-          <td class="nowrap crmf-weight">{$row.weight}</td>
+          <td class="nowrap crmf-weight">{$row.weight|smarty:nodefaults}</td>
           <td class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
       {/foreach}
     </table>

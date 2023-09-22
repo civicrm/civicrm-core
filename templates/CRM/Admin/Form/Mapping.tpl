@@ -9,8 +9,7 @@
 *}
 {* this template is used for adding/editing a saved mapping *}
 <div class="crm-block crm-form-block crm-mapping-form-block">
-    {if $action eq 1 or $action eq 2 }
-      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+    {if $action eq 1 or $action eq 2}
       <table class="form-layout-compressed">
        <tr class="crm-mapping-form-block-name">
           <td class="label">{$form.name.label}</td>
@@ -27,11 +26,10 @@
       </table>
     {else}
         <div class="messages status no-popup">
-            <div class="icon inform-icon"></div> &nbsp;
+            {icon icon="fa-info-circle"}{/icon}
             {ts 1=$mappingName}WARNING: Are you sure you want to delete mapping '<b>%1</b>'?{/ts} {ts}This action cannot be undone.{/ts}
         </div>
         <br />
     {/if}
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" loaction="bottom"}</div>
-    <div class="spacer"></div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" loaction="bottom"}</div>
 </div>

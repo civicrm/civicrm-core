@@ -206,6 +206,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
           'url' => $url,
           'qs' => $qsView,
           'title' => ts('View Activity'),
+          'weight' => -20,
         ],
       ];
     }
@@ -226,6 +227,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
             'url' => $updateUrl,
             'qs' => $qsUpdate,
             'title' => ts('Update Activity'),
+            'weight' => -10,
           ],
         ];
       }
@@ -242,6 +244,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
           'url' => '#',
           'extra' => 'onclick="javascript:fileOnCase( \'file\', \'%%id%%\', null, this ); return false;"',
           'title' => ts('File on Case'),
+          'weight' => 50,
         ],
       ];
     }
@@ -257,6 +260,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
           'url' => $delUrl,
           'qs' => $qsDelete,
           'title' => ts('Delete Activity'),
+          'weight' => 100,
         ],
       ];
     }
@@ -285,7 +289,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
   public function getPagerParams($action, &$params) {
     $params['status'] = ts('Activities %%StatusMessage%%');
     $params['csvString'] = NULL;
-    $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
+    $params['rowCount'] = Civi::settings()->get('default_pager_size');
 
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
@@ -395,8 +399,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       $row = &$rows[$k];
 
       // add class to this row if overdue
-      if (CRM_Utils_Date::overdue(CRM_Utils_Array::value('activity_date_time', $row))
-        && CRM_Utils_Array::value('status_id', $row) == 1
+      if (CRM_Utils_Date::overdue($row['activity_date_time'] ?? '')
+        && ($row['status_id'] ?? NULL) == 1
       ) {
         $row['overdue'] = 1;
         $row['class'] = 'status-overdue';
@@ -408,19 +412,15 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
 
       $row['status'] = $row['status_id'] ? $activityStatus[$row['status_id']] : NULL;
 
-      if ($engagementLevel = CRM_Utils_Array::value('engagement_level', $row)) {
+      $engagementLevel = $row['engagement_level'] ?? NULL;
+      if ($engagementLevel) {
         $row['engagement_level'] = CRM_Utils_Array::value($engagementLevel, $engagementLevels, $engagementLevel);
-      }
-
-      // CRM-3553
-      $accessMailingReport = FALSE;
-      if (!empty($row['mailingId'])) {
-        $accessMailingReport = TRUE;
       }
 
       $actionLinks = $this->actionLinks(CRM_Utils_Array::value('activity_type_id', $row),
         CRM_Utils_Array::value('source_record_id', $row),
-        $accessMailingReport,
+        // CRM-3553
+        !empty($row['mailingId']),
         CRM_Utils_Array::value('activity_id', $row),
         $this->_key
       );

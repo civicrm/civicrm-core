@@ -22,23 +22,16 @@
 class CRM_Core_BAO_CustomOption {
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_BAO_CustomOption
+   * @return CRM_Core_DAO_OptionValue|NULL
    */
-  public static function retrieve(&$params, &$defaults) {
-    $customOption = new CRM_Core_DAO_OptionValue();
-    $customOption->copyValues($params);
-    if ($customOption->find(TRUE)) {
-      CRM_Core_DAO::storeValues($customOption, $defaults);
-      return $customOption;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_OptionValue', $params, $defaults);
   }
 
   /**
@@ -137,7 +130,7 @@ class CRM_Core_BAO_CustomOption {
         $action -= CRM_Core_Action::DELETE;
       }
 
-      if (in_array($field->html_type, ['CheckBox', 'Multi-Select'])) {
+      if ($field->html_type == 'CheckBox' || ($field->html_type == 'Select' && $field->serialize == 1)) {
         $options[$dao->id]['is_default'] = (isset($defVal) && in_array($dao->value, $defVal));
       }
       else {
@@ -167,7 +160,7 @@ class CRM_Core_BAO_CustomOption {
   /**
    * Delete Option.
    *
-   * @param $optionId integer
+   * @param int $optionId
    *   option id
    *
    */
@@ -198,88 +191,10 @@ AND    g.id    = v.option_group_id";
         'value' => $value,
       ];
       // delete this value from the tables
-      self::updateCustomValues($params);
+      self::updateValue($optionId, $value);
 
       // also delete this option value
-      $query = "
-DELETE
-FROM   civicrm_option_value
-WHERE  id = %1";
-      $params = [1 => [$optionId, 'Integer']];
-      CRM_Core_DAO::executeQuery($query, $params);
-    }
-  }
-
-  /**
-   * @param array $params
-   *
-   * @throws Exception
-   */
-  public static function updateCustomValues($params) {
-    $optionDAO = new CRM_Core_DAO_OptionValue();
-    $optionDAO->id = $params['optionId'];
-    $optionDAO->find(TRUE);
-    $oldValue = $optionDAO->value;
-
-    // get the table, column, html_type and data type for this field
-    $query = "
-SELECT g.table_name  as tableName ,
-       f.column_name as columnName,
-       f.data_type   as dataType,
-       f.html_type   as htmlType
-FROM   civicrm_custom_group g,
-       civicrm_custom_field f
-WHERE  f.custom_group_id = g.id
-  AND  f.id = %1";
-    $queryParams = [1 => [$params['fieldId'], 'Integer']];
-    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
-    if ($dao->fetch()) {
-      if ($dao->dataType == 'Money') {
-        $params['value'] = CRM_Utils_Rule::cleanMoney($params['value']);
-      }
-      switch ($dao->htmlType) {
-        case 'Autocomplete-Select':
-        case 'Select':
-        case 'Radio':
-          $query = "
-UPDATE {$dao->tableName}
-SET    {$dao->columnName} = %1
-WHERE  id = %2";
-          if ($dao->dataType == 'Auto-complete') {
-            $dataType = "String";
-          }
-          else {
-            $dataType = $dao->dataType;
-          }
-          $queryParams = [
-            1 => [
-              $params['value'],
-              $dataType,
-            ],
-            2 => [
-              $params['optionId'],
-              'Integer',
-            ],
-          ];
-          break;
-
-        case 'Multi-Select':
-        case 'CheckBox':
-          $oldString = CRM_Core_DAO::VALUE_SEPARATOR . $oldValue . CRM_Core_DAO::VALUE_SEPARATOR;
-          $newString = CRM_Core_DAO::VALUE_SEPARATOR . $params['value'] . CRM_Core_DAO::VALUE_SEPARATOR;
-          $query = "
-UPDATE {$dao->tableName}
-SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
-          $queryParams = [
-            1 => [$oldString, 'String'],
-            2 => [$newString, 'String'],
-          ];
-          break;
-
-        default:
-          throw new CRM_Core_Exception('Invalid HTML Type');
-      }
-      $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+      CRM_Core_BAO_OptionValue::deleteRecord(['id' => $optionId]);
     }
   }
 

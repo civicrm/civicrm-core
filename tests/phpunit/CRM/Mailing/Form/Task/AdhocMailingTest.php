@@ -9,25 +9,10 @@
  +--------------------------------------------------------------------+
  */
 /**
- * Test class for CRM_Contact_Form_Task_EmailCommon.
+ * Test class for CRM_Mailing_Form_Task_AdhocMailing.
  * @group headless
  */
 class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {
-
-  /**
-   * @throws \Exception
-   */
-  protected function setUp() {
-    parent::setUp();
-    $this->_contactIds = [
-      $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),
-      $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']),
-    ];
-    $this->_optionValue = $this->callAPISuccess('optionValue', 'create', [
-      'label' => '"Seamus Lee" <seamus@example.com>',
-      'option_group_id' => 'from_email_address',
-    ]);
-  }
 
   /**
    * Test creating a hidden smart group from a search builder search.
@@ -35,12 +20,10 @@ class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {
    * A hidden smart group is a group used for sending emails.
    *
    * @throws \CRM_Core_Exception
-   * @throws \Exception
    */
-  public function testCreateHiddenGroupFromSearchBuilder() {
+  public function testCreateHiddenGroupFromSearchBuilder(): void {
     $this->createLoggedInUser();
     $formValues = [
-      'qfKey' => 'dde96a85ddebb90fb66de44859404aeb_2077',
       'entryURL' => 'http://dmaster.local/civicrm/contact/search/builder?reset=1',
       'mapper' => [1 => [['Individual']]],
       'operator' => [1 => ['=']],
@@ -49,7 +32,7 @@ class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {
       '_qf_Builder_refresh' => 'Search',
       'radio_ts' => '',
     ];
-    $form = $this->getFormObject('CRM_Mailing_Form_Task_AdhocMailing', $formValues, 'Builder');
+    $form = $this->getSearchFormObject('CRM_Mailing_Form_Task_AdhocMailing', $formValues, 'Builder');
     $form->setAction(CRM_Core_Action::PROFILE);
     $form->set('formValues', $formValues);
     $form->set('isSearchBuilder', 1);
@@ -60,8 +43,9 @@ class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {
     catch (CRM_Core_Exception_PrematureExitException $e) {
       // Nothing to see here.
     }
-    $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
-    $this->assertEquals($formValues, $savedSearch['form_values']);
+    $savedSearch = $this->callAPISuccess('SavedSearch', 'get', ['sequential' => 1, 'options' => ['sort' => "id DESC"]]);
+    $this->assertGreaterThan(0, $savedSearch['count']);
+    $this->assertEquals($formValues, $savedSearch['values'][0]['form_values']);
   }
 
 }

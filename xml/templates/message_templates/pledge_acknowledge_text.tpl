@@ -1,4 +1,4 @@
-{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
 
 {ts}Thank you for your generous pledge.{/ts}
 
@@ -30,7 +30,7 @@
 {/if}
 
 
-{ts 1=$domain.phone 2=$domain.email}Please contact us at %1 or send email to %2 if you have questions
+{ts 1='{domain.phone}' 2='{domain.email}'}Please contact us at %1 or send email to %2 if you have questions
 or need to modify your payment schedule.{/ts}
 
 {if $customGroup}

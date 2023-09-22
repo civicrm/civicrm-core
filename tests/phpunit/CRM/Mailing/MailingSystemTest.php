@@ -21,7 +21,10 @@
  */
 
 /**
- * Class CRM_Mailing_MailingSystemTest
+ * Class CRM_Mailing_MailingSystemTest.
+ *
+ * This class tests the deprecated code that we are moving
+ * away from supporting.
  *
  * MailingSystemTest checks that overall composition and delivery of
  * CiviMail blasts works. It extends CRM_Mailing_BaseMailingSystemTest
@@ -38,10 +41,13 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
   private $counts;
 
-  public function setUp() {
-    parent::setUp();
-    Civi::settings()->add(['experimentalFlexMailerEngine' => FALSE]);
+  private $checkMailParamsContext = TRUE;
 
+  /**
+   * Set up the deprecated bao support.
+   */
+  public function setUp(): void {
+    parent::setUp();
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
       [$this, 'hook_alterMailParams']);
@@ -50,18 +56,45 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
   /**
    * @see CRM_Utils_Hook::alterMailParams
    */
-  public function hook_alterMailParams(&$params, $context = NULL) {
+  public function hook_alterMailParams(): void {
     $this->counts['hook_alterMailParams'] = 1;
-    $this->assertEquals('civimail', $context);
   }
 
-  public function tearDown() {
+  /**
+   * Post test cleanup.
+   */
+  public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
-      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+      $this->disableMultilingual();
     }
     parent::tearDown();
     $this->assertNotEmpty($this->counts['hook_alterMailParams']);
+  }
+
+  /**
+   * Test legacy mailer preview functionality.
+   */
+  public function testMailerPreviewExtraScheme(): void {
+    $contactID = $this->individualCreate();
+    $displayName = $this->callAPISuccess('contact', 'get', ['id' => $contactID]);
+    $displayName = $displayName['values'][$contactID]['display_name'];
+    $this->assertNotEmpty($displayName);
+
+    $params = $this->_params;
+    /** @noinspection HttpUrlsUsage */
+    $params['body_html'] = '<a href="http://{action.forward}">Forward this email written in ckeditor</a>';
+    $params['api.Mailing.preview'] = [
+      'id' => '$value.id',
+      'contact_id' => $contactID,
+    ];
+    $params['options']['force_rollback'] = 1;
+
+    $result = $this->callAPISuccess('mailing', 'create', $params);
+    $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
+    $this->assertMatchesRegularExpression('!>Forward this email written in ckeditor</a>!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
+    $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
   // ---- Boilerplate ----
@@ -73,29 +106,31 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
    * Generate a fully-formatted mailing (with body_html content).
    *
    * @dataProvider urlTrackingExamples
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testUrlTracking(
     $inputHtml,
     $htmlUrlRegex,
     $textUrlRegex,
     $params
-  ) {
+  ): void {
     parent::testUrlTracking($inputHtml, $htmlUrlRegex, $textUrlRegex, $params);
   }
 
-  public function testBasicHeaders() {
+  public function testBasicHeaders(): void {
     parent::testBasicHeaders();
   }
 
-  public function testText() {
+  public function testText(): void {
     parent::testText();
   }
 
-  public function testHtmlWithOpenTracking() {
+  public function testHtmlWithOpenTracking(): void {
     parent::testHtmlWithOpenTracking();
   }
 
-  public function testHtmlWithOpenAndUrlTracking() {
+  public function testHtmlWithOpenAndUrlTracking(): void {
     parent::testHtmlWithOpenAndUrlTracking();
   }
 
@@ -103,7 +138,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
    * Test to check Activity being created on mailing Job.
    *
    */
-  public function testMailingActivityCreate() {
+  public function testMailingActivityCreate(): void {
     $subject = uniqid('testMailingActivityCreate');
     $this->runMailingSuccess([
       'subject' => $subject,
@@ -116,6 +151,74 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
       'status_id' => 'Completed',
       'subject' => $subject,
     ], 1);
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailingReplyAutoRespond(): void {
+    // Because our parent class marks the _groupID as private, we can't use that :-(
+    $group_1 = $this->groupCreate([
+      'name' => 'Test Group Mailing Reply',
+      'title' => 'Test Group Mailing Reply',
+    ]);
+    $this->createContactsInGroup(1, $group_1);
+    $this->callAPISuccess('Address', 'create', ['street_address' => 'Sesame Street', 'contact_id' => 1]);
+
+    // Also _mut is private to the parent, so we have to make our own:
+    $mut = new CiviMailUtils($this, TRUE);
+
+    $replyComponent = $this->callAPISuccess('MailingComponent', 'get', ['id' => CRM_Mailing_PseudoConstant::defaultComponent('Reply', ''), 'sequential' => 1])['values'][0];
+    $replyComponent['body_html'] .= ' {domain.address} ';
+    $replyComponent['body_txt'] = $replyComponent['body_txt'] ?? '' . ' {domain.address} ';
+    $this->callAPISuccess('MailingComponent', 'create', $replyComponent);
+
+    // Create initial mailing to the group.
+    $mailingParams = [
+      'name'           => 'Mailing Reply: mailing ',
+      'subject'        => 'Mailing Reply: test',
+      'created_id'     => 1,
+      'groups'         => ['include' => [$group_1]],
+      'scheduled_date' => 'now',
+      'body_text'      => 'Please just {action.unsubscribeUrl}',
+      'auto_responder' => 1,
+      'reply_id'       => $replyComponent['id'],
+    ];
+
+    // The following code is exactly the same as runMailingSuccess() except that we store the ID of the mailing.
+    $mailing_1 = $this->callAPISuccess('Mailing', 'create', $mailingParams);
+    $mut->assertRecipients(array());
+    $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
+
+    $allMessages = $mut->getAllMessages('ezc');
+    $this->assertCount(1, $allMessages);
+
+    // So far so good.
+    $message = end($allMessages);
+    $this->assertInstanceOf(ezcMailText::class, $message->body);
+    $this->assertEquals('plain', $message->body->subType);
+    $this->assertEquals(1, preg_match(
+      '@mailing/unsubscribe.*jid=(\d+)&qid=(\d+)&h=([0-9a-z]+)@',
+      $message->body->text,
+      $matches
+    ));
+
+    $this->checkMailParamsContext = FALSE;
+
+    CRM_Mailing_Event_BAO_MailingEventReply::reply(
+      $matches[1],
+      $matches[2],
+      $matches[3]
+    );
+    $mut->checkMailLog([
+      'Please Send Inquiries to Our Contact Email Address',
+      'Sesame Street',
+      'do-not-reply@chaos.org',
+      'info@EXAMPLE.ORG',
+      'mail1@nul.example.com',
+    ], ['{domain.address}']);
+    $this->callAPISuccess('Mailing', 'delete', ['id' => $mailing_1['id']]);
+    $this->callAPISuccess('Group', 'delete', ['id' => $group_1]);
   }
 
   /**
@@ -150,7 +253,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
    * @dataProvider multiLingual
    *
    */
-  public function testGitLabIssue1108($isMultiLingual) {
+  public function testGitLabIssue1108($isMultiLingual): void {
 
     // We need to make sure the mailing IDs are higher than the groupIDs.
     // We do this by adding mailings until the mailing.id value is at least 10
@@ -159,8 +262,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     // transaction still increments the AUTO_INCREMENT counter for the table.
     // (If this behaviour ever changes we throw an exception.)
     if ($isMultiLingual) {
-      $this->enableMultilingual();
-      CRM_Core_I18n_Schema::addLocale('fr_FR', 'en_US');
+      $cleanup = $this->useMultilingual(['en_US' => 'fr_FR']);
     }
     $max_group_id = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM civicrm_group");
     $max_mailing_id = 0;
@@ -279,7 +381,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
       });
 
     // Now test unsubscribe groups.
-    $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing(
+    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(
       $matches[1],
       $matches[2],
       $matches[3],
@@ -301,7 +403,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
       global $dbLocale;
       $dbLocale = '_fr_FR';
       // Now test unsubscribe groups.
-      $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing(
+      $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(
         $matches[1],
         $matches[2],
         $matches[3],

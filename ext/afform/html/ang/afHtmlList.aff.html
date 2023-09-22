@@ -1,0 +1,52 @@
+<div
+  af-api4="['Afform', 'get', {select: ['name','title','is_public','server_route', 'has_local', 'has_base'], orderBy: {name:'ASC'}}]"
+  af-api4-ctrl="listCtrl">
+
+  <div ng-if="apiData.result.length == 0">
+    {{ts('There are no forms! Tell Aristotle!')}}
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>{{ts('Name')}}</th>
+        <th>{{ts('Title')}}</th>
+        <th>{{ts('Server Route')}}</th>
+        <th>{{ts('Frontend?')}}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="availForm in listCtrl.result">
+      <td>
+        <a ng-href="#!/?name={{availForm.name}}">{{availForm.name}}</a>
+      </td>
+      <td>{{availForm.title}}</td>
+      <td>
+        <a ng-if="availForm.server_route" ng-href="{{crmUrl(availForm.server_route)}}" target="_blank">
+          <code>{{availForm.server_route}}</code>
+        </a>
+      </td>
+      <td>{{availForm.is_public ? ts('Frontend') : ts('Backend')}}</td>
+      <td>
+        <!--<a ng-click="crmStatus({start: ts('Reverting...'), success: ts('Reverted')}, crmApi4('Afform', 'revert', {where: [['name', '=', availForm.name]]}))">{{ts('Revert')}}</a>-->
+        <a af-api4-action="['Afform', 'revert', {where: [['name','=', availForm.name]]}]"
+           af-api4-start-msg="ts('Reverting...')"
+           af-api4-success-msg="ts('Reverted')"
+           af-api4-success="listCtrl.refresh()"
+           class="btn btn-xs btn-default"
+           ng-if="availForm.has_local && availForm.has_base"
+          >{{ts('Revert')}}</a>
+        <a af-api4-action="['Afform', 'revert', {where: [['name','=', availForm.name]]}]"
+           af-api4-start-msg="ts('Deleting...')"
+           af-api4-success-msg="ts('Deleted')"
+           af-api4-success="listCtrl.refresh()"
+           class="btn btn-xs btn-default"
+           ng-if="availForm.has_local && !availForm.has_base"
+        >{{ts('Delete')}}</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>

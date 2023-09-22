@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Search</base>
+  <class>SearchSegment</class>
+  <name>civicrm_search_segment</name>
+  <comment>Data segmentation sets for searches.</comment>
+  <log>true</log>
+  <icon>fa-object-group</icon>
+  <labelField>label</labelField>
+
+  <field>
+    <name>id</name>
+    <title>Search Segment ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique SearchSegment ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>name</name>
+    <title>Search Segment Name</title>
+    <comment>Unique name</comment>
+    <required>true</required>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>label</name>
+    <title>Label</title>
+    <comment>Label for identifying search segment (will appear as name of calculated field)</comment>
+    <required>true</required>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>description</name>
+    <type>varchar</type>
+    <title>Description</title>
+    <length>255</length>
+    <comment>Description will appear when selecting SearchSegment in the fields dropdown.</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>entity_name</name>
+    <title>Entity</title>
+    <comment>Entity for which this set is used.</comment>
+    <required>true</required>
+    <type>varchar</type>
+    <length>255</length>
+    <pseudoconstant>
+      <callback>CRM_Search_BAO_SearchSegment::getDAOEntityOptions</callback>
+    </pseudoconstant>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>items</name>
+    <type>text</type>
+    <title>Items</title>
+    <comment>All items in set</comment>
+    <serialize>JSON</serialize>
+  </field>
+
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+  </index>
+
+</table>

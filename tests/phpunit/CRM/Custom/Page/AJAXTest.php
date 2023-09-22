@@ -16,16 +16,9 @@
 class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
 
   /**
-   * Set up function.
-   */
-  public function setUp() {
-    parent::setUp();
-  }
-
-  /**
    * Test multi-record custom fields
    */
-  public function testMultiRecordFieldList() {
+  public function testMultiRecordFieldList(): void {
     //create multi record custom group
     $ids = $this->CustomGroupMultipleCreateWithFields(['style' => 'Tab with table']);
     $params = [
@@ -54,9 +47,13 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
     $_GET = [
       'cid' => $contactId,
       'cgid' => $ids['custom_group_id'],
-      'is_unit_test' => TRUE,
     ];
-    $multiRecordFields = CRM_Custom_Page_AJAX::getMultiRecordFieldList();
+    try {
+      CRM_Custom_Page_AJAX::getMultiRecordFieldList();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $multiRecordFields = $e->errorData;
+    }
 
     //check sorting
     foreach ($customFields as $fieldId) {
@@ -72,7 +69,12 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
         'dir' => 'desc',
       ],
     ];
-    $sortedRecords = CRM_Custom_Page_AJAX::getMultiRecordFieldList();
+    try {
+      CRM_Custom_Page_AJAX::getMultiRecordFieldList();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $sortedRecords = $e->errorData;
+    }
 
     $this->assertEquals(3, $sortedRecords['recordsTotal']);
     $this->assertEquals(3, $multiRecordFields['recordsTotal']);

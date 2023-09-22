@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $hasParent || $isRepeatingEntity || $scheduleReminderId}
+{if !empty($hasParent) || !empty($isRepeatingEntity) || !empty($scheduleReminderId)}
   {capture assign='entity_type'}{$recurringEntityType|lower}{/capture}
   <script type="text/template" id="recurring-dialog-tpl">
     <div class="recurring-dialog">

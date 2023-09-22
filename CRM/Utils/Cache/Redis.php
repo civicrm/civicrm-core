@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
 
@@ -97,6 +95,9 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
     if (isset($config['prefix'])) {
       $this->_prefix = $config['prefix'];
     }
+    if (defined('CIVICRM_DEPLOY_ID')) {
+      $this->_prefix = CIVICRM_DEPLOY_ID . '_' . $this->_prefix;
+    }
 
     $this->_cache = self::connect($config);
   }
@@ -147,7 +148,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    */
   public function delete($key) {
     CRM_Utils_Cache::assertValidKey($key);
-    $this->_cache->delete($this->_prefix . $key);
+    $this->_cache->del($this->_prefix . $key);
     return TRUE;
   }
 

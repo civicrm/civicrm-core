@@ -8,7 +8,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
   protected $mandates;
   protected $origSetting;
 
-  protected function setUp() {
+  protected function setUp(): void {
     $this->origSetting = $GLOBALS['civicrm_setting'];
 
     parent::setUp();
@@ -38,7 +38,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     ];
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $GLOBALS['civicrm_setting'] = $this->origSetting;
     parent::tearDown();
   }
@@ -46,7 +46,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
   /**
    * Test mingled reads/writes of settings for two different domains.
    */
-  public function testTwoDomains() {
+  public function testTwoDomains(): void {
     $da = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
     $db = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
 
@@ -74,7 +74,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
   /**
    * Test mingled reads/writes of settings for two different contacts.
    */
-  public function testTwoContacts() {
+  public function testTwoContacts(): void {
     $domain = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
     $ca = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
     $cb = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
@@ -101,7 +101,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     $this->assertEquals('GAMMA MAN!', $caSettingsRedux->get('c3'));
   }
 
-  public function testCrossOver() {
+  public function testCrossOver(): void {
     $domain = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
     $contact = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
@@ -131,7 +131,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
    * @return SettingsManager
    */
   protected function createManager() {
-    $cache = new \CRM_Utils_Cache_Arraycache([]);
+    $cache = new \CRM_Utils_Cache_ArrayCache([]);
     $cache->set('defaults_domain', $this->domainDefaults);
     $cache->set('defaults_contact', $this->contactDefaults);
     foreach ($this->mandates as $entity => $keyValues) {
@@ -146,7 +146,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
   /**
    * Test passing in an array to Civi::settings facade
    */
-  public function testArraySetting() {
+  public function testArraySetting(): void {
     $domain = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
 
     $manager = $this->createManager()->useDefaults();

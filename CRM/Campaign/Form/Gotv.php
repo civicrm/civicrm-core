@@ -72,7 +72,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
     }
 
     //set the form title.
-    CRM_Utils_System::setTitle(ts('GOTV (Voter Tracking)'));
+    $this->setTitle(ts('GOTV (Voter Tracking)'));
   }
 
   /**
@@ -137,7 +137,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
 
     $surveys = CRM_Campaign_BAO_Survey::getSurveys();
     if (empty($surveys)) {
-      $errorMessages[] = ts("Oops. It looks like no surveys have been created. <a href='%1'>Click here to create a new survey.</a>", [1 => CRM_Utils_System::url('civicrm/survey/add', 'reset=1&action=add')]);
+      $errorMessages[] = ts("It looks like no surveys have been created yet. <a %1>Click here to create a new survey.</a>", [1 => 'href="' . CRM_Utils_System::url('civicrm/survey/add', 'reset=1&action=add') . '"']);
     }
 
     if ($this->_force && !$this->_surveyId) {

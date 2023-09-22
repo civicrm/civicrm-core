@@ -15,7 +15,7 @@
  *
  * You should obtain a singleton of this class via
  *
- * $manager = CRM_Extension_Manager::singleton()->getManager();
+ * $manager = CRM_Extension_System::singleton()->getManager();
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
@@ -130,7 +130,7 @@ class CRM_Extension_Manager {
    * Class constructor.
    *
    * @param CRM_Extension_Container_Interface $fullContainer
-   * @param CRM_Extension_Container_Basic|FALSE $defaultContainer
+   * @param CRM_Extension_Container_Basic|false $defaultContainer
    * @param CRM_Extension_Mapper $mapper
    * @param array $typeManagers
    */
@@ -175,7 +175,7 @@ class CRM_Extension_Manager {
           CRM_Core_Session::setStatus(ts('A copy of the extension (%1) is in a system folder (%2). The system copy will be preserved, but the new copy will be used.', [
             1 => $newInfo->key,
             2 => $oldPath,
-          ]));
+          ]), '', 'alert', ['expires' => 0]);
         }
         break;
 
@@ -225,6 +225,9 @@ class CRM_Extension_Manager {
     }
 
     $this->refresh();
+    // It might be useful to reset the container, but (given dev/core#3686) that's not likely to do much.
+    // \Civi::reset();
+    // \CRM_Core_Config::singleton(TRUE, TRUE);
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
   }
 
@@ -310,11 +313,14 @@ class CRM_Extension_Manager {
 
     $this->statuses = NULL;
     $this->mapper->refresh();
-    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+    if (!CRM_Core_Config::isUpgradeMode()) {
+      \Civi::reset();
+      \CRM_Core_Config::singleton(TRUE, TRUE);
+      CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
 
-    $schema = new CRM_Logging_Schema();
-    $schema->fixSchemaDifferences();
-
+      $schema = new CRM_Logging_Schema();
+      $schema->fixSchemaDifferences();
+    }
     foreach ($keys as $key) {
       // throws Exception
       list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
@@ -372,6 +378,9 @@ class CRM_Extension_Manager {
 
     sort($keys);
     $disableRequirements = $this->findDisableRequirements($keys);
+
+    $requiredExtensions = $this->mapper->getKeysByTag('mgmt:required');
+
     // This munges order, but makes it comparable.
     sort($disableRequirements);
     if ($keys !== $disableRequirements) {
@@ -381,41 +390,52 @@ class CRM_Extension_Manager {
     $this->addProcess($keys, 'disable');
 
     foreach ($keys as $key) {
-      switch ($origStatuses[$key]) {
-        case self::STATUS_INSTALLED:
-          $this->addProcess([$key], 'disabling');
-          // throws Exception
-          list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
-          $typeManager->onPreDisable($info);
-          $this->_setExtensionActive($info, 0);
-          $typeManager->onPostDisable($info);
-          $this->popProcess([$key]);
-          break;
+      if (isset($origStatuses[$key])) {
+        if (in_array($key, $requiredExtensions)) {
+          throw new CRM_Extension_Exception("Cannot disable required extension: $key");
+        }
 
-        case self::STATUS_INSTALLED_MISSING:
-          // throws Exception
-          list ($info, $typeManager) = $this->_getMissingInfoTypeHandler($key);
-          $typeManager->onPreDisable($info);
-          $this->_setExtensionActive($info, 0);
-          $typeManager->onPostDisable($info);
-          break;
+        switch ($origStatuses[$key]) {
+          case self::STATUS_INSTALLED:
+            $this->addProcess([$key], 'disabling');
+            // throws Exception
+            list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
+            $typeManager->onPreDisable($info);
+            $this->_setExtensionActive($info, 0);
+            $typeManager->onPostDisable($info);
+            $this->popProcess([$key]);
+            break;
 
-        case self::STATUS_DISABLED:
-        case self::STATUS_DISABLED_MISSING:
-        case self::STATUS_UNINSTALLED:
-          // ok, nothing to do
-          // Remove the 'disable' process as we're not doing that.
-          $this->popProcess([$key]);
-          break;
+          case self::STATUS_INSTALLED_MISSING:
+            // throws Exception
+            list ($info, $typeManager) = $this->_getMissingInfoTypeHandler($key);
+            $typeManager->onPreDisable($info);
+            $this->_setExtensionActive($info, 0);
+            $typeManager->onPostDisable($info);
+            break;
 
-        case self::STATUS_UNKNOWN:
-        default:
-          throw new CRM_Extension_Exception("Cannot disable unknown extension: $key");
+          case self::STATUS_DISABLED:
+          case self::STATUS_DISABLED_MISSING:
+          case self::STATUS_UNINSTALLED:
+            // ok, nothing to do
+            // Remove the 'disable' process as we're not doing that.
+            $this->popProcess([$key]);
+            break;
+
+          case self::STATUS_UNKNOWN:
+          default:
+            throw new CRM_Extension_Exception("Cannot disable unknown extension: $key");
+        }
+      }
+      else {
+        throw new CRM_Extension_Exception("Cannot disable unknown extension: $key");
       }
     }
 
     $this->statuses = NULL;
     $this->mapper->refresh();
+    \Civi::reset();
+    \CRM_Core_Config::singleton(TRUE, TRUE);
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
 
     $this->popProcess($keys);
@@ -434,6 +454,12 @@ class CRM_Extension_Manager {
 
     // TODO: to mitigate the risk of crashing during installation, scan
     // keys/statuses/types before doing anything
+
+    // Component data still lives inside of core-core. Uninstalling is nonsensical.
+    $notUninstallable = array_intersect($keys, $this->mapper->getKeysByTag('component'));
+    if (count($notUninstallable)) {
+      throw new CRM_Extension_Exception("Cannot uninstall extensions which are tagged as components: " . implode(', ', $notUninstallable));
+    }
 
     $this->addProcess($keys, 'uninstall');
 
@@ -474,6 +500,8 @@ class CRM_Extension_Manager {
 
     $this->statuses = NULL;
     $this->mapper->refresh();
+    // At the analogous step of `install()` or `disable()`, it would reset the container.
+    // But here, the extension goes from "disabled=>uninstall". All we really need is to reconcile mgd's.
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
     $this->popProcess($keys);
   }
@@ -560,7 +588,7 @@ class CRM_Extension_Manager {
   /**
    * Return current processes for given extension.
    *
-   * @param String $key extension key
+   * @param string $key extension key
    *
    * @return array
    */
@@ -572,7 +600,7 @@ class CRM_Extension_Manager {
    * Determine if the extension specified is currently involved in an install
    * or enable process. Just sugar code to make things more readable.
    *
-   * @param String $key extension key
+   * @param string $key extension key
    *
    * @return bool
    */
@@ -678,11 +706,12 @@ class CRM_Extension_Manager {
     $dao = new CRM_Core_DAO_Extension();
     $dao->full_name = $info->key;
     if ($dao->find(TRUE)) {
-      if (CRM_Core_BAO_Extension::del($dao->id)) {
+      try {
+        CRM_Core_BAO_Extension::deleteRecord(['id' => $dao->id]);
         CRM_Core_Session::setStatus(ts('Selected option value has been deleted.'), ts('Deleted'), 'success');
       }
-      else {
-        throw new CRM_Extension_Exception("Failed to remove extension entry");
+      catch (CRM_Core_Exception $e) {
+        throw new CRM_Extension_Exception("Failed to remove extension entry $dao->id");
       }
     } // else: post-condition already satisified
   }
@@ -706,9 +735,12 @@ class CRM_Extension_Manager {
    * @return CRM_Extension_Info|NULL
    */
   public function createInfoFromDB($key) {
-    $dao = new CRM_Core_DAO_Extension();
-    $dao->full_name = $key;
-    if ($dao->find(TRUE)) {
+    // System hasn't booted - and extension is missing. Need low-tech/no-hook SELECT to learn more about what's missing.
+    $select = CRM_Utils_SQL_Select::from('civicrm_extension')
+      ->where('full_name = @key', ['key' => $key])
+      ->select('full_name, type, name, label, file');
+    $dao = $select->execute();
+    if ($dao->fetch()) {
       $info = new CRM_Extension_Info($dao->full_name, $dao->type, $dao->name, $dao->label, $dao->file);
       return $info;
     }

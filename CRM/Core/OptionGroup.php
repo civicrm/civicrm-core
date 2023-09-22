@@ -21,12 +21,22 @@ class CRM_Core_OptionGroup {
   /**
    * $_domainIDGroups array maintains the list of option groups for whom
    * domainID is to be considered.
+   *
+   * FIXME: Hardcoded list = bad. It would be better to make this a column in the civicrm_option_group table
    * @var array
    */
   public static $_domainIDGroups = [
     'from_email_address',
     'grant_type',
   ];
+
+  /**
+   * @param $groupName
+   * @return bool
+   */
+  public static function isDomainOptionGroup($groupName) {
+    return in_array($groupName, self::$_domainIDGroups, TRUE);
+  }
 
   /**
    * @param CRM_Core_DAO $dao
@@ -100,24 +110,27 @@ class CRM_Core_OptionGroup {
    *   The values as specified by the params
    */
   public static function &values(
-    $name, $flip = FALSE, $grouping = FALSE,
+    string $name, $flip = FALSE, $grouping = FALSE,
     $localize = FALSE, $condition = NULL,
     $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE, $keyColumnName = 'value',
     $orderBy = 'weight'
   ) {
-    $cache = CRM_Utils_Cache::singleton();
-    $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy);
 
+    if (self::isDomainOptionGroup($name)) {
+      $cacheKey = self::createCacheKey($name, CRM_Core_I18n::getLocale(), $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy, CRM_Core_Config::domainID());
+    }
+    else {
+      $cacheKey = self::createCacheKey($name, CRM_Core_I18n::getLocale(), $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy);
+    }
+    $cache = Civi::cache('metadata');
     if (!$fresh) {
-      // Fetch from static var
-      if (array_key_exists($cacheKey, self::$_cache)) {
-        return self::$_cache[$cacheKey];
+      if ($cache->has($cacheKey)) {
+        $result = $cache->get($cacheKey);
+        return $result;
       }
-      // Fetch from main cache
-      self::$_cache[$cacheKey] = $cache->get($cacheKey);
-      if (self::$_cache[$cacheKey] !== NULL) {
-        return self::$_cache[$cacheKey];
-      }
+    }
+    else {
+      CRM_Core_Error::deprecatedWarning('do not call to flush cache');
     }
 
     $query = "
@@ -129,27 +142,30 @@ WHERE  v.option_group_id = g.id
   AND  g.is_active       = 1 ";
 
     if ($onlyActive) {
-      $query .= " AND  v.is_active = 1 ";
+      $query .= ' AND  v.is_active = 1 ';
       // Only show options for enabled components
       $componentClause = ' v.component_id IS NULL ';
-      $enabledComponents = CRM_Core_Config::singleton()->enableComponents;
+      $enabledComponents = Civi::settings()->get('enable_components');
       if ($enabledComponents) {
         $enabledComponents = '"' . implode('","', $enabledComponents) . '"';
         $componentClause .= " OR v.component_id IN (SELECT id FROM civicrm_component WHERE name IN ($enabledComponents)) ";
       }
       $query .= " AND ($componentClause) ";
     }
-    if (in_array($name, self::$_domainIDGroups)) {
-      $query .= " AND v.domain_id = " . CRM_Core_Config::domainID();
+    if (self::isDomainOptionGroup($name)) {
+      $query .= ' AND v.domain_id = ' . CRM_Core_Config::domainID();
     }
 
     if ($condition) {
       $query .= $condition;
     }
 
-    $query .= " ORDER BY v.{$orderBy}";
+    $query .= " ORDER BY %2";
 
-    $p = [1 => [$name, 'String']];
+    $p = [
+      1 => [$name, 'String'],
+      2 => ['v.' . $orderBy, 'MysqlOrderBy'],
+    ];
     $dao = CRM_Core_DAO::executeQuery($query, $p);
 
     $var = self::valuesCommon($dao, $flip, $grouping, $localize, $labelColumnName);
@@ -157,7 +173,6 @@ WHERE  v.option_group_id = g.id
     // call option value hook
     CRM_Utils_Hook::optionValues($var, $name);
 
-    self::$_cache[$cacheKey] = $var;
     $cache->set($cacheKey, $var);
 
     return $var;
@@ -176,7 +191,7 @@ WHERE  v.option_group_id = g.id
    * @param string $keyColumnName
    */
   protected static function flushValues($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName = 'value') {
-    $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName);
+    $cacheKey = self::createCacheKey($name, CRM_Core_I18n::getLocale(), $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName);
     $cache = CRM_Utils_Cache::singleton();
     $cache->delete($cacheKey);
     unset(self::$_cache[$cacheKey]);
@@ -186,8 +201,7 @@ WHERE  v.option_group_id = g.id
    * @return string
    */
   protected static function createCacheKey($id) {
-    $cacheKey = "CRM_OG_" . preg_replace('/[^a-zA-Z0-9]/', '', $id) . '_' . md5(serialize(func_get_args()));
-    return $cacheKey;
+    return "CRM_OG_" . preg_replace('/[^a-zA-Z0-9]/', '', $id) . '_' . md5(serialize(func_get_args()));
   }
 
   /**
@@ -215,7 +229,7 @@ WHERE  v.option_group_id = g.id
    * @void
    */
   public static function &valuesByID($id, $flip = FALSE, $grouping = FALSE, $localize = FALSE, $labelColumnName = 'label', $onlyActive = TRUE, $fresh = FALSE) {
-    $cacheKey = self::createCacheKey($id, $flip, $grouping, $localize, $labelColumnName, $onlyActive);
+    $cacheKey = self::createCacheKey($id, CRM_Core_I18n::getLocale(), $flip, $grouping, $localize, $labelColumnName, $onlyActive);
 
     $cache = CRM_Utils_Cache::singleton();
     if (!$fresh) {
@@ -268,7 +282,8 @@ WHERE  v.option_group_id = g.id
   public static function lookupValues(&$params, $names, $flip = FALSE) {
     foreach ($names as $postName => $value) {
       // See if $params field is in $names array (i.e. is a value that we need to lookup)
-      if ($postalName = CRM_Utils_Array::value($postName, $params)) {
+      $postalName = $params[$postName] ?? NULL;
+      if ($postalName) {
         $postValues = [];
         // params[$postName] may be a Ctrl+A separated value list
         if (is_string($postalName) &&
@@ -318,94 +333,6 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * @deprecated - use CRM_Core_PseudoConstant::getLabel
-   *
-   * @param string $groupName
-   * @param $value
-   * @param bool $onlyActiveValue
-   *
-   * @return null
-   */
-  public static function getLabel($groupName, $value, $onlyActiveValue = TRUE) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_PseudoConstant::getLabel');
-    if (empty($groupName) ||
-      empty($value)
-    ) {
-      return NULL;
-    }
-
-    $query = "
-SELECT  v.label as label ,v.value as value
-FROM   civicrm_option_value v,
-       civicrm_option_group g
-WHERE  v.option_group_id = g.id
-  AND  g.name            = %1
-  AND  g.is_active       = 1
-  AND  v.value           = %2
-";
-    if ($onlyActiveValue) {
-      $query .= " AND  v.is_active = 1 ";
-    }
-    $p = [
-      1 => [$groupName, 'String'],
-      2 => [$value, 'Integer'],
-    ];
-    $dao = CRM_Core_DAO::executeQuery($query, $p);
-    if ($dao->fetch()) {
-      return $dao->label;
-    }
-    return NULL;
-  }
-
-  /**
-   * @deprecated
-   *
-   * This function is not cached.
-   *
-   * @param string $groupName
-   * @param $label
-   * @param string $labelField
-   * @param string $labelType
-   * @param string $valueField
-   *
-   * @return null
-   */
-  public static function getValue(
-    $groupName,
-    $label,
-    $labelField = 'label',
-    $labelType = 'String',
-    $valueField = 'value'
-  ) {
-    if (empty($label)) {
-      return NULL;
-    }
-
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_PseudoConstant::getKey');
-
-    $query = "
-SELECT  v.label as label ,v.{$valueField} as value
-FROM   civicrm_option_value v,
-       civicrm_option_group g
-WHERE  v.option_group_id = g.id
-  AND  g.name            = %1
-  AND  v.is_active       = 1
-  AND  g.is_active       = 1
-  AND  v.$labelField     = %2
-";
-
-    $p = [
-      1 => [$groupName, 'String'],
-      2 => [$label, $labelType],
-    ];
-    $dao = CRM_Core_DAO::executeQuery($query, $p);
-    if ($dao->fetch()) {
-      return $dao->value;
-    }
-    return NULL;
-  }
-
-  /**
    * Get option_value.value from default option_value row for an option group
    *
    * @param string $groupName
@@ -429,7 +356,7 @@ WHERE  v.option_group_id = g.id
   AND  g.is_active       = 1
   AND  v.is_default      = 1
 ";
-    if (in_array($groupName, self::$_domainIDGroups)) {
+    if (self::isDomainOptionGroup($groupName)) {
       $query .= " AND v.domain_id = " . CRM_Core_Config::domainID();
     }
 
@@ -462,6 +389,13 @@ WHERE  v.option_group_id = g.id
    *   the option group ID
    */
   public static function createAssoc($groupName, &$values, &$defaultID, $groupTitle = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the api');
+    // @TODO: This causes a problem in multilingual
+    // (https://github.com/civicrm/civicrm-core/pull/17228), but is needed in
+    // order to be able to remove currencies once added.
+    if (!CRM_Core_I18n::isMultiLingual()) {
+      self::deleteAssoc($groupName);
+    }
     if (!empty($values)) {
       $group = new CRM_Core_DAO_OptionGroup();
       $group->name = $groupName;
@@ -552,7 +486,8 @@ ORDER BY v.weight
    * @deprecated
    */
   public static function deleteAssoc($groupName, $operator = "=") {
-    CRM_Core_Error::deprecatedFunctionWarning('unused function');
+    CRM_Core_Error::deprecatedFunctionWarning('use the api');
+
     $query = "
 DELETE g, v
   FROM civicrm_option_group g,
@@ -612,7 +547,7 @@ WHERE  v.option_group_id = g.id
       ] as $fld) {
         $row[$fld] = $dao->$fld;
         if ($localize && in_array($fld, ['label', 'description'])) {
-          $row[$fld] = ts($row[$fld]);
+          $row[$fld] = _ts($row[$fld]);
         }
       }
     }

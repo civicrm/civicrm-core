@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -26,19 +24,21 @@ use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
 use Civi\Api4\Email;
 use api\v4\Traits\TableDropperTrait;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
+use Civi\Api4\EntityTag;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ReplaceTest extends UnitTestCase {
+class ReplaceTest extends Api4TestBase implements TransactionalInterface {
   use TableDropperTrait;
 
   /**
    * Set up baseline for testing
    */
-  public function setUp() {
+  public function setUp(): void {
     $tablesToTruncate = [
       'civicrm_custom_group',
       'civicrm_custom_field',
@@ -49,7 +49,7 @@ class ReplaceTest extends UnitTestCase {
     parent::setUp();
   }
 
-  public function testEmailReplace() {
+  public function testEmailReplace(): void {
     $cid1 = Contact::create()
       ->addValue('first_name', 'Lotsa')
       ->addValue('last_name', 'Emails')
@@ -105,10 +105,9 @@ class ReplaceTest extends UnitTestCase {
     $this->assertEquals('nosomany@example.com', $c2email['email']);
   }
 
-  public function testCustomValueReplace() {
-    $customGroup = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
-      ->addValue('name', 'replaceTest')
+  public function testCustomValueReplace(): void {
+    $customGroup = CustomGroup::create(FALSE)
+      ->addValue('title', 'replaceTest')
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', TRUE)
       ->execute()
@@ -121,8 +120,7 @@ class ReplaceTest extends UnitTestCase {
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'Custom2')
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'String')
@@ -185,6 +183,48 @@ class ReplaceTest extends UnitTestCase {
     $this->assertEquals('new two', $newRecords->last()['Custom2']);
     $this->assertEquals('changed one', $newRecords[$cid1Records[0]['id']]['Custom1']);
     $this->assertEquals('changed two', $newRecords[$cid1Records[0]['id']]['Custom2']);
+  }
+
+  public function testReplaceEntityTag(): void {
+    $t1 = uniqid();
+    $t2 = uniqid();
+    $t3 = uniqid();
+    $this->saveTestRecords('Tag', [
+      'records' => [['name' => $t1], ['name' => $t2], ['name' => $t3]],
+      'defaults' => ['used_for' => ['civicrm_contact']],
+    ]);
+
+    $cid = $this->createTestRecord('Contact')['id'];
+
+    EntityTag::replace(FALSE)
+      ->addWhere('entity_id', '=', $cid)
+      ->setRecords([['tag_id:name' => $t1], ['tag_id:name' => $t2]])
+      ->addDefault('entity_table', 'civicrm_contact')
+      ->setMatch(['entity_table', 'entity_id', 'tag_id'])
+      ->execute();
+
+    $result = EntityTag::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_contact')
+      ->addWhere('entity_id', '=', $cid)
+      ->addSelect('tag_id:name')
+      ->execute()->column('tag_id:name');
+
+    $this->assertEquals([$t1, $t2], $result);
+
+    EntityTag::replace(FALSE)
+      ->addWhere('entity_id', '=', $cid)
+      ->setRecords([['tag_id:name' => $t1], ['tag_id:name' => $t3]])
+      ->addDefault('entity_table', 'civicrm_contact')
+      ->setMatch(['entity_table', 'entity_id', 'tag_id'])
+      ->execute();
+
+    $result = EntityTag::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_contact')
+      ->addWhere('entity_id', '=', $cid)
+      ->addSelect('tag_id:name')
+      ->execute()->column('tag_id:name');
+
+    $this->assertEquals([$t1, $t3], $result);
   }
 
 }

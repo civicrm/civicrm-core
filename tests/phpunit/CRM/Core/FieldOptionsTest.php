@@ -30,12 +30,12 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
    */
   public $targetField;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     CRM_Utils_Hook::singleton()->setHook('civicrm_fieldOptions', [$this, 'hook_civicrm_fieldOptions']);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $this->quickCleanup(['civicrm_custom_field', 'civicrm_custom_group']);
   }
@@ -44,7 +44,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
    * Assure CRM_Core_PseudoConstant::get() is working properly for a range of
    * DAO fields having a <pseudoconstant> tag in the XML schema.
    */
-  public function testOptionValues() {
+  public function testOptionValues(): void {
     /**
      * baoName/field combinations to test
      * Format: array[BAO Name] = $properties, where properties is an array whose
@@ -101,7 +101,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
   /**
    * Ensure hook_civicrm_fieldOptions is working
    */
-  public function testHookFieldOptions() {
+  public function testHookFieldOptions(): void {
     CRM_Core_PseudoConstant::flush();
 
     // Test replacing all options with a hook
@@ -126,7 +126,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
   /**
    * Ensure hook_civicrm_fieldOptions works with custom fields
    */
-  public function testHookFieldOptionsWithCustomFields() {
+  public function testHookFieldOptionsWithCustomFields(): void {
     // Create a custom field group for testing.
     $custom_group_name = md5(microtime());
     $api_params = [

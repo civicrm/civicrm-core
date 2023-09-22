@@ -17,14 +17,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
  */
 class CRM_Core_Controller_Simple extends CRM_Core_Controller {
 
   /**
    * Constructor.
    *
-   * @param null $path
+   * @param string $path
    *   The class Path of the form being implemented
    * @param bool $title
    * @param string $mode
@@ -60,7 +59,7 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
       $mode = $savedAction;
     }
 
-    $this->_stateMachine->addSequentialPages($params, $mode);
+    $this->_stateMachine->addSequentialPages($params);
 
     $this->addPages($this->_stateMachine, $mode);
 
@@ -107,7 +106,7 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
   public function getTemplateFileName() {
     // there is only one form here, so should be quite easy
     $actionName = $this->getActionName();
-    list($pageName, $action) = $actionName;
+    [$pageName, $action] = $actionName;
 
     return $this->_pages[$pageName]->getTemplateFileName();
   }

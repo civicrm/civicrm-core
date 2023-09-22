@@ -17,6 +17,11 @@
 class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {

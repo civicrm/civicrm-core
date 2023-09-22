@@ -8,12 +8,24 @@
   </comment>
   <add>1.1</add>
   <log>true</log>
+  <title>Custom Field Group</title>
+  <labelField>title</labelField>
+  <paths>
+    <add>civicrm/admin/custom/group/edit?action=add&amp;reset=1</add>
+    <update>civicrm/admin/custom/group/edit?action=update&amp;reset=1&amp;id=[id]</update>
+    <preview>civicrm/admin/custom/group/preview?reset=1&amp;gid=[id]</preview>
+    <delete>civicrm/admin/custom/group/delete?reset=1&amp;id=[id]</delete>
+    <browse>civicrm/admin/custom/group</browse>
+  </paths>
   <field>
     <name>id</name>
     <type>int unsigned</type>
     <title>Custom Group ID</title>
     <required>true</required>
     <comment>Unique Custom Group ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -37,6 +49,9 @@
     <localizable>true</localizable>
     <comment>Friendly Name.</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>extends</name>
@@ -46,14 +61,13 @@
     <default>'Contact'</default>
     <comment>Type of object this group extends (can add other options later e.g. contact_address, etc.).</comment>
     <add>1.1</add>
-  </field>
-  <field>
-    <name>extends_entity_column_name</name>
-    <type>varchar</type>
-    <length>64</length>
-    <comment>linking custom group for dynamic object</comment>
-    <add>1.6</add>
-    <drop>2.2</drop>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions</callback>
+      <suffixes>name,label,grouping</suffixes>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>extends_entity_column_id</name>
@@ -62,11 +76,13 @@
     <default>NULL</default>
     <comment>FK to civicrm_option_value.id (for option group custom_data_type.)</comment>
     <pseudoconstant>
-      <optionGroupName>custom_data_type</optionGroupName>
+      <callback>CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions</callback>
+      <suffixes>name,label,grouping</suffixes>
     </pseudoconstant>
     <add>2.2</add>
     <html>
-      <type>Select</type>
+      <type>ChainSelect</type>
+      <controlField>extends</controlField>
     </html>
   </field>
   <field>
@@ -76,6 +92,13 @@
     <length>255</length>
     <comment>linking custom group for dynamic object</comment>
     <serialize>SEPARATOR_BOOKEND</serialize>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions</callback>
+    </pseudoconstant>
+    <html>
+      <type>ChainSelect</type>
+      <controlField>extends_entity_column_id</controlField>
+    </html>
     <add>1.6</add>
   </field>
   <field>
@@ -97,6 +120,7 @@
     <type>boolean</type>
     <title>Collapse Custom Group?</title>
     <default>0</default>
+    <required>true</required>
     <comment>Will this group be in collapsed or expanded mode on initial display ?</comment>
     <add>1.1</add>
   </field>
@@ -140,7 +164,12 @@
     <type>boolean</type>
     <title>Custom Group Is Active?</title>
     <comment>Is this property active?</comment>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <default>1</default>
+    <required>true</required>
     <add>1.1</add>
   </field>
   <field>
@@ -148,6 +177,10 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Name of the table that holds the values for this group.</comment>
+    <html>
+      <label>Table Name</label>
+    </html>
+    <readonly>true</readonly>
     <add>2.0</add>
   </field>
   <field>
@@ -156,6 +189,7 @@
     <title>Supports Multiple Records</title>
     <comment>Does this group hold multiple values?</comment>
     <default>0</default>
+    <required>true</required>
     <add>2.0</add>
   </field>
   <field>
@@ -177,6 +211,7 @@
     <type>boolean</type>
     <title>Collapse Group Display</title>
     <default>0</default>
+    <required>true</required>
     <comment>Will this group be in collapsed or expanded mode on advanced search display ?</comment>
     <add>3.0</add>
   </field>
@@ -188,17 +223,19 @@
     <add>2.1</add>
   </index>
   <index>
-    <name>UI_name_extends</name>
+    <name>UI_name</name>
     <fieldName>name</fieldName>
-    <fieldName>extends</fieldName>
     <unique>true</unique>
-    <add>2.1</add>
+    <add>5.47</add>
   </index>
   <field>
     <name>created_id</name>
     <type>int unsigned</type>
-    <title>Custom Group Created By</title>
+    <title>Created By Contact ID</title>
     <comment>FK to civicrm_contact, who created this custom group</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -220,6 +257,7 @@
     <type>boolean</type>
     <title>Reserved Group?</title>
     <default>0</default>
+    <required>true</required>
     <comment>Is this a reserved Custom Group?</comment>
     <add>4.4</add>
   </field>
@@ -228,6 +266,7 @@
     <type>boolean</type>
     <title>Custom Group Is Public?</title>
     <default>1</default>
+    <required>true</required>
     <comment>Is this property public?</comment>
     <add>4.7</add>
   </field>

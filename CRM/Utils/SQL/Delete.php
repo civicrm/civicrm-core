@@ -10,7 +10,7 @@
  */
 
 /**
- * Dear God Why Do I Have To Write This (Dumb SQL Builder)
+ * Object-oriented SQL builder for DELETE queries.
  *
  * Usage:
  * ```
@@ -105,7 +105,7 @@ class CRM_Utils_SQL_Delete extends CRM_Utils_SQL_BaseParamQuery {
    * Merge something or other.
    *
    * @param CRM_Utils_SQL_Delete $other
-   * @param array|NULL $parts
+   * @param array|null $parts
    *   ex: 'wheres'
    * @return CRM_Utils_SQL_Delete
    */
@@ -177,7 +177,7 @@ class CRM_Utils_SQL_Delete extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
-   * @param array|NULL $parts
+   * @param array|null $parts
    *   List of fields to check (e.g. 'wheres').
    *   Defaults to all.
    * @return bool
@@ -224,7 +224,7 @@ class CRM_Utils_SQL_Delete extends CRM_Utils_SQL_BaseParamQuery {
    * To examine the results, use a function like `fetch()`, `fetchAll()`,
    * `fetchValue()`, or `fetchMap()`.
    *
-   * @param string|NULL $daoName
+   * @param string|null $daoName
    *   The return object should be an instance of this class.
    *   Ex: 'CRM_Contact_BAO_Contact'.
    * @param bool $i18nRewrite
@@ -241,7 +241,6 @@ class CRM_Utils_SQL_Delete extends CRM_Utils_SQL_BaseParamQuery {
     // Don't pass through $abort, $trapException. Just use straight-up exceptions.
     $abort = TRUE;
     $trapException = FALSE;
-    $errorScope = CRM_Core_TemporaryErrorScope::useException();
 
     // Don't pass through freeDAO. You can do it yourself.
     $freeDAO = FALSE;

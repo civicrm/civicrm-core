@@ -37,6 +37,7 @@ class CRM_Event_Form_EventFees {
     $form->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $form);
     $form->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $form);
 
+    // @todo - stop setting this, call the function, as appropriate. This is in a weird place.
     $form->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($form->_eventId);
 
     //CRM-6907 set event specific currency.
@@ -65,6 +66,9 @@ class CRM_Event_Form_EventFees {
       if (!empty($details[$form->_eventId]['financial_type_id'])) {
         $defaults[$form->_pId]['financial_type_id'] = $details[$form->_eventId]['financial_type_id'];
       }
+      if (!empty($details[$form->_eventId]['confirm_email_text'])) {
+        $defaults[$form->_pId]['receipt_text'] = $details[$form->_eventId]['confirm_email_text'];
+      }
     }
 
     if ($form->_pId) {
@@ -92,11 +96,6 @@ class CRM_Event_Form_EventFees {
     }
     else {
       $defaults[$form->_pId]['send_receipt'] = (strtotime(CRM_Utils_Array::value('start_date', $details[$form->_eventId])) >= time()) ? 1 : 0;
-      if ($form->_eventId && !empty($details[$form->_eventId]['confirm_email_text'])) {
-        //set receipt text
-        $defaults[$form->_pId]['receipt_text'] = $details[$form->_eventId]['confirm_email_text'];
-      }
-
       $defaults[$form->_pId]['receive_date'] = date('Y-m-d H:i:s');
     }
 
@@ -159,6 +158,7 @@ class CRM_Event_Form_EventFees {
       if (in_array(get_class($form),
         [
           'CRM_Event_Form_Participant',
+          'CRM_Event_Form_Task_Register',
           'CRM_Event_Form_Registration_Register',
           'CRM_Event_Form_Registration_AdditionalParticipant',
         ]
@@ -173,7 +173,7 @@ class CRM_Event_Form_EventFees {
         foreach ($form->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
             if ($values['is_default']) {
-              if (get_class($form) != 'CRM_Event_Form_Participant' && !empty($values['is_full'])) {
+              if (!in_array(get_class($form), ['CRM_Event_Form_Participant', 'CRM_Event_Form_Task_Register']) && !empty($values['is_full'])) {
                 continue;
               }
 

@@ -11,12 +11,10 @@
 <div class="crm-block crm-form-block crm-financial_type-form-block">
 {if $action eq 8}
   <div class="messages status">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {ts}WARNING: You cannot delete a financial type if it is currently used by any Contributions, Contribution Pages or Membership Types. Consider disabling this option instead.{/ts} {ts}Deleting a financial type cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
   </div>
 {else}
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
   <table class="form-layout">
     <tr class="crm-contribution-form-block-name">
       <td class="label">{$form.title.label}</td>

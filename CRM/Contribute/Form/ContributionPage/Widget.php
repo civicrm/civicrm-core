@@ -40,7 +40,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
 
     $this->assign('cpageId', $this->_id);
 
-    $this->assign('widgetExternUrl', CRM_Utils_System::externUrl('extern/widget', "cpageId={$this->_id}&widgetId={$this->_widget->id}&format=3"));
+    $this->assign('widgetExternUrl', CRM_Utils_System::externUrl('extern/widget', "cpageId={$this->_id}&widgetId=" . ($this->_widget->id ?? '') . "&format=3"));
 
     $config = CRM_Core_Config::singleton();
     $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
@@ -188,9 +188,10 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     $this->assign_by_ref('colorFields', $this->_colorFields);
 
     $this->_refreshButtonName = $this->getButtonName('refresh');
-    $this->addElement('submit',
+    $this->addElement('xbutton',
       $this->_refreshButtonName,
-      ts('Save and Preview')
+      ts('Save and Preview'),
+      ['type' => 'submit', 'class' => 'crm-button crm-form-submit crm-button-type-submit']
     );
     parent::buildQuickForm();
     $this->addFormRule(['CRM_Contribute_Form_ContributionPage_Widget', 'formRule'], $this);
@@ -203,7 +204,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
    *   (ref.) an assoc array of name/value pairs.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return bool|array
    *   mixed true or array of errors

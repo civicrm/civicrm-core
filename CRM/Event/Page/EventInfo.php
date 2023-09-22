@@ -16,7 +16,7 @@
  */
 
 /**
- * Event Info Page - Summmary about the event
+ * Event Info Page - Summary about the event
  */
 class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
@@ -30,12 +30,10 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
    * @return void
    */
   public function run() {
-    //get the event id.
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $config = CRM_Core_Config::singleton();
     // ensure that the user has permission to see this page
     if (!CRM_Core_Permission::event(CRM_Core_Permission::VIEW,
-      $this->_id, 'view event info'
+      $this->getEventID(), 'view event info'
     )
     ) {
       CRM_Utils_System::setUFMessage(ts('You do not have permission to view this event'));
@@ -47,20 +45,17 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('context', $context);
 
     $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks($this->_id));
+    $this->assign('isShowICalIconsInline', TRUE);
 
     // Sometimes we want to suppress the Event Full msg
     $noFullMsg = CRM_Utils_Request::retrieve('noFullMsg', 'String', $this, FALSE, 'false');
 
-    // set breadcrumb to append to 2nd layer pages
-    $breadCrumbPath = CRM_Utils_System::url('civicrm/event/info',
-      "id={$this->_id}&reset=1"
-    );
-
     //retrieve event information
     $params = ['id' => $this->_id];
+    $values = ['event' => NULL];
     CRM_Event_BAO_Event::retrieve($params, $values['event']);
 
-    if (!$values['event']['is_active']) {
+    if (!$values['event'] || !$values['event']['is_active']) {
       CRM_Utils_System::setUFMessage(ts('The event you requested is currently unavailable (contact the site administrator for assistance).'));
       return CRM_Utils_System::permissionDenied();
     }
@@ -79,9 +74,11 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     $this->assign('isShowLocation', CRM_Utils_Array::value('is_show_location', $values['event']));
 
+    $eventCurrency = CRM_Utils_Array::value('currency', $values['event'], $config->defaultCurrency);
+    $this->assign('eventCurrency', $eventCurrency);
+
     // show event fees.
     if ($this->_id && !empty($values['event']['is_monetary'])) {
-      CRM_Contribute_BAO_Contribution_Utils::overrideDefaultCurrency($values['event']);
 
       //CRM-10434
       $discountId = CRM_Core_BAO_Discount::findSet($this->_id, 'civicrm_event');
@@ -107,16 +104,17 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
             $adminFieldVisible = TRUE;
           }
 
-          foreach ($priceSetFields as $fid => $fieldValues) {
+          foreach ($priceSetFields as $fieldValues) {
             if (!is_array($fieldValues['options']) ||
               empty($fieldValues['options']) ||
-              (CRM_Utils_Array::value('visibility_id', $fieldValues) != array_search('public', $visibility) && $adminFieldVisible == FALSE)
+              (($fieldValues['visibility_id'] ?? NULL) != array_search('public', $visibility) && $adminFieldVisible == FALSE)
             ) {
               continue;
             }
 
             if (count($fieldValues['options']) > 1) {
               $values['feeBlock']['value'][$fieldCnt] = '';
+              $values['feeBlock']['tax_amount'][$fieldCnt] = '';
               $values['feeBlock']['label'][$fieldCnt] = $fieldValues['label'];
               $values['feeBlock']['lClass'][$fieldCnt] = 'price_set_option_group-label';
               $values['feeBlock']['isDisplayAmount'][$fieldCnt] = $fieldValues['is_display_amounts'] ?? NULL;
@@ -126,25 +124,22 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
             else {
               $labelClass = 'price_set_field-label';
             }
-            // show tax rate with amount
-            $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-            $taxTerm = Civi::settings()->get('tax_term');
-            $displayOpt = $invoiceSettings['tax_display_settings'] ?? NULL;
-            $invoicing = $invoiceSettings['invoicing'] ?? NULL;
+
             foreach ($fieldValues['options'] as $optionId => $optionVal) {
-              if (CRM_Utils_Array::value('visibility_id', $optionVal) != array_search('public', $visibility) &&
+              if (($optionVal['visibility_id'] ?? NULL) != array_search('public', $visibility) &&
                 $adminFieldVisible == FALSE
               ) {
                 continue;
               }
 
               $values['feeBlock']['isDisplayAmount'][$fieldCnt] = $fieldValues['is_display_amounts'] ?? NULL;
-              if ($invoicing && isset($optionVal['tax_amount'])) {
-                $values['feeBlock']['value'][$fieldCnt] = CRM_Price_BAO_PriceField::getTaxLabel($optionVal, 'amount', $displayOpt, $taxTerm);
+              if (Civi::settings()->get('invoicing') && isset($optionVal['tax_amount'])) {
+                $values['feeBlock']['value'][$fieldCnt] = CRM_Price_BAO_PriceField::getTaxLabel($optionVal, 'amount', $eventCurrency);
                 $values['feeBlock']['tax_amount'][$fieldCnt] = $optionVal['tax_amount'];
               }
               else {
                 $values['feeBlock']['value'][$fieldCnt] = $optionVal['amount'];
+                $values['feeBlock']['tax_amount'][$fieldCnt] = 0;
               }
               $values['feeBlock']['label'][$fieldCnt] = $optionVal['label'];
               $values['feeBlock']['lClass'][$fieldCnt] = $labelClass;
@@ -172,15 +167,16 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
 
     //retrieve custom field information
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, $this->_id, 0, $values['event']['event_type_id'], NULL, TRUE, NULL, FALSE, TRUE, NULL, TRUE);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, $this->_id, 0, $values['event']['event_type_id'], NULL,
+      TRUE, NULL, FALSE, CRM_Core_Permission::VIEW, NULL, TRUE);
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->_id);
     $this->assign('action', CRM_Core_Action::VIEW);
     //To show the event location on maps directly on event info page
     $locations = CRM_Event_BAO_Event::getMapInfo($this->_id);
+    $this->assign('locations', $locations);
     if (!empty($locations) && !empty($values['event']['is_map'])) {
-      $this->assign('locations', $locations);
-      $this->assign('mapProvider', $config->mapProvider);
-      $this->assign('mapKey', $config->mapAPIKey);
+      $this->assign('mapProvider', \Civi::settings()->get('mapProvider'));
+      $this->assign('mapKey', \Civi::settings()->get('mapAPIKey'));
       $sumLat = $sumLng = 0;
       $maxLat = $maxLng = -400;
       $minLat = $minLng = 400;
@@ -272,27 +268,15 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
             $registerText = $values['event']['registration_link_text'];
           }
 
-          // check if we're in shopping cart mode for events
-          $enable_cart = Civi::settings()->get('enable_cart');
-          if ($enable_cart) {
-            $link = CRM_Event_Cart_BAO_EventInCart::get_registration_link($this->_id);
-            $registerText = $link['label'];
-
-            $url = CRM_Utils_System::url($link['path'], $link['query'] . $action_query, FALSE, NULL, TRUE, TRUE);
-          }
-
           //Fixed for CRM-4855
           $allowRegistration = CRM_Event_BAO_Event::showHideRegistrationLink($values);
 
           $this->assign('registerText', $registerText);
           $this->assign('registerURL', $url);
-          $this->assign('eventCartEnabled', $enable_cart);
         }
       }
-      elseif (CRM_Core_Permission::check('register for events')) {
-        $this->assign('registerClosed', TRUE);
-      }
     }
+    $this->assign('registerClosed', !empty($values['event']['is_online_registration']) && !$isEventOpenForRegistration);
 
     $this->assign('allowRegistration', $allowRegistration);
 
@@ -335,9 +319,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     CRM_Utils_System::setTitle($values['event']['title']);
 
     $this->assign('event', $values['event']);
-    if (isset($values['feeBlock'])) {
-      $this->assign('feeBlock', $values['feeBlock']);
-    }
+    $this->assign('feeBlock', $values['feeBlock'] ?? NULL);
     $this->assign('location', $values['location']);
 
     if (CRM_Core_Permission::check(['access CiviEvent', 'edit all events'])) {
@@ -348,10 +330,27 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
   }
 
   /**
+   * Get the selected Event ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int|null
+   */
+  public function getEventID(): int {
+    if (!isset($this->_id)) {
+      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+      $this->_id = $id;
+    }
+    return (int) $this->_id;
+  }
+
+  /**
    * @return string
    */
   public function getTemplateFileName() {
-    if ($this->_id) {
+    if ($this->getEventID()) {
       $templateFile = "CRM/Event/Page/{$this->_id}/EventInfo.tpl";
       $template = CRM_Core_Page::getTemplate();
 

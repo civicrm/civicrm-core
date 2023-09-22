@@ -80,10 +80,10 @@ class CRM_Mailing_Task extends CRM_Core_Task {
       $value = self::TASK_PRINT;
     }
 
-    return [
-      self::$_tasks[$value]['class'],
-      self::$_tasks[$value]['result'],
-    ];
+    if (isset(self::$_tasks[$value])) {
+      return [[self::$_tasks[$value]['class']], self::$_tasks[$value]['result']];
+    }
+    return [[], NULL];
   }
 
 }

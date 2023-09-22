@@ -30,9 +30,8 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -336,8 +335,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form {
   }
 
   /**
-   * Add The statistics.
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
@@ -414,7 +412,8 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form {
       }
     }
     //add blank column at the end
-    if ($blankcols = CRM_Utils_Array::value('blank_column_end', $this->_params)) {
+    $blankcols = $this->_params['blank_column_end'] ?? NULL;
+    if ($blankcols) {
       for ($i = 1; $i <= $blankcols; $i++) {
         $select[] = " '' as blankColumnEnd_{$i}";
         $this->_columnHeaders["blank_{$i}"]['title'] = "_ _ _ _";
@@ -427,7 +426,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */

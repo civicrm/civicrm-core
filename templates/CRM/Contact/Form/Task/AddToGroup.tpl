@@ -9,7 +9,7 @@
 *}
 <div class="crm-block crm-form-block crm-contact-task-addtogroup-form-block">
 <table class="form-layout">
-    {if $group.id}
+    {if $form.group_id.value}
        <tr class="crm-contact-task-addtogroup-form-block-group_id">
           <td class="label">{ts}Group{/ts}</td>
           <td>{$form.group_id.html}</td>
@@ -33,12 +33,15 @@
                 <tr class="crm-contact-task-addtogroup-form-block-description">
                    <td class="label">{$form.description.label}</td>
                    <td>{$form.description.html}</td></tr>
-                {if $form.group_type}
+                {if !empty($form.group_type)}
                 <tr class="crm-contact-task-addtogroup-form-block-group_type">
         <td class="label">{$form.group_type.label}</td>
                     <td>{$form.group_type.html}</td>
                 </tr>
                 {/if}
+                <tr>
+                  <td colspan=2>{include file="CRM/Custom/Form/CustomData.tpl"}</td>
+                </tr>
                 </table>
             </td>
         </tr>
@@ -51,7 +54,7 @@
 </div>
 {include file="CRM/common/showHide.tpl"}
 
-{if !$group.id}
+{if !$form.group_id.value}
 {literal}
 <script type="text/javascript">
 showElements();

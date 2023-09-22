@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -9,19 +8,15 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
 namespace Civi\Api4;
 
 /**
  * IM entity.
  *
+ * @ui_join_filters is_primary
+ *
+ * @searchable secondary
+ * @since 5.19
  * @package Civi\Api4
  */
 class IM extends Generic\DAOEntity {

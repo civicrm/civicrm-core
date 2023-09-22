@@ -22,7 +22,7 @@
  *
  * @return array
  *   API Success Array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_logging_revert($params) {
@@ -39,7 +39,7 @@ function civicrm_api3_logging_revert($params) {
  *
  * @param array $params
  *
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function _civicrm_api3_logging_revert_spec(&$params) {
@@ -73,7 +73,7 @@ function _civicrm_api3_logging_revert_spec(&$params) {
  *
  * @return array
  *   API Success Array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_logging_get($params) {
@@ -89,7 +89,7 @@ function civicrm_api3_logging_get($params) {
  *
  * @param array $params
  *
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function _civicrm_api3_logging_get_spec(&$params) {

@@ -46,7 +46,7 @@
               <td class="crm-event-is_monetary">{if $row.is_monetary eq 1}{ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
               <td class="crm-event-is_online_registration">{if $row.is_online_registration eq 1}{ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
               <td class="crm-event-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-              <td class="crm-event-action">{$row.action|replace:'xx':$row.id}</td>
+              <td class="crm-event-action">{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
           </tr>
         {/foreach}
       </table>
@@ -56,7 +56,7 @@
 
 {else}
     <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {capture assign=crmURL}{crmURL p='civicrm/event/add' q="action=add&is_template=1&reset=1"}{/capture}
         {ts 1=$crmURL}There are no Event Templates present. You can <a href='%1'>add one</a>.{/ts}
     </div>

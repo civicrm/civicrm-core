@@ -7,12 +7,18 @@
   <comment>joins premiums (settings) to individual product/premium items - determines which products are available for a given contribution page</comment>
   <add>1.4</add>
   <log>true</log>
+  <component>CiviContribute</component>
+  <title>Product Premium</title>
+  <titlePlural>Product Premiums</titlePlural>
   <field>
     <name>id</name>
     <title>Premium Product ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Contribution ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.4</add>
   </field>
   <primaryKey>
@@ -21,10 +27,13 @@
   </primaryKey>
   <field>
     <name>premiums_id</name>
-    <title>Premium</title>
+    <title>Premium ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to premiums settings record.</comment>
+    <html>
+      <label>Premium</label>
+    </html>
     <add>1.4</add>
   </field>
   <foreignKey>
@@ -35,10 +44,13 @@
   </foreignKey>
   <field>
     <name>product_id</name>
-    <title>Product</title>
+    <title>Product ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to each product object.</comment>
+    <html>
+      <label>Product</label>
+    </html>
     <add>1.4</add>
   </field>
   <foreignKey>
@@ -48,14 +60,6 @@
     <add>1.4</add>
   </foreignKey>
   <field>
-    <name>sort_position</name>
-    <title>Sort Position</title>
-    <type>int unsigned</type>
-    <required>true</required>
-    <add>1.4</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
     <name>weight</name>
     <title>Order</title>
     <type>int unsigned</type>
@@ -64,7 +68,7 @@
   </field>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <pseudoconstant>
@@ -73,6 +77,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>FK to Financial Type.</comment>
+    <html>
+      <label>Financial Type</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>

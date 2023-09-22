@@ -16,12 +16,31 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionMAX extends SqlFunction {
 
-  protected static $params = [
-    [
-      'prefix' => ['', 'DISTINCT', 'ALL'],
-      'expr' => 1,
-      'must_be' => ['SqlField'],
-    ],
-  ];
+  public $supportsExpansion = TRUE;
+
+  protected static $category = self::CATEGORY_AGGREGATE;
+
+  protected static function params(): array {
+    return [
+      [
+        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct')],
+        'must_be' => ['SqlField'],
+      ],
+    ];
+  }
+
+  /**
+   * @return string
+   */
+  public static function getTitle(): string {
+    return ts('Max');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The largest value in the grouping.');
+  }
 
 }

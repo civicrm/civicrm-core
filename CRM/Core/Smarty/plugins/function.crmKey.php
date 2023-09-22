@@ -13,14 +13,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
  * Generate a CRM_Core_Key of a given name
  *
- * @param string $params
+ * @param array $params
  *   Params of the {crmKey} call, with the ‘name’ key holding the name of the key.
  * @param CRM_Core_Smarty $smarty
  *   The Smarty object.

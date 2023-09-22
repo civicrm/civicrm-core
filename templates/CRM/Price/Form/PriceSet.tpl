@@ -14,15 +14,22 @@
     {/if}
 
     {assign var='adminFld' value=false}
-    {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+    {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
       {assign var='adminFld' value=true}
+      {if $priceSet.id && !$priceSet.is_quick_config}
+        <div class='float-right'>
+          <a class="crm-hover-button" target="_blank" href="{crmURL p="civicrm/admin/price/field" q="reset=1&action=browse&sid=`$priceSet.id`" fb=1}">
+            {icon icon="fa-wrench"}{ts}Edit Price Set{/ts}{/icon}
+          </a>
+        </div>
+      {/if}
     {/if}
 
     {foreach from=$priceSet.fields item=element key=field_id}
         {* Skip 'Admin' visibility price fields WHEN this tpl is used in online registration unless user has administer CiviCRM permission. *}
-        {if $element.visibility EQ 'public' || ($element.visibility EQ 'admin' && $adminFld EQ true) || $context eq 'standalone' || $context eq 'advanced' || $context eq 'search' || $context eq 'participant' || $context eq 'dashboard' || $action eq 1024}
+        {if $element.visibility EQ 'public' || ($element.visibility EQ 'admin' && $adminFld EQ true) || $context eq 'standalone' || $context eq 'advanced' || $context eq 'search' || $context eq 'participant' || $context eq 'dashboard'}
             {if $element.help_pre}<span class="content description">{$element.help_pre}</span><br />{/if}
-            <div class="crm-section {$element.name}-section">
+            <div class="crm-section {$element.name}-section crm-price-field-id-{$field_id}">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
               {assign var="element_name" value="price_"|cat:$field_id}
               <div class="label">{$form.$element_name.label}</div>
@@ -32,7 +39,7 @@
                 {assign var="rowCount" value="0"}
                 {foreach name=outer key=key item=item from=$form.$element_name}
                   {assign var="elementCount" value=`$elementCount+1`}
-                  {if is_numeric($key) }
+                  {if is_numeric($key)}
                     {assign var="optionCount" value=`$optionCount+1`}
                     {if $optionCount == 1}
                       {assign var="rowCount" value=`$rowCount+1`}
@@ -63,16 +70,16 @@
                       {if ($option.tax_amount || $option.tax_amount == "0") && $displayOpt && $invoicing}
                         {assign var="amount" value=`$option.amount+$option.tax_amount`}
                         {if $displayOpt == 'Do_not_show'}
-                          {$amount|crmMoney}
+                          {$amount|crmMoney:$currency}
                         {elseif $displayOpt == 'Inclusive'}
-                          {$amount|crmMoney}
-                          <span class='crm-price-amount-label'> {ts 1=$taxTerm 2=$option.tax_amount|crmMoney}(includes %1 of %2){/ts}</span>
+                          {$amount|crmMoney:$currency}
+                          <span class='crm-price-amount-tax'> {ts 1=$taxTerm 2=$option.tax_amount|crmMoney:$currency}(includes %1 of %2){/ts}</span>
                         {else}
-                          {$option.amount|crmMoney}
-                          <span class='crm-price-amount-label'> + {$option.tax_amount|crmMoney} {$taxTerm}</span>
+                          {$option.amount|crmMoney:$currency}
+                          <span class='crm-price-amount-tax'> + {$option.tax_amount|crmMoney:$currency} {$taxTerm}</span>
                         {/if}
                       {else}
-                        {$option.amount|crmMoney} {$fieldHandle} {$form.$fieldHandle.frozen}
+                        {$option.amount|crmMoney:$currency} {$fieldHandle} {$form.$fieldHandle.frozen}
                       {/if}
                       {if $form.$element_name.frozen EQ 1} ({ts}Sold out{/ts}){/if}
                     {/foreach}
@@ -94,7 +101,7 @@
                     <div class='crm-section auto-renew'>
                       <div class='label'></div>
                       <div class='content' id="auto_renew_section">
-                        {if isset($form.auto_renew) }
+                        {if $form.auto_renew}
                           {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
                         {/if}
                       </div>

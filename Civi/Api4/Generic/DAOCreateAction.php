@@ -10,16 +10,9 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Generic;
+
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Create a new $ENTITY from supplied values.
@@ -35,21 +28,20 @@ class DAOCreateAction extends AbstractCreateAction {
    */
   public function _run(Result $result) {
     $this->formatWriteValues($this->values);
+    $this->fillDefaults($this->values);
     $this->validateValues();
-    $params = $this->values;
-    $this->fillDefaults($params);
 
-    $resultArray = $this->writeObjects([$params]);
-
-    $result->exchangeArray($resultArray);
+    $items = [$this->values];
+    $result->exchangeArray($this->writeObjects($items));
   }
 
   /**
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function validateValues() {
-    if (!empty($this->values['id'])) {
-      throw new \API_Exception('Cannot pass id to Create action. Use Update action instead.');
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
+    if (!empty($this->values[$idField])) {
+      throw new \CRM_Core_Exception("Cannot pass $idField to Create action. Use Update action instead.");
     }
     parent::validateValues();
   }

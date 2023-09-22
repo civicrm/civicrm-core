@@ -17,47 +17,26 @@
 class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Retrieve DB object based on input parameters.
+   * Retrieve DB object and copy to defaults array.
    *
-   * It also stores all the retrieved values in the default array.
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Core_DAO_PrintLabel|null
-   *   object on success, null otherwise
+   * @return CRM_Core_DAO_PrintLabel|NULL
    */
-  public static function retrieve(&$params, &$defaults) {
-    $printLabel = new CRM_Core_DAO_PrintLabel();
-    $printLabel->copyValues($params);
-    if ($printLabel->find(TRUE)) {
-      CRM_Core_DAO::storeValues($printLabel, $defaults);
-      return $printLabel;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve('CRM_Core_DAO_PrintLabel', $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_PrintLabel', $id, 'is_active', $is_active);
   }
 
@@ -106,13 +85,11 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * Delete name labels.
    *
    * @param int $printLabelId
-   *   ID of the name label to be deleted.
-   *
+   * @deprecated
    */
   public static function del($printLabelId) {
-    $printLabel = new CRM_Core_DAO_PrintLabel();
-    $printLabel->id = $printLabelId;
-    $printLabel->delete();
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    self::deleteRecord(['id' => $printLabelId]);
   }
 
   /**
@@ -155,7 +132,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   /**
    * Decode encoded data and return as an array.
    *
-   * @param json $jsonData
+   * @param string $jsonData
    *   Json object.
    *
    * @return array

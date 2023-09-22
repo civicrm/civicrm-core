@@ -48,15 +48,15 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     // do u want to allow a free form text field for amount
     $this->addElement('checkbox', 'is_allow_other_amount', ts('Allow other amounts'), NULL, ['onclick' => "minMax(this);showHideAmountBlock( this, 'is_allow_other_amount' );"]);
     $this->add('text', 'min_amount', ts('Minimum Amount'), ['size' => 8, 'maxlength' => 8]);
-    $this->addRule('min_amount', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('9.99', ' ')]), 'money');
+    $this->addRule('min_amount', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('9.99')]), 'money');
 
     $this->add('text', 'max_amount', ts('Maximum Amount'), ['size' => 8, 'maxlength' => 8]);
-    $this->addRule('max_amount', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+    $this->addRule('max_amount', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
     //CRM-12055
     $this->add('text', 'amount_label', ts('Contribution Amounts Label'));
 
-    $default = [$this->createElement('radio', NULL, NULL, NULL, 0)];
+    $default = [0 => NULL];
     $this->add('hidden', "price_field_id", '', ['id' => "price_field_id"]);
     $this->add('hidden', "price_field_other", '', ['id' => "price_field_option"]);
     for ($i = 1; $i <= self::NUM_OPTION; $i++) {
@@ -67,13 +67,13 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
       // value
       $this->add('text', "value[$i]", ts('Value'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'));
-      $this->addRule("value[$i]", ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+      $this->addRule("value[$i]", ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
       // default
-      $default[] = $this->createElement('radio', NULL, NULL, NULL, $i);
+      $default[$i] = NULL;
     }
 
-    $this->addGroup($default, 'default');
+    $this->addRadio('default', '', $default);
 
     $this->addElement('checkbox', 'amount_block_is_active', ts('Contribution Amounts section enabled'), NULL, ['onclick' => "showHideAmountBlock( this, 'amount_block_is_active' );"]);
 
@@ -145,15 +145,16 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       $this->assign('price', TRUE);
     }
 
-    $this->addField('price_set_id', [
+    $this->addSelect('price_set_id', [
       'entity' => 'PriceSet',
+      'option_url' => 'civicrm/admin/price',
       'options' => $price,
+      'label' => ts('Price Set'),
       'onchange' => "showHideAmountBlock( this.value, 'price_set_id' );",
     ]);
 
     //CiviPledge fields.
-    $config = CRM_Core_Config::singleton();
-    if (in_array('CiviPledge', $config->enableComponents)) {
+    if (CRM_Core_Component::isEnabled('CiviPledge')) {
       $this->assign('civiPledge', TRUE);
       $this->addElement('checkbox', 'is_pledge_active', ts('Pledges'),
         NULL, ['onclick' => "showHideAmountBlock( this, 'is_pledge_active' ); return showHideByValue('is_pledge_active',true,'pledgeFields','table-row','radio',false);"]
@@ -174,7 +175,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
         );
         $this->add('datepicker', 'pledge_calendar_date', ts('Specific Calendar Date'), [], FALSE, ['time' => FALSE]);
         $month = CRM_Utils_Date::getCalendarDayOfMonth();
-        $this->add('select', 'pledge_calendar_month', ts('Specific day of Month'), $month);
+        $this->add('select', 'pledge_calendar_month', ts('Specific day of Month'), $month, FALSE, ['class' => 'crm-select2 eight']);
         $pledgeDefaults = [
           'contribution_date' => ts('Day of Contribution'),
           'calendar_date' => ts('Specific Calendar Date'),
@@ -262,17 +263,17 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
         // CRM-4038: fix value display
         foreach ($defaults['value'] as & $amount) {
-          $amount = trim(CRM_Utils_Money::format($amount, ' '));
+          $amount = trim(CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($amount));
         }
       }
     }
 
     // fix the display of the monetary value, CRM-4038
     if (isset($defaults['min_amount'])) {
-      $defaults['min_amount'] = CRM_Utils_Money::format($defaults['min_amount'], NULL, '%a');
+      $defaults['min_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['min_amount']);
     }
     if (isset($defaults['max_amount'])) {
-      $defaults['max_amount'] = CRM_Utils_Money::format($defaults['max_amount'], NULL, '%a');
+      $defaults['max_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['max_amount']);
     }
 
     if (!empty($defaults['payment_processor'])) {
@@ -290,7 +291,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param self $self
    *
    *
    * @return bool|array
@@ -310,14 +311,19 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     $membershipBlock->is_active = 1;
     $hasMembershipBlk = FALSE;
     if ($membershipBlock->find(TRUE)) {
-      if (!empty($fields['amount_block_is_active']) &&
-        ($setID = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $self->_id, NULL, 1))
-      ) {
-        $extends = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID, 'extends');
-        if ($extends && $extends == CRM_Core_Component::getComponentID('CiviMember')) {
-          $errors['amount_block_is_active'] = ts('You cannot use a Membership Price Set when the Contribution Amounts section is enabled. Click the Memberships tab above, and select your Membership Price Set on that form. Membership Price Sets may include additional fields for non-membership options that require an additional fee (e.g. magazine subscription) or an additional voluntary contribution.');
-          return $errors;
-        }
+      // Don't allow Contribution price set w/ membership signup, CRM-5095.
+      $priceSetExtendsMembership = \Civi\Api4\PriceSetEntity::get(FALSE)
+        ->addSelect('id')
+        ->addJoin('PriceSet AS price_set', 'LEFT', ['price_set_id', '=', 'price_set.id'])
+        ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+        ->addWhere('entity_id', '=', $self->_id)
+        ->addWhere('price_set.extends:name', 'CONTAINS', 'CiviMember')
+        ->addWhere('price_set.is_quick_config', '=', 0)
+        ->execute()
+        ->first();
+      if (!empty($fields['amount_block_is_active']) && $priceSetExtendsMembership) {
+        $errors['amount_block_is_active'] = ts('You cannot use a Membership Price Set when the Contribution Amounts section is enabled. Click the Memberships tab above, and select your Membership Price Set on that form. Membership Price Sets may include additional fields for non-membership options that require an additional fee (e.g. magazine subscription) or an additional voluntary contribution.');
+        return $errors;
       }
       $hasMembershipBlk = TRUE;
       if ($membershipBlock->is_separate_payment && empty($fields['amount_block_is_active'])) {
@@ -366,16 +372,17 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       }
     }
     else {
-      if ($fields['amount_block_is_active'] && empty($fields['payment_processor'])) {
+      if (!empty($fields['amount_block_is_active']) && empty($fields['payment_processor'])) {
         $errors['payment_processor'] = ts('You have listed fixed contribution options or selected a price set, but no payment option has been selected. Please select at least one payment processor and/or enable the pay later option.');
       }
     }
 
     // don't allow price set w/ membership signup, CRM-5095
-    if ($priceSetId = CRM_Utils_Array::value('price_set_id', $fields)) {
+    $priceSetId = $fields['price_set_id'] ?? NULL;
+    if ($priceSetId) {
       // don't allow price set w/ membership.
       if ($hasMembershipBlk) {
-        $errors['price_set_id'] = ts('You cannot enable both a Contribution Price Set and Membership Signup on the same online contribution page.');
+        $errors['price_set_id'] = ts('You cannot enable both Membership Signup and a Contribution Price Set on the same online contribution page.');
       }
     }
     else {
@@ -533,7 +540,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     if (array_key_exists('payment_processor', $params) &&
       !CRM_Utils_System::isNull($params['payment_processor'])
     ) {
-      $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($params['payment_processor']));
+      $params['payment_processor'] = array_keys($params['payment_processor']);
     }
     else {
       $params['payment_processor'] = 'null';
@@ -620,7 +627,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
               $priceSetId = $usedPriceSetId;
             }
             else {
-              if ($priceFieldId = CRM_Utils_Array::value('price_field_id', $params)) {
+              $priceFieldId = $params['price_field_id'] ?? NULL;
+              if ($priceFieldId) {
                 foreach ($params['price_field_value'] as $arrayID => $fieldValueID) {
                   if (empty($params['label'][$arrayID]) && empty($params['value'][$arrayID]) && !empty($fieldValueID)) {
                     CRM_Price_BAO_PriceFieldValue::setIsActive($fieldValueID, '0');
@@ -687,7 +695,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
               CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
 
-              if (!$priceFieldID = CRM_Utils_Array::value('id', $editedResults)) {
+              $priceFieldID = $editedResults['id'] ?? NULL;
+              if (!$priceFieldID) {
                 $fieldParams = [
                   'name' => 'other_amount',
                   'label' => ts('Other Amount'),
@@ -752,7 +761,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
             $deletePledgeBlk = FALSE;
             $pledgeBlockParams = [
               'entity_id' => $contributionPageID,
-              'entity_table' => ts('civicrm_contribution_page'),
+              'entity_table' => 'civicrm_contribution_page',
             ];
             if ($this->_pledgeBlockID) {
               $pledgeBlockParams['id'] = $this->_pledgeBlockID;

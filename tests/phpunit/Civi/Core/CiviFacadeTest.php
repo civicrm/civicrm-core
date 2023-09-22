@@ -5,7 +5,9 @@ class CiviFacadeTest extends \CiviUnitTestCase {
 
   protected $origSetting;
 
-  protected function setUp() {
+  protected $mandates;
+
+  protected function setUp(): void {
     $this->origSetting = $GLOBALS['civicrm_setting'];
 
     parent::setUp();
@@ -14,7 +16,7 @@ class CiviFacadeTest extends \CiviUnitTestCase {
     $this->mandates = [];
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $GLOBALS['civicrm_setting'] = $this->origSetting;
     parent::tearDown();
   }
@@ -22,7 +24,7 @@ class CiviFacadeTest extends \CiviUnitTestCase {
   /**
    * Get the the settingsbag for a logged-in user.
    */
-  public function testContactSettings_loggedIn() {
+  public function testContactSettings_loggedIn(): void {
     $this->createLoggedInUser();
     $settingsBag = \Civi::contactSettings();
     $settingsBag->set('foo', 'bar');
@@ -31,16 +33,16 @@ class CiviFacadeTest extends \CiviUnitTestCase {
 
   /**
    * Anonymous users don't have a SettingsBag.
-   * @expectedException \CRM_Core_Exception
    */
-  public function testContactSettings_anonFail() {
+  public function testContactSettings_anonFail(): void {
+    $this->expectException(\CRM_Core_Exception::class);
     \Civi::contactSettings();
   }
 
   /**
    * Get the SettingsBag for a specific user.
    */
-  public function testContactSettings_byId() {
+  public function testContactSettings_byId(): void {
     $cid = \CRM_Core_DAO::singleValueQuery('SELECT MIN(id) FROM civicrm_contact');
     $settingsBag = \Civi::contactSettings($cid);
     $settingsBag->set('foo', 'bar');

@@ -13,6 +13,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Relationship ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.0</add>
   </field>
   <primaryKey>
@@ -21,10 +24,13 @@
   </primaryKey>
   <field>
     <name>child_group_id</name>
-    <title>Child Group</title>
+    <title>Child Group ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID of the child group</comment>
+    <html>
+      <label>Child Group</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>
@@ -36,10 +42,13 @@
   </foreignKey>
   <field>
     <name>parent_group_id</name>
-    <title>Parent Group</title>
+    <title>Parent Group ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID of the parent group</comment>
+    <html>
+      <label>Parent Group</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>

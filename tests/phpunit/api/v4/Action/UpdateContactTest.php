@@ -14,34 +14,31 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace api\v4\Action;
 
 use Civi\Api4\Contact;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
+use Civi\Test\TransactionalInterface;
 
 /**
  * Class UpdateContactTest
  * @package api\v4\Action
  * @group headless
  */
-class UpdateContactTest extends UnitTestCase {
+class UpdateContactTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testUpdateWithIdInWhere() {
-    $contactId = Contact::create()
-      ->setCheckPermissions(FALSE)
+  public function testUpdateWithIdInWhere(): void {
+    $contactId = Contact::create(FALSE)
       ->addValue('first_name', 'Johann')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
       ->execute()
       ->first()['id'];
 
-    $contact = Contact::update()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::update(FALSE)
       ->addWhere('id', '=', $contactId)
       ->addValue('first_name', 'Testy')
       ->execute()
@@ -50,17 +47,15 @@ class UpdateContactTest extends UnitTestCase {
     $this->assertEquals('Tester', $contact['last_name']);
   }
 
-  public function testUpdateWithIdInValues() {
-    $contactId = Contact::create()
-      ->setCheckPermissions(FALSE)
+  public function testUpdateWithIdInValues(): void {
+    $contactId = Contact::create(FALSE)
       ->addValue('first_name', 'Bobby')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
       ->execute()
       ->first()['id'];
 
-    $contact = Contact::update()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::update(FALSE)
       ->addValue('id', $contactId)
       ->addValue('first_name', 'Billy')
       ->execute();

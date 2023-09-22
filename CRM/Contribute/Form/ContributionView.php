@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  *
  * @package CRM
@@ -22,41 +24,71 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $id = $this->get('id');
+    $id = $this->getID();
+
+    // Check permission for action.
+    $actionMapping = [
+      CRM_Core_Action::VIEW => 'get',
+      CRM_Core_Action::ADD => 'create',
+      CRM_Core_Action::UPDATE => 'update',
+      CRM_Core_Action::DELETE => 'delete',
+    ];
+    if (!$this->isHasAccess($actionMapping[$this->_action])) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+    }
     $params = ['id' => $id];
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $context);
 
-    $values = CRM_Contribute_BAO_Contribution::getValuesWithMappings($params);
+    // Note than this get could be restricted by ACLs in an extension
+    $contribution = Contribution::get(TRUE)->addWhere('id', '=', $id)->addSelect('*')->execute()->first();
+    if (empty($contribution)) {
+      CRM_Core_Error::statusBounce(ts('Access to contribution not permitted'));
+    }
+    // We just cast here because it was traditionally an array called values - would be better
+    // just to use 'contribution'.
+    $values = (array) $contribution;
+    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $values['contribution_status_id']);
 
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && $this->_action & CRM_Core_Action::VIEW) {
-      $financialTypeID = CRM_Contribute_PseudoConstant::financialType($values['financial_type_id']);
-      CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'view');
-      if (CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'edit', FALSE)) {
-        $this->assign('canEdit', TRUE);
-      }
-      if (CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'delete', FALSE)) {
-        $this->assign('canDelete', TRUE);
-      }
-      if (!CRM_Core_Permission::check('view contributions of type ' . $financialTypeID)) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+    $this->addExpectedSmartyVariables([
+      'hookDiscount',
+      'pricesetFieldsCount',
+      'pcp_id',
+      'getTaxDetails',
+      // currencySymbol maybe doesn't make sense but is probably old?
+      'currencySymbol',
+    ]);
+
+    // @todo - it might have been better to create a new form that extends this
+    // for template contributions rather than overloading this form.
+    $force_create_template = CRM_Utils_Request::retrieve('force_create_template', 'Boolean', $this, FALSE, FALSE);
+    if ($force_create_template && !empty($values['contribution_recur_id']) && empty($values['is_template'])) {
+      // Create a template contribution.
+      $templateContributionId = CRM_Contribute_BAO_ContributionRecur::ensureTemplateContributionExists($values['contribution_recur_id']);
+      if (!empty($templateContributionId)) {
+        $id = $templateContributionId;
+        $params = ['id' => $id];
+        $values = CRM_Contribute_BAO_Contribution::getValuesWithMappings($params);
       }
     }
-    elseif ($this->_action & CRM_Core_Action::VIEW) {
-      $this->assign('noACL', TRUE);
-    }
+    $this->assign('is_template', $values['is_template']);
+
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
 
+    $values['contribution_page_title'] = '';
     if (!empty($values['contribution_page_id'])) {
       $contribPages = CRM_Contribute_PseudoConstant::contributionPage(NULL, TRUE);
       $values['contribution_page_title'] = CRM_Utils_Array::value(CRM_Utils_Array::value('contribution_page_id', $values), $contribPages);
     }
 
     // get received into i.e to_financial_account_id from last trxn
-    $financialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($values['contribution_id'], 'DESC');
+    $financialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getID(), 'DESC');
     $values['to_financial_account'] = '';
+    $values['payment_processor_name'] = '';
     if (!empty($financialTrxnId['financialTrxnId'])) {
       $values['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $financialTrxnId['financialTrxnId'], 'to_financial_account_id');
       if ($values['to_financial_account_id']) {
@@ -79,19 +111,47 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       }
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', NULL, $id, 0, CRM_Utils_Array::value('financial_type_id', $values));
+    try {
+      $participantLineItems = \Civi\Api4\LineItem::get()
+        ->addSelect('entity_id', 'participant.role_id:label', 'participant.fee_level', 'participant.contact_id', 'contact.display_name')
+        ->addJoin('Participant AS participant', 'LEFT', ['participant.id', '=', 'entity_id'])
+        ->addJoin('Contact AS contact', 'LEFT', ['contact.id', '=', 'participant.contact_id'])
+        ->addWhere('entity_table', '=', 'civicrm_participant')
+        ->addWhere('contribution_id', '=', $id)
+        ->addGroupBy('entity_id')
+        ->execute();
+    }
+    catch (CRM_Core_Exception $e) {
+      // likely don't have permission for events/participants
+      $participantLineItems = [];
+    }
+
+    $associatedParticipants = empty($participantLineItems) ? FALSE : [];
+    foreach ($participantLineItems as $participant) {
+      $associatedParticipants[] = [
+        'participantLink' => CRM_Utils_System::url('civicrm/contact/view/participant',
+          "action=view&reset=1&id={$participant['entity_id']}&cid={$participant['participant.contact_id']}&context=home"
+        ),
+        'participantName' => $participant['contact.display_name'],
+        'fee' => implode(', ', $participant['participant.fee_level'] ?? []),
+        'role' => implode(', ', $participant['participant.role_id:label']),
+      ];
+    }
+    $this->assign('associatedParticipants', $associatedParticipants);
+
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', NULL, $id, 0, $values['financial_type_id'] ?? NULL,
+      NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $id);
 
     $premiumId = NULL;
-    if ($id) {
-      $dao = new CRM_Contribute_DAO_ContributionProduct();
-      $dao->contribution_id = $id;
-      if ($dao->find(TRUE)) {
-        $premiumId = $dao->id;
-        $productID = $dao->product_id;
-      }
+    $dao = new CRM_Contribute_DAO_ContributionProduct();
+    $dao->contribution_id = $id;
+    if ($dao->find(TRUE)) {
+      $premiumId = $dao->id;
+      $productID = $dao->product_id;
     }
 
+    $this->assign('premium', '');
     if ($premiumId) {
       $productDAO = new CRM_Contribute_DAO_Product();
       $productDAO->id = $productID;
@@ -107,6 +167,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $values['note'] = array_values($noteValue);
 
     // show billing address location details, if exists
+    $values['billing_address'] = '';
     if (!empty($values['address_id'])) {
       $addressParams = ['id' => $values['address_id']];
       $addressDetails = CRM_Core_BAO_Address::getValues($addressParams, FALSE, 'id');
@@ -115,56 +176,32 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     //assign soft credit record if exists.
-    $SCRecords = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($values['contribution_id'], TRUE);
-    if (!empty($SCRecords['soft_credit'])) {
-      $this->assign('softContributions', $SCRecords['soft_credit']);
-      unset($SCRecords['soft_credit']);
-    }
-
-    //assign pcp record if exists
+    $SCRecords = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->getID(), TRUE);
+    $this->assign('softContributions', empty($SCRecords['soft_credit']) ? NULL : $SCRecords['soft_credit']);
+    // unset doesn't complain if array member missing
+    unset($SCRecords['soft_credit']);
     foreach ($SCRecords as $name => $value) {
       $this->assign($name, $value);
     }
 
-    $lineItems = [];
-    $displayLineItems = FALSE;
-    if ($id) {
-      $lineItems = [CRM_Price_BAO_LineItem::getLineItemsByContributionID(($id))];
-      $firstLineItem = reset($lineItems[0]);
-      if (empty($firstLineItem['price_set_id'])) {
-        // CRM-20297 All we care is that it's not QuickConfig, so no price set
-        // is no problem.
-        $displayLineItems = TRUE;
-      }
-      else {
-        try {
-          $priceSet = civicrm_api3('PriceSet', 'getsingle', [
-            'id' => $firstLineItem['price_set_id'],
-            'return' => 'is_quick_config, id',
-          ]);
-          $displayLineItems = !$priceSet['is_quick_config'];
-        }
-        catch (CiviCRM_API3_Exception $e) {
-          throw new CRM_Core_Exception('Cannot find price set by ID');
-        }
-      }
-    }
+    $lineItems = [CRM_Price_BAO_LineItem::getLineItemsByContributionID(($id))];
     $this->assign('lineItem', $lineItems);
-    $this->assign('displayLineItems', $displayLineItems);
     $values['totalAmount'] = $values['total_amount'];
     $this->assign('displayLineItemFinancialType', TRUE);
 
     //do check for campaigns
-    if ($campaignId = CRM_Utils_Array::value('campaign_id', $values)) {
+    $values['campaign'] = '';
+    $campaignId = $values['campaign_id'] ?? NULL;
+    if ($campaignId) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
     }
-    if ($values['contribution_status'] == 'Refunded') {
+    if ($contributionStatus === 'Refunded') {
       $this->assign('refund_trxn_id', CRM_Core_BAO_FinancialTrxn::getRefundTransactionTrxnID($id));
     }
 
     // assign values to the template
-    $this->assign($values);
+    $this->assignVariables($values, array_keys($values));
     $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
     $this->assign('invoicing', $invoicing);
     $this->assign('isDeferred', Civi::settings()->get('deferred_revenue_enabled'));
@@ -172,16 +209,20 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $this->assign('totalTaxAmount', $values['tax_amount']);
     }
 
+    // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
     $displayName = CRM_Contact_BAO_Contact::displayName($values['contact_id']);
     $this->assign('displayName', $displayName);
-
     // Check if this is default domain contact CRM-10482
     if (CRM_Contact_BAO_Contact::checkDomainContact($values['contact_id'])) {
       $displayName .= ' (' . ts('default organization') . ')';
     }
 
-    // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-    CRM_Utils_System::setTitle(ts('View Contribution from') . ' ' . $displayName);
+    if (empty($values['is_template'])) {
+      $this->setTitle(ts('View Contribution from') . ' ' . $displayName);
+    }
+    else {
+      $this->setTitle(ts('View Template Contribution from') . ' ' . $displayName);
+    }
 
     // add viewed contribution to recent items list
     $url = CRM_Utils_System::url('civicrm/contact/view/contribution',
@@ -211,20 +252,82 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     );
     $statusOptionValueNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $contributionStatus = $statusOptionValueNames[$values['contribution_status_id']];
-    if (in_array($contributionStatus, ['Partially paid', 'Pending refund'])
-        || ($contributionStatus == 'Pending' && $values['is_pay_later'])
-        ) {
-      if ($contributionStatus == 'Pending refund') {
-        $this->assign('paymentButtonName', ts('Record Refund'));
+    $this->assign('addRecordPayment', in_array($contributionStatus, ['Partially paid', 'Pending refund', 'Pending']));
+    $this->assignPaymentInfoBlock($id);
+
+    $searchKey = NULL;
+    if ($this->controller->_key) {
+      $searchKey = $this->controller->_key;
+    }
+
+    if ($this->isHasAccess('update')) {
+      $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=update&context={$context}";
+      if (($context === 'fulltext' || $context === 'search') && $searchKey) {
+        $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=update&context={$context}&key={$searchKey}";
+      }
+      if (!$contribution['is_template']) {
+        foreach (CRM_Contribute_BAO_Contribution::getContributionPaymentLinks($this->getID(), $contributionStatus) as $paymentButton) {
+          $paymentButton['icon'] = 'fa-plus-circle';
+          $linkButtons[] = $paymentButton;
+        }
+      }
+      $linkButtons[] = [
+        'title' => ts('Edit'),
+        'url' => 'civicrm/contact/view/contribution',
+        'qs' => $urlParams,
+        'icon' => 'fa-pencil',
+        'accessKey' => 'e',
+        'ref' => '',
+        'name' => '',
+        'extra' => '',
+      ];
+    }
+
+    if ($this->isHasAccess('delete')) {
+      $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=delete&context={$context}";
+      if (($context === 'fulltext' || $context === 'search') && $searchKey) {
+        $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=delete&context={$context}&key={$searchKey}";
+      }
+      $linkButtons[] = [
+        'title' => ts('Delete'),
+        'url' => 'civicrm/contact/view/contribution',
+        'qs' => $urlParams,
+        'icon' => 'fa-trash',
+        'accessKey' => '',
+        'ref' => '',
+        'name' => '',
+        'extra' => '',
+      ];
+    }
+
+    $pdfUrlParams = "reset=1&id={$id}&cid={$values['contact_id']}";
+    $emailUrlParams = "reset=1&id={$id}&cid={$values['contact_id']}&select=email";
+    if (Civi::settings()->get('invoicing') && !$contribution['is_template']) {
+      if (($values['contribution_status'] !== 'Refunded') && ($values['contribution_status'] !== 'Cancelled')) {
+        $invoiceButtonText = ts('Download Invoice');
       }
       else {
-        $this->assign('paymentButtonName', ts('Record Payment'));
+        $invoiceButtonText = ts('Download Invoice and Credit Note');
       }
-      $this->assign('addRecordPayment', TRUE);
-      $this->assign('contactId', $values['contact_id']);
-      $this->assign('componentId', $id);
-      $this->assign('component', 'contribution');
+      $linkButtons[] = [
+        'title' => $invoiceButtonText,
+        'url' => 'civicrm/contribute/invoice',
+        'qs' => $pdfUrlParams,
+        'class' => 'no-popup',
+        'icon' => 'fa-download',
+      ];
+      $linkButtons[] = [
+        'title' => ts('Email Invoice'),
+        'url' => 'civicrm/contribute/invoice/email',
+        'qs' => $emailUrlParams,
+        'icon' => 'fa-paper-plane',
+      ];
     }
+    $this->assign('linkButtons', $linkButtons ?? []);
+    // These next 3 parameters are used to construct a url in PaymentInfo.tpl
+    $this->assign('contactId', $values['contact_id']);
+    $this->assign('componentId', $id);
+    $this->assign('component', 'contribution');
     $this->assignPaymentInfoBlock($id);
   }
 
@@ -260,9 +363,40 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($id, 'contribution', TRUE);
     $title = ts('View Payment');
     $this->assign('transaction', TRUE);
+    // Used in paymentInfoBlock.tpl
     $this->assign('payments', $paymentInfo['transaction']);
     $this->assign('paymentLinks', $paymentInfo['payment_links']);
     return $title;
+  }
+
+  /**
+   * @param string $action
+   *
+   * @return bool
+   */
+  private function isHasAccess(string $action): bool {
+    try {
+      return Contribution::checkAccess()
+        ->setAction($action)
+        ->addValue('id', $this->getID())
+        ->execute()->first()['access'];
+    }
+    catch (CRM_Core_Exception $e) {
+      return FALSE;
+    }
+  }
+
+  /**
+   * Get the contribution ID.
+   *
+   * @return int
+   */
+  private function getID(): int {
+    $id = $this->get('id');
+    if (empty($id)) {
+      CRM_Core_Error::statusBounce('Contribution ID is required');
+    }
+    return $id;
   }
 
 }

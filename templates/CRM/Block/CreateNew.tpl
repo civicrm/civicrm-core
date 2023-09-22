@@ -33,7 +33,7 @@
             {if $short.shortCuts}
               <ul>
                 {foreach from=$short.shortCuts item=shortCut}
-                  <li><a href="{$shortCut.url}" class="crm-{$shortCut.ref}">{$shortCut.title}</a></li>
+                  <li><a href="{$shortCut.url}" class="crm-{$shortCut.ref}">{$shortCut.title|smarty:nodefaults}</a></li>
                 {/foreach}
               </ul>
             {/if}

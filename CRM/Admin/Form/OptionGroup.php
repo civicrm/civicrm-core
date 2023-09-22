@@ -21,6 +21,11 @@
 class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -35,7 +40,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
-    CRM_Utils_System::setTitle(ts('Dropdown Options'));
+    $this->setTitle(ts('Dropdown Options'));
 
     $this->applyFilter('__ALL__', 'trim');
 
@@ -89,7 +94,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
    *   The input form values.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return bool|array
    *   true if no errors, else array of errors
@@ -103,7 +108,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       $name = CRM_Utils_String::titleToVar(strtolower($fields['title']));
     }
     if (!CRM_Core_DAO::objectExists($name, 'CRM_Core_DAO_OptionGroup', $self->_id)) {
-      $errors['title'] = ts('Option Group name ' . $name . ' already exists in the database. Option Group Names need to be unique');
+      $errors['title'] = ts("Option Group name '%1' already exists in the database. Option Group Names must be unique.", [1 => $name]);
     }
     return empty($errors) ? TRUE : $errors;
   }
@@ -115,7 +120,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
     CRM_Utils_System::flushCache();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Core_BAO_OptionGroup::del($this->_id);
+      CRM_Core_BAO_OptionGroup::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts('Selected option group has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
@@ -133,7 +138,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       }
 
       $optionGroup = CRM_Core_BAO_OptionGroup::add($params);
-      CRM_Core_Session::setStatus(ts('The Option Group \'%1\' has been saved.', [1 => $optionGroup->name]), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('The Option Group \'%1\' has been saved.', [1 => $optionGroup->title]), ts('Saved'), 'success');
     }
   }
 

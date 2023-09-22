@@ -14,7 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
  */
 class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
 
@@ -73,6 +72,7 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
     // get the element containing the upload
     $element = &$page->getElement($uploadName);
     if ('file' == $element->getType()) {
+      /** @var HTML_QuickForm_file $element */
       if ($element->isUploadedFile()) {
         // rename the uploaded file with a unique number at the end
         $value = $element->getValue();

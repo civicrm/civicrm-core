@@ -1,0 +1,8 @@
+<div class="progress">
+  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{ $ctrl.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ $ctrl.progress }}%">
+    <span class="sr-only">{{ ts('%1% Complete', {1: $ctrl.progress}) }}</span>
+  </div>
+</div>
+<p class="help-block">
+  {{ ts('Processing records %1 - %2', {1: 1 + $ctrl.first, 2: $ctrl.last}) }}
+</p>

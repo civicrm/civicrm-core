@@ -21,7 +21,7 @@
  */
 class api_v3_SystemCheckTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
   }

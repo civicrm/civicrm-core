@@ -23,12 +23,12 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
-  public function createUser(&$params, $mail) {
+  public function createUser(&$params, $mailParam) {
     $form_state = form_state_defaults();
 
     $form_state['input'] = [
       'name' => $params['cms_name'],
-      'mail' => $params[$mail],
+      'mail' => $params[$mailParam],
       'op' => 'Create new account',
     ];
 
@@ -100,25 +100,13 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if username and email exists in the drupal db.
-   *
-   * @param array $params
-   *   Array of name and mail values.
-   * @param array $errors
-   *   Array of errors.
-   * @param string $emailName
-   *   Field label for the 'email'.
+   * @inheritdoc
    */
-  public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
-    $config = CRM_Core_Config::singleton();
-
-    $dao = new CRM_Core_DAO();
-    $name = $dao->escape(CRM_Utils_Array::value('name', $params));
-    $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
-    $errors = form_get_errors();
-    if ($errors) {
-      // unset drupal messages to avoid twice display of errors
+  public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
+    if ($drupal_errors = form_get_errors()) {
+      // unset Drupal messages to avoid twice display of errors
       unset($_SESSION['messages']);
+      $errors = array_merge($errors, $drupal_errors);
     }
 
     if (!empty($params['name'])) {
@@ -315,11 +303,22 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     require_once 'DB.php';
 
+    /* Before we do any loading, let's start the session and write to it.
+     * We typically call authenticate only when we need to bootstrap the CMS
+     * directly via Civi and hence bypass the normal CMS auth and bootstrap
+     * process typically done in CLI and cron scripts. See: CRM-12648
+     */
+    $session = CRM_Core_Session::singleton();
+    $session->set('civicrmInitSession', TRUE);
+
     $config = CRM_Core_Config::singleton();
 
-    $dbDrupal = DB::connect($config->userFrameworkDSN);
-    if (DB::isError($dbDrupal)) {
-      throw new CRM_Core_Exception("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
+    $ufDSN = CRM_Utils_SQL::autoSwitchDSN($config->userFrameworkDSN);
+    try {
+      $dbDrupal = DB::connect($ufDSN);
+    }
+    catch (Exception $e) {
+      throw new CRM_Core_Exception("Cannot connect to drupal db via $ufDSN, " . $e->getMessage());
     }
 
     $account = $userUid = $userMail = NULL;
@@ -490,10 +489,6 @@ AND    u.status = 1
     // @ to suppress notices eg 'DRUPALFOO already defined'.
     @drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 
-    // explicitly setting error reporting, since we cannot handle drupal related notices
-    // @todo 1 = E_ERROR, but more to the point setting error reporting deep in code
-    // causes grief with debugging scripts
-    error_reporting(1);
     if (!function_exists('module_exists')) {
       if ($throwError) {
         throw new Exception('Sorry, could not load drupal bootstrap.');
@@ -518,7 +513,7 @@ AND    u.status = 1
     // all the modules that are listening on it, does not apply
     // to J! and WP as yet
     // CRM-8655
-    CRM_Utils_Hook::config($config);
+    CRM_Utils_Hook::config($config, ['uf' => TRUE]);
 
     if (!$loadUser) {
       return TRUE;
@@ -527,8 +522,8 @@ AND    u.status = 1
     $uid = $params['uid'] ?? NULL;
     if (!$uid) {
       //load user, we need to check drupal permissions.
-      $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $_REQUEST));
-      $pass = CRM_Utils_Array::value('pass', $params, FALSE) ? $params['pass'] : trim(CRM_Utils_Array::value('pass', $_REQUEST));
+      $name = !empty($params['name']) ? $params['name'] : trim($_REQUEST['name'] ?? '');
+      $pass = !empty($params['pass']) ? $params['pass'] : trim($_REQUEST['pass'] ?? '');
 
       if ($name) {
         $uid = user_authenticate($name, $pass);
@@ -543,7 +538,7 @@ AND    u.status = 1
 
     if ($uid) {
       $account = user_load($uid);
-      if ($account && $account->uid) {
+      if ($account && $account->uid && $account->status) {
         global $user;
         $user = $account;
         return TRUE;
@@ -561,6 +556,7 @@ AND    u.status = 1
     $config->cleanURL = (int) variable_get('clean_url', '0');
 
     // CRM-8655: Drupal wasn't available during bootstrap, so hook_civicrm_config never executes
+    // FIXME: This call looks redundant with the earlier call in the same function. Consider removing it.
     CRM_Utils_Hook::config($config);
 
     return FALSE;
@@ -851,8 +847,89 @@ AND    u.status = 1
       if (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != 'update') {
         module_invoke_all('exit');
       }
-      drupal_session_commit();
+      if (!defined('_CIVICRM_FAKE_SESSION')) {
+        drupal_session_commit();
+      }
     }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function viewsIntegration(): string {
+    global $databases;
+    $config = CRM_Core_Config::singleton();
+    $text = '';
+    $drupal_prefix = '';
+    if (isset($databases['default']['default']['prefix'])) {
+      if (is_array($databases['default']['default']['prefix'])) {
+        $drupal_prefix = $databases['default']['default']['prefix']['default'];
+      }
+      else {
+        $drupal_prefix = $databases['default']['default']['prefix'];
+      }
+    }
+
+    if ($this->viewsExists() &&
+      (
+        $config->dsn != $config->userFrameworkDSN || !empty($drupal_prefix)
+      )
+    ) {
+      $text = '<div>' . ts('To enable CiviCRM Views integration, add or update the following item in the <code>settings.php</code> file:') . '</div>';
+
+      $tableNames = CRM_Core_DAO::getTableNames();
+      asort($tableNames);
+      $text .= '<pre>$databases[\'default\'][\'default\'][\'prefix\']= [';
+
+      // Add default prefix.
+      $text .= "\n  'default' => '$drupal_prefix',";
+      $prefix = $this->getCRMDatabasePrefix();
+      foreach ($tableNames as $tableName) {
+        $text .= "\n  '" . str_pad($tableName . "'", 41) . " => '{$prefix}',";
+      }
+      $text .= "\n];</pre>";
+    }
+
+    return $text;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    $ret = FALSE;
+
+    if (!$print) {
+      if ($maintenance) {
+        drupal_set_breadcrumb('');
+        drupal_maintenance_theme();
+        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+          CRM_Utils_System::addHTMLHead($region->render(''));
+        }
+        print theme('maintenance_page', ['content' => $content]);
+        exit();
+      }
+      $ret = TRUE;
+    }
+    $out = $content;
+
+    if ($ret) {
+      return $out;
+    }
+    else {
+      print $out;
+      return NULL;
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function ipAddress():?string {
+    // Drupal function handles the server being behind a proxy securely. We
+    // still have legacy ipn methods that reach this point without bootstrapping
+    // hence the check that the fn exists.
+    return function_exists('ip_address') ? ip_address() : ($_SERVER['REMOTE_ADDR'] ?? NULL);
   }
 
 }

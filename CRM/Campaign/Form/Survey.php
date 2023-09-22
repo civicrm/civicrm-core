@@ -72,7 +72,7 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
       CRM_Campaign_BAO_Survey::retrieve($params, $surveyInfo);
       $this->_surveyTitle = $surveyInfo['title'];
       $this->assign('surveyTitle', $this->_surveyTitle);
-      CRM_Utils_System::setTitle(ts('Configure Survey - %1', [1 => $this->_surveyTitle]));
+      $this->setTitle(ts('Configure Survey - %1', [1 => $this->_surveyTitle]));
     }
 
     $this->assign('action', $this->_action);
@@ -168,15 +168,13 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   /**
    * @return string
    */
-  public function getTemplateFileName() {
-    if ($this->controller->getPrint() || $this->getVar('_surveyId') <= 0) {
+  public function getTemplateFileName(): string {
+    if ($this->_surveyId <= 0 || $this->controller->getPrint()) {
       return parent::getTemplateFileName();
     }
-    else {
-      // hack lets suppress the form rendering for now
-      self::$_template->assign('isForm', FALSE);
-      return 'CRM/Campaign/Form/Survey/Tab.tpl';
-    }
+    // hack lets suppress the form rendering for now
+    self::$_template->assign('isForm', FALSE);
+    return 'CRM/Campaign/Form/Survey/Tab.tpl';
   }
 
 }

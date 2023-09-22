@@ -25,7 +25,7 @@ class CRM_Invoicing_Utils {
    * @param bool $newValue
    * @param array $metadata
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function onToggle($oldValue, $newValue, $metadata) {
     if ($oldValue == $newValue) {
@@ -55,11 +55,7 @@ class CRM_Invoicing_Utils {
    * We check both here. But will deprecate the latter in time.
    */
   public static function isInvoicingEnabled() {
-    if (Civi::settings()->get('invoicing')) {
-      return TRUE;
-    }
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    return $invoiceSettings['invoicing'] ?? NULL;
+    return Civi::settings()->get('invoicing');
   }
 
   /**

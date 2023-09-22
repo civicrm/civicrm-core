@@ -236,7 +236,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
    */
   public static function whereClauseSingle(&$values, &$query) {
     $checkPermission = empty($query->_skipPermission);
-    list($name, $op, $value, $grouping, $wildcard) = $values;
+    [$name, $op, $value, $grouping, $wildcard] = $values;
     $fields = array_merge(CRM_Event_BAO_Event::fields(), CRM_Event_BAO_Participant::exportableFields());
     $fieldSpec = $fields[$values[0]] ?? [];
 
@@ -323,7 +323,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
             "Boolean"
           );
 
-          $isTest = $value ? 'a Test' : 'not a Test';
+          $isTest = $value ? ts('a Test') : ts('not a Test');
           $query->_qill[$grouping][] = ts("Participant is %1", [1 => $isTest]);
           $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         }
@@ -335,6 +335,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
           $labels[] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
         }
         $query->_where[$grouping][] = "civicrm_line_item.price_field_value_id IN (" . implode(', ', $value) . ")";
+        $query->_where[$grouping][] = "civicrm_line_item.qty > 0";
         $query->_qill[$grouping][] = ts("Fee level") . " IN " . implode(', ', $labels);
         $query->_tables['civicrm_participant'] = $query->_tables['civicrm_line_item'] = $query->_whereTables['civicrm_line_item'] = 1;
         return;
@@ -388,7 +389,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         }
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$tableName.$name", $op, $value, $dataType);
 
-        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
+        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [1 => $fields[$qillName]['title'], 2 => $op, 3 => $value]);
         $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         return;
@@ -413,7 +414,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$tableName.$name", $op, $value, $dataType);
         }
 
-        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
+        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [1 => $fields[$qillName]['title'], 2 => $op, 3 => $value]);
         $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         return;
@@ -447,7 +448,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         if (!array_key_exists($qillName, $fields)) {
           break;
         }
-        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Event', $name, $value, $op, ['check_permission' => $checkPermission]);
+        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Event', $name, $value, $op, ['check_permission' => $checkPermission]);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [1 => $fields[$qillName]['title'], 2 => $op, 3 => $value]);
         return;
 
@@ -568,7 +569,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   /**
    * Get the metadata for fields to be included on the grant search form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
@@ -587,7 +588,6 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
    *
    * @param \CRM_Event_Form_Search $form
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public static function buildSearchForm(&$form) {
@@ -640,6 +640,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
 
     $form->addRule('participant_fee_amount_low', ts('Please enter a valid money value.'), 'money');
     $form->addRule('participant_fee_amount_high', ts('Please enter a valid money value.'), 'money');
+    $form->add('number', 'participant_id', ts('Participant ID'), ['class' => 'four', 'min' => 1]);
 
     self::addCustomFormFields($form, ['Participant', 'Event']);
 

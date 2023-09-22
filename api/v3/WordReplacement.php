@@ -24,7 +24,7 @@
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_word_replacement_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

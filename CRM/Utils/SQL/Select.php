@@ -10,7 +10,10 @@
  */
 
 /**
- * Dear God Why Do I Have To Write This (Dumb SQL Builder)
+ * Object-oriented SQL builder for SELECT queries.
+ *
+ * This class is foundational to CiviCRM's query functionality for the API,
+ * SearchKit, ScheduledReminders, MailingRecipients, etc.
  *
  * Usage:
  * ```
@@ -69,8 +72,11 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   private $insertInto = NULL;
   private $insertVerb = 'INSERT INTO ';
   private $insertIntoFields = [];
+  private $onDuplicates = [];
   private $selects = [];
   private $from;
+  private $setOps;
+  private $setAlias;
   private $joins = [];
   private $wheres = [];
   private $groupBys = [];
@@ -93,6 +99,27 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
+   * Create a new SELECT-like query by performing set-operations (e.g. UNION).
+   *
+   * For example, if you want to query two tables and treat the results as one combined-set, then
+   * this is s a set-operation.
+   *
+   * $queryA = CRM_Utils_SQL_Select::from('table_a');
+   * $queryB = CRM_Utils_SQL_Select::from('table_b');
+   * $querySet = CRM_Utils_SQL_Select::fromSet()->union('DISTINCT', [$queryA, $queryB])->toSQL();
+   *
+   * @param array $options
+   *   Ex: ['setAlias' => 'uniondata']
+   * @return CRM_Utils_SQL_Select
+   */
+  public static function fromSet($options = []) {
+    $options = array_merge(['setAlias' => '_sql_set'], $options);
+    $result = new self(NULL, $options);
+    $result->setOps = [];
+    return $result;
+  }
+
+  /**
    * Create a partial SELECT query.
    *
    * @param array $options
@@ -112,6 +139,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   public function __construct($from, $options = []) {
     $this->from = $from;
     $this->mode = $options['mode'] ?? self::INTERPOLATE_AUTO;
+    $this->setAlias = $options['setAlias'] ?? NULL;
   }
 
   /**
@@ -127,7 +155,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    * Merge something or other.
    *
    * @param array|CRM_Utils_SQL_Select $other
-   * @param array|NULL $parts
+   * @param array|null $parts
    *   ex: 'joins', 'wheres'
    * @return CRM_Utils_SQL_Select
    */
@@ -179,7 +207,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    * Note: To add multiple JOINs at once, use $name===NULL and
    * pass an array of $exprs.
    *
-   * @param string|NULL $name
+   * @param string|null $name
    *   The effective alias of the joined table.
    * @param string|array $exprs
    *   The complete join expression (eg "INNER JOIN mytable myalias ON mytable.id = maintable.foo_id").
@@ -330,6 +358,53 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
+   * Add a union to the list of set operations.
+   *
+   * Ex: CRM_Utils_SQL_Select::fromSet()->union([$subQuery1, $subQuery2])
+   * Ex: CRM_Utils_SQL_Select::fromSet()->union($subQuery1)->union($subQuery2);
+   *
+   * @param string $type "DISTINCT"|"ALL"
+   * @param CRM_Utils_SQL_Select[]|CRM_Utils_SQL_Select $subQueries
+   * @return $this
+   */
+  public function union(string $type, $subQueries) {
+    return $this->setOp("UNION $type", $subQueries);
+  }
+
+  /**
+   * Add a set operation.
+   *
+   * Ex: CRM_Utils_SQL_Select::fromSet()->setOp('INTERSECT', [$subQuery1, $subQuery2])
+   *
+   * @param string $setOperation
+   *   Ex: 'UNION DISTINCT', 'UNION ALL'.
+   *   TODO: 'INTERSECT', 'EXCEPT' when moving to MySQL 8.
+   * @param CRM_Utils_SQL_Select[]|CRM_Utils_SQL_Select $subQueries
+   * @return $this
+   * @see https://dev.mysql.com/doc/refman/8.0/en/set-operations.html
+   */
+  public function setOp(string $setOperation, $subQueries) {
+    // TODO: Support more ops like 'INTERSECT' & 'EXCEPT'
+    $supportedOps = ['UNION DISTINCT', 'UNION ALL'];
+    if (!in_array($setOperation, $supportedOps, TRUE)) {
+      throw new CRM_Core_Exception("Unsupported set-operation '$setOperation'. Must be one of (" . implode(', ', $supportedOps) . ')');
+    }
+    if ($this->from !== NULL || !is_array($this->setOps)) {
+      throw new CRM_Core_Exception("Set-operation '$setOperation' must have a list of subqueries. Primitive FROM is not supported.");
+    }
+    $subQueries = is_array($subQueries) ? $subQueries : [$subQueries]; /* Simple (array)cast would mishandle objects. */
+    foreach ($subQueries as $subQuery) {
+      if ($this->setOps === []) {
+        $this->setOps[] = ['', $subQuery];
+      }
+      else {
+        $this->setOps[] = [" $setOperation ", $subQuery];
+      }
+    }
+    return $this;
+  }
+
+  /**
    * Insert the results of the SELECT query into another
    * table.
    *
@@ -374,6 +449,45 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
+   * Take the results of the SELECT query and copy them into another
+   * table.
+   *
+   * If the same record already exists in the other table (based on
+   * primary-key or unique-key), then update the corresponding record.
+   *
+   * @param string $table
+   *   The table to write data into.
+   * @param array|string $keys
+   *   List of PK/unique fields
+   *   NOTE: This must match the unique-key that was declared in the schema.
+   * @param array $mapping
+   *   List of values to select and where to send them.
+   *
+   *   For example, consider:
+   *     ['relationship_id' => 'rel.id']
+   *
+   *   This would select the value of 'rel.id' and write to 'relationship_id'.
+   *
+   * @param null|array $args
+   *   Use NULL to skip interpolation; use an array of variables to enable.
+   * @return $this
+   */
+  public function syncInto($table, $keys, $mapping, $args = NULL) {
+    $keys = (array) $keys;
+
+    $this->select(array_values($mapping), $args);
+    $this->insertInto($table, array_keys($mapping));
+
+    foreach ($mapping as $intoColumn => $fromValue) {
+      if (!in_array($intoColumn, $keys)) {
+        $this->onDuplicate("$intoColumn = $fromValue", $args);
+      }
+    }
+
+    return $this;
+  }
+
+  /**
    * @param array $fields
    *   The fields to fill in the other table (in order).
    * @return CRM_Utils_SQL_Select
@@ -387,7 +501,23 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
-   * @param array|NULL $parts
+   * For INSERT INTO...SELECT...' queries, you may give an "ON DUPLICATE UPDATE" clause.
+   *
+   * @param string|array $exprs list of SQL expressions
+   * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
+   * @return CRM_Utils_SQL_Select
+   */
+  public function onDuplicate($exprs, $args = NULL) {
+    $exprs = (array) $exprs;
+    foreach ($exprs as $expr) {
+      $evaluatedExpr = $this->interpolate($expr, $args);
+      $this->onDuplicates[$evaluatedExpr] = $evaluatedExpr;
+    }
+    return $this;
+  }
+
+  /**
+   * @param array|null $parts
    *   List of fields to check (e.g. 'selects', 'joins').
    *   Defaults to all.
    * @return bool
@@ -439,6 +569,14 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
     if ($this->from !== NULL) {
       $sql .= 'FROM ' . $this->from . "\n";
     }
+    elseif (is_array($this->setOps)) {
+      $sql .= 'FROM (';
+      foreach ($this->setOps as $setOp) {
+        $sql .= $setOp[0];
+        $sql .= '(' . (is_object($setOp[1]) ? $setOp[1]->toSQL() : $setOp[1]) . ')';
+      }
+      $sql .= ") {$this->setAlias}\n";
+    }
     foreach ($this->joins as $join) {
       $sql .= $join . "\n";
     }
@@ -463,6 +601,15 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
         $sql .= 'OFFSET ' . $this->offset . "\n";
       }
     }
+    if ($this->onDuplicates) {
+      if ($this->insertVerb === 'INSERT INTO ') {
+        $sql .= ' ON DUPLICATE KEY UPDATE ' . implode(", ", $this->onDuplicates) . "\n";
+      }
+      else {
+        throw new \Exception("The ON DUPLICATE clause and only be used with INSERT INTO queries.");
+      }
+    }
+
     if ($this->mode === self::INTERPOLATE_OUTPUT) {
       $sql = $this->interpolate($sql, $this->params, self::INTERPOLATE_OUTPUT);
     }
@@ -475,7 +622,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    * To examine the results, use a function like `fetch()`, `fetchAll()`,
    * `fetchValue()`, or `fetchMap()`.
    *
-   * @param string|NULL $daoName
+   * @param string|null $daoName
    *   The return object should be an instance of this class.
    *   Ex: 'CRM_Contact_BAO_Contact'.
    * @param bool $i18nRewrite
@@ -492,13 +639,19 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
     // Don't pass through $abort, $trapException. Just use straight-up exceptions.
     $abort = TRUE;
     $trapException = FALSE;
-    $errorScope = CRM_Core_TemporaryErrorScope::useException();
 
     // Don't pass through freeDAO. You can do it yourself.
     $freeDAO = FALSE;
 
     return CRM_Core_DAO::executeQuery($this->toSQL(), $params, $abort, $daoName,
       $freeDAO, $i18nRewrite, $trapException);
+  }
+
+  /**
+   * @return string
+   */
+  public function getFrom(): string {
+    return $this->from;
   }
 
 }

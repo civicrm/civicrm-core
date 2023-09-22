@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!--  $Id: custom_group_activity_type.xml 23352 2009-08-19 21:52:45Z walt $  -->
 <dataset>
     <civicrm_custom_group
         id="9"

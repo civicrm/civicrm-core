@@ -1,0 +1,31 @@
+<af-form ctrl="modelListCtrl" >
+  <div crm-ui-debug="modelListCtrl.getEntity('parent')" />
+  <div crm-ui-debug="modelListCtrl.getData('parent')" />
+  <af-entity type="Contact" data="{contact_type: 'Individual'}" name="parent" label="Parent" url-autofill="1" autofill="user" />
+  <af-entity type="Contact" data="{contact_type: 'Individual'}" name="spouse" label="Spouse" contact-relationship="['Spouse of', 'parent']" />
+
+  <fieldset af-fieldset="parent">
+    <legend class="af-text">About You</legend>
+
+    <div class="af-container af-layout-inline">
+      <af-field name="first_name" />
+      <af-field name="last_name" />
+    </div>
+    <af-field name="gender_id" defn="{options: [{id: 1, label: 'Girl'}, {id: 2, label: 'Boy'}, {id: 3, label: 'Other'}]}"/>
+    <af-field name="constituent_information.Marital_Status" />
+    <af-field name="constituent_information.Marriage_Date" />
+    <af-field name="constituent_information.Most_Important_Issue" />
+  </fieldset>
+
+  <div af-fieldset="spouse" ng-if="modelListCtrl.getData('parent')['constituent_information.Marital_Status'] == 'M'">
+    <h3 class="af-text text-center">About Your Spouse</h3>
+    <p class="af-text">Only visible if you are married.</p>
+    <af-field name="first_name" defn='{title: ts("Spouse First Name")}' />
+    <af-field name="last_name" defn='{title: ts("Spouse Last Name")}' />
+    <af-field name="do_not_email" />
+  </div>
+
+  <!-- General elements: FIELDSET, UL, BUTTON, P, H1 should work anywhere -->
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="modelListCtrl.submit()">Submit</button>
+
+</af-form>

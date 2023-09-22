@@ -6,11 +6,15 @@
   <name>civicrm_action_mapping</name>
   <comment>Table to store mapping for the reminder.</comment>
   <add>3.4</add>
+  <drop>5.64</drop>
   <field>
     <name>id</name>
     <title>Action Mapping ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.4</add>
   </field>
   <primaryKey>

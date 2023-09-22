@@ -23,7 +23,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   /**
    * Test we can set a contact ID.
    */
-  public function testSetContactID() {
+  public function testSetContactID(): void {
     // Do things proper.
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID(123);
@@ -33,7 +33,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     // (php should throw its own warnings about this because of the signature)
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID('123');
-    $this->assertInternalType('int', $propertyBag->getContactID());
+    $this->assertIsInt($propertyBag->getContactID());
     $this->assertEquals(123, $propertyBag->getContactID());
 
     // Test we can have different labels
@@ -45,11 +45,60 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   /**
-   * Test we cannot set an invalid contact ID.
+   * Test we can set an amount.
    *
-   * @expectedException \InvalidArgumentException
+   * @see https://github.com/civicrm/civicrm-core/pull/18219
+   *
+   * @dataProvider setAmountDataProvider
+   *
+   * @param mixed $value input
+   * @param mixed $expect output expected. Typically a string like '1.23' or NULL
+   * @param string $expectedExceptionMessage if there is one expected.
    */
-  public function testSetContactIDFailsIfInvalid() {
+  public function testSetAmount($value, $expect, $expectedExceptionMessage = '') {
+    $propertyBag = new PropertyBag();
+    try {
+      $propertyBag->setAmount($value);
+    }
+    catch (\Exception $e) {
+      if ($expectedExceptionMessage) {
+        $this->assertEquals($expectedExceptionMessage, $e->getMessage(), 'Expected a different exception.');
+        // OK.
+        return;
+      }
+      // not expecting an exception, re-throw it.
+      throw $e;
+    }
+    $got = $propertyBag->getAmount();
+    $this->assertIsString($got);
+    $this->assertEquals($expect, $got);
+  }
+
+  /**
+   *
+   */
+  public function setAmountDataProvider() {
+    return [
+      [1, '1'],
+      [1.23, '1.23'],
+      [1.234, '1.234'],
+      [-1.23, '-1.23'],
+      ['1', '1'],
+      ['1.23', '1.23'],
+      ['1.234', '1.234'],
+      ['-1.23', '-1.23'],
+      ['1,000.23', NULL, 'setAmount requires a numeric amount value'],
+      ['1,000', NULL, 'setAmount requires a numeric amount value'],
+      ['1,23', NULL, 'setAmount requires a numeric amount value'],
+      ['1.230,12', NULL, 'setAmount requires a numeric amount value'],
+    ];
+  }
+
+  /**
+   * Test we cannot set an invalid contact ID.
+   */
+  public function testSetContactIDFailsIfInvalid(): void {
+    $this->expectException(\InvalidArgumentException::class);
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID(0);
   }
@@ -57,8 +106,9 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   /**
    * Test we can set a contact ID the wrong way
    */
-  public function testSetContactIDLegacyWay() {
+  public function testSetContactIDLegacyWay(): void {
     $propertyBag = new PropertyBag();
+    $propertyBag->setSuppressLegacyWarnings(FALSE);
 
     // To prevent E_USER_DEPRECATED errors during phpunit tests we take a copy
     // of the existing error_reporting.
@@ -98,7 +148,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   /**
    * Test that emails set by the legacy method of 'email-5' can be retrieved with getEmail.
    */
-  public function testSetBillingEmailLegacy() {
+  public function testSetBillingEmailLegacy(): void {
     $localPropertyBag = PropertyBag::cast(['email-' . \CRM_Core_BAO_LocationType::getBilling() => 'a@b.com']);
     $this->assertEquals('a@b.com', $localPropertyBag->getEmail());
   }
@@ -108,7 +158,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    *
    * See https://github.com/civicrm/civicrm-core/pull/17292
    */
-  public function testRecurProcessorIDNull() {
+  public function testRecurProcessorIDNull(): void {
     $bag = new PropertyBag();
     $bag->setRecurProcessorID(NULL);
     $value = $bag->getRecurProcessorID();
@@ -117,7 +167,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
   /**
    */
-  public function testMergeInputs() {
+  public function testMergeInputs(): void {
     $propertyBag = PropertyBag::cast([
       'contactID' => 123,
       'contributionRecurID' => 456,
@@ -129,7 +179,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   /**
    * Test we can set and access custom props.
    */
-  public function testSetCustomProp() {
+  public function testSetCustomProp(): void {
     $oldLevel = error_reporting();
     $ignoreUserDeprecatedErrors = $oldLevel & ~E_USER_DEPRECATED;
 
@@ -141,6 +191,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Test we can do this with array, although we should get a warning.
     $propertyBag = new PropertyBag();
+    $propertyBag->setSuppressLegacyWarnings(FALSE);
 
     // Set by array access should cause deprecated error.
     try {
@@ -173,11 +224,10 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
   /**
    * Test we can't set a custom prop that we know about.
-   *
-   * @expectedException \InvalidArgumentException
-   * @expectedExceptionMessage Attempted to set 'contactID' via setCustomProperty - must use using its setter.
    */
-  public function testSetCustomPropFails() {
+  public function testSetCustomPropFails(): void {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('Attempted to set \'contactID\' via setCustomProperty - must use using its setter.');
     $propertyBag = new PropertyBag();
     $propertyBag->setCustomProperty('contactID', 123);
   }
@@ -186,11 +236,10 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    * Test we get NULL for custom prop that was not set.
    *
    * This is only for backward compatibility/ease of transition. One day it would be nice to throw an exception instead.
-   *
-   * @expectedException \BadMethodCallException
-   * @expectedExceptionMessage Property 'aCustomProp' has not been set.
    */
-  public function testGetCustomPropFails() {
+  public function testGetCustomPropFails(): void {
+    $this->expectException(\BadMethodCallException::class);
+    $this->expectExceptionMessage('Property \'aCustomProp\' has not been set.');
     $propertyBag = new PropertyBag();
     // Tricky test. We need to ignore deprecation errors, we're testing deprecated behaviour,
     // but we need to listen out for a different exception.
@@ -276,7 +325,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   /**
    * Test the require method works.
    */
-  public function testRequire() {
+  public function testRequire(): void {
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID(123);
     $propertyBag->setDescription('foo');
@@ -293,7 +342,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   /**
    * Test retrieves using CRM_Utils_Array::value still work.
    */
-  public function testUtilsArray() {
+  public function testUtilsArray(): void {
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID(123);
     // This will throw deprecation notices but we don't care.
@@ -309,7 +358,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
   /**
    */
-  public function testEmpty() {
+  public function testEmpty(): void {
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID(123);
     $propertyBag->setRecurProcessorID('');
@@ -360,9 +409,10 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   /**
-   *
    * Data provider for testOtherParams
+   * $prop, $legacy_names, $valid_values, $invalid_values
    *
+   * return array
    */
   public function otherParamsDataProvider() {
     $valid_bools = [['0' , FALSE], ['', FALSE], [0, FALSE], [FALSE, FALSE], [TRUE, TRUE], [1, TRUE], ['1', TRUE]];
@@ -371,14 +421,14 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $valid_ints = [[123, 123], ['123', 123]];
     $invalid_ints = [-1, 0, NULL, ''];
     return [
-      ['billingStreetAddress', [], $valid_strings_inc_null, []],
+      ['billingStreetAddress', ['billing_street_address', 'street_address', 'billing_street_address-5'], $valid_strings_inc_null, []],
       ['billingSupplementalAddress1', [], $valid_strings_inc_null, []],
       ['billingSupplementalAddress2', [], $valid_strings_inc_null, []],
       ['billingSupplementalAddress3', [], $valid_strings_inc_null, []],
-      ['billingCity', [], $valid_strings_inc_null, []],
-      ['billingPostalCode', [], $valid_strings_inc_null, []],
+      ['billingCity', ['billing_city', 'city', 'billing_city-5'], $valid_strings_inc_null, []],
+      ['billingPostalCode', ['billing_postal_code', 'postal_code', 'billing_postal_code-5'], $valid_strings_inc_null, []],
       ['billingCounty', [], $valid_strings_inc_null, []],
-      ['billingCountry', [], [['GB', 'GB'], ['NZ', 'NZ']], ['XX', '', NULL, 0]],
+      ['billingStateProvince', ['billing_state_province', 'state_province', 'billing_state_province-5'], $valid_strings_inc_null, []],
       ['contributionID', ['contribution_id'], $valid_ints, $invalid_ints],
       ['contributionRecurID', ['contribution_recur_id'], $valid_ints, $invalid_ints],
       ['description', [], [['foo' , 'foo'], ['', '']], []],
@@ -398,10 +448,80 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   /**
+   * Billing country is a mess.
+   */
+  public function testBillingCountry(): void {
+
+    // Test designed use
+    foreach (['NZ', 'GB'] as $valid) {
+      $propertyBag = new PropertyBag();
+      $propertyBag->setBillingCountry($valid);
+      $this->assertEquals($valid, $propertyBag->getBillingCountry());
+      $this->assertCount(0, $propertyBag->logs);
+    }
+
+    // Many sorts of nothingness
+    foreach ([NULL, 0, FALSE] as $bad) {
+      $propertyBag = new PropertyBag();
+      $propertyBag->ignoreDeprecatedWarningsInFunction = 'setBillingCountry';
+      $propertyBag->setBillingCountry($bad);
+      $this->assertCount(1, $propertyBag->logs);
+      $latestLog = end($propertyBag->logs);
+      $this->assertMatchesRegularExpression("/setBillingCountry input warnings.*Expected string.*munged to: \"\"/s", $latestLog);
+      $this->assertEquals('', $propertyBag->getBillingCountry());
+    }
+
+    // '' special case
+    $propertyBag = new PropertyBag();
+    $propertyBag->ignoreDeprecatedWarningsInFunction = 'setBillingCountry';
+    $propertyBag->setBillingCountry('');
+    $this->assertCount(1, $propertyBag->logs);
+    $latestLog = end($propertyBag->logs);
+    $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\n.*munged to: ""/', $latestLog);
+    $this->assertEquals('', $propertyBag->getBillingCountry());
+
+    // Invalid country name
+    $propertyBag = new PropertyBag();
+    $propertyBag->ignoreDeprecatedWarningsInFunction = 'setBillingCountry';
+    $propertyBag->setBillingCountry('UnitedKing');
+    $this->assertCount(1, $propertyBag->logs);
+    $latestLog = end($propertyBag->logs);
+    $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\nGiven input did not match a country name\.\n.*munged to: ""/', $latestLog);
+    $this->assertEquals('', $propertyBag->getBillingCountry());
+
+    // Valid country name
+    $propertyBag = new PropertyBag();
+    $propertyBag->ignoreDeprecatedWarningsInFunction = 'setBillingCountry';
+    $propertyBag->setBillingCountry('United Kingdom');
+    $this->assertCount(1, $propertyBag->logs);
+    $latestLog = end($propertyBag->logs);
+    $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\nGiven input matched a country name.*?\n.*munged to: "GB"/', $latestLog);
+    $this->assertEquals('GB', $propertyBag->getBillingCountry());
+
+    // Invalid country ID
+    $propertyBag = new PropertyBag();
+    $propertyBag->ignoreDeprecatedWarningsInFunction = 'setBillingCountry';
+    $propertyBag->setBillingCountry(-1);
+    $this->assertCount(1, $propertyBag->logs);
+    $latestLog = end($propertyBag->logs);
+    $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nExpected string\nGiven input looked like it could be a country ID but did not.*?\n.*munged to: ""/', $latestLog);
+    $this->assertEquals('', $propertyBag->getBillingCountry());
+
+    // Valid country ID
+    $propertyBag = new PropertyBag();
+    $propertyBag->ignoreDeprecatedWarningsInFunction = 'setBillingCountry';
+    $propertyBag->setBillingCountry(1154); /* should be New Zealand */
+    $this->assertCount(1, $propertyBag->logs);
+    $latestLog = end($propertyBag->logs);
+    $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nExpected string\nGiven input matched a country ID.*?\n.*munged to: "NZ"/', $latestLog);
+    $this->assertEquals('NZ', $propertyBag->getBillingCountry());
+  }
+
+  /**
    * Test generic getter, setter methods.
    *
    */
-  public function testGetterAndSetter() {
+  public function testGetterAndSetter(): void {
     $propertyBag = new PropertyBag();
 
     $propertyBag->setter('contactID', 123);

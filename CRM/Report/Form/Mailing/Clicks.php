@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
 
@@ -31,12 +29,6 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     'Organization',
   ];
 
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
-
   /**
    * This report has not been optimised for group filtering.
    *
@@ -44,9 +36,8 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -157,7 +148,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     ];
 
     $this->_columns['civicrm_mailing_trackable_url'] = [
-      'dao' => 'CRM_Mailing_DAO_TrackableURL',
+      'dao' => 'CRM_Mailing_DAO_MailingTrackableURL',
       'fields' => [
         'url' => [
           'title' => ts('Click through URL'),
@@ -180,7 +171,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     ];
 
     $this->_columns['civicrm_mailing_event_trackable_url_open'] = [
-      'dao' => 'CRM_Mailing_Event_DAO_TrackableURLOpen',
+      'dao' => 'CRM_Mailing_Event_DAO_MailingEventTrackableURLOpen',
       'fields' => [
         'time_stamp' => [
           'title' => ts('Click Date'),
@@ -200,6 +191,13 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
         ],
       ],
       'grouping' => 'mailing-fields',
+    ];
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
     ];
 
     $this->_groupFilter = TRUE;
@@ -249,7 +247,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */

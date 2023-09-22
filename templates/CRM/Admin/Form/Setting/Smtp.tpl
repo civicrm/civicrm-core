@@ -12,8 +12,8 @@
   <h3>{ts}General{/ts}</h3>
      <table class="form-layout-compressed">
        <tr class="crm-smtp-form-block-allow_mail_from_logged_in_contact">
-         <td class="label">{$form.allow_mail_from_logged_in_contact.html}</td>
          <td>{$form.allow_mail_from_logged_in_contact.label} {help id=allow_mail_contact_email}</td>
+         <td class="label">{$form.allow_mail_from_logged_in_contact.html}</td>
        </tr>
      </table>
   </div>
@@ -85,7 +85,7 @@
         </div>
         <div class="spacer"></div>
         <div class="crm-submit-buttons">
-            {include file="CRM/common/formButtons.tpl"}
+            {include file="CRM/common/formButtons.tpl" location=''}
         </div>
 
 {literal}

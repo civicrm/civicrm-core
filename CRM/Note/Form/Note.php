@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -26,6 +24,8 @@
  *
  */
 class CRM_Note_Form_Note extends CRM_Core_Form {
+
+  use CRM_Core_Form_EntityFormTrait;
 
   /**
    * The table name, used when editing/creating a note
@@ -40,13 +40,6 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    * @var int
    */
   protected $_entityId;
-
-  /**
-   * The note id, used when editing the note
-   *
-   * @var int
-   */
-  protected $_id;
 
   /**
    * The parent note id, used when adding a comment to a note
@@ -74,8 +67,8 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   *
-   * @return void
+   * @return array
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $defaults = [];
@@ -89,9 +82,12 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
         $defaults['parent_id'] = $defaults['entity_id'];
       }
     }
-    elseif ($this->_action & CRM_Core_Action::ADD && $this->_parentId) {
-      $defaults['parent_id'] = $this->_parentId;
-      $defaults['subject'] = 'Re: ' . CRM_Core_BAO_Note::getNoteSubject($this->_parentId);
+    elseif ($this->_action & CRM_Core_Action::ADD) {
+      $defaults['note_date'] = date('Y-m-d H:i:s');
+      if ($this->_parentId) {
+        $defaults['parent_id'] = $this->_parentId;
+        $defaults['subject'] = 'Re: ' . CRM_Core_BAO_Note::getNoteSubject($this->_parentId);
+      }
     }
     return $defaults;
   }
@@ -132,6 +128,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     }
 
     $this->addField('subject');
+    $this->addField('note_date', [], TRUE, FALSE);
     $this->addField('note', [], TRUE);
     $this->addField('privacy');
     $this->add('hidden', 'parent_id');
@@ -164,7 +161,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $params['contact_id'] = $session->get('userID');
 
-    if ($params['parent_id']) {
+    if (!empty($params['parent_id'])) {
       $params['entity_table'] = 'civicrm_note';
       $params['entity_id'] = $params['parent_id'];
     }
@@ -174,7 +171,9 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Core_BAO_Note::del($this->_id);
+      CRM_Core_BAO_Note::deleteRecord(['id' => $this->_id]);
+      $status = ts('Selected Note has been deleted successfully.');
+      CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
       return;
     }
 
@@ -188,6 +187,9 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
 
     $ids = [];
     $note = CRM_Core_BAO_Note::add($params, $ids);
+
+    // Required for postProcess hooks
+    $this->setEntityId($note->id);
 
     CRM_Core_Session::setStatus(ts('Your Note has been saved.'), ts('Saved'), 'success');
   }

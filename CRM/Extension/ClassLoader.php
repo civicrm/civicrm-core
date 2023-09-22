@@ -15,6 +15,21 @@
 class CRM_Extension_ClassLoader {
 
   /**
+   * List of class-loader features that are valid in this version of Civi.
+   *
+   * This may be useful for some extensions which enable/disable polyfills based on environment.
+   */
+  const FEATURES = ',psr0,psr4,';
+
+  /**
+   * A list of recently-activated extensions. This list is retained
+   * even if some ill-advised part of the installer does a `ClassLoader::refresh()`.
+   *
+   * @var array
+   */
+  private static $newExtensions = [];
+
+  /**
    * @var CRM_Extension_Mapper
    */
   protected $mapper;
@@ -57,21 +72,22 @@ class CRM_Extension_ClassLoader {
   public function register() {
     // In pre-installation environments, don't bother with caching.
     if (!defined('CIVICRM_DSN') || defined('CIVICRM_TEST') || \CRM_Utils_System::isInUpgradeMode()) {
-      return $this->buildClassLoader()->register();
+      $this->loader = $this->buildClassLoader();
+      return $this->loader->register();
     }
 
     $file = $this->getCacheFile();
     if (file_exists($file)) {
-      $loader = require $file;
+      $this->loader = require $file;
     }
     else {
-      $loader = $this->buildClassLoader();
-      $ser = serialize($loader);
+      $this->loader = $this->buildClassLoader();
+      $ser = serialize($this->loader);
       file_put_contents($file,
         sprintf("<?php\nreturn unserialize(%s);", var_export($ser, 1))
       );
     }
-    return $loader->register();
+    return $this->loader->register();
   }
 
   /**
@@ -87,18 +103,10 @@ class CRM_Extension_ClassLoader {
       if ($status !== CRM_Extension_Manager::STATUS_INSTALLED) {
         continue;
       }
-      $path = $this->mapper->keyToBasePath($key);
-      $info = $this->mapper->keyToInfo($key);
-      if (!empty($info->classloader)) {
-        foreach ($info->classloader as $mapping) {
-          switch ($mapping['type']) {
-            case 'psr4':
-              $loader->addPsr4($mapping['prefix'], $path . '/' . $mapping['path']);
-              break;
-          }
-          $result[] = $mapping;
-        }
-      }
+      self::loadExtension($loader, $this->mapper->keyToInfo($key), $this->mapper->keyToBasePath($key));
+    }
+    foreach (static::$newExtensions as $record) {
+      static::loadExtension($loader, $record[0], $record[1]);
     }
 
     return $loader;
@@ -121,10 +129,62 @@ class CRM_Extension_ClassLoader {
   }
 
   /**
+   * Add a newly installed extension to the active classloader.
+   *
+   * NOTE: This is intended for use by CRM/Extension subsystem during installation.
+   *
+   * @param \CRM_Extension_Info $info
+   * @param string $path
+   */
+  public function installExtension(CRM_Extension_Info $info, string $path): void {
+    $file = $this->getCacheFile();
+    if (file_exists($file)) {
+      unlink($file);
+    }
+    static::$newExtensions[] = [$info, $path];
+    if ($this->loader) {
+      self::loadExtension($this->loader, $info, $path);
+    }
+  }
+
+  /**
+   * Read the extension metadata configure a classloader.
+   *
+   * @param \Composer\Autoload\ClassLoader $loader
+   * @param \CRM_Extension_Info $info
+   * @param string $path
+   */
+  private static function loadExtension(\Composer\Autoload\ClassLoader $loader, CRM_Extension_Info $info, string $path): void {
+    if (!empty($info->classloader)) {
+      foreach ($info->classloader as $mapping) {
+        switch ($mapping['type']) {
+          case 'psr0':
+            $loader->add($mapping['prefix'], CRM_Utils_File::addTrailingSlash($path . '/' . $mapping['path']));
+            break;
+
+          case 'psr4':
+            $loader->addPsr4($mapping['prefix'], $path . '/' . $mapping['path']);
+            if (defined('CIVICRM_TEST')) {
+              if (is_dir($path . '/tests/phpunit/' . $mapping['path'])) {
+                $loader->addPsr4($mapping['prefix'], $path . '/tests/phpunit/' . $mapping['path']);
+              }
+            }
+            break;
+        }
+      }
+    }
+  }
+
+  /**
    * @return string
    */
   protected function getCacheFile() {
-    $envId = \CRM_Core_Config_Runtime::getId();
+    $envId = md5(implode(',', array_merge(
+      [\CRM_Core_Config_Runtime::getId()],
+      array_column($this->mapper->getActiveModuleFiles(), 'prefix')
+      // dev/core#4055 - When toggling ext's on systems with opcode caching, you may get stale reads for a moment.
+      // New cache key ensures new data-set.
+    )));
     $file = \Civi::paths()->getPath("[civicrm.compile]/CachedExtLoader.{$envId}.php");
     return $file;
   }

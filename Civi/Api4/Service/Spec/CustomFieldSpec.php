@@ -10,32 +10,23 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Service\Spec;
 
 class CustomFieldSpec extends FieldSpec {
   /**
    * @var int
    */
-  protected $customFieldId;
+  public $customFieldId;
 
   /**
    * @var int
    */
-  protected $customGroup;
+  public $customGroup;
 
   /**
    * @var string
    */
-  protected $tableName;
+  public $type = 'Custom';
 
   /**
    * @inheritDoc
@@ -44,6 +35,10 @@ class CustomFieldSpec extends FieldSpec {
     switch ($dataType) {
       case 'ContactReference':
         $this->setFkEntity('Contact');
+        $dataType = 'Integer';
+        break;
+
+      case 'EntityReference':
         $dataType = 'Integer';
         break;
 
@@ -89,24 +84,6 @@ class CustomFieldSpec extends FieldSpec {
    */
   public function setCustomGroupName($customGroupName) {
     $this->customGroup = $customGroupName;
-
-    return $this;
-  }
-
-  /**
-   * @return string
-   */
-  public function getCustomTableName() {
-    return $this->tableName;
-  }
-
-  /**
-   * @param string $customFieldColumnName
-   *
-   * @return $this
-   */
-  public function setCustomTableName($customFieldColumnName) {
-    $this->tableName = $customFieldColumnName;
 
     return $this;
   }

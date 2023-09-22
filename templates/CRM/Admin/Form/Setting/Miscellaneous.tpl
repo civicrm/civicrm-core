@@ -8,8 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-miscellaneous-form-block">
-   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
     <table class="form-layout">
       <tr class="crm-miscellaneous-form-block-checksum_timeout">
         <td class="label">{$form.checksum_timeout.label}</td>
@@ -17,7 +15,6 @@
             <span class="description">{ts}The number of days before a personalized (hashed) link will expire.{/ts}</span></td>
       </tr>
     </table>
-
     <table class="form-layout">
       <tr class="crm-miscellaneous-form-block-contact_undelete">
         <td class="label">{$form.contact_undelete.label}</td>
@@ -31,10 +28,20 @@
         <td>
           {$form.logging.html}<br />
         {if $validTriggerPermission}
-          <p class="description">{ts}If enabled, all actions will be logged with a complete record of changes.{/ts}</p>
+          {if $isMultilingual}
+            <p class="description">{ts}Logging is not supported in multilingual environments.{/ts}</p>
+          {else}
+            <p class="description">{ts}If enabled, all actions will be logged with a complete record of changes.{/ts}</p>
+          {/if}
         {else}
           <p class="description">{ts}In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.{/ts}&nbsp;{ts}This functionality cannot be enabled on multilingual installations.{/ts}</p>
-         {/if}
+        {/if}
+        </td>
+      </tr>
+      <tr class="crm-miscellaneous-form-block-enableBackgroundQueue">
+        <td class="label">{$form.enableBackgroundQueue.label}</td>
+        <td>{$form.enableBackgroundQueue.html}<br />
+          <span class="description">{$setting_descriptions.enableBackgroundQueue}</span>
         </td>
       </tr>
       <tr class="crm-miscellaneous-form-block-doNotAttachPDFReceipt">
@@ -47,6 +54,24 @@
         <td class="label">{$form.recordGeneratedLetters.label}</td>
         <td>{$form.recordGeneratedLetters.html}<br />
           <p class="description">{ts}When generating a letter (PDF/Word) via mail-merge, how should the letter be recorded?{/ts}</p>
+        </td>
+      </tr>
+      <tr class="crm-miscellaneous-form-block-dompdf_font_dir">
+        <td class="label">{$form.dompdf_font_dir.label}</td>
+        <td>{$form.dompdf_font_dir.html}<br />
+          <p class="description">{ts}Additional folder where DOMPDF will look for fonts.{/ts}</p>
+        </td>
+      </tr>
+      <tr class="crm-miscellaneous-form-block-dompdf_chroot">
+        <td class="label">{$form.dompdf_chroot.label}</td>
+        <td>{$form.dompdf_chroot.html}<br />
+          <p class="description">{ts}Folder to restrict where DOMPDF looks when loading local images. By default it is the DOMPDF folder itself for security reasons. It will search in subfolders.{/ts}</p>
+        </td>
+      </tr>
+      <tr class="crm-miscellaneous-form-block-dompdf_enable_remote">
+        <td class="label">{$form.dompdf_enable_remote.label}</td>
+        <td>{$form.dompdf_enable_remote.html}<br />
+          <p class="description">{ts}Enable the use of remote images. By default this is enabled, but if not using remote images you may wish to turn it off for security reasons.{/ts}</p>
         </td>
       </tr>
       <tr class="crm-miscellaneous-form-block-wkhtmltopdfPath">
@@ -73,39 +98,6 @@
         <td class="label">{$form.allow_alert_autodismissal.label}</td>
         <td>{$form.allow_alert_autodismissal.html}<br />
           <p class="description">{ts}If disabled, CiviCRM will not automatically dismiss any alerts after 10 seconds.{/ts}</p>
-        </td>
-      </tr>
-    </table>
-
-    <h3>{ts}reCAPTCHA v2{/ts}</h3>
-    <div class="description">
-      {ts 1='href="https://www.google.com/recaptcha" target="_blank"'}reCAPTCHA is a free service that helps prevent automated abuse of your site. To use it on public-facing CiviCRM forms: sign up at <a %1>Google's reCaptcha site</a>; enter the provided public and private keys here; then enable reCAPTCHA under Advanced Settings in any Profile.{/ts}
-      <br/><strong>{ts}Only the reCAPTCHA v2 checkbox type is supported.{/ts}</strong>
-    </div>
-    <table class="form-layout">
-      <tr class="crm-miscellaneous-form-block-recaptchaPublicKey">
-        <td class="label">{$form.recaptchaPublicKey.label}</td>
-        <td>{$form.recaptchaPublicKey.html}</td>
-      </tr>
-      <tr class="crm-miscellaneous-form-block-recaptchaPrivateKey">
-        <td class="label">{$form.recaptchaPrivateKey.label}</td>
-        <td>{$form.recaptchaPrivateKey.html}</td>
-      </tr>
-      <tr class="crm-miscellaneous-form-block-recaptchaOptions">
-        <td class="label">{$form.recaptchaOptions.label}</td>
-        <td>{$form.recaptchaOptions.html}<br />
-          <span class="description">
-            {ts}You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:'blackglass', lang : 'fr' ).{/ts}
-            <br />
-            {ts 1='href="https://developers.google.com/recaptcha/docs/display#configuration" target="_blank"'}Check the available options at <a %1>Customizing the Look and Feel of reCAPTCHA</a>.{/ts}
-          </span>
-        </td>
-      </tr>
-      <tr class="crm-miscellaneous-form-block-recaptchaPrivateKey">
-        <td class="label">{$form.forceRecaptcha.label}</td>
-        <td>
-          {$form.forceRecaptcha.html}
-          <p class="description">{ts}If enabled, reCAPTCHA will show on all contribution pages.{/ts}</p>
         </td>
       </tr>
     </table>

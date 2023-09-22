@@ -45,8 +45,8 @@ class CRM_Pledge_Task extends CRM_Core_Task {
         self::TASK_EXPORT => [
           'title' => ts('Export pledges'),
           'class' => [
-            'CRM_Export_Form_Select',
-            'CRM_Export_Form_Map',
+            'CRM_Pledge_Export_Form_Select',
+            'CRM_Pledge_Export_Form_Map',
           ],
           'result' => FALSE,
         ],

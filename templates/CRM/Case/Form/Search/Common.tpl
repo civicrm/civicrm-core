@@ -22,10 +22,10 @@
   </tr>
 
   <tr>
-    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="case_start_date"}
+    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="case_start_date" to='' from='' colspan='' class ='' hideRelativeLabel=0}
   </tr>
   <tr>
-    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="case_end_date"}
+    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="case_end_date" to='' from='' colspan='' class ='' hideRelativeLabel=0}
   </tr>
 
   <tr id='case_search_form'>
@@ -41,14 +41,14 @@
         <br />
         {$form.case_owner.html}
       {/if}
-      {if $form.case_deleted}
+      {if !empty($form.case_deleted)}
         <br />
         {$form.case_deleted.html}
         {$form.case_deleted.label}
       {/if}
     </td>
     <td class="crm-case-common-form-block-case_tags">
-      {if $form.case_tags.html}
+      {if !empty($form.case_tags.html)}
         {$form.case_tags.label}<br />
         {$form.case_tags.html}
       {/if}
@@ -59,7 +59,7 @@
     <td colspan="3">{include file="CRM/common/Tagset.tpl" tagsetType='case'}</td>
   </tr>
 
-  {if $caseGroupTree}
+  {if !empty($caseGroupTree)}
     <tr>
       <td colspan="3">
         {include file="CRM/Custom/Form/Search.tpl" groupTree=$caseGroupTree showHideLinks=false}

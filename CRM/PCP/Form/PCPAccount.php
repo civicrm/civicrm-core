@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -36,6 +34,24 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * @var bool
    */
   public $_single;
+
+  /**
+   * Get the active UFGroups (profiles) on this form
+   * Many forms load one or more UFGroups (profiles).
+   * This provides a standard function to retrieve the IDs of those profiles from the form
+   * so that you can implement things such as "is is_captcha field set on any of the active profiles on this form?"
+   *
+   * NOT SUPPORTED FOR USE OUTSIDE CORE EXTENSIONS - Added for reCAPTCHA core extension.
+   *
+   * @return array
+   */
+  public function getUFGroupIDs() {
+    $ufGroupIDs = [];
+    if (!empty($this->_pageId)) {
+      $ufGroupIDs[] = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
+    }
+    return $ufGroupIDs;
+  }
 
   public function preProcess() {
     $session = CRM_Core_Session::singleton();
@@ -84,7 +100,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     $this->assign('pcpComponent', $this->_component);
 
     if ($this->_single) {
-      CRM_Utils_System::setTitle(ts('Update Contact Information'));
+      $this->setTitle(ts('Update Contact Information'));
     }
   }
 
@@ -99,6 +115,34 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       }
 
       CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
+
+      if (!empty($this->_defaults['image_URL'])) {
+        $this->assign("imageURL", CRM_Utils_File::getImageURL($this->_defaults['image_URL']));
+        $this->removeFileRequiredRules('image_URL');
+
+        $deleteExtra = json_encode(ts('Are you sure you want to delete the contact image?'));
+        $deleteURL = [
+          CRM_Core_Action::DELETE => [
+            'name' => ts('Delete Contact Image'),
+            'url' => 'civicrm/contact/image',
+            'qs' => 'reset=1&cid=%%id%%&action=delete&qfKey=%%key%%&pcp=1',
+            'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
+          ],
+        ];
+        $deleteURL = CRM_Core_Action::formLink($deleteURL,
+          CRM_Core_Action::DELETE,
+          [
+            'id' => $this->_contactID,
+            'key' => $this->controller->_key,
+          ],
+          ts('more'),
+          FALSE,
+          'contact.image.delete',
+          'Contact',
+          $this->_contactID
+        );
+        $this->assign('deleteURL', $deleteURL);
+      }
     }
     //set custom field defaults
     foreach ($this->_fields as $name => $field) {
@@ -119,26 +163,25 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    $id = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
-    if (CRM_PCP_BAO_PCP::checkEmailProfile($id)) {
+    $ufGroupID = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
+    if (CRM_PCP_BAO_PCP::checkEmailProfile($ufGroupID)) {
       $this->assign('profileDisplay', TRUE);
     }
     $fields = NULL;
     if ($this->_contactID) {
-      if (CRM_Core_BAO_UFGroup::filterUFGroups($id, $this->_contactID)) {
-        $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD);
+      if (CRM_Core_BAO_UFGroup::filterUFGroups($ufGroupID, $this->_contactID)) {
+        $fields = CRM_Core_BAO_UFGroup::getFields($ufGroupID, FALSE, CRM_Core_Action::ADD);
       }
       $this->addFormRule(['CRM_PCP_Form_PCPAccount', 'formRule'], $this);
     }
     else {
-      CRM_Core_BAO_CMSUser::buildForm($this, $id, TRUE);
+      CRM_Core_BAO_CMSUser::buildForm($this, $ufGroupID, TRUE);
 
-      $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD);
+      $fields = CRM_Core_BAO_UFGroup::getFields($ufGroupID, FALSE, CRM_Core_Action::ADD);
     }
 
     if ($fields) {
       $this->assign('fields', $fields);
-      $addCaptcha = FALSE;
       foreach ($fields as $key => $field) {
         if (isset($field['data_type']) && $field['data_type'] == 'File') {
           // ignore file upload fields
@@ -146,17 +189,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
         }
         CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE);
         $this->_fields[$key] = $field;
-
-        // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
-        if ($field['add_captcha'] && !$this->_contactID) {
-          $addCaptcha = TRUE;
-        }
-      }
-
-      if ($addCaptcha) {
-        $captcha = &CRM_Utils_ReCAPTCHA::singleton();
-        $captcha->add($this);
-        $this->assign('isCaptcha', TRUE);
       }
     }
 
@@ -167,10 +199,19 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       $this->assign('campaignName', CRM_Event_PseudoConstant::event($this->_pageId));
     }
 
+    // get the value from session, this is set if there is any file upload field
+    $uploadNames = $this->get('uploadNames');
+    if (!empty($uploadNames)) {
+      $buttonName = 'upload';
+    }
+    else {
+      $buttonName = 'next';
+    }
+
     if ($this->_single) {
       $button = [
         [
-          'type' => 'next',
+          'type' => $buttonName,
           'name' => ts('Save'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
@@ -183,7 +224,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     }
     else {
       $button[] = [
-        'type' => 'next',
+        'type' => $buttonName,
         'name' => ts('Continue'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
@@ -200,7 +241,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param self $self
    *
    *
    * @return bool|array
@@ -252,7 +293,16 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
     $this->_contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', [], FALSE);
 
-    $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
+    if (!empty($params['image_URL'])) {
+      CRM_Contact_BAO_Contact::processImageParams($params);
+    }
+    $ufGroupID = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
+    $addToGroupId = \Civi\Api4\UFGroup::get(FALSE)
+      ->addSelect('add_to_group_id')
+      ->addWhere('id', '=', $ufGroupID)
+      ->execute()
+      ->first()['add_to_group_id'] ?? NULL;
+    $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID, $addToGroupId);
     $this->set('contactID', $contactID);
 
     if (!empty($params['email'])) {

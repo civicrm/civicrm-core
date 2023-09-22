@@ -7,13 +7,18 @@
   <comment>A Personal Campaign Page Block stores admin configurable status options and rules</comment>
   <add>2.2</add>
   <log>true</log>
+  <component>CiviContribute</component>
+  <title>Personal Campaign Block</title>
   <field>
     <name>id</name>
     <title>PCP Block ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>PCP block Id</comment>
+    <comment>PCP block ID</comment>
     <add>2.2</add>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -39,13 +44,6 @@
     <typeColumn>entity_table</typeColumn>
     <add>2.2</add>
   </dynamicForeignKey>
-  <foreignKey>
-    <name>entity_id</name>
-    <table>civicrm_contribution_page</table>
-    <key>id</key>
-    <add>2.2</add>
-    <drop>4.1</drop>
-  </foreignKey>
   <field>
     <name>target_entity_type</name>
     <title>Target Entity</title>
@@ -72,10 +70,13 @@
   </dynamicForeignKey>
   <field>
     <name>supporter_profile_id</name>
-    <title>Supporter Profile</title>
+    <title>Supporter Profile ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_uf_group.id. Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?</comment>
     <default>NULL</default>
+    <html>
+      <label>Supporter Profile</label>
+    </html>
     <add>2.2</add>
   </field>
   <foreignKey>
@@ -104,7 +105,8 @@
     <title>Approval Required?</title>
     <type>boolean</type>
     <comment>Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?</comment>
-    <default>NULL</default>
+    <default>0</default>
+    <required>true</required>
     <add>2.2</add>
   </field>
   <field>
@@ -112,7 +114,8 @@
     <title>Tell a Friend Enabled?</title>
     <type>boolean</type>
     <comment>Does Personal Campaign Page allow using tell a friend?</comment>
-    <default>NULL</default>
+    <default>0</default>
+    <required>true</required>
     <add>2.2</add>
   </field>
   <field>
@@ -139,6 +142,11 @@
     <type>boolean</type>
     <comment>Is Personal Campaign Page Block enabled/active?</comment>
     <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <add>2.2</add>
   </field>
   <field>

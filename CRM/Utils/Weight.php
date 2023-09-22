@@ -122,14 +122,11 @@ class CRM_Utils_Weight {
    * @return int
    */
   public static function updateOtherWeights($daoName, $oldWeight, $newWeight, $fieldValues = NULL, $weightField = 'weight') {
-    $oldWeight = (int ) $oldWeight;
-    $newWeight = (int ) $newWeight;
+    $oldWeight = (int) $oldWeight;
+    $newWeight = (int) $newWeight;
 
     // max weight is the highest current weight
-    $maxWeight = CRM_Utils_Weight::getMax($daoName, $fieldValues, $weightField);
-    if (!$maxWeight) {
-      $maxWeight = 1;
-    }
+    $maxWeight = self::getMax($daoName, $fieldValues, $weightField) ?: 1;
 
     if ($newWeight > $maxWeight) {
       // calculate new weight, CRM-4133
@@ -154,12 +151,18 @@ class CRM_Utils_Weight {
       return $newWeight;
     }
 
+    // Check for an existing record with this weight
+    $existing = self::query('SELECT', $daoName, $fieldValues, "id", "$weightField = $newWeight");
+    // Nothing to do if no existing record has this weight
+    if (empty($existing->N)) {
+      return $newWeight;
+    }
+
     // if oldWeight not present, indicates new weight is to be added. So create a gap for a new row to be inserted.
     if (!$oldWeight) {
       $additionalWhere = "$weightField >= $newWeight";
       $update = "$weightField = ($weightField + 1)";
       CRM_Utils_Weight::query('UPDATE', $daoName, $fieldValues, $update, $additionalWhere);
-      return $newWeight;
     }
     else {
       if ($newWeight > $oldWeight) {
@@ -171,8 +174,8 @@ class CRM_Utils_Weight {
         $update = "$weightField = ($weightField + 1)";
       }
       CRM_Utils_Weight::query('UPDATE', $daoName, $fieldValues, $update, $additionalWhere);
-      return $newWeight;
     }
+    return $newWeight;
   }
 
   /**
@@ -230,6 +233,11 @@ class CRM_Utils_Weight {
    * @return int
    */
   public static function getMax($daoName, $fieldValues = NULL, $weightField = 'weight') {
+    if (empty($weightField)) {
+      Civi::log()->warning('Missing weight field name for ' . $daoName);
+      return 0;
+    }
+
     $selectField = "MAX(ROUND($weightField)) AS max_weight";
     $weightDAO = CRM_Utils_Weight::query('SELECT', $daoName, $fieldValues, $selectField);
     $weightDAO->fetch();
@@ -262,17 +270,18 @@ class CRM_Utils_Weight {
    *
    * @param string $queryType
    *   SELECT, UPDATE, DELETE.
-   * @param string $daoName
+   * @param CRM_Core_DAO|string $daoName
    *   Full name of the DAO.
    * @param array $fieldValues
    *   Field => value to be used in the WHERE.
    * @param string $queryData
    *   Data to be used, dependent on the query type.
-   * @param null $additionalWhere
-   * @param string $orderBy
+   * @param string|null $additionalWhere
+   *   Optional WHERE field.
+   * @param string|null $orderBy
    *   Optional ORDER BY field.
-   *
-   * @param null $groupBy
+   * @param string|null $groupBy
+   *   Optional GROU{} BY field.
    *
    * @return CRM_Core_DAO
    *   objet that holds the results of the query
@@ -280,18 +289,14 @@ class CRM_Utils_Weight {
   public static function &query(
     $queryType,
     $daoName,
-    $fieldValues = NULL,
+    $fieldValues,
     $queryData,
     $additionalWhere = NULL,
     $orderBy = NULL,
     $groupBy = NULL
   ) {
-
-    require_once str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php";
-
-    $dao = new $daoName();
-    $table = $dao->getTablename();
-    $fields = &$dao->fields();
+    $table = $daoName::getTablename();
+    $fields = $daoName::getSupportedFields();
     $fieldlist = array_keys($fields);
 
     $whereConditions = [];
@@ -304,12 +309,17 @@ class CRM_Utils_Weight {
       foreach ($fieldValues as $fieldName => $value) {
         if (!in_array($fieldName, $fieldlist)) {
           // invalid field specified.  abort.
-          return FALSE;
+          throw new CRM_Core_Exception("Invalid field '$fieldName' for $daoName");
         }
-        $fieldNum++;
-        $whereConditions[] = "$fieldName = %$fieldNum";
-        $fieldType = $fields[$fieldName]['type'];
-        $params[$fieldNum] = [$value, CRM_Utils_Type::typeToString($fieldType)];
+        if (CRM_Utils_System::isNull($value)) {
+          $whereConditions[] = "$fieldName IS NULL";
+        }
+        else {
+          $fieldNum++;
+          $whereConditions[] = "$fieldName = %$fieldNum";
+          $fieldType = $fields[$fieldName]['type'];
+          $params[$fieldNum] = [$value, CRM_Utils_Type::typeToString($fieldType)];
+        }
       }
     }
     $where = implode(' AND ', $whereConditions);
@@ -340,7 +350,7 @@ class CRM_Utils_Weight {
         break;
 
       default:
-        return FALSE;
+        throw new CRM_Core_Exception("Invalid query operation for $daoName");
     }
 
     $resultDAO = CRM_Core_DAO::executeQuery($query, $params);
@@ -348,11 +358,11 @@ class CRM_Utils_Weight {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    * @param string $daoName
    * @param string $idName
-   * @param $returnURL
-   * @param null $filter
+   * @param string $returnURL
+   * @param string|null $filter
    */
   public static function addOrder(&$rows, $daoName, $idName, $returnURL, $filter = NULL) {
     if (empty($rows)) {
@@ -400,8 +410,8 @@ class CRM_Utils_Weight {
         $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&amp;dst={$prevID}&amp;dir=swap\"><img src=\"{$imageURL}/up.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
       }
       else {
-        $links[] = "<img src=\"{$imageURL}/spacer.gif\" class=\"order-icon\">";
-        $links[] = "<img src=\"{$imageURL}/spacer.gif\" class=\"order-icon\">";
+        $links[] = "<span class=\"order-icon\"></span>";
+        $links[] = "<span class=\"order-icon\"></span>";
       }
 
       if ($nextID != 0) {
@@ -412,8 +422,8 @@ class CRM_Utils_Weight {
         $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&amp;dst={$lastID}&amp;dir=last\"><img src=\"{$imageURL}/last.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
       }
       else {
-        $links[] = "<img src=\"{$imageURL}/spacer.gif\" class=\"order-icon\">";
-        $links[] = "<img src=\"{$imageURL}/spacer.gif\" class=\"order-icon\">";
+        $links[] = "<span class=\"order-icon\"></span>";
+        $links[] = "<span class=\"order-icon\"></span>";
       }
       $rows[$id]['weight'] = implode('&nbsp;', $links);
     }
@@ -493,7 +503,7 @@ class CRM_Utils_Weight {
   }
 
   /**
-   * @param $url
+   * @param string $url
    */
   public static function fixOrderOutput($url) {
     if (empty($_GET['snippet']) || $_GET['snippet'] !== 'json') {

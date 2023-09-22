@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -9,23 +8,24 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4;
 
 /**
  * Note entity.
  *
+ * @searchable secondary
+ * @since 5.19
  * @package Civi\Api4
  */
 class Note extends Generic\DAOEntity {
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Note\Get
+   */
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\Note\Get(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
 
 }

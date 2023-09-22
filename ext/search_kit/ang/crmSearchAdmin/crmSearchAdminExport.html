@@ -1,0 +1,38 @@
+<div id="bootstrap-theme">
+  <div class="alert alert-info">
+    <p>
+      <i class="crm-i fa-info-circle"></i>
+      {{:: ts('Search configuration can be copied from here, then pasted into "Import" to e.g. transfer between sites.') }}
+    </p>
+    <p>
+      <i class="crm-i fa-suitcase"></i>
+      {{:: ts('To package for distribution in an extension, use') }}
+      <a ng-href="{{:: $ctrl.apiExplorerLink }}" target="_blank">
+        <u>{{:: ts('API Explorer Export') }}</u>
+        <i class="crm-i fa-external-link"></i>
+      </a>
+    </p>
+  </div>
+  <h4>{{:: ts('Include in output') }}</h4>
+  <div ng-if="!$ctrl.output" style="width: 150px">
+    <div class="crm-search-loading-placeholder"></div>
+    <div class="crm-search-loading-placeholder"></div>
+    <div class="crm-search-loading-placeholder"></div>
+  </div>
+  <div ng-if="$ctrl.output" class="form-group">
+    <div ng-repeat="type in $ctrl.types" class="checkbox">
+      <label ng-class="{disabled: !type.values.length}">
+        <input type="checkbox" ng-disabled="!type.values.length" ng-model="type.enabled" ng-change="$ctrl.refreshOutput()">
+        <span ng-if="type.values.length === 1">{{:: type.title }}</span>
+        <span ng-if="type.values.length !== 1">{{:: type.plural.replace('%1', type.values.length) }}</span>
+      </label>
+    </div>
+  </div>
+  <textarea id="crm-search-admin-export-output-code" class="form-control" readonly ng-model="$ctrl.output" rows="8"></textarea>
+  <div class="btn-group">
+    <button type="button" ng-disabled="!$ctrl.output" class="btn btn-{{ $ctrl.copied ? 'success' : 'primary' }}" ng-click="$ctrl.copyToClipboard()">
+      <i class="crm-i fa-{{ $ctrl.copied ? 'check' : 'clipboard' }}"></i>
+      {{ $ctrl.copied ? ts('Copied to clipboard') : ts('Copy to clipboard') }}
+    </button>
+  </div>
+</div>

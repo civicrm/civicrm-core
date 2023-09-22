@@ -26,9 +26,13 @@ class CiviCaseTestCase extends CiviUnitTestCase {
 
   protected $optionValues;
 
-  protected $_loggedInUser;
+  /**
+   * Tables to truncate as part of cleanup
+   * @var array
+   */
+  protected $tablesToTruncate;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     // CRM-9404 - set-up is a bit cumbersome but had to put something in place to set up activity types & case types
@@ -90,7 +94,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     $enableResult = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $this->assertTrue($enableResult, 'Cannot enable CiviCase in line ' . __LINE__);
 
-    /** @var $hooks \CRM_Utils_Hook_UnitTests */
+    /** @var \CRM_Utils_Hook_UnitTests $hooks  */
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_caseTypes', array($this, 'hook_caseTypes'));
     \CRM_Case_XMLRepository::singleton(TRUE);
@@ -98,8 +102,6 @@ class CiviCaseTestCase extends CiviUnitTestCase {
 
     // create a logged in USER since the code references it for source_contact_id
     $this->createLoggedInUser();
-    $session = CRM_Core_Session::singleton();
-    $this->_loggedInUser = $session->get('userID');
     /// note that activityType options are cached by the FULL set of options you pass in
     // ie. because Activity api includes campaign in it's call cache is not flushed unless
     // included in this call. Also note flush function doesn't work on this property as it sets to null not empty array
@@ -110,10 +112,11 @@ class CiviCaseTestCase extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    */
-  public function tearDown() {
-    $this->quickCleanup($this->tablesToTruncate, TRUE);
+  public function tearDown(): void {
     $this->customDirectories(array('template_path' => FALSE));
+    $this->quickCleanup($this->tablesToTruncate, TRUE);
     CRM_Case_XMLRepository::singleton(TRUE);
+    parent::tearDown();
   }
 
   /**

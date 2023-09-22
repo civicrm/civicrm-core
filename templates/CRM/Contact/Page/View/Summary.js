@@ -61,10 +61,14 @@
   function reloadBlock(el) {
     return $(el).each(function() {
       var data = $(this).data('edit-params');
-      data.snippet = data.reset = 1;
-      data.class_name = data.class_name.replace('Form', 'Page');
-      data.type = 'page';
-      $(this).closest('.crm-summary-block').load(CRM.url('civicrm/ajax/inline', data), function() {$(this).trigger('crmLoad');});
+      if (data) {
+        data.snippet = data.reset = 1;
+        data.class_name = data.class_name.replace('Form', 'Page');
+        data.type = 'page';
+        $(this).closest('.crm-summary-block').load(CRM.url('civicrm/ajax/inline', data), function() {
+          $(this).trigger('crmLoad');
+        });
+      }
     });
   }
 
@@ -189,10 +193,10 @@
     function refreshTitle() {
       var contactName = $('.crm-summary-display_name').text();
       contactName = $.trim(contactName);
-      document.title = $('title').html().replace(oldName, contactName);
+      document.title = document.title.replace(oldName, contactName);
       oldName = contactName;
     }
-    $('#contactname-block').load(refreshTitle);
+    $('#contactname-block').on('load', refreshTitle);
     refreshTitle();
 
     var clicking;
@@ -255,9 +259,14 @@
         //unset and set first as primary
         if ($('[class$=is_primary] input:checked', row).length > 0) {
           $('[class$=is_primary] input', row).prop('checked', false);
-          $('[class$=is_primary] input:first', form).prop('checked', true );
+          $('[class$=is_primary] input:visible:first', form).prop('checked', true );
         }
         $('.add-more-inline', form).show();
+        if ($('[class$=is_primary] input:visible', form).length == 0) {
+          $('.add-more-inline', form).click();
+          $('[class$=is_primary] input:visible:first', form).prop('checked', true );
+        }
+
         e.preventDefault();
       })
       // Delete an address

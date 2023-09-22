@@ -11,12 +11,7 @@
     var SETTING_DEBOUNCE_MS = 5000;
     var RECIPIENTS_PREVIEW_LIMIT = 50;
 
-    var ts = $scope.ts = CRM.ts(null);
-
-    $scope.isMailingList = function isMailingList(group) {
-      var GROUP_TYPE_MAILING_LIST = '2';
-      return _.contains(group.group_type, GROUP_TYPE_MAILING_LIST);
-    };
+    var ts = $scope.ts = CRM.ts();
 
     $scope.recipients = null;
     $scope.outdated = null;
@@ -73,9 +68,7 @@
     // refresh setting at a duration on 5sec
     var refreshSetting = _.debounce(function() {
       $scope.$apply(function() {
-        crmApi('Setting', 'getvalue', {"name": 'auto_recipient_rebuild', "return": "value"}).then(function(response) {
-          $scope.permitRecipientRebuild = (response.result === 0);
-        });
+        $scope.permitRecipientRebuild = !$scope.$parent.crmMailingConst.autoRecipientRebuild;
       });
     }, SETTING_DEBOUNCE_MS);
     $scope.$watchCollection("permitRecipientRebuild", refreshSetting);

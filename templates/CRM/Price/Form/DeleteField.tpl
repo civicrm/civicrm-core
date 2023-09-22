@@ -10,7 +10,7 @@
 {* this template is used for confirmation of delete for a Fields  *}
 <div class="crm-block crm-form-block crm-price_field_delete-form-block">
     <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
+        {icon icon="fa-info-circle"}{/icon}
           {ts 1=$title}WARNING: Deleting this price field will result in the loss of all '%1' data.{/ts} {ts}This action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
     </div>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

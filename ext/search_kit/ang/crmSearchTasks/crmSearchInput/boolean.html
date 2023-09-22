@@ -1,0 +1,8 @@
+<div class="form-group" ng-if="!$ctrl.isMulti()" >
+  <label class="radio-inline"><input type="radio" ng-value="true" ng-model="$ctrl.value"> {{:: ts('Yes') }}</label>
+  <label class="radio-inline"><input type="radio" ng-value="false" ng-model="$ctrl.value"> {{:: ts('No') }}</label>
+</div>
+<div class="form-group" ng-if="$ctrl.isMulti()" >
+  <label class="checkbox-inline"><input type="checkbox" checklist-value="true" checklist-model="$ctrl.value"> {{:: ts('Yes') }}</label>
+  <label class="checkbox-inline"><input type="checkbox" checklist-value="false" checklist-model="$ctrl.value"> {{:: ts('No') }}</label>
+</div>

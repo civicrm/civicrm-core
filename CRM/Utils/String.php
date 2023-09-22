@@ -43,12 +43,14 @@ class CRM_Utils_String {
   public static function titleToVar($title, $maxLength = 31) {
     $variable = self::munge($title, '_', $maxLength);
 
+    // FIXME: nothing below this line makes sense. The above call to self::munge will always
+    // return a safe string of the correct length, so why are we now checking if it's a safe
+    // string of the correct length?
     if (CRM_Utils_Rule::title($variable, $maxLength)) {
       return $variable;
     }
 
-    // if longer than the maxLength lets just return a substr of the
-    // md5 to prevent errors downstream
+    // FIXME: When would this ever be reachable?
     return substr(md5($title), 0, $maxLength);
   }
 
@@ -71,8 +73,8 @@ class CRM_Utils_String {
     // CRM-11744
     $name = preg_replace('/[^a-zA-Z0-9]+/', $char, trim($name));
 
-    //If there are no ascii characters present.
-    if ($name == $char) {
+    // If there are no ascii characters present.
+    if (!strlen(trim($name, $char))) {
       $name = self::createRandom($len, self::ALPHANUMERIC);
     }
 
@@ -86,7 +88,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Convert possibly underscore separated words to camel case.
+   * Convert possibly underscore, space or dash separated words to CamelCase.
    *
    * @param string $str
    * @param bool $ucFirst
@@ -94,9 +96,29 @@ class CRM_Utils_String {
    * @return string
    */
   public static function convertStringToCamel($str, $ucFirst = TRUE) {
-    $fragments = explode('_', $str);
+    $fragments = preg_split('/[-_ ]/', $str, -1, PREG_SPLIT_NO_EMPTY);
     $camel = implode('', array_map('ucfirst', $fragments));
     return $ucFirst ? $camel : lcfirst($camel);
+  }
+
+  /**
+   * Inverse of above function, converts camelCase to snake_case
+   *
+   * @param string $str
+   * @return string
+   */
+  public static function convertStringToSnakeCase(string $str): string {
+    return strtolower(ltrim(preg_replace('/(?=[A-Z])/', '_$0', $str), '_'));
+  }
+
+  /**
+   * Converts `CamelCase` or `snake_case` to `dash-format`
+   *
+   * @param string $str
+   * @return string
+   */
+  public static function convertStringToDash(string $str): string {
+    return strtolower(implode('-', preg_split('/[-_ ]|(?=[A-Z])/', $str, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
   }
 
   /**
@@ -222,6 +244,31 @@ class CRM_Utils_String {
   }
 
   /**
+   * Encode string using URL-safe Base64.
+   *
+   * @param string $v
+   *
+   * @return string
+   * @see https://tools.ietf.org/html/rfc4648#section-5
+   */
+  public static function base64UrlEncode($v) {
+    return rtrim(str_replace(['+', '/'], ['-', '_'], base64_encode($v)), '=');
+  }
+
+  /**
+   * Decode string using URL-safe Base64.
+   *
+   * @param string $v
+   *
+   * @return false|string
+   * @see https://tools.ietf.org/html/rfc4648#section-5
+   */
+  public static function base64UrlDecode($v) {
+    // PHP base64_decode() is already forgiving about padding ("=").
+    return base64_decode(str_replace(['-', '_'], ['+', '/'], $v));
+  }
+
+  /**
    * Determine the string replacements for redaction.
    * on the basis of the regular expressions
    *
@@ -292,21 +339,8 @@ class CRM_Utils_String {
    * @return bool
    */
   public static function isUtf8($str) {
-    if (!function_exists(mb_detect_encoding)) {
-      // eliminate all white space from the string
-      $str = preg_replace('/\s+/', '', $str);
-
-      // pattern stolen from the php.net function documentation for
-      // utf8decode();
-      // comment by JF Sebastian, 30-Mar-2005
-      return preg_match('/^([\x00-\x7f]|[\xc2-\xdf][\x80-\xbf]|\xe0[\xa0-\xbf][\x80-\xbf]|[\xe1-\xec][\x80-\xbf]{2}|\xed[\x80-\x9f][\x80-\xbf]|[\xee-\xef][\x80-\xbf]{2}|f0[\x90-\xbf][\x80-\xbf]{2}|[\xf1-\xf3][\x80-\xbf]{3}|\xf4[\x80-\x8f][\x80-\xbf]{2})*$/', $str);
-      // ||
-      // iconv('ISO-8859-1', 'UTF-8', $str);
-    }
-    else {
-      $enc = mb_detect_encoding($str, ['UTF-8'], TRUE);
-      return ($enc !== FALSE);
-    }
+    $enc = mb_detect_encoding($str, ['UTF-8'], TRUE);
+    return ($enc !== FALSE);
   }
 
   /**
@@ -321,14 +355,11 @@ class CRM_Utils_String {
    *   true if the urls match, else false
    */
   public static function match($url1, $url2) {
-    $url1 = strtolower($url1);
-    $url2 = strtolower($url2);
+    $component1 = parse_url(strtolower($url1));
+    $component2 = parse_url(strtolower($url2));
 
-    $url1Str = parse_url($url1);
-    $url2Str = parse_url($url2);
-
-    if ($url1Str['path'] == $url2Str['path'] &&
-      self::extractURLVarValue(CRM_Utils_Array::value('query', $url1Str)) == self::extractURLVarValue(CRM_Utils_Array::value('query', $url2Str))
+    if ($component1['path'] == $component2['path'] &&
+      self::extractURLVarValue($component1['query'] ?? '') == self::extractURLVarValue($component2['query'] ?? '')
     ) {
       return TRUE;
     }
@@ -385,7 +416,7 @@ class CRM_Utils_String {
    * @param string $str
    *   The string to be translated.
    *
-   * @return bool
+   * @return string|false
    */
   public static function strtoboolstr($str) {
     if (!is_scalar($str)) {
@@ -413,10 +444,9 @@ class CRM_Utils_String {
    *   the converted string
    */
   public static function htmlToText($html) {
-    require_once 'html2text/rcube_html2text.php';
     $token_html = preg_replace('!\{([a-z_.]+)\}!i', 'token:{$1}', $html);
-    $converter = new rcube_html2text($token_html);
-    $token_text = $converter->get_text();
+    $converter = new \Html2Text\Html2Text($token_html, ['do_links' => 'table', 'width' => 75]);
+    $token_text = $converter->getText();
     $text = preg_replace('!token\:\{([a-z_.]+)\}!i', '{$1}', $token_text);
     return $text;
   }
@@ -506,7 +536,7 @@ class CRM_Utils_String {
    */
   public static function stripAlternatives($full) {
     $matches = [];
-    preg_match('/-ALTERNATIVE ITEM 0-(.*?)-ALTERNATIVE ITEM 1-.*-ALTERNATIVE END-/s', $full, $matches);
+    preg_match('/-ALTERNATIVE ITEM 0-(.*?)-ALTERNATIVE ITEM 1-.*-ALTERNATIVE END-/s', ($full ?? ''), $matches);
 
     if (isset($matches[1]) &&
       trim(strip_tags($matches[1])) != ''
@@ -616,7 +646,7 @@ class CRM_Utils_String {
       $_filter = new HTMLPurifier($config);
     }
 
-    return $_filter->purify($string);
+    return $_filter->purify($string ?? '');
   }
 
   /**
@@ -637,15 +667,15 @@ class CRM_Utils_String {
   /**
    * Generate a random string.
    *
-   * @param $len
-   * @param $alphabet
+   * @param int $len
+   * @param string $alphabet
    * @return string
    */
   public static function createRandom($len, $alphabet) {
     $alphabetSize = strlen($alphabet);
     $result = '';
     for ($i = 0; $i < $len; $i++) {
-      $result .= $alphabet{rand(1, $alphabetSize) - 1};
+      $result .= $alphabet[rand(1, $alphabetSize) - 1];
     }
     return $result;
   }
@@ -655,22 +685,26 @@ class CRM_Utils_String {
    * "admin foo" => array(NULL,"admin foo")
    * "cms:admin foo" => array("cms", "admin foo")
    *
-   * @param $delim
+   * @param string $delim
    * @param string $string
    *   E.g. "view all contacts". Syntax: "[prefix:]name".
-   * @param null $defaultPrefix
+   * @param string|null $defaultPrefix
+   * @param string $validPrefixPattern
+   *   A regular expression used to determine if a prefix is valid.
+   *   To wit: Prefixes MUST be strictly alphanumeric.
    *
    * @return array
    *   (0 => string|NULL $prefix, 1 => string $value)
    */
-  public static function parsePrefix($delim, $string, $defaultPrefix = NULL) {
+  public static function parsePrefix($delim, $string, $defaultPrefix = NULL, $validPrefixPattern = '/^[A-Za-z0-9]+$/') {
     $pos = strpos($string, $delim);
     if ($pos === FALSE) {
       return [$defaultPrefix, $string];
     }
-    else {
-      return [substr($string, 0, $pos), substr($string, 1 + $pos)];
-    }
+
+    $lhs = substr($string, 0, $pos);
+    $rhs = substr($string, 1 + $pos);
+    return preg_match($validPrefixPattern, $lhs) ? [$lhs, $rhs] : [$defaultPrefix, $string];
   }
 
   /**
@@ -854,8 +888,8 @@ class CRM_Utils_String {
     if ($fragment === '') {
       return TRUE;
     }
-    $len = strlen($fragment);
-    return substr($string, 0, $len) === $fragment;
+    $len = strlen($fragment ?? '');
+    return substr(($string ?? ''), 0, $len) === $fragment;
   }
 
   /**
@@ -871,8 +905,8 @@ class CRM_Utils_String {
     if ($fragment === '') {
       return TRUE;
     }
-    $len = strlen($fragment);
-    return substr($string, -1 * $len) === $fragment;
+    $len = strlen($fragment ?? '');
+    return substr(($string ?? ''), -1 * $len) === $fragment;
   }
 
   /**
@@ -916,7 +950,7 @@ class CRM_Utils_String {
    * safe, standard data interchange formats such as JSON rather than PHP's
    * serialization format when dealing with user input.
    *
-   * @param string|NULL $string
+   * @param string|null $string
    *
    * @return mixed
    */
@@ -941,10 +975,10 @@ class CRM_Utils_String {
   public static function pluralize($str) {
     $lastLetter = substr($str, -1);
     $lastTwo = substr($str, -2);
-    if ($lastLetter == 's' || $lastTwo == 'ch') {
+    if ($lastLetter == 's' || $lastLetter == 'x' || $lastTwo == 'ch') {
       return $str . 'es';
     }
-    if ($lastLetter == 'y' && $lastTwo != 'ey') {
+    if ($lastLetter == 'y' && !in_array($lastTwo, ['ay', 'ey', 'iy', 'oy', 'uy'])) {
       return substr($str, 0, -1) . 'ies';
     }
     return $str . 's';
@@ -993,6 +1027,10 @@ class CRM_Utils_String {
    * @param string $templateString
    *
    * @return string
+   *
+   * @noinspection PhpDocRedundantThrowsInspection
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function parseOneOffStringThroughSmarty($templateString) {
     if (!CRM_Utils_String::stringContainsTokens($templateString)) {
@@ -1001,11 +1039,15 @@ class CRM_Utils_String {
     }
     $smarty = CRM_Core_Smarty::singleton();
     $cachingValue = $smarty->caching;
+    set_error_handler([$smarty, 'handleSmartyError'], E_USER_ERROR);
     $smarty->caching = 0;
     $smarty->assign('smartySingleUseString', $templateString);
-    $templateString = $smarty->fetch('string:{eval var=$smartySingleUseString}');
+    // Do not escape the smartySingleUseString as that is our smarty template
+    // and is likely to contain html.
+    $templateString = (string) $smarty->fetch('string:{eval var=$smartySingleUseString|smarty:nodefaults}');
     $smarty->caching = $cachingValue;
-    $smarty->assign('smartySingleUseString', NULL);
+    $smarty->assign('smartySingleUseString');
+    restore_error_handler();
     return $templateString;
   }
 

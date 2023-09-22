@@ -139,19 +139,19 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Set page title based on action
     switch ($this->_action) {
       case CRM_Core_Action::VIEW:
-        CRM_Utils_System::setTitle(ts('View Relationship for %1', [1 => $this->_display_name_a]));
+        $this->setTitle(ts('View Relationship for %1', [1 => $this->_display_name_a]));
         break;
 
       case CRM_Core_Action::ADD:
-        CRM_Utils_System::setTitle(ts('Add Relationship for %1', [1 => $this->_display_name_a]));
+        $this->setTitle(ts('Add Relationship for %1', [1 => $this->_display_name_a]));
         break;
 
       case CRM_Core_Action::UPDATE:
-        CRM_Utils_System::setTitle(ts('Edit Relationship for %1', [1 => $this->_display_name_a]));
+        $this->setTitle(ts('Edit Relationship for %1', [1 => $this->_display_name_a]));
         break;
 
       case CRM_Core_Action::DELETE:
-        CRM_Utils_System::setTitle(ts('Delete Relationship for %1', [1 => $this->_display_name_a]));
+        $this->setTitle(ts('Delete Relationship for %1', [1 => $this->_display_name_a]));
         break;
     }
 
@@ -297,7 +297,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       [
         'options' => ['' => ts('- select -')] + $relationshipList,
         'class' => 'huge',
-        'placeholder' => '- select -',
+        'placeholder' => ts('- select -'),
         'option_url' => 'civicrm/admin/reltype',
         'option_context' => [
           'contact_id' => $this->_contactId,
@@ -473,7 +473,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   /**
-   * @param $relationshipList
+   * @param array $relationshipList
    *
    * @return array
    */
@@ -508,7 +508,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    *   Relationship ID
    */
   private function deleteAction($id) {
-    CRM_Contact_BAO_Relationship::del($id);
+    CRM_Contact_BAO_Relationship::deleteRecord(['id' => $id]);
+    CRM_Core_Session::setStatus(ts('Selected relationship has been deleted successfully.'), ts('Record Deleted'), 'success');
 
     // reload all blocks to reflect this change on the user interface.
     $this->ajaxResponse['reloadBlocks'] = ['#crm-contactinfo-content'];
@@ -523,11 +524,11 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   private function updateAction($params) {
-    list($params, $_) = $this->preparePostProcessParameters($params);
+    [$params, $_] = $this->preparePostProcessParameters($params);
     try {
       civicrm_api3('relationship', 'create', $params);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       throw new CRM_Core_Exception('Relationship create error ' . $e->getMessage());
     }
 
@@ -544,7 +545,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   private function createAction($params) {
-    list($params, $primaryContactLetter) = $this->preparePostProcessParameters($params);
+    [$params, $primaryContactLetter] = $this->preparePostProcessParameters($params);
 
     $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $primaryContactLetter);
 
@@ -564,7 +565,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   private function preparePostProcessParameters($values) {
     $params = $values;
-    list($relationshipTypeId, $a, $b) = explode('_', $params['relationship_type_id']);
+    [$relationshipTypeId, $a, $b] = explode('_', $params['relationship_type_id']);
 
     $params['relationship_type_id'] = $relationshipTypeId;
     $params['contact_id_' . $a] = $this->_contactId;
@@ -590,7 +591,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @param array $relationshipIds
    * @param string $note
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private function saveRelationshipNotes($relationshipIds, $note) {
     foreach ($relationshipIds as $id) {

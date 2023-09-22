@@ -26,16 +26,16 @@
  */
 function civicrm_api3_mailing_event_resubscribe_create($params) {
 
-  $groups = CRM_Mailing_Event_BAO_Resubscribe::resub_to_mailing(
+  $groups = CRM_Mailing_Event_BAO_MailingEventResubscribe::resub_to_mailing(
     $params['job_id'],
     $params['event_queue_id'],
     $params['hash']
   );
 
-  if (count($groups)) {
-    CRM_Mailing_Event_BAO_Resubscribe::send_resub_response(
+  if (!empty($groups)) {
+    CRM_Mailing_Event_BAO_MailingEventResubscribe::send_resub_response(
       $params['event_queue_id'],
-      $groups, FALSE,
+      $groups,
       $params['job_id']
     );
     return civicrm_api3_create_success($params);

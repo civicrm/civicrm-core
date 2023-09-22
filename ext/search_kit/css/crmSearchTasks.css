@@ -1,0 +1,22 @@
+.crm-search-task-progress {
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid lightgrey;
+}
+
+.crm-search-display.crm-search-display-table td > crm-search-display-editable,
+.crm-search-display.crm-search-display-table td > .crm-editable-disabled,
+.crm-search-display.crm-search-display-table td > .crm-editable-enabled {
+  display: block !important;
+}
+
+.crm-search-display crm-search-display-editable {
+  position: relative;
+}
+
+.crm-search-display .crm-search-display-editable-buttons {
+  position: absolute;
+  bottom: -24px;
+  left: 0;
+  min-width: 50px;
+}

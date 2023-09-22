@@ -1,0 +1,34 @@
+/* SearchKit table display styling */
+
+#bootstrap-theme .crm-search-display-table > table.table > thead > tr > th {
+  position: relative;
+}
+
+#bootstrap-theme .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
+  position: absolute;
+  left: 2px;
+  bottom: 10px;
+}
+
+#bootstrap-theme .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon + .crm-search-display-table-column-label {
+  margin-left: 4px;
+  display: inline-block;
+}
+
+#bootstrap-theme .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
+  padding-left: 0;
+  padding-right: 0;
+  text-transform: none;
+  color: initial;
+  /* Don't allow button to be split on 2 lines */
+  min-width: 86px;
+}
+
+#bootstrap-theme .crm-search-display.crm-search-display-table tfoot > tr > td {
+  font-weight: bold;
+}
+
+table.crm-sticky-header > thead > tr {
+  position: sticky !important;
+  top: var(--crm-menubar-bottom, 0px);
+}

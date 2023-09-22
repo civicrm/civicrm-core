@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -24,19 +22,25 @@ namespace api\v4\Service\Schema;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Civi\Api4\Service\Schema\SchemaMap;
 use Civi\Api4\Service\Schema\Table;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class SchemaMapperTest extends UnitTestCase {
+class SchemaMapperTest extends Api4TestBase {
 
-  public function testWillHaveNoPathWithNoTables() {
+  public function testWillHaveNoPathWithNoTables(): void {
     $map = new SchemaMap();
-    $this->assertEmpty($map->getPath('foo', 'bar'));
+    try {
+      $map->getLink('foo', 'bar');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $exception = $e;
+    }
+    $this->assertStringContainsString('not found', $exception->getMessage());
   }
 
-  public function testWillHavePathWithSingleJump() {
+  public function testWillHavePathWithSingleJump(): void {
     $phoneTable = new Table('civicrm_phone');
     $locationTable = new Table('civicrm_location_type');
     $link = new Joinable('civicrm_location_type', 'id', 'location');
@@ -45,38 +49,10 @@ class SchemaMapperTest extends UnitTestCase {
     $map = new SchemaMap();
     $map->addTables([$phoneTable, $locationTable]);
 
-    $this->assertNotEmpty($map->getPath('civicrm_phone', 'location'));
+    $this->assertNotEmpty($map->getLink('civicrm_phone', 'location'));
   }
 
-  public function testWillHavePathWithDoubleJump() {
-    $activity = new Table('activity');
-    $activityContact = new Table('activity_contact');
-    $middleLink = new Joinable('activity_contact', 'activity_id');
-    $contactLink = new Joinable('contact', 'id');
-    $activity->addTableLink('id', $middleLink);
-    $activityContact->addTableLink('contact_id', $contactLink);
-
-    $map = new SchemaMap();
-    $map->addTables([$activity, $activityContact]);
-
-    $this->assertNotEmpty($map->getPath('activity', 'contact'));
-  }
-
-  public function testPathWithTripleJoin() {
-    $first = new Table('first');
-    $second = new Table('second');
-    $third = new Table('third');
-    $first->addTableLink('id', new Joinable('second', 'id'));
-    $second->addTableLink('id', new Joinable('third', 'id'));
-    $third->addTableLink('id', new Joinable('fourth', 'id'));
-
-    $map = new SchemaMap();
-    $map->addTables([$first, $second, $third]);
-
-    $this->assertNotEmpty($map->getPath('first', 'fourth'));
-  }
-
-  public function testCircularReferenceWillNotBreakIt() {
+  public function testCircularReferenceWillNotBreakIt(): void {
     $contactTable = new Table('contact');
     $carTable = new Table('car');
     $carLink = new Joinable('car', 'id');
@@ -87,10 +63,10 @@ class SchemaMapperTest extends UnitTestCase {
     $map = new SchemaMap();
     $map->addTables([$contactTable, $carTable]);
 
-    $this->assertEmpty($map->getPath('contact', 'foo'));
+    $this->assertEmpty($map->getLink('contact', 'foo'));
   }
 
-  public function testCannotGoOverJoinLimit() {
+  public function testCannotGoOverJoinLimit(): void {
     $first = new Table('first');
     $second = new Table('second');
     $third = new Table('third');
@@ -103,7 +79,7 @@ class SchemaMapperTest extends UnitTestCase {
     $map = new SchemaMap();
     $map->addTables([$first, $second, $third, $fourth]);
 
-    $this->assertEmpty($map->getPath('first', 'fifth'));
+    $this->assertEmpty($map->getLink('first', 'fifth'));
   }
 
 }

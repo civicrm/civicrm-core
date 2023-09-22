@@ -26,7 +26,9 @@
 *}
 {* this template is for configuring label formats *}
 <div class="help">
-  {ts}You can configure one or more Label Formats for your CiviCRM installation. Label Formats are used when creating mailing labels.{/ts}
+  {ts}You can configure one or more Label Formats for your CiviCRM installation. Label Formats are used when creating mailing labels.{/ts}<br />
+  {capture assign=addressSettings}href="{crmURL p='civicrm/admin/setting/preferences/address' q='reset=1'}"{/capture}
+  {ts 1=$addressSettings}You can change which fields are printed on each label in <a %1>Address Settings</a>.{/ts}
 </div>
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
   {include file="CRM/Admin/Form/LabelFormats.tpl"}
@@ -48,15 +50,15 @@
           </tr>
           </thead>
           {foreach from=$rows item=row}
-            <tr id="row_{$row.id}" class="crm-labelFormat {cycle values="odd-row,even-row"} {$row.class}">
+            <tr id="row_{$row.id}" class="crm-labelFormat {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}">
               <td class="crm-labelFormat-name">{$row.label}</td>
               <td class="crm-labelFormat-name">{$row.groupName}</td>
-              <td class="crm-labelFormat-order nowrap">{$row.weight}</td>
+              <td class="crm-labelFormat-order nowrap">{$row.weight|smarty:nodefaults}</td>
               <td class="crm-labelFormat-description">{$row.grouping}</td>
               <td class="crm-labelFormat-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;</td>
               <td class="crm-labelFormat-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}
                 &nbsp;</td>
-              <td>{$row.action|replace:'xx':$row.id}</td>
+              <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
             </tr>
           {/foreach}
         </table>
@@ -68,7 +70,7 @@
     </div>
   {else}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {capture assign=crmURL}{crmURL p='civicrm/admin/labelFormats' q="action=add&reset=1"}{/capture}
       {ts 1=$crmURL}There are no Label Formats configured. You can<a href='%1'>add one</a>.{/ts}
     </div>

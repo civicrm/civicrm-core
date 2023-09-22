@@ -10,19 +10,10 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Event;
 
 use Civi\Api4\Service\Schema\SchemaMap;
-use Symfony\Component\EventDispatcher\Event as BaseEvent;
+use Civi\Core\Event\GenericHookEvent as BaseEvent;
 
 class SchemaMapBuildEvent extends BaseEvent {
   /**

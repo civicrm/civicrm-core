@@ -7,12 +7,23 @@
   <comment>A Contribution object store meta information about a single customized contribution page</comment>
   <add>1.3</add>
   <log>true</log>
+  <component>CiviContribute</component>
+  <labelField>title</labelField>
+  <paths>
+    <add>civicrm/admin/contribute/add?reset=1&amp;action=add</add>
+    <update>civicrm/admin/contribute/settings?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/admin/contribute?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <browse>civicrm/admin/contribute</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>Contribution Page ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Contribution Id</comment>
+    <comment>Contribution ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.3</add>
   </field>
   <primaryKey>
@@ -21,12 +32,41 @@
   </primaryKey>
   <field>
     <name>title</name>
-    <title>Contribution Page Title</title>
+    <title>Page Name</title>
     <type>varchar</type>
     <length>255</length>
     <localizable>true</localizable>
+    <required>true</required>
     <comment>Contribution Page title. For top of page display</comment>
     <add>1.3</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>frontend_title</name>
+    <title>Public Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <required>true</required>
+    <comment>Contribution Page Public title</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.20</add>
+  </field>
+  <field>
+    <name>name</name>
+    <title>Unique Name</title>
+    <comment>Unique name for identifying contribution page</comment>
+    <required>true</required>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.63</add>
   </field>
   <field>
     <name>intro_text</name>
@@ -42,22 +82,8 @@
     <add>1.3</add>
   </field>
   <field>
-    <name>contribution_type_id</name>
-    <type>int unsigned</type>
-    <required>true</required>
-    <comment>default Contribution type assigned to contributions submitted via this page, e.g. Contribution, Campaign Contribution</comment>
-    <add>1.3</add>
-    <drop>4.3</drop>
-  </field>
-  <foreignKey>
-    <name>contribution_type_id</name>
-    <table>civicrm_contribution_type</table>
-    <key>id</key>
-    <drop>4.3</drop>
-  </foreignKey>
-  <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <comment>default financial type assigned to contributions submitted via this page, e.g. Contribution, Campaign Contribution</comment>
     <pseudoconstant>
@@ -67,6 +93,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Financial Type</label>
     </html>
     <add>4.3</add>
   </field>
@@ -80,6 +107,7 @@
     <name>payment_processor</name>
     <type>varchar</type>
     <length>128</length>
+    <serialize>SEPARATOR_TRIMMED</serialize>
     <comment>Payment Processors configured for this contribution Page</comment>
     <pseudoconstant>
       <table>civicrm_payment_processor</table>
@@ -88,6 +116,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Payment Processors</label>
     </html>
     <add>1.8</add>
   </field>
@@ -97,6 +126,7 @@
     <type>boolean</type>
     <comment>if true - processing logic must reject transaction at confirmation stage if pay method != credit card</comment>
     <default>0</default>
+    <required>true</required>
     <add>1.3</add>
   </field>
   <field>
@@ -104,6 +134,7 @@
     <title>Is Monetary</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>if true - allows real-time monetary transactions otherwise non-monetary transactions</comment>
     <add>1.6</add>
   </field>
@@ -112,6 +143,7 @@
     <title>Is Recurring</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>if true - allows recurring contributions, valid only for PayPal_Standard</comment>
     <add>1.6</add>
   </field>
@@ -120,6 +152,7 @@
     <title>Confirmation Page?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>if false, the confirm page in contribution pages gets skipped</comment>
     <add>4.2</add>
   </field>
@@ -145,6 +178,7 @@
     <title>Support Recurring Intervals</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>if true - supports recurring intervals</comment>
     <add>2.1</add>
   </field>
@@ -153,6 +187,7 @@
     <title>Recurring Installments?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>if true - asks user for recurring installments</comment>
     <add>4.3</add>
   </field>
@@ -161,6 +196,7 @@
     <title>Adjust Recurring Start Date</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>if true - user is able to adjust payment start date</comment>
     <add>4.7</add>
   </field>
@@ -169,6 +205,7 @@
     <title>Pay Later</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>if true - allows the user to send payment directly to the org later</comment>
     <add>2.0</add>
   </field>
@@ -185,6 +222,11 @@
     <title>Pay Later Receipt</title>
     <type>text</type>
     <localizable>true</localizable>
+    <html>
+      <type>RichTextEditor</type>
+      <rows>8</rows>
+      <cols>60</cols>
+    </html>
     <comment>The receipt sent to the user instead of the normal receipt text</comment>
     <add>2.0</add>
   </field>
@@ -202,6 +244,9 @@
     <length>255</length>
     <localizable>true</localizable>
     <comment>Initial amount label for partial payment</comment>
+    <html>
+      <label>Initial Amount Label</label>
+    </html>
     <add>4.3</add>
   </field>
   <field>
@@ -209,12 +254,18 @@
     <type>text</type>
     <localizable>true</localizable>
     <comment>Initial amount help text for partial payment</comment>
+    <html>
+      <label>Initial Amount Help Text</label>
+    </html>
     <add>4.3</add>
   </field>
   <field>
     <name>min_initial_amount</name>
     <type>decimal</type>
     <comment>Minimum initial amount for partial payment</comment>
+    <html>
+      <label>Min. Initial Amount</label>
+    </html>
     <add>4.3</add>
   </field>
   <field>
@@ -223,6 +274,7 @@
     <type>boolean</type>
     <comment>if true, page will include an input text field where user can enter their own amount</comment>
     <default>0</default>
+    <required>true</required>
     <add>1.3</add>
   </field>
   <field>
@@ -250,6 +302,9 @@
     <name>goal_amount</name>
     <type>decimal</type>
     <comment>The target goal for this page, allows people to build a goal meter</comment>
+    <html>
+      <label>Goal Amount</label>
+    </html>
     <add>1.5</add>
   </field>
   <field>
@@ -293,6 +348,7 @@
     <type>boolean</type>
     <comment>if true, receipt is automatically emailed to contact on success</comment>
     <default>0</default>
+    <required>true</required>
     <add>1.3</add>
   </field>
   <field>
@@ -345,7 +401,13 @@
     <name>is_active</name>
     <title>Is Page Active?</title>
     <type>boolean</type>
-    <comment>Is this property active?</comment>
+    <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <comment>Is this page active?</comment>
     <add>1.3</add>
   </field>
   <field>
@@ -367,13 +429,13 @@
     <type>boolean</type>
     <comment>Is this property active?</comment>
     <default>1</default>
+    <required>true</required>
     <add>1.5</add>
   </field>
   <field>
     <name>start_date</name>
     <title>Contribution Page Start Date</title>
     <type>datetime</type>
-    <title>Contribution Page Start Date</title>
     <comment>Date and time that this page starts.</comment>
     <add>1.8</add>
   </field>
@@ -386,9 +448,12 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>Contribution Page Created By</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this contribution page</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -428,15 +493,21 @@
   </field>
   <field>
     <name>campaign_id</name>
-    <title>Contribution Page Campaign ID</title>
+    <component>CiviCampaign</component>
+    <title>Campaign ID</title>
     <type>int unsigned</type>
     <comment>The campaign for which we are collecting contributions with this page.</comment>
+    <html>
+      <type>EntityRef</type>
+      <label>Campaign</label>
+    </html>
+    <add>3.4</add>
     <pseudoconstant>
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
-    <add>3.4</add>
   </field>
   <foreignKey>
     <name>campaign_id</name>
@@ -449,6 +520,7 @@
     <title>Is Contribution Page Shared?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Can people share the contribution page through social media?</comment>
     <add>4.1</add>
   </field>
@@ -457,21 +529,14 @@
     <title>Is billing block required</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>if true - billing block is required for online contribution page</comment>
     <add>4.6</add>
   </field>
-  <field>
-    <name>frontend_title</name>
-    <title>Public Title</title>
-    <type>varchar</type>
-    <length>255</length>
-    <localizable>true</localizable>
-    <default>NULL</default>
-    <comment>Contribution Page Public title</comment>
-    <html>
-      <type>Text</type>
-    </html>
-    <add>5.20</add>
-    <uniqueName>contribution_page_frontend_title</uniqueName>
-  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>2.1</add>
+  </index>
 </table>

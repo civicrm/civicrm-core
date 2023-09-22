@@ -1,0 +1,142 @@
+<?php
+
+function invoke() {
+  $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+
+  // Required so that the userID is set before generating the menu
+  \CRM_Core_Session::singleton()->initialize();
+  // Add CSS, JS, etc. that is required for this page.
+  \CRM_Core_Resources::singleton()->addCoreResources();
+  $parts = explode('?', $requestUri);
+  $args = explode('/', $parts[0] ?? '');
+  // Remove empty path segments, a//b becomes equivalent to a/b
+  $args = array_values(array_filter($args));
+  if (!$args) {
+    // This is a request for the site's homepage. See if we have one.
+    $item = CRM_Core_Invoke::getItem('/');
+    if (!$item) {
+      // We have no public homepage, so send them to login.
+      // This doesn't allow for /civicrm itself to be public,
+      // but that's got to be a pretty edge case, right?!
+      CRM_Utils_System::redirect('/civicrm/login');
+    }
+  }
+  // This IS required for compatibility. e.g. the extensions (at least) quickform uses it for the form's action attribute.
+  $_GET['q'] = implode('/', $args);
+
+  // Render the page
+  print CRM_Core_Invoke::invoke($args);
+}
+
+function findStandaloneSettings(): string {
+  return dirname($_SERVER['DOCUMENT_ROOT']) . '/data/civicrm.settings.php';
+}
+
+function findStandaloneCore(): ?string {
+  $candidates = [
+    implode(DIRECTORY_SEPARATOR, [$_SERVER['DOCUMENT_ROOT'], 'core']),
+    implode(DIRECTORY_SEPARATOR, [dirname($_SERVER['DOCUMENT_ROOT']), 'vendor', 'civicrm', 'civicrm-core']),
+  ];
+  foreach ($candidates as $candidate) {
+    if (file_exists($candidate)) {
+      return $candidate;
+    }
+  }
+  return NULL;
+}
+
+function findStandaloneAutoload(): ?string {
+  $candidates = [
+    implode(DIRECTORY_SEPARATOR, [dirname($_SERVER['DOCUMENT_ROOT']), 'vendor', 'autoload.php']),
+    implode(DIRECTORY_SEPARATOR, [$_SERVER['DOCUMENT_ROOT'], 'core', 'vendor', 'autoload.php']),
+  ];
+  foreach ($candidates as $candidate) {
+    if (file_exists($candidate)) {
+      return $candidate;
+    }
+  }
+  return NULL;
+}
+
+require_once findStandaloneAutoload();
+$civiCorePath = findStandaloneCore();
+$classLoader = implode(DIRECTORY_SEPARATOR, [$civiCorePath, 'CRM', 'Core', 'ClassLoader.php']);
+require_once $classLoader;
+CRM_Core_ClassLoader::singleton()->register();
+
+function standaloneErrorHandler(
+    int $errno,
+    string $errstr,
+    ?string $errfile,
+    ?int $errline) {
+  static $handlingError = FALSE;
+  if ($handlingError) {
+    throw new \RuntimeException("Died: error was thrown during error handling");
+  }
+  $config = CRM_Core_Config::singleton();
+  if (!$config->debug) {
+    // For these errors to show, we must be debugging.
+    return;
+  }
+
+  $handlingError = TRUE;
+  $trace = '';
+  if ($config->backtrace) {
+    // Backtrace is configured for errors.
+    $trace = [];
+    foreach (array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1) as $item) {
+      $_ = '';
+      if (!empty($item['function'])) {
+        if (!empty($item['class']) && !empty($item['type'])) {
+          $_ = htmlspecialchars("$item[class]$item[type]$item[function]() ");
+        }
+        else {
+          $_ = htmlspecialchars("$item[function]() ");
+        }
+      }
+      $_ .= "<code>" . htmlspecialchars($item['file']) . '</code> line ' . $item['line'];
+      $trace[] = $_;
+    }
+    $trace = '<pre class=backtrace>' . implode("\n", $trace) . '</pre>';
+  }
+
+  if (!isset(Civi::$statics[__FUNCTION__])) {
+    Civi::$statics[__FUNCTION__] = [];
+  }
+  Civi::$statics[__FUNCTION__][] = '<li style="white-space:pre-wrap">'
+    . htmlspecialchars("$errstr [$errno]\n") . '<code>' . htmlspecialchars($errfile) . "</code> line $errline"
+    . $trace
+    . '</li>';
+  CRM_Core_Smarty::singleton()->assign('standaloneErrors', implode("\n", Civi::$statics[__FUNCTION__]));
+
+  $handlingError = FALSE;
+}
+
+if (file_exists(findStandaloneSettings())) {
+  require_once findStandaloneSettings();
+  set_error_handler('standaloneErrorHandler', E_ALL);
+  invoke();
+}
+else {
+  \Civi\Setup::assertProtocolCompatibility(1.0);
+
+  \Civi\Setup::init([
+    // This is just enough information to get going.
+    'cms'     => 'Standalone',
+    'srcPath' => $civiCorePath,
+  ]);
+
+  $coreUrl = \Civi\Setup::instance()->getModel()->mandatorySettings['userFrameworkResourceURL'];
+
+  $ctrl = \Civi\Setup::instance()->createController()->getCtrl();
+  $ctrl->setUrls([
+    // The URL of this setup controller. May be used for POST-backs
+    'ctrl'             => '/civicrm', /* @todo this had url('civicrm') ? */
+    // The base URL for loading resource files (images/javascripts) for this project. Includes trailing slash.
+    'res'              => $coreUrl . '/setup/res/',
+    'jquery.js'        => $coreUrl . '/bower_components/jquery/dist/jquery.min.js',
+    'font-awesome.css' => $coreUrl . '/bower_components/font-awesome/css/font-awesome.min.css',
+  ]);
+  \Civi\Setup\BasicRunner::run($ctrl);
+  exit();
+}

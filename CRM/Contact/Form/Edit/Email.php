@@ -33,6 +33,7 @@ class CRM_Contact_Form_Edit_Email {
   public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
     if (!$blockCount) {
+      CRM_Core_Error::deprecatedWarning('pass in blockCount');
       $blockId = ($form->get('Email_Block_Count')) ? $form->get('Email_Block_Count') : 1;
     }
     else {
@@ -42,7 +43,11 @@ class CRM_Contact_Form_Edit_Email {
     $form->applyFilter('__ALL__', 'trim');
 
     //Email box
-    $form->addField("email[$blockId][email]", ['entity' => 'email', 'aria-label' => ts('Email %1', [1 => $blockId])]);
+    $form->addField("email[$blockId][email]", [
+      'entity' => 'email',
+      'aria-label' => ts('Email %1', [1 => $blockId]),
+      'label' => ts('Email %1', [1 => $blockId]),
+    ]);
     $form->addRule("email[$blockId][email]", ts('Email is not valid.'), 'email');
     if (isset($form->_contactType) || $blockEdit) {
       //Block type
@@ -66,30 +71,19 @@ class CRM_Contact_Form_Edit_Email {
 
       //Bulkmail checkbox
       $form->assign('multipleBulk', $multipleBulk);
-      $js = ['id' => "Email_" . $blockId . "_IsBulkmail" , 'aria-label' => ts('Bulk Mailing for Email %1?', [1 => $blockId])];
-      if (!$blockEdit) {
+      $js = ['id' => 'Email_' . $blockId . '_IsBulkmail', 'aria-label' => ts('Bulk Mailing for Email %1?', [1 => $blockId])];
+      if (!$blockEdit && !$multipleBulk) {
         $js['onClick'] = 'singleSelect( this.id );';
       }
       $form->addElement('advcheckbox', "email[$blockId][is_bulkmail]", NULL, '', $js);
 
       //is_Primary radio
-      $js = ['id' => "Email_" . $blockId . "_IsPrimary", 'aria-label' => ts('Email %1 is primary?', [1 => $blockId])];
+      $js = ['id' => 'Email_' . $blockId . '_IsPrimary', 'aria-label' => ts('Email %1 is primary?', [1 => $blockId])];
       if (!$blockEdit) {
         $js['onClick'] = 'singleSelect( this.id );';
       }
 
       $form->addElement('radio', "email[$blockId][is_primary]", '', '', '1', $js);
-
-      if (CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Contact') {
-
-        $form->add('textarea', "email[$blockId][signature_text]", ts('Signature (Text)'),
-          ['rows' => 2, 'cols' => 40]
-        );
-
-        $form->add('wysiwyg', "email[$blockId][signature_html]", ts('Signature (HTML)'),
-          ['rows' => 2, 'cols' => 40]
-        );
-      }
     }
   }
 

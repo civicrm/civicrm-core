@@ -11,6 +11,9 @@
     <title>Setting ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.1</add>
   </field>
   <primaryKey>
@@ -47,19 +50,25 @@
     <type>text</type>
     <comment>data associated with this group / name combo</comment>
     <serialize>PHP</serialize>
+    <html>
+      <label>Value</label>
+    </html>
     <add>4.1</add>
   </field>
   <field>
     <name>domain_id</name>
-    <title>Setting Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
-    <required>true</required>
+    <default>NULL</default>
     <pseudoconstant>
       <table>civicrm_domain</table>
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
-    <comment>Which Domain is this menu item for</comment>
+    <comment>Which Domain does this setting belong to</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>4.1</add>
   </field>
   <foreignKey>
@@ -71,9 +80,12 @@
   </foreignKey>
   <field>
     <name>contact_id</name>
-    <title>Setting Contact</title>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID if the setting is localized to a contact</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>4.1</add>
   </field>
   <foreignKey>
@@ -87,12 +99,14 @@
     <name>is_domain</name>
     <title>Is Domain Setting?</title>
     <type>boolean</type>
-    <comment>Is this setting a contact specific or site wide setting?</comment>
+    <default>0</default>
+    <required>true</required>
+    <comment>Is this setting per-domain or global?</comment>
     <add>4.1</add>
   </field>
   <field>
     <name>component_id</name>
-    <title>Setting Component</title>
+    <title>Component ID</title>
     <type>int unsigned</type>
     <comment>Component that this menu item belongs to</comment>
     <add>4.1</add>
@@ -103,6 +117,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Component</label>
     </html>
   </field>
   <foreignKey>
@@ -120,9 +135,12 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>Setting Created By</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this setting</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>4.1</add>
   </field>
   <foreignKey>

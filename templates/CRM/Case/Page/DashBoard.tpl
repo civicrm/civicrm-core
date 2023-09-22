@@ -26,12 +26,12 @@
         {if $myCases}
           {* check for access all cases and activities *}
           {if call_user_func(array('CRM_Core_Permission','check'), 'access all cases and activities')}
-            <div><input name="allupcoming" type="radio" class="radio" onClick='window.location.replace("{crmURL p="civicrm/case" q="reset=1&all=1"}")' value="1"><span>{ts}All Cases with Upcoming Activities{/ts}</span></input></div>
-            <div><input name="allupcoming" checked type="radio" class="radio" onClick='window.location.replace("{crmURL p="civicrm/case" q="reset=1&all=0"}")' value="0"><span>{ts}My Cases with Upcoming Activities{/ts}</span></input></div>
+            <div><input name="allupcoming" id="allupcoming-all" type="radio" class="radio" onClick='window.location.replace("{crmURL p="civicrm/case" q="reset=1&all=1"}")' value="1"><label for="allupcoming-all">{ts}All Cases{/ts}</label></div>
+            <div><input name="allupcoming" id="allupcoming-my" checked type="radio" class="radio" onClick='window.location.replace("{crmURL p="civicrm/case" q="reset=1&all=0"}")' value="0"><label for="allupcoming-my">{ts}My Cases{/ts}</label></div>
           {/if}
         {else}
-          <div><input name="allupcoming" checked type="radio" class="radio" onClick='window.location.replace("{crmURL p="civicrm/case" q="reset=1&all=1"}")' value="1"><span>{ts}All Cases with Upcoming Activities{/ts}</span></input></div>
-          <div><input name="allupcoming" type="radio" class="radio" onClick='window.location.replace("{crmURL p="civicrm/case" q="reset=1&all=0"}")' value="0"><span>{ts}My Cases with Upcoming Activities{/ts}</span></input></div>
+          <div><input name="allupcoming" id="allupcoming-all" checked type="radio" class="radio" onClick='window.location.replace("{crmURL p="civicrm/case" q="reset=1&all=1"}")' value="1"><label for="allupcoming-all">{ts}All Cases with Upcoming Activities{/ts}</label></div>
+          <div><input name="allupcoming" id="allupcoming-my" type="radio" class="radio" onClick='window.location.replace("{crmURL p="civicrm/case" q="reset=1&all=0"}")' value="0"><label for="allupcoming-my">{ts}My Cases with Upcoming Activities{/ts}</label></div>
         {/if}
       </div>
     </div>
@@ -56,7 +56,7 @@
           {foreach from=$casesSummary.headers item=header}
             {assign var="caseStatus" value=$header.status}
             <td class="label">
-              {if $row.$caseStatus}
+              {if is_array($row.$caseStatus)}
                 <a class="crm-case-summary-drilldown" href="{$row.$caseStatus.url}">{$row.$caseStatus.count}</a>
               {else}
                 0

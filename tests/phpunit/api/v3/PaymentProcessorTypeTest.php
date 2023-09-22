@@ -17,13 +17,13 @@
 class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   protected $_ppTypeID;
 
-  public function setUp() {
+  public function setUp(): void {
 
     parent::setUp();
     $this->useTransaction(TRUE);
   }
 
-  //  function tearDown() {
+  //  function tearDown(): void {
   //
   //    $tablesToTruncate = array(
   //      'civicrm_payment_processor_type',
@@ -43,14 +43,17 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
     $result = $this->callAPIFailure('payment_processor_type', 'create', $payProcParams);
-    $this->assertContains('name, title, class_name, billing_mode', $result['error_message']);
+    $this->assertStringContainsString('name, title, class_name, billing_mode', $result['error_message']);
   }
 
   /**
    * Create payment processor type.
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testPaymentProcessorTypeCreate($version) {
+  public function testPaymentProcessorTypeCreate($version): void {
     $this->_apiversion = $version;
     $params = [
       'sequential' => 1,
@@ -60,7 +63,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'billing_mode' => 'form',
       'is_recur' => 0,
     ];
-    $result = $this->callAPIAndDocument('payment_processor_type', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('PaymentProcessorType', 'create', $params);
     $this->assertNotNull($result['values'][0]['id']);
 
     // mutate $params to match expected return value
@@ -70,31 +73,26 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $this->assertDBState('CRM_Financial_DAO_PaymentProcessorType', $result['id'], $params);
   }
 
-  /**
-   * Test  using example code.
-   */
-  public function testPaymentProcessorTypeCreateExample() {
-    require_once 'api/v3/examples/PaymentProcessorType/Create.ex.php';
-    $result = payment_processor_type_create_example();
-    $expectedResult = payment_processor_type_create_expectedresult();
-    $this->assertAPISuccess($result);
-  }
-
   ///////////////// civicrm_payment_processor_type_delete methods
 
   /**
    * Check with empty array.
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
   public function testPaymentProcessorTypeDeleteEmpty($version) {
     $this->_apiversion = $version;
-    $params = [];
-    $result = $this->callAPIFailure('payment_processor_type', 'delete', $params);
+    $this->callAPIFailure('PaymentProcessorType', 'delete', []);
   }
 
   /**
    * Check if required fields are not passed.
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
   public function testPaymentProcessorTypeDeleteWithoutRequired($version) {
     $this->_apiversion = $version;
@@ -110,38 +108,44 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
   /**
    * Check with incorrect required fields.
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
   public function testPaymentProcessorTypeDeleteWithIncorrectData($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPIFailure('payment_processor_type', 'delete', ['id' => 'abcd']);
+    $this->callAPIFailure('payment_processor_type', 'delete', ['id' => 'abcd']);
   }
 
   /**
    * Check payment processor type delete.
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @param $version
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentProcessorTypeDelete($version) {
     $this->_apiversion = $version;
-    $payProcType = $this->paymentProcessorTypeCreate();
-    $params = [
-      'id' => $payProcType,
-    ];
-
-    $result = $this->callAPIAndDocument('payment_processor_type', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('PaymentProcessorType', 'delete', ['id' => $this->paymentProcessorTypeCreate()]);
   }
 
   ///////////////// civicrm_payment_processor_type_update
 
   /**
    * Check with empty array.
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
   public function testPaymentProcessorTypeUpdateEmpty($version) {
     $this->_apiversion = $version;
     $params = [];
-    $result = $this->callAPIFailure('payment_processor_type', 'create', $params);
-    $this->assertContains('name, title, class_name, billing_mode', $result['error_message']);
+    $result = $this->callAPIFailure('PaymentProcessorType', 'create', $params);
+    $this->assertStringContainsString('name, title, class_name, billing_mode', $result['error_message']);
   }
 
   /**
@@ -151,7 +155,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   public function testPaymentProcessorTypeUpdate($version) {
     $this->_apiversion = $version;
     // create sample payment processor type.
-    $this->_ppTypeID = $this->paymentProcessorTypeCreate(NULL);
+    $this->_ppTypeID = $this->paymentProcessorTypeCreate();
 
     $params = [
       'id' => $this->_ppTypeID,

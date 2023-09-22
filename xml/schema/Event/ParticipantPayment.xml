@@ -6,12 +6,16 @@
   <name>civicrm_participant_payment</name>
   <add>1.7</add>
   <log>true</log>
+  <component>CiviEvent</component>
   <field>
     <name>id</name>
     <title>Payment ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Participant Payment Id</comment>
+    <comment>Participant Payment ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.7</add>
   </field>
   <primaryKey>
@@ -23,7 +27,10 @@
     <title>Participant ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Participant Id (FK)</comment>
+    <comment>Participant ID (FK)</comment>
+    <html>
+      <label>Participant</label>
+    </html>
     <add>1.7</add>
   </field>
   <foreignKey>
@@ -34,10 +41,14 @@
   </foreignKey>
   <field>
     <name>contribution_id</name>
-    <title>Contribution</title>
+    <title>Contribution ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to contribution table.</comment>
+    <html>
+      <label>Contribution</label>
+      <type>EntityRef</type>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>

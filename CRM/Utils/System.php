@@ -22,21 +22,24 @@
  *
  * FIXME: This is a massive and random collection that could be split into smaller services
  *
+ * @method static void getCMSPermissionsUrlParams() Immediately stop script execution and display a 401 "Access Denied" page.
  * @method static mixed permissionDenied() Show access denied screen.
  * @method static mixed logout() Log out the current user.
  * @method static mixed updateCategories() Clear CMS caches related to the user registration/profile forms.
- * @method static appendBreadCrumb(array $breadCrumbs) Append an additional breadcrumb tag to the existing breadcrumbs.
- * @method static resetBreadCrumb() Reset an additional breadcrumb tag to the existing breadcrumb.
- * @method static addHTMLHead(string $bc) Append a string to the head of the HTML file.
+ * @method static void appendBreadCrumb(array $breadCrumbs) Append an additional breadcrumb tag to the existing breadcrumbs.
+ * @method static void resetBreadCrumb() Reset an additional breadcrumb tag to the existing breadcrumb.
+ * @method static void addHTMLHead(string $head) Append a string to the head of the HTML file.
  * @method static string postURL(int $action) Determine the post URL for a form.
  * @method static string|null getUFLocale() Get the locale of the CMS.
  * @method static bool setUFLocale(string $civicrm_language) Set the locale of the CMS.
  * @method static bool isUserLoggedIn() Check if user is logged in.
  * @method static int getLoggedInUfID() Get current logged in user id.
- * @method static setHttpHeader(string $name, string $value) Set http header.
+ * @method static void setHttpHeader(string $name, string $value) Set http header.
  * @method static array synchronizeUsers() Create CRM contacts for all existing CMS users.
- * @method static appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_coreResourceList.
- * @method static alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
+ * @method static void appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_coreResourceList.
+ * @method static void alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
+ * @method static bool shouldExitAfterFatal() Should the current execution exit after a fatal error?
+ * @method static string|null currentPath() Path of the current page e.g. 'civicrm/contact/view'
  */
 class CRM_Utils_System {
 
@@ -124,7 +127,7 @@ class CRM_Utils_System {
       for ($i = 0, $cnt = count($qs); $i < $cnt; $i++) {
         // check first if exist a pair
         if (strstr($qs[$i], '=') !== FALSE) {
-          list($name, $value) = explode('=', $qs[$i]);
+          [$name, $value] = explode('=', $qs[$i]);
           if ($name != $urlVar) {
             $name = rawurldecode($name);
             // check for arrays in parameters: site.php?foo[]=1&foo[]=2&foo[]=3
@@ -205,13 +208,13 @@ class CRM_Utils_System {
    *
    * @param array|string $query
    *
-   * @return string
+   * @return string|null
    */
   public static function makeQueryString($query) {
     if (is_array($query)) {
       $buf = '';
       foreach ($query as $key => $value) {
-        $buf .= ($buf ? '&' : '') . urlencode($key) . '=' . urlencode($value);
+        $buf .= ($buf ? '&' : '') . urlencode($key ?? '') . '=' . urlencode($value ?? '');
       }
       $query = $buf;
     }
@@ -242,14 +245,18 @@ class CRM_Utils_System {
    *   An HTML string containing a link to the given path.
    */
   public static function url(
-    $path = NULL,
-    $query = NULL,
+    $path = '',
+    $query = '',
     $absolute = FALSE,
     $fragment = NULL,
     $htmlize = TRUE,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
+    // handle legacy null params
+    $path = $path ?? '';
+    $query = $query ?? '';
+
     $query = self::makeQueryString($query);
 
     // Legacy handling for when the system passes around html escaped strings
@@ -259,15 +266,15 @@ class CRM_Utils_System {
 
     // Extract fragment from path or query if munged together
     if ($query && strstr($query, '#')) {
-      list($path, $fragment) = explode('#', $query);
+      [$path, $fragment] = explode('#', $query);
     }
     if ($path && strstr($path, '#')) {
-      list($path, $fragment) = explode('#', $path);
+      [$path, $fragment] = explode('#', $path);
     }
 
     // Extract query from path if munged together
     if ($path && strstr($path, '?')) {
-      list($path, $extraQuery) = explode('?', $path);
+      [$path, $extraQuery] = explode('?', $path);
       $query = $extraQuery . ($query ? "&$query" : '');
     }
 
@@ -279,6 +286,43 @@ class CRM_Utils_System {
     }
 
     return $url;
+  }
+
+  /**
+   * Return the Notification URL for Payments.
+   *
+   * @param string $path
+   *   The path being linked to, such as "civicrm/add".
+   * @param array|string $query
+   *   A query string to append to the link, or an array of key-value pairs.
+   * @param bool $absolute
+   *   Whether to force the output to be an absolute link (beginning with a
+   *   URI-scheme such as 'http:'). Useful for links that will be displayed
+   *   outside the site, such as in an RSS feed.
+   * @param string $fragment
+   *   A fragment identifier (named anchor) to append to the link.
+   * @param bool $htmlize
+   *   Unused param
+   * @param bool $frontend
+   *   This link should be to the CMS front end (applies to WP & Joomla).
+   * @param bool $forceBackend
+   *   This link should be to the CMS back end (applies to WP & Joomla).
+   *
+   * @return string
+   *   The Notification URL.
+   */
+  public static function getNotifyUrl(
+    $path = NULL,
+    $query = NULL,
+    $absolute = FALSE,
+    $fragment = NULL,
+    $htmlize = NULL,
+    $frontend = FALSE,
+    $forceBackend = FALSE
+  ) {
+    $config = CRM_Core_Config::singleton();
+    $query = self::makeQueryString($query);
+    return $config->userSystem->getNotifyUrl($path, $query, $absolute, $fragment, $frontend, $forceBackend);
   }
 
   /**
@@ -333,7 +377,7 @@ class CRM_Utils_System {
      * @return \Psr\Http\Message\UriInterface
      */
     $mkRouteUri = function ($path, $query) use ($e) {
-      $urlTxt = CRM_Utils_System::url($path, $query, $e->absolute, $e->fragment, FALSE);
+      $urlTxt = CRM_Utils_System::url($path, $query, $e->absolute, $e->fragment, FALSE, TRUE);
       if ($e->isSSL || ($e->isSSL === NULL && \CRM_Utils_System::isSSL())) {
         $urlTxt = str_replace('http://', 'https://', $urlTxt);
       }
@@ -347,6 +391,10 @@ class CRM_Utils_System {
 
       case 'router:extern/url':
         $e->url = $mkRouteUri('civicrm/mailing/url', $e->query);
+        break;
+
+      case 'router:extern/widget':
+        $e->url = $mkRouteUri('civicrm/contribute/widget', $e->query);
         break;
 
       // Otherwise, keep the default.
@@ -387,24 +435,14 @@ class CRM_Utils_System {
   }
 
   /**
-   * Path of the current page e.g. 'civicrm/contact/view'
+   * Compose a URL. This is a wrapper for `url()` which is optimized for use in Smarty.
    *
-   * @return string|null
-   *   the current menu path
-   */
-  public static function currentPath() {
-    $config = CRM_Core_Config::singleton();
-    return isset($_GET[$config->userFrameworkURLVar]) ? trim($_GET[$config->userFrameworkURLVar], '/') : NULL;
-  }
-
-  /**
-   * Called from a template to compose a url.
-   *
+   * @see \smarty_function_crmURL()
    * @param array $params
-   *   List of parameters.
-   *
+   *   URL properties. Keys are abbreviated ("p"<=>"path").
+   *   See Smarty doc for full details.
    * @return string
-   *   url
+   *   URL
    */
   public static function crmURL($params) {
     $p = $params['p'] ?? NULL;
@@ -434,7 +472,7 @@ class CRM_Utils_System {
   public static function setTitle($title, $pageTitle = NULL) {
     self::$title = $title;
     $config = CRM_Core_Config::singleton();
-    return $config->userSystem->setTitle($title, $pageTitle);
+    return $config->userSystem->setTitle(CRM_Utils_String::purifyHtml($title), CRM_Utils_String::purifyHtml($pageTitle));
   }
 
   /**
@@ -497,7 +535,9 @@ class CRM_Utils_System {
     $url = str_replace('&amp;', '&', $url);
 
     $context['output'] = $_GET['snippet'] ?? NULL;
-
+    if ($context['noindex'] ?? FALSE) {
+      self::setHttpHeader('X-Robots-Tag', 'noindex');
+    }
     $parsedUrl = CRM_Utils_Url::parseUrl($url);
     CRM_Utils_Hook::alterRedirect($parsedUrl, $context);
     $url = CRM_Utils_Url::unparseUrl($parsedUrl);
@@ -511,7 +551,7 @@ class CRM_Utils_System {
     }
 
     self::setHttpHeader('Location', $url);
-    self::civiExit();
+    self::civiExit(0, ['url' => $url, 'context' => 'redirect']);
   }
 
   /**
@@ -598,9 +638,9 @@ class CRM_Utils_System {
    */
   public static function authenticateKey($abort = TRUE) {
     // also make sure the key is sent and is valid
-    $key = trim(CRM_Utils_Array::value('key', $_REQUEST));
+    $key = trim($_REQUEST['key'] ?? '');
 
-    $docAdd = "More info at:" . CRM_Utils_System::docURL2("Managing Scheduled Jobs", TRUE, NULL, NULL, NULL, "wiki");
+    $docAdd = "More info at: " . CRM_Utils_System::docURL2('sysadmin/setup/jobs', TRUE);
 
     if (!$key) {
       return self::authenticateAbort(
@@ -625,7 +665,7 @@ class CRM_Utils_System {
       );
     }
 
-    if ($key !== $siteKey) {
+    if (!hash_equals($siteKey, $key)) {
       return self::authenticateAbort(
         "ERROR: Invalid key value sent. " . $docAdd . "\n",
         $abort
@@ -651,8 +691,8 @@ class CRM_Utils_System {
     // auth to make sure the user has a login/password to do a shell operation
     // later on we'll link this to acl's
     if (!$name) {
-      $name = trim(CRM_Utils_Array::value('name', $_REQUEST));
-      $pass = trim(CRM_Utils_Array::value('pass', $_REQUEST));
+      $name = trim($_REQUEST['name'] ?? '');
+      $pass = trim($_REQUEST['pass'] ?? '');
     }
 
     // its ok to have an empty password
@@ -676,7 +716,7 @@ class CRM_Utils_System {
     }
     elseif ($storeInSession) {
       // lets store contact id and user id in session
-      list($userID, $ufID, $randomNumber) = $result;
+      [$userID, $ufID, $randomNumber] = $result;
       if ($userID && $ufID) {
         $config = CRM_Core_Config::singleton();
         $config->userSystem->setUserSession([$userID, $ufID]);
@@ -711,21 +751,6 @@ class CRM_Utils_System {
   public static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $config = CRM_Core_Config::singleton();
 
-    /* Before we do any loading, let's start the session and write to it.
-     * We typically call authenticate only when we need to bootstrap the CMS
-     * directly via Civi and hence bypass the normal CMS auth and bootstrap
-     * process typically done in CLI and cron scripts. See: CRM-12648
-     *
-     * Q: Can we move this to the userSystem class so that it can be tuned
-     * per-CMS? For example, when dealing with UnitTests UF, there's no
-     * userFrameworkDSN.
-     */
-    $session = CRM_Core_Session::singleton();
-    $session->set('civicrmInitSession', TRUE);
-
-    if ($config->userFrameworkDSN) {
-      $dbDrupal = DB::connect($config->userFrameworkDSN);
-    }
     return $config->userSystem->authenticate($name, $password, $loadCMSBootstrap, $realPath);
   }
 
@@ -777,7 +802,7 @@ class CRM_Utils_System {
    *   The obscured credit card number.
    */
   public static function mungeCreditCard($number, $keep = 4) {
-    $number = trim($number);
+    $number = trim($number ?? '');
     if (empty($number)) {
       return NULL;
     }
@@ -911,7 +936,7 @@ class CRM_Utils_System {
    *   (optional) Whether to log the memory usage information.
    */
   public static function xMemory($title = NULL, $log = FALSE) {
-    $mem = (float ) xdebug_memory_usage() / (float ) (1024);
+    $mem = (float) xdebug_memory_usage() / (float) (1024);
     $mem = number_format($mem, 5) . ", " . time();
     if ($log) {
       echo "<p>$title: $mem<p>";
@@ -963,7 +988,7 @@ class CRM_Utils_System {
 
     if (!array_key_exists($callback, self::$_callbacks)) {
       if (strpos($callback, '::') !== FALSE) {
-        list($className, $methodName) = explode('::', $callback);
+        [$className, $methodName] = explode('::', $callback);
         $fileName = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
         // ignore errors if any
         @include_once $fileName;
@@ -1002,7 +1027,7 @@ class CRM_Utils_System {
    * @return string[]
    */
   public static function explode($separator, $string, $limit) {
-    $result = explode($separator, $string, $limit);
+    $result = explode($separator, ($string ?? ''), $limit);
     for ($i = count($result); $i < $limit; $i++) {
       $result[$i] = NULL;
     }
@@ -1066,35 +1091,14 @@ class CRM_Utils_System {
   }
 
   /**
-   * Format wiki url.
-   *
-   * @param string $string
-   * @param bool $encode
-   *
-   * @return string
-   */
-  public static function formatWikiURL($string, $encode = FALSE) {
-    $items = explode(' ', trim($string), 2);
-    if (count($items) == 2) {
-      $title = $items[1];
-    }
-    else {
-      $title = $items[0];
-    }
-
-    // fix for CRM-4044
-    $url = $encode ? self::urlEncode($items[0]) : $items[0];
-    return "<a href=\"$url\">$title</a>";
-  }
-
-  /**
    * Encode url.
    *
    * @param string $url
-   *
+   * @deprecated
    * @return null|string
    */
   public static function urlEncode($url) {
+    CRM_Core_Error::deprecatedFunctionWarning('urlEncode');
     $items = parse_url($url);
     if ($items === FALSE) {
       return NULL;
@@ -1160,7 +1164,7 @@ class CRM_Utils_System {
    * @return string
    */
   public static function majorVersion() {
-    list($a, $b) = explode('.', self::version());
+    [$a, $b] = explode('.', self::version());
     return "$a.$b";
   }
 
@@ -1229,7 +1233,7 @@ class CRM_Utils_System {
   /**
    * Redirect to SSL.
    *
-   * @param bool|FALSE $abort
+   * @param bool|false $abort
    *
    * @throws \CRM_Core_Exception
    */
@@ -1239,7 +1243,7 @@ class CRM_Utils_System {
     // FIXME: Shouldn't the X-Forwarded-Proto check be part of CRM_Utils_System::isSSL()?
     if (Civi::settings()->get('enableSSL') &&
       !self::isSSL() &&
-      strtolower(CRM_Utils_Array::value('X_FORWARDED_PROTO', $req_headers)) != 'https'
+      strtolower($req_headers['X_FORWARDED_PROTO'] ?? '') != 'https'
     ) {
       // ensure that SSL is enabled on a civicrm url (for cookie reasons etc)
       $url = "https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
@@ -1261,7 +1265,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * Get logged in user's IP address.
+   * Get the client's IP address.
    *
    * Get IP address from HTTP REMOTE_ADDR header. If the CMS is Drupal then use
    * the Drupal function as this also handles reverse proxies (based on proper
@@ -1274,14 +1278,8 @@ class CRM_Utils_System {
    *   IP address of logged in user.
    */
   public static function ipAddress($strictIPV4 = TRUE) {
-    $address = $_SERVER['REMOTE_ADDR'] ?? NULL;
-
     $config = CRM_Core_Config::singleton();
-    if ($config->userSystem->is_drupal && function_exists('ip_address')) {
-      // drupal function handles the server being behind a proxy securely. We still have legacy ipn methods
-      // that reach this point without bootstrapping hence the check that the fn exists
-      $address = ip_address();
-    }
+    $address = $config->userSystem->ipAddress();
 
     // hack for safari
     if ($address == '::1') {
@@ -1343,14 +1341,13 @@ class CRM_Utils_System {
    *   Title of documentation wiki page.
    * @param bool $URLonly
    *   (optional) Whether to return URL only or full HTML link (default).
-   * @param string $text
+   * @param string|null $text
    *   (optional) Text of HTML link (no effect if $URLonly = false).
-   * @param string $title
+   * @param string|null $title
    *   (optional) Tooltip text for HTML link (no effect if $URLonly = false)
-   * @param string $style
+   * @param string|null $style
    *   (optional) Style attribute value for HTML link (no effect if $URLonly = false)
-   *
-   * @param null $resource
+   * @param string|null $resource
    *
    * @return string
    *   URL or link to documentation page, based on provided parameters.
@@ -1398,7 +1395,7 @@ class CRM_Utils_System {
       return NULL;
     }
 
-    if (CRM_Utils_Array::value('resource', $params) == 'wiki') {
+    if (($params['resource'] ?? NULL) == 'wiki') {
       $docBaseURL = self::getWikiBaseURL();
     }
     else {
@@ -1411,7 +1408,7 @@ class CRM_Utils_System {
     }
 
     if (!isset($params['text']) or $params['text'] === NULL) {
-      $params['text'] = ts('(learn more...)');
+      $params['text'] = ts('(Learn more...)');
     }
 
     if (!isset($params['style']) || $params['style'] === NULL) {
@@ -1440,7 +1437,7 @@ class CRM_Utils_System {
    * @return mixed
    */
   public static function formatDocUrl($url) {
-    return preg_replace('#^(user|sysadmin|dev)/#', '\1/en/stable/', $url);
+    return preg_replace('#^(installation|user|sysadmin|dev)/#', '\1/en/latest/', $url);
   }
 
   /**
@@ -1481,13 +1478,7 @@ class CRM_Utils_System {
     // a bit aggressive, but livable for now
     CRM_Utils_Cache::singleton()->flush();
 
-    // Traditionally, systems running on memory-backed caches were quite
-    // zealous about destroying *all* memory-backed caches during a flush().
-    // These flushes simulate that legacy behavior. However, they should probably
-    // be removed at some point.
-    $localDrivers = ['CRM_Utils_Cache_ArrayCache', 'CRM_Utils_Cache_NoCache'];
-    if (Civi\Core\Container::isContainerBooted()
-      && !in_array(get_class(CRM_Utils_Cache::singleton()), $localDrivers)) {
+    if (Civi\Core\Container::isContainerBooted()) {
       Civi::cache('long')->flush();
       Civi::cache('settings')->flush();
       Civi::cache('js_strings')->flush();
@@ -1497,6 +1488,7 @@ class CRM_Utils_System {
       Civi::cache('customData')->flush();
       Civi::cache('contactTypes')->clear();
       Civi::cache('metadata')->clear();
+      \Civi\Core\ClassScanner::cache('index')->flush();
       CRM_Extension_System::singleton()->getCache()->flush();
       CRM_Cxn_CiviCxnHttp::singleton()->getCache()->flush();
     }
@@ -1518,7 +1510,7 @@ class CRM_Utils_System {
         = CRM_Contribute_BAO_Contribution::$_exportableFields
           = CRM_Pledge_BAO_Pledge::$_exportableFields
             = CRM_Core_BAO_CustomField::$_importFields
-              = CRM_Core_BAO_Cache::$_cache = CRM_Core_DAO::$_dbColumnValueCache = NULL;
+              = CRM_Core_DAO::$_dbColumnValueCache = NULL;
 
     CRM_Core_OptionGroup::flushAll();
     CRM_Utils_PseudoConstant::flushAll();
@@ -1596,10 +1588,11 @@ class CRM_Utils_System {
    * Given a URL, return a relative URL if possible.
    *
    * @param string $url
-   *
+   * @deprecated
    * @return string
    */
   public static function relativeURL($url) {
+    CRM_Core_Error::deprecatedFunctionWarning('url');
     // check if url is relative, if so return immediately
     if (substr($url, 0, 4) != 'http') {
       return $url;
@@ -1627,6 +1620,7 @@ class CRM_Utils_System {
    * @return string
    */
   public static function absoluteURL($url, $removeLanguagePart = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('url');
     // check if url is already absolute, if so return immediately
     if (substr($url, 0, 4) == 'http') {
       return $url;
@@ -1737,7 +1731,12 @@ class CRM_Utils_System {
     $inc_dirs = explode(PATH_SEPARATOR, get_include_path());
     foreach ($inc_dirs as $inc_dir) {
       $target_dir = $inc_dir . DIRECTORY_SEPARATOR . $relpath;
-      if (is_dir($target_dir)) {
+      // While it seems pointless to have a folder that's outside open_basedir
+      // listed in include_path and that seems more like a configuration issue,
+      // not everyone has control over the hosting provider's include_path and
+      // this does happen out in the wild, so use our wrapper to avoid flooding
+      // logs.
+      if (CRM_Utils_File::isDir($target_dir)) {
         $cur_list = scandir($target_dir);
         foreach ($cur_list as $fname) {
           if ($fname != '.' && $fname != '..') {
@@ -1805,7 +1804,7 @@ class CRM_Utils_System {
   /**
    * Evaluate any tokens in a URL.
    *
-   * @param string|FALSE $url
+   * @param string|false $url
    *
    * @return string|FALSE
    */
@@ -1823,7 +1822,7 @@ class CRM_Utils_System {
         '{sid}' => self::getSiteID(),
         '{baseUrl}' => $config->userFrameworkBaseURL,
         '{lang}' => $tsLocale,
-        '{co}' => $config->defaultContactCountry,
+        '{co}' => $config->defaultContactCountry ?? '',
       ];
       return strtr($url, array_map('urlencode', $vars));
     }
@@ -1847,86 +1846,80 @@ class CRM_Utils_System {
   }
 
   /**
-   * Determine whether this is a developmental system.
-   *
-   * @return bool
-   */
-  public static function isDevelopment() {
-    static $cache = NULL;
-    if ($cache === NULL) {
-      global $civicrm_root;
-      $cache = file_exists("{$civicrm_root}/.svn") || file_exists("{$civicrm_root}/.git");
-    }
-    return $cache;
-  }
-
-  /**
    * Is in upgrade mode.
    *
    * @return bool
+   * @deprecated
+   * @see CRM_Core_Config::isUpgradeMode()
    */
   public static function isInUpgradeMode() {
-    $args = explode('/', CRM_Utils_Array::value('q', $_GET));
-    $upgradeInProcess = CRM_Core_Session::singleton()->get('isUpgradePending');
-    if ((isset($args[1]) && $args[1] == 'upgrade') || $upgradeInProcess) {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+    return CRM_Core_Config::isUpgradeMode();
   }
 
   /**
-   * Determine the standard URL for viewing or editing the specified link.
-   *
-   * This function delegates the decision-making to (a) the hook system and
-   * (b) the BAO system.
+   * Determine the standard URL for view/update/delete of a given entity.
    *
    * @param array $crudLinkSpec
    *   With keys:.
-   *   - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
-   *   - entity_table: string, eg "civicrm_contact"
-   *   - entity_id: int
+   *   - action: sting|int, e.g. 'update' or CRM_Core_Action::UPDATE or 'view' or CRM_Core_Action::VIEW [default: 'view']
+   *   - entity|entity_table: string, eg "Contact" or "civicrm_contact"
+   *   - id|entity_id: int
+   *
+   * @param bool $absolute whether the generated link should have an absolute (external) URL beginning with http
    *
    * @return array|NULL
    *   NULL if unavailable, or an array. array has keys:
-   *   - path: string
-   *   - query: array
    *   - title: string
    *   - url: string
    */
-  public static function createDefaultCrudLink($crudLinkSpec) {
-    $crudLinkSpec['action'] = CRM_Utils_Array::value('action', $crudLinkSpec, CRM_Core_Action::VIEW);
-    $daoClass = CRM_Core_DAO_AllCoreTables::getClassForTable($crudLinkSpec['entity_table']);
-    if (!$daoClass) {
+  public static function createDefaultCrudLink($crudLinkSpec, $absolute = FALSE) {
+    $action = $crudLinkSpec['action'] ?? 'view';
+    if (is_numeric($action)) {
+      $action = CRM_Core_Action::description($action);
+    }
+    else {
+      $action = strtolower($action);
+    }
+
+    $daoClass = isset($crudLinkSpec['entity']) ? CRM_Core_DAO_AllCoreTables::getFullName($crudLinkSpec['entity']) : CRM_Core_DAO_AllCoreTables::getClassForTable($crudLinkSpec['entity_table']);
+    $paths = $daoClass ? $daoClass::getEntityPaths() : [];
+    $path = $paths[$action] ?? NULL;
+    if (!$path) {
       return NULL;
     }
 
-    $baoClass = str_replace('_DAO_', '_BAO_', $daoClass);
-    if (!class_exists($baoClass)) {
-      return NULL;
+    if (empty($crudLinkSpec['id']) && !empty($crudLinkSpec['entity_id'])) {
+      $crudLinkSpec['id'] = $crudLinkSpec['entity_id'];
+    }
+    foreach ($crudLinkSpec as $key => $value) {
+      $path = str_replace('[' . $key . ']', $value, $path);
     }
 
-    $bao = new $baoClass();
-    $bao->id = $crudLinkSpec['entity_id'];
-    if (!$bao->find(TRUE)) {
-      return NULL;
+    switch ($action) {
+      case 'add':
+        $title = ts('New %1', [1 => $daoClass::getEntityTitle()]);
+        break;
+
+      case 'view':
+        $title = ts('View %1', [1 => $daoClass::getEntityTitle()]);
+        break;
+
+      case 'update':
+        $title = ts('Edit %1', [1 => $daoClass::getEntityTitle()]);
+        break;
+
+      case 'delete':
+        $title = ts('Delete %1', [1 => $daoClass::getEntityTitle()]);
+        break;
+
+      default:
+        $title = ts(ucfirst($action)) . ' ' . $daoClass::getEntityTitle();
     }
 
-    $link = [];
-    CRM_Utils_Hook::crudLink($crudLinkSpec, $bao, $link);
-    if (empty($link) && is_callable([$bao, 'createDefaultCrudLink'])) {
-      $link = $bao->createDefaultCrudLink($crudLinkSpec);
-    }
-
-    if (!empty($link)) {
-      if (!isset($link['url'])) {
-        $link['url'] = self::url($link['path'], $link['query'], TRUE, NULL, FALSE);
-      }
-      return $link;
-    }
-
-    return NULL;
+    return [
+      'title' => $title,
+      'url' => self::url($path, NULL, $absolute, NULL, FALSE),
+    ];
   }
 
   /**
@@ -1935,6 +1928,13 @@ class CRM_Utils_System {
    */
   public static function sendResponse(\Psr\Http\Message\ResponseInterface $response) {
     $config = CRM_Core_Config::singleton()->userSystem->sendResponse($response);
+  }
+
+  /**
+   * Perform any necessary actions prior to redirecting via POST.
+   */
+  public static function prePostRedirect() {
+    CRM_Core_Config::singleton()->userSystem->prePostRedirect();
   }
 
 }

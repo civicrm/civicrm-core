@@ -19,16 +19,26 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   protected $_apiversion;
 
   /**
+   * @var int
+   */
+  private $_groupID;
+
+  /**
+   * @var int
+   */
+  private $_orgID;
+
+  /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     $this->_apiversion = 3;
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_groupID = $this->groupCreate();
 
-    $this->_orgID = $this->organizationCreate(NULL);
+    $this->_orgID = $this->organizationCreate();
   }
 
   ///////////////// civicrm_group_organization_get methods
@@ -38,7 +48,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGroupOrganizationGet() {
+  public function testGroupOrganizationGet(): void {
 
     $params = [
       'organization_id' => $this->_orgID,
@@ -48,7 +58,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
     $paramsGet = [
       'organization_id' => $result['id'],
     ];
-    $result = $this->callAPIAndDocument('group_organization', 'get', $paramsGet, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_organization', 'get', $paramsGet);
   }
 
   /**
@@ -56,7 +66,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGroupOrganizationGetWithGroupId() {
+  public function testGroupOrganizationGetWithGroupId(): void {
     $createParams = [
       'organization_id' => $this->_orgID,
       'group_id' => $this->_groupID,
@@ -76,7 +86,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGroupOrganizationGetWithEmptyParams() {
+  public function testGroupOrganizationGetWithEmptyParams(): void {
     $params = [];
     $result = $this->callAPISuccess('group_organization', 'get', $params);
 
@@ -88,7 +98,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGroupOrganizationGetWithInvalidKeys() {
+  public function testGroupOrganizationGetWithInvalidKeys(): void {
     $params = [
       'invalid_key' => 1,
     ];
@@ -104,12 +114,12 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGroupOrganizationCreate() {
+  public function testGroupOrganizationCreate(): void {
     $params = [
       'organization_id' => $this->_orgID,
       'group_id' => $this->_groupID,
     ];
-    $result = $this->callAPIAndDocument('group_organization', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_organization', 'create', $params);
   }
 
   /**
@@ -117,7 +127,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGroupOrganizationCreateTwice() {
+  public function testGroupOrganizationCreateTwice(): void {
     $params = [
       'organization_id' => $this->_orgID,
       'group_id' => $this->_groupID,
@@ -132,7 +142,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGroupOrganizationCreateWithEmptyParams() {
+  public function testGroupOrganizationCreateWithEmptyParams(): void {
     $params = [];
     $result = $this->callAPIFailure('group_organization', 'create', $params);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: group_id, organization_id');
@@ -143,7 +153,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGroupOrganizationCreateWithInvalidKeys() {
+  public function testGroupOrganizationCreateWithInvalidKeys(): void {
     $params = [
       'invalid_key' => 1,
     ];
@@ -158,7 +168,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGroupOrganizationDeleteWithEmptyParams() {
+  public function testGroupOrganizationDeleteWithEmptyParams(): void {
     $params = [];
     $result = $this->callAPIFailure('group_organization', 'delete', $params);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
@@ -169,7 +179,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGroupOrganizationDelete() {
+  public function testGroupOrganizationDelete(): void {
     $paramsC = [
       'organization_id' => $this->_orgID,
       'group_id' => $this->_groupID,
@@ -179,7 +189,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
     $params = [
       'id' => $result['id'],
     ];
-    $result = $this->callAPIAndDocument('group_organization', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_organization', 'delete', $params);
   }
 
   /**
@@ -187,7 +197,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGroupOrganizationDeleteWithInvalidKey() {
+  public function testGroupOrganizationDeleteWithInvalidKey(): void {
     $paramsDelete = [
       'invalid_key' => 1,
     ];

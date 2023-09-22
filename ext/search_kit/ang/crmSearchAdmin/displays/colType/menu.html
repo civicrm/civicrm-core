@@ -1,0 +1,35 @@
+<div class="form-inline">
+  <label for="crm-search-admin-col-size-{{$index}}">
+    {{:: ts('Menu Button Size') }}
+  </label>
+  <select id="crm-search-admin-col-size-{{$index}}" class="form-control" ng-model="col.size">
+    <option value="btn-lg">{{:: ts('Large') }}</option>
+    <option value="">{{:: ts('Regular') }}</option>
+    <option value="btn-sm">{{:: ts('Small') }}</option>
+    <option value="btn-xs">{{:: ts('Tiny') }}</option>
+  </select>
+  <label for="crm-search-admin-col-style-{{$index}}">
+    {{:: ts('Style') }}
+  </label>
+  <select id="crm-search-admin-col-style-{{$index}}" class="form-control" ng-model="col.style">
+    <option ng-repeat="opt in $ctrl.parent.styles" value="{{:: opt.key }}">{{:: opt.value }}</option>
+    <option ng-repeat="opt in $ctrl.parent.styles" value="{{:: opt.key + '-outline' }}">{{:: opt.value + ' ' + ts('Outline') }}</option>
+  </select>
+</div>
+<div class="form-inline">
+  <label>
+    {{:: ts('Menu Icon/Text') }}
+  </label>
+  <div class="btn-group">
+    <button type="button" class="btn btn-{{ col.style + ' ' + col.size }}">
+      <span class="crm-editable-enabled" ng-click="$ctrl.parent.pickIcon(col, 'icon')">
+        <i class="{{ col.icon ? 'crm-i ' + col.icon : '' }}"></i>
+      </span>
+      <span crm-ui-editable ng-model="col.text">{{ col.text }}</span>
+      <span class="caret disabled"></span>
+    </button>
+  </div>
+  <crm-search-admin-token-select model="col" field="text" suffix=":label"></crm-search-admin-token-select>
+</div>
+<hr>
+<crm-search-admin-link-group links="$ctrl.parent.getLinks()" group="col.links" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></crm-search-admin-link-group>

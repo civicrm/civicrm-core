@@ -29,25 +29,19 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form_Task {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param \CRM_Core_Form_Task $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcessCommon(&$form) {
-    $values = $form->controller->exportValues($form->get('searchFormName'));
+    $values = $form->getSearchFormValues();
 
     $form->_task = $values['task'] ?? NULL;
-    $mailingTasks = CRM_Mailing_Task::tasks();
-    $form->assign('taskName', CRM_Utils_Array::value('task', $values));
 
     // ids are mailing event queue ids
-    $ids = [];
-    if ($values['radio_ts'] == 'ts_sel') {
-      foreach ($values as $name => $value) {
-        if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
-          $ids[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
-        }
-      }
-    }
-    else {
+    $ids = $form->getSelectedIDs($values);
+
+    if (!$ids) {
       $queryParams = $form->get('queryParams');
       $sortOrder = NULL;
       if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {

@@ -116,6 +116,10 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     }
 
     $component = CRM_Mailing_BAO_MailingComponent::add($params);
+
+    // set the id after save, so it can be used in a extension using the postProcess hook
+    $this->_id = $component->id;
+
     CRM_Core_Session::setStatus(ts('The mailing component \'%1\' has been saved.', [
       1 => $component->name,
     ]), ts('Saved'), 'success');

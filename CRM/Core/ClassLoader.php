@@ -65,6 +65,7 @@ class CRM_Core_ClassLoader {
       'CiviTestSuite',
       'CiviUnitTestCase',
       'CiviEndToEndTestCase',
+      'CiviSimpleCacheTest',
       'Contact',
       'ContributionPage',
       'Custom',
@@ -119,7 +120,6 @@ class CRM_Core_ClassLoader {
     // TODO Remove this autoloader. For civicrm-core and civicrm-packages, the composer autoloader works fine.
     // Extensions rely on include_path-based autoloading
     spl_autoload_register([$this, 'loadClass'], TRUE, $prepend);
-    $this->initHtmlPurifier($prepend);
 
     $this->_registered = TRUE;
     // The ClassLoader runs before the classes are available. Approximate Civi::paths()->get('[civicrm.packages]').
@@ -141,64 +141,10 @@ class CRM_Core_ClassLoader {
   }
 
   /**
-   * Initialize HTML purifier class.
-   *
-   * @param string $prepend
-   */
-  public function initHtmlPurifier($prepend) {
-    if (class_exists('HTMLPurifier_Bootstrap')) {
-      // HTMLPurifier is already initialized, e.g. by the Drupal module.
-      return;
-    }
-
-    $htmlPurifierPath = $this->getHtmlPurifierPath();
-
-    if (FALSE === $htmlPurifierPath) {
-      // No HTMLPurifier available, e.g. during installation.
-      return;
-    }
-    require_once $htmlPurifierPath;
-    spl_autoload_register(['HTMLPurifier_Bootstrap', 'autoload'], TRUE, $prepend);
-  }
-
-  /**
-   * @return string|false
-   *   Path to the file where the class HTMLPurifier_Bootstrap is defined, or
-   *   FALSE, if such a file does not exist.
-   */
-  private function getHtmlPurifierPath() {
-    if (function_exists('libraries_get_path')
-      && ($path = libraries_get_path('htmlpurifier'))
-      && file_exists($file = $path . '/library/HTMLPurifier/Bootstrap.php')
-    ) {
-      // We are in Drupal 7, and the HTMLPurifier module is installed.
-      // Use Drupal's HTMLPurifier path, to avoid conflicts.
-      // @todo Verify that we are really in Drupal 7, and not in some other
-      // environment that happens to provide a 'libraries_get_path()' function.
-      return $file;
-    }
-
-    // we do this to prevent a autoloader errors with joomla / 3rd party packages
-    // Use absolute path, since we don't know the content of include_path yet.
-    // CRM-11304
-    if (isset($GLOBALS['civicrm_paths']['civicrm.packages']['path'])) {
-      $file = rtrim($GLOBALS['civicrm_paths']['civicrm.packages']['path'], DIRECTORY_SEPARATOR) . '/IDS/vendors/htmlpurifier/HTMLPurifier/Bootstrap.php';
-    }
-    else {
-      $file = dirname(__FILE__) . '/../../packages/IDS/vendors/htmlpurifier/HTMLPurifier/Bootstrap.php';
-    }
-    if (file_exists($file)) {
-      return $file;
-    }
-
-    return FALSE;
-  }
-
-  /**
    * @param $class
    */
   public function loadClass($class) {
-    if ($class === 'CiviCRM_API3_Exception') {
+    if ($class === 'CiviCRM_API3_Exception' || $class === 'API_Exception') {
       //call internal error class api/Exception first
       // allow api/Exception class call external error class
       // CiviCRM_API3_Exception
@@ -207,7 +153,7 @@ class CRM_Core_ClassLoader {
     if (
       // Only load classes that clearly belong to CiviCRM.
       // Note: api/v3 does not use classes, but api_v3's test-suite does
-      (0 === strncmp($class, 'CRM_', 4) || 0 === strncmp($class, 'CRMTraits', 9) || 0 === strncmp($class, 'api_v3_', 7) || 0 === strncmp($class, 'WebTest_', 8) || 0 === strncmp($class, 'E2E_', 4)) &&
+      (0 === strncmp($class, 'CRM_', 4) || 0 === strncmp($class, 'CRMTraits', 9) || 0 === strncmp($class, 'api_v3_', 7) || 0 === strncmp($class, 'E2E_', 4)) &&
       // Do not load PHP 5.3 namespaced classes.
       // (in a future version, maybe)
       FALSE === strpos($class, '\\')
@@ -224,14 +170,6 @@ class CRM_Core_ClassLoader {
       $file = "tests/phpunit/CiviTest/{$class}.php";
       if (FALSE != stream_resolve_include_path($file)) {
         require_once $file;
-      }
-    }
-    elseif ($class === 'CiviSeleniumSettings') {
-      if (!empty($GLOBALS['_CV'])) {
-        require_once 'tests/phpunit/CiviTest/CiviSeleniumSettings.auto.php';
-      }
-      elseif (CRM_Utils_File::isIncludable('tests/phpunit/CiviTest/CiviSeleniumSettings.php')) {
-        require_once 'tests/phpunit/CiviTest/CiviSeleniumSettings.php';
       }
     }
   }

@@ -73,7 +73,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
    */
   public function buildQuickform() {
     $title = ts('Approve/Reject Mailing') . " - {$this->_mailing->name}";
-    CRM_Utils_System::setTitle($title);
+    $this->setTitle($title);
 
     $this->addElement('textarea', 'approval_note', ts('Approve/Reject Note'));
 
@@ -129,15 +129,14 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
 
-    $ids = [];
     if (isset($this->_mailingID)) {
-      $ids['mailing_id'] = $this->_mailingID;
+      $params['id'] = $this->_mailingID;
     }
     else {
-      $ids['mailing_id'] = $this->get('mailing_id');
+      $params['id'] = $this->get('mailing_id');
     }
 
-    if (!$ids['mailing_id']) {
+    if (!$params['id']) {
       CRM_Core_Error::statusBounce(ts('No mailing id has been able to be determined'));
     }
 
@@ -154,20 +153,20 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
 
       // also delete any jobs associated with this mailing
       $job = new CRM_Mailing_BAO_MailingJob();
-      $job->mailing_id = $ids['mailing_id'];
+      $job->mailing_id = $params['id'];
       while ($job->fetch()) {
-        CRM_Mailing_BAO_MailingJob::del($job->id);
+        CRM_Mailing_BAO_MailingJob::deleteRecord(['id' => $job->id]);
       }
     }
     else {
       $mailing = new CRM_Mailing_BAO_Mailing();
-      $mailing->id = $ids['mailing_id'];
+      $mailing->id = $params['id'];
       $mailing->find(TRUE);
 
       $params['scheduled_date'] = CRM_Utils_Date::processDate($mailing->scheduled_date);
     }
 
-    CRM_Mailing_BAO_Mailing::create($params, $ids);
+    CRM_Mailing_BAO_Mailing::create($params);
 
     //when user perform mailing from search context
     //redirect it to search result CRM-3711

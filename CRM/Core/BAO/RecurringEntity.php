@@ -20,7 +20,7 @@ use When\When;
 /**
  * Class CRM_Core_BAO_RecurringEntity.
  */
-class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
+class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
 
   const RUNNING = 1;
   public $schedule = [];
@@ -115,6 +115,14 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   const MODE_NEXT_ALL_ENTITY = 2;
   const MODE_ALL_ENTITY_IN_SERIES = 3;
 
+  public static function getSubscribedEvents() {
+    return [
+      'civi.dao.postInsert' => 'triggerInsert',
+      'civi.dao.postUpdate' => 'triggerUpdate',
+      'civi.dao.postDelete' => 'triggerDelete',
+    ];
+  }
+
   /**
    * Getter for status.
    *
@@ -136,10 +144,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   /**
    * Create or update a RecurringEntity.
    *
+   * @deprecated
    * @param array $params
    * @return CRM_Core_DAO_RecurringEntity
    */
   public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -580,15 +590,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just updated.
    */
   public static function triggerUpdate($event) {
-    // if DB version is earlier than 4.6 skip any processing
-    static $currentVer = NULL;
-    if (!$currentVer) {
-      $currentVer = CRM_Core_BAO_Domain::version();
-    }
-    if (version_compare($currentVer, '4.6.alpha1') < 0) {
-      return;
-    }
-
     static $processedEntities = [];
     $obj =& $event->object;
     if (empty($obj->id) || empty($obj->__table)) {
@@ -650,15 +651,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   public static function triggerInsert($event) {
     $obj =& $event->object;
     if (!array_key_exists($obj->__table, self::$_linkedEntitiesInfo)) {
-      return;
-    }
-
-    // if DB version is earlier than 4.6 skip any processing
-    static $currentVer = NULL;
-    if (!$currentVer) {
-      $currentVer = CRM_Core_BAO_Domain::version();
-    }
-    if (version_compare($currentVer, '4.6.alpha1') < 0) {
       return;
     }
 
@@ -756,15 +748,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    */
   public static function triggerDelete($event) {
     $obj =& $event->object;
-
-    // if DB version is earlier than 4.6 skip any processing
-    static $currentVer = NULL;
-    if (!$currentVer) {
-      $currentVer = CRM_Core_BAO_Domain::version();
-    }
-    if (version_compare($currentVer, '4.6.alpha1') < 0) {
-      return;
-    }
 
     static $processedEntities = [];
     if (empty($obj->id) || empty($obj->__table) || !$event->result) {
@@ -1031,7 +1014,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           $concatStartActionDateBits = $startActionDate1 . strtoupper(substr($startActionDate[1], 0, 2));
           $r->byday([$concatStartActionDateBits]);
         }
-        elseif ($scheduleReminderDetails['limit_to']) {
+        elseif ($scheduleReminderDetails['limit_to'] == 1) {
           $r->bymonthday([$scheduleReminderDetails['limit_to']]);
         }
       }
@@ -1130,7 +1113,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         $dao = self::$_tableDAOMapper[$linkedEntityTable];
       }
       else {
-        CRM_Core_Session::setStatus('Could not update mode for linked entities');
+        CRM_Core_Session::setStatus(ts('Could not update mode for linked entities'));
         return NULL;
       }
       $entityTable = $linkedEntityTable;
@@ -1241,7 +1224,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       return $this->recursion->getNextOccurrence($occurDate, $strictly_after);
     }
     catch (Exception $exception) {
-      CRM_Core_Session::setStatus(ts($exception->getMessage()));
+      CRM_Core_Session::setStatus(_ts($exception->getMessage()));
     }
     return FALSE;
   }

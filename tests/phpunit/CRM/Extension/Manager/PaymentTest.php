@@ -15,7 +15,12 @@
  */
 class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  /**
+   * @var CRM_Extension_System
+   */
+  private $system;
+
+  public function setUp(): void {
     parent::setUp();
     if (class_exists('test_extension_manager_paymenttest')) {
       test_extension_manager_paymenttest::$counts = [];
@@ -27,7 +32,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
     $this->quickCleanup(['civicrm_payment_processor']);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $this->system = NULL;
     $this->quickCleanup(['civicrm_payment_processor']);
@@ -37,7 +42,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   /**
    * Install an extension with a valid type name.
    */
-  public function testInstallDisableUninstall() {
+  public function testInstallDisableUninstall(): void {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
     $manager->install(['test.extension.manager.paymenttest']);
@@ -57,7 +62,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   /**
    * Install an extension with a valid type name.
    */
-  public function testInstallDisableEnable() {
+  public function testInstallDisableEnable(): void {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
 
@@ -80,7 +85,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
    * Install an extension and create a payment processor which uses it.
    * Attempts to uninstall fail
    */
-  public function testInstall_Add_FailUninstall() {
+  public function testInstall_Add_FailUninstall(): void {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
 
@@ -89,7 +94,8 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest" AND is_active = 1');
     $payment_processor_type_id = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_payment_processor_type  WHERE class_name = "test.extension.manager.paymenttest"');
 
-    $ppDAO = CRM_Financial_BAO_PaymentProcessor::create([
+    $ppDAO = CRM_Financial_BAO_PaymentProcessor::writeRecord([
+      'title' => __FUNCTION__,
       'payment_processor_type_id' => $payment_processor_type_id,
       'domain_id' => CRM_Core_Config::domainID(),
     ]);

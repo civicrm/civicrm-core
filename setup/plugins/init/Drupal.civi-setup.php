@@ -37,11 +37,14 @@ if (!defined('CIVI_SETUP')) {
 
     // Compute DSN.
     global $databases;
+    $ssl_params = \Civi\Setup\DrupalUtil::guessSslParams($databases['default']['default']);
+    // @todo Does Drupal support unixsocket in config? Set 'server' => 'unix(/path/to/socket.sock)'
     $model->db = $model->cmsDb = array(
       'server' => \Civi\Setup\DbUtil::encodeHostPort($databases['default']['default']['host'], $databases['default']['default']['port'] ?: NULL),
       'username' => $databases['default']['default']['username'],
       'password' => $databases['default']['default']['password'],
       'database' => $databases['default']['default']['database'],
+      'ssl_params' => empty($ssl_params) ? NULL : $ssl_params,
     );
 
     // Compute cmsBaseUrl.
@@ -59,7 +62,7 @@ if (!defined('CIVI_SETUP')) {
 
     // Compute default locale.
     global $language;
-    $model->lang = \Civi\Setup\LocaleUtil::pickClosest($language->langcode, $model->getField('lang', 'options'));
+    $model->lang = \Civi\Setup\LocaleUtil::pickClosest($language->langcode ?? NULL, $model->getField('lang', 'options'));
   });
 
 function _drupal_civisetup_getPublicFiles() {

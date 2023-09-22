@@ -2,43 +2,25 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2020                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 namespace api\v4\Entity;
 
 use Civi\Api4\ActivityContact;
 use Civi\Api4\Contact;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -47,7 +29,7 @@ use Civi\Test\TransactionalInterface;
  *
  * @group headless
  */
-class ContactInterchangeTest extends UnitTestCase implements TransactionalInterface {
+class ContactInterchangeTest extends Api4TestBase implements TransactionalInterface {
 
   public function getExamples() {
     $apiWriters = [
@@ -218,16 +200,16 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
   public function readNameByActSubjectJoin_4($cid, $strs) {
     $get = ActivityContact::get()
       ->addWhere('record_type_id:label', '=', 'Activity Source')
-      ->addWhere('activity.subject', '=', $strs['api'])
-      ->addSelect('contact.first_name')
+      ->addWhere('activity_id.subject', '=', $strs['api'])
+      ->addSelect('contact_id.first_name')
       ->execute();
-    return $get->first()['contact.first_name'];
+    return $get->first()['contact_id.first_name'];
   }
 
   public function readNameByActSubjectChain_4($cid, $strs) {
     $get = ActivityContact::get()
       ->addWhere('record_type_id:label', '=', 'Activity Source')
-      ->addWhere('activity.subject', '=', $strs['api'])
+      ->addWhere('activity_id.subject', '=', $strs['api'])
       ->setSelect(['activity_id', 'contact_id'])
       ->setChain([
         'the_contact' => [
@@ -270,16 +252,16 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
   public function readNameByActDetailsJoin_4($cid, $strs) {
     $get = ActivityContact::get()
       ->addWhere('record_type_id:label', '=', 'Activity Source')
-      ->addWhere('activity.details', '=', $strs['api'])
-      ->addSelect('contact.first_name')
+      ->addWhere('activity_id.details', '=', $strs['api'])
+      ->addSelect('contact_id.first_name')
       ->execute();
-    return $get->first()['contact.first_name'];
+    return $get->first()['contact_id.first_name'];
   }
 
   public function readNameByActDetailsChain_4($cid, $strs) {
     $get = ActivityContact::get()
       ->addWhere('record_type_id:label', '=', 'Activity Source')
-      ->addWhere('activity.details', '=', $strs['api'])
+      ->addWhere('activity_id.details', '=', $strs['api'])
       ->setSelect(['activity_id', 'contact_id'])
       ->setChain([
         'the_contact' => [

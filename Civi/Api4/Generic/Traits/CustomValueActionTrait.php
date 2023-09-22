@@ -10,15 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Generic\Traits;
 
 use Civi\Api4\Utils\FormattingUtil;
@@ -33,7 +24,7 @@ trait CustomValueActionTrait {
 
   public function __construct($customGroup, $actionName) {
     $this->customGroup = $customGroup;
-    parent::__construct('CustomValue', $actionName, ['id', 'entity_id']);
+    parent::__construct('CustomValue', $actionName);
   }
 
   /**
@@ -51,12 +42,32 @@ trait CustomValueActionTrait {
   }
 
   /**
+   * Is this api call permitted?
+   *
+   * This function is called if checkPermissions is set to true.
+   *
+   * @return bool
+   */
+  public function isAuthorized(): bool {
+    if ($this->getActionName() !== 'getFields') {
+      // Check access to custom group
+      $permissionToCheck = $this->getActionName() == 'get' ? \CRM_Core_Permission::VIEW : \CRM_Core_Permission::EDIT;
+      $groupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->getCustomGroup(), 'id', 'name');
+      if (!\CRM_Core_BAO_CustomGroup::checkGroupAccess($groupId, $permissionToCheck)) {
+        return FALSE;
+      }
+    }
+    return parent::isAuthorized();
+  }
+
+  /**
    * @inheritDoc
    */
   protected function writeObjects($items) {
-    $result = [];
     $fields = $this->entityFields();
-    foreach ($items as $item) {
+    // Note: Some parts of this loop mutate $item for purposes of internal processing only
+    // so we do not loop through $items by reference as to preserve the original structure for output.
+    foreach ($items as $idx => $item) {
       FormattingUtil::formatWriteParams($item, $fields);
 
       // Convert field names to custom_xx format
@@ -67,9 +78,16 @@ trait CustomValueActionTrait {
         }
       }
 
-      $result[] = \CRM_Core_BAO_CustomValueTable::setValues($item);
+      \CRM_Core_BAO_CustomValueTable::setValues($item);
+
+      // Darn setValues function doesn't return an id.
+      if (empty($item['id'])) {
+        $tableName = CoreUtil::getTableName($this->getEntityName());
+        $items[$idx]['id'] = (int) \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM ' . $tableName);
+      }
+      FormattingUtil::formatOutputValues($items[$idx], $fields, 'create');
     }
-    return $result;
+    return $items;
   }
 
   /**
@@ -79,7 +97,7 @@ trait CustomValueActionTrait {
     $customTable = CoreUtil::getTableName($this->getEntityName());
     $ids = [];
     foreach ($items as $item) {
-      \CRM_Utils_Hook::pre('delete', $this->getEntityName(), $item['id'], \CRM_Core_DAO::$_nullArray);
+      \CRM_Utils_Hook::pre('delete', $this->getEntityName(), $item['id']);
       \CRM_Utils_SQL_Delete::from($customTable)
         ->where('id = #value')
         ->param('#value', $item['id'])
@@ -106,6 +124,13 @@ trait CustomValueActionTrait {
    */
   public function getCustomGroup() {
     return $this->customGroup;
+  }
+
+  /**
+   * @return \CRM_Core_DAO|string
+   */
+  protected function getBaoName() {
+    return \CRM_Core_BAO_CustomValue::class;
   }
 
 }

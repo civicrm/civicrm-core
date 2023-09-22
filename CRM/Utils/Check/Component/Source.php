@@ -35,6 +35,8 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
     $files[] = '[civicrm.vendor]/pear/net_smtp/phpdoc.sh';
     $files[] = '[civicrm.vendor]/phpoffice/phpword/samples';
     $files[] = '[civicrm.root]/templates/CRM/common/version.tpl';
+    // TODO: We need more proactive deletion for files like:
+    // $files[]  = '[civicrm.root]/CRM/Contact/Import/Parser.php';
     $files[] = '[civicrm.packages]/Log.php';
     $files[] = '[civicrm.packages]/_ORIGINAL_/Log.php';
     $files[] = '[civicrm.packages]/Log/composite.php';
@@ -66,7 +68,7 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
    */
   public function findOrphanedFiles() {
     $orphans = [];
-
+    $core_supplied_vendor = Civi::paths()->getPath('[civicrm.root]/vendor');
     foreach ($this->getRemovedFiles() as $file) {
       $path = Civi::paths()->getPath($file);
       if (empty($path) || strpos('[civicrm', $path) !== FALSE) {
@@ -74,6 +76,10 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
           'file' => $file,
           'path' => $path,
         ]);
+      }
+      // If Vendor directory is not within the civicrm module directory (Drupal 8/9/10) etc ignore checks on the vendor paths.
+      if (strpos($file, '.vendor') !== FALSE && !is_dir($core_supplied_vendor)) {
+        continue;
       }
       if (file_exists($path)) {
         $orphans[] = [
@@ -99,7 +105,7 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkOrphans() {
     $orphans = $this->findOrphanedFiles();

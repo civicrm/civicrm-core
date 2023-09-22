@@ -30,7 +30,6 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
   /**
    * Set variables up before form is built.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
@@ -43,7 +42,7 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'title');
     }
 
-    if (!CRM_Event_BAO_Event::checkPermission($this->_id, CRM_Core_Permission::DELETE)) {
+    if (!CRM_Event_BAO_Event::checkPermission((int) $this->_id, CRM_Core_Permission::DELETE)) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
   }
@@ -82,7 +81,7 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
       ), ts('Deletion Error'), 'error');
       return;
     }
-    CRM_Event_BAO_Event::del($this->_id);
+    CRM_Event_BAO_Event::deleteRecord(['id' => $this->_id]);
     if ($this->_isTemplate) {
       CRM_Core_Session::setStatus(ts("'%1' has been deleted.", [1 => $this->_title]), ts('Template Deleted'), 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1'));

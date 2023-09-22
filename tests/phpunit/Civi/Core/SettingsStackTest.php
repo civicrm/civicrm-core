@@ -3,19 +3,15 @@ namespace Civi\Core;
 
 class SettingsStackTest extends \CiviUnitTestCase {
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
-  }
-
-  public function tearDown() {
-    parent::tearDown();
   }
 
   /**
    * Temporarily modify -- then restore -- settings.
    */
-  public function testStack() {
+  public function testStack(): void {
     $origVal = \Civi::settings()->get('show_events');
 
     $settingsStack = new \Civi\Core\SettingsStack();

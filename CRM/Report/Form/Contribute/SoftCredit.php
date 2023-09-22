@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
 
@@ -22,11 +20,6 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
   protected $_emailFieldCredit = FALSE;
   protected $_phoneField = FALSE;
   protected $_phoneFieldCredit = FALSE;
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
 
   protected $_customGroupExtends = [
     'Contact',
@@ -43,9 +36,8 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -209,7 +201,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'title' => ts('Financial Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search'),
           ],
         ],
         'grouping' => 'softcredit-fields',
@@ -301,6 +293,13 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
 
     // If we have a campaign, build out the relevant elements
     $this->addCampaignFields('civicrm_contribution');
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
+    ];
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -465,11 +464,11 @@ GROUP BY {$this->_aliases['civicrm_contribution_soft']}.contact_id, constituentn
 
   public function where() {
     parent::where();
-    $this->_where .= " AND {$this->_aliases['civicrm_contribution']}.is_test = 0 ";
+    $this->_where .= " AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0 ";
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
@@ -570,7 +569,7 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_contact_display_name_creditor_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_display_name_creditor_hover'] = ts("view contact summary");
+        $rows[$rowNum]['civicrm_contact_display_name_creditor_hover'] = ts("View contact summary");
       }
 
       // make subtotals look nicer

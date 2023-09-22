@@ -7,12 +7,16 @@
   <comment>Website information for a specific location.</comment>
   <add>3.2</add>
   <icon>fa-desktop</icon>
+  <labelField>url</labelField>
   <field>
     <name>id</name>
     <type>int unsigned</type>
     <title>Website ID</title>
     <required>true</required>
     <comment>Unique Website ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.2</add>
   </field>
   <primaryKey>
@@ -21,9 +25,12 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
-    <title>Contact</title>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>3.2</add>
   </field>
   <foreignKey>
@@ -37,10 +44,10 @@
     <name>url</name>
     <title>Website</title>
     <type>varchar</type>
-    <length>128</length>
+    <length>255</length>
     <html>
       <type>Text</type>
-      <size>30</size>
+      <size>45</size>
     </html>
     <import>true</import>
     <headerPattern>/Website/i</headerPattern>

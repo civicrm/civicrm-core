@@ -14,44 +14,58 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace api\v4\Query;
 
 use Civi\Api4\Email;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * Class SelectQueryMultiJoinTest
  * @package api\v4\Query
  * @group headless
  */
-class SelectQueryMultiJoinTest extends UnitTestCase {
+class SelectQueryMultiJoinTest extends Api4TestBase {
 
-  public function setUpHeadless() {
-    $this->cleanup(['tablesToTruncate' => ['civicrm_contact', 'civicrm_email']]);
-    $this->loadDataSet('MultiContactMultiEmail');
-    return parent::setUpHeadless();
-  }
+  public function testManyToOneSelect(): void {
 
-  public function testManyToOneSelect() {
+    $contact1 = $this->createTestRecord('Contact', [
+      'first_name' => 'First',
+      'last_name' => 'Contact',
+    ]);
+    $firstEmail = $this->createTestRecord('Email', [
+      'contact_id' => $contact1['id'],
+      'location_type_id:name' => 'Home',
+    ]);
+    $secondEmail = $this->createTestRecord('Email', [
+      'contact_id' => $contact1['id'],
+      'location_type_id:name' => 'Work',
+    ]);
+    $contact2 = $this->createTestRecord('Contact', [
+      'first_name' => 'Second',
+      'last_name' => 'Contact',
+    ]);
+    $thirdEmail = $this->createTestRecord('Email', [
+      'contact_id' => $contact2['id'],
+      'location_type_id:name' => 'Home',
+    ]);
+    $fourthEmail = $this->createTestRecord('Email', [
+      'contact_id' => $contact2['id'],
+      'location_type_id:name' => 'Work',
+    ]);
+
     $results = Email::get()
-      ->addSelect('contact.display_name')
+      ->addSelect('contact_id.display_name')
       ->execute()
       ->indexBy('id');
 
-    $firstEmail = $this->getReference('test_email_1');
-    $secondEmail = $this->getReference('test_email_2');
-    $thirdEmail = $this->getReference('test_email_3');
-    $fourthEmail = $this->getReference('test_email_4');
     $firstContactEmailIds = [$firstEmail['id'], $secondEmail['id']];
     $secondContactEmailIds = [$thirdEmail['id'], $fourthEmail['id']];
 
     foreach ($results as $id => $email) {
-      $displayName = $email['contact.display_name'];
+      $displayName = $email['contact_id.display_name'];
       if (in_array($id, $firstContactEmailIds)) {
         $this->assertEquals('First Contact', $displayName);
       }

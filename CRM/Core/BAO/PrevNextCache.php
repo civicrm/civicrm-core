@@ -35,7 +35,7 @@ class CRM_Core_BAO_PrevNextCache extends CRM_Core_DAO_PrevNextCache {
    */
   public static function getPositions($cacheKey, $id1, $id2, &$mergeId = NULL, $join = NULL, $where = NULL, $flip = FALSE) {
     if ($flip) {
-      list($id1, $id2) = [$id2, $id1];
+      [$id1, $id2] = [$id2, $id1];
     }
 
     if ($mergeId == NULL) {
@@ -118,32 +118,6 @@ WHERE  cachekey     = %3 AND
       $sql .= " AND cachekey LIKE %3";
       $params[3] = ["{$cacheKey}%", 'String'];
     }
-    CRM_Core_DAO::executeQuery($sql, $params);
-  }
-
-  /**
-   * Delete pair from the previous next cache table to remove it from further merge consideration.
-   *
-   * The pair may have been flipped, so make sure we delete using both orders
-   *
-   * @param int $id1
-   * @param int $id2
-   * @param string $cacheKey
-   */
-  public static function deletePair($id1, $id2, $cacheKey = NULL) {
-    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  entity_table = 'civicrm_contact'";
-
-    $pair = "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
-    $sql .= " AND ( {$pair} )";
-    $params[2] = [$id1, 'Integer'];
-    $params[3] = [$id2, 'Integer'];
-
-    if (isset($cacheKey)) {
-      $sql .= " AND cachekey LIKE %4";
-      // used % to address any row with conflict-cacheKey e.g "merge Individual_8_0_conflicts"
-      $params[4] = ["{$cacheKey}%", 'String'];
-    }
-
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
@@ -313,59 +287,12 @@ FROM   civicrm_prevnext_cache pn
   }
 
   /**
-   * @param $string
+   * @param mixed $string
    *
    * @return bool
    */
   public static function is_serialized($string) {
     return (@CRM_Utils_String::unserialize($string) !== FALSE);
-  }
-
-  /**
-   * @param string $sqlValues string of SQLValues to insert
-   * @return array
-   */
-  public static function convertSetItemValues($sqlValues) {
-    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
-    $closingBrace = strpos($sqlValues, ')') - strlen($sqlValues);
-    $valueArray = array_map('trim', explode(', ', substr($sqlValues, strpos($sqlValues, '(') + 1, $closingBrace - 1)));
-    foreach ($valueArray as $key => &$value) {
-      // remove any quotes from values.
-      if (substr($value, 0, 1) == "'") {
-        $valueArray[$key] = substr($value, 1, -1);
-      }
-    }
-    return $valueArray;
-  }
-
-  /**
-   * @deprecated
-   *
-   * @param array|string $entity_table
-   * @param int $entity_id1
-   * @param int $entity_id2
-   * @param string $cacheKey
-   * @param string $data
-   */
-  public static function setItem($entity_table = NULL, $entity_id1 = NULL, $entity_id2 = NULL, $cacheKey = NULL, $data = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
-    // If entity table is an array we are passing in an older format where this function only had 1 param $values. We put a deprecation warning.
-    if (!empty($entity_table) && is_array($entity_table)) {
-      Civi::log()->warning('Deprecated code path. Values should not be set this is going away in the future in favour of specific function params for each column.', array('civi.tag' => 'deprecated'));
-      foreach ($values as $value) {
-        $valueArray = self::convertSetItemValues($value);
-        self::setItem($valueArray[0], $valueArray[1], $valueArray[2], $valueArray[3], $valueArray[4]);
-      }
-    }
-    else {
-      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cacheKey, data) VALUES
-        (%1, %2, %3, %4, '{$data}')", [
-          1 => [$entity_table, 'String'],
-          2 => [$entity_id1, 'Integer'],
-          3 => [$entity_id2, 'Integer'],
-          4 => [$cacheKey, 'String'],
-        ]);
-    }
   }
 
   /**
@@ -414,7 +341,6 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
    *  the number of searched contacts, not the matches found.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function refillCache($rgid, $gid, $criteria, $checkPermissions, $searchLimit = 0) {
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions, $searchLimit);
@@ -461,30 +387,6 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
     if (!empty($foundDupes)) {
       CRM_Dedupe_Finder::parseAndStoreDupePairs($foundDupes, $cacheKeyString);
     }
-  }
-
-  /**
-   * Old function to clean up he cache.
-   *
-   * @deprecated.
-   */
-  public static function cleanupCache() {
-    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
-    Civi::service('prevnext')->cleanup();
-  }
-
-  /**
-   * Get the selections.
-   *
-   * NOTE: This stub has been preserved because one extension in `universe`
-   * was referencing the function.
-   *
-   * @deprecated
-   * @see CRM_Core_PrevNextCache_Sql::getSelection()
-   */
-  public static function getSelection($cacheKey, $action = 'get') {
-    CRM_Core_Error::deprecatedFunctionWarning('Deprecated function');
-    return Civi::service('prevnext')->getSelection($cacheKey, $action);
   }
 
   /**

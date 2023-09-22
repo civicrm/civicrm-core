@@ -3,10 +3,18 @@
   <base>CRM/Activity</base>
   <class>Activity</class>
   <name>civicrm_activity</name>
+  <description>Past or future actions concerning one or more contacts.</description>
   <comment>Other Activity details stored here include contact, location, details.</comment>
   <add>1.1</add>
   <log>true</log>
   <icon>fa-tasks</icon>
+  <labelField>subject</labelField>
+  <paths>
+    <add>civicrm/activity?reset=1&amp;action=add&amp;context=standalone</add>
+    <view>civicrm/activity?reset=1&amp;action=view&amp;id=[id]</view>
+    <update>civicrm/activity/add?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/activity?reset=1&amp;action=delete&amp;id=[id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <uniqueName>activity_id</uniqueName>
@@ -15,6 +23,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique  Other Activity ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -22,34 +33,11 @@
     <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
-    <name>source_contact_id</name>
-    <type>int unsigned</type>
-    <title>Source Contact</title>
-    <import>true</import>
-    <headerPattern>/(activity.)?source(.contact(.id)?)?/i</headerPattern>
-    <comment>Contact ID of the person scheduling or logging this Activity. Usually the authenticated user.</comment>
-    <add>1.1</add>
-    <drop>4.4</drop>
-  </field>
-  <foreignKey>
-    <name>source_contact_id</name>
-    <table>civicrm_contact</table>
-    <key>id</key>
-    <add>1.1</add>
-    <drop>4.4</drop>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
-  <index>
-    <name>UI_source_contact_id</name>
-    <fieldName>source_contact_id</fieldName>
-    <add>2.0</add>
-    <drop>3.2</drop>
-  </index>
-  <field>
     <name>source_record_id</name>
     <type>int unsigned</type>
     <title>Source Record</title>
-    <comment>Artificial FK to original transaction (e.g. contribution) IF it is not an Activity. Table can be figured out through activity_type_id, and further through component registry.</comment>
+    <comment>Artificial FK to original transaction (e.g. contribution) IF it is not an Activity. Entity table is discovered by filtering by the appropriate activity_type_id.</comment>
+    <readonly>true</readonly>
     <add>2.0</add>
   </field>
   <index>
@@ -59,7 +47,7 @@
   </index>
   <field>
     <name>activity_type_id</name>
-    <title>Activity Type</title>
+    <title>Activity Type ID</title>
     <import>true</import>
     <type>int unsigned</type>
     <required>true</required>
@@ -73,6 +61,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Activity Type</label>
     </html>
   </field>
   <index>
@@ -80,23 +69,6 @@
     <fieldName>activity_type_id</fieldName>
     <add>1.6</add>
   </index>
-  <field>
-    <name>target_entity_table</name>
-    <type>varchar</type>
-    <length>64</length>
-    <required>true</required>
-    <comment>Name of table where item being referenced is stored.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
-    <name>target_entity_id</name>
-    <type>int unsigned</type>
-    <required>true</required>
-    <comment>Foreign key to the referenced item.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
   <field>
     <name>subject</name>
     <uniqueName>activity_subject</uniqueName>
@@ -111,13 +83,6 @@
     </html>
     <add>1.1</add>
     <change>2.0</change>
-  </field>
-  <field>
-    <name>scheduled_date</name>
-    <type>datetime</type>
-    <comment>Date and time meeting is scheduled to occur.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
   </field>
   <field>
     <name>activity_date_time</name>
@@ -140,27 +105,6 @@
     <fieldName>activity_date_time</fieldName>
     <add>4.7</add>
   </index>
-  <field>
-    <name>due_date_time</name>
-    <type>datetime</type>
-    <comment>Date and time this activity is due.</comment>
-    <add>2.0</add>
-    <drop>3.0</drop>
-  </field>
-  <field>
-    <name>duration_hours</name>
-    <type>int unsigned</type>
-    <comment>Planned or actual duration of meeting - hours.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
-    <name>duration_minutes</name>
-    <type>int unsigned</type>
-    <comment>Planned or actual duration of meeting - minutes.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
   <field>
     <name>duration</name>
     <uniqueName>activity_duration</uniqueName>
@@ -191,11 +135,13 @@
   <field>
     <name>phone_id</name>
     <type>int unsigned</type>
-    <title>Phone (called)</title>
+    <title>Phone ID (called)</title>
     <comment>Phone ID of the number called (optional - used if an existing phone number is selected).</comment>
     <add>2.0</add>
+    <deprecated>true</deprecated>
     <html>
       <type>EntityRef</type>
+      <label>Phone (called)</label>
     </html>
   </field>
   <foreignKey>
@@ -210,6 +156,7 @@
     <title>Phone (called) Number</title>
     <type>varchar</type>
     <length>64</length>
+    <deprecated>true</deprecated>
     <comment>Phone number in case the number does not exist in the civicrm_phone table.</comment>
     <html>
       <type>Text</type>
@@ -230,15 +177,6 @@
       <cols>60</cols>
     </html>
     <add>1.1</add>
-  </field>
-  <field>
-    <name>status</name>
-    <type>enum</type>
-    <title>Status</title>
-    <values>Scheduled, Completed</values>
-    <comment>What is the status of this meeting? Completed meeting status results in activity history entry.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
   </field>
   <field>
     <name>status_id</name>
@@ -279,9 +217,13 @@
   </field>
   <field>
     <name>parent_id</name>
-    <title>Parent Activity Id</title>
+    <title>Parent Activity ID</title>
     <type>int unsigned</type>
-    <comment>Parent meeting ID (if this is a follow-up item). This is not currently implemented</comment>
+    <comment>Parent meeting ID (if this is a follow-up item).</comment>
+    <readonly>true</readonly>
+    <html>
+      <label>Parent Activity</label>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>
@@ -289,7 +231,7 @@
     <table>civicrm_activity</table>
     <key>id</key>
     <add>1.1</add>
-    <onDelete>CASCADE</onDelete>
+    <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
     <name>is_test</name>
@@ -297,6 +239,7 @@
     <uniqueName>activity_is_test</uniqueName>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <headerPattern>/(is.)?test(.activity)?/i</headerPattern>
     <add>2.0</add>
@@ -323,20 +266,26 @@
     <name>index_medium_id</name>
     <fieldName>medium_id</fieldName>
     <add>2.2</add>
+    <drop>5.28</drop>
   </index>
   <field>
     <name>is_auto</name>
     <title>Auto</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <add>2.2</add>
   </field>
   <field>
     <name>relationship_id</name>
-    <title>Relationship Id</title>
+    <title>Relationship ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Relationship ID</comment>
+    <html>
+      <label>Relationship</label>
+    </html>
+    <deprecated>true</deprecated>
     <add>2.2</add>
   </field>
   <foreignKey>
@@ -347,11 +296,12 @@
   </foreignKey>
   <field>
     <name>is_current_revision</name>
-    <title>Is this activity a current revision in versioning chain?</title>
+    <title>Is current (unused)</title>
     <type>boolean</type>
     <default>1</default>
-    <import>true</import>
-    <headerPattern>/(is.)?(current.)?(revision|version(ing)?)/i</headerPattern>
+    <comment>Unused deprecated column.</comment>
+    <required>true</required>
+    <deprecated>true</deprecated>
     <add>2.2</add>
   </field>
   <index>
@@ -362,8 +312,13 @@
   <field>
     <name>original_id</name>
     <type>int unsigned</type>
-    <title>Original Activity ID </title>
-    <comment>Activity ID of the first activity record in versioning chain.</comment>
+    <title>Original ID (unused)</title>
+    <comment>Unused deprecated column.</comment>
+    <deprecated>true</deprecated>
+    <readonly>true</readonly>
+    <html>
+      <label>Original Activity</label>
+    </html>
     <add>2.2</add>
   </field>
   <foreignKey>
@@ -371,14 +326,8 @@
     <table>civicrm_activity</table>
     <key>id</key>
     <add>2.2</add>
-    <onDelete>CASCADE</onDelete>
+    <onDelete>SET NULL</onDelete>
   </foreignKey>
-  <index>
-    <name>UI_original_id</name>
-    <fieldName>original_id</fieldName>
-    <add>2.2</add>
-    <drop>3.2</drop>
-  </index>
   <field>
     <name>result</name>
     <uniqueName>activity_result</uniqueName>
@@ -394,6 +343,7 @@
     <title>Activity is in the Trash</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <headerPattern>/(activity.)?(trash|deleted)/i</headerPattern>
     <add>2.2</add>
@@ -408,20 +358,23 @@
   </index>
   <field>
     <name>campaign_id</name>
+    <component>CiviCampaign</component>
     <uniqueName>activity_campaign_id</uniqueName>
     <type>int unsigned</type>
-    <title>Campaign</title>
+    <title>Campaign ID</title>
     <import>true</import>
     <comment>The campaign for which this activity has been triggered.</comment>
+    <add>3.4</add>
+    <html>
+      <type>EntityRef</type>
+      <label>Campaign</label>
+    </html>
     <pseudoconstant>
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
-    <add>3.4</add>
-    <html>
-      <type>Select</type>
-    </html>
   </field>
   <foreignKey>
     <name>campaign_id</name>
@@ -455,6 +408,7 @@
     <title>Is Starred</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <comment>Activity marked as favorite.</comment>
     <headerPattern>/(activity.)?(star|favorite)/i</headerPattern>
@@ -471,6 +425,10 @@
     <required>false</required>
     <export>true</export>
     <default>CURRENT_TIMESTAMP</default>
+    <html>
+      <label>Created Date</label>
+      <type>Select Date</type>
+    </html>
     <add>4.7</add>
   </field>
   <field>
@@ -481,6 +439,11 @@
     <required>false</required>
     <export>true</export>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <html>
+      <label>Modified Date</label>
+      <type>Select Date</type>
+    </html>
+    <readonly>true</readonly>
     <add>4.7</add>
   </field>
 </table>

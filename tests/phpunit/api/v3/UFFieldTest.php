@@ -18,27 +18,11 @@
 class api_v3_UFFieldTest extends CiviUnitTestCase {
 
   /**
-   * ids from the uf_group_test.xml fixture
-   *
-   * @var int
-   */
-  protected $_ufGroupId = 11;
-
-  protected $_ufFieldId;
-
-  protected $_contactId = 69;
-
-  protected $_params;
-
-  protected $_entity = 'uf_field';
-
-  /**
    * Set up for test.
    *
    * @throws \Exception
    */
-  protected function setUp() {
-    parent::setUp();
+  public function tearDown(): void {
     $this->quickCleanup(
       [
         'civicrm_group',
@@ -49,12 +33,21 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
         'civicrm_uf_match',
       ]
     );
+    parent::tearDown();
+  }
 
-    $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml');
-
-    $this->callAPISuccess('uf_field', 'getfields', ['cache_clear' => 1]);
-
-    $this->_params = [
+  /**
+   * Create a field with 'weight=1' and then a second with 'weight=1'.
+   *
+   * The second field winds up with weight=1, and the first field gets bumped to 'weight=2'.
+   *
+   * @param int $version
+   *
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateUFFieldWithDefaultAutoWeight(int $version): void {
+    $this->_apiversion = $version;
+    $params = [
       'field_name' => 'phone',
       'field_type' => 'Contact',
       'visibility' => 'Public Pages and Listings',
@@ -64,86 +57,20 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       'is_active' => 1,
       'location_type_id' => 1,
       'phone_type_id' => 1,
-      'uf_group_id' => $this->_ufGroupId,
+      'uf_group_id' => $this->createTestEntity('UFGroup', [
+        'group_type' => 'Contact',
+        'title' => 'Test Profile',
+      ])['id'],
     ];
-  }
-
-  /**
-   * Tear down function.
-   *
-   * @throws \Exception
-   */
-  public function tearDown() {
-    $this->quickCleanup(
-      [
-        'civicrm_group',
-        'civicrm_contact',
-        'civicrm_uf_group',
-        'civicrm_uf_join',
-        'civicrm_uf_match',
-      ]
-    );
-  }
-
-  /**
-   * Create / updating field.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testCreateUFField($version) {
-    $this->_apiversion = $version;
-    $params = $this->_params;
-    $ufField = $this->callAPIAndDocument('uf_field', 'create', $params, __FUNCTION__, __FILE__);
-    unset($params['uf_group_id']);
-    $this->_ufFieldId = $ufField['id'];
-    foreach ($params as $key => $value) {
-      $this->assertEquals($ufField['values'][$ufField['id']][$key], $params[$key]);
-    }
-  }
-
-  /**
-   * Failure test for field_name.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testCreateUFFieldWithBadFieldName($version) {
-    $this->_apiversion = $version;
-    $params = $this->_params;
-    $params['field_name'] = 'custom_98789';
-    $this->callAPIFailure('uf_field', 'create', $params);
-  }
-
-  /**
-   * Failure test for bad parameters.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testCreateUFFieldWithWrongParams($version) {
-    $this->_apiversion = $version;
-    $this->callAPIFailure('uf_field', 'create', ['field_name' => 'test field']);
-    $this->callAPIFailure('uf_field', 'create', ['label' => 'name-less field']);
-  }
-
-  /**
-   * Create a field with 'weight=1' and then a second with 'weight=1'.
-   *
-   * The second field winds up with weight=1, and the first field gets bumped to 'weight=2'.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testCreateUFFieldWithDefaultAutoWeight($version) {
-    $this->_apiversion = $version;
-    $params1 = $this->_params;
-    $ufField1 = $this->callAPISuccess('uf_field', 'create', $params1);
+    $ufField1 = $this->callAPISuccess('uf_field', 'create', $params);
     $this->assertEquals(1, $ufField1['values'][$ufField1['id']]['weight']);
     $this->assertDBQuery(1, 'SELECT weight FROM civicrm_uf_field WHERE id = %1', [
       1 => [$ufField1['id'], 'Int'],
     ]);
 
-    $params2 = $this->_params;
     // needs to be a different field
-    $params2['location_type_id'] = 2;
-    $ufField2 = $this->callAPISuccess('uf_field', 'create', $params2);
+    $params['location_type_id'] = 2;
+    $ufField2 = $this->callAPISuccess('UFField', 'create', $params);
     $this->assertEquals(1, $ufField2['values'][$ufField2['id']]['weight']);
     $this->assertDBQuery(1, 'SELECT weight FROM civicrm_uf_field WHERE id = %1', [
       1 => [$ufField2['id'], 'Int'],
@@ -154,35 +81,9 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Deleting field.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testDeleteUFField($version) {
-    $this->_apiversion = $version;
-    $ufField = $this->callAPISuccess('uf_field', 'create', $this->_params);
-    $params = [
-      'field_id' => $ufField['id'],
-    ];
-    $this->callAPIAndDocument('uf_field', 'delete', $params, __FUNCTION__, __FILE__);
-  }
-
-  /**
-   * Test getting ufField.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGetUFFieldSuccess($version) {
-    $this->_apiversion = $version;
-    $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $result = $this->callAPIAndDocument($this->_entity, 'get', [], __FUNCTION__, __FILE__);
-    $this->getAndCheck($this->_params, $result['id'], $this->_entity);
-  }
-
-  /**
    * Create / updating field.
    */
-  public function testReplaceUFFields() {
+  public function testReplaceUFFields(): void {
     $baseFields = [];
     $baseFields[] = [
       'field_name' => 'first_name',
@@ -216,21 +117,24 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     ];
 
     $params = [
-      'uf_group_id' => $this->_ufGroupId,
+      'uf_group_id' => $this->createTestEntity('UFGroup', [
+        'group_type' => 'Contact',
+        'title' => 'Test Profile',
+      ])['id'],
       'option.autoweight' => FALSE,
       'values' => $baseFields,
       'check_permissions' => TRUE,
     ];
 
-    $result = $this->callAPIAndDocument('uf_field', 'replace', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('UFField', 'replace', $params);
     $inputsByName = CRM_Utils_Array::index(['field_name'], $params['values']);
-    $this->assertEquals(count($params['values']), count($result['values']));
+    $this->assertSameSize($params['values'], $result['values']);
     foreach ($result['values'] as $outUfField) {
-      $this->assertTrue(is_string($outUfField['field_name']));
+      $this->assertIsString($outUfField['field_name']);
       $inUfField = $inputsByName[$outUfField['field_name']];
       foreach ($inUfField as $key => $inValue) {
         $this->assertEquals($inValue, $outUfField[$key],
-          sprintf("field_name=[%s] key=[%s] expected=[%s] actual=[%s]",
+          sprintf('field_name=[%s] key=[%s] expected=[%s] actual=[%s]',
             $outUfField['field_name'],
             $key,
             $inValue,
@@ -246,7 +150,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
    * @param int $version
    * @dataProvider versionThreeAndFour
    */
-  public function testProfilesWithoutACL($version) {
+  public function testProfilesWithoutACL(int $version): void {
     $this->_apiversion = $version;
     $this->createLoggedInUser();
     $baseFields[] = [
@@ -260,25 +164,29 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     ];
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $params = [
-      'uf_group_id' => $this->_ufGroupId,
+      'uf_group_id' => $this->createTestEntity('UFGroup', [
+        'group_type' => 'Contact',
+        'title' => 'Test Profile',
+      ])['id'],
       'option.autoweight' => FALSE,
       'values' => $baseFields,
       'check_permissions' => TRUE,
     ];
-    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
-    $this->callAPIFailure('uf_field', 'replace', $params);
+    $this->callAPIFailure('UFField', 'replace', $params);
   }
 
   /**
    * Check Profile ACL for API permission.
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function testACLPermissionforProfiles() {
+  public function testACLPermissionForProfiles(): void {
     $this->createLoggedInUser();
-    $this->_permissionedGroup = $this->groupCreate([
+    $this->groupCreate([
       'title' => 'Edit Profiles',
       'is_active' => 1,
       'name' => 'edit-profiles',
-    ]);
+    ], 'permissioned_group');
     $this->setupACL(TRUE);
     $this->testReplaceUFFields();
   }

@@ -8,8 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-form crm-form-block crm-{$taskComponent.lc}-task-pickprofile-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-   <table class="form-layout-compressed">
+  <table class="form-layout-compressed">
      <tr class="crm-{$taskComponent.lc}-task-pickprofile-form-block-uf_group_id">
        <td class="label">{$form.uf_group_id.label}</td><td>{$form.uf_group_id.html}</td>
      </tr>
@@ -19,6 +18,6 @@
          {assign var="ucfirst" value=$taskComponent.ucfirst}
          {include file="CRM/$ucfirst/Form/Task.tpl"}</td>
      </tr>
- </table>
-   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  </table>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

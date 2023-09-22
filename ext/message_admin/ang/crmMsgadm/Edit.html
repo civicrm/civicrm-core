@@ -1,0 +1,97 @@
+<div id="bootstrap-theme">
+
+  <div crm-ui-debug="$ctrl"></div>
+
+  <ng-form name="edit_form">
+
+    <div class="form-group">
+      <label for="msgtpl_title">
+        {{:: ts('Message Title') }} <span class="crm-marker">*</span>
+      </label>
+      <input ng-model="$ctrl.records.main.msg_title" class="form-control" id="msgtpl_title" required title="{{:: ts('Required') }}" ng-disabled="!!$ctrl.records.main.workflow_name" />
+      <p class="help-block">{{:: ts('Descriptive title of the message - used for template selection') }}</p>
+    </div>
+
+    <div class="form-group" ng-if="$ctrl.lang">
+      <label for="msgtpl_language">
+        {{:: ts('Locale') }} <span class="crm-marker">*</span>
+      </label>
+      <input ng-model="$ctrl.locales[$ctrl.lang]" class="form-control" id="msgtpl_language" required title="{{:: ts('Required') }}" ng-disabled="true" />
+      <!-- TODO: Pretty name -->
+    </div>
+
+    <a name="crm-msgadm-tabs"></a>
+    <div class="panel panel-default">
+      <div class="panel-heading" role="navigation">
+        <ul class="nav nav-pills">
+          <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'main'}" ng-if="!$ctrl.lang">
+            <a crm-icon="fa-file-text" class="nav-link" ng-click="$ctrl.tab = 'main'">
+              {{:: ts('Current') }}
+            </a>
+          </li>
+          <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'txActive'}" ng-if="!!$ctrl.lang">
+            <a crm-icon="fa-file-text" class="nav-link" ng-click="$ctrl.tab = 'txActive'">
+              {{:: ts('Current') }}
+            </a>
+          </li>
+          <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'txDraft'}" ng-if="$ctrl.hasDraft()">
+            <a crm-icon="fa-file-text-o" class="nav-link" ng-click="$ctrl.tab = 'txDraft'">
+              {{:: ts('Draft') }}
+            </a>
+          </li>
+          <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'original'}">
+            <a crm-icon="fa-file-text-o" class="nav-link" ng-click="$ctrl.tab = 'original'">
+              {{:: ts('Original') }}
+            </a>
+          </li>
+          <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab.match('txActive|original') && !$ctrl.hasDraft() && $ctrl.allowDraft()">
+            <a crm-icon="fa-plus" class="nav-link text-success" ng-click="$ctrl.createDraft($ctrl.records[$ctrl.tab])">
+              {{:: ts('Create draft') }}
+            </a>
+          </li>
+          <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab.match('txActive|original') && $ctrl.hasDraft() && $ctrl.allowDraft()">
+            <a crm-icon="fa-plus" class="nav-link text-warning" crm-confirm="{title: ts('Create draft?'), message: ts('There is already an existing draft. Click &quot;Continue&quot; to overwrite it with a new, clean draft.')}" on-yes="$ctrl.createDraft($ctrl.records[$ctrl.tab])">
+              {{:: ts('Create draft') }}
+            </a>
+          </li>
+          <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab === 'txDraft'">
+            <a crm-icon="fa-trash" class="nav-link text-danger" crm-confirm="{type: 'delete', obj: {}, title: ts('Abandon draft?'), message: ts('Are you sure you want to abandon this draft?')}" on-yes="$ctrl.deleteDraft()">
+              {{:: ts('Abandon draft') }}
+            </a>
+          </li>
+          <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab === 'txDraft'">
+            <a crm-icon="fa-rocket" class="nav-link text-success" crm-confirm="{title: ts('Activate draft?'), message: ts('Are you sure you want to activate this draft?')}" on-yes="$ctrl.activateDraft()">
+              {{:: ts('Activate draft') }}
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="panel-body" ng-hide="$ctrl.loading">
+        <crm-msgadm-edit-content msgtpl="$ctrl.records[$ctrl.tab]" token-list="$ctrl.tokenList" disabled="$ctrl.tab==='original'"></crm-msgadm-edit-content>
+      </div>
+    </div>
+
+    <div class="btn-group pull-right">
+      <button type="button" class="btn btn-primary" ng-click="$ctrl.save()">
+        <i class="crm-i fa-check"></i>
+        {{:: ts('Save') }}
+      </button>
+      <button type="button" class="btn btn-primary" ng-click="$ctrl.save().then($ctrl.cancel)">
+        <i class="crm-i fa-check-circle"></i>
+        {{:: ts('Save and Done') }}
+      </button>
+      <button type="button" class="btn btn-primary" ng-click="$ctrl.cancel()">
+        <i class="crm-i fa-times"></i>
+        {{:: ts('Cancel') }}
+      </button>
+      <button type="button" class="btn btn-danger" crm-confirm="{type: 'delete', obj: {}, title: ts('Delete translation?'), message: ts('Are you sure want to delete this translation (%1)? This will remove any current and draft versions.', {1: $ctrl.lang})}" on-yes="$ctrl.delete()" ng-if="!!$ctrl.lang">
+        <i class="crm-i fa-trash"></i>
+        {{:: ts('Delete') }}
+      </button>
+    </div>
+
+    <div class="clearfix"></div>
+
+  </ng-form>
+
+</div>

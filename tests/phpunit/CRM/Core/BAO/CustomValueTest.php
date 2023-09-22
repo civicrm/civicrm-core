@@ -21,7 +21,7 @@
  */
 class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
 
-  public function testTypeCheckWithValidInput() {
+  public function testTypeCheckWithValidInput(): void {
 
     $values = [
       'Memo' => 'Test1',
@@ -45,7 +45,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function testTypeCheckWithInvalidInput() {
+  public function testTypeCheckWithInvalidInput(): void {
     $values = ['check1' => 'chk'];
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typecheck($type, $value);
@@ -53,7 +53,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function testTypeCheckWithWrongInput() {
+  public function testTypeCheckWithWrongInput(): void {
     $values = [
       'String' => 1,
       'Boolean' => 'US',
@@ -64,7 +64,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function testTypeToFieldWithValidInput() {
+  public function testTypeToFieldWithValidInput(): void {
     $values = [
       'String' => 'char_data',
       'File' => 'char_data',
@@ -85,7 +85,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function testTypeToFieldWithWrongInput() {
+  public function testTypeToFieldWithWrongInput(): void {
     $values = [
       'String' => 'memo_data',
       'File' => 'date_data',
@@ -97,32 +97,64 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function fixCustomFieldValue() {
+  public function testFixCustomFieldValue(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
-
-    $fields = [
-      'custom_group_id' => $customGroup['id'],
-      'data_type' => 'Memo',
-      'html_type' => 'TextArea',
-      'default_value' => '',
-    ];
-
-    $customField = $this->customFieldCreate($fields);
-
-    $custom = 'custom_' . $customField['id'];
     $params = [
-      'email' => 'abc@webaccess.co.in',
-      $custom => 'note',
+      'email' => 'abc@example.com',
     ];
 
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
-    $this->assertEquals($params[$custom], '%note%', 'Checking the returned value of type Memo.');
+    foreach ([
+      [
+        'custom_group_id' => $customGroup['id'],
+        'data_type' => 'Memo',
+        'html_type' => 'TextArea',
+        'default_value' => '',
+        'search_value' => '%note%',
+        'expected_value' => ['LIKE' => '%note%'],
+      ],
+      [
+        'custom_group_id' => $customGroup['id'],
+        'data_type' => 'String',
+        'html_type' => 'Autocomplete-Select',
+        'default_value' => '',
+        'search_value' => 'R,Y',
+        'expected_value' => ['IN' => ['R', 'Y']],
+        'option_values' => [
+          [
+            'label' => 'Red',
+            'value' => 'R',
+            'weight' => 1,
+            'is_active' => 1,
+          ],
+          [
+            'label' => 'Yellow',
+            'value' => 'Y',
+            'weight' => 2,
+            'is_active' => 1,
+          ],
+          [
+            'label' => 'Green',
+            'value' => 'G',
+            'weight' => 3,
+            'is_active' => 1,
+          ],
+        ],
+      ],
+    ] as $field) {
+      $id = $this->customFieldCreate($field)['id'];
+      $customKey = 'custom_' . $id;
+      $params[$customKey] = $field['search_value'];
+      CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
+      $this->assertEquals($params[$customKey], $field['expected_value'], 'Checking the returned value of type ' . $field['data_type']);
 
-    $this->customFieldDelete($customField['id']);
+      // delete created custom field
+      $this->customFieldDelete($id);
+    }
+
     $this->customGroupDelete($customGroup['id']);
   }
 
-  public function testFixCustomFieldValueWithEmptyParams() {
+  public function testFixCustomFieldValueWithEmptyParams(): void {
     $params = [];
     $result = CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
     $this->assertEquals($result, NULL, 'Checking the returned value of type Memo.');

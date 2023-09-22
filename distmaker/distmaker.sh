@@ -37,11 +37,12 @@ source "$P/dists/common.sh"
 # Set no actions by default
 BPACK=0
 D5PACK=0
-D56PACK=0
 D7DIR=0
 J5PACK=0
 WP5PACK=0
+PATCHPACK=0
 SK5PACK=0
+STANDALONEPACK=0
 L10NPACK=0
 REPOREPORT=0
 
@@ -57,11 +58,12 @@ display_usage()
   echo "  l10n           - generate internationalization data"
   echo "  Backdrop       - generate Backdrop PHP5 module"
   echo "  Drupal|d5      - generate Drupal7 PHP5 module"
-  echo "  Drupal6|d5.6   - generate Drupal6 PHP5 module"
   echo "  d7_dir         - generate Drupal7 PHP5 module, but output to a directory, no tarball"
   echo "  Joomla|j5      - generate Joomla PHP5 module"
   echo "  WordPress|wp5  - generate Wordpress PHP5 module"
+  echo "  patchset       - generate a tarball with patch files"
   echo "  sk             - generate Drupal StarterKit module"
+  echo "  standalone     - generate CiviCRM Standalone"
   echo
   echo "You also need to have distmaker.conf file in place."
   echo "See distmaker.conf.dist for example contents."
@@ -123,7 +125,7 @@ check_conf()
     echo "Current directory is : $THIS_DIR";
     exit 1
   else
-    export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL6 DM_REF_DRUPAL8 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_PACKAGES
+    export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL8 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_STANDALONE DM_REF_PACKAGES
     if [ ! -d "$DM_SOURCEDIR" ]; then
       echo; echo "ERROR! " DM_SOURCEDIR "directory not found!"; echo "(if you get empty directory name, it might mean that one of necessary variables is not set)"; echo;
     fi
@@ -175,12 +177,6 @@ case $1 in
   SKPACK=1
   ;;
 
-  # DRUPAL6 PHP5
-  d5.6|Drupal6)
-  echo; echo "Generating Drupal6 PHP5 module"; echo;
-  D56PACK=1
-  ;;
-
   # JOOMLA PHP5
   j5|Joomla)
   echo; echo "Generating Joomla PHP5 module"; echo;
@@ -191,6 +187,18 @@ case $1 in
   wp5|WordPress)
   echo; echo "Generating Wordpress PHP5 module"; echo;
   WP5PACK=1
+  ;;
+
+  # STANDALONE
+  standalone|Standalone)
+  echo; echo "Generating CiviCRM Standalone"; echo;
+  STANDALONEPACK=1
+  ;;
+
+  ## PATCHSET export
+  patchset)
+  echo; echo "Generating patchset"; echo;
+  PATCHPACK=1
   ;;
 
   # REPO REPORT PHP5
@@ -204,10 +212,11 @@ case $1 in
   echo; echo "Generating all the tarballs we've got (not the directories). "; echo;
   BPACK=1
   D5PACK=1
-  D56PACK=1
   J5PACK=1
   WP5PACK=1
+  PATCHPACK=1
   SKPACK=1
+  STANDALONEPACK=1
   L10NPACK=1
   REPOREPORT=1
   ;;
@@ -238,10 +247,12 @@ if [ -d "$DM_SOURCEDIR/drupal-8" ]; then
   dm_git_checkout "$DM_SOURCEDIR/drupal-8" "$DM_REF_DRUPAL8"
 fi
 
-## Get fresh dependencies
-[ -d "$DM_SOURCEDIR/vendor" ] && rm -rf $DM_SOURCEDIR/vendor
-[ -d "$DM_SOURCEDIR/bower_components" ] && rm -rf $DM_SOURCEDIR/bower_components
-dm_generate_vendor "$DM_SOURCEDIR"
+if [ -z "$DM_KEEP_DEPS" ]; then
+  ## Get fresh dependencies
+  [ -d "$DM_SOURCEDIR/vendor" ] && rm -rf $DM_SOURCEDIR/vendor
+  [ -d "$DM_SOURCEDIR/bower_components" ] && rm -rf $DM_SOURCEDIR/bower_components
+  dm_generate_vendor "$DM_SOURCEDIR"
+fi
 
 # Before anything - regenerate DAOs
 
@@ -259,12 +270,6 @@ if [ "$BPACK" = 1 ]; then
   echo; echo "Packaging for Backdrop, PHP5 version"; echo;
   dm_git_checkout "$DM_SOURCEDIR/backdrop" "$DM_REF_BACKDROP"
   bash $P/dists/backdrop_php5.sh
-fi
-
-if [ "$D56PACK" = 1 ]; then
-  echo; echo "Packaging for Drupal6, PHP5 version"; echo;
-  dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL6"
-  bash $P/dists/drupal6_php5.sh
 fi
 
 if [ "$D5PACK" = 1 ]; then
@@ -297,17 +302,27 @@ if [ "$WP5PACK" = 1 ]; then
   bash $P/dists/wordpress_php5.sh
 fi
 
+if [ "$STANDALONEPACK" = 1 ]; then
+  echo; echo "Packaging for CiviCRM Standalone"; echo;
+  bash $P/dists/standalone.sh
+fi
+
+if [ "$PATCHPACK" = 1 ]; then
+  echo; echo "Packaging for patchset tarball"; echo;
+  bash $P/dists/patchset.sh
+fi
+
 if [ "$REPOREPORT" = 1 ]; then
   echo; echo "Preparing repository report"; echo;
   env \
     L10NPACK="$L10NPACK" \
     BPACK="$BPACK" \
-    D56PACK="$D56PACK" \
     D5PACK="$D5PACK" \
     D7DIR="$D7DIR" \
     SKPACK="$SKPACK" \
     J5PACK="$J5PACK" \
     WP5PACK="$WP5PACK" \
+    STANDALONEPACK="$STANDALONEPACK" \
     bash $P/dists/repo-report.sh
 fi
 

@@ -52,27 +52,62 @@ class CRM_Utils_SQL {
   /**
    * Helper function for adding the permissioned subquery from one entity onto another
    *
-   * @param string $entity
+   * @param string $entityName
    * @param string $joinColumn
    * @return array
    */
-  public static function mergeSubquery($entity, $joinColumn = 'id') {
-    require_once 'api/v3/utils.php';
-    $baoName = _civicrm_api3_get_BAO($entity);
+  public static function mergeSubquery($entityName, $joinColumn = 'id') {
+    $baoName = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getFullName($entityName));
     $bao = new $baoName();
-    $clauses = $subclauses = [];
-    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
-      if ($vals && $field == $joinColumn) {
-        $clauses = array_merge($clauses, (array) $vals);
-      }
-      elseif ($vals) {
-        $subclauses[] = "$field " . implode(" AND $field ", (array) $vals);
+    $fields = $bao::getSupportedFields();
+    $mergeClauses = $subClauses = [];
+    foreach ((array) $bao->addSelectWhereClause($entityName) as $fieldName => $fieldClauses) {
+      if ($fieldClauses) {
+        foreach ((array) $fieldClauses as $fieldClause) {
+          $formattedClause = CRM_Utils_SQL::prefixFieldNames($fieldClause, array_keys($fields), $bao->tableName());
+          // Same as join column with no additional fields - can be added directly
+          if ($fieldName === $joinColumn && $fieldClause === $formattedClause) {
+            $mergeClauses[] = $formattedClause;
+          }
+          // Arrays of arrays get joined with OR (similar to CRM_Core_Permission::check)
+          elseif (is_array($formattedClause)) {
+            $subClauses[] = "($fieldName " . implode(" OR $fieldName ", $formattedClause) . ')';
+          }
+          else {
+            $subClauses[] = "$fieldName $formattedClause";
+          }
+        }
       }
     }
-    if ($subclauses) {
-      $clauses[] = "IN (SELECT `$joinColumn` FROM `" . $bao->tableName() . "` WHERE " . implode(' AND ', $subclauses) . ")";
+    if ($subClauses) {
+      $mergeClauses[] = "IN (SELECT `$joinColumn` FROM `" . $bao->tableName() . "` WHERE " . implode(' AND ', $subClauses) . ")";
     }
-    return $clauses;
+    return $mergeClauses;
+  }
+
+  /**
+   * Walk a nested array and replace "{field_name}" with "`tableAlias`.`field_name`"
+   *
+   * @param string|array $clause
+   * @param array $fieldNames
+   * @param string $tableAlias
+   * @return string|array
+   */
+  public static function prefixFieldNames(&$clause, array $fieldNames, string $tableAlias) {
+    if (is_array($clause)) {
+      foreach ($clause as $index => $subclause) {
+        $clause[$index] = self::prefixFieldNames($subclause, $fieldNames, $tableAlias);
+      }
+    }
+    if (is_string($clause) && str_contains($clause, '{')) {
+      $find = $replace = [];
+      foreach ($fieldNames as $fieldName) {
+        $find[] = '{' . $fieldName . '}';
+        $replace[] = '`' . $tableAlias . '`.`' . $fieldName . '`';
+      }
+      $clause = str_replace($find, $replace, $clause);
+    }
+    return $clause;
   }
 
   /**
@@ -136,36 +171,73 @@ class CRM_Utils_SQL {
   }
 
   /**
-   * Does the DB version support mutliple locks per
-   *
-   * https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html#function_get-lock
-   *
-   * This is a conservative measure to introduce the change which we expect to deprecate later.
-   *
-   * @todo we only check mariadb & mysql right now but maybe can add percona.
-   */
-  public static function supportsMultipleLocks() {
-    static $isSupportLocks = NULL;
-    if (!isset($isSupportLocks)) {
-      $version = self::getDatabaseVersion();
-      if (stripos($version, 'mariadb') !== FALSE) {
-        $isSupportLocks = version_compare($version, '10.0.2', '>=');
-      }
-      else {
-        $isSupportLocks = version_compare($version, '5.7.5', '>=');
-      }
-    }
-
-    return $isSupportLocks;
-  }
-
-  /**
    * Get the version string for the database.
    *
    * @return string
    */
   public static function getDatabaseVersion() {
     return CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+  }
+
+  /**
+   * Does the DSN indicate the connection should use ssl.
+   *
+   * @param string $dsn
+   *
+   * @return bool
+   */
+  public static function isSSLDSN(string $dsn):bool {
+    // Note that ssl= below is not an official PEAR::DB option. It doesn't know
+    // what to do with it. We made it up because it's not required
+    // to have client-side certificates to use ssl, so here you can specify
+    // you want that by putting ssl=1 in the DSN string.
+    //
+    // Cast to bool in case of error which we interpret as no ssl.
+    return (bool) preg_match('/[\?&](key|cert|ca|capath|cipher|ssl)=/', $dsn);
+  }
+
+  /**
+   * If DB_DSN_MODE is auto then we should replace mysql with mysqli if mysqli is available or the other way around as appropriate
+   * @param string $dsn
+   *
+   * @return string
+   */
+  public static function autoSwitchDSN($dsn) {
+    if (defined('DB_DSN_MODE') && DB_DSN_MODE === 'auto') {
+      if (extension_loaded('mysqli')) {
+        $dsn = preg_replace('/^mysql:/', 'mysqli:', $dsn);
+      }
+      else {
+        $dsn = preg_replace('/^mysqli:/', 'mysql:', $dsn);
+      }
+    }
+    return $dsn;
+  }
+
+  /**
+   * Filter out Emojis in where clause if the database (determined by checking the create table for civicrm_contact)
+   * cannot support emojis
+   * @param mixed $criteria - filter criteria to check
+   *
+   * @return bool|string
+   */
+  public static function handleEmojiInQuery($criteria) {
+    if (!CRM_Core_BAO_SchemaHandler::databaseSupportsUTF8MB4()) {
+      foreach ((array) $criteria as $criterion) {
+        if (!empty($criterion) && !is_numeric($criterion)
+          // The first 2 criteria are redundant but are added as they
+          // seem like they would
+          // be quicker than this 3rd check.
+          && max(array_map('ord', str_split($criterion))) >= 240) {
+          // String contains unsupported emojis.
+          // We return a clause that resolves to false as an emoji string by definition cannot be saved.
+          // note that if we return just 0 for false if gets lost in empty checks.
+          // https://stackoverflow.com/questions/16496554/can-php-detect-4-byte-encoded-utf8-chars
+          return '0 = 1';
+        }
+      }
+      return TRUE;
+    }
   }
 
 }

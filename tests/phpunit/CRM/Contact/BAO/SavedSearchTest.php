@@ -20,20 +20,11 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
 
   /**
-   * Sets up the fixture, for example, opens a network connection.
-   *
-   * This method is called before a test is executed.
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
-
-  /**
    * Tears down the fixture, for example, closes a network connection.
    *
    * This method is called after a test is executed.
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     if (!empty($this->ids['CustomField'])) {
       foreach ($this->ids['CustomField'] as $type => $id) {
         $field = civicrm_api3('CustomField', 'getsingle', ['id' => $id]);
@@ -49,6 +40,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
       'civicrm_custom_field',
       'civicrm_custom_group',
     ]);
+    parent::tearDown();
   }
 
   /**
@@ -56,7 +48,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testDefaultValues() {
+  public function testDefaultValues(): void {
     $this->createCustomGroupWithFieldOfType([], 'int');
     $sg = new CRM_Contact_Form_Search_Advanced();
     $sg->controller = new CRM_Core_Controller();
@@ -91,7 +83,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testGetFormValuesWithCustomFields() {
+  public function testGetFormValuesWithCustomFields(): void {
     $this->createCustomGroupWithFieldsOfAllTypes();
     $sg = new CRM_Contact_Form_Search_Advanced();
     $sg->controller = new CRM_Core_Controller();
@@ -135,7 +127,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    * Test if skipped elements are correctly
    * stored and retrieved as formvalues.
    */
-  public function testSkippedElements() {
+  public function testSkippedElements(): void {
     $relTypeID = $this->relationshipTypeCreate();
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $formValues = [

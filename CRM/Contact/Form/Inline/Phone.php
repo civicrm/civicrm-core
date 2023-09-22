@@ -42,7 +42,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
     $phone = new CRM_Core_BAO_Phone();
     $phone->contact_id = $this->_contactId;
 
-    $this->_phones = CRM_Core_BAO_Block::retrieveBlock($phone, NULL);
+    $this->_phones = CRM_Core_BAO_Block::retrieveBlock($phone);
   }
 
   /**

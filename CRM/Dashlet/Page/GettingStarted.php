@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -33,6 +31,7 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
   public static $_tokens = [
     'crmurl' => [
       'configbackend' => 'civicrm/admin/configtask',
+      'systemstatus' => 'civicrm/a/#/status',
     ],
   ];
 
@@ -90,7 +89,7 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
   /**
    * Get html.
    *
-   * @param $url
+   * @param string $url
    *
    * @return array|NULL
    *   array of gettingStarted items; or NULL if not available

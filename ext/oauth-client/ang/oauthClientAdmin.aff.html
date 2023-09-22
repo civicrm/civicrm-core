@@ -1,0 +1,11 @@
+<div oauth-util-import="CRM.oauthUtil.providers" to="theProviders"></div>
+
+<div id="bootstrap-theme">
+  <div ng-if="!routeParams.provider">
+    <oauth-provider-list></oauth-provider-list>
+  </div>
+
+  <div ng-if="routeParams.provider">
+    <oauth-provider-detail options="{provider: theProviders[routeParams.provider]}"></oauth-provider-detail>
+  </div>
+</div>

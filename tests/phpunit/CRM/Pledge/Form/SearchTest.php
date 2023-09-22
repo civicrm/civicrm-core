@@ -6,13 +6,12 @@
  */
 class CRM_Pledge_Form_SearchTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
-    $this->individualID = $this->individualCreate();
-    $this->pledgeCreate(['contact_id' => $this->individualID]);
+    $this->pledgeCreate(['contact_id' => $this->individualCreate()]);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $tablesToTruncate = [
       'civicrm_activity',
@@ -25,7 +24,7 @@ class CRM_Pledge_Form_SearchTest extends CiviUnitTestCase {
   /**
    *  Test submitted the search form.
    */
-  public function testSearch() {
+  public function testSearch(): void {
     $form = new CRM_Pledge_Form_Search();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Pledge_Controller_Search();
@@ -53,7 +52,7 @@ class CRM_Pledge_Form_SearchTest extends CiviUnitTestCase {
       'pledge_status_name' => 'Pending Label**',
       'checkbox' => 'mark_x_1',
       'action' => '<span><a href="/index.php?q=civicrm/contact/view/pledge&amp;reset=1&amp;id=1&amp;cid=3&amp;action=view&amp;context=search&amp;selectedChild=pledge&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=' . "'" . 'View Pledge' . "'" . ' >View</a><a href="/index.php?q=civicrm/contact/view/pledge&amp;reset=1&amp;action=update&amp;id=1&amp;cid=3&amp;context=search&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=' . "'" . 'Edit Pledge' . "'" . ' >Edit</a></span><span class=' . "'" . 'btn-slide crm-hover-button' . "'" . '>more<ul class=' . "'" . 'panel' . "'" . '><li><a href="/index.php?q=civicrm/contact/view/pledge&amp;reset=1&amp;action=detach&amp;id=1&amp;cid=3&amp;context=search&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=' . "'" . 'Cancel Pledge' . "'" . ' onclick = "return confirm(' . "'" . 'Cancelling this pledge will also cancel any scheduled (and not completed) pledge payments. This action cannot be undone. Do you want to continue?' . "'" . ');">Cancel</a></li><li><a href="/index.php?q=civicrm/contact/view/pledge&amp;reset=1&amp;action=delete&amp;id=1&amp;cid=3&amp;context=search&amp;key=' . $qfKey . '" class="action-item crm-hover-button small-popup" title=' . "'" . 'Delete Pledge' . "'" . ' >Delete</a></li></ul></span>',
-      'contact_type' => '<a href="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4" class="crm-summary-link"><div class="icon crm-icon Individual-icon"></div></a>',
+      'contact_type' => '<a href="/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3" data-tooltip-url="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4&amp;is_show_email_task=1" class="crm-summary-link"><i class="crm-i fa-fw fa-user" title=""></i></a>',
     ], $rows[0]);
   }
 

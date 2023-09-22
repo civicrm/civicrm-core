@@ -6,6 +6,10 @@
   <name>civicrm_option_value</name>
   <add>1.5</add>
   <log>true</log>
+  <paths>
+    <update>civicrm/admin/options/[option_group_id:name]?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/admin/options/[option_group_id:name]?reset=1&amp;action=delete&amp;id=[id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Option Value ID</title>
@@ -33,6 +37,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Option Group</label>
     </html>
   </field>
   <foreignKey>
@@ -84,6 +89,9 @@
     <type>int unsigned</type>
     <default>0</default>
     <comment>Bitwise logic can be used to create subsets of options within an option_group for different uses.</comment>
+    <html>
+      <label>Filter</label>
+    </html>
     <add>1.5</add>
   </field>
   <field>
@@ -91,6 +99,10 @@
     <title>Option is Default?</title>
     <type>boolean</type>
     <default>0</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Default</label>
+    </html>
     <comment>Is this the default option for the group?</comment>
     <add>1.5</add>
   </field>
@@ -136,12 +148,16 @@
     <title>Option Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Is this option active?</comment>
     <add>1.5</add>
   </field>
   <field>
     <name>component_id</name>
-    <title>Option Component</title>
+    <title>Component ID</title>
     <type>int unsigned</type>
     <comment>Component that this option value belongs/caters to.</comment>
     <add>2.0</add>
@@ -152,6 +168,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Component</label>
     </html>
   </field>
   <foreignKey>
@@ -162,7 +179,7 @@
   </foreignKey>
   <field>
     <name>domain_id</name>
-    <title>Option Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -170,6 +187,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this option value for</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>3.1</add>
   </field>
   <foreignKey>

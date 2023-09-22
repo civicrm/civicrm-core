@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -9,21 +8,13 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4;
 
 /**
- * UFMatch entity - links civicrm contacts with users created externally
+ * Matches CiviCRM contacts with their CMS user accounts
  *
+ * @searchable secondary
+ * @since 5.19
  * @package Civi\Api4
  */
 class UFMatch extends Generic\DAOEntity {

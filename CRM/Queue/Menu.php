@@ -15,8 +15,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 require_once 'CRM/Core/I18n.php';
@@ -63,6 +61,15 @@ class CRM_Queue_Menu {
       case 'civicrm/upgrade/queue/ajax/onEnd':
         $menuPath['path'] = $path;
         $menuPath['page_callback'] = ['CRM_Queue_Page_AJAX', 'onEnd'];
+        $menuPath['access_arguments'][0][] = 'access CiviCRM';
+        $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
+        break;
+
+      case 'civicrm/queue/monitor':
+        // Not supported: case 'civicrm/upgrade/queue/monitor':
+        $menuPath['path'] = $path;
+        $menuPath['title'] = 'Queue Monitor';
+        $menuPath['page_callback'] = 'CRM_Queue_Page_Monitor';
         $menuPath['access_arguments'][0][] = 'access CiviCRM';
         $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
         break;

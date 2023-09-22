@@ -10,6 +10,8 @@
  */
 namespace Civi\API;
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Class Request
  * @package Civi\API
@@ -43,17 +45,14 @@ class Request {
         ];
 
       case 4:
-        // For custom pseudo-entities
-        if (strpos($entity, 'Custom_') === 0) {
-          $apiRequest = \Civi\Api4\CustomValue::$action(substr($entity, 7));
+        $className = CoreUtil::getApiClass($entity);
+        $callable = [$className, $action];
+        if (!$className || !is_callable($callable)) {
+          throw new \Civi\API\Exception\NotImplementedException("API ($entity, $action) does not exist (or the extension it belongs to is not enabled).");
         }
-        else {
-          $callable = ["\\Civi\\Api4\\$entity", $action];
-          if (!is_callable($callable)) {
-            throw new \Civi\API\Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
-          }
-          $apiRequest = call_user_func($callable);
-        }
+        // Extra arguments used e.g. by dynamic entities like Multi-Record custom groups & the ECK extension
+        $args = (array) CoreUtil::getInfoItem($entity, 'class_args');
+        $apiRequest = call_user_func_array($callable, $args);
         foreach ($params as $name => $param) {
           $setter = 'set' . ucfirst($name);
           $apiRequest->$setter($param);

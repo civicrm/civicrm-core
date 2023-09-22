@@ -14,12 +14,39 @@ namespace Civi\Api4\Action\System;
 
 /**
  * Retrieve system notices, warnings, errors, etc.
+ * @method bool getIncludeDisabled()
  */
 class Check extends \Civi\Api4\Generic\BasicGetAction {
 
+  /**
+   * Run checks that have been explicitly disabled (default false)
+   * @var bool
+   */
+  protected $includeDisabled = FALSE;
+
+  /**
+   * @param bool $includeDisabled
+   * @return Check
+   */
+  public function setIncludeDisabled(bool $includeDisabled): Check {
+    $this->includeDisabled = $includeDisabled;
+    return $this;
+  }
+
   protected function getRecords() {
-    $messages = [];
-    foreach (\CRM_Utils_Check::checkAll() as $message) {
+    $messages = $names = [];
+
+    // Filtering by name relies on the component check rather than the api arrayQuery
+    // @see \CRM_Utils_Check_Component::isCheckable
+    foreach ($this->where as $i => $clause) {
+      if ($clause[0] == 'name' && !empty($clause[2]) && in_array($clause[1], ['=', 'IN'], TRUE)) {
+        $names = (array) $clause[2];
+        unset($this->where[$i]);
+        break;
+      }
+    }
+
+    foreach (\CRM_Utils_Check::checkStatus($names, $this->includeDisabled) as $message) {
       $messages[] = $message->toArray();
     }
     return $messages;
@@ -57,23 +84,16 @@ class Check extends \Civi\Api4\Generic\BasicGetAction {
         'data_type' => 'String',
       ],
       [
-        'name' => 'severity',
-        'title' => 'Severity',
-        'description' => 'Psr\Log\LogLevel string',
-        'data_type' => 'String',
-        'options' => array_combine(\CRM_Utils_Check::getSeverityList(), \CRM_Utils_Check::getSeverityList()),
-      ],
-      [
         'name' => 'severity_id',
         'title' => 'Severity ID',
         'description' => 'Integer representation of Psr\Log\LogLevel',
         'data_type' => 'Integer',
-        'options' => \CRM_Utils_Check::getSeverityList(),
+        'options' => \CRM_Utils_Check::getSeverityOptions(),
       ],
       [
         'name' => 'is_visible',
         'title' => 'is visible',
-        'description' => '0 if message has been hidden by the user',
+        'description' => 'FALSE if message has been hidden by the user',
         'data_type' => 'Boolean',
       ],
       [

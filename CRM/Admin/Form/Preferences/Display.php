@@ -47,10 +47,19 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   public function buildQuickForm() {
 
     //changes for freezing the invoices/credit notes checkbox if invoicing is uncheck
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $this->assign('invoicing', CRM_Invoicing_Utils::isInvoicingEnabled());
+    $this->assign('invoicing', Civi::settings()->get('invoicing'));
 
-    $this->addElement('submit', 'ckeditor_config', ts('Configure CKEditor'));
+    $this->addElement(
+      'xbutton',
+      'ckeditor_config',
+      CRM_Core_Page::crmIcon('fa-wrench') . ' ' . ts('Configure CKEditor'),
+      [
+        'type' => 'submit',
+        'class' => 'crm-button',
+        'style' => 'display:inline-block;vertical-align:middle;float:none!important;',
+        'value' => 1,
+      ]
+    );
 
     $editOptions = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 0');
     $this->assign('editOptions', $editOptions);

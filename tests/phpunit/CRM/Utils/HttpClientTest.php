@@ -24,8 +24,9 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
    */
   protected $client;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
+    $this->useTransaction();
 
     $this->tmpFile = $this->createTempDir() . '/example.txt';
 
@@ -37,31 +38,31 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
     $this->client = new CRM_Utils_HttpClient();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_setting WHERE name = 'verifySSL'");
     CRM_Core_Config::singleton(TRUE);
     parent::tearDown();
   }
 
-  public function testFetchHttp() {
+  public function testFetchHttp(): void {
     $result = $this->client->fetch(self::VALID_HTTP_URL, $this->tmpFile);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $result);
-    $this->assertRegExp(self::VALID_HTTP_REGEX, file_get_contents($this->tmpFile));
+    $this->assertMatchesRegularExpression(self::VALID_HTTP_REGEX, file_get_contents($this->tmpFile));
   }
 
-  public function testFetchHttps_valid() {
+  public function testFetchHttps_valid(): void {
     $result = $this->client->fetch(self::VALID_HTTPS_URL, $this->tmpFile);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $result);
-    $this->assertRegExp(self::VALID_HTTPS_REGEX, file_get_contents($this->tmpFile));
+    $this->assertMatchesRegularExpression(self::VALID_HTTPS_REGEX, file_get_contents($this->tmpFile));
   }
 
-  public function testFetchHttps_invalid_verify() {
+  public function testFetchHttps_invalid_verify(): void {
     $result = $this->client->fetch(self::SELF_SIGNED_HTTPS_URL, $this->tmpFile);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_DL_ERROR, $result);
     $this->assertEquals('', file_get_contents($this->tmpFile));
   }
 
-  public function testFetchHttps_invalid_noVerify() {
+  public function testFetchHttps_invalid_noVerify(): void {
     $result = civicrm_api('Setting', 'create', [
       'version' => 3,
       'verifySSL' => FALSE,
@@ -70,42 +71,42 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
 
     $result = $this->client->fetch(self::SELF_SIGNED_HTTPS_URL, $this->tmpFile);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $result);
-    $this->assertRegExp(self::SELF_SIGNED_HTTPS_REGEX, file_get_contents($this->tmpFile));
+    $this->assertMatchesRegularExpression(self::SELF_SIGNED_HTTPS_REGEX, file_get_contents($this->tmpFile));
   }
 
-  public function testFetchHttp_badOutFile() {
+  public function testFetchHttp_badOutFile(): void {
     $result = $this->client->fetch(self::VALID_HTTP_URL, '/ba/d/path/too/utput');
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_WRITE_ERROR, $result);
   }
 
-  public function testGetHttp() {
-    list($status, $data) = $this->client->get(self::VALID_HTTP_URL);
+  public function testGetHttp(): void {
+    [$status, $data] = $this->client->get(self::VALID_HTTP_URL);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $this->assertRegExp(self::VALID_HTTP_REGEX, $data);
+    $this->assertMatchesRegularExpression(self::VALID_HTTP_REGEX, $data);
   }
 
-  public function testGetHttps_valid() {
-    list($status, $data) = $this->client->get(self::VALID_HTTPS_URL);
+  public function testGetHttps_valid(): void {
+    [$status, $data] = $this->client->get(self::VALID_HTTPS_URL);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $this->assertRegExp(self::VALID_HTTPS_REGEX, $data);
+    $this->assertMatchesRegularExpression(self::VALID_HTTPS_REGEX, $data);
   }
 
-  public function testGetHttps_invalid_verify() {
-    list($status, $data) = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
+  public function testGetHttps_invalid_verify(): void {
+    [$status, $data] = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_DL_ERROR, $status);
     $this->assertEquals('', $data);
   }
 
-  public function testGetHttps_invalid_noVerify() {
+  public function testGetHttps_invalid_noVerify(): void {
     $result = civicrm_api('Setting', 'create', [
       'version' => 3,
       'verifySSL' => FALSE,
     ]);
     $this->assertAPISuccess($result);
 
-    list($status, $data) = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
+    [$status, $data] = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $this->assertRegExp(self::SELF_SIGNED_HTTPS_REGEX, $data);
+    $this->assertMatchesRegularExpression(self::SELF_SIGNED_HTTPS_REGEX, $data);
   }
 
 }

@@ -7,7 +7,7 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  */
 class CRM_Case_Form_SearchTest extends CiviCaseTestCase {
 
-  public function setUp() {
+  public function setUp():void {
     parent::setUp();
     $this->quickCleanup(['civicrm_case_contact', 'civicrm_case', 'civicrm_contact']);
   }
@@ -22,7 +22,7 @@ class CRM_Case_Form_SearchTest extends CiviCaseTestCase {
    * variable so it has a typo in CRM_Case_Form_Search::preProcess(), and then
    * this test will throw an exception.
    */
-  public function testOpeningFindCaseForm() {
+  public function testOpeningFindCaseForm(): void {
     $form = new CRM_Case_Form_Search();
     $form->controller = new CRM_Case_Controller_Search('Find Cases');
 
@@ -36,7 +36,7 @@ class CRM_Case_Form_SearchTest extends CiviCaseTestCase {
     // as webtests. Mostly what we're doing in this test is checking that it
     // doesn't generate any E_NOTICES/WARNINGS or other errors. But let's do
     // one check.
-    $this->assertContains('<label for="case_id">', $contents);
+    $this->assertStringContainsString('<label for="case_id">', $contents);
   }
 
 }

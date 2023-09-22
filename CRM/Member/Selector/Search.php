@@ -103,7 +103,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * The query object.
    *
-   * @var string
+   * @var CRM_Contact_BAO_Query
    */
   protected $_query;
 
@@ -165,17 +165,17 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    *
    * @param string $status
    * @param bool $isPaymentProcessor
-   * @param null $accessContribution
-   * @param null $qfKey
-   * @param null $context
+   * @param bool $accessContribution
+   * @param string|null $qfKey
+   * @param string|null $context
    * @param bool $isCancelSupported
    *
    * @return array
    */
   public static function &links(
     $status = 'all',
-    $isPaymentProcessor = NULL,
-    $accessContribution = NULL,
+    $isPaymentProcessor = FALSE,
+    $accessContribution = FALSE,
     $qfKey = NULL,
     $context = NULL,
     $isCancelSupported = FALSE
@@ -188,13 +188,14 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       $extraParams .= "&key={$qfKey}";
     }
 
-    if (!self::$_links['view']) {
+    if (empty(self::$_links['view'])) {
       self::$_links['view'] = [
         CRM_Core_Action::VIEW => [
           'name' => ts('View'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=view&context=%%cxt%%&selectedChild=member' . $extraParams,
           'title' => ts('View Membership'),
+          'weight' => -20,
         ],
       ];
     }
@@ -205,24 +206,28 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Edit Membership'),
+          'weight' => -10,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Delete Membership'),
+          'weight' => 100,
         ],
         CRM_Core_Action::RENEW => [
           'name' => ts('Renew'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&action=renew&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Renew Membership'),
+          'weight' => 40,
         ],
         CRM_Core_Action::FOLLOWUP => [
           'name' => ts('Renew-Credit Card'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=renew&reset=1&cid=%%cid%%&id=%%id%%&context=%%cxt%%&mode=live' . $extraParams,
           'title' => ts('Renew Membership Using Credit Card'),
+          'weight' => 50,
         ],
       ];
       if (!$isPaymentProcessor || !$accessContribution) {
@@ -240,6 +245,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         'url' => 'civicrm/contribute/unsubscribe',
         'qs' => 'reset=1&mid=%%id%%&context=%%cxt%%' . $extraParams,
         'title' => ts('Cancel Auto Renew Subscription'),
+        'weight' => 40,
       ];
     }
     elseif (isset(self::$_links['all'][CRM_Core_Action::DISABLE])) {
@@ -262,7 +268,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       $params['rowCount'] = $this->_limit;
     }
     else {
-      $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
+      $params['rowCount'] = Civi::settings()->get('default_pager_size');
     }
 
     $params['buttonTop'] = 'PagerTopButton';
@@ -308,19 +314,15 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE,
       "billing_mode IN ( 1, 3 )"
     );
+    $isPaymentProcessor = FALSE;
     if (count($processors) > 0) {
-      $this->_isPaymentProcessor = TRUE;
-    }
-    else {
-      $this->_isPaymentProcessor = FALSE;
+      $isPaymentProcessor = TRUE;
     }
 
     // Only show credit card membership signup and renewal if user has CiviContribute permission
+    $accessContribution = FALSE;
     if (CRM_Core_Permission::access('CiviContribute')) {
-      $this->_accessContribution = TRUE;
-    }
-    else {
-      $this->_accessContribution = FALSE;
+      $accessContribution = TRUE;
     }
 
     //get all campaigns.
@@ -375,8 +377,8 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
 
         $isCancelSupported = CRM_Member_BAO_Membership::isCancelSubscriptionSupported($row['membership_id']);
         $links = self::links('all',
-          $this->_isPaymentProcessor,
-          $this->_accessContribution,
+          $isPaymentProcessor,
+          $accessContribution,
           $this->_key,
           $this->_context,
           $isCancelSupported
@@ -427,7 +429,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
 
       // Display Auto-renew status on page (0=disabled, 1=enabled, 2=enabled, but error
       if (!empty($result->membership_recur_id)) {
-        if (CRM_Member_BAO_Membership::isSubscriptionCancelled($row['membership_id'])) {
+        if (CRM_Member_BAO_Membership::isSubscriptionCancelled((int) $row['membership_id'])) {
           $row['auto_renew'] = 2;
         }
         else {
@@ -481,17 +483,17 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'direction' => CRM_Utils_Sort::DESCENDING,
         ],
         [
-          'name' => ts('Start Date'),
+          'name' => ts('Membership Start Date'),
           'sort' => 'membership_start_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         [
-          'name' => ts('End Date'),
+          'name' => ts('Membership Expiration Date'),
           'sort' => 'membership_end_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         [
-          'name' => ts('Source'),
+          'name' => ts('Membership Source'),
           'sort' => 'membership_source',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
@@ -524,7 +526,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
   /**
    * Alphabet query.
    *
-   * @return mixed
+   * @return CRM_Core_DAO
    */
   public function alphabetQuery() {
     return $this->_query->alphabetQuery();

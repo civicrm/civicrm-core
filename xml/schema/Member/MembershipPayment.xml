@@ -7,12 +7,16 @@
   <comment>Membership Payment</comment>
   <add>1.5</add>
   <log>true</log>
+  <component>CiviMember</component>
   <field>
     <name>id</name>
     <title>Membership Payment ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>1.5</add>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -20,10 +24,13 @@
   </primaryKey>
   <field>
     <name>membership_id</name>
-    <title>Membership</title>
+    <title>Membership ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Membership table</comment>
+    <html>
+      <label>Membership</label>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>
@@ -35,9 +42,13 @@
   </foreignKey>
   <field>
     <name>contribution_id</name>
-    <title>Contribution</title>
+    <title>Contribution ID</title>
     <type>int unsigned</type>
     <comment>FK to contribution table.</comment>
+    <html>
+      <label>Contribution</label>
+      <type>EntityRef</type>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>

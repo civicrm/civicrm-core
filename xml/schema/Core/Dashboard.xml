@@ -11,6 +11,9 @@
     <type>int unsigned</type>
     <title>DashletID</title>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.1</add>
   </field>
   <primaryKey>
@@ -20,7 +23,7 @@
   <field>
     <name>domain_id</name>
     <type>int unsigned</type>
-    <title>Dashlet Domain</title>
+    <title>Domain ID</title>
     <required>true</required>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -28,6 +31,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Domain for dashboard</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>3.1</add>
   </field>
   <foreignKey>
@@ -63,13 +69,6 @@
     <add>3.1</add>
   </field>
   <field>
-    <name>content</name>
-    <type>text</type>
-    <comment>dashlet content</comment>
-    <add>3.1</add>
-    <drop>3.3</drop>
-  </field>
-  <field>
     <name>permission</name>
     <type>varchar</type>
     <title>Dashlet Permission</title>
@@ -83,6 +82,9 @@
     <type>varchar</type>
     <title>Dashlet Permission Operator</title>
     <length>3</length>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::andOr</callback>
+    </pseudoconstant>
     <comment>Permission Operator</comment>
     <add>3.1</add>
   </field>
@@ -92,6 +94,7 @@
     <title>Dashlet Column</title>
     <comment>column no for this dashlet</comment>
     <default>0</default>
+    <required>true</required>
     <add>3.1</add>
     <drop>4.7</drop>
   </field>
@@ -101,6 +104,7 @@
     <title>Minimize Dashlet?</title>
     <comment>Is Minimized?</comment>
     <default>0</default>
+    <required>true</required>
     <add>3.1</add>
     <drop>4.7</drop>
   </field>
@@ -118,6 +122,7 @@
     <title>Is Fullscreen?</title>
     <comment>Is Fullscreen?</comment>
     <default>1</default>
+    <required>true</required>
     <add>3.1</add>
     <drop>4.7</drop>
   </field>
@@ -127,6 +132,11 @@
     <title>Is Dashlet Active?</title>
     <comment>Is this dashlet active?</comment>
     <default>0</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <required>true</required>
     <add>3.1</add>
   </field>
   <field>
@@ -135,6 +145,7 @@
     <title>Is Dashlet Reserved?</title>
     <comment>Is this dashlet reserved?</comment>
     <default>0</default>
+    <required>true</required>
     <add>3.1</add>
   </field>
   <field>
@@ -156,11 +167,11 @@
     <add>4.7</add>
   </field>
   <field>
-    <name>created_date</name>
-    <type>datetime</type>
-    <title>Dashlet Created Date</title>
-    <comment>When was content populated</comment>
-    <add>3.1</add>
-    <drop>3.3</drop>
+    <name>directive</name>
+    <type>varchar</type>
+    <title>Angular directive</title>
+    <length>255</length>
+    <comment>Element name of angular directive to invoke (lowercase hyphenated format)</comment>
+    <add>5.33</add>
   </field>
 </table>

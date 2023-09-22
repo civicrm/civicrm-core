@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -55,13 +53,13 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
-          'url' => 'civicrm/admin/price',
+          'url' => 'civicrm/admin/price/edit',
           'qs' => 'action=preview&reset=1&sid=%%sid%%',
           'title' => ts('Preview Price Set'),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Settings'),
-          'url' => 'civicrm/admin/price',
+          'url' => 'civicrm/admin/price/edit',
           'qs' => 'action=update&reset=1&sid=%%sid%%',
           'title' => ts('Edit Price Set'),
         ],
@@ -77,7 +75,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/price',
+          'url' => 'civicrm/admin/price/edit',
           'qs' => 'action=delete&reset=1&sid=%%sid%%',
           'title' => ts('Delete Price Set'),
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
@@ -111,6 +109,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
     );
 
     // assign vars to templates
+    $this->assign('usedBy', FALSE);
     $this->assign('action', $action);
     $sid = CRM_Utils_Request::retrieve('sid', 'Positive',
       $this, FALSE, 0

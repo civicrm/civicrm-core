@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -9,12 +8,13 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
 namespace Civi\Api4;
 
 /**
  * LocationType entity.
  *
+ * @searchable secondary
+ * @since 5.19
  * @package Civi\Api4
  */
 class LocationType extends Generic\DAOEntity {

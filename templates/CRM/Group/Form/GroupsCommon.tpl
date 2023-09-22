@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {*CRM-14190*}
-{if $parent_groups|@count > 0 or $form.parents.html}
+{if $parent_groups|@count > 0 || !empty($form.parents.html)}
   <h3>{ts}Parent Groups{/ts} {help id="id-group-parent" file="CRM/Group/Page/Group.hlp"}</h3>
   {if $parent_groups|@count > 0}
     <table class="form-layout-compressed">
@@ -31,7 +31,7 @@
     </tr>
   </table>
 {/if}
-{if $form.organization_id}
+{if array_key_exists('organization_id', $form)}
   <h3>{ts}Associated Organization{/ts} {help id="id-group-organization" file="CRM/Group/Page/Group.hlp"}</h3>
   <table class="form-layout-compressed">
     <tr class="crm-group-form-block-organization">

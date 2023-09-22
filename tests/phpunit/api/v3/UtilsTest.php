@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CRM/Utils/DeprecatedUtils.php';
-
 /**
  * Test class for API utils
  *
@@ -19,7 +17,6 @@ require_once 'CRM/Utils/DeprecatedUtils.php';
  */
 class api_v3_UtilsTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  public $DBResetRequired = FALSE;
 
   public $_contactID = 1;
 
@@ -28,19 +25,12 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    *
    * This method is called before a test is executed.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
   }
 
-  public function testAddFormattedParam() {
-    $values = ['contact_type' => 'Individual'];
-    $params = ['something' => 1];
-    $result = _civicrm_api3_deprecated_add_formatted_param($values, $params);
-    $this->assertTrue($result);
-  }
-
-  public function testCheckPermissionReturn() {
+  public function testCheckPermissionReturn(): void {
     $check = ['check_permissions' => TRUE];
     $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = [];
@@ -57,7 +47,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertTrue($this->runPermissionCheck('contact', 'create', $check), 'overfluous permissions should be enough');
   }
 
-  public function testCheckPermissionThrow() {
+  public function testCheckPermissionThrow(): void {
     $check = ['check_permissions' => TRUE];
     $config = CRM_Core_Config::singleton();
     try {
@@ -73,7 +63,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertTrue($this->runPermissionCheck('contact', 'create', $check), 'overfluous permissions should return true');
   }
 
-  public function testCheckPermissionSkip() {
+  public function testCheckPermissionSkip(): void {
     $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = ['access CiviCRM'];
     $params = ['check_permissions' => TRUE];
@@ -134,14 +124,14 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    * @param bool $throws
    *   Whether we should pass any exceptions for authorization failures.
    *
-   * @throws API_Exception
+   * @throws CRM_Core_Exception
    * @throws Exception
    * @return bool
    *   TRUE or FALSE depending on the outcome of the authorization check
    */
   public function runPermissionCheck($entity, $action, $params, $throws = FALSE) {
     $params['version'] = 3;
-    $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+    $dispatcher = new \Civi\Core\CiviEventDispatcher();
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
     $kernel = new \Civi\API\Kernel($dispatcher);
     $apiRequest = \Civi\API\Request::create($entity, $action, $params);
@@ -149,9 +139,9 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       $kernel->authorize(NULL, $apiRequest);
       return TRUE;
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $extra = $e->getExtraParams();
-      if (!$throws && $extra['error_code'] == API_Exception::UNAUTHORIZED) {
+      if (!$throws && $extra['error_code'] == CRM_Core_Exception::UNAUTHORIZED) {
         return FALSE;
       }
       else {
@@ -163,7 +153,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   /**
    * Test verify mandatory - includes DAO & passed as well as empty & NULL fields
    */
-  public function testVerifyMandatory() {
+  public function testVerifyMandatory(): void {
     _civicrm_api3_initialize(TRUE);
     $params = [
       'entity_table' => 'civicrm_contact',
@@ -187,7 +177,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   /**
    * Test verify one mandatory - includes DAO & passed as well as empty & NULL fields
    */
-  public function testVerifyOneMandatory() {
+  public function testVerifyOneMandatory(): void {
     _civicrm_api3_initialize(TRUE);
     $params = [
       'entity_table' => 'civicrm_contact',
@@ -212,7 +202,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   /**
    * Test verify one mandatory - includes DAO & passed as well as empty & NULL fields
    */
-  public function testVerifyOneMandatoryOneSet() {
+  public function testVerifyOneMandatoryOneSet(): void {
     _civicrm_api3_initialize(TRUE);
     $params = [
       'version' => 3,
@@ -234,7 +224,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   /**
    * Test GET DAO function returns DAO.
    */
-  public function testGetDAO() {
+  public function testGetDAO(): void {
     $params = [
       'civicrm_api3_custom_group_get' => 'CRM_Core_DAO_CustomGroup',
       'custom_group' => 'CRM_Core_DAO_CustomGroup',
@@ -254,7 +244,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   /**
    * Test GET BAO function returns BAO when it exists.
    */
-  public function testGetBAO() {
+  public function testGetBAO(): void {
     $params = [
       'civicrm_api3_website_get' => 'CRM_Core_BAO_Website',
       'civicrm_api3_survey_get' => 'CRM_Campaign_BAO_Survey',
@@ -274,10 +264,10 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   /**
    * Test the validate function transforms dates.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Exception
    */
-  public function test_civicrm_api3_validate_fields() {
+  public function test_civicrm_api3_validate_fields(): void {
     $params = ['relationship_start_date' => '2010-12-20', 'relationship_end_date' => ''];
     $fields = civicrm_api3('relationship', 'getfields', ['action' => 'get']);
     _civicrm_api3_validate_fields('relationship', 'get', $params, $fields['values']);
@@ -285,7 +275,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertEquals('', $params['relationship_end_date']);
   }
 
-  public function test_civicrm_api3_validate_fields_membership() {
+  public function test_civicrm_api3_validate_fields_membership(): void {
     $params = [
       'start_date' => '2010-12-20',
       'end_date' => '',
@@ -301,7 +291,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertEquals('20101220000000', $params['membership_join_date'], 'join_date not set in line ' . __LINE__);
   }
 
-  public function test_civicrm_api3_validate_fields_event() {
+  public function test_civicrm_api3_validate_fields_event(): void {
 
     $params = [
       'registration_start_date' => 20080601,
@@ -317,7 +307,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertEquals('20080601000000', $params['registration_start_date']);
   }
 
-  public function test_civicrm_api3_validate_fields_exception() {
+  public function test_civicrm_api3_validate_fields_exception(): void {
     $params = [
       'membership_join_date' => 'abc',
     ];
@@ -330,7 +320,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     }
   }
 
-  public function testGetFields() {
+  public function testGetFields(): void {
     $result = $this->callAPISuccess('membership', 'getfields', []);
     $this->assertArrayHasKey('values', $result);
     $result = $this->callAPISuccess('relationship', 'getfields', []);
@@ -339,14 +329,13 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('values', $result);
   }
 
-  public function testGetFields_AllOptions() {
-    $result = $this->callAPISuccess('contact', 'getfields', [
+  public function testGetFieldsAllOptions(): void {
+    $result = $this->callAPISuccess('Contact', 'getfields', [
       'options' => [
         'get_options' => 'all',
       ],
     ]);
     $this->assertEquals('Household', $result['values']['contact_type']['options']['Household']);
-    $this->assertEquals('HTML', $result['values']['preferred_mail_format']['options']['HTML']);
   }
 
   public function basicArrayCases() {
@@ -376,14 +365,44 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
 
     $cases[] = [
       $records,
-      ['version' => 3, 'cheese' => 'cheddar'],
+      ['version' => 3, 'cheese' => 'cheddar', 'options' => ['sort' => 'fruit desc']],
       ['b', 'c'],
+    ];
+
+    $cases[] = [
+      $records,
+      ['version' => 3, 'cheese' => 'cheddar', 'options' => ['sort' => 'fruit']],
+      ['c', 'b'],
+    ];
+
+    $cases[] = [
+      $records,
+      ['version' => 3, 'cheese' => ['IS NOT NULL' => 1], 'options' => ['sort' => 'fruit, cheese']],
+      ['c', 'd', 'e', 'a', 'b'],
     ];
 
     $cases[] = [
       $records,
       ['version' => 3, 'id' => 'd'],
       ['d'],
+    ];
+
+    $cases[] = [
+      $records,
+      ['version' => 3, 'fruit' => ['!=' => 'apple']],
+      ['b'],
+    ];
+
+    $cases[] = [
+      $records,
+      ['version' => 3, 'cheese' => ['LIKE' => '%o%']],
+      ['d', 'e'],
+    ];
+
+    $cases[] = [
+      $records,
+      ['version' => 3, 'cheese' => ['IN' => ['swiss', 'cheddar', 'gouda']]],
+      ['a', 'b', 'c', 'd'],
     ];
 
     return $cases;
@@ -404,7 +423,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   public function testBasicArrayGet($records, $params, $resultIds) {
     $params['version'] = 3;
 
-    $kernel = new \Civi\API\Kernel(new \Symfony\Component\EventDispatcher\EventDispatcher());
+    $kernel = new \Civi\API\Kernel(new \Civi\Core\CiviEventDispatcher());
 
     $provider = new \Civi\API\Provider\AdhocProvider($params['version'], 'Widget');
     $provider->addAction('get', 'access CiviCRM', function ($apiRequest) use ($records) {
@@ -423,21 +442,23 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertEquals($resultIds, array_values(CRM_Utils_Array::collect('snack_id', $r2['values'])));
     $this->assertEquals($resultIds, array_values(CRM_Utils_Array::collect('id', $r2['values'])));
 
-    $r3 = $kernel->runSafe('Widget', 'get', $params + ['options' => ['offset' => 1, 'limit' => 2]]);
+    $params['options']['offset'] = 1;
+    $params['options']['limit'] = 2;
+    $r3 = $kernel->runSafe('Widget', 'get', $params);
     $slice = array_slice($resultIds, 1, 2);
     $this->assertEquals(count($slice), $r3['count']);
     $this->assertEquals($slice, array_values(CRM_Utils_Array::collect('snack_id', $r3['values'])));
     $this->assertEquals($slice, array_values(CRM_Utils_Array::collect('id', $r3['values'])));
   }
 
-  public function testBasicArrayGetReturn() {
+  public function testBasicArrayGetReturn(): void {
     $records = [
       ['snack_id' => 'a', 'fruit' => 'apple', 'cheese' => 'swiss'],
       ['snack_id' => 'b', 'fruit' => 'grape', 'cheese' => 'cheddar'],
       ['snack_id' => 'c', 'fruit' => 'apple', 'cheese' => 'cheddar'],
     ];
 
-    $kernel = new \Civi\API\Kernel(new \Symfony\Component\EventDispatcher\EventDispatcher());
+    $kernel = new \Civi\API\Kernel(new \Civi\Core\CiviEventDispatcher());
     $provider = new \Civi\API\Provider\AdhocProvider(3, 'Widget');
     $provider->addAction('get', 'access CiviCRM', function ($apiRequest) use ($records) {
       return _civicrm_api3_basic_array_get('Widget', $apiRequest['params'], $records, 'snack_id', ['snack_id', 'fruit', 'cheese']);
@@ -477,7 +498,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testTimeStampChecking() {
+  public function testTimeStampChecking(): void {
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_mailing (id, modified_date) VALUES (25, '2016-06-30 12:52:52')");
     $this->assertTrue(_civicrm_api3_compare_timestamps('2017-02-15 16:00:00', 25, 'Mailing'));
     $this->callAPISuccess('Mailing', 'create', ['id' => 25, 'subject' => 'Test Subject']);
@@ -489,16 +510,15 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    * Test that the foreign key constraint test correctly interprets pseudoconstants.
    *
    * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
-  public function testKeyConstraintCheck() {
+  public function testKeyConstraintCheck(): void {
     $fieldInfo = $this->callAPISuccess('Contribution', 'getfields', [])['values']['financial_type_id'];
     _civicrm_api3_validate_constraint(1, 'financial_type_id', $fieldInfo, 'Contribution');
     _civicrm_api3_validate_constraint('Donation', 'financial_type_id', $fieldInfo, 'Contribution');
     try {
       _civicrm_api3_validate_constraint('Blah', 'financial_type_id', $fieldInfo, 'Contribution');
     }
-    catch (API_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       $this->assertEquals("'Blah' is not a valid option for field financial_type_id", $e->getMessage());
       return;
     }

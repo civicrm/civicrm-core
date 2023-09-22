@@ -20,10 +20,26 @@ use Civi\Payment\PropertyBag;
  * Dummy payment processor
  */
 class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
-  protected $_mode;
 
-  protected $_params = [];
+  protected $_mode;
   protected $_doDirectPaymentResult = [];
+
+  /**
+   * This support variable is used to allow the capabilities supported by the Dummy processor to be set from unit tests
+   *   so that we don't need to create a lot of new processors to test combinations of features.
+   * Initially these capabilities are set to TRUE, however they can be altered by calling the setSupports function directly from outside the class.
+   * @var bool[]
+   */
+  protected $supports = [
+    'MultipleConcurrentPayments' => TRUE,
+    'EditRecurringContribution' => TRUE,
+    'CancelRecurringNotifyOptional' => TRUE,
+    'BackOffice' => TRUE,
+    'NoEmailProvided' => TRUE,
+    'CancelRecurring' => TRUE,
+    'FutureRecurStartDate' => TRUE,
+    'Refund' => TRUE,
+  ];
 
   /**
    * Set result from do Direct Payment for test purposes.
@@ -55,17 +71,150 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
-   * Submit a payment using Advanced Integration Method.
+   * Does this payment processor support refund?
    *
-   * @param array $params
-   *   Assoc array of input parameters for this transaction.
+   * @return bool
+   */
+  public function supportsRefund() {
+    return $this->supports['Refund'];
+  }
+
+  /**
+   * Should the first payment date be configurable when setting up back office recurring payments.
+   *
+   * We set this to false for historical consistency but in fact most new processors use tokens for recurring and can support this
+   *
+   * @return bool
+   */
+  public function supportsFutureRecurStartDate() {
+    return $this->supports['FutureRecurStartDate'];
+  }
+
+  /**
+   * Can more than one transaction be processed at once?
+   *
+   * In general processors that process payment by server to server communication support this while others do not.
+   *
+   * In future we are likely to hit an issue where this depends on whether a token already exists.
+   *
+   * @return bool
+   */
+  protected function supportsMultipleConcurrentPayments() {
+    return $this->supports['MultipleConcurrentPayments'];
+  }
+
+  /**
+   * Checks if back-office recurring edit is allowed
+   *
+   * @return bool
+   */
+  public function supportsEditRecurringContribution() {
+    return $this->supports['EditRecurringContribution'];
+  }
+
+  /**
+   * Are back office payments supported.
+   *
+   * e.g paypal standard won't permit you to enter a credit card associated
+   * with someone else's login.
+   * The intention is to support off-site (other than paypal) & direct debit but that is not all working yet so to
+   * reach a 'stable' point we disable.
+   *
+   * @return bool
+   */
+  protected function supportsBackOffice() {
+    return $this->supports['BackOffice'];
+  }
+
+  /**
+   * Does the processor work without an email address?
+   *
+   * The historic assumption is that all processors require an email address. This capability
+   * allows a processor to state it does not need to be provided with an email address.
+   * NB: when this was added (Feb 2020), the Manual processor class overrides this but
+   * the only use of the capability is in the webform_civicrm module.  It is not currently
+   * used in core but may be in future.
+   *
+   * @return bool
+   */
+  protected function supportsNoEmailProvided() {
+    return $this->supports['NoEmailProvided'];
+  }
+
+  /**
+   * Does this processor support cancelling recurring contributions through code.
+   *
+   * If the processor returns true it must be possible to take action from within CiviCRM
+   * that will result in no further payments being processed. In the case of token processors (e.g
+   * IATS, eWay) updating the contribution_recur table is probably sufficient.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurring() {
+    return $this->supports['CancelRecurring'];
+  }
+
+  /**
+   * Does the processor support the user having a choice as to whether to cancel the recurring with the processor?
+   *
+   * If this returns TRUE then there will be an option to send a cancellation request in the cancellation form.
+   *
+   * This would normally be false for processors where CiviCRM maintains the schedule.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurringNotifyOptional() {
+    return $this->supports['CancelRecurringNotifyOptional'];
+  }
+
+  /**
+   * Does this processor support pre-approval.
+   *
+   * This would generally look like a redirect to enter credentials which can then be used in a later payment call.
+   *
+   * Currently Paypal express supports this, with a redirect to paypal after the 'Main' form is submitted in the
+   * contribution page. This token can then be processed at the confirm phase. Although this flow 'looks' like the
+   * 'notify' flow a key difference is that in the notify flow they don't have to return but in this flow they do.
+   *
+   * @return bool
+   */
+  protected function supportsPreApproval(): bool {
+    return $this->supports['PreApproval'] ?? FALSE;
+  }
+
+  /**
+   * Set the return value of support functions. By default it is TRUE
+   *
+   */
+  public function setSupports(array $support) {
+    $this->supports = array_merge($this->supports, $support);
+  }
+
+  /**
+   * @param array|PropertyBag $params
+   *
+   * @param string $component
    *
    * @return array
-   *   the result in a nice formatted array (or an error object)
+   *   Result array (containing at least the key payment_status_id)
+   *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doDirectPayment(&$params) {
+  public function doPayment(&$params, $component = 'contribute') {
+    $this->_component = $component;
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+
     $propertyBag = PropertyBag::cast($params);
+
+    // If we have a $0 amount, skip call to processor and set payment_status to Completed.
+    // Conceivably a processor might override this - perhaps for setting up a token - but we don't
+    // have an example of that at the mome.
+    if ($propertyBag->getAmount() == 0) {
+      $result['payment_status_id'] = array_search('Completed', $statuses);
+      $result['payment_status'] = 'Completed';
+      return $result;
+    }
+
     // Invoke hook_civicrm_paymentProcessor
     // In Dummy's case, there is no translation of parameters into
     // the back-end's canonical set of parameters.  But if a processor
@@ -75,52 +224,46 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
       $throwAnENoticeIfNotSetAsTheseAreRequired = $propertyBag->getRecurFrequencyInterval() . $propertyBag->getRecurFrequencyUnit();
     }
     // no translation in Dummy processor
-    CRM_Utils_Hook::alterPaymentProcessorParams($this,
-      $params,
-      $propertyBag
-    );
+    CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $propertyBag);
     // This means we can test failing transactions by setting a past year in expiry. A full expiry check would
     // be more complete.
-    if (!empty($params['credit_card_exp_date']['Y']) && date('Y') >
+    if (!empty($params['credit_card_exp_date']['Y']) && CRM_Utils_Time::date('Y') >
       CRM_Core_Payment_Form::getCreditCardExpirationYear($params)) {
       throw new PaymentProcessorException(ts('Invalid expiry date'));
     }
-    //end of hook invocation
+
     if (!empty($this->_doDirectPaymentResult)) {
       $result = $this->_doDirectPaymentResult;
-      if (CRM_Utils_Array::value('payment_status_id', $result) === 'failed') {
+      if (empty($result['payment_status_id'])) {
+        $result['payment_status_id'] = array_search('Pending', $statuses);
+        $result['payment_status'] = 'Pending';
+      }
+      if ($result['payment_status_id'] === 'failed') {
         throw new PaymentProcessorException($result['message'] ?? 'failed');
       }
       $result['trxn_id'] = array_shift($this->_doDirectPaymentResult['trxn_id']);
       return $result;
     }
 
-    $params['trxn_id'] = $this->getTrxnID();;
+    $result['trxn_id'] = $this->getTrxnID();
 
-    $params['gross_amount'] = $propertyBag->getAmount();
     // Add a fee_amount so we can make sure fees are handled properly in underlying classes.
-    $params['fee_amount'] = 1.50;
-    $params['description'] = $this->getPaymentDescription($params);
+    $result['fee_amount'] = 1.50;
+    $result['description'] = $this->getPaymentDescription($params);
 
-    return $params;
-  }
+    if (!isset($result['payment_status_id'])) {
+      if (!empty($propertyBag->getIsRecur())) {
+        // See comment block.
+        $result['payment_status_id'] = array_search('Pending', $statuses);
+        $result['payment_status'] = 'Pending';
+      }
+      else {
+        $result['payment_status_id'] = array_search('Completed', $statuses);
+        $result['payment_status'] = 'Completed';
+      }
+    }
 
-  /**
-   * Does this payment processor support refund?
-   *
-   * @return bool
-   */
-  public function supportsRefund() {
-    return TRUE;
-  }
-
-  /**
-   * Supports altering future start dates.
-   *
-   * @return bool
-   */
-  public function supportsFutureRecurStartDate() {
-    return TRUE;
+    return $result;
   }
 
   /**
@@ -132,6 +275,21 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    *   Assoc array of input parameters for this transaction.
    */
   public function doRefund(&$params) {}
+
+  /**
+   * Function to action pre-approval if supported
+   *
+   * @param array $params
+   *   Parameters from the form
+   *
+   * This function returns an array which should contain
+   *   - pre_approval_parameters (this will be stored on the calling form & available later)
+   *   - redirect_url (if set the browser will be redirected to this.
+   */
+  public function doPreApproval(&$params): void {
+    // We set this here to allow the test to check what is set.
+    \Civi::$statics[__CLASS__][__FUNCTION__] = $params;
+  }
 
   /**
    * This function checks to see if we have the right config values.
@@ -173,19 +331,6 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
-   * Does this processor support cancelling recurring contributions through code.
-   *
-   * If the processor returns true it must be possible to take action from within CiviCRM
-   * that will result in no further payments being processed. In the case of token processors (e.g
-   * IATS, eWay) updating the contribution_recur table is probably sufficient.
-   *
-   * @return bool
-   */
-  protected function supportsCancelRecurring() {
-    return TRUE;
-  }
-
-  /**
    * Cancel a recurring subscription.
    *
    * Payment processor classes should override this rather than implementing cancelSubscription.
@@ -217,7 +362,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    */
   protected function getTrxnID() {
     $string = $this->_mode;
-    $trxn_id = CRM_Core_DAO::singleValueQuery("SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE '{$string}_%'");
+    $trxn_id = CRM_Core_DAO::singleValueQuery("SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE '{$string}_%'") ?? '';
     $trxn_id = str_replace($string, '', $trxn_id);
     $trxn_id = (int) $trxn_id + 1;
     return $string . '_' . $trxn_id . '_' . uniqid();

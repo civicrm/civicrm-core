@@ -15,10 +15,6 @@ namespace Civi\Test\Legacy;
  * @see HookInterface
  */
 class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
-  /**
-   * @var \CRM_Core_TemporaryErrorScope
-   */
-  private $errorScope;
 
   /**
    * @var array
@@ -45,18 +41,13 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
   public function startTest(\PHPUnit_Framework_Test $test) {
     if ($this->isCiviTest($test)) {
       error_reporting(E_ALL);
-      $this->errorScope = \CRM_Core_TemporaryErrorScope::useException();
+      $GLOBALS['CIVICRM_TEST_CASE'] = $test;
     }
 
     if ($test instanceof \Civi\Test\HeadlessInterface) {
       $this->bootHeadless($test);
     }
 
-    if ($test instanceof \Civi\Test\HookInterface) {
-      // Note: bootHeadless() indirectly resets any hooks, which means that hook_civicrm_config
-      // is unsubscribable. However, after bootHeadless(), we're free to subscribe to hooks again.
-      $this->registerHooks($test);
-    }
     if ($test instanceof \Civi\Test\TransactionalInterface) {
       $this->tx = new \CRM_Core_Transaction(TRUE);
       $this->tx->rollback();
@@ -64,9 +55,24 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     else {
       $this->tx = NULL;
     }
+
+    if ($this->isCiviTest($test) || $test instanceof \CiviUnitTestCase) {
+      \Civi\Test::eventChecker()->start($test);
+    }
   }
 
   public function endTest(\PHPUnit_Framework_Test $test, $time) {
+    $exception = NULL;
+
+    if ($this->isCiviTest($test) || $test instanceof \CiviUnitTestCase) {
+      try {
+        \Civi\Test::eventChecker()->stop($test);
+      }
+      catch (\Exception $e) {
+        $exception = $e;
+      }
+    }
+
     if ($test instanceof \Civi\Test\TransactionalInterface) {
       $this->tx->rollback()->commit();
       $this->tx = NULL;
@@ -74,9 +80,15 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     if ($test instanceof \Civi\Test\HookInterface) {
       \CRM_Utils_Hook::singleton()->reset();
     }
+    \CRM_Utils_Time::resetTime();
     if ($this->isCiviTest($test)) {
+      unset($GLOBALS['CIVICRM_TEST_CASE']);
       error_reporting(E_ALL & ~E_NOTICE);
       $this->errorScope = NULL;
+    }
+
+    if ($exception) {
+      throw $exception;
     }
   }
 
@@ -99,29 +111,11 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     \CRM_Core_Session::singleton()->set('userID', NULL);
     // ugh, performance
     $config = \CRM_Core_Config::singleton(TRUE, TRUE);
+    $config->userSystem->setMySQLTimeZone();
 
     if (property_exists($config->userPermissionClass, 'permissions')) {
       $config->userPermissionClass->permissions = NULL;
     }
-  }
-
-  /**
-   * @param \Civi\Test\HookInterface $test
-   * @return array
-   *   Array(string $hookName => string $methodName)).
-   */
-  protected function findTestHooks(\Civi\Test\HookInterface $test) {
-    $class = get_class($test);
-    if (!isset($this->cache[$class])) {
-      $funcs = [];
-      foreach (get_class_methods($class) as $func) {
-        if (preg_match('/^hook_/', $func)) {
-          $funcs[substr($func, 5)] = $func;
-        }
-      }
-      $this->cache[$class] = $funcs;
-    }
-    return $this->cache[$class];
   }
 
   /**
@@ -130,25 +124,6 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
    */
   protected function isCiviTest(\PHPUnit_Framework_Test $test) {
     return $test instanceof \Civi\Test\HookInterface || $test instanceof \Civi\Test\HeadlessInterface;
-  }
-
-  /**
-   * Find any hook functions in $test and register them.
-   *
-   * @param \Civi\Test\HookInterface $test
-   */
-  protected function registerHooks(\Civi\Test\HookInterface $test) {
-    if (CIVICRM_UF !== 'UnitTests') {
-      // This is not ideal -- it's just a side-effect of how hooks and E2E tests work.
-      // We can temporarily subscribe to hooks in-process, but for other processes, it gets messy.
-      throw new \RuntimeException('CiviHookTestInterface requires CIVICRM_UF=UnitTests');
-    }
-    \CRM_Utils_Hook::singleton()->reset();
-    /** @var \CRM_Utils_Hook_UnitTests $hooks */
-    $hooks = \CRM_Utils_Hook::singleton();
-    foreach ($this->findTestHooks($test) as $hook => $func) {
-      $hooks->setHook($hook, [$test, $func]);
-    }
   }
 
   /**

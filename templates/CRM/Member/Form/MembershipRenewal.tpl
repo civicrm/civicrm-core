@@ -8,31 +8,36 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for renewing memberships for a contact  *}
-  {if $membershipMode == 'test' }
+  {if $membershipMode == 'test'}
     {assign var=registerMode value="TEST"}
   {elseif $membershipMode == 'live'}
     {assign var=registerMode value="LIVE"}
   {/if}
   {if !$email}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       <p>{ts}You will not be able to send an automatic email receipt for this Renew Membership because there is no email address recorded for this contact. If you want a receipt to be sent when this Membership is recorded, click Cancel and then click Edit from the Summary tab to add an email address before Renewal the Membership.{/ts}</p>
     </div>
   {/if}
   {if $membershipMode}
     <div class="help">
-      {ts 1=$displayName 2=$registerMode}Use this form to Renew Membership Record on behalf of %1.
-        <strong>A %2 transaction will be submitted</strong>
-        using the selected payment processor.{/ts}
+      {ts 1=$displayName}Use this form to Renew Membership Record on behalf of %1.{/ts}
+      {if $registerMode == 'LIVE'}
+        {ts}<strong>A LIVE transaction will be submitted</strong> using the selected payment processor.{/ts}
+      {else}
+        {ts}<strong>A TEST transaction will be submitted</strong> using the selected payment processor.{/ts}
+      {/if}
     </div>
   {/if}
   {if $action eq 32768}
     {if $cancelAutoRenew}
       <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
-        <p>{ts 1=$cancelAutoRenew}This membership is set to renew automatically {if $renewalDate}on {$renewalDate|crmDate}{/if}. You will need to cancel the auto-renew option if you want to modify the Membership Type, End Date or Membership Status.
-            <a href="%1">Click here</a>
-            if you want to cancel the automatic renewal option.{/ts}</p>
+        {icon icon="fa-info-circle"}{/icon}
+        {if $renewalDate}
+          <p>{ts 1=$cancelAutoRenew 2=$renewalDate|crmDate}This membership is set to renew automatically on %2. You will need to cancel the auto-renew option if you want to modify the Membership Type, End Date or Membership Status. <a href="%1">Click here</a> if you want to cancel the automatic renewal option.{/ts}</p>
+        {else}
+          <p>{ts 1=$cancelAutoRenew}This membership is set to renew automatically. You will need to cancel the auto-renew option if you want to modify the Membership Type, End Date or Membership Status. <a href="%1">Click here</a> if you want to cancel the automatic renewal option.{/ts}</p>
+        {/if}
       </div>
     {/if}
   {/if}
@@ -56,45 +61,36 @@
       </tr>
       <tr id="membershipOrgType" class="crm-member-membershiprenew-form-block-renew_org_name hiddenElement">
         <td class="label">{$form.membership_type_id.label}</td>
-        <td>{$form.membership_type_id.html}
+        <td>{$form.membership_type_id.html|smarty:nodefaults}
           {if $member_is_test} {ts}(test){/ts}{/if}<br/>
           <span class="description">{ts}Select Membership Organization and then Membership Type.{/ts}</span>
         </td>
       </tr>
       <tr class="crm-member-membershiprenew-form-block-membership_status">
         <td class="label">{ts}Membership Status{/ts}</td>
-        <td class="html-adjust">&nbsp;{$membershipStatus}<br/>
-          <span class="description">{ts}Status of this membership.{/ts}</span></td>
+        <td class="html-adjust">&nbsp;{$membershipStatus}</td>
       </tr>
       <tr class="crm-member-membershiprenew-form-block-end_date">
-        <td class="label">{ts}Membership End Date{/ts}</td>
-        <td class="html-adjust">&nbsp;{$endDate}</td>
+        <td class="label">{ts}Membership Expiration Date{/ts}</td>
+        <td class="html-adjust">&nbsp;{$endDate|crmDate}</td>
       </tr>
       <tr class="crm-member-membershiprenew-form-block-renewal_date">
         <td class="label">{$form.renewal_date.label}</td>
-        <td>{$form.renewal_date.html}</td>
-      </tr>
-      <tr id="defaultNumTerms" class="crm-member-membershiprenew-form-block-default-num_terms">
-        <td colspan="2" class="description">
-          {ts}Renewal extends membership end date by one membership period{/ts}
-          &nbsp; <a id="changeTermsLink" href='#'
-                    onclick='changeNumTerms(); return false;'>{ts}change{/ts}</a>
+        <td>{$form.renewal_date.html}
+          <div id="defaultNumTerms" class="crm-member-membershiprenew-form-block-default-num_terms description">
+            {ts}Renewal extends Membership Expiration Date by one membership period{/ts}
+            &nbsp;<a id="changeTermsLink" href='#' onclick='changeNumTerms(); return false;'>{ts}change{/ts}</a>
+          </div>
         </td>
       </tr>
       <tr id="changeNumTerms" class="crm-member-membershiprenew-form-block-change-num_terms">
         <td class="label">{$form.num_terms.label}</td>
-        <td>{$form.num_terms.html|crmAddClass:two} {ts}membership periods{/ts}<br/>
-          <span
-            class="description">{ts}Extend the membership end date by this many membership periods. Make sure the appropriate corresponding fee is entered below.{/ts}</span>
-        </td>
+        <td>{$form.num_terms.html|crmAddClass:two} {ts}membership periods{/ts}</td>
       </tr>
       {if $accessContribution and ! $membershipMode}
         <tr class="crm-member-membershiprenew-form-block-record_contribution">
           <td class="label">{$form.record_contribution.label}</td>
-          <td class="html-adjust">{$form.record_contribution.html}<br/>
-            <span
-              class="description">{ts}Check this box to enter payment information. You will also be able to generate a customized receipt.{/ts}</span>
-          </td>
+          <td class="html-adjust">{$form.record_contribution.html}</td>
         </tr>
         <tr id="recordContribution" class="crm-member-membershiprenew-form-block-membership_renewal">
           <td colspan="2">
@@ -107,19 +103,21 @@
       <table class="form-layout">
         <tr class="crm-{$formClass}-form-block-send_receipt">
           <td class="label">{$form.send_receipt.label}</td>
-          <td>{$form.send_receipt.html}<br/>
+          <td>{$form.send_receipt.html}
             <span class="description">{ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1?{/ts}</span>
           </td>
         </tr>
         <tr id="fromEmail">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+          <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         </tr>
-        <tr id="notice" class="crm-member-membershiprenew-form-block-receipt_text_renewal">
-          <td class="label">{$form.receipt_text_renewal.label}</td>
-          <td><span
-              class="description">{ts}Enter a message you want included at the beginning of the emailed receipt. EXAMPLE: 'Thanks for supporting our organization with your membership.'{/ts}</span><br/>
-            {$form.receipt_text_renewal.html|crmAddClass:huge}</td>
+        <tr id="notice" class="crm-member-membershiprenew-form-block-receipt_text">
+          <td class="label">{$form.receipt_text.label}</td>
+          <td>{$form.receipt_text.html|crmAddClass:huge}<br />
+             <span class="description">
+             {ts}Enter a message you want included at the beginning of the emailed receipt.{/ts}
+             </span>
+          </td>
         </tr>
       </table>
     {/if}

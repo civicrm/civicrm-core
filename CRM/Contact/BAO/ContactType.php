@@ -9,34 +9,22 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\ContactType;
-
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
+class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements \Civi\Core\HookInterface {
 
   /**
-   * Fetch object based on array of properties.
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
-   *
-   * @return CRM_Contact_DAO_ContactType|null
-   *   object on success, null otherwise
+   * @return self|null
    */
-  public static function retrieve(&$params, &$defaults) {
-    $contactType = new CRM_Contact_DAO_ContactType();
-    $contactType->copyValues($params);
-    if ($contactType->find(TRUE)) {
-      CRM_Core_DAO::storeValues($contactType, $defaults);
-      return $contactType;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -45,9 +33,11 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @param string $contactType
    *
    * @return bool
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function isActive($contactType) {
-    $contact = self::contactTypeInfo(FALSE);
+    $contact = self::contactTypeInfo();
     return array_key_exists($contactType, $contact);
   }
 
@@ -59,19 +49,13 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @return array
    *   Array of basic contact types information.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function basicTypeInfo($includeInactive = FALSE) {
-    $cacheKey = 'CRM_CT_BTI_' . (int) $includeInactive;
-    if (!Civi::cache('contactTypes')->has($cacheKey)) {
-      $contactType = ContactType::get()->setCheckPermissions(FALSE)->setSelect(['*'])->addWhere('parent_id', 'IS NULL');
-      if ($includeInactive === FALSE) {
-        $contactType->addWhere('is_active', '=', 1);
-      }
-      Civi::cache('contactTypes')->set($cacheKey, (array) $contactType->execute()->indexBy('name'));
-    }
-    return Civi::cache('contactTypes')->get($cacheKey);
+    return array_filter(self::getAllContactTypes(), function($type) use ($includeInactive) {
+      return empty($type['parent']) && ($includeInactive || $type['is_active']);
+    });
   }
 
   /**
@@ -82,7 +66,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @return array
    *   Array of basic contact types
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function basicTypes($all = FALSE) {
@@ -94,7 +78,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @param string $key
    *
    * @return array
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function basicTypePairs($all = FALSE, $key = 'name') {
@@ -111,57 +95,32 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
   /**
    * Retrieve all subtypes Information.
    *
-   * @param array $contactType
-   *   ..
+   * @param string|null $contactType
    * @param bool $all
-   * @param bool $ignoreCache
    *
    * @return array
-   *   Array of sub type information
+   *   Array of sub type information, subset of getAllContactTypes.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function subTypeInfo($contactType = NULL, $all = FALSE, $ignoreCache = FALSE) {
-    $argString = $all ? 'CRM_CT_STI_1_' : 'CRM_CT_STI_0_';
-    if (!empty($contactType)) {
-      $contactType = (array) $contactType;
-      $argString .= implode('_', $contactType);
+  public static function subTypeInfo($contactType = NULL, $all = FALSE) {
+    $contactTypes = self::getAllContactTypes();
+    foreach ($contactTypes as $index => $type) {
+      if (empty($type['parent']) ||
+        (!$all && !$type['is_active'])
+        || ($contactType && $type['parent'] !== $contactType)
+      ) {
+        unset($contactTypes[$index]);
+      }
     }
-    if (!Civi::cache('contactTypes')->has($argString) || $ignoreCache) {
-      $ctWHERE = '';
-      if (!empty($contactType)) {
-        $ctWHERE = " AND parent.name IN ('" . implode("','", $contactType) . "')";
-      }
-
-      $sql = "
-SELECT subtype.*, parent.name as parent, parent.label as parent_label
-FROM   civicrm_contact_type subtype
-INNER JOIN civicrm_contact_type parent ON subtype.parent_id = parent.id
-WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
-";
-      if ($all === FALSE) {
-        $sql .= " AND subtype.is_active = 1 AND parent.is_active = 1 ORDER BY parent.id";
-      }
-      $dao = CRM_Core_DAO::executeQuery($sql, [],
-        FALSE, 'CRM_Contact_DAO_ContactType'
-      );
-      $values = [];
-      while ($dao->fetch()) {
-        $value = [];
-        CRM_Core_DAO::storeValues($dao, $value);
-        $value['parent'] = $dao->parent;
-        $value['parent_label'] = $dao->parent_label;
-        $values[$dao->name] = $value;
-      }
-      Civi::cache('contactTypes')->set($argString, $values);
-    }
-    return Civi::cache('contactTypes')->get($argString);
+    return $contactTypes;
   }
 
   /**
    *
    *   retrieve all subtypes
    *
-   * @param array $contactType
-   *   ..
+   * @param string|null $contactType
    * @param bool $all
    * @param string $columnName
    * @param bool $ignoreCache
@@ -169,10 +128,11 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    * @return array
    *   all subtypes OR list of subtypes associated to
    *   a given basic contact type
+   * @throws \CRM_Core_Exception
    */
   public static function subTypes($contactType = NULL, $all = FALSE, $columnName = 'name', $ignoreCache = FALSE) {
     if ($columnName === 'name') {
-      return array_keys(self::subTypeInfo($contactType, $all, $ignoreCache));
+      return array_keys(self::subTypeInfo($contactType, $all));
     }
     else {
       return array_values(self::subTypePairs($contactType, FALSE, NULL, $ignoreCache));
@@ -185,14 +145,14 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    *
    * @param array $contactType
    * @param bool $all
-   * @param string $labelPrefix
+   * @param string|null $labelPrefix
    * @param bool $ignoreCache
    *
    * @return array
    *   list of subtypes with name as 'subtype-name' and 'label' as value
    */
   public static function subTypePairs($contactType = NULL, $all = FALSE, $labelPrefix = '- ', $ignoreCache = FALSE) {
-    $subtypes = self::subTypeInfo($contactType, $all, $ignoreCache);
+    $subtypes = self::subTypeInfo($contactType, $all);
 
     $pairs = [];
     foreach ($subtypes as $name => $info) {
@@ -202,8 +162,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
   }
 
   /**
-   *
-   * retrieve list of all types i.e basic + subtypes.
+   * Retrieve list of all types i.e basic + subtypes.
    *
    * @param bool $all
    *
@@ -217,65 +176,37 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
   /**
    * Retrieve info array about all types i.e basic + subtypes.
    *
+   * @todo deprecate calling this with $all = TRUE in favour of getAllContactTypes
+   * & ideally add getActiveContactTypes & call that from this fully
+   * deprecated function.
+   *
    * @param bool $all
    *
    * @return array
    *   Array of basic types + all subtypes.
    */
   public static function contactTypeInfo($all = FALSE) {
-
-    if (!isset(Civi::$statics[__CLASS__]['contactTypeInfo'])) {
-      Civi::$statics[__CLASS__]['contactTypeInfo'] = [];
-    }
-    $_cache = &Civi::$statics[__CLASS__]['contactTypeInfo'];
-
-    $argString = $all ? 'CRM_CT_CTI_1' : 'CRM_CT_CTI_0';
-    if (!array_key_exists($argString, $_cache)) {
-      $cache = CRM_Utils_Cache::singleton();
-      $_cache[$argString] = $cache->get($argString);
-      if (!$_cache[$argString]) {
-        $_cache[$argString] = [];
-
-        $sql = '
-SELECT type.*, parent.name as parent, parent.label as parent_label
-FROM      civicrm_contact_type type
-LEFT JOIN civicrm_contact_type parent ON type.parent_id = parent.id';
-
-        if ($all === FALSE) {
-          $sql .= ' WHERE type.is_active = 1';
+    $contactTypes = self::getAllContactTypes();
+    if (!$all) {
+      foreach ($contactTypes as $index => $value) {
+        if (!$value['is_active']) {
+          unset($contactTypes[$index]);
         }
-
-        $dao = CRM_Core_DAO::executeQuery($sql,
-          [],
-          FALSE,
-          'CRM_Contact_DAO_ContactType'
-        );
-        while ($dao->fetch()) {
-          $value = [];
-          CRM_Core_DAO::storeValues($dao, $value);
-          if (array_key_exists('parent_id', $value)) {
-            $value['parent'] = $dao->parent;
-            $value['parent_label'] = $dao->parent_label;
-          }
-          $_cache[$argString][$dao->name] = $value;
-        }
-
-        $cache->set($argString, $_cache[$argString]);
       }
     }
-
-    return $_cache[$argString];
+    return $contactTypes;
   }
 
   /**
    * Retrieve basic type pairs with name as 'built-in name' and 'label' as value.
    *
    * @param bool $all
-   * @param null $typeName
-   * @param null $delimiter
+   * @param array|string|null $typeName
+   * @param string|null $delimiter
    *
-   * @return array
+   * @return array|string
    *   Array of basictypes with name as 'built-in name' and 'label' as value
+   * @throws \CRM_Core_Exception
    */
   public static function contactTypePairs($all = FALSE, $typeName = NULL, $delimiter = NULL) {
     $types = self::contactTypeInfo($all);
@@ -303,17 +234,20 @@ LEFT JOIN civicrm_contact_type parent ON type.parent_id = parent.id';
 
   /**
    * Get a list of elements for select box.
-   * Note that this used to default to using the hex(01) character - which results in an invalid character being used in form fields
-   * which was not handled well be anything that loaded & resaved the html (outside core)
-   * The use of this separator is now explicit in the calling functions as a step towards it's removal
+   * Note that this used to default to using the hex(01) character - which
+   * results in an invalid character being used in form fields which was not
+   * handled well be anything that loaded & resaved the html (outside core) The
+   * use of this separator is now explicit in the calling functions as a step
+   * towards it's removal
    *
    * @param bool $all
    * @param bool $isSeparator
    * @param string $separator
    *
    * @return mixed
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public  static function getSelectElements(
+  public static function getSelectElements(
     $all = FALSE,
     $isSeparator = TRUE,
     $separator = '__'
@@ -325,6 +259,7 @@ LEFT JOIN civicrm_contact_type parent ON type.parent_id = parent.id';
       $_cache = [];
     }
 
+    // @todo - call getAllContactTypes & return filtered results.
     $argString = $all ? 'CRM_CT_GSE_1' : 'CRM_CT_GSE_0';
     $argString .= $isSeparator ? '_1' : '_0';
     $argString .= $separator;
@@ -405,7 +340,6 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
    *
    * @param array|string $subType contact subType.
    * @return array|string
-   *   basicTypes.
    */
   public static function getBasicType($subType) {
     // @todo - use Cache class - ie like Civi::cache('contactTypes')
@@ -493,7 +427,8 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
         $typeValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $key);
         $cType = $typeValue['0'] ?? NULL;
         $typeUrl = 'ct=' . $cType;
-        if ($csType = CRM_Utils_Array::value('1', $typeValue)) {
+        $csType = $typeValue['1'] ?? NULL;
+        if ($csType) {
           $typeUrl .= "&cst=$csType";
         }
         $shortCut = [
@@ -502,7 +437,8 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
           'ref' => "new-$value",
           'title' => $value,
         ];
-        if ($csType = CRM_Utils_Array::value('1', $typeValue)) {
+        $csType = $typeValue['1'] ?? NULL;
+        if ($csType) {
           $shortCuts[$cType]['shortCuts'][] = $shortCut;
         }
         else {
@@ -518,132 +454,123 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
    *
    * @param int $contactTypeId
    *   ID of the Contact Subtype to be deleted.
-   *
+   * @deprecated
    * @return bool
    */
   public static function del($contactTypeId) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     if (!$contactTypeId) {
       return FALSE;
     }
-
-    $params = ['id' => $contactTypeId];
-    self::retrieve($params, $typeInfo);
-    $name = $typeInfo['name'];
-    // check if any custom group
-    $custom = new CRM_Core_DAO_CustomGroup();
-    $custom->whereAdd("extends_entity_column_value LIKE '%" .
-      CRM_Core_DAO::VALUE_SEPARATOR .
-      $name .
-      CRM_Core_DAO::VALUE_SEPARATOR . "%'"
-    );
-    if ($custom->find()) {
+    try {
+      static::deleteRecord(['id' => $contactTypeId]);
+      return TRUE;
+    }
+    catch (CRM_Core_Exception $e) {
       return FALSE;
     }
-
-    // remove subtype for existing contacts
-    $sql = "
-UPDATE civicrm_contact SET contact_sub_type = NULL
-WHERE contact_sub_type = '$name'";
-    CRM_Core_DAO::executeQuery($sql);
-
-    // remove subtype from contact type table
-    $contactType = new CRM_Contact_DAO_ContactType();
-    $contactType->id = $contactTypeId;
-    $contactType->delete();
-
-    // remove navigation entry if any
-    if ($name) {
-      $sql = '
-DELETE
-FROM civicrm_navigation
-WHERE name = %1';
-      $params = [1 => ["New $name", 'String']];
-      CRM_Core_DAO::executeQuery($sql, $params);
-      CRM_Core_BAO_Navigation::resetNavigation();
-      Civi::cache('contactTypes')->clear();
-    }
-    return TRUE;
   }
 
   /**
-   * Add or update Contact SubTypes.
-   *
-   * @param array $params
-   *   An assoc array of name/value pairs.
-   *
-   * @return object|void
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    // Before deleting a contactType, check references by custom groups
+    if ($event->action === 'delete') {
+      $name = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $event->id);
+      $sep = CRM_Core_DAO::VALUE_SEPARATOR;
+      $custom = new CRM_Core_DAO_CustomGroup();
+      $custom->whereAdd("extends_entity_column_value LIKE '%{$sep}{$name}{$sep}%'");
+      if ($custom->find()) {
+        throw new CRM_Core_Exception(ts("You can not delete this contact type -- it is used by %1 custom field group(s). The custom fields must be deleted first.", [1 => $custom->N]));
+      }
+    }
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    /** @var CRM_Contact_DAO_ContactType $contactType */
+    $contactType = $event->object;
+    if ($event->action === 'edit' && $contactType->find(TRUE)) {
+      // Update navigation menu for contact type
+      $navigation = [
+        'label' => ts("New %1", [1 => $contactType->label]),
+        'name' => "New {$contactType->name}",
+        'is_active' => $contactType->is_active,
+      ];
+      civicrm_api4('Navigation', 'save', [
+        'checkPermissions' => FALSE,
+        'records' => [$navigation],
+        'match' => ['name'],
+      ]);
+    }
+    if ($event->action === 'create' && $contactType->find(TRUE)) {
+      $name = self::getBasicType($contactType->name);
+      if (!$name) {
+        return;
+      }
+      $navigation = [
+        'label' => ts("New %1", [1 => $contactType->label]),
+        'name' => "New {$contactType->name}",
+        'url' => "civicrm/contact/add?ct=$name&cst={$contactType->name}&reset=1",
+        'permission' => 'add contacts',
+        'parent_id:name' => "New $name",
+        'is_active' => $contactType->is_active,
+      ];
+      civicrm_api4('Navigation', 'save', [
+        'checkPermissions' => FALSE,
+        'records' => [$navigation],
+        'match' => ['name'],
+      ]);
+    }
+    if ($event->action === 'delete') {
+      $sep = CRM_Core_DAO::VALUE_SEPARATOR;
+      $subType = "$sep{$contactType->name}$sep";
+      // For contacts with just the one sub-type, set to null
+      $sql = "
+UPDATE civicrm_contact SET contact_sub_type = NULL
+WHERE contact_sub_type = '$subType'";
+      CRM_Core_DAO::executeQuery($sql);
+      // For contacts with multipe sub-types, remove this one
+      $sql = "
+UPDATE civicrm_contact SET contact_sub_type = REPLACE(contact_sub_type, '$subType', '$sep')
+WHERE contact_sub_type LIKE '%{$subType}%'";
+      CRM_Core_DAO::executeQuery($sql);
+
+      // remove navigation entry which was auto-created when this sub-type was added
+      \Civi\Api4\Navigation::delete(FALSE)
+        ->addWhere('name', '=', "New {$contactType->name}")
+        ->addWhere('url', 'LIKE', 'civicrm/contact/add%')
+        // Overide the default which limits to a single domain
+        ->addWhere('domain_id', '>', 0)
+        ->execute();
+    }
+    Civi::cache('contactTypes')->clear();
+  }
+
+  /**
+   * @deprecated
+   * @return CRM_Contact_DAO_ContactType
    * @throws \CRM_Core_Exception
    */
   public static function add($params) {
-
-    // label or name
-    if (empty($params['id']) && empty($params['label'])) {
-      // @todo consider throwing exception instead.
-      return NULL;
-    }
-    if (empty($params['id']) && empty($params['name'])) {
-      $params['name'] = ucfirst(CRM_Utils_String::munge($params['label']));
-    }
-    if (!empty($params['parent_id']) &&
-      !CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $params['parent_id'])
-    ) {
-      return NULL;
-    }
-
-    $contactType = new CRM_Contact_DAO_ContactType();
-    $contactType->copyValues($params);
-    $contactType->id = $params['id'] ?? NULL;
-
-    $contactType->save();
-    if ($contactType->find(TRUE)) {
-      $contactName = $contactType->name;
-      $contact = ucfirst($contactType->label);
-      $active = $contactType->is_active;
-    }
-
-    if (!empty($params['id'])) {
-      $newParams = [
-        'label' => ts("New %1", [1 => $contact]),
-        'is_active' => $contactType->is_active,
-      ];
-      CRM_Core_BAO_Navigation::processUpdate(['name' => "New $contactName"], $newParams);
-    }
-    else {
-      $name = self::getBasicType($contactName);
-      if (!$name) {
-        return NULL;
-      }
-      $value = ['name' => "New $name"];
-      CRM_Core_BAO_Navigation::retrieve($value, $navinfo);
-      $navigation = [
-        'label' => ts("New %1", [1 => $contact]),
-        'name' => "New $contactName",
-        'url' => "civicrm/contact/add?ct=$name&cst=$contactName&reset=1",
-        'permission' => 'add contacts',
-        'parent_id' => $navinfo['id'],
-        'is_active' => $active,
-      ];
-      CRM_Core_BAO_Navigation::add($navigation);
-    }
-    CRM_Core_BAO_Navigation::resetNavigation();
-    Civi::cache('contactTypes')->clear();
-
-    return $contactType;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     $params = ['id' => $id];
     self::retrieve($params, $contactinfo);
     $params = ['name' => "New $contactinfo[name]"];
@@ -658,7 +585,8 @@ WHERE name = %1';
   /**
    * @param string $typeName
    *
-   * @return mixed
+   * @return string
+   * @throws \CRM_Core_Exception
    */
   public static function getLabel($typeName) {
     $types = self::contactTypeInfo(TRUE);
@@ -703,7 +631,7 @@ WHERE name = %1';
   }
 
   /**
-   * @param $contactType
+   * @param string $contactType
    * @param int $contactId
    *
    * @return bool
@@ -740,12 +668,11 @@ WHERE name = %1';
   /**
    * @todo what does this function do?
    * @param int $contactId
-   * @param $contactType
+   * @param string $contactType
    *
    * @return bool
    */
   public static function hasRelationships($contactId, $contactType) {
-    $subTypeClause = NULL;
     if (self::isaSubType($contactType)) {
       $subType = $contactType;
       $contactType = self::getBasicType($subType);
@@ -804,16 +731,18 @@ WHERE extends = %1 AND ' . implode(" OR ", $subTypeClause);
 
   /**
    * Function that does something.
-   * @todo what does this function do?
    *
    * @param int $contactID
-   * @param $contactType
+   * @param string $contactType
    * @param array $oldSubtypeSet
    * @param array $newSubtypeSet
    *
    * @return bool
+   * @throws \CRM_Core_Exception
+   *
+   * @todo what does this function do?
    */
-  public  static function deleteCustomSetForSubtypeMigration(
+  public static function deleteCustomSetForSubtypeMigration(
     $contactID,
     $contactType,
     $oldSubtypeSet = [],
@@ -841,6 +770,8 @@ WHERE extends = %1 AND ' . implode(" OR ", $subTypeClause);
    * @param array $subtypesToPreserve
    *
    * @return bool
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function deleteCustomRowsOfSubtype($gID, $subtypes = [], $subtypesToPreserve = []) {
     if (!$gID or empty($subtypes)) {
@@ -886,11 +817,65 @@ WHERE ($subtypeClause)";
    *   Entity id.
    *
    * @return null|string
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function deleteCustomRowsForEntityID($customTable, $entityID) {
     $customTable = CRM_Utils_Type::escape($customTable, 'String');
     $query = "DELETE FROM {$customTable} WHERE entity_id = %1";
     return CRM_Core_DAO::singleValueQuery($query, [1 => [$entityID, 'Integer']]);
+  }
+
+  /**
+   * Get all contact types, leveraging caching.
+   *
+   * Note, this function is used within APIv4 Entity.get, so must use a
+   * SQL query instead of calling APIv4 to avoid an infinite loop.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public static function getAllContactTypes() {
+    $cache = Civi::cache('contactTypes');
+    $cacheKey = 'all_' . $GLOBALS['tsLocale'];
+    $contactTypes = $cache->get($cacheKey);
+    if ($contactTypes === NULL) {
+      $query = CRM_Utils_SQL_Select::from('civicrm_contact_type');
+      $dao = CRM_Core_DAO::executeQuery($query->toSQL());
+      $contactTypes = array_column($dao->fetchAll(), NULL, 'name');
+      $parents = array_column($contactTypes, NULL, 'id');
+      foreach ($contactTypes as $name => $contactType) {
+        $contactTypes[$name]['parent'] = $contactType['parent_id'] ? $parents[$contactType['parent_id']]['name'] : NULL;
+        $contactTypes[$name]['parent_label'] = $contactType['parent_id'] ? $parents[$contactType['parent_id']]['label'] : NULL;
+        // Cast int/bool types.
+        $contactTypes[$name]['id'] = (int) $contactType['id'];
+        $contactTypes[$name]['parent_id'] = $contactType['parent_id'] ? (int) $contactType['parent_id'] : NULL;
+        $contactTypes[$name]['is_active'] = (bool) $contactType['is_active'];
+        $contactTypes[$name]['is_reserved'] = (bool) $contactType['is_reserved'];
+      }
+      $cache->set($cacheKey, $contactTypes);
+    }
+    return $contactTypes;
+  }
+
+  /**
+   * @param string $entityName
+   * @param string $action
+   * @param array $record
+   * @param $userID
+   * @return bool
+   * @see CRM_Core_DAO::checkAccess
+   */
+  public static function _checkAccess(string $entityName, string $action, array $record, $userID): bool {
+    // Only records with a parent may be deleted
+    if ($action === 'delete') {
+      if (!array_key_exists('parent_id', $record)) {
+        $record['parent_id'] = CRM_Core_DAO::getFieldValue(parent::class, $record['id'], 'parent_id');
+      }
+      return (bool) $record['parent_id'];
+    }
+    // Gatekeeper permissions suffice for everything else
+    return TRUE;
   }
 
 }

@@ -12,7 +12,7 @@
 /**
  * Class to generate various "icalendar" type event feeds
  */
-class CRM_Event_ICalendar extends CRM_Core_Page {
+class CRM_Event_ICalendar {
 
   /**
    * Heart of the iCalendar data assignment process. The runner gets all the meta
@@ -21,7 +21,7 @@ class CRM_Event_ICalendar extends CRM_Core_Page {
    * Else outputs iCalendar format per IETF RFC2445. Page param true means send
    * to browser as inline content. Else, we send .ics file as attachment.
    */
-  public function run() {
+  public static function run() {
     $id = CRM_Utils_Request::retrieveValue('id', 'Positive', NULL, FALSE, 'GET');
     $type = CRM_Utils_Request::retrieveValue('type', 'Positive', 0);
     $start = CRM_Utils_Request::retrieveValue('start', 'Positive', 0);
@@ -42,13 +42,22 @@ class CRM_Event_ICalendar extends CRM_Core_Page {
     $iCalPage = CRM_Utils_Request::retrieveValue('list', 'Positive', 0);
     $gData = CRM_Utils_Request::retrieveValue('gData', 'Positive', 0);
     $rss = CRM_Utils_Request::retrieveValue('rss', 'Positive', 0);
+    $gCalendar = CRM_Utils_Request::retrieveValue('gCalendar', 'Positive', 0);
+
+    $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
+
+    if ($gCalendar && count($info) === 1) {
+      return self::gCalRedirect($info);
+    }
 
     $template = CRM_Core_Smarty::singleton();
     $config = CRM_Core_Config::singleton();
 
-    $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
     $template->assign('events', $info);
-    $template->assign('timezone', @date_default_timezone_get());
+
+    $timezones = [@date_default_timezone_get()];
+
+    $template->assign('timezone', $timezones[0]);
 
     // Send data to the correct template for formatting (iCal vs. gData)
     if ($rss) {
@@ -60,6 +69,23 @@ class CRM_Event_ICalendar extends CRM_Core_Page {
       $calendar = $template->fetch('CRM/Core/Calendar/GData.tpl');
     }
     else {
+      if (count($info) > 0) {
+        $date_min = min(
+          array_map(function ($event) {
+            return strtotime($event['start_date']);
+          }, $info)
+        );
+        $date_max = max(
+          array_map(function ($event) {
+            return strtotime($event['end_date'] ?? $event['start_date']);
+          }, $info)
+        );
+        $template->assign('timezones', CRM_Utils_ICalendar::generate_timezones($timezones, $date_min, $date_max));
+      }
+      else {
+        $template->assign('timezones', NULL);
+      }
+
       $calendar = $template->fetch('CRM/Core/Calendar/ICal.tpl');
       $calendar = preg_replace('/(?<!\r)\n/', "\r\n", $calendar);
     }
@@ -70,13 +96,60 @@ class CRM_Event_ICalendar extends CRM_Core_Page {
         CRM_Utils_ICalendar::send($calendar, 'text/xml', 'utf-8');
       }
       else {
-        CRM_Utils_ICalendar::send($calendar, 'text/plain', 'utf-8');
+        CRM_Utils_ICalendar::send($calendar, 'text/calendar', 'utf-8');
       }
     }
     else {
       CRM_Utils_ICalendar::send($calendar, 'text/calendar', 'utf-8', 'civicrm_ical.ics', 'attachment');
     }
     CRM_Utils_System::civiExit();
+  }
+
+  protected static function gCalRedirect(array $events) {
+    $event = reset($events);
+
+    // Fetch the required Date TimeStamps
+    $start_date = date_create($event['start_date']);
+
+    // Google Requires that a Full Day event end day happens on the next Day
+    $end_date = ($event['end_date']
+      ? date_create($event['end_date'])
+      : date_create($event['start_date'])
+        ->add(DateInterval::createFromDateString('1 day'))
+        ->setTime(0, 0, 0)
+    );
+
+    $dates = $start_date->format('Ymd\THis') . '/' . $end_date->format('Ymd\THis');
+
+    $event_details = $event['description'];
+
+    // Add space after paragraph
+    $event_details = str_replace('</p>', '</p> ', $event_details);
+    $event_details = strip_tags($event_details);
+
+    // Truncate Event Description and add permalink if greater than 996 characters
+    if (strlen($event_details) > 996) {
+      if (preg_match('/^.{0,996}(?=\s|$_)/', $event_details, $m)) {
+        $event_details = $m[0] . '...';
+      }
+    }
+
+    $event_details .= "\n\n<a href=\"{$event['url']}\">" . ts('View %1 Details', [1 => $event['event_type']]) . '</a>';
+
+    $params = [
+      'action' => 'TEMPLATE',
+      'text' => strip_tags($event['title']),
+      'dates' => $dates,
+      'details' => $event_details,
+      'location' => str_replace("\n", "\t", $event['location']),
+      'trp' => 'false',
+      'sprop' => 'website:' . CRM_Utils_System::baseCMSURL(),
+      'ctz' => @date_default_timezone_get(),
+    ];
+
+    $url = 'https://www.google.com/calendar/event?' . CRM_Utils_System::makeQueryString($params);
+
+    CRM_Utils_System::redirect($url);
   }
 
 }

@@ -14,5 +14,5 @@ SET @UKCountryId = (SELECT id FROM civicrm_country cc WHERE cc.name = 'United Ki
 INSERT IGNORE INTO civicrm_state_province (country_id, abbreviation, name)
 VALUES (@UKCountryId, 'MON', 'Monmouthshire');
 
-{* dev/core/#152 *}
+{* dev/core#152 *}
 UPDATE `civicrm_custom_field` set `html_type` = "Multi-Select" WHERE `html_type` = "AdvMulti-Select";

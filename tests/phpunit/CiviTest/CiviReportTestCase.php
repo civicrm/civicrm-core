@@ -14,12 +14,7 @@
  */
 class CiviReportTestCase extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-    $this->_sethtmlGlobals();
-  }
-
-  public function tearDown() {
+  public function tearDown(): void {
     // TODO Figure out how to automatically drop all temporary tables.
     // Note that MySQL doesn't provide a way to list them, so we would need
     // to keep track ourselves (eg CRM_Core_TemporaryTableManager) or reset
@@ -34,31 +29,26 @@ class CiviReportTestCase extends CiviUnitTestCase {
    * @param array $inputParams
    *
    * @return string
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
   public function getReportOutputAsCsv($reportClass, $inputParams) {
 
     $reportObj = $this->getReportObject($reportClass, $inputParams);
-    try {
-      $rows = $reportObj->getResultSet();
-      $tmpFile = $this->createTempDir() . CRM_Utils_File::makeFileName('CiviReport.csv');
-      $csvContent = CRM_Report_Utils_Report::makeCsv($reportObj, $rows);
-      file_put_contents($tmpFile, $csvContent);
-    }
-    catch (Exception $e) {
-      throw $e;
-    }
+    $rows = $reportObj->getResultSet();
+    $tmpFile = $this->createTempDir() . CRM_Utils_File::makeFileName('CiviReport.csv');
+    $csvContent = CRM_Report_Utils_Report::makeCsv($reportObj, $rows);
+    file_put_contents($tmpFile, $csvContent);
     return $tmpFile;
   }
 
   /**
-   * @param $reportClass
+   * @param string $reportClass
    * @param array $inputParams
    *
-   * @return array
-   * @throws Exception
+   * @return CRM_Report_Form
+   * @throws \CRM_Core_Exception
    */
-  public function getReportObject($reportClass, $inputParams) {
+  public function getReportObject(string $reportClass, array $inputParams): CRM_Report_Form {
     $config = CRM_Core_Config::singleton();
     $config->keyDisable = TRUE;
     $controller = new CRM_Core_Controller_Simple($reportClass, ts('some title'));
@@ -91,7 +81,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
       $reportObj->storeResultSet();
       $reportObj->buildForm();
     }
-    catch (Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // print_r($e->getCause()->getUserInfo());
       CRM_Utils_GlobalStack::singleton()->pop();
       throw $e;
@@ -131,10 +121,8 @@ class CiviReportTestCase extends CiviUnitTestCase {
       . "\n===== ACTUAL DATA ====\n"
       . $this->flattenCsvArray($actualCsvArray);
 
-    $this->assertEquals(
-      count($actualCsvArray),
-      count($expectedCsvArray),
-      'Arrays have different number of rows; in line ' . __LINE__ . '; data: ' . $flatData
+    $this->assertCount(
+      count($actualCsvArray), $expectedCsvArray, 'Arrays have different number of rows; data: ' . $flatData
     );
 
     foreach ($actualCsvArray as $intKey => $strVal) {

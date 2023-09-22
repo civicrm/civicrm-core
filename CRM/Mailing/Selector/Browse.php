@@ -62,7 +62,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
    */
   public function getPagerParams($action, &$params) {
     $params['csvString'] = NULL;
-    $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
+    $params['rowCount'] = Civi::settings()->get('default_pager_size');
     $params['status'] = ts('Mailings %%StatusMessage%%');
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
@@ -162,7 +162,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
         ]
       );
 
-      if (CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
+      if (CRM_Campaign_BAO_Campaign::isComponentEnabled()) {
         self::$_columnHeaders[] = [
           'name' => ts('Campaign'),
           'sort' => 'campaign_id',
@@ -238,18 +238,14 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           'url' => 'civicrm/mailing/approve',
           'qs' => 'mid=%%mid%%&reset=1',
           'title' => ts('Approve/Reject Mailing'),
+          'weight' => -50,
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('Report'),
           'url' => 'civicrm/mailing/report',
           'qs' => 'mid=%%mid%%&reset=1',
           'title' => ts('View Mailing Report'),
-        ],
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Re-Use'),
-          'url' => 'civicrm/mailing/send',
-          'qs' => 'mid=%%mid%%&reset=1',
-          'title' => ts('Re-Send Mailing'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Cancel'),
@@ -257,12 +253,21 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           'qs' => 'action=disable&mid=%%mid%%&reset=1',
           'extra' => 'onclick="if (confirm(\'' . $cancelExtra . '\')) this.href+=\'&amp;confirmed=1\'; else return false;"',
           'title' => ts('Cancel Mailing'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Continue'),
           'url' => 'civicrm/mailing/send',
           'qs' => 'mid=%%mid%%&continue=true&reset=1',
           'title' => ts('Continue Mailing'),
+          'weight' => 50,
+        ],
+        CRM_Core_Action::UPDATE => [
+          'name' => ts('Copy'),
+          'url' => 'civicrm/mailing/send',
+          'qs' => 'mid=%%mid%%&reset=1',
+          'title' => ts('Copy Mailing'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
@@ -270,6 +275,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           'qs' => 'action=delete&mid=%%mid%%&reset=1',
           'extra' => 'onclick="if (confirm(\'' . $deleteExtra . '\')) this.href+=\'&amp;confirmed=1\'; else return false;"',
           'title' => ts('Delete Mailing'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::RENEW => [
           'name' => ts('Archive'),
@@ -277,18 +283,21 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           'qs' => 'action=renew&mid=%%mid%%&reset=1',
           'extra' => 'onclick="if (confirm(\'' . $archiveExtra . '\')) this.href+=\'&amp;confirmed=1\'; else return false;"',
           'title' => ts('Archive Mailing'),
+          'weight' => 110,
         ],
         CRM_Core_Action::REOPEN => [
           'name' => ts('Resume'),
           'url' => 'civicrm/mailing/browse',
           'qs' => 'action=reopen&mid=%%mid%%&reset=1',
           'title' => ts('Resume mailing'),
+          'weight' => 120,
         ],
         CRM_Core_Action::CLOSE => [
           'name' => ts('Pause'),
           'url' => 'civicrm/mailing/browse',
           'qs' => 'action=close&mid=%%mid%%&reset=1',
           'title' => ts('Pause mailing'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::BROWSE),
         ],
       ];
     }
@@ -359,15 +368,9 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           $actionLinks[CRM_Core_Action::PREVIEW]['url'] = 'civicrm/sms/send';
         }
 
-        if (!($row['status'] == 'Not scheduled') && !$row['sms_provider_id']) {
+        if (!($row['status'] === 'Not scheduled') && !$row['sms_provider_id']) {
           if ($allAccess || $showCreateLinks) {
             $actionMask = CRM_Core_Action::VIEW;
-          }
-
-          if (!in_array($row['id'], $searchMailings)) {
-            if ($allAccess || $showCreateLinks) {
-              $actionMask |= CRM_Core_Action::UPDATE;
-            }
           }
         }
         else {
@@ -385,14 +388,14 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           ) {
 
             $actionMask |= CRM_Core_Action::DISABLE;
-            if ($row['status'] == "Paused") {
+            if ($row['status'] === "Paused") {
               $actionMask |= CRM_Core_Action::REOPEN;
             }
             else {
               $actionMask |= CRM_Core_Action::CLOSE;
             }
           }
-          if ($row['status'] == 'Scheduled' &&
+          if ($row['status'] === 'Scheduled' &&
             empty($row['approval_status_id'])
           ) {
             if ($workFlow && ($allAccess || $showApprovalLinks)) {
@@ -407,6 +410,10 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           if ($allAccess || $showCreateLinks) {
             $actionMask |= CRM_Core_Action::RENEW;
           }
+        }
+
+        if ($allAccess || $showCreateLinks) {
+          $actionMask |= CRM_Core_Action::UPDATE;
         }
 
         // check for delete permission.
@@ -431,6 +438,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
             'qs' => 'id=%%hashOrMid%%&reset=1',
             'title' => ts('Public View'),
             'fe' => TRUE,
+            'weight' => 150,
           ];
           $actionMask |= CRM_Core_Action::BROWSE;
         }
@@ -441,9 +449,9 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           $actionMask,
           [
             'mid' => $row['id'],
-            'hashOrMid' => $hash ? $hash : $row['id'],
+            'hashOrMid' => $hash ?: $row['id'],
           ],
-          "more",
+          'more',
           FALSE,
           $opString,
           "Mailing",
@@ -584,7 +592,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         $clauses[] = "civicrm_mailing.is_archived = 1";
       }
       else {
-        $clauses[] = "(civicrm_mailing.is_archived IS NULL OR civicrm_mailing.is_archived = 0)";
+        $clauses[] = "civicrm_mailing.is_archived = 0";
       }
     }
 
@@ -617,12 +625,12 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $params[5] = [$createdId, 'Integer'];
     }
 
-    $campainIds = $this->_parent->get('campaign_id');
-    if (!CRM_Utils_System::isNull($campainIds)) {
-      if (!is_array($campainIds)) {
+    $campaignIds = $this->_parent->get('campaign_id');
+    if (!CRM_Utils_System::isNull($campaignIds)) {
+      if (!is_array($campaignIds)) {
         $campaignIds = [$campaignIds];
       }
-      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
+      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campaignIds)) . ' ) )';
     }
 
     if ($language = $this->_parent->get('language')) {

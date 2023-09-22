@@ -20,14 +20,14 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   protected $_relTypeID;
   protected $_apiversion = 3;
 
-  public function setUp() {
+  public function setUp(): void {
 
     parent::setUp();
     $this->_cId_a = $this->individualCreate();
     $this->_cId_b = $this->organizationCreate();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
 
     $tablesToTruncate = [
       'civicrm_contact',
@@ -68,24 +68,11 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'is_active' => 1,
       'sequential' => 1,
     ];
-    $result = $this->callAPIAndDocument('relationship_type', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('relationship_type', 'create', $params);
     $this->assertNotNull($result['values'][0]['id']);
     unset($params['sequential']);
     //assertDBState compares expected values in $result to actual values in the DB
     $this->assertDBState('CRM_Contact_DAO_RelationshipType', $result['id'], $params);
-  }
-
-  /**
-   * Test  using example code.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testRelationshipTypeCreateExample($version) {
-    $this->_apiversion = $version;
-    require_once 'api/v3/examples/RelationshipType/Create.ex.php';
-    $result = relationship_type_create_example();
-    $expectedResult = relationship_type_create_expectedresult();
-    $this->assertAPISuccess($result);
   }
 
   /**
@@ -114,7 +101,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   /**
    * Check with incorrect required fields.
    */
-  public function testRelationshipTypeDeleteWithIncorrectData() {
+  public function testRelationshipTypeDeleteWithIncorrectData(): void {
     $params = [
       'id' => 'abcd',
       'name_b_a' => 'Relation 2 delete with incorrect',
@@ -141,7 +128,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     $params = [
       'id' => $id,
     ];
-    $result = $this->callAPIAndDocument('relationship_type', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('relationship_type', 'delete', $params);
     $this->assertAPIDeleted('relationship_type', $id);
   }
 
@@ -156,8 +143,8 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = [];
     $result = $this->callAPIFailure('relationship_type', 'create', $params);
-    $this->assertContains('name_a_b', $result['error_message']);
-    $this->assertContains('name_b_a', $result['error_message']);
+    $this->assertStringContainsString('name_a_b', $result['error_message']);
+    $this->assertStringContainsString('name_b_a', $result['error_message']);
   }
 
   /**

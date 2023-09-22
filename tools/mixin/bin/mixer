@@ -1,0 +1,286 @@
+#!/usr/bin/env php
+<?php
+
+require_once dirname(__DIR__) . '/src/Mixlib.php';
+
+function mixlib(): Mixlib {
+  static $mixlib;
+  if ($mixlib === NULL) {
+    $mixlib = new Mixlib();
+  }
+  return $mixlib;
+}
+
+/**
+ * Generate a test extension which uses the given mixins..
+ *
+ * @param array $options
+ *   Ex: ['force' => TRUE]
+ * @param string $targetDir
+ *   The output directory.
+ * @param mixed ...$mixinNames
+ *   List of mixins to include in the generated extension.
+ * @return string
+ */
+function task_create(array $options, string $targetDir, ...$mixinNames) {
+  if (file_exists($targetDir)) {
+    if (!empty($options['force'])) {
+      fprintf(STDOUT, "Remove %s\n", $targetDir);
+      remove_dir($targetDir);
+    }
+    else {
+      throw new \RuntimeException("Cannot overwrite $targetDir");
+    }
+  }
+
+  $mixinNames = resolve_mixin_names($mixinNames);
+  fprintf(STDOUT, "Create %s for %s\n", $targetDir, implode(',', $mixinNames));
+
+  $srcDirs = [];
+  $srcDirs[] = mixer_shimmy_dir();
+  foreach ($mixinNames as $mixinName) {
+    if (is_dir(mixer_mixlib_dir() . "/$mixinName/example")) {
+      $srcDirs[] = mixer_mixlib_dir() . "/$mixinName/example";
+    }
+  }
+  deep_copy($srcDirs, $targetDir);
+
+  $mixins = [];
+  foreach ($mixinNames as $mixinName) {
+    $mixins[$mixinName] = mixlib()->assertValid(mixlib()->get($mixinName));
+  }
+
+  if (empty($options['bare'])) {
+    mkdir("$targetDir/mixin");
+    file_put_contents("$targetDir/mixin/polyfill.php", mixlib()->get('polyfill')['src']);
+    foreach ($mixins as $mixin) {
+      file_put_contents("$targetDir/mixin/{$mixin['mixinName']}@{$mixin['mixinVersion']}.mixin.php", $mixin['src']);
+    }
+  }
+
+  rename(assert_file("$targetDir/info.xml.template"), "$targetDir/info.xml");
+  update_xml("$targetDir/info.xml", function (SimpleXMLElement $info) use ($mixins) {
+    $mixinsXml = $info->addChild('mixins');
+    foreach ($mixins as $mixinName => $mixin) {
+      $mixinsXml->addChild('mixin', $mixin['mixinName'] . '@' . $mixin['mixinVersion']);
+    }
+    if (!empty($options['bare'])) {
+      // If the example doesn't include mixins, then we must get them from elsewhere.
+      $requiresXml = $info->addChild('requires');
+      $requiresXml->addChild('ext', 'mixinlib');
+    }
+  });
+
+  return $targetDir;
+}
+
+/**
+ * Generate and test an extension that uses the given mixins..
+ *
+ * @param array $options
+ *   Ex: ['force' => TRUE]
+ *   Ex: ['isolate' => TRUE]
+ * @param string $targetDir
+ *   The output directory.
+ * @param mixed ...$mixinNames
+ *   List of mixins to include in the generated extension.
+ */
+function task_test(array $options, string $targetDir, ...$args) {
+  if (($split = array_search('--', $args)) !== FALSE) {
+    $mixinNames = array_slice($args, 0, $split);
+    $phpunitArgs = array_slice($args, $split + 1);
+  }
+  else {
+    $mixinNames = $args;
+    $phpunitArgs = explode(' ', '--group e2e --debug --stop-on-failure');
+  }
+
+  $mixinNames = resolve_mixin_names($mixinNames);
+  $errors = [];
+  if (!empty($options['isolate']) && count($mixinNames) > 1) {
+    foreach ($mixinNames as $mixinName) {
+      try {
+        task_test($options + ['force' => TRUE], $targetDir, $mixinName, '--', ...$phpunitArgs);
+      }
+      catch (\Throwable $t) {
+        fprintf(STDERR, "Error testing $mixinName\n%s\n\n", $t->getTraceAsString());
+        $errors = [$mixinName];
+      }
+    }
+    if ($errors) {
+      fprintf(STDERR, "Error processing mixins: %s\n", implode(' ', $errors));
+      exit(1);
+    }
+    return;
+  }
+
+  if (is_dir($targetDir) || !empty($options['force'])) {
+    $targetDir = task_create($options, $targetDir, ...$mixinNames);
+  }
+  if (empty(glob("$targetDir/tests/mixin/*.php"))) {
+    fprintf(STDERR, "Skip. No tests found for %s\n", implode(',', $mixinNames));
+    return;
+  }
+  fprintf(STDOUT, "Test %s\n", implode(',', $mixinNames));
+  with_dir($targetDir, function () use ($phpunitArgs) {
+    phpunit($phpunitArgs);
+  });
+}
+
+function task_list(array $options, ...$mixinNames) {
+  $mixinNames = resolve_mixin_names($mixinNames);
+  fprintf(STDOUT, "%-20s %-8s %-8s %s\n", "NAME", "VERSION", "SINCE", "DESCRIPTION");
+  fprintf(STDOUT, "%-20s %-8s %-8s %s\n", "----", "-------", "-----", "-----------");
+  foreach ($mixinNames as $mixinName) {
+    $mixin = mixlib()->get($mixinName);
+    fprintf(STDOUT, "%-20s %-8s %-8s %s\n",
+      $mixin['mixinName'],
+      $mixin['mixinVersion'] ?? '',
+      $mixin['since'] ?? '',
+      $mixin['description'] ?? '');
+  }
+}
+
+function task_help(array $options) {
+  $cmd = basename($GLOBALS['argv'][0]);
+  fprintf(STDERR, "%s - Test utility for extension mixins\n", $cmd);
+  fprintf(STDERR, "\n");
+  fprintf(STDERR, "Usage:\n");
+  fprintf(STDERR, "  %s create [-f] [--bare] <new-ext-path> [<mixin-name>...]\n", $cmd);
+  fprintf(STDERR, "  %s test [-f] [--bare] [--isolate] <new-ext-path> [<mixin-name>...] -- [<phpunit-args>...]\n", $cmd);
+  fprintf(STDERR, "  %s list [<mixin-name>...]\n", $cmd);
+}
+
+function mixer_mixlib_dir(): string {
+  return dirname(__DIR__, 3) . '/mixin';
+}
+
+function mixer_shimmy_dir(): string {
+  return dirname(__DIR__, 3) . '/tests/extensions/shimmy';
+}
+
+function assert_dir(string $dir): string {
+  if (!file_exists($dir) || !is_dir($dir)) {
+    throw new \RuntimeException("Directory does not exist ($dir)");
+  }
+  return $dir;
+}
+
+function assert_file(string $file): string {
+  if (!file_exists($file)) {
+    throw new \RuntimeException("File does not exist ($file)");
+  }
+  return $file;
+}
+
+function remove_dir(string $dir): void {
+  if (file_exists($dir)) {
+    passthru_ok("rm -rf " . escapeshellarg($dir));
+  }
+}
+
+function deep_copy(array $srcDirs, string $targetDir): void {
+  $srcDirs = (array) $srcDirs;
+  foreach ($srcDirs as $srcDir) {
+    assert_dir($srcDir);
+  }
+
+  if (!file_exists($targetDir)) {
+    mkdir($targetDir);
+  }
+
+  foreach ($srcDirs as $srcDir) {
+    passthru_ok(sprintf('rsync -a %s/./ %s/./', escapeshellarg($srcDir), escapeshellarg($targetDir)));
+  }
+}
+
+function phpunit(array $args = []) {
+  $argString = implode(' ' , array_map('escapeshellarg', $args));
+  $phpunit = getenv('PHPUNIT') ?: 'phpunit9';
+  passthru_ok($phpunit . ' ' . $argString);
+}
+
+function passthru_ok($cmd) {
+  passthru($cmd, $return);
+  if ($return !== 0) {
+    throw new \RuntimeException("Command failed ($cmd)");
+  }
+}
+
+function resolve_mixin_names(array $mixinNames): array {
+  if (empty($mixinNames)) {
+    return mixlib()->getList();
+  }
+  else {
+    return array_map(
+      function (string $mixinName) {
+        return trim($mixinName, '/' . DIRECTORY_SEPARATOR);
+      }, $mixinNames);
+  }
+}
+
+function with_dir(string $dir, callable $callback) {
+  assert_dir($dir);
+  $orig = getcwd();
+  try {
+    chdir($dir);
+    $callback();
+  } finally {
+    chdir($orig);
+  }
+}
+
+function update_xml(string $file, callable $filter): void {
+  $dom = new DomDocument();
+  $dom->load($file);
+  $dom->xinclude();
+  $simpleXml = simplexml_import_dom($dom);
+  $filter($simpleXml);
+  // force pretty printing with encode/decode cycle
+  $outXML = $simpleXml->saveXML();
+  $xml = new DOMDocument();
+  $xml->encoding = 'iso-8859-1';
+  $xml->preserveWhiteSpace = FALSE;
+  $xml->formatOutput = TRUE;
+  $xml->loadXML($outXML);
+  file_put_contents($file, $xml->saveXML());
+}
+
+function main($args) {
+  $cmd = array_shift($args);
+
+  $isParsingOptions = TRUE;
+  $newOptions = $newArgs = [];
+  $task = NULL;
+  foreach ($args as $arg) {
+    if (!$isParsingOptions) {
+      $newArgs[] = $arg;
+    }
+    elseif ($arg === '--') {
+      $isParsingOptions = FALSE;
+      $newArgs[] = $arg;
+    }
+    elseif ($arg === '-f') {
+      $newOptions['force'] = TRUE;
+    }
+    elseif (preg_match(';^--(bare|isolate|force)$;', $arg, $m)) {
+      $newOptions[$m[1]] = TRUE;
+    }
+    elseif ($task === NULL) {
+      $task = 'task_' . preg_replace(';[^\w];', '_', $arg);
+    }
+    else {
+      $newArgs[] = $arg;
+    }
+  }
+
+  if (function_exists($task)) {
+    call_user_func($task, $newOptions, ...$newArgs);
+  }
+  else {
+    task_help([]);
+    exit(1);
+  }
+}
+
+main($argv);

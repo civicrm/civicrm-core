@@ -29,16 +29,16 @@
         <th></th>
       </thead>
       {foreach from=$rows item=row}
-       <tr id="participant_status_type-{$row.id}" class="crm-entity crm-participant_{$row.id} {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+       <tr id="participant_status_type-{$row.id}" class="crm-entity crm-participant_{$row.id} {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
           <td class="crmf-label crm-editable" data-field="label">{$row.label}</td>
           <td class="crmf-name">{$row.name} ({$row.id})</td>
-          <td class="crmf-class {if !$row.is_reserved} crm-editable {/if}" data-type="select">{$row.class}</td>
+          <td class="crmf-class {if empty($row.is_reserved)} crm-editable {/if}" data-type="select">{$row.class}</td>
           <td class="center crmf-is_reserved">{icon condition=$row.is_reserved}{ts}Reserved{/ts}{/icon}</td>
         <td id="row_{$row.id}_status" class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="center crmf-is_counted">{icon condition=$row.is_counted}{ts}Counted{/ts}{/icon}</td>
-          <td class="crmf-weight">{$row.weight}</td>
+          <td class="crmf-weight">{$row.weight|smarty:nodefaults}</td>
           <td class="crmf-visibility">{$row.visibility}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
       {/foreach}
     </table>

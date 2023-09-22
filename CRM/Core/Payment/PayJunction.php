@@ -41,14 +41,28 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    * This function sends request and receives response from
    * PayJunction payment process
    *
-   * @param array $params
-   *   Assoc array of input parameters for this transaction.
+   * @param array|\Civi\Payment\PropertyBag $params
+   *
+   * @param string $component
    *
    * @return array
-   *   the result in an nice formatted array (or an error object)
+   *   Result array (containing at least the key payment_status_id)
+   *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doDirectPayment(&$params) {
+  public function doPayment(&$params, $component = 'contribute') {
+    $propertyBag = \Civi\Payment\PropertyBag::cast($params);
+    $this->_component = $component;
+    $result = $this->setStatusPaymentPending([]);
+
+    // If we have a $0 amount, skip call to processor and set payment_status to Completed.
+    // Conceivably a processor might override this - perhaps for setting up a token - but we don't
+    // have an example of that at the moment.
+    if ($propertyBag->getAmount() == 0) {
+      $result = $this->setStatusPaymentCompleted($result);
+      return $result;
+    }
+
     $logon = $this->_paymentProcessor['user_name'];
     $password = $this->_paymentProcessor['password'];
     $url_site = $this->_paymentProcessor['url_site'];
@@ -150,10 +164,9 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
     // Success
     $params['trxn_result_code'] = $pjpgResponse['dc_response_code'];
-    $params['trxn_id'] = $pjpgResponse['dc_transaction_id'];
-    $params['gross_amount'] = $params['amount'];
-
-    return $params;
+    $result['trxn_id'] = $pjpgResponse['dc_transaction_id'];
+    $result = $this->setStatusPaymentCompleted($result);
+    return $result;
   }
 
   // end function doDirectPayment
@@ -172,43 +185,6 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
       return FALSE;
     }
     return TRUE;
-
-  }
-
-  /**
-   * Get the value of a field if set.
-   *
-   * @param string $field
-   *   The field.
-   *
-   * @return mixed
-   *   value of the field, or empty string if the field is
-   *   not set
-   */
-  public function _getParam($field) {
-    if (isset($this->_params[$field])) {
-      return $this->_params[$field];
-    }
-    return '';
-  }
-
-  /**
-   * Set a field to the specified value.  Value must be a scalar (int,
-   * float, string, or boolean)
-   *
-   * @param string $field
-   * @param mixed $value
-   *
-   * @return bool
-   *   false if value is not a scalar, true if successful
-   */
-  public function _setParam($field, $value) {
-    if (!is_scalar($value)) {
-      return FALSE;
-    }
-    else {
-      $this->_params[$field] = $value;
-    }
   }
 
   /**

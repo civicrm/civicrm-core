@@ -1,17 +1,17 @@
-{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
 
 {if $is_pay_later}
   This is being sent to you as an acknowledgement that you have registered one or more members for the following workshop, event or purchase. Please note, however, that the status of your payment is pending, and the registration for this event will not be completed until your payment is received.
 {else}
-  This is being sent to you as a {if $is_refund}confirmation of refund{else}receipt of payment made{/if} for the following workshop, event registration or purchase.
+  This is being sent to you as a {if !empty($is_refund)}confirmation of refund{else}receipt of payment made{/if} for the following workshop, event registration or purchase.
 {/if}
 
 {if $is_pay_later}
   {$pay_later_receipt}
 {/if}
 
-  Your order number is #{$transaction_id}. {if $line_items && !$is_refund} Information about the workshops will be sent separately to each participant.{/if}
- Here's a summary of your transaction placed on {$transaction_date|date_format:"%D %I:%M %p %Z"}:
+  Your order number is #{$transaction_id}. {if !empty($line_items) && empty($is_refund)} Information about the workshops will be sent separately to each participant.{/if}
+ Here's a summary of your transaction placed on {$transaction_date|crmDate:"%D %I:%M %p %Z"}:
 
 {if $billing_name}
 ===========================================================
@@ -27,17 +27,17 @@
 {$email}
 {/if}
 
-{if $source}
+{if !empty($source)}
 {$source}
 {/if}
 
 
 {foreach from=$line_items item=line_item}
-{$line_item.event->title} ({$line_item.event->start_date|date_format:"%D"})
+{$line_item.event->title} ({$line_item.event->start_date|crmDate:"%D"})
 {if $line_item.event->is_show_location}
   {$line_item.location.address.1.display|strip_tags:false}
 {/if}{*End of isShowLocation condition*}
-{$line_item.event->start_date|date_format:"%D %I:%M %p"} - {$line_item.event->end_date|date_format:"%I:%M %p"}
+{$line_item.event->start_date|crmDate:"%D %I:%M %p"} - {$line_item.event->end_date|crmDate:"%I:%M %p"}
 
   Quantity: {$line_item.num_participants}
 

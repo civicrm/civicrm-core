@@ -25,7 +25,7 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
       NULL,
       NULL, TRUE, TRUE,
       $this->_onlyPublicGroups,
-      NULL, NULL, TRUE
+      NULL, NULL, TRUE, TRUE
     );
 
     $in = CRM_Contact_BAO_GroupContact::getContactGroup(
@@ -33,7 +33,7 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
       'Added',
       NULL, FALSE, TRUE,
       $this->_onlyPublicGroups,
-      NULL, NULL, TRUE
+      NULL, NULL, TRUE, TRUE
     );
 
     $pending = CRM_Contact_BAO_GroupContact::getContactGroup(
@@ -41,7 +41,7 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
       'Pending',
       NULL, FALSE, TRUE,
       $this->_onlyPublicGroups,
-      NULL, NULL, TRUE
+      NULL, NULL, TRUE, TRUE
     );
 
     $out = CRM_Contact_BAO_GroupContact::getContactGroup(
@@ -49,7 +49,7 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
       'Removed',
       NULL, FALSE, TRUE,
       $this->_onlyPublicGroups,
-      NULL, NULL, TRUE
+      NULL, NULL, TRUE, TRUE
     );
 
     $this->assign('groupCount', $count);

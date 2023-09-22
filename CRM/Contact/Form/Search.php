@@ -78,7 +78,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * @var array
    */
   public $_tag;
-  public $_tagElement;
 
   /**
    * The params used for search.
@@ -147,6 +146,14 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_customSearchClass = NULL;
 
   protected $_openedPanes = [];
+
+  public function __construct($state = NULL, $action = CRM_Core_Action::NONE, $method = 'post', $name = NULL) {
+    parent::__construct($state, $action, $method, $name);
+    // Because this is a static variable, reset it in case it got changed elsewhere.
+    // Should only come up during unit tests.
+    // Note the only subclass that seems to set this does it in preprocess (custom searches)
+    self::$_selectorName = 'CRM_Contact_Selector';
+  }
 
   /**
    * Explicitly declare the entity api name.
@@ -392,9 +399,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'name' => CRM_Contact_BAO_SavedSearch::getName($this->_ssID, 'title'),
         'search_custom_id' => $search_custom_id,
       ];
-      $this->assign_by_ref('savedSearch', $savedSearchValues);
-      $this->assign('ssID', $this->_ssID);
     }
+    $this->assign('savedSearch', $savedSearchValues ?? NULL);
+    $this->assign('ssID', $this->_ssID);
 
     if ($this->_context === 'smog') {
       // CRM-11788, we might want to do this for all of search where force=1
@@ -429,15 +436,11 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $ssID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_groupID, 'saved_search_id');
         $this->assign('ssID', $ssID);
 
-        //get the saved search mapping id
-        if ($ssID) {
-          $this->_ssID = $ssID;
-          $ssMappingId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $ssID, 'mapping_id');
-          $this->assign('ssMappingID', $ssMappingId);
-        }
+        $this->_ssID = $ssID;
+        $this->assign('editSmartGroupURL', $ssID ? CRM_Contact_BAO_SavedSearch::getEditSearchUrl($ssID) : FALSE);
 
         // Set dynamic page title for 'Show Members of Group'
-        CRM_Utils_System::setTitle(ts('Contacts in Group: %1', [1 => $this->_group[$this->_groupID]]));
+        $this->setTitle(ts('Contacts in Group: %1', [1 => $this->_group[$this->_groupID]]));
       }
 
       $group_contact_status = [];
@@ -450,6 +453,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'group_contact_status', ts('Group Status')
       );
 
+      $this->assign('permissionEditSmartGroup', CRM_Core_Permission::check('edit groups'));
       $this->assign('permissionedForGroup', $permissionForGroup);
     }
 
@@ -464,12 +468,13 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       }
 
       // Set dynamic page title for 'Add Members Group'
-      CRM_Utils_System::setTitle(ts('Add to Group: %1', [1 => $this->_group[$this->_amtgID]]));
+      $this->setTitle(ts('Add to Group: %1', [1 => $this->_group[$this->_amtgID]]));
       // also set the group title and freeze the action task with Add Members to Group
       $groupValues = ['id' => $this->_amtgID, 'title' => $this->_group[$this->_amtgID]];
       $this->assign_by_ref('group', $groupValues);
-      $this->add('submit', $this->_actionButtonName, ts('Add Contacts to %1', [1 => $this->_group[$this->_amtgID]]),
+      $this->add('xbutton', $this->_actionButtonName, ts('Add Contacts to %1', [1 => $this->_group[$this->_amtgID]]),
         [
+          'type' => 'submit',
           'class' => 'crm-form-submit',
         ]
       );
@@ -528,6 +533,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $this->_ufGroupID = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_componentMode = CRM_Utils_Request::retrieve('component_mode', 'Positive', $this, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS, $_REQUEST);
     $this->_operator = CRM_Utils_Request::retrieve('operator', 'String', $this, FALSE, CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND, 'REQUEST');
+
+    if (!empty($this->_ssID) && !CRM_Core_Permission::check('edit groups')) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to modify smart groups'));
+    }
 
     /**
      * set the button names
@@ -673,8 +682,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     // show the context menu only when we’re not searching for deleted contacts; CRM-5673
     if (empty($this->_formValues['deleted_contacts'])) {
       $menuItems = CRM_Contact_BAO_Contact::contextMenu();
-      $primaryActions = CRM_Utils_Array::value('primaryActions', $menuItems, []);
-      $this->_contextMenu = CRM_Utils_Array::value('moreActions', $menuItems, []);
+      $primaryActions = $menuItems['primaryActions'] ?? [];
+      $this->_contextMenu = $menuItems['moreActions'] ?? [];
       $this->assign('contextMenu', $primaryActions + $this->_contextMenu);
     }
 
@@ -895,7 +904,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   /**
    * Load metadata for fields on the form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function loadMetadata() {
     // can't by pass acls by passing search criteria in the url.

@@ -70,30 +70,29 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @return string
    */
-  public static function buildTableSQL($params) {
+  public static function buildTableSQL($params): string {
     $sql = "CREATE TABLE {$params['name']} (";
     if (isset($params['fields']) &&
       is_array($params['fields'])
     ) {
       $separator = "\n";
-      $prefix = NULL;
       foreach ($params['fields'] as $field) {
-        $sql .= self::buildFieldSQL($field, $separator, $prefix);
+        $sql .= self::buildFieldSQL($field, $separator);
         $separator = ",\n";
       }
       foreach ($params['fields'] as $field) {
-        $sql .= self::buildPrimaryKeySQL($field, $separator, $prefix);
+        $sql .= self::buildPrimaryKeySQL($field, $separator);
       }
       foreach ($params['fields'] as $field) {
-        $sql .= self::buildSearchIndexSQL($field, $separator, $prefix);
+        $sql .= self::buildSearchIndexSQL($field, $separator, 'INDEX ');
       }
       if (isset($params['indexes'])) {
         foreach ($params['indexes'] as $index) {
-          $sql .= self::buildIndexSQL($index, $separator, $prefix);
+          $sql .= self::buildIndexSQL($index, $separator);
         }
       }
       foreach ($params['fields'] as $field) {
-        $sql .= self::buildForeignKeySQL($field, $separator, $prefix, $params['name']);
+        $sql .= self::buildForeignKeySQL($field, $separator, '', $params['name']);
       }
     }
     $sql .= "\n) {$params['attributes']};";
@@ -102,12 +101,12 @@ class CRM_Core_BAO_SchemaHandler {
 
   /**
    * @param array $params
-   * @param $separator
-   * @param $prefix
+   * @param string $separator
+   * @param string $prefix
    *
    * @return string
    */
-  public static function buildFieldSQL($params, $separator, $prefix) {
+  public static function buildFieldSQL($params, $separator, $prefix = ''): string {
     $sql = '';
     $sql .= $separator;
     $sql .= str_repeat(' ', 8);
@@ -138,12 +137,12 @@ class CRM_Core_BAO_SchemaHandler {
   /**
    * @param array $params
    * @param $separator
-   * @param $prefix
+   * @param string $prefix
    *
-   * @return NULL|string
+   * @return string
    */
-  public static function buildPrimaryKeySQL($params, $separator, $prefix) {
-    $sql = NULL;
+  public static function buildPrimaryKeySQL($params, $separator, $prefix = ''): string {
+    $sql = '';
     if (!empty($params['primary'])) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
@@ -155,49 +154,49 @@ class CRM_Core_BAO_SchemaHandler {
 
   /**
    * @param array $params
-   * @param $separator
-   * @param $prefix
-   * @param bool $indexExist
+   * @param string $separator
+   * @param string $prefix
+   * @param string $existingIndex
    *
    * @return NULL|string
    */
-  public static function buildSearchIndexSQL($params, $separator, $prefix, $indexExist = FALSE) {
-    $sql = NULL;
+  public static function buildSearchIndexSQL($params, $separator, $prefix = '', $existingIndex = '') {
+    $sql = '';
 
-    // dont index blob
+    // Don't index blob
     if ($params['type'] == 'text') {
-      return $sql;
+      return NULL;
     }
 
-    //create index only for searchable fields during ADD,
-    //create index only if field is become searchable during MODIFY,
-    //drop index only if field is no longer searchable and it does not reference
-    //a forgein key (and indexExist is true)
-    if (!empty($params['searchable']) && !$indexExist) {
+    // Perform case-insensitive match to see if index name begins with "index_" or "INDEX_"
+    // (for legacy reasons it could be either)
+    $searchIndexExists = stripos($existingIndex ?? '', 'index_') === 0;
+
+    // Add index if field is searchable if it does not reference a foreign key
+    // (skip indexing FK fields because it would be redundant to have 2 indexes)
+    if (!empty($params['searchable']) && empty($params['fk_table_name']) && !$searchIndexExists) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
-      $sql .= "INDEX_{$params['name']} ( {$params['name']} )";
+      $sql .= "index_{$params['name']} ( {$params['name']} )";
     }
-    elseif (empty($params['searchable']) && empty($params['fk_table_name']) && $indexExist) {
+    // Drop search index if field is no longer searchable
+    elseif (empty($params['searchable']) && $searchIndexExists) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
-      $sql .= "DROP INDEX INDEX_{$params['name']}";
+      $sql .= "DROP INDEX $existingIndex";
     }
-    return $sql;
+    return $sql ?: NULL;
   }
 
   /**
    * @param array $params
-   * @param $separator
-   * @param $prefix
+   * @param string $separator
    *
    * @return string
    */
-  public static function buildIndexSQL(&$params, $separator, $prefix) {
-    $sql = '';
-    $sql .= $separator;
-    $sql .= str_repeat(' ', 8);
+  public static function buildIndexSQL($params, $separator = ''): string {
+    $sql = $separator . str_repeat(' ', 8);
     if ($params['unique']) {
       $sql .= 'UNIQUE INDEX';
       $indexName = 'unique';
@@ -223,10 +222,8 @@ class CRM_Core_BAO_SchemaHandler {
   /**
    * @param string $tableName
    * @param string $fkTableName
-   *
-   * @return bool
    */
-  public static function changeFKConstraint($tableName, $fkTableName) {
+  public static function changeFKConstraint($tableName, $fkTableName): void {
     $fkName = "{$tableName}_entity_id";
     if (strlen($fkName) >= 48) {
       $fkName = substr($fkName, 0, 32) . "_" . substr(md5($fkName), 0, 16);
@@ -242,80 +239,38 @@ ALTER TABLE {$tableName}
       ADD CONSTRAINT `FK_{$fkName}` FOREIGN KEY (`entity_id`) REFERENCES {$fkTableName} (`id`) ON DELETE CASCADE;";
     // CRM-7007: do not i18n-rewrite this query
     CRM_Core_DAO::executeQuery($addFKSql, [], TRUE, NULL, FALSE, FALSE);
-
-    return TRUE;
   }
 
   /**
    * @param array $params
-   * @param $separator
-   * @param $prefix
+   * @param string $separator
+   * @param string $prefix
    * @param string $tableName
    *
-   * @return NULL|string
+   * @return string
    */
-  public static function buildForeignKeySQL($params, $separator, $prefix, $tableName) {
-    $sql = NULL;
+  public static function buildForeignKeySQL($params, $separator, $prefix, $tableName): string {
+    $sql = '';
     if (!empty($params['fk_table_name']) && !empty($params['fk_field_name'])) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
-      $fkName = "{$tableName}_{$params['name']}";
-      if (strlen($fkName) >= 48) {
-        $fkName = substr($fkName, 0, 32) . "_" . substr(md5($fkName), 0, 16);
-      }
+      $fkName = $params['fkName'] ?? self::getIndexName($tableName, $params['name']);
 
       $sql .= "CONSTRAINT FK_$fkName FOREIGN KEY ( `{$params['name']}` ) REFERENCES {$params['fk_table_name']} ( {$params['fk_field_name']} ) ";
-      $sql .= CRM_Utils_Array::value('fk_attributes', $params);
+      $sql .= $params['fk_attributes'] ?? '';
     }
     return $sql;
   }
 
   /**
-   * @deprecated
-   *
-   * @param array $params
-   * @param bool $indexExist
-   * @param bool $triggerRebuild
-   *
-   * @return bool
-   */
-  public static function alterFieldSQL($params, $indexExist = FALSE, $triggerRebuild = TRUE) {
-    CRM_Core_Error::deprecatedFunctionWarning('function no longer in use / supported');
-    // lets suppress the required flag, since that can cause sql issue
-    $params['required'] = FALSE;
-
-    $sql = self::buildFieldChangeSql($params, $indexExist);
-
-    // CRM-7007: do not i18n-rewrite this query
-    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
-
-    $config = CRM_Core_Config::singleton();
-    if ($config->logging) {
-      // CRM-16717 not sure why this was originally limited to add.
-      // For example custom tables can have field length changes - which need to flow through to logging.
-      // Are there any modifies we DON'T was to call this function for (& shouldn't it be clever enough to cope?)
-      if ($params['operation'] == 'add' || $params['operation'] == 'modify') {
-        $logging = new CRM_Logging_Schema();
-        $logging->fixSchemaDifferencesFor($params['table_name'], [trim(strtoupper($params['operation'])) => [$params['name']]]);
-      }
-    }
-
-    if ($triggerRebuild) {
-      Civi::service('sql_triggers')->rebuild($params['table_name'], TRUE);
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Delete a CiviCRM-table.
+   * Drop a table if it exists.
    *
    * @param string $tableName
-   *   Name of the table to be created.
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function dropTable($tableName) {
-    $sql = "DROP TABLE $tableName";
+  public static function dropTable(string $tableName): void {
+    $sql = "DROP TABLE IF EXISTS $tableName";
     CRM_Core_DAO::executeQuery($sql);
   }
 
@@ -335,10 +290,8 @@ ALTER TABLE {$tableName}
       else {
         CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
       }
-      $domain = new CRM_Core_DAO_Domain();
-      $domain->find(TRUE);
-      if ($domain->locales) {
-        $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      $locales = CRM_Core_I18n::getMultilingual();
+      if ($locales) {
         CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, $isUpgradeMode);
       }
     }
@@ -367,9 +320,9 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
    *
    * @param $tables
    *   Tables to create index for in the format:
-   *     array('civicrm_entity_table' => 'entity_id')
+   *     ['civicrm_entity_table' => ['entity_id']]
    *     OR
-   *     array('civicrm_entity_table' => array('entity_id', 'entity_table'))
+   *     array['civicrm_entity_table' => array['entity_id', 'entity_table']]
    *   The latter will create a combined index on the 2 keys (in order).
    *
    *  Side note - when creating combined indexes the one with the most variation
@@ -385,9 +338,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
    */
   public static function createIndexes($tables, $createIndexPrefix = 'index', $substrLengths = []) {
     $queries = [];
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+    $locales = CRM_Core_I18n::getMultilingual();
 
     // if we're multilingual, cache the information on internationalised fields
     static $columns = NULL;
@@ -436,6 +387,8 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
           }
         }
 
+        $indexType = $createIndexPrefix === 'UI' ? 'UNIQUE' : '';
+
         // the index doesn't exist, so create it
         // if we're multilingual and the field is internationalised, do it for every locale
         // @todo remove is_array check & add multilingual support for combined indexes and add a test.
@@ -443,11 +396,11 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
         // entity_id + entity_table which are not multilingual.
         if (!is_array($field) && !CRM_Utils_System::isNull($locales) and isset($columns[$table][$fieldName])) {
           foreach ($locales as $locale) {
-            $queries[] = "CREATE INDEX {$createIndexPrefix}_{$fieldName}{$lengthName}_{$locale} ON {$table} ({$fieldName}_{$locale}{$lengthSize})";
+            $queries[] = "CREATE $indexType INDEX {$createIndexPrefix}_{$fieldName}{$lengthName}_{$locale} ON {$table} ({$fieldName}_{$locale}{$lengthSize})";
           }
         }
         else {
-          $queries[] = "CREATE INDEX {$createIndexPrefix}_{$fieldName}{$lengthName} ON {$table} (" . implode(',', (array) $field) . "{$lengthSize})";
+          $queries[] = "CREATE $indexType INDEX {$createIndexPrefix}_{$fieldName}{$lengthName} ON {$table} (" . implode(',', (array) $field) . "{$lengthSize})";
         }
       }
     }
@@ -590,24 +543,23 @@ MODIFY      {$columnName} varchar( $length )
 
   /**
    * Check if a foreign key Exists
+   *
    * @param string $table_name
    * @param string $constraint_name
+   *
    * @return bool TRUE if FK is found
    */
-  public static function checkFKExists($table_name, $constraint_name) {
-    $config = CRM_Core_Config::singleton();
-    $dbUf = DB::parseDSN($config->dsn);
+  public static function checkFKExists(string $table_name, string $constraint_name): bool {
     $query = "
       SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-      WHERE TABLE_SCHEMA = %1
-      AND TABLE_NAME = %2
-      AND CONSTRAINT_NAME = %3
+      WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = %1
+      AND CONSTRAINT_NAME = %2
       AND CONSTRAINT_TYPE = 'FOREIGN KEY'
     ";
     $params = [
-      1 => [$dbUf['database'], 'String'],
-      2 => [$table_name, 'String'],
-      3 => [$constraint_name, 'String'],
+      1 => [$table_name, 'String'],
+      2 => [$constraint_name, 'String'],
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
 
@@ -653,7 +605,7 @@ MODIFY      {$columnName} varchar( $length )
    * @param bool $dropFalseIndices
    *  If set - this function deletes false indices present in the DB which mismatches the expected
    *  values of xml file so that civi re-creates them with correct values using createMissingIndices() function.
-   * @param array|FALSE $tables
+   * @param array|false $tables
    *   An optional array of tables - if provided the results will be restricted to these tables.
    *
    * @return array
@@ -742,14 +694,13 @@ MODIFY      {$columnName} varchar( $length )
    * Build the sql to alter the field.
    *
    * @param array $params
-   * @param bool $indexExist
    *
    * @return string
    */
-  public static function buildFieldChangeSql($params, $indexExist) {
+  public static function buildFieldChangeSql($params) {
     $sql = str_repeat(' ', 8);
     $sql .= "ALTER TABLE {$params['table_name']}";
-    return $sql . self::getFieldAlterSQL($params, $indexExist);
+    return $sql . self::getFieldAlterSQL($params);
   }
 
   /**
@@ -759,11 +710,10 @@ MODIFY      {$columnName} varchar( $length )
    * by individual field we can do one or many.
    *
    * @param array $params
-   * @param bool $indexExist
    *
    * @return string
    */
-  public static function getFieldAlterSQL($params, $indexExist) {
+  public static function getFieldAlterSQL($params) {
     $sql = '';
     switch ($params['operation']) {
       case 'add':
@@ -777,9 +727,22 @@ MODIFY      {$columnName} varchar( $length )
 
       case 'modify':
         $separator = "\n";
+        $existingIndex = NULL;
+        $dao = CRM_Core_DAO::executeQuery("SHOW INDEX FROM `{$params['table_name']}` WHERE Column_name = '{$params['name']}'");
+        if ($dao->fetch()) {
+          $existingIndex = $dao->Key_name;
+        }
+        $fkSql = self::buildForeignKeySQL($params, ",\n", "ADD ", $params['table_name']);
+        if (substr(($existingIndex ?? ''), 0, 2) === 'FK' && !$fkSql) {
+          $sql .= "$separator DROP FOREIGN KEY {$existingIndex},\nDROP INDEX {$existingIndex}";
+          $separator = ",\n";
+        }
         $sql .= self::buildFieldSQL($params, $separator, "MODIFY ");
         $separator = ",\n";
-        $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ", $indexExist);
+        $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ", $existingIndex);
+        if (!$existingIndex && $fkSql) {
+          $sql .= $fkSql;
+        }
         break;
 
       case 'delete':
@@ -796,34 +759,70 @@ MODIFY      {$columnName} varchar( $length )
   }
 
   /**
+   * Turns tableName + columnName into a safe & predictable index name
+   *
+   * @param $tableName
+   * @param $columnName
+   * @return string
+   */
+  public static function getIndexName($tableName, $columnName) {
+    $indexName = "{$tableName}_{$columnName}";
+    if (strlen($indexName) >= 48) {
+      $indexName = substr($indexName, 0, 32) . "_" . substr(md5($indexName), 0, 16);
+    }
+    return $indexName;
+  }
+
+  /**
    * Performs the utf8mb4 migration.
    *
    * @param bool $revert
    *   Being able to revert if primarily for unit testing.
+   * @param array $patterns
+   *   Defaults to ['civicrm\_%'] but can be overridden to specify any pattern. eg ['civicrm\_%', 'civi%\_%', 'veda%\_%'].
+   * @param array $databaseList
+   *   Allows you to specify an alternative database to the configured CiviCRM database.
    *
    * @return bool
    */
-  public static function migrateUtf8mb4($revert = FALSE) {
+  public static function migrateUtf8mb4($revert = FALSE, $patterns = ['civicrm\_%'], $databaseList = NULL) {
     $newCharSet = $revert ? 'utf8' : 'utf8mb4';
     $newCollation = $revert ? 'utf8_unicode_ci' : 'utf8mb4_unicode_ci';
     $newBinaryCollation = $revert ? 'utf8_bin' : 'utf8mb4_bin';
     $tables = [];
     $dao = new CRM_Core_DAO();
-    $database = $dao->_database;
-    CRM_Core_DAO::executeQuery("ALTER DATABASE $database CHARACTER SET = $newCharSet COLLATE = $newCollation");
-    $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS WHERE Engine = 'InnoDB' AND Name LIKE 'civicrm\_%'");
-    while ($dao->fetch()) {
-      $tables[$dao->Name] = [
-        'Engine' => $dao->Engine,
-      ];
+    $databases = $databaseList ?? [$dao->_database];
+
+    $tableNameLikePatterns = [];
+    $logTableNameLikePatterns = [];
+
+    foreach ($patterns as $pattern) {
+      $pattern = CRM_Utils_Type::escape($pattern, 'String');
+      $tableNameLikePatterns[] = "Name LIKE '{$pattern}'";
+      $logTableNameLikePatterns[] = "Name LIKE 'log\_{$pattern}'";
     }
-    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
-    $logging_database = $dsn['database'];
-    $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `$logging_database` WHERE Engine <> 'MyISAM' AND Name LIKE 'log\_civicrm\_%'");
-    while ($dao->fetch()) {
-      $tables["$logging_database.{$dao->Name}"] = [
-        'Engine' => $dao->Engine,
-      ];
+
+    foreach ($databases as $database) {
+      CRM_Core_DAO::executeQuery("ALTER DATABASE `{$database}` CHARACTER SET = $newCharSet COLLATE = $newCollation");
+      $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `{$database}` WHERE Engine = 'InnoDB' AND (" . implode(' OR ', $tableNameLikePatterns) . ")");
+      while ($dao->fetch()) {
+        $tables["`{$database}`.`{$dao->Name}`"] = [
+          'Engine' => $dao->Engine,
+        ];
+      }
+    }
+    // If we specified a list of databases assume the user knows what they are doing.
+    // If they specify the database they should also specify the pattern.
+    if (!$databaseList) {
+      $dsn = defined('CIVICRM_LOGGING_DSN') ? CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN) : CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+      $dsn = DB::parseDSN($dsn);
+      $logging_database = $dsn['database'];
+      $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `{$logging_database}` WHERE Engine <> 'MyISAM' AND (" . implode(' OR ', $logTableNameLikePatterns) . ")");
+      while ($dao->fetch()) {
+        $tables["`{$logging_database}`.`{$dao->Name}`"] = [
+          'Engine' => $dao->Engine,
+        ];
+      }
     }
     foreach ($tables as $table => $param) {
       $query = "ALTER TABLE $table";
@@ -871,6 +870,9 @@ MODIFY      {$columnName} varchar( $length )
       // Disable i18n rewrite.
       CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
     }
+    // Rebuild triggers and other schema reconciliation if needed.
+    $logging = new CRM_Logging_Schema();
+    $logging->fixSchemaDifferences();
     return TRUE;
   }
 
@@ -881,6 +883,83 @@ MODIFY      {$columnName} varchar( $length )
    */
   public static function getDBCollation() {
     return CRM_Core_DAO::singleValueQuery('SELECT @@collation_database');
+  }
+
+  /**
+   * Get the collation actually being used by the tables in the database.
+   *
+   * The db collation may not match the collation used by the tables, get what is
+   * set on the tables (represented by civicrm_contact).
+   *
+   * @return string
+   */
+  public static function getInUseCollation(): string {
+    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__])) {
+      $dao = CRM_Core_DAO::executeQuery('SHOW TABLE STATUS LIKE \'civicrm_contact\'');
+      $dao->fetch();
+      \Civi::$statics[__CLASS__][__FUNCTION__] = $dao->Collation;
+    }
+    return \Civi::$statics[__CLASS__][__FUNCTION__];
+  }
+
+  /**
+   * Get estimated number of rows in the given tables.
+   *
+   * Note that this query is less precise than SELECT(*) - especially on
+   * larger tables but performs significantly better.
+   * See https://dba.stackexchange.com/questions/184685/why-is-count-slow-when-explain-knows-the-answer
+   *
+   * @param array $tables
+   *   e.g ['civicrm_contact', 'civicrm_activity']
+   *
+   * @return array
+   *   e.g ['civicrm_contact' => 200000, 'civicrm_activity' => 100000]
+   */
+  public static function getRowCountForTables(array $tables): array {
+    $cachedResults = Civi::$statics[__CLASS__][__FUNCTION__] ?? [];
+    // Compile list of tables not already cached.
+    $tablesToCheck = array_keys(array_diff_key(array_flip($tables), $cachedResults));
+    $result = CRM_Core_DAO::executeQuery('
+      SELECT TABLE_ROWS as row_count, TABLE_NAME as table_name FROM information_schema.TABLES WHERE
+      TABLE_NAME IN("' . implode('","', $tablesToCheck) . '")
+      AND TABLE_SCHEMA = DATABASE()'
+    );
+    while ($result->fetch()) {
+      $cachedResults[$result->table_name] = (int) $result->row_count;
+    }
+    Civi::$statics[__CLASS__][__FUNCTION__] = $cachedResults;
+    return array_intersect_key($cachedResults, array_fill_keys($tables, TRUE));
+  }
+
+  /**
+   * Get estimated number of rows in the given table.
+   *
+   * @see self::getRowCountForTables
+   *
+   * @param string $tableName
+   *
+   * @return int
+   *   The approximate number of rows in the table. This is also 0 if the table does not exist.
+   */
+  public static function getRowCountForTable(string $tableName): int {
+    return self::getRowCountForTables([$tableName])[$tableName] ?? 0;
+  }
+
+  /**
+   * Does the database support utf8mb4.
+   *
+   * Utf8mb4 is required to support emojis but older databases may not have it enabled.
+   *
+   * This is aggressively cached despite just being a string function
+   * as it is expected it might be called many times.
+   *
+   * @return bool
+   */
+  public static function databaseSupportsUTF8MB4(): bool {
+    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__])) {
+      \Civi::$statics[__CLASS__][__FUNCTION__] = stripos(self::getInUseCollation(), 'utf8mb4') === 0;
+    }
+    return \Civi::$statics[__CLASS__][__FUNCTION__];
   }
 
   /**

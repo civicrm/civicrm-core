@@ -1,13 +1,23 @@
 <?php
 
+use Civi\Test\Invasive;
+
 /**
  * Class CRM_Utils_versionCheckTest
  * @group headless
  */
 class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  /**
+   * @var string
+   */
+  protected $tempDir;
+
+  public function setUp(): void {
     parent::setUp();
+    $this->useTransaction();
+    $this->tempDir = sys_get_temp_dir() . '/VersionCheck-' . rand() . rand();
+    mkdir($this->tempDir);
   }
 
   /**
@@ -89,17 +99,20 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     ],
   ];
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $vc = new CRM_Utils_VersionCheck();
     if (file_exists($vc->cacheFile)) {
       unlink($vc->cacheFile);
     }
+    if (file_exists($this->tempDir)) {
+      CRM_Utils_File::cleanDir($this->tempDir, TRUE, FALSE);
+    }
   }
 
-  public function testCronFallback() {
+  public function testCronFallback(): void {
     // Fake "remote" source data
-    $tmpSrc = '/tmp/versionCheckTestFile.json';
+    $tmpSrc = $this->tempDir . '/versionCheckTestFile.json';
     file_put_contents($tmpSrc, json_encode($this->sampleVersionInfo));
 
     $vc = new CRM_Utils_VersionCheck();
@@ -134,7 +147,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     $this->assertEquals($remoteData, $vc->versionInfo);
   }
 
-  public function testGetSiteStats() {
+  public function testGetSiteStats(): void {
     // Create domain address so the domain country will come up in the stats.
     $country_params = [
       'sequential' => 1,
@@ -163,16 +176,9 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     $address_result = civicrm_api3('address', 'create', $address_params);
 
     // Build stats and test them.
-    $vc = new ReflectionClass('CRM_Utils_VersionCheck');
-    $vc_instance = $vc->newInstance();
-
-    $statsBuilder = $vc->getMethod('getSiteStats');
-    $statsBuilder->setAccessible(TRUE);
-    $statsBuilder->invoke($vc_instance, NULL);
-
-    $statsProperty = $vc->getProperty('stats');
-    $statsProperty->setAccessible(TRUE);
-    $stats = $statsProperty->getValue($vc_instance);
+    $vc = new CRM_Utils_VersionCheck();
+    Invasive::call([$vc, 'getSiteStats']);
+    $stats = Invasive::get([$vc, 'stats']);
 
     // Stats array should have correct elements.
     $this->assertArrayHasKey('version', $stats);
@@ -192,8 +198,8 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
       $this->assertArrayHasKey('PPTypes', $stats);
       $this->assertArrayHasKey('entities', $stats);
       $this->assertArrayHasKey('extensions', $stats);
-      $this->assertType('array', $stats['entities']);
-      $this->assertType('array', $stats['extensions']);
+      $this->assertIsArray($stats['entities']);
+      $this->assertIsArray($stats['extensions']);
 
       // Assert $stats['domain_isoCode'] is correct.
       $this->assertEquals($country['iso_code'], $stats['domain_isoCode']);
@@ -201,7 +207,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
       $entity_names = [];
       foreach ($stats['entities'] as $entity) {
         $entity_names[] = $entity['name'];
-        $this->assertType('int', $entity['size'], "Stats entity {$entity['name']} has integer size?");
+        $this->assertIsInt($entity['size'], "Stats entity {$entity['name']} has integer size?");
       }
 
       $expected_entity_names = [
@@ -220,13 +226,13 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
         'Event',
         'Participant',
         'Friend',
-        'Grant',
         'Mailing',
         'Membership',
         'MembershipBlock',
         'Pledge',
         'PledgeBlock',
         'Delivered',
+        // TIP: If an entity is renamed, then update VersionCheck's $compat list.
       ];
       sort($entity_names);
       sort($expected_entity_names);

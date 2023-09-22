@@ -10,13 +10,13 @@
 {* Confirmation of participation deletes  *}
 <div class="crm-block crm-form-block crm-event-delete-form-block">
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
   <div>
     <p>{ts}Are you sure you want to delete the selected participations? This delete operation cannot be undone and will delete all transactions and activity associated with these participations.{/ts}</p>
-        <p>{include file="CRM/Event/Form/Task.tpl"}</p>
+    <p>{ts 1=$totalSelectedParticipants}Number of selected participants: %1{/ts}</p>
   </div>
 </div>
-{if $additionalParticipants}
+{if array_key_exists('delete_participant', $form)}
     {$form.delete_participant.html}
 {/if}
 <p>

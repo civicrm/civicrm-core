@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-custom-field-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout">
     <tr class="crm-custom-field-form-block-label">
       <td class="label">{$form.label.label}
@@ -20,36 +19,32 @@
     </tr>
     <tr class="crm-custom-field-form-block-data_type">
       <td class="label">{$form.data_type.label}</td>
-      <td class="html-adjust">{$form.data_type.html}
-        {if $action neq 4 and $action neq 2}
-          <br /><span class="description">{ts}Select the type of data you want to collect and store for this contact. Then select from the available HTML input field types (choices are based on the type of data being collected).{/ts}</span>
-        {/if}
-        {if $action eq 2 and $changeFieldType}
-          <br />
-          <a class="action-item crm-hover-button" href='{crmURL p="civicrm/admin/custom/group/field/changetype" q="reset=1&id=`$id`"}'>
-            <i class="crm-i fa-wrench" aria-hidden="true"></i>
-            {ts}Change Input Field Type{/ts}
-          </a>
-          <div class='clear'></div>
-        {/if}
-      </td>
+      <td class="html-adjust">{$form.data_type.html}</td>
+    </tr>
+    <tr class="crm-custom-field-form-block-html_type">
+      <td class="label">{$form.html_type.label}</td>
+      <td class="html-adjust">{$form.html_type.html}</td>
+    </tr>
+    <tr class="crm-custom-field-form-block-fk_entity">
+      <td class="label">{$form.fk_entity.label} <span class="crm-marker">*</span></td>
+      <td class="html-adjust">{$form.fk_entity.html}</td>
     </tr>
     <tr class="crm-custom-field-form-block-serialize">
       <td class="label">{$form.serialize.label}</td>
       <td class="html-adjust">{$form.serialize.html}</td>
     </tr>
-    {if $form.in_selector}
+    {if array_key_exists('in_selector', $form)}
       <tr class='crm-custom-field-form-block-in_selector'>
         <td class='label'>{$form.in_selector.label}</td>
         <td class='html-adjust'>{$form.in_selector.html} {help id="id-in_selector"}</td>
       </tr>
     {/if}
-    <tr class="crm-custom-field-form-block-text_length"  id="textLength" {if !( $action eq 1 || $action eq 2 ) && ($form.data_type.value.0.0 != 0)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-text_length"  id="textLength">
       <td class="label">{$form.text_length.label}</td>
       <td class="html-adjust">{$form.text_length.html}</td>
     </tr>
 
-    <tr id='showoption' {if $action eq 1 or $action eq 2 }class="hiddenElement"{/if}>
+    <tr id='showoption' {if $action eq 1 or $action eq 2}class="hiddenElement"{/if}>
       <td colspan="2">
         <table class="form-layout-compressed">
           {* Conditionally show table for setting up selection options - for field types = radio, checkbox or select *}
@@ -70,36 +65,47 @@
       <td class="label">{$form.filter.label}</td>
       <td class="html-adjust">
         {$form.filter.html}
-        &nbsp;&nbsp;<span><a class="crm-hover-button toggle-contact-ref-mode" href="#Group">{ts}Filter by Group{/ts}</a></span>
+        <span class="api3-filter-info"><a class="crm-hover-button toggle-contact-ref-mode" href="#Group">{ts}Filter by Group{/ts}</a></span>
         <br />
-        <span class="description">{ts}Filter contact search results for this field using Contact get API parameters. EXAMPLE: To list Students in group 3:{/ts} "action=get&group=3&contact_sub_type=Student" {docURL page="Using the API" resource="wiki"}</span>
+        <span class="description api3-filter-info">
+          {ts}Filter contact search results for this field using Contact get API parameters. EXAMPLE: To list Students in group 3:{/ts}
+          <code>action=get&group=3&contact_sub_type=Student</code>
+          {docURL page="dev/api"}
+        </span>
+        <span class="description api4-filter-info">
+          {ts}Filter search results for this field using API-style parameters{/ts}
+          (<code>field=value&another_field=val1,val2</code>).<br>
+          {ts}EXAMPLE (Contact entity): To list Students in "Volunteers" or "Supporters" groups:{/ts}
+          <code>contact_sub_type=Student&groups:name=Volunteers,Supporters</code>
+          {docURL page="dev/api"}
+        </span>
       </td>
     </tr>
-    <tr class="crm-custom-field-form-block-options_per_line" id="optionsPerLine" {if $action neq 2 && ($form.data_type.value.0.0 >= 4 && $form.data_type.value.1.0 neq 'CheckBox' || $form.data_type.value.1.0 neq 'Radio' )}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-options_per_line" id="optionsPerLine">
       <td class="label">{$form.options_per_line.label}</td>
       <td class="html-adjust">{$form.options_per_line.html|crmAddClass:two}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-start_date_years" id="startDateRange" {if $action neq 2 && ($form.data_type.value.0.0 != 5)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-start_date_years" id="startDateRange">
       <td class="label">{$form.start_date_years.label}</td>
       <td class="html-adjust">{$form.start_date_years.html} {ts}years prior to current date.{/ts}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-end_date_years" id="endDateRange" {if $action neq 2 && ($form.data_type.value.0.0 != 5)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-end_date_years" id="endDateRange">
       <td class="label">{$form.end_date_years.label}</td>
       <td class="html-adjust">{$form.end_date_years.html} {ts}years after the current date.{/ts}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-date_format"  id="includedDatePart" {if $action neq 2 && ($form.data_type.value.0.0 != 5)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-date_format"  id="includedDatePart">
       <td class="label">{$form.date_format.label}</td>
       <td class="html-adjust">{$form.date_format.html}&nbsp;&nbsp;&nbsp;{$form.time_format.label}&nbsp;&nbsp;{$form.time_format.html}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-note_rows"  id="noteRows" {if $action neq 2 && ($form.data_type.value.0.0 != 4)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-note_rows"  id="noteRows" >
       <td class="label">{$form.note_rows.label}</td>
       <td class="html-adjust">{$form.note_rows.html}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-note_columns" id="noteColumns" {if $action neq 2 && ($form.data_type.value.0.0 != 4)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-note_columns" id="noteColumns" >
       <td class="label">{$form.note_columns.label}</td>
       <td class="html-adjust">{$form.note_columns.html}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-note_length" id="noteLength" {if $action neq 2 && ($form.data_type.value.0.0 != 4)}class="hiddenElement"{/if}>
+    <tr class="crm-custom-field-form-block-note_length" id="noteLength" >
       <td class="label">{$form.note_length.label}</td>
       <td class="html-adjust">{$form.note_length.html} <span class="description">{ts}Leave blank for unlimited. This limit is not implemented by all browsers and rich text editors.{/ts}</span></td>
     </tr>
@@ -107,17 +113,18 @@
       <td class="label">{$form.weight.label}</td>
       <td>{$form.weight.html|crmAddClass:two}
         {if $action neq 4}
+          <br />
           <span class="description">{ts}Weight controls the order in which fields are displayed in a group. Enter a positive or negative integer - lower numbers are displayed ahead of higher numbers.{/ts}</span>
         {/if}
       </td>
     </tr>
-    <tr class="crm-custom-field-form-block-default_value" id="hideDefault" {if $action eq 2 && ($form.data_type.value.0.0 < 4 && $form.data_type.value.1.0 NEQ 'Text')}class="hiddenElement"{/if}>
-      <td title="hideDefaultValTxt" class="label">{$form.default_value.label}</td>
-      <td title="hideDefaultValDef" class="html-adjust">{$form.default_value.html}</td>
+    <tr class="crm-custom-field-form-block-default_value" id="hideDefault" >
+      <td class="label">{$form.default_value.label}</td>
+      <td class="html-adjust">{$form.default_value.html}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-description"  id="hideDesc" {if $action neq 4 && $action eq 2 && ($form.data_type.value.0.0 < 4 && $form.data_type.value.1.0 NEQ 'Text')}class="hiddenElement"{/if}>
-      <td title="hideDescTxt" class="label">&nbsp;</td>
-      <td title="hideDescDef" class="html-adjust"><span class="description">{ts}If you want to provide a default value for this field, enter it here. For date fields, format is YYYY-MM-DD.{/ts}</span></td>
+    <tr class="crm-custom-field-form-block-description"  id="hideDesc" >
+      <td class="label">&nbsp;</td>
+      <td class="html-adjust"><span class="description">{ts}If you want to provide a default value for this field, enter it here. For date fields, format is YYYY-MM-DD.{/ts}</span></td>
     </tr>
     <tr class="crm-custom-field-form-block-help_pre">
       <td class="label">{$form.help_pre.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_field' field='help_pre' id=$id}{/if}</td>
@@ -127,6 +134,7 @@
       <td class="label">{$form.help_post.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_field' field='help_post' id=$id}{/if}</td>
       <td class="html-adjust">{$form.help_post.html|crmAddClass:huge}
         {if $action neq 4}
+          <br />
           <span class="description">{ts}Explanatory text displayed on back-end forms. Pre help is displayed inline on the form (above the field). Post help is displayed in a pop-up - users click the help balloon to view help text.{/ts}</span>
         {/if}
       </td>
@@ -158,7 +166,10 @@
     <tr class="crm-custom-field-form-block-is_view">
       <td class="label">{$form.is_view.label}</td>
       <td class="html-adjust">{$form.is_view.html}
-        <span class="description">{ts}Is this field set by PHP code (via a custom hook). This field will not be updated by CiviCRM.{/ts}</span>
+        {if $action neq 4}
+          <br />
+          <span class="description">{ts}Is this field set by PHP code (via a custom hook). This field will not be updated by CiviCRM.{/ts}</span>
+        {/if}
       </td>
     </tr>
   </table>
@@ -171,19 +182,53 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    var $form = $('form.{/literal}{$form.formClass}{literal}'),
-      dataTypes = {/literal}{$dataTypeKeys|@json_encode}{literal};
+    var _ = CRM._,
+      $form = $('form.{/literal}{$form.formClass}{literal}'),
+      dataToHTML = {/literal}{$dataToHTML|@json_encode}{literal},
+      originalHtmlType = '{/literal}{$originalHtmlType}{literal}',
+      existingMultiValueCount = {/literal}{if empty($existingMultiValueCount)}null{else}{$existingMultiValueCount}{/if}{literal},
+      originalSerialize = {/literal}{if empty($originalSerialize)}false{else}true{/if}{literal},
+      htmlTypes = CRM.utils.getOptions($('#html_type', $form));
 
-    function showSearchRange() {
-      var htmlType = $("[name='data_type[1]']", $form).val(),
-       dataType = dataTypes[$("[name='data_type[0]']", $form).val()];
+    function onChangeDataType() {
+      var dataType = $(this).val(),
+        allowedHtmlTypes = _.filter(htmlTypes, function(type) {
+          return _.includes(dataToHTML[dataType], type.key);
+        });
+      CRM.utils.setOptions($('#html_type', $form), allowedHtmlTypes);
+      if (!$('#html_type', $form).val()) {
+        $('#html_type', $form).val(dataToHTML[dataType][0]).change();
+      }
+      // Hide html_type if there is only one option
+      $('.crm-custom-field-form-block-html_type').toggle(allowedHtmlTypes.length > 1);
+      customOptionHtmlType(dataType);
+      makeDefaultValueField(dataType);
 
-      if (dataType === 'Int' || dataType === 'Float' || dataType === 'Money' || dataType === 'Date') {
-        if ($('#is_searchable', $form).is(':checked')) {
-          $("#searchByRange", $form).show();
-        } else {
-          $("#searchByRange", $form).hide();
-        }
+      // Show/hide entityReference selector
+      $('.crm-custom-field-form-block-fk_entity').toggle(dataType === 'EntityReference');
+    }
+
+    function onChangeHtmlType() {
+      var htmlType = $(this).val(),
+        dataType = $('#data_type', $form).val();
+
+      if (htmlType === 'CheckBox' || htmlType === 'Radio') {
+        $('#serialize', $form).prop('checked', htmlType === 'CheckBox');
+      }
+      else {
+        $("#options_per_line", $form).val('');
+      }
+
+      showSearchRange(dataType);
+      customOptionHtmlType(dataType);
+    }
+
+    $('#data_type', $form).each(onChangeDataType).change(onChangeDataType);
+    $('#html_type', $form).each(onChangeHtmlType).change(onChangeHtmlType);
+
+    function showSearchRange(dataType) {
+      if (_.includes(['Date', 'Int', 'Float', 'Money'], dataType)) {
+        $("#searchByRange", $form).toggle($('#is_searchable', $form).is(':checked'));
       } else {
         $("#searchByRange", $form).hide();
       }
@@ -197,8 +242,8 @@
         $('#filter_selected').val(setSelected.slice(1));
       }
       if (setSelected == '#Advance') {
-        $('#contact_reference_group').hide( );
-        $('#field_advance_filter').show( );
+        $('#contact_reference_group, .api4-filter-info').hide();
+        $('#field_advance_filter, .api3-filter-info').show();
       } else {
         $('#field_advance_filter').hide( );
         $('#contact_reference_group').show( );
@@ -207,23 +252,24 @@
     }
     $('.toggle-contact-ref-mode', $form).click(toggleContactRefFilter);
 
-    function customOptionHtmlType() {
-      var htmlType = $("[name='data_type[1]']", $form).val(),
-        dataTypeId = $("[name='data_type[0]']", $form).val(),
-        dataType = dataTypes[dataTypeId],
-        radioOption, checkBoxOption;
+    function customOptionHtmlType(dataType) {
+      var htmlType = $("#html_type", $form).val(),
+        serialize = $("#serialize", $form).is(':checked');
 
-      if (!htmlType && !dataTypeId) {
+      if (!htmlType) {
         return;
       }
 
       if (dataType === 'ContactReference') {
         toggleContactRefFilter();
+      } else if (dataType === 'EntityReference') {
+        $('#field_advance_filter, .api4-filter-info').show();
+        $('#contact_reference_group, .api3-filter-info').hide();
       } else {
         $('#field_advance_filter, #contact_reference_group', $form).hide();
       }
 
-      if (dataTypeId < 4) {
+      if (_.includes(['String', 'Int', 'Float', 'Money'], dataType)) {
         if (htmlType !== "Text") {
           $("#showoption, #searchable", $form).show();
           $("#hideDefault, #hideDesc, #searchByRange", $form).hide();
@@ -243,23 +289,17 @@
         $("#showoption").hide();
       }
 
-      for (var i=1; i<=11; i++) {
-        radioOption = 'radio'+i;
-        checkBoxOption = 'checkbox'+i;
-        if (dataTypeId < 4) {
-          if (htmlType != "Text") {
-            if (htmlType == "CheckBox" || htmlType == "Multi-Select") {
-              $("#"+checkBoxOption, $form).show();
-              $("#"+radioOption, $form).hide();
-            } else {
-              $("#"+radioOption, $form).show();
-              $("#"+checkBoxOption, $form).hide();
-            }
-          }
+      if (_.includes(['String', 'Int', 'Float', 'Money'], dataType) && htmlType !== 'Text') {
+        if (serialize) {
+          $('div[id^=checkbox]', '#optionField').show();
+          $('div[id^=radio]', '#optionField').hide();
+        } else {
+          $('div[id^=radio]', '#optionField').show();
+          $('div[id^=checkbox]', '#optionField').hide();
         }
       }
 
-      $("#optionsPerLine", $form).toggle((htmlType == "CheckBox" || htmlType == "Radio") && dataType !== 'Boolean');
+      $("#optionsPerLine", $form).toggle((htmlType === "CheckBox" || htmlType === "Radio") && dataType !== 'Boolean');
 
       $("#startDateRange, #endDateRange, #includedDatePart", $form).toggle(dataType === 'Date');
 
@@ -267,18 +307,54 @@
 
       $("#noteColumns, #noteRows, #noteLength", $form).toggle(dataType === 'Memo');
 
-      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlType === 'Select' || htmlType === 'Country' || htmlType === 'StateProvince');
+      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlType === 'Select' || htmlType === 'Autocomplete-Select' && dataType !== 'EntityReference');
     }
 
-    $('[name^="data_type"]', $form).change(customOptionHtmlType);
-    customOptionHtmlType();
-    $('#is_searchable, [name^="data_type"]', $form).change(showSearchRange);
-    showSearchRange();
+    function makeDefaultValueField(dataType) {
+      var field = $('#default_value', $form);
+      field.crmDatepicker('destroy');
+      field.crmSelect2('destroy');
+      switch (dataType) {
+        case 'Date':
+          field.crmDatepicker({date: 'yy-mm-dd', time: false});
+          break;
+
+        case 'Boolean':
+          field.crmSelect2({data: [{id: '1', text: ts('Yes')}, {id: '0', text: ts('No')}], placeholder: ' '});
+          break;
+
+        case 'Country':
+          field.crmEntityRef({entity: 'Country'});
+          break;
+
+        case 'StateProvince':
+          field.crmEntityRef({entity: 'StateProvince', api: {description_field: ['country_id.name']}});
+          break;
+      }
+    }
+
+    $('#is_searchable, #serialize', $form).change(onChangeHtmlType);
+
+    $form.submit(function() {
+      var htmlType = $('#html_type', $form).val(),
+        serialize = $("#serialize", $form).is(':checked'),
+        htmlTypeLabel = (serialize && _.includes(['Select', 'Autocomplete-Select'], htmlType)) ? ts('Multi-Select') : _.find(htmlTypes, {key: htmlType}).value;
+      if (originalHtmlType && (originalHtmlType !== htmlType || originalSerialize !== serialize)) {
+        var origHtmlTypeLabel = (originalSerialize && originalHtmlType === 'Select') ? ts('Multi-Select') : _.find(htmlTypes, {key: originalHtmlType}).value;
+        if (originalSerialize && !serialize && existingMultiValueCount) {
+          return confirm(ts('WARNING: Changing this multivalued field to singular will result in the loss of data!')
+            + "\n" + ts('%1 existing records contain multiple values - the data in each of these fields will be truncated to a single value.', {1: existingMultiValueCount})
+          )
+        } else {
+          return confirm(ts('Change this field from %1 to %2? Existing data will be preserved.', {1: origHtmlTypeLabel, 2: htmlTypeLabel}));
+        }
+      }
+    });
   });
 </script>
 {/literal}
-{* Give link to view/edit choice options if in edit mode and html_type is one of the multiple choice types *}
-{if $action eq 2 AND ($form.data_type.value.1.0 eq 'CheckBox' OR ($form.data_type.value.1.0 eq 'Radio' AND $form.data_type.value.0.0 neq 6) OR $form.data_type.value.1.0 eq 'Select' OR ($form.data_type.value.1.0 eq 'Multi-Select' AND $dontShowLink neq 1 ) ) }
+{* Give link to view/edit option group *}
+{if $action eq 2 && !empty($hasOptionGroup)}
   <div class="action-link">
     {crmButton p="civicrm/admin/custom/group/field/option" q="reset=1&action=browse&fid=`$id`&gid=`$gid`" icon="pencil"}{ts}View / Edit Multiple Choice Options{/ts}{/crmButton}
   </div>

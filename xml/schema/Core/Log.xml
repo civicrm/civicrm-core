@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Log ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.5</add>
   </field>
   <primaryKey>
@@ -56,9 +59,12 @@
   </field>
   <field>
     <name>modified_id</name>
-    <title>Modified By</title>
+    <title>Modified By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID of person under whose credentials this data modification was made.</comment>
+    <html>
+      <label>Modified By</label>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>

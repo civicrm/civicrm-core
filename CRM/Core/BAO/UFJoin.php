@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -23,11 +21,11 @@
 class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
 
   /**
-   * Takes an associative array and creates a uf join object.
+   * This deprecated "create" function alarmingly will DELETE records if you don't pass them in just right!
    *
    * @param array $params
-   *   (reference) an assoc array of name/value pairs.
    *
+   * @deprecated
    * @return CRM_Core_DAO_UFJoin
    */
   public static function &create($params) {
@@ -175,6 +173,20 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
       'civicrm_contribution_page' => 'ContributionPage',
       'civicrm_survey' => 'Survey',
     ];
+  }
+
+  /**
+   * Override base method which assumes permissions should be based on entity_table.
+   *
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
+   * @return array
+   */
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+    $clauses = [];
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
+    return $clauses;
   }
 
 }

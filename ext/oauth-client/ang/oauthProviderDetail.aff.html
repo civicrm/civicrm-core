@@ -1,0 +1,55 @@
+<h1>{{options.provider.title}}</h1>
+
+<div af-api4-ctrl="theClients" af-api4="['OAuthClient', 'get', {where: [['provider','=',options.provider.name]]}]"></div>
+
+<div ng-if="!theClients.loading">
+  <div class="panel panel-info" ng-init="selected = {tab: theClients.result.length > 0 ? 'client_' + theClients.result[0].id : 'new'}">
+    <ul class="panel-heading nav nav-tabs">
+      <li role="presentation" ng-repeat="theClient in theClients.result" ng-class="{active: selected.tab === 'client_' + theClient.id}"><a ng-click="selected.tab = 'client_' + theClient.id">{{ts('Client #%1', {1: theClient.id})}}</a></li>
+      <li role="presentation" ng-class="{active: selected.tab === 'new'}"><a ng-click="selected.tab = 'new'">{{ts('Register Client')}}</a></li>
+      <li role="presentation" ng-class="{active: selected.tab === 'details'}"><a ng-click="selected.tab = 'details'">{{ts('Details')}}</a></li>
+    </ul>
+
+    <div class="panel-body" ng-if="selected.tab === 'details'">
+      <pre>{{options.provider|json}}</pre>
+    </div>
+
+    <div class="panel-body" ng-repeat="resultClient in theClients.result" ng-if="selected.tab === 'client_'+resultClient.id">
+      <div ng-form="editClientForm">
+        <h4>{{ts('Tokens')}}</h4>
+
+        <oauth-client-tokens options="{clientId: resultClient.id}"></oauth-client-tokens>
+
+        <div class="btn-group" oauth-util-grant-ctrl="granter">
+          <a class="btn btn-primary" ng-click="granter.authCode(resultClient.id)">{{ts('Add (Auth Code)')}}</a>
+        </div>
+
+        <h4>{{ts('Properties')}}</h4>
+
+        <oauth-client-editor options="{client: resultClient}"></oauth-client-editor>
+        <div class="btn-group">
+          <a class="btn btn-primary"
+             af-api4-action="['OAuthClient', 'update', {where: [['id', '=', resultClient.id]], values:resultClient}]">{{ts('Save')}}</a>
+          <a class="btn btn-danger"
+             af-api4-action="['OAuthClient', 'delete', {where: [['id', '=', resultClient.id]]}]"
+             af-api4-success="selected.tab = 'details'; theClients.refresh()"
+          >{{ts('Delete')}}</a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="panel-body" ng-if="selected.tab === 'new'" ng-form="newClientForm" ng-init="theNew = {provider: options.provider.name}">
+      <oauth-client-create-help options="{provider: options.provider}"></oauth-client-create-help>
+      <div crm-ui-debug="theNew"></div>
+      <oauth-client-creator options="{client: theNew}"></oauth-client-creator>
+      <div class="btn-group">
+        <a class="btn btn-primary"
+           af-api4-action="['OAuthClient', 'create', {values:theNew}]"
+           af-api4-success="theNew = {provider: options.provider.name}; theClients.refresh(); selected.tab = 'client_' + response[0].id"
+        >{{ts('Add')}}</a>
+      </div>
+    </div>
+  </div>
+
+</div>

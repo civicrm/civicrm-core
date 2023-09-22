@@ -43,7 +43,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
+  public function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL, $frontend = FALSE, $forceBackend = FALSE, $htmlize = TRUE) {
     if (isset(self::$ufClass)) {
       $className = self::$ufClass;
       $url = $className::url($path, $query, $absolute, $fragment);
@@ -75,6 +75,14 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function authenticate($name, $pass) {
+    /* Before we do any loading, let's start the session and write to it.
+     * We typically call authenticate only when we need to bootstrap the CMS
+     * directly via Civi and hence bypass the normal CMS auth and bootstrap
+     * process typically done in CLI and cron scripts. See: CRM-12648
+     */
+    $session = CRM_Core_Session::singleton();
+    $session->set('civicrmInitSession', TRUE);
+
     if (isset(self::$ufClass)) {
       $className = self::$ufClass;
       $result =& $className::authenticate($name, $pass);
@@ -112,6 +120,22 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     // It makes zero sense for this class to extend CRM_Utils_System_Base.
     throw new \RuntimeException("Not implemented");
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getCiviSourceStorage():array {
+    global $civicrm_root;
+
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+
+    return [
+      'url' => CRM_Utils_File::addTrailingSlash('', '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+    ];
   }
 
 }

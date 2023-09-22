@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -23,10 +21,11 @@
  *
  */
 class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Registration {
-  // optional credit card return status code
+
   /**
-   * CRM-6060
+   * Optional credit card return status code
    * @var string
+   * @see https://issues.civicrm.org/jira/browse/CRM-6060
    */
   protected $_cc = NULL;
 
@@ -42,7 +41,6 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
 
     //get the contact and event id and assing to session.
     $values = [];
-    $csContactID = NULL;
     if ($this->_participantId) {
       $params = ['id' => $this->_participantId];
       CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Participant', $params, $values,
@@ -99,10 +97,10 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
       //need to confirm that though participant confirming
       //registration - but is there enough space to confirm.
       $emptySeats = CRM_Event_BAO_Participant::eventFull($this->_eventId, TRUE, FALSE, TRUE, FALSE, TRUE);
-      $additonalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_participantId);
-      $requireSpace = 1 + count($additonalIds);
+      $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_participantId);
+      $requireSpace = 1 + count($additionalIds);
       if ($emptySeats !== NULL && ($requireSpace > $emptySeats)) {
-        $statusMsg = ts("Oops, it looks like there are currently no available spaces for the %1 event.", [1 => $values['title']]);
+        $statusMsg = ts("Unfortunately there are currently no available spaces for the %1 event.", [1 => $values['title']]);
       }
       else {
         if ($this->_cc == 'fail') {
@@ -144,7 +142,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
       }
     }
     if (!$statusMsg) {
-      $statusMsg = ts("Oops, it looks like your registration for %1 has already been cancelled.",
+      $statusMsg = ts("Your registration for %1 has already been cancelled. No further action is needed.",
         [1 => $values['title']]
       );
     }

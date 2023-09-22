@@ -21,11 +21,17 @@
 class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'ContactType';
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->setPageTitle(ts('Contact Type'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -51,7 +57,15 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
         $enabled->freeze();
       }
     }
-    $this->addElement('text', 'image_URL', ts('Image URL'));
+    // TODO: Remove when dropping image_URL column
+    if ($this->_id) {
+      $imageUrl = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $this->_id, 'image_URL');
+      if ($imageUrl) {
+        $this->addElement('text', 'image_URL', ts('Image URL'));
+      }
+    }
+    $this->assign('hasImageUrl', !empty($imageUrl));
+    $this->add('text', 'icon', ts('Icon'), ['class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE]);
     $this->add('text', 'description', ts('Description'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_ContactType', 'description')
     );
@@ -67,7 +81,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
    *   The input form values.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return bool|array
    *   true if no errors, else array of errors
@@ -89,7 +103,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
 
     $reservedKeyWords = CRM_Core_SelectValues::customGroupExtends();
     //restrict "name" from being a reserved keyword when a new contact subtype is created
-    if (!$self->_id && in_array($contactName, array_keys($reservedKeyWords))) {
+    if (!$self->_id && array_key_exists($contactName, $reservedKeyWords)) {
       $errors['label'] = ts('Contact type names should not use reserved keywords.');
     }
     return empty($errors) ? TRUE : $errors;
@@ -102,11 +116,11 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
     CRM_Utils_System::flushCache();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $isDelete = CRM_Contact_BAO_ContactType::del($this->_id);
-      if ($isDelete) {
+      try {
+        CRM_Contact_BAO_ContactType::deleteRecord(['id' => $this->_id]);
         CRM_Core_Session::setStatus(ts('Selected contact type has been deleted.'), ts('Record Deleted'), 'success');
       }
-      else {
+      catch (CRM_Core_Exception $e) {
         CRM_Core_Session::setStatus(ts("Selected contact type can not be deleted. Make sure contact type doesn't have any associated custom data or group."), ts('Sorry'), 'error');
       }
       return;
@@ -122,7 +136,12 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
       }
     }
 
-    $contactType = CRM_Contact_BAO_ContactType::add($params);
+    // If icon is set, it overrides image_URL
+    if (!empty($params['icon'])) {
+      $params['image_URL'] = '';
+    }
+
+    $contactType = CRM_Contact_BAO_ContactType::writeRecord($params);
     CRM_Core_Session::setStatus(ts("The Contact Type '%1' has been saved.",
       [1 => $contactType->label]
     ), ts('Saved'), 'success');

@@ -35,29 +35,15 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE
-    );
-
-    if ($id) {
-      $this->_contributionIds = [$id];
-      $this->_componentClause = " civicrm_contribution.id IN ( $id ) ";
-      $this->_single = TRUE;
-      $this->assign('totalSelectedContributions', 1);
-    }
-    else {
-      parent::preProcess();
-    }
-
+    parent::preProcess();
     // check that all the contribution ids have pending status
     $query = "
 SELECT count(*)
 FROM   civicrm_contribution
 WHERE  contribution_status_id != 1
 AND    {$this->_componentClause}";
-    $count = CRM_Core_DAO::singleValueQuery($query);
-    if ($count != 0) {
-      CRM_Core_Error::statusBounce("Please select only online contributions with Completed status.");
+    if (CRM_Core_DAO::singleValueQuery($query)) {
+      CRM_Core_Error::statusBounce("Please select only contributions with Completed status.");
     }
 
     $this->assign('single', $this->_single);
@@ -79,7 +65,9 @@ AND    {$this->_componentClause}";
     // we have all the contribution ids, so now we get the contact ids
     parent::setContactIDs();
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
-    CRM_Utils_System::setTitle(ts('Print Contribution Receipts'));
+    $this->setTitle(ts('Print Contribution Receipts'));
+    // Ajax submit would interfere with pdf file download
+    $this->preventAjaxSubmit();
   }
 
   /**
@@ -139,15 +127,25 @@ AND    {$this->_componentClause}";
     $template = CRM_Core_Smarty::singleton();
 
     $params = $this->controller->exportValues($this->_name);
-    $elements = self::getElements($this->_contributionIds, $params, $this->_contactIds);
+    $isCreatePDF = FALSE;
+    if (!empty($params['output']) &&
+      ($params['output'] === 'pdf_invoice' || $params['output'] === 'pdf_receipt')
+    ) {
+      $isCreatePDF = TRUE;
+    }
+    $elements = self::getElements($this->_contributionIds, $params, $this->_contactIds, $isCreatePDF);
+    $elementDetails = $elements['details'];
+    $excludedContactIDs = $elements['excludeContactIds'];
+    $suppressedEmails = $elements['suppressedEmails'];
 
-    foreach ($elements['details'] as $contribID => $detail) {
-      $input = $ids = $objects = [];
+    unset($elements);
+    foreach ($elementDetails as $contribID => $detail) {
+      $input = $ids = [];
 
-      if (in_array($detail['contact'], $elements['excludeContactIds'])) {
+      if (in_array($detail['contact'], $excludedContactIDs)) {
         continue;
       }
-
+      // @todo - CRM_Contribute_BAO_Contribution::sendMail re-does pretty much everything between here & when we call it.
       $input['component'] = $detail['component'];
 
       $ids['contact'] = $detail['contact'];
@@ -158,11 +156,9 @@ AND    {$this->_componentClause}";
       $ids['participant'] = $detail['participant'] ?? NULL;
       $ids['event'] = $detail['event'] ?? NULL;
 
-      if (!$elements['baseIPN']->validateData($input, $ids, $objects, FALSE)) {
-        throw new CRM_Core_Exception('invalid data');
-      }
-
-      $contribution = &$objects['contribution'];
+      $contribution = new CRM_Contribute_BAO_Contribution();
+      $contribution->id = $contribID;
+      $contribution->fetch();
 
       // set some fake input values so we can reuse IPN code
       $input['amount'] = $contribution->total_amount;
@@ -181,11 +177,7 @@ AND    {$this->_componentClause}";
             1 => [$contribution->trxn_id, 'String'],
           ]);
 
-      // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
-      $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
-
-      $values = [];
-      if (isset($params['from_email_address']) && !$elements['createPdf']) {
+      if (isset($params['from_email_address']) && !$isCreatePDF) {
         // If a logged in user from email is used rather than a domain wide from email address
         // the from_email_address params key will be numerical and we need to convert it to be
         // in normal from email format
@@ -196,13 +188,12 @@ AND    {$this->_componentClause}";
         $input['receipt_from_name'] = str_replace('"', '', $fromDetails[0]);
       }
 
-      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $values,
-        $elements['createPdf']);
+      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contribID, $isCreatePDF);
 
-      if ($mail['html']) {
+      if (!empty($mail['html'])) {
         $message[] = $mail['html'];
       }
-      else {
+      elseif (!empty($mail['body'])) {
         $message[] = nl2br($mail['body']);
       }
 
@@ -210,17 +201,17 @@ AND    {$this->_componentClause}";
       $template->clearTemplateVars();
     }
 
-    if ($elements['createPdf']) {
+    if ($isCreatePDF) {
       CRM_Utils_PDF_Utils::html2pdf($message,
-        'civicrmContributionReceipt.pdf',
+        'receipt.pdf',
         FALSE,
-        $elements['params']['pdf_format_id']
+        $params['pdf_format_id']
       );
       CRM_Utils_System::civiExit();
     }
     else {
-      if ($elements['suppressedEmails']) {
-        $status = ts('Email was NOT sent to %1 contacts (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).', [1 => $elements['suppressedEmails']]);
+      if ($suppressedEmails) {
+        $status = ts('Email was NOT sent to %1 contacts (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).', [1 => $suppressedEmails]);
         $msgTitle = ts('Email Error');
         $msgType = 'error';
       }
@@ -236,48 +227,30 @@ AND    {$this->_componentClause}";
   /**
    * Declaration of common variables for Invoice and PDF.
    *
-   *
    * @param array $contribIds
    *   Contribution Id.
    * @param array $params
    *   Parameter for pdf or email invoices.
-   * @param array $contactIds
+   * @param array|int $contactIds
    *   Contact Id.
+   * @param bool $isCreatePDF
    *
    * @return array
    *   array of common elements
    *
+   * @throws \CRM_Core_Exception
    */
-  public static function getElements($contribIds, $params, $contactIds) {
+  public static function getElements(array $contribIds, array $params, $contactIds, bool $isCreatePDF): array {
     $pdfElements = [];
-
-    $pdfElements['contribIDs'] = implode(',', $contribIds);
-
-    $pdfElements['details'] = CRM_Contribute_Form_Task_Status::getDetails($pdfElements['contribIDs']);
-
-    $pdfElements['baseIPN'] = new CRM_Core_Payment_BaseIPN();
-
-    $pdfElements['params'] = $params;
-
-    $pdfElements['createPdf'] = FALSE;
-    if (!empty($pdfElements['params']['output']) &&
-      ($pdfElements['params']['output'] == "pdf_invoice" || $pdfElements['params']['output'] == "pdf_receipt")
-    ) {
-      $pdfElements['createPdf'] = TRUE;
-    }
-
+    $pdfElements['details'] = self::getDetails(implode(',', $contribIds));
     $excludeContactIds = [];
-    if (!$pdfElements['createPdf']) {
-      $returnProperties = [
-        'email' => 1,
-        'do_not_email' => 1,
-        'is_deceased' => 1,
-        'on_hold' => 1,
-      ];
-
-      list($contactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, $returnProperties, FALSE, FALSE);
-      $pdfElements['suppressedEmails'] = 0;
-      $suppressedEmails = 0;
+    $suppressedEmails = 0;
+    if (!$isCreatePDF) {
+      $contactDetails = civicrm_api3('Contact', 'get', [
+        'return' => ['email', 'do_not_email', 'is_deceased', 'on_hold'],
+        'id' => ['IN' => $contactIds],
+        'options' => ['limit' => 0],
+      ])['values'];
       foreach ($contactDetails as $id => $values) {
         if (empty($values['email']) ||
           (empty($params['override_privacy']) && !empty($values['do_not_email']))
@@ -285,14 +258,57 @@ AND    {$this->_componentClause}";
           || !empty($values['on_hold'])
         ) {
           $suppressedEmails++;
-          $pdfElements['suppressedEmails'] = $suppressedEmails;
           $excludeContactIds[] = $values['contact_id'];
         }
       }
     }
+    $pdfElements['suppressedEmails'] = $suppressedEmails;
     $pdfElements['excludeContactIds'] = $excludeContactIds;
 
     return $pdfElements;
+  }
+
+  /**
+   * @param string $contributionIDs
+   *
+   * @return array
+   */
+  private static function getDetails($contributionIDs) {
+    if (empty($contributionIDs)) {
+      return [];
+    }
+    $query = "
+SELECT    c.id              as contribution_id,
+          c.contact_id      as contact_id     ,
+          mp.membership_id  as membership_id  ,
+          pp.participant_id as participant_id ,
+          p.event_id        as event_id
+FROM      civicrm_contribution c
+LEFT JOIN civicrm_membership_payment  mp ON mp.contribution_id = c.id
+LEFT JOIN civicrm_participant_payment pp ON pp.contribution_id = c.id
+LEFT JOIN civicrm_participant         p  ON pp.participant_id  = p.id
+WHERE     c.id IN ( $contributionIDs )";
+
+    $rows = [];
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    while ($dao->fetch()) {
+      $rows[$dao->contribution_id]['component'] = $dao->participant_id ? 'event' : 'contribute';
+      $rows[$dao->contribution_id]['contact'] = $dao->contact_id;
+      if ($dao->membership_id) {
+        if (!array_key_exists('membership', $rows[$dao->contribution_id])) {
+          $rows[$dao->contribution_id]['membership'] = [];
+        }
+        $rows[$dao->contribution_id]['membership'][] = $dao->membership_id;
+      }
+      if ($dao->participant_id) {
+        $rows[$dao->contribution_id]['participant'] = $dao->participant_id;
+      }
+      if ($dao->event_id) {
+        $rows[$dao->contribution_id]['event'] = $dao->event_id;
+      }
+    }
+    return $rows;
   }
 
 }

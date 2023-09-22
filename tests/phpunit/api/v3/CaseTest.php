@@ -58,7 +58,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file.
    */
-  public function setUp() {
+  public function setUp(): void {
     $this->_entity = 'case';
 
     parent::setUp();
@@ -80,7 +80,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->settingsStack = new \Civi\Core\SettingsStack();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->settingsStack->popAll();
     parent::tearDown();
   }
@@ -88,14 +88,14 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Check with empty array.
    */
-  public function testCaseCreateEmpty() {
+  public function testCaseCreateEmpty(): void {
     $this->callAPIFailure('case', 'create', []);
   }
 
   /**
    * Check if required fields are not passed.
    */
-  public function testCaseCreateWithoutRequired() {
+  public function testCaseCreateWithoutRequired(): void {
     $params = [
       'subject' => 'this case should fail',
       'case_type_id' => 1,
@@ -107,7 +107,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test Getlist with id and case_id
    */
-  public function testCaseGetListById() {
+  public function testCaseGetListById(): void {
     $params = $this->_params;
     $params['contact_id'] = $this->individualCreate();
 
@@ -134,17 +134,36 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     //Only 1 case should be returned.
     $this->assertEquals(count($result['values']), 1);
     $this->assertEquals($result['values'][0]['id'], $case1['id']);
+
+    // For this next part to work we need to make sure we don't have a ton of cases in total.
+    // We expect cases to have ids 1, 2, 3 etc, so the 'input' param below should match one and only one.
+    $this->assertLessThan(10, $this->callAPISuccess('Case', 'getcount'));
+    // These are the same params as the file-on-case widget
+    $getParams = [
+      'input' => '2',
+      'extra' => ['contact_id'],
+      'params' => [
+        'version' => 3,
+        'case_id' => ['!=' => NULL],
+        'case_id.is_deleted' => 0,
+        'case_id.status_id' => ['!=' => "Closed"],
+        'case_id.end_date' => ['IS NULL' => 1],
+      ],
+    ];
+    $result = $this->callAPISuccess('case', 'getlist', $getParams);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals(2, $result['values'][0]['id']);
   }
 
   /**
    * Test create function with valid parameters.
    */
-  public function testCaseCreate() {
+  public function testCaseCreate(): void {
     $params = $this->_params;
-    // Test using label instead of value.
+    // Test using name instead of value.
     unset($params['case_type_id']);
     $params['case_type'] = $this->caseType;
-    $result = $this->callAPIAndDocument('case', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('case', 'create', $params);
     $id = $result['id'];
 
     // Check result
@@ -157,9 +176,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test create function with resolved status.
    */
-  public function testCaseCreateWithResolvedStatus() {
+  public function testCaseCreateWithResolvedStatus(): void {
     $params = $this->_params;
-    // Test using label instead of value.
+    // Test using name instead of value.
     unset($params['case_type_id']);
     $params['case_type'] = $this->caseType;
     $params['status_id'] = 'Closed';
@@ -178,7 +197,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'sequential' => 1,
       'case_id' => $id,
     ]);
-    foreach ($relationships['values'] as $key => $values) {
+    foreach ($relationships['values'] as $values) {
       $this->assertEquals($values['end_date'], date('Y-m-d'));
     }
 
@@ -194,11 +213,11 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test case create with valid parameters and custom data.
    */
-  public function testCaseCreateCustom() {
+  public function testCaseCreateCustom(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $result = $this->callAPISuccess($this->_entity, 'get', [
       'return.custom_' . $ids['custom_field_id'] => 1,
       'id' => $result['id'],
@@ -212,7 +231,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test update (create with id) function with valid parameters.
    */
-  public function testCaseUpdate() {
+  public function testCaseUpdate(): void {
     $params = $this->_params;
     // Test using name instead of value
     unset($params['case_type_id']);
@@ -238,7 +257,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test update (create with id) function with valid parameters.
    */
-  public function testCaseUpdateWithExistingCaseContact() {
+  public function testCaseUpdateWithExistingCaseContact(): void {
     $params = $this->_params;
     // Test using name instead of value
     unset($params['case_type_id']);
@@ -264,7 +283,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test case update with custom data
    */
-  public function testCaseUpdateCustom() {
+  public function testCaseUpdateCustom(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params = $this->_params;
 
@@ -301,7 +320,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test delete function with valid parameters.
    */
-  public function testCaseDelete() {
+  public function testCaseDelete(): void {
     // Create Case
     $result = $this->callAPISuccess('case', 'create', $this->_params);
 
@@ -332,7 +351,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    * Test Case role relationship is correctly created
    * for contacts.
    */
-  public function testCaseRoleRelationships() {
+  public function testCaseRoleRelationships(): void {
     // Create Case
     $case = $this->callAPISuccess('case', 'create', $this->_params);
     $relType = $this->relationshipTypeCreate(['name_a_b' => 'Test AB', 'name_b_a' => 'Test BA', 'contact_type_b' => 'Individual']);
@@ -368,7 +387,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test get function based on activity.
    */
-  public function testCaseGetByActivity() {
+  public function testCaseGetByActivity(): void {
     // Create Case
     $result = $this->callAPISuccess('case', 'create', $this->_params);
     $id = $result['id'];
@@ -390,7 +409,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test get function based on contact id.
    */
-  public function testCaseGetByContact() {
+  public function testCaseGetByContact(): void {
     // Create Case
     $result = $this->callAPISuccess('case', 'create', $this->_params);
     $id = $result['id'];
@@ -409,7 +428,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test get function based on subject.
    */
-  public function testCaseGetBySubject() {
+  public function testCaseGetBySubject(): void {
     // Create Case
     $result = $this->callAPISuccess('case', 'create', $this->_params);
     $id = $result['id'];
@@ -428,7 +447,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test get function based on wrong subject.
    */
-  public function testCaseGetByWrongSubject() {
+  public function testCaseGetByWrongSubject(): void {
     $this->callAPISuccess('case', 'create', $this->_params);
 
     // Append 'wrong' to subject so that it is no longer the same.
@@ -442,7 +461,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test get function with no criteria.
    */
-  public function testCaseGetNoCriteria() {
+  public function testCaseGetNoCriteria(): void {
     $result = $this->callAPISuccess('case', 'create', $this->_params);
     $id = $result['id'];
 
@@ -456,7 +475,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test activity api create for case activities.
    */
-  public function testCaseActivityCreate() {
+  public function testCaseActivityCreate(): void {
     $params = $this->_params;
     $case = $this->callAPISuccess('case', 'create', $params);
     $params = [
@@ -464,10 +483,10 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       // follow up
       'activity_type_id' => $this->followup_activity_type_value,
       'subject' => 'Test followup 123',
-      'source_contact_id' => $this->_loggedInUser,
+      'source_contact_id' => $this->getLoggedInUser(),
       'target_contact_id' => $this->_params['contact_id'],
     ];
-    $result = $this->callAPISuccess('activity', 'create', $params);
+    $result = $this->callAPISuccess('Activity', 'create', $params);
     $this->assertEquals($result['values'][$result['id']]['activity_type_id'], $params['activity_type_id']);
 
     // might need this for other tests that piggyback on this one
@@ -492,130 +511,10 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'subject' => 'Test followup 123',
       'return' => ['case_id'],
     ]);
-    $this->assertContains($case['id'], $result['case_id']);
+    $this->assertContainsEquals($case['id'], $result['case_id']);
   }
 
-  /**
-   * Test activity api update for case activities.
-   */
-  public function testCaseActivityUpdate_Tracked() {
-    $this->settingsStack->push('civicaseActivityRevisions', TRUE);
-
-    // Need to create the case and activity before we can update it
-    $this->testCaseActivityCreate();
-
-    $params = [
-      'activity_id' => $this->_caseActivityId,
-      'case_id' => 1,
-      'activity_type_id' => 14,
-      'source_contact_id' => $this->_loggedInUser,
-      'subject' => 'New subject',
-    ];
-    $result = $this->callAPISuccess('activity', 'create', $params);
-
-    $this->assertEquals($result['values'][$result['id']]['subject'], $params['subject']);
-
-    // id should be one greater, since this is a new revision
-    $this->assertEquals($result['values'][$result['id']]['id'], $this->_caseActivityId + 1);
-    $this->assertEquals($result['values'][$result['id']]['original_id'], $this->_caseActivityId);
-
-    // Check revision is as expected
-    $revParams = [
-      'activity_id' => $this->_caseActivityId,
-    ];
-    $revActivity = $this->callAPISuccess('activity', 'get', $revParams);
-    $this->assertEquals($revActivity['values'][$this->_caseActivityId]['is_current_revision'],
-      0);
-    $this->assertEquals($revActivity['values'][$this->_caseActivityId]['is_deleted'],
-      0
-    );
-  }
-
-  /**
-   * If you disable `civicaseActivityRevisions`, then editing an activity
-   * will *not* create or change IDs.
-   */
-  public function testCaseActivityUpdate_Untracked() {
-    $this->settingsStack->push('civicaseActivityRevisions', FALSE);
-
-    //  Need to create the case and activity before we can update it
-    $this->testCaseActivityCreate();
-
-    $oldIDs = CRM_Utils_SQL_Select::from('civicrm_activity')
-      ->select('id, original_id, is_current_revision')
-      ->orderBy('id')
-      ->execute()->fetchAll();
-
-    $params = [
-      'activity_id' => $this->_caseActivityId,
-      'case_id' => 1,
-      'activity_type_id' => 14,
-      'source_contact_id' => $this->_loggedInUser,
-      'subject' => 'New subject',
-    ];
-    $result = $this->callAPISuccess('activity', 'create', $params);
-    $this->assertEquals($result['values'][$result['id']]['subject'], $params['subject']);
-
-    // id should not change because we've opted out.
-    $this->assertEquals($this->_caseActivityId, $result['values'][$result['id']]['id']);
-    $this->assertEmpty($result['values'][$result['id']]['original_id']);
-
-    $newIDs = CRM_Utils_SQL_Select::from('civicrm_activity')
-      ->select('id, original_id, is_current_revision')
-      ->orderBy('id')
-      ->execute()->fetchAll();
-    $this->assertEquals($oldIDs, $newIDs);
-  }
-
-  public function testCaseActivityUpdateCustom() {
-    $this->settingsStack->push('civicaseActivityRevisions', TRUE);
-
-    // Create a case first
-    $result = $this->callAPISuccess('case', 'create', $this->_params);
-
-    // Create custom field group
-    // Note the second parameter is Activity on purpose, not Case.
-    $custom_ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ActivityTest.php');
-
-    // create activity
-    $params = [
-      'case_id' => $result['id'],
-      // follow up
-      'activity_type_id' => 14,
-      'subject' => 'Test followup',
-      'source_contact_id' => $this->_loggedInUser,
-      'target_contact_id' => $this->_params['contact_id'],
-      'custom_' . $custom_ids['custom_field_id'] => "custom string",
-    ];
-    $result = $this->callAPISuccess('activity', 'create', $params);
-
-    $aid = $result['values'][$result['id']]['id'];
-
-    // Update activity
-    $params = [
-      'activity_id' => $aid,
-      'case_id' => 1,
-      'activity_type_id' => 14,
-      'source_contact_id' => $this->_loggedInUser,
-      'subject' => 'New subject',
-    ];
-    $this->callAPISuccess('activity', 'create', $params);
-
-    // Retrieve revision and check custom fields got copied.
-    $revParams = [
-      'activity_id' => $aid + 1,
-      'return.custom_' . $custom_ids['custom_field_id'] => 1,
-    ];
-    $revAct = $this->callAPISuccess('activity', 'get', $revParams);
-
-    $this->assertEquals($revAct['values'][$aid + 1]['custom_' . $custom_ids['custom_field_id']], "custom string",
-      "Error message: " . CRM_Utils_Array::value('error_message', $revAct));
-
-    $this->customFieldDelete($custom_ids['custom_field_id']);
-    $this->customGroupDelete($custom_ids['custom_group_id']);
-  }
-
-  public function testCaseGetByStatus() {
+  public function testCaseGetByStatus(): void {
     // Create 2 cases with different status ids.
     $case1 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => 17,
@@ -639,7 +538,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertEquals($case1['id'], $result['id']);
   }
 
-  public function testCaseGetWithRoles() {
+  public function testCaseGetWithRoles(): void {
     $case1 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => 17,
       'subject' => "Test case with roles",
@@ -666,7 +565,49 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertTrue($foundManager);
   }
 
-  public function testCaseGetWithDefinition() {
+  /**
+   * Test that case role is not assigned to logged in user if you've unchecked
+   * the assign to creator in the case type definition.
+   */
+  public function testCaseGetWithRolesNoCreator(): void {
+    // Copy and adjust stock case type so that assign role to creator is not checked
+    $caseType = $this->callAPISuccess('CaseType', 'get', ['id' => $this->caseTypeId]);
+    $newCaseType = $caseType['values'][$this->caseTypeId];
+    // Sanity check that we're changing what we think we're changing.
+    $this->assertEquals('Homeless Services Coordinator', $newCaseType['definition']['caseRoles'][0]['name']);
+    // string '0' to match what actually happens when you do it in UI
+    $newCaseType['definition']['caseRoles'][0]['creator'] = '0';
+    unset($newCaseType['id']);
+    $newCaseType['name'] = 'tree_climbing';
+    $newCaseType['title'] = 'Tree Climbing';
+    $newCaseType = $this->callAPISuccess('CaseType', 'create', $newCaseType);
+
+    $case1 = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => 17,
+      'subject' => "Test case with roles no creator",
+      'case_type_id' => $newCaseType['id'],
+      'status_id' => "Open",
+    ]);
+    $result = $this->callAPISuccessGetSingle('Case', [
+      'id' => $case1['id'],
+      'status_id' => "Open",
+      'return' => ['contacts'],
+    ]);
+
+    // There should only be the client role.
+    $this->assertCount(1, $result['contacts']);
+    $contact = $result['contacts'][0];
+    $this->assertEquals('Client', $contact['role']);
+    // For good measure
+    $this->assertNotEquals(1, $contact['creator'] ?? NULL);
+    $this->assertNotEquals(1, $contact['manager'] ?? NULL);
+
+    // clean up
+    $this->callAPISuccess('Case', 'create', ['id' => $case1['id'], 'case_type_id' => $this->caseTypeId]);
+    $this->callAPISuccess('CaseType', 'delete', ['id' => $newCaseType['id']]);
+  }
+
+  public function testCaseGetWithDefinition(): void {
     $case1 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => 17,
       'subject' => "Test case with definition",
@@ -691,7 +632,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertNotEmpty($def['caseRoles'][0]['creator']);
   }
 
-  public function testCaseGetTags() {
+  public function testCaseGetTags(): void {
     $case1 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => 17,
       'subject' => "Test case with tags",
@@ -728,7 +669,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    *
    * @throws \Exception
    */
-  public function testCaseGetChainedOp() {
+  public function testCaseGetChainedOp(): void {
     $contact1 = $this->individualCreate([], 1);
     $contact2 = $this->individualCreate([], 2);
     $case1 = $this->callAPISuccess('Case', 'create', [
@@ -776,7 +717,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    *
    * For multi-client cases, should order by the first client.
    */
-  public function testCaseGetOrderByClient() {
+  public function testCaseGetOrderByClient(): void {
     $contact1 = $this->individualCreate(['first_name' => 'Aa', 'last_name' => 'Zz']);
     $contact2 = $this->individualCreate(['first_name' => 'Bb', 'last_name' => 'Zz']);
     $contact3 = $this->individualCreate(['first_name' => 'Cc', 'last_name' => 'Xx']);
@@ -844,7 +785,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    *
    * For multi-client cases, case clients should not be returned in duplicates for contacts.
    */
-  public function testCaseGetDoesNotReturnClientsAsPartOfRelatedContacts() {
+  public function testCaseGetDoesNotReturnClientsAsPartOfRelatedContacts(): void {
     $contact1 = $this->individualCreate(['first_name' => 'Aa', 'last_name' => 'Zz']);
     $contact2 = $this->individualCreate(['first_name' => 'Bb', 'last_name' => 'Zz']);
     $relContact = $this->individualCreate(['first_name' => 'Rel', 'last_name' => 'Contact']);
@@ -891,15 +832,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    *
    * See the case.addtimeline api.
    *
-   * @param bool $enableRevisions
-   *
-   * @dataProvider caseActivityRevisionExamples
-   *
    * @throws \Exception
    */
-  public function testCaseAddtimeline($enableRevisions) {
-    $this->settingsStack->push('civicaseActivityRevisions', $enableRevisions);
-
+  public function testCaseAddtimeline(): void {
     $caseSpec = [
       'title' => 'Application with Definition',
       'name' => 'Application_with_Definition',
@@ -961,19 +896,17 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    * Test the case merge function.
    *
    * 2 cases should be mergeable into 1
-   *
-   * @throws \Exception
    */
-  public function testCaseMerge() {
+  public function testCaseMerge(): void {
     $contact1 = $this->individualCreate([], 1);
     $case1 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => $contact1,
-      'subject' => "Test case 1",
+      'subject' => 'Test case 1',
       'case_type_id' => $this->caseTypeId,
     ]);
     $case2 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => $contact1,
-      'subject' => "Test case 2",
+      'subject' => 'Test case 2',
       'case_type_id' => $this->caseTypeId,
     ]);
     $result = $this->callAPISuccess('Case', 'getcount', ['contact_id' => $contact1]);
@@ -985,27 +918,15 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertEquals(1, $result['is_deleted']);
   }
 
-  /**
-   * Get case activity revision sample data.
-   *
-   * @return array
-   */
-  public function caseActivityRevisionExamples() {
-    $examples = [];
-    $examples[] = [FALSE];
-    $examples[] = [TRUE];
-    return $examples;
-  }
-
-  public function testTimestamps() {
+  public function testTimestamps(): void {
     $params = $this->_params;
     $case_created = $this->callAPISuccess('case', 'create', $params);
 
     $case_1 = $this->callAPISuccess('Case', 'getsingle', [
       'id' => $case_created['id'],
     ]);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['created_date']);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['modified_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['created_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['modified_date']);
     $this->assertApproxEquals(strtotime($case_1['created_date']), strtotime($case_1['modified_date']), 2);
 
     $activity_1 = $this->callAPISuccess('activity', 'getsingle', [
@@ -1014,8 +935,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
         'limit' => 1,
       ],
     ]);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['created_date']);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['modified_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['created_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['modified_date']);
     $this->assertApproxEquals(strtotime($activity_1['created_date']), strtotime($activity_1['modified_date']), 2);
 
     usleep(1.5 * 1000000);
@@ -1027,8 +948,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $activity_2 = $this->callAPISuccess('activity', 'getsingle', [
       'id' => $activity_1['id'],
     ]);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_2['created_date']);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_2['modified_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_2['created_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_2['modified_date']);
     $this->assertNotEquals($activity_2['created_date'], $activity_2['modified_date']);
 
     $this->assertEquals($activity_1['created_date'], $activity_2['created_date']);
@@ -1039,8 +960,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $case_2 = $this->callAPISuccess('Case', 'getsingle', [
       'id' => $case_created['id'],
     ]);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_2['created_date']);
-    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_2['modified_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_2['created_date']);
+    $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_2['modified_date']);
     $this->assertEquals($case_1['created_date'], $case_2['created_date']);
     $this->assertNotEquals($case_2['created_date'], $case_2['modified_date']);
   }

@@ -135,7 +135,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    *   array reference of all mailing components
    */
   public static function &component($type = NULL) {
-    $name = $type ? $type : 'ALL';
+    $name = $type ?: 'ALL';
 
     if (!self::$component || !array_key_exists($name, self::$component)) {
       if (!self::$component) {
@@ -236,9 +236,8 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Labels for advanced search against mailing summary.
    *
-   * @param $field
-   *
-   * @return unknown_type
+   * @param string $field
+   * @return array
    */
   public static function &yesNoOptions($field) {
     static $options;

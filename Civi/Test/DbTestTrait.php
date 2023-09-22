@@ -25,9 +25,8 @@ trait DbTestTrait {
    * @param $id
    * @param $match
    * @param bool $delete
-   * @throws \PHPUnit_Framework_AssertionFailedError
    */
-  public function assertDBState($daoName, $id, $match, $delete = FALSE) {
+  public function assertDBState($daoName, $id, $match, $delete = FALSE): void {
     if (empty($id)) {
       // adding this here since developers forget to check for an id
       // and hence we get the first value in the db
@@ -112,7 +111,7 @@ trait DbTestTrait {
    * @param null $message
    */
   public function assertDBRowNotExist($daoName, $id, $message = NULL) {
-    $message = $message ? $message : "$daoName (#$id) should not exist";
+    $message = $message ?: "$daoName (#$id) should not exist";
     $value = \CRM_Core_DAO::getFieldValue($daoName, $id, 'id', 'id', TRUE);
     $this->assertNull($value, $message);
   }
@@ -124,7 +123,7 @@ trait DbTestTrait {
    * @param null $message
    */
   public function assertDBRowExist($daoName, $id, $message = NULL) {
-    $message = $message ? $message : "$daoName (#$id) should exist";
+    $message = $message ?: "$daoName (#$id) should exist";
     $value = \CRM_Core_DAO::getFieldValue($daoName, $id, 'id', 'id', TRUE);
     $this->assertEquals($id, $value, $message);
   }
@@ -143,7 +142,7 @@ trait DbTestTrait {
     $expectedValue, $message
   ) {
     $value = \CRM_Core_DAO::getFieldValue($daoName, $searchValue, $returnColumn, $searchColumn, TRUE);
-    $this->assertEquals(trim($expectedValue), trim($value), $message);
+    $this->assertEquals(trim($expectedValue), trim($value ?? ''), $message);
   }
 
   /**
@@ -170,21 +169,22 @@ trait DbTestTrait {
    * Example: $this->assertSql(2, 'select count(*) from foo where foo.bar like "%1"',
    * array(1 => array("Whiz", "String")));
    *
-   * @param $expected
-   * @param $query
+   * @param string|null|int $expected
+   * @param string $query
    * @param array $params
    * @param string $message
    *
-   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
-  public function assertDBQuery($expected, $query, $params = [], $message = '') {
+  public function assertDBQuery($expected, string $query, array $params = [], string $message = ''): void {
     if ($message) {
       $message .= ': ';
     }
     $actual = \CRM_Core_DAO::singleValueQuery($query, $params);
     $this->assertEquals($expected, $actual,
       sprintf('%sexpected=[%s] actual=[%s] query=[%s]',
-        $message, $expected, $actual, \CRM_Core_DAO::composeQuery($query, $params, FALSE)
+        $message, $expected, $actual, \CRM_Core_DAO::composeQuery($query, $params)
       )
     );
   }

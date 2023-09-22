@@ -22,9 +22,7 @@
     <div class="status message status-warning">
       <i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i> {ts}Total for amounts entered below does not match the expected batch total.{/ts}
     </div>
-    <span class="crm-button crm-button_qf_Entry_upload_force-save">
-      {$form._qf_Entry_upload_force.html}
-    </span>
+    {$form._qf_Entry_upload_force.html}
     <div class="clear"></div>
   {/if}
   <table class="form-layout-compressed batch-totals">
@@ -97,14 +95,14 @@
           {elseif $n eq 'total_amount'}
              <div class="compressed crm-grid-cell">
                {$form.field.$rowNumber.$n.html}
-               {if $batchType eq 3 }
+               {if $batchType eq 3}
 		 {ts}<span id={$rowNumber} class="pledge-adjust-option"><a href='#'>adjust payment amount</a></span>{/ts}
                  <span id="adjust-select-{$rowNumber}" class="adjust-selectbox">{$form.option_type.$rowNumber.html}</span>
                {/if}
              </div>
           {else}
             <div class="compressed crm-grid-cell">
-              {$form.field.$rowNumber.$n.html}
+              {$form.field.$rowNumber.$n.html|smarty:nodefaults}
               {if $fields.$n.html_type eq 'File' && !empty($form.field.$rowNumber.$fieldName.value.size)}
                 {ts}Attached{/ts}: {$form.field.$rowNumber.$fieldName.value.name}
               {/if}
@@ -157,7 +155,7 @@ CRM.$(function($) {
     calculateActualTotal();
   });
 
-  {/literal}{if $batchType eq 1 }{literal}
+  {/literal}{if $batchType eq 1}{literal}
   // hide all dates if send receipt is checked
   hideSendReceipt();
 

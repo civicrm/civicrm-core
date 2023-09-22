@@ -6,18 +6,10 @@
  */
 class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function tearDown() {
-    parent::tearDown();
-  }
-
   /**
    * Add and remove two items from the same cache instance.
    */
-  public function testSameInstance() {
+  public function testSameInstance(): void {
     $a = new CRM_Utils_Cache_SqlGroup([
       'group' => 'testSameInstance',
     ]);
@@ -42,7 +34,7 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
   /**
    * Add item to one cache instance then read with another.
    */
-  public function testTwoInstance() {
+  public function testTwoInstance(): void {
     $a = new CRM_Utils_Cache_SqlGroup([
       'group' => 'testTwoInstance',
     ]);
@@ -62,7 +54,7 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
   /**
    * Add item to one cache instance then read (with or without prefetch) from another
    */
-  public function testPrefetch() {
+  public function testPrefetch(): void {
     // 1. put data in cache
     $a = new CRM_Utils_Cache_SqlGroup([
       'group' => 'testPrefetch',

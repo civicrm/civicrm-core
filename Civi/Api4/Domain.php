@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -9,29 +8,25 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4;
 
 /**
  * Domains - multisite instances of CiviCRM.
  *
  * @see https://docs.civicrm.org/sysadmin/en/latest/setup/multisite/
- *
+ * @searchable none
+ * @since 5.19
  * @package Civi\Api4
  */
 class Domain extends Generic\DAOEntity {
 
-  public static function get() {
-    return new \Civi\Api4\Action\Domain\Get(__CLASS__, __FUNCTION__);
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Domain\Get
+   */
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\Domain\Get(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
 }

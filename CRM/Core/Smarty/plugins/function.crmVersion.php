@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright TTTP
- * $Id$
  *
  */
 

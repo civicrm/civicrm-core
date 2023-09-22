@@ -28,7 +28,7 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
     parent::preprocess();
 
     // set print view, so that print templates are called
-    $this->controller->setPrint(1);
+    $this->controller->setPrint(CRM_Core_Smarty::PRINT_PAGE);
     $this->assign('id', $this->get('id'));
     $this->assign('pageTitle', ts('CiviCRM Contact Listing'));
 

@@ -24,7 +24,7 @@
  * @return array
  *   API result array
  *
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_email_create($params) {
@@ -58,8 +58,7 @@ function _civicrm_api3_email_create_spec(&$params) {
  * @return array
  *   API result array.
  *
- * @throws \API_Exception
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_email_delete($params) {

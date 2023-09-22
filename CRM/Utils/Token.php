@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  *
  * @package CRM
@@ -169,7 +171,7 @@ class CRM_Utils_Token {
    * @return string
    *   The processed string
    */
-  public static function &token_replace($type, $var, $value, &$str, $escapeSmarty = FALSE) {
+  public static function token_replace($type, $var, $value, &$str, $escapeSmarty = FALSE) {
     $token = preg_quote('{' . "$type.$var") . '(\|([^\}]+?))?' . preg_quote('}');
     if (!$value) {
       $value = '$3';
@@ -182,16 +184,16 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Get< the regex for token replacement
+   * Get the regex for token replacement
    *
    * @param string $token_type
    *   A string indicating the the type of token to be used in the expression.
    *
    * @return string
-   *   regular expression sutiable for using in preg_replace
+   *   regular expression suitable for using in preg_replace
    */
-  private static function tokenRegex($token_type) {
-    return '/(?<!\{|\\\\)\{' . $token_type . '\.([\w]+(\-[\w\s]+)?)\}(?!\})/';
+  private static function tokenRegex(string $token_type) {
+    return '/(?<!\{|\\\\)\{' . $token_type . '\.([\w]+(:|\.)?\w*(\-[\w\s]+)?)\}(?!\})/';
   }
 
   /**
@@ -211,6 +213,8 @@ class CRM_Utils_Token {
   /**
    * Replace all the domain-level tokens in $str
    *
+   * @deprecated
+   *
    * @param string $str
    *   The string with tokens to be replaced.
    * @param object $domain
@@ -224,9 +228,9 @@ class CRM_Utils_Token {
    * @return string
    *   The processed string
    */
-  public static function &replaceDomainTokens(
+  public static function replaceDomainTokens(
     $str,
-    &$domain,
+    $domain,
     $html = FALSE,
     $knownTokens = NULL,
     $escapeSmarty = FALSE
@@ -240,7 +244,7 @@ class CRM_Utils_Token {
 
     $str = preg_replace_callback(
       self::tokenRegex($key),
-      function ($matches) use (&$domain, $html, $escapeSmarty) {
+      function ($matches) use ($domain, $html, $escapeSmarty) {
         return CRM_Utils_Token::getDomainTokenReplacement($matches[1], $domain, $html, $escapeSmarty);
       },
       $str
@@ -249,152 +253,24 @@ class CRM_Utils_Token {
   }
 
   /**
-   * @param $token
-   * @param $domain
+   * Do not use.
+   *
+   * @deprecated
+   *
+   * @param string $token
+   * @param CRM_Core_BAO_Domain $domain
    * @param bool $html
    * @param bool $escapeSmarty
    *
-   * @return mixed|null|string
+   * @return null|string
    */
-  public static function getDomainTokenReplacement($token, &$domain, $html = FALSE, $escapeSmarty = FALSE) {
-    // check if the token we were passed is valid
-    // we have to do this because this function is
-    // called only when we find a token in the string
-
-    $loc = &$domain->getLocationValues();
-
-    if (!in_array($token, self::$_tokens['domain'])) {
-      $value = "{domain.$token}";
-    }
-    elseif ($token == 'address') {
-      static $addressCache = [];
-
-      $cache_key = $html ? 'address-html' : 'address-text';
-      if (array_key_exists($cache_key, $addressCache)) {
-        return $addressCache[$cache_key];
-      }
-
-      $value = NULL;
-      // Construct the address token
-
-      if (!empty($loc[$token])) {
-        if ($html) {
-          $value = $loc[$token][1]['display'];
-          $value = str_replace("\n", '<br />', $value);
-        }
-        else {
-          $value = $loc[$token][1]['display_text'];
-        }
-        $addressCache[$cache_key] = $value;
-      }
-    }
-    elseif ($token == 'name' || $token == 'id' || $token == 'description') {
-      $value = $domain->$token;
-    }
-    elseif ($token == 'phone' || $token == 'email') {
-      // Construct the phone and email tokens
-
-      $value = NULL;
-      if (!empty($loc[$token])) {
-        foreach ($loc[$token] as $index => $entity) {
-          $value = $entity[$token];
-          break;
-        }
-      }
-    }
-
+  public static function getDomainTokenReplacement($token, $domain, $html = FALSE, $escapeSmarty = FALSE): ?string {
+    $tokens = CRM_Core_DomainTokens::getDomainTokenValues($domain->id, $html);
+    $value = $tokens[$token] ?? "{domain.$token}";
     if ($escapeSmarty) {
       $value = self::tokenEscapeSmarty($value);
     }
-
     return $value;
-  }
-
-  /**
-   * Replace all the org-level tokens in $str
-   *
-   * @fixme: This function appears to be broken, as it depends on
-   * nonexistant method: CRM_Core_BAO_CustomValue::getContactValues()
-   * Marking as deprecated until this is fixed
-   * @deprecated
-   *
-   * @param string $str
-   *   The string with tokens to be replaced.
-   * @param object $org
-   *   Associative array of org properties.
-   * @param bool $html
-   *   Replace tokens with HTML or plain text.
-   *
-   * @param bool $escapeSmarty
-   *
-   * @return string
-   *   The processed string
-   */
-  public static function &replaceOrgTokens($str, &$org, $html = FALSE, $escapeSmarty = FALSE) {
-    self::$_tokens['org']
-      = array_merge(
-        array_keys(CRM_Contact_BAO_Contact::importableFields('Organization')),
-        ['address', 'display_name', 'checksum', 'contact_id']
-      );
-
-    $cv = NULL;
-    foreach (self::$_tokens['org'] as $token) {
-      // print "Getting token value for $token<br/><br/>";
-      if ($token == '') {
-        continue;
-      }
-
-      // If the string doesn't contain this token, skip it.
-
-      if (!self::token_match('org', $token, $str)) {
-        continue;
-      }
-
-      // Construct value from $token and $contact
-
-      $value = NULL;
-
-      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($token)) {
-        // only generate cv if we need it
-        if ($cv === NULL) {
-          $cv = CRM_Core_BAO_CustomValue::getContactValues($org['contact_id']);
-        }
-        foreach ($cv as $cvFieldID => $value) {
-          if ($cvFieldID == $cfID) {
-            $value = CRM_Core_BAO_CustomField::displayValue($value, $cfID);
-            break;
-          }
-        }
-      }
-      elseif ($token == 'checksum') {
-        $cs = CRM_Contact_BAO_Contact_Utils::generateChecksum($org['contact_id']);
-        $value = "cs={$cs}";
-      }
-      elseif ($token == 'address') {
-        // Build the location values array
-
-        $loc = [];
-        $loc['display_name'] = CRM_Utils_Array::retrieveValueRecursive($org, 'display_name');
-        $loc['street_address'] = CRM_Utils_Array::retrieveValueRecursive($org, 'street_address');
-        $loc['city'] = CRM_Utils_Array::retrieveValueRecursive($org, 'city');
-        $loc['state_province'] = CRM_Utils_Array::retrieveValueRecursive($org, 'state_province');
-        $loc['postal_code'] = CRM_Utils_Array::retrieveValueRecursive($org, 'postal_code');
-
-        // Construct the address token
-
-        $value = CRM_Utils_Address::format($loc);
-        if ($html) {
-          $value = str_replace("\n", '<br />', $value);
-        }
-      }
-      else {
-        $value = CRM_Utils_Array::retrieveValueRecursive($org, $token);
-      }
-
-      self::token_replace('org', $token, $value, $str, $escapeSmarty);
-    }
-
-    return $str;
   }
 
   /**
@@ -412,6 +288,8 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
+   *
+   * @deprecated
    */
   public static function &replaceMailingTokens(
     $str,
@@ -579,6 +457,8 @@ class CRM_Utils_Token {
   }
 
   /**
+   * @deprecated
+   *
    * @param $token
    * @param $addresses
    * @param $urls
@@ -639,12 +519,14 @@ class CRM_Utils_Token {
    * @param bool $returnBlankToken
    *   Return unevaluated token if value is null.
    *
+   * @deprecated
+   *
    * @param bool $escapeSmarty
    *
    * @return string
    *   The processed string
    */
-  public static function &replaceContactTokens(
+  public static function replaceContactTokens(
     $str,
     &$contact,
     $html = FALSE,
@@ -652,6 +534,7 @@ class CRM_Utils_Token {
     $returnBlankToken = FALSE,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     // Refresh contact tokens in case they have changed. There is heavy caching
     // in exportable fields so there is no benefit in doing this conditionally.
     self::$_tokens['contact'] = array_merge(
@@ -681,6 +564,13 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do Not use.
+   *
+   * Only core usage is from a deprecated unused function and
+   * from deprecated BAO_Mailing code (to be replaced by flexmailer).
+   *
+   * @deprecated
+   *
    * @param $token
    * @param $contact
    * @param bool $html
@@ -696,6 +586,7 @@ class CRM_Utils_Token {
     $returnBlankToken = FALSE,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (self::$_tokens['contact'] == NULL) {
       /* This should come from UF */
 
@@ -718,7 +609,7 @@ class CRM_Utils_Token {
     // we have to do this because this function is
     // called only when we find a token in the string
 
-    if (!in_array($token, self::$_tokens['contact'])) {
+    if (!in_array(str_replace(':label', '', $token), self::$_tokens['contact'])) {
       $noReplace = TRUE;
     }
     elseif ($token == 'checksum') {
@@ -732,22 +623,12 @@ class CRM_Utils_Token {
       $value = "cs={$cs}";
     }
     else {
-      $value = CRM_Utils_Array::retrieveValueRecursive($contact, $token);
+      $value = (array) CRM_Utils_Array::retrieveValueRecursive($contact, str_replace(':label', '', $token));
 
-      // FIXME: for some pseudoconstants we get array ( 0 => id, 1 => label )
-      if (is_array($value)) {
-        $value = $value[1];
+      foreach ($value as $index => $item) {
+        $value[$index] = self::convertPseudoConstantsUsingMetadata($value[$index], str_replace(':label', '', $token));
       }
-      // Convert pseudoconstants using metadata
-      elseif ($value && is_numeric($value)) {
-        $allFields = CRM_Contact_BAO_Contact::exportableFields('All');
-        if (!empty($allFields[$token]['pseudoconstant'])) {
-          $value = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $token, $value);
-        }
-      }
-      elseif ($value && CRM_Utils_String::endsWith($token, '_date')) {
-        $value = CRM_Utils_Date::customFormat($value);
-      }
+      $value = implode(', ', $value);
     }
 
     if (!$html) {
@@ -775,8 +656,12 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use - unused in core.
+   *
    * Replace all the hook tokens in $str with information from
    * $contact.
+   *
+   * @deprecated
    *
    * @param string $str
    *   The string with tokens to be replaced.
@@ -794,10 +679,14 @@ class CRM_Utils_Token {
   public static function &replaceHookTokens(
     $str,
     &$contact,
-    &$categories,
+    $categories = NULL,
     $html = FALSE,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
+    if (!$categories) {
+      $categories = self::getTokenCategories();
+    }
     foreach ($categories as $key) {
       $str = preg_replace_callback(
         self::tokenRegex($key),
@@ -811,14 +700,30 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Get the categories required for rendering tokens.
+   *
+   * @return array
+   */
+  public static function getTokenCategories(): array {
+    if (!isset(\Civi::$statics[__CLASS__]['token_categories'])) {
+      $tokens = [];
+      \CRM_Utils_Hook::tokens($tokens);
+      \Civi::$statics[__CLASS__]['token_categories'] = array_keys($tokens);
+    }
+    return \Civi::$statics[__CLASS__]['token_categories'];
+  }
+
+  /**
    * Parse html through Smarty resolving any smarty functions.
    * @param string $tokenHtml
    * @param array $entity
    * @param string $entityType
    * @return string
    *   html parsed through smarty
+   * @deprecated
    */
   public static function parseThroughSmarty($tokenHtml, $entity, $entityType = 'contact') {
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
       $smarty = CRM_Core_Smarty::singleton();
       // also add the tokens to the template
@@ -829,6 +734,10 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use, unused in core.
+   *
+   * @deprecated
+   *
    * @param $token
    * @param $contact
    * @param $category
@@ -863,7 +772,9 @@ class CRM_Utils_Token {
    *
    * this routine will remove the extra backslashes and braces
    *
-   * @param $str ref to the string that will be scanned and modified
+   * @deprecated
+   *
+   * @param string $str ref to the string that will be scanned and modified
    */
   public static function unescapeTokens(&$str) {
     $str = preg_replace('/\\\\|\{(\{\w+\.\w+\})\}/', '\\1', $str);
@@ -949,6 +860,8 @@ class CRM_Utils_Token {
   /**
    * Replace subscription-confirmation-request tokens
    *
+   * @deprecated
+   *
    * @param string $str
    *   The string with tokens to be replaced.
    * @param string $group
@@ -961,6 +874,7 @@ class CRM_Utils_Token {
    *   The processed string
    */
   public static function &replaceSubscribeTokens($str, $group, $url, $html) {
+    CRM_Core_Error::deprecatedFunctionWarning('use token processor');
     if (self::token_match('subscribe', 'group', $str)) {
       self::token_replace('subscribe', 'group', $group, $str);
     }
@@ -1015,6 +929,8 @@ class CRM_Utils_Token {
   /**
    * Replace welcome/confirmation tokens
    *
+   * @deprecated since 5.65 will be removed around 5.71
+   *
    * @param string $str
    *   The string with tokens to be replaced.
    * @param string $group
@@ -1026,6 +942,7 @@ class CRM_Utils_Token {
    *   The processed string
    */
   public static function &replaceWelcomeTokens($str, $group, $html) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     if (self::token_match('welcome', 'group', $str)) {
       self::token_replace('welcome', 'group', $group, $str);
     }
@@ -1048,45 +965,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Find and replace tokens for each component.
-   *
-   * @param string $str
-   *   The string to search.
-   * @param array $contact
-   *   Associative array of contact properties.
-   * @param array $components
-   *   A list of tokens that are known to exist in the email body.
-   *
-   * @param bool $escapeSmarty
-   * @param bool $returnEmptyToken
-   *
-   * @return string
-   *   The processed string
-   */
-  public static function &replaceComponentTokens(&$str, $contact, $components, $escapeSmarty = FALSE, $returnEmptyToken = TRUE) {
-    if (!is_array($components) || empty($contact)) {
-      return $str;
-    }
-
-    foreach ($components as $name => $tokens) {
-      if (!is_array($tokens) || empty($tokens)) {
-        continue;
-      }
-
-      foreach ($tokens as $token) {
-        if (self::token_match($name, $token, $str) && isset($contact[$name . '.' . $token])) {
-          self::token_replace($name, $token, $contact[$name . '.' . $token], $str, $escapeSmarty);
-        }
-        elseif (!$returnEmptyToken) {
-          //replacing empty token
-          self::token_replace($name, $token, "", $str, $escapeSmarty);
-        }
-      }
-    }
-    return $str;
-  }
-
-  /**
    * Get array of string tokens.
    *
    * @param string $string
@@ -1098,7 +976,7 @@ class CRM_Utils_Token {
   public static function getTokens($string) {
     $matches = [];
     $tokens = [];
-    preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
+    preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+(:|.)?\w*)\}(?!\})/',
       $string,
       $matches,
       PREG_PATTERN_ORDER
@@ -1106,12 +984,15 @@ class CRM_Utils_Token {
 
     if ($matches[1]) {
       foreach ($matches[1] as $token) {
-        list($type, $name) = preg_split('/\./', $token, 2);
+        $parts = explode('.', $token, 3);
+        $type = $parts[0];
+        $name = $parts[1];
+        $suffix = !empty($parts[2]) ? ('.' . $parts[2]) : '';
         if ($name && $type) {
           if (!isset($tokens[$type])) {
             $tokens[$type] = [];
           }
-          $tokens[$type][] = $name;
+          $tokens[$type][] = $name . $suffix;
         }
       }
     }
@@ -1135,7 +1016,7 @@ class CRM_Utils_Token {
     );
     if ($matches[1]) {
       foreach ($matches[1] as $token) {
-        list($type, $name) = preg_split('/\./', $token, 2);
+        [$type, $name] = preg_split('/\./', $token, 2);
         if ($name) {
           $returnProperties["{$name}"] = 1;
         }
@@ -1146,6 +1027,8 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use this function.
+   *
    * Gives required details of contacts in an indexed array format so we
    * can iterate in a nice loop and do token evaluation
    *
@@ -1157,14 +1040,16 @@ class CRM_Utils_Token {
    * @param bool $skipDeceased Don't return deceased contact info.
    *   Don't return deceased contact info.
    * @param array $extraParams
-   *   Extra params.
+   *   Extra params - DEPRECATED
    * @param array $tokens
    *   The list of tokens we've extracted from the content.
-   * @param null $className
-   * @param int $jobID
+   * @param string|null $className
+   * @param int|null $jobID
    *   The mailing list jobID - this is a legacy param.
    *
-   * @return array
+   * @deprecated
+   *
+   * @return array - e.g [[1 => ['first_name' => 'bob'...], 34 => ['first_name' => 'fred'...]]]
    */
   public static function getTokenDetails(
     $contactIDs,
@@ -1176,7 +1061,7 @@ class CRM_Utils_Token {
     $className = NULL,
     $jobID = NULL
   ) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('If you hit this in mailing code you should use flexmailer - otherwise use the token processor');
     $params = [];
     foreach ($contactIDs as $contactID) {
       $params[] = [
@@ -1199,6 +1084,7 @@ class CRM_Utils_Token {
     }
 
     if ($extraParams) {
+      CRM_Core_Error::deprecatedWarning('Passing $extraParams to getTokenDetails() is not supported and will be removed in a future version');
       $params = array_merge($params, $extraParams);
     }
 
@@ -1227,15 +1113,14 @@ class CRM_Utils_Token {
       }
     }
 
-    $details = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs), TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, TRUE);
-    $contactDetails = &$details[0];
+    [$contactDetails] = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs), TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, TRUE);
 
     foreach ($contactIDs as $contactID) {
       if (array_key_exists($contactID, $contactDetails)) {
         if (!empty($contactDetails[$contactID]['preferred_communication_method'])
         ) {
           $communicationPreferences = [];
-          foreach ($contactDetails[$contactID]['preferred_communication_method'] as $val) {
+          foreach ((array) $contactDetails[$contactID]['preferred_communication_method'] as $val) {
             if ($val) {
               $communicationPreferences[$val] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_communication_method', $val);
             }
@@ -1270,7 +1155,7 @@ class CRM_Utils_Token {
       $tokens,
       $className
     );
-    return $details;
+    return [$contactDetails];
   }
 
   /**
@@ -1290,6 +1175,8 @@ class CRM_Utils_Token {
    * @param string $jobID
    * @return array
    *   contactDetails with hooks swapped out
+   *
+   * @deprecated
    */
   public static function getAnonymousTokenDetails($contactIDs = [0],
                                            $returnProperties = NULL,
@@ -1314,8 +1201,11 @@ class CRM_Utils_Token {
    * Get Membership Token Details.
    * @param array $membershipIDs
    *   Array of membership IDS.
+   *
+   * @deprecated
    */
   public static function getMembershipTokenDetails($membershipIDs) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     $memberships = civicrm_api3('membership', 'get', [
       'options' => ['limit' => 0],
       'membership_id' => ['IN' => (array) $membershipIDs],
@@ -1332,9 +1222,6 @@ class CRM_Utils_Token {
    *
    * @TODO Remove that inconsistency in usage.
    *
-   * ::replaceContactTokens() may need to be called after this method, to
-   * replace tokens supplied from this method.
-   *
    * @param string $tokenString
    * @param array $contactDetails
    * @param int $contactId
@@ -1346,122 +1233,20 @@ class CRM_Utils_Token {
     if (!$contactDetails && !$contactId) {
       return;
     }
-
     // check if there are any tokens
-    $greetingTokens = self::getTokens($tokenString);
-
-    if (!empty($greetingTokens)) {
-      // first use the existing contact object for token replacement
-      if (!empty($contactDetails)) {
-        $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE, $escapeSmarty);
-      }
-
-      self::removeNullContactTokens($tokenString, $contactDetails, $greetingTokens);
-      // check if there are any unevaluated tokens
-      $greetingTokens = self::getTokens($tokenString);
-
-      // $greetingTokens not empty, means there are few tokens which are not
-      // evaluated, like custom data etc
-      // so retrieve it from database
-      if (!empty($greetingTokens) && array_key_exists('contact', $greetingTokens)) {
-        $greetingsReturnProperties = array_flip(CRM_Utils_Array::value('contact', $greetingTokens));
-        $greetingsReturnProperties = array_fill_keys(array_keys($greetingsReturnProperties), 1);
-        $contactParams = ['contact_id' => $contactId];
-
-        $greetingDetails = self::getTokenDetails($contactParams,
-          $greetingsReturnProperties,
-          FALSE, FALSE, NULL,
-          $greetingTokens,
-          $className
-        );
-
-        // again replace tokens
-        $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString,
-          $greetingDetails,
-          TRUE,
-          $greetingTokens,
-          TRUE,
-          $escapeSmarty
-        );
-      }
-
-      // check if there are still any unevaluated tokens
-      $remainingTokens = self::getTokens($tokenString);
-
-      // $greetingTokens not empty, there are customized or hook tokens to replace
-      if (!empty($remainingTokens)) {
-        // Fill the return properties array
-        $greetingTokens = $remainingTokens;
-        reset($greetingTokens);
-        $greetingsReturnProperties = [];
-        foreach ($greetingTokens as $value) {
-          $props = array_flip($value);
-          $props = array_fill_keys(array_keys($props), 1);
-          $greetingsReturnProperties = $greetingsReturnProperties + $props;
-        }
-        $contactParams = ['contact_id' => $contactId];
-        $greetingDetails = self::getTokenDetails($contactParams,
-          $greetingsReturnProperties,
-          FALSE, FALSE, NULL,
-          $greetingTokens,
-          $className
-        );
-        // Prepare variables for calling replaceHookTokens
-        $categories = array_keys($greetingTokens);
-        list($contact) = $greetingDetails;
-        // Replace tokens defined in Hooks.
-        $tokenString = CRM_Utils_Token::replaceHookTokens($tokenString, $contact[$contactId], $categories);
-      }
+    $context = $contactId ? ['contactId' => $contactId] : [];
+    if ($contactDetails) {
+      $context['contact'] = isset($contactDetails[0]) ? reset($contactDetails[0]) : $contactDetails;
     }
-  }
-
-  /**
-   * At this point, $contactDetails has loaded the contact from the DAO. Any
-   * (non-custom) missing fields are null.  By removing them, we can avoid
-   * expensive calls to CRM_Contact_BAO_Query.
-   *
-   * @param string $tokenString
-   * @param array $contactDetails
-   * @param array $greetingTokens
-   */
-  private static function removeNullContactTokens(&$tokenString, $contactDetails, &$greetingTokens) {
-
-    // Only applies to contact tokens
-    if (!array_key_exists('contact', $greetingTokens)) {
-      return;
-    }
-
-    $greetingTokensOriginal = $greetingTokens;
-    $contactFieldList = CRM_Contact_DAO_Contact::fields();
-    // Sometimes contactDetails are in a multidemensional array, sometimes a
-    // single-dimension array.
-    if (array_key_exists(0, $contactDetails) && is_array($contactDetails[0])) {
-      $contactDetails = current($contactDetails[0]);
-    }
-    $nullFields = array_keys(array_diff_key($contactFieldList, $contactDetails));
-
-    // Handle legacy tokens
-    foreach (self::legacyContactTokens() as $oldToken => $newToken) {
-      if (CRM_Utils_Array::key($newToken, $nullFields)) {
-        $nullFields[] = $oldToken;
-      }
-    }
-
-    // Remove null contact fields from $greetingTokens
-    $greetingTokens['contact'] = array_diff($greetingTokens['contact'], $nullFields);
-
-    // Also remove them from $tokenString
-    $removedTokens = array_diff($greetingTokensOriginal['contact'], $greetingTokens['contact']);
-    // Handle legacy tokens again, sigh
-    if (!empty($removedTokens)) {
-      foreach ($removedTokens as $token) {
-        if (CRM_Utils_Array::value($token, self::legacyContactTokens()) !== NULL) {
-          $removedTokens[] = CRM_Utils_Array::value($token, self::legacyContactTokens());
-        }
-      }
-      foreach ($removedTokens as $token) {
-        $tokenString = str_replace("{contact.$token}", '', $tokenString);
-      }
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'smarty' => FALSE,
+      'class' => $className,
+    ]);
+    $tokenProcessor->addRow($context);
+    $tokenProcessor->addMessage('greeting', $tokenString, 'text/plain');
+    $tokenProcessor->evaluate();
+    foreach ($tokenProcessor->getRows() as $row) {
+      $tokenString = $row->render('greeting');
     }
   }
 
@@ -1533,7 +1318,7 @@ class CRM_Utils_Token {
   public static function getUserTokenReplacement($token, $escapeSmarty = FALSE) {
     $value = '';
 
-    list($objectName, $objectValue) = explode('-', $token, 2);
+    [$objectName, $objectValue] = explode('-', $token, 2);
 
     switch ($objectName) {
       case 'permission':
@@ -1552,32 +1337,54 @@ class CRM_Utils_Token {
     return $value;
   }
 
-  protected static function _buildContributionTokens() {
-    $key = 'contribution';
-    if (self::$_tokens[$key] == NULL) {
-      self::$_tokens[$key] = array_keys(array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
-        ['campaign', 'financial_type'],
-        self::getCustomFieldTokens('Contribution')
-      ));
-    }
-  }
-
   /**
-   * Store membership tokens on the static _tokens array.
+   * @deprecated
+   *
+   * Do not use this function - it still needs full removal from active code
+   * in CRM_Contribute_Form_Task_PDFLetter.
    */
-  protected static function _buildMembershipTokens() {
-    $key = 'membership';
-    if (!isset(self::$_tokens[$key]) || self::$_tokens[$key] == NULL) {
-      $membershipTokens = [];
-      $tokens = CRM_Core_SelectValues::membershipTokens();
-      foreach ($tokens as $token => $dontCare) {
-        $membershipTokens[] = substr($token, (strpos($token, '.') + 1), -1);
+  protected static function _buildContributionTokens() {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
+    $key = 'contribution';
+
+    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__][$key])) {
+      $tokens = array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
+        ['campaign' => [], 'financial_type' => [], 'payment_instrument' => []],
+        self::getCustomFieldTokens('Contribution'),
+        [
+          'financial_type_id:label',
+          'financial_type_id:name',
+          'contribution_page_id:label',
+          'contribution_page_id:name',
+          'payment_instrument_id:label',
+          'payment_instrument_id:name',
+          'is_test:label',
+          'is_pay_later:label',
+          'contribution_status_id:label',
+          'contribution_status_id:name',
+          'is_template:label',
+          'campaign_id:label',
+          'campaign_id:name',
+        ]
+      );
+      foreach ($tokens as $token) {
+        if (!empty($token['name'])) {
+          $tokens[$token['name']] = [];
+        }
+        elseif (is_string($token) && strpos($token, ':') !== FALSE) {
+          $tokens[$token] = [];
+        }
       }
-      self::$_tokens[$key] = $membershipTokens;
+      Civi::$statics[__CLASS__][__FUNCTION__][$key] = array_keys($tokens);
     }
+    self::$_tokens[$key] = Civi::$statics[__CLASS__][__FUNCTION__][$key];
   }
 
   /**
+   * Do not use.
+   *
+   * @deprecated
+   *
    * Replace tokens for an entity.
    * @param string $entity
    * @param array $entityArray
@@ -1591,6 +1398,7 @@ class CRM_Utils_Token {
    *   string with replacements made
    */
   public static function replaceEntityTokens($entity, $entityArray, $str, $knownTokens = [], $escapeSmarty = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (!$knownTokens || empty($knownTokens[$entity])) {
       return $str;
     }
@@ -1599,7 +1407,12 @@ class CRM_Utils_Token {
     $fn = is_callable(['CRM_Utils_Token', $fn]) ? $fn : 'getApiTokenReplacement';
     // since we already know the tokens lets just use them & do str_replace which is faster & simpler than preg_replace
     foreach ($knownTokens[$entity] as $token) {
-      $replacement = self::$fn($entity, $token, $entityArray);
+      // We are now supporting the syntax case_type_id:label
+      // so strip anything after the ':'
+      // (we aren't supporting 'name' at this stage, so we can assume 'label'
+      // test cover in TokenConsistencyTest.
+      $parts = explode(':', $token);
+      $replacement = self::$fn($entity, $parts[0], $entityArray);
       if ($escapeSmarty) {
         $replacement = self::tokenEscapeSmarty($replacement);
       }
@@ -1609,16 +1422,22 @@ class CRM_Utils_Token {
   }
 
   /**
+   * @deprecated
+   *
    * @param int $caseId
    * @param string $str
    * @param array $knownTokens
    * @param bool $escapeSmarty
    * @return string
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function replaceCaseTokens($caseId, $str, $knownTokens = [], $escapeSmarty = FALSE) {
-    if (!$knownTokens || empty($knownTokens['case'])) {
+  public static function replaceCaseTokens($caseId, $str, $knownTokens = NULL, $escapeSmarty = FALSE): string {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
+    if (strpos($str, '{case.') === FALSE) {
       return $str;
+    }
+    if (!$knownTokens) {
+      $knownTokens = self::getTokens($str);
     }
     $case = civicrm_api3('case', 'getsingle', ['id' => $caseId]);
     return self::replaceEntityTokens('case', $case, $str, $knownTokens, $escapeSmarty);
@@ -1627,11 +1446,13 @@ class CRM_Utils_Token {
   /**
    * Generic function for formatting token replacement for an api field
    *
+   * @deprecated
+   *
    * @param string $entity
    * @param string $token
    * @param array $entityArray
    * @return string
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getApiTokenReplacement($entity, $token, $entityArray) {
     if (!isset($entityArray[$token])) {
@@ -1653,13 +1474,15 @@ class CRM_Utils_Token {
       return implode(', ', $ret);
     }
     // Format date fields
-    elseif ($entityArray[$token] && $fieldType == CRM_Utils_Type::T_DATE) {
+    elseif ($entityArray[$token] && in_array($fieldType, [CRM_Utils_Type::T_DATE, CRM_Utils_Type::T_TIMESTAMP, (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)])) {
       return CRM_Utils_Date::customFormat($entityArray[$token]);
     }
     return implode(', ', (array) $entityArray[$token]);
   }
 
   /**
+   * Do not use - unused in core.
+   *
    * Replace Contribution tokens in html.
    *
    * @param string $str
@@ -1668,15 +1491,17 @@ class CRM_Utils_Token {
    * @param string $knownTokens
    * @param bool|string $escapeSmarty
    *
+   * @deprecated
+   *
    * @return mixed
    */
   public static function replaceContributionTokens($str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     $key = 'contribution';
     if (!$knownTokens || empty($knownTokens[$key])) {
       //early return
       return $str;
     }
-    self::_buildContributionTokens();
 
     // here we intersect with the list of pre-configured valid tokens
     // so that we remove anything we do not recognize
@@ -1696,44 +1521,16 @@ class CRM_Utils_Token {
   }
 
   /**
-   * We have a situation where we are rendering more than one token in each field because we are combining
-   * tokens from more than one contribution when pdf thank you letters are grouped (CRM-14367)
-   *
-   * The replaceContributionToken doesn't handle receive_date correctly in this scenario because of the formatting
-   * it applies (other tokens are OK including date fields)
-   *
-   * So we sort this out & then call the main function. Note that we are not escaping smarty on this fields like the main function
-   * does - but the fields is already being formatted through a date function
-   *
-   * @param string $separator
-   * @param string $str
-   * @param array $contribution
-   * @param bool|string $html
-   * @param string $knownTokens
-   * @param bool|string $escapeSmarty
-   *
-   * @return string
-   */
-  public static function replaceMultipleContributionTokens($separator, $str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
-    if (empty($knownTokens['contribution'])) {
-      return $str;
-    }
-
-    if (in_array('receive_date', $knownTokens['contribution'])) {
-      $formattedDates = [];
-      $dates = explode($separator, $contribution['receive_date']);
-      foreach ($dates as $date) {
-        $formattedDates[] = CRM_Utils_Date::customFormat($date, NULL, ['j', 'm', 'Y']);
-      }
-      $str = str_replace("{contribution.receive_date}", implode($separator, $formattedDates), $str);
-      unset($knownTokens['contribution']['receive_date']);
-    }
-    return self::replaceContributionTokens($str, $contribution, $html, $knownTokens, $escapeSmarty);
-  }
-
-  /**
    * Get replacement strings for any membership tokens (only a small number of tokens are implemnted in the first instance
    * - this is used by the pdfLetter task from membership search
+   *
+   * This is called via replaceEntityTokens.
+   *
+   * In the near term it will not be called at all from core as
+   * the pdf letter task is updated to use the processor.
+   *
+   * @deprecated
+   *
    * @param string $entity
    *   should always be "membership"
    * @param string $token
@@ -1743,13 +1540,29 @@ class CRM_Utils_Token {
    * @return string token replacement
    */
   public static function getMembershipTokenReplacement($entity, $token, $membership) {
-    self::_buildMembershipTokens();
+    $supportedTokens = [
+      'id',
+      'status',
+      'status_id',
+      'type',
+      'membership_type_id',
+      'start_date',
+      'join_date',
+      'end_date',
+      'fee',
+    ];
     switch ($token) {
       case 'type':
+        // membership_type_id would only be requested if the calling
+        // class is mapping it to '{membership:membership_type_id:label'}
+      case 'membership_type_id':
         $value = $membership['membership_name'];
         break;
 
       case 'status':
+        // status_id would only be requested if the calling
+        // class is mapping it to '{membership:status_id:label'}
+      case 'status_id':
         $statuses = CRM_Member_BAO_Membership::buildOptions('status_id');
         $value = $statuses[$membership['status_id']];
         break;
@@ -1762,7 +1575,7 @@ class CRM_Utils_Token {
           ]);
           $value = CRM_Utils_Money::format($value, NULL, NULL, TRUE);
         }
-        catch (CiviCRM_API3_Exception $e) {
+        catch (CRM_Core_Exception $e) {
           // we can anticipate we will get an error if the minimum fee is set to 'NULL' because of the way the
           // api handles NULL (4.4)
           $value = 0;
@@ -1770,7 +1583,7 @@ class CRM_Utils_Token {
         break;
 
       default:
-        if (in_array($token, self::$_tokens[$entity])) {
+        if (in_array($token, $supportedTokens)) {
           $value = $membership[$token];
           if (CRM_Utils_String::endsWith($token, '_date')) {
             $value = CRM_Utils_Date::customFormat($value);
@@ -1787,14 +1600,20 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use - unused in core.
+   *
    * @param $token
    * @param $contribution
    * @param bool $html
    * @param bool $escapeSmarty
    *
+   * @deprecated
+   *
    * @return mixed|string
+   * @throws \CRM_Core_Exception
    */
-  public static function getContributionTokenReplacement($token, &$contribution, $html = FALSE, $escapeSmarty = FALSE) {
+  public static function getContributionTokenReplacement($token, $contribution, $html = FALSE, $escapeSmarty = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     self::_buildContributionTokens();
 
     switch ($token) {
@@ -1802,12 +1621,21 @@ class CRM_Utils_Token {
       case 'net_amount':
       case 'fee_amount':
       case 'non_deductible_amount':
-        $value = CRM_Utils_Money::format(CRM_Utils_Array::retrieveValueRecursive($contribution, $token));
+        // FIXME: Is this ever a multi-dimensional array?  Why use retrieveValueRecursive()?
+        $amount = CRM_Utils_Array::retrieveValueRecursive($contribution, $token);
+        $currency = CRM_Utils_Array::retrieveValueRecursive($contribution, 'currency');
+        $value = CRM_Utils_Money::format($amount, $currency);
         break;
 
       case 'receive_date':
+      case 'receipt_date':
         $value = CRM_Utils_Array::retrieveValueRecursive($contribution, $token);
-        $value = CRM_Utils_Date::customFormat($value, NULL, ['j', 'm', 'Y']);
+        $config = CRM_Core_Config::singleton();
+        $value = CRM_Utils_Date::customFormat($value, $config->dateformatDatetime);
+        break;
+
+      case 'source':
+        $value = CRM_Utils_Array::retrieveValueRecursive($contribution, 'contribution_source');
         break;
 
       default:
@@ -1827,6 +1655,10 @@ class CRM_Utils_Token {
   }
 
   /**
+   * @deprecated
+   *
+   * Only used from deprecated functions not called by core.
+   *
    * @return array
    *   [legacy_token => new_token]
    */
@@ -1842,19 +1674,17 @@ class CRM_Utils_Token {
   /**
    * Get all custom field tokens of $entity
    *
-   * @param string $entity
-   * @param bool $usedForTokenWidget
+   * @deprecated
    *
+   * @param string $entity
    * @return array
    *   return custom field tokens in array('custom_N' => 'label') format
    */
-  public static function getCustomFieldTokens($entity, $usedForTokenWidget = FALSE) {
+  public static function getCustomFieldTokens($entity) {
     $customTokens = [];
-    $tokenName = $usedForTokenWidget ? "{contribution.custom_%d}" : "custom_%d";
     foreach (CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
-      $customTokens[sprintf($tokenName, $id)] = $info['label'];
+      $customTokens['custom_' . $id] = $info['label'] . ' :: ' . $info['groupTitle'];
     }
-
     return $customTokens;
   }
 
@@ -1887,7 +1717,7 @@ class CRM_Utils_Token {
         else {
           $entity = 'Contact';
         }
-        $sorted[ts($entity)][] = ['id' => $k, 'text' => $v];
+        $sorted[_ts($entity)][] = ['id' => $k, 'text' => $v];
       }
     }
 
@@ -1897,6 +1727,67 @@ class CRM_Utils_Token {
     }
 
     return $output;
+  }
+
+  /**
+   * @deprecated
+   *
+   * @param $value
+   * @param $token
+   *
+   * @return bool|int|mixed|string|null
+   */
+  protected static function convertPseudoConstantsUsingMetadata($value, $token) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
+    // Convert pseudoconstants using metadata
+    if ($value && is_numeric($value)) {
+      $allFields = CRM_Contact_BAO_Contact::exportableFields('All');
+      if (!empty($allFields[$token]['pseudoconstant'])) {
+        $value = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $token, $value);
+      }
+    }
+    elseif ($value && CRM_Utils_String::endsWith($token, '_date')) {
+      $value = CRM_Utils_Date::customFormat($value);
+    }
+    return $value;
+  }
+
+  /**
+   * Get token deprecation information.
+   *
+   * @return array
+   */
+  public static function getTokenDeprecations(): array {
+    return [
+      'WorkFlowMessageTemplates' => [
+        'contribution_invoice_receipt' => [
+          '$display_name' => 'contact.display_name',
+        ],
+        'contribution_online_receipt' => [
+          '$contributeMode' => 'no longer available / relevant',
+          '$first_name' => 'contact.first_name',
+          '$last_name' => 'contact.last_name',
+          '$displayName' => 'contact.display_name',
+        ],
+        'membership_offline_receipt' => [
+          // receipt_text_renewal appears to be long gone.
+          'receipt_text_renewal' => 'receipt_text',
+          '$isAmountZero' => 'no longer available / relevant',
+        ],
+        'event_offline_receipt' => [
+          '$contributeMode' => 'no longer available / relevant',
+          '$isAmountZero' => 'no longer available / relevant',
+        ],
+        'pledge_acknowledgement' => [
+          '$domain' => 'no longer available / relevant',
+          '$contact' => 'no longer available / relevant',
+        ],
+        'pledge_reminder' => [
+          '$domain' => 'no longer available / relevant',
+          '$contact' => 'no longer available / relevant',
+        ],
+      ],
+    ];
   }
 
 }

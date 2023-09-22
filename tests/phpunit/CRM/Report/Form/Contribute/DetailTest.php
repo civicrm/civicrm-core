@@ -24,9 +24,16 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
   ];
 
   /**
+   * Skip validating financials as the financial data is not correct in the csvs.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = FALSE;
+
+  /**
    * @return array
    */
-  public function dataProvider() {
+  public function dataProvider(): array {
     return [
       [
         'CRM_Report_Form_Contribute_Detail',
@@ -49,7 +56,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     ];
   }
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->quickCleanup($this->_tablesToTruncate);
   }
@@ -140,12 +147,12 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
    * Make sure the total amount of a contribution doesn't multiply by the number
    * of soft credits.
    */
-  public function testMultipleSoftCredits() {
+  public function testMultipleSoftCredits(): void {
     $this->quickCleanup($this->_tablesToTruncate);
 
     $solParams = [
       'first_name' => 'Solicitor 1',
-      'last_name' => 'User ' . rand(),
+      'last_name' => 'User',
       'contact_type' => 'Individual',
     ];
     $solicitor1Id = $this->individualCreate($solParams);
@@ -176,10 +183,10 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     $this->callAPISuccess('ContributionSoft', 'create', $softParams);
 
     $input = [
-      'filters' => [
-        'contribution_or_soft_op' => 'eq',
-        'contribution_or_soft_value' => 'contributions_only',
-      ],
+      'contribution_or_soft_op' => 'eq',
+      'contribution_or_soft_value' => 'contributions_only',
+      'soft_credit_type_id_op' => 'nnll',
+      'soft_credit_type_id_value' => [],
       'fields' => [
         'sort_name',
         'email',
@@ -190,10 +197,147 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
         'soft_credits',
       ],
     ];
-    $obj = $this->getReportObject('CRM_Report_Form_Contribute_Detail', $input);
-    $rows = $obj->getResultSet();
-    $this->assertEquals(1, count($rows));
+    $params = array_merge([
+      'report_id' => 'contribute/detail',
+    ], $input);
+    $rows = $this->callAPISuccess('ReportTemplate', 'getrows', $params)['values'];
+    $this->assertCount(1, $rows);
     $this->assertEquals('$ 150.00', $rows[0]['civicrm_contribution_total_amount']);
+
+    $statistics = $this->callAPISuccess('ReportTemplate', 'getstatistics', $params)['values'];
+    $this->assertEquals([
+      'counts' => [
+        'rowCount' => [
+          'title' => 'Row(s) Listed',
+          'value' => 1,
+          'type' => CRM_Utils_Type::T_INT,
+        ],
+        'amount' => [
+          'title' => 'Total Amount (Contributions)',
+          'value' => '$ 150.00 (1)',
+          'type' => 2,
+        ],
+        'count' => [
+          'title' => 'Total Contributions',
+          'value' => 1,
+        ],
+        'fees' => [
+          'title' => 'Fees',
+          'value' => '$ 5.00',
+          'type' => 2,
+        ],
+        'net' => [
+          'title' => 'Net',
+          'value' => '$ 145.00',
+          'type' => 2,
+        ],
+        'avg' => [
+          'title' => 'Average',
+          'value' => '$ 150.00',
+          'type' => 2,
+        ],
+      ],
+      'groups' => [
+        [
+          'title' => 'Grouping(s)',
+          'value' => 'Contribution',
+        ],
+      ],
+      'filters' => [
+        [
+          'title' => 'Contribution OR Soft Credit?',
+          'value' => 'Is equal to Contributions Only',
+        ],
+        [
+          'title' => 'Contribution Status',
+          'value' => 'Is Completed',
+        ],
+        [
+          'title' => 'Soft Credit Type',
+          'value' => 'Is not empty (Null)',
+        ],
+      ],
+    ], $statistics);
+
+  }
+
+  /**
+   * Make sure the civicrm_alterReportVar hook for contribute detail report work well.
+   */
+  public function testContributeDetailReportWithNewColumnFromCustomTable(): void {
+    $this->quickCleanup($this->_tablesToTruncate);
+
+    $solParams = [
+      'first_name' => 'Solicitor 1',
+      'last_name' => 'User ' . rand(),
+      'contact_type' => 'Individual',
+    ];
+    $solicitor1Id = $this->individualCreate($solParams);
+    $solParams['first_name'] = 'Solicitor 2';
+    $solicitor2Id = $this->individualCreate($solParams);
+    $solParams['first_name'] = 'Donor';
+    $donorId = $this->individualCreate($solParams);
+
+    $contribParams = [
+      'total_amount' => 150,
+      'contact_id' => $donorId,
+      // TODO: We're getting a "DB Error: already exists" when inserting a line
+      // item, but that's beside the point for this test, so skipping.
+      'skipLineItem' => 1,
+    ];
+    $contribId = $this->contributionCreate($contribParams);
+
+    $config = CRM_Core_Config::singleton();
+    CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/fixtures/value_extension_tng55_table.sql");
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_value_extension_tng55 (`entity_id`, `title`) VALUES (%1, 'some_title')", [1 => [$contribId, 'Positive']]);
+
+    CRM_Utils_Hook::singleton()->setHook('civicrm_alterReportVar', function ($varType, &$var, &$reportForm) {
+      if ($varType === 'columns') {
+        $var['civicrm_value_extension_tng55'] = [
+          'fields' => [
+            'extension_tng55_title' => [
+              'title' => ts('Extension Title'),
+              'dbAlias' => "civicrm_value_extension_tng55.title",
+            ],
+          ],
+          'filters' => [
+            'extension_tng55_title' => [
+              'title' => ts('Extension Title'),
+              'dbAlias' => "civicrm_value_extension_tng55.title",
+              'type' => CRM_Utils_Type::T_INT,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => [],
+            ],
+          ],
+        ];
+      }
+      if ($varType === 'sql') {
+        $from = $var->getVar('_from');
+        $from .= "
+            LEFT JOIN civicrm_value_extension_tng55
+            ON (civicrm_value_extension_tng55.entity_id = contribution_civireport.id)
+        ";
+        $var->setVar('_from', $from);
+      }
+    });
+
+    $input = [
+      'extension_tng55_title_op' => 'nnll',
+      'fields' => [
+        'sort_name' => 1,
+        'contribution_id' => 1,
+        'total_amount' => 1,
+        'extension_tng55_title' => 1,
+      ],
+    ];
+    $params = array_merge([
+      'report_id' => 'contribute/detail',
+    ], $input);
+    $rows = $this->callAPISuccess('ReportTemplate', 'getrows', $params)['values'];
+
+    $this->assertCount(1, $rows);
+    $this->assertEquals('some_title', $rows[0]['civicrm_value_extension_tng55_extension_tng55_title']);
+
   }
 
 }

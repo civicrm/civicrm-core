@@ -57,10 +57,10 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
-        CRM_Utils_System::setTitle(ts('Edit Survey'));
+        $this->setTitle(ts('Edit Survey'));
       }
       else {
-        CRM_Utils_System::setTitle(ts('Delete Survey'));
+        $this->setTitle(ts('Delete Survey'));
       }
     }
 
@@ -89,10 +89,10 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
-        CRM_Utils_System::setTitle(ts('Edit Petition'));
+        $this->setTitle(ts('Edit Petition'));
       }
       else {
-        CRM_Utils_System::setTitle(ts('Delete Petition'));
+        $this->setTitle(ts('Delete Petition'));
       }
     }
 
@@ -203,13 +203,13 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     $this->add('checkbox', 'bypass_confirm', ts('Bypass email confirmation'));
 
     //is share through social media
-    $this->addElement('checkbox', 'is_share', ts('Allow sharing through social media?'));
+    $this->addElement('checkbox', 'is_share', ts('Add footer region with Twitter, Facebook and LinkedIn share buttons and scripts?'));
 
     // is active ?
-    $this->add('checkbox', 'is_active', ts('Is Active?'));
+    $this->add('checkbox', 'is_active', ts('Active?'));
 
     // is default ?
-    $this->add('checkbox', 'is_default', ts('Is Default?'));
+    $this->add('checkbox', 'is_default', ts('Default?'));
 
     // add buttons
     $this->addButtons(
@@ -237,9 +237,9 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
   /**
    * Global validation rules for the form.
-   * @param $fields
+   * @param array $fields
    * @param $files
-   * @param $form
+   * @param CRM_Core_Form $form
    * @return array|bool
    */
   public static function formRule($fields, $files, $form) {
@@ -296,7 +296,7 @@ WHERE  $whereClause
     if ($this->_surveyId) {
 
       if ($this->_action & CRM_Core_Action::DELETE) {
-        CRM_Campaign_BAO_Survey::del($this->_surveyId);
+        CRM_Campaign_BAO_Survey::deleteRecord(['id' => $this->_surveyId]);
         CRM_Core_Session::setStatus(ts(' Petition has been deleted.'), ts('Record Deleted'), 'success');
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=petition'));
         return;

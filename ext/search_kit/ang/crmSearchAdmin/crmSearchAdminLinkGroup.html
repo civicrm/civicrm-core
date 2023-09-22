@@ -1,0 +1,88 @@
+<table>
+  <thead>
+    <tr>
+      <th class="crm-search-admin-icon-col"></th>
+      <th>{{:: ts('Link') }}</th>
+      <th class="crm-search-admin-icon-col">{{:: ts('Icon') }}</th>
+      <th>{{:: ts('Open') }}</th>
+      <th>{{:: ts('Text') }}</th>
+      <th>{{:: ts('Show if') }}</th>
+      <th>{{:: ts('Style') }}</th>
+      <th class="crm-search-admin-icon-col"></th>
+    </tr>
+  </thead>
+  <tbody ui-sortable="$ctrl.sortableOptions" ng-model="$ctrl.group">
+    <tr ng-repeat="item in $ctrl.group" class="crm-draggable">
+      <td class="crm-search-admin-icon-col">
+        <i class="crm-i fa-arrows crm-search-move-icon"></i>
+      </td>
+      <td class="form-inline">
+        <crm-search-admin-link-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" link="item" links="$ctrl.links" on-change="$ctrl.onChangeLink(item, newLink)"></crm-search-admin-link-select>
+      </td>
+      <td class="crm-search-admin-icon-col">
+        <span class="crm-editable-enabled" ng-click="pickIcon($index)">
+          <i class="{{ item.icon ? 'crm-i ' + item.icon : '' }}" style="opacity: 1"></i>
+        </span>
+      </td>
+      <td>
+        <select class="form-control" ng-model="item.target">
+          <option value>{{:: ts('Normal') }}</option>
+          <option value="_blank">{{:: ts('New tab') }}</option>
+          <option value="crm-popup">{{:: ts('Popup dialog') }}</option>
+        </select>
+      </td>
+      <td class="form-inline">
+        <input type="text" class="form-control" ng-model="item.text">
+        <crm-search-admin-token-select model="item" field="text" suffix=":label"></crm-search-admin-token-select>
+      </td>
+      <td class="form-inline">
+        <input ng-model="item.condition[0]" crm-ui-select="{placeholder: item.action ? ts('Allowed') : ts('Always'), data: $ctrl.fields}" ng-change="$ctrl.onChangeCondition(item)">
+        <div class="form-group" ng-if="item.condition[0] === 'check user permission'">
+          <select class="form-control api4-operator" ng-model="item.condition[1]" ng-options="o.key as o.value for o in $ctrl.permissionOperators"></select>
+          <input class="form-control" crm-ui-select="{data: $ctrl.permissions, multiple: true}" ng-model="item.condition[2]" ng-list>
+        </div>
+        <crm-search-condition class="form-group"
+          ng-if="item.condition[0] && item.condition[0] !== 'check user permission'"
+          clause="item.condition"
+          field="$ctrl.getField(item.condition[0])"
+          offset="1"
+          option-key="'name'">
+        </crm-search-condition>
+      </td>
+      <td>
+        <div class="btn-group">
+          <button type="button" style="min-width: 85px" class="btn btn-{{ item.style }} dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{ $ctrl.getStyle(item).value }} <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li ng-repeat="opt in $ctrl.styles">
+              <a href class="bg-{{:: opt.key }}" ng-click="item.style = opt.key">{{:: opt.value }}</a>
+            </li>
+          </ul>
+        </div>
+      </td>
+      <td class="crm-search-admin-icon-col">
+        <button ng-if="$ctrl.group.length > 1" type="button" class="btn btn-xs btn-danger-outline" ng-click="$ctrl.group.splice($index, 1)">
+          <i class="crm-i fa-times"></i>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="6" class="form-inline">
+        <select class="form-control crm-search-admin-add-link">
+          <option value="">
+            + {{:: ts('Add...') }}
+          </option>
+          <option ng-repeat="link in $ctrl.links" value="{{:: $ctrl.serialize(link) }}">
+            {{ link.text }}
+          </option>
+          <option value="{{:: $ctrl.default }}">
+            {{:: ts('Other...') }}
+          </option>
+        </select>
+      </td>
+    </tr>
+  </tfoot>
+</table>

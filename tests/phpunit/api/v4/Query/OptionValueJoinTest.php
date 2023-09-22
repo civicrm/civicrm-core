@@ -14,45 +14,31 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace api\v4\Query;
 
 use Civi\Api4\Query\Api4SelectQuery;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class OptionValueJoinTest extends UnitTestCase {
+class OptionValueJoinTest extends Api4TestBase {
 
-  public function setUpHeadless() {
-    $relatedTables = [
-      'civicrm_address',
-      'civicrm_email',
-      'civicrm_phone',
-      'civicrm_openid',
-      'civicrm_im',
-      'civicrm_website',
-      'civicrm_activity',
-      'civicrm_activity_contact',
-    ];
+  public function testCommunicationMethodJoin(): void {
+    $this->createTestRecord('Contact', [
+      'preferred_communication_method' => 1,
+    ]);
 
-    $this->cleanup(['tablesToTruncate' => $relatedTables]);
-    $this->loadDataSet('SingleContact');
-
-    return parent::setUpHeadless();
-  }
-
-  public function testCommunicationMethodJoin() {
-    $api = \Civi\API\Request::create('Contact', 'get', ['version' => 4, 'checkPermissions' => FALSE]);
+    $api = \Civi\API\Request::create('Contact', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['first_name', 'preferred_communication_method:label'],
+      'where' => [['preferred_communication_method', 'IS NOT NULL']],
+    ]);
     $query = new Api4SelectQuery($api);
-    $query->select[] = 'first_name';
-    $query->select[] = 'preferred_communication_method:label';
-    $query->where[] = ['preferred_communication_method', 'IS NOT NULL'];
     $results = $query->run();
     $first = array_shift($results);
     $keys = array_keys($first);

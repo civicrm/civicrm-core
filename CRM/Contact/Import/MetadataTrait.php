@@ -37,7 +37,7 @@ trait CRM_Contact_Import_MetadataTrait {
     }
 
     foreach ($this->getRelationships() as $key => $var) {
-      list($type) = explode('_', $key);
+      [$type] = explode('_', $key);
       $relationshipType[$key]['title'] = $var;
       $relationshipType[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
       $relationshipType[$key]['import'] = TRUE;
@@ -79,19 +79,13 @@ trait CRM_Contact_Import_MetadataTrait {
   /**
    * Get an array of header patterns for importable keys.
    *
-   * @return array
-   */
-  public function getHeaderPatterns() {
-    return CRM_Utils_Array::collect('headerPattern', $this->getContactImportMetadata());
-  }
-
-  /**
-   * Get an array of header patterns for importable keys.
+   * We should do this work on the form layer.
    *
+   * @deprecated
    * @return array
    */
-  public function getDataPatterns() {
-    return CRM_Utils_Array::collect('dataPattern', $this->getContactImportMetadata());
+  public function getHeaderPatterns(): array {
+    return CRM_Utils_Array::collect('headerPattern', $this->getContactImportMetadata());
   }
 
   /**
@@ -101,22 +95,6 @@ trait CRM_Contact_Import_MetadataTrait {
    */
   public function getFieldTitles() {
     return CRM_Utils_Array::collect('title', $this->getContactImportMetadata());
-  }
-
-  /**
-   * Get configured contact type.
-   */
-  protected function getContactType() {
-    return $this->_contactType ?? 'Individual';
-  }
-
-  /**
-   * Get configured contact sub type.
-   *
-   * @return string
-   */
-  protected function getContactSubType() {
-    return $this->_contactSubType ?? NULL;
   }
 
 }

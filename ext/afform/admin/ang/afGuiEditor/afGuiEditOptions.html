@@ -1,0 +1,30 @@
+<div class="af-gui-edit-options-bar" >
+  <h4 class="pull-left">{{:: ts('Customize options') }}</h4>
+  <div class="btn-group-sm">
+    <button type="button" class="btn btn-default" ng-click="close()">
+      <i class="crm-i fa-times-circle"></i>
+      {{:: ts('Cancel') }}
+    </button>
+    <button type="button" class="btn btn-success" ng-click="save()">
+      <i class="crm-i fa-check-circle"></i>
+      {{:: ts('Done') }}
+    </button>
+  </div>
+</div>
+<ul ui-sortable="{connectWith: '.af-gui-edit-options-deleted', cancel: 'input,textarea,button,select,option,a,[contenteditable]'}" ng-model="options" class="af-gui-edit-options-enabled">
+  <li ng-repeat="option in options">
+    <div crm-ui-editable ng-model="option.label" default-value="originalLabels[option.id]" >{{ option.label }}</div>
+    <button type="button" class="btn btn-danger-outline btn-xs pull-right" ng-click="deleteOption(option, $index)" title="{{:: ts('Remove option') }}">
+      <i class="crm-i fa-trash"></i>
+    </button>
+  </li>
+</ul>
+<h5 ng-show="deletedOptions.length">{{ ts('Deleted options') }}</h5>
+<ul ng-if="deletedOptions.length" ui-sortable="{connectWith: '.af-gui-edit-options-enabled'}" ng-model="deletedOptions" class="af-gui-edit-options-deleted">
+  <li ng-repeat="option in deletedOptions">
+    <div>{{ option.label }}</div>
+    <button type="button" class="btn btn-success-outline btn-xs pull-right" ng-click="restoreOption(option, $index)" title="{{:: ts('Restore option') }}">
+      <i class="crm-i fa-arrow-circle-o-up"></i>
+    </button>
+  </li>
+</ul>

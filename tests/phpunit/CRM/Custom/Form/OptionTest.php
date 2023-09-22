@@ -6,14 +6,10 @@
  */
 class CRM_Custom_Form_OptionTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Test the `name` field doesn't get changed when editing an existing option.
    */
-  public function testEditCustomFieldOptionValue() {
+  public function testEditCustomFieldOptionValue(): void {
     // Create a custom field for contacts with some option choices
     $customGroup = $this->customGroupCreate(['extends' => 'Contact', 'title' => 'contact stuff']);
     $customField = $this->customFieldOptionValueCreate($customGroup, 'myCustomField');
@@ -26,11 +22,13 @@ class CRM_Custom_Form_OptionTest extends CiviUnitTestCase {
 
     // Run the form
     $form = new CRM_Custom_Form_Option();
+    $form->assign('formTpl', NULL);
     $form->controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Option', 'Custom Option');
 
     $form->set('id', $optionValue['id']);
     $form->set('fid', $customField['id']);
     $form->set('gid', $customGroup['id']);
+    $form->buildForm();
 
     ob_start();
     $form->controller->_actions['display']->perform($form, 'display');

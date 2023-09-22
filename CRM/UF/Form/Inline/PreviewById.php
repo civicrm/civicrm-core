@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -28,8 +26,6 @@ class CRM_UF_Form_Inline_PreviewById extends CRM_UF_Form_AbstractPreview {
    * Pre processing work done here.
    *
    * gets session variables for group or field id
-   *
-   * @param
    *
    * @return void
    * @throws \CRM_Core_Exception

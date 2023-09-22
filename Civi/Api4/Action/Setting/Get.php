@@ -39,25 +39,31 @@ class Get extends AbstractSettingAction {
   protected function processSettings(Result $result, $settingsBag, $meta, $domain) {
     if ($this->select) {
       foreach ($this->select as $name) {
+        [$name, $suffix] = array_pad(explode(':', $name), 2, NULL);
+        $value = $settingsBag->get($name);
+        if (isset($value) && !empty($meta[$name]['serialize'])) {
+          $value = \CRM_Core_DAO::unSerializeField($value, $meta[$name]['serialize']);
+        }
+        if ($suffix) {
+          $value = $this->matchPseudoconstant($name, $value, 'id', $suffix, $domain);
+        }
         $result[] = [
-          'name' => $name,
-          'value' => $settingsBag->get($name),
+          'name' => $suffix ? "$name:$suffix" : $name,
+          'value' => $value,
           'domain_id' => $domain,
         ];
       }
     }
     else {
       foreach ($settingsBag->all() as $name => $value) {
+        if (isset($value) && !empty($meta[$name]['serialize'])) {
+          $value = \CRM_Core_DAO::unSerializeField($value, $meta[$name]['serialize']);
+        }
         $result[] = [
           'name' => $name,
           'value' => $value,
           'domain_id' => $domain,
         ];
-      }
-    }
-    foreach ($result as $name => &$setting) {
-      if (isset($setting['value']) && !empty($meta[$name]['serialize'])) {
-        $setting['value'] = \CRM_Core_DAO::unSerializeField($setting['value'], $meta[$name]['serialize']);
       }
     }
   }

@@ -19,15 +19,19 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
   /**
    * Clean up after each test.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     CRM_Utils_Hook::singleton()->reset();
+    parent::tearDown();
   }
 
   /**
    * Test update pending contribution with sending a confirmation mail.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Exception
    */
-  public function testUpdatePendingContributionWithSendingEmail() {
+  public function testUpdatePendingContributionWithSendingEmail(): void {
     $this->_individualId = $this->individualCreate();
     $form = new CRM_Contribute_Form_Task_Status();
 
@@ -75,7 +79,7 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
   /**
    * Test update pending contribution without sending a confirmation mail.
    */
-  public function testUpdatePendingContributionWithoutSendingEmail() {
+  public function testUpdatePendingContributionWithoutSendingEmail(): void {
     $this->_individualId = $this->individualCreate();
     $form = new CRM_Contribute_Form_Task_Status();
 

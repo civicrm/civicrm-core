@@ -19,6 +19,7 @@
  * This class generates form components for Financial Account
  */
 class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
+  use CRM_Core_Form_EntityFormTrait;
 
   /**
    * Flag if its a AR account type.
@@ -28,10 +29,23 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   protected $_isARFlag = FALSE;
 
   /**
+   * Explicitly declare the entity api name.
+   *
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'FinancialAccount';
+  }
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
     parent::preProcess();
+
+    // Add custom data to form
+    CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'FinancialAccount', $this->_id);
+    CRM_Custom_Form_CustomData::buildQuickForm($this);
 
     if ($this->_id) {
       $params = [
@@ -57,7 +71,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->setPageTitle(ts('Financial Account'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -90,7 +103,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id');
     if (!empty($financialAccountType)) {
       $element = $this->add('select', 'financial_account_type_id', ts('Financial Account Type'),
-        ['' => '- select -'] + $financialAccountType, TRUE, ['class' => 'crm-select2 huge']);
+        ['' => ts('- select -')] + $financialAccountType, TRUE, ['class' => 'crm-select2 huge']);
       if ($this->_isARFlag) {
         $element->freeze();
         $elementAccounting->freeze();
@@ -101,6 +114,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       }
     }
 
+    $this->addCustomDataToForm();
     if ($this->_action == CRM_Core_Action::UPDATE &&
       CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $this->_id, 'is_reserved')
     ) {
@@ -115,7 +129,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * @param array $values
    *   posted values of the form
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -131,7 +145,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
         $errorMsg['tax_rate'] = ts('Please enter value for tax rate');
       }
     }
-    if ((CRM_Utils_Array::value('tax_rate', $values) != NULL)) {
+    if ((($values['tax_rate'] ?? NULL) != NULL)) {
       if ($values['tax_rate'] < 0 || $values['tax_rate'] >= 100) {
         $errorMsg['tax_rate'] = ts('Tax Rate Should be between 0 - 100');
       }
@@ -144,7 +158,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
           'financial_account_id' => $self->_id,
           'account_relationship' => $relationshipId,
         ];
-        $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
+        $result = CRM_Financial_BAO_EntityFinancialAccount::retrieve($params, $defaults);
         if ($result) {
           $errorMsg['is_tax'] = ts('Is Tax? must be set for this financial account');
         }
@@ -159,8 +173,9 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
+    $defaults = array_merge($defaults, CRM_Custom_Form_CustomData::setDefaultValues($this));
     if ($this->_action & CRM_Core_Action::ADD) {
-      $defaults['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id');
+      $defaults['contact_id'] = CRM_Core_BAO_Domain::getDomain()->contact_id;
     }
     return $defaults;
   }
@@ -180,6 +195,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     else {
       // store the submitted values in an array
       $params = $this->exportValues();
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->_submitValues, $this->_id, 'FinancialAccount');
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->_id;
@@ -192,7 +208,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       ] as $field) {
         $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
       }
-      $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
+      $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($params);
       CRM_Core_Session::setStatus(ts('The Financial Account \'%1\' has been saved.', [1 => $financialAccount->name]), ts('Saved'), 'success');
     }
   }

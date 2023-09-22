@@ -1,0 +1,32 @@
+<div id="bootstrap-theme">
+  <div ng-init="data = {tokenId: routeParams.id, token: null}"></div>
+
+  <p>This is a temporary debug page. It requires super user permissions or <code>manage oauth client secrets</code>.</p>
+
+  <p>Some (but not all) OAuth2 tokens are based on <a href="https://en.wikipedia.org/wiki/JSON_Web_Token">JWT</a>. If a token is based on JWT, then we can examine its content to learn more about what the token signifies. This may help with debugging token-access issues.</p>
+
+  <div af-api4-ctrl="tokens" af-api4="['OAuthSysToken', 'get', {'where': [['id', '=', routeParams.id]]}]"></div>
+
+  <div ng-if="tokens.result.length == 0">
+    No tokens found.
+  </div>
+
+  <div ng-repeat="token in tokens.result">
+
+    <h3>Token Record</h3>
+
+    <pre>{{token|json}}</pre>
+
+    <h3>Access Token: Raw</h3>
+
+    <pre>{{token.access_token}}</pre>
+
+    <h3>Access Token: JWT Payload</h3>
+
+    (This will only display meaningful data if the token is based on JWT.)
+
+    <pre>{{token.access_token|unvalidatedJwtDecode|json}}</pre>
+
+  </div>
+
+</div>

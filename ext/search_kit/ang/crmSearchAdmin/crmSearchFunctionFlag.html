@@ -1,0 +1,13 @@
+<span ng-switch="$ctrl.widget">
+  <span ng-switch-when="checkbox">
+    <label ng-repeat="(val, label) in $ctrl.param.flag_before" ng-if="val">
+      <input type="checkbox" ng-checked="$ctrl.arg.flag_before === val" ng-click="$ctrl.arg.flag_before = ($ctrl.arg.flag_before === val ? null : val); $ctrl.writeExpr();" >
+      {{ label }}
+    </label>
+  </span>
+  <select ng-switch-when="select" class="form-control" ng-model="$ctrl.arg.flag_before" ng-change="$ctrl.writeExpr();">
+    <option ng-repeat="(val, label) in $ctrl.param.flag_before" value="{{ val }}">
+      {{ label }}
+    </option>
+  </select>
+</span>

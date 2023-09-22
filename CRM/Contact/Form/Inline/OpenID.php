@@ -42,7 +42,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
     $openid = new CRM_Core_BAO_OpenID();
     $openid->contact_id = $this->_contactId;
 
-    $this->_openids = CRM_Core_BAO_Block::retrieveBlock($openid, NULL);
+    $this->_openids = CRM_Core_BAO_Block::retrieveBlock($openid);
   }
 
   /**

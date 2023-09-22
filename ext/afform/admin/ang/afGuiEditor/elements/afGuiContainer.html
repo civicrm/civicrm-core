@@ -1,0 +1,56 @@
+<div class="af-gui-bar {{ block ? 'af-gui-block-bar' : '' }}" ng-if="$ctrl.node['#tag']" ng-click="selectEntity()" >
+  <div ng-if="!$ctrl.loading" class="form-inline" title="{{ $ctrl.getToolTip() }}">
+    <span ng-if="block">{{ $ctrl.join ? ts($ctrl.join) + ':' : ts('Block:') }}</span>
+    <select ng-if="block" ng-model="block.directive" ng-change="selectBlockDirective()" title="{{:: ts('Select block') }}">
+      <option value="">{{:: ts('Custom') }}</option>
+      <option ng-value="option.id" ng-repeat="option in block.options track by option.id">{{ option.text }}</option>
+    </select>
+    <button type="button" class="btn btn-default btn-xs" ng-if="block && !block.layout" ng-click="saveBlock()" title="{{:: ts('Save block') }}">{{:: ts('Save...') }}</button>
+    <div class="btn-group pull-right" title="">
+      <af-gui-container-multi-toggle ng-if="!ctrl.loading && ($ctrl.join || $ctrl.node['af-repeat'])" entity="$ctrl.getFieldEntityType()" class="btn-group"></af-gui-container-multi-toggle>
+      <div class="btn-group" af-gui-menu>
+        <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
+          <span><i class="crm-i fa-gear"></i></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right" ng-if="menu.open" ng-include="'~/afGuiEditor/elements/' + ($ctrl.node['af-fieldset'] === '' ? 'afGuiSearchContainer' : 'afGuiContainer') + '-menu.html'"></ul>
+      </div>
+    </div>
+  </div>
+  <div ng-if="$ctrl.loading"><i class="crm-i fa-spin fa-spinner"></i></div>
+</div>
+<label class="af-gui-node-title af-gui-container-title af-gui-text-h3" ng-if="$ctrl.node['#tag'] && !block" title="{{:: ts('Container title') }}">
+  <i class="crm-i {{ $ctrl.getCollapsibleIcon() }}"></i>
+  <span placeholder="{{:: ts('No title') }}" crm-ui-editable ng-model="$ctrl.getSetTitle" ng-model-options="{getterSetter: true}"></span>
+</label>
+<div ng-if="!$ctrl.loading" ui-sortable="$ctrl.sortableOptions" ui-sortable-update="$ctrl.editor.onDrop" ng-model="getSetChildren" ng-model-options="{getterSetter: true}" class="af-gui-layout {{ getLayout() }}">
+  <div ng-repeat="item in getSetChildren()" >
+    <div ng-switch="$ctrl.getNodeType(item)">
+      <af-gui-container ng-switch-when="fieldset" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] + ' ' + item['class'] }}" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" ></af-gui-container>
+      <af-gui-container ng-switch-when="container" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-container-type-{{ item['#tag'] + ' ' + item['class'] }}" entity-name="$ctrl.entityName" data-entity="{{ $ctrl.getDataEntity() }}" ></af-gui-container>
+      <af-gui-container ng-switch-when="join" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container" join="item['af-join']" entity-name="$ctrl.entityName + '-join-' + item['af-join']" data-entity="{{ $ctrl.entityName + '-join-' + item['af-join'] }}" ></af-gui-container>
+      <af-gui-field ng-switch-when="field" node="item" delete-this="$ctrl.removeElement(item)" ></af-gui-field>
+      <af-gui-text ng-switch-when="text" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-text" ></af-gui-text>
+      <af-gui-markup ng-switch-when="markup" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-markup" ></af-gui-markup>
+      <af-gui-button ng-switch-when="button" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-button" ></af-gui-button>
+      <af-gui-container ng-switch-when="searchFieldset" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] + ' ' + item['class'] }}" ng-class="{'af-entity-selected': isSelectedSearchFieldset(item)}" data-entity="{{ getSearchKey(item) }}" ></af-gui-container>
+      <af-gui-search-display ng-switch-when="searchDisplay" node="item" class="af-gui-element"></af-gui-search-display>
+      <af-gui-generic-element ng-switch-when="generic" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-generic" ></af-gui-generic-element>
+    </div>
+  </div>
+</div>
+<div ng-if="$ctrl.node['af-repeat'] || $ctrl.node['af-repeat'] === ''" class="af-gui-button">
+  <button type="button" class="btn btn-xs btn-primary disabled">
+    <span class="crm-editable-enabled" ng-click="pickAddIcon()" >
+      <i class="crm-i {{ $ctrl.node['add-icon'] || 'fa-plus' }}"></i>
+    </span>
+    <span crm-ui-editable ng-model="$ctrl.node['af-repeat']">{{ $ctrl.node['af-repeat'] }}</span>
+  </button>
+</div>
+<div ng-if="$ctrl.node['af-copy'] || $ctrl.node['af-copy'] === ''" class="af-gui-button">
+  <button type="button" class="btn btn-xs btn-primary disabled">
+    <span class="crm-editable-enabled" ng-click="pickCopyIcon()" >
+      <i class="crm-i {{ $ctrl.node['copy-icon'] || 'fa-copy' }}"></i>
+    </span>
+    <span crm-ui-editable ng-model="$ctrl.node['af-copy']">{{ $ctrl.node['af-copy'] }}</span>
+  </button>
+</div>

@@ -14,7 +14,7 @@
   </td>
 </tr>
 <tr>
-  {if $form.activity_type_id}
+  {if !empty($form.activity_type_id)}
     <td><label>{$form.activity_type_id.label}</label>
        <br />
        {$form.activity_type_id.html}
@@ -22,9 +22,9 @@
   {else}
     <td>&nbsp;</td>
   {/if}
-  {if $form.activity_survey_id || $buildEngagementLevel}
+  {if !empty($form.activity_survey_id) || $buildEngagementLevel}
     <td>
-      {if $form.activity_survey_id}
+      {if !empty($form.activity_survey_id)}
         <label>{$form.activity_survey_id.label}</label>
         <br/>
         {$form.activity_survey_id.html}
@@ -43,14 +43,14 @@
   <td>
     <table>
       <tr><td>
-        {if $form.parent_id}
+        {if !empty($form.parent_id)}
           <label>{ts}Has a Followup Activity?{/ts}</label>
           <br/>
           {$form.parent_id.html}
         {/if}
       </td></tr>
       <tr><td>
-      {if $form.followup_parent_id}
+      {if !empty($form.followup_parent_id)}
           <label>{ts}Is a Followup Activity?{/ts}</label>
           <br/>
           {$form.followup_parent_id.html}
@@ -60,7 +60,7 @@
   </td>
 </tr>
 
-{if $form.activity_tags}
+{if !empty($form.activity_tags)}
   <tr>
     <td><label>{$form.activity_tags.label}</label>
       <br/>
@@ -70,7 +70,7 @@
 {/if}
 
 <tr>
-  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="activity_date_time" colspan="2"}
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="activity_date_time" to='' from='' colspan="2" hideRelativeLabel=0 class =''}
   <td>&nbsp;</td>
 </tr>
 <tr>
@@ -114,10 +114,10 @@
 {/if}
 
 {* campaign in activity search *}
-{include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
-campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
+{include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
+campaignTrClass='' campaignTdClass=''}
 
-{if $activityGroupTree}
+{if !empty($activityGroupTree)}
   <tr id="activityCustom">
     <td id="activityCustomData" colspan="4">
       {include file="CRM/Custom/Form/Search.tpl" groupTree=$activityGroupTree showHideLinks=false}

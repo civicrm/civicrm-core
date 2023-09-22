@@ -40,7 +40,7 @@
  */
 function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
   static $results = [];
-  if ((CRM_Utils_Array::value('cache_clear', $apiRequest['params']))) {
+  if (!empty($apiRequest['params']['cache_clear'])) {
     $results = [];
     // we will also clear pseudoconstants here - should potentially be moved to relevant BAO classes
     CRM_Core_PseudoConstant::flush();
@@ -167,11 +167,11 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
     }
     else {
       // not implemented MagicFunctionProvider
-      $helper = NULL;
+      $helper = '';
     }
   }
   catch (\Civi\API\Exception\NotImplementedException $e) {
-    $helper = NULL;
+    $helper = '';
   }
   if (function_exists($helper)) {
     // alter
@@ -231,7 +231,7 @@ function civicrm_api3_generic_getfield($apiRequest) {
  * @param array $params
  * @param array $apiRequest
  *
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  * @throws \Exception
  */
 function _civicrm_api3_generic_getfield_spec(&$params, $apiRequest) {
@@ -272,18 +272,18 @@ function _civicrm_api3_generic_getfield_spec(&$params, $apiRequest) {
  * @param array $apiRequest
  *   Api request as an array. Keys are.
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return int
  *   count of results
  */
 function civicrm_api3_generic_getcount($apiRequest) {
   $apiRequest['params']['options']['is_count'] = TRUE;
   $result = civicrm_api($apiRequest['entity'], 'get', $apiRequest['params']);
-  if (is_numeric(CRM_Utils_Array::value('values', $result))) {
+  if (is_numeric($result['values'] ?? '')) {
     return (int) $result['values'];
   }
   if (!isset($result['count'])) {
-    throw new API_Exception(ts('Unexpected result from getcount') . print_r($result, TRUE));
+    throw new CRM_Core_Exception(ts('Unexpected result from getcount') . print_r($result, TRUE));
   }
   return $result['count'];
 }
@@ -363,18 +363,18 @@ function _civicrm_api3_generic_getrefcount_spec(&$params, $apiRequest) {
  * @param array $apiRequest
  *   Api request as an array.
  *
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @return array
  *   API result (int 0 or 1)
  */
 function civicrm_api3_generic_getrefcount($apiRequest) {
   $entityToClassMap = CRM_Core_DAO_AllCoreTables::daoToClass();
   if (!isset($entityToClassMap[$apiRequest['entity']])) {
-    throw new API_Exception("The entity '{$apiRequest['entity']}' is unknown or unsupported by 'getrefcount'. Consider implementing this API.", 'getrefcount_unsupported');
+    throw new CRM_Core_Exception("The entity '{$apiRequest['entity']}' is unknown or unsupported by 'getrefcount'. Consider implementing this API.", 'getrefcount_unsupported');
   }
   $daoClass = $entityToClassMap[$apiRequest['entity']];
 
-  /* @var $dao CRM_Core_DAO */
+  /** @var CRM_Core_DAO $dao */
   $dao = new $daoClass();
   $dao->id = $apiRequest['params']['id'];
   if ($dao->find(TRUE)) {
@@ -406,7 +406,7 @@ function civicrm_api3_generic_replace($apiRequest) {
  *
  * @return array
  *   Array of results
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_generic_getoptions($apiRequest) {
   // Resolve aliases.
@@ -419,8 +419,28 @@ function civicrm_api3_generic_getoptions($apiRequest) {
   CRM_Core_DAO::buildOptionsContext($context);
   unset($apiRequest['params']['context'], $apiRequest['params']['field'], $apiRequest['params']['condition']);
 
-  $baoName = _civicrm_api3_get_BAO($apiRequest['entity']);
-  $options = $baoName::buildOptions($fieldName, $context, $apiRequest['params']);
+  // Legacy support for campaign_id fields which used to have a pseudoconstant
+  if ($fieldName === 'campaign_id') {
+    $campaignParams = [
+      'select' => ['id', 'name', 'title'],
+      'options' => ['limit' => 0],
+    ];
+    if ($context === 'match' || $context === 'create') {
+      $campaignParams['is_active'] = 1;
+    }
+    $labelField = $context === 'validate' ? 'name' : 'title';
+    $keyField = $context === 'match' ? 'name' : 'id';
+    $options = array_column(civicrm_api3('Campaign', 'get', $campaignParams)['values'], $labelField, $keyField);
+  }
+  else {
+    $baoName = _civicrm_api3_get_BAO($apiRequest['entity']);
+    if (!isset($apiRequest['params']['check_permissions'])) {
+      // Ensure this is set so buildOptions for ContributionPage.buildOptions
+      // can distinguish between 'who knows' and 'NO'.
+      $apiRequest['params']['check_permissions'] = FALSE;
+    }
+    $options = $baoName::buildOptions($fieldName, $context, $apiRequest['params']);
+  }
   if ($options === FALSE) {
     return civicrm_api3_create_error("The field '{$fieldName}' has no associated option list.");
   }
@@ -434,8 +454,8 @@ function civicrm_api3_generic_getoptions($apiRequest) {
 /**
  * Provide metadata for this generic action
  *
- * @param $params
- * @param $apiRequest
+ * @param array $params
+ * @param array $apiRequest
  */
 function _civicrm_api3_generic_getoptions_spec(&$params, $apiRequest) {
   $params += [
@@ -496,7 +516,12 @@ function _civicrm_api3_generic_get_metadata_options(&$metadata, $apiRequest, $fi
     return;
   }
 
-  $fieldsToResolve = $apiRequest['params']['options']['get_options'];
+  if (!is_array($apiRequest['params']['options'])) {
+    $fieldsToResolve = [];
+  }
+  else {
+    $fieldsToResolve = $apiRequest['params']['options']['get_options'];
+  }
 
   if (!empty($metadata[$fieldname]['options']) || (!in_array($fieldname, $fieldsToResolve) && !in_array('all', $fieldsToResolve))) {
     return;

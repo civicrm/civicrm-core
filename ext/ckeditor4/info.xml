@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<extension key="ckeditor4" type="module">
+  <file>ckeditor4</file>
+  <name>CKEditor4</name>
+  <description>CiviCRM CKEditor4 Plugin.</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Seamus Lee</author>
+    <email>seamus@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">https://github.com/civicrm/civicrm-core/</url>
+    <url desc="Documentation">https://github.com/civicrm/civicrm-core/</url>
+    <url desc="Support">https://github.com/civicrm/civicrm-core/</url>
+    <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2021-05-23</releaseDate>
+  <version>5.67.alpha1</version>
+  <develStage>stable</develStage>
+  <compatibility>
+    <ver>5.67</ver>
+  </compatibility>
+  <comments>This is the version of CKEditor that originally shipped with CiviCRM core</comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <mixins>
+    <mixin>menu-xml@1.0.0</mixin>
+    <mixin>smarty-v2@1.0.0</mixin>
+  </mixins>
+  <civix>
+    <namespace>CRM/Ckeditor4</namespace>
+    <format>23.02.0</format>
+  </civix>
+  <upgrader>CRM_Ckeditor4_Upgrader</upgrader>
+</extension>

@@ -7,11 +7,18 @@
   <comment>Define date preferences for the site</comment>
   <add>2.0</add>
   <log>true</log>
+  <title>Date Preference</title>
+  <paths>
+    <update>civicrm/admin/setting/preferences/date?reset=1&amp;action=update&amp;id=[id]</update>
+  </paths>
   <field>
     <name>id</name>
     <title>Date Preference ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.0</add>
   </field>
   <primaryKey>
@@ -37,6 +44,9 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Description of this date type.</comment>
+    <html>
+      <label>Description</label>
+    </html>
     <add>2.0</add>
   </field>
   <field>
@@ -44,6 +54,9 @@
     <type>int</type>
     <required>true</required>
     <comment>The start offset relative to current year</comment>
+    <html>
+      <label>Start</label>
+    </html>
     <add>2.0</add>
   </field>
   <field>
@@ -58,6 +71,9 @@
     <name>minute_increment</name>
     <type>int</type>
     <comment>The minute increment number</comment>
+    <html>
+      <label>Minute Increment</label>
+    </html>
     <add>2.0</add>
     <drop>3.1</drop>
   </field>
@@ -66,6 +82,9 @@
     <type>varchar</type>
     <length>64</length>
     <comment>The date type</comment>
+    <html>
+      <label>Date Format</label>
+    </html>
     <add>2.0</add>
   </field>
   <field>
@@ -73,6 +92,9 @@
     <type>varchar</type>
     <length>64</length>
     <comment>time format</comment>
+    <html>
+      <label>Time Format</label>
+    </html>
     <add>3.1</add>
   </field>
 </table>

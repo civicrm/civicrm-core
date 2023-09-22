@@ -19,6 +19,9 @@
  */
 class CRM_Activity_Task extends CRM_Core_Task {
 
+  /**
+   * @var string
+   */
   public static $objectType = 'activity';
 
   /**
@@ -44,8 +47,8 @@ class CRM_Activity_Task extends CRM_Core_Task {
         self::TASK_EXPORT => [
           'title' => ts('Export activities'),
           'class' => [
-            'CRM_Export_Form_Select',
-            'CRM_Export_Form_Map',
+            'CRM_Activity_Export_Form_Select',
+            'CRM_Activity_Export_Form_Map',
           ],
           'result' => FALSE,
         ],
@@ -90,8 +93,7 @@ class CRM_Activity_Task extends CRM_Core_Task {
         ],
       ];
 
-      $config = CRM_Core_Config::singleton();
-      if (in_array('CiviCase', $config->enableComponents)) {
+      if (CRM_Core_Component::isEnabled('CiviCase')) {
         if (CRM_Core_Permission::check('access all cases and activities') ||
           CRM_Core_Permission::check('access my cases and activities')
         ) {
@@ -156,11 +158,10 @@ class CRM_Activity_Task extends CRM_Core_Task {
       // make the print task by default
       $value = self::TASK_PRINT;
     }
-
-    return [
-      self::$_tasks[$value]['class'],
-      self::$_tasks[$value]['result'],
-    ];
+    if (isset(self::$_tasks[$value])) {
+      return [(array) self::$_tasks[$value]['class'], self::$_tasks[$value]['result']];
+    }
+    return [[], NULL];
   }
 
 }

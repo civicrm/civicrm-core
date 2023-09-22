@@ -1,7 +1,7 @@
 // https://civicrm.org/licensing
 /**
- * @see https://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface
- * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Ajax+Pages+and+Forms
+ * @see https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
+ * @see https://docs.civicrm.org/dev/en/latest/framework/ajax/
  */
 (function($, CRM, _, undefined) {
   /**
@@ -22,19 +22,30 @@
       mode = CRM.config && CRM.config.isFrontend ? 'front' : 'back';
     }
     query = query || '';
-    var frag = path.split('?');
-    var url = tplURL[mode].replace("civicrm-placeholder-url-path", frag[0]);
-
-    if (!query) {
-      url = url.replace(/[?&]civicrm-placeholder-url-query=1/, '');
+    var url, frag, hash = '';
+    if (path.indexOf('#') > -1) {
+      hash = '#' + path.split('#')[1];
+      path = path.split('#')[0];
     }
-    else {
-      url = url.replace("civicrm-placeholder-url-query=1", typeof query === 'string' ? query : $.param(query));
+    frag = path.split('?');
+    // Remove basepage as it can be changed on some CMS eg. WordPress frontend.
+    frag[0] = frag[0].replace('civicrm/', '/');
+    // Encode url path only if slashes in placeholder were also encoded
+    if (tplURL[mode].indexOf('/crmajax-placeholder-url-path') >= 0) {
+      url = tplURL[mode].replace('/crmajax-placeholder-url-path', frag[0]);
+    } else {
+      url = tplURL[mode].replace('%2Fcrmajax-placeholder-url-path', encodeURIComponent(frag[0]));
+    }
+
+    if (_.isEmpty(query)) {
+      url = url.replace(/[?&]civicrm-placeholder-url-query=1/, '');
+    } else {
+      url = url.replace('civicrm-placeholder-url-query=1', typeof query === 'string' ? query : $.param(query));
     }
     if (frag[1]) {
       url += (url.indexOf('?') < 0 ? '?' : '&') + frag[1];
     }
-    return url;
+    return url + hash;
   };
 
   $.fn.crmURL = function () {
@@ -56,6 +67,7 @@
     return result;
   }
 
+  // https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
   CRM.api4 = function(entity, action, params, index) {
     return new Promise(function(resolve, reject) {
       if (typeof entity === 'string') {
@@ -88,7 +100,7 @@
 
   /**
    * AJAX api
-   * @link http://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface#AJAXInterface-CRM.api3
+   * @link https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
    */
   CRM.api3 = function(entity, action, params, status) {
     if (typeof(entity) === 'string') {
@@ -190,6 +202,7 @@
     options: {
       url: null,
       block: true,
+      post: null,
       crmForm: null
     },
     _originalContent: null,
@@ -260,6 +273,10 @@
         } else {
           url = url.replace(/snippet=[^&]*/, 'snippet=' + snippetType);
         }
+        // See Civi\Angular\AngularLoader
+        if (snippetType === 'json' && CRM.angular) {
+          url += '&crmAngularModules=' + CRM.angular.modules.join();
+        }
       }
       return url;
     },
@@ -275,12 +292,24 @@
         return false;
       });
     },
+    _ajax: function(url) {
+      if (!this.options.post || !this.isOriginalUrl()) {
+        return $.getJSON(url);
+      }
+      return $.post({
+        url: url,
+        dataType: 'json',
+        data: this.options.post
+      });
+    },
     refresh: function() {
-      var that = this;
-      var url = this._formatUrl(this.options.url, 'json');
+      var that = this,
+        hash = this.options.url.split('#')[1],
+        url = this._formatUrl(this.options.url, 'json');
+      $(this.element).data('urlHash', hash);
       if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
       if (this.options.block) this.element.block();
-      $.getJSON(url, function(data) {
+      this._ajax(url).then(function(data) {
         if (data.status === 'redirect') {
           that.options.url = data.userContext;
           return that.refresh();
@@ -309,7 +338,7 @@
             $('[name="'+formElement+'"]', that.element).crmError(msg);
           });
         }
-      }).fail(function(data, msg, status) {
+      }, function(data, msg, status) {
         that._onFailure(data, status);
       });
     },
@@ -481,7 +510,7 @@
       if (settings.openInline) {
         settings.autoClose = $el.crmSnippet('isOriginalUrl');
         $(this).off('.openInline').on('click.openInline', settings.openInline, function(e) {
-          if ($(this).is(exclude + ', .crm-popup')) {
+          if ($(this).is(exclude + ', .crm-popup, [target=crm-popup]')) {
             return;
           }
           if ($(this).hasClass('open-inline-noreturn')) {
@@ -497,10 +526,11 @@
         var buttonContainers = '.crm-submit-buttons, .action-link',
           buttons = [],
           added = [];
-        $(buttonContainers, $el).find('input.crm-form-submit, a.button, button').each(function() {
+        $(buttonContainers, $el).find('.crm-form-submit, .crm-form-xbutton, a.button, button').each(function() {
           var $el = $(this),
             label = $el.is('input') ? $el.attr('value') : $el.text(),
             identifier = $el.attr('name') || $el.attr('href');
+          $el.attr('tabindex', '-1');
           if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
             var $icon = $el.find('.icon, .crm-i'),
               button = {'data-identifier': identifier, text: label, click: function() {
@@ -516,12 +546,12 @@
             added.push(identifier);
           }
           // display:none causes the form to not submit when pressing "enter"
-          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'}).find('.crm-button-icon').hide();
+          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'}).attr('aria-hidden', 'true');
         });
         $el.dialog('option', 'buttons', buttons);
       }
       // Allow a button to prevent ajax submit
-      $('input[data-no-ajax-submit=true]').click(function() {
+      $('input[data-no-ajax-submit=true], button[data-no-ajax-submit=true]').click(function() {
         $(this).closest('form').ajaxFormUnbind();
       });
       // For convenience, focus the first field
@@ -548,7 +578,8 @@
       settings.dialog.height = 300;
     }
     else if ($el.hasClass('medium-popup')) {
-      settings.dialog.width = settings.dialog.height = '50%';
+      settings.dialog.width = '50%';
+      settings.dialog.height = '30%';
     }
     var dialog = popup(url, settings);
     // Trigger events from the dialog on the original link element
@@ -588,7 +619,7 @@
 
   $(function($) {
     $('body')
-      .on('click', 'a.crm-popup', CRM.popup)
+      .on('click', 'a.crm-popup, a[target=crm-popup]', CRM.popup)
       // Close unsaved dialog messages
       .on('dialogopen', function(e) {
         $('.alert.unsaved-dialog .ui-notify-cross', '#crm-notification-container').click();

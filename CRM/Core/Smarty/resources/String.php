@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  * @param $tpl_name
  * @param $tpl_source
  * @param $smarty_obj

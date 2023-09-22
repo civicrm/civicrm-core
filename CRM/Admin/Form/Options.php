@@ -15,6 +15,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\OptionGroup;
+use Civi\Api4\OptionValue;
+
 /**
  * This class generates form components for Options.
  */
@@ -23,7 +26,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   /**
    * The option group name.
    *
-   * @var array
+   * @var string
    */
   protected $_gName;
 
@@ -39,6 +42,11 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * @var bool
    */
   protected $_domainSpecific = FALSE;
+
+  /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
 
   /**
    * Pre-process
@@ -64,7 +72,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'name'
     );
     $this->_gLabel = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->_gid, 'title');
-    $this->_domainSpecific = in_array($this->_gName, CRM_Core_OptionGroup::$_domainIDGroups);
+    $this->_domainSpecific = CRM_Core_OptionGroup::isDomainOptionGroup($this->_gName);
     $url = "civicrm/admin/options/{$this->_gName}";
     $params = "reset=1";
 
@@ -91,7 +99,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     $session->pushUserContext(CRM_Utils_System::url($url, $params));
     $this->assign('id', $this->_id);
 
-    if ($this->_id && in_array($this->_gName, CRM_Core_OptionGroup::$_domainIDGroups)) {
+    if ($this->_id && CRM_Core_OptionGroup::isDomainOptionGroup($this->_gName)) {
       $domainID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domainID) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
@@ -108,7 +116,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     // Default weight & value
     $fieldValues = ['option_group_id' => $this->_gid];
     foreach (['weight', 'value'] as $field) {
-      if (empty($defaults[$field])) {
+      if (!isset($defaults[$field]) || $defaults[$field] === '') {
         $defaults[$field] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $fieldValues, $field);
       }
     }
@@ -119,7 +127,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'postal_greeting',
       'addressee',
     ])) {
-      $defaults['contactOptions'] = (CRM_Utils_Array::value('filter', $defaults)) ? $defaults['filter'] : NULL;
+      $defaults['contact_type_id'] = (CRM_Utils_Array::value('filter', $defaults)) ? $defaults['filter'] : NULL;
     }
     // CRM-11516
     if ($this->_gName == 'payment_instrument' && $this->_id) {
@@ -132,15 +140,28 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   }
 
   /**
-   * Build the form object.
+   * @return string
    */
-  public function buildQuickForm() {
+  public function getOptionGroupName() : string {
+    return $this->_gName;
+  }
+
+  /**
+   * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function buildQuickForm(): void {
     parent::buildQuickForm();
     $this->setPageTitle(ts('%1 Option', [1 => $this->_gLabel]));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
+
+    $optionGroup = OptionGroup::get(FALSE)
+      ->addWhere('id', '=', $this->_gid)
+      ->execute()->first();
 
     $this->applyFilter('__ALL__', 'trim');
 
@@ -169,11 +190,12 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         ['CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'value', $this->_domainSpecific]
       );
     }
-    else {
+
+    // Add icon & color if this option group supports it.
+    if ($optionGroup['option_value_fields'] && in_array('icon', $optionGroup['option_value_fields'])) {
       $this->add('text', 'icon', ts('Icon'), ['class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE]);
     }
-
-    if (in_array($this->_gName, ['activity_status', 'case_status'])) {
+    if ($optionGroup['option_value_fields'] && in_array('color', $optionGroup['option_value_fields'])) {
       $this->add('color', 'color', ts('Color'));
     }
 
@@ -264,8 +286,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
     // If CiviCase enabled AND "Add" mode OR "edit" mode for non-reserved activities, only allow user to pick Core or CiviCase component.
     // FIXME: Each component should define whether adding new activity types is allowed.
-    $config = CRM_Core_Config::singleton();
-    if ($this->_gName == 'activity_type' && in_array("CiviCase", $config->enableComponents) &&
+    if ($this->_gName == 'activity_type' && CRM_Core_Component::isEnabled("CiviCase") &&
       (($this->_action & CRM_Core_Action::ADD) || !$isReserved)
     ) {
       $caseID = CRM_Core_Component::getComponentID('CiviCase');
@@ -304,16 +325,20 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
 
     // get contact type for which user want to create a new greeting/addressee type, CRM-4575
-    if (in_array($this->_gName, ['email_greeting', 'postal_greeting', 'addressee'])
+    if (in_array($optionGroup['name'], ['email_greeting', 'postal_greeting', 'addressee'], TRUE)
       && !$isReserved
     ) {
       $values = [
         1 => ts('Individual'),
         2 => ts('Household'),
         3 => ts('Organization'),
-        4 => ts('Multiple Contact Merge'),
       ];
-      $this->add('select', 'contactOptions', ts('Contact Type'), ['' => '-select-'] + $values, TRUE);
+      if ($optionGroup['name'] !== 'email_greeting') {
+        // This isn't really a contact type - but it becomes available when exporting
+        // if 'Merge All Contacts with the Same Address' is selected.
+        $values[4] = ts('Multiple Contact Merge during Export');
+      }
+      $this->add('select', 'contact_type_id', ts('Contact Type'), ['' => '-select-'] + $values, TRUE);
       $this->assign('showContactFilter', TRUE);
     }
 
@@ -337,7 +362,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param array $self
+   * @param self $self
    *   Current form object.
    *
    * @return array
@@ -346,28 +371,24 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    */
   public static function formRule($fields, $files, $self) {
     $errors = [];
-    if ($self->_gName == 'case_status' && empty($fields['grouping'])) {
+    $optionGroupName = $self->_gName;
+    if ($optionGroupName === 'case_status' && empty($fields['grouping'])) {
       $errors['grouping'] = ts('Status class is a required field');
     }
 
-    if (in_array($self->_gName, ['email_greeting', 'postal_greeting', 'addressee'])
-      && empty($self->_defaultValues['is_reserved'])
+    if (
+      // We are checking no other option value exists for this label+contact type combo.
+      // @todo - bypassing reserved is historical - why would we not do this check for reserved options?
+      empty($self->_defaultValues['is_reserved'])
+      && in_array($optionGroupName, ['email_greeting', 'postal_greeting', 'addressee'], TRUE)
     ) {
-      $label = $fields['label'];
-      $condition = " AND v.label = '{$label}' ";
-      $values = CRM_Core_OptionGroup::values($self->_gName, FALSE, FALSE, FALSE, $condition, 'filter');
-      $checkContactOptions = TRUE;
-
-      if ($self->_id && ($self->_defaultValues['contactOptions'] == $fields['contactOptions'])) {
-        $checkContactOptions = FALSE;
-      }
-
-      if ($checkContactOptions && in_array($fields['contactOptions'], $values)) {
+      if (self::greetingExists($self->_id, $fields['label'], $fields['contact_type_id'], $optionGroupName)) {
         $errors['label'] = ts('This Label already exists in the database for the selected contact type.');
       }
+
     }
 
-    if ($self->_gName == 'from_email_address') {
+    if ($optionGroupName === 'from_email_address') {
       $formEmail = CRM_Utils_Mail::pluckEmailFromHeader($fields['label']);
       if (!CRM_Utils_Rule::email($formEmail)) {
         $errors['label'] = ts('Please enter a valid email address.');
@@ -379,8 +400,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
 
-    $dataType = self::getOptionGroupDataType($self->_gName);
-    if ($dataType && $self->_gName !== 'activity_type') {
+    $dataType = self::getOptionGroupDataType($optionGroupName);
+    if ($dataType && $optionGroupName !== 'activity_type') {
       $validate = CRM_Utils_Type::validate($fields['value'], $dataType, FALSE);
       if ($validate === FALSE) {
         CRM_Core_Session::setStatus(
@@ -389,6 +410,31 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
     return $errors;
+  }
+
+  /**
+   * Does an existing option already have this label for this contact type.
+   *
+   * @param int|null $id
+   * @param string $label
+   * @param int $contactTypeID
+   * @param string $optionGroupName
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected static function greetingExists(?int $id, string $label, int $contactTypeID, string $optionGroupName): bool {
+    $query = OptionValue::get(FALSE)
+      ->addWhere('label', '=', $label)
+      ->addWhere('option_group_id.name', '=', $optionGroupName)
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('filter', '=', (int) $contactTypeID)
+      ->addSelect('rowCount');
+    if ($id) {
+      $query->addWhere('id', '<>', $id);
+    }
+    return (bool) $query->execute()->count();
   }
 
   /**
@@ -413,7 +459,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $fieldValues = ['option_group_id' => $this->_gid];
       CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $this->_id, $fieldValues);
 
-      if (CRM_Core_BAO_OptionValue::del($this->_id)) {
+      if (CRM_Core_BAO_OptionValue::deleteRecord(['id' => $this->_id])) {
         if ($this->_gName == 'phone_type') {
           CRM_Core_BAO_Phone::setOptionToNull(CRM_Utils_Array::value('value', $this->_defaultValues));
         }
@@ -427,24 +473,14 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
     else {
       $params = $this->exportValues();
-
-      // allow multiple defaults within group.
-      $allowMultiDefaults = ['email_greeting', 'postal_greeting', 'addressee', 'from_email_address'];
-      if (in_array($this->_gName, $allowMultiDefaults)) {
-        if ($this->_gName == 'from_email_address') {
-          $params['reset_default_for'] = ['domain_id' => CRM_Core_Config::domainID()];
-        }
-        elseif ($filter = CRM_Utils_Array::value('contactOptions', $params)) {
-          $params['filter'] = $filter;
-          $params['reset_default_for'] = ['filter' => "0, " . $params['filter']];
-        }
-
-        //make sure we only have a single space, CRM-6977 and dev/mail/15
-        if ($this->_gName == 'from_email_address') {
-          $params['label'] = $this->sanitizeFromEmailAddress($params['label']);
-        }
+      if ($this->isGreetingOptionGroup()) {
+        $params['filter'] = $params['contact_type_id'];
       }
 
+      //make sure we only have a single space, CRM-6977 and dev/mail/15
+      if ($this->_gName == 'from_email_address') {
+        $params['label'] = $this->sanitizeFromEmailAddress($params['label']);
+      }
       // set value of filter if not present in params
       if ($this->_id && !array_key_exists('filter', $params)) {
         if ($this->_gName == 'participant_role') {
@@ -473,6 +509,15 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   public function sanitizeFromEmailAddress($email) {
     preg_match("/^\"(.*)\" *<([^@>]*@[^@>]*)>$/", $email, $parts);
     return "\"{$parts[1]}\" <$parts[2]>";
+  }
+
+  /**
+   * Is the option group one of our greetings.
+   *
+   * @return bool
+   */
+  protected function isGreetingOptionGroup(): bool {
+    return in_array($this->getOptionGroupName(), ['email_greeting', 'postal_greeting', 'addressee'], TRUE);
   }
 
 }

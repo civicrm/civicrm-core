@@ -11,11 +11,10 @@
 <div class="crm-block crm-form-block crm-contribution_type-form-block crm-financial_type-form-block">
 {if $action eq 8}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {ts}WARNING: You cannot delete a {$delName} Financial Account if it is currently used by any Financial Types. Consider disabling this option instead.{/ts} {ts}Deleting a financial type cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
   </div>
 {else}
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
     <tr class="crm-contribution-form-block-name">
       <td class="label">{$form.name.label}</td>
@@ -76,6 +75,9 @@
       </td>
     </tr>
   </table>
+  <div id="financial_account_custom_field_extension_section" class="crm-accordion-wrapper crm-financial-account-panel">
+  {include file="CRM/Custom/Form/CustomData.tpl"}
+  </div>
 {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
 </div>

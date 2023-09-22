@@ -133,7 +133,7 @@ function getValues(&$contactIDs, &$values) {
  * @param $tableName
  * @param $fields
  * @param $whereField
- * @param null $additionalWhereCond
+ * @param string|null $additionalWhereCond
  */
 function getTableInfo(&$contactIDs, &$values, $tableName, &$fields, $whereField, $additionalWhereCond = NULL) {
   $selectString = implode(',', array_keys($fields));

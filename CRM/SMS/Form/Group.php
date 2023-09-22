@@ -30,10 +30,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/mailing/browse', 'reset=1&sms=1'));
-
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $this->assign('isAdmin', 1);
-    }
+    $this->assign('isAdmin', CRM_Core_Permission::check('administer CiviCRM'));
   }
 
   /**
@@ -97,12 +94,12 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
     $this->add('select', 'sms_provider_id',
       ts('Select SMS Provider'),
-      CRM_Utils_Array::collect('title', CRM_SMS_BAO_Provider::getProviders()),
+      CRM_Utils_Array::collect('title', CRM_SMS_BAO_Provider::getProviders(NULL, ['is_active' => 1])),
       TRUE
     );
 
     // Get the mailing groups.
-    $groups = CRM_Core_PseudoConstant::nestedGroup('Mailing');
+    $groups = CRM_Core_PseudoConstant::nestedGroup(TRUE, 'Mailing');
 
     // Get the sms mailing list.
     $mailings = CRM_Mailing_PseudoConstant::completed('sms');
@@ -267,7 +264,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     // also compute the recipients and store them in the mailing recipients table
     CRM_Mailing_BAO_Mailing::getRecipients($mailing->id);
 
-    $count = CRM_Mailing_BAO_Recipients::mailingSize($mailing->id);
+    $count = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing->id);
     $this->set('count', $count);
     $this->assign('count', $count);
     $this->set('groups', $groups);

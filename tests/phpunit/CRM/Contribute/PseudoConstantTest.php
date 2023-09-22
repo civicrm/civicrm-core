@@ -18,7 +18,7 @@ class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
   /**
    * Clean up after tests.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
@@ -30,7 +30,7 @@ class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
    *
    * Future is CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship
    */
-  public function testGetRelationalFinancialAccount() {
+  public function testGetRelationalFinancialAccount(): void {
     $financialTypes = $this->callAPISuccess('FinancialType', 'get', [])['values'];
     $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', [])['values'];
     foreach ($financialTypes as $financialType) {
@@ -59,11 +59,11 @@ class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
    *
    * Future is CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship
    */
-  public function testGetRelationalFinancialAccountForPaymentInstrument() {
+  public function testGetRelationalFinancialAccountForPaymentInstrument(): void {
     $paymentInstruments = $this->callAPISuccess('Contribution', 'getoptions', ['field' => 'payment_instrument_id'])['values'];
     $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', [])['values'];
     foreach ($paymentInstruments as $paymentInstrumentID => $paymentInstrumentName) {
-      $financialAccountID = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($paymentInstrumentID);
+      $financialAccountID = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($paymentInstrumentID);
       if (in_array($paymentInstrumentName, ['Credit Card', 'Debit Card'])) {
         $this->assertEquals('Payment Processor Account', $financialAccounts[$financialAccountID]['name']);
       }

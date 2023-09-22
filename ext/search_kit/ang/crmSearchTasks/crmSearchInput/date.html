@@ -1,0 +1,35 @@
+<div class="form-group">
+  <select class="form-control" ng-if="$ctrl.isMulti() === false" ng-model="$ctrl.dateType" ng-change="$ctrl.changeDateType()">
+    <option value="fixed">{{:: ts('Pick Date') }}</option>
+    <option value="range">{{:: ts('Date Range') }}</option>
+    <option value="now">{{:: ts('Now') }}</option>
+    <option value="now -">{{:: ts('Before now') }}</option>
+    <option value="now +">{{:: ts('After now') }}</option>
+  </select>
+
+  <div class="form-group" ng-switch="$ctrl.dateType">
+
+    <div class="form-group" ng-switch-when="fixed">
+      <input class="form-control" crm-ui-datepicker="{time: $ctrl.field.data_type === 'Timestamp'}" ng-model="$ctrl.value" ng-required="!$ctrl.field.nullable" ng-if="!$ctrl.isMulti()">
+      <input class="form-control" crm-multi-select-date ng-model="$ctrl.value" ng-required="!$ctrl.field.nullable" ng-if="$ctrl.isMulti()">
+    </div>
+
+    <div class="form-group" ng-switch-when="range">
+      <input class="form-control" crm-ui-select="{data: $ctrl.dateRanges}" ng-model="$ctrl.value" >
+    </div>
+
+    <div class="form-group" ng-switch-when="now +|now -" ng-switch-when-separator="|">
+      <input class="form-control" type="number" min="1" step="1" ng-model="$ctrl.dateNumber" ng-model-options="{getterSetter: true}" >
+      <select class="form-control" ng-model="$ctrl.dateUnits" ng-model-options="{getterSetter: true}" >
+        <option value="second" ng-if="$ctrl.field.data_type === 'Timestamp'">{{ $ctrl.dateNumber() === 1 ? ts('Second') : ts('Seconds') }}</option>
+        <option value="minute" ng-if="$ctrl.field.data_type === 'Timestamp'">{{ $ctrl.dateNumber() === 1 ? ts('Minute') : ts('Minutes') }}</option>
+        <option value="hour" ng-if="$ctrl.field.data_type === 'Timestamp'">{{ $ctrl.dateNumber() === 1 ? ts('Hour') : ts('Hours') }}</option>
+        <option value="day">{{ $ctrl.dateNumber() === 1 ? ts('Day') : ts('Days') }}</option>
+        <option value="week">{{ $ctrl.dateNumber() === 1 ? ts('Week') : ts('Weeks') }}</option>
+        <option value="month">{{ $ctrl.dateNumber() === 1 ? ts('Month') : ts('Months') }}</option>
+        <option value="year">{{ $ctrl.dateNumber() === 1 ? ts('Year') : ts('Years') }}</option>
+      </select>
+    </div>
+
+  </div>
+</div>

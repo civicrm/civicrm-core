@@ -1,0 +1,13 @@
+<div class="form-inline">
+  <label for="crm-search-admin-col-size-{{$index}}">
+    {{:: ts('Button Size') }}
+  </label>
+  <select id="crm-search-admin-col-size-{{$index}}" class="form-control" ng-model="col.size">
+    <option value="btn-lg">{{:: ts('Large') }}</option>
+    <option value="">{{:: ts('Regular') }}</option>
+    <option value="btn-sm">{{:: ts('Small') }}</option>
+    <option value="btn-xs">{{:: ts('Tiny') }}</option>
+  </select>
+</div>
+<hr>
+<crm-search-admin-link-group links="$ctrl.parent.getLinks()" group="col.links" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></crm-search-admin-link-group>

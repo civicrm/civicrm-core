@@ -7,7 +7,7 @@ CRM.$(function($) {
   $('<br>')
     .appendTo($('#update_modified_date'));
   $('<button>')
-    .text("{/literal}{ts}Save Anyway{/ts}{literal}")
+    .text("{/literal}{ts escape='js'}Save Anyway{/ts}{literal}")
     .click(function() {
       $('input[name="modified_date"]').val(
               $('#update_modified_date').attr('data:latest_modified_date')
@@ -18,7 +18,7 @@ CRM.$(function($) {
     .appendTo($('#update_modified_date'))
     ;
   $('<button>')
-    .text("{/literal}{ts}Reload Page{/ts}{literal}")
+    .text("{/literal}{ts escape='js'}Reload Page{/ts}{literal}")
     .click(function() {
       window.location.href = CRM.url('civicrm/contact/add', {
         reset: 1,

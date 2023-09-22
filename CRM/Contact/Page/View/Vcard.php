@@ -127,7 +127,7 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
         if ($vcardName) {
           $vcard->addParam('TYPE', $vcardName);
         }
-        if ($phone['is_primary']) {
+        if (!empty($phone['is_primary'])) {
           $vcard->addParam('TYPE', 'PREF');
         }
       }
@@ -140,7 +140,7 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
         if ($vcardName) {
           $vcard->addParam('TYPE', $vcardName);
         }
-        if ($email['is_primary']) {
+        if (!empty($email['is_primary'])) {
           $vcard->addParam('TYPE', 'PREF');
         }
       }

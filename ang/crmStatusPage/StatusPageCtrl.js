@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  angular.module('statuspage').controller('statuspageStatusPage',
+  angular.module('crmStatusPage').controller('crmStatusPageCtrl',
     function($scope, crmApi, crmStatus, statusData) {
       $scope.ts = CRM.ts();
       $scope.help = CRM.help;
@@ -10,7 +10,7 @@
       // Refresh the list. Optionally execute api calls first.
       function refresh(apiCalls, title) {
         title = title || 'Untitled operation';
-        apiCalls = (apiCalls || []).concat([['System', 'check', {sequential: 1}]]);
+        apiCalls = (apiCalls || []).concat([['System', 'check', {sequential: 1, options: {limit: 0, sort: 'severity_id DESC'}}]]);
         $('#crm-status-list').block();
         crmApi(apiCalls, true)
           .then(function(results) {
@@ -40,7 +40,7 @@
           }]
         ], 'Set preference');
       };
-      
+
       $scope.countVisible = function(visibility) {
         return _.filter($scope.statuses, function(s) {
           return s.is_visible == visibility && s.severity_id >= 2;

@@ -24,23 +24,29 @@
   </div>
 {/if}
 
-{if $pageTitle}
-  <div class="crm-title">
-    <h1 class="title">{if $isDeleted}<del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
-  </div>
+{if $urlIsPublic}
+    {if $pageTitle}
+      <div class="crm-title">
+        <h2 class="title">{$pageTitle}</h2>
+      </div>
+    {/if}
+{else}
+    {if $pageTitle}
+      <div class="crm-title">
+        <h1 class="title">{if $isDeleted}
+          <del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
+      </div>
+    {/if}
 {/if}
 
 {crmRegion name='page-header'}
 {/crmRegion}
 <div class="clear"></div>
 
-{if isset($localTasks) and $localTasks}
-    {include file="CRM/common/localNav.tpl"}
-{/if}
 <div id="crm-main-content-wrapper">
   {include file="CRM/common/status.tpl"}
   {crmRegion name='page-body'}
-    {if isset($isForm) and $isForm and isset($formTpl)}
+    {if $isForm and $formTpl}
       {include file="CRM/Form/$formTpl.tpl"}
     {else}
       {include file=$tplFile}

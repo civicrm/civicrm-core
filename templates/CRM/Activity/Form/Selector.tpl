@@ -14,17 +14,19 @@
 
 {strip}
 <table class="selector row-highlight">
-   <thead>
-     <tr class="sticky">
-       {if !$single and $context eq 'Search' }
-          <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
+   <thead class="sticky">
+     <tr>
+       {if !$single and $context eq 'Search'}
+          <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
        {/if}
        {foreach from=$columnHeaders item=header}
           <th scope="col">
           {if $header.sort}
             {assign var='key' value=$header.sort}
-            {$sort->_response.$key.link}
-          {else}
+            {if !empty($sort)}
+              {$sort->_response.$key.link}
+            {/if}
+          {elseif $header.name}
             {$header.name}
           {/if}
           </th>
@@ -35,9 +37,9 @@
 
   {counter start=0 skip=1 print=false}
   {foreach from=$rows item=row}
-  <tr id='rowid{$row.activity_id}' class="{cycle values="odd-row,even-row"} {$row.class}">
-  {if !$single }
-        {if $context eq 'Search' }
+  <tr id='rowid{$row.activity_id}' class="{cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}">
+  {if !$single}
+        {if $context eq 'Search'}
           {assign var=cbName value=$row.checkbox}
           <td>{$form.$cbName.html}</td>
      {/if}
@@ -52,15 +54,13 @@
       {/if}
     </td>
 
-  <td>{$row.activity_subject}</td>
+  <td>{$row.activity_subject|purify}</td>
 
     <td>
     {if !$row.source_contact_id}
       <em>n/a</em>
-    {elseif $contactId NEQ $row.source_contact_id}
-      <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.source_contact_id`"}" title="{ts}View contact{/ts}">{$row.source_contact_name}</a>
     {else}
-      {$row.source_contact_name}
+      <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.source_contact_id`"}" title="{ts}View contact{/ts}">{$row.source_contact_name|purify}</a>
     {/if}
     </td>
 
@@ -102,7 +102,14 @@
 
     <td>{$row.activity_status}</td>
 
-    <td>{$row.action|replace:'xx':$row.id}</td>
+    <td>
+      {if (!empty($row.id))}
+        {$row.action|smarty:nodefaults|replace:'xx':$row.id}
+      {else}
+        {$row.action}
+      {/if}
+    </td>
+
   </tr>
   {/foreach}
 

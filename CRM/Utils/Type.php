@@ -236,6 +236,7 @@ class CRM_Utils_Type {
       case 'Date':
       case 'Timestamp':
       case 'ContactReference':
+      case 'EntityReference':
       case 'MysqlOrderByDirection':
         $validatedData = self::validate($data, $type, $abort);
         if (isset($validatedData)) {
@@ -334,11 +335,10 @@ class CRM_Utils_Type {
 
       default:
         throw new CRM_Core_Exception(
-          $type . " is not a recognised (camel cased) data type."
+          $type . " is not a recognized (camel cased) data type."
         );
     }
 
-    // @todo Use exceptions instead of CRM_Core_Error::fatal().
     if ($abort) {
       $data = htmlentities($data);
 
@@ -381,6 +381,7 @@ class CRM_Utils_Type {
       'Date',
       'Timestamp',
       'ContactReference',
+      'EntityReference',
       'MysqlColumnNameOrAlias',
       'MysqlOrderByDirection',
       'MysqlOrderBy',
@@ -390,7 +391,7 @@ class CRM_Utils_Type {
       'Color',
     ];
     if (!in_array($type, $possibleTypes)) {
-      throw new CRM_Core_Exception(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
+      throw new CRM_Core_Exception('Invalid type, must be one of : ' . implode($possibleTypes));
     }
     switch ($type) {
       case 'Integer':
@@ -422,8 +423,8 @@ class CRM_Utils_Type {
       case 'Date':
       case 'Timestamp':
         // a null timestamp is valid
-        if (strlen(trim($data)) == 0) {
-          return trim($data);
+        if (strlen(trim($data ?? '')) == 0) {
+          return trim($data ?? '');
         }
 
         if ((preg_match('/^\d{14}$/', $data) ||
@@ -436,12 +437,13 @@ class CRM_Utils_Type {
         break;
 
       case 'ContactReference':
+      case 'EntityReference':
         // null is valid
         if (strlen(trim($data)) == 0) {
           return trim($data);
         }
 
-        if (CRM_Utils_Rule::validContact($data)) {
+        if (CRM_Utils_Rule::positiveInteger($data)) {
           return (int) $data;
         }
         break;
@@ -466,11 +468,108 @@ class CRM_Utils_Type {
     }
 
     if ($abort) {
-      $data = htmlentities($data);
+      // Note the string 'NULL' is just for display purposes here and to avoid
+      // passing real null to htmlentities - it's not for database queries.
+      $data = htmlentities($data ?? 'NULL');
       throw new CRM_Core_Exception("$name (value: $data) is not of the type $type");
     }
 
     return NULL;
+  }
+
+  /**
+   * Validate that a value matches a PHP type.
+   *
+   * Note that, at a micro-level, this is probably slower than using real PHP type-checking, but it doesn't seem bad.
+   * (In light benchmarking of ~1000 validations on an i3-10100, there is no obvious effect on the execution-time.)
+   * Should be fast enough for validating business entities.
+   *
+   * Example usage: 'validatePhpType(123, 'int|double');`
+   *
+   * @param mixed $value
+   * @param string|string[] $types
+   *   The list of acceptable PHP types and/or classnames.
+   *   Either an array or a string (with '|' delimiters).
+   *   Note that 'null' is a distinct type.
+   *   Ex: 'int'
+   *   Ex: 'Countable|null'
+   *   Ex: 'string|bool'
+   *   Ex: 'string|false'
+   * @param bool $isStrict
+   *   If data is likely to come from another text medium, then you may want to
+   *   allow (say) numbers and string-like-numbers to be used interchangably.
+   *
+   *   With $isStrict=TRUE, the string "123" does not match type "int". The int 456 does not match type "double". etc.
+   *
+   *   With $isStrict=FALSE, the string "123" will match types "string", "int", and "double".
+   * @return bool
+   */
+  public static function validatePhpType($value, $types, bool $isStrict = TRUE) {
+    if (is_string($types)) {
+      $types = preg_split('/ *\| */', $types);
+    }
+
+    $checkTypeStrict = function($type, $value) {
+      static $aliases = ['integer' => 'int', 'boolean' => 'bool', 'float' => 'double', 'NULL' => 'null'];
+      switch ($type) {
+        case 'mixed':
+          return TRUE;
+
+        case 'false':
+        case 'FALSE':
+        case 'true':
+        case 'TRUE':
+          $expectBool = mb_strtolower($type) === 'true';
+          return $value === $expectBool;
+      }
+      $realType = gettype($value);
+      if (($aliases[$realType] ?? $realType) === ($aliases[$type] ?? $type)) {
+        return TRUE;
+      }
+      if ($realType === 'object' && $value instanceof $type) {
+        return TRUE;
+      }
+      return FALSE;
+    };
+    $checkTypeRelaxed = function($type, $value) use ($checkTypeStrict) {
+      switch ($type) {
+        case 'string':
+          return is_string($value) || is_int($value) || is_float($value);
+
+        case 'bool':
+        case 'boolean':
+          return is_bool($value) || CRM_Utils_Rule::integer($value);
+
+        case 'int':
+        case' integer':
+          return CRM_Utils_Rule::integer($value);
+
+        case 'float':
+        case 'double':
+          return CRM_Utils_Rule::numeric($value);
+
+        default:
+          return $checkTypeStrict($type, $value);
+      }
+    };
+    $checkType = $isStrict ? $checkTypeStrict : $checkTypeRelaxed;
+
+    foreach ($types as $type) {
+      $isTypedArray = substr($type, -2, 2) === '[]';
+      if (!$isTypedArray && $checkType($type, $value)) {
+        return TRUE;
+      }
+      if ($isTypedArray && is_array($value)) {
+        $baseType = substr($type, 0, -2);
+        foreach ($value as $vItem) {
+          if (!\CRM_Utils_Type::validatePhpType($vItem, [$baseType], $isStrict)) {
+            continue 2;
+          }
+        }
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -512,7 +611,7 @@ class CRM_Utils_Type {
   }
 
   /**
-   * Get list of avaliable Data Types for Option Groups
+   * Get list of available Data Types for Option Groups
    *
    * @return array
    */
@@ -527,6 +626,32 @@ class CRM_Utils_Type {
       'Email',
     ];
     return array_combine($types, $types);
+  }
+
+  /**
+   * Get all the types that are text-like.
+   *
+   * The returned types would all legitimately be compared to '' by mysql
+   * in a query.
+   *
+   * e.g
+   * WHERE display_name = '' is valid
+   * WHERE id = '' is not and in some mysql configurations and queries
+   * could cause an error.
+   *
+   * @return array
+   */
+  public static function getTextTypes(): array {
+    return [
+      self::T_STRING,
+      self::T_ENUM,
+      self::T_TEXT,
+      self::T_LONGTEXT,
+      self::T_BLOB,
+      self::T_EMAIL,
+      self::T_URL,
+      self::T_MEDIUMBLOB,
+    ];
   }
 
 }

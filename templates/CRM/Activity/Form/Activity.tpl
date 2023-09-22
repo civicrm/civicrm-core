@@ -11,15 +11,11 @@
   {if $action eq 4}
     <div class="crm-block crm-content-block crm-activity-view-block">
   {else}
-    {if $activityTypeDescription }
+    {if $activityTypeDescription}
       <div class="help">{$activityTypeDescription}</div>
     {/if}
     <div class="crm-block crm-form-block crm-activity-form-block">
   {/if}
-  {if !$action or ( $action eq 1 ) or ( $action eq 2 ) }
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-  {/if}
-
   {if $action eq 8} {* Delete action. *}
   <table class="form-layout">
   <tr>
@@ -32,7 +28,7 @@
   <table class="{if $action eq 4}crm-info-panel{else}form-layout{/if}">
 
   {if $action eq 4}
-    {if $activityTypeDescription }
+    {if $activityTypeDescription}
     <div class="help">{$activityTypeDescription}</div>
     {/if}
   {else}
@@ -78,7 +74,7 @@
       <td>
         {$form.assignee_contact_id.html}
         {if $action neq 4}
-          {if !$form.target_contact_id.frozen}
+          {if empty($disable_swap_button)}
             <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
               <i class="crm-i fa-random" aria-hidden="true"></i>
             </a>
@@ -92,7 +88,7 @@
   </tr>
 
   {if $activityTypeFile}
-  {include file="CRM/$crmDir/Form/Activity/$activityTypeFile.tpl"}
+    {include file="CRM/$crmDir/Form/Activity/$activityTypeFile.tpl"}
   {/if}
 
   <tr class="crm-activity-form-block-subject">
@@ -104,7 +100,7 @@
   campaignTrClass="crm-activity-form-block-campaign_id"}
 
   {* build engagement level CRM-7775 *}
-  {if $buildEngagementLevel}
+  {if !empty($buildEngagementLevel)}
   <tr class="crm-activity-form-block-engagement_level">
     <td class="label">{$form.engagement_level.label}</td>
     <td class="view-value">{$form.engagement_level.html}</td>
@@ -138,7 +134,7 @@
       <td class="view-value">
       {$form.details.html}
       </td>
-    {elseif $activityTypeNameAndLabel.machineName eq "Inbound Email"}
+    {elseif $activityTypeNameAndLabel.machineName eq "Inbound Email" && $form.details.value|crmStripAlternatives|strip_tags eq $form.details.value|crmStripAlternatives}
       <td class="view-value">
        {$form.details.html|crmStripAlternatives|nl2br}
       </td>
@@ -151,12 +147,12 @@
   <tr class="crm-activity-form-block-priority_id">
     <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
   </tr>
-  {if $surveyActivity }
+  {if !empty($surveyActivity)}
   <tr class="crm-activity-form-block-result">
     <td class="label">{$form.result.label}</td><td class="view-value">{$form.result.html}</td>
   </tr>
   {/if}
-  {if $form.tag.html}
+  {if $form.tag}
   <tr class="crm-activity-form-block-tag">
     <td class="label">{$form.tag.label}</td>
     <td class="view-value">
@@ -165,7 +161,7 @@
   </tr>
   {/if}
 
-  {if $tagsetInfo.activity}
+  {if $isTagset}
     <tr class="crm-activity-form-block-tag_set">
       {include file="CRM/common/Tagset.tpl" tagsetType='activity' tableLayout=true}
     </tr>
@@ -236,7 +232,7 @@
   </table>
   <div class="crm-submit-buttons">
   {if $action eq 4 && ($activityTypeNameAndLabel.machineName neq 'Inbound Email' || $allow_edit_inbound_emails == 1)}
-    {if !$context }
+    {if !$context}
       {assign var="context" value='activity'}
     {/if}
     {if $permission EQ 'edit'}
@@ -282,4 +278,4 @@
   {/if}
   </div>{* end of form block*}
 
-{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity"}
+{include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity" isRepeatingEntity=false}

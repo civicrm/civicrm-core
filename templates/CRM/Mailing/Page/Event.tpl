@@ -9,7 +9,7 @@
 *}
 {include file="CRM/common/pager.tpl" location="top"}
 
-{if $rows }
+{if $rows}
   {include file="CRM/common/jsortable.tpl"}
   {strip}
     <table id="mailing_event">
@@ -39,7 +39,7 @@
   {/strip}
 {else}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     &nbsp;
     {ts 1=$title}There are currently no %1.{/ts}
   </div>
@@ -56,7 +56,7 @@
   <script type="text/javascript">
     var totalPages = {/literal}{$pager->_totalPages}{literal};
     CRM.$(function($) {
-      $("#crm-container .crm-pager input.crm-form-submit").click(function () {
+      $("#crm-container .crm-pager button.crm-form-submit").click(function () {
         submitPagerData(this);
       });
     });
@@ -71,8 +71,8 @@
         jumpTo = totalPages;
       }
       {/literal}
-      {foreach from=$pager->_linkData item=val key=k }
-        {if $k neq 'crmPID' && $k neq 'force' && $k neq 'q' }
+      {foreach from=$pager->_linkData item=val key=k}
+        {if $k neq 'crmPID' && $k neq 'force' && $k neq 'q'}
         {literal}
         urlParams += '&{/literal}{$k}={$val}{literal}';
         {/literal}
@@ -80,7 +80,7 @@
       {/foreach}
       {literal}
       urlParams += '&crmPID=' + parseInt(jumpTo);
-      var submitUrl = {/literal}'{crmURL p="civicrm/mailing/report/event" q="force=1" h=0 }'{literal};
+      var submitUrl = {/literal}'{crmURL p="civicrm/mailing/report/event" q="force=1" h=0}'{literal};
       document.location = submitUrl + urlParams;
     }
   </script>

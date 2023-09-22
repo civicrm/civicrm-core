@@ -13,13 +13,13 @@
   <tr>
     <td colspan="5">
       <div class="crm-submit-buttons">
-        {include file="CRM/common/formButtons.tpl"}
+        {include file="CRM/common/formButtons.tpl" location=''}
       </div>
     </td>
   </tr>
   <tr>
     <td>{ts}Email{/ts}&nbsp;
-      {if $actualBlockCount lt 5 }
+      {if $actualBlockCount lt 5}
         <span id="add-more-email" title="{ts}click to add more{/ts}">
           <a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a>
         </span>
@@ -37,12 +37,7 @@
       <td align="center">{$form.email.$blockId.on_hold.html}</td>
       <td align="center" {if !$multipleBulk}class="crm-email-bulkmail"{/if}>{$form.email.$blockId.is_bulkmail.html}</td>
       <td align="center" class="crm-email-is_primary">{$form.email.$blockId.is_primary.1.html}</td>
-      <td>
-        {if $blockId gt 1}
-          <a title="{ts}Delete Email{/ts}" class="crm-delete-inline crm-hover-button" href="#"><span
-              class="icon delete-icon"></span></a>
-        {/if}
-      </td>
+      <td><a title="{ts}Delete Email{/ts}" class="crm-delete-inline crm-hover-button" href="#"><span class="icon delete-icon"></span></a></td>
     </tr>
   {/section}
 </table>

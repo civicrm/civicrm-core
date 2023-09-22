@@ -23,29 +23,9 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   use CRM_Core_Form_EntityFormTrait;
 
   /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * Fields may have keys
-   *  - name (required to show in tpl from the array)
-   *  - description (optional, will appear below the field)
-   *  - not-auto-addable - this class will not attempt to add the field using addField.
-   *    (this will be automatically set if the field does not have html in it's metadata
-   *    or is not a core field on the form's entity).
-   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
-   *  - template - use a field specific template to render this field
-   *  - required
-   *  - is_freeze (field should be frozen).
-   *
-   * @var array
+   * @var bool
    */
-  protected $entityFields = [];
-
-  /**
-   * Deletion message to be assigned to the form.
-   *
-   * @var string
-   */
-  protected $deleteMessage;
+  public $submitOnce = TRUE;
 
   /**
    * Set entity fields to be assigned to the form.
@@ -104,6 +84,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * Set variables up before form is built.
    */
   public function preProcess() {
+    $this->preventAjaxSubmit();
     // current form id
     $this->_id = $this->get('id');
     if (!$this->_id) {
@@ -119,7 +100,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
 
     // setting title for html page
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      CRM_Utils_System::setTitle(ts('Profile Settings') . " - $title");
+      $this->setTitle(ts('Profile Settings') . " - $title");
     }
     elseif ($this->_action & (CRM_Core_Action::DISABLE | CRM_Core_Action::DELETE)) {
       $ufGroup['module'] = implode(' , ', CRM_Core_BAO_UFGroup::getUFJoinRecord($this->_id, TRUE));
@@ -144,7 +125,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       $this->assign('message', $message);
     }
     else {
-      CRM_Utils_System::setTitle(ts('New CiviCRM Profile'));
+      $this->setTitle(ts('New CiviCRM Profile'));
     }
   }
 
@@ -194,9 +175,11 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     $this->addRule('weight', ts('is a numeric field'), 'numeric');
 
     // is this group active ?
-    $this->addElement('checkbox', 'is_active', ts('Is this CiviCRM Profile active?'));
+    $this->addElement('advcheckbox', 'is_active', ts('Is this CiviCRM Profile active?'));
 
-    $paneNames = ['Advanced Settings' => 'buildAdvanceSetting'];
+    $paneNames = [
+      ts('Advanced Settings') => 'buildAdvanceSetting',
+    ];
 
     foreach ($paneNames as $name => $type) {
       if ($this->_id) {
@@ -227,12 +210,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
         'name' => ts('Cancel'),
       ],
     ]);
-
-    // views are implemented as frozen form
-    if ($this->_action & CRM_Core_Action::VIEW) {
-      $this->freeze();
-      $this->addElement('button', 'done', ts('Done'), ['onclick' => "location.href='civicrm/admin/uf/group?reset=1&action=browse'"]);
-    }
 
     $this->addFormRule(['CRM_UF_Form_Group', 'formRule'], $this);
   }
@@ -276,8 +253,8 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       $showAdvanced = 0;
       $advFields = [
         'group',
-        'post_URL',
-        'cancel_URL',
+        'post_url',
+        'cancel_url',
         'add_captcha',
         'is_map',
         'is_uf_link',
@@ -316,7 +293,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param array $self
+   * @param self $self
    *   Current form object.
    *
    * @return bool|array
@@ -349,7 +326,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $title = CRM_Core_BAO_UFGroup::getTitle($this->_id);
-      CRM_Core_BAO_UFGroup::del($this->_id);
+      CRM_Core_BAO_UFGroup::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts("Your CiviCRM Profile '%1' has been deleted.", [1 => $title]), ts('Profile Deleted'), 'success');
     }
     elseif ($this->_action & CRM_Core_Action::DISABLE) {
@@ -360,15 +337,9 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     }
     else {
       // get the submitted form values.
-      $ids = [];
       $params = $this->controller->exportValues($this->_name);
-
-      if (!array_key_exists('is_active', $params)) {
-        $params['is_active'] = 0;
-      }
-
       if ($this->_action & (CRM_Core_Action::UPDATE)) {
-        $ids['ufgroup'] = $this->_id;
+        $params['id'] = $this->_id;
         // CRM-5284
         // lets skip trying to mess around with profile weights and allow the user to do as needed.
       }
@@ -379,7 +350,8 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
 
       // create uf group
-      $ufGroup = CRM_Core_BAO_UFGroup::add($params, $ids);
+      $ufGroup = CRM_Core_BAO_UFGroup::add($params);
+      $this->_id = $ufGroup->id;
 
       if (!empty($params['is_active'])) {
         //make entry in uf join table

@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -26,7 +24,7 @@ class CRM_UF_Page_AJAX {
    * Function the check whether the field belongs.
    * to multi-record custom set
    */
-  public function checkIsMultiRecord() {
+  public static function checkIsMultiRecord() {
     $customId = $_GET['customId'];
 
     $isMultiple = CRM_Core_BAO_CustomField::isMultiRecordField($customId);

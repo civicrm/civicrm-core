@@ -10,19 +10,13 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Service\Spec\Provider\Generic;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
+/**
+ * @serviceTags spec_provider
+ */
 interface SpecProviderInterface {
 
   /**
@@ -35,9 +29,12 @@ interface SpecProviderInterface {
   /**
    * @param string $entity
    * @param string $action
+   * Optional @param array $values
+   *   $values from the api getFields request.
+   *   This param works but has not been added to the interface for the sake of backward-compatability.
    *
    * @return bool
    */
-  public function applies($entity, $action);
+  public function applies(string $entity, string $action/*, array $values = []*/);
 
 }

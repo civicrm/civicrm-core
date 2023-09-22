@@ -30,19 +30,12 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
   public $_drilldownReport = ['contribute/detail' => 'Link to Detail Report'];
-
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
 
   /**
    */
@@ -136,7 +129,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'title' => ts('Financial Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search'),
           ],
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
@@ -174,6 +167,14 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'no_repeat' => TRUE,
           ],
         ],
+        'filters' => [
+          'on_hold' => [
+            'title' => ts('On Hold'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => ['' => ts('Any')] + CRM_Core_PseudoConstant::emailOnHoldOptions(),
+          ],
+        ],
         'grouping' => 'email-fields',
       ],
       'civicrm_phone' => [
@@ -189,6 +190,13 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
       ],
     ];
 
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
+    ];
+
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     $this->_currencyColumn = 'civicrm_contribution_currency';
@@ -198,7 +206,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */
@@ -226,7 +234,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
             INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0
+                ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0
        ";
 
     // for credit card type
@@ -244,7 +252,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+          if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
@@ -331,7 +339,8 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   /**
    * @param int $rowCount
    */
-  public function limit($rowCount = CRM_Report_Form::ROW_COUNT_LIMIT) {
+  public function limit($rowCount = NULL) {
+    $rowCount = $rowCount ?? $this->getRowCount();
     // lets do the pager if in html mode
     $this->_limit = NULL;
 
@@ -353,7 +362,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
         }
       }
 
-      $pageId = $pageId ? $pageId : 1;
+      $pageId = $pageId ?: 1;
       $this->set(CRM_Utils_Pager::PAGE_ID, $pageId);
       $offset = ($pageId - 1) * $rowCount;
 

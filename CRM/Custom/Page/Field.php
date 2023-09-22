@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -57,28 +55,33 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
           'url' => 'civicrm/admin/custom/group/field/update',
           'qs' => 'action=update&reset=1&gid=%%gid%%&id=%%id%%',
           'title' => ts('Edit Custom Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::BROWSE => [
           'name' => ts('Edit Multiple Choice Options'),
           'url' => 'civicrm/admin/custom/group/field/option',
           'qs' => 'reset=1&action=browse&gid=%%gid%%&fid=%%id%%',
           'title' => ts('List Custom Options'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::BROWSE),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview Field Display'),
-          'url' => 'civicrm/admin/custom/group/field',
-          'qs' => 'action=preview&reset=1&gid=%%gid%%&id=%%id%%',
+          'url' => 'civicrm/admin/custom/group/preview',
+          'qs' => 'action=preview&reset=1&fid=%%id%%',
           'title' => ts('Preview Custom Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::PREVIEW),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Custom Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Custom Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::EXPORT => [
           'name' => ts('Move'),
@@ -86,12 +89,14 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
           'class' => 'small-popup',
           'qs' => 'reset=1&fid=%%id%%',
           'title' => ts('Move Custom Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::EXPORT),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/custom/group/field',
-          'qs' => 'action=delete&reset=1&gid=%%gid%%&id=%%id%%',
+          'url' => 'civicrm/admin/custom/group/field/delete',
+          'qs' => 'reset=1&id=%%id%%',
           'title' => ts('Delete Custom Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -151,7 +156,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
           break;
       }
 
-      $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
+      $customFieldDataType = array_column(CRM_Core_BAO_CustomField::dataType(), 'label', 'id');
       $customField[$customFieldBAO->id]['data_type'] = $customFieldDataType[$customField[$customFieldBAO->id]['data_type']];
       $customField[$customFieldBAO->id]['order'] = $customField[$customFieldBAO->id]['weight'];
       $customField[$customFieldBAO->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
@@ -177,30 +182,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
   }
 
   /**
-   * Edit custom data.
-   *
-   * editing would involved modifying existing fields + adding data to new fields.
-   *
-   * @param string $action
-   *   The action to be invoked.
-   *
-   * @return void
-   */
-  public function edit($action) {
-    // create a simple controller for editing custom dataCRM/Custom/Page/Field.php
-    $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Field', ts('Custom Field'), $action);
-
-    // set the userContext stack
-    $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field', 'reset=1&action=browse&gid=' . $this->_gid));
-
-    $controller->set('gid', $this->_gid);
-    $controller->setEmbedded(TRUE);
-    $controller->process();
-    $controller->run();
-  }
-
-  /**
    * Run the page.
    *
    * This method is called after the page is created. It checks for the
@@ -209,92 +190,22 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @return void
    */
   public function run() {
+    $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, TRUE);
 
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE, 0
-    );
-
-    if ($id) {
-      $values = civicrm_api3('custom_field', 'getsingle', ['id' => $id]);
-      $this->_gid = $values['custom_group_id'];
-    }
-    // get the group id
-    else {
-      $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive',
-        $this
-      );
-    }
-
-    if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
+    if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved')) {
       CRM_Core_Error::statusBounce("You cannot add or edit fields in a reserved custom field-set.");
     }
 
-    $action = CRM_Utils_Request::retrieve('action', 'String',
-      // default to 'browse'
-      $this, FALSE, 'browse'
-    );
-
-    if ($action & CRM_Core_Action::DELETE) {
-
-      $session = CRM_Core_Session::singleton();
-      $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field', 'reset=1&action=browse&gid=' . $this->_gid));
-      $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_DeleteField', "Delete Custom Field", '');
-      $id = CRM_Utils_Request::retrieve('id', 'Positive',
-        $this, FALSE, 0
-      );
-      $controller->set('id', $id);
-      $controller->setEmbedded(TRUE);
-      $controller->process();
-      $controller->run();
-      $fieldValues = ['custom_group_id' => $this->_gid];
-      $wt = CRM_Utils_Weight::delWeight('CRM_Core_DAO_CustomField', $id, $fieldValues);
-    }
-
-    if ($this->_gid) {
-      $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_gid);
-      $this->assign('gid', $this->_gid);
-      $this->assign('groupTitle', $groupTitle);
-      if ($action & CRM_Core_Action::BROWSE) {
-        CRM_Utils_System::setTitle(ts('%1 - Custom Fields', [1 => $groupTitle]));
-      }
-    }
+    $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_gid);
+    $this->assign('gid', $this->_gid);
+    $this->assign('groupTitle', $groupTitle);
 
     // assign vars to templates
-    $this->assign('action', $action);
+    $this->assign('action', 'browse');
 
-    // what action to take ?
-    if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
-      // no browse for edit/update/view
-      $this->edit($action);
-    }
-    elseif ($action & CRM_Core_Action::PREVIEW) {
-      $this->preview($id);
-    }
-    else {
-      $this->browse();
-    }
+    $this->browse();
 
-    // Call the parents run method
     return parent::run();
-  }
-
-  /**
-   * Preview custom field.
-   *
-   * @param int $id
-   *   Custom field id.
-   *
-   * @return void
-   */
-  public function preview($id) {
-    $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Preview', ts('Preview Custom Data'), CRM_Core_Action::PREVIEW);
-    $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field', 'reset=1&action=browse&gid=' . $this->_gid));
-    $controller->set('fieldId', $id);
-    $controller->set('groupId', $this->_gid);
-    $controller->setEmbedded(TRUE);
-    $controller->process();
-    $controller->run();
   }
 
 }

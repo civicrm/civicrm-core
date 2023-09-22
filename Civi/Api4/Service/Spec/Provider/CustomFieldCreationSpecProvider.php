@@ -10,21 +10,16 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
 
-class CustomFieldCreationSpecProvider implements Generic\SpecProviderInterface {
+/**
+ * @service
+ * @internal
+ */
+class CustomFieldCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc

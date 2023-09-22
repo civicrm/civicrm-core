@@ -6,16 +6,25 @@
   <name>civicrm_price_set</name>
   <add>1.8</add>
   <log>true</log>
+  <component>CiviContribute</component>
+  <paths>
+    <add>civicrm/admin/price/add?reset=1&amp;action=add</add>
+    <update>civicrm/admin/price/edit?reset=1&amp;action=update&amp;sid=[id]</update>
+    <delete>civicrm/admin/price/edit?reset=1&amp;action=delete&amp;sid=[id]</delete>
+    <preview>civicrm/admin/price/edit?reset=1&amp;action=preview&amp;sid=[id]</preview>
+    <browse>civicrm/admin/price</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>Price Set</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Price Set</comment>
-    <add>1.8</add>
     <html>
-      <type>Select</type>
+      <type>Number</type>
+      <label>ID</label>
     </html>
+    <add>1.8</add>
   </field>
   <primaryKey>
     <name>id</name>
@@ -23,7 +32,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Price Set Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -34,6 +43,7 @@
     <add>3.1</add>
     <html>
       <type>Text</type>
+      <label>Domain</label>
     </html>
   </field>
   <foreignKey>
@@ -51,6 +61,7 @@
     <add>1.8</add>
     <html>
       <type>Text</type>
+      <label>Name</label>
     </html>
   </field>
   <index>
@@ -77,10 +88,12 @@
     <title>Price Set Is Active?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
     <comment>Is this price set active</comment>
     <add>1.8</add>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
   </field>
   <field>
@@ -128,35 +141,17 @@
     <required>true</required>
     <comment>What components are using this price set?</comment>
     <pseudoconstant>
-      <table>civicrm_component</table>
-      <keyColumn>id</keyColumn>
-      <labelColumn>name</labelColumn>
+      <callback>CRM_Price_BAO_PriceSet::getExtendsOptions</callback>
     </pseudoconstant>
+    <serialize>SEPARATOR_BOOKEND</serialize>
     <add>3.1</add>
     <html>
       <type>Text</type>
     </html>
   </field>
   <field>
-    <name>contribution_type_id</name>
-    <title>Price Set Contribution Type</title>
-    <type>int unsigned</type>
-    <default>NULL</default>
-    <comment>FK to Contribution Type(for membership price sets only).</comment>
-    <add>3.4</add>
-    <drop>4.3</drop>
-  </field>
-  <foreignKey>
-    <name>contribution_type_id</name>
-    <table>civicrm_contribution_type</table>
-    <key>id</key>
-    <add>3.4</add>
-    <drop>4.3</drop>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
-  <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Financial Type(for membership price sets only).</comment>
@@ -168,6 +163,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Financial Type</label>
     </html>
   </field>
   <foreignKey>
@@ -182,6 +178,7 @@
     <title>Is Price Set Quick Config?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is set if edited on Contribution or Event Page rather than through Manage Price Sets</comment>
     <html>
       <type>CheckBox</type>
@@ -193,6 +190,7 @@
     <title>Price Set Is Reserved</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this a predefined system price set  (i.e. it can not be deleted, edited)?</comment>
     <add>4.2</add>
     <html>
@@ -202,8 +200,8 @@
   <field>
     <name>min_amount</name>
     <title>Minimum Amount</title>
-    <type>int unsigned</type>
-    <default>0</default>
+    <type>decimal</type>
+    <default>0.0</default>
     <comment>Minimum Amount required for this set.</comment>
     <add>4.7</add>
     <html>

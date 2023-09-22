@@ -21,13 +21,18 @@
 class CRM_Activity_Form_Task_Print extends CRM_Activity_Form_Task {
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
     parent::preprocess();
 
     // set print view, so that print templates are called
-    $this->controller->setPrint(1);
+    $this->controller->setPrint(CRM_Core_Smarty::PRINT_PAGE);
 
     // get the formatted params
     $queryParams = $this->get('queryParams');

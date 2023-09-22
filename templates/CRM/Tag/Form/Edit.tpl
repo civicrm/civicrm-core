@@ -9,8 +9,7 @@
 *}
 {* this template is used for adding/editing a tag (admin)  *}
 <div class="crm-block crm-form-block crm-tag-form-block">
-  {if $action eq 1 or $action eq 2 }
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+  {if $action eq 1 or $action eq 2}
     <table class="form-layout-compressed">
        <tr class="crm-tag-form-block-label">
           <td class="label">{$form.name.label}</td>
@@ -20,25 +19,23 @@
           <td class="label">{$form.description.label}</td>
           <td>{$form.description.html}</td>
        </tr>
-         {if $form.parent_id.html}
+         {if !empty($form.parent_id.html)}
        <tr class="crm-tag-form-block-parent_id">
          <td class="label">{$form.parent_id.label}</td>
          <td>{$form.parent_id.html}</td>
        </tr>
    {/if}
-      {if $form.used_for}
+      {if !empty($form.used_for)}
        <tr class="crm-tag-form-block-used_for">
           <td class="label">{$form.used_for.label}</td>
           <td>{$form.used_for.html} <br />
             <span class="description">
-              {if $is_parent}{ts}You can change the types of records which this tag can be used for by editing the 'Parent' tag.{/ts}
-              {else}{ts}What types of record(s) can this tag be used for?{/ts}
-              {/if}
+              {ts}What types of record(s) can this tag be used for?{/ts}
             </span>
           </td>
         </tr>
       {/if}
-      {if $form.color.html}
+      {if !empty($form.color.html)}
         <tr class="crm-tag-form-block-color">
           <td class="label">{$form.color.label}</td>
           <td>{$form.color.html}</td>

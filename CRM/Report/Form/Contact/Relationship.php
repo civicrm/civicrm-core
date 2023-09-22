@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
@@ -35,9 +33,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -250,6 +247,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ],
           'is_active' => [
             'title' => ts('Is active?'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
           ],
           'relationship_id' => [
             'title' => ts('Rel ID'),
@@ -416,11 +414,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
     // Include Email Field.
     if ($this->_emailField_a) {
-      $this->_from .= "
-             LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                       ON ( {$this->_aliases['civicrm_contact']}.id =
-                            {$this->_aliases['civicrm_email']}.contact_id AND
-                            {$this->_aliases['civicrm_email']}.is_primary = 1 )";
+      $this->joinEmailFromContact();
     }
     if ($this->_emailField_b) {
       $this->_from .= "
@@ -431,11 +425,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
     // Include Phone Field.
     if ($this->_phoneField_a) {
-      $this->_from .= "
-             LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                       ON ( {$this->_aliases['civicrm_contact']}.id =
-                            {$this->_aliases['civicrm_phone']}.contact_id AND
-                            {$this->_aliases['civicrm_phone']}.is_primary = 1 )";
+      $this->joinPhoneFromContact();
     }
     if ($this->_phoneField_b) {
       $this->_from .= "
@@ -453,7 +443,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         foreach ($table['filters'] as $fieldName => $field) {
 
           $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+          if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
@@ -563,7 +553,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
@@ -572,10 +562,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
     $isStatusFilter = FALSE;
     $relStatus = NULL;
-    if (CRM_Utils_Array::value('is_active_value', $this->_params) == '1') {
+    if (($this->_params['is_active_value'] ?? NULL) == '1') {
       $relStatus = ts('Is equal to Active');
     }
-    elseif (CRM_Utils_Array::value('is_active_value', $this->_params) == '0') {
+    elseif (($this->_params['is_active_value'] ?? NULL) == '0') {
       $relStatus = ts('Is equal to Inactive');
     }
     if (!empty($statistics['filters'])) {
@@ -583,7 +573,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         // For displaying relationship type filter.
         if ($value['title'] == 'Relationship') {
           $relTypes = CRM_Core_PseudoConstant::relationshipType();
-          $op = CRM_Utils_Array::value('relationship_type_id_op', $this->_params) == 'in' ? ts('Is one of') . ' ' : ts('Is not one of') . ' ';
+          $op = ($this->_params['relationship_type_id_op'] ?? NULL) == 'in' ? ts('Is one of') . ' ' : ts('Is not one of') . ' ';
           $relationshipTypes = [];
           foreach ($this->_params['relationship_type_id_value'] as $relationship) {
             $relationshipTypes[] = $relTypes[$relationship]['label_' . $this->relationType];
@@ -762,17 +752,15 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       // Handle permissioned relationships
       if (array_key_exists('civicrm_relationship_is_permission_a_b', $row)) {
         $rows[$rowNum]['civicrm_relationship_is_permission_a_b']
-          = ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_a_b']));
+          = _ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_a_b']));
         $entryFound = TRUE;
       }
 
       if (array_key_exists('civicrm_relationship_is_permission_b_a', $row)) {
         $rows[$rowNum]['civicrm_relationship_is_permission_b_a']
-          = ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_b_a']));
+          = _ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_b_a']));
         $entryFound = TRUE;
       }
-
-      $rows[$rowNum]['civicrm_relationship_is_active'] = $row['civicrm_relationship_is_active'] ? ts('Yes') : '';
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
@@ -828,7 +816,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $fieldName,
     $relative, $from, $to, $type = NULL) {
     $clauses = [];
-    if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
+    if (array_key_exists($relative, $this->getOperationPair(CRM_Report_Form::OP_DATE))) {
       return NULL;
     }
 

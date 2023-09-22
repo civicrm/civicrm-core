@@ -25,12 +25,12 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   /**
    * Build the form object.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      return parent::buildQuickForm();
+      parent::buildQuickForm();
+      return;
     }
 
-    $config = CRM_Core_Config::singleton();
     $resources = CRM_Core_Resources::singleton();
     $resources->addSetting(
       [
@@ -49,13 +49,17 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('text', 'description', ts('Description'),
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
 
-    // get the tokens
+    // get the tokens - at the point of rendering the token processor is used so
+    // the only reason for this cut-down set of tokens is UI on this
+    // screen and / or historical.
     $contactTokens = CRM_Core_SelectValues::contactTokens();
     $eventTokens = [
       '{event.event_id}' => ts('Event ID'),
       '{event.title}' => ts('Event Title'),
-      '{event.start_date}' => ts('Event Start Date'),
-      '{event.end_date}' => ts('Event End Date'),
+      // This layout selection is day + month eg October 27th
+      // obviously someone felt year was not logical for dates.
+      '{event.start_date|crmDate:"%B %E%f"}' => ts('Event Start Date'),
+      '{event.end_date|crmDate:"%B %E%f"}' => ts('Event End Date'),
     ];
     $participantTokens = CRM_Core_SelectValues::participantTokens();
 
@@ -136,8 +140,8 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    */
   public function setDefaultValues() {
     if (isset($this->_id)) {
-      $defaults = array_merge($this->_values,
-        CRM_Badge_BAO_Layout::getDecodedData(CRM_Utils_Array::value('data', $this->_values, '[]')));
+      $data = empty($this->_values['data']) ? '{}' : $this->_values['data'];
+      $defaults = array_merge($this->_values, json_decode($data, TRUE));
     }
     else {
       for ($i = 1; $i <= self::FIELD_ROWCOUNT; $i++) {
@@ -160,7 +164,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Badge_BAO_Layout::del($this->_id);
+      CRM_Badge_BAO_Layout::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts('Selected badge layout has been deleted.'), ts('Record Deleted'), 'success');
       return;
     }

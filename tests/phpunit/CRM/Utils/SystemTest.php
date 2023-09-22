@@ -7,11 +7,12 @@
  */
 class CRM_Utils_SystemTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
+    $this->useTransaction();
   }
 
-  public function testUrlQueryString() {
+  public function testUrlQueryString(): void {
     $config = CRM_Core_Config::singleton();
     $this->assertTrue($config->userSystem instanceof CRM_Utils_System_UnitTests);
     $expected = '/index.php?q=civicrm/foo/bar&foo=ab&bar=cd%26ef';
@@ -19,7 +20,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function testUrlQueryArray() {
+  public function testUrlQueryArray(): void {
     $config = CRM_Core_Config::singleton();
     $this->assertTrue($config->userSystem instanceof CRM_Utils_System_UnitTests);
     $expected = '/index.php?q=civicrm/foo/bar&foo=ab&bar=cd%26ef';
@@ -30,7 +31,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function testEvalUrl() {
+  public function testEvalUrl(): void {
     $this->assertEquals(FALSE, CRM_Utils_System::evalUrl(FALSE));
     $this->assertEquals('http://example.com/', CRM_Utils_System::evalUrl('http://example.com/'));
     $this->assertEquals('http://example.com/?cms=UnitTests', CRM_Utils_System::evalUrl('http://example.com/?cms={uf}'));
@@ -117,16 +118,16 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   /**
    * Test extern url.
    */
-  public function testExternUrl() {
+  public function testExternUrl(): void {
     $siteKey = mt_rand();
     $apiKey = mt_rand();
     $restUrl = CRM_Utils_System::externUrl('extern/rest', "entity=Contact&action=get&key=$siteKey&api_key=$apiKey");
-    $this->assertContains('extern/rest.php', $restUrl);
-    $this->assertContains('?', $restUrl);
-    $this->assertContains('entity=Contact', $restUrl);
-    $this->assertContains('action=get', $restUrl);
-    $this->assertContains("key=$siteKey", $restUrl);
-    $this->assertContains("api_key=$apiKey", $restUrl);
+    $this->assertStringContainsString('extern/rest.php', $restUrl);
+    $this->assertStringContainsString('?', $restUrl);
+    $this->assertStringContainsString('entity=Contact', $restUrl);
+    $this->assertStringContainsString('action=get', $restUrl);
+    $this->assertStringContainsString("key=$siteKey", $restUrl);
+    $this->assertStringContainsString("api_key=$apiKey", $restUrl);
   }
 
   /**
@@ -140,8 +141,8 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   public function testAlterExternUrlHook($path, $expected) {
     Civi::dispatcher()->addListener('hook_civicrm_alterExternUrl', [$this, 'hook_civicrm_alterExternUrl']);
     $externUrl = CRM_Utils_System::externUrl($path, $expected['query']);
-    $this->assertContains('path/altered/by/hook', $externUrl, 'Hook failed to alter URL path');
-    $this->assertContains($expected['query'] . '&thisWas=alteredByHook', $externUrl, 'Hook failed to alter URL query');
+    $this->assertStringContainsString('/path/altered/by/hook', $externUrl, 'Hook failed to alter URL path');
+    $this->assertStringContainsString($expected['query'] . '&thisWas=alteredByHook', $externUrl, 'Hook failed to alter URL query');
   }
 
   /**
@@ -158,7 +159,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertTrue($event->hasField('fragment'));
     $this->assertTrue($event->hasField('absolute'));
     $this->assertTrue($event->hasField('isSSL'));
-    $event->url = $event->url->withPath('path/altered/by/hook');
+    $event->url = $event->url->withPath('/path/altered/by/hook');
     $event->url = $event->url->withQuery($event->query . '&thisWas=alteredByHook');
   }
 
@@ -189,7 +190,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   /**
    * Demonstrate the, um, "flexibility" of isNull
    */
-  public function testIsNull() {
+  public function testIsNull(): void {
     $this->assertTrue(CRM_Utils_System::isNull(NULL));
     $this->assertTrue(CRM_Utils_System::isNull(''));
     $this->assertTrue(CRM_Utils_System::isNull('null'));
@@ -250,15 +251,44 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertTrue(CRM_Utils_System::isNull($arr));
   }
 
+  public function crudLinkExamples() {
+    return [
+      'Contact:update' => [
+        ['entity' => 'Contact', 'action' => 'update', 'id' => 123],
+        ['title' => 'Edit Contact', 'url' => '/index.php?q=civicrm/contact/add&reset=1&action=update&cid=123'],
+      ],
+      'civicrm_contact:UPDATE' => [
+        ['entity_table' => 'civicrm_contact', 'action' => CRM_Core_Action::UPDATE, 'entity_id' => 123],
+        ['title' => 'Edit Contact', 'url' => '/index.php?q=civicrm/contact/add&reset=1&action=update&cid=123'],
+      ],
+      'civicrm_activity:ADD' => [
+        ['entity_table' => 'civicrm_activity', 'action' => CRM_Core_Action::ADD],
+        ['title' => 'New Activity', 'url' => '/index.php?q=civicrm/activity&reset=1&action=add&context=standalone'],
+      ],
+      'Contribution:delete' => [
+        ['entity' => 'Contribution', 'action' => 'DELETE', 'id' => 456],
+        ['title' => 'Delete Contribution', 'url' => '/index.php?q=civicrm/contact/view/contribution&reset=1&action=delete&id=456'],
+      ],
+    ];
+  }
+
+  /**
+   * @dataProvider crudLinkExamples
+   */
+  public function testCrudLink($params, $expectedResult) {
+    $result = CRM_Utils_System::createDefaultCrudLink($params);
+    $this->assertEquals($expectedResult, $result);
+  }
+
   /**
    * Test that flushing cache clears the asset cache.
    */
-  public function testFlushCacheClearsAssetCache() {
+  public function testFlushCacheClearsAssetCache(): void {
     // We need to get the file path for the folder and there isn't a public
     // method to get it, so create a file in the folder using public methods,
     // then get the path from that, then flush the cache, then check if the
     // folder is empty.
-    \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', array($this, 'flushCacheClearsAssetCache_buildAsset'));
+    \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', [$this, 'flushCacheClearsAssetCache_buildAsset']);
     $fakeFile = \Civi::service("asset_builder")->getPath('fakeFile.json');
 
     CRM_Utils_System::flushCache();

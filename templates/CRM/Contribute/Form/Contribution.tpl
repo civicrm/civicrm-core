@@ -10,36 +10,38 @@
 {* this template is used for adding/editing/deleting contributions and pledge payments *}
 
 {if $priceSetId}
-  {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Contribution"}
-{elseif $showAdditionalInfo and $formType }
+  {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Contribution" hideTotal=false}
+{elseif !empty($showAdditionalInfo) and !empty($formType)}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
   {include file="CRM/Contribute/Form/AdditionalInfo/Payment.tpl"}
   {if $contributionMode}
     <div class="help">
       {if $contactId && $payNow}
-        {ts 1=$displayName 2=$contributionMode|upper}Use this form to edit a contribution on behalf of %1. <strong>A
-          %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+        {ts 1=$displayName}Use this form to edit a contribution on behalf of %1.{/ts}
       {elseif $contactId}
-        {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution on behalf of %1. <strong>A
-          %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+        {ts 1=$displayName}Use this form to submit a new contribution on behalf of %1.{/ts}
       {else}
-        {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+        {ts}Use this form to submit a new contribution.{/ts}
+      {/if}
+      {if $contributionMode == 'live'}
+        {ts}<strong>A LIVE transaction will be submitted</strong> using the selected payment processor.{/ts}
+      {else}
+        {ts}<strong>A TEST transaction will be submitted</strong> using the selected payment processor.{/ts}
       {/if}
     </div>
   {/if}
 
   <div class="crm-block crm-form-block crm-contribution-form-block">
-
-    {if !$email and $action neq 8 and $context neq 'standalone'}
+    {if $context neq 'standalone' && !$email and $action neq 8}
       <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this contribution because there is no email address recorded for this contact. If you want a receipt to be sent when this contribution is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the contribution.{/ts}
+        {icon icon="fa-info-circle"}{/icon}{ts}You will not be able to send an automatic email receipt for this contribution because there is no email address recorded for this contact. If you want a receipt to be sent when this contribution is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the contribution.{/ts}
       </div>
     {/if}
 
     {if $action eq 8}
       <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
+        {icon icon="fa-info-circle"}{/icon}
         {ts}WARNING: Deleting this contribution will result in the loss of the associated financial transactions (if any).{/ts} {ts}Do you want to continue?{/ts}
       </div>
     {else}
@@ -53,10 +55,7 @@
         <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}submit credit card contribution{/ts}</a>
       </div>
     {/if}
-      <div class="crm-submit-buttons">
-        {include file="CRM/common/formButtons.tpl"}
-      </div>
-      {if $isOnline}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
+      {if !empty($isOnline)}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
       <table class="form-layout-compressed">
         <tr class="crm-contribution-form-block-contact_id">
           <td class="label">{$form.contact_id.label}</td>
@@ -79,7 +78,7 @@
             <td class="label">{$form.total_amount.label}</td>
             <td {$valueStyle}>
               <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>
-              {if $freezeFinancialType}
+              {if !empty($freezeFinancialType)}
                 {help id="id-total_amount"}
               {/if}
               {if !$payNow}
@@ -89,9 +88,8 @@
                   <div id="priceset" class="hiddenElement"></div>
                 {/if}
 
-                {if $ppID}{ts}<a class='action-item crm-hover-button' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
+                {if !empty($ppID)}{ts}<a class='action-item crm-hover-button' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
                 <div id="totalAmountBlock">
-                  {if $hasPriceSets}<span class="description">{ts}Alternatively, you can use a price set.{/ts}</span>{/if}
                   <div id="totalTaxAmount" class="label"></div>
                 </div>
               {/if}
@@ -99,32 +97,34 @@
           </tr>
 
           {if $buildRecurBlock && !$payNow}
-            <tr id='recurringPaymentBlock' class='hiddenElement'>
+            <tr id='recurringPaymentBlock'>
               <td></td>
               <td>
-                <strong>{$form.is_recur.html} {ts}every{/ts}
-                  &nbsp;{$form.frequency_interval.html}
-                  &nbsp;{$form.frequency_unit.html}&nbsp;
-                  {ts}for{/ts}
-                  &nbsp;{$form.installments.html}
-                  &nbsp;{$form.installments.label}
-                </strong>
+                {$form.is_recur.html} {ts}every{/ts}
+                &nbsp;{$form.frequency_interval.html}
+                &nbsp;{$form.frequency_unit.html}&nbsp;
+                {ts}for{/ts}
+                &nbsp;{$form.installments.html}
+                &nbsp;{$form.installments.label}
                 <br />
                 <span class="description">
-            {ts}Your recurring contribution will be processed automatically for the number of installments you specify. You can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time. You will receive an email receipt for each recurring contribution. The receipts will include a link you can use if you decide to modify or cancel your future contributions.{/ts}
+            {ts}You can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.{/ts}
           </span>
               </td>
             </tr>
           {/if}
 
-          <tr id="adjust-option-type" class="crm-contribution-form-block-option_type">
-            <td class="label"></td><td {$valueStyle}>{$form.option_type.html}</td>
-          </tr>
+          {if array_key_exists('option_type', $form)}
+            <tr id="adjust-option-type" class="crm-contribution-form-block-option_type">
+              <td class="label"></td><td {$valueStyle}>{$form.option_type.html}</td>
+            </tr>
+          {/if}
+
         {/if}
         {if $contributionMode && $processorSupportsFutureStartDate}
           <tr id='start_date' class="crm-contribution-form-block-receive_date">
             <td class="label">{ts}Start Date{/ts}</td>
-            <td {$valueStyle}>{if $hideCalender neq true}{$form.receive_date.html}{/if}<br />
+            <td {$valueStyle}>{$form.receive_date.html}<br />
               <span class="description">{ts}You can set a start date for recurring contributions and the first payment will be on that date. For a single post-dated contribution you must select recurring and choose one installment{/ts}</span>
             </td>
           </tr>
@@ -139,14 +139,14 @@
         {* CRM-7362 --add campaign to contributions *}
         {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contribution-form-block-campaign_id"}
 
-        {if !$contributionMode || $payNow}
+        {if (empty($is_template) && (!$contributionMode || $payNow))}
           <tr class="crm-contribution-form-block-contribution_status_id">
             <td class="label">{$form.contribution_status_id.label}</td>
             <td>{$form.contribution_status_id.html}
-              {if $contribution_status_id eq 2}{if $is_pay_later }: {ts}Pay Later{/ts} {else}: {ts}Incomplete Transaction{/ts}{/if}{/if}
+              {if $contribution_status_id eq 2}{if $is_pay_later}: {ts}Pay Later{/ts} {else}: {ts}Incomplete Transaction{/ts}{/if}{/if}
             </td>
             <td>
-              {if !$isUsePaymentBlock && $contactId && $contribID && $contributionMode EQ null && $contribution_status_id eq 2}
+              {if !$isUsePaymentBlock && $contactId && $contribution_status_id eq 2 && $contribID && $contributionMode EQ null}
                 {capture assign=payNowLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=update&id=`$contribID`&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
                 <a class="open-inline action-item crm-hover-button" href="{$payNowLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Pay with Credit Card{/ts}</a>
               {/if}
@@ -163,11 +163,7 @@
                   <tr id="cancelDate" class="crm-contribution-form-block-cancel_date">
                     <td class="label">{$form.cancel_date.label}</td>
                     <td>
-                      {if $hideCalendar neq true}
-                        {$form.cancel_date.html}
-                      {else}
-                        {$form.cancel_date.value|crmDate}
-                      {/if}
+                      {$form.cancel_date.html}
                     </td>
                   </tr>
                   <tr id="cancelDescription" class="crm-contribution-form-block-cancel_reason">
@@ -178,58 +174,63 @@
                     <td class="label" style="vertical-align: top;">{$form.cancel_reason.label}</td>
                     <td>{$form.cancel_reason.html}</td>
                   </tr>
-                  <tr id="refundTrxnID">
-                    <td class="label" style="vertical-align: top;">{$form.refund_trxn_id.label}</td>
-                    <td>{$form.refund_trxn_id.html}</td>
-                  </tr>
+                  {if array_key_exists('refund_trxn_id', $form)}
+                    <tr id="refundTrxnID">
+                      <td class="label" style="vertical-align: top;">{$form.refund_trxn_id.label}</td>
+                      <td>{$form.refund_trxn_id.html}</td>
+                    </tr>
+                  {/if}
                 </table>
               </fieldset>
             </td>
           </tr>
+          {if empty($is_template)}
           <tr class="crm-contribution-form-block-receive_date">
             <td class="label">{$form.receive_date.label}</td>
-            <td>{$form.receive_date.html}<br />
-              <span class="description">{ts}The date this contribution was received.{/ts}</span>
-            </td>
+            <td>{$form.receive_date.html}</td>
           </tr>
+          {/if}
         {/if}
-        {if $form.revenue_recognition_date && !$payNow}
+        {if array_key_exists('revenue_recognition_date', $form) && !$payNow}
           <tr class="crm-contribution-form-block-revenue_recognition_date">
             <td class="label">{$form.revenue_recognition_date.label}</td>
             <td>{$form.revenue_recognition_date.html}</td>
           </tr>
         {/if}
 
-        {if $email and $outBound_option != 2}
+        {if empty($is_template) and $email and $outBound_option != 2}
           <tr class="crm-contribution-form-block-is_email_receipt">
             <td class="label">{$form.is_email_receipt.label}</td>
-            <td>{$form.is_email_receipt.html}&nbsp;
+            <td>{$form.is_email_receipt.html}
               <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
             </td>
           </tr>
-        {elseif $context eq 'standalone' and $outBound_option != 2 }
+        {elseif empty($is_template) and $context eq 'standalone' and $outBound_option != 2}
           <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
             <td class="label">{$form.is_email_receipt.label}</td>
-            <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
+            <td>{$form.is_email_receipt.html}
+              <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
             </td>
           </tr>
         {/if}
+        {if empty($is_template)}
         <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         </tr>
+        {/if}
+        {if empty($is_template)}
         <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
           <td class="label">{$form.receipt_date.label}</td>
-          <td>{$form.receipt_date.html}<br />
-            <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
-          </td>
+          <td>{$form.receipt_date.html}</td>
         </tr>
-        {if $form.payment_processor_id}
+        {/if}
+        {if !empty($form.payment_processor_id)}
           <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
         {/if}
       </table>
 
-    {if !$contributionMode}
+    {if !$contributionMode && empty($is_template)}
       <fieldset class="payment-details_group">
         <legend>
           {ts}Payment Details{/ts}
@@ -275,8 +276,8 @@
     <!-- end of soft credit -->
 
     <!-- start of PCP -->
-    {if $siteHasPCPs && !$payNow}
-      <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noPCP}collapsed{/if}" id="softCredit">
+    {if array_key_exists('pcp_made_through_id', $form) && !$payNow}
+      <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noPCP}collapsed{/if}" id="pcp">
         <div class="crm-accordion-header">
           {ts}Personal Campaign Page{/ts}&nbsp;{help id="id-pcp"}
         </div>
@@ -297,16 +298,11 @@
                     </tr>
                     <tr id="nickID" class="crm-contribution-form-block-pcp_roll_nickname">
                       <td class="label">{$form.pcp_roll_nickname.label}</td>
-                      <td>{$form.pcp_roll_nickname.html|crmAddClass:big}<br/>
-                        <div class="description">{ts}Name or nickname contributor wants to be displayed in the Honor Roll. Enter "Anonymous" for anonymous contributions.{/ts}</div>
-                      </td>
+                      <td>{$form.pcp_roll_nickname.html|crmAddClass:big}</td>
                     </tr>
                     <tr id="personalNoteID" class="crm-contribution-form-block-pcp_personal_note">
                       <td class="label" style="vertical-align: top">{$form.pcp_personal_note.label}</td>
-                      <td>
-                        {$form.pcp_personal_note.html}
-                        <div class="description">{ts}Personal message submitted by contributor for display in the Honor Roll.{/ts}</div>
-                      </td>
+                      <td>{$form.pcp_personal_note.html}</td>
                     </tr>
                   </table>
                 </div>
@@ -340,6 +336,7 @@
             loadPanes(cj(this).attr('id'));
           });
         });
+
         // load panes function calls for snippet based on id of crm-accordion-header
         function loadPanes(id) {
           var url = "{/literal}{crmURL p='civicrm/contact/view/contribution' q="snippet=4&id=`$entityID`&formType=" h=0}{literal}" + id;
@@ -375,16 +372,32 @@
           function checkEmail() {
             var data = $("#contact_id", $form).select2('data');
             if (data && data.extra && data.extra.email && data.extra.email.length) {
-              $("#email-receipt", $form).show();
-              $("#email-address", $form).html(data.extra.email);
+              CRM.api4('Email', 'get', {
+                select: ["on_hold", "contact.do_not_email"],
+                join: [["Contact AS contact", "LEFT", ["contact_id", "=", "contact.id"]]],
+                where: [["contact_id", "=", data.id], ["is_primary", "=", true]]
+              }).then(function(emails) {
+                if (!emails[0]['on_hold'] && !emails[0]['contact.do_not_email']) {
+                  $("#email-receipt", $form).show();
+                  $("#email-address", $form).html(data.extra.email);
+                }
+                else {
+                  CRM.alert(ts("No email receipt can be sent as the contact's primary email address is on hold or they are set to do not email."), ts("Cannot send email receipt"));
+                  $("#email-receipt", $form).hide();
+                  $("#is_email_receipt", $form).removeAttr('checked');
+                }
+              }, function(failure) {
+                $("#email-receipt", $form).show();
+                $("#email-address", $form).html(data.extra.email);
+              });
             }
             else {
               $("#email-receipt", $form).hide();
+              $("#is_email_receipt", $form).removeAttr('checked');
             }
-          }
-
           showHideByValue('is_email_receipt', '', 'receiptDate', 'table-row', 'radio', true);
           showHideByValue('is_email_receipt', '', 'fromEmail', 'table-row', 'radio', false);
+          }
         });
 
         {/literal}
@@ -395,15 +408,21 @@
         {* Additional Detail / Honoree Information / Premium Information *}
         {foreach from=$allPanes key=paneName item=paneValue}
           <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open neq 'true'}collapsed{/if}">
-            <div class="crm-accordion-header" id="{$paneValue.id}">
-              {$paneName}
-            </div><!-- /.crm-accordion-header -->
+            <div class="crm-accordion-header" id="{$paneValue.id}">{$paneName}</div>
             <div class="crm-accordion-body">
               <div class="{$paneValue.id}"></div>
             </div><!-- /.crm-accordion-body -->
           </div><!-- /.crm-accordion-wrapper -->
         {/foreach}
       </div>
+    {/if}
+    {if $billing_address}
+      <fieldset>
+        <legend>{ts}Billing Address{/ts}</legend>
+        <div class="form-item">
+          {$billing_address|nl2br}
+        </div>
+      </fieldset>
     {/if}
     <br />
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
@@ -450,7 +469,7 @@
         });
 
         function showHideCancelInfo(obj) {
-          var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids}{literal}];
+          var cancelInfo_show_ids = [{/literal}{$cancelInfo_show_ids|smarty:nodefaults}{literal}];
           if (cancelInfo_show_ids.indexOf(obj.val()) > -1) {
             $('#cancelInfo', $form).show();
             $('#total_amount', $form).attr('readonly', true);
@@ -466,17 +485,13 @@
       });
     </script>
   {/if} {* not delete mode if*}
-
 {/if} {* closing of main custom data if *}
 
 {literal}
 <script type="text/javascript">
-
   {/literal}
-
   // load form during form rule.
   {if $buildPriceSet}{literal}buildAmount();{/literal}{/if}
-
   {literal}
 
   // CRM-16451: set financial type of 'Price Set' in back office contribution
@@ -494,7 +509,7 @@
       var choose = "{/literal}{ts escape='js'}Choose price set{/ts}{literal}";
       cj("#price_set_id option[value='']").html(choose);
 
-      cj('label[for="total_amount"]').text('{/literal}{ts}Total Amount{/ts}{literal}');
+      cj('label[for="total_amount"]').text('{/literal}{ts escape='js'}Total Amount{/ts}{literal}');
       cj(".crm-contribution-form-block-financial_type_id").show();
       cj("#financial_type_id option[value='']").attr('selected', true);
 
@@ -528,7 +543,7 @@
     var manual = "{/literal}{ts escape='js'}Manual contribution amount{/ts}{literal}";
     cj("#price_set_id option[value='']").html(manual);
 
-    cj('label[for="total_amount"]').text('{/literal}{ts}Price Sets{/ts}{literal}');
+    cj('label[for="total_amount"]').text('{/literal}{ts escape='js'}Price Sets{/ts}{literal}');
     if (financialtypeIds) {
       cj("#financial_type_id option[value="+financialtypeIds[priceSetId]+"]").prop('selected', true);
     }
@@ -576,10 +591,10 @@
         var freezeFinancialType = '{/literal}{$freezeFinancialType}{literal}';
         if (!freezeFinancialType) {
           var financialType = $('#financial_type_id').val();
-          var taxRates = '{/literal}{$taxRates}{literal}';
+          var taxRates = '{/literal}{$taxRates|smarty:nodefaults}{literal}';
           var taxTerm = '{/literal}{$taxTerm}{literal}';
           taxRates = JSON.parse(taxRates);
-          var currencies = '{/literal}{$currencies}{literal}';
+          var currencies = '{/literal}{$currencies|smarty:nodefaults}{literal}';
           currencies = JSON.parse(currencies);
           var currencySelect = $('#currency').val();
           var currencySymbol = currencies[currencySelect];
@@ -598,7 +613,6 @@
           // replace all thousandMarker and change the separator to a dot
           totalAmount = totalAmount.replace(thousandMarker,'').replace(separator,'.');
 
-          var totalTaxAmount = '{/literal}{$totalTaxAmount}{literal}';
           var taxAmount = (taxRate/100)*totalAmount;
           taxAmount = isNaN (taxAmount) ? 0:taxAmount;
           var totalTaxAmount = taxAmount + Number(totalAmount);

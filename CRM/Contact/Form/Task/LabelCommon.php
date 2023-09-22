@@ -30,7 +30,10 @@ class CRM_Contact_Form_Task_LabelCommon {
    * @param string $fileName
    *   The name of the file to save the label in.
    */
-  public static function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
+  public static function createLabel($contactRows, $format, $fileName = 'MailingLabels_CiviCRM.pdf') {
+    if (CIVICRM_UF === 'UnitTests') {
+      throw new CRM_Core_Exception_PrematureExitException('civiExit called', ['rows' => $contactRows, 'format' => $format, 'file_name' => $fileName]);
+    }
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
     $pdf->Open();
     $pdf->AddPage();
@@ -51,10 +54,10 @@ class CRM_Contact_Form_Task_LabelCommon {
   /**
    * Get the rows for the labels.
    *
-   * @param $contactIDs
+   * @param array $contactIDs
    * @param int $locationTypeID
    * @param bool $respectDoNotMail
-   * @param $mergeSameAddress
+   * @param bool $mergeSameAddress
    * @param bool $mergeSameHousehold
    *   UNUSED.
    *
@@ -136,12 +139,9 @@ class CRM_Contact_Form_Task_LabelCommon {
     $numberofContacts = count($contactIDs);
     //this does the same as calling civicrm_api3('contact, get, array('id' => array('IN' => $this->_contactIds)
     // except it also handles multiple locations
-    $query = new CRM_Contact_BAO_Query($params, $returnProperties);
-    $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
+    [$details] = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
 
-    $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
-    // $details[0] is an array of [ contactID => contactDetails ]
-    $details = $details[0];
+    // $details is an array of [ contactID => contactDetails ]
     $tokenFields = CRM_Contact_Form_Task_LabelCommon::getTokenData($details);
 
     foreach ($contactIDs as $value) {
@@ -182,7 +182,7 @@ class CRM_Contact_Form_Task_LabelCommon {
         $valuesothers = CRM_Core_BAO_Location::getValues($paramsothers, $valuesothers);
         if ($locationTypeID) {
           foreach ($valuesothers as $vals) {
-            if (CRM_Utils_Array::value('location_type_id', $vals) ==
+            if (($vals['location_type_id'] ?? NULL) ==
               $locationTypeID
             ) {
               foreach ($vals as $k => $v) {
@@ -234,7 +234,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    *   return properties for address e.g
    *   [street_address => 1, supplemental_address_1 => 1, supplemental_address_2 => 1]
    */
-  public static function getAddressReturnProperties() {
+  public static function getAddressReturnProperties(): array {
     $mailingFormat = Civi::settings()->get('mailing_format');
 
     $addressFields = CRM_Utils_Address::sequence($mailingFormat);
@@ -280,7 +280,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    *
    * @return array
    */
-  public function mergeSameHousehold(&$rows) {
+  public static function mergeSameHousehold(&$rows) {
     // group selected contacts by type
     $individuals = [];
     $households = [];

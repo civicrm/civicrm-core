@@ -17,7 +17,6 @@
     </p>
 </div>
 <div class="crm-block crm-form-block crm-path-form-block">
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
            <table class="form-layout">
             <tr class="crm-path-form-block-uploadDir">
                 <td class="label">{$form.uploadDir.label}</td>
@@ -40,7 +39,7 @@
             <tr class="crm-path-form-block-customTemplateDir">
                 <td class="label">{$form.customTemplateDir.label}</td>
                 <td>{$form.customTemplateDir.html|crmAddClass:'huge40'}<br />
-                    <span class="description">{ts}Path where site specific templates are stored if any. This directory is searched first if set. Custom JavaScript code can be added to templates by creating files named <em>templateFile.extra.tpl</em>.{/ts} {docURL page="Customize Built-in Screens" resource="wiki"}</span><br />
+                    <span class="description">{ts}Path where site specific templates are stored if any. This directory is searched first if set. Custom JavaScript code can be added to templates by creating files named <em>templateFile.extra.tpl</em>.{/ts} {docURL page="sysadmin/setup/directories"}</span><br />
                     <span class="description">{ts}CiviCase configuration files can also be stored in this custom path.{/ts} {docURL page="user/case-management/set-up"}</span>
                 </td>
             </tr>
@@ -56,6 +55,12 @@
                     <span class="description">{ts}Path where CiviCRM extensions are stored.{/ts}</span>
                 </td>
             </tr>
+             <tr class="crm-path-form-block-ext_max_depth">
+               <td class="label">{$form.ext_max_depth.label}</td>
+               <td>{$form.ext_max_depth.html}<br />
+                 <span class="description">{ts}When searching for extensions, limit the number of subdirectories.{/ts}</span>
+               </td>
+             </tr>
         </table>
    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

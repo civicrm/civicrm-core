@@ -24,6 +24,9 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    * Processing needed for buildForm and later.
    */
   public function preProcess() {
+    // SearchFormName is deprecated & to be removed - the replacement is for the task to
+    // call $this->form->getSearchFormValues()
+    // A couple of extensions use it.
     $this->set('searchFormName', 'Advanced');
 
     parent::preProcess();
@@ -60,7 +63,8 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     ];
 
     //check if there are any custom data searchable fields
-    $extends = array_merge(['Contact', 'Individual', 'Household', 'Organization'],
+    $extends = array_merge(['Contact'],
+      CRM_Contact_BAO_ContactType::basicTypes(),
       CRM_Contact_BAO_ContactType::subTypes()
     );
     $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE,
@@ -81,7 +85,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
     $componentPanes = [];
     foreach ($components as $name => $component) {
-      if (in_array($name, array_keys($this->_searchOptions)) &&
+      if (array_key_exists($name, $this->_searchOptions) &&
         $this->_searchOptions[$name] &&
         CRM_Core_Permission::access($component->name)
       ) {
@@ -127,6 +131,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
           $this->_paneTemplatePath[$type] = $c->getAdvancedSearchPaneTemplatePath();
         }
         elseif (in_array($type, $hookPanes)) {
+          $this->add('hidden', "hidden_$type", 1);
           CRM_Contact_BAO_Query_Hook::singleton()->buildAdvancedSearchPaneForm($this, $type);
           CRM_Contact_BAO_Query_Hook::singleton()->setAdvancedSearchPaneTemplatePath($this->_paneTemplatePath, $type);
         }
@@ -189,7 +194,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'privacy_toggle' => 1,
       'operator' => 'AND',
     ], $defaults);
-    $this->normalizeDefaultValues($defaults);
+    $defaults = $this->normalizeDefaultValues($defaults);
 
     //991/Subtypes not respected when editing smart group criteria
     if (!empty($defaults['contact_type']) && !empty($this->_formValues['contact_sub_type'])) {
@@ -296,8 +301,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     else {
       $this->_sortByCharacter = NULL;
     }
-
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
     $this->_returnProperties = &$this->returnProperties();

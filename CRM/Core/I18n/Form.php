@@ -16,6 +16,22 @@
  */
 class CRM_Core_I18n_Form extends CRM_Core_Form {
 
+  /**
+   * List of available locales
+   *
+   * @var array
+   * @internal
+   */
+  public $_locales = [];
+
+  /**
+   * Database structure of translatable columns
+   *
+   * @var array
+   * @internal
+   */
+  public $_structure = [];
+
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
     $tsLocale = CRM_Core_I18n::getLocale();
@@ -80,7 +96,7 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
 
     $this->addDefaultButtons(ts('Save'), 'next', NULL);
 
-    CRM_Utils_System::setTitle(ts('Languages'));
+    $this->setTitle(ts('Languages'));
 
     $this->assign('locales', $this->_locales);
     $this->assign('field', $field);

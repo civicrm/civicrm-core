@@ -10,13 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
 namespace Civi\Api4\Event\Subscriber\Generic;
 
 use Civi\API\Event\PrepareEvent;

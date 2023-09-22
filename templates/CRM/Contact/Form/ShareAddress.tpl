@@ -110,7 +110,7 @@
             });
 
             if (!addressHTML) {
-              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please click the following link to edit that contact to add an address, or select a different contact.{/ts}"{literal} + ' <a target="_blank" href="' + CRM.url('civicrm/contact/add', 'reset=1&action=update&cid=' + sharedContactId) + '">{/literal}{ts}Edit Contact Details{/ts}{literal}</a>';
+              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please click the following link to edit that contact to add an address, or select a different contact.{/ts}"{literal} + ' <a target="_blank" href="' + CRM.url('civicrm/contact/add', 'reset=1&action=update&cid=' + sharedContactId) + '">{/literal}{ts escape='js'}Edit Contact Details{/ts}{literal}</a>';
             }
 
             $contentArea.html(addressHTML);

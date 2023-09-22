@@ -10,7 +10,6 @@
 {* add/update/view custom data group *}
 <div class="help">{ts}Use Custom Field Sets to add logically related fields for a specific type of CiviCRM record (e.g. contact records, contribution records, etc.).{/ts} {help id="id-group_intro"}</div>
 <div class="crm-block crm-form-block">
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
     <tr>
         <td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_group' field='title' id=$gid}{/if}</td>
@@ -18,7 +17,7 @@
     </tr>
     <tr>
         <td class="label">{$form.extends.label}</td>
-        <td>{$form.extends.html} {help id="id-extends"}</td>
+        <td>{$form.extends.html|smarty:nodefaults} {help id="id-extends"}</td>
     </tr>
     <tr>
         <td class="label">{$form.weight.label}</td>
@@ -73,7 +72,7 @@
       {crmButton p='civicrm/admin/custom/group/field' q="action=browse&reset=1&gid=$gid" icon="th-list"}{ts}Custom Fields for this Set{/ts}{/crmButton}
     </div>
 {/if}
-{$initHideBlocks}
+
 {literal}
 <script type="text/Javascript">
 CRM.$(function($) {
@@ -102,7 +101,7 @@ CRM.$(function($) {
   function showHideStyle() {
     var
       extend = $(this).val(),
-      contactTypes = {/literal}{$contactTypes}{literal},
+      contactTypes = {/literal}{$contactTypes|smarty:nodefaults}{literal},
       showStyle = "{/literal}{$showStyle}{literal}",
       showMultiple = "{/literal}{$showMultiple}{literal}",
       showMaxMultiple = "{/literal}{$showMaxMultiple}{literal}",

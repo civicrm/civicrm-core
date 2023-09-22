@@ -13,10 +13,30 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Core_Key {
+
+  /**
+   * The length of the randomly-generated, per-session signing key.
+   *
+   * Expressed as number of bytes. (Ex: 128 bits = 16 bytes)
+   *
+   * @var int
+   */
+  const PRIVATE_KEY_LENGTH = 16;
+
+  /**
+   * @var string
+   * @see hash_hmac_algos()
+   */
+  const HASH_ALGO = 'sha256';
+
+  /**
+   * The minimum length of a generated signature/digest (expressed in base36 digits).
+   * @var int
+   */
+  const HASH_LENGTH = 25;
+
   public static $_key = NULL;
 
   public static $_sessionID = NULL;
@@ -32,7 +52,7 @@ class CRM_Core_Key {
       $session = CRM_Core_Session::singleton();
       self::$_key = $session->get('qfPrivateKey');
       if (!self::$_key) {
-        self::$_key = md5(uniqid(mt_rand(), TRUE)) . md5(uniqid(mt_rand(), TRUE));
+        self::$_key = base64_encode(random_bytes(self::PRIVATE_KEY_LENGTH));
         $session->set('qfPrivateKey', self::$_key);
       }
     }
@@ -47,7 +67,7 @@ class CRM_Core_Key {
       $session = CRM_Core_Session::singleton();
       self::$_sessionID = $session->get('qfSessionID');
       if (!self::$_sessionID) {
-        self::$_sessionID = session_id();
+        self::$_sessionID = CRM_Core_Config::singleton()->userSystem->getSessionId();
         $session->set('qfSessionID', self::$_sessionID);
       }
     }
@@ -66,12 +86,10 @@ class CRM_Core_Key {
    *   valid formID
    */
   public static function get($name, $addSequence = FALSE) {
-    $privateKey = self::privateKey();
-    $sessionID = self::sessionID();
-    $key = md5($sessionID . $name . $privateKey);
+    $key = self::sign($name);
 
     if ($addSequence) {
-      // now generate a random number between 1 and 100K and add it to the key
+      // now generate a random number between 1 and 10000 and add it to the key
       // so that we can have forms in mutiple tabs etc
       $key = $key . '_' . mt_rand(1, 10000);
     }
@@ -85,7 +103,7 @@ class CRM_Core_Key {
    * @param string $name
    * @param bool $addSequence
    *
-   * @return string
+   * @return string|null
    *   if valid, else null
    */
   public static function validate($key, $name, $addSequence = FALSE) {
@@ -94,7 +112,7 @@ class CRM_Core_Key {
     }
 
     if ($addSequence) {
-      list($k, $t) = explode('_', $key);
+      [$k, $t] = explode('_', $key);
       if ($t < 1 || $t > 10000) {
         return NULL;
       }
@@ -103,39 +121,46 @@ class CRM_Core_Key {
       $k = $key;
     }
 
-    $privateKey = self::privateKey();
-    $sessionID = self::sessionID();
-    if ($k != md5($sessionID . $name . $privateKey)) {
+    $expected = self::sign($name);
+    if (!hash_equals($k, $expected)) {
       return NULL;
     }
     return $key;
   }
 
   /**
-   * @param $key
+   * Check that the key is well-formed. This does not check that the key is
+   * currently a key that is in use or belongs to a real form/session.
+   *
+   * @param string $key
    *
    * @return bool
+   *   TRUE if the signature ($key) is well-formed.
    */
   public static function valid($key) {
-    // a valid key is a 32 digit hex number
-    // followed by an optional _ and a number between 1 and 10000
-    if (strpos('_', $key) !== FALSE) {
-      list($hash, $seq) = explode('_', $key);
+    // ensure that key is an alphanumeric string of at least HASH_LENGTH with
+    // an optional underscore+digits at the end.
+    return preg_match('#^[0-9a-zA-Z]{' . self::HASH_LENGTH . ',}+(_\d+)?$#', ($key ?? '')) ? TRUE : FALSE;
+  }
 
-      // ensure seq is between 1 and 10000
-      if (!is_numeric($seq) ||
-        $seq < 1 ||
-        $seq > 10000
-      ) {
-        return FALSE;
-      }
+  /**
+   * @param string $name
+   *   The name of the form
+   * @return string
+   *   A signed digest of $name, computed with the per-session private key
+   */
+  private static function sign($name) {
+    $privateKey = self::privateKey();
+    $sessionID = self::sessionID();
+    $delim = chr(0);
+    if (strpos($sessionID, $delim) !== FALSE || strpos($name, $delim) !== FALSE) {
+      throw new \RuntimeException("Failed to generate signature. Malformed session-id or form-name.");
     }
-    else {
-      $hash = $key;
-    }
+    // The "prefix" gives some advisory details to help with debugging.
+    $prefix = preg_replace('/[^a-zA-Z0-9]/', '', $name);
+    // Note: Unsure why $sessionID is included, but it's always been there, and it doesn't seem harmful.
+    return $prefix . base_convert(hash_hmac(self::HASH_ALGO, $sessionID . $delim . $name, $privateKey), 16, 36);
 
-    // ensure that hash is a 32 digit hex number
-    return (bool) preg_match('#[0-9a-f]{32}#i', $hash);
   }
 
 }

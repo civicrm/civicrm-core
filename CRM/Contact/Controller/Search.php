@@ -27,6 +27,8 @@
  */
 class CRM_Contact_Controller_Search extends CRM_Core_Controller {
 
+  protected $entity = 'Contact';
+
   /**
    * Class constructor.
    *
@@ -44,6 +46,7 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
 
     // add all the actions
     $this->addActions();
+    $this->set('entity', $this->entity);
   }
 
   /**
@@ -69,14 +72,6 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
     elseif (strpos($qString, 'builder') !== FALSE) {
       $path = 'civicrm/contact/search/builder';
     }
-    elseif (
-      strpos($qString, 'custom') !== FALSE &&
-      isset($_REQUEST['csid'])
-    ) {
-      $path = 'civicrm/contact/search/custom';
-      $args = "reset=1&csid={$_REQUEST['csid']}";
-    }
-
     $url = CRM_Utils_System::url($path, $args);
     CRM_Utils_System::redirect($url);
   }

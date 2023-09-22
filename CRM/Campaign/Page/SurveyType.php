@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of Gender.
+ * Page for displaying list of survey types.
  */
 class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
 
@@ -131,7 +131,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
     $optionValues = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');
 
     foreach ($optionValues as $key => $optionValue) {
-      if (CRM_Utils_Array::value('component_id', $optionValue) != $campaingCompId) {
+      if (($optionValue['component_id'] ?? NULL) != $campaingCompId) {
         unset($optionValues[$key]);
       }
     }

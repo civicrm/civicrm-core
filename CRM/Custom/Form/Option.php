@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -97,9 +95,9 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
 
       $paramsField = ['id' => $this->_fid];
       CRM_Core_BAO_CustomField::retrieve($paramsField, $fieldDefaults);
-
       if ($fieldDefaults['html_type'] == 'CheckBox'
-        || $fieldDefaults['html_type'] == 'Multi-Select'
+        // Multi-Select
+        || ($fieldDefaults['html_type'] == 'Select' && $fieldDefaults['serialize'] == 1)
       ) {
         if (!empty($fieldDefaults['default_value'])) {
           $defaultCheckValues = explode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -111,7 +109,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
         }
       }
       else {
-        if (CRM_Utils_Array::value('default_value', $fieldDefaults) == CRM_Utils_Array::value('value', $defaults)) {
+        if (($fieldDefaults['default_value'] ?? NULL) == CRM_Utils_Array::value('value', $defaults)) {
           $defaults['default_value'] = 1;
         }
       }
@@ -203,10 +201,14 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
           'reset=1&action=browse&fid=' . $this->_fid . '&gid=' . $this->_gid,
           TRUE, NULL, FALSE
         );
-        $this->addElement('button',
+        $this->addElement('xbutton',
           'done',
-          ts('Done'),
-          ['onclick' => "location.href='$url'", 'class' => 'crm-form-submit cancel', 'crm-icon' => 'fa-times']
+          CRM_Core_Page::crmIcon('fa-times') . ' ' . ts('Done'),
+          [
+            'type' => 'button',
+            'onclick' => "location.href='$url'",
+            'class' => 'crm-form-submit cancel',
+          ]
         );
       }
     }
@@ -395,7 +397,6 @@ SELECT count(*)
     $oldWeight = NULL;
     if ($this->_id) {
       $customOption->id = $this->_id;
-      CRM_Core_BAO_CustomOption::updateCustomValues($params);
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'weight', 'id');
     }
     else {
@@ -418,7 +419,8 @@ SELECT count(*)
       $customField->find(TRUE) &&
       (
         $customField->html_type == 'CheckBox' ||
-        $customField->html_type == 'Multi-Select'
+        // Multi Value Select
+        ($customField->html_type == 'Select' && $customField->serialize == 1)
       )
     ) {
       $defVal = explode(
@@ -481,6 +483,9 @@ SELECT count(*)
       }
     }
 
+    if ($this->_id) {
+      CRM_Core_BAO_CustomOption::updateValue($customOption->id, $customOption->value);
+    }
     $customOption->save();
 
     $msg = ts('Your multiple choice option \'%1\' has been saved', [1 => $customOption->label]);

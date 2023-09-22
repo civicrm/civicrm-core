@@ -24,8 +24,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
   protected $_settings = [];
 
-  protected $includesReadOnlyFields;
-
   /**
    * Set default values for the form.
    *
@@ -66,10 +64,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     ]);
 
     $this->addFieldsDefinedInSettingsMetadata();
-
-    if ($this->includesReadOnlyFields) {
-      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', ['expires' => 0]);
-    }
   }
 
   /**
@@ -101,7 +95,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     try {
       $this->saveMetadataDefinedSettings($params);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       CRM_Core_Session::setStatus($e->getMessage(), ts('Save Failed'), 'error');
     }
 
@@ -117,6 +111,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     Civi::cache('session')->clear();
     CRM_Utils_System::flushCache();
     CRM_Core_Resources::singleton()->resetCacheCode();
+    $this->rebuildMenu();
 
     CRM_Core_Session::setStatus(" ", ts('Changes Saved'), "success");
   }

@@ -27,7 +27,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @param CRM_Core_Form $form
    */
-  public static function buildPremium(&$form) {
+  public static function buildPremium($form) {
     //premium section
     $form->add('hidden', 'hidden_Premium', 1);
     $sel1 = $sel2 = [];
@@ -127,11 +127,10 @@ class CRM_Contribute_Form_AdditionalInfo {
     }
 
     $form->add('select', 'contribution_page_id',
-      ts('Online Contribution Page'),
-      [
-        '' => ts('- select -'),
-      ] +
-      CRM_Contribute_PseudoConstant::contributionPage()
+      ts('Contribution Page'),
+      ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::contributionPage(),
+      FALSE,
+      ['class' => 'crm-select2']
     );
 
     $form->add('textarea', 'note', ts('Notes'), ["rows" => 4, "cols" => 60]);
@@ -190,10 +189,16 @@ class CRM_Contribute_Form_AdditionalInfo {
     if (!empty($options[$selectedProductID])) {
       $dao->product_option = $options[$selectedProductID][$selectedProductOptionID];
     }
-    if ($premiumID) {
+
+    // This IF condition codeblock does the following:
+    // 1. If premium is present then get previous contribution-product mapping record (if any) based on contribtuion ID.
+    //   If found and the product chosen doesn't matches with old done, then delete or else set the ID for update
+    // 2. If no product is chosen theb delete the previous contribution-product mapping record based on contribtuion ID.
+    if ($premiumID || empty($selectedProductID)) {
       $ContributionProduct = new CRM_Contribute_DAO_ContributionProduct();
-      $ContributionProduct->id = $premiumID;
+      $ContributionProduct->contribution_id = $contributionID;
       $ContributionProduct->find(TRUE);
+      // here $selectedProductID can be 0 in case one unselect the premium product on backoffice update form
       if ($ContributionProduct->product_id == $selectedProductID) {
         $dao->id = $premiumID;
       }
@@ -203,7 +208,11 @@ class CRM_Contribute_Form_AdditionalInfo {
       }
     }
 
-    $dao->save();
+    // only add/update contribution product when a product is selected
+    if (!empty($selectedProductID)) {
+      $dao->save();
+    }
+
     //CRM-11106
     if ($premiumID == NULL || $isDeleted) {
       $premiumParams = [
@@ -231,7 +240,9 @@ class CRM_Contribute_Form_AdditionalInfo {
    */
   public static function processNote($params, $contactID, $contributionID, $contributionNoteID = NULL) {
     if (CRM_Utils_System::isNull($params['note']) && $contributionNoteID) {
-      CRM_Core_BAO_Note::del($contributionNoteID);
+      CRM_Core_BAO_Note::deleteRecord(['id' => $contributionNoteID]);
+      $status = ts('Selected Note has been deleted successfully.');
+      CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
       return;
     }
     //process note
@@ -244,7 +255,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $noteID = [];
     if ($contributionNoteID) {
       $noteID = ["id" => $contributionNoteID];
-      $noteParams['note'] = $noteParams['note'] ? $noteParams['note'] : "null";
+      $noteParams['note'] = $noteParams['note'] ?: "null";
     }
     CRM_Core_BAO_Note::add($noteParams, $noteID);
   }
@@ -271,8 +282,8 @@ class CRM_Contribute_Form_AdditionalInfo {
       $formatted[$f] = $params[$f] ?? NULL;
     }
 
-    if (!empty($params['thankyou_date']) && !CRM_Utils_System::isNull($params['thankyou_date'])) {
-      $formatted['thankyou_date'] = CRM_Utils_Date::processDate($params['thankyou_date'], $params['thankyou_date_time']);
+    if (!empty($params['thankyou_date'])) {
+      $formatted['thankyou_date'] = CRM_Utils_Date::processDate($params['thankyou_date']);
     }
     else {
       $formatted['thankyou_date'] = 'null';
@@ -393,6 +404,11 @@ class CRM_Contribute_Form_AdditionalInfo {
         if ($groupID == 'info') {
           continue;
         }
+
+        $is_public = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupID, 'is_public');
+        if (!$is_public) {
+          continue;
+        }
         foreach ($group['fields'] as $k => $field) {
           $field['title'] = $field['label'];
           $customFields["custom_{$k}"] = $field;
@@ -421,30 +437,18 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->assign('receive_date', CRM_Utils_Date::processDate($params['receive_date']));
     }
 
-    $template = CRM_Core_Smarty::singleton();
-    $taxAmt = $template->get_template_vars('dataArray');
-    $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
-    $prefixValue = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = $prefixValue['invoicing'] ?? NULL;
-    if ((!empty($taxAmt) || isset($eventTaxAmt)) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
-      $isEmailPdf = TRUE;
-    }
-    else {
-      $isEmailPdf = FALSE;
-    }
-
-    list($sendReceipt, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+    [$sendReceipt] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
-        'groupName' => 'msg_tpl_workflow_contribution',
-        'valueName' => 'contribution_offline_receipt',
+        'workflow' => 'contribution_offline_receipt',
         'contactId' => $params['contact_id'],
         'contributionId' => $params['contribution_id'],
+        'tokenContext' => ['contributionId' => (int) $params['contribution_id'], 'contactId' => $params['contact_id']],
         'from' => $params['from_email_address'],
         'toName' => $contributorDisplayName,
         'toEmail' => $contributorEmail,
-        'isTest' => $form->_mode == 'test',
+        'isTest' => $form->_mode === 'test',
         'PDFFilename' => ts('receipt') . '.pdf',
-        'isEmailPdf' => $isEmailPdf,
+        'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
       ]
     );
 

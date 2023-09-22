@@ -11,6 +11,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Component ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.0</add>
   </field>
   <primaryKey>

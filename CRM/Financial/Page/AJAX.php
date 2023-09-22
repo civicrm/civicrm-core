@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Batch;
+
 /**
  * This class contains all the function that are called using AJAX
  */
@@ -33,7 +35,7 @@ class CRM_Financial_Page_AJAX {
       CRM_Utils_System::civiExit();
     }
     $defaultId = NULL;
-    if ($_GET['_value'] == 'select') {
+    if ($_GET['_value'] === 'select') {
       $result = CRM_Contribute_PseudoConstant::financialAccount();
     }
     else {
@@ -76,7 +78,7 @@ class CRM_Financial_Page_AJAX {
       CRM_Utils_System::civiExit();
     }
 
-    if ($_GET['_value'] != 'select') {
+    if ($_GET['_value'] !== 'select') {
       $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations(TRUE);
       $financialAccountId = CRM_Utils_Request::retrieve('_value', 'Positive');
       $financialAccountTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountId, 'financial_account_type_id');
@@ -170,18 +172,12 @@ class CRM_Financial_Page_AJAX {
         switch ($op) {
           case 'assign':
           case 'remove':
-            $recordPID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $recordID, 'payment_instrument_id');
-            $batchPID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $entityID, 'payment_instrument_id');
-            $paymentInstrument = CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $batchPID);
-            if ($op == 'remove' || ($recordPID == $batchPID && $op == 'assign') || !isset($batchPID)) {
+            if ($op == 'remove' || $op == 'assign') {
               $params = [
                 'entity_id' => $recordID,
                 'entity_table' => 'civicrm_financial_trxn',
                 'batch_id' => $entityID,
               ];
-            }
-            else {
-              $response = ['status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", [1 => $paymentInstrument])];
             }
             break;
 
@@ -198,17 +194,18 @@ class CRM_Financial_Page_AJAX {
             $params['id'] = $recordID;
             break;
 
-          case 'export':
-            CRM_Utils_System::redirect("civicrm/financial/batch/export?reset=1&id=$recordID");
-            break;
-
           case 'delete':
             $params = $recordID;
             break;
         }
 
         if (method_exists($recordBAO, $methods[$op]) & !empty($params)) {
-          $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params));
+          try {
+            $updated = call_user_func_array([$recordBAO, $methods[$op]], [&$params]);
+          }
+          catch (\CRM_Core_Exception $e) {
+            $errorMessage = $e->getMessage();
+          }
           if ($updated) {
             $redirectStatus = $updated->status_id;
             if ($batchStatus[$updated->status_id] == "Reopened") {
@@ -218,6 +215,9 @@ class CRM_Financial_Page_AJAX {
               'status' => 'record-updated-success',
               'status_id' => $redirectStatus,
             ];
+          }
+          if ($errorMessage ?? FALSE) {
+            $response = ['status' => $errorMessage];
           }
         }
       }
@@ -287,7 +287,7 @@ class CRM_Financial_Page_AJAX {
       'amount' => ts('Amount'),
       'trxn_id' => ts('Trxn ID'),
       'transaction_date' => ts('Transaction Date'),
-      'receive_date' => ts('Received'),
+      'receive_date' => ts('Contribution Date'),
       'payment_method' => ts('Payment Method'),
       'status' => ts('Status'),
       'name' => ts('Type'),
@@ -341,12 +341,12 @@ class CRM_Financial_Page_AJAX {
     while ($financialItem->fetch()) {
       $row[$financialItem->id] = [];
       foreach ($columnHeader as $columnKey => $columnValue) {
-        if ($financialItem->contact_sub_type && $columnKey == 'contact_type') {
+        if ($financialItem->contact_sub_type && $columnKey === 'contact_type') {
           $row[$financialItem->id][$columnKey] = $financialItem->contact_sub_type;
           continue;
         }
         $row[$financialItem->id][$columnKey] = $financialItem->$columnKey;
-        if ($columnKey == 'sort_name' && $financialItem->$columnKey && $financialItem->contact_id) {
+        if ($columnKey === 'sort_name' && $financialItem->$columnKey && $financialItem->contact_id) {
           $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=" . $financialItem->contact_id);
           $row[$financialItem->id][$columnKey] = '<a href=' . $url . '>' . $financialItem->$columnKey . '</a>';
         }
@@ -357,10 +357,10 @@ class CRM_Financial_Page_AJAX {
             $row[$financialItem->id][$columnKey] = $row[$financialItem->id][$columnKey] . $checkNumber;
           }
         }
-        elseif ($columnKey == 'amount' && $financialItem->$columnKey) {
-          $row[$financialItem->id][$columnKey] = CRM_Utils_Money::format($financialItem->$columnKey, $financialItem->currency);
+        elseif ($columnKey === 'amount' && $financialItem->$columnKey) {
+          $row[$financialItem->id][$columnKey] = Civi::format()->money($financialItem->$columnKey, $financialItem->currency);
         }
-        elseif ($columnKey == 'transaction_date' && $financialItem->$columnKey) {
+        elseif ($columnKey === 'transaction_date' && $financialItem->$columnKey) {
           $row[$financialItem->id][$columnKey] = CRM_Utils_Date::customFormat($financialItem->$columnKey);
         }
         elseif ($columnKey == 'receive_date' && $financialItem->$columnKey) {
@@ -375,7 +375,7 @@ class CRM_Financial_Page_AJAX {
           $js = "enableActions('x')";
           $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_x_" . $financialItem->id . "' name='mark_x_" . $financialItem->id . "' value='1' onclick={$js}></input>";
           $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
-            CRM_Financial_Form_BatchTransaction::links(),
+            (new CRM_Financial_Form_BatchTransaction())->links(),
             NULL,
             [
               'id' => $financialItem->id,
@@ -393,7 +393,7 @@ class CRM_Financial_Page_AJAX {
           $js = "enableActions('y')";
           $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_y_" . $financialItem->id . "' name='mark_y_" . $financialItem->id . "' value='1' onclick={$js}></input>";
           $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
-            CRM_Financial_Page_BatchTransaction::links(),
+            (new CRM_Financial_Page_BatchTransaction())->links(),
             NULL,
             [
               'id' => $financialItem->id,
@@ -431,6 +431,7 @@ class CRM_Financial_Page_AJAX {
       if ($financialItem->contact_id) {
         $row[$financialItem->id]['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage(!empty($row[$financialItem->id]['contact_sub_type']) ? $row[$financialItem->id]['contact_sub_type'] : CRM_Utils_Array::value('contact_type', $row[$financialItem->id]), FALSE, $financialItem->contact_id);
       }
+      // @todo: Is this right? Shouldn't it be adding to the array as we loop?
       $financialitems = $row;
     }
 
@@ -468,66 +469,82 @@ class CRM_Financial_Page_AJAX {
       }
     }
 
-    $batchPID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $entityID, 'payment_instrument_id');
-    $paymentInstrument = CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $batchPID);
-    foreach ($cIDs as $key => $value) {
-      $recordPID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $value, 'payment_instrument_id');
-      if ($action == 'Remove' || ($recordPID == $batchPID && $action == 'Assign') || !isset($batchPID)) {
+    foreach ($cIDs as $value) {
+      if ($action == 'Remove' || $action == 'Assign') {
         $params = [
           'entity_id' => $value,
           'entity_table' => 'civicrm_financial_trxn',
           'batch_id' => $entityID,
         ];
-        if ($action == 'Assign') {
-          $updated = CRM_Batch_BAO_EntityBatch::create($params);
+        try {
+          if ($action == 'Assign') {
+            CRM_Batch_BAO_EntityBatch::create($params);
+          }
+          else {
+            $delete = \Civi\Api4\EntityBatch::delete(FALSE);
+            foreach ($params as $field => $val) {
+              $delete->addWhere($field, '=', $val);
+            }
+            $delete->execute()->count();
+          }
         }
-        else {
-          $updated = CRM_Batch_BAO_EntityBatch::del($params);
+        catch (\CRM_Core_Exception $e) {
+          $errorMessage = $e->getMessage();
         }
       }
     }
-    if ($updated) {
-      $status = ['status' => 'record-updated-success'];
+    if ($errorMessage ?? FALSE) {
+      $status = ['status' => $errorMessage];
     }
     else {
-      $status = ['status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", [1 => $paymentInstrument])];
+      $status = ['status' => 'record-updated-success'];
     }
     CRM_Utils_JSON::output($status);
   }
 
-  public static function getBatchSummary() {
-    $batchID = CRM_Utils_Type::escape($_REQUEST['batchID'], 'String');
-    $params = ['id' => $batchID];
-
-    $batchSummary = self::makeBatchSummary($batchID, $params);
-
-    CRM_Utils_JSON::output($batchSummary);
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public static function getBatchSummary(): void {
+    CRM_Utils_JSON::output(self::makeBatchSummary(CRM_Utils_Type::escape($_REQUEST['batchID'], 'Integer')));
   }
 
   /**
-   * Makes an array of the batch's summary and returns array to parent getBatchSummary() function.
+   * Get a summary of the batch..
    *
    * @param $batchID
-   * @param $params
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  public static function makeBatchSummary($batchID, $params) {
-    $batchInfo = CRM_Batch_BAO_Batch::retrieve($params, $value);
+  public static function makeBatchSummary(int $batchID): array {
+    // We use permissions false because the old function did that & we
+    // have not tested to ensure permissions are correct - but ideally
+    // we would setCheckPermissions = TRUE.
+    $batchInfo = Batch::get(FALSE)
+      ->addWhere('id', '=', $batchID)
+      ->addSelect(
+        'description',
+        'item_count',
+        'total',
+        'created_date',
+        'created_id.display_name',
+        'status_id:label',
+        'payment_instrument_id:label'
+      )
+      ->execute()->first();
     $batchTotals = CRM_Batch_BAO_Batch::batchTotals([$batchID]);
-    $batchSummary = [
-      'created_by' => CRM_Contact_BAO_Contact::displayName($batchInfo->created_id),
-      'status' => CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'status_id', $batchInfo->status_id),
-      'description' => $batchInfo->description,
-      'payment_instrument' => CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $batchInfo->payment_instrument_id),
-      'item_count' => $batchInfo->item_count,
+    return [
+      'created_by' => $batchInfo['created_id.display_name'],
+      'status' => $batchInfo['status_id:label'],
+      'description' => $batchInfo['description'],
+      'payment_instrument' => $batchInfo['payment_instrument_id:label'],
+      'item_count' => $batchInfo['item_count'],
       'assigned_item_count' => $batchTotals[$batchID]['item_count'],
-      'total' => CRM_Utils_Money::format($batchInfo->total),
-      'assigned_total' => CRM_Utils_Money::format($batchTotals[$batchID]['total']),
-      'opened_date' => CRM_Utils_Date::customFormat($batchInfo->created_date),
+      'total' => Civi::format()->money($batchInfo['total']),
+      'assigned_total' => Civi::format()->money($batchTotals[$batchID]['total']),
+      'opened_date' => CRM_Utils_Date::customFormat($batchInfo['created_date']),
     ];
-
-    return $batchSummary;
   }
 
 }

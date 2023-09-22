@@ -48,13 +48,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   protected $_prefix = "event_";
 
   /**
-   * The saved search ID retrieved from the GET vars.
-   *
-   * @var int
-   */
-  protected $_ssID;
-
-  /**
    * Metadata of all fields to include on the form.
    *
    * @var array
@@ -76,9 +69,11 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @return void
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
+    // SearchFormName is deprecated & to be removed - the replacement is for the task to
+    // call $this->form->getSearchFormValues()
+    // A couple of extensions use it.
     $this->set('searchFormName', 'Search');
 
     /**
@@ -126,7 +121,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @return void
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -153,12 +147,13 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       if (count($eventIds) == 1) {
         //convert form values to clause.
         $seatClause = [];
-        if (CRM_Utils_Array::value('participant_test', $this->_formValues) == '1' || CRM_Utils_Array::value('participant_test', $this->_formValues) == '0') {
+        if (($this->_formValues['participant_test'] ?? NULL) == '1' || ($this->_formValues['participant_test'] ?? NULL) == '0') {
           $seatClause[] = "( participant.is_test = {$this->_formValues['participant_test']} )";
         }
         if (!empty($this->_formValues['participant_status_id'])) {
           $seatClause[] = CRM_Contact_BAO_Query::buildClause("participant.status_id", 'IN', $this->_formValues['participant_status_id'], 'Int');
-          if ($status = CRM_Utils_Array::value('IN', $this->_formValues['participant_status_id'])) {
+          $status = $this->_formValues['participant_status_id']['IN'] ?? NULL;
+          if ($status) {
             $this->_formValues['participant_status_id'] = $status;
           }
         }
@@ -197,9 +192,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
           'id' => $this->_ssID,
           'name' => CRM_Contact_BAO_SavedSearch::getName($this->_ssID, 'title'),
         ];
-        $this->assign_by_ref('savedSearch', $savedSearchValues);
-        $this->assign('ssID', $this->_ssID);
       }
+      $this->assign('savedSearch', $savedSearchValues ?? NULL);
+      $this->assign('ssID', $this->_ssID);
 
       $this->addTaskMenu($tasks);
     }
@@ -280,13 +275,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
     }
 
-    // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['participant_test']) && $this->_force) {
-      $this->_formValues["participant_test"] = 0;
-    }
-
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
-
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, ['event_id']);
 
     $this->set('queryParams', $this->_queryParams);
@@ -348,8 +336,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    *        done.
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
-   *
-   * @param
    *
    * @return void
    * @throws \CRM_Core_Exception
@@ -425,7 +411,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   /**
    * Set the metadata for the form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setSearchMetadata() {
     $this->addSearchFieldMetadata(['Participant' => CRM_Event_BAO_Query::getSearchFieldMetadata()]);

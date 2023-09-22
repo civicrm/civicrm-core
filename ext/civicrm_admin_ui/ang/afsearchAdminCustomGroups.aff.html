@@ -1,0 +1,14 @@
+<div af-fieldset="">
+  <div class="af-markup">
+    <div class="help">
+      {{:: ts('Custom data is stored in custom fields. Custom fields are organized into logically related custom data sets (e.g. Volunteer Info). Use custom fields to collect and store custom data which are not included in the standard CiviCRM forms. You can create one or many sets of custom fields.') }}
+      <a href="https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields" target="_blank" class="crm-doc-link no-popup">{{:: ts('Learn more...') }}</a>
+    </div>
+  </div>
+  <div class="af-container af-layout-inline">
+    <af-field name="title" defn="{required: false, input_attrs: {}, label: 'Group'}" />
+    <af-field name="extends" defn="{input_attrs: {multiple: true}, label: 'Used For'}" />
+    <af-field name="CustomGroup_CustomField_custom_group_id_01.label" defn="{required: false, input_attrs: {}, label: 'Field'}" />
+  </div>
+  <crm-search-display-table search-name="Administer_Custom_Groups" display-name="Table"></crm-search-display-table>
+</div>

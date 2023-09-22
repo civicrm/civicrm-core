@@ -9,14 +9,17 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  * Class CRM_Core_BAO_FinancialTrxnTest
  * @group headless
  */
 class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**
@@ -24,15 +27,15 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $contactId = $this->individualCreate();
     $financialTypeId = 1;
-    $this->contributionCreate([
+    $contributionID = $this->contributionCreate([
       'contact_id' => $contactId,
       'financial_type_id' => $financialTypeId,
     ]);
     $params = [
-      'contribution_id' => $financialTypeId,
+      'contribution_id' => $contributionID,
       'to_financial_account_id' => 1,
       'trxn_date' => 20091021184930,
       'trxn_type' => 'Debit',
@@ -57,7 +60,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetTotalPayments() {
+  public function testGetTotalPayments(): void {
     $contactId = $this->individualCreate();
 
     $params = [
@@ -85,13 +88,19 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
     $this->assertEquals(0, $totalPaymentAmount, 'Amount not matching.');
 
+    $this->assertEquals(0, Contribution::get()->addWhere('id', '=', $contribution['id'])
+      ->addSelect('paid_amount')->execute()->first()['paid_amount']);
     $params['id'] = $contribution['id'];
     $params['contribution_status_id'] = 1;
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
 
     $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
+    $this->assertEquals('200.00', Contribution::get()->addWhere('id', '=', $contribution['id'])
+      ->addSelect('paid_amount')->execute()->first()['paid_amount']);
+
     $this->assertEquals('200.00', $totalPaymentAmount, 'Amount not matching.');
+
   }
 
   /**
@@ -99,7 +108,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetTotalPaymentsParticipantOrder() {
+  public function testGetTotalPaymentsParticipantOrder(): void {
     $orderID = $this->createPartiallyPaidParticipantOrder()['id'];
     $params = [
       'contribution_id' => $orderID,
@@ -115,11 +124,10 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreateDeferredTrxn() {
+  public function testCreateDeferredTrxn(): void {
     Civi::settings()->set('deferred_revenue_enabled', TRUE);
-    $cid = $this->individualCreate();
     $params = [
-      'contact_id' => $cid,
+      'contact_id' => $this->individualCreate(),
       'receive_date' => '2016-01-20',
       'total_amount' => 622,
       'financial_type_id' => 4,
@@ -144,13 +152,10 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
 
   /**
    * Test for updateCreditCardDetails().
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testUpdateCreditCardDetailsUsingContributionAPI() {
-    $cid = $this->individualCreate();
+  public function testUpdateCreditCardDetailsUsingContributionAPI(): void {
     $params = [
-      'contact_id' => $cid,
+      'contact_id' => $this->individualCreate(),
       'receive_date' => '2016-01-20',
       'total_amount' => 100,
       'financial_type_id' => 1,
@@ -164,8 +169,8 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
         'return' => ['card_type_id', 'pan_truncation'],
       ]
     );
-    $this->assertEquals(CRM_Utils_Array::value('card_type_id', $financialTrxn), NULL);
-    $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), NULL);
+    $this->assertArrayNotHasKey('card_type_id', $financialTrxn);
+    $this->assertEquals(NULL, CRM_Utils_Array::value('pan_truncation', $financialTrxn));
     $params = [
       'card_type_id' => 2,
       'pan_truncation' => 4567,
@@ -179,8 +184,8 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
         'return' => ['card_type_id', 'pan_truncation'],
       ]
     );
-    $this->assertEquals($financialTrxn['card_type_id'], 2);
-    $this->assertEquals($financialTrxn['pan_truncation'], 4567);
+    $this->assertEquals(2, $financialTrxn['card_type_id']);
+    $this->assertEquals(4567, $financialTrxn['pan_truncation']);
   }
 
   /**
@@ -188,7 +193,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testUpdateCreditCardDetails() {
+  public function testUpdateCreditCardDetails(): void {
     $cid = $this->individualCreate();
     $params = [
       'contact_id' => $cid,
@@ -224,7 +229,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetContributionBalance() {
+  public function testGetContributionBalance(): void {
     //create the contribution that isn't paid yet
     $contactId = $this->individualCreate();
     $params = [
@@ -247,6 +252,73 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     //amount owed should be one cent
     $amountOwed = CRM_Contribute_BAO_Contribution::getContributionBalance($contribution['id']);
     $this->assertEquals(0.01, $amountOwed, 'Amount does not match');
+  }
+
+  /**
+   * Test that financial trxns for fee amounts have the correct financial account.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testFeeAmountTrxns(): void {
+    $contactId = $this->individualCreate();
+
+    // Get the expected financial account of a payment made with a credit card.
+    // Also et the financial account of a payment with the default payment method.
+    // I wish we could join here - maybe when API4 EntityBridge is complete.
+    $creditCardOvId = $this->callAPISuccess('OptionValue', 'getvalue', [
+      'return' => "id",
+      'option_group_id' => "payment_instrument",
+      'name' => "Credit Card",
+    ]);
+    $defaultPaymentMethodOvId = $this->callAPISuccess('OptionValue', 'getvalue', [
+      'return' => "id",
+      'option_group_id' => "payment_instrument",
+      'is_default' => 1,
+    ]);
+    $expectedFinancialAccountId = $this->callAPISuccess('EntityFinancialAccount', 'getvalue', [
+      'return' => "financial_account_id",
+      'entity_id' => $creditCardOvId,
+    ]);
+    $wrongFinancialAccountId = $this->callAPISuccess('EntityFinancialAccount', 'getvalue', [
+      'return' => "financial_account_id",
+      'entity_id' => $defaultPaymentMethodOvId,
+    ]);
+    // If these two are the same, there's no bug but this test is no longer valid and needs rewriting.
+    $this->assertNotEquals($expectedFinancialAccountId, $wrongFinancialAccountId, 'invalid test: Financial Account ID of credit card matches default payment method Financial Account ID');
+
+    // Create a credit card contribution with a fee amount.
+    $price = 100;
+    $cParams = [
+      'contact_id' => $contactId,
+      'total_amount' => $price,
+      'financial_type_id' => 1,
+      'is_active' => 1,
+      'payment_instrument_id' => 'Credit Card',
+      'fee_amount' => 3,
+    ];
+    $contribution = $this->callAPISuccess('Contribution', 'create', $cParams);
+    // Confirm that the from_financial_account_id amount on the fee trxn matches the expected value.
+    $trxnParams = [
+      'sequential' => 1,
+      'return' => ["financial_trxn_id.from_financial_account_id"],
+      'entity_table' => "civicrm_contribution",
+      'entity_id' => $contribution['id'],
+      'financial_trxn_id.total_amount' => 3,
+    ];
+    $firstFeeTrxnFromAccountId = $this->callAPISuccess('EntityFinancialTrxn', 'get', $trxnParams)['values'][0]['financial_trxn_id.from_financial_account_id'];
+    $this->assertEquals($expectedFinancialAccountId, $firstFeeTrxnFromAccountId);
+
+    // dev/financial#160 - ensure the from_financial_account_id is correct on a trxn generated by a contribution edit.
+    $updatedContributionParams = [
+      'id' => $contribution['id'],
+      'fee_amount' => 5,
+    ];
+    $this->callAPISuccess('Contribution', 'create', $updatedContributionParams);
+
+    // 2 = 5 - 3.
+    $trxnParams['financial_trxn_id.total_amount'] = 2;
+    $secondFeeTrxnFromAccountId = $this->callAPISuccess('EntityFinancialTrxn', 'get', $trxnParams)['values'][0]['financial_trxn_id.from_financial_account_id'];
+    $this->assertEquals($expectedFinancialAccountId, $secondFeeTrxnFromAccountId);
   }
 
 }

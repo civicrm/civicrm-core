@@ -1,0 +1,47 @@
+<div class="btn-group btn-group-xs crm-search-admin-search-listing-buttons">
+  <a class="btn btn-primary" ng-href="#/edit/{{:: row.data.id }}" ng-if=":: row.permissionToEdit" title="{{:: ts('Edit search and displays') }}">
+    <i class="crm-i fa-pencil fa-fw"></i>
+  </a>
+  <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="row.menuOpen = true">
+    <i class="crm-i fa-bars"></i>
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-right" ng-if=":: row.menuOpen">
+    <li ng-if=":: row.permissionToEdit" title="{{:: ts('Edit search and displays') }}">
+      <a ng-href="#/edit/{{:: row.data.id }}">
+        <i class="crm-i fa-pencil fa-fw"></i>
+        {{:: ts('Edit') }}
+      </a>
+    </li>
+    <li title="{{:: ts('View search results table') }}">
+      <a ng-href="{{:: $ctrl.searchDisplayPath + '#/display/' + row.data.name }}" target="_blank">
+        <i class="crm-i fa-table"></i>
+        {{:: ts('View Results') }}
+      </a>
+    </li>
+    <li title="{{:: ts('Create a new search based on this one') }}">
+      <a ng-href="#/create/{{:: row.data.api_entity + '?params=' + $ctrl.encode(row.data.api_params) }}">
+        <i class="crm-i fa-copy"></i>
+        {{:: ts('Clone...') }}
+      </a>
+    </li>
+    <li title="{{:: ts('Export this saved search to a file') }}">
+      <a href crm-dialog-popup="crmSearchAdminExport" popup-data="row" popup-tpl="~/crmSearchAdmin/searchListing/export.html" title="{{:: ts('Export %1', {1: row.data.label}) }}">
+        <i class="crm-i fa-download"></i>
+        {{:: ts('Export...') }}
+      </a>
+    </li>
+    <li ng-if="!row.data['base_module:label']" title="{{:: ts('Delete search along with any displays and forms') }}">
+      <a href ng-click="$ctrl.deleteOrRevert(row)">
+        <i class="crm-i fa-trash"></i>
+        {{:: ts('Delete') }}
+      </a>
+    </li>
+    <li ng-if="row.data['base_module:label'] && row.data['local_modified_date']" title="{{:: ts('Revert search to its packaged state') }}">
+      <a href ng-click="$ctrl.deleteOrRevert(row)">
+        <i class="crm-i fa-undo"></i>
+        {{:: ts('Revert') }}
+      </a>
+    </li>
+  </ul>
+</div>

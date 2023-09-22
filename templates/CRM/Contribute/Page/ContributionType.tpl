@@ -32,14 +32,14 @@
             <th></th>
           </thead>
          {foreach from=$rows item=row}
-        <tr id="contribution_type-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+        <tr id="contribution_type-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
           <td>{$row.name}</td>
           <td>{$row.description}</td>
               <td>{$row.accounting_code}</td>
           <td>{if $row.is_deductible eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
          </table>
@@ -49,7 +49,7 @@
 </div>
 {else}
     <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
+        {icon icon="fa-info-circle"}{/icon}
       {ts}None found.{/ts}
     </div>
 {/if}

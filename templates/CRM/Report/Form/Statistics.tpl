@@ -8,11 +8,11 @@
  +--------------------------------------------------------------------+
 *}
 {if $top}
-  {if $printOnly}
+  {if !empty($printOnly)}
     <h1>{$reportTitle}</h1>
-    <div id="report-date">{$reportDate}</div>
+    <div id="report-date">{if !empty($reportDate)}{$reportDate}{/if}</div>
   {/if}
-  {if $statistics}
+  {if !empty($statistics)}
     <table class="report-layout statistics-table">
       {foreach from=$statistics.groups item=row}
         <tr>
@@ -30,22 +30,24 @@
   {/if}
 {/if}
 
-{if $bottom and $rows and $statistics}
+{if $bottom and !empty($rows) and !empty($statistics)}
   <table class="report-layout">
-    {foreach from=$statistics.counts item=row}
-      <tr>
-        <th class="statistics" scope="row">{$row.title}</th>
-        <td>
-          {if $row.type eq 1024}
-            {$row.value|crmMoney|escape}
-          {elseif $row.type eq 2}
-            {$row.value|escape}
-          {else}
-            {$row.value|crmNumberFormat|escape}
-          {/if}
+    {if $statistics.counts}
+      {foreach from=$statistics.counts item=row}
+        <tr>
+          <th class="statistics" scope="row">{$row.title}</th>
+          <td>
+            {if $row.type eq 1024}
+              {$row.value|crmMoney|escape}
+            {elseif $row.type eq 2}
+              {$row.value|purify}
+            {else}
+               {$row.value|crmNumberFormat|escape}
+            {/if}
 
-        </td>
-      </tr>
-    {/foreach}
+          </td>
+        </tr>
+      {/foreach}
+    {/if}
   </table>
 {/if}

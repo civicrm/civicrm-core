@@ -37,8 +37,6 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
   /**
    * Build all the data structures needed to build the form.
    *
-   * @param
-   *
    * @return void
    */
   public function preProcess() {
@@ -67,7 +65,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Make Name Badges'));
+    $this->setTitle(ts('Make Name Badges'));
 
     // Ajax submit would interfere with file download
     $this->preventAjaxSubmit();

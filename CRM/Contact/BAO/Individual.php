@@ -44,15 +44,15 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     // "null" value for example is passed by dedupe merge in order to empty.
     // Display name computation shouldn't consider such values.
     foreach (['first_name', 'middle_name', 'last_name', 'nick_name', 'formal_title', 'birth_date', 'deceased_date'] as $displayField) {
-      if (CRM_Utils_Array::value($displayField, $params) == "null") {
+      if (($params[$displayField] ?? NULL) == "null") {
         $params[$displayField] = '';
       }
     }
 
     $sortName = $displayName = '';
-    $firstName = CRM_Utils_Array::value('first_name', $params, '');
-    $middleName = CRM_Utils_Array::value('middle_name', $params, '');
-    $lastName = CRM_Utils_Array::value('last_name', $params, '');
+    $firstName = trim($params['first_name'] ?? '');
+    $middleName = trim($params['middle_name'] ?? '');
+    $lastName = trim($params['last_name'] ?? '');
     $nickName = CRM_Utils_Array::value('nick_name', $params, '');
     $prefix_id = CRM_Utils_Array::value('prefix_id', $params, '');
     $suffix_id = CRM_Utils_Array::value('suffix_id', $params, '');
@@ -66,8 +66,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     if ($suffix_id) {
       $params['individual_suffix'] = $suffix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'suffix_id', $suffix_id);
     }
-
-    $params['is_deceased'] = CRM_Utils_Array::value('is_deceased', $params, FALSE);
 
     $individual = NULL;
     if ($contact->id) {
@@ -162,11 +160,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       }
     }
 
-    //first trim before further processing.
-    foreach (['lastName', 'firstName', 'middleName'] as $fld) {
-      $$fld = trim($$fld);
-    }
-
     if ($lastName || $firstName || $middleName) {
       // make sure we have values for all the name fields.
       $formatted = $params;
@@ -255,124 +248,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       }
     }
 
-    $format = CRM_Utils_Date::getDateFormat('birth');
-    if ($date = CRM_Utils_Array::value('birth_date', $params)) {
-      if (in_array($format, [
-        'dd-mm',
-        'mm/dd',
-      ])) {
-        $separator = '/';
-        if ($format == 'dd-mm') {
-          $separator = '-';
-        }
-        $date = $date . $separator . '1902';
-      }
-      elseif (in_array($format, [
-        'yy-mm',
-      ])) {
-        $date = $date . '-01';
-      }
-      elseif (in_array($format, [
-        'M yy',
-      ])) {
-        $date = $date . '-01';
-      }
-      elseif (in_array($format, [
-        'yy',
-      ])) {
-        $date = $date . '-01-01';
-      }
-      $contact->birth_date = CRM_Utils_Date::processDate($date);
-    }
-    elseif ($contact->birth_date) {
-      $contact->birth_date = CRM_Utils_Date::isoToMysql($contact->birth_date);
-    }
-
-    if ($date = CRM_Utils_Array::value('deceased_date', $params)) {
-      if (in_array($format, [
-        'dd-mm',
-        'mm/dd',
-      ])) {
-        $separator = '/';
-        if ($format == 'dd-mm') {
-          $separator = '-';
-        }
-        $date = $date . $separator . '1902';
-      }
-      elseif (in_array($format, [
-        'yy-mm',
-      ])) {
-        $date = $date . '-01';
-      }
-      elseif (in_array($format, [
-        'M yy',
-      ])) {
-        $date = $date . '-01';
-      }
-      elseif (in_array($format, [
-        'yy',
-      ])) {
-        $date = $date . '-01-01';
-      }
-
-      $contact->deceased_date = CRM_Utils_Date::processDate($date);
-    }
-    elseif ($contact->deceased_date) {
-      $contact->deceased_date = CRM_Utils_Date::isoToMysql($contact->deceased_date);
-    }
-
-    if ($middle_name = CRM_Utils_Array::value('middle_name', $params)) {
-      $contact->middle_name = $middle_name;
-    }
-
     return $contact;
-  }
-
-  /**
-   * Regenerates display_name for contacts with given prefixes/suffixes.
-   *
-   * @param array $ids
-   *   The array with the prefix/suffix id governing which contacts to regenerate.
-   * @param int $action
-   *   The action describing whether prefix/suffix was UPDATED or DELETED.
-   */
-  public static function updateDisplayNames(&$ids, $action) {
-    // get the proper field name (prefix_id or suffix_id) and its value
-    $fieldName = '';
-    foreach ($ids as $key => $value) {
-      switch ($key) {
-        case 'individualPrefix':
-          $fieldName = 'prefix_id';
-          $fieldValue = $value;
-          break 2;
-
-        case 'individualSuffix':
-          $fieldName = 'suffix_id';
-          $fieldValue = $value;
-          break 2;
-      }
-    }
-    if ($fieldName == '') {
-      return;
-    }
-
-    // query for the affected individuals
-    $fieldValue = CRM_Utils_Type::escape($fieldValue, 'Integer');
-    $contact = new CRM_Contact_BAO_Contact();
-    $contact->$fieldName = $fieldValue;
-    $contact->find();
-
-    // iterate through the affected individuals and rebuild their display_names
-    while ($contact->fetch()) {
-      $contact = new CRM_Contact_BAO_Contact();
-      $contact->id = $contact->contact_id;
-      if ($action == CRM_Core_Action::DELETE) {
-        $contact->$fieldName = 'NULL';
-        $contact->save();
-      }
-      $contact->display_name = $contact->displayName();
-      $contact->save();
-    }
   }
 
   /**

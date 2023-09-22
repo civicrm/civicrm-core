@@ -22,7 +22,7 @@ class CRM_Contact_Form_Search_CriteriaTest extends CiviUnitTestCase {
    * Test that the 'multiple bulk email' setting correctly affects the type of
    * field used for the 'email on hold' criteria in Advanced Search.
    */
-  public function testAdvancedHSearchObservesMultipleBulkEmailSetting() {
+  public function testAdvancedHSearchObservesMultipleBulkEmailSetting(): void {
 
     // If setting is enabled, criteria should be a select element.
     Civi::settings()->set('civimail_multiple_bulk_emails', 1);

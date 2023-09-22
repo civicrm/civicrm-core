@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/ckeditor</path>
+    <title>Configure CKEditor 4</title>
+    <page_callback>CRM_Ckeditor4_Form_CKEditorConfig</page_callback>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+</menu>

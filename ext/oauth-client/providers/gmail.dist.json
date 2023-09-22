@@ -1,0 +1,27 @@
+{
+  "title": "Google Mail",
+  "class": "League\\OAuth2\\Client\\Provider\\Google",
+  "options": {
+    "urlAuthorize": "https://accounts.google.com/o/oauth2/v2/auth",
+    "urlAccessToken": "https://www.googleapis.com/oauth2/v4/token",
+    "urlResourceOwnerDetails": "https://openidconnect.googleapis.com/v1/userinfo",
+    "accessType": "offline",
+    "scopeSeparator": " ",
+    "scopes": [
+      "https://mail.google.com/",
+      "openid"
+    ],
+    "prompt": "select_account consent"
+  },
+  "mailSettingsTemplate": {
+    "name": "{{token.resource_owner.email}}",
+    "domain": "{{token.resource_owner.email|getMailDomain}}",
+    "localpart": null,
+    "return_path": null,
+    "protocol:name": "IMAP",
+    "server": "imap.gmail.com",
+    "username": "{{token.resource_owner.email}}",
+    "password": null,
+    "is_ssl": true
+  }
+}

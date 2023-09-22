@@ -5,6 +5,7 @@
   <class>EntityTag</class>
   <name>civicrm_entity_tag</name>
   <comment>Tag entities (Contacts, Groups, Actions) to categories.</comment>
+  <add>1.1</add>
   <log>true</log>
   <field>
     <name>id</name>
@@ -12,28 +13,15 @@
     <title>Entity Tag ID</title>
     <required>true</required>
     <comment>primary key</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
     <name>id</name>
     <autoincrement>true</autoincrement>
   </primaryKey>
-  <field>
-    <name>contact_id</name>
-    <type>int unsigned</type>
-    <required>true</required>
-    <comment>FK to contact table.</comment>
-    <add>2.0</add>
-    <drop>3.2</drop>
-  </field>
-  <foreignKey>
-    <name>contact_id</name>
-    <table>civicrm_contact</table>
-    <key>id</key>
-    <add>2.0</add>
-    <drop>3.2</drop>
-    <onDelete>CASCADE</onDelete>
-  </foreignKey>
   <field>
     <name>entity_table</name>
     <type>varchar</type>
@@ -58,17 +46,10 @@
     <typeColumn>entity_table</typeColumn>
     <add>3.2</add>
   </dynamicForeignKey>
-  <index>
-    <name>index_entity</name>
-    <fieldName>entity_table</fieldName>
-    <fieldName>entity_id</fieldName>
-    <add>3.2</add>
-    <drop>3.4</drop>
-  </index>
   <field>
     <name>tag_id</name>
     <type>int unsigned</type>
-    <title>Tag</title>
+    <title>Tag ID</title>
     <required>true</required>
     <comment>FK to civicrm_tag</comment>
     <add>1.1</add>
@@ -76,9 +57,12 @@
       <table>civicrm_tag</table>
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
+      <condition>is_tagset != 1</condition>
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Tag</label>
+      <controlField>entity_table</controlField>
     </html>
   </field>
   <foreignKey>

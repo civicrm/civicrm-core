@@ -42,9 +42,8 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -110,6 +109,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
           ],
           'pledge_create_date' => [
             'title' => ts('Pledge Made Date'),
+            'type' => CRM_Utils_Type::T_DATE,
           ],
           'start_date' => [
             'title' => ts('Pledge Start Date'),
@@ -121,7 +121,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
           ],
           'status_id' => [
             'title' => ts('Pledge Status'),
-            'required' => TRUE,
+            'default' => TRUE,
           ],
         ],
         'filters' => [
@@ -195,9 +195,9 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
    * If we are retrieving total paid we need to define the inclusion of pledge_payment.
    *
    * @param string $tableName
-   * @param $tableKey
+   * @param string $tableKey
    * @param string $fieldName
-   * @param $field
+   * @param array $field
    *
    * @return bool|string
    */
@@ -256,7 +256,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
@@ -330,7 +330,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+          if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;

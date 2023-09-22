@@ -1,12 +1,19 @@
 <?php
 
+use Civi\Test\Invasive;
+
 /**
  *  Include dataProvider for tests
  * @group headless
  */
 class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  protected $assignee1;
+  protected $assignee2;
+  protected $target;
+  protected $source;
+
+  public function setUp():void {
     parent::setUp();
     $this->assignee1 = $this->individualCreate([
       'first_name' => 'testassignee1',
@@ -22,7 +29,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
     $this->source = $this->individualCreate();
   }
 
-  public function testActivityCreate() {
+  public function testActivityCreate(): void {
     Civi::settings()->set('activity_assignee_notification', TRUE);
     //Reset filter to none.
     Civi::settings()->set('do_not_notify_assignees_for', []);
@@ -39,10 +46,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
       'activity_type_id' => $activityTypeId,
     ];
 
-    $activityRef = new ReflectionClass('CRM_Activity_Form_Activity');
-    $method = $activityRef->getMethod('processActivity');
-    $method->setAccessible(TRUE);
-    $method->invokeArgs($form, [&$params]);
+    Invasive::call([$form, 'processActivity'], [&$params]);
 
     $msg = $mut->getMostRecentEmail();
     $this->assertNotEmpty($msg);
@@ -51,12 +55,13 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
     //Block Meeting notification.
     Civi::settings()->set('do_not_notify_assignees_for', [$activityTypeId]);
     $params['assignee_contact_id'] = [$this->assignee2];
-    $method->invokeArgs($form, [&$params]);
+    Invasive::call([$form, 'processActivity'], [&$params]);
+
     $msg = $mut->getMostRecentEmail();
     $this->assertEmpty($msg);
   }
 
-  public function testActivityDelete() {
+  public function testActivityDelete(): void {
     // Set the parameters of the test.
     $numberOfSingleActivitiesToCreate = 3;
     $numberOfRepeatingActivitiesToCreate = 6;
@@ -94,6 +99,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
 
     // Create the repeating activity's schedule.
     $actionScheduleParams = [
+      'title' => 'RepeatingActSchedule',
       'used_for' => 'civicrm_activity',
       'entity_value' => $repeatingActivityBao->id,
       'start_action_date' => $repeatingActivityBao->activity_date_time,
@@ -101,7 +107,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
       'repetition_frequency_interval' => 1,
       'start_action_offset' => $numberOfRepeatingActivitiesToCreate - 1,
     ];
-    $actionScheduleBao = CRM_Core_BAO_ActionSchedule::add($actionScheduleParams);
+    $actionScheduleBao = CRM_Core_BAO_ActionSchedule::writeRecord($actionScheduleParams);
 
     // Create the activity's repeats.
     $recurringEntityBao = new CRM_Core_BAO_RecurringEntity();
@@ -152,7 +158,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
   /**
    * Test deleting an activity that has an attachment.
    */
-  public function testActivityDeleteWithAttachment() {
+  public function testActivityDeleteWithAttachment(): void {
     $loggedInUser = $this->createLoggedInUser();
     // Create an activity
     $activity = $this->callAPISuccess('Activity', 'create', [
@@ -236,7 +242,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
   /**
    * This is a bit messed up having a variable called name that means label but we don't want to fix it because it's a form member variable _activityTypeName that might be used in form hooks, so just make sure it doesn't flip between name and label. dev/core#1116
    */
-  public function testActivityTypeNameIsReallyLabel() {
+  public function testActivityTypeNameIsReallyLabel(): void {
     $form = new CRM_Activity_Form_Activity();
 
     // the actual value is irrelevant we just need something for the tested function to act on
@@ -270,7 +276,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
    *
    * See also testActivityTypeNameIsReallyLabel()
    */
-  public function testActivityTypeAssignment() {
+  public function testActivityTypeAssignment(): void {
     $form = new CRM_Activity_Form_Activity();
 
     $form->_currentlyViewedContactId = $this->source;
@@ -303,8 +309,10 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
    * Test that inbound email is still treated properly if you change the label.
    * I'm not crazy about the strategy used in this test but I can't see another
    * way to do it.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testInboundEmailDisplaysWithLinebreaks() {
+  public function testInboundEmailDisplaysWithLineBreaks(): void {
     // Change label
     $inbound_email = $this->callAPISuccess('OptionValue', 'getsingle', [
       'option_group_id' => 'activity_type',
@@ -349,34 +357,20 @@ ENDBODY;
       'source_contact_id' => $this->source,
       'assignee_contact_id' => NULL,
     ]);
-    $activity_id = $activity['id'];
+    $_REQUEST = [
+      'context' => 'standalone',
+      'cid' => $this->source,
+      'action' => 'view',
+      'id' => $activity['id'],
+      'atype' => $activity['values'][$activity['id']]['activity_type_id'],
+    ];
 
     // Simulate viewing it from the form.
-
-    $form = new CRM_Activity_Form_Activity();
-    $form->controller = new CRM_Core_Controller_Simple('CRM_Activity_Form_Activity', 'Activity');
-    $form->set('context', 'standalone');
-    $form->set('cid', $this->source);
-    $form->set('action', 'view');
-    $form->set('id', $activity_id);
-    $form->set('atype', $activity['values'][$activity_id]['activity_type_id']);
-
-    $form->buildForm();
-
-    // Wish there was another way to do this
-    $form->controller->handle($form, 'display');
-
-    // This isn't a faithful representation of the output since there'll
-    // probably be a lot missing, but for now I don't see a simpler way to
-    // do this.
-    // Also this is printing the template code to the console. It doesn't hurt
-    // the test but it's clutter and I don't know where it's coming from
-    // and can't seem to prevent it.
-    $output = $form->getTemplate()->fetch($form->getTemplateFileName());
+    $output = $this->getRenderedFormContents('CRM_Activity_Form_Activity');
 
     // This kind of suffers from the same problem as the old webtests. It's
     // a bit brittle and tied to the UI.
-    $this->assertContains("Hi,<br />\n<br />\nWassup!?!?<br />\n<br />\nLet's check if the output when viewing the form has legible line breaks in the output.<br />\n<br />\nThanks!", $output);
+    $this->assertStringContainsString("Hi,<br />\n<br />\nWassup!?!?<br />\n<br />\nLet's check if the output when viewing the form has legible line breaks in the output.<br />\n<br />\nThanks!", $output);
 
     // Put label back
     $this->callAPISuccess('OptionValue', 'create', [

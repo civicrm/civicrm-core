@@ -12,9 +12,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -82,21 +80,6 @@ return [
       'callback' => 'CRM_Case_Info::getSortOptions',
     ],
     'description' => ts('How to sort activity-types on the "Manage Case" screen? (Set "Default" to load setting from the legacy "Settings.xml" file.)'),
-    'help_text' => '',
-  ],
-  'civicaseActivityRevisions' => [
-    'group_name' => 'CiviCRM Preferences',
-    'group' => 'core',
-    'name' => 'civicaseActivityRevisions',
-    'type' => 'Boolean',
-    'quick_form_type' => 'YesNo',
-    'default' => FALSE,
-    'html_type' => 'radio',
-    'add' => '4.7',
-    'title' => ts('Enable Embedded Activity Revisions'),
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => ts('Enable tracking of activity revisions embedded within the "civicrm_activity" table. Alternatively, see "Administer => System Settings => Misc => Logging".'),
     'help_text' => '',
   ],
   'civicaseShowCaseActivities' => [

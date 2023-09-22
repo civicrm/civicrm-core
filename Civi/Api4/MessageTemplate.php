@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -9,20 +8,14 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
 namespace Civi\Api4;
 
 /**
  * MsgTemplate entity.
  *
  * This is a collection of MsgTemplate, for reuse in import, export, etc.
- *
+ * @searchable secondary
+ * @since 5.26
  * @package Civi\Api4
  */
 class MessageTemplate extends Generic\DAOEntity {

@@ -19,5 +19,4 @@ return [
     'ui.sortable',
     'dialogService',
   ],
-  'settings' => [],
 ];

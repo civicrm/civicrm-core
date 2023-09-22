@@ -49,7 +49,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
     // add select for groups
     // Get hierarchical listing of groups, respecting ACLs for CRM-16836.
-    $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($this->_group, NULL, '&nbsp;&nbsp;', TRUE);
+    $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($this->_group, NULL, '- ', TRUE);
     if (!empty($searchOptions['groups'])) {
       $this->addField('group', [
         'entity' => 'group_contact',
@@ -116,6 +116,9 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * Processing needed for buildForm and later.
    */
   public function preProcess() {
+    // SearchFormName is deprecated & to be removed - the replacement is for the task to
+    // call $this->form->getSearchFormValues()
+    // A couple of extensions use it.
     $this->set('searchFormName', 'Basic');
 
     parent::preProcess();
@@ -193,7 +196,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
         return ['task' => 'Please select a valid action.'];
       }
 
-      if (CRM_Utils_Array::value('task', $fields) == CRM_Contact_Task::SAVE_SEARCH) {
+      if (($fields['task'] ?? NULL) == CRM_Contact_Task::SAVE_SEARCH) {
         // dont need to check for selection of contacts for saving search
         return TRUE;
       }

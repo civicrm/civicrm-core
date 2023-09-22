@@ -87,7 +87,7 @@ class StaticProvider extends AdhocProvider {
    *   The full description of the API request.
    * @return array
    *   Formatted API result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function doCreate($apiRequest) {
     if (isset($apiRequest['params']['id'])) {
@@ -99,7 +99,7 @@ class StaticProvider extends AdhocProvider {
     }
 
     if (!isset($this->records[$id])) {
-      throw new \API_Exception("Invalid ID: $id");
+      throw new \CRM_Core_Exception("Invalid ID: $id");
     }
 
     foreach ($this->fields as $field) {
@@ -116,7 +116,7 @@ class StaticProvider extends AdhocProvider {
    *   The full description of the API request.
    * @return array
    *   Formatted API result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function doGet($apiRequest) {
     return _civicrm_api3_basic_array_get($apiRequest['entity'], $apiRequest['params'], $this->records, 'id', $this->fields);
@@ -127,7 +127,7 @@ class StaticProvider extends AdhocProvider {
    *   The full description of the API request.
    * @return array
    *   Formatted API result
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function doDelete($apiRequest) {
     $id = @$apiRequest['params']['id'];

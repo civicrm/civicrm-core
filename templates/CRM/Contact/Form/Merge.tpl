@@ -13,13 +13,13 @@
   </div>
 
   <div class="message status">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     <strong>{ts}WARNING: The duplicate contact record WILL BE DELETED after the merge is complete.{/ts}</strong>
   </div>
 
   {if $user}
     <div class="message status">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       <strong>{ts 1=$config->userFramework}WARNING: There are %1 user accounts associated with both the original and duplicate contacts. Ensure that the %1 user you want to retain is on the right - if necessary use the 'Flip between original and duplicate contacts.' option at top to swap the positions of the two records before doing the merge.
   The user record associated with the duplicate contact will not be deleted, but will be unlinked from the associated contact record (which will be deleted).
   You will need to manually delete that user (click on the link to open the %1 user account in new screen). You may need to give thought to how you handle any content or contents associated with that user.{/ts}</strong>
@@ -59,7 +59,7 @@
       <th>{$otherContactTypeIcon} <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name|escape}</a> ({ts}duplicate{/ts})</th>
       <th>{ts}Mark All{/ts}<br />=={$form.toggleSelect.html} ==&gt;</th>
       <th>{$mainContactTypeIcon}<a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name|escape}</a></th>
-      <th width="300">Add/overwrite?</th>
+      <th width="300">{ts}Add/overwrite?{/ts}</th>
     </tr>
 
 
@@ -75,7 +75,7 @@
 
     {foreach from=$rows item=row key=field}
 
-      {if !isset($row.main) && !isset($row.other)}
+      {if !$row.main && !$row.other}
         <tr style="background-color: #fff !important; border-bottom:1px solid #ccc !important;" class="no-data">
           <td>
             <strong>{$row.title|escape}</strong>
@@ -114,7 +114,7 @@
           </td>
 
           <td style='white-space: nowrap'>
-             {if $form.$field}=={$form.$field.html|crmAddClass:"select-row"}==&gt;{/if}
+             {if array_key_exists($field, $form) && $form.$field}=={$form.$field.html|crmAddClass:"select-row"}==&gt;{/if}
           </td>
 
           {* For location blocks *}
@@ -142,12 +142,12 @@
 
             <td>
               {* Display location for fields with locations *}
-              {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im' }
+              {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im'}
                 {$form.location_blocks.$blockName.$blockId.locTypeId.html}&nbsp;
               {/if}
 
               {* Display other_type_id for websites, ims and phones *}
-              {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone' }
+              {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone'}
                 {$form.location_blocks.$blockName.$blockId.typeTypeId.html}&nbsp;
               {/if}
 
@@ -155,7 +155,7 @@
               <span id="main_{$blockName}_{$blockId}_overwrite" class="location_block_controls">
 
                 <span class="location_primary">
-                  {if $row.main && $row.main_is_primary == "1"}Primary{/if}
+                  {if $row.main && $row.main_is_primary == "1"}{ts}Primary{/ts}{/if}
                 </span>
 
                 <span class="location_block_controls_options">
@@ -193,7 +193,7 @@
             </td>
 
             <td>
-              {if isset($row.main) || isset($row.other)}
+              {if $row.main || $row.other}
                 <span>
                   {if $row.main == $row.other}
                     <span class="action_label">({ts}match{/ts})</span><br />
@@ -219,7 +219,7 @@
       </tr>
       {else}
       <tr class="{cycle values="even-row,odd-row"}">
-        <td><strong>{ts}Move related...{/ts}</strong></td><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $form.operation.$paramName.add.html}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
+        <td><strong>{ts}Move related...{/ts}</strong></td><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $params.has_operation}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
          <td>({ts}migrate{/ts})</td>
       </tr>
       {/if}
@@ -283,7 +283,7 @@
 
     // Update primary label
     if (mainBlock != false && mainBlock['is_primary'] == '1') {
-      this_controls.find(".location_primary").text('Primary');
+      this_controls.find(".location_primary").text('{/literal}{ts escape='js'}Primary{/ts}{literal}');
     }
     else {
       this_controls.find(".location_primary").text('');
@@ -294,10 +294,10 @@
     var add_new_check_length = this_controls.find(".location_operation_checkbox input:checked").length;
     if (mainBlock != false) {
       if (add_new_check_length > 0) {
-        operation_description = "{/literal}{ts}add new{/ts}{literal}";
+        operation_description = "{/literal}{ts escape='js'}add new{/ts}{literal}";
       }
       else {
-        operation_description = "{/literal}{ts}overwrite{/ts}{literal}";
+        operation_description = "{/literal}{ts escape='js'}overwrite{/ts}{literal}";
       }
     }
     this_controls.find(".location_operation_description").text("(" + operation_description + ")");
@@ -309,7 +309,7 @@
       if (mainBlock != false && (blockName == 'email' || blockName == 'phone')) {
         var op_id = 'location_blocks[' + blockName + '][' + blockId + '][operation]';
         this_controls.find(".location_operation_checkbox").html(
-                '<input id="' + op_id + '" name="' + op_id + '" type="checkbox" value="1" class="crm-form-checkbox"><label for="' + op_id + '">{/literal}{ts}Add new{/ts}{literal}</label>'
+                '<input id="' + op_id + '" name="' + op_id + '" type="checkbox" value="1" class="crm-form-checkbox"><label for="' + op_id + '">{/literal}{ts escape='js'}Add new{/ts}{literal}</label>'
         );
       }
       else {
@@ -323,7 +323,7 @@
       if (blockName != 'website' && (mainBlock == false || mainBlock['is_primary'] != "1" || add_new_check_length > 0)) {
         var prim_id = 'location_blocks[' + blockName + '][' + blockId + '][set_other_primary]';
         this_controls.find(".location_set_other_primary").html(
-                '<input id="' + prim_id + '" name="' + prim_id + '" type="checkbox" value="1" class="crm-form-checkbox"><label for="' + prim_id + '">{/literal}{ts}Set as primary{/ts}{literal}</label>'
+                '<input id="' + prim_id + '" name="' + prim_id + '" type="checkbox" value="1" class="crm-form-checkbox"><label for="' + prim_id + '">{/literal}{ts escape='js'}Set as primary{/ts}{literal}</label>'
         );
       }
       else {

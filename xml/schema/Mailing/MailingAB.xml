@@ -6,11 +6,15 @@
   <name>civicrm_mailing_abtest</name>
   <comment>Stores information about abtesting</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <type>int unsigned</type>
     <title>MailingAB ID</title>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -107,9 +111,12 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>AB Test Created By</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>4.6</add>
   </field>
   <foreignKey>
@@ -129,6 +136,7 @@
     <add>4.6</add>
     <html>
       <type>Select Date</type>
+      <formatType>mailing</formatType>
     </html>
   </field>
 </table>

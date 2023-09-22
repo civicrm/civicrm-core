@@ -23,80 +23,78 @@ function safe_delete() {
 ##############################################################################
 ## usage: make_font_cache > font-cache.php
 function make_font_cache() {
-cat <<EOFONT
-<?php return array (
+php -r "echo json_encode(array (
   'sans-serif' =>
   array (
-    'normal' => DOMPDF_DIR . '/lib/fonts/Helvetica',
-    'bold' => DOMPDF_DIR . '/lib/fonts/Helvetica-Bold',
-    'italic' => DOMPDF_DIR . '/lib/fonts/Helvetica-Oblique',
-    'bold_italic' => DOMPDF_DIR . '/lib/fonts/Helvetica-BoldOblique',
+    'normal' => 'Helvetica',
+    'bold' => 'Helvetica-Bold',
+    'italic' => 'Helvetica-Oblique',
+    'bold_italic' => 'Helvetica-BoldOblique',
   ),
   'times' =>
   array (
-    'normal' => DOMPDF_DIR . '/lib/fonts/Times-Roman',
-    'bold' => DOMPDF_DIR . '/lib/fonts/Times-Bold',
-    'italic' => DOMPDF_DIR . '/lib/fonts/Times-Italic',
-    'bold_italic' => DOMPDF_DIR . '/lib/fonts/Times-BoldItalic',
+    'normal' => 'Times-Roman',
+    'bold' => 'Times-Bold',
+    'italic' => 'Times-Italic',
+    'bold_italic' => 'Times-BoldItalic',
   ),
   'times-roman' =>
   array (
-    'normal' => DOMPDF_DIR . '/lib/fonts/Times-Roman',
-    'bold' => DOMPDF_DIR . '/lib/fonts/Times-Bold',
-    'italic' => DOMPDF_DIR . '/lib/fonts/Times-Italic',
-    'bold_italic' => DOMPDF_DIR . '/lib/fonts/Times-BoldItalic',
+    'normal' => 'Times-Roman',
+    'bold' => 'Times-Bold',
+    'italic' => 'Times-Italic',
+    'bold_italic' => 'Times-BoldItalic',
   ),
   'courier' =>
   array (
-    'normal' => DOMPDF_DIR . '/lib/fonts/Courier',
-    'bold' => DOMPDF_DIR . '/lib/fonts/Courier-Bold',
-    'italic' => DOMPDF_DIR . '/lib/fonts/Courier-Oblique',
-    'bold_italic' => DOMPDF_DIR . '/lib/fonts/Courier-BoldOblique',
+    'normal' => 'Courier',
+    'bold' => 'Courier-Bold',
+    'italic' => 'Courier-Oblique',
+    'bold_italic' => 'Courier-BoldOblique',
   ),
   'helvetica' =>
   array (
-    'normal' => DOMPDF_DIR . '/lib/fonts/Helvetica',
-    'bold' => DOMPDF_DIR . '/lib/fonts/Helvetica-Bold',
-    'italic' => DOMPDF_DIR . '/lib/fonts/Helvetica-Oblique',
-    'bold_italic' => DOMPDF_DIR . '/lib/fonts/Helvetica-BoldOblique',
+    'normal' => 'Helvetica',
+    'bold' => 'Helvetica-Bold',
+    'italic' => 'Helvetica-Oblique',
+    'bold_italic' => 'Helvetica-BoldOblique',
   ),
   'zapfdingbats' =>
   array (
-    'normal' => DOMPDF_DIR . '/lib/fonts/ZapfDingbats',
-    'bold' => DOMPDF_DIR . '/lib/fonts/ZapfDingbats',
-    'italic' => DOMPDF_DIR . '/lib/fonts/ZapfDingbats',
-    'bold_italic' => DOMPDF_DIR . '/lib/fonts/ZapfDingbats',
+    'normal' => 'ZapfDingbats',
+    'bold' => 'ZapfDingbats',
+    'italic' => 'ZapfDingbats',
+    'bold_italic' => 'ZapfDingbats',
   ),
   'symbol' =>
   array (
-    'normal' => DOMPDF_DIR . '/lib/fonts/Symbol',
-    'bold' => DOMPDF_DIR . '/lib/fonts/Symbol',
-    'italic' => DOMPDF_DIR . '/lib/fonts/Symbol',
-    'bold_italic' => DOMPDF_DIR . '/lib/fonts/Symbol',
+    'normal' => 'Symbol',
+    'bold' => 'Symbol',
+    'italic' => 'Symbol',
+    'bold_italic' => 'Symbol',
   ),
   'serif' =>
   array (
-    'normal' => DOMPDF_DIR . '/lib/fonts/Times-Roman',
-    'bold' => DOMPDF_DIR . '/lib/fonts/Times-Bold',
-    'italic' => DOMPDF_DIR . '/lib/fonts/Times-Italic',
-    'bold_italic' => DOMPDF_DIR . '/lib/fonts/Times-BoldItalic',
+    'normal' => 'Times-Roman',
+    'bold' => 'Times-Bold',
+    'italic' => 'Times-Italic',
+    'bold_italic' => 'Times-BoldItalic',
   ),
   'monospace' =>
   array (
-    'normal' => DOMPDF_DIR . '/lib/fonts/Courier',
-    'bold' => DOMPDF_DIR . '/lib/fonts/Courier-Bold',
-    'italic' => DOMPDF_DIR . '/lib/fonts/Courier-Oblique',
-    'bold_italic' => DOMPDF_DIR . '/lib/fonts/Courier-BoldOblique',
+    'normal' => 'Courier',
+    'bold' => 'Courier-Bold',
+    'italic' => 'Courier-Oblique',
+    'bold_italic' => 'Courier-BoldOblique',
   ),
   'fixed' =>
   array (
-    'normal' => DOMPDF_DIR . '/lib/fonts/Courier',
-    'bold' => DOMPDF_DIR . '/lib/fonts/Courier-Bold',
-    'italic' => DOMPDF_DIR . '/lib/fonts/Courier-Oblique',
-    'bold_italic' => DOMPDF_DIR . '/lib/fonts/Courier-BoldOblique',
+    'normal' => 'Courier',
+    'bold' => 'Courier-Bold',
+    'italic' => 'Courier-Oblique',
+    'bold_italic' => 'Courier-BoldOblique',
   ),
-) ?>
-EOFONT
+), JSON_PRETTY_PRINT);"
 }
 
 function make_font_readme() {
@@ -124,8 +122,5 @@ safe_delete vendor/phenx/php-font-lib/www
 
 # Remove DejaVu fonts. They add 12mb.
 safe_delete vendor/dompdf/dompdf/lib/fonts/DejaVu*
-make_font_cache > vendor/dompdf/dompdf/lib/fonts/dompdf_font_family_cache.dist.php
+make_font_cache > vendor/dompdf/dompdf/lib/fonts/installed-fonts.dist.json
 make_font_readme > vendor/dompdf/dompdf/lib/fonts/README.DejaVuFonts.txt
-
-# Remove debug_print_backtrace(), which can leak system details. Put backtrace in log.
-simple_replace vendor/dompdf/dompdf/lib/html5lib/TreeBuilder.php 'debug_print_backtrace();' 'CRM_Core_Error::backtrace("backTrace", TRUE);'

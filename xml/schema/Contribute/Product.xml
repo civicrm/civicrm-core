@@ -7,11 +7,16 @@
   <name>civicrm_product</name>
   <add>1.4</add>
   <log>true</log>
+  <component>CiviContribute</component>
+  <labelField>name</labelField>
   <field>
     <name>id</name>
     <title>Product ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.4</add>
   </field>
   <primaryKey>
@@ -94,11 +99,12 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Currency</label>
     </html>
   </field>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <pseudoconstant>
@@ -107,6 +113,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>FK to Financial Type.</comment>
+    <html>
+      <label>Financial Type</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>
@@ -136,6 +145,11 @@
     <title>Is Active</title>
     <type>boolean</type>
     <required>true</required>
+    <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Disabling premium removes it from the premiums_premium join table below.</comment>
     <add>1.4</add>
   </field>

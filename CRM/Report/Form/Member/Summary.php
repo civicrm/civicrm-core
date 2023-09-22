@@ -18,11 +18,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
   protected $_summary = NULL;
   protected $_interval = NULL;
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
+
   protected $_add2groupSupported = FALSE;
 
   protected $_customGroupExtends = ['Membership'];
@@ -36,9 +32,8 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -70,7 +65,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           ],
           'membership_end_date' => [
             'name' => 'end_date',
-            'title' => ts('Membership End Date'),
+            'title' => ts('Membership Expiration Date'),
             'type' => CRM_Utils_Type::T_DATE,
             'operatorType' => CRM_Report_Form::OP_DATE,
           ],
@@ -160,6 +155,13 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
     // If we have campaigns enabled, add those elements to both the fields, filters and group by
     $this->addCampaignFields('civicrm_membership', TRUE);
 
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
+    ];
+
     $this->_groupFilter = TRUE;
     $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
@@ -180,7 +182,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
         foreach ($table['group_bys'] as $fieldName => $field) {
           if (!empty($this->_params['group_bys'][$fieldName])) {
 
-            switch (CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])) {
+            switch ($this->_params['group_bys_freq'][$fieldName] ?? NULL) {
               case 'YEARWEEK':
                 $select[] = "DATE_SUB({$field['dbAlias']}, INTERVAL WEEKDAY({$field['dbAlias']}) DAY) AS {$tableName}_{$fieldName}_start";
 
@@ -361,7 +363,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
@@ -440,7 +442,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    */
   public function buildChart(&$rows) {
     $graphRows = [];

@@ -5,7 +5,7 @@
  */
 class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
   }
 
@@ -14,8 +14,8 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testParticipantNote() {
-    $event = $this->eventCreate();
+  public function testParticipantNote(): void {
+    $event = $this->eventCreateUnpaid();
     $this->individualCreate([
       'api.participant.create' => [
         'event_id' => $event['id'],
@@ -49,8 +49,8 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testEventType() {
-    $event = $this->eventCreate();
+  public function testEventType(): void {
+    $event = $this->eventCreateUnpaid();
     $contactId = $this->individualCreate([
       'api.participant.create' => [
         'event_id' => $event['id'],
@@ -117,14 +117,14 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
         [['participant_status_id', '=', 1, 0, 0]],
         [
           'where' => '( civicrm_participant.status_id = 1 )',
-          'qill' => 'Participant Status (ID) = Registered',
+          'qill' => 'Status ID = Registered',
         ],
       ],
       [
         [['participant_status_id', 'IN', [1, 2], 0, 0]],
         [
           'where' => '( civicrm_participant.status_id IN ("1", "2") )',
-          'qill' => 'Participant Status (ID) In Registered, Attended',
+          'qill' => 'Status ID In Registered, Attended',
         ],
       ],
     ];

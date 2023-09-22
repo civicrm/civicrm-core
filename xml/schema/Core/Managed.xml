@@ -7,12 +7,16 @@
   <comment>List of declaratively managed objects</comment>
   <add>4.2</add>
   <log>false</log>
+  <title>Managed Record</title>
   <field>
     <name>id</name>
     <title>Managed ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Surrogate Key</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.2</add>
   </field>
   <primaryKey>
@@ -72,6 +76,14 @@
       <type>Select</type>
     </html>
     <add>4.5</add>
+  </field>
+  <field>
+    <name>entity_modified_date</name>
+    <type>timestamp</type>
+    <comment>When the managed entity was changed from its original settings.</comment>
+    <required>false</required>
+    <default>NULL</default>
+    <add>5.45</add>
   </field>
   <index>
     <name>UI_managed_entity</name>

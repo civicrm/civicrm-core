@@ -1,5 +1,8 @@
 <?php
 
+use Civi\Token\Event\TokenValueEvent;
+use Civi\Token\TokenProcessor;
+
 trait CRM_Core_TokenTrait {
 
   private $basicTokens;
@@ -16,18 +19,22 @@ trait CRM_Core_TokenTrait {
   }
 
   /**
-   * @inheritDoc
+   * Check if the token processor is active.
+   *
+   * @param \Civi\Token\TokenProcessor $processor
+   *
+   * @return bool
    */
-  public function checkActive(\Civi\Token\TokenProcessor $processor) {
+  public function checkActive(TokenProcessor $processor) {
     return in_array($this->getEntityContextSchema(), $processor->context['schema']) ||
       (!empty($processor->context['actionMapping'])
-        && $processor->context['actionMapping']->getEntity() === $this->getEntityTableName());
+        && $processor->context['actionMapping']->getEntityTable() === $this->getEntityTableName());
   }
 
   /**
    * @inheritDoc
    */
-  public function getActiveTokens(\Civi\Token\Event\TokenValueEvent $e) {
+  public function getActiveTokens(TokenValueEvent $e) {
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();
     if (!isset($messageTokens[$this->entity])) {
       return NULL;
@@ -39,28 +46,22 @@ trait CRM_Core_TokenTrait {
       if (array_key_exists($msgToken, $this->tokenNames)) {
         $activeTokens[] = $msgToken;
       }
-      else {
-        $altToken = preg_replace('/_\d+_/', '_N_', $msgToken);
-        if (array_key_exists($altToken, $this->tokenNames)) {
-          $activeTokens[] = $msgToken;
-        }
-      }
     }
     return array_unique($activeTokens);
   }
 
   /**
    * Find the fields that we need to get to construct the tokens requested.
-   * @param  array $tokens list of tokens
+   *
    * @return array         list of fields needed to generate those tokens
    */
-  public function getReturnFields($tokens) {
+  public function getReturnFields(): array {
     // Make sure we always return something
     $fields = ['id'];
 
-    foreach (array_intersect($tokens,
-      array_merge(array_keys(self::getBasicTokens()), array_keys(self::getCustomFieldTokens()))
-             ) as $token) {
+    $tokensInUse =
+      array_merge(array_keys(self::getBasicTokens()), array_keys(self::getCustomFieldTokens()));
+    foreach ($tokensInUse as $token) {
       if (isset(self::$fieldMapping[$token])) {
         $fields = array_merge($fields, self::$fieldMapping[$token]);
       }
@@ -75,9 +76,12 @@ trait CRM_Core_TokenTrait {
    * Get the tokens for custom fields
    * @return array token name => token label
    */
-  protected function getCustomFieldTokens() {
+  protected function getCustomFieldTokens(): array {
     if (!isset($this->customFieldTokens)) {
-      $this->customFieldTokens = \CRM_Utils_Token::getCustomFieldTokens(ucfirst($this->getEntityName()));
+      $this->customFieldTokens = [];
+      foreach (CRM_Core_BAO_CustomField::getFields(ucfirst($this->getEntityName())) as $id => $info) {
+        $this->customFieldTokens['custom_' . $id] = $info['label'] . ' :: ' . $info['groupTitle'];
+      }
     }
     return $this->customFieldTokens;
   }

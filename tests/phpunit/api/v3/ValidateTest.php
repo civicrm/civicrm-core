@@ -20,11 +20,11 @@ class api_v3_ValidateTest extends CiviUnitTestCase {
   /**
    * This method is called before a test is executed.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
   }
 
-  public function testEmptyContactValidate() {
+  public function testEmptyContactValidate(): void {
     $validation = $this->callAPISuccess('Contact', 'validate', ['action' => "create"]);
     $expectedOut = [
       'contact_type' => [
@@ -35,7 +35,7 @@ class api_v3_ValidateTest extends CiviUnitTestCase {
     $this->assertEquals($validation['values'][0], $expectedOut);
   }
 
-  public function testContributionValidate() {
+  public function testContributionValidate(): void {
     $validation = $this->callAPISuccess('Contribution', 'validate', ['action' => "create", 'total_amount' => "100w"]);
     $totalAmountErrors = [
       'message' => "total_amount is  not a valid amount: 100w",
@@ -51,7 +51,7 @@ class api_v3_ValidateTest extends CiviUnitTestCase {
     $this->assertEquals($validation['values'][0]['contact_id'], $contactIdErrors);
   }
 
-  public function testContributionDateValidate() {
+  public function testContributionDateValidate(): void {
     $params = [
       'action' => "create",
       'financial_type_id' => "1",

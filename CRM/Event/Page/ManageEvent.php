@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -55,25 +53,26 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     if (!(self::$_actionLinks)) {
       // helper variable for nicer formatting
       $copyExtra = ts('Are you sure you want to make a copy of this Event?');
-      $deleteExtra = ts('Are you sure you want to delete this Event?');
 
       self::$_actionLinks = [
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Event'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Event'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => CRM_Utils_System::currentPath(),
           'qs' => 'action=delete&id=%%id%%',
-          'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
           'title' => ts('Delete Event'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
@@ -81,6 +80,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'qs' => 'reset=1&action=copy&id=%%id%%',
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'title' => ts('Copy Event'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
         ],
       ];
     }
@@ -95,6 +95,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'title' => ts('Register Participant'),
           'url' => 'civicrm/participant/add',
           'qs' => 'reset=1&action=add&context=standalone&eid=%%id%%',
+          'weight' => -30,
         ],
         'event_info' => [
           'name' => ts('Event Info'),
@@ -102,6 +103,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'url' => 'civicrm/event/info',
           'qs' => 'reset=1&id=%%id%%',
           'fe' => TRUE,
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         'online_registration_test' => [
           'name' => ts('Registration (Test-drive)'),
@@ -109,6 +111,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'url' => 'civicrm/event/register',
           'qs' => 'reset=1&action=preview&id=%%id%%',
           'fe' => TRUE,
+          'weight' => 30,
         ],
         'online_registration_live' => [
           'name' => ts('Registration (Live)'),
@@ -116,6 +119,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'url' => 'civicrm/event/register',
           'qs' => 'reset=1&id=%%id%%',
           'fe' => TRUE,
+          'weight' => 40,
         ],
       ];
     }
@@ -125,14 +129,12 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   /**
    * Get tab  Links for events.
    *
-   * @param $enableCart
-   *
    * @return array
    *   (reference) of tab links
+   * @throws \CRM_Core_Exception
    */
   public static function &tabs() {
-    $enableCart = Civi::settings()->get('enable_cart');
-    $cacheKey = $enableCart ? 1 : 0;
+    $cacheKey = 0;
     if (!(self::$_tabLinks)) {
       self::$_tabLinks = [];
     }
@@ -149,13 +151,16 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'url' => 'civicrm/event/manage/location',
           'field' => 'loc_block_id',
         ];
+      // If CiviContribute is active, create the Fees dropdown menu item.
+      if (CRM_Core_Component::isEnabled('CiviContribute')) {
+        self::$_tabLinks[$cacheKey]['fee']
+          = [
+            'title' => ts('Fees'),
+            'url' => 'civicrm/event/manage/fee',
+            'field' => 'is_monetary',
+          ];
+      }
 
-      self::$_tabLinks[$cacheKey]['fee']
-        = [
-          'title' => ts('Fees'),
-          'url' => 'civicrm/event/manage/fee',
-          'field' => 'is_monetary',
-        ];
       self::$_tabLinks[$cacheKey]['registration']
         = [
           'title' => ts('Online Registration'),
@@ -165,7 +170,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
       // @fixme I don't understand the event permissions check here - can we just get rid of it?
       $permissions = CRM_Event_BAO_Event::getAllPermissions();
-      if (CRM_Core_Permission::check('administer CiviCRM') || !empty($permissions[CRM_Core_Permission::EDIT])) {
+      if (CRM_Core_Permission::check('administer CiviCRM data') || !empty($permissions[CRM_Core_Permission::EDIT])) {
         self::$_tabLinks[$cacheKey]['reminder']
           = [
             'title' => ts('Schedule Reminders'),
@@ -173,12 +178,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
             'field' => 'reminder',
           ];
       }
-      self::$_tabLinks[$cacheKey]['conference']
-        = [
-          'title' => ts('Conference Slots'),
-          'url' => 'civicrm/event/manage/conference',
-          'field' => 'slot_label_id',
-        ];
       self::$_tabLinks[$cacheKey]['friend']
         = [
           'title' => ts('Tell a Friend'),
@@ -197,10 +196,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'url' => 'civicrm/event/manage/repeat',
           'field' => 'is_repeating_event',
         ];
-    }
-
-    if (!$enableCart) {
-      unset(self::$_tabLinks[$cacheKey]['conference']);
     }
 
     CRM_Utils_Hook::tabset('civicrm/event/manage', self::$_tabLinks[$cacheKey], []);
@@ -226,6 +221,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     // assign vars to templates
     $this->assign('action', $action);
     $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks());
+    $this->assign('isShowICalIconsInline', FALSE);
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0, 'REQUEST'
     );
@@ -284,7 +280,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       $this
     );
     $createdId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, 0);
-    if (strtolower($this->_sortByCharacter) == 'all' ||
+    if ((!empty($this->_sortByCharacter) && strtolower($this->_sortByCharacter) == 'all') ||
       !empty($_POST)
     ) {
       $this->_sortByCharacter = '';
@@ -310,7 +306,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     $params = [];
     $whereClause = $this->whereClause($params, TRUE, $this->_force);
     // because is_template != 1 would be to simple
-    $whereClause .= ' AND (is_template = 0 OR is_template IS NULL)';
+    $whereClause .= ' AND is_template = 0';
 
     $this->pager($whereClause, $params);
 
@@ -342,16 +338,17 @@ ORDER BY start_date desc
     while ($pcpDao->fetch()) {
       $eventPCPS[$pcpDao->entity_id] = $pcpDao->entity_id;
     }
-    // check if we're in shopping cart mode for events
-    $enableCart = Civi::settings()->get('enable_cart');
-    $this->assign('eventCartEnabled', $enableCart);
-    $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([
-      'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
-    ]));
     $eventType = CRM_Core_OptionGroup::values('event_type');
     while ($dao->fetch()) {
       if (in_array($dao->id, $permittedEventsByAction[CRM_Core_Permission::VIEW])) {
-        $manageEvent[$dao->id] = [];
+        $manageEvent[$dao->id] = [
+          // Set defaults to prevent smarty e-notices, will be overwritten if populated.
+          'city' => '',
+          'state_province' => '',
+          'end_date' => '',
+          'loc_block_id' => '',
+          'participant_listing_id' => '',
+        ];
         $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($dao->id, 'civicrm_event');
         $manageEvent[$dao->id]['repeat'] = '';
         if ($repeat) {
@@ -419,7 +416,7 @@ ORDER BY start_date desc
 
         //show campaigns on selector.
         $manageEvent[$dao->id]['campaign'] = $allCampaigns[$dao->campaign_id] ?? NULL;
-        $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mapping->getId());
+        $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID);
         $manageEvent[$dao->id]['is_pcp_enabled'] = $eventPCPS[$dao->id] ?? NULL;
         $manageEvent[$dao->id]['event_type'] = $eventType[$manageEvent[$dao->id]['event_type_id']] ?? NULL;
         $manageEvent[$dao->id]['is_repeating_event'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_RecurringEntity', $dao->id, 'parent_id', 'entity_id');
@@ -428,7 +425,7 @@ ORDER BY start_date desc
       }
     }
 
-    $manageEvent['tab'] = self::tabs($enableCart);
+    $manageEvent['tab'] = self::tabs();
     $this->assign('rows', $manageEvent);
 
     $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1', 'label');
@@ -483,7 +480,7 @@ ORDER BY start_date desc
    *
    * @return string
    */
-  public function whereClause(&$params, $sortBy = TRUE, $force) {
+  public function whereClause(&$params, $sortBy, $force) {
     $values = [];
     $clauses = [];
     $title = $this->get('title');
@@ -530,12 +527,14 @@ ORDER BY start_date desc
       }
       else {
         $curDate = date('YmdHis');
-        $clauses[] = "(end_date >= {$curDate} OR end_date IS NULL)";
+        $dayBefore = date_sub(date_create(), date_interval_create_from_date_string("1 day"))->format('YmdHis');
+        $clauses[] = "(end_date >= {$curDate} OR (end_date IS NULL AND start_date >= {$dayBefore}))";
       }
     }
     else {
       $curDate = date('YmdHis');
-      $clauses[] = "(end_date >= {$curDate} OR end_date IS NULL)";
+      $dayBefore = date_sub(date_create(), date_interval_create_from_date_string("1 day"))->format('YmdHis');
+      $clauses[] = "(end_date >= {$curDate} OR (end_date IS NULL AND start_date >= {$dayBefore}))";
     }
 
     if ($sortBy &&
@@ -578,7 +577,7 @@ ORDER BY start_date desc
     $params['buttonBottom'] = 'PagerBottomButton';
     $params['rowCount'] = $this->get(CRM_Utils_Pager::PAGE_ROWCOUNT);
     if (!$params['rowCount']) {
-      $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
+      $params['rowCount'] = Civi::settings()->get('default_pager_size');
     }
 
     $query = "

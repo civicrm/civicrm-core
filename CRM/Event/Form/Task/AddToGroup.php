@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -122,10 +120,10 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
 
     // Set dynamic page title for 'Add Members Group (confirm)'
     if ($this->_id) {
-      CRM_Utils_System::setTitle(ts('Add Contacts: %1', [1 => $this->_title]));
+      $this->setTitle(ts('Add Contacts: %1', [1 => $this->_title]));
     }
     else {
-      CRM_Utils_System::setTitle(ts('Add Contacts to A Group'));
+      $this->setTitle(ts('Add Contacts to A Group'));
     }
 
     $this->addDefaultButtons(ts('Add to Group'));
@@ -172,10 +170,10 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
     $errors = [];
 
     if (!empty($params['group_option']) && empty($params['title'])) {
-      $errors['title'] = "Group Name is a required field";
+      $errors['title'] = ts('Group Name is a required field');
     }
     elseif (empty($params['group_option']) && empty($params['group_id'])) {
-      $errors['group_id'] = "Select Group is a required field.";
+      $errors['group_id'] = ts('Select Group is a required field.');
     }
 
     return empty($errors) ? TRUE : $errors;
@@ -234,7 +232,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
       1 => $groupName,
       'count' => $added,
       'plural' => 'Added Contacts to %1',
-    ]), 'success', ['expires' => 0]);
+    ]), 'success');
   }
 
 }

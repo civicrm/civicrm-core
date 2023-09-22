@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -23,17 +21,17 @@ namespace api\v4\Utils;
 
 use Civi\Api4\Utils\ReflectionUtils;
 use api\v4\Mock\MockV4ReflectionGrandchild;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class ReflectionUtilsTest extends UnitTestCase {
+class ReflectionUtilsTest extends Api4TestBase {
 
   /**
    * Test that class annotations are returned across @inheritDoc
    */
-  public function testGetDocBlockForClass() {
+  public function testGetDocBlockForClass(): void {
     $grandChild = new MockV4ReflectionGrandchild();
     $reflection = new \ReflectionClass($grandChild);
     $doc = ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => "Test"]);
@@ -53,7 +51,7 @@ This is the base class.';
   /**
    * Test that property annotations are returned across @inheritDoc
    */
-  public function testGetDocBlockForProperty() {
+  public function testGetDocBlockForProperty(): void {
     $grandChild = new MockV4ReflectionGrandchild();
     $reflection = new \ReflectionClass($grandChild);
     $doc = ReflectionUtils::getCodeDocs($reflection->getProperty('foo'), 'Property');
@@ -109,6 +107,12 @@ This is the base class.';
    */
   public function testParseDocBlock($input, $expected) {
     $this->assertEquals($expected, ReflectionUtils::parseDocBlock($input));
+  }
+
+  public function testIsMethodDeprecated(): void {
+    $mockClass = 'api\v4\Mock\MockV4ReflectionGrandchild';
+    $this->assertTrue(ReflectionUtils::isMethodDeprecated($mockClass, 'deprecatedFn'));
+    $this->assertFalse(ReflectionUtils::isMethodDeprecated($mockClass, 'nonDeprecatedFn'));
   }
 
 }

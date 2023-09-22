@@ -1,0 +1,9 @@
+{
+    "type": "search",
+    "title": "Financial Accounts",
+    "description": "Administer Financial Accounts",
+    "is_public": false,
+    "icon": "fa-list-alt",
+    "server_route": "civicrm/admin/financial/financialAccount",
+    "permission": "administer CiviCRM"
+}

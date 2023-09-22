@@ -55,8 +55,8 @@
         <td>{ts}Adjust search behaviors including wildcards, and data to include in quick search results. Adjusting search settings can improve performance for larger datasets.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/misc" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.){/ts}</a></td>
-        <td>{ts}Version reporting and alerts, reCAPTCHA configuration and attachments.{/ts}</td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/misc" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Misc (Undelete, PDFs, Limits, Logging, etc.){/ts}</a></td>
+        <td>{ts}Version reporting, alerts and attachments.{/ts}</td>
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/subtype" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Contact Types{/ts}</a></td>
@@ -89,7 +89,7 @@
             {else}
                 <td class="tasklist"><a href="{$config->userFrameworkBaseURL}?q=admin/user/permissions&civicrmDestination=civicrm/admin/configtask">{ts}Permissions for Anonymous Users{/ts}</a></td>
             {/if}
-            <td>{ts}You will also need to change Drupal permissions so anonymous users can make contributions, register for events and / or use profiles to enter contact information.{/ts} {docURL page="user/en/latest/initial-set-up/permissions-and-access-control" text="(learn more...)"}</td>
+            <td>{ts}You will also need to change Drupal permissions so anonymous users can make contributions, register for events and / or use profiles to enter contact information.{/ts} {docURL page="user/initial-set-up/permissions-and-access-control"}</td>
         </tr>
     {/if}
     {if $enabledComponents.CiviContribute eq 1}
@@ -102,7 +102,8 @@
 <br />
 
 <div class="description">
-    {capture assign=docLink}{docURL page="user/organising-your-data/overview" text="Organizing Your Data"}{/capture}
+    {capture assign=docUrlText}{ts}Organizing Your Data{/ts}{/capture}
+    {capture assign=docLink}{docURL page="user/organising-your-data/overview" text=$docUrlText}{/capture}
     {ts 1=$adminMenu 2=$docLink}The next set of tasks involve planning and have multiple steps. You may want to check out the %2 section in the User and Administrator Guide before you begin. You will not be returned to this page after completing these tasks, but you can always get back here from the <a href="%1">Administer CiviCRM</a> menu.{/ts}
 </div>
 
@@ -111,7 +112,7 @@
         <td colspan="2">{ts}Organize your contacts{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/tag" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Tags (Categories){/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/tag" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Tags{/ts}</a></td>
         <td>{ts}Tags can be assigned to any contact record, and are a convenient way to find contacts. You can create as many tags as needed to organize and segment your records.{/ts}</td>
     </tr>
     <tr class="even">
@@ -141,35 +142,35 @@
         <td colspan="2">{ts}Components{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap" style="width: 10%;">{docURL page="user/contributions/what-is-civicontribute" text="CiviContribute"}</td>
+        <td class="tasklist nowrap" style="width: 10%;">{docURL page="user/contributions/what-is-civicontribute" text=$componentTitles.CiviContribute}</td>
         <td>{ts}Online fundraising and donor management, as well as offline contribution processing and tracking.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap" style="width: 10%;">{docURL page="user/pledges/what-is-civipledge" text="CiviPledge"}</td>
+        <td class="tasklist nowrap" style="width: 10%;">{docURL page="user/pledges/what-is-civipledge" text=$componentTitles.CiviPledge}</td>
         <td>{ts}Accept and track pledges (for recurring gifts).{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/events/what-is-civievent" text="CiviEvent"}</td>
+        <td class="tasklist nowrap">{docURL page="user/events/what-is-civievent" text=$componentTitles.CiviEvent}</td>
         <td>{ts}Online event registration and participant tracking.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/membership/what-is-civimember" text="CiviMember"}</td>
+        <td class="tasklist nowrap">{docURL page="user/membership/what-is-civimember" text=$componentTitles.CiviMember}</td>
         <td>{ts}Online signup and membership management.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/email/what-is-civimail" text="CiviMail"}</td>
+        <td class="tasklist nowrap">{docURL page="user/email/what-is-civimail" text=$componentTitles.CiviMail}</td>
         <td>{ts}Personalized email blasts and newsletters.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/campaign/what-is-civicampaign" text="CiviCampaign"}</td>
+        <td class="tasklist nowrap">{docURL page="user/campaign/what-is-civicampaign" text=$componentTitles.CiviCampaign}</td>
         <td>{ts}Link together events, mailings, activities, and contributions. Create surveys and online petitions.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/case-management/what-is-civicase" text="CiviCase"}</td>
+        <td class="tasklist nowrap">{docURL page="user/case-management/what-is-civicase" text=$componentTitles.CiviCase}</td>
         <td>{ts}Integrated case management for human service providers{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/grants/what-is-civigrant" text="CiviGrant"}</td>
+        <td class="tasklist nowrap">{docURL page="user/grants/what-is-civigrant" text=$componentTitles.CiviGrant}</td>
         <td>{ts}Distribute funds to others, for example foundations, grant givers, etc.{/ts}</td>
     </tr>
 </table>

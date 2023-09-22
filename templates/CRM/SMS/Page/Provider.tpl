@@ -10,9 +10,8 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/SMS/Form/Provider.tpl"}
 {else}
-  {capture assign=wikiLink}{docURL page="Setting up a SMS Provider for CiviSMS" text="(How to add a SMS Provider)" resource="wiki"}{/capture}
   <div class="help">
-    {ts}You can configure one or more SMS Providers for your CiviCRM installation. To learn more about the procedure to install SMS extension and Provider, refer{/ts} {$wikiLink}
+    {ts}You can configure one or more SMS Providers for your CiviCRM installation.{/ts} {docURL page="user/sms-text-messaging/set-up"}
   </div>
 
 <div class="crm-content-block crm-block">
@@ -30,7 +29,7 @@
             <th >{ts}Action{/ts}</th>
         </tr>
         {foreach from=$rows item=row}
-        <tr id="sms_provider-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+        <tr id="sms_provider-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
             <td class="crm-provider-name"><strong>{$row.name}</strong> ({$row.title})<br/>
                 {ts}API Type:{/ts} {$row.api_type}<br/>
                 {ts}API Url:{/ts} {$row.api_url}<br/>
@@ -39,7 +38,7 @@
         </td>
             <td class="crm-api-params">{if $row.api_params eq null}<em>{ts}no parameters{/ts}</em>{else}<pre>{$row.api_params}</pre>{/if}</td>
 
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </table>
@@ -47,7 +46,7 @@
   </div>
   {else}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
         {ts}None found.{/ts}
      </div>
 

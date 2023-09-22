@@ -104,16 +104,19 @@ class System {
    *
    * @param int $id
    *
-   * @return \CRM_Core_Payment|NULL
+   * @return \CRM_Core_Payment
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getById($id) {
-    if ($id == 0) {
+    if (isset($this->cache[$id])) {
+      return $this->cache[$id];
+    }
+    if ((int) $id === 0) {
       return new \CRM_Core_Payment_Manual();
     }
     $processor = civicrm_api3('payment_processor', 'getsingle', ['id' => $id, 'is_test' => NULL]);
-    return self::getByProcessor($processor);
+    return $this->getByProcessor($processor);
   }
 
   /**
@@ -121,7 +124,7 @@ class System {
    * @param bool $is_test
    *
    * @return \CRM_Core_Payment|NULL
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function getByName($name, $is_test) {
     $processor = civicrm_api3('payment_processor', 'getsingle', ['name' => $name, 'is_test' => $is_test]);
@@ -153,8 +156,8 @@ class System {
    *
    * @param string $className
    *
-   * @return \Civi\Payment\CRM_Core_Payment|NULL
-   * @throws \CiviCRM_API3_Exception
+   * @return \CRM_Core_Payment|NULL
+   * @throws \CRM_Core_Exception
    */
   public function getByClass($className) {
     return $this->getByProcessor([

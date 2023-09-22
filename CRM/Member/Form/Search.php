@@ -60,9 +60,11 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
+    // SearchFormName is deprecated & to be removed - the replacement is for the task to
+    // call $this->form->getSearchFormValues()
+    // A couple of extensions use it.
     $this->set('searchFormName', 'Search');
 
     $this->_actionButtonName = $this->getButtonName('next', 'action');
@@ -106,7 +108,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -217,13 +218,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     $this->fixFormValues();
 
-    // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['member_test']) && $this->_force) {
-      $this->_formValues["member_test"] = 0;
-    }
-
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
-
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
 
     $this->set('queryParams', $this->_queryParams);
@@ -299,7 +293,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');
       if ($cid > 0) {
         $this->_formValues['contact_id'] = $cid;
-        list($display, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
+        [$display, $image] = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
         $this->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid,
           'sort_name'
         );
@@ -310,24 +304,24 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     $fromDate = CRM_Utils_Request::retrieve('start', 'Date');
     if ($fromDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($fromDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($fromDate);
       $this->_formValues['member_start_date_low'] = $this->_defaults['member_start_date_low'] = $date;
     }
 
     $toDate = CRM_Utils_Request::retrieve('end', 'Date');
     if ($toDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($toDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($toDate);
       $this->_formValues['member_start_date_high'] = $this->_defaults['member_start_date_high'] = $date;
     }
     $joinDate = CRM_Utils_Request::retrieve('join', 'Date');
     if ($joinDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($joinDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($joinDate);
       $this->_formValues['member_join_date_low'] = $this->_defaults['member_join_date_low'] = $date;
     }
 
     $joinEndDate = CRM_Utils_Request::retrieve('joinEnd', 'Date');
     if ($joinEndDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($joinEndDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($joinEndDate);
       $this->_formValues['member_join_date_high'] = $this->_defaults['member_join_date_high'] = $date;
     }
 
@@ -348,7 +342,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
   /**
    * Set the metadata for the form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setSearchMetadata() {
     $this->addSearchFieldMetadata(['Membership' => CRM_Member_BAO_Query::getSearchFieldMetadata()]);

@@ -1,22 +1,18 @@
 <?php
 
+use Civi\Api4\UFGroup;
+
 /**
  * Class CRM_Core_BAO_UFFieldTest
  * @group headless
  */
 class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-
-    $this->quickCleanup(['civicrm_uf_group', 'civicrm_uf_field']);
-  }
-
   /**
-   * When passing in a GID, fields should be omitted if they already appear in the group.
+   * When passing in an id, fields should be omitted if they already appear in the group.
    */
-  public function testGetAvailable_byGid() {
-    $ufGroupId = $this->createUFGroup([
+  public function testGetByID(): void {
+    $fields = CRM_Core_BAO_UFField::getAvailableFields($this->createUFGroup([
       [
         'field_name' => 'do_not_sms',
         'field_type' => 'Contact',
@@ -41,8 +37,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
         'field_name' => 'activity_date_time',
         'field_type' => 'Activity',
       ],
-    ]);
-    $fields = CRM_Core_BAO_UFField::getAvailableFields($ufGroupId);
+    ]));
 
     // Make sure that each entity has 1+ present field and 1+ missing (already-used) field
     // already used
@@ -85,8 +80,8 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
    * When passing in $defaults, the currently selected field should still be included -- even if
    * it's already part of the profile.
    */
-  public function testGetAvailable_byGidDefaults() {
-    $ufGroupId = $this->createUFGroup([
+  public function testGetAvailableByIDDefaults(): void {
+    $this->createUFGroup([
       [
         'field_name' => 'do_not_sms',
         'field_type' => 'Contact',
@@ -97,7 +92,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
       ],
     ]);
     $defaults = ['field_name' => ['Individual', 'first_name']];
-    $fields = CRM_Core_BAO_UFField::getAvailableFields($ufGroupId, $defaults);
+    $fields = CRM_Core_BAO_UFField::getAvailableFields($this->ids['UFGroup']['test'], $defaults);
 
     // already used
     $this->assertFalse(isset($fields['Contact']['do_not_sms']));
@@ -109,9 +104,9 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * When omitting a GID, return a list of all fields.
+   * When omitting the id, return a list of all fields.
    */
-  public function testGetAvailable_full() {
+  public function testGetAvailableFull(): void {
     $fields = CRM_Core_BAO_UFField::getAvailableFields();
 
     // Make sure that each entity appears with at least one field
@@ -146,9 +141,9 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * When omitting a GID, return a list of all fields.
+   * When omitting the id, return a list of all fields.
    */
-  public function testGetAvailableFlat() {
+  public function testGetAvailableFlat(): void {
     $fields = CRM_Core_BAO_UFField::getAvailableFieldsFlat();
 
     // Make sure that each entity appears with at least one field
@@ -180,29 +175,25 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Make sure that the existence of a profile doesn't break listing all fields
-   *
-   * public function testGetAvailable_mixed() {
-   * // FIXME
-   * $this->testGetAvailable_full();
-   * // $this->testGetAvailable_byGid();
-   * $this->testGetAvailable_full();
-   * // $this->testGetAvailable_byGid();
-   * } // */
-
-  /**
    * @param array $fields
    *   List of fields to include in the profile.
+   *
    * @return int
    *   field id
    */
-  protected function createUFGroup($fields) {
-    $ufGroup = CRM_Core_DAO::createTestObject('CRM_Core_DAO_UFGroup');
-    $this->assertTrue(is_numeric($ufGroup->id));
-
+  protected function createUFGroup(array $fields): int {
+    try {
+      $this->ids['UFGroup']['test'] = UFGroup::create()
+        ->setValues(['name' => 'uf_field_test', 'title' => 'group'])
+        ->execute()
+        ->first()['id'];
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->fail('Failed to create UFGroup');
+    }
     foreach ($fields as $field) {
       $defaults = [
-        'uf_group_id' => $ufGroup->id,
+        'uf_group_id' => $this->ids['UFGroup']['test'],
         'visibility' => 'Public Pages and Listings',
         'weight' => 1,
         'label' => 'Label for ' . $field['field_name'],
@@ -210,28 +201,33 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
         'is_active' => 1,
         'location_type_id' => NULL,
       ];
-      $params = array_merge($field, $defaults);
-      $ufField = $this->callAPISuccess('UFField', 'create', $params);
-      $this->assertAPISuccess($ufField);
+      $this->callAPISuccess('UFField', 'create', array_merge($field, $defaults));
     }
 
-    return $ufGroup->id;
+    return $this->ids['UFGroup']['test'];
   }
 
   /**
    * Test ability to modify the acceptable fields for use in a profile via hook
    */
-  public function testGetFieldsFlatModifiedByHook() {
+  public function testGetFieldsFlatModifiedByHook(): void {
     unset(Civi::$statics['UFFieldsFlat']);
     $this->hookClass->setHook('civicrm_alterUFFields', [$this, 'modifyUFFields']);
     $fields = CRM_Core_BAO_UFField::getAvailableFieldsFlat();
 
-    $this->assertEquals('Grant', $fields['grant_id']['field_type']);
-    $this->assertEquals('contact_id', $fields['grant_contact_id']['name']);
+    $this->assertEquals('Foo', $fields['foo_id']['field_type']);
+    $this->assertEquals('contact_id', $fields['foo_contact_id']['name']);
   }
 
-  public function modifyUFFields(&$fields) {
-    $fields['Grant'] = CRM_Grant_DAO_Grant::export();
+  public function modifyUFFields(&$fields): void {
+    $fields['Foo'] = [
+      'foo_id' => [
+        'name' => 'id',
+      ],
+      'foo_contact_id' => [
+        'name' => 'contact_id',
+      ],
+    ];
   }
 
 }

@@ -18,7 +18,7 @@
 /**
  * This class contains the functions for Case Type management.
  */
-class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
+class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\HookInterface {
 
   /**
    * Static field for all the case information that we can potentially export.
@@ -57,15 +57,16 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     $caseTypeName = (isset($params['name'])) ? $params['name'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $params['id'], 'name', 'id', TRUE);
 
-    // function to format definition column
+    // Format definition column
     if (isset($params['definition']) && is_array($params['definition'])) {
       $params['definition'] = self::convertDefinitionToXML($caseTypeName, $params['definition']);
-      CRM_Core_ManagedEntities::scheduleReconciliation();
+      // Ensure entities declared in the definition get created.
+      // @see CRM_Case_ManagedEntities
+      CRM_Core_ManagedEntities::scheduleReconciliation(['civicrm']);
     }
 
     $caseTypeDAO->copyValues($params);
     $result = $caseTypeDAO->save();
-    CRM_Case_XMLRepository::singleton()->flush();
     return $result;
   }
 
@@ -83,6 +84,18 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     }
     else {
       parent::assignTestValue($fieldName, $fieldDef, $counter);
+    }
+  }
+
+  public static function formatOutputDefinition(&$value, $row) {
+    if ($value) {
+      [$xml] = CRM_Utils_XML::parseString($value);
+      $value = $xml ? self::convertXmlToDefinition($xml) : [];
+    }
+    elseif (!empty($row['id']) || !empty($row['name'])) {
+      $caseTypeName = $row['name'] ?? CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $row['id']);
+      $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
+      $value = $xml ? self::convertXmlToDefinition($xml) : [];
     }
   }
 
@@ -371,12 +384,22 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    */
   public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
+    // Computed properties.
+    unset($params['is_forkable']);
+    unset($params['is_forked']);
 
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'CaseType', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'CaseType', NULL, $params);
+    $action = empty($params['id']) ? 'create' : 'edit';
+
+    CRM_Utils_Hook::pre($action, 'CaseType', $params['id'] ?? NULL, $params);
+
+    // This is an existing case-type.
+    if ($action === 'edit' && isset($params['definition'])
+      // which is not yet forked
+      && !self::isForked($params['id'])
+      // for which new forks are prohibited
+      && !self::isForkable($params['id'])
+    ) {
+      unset($params['definition']);
     }
 
     $caseType = self::add($params);
@@ -385,16 +408,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       $transaction->rollback();
       return $caseType;
     }
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'CaseType', $caseType->id, $case);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'CaseType', $caseType->id, $case);
-    }
     $transaction->commit();
-    CRM_Case_XMLRepository::singleton(TRUE);
-    CRM_Core_OptionGroup::flushAll();
+
+    CRM_Utils_Hook::post($action, 'CaseType', $caseType->id, $case);
 
     return $caseType;
   }
@@ -420,20 +436,41 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
   /**
    * @param int $caseTypeId
    *
+   * @deprecated
    * @throws CRM_Core_Exception
-   * @return mixed
+   * @return CRM_Case_DAO_CaseType
    */
   public static function del($caseTypeId) {
-    $caseType = new CRM_Case_DAO_CaseType();
-    $caseType->id = $caseTypeId;
-    $refCounts = $caseType->getReferenceCounts();
-    $total = array_sum(CRM_Utils_Array::collect('count', $refCounts));
-    if ($total) {
-      throw new CRM_Core_Exception(ts("You can not delete this case type -- it is assigned to %1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", [1 => $total]));
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return static::deleteRecord(['id' => $caseTypeId]);
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    // Before deleting a caseType, check references
+    if ($event->action === 'delete') {
+      $caseType = new CRM_Case_DAO_CaseType();
+      $caseType->id = $event->id;
+      $refCounts = $caseType->getReferenceCounts();
+      $total = array_sum(CRM_Utils_Array::collect('count', $refCounts));
+      if (array_sum(CRM_Utils_Array::collect('count', $refCounts))) {
+        throw new CRM_Core_Exception(ts("You can not delete this case type -- it is assigned to %1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", [1 => $total]));
+      }
     }
-    $result = $caseType->delete();
-    CRM_Case_XMLRepository::singleton(TRUE);
-    return $result;
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    // When a caseType is saved or deleted, flush xml and optionGroup cache
+    CRM_Case_XMLRepository::singleton()->flush();
+    CRM_Core_OptionGroup::flushAll();
   }
 
   /**

@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -32,5 +30,22 @@ namespace api\v4\Mock;
  * @inheritdoc
  */
 class MockV4ReflectionGrandchild extends MockV4ReflectionChild {
+
+  /**
+   * Function marked deprecated
+   * @see \api\v4\Utils\ReflectionUtilsTest::testIsMethodDeprecated
+   * @deprecated
+   */
+  public static function deprecatedFn() {
+
+  }
+
+  /**
+   * Function not marked deprecated
+   * @see \api\v4\Utils\ReflectionUtilsTest::testIsMethodDeprecated
+   */
+  public static function nonDeprecatedFn() {
+
+  }
 
 }

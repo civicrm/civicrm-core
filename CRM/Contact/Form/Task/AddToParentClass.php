@@ -30,7 +30,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
 
   public function buildQuickForm() {
     $contactType = $this->get('contactType');
-    CRM_Utils_System::setTitle(ts('Add Contacts to %1', [1 => $contactType]));
+    $this->setTitle(ts('Add Contacts to %1', [1 => $contactType]));
     $this->addElement('text', 'name', ts('Find Target %1', [1 => $contactType]));
 
     $this->add('select',
@@ -44,6 +44,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
 
     $searchRows = $this->get('searchRows');
     $searchCount = $this->get('searchCount');
+    $this->assign('searchRows', FALSE);
     if ($searchRows) {
       $checkBoxes = [];
       $chekFlag = 0;
@@ -52,12 +53,17 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
           $chekFlag = $id;
         }
 
-        $checkBoxes[$id] = $this->createElement('radio', NULL, NULL, NULL, $id);
+        $checkBoxes[$id] = NULL;
       }
 
-      $this->addGroup($checkBoxes, 'contact_check');
+      $group = $this->addRadio('contact_check', NULL, $checkBoxes);
+      $groupElements = $group->getElements();
       if ($chekFlag) {
-        $checkBoxes[$chekFlag]->setChecked(TRUE);
+        foreach ($groupElements as $groupElement) {
+          if ($groupElement->getValue() == $chekFlag) {
+            $groupElement->setChecked(TRUE);
+          }
+        }
       }
       $this->assign('searchRows', $searchRows);
     }
@@ -65,8 +71,13 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     $this->assign('searchCount', $searchCount);
     $this->assign('searchDone', $this->get('searchDone'));
     $this->assign('contact_type_display', $contactType);
-    $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), ['class' => 'crm-form-submit']);
-    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), ['class' => 'crm-form-submit']);
+    $buttonAttrs = [
+      'type' => 'submit',
+      'class' => 'crm-form-submit',
+      'value' => 1,
+    ];
+    $this->addElement('xbutton', $this->getButtonName('refresh'), ts('Search'), $buttonAttrs);
+    $this->addElement('xbutton', $this->getButtonName('cancel'), ts('Cancel'), $buttonAttrs);
     $this->addButtons([
       [
         'type' => 'next',
@@ -135,7 +146,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     CRM_Core_Session::setStatus($status, ts('Relationship created.', [
       'count' => $outcome['valid'],
       'plural' => 'Relationships created.',
-    ]), 'success', ['expires' => 0]);
+    ]), 'success');
 
   }
 
@@ -168,7 +179,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
 
     if (!empty($params['relationship_type_id'])) {
       $relationshipType = new CRM_Contact_DAO_RelationshipType();
-      list($rid, $direction) = explode('_', $params['relationship_type_id'], 2);
+      [$rid, $direction] = explode('_', $params['relationship_type_id'], 2);
 
       $relationshipType->id = $rid;
       if ($relationshipType->find(TRUE)) {
@@ -199,7 +210,6 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     }
 
     // get the count of contact
-    $contactBAO = new CRM_Contact_BAO_Contact();
     $query = new CRM_Contact_BAO_Query($searchValues);
     $searchCount = $query->searchQuery(0, 0, NULL, TRUE);
     $form->set('searchCount', $searchCount);

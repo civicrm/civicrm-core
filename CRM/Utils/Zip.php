@@ -80,7 +80,7 @@ class CRM_Utils_Zip {
    * Determine the name of the folder within a zip.
    *
    * @param ZipArchive $zip
-   * @param $expected
+   * @param string $expected
    *
    * @return string|bool
    *   Return string or FALSE
@@ -116,7 +116,7 @@ class CRM_Utils_Zip {
    */
   public static function createTestZip($zipName, $dirs, $files) {
     $zip = new ZipArchive();
-    $res = $zip->open($zipName, ZipArchive::CREATE);
+    $res = $zip->open($zipName, ZipArchive::OVERWRITE);
     if ($res === TRUE) {
       foreach ($dirs as $dir) {
         if (!$zip->addEmptyDir($dir)) {

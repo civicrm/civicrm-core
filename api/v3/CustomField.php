@@ -19,21 +19,24 @@
  * Create a 'custom field' within a custom field group.
  *
  * We also empty the static var in the getfields
- * function after deletion so that the field is available for us (getfields manages date conversion
- * among other things
+ * function after deletion so that the field is available for us (getfields
+ * manages date conversion among other things
  *
  * @param array $params
  *   Array per getfields metadata.
  *
  * @return array
  *   API success array
+ * @throws \CRM_Core_Exception
  */
-function civicrm_api3_custom_field_create($params) {
+function civicrm_api3_custom_field_create(array $params): array {
 
   // Legacy handling for old way of naming serialized fields
-  if (!empty($params['html_type']) && ($params['html_type'] == 'CheckBox' || strpos($params['html_type'], 'Multi-') === 0)) {
-    $params['serialize'] = 1;
-    $params['html_type'] = str_replace('Multi-', '', $params['html_type']);
+  if (!empty($params['html_type'])) {
+    if ($params['html_type'] === 'CheckBox' || strpos($params['html_type'], 'Multi-') === 0) {
+      $params['serialize'] = 1;
+    }
+    $params['html_type'] = str_replace(['Multi-Select', 'Select Country', 'Select State/Province'], 'Select', $params['html_type']);
   }
 
   // Array created for passing options in params.
@@ -56,6 +59,18 @@ function civicrm_api3_custom_field_create($params) {
       $params['option_weight'][$key] = $value['weight'];
     }
   }
+  elseif (
+    // Legacy handling for historical apiv3 behaviour.
+    empty($params['id'])
+    && !empty($params['html_type'])
+    && $params['html_type'] !== 'Text'
+    && empty($params['option_group_id'])
+    && empty($params['option_value'])
+    && in_array($params['data_type'] ?? '', ['String', 'Int', 'Float', 'Money'])) {
+    // Trick the BAO into creating an option group even though no option values exist
+    // because that odd behaviour is locked in via a test.
+    $params['option_value'] = 1;
+  }
   $values = [];
   $customField = CRM_Core_BAO_CustomField::create($params);
   _civicrm_api3_object_to_array_unique_fields($customField, $values[$customField->id]);
@@ -67,6 +82,9 @@ function civicrm_api3_custom_field_create($params) {
  * Flush static caches in functions that might have stored available custom fields.
  */
 function _civicrm_api3_custom_field_flush_static_caches() {
+  if (isset(\Civi::$statics['CRM_Core_BAO_OptionGroup']['titles_by_name'])) {
+    unset(\Civi::$statics['CRM_Core_BAO_OptionGroup']['titles_by_name']);
+  }
   civicrm_api('CustomField', 'getfields', ['version' => 3, 'cache_clear' => 1]);
   CRM_Core_BAO_UFField::getAvailableFieldsFlat(TRUE);
 }
@@ -84,13 +102,6 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
   $params['option_values'] = [
     'title' => 'Option Values',
     'description' => "Pass an array of options (value => label) to create this field's option values",
-  ];
-  // TODO: Why expose this to the api at all?
-  $params['option_type'] = [
-    'title' => 'Option Type',
-    'description' => 'This (boolean) field tells the BAO to create an option group for the field if the field type is appropriate',
-    'api.default' => 1,
-    'type' => CRM_Utils_Type::T_BOOLEAN,
   ];
   $params['data_type']['api.default'] = 'String';
   $params['is_active']['api.default'] = 1;
@@ -122,21 +133,64 @@ function civicrm_api3_custom_field_delete($params) {
  * @return array
  */
 function civicrm_api3_custom_field_get($params) {
-  if (($params['legacy_html_type'] ?? TRUE) && !empty($params['return'])) {
-    if (is_array($params['return'])) {
+  // Legacy handling for serialize property
+  $handleLegacy = (($params['legacy_html_type'] ?? !isset($params['serialize'])) && CRM_Core_BAO_Domain::isDBVersionAtLeast('5.27.alpha1'));
+  if ($handleLegacy && !empty($params['return'])) {
+    if (!is_array($params['return'])) {
+      $params['return'] = explode(',', str_replace(' ', '', $params['return']));
+    }
+    if (!in_array('serialize', $params['return'])) {
       $params['return'][] = 'serialize';
     }
-    elseif (is_string($params['return'])) {
-      $params['return'] .= ',serialize';
+    if (!in_array('data_type', $params['return'])) {
+      $params['return'][] = 'data_type';
+    }
+  }
+  $legacyDataTypes = [
+    'Select State/Province' => 'StateProvince',
+    'Select Country' => 'Country',
+  ];
+  if ($handleLegacy && !empty($params['html_type'])) {
+    $serializedTypes = ['CheckBox', 'Multi-Select', 'Multi-Select Country', 'Multi-Select State/Province'];
+    if (is_string($params['html_type'])) {
+      if (strpos($params['html_type'], 'Multi-Select') === 0) {
+        $params['html_type'] = str_replace('Multi-Select', 'Select', $params['html_type']);
+        $params['serialize'] = 1;
+      }
+      elseif (!in_array($params['html_type'], $serializedTypes)) {
+        $params['serialize'] = 0;
+      }
+      if (isset($legacyDataTypes[$params['html_type']])) {
+        $params['data_type'] = $legacyDataTypes[$params['html_type']];
+        unset($params['html_type']);
+      }
+    }
+    elseif (is_array($params['html_type']) && !empty($params['html_type']['IN'])) {
+      $excludeNonSerialized = !array_diff($params['html_type']['IN'], $serializedTypes);
+      $onlyNonSerialized = !array_intersect($params['html_type']['IN'], $serializedTypes);
+      $params['html_type']['IN'] = array_map(function($val) {
+        return str_replace(['Multi-Select', 'Select Country', 'Select State/Province'], 'Select', $val);
+      }, $params['html_type']['IN']);
+      if ($excludeNonSerialized) {
+        $params['serialize'] = 1;
+      }
+      if ($onlyNonSerialized) {
+        $params['serialize'] = 0;
+      }
     }
   }
 
   $results = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 
-  if (($params['legacy_html_type'] ?? TRUE) && !empty($results['values']) && is_array($results['values'])) {
-    foreach ($results['values'] as $id => $result) {
-      if (!empty($result['serialize']) && !empty($result['html_type'])) {
-        $results['values'][$id]['html_type'] = str_replace('Select', 'Multi-Select', $result['html_type']);
+  if ($handleLegacy && !empty($results['values']) && is_array($results['values'])) {
+    foreach ($results['values'] as $id => &$result) {
+      if (!empty($result['html_type'])) {
+        if (in_array($result['data_type'], $legacyDataTypes)) {
+          $result['html_type'] = array_search($result['data_type'], $legacyDataTypes);
+        }
+        if (!empty($result['serialize']) && $result['html_type'] !== 'Autocomplete-Select') {
+          $result['html_type'] = str_replace('Select', 'Multi-Select', $result['html_type']);
+        }
       }
     }
   }

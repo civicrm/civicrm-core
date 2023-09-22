@@ -13,8 +13,6 @@
 </div>
 {capture assign="enableComponents"}{crmURL p='civicrm/admin/setting/component' q="reset=1"}{/capture}
 <div class="crm-form-block">
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
     <table class="form-layout">
         <tr class="crm-price-set-form-block-title">
            <td class="label">{$form.title.label}</td>
@@ -36,7 +34,7 @@
           {/if}
           </td>
         </tr>
-        <tr id="min_amount" class="crm-price-set-form-block-min_amount">
+        <tr class="crm-price-set-form-block-min_amount">
            <td class="label">{$form.min_amount.label}</td>
            <td>{$form.min_amount.html}</td>
         </tr>
@@ -72,7 +70,6 @@
         </tr>
      </table>
      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-
 </div>
 {if $action eq 2 or $action eq 4} {* Update or View*}
     <p></p>
@@ -80,4 +77,3 @@
     <a href="{crmURL p='civicrm/admin/price/field' q="action=browse&reset=1&sid=$sid"}" class="button"><span>{ts}Fields for this Set{/ts}</span></a>
     </div>
 {/if}
-

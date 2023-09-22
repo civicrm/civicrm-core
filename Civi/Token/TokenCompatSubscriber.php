@@ -3,106 +3,50 @@ namespace Civi\Token;
 
 use Civi\Token\Event\TokenRenderEvent;
 use Civi\Token\Event\TokenValueEvent;
+use Money\Money;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class TokenCompatSubscriber
  * @package Civi\Token
  *
- * This class provides a compatibility layer for using CRM_Utils_Token
- * helpers within TokenProcessor.
- *
- * THIS IS NOT A GOOD EXAMPLE TO EMULATE. The class exists to two
- * bridge two different designs. CRM_Utils_Token has some
- * undesirable elements (like iterative token substitution).
- * However, if you're refactor CRM_Utils_Token or improve the
- * bridge, then it makes sense to update this class.
+ * This class handles the smarty processing of tokens.
  */
 class TokenCompatSubscriber implements EventSubscriberInterface {
 
   /**
    * @inheritDoc
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
-      'civi.token.eval' => 'onEvaluate',
+      'civi.token.eval' => [
+        ['setupSmartyAliases', 1000],
+      ],
       'civi.token.render' => 'onRender',
     ];
   }
 
   /**
-   * Load token data.
+   * Interpret the variable `$context['smartyTokenAlias']` (e.g. `mySmartyField' => `tkn_entity.tkn_field`).
+   *
+   * We need to ensure that any tokens like `{tkn_entity.tkn_field}` are hydrated, so
+   * we pretend that they are in use.
    *
    * @param \Civi\Token\Event\TokenValueEvent $e
-   * @throws TokenException
    */
-  public function onEvaluate(TokenValueEvent $e) {
-    // For reasons unknown, replaceHookTokens requires a pre-computed list of
-    // hook *categories* (aka entities aka namespaces). We'll cache
-    // this in the TokenProcessor's context.
-
-    $hookTokens = [];
-    \CRM_Utils_Hook::tokens($hookTokens);
-    $categories = array_keys($hookTokens);
-    $e->getTokenProcessor()->context['hookTokenCategories'] = $categories;
-
-    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
-
+  public function setupSmartyAliases(TokenValueEvent $e) {
+    $aliasedTokens = [];
     foreach ($e->getRows() as $row) {
-      if (empty($row->context['contactId'])) {
-        continue;
-      }
-      /** @var int $contactId */
-      $contactId = $row->context['contactId'];
-      if (empty($row->context['contact'])) {
-        $params = [
-          ['contact_id', '=', $contactId, 0, 0],
-        ];
-        list($contact, $_) = \CRM_Contact_BAO_Query::apiQuery($params);
-        //CRM-4524
-        $contact = reset($contact);
-        if (!$contact || is_a($contact, 'CRM_Core_Error')) {
-          // FIXME: Need to differentiate errors which kill the batch vs the individual row.
-          \Civi::log()->debug("Failed to generate token data. Invalid contact ID: " . $row->context['contactId']);
-          continue;
-        }
-
-        //update value of custom field token
-        if (!empty($messageTokens['contact'])) {
-          foreach ($messageTokens['contact'] as $token) {
-            if (\CRM_Core_BAO_CustomField::getKeyID($token)) {
-              $contact[$token] = civicrm_api3('Contact', 'getvalue', [
-                'return' => $token,
-                'id' => $contactId,
-              ]);
-            }
-          }
-        }
-      }
-      else {
-        $contact = $row->context['contact'];
-      }
-
-      if (!empty($row->context['tmpTokenParams'])) {
-        // merge activity tokens with contact array
-        // this is pretty weird.
-        $contact = array_merge($contact, $row->context['tmpTokenParams']);
-      }
-
-      $contactArray = [$contactId => $contact];
-      \CRM_Utils_Hook::tokenValues($contactArray,
-        [$contactId],
-        empty($row->context['mailingJobId']) ? NULL : $row->context['mailingJobId'],
-        $messageTokens,
-        $row->context['controller']
-      );
-
-      // merge the custom tokens in the $contact array
-      if (!empty($contactArray[$contactId])) {
-        $contact = array_merge($contact, $contactArray[$contactId]);
-      }
-      $row->context('contact', $contact);
+      $aliasedTokens = array_unique(array_merge($aliasedTokens,
+        array_values($row->context['smartyTokenAlias'] ?? [])));
     }
+
+    $fakeMessage = implode('', array_map(function ($f) {
+      return '{' . $f . '}';
+    }, $aliasedTokens));
+
+    $proc = $e->getTokenProcessor();
+    $proc->addMessage('TokenCompatSubscriber.aliases', $fakeMessage, 'text/plain');
   }
 
   /**
@@ -110,24 +54,48 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    *
    * @param \Civi\Token\Event\TokenRenderEvent $e
    */
-  public function onRender(TokenRenderEvent $e) {
-    $isHtml = ($e->message['format'] == 'text/html');
+  public function onRender(TokenRenderEvent $e): void {
     $useSmarty = !empty($e->context['smarty']);
+    $e->string = $e->getTokenProcessor()->visitTokens($e->string, function($token = NULL, $entity = NULL, $field = NULL, $filterParams = NULL) {
+      if ($filterParams && $filterParams[0] === 'boolean') {
+        // This token was missed during primary rendering, and it's supposed to be coerced to boolean.
+        // Treat an unknown token as false-y.
+        return 0;
+      }
+      // For historical consistency, we filter out unrecognized tokens.
+      return '';
+    });
 
-    $domain = \CRM_Core_BAO_Domain::getDomain();
-    $e->string = \CRM_Utils_Token::replaceDomainTokens($e->string, $domain, $isHtml, $e->message['tokens'], $useSmarty);
-
-    if (!empty($e->context['contact'])) {
-      \CRM_Utils_Token::replaceGreetingTokens($e->string, $e->context['contact'], $e->context['contact']['contact_id'], NULL, $useSmarty);
-      $e->string = \CRM_Utils_Token::replaceContactTokens($e->string, $e->context['contact'], $isHtml, $e->message['tokens'], TRUE, $useSmarty);
-
-      // FIXME: This may depend on $contact being merged with hook values.
-      $e->string = \CRM_Utils_Token::replaceHookTokens($e->string, $e->context['contact'], $e->context['hookTokenCategories'], $isHtml, $useSmarty);
-    }
+    // This removes the pattern used in greetings of having bits of text that
+    // depend on the tokens around them - ie '{first_name}{ }{last_name}
+    // has an extra construct '{ }' which will resolve as a space if the
+    // tokens on either side are resolved to 'something'
+    $e->string = preg_replace('/\\\\|\{(\s*)?\}/', ' ', $e->string);
 
     if ($useSmarty) {
-      $smarty = \CRM_Core_Smarty::singleton();
-      $e->string = $smarty->fetch("string:" . $e->string);
+      $smartyVars = [];
+      foreach ($e->context['smartyTokenAlias'] ?? [] as $smartyName => $tokenName) {
+        $tokenParts = explode('|', $tokenName);
+        $modifier = $tokenParts[1] ?? '';
+        $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenParts[0]), '');
+        if ($smartyVars[$smartyName] instanceof \Brick\Money\Money) {
+          // TODO: We should reuse the filters from TokenProcessor::filterTokenValue()
+          if ($modifier === 'crmMoney') {
+            $smartyVars[$smartyName] = \Civi::format()
+              ->money($smartyVars[$smartyName]->getAmount(), $smartyVars[$smartyName]->getCurrency());
+          }
+          else {
+            $smartyVars[$smartyName] = $smartyVars[$smartyName]->getAmount();
+          }
+        }
+      }
+      \CRM_Core_Smarty::singleton()->pushScope($smartyVars);
+      try {
+        $e->string = \CRM_Utils_String::parseOneOffStringThroughSmarty($e->string);
+      }
+      finally {
+        \CRM_Core_Smarty::singleton()->popScope();
+      }
     }
   }
 

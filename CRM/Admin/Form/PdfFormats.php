@@ -1,28 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright (C) 2011 Marty Wright                                    |
- | Licensed to CiviCRM under the Academic Free License version 3.0.   |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -42,6 +25,11 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
    * @var int
    */
   public $_id = NULL;
+
+  /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
 
   /**
    * Build the form object.
@@ -67,7 +55,7 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
       ['onChange' => "selectPaper( this.value );"]
     );
 
-    $this->add('static', 'paper_dimensions', NULL, ts('Width x Height'));
+    $this->add('static', 'paper_dimensions', ts('Width x Height'));
     $this->add('select', 'orientation', ts('Orientation'), CRM_Core_BAO_PdfFormat::getPageOrientations(), FALSE,
       ['onChange' => "updatePaperDimensions();"]
     );
@@ -120,11 +108,11 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
     $bao = new CRM_Core_BAO_PdfFormat();
     $bao->savePdfFormat($values, $this->_id);
 
-    $status = ts('Your new PDF Page Format titled <strong>%1</strong> has been saved.', [1 => $values['name']], ts('Saved'), 'success');
+    $status = ts('Your new PDF Page Format titled <strong>%1</strong> has been saved.', [1 => $values['name']]);
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $status = ts('Your PDF Page Format titled <strong>%1</strong> has been updated.', [1 => $values['name']], ts('Saved'), 'success');
+      $status = ts('Your PDF Page Format titled <strong>%1</strong> has been updated.', [1 => $values['name']]);
     }
-    CRM_Core_Session::setStatus($status);
+    CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
   }
 
 }

@@ -21,6 +21,7 @@
     <div class="crm-accordion-body">
       <div id="financial-search-form" class="crm-block crm-form-block">
         <table class="form-layout-compressed">
+          {if !empty($elements)}
           {* Loop through all defined search criteria fields (defined in the buildForm() function). *}
           {foreach from=$elements item=element}
             <tr class="crm-financial-search-form-block-{$element}">
@@ -28,16 +29,17 @@
               <td>{$form.$element.html}</td>
             </tr>
           {/foreach}
+          {/if}
         </table>
       </div>
     </div>
   </div>
 </div>
-<div class="form-layout-compressed">{$form.batch_update.html}&nbsp;{$form.submit.html}</div><br/>
+{if !empty($form.batch_update)}<div class="form-layout-compressed">{$form.batch_update.html}&nbsp;{$form.submit.html}</div><br/>{/if}
 <table id="crm-batch-selector-{$batchStatus}" class="row-highlight">
   <thead>
     <tr>
-      <th class="crm-batch-checkbox">{$form.toggleSelect.html}</th>
+      <th class="crm-batch-checkbox">{if !empty($form.toggleSelect.html)}{$form.toggleSelect.html}{/if}</th>
       <th class="crm-batch-name">{ts}Batch Name{/ts}</th>
       <th class="crm-batch-payment_instrument">{ts}Payment Method{/ts}</th>
       <th class="crm-batch-item_count">{ts}Item Count{/ts}</th>
@@ -214,12 +216,9 @@ CRM.$(function($) {
   }
 
   function saveRecords(records, op) {
-    if (op == 'export') {
-      return exportRecords(records);
-    }
     var postUrl = CRM.url('civicrm/ajax/rest', 'className=CRM_Financial_Page_AJAX&fnName=assignRemove');
     //post request and get response
-    $.post(postUrl, {records: records, recordBAO: 'CRM_Batch_BAO_Batch', op: op, key: {/literal}"{crmKey name='civicrm/ajax/ar'}"{literal}},
+    $.post(postUrl, {records: records, recordBAO: 'CRM_Batch_BAO_Batch', op: op},
       function(response) {
         //this is custom status set when record update success.
         if (response.status == 'record-updated-success') {
@@ -231,20 +230,7 @@ CRM.$(function($) {
           CRM.alert({/literal}'{ts escape="js"}An error occurred while processing your request.{/ts}', $("#batch_update option[value=" + op + "]").text() + ' {ts escape="js"}Error{/ts}'{literal}, 'error');
         }
       },
-      'json').error(serverError);
-  }
-
-  function exportRecords(records) {
-    var query = {'batch_id': records, 'export_format': $('select.export-format').val()};
-    var exportUrl = CRM.url('civicrm/financial/batch/export', 'reset=1');
-    // jQuery redirect expects all query args as an object, so extract them from crm url
-    var urlParts = exportUrl.split('?');
-    $.each(urlParts[1].split('&'), function(key, val) {
-      var q = val.split('=');
-      query[q[0]] = q[1];
-    });
-    $().redirect(urlParts[0], query, 'GET');
-    setTimeout(function() {batchSelector.fnDraw();}, 4000);
+      'json').fail(serverError);
   }
 
   function validateOp(records, op) {
@@ -302,6 +288,11 @@ CRM.$(function($) {
       $("input.select-row:checked").each(function() {
         records.push($(this).attr('id').replace('check_', ''));
       });
+      if (op == 'export') {
+        // No need for the modal pop-up, just proceed to the next screen.
+        window.location = CRM.url("civicrm/financial/batch/export", {reset: 1, id: records[0], status: 1});
+        return false;
+      }
       editRecords(records, op);
     }
     return false;

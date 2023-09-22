@@ -75,7 +75,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       $title = ts('Delete Campaign');
     }
     if ($title) {
-      CRM_Utils_System::setTitle($title);
+      $this->setTitle($title);
     }
 
     $session = CRM_Core_Session::singleton();
@@ -188,10 +188,10 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $this->add('datepicker', 'end_date', ts('End Date'));
 
     // add campaign type
-    $this->addSelect('campaign_type_id', ['onChange' => "CRM.buildCustomData( 'Campaign', this.value );"], TRUE);
+    $this->addSelect('campaign_type_id', ['placeholder' => ts('- select type -'), 'onChange' => "CRM.buildCustomData( 'Campaign', this.value );"], TRUE);
 
     // add campaign status
-    $this->addSelect('status_id');
+    $this->addSelect('status_id', ['placeholder' => ts('- select status -')]);
 
     // add External Identifier Element
     $this->add('text', 'external_identifier', ts('External ID'),
@@ -222,7 +222,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $this->add('wysiwyg', 'goal_general', ts('Campaign Goals'), ['rows' => 2, 'cols' => 40]);
     $this->add('text', 'goal_revenue', ts('Revenue Goal'), ['size' => 8, 'maxlength' => 12]);
     $this->addRule('goal_revenue', ts('Please enter a valid money value (e.g. %1).',
-      [1 => CRM_Utils_Money::format('99.99', ' ')]
+      [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency(99.99)]
     ), 'money');
 
     // is this Campaign active
@@ -249,6 +249,8 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     ];
 
     $this->addButtons($buttons);
+
+    $this->addFormRule(['CRM_Campaign_Form_Campaign', 'formRule']);
   }
 
   /**
@@ -256,14 +258,17 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    * All local rules are added near the element
    *
    * @param $fields
-   * @param $files
-   * @param $errors
    *
    * @return bool|array
-   * @see valid_date
    */
-  public static function formRule($fields, $files, $errors) {
+  public static function formRule($fields) {
     $errors = [];
+
+    // Validate start/end date inputs
+    $validateDates = \CRM_Utils_Date::validateStartEndDatepickerInputs('start_date', $fields['start_date'], 'end_date', $fields['end_date']);
+    if ($validateDates !== TRUE) {
+      $errors[$validateDates['key']] = $validateDates['message'];
+    }
 
     return empty($errors) ? TRUE : $errors;
   }
@@ -282,7 +287,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
     if (!empty($params['id'])) {
       if ($this->_action & CRM_Core_Action::DELETE) {
-        CRM_Campaign_BAO_Campaign::del($params['id']);
+        CRM_Campaign_BAO_Campaign::deleteRecord(['id' => $params['id']]);
         CRM_Core_Session::setStatus(ts('Campaign has been deleted.'), ts('Record Deleted'), 'success');
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
         return;
@@ -314,7 +319,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
   }
 
-  public static function submit($params = [], $form) {
+  public static function submit($params, $form) {
     $groups = [];
     if (!empty($params['includeGroups']) && is_array($params['includeGroups'])) {
       foreach ($params['includeGroups'] as $key => $id) {
@@ -336,9 +341,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
 
     //process custom data.
-    $customFields = CRM_Core_BAO_CustomField::getFields('Campaign', FALSE, FALSE,
-      CRM_Utils_Array::value('campaign_type_id', $params)
-    );
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
       $form->_campaignId,
       'Campaign'

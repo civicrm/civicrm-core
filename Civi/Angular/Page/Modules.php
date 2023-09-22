@@ -85,7 +85,12 @@ class Modules extends \CRM_Core_Page {
       case 'angular-modules.js':
         $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL, $angular);
         $event->mimeType = 'application/javascript';
-        $event->content = $page->digestJs($angular->getResources($moduleNames, 'js', 'path'));
+        $files = array_merge(
+          // FIXME: The `resetLocationProviderHashPrefix.js` has to stay in sync with `\Civi\Angular\AngularLoader::load()`.
+          [\Civi::resources()->getPath('civicrm', 'ang/resetLocationProviderHashPrefix.js')],
+          $angular->getResources($moduleNames, 'js', 'path')
+        );
+        $event->content = $page->digestJs($files);
         break;
 
       case 'angular-modules.css':
@@ -106,15 +111,14 @@ class Modules extends \CRM_Core_Page {
   public function digestJs($files) {
     $scripts = [];
     foreach ($files as $file) {
-      $scripts[] = file_get_contents($file);
+      $scripts[] = \CRM_Utils_JS::stripComments(file_get_contents($file));
     }
     $scripts = \CRM_Utils_JS::dedupeClosures(
       $scripts,
       ['angular', '$', '_'],
       ['angular', 'CRM.$', 'CRM._']
     );
-    // This impl of stripComments currently adds 10-20ms and cuts ~7%
-    return \CRM_Utils_JS::stripComments(implode("\n", $scripts));
+    return implode("\n", $scripts);
   }
 
   /**

@@ -32,7 +32,7 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
   public function run() {
     $queue_id = CRM_Utils_Request::retrieveValue('qid', 'Integer');
     $url_id = CRM_Utils_Request::retrieveValue('u', 'Integer', NULL, TRUE);
-    $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($queue_id, $url_id);
+    $url = trim(CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($queue_id, $url_id));
     $query_string = $this->extractPassthroughParameters();
 
     if (strlen($query_string) > 0) {
@@ -62,6 +62,7 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
       'for' => 'civicrm/mailing/url',
       'queue_id' => $queue_id,
       'url_id' => $url_id,
+      'noindex' => TRUE,
     ]);
   }
 
@@ -91,10 +92,16 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
     unset($query_param['qid']);
     unset($query_param['u']);
     unset($query_param[$config->userFrameworkURLVar]);
+
+    // @see dev/core#1865 for some additional query strings we need to remove as well.
     if ($config->userFramework === 'WordPress') {
       // Ugh
       unset($query_param['page']);
       unset($query_param['noheader']);
+      unset($query_param['civiwp']);
+    }
+    elseif ($config->userFramework === 'Joomla') {
+      unset($query_param['option']);
     }
 
     $query_string = http_build_query($query_param);

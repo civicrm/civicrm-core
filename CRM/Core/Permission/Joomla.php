@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -35,7 +33,10 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
   public function check($str, $userId = NULL) {
     $config = CRM_Core_Config::singleton();
     // JFactory::getUser does strict type checking, so convert falesy values to NULL
-    if (!$userId) {
+    if ($userId === 0 || $userId === '0') {
+      $userId = 0;
+    }
+    elseif (!$userId) {
       $userId = NULL;
     }
 
@@ -52,23 +53,13 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     // not execute hooks if joomla is not loaded
     if (defined('_JEXEC')) {
       $user = JFactory::getUser($userId);
-      $api_key    = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
+      $api_key = CRM_Utils_Request::retrieve('api_key', 'String');
 
       // If we are coming from REST we don't have a user but we do have the api_key for a user.
       if ($user->id === 0 && !is_null($api_key)) {
-        // This is a codeblock copied from /Civicrm/Utils/REST
-        $uid = NULL;
-        if (!$uid) {
-          $store = NULL;
-
-          $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
-
-          if ($contact_id) {
-            $uid = CRM_Core_BAO_UFMatch::getUFId($contact_id);
-          }
-          $user = JFactory::getUser($uid);
-
-        }
+        $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
+        $uid = ($contact_id) ? CRM_Core_BAO_UFMatch::getUFId($contact_id) : NULL;
+        $user = JFactory::getUser($uid);
       }
 
       return $user->authorise($translated[0], $translated[1]);

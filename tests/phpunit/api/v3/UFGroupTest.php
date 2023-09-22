@@ -27,7 +27,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
   protected $_groupId;
   protected $params;
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->_groupId = $this->groupCreate();
     $this->_contactId = $this->individualCreate();
@@ -38,17 +38,16 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'title' => 'Test Profile',
     ]);
     $this->_ufGroupId = $ufGroup['id'];
-    $ufMatch = $this->callAPISuccess('uf_match', 'create', [
+    $this->callAPISuccess('uf_match', 'create', [
       'contact_id' => $this->_contactId,
       'uf_id' => 42,
       'uf_name' => 'email@mail.com',
     ]);
-    $this->_ufMatchId = $ufMatch['id'];
     $this->params = [
       'add_captcha' => 1,
       'add_contact_to_group' => $this->_groupId,
       'group' => $this->_groupId,
-      'cancel_URL' => 'http://example.org/cancel',
+      'cancel_url' => 'http://example.org/cancel',
       'created_date' => '2009-06-27 00:00:00',
       'created_id' => $this->_contactId,
       'group_type' => 'Individual,Contact',
@@ -63,12 +62,12 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'is_update_dupe' => 1,
       'name' => 'Test_Group',
       'notify' => 'admin@example.org',
-      'post_URL' => 'http://example.org/post',
+      'post_url' => 'http://example.org/post',
       'title' => 'Test Group',
     ];
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     //  Truncate the tables
     $this->quickCleanup(
       [
@@ -101,12 +100,27 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test what happens if you don't set is_active
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testUpdateUFGroupActiveMissing($version) {
+    $this->_apiversion = $version;
+    $this->callAPISuccess('uf_group', 'create', [
+      'title' => 'Edited Test Profile',
+      'id' => $this->_ufGroupId,
+    ]);
+    $result = $this->callAPISuccess('uf_group', 'getsingle', ['id' => $this->_ufGroupId]);
+    $this->assertSame($this->_apiversion === 3 ? '1' : TRUE, $result['is_active']);
+  }
+
+  /**
    * @param int $version
    * @dataProvider versionThreeAndFour
    */
   public function testUFGroupCreate($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPIAndDocument('uf_group', 'create', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('uf_group', 'create', $this->params);
     $this->assertAPISuccess($result);
     $this->assertEquals($result['values'][$result['id']]['add_to_group_id'], $this->params['add_contact_to_group']);
     $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $this->params['group']);
@@ -143,7 +157,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'id' => $this->_ufGroupId,
       'add_captcha' => 1,
       'add_contact_to_group' => $this->_groupId,
-      'cancel_URL' => 'http://example.org/cancel',
+      'cancel_url' => 'http://example.org/cancel',
       'created_date' => '2009-06-27',
       'created_id' => $this->_contactId,
       'group' => $this->_groupId,
@@ -159,7 +173,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       'is_update_dupe' => 1,
       'name' => 'test_group',
       'notify' => 'admin@example.org',
-      'post_URL' => 'http://example.org/post',
+      'post_url' => 'http://example.org/post',
       'title' => 'Test Group',
     ];
     $result = $this->callAPISuccess('uf_group', 'create', $params);
@@ -187,7 +201,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess('uf_group', 'create', $this->params);
     $params = ['id' => $result['id']];
-    $result = $this->callAPIAndDocument('uf_group', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('uf_group', 'get', $params);
     $this->assertEquals($result['values'][$result['id']]['add_to_group_id'], $this->params['add_contact_to_group']);
     $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $this->params['group']);
     foreach ($this->params as $key => $value) {
@@ -223,8 +237,40 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     $ufGroup = $this->callAPISuccess('uf_group', 'create', $this->params);
     $params = ['id' => $ufGroup['id']];
     $this->assertEquals(1, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
-    $result = $this->callAPIAndDocument('uf_group', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('uf_group', 'delete', $params);
     $this->assertEquals(0, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
+  }
+
+  /**
+   * Test creating a profile with an "Add contact to group" group set and
+   * then removing it. It should get removed.
+   * It's complicated by the fact that the parameter name is not the same as
+   * the field name.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testUFGroupUnsetAddToGroup($version) {
+    $this->_apiversion = $version;
+
+    // sanity check
+    $this->assertNotEmpty($this->params['add_contact_to_group']);
+
+    $ufGroup = $this->callAPISuccess('uf_group', 'create', $this->params);
+    $result = $this->callAPISuccess('uf_group', 'getsingle', ['id' => $ufGroup['id']]);
+    $this->assertEquals($this->params['add_contact_to_group'], $result['add_to_group_id']);
+
+    // now remove it
+    $this->callAPISuccess('uf_group', 'create', [
+      'id' => $ufGroup['id'],
+      'add_contact_to_group' => '',
+    ]);
+    $result = $this->callAPISuccess('uf_group', 'getsingle', ['id' => $ufGroup['id']]);
+    if ($this->_apiversion === 3) {
+      $this->assertFalse(array_key_exists('add_to_group_id', $result));
+    }
+    else {
+      $this->assertNull($result['add_to_group_id']);
+    }
   }
 
 }

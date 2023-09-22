@@ -23,7 +23,7 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
   protected $_activityID;
   protected $_params;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
 
@@ -40,28 +40,35 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateActivityContact($version) {
     $this->_apiversion = $version;
 
-    $result = $this->callAPIAndDocument('activity_contact', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('ActivityContact', 'create', $this->_params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
+
+    $result = $this->callAPISuccess('ActivityContact', 'create', $this->_params);
+    $this->assertEquals(1, $result['count']);
 
     $this->callAPISuccess('activity_contact', 'delete', ['id' => $result['id']]);
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testDeleteActivityContact($version) {
     $this->_apiversion = $version;
     //create one
     $create = $this->callAPISuccess('activity_contact', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('activity_contact', 'delete', ['id' => $create['id']], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('activity_contact', 'delete', ['id' => $create['id']]);
     $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('activity_contact', 'get', [
       'id' => $create['id'],
@@ -71,7 +78,9 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetActivitiesByContact($version) {
     $this->_apiversion = $version;
@@ -80,7 +89,9 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetActivitiesByActivity($version) {
     $this->_apiversion = $version;
@@ -89,8 +100,11 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_activity_contact_get with empty params.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetEmptyParams($version) {
     $this->_apiversion = $version;
@@ -101,7 +115,7 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
    * Test civicrm_activity_contact_get with wrong params.
    * FIXME: Api4
    */
-  public function testGetWrongParams() {
+  public function testGetWrongParams(): void {
     $this->callAPIFailure('ActivityContact', 'Get', ['contact_id' => 'abc']);
     $this->callAPIFailure('ActivityContact', 'Get', ['activity_id' => 'abc']);
     $this->callAPIFailure('ActivityContact', 'Get', ['record_type_id' => 'abc']);

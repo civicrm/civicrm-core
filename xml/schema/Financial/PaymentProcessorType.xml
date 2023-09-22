@@ -5,12 +5,21 @@
   <class>PaymentProcessorType</class>
   <name>civicrm_payment_processor_type</name>
   <add>1.8</add>
+  <component>CiviContribute</component>
+  <paths>
+    <add>civicrm/admin/paymentProcessorType?reset=1&amp;action=add</add>
+    <delete>civicrm/admin/paymentProcessorType?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <update>civicrm/admin/paymentProcessorType?reset=1&amp;action=update&amp;id=[id]</update>
+  </paths>
   <field>
     <name>id</name>
     <title>Payment Processor Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Payment Processor Type ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>
@@ -47,17 +56,27 @@
     <name>is_active</name>
     <title>Processor Type Is Active?</title>
     <type>boolean</type>
-    <comment>Is this processor active?</comment>
-    <add>1.8</add>
     <default>1</default>
+    <required>true</required>
+    <comment>Is this processor active?</comment>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <add>1.8</add>
   </field>
   <field>
     <name>is_default</name>
     <title>Processor Type is Default?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Default</label>
+    </html>
     <comment>Is this processor the default?</comment>
     <add>1.8</add>
-    <default>0</default>
   </field>
   <index>
     <name>UI_name</name>
@@ -167,6 +186,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Billing Mode</label>
     </html>
     <add>1.8</add>
   </field>
@@ -174,6 +194,8 @@
     <name>is_recur</name>
     <title>Processor Type Supports Recurring?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>Can process recurring contributions</comment>
     <add>1.8</add>
   </field>

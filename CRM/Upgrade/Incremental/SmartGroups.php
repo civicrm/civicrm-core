@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  * Class to handled upgrading any saved searches with changed patterns.
  */
 class CRM_Upgrade_Incremental_SmartGroups {

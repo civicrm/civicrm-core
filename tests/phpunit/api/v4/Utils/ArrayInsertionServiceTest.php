@@ -14,22 +14,20 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace api\v4\Utils;
 
 use Civi\Api4\Utils\ArrayInsertionUtil;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class ArrayInsertionServiceTest extends UnitTestCase {
+class ArrayInsertionServiceTest extends Api4TestBase {
 
-  public function testInsertWillWork() {
+  public function testInsertWillWork(): void {
     $arr = [];
     $path = ['foo' => FALSE, 'bar' => FALSE];
     $inserter = new ArrayInsertionUtil();
@@ -44,7 +42,7 @@ class ArrayInsertionServiceTest extends UnitTestCase {
     $this->assertEquals($expected, $arr);
   }
 
-  public function testInsertionOfContactEmailLocation() {
+  public function testInsertionOfContactEmailLocation(): void {
     $contacts = [
       [
         'id' => 1,

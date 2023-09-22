@@ -40,9 +40,16 @@
     <path>civicrm/admin/mailSettings</path>
     <title>Mail Accounts</title>
     <page_callback>CRM_Admin_Page_MailSettings</page_callback>
-    <desc>Configure email account setting.</desc>
+    <desc>List email accounts.</desc>
     <access_arguments>access CiviCRM,access CiviMail</access_arguments>
     <adminGroup>CiviMail</adminGroup>
+    <weight>420</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/mailSettings/edit</path>
+    <title>Mail Accounts</title>
+    <page_callback>CRM_Admin_Form_MailSettings</page_callback>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
     <weight>420</weight>
   </item>
   <item>
@@ -137,13 +144,6 @@
     <weight>660</weight>
   </item>
   <item>
-    <path>civicrm/mailing/preview</path>
-    <title>Preview Mailing</title>
-    <page_callback>CRM_Mailing_Page_Preview</page_callback>
-    <access_arguments>access CiviMail;approve mailings;create mailings;schedule mailings</access_arguments>
-    <weight>670</weight>
-  </item>
-  <item>
     <path>civicrm/mailing/report</path>
     <title>Mailing Report</title>
     <page_callback>CRM_Mailing_Page_Report</page_callback>
@@ -158,13 +158,6 @@
     <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
     <is_public>true</is_public>
     <weight>685</weight>
-  </item>
-  <item>
-    <path>civicrm/mailing/queue</path>
-    <title>Sending Mail</title>
-    <page_callback>CRM_Mailing_Page_Browse</page_callback>
-    <access_arguments>access CiviMail</access_arguments>
-    <weight>690</weight>
   </item>
   <item>
     <path>civicrm/mailing/report/event</path>
@@ -203,13 +196,20 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+    <path>civicrm/ajax/setupMailAccount</path>
+    <page_callback>CRM_Mailing_Page_AJAX::setup</page_callback>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
+  </item>
+  <item>
     <path>civicrm/mailing/url</path>
     <page_callback>CRM_Mailing_Page_Url</page_callback>
     <access_arguments>*always allow*</access_arguments>
+    <is_public>true</is_public>
   </item>
   <item>
     <path>civicrm/mailing/open</path>
     <page_callback>CRM_Mailing_Page_Open</page_callback>
     <access_arguments>*always allow*</access_arguments>
+    <is_public>true</is_public>
   </item>
 </menu>

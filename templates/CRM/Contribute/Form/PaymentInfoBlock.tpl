@@ -14,7 +14,7 @@
       <th>{ts}Amount{/ts}</th>
       <th>{ts}Type{/ts}</th>
       <th>{ts}Payment Method{/ts}</th>
-      <th>{ts}Received{/ts}</th>
+      <th>{ts}Contribution Date{/ts}</th>
       <th>{ts}Transaction ID{/ts}</th>
       <th>{ts}Status{/ts}</th>
       <th></th>
@@ -41,7 +41,7 @@
 {/if}
 
   {foreach from=$paymentLinks item=paymentLink}
-    <a class="open-inline action-item crm-hover-button" href="{$paymentLink.url}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}{$paymentLink.title}{/ts}</a>
+    <a class="open-inline action-item crm-hover-button" href="{crmURL p=$paymentLink.url q=$paymentLink.qs}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}{$paymentLink.title}{/ts}</a>
   {/foreach}
 
 {/crmRegion}

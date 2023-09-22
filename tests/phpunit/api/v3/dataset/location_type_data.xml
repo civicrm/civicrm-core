@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!--  $Id: location_type_data.xml 30511 2010-11-03 11:36:36Z shot $  -->
 <dataset>
   <table name="civicrm_location_type">
     <column>id</column>
@@ -25,7 +24,7 @@
       <value>Work location</value>             <!--  description  -->
       <value>0</value>                         <!--  is_reserved  -->
       <value>1</value>                         <!--  is_active  -->
-      <null />                                 <!--  is_default  -->
+      <value>0</value>                         <!--  is_default  -->
     </row>
     <row>
       <value>3</value>                         <!--  id  -->
@@ -34,7 +33,7 @@
       <value>Main office location</value>      <!--  description  -->
       <value>0</value>                         <!--  is_reserved  -->
       <value>1</value>                         <!--  is_active  -->
-      <null />                                 <!--  is_default  -->
+      <value>0</value>                         <!--  is_default  -->
     </row>
     <row>
       <value>4</value>                         <!--  id  -->
@@ -43,7 +42,7 @@
       <value>Other location</value>            <!--  description  -->
       <value>0</value>                         <!--  is_reserved  -->
       <value>0</value>                         <!--  is_active  -->
-      <null />                                 <!--  is_default  -->
+      <value>0</value>                         <!--  is_default  -->
     </row>
     <row>
       <value>5</value>                         <!--  id  -->
@@ -52,7 +51,7 @@
       <value>Billing Address location</value>  <!--  description  -->
       <value>1</value>                         <!--  is_reserved  -->
       <value>1</value>                         <!--  is_active  -->
-      <null />                                 <!--  is_default  -->
+      <value>0</value>                         <!--  is_default  -->
     </row>
   </table>
 </dataset>

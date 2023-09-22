@@ -1,0 +1,30 @@
+<div class="crm-flex-box crm-search-display-pager" ng-if="$ctrl.rowCount && $ctrl.settings.pager">
+  <div>
+    <div class="form-inline" ng-if="$ctrl.settings.pager.show_count" ng-include="'~/crmSearchDisplay/ResultCount.html'">
+    </div>
+  </div>
+  <div ng-if="!$ctrl.settings.pager.hide_single || ($ctrl.rowCount > $ctrl.limit)" class="text-center crm-flex-2">
+    <ul uib-pagination
+        class="pagination"
+        boundary-links="true"
+        total-items="$ctrl.rowCount"
+        ng-model="$ctrl.page"
+        ng-change="$ctrl.getResultsPronto()"
+        items-per-page="$ctrl.limit"
+        max-size="6"
+        force-ellipses="true"
+        previous-text="&lsaquo;"
+        next-text="&rsaquo;"
+        first-text="&laquo;"
+        last-text="&raquo;"
+    ></ul>
+  </div>
+  <div>
+    <div class="form-inline text-right" ng-if="$ctrl.settings.pager.expose_limit">
+      <label for="crm-search-results-page-size" >
+        {{:: ts('Page Size') }}
+      </label>
+      <input class="form-control" id="crm-search-results-page-size" type="number" ng-model="$ctrl.limit" min="10" step="10">
+    </div>
+  </div>
+</div>

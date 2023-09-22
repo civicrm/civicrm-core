@@ -1,0 +1,58 @@
+/* Sortable headers */
+#bootstrap-theme .crm-search-display th.crm-sortable-col {
+  cursor: pointer;
+}
+#bootstrap-theme .crm-search-display th i.fa-sort-desc,
+#bootstrap-theme .crm-search-display th i.fa-sort-asc {
+  color: #1a5a82;
+}
+#bootstrap-theme .crm-search-display th:not(:hover) i.fa-sort {
+  opacity: .5;
+}
+
+#bootstrap-theme.crm-search input.ng-invalid,
+#bootstrap-theme.crm-search-display input.ng-invalid,
+.crm-search-task-dialog #bootstrap-theme input.ng-invalid {
+  border-color: #8a1f11;
+}
+
+#bootstrap-theme #crm-search-results-page-size {
+  width: 60px;
+}
+
+#bootstrap-theme .crm-search-display button.dropdown-toggle {
+  white-space: nowrap;
+}
+
+/* Loading placeholders */
+#bootstrap-theme .crm-search-loading-placeholder {
+  height: 2em;
+  width: 80%;
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(0,0,0,.03);
+  display: inline-block;
+}
+#bootstrap-theme .crm-search-loading-placeholder::before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: -150px;
+  top: 0;
+  height: 100%;
+  width: 150px;
+  background: linear-gradient(to right, transparent 0%, rgba(0,0,0,.05) 50%, transparent 100%);
+  animation: searchKitLoadingAnimation 1s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+}
+@keyframes searchKitLoadingAnimation {
+  from {
+    left: -150px;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+#bootstrap-theme .crm-search-display ul.pagination > li {
+  margin: 0;
+}

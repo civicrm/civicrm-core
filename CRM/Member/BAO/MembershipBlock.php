@@ -13,25 +13,18 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Create or update a MembershipBlock.
    *
+   * @deprecated
    * @param array $params
    * @return CRM_Member_DAO_MembershipBlock
    */
   public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -39,18 +32,12 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
    * Delete membership Blocks.
    *
    * @param int $id
-   *
+   * @deprecated
    * @return bool
    */
   public static function del($id) {
-    $dao = new CRM_Member_DAO_MembershipBlock();
-    $dao->id = $id;
-    $result = FALSE;
-    if ($dao->find(TRUE)) {
-      $dao->delete();
-      $result = TRUE;
-    }
-    return $result;
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
 }

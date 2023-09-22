@@ -14,20 +14,19 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace api\v4\Query;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Query\SqlExpression;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SqlExpressionParserTest extends UnitTestCase {
+class SqlExpressionParserTest extends Api4TestBase implements TransactionalInterface {
 
   public function aggregateFunctions() {
     return [
@@ -46,45 +45,45 @@ class SqlExpressionParserTest extends UnitTestCase {
   public function testAggregateFuncitons($fnName) {
     $className = 'Civi\Api4\Query\SqlFunction' . $fnName;
     $params = $className::getParams();
-    $this->assertNotEmpty($params[0]['prefix']);
-    $this->assertEmpty($params[0]['suffix']);
+    $this->assertNotEmpty($params[0]['flag_before']);
+    $this->assertEmpty($params[0]['flag_after']);
 
     $sqlFn = new $className($fnName . '(total)');
     $this->assertEquals($fnName, $sqlFn->getName());
     $this->assertEquals(['total'], $sqlFn->getFields());
-    $this->assertCount(1, $this->getArgs($sqlFn));
+    $args = $sqlFn->getArgs();
+    $this->assertCount(1, $args);
+    $this->assertEmpty($args[0]['prefix']);
+    $this->assertEmpty($args[0]['suffix']);
+    $this->assertTrue(is_a($args[0]['expr'][0], 'Civi\Api4\Query\SqlField'));
 
     $sqlFn = SqlExpression::convert($fnName . '(DISTINCT stuff)');
     $this->assertEquals($fnName, $sqlFn->getName());
     $this->assertEquals("Civi\Api4\Query\SqlFunction$fnName", get_class($sqlFn));
     $this->assertEquals($params, $sqlFn->getParams());
     $this->assertEquals(['stuff'], $sqlFn->getFields());
-    $this->assertCount(2, $this->getArgs($sqlFn));
+    $args = $sqlFn->getArgs();
+    $this->assertCount(1, $args);
+    $this->assertEquals('DISTINCT', $args[0]['prefix'][0]);
+    $this->assertEmpty($args[0]['suffix']);
+    $this->assertTrue(is_a($args[0]['expr'][0], 'Civi\Api4\Query\SqlField'));
 
     try {
       $sqlFn = SqlExpression::convert($fnName . '(*)');
       if ($fnName === 'COUNT') {
-        $this->assertTrue(is_a($this->getArgs($sqlFn)[0], 'Civi\Api4\Query\SqlWild'));
+        $args = $sqlFn->getArgs();
+        $this->assertCount(1, $args);
+        $this->assertEmpty($args[0]['prefix']);
+        $this->assertEmpty($args[0]['suffix']);
+        $this->assertTrue(is_a($args[0]['expr'][0], 'Civi\Api4\Query\SqlWild'));
       }
       else {
         $this->fail('SqlWild should only be allowed in COUNT.');
       }
     }
-    catch (\API_Exception $e) {
-      $this->assertContains('Illegal', $e->getMessage());
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('Illegal', $e->getMessage());
     }
-  }
-
-  /**
-   * @param \Civi\Api4\Query\SqlFunction $fn
-   * @return array
-   * @throws \ReflectionException
-   */
-  private function getArgs($fn) {
-    $ref = new \ReflectionClass($fn);
-    $args = $ref->getProperty('args');
-    $args->setAccessible(TRUE);
-    return $args->getValue($fn);
   }
 
 }

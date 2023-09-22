@@ -11,7 +11,11 @@ use GuzzleHttp\Client;
 /**
  * Class GuzzleTestTrait
  *
- * This trait defines a number of helper functions for testing guzzle.
+ * This trait defines a number of helper functions for testing Guzzle-based logic,
+ * such as a payment-processing gateway.
+ *
+ * Use this in a headless test for which you need to mock outbound HTTP requests from Civi.
+ * Alternatively, to write an E2E test with inbound HTTP requests to Civi, see HttpTestTrait.
  */
 trait GuzzleTestTrait {
   /**

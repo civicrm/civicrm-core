@@ -1,0 +1,755 @@
+As of CiviCRM 5.25, contributor recognition is viewable in the release notes of each individual version. This file represents an archive of recognition for people and organizations that have sponsored and/or contributed to the project prior to version 5.25.
+
+************************************************
+Code Contributors for 5.x
+************************************************
+
+CiviCRM - Coleman Watts, Tim Otten
+a-n The Artists Information Company - William Mortada
+AGH Strategies - Alice Frumin, Andie Hunt, Eli Lisseck, Tommy Bobo
+Agileware - Alok Patel, Francis Whittle, Justin Freeman, Pengyi Zhang
+Alexy Mikhailichenko
+Andrei Mondoc
+Andrew Thompson
+Armadillo Sec Ltd - Daniel Compton
+Australian Greens - Andrew Cormick-Dockery
+Bastien Ho
+Blackfly Solutions - Alan Dixon
+Business & Code - Alain Benbassat
+Calbasi - Joan Cervan Andreu
+Calibrate - Wannes De Roy, Wouter Hechtermans
+Caltha - Tomasz Pietrzkowski
+CEDC - Laryn Kragt Bakker
+Centrale Organisatie van Voetbal Scheidsrechters (COVS) - Ed van Leeuwen
+Chris Burgess
+Christian Wach
+Circle Interactive - Dave Jenkins, Kirk Jackson, Martin Castle, Pradeep Nayak,
+    Reece Benson
+CiviCoop - Jaap Jansma, Klaas Eikelboom
+CiviDesk - Sushant Paste, Yashodha Chaku
+CiviFirst - John Kirk
+CompuCorp - Camilo Rodriguez, Davi Alexandre, Debarshi Bhaumik, Michael Devery,
+    Mukesh Ram, Omar Abu Hussein, René Olivo, Vinu Varshith Sekar
+Coop SymbioTIC - Guillaume Boudrias, Mathieu Lutfy, Samuel Vanhove
+Davis Media Access - Darrick Servis
+Deepak Srivastava
+Derek Lewis
+Digitalcourage - Detlev Sieber
+DignityUSA - Logan Bear
+Electronic Frontier Foundation - Mark Burdett
+eQuality Technology - Greg Rundlett
+Florian Kohrt
+Francesc Bassas i Bullich
+Frank J. Gómez
+Freeform Solutions - Herb van den Dool
+Fuzion - Jitendra Purohit, Luke Stewart
+Hossein Amin
+Giant Rabbit - Peter Haight
+Giovanni Dalmas
+GMVCO Databases - Craig Almond, Jade Gaunt
+Greenpeace Central and Eastern Europe - Patrick Figel
+Guillaume Rischard
+iXiam - César Ramos, Luciano Spiegel, Vangelis Pantazis
+Jamie Tillman
+Jens Schuppe
+JMA Consulting - Edsel Lopez, Joe Murray, Monish Deb, Seamus Lee
+Johan Vervloet
+John Kingsnorth
+John Kyle Cronan
+Joinery - Allen Shaw
+Joost Fock
+Just Hope - Phil Morice Brubaker
+Kanzu Code - Carl Andrew Lema
+Ken West
+Kilakwa Associates - smaen123
+Kompetenzzentrum Technik-Diversity-Chancengleichheit - Niels Heinemann
+Korlon - Stuart Gaston
+Left Join Labs - Sean Madsen
+Lemniscus - Noah Miller
+Lighthouse Design and Consulting - Brian Shaughnessy
+Liquid Web, Inc. - Jason Gillman Jr.
+Łukasz Krutul
+Marcus J Wilson
+Mark Westergaard
+Megaphone Technology Consulting - Jon Goldberg
+MillerTech - Chamil Wijesooriya
+MJCO - Mikey O'Toole
+MJW Consulting - Matthew Wire
+Mountev Ltd
+myDropWizard - David Snopek
+Naomi Rosenberg
+Nicol Wistreich
+Olivier Tétard
+Onyemenam Ndubuisi
+OSSeed Technologies - Madhavi Malgaonkar
+Oxfam Germany - Thomas Schüttler, Yuliyana Liyana
+Palante Technology Cooperative - Morgan Robinson
+PeaceWorks Technology Solutions - Martin Hansen
+PHD Computer Consultants - Chris Cant
+Progressive Technology Project - Jamie McClelland
+Ray Wright
+Richard van Oosterhout
+Romain Thouvenin
+Samson Alajede
+Selwyn Tang
+Semper IT - Karin Gerritsen
+Skvare - Mark Hanna, Sunil Pawar
+Squiffle Consulting - Aidan Saunders
+Stephen Palmstrom
+Steve Ellis
+Systopia - Björn Endres, Thomas Leichtfuss
+Tadpole Collective - Kevin Cristiano
+Tanya Bouman
+Team Expansion - Greg Harris
+Third Sector Design - Michael McAndrew, Kurund Jalmi, William Mortada
+Thomas Mannell
+Timbsoft Technologies - Tunbola Ogunwande
+Tiotsop Gerest
+Tom Bloor
+Veda Consulting - Mathavan Veeramuthu
+Wikimedia Foundation - Eileen McNaughton, Elliott Eggleston
+Wildsight - Lars Sanders-Green
+Will Long
+GitHub users 19ATF77, applicado, avall-llovera, JGaunt, marcineq, maynardsmith,
+    mmyriam, skherraz, tapash, yalh
+
+
+************************************************
+Key Contributors and Sponsors for 4.7
+************************************************
+
+CiviCRM - Coleman Watts, Josh Gowans, Tim Otten
+
+Aaron Jones
+Abhikalak Consultants - Amal Sharma
+AGH Strategies - Alice Frumin, Andie Hunt, Eli Lisseck, Nikki Murray, Tommy
+    Bobo, Tyrell Cook
+Agileware - Alok Patel, Francis Whittle, Iris Abarquez, Justin Freeman, Vaibhav
+    Sagar
+András Molnár
+Andrew West
+AppChecker
+Aputsiaĸ Niels Janussen
+Arkadiusz Rzadkowolski
+Arun Singh
+ATD Fourth World - Véronique Gratioulet
+Atif Shaikh
+Australian Greens - Seamus Lee
+Awebon Technologies - Karthikeyan Balasubramanian
+BackOffice Thinking - Hassan Farooq
+Barbara Miller
+Black Brick Software - David Hayes
+Blackfly Solutions - Alan Dixon
+British Humanist Association - Andrew West
+Borislav Zlatanov
+Brian Dombrowski
+Brooks Digital - Spencer Brooks
+Caroline Badley
+CEDC - Laryn Kragt Bakker
+Chanun Chirattikanon
+Charlie DeTar
+Chirojeugd Vlaanderen - Johan Vervloet
+Chris Burgess
+Christian Wach
+Circle Interactive - Dave Jenkins
+CiviCoop - Erik Hommel, Jaap Jansma
+CiviDesk - Nicolas Ganivet, Sunil Pawar, Virginie Ganivet, Yashodha Chaku
+CiviFirst - John Kirk
+Community Builders - Dejan Lukic
+Community IT Academy - William Mortada
+CompuCorp - Camilo Rodriguez, Guanhuan Chen, Kacper Warda, Jamie Novick, Michael
+    Devery, Mukesh Ram, Omar Abu Hussein
+Coop SymbioTIC - Mathieu Lutfy, Samuel Vanhove
+Dave D
+Dave Greenberg
+David Hayes
+Deepak Srivastava
+Denver DataMan - Steve Kessler
+Dhanesh Dhuri
+Daniël van Vuuren
+Dmitry Smirnov
+Donald Lobo
+E-Dynamics - Franky Van Liedekerke
+Eaiman Shoshi
+Effy Elden
+Electronic Frontier Foundation - Mark Burdett
+Elin Waring
+Emphanos LLC
+Ergon Logic Enterprises - Christopher Gervais
+Erich Schulz
+Esantanche
+Francesc Bassas i Bullich
+Freeform Solutions - Lola Slade, Stephanie Gray, Herb van den Dool
+Future First - David Knoll, John Prescott
+Fuzion - Peter Davis, Torrance Hodgson, Jitendra Purohit
+Giant Rabbit - Peter Haight
+Ginkgo Street Labs - Frank Gómez, Galata Tona, Michael Daryabeygi, Roshani
+    Kothari
+Gizra - Aron Novak
+Greenleaf Advancement - Guy Iaccarino, Karen Stevenson
+Hartmann Computer Consulting - Peter Hartmann
+iXiam - Luciano Spiegel
+Jake Martin White
+JazzMan
+jernic
+Jérôme Lebleu
+JMA Consulting - Edsel Lopez, Joe Murray, Monish Deb
+Joanne Chester
+Joe McLaughlin
+John Kingsnorth
+Joinery - Allen Shaw
+Joost Fock
+Joris
+Kanzu Code - Carl Andrew Lema
+Kemal Bay
+Ken West
+Kevin Levie
+Kevin Reynen
+Klaas Eikelboom
+Klangsoft - David Reedy Jr
+Kompetenzzentrum Technik-Diversity-Chancengleichheit - Niels Heinemann
+Korlon - Stuart Gaston
+K Sneed Consulting - Kate Sneed
+Left Join Labs - Sean Madsen
+Lemniscus - Noah Miller
+Lesley Evensen
+Lighthouse Consulting and Design - Brian Shaughnessy
+Marc Brazeau
+Marty Wright
+Mattias Michaux
+Megaphone Technology Consulting - Jon Goldberg
+Michael Hurwicz
+Mihael Mladenov
+Milton Zurita
+MJW Consulting - Matthew Wire
+Mohit Aggarwal
+MongoDB - A. Jesse Jiryu Davis
+mountev
+myDropWizard - David Snopek
+Nathan Brettell
+National Urban League - Lisa Taliano
+Neuwald Tecnologia da Informação - Arthur Almeida
+Nicholai Burton
+Niels Heinemann
+New York City Council
+New York State Senate - Ken Zalewski
+Noah's Light Foundation - Carlos Loeza
+Northbridge Digital - Oliver Gibson
+Olaf Buddenhagen
+Olivier Hertrich
+Oxfam Germany - Thomas Schüttler
+Palante Technology Cooperative - Joseph Lacey
+Paul Campbell
+Pawel Nowak
+PowDevel - Beto Aveiga
+Pradeep Nayak
+Progressive Technology Project - Alice Aguilar, Jamie McClelland
+Randy Tobias
+Redfin Solutions - Chris Wells
+Richard Van Oosterhout
+Rohan Ramesh Katkar
+Romain Thouvenin
+Rupal Javiya
+Samson Alajede
+Saurabh Batra
+Sébastien Beyou
+Semper IT - Karin Gerritsen
+Sharique Ahmed Farooqui
+Shawn Holt
+Skvare - Jeremy Proffitt, Mark Hanna, Peter Petrik
+Smiling Heart Enterprises - Neil Planchon
+Spry Digital - Ellen Hendricks
+Squiffle Consulting - Aidan Saunders
+Stan Dragnev
+Stephen Palmstrom
+Symbiotic - Mathieu Lutfy, Samuel Vanhove
+Systopia - Björn Endres, Niko Bochan, Philipp Batroff
+Tadpole Collective - Dana Skallman, Kevin Cristiano
+Team Expansion - Greg Harris
+Tech to the People - Xavier Dutoit
+Third Sector Design - Michael McAndrew
+Thomas Leichtuss
+Thomas Schüttler
+Tim Mallezie
+Timbsoft Technologies - Tunbola Ogunwande
+Tobias Lounsbury
+Torenware Networks - Rob Thorne
+University of Cambridge – Alex Corr
+Vasantha Kaje
+Veda Consulting - Parvez Saleh, Kajan
+Vedant Rathore
+Vikas Kumar
+Vinu Varshith Sekar
+Wanna Pixel - Nathan Porter, Marisa Porter
+We Move Europe/Caltha - Tomasz Pietrzkowski
+Web Access - Kurund Jalmi, Sudha Bisht
+Wikimedia Foundation - Adam Wight, Eileen McNaughton, Elliott Eggleston, Maggie
+    Epps
+Will Long
+yurg
+
+************************************************
+Key Contributors and Sponsors for 4.6
+************************************************
+
+CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Donald Lobo,
+               Eileen McNaughton, Jitendra Purohit, Josh Gowan, Kurund Jalmi,
+               Michael McAndrew, Monish Deb, Rohan Ramesh Katkar, Tim Otten,
+               Yashodha Chaku
+ADG Communications - Steve Binkowski
+AGH Strategies - Andie Hunt, Jane Hanley, Tommy Bobo, Tyrell Cook
+Agileware - Justin Freeman, Francis Whittle, Iris Abarquez, Vaibhav Sagar
+Alex C
+Allan Chappell
+Amnesty International Spain - Carlos Capote
+Andreas Hennings
+Andy Clark
+Arete Imagine - Marisa Porter, Nate Porter
+Asylum Hill Congregational Church
+Blackfly Solutions - Alan Dixon
+Botanical Society of America - Toby Lounsbury
+Chirojeugd Vlaanderen - Johan Vervloet
+Christian Wach
+Chris Ward
+Circle Interactive - Dave Moreton, Andrew Walker, Dave Jenkins, Maya Gibbs
+CiviCoop - Erik Hommel, Jaap Jansma
+CiviDesk - Nicolas Ganivet, Sunil Pawar
+Community Human Services Corporation - Paul Mosey
+Compucorp - Jamie Novick, Greg Meszeros, Robin Mitra, Guanhuan Chen, Chanun Chirattikanon
+David Hepper
+Detlev Sieber
+Drishtant - Ruchi Kumar
+Drupal Association - Neil Drumm
+Elliott Eggleston
+Freeform Solutions - Lola Slade
+Future First - David Knoll, John Prescott, Vitor Nobrega
+Fuzion, NZ - Chris Burgess, Eileen McNaughton, Peter Davis
+Giantrabbit - Anthony Nemirovsky, Peter Haight
+Ginkgo Street Labs - Frank J. Gómez, Michael Daryabeygi
+GMVCO Databases - Jon-man Cheung, Alex Lee, Craig Almond
+Google Summer of Code - Aditya Nambiar, Siddhant Rajagopalan, Torrance Hodgeson
+Gnu.org - David Thompson
+Jaka Kranjc
+JMA Consulting - Joe Murray, Pradeep Nayak, Edsel Lopez
+Joanne Chester
+John Kingsnorth
+jsnyder83
+Kathryn Benedicto
+Han Velthuis
+Ken West
+Kirk Jackson
+Korlon - Stuart Gaston
+Lighthouse Consulting and Design - Brian Shaughnessy
+Mattias Michaux
+Max
+MC3 - Graham Mitchell
+Mission Matters - Joshua Aranda
+Mobius - Jeremy Proffitt
+Northbridge Digital - Oliver Gibson
+Symbiotic - Mathieu Lutfy, Samuel Vanhove
+National Democratic Institute - Chris Doten
+New York State Senate - Ken Zalewski
+Niro Solutions
+Palente Technology Cooperative - Jon Goldberg, Joseph Lacey
+Paul Campbell
+Pogstone - Sarah Gladstone
+Progressive Tech Project - Alice Aguilar, Jamie McClelland
+Registered Nurses Association of Ontario - Stan Dragnev
+Richard Van Oosterhout
+Seamus Lee
+Semper IT - Karin Gerritsen
+Skvare - Mark Hanna, Peter Petrik
+Squiffle Consulting - Aidan Saunders
+Stephen Palmstrom
+Systopia - Björn Endres, Fabian Schuttenberg, Martin Peth, Niko Bochan
+Tadpole - Dana Skallman, Kevin Cristiano
+Tech to the People - Xavier Dutoit
+TeNNoX
+Tim Mallezie
+Toke Høiland-Jørgensen
+Veda Consulting - Priyanka Karan, Parvez Saleh, Deepak Srivastava
+William Theaker
+Web Access - Tony Mazzerella, Nileema Jadhav, Parag Bhilkar, Pratiksha Dubey, Manish More
+Wikimedia Foundation - Adam Wight
+Zing - Simon West, Andrew Tombs, Vivek Arora
+
+************************************************
+Key Contributors and Sponsors for 4.5
+************************************************
+
+CiviCRM Team - Coleman Watts, David Greenberg, Donald Lobo,
+               Kurund Jalmi, Michael McAndrew, Monish Deb, Pratik Joshi,
+               Tim Otten, Yashodha Chaku, Eileen McNaughton
+AGH Strategies - Andie Hunt, Maggie Epps, Tyrell Cook
+Allan Chappell
+Amnesty International Spain - Carlos Capote
+Andy Clark
+Arete Imagine - Marisa Porter, Nate Porter
+Botanical Society of America - Toby Lounsbury
+Chris Burgess
+Chris Ward
+Circle Interactive - Andrew Walker, Dave Jenkins
+CiviDesk - Nicolas Ganivet, Sunil Pawar
+Compucorp - Jamie Novick, Erawat Chamanont
+CiviCoop - Erik Hommel, Jaap Jansma
+Detlev Sieber
+Drishtant - Ruchi Kumar
+Drupal Association - Neil Drumm
+Electronic Frontier Foundation - Mark Burdett, Max Hunter, Leez Wright
+Freeform Solutions - Lola Slade
+Fuzion, NZ - Eileen McNaughton, Peter Davis, Torrance Hodgeson
+Giant Rabbit - Peter Haight, Anthony Nemirovsky
+Ginkgo Street Labs - Frank J. Gómez, Michael Daryabeygi
+Graham Mitchell
+Great Lakes Planetarium Association - Geoff Holt
+Jennifer Simonis
+Jeremy Proffitt
+Jim Meehan
+Jimmy Huang
+JMA Consulting - Joe Murray
+Joanne Chester
+Ken West
+Kirk Jackson
+Korlon - Stuart Gaston
+Koumbit - Samuel Vanhove
+Lighthouse Consulting and Design - Brian Shaughnessy
+Mathieu Lutfy
+Mission Matters - Joshua Aranda
+National Democratic Institute - Chris Doten
+New York State Senate - Ken Zalewski
+Niro Solutions
+Palente Technology Cooperative - Jon Goldberg, Joseph Lacey
+Pogstone - Sarah Gladstone
+Progressive Tech Project - Alice Aguilar, Jamie McClelland
+Semper IT - Karin Gerritsen
+Skvare - Mark Hanna, Peter Petrik
+Systopia - Björn Endres
+Tadpole - Dana Skallman
+Tech to the People - Xavier Dutoit
+Veda Consulting - Parvez Saleh, Deepak Srivastava
+Web Access - Pradeep Nayak, Tony Mazzarella
+Wikimedia Foundation - Adam Wight
+Zing - Simon West, Andrew Tombs
+
+************************************************
+Key Contributors and Sponsors for 4.4
+************************************************
+
+CiviCRM Team - Coleman Watts, David Greenberg, Donald Lobo,
+               Kurund Jalmi, Michael McAndrew, Monish Deb,
+               Tim Otten, Yashodha Chaku, Eileen McNaughton
+AGH Strategies - Andie Hunt
+Backoffice Thinking
+Chris Burgess
+Circle Interactive - Andrew Walker, Dave Jenkins
+CiviDesk - Nicolas Ganivet
+CiviCoop - Erik Hommel, Jaap Jansma
+CiviHosting - Hershel Robinson
+CompuCorp - Jamie Novick, Erawat Chamanont
+Confluence - Frank Gomez, Michael Daryabeygi
+Dave D
+Detlev Sieber
+Drupal Association - Neil Drumm
+Electronic Frontier Foundation - Micah Lee, Kellie Brownell
+Emphanos - Allen Shaw
+Freeform Solutions - Lola Slade
+Fuzion, NZ - Eileen McNaughton, Peter Davis, Torrance Hodgeson
+Giant Rabbit - Anna Heath
+Jim Meehan
+JMA Consulting - Joe Murray
+Joanne Chester
+Keith Morgan
+Ken West
+Korlon - Stuart Gaston
+Koumbit - Samuel Vanhove
+Lighthouse Consulting and Design - Brian Shaughnessy
+Mathieu Lutfy
+National Democratic Institute - Chris Doten
+New York State Senate - Ken Zalewski
+NfP Services (MTL Software Group) - Jag Kandasamy, Rajesh Sundararajan
+Niro Solutions
+Noah Miller
+Orgis - Hans Idink
+Palente Technology Cooperative - Jon Goldberg, Joseph Lacey
+Paul Delbar
+Pogstone - Sarah Gladstone
+Progressive Tech Project - Alice Aguilar, Jamie McClelland
+Registered Nurses Association of Ontario
+San Francisco Baykeeper - Eliet Henderson
+Tadpole - Dana Skallman
+Tallyfox
+Tech to the People - Xavier Dutoit
+Veda Consulting - Parvez Saleh, Deepak Srivastava
+Web Access - Pradeep Nayak
+Wikimedia Foundation - Adam Wight
+Zing - Simon West, Andrew Tombs
+
+************************************************
+Key Contributors and Sponsors for 4.3
+************************************************
+
+CiviCRM Team - Coleman Watts, David Greenberg, Deepak Srivastava, Donald Lobo,
+               Kurund Jalmi, Michael McAndrew, Pratik Joshi, Ravish Nair,
+               Tim Otten, Yashodha Chaku, Eileen McNaughton
+AGH Strategies - Andie Hunt
+Backoffice Thinking
+Chris Burgess
+Circle Interactive - Andrew Walker, Dave Jenkins
+CiviDesk - Nicolas Ganivet
+CiviHosting - Hershel Robinson
+Community Builders
+Compucorp
+Dave D
+EE-atWork - Erik Hommel
+Electronic Frontier Foundation - Micah Lee, Kellie Brownell
+Emphanos - Allen Shaw
+Fuzion, NZ - Eileen McNaughton, Peter Davis, Torrance Hodgeson
+Ginkgo Street Labs - Frank J. Gómez, Michael Daryabeygi
+Jim Meehan
+JMA Consulting - Joe Murray, Pradeep Nayak
+Keith Morgan
+Ken West
+Korlon - Stuart Gaston
+Koumbit - Samuel Vanhove
+Lighthouse Consulting and Design - Brian Shaughnessy
+Mathieu Lutfy
+New York State Senate - Ken Zalewski
+NfP Services (MTL Software Group) - Jag Kandasamy, Rajesh Sundararajan
+Niro Solutions
+Noah Miller
+Palente Technology Cooperative - Jon Goldberg
+Progressive Tech Project - Alice Aguilar, Jamie McClelland
+Paul Delbar
+Registered Nurses Association of Ontario
+San Francisco Baykeeper - Eliet Henderson
+Tech to the People - Xavier Dutoit
+Third Sector Design
+Veda Consulting - Parvez Saleh
+Web Access
+Zing - Simon West, Andrew Tombs
+
+
+************************************************
+Sponsors and key contributors for 4.2
+************************************************
+The following people and organizations sponsored and/or contributed new and improved features for the 4.2 release.
+
+Abril Rocabert
+Adam Wight
+Alice Aguilar
+Allen Shaw
+Andres Spagarino
+Andie Hunt
+Anthony Camilleri
+Ariel Gold
+Brian Shaughnessy
+Chris Ward
+Dave Moreton
+Eileen McNaughton
+Eliet Henderson
+Erik Hommel
+Frank Gomez
+Graylin Kim
+Jamie McClelland
+Jane Hanley
+Jason Bertolacci
+Joe Murray
+John Derry
+Jon Goldberg
+Kasia Wakarecy
+Katie Horn
+Katy Jockelson
+
+Ken Zalewski
+Lisa Jervis
+Mathieu Lutfy
+Matt Neimayer
+Micah Lee
+Michael McAndrew
+Nicolas Ganivet
+Noah Miller
+Parvez Saleh
+Peter Gehres
+Peter McAndrew
+Robyn Perry
+Samuel Vanhove
+Simon West
+Stéphane Lussier
+Stuart Gaston
+Xavier Dutoit
+
+Art of Living
+Backoffice Thinking
+Community Builders
+DC Road Runners
+EE atWork
+Electronic Frontier Foundation
+Freeform Solutions
+Free Software Foundation
+Fuzion NZ
+Gingko Street Consulting
+JMA Consulting
+Korlon
+Koumbit
+Lighthouse Consulting
+National Democratic Institute
+New York State Senate
+NS Web Solutions
+Progressive Technology Project
+San Francisco Baykeeper
+Tech to the People
+The Monthly.com
+Veda Consulting
+Xstreme Media
+Zing
+
+************************************************
+Sponsors and key contributors for 4.1
+************************************************
+The following people and organizations sponsored and/or contributed new and improved features for the 4.1 release.
+
+Adam Wight
+Andrew Harris
+Alice Aguilar
+Andre Gurgel
+Brian Shaugnessy
+Coleman Watts
+Dave D
+Dave Moreton
+Eileen McNaughton
+Erik Brower
+Erik Hommel
+Henry Bennett
+Jamie McClelland
+Jim Taylor
+Jonathan Mark
+Joe Murray
+Marianela Zucotti Bozzano
+Michael McAndrew
+Steve Colson
+Stuart Gaston
+Tim Otten
+Tom Kirkpatrick
+Xavier Dutoit
+
+AGH Strategies
+Amigos Library Services
+Association for Learning Technology
+Attendee Management
+Benton Consulting
+Circle Interactive
+CivicActions
+Community Builders
+EE-atWork
+Fuzion (NZ)
+Giant Rabbit
+Kindling Trust
+Korlon
+International Mountain Biking Association
+International Society for Bayesian Analysis
+Josiesque Designs
+Michigan Parents for Schools
+New York State Senate
+Nonprofit Association of Oregon
+Nonprofit Solutions
+Powered by Action
+Progressive Technology Project
+Resolutions Northwest
+River Pool at Beacon
+Rooty Hollow
+San Francisco Baykeeper
+Scotland's Colleges
+Switchback
+System Seed
+Tech to the People
+The San Francisco Orff-Schulwerk
+Third Sector Design
+Voluntary Action Westminster
+Vpod Schweiz
+Woven
+
+************************************************
+Sponsors for 3.4 / 4.0 Make-it-Happen Projects
+************************************************
+The following people and organizations sponsored new and improved features for the 3.4 / 4.0 release.
+
+ACORN Canada http://acorncanada.org
+Allora Consulting http://alloraconsulting.com
+American Friends Service Committee http://afsc.org/
+Australian Greens http://greens.org.au
+BREAZE http://breaze.org.au
+Canadian Paramedics http://www.peelparamedics.com
+Community Builders Australia Pty Ltd
+Corvair Society of America (CORSA) http://www.corvair.org/
+Donor Depot http://donordepot.com
+Energetica http://energetica.com.au
+Fuzion http://fuzion.co.nz
+Gold Strategy Group http://www.goldstrategygroup.com
+JMA Consulting http://jmaconsulting.biz
+Joomkit Ltd http://joomkit.com
+Kabissa - Space for Change in Africa http://kabissa.org
+NS Web Solutions http://nswebsolutions.com
+NAMI Louisville  http://namilouisville.org
+Progressive Technology Project http://www.progressivetech.org
+RVTC http://rvtc.us
+Volunteer Honduras http://www.volunteerhonduras.org
+
+Briney, Matthew
+Brownsberger, Will
+Burden, Monica
+Calleeuw, Bart
+Cimpian, Casti
+Clarke, Jill
+Davis, Peter
+Day, Janette
+Gold, Ariel
+Hadar, Kehilat
+Malkoun, Anthony
+Matsushita, Jun
+McNaughton, Eileen
+Murray, Joe
+Shaughnessy, Brian
+Spagarino, Andres
+Speleo
+Stuart, josh
+Tabletguy
+Watts, Danny
+Wistreich, Nic
+
+****************************************
+Sponsors for 3.3 Make-it-Happen Projects
+****************************************
+The following people and organizations sponsored new and improved features for the 3.3 release.
+
+JMA Consulting: http://jmaconsulting.biz/
+Emergency Picnic: http://emergencypicnic.net/
+Thomas Carlson
+Micheas Herman
+T.J. Hellman
+Gold Strategy Group: http://www.goldstrategygroup.com
+Laura Velkei
+John Barclay
+Matthew Briney: http://emotivellc.com
+2020Media: http://www.2020media.com/
+Social Contxt: http://socialcontxt.com/
+Impari Systems Inc: http://www.imparisystems.com/
+Alpha: http://uk.alpha.org
+Cambridge Union: http://www.cus.org
+St Ethelburga's: http://stethelburgas.org
+Joomkit: http://www.joomkit.com
+International Mountain Biking Association: http://www.imba.com/
+Niro Solutions: http://www.nirosolutions.com/
+Fuzion: http://fuzion.co.nz
+ArtD Webdesign
+CivicActions: http://civicactions.com/
+NES Alumni and Friends Nonprofit Partnership: https://www.nesalumni.org/en
+Gold Strategy Group: http://www.goldstrategygroup.com
+Creative Commons: http://creativecommons.org/
+Community Builders Australia Pty Ltd: http://www.communitybuilders.com.au/
+Australian Greens: http://greens.org.au/
+NES Alumni and Friends Nonprofit Partnership: https://www.nesalumni.org/en
+Data-Scribe: http://www.datascribe.biz/
+Rayogram: http://www.rayogram.com/
+GingerFeet LLC: http://www.gingerfeet.com/
+Kabissa: http://kabissa.org
+Beth Hynes-Ciernia

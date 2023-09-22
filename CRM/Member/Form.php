@@ -24,10 +24,29 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   use CRM_Core_Form_EntityFormTrait;
 
   /**
+   * Membership created or edited on this form.
+   *
+   * If a price set creates multiple this will be the last one created.
+   *
+   * This 'last' bias reflects historical code - but it's mostly used in the receipt
+   * and there is all sorts of weird and wonderful handling that potentially compensates.
+   *
+   * @var array
+   */
+  protected $membership = [];
+
+  /**
    * Membership Type ID
    * @var int
    */
   protected $_memType;
+
+  /**
+   * IDs of relevant entities.
+   *
+   * @var array
+   */
+  protected $ids = [];
 
   /**
    * Array of from email ids
@@ -43,7 +62,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   protected $allMembershipTypeDetails = [];
 
   /**
-   * Array of membership type IDs and whether they permit autorenewal.
+   * Array of membership type IDs and whether they permit auto-renewal.
    *
    * @var array
    */
@@ -64,9 +83,89 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   public $_priceSet;
 
   /**
+   * The order being processed.
+   *
+   * @var \CRM_Financial_BAO_Order
+   */
+  protected $order;
+
+  /**
+   * This string is the used for passing to the buildAmount hook.
+   *
+   * @var string
+   */
+  protected $formContext = 'membership';
+
+  /**
+   * Array of the payment fields to be displayed in the payment fieldset (pane) in billingBlock.tpl
+   * this contains all the information to describe these fields from QuickForm. See CRM_Core_Form_Payment getPaymentFormFieldsMetadata
+   *
+   * @var array
+   */
+  public $_paymentFields = [];
+
+  /**
+   * Display name of the member.
+   *
+   * @var string
+   */
+  protected $_memberDisplayName;
+
+  /**
+   * email of the person paying for the membership (used for receipts)
+   * @var string
+   */
+  protected $_memberEmail;
+
+  protected $_recurMembershipTypes;
+
+  /**
+   * Keep a class variable for ALL membership IDs so
+   * postProcess hook function can do something with it
+   *
+   * @var array
+   */
+  protected $_membershipIDs = [];
+
+  /**
+   * Display name of the person paying for the membership (used for receipts)
+   *
+   * @var string
+   */
+  protected $_contributorDisplayName;
+
+  /**
+   * Email of the person paying for the membership (used for receipts).
+   *
+   * @var string
+   */
+  protected $_contributorEmail;
+
+  /**
+   * email of the person paying for the membership (used for receipts)
+   *
+   * @var int
+   */
+  protected $_contributorContactID;
+
+  /**
+   * ID of the person the receipt is to go to.
+   *
+   * @var int
+   */
+  protected $_receiptContactId;
+
+  /**
+   * @return string
+   */
+  public function getFormContext(): string {
+    return $this->formContext;
+  }
+
+  /**
    * Explicitly declare the entity api name.
    */
-  public function getDefaultEntity() {
+  public function getDefaultEntity(): string {
     return 'Membership';
   }
 
@@ -78,9 +177,9 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   /**
    * Add to the status message.
    *
-   * @param $message
+   * @param string $message
    */
-  protected function addStatusMessage($message) {
+  protected function addStatusMessage(string $message): void {
     $this->statusMessage[] = $message;
   }
 
@@ -89,7 +188,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @return string
    */
-  protected function getStatusMessage() {
+  protected function getStatusMessage(): string {
     return implode(' ', $this->statusMessage);
   }
 
@@ -99,24 +198,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @var array
    */
   protected $_params = [];
-
-  /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * Fields may have keys
-   *  - name (required to show in tpl from the array)
-   *  - description (optional, will appear below the field)
-   *  - not-auto-addable - this class will not attempt to add the field using addField.
-   *    (this will be automatically set if the field does not have html in it's metadata
-   *    or is not a core field on the form's entity).
-   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
-   *  - template - use a field specific template to render this field
-   *  - required
-   *  - is_freeze (field should be frozen).
-   *
-   * @var array
-   */
-  protected $entityFields = [];
 
   public function preProcess() {
     // Check for edit permission.
@@ -138,6 +219,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
     $this->assign('context', $this->_context);
     $this->assign('membershipMode', $this->_mode);
+    $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
     $this->allMembershipTypeDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, [], TRUE);
     foreach ($this->allMembershipTypeDetails as $index => $membershipType) {
       if ($membershipType['auto_renew']) {
@@ -154,6 +236,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @return array
    *   defaults
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $defaults = [];
@@ -161,7 +244,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       $params = ['id' => $this->_id];
       CRM_Member_BAO_Membership::retrieve($params, $defaults);
       if (isset($defaults['minimum_fee'])) {
-        $defaults['minimum_fee'] = CRM_Utils_Money::format($defaults['minimum_fee'], NULL, '%a');
+        $defaults['minimum_fee'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['minimum_fee']);
       }
 
       if (isset($defaults['status'])) {
@@ -207,6 +290,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     $this->assignSalesTaxMetadataToTemplate();
@@ -216,10 +301,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $this->assign('recurProcessor', json_encode($this->_recurPaymentProcessors));
     // Build the form for auto renew. This is displayed when in credit card mode or update mode.
     // The reason for showing it in update mode is not that clear.
+    $this->assign('allowAutoRenew', $this->_mode && !empty($this->_recurPaymentProcessors));
     if ($this->_mode || ($this->_action & CRM_Core_Action::UPDATE)) {
-      if (!empty($this->_recurPaymentProcessors)) {
-        $this->assign('allowAutoRenew', TRUE);
-      }
 
       $autoRenewElement = $this->addElement('checkbox', 'auto_renew', ts('Membership renewed automatically'),
         NULL, ['onclick' => "showHideByValue('auto_renew','','send-receipt','table-row','radio',true); showHideNotice( );"]
@@ -301,28 +384,61 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *  - contact_id
    *  - soft_credit_contact_id
    */
-  public function storeContactFields($formValues) {
+  public function storeContactFields(array $formValues): void {
     // in a 'standalone form' (contact id not in the url) the contact will be in the form values
     if (!empty($formValues['contact_id'])) {
       $this->_contactID = $formValues['contact_id'];
     }
 
-    list($this->_memberDisplayName,
-      $this->_memberEmail
-      ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
-
+    [$this->_memberDisplayName, $this->_memberEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+    $this->_contributorContactID = $this->getContributionContactID();
     //CRM-10375 Where the payer differs to the member the payer should get the email.
     // here we store details in order to do that
     if (!empty($formValues['soft_credit_contact_id'])) {
-      $this->_receiptContactId = $this->_contributorContactID = $formValues['soft_credit_contact_id'];
-      list($this->_contributorDisplayName,
-        $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contributorContactID);
+      $this->_receiptContactId = $formValues['soft_credit_contact_id'];
+      [$this->_contributorDisplayName, $this->_contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contributorContactID);
     }
     else {
-      $this->_receiptContactId = $this->_contributorContactID = $this->_contactID;
+      $this->_receiptContactId = $this->_contactID;
       $this->_contributorDisplayName = $this->_memberDisplayName;
       $this->_contributorEmail = $this->_memberEmail;
     }
+  }
+
+  /**
+   * Get the contact id for the contribution.
+   *
+   * @return int
+   */
+  protected function getContributionContactID(): int {
+    return (int) ($this->getSubmittedValue('soft_credit_contact_id') ?: $this->getSubmittedValue('contact_id'));
+  }
+
+  /**
+   * Get the contact id for the contribution.
+   *
+   * @return int
+   */
+  protected function getMembershipContactID(): int {
+    // It's not clear that $this->_contactID *could* be set outside
+    // tests when contact_id is not submitted - so this fallback
+    // is precautionary in order to be similar to past behaviour.
+    return (int) ($this->getSubmittedValue('contact_id') ?: $this->_contactID);
+  }
+
+  /**
+   * Get the membership ID.
+   *
+   * For new memberships this may initially be NULL.
+   *
+   * @return int
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getMembershipID(): ?int {
+    return $this->_id;
   }
 
   /**
@@ -331,8 +447,10 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * This is part of refactoring for unit testability on the submit function.
    *
    * @param array $params
+   *
+   * @throws \CRM_Core_Exception
    */
-  protected function setContextVariables($params) {
+  protected function setContextVariables(array $params): void {
     $variables = [
       'action' => '_action',
       'context' => '_context',
@@ -358,19 +476,19 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @param array $contributionRecurParams
    *
-   * @param int $membershipID
+   * @param int $membershipTypeID
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
-  protected function processRecurringContribution($contributionRecurParams, $membershipID) {
+  protected function processRecurringContribution(array $contributionRecurParams, int $membershipTypeID): array {
 
     $mapping = [
       'frequency_interval' => 'duration_interval',
       'frequency_unit' => 'duration_unit',
     ];
     $membershipType = civicrm_api3('MembershipType', 'getsingle', [
-      'id' => $membershipID,
+      'id' => $membershipTypeID,
       'return' => $mapping,
     ]);
 
@@ -393,9 +511,9 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @param array $formValues
    */
-  protected function ensurePriceParamsAreSet(&$formValues) {
+  protected function ensurePriceParamsAreSet(array &$formValues): void {
     foreach ($formValues as $key => $value) {
-      if ((substr($key, 0, 6) == 'price_') && is_numeric(substr($key, 6))) {
+      if ((strpos($key, 'price_') === 0) && is_numeric(substr($key, 6))) {
         return;
       }
     }
@@ -416,7 +534,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @return array
    */
-  protected static function getPriceSetDetails($params) {
+  protected function getPriceSetDetails(array $params): ?array {
     $priceSetID = $params['price_set_id'] ?? NULL;
     if ($priceSetID) {
       return CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
@@ -436,10 +554,10 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @return int
    */
-  protected static function getPriceSetID($params) {
+  protected function getPriceSetID(array $params): int {
     $priceSetID = $params['price_set_id'] ?? NULL;
     if (!$priceSetID) {
-      $priceSetDetails = self::getPriceSetDetails($params);
+      $priceSetDetails = $this->getPriceSetDetails($params);
       return (int) key($priceSetDetails);
     }
     return (int) $priceSetID;
@@ -451,13 +569,21 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @param array $formValues
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  protected function setPriceSetParameters($formValues) {
-    $this->_priceSetId = self::getPriceSetID($formValues);
-    $priceSetDetails = self::getPriceSetDetails($formValues);
-    $this->_priceSet = $priceSetDetails[$this->_priceSetId];
+  protected function setPriceSetParameters(array $formValues): array {
     // process price set and get total amount and line items.
+    $this->_priceSetId = $this->getPriceSetID($formValues);
     $this->ensurePriceParamsAreSet($formValues);
+    $priceSetDetails = $this->getPriceSetDetails($formValues);
+    $this->_priceSet = $priceSetDetails[$this->_priceSetId];
+    $this->order = new CRM_Financial_BAO_Order();
+    $this->order->setForm($this);
+    $this->order->setPriceSelectionFromUnfilteredInput($formValues);
+    if (isset($formValues['total_amount'])) {
+      $this->order->setOverrideTotalAmount((float) $formValues['total_amount']);
+    }
+    $this->order->setOverrideFinancialTypeID((int) $formValues['financial_type_id']);
     return $formValues;
   }
 
@@ -465,12 +591,85 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * Wrapper function for unit tests.
    *
    * @param array $formValues
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testSubmit($formValues) {
+  public function testSubmit(array $formValues = []): void {
+    if (empty($formValues)) {
+      // If getForm is used these will be set - this is now
+      // preferred.
+      $formValues = $this->controller->exportValues($this->_name);
+    }
+    $this->exportedValues = $formValues;
     $this->setContextVariables($formValues);
-    $this->_memType = $formValues['membership_type_id'][1];
+    $this->_memType = !empty($formValues['membership_type_id']) ? $formValues['membership_type_id'][1] : NULL;
     $this->_params = $formValues;
     $this->submit();
+  }
+
+  /**
+   * Get order related params.
+   *
+   * In practice these are contribution params but later they cann be used with the Order api.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getOrderParams(): array {
+    return [
+      'lineItems' => [$this->_priceSetId => $this->order->getLineItems()],
+      // This is one of those weird & wonderful legacy params we aim to get rid of.
+      'processPriceSet' => TRUE,
+      'tax_amount' => $this->order->getTotalTaxAmount(),
+    ];
+  }
+
+  /**
+   * Get the currency in use.
+   *
+   * This just defaults to getting the default currency
+   * as other currencies are not supported on the membership
+   * forms at the moment.
+   *
+   * @param array $submittedValues
+   *
+   * @return string
+   */
+  public function getCurrency($submittedValues = []): string {
+    return CRM_Core_Config::singleton()->defaultCurrency;
+  }
+
+  /**
+   * Get the relevant payment instrument id.
+   *
+   * @return int
+   */
+  protected function getPaymentInstrumentID(): int {
+    return (int) $this->getSubmittedValue('payment_instrument_id') ?: $this->_paymentProcessor['object']->getPaymentInstrumentID();
+  }
+
+  /**
+   * Get the last 4 numbers of the card.
+   *
+   * @return int|null
+   */
+  protected function getPanTruncation(): ?int {
+    $card = $this->getSubmittedValue('credit_card_number');
+    return $card ? (int) substr($card, -4) : NULL;
+  }
+
+  /**
+   * Get the card_type_id.
+   *
+   * This value is the integer representing the option value for
+   * the credit card type (visa, mastercard). It is stored as part of the
+   * payment record in civicrm_financial_trxn.
+   *
+   * @return int|null
+   */
+  protected function getCardTypeID(): ?int {
+    return CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type'));
   }
 
 }

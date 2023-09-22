@@ -17,19 +17,11 @@
 class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
 
   /**
-   * Class constructor.
+   * @return int
    */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * @return null|string
-   */
-  public static function activeProviderCount() {
-    $activeProviders = CRM_Core_DAO::singleValueQuery('SELECT count(id) FROM civicrm_sms_provider WHERE is_active = 1 AND (domain_id = %1 OR domain_id IS NULL)',
+  public static function activeProviderCount(): int {
+    return (int) CRM_Core_DAO::singleValueQuery('SELECT count(id) FROM civicrm_sms_provider WHERE is_active = 1 AND (domain_id = %1 OR domain_id IS NULL)',
        [1 => [CRM_Core_Config::domainID(), 'Positive']]);
-    return $activeProviders;
   }
 
   /**
@@ -110,12 +102,13 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
   }
 
   /**
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   * @param $is_active
-   *
+   * @param bool $is_active
    * @return bool
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_SMS_DAO_Provider', $id, 'is_active', $is_active);
   }
 
@@ -124,6 +117,8 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
    *
    * @return null
    * @throws CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function del($providerID) {
     if (!$providerID) {
@@ -136,13 +131,15 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
     if (!$dao->find(TRUE)) {
       return NULL;
     }
-    $dao->delete();
+    // The above just filters out attempts to delete for other domains
+    // Not sure it's needed, but preserves old behaviour and is deprecated.
+    static::deleteRecord(['id' => $providerID]);
   }
 
   /**
    * @param int $providerID
-   * @param null $returnParam
-   * @param null $returnDefaultString
+   * @param string|null $returnParam
+   * @param string|null $returnDefaultString
    *
    * @return mixed
    */

@@ -14,6 +14,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
  * This class generates form components generic to recurring contributions.
@@ -83,6 +84,8 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     }
 
     $this->assign('self_service', $this->isSelfService());
+    $this->assign('recur_frequency_interval', $this->_subscriptionDetails->frequency_interval);
+    $this->assign('recur_frequency_unit', $this->_subscriptionDetails->frequency_unit);
 
     $this->editableScheduleFields = $this->_paymentProcessorObj->getEditableRecurringScheduleFields();
 
@@ -111,10 +114,10 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $this->assign('editableScheduleFields', array_diff($this->editableScheduleFields, $alreadyHardCodedFields));
 
     if ($this->_subscriptionDetails->contact_id) {
-      list($this->_donorDisplayName, $this->_donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
+      [$this->_donorDisplayName, $this->_donorEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
     }
 
-    CRM_Utils_System::setTitle(ts('Update Recurring Contribution'));
+    $this->setTitle(ts('Update Recurring Contribution'));
 
     // Handle context redirection.
     CRM_Contribute_BAO_ContributionRecur::setSubscriptionContext();
@@ -131,7 +134,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $this->_defaults['installments'] = $this->_subscriptionDetails->installments;
     $this->_defaults['campaign_id'] = $this->_subscriptionDetails->campaign_id;
     $this->_defaults['financial_type_id'] = $this->_subscriptionDetails->financial_type_id;
-    $this->_defaults['is_notify'] = 1;
     foreach ($this->editableScheduleFields as $field) {
       $this->_defaults[$field] = $this->_subscriptionDetails->$field ?? NULL;
     }
@@ -149,9 +151,21 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     if (count($lineItems) > 1) {
       $amtAttr += ['readonly' => TRUE];
     }
-    $this->addMoney('amount', ts('Recurring Contribution Amount'), TRUE, $amtAttr,
+    $amountField = $this->addMoney('amount', ts('Recurring Contribution Amount'), TRUE, $amtAttr,
       TRUE, 'currency', $this->_subscriptionDetails->currency, TRUE
     );
+
+    // https://lab.civicrm.org/dev/financial/-/issues/197 https://github.com/civicrm/civicrm-core/pull/23796
+    // Revert freezing on total_amount field on recurring form - particularly affects IATs
+    // This will need revisiting in the future as updating amount on recur does not work for multiple lineitems.
+    // Also there are "point of truth" issues ie. is the amount on template contribution or recur the current one?
+    // The amount on the recurring contribution should not be updated directly. If we update the amount using a template contribution the recurring contribution
+    //   will be updated automatically.
+    // $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($this->contributionRecurID));
+    // $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($this->contributionRecurID);
+    // if (!empty($templateContribution['id']) && $paymentProcessorObj->supportsEditRecurringContribution()) {
+    //   $amountField->freeze();
+    // }
 
     $this->add('text', 'installments', ts('Number of Installments'), ['size' => 20], FALSE);
 
@@ -192,6 +206,8 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
 
   /**
    * Called after the user submits the form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -203,26 +219,25 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     }
 
     // if this is an update of an existing recurring contribution, pass the ID
-    $params['id'] = $this->_subscriptionDetails->recur_id;
+    $params['contributionRecurID'] = $params['id'] = $this->getContributionRecurID();
     $message = '';
 
-    $params['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
+    $params['recurProcessorID'] = $params['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
+
     $updateSubscription = TRUE;
     if ($this->_paymentProcessorObj->supports('changeSubscriptionAmount')) {
       try {
         $updateSubscription = $this->_paymentProcessorObj->changeSubscriptionAmount($message, $params);
+        if ($updateSubscription instanceof CRM_Core_Error) {
+          CRM_Core_Error::deprecatedWarning('An exception should be thrown');
+          throw new PaymentProcessorException(ts('Could not update the Recurring contribution details'));
+        }
       }
-      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      catch (PaymentProcessorException $e) {
         CRM_Core_Error::statusBounce($e->getMessage());
       }
     }
-    if (is_a($updateSubscription, 'CRM_Core_Error')) {
-      CRM_Core_Error::displaySessionError($updateSubscription);
-      $status = ts('Could not update the Recurring contribution details');
-      $msgTitle = ts('Update Error');
-      $msgType = 'error';
-    }
-    elseif ($updateSubscription) {
+    if ($updateSubscription) {
       // Handle custom data
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->contributionRecurID, 'ContributionRecur');
       // save the changes
@@ -281,46 +296,23 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       CRM_Activity_BAO_Activity::create($activityParams);
 
       if (!empty($params['is_notify'])) {
-        // send notification
-        if ($this->_subscriptionDetails->contribution_page_id) {
-          CRM_Core_DAO::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage', 'id',
-            $this->_subscriptionDetails->contribution_page_id, $value, [
-              'title',
-              'receipt_from_name',
-              'receipt_from_email',
-            ]
-          );
-          $receiptFrom = '"' . CRM_Utils_Array::value('receipt_from_name', $value[$this->_subscriptionDetails->contribution_page_id]) . '" <' . $value[$this->_subscriptionDetails->contribution_page_id]['receipt_from_email'] . '>';
-        }
-        else {
-          $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
-          $receiptFrom = "$domainValues[0] <$domainValues[1]>";
-        }
+        $receiptFrom = CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID());
 
-        list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($contactID);
-
-        $tplParams = [
-          'recur_frequency_interval' => $this->_subscriptionDetails->frequency_interval,
-          'recur_frequency_unit' => $this->_subscriptionDetails->frequency_unit,
-          'amount' => CRM_Utils_Money::format($params['amount']),
-          'installments' => $params['installments'],
-        ];
-
-        $tplParams['contact'] = ['display_name' => $donorDisplayName];
-        $tplParams['receipt_from_email'] = $receiptFrom;
+        [$donorDisplayName, $donorEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
 
         $sendTemplateParams = [
           'groupName' => 'msg_tpl_workflow_contribution',
-          'valueName' => 'contribution_recurring_edit',
+          'workflow' => 'contribution_recurring_edit',
           'contactId' => $contactID,
-          'tplParams' => $tplParams,
+          'tplParams' => ['receipt_from_email' => $receiptFrom],
           'isTest' => $this->_subscriptionDetails->is_test,
           'PDFFilename' => 'receipt.pdf',
           'from' => $receiptFrom,
           'toName' => $donorDisplayName,
           'toEmail' => $donorEmail,
+          'tokenContext' => ['contribution_recurId' => $this->getContributionRecurID()],
         ];
-        list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
     }
 
@@ -334,7 +326,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
         CRM_Utils_System::setUFMessage($status);
       }
       // keep result as 1, since we not displaying anything on the redirected page anyway
-      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus',
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus',
         "reset=1&task=update&result=1"));
     }
   }

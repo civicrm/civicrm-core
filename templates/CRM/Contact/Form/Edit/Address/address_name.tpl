@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if !empty($form.address.$blockId.name)}
+{if array_key_exists('name', $form.address.$blockId)}
   <tr>
       <td colspan="2">
         {$form.address.$blockId.name.label} {help id="id-address-name" file="CRM/Contact/Form/Contact.hlp"}<br />

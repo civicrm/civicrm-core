@@ -30,14 +30,14 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
 
   /**
    * Batch status name.
+   *
    * @var string
    */
-  protected $_batchStatus;
+  protected $_batchStatus = 'open';
 
   public function preProcess() {
     // This reuses some styles from search forms
     CRM_Core_Resources::singleton()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
-
     self::$_entityID = CRM_Utils_Request::retrieve('bid', 'Positive') ? CRM_Utils_Request::retrieve('bid', 'Positive') : CRM_Utils_Array::value('batch_id', $_POST);
     $this->assign('entityID', self::$_entityID);
     if (isset(self::$_entityID)) {
@@ -45,7 +45,6 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       $batchStatuses = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name', 'condition' => " v.value={$this->_batchStatusId}"]);
       $this->_batchStatus = $batchStatuses[$this->_batchStatusId];
       $this->assign('statusID', $this->_batchStatusId);
-      $this->assign('batchStatus', $this->_batchStatus);
       $validStatus = FALSE;
       if (in_array($this->_batchStatus, ['Open', 'Reopened'])) {
         $validStatus = TRUE;
@@ -53,7 +52,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       $this->assign('validStatus', $validStatus);
       $this->_values = civicrm_api3('Batch', 'getSingle', ['id' => self::$_entityID]);
       $batchTitle = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'title');
-      CRM_Utils_System::setTitle(ts('Accounting Batch - %1', [1 => $batchTitle]));
+      $this->setTitle(ts('Accounting Batch - %1', [1 => $batchTitle]));
 
       $columnHeaders = [
         'created_by' => ts('Created By'),
@@ -68,14 +67,15 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       ];
       $this->assign('columnHeaders', $columnHeaders);
     }
+    $this->assign('batchStatus', $this->_batchStatus);
   }
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
-    if ($this->_batchStatus == 'Closed') {
-      $this->add('submit', 'export_batch', ts('Export Batch'));
+    if ($this->_batchStatus === 'Closed') {
+      $this->add('xbutton', 'export_batch', ts('Export Batch'), ['type' => 'submit']);
     }
 
     // do not build rest of form unless it is open/reopened batch
@@ -85,9 +85,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
 
     parent::buildQuickForm();
     if (CRM_Batch_BAO_Batch::checkBatchPermission('close', $this->_values['created_id'])) {
-      $this->add('submit', 'close_batch', ts('Close Batch'));
+      $this->add('xbutton', 'close_batch', ts('Close Batch'), ['type' => 'submit']);
       if (CRM_Batch_BAO_Batch::checkBatchPermission('export', $this->_values['created_id'])) {
-        $this->add('submit', 'export_batch', ts('Close & Export Batch'));
+        $this->add('xbutton', 'export_batch', ts('Close and Export Batch'), ['type' => 'submit']);
       }
     }
 
@@ -99,8 +99,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       ts('Task'),
       ['' => ts('- actions -')] + ['Remove' => ts('Remove from Batch')]);
 
-    $this->add('submit', 'rSubmit', ts('Go'),
+    $this->add('xbutton', 'rSubmit', ts('Go'),
       [
+        'type' => 'submit',
         'class' => 'crm-form-submit',
         'id' => 'GoRemove',
       ]);
@@ -123,8 +124,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       ts('Task'),
       ['' => ts('- actions -')] + ['Assign' => ts('Assign to Batch')]);
 
-    $this->add('submit', 'submit', ts('Go'),
+    $this->add('xbutton', 'submit', ts('Go'),
       [
+        'type' => 'submit',
         'class' => 'crm-form-submit',
         'id' => 'Go',
       ]);
@@ -164,12 +166,14 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
           'url' => 'civicrm/contact/view/contribution',
           'qs' => 'reset=1&id=%%contid%%&cid=%%cid%%&action=view&context=contribution&selectedChild=contribute',
           'title' => ts('View Contribution'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         'assign' => [
           'name' => ts('Assign'),
           'ref' => 'disable-action',
           'title' => ts('Assign Transaction'),
           'extra' => 'onclick = "assignRemove( %%id%%,\'' . 'assign' . '\' );"',
+          'weight' => 50,
         ],
       ];
     }

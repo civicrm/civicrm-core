@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -23,14 +21,14 @@ namespace api\v4\Spec;
 
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class RequestSpecTest extends UnitTestCase {
+class RequestSpecTest extends Api4TestBase {
 
-  public function testRequiredFieldFetching() {
+  public function testRequiredFieldFetching(): void {
     $spec = new RequestSpec('Contact', 'get');
     $requiredField = new FieldSpec('name', 'Contact');
     $requiredField->setRequired(TRUE);
@@ -45,7 +43,7 @@ class RequestSpecTest extends UnitTestCase {
     $this->assertEquals('name', array_shift($requiredFields)->getName());
   }
 
-  public function testGettingFieldNames() {
+  public function testGettingFieldNames(): void {
     $spec = new RequestSpec('Contact', 'get');
     $nameField = new FieldSpec('name', 'Contact');
     $ageField = new FieldSpec('age', 'Contact', 'Integer');

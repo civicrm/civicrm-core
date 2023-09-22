@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<extension key="civicrm_admin_ui" type="module">
+  <file>civicrm_admin_ui</file>
+  <name>AdminUI</name>
+  <description>Administration screens for managing CiviCRM settings, options, custom data, etc.</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Coleman Watts</author>
+    <email>coleman@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">https://lab.civicrm.org/dev/core/-/issues/3912</url>
+    <url desc="Documentation">https://lab.civicrm.org/dev/core/-/issues/3912</url>
+    <url desc="Support">https://lab.civicrm.org/dev/core/-/issues</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2022-01-02</releaseDate>
+  <version>5.67.alpha1</version>
+  <develStage>beta</develStage>
+  <compatibility>
+    <ver>5.67</ver>
+  </compatibility>
+  <requires>
+    <ext>org.civicrm.search_kit</ext>
+    <ext>org.civicrm.afform</ext>
+  </requires>
+  <comments>Replaces legacy pages with configurable Search Display Forms.</comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/CivicrmAdminUi</namespace>
+    <angularModule>crmCivicrmAdminUi</angularModule>
+    <format>23.02.1</format>
+  </civix>
+  <mixins>
+    <mixin>mgd-php@1.0.0</mixin>
+  </mixins>
+  <upgrader>CRM_CivicrmAdminUi_Upgrader</upgrader>
+</extension>

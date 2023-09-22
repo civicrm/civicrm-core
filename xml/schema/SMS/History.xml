@@ -12,6 +12,10 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>SMS History ID</comment>
+    <html>
+      <type>Number</type>
+      <label>SMS History ID</label>
+    </html>
     <add>1.4</add>
   </field>
   <primaryKey>
@@ -26,17 +30,20 @@
       <type>TextArea</type>
       <rows>5</rows>
       <cols>80</cols>
+      <label>Message</label>
     </html>
     <add>1.4</add>
   </field>
   <field>
     <name>contact_id</name>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Contact who is sending this SMS</comment>
     <add>1.4</add>
     <html>
       <type>EntityRef</type>
+      <label>Contact</label>
     </html>
   </field>
   <foreignKey>
@@ -49,6 +56,9 @@
     <name>sent_date</name>
     <type>date</type>
     <comment>When was this SMS sent</comment>
+    <html>
+      <label>Sent Date</label>
+    </html>
     <add>1.4</add>
   </field>
 </table>

@@ -17,24 +17,7 @@
  */
 class CRM_Contact_Page_DedupeExceptionTest extends CiviUnitTestCase {
 
-  /**
-   * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   *
-   * This method is called after a test is executed.
-   */
-  protected function tearDown() {
-    parent::tearDown();
-  }
-
-  public function testGetDedupeExceptions() {
+  public function testGetDedupeExceptions(): void {
     $contact1      = $this->individualCreate();
     $contact2      = $this->individualCreate();
     $exception     = $this->callAPISuccess('Exception', 'create', [
@@ -45,7 +28,7 @@ class CRM_Contact_Page_DedupeExceptionTest extends CiviUnitTestCase {
     $totalitems    = civicrm_api3('Exception', "getcount", []);
     $params        = [
       'total' => $totalitems,
-      'rowCount' => CRM_Utils_Pager::ROWCOUNT,
+      'rowCount' => Civi::settings()->get('default_pager_size'),
       'status' => ts('Dedupe Exceptions %%StatusMessage%%'),
       'buttonBottom' => 'PagerBottomButton',
       'buttonTop' => 'PagerTopButton',

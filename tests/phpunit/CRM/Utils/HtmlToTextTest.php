@@ -6,8 +6,9 @@
  */
 class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**
@@ -60,8 +61,8 @@ class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
   public function testHtmlToText($html, $text) {
     $output = CRM_Utils_String::htmlToText($html);
     $this->assertEquals(
-      trim($output),
       trim($text),
+      trim($output),
       "Text Output did not match for $html"
     );
   }

@@ -17,8 +17,10 @@
     <div class="clear">&nbsp;</div>
     <h3 id="crm-event-dashboard-heading">{ts}Event Summary{/ts}
       {help id="id-event-intro"}
-      {include file="CRM/Event/Page/iCalLinks.tpl"}
     </h3>
+    <div class="crm-clearfix">
+      {include file="CRM/Event/Page/iCalLinks.tpl"}
+    </div>
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>
@@ -87,7 +89,7 @@
       {if $actionColumn}
         <td class="crm-event-isMap">
           {if $values.isMap}
-            <a href="{$values.isMap}" title="{ts}Map event location{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i>&nbsp;{ts}Map{/ts}</a>
+            <a href="{$values.isMap}" title="{ts}Map event location{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i> {ts}Map{/ts}</a>
             &nbsp;|&nbsp;
           {/if}
           {if $values.configure}
@@ -96,7 +98,7 @@
                   <ul class="panel" id="panel_info_{$id}">
                     {foreach from=$eventSummary.tab key=k item=v}
                       {assign var="fld" value=$v.field}
-                      {if NOT $values.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
+                      {if empty($values.$fld)}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
                       {* Schedule Reminders requires a different query string. *}
                       {if $v.url EQ 'civicrm/event/manage/reminder'}
                         <li><a title="{$v.title|escape}" class="action-item crm-hover-button no-popup {$status}"
@@ -124,7 +126,7 @@
     <br />
     <div class="messages status no-popup">
         <table>
-            <tr><div class="icon inform-icon"></div></tr>
+            <tr>{icon icon="fa-info-circle"}{/icon}</tr>
             <tr>
                 {ts}There are no active Events to display.{/ts}
                 {ts 1=$newEventURL}You can <a href="%1">Create a New Event</a> now.{/ts}

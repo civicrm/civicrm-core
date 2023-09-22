@@ -9,7 +9,7 @@
 *}
 {assign var=uploadURL value=$config->imageUploadURL|replace:'/persist/contribute/':'/persist/'}
 {* Display weekly,Quarterly,monthly and yearly contributions using pChart (Bar and Pie) *}
-{if $chartEnabled and $chartSupported}
+{if $chartEnabled and !empty($chartSupported)}
   <div class='crm-chart'>
     {if $outputMode eq 'print' OR $outputMode eq 'pdf'}
       <img src="{$uploadURL|cat:$chartId}.png" />
@@ -19,11 +19,11 @@
   </div>
 {/if}
 
-{if !$printOnly} {* NO print section starts *}
-  {if !$section}
+{if empty($printOnly)} {* NO print section starts *}
+  {if empty($section)}
     {include file="CRM/common/chart.tpl" divId="chart_$uniqueId"}
   {/if}
-  {if $chartData}
+  {if !empty($chartData)}
     {literal}
     <script type="text/javascript">
        CRM.$(function($) {
@@ -33,14 +33,6 @@
          $.each( allData, function( chartID, chartValues ) {
            var divName = {/literal}"chart_{$uniqueId}"{literal};
            createChart( chartID, divName, chartValues.size.xSize, chartValues.size.ySize, allData[chartID].object );
-         });
-
-         $("input[id$='submit_print'],input[id$='submit_pdf']").bind('click', function(e){
-           // image creator php file path and append image name
-           var url = CRM.url('civicrm/report/chart', 'name=' + '{/literal}{$chartId}{literal}' + '.png');
-
-           //fetch object and 'POST' image
-           swfobject.getObjectById("chart_{/literal}{$uniqueId}{literal}").post_image(url, true, false);
          });
        });
 

@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 /*
  * Settings metadata file
@@ -157,6 +155,9 @@ return [
     'type' => 'Integer',
     'quick_form_type' => 'ChainSelect',
     'html_type' => 'ChainSelect',
+    'chain_select_settings' => [
+      'control_field' => 'defaultContactCountry',
+    ],
     //'pseudoconstant' => array(
     //  'callback' => 'CRM_Core_PseudoConstant::stateProvince',
     //),
@@ -408,6 +409,41 @@ return [
       'callback' => 'CRM_Core_I18n::languages',
     ],
   ],
+  'partial_locales' => [
+    'group_name' => 'Localization Preferences',
+    'group' => 'localization',
+    'name' => 'partial_locales',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => '1',
+    'add' => '5.54',
+    'title' => ts('Partial Locales'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'help_text' => NULL,
+    'description' => ts('If Yes, the system will allow processing data in locales which are not fully supported. (Some tokens or resources may unavailable or substituted from other locales.)'),
+  ],
+  'format_locale' => [
+    'group_name' => 'Localization Preferences',
+    'group' => 'localization',
+    'name' => 'format_locale',
+    'type' => 'String',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => [
+      'class' => 'crm-select2',
+    ],
+    'default' => NULL,
+    'add' => '5.47',
+    'title' => ts('Formatting locale'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'help_text' => NULL,
+    'pseudoconstant' => [
+      'callback' => 'CRM_Core_I18n::getFormatLocales',
+    ],
+    'description' => ts('Locale to use when formatting money (and in future dates). This replaces thousandsSeparator & decimalSeparator & moneyFormat settings.'),
+  ],
   'uiLanguages' => [
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
@@ -529,5 +565,28 @@ return [
     'description' => ts('Default language (if any) for contact records.'),
     'help_text' => 'If a contact is created with no language this setting will determine the language data (if any) to save.'
     . 'You may or may not wish to make an assumption here about whether it matches the site language',
+  ],
+  'pinnedContactCountries' => [
+    'group_name' => 'Localization Preferences',
+    'group' => 'localization',
+    'name' => 'pinnedContactCountries',
+    'type' => 'Array',
+    'quick_form_type' => 'Element',
+    'html_type' => 'advmultiselect',
+    'html_attributes' => [
+      'size' => 5,
+      'style' => 'width:150px',
+      'class' => 'advmultiselect',
+    ],
+    'default' => [],
+    'add' => '5.33',
+    'title' => ts('Pinned Countries'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Appear in Top section of select list'),
+    'help_text' => ts('Selected countries will appear in top section of country list'),
+    'pseudoconstant' => [
+      'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
+    ],
   ],
 ];

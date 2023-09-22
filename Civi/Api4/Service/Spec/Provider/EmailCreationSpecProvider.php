@@ -10,29 +10,27 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-class EmailCreationSpecProvider implements Generic\SpecProviderInterface {
+/**
+ * @service
+ * @internal
+ */
+class EmailCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc
    */
   public function modifySpec(RequestSpec $spec) {
-    $spec->getFieldByName('contact_id')->setRequired(TRUE);
     $spec->getFieldByName('email')->setRequired(TRUE);
     $spec->getFieldByName('on_hold')->setRequired(FALSE);
     $spec->getFieldByName('is_bulkmail')->setRequired(FALSE);
+    $spec->getFieldByName('is_primary')->setRequired(FALSE);
+
+    $defaultLocationType = \CRM_Core_BAO_LocationType::getDefault()->id ?? NULL;
+    $spec->getFieldByName('location_type_id')->setDefaultValue($defaultLocationType ? (int) $defaultLocationType : NULL);
   }
 
   /**

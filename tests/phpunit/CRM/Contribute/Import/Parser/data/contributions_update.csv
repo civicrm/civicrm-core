@@ -1,0 +1,7 @@
+Contribution ID,Invoice ID,Trxn ID,Contact ID,Total Amount,Receive Date,Financial Type,Reason,Row Status
+1,67,abc,8,999,2008-09-20,Donation,Invoice ID mismatch,invalid
+1,67,abcd,8,999,2008-09-20,Donation,Trxn ID mismatch,invalid
+1,65,abc,3,999,2008-09-20,Donation,All fields OK,valid
+,65,abc,3,999,2008-09-20,Donation,Only Invoice ID OK,valid
+1,,"",3,99,2008-09-20,Donation,Only Contribution ID OK,valid
+

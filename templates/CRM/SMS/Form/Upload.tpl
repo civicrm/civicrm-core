@@ -40,7 +40,7 @@
     </table>
   </fieldset>
 
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 </div><!-- / .crm-form-block -->
 
 {* -- Javascript for showing/hiding the upload/compose options -- *}

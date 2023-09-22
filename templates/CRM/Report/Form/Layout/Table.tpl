@@ -7,7 +7,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if (!$chartEnabled || !$chartSupported )&& $rows}
+{if !$rows}
+  <p>{ts}None found.{/ts}</p>
+{else}
     {if $pager and $pager->_response and $pager->_response.numPages > 1}
         <div class="report-pager">
             {include file="CRM/common/pager.tpl" location="top"}
@@ -42,8 +44,8 @@
         {if !$sections} {* section headers and sticky headers aren't playing nice yet *}
             <thead class="sticky">
             <tr>
-                {$tableHeader}
-        </tr>
+              {$tableHeader|smarty:nodefaults}
+            </tr>
         </thead>
         {/if}
 
@@ -90,17 +92,24 @@
 
         {foreach from=$rows item=row key=rowid}
            {eval var=$sectionHeaderTemplate}
-            <tr  class="{cycle values="odd-row,even-row"} {$row.class} crm-report" id="crm-report_{$rowid}">
+            <tr  class="{cycle values="odd-row,even-row"} {if $row.class}{$row.class}{/if} crm-report" id="crm-report_{$rowid}">
                 {foreach from=$columnHeaders item=header key=field}
                     {assign var=fieldLink value=$field|cat:"_link"}
                     {assign var=fieldHover value=$field|cat:"_hover"}
                     {assign var=fieldClass value=$field|cat:"_class"}
                     <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
-                        {if $row.$fieldLink}
-                            <a title="{$row.$fieldHover|escape}" href="{$row.$fieldLink}"  {if $row.$fieldClass} class="{$row.$fieldClass}"{/if}>
+                        {if array_key_exists($fieldLink, $row) && $row.$fieldLink}
+                            <a href="{$row.$fieldLink}"
+                               {if array_key_exists($fieldHover, $row)}title="{$row.$fieldHover|escape}"{/if}
+                               {if array_key_exists($fieldClass, $row)}class="{$row.$fieldClass}"{/if}
+                            >
                         {/if}
 
-                        {if $row.$field eq 'Subtotal'}
+                        {if is_array($row.$field)}
+                            {foreach from=$row.$field item=fieldrow key=fieldid}
+                                <div class="crm-report-{$field}-row-{$fieldid}">{$fieldrow}</div>
+                            {/foreach}
+                        {elseif $row.$field eq 'Subtotal'}
                             {$row.$field}
                         {elseif $header.type & 4 OR $header.type & 256}
                             {if $header.group_by eq 'MONTH' or $header.group_by eq 'QUARTER'}
@@ -121,10 +130,10 @@
                                 <span class="nowrap">{$row.$field|crmMoney}</span>
                            {/if}
                         {else}
-                            {$row.$field}
+                            {$row.$field|smarty:nodefaults|purify}
                         {/if}
 
-                        {if $row.$fieldLink}</a>{/if}
+                        {if array_key_exists($fieldLink, $row) && $row.$fieldLink}</a>{/if}
                     </td>
                 {/foreach}
             </tr>
@@ -136,7 +145,11 @@
                 {foreach from=$columnHeaders item=header key=field}
                     <td class="report-label">
                         {if $header.type eq 1024}
-                            {$grandStat.$field|crmMoney}
+                            {if $currencyColumn}
+                                {$grandStat.$field|crmMoney:$row.$currencyColumn}
+                            {else}
+                                {$grandStat.$field|crmMoney}
+                            {/if}
                         {else}
                             {$grandStat.$field}
                         {/if}
@@ -148,7 +161,7 @@
     </table>
     {if $pager and $pager->_response and $pager->_response.numPages > 1}
         <div class="report-pager">
-            {include file="CRM/common/pager.tpl" }
+            {include file="CRM/common/pager.tpl" location="bottom"}
         </div>
     {/if}
 {/if}

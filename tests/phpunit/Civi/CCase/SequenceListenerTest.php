@@ -9,7 +9,7 @@ namespace Civi\CCase;
  */
 class SequenceListenerTest extends \CiviCaseTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_params = [
       'case_type' => $this->caseType,
@@ -24,8 +24,8 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     ]);
   }
 
-  public function testSequence() {
-    $actStatuses = array_flip(\CRM_Core_PseudoConstant::activityStatus('name'));
+  public function testSequence(): void {
+    $actStatuses = array_flip(\CRM_Activity_BAO_Activity::buildOptions('status_id', 'validate'));
     $caseStatuses = array_flip(\CRM_Case_PseudoConstant::caseStatus('name'));
     $actTypes = array_flip(\CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'create'));
 

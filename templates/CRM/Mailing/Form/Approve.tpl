@@ -22,7 +22,7 @@
     </tr>
   </tbody>
 </table>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 
 <div class="crm-accordion-wrapper crm-plain_text_email-accordion collapsed">
     <div class="crm-accordion-header">

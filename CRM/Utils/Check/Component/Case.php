@@ -40,13 +40,13 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
    * @inheritDoc
    */
   public function isEnabled() {
-    return CRM_Case_BAO_Case::enabled();
+    return CRM_Case_BAO_Case::isComponentEnabled();
   }
 
   /**
    * Check that the case-type names don't rely on double-munging.
    *
-   * @return array<CRM_Utils_Check_Message>
+   * @return CRM_Utils_Check_Message[]
    *   An empty array, or a list of warnings
    */
   public function checkCaseTypeNameConsistency() {
@@ -105,7 +105,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
   /**
    * Check that the timestamp columns are populated. (CRM-20958)
    *
-   * @return array<CRM_Utils_Check_Message>
+   * @return CRM_Utils_Check_Message[]
    *   An empty array, or a list of warnings
    */
   public function checkNullTimestamps() {
@@ -149,7 +149,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
   /**
    * Check that the relationship types aren't going to cause problems.
    *
-   * @return array<CRM_Utils_Check_Message>
+   * @return CRM_Utils_Check_Message[]
    *   An empty array, or a list of warnings
    */
   public function checkRelationshipTypeProblems() {
@@ -342,7 +342,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       + array_column($relationshipTypes, 'id', 'label_b_a');
     $missing = [];
     foreach ($caseTypes as $caseType) {
-      foreach ($caseType['definition']['caseRoles'] as $role) {
+      foreach ($caseType['definition']['caseRoles'] ?? [] as $role) {
         if (!isset($allConfigured[$role['name']])) {
           $missing[$role['name']] = $role['name'];
         }
@@ -361,17 +361,15 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       }
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__ . "missingroles",
-        ts("<p>The following roles listed in your case type definitions do not match any relationship type defined in the system: <em>%1</em>.</p>"
-          . "<p>This might be because of a mismatch if you are using external xml files to manage case types. If using xml files, then use either the name_a_b or name_b_a value from the following table. (Out of the box you would use name_b_a, which lists them on the case from the client perspective.) If you are not using xml files, you can edit your case types at Administer - CiviCase - Case Types.</p>"
-          . "<table>
-            <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>"
+        '<p>' . ts("The following roles listed in your case type definitions do not match any relationship type defined in the system: <em>%1</em>.", [1 => htmlspecialchars(implode(', ', $missing))]) . '</p>'
+          . "<p>" . ts("This might be because of a mismatch if you are using external xml files to manage case types. If using xml files, then use either the name_a_b or name_b_a value from the following table. (Out of the box you would use name_b_a, which lists them on the case from the client perspective.) If you are not using xml files, you can edit your case types at Administer - CiviCase - Case Types.") . '</p>'
+          . '<table>'
+          . '<tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>'
           . implode("\n", $tableRows)
-          . "</table>", [
-            1 => htmlspecialchars(implode(', ', $missing)),
-          ]) .
-          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#missing-roles', TRUE) . '">' .
-          ts('Read more about this warning') .
-          '</a>',
+          . '</table>'
+          . '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#missing-roles', TRUE) . '">'
+          . ts('Read more about this warning')
+          . '</a>',
         ts('Missing Roles'),
         \Psr\Log\LogLevel::ERROR,
         'fa-exclamation'
@@ -387,7 +385,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
    * We don't have to think about edge cases because there are already
    * status checks above for those.
    *
-   * @return array<CRM_Utils_Check_Message>
+   * @return CRM_Utils_Check_Message[]
    *   An empty array, or a list of warnings
    */
   public function checkExternalXmlFileRoleNames() {
@@ -486,6 +484,34 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
             'fa-code'
           );
         }
+      }
+    }
+    return $messages;
+  }
+
+  /**
+   * At some point the valid names changed so that you can't have e.g. spaces.
+   * For systems upgraded that use external xml files it's then not clear why
+   * the other messages about outdated filenames are coming up because when
+   * you then fix it as suggested it then gives a red error just saying it
+   * can't find it.
+   */
+  public function checkCaseTypeNameValidity() {
+    $messages = [];
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, name, title FROM civicrm_case_type");
+    while ($dao->fetch()) {
+      if (!CRM_Case_BAO_CaseType::isValidName($dao->name)) {
+        $messages[] = new CRM_Utils_Check_Message(
+          __FUNCTION__ . "invalidcasetypename",
+          '<p>' . ts('Case Type "<em>%1</em>" has invalid characters in the internal machine name (<em>%2</em>). Only letters, numbers, and underscore are allowed.',
+          [
+            1 => htmlspecialchars(empty($dao->title) ? $dao->id : $dao->title),
+            2 => htmlspecialchars($dao->name),
+          ]) . '</p>',
+          ts('Invalid Case Type Name'),
+          \Psr\Log\LogLevel::ERROR,
+          'fa-exclamation'
+        );
       }
     }
     return $messages;

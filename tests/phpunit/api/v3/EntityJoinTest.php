@@ -17,12 +17,12 @@
  */
 class api_v3_EntityJoinTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
   }
 
-  public function testJoinEmailToContact() {
+  public function testJoinEmailToContact(): void {
     $first = 'firstthisisatest';
     $last = 'lastthisisatest';
     $org = $this->organizationCreate(['organization_name' => 'Employer of one']);

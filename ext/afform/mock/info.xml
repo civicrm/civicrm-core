@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<extension key="org.civicrm.afform-mock" type="module">
+  <file>afform_mock</file>
+  <name>Mock Form Collection</name>
+  <description>(DEVELOPMENT ONLY) List of example forms used for automated testing</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Tim Otten</author>
+    <email>totten@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2020-01-09</releaseDate>
+  <version>5.67.alpha1</version>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>5.67</ver>
+  </compatibility>
+  <requires>
+    <ext>org.civicrm.afform</ext>
+  </requires>
+  <comments>Examples and tests for CiviCRM Afforms.</comments>
+  <mixins>
+    <mixin>ang-php@1.0.0</mixin>
+  </mixins>
+  <civix>
+    <namespace>CRM/AfformMock</namespace>
+    <format>22.10.0</format>
+  </civix>
+</extension>

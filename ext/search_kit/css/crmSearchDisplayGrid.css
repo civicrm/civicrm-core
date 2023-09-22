@@ -1,0 +1,23 @@
+/* SearchKit grid layout styling */
+.crm-search-display-grid-container {
+  display: grid;
+  grid-gap: 1em;
+  align-items: center;
+  justify-items: center;
+}
+
+.crm-search-display-grid-layout-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.crm-search-display-grid-layout-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.crm-search-display-grid-layout-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.crm-search-display-grid-layout-5 {
+  grid-template-columns: repeat(5, 1fr);
+}

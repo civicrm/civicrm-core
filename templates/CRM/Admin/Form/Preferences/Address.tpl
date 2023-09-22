@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-preferences-address-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <h3>{ts}Mailing Labels{/ts}</h3>
         <table class="form-layout">
         <tr class="crm-preferences-address-form-block-mailing_format">
@@ -19,7 +18,10 @@
                 {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
               </div>
                 {$form.mailing_format.html|crmAddClass:huge12}<br />
-                <span class="description">{ts}Content and format for mailing labels.{/ts}</span>
+                <span class="description">{ts}Content and format for mailing labels.{/ts}<br />
+                  {capture assign=labelFormats}href="{crmURL p='civicrm/admin/labelFormats' q='reset=1'}"{/capture}
+                  {ts 1=$labelFormats}You can change the size and layout of labels at <a %1>Label Page Formats</a>.{/ts}
+                </span>
             </td>
         </tr>
          <tr class="crm-preferences-address-form-block-hideCountryMailingLabels">

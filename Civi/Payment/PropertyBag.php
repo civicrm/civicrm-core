@@ -2,9 +2,9 @@
 namespace Civi\Payment;
 
 use InvalidArgumentException;
-use Civi;
 use CRM_Core_Error;
 use CRM_Core_PseudoConstant;
+use Civi\Api4\Country;
 
 /**
  * @class
@@ -26,13 +26,23 @@ class PropertyBag implements \ArrayAccess {
   protected $props = ['default' => []];
 
   protected static $propMap = [
+    'amount'                      => TRUE,
     'billingStreetAddress'        => TRUE,
+    'billing_street_address'      => 'billingStreetAddress',
+    'street_address'              => 'billingStreetAddress',
     'billingSupplementalAddress1' => TRUE,
     'billingSupplementalAddress2' => TRUE,
     'billingSupplementalAddress3' => TRUE,
     'billingCity'                 => TRUE,
+    'billing_city'                => 'billingCity',
+    'city'                        => 'billingCity',
     'billingPostalCode'           => TRUE,
+    'billing_postal_code'         => 'billingPostalCode',
+    'postal_code'                 => 'billingPostalCode',
     'billingCounty'               => TRUE,
+    'billingStateProvince'        => TRUE,
+    'billing_state_province'      => 'billingStateProvince',
+    'state_province'              => 'billingStateProvince',
     'billingCountry'              => TRUE,
     'contactID'                   => TRUE,
     'contact_id'                  => 'contactID',
@@ -63,6 +73,8 @@ class PropertyBag implements \ArrayAccess {
     'frequency_interval'          => 'recurFrequencyInterval',
     'recurFrequencyUnit'          => TRUE,
     'frequency_unit'              => 'recurFrequencyUnit',
+    'recurInstallments'           => TRUE,
+    'installments'                => 'recurInstallments',
     'subscriptionId'              => 'recurProcessorID',
     'recurProcessorID'            => TRUE,
     'transactionID'               => TRUE,
@@ -71,13 +83,49 @@ class PropertyBag implements \ArrayAccess {
     'isNotifyProcessorOnCancelRecur' => TRUE,
   ];
 
+  /**
+   * For unit tests only.
+   *
+   * @var array
+   */
+  public $logs = [];
+
+  /**
+   * For unit tests only. Set to the name of a function, e.g. setBillingCountry
+   * to suppress calling CRM_Core_Error::deprecatedWarning which will break tests.
+   * Useful when a test is testing THAT a deprecatedWarning is thrown.
+   *
+   * @var string
+   */
+  public $ignoreDeprecatedWarningsInFunction = '';
 
   /**
    * @var bool
    * Temporary, internal variable to help ease transition to PropertyBag.
    * Used by cast() to suppress legacy warnings.
+   * For paymentprocessors that have not converted to propertyBag we need to support "legacy" properties - eg. "is_recur"
+   *   without warnings. Setting this allows us to pass a propertyBag into doPayment() and expect it to "work" with
+   *   existing payment processors.
    */
-  protected $suppressLegacyWarnings = FALSE;
+  protected $suppressLegacyWarnings = TRUE;
+
+  /**
+   * Get the value of the suppressLegacyWarnings parameter
+   * @return bool
+   */
+  public function getSuppressLegacyWarnings() {
+    return $this->suppressLegacyWarnings;
+  }
+
+  /**
+   * Set the suppressLegacyWarnings parameter - useful for unit tests.
+   * Eg. you could set to FALSE for unit tests on a paymentprocessor to capture use of legacy keys in that processor
+   * code.
+   * @param bool $suppressLegacyWarnings
+   */
+  public function setSuppressLegacyWarnings(bool $suppressLegacyWarnings) {
+    $this->suppressLegacyWarnings = $suppressLegacyWarnings;
+  }
 
   /**
    * Get the property bag.
@@ -124,17 +172,20 @@ class PropertyBag implements \ArrayAccess {
    * @param mixed $offset
    * @return mixed
    */
+  #[\ReturnTypeWillChange]
   public function offsetGet($offset) {
     try {
       $prop = $this->handleLegacyPropNames($offset);
     }
     catch (InvalidArgumentException $e) {
 
-      CRM_Core_Error::deprecatedFunctionWarning(
-        "proper getCustomProperty('$offset') for non-core properties. "
-        . $e->getMessage(),
-        "PropertyBag array access to get '$offset'"
-      );
+      if (!$this->getSuppressLegacyWarnings()) {
+        CRM_Core_Error::deprecatedFunctionWarning(
+          "proper getCustomProperty('$offset') for non-core properties. "
+          . $e->getMessage(),
+          "PropertyBag array access to get '$offset'"
+        );
+      }
 
       try {
         return $this->getCustomProperty($offset, 'default');
@@ -149,10 +200,12 @@ class PropertyBag implements \ArrayAccess {
       }
     }
 
-    CRM_Core_Error::deprecatedFunctionWarning(
-      "get" . ucfirst($offset) . "()",
-      "PropertyBag array access for core property '$offset'"
-    );
+    if (!$this->getSuppressLegacyWarnings()) {
+      CRM_Core_Error::deprecatedFunctionWarning(
+        "get" . ucfirst($offset) . "()",
+        "PropertyBag array access for core property '$offset'"
+      );
+    }
     return $this->get($prop, 'default');
   }
 
@@ -162,7 +215,7 @@ class PropertyBag implements \ArrayAccess {
    * @param mixed $offset
    * @param mixed $value
    */
-  public function offsetSet($offset, $value) {
+  public function offsetSet($offset, $value): void {
     try {
       $prop = $this->handleLegacyPropNames($offset);
     }
@@ -210,22 +263,9 @@ class PropertyBag implements \ArrayAccess {
    *
    * @param mixed $offset
    */
-  public function offsetUnset ($offset) {
+  public function offsetUnset ($offset): void {
     $prop = $this->handleLegacyPropNames($offset);
     unset($this->props['default'][$prop]);
-  }
-
-  /**
-   * Save any legacy warnings to log.
-   *
-   * Called as a shutdown function.
-   */
-  public static function writeLegacyWarnings() {
-    if (!empty(static::$legacyWarnings)) {
-      $message = "Civi\\Payment\\PropertyBag related deprecation warnings:\n"
-        . implode("\n", array_keys(static::$legacyWarnings));
-      Civi::log()->warning($message, ['civi.tag' => 'deprecated']);
-    }
   }
 
   /**
@@ -244,18 +284,23 @@ class PropertyBag implements \ArrayAccess {
     if ($newName === NULL && substr($prop, -2) === '-' . \CRM_Core_BAO_LocationType::getBilling()
       && isset(static::$propMap[substr($prop, 0, -2)])
     ) {
-      $newName = substr($prop, 0, -2);
+      $billingAddressProp = substr($prop, 0, -2);
+      $newName = static::$propMap[$billingAddressProp] ?? NULL;
+      if ($newName === TRUE) {
+        // Good, modern name.
+        return $billingAddressProp;
+      }
     }
 
     if ($newName === NULL) {
       if ($silent) {
         // Only for use by offsetExists
-        return;
+        return NULL;
       }
       throw new \InvalidArgumentException("Unknown property '$prop'.");
     }
     // Remaining case is legacy name that's been translated.
-    if (!$this->suppressLegacyWarnings) {
+    if (!$this->getSuppressLegacyWarnings()) {
       CRM_Core_Error::deprecatedFunctionWarning("Canonical property name '$newName'", "Legacy property name '$prop'");
     }
 
@@ -286,7 +331,7 @@ class PropertyBag implements \ArrayAccess {
    *
    * @return PropertyBag $this object so you can chain set setters.
    */
-  protected function set($prop, $label = 'default', $value) {
+  protected function set($prop, $label, $value) {
     $this->props[$label][$prop] = $value;
     return $this;
   }
@@ -331,13 +376,14 @@ class PropertyBag implements \ArrayAccess {
     // Suppress legacy warnings for merging an array of data as this
     // suits our migration plan at this moment. Future behaviour may differ.
     // @see https://github.com/civicrm/civicrm-core/pull/17643
-    $this->suppressLegacyWarnings = TRUE;
+    $suppressLegacyWarnings = $this->getSuppressLegacyWarnings();
+    $this->setSuppressLegacyWarnings(TRUE);
     foreach ($data as $key => $value) {
       if ($value !== NULL && $value !== '') {
         $this->offsetSet($key, $value);
       }
     }
-    $this->suppressLegacyWarnings = FALSE;
+    $this->setSuppressLegacyWarnings($suppressLegacyWarnings);
   }
 
   /**
@@ -417,14 +463,26 @@ class PropertyBag implements \ArrayAccess {
   }
 
   /**
-   * Get the monetary amount.
+   * Set the monetary amount.
+   *
+   * - We expect to be called with a string amount with optional decimals using
+   *   a '.' as the decimal point (not a ',').
+   *
+   * - We're ok with floats/ints being passed in, too, but we'll cast them to a
+   *   string.
+   *
+   * - Negatives are fine.
+   *
+   * @see https://github.com/civicrm/civicrm-core/pull/18219
+   *
+   * @param string|float|int $value
+   * @param string $label
    */
   public function setAmount($value, $label = 'default') {
     if (!is_numeric($value)) {
       throw new \InvalidArgumentException("setAmount requires a numeric amount value");
     }
-
-    return $this->set('amount', $label, \CRM_Utils_Money::format($value, NULL, NULL, TRUE));
+    return $this->set('amount', $label, filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION));
   }
 
   /**
@@ -565,6 +623,27 @@ class PropertyBag implements \ArrayAccess {
   }
 
   /**
+   * BillingStateProvince getter.
+   *
+   * @return string
+   */
+  public function getBillingStateProvince($label = 'default') {
+    return $this->get('billingStateProvince', $label);
+  }
+
+  /**
+   * BillingStateProvince setter.
+   *
+   * Nb. we can't validate this unless we have the country ID too, so we don't.
+   *
+   * @param string $input
+   * @param string $label e.g. 'default'
+   */
+  public function setBillingStateProvince($input, $label = 'default') {
+    return $this->set('billingStateProvince', $label, (string) $input);
+  }
+
+  /**
    * BillingCountry getter.
    *
    * @return string
@@ -582,13 +661,60 @@ class PropertyBag implements \ArrayAccess {
    * @param string $label e.g. 'default'
    */
   public function setBillingCountry($input, $label = 'default') {
-    if (!is_string($input) || strlen($input) !== 2) {
-      throw new \InvalidArgumentException("setBillingCountry expects ISO 3166-1 alpha-2 country code.");
+    $warnings = [];
+    $munged = $input;
+    if (!is_string($input)) {
+      $warnings[] = 'Expected string';
     }
-    if (!CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'country_id', $input)) {
-      throw new \InvalidArgumentException("setBillingCountry expects ISO 3166-1 alpha-2 country code.");
+    else {
+      if (!(strlen($input) === 2 && CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'country_id', $input))) {
+        $warnings[] = 'Not ISO 3166-1 alpha-2 code.';
+      }
     }
-    return $this->set('billingCountry', $label, (string) $input);
+
+    if ($warnings) {
+      // Try to munge.
+      if (empty($input)) {
+        $munged = '';
+      }
+      else {
+        if ((is_int($input) || preg_match('/^\d+$/', $input))) {
+          // Got a number. Maybe it's an ID?
+          $munged = Country::get(FALSE)->addSelect('iso_code')->addWhere('id', '=', $input)->execute()->first()['iso_code'] ?? '';
+          if ($munged) {
+            $warnings[] = "Given input matched a country ID, assuming it was that.";
+          }
+          else {
+            $warnings[] = "Given input looked like it could be a country ID but did not match a country.";
+          }
+        }
+        elseif (is_string($input)) {
+          $munged = Country::get(FALSE)->addSelect('iso_code')->addWhere('name', '=', $input)->execute()->first()['iso_code'] ?? '';
+          if ($munged) {
+            $warnings[] = "Given input matched a country name, assuming it was that.";
+          }
+          else {
+            $warnings[] = "Given input did not match a country name.";
+          }
+        }
+        else {
+          $munged = '';
+          $warnings[] = "Given input is plain weird.";
+        }
+      }
+    }
+
+    if ($warnings) {
+      $warnings[] = "Input: " . json_encode($input) . " was munged to: " . json_encode($munged);
+      $warnings = "PropertyBag::setBillingCountry input warnings (may be errors in future):\n" . implode("\n", $warnings);
+      $this->logs[] = $warnings;
+      // Emit a deprecatedWarning except in the case that we're testing this function.
+      if (__FUNCTION__ !== $this->ignoreDeprecatedWarningsInFunction) {
+        CRM_Core_Error::deprecatedWarning($warnings);
+      }
+    }
+
+    return $this->set('billingCountry', $label, $munged);
   }
 
   /**
@@ -986,10 +1112,38 @@ class PropertyBag implements \ArrayAccess {
    * @param string $label e.g. 'default'
    */
   public function setRecurFrequencyUnit($recurFrequencyUnit, $label = 'default') {
-    if (!preg_match('/^day|week|month|year$/', $recurFrequencyUnit)) {
+    if (!preg_match('/^day|week|month|year$/', ($recurFrequencyUnit ?? ''))) {
       throw new \InvalidArgumentException("recurFrequencyUnit must be day|week|month|year");
     }
     return $this->set('recurFrequencyUnit', $label, $recurFrequencyUnit);
+  }
+
+  /**
+   * @param string $label
+   *
+   * @return int
+   */
+  public function getRecurInstallments($label = 'default') {
+    return $this->get('recurInstallments', $label);
+  }
+
+  /**
+   * @param int $recurInstallments
+   * @param string $label
+   *
+   * @return \Civi\Payment\PropertyBag
+   * @throws \CRM_Core_Exception
+   */
+  public function setRecurInstallments($recurInstallments, $label = 'default') {
+    // Counts zero as positive which is ok - means no installments
+    try {
+      \CRM_Utils_Type::validate($recurInstallments, 'Positive');
+    }
+    catch (\CRM_Core_Exception $e) {
+      throw new InvalidArgumentException('recurInstallments must be 0 or a positive integer');
+    }
+
+    return $this->set('recurInstallments', $label, (int) $recurInstallments);
   }
 
   /**
@@ -1022,7 +1176,7 @@ class PropertyBag implements \ArrayAccess {
     if ($input === '') {
       $input = NULL;
     }
-    if (strlen($input) > 255 || in_array($input, [FALSE, 0], TRUE)) {
+    if (strlen($input ?? '') > 255 || in_array($input, [FALSE, 0], TRUE)) {
       throw new \InvalidArgumentException('processorID field has max length of 255');
     }
     return $this->set('recurProcessorID', $label, $input);

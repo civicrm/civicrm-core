@@ -14,63 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
-  /**
-   * Class constructor.
-   *
-   * @return \CRM_Financial_DAO_FinancialTrxn
-   */
-
-  /**
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Takes an associative array and creates a financial transaction object.
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return CRM_Financial_DAO_FinancialTrxn
-   */
-  public static function create($params) {
-    $trxn = new CRM_Financial_DAO_FinancialTrxn();
-    $trxn->copyValues($params);
-
-    if (isset($params['fee_amount']) && is_numeric($params['fee_amount'])) {
-      if (!isset($params['total_amount'])) {
-        $trxn->fetch();
-        $params['total_amount'] = $trxn->total_amount;
-      }
-      $trxn->net_amount = $params['total_amount'] - $params['fee_amount'];
-    }
-
-    if (empty($params['id']) && !CRM_Utils_Rule::currencyCode($trxn->currency)) {
-      $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
-    }
-
-    $trxn->save();
-
-    if (!empty($params['id'])) {
-      // For an update entity financial transaction record will already exist. Return early.
-      return $trxn;
-    }
-
-    // Save to entity_financial_trxn table.
-    $entityFinancialTrxnParams = [
-      'entity_table' => CRM_Utils_Array::value('entity_table', $params, 'civicrm_contribution'),
-      'entity_id' => CRM_Utils_Array::value('entity_id', $params, CRM_Utils_Array::value('contribution_id', $params)),
-      'financial_trxn_id' => $trxn->id,
-      'amount' => $params['total_amount'],
-    ];
-
-    $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
-    $entityTrxn->copyValues($entityFinancialTrxnParams);
-    $entityTrxn->save();
-    return $trxn;
-  }
+class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_BAO_FinancialTrxn {
 
   /**
    * @param int $contributionId
@@ -82,7 +26,8 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     if (!$contributionFinancialTypeId) {
       $contributionFinancialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'financial_type_id');
     }
-    $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionFinancialTypeId, 'Accounts Receivable Account is');
+    $toFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($contributionFinancialTypeId, 'Accounts Receivable Account is');
+
     $q = "SELECT ft.id, ft.total_amount FROM civicrm_financial_trxn ft INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution') WHERE eft.entity_id = %1 AND ft.to_financial_account_id = %2";
 
     $p[1] = [$contributionId, 'Integer'];
@@ -102,23 +47,20 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   }
 
   /**
-   * Fetch object based on array of properties.
+   * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of criteria values.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
+   *   Array to be populated with found values.
    *
-   * @return \CRM_Financial_DAO_FinancialTrxn
+   * @return self|null
+   *   The DAO object, if found.
+   *
+   * @deprecated
    */
-  public static function retrieve(&$params, &$defaults = []) {
-    $financialItem = new CRM_Financial_DAO_FinancialTrxn();
-    $financialItem->copyValues($params);
-    if ($financialItem->find(TRUE)) {
-      CRM_Core_DAO::storeValues($financialItem, $defaults);
-      return $financialItem;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults = []) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -196,29 +138,6 @@ LIMIT 1;";
   public static function getRefundTransactionIDs($contributionID) {
     $refundStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
     return self::getFinancialTrxnId($contributionID, 'DESC', FALSE, " AND cft.status_id = $refundStatusID");
-  }
-
-  /**
-   * Given an entity_id and entity_table, check for corresponding entity_financial_trxn and financial_trxn record.
-   * @todo This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
-   *
-   * @param int $entity_id
-   *   Id of the entity usually the contactID.
-   *
-   * @return array
-   *   array of category id's the contact belongs to.
-   *
-   */
-  public static function getFinancialTrxnTotal($entity_id) {
-    $query = "
-      SELECT (ft.amount+SUM(ceft.amount)) AS total FROM civicrm_entity_financial_trxn AS ft
-LEFT JOIN civicrm_entity_financial_trxn AS ceft ON ft.financial_trxn_id = ceft.entity_id
-WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
-        ";
-
-    $sqlParams = [1 => [$entity_id, 'Integer']];
-    return CRM_Core_DAO::singleValueQuery($query, $sqlParams);
-
   }
 
   /**
@@ -341,7 +260,6 @@ WHERE ceft.entity_id = %1";
     }
 
     if (!empty($params['cost'])) {
-      $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       $toFinancialAccountType = !empty($params['isDeleted']) ? 'Premiums Inventory Account is' : 'Cost of Sales Account is';
       $fromFinancialAccountType = !empty($params['isDeleted']) ? 'Cost of Sales Account is' : 'Premiums Inventory Account is';
       $financialtrxn = [
@@ -350,7 +268,7 @@ WHERE ceft.entity_id = %1";
         'trxn_date' => date('YmdHis'),
         'total_amount' => $params['cost'] ?? 0,
         'currency' => $params['currency'] ?? NULL,
-        'status_id' => array_search('Completed', $contributionStatuses),
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
         'entity_table' => 'civicrm_contribution',
         'entity_id' => $params['contributionId'],
       ];
@@ -415,9 +333,9 @@ WHERE ceft.entity_id = %1";
     $fItemParams
       = [
         'financial_account_id' => $financialAccount,
-        'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id'),
+        'contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
         'created_date' => date('YmdHis'),
-        'transaction_date' => date('YmdHis'),
+        'transaction_date' => $params['trxnParams']['trxn_date'],
         'amount' => $amount,
         'description' => 'Fee',
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
@@ -482,6 +400,8 @@ WHERE ceft.entity_id = %1";
    *
    * @param int $contributionID
    * @param bool $includeRefund
+   *
+   * @deprecated use Apiv4.
    *
    * @return float
    */
@@ -557,10 +477,9 @@ WHERE ceft.entity_id = %1";
     }
     $revenueRecognitionDate = $contributionDetails->revenue_recognition_date;
     if (!CRM_Utils_System::isNull($revenueRecognitionDate)) {
-      $statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       if (!$update
-        && (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Completed'
-          || (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Pending'
+        && ($contributionDetails->contribution_status_id != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')
+          || ($contributionDetails->contribution_status_id != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')
             && $contributionDetails->is_pay_later)
           )
       ) {
@@ -697,7 +616,7 @@ WHERE ceft.entity_id = %1";
 
     $deferredFinancialAccount = $inputParams['deferred_financial_account_id'] ?? NULL;
     if (empty($deferredFinancialAccount)) {
-      $deferredFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($prevContribution->financial_type_id, 'Deferred Revenue Account is');
+      $deferredFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($prevContribution->financial_type_id, 'Deferred Revenue Account is');
     }
 
     $lastFinancialTrxnId = self::getFinancialTrxnId($prevContribution->id, 'DESC', FALSE, NULL, $deferredFinancialAccount);
@@ -726,28 +645,9 @@ WHERE ceft.entity_id = %1";
       CRM_Contribute_BAO_Contribution::assignProportionalLineItems($trxnParams, $trxn->id, $prevContribution->total_amount);
     }
 
-    self::createDeferredTrxn(CRM_Utils_Array::value('line_item', $inputParams), $currentContribution, TRUE, 'changePaymentInstrument');
+    self::createDeferredTrxn($inputParams['line_item'] ?? NULL, $currentContribution, TRUE, 'changePaymentInstrument');
 
     return TRUE;
-  }
-
-  /**
-   * Generate and assign an arbitrary value to a field of a test object.
-   *
-   * Always set is_payment to 1 as this is used for Payment api as  well as FinancialTrxn.
-   *
-   * @param string $fieldName
-   * @param array $fieldDef
-   * @param int $counter
-   *   The globally-unique ID of the test object.
-   */
-  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
-    if ($fieldName === 'is_payment') {
-      $this->is_payment = 1;
-    }
-    else {
-      parent::assignTestValue($fieldName, $fieldDef, $counter);
-    }
   }
 
 }

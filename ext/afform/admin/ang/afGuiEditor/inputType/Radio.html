@@ -1,0 +1,9 @@
+<div class="form-inline" title="{{:: ts('Set default value') }}">
+  <label ng-repeat="opt in $ctrl.getOptions()" class="radio" >
+    <input class="crm-form-radio" type="radio" ng-checked="defaultValueContains(opt.id)" ng-click="toggleDefaultValueItem(opt.id)" >
+    {{ opt.label }}
+  </label>
+  <a href ng-if="!getProp('required')" class="crm-hover-button" title="{{:: ts('Clear Default') }}" ng-click="toggleDefaultValueItem(getSet('afform_default'))">
+    <i class="crm-i fa-times" aria-hidden="true"></i>
+  </a>
+</div>

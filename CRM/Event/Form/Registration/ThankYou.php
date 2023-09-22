@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -48,7 +46,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
     CRM_Event_Form_Registration_Confirm::assignProfiles($this);
 
-    CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values['event']));
+    $this->setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values['event']));
   }
 
   /**
@@ -75,7 +73,10 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     // Assign the email address from a contact id lookup as in CRM_Event_BAO_Event->sendMail()
     $primaryContactId = $this->get('primaryContactId');
     if ($primaryContactId) {
-      list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($primaryContactId);
+      $email = CRM_Utils_Array::valueByRegexKey('/^email-/', current($this->_params));
+      if (!$email) {
+        $email = CRM_Contact_BAO_Contact::getPrimaryEmail($primaryContactId);
+      }
       $this->assign('email', $email);
     }
     $this->assignToTemplate();
@@ -123,7 +124,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $this->assign('isAmountzero', $this->_totalAmount <= 0);
 
     $this->assign('defaultRole', FALSE);
-    if (CRM_Utils_Array::value('defaultRole', $this->_params[0]) == 1) {
+    if (($this->_params[0]['defaultRole'] ?? NULL) == 1) {
       $this->assign('defaultRole', TRUE);
     }
     $defaults = [];
@@ -176,6 +177,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
 
     $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks($this->_eventId));
+    $this->assign('isShowICalIconsInline', TRUE);
 
     $this->freeze();
 

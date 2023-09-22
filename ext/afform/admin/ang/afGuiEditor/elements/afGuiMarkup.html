@@ -1,0 +1,30 @@
+<div class="af-gui-bar">
+  <div class="form-inline pull-right">
+    <div class="btn-group pull-right" af-gui-menu>
+      <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
+        <span><i class="crm-i fa-gear"></i></span>
+      </button>
+      <ul class="dropdown-menu" ng-if="menu.open" ng-include="'~/afGuiEditor/elements/afGuiMarkup-menu.html'"></ul>
+    </div>
+  </div>
+</div>
+<div ng-if="!editingMarkup" ng-click="edit()" class="af-gui-markup-content crm-editable-enabled {{ $ctrl.node['class'] }}">
+  <div ng-bind-html="getMarkup()" style="{{ $ctrl.node.style }}"></div>
+  <div class="af-gui-markup-content-overlay"></div>
+</div>
+<div class="af-gui-content-editing-area">
+  <div class="af-gui-edit-options-bar" ng-if="editingMarkup">
+    <h4 class="pull-left">{{:: ts('Editing content') }}</h4>
+    <div class="btn-group-sm pull-right">
+      <button type="button" class="btn btn-default" ng-click="close()">
+        <i class="crm-i fa-times-circle"></i>
+        {{:: ts('Cancel') }}
+      </button>
+      <button type="button" class="btn btn-success" ng-click="save()">
+        <i class="crm-i fa-check-circle"></i>
+        {{:: ts('Done') }}
+      </button>
+    </div>
+  </div>
+  <textarea id="{{ id }}" ng-show="editingMarkup"></textarea>
+</div>

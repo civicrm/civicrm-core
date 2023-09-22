@@ -15,14 +15,10 @@
  */
 class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Check method add()
    */
-  public function testAdd() {
+  public function testAdd(): void {
     $params = [
       'name' => 'Test Product',
       'sku' => 'TP-10',
@@ -45,7 +41,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
   /**
    * Check method retrieve( )
    */
-  public function testRetrieve() {
+  public function testRetrieve(): void {
     $params = [
       'name' => 'Test Product',
       'sku' => 'TP-10',
@@ -64,34 +60,9 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method setIsActive( )
-   */
-  public function testSetIsActive() {
-    $params = [
-      'name' => 'Test Product',
-      'sku' => 'TP-10',
-      'imageOption' => 'noImage',
-      'price' => 12,
-      'cost' => 5,
-      'min_contribution' => 5,
-      'is_active' => 1,
-    ];
-
-    $product = CRM_Contribute_BAO_Product::create($params);
-    CRM_Contribute_BAO_Product::setIsActive($product->id, 0);
-
-    $isActive = $this->assertDBNotNull('CRM_Contribute_BAO_Product', $product->id,
-      'is_active', 'id',
-      'Database check on updated for product records is_active.'
-    );
-
-    $this->assertEquals($isActive, 0, 'Verify product records is_active.');
-  }
-
-  /**
    * Check method del( )
    */
-  public function testDel() {
+  public function testDel(): void {
     $params = [
       'name' => 'Test Product',
       'sku' => 'TP-10',
@@ -103,7 +74,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
     ];
 
     $product = CRM_Contribute_BAO_Product::create($params);
-    CRM_Contribute_BAO_Product::del($product->id);
+    CRM_Contribute_BAO_Product::deleteRecord(['id' => $product->id]);
 
     $params = ['id' => $product->id];
     $defaults = [];

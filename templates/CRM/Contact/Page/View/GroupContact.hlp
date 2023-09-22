@@ -1,0 +1,19 @@
+{*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="actions-title"}
+  {ts}Past groups{/ts}
+{/htxt}
+{htxt id="actions"}
+    <p>{ts}For regular groups, you can add the contact to the group again by clicking Rejoin Group.{/ts}<br />
+    {ts}Deleting a contact from a group means the contact has no relationship to the group. It won't have a "removed" status in the group any more.{/ts}</p>
+    <p>{ts}* indicates a smart group.{/ts}</p>
+    <p>{ts}For smart groups, you can add the contact to the group manually.{/ts}<br />
+    {ts}If you delete a contact from a smart group, it will no longer be "removed" from the smart group, which means the contact will be in the smart group or not based on the smart group criteria.{/ts}</p>
+{/htxt}

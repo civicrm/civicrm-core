@@ -25,7 +25,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *
    * @var int
    */
-  protected $_gid;
+  public $_gid;
 
   /**
    * The field id, used when editing the field.
@@ -78,6 +78,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   public function preProcess() {
     $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+
+    if (!$this->_gid && $this->_id) {
+      $this->_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $this->_id, 'uf_group_id');
+      $this->set('_gid', $this->_gid);
+    }
     if ($this->_gid) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'title');
 
@@ -287,7 +292,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     unset($contactTypes['']);
 
     $contactTypes = !empty($contactTypes) ? ['Contact' => 'Contacts'] + $contactTypes : [];
-    $sel1 = ['' => '- select -'] + $contactTypes;
+    $sel1 = ['' => ts('- select -')] + $contactTypes;
 
     if (!empty($fields['Activity'])) {
       $sel1['Activity'] = 'Activity';
@@ -411,7 +416,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       ts('Visibility'),
       CRM_Core_SelectValues::ufVisibility(),
       TRUE,
-      ['onChange' => "showHideSeletorSearch(this.value);"]
+      ['onChange' => "showHideSelectorSearch(this.value);"]
     );
 
     //CRM-4363
@@ -464,14 +469,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     $this->addFormRule(['CRM_UF_Form_Field', 'formRule'], $this);
 
-    // if view mode pls freeze it with the done button.
-    if ($this->_action & CRM_Core_Action::VIEW) {
-      $this->freeze();
-      $this->addElement('button', 'done', ts('Done'),
-        ['onclick' => "location.href='civicrm/admin/uf/group/field?reset=1&action=browse&gid=" . $this->_gid . "'"]
-      );
-    }
-
     $this->setDefaults($defaults);
   }
 
@@ -485,7 +482,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $fieldValues = ['uf_group_id' => $this->_gid];
       CRM_Utils_Weight::delWeight('CRM_Core_DAO_UFField', $this->_id, $fieldValues);
-      $deleted = CRM_Core_BAO_UFField::del($this->_id);
+      $deleted = CRM_Core_BAO_UFField::deleteRecord(['id' => $this->_id]);
 
       //update group_type every time. CRM-3608
       if ($this->_gid && $deleted) {
@@ -530,9 +527,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         $apiFormattedParams['location_type_id'] = $params['field_name'][2];
       }
     }
-    elseif ($params['field_name'][2] == 0) {
+    elseif (isset($params['field_name'][2]) && $params['field_name'][2] == 0) {
       // 0 is Primary location type
-      $apiFormattedParams['location_type_id'] = NULL;
+      $apiFormattedParams['location_type_id'] = '';
     }
     if (!empty($params['field_name'][3])) {
       $apiFormattedParams['phone_type_id'] = $params['field_name'][3];
@@ -554,9 +551,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       $this->setMessageIfCountryNotAboveState($fieldName, CRM_Utils_Array::value('location_type_id', $apiFormattedParams), $apiFormattedParams['weight'], $apiFormattedParams['uf_group_id']);
 
-      CRM_Core_Session::setStatus(ts('Your CiviCRM Profile Field \'%1\' has been saved to \'%2\'.',
-        [1 => $name, 2 => $this->_title]
-      ), ts('Profile Field Saved'), 'success');
     }
     $buttonName = $this->controller->getButtonName();
 
@@ -650,7 +644,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $params = ['id' => $customField->custom_group_id];
       $customGroup = [];
       CRM_Core_BAO_CustomGroup::retrieve($params, $customGroup);
-      if (($fieldType != CRM_Utils_Array::value('extends', $customGroup)) || empty($customGroup['extends_entity_column_value'])) {
+      if (($fieldType != ($customGroup['extends'] ?? NULL)) || empty($customGroup['extends_entity_column_value'])) {
         return $errors;
       }
 
@@ -725,7 +719,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *   Posted values of the form.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -795,7 +789,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     //adding group field, email field should be present in the group
     //fixed for  issue CRM-2861 & CRM-4153
     if (CRM_Core_BAO_UFGroup::isProfileDoubleOptin()) {
-      if (CRM_Utils_Array::value(1, $fields['field_name']) == 'group') {
+      if (($fields['field_name'][1] ?? NULL) == 'group') {
         $dao = new CRM_Core_BAO_UFField();
         $dao->uf_group_id = $fields['group_id'];
         $dao->find();
@@ -964,9 +958,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           }
         }
         elseif (
-          CRM_Utils_Array::value(1, $fields['field_name']) == 'contact_sub_type' &&
-          !in_array($profileType, ['Individual', 'Household', 'Organization']) &&
-          !in_array($profileType, CRM_Contact_BAO_ContactType::subTypes())
+          ($fields['field_name'][1] ?? NULL) == 'contact_sub_type' &&
+          !in_array($profileType, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE) &&
+          !in_array($profileType, CRM_Contact_BAO_ContactType::subTypes(), TRUE)
         ) {
           $errors['field_name'] = ts('Cannot add or update profile field Contact Subtype as profile type is not one of Individual, Household or Organization.');
         }

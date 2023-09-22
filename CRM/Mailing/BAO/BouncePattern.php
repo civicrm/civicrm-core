@@ -23,13 +23,6 @@ class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
   public static $_patterns = NULL;
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Build the static pattern array.
    */
   public static function buildPatterns() {
@@ -60,7 +53,7 @@ class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
    * @return array
    *   Tuple (bounce_type, bounce_reason)
    */
-  public static function &match(&$message) {
+  public static function match($message) {
     // clean up $message and replace all white space by a single space, CRM-4767
     $message = preg_replace('/\s+/', ' ', $message);
 

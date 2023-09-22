@@ -1,13 +1,11 @@
 <?php
 namespace Civi\API\Exception;
 
-require_once 'api/Exception.php';
-
 /**
  * Class NotImplementedException
  * @package Civi\API\Exception
  */
-class NotImplementedException extends \API_Exception {
+class NotImplementedException extends \CRM_Core_Exception {
 
   /**
    * @param string $message
@@ -16,11 +14,11 @@ class NotImplementedException extends \API_Exception {
    *   Extra params to return. eg an extra array of ids. It is not mandatory,
    *   but can help the computer using the api. Keep in mind the api consumer
    *   isn't to be trusted. eg. the database password is NOT a good extra data.
-   * @param \Exception|NULL $previous
+   * @param \Exception|null $previous
    *   A previous exception which caused this new exception.
    */
   public function __construct($message, $extraParams = [], \Exception $previous = NULL) {
-    parent::__construct($message, \API_Exception::NOT_IMPLEMENTED, $extraParams, $previous);
+    parent::__construct($message, \CRM_Core_Exception::NOT_IMPLEMENTED, $extraParams, $previous);
   }
 
 }

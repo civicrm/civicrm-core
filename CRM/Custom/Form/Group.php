@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -27,7 +25,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    *
    * @var int
    */
-  protected $_id;
+  public $_id;
 
   /**
    *  set is empty or not.
@@ -50,28 +48,20 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
+    $this->preventAjaxSubmit();
     Civi::resources()->addScriptFile('civicrm', 'js/jquery/jquery.crmIconPicker.js');
 
     // current set id
-    $this->_id = $this->get('id');
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->setAction($this->_id ? CRM_Core_Action::UPDATE : CRM_Core_Action::ADD);
 
-    if ($this->_id && $isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_id, 'is_reserved', 'id')) {
+    if ($this->_id && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_id, 'is_reserved', 'id')) {
       CRM_Core_Error::statusBounce("You cannot edit the settings of a reserved custom field-set.");
     }
-    // setting title for html page
-    if ($this->_action == CRM_Core_Action::UPDATE) {
-      $title = CRM_Core_BAO_CustomGroup::getTitle($this->_id);
-      CRM_Utils_System::setTitle(ts('Edit %1', [1 => $title]));
-    }
-    elseif ($this->_action == CRM_Core_Action::VIEW) {
-      $title = CRM_Core_BAO_CustomGroup::getTitle($this->_id);
-      CRM_Utils_System::setTitle(ts('Preview %1', [1 => $title]));
-    }
-    else {
-      CRM_Utils_System::setTitle(ts('New Custom Field Set'));
-    }
 
-    if (isset($this->_id)) {
+    if ($this->_id) {
+      $title = CRM_Core_BAO_CustomGroup::getTitle($this->_id);
+      $this->setTitle(ts('Edit %1', [1 => $title]));
       $params = ['id' => $this->_id];
       CRM_Core_BAO_CustomGroup::retrieve($params, $this->_defaults);
 
@@ -79,6 +69,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       if (!empty($subExtends)) {
         $this->_subtypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($subExtends, 1, -1));
       }
+    }
+    else {
+      $this->setTitle(ts('New Custom Field Set'));
     }
   }
 
@@ -89,7 +82,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param self $self
    *
    *
    * @return bool|array
@@ -138,7 +131,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $title = $fields['title'];
     if (!empty($title)) {
       // gives the ascii value
-      $asciiValue = ord($title{0});
+      $asciiValue = ord($title[0]);
       if ($asciiValue >= 48 && $asciiValue <= 57) {
         $errors['title'] = ts("Name cannot not start with a digit");
       }
@@ -174,70 +167,18 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $this->add('text', 'title', ts('Set Name'), $attributes['title'], TRUE);
 
     //Fix for code alignment, CRM-3058
-    $contactTypes = ['Contact', 'Individual', 'Household', 'Organization'];
+    $contactTypes = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes());
     $this->assign('contactTypes', json_encode($contactTypes));
 
     $sel1 = ["" => ts("- select -")] + CRM_Core_SelectValues::customGroupExtends();
-    $sel2 = [];
-    $activityType = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
-
-    $eventType = CRM_Core_OptionGroup::values('event_type');
-    $grantType = CRM_Core_OptionGroup::values('grant_type');
-    $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
-    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
-    $participantRole = CRM_Core_OptionGroup::values('participant_role');
-
     ksort($sel1);
-    asort($activityType);
-    asort($eventType);
-    asort($grantType);
-    asort($membershipType);
-    asort($participantRole);
-
-    $sel2['Event'] = $eventType;
-    $sel2['Grant'] = $grantType;
-    $sel2['Activity'] = $activityType;
-    $sel2['Campaign'] = $campaignTypes;
-    $sel2['Membership'] = $membershipType;
-    $sel2['ParticipantRole'] = $participantRole;
-    $sel2['ParticipantEventName'] = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
-    $sel2['ParticipantEventType'] = $eventType;
-    $sel2['Contribution'] = CRM_Contribute_PseudoConstant::financialType();
-    $sel2['Relationship'] = self::getRelationshipTypes();
-
-    $sel2['Individual'] = CRM_Contact_BAO_ContactType::subTypePairs('Individual', FALSE, NULL);
-    $sel2['Household'] = CRM_Contact_BAO_ContactType::subTypePairs('Household', FALSE, NULL);
-    $sel2['Organization'] = CRM_Contact_BAO_ContactType::subTypePairs('Organization', FALSE, NULL);
-
-    CRM_Core_BAO_CustomGroup::getExtendedObjectTypes($sel2);
+    $sel2 = CRM_Core_BAO_CustomGroup::getSubTypes();
 
     foreach ($sel2 as $main => $sub) {
       if (!empty($sel2[$main])) {
         $sel2[$main] = [
           '' => ts("- Any -"),
         ] + $sel2[$main];
-      }
-    }
-
-    $cSubTypes = CRM_Core_Component::contactSubTypes();
-
-    if (!empty($cSubTypes)) {
-      $contactSubTypes = [];
-      foreach ($cSubTypes as $key => $value) {
-        $contactSubTypes[$key] = $key;
-      }
-      $sel2['Contact'] = [
-        "" => ("- Any -"),
-      ] + $contactSubTypes;
-    }
-    else {
-      if (!isset($this->_id)) {
-        $formName = 'document.forms.' . $this->_name;
-
-        $js = "<script type='text/javascript'>\n";
-        $js .= "{$formName}['extends_1'].style.display = 'none';\n";
-        $js .= "</script>";
-        $this->assign('initHideBlocks', $js);
       }
     }
 
@@ -320,7 +261,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     // $min_multiple = $this->add('text', 'min_multiple', ts('Minimum number of multiple records'), $attributes['min_multiple'] );
     // $this->addRule('min_multiple', ts('is a numeric field') , 'numeric');
 
-    $max_multiple = $this->add('text', 'max_multiple', ts('Maximum number of multiple records'), $attributes['max_multiple']);
+    $max_multiple = $this->add('number', 'max_multiple', ts('Maximum number of multiple records'), $attributes['max_multiple']);
     $this->addRule('max_multiple', ts('is a numeric field'), 'numeric');
 
     //allow to edit settings if custom set is empty CRM-5258
@@ -349,12 +290,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $buttons[0]['class'] = 'crm-warnDataLoss';
     }
     $this->addButtons($buttons);
-
-    // TODO: Is this condition ever true? Can this code be removed?
-    if ($this->_action & CRM_Core_Action::VIEW) {
-      $this->freeze();
-      $this->addElement('button', 'done', ts('Done'), ['onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'"]);
-    }
   }
 
   /**
@@ -372,7 +307,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_CustomGroup');
 
       $defaults['is_multiple'] = $defaults['min_multiple'] = 0;
-      $defaults['is_active'] = $defaults['is_public'] = $defaults['collapse_display'] = 1;
+      $defaults['is_active'] = $defaults['is_public'] = $defaults['collapse_adv_display'] = 1;
       $defaults['style'] = 'Inline';
     }
     elseif (empty($defaults['max_multiple']) && !$this->_isGroupEmpty) {
@@ -442,7 +377,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $params['created_date'] = date('YmdHis');
     }
 
-    $group = CRM_Core_BAO_CustomGroup::create($params);
+    $result = civicrm_api3('CustomGroup', 'create', $params);
+    $group = $result['values'][$result['id']];
+    $this->_id = $result['id'];
 
     // reset the cache
     Civi::cache('fields')->flush();
@@ -450,14 +387,14 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     CRM_Core_BAO_Cache::resetCaches();
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      CRM_Core_Session::setStatus(ts('Your custom field set \'%1 \' has been saved.', [1 => $group->title]), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('Your custom field set \'%1 \' has been saved.', [1 => $group['title']]), ts('Saved'), 'success');
     }
     else {
       // Jump directly to adding a field if popups are disabled
       $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
-      $url = CRM_Utils_System::url("civicrm/admin/custom/group/field$action", 'reset=1&new=1&gid=' . $group->id . '&action=' . ($action ? 'add' : 'browse'));
+      $url = CRM_Utils_System::url("civicrm/admin/custom/group/field$action", 'reset=1&new=1&gid=' . $group['id']);
       CRM_Core_Session::setStatus(ts("Your custom field set '%1' has been added. You can add custom fields now.",
-        [1 => $group->title]
+        [1 => $group['title']]
       ), ts('Saved'), 'success');
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext($url);
@@ -466,7 +403,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     // prompt Drupal Views users to update $db_prefix in settings.php, if necessary
     global $db_prefix;
     $config = CRM_Core_Config::singleton();
-    if (is_array($db_prefix) && $config->userSystem->is_drupal && module_exists('views')) {
+    if (is_array($db_prefix) && $config->userSystem->viewsExists()) {
       // get table_name for each custom group
       $tables = [];
       $sql = "SELECT table_name FROM civicrm_custom_group WHERE is_active = 1";

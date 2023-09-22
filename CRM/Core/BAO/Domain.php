@@ -21,47 +21,49 @@
 class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
-   * Cache for the current domain object.
-   * @var object
-   */
-  public static $_domain = NULL;
-
-  /**
    * Cache for a domain's location array
    * @var array
    */
   private $_location = NULL;
 
   /**
-   * Fetch object based on array of properties.
+   * Flushes the cache set by getDomain.
    *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
-   *
-   * @return CRM_Core_DAO_Domain
+   * @see CRM_Core_BAO_Domain::getDomain()
+   * @param CRM_Core_DAO_Domain $domain
    */
-  public static function retrieve(&$params, &$defaults) {
-    return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_Domain', $params, $defaults);
+  public static function onPostSave($domain) {
+    // We want to clear out any cached tokens.
+    // Editing a domain is so rare we can risk being heavy handed.
+    Civi::cache('metadata')->clear();
+    Civi::$statics[__CLASS__]['current'] = NULL;
   }
 
   /**
-   * Get the domain BAO.
-   *
-   * @param bool $reset
+   * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
+   */
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
+  }
+
+  /**
+   * Get the current domain.
    *
    * @return \CRM_Core_BAO_Domain
    * @throws \CRM_Core_Exception
    */
-  public static function getDomain($reset = NULL) {
-    static $domain = NULL;
-    if (!$domain || $reset) {
+  public static function getDomain() {
+    $domain = Civi::$statics[__CLASS__]['current'] ?? NULL;
+    if (!$domain) {
       $domain = new CRM_Core_BAO_Domain();
       $domain->id = CRM_Core_Config::domainID();
       if (!$domain->find(TRUE)) {
         throw new CRM_Core_Exception('No domain in DB');
       }
+      Civi::$statics[__CLASS__]['current'] = $domain;
     }
     return $domain;
   }
@@ -69,32 +71,61 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * @param bool $skipUsingCache
    *
-   * @return null|string
+   * @return string
    *
    * @throws \CRM_Core_Exception
    */
   public static function version($skipUsingCache = FALSE) {
-    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
-      CRM_Core_Config::domainID(),
-      'version',
-      'id',
-      $skipUsingCache
+    if ($skipUsingCache) {
+      Civi::$statics[__CLASS__]['current'] = NULL;
+    }
+
+    return self::getDomain()->version;
+  }
+
+  /**
+   * Is a database update required to apply latest schema changes.
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function isDBUpdateRequired() {
+    $dbVersion = self::version();
+    $codeVersion = CRM_Utils_System::version();
+    return version_compare($dbVersion, $codeVersion) < 0;
+  }
+
+  /**
+   * Checks that the current DB schema is at least $min version
+   *
+   * @param string|int $min
+   * @return bool
+   */
+  public static function isDBVersionAtLeast($min) {
+    return version_compare(self::version(), $min, '>=');
+  }
+
+  /**
+   * @return string
+   */
+  protected static function getMissingDomainFromEmailMessage(): string {
+    $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address',
+      'reset=1'
     );
+    $status = ts("There is no valid default from email address configured for the domain. You can configure here <a href='%1'>Configure From Email Address.</a>", [1 => $url]);
+    return $status;
   }
 
   /**
    * Get the location values of a domain.
    *
-   * @return array
-   *   Location::getValues
-   *
-   * @throws \CRM_Core_Exception
+   * @return CRM_Core_BAO_Location[]|NULL
    */
-  public function &getLocationValues() {
+  public function getLocationValues() {
     if ($this->_location == NULL) {
-      $domain = self::getDomain(NULL);
       $params = [
-        'contact_id' => $domain->contact_id,
+        'contact_id' => $this->contact_id,
       ];
       $this->_location = CRM_Core_BAO_Location::getValues($params, TRUE);
 
@@ -111,9 +142,11 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @param array $params
    * @param int $id
    *
+   * @deprecated
    * @return CRM_Core_DAO_Domain
+   * @throws \CRM_Core_Exception
    */
-  public static function edit($params, $id) {
+  public static function edit($params, $id): CRM_Core_DAO_Domain {
     $params['id'] = $id;
     return self::writeRecord($params);
   }
@@ -121,10 +154,12 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Create or update domain.
    *
+   * @deprecated
    * @param array $params
    * @return CRM_Core_DAO_Domain
    */
   public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -146,6 +181,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * @param bool $skipFatal
    * @param bool $returnString
+   *  If you are using this second parameter you probably are better
+   *  calling `getFromEmail()` which will return an actual string.
    *
    * @return array
    *   name & email for domain
@@ -172,12 +209,24 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       return [NULL, NULL];
     }
 
-    $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address',
-      'reset=1'
-    );
-    $status = ts("There is no valid default from email address configured for the domain. You can configure here <a href='%1'>Configure From Email Address.</a>", [1 => $url]);
+    $status = self::getMissingDomainFromEmailMessage();
 
     throw new CRM_Core_Exception($status);
+  }
+
+  /**
+   * Get the domain email in a format suitable for using as the from address.
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public static function getFromEmail(): string {
+    $email = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
+    $email = current($email);
+    if (!$email) {
+      throw new CRM_Core_Exception(self::getMissingDomainFromEmailMessage());
+    }
+    return $email;
   }
 
   /**
@@ -219,14 +268,12 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     }
     elseif ($multisite) {
       // create a group with that of domain name
-      $title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
-        CRM_Core_Config::domainID(), 'name'
-      );
+      $title = self::getDomain()->name;
       $groupID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
         $title, 'id', 'title', TRUE
       );
     }
-    return $groupID ? $groupID : FALSE;
+    return $groupID ?: FALSE;
   }
 
   /**
@@ -288,7 +335,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Return domain information / user information for the usage in receipts
    * Try default from address then fall back to using logged in user details
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function getDefaultReceiptFrom() {
     $domain = civicrm_api3('domain', 'getsingle', ['id' => CRM_Core_Config::domainID()]);
@@ -305,9 +352,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       return [$userName, $userEmail];
     }
 
-    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $userID = CRM_Core_Session::getLoggedInContactID();
     if (!empty($userID)) {
-      list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
+      [$userName, $userEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
     }
     // If still empty fall back to the logged in user details.
     // return empty values no matter what.
@@ -319,7 +366,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    */
   public static function getNoReplyEmailAddress() {
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
-    return "do-not-reply@$emailDomain";
+    $noReplyAddress = Civi::settings()->get('no_reply_email_address');
+
+    return $noReplyAddress ?: "do-not-reply@$emailDomain";
   }
 
 }

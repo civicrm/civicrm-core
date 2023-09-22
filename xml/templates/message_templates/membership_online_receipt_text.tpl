@@ -1,5 +1,5 @@
-{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
-{if $receipt_text}
+{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
+{if !empty($receipt_text)}
 {$receipt_text}
 {/if}
 {if $is_pay_later}
@@ -17,7 +17,7 @@
 {ts}Membership Type{/ts}: {$membership_name}
 {if $mem_start_date}{ts}Membership Start Date{/ts}: {$mem_start_date|crmDate}
 {/if}
-{if $mem_end_date}{ts}Membership End Date{/ts}: {$mem_end_date|crmDate}
+{if $mem_end_date}{ts}Membership Expiration Date{/ts}: {$mem_end_date|crmDate}
 {/if}
 
 {/if}
@@ -26,14 +26,14 @@
 {ts}Membership Fee{/ts}
 
 ===========================================================
-{if !$useForMember && $membership_amount && $is_quick_config}
+{if !$useForMember && isset($membership_amount) && !empty($is_quick_config)}
 {ts 1=$membership_name}%1 Membership{/ts}: {$membership_amount|crmMoney}
-{if $amount && !$is_separate_payment }
+{if $amount && !$is_separate_payment}
 {ts}Contribution Amount{/ts}: {$amount|crmMoney}
 -------------------------------------------
 {ts}Total{/ts}: {$amount+$membership_amount|crmMoney}
 {/if}
-{elseif !$useForMember && $lineItem and $priceSetID & !$is_quick_config}
+{elseif !$useForMember && !empty($lineItem) and !empty($priceSetID) & empty($is_quick_config)}
 {foreach from=$lineItem item=value key=priceset}
 ---------------------------------------------------------
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
@@ -49,28 +49,28 @@
 
 {ts}Total Amount{/ts}: {$amount|crmMoney}
 {else}
-{if $useForMember && $lineItem && !$is_quick_config}
+{if $useForMember && $lineItem && empty($is_quick_config)}
 {foreach from=$lineItem item=value key=priceset}
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
 {capture assign=ts_total}{ts}Fee{/ts}{/capture}
-{if $dataArray}
+{if !empty($dataArray)}
 {capture assign=ts_subtotal}{ts}Subtotal{/ts}{/capture}
 {capture assign=ts_taxRate}{ts}Tax Rate{/ts}{/capture}
 {capture assign=ts_taxAmount}{ts}Tax Amount{/ts}{/capture}
 {capture assign=ts_total}{ts}Total{/ts}{/capture}
 {/if}
 {capture assign=ts_start_date}{ts}Membership Start Date{/ts}{/capture}
-{capture assign=ts_end_date}{ts}Membership End Date{/ts}{/capture}
-{$ts_item|string_format:"%-30s"} {$ts_total|string_format:"%10s"} {if $dataArray} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {$ts_total|string_format:"%10s"} {/if} {$ts_start_date|string_format:"%20s"} {$ts_end_date|string_format:"%20s"}
+{capture assign=ts_end_date}{ts}Membership Expiration Date{/ts}{/capture}
+{$ts_item|string_format:"%-30s"} {$ts_total|string_format:"%10s"} {if !empty($dataArray)} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {$ts_total|string_format:"%10s"} {/if} {$ts_start_date|string_format:"%20s"} {$ts_end_date|string_format:"%20s"}
 --------------------------------------------------------------------------------------------------
 
 {foreach from=$value item=line}
-{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.line_total|crmMoney|string_format:"%10s"}  {if $dataArray} {$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if $line.tax_rate != "" || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {else}                  {/if}   {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {/if} {$line.start_date|string_format:"%20s"} {$line.end_date|string_format:"%20s"}
+{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.line_total|crmMoney|string_format:"%10s"}  {if !empty($dataArray)} {$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {else}                  {/if}   {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {/if} {$line.start_date|string_format:"%20s"} {$line.end_date|string_format:"%20s"}
 {/foreach}
 {/foreach}
 
-{if $dataArray}
-{ts}Amount before Tax{/ts}: {$amount-$totalTaxAmount|crmMoney:$currency}
+{if !empty($dataArray)}
+{ts}Amount before Tax:{/ts} {$amount-$totalTaxAmount|crmMoney:$currency}
 
 {foreach from=$dataArray item=value key=priceset}
 {if $priceset || $priceset == 0}
@@ -87,9 +87,9 @@
 {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
 {/if}
 
-{ts}Amount{/ts}: {$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}
+{ts}Amount{/ts}: {$amount|crmMoney} {if isset($amount_level)} - {$amount_level} {/if}
 {/if}
-{elseif $membership_amount}
+{elseif isset($membership_amount)}
 ===========================================================
 {ts}Membership Fee{/ts}
 
@@ -97,19 +97,19 @@
 {ts 1=$membership_name}%1 Membership{/ts}: {$membership_amount|crmMoney}
 {/if}
 
-{if $receive_date}
+{if !empty($receive_date)}
 
 {ts}Date{/ts}: {$receive_date|crmDate}
 {/if}
-{if $is_monetary and $trxn_id}
+{if !empty($is_monetary) and !empty($trxn_id)}
 {ts}Transaction #{/ts}: {$trxn_id}
 
 {/if}
-{if $membership_trx_id}
+{if !empty($membership_trx_id)}
 {ts}Membership Transaction #{/ts}: {$membership_trx_id}
 
 {/if}
-{if $is_recur}
+{if !empty($is_recur)}
 {ts}This membership will be renewed automatically.{/ts}
 {if $cancelSubscriptionUrl}
 
@@ -123,7 +123,7 @@
 {/if}
 {/if}
 
-{if $honor_block_is_active }
+{if $honor_block_is_active}
 ===========================================================
 {$soft_credit_type}
 ===========================================================
@@ -132,7 +132,7 @@
 {/foreach}
 
 {/if}
-{if $pcpBlock}
+{if !empty($pcpBlock)}
 ===========================================================
 {ts}Personal Campaign Page{/ts}
 
@@ -144,7 +144,7 @@
 {if $pcp_personal_note}{ts}Personal Note{/ts}: {$pcp_personal_note}{/if}
 
 {/if}
-{if $onBehalfProfile}
+{if !empty($onBehalfProfile)}
 ===========================================================
 {ts}On Behalf Of{/ts}
 
@@ -154,7 +154,7 @@
 {/foreach}
 {/if}
 
-{if $billingName}
+{if !empty($billingName)}
 ===========================================================
 {ts}Billing Name and Address{/ts}
 
@@ -163,14 +163,14 @@
 {$address}
 
 {$email}
-{elseif $email}
+{elseif !empty($email)}
 ===========================================================
 {ts}Registered Email{/ts}
 
 ===========================================================
 {$email}
 {/if} {* End billingName or email *}
-{if $credit_card_type}
+{if !empty($credit_card_type)}
 
 ===========================================================
 {ts}Credit Card Information{/ts}
@@ -181,7 +181,7 @@
 {ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}
 {/if}
 
-{if $selectPremium }
+{if !empty($selectPremium)}
 ===========================================================
 {ts}Premium Information{/ts}
 
@@ -199,43 +199,39 @@
 {if $end_date}
 {ts}End Date{/ts}: {$end_date|crmDate}
 {/if}
-{if $contact_email OR $contact_phone}
+{if !empty($contact_email) OR !empty($contact_phone)}
 
 {ts}For information about this premium, contact:{/ts}
 
-{if $contact_email}
+{if !empty($contact_email)}
   {$contact_email}
 {/if}
-{if $contact_phone}
+{if !empty($contact_phone)}
   {$contact_phone}
 {/if}
 {/if}
-{if $is_deductible AND $price}
+{if $is_deductible AND !empty($price)}
 
 {ts 1=$price|crmMoney}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}{/if}
 {/if}
 
-{if $customPre}
+{if !empty($customPre)}
 ===========================================================
 {$customPre_grouptitle}
 
 ===========================================================
 {foreach from=$customPre item=customValue key=customName}
-{if ( $trackingFields and ! in_array( $customName, $trackingFields ) ) or ! $trackingFields}
  {$customName}: {$customValue}
-{/if}
 {/foreach}
 {/if}
 
 
-{if $customPost}
+{if !empty($customPost)}
 ===========================================================
 {$customPost_grouptitle}
 
 ===========================================================
 {foreach from=$customPost item=customValue key=customName}
-{if ( $trackingFields and ! in_array( $customName, $trackingFields ) ) or ! $trackingFields}
  {$customName}: {$customValue}
-{/if}
 {/foreach}
 {/if}

@@ -12,11 +12,11 @@
 {if $session->getStatus(false)}
   {assign var="status" value=$session->getStatus(true)}
   {foreach name=statLoop item=statItem from=$status}
-    {if $urlIsPublic}
+    {if !empty($urlIsPublic)}
       {assign var="infoType" value="no-popup `$statItem.type`"}
     {else}
       {assign var="infoType" value=$statItem.type}
     {/if}
-    {include file="CRM/common/info.tpl" infoTitle=$statItem.title infoMessage=$statItem.text infoOptions=$statItem.options|@json_encode}
+    {include file="CRM/common/info.tpl" infoTitle=$statItem.title infoMessage=$statItem.text|smarty:nodefaults|purify infoOptions=$statItem.options|smarty:nodefaults|@json_encode}
   {/foreach}
 {/if}

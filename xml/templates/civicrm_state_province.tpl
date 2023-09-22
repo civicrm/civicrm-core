@@ -9,7 +9,7 @@
 -- Generated from {$smarty.template}
 -- {$generated}
 --
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1000, 1228, "AL", "Alabama"),
@@ -85,13 +85,13 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1110, 1039, "QC", "Quebec"),
 (1111, 1039, "SK", "Saskatchewan"),
 (1112, 1039, "YT", "Yukon Territory"),
-(1200, 1101, "MM", "Maharashtra"),
+(1200, 1101, "MH", "Maharashtra"),
 (1201, 1101, "KA", "Karnataka"),
 (1202, 1101, "AP", "Andhra Pradesh"),
 (1203, 1101, "AR", "Arunachal Pradesh"),
 (1204, 1101, "AS", "Assam"),
 (1205, 1101, "BR", "Bihar"),
-(1206, 1101, "CH", "Chhattisgarh"),
+(1206, 1101, "CG", "Chhattisgarh"),
 (1207, 1101, "GA", "Goa"),
 (1208, 1101, "GJ", "Gujarat"),
 (1209, 1101, "HR", "Haryana"),
@@ -114,8 +114,6 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1226, 1101, "UP", "Uttar Pradesh"),
 (1227, 1101, "WB", "West Bengal"),
 (1228, 1101, "AN", "Andaman and Nicobar Islands"),
-(1229, 1101, "DN", "Dadra and Nagar Haveli"),
-(1230, 1101, "DD", "Daman and Diu"),
 (1231, 1101, "DL", "Delhi"),
 (1232, 1101, "LD", "Lakshadweep"),
 (1233, 1101, "PY", "Pondicherry"),
@@ -1216,7 +1214,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2597, 1226, "AGB", "Argyll and Bute"),
 (2598, 1226, "ARM", "Co Armagh"),
 (2606, 1226, "BDF", "Bedfordshire"),
-(2612, 1226, "BGW", "Gwent"),
+(2612, 1226, "BGW", "Blaenau Gwent"),
 (2620, 1226, "BST", "Bristol, City of"),
 (2622, 1226, "BKM", "Buckinghamshire"),
 (2626, 1226, "CAM", "Cambridgeshire"),
@@ -1285,7 +1283,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2786, 1226, "STG", "Stirling"),
 (2791, 1226, "SFK", "Suffolk"),
 (2793, 1226, "SRY", "Surrey"),
-(2804, 1226, "VGL", "Mid Glamorgan"),
+(2804, 1226, "VGL", "Vale of Glamorgan, The"),
 (2811, 1226, "WAR", "Warwickshire"),
 (2813, 1226, "WDU", "West Dunbartonshire"),
 (2814, 1226, "WLN", "West Lothian"),
@@ -1986,8 +1984,8 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (3519, 1125, "TE", "Telšių Apskritis"),
 (3520, 1125, "UT", "Utenos Apskritis"),
 (3521, 1125, "VL", "Vilniaus Apskritis"),
-(3522, 1126, "D", "Diekirch"),
-(3523, 1126, "G", "GreveNmacher"),
+(3522, 1126, "DI", "Diekirch"),
+(3523, 1126, "GR", "Grevenmacher"),
 (3550, 1119, "DGV", "Daugavpils"),
 (3551, 1119, "JEL", "Jelgava"),
 (3552, 1119, "JUR", "Jūrmala"),
@@ -2503,8 +2501,8 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4062, 1170, "CAT", "Catanduanes"),
 (4063, 1170, "CAV", "Cavite"),
 (4064, 1170, "CEB", "Cebu"),
-(4065, 1170, "COM", "Compostela Valley"),
-(4066, 1170, "DAV", "Davao"),
+(4065, 1170, "COM", "Davao de Oro"),
+(4066, 1170, "DAV", "Davao del Norte"),
 (4067, 1170, "DAS", "Davao del Sur"),
 (4068, 1170, "DAO", "Davao Oriental"),
 (4069, 1170, "EAS", "Eastern Samar"),
@@ -2514,7 +2512,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4073, 1170, "ILS", "Ilocos Sur"),
 (4074, 1170, "ILI", "Iloilo"),
 (4075, 1170, "ISA", "Isabela"),
-(4076, 1170, "KAL", "Kalinga-Apayso"),
+(4076, 1170, "KAL", "Kalinga"),
 (4077, 1170, "LAG", "Laguna"),
 (4078, 1170, "LAN", "Lanao del Norte"),
 (4079, 1170, "LAS", "Lanao del Sur"),
@@ -2530,7 +2528,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4089, 1170, "MOU", "Mountain Province"),
 (4090, 1170, "NEC", "Negroe Occidental"),
 (4091, 1170, "NER", "Negros Oriental"),
-(4092, 1170, "NCO", "North Cotabato"),
+(4092, 1170, "NCO", "Cotabato"),
 (4093, 1170, "NSA", "Northern Samar"),
 (4094, 1170, "NUE", "Nueva Ecija"),
 (4095, 1170, "NUV", "Nueva Vizcaya"),
@@ -3682,14 +3680,13 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 -- department of France (CRM-4769)
 (10009, 1076, "39", "Jura"),
 
--- new Italian provinces, as yet without codes (CRM-5048)
-(10010, 1107, "Bar", "Barletta-Andria-Trani"),
-(10011, 1107, "Fer", "Fermo"),
-(10012, 1107, "Mon", "Monza e Brianza"),
+-- new Italian provinces (CRM-5048)
+(10010, 1107, "BT", "Barletta-Andria-Trani"),
+(10011, 1107, "FM", "Fermo"),
+(10012, 1107, "MB", "Monza e Brianza"),
 
 -- new UK provinces (CRM-5224)
 (10013, 1226, "CWD", "Clwyd"),
-(10014, 1226, "DFD", "Dyfed"),
 (10015, 1226, "SGM", "South Glamorgan"),
 
 -- Haiti (CRM-5628)
@@ -3760,7 +3757,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1045, "ZW", "Zhongwei"),
 
 -- CRM-10863 Added Missing Province for Luxembourg
-(NULL, 1126, "L", "Luxembourg"),
+(NULL, 1126, "LU", "Luxembourg"),
 
 -- CRM-11367 Latvian regions
 (NULL, 1119, "002", "Aizkraukles novads"),
@@ -4108,4 +4105,78 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1080, "09", "Woleu-Ntem"),
 
 -- dev/Core#131 Missing UK State
-(NULL, 1226, "MON", "Monmouthshire");
+(NULL, 1226, "MON", "Monmouthshire"),
+
+-- dev/core#2027 Missing subdivisions for Northern Ireland and Wales
+(NULL, 1226, "ANN", "Antrim and Newtownabbey"),
+(NULL, 1226, "AND", "Ards and North Down"),
+(NULL, 1226, "ABC", "Armagh City, Banbridge and Craigavon"),
+(NULL, 1226, "BFS", "Belfast"),
+(NULL, 1226, "CCG", "Causeway Coast and Glens"),
+(NULL, 1226, "DRS", "Derry City and Strabane"),
+(NULL, 1226, "FMO", "Fermanagh and Omagh"),
+(NULL, 1226, "LBC", "Lisburn and Castlereagh"),
+(NULL, 1226, "MEA", "Mid and East Antrim"),
+(NULL, 1226, "MUL", "Mid Ulster"),
+(NULL, 1226, "NMD", "Newry, Mourne and Down"),
+
+(NULL, 1226, "BGE", "Bridgend"),
+(NULL, 1226, "CAY", "Caerphilly"),
+(NULL, 1226, "CRF", "Cardiff"),
+(NULL, 1226, "CMN", "Carmarthenshire"),
+(NULL, 1226, "CGN", "Ceredigion"),
+(NULL, 1226, "CWY", "Conwy"),
+(NULL, 1226, "DEN", "Denbighshire"),
+(NULL, 1226, "FLN", "Flintshire"),
+(NULL, 1226, "AGY", "Isle of Anglesey"),
+(NULL, 1226, "MTY", "Merthyr Tydfil"),
+(NULL, 1226, "NTL", "Neath Port Talbot"),
+(NULL, 1226, "NWP", "Newport"),
+(NULL, 1226, "PEM", "Pembrokeshire"),
+(NULL, 1226, "RCT", "Rhondda, Cynon, Taff"),
+(NULL, 1226, "SWA", "Swansea"),
+(NULL, 1226, "TOF", "Torfaen"),
+(NULL, 1226, "WRX", "Wrexham"),
+
+-- Add missing state for South Korea
+(NULL, 1115, "50", "Sejong"),
+
+-- Add missing province for Philippines
+(NULL, 1170, "DIN", "Dinagat Islands"),
+
+-- Add missing state for Colombia
+(NULL, 1048, "HUI", "Huila"),
+
+-- Add missing parishes for Bermuda
+ (NULL, 1023, 'DEV', 'Devonshire'),
+ (NULL, 1023, 'HAM', 'Hamilton Parish'),
+ (NULL, 1023, 'HA', 'City of Hamilton'),
+ (NULL, 1023, 'PAG', 'Paget'),
+ (NULL, 1023, 'PEM', 'Pembroke'),
+ (NULL, 1023, 'SG', 'Town of St. George'),
+ (NULL, 1023, 'SGE', 'Saint George\'s'),
+ (NULL, 1023, 'SAN', 'Sandys'),
+ (NULL, 1023, 'SMI', 'Smiths'),
+ (NULL, 1023, 'SOU', 'Southampton'),
+ (NULL, 1023, 'WAR', 'Warwick'),
+
+-- Add in missing Indian State provinces
+
+(NULL, 1101, "DH", "Dādra and Nagar Haveli and Damān and Diu"),
+(NULL, 1101, "LA", "Ladākh"),
+
+ -- end of statement:
+
+-- Add missing provinces for Luxembourg
+(NULL, 1126, 'CA', 'Capellen'),
+(NULL, 1126, 'CL', 'Clervaux'),
+(NULL, 1126, 'EC', 'Echternach'),
+(NULL, 1126, 'ES', 'Esch-sur-Alzette'),
+(NULL, 1126, 'ME', 'Mersch'),
+(NULL, 1126, 'RD', 'Redange-sur-Attert'),
+(NULL, 1126, 'RM', 'Remich'),
+(NULL, 1126, 'VD', 'Vianden'),
+(NULL, 1126, 'WI', 'Wiltz')
+
+-- end of statement:
+ ;

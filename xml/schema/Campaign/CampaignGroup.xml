@@ -5,13 +5,16 @@
   <name>civicrm_campaign_group</name>
   <comment>Campaign Group Details.</comment>
   <add>3.3</add>
-
+  <component>CiviCampaign</component>
   <field>
     <name>id</name>
     <title>Campaign Group ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Campaign Group id.</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>
@@ -21,16 +24,21 @@
 
   <field>
     <name>campaign_id</name>
-    <title>Campaign</title>
+    <title>Campaign ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to the activity Campaign.</comment>
+    <html>
+      <type>EntityRef</type>
+      <label>Campaign</label>
+    </html>
+    <add>3.3</add>
     <pseudoconstant>
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
-    <add>3.3</add>
   </field>
   <foreignKey>
     <name>campaign_id</name>

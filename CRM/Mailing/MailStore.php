@@ -16,10 +16,18 @@
  */
 class CRM_Mailing_MailStore {
   /**
-   * flag to decide whether to print debug messages
+   * Flag to decide whether to print debug messages
+   *
    * @var bool
    */
   public $_debug = FALSE;
+
+  /**
+   * Holds the underlying mailbox transport implementation
+   *
+   * @var ezcMailImapTransport|ezcMailMboxTransport|ezcMailPop3Transport|null
+   */
+  protected $_transport;
 
   /**
    * Return the proper mail store implementation, based on config settings.
@@ -28,7 +36,7 @@ class CRM_Mailing_MailStore {
    *   Name of the settings set from civimail_mail_settings to use (null for default).
    *
    * @throws Exception
-   * @return object
+   * @return CRM_Mailing_MailStore
    *   mail store implementation for processing CiviMail-bound emails
    */
   public static function getStore($name = NULL) {
@@ -40,34 +48,75 @@ class CRM_Mailing_MailStore {
     }
 
     $protocols = CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol', [], 'validate');
-    if (empty($protocols[$dao->protocol])) {
-      throw new Exception("Empty mail protocol");
+
+    // Prepare normalized/hookable representation of the mail settings.
+    $mailSettings = $dao->toArray();
+    $mailSettings['protocol'] = $protocols[$mailSettings['protocol']] ?? NULL;
+    $protocolDefaults = self::getProtocolDefaults($mailSettings['protocol']);
+    $mailSettings = array_merge($protocolDefaults, $mailSettings);
+
+    CRM_Utils_Hook::alterMailStore($mailSettings);
+
+    if (!empty($mailSettings['factory'])) {
+      return call_user_func($mailSettings['factory'], $mailSettings);
     }
+    else {
+      throw new Exception("Unknown protocol {$mailSettings['protocol']}");
+    }
+  }
 
-    switch ($protocols[$dao->protocol]) {
+  /**
+   * @param string $protocol
+   *   Ex: 'IMAP', 'Maildir'
+   * @return array
+   *   List of properties to merge into the $mailSettings.
+   *   The most important property is 'factory' with signature:
+   *
+   *   function($mailSettings): CRM_Mailing_MailStore
+   */
+  private static function getProtocolDefaults($protocol) {
+    switch ($protocol) {
       case 'IMAP':
-        return new CRM_Mailing_MailStore_Imap($dao->server, $dao->username, $dao->password, (bool) $dao->is_ssl, $dao->source);
-
-      case 'IMAP_XOAUTH2':
-        return new CRM_Mailing_MailStore_Imap($dao->server, $dao->username, $dao->password, (bool) $dao->is_ssl, $dao->source, TRUE);
+        return [
+          'auth' => 'Password',
+          'factory' => function($mailSettings) {
+            $useXOAuth2 = ($mailSettings['auth'] === 'XOAuth2');
+            return new CRM_Mailing_MailStore_Imap($mailSettings['server'], $mailSettings['username'], $mailSettings['password'], (bool) $mailSettings['is_ssl'], $mailSettings['source'], $useXOAuth2);
+          },
+        ];
 
       case 'POP3':
-        return new CRM_Mailing_MailStore_Pop3($dao->server, $dao->username, $dao->password, (bool) $dao->is_ssl);
+        return [
+          'factory' => function ($mailSettings) {
+            return new CRM_Mailing_MailStore_Pop3($mailSettings['server'], $mailSettings['username'], $mailSettings['password'], (bool) $mailSettings['is_ssl']);
+          },
+        ];
 
       case 'Maildir':
-        return new CRM_Mailing_MailStore_Maildir($dao->source);
+        return [
+          'factory' => function ($mailSettings) {
+            return new CRM_Mailing_MailStore_Maildir($mailSettings['source']);
+          },
+        ];
 
       case 'Localdir':
-        return new CRM_Mailing_MailStore_Localdir($dao->source);
+        return [
+          'factory' => function ($mailSettings) {
+            return new CRM_Mailing_MailStore_Localdir($mailSettings['source']);
+          },
+        ];
 
       // DO NOT USE the mbox transport for anything other than testing
       // in particular, it does not clear the mbox afterwards
-
       case 'mbox':
-        return new CRM_Mailing_MailStore_Mbox($dao->source);
+        return [
+          'factory' => function ($mailSettings) {
+            return new CRM_Mailing_MailStore_Mbox($mailSettings['source']);
+          },
+        ];
 
       default:
-        throw new Exception("Unknown protocol {$dao->protocol}");
+        return [];
     }
   }
 

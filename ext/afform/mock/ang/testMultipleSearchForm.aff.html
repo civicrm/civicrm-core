@@ -1,0 +1,21 @@
+<div>
+  <div af-fieldset="">
+    <af-field name="source" />
+    <af-field name="Contact_Email_contact_id_01.location_type_id" defn="{input_attrs: {multiple: true}}" />
+    <crm-search-display-table search-name="TestContactEmailSearch" display-name="TestContactEmailDisplay"></crm-search-display-table>
+  </div>
+  <div af-fieldset="">
+    <!-- Filter is in wrong fieldset to work with `TestSearchForEmail`. See SearchAfformTest::testRunMultipleSearchForm -->
+    <af-field name="email" />
+    <crm-search-display-table search-name="TestContactEmailSearch" display-name=""></crm-search-display-table>
+  </div>
+</div>
+<div af-fieldset="">
+  <af-field name="contact_id.display_name" />
+  <af-field name="location_type_id" />
+  <crm-search-display-table search-name="TestSearchForEmail" display-name=""></crm-search-display-table>
+</div>
+<!-- This display is not enclosed in an af-fieldset so this filter will not work. See SearchAfformTest::testRunMultipleSearchForm -->
+<af-field name="location_type_id" />
+<crm-search-display-table filters="{'contact_id.display_name': 'testRunMultipleSearchForm'}" search-name="TestSearchForPhone" display-name=""></crm-search-display-table>
+

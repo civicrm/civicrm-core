@@ -17,6 +17,16 @@
 class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
 
   /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
+   * are some test data issues and some real bugs currently blocking.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
+  /**
    * The id of the financial trxn.
    *
    * @var int
@@ -29,6 +39,15 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    * @var int
    */
   protected $_contributionID;
+
+  /**
+   * Get the related contribution id.
+   *
+   * @return int
+   */
+  public function getContributionID(): int {
+    return $this->_contributionID;
+  }
 
   /**
    * The variable which holds the information of a financial transaction
@@ -67,11 +86,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
-    // Format money fields - localize for display
-    $moneyFields = ['total_amount', 'fee_amount', 'net_amount'];
-    foreach ($moneyFields as $field) {
-      $defaults[$field] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->_values[$field]);
-    }
+    $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->_values['total_amount']);
     return $defaults;
   }
 
@@ -79,7 +94,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    * Build quickForm.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Update Payment details'));
+    $this->setTitle(ts('Update Payment details'));
 
     $paymentFields = $this->getPaymentFields();
     $this->assign('paymentFields', $paymentFields);
@@ -124,7 +139,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param self $self
    *
    * @return bool|array
    *   true if no errors, else array of errors
@@ -133,7 +148,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     $errors = [];
 
     // if Credit Card is chosen and pan_truncation is not NULL ensure that it's value is numeric else throw validation error
-    if (CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'payment_instrument_id', $fields['payment_instrument_id']) == 'Credit Card' &&
+    if (CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'payment_instrument_id', $fields['payment_instrument_id']) === 'Credit Card' &&
       !empty($fields['pan_truncation']) &&
       !CRM_Utils_Rule::numeric($fields['pan_truncation'])
     ) {
@@ -145,8 +160,10 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
 
   /**
    * Process the form submission.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function postProcess() {
+  public function postProcess(): void {
     $params = [
       'id' => $this->_id,
       'payment_instrument_id' => $this->_submitValues['payment_instrument_id'],
@@ -155,20 +172,20 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     ];
 
     $paymentInstrumentName = CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'payment_instrument_id', $params['payment_instrument_id']);
-    if ($paymentInstrumentName == 'Credit Card') {
+    if ($paymentInstrumentName === 'Credit Card') {
       $params['card_type_id'] = $this->_submitValues['card_type_id'] ?? NULL;
       $params['pan_truncation'] = $this->_submitValues['pan_truncation'] ?? NULL;
     }
-    elseif ($paymentInstrumentName == 'Check') {
+    elseif ($paymentInstrumentName === 'Check') {
       $params['check_number'] = $this->_submitValues['check_number'] ?? NULL;
     }
 
     $this->submit($params);
 
-    $contactId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionID, 'contact_id');
+    $contactId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->getContributionID(), 'contact_id');
     $url = CRM_Utils_System::url(
       "civicrm/contact/view/contribution",
-      "reset=1&action=update&id={$this->_contributionID}&cid={$contactId}&context=contribution"
+      "reset=1&action=update&id=" . $this->getContributionID() . "&cid={$contactId}&context=contribution"
     );
     CRM_Core_Session::singleton()->pushUserContext($url);
   }
@@ -178,6 +195,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    *
    * @param array $submittedValues
    *
+   * @throws \CRM_Core_Exception
    */
   protected function submit($submittedValues) {
     // if payment instrument is changed then
@@ -185,44 +203,35 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     //  2. Record a new financial transaction with new payment instrument
     //  3. Add EntityFinancialTrxn records to relate with corresponding financial item and contribution
     if ($submittedValues['payment_instrument_id'] != $this->_values['payment_instrument_id']) {
-      $previousFinanciaTrxn = $this->_values;
+      civicrm_api3('Payment', 'cancel', [
+        'id' => $this->_values['id'],
+        'trxn_date' => $submittedValues['trxn_date'],
+      ]);
+
       $newFinancialTrxn = $submittedValues;
-      unset($previousFinanciaTrxn['id'], $newFinancialTrxn['id']);
-      $previousFinanciaTrxn['trxn_date'] = CRM_Utils_Array::value('trxn_date', $submittedValues, date('YmdHis'));
-      $previousFinanciaTrxn['total_amount'] = -$previousFinanciaTrxn['total_amount'];
-      $previousFinanciaTrxn['net_amount'] = -$previousFinanciaTrxn['net_amount'];
-      $previousFinanciaTrxn['fee_amount'] = -$previousFinanciaTrxn['fee_amount'];
-      $previousFinanciaTrxn['contribution_id'] = $newFinancialTrxn['contribution_id'] = $this->_contributionID;
-
-      $newFinancialTrxn['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($submittedValues['payment_instrument_id']);
-      foreach (['total_amount', 'fee_amount', 'net_amount', 'currency', 'is_payment', 'status_id'] as $fieldName) {
-        $newFinancialTrxn[$fieldName] = $this->_values[$fieldName];
-      }
-
-      foreach ([$previousFinanciaTrxn, $newFinancialTrxn] as $financialTrxnParams) {
-        $financialTrxn = civicrm_api3('FinancialTrxn', 'create', $financialTrxnParams);
-        $trxnParams = [
-          'total_amount' => $financialTrxnParams['total_amount'],
-          'contribution_id' => $this->_contributionID,
-        ];
-        $contributionTotalAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $this->_contributionID, 'total_amount');
-        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($trxnParams, $financialTrxn['id'], $contributionTotalAmount);
-      }
+      unset($newFinancialTrxn['id']);
+      $newFinancialTrxn['to_financial_account_id'] = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($submittedValues['payment_instrument_id']);
+      $newFinancialTrxn['total_amount'] = $this->_values['total_amount'];
+      $newFinancialTrxn['currency'] = $this->_values['currency'];
+      $newFinancialTrxn['contribution_id'] = $this->getContributionID();
+      civicrm_api3('Payment', 'create', $newFinancialTrxn);
     }
     else {
       // simply update the financial trxn
       civicrm_api3('FinancialTrxn', 'create', $submittedValues);
     }
 
-    CRM_Financial_BAO_Payment::updateRelatedContribution($submittedValues, $this->_contributionID);
+    CRM_Financial_BAO_Payment::updateRelatedContribution($submittedValues, $this->getContributionID());
   }
 
   /**
    * Wrapper for unit testing the post process submit function.
    *
    * @param array $params
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testSubmit($params) {
+  public function testSubmit(array $params): void {
     $this->_id = $params['id'];
     $this->_contributionID = $params['contribution_id'];
     $this->_values = civicrm_api3('FinancialTrxn', 'getsingle', ['id' => $params['id']]);

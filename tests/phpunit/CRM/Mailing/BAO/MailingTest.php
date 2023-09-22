@@ -16,14 +16,10 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
   protected $allowedContactId = 0;
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function tearDown() {
+  public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
-      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+      $this->disableMultilingual();
     }
     parent::tearDown();
   }
@@ -33,7 +29,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * match the expected list
    *
    * @param $mailingID
-   * @param $expectedRecipients array
+   * @param array $expectedRecipients
    *   Array of contact ID that should be in the recipient list.
    */
   private function assertRecipientsCorrect($mailingID, $expectedRecipients) {
@@ -59,9 +55,10 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * @param $mailingID
    * @param $groupID
    * @param string $type
+   *
    * @return array|int
    */
-  private function createMailingGroup($mailingID, $groupID, $type = 'Include') {
+  private function createMailingGroup($mailingID, $groupID, string $type = 'Include') {
     return $this->callAPISuccess('MailingGroup', 'create', [
       'mailing_id' => $mailingID,
       'group_type' => $type,
@@ -73,7 +70,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   /**
    * Test to ensure that using ACL permitted contacts are correctly fetched for bulk mailing
    */
-  public function testgetRecipientsUsingACL() {
+  public function testgetRecipientsUsingACL(): void {
     $this->prepareForACLs();
     $this->createLoggedInUser();
     // create hook to build ACL where clause which choses $this->allowedContactId as the only contact to be considered as mail recipient
@@ -81,7 +78,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view my contact'];
 
     // Create dummy group and assign 2 contacts
-    $name = 'Test static group ' . substr(sha1(rand()), 0, 7);
+    $name = 'Test static group 1';
     $groupID = $this->groupCreate([
       'name' => $name,
       'title' => $name,
@@ -115,20 +112,16 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test mailing receipients when using previous mailing as include and contact is in exclude as well
+   * Test mailing recipients when using previous mailing as include and contact is in exclude as well
    */
-  public function testMailingIncludePreviousMailingExcludeGroup() {
-    $groupName = 'Test static group ' . substr(sha1(rand()), 0, 7);
-    $groupName2 = 'Test static group 2' . substr(sha1(rand()), 0, 7);
+  public function testMailingIncludePreviousMailingExcludeGroup(): void {
     $groupID = $this->groupCreate([
-      'name' => $groupName,
-      'title' => $groupName,
-      'is_active' => 1,
+      'name' => 'Test static group 1',
+      'title' => 'Test static group 1',
     ]);
     $groupID2 = $this->groupCreate([
-      'name' => $groupName2,
-      'title' => $groupName2,
-      'is_active' => 1,
+      'name' => 'Test static group 2',
+      'title' => 'Test static group 2',
     ]);
     $contactID = $this->individualCreate([], 0);
     $contactID2 = $this->individualCreate([], 2);
@@ -170,7 +163,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   /**
    * Test verify that a disabled mailing group doesn't prvent access to the mailing generated with the group.
    */
-  public function testGetMailingDisabledGroup() {
+  public function testGetMailingDisabledGroup(): void {
     $this->prepareForACLs();
     $this->createLoggedInUser();
     // create hook to build ACL where clause which choses $this->allowedContactId as the only contact to be considered as mail recipient
@@ -232,6 +225,9 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * @param array $currentGroups
    */
   public function hook_civicrm_aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
+    if ($tableName !== 'civicrm_group') {
+      return;
+    }
     //don't use api - you will get a loop
     $sql = " SELECT * FROM civicrm_group";
     $groups = [];
@@ -274,9 +270,26 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * contact 8 : smart 5 (base)
    *
    * here 'contact 1 : static 0 (inc)' identified as static group $groupIDs[0]
-   *  that has 'contact 1' identified as $contactIDs[0] and Included in the mailing recipient list
+   *  that has 'contact 1' identified as $contactIDs[0] and Included in the
+   * mailing recipient list
+   *
+   * @throws \CRM_Core_Exception
+   * @group locale
    */
-  public function testgetRecipientsEmailGroupIncludeExclude() {
+  public function testGetRecipientsEmailGroupIncludeExclude(): void {
+    // Create contacts
+    $contactIDs = [
+      $this->individualCreate(['last_name' => 'smart5'], 0),
+      $this->individualCreate([], 1),
+      $this->individualCreate([], 2),
+      $this->individualCreate([], 3),
+      $this->individualCreate(['last_name' => 'smart3'], 4),
+      $this->individualCreate(['last_name' => 'smart3'], 5),
+      $this->individualCreate(['last_name' => 'smart4'], 6),
+      $this->individualCreate(['last_name' => 'smart4'], 7),
+      $this->individualCreate(['last_name' => 'smart5'], 8),
+    ];
+
     // Set up groups; 3 standard, 4 smart
     $groupIDs = [];
     for ($i = 0; $i < 7; $i++) {
@@ -294,19 +307,6 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
         ], $params);
       }
     }
-
-    // Create contacts
-    $contactIDs = [
-      $this->individualCreate(['last_name' => 'smart5'], 0),
-      $this->individualCreate([], 1),
-      $this->individualCreate([], 2),
-      $this->individualCreate([], 3),
-      $this->individualCreate(['last_name' => 'smart3'], 4),
-      $this->individualCreate(['last_name' => 'smart3'], 5),
-      $this->individualCreate(['last_name' => 'smart4'], 6),
-      $this->individualCreate(['last_name' => 'smart4'], 7),
-      $this->individualCreate(['last_name' => 'smart5'], 8),
-    ];
 
     // Add contacts to static groups
     $this->callAPISuccess('GroupContact', 'Create', [
@@ -335,7 +335,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       $group = new CRM_Contact_DAO_Group();
       $group->id = $groupIDs[$i];
       $group->find(TRUE);
-      CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+      CRM_Contact_BAO_GroupContactCache::load($group);
     }
 
     // Check that we can include static groups in the mailing.
@@ -408,7 +408,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   /**
    * Test That No BUlk Emails User Optt Out is resepected when constructing a mailing
    */
-  public function testGetReceipientNoBulkEmails() {
+  public function testGetReceipientNoBulkEmails(): void {
     // Set up groups; 3 standard, 4 smart
     $groupIDs = [];
     $params = [
@@ -451,7 +451,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   /**
    * Test CRM_Mailing_BAO_Mailing::getRecipients() on sms mode
    */
-  public function testgetRecipientsSMS() {
+  public function testgetRecipientsSMS(): void {
     // Tests for SMS bulk mailing recipients
     // +CRM-21320 Ensure primary mobile number is selected over non-primary
     // +core/384 Ensure that a secondary mobile number is selected if the primary can not receive SMS
@@ -582,7 +582,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    *  1. In the first call we will modify the mailing filter to include only deceased recipients
    *  2. In the second call we will check if only deceased recipient is populated in MailingRecipient table
    */
-  public function testAlterMailingRecipientsHook() {
+  public function testAlterMailingRecipientsHook(): void {
     $groupID = $this->groupCreate();
     $this->tagCreate(['name' => 'Tagged']);
 

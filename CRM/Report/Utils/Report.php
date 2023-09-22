@@ -59,7 +59,7 @@ class CRM_Report_Utils_Report {
   }
 
   /**
-   * @param $optionVal
+   * @param string $optionVal
    *
    * @return mixed
    */
@@ -100,7 +100,7 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
   }
 
   /**
-   * @param $urlValue
+   * @param string $urlValue
    * @param string $query
    * @param bool $absolute
    * @param int $instanceID
@@ -137,7 +137,7 @@ WHERE  TRIM(BOTH '/' FROM CONCAT(report_id, '/', name)) = %1";
 
   /**
    * get instance count for a template.
-   * @param $optionVal
+   * @param string $optionVal
    *
    * @return int|null|string
    */
@@ -200,7 +200,7 @@ WHERE  inst.report_id = %1";
 
   /**
    * @param CRM_Core_Form $form
-   * @param $rows
+   * @param array $rows
    */
   public static function export2csv(&$form, &$rows) {
     //Mark as a CSV file.
@@ -209,10 +209,6 @@ WHERE  inst.report_id = %1";
     //Force a download and name the file using the current timestamp.
     $datetime = date('Ymd-Gi', $_SERVER['REQUEST_TIME']);
     CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename=Report_' . $datetime . '.csv');
-    // Output UTF BOM so that MS Excel copes with diacritics. This is recommended as
-    // the Windows variant but is tested with MS Excel for Mac (Office 365 v 16.31)
-    // and it continues to work on Libre Office, Numbers, Notes etc.
-    echo "\xEF\xBB\xBF";
     echo self::makeCsv($form, $rows);
     CRM_Utils_System::civiExit();
   }
@@ -228,7 +224,11 @@ WHERE  inst.report_id = %1";
    */
   public static function makeCsv(&$form, &$rows) {
     $config = CRM_Core_Config::singleton();
-    $csv = '';
+
+    // Output UTF BOM so that MS Excel copes with diacritics. This is recommended as
+    // the Windows variant but is tested with MS Excel for Mac (Office 365 v 16.31)
+    // and it continues to work on Libre Office, Numbers, Notes etc.
+    $csv = "\xEF\xBB\xBF";
 
     // Add headers if this is the first row.
     $columnHeaders = array_keys($form->_columnHeaders);
@@ -253,13 +253,13 @@ WHERE  inst.report_id = %1";
           // Remove HTML, unencode entities, and escape quotation marks.
           $value = str_replace('"', '""', html_entity_decode(strip_tags($value), ENT_QUOTES | ENT_HTML401));
 
-          if (CRM_Utils_Array::value('type', $form->_columnHeaders[$v]) & 4) {
-            if (CRM_Utils_Array::value('group_by', $form->_columnHeaders[$v]) == 'MONTH' ||
-              CRM_Utils_Array::value('group_by', $form->_columnHeaders[$v]) == 'QUARTER'
+          if (($form->_columnHeaders[$v]['type'] ?? 0) & 4) {
+            if (($form->_columnHeaders[$v]['group_by'] ?? NULL) == 'MONTH' ||
+              ($form->_columnHeaders[$v]['group_by'] ?? NULL) == 'QUARTER'
             ) {
               $value = CRM_Utils_Date::customFormat($value, $config->dateformatPartial);
             }
-            elseif (CRM_Utils_Array::value('group_by', $form->_columnHeaders[$v]) == 'YEAR') {
+            elseif (($form->_columnHeaders[$v]['group_by'] ?? NULL) == 'YEAR') {
               $value = CRM_Utils_Date::customFormat($value, $config->dateformatYear);
             }
             elseif ($form->_columnHeaders[$v]['type'] == 12) {
@@ -272,7 +272,7 @@ WHERE  inst.report_id = %1";
           }
           // Note the reference to a specific field does not belong in this generic class & does not work on all reports.
           // @todo - fix this properly rather than just supressing the en-otice. Repeat transaction report is a good example.
-          elseif (CRM_Utils_Array::value('type', $form->_columnHeaders[$v]) == 1024 && !empty($row['civicrm_contribution_currency'])) {
+          elseif (($form->_columnHeaders[$v]['type'] ?? NULL) == 1024 && !empty($row['civicrm_contribution_currency'])) {
             $value = CRM_Utils_Money::format($value, $row['civicrm_contribution_currency']);
           }
           $displayRows[$v] = '"' . $value . '"';
@@ -394,46 +394,50 @@ WHERE  inst.report_id = %1";
     $_REQUEST['reset'] = CRM_Utils_Array::value('reset', $params, 1);
 
     $optionVal = self::getValueFromUrl($instanceId);
-    $messages = ["Report Mail Triggered..."];
-
-    $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', $optionVal, 'value');
-    $obj = new CRM_Report_Page_Instance();
-    $is_error = 0;
-    if (strstr(CRM_Utils_Array::value('name', $templateInfo), '_Form')) {
-      $instanceInfo = [];
-      CRM_Report_BAO_ReportInstance::retrieve(['id' => $instanceId], $instanceInfo);
-
-      if (!empty($instanceInfo['title'])) {
-        $obj->assign('reportTitle', $instanceInfo['title']);
-      }
-      else {
-        $obj->assign('reportTitle', $templateInfo['label']);
-      }
-
-      $wrapper = new CRM_Utils_Wrapper();
-      $arguments = [
-        'urlToSession' => [
-          [
-            'urlVar' => 'instanceId',
-            'type' => 'Positive',
-            'sessionVar' => 'instanceId',
-            'default' => 'null',
-          ],
-        ],
-        'ignoreKey' => TRUE,
-      ];
-      $messages[] = $wrapper->run($templateInfo['name'], NULL, $arguments);
+    $messages = ['Report Mail Triggered...'];
+    if (empty($optionVal)) {
+      $is_error = 1;
+      $messages[] = 'Did not find a valid instance to execute';
     }
     else {
-      $is_error = 1;
-      if (!$instanceId) {
-        $messages[] = 'Required parameter missing: instanceId';
+      $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', $optionVal, 'value');
+      $obj = new CRM_Report_Page_Instance();
+      $is_error = 0;
+      if (strstr(CRM_Utils_Array::value('name', $templateInfo), '_Form')) {
+        $instanceInfo = [];
+        CRM_Report_BAO_ReportInstance::retrieve(['id' => $instanceId], $instanceInfo);
+
+        if (!empty($instanceInfo['title'])) {
+          $obj->assign('reportTitle', $instanceInfo['title']);
+        }
+        else {
+          $obj->assign('reportTitle', $templateInfo['label']);
+        }
+
+        $wrapper = new CRM_Utils_Wrapper();
+        $arguments = [
+          'urlToSession' => [
+            [
+              'urlVar' => 'instanceId',
+              'type' => 'Positive',
+              'sessionVar' => 'instanceId',
+              'default' => 'null',
+            ],
+          ],
+          'ignoreKey' => TRUE,
+        ];
+        $messages[] = $wrapper->run($templateInfo['name'], NULL, $arguments);
       }
       else {
-        $messages[] = 'Did not find valid instance to execute';
+        $is_error = 1;
+        if (!$instanceId) {
+          $messages[] = 'Required parameter missing: instanceId';
+        }
+        else {
+          $messages[] = 'Did not find valid instance to execute';
+        }
       }
     }
-
     $result = [
       'is_error' => $is_error,
       'messages' => implode("\n", $messages),
@@ -524,7 +528,7 @@ WHERE  inst.report_id = %1";
   }
 
   /**
-   * @param $reportUrl
+   * @param string $reportUrl
    *
    * @return mixed
    */

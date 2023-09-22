@@ -10,12 +10,12 @@
 
 {if !$hasCampaigns}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     &nbsp;
     {ts}None found.{/ts}
   </div>
   <div class="action-link">
-    {crmButton p="civicrm/campaign/add" q="reset=1" icon="crm-i fa-plus-circle" h=0}{ts}Add Campaign{/ts}{/crmButton}
+    {crmButton p="civicrm/campaign/add" q="reset=1" icon="plus-circle" h=0}{ts}Add Campaign{/ts}{/crmButton}
   </div>
 {elseif $buildSelector}
 
@@ -52,7 +52,7 @@
   </table>
 {else}
   <div class="action-link">
-    {crmButton p="civicrm/campaign/add" q="reset=1" icon="crm-i fa-plus-circle" h=0}{ts}Add Campaign{/ts}{/crmButton}
+    {crmButton p="civicrm/campaign/add" q="reset=1" icon="plus-circle" h=0}{ts}Add Campaign{/ts}{/crmButton}
   </div>
 {* build search form here *}
 
@@ -144,13 +144,13 @@
   };
 
   window.loadCampaignList = function() {
-    var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_Campaign_Page_AJAX&fnName=campaignList' }"{literal};
+    var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_Campaign_Page_AJAX&fnName=campaignList'}"{literal};
 
     //build the search qill.
     //get the search criteria.
-    var searchParams = {/literal}{$searchParams}{literal};
-    var campaignTypes = {/literal}{$campaignTypes}{literal};
-    var campaignStatus = {/literal}{$campaignStatus}{literal};
+    var searchParams = {/literal}{$searchParams|smarty:nodefaults}{literal};
+    var campaignTypes = {/literal}{$campaignTypes|smarty:nodefaults}{literal};
+    var campaignStatus = {/literal}{$campaignStatus|smarty:nodefaults}{literal};
     var noRecordFoundMsg = '{/literal}{ts escape='js'}No matches found for:{/ts}{literal}';
     noRecordFoundMsg += '<div class="qill">';
 
@@ -226,7 +226,7 @@
         var searchCriteria = [];
 
         //get the search criteria.
-        var searchParams = {/literal}{$searchParams}{literal};
+        var searchParams = {/literal}{$searchParams|smarty:nodefaults}{literal};
         for (param in searchParams) {
           fldName = param;
           if (param == 'campaign_title') {

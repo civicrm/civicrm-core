@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/messageTemplates</path>
+    <page_callback>CRM_MessageAdmin_Page_MsgtplBasePage</page_callback>
+    <title>MsgtplBasePage</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

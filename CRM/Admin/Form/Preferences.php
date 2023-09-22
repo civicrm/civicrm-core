@@ -83,6 +83,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->assign('entityInClassFormat', 'setting');
 
     $this->addButtons([
       [
@@ -122,12 +123,9 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
       $this->saveMetadataDefinedSettings($this->_params);
       $this->filterParamsSetByMetadata($this->_params);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       CRM_Core_Session::setStatus($e->getMessage(), ts('Save Failed'), 'error');
     }
-
-    // Update any settings stored in dynamic js
-    CRM_Core_Resources::singleton()->resetCacheCode();
 
     CRM_Core_Session::setStatus(ts('Your changes have been saved.'), ts('Saved'), 'success');
   }

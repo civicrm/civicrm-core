@@ -23,12 +23,12 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
     'civicrm_contribution',
   ];
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->quickCleanup($this->_tablesToTruncate);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_activity_temp_target');
   }
@@ -36,7 +36,7 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
   /**
    * Ensure long custom field names don't result in errors.
    */
-  public function testLongCustomFieldNames() {
+  public function testLongCustomFieldNames(): void {
     // Create custom group with long name and custom field with long name.
     $long_name = 'this is a very very very very long name with 65 characters in it';
     $group_params = [
@@ -67,7 +67,7 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
   /**
    * Ensure that activity detail report only shows addres fields of target contact
    */
-  public function testTargetAddressFields() {
+  public function testTargetAddressFields(): void {
     $countryNames = array_flip(CRM_Core_PseudoConstant::country());
     // Create contact 1 and 2 with address fields, later considered as target contacts for activity
     $contactID1 = $this->individualCreate([

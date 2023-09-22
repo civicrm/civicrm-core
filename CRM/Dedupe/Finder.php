@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -41,7 +39,7 @@ class CRM_Dedupe_Finder {
    * @throws \CRM_Core_Exception
    */
   public static function dupes($rgid, $cids = [], $checkPermissions = TRUE) {
-    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+    $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
     $rgBao->id = $rgid;
     $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
@@ -49,13 +47,12 @@ class CRM_Dedupe_Finder {
     }
 
     $rgBao->fillTable();
-    $dao = new CRM_Core_DAO();
-    $dao->query($rgBao->thresholdQuery($checkPermissions));
+    $dao = CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($checkPermissions));
     $dupes = [];
     while ($dao->fetch()) {
       $dupes[] = [$dao->id1, $dao->id2, $dao->weight];
     }
-    $dao->query($rgBao->tableDropQuery());
+    CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
 
     return $dupes;
   }
@@ -96,13 +93,13 @@ class CRM_Dedupe_Finder {
     if (!$params) {
       return [];
     }
-    $checkPermission = CRM_Utils_Array::value('check_permission', $params, TRUE);
+    $checkPermission = $params['check_permission'] ?? TRUE;
     // This may no longer be required - see https://github.com/civicrm/civicrm-core/pull/13176
     $params = array_filter($params);
 
     $foundByID = FALSE;
     if ($ruleGroupID) {
-      $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+      $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
       $rgBao->id = $ruleGroupID;
       $rgBao->contact_type = $ctype;
       if ($rgBao->find(TRUE)) {
@@ -111,7 +108,7 @@ class CRM_Dedupe_Finder {
     }
 
     if (!$foundByID) {
-      $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+      $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
       $rgBao->contact_type = $ctype;
       $rgBao->used = $used;
       if (!$rgBao->find(TRUE)) {
@@ -125,15 +122,15 @@ class CRM_Dedupe_Finder {
     }
     $rgBao->params = $params;
     $rgBao->fillTable();
-    $dao = new CRM_Core_DAO();
-    $dao->query($rgBao->thresholdQuery($checkPermission));
+
+    $dao = CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($checkPermission));
     $dupes = [];
     while ($dao->fetch()) {
       if (isset($dao->id) && $dao->id) {
         $dupes[] = $dao->id;
       }
     }
-    $dao->query($rgBao->tableDropQuery());
+    CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
     return array_diff($dupes, $except);
   }
 
@@ -223,7 +220,11 @@ class CRM_Dedupe_Finder {
     }
 
     // handle custom data
-    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1);
+
+    $subTypes = $fields['contact_sub_type'] ?? [];
+    // Only return custom for subType + unrestricted or return all custom
+    // fields.
+    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, $subTypes, NULL, TRUE, NULL, TRUE);
     CRM_Core_BAO_CustomGroup::postProcess($tree, $fields, TRUE);
     foreach ($tree as $key => $cg) {
       if (!is_int($key)) {
@@ -252,7 +253,7 @@ class CRM_Dedupe_Finder {
     // the -digit to civicrm_address.location_type_id and -Primary to civicrm_address.is_primary
     foreach ($flat as $key => $value) {
       $matches = [];
-      if (preg_match('/(.*)-(Primary-[\d+])$|(.*)-(\d+|Primary)$/', $key, $matches)) {
+      if (preg_match('/(.*)-(Primary-[\d+])$|(.*)-(\d+-\d+)$|(.*)-(\d+|Primary)$/', $key, $matches)) {
         $return = array_values(array_filter($matches));
         // make sure the first occurrence is kept, not the last
         $flat[$return[1]] = empty($flat[$return[1]]) ? $value : $flat[$return[1]];
@@ -261,39 +262,37 @@ class CRM_Dedupe_Finder {
     }
 
     $params = [];
-    $supportedFields = CRM_Dedupe_BAO_RuleGroup::supportedFields($ctype);
-    if (is_array($supportedFields)) {
-      foreach ($supportedFields as $table => $fields) {
-        if ($table === 'civicrm_address') {
-          // for matching on civicrm_address fields, we also need the location_type_id
-          $fields['location_type_id'] = '';
-          // FIXME: we also need to do some hacking for id and name fields, see CRM-3902’s comments
-          $fixes = [
-            'address_name' => 'name',
-            'country' => 'country_id',
-            'state_province' => 'state_province_id',
-            'county' => 'county_id',
-          ];
-          foreach ($fixes as $orig => $target) {
-            if (!empty($flat[$orig])) {
-              $params[$table][$target] = $flat[$orig];
-            }
+
+    foreach (CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields($ctype) as $table => $fields) {
+      if ($table === 'civicrm_address') {
+        // for matching on civicrm_address fields, we also need the location_type_id
+        $fields['location_type_id'] = '';
+        // FIXME: we also need to do some hacking for id and name fields, see CRM-3902’s comments
+        $fixes = [
+          'address_name' => 'name',
+          'country' => 'country_id',
+          'state_province' => 'state_province_id',
+          'county' => 'county_id',
+        ];
+        foreach ($fixes as $orig => $target) {
+          if (!empty($flat[$orig])) {
+            $params[$table][$target] = $flat[$orig];
           }
         }
-        if ($table === 'civicrm_phone') {
-          $fixes = [
-            'phone' => 'phone_numeric',
-          ];
-          foreach ($fixes as $orig => $target) {
-            if (!empty($flat[$orig])) {
-              $params[$table][$target] = $flat[$orig];
-            }
+      }
+      if ($table === 'civicrm_phone') {
+        $fixes = [
+          'phone' => 'phone_numeric',
+        ];
+        foreach ($fixes as $orig => $target) {
+          if (!empty($flat[$orig])) {
+            $params[$table][$target] = $flat[$orig];
           }
         }
-        foreach ($fields as $field => $title) {
-          if (!empty($flat[$field])) {
-            $params[$table][$field] = $flat[$field];
-          }
+      }
+      foreach ($fields as $field => $title) {
+        if (!empty($flat[$field])) {
+          $params[$table][$field] = $flat[$field];
         }
       }
     }

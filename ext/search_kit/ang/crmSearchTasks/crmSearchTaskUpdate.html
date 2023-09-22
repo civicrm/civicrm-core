@@ -1,0 +1,19 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form name="crmSearchTaskUpdateForm" ng-controller="crmSearchTaskUpdate as $ctrl">
+    <p><strong>{{:: ts('Update the %1 selected %2 with the following values:', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
+    <div class="form-inline" ng-repeat="clause in $ctrl.values" >
+      <input class="form-control" ng-change="$ctrl.updateField($index)" ng-disabled="$ctrl.run" ng-model="clause[0]" crm-ui-select="{data: $ctrl.availableFields, allowClear: true, placeholder: 'Field'}" />
+      <crm-search-input class="form-group" ng-model="clause[1]" field="$ctrl.getField(clause[0])" ></crm-search-input>
+    </div>
+    <div class="form-inline" ng-hide="$ctrl.run">
+      <input class="form-control twenty" style="width: 15em;" ng-model="$ctrl.add" ng-change="$ctrl.addField()" ng-disabled="!$ctrl.fields" ng-class="{loading: !$ctrl.fields}" crm-ui-select="{data: $ctrl.availableFields, placeholder: ts('Add Value')}"/>
+    </div>
+    <div ng-if="$ctrl.run" class="crm-search-task-progress">
+      <h5>{{:: ts('Updating %1 %2...', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</h5>
+      <crm-search-batch-runner entity="model.entity" action="update" params="$ctrl.run" ids="model.ids" success="$ctrl.onSuccess()" error="$ctrl.onError()" ></crm-search-batch-runner>
+    </div>
+
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" ></crm-dialog-button>
+    <crm-dialog-button text="ts('Update %1', {1: $ctrl.entityTitle})" icons="{primary: $ctrl.run ? 'fa-spin fa-spinner' : 'fa-check'}" on-click="$ctrl.save()" disabled="!$ctrl.values.length || $ctrl.run || !crmSearchTaskUpdateForm.$valid" ></crm-dialog-button>
+  </form>
+</div>

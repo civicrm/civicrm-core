@@ -27,10 +27,11 @@
       <is_required>1</is_required>
       <is_searchable>0</is_searchable>
       <is_search_range>0</is_search_range>
-      <weight>4</weight>
+      <weight>1</weight>
       <is_active>1</is_active>
       <is_view>0</is_view>
       <column_name>name1_1</column_name>
+      <serialize>0</serialize>
       <in_selector>0</in_selector>
       <custom_group_name>example</custom_group_name>
     </CustomField>

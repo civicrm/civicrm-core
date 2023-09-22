@@ -54,7 +54,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
 
     $this->_id = CRM_Utils_Request::retrieve('ppId', 'Positive', $this);
 
-    CRM_Utils_System::setTitle(ts('Edit Scheduled Pledge Payment'));
+    $this->setTitle(ts('Edit Scheduled Pledge Payment'));
   }
 
   /**
@@ -137,7 +137,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     $pledgeId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment', $params['id'], 'pledge_id');
 
     CRM_Pledge_BAO_PledgePayment::add($params);
-    $adjustTotalAmount = (CRM_Utils_Array::value('option_type', $formValues) == 2);
+    $adjustTotalAmount = (($formValues['option_type'] ?? NULL) == 2);
 
     $pledgeScheduledAmount = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
       $params['id'],

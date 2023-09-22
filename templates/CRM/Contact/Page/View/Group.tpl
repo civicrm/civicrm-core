@@ -16,7 +16,7 @@
 <div id="groupContact">
  <p>
     <div class="form-item">
-    {if $groupCount > 0 }
+    {if $groupCount > 0}
        <table>
        <tr class="columnheader"><th>{ts}Group Listings{/ts}</th><th>{ts}In Date{/ts}</th><th>{ts}Out Date{/ts}</th><th></th></tr>
        {foreach from=$groupContact item=row}
@@ -30,7 +30,7 @@
        </table>
      {else}
      <div class="messages status no-popup">
-     <div class="icon inform-icon"></div> &nbsp;
+     {icon icon="fa-info-circle"}{/icon}
       {ts}This contact does not belong to any groups.{/ts}
      </div>
      {/if}

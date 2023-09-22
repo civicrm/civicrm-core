@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>UserJob</class>
+  <name>civicrm_user_job</name>
+  <comment>Tracking for user jobs (eg. imports).</comment>
+  <add>5.50</add>
+  <log>false</log>
+  <paths>
+    <view>civicrm/import/contact/summary?reset=1&amp;user_job_id=[id]</view>
+  </paths>
+  <field>
+    <name>id</name>
+    <title>User Job ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Job ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+    <add>5.50</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>User job name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Unique name for job.</comment>
+    <add>5.50</add>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>5.50</add>
+  </index>
+  <field>
+    <name>created_id</name>
+    <type>int unsigned</type>
+    <title>Created By Contact ID</title>
+    <comment>FK to contact table.</comment>
+    <html>
+      <label>Created By</label>
+    </html>
+    <add>5.50</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>5.50</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
+    <required>true</required>
+    <title>Import Job Created Date</title>
+    <readonly>true</readonly>
+    <comment>Date and time this job was created.</comment>
+    <add>5.50</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
+  </field>
+  <field>
+    <name>start_date</name>
+    <type>timestamp</type>
+    <required>false</required>
+    <title>Import Job Started Date</title>
+    <comment>Date and time this import job started.</comment>
+    <add>5.50</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
+    <readonly>true</readonly>
+  </field>
+  <field>
+    <name>end_date</name>
+    <type>timestamp</type>
+    <required>false</required>
+    <title>Job Ended Date</title>
+    <comment>Date and time this import job ended.</comment>
+    <add>5.50</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
+  </field>
+  <field>
+    <name>expires_date</name>
+    <type>timestamp</type>
+    <required>false</required>
+    <title>Import Job Expires Date</title>
+    <comment>Date and time to clean up after this import job (temp table deletion date).</comment>
+    <add>5.50</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
+  </field>
+  <field>
+    <name>status_id</name>
+    <title>User Job Status ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <html>
+      <label>Job Status</label>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_UserJob::getStatuses</callback>
+    </pseudoconstant>
+    <add>5.50</add>
+  </field>
+  <field>
+    <name>job_type</name>
+    <title>User Job Type</title>
+    <type>varchar</type>
+    <comment>Name of the job type, which will allow finding the correct class</comment>
+    <required>true</required>
+    <length>64</length>
+    <html>
+      <label>Job Type</label>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_UserJob::getTypes</callback>
+      <suffixes>name,label,url</suffixes>
+    </pseudoconstant>
+    <add>5.50</add>
+  </field>
+  <field>
+    <name>queue_id</name>
+    <title>Queue ID</title>
+    <type>int unsigned</type>
+    <comment>FK to Queue</comment>
+    <html>
+      <label>Queue</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>queue_id</name>
+    <table>civicrm_queue</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>metadata</name>
+    <type>text</type>
+    <title>Job metadata</title>
+    <comment>Data pertaining to job configuration</comment>
+    <serialize>JSON</serialize>
+    <add>5.50</add>
+  </field>
+  <field>
+    <name>is_template</name>
+    <title>Is Template</title>
+    <type>boolean</type>
+    <required>true</required>
+    <default>0</default>
+    <comment>Is this a template configuration (for use by other/future jobs)?</comment>
+    <html>
+      <type>CheckBox</type>
+      <label>Is Template</label>
+    </html>
+    <add>5.51</add>
+  </field>
+</table>

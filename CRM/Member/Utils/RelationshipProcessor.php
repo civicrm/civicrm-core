@@ -38,10 +38,10 @@ class CRM_Member_Utils_RelationshipProcessor {
   /**
    * CRM_Member_Utils_RelationshipProcessor constructor.
    *
-   * @param [int] $contactIDs
+   * @param int[] $contactIDs
    * @param bool $active
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function __construct($contactIDs, $active) {
     $this->contactIDs = $contactIDs;
@@ -72,7 +72,7 @@ class CRM_Member_Utils_RelationshipProcessor {
    * We are looking at relationships that are potentially inheritable
    * so we can filter out membership types with NULL relationship_type_id
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setMemberships() {
     $return = array_keys(civicrm_api3('Membership', 'getfields', [])['values']);

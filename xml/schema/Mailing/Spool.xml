@@ -5,11 +5,15 @@
   <class>Spool</class>
   <name>civicrm_mailing_spool</name>
   <comment>Stores the outbond mails</comment>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Spool ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -17,10 +21,13 @@
   </primaryKey>
   <field>
     <name>job_id</name>
-    <title>Mailing Job</title>
+    <title>Job ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>The ID of the Job .</comment>
+    <html>
+      <label>Job</label>
+    </html>
   </field>
   <foreignKey>
     <name>job_id</name>

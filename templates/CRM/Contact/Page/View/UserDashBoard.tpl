@@ -21,10 +21,10 @@
   {/if}
 
   {foreach from=$dashboardElements item=element}
-    <tr{if isset($element.class)} class="{$element.class}"{/if}>
+    <tr{if $element.class} class="{$element.class}"{/if}>
       <td>
         <div class="header-dark">{$element.sectionTitle}</div>
-        {include file=$element.templatePath}
+        {include file=$element.templatePath context="user"}
       </td>
     </tr>
   {/foreach}

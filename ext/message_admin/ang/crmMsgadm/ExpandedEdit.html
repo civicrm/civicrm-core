@@ -1,0 +1,42 @@
+<div id="bootstrap-theme" crm-dialog="expandedEditDlg" ng-controller="MsgtpluiGenericCtrl">
+
+  <form name="expandedEditForm">
+
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <div class="navbar-brand">
+            {{::model.title}}
+          </div>
+        </div>
+        <div class="navbar-form navbar-right">
+          <div class="form-group">
+            <button type="button" class="btn btn-default" ng-click="model.openPreview({formatName: model.field})">
+              <i class="crm-i fa-eye"></i>
+              {{ ::ts('Preview') }}
+            </button>
+
+            <input class="form-control crm-action-menu fa-code"
+                   tabindex="-1"
+                   style="z-index:1"
+                   crm-ui-select="{placeholder: ts('Token'), data: model.tokenList, width: '12em', dropdownAutoWidth: true}"
+                   on-crm-ui-select="$broadcast('insert:expanded', selection)"
+            />
+
+            <button type="button" class="btn btn-default" ng-click="expandedEditDlg.close()">
+              <i class="crm-i fa-times"></i>
+              {{ ::ts('Close') }}
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div ng-model="model.record[model.field]"
+         crm-monaco="model.monacoOptions"
+         crm-monaco-insert-rx="insert:expanded"
+    ></div>
+  </form>
+
+</div>

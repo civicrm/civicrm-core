@@ -13,6 +13,7 @@
 <xi:include href="GroupOrganization.xml"    parse="xml" />
 <xi:include href="Relationship.xml"         parse="xml" />
 <xi:include href="RelationshipType.xml"     parse="xml" />
+<xi:include href="RelationshipCache.xml"    parse="xml" />
 <xi:include href="SavedSearch.xml"          parse="xml" />
 <xi:include href="ContactType.xml"          parse="xml" />
 

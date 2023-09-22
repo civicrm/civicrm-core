@@ -13,16 +13,31 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
 
   /**
-   * Class constructor.
+   * Get a list of setup-actions.
+   *
+   * @return array
+   *   List of available actions. See description in the hook-docs.
+   * @see CRM_Utils_Hook::mailSetupActions()
    */
-  public function __construct() {
-    parent::__construct();
+  public static function getSetupActions() {
+    $setupActions = [];
+    $setupActions['standard'] = [
+      'title' => ts('Standard Mail Account'),
+      'callback' => ['CRM_Core_BAO_MailSettings', 'setupStandardAccount'],
+    ];
+
+    CRM_Utils_Hook::mailSetupActions($setupActions);
+    return $setupActions;
+  }
+
+  public static function setupStandardAccount($setupAction) {
+    return [
+      'url' => CRM_Utils_System::url('civicrm/admin/mailSettings/edit', 'action=add&reset=1', TRUE, NULL, FALSE),
+    ];
   }
 
   /**
@@ -88,28 +103,14 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
-   * Retrieve DB object based on input parameters.
-   *
-   * It also stores all the retrieved values in the default array.
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
-   *
-   * @return CRM_Core_BAO_MailSettings
+   * @return self|null
    */
-  public static function retrieve(&$params, &$defaults) {
-    $mailSettings = new CRM_Core_DAO_MailSettings();
-    $mailSettings->copyValues($params);
-
-    $result = NULL;
-    if ($mailSettings->find(TRUE)) {
-      CRM_Core_DAO::storeValues($mailSettings, $defaults);
-      $result = $mailSettings;
-    }
-
-    return $result;
+  public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -119,7 +120,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *   Reference array contains the values submitted by the form.
    *
    *
-   * @return object
+   * @return CRM_Core_DAO_MailSettings
    */
   public static function add(&$params) {
     $result = NULL;
@@ -152,7 +153,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_BAO_MailSettings
+   * @return CRM_Core_DAO_MailSettings|CRM_Core_Error
    */
   public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();

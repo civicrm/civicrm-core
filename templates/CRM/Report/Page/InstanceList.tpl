@@ -22,7 +22,7 @@
       {foreach from=$list item=rows key=report}
         <div class="crm-accordion-wrapper crm-accordion_{$report}-accordion ">
           <div class="crm-accordion-header">
-            {if $title}{$title}{elseif $report EQ 'Contribute'}{ts}Contribution Reports{/ts}{else}{ts}{$report} Reports{/ts}{/if}</a>
+            {if $title}{$title}{elseif $report EQ 'Contribute'}{ts}Contribution Reports{/ts}{else}{ts 1=$report}%1 Reports{/ts}{/if}</a>
           </div><!-- /.crm-accordion-header -->
           <div class="crm-accordion-body">
             <div id="{$report}" class="boxBlock">
@@ -33,7 +33,7 @@
                     <td class="crm-report-instanceList-description">{$row.description}</td>
                     <td>
                     <a href="{$row.viewUrl}" class="action-item crm-hover-button">{ts}View Results{/ts}</a>
-                    <span class="btn-slide crm-hover-button">more
+                    <span class="btn-slide crm-hover-button">{ts}more{/ts}
                       <ul class="panel">
                         {foreach from=$row.actions item=action key=action_name}
                           <li><a href="{$action.url}" class="{$action_name} action-item crm-hover-button small-popup"
@@ -64,11 +64,15 @@
   {else}
     <div class="crm-content-block">
       <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>&nbsp;
-        {if $myReports}
+        {icon icon="fa-info-circle"}{/icon}
+        {if !$myReports}
           {ts}You do not have any private reports. To add a report to this section, edit the Report Settings for a report and set 'Add to My Reports' to Yes.{/ts} &nbsp;
         {else}
-          {ts 1=$compName}No %1 reports have been created.{/ts} &nbsp;
+          {if $compName}
+            {ts 1=$compName}No %1 reports have been created.{/ts} &nbsp;
+          {else}
+            {ts}No reports have been created.{/ts} &nbsp;
+          {/if}
           {if $templateUrl}
             {ts 1=$templateUrl}You can create reports by selecting from the <a href="%1">list of report templates here.</a>{/ts}
           {else}

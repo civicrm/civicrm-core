@@ -106,6 +106,7 @@ function _civicrm_api3_membership_type_get_spec(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_membership_type_getlist_params(&$request) {
+  _civicrm_api3_generic_getlist_params($request);
   if (!isset($request['params']['is_active']) && empty($request['params']['id'])) {
     $request['params']['is_active'] = 1;
   }

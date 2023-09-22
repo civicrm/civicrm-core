@@ -13,14 +13,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
  * Fix for bug CRM-392. Not sure if this is the best fix or it will impact
  * other similar PEAR packages. doubt it
  */
+
+use Civi\Core\Event\SmartyErrorEvent;
+
 if (!class_exists('Smarty')) {
   require_once 'Smarty/Smarty.class.php';
 }
@@ -66,13 +67,14 @@ class CRM_Core_Smarty extends Smarty {
   private $backupFrames = [];
 
   /**
-   * Class constructor.
+   * This is a sentinel-object that indicates an undefined value.
    *
-   * @return CRM_Core_Smarty
+   * It lacks any substantive content; but it has unique identity that cannot be mistaken for
+   * organic values like `null`, `string`, `false`, or similar.
+   *
+   * @var object
    */
-  public function __construct() {
-    parent::__construct();
-  }
+  private static $UNDEFINED_VALUE;
 
   private function initialize() {
     $config = CRM_Core_Config::singleton();
@@ -97,16 +99,10 @@ class CRM_Core_Smarty extends Smarty {
       exit();
     }
 
-    //Check for safe mode CRM-2207
-    if (ini_get('safe_mode')) {
-      $this->use_sub_dirs = FALSE;
-    }
-    else {
-      $this->use_sub_dirs = TRUE;
-    }
+    $this->use_sub_dirs = TRUE;
 
     $customPluginsDir = NULL;
-    if (isset($config->customPHPPathDir)) {
+    if (!empty($config->customPHPPathDir) || $config->customPHPPathDir === '0') {
       $customPluginsDir
         = $config->customPHPPathDir . DIRECTORY_SEPARATOR .
         'CRM' . DIRECTORY_SEPARATOR .
@@ -134,8 +130,8 @@ class CRM_Core_Smarty extends Smarty {
     // add the session and the config here
     $session = CRM_Core_Session::singleton();
 
-    $this->assign_by_ref('config', $config);
-    $this->assign_by_ref('session', $session);
+    $this->assign('config', $config);
+    $this->assign('session', $session);
 
     $tsLocale = CRM_Core_I18n::getLocale();
     $this->assign('tsLocale', $tsLocale);
@@ -145,10 +141,25 @@ class CRM_Core_Smarty extends Smarty {
       $this->assign('langSwitch', CRM_Core_I18n::uiLanguages());
     }
 
-    $this->register_function('crmURL', ['CRM_Utils_System', 'crmURL']);
+    if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
+      // When default escape is enabled if the core escape is called before
+      // any custom escaping is done the modifier_escape function is not
+      // found, so require_once straight away. Note this was hit on the basic
+      // contribution dashboard from RecentlyViewed.tpl
+      require_once 'Smarty/plugins/modifier.escape.php';
+      if (!isset($this->_plugins['modifier']['escape'])) {
+        $this->register_modifier('escape', ['CRM_Core_Smarty', 'escape']);
+      }
+      $this->default_modifiers[] = 'escape:"htmlall"';
+    }
     $this->load_filter('pre', 'resetExtScope');
+    $this->load_filter('pre', 'htxtFilter');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
+
+    if ($config->debug) {
+      $this->error_reporting = E_ALL;
+    }
   }
 
   /**
@@ -156,8 +167,13 @@ class CRM_Core_Smarty extends Smarty {
    *
    * Method providing static instance of SmartTemplate, as
    * in Singleton pattern.
+   *
+   * @return \CRM_Core_Smarty
    */
   public static function &singleton() {
+    if (static::$UNDEFINED_VALUE === NULL) {
+      static::$UNDEFINED_VALUE = new stdClass();
+    }
     if (!isset(self::$_singleton)) {
       self::$_singleton = new CRM_Core_Smarty();
       self::$_singleton->initialize();
@@ -176,17 +192,72 @@ class CRM_Core_Smarty extends Smarty {
    * @param bool $display
    *
    * @return bool|mixed|string
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
   public function fetch($resource_name, $cache_id = NULL, $compile_id = NULL, $display = FALSE) {
     if (preg_match('/^(\s+)?string:/', $resource_name)) {
       $old_security = $this->security;
       $this->security = TRUE;
     }
-    $output = parent::fetch($resource_name, $cache_id, $compile_id, $display);
-    if (isset($old_security)) {
-      $this->security = $old_security;
+    try {
+      $output = parent::fetch($resource_name, $cache_id, $compile_id, $display);
+    }
+    finally {
+      if (isset($old_security)) {
+        $this->security = $old_security;
+      }
     }
     return $output;
+  }
+
+  /**
+   * Handle smarty error in one off string.
+   *
+   * @param int $errorNumber
+   * @param string $errorMessage
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function handleSmartyError(int $errorNumber, string $errorMessage): void {
+    $event = new SmartyErrorEvent($errorNumber, $errorMessage);
+    \Civi::dispatcher()->dispatch('civi.smarty.error', $event);
+    restore_error_handler();
+    throw new \CRM_Core_Exception('Message was not parsed due to invalid smarty syntax : ' . $errorMessage);
+  }
+
+  /**
+   * Ensure these variables are set to make it easier to access them without e-notice.
+   *
+   * @param array $variables
+   */
+  public function ensureVariablesAreAssigned(array $variables): void {
+    foreach ($variables as $variable) {
+      if (!isset($this->get_template_vars()[$variable])) {
+        $this->assign($variable);
+      }
+    }
+  }
+
+  /**
+   * Avoid e-notices on pages with tabs,
+   * by ensuring tabHeader items contain the necessary keys
+   */
+  public function addExpectedTabHeaderKeys(): void {
+    $defaults = [
+      'class' => '',
+      'extra' => '',
+      'icon' => FALSE,
+      'count' => FALSE,
+      'template' => FALSE,
+    ];
+
+    $tabs = $this->get_template_vars('tabHeader');
+    foreach ((array) $tabs as $i => $tab) {
+      $tabs[$i] = array_merge($defaults, $tab);
+    }
+    $this->assign('tabHeader', $tabs);
   }
 
   /**
@@ -243,16 +314,28 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
-   * @param $path
+   * Add template directory(s).
+   *
+   * @param string|array $template_dir directory(s) of template sources
+   * @param string $key (Smarty3+) of the array element to assign the template dir to
+   * @param bool $isConfig (Smarty3+) true for config_dir
+   *
+   * @return Smarty          current Smarty instance for chaining
    */
-  public function addTemplateDir($path) {
+  public function addTemplateDir($template_dir, $key = NULL, $isConfig = FALSE) {
+    if (method_exists('parent', 'addTemplateDir')) {
+      // More recent versions of Smarty have this method.
+      return parent::addTemplateDir($template_dir, $key, $isConfig);
+    }
     if (is_array($this->template_dir)) {
-      array_unshift($this->template_dir, $path);
+      if (!in_array($template_dir, $this->template_dir)) {
+        array_unshift($this->template_dir, $template_dir);
+      }
     }
     else {
-      $this->template_dir = [$path, $this->template_dir];
+      $this->template_dir = [$template_dir, $this->template_dir];
     }
-
+    return $this;
   }
 
   /**
@@ -276,7 +359,7 @@ class CRM_Core_Smarty extends Smarty {
     $oldVars = $this->get_template_vars();
     $backupFrame = [];
     foreach ($vars as $key => $value) {
-      $backupFrame[$key] = $oldVars[$key] ?? NULL;
+      $backupFrame[$key] = array_key_exists($key, $oldVars) ? $oldVars[$key] : static::$UNDEFINED_VALUE;
     }
     $this->backupFrames[] = $backupFrame;
 
@@ -303,7 +386,12 @@ class CRM_Core_Smarty extends Smarty {
    */
   public function assignAll($vars) {
     foreach ($vars as $key => $value) {
-      $this->assign($key, $value);
+      if ($value !== static::$UNDEFINED_VALUE) {
+        $this->assign($key, $value);
+      }
+      else {
+        $this->clear_assign($key);
+      }
     }
     return $this;
   }
@@ -335,6 +423,94 @@ class CRM_Core_Smarty extends Smarty {
   private function isCheckSmartyIsCompiled() {
     // check for define in civicrm.settings.php as FALSE, otherwise returns TRUE
     return CRM_Utils_Constant::value('CIVICRM_TEMPLATE_COMPILE_CHECK', TRUE);
+  }
+
+  /**
+   * Smarty escape modifier plugin.
+   *
+   * This replaces the core smarty modifier and basically does a lot of
+   * early-returning before calling the core function.
+   *
+   * It early returns on patterns that are common 'no-escape' patterns
+   * in CiviCRM - this list can be honed over time.
+   *
+   * It also logs anything that is actually escaped. Since this only kicks
+   * in when CIVICRM_SMARTY_DEFAULT_ESCAPE is defined it is ok to be aggressive
+   * about logging as we mostly care about developers using it at this stage.
+   *
+   * Note we don't actually use 'htmlall' anywhere in our tpl layer yet so
+   * anything coming in with this be happening because of the default modifier.
+   *
+   * Also note the right way to opt a field OUT of escaping is
+   * ``{$fieldName|smarty:nodefaults}``
+   * This should be used for fields with known html AND for fields where
+   * we are doing empty or isset checks - as otherwise the value is passed for
+   * escaping first so you still get an enotice for 'empty' or a fatal for 'isset'
+   *
+   * Type:     modifier<br>
+   * Name:     escape<br>
+   * Purpose:  Escape the string according to escapement type
+   *
+   * @link http://smarty.php.net/manual/en/language.modifier.escape.php
+   *          escape (Smarty online manual)
+   * @author   Monte Ohrt <monte at ohrt dot com>
+   *
+   * @param string $string
+   * @param string $esc_type
+   * @param string $char_set
+   *
+   * @return string
+   */
+  public static function escape($string, $esc_type = 'html', $char_set = 'UTF-8') {
+    // CiviCRM variables are often arrays - just handle them.
+    // The early return on booleans & numbers is mostly to prevent them being
+    // logged as 'changed' when they are cast to a string.
+    if (!is_scalar($string) || empty($string) || is_bool($string) || is_numeric($string) || $esc_type === 'none') {
+      return $string;
+    }
+    if ($esc_type === 'htmlall') {
+      // 'htmlall' is the nothing-specified default.
+      // Don't escape things we think quickform added.
+      if (strpos($string, '<input') === 0
+        || strpos($string, '<select') === 0
+        // Not handling as yet but these ones really should get some love.
+        || strpos($string, '<label') === 0
+        || strpos($string, '<button') === 0
+        || strpos($string, '<span class="crm-frozen-field">') === 0
+        || strpos($string, '<textarea') === 0
+
+        // The ones below this point are hopefully here short term.
+        || strpos($string, '<a') === 0
+        // Message templates screen
+        || strpos($string, '<span><a href') === 0
+        // Not sure how big a pattern this is - used in Pledge view tab
+        // not sure if it needs escaping
+        || strpos($string, ' action="/civicrm/') === 0
+        // eg. Tag edit page, civicrm/admin/financial/financialType/accounts?action=add&reset=1&aid=1
+        || strpos($string, ' action="" method="post"') === 0
+        // This seems to be urls...
+        || strpos($string, '/civicrm/') === 0
+        // Validation error message - eg. <span class="crm-error">Tournament Fees is a required field.</span>
+        || strpos($string, '
+    <span class="crm-error">') === 0
+        // e.g from participant tab class="action-item" href=/civicrm/contact/view/participant?reset=1&amp;action=add&amp;cid=142&amp;context=participant
+        || strpos($string, 'class="action-item" href=/civicrm/"') === 0
+      ) {
+        // Do not escape the above common patterns.
+        return $string;
+      }
+    }
+
+    $value = smarty_modifier_escape($string, $esc_type, $char_set);
+    if ($value !== $string) {
+      Civi::log('smarty')->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
+        'original' => $string,
+        'escaped' => $value,
+        'type' => $esc_type,
+        'charset' => $char_set,
+      ]);
+    }
+    return $value;
   }
 
 }

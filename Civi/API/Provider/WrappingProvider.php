@@ -50,12 +50,12 @@ class WrappingProvider implements ProviderInterface {
 
   public function getEntityNames($version) {
     // return $version == $this->version ? [$this->entity] : [];
-    throw new \API_Exception("Not support: WrappingProvider::getEntityNames()");
+    throw new \CRM_Core_Exception("Not support: WrappingProvider::getEntityNames()");
   }
 
   public function getActionNames($version, $entity) {
     // return $version == $this->version && $this->entity == $entity ? [$this->action] : [];
-    throw new \API_Exception("Not support: WrappingProvider::getActionNames()");
+    throw new \CRM_Core_Exception("Not support: WrappingProvider::getActionNames()");
   }
 
 }

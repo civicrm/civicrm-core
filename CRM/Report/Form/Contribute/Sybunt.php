@@ -16,12 +16,6 @@
  */
 class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
-  protected $_charts = [
-    '' => 'Tabular',
-    'barChart' => 'Bar Chart',
-    'pieChart' => 'Pie Chart',
-  ];
-
   protected $_customGroupExtends = [
     'Contact',
     'Individual',
@@ -33,11 +27,15 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   /**
    * This report has been optimised for group filtering.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = FALSE;
+
+  /**
+   * @var string
+   */
+  protected $statusClause = '';
 
   /**
    * Class constructor.
@@ -161,6 +159,14 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             'default' => TRUE,
           ],
         ],
+        'filters' => [
+          'on_hold' => [
+            'title' => ts('On Hold'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => ['' => ts('Any')] + CRM_Core_PseudoConstant::emailOnHoldOptions(),
+          ],
+        ],
       ],
       'civicrm_phone' => [
         'dao' => 'CRM_Core_DAO_Phone',
@@ -210,7 +216,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             'title' => ts('Financial Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search'),
           ],
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
@@ -244,6 +250,13 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
     // If we have a campaign, build out the relevant elements
     $this->addCampaignFields('civicrm_contribution');
+
+    // Add charts support
+    $this->_charts = [
+      '' => ts('Tabular'),
+      'barChart' => ts('Bar Chart'),
+      'pieChart' => ts('Pie Chart'),
+    ];
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -326,8 +339,11 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   public function where() {
-    $this->_statusClause = "";
-    $clauses = [$this->_aliases['civicrm_contribution'] . '.is_test = 0'];
+    $this->statusClause = "";
+    $clauses = [
+      $this->_aliases['civicrm_contribution'] . '.is_test = 0',
+      $this->_aliases['civicrm_contribution'] . '.is_template = 0',
+    ];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
@@ -337,9 +353,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 (SELECT distinct cont.id FROM civicrm_contact cont, civicrm_contribution contri
  WHERE  cont.id = contri.contact_id AND " .
               self::fiscalYearOffset('contri.receive_date') .
-              " = {$this->_params['yid_value']} AND contri.is_test = 0 )";
+              " = {$this->_params['yid_value']} AND contri.is_test = 0 AND contri.is_template = 0 )";
           }
-          elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE
+          elseif (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE
           ) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
@@ -361,7 +377,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
               if (($fieldName == 'contribution_status_id' ||
                   $fieldName == 'financial_type_id') && !empty($clause)
               ) {
-                $this->_statusClause .= " AND " . $clause;
+                $this->statusClause .= " AND " . $clause;
               }
             }
           }
@@ -389,7 +405,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
@@ -441,7 +457,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         $sql = "" .
           "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
           implode(',', $contactIds) .
-          ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
+          ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0 {$this->statusClause} {$this->_groupBy} ";
       }
 
       $current_year = $this->_params['yid_value'];
@@ -492,11 +508,11 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * @param array $rows
    */
   public function buildChart(&$rows) {
     $graphRows = [];
-    $count = 0;
+    $display = [];
     $current_year = $this->_params['yid_value'];
     $previous_year = $current_year - 1;
     $previous_two_year = $current_year - 2;

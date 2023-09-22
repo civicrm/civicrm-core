@@ -34,9 +34,9 @@ class CRM_Core_Form_RecurringEntity {
 
   /**
    * Schedule Reminder data
-   * @var array
+   * @var CRM_Core_DAO|null
    */
-  protected static $_scheduleReminderDetails = [];
+  protected static $_scheduleReminderDetails = NULL;
 
   /**
    *  Parent Entity ID
@@ -94,9 +94,9 @@ class CRM_Core_Form_RecurringEntity {
     }
 
     // Assign variables
-    $entityType = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable));
+    $entityType = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($entityTable);
     $tpl = CRM_Core_Smarty::singleton();
-    $tpl->assign('recurringEntityType', ts($entityType));
+    $tpl->assign('recurringEntityType', _ts($entityType));
     $tpl->assign('currentEntityId', self::$_entityId);
     $tpl->assign('entityTable', self::$_entityTable);
     $tpl->assign('scheduleReminderId', self::$_scheduleReminderID);
@@ -134,7 +134,7 @@ class CRM_Core_Form_RecurringEntity {
         $defaults['ends'] = 2;
       }
       $defaults['limit_to'] = self::$_scheduleReminderDetails->limit_to;
-      if (self::$_scheduleReminderDetails->limit_to) {
+      if (self::$_scheduleReminderDetails->limit_to == 1) {
         $defaults['repeats_by'] = 1;
       }
       if (self::$_scheduleReminderDetails->entity_status) {
@@ -319,15 +319,15 @@ class CRM_Core_Form_RecurringEntity {
    * @param string $type
    * @param array $linkedEntities
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function postProcess($params = [], $type, $linkedEntities = []) {
+  public static function postProcess($params, $type, $linkedEntities = []) {
     // Check entity_id not present in params take it from class variable
     if (empty($params['entity_id'])) {
       $params['entity_id'] = self::$_entityId;
     }
     //Process this function only when you get this variable
-    if (CRM_Utils_Array::value('allowRepeatConfigToSubmit', $params) == 1) {
+    if (($params['allowRepeatConfigToSubmit'] ?? NULL) == 1) {
       if (!empty($params['entity_table']) && !empty($params['entity_id']) && $type) {
         $params['used_for'] = $type;
         if (empty($params['parent_entity_id'])) {
@@ -346,10 +346,11 @@ class CRM_Core_Form_RecurringEntity {
 
         //Delete repeat configuration and rebuild
         if (!empty($params['id'])) {
-          CRM_Core_BAO_ActionSchedule::del($params['id']);
+          CRM_Core_BAO_ActionSchedule::deleteRecord($params);
           unset($params['id']);
         }
-        $actionScheduleObj = CRM_Core_BAO_ActionSchedule::add($dbParams);
+        $dbParams['name'] = 'repeat_' . $params['used_for'] . '_' . $params['entity_id'];
+        $actionScheduleObj = CRM_Core_BAO_ActionSchedule::writeRecord($dbParams);
 
         //exclude dates
         $excludeDateList = [];
@@ -364,7 +365,7 @@ class CRM_Core_Form_RecurringEntity {
             'name'
           );
           if ($optionGroupIdExists) {
-            CRM_Core_BAO_OptionGroup::del($optionGroupIdExists);
+            CRM_Core_BAO_OptionGroup::deleteRecord(['id' => $optionGroupIdExists]);
           }
           $optionGroupParams = [
             'name' => $type . '_repeat_exclude_dates_' . $actionScheduleObj->entity_value,
@@ -392,7 +393,7 @@ class CRM_Core_Form_RecurringEntity {
           }
         }
 
-        //Set type for API
+        // FIXME: This is the worst way possible to convert a table name to an api entity name
         $apiEntityType = explode("_", $type);
         if (!empty($apiEntityType[1])) {
           $apiType = $apiEntityType[1];
@@ -403,10 +404,11 @@ class CRM_Core_Form_RecurringEntity {
           if (!empty(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func']) &&
             !empty(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'])
           ) {
-            $preDeleteResult = call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], [$params['entity_id']]);
-            if (!empty($preDeleteResult)) {
-              call_user_func([CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['helper_class'], $preDeleteResult]);
-            }
+            // FIXME: This calls `CRM_Event_Form_ManageEvent_Repeat::checkRegistrationForEvents`
+            // which then sets the static variable `CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted`
+            // which is then accessed below and used to delete events with no registrations.
+            // I can't think of a worse way to pass a variable back from a function.
+            call_user_func_array(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['pre_delete_func'], [$params['entity_id']]);
           }
           //Ready to execute delete on entities if it has delete function set
           if (!empty(CRM_Core_BAO_RecurringEntity::$_recurringEntityHelper[$params['entity_table']]['delete_func']) &&
@@ -424,7 +426,7 @@ class CRM_Core_Form_RecurringEntity {
                   ]
                 );
                 if ($result['error']) {
-                  CRM_Core_Error::statusBounce('Error creating recurring list');
+                  CRM_Core_Error::statusBounce(ts('Error creating recurring list'));
                 }
               }
             }
@@ -440,7 +442,7 @@ class CRM_Core_Form_RecurringEntity {
                   ]
                 );
                 if ($result['error']) {
-                  CRM_Core_Error::statusBounce('Error creating recurring list');
+                  CRM_Core_Error::statusBounce(ts('Error creating recurring list'));
                 }
               }
             }

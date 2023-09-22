@@ -10,47 +10,39 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
- * $ACTION one or more $ENTITIES.
- *
- * If saving more than one new $ENTITY with similar values, use the `defaults` parameter.
- *
- * Set `reload` if you need the api to return complete $ENTITY records.
+ * @inheritDoc
  */
 class BasicSaveAction extends AbstractSaveAction {
 
   /**
    * @var callable
-   *
-   * Function(array $item, BasicCreateAction $thisAction) => array
+   *   Function(array $item, BasicCreateAction $thisAction): array
    */
   private $setter;
 
   /**
-   * Basic Create constructor.
+   * Basic Save constructor.
    *
    * @param string $entityName
    * @param string $actionName
-   * @param string $idField
    * @param callable $setter
-   *   Function(array $item, BasicCreateAction $thisAction) => array
    */
-  public function __construct($entityName, $actionName, $idField = 'id', $setter = NULL) {
-    parent::__construct($entityName, $actionName, $idField);
-    $this->setter = $setter;
+  public function __construct($entityName, $actionName, $setter = NULL) {
+    parent::__construct($entityName, $actionName);
+    // Accept setter as 4th param for now, but emit deprecated warning
+    $this->setter = func_get_args()[3] ?? NULL;
+    if ($this->setter) {
+      \CRM_Core_Error::deprecatedWarning(__CLASS__ . ' constructor received $setter as 4th param; it should be the 3rd as the $select param has been removed');
+    }
+    else {
+      $this->setter = $setter;
+    }
   }
 
   /**
@@ -60,9 +52,11 @@ class BasicSaveAction extends AbstractSaveAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
     foreach ($this->records as &$record) {
       $record += $this->defaults;
       $this->formatWriteValues($record);
+      $this->matchExisting($record);
     }
     $this->validateValues();
     foreach ($this->records as $item) {
@@ -73,7 +67,7 @@ class BasicSaveAction extends AbstractSaveAction {
       $get = \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4]);
       $get
         ->setCheckPermissions($this->getCheckPermissions())
-        ->addWhere($this->getIdField(), 'IN', (array) $result->column($this->getIdField()));
+        ->addWhere($idField, 'IN', (array) $result->column($idField));
       $result->exchangeArray((array) $get->execute());
     }
   }

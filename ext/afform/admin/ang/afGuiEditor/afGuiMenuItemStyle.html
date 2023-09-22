@@ -1,0 +1,7 @@
+<div class="af-gui-field-select-in-dropdown form-inline" ng-click="$event.stopPropagation()">
+  <label>{{:: ts('Style:') }}</label>
+  <select class="form-control" ng-model="getSetStyle" ng-model-options="{getterSetter: true}">
+    <option value="">{{:: ts('None') }}</option>
+    <option ng-repeat="style in $ctrl.styles" value="{{:: style.name }}">{{:: style.label }}</option>
+  </select>
+</div>

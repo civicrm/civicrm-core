@@ -30,7 +30,7 @@
                 </tr>
                 <tr><td></td><td>{$form.$refresh.html}&nbsp;&nbsp;{$form.$cancel.html}</td></tr>
      </table>
-         {if $searchDone } {* Search button clicked *}
+         {if $searchDone} {* Search button clicked *}
              {if $searchCount}
                  {if $searchRows} {* we've got rows to display *}
                      <fieldset><legend>{ts}Mark Target Contact(s) for this Relationship{/ts}</legend>
@@ -84,11 +84,8 @@
                     <div class="description">
 
                     </div>
-               <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+               <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
             </div>
-  <div class="form-item">
-  {$form.status.label} {$form.status.html}
-  </div>
 
 
             </div></fieldset>

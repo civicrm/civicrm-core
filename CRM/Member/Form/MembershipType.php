@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 /**
@@ -23,24 +22,6 @@
 class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
   use CRM_Core_Form_EntityFormTrait;
-
-  /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * Fields may have keys
-   *  - name (required to show in tpl from the array)
-   *  - description (optional, will appear below the field)
-   *  - not-auto-addable - this class will not attempt to add the field using addField.
-   *    (this will be automatically set if the field does not have html in it's metadata
-   *    or is not a core field on the form's entity).
-   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
-   *  - template - use a field specific template to render this field
-   *  - required
-   *  - is_freeze (field should be frozen).
-   *
-   * @var array
-   */
-  protected $entityFields = [];
 
   /**
    * Set entity fields to be assigned to the form.
@@ -121,13 +102,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       $this->entityFields['auto_renew']['documentation_link'] = ['page' => 'user/contributions/payment-processors'];
     }
   }
-
-  /**
-   * Deletion message to be assigned to the form.
-   *
-   * @var string
-   */
-  protected $deleteMessage;
 
   /**
    * Explicitly declare the entity api name.
@@ -223,7 +197,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    *
    * @return void
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     self::buildQuickEntityForm();
@@ -285,21 +258,12 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $result = civicrm_api3("Membership", "get", ["membership_type_id" => $this->_id, "options" => ["limit" => 1]]);
       $membershipRecords = ($result["count"] > 0);
-      if ($membershipRecords) {
-        $memberRel->freeze();
-      }
     }
 
     $this->assign('membershipRecordsExists', $membershipRecords);
-
-    $this->addFormRule(['CRM_Member_Form_MembershipType', 'formRule']);
-
     $this->assign('membershipTypeId', $this->_id);
-
-    if (Civi::settings()->get('deferred_revenue_enabled')) {
-      $deferredFinancialType = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
-      $this->assign('deferredFinancialType', array_keys($deferredFinancialType));
-    }
+    $this->assign('deferredFinancialType', Civi::settings()->get('deferred_revenue_enabled') ? array_keys(CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType()) : NULL);
+    $this->addFormRule(['CRM_Member_Form_MembershipType', 'formRule']);
   }
 
   /**
@@ -365,14 +329,14 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     }
 
     if ($params['fixed_period_start_day'] && !empty($params['fixed_period_start_day'])) {
-      $params['fixed_period_start_day']['Y'] = date('Y');
+      $params['fixed_period_start_day']['Y'] = CRM_Utils_Time::date('Y');
       if (!CRM_Utils_Rule::qfDate($params['fixed_period_start_day'])) {
         $errors['fixed_period_start_day'] = ts('Please enter valid Fixed Period Start Day');
       }
     }
 
     if ($params['fixed_period_rollover_day'] && !empty($params['fixed_period_rollover_day'])) {
-      $params['fixed_period_rollover_day']['Y'] = date('Y');
+      $params['fixed_period_rollover_day']['Y'] = CRM_Utils_Time::date('Y');
       if (!CRM_Utils_Rule::qfDate($params['fixed_period_rollover_day'])) {
         $errors['fixed_period_rollover_day'] = ts('Please enter valid Fixed Period Rollover Day');
       }
@@ -389,7 +353,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       try {
-        CRM_Member_BAO_MembershipType::del($this->_id);
+        CRM_Member_BAO_MembershipType::deleteRecord(['id' => $this->_id]);
       }
       catch (CRM_Core_Exception $e) {
         CRM_Core_Error::statusBounce($e->getMessage(), NULL, ts('Membership Type Not Deleted'));

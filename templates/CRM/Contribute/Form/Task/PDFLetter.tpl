@@ -21,20 +21,22 @@
     <table class="form-layout-compressed">
       <tr><td class="label-left">{$form.thankyou_update.html} {$form.thankyou_update.label}</td><td></td></tr>
       <tr><td class="label-left">{$form.receipt_update.html} {$form.receipt_update.label}</td><td></td></tr>
-      <tr>
-        <td class="label-left">{$form.group_by.label} {help id="id-contribution-grouping"}</td>
-        <td>{$form.group_by.html}</td>
-      </tr>
-      <tr>
-        <td class="label-left">{$form.group_by_separator.label}</td>
-        <td>{$form.group_by_separator.html}</td>
-      </tr>
+      {if !$single}
+        <tr>
+          <td class="label-left">{$form.group_by.label} {help id="id-contribution-grouping"}</td>
+          <td>{$form.group_by.html}</td>
+        </tr>
+        <tr>
+          <td class="label-left">{$form.group_by_separator.label}</td>
+          <td>{$form.group_by_separator.html}</td>
+        </tr>
+      {/if}
       <tr>
         <td class="label-left">{$form.email_options.label} {help id="id-contribution-email-print"}</td>
         <td>{$form.email_options.html}</td>
       </tr>
       <tr>
-        <td class="label-left">{$form.from_email_address.label} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+        <td class="label-left">{$form.from_email_address.label}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         <td>{$form.from_email_address.html}</td>
       </tr>
     </table>

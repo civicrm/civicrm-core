@@ -25,7 +25,6 @@
  * @return array
  *   API result Array.
  * @throws \CRM_Core_Exception
- * @throws \API_Exception
  */
 function civicrm_api3_event_create($params) {
   // Required fields for creating an event
@@ -166,9 +165,12 @@ function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
  * @param array $params
  *
  * @return array
+ * @throws \CRM_Core_Exception
+ * @noinspection PhpUnused
  */
-function civicrm_api3_event_delete($params) {
-  return CRM_Event_BAO_Event::del($params['id']) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while deleting event'));
+function civicrm_api3_event_delete(array $params): array {
+  CRM_Event_BAO_Event::deleteRecord($params);
+  return civicrm_api3_create_success();
 }
 
 /**
@@ -204,7 +206,14 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
  * @param array $request
  */
 function _civicrm_api3_event_getlist_params(&$request) {
-  $fieldsToReturn = ['start_date', 'event_type_id', 'title', 'summary'];
+  $fieldsToReturn = [
+    'start_date',
+    'event_type_id',
+    'title',
+    'summary',
+    $request['id_field'],
+    $request['label_field'],
+  ];
   $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
   $request['params']['options']['sort'] = 'start_date DESC';
   if (empty($request['params']['id'])) {

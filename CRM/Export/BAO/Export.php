@@ -125,14 +125,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $processor->setComponentClause($componentClause);
     $processor->setIds($ids);
 
-    list($query, $queryString) = $processor->runQuery($params, $order);
+    [$query, $queryString] = $processor->runQuery($params, $order);
 
     // This perhaps only needs calling when $mergeSameHousehold == 1
     self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable);
 
     $addPaymentHeader = FALSE;
 
-    list($outputColumns, $metadata) = $processor->getExportStructureArrays();
+    [$outputColumns] = $processor->getExportStructureArrays();
 
     if ($processor->isMergeSameAddress()) {
       foreach (array_keys($processor->getAdditionalFieldsForSameAddressMerge()) as $field) {
@@ -185,7 +185,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       while ($iterationDAO->fetch()) {
         $count++;
         $rowsThisIteration++;
-        $row = $processor->buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader);
+        $row = $processor->buildRow($query, $iterationDAO, $outputColumns, $paymentDetails, $addPaymentHeader);
         if ($row === FALSE) {
           continue;
         }
@@ -247,11 +247,11 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     if ($parserClass[0] == 'CRM' &&
       count($parserClass) >= 3
     ) {
-      require_once str_replace('_', DIRECTORY_SEPARATOR, $parserName) . ".php";
       // ensure the functions exists
       if (method_exists($parserName, 'errorFileName') &&
         method_exists($parserName, 'saveFileName')
       ) {
+        CRM_Core_Error::deprecatedWarning('unused code');
         $errorFileName = $parserName::errorFileName($type);
         $saveFileName = $parserName::saveFileName($type);
         if (!empty($errorFileName) && !empty($saveFileName)) {
@@ -265,56 +265,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         }
       }
     }
-    CRM_Utils_System::civiExit();
-  }
-
-  /**
-   * @param $customSearchClass
-   * @param $formValues
-   * @param $order
-   */
-  public static function exportCustom($customSearchClass, $formValues, $order) {
-    $ext = CRM_Extension_System::singleton()->getMapper();
-    if (!$ext->isExtensionClass($customSearchClass)) {
-      require_once str_replace('_', DIRECTORY_SEPARATOR, $customSearchClass) . '.php';
-    }
-    else {
-      require_once $ext->classToPath($customSearchClass);
-    }
-    $search = new $customSearchClass($formValues);
-
-    $includeContactIDs = FALSE;
-    if ($formValues['radio_ts'] == 'ts_sel') {
-      $includeContactIDs = TRUE;
-    }
-
-    $sql = $search->all(0, 0, $order, $includeContactIDs);
-
-    $columns = $search->columns();
-
-    $header = array_keys($columns);
-    $fields = array_values($columns);
-
-    $rows = [];
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    $alterRow = FALSE;
-    if (method_exists($search, 'alterRow')) {
-      $alterRow = TRUE;
-    }
-    while ($dao->fetch()) {
-      $row = [];
-
-      foreach ($fields as $field) {
-        $unqualified_field = CRM_Utils_Array::First(array_slice(explode('.', $field), -1));
-        $row[$field] = $dao->$unqualified_field;
-      }
-      if ($alterRow) {
-        $search->alterRow($row);
-      }
-      $rows[] = $row;
-    }
-
-    CRM_Core_Report_Excel::writeCSVFile(ts('CiviCRM Contact Search'), $header, $rows);
     CRM_Utils_System::civiExit();
   }
 
@@ -424,9 +374,9 @@ VALUES $sqlValueString
       $relationQuery = new CRM_Contact_BAO_Query(NULL, $relationReturnProperties,
         NULL, FALSE, FALSE, $queryMode
       );
-      list($relationSelect, $relationFrom, $relationWhere, $relationHaving) = $relationQuery->query();
+      [$relationSelect, $relationFrom, $relationWhere, $relationHaving] = $relationQuery->query();
 
-      list($id, $direction) = explode('_', $relationshipKey, 2);
+      [$id, $direction] = explode('_', $relationshipKey, 2);
       // identify the relationship direction
       $contactA = 'contact_id_a';
       $contactB = 'contact_id_b';
@@ -438,7 +388,11 @@ VALUES $sqlValueString
 
       $relationshipJoin = $relationshipClause = '';
       if (!$selectAll && $componentTable) {
-        $relationshipJoin = " INNER JOIN {$componentTable} ctTable ON ctTable.contact_id = {$contactA}";
+        $field = 'contact_id';
+        if ($componentTable === 'civicrm_contact') {
+          $field = 'id';
+        }
+        $relationshipJoin = " INNER JOIN {$componentTable} ctTable ON ctTable.$field = {$contactA}";
       }
       elseif (!empty($relIDs)) {
         $relID = implode(',', $relIDs);

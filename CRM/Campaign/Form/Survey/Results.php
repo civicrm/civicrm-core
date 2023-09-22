@@ -123,12 +123,11 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
     }
 
     // form fields of Custom Option rows
-    $defaultOption = [];
-    $_showHide = new CRM_Core_ShowHideBlocks('', '');
+    $defaultOptionValues = [];
+    $_showHide = new CRM_Core_ShowHideBlocks();
 
     $optionAttributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue');
     $optionAttributes['label']['size'] = $optionAttributes['value']['size'] = 25;
-
     for ($i = 1; $i <= self::NUM_OPTION; $i++) {
       //the show hide blocks
       $showBlocks = 'optionField_' . $i;
@@ -161,11 +160,11 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'release_frequency')
       );
 
-      $defaultOption[$i] = $this->createElement('radio', NULL, NULL, NULL, $i);
+      $defaultOptionValues[$i] = NULL;
     }
 
     //default option selection
-    $this->addGroup($defaultOption, 'default_option');
+    $this->addRadio('default_option', '', $defaultOptionValues);
 
     $_showHide->addToTemplate();
 
@@ -215,7 +214,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
     }
 
     $_flagOption = $_rowError = 0;
-    $_showHide = new CRM_Core_ShowHideBlocks('', '');
+    $_showHide = new CRM_Core_ShowHideBlocks();
 
     //capture duplicate Custom option values
     if (!empty($fields['option_value'])) {
@@ -337,14 +336,13 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
     $updateResultSet = FALSE;
     $resultSetOptGrpId = NULL;
-    if ((CRM_Utils_Array::value('option_type', $params) == 2) &&
+    if ((($params['option_type'] ?? NULL) == 2) &&
       !empty($params['option_group_id'])
     ) {
       $updateResultSet = TRUE;
       $resultSetOptGrpId = $params['option_group_id'];
     }
 
-    $recontactInterval = [];
     if ($updateResultSet) {
       $optionValue = new CRM_Core_DAO_OptionValue();
       $optionValue->option_group_id = $resultSetOptGrpId;
@@ -373,6 +371,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         $optionValue->value = trim($v);
         $optionValue->weight = $params['option_weight'][$k];
         $optionValue->is_active = 1;
+        $optionValue->filter = $params['option_interval'][$k];
 
         if (!empty($params['default_option']) &&
           $params['default_option'] == $k
@@ -382,14 +381,9 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
         $optionValue->save();
 
-        // using is_numeric since 0 is a valid value for option_interval
-        if (is_numeric($params['option_interval'][$k])) {
-          $recontactInterval[$optionValue->label] = $params['option_interval'][$k];
-        }
       }
     }
 
-    $params['recontact_interval'] = serialize($recontactInterval);
     $survey = CRM_Campaign_BAO_Survey::create($params);
 
     // create report if required.
@@ -398,7 +392,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       $activityStatus = array_flip($activityStatus);
       $this->_params = [
         'name' => "survey_{$survey->id}",
-        'title' => $params['report_title'] ? $params['report_title'] : $this->_values['title'],
+        'title' => $params['report_title'] ?: $this->_values['title'],
         'status_id_op' => 'eq',
         // reserved status
         'status_id_value' => $activityStatus['Scheduled'],
@@ -461,6 +455,8 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       }
       $this->_createNew = TRUE;
       $this->_id = CRM_Report_Utils_Report::getInstanceIDForValue('survey/detail');
+      CRM_Report_Form_Instance::setDefaultValues($this, $this->_defaults);
+      $this->_params = array_merge($this->_params, $this->_defaults);
       CRM_Report_Form_Instance::postProcess($this, FALSE);
 
       $query = "SELECT MAX(id) FROM civicrm_report_instance WHERE name = %1";

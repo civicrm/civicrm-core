@@ -27,6 +27,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Campaign_DAO_Campaign
+   * @throws \CRM_Core_Exception
    */
   public static function create(&$params) {
     if (empty($params)) {
@@ -37,16 +38,9 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       if (empty($params['created_id'])) {
         $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
       }
-
-      if (empty($params['created_date'])) {
-        $params['created_date'] = date('YmdHis');
-      }
-
-      if (empty($params['name'])) {
-        $params['name'] = CRM_Utils_String::titleToVar($params['title'], 64);
-      }
     }
 
+    /** @var \CRM_Campaign_DAO_Campaign $campaign */
     $campaign = self::writeRecord($params);
 
     /* Create the campaign group record */
@@ -63,11 +57,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       }
     }
 
-    //store custom data
-    if (!empty($params['custom']) && is_array($params['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_campaign', $campaign->id);
-    }
-
     return $campaign;
   }
 
@@ -75,55 +64,37 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * Delete the campaign.
    *
    * @param int $id
-   *   Id of the campaign.
    *
-   * @return bool|mixed
+   * @deprecated
+   * @return bool|int
    */
   public static function del($id) {
-    if (!$id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    try {
+      self::deleteRecord(['id' => $id]);
+    }
+    catch (CRM_Core_Exception $e) {
       return FALSE;
     }
-
-    CRM_Utils_Hook::pre('delete', 'Campaign', $id, CRM_Core_DAO::$_nullArray);
-
-    $dao = new CRM_Campaign_DAO_Campaign();
-    $dao->id = $id;
-    $result = $dao->delete();
-
-    CRM_Utils_Hook::post('delete', 'Campaign', $id, $dao);
-
-    return $result;
+    return 1;
   }
 
   /**
-   * Retrieve DB object based on input parameters.
-   *
-   * It also stores all the retrieved values in the default array.
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
-   *
-   * @return \CRM_Campaign_DAO_Campaign|null
+   * @return self|null
    */
-  public static function retrieve(&$params, &$defaults) {
-    $campaign = new CRM_Campaign_DAO_Campaign();
-
-    $campaign->copyValues($params);
-
-    if ($campaign->find(TRUE)) {
-      CRM_Core_DAO::storeValues($campaign, $defaults);
-      return $campaign;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
    * Return the all eligible campaigns w/ cache.
    *
    * @param int $includeId
-   *   Lets inlcude this campaign by force.
+   *   Lets include this campaign by force.
    * @param int $excludeId
    *   Do not include this campaign.
    * @param bool $onlyActive
@@ -271,7 +242,7 @@ Order By  camp.title";
 
       //do check for component.
       if ($doCheckForComponent) {
-        $campaigns['isCampaignEnabled'] = $isValid = self::isCampaignEnable();
+        $campaigns['isCampaignEnabled'] = $isValid = self::isComponentEnabled();
       }
 
       //do check for permissions.
@@ -299,20 +270,12 @@ Order By  camp.title";
 
   /**
    * Is CiviCampaign enabled.
+   * @deprecated
    * @return bool
    */
-  public static function isCampaignEnable() {
-    static $isEnable = NULL;
-
-    if (!isset($isEnable)) {
-      $isEnable = FALSE;
-      $config = CRM_Core_Config::singleton();
-      if (in_array('CiviCampaign', $config->enableComponents)) {
-        $isEnable = TRUE;
-      }
-    }
-
-    return $isEnable;
+  public static function isCampaignEnable(): bool {
+    CRM_Core_Error::deprecatedFunctionWarning('isComponentEnabled');
+    return self::isComponentEnabled();
   }
 
   /**
@@ -343,14 +306,14 @@ Order By  camp.title";
 
       //need to lookup tables.
       $orderOnCampaignTable = TRUE;
-      if ($sortParams['sort'] == 'status') {
+      if ($sortParams['sort'] === 'status') {
         $orderOnCampaignTable = FALSE;
         $lookupTableJoins = "
  LEFT JOIN civicrm_option_value status ON ( status.value = campaign.status_id OR campaign.status_id IS NULL )
 INNER JOIN civicrm_option_group grp ON ( status.option_group_id = grp.id AND grp.name = 'campaign_status' )";
         $orderByClause = "ORDER BY status.label {$sortParams['sortOrder']}";
       }
-      elseif ($sortParams['sort'] == 'campaign_type') {
+      elseif ($sortParams['sort'] === 'campaign_type') {
         $orderOnCampaignTable = FALSE;
         $lookupTableJoins = "
  LEFT JOIN civicrm_option_value campaign_type ON ( campaign_type.value = campaign.campaign_type_id
@@ -358,7 +321,7 @@ INNER JOIN civicrm_option_group grp ON ( status.option_group_id = grp.id AND grp
 INNER JOIN civicrm_option_group grp ON ( campaign_type.option_group_id = grp.id AND grp.name = 'campaign_type' )";
         $orderByClause = "ORDER BY campaign_type.label {$sortParams['sortOrder']}";
       }
-      elseif ($sortParams['sort'] == 'isActive') {
+      elseif ($sortParams['sort'] === 'isActive') {
         $sortParams['sort'] = 'is_active';
       }
       if ($orderOnCampaignTable) {
@@ -407,7 +370,7 @@ INNER JOIN civicrm_option_group grp ON ( campaign_type.option_group_id = grp.id 
     if (array_key_exists('is_active', $params)) {
       $active = "( campaign.is_active = 1 )";
       if (!empty($params['is_active'])) {
-        $active = "( campaign.is_active = 0 OR campaign.is_active IS NULL )";
+        $active = "campaign.is_active = 0";
       }
       $where[] = $active;
     }
@@ -463,8 +426,9 @@ SELECT  campaign.id               as id,
   /**
    * Get the campaign count.
    *
+   * @return int
    */
-  public static function getCampaignCount() {
+  public static function getCampaignCount(): int {
     return (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_campaign');
   }
 
@@ -503,17 +467,13 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Campaign', $id, 'is_active', $is_active);
   }
 
@@ -589,10 +549,10 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   public static function addCampaignInComponentSearch(&$form, $elementName = 'campaign_id') {
     $campaignInfo = [];
     $campaignDetails = self::getPermissionedCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
-    $fields = ['campaigns', 'hasAccessCampaign', 'isCampaignEnabled'];
-    foreach ($fields as $fld) {
-      $$fld = $campaignDetails[$fld] ?? NULL;
-    }
+    $campaigns = $campaignDetails['campaigns'] ?? NULL;
+    $hasAccessCampaign = $campaignDetails['hasAccessCampaign'] ?? NULL;
+    $isCampaignEnabled = $campaignDetails['isCampaignEnabled'] ?? NULL;
+
     $showCampaignInSearch = FALSE;
     if ($isCampaignEnabled && $hasAccessCampaign && !empty($campaigns)) {
       //get the current campaign only.
@@ -611,16 +571,8 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
         ['id' => 'campaigns', 'multiple' => 'multiple', 'class' => 'crm-select2']
       );
     }
-    $infoFields = [
-      'elementName',
-      'hasAccessCampaign',
-      'isCampaignEnabled',
-      'showCampaignInSearch',
-    ];
-    foreach ($infoFields as $fld) {
-      $campaignInfo[$fld] = $$fld;
-    }
-    $form->assign('campaignInfo', $campaignInfo);
+
+    $form->assign('campaignElementName', $showCampaignInSearch ? $elementName : '');
   }
 
   /**

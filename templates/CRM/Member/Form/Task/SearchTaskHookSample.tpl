@@ -10,9 +10,9 @@
 <table>
   <tr class="columnheader">
     <th>{ts}Display Name{/ts}</th>
-    <th>{ts}Start Date{/ts}</th>
-    <th>{ts}End Date{/ts}</th>
-    <th>{ts}Source{/ts}</th>
+    <th>{ts}Membership Start Date{/ts}</th>
+    <th>{ts}Membership Expiration Date{/ts}</th>
+    <th>{ts}Membership Source{/ts}</th>
   </tr>
 
   {foreach from=$rows item=row}
@@ -30,7 +30,7 @@
 </div>
 {else}
    <div class="messages status no-popup">
-            <div class="icon inform-icon"></div>
+            {icon icon="fa-info-circle"}{/icon}
                {ts}There are no records selected.{/ts}
    </div>
 {/if}

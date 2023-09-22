@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/oauth-client/return</path>
+    <page_callback>CRM_OAuth_Page_Return</page_callback>
+    <title>Return</title>
+    <access_arguments>create OAuth tokens via auth code flow;manage OAuth client</access_arguments>
+  </item>
+</menu>

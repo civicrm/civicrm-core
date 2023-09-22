@@ -74,7 +74,7 @@ class CRM_Contact_Form_Edit_Organization {
 
     // make sure that organization name is set
     if (empty($fields['organization_name'])) {
-      $errors['organization_name'] = 'Organization Name should be set.';
+      $errors['organization_name'] = ts('Organization Name should be set.');
     }
 
     // add code to make sure that the uniqueness criteria is satisfied

@@ -67,13 +67,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $pcPage;
 
   /**
-   * Status of personal campaign page
-   * @var array
-   * @deprecated
-   */
-  private static $pcpStatus;
-
-  /**
    * Contribution / financial batches
    * @var array
    */
@@ -180,7 +173,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *   Do we want all pages or only active pages.
    *
    *
-   * @return array
+   * @return string|array|null
    *   array reference of all contribution pages if any
    */
   public static function &contributionPage($id = NULL, $all = FALSE) {
@@ -289,6 +282,12 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @param int $id
    * @param string $columnName
+   * @deprecated use standard methods like
+   *   CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatusID);
+   *   CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatusID);
+   *   CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatusID);
+   *   & don't specify 'CRM_Contribute_BAO_Contribution' if you mean 'CRM_Contribute_BAO_ContributionRecur' ...
+   *
    * @return array
    *   array reference of all contribution statuses
    */
@@ -311,7 +310,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the Personal campaign pages.
    *
    *
-   * @param null $pageType
+   * @param string|null $pageType
    * @param int $id
    *
    * @return array
@@ -336,31 +335,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
 
     return $result;
-  }
-
-  /**
-   * Get all PCP Statuses.
-   *
-   * The static array pcpStatus is returned
-   *
-   * @deprecated
-   * @param string $column
-   * @return array
-   *   array reference of all PCP activity statuses
-   */
-  public static function &pcpStatus($column = 'label') {
-    CRM_Core_Error::deprecatedFunctionWarning('Function pcpStatus will be removed');
-    if (NULL === self::$pcpStatus) {
-      self::$pcpStatus = [];
-    }
-    if (!array_key_exists($column, self::$pcpStatus)) {
-      self::$pcpStatus[$column] = [];
-
-      self::$pcpStatus[$column] = CRM_Core_OptionGroup::values('pcp_status', FALSE,
-        FALSE, FALSE, NULL, $column
-      );
-    }
-    return self::$pcpStatus[$column];
   }
 
   /**

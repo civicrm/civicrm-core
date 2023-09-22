@@ -22,6 +22,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
+  /**
+   * @var string[]
+   */
   private $skipFields = NULL;
 
   /**
@@ -40,13 +43,20 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   /**
+   * @return void
+   */
+  public function flushCache(): void {
+    $this->skipFields = NULL;
+  }
+
+  /**
    * Get skipped fields.
    *
-   * @return array<string>
+   * @return string[]
    *   list of field names
    */
   public function getSkipFields() {
-    if ($this->skipFields === NULL) {
+    if (!isset($this->skipFields)) {
       $this->skipFields = [
         'widget_code',
         'html_message',
@@ -109,10 +119,22 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'header',
         // https://lab.civicrm.org/dev/core/issues/1286
         'footer',
+        // SavedSearch entity
+        'api_params',
+        // SearchDisplay entity
+        'settings',
+        // SearchSegment items
+        'items',
+        // Survey entity
+        'instructions',
       ];
-      $custom = CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_custom_field WHERE html_type = "RichTextEditor"');
+      $custom = CRM_Core_DAO::executeQuery('
+        SELECT cf.id, cf.name AS field_name, cg.name AS group_name
+        FROM civicrm_custom_field cf, civicrm_custom_group cg
+        WHERE cf.custom_group_id = cg.id AND cf.data_type = "Memo"');
       while ($custom->fetch()) {
         $this->skipFields[] = 'custom_' . $custom->id;
+        $this->skipFields[] = $custom->group_name . '.' . $custom->field_name;
       }
     }
     return $this->skipFields;
@@ -139,7 +161,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   public function encodeValue($value) {
-    return str_replace(['<', '>'], ['&lt;', '&gt;'], $value);
+    return str_replace(['<', '>'], ['&lt;', '&gt;'], ($value ?? ''));
   }
 
   /**
@@ -186,7 +208,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   public function decodeValue($value) {
-    return str_replace(['&lt;', '&gt;'], ['<', '>'], $value);
+    return str_replace(['&lt;', '&gt;'], ['<', '>'], ($value ?? ''));
   }
 
   /**

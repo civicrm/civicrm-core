@@ -13,15 +13,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatusType {
 
   /**
    * @param array $params
    *
-   * @return this|null
+   * @return self|null
    */
   public static function add(&$params) {
     if (empty($params)) {
@@ -35,7 +33,7 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   /**
    * @param array $params
    *
-   * @return this|null
+   * @return self|null
    */
   public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
@@ -73,32 +71,47 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
+   * @deprecated
    * @param array $params
-   * @param $defaults
-   *
-   * @return CRM_Event_DAO_ParticipantStatusType|null
+   * @param array $defaults
+   * @return self|null
    */
-  public static function retrieve(&$params, &$defaults) {
-    $result = NULL;
-
-    $dao = new CRM_Event_DAO_ParticipantStatusType();
-    $dao->copyValues($params);
-    if ($dao->find(TRUE)) {
-      CRM_Core_DAO::storeValues($dao, $defaults);
-      $result = $dao;
-    }
-
-    return $result;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   * @param $isActive
-   *
+   * @param bool $isActive
    * @return bool
    */
   public static function setIsActive($id, $isActive) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Event_BAO_ParticipantStatusType', $id, 'is_active', $isActive);
+  }
+
+  /**
+   * Checks if status_id (id or string (eg. 5 or "Pending from pay later") is allowed for class
+   *
+   * @param int|string $status_id
+   * @param string $class
+   *
+   * @return bool
+   */
+  public static function getIsValidStatusForClass($status_id, $class = 'Pending') {
+    $classParticipantStatuses = civicrm_api3('ParticipantStatusType', 'get', [
+      'class' => $class,
+      'is_active' => 1,
+    ])['values'];
+    $allowedParticipantStatuses = [];
+    foreach ($classParticipantStatuses as $id => $detail) {
+      $allowedParticipantStatuses[$id] = $detail['name'];
+    }
+    if (in_array($status_id, $allowedParticipantStatuses) || array_key_exists($status_id, $allowedParticipantStatuses)) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**

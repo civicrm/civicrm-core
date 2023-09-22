@@ -48,9 +48,7 @@ class SetupController implements SetupControllerInterface {
    *   Ex: 'GET' or 'POST'.
    * @param array $fields
    *   List of any HTTP GET/POST fields.
-   * @return array
-   *   The HTTP headers and response text.
-   *   [0 => array $headers, 1 => string $body].
+   * @return SetupResponse
    */
   public function run($method, $fields = array()) {
     $this->setup->getDispatcher()->dispatch('civi.setupui.run', new UIBootEvent($this, $method, $fields));
@@ -74,14 +72,12 @@ class SetupController implements SetupControllerInterface {
    *   Ex: 'GET' or 'POST'.
    * @param array $fields
    *   List of any HTTP GET/POST fields.
-   * @return array
-   *   The HTTP headers and response text.
-   *   [0 => array $headers, 1 => string $body].
+   * @return SetupResponse
    */
   public function runStart($method, $fields) {
     $checkInstalled = $this->setup->checkInstalled();
     if ($checkInstalled->isDatabaseInstalled() || $checkInstalled->isSettingInstalled()) {
-      return $this->createError("CiviCRM is already installed");
+      return $this->renderAlreadyInstalled();
     }
 
     /**
@@ -89,21 +85,14 @@ class SetupController implements SetupControllerInterface {
      */
     $model = $this->setup->getModel();
 
-    $tplFile = $this->getResourcePath('template.php');
+    $tplFile = $this->getResourcePath('installer.tpl.php');
     $tplVars = [
-      'ctrl' => $this,
-      'civicrm_version' => \CRM_Utils_System::version(),
-      'installURLPath' => $this->urls['res'],
-      'short_lang_code' => \CRM_Core_I18n_PseudoConstant::shortForLong($GLOBALS['tsLocale']),
-      'text_direction' => (\CRM_Core_I18n::isLanguageRTL($GLOBALS['tsLocale']) ? 'rtl' : 'ltr'),
       'model' => $model,
       'reqs' => $this->setup->checkRequirements(),
     ];
 
     // $body = "<pre>" . htmlentities(print_r(['method' => $method, 'urls' => $this->urls, 'data' => $fields], 1)) . "</pre>";
-    $body = $this->render($tplFile, $tplVars);
-
-    return array(array(), $body);
+    return $this->createPage(ts('CiviCRM Installer'), $this->render($tplFile, $tplVars));
   }
 
   /**
@@ -113,14 +102,12 @@ class SetupController implements SetupControllerInterface {
    *   Ex: 'GET' or 'POST'.
    * @param array $fields
    *   List of any HTTP GET/POST fields.
-   * @return array
-   *   The HTTP headers and response text.
-   *   [0 => array $headers, 1 => string $body].
+   * @return SetupResponse
    */
   public function runInstall($method, $fields) {
     $checkInstalled = $this->setup->checkInstalled();
     if ($checkInstalled->isDatabaseInstalled() || $checkInstalled->isSettingInstalled()) {
-      return $this->createError("CiviCRM is already installed");
+      return $this->renderAlreadyInstalled();
     }
 
     $reqs = $this->setup->checkRequirements();
@@ -130,29 +117,33 @@ class SetupController implements SetupControllerInterface {
 
     $this->setup->installFiles();
     $this->setup->installDatabase();
-
-    $m = $this->setup->getModel();
-    $tplFile = $this->getResourcePath('finished.' . $m->cms . '.php');
-    if (file_exists($tplFile)) {
-      $tplVars = array();
-      return array(array(), $this->render($tplFile, $tplVars));
-    }
-    else {
-      return $this->createError("Installation succeeded. However, the final page ($tplFile) was not available.");
-    }
+    return $this->renderFinished();
   }
 
   /**
    * Partially bootstrap Civi services (such as localization).
    */
   protected function boot($method, $fields) {
+    /** @var \Civi\Setup\Model $model */
     $model = $this->setup->getModel();
 
     define('CIVICRM_UF', $model->cms);
+    define('CIVICRM_TEMPLATE_COMPILEDIR', $model->templateCompilePath);
+    define('CIVICRM_UF_BASEURL', $model->cmsBaseUrl);
+
+    global $civicrm_root;
+    $civicrm_root = $model->srcPath;
 
     // Set the Locale (required by CRM_Core_Config)
     global $tsLocale;
     $tsLocale = 'en_US';
+
+    global $civicrm_paths;
+    foreach ($model->paths as $pathVar => $pathValues) {
+      foreach (['url', 'path'] as $aspectName => $aspectValue) {
+        $civicrm_paths[$pathVar][$aspectName] = $aspectValue;
+      }
+    }
 
     // CRM-16801 This validates that lang is valid by looking in $langs.
     // NB: the variable is initial a $_REQUEST for the initial page reload,
@@ -174,15 +165,43 @@ class SetupController implements SetupControllerInterface {
     $this->setup->getDispatcher()->dispatch('civi.setupui.boot', new UIBootEvent($this, $method, $fields));
   }
 
+  /**
+   * @param string $message
+   * @param string $title
+   * @return SetupResponse
+   */
   public function createError($message, $title = 'Error') {
-    return [
-      [],
-      $this->render($this->getResourcePath('error.html'), [
-        'errorTitle' => htmlentities($title),
-        'errorMsg' => htmlentities($message),
-        'installURLPath' => $this->urls['res'],
-      ]),
+    return $this->createPage($title, sprintf('<h1>%s</h1>\n%s', htmlentities($title), htmlentities($message)));
+  }
+
+  /**
+   * @param string $title
+   * @param string $body
+   * @return SetupResponse
+   */
+  public function createPage($title, $body) {
+    /** @var \Civi\Setup\Model $model */
+    $model = $this->setup->getModel();
+
+    $r = new SetupResponse();
+    $r->code = 200;
+    $r->headers = [];
+    $r->isComplete = FALSE;
+    $r->title = $title;
+    $r->body = $body;
+    $r->assets = [
+      ['type' => 'script-url', 'url' => $this->getUrl('jquery.js')],
+      ['type' => 'script-url', 'url' => $this->urls['res'] . "jquery.setupui.js"],
+      ['type' => 'script-code', 'code' => 'window.csj$ = jQuery.noConflict();'],
+      ['type' => 'style-url', 'url' => $this->urls['res'] . "template.css"],
+      ['type' => 'style-url', 'url' => $this->getUrl('font-awesome.css')],
     ];
+
+    if (\CRM_Core_I18n::isLanguageRTL($model->lang)) {
+      $r->assets[] = ['type' => 'style-url', 'url' => $this->urls['res'] . "template-rtl.css"];
+    }
+
+    return $r;
   }
 
   /**
@@ -195,6 +214,7 @@ class SetupController implements SetupControllerInterface {
    * @return string
    */
   public function render($_tpl_file, $_tpl_params = array()) {
+    $_tpl_params = array_merge($this->getCommonTplVars(), $_tpl_params);
     extract($_tpl_params);
     ob_start();
     require $_tpl_file;
@@ -227,7 +247,7 @@ class SetupController implements SetupControllerInterface {
    *
    * @param array $fields
    *   HTTP inputs -- e.g. with a form element like this:
-   *   `<input type="submit" name="civisetup[action][Foo]" value="Do the foo">`
+   *   `<button type="submit" name="civisetup[action][Foo]">Do the foo</button>`
    * @param string $default
    *   The action-name to return if no other action is identified.
    * @return string
@@ -288,6 +308,36 @@ class SetupController implements SetupControllerInterface {
    */
   public function getSetup() {
     return $this->setup;
+  }
+
+  private function renderAlreadyInstalled() {
+    // return $this->createError("CiviCRM is already installed");
+    return $this->renderFinished();
+  }
+
+  /**
+   * @return SetupResponse
+   */
+  private function renderFinished() {
+    $m = $this->setup->getModel();
+    $tplFile = $this->getResourcePath('finished.' . $m->cms . '.php');
+    if (file_exists($tplFile)) {
+      return $this->createPage(ts('CiviCRM Installed'), $this->render($tplFile));
+    }
+    else {
+      return $this->createError("Installation succeeded. However, the final page ($tplFile) was not available.");
+    }
+  }
+
+  /**
+   * @return array
+   */
+  private function getCommonTplVars() {
+    return [
+      'ctrl' => $this,
+      'civicrm_version' => \CRM_Utils_System::version(),
+      'installURLPath' => $this->urls['res'],
+    ];
   }
 
 }

@@ -14,26 +14,25 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
-
 namespace Civi\Api4;
-
-use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
  * MockArrayEntity entity.
  *
- * @method Generic\BasicGetAction get()
+ * @method static Generic\BasicGetAction get()
  *
  * @package Civi\Api4
  */
 class MockArrayEntity extends Generic\AbstractEntity {
 
-  public static function getFields() {
-    return new BasicGetFieldsAction(static::class, __FUNCTION__, function() {
+  /**
+   * @param bool $checkPermissions
+   * @return Generic\BasicGetFieldsAction
+   */
+  public static function getFields($checkPermissions = TRUE) {
+    return (new Generic\BasicGetFieldsAction(static::class, __FUNCTION__, function() {
       return [
         ['name' => 'field1'],
         ['name' => 'field2'],
@@ -42,7 +41,7 @@ class MockArrayEntity extends Generic\AbstractEntity {
         ['name' => 'field5'],
         ['name' => 'field6'],
       ];
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
 }

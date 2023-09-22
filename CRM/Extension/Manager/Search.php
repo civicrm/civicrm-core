@@ -24,7 +24,10 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
    */
   public function __construct() {
     parent::__construct(TRUE);
-    $this->groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
+  }
+
+  public function getGroupId() {
+    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
       self::CUSTOM_SEARCH_GROUP_NAME, 'id', 'name'
     );
   }
@@ -42,11 +45,11 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
     }
 
     $weight = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
-      ['option_group_id' => $this->groupId]
+      ['option_group_id' => $this->getGroupId()]
     );
 
     $params = [
-      'option_group_id' => $this->groupId,
+      'option_group_id' => $this->getGroupId(),
       'weight' => $weight,
       'description' => $info->label . ' (' . $info->key . ')',
       'name' => $info->key,
@@ -74,7 +77,7 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
 
     $cs = $this->getCustomSearchesById();
     $id = $cs[$customSearchesByName[$info->key]];
-    CRM_Core_BAO_OptionValue::del($id);
+    CRM_Core_BAO_OptionValue::deleteRecord(['id' => $id]);
 
     return TRUE;
   }
@@ -102,15 +105,15 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
   /**
    * @return array
    */
-  protected function getCustomSearchesByName() {
-    return CRM_Core_OptionGroup::values(self::CUSTOM_SEARCH_GROUP_NAME, TRUE, FALSE, FALSE, NULL, 'name', FALSE, TRUE);
+  protected function getCustomSearchesByName(): array {
+    return CRM_Core_OptionGroup::values(self::CUSTOM_SEARCH_GROUP_NAME, TRUE, FALSE, FALSE, NULL, 'name', FALSE);
   }
 
   /**
    * @return array
    */
-  protected function getCustomSearchesById() {
-    return CRM_Core_OptionGroup::values(self::CUSTOM_SEARCH_GROUP_NAME, FALSE, FALSE, FALSE, NULL, 'id', FALSE, TRUE);
+  protected function getCustomSearchesById(): array {
+    return CRM_Core_OptionGroup::values(self::CUSTOM_SEARCH_GROUP_NAME, FALSE, FALSE, FALSE, NULL, 'id', FALSE);
   }
 
 }

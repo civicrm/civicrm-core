@@ -25,13 +25,20 @@ var isMailing    = false;
   text_message = "mailing_format";
   isMailing = false;
   {/literal}
-  {elseif $form.formClass eq 'CRM_SMS_Form_Upload' || $form.formClass eq 'CRM_Contact_Form_Task_SMS'}
+{elseif $form.formClass eq 'CRM_SMS_Form_Upload' || $form.formClass eq 'CRM_Contact_Form_Task_SMS'}
   {literal}
   prefix = "SMS";
   text_message = "sms_text_message";
   isMailing = true;
   {/literal}
-  {else}
+  {if $templateSelected}
+    {literal}
+      if ( document.getElementsByName(prefix + "saveTemplate")[0].checked ) {
+        document.getElementById(prefix + "template").selectedIndex = {/literal}{$templateSelected}{literal};
+      }
+    {/literal}
+  {/if}
+{else}
   {literal}
   text_message = "text_message";
   html_message = (cj("#edit-html-message-value").length > 0) ? "edit-html-message-value" : "html_message";
@@ -45,17 +52,28 @@ var isMailing    = false;
   {/literal}
 {/if}
 
-{if $templateSelected}
-  {literal}
-  if ( document.getElementsByName(prefix + "saveTemplate")[0].checked ) {
-    document.getElementById(prefix + "template").selectedIndex = {/literal}{$templateSelected}{literal};
-  }
-{/literal}
-{/if}
 {literal}
+
+/**
+ * Checks if both the Save Template and Update Template fields exist.
+ * These fields will not exist if user does not have the edit message
+ * templates permission.
+ *
+ * @param {String} prefix
+ */
+function manageTemplateFieldsExists(prefix) {
+  var saveTemplate = document.getElementsByName(prefix + "saveTemplate");
+  var updateTemplate = document.getElementsByName(prefix + "updateTemplate");
+
+  return saveTemplate.length > 0 && updateTemplate.length > 0;
+}
 
 function showSaveUpdateChkBox(prefix) {
   prefix = prefix || '';
+  if (!manageTemplateFieldsExists(prefix)) {
+    document.getElementById(prefix + "saveDetails").style.display = "none";
+    return;
+  }
   if (document.getElementById(prefix + "template") == null) {
     if (document.getElementsByName(prefix + "saveTemplate")[0].checked){
       document.getElementById(prefix + "saveDetails").style.display = "block";
@@ -89,9 +107,11 @@ function showSaveUpdateChkBox(prefix) {
 }
 
 function selectValue( val, prefix) {
-  document.getElementsByName(prefix + "saveTemplate")[0].checked = false;
-  document.getElementsByName(prefix + "updateTemplate")[0].checked = false;
-  showSaveUpdateChkBox(prefix);
+  if (manageTemplateFieldsExists(prefix)) {
+    document.getElementsByName(prefix + "saveTemplate")[0].checked = false;
+    document.getElementsByName(prefix + "updateTemplate")[0].checked = false;
+    showSaveUpdateChkBox(prefix);
+  }
   if ( !val ) {
     if (document.getElementById("subject").length) {
       document.getElementById("subject").value ="";
@@ -121,7 +141,7 @@ function selectValue( val, prefix) {
     return;
   }
 
-  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/template' h=0 }"{literal};
+  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/template' h=0}"{literal};
 
   cj.post( dataUrl, {tid: val}, function( data ) {
     var hide = (data.document_body && isPDF) ? false : true;
@@ -180,6 +200,9 @@ if ( isMailing ) {
 
   function verify(select, prefix) {
     prefix = prefix || '';
+    if (!manageTemplateFieldsExists(prefix)) {
+      return;
+    }
     if (document.getElementsByName(prefix + "saveTemplate")[0].checked  == false) {
       document.getElementById(prefix + "saveDetails").style.display = "none";
     }
@@ -287,7 +310,7 @@ CRM.$(function($) {
   function setSignature() {
     var emailID = $("#fromEmailAddress").val( );
     if ( !isNaN( emailID ) ) {
-      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/signature' h=0 }"{literal};
+      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/signature' h=0}"{literal};
       $.post( dataUrl, {emailID: emailID}, function( data ) {
 
         if (data.signature_text) {

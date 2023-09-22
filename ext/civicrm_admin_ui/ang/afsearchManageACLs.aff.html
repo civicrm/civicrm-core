@@ -1,0 +1,8 @@
+<div af-fieldset="">
+  <div class="help">
+    <p>{{:: ts('ACLs allow you to control access to CiviCRM data. An ACL consists of an Operation (e.g. "View" or "Edit"), a set of data the operation can be performed on (e.g. a group of contacts), and a user Role the ACL applies to.') }}</p>
+    <p>{{:: ts('Depending on the chosen mode, each ACL either Allows or Denies permission. When multiple rules contradict each other (e.g. one rule allows and the second rule denies access to the same contacts) the rule with the highest priority takes precidence.') }}</p>
+    <p><a href="https://docs.civicrm.org/user/en/latest/initial-set-up/permissions-and-access-control/" target="_blank">{{:: ts('Learn more...') }}</a></p>
+  </div>
+  <crm-search-display-table search-name="Manage_ACLs" display-name="Manage_ACLs_Table_1"></crm-search-display-table>
+</div>

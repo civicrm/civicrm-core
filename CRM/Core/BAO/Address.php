@@ -15,166 +15,75 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Address;
+
 /**
  * This is class to handle address related functions.
  */
-class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
+class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\HookInterface {
+  use CRM_Contact_AccessTrait;
 
   /**
-   * Takes an associative array and creates a address.
+   * @deprecated
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param bool $fixAddress
-   *   True if you need to fix (format) address values.
-   *                               before inserting in db
-   *
-   * @param null $entity
-   *
-   * @return array|NULL
-   *   array of created address
+   * @return CRM_Core_BAO_Address
+   * @throws CRM_Core_Exception
    */
-  public static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
-    if (!isset($params['address']) || !is_array($params['address'])) {
-      return NULL;
-    }
-    CRM_Core_BAO_Block::sortPrimaryFirst($params['address']);
-    $addresses = [];
-    $contactId = NULL;
-
-    $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
-    if (!$entity) {
-      $contactId = $params['contact_id'];
-      //get all the addresses for this contact
-      $addresses = self::allAddress($contactId);
-    }
-    else {
-      // get all address from location block
-      $entityElements = [
-        'entity_table' => $params['entity_table'],
-        'entity_id' => $params['entity_id'],
-      ];
-      $addresses = self::allEntityAddress($entityElements);
-    }
-
-    $isPrimary = $isBilling = TRUE;
-    $blocks = [];
-    foreach ($params['address'] as $key => $value) {
-      if (!is_array($value)) {
-        continue;
-      }
-
-      $addressExists = self::dataExists($value);
-      if (empty($value['id'])) {
-        if (!empty($addresses) && !empty($value['location_type_id']) && array_key_exists($value['location_type_id'], $addresses)) {
-          $value['id'] = $addresses[$value['location_type_id']];
-        }
-      }
-
-      // Note there could be cases when address info already exist ($value[id] is set) for a contact/entity
-      // BUT info is not present at this time, and therefore we should be really careful when deleting the block.
-      // $updateBlankLocInfo will help take appropriate decision. CRM-5969
-      if (isset($value['id']) && !$addressExists && $updateBlankLocInfo) {
-        //delete the existing record
-        CRM_Core_BAO_Block::blockDelete('Address', ['id' => $value['id']]);
-        continue;
-      }
-      elseif (!$addressExists) {
-        continue;
-      }
-
-      if ($isPrimary && !empty($value['is_primary'])) {
-        $isPrimary = FALSE;
-      }
-      else {
-        $value['is_primary'] = 0;
-      }
-
-      if ($isBilling && !empty($value['is_billing'])) {
-        $isBilling = FALSE;
-      }
-      else {
-        $value['is_billing'] = 0;
-      }
-
-      if (empty($value['manual_geo_code'])) {
-        $value['manual_geo_code'] = 0;
-      }
-      $value['contact_id'] = $contactId;
-      $blocks[] = self::add($value, $fixAddress);
-    }
-
-    return $blocks;
-  }
-
-  /**
-   * Takes an associative array and adds address.
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param bool $fixAddress
-   *   True if you need to fix (format) address values.
-   *                               before inserting in db
-   *
-   * @return CRM_Core_BAO_Address|null
-   */
-  public static function add(&$params, $fixAddress = FALSE) {
-
-    $address = new CRM_Core_DAO_Address();
-    $checkPermissions = $params['check_permissions'] ?? TRUE;
-
-    // fixAddress mode to be done
+  public static function create(array &$params, $fixAddress = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if ($fixAddress) {
       CRM_Core_BAO_Address::fixAddress($params);
     }
+    return self::writeRecord($params);
+  }
 
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'Address', CRM_Utils_Array::value('id', $params), $params);
+  /**
+   * @deprecated
+   *
+   * @param array $params
+   * @param bool $fixAddress
+   * @return CRM_Core_BAO_Address
+   * @throws CRM_Core_Exception
+   */
+  public static function add(&$params, $fixAddress = FALSE) {
+    return self::create($params, $fixAddress);
+  }
 
-    // if id is set & is_primary isn't we can assume no change
-    if (is_numeric(CRM_Utils_Array::value('is_primary', $params)) || empty($params['id'])) {
-      CRM_Core_BAO_Block::handlePrimary($params, get_class());
+  /**
+   * Event fired before modifying an Address.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (in_array($event->action, ['create', 'edit'])) {
+      CRM_Core_BAO_Block::handlePrimary($event->params, __CLASS__);
+      CRM_Core_BAO_Block::handleBilling($event->params, __CLASS__);
+
+      // (prevent chaining 1 and 3) CRM-21214
+      if (isset($event->params['master_id']) && !CRM_Utils_System::isNull($event->params['master_id'])) {
+        self::fixSharedAddress($event->params);
+      }
     }
+  }
 
-    // (prevent chaining 1 and 3) CRM-21214
-    if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
-      self::fixSharedAddress($params);
+  /**
+   * Event fired after modifying an Address.
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    // Copy custom data from master address if not supplied
+    if ($event->action === 'create' && !isset($event->params['custom'])) {
+      if (isset($event->params['master_id']) && !CRM_Utils_System::isNull($event->params['master_id'])) {
+        $event->object->copyCustomFields($event->params['master_id'], $event->id, $event->action);
+      }
     }
-
-    $address->copyValues($params);
-
-    $address->save();
-
-    if ($address->id) {
-      if (isset($params['custom'])) {
-        $addressCustom = $params['custom'];
-      }
-      else {
-        $customFields = CRM_Core_BAO_CustomField::getFields('Address', FALSE, TRUE, NULL, NULL, FALSE, FALSE, $checkPermissions);
-
-        if (!empty($customFields)) {
-          $addressCustom = CRM_Core_BAO_CustomField::postProcess($params,
-            $address->id,
-            'Address',
-            FALSE,
-            $checkPermissions
-          );
-        }
-      }
-      if (!empty($addressCustom)) {
-        CRM_Core_BAO_CustomValueTable::store($addressCustom, 'civicrm_address', $address->id);
-      }
-
+    if (in_array($event->action, ['create', 'edit'])) {
       // call the function to sync shared address and create relationships
       // if address is already shared, share master_id with all children and update relationships accordingly
       // (prevent chaining 2) CRM-21214
-      self::processSharedAddress($address->id, $params);
-
-      // lets call the post hook only after we've done all the follow on processing
-      CRM_Utils_Hook::post($hook, 'Address', $address->id, $address);
+      self::processSharedAddress($event->id, $event->params, $event->action);
     }
-
-    return $address;
   }
 
   /**
@@ -198,7 +107,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       ];
 
       foreach ($billing as $key => $val) {
-        if ($value = CRM_Utils_Array::value($val, $params)) {
+        $value = $params[$val] ?? NULL;
+        if ($value) {
           if (!empty($params[$key])) {
             unset($params[$val]);
           }
@@ -542,7 +452,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       // added this for CRM 1200
       'address_id' => $this->id,
       // CRM-4003
-      'address_name' => str_replace('', ' ', $this->name),
+      'address_name' => str_replace('', ' ', ($this->name ?? '')),
       'street_address' => $this->street_address,
       'supplemental_address_1' => $this->supplemental_address_1,
       'supplemental_address_2' => $this->supplemental_address_2,
@@ -837,7 +747,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     // the DB to fatal
     $fields = CRM_Core_BAO_Address::fields();
     foreach ($fields as $fieldname => $field) {
-      if (!empty($field['maxlength']) && strlen(CRM_Utils_Array::value($fieldname, $parseFields)) > $field['maxlength']) {
+      if (!empty($field['maxlength']) && strlen(($parseFields[$fieldname] ?? '')) > $field['maxlength']) {
         return $emptyParseFields;
       }
     }
@@ -1007,7 +917,7 @@ SELECT is_primary,
     }
 
     // prevent an endless chain between two shared addresses (prevent chaining 3) CRM-21214
-    if (CRM_Utils_Array::value('id', $params) == $params['master_id']) {
+    if (($params['id'] ?? NULL) == $params['master_id']) {
       $params['master_id'] = NULL;
       CRM_Core_Session::setStatus(ts("You can't connect an address to itself"), '', 'warning');
     }
@@ -1020,17 +930,11 @@ SELECT is_primary,
    *   Address id.
    * @param array $params
    *   Associated array of address params.
+   * @param string $parentOperation Operation being taken on the parent entity.
    */
-  public static function processSharedAddress($addressId, $params) {
+  public static function processSharedAddress($addressId, $params, $parentOperation = NULL) {
     $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
     $dao = CRM_Core_DAO::executeQuery($query, [1 => [$addressId, 'Integer']]);
-
-    // legacy - for api backward compatibility
-    if (!isset($params['add_relationship']) && isset($params['update_current_employer'])) {
-      // warning
-      CRM_Core_Error::deprecatedFunctionWarning('update_current_employer is deprecated, use add_relationship instead');
-      $params['add_relationship'] = $params['update_current_employer'];
-    }
 
     // Default to TRUE if not set to maintain api backward compatibility.
     $createRelationship = $params['add_relationship'] ?? TRUE;
@@ -1060,6 +964,7 @@ SELECT is_primary,
       $addressDAO->copyValues($params);
       $addressDAO->id = $dao->id;
       $addressDAO->save();
+      $addressDAO->copyCustomFields($addressId, $addressDAO->id, $parentOperation);
     }
   }
 
@@ -1193,7 +1098,7 @@ SELECT is_primary,
 
     // If already there is a relationship record of $relParam criteria, avoid creating relationship again or else
     // it will casue CRM-16588 as the Duplicate Relationship Exception will revert other contact field values on update
-    if (CRM_Contact_BAO_Relationship::checkDuplicateRelationship($relParam, $currentContactId, $sharedContactId)) {
+    if (CRM_Contact_BAO_Relationship::checkDuplicateRelationship($relParam, (int) $currentContactId, (int) $sharedContactId)) {
       return;
     }
 
@@ -1201,7 +1106,7 @@ SELECT is_primary,
       // create relationship
       civicrm_api3('relationship', 'create', $relParam);
     }
-    catch (CiviCRM_API3_Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // We catch and ignore here because this has historically been a best-effort relationship create call.
       // presumably it could refuse due to duplication or similar and we would ignore that.
     }
@@ -1217,7 +1122,8 @@ SELECT is_primary,
    * @param bool $returnStatus
    *   By default false.
    *
-   * @return string
+   * @return array|void
+   *   If ($returnStatus == true) the returned value is an array containing contactList and count
    */
   public static function setSharedAddressDeleteStatus($addressId = NULL, $contactId = NULL, $returnStatus = FALSE) {
     // check if address that is being deleted has any shared
@@ -1272,12 +1178,15 @@ SELECT is_primary,
   /**
    * Call common delete function.
    *
-   * @param int $id
+   * @see \CRM_Contact_BAO_Contact::on_hook_civicrm_post
    *
+   * @param int $id
+   * @deprecated
    * @return bool
    */
   public static function del($id) {
-    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Address', $id);
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
   /**
@@ -1369,12 +1278,101 @@ SELECT is_primary,
   public static function addGeocoderData(&$params) {
     try {
       $provider = CRM_Utils_GeocodeProvider::getConfiguredProvider();
+      $providerExists = TRUE;
     }
     catch (CRM_Core_Exception $e) {
-      return FALSE;
+      $providerExists = FALSE;
     }
-    $provider::format($params);
-    return TRUE;
+    if ($providerExists) {
+      $provider::format($params);
+    }
+    // dev/core#2379 - Limit geocode length to 14 characters to avoid validation error on save in UI.
+    foreach (['geo_code_1', 'geo_code_2'] as $geocode) {
+      if ($params[$geocode] ?? FALSE) {
+        // ensure that if the geocoding provider (Google, OSM etc) has returned the string 'null' because they can't geocode, ensure that contacts are not placed on null island 0,0
+        if ($params[$geocode] !== 'null') {
+          $params[$geocode] = (float) substr($params[$geocode], 0, 14);
+        }
+      }
+    }
+    return $providerExists;
+  }
+
+  /**
+   * Create multiple addresses using legacy methodology.
+   *
+   * @param array $params
+   * @param bool $fixAddress
+   *
+   * @return array|null
+   */
+  public static function legacyCreate(array $params, bool $fixAddress) {
+    if (!isset($params['address']) || !is_array($params['address'])) {
+      return NULL;
+    }
+    CRM_Core_BAO_Block::sortPrimaryFirst($params['address']);
+
+    $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
+    $contactId = $params['contact_id'];
+    //get all the addresses for this contact
+    $addresses = self::allAddress($contactId);
+
+    $isPrimary = $isBilling = TRUE;
+    $blocks = [];
+    foreach ($params['address'] as $key => $value) {
+      if (!is_array($value)) {
+        continue;
+      }
+
+      $addressExists = self::dataExists($value);
+      if (empty($value['id'])) {
+        if (!empty($addresses) && !empty($value['location_type_id']) && array_key_exists($value['location_type_id'], $addresses)) {
+          $value['id'] = $addresses[$value['location_type_id']];
+        }
+      }
+
+      // Note there could be cases when address info already exist ($value[id] is set) for a contact/entity
+      // BUT info is not present at this time, and therefore we should be really careful when deleting the block.
+      // $updateBlankLocInfo will help take appropriate decision. CRM-5969
+      if (isset($value['id']) && !$addressExists && $updateBlankLocInfo) {
+        Address::delete(FALSE)->addWhere('id', '=', $value['id'])->execute();
+        continue;
+      }
+      elseif (!$addressExists) {
+        continue;
+      }
+
+      if ($isPrimary && !empty($value['is_primary'])) {
+        $isPrimary = FALSE;
+      }
+      else {
+        $value['is_primary'] = 0;
+      }
+
+      if ($isBilling && !empty($value['is_billing'])) {
+        $isBilling = FALSE;
+      }
+      else {
+        $value['is_billing'] = 0;
+      }
+
+      if (empty($value['manual_geo_code'])) {
+        $value['manual_geo_code'] = 0;
+      }
+      $value['contact_id'] = $contactId;
+
+      if ($fixAddress) {
+        self::fixAddress($value);
+      }
+
+      // Format custom data
+      if (!isset($value['custom'])) {
+        $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value, $value['id'] ?? NULL, 'Address');
+      }
+
+      $blocks[] = self::writeRecord($value);
+    }
+    return $blocks;
   }
 
 }

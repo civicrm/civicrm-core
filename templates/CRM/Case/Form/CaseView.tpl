@@ -24,7 +24,7 @@
         <td colspan="5" class="label">
           {ts}Clients:{/ts}
           {foreach from=$caseRoles.client item=client name=clients}
-            <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if not $smarty.foreach.clients.last}, &nbsp; {/if}
+            <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if count($caseRoles.client) gt 1}<a class="crm-popup crm-hover-button" href="{crmURL p='civicrm/contact/view/case/deleteClient' q="action=delete&reset=1&cid=`$client.contact_id`&id=`$caseId`&rcid=`$contactID`"}" title="{ts}Remove Client{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>{/if}{if not $smarty.foreach.clients.last}, &nbsp; {/if}
           {/foreach}
           <a href="#addClientDialog" class="crm-hover-button case-miniform" title="{ts}Add Client{/ts}" data-key="{crmKey name='civicrm/case/ajax/addclient'}">
             <i class="crm-i fa-user-plus" aria-hidden="true"></i>
@@ -45,7 +45,7 @@
             {foreach from=$caseRoles.client item=client}
               <tr class="crm-case-caseview-display_name">
                 <td class="label-left bold" style="padding: 0px; border: none;">
-                  <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if $client.email}{crmAPI var='email_type_id' entity='OptionValue' action='getsingle' return="value" name="Email" option_group_id="activity_type"}<span class="crm-case-caseview-email"><a class="crm-hover-button crm-popup" href="{crmURL p='civicrm/activity/email/add' q="reset=1&action=add&atype=`$email_type_id.value`&cid=`$client.contact_id`&caseid=`$caseId`"}" title="{ts 1=$client.email|escape}Email: %1{/ts}"><i class="crm-i fa-envelope" aria-hidden="true"></i></a></span>{/if}
+                  <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if $client.email}{crmAPI var='email_type_id' entity='OptionValue' action='getsingle' return="value" name="Email" option_group_id="activity_type"}<span class="crm-case-caseview-email"><a class="crm-hover-button crm-popup" href="{crmURL p='civicrm/case/email/add' q="reset=1&action=add&atype=`$email_type_id.value`&cid=`$client.contact_id`&caseid=`$caseId`"}" title="{ts 1=$client.email|escape}Email: %1{/ts}"><i class="crm-i fa-envelope" aria-hidden="true"></i></a></span>{/if}
                 </td>
               </tr>
               {if $client.phone}
@@ -95,7 +95,7 @@
       <p>
         {$form.add_activity_type_id.html}
         {if $hasAccessToAllCases} &nbsp;
-          {$form.timeline_id.html}{$form._qf_CaseView_next.html} &nbsp;
+          {$form.timeline_id.html}{*This CaseView_next button is hidden, but gets clicked by the onChange handler for timeline_id in CaseView.js*}{$form._qf_CaseView_next.html} &nbsp;
           {$form.report_id.html}
         {/if}
       </p>
@@ -112,7 +112,7 @@
 
         {if $mergeCases}
           <a href="#mergeCasesDialog" class="action-item no-popup crm-hover-button case-miniform"><i class="crm-i fa-compress" aria-hidden="true"></i> {ts}Merge Case{/ts}</a>
-          {$form._qf_CaseView_next_merge_case.html}
+          {*This CaseView_next_merge_case button is hidden, but gets clicked by javascript in CaseView.js when the mergeCasesDialog popup is saved.*}{$form._qf_CaseView_next_merge_case.html}
           <span id="mergeCasesDialog" class="hiddenElement">
             {$form.merge_case_id.html}
           </span>
@@ -150,15 +150,35 @@
         <div><label for="edit_role_contact_id">{ts}Change To{/ts}:</label></div>
         <div><input name="edit_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
       </div>
-
+      <div id="caseRoles-selector-show-active">
+        {* Add checkbox to show inactive roles. For open cases, default value is unchecked, i.e. show active roles. For closed cases default is checked. *}
+        <label><input type="checkbox" id="role_inactive" name="role_inactive[]"{if $caseDetails.status_class neq 'Opened'} checked="checked"{/if}>{ts}Show Inactive relationships{/ts}</label>
+      </div>
+      {literal}
+        <script type="text/javascript">
+            (function($) {
+                // hide the inactive role when checkbox is checked
+                $('input[type=checkbox][id=role_inactive]').change(function() {
+                  if (this.checked == true) {
+                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').hide();
+                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').show();
+                  } else if (this.checked == false) {
+                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').show();
+                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').hide();
+                  }
+                });
+            })(CRM.$);
+        </script>
+      {/literal}
       <table id="caseRoles-selector-{$caseID}"  class="report-layout crm-ajax-table" data-page-length="10">
         <thead>
           <tr>
             <th data-data="relation">{ts}Case Role{/ts}</th>
-            <th data-data="name">{ts}Name{/ts}</th>
+            <th data-data="sort_name">{ts}Name{/ts}</th>
             <th data-data="phone">{ts}Phone{/ts}</th>
             <th data-data="email">{ts}Email{/ts}</th>
-            {if $relId neq 'client' and $hasAccessToAllCases}
+            <th data-data="end_date">{ts}End Date{/ts}</th>
+            {if $hasAccessToAllCases}
               <th data-data="actions" data-orderable="false">{ts}Actions{/ts}</th>
             {/if}
           </tr>
@@ -170,7 +190,17 @@
             var caseId = {/literal}{$caseID}{literal};
             CRM.$('table#caseRoles-selector-' + caseId).data({
               "ajax": {
-                "url": {/literal}'{crmURL p="civicrm/ajax/caseroles" h=0 q="snippet=4&caseID=$caseId&cid=$contactID&userID=$userID"}'{literal}
+                "url": {/literal}'{crmURL p="civicrm/ajax/caseroles" h=0 q="snippet=4&caseID=$caseId&cid=$contactID&userID=$userID"}'{literal},
+                "complete" : function(){
+                  if (CRM.$('input[type=checkbox][id=role_inactive]').prop('checked')) {
+                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').hide();
+                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').show();
+                  }
+                  else {
+                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').show();
+                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').hide();
+                  }
+                }
               }
             });
           })(CRM.$);
@@ -279,7 +309,7 @@
      </p>
    {/foreach}
 
-   {if !$tags && !$tagSetTags }
+   {if !$tags && !$tagSetTags}
      <div class="status">
        {ts}There are no tags currently assigned to this case.{/ts}
      </div>

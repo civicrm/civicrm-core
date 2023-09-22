@@ -130,7 +130,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    * We add the icons based on these css names which are lower cased
    * and only AlphaNumeric (+ _).
    *
-   * @param $key
+   * @param string $key
    *
    * @return string
    */
@@ -148,7 +148,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    * We do a strotolower comparison as we don't know what case people might have if they
    * are using a non-std one like dinersclub.
    *
-   * @param $key
+   * @param string $key
    *
    * Based on http://davidwalsh.name/validate-credit-cards
    * See also https://en.wikipedia.org/wiki/Credit_card_numbers

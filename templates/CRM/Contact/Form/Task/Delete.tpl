@@ -10,7 +10,7 @@
 {* Confirmation of contact deletes  *}
 <div class="crm-block crm-form-block crm-contact-task-delete-form-block">
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>&nbsp;
+  {icon icon="fa-info-circle"}{/icon}
       {if $restore}
     {ts}Are you sure you want to restore the selected contact(s)? The contact(s) and all related data will be fully restored.{/ts}
       {elseif $trash}
@@ -22,5 +22,5 @@
 
 
     <h3>{include file="CRM/Contact/Form/Task.tpl"}</h3>
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 </div>

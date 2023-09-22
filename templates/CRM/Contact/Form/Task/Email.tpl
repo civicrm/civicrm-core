@@ -8,32 +8,31 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-contactEmail-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 {if $suppressedEmails > 0}
     <div class="status">
         <p>{ts count=$suppressedEmails plural='Email will NOT be sent to %count contacts - (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).'}Email will NOT be sent to %count contact - (no email address on file, or communication preferences specify DO NOT EMAIL, or contact is deceased).{/ts}</p>
     </div>
 {/if}
-{crmSetting var="logged_in_email_setting" name="allow_mail_from_logged_in_contact"}
+
 <table class="form-layout-compressed">
   <tr id="selectEmailFrom" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
     <td class="label">{$form.from_email_address.label}</td>
-    <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin logged_in_email_setting=$logged_in_email_setting}</td>
+    <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
   </tr>
     <tr class="crm-contactEmail-form-block-recipient">
        <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
        <td>
-         {$form.to.html}
+         {$form.to.html} {help id="id-to_email" file="CRM/Contact/Form/Task/Email.hlp"}
        </td>
     </tr>
-    <tr class="crm-contactEmail-form-block-cc_id" {if !$form.cc_id.value}style="display:none;"{/if}>
+    <tr class="crm-contactEmail-form-block-cc_id" {if empty($form.cc_id.value)}style="display:none;"{/if}>
       <td class="label">{$form.cc_id.label}</td>
       <td>
         {$form.cc_id.html}
         <a class="crm-hover-button clear-cc-link" rel="cc_id" title="{ts}Clear{/ts}" href="#"><i class="crm-i fa-times" aria-hidden="true"></i></a>
       </td>
     </tr>
-    <tr class="crm-contactEmail-form-block-bcc_id" {if !$form.bcc_id.value}style="display:none;"{/if}>
+    <tr class="crm-contactEmail-form-block-bcc_id" {if empty($form.bcc_id.value)}style="display:none;"{/if}>
       <td class="label">{$form.bcc_id.label}</td>
       <td>
         {$form.bcc_id.html}
@@ -44,8 +43,8 @@
       <td></td>
       <td>
         <div>
-          <a href="#" rel="cc_id" class="add-cc-link crm-hover-button" {if $form.cc_id.value}style="display:none;"{/if}>{ts}Add CC{/ts}</a>&nbsp;&nbsp;
-          <a href="#" rel="bcc_id" class="add-cc-link crm-hover-button" {if $form.bcc_id.value}style="display:none;"{/if}>{ts}Add BCC{/ts}</a>
+          <a href="#" rel="cc_id" class="add-cc-link crm-hover-button" {if !empty($form.cc_id.value)}style="display:none;"{/if}>{ts}Add CC{/ts}</a>&nbsp;&nbsp;
+          <a href="#" rel="bcc_id" class="add-cc-link crm-hover-button" {if !empty($form.bcc_id.value)}style="display:none;"{/if}>{ts}Add BCC{/ts}</a>
         </div>
       </td>
     </tr>
@@ -68,7 +67,7 @@
   {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contactEmail-form-block-campaign_id"}
 </table>
 
-{include file="CRM/Contact/Form/Task/EmailCommon.tpl"}
+{include file="CRM/Contact/Form/Task/EmailCommon.tpl" noAttach=0}
 {include file="CRM/Activity/Form/FollowUp.tpl" type='email-'}
 
 <div class="spacer"> </div>
@@ -101,7 +100,7 @@ CRM.$(function($) {
     $('.crm-contactEmail-form-block-'+type, $form).hide().find('input.crm-ajax-select').select2('data', []);
   });
 
-  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0 }{literal}";
+  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0}{literal}";
 
   function emailSelect(el, prepopulate) {
     $(el, $form).data('api-entity', 'contact').css({width: '40em', 'max-width': '90%'}).crmSelect2({
@@ -124,8 +123,7 @@ CRM.$(function($) {
   }
 
   {/literal}
-  var toContact = {if $toContact}{$toContact}{else}''{/if},
-    ccContact = {if $ccContact}{$ccContact}{else}''{/if};
+  var toContact = {if $toContact}{$toContact}{else}''{/if};
   {literal}
   emailSelect('#to', toContact);
 });

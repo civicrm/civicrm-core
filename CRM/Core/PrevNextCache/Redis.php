@@ -23,7 +23,7 @@
  */
 class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
 
-  const TTL = 21600;
+  private const TTL = 21600;
 
   /**
    * @var Redis
@@ -45,31 +45,53 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     $this->prefix .= \CRM_Utils_Cache::DELIMITER . 'prevnext' . \CRM_Utils_Cache::DELIMITER;
   }
 
+  /**
+   * Get the time-to-live.
+   *
+   * This is likely to be made configurable in future.
+   *
+   * @return int
+   */
+  public function getTTL() : int {
+    return self::TTL;
+  }
+
   public function fillWithSql($cacheKey, $sql, $sqlParams = []) {
-    $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams, FALSE, NULL, FALSE, TRUE, TRUE);
-    if (is_a($dao, 'DB_Error')) {
-      throw new CRM_Core_Exception($dao->message);
-    }
+    $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams, FALSE);
 
-    list($allKey, $dataKey, , $maxScore) = $this->initCacheKey($cacheKey);
-
+    [$allKey, $dataKey, , $maxScore] = $this->initCacheKey($cacheKey);
+    $first = TRUE;
     while ($dao->fetch()) {
-      list (, $entity_id, $data) = array_values($dao->toArray());
+      [, $entity_id, $data] = array_values($dao->toArray());
       $maxScore++;
       $this->redis->zAdd($allKey, $maxScore, $entity_id);
+      if ($first) {
+        $this->redis->expire($allKey, $this->getTTL());
+      }
       $this->redis->hSet($dataKey, $entity_id, $data);
+      if ($first) {
+        $this->redis->expire($dataKey, $this->getTTL());
+      }
+      $first = FALSE;
     }
 
     return TRUE;
   }
 
   public function fillWithArray($cacheKey, $rows) {
-    list($allKey, $dataKey, , $maxScore) = $this->initCacheKey($cacheKey);
-
+    [$allKey, $dataKey, , $maxScore] = $this->initCacheKey($cacheKey);
+    $first = TRUE;
     foreach ($rows as $row) {
       $maxScore++;
       $this->redis->zAdd($allKey, $maxScore, $row['entity_id1']);
+      if ($first) {
+        $this->redis->expire($allKey, $this->getTTL());
+      }
       $this->redis->hSet($dataKey, $row['entity_id1'], $row['data']);
+      if ($first) {
+        $this->redis->expire($dataKey, $this->getTTL());
+      }
+      $first = FALSE;
     }
 
     return TRUE;
@@ -85,22 +107,30 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     $selKey = $this->key($cacheKey, 'sel');
 
     if ($action === 'select') {
+      $first = TRUE;
       foreach ((array) $ids as $id) {
         $score = $this->redis->zScore($allKey, $id);
         $this->redis->zAdd($selKey, $score, $id);
+        if ($first) {
+          $this->redis->expire($selKey, $this->getTTL());
+        }
+        $first = FALSE;
       }
     }
     elseif ($action === 'unselect' && $ids === NULL) {
-      $this->redis->delete($selKey);
-      $this->redis->setTimeout($selKey, self::TTL);
+      $this->redis->del($selKey);
+      $this->redis->expire($selKey, $this->getTTL());
     }
     elseif ($action === 'unselect' && $ids !== NULL) {
       foreach ((array) $ids as $id) {
-        $this->redis->zDelete($selKey, $id);
+        $this->redis->zRem($selKey, $id);
       }
     }
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function getSelection($cacheKey, $action = 'get') {
     $allKey = $this->key($cacheKey, 'all');
     $selKey = $this->key($cacheKey, 'sel');
@@ -112,16 +142,14 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
       }
       return [$cacheKey => $result];
     }
-    elseif ($action === 'getall') {
+    if ($action === 'getall') {
       $result = [];
       foreach ($this->redis->zRange($allKey, 0, -1) as $entity_id) {
         $result[$entity_id] = 1;
       }
       return [$cacheKey => $result];
     }
-    else {
-      throw new \CRM_Core_Exception("Unrecognized action: $action");
-    }
+    throw new \CRM_Core_Exception("Unrecognized action: $action");
   }
 
   public function getPositions($cacheKey, $id1) {
@@ -155,13 +183,16 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     return $pos;
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function deleteItem($id = NULL, $cacheKey = NULL) {
     if ($id === NULL && $cacheKey !== NULL) {
       // Delete by cacheKey.
       $allKey = $this->key($cacheKey, 'all');
       $selKey = $this->key($cacheKey, 'sel');
       $dataKey = $this->key($cacheKey, 'data');
-      $this->redis->delete($allKey, $selKey, $dataKey);
+      $this->redis->del($allKey, $selKey, $dataKey);
     }
     elseif ($id === NULL && $cacheKey === NULL) {
       // Delete everything.
@@ -170,9 +201,12 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     }
     elseif ($id !== NULL && $cacheKey !== NULL) {
       // Delete a specific contact, within a specific cache.
-      $this->redis->zDelete($this->key($cacheKey, 'all'), $id);
-      $this->redis->zDelete($this->key($cacheKey, 'sel'), $id);
-      $this->redis->hDel($this->key($cacheKey, 'data'), $id);
+      $deleted = $this->redis->zRem($this->key($cacheKey, 'all'), $id);
+      if ($deleted) {
+        // If they were in the 'all' key they might be in the more specific 'sel' and 'data' keys.
+        $this->redis->zRem($this->key($cacheKey, 'sel'), $id);
+        $this->redis->hDel($this->key($cacheKey, 'data'), $id);
+      }
     }
     elseif ($id !== NULL && $cacheKey === NULL) {
       // Delete a specific contact, across all prevnext caches.
@@ -185,13 +219,13 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
       }
     }
     else {
-      throw new CRM_Core_Exception("Not implemented: Redis::deleteItem");
+      throw new CRM_Core_Exception('Not implemented: Redis::deleteItem');
     }
   }
 
   public function getCount($cacheKey) {
     $allKey = $this->key($cacheKey, 'all');
-    return $this->redis->zSize($allKey);
+    return $this->redis->zCard($allKey);
   }
 
   /**
@@ -224,10 +258,6 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     $allKey = $this->key($cacheKey, 'all');
     $selKey = $this->key($cacheKey, 'sel');
     $dataKey = $this->key($cacheKey, 'data');
-
-    $this->redis->setTimeout($allKey, self::TTL);
-    $this->redis->setTimeout($dataKey, self::TTL);
-    $this->redis->setTimeout($selKey, self::TTL);
 
     $maxScore = 0;
     foreach ($this->redis->zRange($allKey, -1, -1, TRUE) as $lastElem => $lastScore) {

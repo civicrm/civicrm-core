@@ -6,11 +6,18 @@
   <name>civicrm_mailing_job</name>
   <comment>Stores information about the job that executes this mailing</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
+  <title>Outbound Mailing</title>
+  <description>Attempted delivery of a mailing.</description>
   <field>
     <name>id</name>
     <title>Mailing Job ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <label>ID</label>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -18,10 +25,13 @@
   </primaryKey>
   <field>
     <name>mailing_id</name>
-    <title>Mailing</title>
+    <title>Mailing ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>The ID of the mailing this Job will send.</comment>
+    <html>
+      <label>Mailing</label>
+    </html>
   </field>
   <foreignKey>
     <name>mailing_id</name>
@@ -86,6 +96,7 @@
     <title>Mailing Job Is Test?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this job for a test mail?</comment>
     <add>1.9</add>
   </field>
@@ -99,10 +110,13 @@
   </field>
   <field>
     <name>parent_id</name>
-    <title>Mailing Job Parent</title>
+    <title>Parent ID</title>
     <type>int unsigned</type>
     <comment>Parent job id</comment>
     <default>NULL</default>
+    <html>
+      <label>Parent</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>

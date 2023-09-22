@@ -57,8 +57,8 @@ function _civicrm_api3_note_create_spec(&$params) {
  * @return array
  */
 function civicrm_api3_note_delete($params) {
-  $result = new CRM_Core_BAO_Note();
-  return $result->del($params['id']) ? civicrm_api3_create_success() : civicrm_api3_create_error('Error while deleting Note');
+  $result = CRM_Core_BAO_Note::deleteRecord($params);
+  return $result ? civicrm_api3_create_success() : civicrm_api3_create_error('Error while deleting Note');
 }
 
 /**

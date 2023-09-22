@@ -14,8 +14,8 @@
 {strip}
 <table class="selector row-highlight">
 <thead class="sticky">
-{if ! $single and $context eq 'Search' }
-  <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
+{if ! $single and $context eq 'Search'}
+  <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
 {/if}
   {foreach from=$columnHeaders item=header}
     <th scope="col">
@@ -32,8 +32,8 @@
   {counter start=0 skip=1 print=false}
   {foreach from=$rows item=row}
   <tr id='rowid{$row.membership_id}' class="{cycle values="odd-row,even-row"} {*if $row.cancel_date} disabled{/if*} crm-membership_{$row.membership_id}">
-     {if ! $single }
-       {if $context eq 'Search' }
+     {if ! $single}
+       {if $context eq 'Search'}
           {assign var=cbName value=$row.checkbox}
           <td>{$form.$cbName.html}</td>
        {/if}
@@ -43,7 +43,7 @@
         </td>
     {/if}
     <td class="crm-membership-type crm-membership-type_{$row.membership_type}">
-        {$row.membership_type}{if $row.is_test} ({ts}test{/ts}){/if}
+        {$row.membership_type}
         {if $row.owner_membership_id}<br />({ts}by relationship{/ts}){/if}
     </td>
     <td class="crm-membership-join_date">{$row.membership_join_date|truncate:10:''|crmDate}</td>

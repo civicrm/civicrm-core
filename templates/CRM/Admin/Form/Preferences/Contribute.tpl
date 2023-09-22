@@ -7,8 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-{$formName}-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+<div class="crm-block crm-form-block crm--block">
   {include file="CRM/Form/basicFormFields.tpl"}
 
   <table class="form-layout" id="invoicing_blocks">
@@ -20,7 +19,7 @@
             <td class="label"></td>
             <td>
               {$form.$htmlField.html} {$form.$htmlField.label}
-              {if $desc}
+              {if $fieldSpec.description}
                 <br /><span class="description">{$fieldSpec.description}</span>
               {/if}
             </td>

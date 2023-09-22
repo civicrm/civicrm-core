@@ -138,7 +138,7 @@ class RecipientBuilder {
   public function build() {
     $this->buildRelFirstPass();
 
-    if ($this->prepareAddlFilter('c.id') && $this->notTemplate()) {
+    if ($this->prepareAddlFilter('c.id') && $this->mapping->sendToAdditional($this->actionSchedule->entity_value)) {
       $this->buildAddlFirstPass();
     }
 
@@ -146,7 +146,7 @@ class RecipientBuilder {
       $this->buildRelRepeatPass();
     }
 
-    if ($this->actionSchedule->is_repeat && $this->prepareAddlFilter('c.id')) {
+    if ($this->actionSchedule->is_repeat && $this->prepareAddlFilter('c.id') && $this->mapping->sendToAdditional($this->actionSchedule->entity_value)) {
       $this->buildAddlRepeatPass();
     }
   }
@@ -190,9 +190,9 @@ class RecipientBuilder {
       ->merge($this->prepareAddlFilter('c.id'))
       ->where("c.id NOT IN (
              SELECT rem.contact_id
-             FROM civicrm_action_log rem INNER JOIN {$this->mapping->getEntity()} e ON rem.entity_id = e.id
+             FROM civicrm_action_log rem INNER JOIN {$this->getMappingTable()} e ON rem.entity_id = e.id
              WHERE rem.action_schedule_id = {$this->actionSchedule->id}
-             AND rem.entity_table = '{$this->mapping->getEntity()}'
+             AND rem.entity_table = '{$this->getMappingTable()}'
              )")
       // Where does e.id come from here? ^^^
       ->groupBy("c.id")
@@ -276,14 +276,13 @@ class RecipientBuilder {
     $defaultParams = [
       'casActionScheduleId' => $this->actionSchedule->id,
       'casMappingId' => $this->mapping->getId(),
-      'casMappingEntity' => $this->mapping->getEntity(),
+      'casMappingEntity' => $this->getMappingTable(),
       'casNow' => $this->now,
     ];
 
-    /** @var \CRM_Utils_SQL_Select $query */
     $query = $this->mapping->createQuery($this->actionSchedule, $phase, $defaultParams);
 
-    if ($this->actionSchedule->limit_to /*1*/) {
+    if ($this->actionSchedule->limit_to == 1) {
       $query->merge($this->prepareContactFilter($query['casContactIdField']));
     }
 
@@ -403,11 +402,17 @@ class RecipientBuilder {
       $date = $operator . "(!casDateField, INTERVAL {$actionSchedule->start_action_offset} {$actionSchedule->start_action_unit})";
       $startDateClauses[] = "'!casNow' >= {$date}";
       // This is weird. Waddupwidat?
-      if ($this->mapping->getEntity() == 'civicrm_participant') {
+      if ($this->getMappingTable() == 'civicrm_participant') {
         $startDateClauses[] = $operator . "(!casNow, INTERVAL 1 DAY ) {$op} " . '!casDateField';
       }
       else {
         $startDateClauses[] = "DATE_SUB(!casNow, INTERVAL 1 DAY ) <= {$date}";
+      }
+      if (!empty($actionSchedule->effective_start_date) && $actionSchedule->effective_start_date !== '0000-00-00 00:00:00') {
+        $startDateClauses[] = "'{$actionSchedule->effective_start_date}' <= {$date}";
+      }
+      if (!empty($actionSchedule->effective_end_date) && $actionSchedule->effective_end_date !== '0000-00-00 00:00:00') {
+        $startDateClauses[] = "'{$actionSchedule->effective_end_date}' > {$date}";
       }
     }
     elseif ($actionSchedule->absolute_date) {
@@ -462,7 +467,7 @@ WHERE      $group.id = {$groupId}
    */
   protected function prepareAddlFilter($contactIdField) {
     $contactAddlFilter = NULL;
-    if ($this->actionSchedule->limit_to !== NULL && !$this->actionSchedule->limit_to /*0*/) {
+    if ($this->actionSchedule->limit_to == 2) {
       $contactAddlFilter = $this->prepareContactFilter($contactIdField);
     }
     return $contactAddlFilter;
@@ -561,7 +566,7 @@ WHERE      $group.id = {$groupId}
     switch ($for) {
       case 'rel':
         $contactIdField = $query['casContactIdField'];
-        $entityName = $this->mapping->getEntity();
+        $entityName = $this->getMappingTable();
         $entityIdField = $query['casEntityIdField'];
         break;
 
@@ -603,25 +608,8 @@ reminder.action_schedule_id = {$this->actionSchedule->id}";
     return $this->mapping->resetOnTriggerDateChange($this->actionSchedule);
   }
 
-  /**
-   * Confirm this object isn't attached to a template.
-   * Returns TRUE if this action schedule isn't attached to a template.
-   * Templates are (currently) unique to events, so we only evaluate those.
-   *
-   * @return bool;
-   */
-  private function notTemplate() {
-    if ($this->mapping->getEntity() === 'civicrm_participant') {
-      $entityId = $this->actionSchedule->entity_value;
-      $query = new \CRM_Utils_SQL_Select('civicrm_event e');
-      $sql = $query
-        ->select('is_template')
-        ->where("e.id = {$entityId}")
-        ->toSQL();
-      $dao = \CRM_Core_DAO::executeQuery($sql);
-      return !(bool) $dao->fetchValue();
-    }
-    return TRUE;
+  protected function getMappingTable(): string {
+    return $this->mapping->getEntityTable($this->actionSchedule);
   }
 
 }

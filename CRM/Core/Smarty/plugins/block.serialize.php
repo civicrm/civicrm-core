@@ -15,7 +15,6 @@
  * @package CRM
  * @author Donald Lobo <lobo@civicrm.org>
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
  */
 
 /**

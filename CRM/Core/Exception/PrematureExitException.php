@@ -26,6 +26,13 @@
 class CRM_Core_Exception_PrematureExitException extends RuntimeException {
 
   /**
+   * Contextual data.
+   *
+   * @var array
+   */
+  public $errorData;
+
+  /**
    * Construct the exception. Note: The message is NOT binary safe.
    *
    * @link https://php.net/manual/en/exception.construct.php

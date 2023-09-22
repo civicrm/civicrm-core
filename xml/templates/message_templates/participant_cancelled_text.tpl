@@ -1,4 +1,4 @@
-{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
 
 {ts}Your Event Registration has been cancelled.{/ts}
 
@@ -8,15 +8,15 @@
 
 ===========================================================
 {$event.event_title}
-{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"shortdate" == $event.event_start_date|crmDate:"shortdate"}{$event.event_end_date|crmDate:"Time"}{else}{$event.event_end_date|crmDate}{/if}{/if}
 
-{ts}Participant Role{/ts}: {$participant.role}
+{ts}Participant Role{/ts}: {participant.role_id:label}
 
 {if $isShowLocation}
 {$event.location.address.1.display|strip_tags:false}
 {/if}{*End of isShowLocation condition*}
 
-{if $event.location.phone.1.phone || $event.location.email.1.email}
+{if !empty($event.location.phone.1.phone) || !empty($event.location.email.1.email)}
 
 {ts}Event Contacts:{/ts}
 {foreach from=$event.location.phone item=phone}
@@ -30,18 +30,18 @@
 {ts}Email{/ts}: {$eventEmail.email}{/if}{/foreach}
 {/if}
 
-{if $contact.email}
+{if '{contact.email}'}
 
 ===========================================================
 {ts}Registered Email{/ts}
 
 ===========================================================
-{$contact.email}
+{contact.email}
 {/if}
 
-{if $register_date}
-{ts}Registration Date{/ts}: {$participant.register_date|crmDate}
+{if !empty('{participant.register_date}')}
+{ts}Registration Date{/ts}: {participant.register_date}
 {/if}
 
-{ts 1=$domain.phone 2=$domain.email}Please contact us at %1 or send email to %2 if you have questions.{/ts}
+{ts 1='{domain.phone}' 2='{domain.email}'}Please contact us at %1 or send email to %2 if you have questions.{/ts}
 

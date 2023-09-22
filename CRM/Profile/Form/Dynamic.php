@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 /**
@@ -29,10 +28,8 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
   /**
    * Pre processing work done here.
    *
-   * @param
-   *
    */
-  public function preProcess() {
+  public function preProcess(): void {
     if ($this->get('register')) {
       $this->_mode = CRM_Profile_Form::MODE_REGISTER;
     }
@@ -54,7 +51,7 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
    * Build the form object.
    *
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->addButtons([
       [
         'type' => 'upload',
@@ -92,13 +89,6 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
     }
 
     return CRM_Profile_Form::formRule($fields, $files, $form);
-  }
-
-  /**
-   * Process the user submitted custom data values.
-   */
-  public function postProcess() {
-    parent::postProcess();
   }
 
 }

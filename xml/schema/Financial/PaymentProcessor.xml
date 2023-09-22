@@ -5,12 +5,22 @@
   <class>PaymentProcessor</class>
   <name>civicrm_payment_processor</name>
   <add>1.8</add>
+  <component>CiviContribute</component>
+  <paths>
+    <add>civicrm/admin/paymentProcessor/edit?action=add&amp;reset=1</add>
+    <update>civicrm/admin/paymentProcessor/edit?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/paymentProcessor/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+    <browse>civicrm/admin/paymentProcessor</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>Payment Processor ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Payment Processor ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>
@@ -19,7 +29,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Payment Processor Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -28,6 +38,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this match entry for</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -38,26 +51,44 @@
   </foreignKey>
   <field>
     <name>name</name>
-    <title>Payment Processor</title>
+    <title>Payment Processor Name</title>
+    <required>true</required>
     <type>varchar</type>
     <length>64</length>
     <comment>Payment Processor Name.</comment>
     <add>1.8</add>
     <html>
+      <label>Machine Name</label>
       <type>Text</type>
     </html>
   </field>
   <field>
     <name>title</name>
     <title>Payment Processor Title</title>
+    <required>true</required>
     <type>varchar</type>
-    <length>127</length>
+    <length>255</length>
     <localizable>true</localizable>
     <html>
+      <label>Backend Title</label>
       <type>Text</type>
     </html>
-    <comment>Payment Processor Descriptive Name.</comment>
+    <comment>Name of processor when shown to CiviCRM administrators.</comment>
     <add>5.13</add>
+  </field>
+  <field>
+    <name>frontend_title</name>
+    <title>Payment Processor Frontend Title</title>
+    <required>true</required>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <html>
+      <label>Frontend Title</label>
+      <type>Text</type>
+    </html>
+    <comment>Name of processor when shown to users making a payment.</comment>
+    <add>5.61</add>
   </field>
   <field>
     <name>description</name>
@@ -65,22 +96,15 @@
     <type>varchar</type>
     <length>255</length>
     <html>
+      <label>Description</label>
       <type>Text</type>
     </html>
-    <comment>Payment Processor Description.</comment>
+    <comment>Additional processor information shown to administrators.</comment>
     <add>1.8</add>
-  </field>
-  <field>
-    <name>payment_processor_type</name>
-    <type>varchar</type>
-    <length>255</length>
-    <comment>Payment Processor Type.</comment>
-    <add>1.8</add>
-    <drop>4.3</drop>
   </field>
   <field>
     <name>payment_processor_type_id</name>
-    <title>Payment Processor Type ID</title>
+    <title>Type ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_payment_processor_type</table>
@@ -89,6 +113,9 @@
     </pseudoconstant>
     <required>true</required>
     <length>10</length>
+    <html>
+      <label>Type</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>
@@ -103,15 +130,25 @@
     <type>boolean</type>
     <comment>Is this processor active?</comment>
     <add>1.8</add>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <default>1</default>
+    <required>true</required>
   </field>
   <field>
     <name>is_default</name>
     <title>Processor Is Default?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Default</label>
+    </html>
     <comment>Is this processor the default?</comment>
     <add>1.8</add>
-    <default>0</default>
   </field>
   <field>
     <name>is_test</name>
@@ -120,6 +157,7 @@
     <comment>Is this processor for a test site?</comment>
     <add>1.8</add>
     <default>0</default>
+    <required>true</required>
   </field>
   <index>
     <name>UI_name_test_domain_id</name>
@@ -229,6 +267,8 @@
     <name>is_recur</name>
     <title>Processor Supports Recurring?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>Can process recurring contributions</comment>
     <add>1.8</add>
   </field>

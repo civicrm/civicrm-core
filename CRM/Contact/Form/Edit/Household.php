@@ -42,7 +42,7 @@ class CRM_Contact_Form_Edit_Household {
     if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
       $form->addField('nick_name');
-      $form->addField('contact_source', ['label' => ts('Source')]);
+      $form->addField('contact_source', ['label' => ts('Contact Source')]);
     }
 
     if (!$inlineEditMode) {
@@ -73,7 +73,7 @@ class CRM_Contact_Form_Edit_Household {
 
     // make sure that household name is set
     if (empty($fields['household_name'])) {
-      $errors['household_name'] = 'Household Name should be set.';
+      $errors['household_name'] = ts('Household Name should be set.');
     }
 
     return empty($errors) ? TRUE : $errors;

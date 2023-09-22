@@ -23,10 +23,6 @@
  * @return array
  */
 function civicrm_api3_dashboard_contact_create($params) {
-  $errors = _civicrm_api3_dashboard_contact_check_params($params);
-  if ($errors !== NULL) {
-    return $errors;
-  }
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'DashboardContact');
 }
 
@@ -55,30 +51,12 @@ function _civicrm_api3_dashboard_contact_create_spec(&$fields) {
 }
 
 /**
- * Check permissions on contact dashboard retrieval.
- *
- * @param array $params
- *   Array per getfields metadata.
- *
- * @return array|null
- */
-function _civicrm_api3_dashboard_contact_check_params(&$params) {
-  if (!empty($params['dashboard_id'])) {
-    $allDashlets = CRM_Core_BAO_Dashboard::getDashlets(TRUE, $params['check_permissions'] ?? FALSE);
-    if (!isset($allDashlets[$params['dashboard_id']])) {
-      return civicrm_api3_create_error('Invalid or inaccessible dashboard ID');
-    }
-  }
-  return NULL;
-}
-
-/**
  * Delete an existing dashboard-contact.
  *
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_dashboard_contact_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

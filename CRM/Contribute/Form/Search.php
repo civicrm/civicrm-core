@@ -48,6 +48,11 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   protected $_prefix = 'contribute_';
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -57,10 +62,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   /**
    * Processing needed for buildForm and later.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
+    // SearchFormName is deprecated & to be removed - the replacement is for the task to
+    // call $this->form->getSearchFormValues()
+    // A couple of extensions use it.
     $this->set('searchFormName', 'Search');
 
     $this->_actionButtonName = $this->getButtonName('next', 'action');
@@ -68,6 +75,8 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $this->_done = FALSE;
 
     parent::preProcess();
+    // For contributionTotals.tpl
+    $this->addExpectedSmartyVariables(['annual']);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Contribute_Selector_Search($this->_queryParams,
@@ -139,7 +148,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     if ($this->isFormInViewOrEditMode()) {
@@ -245,10 +253,10 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->fixFormValues();
 
-    // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['contribution_test']) && $this->_force && !empty($this->_context) && $this->_context === 'dashboard') {
+    // We don't show template records in summaries or dashboards
+    if (empty($this->_formValues['is_template']) && $this->_force && !empty($this->_context) && ($this->_context === 'dashboard' || $this->_context === 'contribution')) {
       // @todo - stop changing formValues - respect submitted form values, change a working array.
-      $this->_formValues['contribution_test'] = 0;
+      $this->_formValues['is_template'] = 0;
     }
 
     foreach ([
@@ -306,9 +314,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         }
       }
     }
-
-    // @todo - stop changing formValues - respect submitted form values, change a working array.
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
@@ -389,12 +394,14 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
-    if ($cid) {
+    // skip cid (contact id of membership/participant record) to get associated payments for membership/participant record,
+    // contribution record may be on different contact id.
+    $skip_cid = CRM_Utils_Request::retrieve('skip_cid', 'Boolean', $this, FALSE, FALSE);
+
+    if ($cid && !$skip_cid) {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');
       if ($cid > 0) {
         $this->_formValues['contact_id'] = $cid;
-        // @todo - why do we retrieve these when they are not used?
-        list($display, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
         $this->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid,
           'sort_name'
         );
@@ -438,7 +445,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   /**
    * Set the metadata for the form.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setSearchMetadata() {
     $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);

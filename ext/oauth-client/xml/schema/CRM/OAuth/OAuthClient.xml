@@ -1,0 +1,119 @@
+<table>
+  <base>CRM/OAuth</base>
+  <class>OAuthClient</class>
+  <name>civicrm_oauth_client</name>
+  <add>5.32</add>
+  <field>
+    <name>id</name>
+    <title>Internal Client ID</title>
+    <type>int unsigned</type>
+    <comment>Internal Client ID</comment>
+    <add>5.32</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>provider</name>
+    <title>Provider</title>
+    <type>varchar</type>
+    <length>128</length>
+    <pseudoconstant>
+      <callback>CRM_OAuth_BAO_OAuthClient::getProviders</callback>
+    </pseudoconstant>
+    <required>true</required>
+    <comment>Provider</comment>
+    <add>5.32</add>
+  </field>
+  <index>
+    <name>UI_provider</name>
+    <fieldName>provider</fieldName>
+    <add>5.32</add>
+  </index>
+
+  <field>
+    <name>guid</name>
+    <title>Client ID</title>
+    <type>varchar</type>
+    <length>128</length>
+    <required>true</required>
+    <comment>Client ID</comment>
+    <add>5.32</add>
+  </field>
+  <index>
+    <name>UI_guid</name>
+    <fieldName>guid</fieldName>
+    <add>5.32</add>
+  </index>
+
+  <field>
+    <name>tenant</name>
+    <title>Tenant ID</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Tenant ID</comment>
+    <add>5.57</add>
+    <permission>
+      manage OAuth client
+    </permission>
+  </field>
+
+  <field>
+    <name>secret</name>
+    <title>Client Secret</title>
+    <type>text</type>
+    <comment>Client Secret</comment>
+    <add>5.32</add>
+    <!-- Would prefer this be write-only for std admin, and read-write with special/elevated perm -->
+    <permission>
+      manage OAuth client
+    </permission>
+  </field>
+
+  <field>
+    <name>options</name>
+    <type>text</type>
+    <comment>Extra override options for the service (JSON)</comment>
+    <!-- Ex: urlAuthorize, urlAccessToken, urlResourceOwnerDetails, scopes -->
+    <serialize>JSON</serialize>
+    <add>5.32</add>
+    <permission>
+      manage OAuth client
+    </permission>
+  </field>
+
+  <!-- Lifecycle -->
+
+  <field>
+    <name>is_active</name>
+    <title>Is Active</title>
+    <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <comment>Is the client currently enabled?</comment>
+    <add>5.32</add>
+  </field>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <comment>When the client was created.</comment>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
+    <add>5.32</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <type>timestamp</type>
+    <comment>When the client was created or modified.</comment>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>5.32</add>
+  </field>
+
+</table>

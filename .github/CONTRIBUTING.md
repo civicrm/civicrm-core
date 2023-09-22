@@ -17,4 +17,4 @@ Topics of particular importance while submitting pull requests include:
 * [Release Process](https://docs.civicrm.org/dev/en/latest/core/release-process/)
 * [Developer Community](https://docs.civicrm.org/dev/en/latest/basics/community/)
 
-CiviCRM thanks you for your contributions and invites you to [log your time spent](https://civicrm.org/contributor-log) so that you (or your organization) may receive public recognition and promotion for your efforts.
+CiviCRM thanks you for your contributions.

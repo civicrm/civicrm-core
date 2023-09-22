@@ -8,7 +8,7 @@
     data: null,
     settings: {collapsibleBehavior: 'accordion'},
     position: 'over-cms-menu',
-    toggleButton: true,
+    toggleButton: (CRM.config.userFramework != 'Standalone'),
     attachTo: (CRM.menubar && CRM.menubar.position === 'above-crm-container') ? '#crm-container' : 'body',
     initialize: function() {
       var cache = CRM.cache.get('menubar');
@@ -28,18 +28,14 @@
 
       // Wait for crm-container present on the page as it's faster than document.ready
       function insert(markup) {
-        if ($('#crm-container').length) {
+        if (document.getElementById('crm-container')) {
           render(markup);
         } else {
           new MutationObserver(function(mutations, observer) {
-            _.each(mutations, function(mutant) {
-              _.each(mutant.addedNodes, function(node) {
-                if ($(node).is('#crm-container')) {
-                  render(markup);
-                  observer.disconnect();
-                }
-              });
-            });
+            if (document.getElementById('crm-container')) {
+              observer.disconnect();
+              render(markup);
+            }
           }).observe(document, {childList: true, subtree: true});
         }
       }
@@ -105,11 +101,13 @@
       if (typeof speed === 'number') {
         $('#civicrm-menu').slideDown(speed, function() {
           $(this).css('display', '');
+          handleResize();
         });
       }
       $('body')
         .removeClass('crm-menubar-hidden')
         .addClass('crm-menubar-visible');
+      handleResize();
     },
     hide: function(speed, showMessage) {
       if (typeof speed === 'number') {
@@ -120,6 +118,7 @@
       $('body')
         .addClass('crm-menubar-hidden')
         .removeClass('crm-menubar-visible');
+      document.documentElement.style.setProperty('--crm-menubar-bottom', '0px');
       if (showMessage === true && $('#crm-notification-container').length && initialized) {
         var alert = CRM.alert('<a href="#" id="crm-restore-menu" >' + _.escape(ts('Restore CiviCRM Menu')) + '</a>', ts('Menu hidden'), 'none', {expires: 10000});
         $('#crm-restore-menu')
@@ -253,8 +252,10 @@
     initializeResponsive: function() {
       var $mainMenuState = $('#crm-menubar-state');
       // hide mobile menu beforeunload
-      $(window).on('beforeunload unload', function() {
-        CRM.menubar.spin(true);
+      $(window).on('beforeunload unload', function(e) {
+        if (!e.originalEvent.returnValue) {
+          CRM.menubar.spin(true);
+        }
         if ($mainMenuState[0].checked) {
           $mainMenuState[0].click();
         }
@@ -287,22 +288,28 @@
             var
               option = $('input[name=quickSearchField]:checked'),
               params = {
-                name: request.term,
-                field_name: option.val()
+                formName: 'crmMenubar',
+                fieldName: 'crm-qsearch-input',
+                filters: {},
               };
-            CRM.api3('contact', 'getquick', params).done(function(result) {
+            if (option.val() === 'sort_name') {
+              params.input = request.term;
+            } else {
+              params.filters[option.val()] = request.term;
+            }
+            CRM.api4('Contact', 'autocomplete', params).then(function(result) {
               var ret = [];
-              if (result.values.length > 0) {
+              if (result.length > 0) {
                 $('#crm-qsearch-input').autocomplete('widget').menu('option', 'disabled', false);
-                $.each(result.values, function(k, v) {
-                  ret.push({value: v.id, label: v.data});
+                $.each(result, function(key, item) {
+                  ret.push({value: item.id, label: item.label});
                 });
               } else {
                 $('#crm-qsearch-input').autocomplete('widget').menu('option', 'disabled', true);
                 var label = option.closest('label').text();
                 var msg = ts('%1 not found.', {1: label});
                 // Remind user they are not searching by contact name (unless they enter a number)
-                if (params.field_name !== 'sort_name' && !(/[\d].*/.test(params.name))) {
+                if (option.val() !== 'sort_name' && !(/[\d].*/.test(params.name))) {
                   msg += ' ' + ts('Did you mean to search by Name/Email instead?');
                 }
                 ret.push({value: '0', label: msg});
@@ -314,6 +321,12 @@
             });
           },
           focus: function (event, ui) {
+            // This is when an item is 'focussed' by keyboard up/down or mouse hover.
+            // It is not the same as actually having focus, i.e. it is not :focus
+            var lis = $(event.currentTarget).find('li[data-cid="' + ui.item.value + '"]');
+            lis.children('div').addClass('ui-state-active');
+            lis.siblings().children('div').removeClass('ui-state-active');
+            // Returning false leaves the user-entered text as it was.
             return false;
           },
           select: function (event, ui) {
@@ -336,7 +349,34 @@
               CRM.menubar.open('QuickSearch');
             }
           }
-        });
+        })
+        .autocomplete( "instance" )._renderItem = function( ul, item ) {
+          var uiMenuItemWrapper = $("<div class='ui-menu-item-uiMenuItemWrapper'>");
+          if (item.value == 0) {
+            // "No results"
+            uiMenuItemWrapper.text(item.label);
+          }
+          else {
+            uiMenuItemWrapper.append($('<a>')
+              .attr('href', CRM.url('civicrm/contact/view', {reset: 1, cid: item.value}))
+              .css({ display: 'block' })
+              .text(item.label)
+              .click(function(e) {
+                if (e.ctrlKey || e.shiftKey || e.altKey) {
+                  // Special-clicking lets you open several tabs.
+                  e.stopPropagation();
+                }
+                else {
+                  // Fall back to original behaviour.
+                  e.preventDefault();
+                }
+              }));
+          }
+
+          return $( "<li class='ui-menu-item' data-cid=" + item.value + ">" )
+            .append(uiMenuItemWrapper)
+            .appendTo( ul );
+        };
       $('#crm-qsearch > a').keyup(function(e) {
         if ($(e.target).is(this)) {
           $('#crm-qsearch-input').focus();
@@ -472,6 +512,7 @@
     } else {
       $('body').removeClass('crm-menubar-wrapped');
     }
+    document.documentElement.style.setProperty('--crm-menubar-bottom', ($('#civicrm-menu').height() + $('#civicrm-menu').position().top) + 'px');
   }
 
   // Figure out if we've hit the mobile breakpoint, based on the rule in crm-menubar.css

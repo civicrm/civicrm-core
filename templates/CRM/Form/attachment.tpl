@@ -17,7 +17,7 @@
                 <div id="attachFileRecord_{$attVal.fileID}">
                   <strong><a href="{$attVal.url}"><i class="crm-i {$attVal.icon}" aria-hidden="true"></i> {$attVal.cleanName}</a></strong>
                   {if $attVal.description}&nbsp;-&nbsp;{$attVal.description}{/if}
-                  {if !empty($attVal.tag)}
+                  {if $attVal.tag}
                     <br />
                     {ts}Tags{/ts}: {$attVal.tag}
                     <br />
@@ -32,13 +32,11 @@
     {else}
       {capture assign=attachTitle}{ts}Attachment(s){/ts}{/capture}
     {/if}
-    {if !$noexpand}
-    <div class="crm-accordion-wrapper {if $context NEQ 'pcpCampaign' AND !$currentAttachmentInfo}collapsed{/if}">
-       <div class="crm-accordion-header">
-          {$attachTitle}
-      </div><!-- /.crm-accordion-header -->
-     <div class="crm-accordion-body">
-     {/if}
+    <div class="crm-accordion-wrapper {if (!$context || $context NEQ 'pcpCampaign') AND !$currentAttachmentInfo}collapsed{/if}">
+     <div class="crm-accordion-header">
+      {$attachTitle}
+     </div><!-- /.crm-accordion-header -->
+    <div class="crm-accordion-body">
     <div id="attachments">
       <table class="form-layout-compressed">
       {if $form.attachFile_1}
@@ -48,16 +46,16 @@
         <tr>
           <td class="label">{$form.attachFile_1.label}</td>
           <td>{$form.attachFile_1.html}&nbsp;{$form.attachDesc_1.html}<a href="#" class="crm-hover-button crm-clear-attachment" style="visibility: hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
-            <div class="description">{ts}Browse to the <strong>file</strong> you want to upload.{/ts}{if $maxAttachments GT 1} {ts 1=$maxAttachments}You can have a maximum of %1 attachment(s).{/ts}{/if} {ts 1=$config->maxFileSize}Each file must be less than %1M in size. You can also add a short description.{/ts}</div>
+            <div class="description">{if $maxAttachments GT 1} {ts 1=$maxAttachments}You can have a maximum of %1 attachment(s).{/ts}{/if} {ts 1=$config->maxFileSize}Each file must be less than %1M in size. You can also add a short description.{/ts}</div>
           </td>
         </tr>
-        {if $form.tag_1.html}
+        {if $form.tag_1}
           <tr>
             <td class="label">{$form.tag_1.label}</td>
             <td><div class="crm-select-container crm-attachment-tags">{$form.tag_1.html}</div></td>
           </tr>
         {/if}
-        {if $tagsetInfo.file}
+        {if $tagsetInfo && $tagsetInfo.file}
           <tr>{include file="CRM/common/Tagset.tpl" tagsetType='file' tableLayout=true tagsetElementName="file_taglist_1"}</tr>
         {/if}
         {section name=attachLoop start=2 loop=$numAttachments+1}
@@ -70,11 +68,13 @@
                 <td class="label">{$form.attachFile_1.label}</td>
                 <td>{$form.$attachName.html}&nbsp;{$form.$attachDesc.html}<a href="#" class="crm-hover-button crm-clear-attachment" style="visibility: hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a></td>
             </tr>
+            {if $form.$tagElement}
             <tr>
               <td class="label">{$form.$tagElement.label}</td>
               <td><div class="crm-select-container crm-attachment-tags">{$form.$tagElement.html}</div></td>
             </tr>
-            {if $tagsetInfo.file}
+            {/if}
+            {if $tagsetInfo && $tagsetInfo.file}
               <tr>{include file="CRM/common/Tagset.tpl" tagsetType='file' tableLayout=true tagsetElementName="file_taglist_$index"}</tr>
             {/if}
         {/section}
@@ -92,7 +92,7 @@
                   {if $attVal.deleteURLArgs}
                    <a href="#" class="crm-hover-button delete-attachment" data-filename="{$attVal.cleanName}" data-args="{$attVal.deleteURLArgs}" title="{ts}Delete File{/ts}"><span class="icon delete-icon"></span></a>
                   {/if}
-                  {if !empty($attVal.tag)}
+                  {if $attVal.tag}
                     <br/>
                     {ts}Tags{/ts}: {$attVal.tag}
                     <br/>

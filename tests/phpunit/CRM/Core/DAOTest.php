@@ -8,7 +8,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
 
   const ABORTED_SQL = "_aborted_sql_";
 
-  public function testGetReferenceColumns() {
+  public function testGetReferenceColumns(): void {
     // choose CRM_Core_DAO_Email as an arbitrary example
     $emailRefs = CRM_Core_DAO_Email::getReferenceColumns();
     $refsByTarget = [];
@@ -19,10 +19,10 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $contactRef = $refsByTarget['civicrm_contact'];
     $this->assertEquals('contact_id', $contactRef->getReferenceKey());
     $this->assertEquals('id', $contactRef->getTargetKey());
-    $this->assertEquals('CRM_Core_Reference_Basic', get_class($contactRef));
+    $this->assertInstanceOf(\CRM_Core_Reference_Basic::class, $contactRef);
   }
 
-  public function testGetReferencesToTable() {
+  public function testGetReferencesToTable(): void {
     $refs = CRM_Core_DAO::getReferencesToTable(CRM_Financial_DAO_FinancialType::getTableName());
     $refsBySource = [];
     foreach ($refs as $refSpec) {
@@ -36,25 +36,26 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals('CRM_Core_Reference_Dynamic', get_class($genericRef));
   }
 
-  public function testFindReferences() {
+  public function testFindReferences(): void {
     $params = [
       'first_name' => 'Testy',
       'last_name' => 'McScallion',
       'contact_type' => 'Individual',
     ];
 
-    $contact = CRM_Contact_BAO_Contact::add($params);
-    $this->assertNotNull($contact->id);
+    $contactID = $this->callAPISuccess('Contact', 'create', $params)['id'];
 
     $params = [
       'email' => 'spam@dev.null',
-      'contact_id' => $contact->id,
+      'contact_id' => $contactID,
       'is_primary' => 0,
       'location_type_id' => 1,
     ];
 
-    $email = CRM_Core_BAO_Email::add($params);
+    $this->callAPISuccess('Email', 'create', $params);
 
+    $contact = new CRM_Contact_BAO_Contact();
+    $contact->id = $contactID;
     $refs = $contact->findReferences();
     $refsByTable = [];
     foreach ($refs as $refObj) {
@@ -64,7 +65,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertTrue(array_key_exists('civicrm_email', $refsByTable));
     $refDao = $refsByTable['civicrm_email'];
     $refDao->find(TRUE);
-    $this->assertEquals($contact->id, $refDao->contact_id);
+    $this->assertEquals($contactID, $refDao->contact_id);
   }
 
   /**
@@ -164,7 +165,6 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * @param $expectSql
    */
   public function testComposeQuery($inputSql, $inputParams, $expectSql) {
-    $scope = CRM_Core_TemporaryErrorScope::useException();
     try {
       $actualSql = CRM_Core_DAO::composeQuery($inputSql, $inputParams);
     }
@@ -183,7 +183,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * $params[3] = array('Bob', 'String');
    * i.e. the place holder should be unique and should not contain in any other operational use in query
    */
-  public function testComposeQueryFailure() {
+  public function testComposeQueryFailure(): void {
     $cases[] = [
       'SELECT * FROM whatever WHERE name = %1 AND title = %2 AND year LIKE \'%2012\' ',
       [
@@ -242,16 +242,17 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Core_DAO::shortenSQLName($inputData, $length, $makeRandom));
   }
 
-  public function testFindById() {
+  public function testFindById(): void {
     $params = $this->sampleContact('Individual', 4);
-    $existing_contact = CRM_Contact_BAO_Contact::add($params);
-    $contact = CRM_Contact_BAO_Contact::findById($existing_contact->id);
-    $this->assertEquals($existing_contact->id, $contact->id);
-    $deleted_contact_id = $existing_contact->id;
+    $existing_contact = $this->callAPISuccess('Contact', 'create', $params);
+    /** @var CRM_Contact_DAO_Contact $contact */
+    $contact = CRM_Contact_BAO_Contact::findById($existing_contact['id']);
+    $this->assertEquals($existing_contact['id'], $contact->id);
+    $deleted_contact_id = $existing_contact['id'];
     $this->contactDelete($contact->id);
     $exception_thrown = FALSE;
     try {
-      $deleted_contact = CRM_Contact_BAO_Contact::findById($deleted_contact_id);
+      CRM_Contact_BAO_Contact::findById($deleted_contact_id);
     }
     catch (Exception $e) {
       $exception_thrown = TRUE;
@@ -262,7 +263,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * requireSafeDBName() method (to check valid database name)
    */
-  public function testRequireSafeDBName() {
+  public function testRequireSafeDBName(): void {
     $databases = [
       'testdb' => TRUE,
       'test_db' => TRUE,
@@ -286,7 +287,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * Test the function designed to find myIsam tables.
    */
-  public function testMyISAMCheck() {
+  public function testMyISAMCheck(): void {
     // Cleanup previous, failed tests.
     CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS civicrm_my_isam');
 
@@ -309,7 +310,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * CRM-19930: Test toArray() function with $format param
    */
-  public function testDAOtoArray() {
+  public function testDAOtoArray(): void {
     $format = 'user[%s]';
     $params = [
       'first_name' => 'Testy',
@@ -317,8 +318,8 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ];
 
-    $dao = CRM_Contact_BAO_Contact::add($params);
-    $query = "SELECT contact_type, display_name FROM civicrm_contact WHERE id={$dao->id}";
+    $contact = $this->callAPISuccess('Contact', 'create', $params);
+    $query = "SELECT contact_type, display_name FROM civicrm_contact WHERE id={$contact['id']}";
     $toArray = [
       'contact_type' => 'Individual',
       'display_name' => 'Testy McScallion',
@@ -340,7 +341,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * CRM-17748: Test internal DAO options
    */
-  public function testDBOptions() {
+  public function testDBOptions(): void {
     $contactIDs = [];
     for ($i = 0; $i < 10; $i++) {
       $contactIDs[] = $this->individualCreate([
@@ -376,7 +377,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * Test that known sql modes are present in session.
    */
-  public function testSqlModePresent() {
+  public function testSqlModePresent(): void {
     $sqlModes = CRM_Utils_SQL::getSqlModes();
     // assert we have strict trans
     $this->assertContains('STRICT_TRANS_TABLES', $sqlModes);
@@ -387,6 +388,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
 
   /**
    * @return array
+   * @throws \ReflectionException
    */
   public function serializationMethods() {
     $constants = [];
@@ -405,7 +407,10 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     ];
     $daoInfo = new ReflectionClass('CRM_Core_DAO');
     foreach ($daoInfo->getConstants() as $constant => $val) {
-      if ($constant == 'SERIALIZE_JSON' || $constant == 'SERIALIZE_PHP') {
+      if ($constant === 'SERIALIZE_NONE') {
+        continue;
+      }
+      if ($constant === 'SERIALIZE_JSON' || $constant === 'SERIALIZE_PHP') {
         $constants[] = [$val, array_merge($simpleData, $complexData)];
       }
       elseif (strpos($constant, 'SERIALIZE_') === 0) {
@@ -415,7 +420,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     return $constants;
   }
 
-  public function testFetchGeneratorDao() {
+  public function testFetchGeneratorDao(): void {
     $this->individualCreate([], 0);
     $this->individualCreate([], 1);
     $this->individualCreate([], 2);
@@ -429,7 +434,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals(3, $count);
   }
 
-  public function testFetchGeneratorArray() {
+  public function testFetchGeneratorArray(): void {
     $this->individualCreate([], 0);
     $this->individualCreate([], 1);
     $this->individualCreate([], 2);
@@ -457,7 +462,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * Test the DAO cloning method does not hit issues with freeing the result.
    */
-  public function testCloneDAO() {
+  public function testCloneDAO(): void {
     $dao = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_domain');
     $i = 0;
     while ($dao->fetch()) {
@@ -475,7 +480,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testModifyQuery() {
+  public function testModifyQuery(): void {
     /**
      * @param \Civi\Core\Event\QueryEvent $e
      */
@@ -493,7 +498,8 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    *
    * Demonstrate it is modified showing the query now breaks.
    */
-  public function testModifyAndBreakQuery() {
+  public function testModifyAndBreakQuery(): void {
+    $dbNameString = stripos(CRM_Utils_SQL::getDatabaseVersion(), 'mariadb') !== FALSE ? 'MariaDB' : 'MySQL';
     /**
      * @param \Civi\Core\Event\QueryEvent $e
      */
@@ -506,7 +512,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
     catch (PEAR_Exception $e) {
       $this->assertEquals(
-        "SELECT * FROM civicrm_domain [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '/* Forgot trailing comment markerSELECT * FROM civicrm_domain' at line 1]",
+        "SELECT * FROM civicrm_domain [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your $dbNameString server version for the right syntax to use near '/* Forgot trailing comment markerSELECT * FROM civicrm_domain' at line 1]",
         $e->getCause()->getUserInfo()
       );
       Civi::dispatcher()->removeListener('civi.db.query', $listener);
@@ -514,6 +520,97 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
     Civi::dispatcher()->removeListener('civi.db.query', $listener);
     $this->fail('String not altered');
+  }
+
+  public function testSupportedFields(): void {
+    // Hack a different db version which will trigger getSupportedFields to filter out newer fields
+    CRM_Core_BAO_Domain::getDomain()->version = '5.26.0';
+
+    $customGroupFields = CRM_Core_DAO_CustomGroup::getSupportedFields();
+    // 'icon' was added in 5.28
+    $this->assertArrayNotHasKey('icon', $customGroupFields);
+
+    // Remove domain version override:
+    CRM_Core_BAO_Domain::version(TRUE);
+
+    $activityFields = CRM_Activity_DAO_Activity::getSupportedFields();
+    // Fields should be indexed by name not unique_name (which is "activity_id")
+    $this->assertEquals('id', $activityFields['id']['name']);
+
+    $customGroupFields = CRM_Core_DAO_CustomGroup::getSupportedFields();
+    $this->assertArrayHasKey('icon', $customGroupFields);
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
+    $contactFields = CRM_Contact_DAO_Contact::getSupportedFields();
+    $this->assertArrayHasKey('api_key', $contactFields);
+
+    $permissionedContactFields = CRM_Contact_DAO_Contact::getSupportedFields(TRUE);
+    $this->assertArrayNotHasKey('api_key', $permissionedContactFields);
+  }
+
+  public function testTableHasBeenAdded(): void {
+    // Hack a different db version
+    CRM_Core_BAO_Domain::getDomain()->version = '5.28.0';
+
+    // Table was added in 5.29
+    $this->assertFalse(CRM_Contact_DAO_RelationshipCache::tableHasBeenAdded());
+
+    // Remove domain version override:
+    CRM_Core_BAO_Domain::version(TRUE);
+
+    $this->assertTrue(CRM_Contact_DAO_RelationshipCache::tableHasBeenAdded());
+  }
+
+  /**
+   * Test that a timestamp field that allows null doesn't crash when updating
+   * with a blank date.
+   * An unpatched PEAR::DB_DataObject will fail when sql_mode has NO_ZERO_DATE.
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function testUpdateTimestampWithBlankDate(): void {
+    // Arbitrarily using "Cache" since it has a desired type of timestamp field and is simple.
+    $dao = new CRM_Core_DAO_Cache();
+    $fields = $dao->fields();
+    $this->assertSame(CRM_Utils_Type::T_TIMESTAMP, $fields['expired_date']['type'], 'Oh somebody changed the type, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
+    $this->assertFalse($fields['expired_date']['required'], 'Oh somebody changed the REQUIRED setting, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
+
+    $dao->group_name = 'mytest';
+    $dao->path = 'mypath';
+    $dao->data = 'some data';
+    $dao->expired_date = '';
+    $dao->save();
+    $id = $dao->id;
+
+    // Now retrieve it and update it with a blank timestamp.
+    $dao = new CRM_Core_DAO_Cache();
+    $dao->id = $id;
+    $dao->find(TRUE);
+    // sanity check we got the right one since otherwise checking null might falsely be true
+    $this->assertEquals('mytest', $dao->group_name);
+    $this->assertNull($dao->expired_date);
+
+    $dao->data = 'some updated data';
+    $dao->expired_date = '';
+    // would crash here on update
+    $dao->save();
+
+    $dao = new CRM_Core_DAO_Cache();
+    $dao->id = $id;
+    $dao->find(TRUE);
+    $this->assertEquals('some updated data', $dao->data);
+    $this->assertNull($dao->expired_date);
+  }
+
+  public function testFillValues(): void {
+    $label = uniqid();
+    $saved = CRM_Contact_BAO_SavedSearch::writeRecord([
+      'label' => $label,
+    ]);
+    $onlyId = ['id' => $saved->id];
+    $onlyName = ['name' => $saved->name];
+    $this->assertEquals($label, CRM_Contact_BAO_SavedSearch::fillValues($onlyId, ['label'])['label']);
+    $this->assertEquals($label, CRM_Contact_BAO_SavedSearch::fillValues($onlyName, ['label'])['label']);
   }
 
 }

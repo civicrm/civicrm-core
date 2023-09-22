@@ -7,8 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if ! $suppressForm}
-<form {$form.attributes} >
+{if !$suppressForm}
+<form {$form.attributes|smarty:nodefaults}>
   {crmRegion name='form-top'}{/crmRegion}
 {/if}
 
@@ -18,7 +18,7 @@
     {include file=$tplFile}
   {/crmRegion}
 
-{if ! $suppressForm}
+{if !$suppressForm}
   {crmRegion name='form-bottom'}{/crmRegion}
 </form>
 {/if}

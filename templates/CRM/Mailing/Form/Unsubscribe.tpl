@@ -10,7 +10,7 @@
 <div>
   {if $groupExist}
     <div class="messages status no-popup">
-      {ts}Are you sure you want to be removed from the mailing list(s) shown below:{/ts}<br/>
+      {ts 1=$name_masked}Are you sure you want to remove %1 from the mailing list(s) shown below:{/ts}<br/>
     </div>
     <table class="selector" style="width: auto; margin-top: 20px;">
       {counter start=0 skip=1 print=false}
@@ -22,17 +22,10 @@
       {/foreach}
     </table>
     <div class="crm-block crm-form-block crm-miscellaneous-form-block">
-      <p>{ts}You are requesting to unsubscribe this email address:{/ts}</p>
-      <h3>{$email_masked}</h3>
-      <p>{ts}If this is not your email address, there is no need to do anything. You have <i><b>not</b></i> been added to any mailing lists. If this is your email address and you <i><b>wish to unsubscribe</b></i> please enter your email address below for verification purposes:{/ts}</p>
-      <table class="form-layout">
-        <tbody>
-          <tr>
-            <td class="label">{$form.email_confirm.label}</td>
-            <td class="content">{$form.email_confirm.html}</td>
-          </tr>
-        </tbody>
-      </table>
+      <p>{ts 1=$name_masked}You are requesting to unsubscribe <strong>all email addresses for %1</strong> from the above mailing list.{/ts}</p>
+      <p>
+        {ts}If this is your email address and you <strong>wish to unsubscribe</strong> please click the <strong>Unsubscribe</strong> button to confirm.{/ts}
+      </p>
       <div class="crm-submit-buttons">
         {include file="CRM/common/formButtons.tpl" location="bottom"}
       </div>

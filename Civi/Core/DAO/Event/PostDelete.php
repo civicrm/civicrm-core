@@ -15,7 +15,7 @@ namespace Civi\Core\DAO\Event;
  * Class PostUpdate
  * @package Civi\Core\DAO\Event
  */
-class PostDelete extends \Symfony\Component\EventDispatcher\Event {
+class PostDelete extends \Civi\Core\Event\GenericHookEvent {
 
   /**
    * @var \CRM_Core_DAO
@@ -23,13 +23,18 @@ class PostDelete extends \Symfony\Component\EventDispatcher\Event {
   public $object;
 
   /**
-   * @var mixed
+   * @var int|false
    */
   public $result;
 
   /**
-   * @param $object
-   * @param $result
+   * @var string
+   */
+  public $eventID;
+
+  /**
+   * @param \CRM_Core_DAO $object
+   * @param int|false $result
    */
   public function __construct($object, $result) {
     $this->object = $object;

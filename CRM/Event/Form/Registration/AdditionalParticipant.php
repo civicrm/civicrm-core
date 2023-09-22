@@ -28,6 +28,26 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   public $additionalParticipantId = NULL;
 
   /**
+   * Get the active UFGroups (profiles) on this form
+   * Many forms load one or more UFGroups (profiles).
+   * This provides a standard function to retrieve the IDs of those profiles from the form
+   * so that you can implement things such as "is is_captcha field set on any of the active profiles on this form?"
+   *
+   * NOT SUPPORTED FOR USE OUTSIDE CORE EXTENSIONS - Added for reCAPTCHA core extension.
+   *
+   * @return array
+   */
+  public function getUFGroupIDs() {
+    $ufGroupIDs = [];
+    foreach (['pre', 'post'] as $keys) {
+      if (isset($this->_values['additional_custom_' . $keys . '_id'])) {
+        $ufGroupIDs[] = $this->_values['additional_custom_' . $keys . '_id'];
+      }
+    }
+    return $ufGroupIDs;
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
@@ -52,7 +72,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     if ($skipCount) {
       $this->assign('skipCount', $skipCount);
     }
-    CRM_Utils_System::setTitle(ts('Register Participant %1 of %2', [1 => $participantCnt, 2 => $participantTot]));
+    $this->setTitle(ts('Register Participant %1 of %2', [1 => $participantCnt, 2 => $participantTot]));
 
     //CRM-4320, hack to check last participant.
     $this->_lastParticipant = FALSE;
@@ -159,7 +179,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $button = substr($this->controller->getButtonName(), -4);
 
     if ($this->_values['event']['is_monetary']) {
-      CRM_Event_Form_Registration_Register::buildAmount($this);
+      CRM_Event_Form_Registration_Register::buildAmount($this, TRUE, NULL, $this->_priceSetId);
     }
 
     //Add pre and post profiles on the form.
@@ -316,25 +336,37 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     //CRM-4320
     if ($allowToProceed) {
-      $buttons = array_merge($buttons, [
-        [
-          'type' => 'upload',
-          'name' => ts('Continue'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-      ]);
       if ($includeSkipButton) {
-        $buttons = array_merge($buttons, [
+        $buttons[] =
           [
             'type' => 'next',
             'name' => ts('Skip Participant'),
             'subName' => 'skip',
             'icon' => 'fa-fast-forward',
-          ],
-        ]);
+          ];
       }
+      $buttonParams = [
+        'type' => 'upload',
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ];
+      if ($this->isLastParticipant(TRUE)) {
+        if ($this->_values['event']['is_confirm_enabled'] || $this->_values['event']['is_monetary']) {
+          $buttonParams['name'] = ts('Review');
+          $buttonParams['icon'] = 'fa-chevron-right';
+        }
+        else {
+          $buttonParams['name'] = ts('Register');
+          $buttonParams['icon'] = 'fa-check';
+        }
+      }
+      else {
+        $buttonParams['name'] = ts('Continue');
+        $buttonParams['icon'] = 'fa-chevron-right';
+      }
+      $buttons[] = $buttonParams;
     }
+
     $this->addButtons($buttons);
     $this->addFormRule(['CRM_Event_Form_Registration_AdditionalParticipant', 'formRule'], $this);
     $this->unsavedChangesWarn = TRUE;
@@ -347,7 +379,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param self $self
    *
    *
    * @return bool|array
@@ -368,12 +400,9 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       CRM_Event_Form_Registration_Register::checkProfileComplete($fields, $errors, $self->_eventId);
 
       //Additional Participant can also register for an event only once
-      $isRegistered = CRM_Event_Form_Registration_Register::checkRegistration($fields, $self, TRUE);
-      if ($isRegistered) {
-        if ($self->_values['event']['allow_same_participant_emails']) {
-          $errors['_qf_default'] = ts('A person is already registered for this event.');
-        }
-        else {
+      if (!$self->_values['event']['allow_same_participant_emails']) {
+        $isRegistered = CRM_Event_Form_Registration_Register::checkRegistration($fields, $self, TRUE);
+        if ($isRegistered) {
           $errors["email-{$self->_bltID}"] = ts('A person with this email address is already registered for this event.');
         }
       }
@@ -413,7 +442,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
             else {
               // check with first_name and last_name for additional participants
               if (!empty($value['first_name']) && ($value['first_name'] == CRM_Utils_Array::value('first_name', $fields)) &&
-                (CRM_Utils_Array::value('last_name', $value) == CRM_Utils_Array::value('last_name', $fields))
+                (($value['last_name'] ?? NULL) == CRM_Utils_Array::value('last_name', $fields))
               ) {
                 $errors['first_name'] = ts('The first name and last name must be unique for each participant.');
                 break;
@@ -492,7 +521,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   }
 
   /**
-   * @param $self
+   * @param self $self
    * @param $fields
    *
    * @return bool
@@ -540,7 +569,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
 
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
-      if ($greetingType = CRM_Utils_Array::value($greeting, $self->_params[0])) {
+      $greetingType = $self->_params[0][$greeting] ?? NULL;
+      if ($greetingType) {
         $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $greeting . '_id', 'Customized');
         if ($customizedValue == $greetingType && empty($self->_params[0][$greeting . '_custom'])) {
           return FALSE;
@@ -643,6 +673,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
         }
         elseif (empty($params['priceSetId'])) {
+          CRM_Core_Error::deprecatedWarning('unreachable code, prices set always passed as hidden field for monetary events');
           $params['amount'] = $this->_values['fee'][$params['amount']]['value'];
         }
         else {

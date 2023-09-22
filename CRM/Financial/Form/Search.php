@@ -41,8 +41,6 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-    CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'packages/jquery/plugins/jquery.redirect.min.js', 0, 'html-header');
     $attributes = CRM_Core_DAO::getAttribute('CRM_Batch_DAO_Batch');
     $attributes['total']['class'] = $attributes['item_count']['class'] = 'number';
     $this->add('text', 'title', ts('Batch Name'), $attributes['title']);
@@ -93,8 +91,9 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
       ts('Task'),
       ['' => ts('- actions -')] + $batchAction);
 
-    $this->add('submit', 'submit', ts('Go'),
+    $this->add('xbutton', 'submit', ts('Go'),
       [
+        'type' => 'submit',
         'class' => 'crm-form-submit',
         'id' => 'Go',
       ]);

@@ -14,16 +14,17 @@
     {/ts}
 </div>
 <div class="crm-block crm-form-block crm-dedupe-find-form-block">
-   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    <table class="form-layout-compressed">
      <tr class="crm-dedupe-find-form-block-group_id">
        <td class="label">{$form.group_id.label}</td>
        <td>{$form.group_id.html}</td>
      </tr>
-       <tr class="crm-dedupe-find-form-block-limit">
-        <td class="label">{$form.limit.label}</td>
-        <td>{$form.limit.html}</td>
-       </tr>
+     {if $limitShown}
+        <tr class="crm-dedupe-find-form-block-limit">
+          <td class="label">{$form.limit.label}</td>
+          <td>{$form.limit.html}</td>
+        </tr>
+      {/if}
    </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

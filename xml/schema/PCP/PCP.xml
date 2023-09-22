@@ -6,6 +6,9 @@
   <name>civicrm_pcp</name>
   <add>2.2</add>
   <log>true</log>
+  <component>CiviContribute</component>
+  <labelField>title</labelField>
+  <title>Personal Campaign Page</title>
   <field>
     <name>id</name>
     <uniqueName>pcp_id</uniqueName>
@@ -14,6 +17,9 @@
     <title>Personal Campaign Page ID</title>
     <comment>Personal Campaign Page ID</comment>
     <add>2.2</add>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -29,6 +35,7 @@
     <add>2.2</add>
     <html>
       <type>EntityRef</type>
+      <label>Contact</label>
     </html>
   </field>
   <foreignKey>
@@ -69,6 +76,7 @@
     <add>2.2</add>
     <html>
       <type>TextArea</type>
+      <label>Intro Text</label>
     </html>
   </field>
   <field>
@@ -78,6 +86,7 @@
     <add>2.2</add>
     <html>
       <type>TextArea</type>
+      <label>Page Text</label>
     </html>
   </field>
   <field>
@@ -91,20 +100,6 @@
       <type>Text</type>
     </html>
   </field>
-  <field>
-    <name>contribution_page_id</name>
-    <type>int unsigned</type>
-    <required>true</required>
-    <comment>The Contribution Page which triggered this pcp</comment>
-    <add>2.2</add>
-    <drop>4.1</drop>
-  </field>
-  <foreignKey>
-    <name>contribution_page_id</name>
-    <table>civicrm_contribution_page</table>
-    <key>id</key>
-    <drop>4.1</drop>
-  </foreignKey>
   <field>
     <name>page_id</name>
     <title>Contribution Page</title>
@@ -183,23 +178,16 @@
     </html>
   </field>
   <field>
-    <name>referer</name>
-    <title>Referer</title>
-    <type>varchar</type>
-    <length>255</length>
-    <default>NULL</default>
-    <add>2.2</add>
-    <drop>4.1</drop>
-  </field>
-  <field>
     <name>is_active</name>
     <title>Enabled?</title>
     <type>boolean</type>
     <comment>Is Personal Campaign Page enabled/active?</comment>
-    <default>0</default>
+    <default>1</default>
+    <required>true</required>
     <add>2.2</add>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
   </field>
   <field>
@@ -208,6 +196,7 @@
     <type>boolean</type>
     <comment>Notify owner via email when someone donates to page?</comment>
     <default>0</default>
+    <required>true</required>
     <add>4.6</add>
     <html>
       <type>CheckBox</type>

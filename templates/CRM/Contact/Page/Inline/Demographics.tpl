@@ -22,18 +22,20 @@
     <div class="crm-summary-row">
       <div class="crm-label">{ts}Date of Birth{/ts}</div>
       <div class="crm-content crm-contact-birth_date_display">
-         {assign var="date_format" value = $fields.birth_date.smarty_view_format}
-         {$birth_date|crmDate:$date_format}
-          &nbsp;
+        {assign var="date_format" value=$fields.birth_date.smarty_view_format}
+        {if $birth_date}
+          {$birth_date|crmDate:$date_format}
+        {/if}
       </div>
     </div>
-      {if $is_deceased eq 1}
-        {if $deceased_date}
+      {if !empty($is_deceased)}
+        {if !empty($deceased_date)}
           <div class="crm-summary-row">
             <div class="crm-label">{ts}Date Deceased{/ts}</div>
             <div class="crm-content crm-contact-deceased_date_display">
               {assign var="date_format" value = $fields.birth_date.smarty_view_format}
               {$deceased_date|crmDate:$date_format}
+              {if $birth_date}({ts}Age{/ts} {if $age.y}{ts count=$age.y plural='%count years'}%count year{/ts}{elseif $age.m}{ts count=$age.m plural='%count months'}%count month{/ts}{/if}){/if}
             </div>
           </div>
         {else}

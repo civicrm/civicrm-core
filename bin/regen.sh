@@ -39,8 +39,6 @@ echo "SELECT table_name FROM information_schema.TABLES  WHERE TABLE_SCHEMA='${DB
 $MYSQLCMD < civicrm.mysql
 $MYSQLCMD < civicrm_data.mysql
 $MYSQLCMD < civicrm_sample.mysql
-echo "DROP TABLE IF EXISTS zipcodes" | $MYSQLCMD
-$MYSQLCMD < zipcodes.mysql
 
 ## For first boot on fresh DB, boot CMS before CRM.
 cms_eval 'civicrm_initialize();'
@@ -48,8 +46,8 @@ cms_eval 'civicrm_initialize();'
 php GenerateData.php
 
 ## Prune local data
-$MYSQLCMD -e "DROP TABLE zipcodes; DROP TABLE IF EXISTS civicrm_install_canary; DELETE FROM civicrm_cache; DELETE FROM civicrm_setting;"
-$MYSQLCMD -e "DELETE FROM civicrm_extension WHERE full_name NOT IN ('sequentialcreditnotes');"
+$MYSQLCMD -e "DROP TABLE IF EXISTS civicrm_install_canary; DELETE FROM civicrm_cache; DELETE FROM civicrm_setting;"
+$MYSQLCMD -e "DELETE FROM civicrm_extension WHERE full_name NOT IN ('sequentialcreditnotes', 'eventcart', 'greenwich', 'org.civicrm.search_kit', 'org.civicrm.afform', 'authx', 'org.civicrm.flexmailer', 'financialacls', 'contributioncancelactions', 'recaptcha', 'ckeditor4', 'legacycustomsearches', 'civiimport') and full_name NOT LIKE 'civi_%';"
 TABLENAMES=$( echo "show tables like 'civicrm_%'" | $MYSQLCMD | grep ^civicrm_ | xargs )
 
 cd $CIVISOURCEDIR/sql
@@ -59,6 +57,9 @@ $MYSQLDUMP -cent --skip-triggers $DBNAME $TABLENAMES > civicrm_generated.mysql
 cat civicrm_sample_custom_data.mysql >> civicrm_generated.mysql
 #cat civicrm_devel_config.mysql >> civicrm_generated.mysql
 cat civicrm_dummy_processor.mysql >> civicrm_generated.mysql
+# adapted from https://bugs.mysql.com/bug.php?id=65465
+sed -i -e 's/VALUES (/VALUES\n (/g' civicrm_generated.mysql
+sed -i -e 's/),(\|), (/),\n (/g' civicrm_generated.mysql
 $MYSQLADMCMD -f drop $DBNAME
 $MYSQLADMCMD create $DBNAME
 $MYSQLCMD < civicrm.mysql

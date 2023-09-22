@@ -11,7 +11,7 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
    *
    * See CRM-19123: Merging contacts: blank date fields write as 1970
    */
-  public function testFormatNullDates() {
+  public function testFormatNullDates(): void {
     $params = [
       'contact_type' => 'Individual',
       'birth_date' => 'null',
@@ -29,7 +29,7 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
    *  Test case to check the formatting of the Display name and Sort name
    *  Standard formatting is assumed.
    */
-  public function testFormatDisplayName() {
+  public function testFormatDisplayName(): void {
 
     $params = [
       'contact_type' => 'Individual',
@@ -52,7 +52,7 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
    *  Standard Prefixes and Suffixes are assumed part of
    *  the test database
    */
-  public function testFormatDisplayNamePrefixesById() {
+  public function testFormatDisplayNamePrefixesById(): void {
 
     $params = [
       'contact_type' => 'Individual',
@@ -76,7 +76,7 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
    *  Standard Prefixes and Suffixes are assumed part of
    *  the test database
    */
-  public function testFormatDisplayNameNoIndividual() {
+  public function testFormatDisplayNameNoIndividual(): void {
 
     $params = [
       'contact_type' => 'Organization',
@@ -94,7 +94,7 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
   /**
    *  When no first name or last name are defined, the primary email is used
    */
-  public function testFormatDisplayNameOnlyEmail() {
+  public function testFormatDisplayNameOnlyEmail(): void {
 
     $email['1'] = ['email' => "bleu01@example.com"];
     $email['2'] = ['email' => "bleu02@example.com", 'is_primary' => 1];

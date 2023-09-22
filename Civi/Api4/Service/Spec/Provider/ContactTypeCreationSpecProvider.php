@@ -18,8 +18,10 @@ use Civi\Api4\Service\Spec\RequestSpec;
  * Class ContactTypeCreationSpecProvider
  *
  * @package Civi\Api4\Service\Spec\Provider
+ * @service
+ * @internal
  */
-class ContactTypeCreationSpecProvider implements Generic\SpecProviderInterface {
+class ContactTypeCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec

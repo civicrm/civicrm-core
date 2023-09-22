@@ -15,8 +15,8 @@
 <table class="selector row-highlight">
 <thead class="sticky">
     <tr>
-    {if ! $single and $context eq 'Search' }
-      <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
+    {if ! $single and $context eq 'Search'}
+      <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
     {/if}
     {foreach from=$columnHeaders item=header}
         <th scope="col">
@@ -34,17 +34,17 @@
   {counter start=0 skip=1 print=false}
   {foreach from=$rows item=row}
   <tr id='rowid{$row.participant_id}' class="{cycle values="odd-row,even-row"} crm-event crm-event_{$row.event_id}">
-     {if ! $single }
-        {if $context eq 'Search' }
+     {if ! $single}
+        {if $context eq 'Search'}
             {assign var=cbName value=$row.checkbox}
             <td>{$form.$cbName.html}</td>
         {/if}
   <td class="crm-participant-contact_type">{$row.contact_type}</td>
-      <td class="crm-participant-sort_name"><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}" title="{ts}View contact record{/ts}">{$row.sort_name}</a></td>
+      <td class="crm-participant-sort_name"><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}" title="{ts}View contact record{/ts}">{$row.sort_name|smarty:nodefaults|purify}</a></td>
     {/if}
 
-    <td class="crm-participant-event_title"><a href="{crmURL p='civicrm/event/info' q="id=`$row.event_id`&reset=1"}" title="{ts}View event info page{/ts}">{$row.event_title}</a>
-        {if $contactId}<br /><a href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$row.event_id`"}" title="{ts}List participants for this event (all statuses){/ts}">({ts}participants{/ts})</a>{/if}
+    <td class="crm-participant-event_title"><a href="{crmURL p='civicrm/event/info' q="id=`$row.event_id`&reset=1"}" title="{ts}View event info page{/ts}">{$row.event_title|smarty:nodefaults|purify}</a>
+        {if !empty($contactId)}<br /><a href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$row.event_id`"}" title="{ts}List participants for this event (all statuses){/ts}">({ts}participants{/ts})</a>{/if}
     </td>
     {assign var="participant_id" value=$row.participant_id}
     {if $lineItems.$participant_id}
@@ -60,7 +60,7 @@
     <td class="right nowrap crm-participant-participant_fee_amount">{$row.participant_fee_amount|crmMoney:$row.participant_fee_currency}</td>
     <td class="crm-participant-participant_register_date">{$row.participant_register_date|truncate:10:''|crmDate}</td>
     <td class="crm-participant-event_start_date">{$row.event_start_date|truncate:10:''|crmDate}
-        {if $row.event_end_date && $row.event_end_date|date_format:"%Y%m%d" NEQ $row.event_start_date|date_format:"%Y%m%d"}
+        {if $row.event_end_date && $row.event_end_date|crmDate:"%Y%m%d" NEQ $row.event_start_date|crmDate:"%Y%m%d"}
             <br/>- {$row.event_end_date|truncate:10:''|crmDate}
         {/if}
    </td>
@@ -70,12 +70,12 @@
    </tr>
   {/foreach}
 {* Link to "View all participants" for Dashboard and Contact Summary *}
-{if $limit and $pager->_totalItems GT $limit }
-  {if $context EQ 'event_dashboard' }
+{if $limit and $pager->_totalItems GT $limit}
+  {if $context EQ 'event_dashboard'}
     <tr class="even-row">
     <td colspan="10"><a href="{crmURL p='civicrm/event/search' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Find more event participants{/ts}...</a></td></tr>
     </tr>
-  {elseif $context eq 'participant' }
+  {elseif $context eq 'participant'}
     <tr class="even-row">
     <td colspan="7"><a href="{crmURL p='civicrm/contact/view' q="reset=1&force=1&selectedChild=participant&cid=$contactId"}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View all events for this contact{/ts}...</a></td></tr>
     </tr>

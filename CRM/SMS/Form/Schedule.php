@@ -52,13 +52,15 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     // on page refresh.
     $this->setAttribute('autocomplete', 'off');
 
-    $sendOptions = [
-      $this->createElement('radio', NULL, NULL, ts('Send immediately'), 'send_immediate', ['id' => 'send_immediate', 'style' => 'margin-bottom: 10px;']),
-      $this->createElement('radio', NULL, NULL, ts('Send at:'), 'send_later', ['id' => 'send_later']),
-    ];
-    $this->addGroup($sendOptions, 'send_option', '', '<br>');
+    $this->addRadio('send_option', '', [
+      'send_immediate' => ts('Send immediately'),
+      'send_later' => ts('Send at:'),
+    ], [], '<br>', FALSE, [
+      'send_immediate' => ['id' => 'send_immediate', 'style' => 'margin-bottom: 10px;'],
+      'send_later' => ['id' => 'send_later'],
+    ]);
 
-    $this->add('datepicker', 'start_date', '', NULL, FALSE, ['minDate' => time()]);
+    $this->add('datepicker', 'start_date', '', NULL, FALSE, ['minDate' => date('Y-m-d')]);
 
     $this->addFormRule(['CRM_SMS_Form_Schedule', 'formRule'], $this);
 
@@ -98,7 +100,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
    *   The form values.
    *
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return bool
    *   True if either we deliver immediately, or the date is properly
@@ -112,7 +114,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
       CRM_Utils_System::redirect($url);
     }
 
-    if ((isset($params['send_option']) && $params['send_option'] == 'send_immediate') || CRM_Utils_Array::value('_qf_Schedule_back', $params) == ts('Previous')) {
+    if ((isset($params['send_option']) && $params['send_option'] == 'send_immediate') || ($params['_qf_Schedule_back'] ?? NULL) == ts('Previous')) {
       return TRUE;
     }
 

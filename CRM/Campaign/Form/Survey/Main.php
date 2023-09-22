@@ -47,7 +47,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      CRM_Utils_System::setTitle(ts('Configure Survey') . ' - ' . $this->_surveyTitle);
+      $this->setTitle(ts('Configure Survey') . ' - ' . $this->_surveyTitle);
     }
 
     // Add custom data to form
@@ -82,18 +82,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
   public function setDefaultValues() {
 
     $defaults = $this->_values;
-
-    if ($this->_surveyId) {
-
-      if (!empty($defaults['result_id']) && !empty($defaults['recontact_interval'])) {
-
-        $resultId = $defaults['result_id'];
-        $recontactInterval = CRM_Utils_String::unserialize($defaults['recontact_interval']);
-
-        unset($defaults['recontact_interval']);
-        $defaults['option_group_id'] = $resultId;
-      }
-    }
 
     if (!isset($defaults['is_active'])) {
       $defaults['is_active'] = 1;
@@ -187,7 +175,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
       );
       // delete option group if no any survey is using it.
       if (!$countSurvey) {
-        CRM_Core_BAO_OptionGroup::del($this->_values['result_id']);
+        CRM_Core_BAO_OptionGroup::deleteRecord(['id' => $this->_values['result_id']]);
       }
     }
 

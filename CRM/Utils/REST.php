@@ -48,7 +48,7 @@ class CRM_Utils_REST {
    * @param string $var
    *   The string to be echoed.
    *
-   * @return string
+   * @return array
    */
   public static function ping($var = NULL) {
     $session = CRM_Core_Session::singleton();
@@ -133,7 +133,6 @@ class CRM_Utils_REST {
       if (!empty($requestParams['prettyprint'])) {
         // Don't set content-type header for api explorer output
         return json_encode(array_merge($result), JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES + JSON_UNESCAPED_UNICODE);
-        return self::jsonFormated(array_merge($result));
       }
       CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
       return json_encode(array_merge($result));
@@ -194,7 +193,6 @@ class CRM_Utils_REST {
       if ((count($args) != 3) && ($args[1] != 'ping')) {
         return self::error('Unknown function invocation.');
       }
-      $store = NULL;
 
       if ($args[1] == 'ping') {
         return self::ping();
@@ -212,7 +210,7 @@ class CRM_Utils_REST {
     // interface can be disabled in more change to the configuration file.
     // first check for civicrm site key
     if (!CRM_Utils_System::authenticateKey(FALSE)) {
-      $docLink = CRM_Utils_System::docURL2("Managing Scheduled Jobs", TRUE, NULL, NULL, NULL, "wiki");
+      $docLink = CRM_Utils_System::docURL2('sysadmin/setup/jobs', TRUE);
       $key = $requestParams['key'] ?? NULL;
       if (empty($key)) {
         return self::error("FATAL: mandatory param 'key' missing. More info at: " . $docLink);
@@ -223,7 +221,7 @@ class CRM_Utils_REST {
     // At this point we know we are not calling ping which does not require authentication.
     // Therefore we now need a valid server key and API key.
     // Check and see if a valid secret API key is provided.
-    $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
+    $api_key = CRM_Utils_Request::retrieve('api_key', 'String');
     if (!$api_key || strtolower($api_key) == 'null') {
       return self::error("FATAL: mandatory param 'api_key' (user key) missing");
     }
@@ -270,13 +268,6 @@ class CRM_Utils_REST {
       $params['version'] = 3;
     }
 
-    if ($params['version'] == 2) {
-      $result['is_error'] = 1;
-      $result['error_message'] = "FATAL: API v2 not accessible from ajax/REST";
-      $result['deprecated'] = "Please upgrade to API v3";
-      return $result;
-    }
-
     if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
       strtolower(substr($args[2], 0, 3)) != 'get' &&
       strtolower($args[2] != 'check')) {
@@ -284,7 +275,7 @@ class CRM_Utils_REST {
       require_once 'api/v3/utils.php';
       return civicrm_api3_create_error("SECURITY: All requests that modify the database must be http POST, not GET.",
         [
-          'IP' => $_SERVER['REMOTE_ADDR'],
+          'IP' => CRM_Utils_System::ipAddress(),
           'level' => 'security',
           'referer' => $_SERVER['HTTP_REFERER'],
           'reason' => 'Destructive HTTP GET',
@@ -293,12 +284,12 @@ class CRM_Utils_REST {
     }
 
     // trap all fatal errors
-    $errorScope = CRM_Core_TemporaryErrorScope::create([
-      'CRM_Utils_REST',
-      'fatal',
-    ]);
-    $result = civicrm_api($args[1], $args[2], $params);
-    unset($errorScope);
+    try {
+      $result = civicrm_api($args[1], $args[2], $params);
+    }
+    catch (Exception $e) {
+      return self::error($e->getMessage());
+    }
 
     if ($result === FALSE) {
       return self::error('Unknown error.');
@@ -346,7 +337,9 @@ class CRM_Utils_REST {
   }
 
   /**
-   * @param $pearError
+   * Unused function from the dark ages before PHP Exceptions
+   * @deprecated
+   * @param PEAR_Error $pearError
    */
   public static function fatal($pearError) {
     CRM_Utils_System::setHttpHeader('Content-Type', 'text/xml');
@@ -399,9 +392,7 @@ class CRM_Utils_REST {
     unset($param['q']);
     $smarty->assign_by_ref("request", $param);
 
-    if (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
-      $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
-    ) {
+    if (!self::isWebServiceRequest()) {
 
       $smarty->assign('tplFile', $tpl);
       $config = CRM_Core_Config::singleton();
@@ -434,13 +425,10 @@ class CRM_Utils_REST {
 
     require_once 'api/v3/utils.php';
     $config = CRM_Core_Config::singleton();
-    if (!$config->debug && (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
-        $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
-      )
-    ) {
+    if (!$config->debug && !self::isWebServiceRequest()) {
       $error = civicrm_api3_create_error("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api3().",
         [
-          'IP' => $_SERVER['REMOTE_ADDR'],
+          'IP' => CRM_Utils_System::ipAddress(),
           'level' => 'security',
           'referer' => $_SERVER['HTTP_REFERER'],
           'reason' => 'CSRF suspected',
@@ -457,8 +445,8 @@ class CRM_Utils_REST {
     if (!empty($requestParams['json'])) {
       $params = json_decode($requestParams['json'], TRUE);
     }
-    $entity = CRM_Utils_String::munge(CRM_Utils_Array::value('entity', $requestParams));
-    $action = CRM_Utils_String::munge(CRM_Utils_Array::value('action', $requestParams));
+    $entity = CRM_Utils_String::munge($requestParams['entity'] ?? '');
+    $action = CRM_Utils_String::munge($requestParams['action'] ?? '');
     if (!is_array($params)) {
       CRM_Utils_JSON::output([
         'is_error' => 1,
@@ -467,7 +455,6 @@ class CRM_Utils_REST {
     }
 
     $params['check_permissions'] = TRUE;
-    $params['version'] = 3;
     // $requestParams is local-only; this line seems pointless unless there's a side-effect influencing other functions
     $_GET['json'] = $requestParams['json'] = 1;
     if (!$params['sequential']) {
@@ -475,12 +462,12 @@ class CRM_Utils_REST {
     }
 
     // trap all fatal errors
-    $errorScope = CRM_Core_TemporaryErrorScope::create([
-      'CRM_Utils_REST',
-      'fatal',
-    ]);
-    $result = civicrm_api($entity, $action, $params);
-    unset($errorScope);
+    try {
+      $result = civicrm_api3($entity, $action, $params);
+    }
+    catch (Exception $e) {
+      $result = self::error($e->getMessage());
+    }
 
     echo self::output($result);
 
@@ -499,15 +486,11 @@ class CRM_Utils_REST {
     // restrict calls to this etc
     // the request has to be sent by an ajax call. First line of protection against csrf
     $config = CRM_Core_Config::singleton();
-    if (!$config->debug &&
-      (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
-        $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
-      )
-    ) {
+    if (!$config->debug && !self::isWebServiceRequest()) {
       require_once 'api/v3/utils.php';
       $error = civicrm_api3_create_error("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api3().",
         [
-          'IP' => $_SERVER['REMOTE_ADDR'],
+          'IP' => CRM_Utils_System::ipAddress(),
           'level' => 'security',
           'referer' => $_SERVER['HTTP_REFERER'],
           'reason' => 'CSRF suspected',
@@ -578,7 +561,7 @@ class CRM_Utils_REST {
    */
   public function loadCMSBootstrap() {
     $requestParams = CRM_Utils_Request::exportValues();
-    $q = $requestParams['q'] ?? NULL;
+    $q = $requestParams['q'] ?? '';
     $args = explode('/', $q);
 
     // Proceed with bootstrap for "?entity=X&action=Y"
@@ -599,9 +582,6 @@ class CRM_Utils_REST {
     }
 
     if (!CRM_Utils_System::authenticateKey(FALSE)) {
-      // FIXME: At time of writing, this doesn't actually do anything because
-      // authenticateKey abends, but that's a bad behavior which sends a
-      // malformed response.
       CRM_Utils_System::loadBootStrap([], FALSE, FALSE);
       return self::error('Failed to authenticate key');
     }
@@ -634,6 +614,53 @@ class CRM_Utils_REST {
       CRM_Utils_System::loadBootStrap([], FALSE, FALSE);
       return self::error('ERROR: No CMS user associated with given api-key');
     }
+  }
+
+  /**
+   * Does this request appear to be a web-service request?
+   *
+   * It is important to distinguish regular browser-page-loads from web-service-requests. Regular
+   * page-loads can be CSRF vectors, and we don't web-services to run via CSRF.
+   *
+   * @return bool
+   *   TRUE if the current request appears to either XMLHttpRequest or non-browser-based.
+   *       Indicated by either (a) custom headers like `X-Request-With`/`X-Civi-Auth`
+   *       or (b) strong-secret-params that could theoretically appear in URL bar but which
+   *       cannot be meaningfully forged for CSRF purposes (like `?api_key=SECRET` or `?_authx=SECRET`).
+   *   FALSE if the current request looks like a standard browser request. This request may be generated by
+   *       <A HREF>, <IFRAME>, <IMG>, `Location:`, or similar CSRF vector.
+   */
+  public static function isWebServiceRequest(): bool {
+    if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? NULL) === 'XMLHttpRequest') {
+      return TRUE;
+    }
+
+    // If authx is enabled, and if the user gives a credential, it will store metadata.
+    $authx = \CRM_Core_Session::singleton()->get('authx');
+    $allowFlows = [
+      // Some flows are resistant to CSRF. Allow these:
+
+      // <legacyrest> Current request has valid `?api_key=SECRET&key=SECRET` ==> Strong-secret params
+      'legacyrest',
+
+      // <param> Current request has valid `?_authx=SECRET` ==> Strong-secret param
+      'param',
+
+      // <xheader> Current request has valid `X-Civi-Auth:` ==> Custom header AND strong-secret param
+      'xheader',
+
+      // Other flows are not resistant to CSRF on their own (need combo w/`X-Requested-With:`).
+      // Ignore these:
+      // <login> Relies on a session `Cookie:` (which browsers re-send automatically).
+      // <auto> First request might be resistant, but all others use session `Cookie:`.
+      // <header> Browsers often retain list of credentials and re-send automatically.
+    ];
+
+    if (!empty($authx) && in_array($authx['flow'], $allowFlows)) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
 }

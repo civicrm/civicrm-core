@@ -14,21 +14,19 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class IndexTest extends UnitTestCase {
+class IndexTest extends Api4TestBase {
 
-  public function testIndex() {
+  public function testIndex(): void {
     // Results indexed by name
     $resultByName = civicrm_api4('Activity', 'getActions', [], 'name');
     $this->assertInstanceOf('Civi\Api4\Generic\Result', $resultByName);
@@ -42,34 +40,34 @@ class IndexTest extends UnitTestCase {
     $this->assertEquals($resultByName->first(), (array) $firstResult);
   }
 
-  public function testBadIndexInt() {
+  public function testBadIndexInt(): void {
     $error = '';
     try {
       civicrm_api4('Activity', 'getActions', [], 99);
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $error = $e->getMessage();
     }
-    $this->assertContains('not found', $error);
+    $this->assertStringContainsString('not found', $error);
   }
 
-  public function testBadIndexString() {
+  public function testBadIndexString(): void {
     $error = '';
     try {
       civicrm_api4('Activity', 'getActions', [], 'xyz');
     }
-    catch (\API_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $error = $e->getMessage();
     }
-    $this->assertContains('not found', $error);
+    $this->assertStringContainsString('not found', $error);
   }
 
-  public function testIndexWithSelect() {
+  public function testIndexWithSelect(): void {
     $result = civicrm_api4('Activity', 'getFields', ['select' => ['title'], 'where' => [['name', '=', 'subject']]], 'name');
     $this->assertEquals(['subject' => ['title' => 'Subject']], (array) $result);
   }
 
-  public function testArrayIndex() {
+  public function testArrayIndex(): void {
     // Non-associative
     $result = civicrm_api4('Activity', 'getFields', ['where' => [['name', '=', 'subject']]], ['name' => 'title']);
     $this->assertEquals(['subject' => 'Subject'], (array) $result);

@@ -11,7 +11,7 @@
  */
 class CiviEndToEndTestCase extends PHPUnit\Framework\TestCase implements \Civi\Test\EndToEndInterface {
 
-  public static function setUpBeforeClass() {
+  public static function setUpBeforeClass(): void {
     CRM_Core_Config::singleton(1, 1);
     CRM_Utils_System::loadBootStrap(array(
       'name' => $GLOBALS['_CV']['ADMIN_USER'],

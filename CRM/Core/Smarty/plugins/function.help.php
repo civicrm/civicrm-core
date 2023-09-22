@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -41,22 +39,40 @@ function smarty_function_help($params, &$smarty) {
   }
 
   $params['file'] = str_replace(['.tpl', '.hlp'], '', $params['file']);
+  $fieldID = str_replace('-', '_', preg_replace('/^id-/', '', $params['id']));
 
   if (empty($params['title'])) {
     $vars = $smarty->get_template_vars();
     $smarty->assign('id', $params['id'] . '-title');
 
-    $name = trim($smarty->fetch($params['file'] . '.hlp'));
-    $extraoutput = '';
+    // The way this works is a bit bonkers. All the .hlp files are expecting an
+    // assign called $params (which is different from our php var here called
+    // $params), and it does get assigned via ajax via
+    // CRM_Core_Page_Inline_Help when you click the help bubble (i.e. the link
+    // that we return at the bottom below). But right now when we fetch the
+    // file on the next line, there is no params. So it gives a notice. So
+    // let's assign something.
+    // It's also awkward since the ONLY reason we're fetching the file
+    // now is to get the help section's title and we don't care about the rest
+    // of the file, but that is a bit of a separate issue.
+    $temporary_vars = [];
+    if (!array_key_exists('params', $vars)) {
+      // In the unlikely event that params already exists, we don't want to
+      // overwrite it, so only do this if not already set.
+      $temporary_vars = ['params' => []];
+    }
+    // Note fetchWith adds the temporary ones to the existing scope but then
+    // will reset, unsetting them if not already present before, which is what
+    // we want here.
+    $name = trim($smarty->fetchWith($params['file'] . '.hlp', $temporary_vars)) ?: $vars['form'][$fieldID]['textLabel'] ?? '';
     $additionalTPLFile = $params['file'] . '.extra.hlp';
     if ($smarty->template_exists($additionalTPLFile)) {
-      $extraoutput .= trim($smarty->fetch($additionalTPLFile));
-      // Allow override param to replace default text e.g. {hlp id='foo' override=1}
-      if ($smarty->get_template_vars('override_help_text')) {
-        $name = '';
+      $extraoutput = trim($smarty->fetch($additionalTPLFile));
+      if ($extraoutput) {
+        // Allow override param to replace default text e.g. {hlp id='foo' override=1}
+        $name = ($smarty->get_template_vars('override_help_text') || empty($name)) ? $extraoutput : $name . ' ' . $extraoutput;
       }
     }
-    $name .= $extraoutput;
 
     // Ensure we didn't change any existing vars CRM-11900
     foreach ($vars as $key => $value) {
@@ -66,7 +82,7 @@ function smarty_function_help($params, &$smarty) {
     }
   }
   else {
-    $name = trim(strip_tags($params['title']));
+    $name = trim(strip_tags($params['title'])) ?: $vars['form'][$fieldID]['textLabel'] ?? '';
   }
 
   $class = "helpicon";

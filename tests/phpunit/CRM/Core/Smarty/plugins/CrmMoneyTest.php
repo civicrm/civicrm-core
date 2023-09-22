@@ -3,10 +3,11 @@
 /**
  * Class CRM_Core_Smarty_plugins_CrmMoneyTest
  * @group headless
+ * @group locale
  */
 class CRM_Core_Smarty_plugins_CrmMoneyTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     require_once 'CRM/Core/Smarty.php';
 
@@ -20,12 +21,8 @@ class CRM_Core_Smarty_plugins_CrmMoneyTest extends CiviUnitTestCase {
    */
   public function moneyCases() {
     $cases = [];
-    $cases[] = ['$ 4.00', '{assign var="amount" value="4.00"}{$amount|crmMoney:USD}'];
-    $cases[] = ['€ 1,234.00', '{assign var="amount" value="1234.00"}{$amount|crmMoney:EUR}'];
-    $cases[] = [
-      '$ <input size="10" style="background-color:#EBECE4" readonly="readonly" name="eachPaymentAmount" type="text" id="eachPaymentAmount" class="crm-form-text">',
-      '{assign var="amount" value=\'<input size="10" style="background-color:#EBECE4" readonly="readonly" name="eachPaymentAmount" type="text" id="eachPaymentAmount" class="crm-form-text">\'}{$amount|crmMoney:USD}',
-    ];
+    $cases[] = ['$4.00', '{assign var="amount" value="4.00"}{$amount|crmMoney:USD}'];
+    $cases[] = ['€1,234.00', '{assign var="amount" value="1234.00"}{$amount|crmMoney:EUR}'];
     return $cases;
   }
 

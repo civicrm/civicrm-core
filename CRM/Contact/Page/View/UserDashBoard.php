@@ -19,7 +19,7 @@
  * This class is used to build User Dashboard
  */
 class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
-  public $_contactId = NULL;
+  public $_contactId;
 
   /**
    * Always show public groups.
@@ -34,7 +34,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    *
    * @var array
    */
-  public static $_links = NULL;
+  public static $_links;
 
   /**
    * @throws Exception
@@ -47,20 +47,15 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     }
 
     $this->_contactId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $userID = CRM_Core_Session::getLoggedInContactID();
 
     $userChecksum = $this->getUserChecksum();
-    $validUser = FALSE;
-    if ($userChecksum) {
-      $this->assign('userChecksum', $userChecksum);
-      $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($this->_contactId, $userChecksum);
-      $this->_isChecksumUser = $validUser;
-    }
+    $this->assign('userChecksum', $userChecksum);
 
     if (!$this->_contactId) {
       $this->_contactId = $userID;
     }
-    elseif ($this->_contactId != $userID && !$validUser) {
+    elseif ($this->_contactId != $userID && !$userChecksum) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::VIEW)) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this contact.'));
       }
@@ -73,14 +68,17 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   /**
    * Heart of the viewing process.
    *
-   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
+   * The runner gets all the meta data for the contact and calls the
+   * appropriate type of page to view.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     if (!$this->_contactId) {
       throw new CRM_Core_Exception(ts('You must be logged in to view this page.'));
     }
 
-    list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_contactId);
+    [$displayName, $contactImage] = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_contactId);
 
     $this->set('displayName', $displayName);
     $this->set('contactImage', $contactImage);
@@ -92,6 +90,8 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
 
   /**
    * Build user dashboard.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildUserDashBoard() {
     //build component selectors
@@ -132,6 +132,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       $contactRelationships = $selector = NULL;
       CRM_Utils_Hook::searchColumns('relationship.columns', $columnHeaders, $contactRelationships, $selector);
       $this->assign('columnHeaders', $columnHeaders);
+      $this->assign('entityInClassFormat', 'relationship');
       $dashboardElements[] = [
         'class' => 'crm-dashboard-permissionedOrgs',
         'templatePath' => 'CRM/Contact/Page/View/RelationshipSelector.tpl',
@@ -148,12 +149,12 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
         'sectionTitle' => ts('Personal Campaign Pages'),
         'weight' => 40,
       ];
-      list($pcpBlock, $pcpInfo) = CRM_PCP_BAO_PCP::getPcpDashboardInfo($this->_contactId);
+      [$pcpBlock, $pcpInfo] = CRM_PCP_BAO_PCP::getPcpDashboardInfo((int) $this->_contactId);
       $this->assign('pcpBlock', $pcpBlock);
       $this->assign('pcpInfo', $pcpInfo);
     }
 
-    if (!empty($dashboardOptions['Assigned Activities']) && empty($this->_isChecksumUser)) {
+    if (!empty($dashboardOptions['Assigned Activities']) && !$this->getUserChecksum()) {
       // Assigned Activities section
       $dashboardElements[] = [
         'class' => 'crm-dashboard-assignedActivities',
@@ -166,6 +167,12 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     }
 
     usort($dashboardElements, ['CRM_Utils_Sort', 'cmpFunc']);
+    foreach ($dashboardElements as $index => $dashboardElement) {
+      // Ensure property is set to avoid smarty notices
+      if (!array_key_exists('class', $dashboardElement)) {
+        $dashboardElements[$index]['class'] = NULL;
+      }
+    }
     $this->assign('dashboardElements', $dashboardElements);
 
     if (!empty($dashboardOptions['Groups'])) {
@@ -239,11 +246,12 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   /**
    * Get the user checksum from the url to use in links.
    *
-   * @return string
+   * @return string|false
+   * @throws \CRM_Core_Exception
    */
   protected function getUserChecksum() {
     $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
-    if (empty($userID) && $this->_contactId) {
+    if ($this->_contactId && CRM_Contact_BAO_Contact_Utils::validChecksum($this->_contactId, $userChecksum)) {
       return $userChecksum;
     }
     return FALSE;

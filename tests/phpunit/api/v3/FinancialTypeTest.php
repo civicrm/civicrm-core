@@ -17,8 +17,10 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
 
   /**
    * Test Create, Read, Update Financial type with custom field.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testCreateUpdateFinancialTypeCustomField() {
+  public function testCreateUpdateFinancialTypeCustomField(): void {
     $this->callAPISuccess('OptionValue', 'create', [
       'label' => ts('Financial Type'),
       'name' => 'civicrm_financial_type',
@@ -81,13 +83,79 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
 
       // get financial type to check custom field value
       $expectedResult = array_filter(array_merge($params, $customFields), function($var) {
-        return (!is_null($var) && $var != '');
+        return (!is_null($var) && $var !== '');
       });
       $this->callAPISuccessGetSingle('FinancialType', [
         'id' => $financialType['id'],
       ], $expectedResult);
       $this->callAPISuccess('FinancialType', 'delete', ['id' => $financialType['id']]);
     }
+  }
+
+  /**
+   * Enforce the creation of an associated financial account when a financial
+   * type is created through the api.
+   * @dataProvider versionThreeAndFour
+   */
+  public function testAssociatedFinancialAccountGetsCreated($apiVersion) {
+    $this->callAPISuccess('FinancialType', 'create', [
+      'version' => $apiVersion,
+      'name' => 'Lottery Tickets',
+      'is_deductible' => FALSE,
+      'is_reserved' => FALSE,
+      'is_active' => TRUE,
+    ]);
+    // There should be an account (as opposed to type) with the same name that gets autocreated.
+    $result = $this->callAPISuccess('FinancialAccount', 'getsingle', [
+      'version' => $apiVersion,
+      'name' => 'Lottery Tickets',
+    ]);
+    $this->assertNotEmpty($result['id'], 'Financial account with same name as type did not get created.');
+    $this->assertEquals('INC', $result['account_type_code'], 'Financial account created is not an income account.');
+  }
+
+  public function testMatchFinancialTypeOptions(): void {
+    // Just a string name, should be simple to match on
+    $nonNumericOption = $this->callAPISuccess('FinancialType', 'create', [
+      'name' => 'StringName',
+    ])['id'];
+    // A numeric name, but a number that won't match any existing id
+    $numericOptionUnique = $this->callAPISuccess('FinancialType', 'create', [
+      'name' => '999',
+    ])['id'];
+    // Here's the kicker, a numeric name that matches an existing id!
+    $numericOptionMatchingExistingId = $this->callAPISuccess('FinancialType', 'create', [
+      'name' => $nonNumericOption,
+    ])['id'];
+    $cid = $this->individualCreate();
+
+    // Create a contribution matching non-numeric name
+    $contributionWithNonNumericType = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => 'StringName',
+      'total_amount' => 100,
+      'contact_id' => $cid,
+      'sequential' => TRUE,
+    ]);
+    $this->assertEquals($nonNumericOption, $contributionWithNonNumericType['values'][0]['financial_type_id']);
+
+    // Create a contribution matching unique numeric name
+    $contributionWithUniqueNumericType = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => '999',
+      'total_amount' => 100,
+      'contact_id' => $cid,
+      'sequential' => TRUE,
+    ]);
+    $this->assertEquals($numericOptionUnique, $contributionWithUniqueNumericType['values'][0]['financial_type_id']);
+
+    // Create a contribution matching the id of the non-numeric option, which is ambiguously the name of another option
+    $contributionWithAmbiguousNumericType = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => "$nonNumericOption",
+      'total_amount' => 100,
+      'contact_id' => $cid,
+      'sequential' => TRUE,
+    ]);
+    // The id should have taken priority over matching by name
+    $this->assertEquals($nonNumericOption, $contributionWithAmbiguousNumericType['values'][0]['financial_type_id']);
   }
 
 }

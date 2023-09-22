@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of financial types
+ * Page for displaying list of financial accounts
  */
 class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
 
@@ -49,25 +49,29 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
       self::$_links = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/financial/financialAccount',
+          'url' => 'civicrm/admin/financial/financialAccount/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Financial Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Financial Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Financial Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/financial/financialAccount',
+          'url' => 'civicrm/admin/financial/financialAccount/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Financial Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -103,6 +107,14 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
         else {
           $action -= CRM_Core_Action::DISABLE;
         }
+      }
+
+      // Ensure keys are always set to avoid Smarty notices
+      if (!isset($contributionType[$dao->id]['accounting_code'])) {
+        $contributionType[$dao->id]['accounting_code'] = FALSE;
+      }
+      if (!isset($contributionType[$dao->id]['account_type_code'])) {
+        $contributionType[$dao->id]['account_type_code'] = FALSE;
       }
 
       $contributionType[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,

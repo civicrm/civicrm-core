@@ -26,11 +26,9 @@
 *}
 {* This template is used for adding/configuring PDF Page Formats.  *}
 <div class="crm-block crm-form-block crm-pdfFormat-form-block">
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
 {if $action eq 8}
   <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
         {ts 1=$formatName}WARNING: You are about to delete the PDF Page Format titled <strong>%1</strong>.{/ts}<p>{ts}This will remove the format from all Message Templates that use it. Do you want to continue?{/ts}</p>
   </div>
 {else}
@@ -76,7 +74,7 @@ selectPaper( document.getElementById('paper_size').value );
 
 function selectPaper( val )
 {
-    dataUrl = {/literal}"{crmURL p='civicrm/ajax/paperSize' h=0 }"{literal};
+    dataUrl = {/literal}"{crmURL p='civicrm/ajax/paperSize' h=0}"{literal};
     cj.post( dataUrl, {paperSizeName: val}, function( data ) {
         cj("#paper_size").val( data.name );
         metric = document.getElementById('metric').value;

@@ -13,50 +13,27 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
-class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
+class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi\Core\HookInterface {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   * Fetch object based on array of properties.
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
-   *
-   * @return CRM_Core_BAO_OptionGroup
+   * @return self|null
    */
-  public static function retrieve(&$params, &$defaults) {
-    $optionGroup = new CRM_Core_DAO_OptionGroup();
-    $optionGroup->copyValues($params);
-    if ($optionGroup->find(TRUE)) {
-      CRM_Core_DAO::storeValues($optionGroup, $defaults);
-      return $optionGroup;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_OptionGroup', $id, 'is_active', $is_active);
   }
 
@@ -64,18 +41,14 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * Add the Option Group.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   Reference array contains the id.
    *
-   *
-   * @return object
+   * @deprecated
+   * @return CRM_Core_DAO_OptionGroup
    */
-  public static function add(&$params, $ids = []) {
-    if (empty($params['id']) && !empty($ids['optionGroup'])) {
-      CRM_Core_Error::deprecatedFunctionWarning('no $ids array');
-      $params['id'] = $ids['optionGroup'];
-    }
+  public static function add($params) {
+    // This is very similar to CRM_Core_DAO::makeNameFromLabel which would be
+    // called automatically via `self::writeRecord()`
+    // TODO: Check if the differences matter, then deprecate this function and switch to writeRecord.
     if (empty($params['name']) && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar(strtolower($params['title']));
     }
@@ -94,18 +67,26 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
   /**
    * Delete Option Group.
    *
+   * @deprecated
    * @param int $optionGroupId
-   *   Id of the Option Group to be deleted.
    */
   public static function del($optionGroupId) {
-    // need to delete all option value field before deleting group
-    $optionValue = new CRM_Core_DAO_OptionValue();
-    $optionValue->option_group_id = $optionGroupId;
-    $optionValue->delete();
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    static::deleteRecord(['id' => $optionGroupId]);
+  }
 
-    $optionGroup = new CRM_Core_DAO_OptionGroup();
-    $optionGroup->id = $optionGroupId;
-    $optionGroup->delete();
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete') {
+      // need to delete all option value field before deleting group
+      \Civi\Api4\OptionValue::delete(FALSE)
+        ->addWhere('option_group_id', '=', $event->id)
+        ->execute();
+    }
   }
 
   /**

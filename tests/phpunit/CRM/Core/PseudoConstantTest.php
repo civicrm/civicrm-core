@@ -15,7 +15,7 @@
  */
 class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->loadAllFixtures();
@@ -28,7 +28,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
    * Assure CRM_Core_PseudoConstant::get() is working properly for a range of
    * DAO fields having a <pseudoconstant> tag in the XML schema.
    */
-  public function testOptionValues() {
+  public function testOptionValues(): void {
 
     // Create a custom field group for testing.
     $custom_group_name = md5(microtime());
@@ -73,6 +73,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'domain_id' => 1,
       'payment_processor_type_id' => 'Dummy',
       'name' => $pp_name,
+      'title' => $pp_name,
       'user_name' => $pp_name,
       'class_name' => 'Payment_Dummy',
       'url_site' => 'https://test.com/',
@@ -80,15 +81,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
     $result = civicrm_api3('payment_processor', 'create', $api_params);
-
-    // Create a Campaign for testing.
-    $campaign_name = md5(microtime());
-    $api_params = [
-      'title' => $campaign_name,
-      'is_active' => TRUE,
-      'status_id' => 2,
-    ];
-    $result = civicrm_api3('campaign', 'create', $api_params);
 
     // Create a membership type for testing.
     $membership_type = md5(microtime());
@@ -196,22 +188,26 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ],
         [
           'fieldName' => 'start_action_unit',
-          'sample' => 'hour',
+          'sample' => 'hours',
         ],
         [
           'fieldName' => 'repetition_frequency_unit',
-          'sample' => 'hour',
+          'sample' => 'hours',
         ],
         [
           'fieldName' => 'end_frequency_unit',
-          'sample' => 'hour',
+          'sample' => 'hours',
         ],
         [
           'fieldName' => 'mode',
           'sample' => 'Email',
         ],
+        [
+          'fieldName' => 'mapping_id',
+          'sample' => 'Event Type',
+        ],
       ],
-      'CRM_Dedupe_DAO_RuleGroup' => [
+      'CRM_Dedupe_DAO_DedupeRuleGroup' => [
         [
           'fieldName' => 'contact_type',
           'sample' => 'Individual',
@@ -243,10 +239,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'medium_id',
           'sample' => 'Phone',
         ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
       ],
       'CRM_Campaign_DAO_Campaign' => [
         [
@@ -262,20 +254,12 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       ],
       'CRM_Campaign_DAO_Survey' => [
         [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
-        [
           'fieldName' => 'activity_type_id',
           'sample' => 'Phone Call',
           'max' => 100,
         ],
       ],
       'CRM_Campaign_DAO_CampaignGroup' => [
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
         [
           'fieldName' => 'group_type',
           'sample' => 'Include',
@@ -330,7 +314,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ],
         [
           'fieldName' => 'extends',
-          'sample' => 'CiviEvent',
+          'sample' => 'Event',
         ],
         [
           'fieldName' => 'financial_type_id',
@@ -499,10 +483,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'payment_instrument_id',
           'sample' => 'Check',
         ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
       ],
       'CRM_Pledge_DAO_PledgePayment' => [
         [
@@ -524,10 +504,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         [
           'fieldName' => 'frequency_unit',
           'sample' => 'month',
-        ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
         ],
       ],
       'CRM_PCP_DAO_PCP' => [
@@ -723,10 +699,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'max' => 250,
         ],
         [
-          'fieldName' => 'preferred_mail_format',
-          'sample' => 'Text',
-        ],
-        [
           'fieldName' => 'communication_style_id',
           'sample' => 'Formal',
         ],
@@ -778,10 +750,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => ['USD' => 'US Dollar'],
           'max' => 200,
         ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
       ],
       'CRM_Event_DAO_Event' => [
         [
@@ -809,10 +777,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => ['USD' => 'US Dollar'],
           'max' => 200,
         ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
       ],
       'CRM_Core_DAO_Menu' => [
         [
@@ -833,19 +797,15 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'status_id',
           'sample' => 'New',
         ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
       ],
       'CRM_Member_DAO_MembershipStatus' => [
         [
           'fieldName' => 'start_event',
-          'sample' => 'start date',
+          'sample' => 'Membership Start Date',
         ],
         [
           'fieldName' => 'end_event',
-          'sample' => 'member since',
+          'sample' => 'Member Since',
         ],
         [
           'fieldName' => 'start_event_adjust_unit',
@@ -891,10 +851,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'visibility',
           'sample' => 'Public Pages',
         ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
       ],
       'CRM_Mailing_DAO_MailingComponent' => [
         [
@@ -914,35 +870,16 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Scheduled',
         ],
       ],
-      'CRM_Mailing_Event_DAO_Bounce' => [
+      'CRM_Mailing_Event_DAO_MailingEventBounce' => [
         [
           'fieldName' => 'bounce_type_id',
           'sample' => 'Invalid',
         ],
       ],
-      'CRM_Mailing_Event_DAO_Subscribe' => [
+      'CRM_Mailing_Event_DAO_MailingEventSubscribe' => [
         [
           'fieldName' => 'group_id',
           'sample' => $group_name,
-        ],
-      ],
-      'CRM_Grant_DAO_Grant' => [
-        [
-          'fieldName' => 'status_id',
-          'sample' => 'Approved for Payment',
-        ],
-        [
-          'fieldName' => 'grant_type_id',
-          'sample' => 'Emergency',
-        ],
-        [
-          'fieldName' => 'currency',
-          'sample' => ['USD' => 'US Dollar'],
-          'max' => 200,
-        ],
-        [
-          'fieldName' => 'financial_type_id',
-          'sample' => 'Donation',
         ],
       ],
       'CRM_Contribute_DAO_Contribution' => [
@@ -967,10 +904,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'contribution_page_id',
           'sample' => $contribution_page,
         ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
       ],
       'CRM_Contribute_DAO_PremiumsProduct' => [
         [
@@ -991,10 +924,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'currency',
           'sample' => ['USD' => 'US Dollar'],
           'max' => 200,
-        ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
         ],
       ],
       'CRM_Case_DAO_Case' => [
@@ -1046,7 +975,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     }
   }
 
-  public function testContactTypes() {
+  public function testContactTypes(): void {
     $byName = [
       'Individual' => 'Individual',
       'Household' => 'Household',
@@ -1075,7 +1004,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     $this->assertEquals(array_flip($byId), $result);
   }
 
-  public function testGetTaxRates() {
+  public function testGetTaxRates(): void {
     $contact = $this->createLoggedInUser();
     $financialType = $this->callAPISuccess('financial_type', 'create', [
       'name' => 'Test taxable financial Type',
@@ -1100,7 +1029,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'account_relationship' => 10,
       'financial_account_id' => $financialAccountId,
     ];
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
+    CRM_Financial_BAO_EntityFinancialAccount::add($financialAccountParams);
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     $this->assertEquals('5.00', round($taxRates[$financialType['id']], 2));
   }

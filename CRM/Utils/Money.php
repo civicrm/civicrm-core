@@ -15,9 +15,13 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Brick\Money\Money;
-use Brick\Money\Context\DefaultContext;
 use Brick\Math\RoundingMode;
+use Brick\Money\Context\CustomContext;
+use Brick\Money\Context\DefaultContext;
+use Brick\Money\Currency;
+use Brick\Money\ISOCurrencyProvider;
+use Brick\Money\Money;
+use Brick\Money\Exception\UnknownCurrencyException;
 
 /**
  * Money utilties
@@ -42,14 +46,12 @@ class CRM_Utils_Money {
    * @param string $format
    *   The desired currency format.
    * @param bool $onlyNumber
-   * @param string $valueFormat
-   *   The desired monetary value display format (e.g. '%!i').
    *
    * @return string
    *   formatted monetary string
    *
    */
-  public static function format($amount, $currency = NULL, $format = NULL, $onlyNumber = FALSE, $valueFormat = NULL) {
+  public static function format($amount, $currency = NULL, $format = NULL, $onlyNumber = FALSE) {
 
     if (CRM_Utils_System::isNull($amount)) {
       return '';
@@ -61,19 +63,12 @@ class CRM_Utils_Money {
       $format = $config->moneyformat;
     }
 
-    if (!$valueFormat) {
-      $valueFormat = $config->moneyvalueformat;
-    }
-
-    if (!empty($valueFormat) && $valueFormat !== '%!i') {
-      CRM_Core_Error::deprecatedFunctionWarning('Having a Money Value format other than !%i is deprecated, please report this on the GitLab Issue https://lab.civicrm.org/dev/core/-/issues/1494 with the relevant moneyValueFormat you use.');
+    if (!$currency) {
+      $currency = $config->defaultCurrency;
     }
 
     if ($onlyNumber) {
-      // money_format() exists only in certain PHP install (CRM-650)
-      if (is_numeric($amount) and function_exists('money_format')) {
-        $amount = money_format($valueFormat, $amount);
-      }
+      $amount = self::formatLocaleNumericRoundedByCurrency($amount, $currency);
       return $amount;
     }
 
@@ -84,17 +79,16 @@ class CRM_Utils_Money {
       ]);
     }
 
-    if (!$currency) {
-      $currency = $config->defaultCurrency;
-    }
-
     // ensure $currency is a valid currency code
     // for backwards-compatibility, also accept one space instead of a currency
     if ($currency != ' ' && !array_key_exists($currency, self::$_currencySymbols)) {
       throw new CRM_Core_Exception("Invalid currency \"{$currency}\"");
     }
 
-    $amount = self::formatNumericByFormat($amount, $valueFormat);
+    if ($currency === ' ') {
+      CRM_Core_Error::deprecatedWarning('Passing empty currency to CRM_Utils_Money::format is deprecated if you need it for display without currency call CRM_Utils_Money::formatLocaleNumericRounded');
+    }
+    $amount = self::formatUSLocaleNumericRounded($amount, 2);
     // If it contains tags, means that HTML was passed and the
     // amount is already converted properly,
     // so don't mess with it again.
@@ -128,6 +122,31 @@ class CRM_Utils_Money {
   }
 
   /**
+   * Get the currency object for a given
+   *
+   * Wrapper around the Brick library to support currency codes which Brick doesn't support
+   *
+   * @internal
+   * @param string $currencyCode
+   * @return Brick\Money\Currency
+   */
+  public static function getCurrencyObject(string $currencyCode): Currency {
+    try {
+      $currency = ISOCurrencyProvider::getInstance()->getCurrency($currencyCode);
+    }
+    catch (UnknownCurrencyException $e) {
+      $currency = new Currency(
+        $currencyCode,
+        0,
+        $currencyCode,
+        2
+      );
+    }
+
+    return $currency;
+  }
+
+  /**
    * Subtract currencies using integers instead of floats, to preserve precision
    *
    * @param string|float $leftOp
@@ -139,8 +158,10 @@ class CRM_Utils_Money {
    */
   public static function subtractCurrencies($leftOp, $rightOp, $currency) {
     if (is_numeric($leftOp) && is_numeric($rightOp)) {
-      $money = Money::of($leftOp, $currency, new DefaultContext(), RoundingMode::CEILING);
-      return $money->minus($rightOp)->getAmount()->toFloat();
+      $currencyObject = self::getCurrencyObject($currency);
+      $leftMoney = Money::of($leftOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
+      $rightMoney = Money::of($rightOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
+      return $leftMoney->minus($rightMoney)->getAmount()->toFloat();
     }
   }
 
@@ -154,9 +175,9 @@ class CRM_Utils_Money {
    * 1.234 != 1.236 with a currency precision of 2 decimal points
    * 1.300 != 1.200 with a currency precision of 2 decimal points
    *
-   * @param $value1
-   * @param $value2
-   * @param $currency
+   * @param int|float $value1
+   * @param int|float $value2
+   * @param string $currency
    *
    * @return bool
    */
@@ -167,21 +188,26 @@ class CRM_Utils_Money {
   }
 
   /**
-   * Format money for display (just numeric part) according to the current locale.
+   * Format money (or number) for display (just numeric part) according to the current or supplied locale.
    *
-   * This calls the underlying system function but does not handle currency separators.
+   * Note this should not be used in conjunction with any calls to
+   * replaceCurrencySeparators as this function already does that.
    *
-   * It's not totally clear when it changes the $amount value but has historical usage.
-   *
-   * @param $amount
+   * @param string $amount
+   * @param string $locale
+   * @param string $currency
+   * @param int $numberOfPlaces
    *
    * @return string
+   * @throws \Brick\Money\Exception\UnknownCurrencyException
    */
-  protected static function formatLocaleNumeric($amount) {
-    if (CRM_Core_Config::singleton()->moneyvalueformat !== '%!i') {
-      CRM_Core_Error::deprecatedFunctionWarning('Having a Money Value format other than !%i is deprecated, please report this on GitLab with the relevant moneyValueFormat you use.');
-    }
-    return self::formatNumericByFormat($amount, CRM_Core_Config::singleton()->moneyvalueformat);
+  protected static function formatLocaleNumeric(string $amount, $locale = NULL, $currency = NULL, $numberOfPlaces = 2): string {
+    $currency = $currency ?? CRM_Core_Config::singleton()->defaultCurrency;
+    $currencyObject = self::getCurrencyObject($currency);
+    $money = Money::of($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
+    $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
+    $formatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $numberOfPlaces);
+    return $money->formatWith($formatter);
   }
 
   /**
@@ -194,13 +220,35 @@ class CRM_Utils_Money {
    *
    * It's not totally clear when it changes the $amount value but has historical usage.
    *
-   * @param string $amount
+   * @param string|float $amount
    * @param int $numberOfPlaces
    *
    * @return string
    */
-  protected static function formatLocaleNumericRounded($amount, $numberOfPlaces) {
-    return self::formatLocaleNumeric(round($amount, $numberOfPlaces));
+  public static function formatUSLocaleNumericRounded($amount, int $numberOfPlaces): string {
+    if (!extension_loaded('intl') || !is_numeric($amount)) {
+      // @todo - we should not attempt to format non-numeric strings. For now
+      // these will not fail but will give notices on php 7.4
+      if (!is_numeric($amount)) {
+        CRM_Core_Error::deprecatedWarning('Formatting non-numeric values is no longer supported: ' . htmlspecialchars($amount));
+      }
+      else {
+        self::missingIntlNotice();
+      }
+      return self::formatNumericByFormat($amount, '%!.' . $numberOfPlaces . 'i');
+    }
+    $currencyObject = self::getCurrencyObject(CRM_Core_Config::singleton()->defaultCurrency);
+    $money = Money::of($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
+    // @todo - we specify en_US here because we don't want this function to do
+    // currency replacement at the moment because
+    // formatLocaleNumericRoundedByPrecision is doing it and if it
+    // is done there then it is swapped back in there.. This is a short term
+    // fix to allow us to resolve formatLocaleNumericRoundedByPrecision
+    // and to make the function comments correct - but, we need to reconsider this
+    // in master as it is probably better to use locale than our currency separator fields.
+    $formatter = new \NumberFormatter('en_US', NumberFormatter::DECIMAL);
+    $formatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $numberOfPlaces);
+    return $money->formatWith($formatter);
   }
 
   /**
@@ -215,7 +263,42 @@ class CRM_Utils_Money {
    *   Formatted amount.
    */
   public static function formatLocaleNumericRoundedByCurrency($amount, $currency) {
-    $amount = self::formatLocaleNumericRounded($amount, self::getCurrencyPrecision($currency));
+    return self::formatLocaleNumericRoundedByPrecision($amount, self::getCurrencyPrecision($currency));
+  }
+
+  /**
+   * Format money for display (just numeric part) according to the current locale with rounding to the supplied precision.
+   *
+   * This handles both rounding & replacement of the currency separators for the locale.
+   *
+   * @param string $amount
+   * @param int $precision
+   *
+   * @return string
+   *   Formatted amount.
+   */
+  public static function formatLocaleNumericRoundedByPrecision($amount, $precision) {
+    $amount = self::formatUSLocaleNumericRounded($amount, $precision);
+    return self::replaceCurrencySeparators($amount);
+  }
+
+  /**
+   * Format money for display with rounding to the supplied precision but without padding.
+   *
+   * If the string is shorter than the precision trailing zeros are not added to reach the precision
+   * beyond the 2 required for normally currency formatting.
+   *
+   * This handles both rounding & replacement of the currency separators for the locale.
+   *
+   * @param string $amount
+   * @param int $precision
+   *
+   * @return string
+   *   Formatted amount.
+   */
+  public static function formatLocaleNumericRoundedByOptionalPrecision($amount, $precision) {
+    $decimalPlaces = self::getDecimalPlacesForAmount((string) $amount);
+    $amount = self::formatUSLocaleNumericRounded($amount, $precision > $decimalPlaces ? $decimalPlaces : $precision);
     return self::replaceCurrencySeparators($amount);
   }
 
@@ -258,7 +341,7 @@ class CRM_Utils_Money {
    *
    * @return string
    */
-  protected static function formatNumericByFormat($amount, $valueFormat) {
+  protected static function formatNumericByFormat($amount, $valueFormat = '%!i') {
     // money_format() exists only in certain PHP install (CRM-650)
     // setlocale() affects native gettext (CRM-11054, CRM-9976)
     if (is_numeric($amount) && function_exists('money_format')) {
@@ -268,6 +351,25 @@ class CRM_Utils_Money {
       setlocale(LC_MONETARY, $lc);
     }
     return $amount;
+  }
+
+  /**
+   * Emits a notice indicating we have fallen back to a less accurate way of formatting money due to missing intl extension
+   */
+  public static function missingIntlNotice() {
+    CRM_Core_Session::singleton()->setStatus(ts('As this system does not include the PHP intl extension, CiviCRM has fallen back onto a slightly less accurate and deprecated method to format money'), ts('Missing PHP INTL extension'));
+  }
+
+  /**
+   * Get the number of characters after the decimal point.
+   *
+   * @param string $amount
+   *
+   * @return int
+   */
+  protected static function getDecimalPlacesForAmount(string $amount): int {
+    $decimalPlaces = strlen(substr($amount, strpos($amount, '.') + 1));
+    return $decimalPlaces;
   }
 
 }

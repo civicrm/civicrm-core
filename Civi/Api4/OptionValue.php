@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -9,24 +8,20 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4;
 
 /**
  * OptionValue entity.
  *
  * @see \Civi\Api4\OptionGroup
+ * @searchable secondary
+ * @orderBy weight
+ * @groupWeightsBy option_group_id
+ * @since 5.19
  * @package Civi\Api4
  */
 class OptionValue extends Generic\DAOEntity {
+  use Generic\Traits\ManagedEntity;
+  use Generic\Traits\SortableEntity;
 
 }

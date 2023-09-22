@@ -27,7 +27,7 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
       $this, NULL
     );
 
-    $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
 
     if ($q == NULL) {
 
@@ -38,7 +38,7 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     $mailing = &$q->getMailing();
 
     if ($hash) {
-      $emailId = CRM_Core_DAO::getfieldValue('CRM_Mailing_Event_DAO_Queue', $hash, 'email_id', 'hash');
+      $emailId = CRM_Core_DAO::getfieldValue('CRM_Mailing_Event_DAO_MailingEventQueue', $hash, 'email_id', 'hash');
       $this->_fromEmail = $fromEmail = CRM_Core_DAO::getfieldValue('CRM_Core_DAO_Email', $emailId, 'email');
       $this->assign('fromEmail', $fromEmail);
     }
@@ -46,7 +46,7 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     // Show the subject instead of the name here, since it's being
     // displayed to external contacts/users.
 
-    CRM_Utils_System::setTitle(ts('Forward Mailing: %1', [1 => $mailing->subject]));
+    $this->setTitle(ts('Forward Mailing: %1', [1 => $mailing->subject]));
 
     $this->set('queue_id', $queue_id);
     $this->set('job_id', $job_id);
@@ -74,10 +74,6 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
         'type' => 'next',
         'name' => ts('Forward'),
         'isDefault' => TRUE,
-      ],
-      [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
       ],
     ]);
   }

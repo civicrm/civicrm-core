@@ -11,9 +11,14 @@
 class CRM_ACL_ListTest extends CiviUnitTestCase {
 
   /**
+   * @var array
+   */
+  protected $allowedContactsACL = [];
+
+  /**
    * Set up function.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     // $this->quickCleanup(array('civicrm_acl_contact_cache'), TRUE);
     $this->useTransaction(TRUE);
@@ -23,7 +28,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * general test for the 'view all contacts' permission
    */
-  public function testViewAllPermission() {
+  public function testViewAllPermission(): void {
     // create test contacts
     $contacts = $this->createScenarioPlain();
 
@@ -56,7 +61,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * general test for the 'view all contacts' permission
    */
-  public function testEditAllPermission() {
+  public function testEditAllPermission(): void {
     // create test contacts
     $contacts = $this->createScenarioPlain();
 
@@ -75,23 +80,23 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
 
   /**
    * Test access related to the 'access deleted contact' permission
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testViewEditDeleted() {
+  public function testViewEditDeleted(): void {
     // create test contacts
     $contacts = $this->createScenarioPlain();
 
     // delete one contact
     $deleted_contact_id = $contacts[2];
     $this->callAPISuccess('Contact', 'create', ['id' => $deleted_contact_id, 'contact_is_deleted' => 1]);
-    $deleted_contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $deleted_contact_id]);
-    $this->assertEquals($deleted_contact['contact_is_deleted'], 1, "Contact should've been deleted");
 
     // test WITH explicit permission
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['edit all contacts', 'view all contacts'];
     $result = CRM_Contact_BAO_Contact_Permission::allowList($contacts, CRM_Core_Permission::EDIT);
     sort($result);
-    $this->assertNotContains($deleted_contact_id, $result, "Deleted contacts should be excluded");
-    $this->assertEquals(count($result), count($contacts) - 1, "Only deleted contacts should be excluded");
+    $this->assertNotContains($deleted_contact_id, $result, 'Deleted contacts should be excluded');
+    $this->assertEquals(count($result), count($contacts) - 1, 'Only deleted contacts should be excluded');
   }
 
   /**
@@ -100,7 +105,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
    * There should be the following permission-relationship
    * contact[0] -> contact[1] -> contact[2]
    */
-  public function testPermissionByRelation() {
+  public function testPermissionByRelation(): void {
     // create test scenario
     $contacts = $this->createScenarioRelations();
 
@@ -178,7 +183,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * Test access based on ACL
    */
-  public function testPermissionByACL() {
+  public function testPermissionByACL(): void {
     $contacts = $this->createScenarioPlain();
 
     // set custom hook
@@ -202,7 +207,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * Test access with a mix of ACL and relationship
    */
-  public function testPermissionACLvsRelationship() {
+  public function testPermissionACLvsRelationship(): void {
     $contacts = $this->createScenarioRelations();
 
     // set custom hook
@@ -227,7 +232,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * Test access related to the 'access deleted contact' permission
    */
-  public function testPermissionCompare() {
+  public function testPermissionCompare(): void {
     $contacts = $this->createScenarioRelations();
     $contact_index = array_flip($contacts);
 

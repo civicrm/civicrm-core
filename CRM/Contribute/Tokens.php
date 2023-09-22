@@ -10,6 +10,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ContributionPage;
+use Civi\Api4\ContributionRecur;
+
 /**
  * Class CRM_Contribute_Tokens
  *
@@ -18,114 +21,75 @@
  * At time of writing, we don't have any particularly special tokens -- we just
  * do some basic formatting based on the corresponding DB field.
  */
-class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
+class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
 
   /**
-   * Get a list of tokens whose name and title match the DB fields.
+   * @return string
+   */
+  protected function getEntityAlias(): string {
+    return 'contrib_';
+  }
+
+  /**
+   * Get the entity name for api v4 calls.
+   *
+   * In practice this IS just ucfirst($this->GetEntityName)
+   * but declaring it seems more legible.
+   *
+   * @return string
+   */
+  protected function getApiEntityName(): string {
+    return 'Contribution';
+  }
+
+  /**
    * @return array
    */
-  protected function getPassthruTokens() {
-    return [
-      'contribution_page_id',
-      'receive_date',
-      'total_amount',
-      'fee_amount',
-      'net_amount',
-      'trxn_id',
-      'invoice_id',
-      'currency',
-      'contribution_cancel_date',
-      'receipt_date',
-      'thankyou_date',
-      'tax_amount',
-    ];
+  public function getCurrencyFieldName() {
+    return ['currency'];
   }
 
   /**
-   * Get alias tokens.
+   * Get Related Entity tokens.
    *
-   * @return array
+   * @return array[]
    */
-  protected function getAliasTokens() {
-    return [
-      'id' => 'contribution_id',
-      'payment_instrument' => 'payment_instrument_id',
-      'source' => 'contribution_source',
-      'status' => 'contribution_status_id',
-      'type' => 'financial_type_id',
-      'cancel_date' => 'contribution_cancel_date',
-    ];
-  }
-
-  /**
-   * Class constructor.
-   */
-  public function __construct() {
-    $tokens = CRM_Utils_Array::subset(
-      CRM_Utils_Array::collect('title', CRM_Contribute_DAO_Contribution::fields()),
-      $this->getPassthruTokens()
-    );
-    $tokens['id'] = ts('Contribution ID');
-    $tokens['payment_instrument'] = ts('Payment Instrument');
-    $tokens['source'] = ts('Contribution Source');
-    $tokens['status'] = ts('Contribution Status');
-    $tokens['type'] = ts('Financial Type');
-    $tokens = array_merge($tokens, CRM_Utils_Token::getCustomFieldTokens('Contribution'));
-    parent::__construct('contribution', $tokens);
-  }
-
-  /**
-   * Check if the token processor is active.
-   *
-   * @param \Civi\Token\TokenProcessor $processor
-   *
-   * @return bool
-   */
-  public function checkActive(\Civi\Token\TokenProcessor $processor) {
-    return !empty($processor->context['actionMapping'])
-      && $processor->context['actionMapping']->getEntity() === 'civicrm_contribution';
-  }
-
-  /**
-   * Alter action schedule query.
-   *
-   * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
-   */
-  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
-    if ($e->mapping->getEntity() !== 'civicrm_contribution') {
-      return;
+  protected function getRelatedTokens(): array {
+    $tokens = [];
+    // Check to make sure CiviContribute is enabled, just in case it remains registered. Eventually this will be moved to the CiviContribute extension
+    // and this check can hopefully be removed (as long as caching on enable / disable doesn't explode our brains and / or crash the site).
+    if (!array_key_exists('Contribution', \Civi::service('action_object_provider')->getEntities())) {
+      return $tokens;
     }
-
-    $fields = CRM_Contribute_DAO_Contribution::fields();
-    foreach ($this->getPassthruTokens() as $token) {
-      $e->query->select("e." . $fields[$token]['name'] . " AS contrib_{$token}");
+    // Ideally we would derive this from 'usage' - but it looks like adding the usage data
+    // was quite a bit of work & didn't leave the energy to implement - esp expose for
+    // where clauses (also, it feels like 'hidden+token' would be a good usage.
+    $tokenList = ['frontend_title', 'pay_later_text', 'pay_later_receipt', 'is_share', 'receipt_text'];
+    $contributionPageTokens = ContributionPage::getFields(FALSE)->addWhere('name', 'IN', $tokenList)->execute();
+    foreach ($contributionPageTokens as $contributionPageToken) {
+      $tokens['contribution_page_id.' . $contributionPageToken['name']] = [
+        'title' => $contributionPageToken['title'],
+        'name' => 'contribution_page_id.' . $contributionPageToken['name'],
+        'type' => 'mapped',
+        'data_type' => $contributionPageToken['data_type'],
+        'input_type' => $contributionPageToken['input_type'],
+        'audience' => $contributionPageToken['name'] === 'is_share' ? 'hidden' : 'user',
+      ];
     }
-    foreach ($this->getAliasTokens() as $alias => $orig) {
-      $e->query->select("e." . $fields[$orig]['name'] . " AS contrib_{$alias}");
+    $hiddenTokens = ['modified_date', 'create_date', 'trxn_id', 'invoice_id', 'is_test', 'payment_token_id', 'payment_processor_id', 'payment_instrument_id', 'cycle_day', 'installments', 'processor_id', 'next_sched_contribution_date', 'failure_count', 'failure_retry_date', 'auto_renew', 'is_email_receipt', 'contribution_status_id'];
+    $contributionRecurFields = ContributionRecur::getFields(FALSE)->setLoadOptions(TRUE)->execute();
+    foreach ($contributionRecurFields as $contributionRecurField) {
+      $tokens['contribution_recur_id.' . $contributionRecurField['name']] = [
+        'title' => $contributionRecurField['title'],
+        'name' => 'contribution_recur_id.' . $contributionRecurField['name'],
+        'type' => 'mapped',
+        'options' => $contributionRecurField['options'] ?? NULL,
+        'data_type' => $contributionRecurField['data_type'],
+        'input_type' => $contributionRecurField['input_type'],
+        'audience' => in_array($contributionRecurField['name'], $hiddenTokens) ? 'hidden' : 'user',
+      ];
     }
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $actionSearchResult = $row->context['actionSearchResult'];
-    $fieldValue = $actionSearchResult->{"contrib_$field"} ?? NULL;
-
-    $aliasTokens = $this->getAliasTokens();
-    if (in_array($field, ['total_amount', 'fee_amount', 'net_amount'])) {
-      return $row->format('text/plain')->tokens($entity, $field,
-        \CRM_Utils_Money::format($fieldValue, $actionSearchResult->contrib_currency));
-    }
-    elseif (isset($aliasTokens[$field])) {
-      $row->dbToken($entity, $field, 'CRM_Contribute_BAO_Contribution', $aliasTokens[$field], $fieldValue);
-    }
-    elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
-      $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
-    }
-    else {
-      $row->dbToken($entity, $field, 'CRM_Contribute_BAO_Contribution', $field, $fieldValue);
-    }
+    return $tokens;
   }
 
 }

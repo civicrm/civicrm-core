@@ -7,7 +7,7 @@
  */
 class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
@@ -39,7 +39,7 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
     $queryObj = new CRM_Contact_BAO_Query($params);
     $sql = $queryObj->getSearchSQL(0, 0, $sort . ' asc');
     if ($isUseKeySort) {
-      $this->assertContains('field(', $sql);
+      $this->assertStringContainsString('field(', $sql);
     }
     try {
       $resultDAO = CRM_Core_DAO::executeQuery($sql);
@@ -73,7 +73,7 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testRelativeContributionDates() {
+  public function testRelativeContributionDates(): void {
     $contribution1 = $this->contributionCreate(['receive_date' => '2018-01-02', 'contact_id' => $this->individualCreate()]);
     $contribution2 = $this->contributionCreate(['receive_date' => '2017-01-02', 'contact_id' => $this->individualCreate()]);
     $queryObj = new CRM_Contact_BAO_Query([['receive_date_low', '=', 20170101, 1, 0]]);
@@ -86,7 +86,7 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'delete', ['id' => $contribution2]);
   }
 
-  public function testContributionWithoutSoftCredits() {
+  public function testContributionWithoutSoftCredits(): void {
     $contribution1 = $this->contributionCreate(['receive_date' => '2018-01-02', 'contact_id' => $this->individualCreate()]);
     $contact2 = $this->callAPISuccess('Contact', 'create', [
       'display_name' => 'superman',

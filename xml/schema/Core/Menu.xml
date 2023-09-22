@@ -11,6 +11,9 @@
     <title>Menu ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.1</add>
   </field>
   <primaryKey>
@@ -19,7 +22,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -28,6 +31,10 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this menu item for</comment>
+    <html>
+      <label>Domain</label>
+      <type>Select</type>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -107,6 +114,9 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Url where a page should redirected to, if next url not known.</comment>
+    <html>
+      <label>Return URL</label>
+    </html>
     <add>2.1</add>
   </field>
   <field>
@@ -114,11 +124,14 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Arguments to pass to return_url</comment>
+    <html>
+      <label>Return URL Arguments</label>
+    </html>
     <add>2.1</add>
   </field>
   <field>
     <name>component_id</name>
-    <title>Component</title>
+    <title>Component ID</title>
     <type>int unsigned</type>
     <comment>Component that this menu item belongs to</comment>
     <add>2.1</add>
@@ -129,6 +142,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Component</label>
     </html>
   </field>
   <foreignKey>
@@ -141,6 +155,12 @@
     <name>is_active</name>
     <title>Enabled?</title>
     <type>boolean</type>
+    <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <required>true</required>
     <comment>Is this menu item active?</comment>
     <add>2.1</add>
   </field>
@@ -148,6 +168,8 @@
     <name>is_public</name>
     <title>Public?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>Is this menu accessible to the public?</comment>
     <add>2.1</add>
   </field>
@@ -155,6 +177,8 @@
     <name>is_exposed</name>
     <title>Exposed?</title>
     <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
     <comment>Is this menu exposed to the navigation system?</comment>
     <add>2.1</add>
   </field>
@@ -162,6 +186,8 @@
     <name>is_ssl</name>
     <title>Use SSL?</title>
     <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
     <comment>Should this menu be exposed via SSL if enabled?</comment>
     <add>2.1</add>
   </field>
@@ -196,6 +222,8 @@
     <name>skipBreadcrumb</name>
     <title>Hide Breadcrumb?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>skip this url being exposed to breadcrumb</comment>
     <add>2.2</add>
   </field>

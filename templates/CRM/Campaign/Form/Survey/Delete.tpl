@@ -11,7 +11,7 @@
   <table class="form-layout">
     <tr>
       <td colspan="2">
-        <div class="status"><div class="icon inform-icon"></div>&nbsp;{ts 1=$surveyTitle}Are you sure you want to delete the %1 survey?{/ts}</div>
+        <div class="status">{icon icon="fa-info-circle"}{/icon}{ts 1=$surveyTitle}Are you sure you want to delete the %1 survey?{/ts}</div>
       </td>
     </tr>
   </table>

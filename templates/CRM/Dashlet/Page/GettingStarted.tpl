@@ -8,4 +8,4 @@
  +--------------------------------------------------------------------+
 *}
 
-<div id="civicrm-getting-started">{$gettingStarted}</div>
+<div id="civicrm-getting-started">{$gettingStarted|smarty:nodefaults}</div>

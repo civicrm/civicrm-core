@@ -149,19 +149,22 @@ class CRM_Utils_Check_Message {
    *
    * @param string $title
    *   Text displayed on the status message as a link or button.
-   * @param string $confirmation
+   * @param string|false $confirmation
    *   Optional confirmation message before performing action
    * @param string $type
    *   Currently supports: api3 or href
    * @param array $params
    *   Params to be passed to CRM.api3 or CRM.url depending on type
+   * @param string $icon
+   *   Fa-icon class for the button
    */
-  public function addAction($title, $confirmation, $type, $params) {
+  public function addAction($title, $confirmation, $type, $params, $icon = NULL) {
     $this->actions[] = [
       'title' => $title,
       'confirm' => $confirmation,
       'type' => $type,
       'params' => $params,
+      'icon' => $icon,
     ];
   }
 
@@ -243,7 +246,7 @@ class CRM_Utils_Check_Message {
    *
    * @return bool
    *   TRUE means hidden, FALSE means visible.
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   private function checkStatusPreference() {
     $this->hiddenUntil = FALSE;
@@ -251,22 +254,20 @@ class CRM_Utils_Check_Message {
     if ($this->level < 2) {
       return FALSE;
     }
-    $statusPreferenceParams = [
-      'name' => $this->getName(),
-      'domain_id' => CRM_Core_Config::domainID(),
-      'sequential' => 1,
+    $where = [
+      ['name', '=', $this->getName()],
+      ['domain_id', '=', CRM_Core_Config::domainID()],
     ];
     // Check if there's a StatusPreference matching this name/domain.
-    $statusPreference = civicrm_api3('StatusPreference', 'get', $statusPreferenceParams);
-    $prefs = CRM_Utils_Array::value('values', $statusPreference, []);
-    if ($prefs) {
+    $pref = civicrm_api4('StatusPreference', 'get', ['checkPermissions' => FALSE, 'where' => $where])->first();
+    if ($pref) {
       // If so, compare severity to StatusPreference->severity.
-      if ($this->level <= $prefs[0]['ignore_severity']) {
-        if (isset($prefs[0]['hush_until'])) {
+      if ($this->level <= $pref['ignore_severity']) {
+        if (isset($pref['hush_until'])) {
           // Time-based hush.
-          $this->hiddenUntil = $prefs[0]['hush_until'];
+          $this->hiddenUntil = $pref['hush_until'];
           $today = new DateTime();
-          $snoozeDate = new DateTime($prefs[0]['hush_until']);
+          $snoozeDate = new DateTime($pref['hush_until']);
           return !($today > $snoozeDate);
         }
         else {

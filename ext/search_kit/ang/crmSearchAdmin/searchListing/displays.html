@@ -1,0 +1,16 @@
+<div class="btn-group">
+  <button type="button" disabled ng-if="!row.data.display_name" class="btn btn-xs dropdown-toggle btn-primary-outline">
+    {{:: ts('0 Displays') }}
+  </button>
+  <button type="button" ng-if=":: row.data.display_name" ng-click="row.openDisplayMenu = true" class="btn btn-xs dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    {{:: row.data.display_name.length === 1 ? ts('1 Display') : ts('%1 Displays', {1: row.data.display_name.length}) }} <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" ng-if=":: row.openDisplayMenu">
+    <li ng-repeat="display_name in row.data.display_name" ng-class="{disabled: row.data.display_acl_bypass[$index]}" title="{{:: row.data.display_acl_bypass[$index] ? ts('Display has permissions disabled') : ts('View display') }}">
+      <a ng-href="{{:: row.data.display_acl_bypass[$index] ? '' : $ctrl.searchDisplayPath + '#/display/' + row.data.name + '/' + display_name }}" target="_blank">
+        <i class="crm-i {{:: row.data.display_icon[$index] }}"></i>
+        {{:: row.data.display_label[$index] }}
+      </a>
+    </li>
+  </ul>
+</div>

@@ -13,7 +13,7 @@ namespace Civi\Core\Event;
 
 /**
  * Class GenericHookEvent
- * @package Civi\API\Event
+ * @package Civi\Core\Event
  *
  * The GenericHookEvent is used to expose all traditional hooks to the
  * Symfony EventDispatcher.
@@ -61,7 +61,7 @@ namespace Civi\Core\Event;
  * foreach ($event->getReturnValues() as $retVal) { ... }
  * ```
  */
-class GenericHookEvent extends \Symfony\Component\EventDispatcher\Event {
+class GenericHookEvent extends \Symfony\Contracts\EventDispatcher\Event {
 
   /**
    * @var array

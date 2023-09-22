@@ -31,7 +31,7 @@
                             {if $row.event_end_date}
                                 &nbsp; - &nbsp;
                                 {* Only show end time if end date = start date *}
-                                {if $row.event_end_date|date_format:"%Y%m%d" == $row.event_start_date|date_format:"%Y%m%d"}
+                                {if $row.event_end_date|crmDate:"%Y%m%d" == $row.event_start_date|crmDate:"%Y%m%d"}
                                     {$row.event_end_date|crmDate:0:1}
                                 {else}
                                     {$row.event_end_date|crmDate}
@@ -40,7 +40,7 @@
                        </td>
                        <td class="crm-participant-participant_status">{$row.participant_status}</td>
                        <td class="crm-participant-showConfirmUrl">
-                            {if $row.showConfirmUrl}
+                            {if !empty($row.showConfirmUrl)}
                                 <a href="{crmURL p='civicrm/event/confirm' q="reset=1&participantId=`$row.participant_id`"}">{ts}Confirm Registration{/ts}</a>
                             {/if}
                         </td>
@@ -50,7 +50,7 @@
         {/strip}
     {else}
         <div class="messages status no-popup">
-           <div class="icon inform-icon"></div>
+           {icon icon="fa-info-circle"}{/icon}
            {ts}You are not registered for any current or upcoming Events.{/ts}
         </div>
     {/if}

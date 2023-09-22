@@ -102,10 +102,17 @@ class CRM_Report_Form_Instance {
       $form->freeze('is_reserved');
     }
 
+    $getPerms = \Civi\Api4\Permission::get(0)
+      ->addWhere('is_active', '=', 1)
+      ->addWhere('group', 'IN', ['civicrm', 'cms', 'const'])
+      ->setOrderBy(['title' => 'ASC'])
+      ->execute();
     $form->addElement('select',
       'permission',
       ts('Permission'),
-      ['0' => ts('Everyone (includes anonymous)')] + CRM_Core_Permission::basicPermissions()
+      // FIXME: Historically, CiviReport hard-coded an extra '0' option. This should change to the more general ALWAYS_ALLOW_PERMISSION (but may require testing/migration).
+      ['0' => ts('Everyone (includes anonymous)')] + array_combine($getPerms->column('name'), $getPerms->column('title')),
+      ['class' => 'crm-select2']
     );
 
     // prepare user_roles to save as names not as ids
@@ -127,7 +134,7 @@ class CRM_Report_Form_Instance {
     // navigation field
     $parentMenu = CRM_Core_BAO_Navigation::getNavigationList();
 
-    $form->add('select', 'parent_id', ts('Parent Menu'), ['' => ts('- select -')] + $parentMenu);
+    $form->add('select', 'parent_id', ts('Parent Menu'), ['' => ts('- select -')] + $parentMenu, FALSE, ['class' => 'crm-select2 huge']);
 
     // For now we only providing drilldown for one primary detail report only. In future this could be multiple reports
     foreach ($form->_drilldownReport as $reportUrl => $drillLabel) {
@@ -187,7 +194,7 @@ class CRM_Report_Form_Instance {
    */
   public static function setDefaultValues(&$form, &$defaults) {
     // we should not build form elements in dashlet mode.
-    if ($form->_section) {
+    if (!empty($form->_section)) {
       return;
     }
 
@@ -249,7 +256,7 @@ class CRM_Report_Form_Instance {
 
       // CRM-17310 private reports option.
       $defaults['add_to_my_reports'] = 0;
-      if (CRM_Utils_Array::value('owner_id', $defaults) != NULL) {
+      if (($defaults['owner_id'] ?? NULL) != NULL) {
         $defaults['add_to_my_reports'] = 1;
       }
 
@@ -365,7 +372,7 @@ class CRM_Report_Form_Instance {
     else {
       $statusMsg = ts('"%1" report has been successfully created. You are currently viewing the new report instance.', [1 => $instance->title]);
     }
-    CRM_Core_Session::setStatus($statusMsg);
+    CRM_Core_Session::setStatus($statusMsg, '', 'success');
 
     if ($redirect) {
       $urlParams = ['reset' => 1];

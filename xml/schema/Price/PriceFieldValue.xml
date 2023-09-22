@@ -5,12 +5,23 @@
   <class>PriceFieldValue</class>
   <name>civicrm_price_field_value</name>
   <add>3.3</add>
+  <component>CiviContribute</component>
+  <paths>
+    <add>civicrm/admin/price/field/option/edit?reset=1&amp;action=add&amp;fid=[price_field_id]&amp;sid=[price_field_id.price_set_id]</add>
+    <view>civicrm/admin/price/field/option/edit?reset=1&amp;action=view&amp;oid=[id]&amp;fid=[price_field_id]&amp;sid=[price_field_id.price_set_id]</view>
+    <update>civicrm/admin/price/field/option/edit?reset=1&amp;action=update&amp;oid=[id]&amp;fid=[price_field_id]&amp;sid=[price_field_id.price_set_id]</update>
+    <delete>civicrm/admin/price/field/option/edit?reset=1&amp;action=delete&amp;oid=[id]&amp;fid=[price_field_id]&amp;sid=[price_field_id.price_set_id]</delete>
+    <browse>civicrm/admin/price/field/option</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>Price Field Value ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Price Field Value</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>
@@ -19,10 +30,14 @@
   </primaryKey>
   <field>
     <name>price_field_id</name>
-    <title>Price Field</title>
+    <title>Price Field ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_price_field</comment>
+    <html>
+      <type>EntityRef</type>
+      <label>Price Field</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -37,11 +52,11 @@
     <title>Name</title>
     <length>255</length>
     <comment>Price field option name</comment>
-    <required>true</required>
     <html>
       <type>Text</type>
     </html>
     <add>3.3</add>
+    <default>NULL</default>
   </field>
   <field>
     <name>label</name>
@@ -50,11 +65,11 @@
     <length>255</length>
     <localizable>true</localizable>
     <comment>Price field option label</comment>
-    <required>true</required>
     <html>
       <type>Text</type>
     </html>
     <add>3.3</add>
+    <default>NULL</default>
   </field>
   <field>
     <name>description</name>
@@ -63,6 +78,7 @@
       <type>TextArea</type>
       <rows>2</rows>
       <cols>60</cols>
+      <label>Description</label>
     </html>
     <default>NULL</default>
     <localizable>true</localizable>
@@ -76,6 +92,7 @@
       <type>TextArea</type>
       <rows>2</rows>
       <cols>60</cols>
+      <label>Pre Help</label>
     </html>
     <default>NULL</default>
     <localizable>true</localizable>
@@ -89,6 +106,7 @@
       <type>TextArea</type>
       <rows>2</rows>
       <cols>60</cols>
+      <label>Post Help</label>
     </html>
     <default>NULL</default>
     <localizable>true</localizable>
@@ -116,6 +134,7 @@
     <add>3.3</add>
     <html>
       <type>Text</type>
+      <label>Count</label>
     </html>
   </field>
   <field>
@@ -126,6 +145,7 @@
     <add>3.3</add>
     <html>
       <type>Text</type>
+      <label>Max Value</label>
     </html>
   </field>
   <field>
@@ -141,12 +161,13 @@
   </field>
   <field>
     <name>membership_type_id</name>
-    <title>Membership Type</title>
+    <title>Membership Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Membership Type</comment>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
+      <label>Membership Type</label>
     </html>
     <add>3.4</add>
   </field>
@@ -165,6 +186,7 @@
     <add>4.3</add>
     <html>
       <type>Text</type>
+      <label>Number of terms</label>
     </html>
   </field>
   <field>
@@ -173,10 +195,12 @@
     <type>boolean</type>
     <comment>Is this default price field option</comment>
     <default>0</default>
-    <add>3.3</add>
+    <required>true</required>
     <html>
       <type>CheckBox</type>
+      <label>Default</label>
     </html>
+    <add>3.3</add>
   </field>
   <field>
     <name>is_active</name>
@@ -184,11 +208,16 @@
     <type>boolean</type>
     <comment>Is this price field value active</comment>
     <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <add>3.3</add>
   </field>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <pseudoconstant>
@@ -200,6 +229,7 @@
     <add>4.3</add>
     <html>
       <type>Select</type>
+      <label>Financial Type</label>
     </html>
   </field>
   <foreignKey>

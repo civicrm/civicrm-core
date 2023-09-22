@@ -1,7 +1,8 @@
 var cv = require('civicrm-cv')({mode: 'sync'});
 var _CV = cv('vars:show');
 var cmd =
-  'CRM_Core_BAO_ConfigSetting::enableComponent("CiviCase");' +
+  'define("CIVICRM_KARMA", 1);' +
+  'CRM_Core_BAO_ConfigSetting::enableAllComponents();' +
   'global $civicrm_root;' +
   '$f = CRM_Utils_File::addTrailingSlash($civicrm_root)."tmp/karma.cv.js";' +
   'mkdir(dirname($f), 0777, TRUE);' +
@@ -35,14 +36,12 @@ module.exports = function(config) {
       'js/Common.js',
       'js/crm.datepicker.js',
       'bower_components/angular/angular.js',
-      'js/crm.angular.js',
       angularTempFile,
-      'bower_components/angular-file-upload/angular-file-upload.js',
+      'bower_components/angular-file-upload/dist/angular-file-upload.js',
       'bower_components/angular-jquery-dialog-service/dialog-service.js',
       'bower_components/angular-route/angular-route.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/angular-ui-sortable/sortable.js',
-      'bower_components/angular-ui-utils/ui-utils.js',
       'bower_components/angular-unsavedChanges/dist/unsavedChanges.js',
       'js/crm.ajax.js',
       'ang/*.js',

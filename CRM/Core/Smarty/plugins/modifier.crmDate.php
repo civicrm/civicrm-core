@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -23,14 +21,36 @@
  * @param string $dateString
  *   Date which needs to converted to human readable format.
  *
- * @param null $dateFormat
+ * @param string|null $dateFormat
+ *   A string per https://www.php.net/manual/en/function.strftime.php or
+ *   one of our configured formats name - eg
+ *    - dateformatDatetime
+ *    - dateformatFull
+ *    - dateformatPartial
+ *    - dateformatTime
+ *    - dateformatYear
+ *    - dateformatFinancialBatch
+ *    - dateformatshortdate
+ *
  * @param bool $onlyTime
  *
  * @return string
  *   human readable date format | invalid date message
  */
-function smarty_modifier_crmDate($dateString, $dateFormat = NULL, $onlyTime = FALSE) {
+function smarty_modifier_crmDate($dateString, ?string $dateFormat = NULL, bool $onlyTime = FALSE): string {
   if ($dateString) {
+    $configuredFormats = [
+      'Datetime',
+      'Full',
+      'Partial',
+      'Time',
+      'Year',
+      'FinancialBatch',
+      'shortdate',
+    ];
+    if (in_array($dateFormat, $configuredFormats, TRUE)) {
+      $dateFormat = Civi::settings()->get('dateformat' . $dateFormat);
+    }
     // this check needs to be type sensitive
     // CRM-3689, CRM-2441
     if ($dateFormat === 0) {
@@ -40,7 +60,9 @@ function smarty_modifier_crmDate($dateString, $dateFormat = NULL, $onlyTime = FA
       $config = CRM_Core_Config::singleton();
       $dateFormat = $config->dateformatTime;
     }
-
+    if (is_int($dateString)) {
+      return CRM_Utils_Date::customFormatTs($dateString, $dateFormat);
+    }
     return CRM_Utils_Date::customFormat($dateString, $dateFormat);
   }
   return '';

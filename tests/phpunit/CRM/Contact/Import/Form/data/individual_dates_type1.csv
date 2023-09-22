@@ -1,0 +1,8 @@
+first_name,Last Name,Birth Date,Deceased Date,Custom Date One,Custom Date Two,Street Address,Type,expected
+Joe,1,2008-09-01,2008-09-01,2008-09-01,2008-09-01,10 Downing St,1,Valid
+Joe,2,20080901,20080901,20080901,20080901,11 Downing St,1,Valid
+Joe,3,2008-9-1 ,2008-9-1 ,2008-9-1 ,2008-9-1 ,12 Downing St,1,Valid
+Joe,3,2008-25-1 ,2008-9-1 ,2008-9-1 ,2008-9-1 ,12 Downing St,1,Invalid
+Joe,3,2008-9-1 ,2008-25-1 ,2008-9-1 ,2008-9-1 ,12 Downing St,1,Invalid
+Joe,3,2008-9-1 ,2008-9-1 ,2008-25-1 ,2008-9-1 ,12 Downing St,1,Invalid
+Joe,3,2008-9-1 ,2008-9-1 ,2008-9-1 ,2008-25-1 ,12 Downing St,1,Invalid

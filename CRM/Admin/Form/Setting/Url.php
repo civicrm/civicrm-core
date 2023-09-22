@@ -32,7 +32,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Settings - Resource URLs'));
+    $this->setTitle(ts('Settings - Resource URLs'));
     $settingFields = civicrm_api('setting', 'getfields', [
       'version' => 3,
     ]);
@@ -48,7 +48,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * @param $fields
+   * @param array $fields
    *
    * @return array|bool
    */
@@ -81,8 +81,6 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
     $session->getStatus(TRUE);
 
     parent::postProcess();
-
-    parent::rebuildMenu();
   }
 
 }

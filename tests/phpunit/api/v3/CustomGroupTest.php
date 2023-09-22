@@ -23,7 +23,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
   public $DBResetRequired = TRUE;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->_entity = 'CustomGroup';
     $this->_params = [
       'title' => 'Test_Group_1',
@@ -39,7 +39,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $tablesToTruncate = ['civicrm_custom_group', 'civicrm_custom_field'];
     // true tells quickCleanup to drop any tables that might have been created in the test
     $this->quickCleanup($tablesToTruncate, TRUE);
@@ -53,7 +53,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    * code. The SyntaxConformance is capable of testing this for all entities on create
    * & delete (& it would be easy to add if not there)
    */
-  public function testCustomGroupCreateNoParam() {
+  public function testCustomGroupCreateNoParam(): void {
     $customGroup = $this->callAPIFailure('custom_group', 'create', [],
       'Mandatory key(s) missing from params array: title, extends'
     );
@@ -62,7 +62,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check with empty array.
    */
-  public function testCustomGroupCreateNoExtends() {
+  public function testCustomGroupCreateNoExtends(): void {
     $params = [
       'domain_id' => 1,
       'title' => 'Test_Group_1',
@@ -83,7 +83,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check with empty array.
    */
-  public function testCustomGroupCreateInvalidExtends() {
+  public function testCustomGroupCreateInvalidExtends(): void {
     $params = [
       'domain_id' => 1,
       'title' => 'Test_Group_1',
@@ -104,7 +104,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check with a string instead of array for extends.
    */
-  public function testCustomGroupCreateExtendsString() {
+  public function testCustomGroupCreateExtendsString(): void {
     $params = [
       'domain_id' => 1,
       'title' => 'Test_Group_1',
@@ -124,7 +124,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check with valid array.
    */
-  public function testCustomGroupCreate() {
+  public function testCustomGroupCreate(): void {
     $params = [
       'title' => 'Test_Group_1',
       'name' => 'test_group_1',
@@ -137,7 +137,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
 
-    $result = $this->callAPIAndDocument('custom_group', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('custom_group', 'create', $params);
     $this->assertNotNull($result['id']);
     $this->assertEquals($result['values'][$result['id']]['extends'], 'Individual');
   }
@@ -145,7 +145,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check with valid array.
    */
-  public function testCustomGroupGetFields() {
+  public function testCustomGroupGetFields(): void {
     $params = [
       'options' => ['get_options' => 'style'],
     ];
@@ -162,7 +162,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check with extends array length greater than 1
    */
-  public function testCustomGroupExtendsMultipleCreate() {
+  public function testCustomGroupExtendsMultipleCreate(): void {
     $params = [
       'title' => 'Test_Group_1',
       'name' => 'test_group_1',
@@ -175,14 +175,13 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
 
-    $result = $this->callAPIFailure('custom_group', 'create', $params,
-      'implode(): Invalid arguments passed');
+    $result = $this->callAPIFailure('custom_group', 'create', $params, 'Supplied Sub type is not valid for the specified entitiy');
   }
 
   /**
    * Check with style missing from params array.
    */
-  public function testCustomGroupCreateNoStyle() {
+  public function testCustomGroupCreateNoStyle(): void {
     $params = [
       'title' => 'Test_Group_1',
       'name' => 'test_group_1',
@@ -202,7 +201,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check without title.
    */
-  public function testCustomGroupCreateNoTitle() {
+  public function testCustomGroupCreateNoTitle(): void {
     $params = [
       'extends' => ['Contact'],
       'weight' => 5,
@@ -219,7 +218,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check for household without weight.
    */
-  public function testCustomGroupCreateHouseholdNoWeight() {
+  public function testCustomGroupCreateHouseholdNoWeight(): void {
     $params = [
       'title' => 'Test_Group_3',
       'name' => 'test_group_3',
@@ -240,7 +239,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check for Contribution Donation.
    */
-  public function testCustomGroupCreateContributionDonation() {
+  public function testCustomGroupCreateContributionDonation(): void {
     $params = [
       'title' => 'Test_Group_6',
       'name' => 'test_group_6',
@@ -261,7 +260,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check with valid array.
    */
-  public function testCustomGroupCreateGroup() {
+  public function testCustomGroupCreateGroup(): void {
     $params = [
       'domain_id' => 1,
       'title' => 'Test_Group_8',
@@ -283,7 +282,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Test an empty update does not trigger e-notices when is_multiple has been set.
    */
-  public function testCustomGroupEmptyUpdate() {
+  public function testCustomGroupEmptyUpdate(): void {
     $customGroup = $this->callAPISuccess('CustomGroup', 'create', array_merge($this->_params, ['is_multiple' => 1]));
     $this->callAPISuccess('CustomGroup', 'create', ['id' => $customGroup['id']]);
   }
@@ -292,7 +291,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    * Test an update when is_multiple is an emtpy string this can occur in form submissions for custom groups that extend activites.
    * dev/core#227.
    */
-  public function testCustomGroupEmptyisMultipleUpdate() {
+  public function testCustomGroupEmptyisMultipleUpdate(): void {
     $customGroup = $this->callAPISuccess('CustomGroup', 'create', array_merge($this->_params, ['is_multiple' => 0]));
     $this->callAPISuccess('CustomGroup', 'create', ['id' => $customGroup['id'], 'is_multiple' => '']);
   }
@@ -300,7 +299,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check with Activity - Meeting Type
    */
-  public function testCustomGroupCreateActivityMeeting() {
+  public function testCustomGroupCreateActivityMeeting(): void {
     $params = [
       'title' => 'Test_Group_10',
       'name' => 'test_group_10',
@@ -322,7 +321,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check without GroupID.
    */
-  public function testCustomGroupDeleteWithoutGroupID() {
+  public function testCustomGroupDeleteWithoutGroupID(): void {
     $customGroup = $this->callAPIFailure('custom_group', 'delete', []);
     $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: id');
   }
@@ -330,23 +329,23 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   /**
    * Check with valid custom group id.
    */
-  public function testCustomGroupDelete() {
+  public function testCustomGroupDelete(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'test_group']);
     $params = [
       'id' => $customGroup['id'],
     ];
-    $result = $this->callAPIAndDocument('custom_group', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('custom_group', 'delete', $params);
     $this->assertAPISuccess($result);
   }
 
   /**
    * Main success get function.
    */
-  public function testGetCustomGroupSuccess() {
+  public function testGetCustomGroupSuccess(): void {
 
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $params = [];
-    $result = $this->callAPIAndDocument($this->_entity, 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'get', $params);
     $values = $result['values'][$result['id']];
     foreach ($this->_params as $key => $value) {
       if ($key == 'weight') {
@@ -356,7 +355,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     }
   }
 
-  public function testUpdateCustomGroup() {
+  public function testUpdateCustomGroup(): void {
     $customGroup = $this->customGroupCreate();
     $customGroupId = $customGroup['id'];
 
@@ -367,6 +366,34 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
     $this->assertEquals(0, $result['is_active']);
     $this->customGroupDelete($customGroupId);
+  }
+
+  /**
+   * Test that as per the form that if the extends column is passed as
+   * - ['ParticipantEventType', [4]] Where 4 = Meeting Event Type that we can create a custom group correctly
+   */
+  public function testParticipantEntityCustomGroup(): void {
+    $customGroup = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, ['extends' => ['ParticipantEventType', [4]]]));
+    $result = array_shift($customGroup['values']);
+    $this->assertEquals(3, $result['extends_entity_column_id']);
+    $this->assertEquals('Participant', $result['extends']);
+    $this->customGroupDelete($result['id']);
+  }
+
+  /**
+   * Test that without any fields we can change the entity type of the custom group and fields are correctly updated
+   */
+  public function testChangeEntityCustomGroup(): void {
+    $customGroup = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, ['extends' => ['ParticipantEventType', [4]]]));
+    $result = array_shift($customGroup['values']);
+    $this->assertEquals(3, $result['extends_entity_column_id']);
+    $this->assertEquals('Participant', $result['extends']);
+    $customGroup = $this->callAPISuccess($this->_entity, 'create', ['id' => $customGroup['id'], 'extends' => ['Individual', []]]);
+    $result = array_shift($customGroup['values']);
+    $this->assertTrue(empty($result['extends_entity_column_id']));
+    $this->assertTrue(empty($result['extends_entity_column_value']));
+    $this->assertEquals('Individual', $result['extends']);
+    $this->customGroupDelete($result['id']);
   }
 
 }

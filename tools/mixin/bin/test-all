@@ -1,0 +1,62 @@
+#!/bin/bash
+set -e
+# Not really readed, and currently segfaulting on CI: # export XDEBUG_PORT= XDEBUG_MODE=off
+
+###############################################################################
+## Bootstrap
+
+## Determine the absolute path of the directory with the file
+## usage: absdirname <file-path>
+function absdirname() {
+  pushd $(dirname $0) >> /dev/null
+    pwd
+  popd >> /dev/null
+}
+
+SCRIPT_DIR=$(absdirname "$0")
+EXT_DIR=$(cv path -c extensionsDir)
+EX_EXT_DIR="$EXT_DIR/example-mixin"
+JUNIT_DIR="$1"
+
+## TODO: Once the managed-entity regression is examined/fixed, remove the MY_MIXINS list. Then it will test all mixins.
+# MY_MIXINS='ang-php@1 case-xml@1 menu-xml@1 setting-php@1 theme-php@1'
+MY_MIXINS=''
+
+###############################################################################
+
+## usage: mixer_test <junit-test-file> [--bare] [--isolate] <mixin-names>...
+function mixer_test() {
+  local XML_FILE="$1"
+  shift
+
+  [ -f "$JUNIT_DIR/$XML_FILE" ] && rm -f "$JUNIT_DIR/$XML_FILE"
+
+  civibuild restore
+  cv flush
+
+  ## Facilitate testing of mixin/case-xml@1.
+  cv ev 'CRM_Core_BAO_ConfigSetting::enableComponent("CiviCase");'
+
+  ## usage: mixer test [-f] [--bare] [--isolate] <temp-ext-path> [<mixin-names>...] -- [<phpunit-options>...]
+  "$SCRIPT_DIR/mixer" test -f "$EX_EXT_DIR" "$@" -- --group e2e --log-junit "$JUNIT_DIR/$XML_FILE"
+}
+
+###############################################################################
+
+if [ -z "$EXT_DIR" -o ! -e "$EXT_DIR" ]; then
+  echo "Invalid extension dir: $EXT_DIR"
+  exit 1
+fi
+
+if [ -z "$JUNIT_DIR" ]; then
+  echo "Missing argument: <junit-dir>"
+  exit 1
+elif [ ! -d "$JUNIT_DIR" ]; then
+  mkdir -p "$JUNIT_DIR"
+fi
+
+
+set -ex
+mixer_test "mixin-isolate-bare.xml" $MY_MIXINS --isolate --bare
+mixer_test "mixin-combine-bare.xml" $MY_MIXINS --bare
+mixer_test "mixin-combine-copy.xml" $MY_MIXINS

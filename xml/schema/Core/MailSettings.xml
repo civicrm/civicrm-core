@@ -4,12 +4,22 @@
   <name>civicrm_mail_settings</name>
   <comment>Various email accounts for use by CiviMail (and its processor)</comment>
   <add>2.2</add>
+  <title>Mail Account</title>
+  <paths>
+    <add>civicrm/admin/mailSettings/edit?action=add&amp;reset=1</add>
+    <update>civicrm/admin/mailSettings/edit?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/mailSettings/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+    <browse>civicrm/admin/mailSettings</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>Mail Settings ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>primary key</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.2</add>
   </field>
   <primaryKey>
@@ -18,7 +28,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Mail Settings Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -27,6 +37,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this match entry for</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>3.1</add>
   </field>
   <foreignKey>
@@ -48,6 +61,12 @@
     <name>is_default</name>
     <title>Is Default Mail Settings?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Default</label>
+    </html>
     <comment>whether this is the default set of settings for this domain</comment>
     <add>2.2</add>
   </field>
@@ -124,6 +143,8 @@
     <name>is_ssl</name>
     <title>Mail Account Uses SSL</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <comment>whether to use SSL or not</comment>
     <add>2.2</add>
   </field>
@@ -149,5 +170,113 @@
     <html>
       <type>Select</type>
     </html>
+  </field>
+  <field>
+    <name>is_non_case_email_skipped</name>
+    <title>Skip emails which do not have a Case ID or Case hash</title>
+    <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <comment>Enabling this option will have CiviCRM skip any emails that do not have the Case ID or Case Hash so that the system will only process emails that can be placed on case records. Any emails that are not processed will be moved to the ignored folder.</comment>
+    <add>5.31</add>
+  </field>
+  <field>
+    <name>is_contact_creation_disabled_if_no_match</name>
+    <type>boolean</type>
+    <title>Do not create new contacts when filing emails</title>
+    <default>0</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <description>If this option is enabled, CiviCRM will not create new contacts when filing emails.</description>
+    <add>5.31</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Enabled?</title>
+    <type>boolean</type>
+    <comment>Ignored for bounce processing, only for email-to-activity</comment>
+    <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <add>5.66</add>
+  </field>
+  <field>
+    <name>activity_type_id</name>
+    <title>Activity Type</title>
+    <type>int unsigned</type>
+    <comment>Implicit FK to civicrm_option_value where option_group = activity_type</comment>
+    <add>5.66</add>
+    <pseudoconstant>
+      <optionGroupName>activity_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>campaign_id</name>
+    <title>Campaign ID</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Foreign key to the Campaign.</comment>
+    <html>
+      <type>EntityRef</type>
+      <label>Campaign</label>
+    </html>
+    <add>5.66</add>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+      <prefetch>FALSE</prefetch>
+    </pseudoconstant>
+  </field>
+  <foreignKey>
+    <name>campaign_id</name>
+    <table>civicrm_campaign</table>
+    <key>id</key>
+    <add>5.66</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>activity_source</name>
+    <title>Activity Source</title>
+    <type>varchar</type>
+    <length>4</length>
+    <comment>Which email recipient to add as the activity source (from, to, cc, bcc).</comment>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>5.66</add>
+  </field>
+  <field>
+    <name>activity_targets</name>
+    <title>Activity Targets</title>
+    <type>varchar</type>
+    <length>16</length>
+    <comment>Which email recipients to add as the activity targets (from, to, cc, bcc).</comment>
+    <html>
+      <type>Select</type>
+    </html>
+    <serialize>COMMA</serialize>
+    <add>5.66</add>
+  </field>  <field>
+    <name>activity_assignees</name>
+    <title>Activity Assignees</title>
+    <type>varchar</type>
+    <length>16</length>
+    <comment>Which email recipients to add as the activity assignees (from, to, cc, bcc).</comment>
+    <html>
+      <type>Select</type>
+    </html>
+    <serialize>COMMA</serialize>
+    <add>5.66</add>
   </field>
 </table>

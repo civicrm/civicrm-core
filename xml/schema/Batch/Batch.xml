@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique Address ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>
@@ -35,15 +38,6 @@
     <unique>true</unique>
     <add>4.2</add>
   </index>
-  <field>
-    <name>label</name>
-    <type>varchar</type>
-    <length>64</length>
-    <localizable>true</localizable>
-    <comment>Friendly Name.</comment>
-    <add>3.3</add>
-    <drop>4.2</drop>
-  </field>
   <field>
     <name>title</name>
     <title>Batch Title</title>
@@ -71,9 +65,12 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>Batch Created By</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -91,20 +88,25 @@
     <add>3.3</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
     <name>modified_id</name>
-    <title>Batch Modified By</title>
+    <title>Modified By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Modified By</label>
+    </html>
     <add>3.3</add>
   </field>
   <field>
     <name>modified_date</name>
     <title>Batch Modified Date</title>
     <type>datetime</type>
-    <comment>When was this item created</comment>
+    <comment>When was this item modified</comment>
+    <readonly>true</readonly>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -116,12 +118,13 @@
   </foreignKey>
   <field>
     <name>saved_search_id</name>
-    <title>Batch Smart Group</title>
+    <title>Smart Group ID</title>
     <type>int unsigned</type>
     <comment>FK to Saved Search ID</comment>
     <add>4.1</add>
     <html>
       <type>EntityRef</type>
+      <label>Smart Group</label>
     </html>
   </field>
   <foreignKey>

@@ -20,12 +20,16 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * CMS have a different pattern to their default file path and URL.
    *
    * @todo Use Civi::paths instead?
+   * @return string
    */
   public function getFilePathMarker() {
     $config = CRM_Core_Config::singleton();
     switch ($config->userFramework) {
       case 'Joomla':
         return '/media/';
+
+      case 'WordPress':
+        return '/uploads/';
 
       default:
         return '/files/';
@@ -47,8 +51,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * is browseable or visible to search engines; it means it can be
    * requested directly.
    *
-   * @return array
-   *   Array of messages
+   * @return CRM_Utils_Check_Message[]
    * @see CRM-14091
    */
   public function checkLogFileIsNotAccessible() {
@@ -72,12 +75,12 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           $log_url = implode($filePathMarker, $url);
           if ($this->fileExists($log_url)) {
             $docs_url = $this->createDocUrl('the-log-file-should-not-be-accessible');
-            $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
-              . '<br />' .
-              '<a href="%2">Read more about this warning</a>';
+            $msg = ts('The <a %1>CiviCRM debug log</a> should not be downloadable.', [1 => "href='$log_url'"])
+              . '<br />'
+              . '<a href="' . $docs_url . '">' . ts('Read more about this warning') . '</a>';
             $messages[] = new CRM_Utils_Check_Message(
               __FUNCTION__,
-              ts($msg, [1 => $log_url, 2 => $docs_url]),
+              $msg,
               ts('Security Warning'),
               \Psr\Log\LogLevel::WARNING,
               'fa-lock'
@@ -100,13 +103,16 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * Being retrievable doesn't mean the files are browseable or visible
    * to search engines; it only means they can be requested directly.
    *
-   * @return array
-   *   Array of messages
+   * @return CRM_Utils_Check_Message[]
    * @see CRM-14091
    *
    * @todo Test with WordPress, Joomla.
    */
   public function checkUploadsAreNotAccessible() {
+    if ($this->isLimitedDevelopmentServer()) {
+      return [];
+    }
+
     $messages = [];
 
     $config = CRM_Core_Config::singleton();
@@ -139,6 +145,29 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Some security checks require sending a real HTTP request. This breaks the single-threading
+   * model historically used by the PHP built-in webserver (for local development). There is some
+   * experimental support for multi-threading in PHP 7.4+. Anecdotally, this is still insufficient
+   * on PHP 7.4 -- but it works well enough on PHP 8.1.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkHttpAuditable() {
+    $messages = [];
+    if ($this->isLimitedDevelopmentServer()) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        // No ts since end users should never see this
+        'The built-in php HTTP server has no configuration options to secure folders, and so there is no point testing if they are secure. This problem only affects local development and E2E testing.',
+        'Incomplete Security Checks',
+        \Psr\Log\LogLevel::WARNING,
+        'fa-lock'
+      );
+    }
+    return $messages;
+  }
+
+  /**
    * Check if our uploads or ConfigAndLog directories have browseable
    * listings.
    *
@@ -148,13 +177,16 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * MAY trigger false positives (if you have files named 'a', 'e'
    * we'll probably match that).
    *
-   * @return array
-   *   Array of messages
+   * @return CRM_Utils_Check_Message[]
    * @see CRM-14091
    *
    * @todo Test with WordPress, Joomla.
    */
   public function checkDirectoriesAreNotBrowseable() {
+    if ($this->isLimitedDevelopmentServer()) {
+      return [];
+    }
+
     $messages = [];
     $config = CRM_Core_Config::singleton();
     $publicDirs = [
@@ -187,40 +219,72 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Check that the site is configured with a signing-key.
+   *
+   * The current infrastructure for signatures was introduced circa 5.36. Specifically,
+   * most sites should now define `CIVICRM_SIGN_KEYS`. However, this could be missing for
+   * sites which either (a) upgraded from an earlier release or (b) used an unpatched installer.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkSigningKey(): array {
+    $messages = [];
+
+    try {
+      $found = !empty(Civi::service('crypto.registry')->findKey('SIGN'));
+      // Subtle point: We really want to know if there are any `SIGN`ing keys. The most
+      // typical way to define `SIGN`ing keys is to configure `CIVICRM_SIGN_KEYS`.
+    }
+    catch (\Civi\Crypto\Exception\CryptoException $e) {
+      $found = FALSE;
+    }
+    if (!$found) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The system requires a cryptographic signing key. Please configure <a %1>CIVICRM_SIGN_KEYS</a>. ',
+          [1 => 'href="https://docs.civicrm.org/sysadmin/en/latest/setup/secret-keys/" target="_blank"']
+        ),
+        ts('Signing Key Required'),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-lock'
+      );
+    }
+
+    return $messages;
+  }
+
+  /**
    * Check that some files are not present.
    *
    * These files have generally been deleted but Civi source tree but could be
    * left online if one does a faulty upgrade.
    *
-   * @return array of messages
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkFilesAreNotPresent() {
-    global $civicrm_root;
+    $packages_path = rtrim(\Civi::paths()->getPath('[civicrm.packages]/'), '/' . DIRECTORY_SEPARATOR);
+    $vendor_path = rtrim(\Civi::paths()->getPath('[civicrm.vendor]/'), '/' . DIRECTORY_SEPARATOR);
 
     $messages = [];
     $files = [
       [
         // CRM-16005, upgraded from Civi <= 4.5.6
-        "{$civicrm_root}/packages/dompdf/dompdf.php",
+        "{$packages_path}/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
       ],
       [
         // CRM-16005, Civi >= 4.5.7
-        "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php",
+        "{$packages_path}/vendor/dompdf/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
       ],
       [
         // CRM-16005, Civi >= 4.6.0
-        "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php",
+        "{$vendor_path}/dompdf/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
       ],
       [
         // CIVI-SA-2013-001
-        "{$civicrm_root}/packages/OpenFlashChart/php-ofc-library/ofc_upload_image.php",
-        \Psr\Log\LogLevel::CRITICAL,
-      ],
-      [
-        "{$civicrm_root}/packages/html2text/class.html2text.inc",
+        "{$packages_path}/OpenFlashChart/php-ofc-library/ofc_upload_image.php",
         \Psr\Log\LogLevel::CRITICAL,
       ],
     ];
@@ -240,6 +304,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
 
   /**
    * Discourage use of remote profile forms.
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkRemoteProfile() {
     $messages = [];
@@ -260,8 +325,8 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
-   * Check that the sysadmin has not modified the Cxn
-   * security setup.
+   * Check that the sysadmin has not modified the Cxn security setup.
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkCxnOverrides() {
     $list = [];
@@ -290,6 +355,39 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Check to see if anonymous user has excessive permissions.
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkAnonPermissions() {
+    $messages = [];
+    $permissions = [];
+    // These specific permissions were referenced in a security submission.
+    // This functionality is generally useful -- may be good to expand to a longer list.
+    $checkPerms = ['access CiviContribute', 'edit contributions'];
+    foreach ($checkPerms as $checkPerm) {
+      if (CRM_Core_Config::singleton()->userPermissionClass->check($checkPerm, 0)) {
+        $permissions[] = $checkPerm;
+      }
+    }
+    if (!empty($permissions)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The system configuration grants anonymous users an <em>unusually broad</em> list of permissions. This could compromise security. Please reassess whether these permissions are required: %1', [
+          1 => '<ul><li><tt>' . implode('</tt></li><li><tt>', $permissions) . '</tt></li></ul>',
+        ]),
+        ts('Unusual Permissions for Anonymous Users'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-lock'
+      );
+    }
+    return $messages;
+  }
+
+  public function isLimitedDevelopmentServer(): bool {
+    return PHP_SAPI === 'cli-server';
+  }
+
+  /**
    * Determine whether $url is a public, browsable listing for $dir
    *
    * @param string $dir
@@ -313,7 +411,21 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       return FALSE;
     }
 
-    $content = @file_get_contents("$url");
+    // Since this can be confusing as to how this works:
+    // $url corresponds to $dir not $file, but we're not checking if we can
+    // retrieve $file, we're checking if retrieving $url gives us a LISTING of
+    // the files in $dir. So $content is that listing, and then the stristr
+    // is checking if $file, which is the bare filename (e.g. "delete-this-123")
+    // is contained in that listing (which would be undesirable).
+    $content = '';
+    try {
+      $response = (new \GuzzleHttp\Client())->request('GET', $url, [
+        'timeout' => \Civi::settings()->get('http_timeout'),
+      ]);
+      $content = $response->getBody()->getContents();
+    }
+    catch (\GuzzleHttp\Exception\GuzzleException $e) {
+    }
     if (stristr($content, $file)) {
       $result = TRUE;
     }
@@ -346,8 +458,17 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       return FALSE;
     }
 
+    // @todo why call fileExists before doing almost the same thing. It's slightly different than reading the file's content, but is it necessary?
     if ($this->fileExists("$url/$file")) {
-      $content = @file_get_contents("$url/$file");
+      $content = '';
+      try {
+        $response = (new \GuzzleHttp\Client())->request('GET', "$url/$file", [
+          'timeout' => \Civi::settings()->get('http_timeout'),
+        ]);
+        $content = $response->getBody()->getContents();
+      }
+      catch (\GuzzleHttp\Exception\GuzzleException $e) {
+      }
       if (preg_match('/delete me/', $content)) {
         $result = TRUE;
       }
@@ -359,7 +480,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @param $topic
+   * @param string $topic
    *
    * @return string
    */

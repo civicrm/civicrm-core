@@ -5,12 +5,16 @@
   <class>EntityBatch</class>
   <name>civicrm_entity_batch</name>
   <comment>Batch entities (Contributions, Participants, Contacts) to a batch.</comment>
+  <add>3.3</add>
   <field>
     <name>id</name>
     <title>EntityBatch ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>primary key</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>
@@ -24,6 +28,9 @@
     <length>64</length>
     <comment>physical tablename for entity being joined to file, e.g. civicrm_contact</comment>
     <add>3.3</add>
+    <pseudoconstant>
+      <optionGroupName>entity_batch_extends</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>entity_id</name>
@@ -55,6 +62,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
     </pseudoconstant>
+    <html>
+      <label>Batch</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>

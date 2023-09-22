@@ -47,7 +47,7 @@ abstract class CRM_Core_Task {
    *
    * @var array
    */
-  public static $_tasks = NULL;
+  public static $_tasks = [];
 
   /**
    * @var string
@@ -132,7 +132,7 @@ abstract class CRM_Core_Task {
    */
   public static function corePermissionedTaskTitles($tasks, $permission, $params) {
     // Only offer the "Update Smart Group" task if a smart group/saved search is already in play and we have edit permissions
-    if (!empty($params['ssID']) && ($permission == CRM_Core_Permission::EDIT)) {
+    if (!empty($params['ssID']) && ($permission == CRM_Core_Permission::EDIT) && CRM_Core_Permission::check('edit groups')) {
       $tasks[self::SAVE_SEARCH_UPDATE] = self::$_tasks[self::SAVE_SEARCH_UPDATE]['title'];
     }
     else {
@@ -163,6 +163,51 @@ abstract class CRM_Core_Task {
       CRM_Utils_Array::value('class', self::$_tasks[$value]),
       CRM_Utils_Array::value('result', self::$_tasks[$value]),
     ];
+  }
+
+  /**
+   * Filter tasks based on the permission key, if available.
+   *
+   * @param array $tasks
+   * @param bool $hasEditContactPermission
+   *   Does the user have permission to edit the given contact. Required where
+   *   permission to edit the user is required in conjunction with permission
+   *   to do the task.
+   *
+   * @return array
+   */
+  protected static function getTasksFilteredByPermission(array $tasks, bool $hasEditContactPermission): array {
+    foreach ($tasks as $index => $task) {
+      // requires_edit_contact_permission is a (hopefully transient way) of denoting which
+      // tasks need 'edit this contact' on top of the membership permission.
+      if (!empty($task['requires_edit_contact_permission']) && !$hasEditContactPermission) {
+        unset($tasks[$index]);
+      }
+      elseif (!empty($task['permissions']) && !CRM_Core_Permission::check($task['permissions'])) {
+        unset($tasks[$index]);
+      }
+    }
+    return $tasks;
+  }
+
+  /**
+   * Get task tiles filtered by any declared permissions.
+   *
+   * @param array $tasks
+   * @param bool $hasEditContactPermission
+   *   Does the user have permission to edit the given contact. Required where
+   *   permission to edit the user is required in conjunction with permission
+   *   to do the task.
+   *
+   * @return array
+   */
+  protected static function getTitlesFilteredByPermission(array $tasks, bool $hasEditContactPermission): array {
+    $availableTasks = self::getTasksFilteredByPermission($tasks, $hasEditContactPermission);
+    $return = [];
+    foreach ($availableTasks as $key => $details) {
+      $return[$key] = $details['title'];
+    }
+    return $return;
   }
 
   /**

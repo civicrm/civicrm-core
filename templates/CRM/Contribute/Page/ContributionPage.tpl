@@ -13,7 +13,7 @@
     </div>
 
     {include file="CRM/Contribute/Form/SearchContribution.tpl"}
-    {if NOT ($action eq 1 or $action eq 2) }
+    {if NOT ($action eq 1 or $action eq 2)}
       <table class="form-layout-compressed">
       <tr>
       <td><a href="{$newPageURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Contribution Page{/ts}</span></a></td>
@@ -37,7 +37,7 @@
                  <th>{ts}Title{/ts}</th>
                <th>{ts}ID{/ts}</th>
                <th>{ts}Enabled?{/ts}</th>
-             {if call_user_func(array('CRM_Campaign_BAO_Campaign','isCampaignEnable'))}
+             {if call_user_func(array('CRM_Campaign_BAO_Campaign','isComponentEnabled'))}
              <th>{ts}Campaign{/ts}</th>
             {/if}
             <th></th>
@@ -48,32 +48,32 @@
                      <td><strong>{$row.title}</strong></td>
                      <td>{$row.id}</td>
                      <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          {if call_user_func(array('CRM_Campaign_BAO_Campaign','isCampaignEnable'))}
+          {if call_user_func(array('CRM_Campaign_BAO_Campaign','isComponentEnabled'))}
           <td>{$row.campaign}</td>
           {/if}
           <td class="crm-contribution-page-actions right nowrap">
 
        {if $row.configureActionLinks}
          <div class="crm-contribution-page-configure-actions">
-                  {$row.configureActionLinks|replace:'xx':$row.id}
+           {$row.configureActionLinks|smarty:nodefaults|replace:'xx':$row.id}
          </div>
-             {/if}
+       {/if}
 
-            {if $row.contributionLinks}
-        <div class="crm-contribution-online-contribution-actions">
-                  {$row.contributionLinks|replace:'xx':$row.id}
-        </div>
+        {if $row.contributionLinks}
+          <div class="crm-contribution-online-contribution-actions">
+            {$row.contributionLinks|smarty:nodefaults|replace:'xx':$row.id}
+          </div>
         {/if}
 
         {if $row.onlineContributionLinks}
-        <div class="crm-contribution-search-contribution-actions">
-                  {$row.onlineContributionLinks|replace:'xx':$row.id}
-        </div>
+          <div class="crm-contribution-search-contribution-actions">
+            {$row.onlineContributionLinks|smarty:nodefaults|replace:'xx':$row.id}
+          </div>
         {/if}
 
         <div class="crm-contribution-page-more">
-                    {$row.action|replace:'xx':$row.id}
-            </div>
+          {$row.action|smarty:nodefaults|replace:'xx':$row.id}
+        </div>
 
       </td>
 
@@ -82,6 +82,7 @@
       </table>
 
         {/strip}
+        {include file="CRM/common/pager.tpl" location="bottom"}
       </div>
     {else}
   {if $isSearch eq 1}
@@ -99,7 +100,7 @@
       </div>
       {else}
       <div class="messages status no-popup">
-             <div class="icon inform-icon"></div> &nbsp;
+             {icon icon="fa-info-circle"}{/icon}
              {ts 1=$newPageURL}No contribution pages have been created yet. Click <a accesskey="N" href='%1'>here</a> to create a new contribution page.{/ts}
       </div>
         {/if}

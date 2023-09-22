@@ -9,7 +9,6 @@
 *}
 {* this template is used for editing Site Preferences  *}
 <div class="crm-block crm-form-block crm-preferences-display-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout">
     <tr class="crm-preferences-display-form-block-contact_view_options">
       <td class="label">{$form.contact_view_options.label}</td>
@@ -160,11 +159,6 @@
       <td class="label">{$form.editor_id.label} {help id="editor_id"}</td>
       <td>
         {$form.editor_id.html}
-        &nbsp;
-        <span class="crm-button crm-icon-button" style="display:inline-block;vertical-align:middle;float:none!important;">
-          <i class="crm-i fa-wrench" style="margin: 0 -18px 0 2px;" aria-hidden="true"></i>
-          {$form.ckeditor_config.html}
-        </span>
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-ajaxPopupsEnabled">
@@ -206,26 +200,18 @@
         {$form.menubar_color.html}
       </td>
     </tr>
-
-    {if $config->userSystem->is_drupal EQ '1'}
-      <tr class="crm-preferences-display-form-block-theme">
-        <td class="label">{ts}Theme{/ts} {help id="theme"}</td>
-        <td>{$form.theme_backend.html}</td>
-      </tr>
-    {else}
-      <tr class="crm-preferences-display-form-block-theme_backend">
-        <td class="label">{$form.theme_backend.label} {help id="theme_backend"}</td>
-        <td>{$form.theme_backend.html}</td>
-      </tr>
-      <tr class="crm-preferences-display-form-block-theme_frontend">
-        <td class="label">{$form.theme_frontend.label} {help id="theme_frontend"}</td>
-        <td>{$form.theme_frontend.html}</td>
-      </tr>
-      {/if}
+    <tr class="crm-preferences-display-form-block-theme_backend">
+      <td class="label">{$form.theme_backend.label} {help id="theme_backend"}</td>
+      <td>{$form.theme_backend.html}</td>
+    </tr>
+    <tr class="crm-preferences-display-form-block-theme_frontend">
+      <td class="label">{$form.theme_frontend.label} {help id="theme_frontend"}</td>
+      <td>{$form.theme_frontend.html}</td>
+    </tr>
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-{if $form.contact_edit_options.html}
+{if !empty($form.contact_edit_options.html)}
   {literal}
     <script type="text/javascript">
       CRM.$(function($) {
@@ -263,11 +249,6 @@
         }
 
         $("#contactEditBlocks, #contactEditOptions").on('sortupdate', getSorting);
-
-        function showCKEditorConfig() {
-          $('.crm-preferences-display-form-block-editor_id .crm-button').toggle($(this).val() == 'CKEditor');
-        }
-        $('select[name=editor_id]').each(showCKEditorConfig).change(showCKEditorConfig);
       });
     </script>
   {/literal}

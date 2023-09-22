@@ -3,11 +3,13 @@
 /**
  * Class CRM_Utils_RuleTest
  * @group headless
+ * @group locale
  */
 class CRM_Utils_MoneyTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**
@@ -21,7 +23,7 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_Money::subtractCurrencies($leftOp, $rightOp, $currency));
   }
 
-  public function testEquals() {
+  public function testEquals(): void {
     $testValue = 0.01;
 
     for ($i = 0; $i < 10; $i++) {
@@ -53,7 +55,7 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
    * In practice this only does rounding to 2 since rounding by any other amount is
    * only place-holder supported.
    */
-  public function testFormatLocaleNumericRoundedByCurrency() {
+  public function testFormatLocaleNumericRoundedByCurrency(): void {
     $result = CRM_Utils_Money::formatLocaleNumericRoundedByCurrency(8950.3678, 'NZD');
     $this->assertEquals('8,950.37', $result);
   }
@@ -65,7 +67,7 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
    * and , for decimal. (The Europeans are wrong but they don't know that. We will forgive them
    * because ... metric).
    */
-  public function testFormatLocaleNumericRoundedByCurrencyEuroThousand() {
+  public function testFormatLocaleNumericRoundedByCurrencyEuroThousand(): void {
     $this->setCurrencySeparators('.');
     $result = CRM_Utils_Money::formatLocaleNumericRoundedByCurrency(8950.3678, 'NZD');
     $this->assertEquals('8.950,37', $result);
@@ -73,16 +75,41 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that using the space character as a currency works
+   * Test rounded by currency function with specified precision.
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSpaceCurrency() {
-    $this->assertEquals('  8,950.37', CRM_Utils_Money::format(8950.37, ' '));
+  public function testFormatLocaleNumericRoundedByPrecision($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
+    $result = CRM_Utils_Money::formatLocaleNumericRoundedByPrecision(8950.3678, 3);
+    $expected = ($thousandSeparator === ',') ? '8,950.368' : '8.950,368';
+    $this->assertEquals($expected, $result);
+  }
+
+  /**
+   * Test rounded by currency function with specified precision but without padding to reach it.
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
+   */
+  public function testFormatLocaleNumericRoundedByOptionalPrecision($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
+    $result = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision(8950.3678, 8);
+    $expected = ($thousandSeparator === ',') ? '8,950.3678' : '8.950,3678';
+    $this->assertEquals($expected, $result);
+
+    $result = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision(123456789.987654321, 9);
+    $expected = ($thousandSeparator === ',') ? '123,456,789.98765' : '123.456.789,98765';
+    $this->assertEquals($result, $expected);
   }
 
   /**
    * Test that passing an invalid currency throws an error
    */
-  public function testInvalidCurrency() {
+  public function testInvalidCurrency(): void {
     $this->expectException(\CRM_Core_Exception::class, 'Invalid currency "NOT_A_CURRENCY"');
     CRM_Utils_Money::format(4.00, 'NOT_A_CURRENCY');
   }

@@ -31,6 +31,11 @@ class CRM_Activity_Form_Task_Delete extends CRM_Activity_Form_Task {
   protected $_single = FALSE;
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {

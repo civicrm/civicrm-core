@@ -35,10 +35,10 @@
       <thead class="sticky">
       {foreach from=$columnHeaders item=header}
         <th>
-          {if $header.sort}
+          {if !empty($header.sort)}
             {assign var='key' value=$header.sort}
             {$sort->_response.$key.link}
-          {else}
+          {elseif !empty($header.name)}
             {$header.name}
           {/if}
         </th>
@@ -47,8 +47,8 @@
 
       {counter start=0 skip=1 print=false}
       {foreach from=$rows item=row}
-      <tr id="crm-mailing_{$row.id}" class="{cycle values="odd-row,even-row"} crm-mailing crm-mailing_status-{$row.status}">
-        <td class="crm-mailing-name">{$row.name}</td>
+      <tr id="mailing-{$row.id}" class="{cycle values="odd-row,even-row"} crm-mailing crm-mailing_status-{$row.status} crm-entity" data-action="create">
+        <td class="crm-mailing-name crm-editable crmf-name">{$row.name}</td>
         {if $multilingual}
           <td class="crm-mailing-language">{$row.language}</td>
         {/if}
@@ -67,10 +67,10 @@
         <td class="crm-mailing-scheduled">{$row.scheduled}</td>
         <td class="crm-mailing-start">{$row.start}</td>
         <td class="crm-mailing-end">{$row.end}</td>
-       {if call_user_func(array('CRM_Campaign_BAO_Campaign','isCampaignEnable'))}
-          <td class="crm-mailing-campaign">{$row.campaign}</td>
+       {if call_user_func(array('CRM_Campaign_BAO_Campaign','isComponentEnabled'))}
+          <td class="crm-mailing-campaign crm-editable crmf-campaign_id" data-type="select" data-empty-option="{ts}- none -{/ts}">{$row.campaign}</td>
       {/if}
-        <td>{$row.action|replace:'xx':$row.id}</td>
+        <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
       </tr>
       {/foreach}
     </table>
@@ -97,7 +97,7 @@
     {/if}
     <div class="status messages">
         <table class="form-layout">
-            <tr><div class="icon inform-icon"></div>
+            <tr>{icon icon="fa-info-circle"}{/icon}
                {ts 1=$componentName}No %1 match your search criteria. Suggestions:{/ts}
       </tr>
                 <div class="spacer"></div>
@@ -111,7 +111,7 @@
 {elseif $unscheduled}
 
     <div class="messages status no-popup">
-            <div class="icon inform-icon"></div>&nbsp;
+            {icon icon="fa-info-circle"}{/icon}
             {capture assign=crmURL}{crmURL p=$newMassUrl q='reset=1'}{/capture}
             {ts 1=$componentName}There are no Unscheduled %1.{/ts}
       {if $showLinks}{ts 1=$crmURL}You can <a href='%1'>create and send one</a>.{/ts}{/if}
@@ -119,13 +119,13 @@
 
 {elseif $archived}
     <div class="messages status no-popup">
-            <div class="icon inform-icon"></div>&nbsp
+            {icon icon="fa-info-circle"}{/icon}&nbsp
             {capture assign=crmURL}{crmURL p='civicrm/mailing/browse/scheduled' q='scheduled=true&reset=1'}{$qVal}{/capture}
             {ts 1=$crmURL 2=$componentName}There are no Archived %2. You can archive %2 from <a href='%1'>Scheduled or Sent %2</a>.{/ts}
    </div>
 {else}
     <div class="messages status no-popup">
-            <div class="icon inform-icon"></div>&nbsp;
+            {icon icon="fa-info-circle"}{/icon}
             {capture assign=crmURL}{crmURL p=$newMassUrl q='reset=1'}{/capture}
             {capture assign=archiveURL}{crmURL p='civicrm/mailing/browse/archived' q='reset=1'}{$qVal}{/capture}
             {ts 1=$componentName}There are no Scheduled or Sent %1.{/ts}

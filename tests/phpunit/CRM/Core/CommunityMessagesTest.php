@@ -123,13 +123,13 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     return self::$webResponses;
   }
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
-    $this->cache = new CRM_Utils_Cache_Arraycache([]);
+    $this->cache = new CRM_Utils_Cache_ArrayCache([]);
     self::initWebResponses();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     CRM_Utils_Time::resetTime();
   }
@@ -151,7 +151,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     return $result;
   }
 
-  public function testIsEnabled() {
+  public function testIsEnabled(): void {
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectNoHttpRequest()
@@ -159,7 +159,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $this->assertTrue($communityMessages->isEnabled());
   }
 
-  public function testIsEnabled_false() {
+  public function testIsEnabled_false(): void {
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectNoHttpRequest(),
@@ -171,7 +171,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
   /**
    * Download a document; after the set expiration period, download again.
    */
-  public function testGetDocument_NewOK_CacheOK_UpdateOK() {
+  public function testGetDocument_NewOK_CacheOK_UpdateOK(): void {
     // first try, good response
     CRM_Utils_Time::setTime('2013-03-01 10:00:00');
     $communityMessages = new CRM_Core_CommunityMessages(
@@ -306,7 +306,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
   /**
    * Randomly pick among two options.
    */
-  public function testPick_rand() {
+  public function testPick_rand(): void {
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectOneHttpRequest(self::$webResponses['two-messages'])
@@ -334,7 +334,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * When presented with two options using component filters, always
    * choose the one which references an active component.
    */
-  public function testPick_componentFilter() {
+  public function testPick_componentFilter(): void {
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectOneHttpRequest(self::$webResponses['two-messages-halfbadcomp'])
@@ -355,7 +355,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $this->assertEquals($trials, $freq['<h1>Two</h1>']);
   }
 
-  public function testEvalMarkup() {
+  public function testEvalMarkup(): void {
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectNoHttpRequest()

@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 /**
@@ -92,27 +91,14 @@ class CRM_Campaign_Page_AJAX {
 
     $id = CRM_Utils_Request::retrieve('option_group_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $status = 'fail';
-    $opValues = [];
 
     if ($id) {
-      $groupParams['id'] = $id;
-      CRM_Core_OptionValue::getValues($groupParams, $opValues);
-    }
-
-    $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
-    if ($surveyId) {
-      $survey = new CRM_Campaign_DAO_Survey();
-      $survey->id = $surveyId;
-      $survey->result_id = $id;
-      if ($survey->find(TRUE)) {
-        if ($survey->recontact_interval) {
-          $recontactInterval = CRM_Utils_String::unserialize($survey->recontact_interval);
-          foreach ($opValues as $opValId => $opVal) {
-            if (is_numeric($recontactInterval[$opVal['label']])) {
-              $opValues[$opValId]['interval'] = $recontactInterval[$opVal['label']];
-            }
-          }
-        }
+      $opValues = \Civi\Api4\OptionValue::get(FALSE)
+        ->addWhere('option_group_id', '=', $id)
+        ->addOrderBy('weight')
+        ->execute()->indexBy('id');
+      foreach ($opValues as $id => $value) {
+        $opValues[$id]['interval'] = $value['filter'];
       }
     }
 
@@ -128,7 +114,7 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_JSON::output($result);
   }
 
-  public function voterList() {
+  public static function voterList() {
     //get the search criteria params.
     $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $searchParams = explode(',', $searchCriteria);
@@ -350,7 +336,7 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  public function processVoterData() {
+  public static function processVoterData() {
     $status = NULL;
     $operation = CRM_Utils_Type::escape($_POST['operation'], 'String');
     if ($operation == 'release') {
@@ -478,7 +464,7 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_JSON::output(['status' => $status]);
   }
 
-  public function campaignGroups() {
+  public static function campaignGroups() {
     $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Positive',
       CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST'
     );
@@ -622,7 +608,7 @@ class CRM_Campaign_Page_AJAX {
    * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
    * @deprecated
    */
-  public function surveyList() {
+  public static function surveyList() {
     //get the search criteria params.
     $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $searchParams = explode(',', $searchCriteria);
@@ -727,7 +713,7 @@ class CRM_Campaign_Page_AJAX {
    * This function uses the deprecated v1 datatable api and needs updating. See CRM-16353.
    * @deprecated
    */
-  public function petitionList() {
+  public static function petitionList() {
     //get the search criteria params.
     $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $searchParams = explode(',', $searchCriteria);

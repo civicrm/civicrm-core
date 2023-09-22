@@ -6,12 +6,21 @@
   <comment>various types of CiviEvent participant statuses</comment>
   <add>3.0</add>
   <log>true</log>
+  <component>CiviEvent</component>
+  <paths>
+    <add>civicrm/admin/participant_status?action=add&amp;reset=1</add>
+    <update>civicrm/admin/participant_status?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/participant_status?action=delete&amp;id=[id]&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Participant Status Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>unique participant status type id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.0</add>
   </field>
   <primaryKey>
@@ -58,14 +67,21 @@
     <title>Participant Status Is Reserved?></title>
     <type>boolean</type>
     <comment>whether this is a status type required by the system</comment>
+    <default>0</default>
+    <required>true</required>
     <add>3.0</add>
   </field>
   <field>
     <name>is_active</name>
     <title>Participant Status is Active</title>
     <type>boolean</type>
-    <default>1</default>
     <comment>whether this status type is active</comment>
+    <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <required>true</required>
     <add>3.0</add>
   </field>
   <field>
@@ -73,6 +89,8 @@
     <title>Participant Status Counts?</title>
     <type>boolean</type>
     <comment>whether this status type is counted against event size limit</comment>
+    <default>0</default>
+    <required>true</required>
     <add>3.0</add>
   </field>
   <field>

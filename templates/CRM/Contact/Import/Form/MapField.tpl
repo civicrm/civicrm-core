@@ -15,28 +15,32 @@
  {include file="CRM/common/WizardHeader.tpl"}
 <div class="help">
     <p>{ts}Review the values shown below from the first 2 rows of your import file and select the matching CiviCRM database fields from the drop-down lists in the right-hand column. Select '- do not import -' for any columns in the import file that you want ignored.{/ts}</p>
-    {if $savedMapping}
-    <p>{ts}Click 'Load Saved Field Mapping' if data has been previously imported from the same source. You can then select the saved import mapping setup and load it automatically.{/ts}</p>
-    {/if}
     <p>{ts}If you think you may be importing additional data from the same data source, check 'Save this field mapping' at the bottom of the page before continuing. The saved mapping can then be easily reused the next time data is imported.{/ts}</p>
 </div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {* Table for mapping data to CRM fields *}
- {include file="CRM/Contact/Import/Form/MapTable.tpl}
+  {include file="CRM/Contact/Import/Form/MapTable.tpl" mapper=$form.mapper}
 
-<script type="text/javascript" >
-{literal}
-if ( document.getElementsByName("saveMapping")[0].checked ) {
-    document.getElementsByName("updateMapping")[0].checked = true;
-    document.getElementsByName("saveMapping")[0].checked = false;
-}
-{/literal}
-{if $isCheked}
-    document.getElementsByName("saveMapping")[0].checked = true;
-{/if}
-</script>
+ {* // Set default location type *}
+ {literal}
+   <script type="text/javascript">
+     CRM.$(function($) {
+       var defaultLocationType = "{/literal}{$defaultLocationType}{literal}";
+       if (defaultLocationType.length) {
+        $('#map-field').on('change', 'select[id^="mapper"][id$="_0"]', function() {
+          var select = $(this).next();
+          $('option', select).each(function() {
+            if ($(this).attr('value') == defaultLocationType  && $(this).text() == {/literal}{
+              $defaultLocationTypeLabel|@json_encode}{literal}) {
+              select.val(defaultLocationType);
+            }
+          });
+        });
+       }
+     });
+   </script>
+ {/literal}
 
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
- {$initHideBoxes}
+ {$initHideBoxes|smarty:nodefaults}
 
 </div>

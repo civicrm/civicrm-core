@@ -11,16 +11,16 @@
   <script type="text/javascript">
     CRM.$(function($) {
       function showIndivFldsSearch() {
-        $('#sortnameselect').hide();
-        $('#indivfldselect').show();
+        $('#sortnameselect').css('visibility', 'hidden').css('position','absolute');
+        $('#indivfldselect').css('visibility', 'visible').css('position','static');
         $('#sort_name').val('');
         $('#first_name').removeClass('big').addClass('eight');
         $('#last_name').removeClass('big').addClass('eight');
         return false;
       }
       function showSortNameSearch() {
-        $('#indivfldselect').hide();
-        $('#sortnameselect').show();
+        $('#indivfldselect').css('visibility', 'hidden').css('position','absolute');
+        $('#sortnameselect').css('visibility', 'visible').css('position','static');
         $('#first_name').val('');
         $('#last_name').val('');
         return false;

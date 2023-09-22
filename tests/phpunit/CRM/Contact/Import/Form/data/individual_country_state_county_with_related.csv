@@ -1,0 +1,9 @@
+First Name,Last Name,Email,County,Country,State,Custom field state,Custom Field Country,Address Custom Field Country,Address Custom field state,Mum Name,Mum Last name,Mum email,Mum State,Mum Country,Mum County,Address Mum Custom Field Country,Address Mum Custom field state,Mum Custom Field Country,Mum Custom field State,expected,error_value
+Susie,Jones,susie@example.com,,ABC,,,,,,Mum,Jones,mum@example.com,,,Farnell,,,,,Invalid,ABC
+Susie,Jones,susie@example.com,,,,,,,,Mum,Jones,mum@example.com,NSW,ABC,Farnell,,,,,Invalid,ABC
+Susie,Jones,susie@example.com,farnell,Australia,NSW,NSW,Australia,Australia,NSW,Mum,Jones,mum@example.com,NSW,Australia,Farnell,Australia,NSW,Australia,NSW,Valid,
+Susie,Jones,susie@example.com,farnell,AU,New South Wales,New South Wales,AU,AU,New South Wales,Mum,Jones,mum@example.com,New South Wales,AU,Farnell,AU,New South Wales,Australia,New South Wales,Valid,
+Susie,Jones,susie@example.com,FARNELL,1013,New South Wales,,1013,1013,New South Wales,Mum,Jones,mum@example.com,New South Wales,1013,Farnell,1013,New South Wales,1013,New South Wales,Valid,
+Susie,Jones,susie@example.com,Farnell,AUSTRALIA,NSW,,,,,Mum,Jones,mum@example.com,NSW,austRalia,Farnell,,,,,Valid,
+Susie,Jones,susie@example.com,Farnell,AU,NEW South Wales,NEW South Wales,AU,AU,NEW South Wales,Mum,Jones,mum@example.com,NEW South Wales,AU,Farnell,AU,NEW South Wales,Australia,NEW South Wales,Valid,
+Susie,Jones,susie@example.com,,AU,My own personal fiefdom,My own personal fiefdom,AU,AU,My own personal fiefdom,Mum,Jones,mum@example.com,My own personal fiefdom,AU,Farnell,AU,My own personal fiefdom,Australia,My own personal fiefdom,Invalid,rando

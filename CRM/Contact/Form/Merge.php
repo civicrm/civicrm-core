@@ -132,10 +132,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $this->assign('flip', $flipUrl);
 
       $this->prev = $this->next = NULL;
-      foreach ([
-        'prev',
-        'next',
-      ] as $position) {
+      foreach (['prev', 'next'] as $position) {
         if (!empty($pos[$position])) {
           if ($pos[$position]['id1'] && $pos[$position]['id2']) {
             $rowParams = array_merge($urlParams, [
@@ -145,9 +142,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
               'mergeId' => $pos[$position]['mergeId'],
             ]);
             $this->$position = CRM_Utils_System::url('civicrm/contact/merge', $rowParams);
-            $this->assign($position, $this->$position);
           }
         }
+        $this->assign($position, $this->$position);
       }
 
       // get user info of other contact.
@@ -157,22 +154,22 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       if ($otherUfId) {
         // @todo also calculate & assign url here & get it out of getRowsElementsAndInfo as it is form layer functionality.
         $otherUser = $config->userSystem->getUser($this->_oid);
-        $this->assign('otherUfId', $otherUfId);
-        $this->assign('otherUfName', $otherUser ? $otherUser['name'] : NULL);
       }
+      $this->assign('otherUfId', $otherUfId);
+      $this->assign('otherUfName', $otherUser ? $otherUser['name'] : NULL);
 
       $cmsUser = $mainUfId && $otherUfId;
       $this->assign('user', $cmsUser);
 
-      $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($this->_cid, $this->_oid);
+      $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo((int) $this->_cid, (int) $this->_oid);
       $main = $this->_mainDetails = $rowsElementsAndInfo['main_details'];
       $other = $this->_otherDetails = $rowsElementsAndInfo['other_details'];
 
       $this->assign('contact_type', $main['contact_type']);
       $this->assign('main_name', $main['display_name']);
       $this->assign('other_name', $other['display_name']);
-      $this->assign('main_cid', $main['contact_id']);
-      $this->assign('other_cid', $other['contact_id']);
+      $this->assign('main_cid', $main['id']);
+      $this->assign('other_cid', $other['id']);
       $this->assign('rgid', $this->_rgid);
       $this->assignSummaryRowsToTemplate($contacts);
 
@@ -196,7 +193,16 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         unset($rowsElementsAndInfo['rows']['move_contact_type']);
       }
 
-      $this->assign('rows', $rowsElementsAndInfo['rows']);
+      $assignedRows = $rowsElementsAndInfo['rows'];
+      foreach ($assignedRows as $index => $assignedRow) {
+        // prevent smarty notices.
+        $assignedRows[$index] += [
+          'main' => NULL,
+          'other' => NULL,
+          'location_entity' => NULL,
+        ];
+      }
+      $this->assign('rows', $assignedRows);
 
       // add elements
       foreach ($rowsElementsAndInfo['elements'] as $element) {
@@ -229,9 +235,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       }
 
       // add related table elements
-      foreach ($rowsElementsAndInfo['rel_table_elements'] as $relTableElement) {
-        $element = $this->addElement($relTableElement[0], $relTableElement[1]);
-        $element->setChecked(TRUE);
+      foreach (array_keys($rowsElementsAndInfo['rel_tables']) as $relTableElement) {
+        $this->addElement('checkbox', $relTableElement);
+        $this->_defaults[$relTableElement] = 1;
       }
 
       $this->assign('rel_tables', $rowsElementsAndInfo['rel_tables']);
@@ -248,14 +254,14 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
   public function buildQuickForm() {
     $this->unsavedChangesWarn = FALSE;
-    CRM_Utils_System::setTitle(ts('Merge %1 contacts', [1 => $this->_contactType]));
+    $this->setTitle(ts('Merge %1 contacts', [1 => $this->_contactType]));
     $buttons = [];
 
     $buttons[] = [
       'type' => 'next',
       'name' => $this->next ? ts('Merge and go to Next Pair') : ts('Merge'),
       'isDefault' => TRUE,
-      'icon' => $this->next ? 'fa-play-circle' : 'check',
+      'icon' => $this->next ? 'fa-play-circle' : 'fa-check',
     ];
 
     if ($this->next || $this->prev) {
@@ -282,7 +288,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
   /**
    * @param $fields
    * @param $files
-   * @param $self
+   * @param self $self
    *
    * @return array
    */
@@ -303,7 +309,17 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     $formValues['main_details'] = $this->_mainDetails;
     $formValues['other_details'] = $this->_otherDetails;
+
+    // Check if any rel_tables checkboxes have been de-selected
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo((int) $this->_cid, (int) $this->_oid);
+    // If rel_tables is not set then initialise with 0 value, required for the check which calls removeContactBelongings in moveAllBelongings
+    foreach (array_keys($rowsElementsAndInfo['rel_tables']) as $relTableElement) {
+      if (!array_key_exists($relTableElement, $formValues)) {
+        $formValues[$relTableElement] = '0';
+      }
+    }
     $migrationData = ['migration_info' => $formValues];
+
     CRM_Utils_Hook::merge('form', $migrationData, $this->_cid, $this->_oid);
     CRM_Dedupe_Merger::moveAllBelongings($this->_cid, $this->_oid, $migrationData['migration_info']);
 
@@ -312,19 +328,14 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     CRM_Core_Session::setStatus($message, ts('Contacts Merged'), 'success');
 
     $urlParams = ['reset' => 1, 'cid' => $this->_cid, 'rgid' => $this->_rgid, 'gid' => $this->_gid, 'limit' => $this->limit, 'criteria' => $this->criteria];
-    $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $this->_cid]);
 
+    // When clicking "Merge and go to listing"
     if (!empty($formValues['_qf_Merge_submit'])) {
       $urlParams['action'] = "update";
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/dedupefind',
-        $urlParams
-      ));
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlParams));
     }
-    if (!empty($formValues['_qf_Merge_done'])) {
-      CRM_Utils_System::redirect($contactViewUrl);
-    }
-
-    if ($this->next && $this->_mergeId) {
+    // When clicking "Merge and go to next pair"
+    elseif ($this->next && $this->_mergeId && empty($formValues['_qf_Merge_done'])) {
       $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $this->_gid, json_decode($this->criteria, TRUE), TRUE, $this->limit);
 
       $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
@@ -344,9 +355,12 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/merge', $urlParams));
       }
     }
-
-    // Perhaps never reached.
-    CRM_Utils_System::redirect($contactViewUrl);
+    // When clicking "Merge and View Result" or when used from search forms
+    // Note: search might load this action in a popup, so cannot use a redirect.
+    $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $this->_cid]);
+    CRM_Core_Session::singleton()->pushUserContext($contactViewUrl);
+    // I think this bit is needed because this is a multi-step form.
+    $this->controller->setDestination($contactViewUrl);
   }
 
   /**
@@ -365,7 +379,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts('Cannot merge a contact with itself.'));
     }
 
-    if (!CRM_Dedupe_BAO_Rule::validateContacts($cid, $oid)) {
+    if (!CRM_Dedupe_BAO_DedupeRule::validateContacts($cid, $oid)) {
       CRM_Core_Error::statusBounce(ts('The selected pair of contacts are marked as non duplicates. If these records should be merged, you can remove this exception on the <a href="%1">Dedupe Exceptions</a> page.', [1 => CRM_Utils_System::url('civicrm/dedupe/exception', 'reset=1')]));
     }
 
@@ -376,7 +390,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       CRM_Utils_System::permissionDenied();
     }
     // ensure that oid is not the current user, if so refuse to do the merge
-    if (CRM_Core_Session::singleton()->getLoggedInContactID() == $oid) {
+    if (CRM_Core_Session::getLoggedInContactID() == $oid) {
       $message = ts('The contact record which is linked to the currently logged in user account - \'%1\' - cannot be deleted.',
         [1 => CRM_Core_Session::singleton()->getLoggedInContactDisplayName()]
       );
@@ -412,6 +426,16 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         'other_contact_value' => CRM_Utils_Date::customFormat($contacts[$this->_oid]['modified_date']) . ($mostRecent == $this->_oid ? ' (' . ts('Most Recent') . ')' : ''),
       ],
     ]);
+  }
+
+  /**
+   * Set the defaults for the form.
+   *
+   * @return array
+   *   Array of default values
+   */
+  public function setDefaultValues() {
+    return $this->_defaults;
   }
 
 }

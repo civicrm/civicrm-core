@@ -1,59 +1,39 @@
 <?php
 
-/*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
- */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Event\Subscriber;
 
-use Civi\Api4\Event\Events;
 use Civi\Api4\Event\SchemaMapBuildEvent;
-use Civi\Api4\Service\Schema\Joinable\ActivityToActivityContactAssigneesJoinable;
-use Civi\Api4\Service\Schema\Joinable\BridgeJoinable;
+use Civi\Api4\Service\Schema\Joinable\ExtraJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ActivitySchemaMapSubscriber implements EventSubscriberInterface {
+/**
+ * @service civi.api4.activitySchema
+ */
+class ActivitySchemaMapSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
   /**
    * @return array
    */
   public static function getSubscribedEvents() {
     return [
-      Events::SCHEMA_MAP_BUILD => 'onSchemaBuild',
+      'api.schema_map.build' => 'onSchemaBuild',
     ];
   }
 
   /**
    * @param \Civi\Api4\Event\SchemaMapBuildEvent $event
    */
-  public function onSchemaBuild(SchemaMapBuildEvent $event) {
+  public function onSchemaBuild(SchemaMapBuildEvent $event): void {
     $schema = $event->getSchemaMap();
     $table = $schema->getTableByName('civicrm_activity');
 
-    $middleAlias = \CRM_Utils_String::createRandom(10, implode(range('a', 'z')));
-    $middleLink = new ActivityToActivityContactAssigneesJoinable($middleAlias);
+    $link = (new ExtraJoinable('civicrm_case', 'id', 'case_id'))
+      ->setBaseTable('civicrm_activity')
+      ->setJoinType(Joinable::JOIN_TYPE_MANY_TO_ONE)
+      ->addCondition('`{target_table}`.`id` = (SELECT `civicrm_case_activity`.`case_id` FROM `civicrm_case_activity` WHERE `civicrm_case_activity`.`activity_id` = `{base_table}`.`id` LIMIT 1)');
+    $table->addTableLink('id', $link);
 
-    $bridge = new BridgeJoinable('civicrm_contact', 'id', 'assignees', $middleLink);
-    $bridge->setBaseTable('civicrm_activity_contact');
-    $bridge->setJoinType(Joinable::JOIN_TYPE_ONE_TO_MANY);
-
-    $table->addTableLink('contact_id', $bridge);
   }
 
 }

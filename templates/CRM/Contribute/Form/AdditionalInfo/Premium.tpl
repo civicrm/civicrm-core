@@ -12,7 +12,7 @@
   <table class="form-layout-compressed">
     <tr class="crm-contribution-form-block-product_name">
       <td class="label">{$form.product_name.label}</td>
-      <td class="html-adjust">{$form.product_name.html}</td>
+      <td class="html-adjust">{$form.product_name.html|smarty:nodefaults}</td>
     </tr>
   </table>
 
@@ -20,7 +20,7 @@
     <table class="form-layout-compressed">
       <tr class="crm-contribution-form-block-min_amount">
         <td class="label">{$form.min_amount.label}</td>
-        <td class="html-adjust">{$form.min_amount.html|crmAddClass:'no-border'|crmMoney:$currency}</td>
+        <td class="html-adjust">{$form.min_amount.html}</td>
       </tr>
     </table>
     <div class="spacer"></div>
@@ -69,5 +69,5 @@
   </script>
 {/if}
 {if $action ne 2 or $showOption eq true}
-  {$initHideBoxes}
+  {$initHideBoxes|smarty:nodefaults}
 {/if}

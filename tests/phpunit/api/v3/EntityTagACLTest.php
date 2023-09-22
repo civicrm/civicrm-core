@@ -26,7 +26,7 @@
  */
 class api_v3_EntityTagACLTest extends CiviUnitTestCase {
 
-  use CRMTraits_ACL_PermissionTrait;
+  use Civi\Test\ACLPermissionTrait;
 
   /**
    * API Version in use.
@@ -45,9 +45,9 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
   /**
    * Set up permissions for test.
    */
-  public function setUp() {
-    $this->useTransaction(TRUE);
+  public function setUp(): void {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $individualID = $this->individualCreate();
     $daoObj = new CRM_Core_DAO();
     $this->callAPISuccess('Attachment', 'create', [

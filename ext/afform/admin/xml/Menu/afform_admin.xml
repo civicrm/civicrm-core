@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/afform</path>
+    <page_callback>CRM_AfformAdmin_Page_Base</page_callback>
+    <access_arguments>administer CiviCRM;administer afform</access_arguments>
+  </item>
+</menu>

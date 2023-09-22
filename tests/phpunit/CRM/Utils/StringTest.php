@@ -6,11 +6,28 @@
  */
 class CRM_Utils_StringTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  /**
+   * Set up for tests.
+   */
+  public function setUp(): void {
     parent::setUp();
+    $this->useTransaction();
   }
 
-  public function testStripPathChars() {
+  public function testBase64Url(): void {
+    $examples = [
+      'a' => 'YQ',
+      'ab' => 'YWI',
+      'abc' => 'YWJj',
+      '3f>' => 'M2Y-',
+    ];
+    foreach ($examples as $raw => $b64) {
+      $this->assertEquals($b64, CRM_Utils_String::base64UrlEncode($raw));
+      $this->assertEquals($raw, CRM_Utils_String::base64UrlDecode($b64));
+    }
+  }
+
+  public function testStripPathChars(): void {
     $testSet = [
       '' => '',
       NULL => NULL,
@@ -23,11 +40,11 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
 
     foreach ($testSet as $in => $expected) {
       $out = CRM_Utils_String::stripPathChars($in);
-      $this->assertEquals($out, $expected, "Output does not match");
+      $this->assertEquals($out, $expected, 'Output does not match');
     }
   }
 
-  public function testExtractName() {
+  public function testExtractName(): void {
     $cases = [
       [
         'full_name' => 'Alan',
@@ -76,7 +93,12 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     }
   }
 
-  public function testEllipsify() {
+  /**
+   * Test the ellipsify function.
+   *
+   * @noinspection SpellCheckingInspection
+   */
+  public function testEllipsify(): void {
     $maxLen = 5;
     $cases = [
       '1' => '1',
@@ -92,24 +114,25 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertEquals(TRUE, mb_check_encoding(CRM_Utils_String::ellipsify($input, $maxLen), 'UTF-8'));
   }
 
-  public function testRandom() {
+  public function testRandom(): void {
     for ($i = 0; $i < 4; $i++) {
       $actual = CRM_Utils_String::createRandom(4, 'abc');
       $this->assertEquals(4, strlen($actual));
-      $this->assertRegExp('/^[abc]+$/', $actual);
+      $this->assertMatchesRegularExpression('/^[abc]+$/', $actual);
 
       $actual = CRM_Utils_String::createRandom(6, '12345678');
       $this->assertEquals(6, strlen($actual));
-      $this->assertRegExp('/^[12345678]+$/', $actual);
+      $this->assertMatchesRegularExpression('/^[12345678]+$/', $actual);
     }
   }
 
   /**
    * @return array
    */
-  public function parsePrefixData() {
+  public function parsePrefixData(): array {
     $cases = [];
     $cases[] = ['administer CiviCRM', NULL, [NULL, 'administer CiviCRM']];
+    $cases[] = ['create contributions of type Event Fee: Canada', NULL, [NULL, 'create contributions of type Event Fee: Canada']];
     $cases[] = ['administer CiviCRM', 'com_civicrm', ['com_civicrm', 'administer CiviCRM']];
     $cases[] = ['Drupal:access user profiles', NULL, ['Drupal', 'access user profiles']];
     $cases[] = ['Joomla:component:perm', NULL, ['Joomla', 'component:perm']];
@@ -118,11 +141,12 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider parsePrefixData
+   *
    * @param $input
    * @param $defaultPrefix
    * @param $expected
    */
-  public function testParsePrefix($input, $defaultPrefix, $expected) {
+  public function testParsePrefix($input, $defaultPrefix, $expected): void {
     $actual = CRM_Utils_String::parsePrefix(':', $input, $defaultPrefix);
     $this->assertEquals($expected, $actual);
   }
@@ -130,7 +154,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function booleanDataProvider() {
+  public function booleanDataProvider(): array {
     // array(0 => $input, 1 => $expectedOutput)
     $cases = [];
     $cases[] = [TRUE, TRUE];
@@ -157,16 +181,22 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $input
+   * @param mixed $input
    * @param bool $expected
-   *     * @dataProvider booleanDataProvider
+   *
+   * @dataProvider booleanDataProvider
    */
-  public function testStrToBool($input, $expected) {
+  public function testStrToBool($input, bool $expected): void {
     $actual = CRM_Utils_String::strtobool($input);
-    $this->assertTrue($expected === $actual);
+    $this->assertSame($expected, $actual);
   }
 
-  public function startEndCases() {
+  /**
+   * Data provider for checking how strings start and end.
+   *
+   * @noinspection SpellCheckingInspection
+   */
+  public function startEndCases(): array {
     $cases = [];
     $cases[] = ['startsWith', 'foo', '', TRUE];
     $cases[] = ['startsWith', 'foo', 'f', TRUE];
@@ -185,19 +215,20 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param string $func
+   * @param string $function
    *   One of: 'startsWith' or 'endsWith'.
    * @param $string
    * @param $fragment
    * @param $expectedResult
+   *
    * @dataProvider startEndCases
    */
-  public function testStartEndWith($func, $string, $fragment, $expectedResult) {
-    $actualResult = \CRM_Utils_String::$func($string, $fragment);
-    $this->assertEquals($expectedResult, $actualResult, "Checking $func($string,$fragment)");
+  public function testStartEndWith(string $function, $string, $fragment, $expectedResult): void {
+    $actualResult = CRM_Utils_String::$function($string, $fragment);
+    $this->assertEquals($expectedResult, $actualResult, "Checking $function($string,$fragment)");
   }
 
-  public function wildcardCases() {
+  public function wildcardCases(): array {
     $cases = [];
     $cases[] = ['*', ['foo.bar.1', 'foo.bar.2', 'foo.whiz', 'bang.bang']];
     $cases[] = ['foo.*', ['foo.bar.1', 'foo.bar.2', 'foo.whiz']];
@@ -212,7 +243,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @param $expectedResults
    * @dataProvider wildcardCases
    */
-  public function testFilterByWildCards($patterns, $expectedResults) {
+  public function testFilterByWildCards($patterns, $expectedResults): void {
     $data = ['foo.bar.1', 'foo.bar.2', 'foo.whiz', 'bang.bang'];
 
     $actualResults = CRM_Utils_String::filterByWildcards($patterns, $data);
@@ -221,7 +252,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $patterns = (array) $patterns;
     $patterns[] = 'noise';
 
-    $actualResults = CRM_Utils_String::filterByWildcards($patterns, $data, FALSE);
+    $actualResults = CRM_Utils_String::filterByWildcards($patterns, $data);
     $this->assertEquals($expectedResults, $actualResults);
 
     $actualResults = CRM_Utils_String::filterByWildcards($patterns, $data, TRUE);
@@ -229,16 +260,16 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-20821
-   * CRM-14283
+   * @see https://issues.civicrm.org/jira/browse/CRM-20821
+   * @see https://issues.civicrm.org/jira/browse/CRM-14283
    *
    * @param string $imageURL
-   * @param book $forceHttps
+   * @param bool $forceHttps
    * @param string $expected
    *
    * @dataProvider simplifyURLProvider
    */
-  public function testSimplifyURL($imageURL, $forceHttps, $expected) {
+  public function testSimplifyURL(string $imageURL, bool $forceHttps, string $expected): void {
     $this->assertEquals(
       $expected,
       CRM_Utils_String::simplifyURL($imageURL, $forceHttps)
@@ -249,18 +280,20 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * Used for testNormalizeImageURL above
    *
    * @return array
+   * @throws \CRM_Core_Exception
+   * @noinspection HttpUrlsUsage
    */
-  public function simplifyURLProvider() {
+  public function simplifyURLProvider(): array {
     $config = CRM_Core_Config::singleton();
     $urlParts = CRM_Utils_String::simpleParseUrl($config->userFrameworkBaseURL);
     $localDomain = $urlParts['host+port'];
     if (empty($localDomain)) {
-      throw new \Exception("Failed to determine local base URL");
+      throw new CRM_Core_Exception('Failed to determine local base URL');
     }
     $externalDomain = 'example.org';
 
     // Ensure that $externalDomain really is different from $localDomain
-    if ($externalDomain == $localDomain) {
+    if ($externalDomain === $localDomain) {
       $externalDomain = 'example.net';
     }
 
@@ -286,14 +319,14 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
         "http://$externalDomain/sites/default/files/coffee-mug.jpg",
       ],
       'local URL' => [
-        "/sites/default/files/coffee-mug.jpg",
+        '/sites/default/files/coffee-mug.jpg',
         FALSE,
-        "/sites/default/files/coffee-mug.jpg",
+        '/sites/default/files/coffee-mug.jpg',
       ],
       'local URL without a forward slash' => [
-        "sites/default/files/coffee-mug.jpg",
+        'sites/default/files/coffee-mug.jpg',
         FALSE,
-        "/sites/default/files/coffee-mug.jpg",
+        '/sites/default/files/coffee-mug.jpg',
       ],
       'empty input' => [
         '',
@@ -309,7 +342,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    *
    * @dataProvider parseURLProvider
    */
-  public function testSimpleParseUrl($url, $expected) {
+  public function testSimpleParseUrl(string $url, array $expected): void {
     $this->assertEquals(
       $expected,
       CRM_Utils_String::simpleParseUrl($url)
@@ -321,40 +354,40 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function parseURLProvider() {
+  public function parseURLProvider(): array {
     return [
-      "prototypical example" => [
-        "https://example.com:8000/foo/bar/?id=1#fragment",
+      'prototypical example' => [
+        'https://example.com:8000/foo/bar/?id=1#fragment',
         [
-          'host+port' => "example.com:8000",
-          'path+query' => "/foo/bar/?id=1",
+          'host+port' => 'example.com:8000',
+          'path+query' => '/foo/bar/?id=1',
         ],
       ],
-      "default port example" => [
-        "https://example.com/foo/bar/?id=1#fragment",
+      'default port example' => [
+        'https://example.com/foo/bar/?id=1#fragment',
         [
-          'host+port' => "example.com",
-          'path+query' => "/foo/bar/?id=1",
+          'host+port' => 'example.com',
+          'path+query' => '/foo/bar/?id=1',
         ],
       ],
-      "empty" => [
-        "",
+      'empty' => [
+        '',
         [
-          'host+port' => "",
-          'path+query' => "",
+          'host+port' => '',
+          'path+query' => '',
         ],
       ],
-      "path only" => [
-        "/foo/bar/image.png",
+      'path only' => [
+        '/foo/bar/image.png',
         [
-          'host+port' => "",
-          'path+query' => "/foo/bar/image.png",
+          'host+port' => '',
+          'path+query' => '/foo/bar/image.png',
         ],
       ],
     ];
   }
 
-  public function purifyHTMLProvider() {
+  public function purifyHTMLProvider(): array {
     $tests = [];
     $tests[] = ['<span onmouseover=alert(0)>HOVER</span>', '<span>HOVER</span>'];
     $tests[] = ['<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>', '<a href="https://civicrm.org" target="_blank" class="button-purple" rel="noreferrer noopener">hello</a>'];
@@ -362,52 +395,66 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test ouput of purifyHTML
+   * Test output of purifyHTML
+   *
    * @param string $testString
    * @param string $expectedString
+   *
    * @dataProvider purifyHTMLProvider
    */
-  public function testPurifyHTML($testString, $expectedString) {
+  public function testPurifyHTML(string $testString, string $expectedString): void {
     $this->assertEquals($expectedString, CRM_Utils_String::purifyHTML($testString));
   }
 
-  public function getGoodSerializeExamples() {
-    $strs = [];
-
-    $strs[] = ['a:1:{s:1:"a";s:1:"b";}'];
-    $strs[] = ['d:1.2;'];
-    $strs[] = ['s:3:"abc";'];
-    $strs[] = ['N;'];
-    $strs[] = ['a:7:{i:0;N;i:1;s:3:"abc";i:2;i:1;i:3;d:2.3;i:4;b:1;i:5;b:0;i:6;i:0;}'];
-
-    return $strs;
+  public function getGoodSerializeExamples(): array {
+    $strings = [];
+    $strings[] = ['a:1:{s:1:"a";s:1:"b";}'];
+    $strings[] = ['d:1.2;'];
+    $strings[] = ['s:3:"abc";'];
+    $strings[] = ['N;'];
+    $strings[] = ['a:7:{i:0;N;i:1;s:3:"abc";i:2;i:1;i:3;d:2.3;i:4;b:1;i:5;b:0;i:6;i:0;}'];
+    return $strings;
   }
 
   /**
    * @param string $str
    *   A safe serialized value.
+   *
    * @dataProvider getGoodSerializeExamples
    */
-  public function testGoodSerialize($str) {
+  public function testGoodSerialize(string $str): void {
     $this->assertEquals(unserialize($str), CRM_Utils_String::unserialize($str));
   }
 
-  public function getBadSerializeExamples() {
-    $strs = [];
-
-    $strs[] = ['O:8:"stdClass":0:{}'];
-    $strs[] = ['O:9:"Exception":7:{s:10:"*message";s:3:"abc";s:17:"Exceptionstring";s:0:"";s:7:"*code";i:0;s:7:"*file";s:17:"Command line code";s:7:"*line";i:1;s:16:"Exceptiontrace";a:0:{}s:19:"Exceptionprevious";N;}'];
-
-    return $strs;
+  public function getBadSerializeExamples(): array {
+    $strings = [];
+    $strings[] = ['O:8:"stdClass":0:{}'];
+    $strings[] = ['O:9:"Exception":7:{s:10:"*message";s:3:"abc";s:17:"ExceptionString";s:0:"";s:7:"*code";i:0;s:7:"*file";s:17:"Command line code";s:7:"*line";i:1;s:16:"ExceptionTrace";a:0:{}s:19:"ExceptionPrevious";N;}'];
+    return $strings;
   }
 
   /**
    * @param string $str
    *   An unsafe serialized value.
+   *
    * @dataProvider getBadSerializeExamples
    */
-  public function testBadSerializeExamples($str) {
+  public function testBadSerializeExamples(string $str): void {
     $this->assertFalse(CRM_Utils_String::unserialize($str));
+  }
+
+  /**
+   * Test that we get a meaningful error if Smarty syntax is wrong.
+   */
+  public function testSmartyExceptionHandling(): void {
+    try {
+      CRM_Utils_String::parseOneOffStringThroughSmarty('{if}');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringStartsWith('Message was not parsed due to invalid smarty syntax', $e->getMessage());
+      return;
+    }
+    $this->fail('Exception expected');
   }
 
 }

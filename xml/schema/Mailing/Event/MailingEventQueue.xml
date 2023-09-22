@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing/Event</base>
+  <class>MailingEventQueue</class>
+  <entity>MailingEventQueue</entity>
+  <name>civicrm_mailing_event_queue</name>
+  <comment>A collection of all intended recipients of a job</comment>
+  <archive>true</archive>
+  <component>CiviMail</component>
+  <title>Mailing Recipient</title>
+  <description>Intended recipients of a mailing.</description>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Mailing Event Queue ID</title>
+    <required>true</required>
+    <html>
+      <label>ID</label>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>job_id</name>
+    <type>int unsigned</type>
+    <required>false</required>
+    <title>Job ID</title>
+    <comment>Mailing Job</comment>
+    <html>
+      <label>Outbound Mailing</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>job_id</name>
+    <table>civicrm_mailing_job</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>mailing_id</name>
+    <type>int unsigned</type>
+    <required>false</required>
+    <title>Mailing ID</title>
+    <comment>Related mailing. Used for reporting on mailing success, if present.</comment>
+    <html>
+      <label>Mailing</label>
+    </html>
+    <add>5.67</add>
+  </field>
+  <foreignKey>
+    <name>mailing_id</name>
+    <table>civicrm_mailing</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>is_test</name>
+    <title>Test</title>
+    <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
+    <readonly>true</readonly>
+    <add>5.67</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>email_id</name>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <title>Email ID</title>
+    <comment>FK to Email</comment>
+    <html>
+      <label>Email</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>email_id</name>
+    <table>civicrm_email</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <title>Contact ID</title>
+    <comment>FK to Contact</comment>
+    <html>
+      <label>Contact</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>hash</name>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <title>Security Hash</title>
+    <comment>Security hash</comment>
+  </field>
+  <index>
+    <name>index_hash</name>
+    <fieldName>hash</fieldName>
+    <add>4.7</add>
+  </index>
+  <field>
+    <name>phone_id</name>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <title>Phone ID</title>
+    <comment>FK to Phone</comment>
+    <html>
+      <label>Phone</label>
+    </html>
+  </field>
+  <foreignKey>
+    <name>phone_id</name>
+    <table>civicrm_phone</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+</table>

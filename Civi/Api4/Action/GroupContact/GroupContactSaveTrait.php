@@ -10,13 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
 namespace Civi\Api4\Action\GroupContact;
 
 /**
@@ -46,12 +39,12 @@ trait GroupContactSaveTrait {
   /**
    * @inheritDoc
    */
-  protected function writeObjects($items) {
+  protected function write(array $items) {
     foreach ($items as &$item) {
       $item['method'] = $this->method;
       $item['tracking'] = $this->tracking;
     }
-    return parent::writeObjects($items);
+    return \CRM_Contact_BAO_GroupContact::writeRecords($items);
   }
 
 }

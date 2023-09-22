@@ -14,68 +14,111 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Mapping;
+use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\UserJob;
+
 /**
  * Base class for upload-only import forms (all but Contact import).
  */
-abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
+abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
+
+  /**
+   * Values loaded from a saved UserJob template.
+   *
+   * Within Civi-Import it is possible to save a UserJob with is_template = 1.
+   *
+   * @var array
+   */
+  protected $templateValues = [];
 
   /**
    * Set variables up before form is built.
    */
-  public function preProcess() {
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-    $params = "reset=1";
-    if ($this->_id) {
-      $params .= "&id={$this->_id}";
-    }
-    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url(static::PATH, $params));
-
+  public function preProcess(): void {
+    $this->pushUrlToUserContext();
     // check for post max size
     CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
+    $this->assign('importEntity', $this->getTranslatedEntity());
+    $this->assign('importEntities', $this->getTranslatedEntities());
+  }
+
+  /**
+   * Get the import entity (translated).
+   *
+   * Used for template layer text.
+   *
+   * @return string
+   */
+  protected function getTranslatedEntity(): string {
+    return (string) CoreUtil::getInfoItem($this->getBaseEntity(), 'title');
+  }
+
+  /**
+   * Get the mapping ID that is being loaded.
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getSavedMappingID(): ?int {
+    return $this->getSubmittedValue('savedMapping') ?: NULL;
+  }
+
+  /**
+   * Get the import entity plural (translated).
+   *
+   * Used for template layer text.
+   *
+   * @return string
+   */
+  protected function getTranslatedEntities(): string {
+    return (string) CoreUtil::getInfoItem($this->getBaseEntity(), 'title_plural');
   }
 
   /**
    * Common form elements.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
-    $config = CRM_Core_Config::singleton();
+    $this->assign('errorMessage', $this->getErrorMessage());
 
-    $uploadFileSize = CRM_Utils_Number::formatUnitSize($config->maxFileSize . 'm', TRUE);
-
-    //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
-    if (empty($uploadFileSize)) {
-      $uploadFileSize = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), TRUE);
+    $this->assign('urlPath', 'civicrm/import/datasource');
+    $this->assign('urlPathVar', 'snippet=4&user_job_id=' . $this->get('user_job_id'));
+    if ($this->isImportDataUploaded()) {
+      $this->add('checkbox', 'use_existing_upload', ts('Use data already uploaded'), [
+        'onChange' => "
+          CRM.$('.crm-import-datasource-form-block-dataSource').toggle();
+          CRM.$('#data-source-form-block').toggle()",
+      ]);
     }
-    $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
+    if ($this->getTemplateID()) {
+      $this->setTemplateDefaults();
+    }
 
-    $this->assign('uploadSize', $uploadSize);
+    $this->add('select', 'dataSource', ts('Data Source'), $this->getDataSources(), TRUE,
+      ['onchange' => 'buildDataSourceFormBlock(this.value);']
+    );
 
-    $this->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);
-    $this->setMaxFileSize($uploadFileSize);
-    $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
-      1 => $uploadSize,
-      2 => $uploadFileSize,
-    ]), 'maxfilesize', $uploadFileSize);
-    $this->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
-    $this->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
+    $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . $this->getBaseEntity());
 
-    $this->addElement('checkbox', 'skipColumnHeader', ts('First row contains column headers'));
-
-    $this->add('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2], TRUE);
-    $this->setDefaults(['fieldSeparator' => $config->fieldSeparator]);
-    $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . static::IMPORT_ENTITY);
-
-    $this->assign('savedMapping', $mappingArray);
-    $this->add('select', 'savedMapping', ts('Mapping Option'), ['' => ts('- select -')] + $mappingArray);
-
-    if ($loadedMapping = $this->get('loadedMapping')) {
-      $this->assign('loadedMapping', $loadedMapping);
-      $this->setDefaults(['savedMapping' => $loadedMapping]);
+    $savedMappingElement = $this->add('select', 'savedMapping', ts('Saved Field Mapping'), ['' => ts('- select -')] + $mappingArray);
+    if ($this->getTemplateID()) {
+      $savedMappingElement->freeze();
     }
 
     //build date formats
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
-
+    // When we call buildDataSourceFields we add them to the form both for purposes of
+    // initial display, but also so they are available during `postProcess`. Hence
+    // we need to add them to the form when first displaying it, or when a csv has been
+    // uploaded or csv described but NOT when the existing file is used. We have
+    // to check `_POST` for this because we want them to be not-added BEFORE validation
+    // as `buildDataSourceFields` also adds rules, which will run before `use_existing_upload`
+    // is treated as submitted.
+    if (empty($_POST['use_existing_upload'])) {
+      $this->buildDataSourceFields();
+    }
     $this->addButtons([
         [
           'type' => 'upload',
@@ -90,34 +133,41 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
     ]);
   }
 
+  public function setDefaultValues() {
+    return array_merge($this->dataSourceDefaults, [
+      'dataSource' => $this->getDefaultDataSource(),
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+    ], $this->templateValues);
+  }
+
+  /**
+   * Get an error message to assign to the template.
+   *
+   * @return string
+   */
+  protected function getErrorMessage(): string {
+    return '';
+  }
+
   /**
    * A long-winded way to add one radio element to the form.
    */
   protected function addContactTypeSelector() {
     //contact types option
-    $contactOptions = [];
+    $contactTypeOptions = [];
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-      $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Individual'), CRM_Import_Parser::CONTACT_INDIVIDUAL
-      );
+      $contactTypeOptions['Individual'] = ts('Individual');
     }
     if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-      $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Household'), CRM_Import_Parser::CONTACT_HOUSEHOLD
-      );
+      $contactTypeOptions['Household'] = ts('Household');
     }
     if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-      $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Organization'), CRM_Import_Parser::CONTACT_ORGANIZATION
-      );
+      $contactTypeOptions['Organization'] = ts('Organization');
     }
-
-    $this->addGroup($contactOptions, 'contactType',
-      ts('Contact Type')
-    );
+    $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions);
 
     $this->setDefaults([
-      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
+      'contactType' => 'Individual',
     ]);
   }
 
@@ -126,48 +176,19 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
    *
    * @param array $names
    */
-  protected function storeFormValues($names) {
+  protected function storeFormValues(array $names): void {
     foreach ($names as $name) {
       $this->set($name, $this->controller->exportValue($this->_name, $name));
     }
   }
 
   /**
-   * Common form postProcess.
-   *
-   * @param string $parserClassName
-   *
-   * @param string|null $entity
-   *   Entity to set for paraser currently only for custom import
+   * Common postProcessing.
    */
-  protected function submitFileForMapping($parserClassName, $entity = NULL) {
+  public function postProcess() {
+    $this->processDatasource();
     $this->controller->resetPage('MapField');
-
-    $fileName = $this->controller->exportValue($this->_name, 'uploadFile');
-    $skipColumnHeader = $this->controller->exportValue($this->_name, 'skipColumnHeader');
-
-    $session = CRM_Core_Session::singleton();
-    $session->set("dateTypes", $this->get('dateFormats'));
-
-    $separator = $this->controller->exportValue($this->_name, 'fieldSeparator');
-
-    $mapper = [];
-
-    $parser = new $parserClassName($mapper);
-    if ($entity) {
-      $parser->setEntity($this->get($entity));
-    }
-    $parser->setMaxLinesToProcess(100);
-    $parser->run($fileName,
-      $separator,
-      $mapper,
-      $skipColumnHeader,
-      CRM_Import_Parser::MODE_MAPFIELD,
-      $this->get('contactType')
-    );
-
-    // add all the necessary variables to the form
-    $parser->set($this);
+    parent::postProcess();
   }
 
   /**
@@ -177,6 +198,100 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
    */
   public function getTitle() {
     return ts('Upload Data');
+  }
+
+  /**
+   * Load default values from the relevant template if one is passed in via the url.
+   *
+   * We need to create and UserJob at this point as the relevant values
+   * go beyond the first DataSource screen.
+   *
+   * @return array
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  public function setTemplateDefaults(): array {
+    $templateID = $this->getTemplateID();
+    if ($templateID && !$this->getUserJobID()) {
+      $userJob = UserJob::get(FALSE)->addWhere('id', '=', $templateID)->execute()->first();
+      $userJobName = $userJob['name'];
+      // Strip off import_ prefix from UserJob.name
+      $mappingName = substr($userJobName, 7);
+      $mappingID = Mapping::get(FALSE)->addWhere('name', '=', $mappingName)->addSelect('id')->execute()->first()['id'];
+      // Unset fields that should not be copied over.
+      unset($userJob['id'], $userJob['name'], $userJob['created_date'], $userJob['is_template'], $userJob['queue_id'], $userJob['start_date'], $userJob['end_date']);
+      $userJob['metadata']['template_id'] = $templateID;
+      $userJob['metadata']['Template']['mapping_id'] = $mappingID;
+      $userJob['created_id'] = CRM_Core_Session::getLoggedInContactID();
+      $userJob['expires_date'] = '+1 week';
+      $userJobID = UserJob::create(FALSE)->setValues($userJob)->execute()->first()['id'];
+      $this->set('user_job_id', $userJobID);
+      $userJob['metadata']['submitted_values']['savedMapping'] = $mappingID;
+      $this->templateValues = $userJob['metadata']['submitted_values'];
+    }
+    return [];
+  }
+
+  /**
+   * Process the datasource submission - setting up the job and data source.
+   */
+  protected function processDatasource(): void {
+    try {
+      if (!$this->getUserJobID()) {
+        $this->createUserJob();
+        $this->instantiateDataSource();
+      }
+      else {
+        $submittedValues = $this->getSubmittedValues();
+        $fieldsToCopyOver = array_keys(array_diff_key($submittedValues, $this->submittableFields));
+        if ($submittedValues['use_existing_upload']) {
+          // Use the already saved value.
+          $fieldsToCopyOver[] = 'dataSource';
+          foreach ($fieldsToCopyOver as $field) {
+            $submittedValues[$field] = $this->getUserJobSubmittedValues()[$field];
+          }
+          $this->updateUserJobMetadata('submitted_values', $submittedValues);
+        }
+        else {
+          $this->flushDataSource();
+          $this->updateUserJobMetadata('submitted_values', $submittedValues);
+          $this->instantiateDataSource();
+        }
+      }
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Error::statusBounce($e->getUserMessage());
+    }
+  }
+
+  /**
+   * Instantiate the datasource.
+   *
+   * This gives the datasource a chance to do any table creation etc.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function instantiateDataSource(): void {
+    $this->getDataSourceObject()->initialize();
+  }
+
+  /**
+   * Default values for datasource fields.
+   *
+   * @var array
+   */
+  protected $dataSourceDefaults = [];
+
+  /**
+   * Set dataSource default values.
+   *
+   * @param array $dataSourceDefaults
+   *
+   * @return self
+   */
+  public function setDataSourceDefaults(array $dataSourceDefaults): self {
+    $this->dataSourceDefaults = $dataSourceDefaults;
+    return $this;
   }
 
 }

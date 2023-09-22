@@ -57,7 +57,8 @@ function civicrm_api3_activity_type_create($params) {
 
   $action = 1;
 
-  if ($optionValueID = CRM_Utils_Array::value('option_value_id', $params)) {
+  $optionValueID = $params['option_value_id'] ?? NULL;
+  if ($optionValueID) {
     $action = 2;
   }
 
@@ -94,13 +95,13 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
  * @param array $params
  *   Array including id of activity_type to delete.
  * @return array API result array
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  * @deprecated use OptionValue api
  */
 function civicrm_api3_activity_type_delete($params) {
-  $result = CRM_Core_BAO_OptionValue::del($params['id']);
+  $result = CRM_Core_BAO_OptionValue::deleteRecord($params);
   if ($result) {
     return civicrm_api3_create_success(TRUE, $params);
   }
-  throw new API_Exception("Failure to delete activity type id {$params['id']}");
+  throw new CRM_Core_Exception("Failure to delete activity type id {$params['id']}");
 }

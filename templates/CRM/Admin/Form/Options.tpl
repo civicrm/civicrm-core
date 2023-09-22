@@ -9,13 +9,12 @@
 *}
 {* this template is used for adding/editing options *}
 <div class="crm-block crm-form-block crm-admin-options-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}
-      <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
-             {ts 1=$gLabel}WARNING: Deleting this option will result in the loss of all %1 related records which use the option.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
-      </div>
-    {else}
+    <div class="messages status no-popup">
+      {icon icon="fa-info-circle"}{/icon}
+      {ts 1=$gLabel}WARNING: Deleting this option will result in the loss of all %1 related records which use the option.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
+    </div>
+  {else}
     <table class="form-layout-compressed">
         {if $gName eq 'custom_search'}
            <tr class="crm-admin-options-form-block-custom_search_path">
@@ -38,14 +37,14 @@
                 <span class="description">{ts}A "string value" or regular expression to be redacted (replaced).{/ts}</span>
              </td>
            </tr>
-        {else}
+        {elseif !empty($form.label)}
            <tr class="crm-admin-options-form-block-label">
              <td class="label">{$form.label.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_option_value' field='label' id=$id}{/if}</td>
              <td class="html-adjust">{$form.label.html}<br />
                <span class="description">{ts}The option label is displayed to users.{/ts}</span>
              </td>
            </tr>
-     {if $form.financial_account_id.html}
+     {if !empty($form.financial_account_id.html)}
              <tr class="crm-admin-options-form-block-grouping">
                <td class="label">{$form.financial_account_id.label}</td>
                <td>{$form.financial_account_id.html}</td>
@@ -53,7 +52,7 @@
      {/if}
         {/if}
 
-      {if $form.value.html && $gName neq 'redaction_rule'}
+      {if !empty($form.value.html) && $gName neq 'redaction_rule'}
         <tr class="crm-admin-options-form-block-value">
           <td class="label">{$form.value.label}</td>
           <td>{$form.value.html}<br />
@@ -80,7 +79,7 @@
                </td>
             </tr>
           {/if}
-            {if $form.name.html} {* Get the name value also *}
+            {if !empty($form.name.html)} {* Get the name value also *}
               <tr class="crm-admin-options-form-block-name">
                 <td class="label">{$form.name.label}</td>
                 <td>{$form.name.html}<br />
@@ -88,7 +87,7 @@
                 </td>
               </tr>
             {/if}
-            {if $form.filter.html} {* Filter property is only exposed for some option groups. *}
+            {if !empty($form.filter.html)} {* Filter property is only exposed for some option groups. *}
               <tr class="crm-admin-options-form-block-filter">
                 <td class="label">{$form.filter.label}</td>
                 <td>{$form.filter.html}</td>
@@ -99,9 +98,11 @@
                 <td>{$form.description.html}<br />
             {if $gName eq 'activity_type'}
                <span class="description">{ts}Description is included at the top of the activity edit and view pages for this type of activity.{/ts}</span>
+            {elseif $gName eq 'email_greeting' || $gName eq 'postal_greeting' || $gName eq  'addressee'}
+                <span class="description">{ts}Description will be appended to processed greeting.{/ts}</span>
+            {/if}
                 </td>
               </tr>
-            {/if}
         {/if}
         {if $gName eq 'participant_status'}
               <tr class="crm-admin-options-form-block-visibility_id">
@@ -109,29 +110,31 @@
                 <td>{$form.visibility_id.html}</td>
               </tr>
         {/if}
-        {if $form.grouping.html}
+        {if !empty($form.grouping.html)}
           <tr class="crm-admin-options-form-block-grouping">
             <td class="label">{$form.grouping.label}</td>
             <td>{$form.grouping.html}</td>
           </tr>
         {/if}
+        {if !empty($form.weight)}
               <tr class="crm-admin-options-form-block-weight">
                 <td class="label">{$form.weight.label}</td>
                 <td>{$form.weight.html}</td>
               </tr>
-        {if $form.icon.html}
+        {/if}
+        {if !empty($form.icon.html)}
           <tr class="crm-admin-options-form-block-icon">
             <td class="label">{$form.icon.label}</td>
             <td>{$form.icon.html}</td>
           </tr>
         {/if}
-        {if $form.color.html}
+        {if !empty($form.color.html)}
           <tr class="crm-admin-options-form-block-color">
             <td class="label">{$form.color.label}</td>
             <td>{$form.color.html}</td>
           </tr>
         {/if}
-        {if $form.component_id.html} {* Component ID is exposed for activity types if CiviCase is enabled. *}
+        {if !empty($form.component_id.html)} {* Component ID is exposed for activity types if CiviCase is enabled. *}
               <tr class="crm-admin-options-form-block-component_id">
                 <td class="label">{$form.component_id.label}</td>
                 <td>{$form.component_id.html}</td>
@@ -141,20 +144,19 @@
                 <td class="label">{$form.is_active.label}</td>
                 <td>{$form.is_active.html}</td>
               </tr>
-        {if $showDefault}
+        {if !empty($showDefault)}
               <tr class="crm-admin-options-form-block-is_default">
                 <td class="label">{$form.is_default.label}</td>
                 <td>{$form.is_default.html}</td>
               </tr>
         {/if}
-        {if $showContactFilter}{* contactOptions is exposed for email/postal greeting and addressee types to set filter for contact types *}
+        {if !empty($showContactFilter)}{* contactOptions is exposed for email/postal greeting and addressee types to set filter for contact types *}
            <tr class="crm-admin-options-form-block-contactOptions">
-             <td class="label">{$form.contactOptions.label}</td>
-             <td>{$form.contactOptions.html}</td>
+             <td class="label">{$form.contact_type_id.label}</td>
+             <td>{$form.contact_type_id.html}</td>
            </tr>
         {/if}
     </table>
-    {/if}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
- </fieldset>
+  {/if}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

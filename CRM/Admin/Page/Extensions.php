@@ -66,6 +66,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=add&id=%%id%%&key=%%key%%',
           'title' => ts('Install'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
@@ -73,24 +74,28 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
           'qs' => 'action=enable&id=%%id%%&key=%%key%%',
           'ref' => 'enable-action',
           'title' => ts('Enable'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=disable&id=%%id%%&key=%%key%%',
           'title' => ts('Disable'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Uninstall'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=delete&id=%%id%%&key=%%key%%',
           'title' => ts('Uninstall Extension'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Download'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=update&id=%%id%%&key=%%key%%',
           'title' => ts('Download Extension'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
       ];
     }
@@ -132,6 +137,12 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
     $remoteExtensionRows = $this->formatRemoteExtensionRows($localExtensionRows);
     $this->assign('remoteExtensionRows', $remoteExtensionRows);
+
+    Civi::resources()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
+      ->addSetting([
+        'tabSettings' => ['active' => $_GET['selectedChild'] ?? NULL],
+      ]);
   }
 
   /**
@@ -149,6 +160,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $keys = array_keys($manager->getStatuses());
     sort($keys);
     $hiddenExtensions = $mapper->getKeysByTag('mgmt:hidden');
+    $requiredExtensions = $mapper->getKeysByTag('mgmt:required');
     foreach ($keys as $key) {
       if (in_array($key, $hiddenExtensions)) {
         continue;
@@ -196,7 +208,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       }
       // TODO if extbrowser is enabled and extbrowser has newer version than extcontainer,
       // then $action += CRM_Core_Action::UPDATE
-      if ($action) {
+      if ($action && !in_array($key, $requiredExtensions)) {
         $row['action'] = CRM_Core_Action::formLink(self::links(),
           $action,
           ['id' => $row['id'], 'key' => $obj->key],
@@ -234,13 +246,15 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     // build list of available downloads
     $remoteExtensionRows = [];
     $compat = CRM_Extension_System::getCompatibilityInfo();
+    $mapper = CRM_Extension_System::singleton()->getMapper();
 
     foreach ($remoteExtensions as $info) {
       if (!empty($compat[$info->key]['obsolete'])) {
         continue;
       }
-      $row = (array) $info;
+      $row = self::fillMissingInfoKeys((array) $info);
       $row['id'] = $info->key;
+      $row['upgradelink'] = '';
       $action = CRM_Core_Action::UPDATE;
       $row['action'] = CRM_Core_Action::formLink(self::links(),
         $action,
@@ -257,7 +271,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       if (isset($localExtensionRows[$info->key])) {
         if (array_key_exists('version', $localExtensionRows[$info->key])) {
           if (version_compare($localExtensionRows[$info->key]['version'], $info->version, '<')) {
-            $row['is_upgradeable'] = TRUE;
+            $row['upgradelink'] = $mapper->getUpgradeLink($remoteExtensions[$info->key], $localExtensionRows[$info->key]);
           }
         }
       }
@@ -322,7 +336,35 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * @return array
    */
   public static function createExtendedInfo(CRM_Extension_Info $obj) {
-    return CRM_Extension_System::createExtendedInfo($obj);
+    return self::fillMissingInfoKeys(CRM_Extension_System::createExtendedInfo($obj));
+  }
+
+  /**
+   * Extension templates expect certain keys to always be set, but these might be missing from the relevant info.xml files
+   * This ensures the expect keys are always set.
+   *
+   * @param array $info
+   * @return array
+   */
+  private static function fillMissingInfoKeys(array $info) {
+    $defaultKeys = [
+      'urls' => [],
+      'authors' => [],
+      'version' => '',
+      'description' => '',
+      'license' => '',
+      'path' => '',
+      'releaseDate' => '',
+      'downloadUrl' => FALSE,
+      'compatibility' => FALSE,
+      'develStage' => FALSE,
+      'comments' => FALSE,
+    ];
+    $info = array_merge($defaultKeys, $info);
+    foreach ($info['authors'] as &$author) {
+      $author = array_merge(['homepage' => ''], $author);
+    }
+    return $info;
   }
 
 }

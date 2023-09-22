@@ -17,7 +17,49 @@
 class CRM_Upgrade_DispatchPolicy {
 
   /**
+   * Create an auto-clean object which temporarily applies the preferred policy.
+   *
+   * @code
+   * $cleanup = CRM_Upgrade_DispatchPolicy::useTemporarily('upgrade.finish');
+   * doStuff();
+   * unset($cleanup);
+   * @endCode
+   *
+   * @param string $name
+   * @return \CRM_Utils_AutoClean
+   */
+  public static function useTemporarily(string $name): CRM_Utils_AutoClean {
+    Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get($name));
+    return \CRM_Utils_AutoClean::with(function() {
+      Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
+    });
+  }
+
+  /**
    * Determine the dispatch policy
+   *
+   * @return array
+   * @see \Civi\Core\CiviEventDispatcher::setDispatchPolicy()
+   */
+  public static function pick(): ?array {
+    if (!\CRM_Core_Config::isUpgradeMode()) {
+      return NULL;
+    }
+
+    // Have we run CRM_Upgrade_Form::doCoreFinish() for this version?
+    $codeVer = CRM_Utils_System::version();
+    $isCoreCurrent = CRM_Core_DAO::singleValueQuery('
+        SELECT count(*) as count
+        FROM civicrm_log
+        WHERE entity_table = "civicrm_domain"
+        AND data LIKE %1
+        ', [1 => ['upgrade:%->' . $codeVer, 'String']]);
+
+    return CRM_Upgrade_DispatchPolicy::get($isCoreCurrent < 1 ? 'upgrade.main' : 'upgrade.finish');
+  }
+
+  /**
+   * Read the dispatch policy.
    *
    * @param string $phase
    *   Ex: 'upgrade.main' or 'upgrade.finish'.
@@ -30,6 +72,7 @@ class CRM_Upgrade_DispatchPolicy {
     // mixed: it depends on the specific hook and the specific upgrade-step.
     //
     // Some example considerations:
+    //
     // - If the "log_civicrm_*" tables and triggers are to be reconciled during
     //   the upgrade, then one probably needs access to the list of tables and
     //   triggers defined by extensions. These are provided by hooks.
@@ -47,7 +90,18 @@ class CRM_Upgrade_DispatchPolicy {
     //   they probably are not intended to fire during DB upgrade. Then again,
     //   upgrade-logic is usually written with lower-level semantics that avoid firing hooks.
     //
+    // To balance these mixed considerations, the upgrade runs in two phases:
+    //
+    // - Defensive/conservative/closed phase ("upgrade.main"): Likely mismatch
+    //   between schema+code. Low-confidence in most services (APIs/hooks/etc).
+    //   Ignore caches/indices/etc. Only perform low-level schema revisions.
+    // - Constructive/liberal/open phase ("upgrade.finish"): Schema+code match.
+    //   Higher confidence in most services (APIs/hooks/etc).
+    //   Rehydrate caches/indices/etc.
+    //
     // Related discussions:
+    //
+    // - https://github.com/civicrm/civicrm-core/pull/17126
     // - https://github.com/civicrm/civicrm-core/pull/13551
     // - https://lab.civicrm.org/dev/core/issues/1449
     // - https://lab.civicrm.org/dev/core/issues/1460
@@ -59,6 +113,9 @@ class CRM_Upgrade_DispatchPolicy {
     // It's more restrictive, preventing interference from unexpected callpaths.
     $policies['upgrade.main'] = [
       'hook_civicrm_config' => 'run',
+      // cleanupPermissions() in some UF's can be destructive. Running prematurely could be actively harmful.
+      'hook_civicrm_permission' => 'fail',
+      'hook_civicrm_crypto' => 'drop',
       '/^hook_civicrm_(pre|post)$/' => 'drop',
       '/^hook_civicrm_/' => $strict ? 'warn-drop' : 'drop',
       '/^civi\./' => 'run',
@@ -91,6 +148,32 @@ class CRM_Upgrade_DispatchPolicy {
 
     // return $policies['upgrade.old'];
     return $policies[$phase];
+  }
+
+  /**
+   * Assert that a specific policy is currently active.
+   *
+   * @param string $name
+   *   Ex: 'upgrade.main' or 'upgrade.finish'
+   * @throws \RuntimeException
+   */
+  public static function assertActive(string $name) {
+    $expected = static::get($name);
+    $actual = Civi::dispatcher()->getDispatchPolicy();
+    if ($expected != $actual) {
+      throw new \RuntimeException("Task can not execute correctly. The wrong dispatch policy is active. Expected to find \"$name\".");
+    }
+  }
+
+  /**
+   * Before running upgrade tasks, ensure that we apply the current dispatch-policy.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   */
+  public static function onRunTask(\Civi\Core\Event\GenericHookEvent $event) {
+    if ($event->taskCtx->queue->getName() === \CRM_Upgrade_Form::QUEUE_NAME) {
+      Civi::dispatcher()->setDispatchPolicy(static::pick());
+    }
   }
 
 }

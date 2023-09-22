@@ -46,7 +46,7 @@ function _civicrm_api3_website_create_spec(&$params) {
  *
  * @return array
  *   API result array
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_website_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

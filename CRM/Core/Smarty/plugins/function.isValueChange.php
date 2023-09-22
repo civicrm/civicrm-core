@@ -17,7 +17,6 @@
  * @package CRM
  * @author Allen Shaw <allen@nswebsolutions.com>
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
  */
 
 /**

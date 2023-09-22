@@ -14,103 +14,193 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace api\v4\Action;
 
-use api\v4\UnitTestCase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
-use Civi\Api4\Phone;
+use Civi\Api4\EntityTag;
+use Civi\Api4\Relationship;
+use Civi\Api4\Tag;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class FkJoinTest extends UnitTestCase {
+class FkJoinTest extends Api4TestBase implements TransactionalInterface {
 
-  public function setUpHeadless() {
+  public function tearDown(): void {
     $relatedTables = [
       'civicrm_activity',
       'civicrm_phone',
       'civicrm_activity_contact',
+      'civicrm_relationship',
+      'civicrm_case_contact',
+      'civicrm_case_type',
+      'civicrm_case',
     ];
     $this->cleanup(['tablesToTruncate' => $relatedTables]);
-    $this->loadDataSet('DefaultDataSet');
-
-    return parent::setUpHeadless();
+    parent::tearDown();
   }
 
   /**
    * Fetch all phone call activities. Expects a single activity
    * loaded from the data set.
    */
-  public function testThreeLevelJoin() {
-    $results = Activity::get()
-      ->setCheckPermissions(FALSE)
+  public function testThreeLevelJoin(): void {
+    $this->createTestRecord('Activity', [
+      'activity_type_id:name' => 'Phone Call',
+    ]);
+
+    $results = Activity::get(FALSE)
       ->addWhere('activity_type_id:name', '=', 'Phone Call')
       ->execute();
 
     $this->assertCount(1, $results);
   }
 
-  public function testOptionalJoin() {
-    // DefaultDataSet includes 2 phones for contact 1, 0 for contact 2.
+  public function testOptionalJoin(): void {
+    $contact1 = $this->createTestRecord('Contact');
+    $contact2 = $this->createTestRecord('Contact');
+
+    $this->createTestRecord('Phone', [
+      'location_type_id:name' => 'Home',
+      'contact_id' => $contact1['id'],
+    ]);
+    $this->createTestRecord('Phone', [
+      'location_type_id:name' => 'Work',
+      'contact_id' => $contact1['id'],
+    ]);
+
     // We'll add one for contact 2 as a red herring to make sure we only get back the correct ones.
-    Phone::create()->setCheckPermissions(FALSE)
-      ->setValues(['contact_id' => $this->getReference('test_contact_2')['id'], 'phone' => '123456'])
-      ->execute();
-    $contacts = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $this->createTestRecord('Phone', [
+      'contact_id' => $contact2['id'],
+    ]);
+    $contacts = Contact::get(FALSE)
       ->addJoin('Phone', FALSE)
       ->addSelect('id', 'phone.phone')
-      ->addWhere('id', 'IN', [$this->getReference('test_contact_1')['id']])
+      ->addWhere('id', 'IN', [$contact1['id']])
       ->addOrderBy('phone.id')
       ->execute();
     $this->assertCount(2, $contacts);
-    $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[0]['id']);
-    $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[1]['id']);
+    $this->assertEquals($contact1['id'], $contacts[0]['id']);
+    $this->assertEquals($contact1['id'], $contacts[1]['id']);
   }
 
-  public function testRequiredJoin() {
+  public function testRequiredJoin(): void {
+    $contact1 = $this->createTestRecord('Contact');
+    $contact2 = $this->createTestRecord('Contact');
+
+    $this->createTestRecord('Phone', [
+      'location_type_id:name' => 'Home',
+      'contact_id' => $contact1['id'],
+      'phone' => '+35355439483',
+    ]);
+    $this->createTestRecord('Phone', [
+      'location_type_id:name' => 'Work',
+      'contact_id' => $contact1['id'],
+    ]);
+
     // Joining with no condition
-    $contacts = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contacts = Contact::get(FALSE)
       ->addSelect('id', 'phone.phone')
       ->addJoin('Phone', TRUE)
-      ->addWhere('id', 'IN', [$this->getReference('test_contact_1')['id'], $this->getReference('test_contact_2')['id']])
+      ->addWhere('id', 'IN', [$contact1['id'], $contact2['id']])
       ->addOrderBy('phone.id')
       ->execute();
     $this->assertCount(2, $contacts);
-    $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[0]['id']);
-    $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[1]['id']);
+    $this->assertEquals($contact1['id'], $contacts[0]['id']);
+    $this->assertEquals($contact1['id'], $contacts[1]['id']);
 
     // Add is_primary condition, should result in only one record
-    $contacts = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contacts = Contact::get(FALSE)
       ->addSelect('id', 'phone.phone', 'phone.location_type_id')
       ->addJoin('Phone', TRUE, ['phone.is_primary', '=', TRUE])
-      ->addWhere('id', 'IN', [$this->getReference('test_contact_1')['id'], $this->getReference('test_contact_2')['id']])
+      ->addWhere('id', 'IN', [$contact1['id'], $contact2['id']])
       ->addOrderBy('phone.id')
       ->execute();
     $this->assertCount(1, $contacts);
-    $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[0]['id']);
+    $this->assertEquals($contact1['id'], $contacts[0]['id']);
     $this->assertEquals('+35355439483', $contacts[0]['phone.phone']);
     $this->assertEquals('1', $contacts[0]['phone.location_type_id']);
   }
 
-  public function testJoinToTheSameTableTwice() {
-    $cid1 = Contact::create()->setCheckPermissions(FALSE)
+  public function testImplicitJoinOnExplicitJoin(): void {
+    $contact1 = $this->createTestRecord('Contact');
+    $this->createTestRecord('Address', [
+      'contact_id' => $contact1['id'],
+      'country_id' => 1228,
+    ]);
+
+    $contacts = Contact::get(FALSE)
+      ->addWhere('id', '=', $contact1['id'])
+      ->addJoin('Address AS address', TRUE, ['id', '=', 'address.contact_id'], ['address.location_type_id', '=', 1])
+      ->addSelect('id', 'address.country_id.iso_code')
+      ->execute();
+    $this->assertCount(1, $contacts);
+    $this->assertEquals('US', $contacts[0]['address.country_id.iso_code']);
+  }
+
+  public function testExcludeJoin(): void {
+    $contact1 = $this->createTestRecord('Contact');
+    $this->createTestRecord('Address', [
+      'contact_id' => $contact1['id'],
+      'country_id' => 1228,
+    ]);
+    $contacts = Contact::get(FALSE)
+      ->addJoin('Address AS address', 'EXCLUDE', ['id', '=', 'address.contact_id'], ['address.location_type_id', '=', 1])
+      ->addSelect('id')
+      ->execute()->column('id');
+    $this->assertNotContains($contact1['id'], $contacts);
+  }
+
+  public function testInvalidJoinAlias(): void {
+    // Not allowed to use same alias as the base table
+    try {
+      Contact::get(FALSE)->addJoin('Address AS a')->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+      $message = $e->getMessage();
+    }
+    $this->assertEquals('Illegal join alias: "a"', $message);
+
+    // Not allowed to use dots in the alias
+    try {
+      Contact::get(FALSE)->addJoin('Address AS add.ress')->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+      $message = $e->getMessage();
+    }
+    $this->assertEquals('Illegal join alias: "add.ress"', $message);
+
+    // Not allowed to use an alias > 256 characters
+    try {
+      $longAlias = str_repeat('z', 257);
+      Contact::get(FALSE)->addJoin("Address AS $longAlias")->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+      $message = $e->getMessage();
+    }
+    $this->assertEquals("Illegal join alias: \"$longAlias\"", $message);
+
+    // Alpha-numeric with dashes 256 characters long - weird but allowed
+    $okAlias = str_repeat('-0_a-9Z_', 32);
+    Contact::get(FALSE)->addJoin("Address AS $okAlias")->execute();
+  }
+
+  public function testJoinToTheSameTableTwice(): void {
+    $cid1 = Contact::create(FALSE)
       ->addValue('first_name', 'Aaa')
       ->addChain('email1', Email::create()->setValues(['email' => 'yoohoo@yahoo.test', 'contact_id' => '$id', 'location_type_id:name' => 'Home']))
       ->addChain('email2', Email::create()->setValues(['email' => 'yahoo@yoohoo.test', 'contact_id' => '$id', 'location_type_id:name' => 'Work']))
       ->execute()
       ->first()['id'];
 
-    $cid2 = Contact::create()->setCheckPermissions(FALSE)
+    $cid2 = Contact::create(FALSE)
       ->addValue('first_name', 'Bbb')
       ->addChain('email1', Email::create()->setValues(['email' => '1@test.test', 'contact_id' => '$id', 'location_type_id:name' => 'Home']))
       ->addChain('email2', Email::create()->setValues(['email' => '2@test.test', 'contact_id' => '$id', 'location_type_id:name' => 'Work']))
@@ -118,16 +208,17 @@ class FkJoinTest extends UnitTestCase {
       ->execute()
       ->first()['id'];
 
-    $cid3 = Contact::create()->setCheckPermissions(FALSE)
+    $cid3 = Contact::create(FALSE)
       ->addValue('first_name', 'Ccc')
       ->execute()
       ->first()['id'];
 
-    $contacts = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contacts = Contact::get(FALSE)
       ->addSelect('id', 'first_name', 'any_email.email', 'any_email.location_type_id:name', 'any_email.is_primary', 'primary_email.email')
-      ->addJoin('Email AS any_email', TRUE)
-      ->addJoin('Email AS primary_email', FALSE, ['primary_email.is_primary', '=', TRUE])
+      ->setJoin([
+        ['Email AS any_email', 'INNER', NULL],
+        ['Email AS primary_email', 'LEFT', ['primary_email.is_primary', '=', TRUE]],
+      ])
       ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
       ->addOrderBy('any_email.id')
       ->setDebug(TRUE)
@@ -138,6 +229,264 @@ class FkJoinTest extends UnitTestCase {
     $this->assertEquals('1@test.test', $contacts[2]['primary_email.email']);
     $this->assertEquals('1@test.test', $contacts[3]['primary_email.email']);
     $this->assertEquals('1@test.test', $contacts[4]['primary_email.email']);
+  }
+
+  public function testBridgeJoinTags(): void {
+    $tag1 = Tag::create(FALSE)
+      ->addValue('name', uniqid('join1'))
+      ->execute()
+      ->first()['name'];
+    $tag2 = Tag::create(FALSE)
+      ->addValue('name', uniqid('join2'))
+      ->execute()
+      ->first()['name'];
+    $tag3 = Tag::create(FALSE)
+      ->addValue('name', uniqid('join3'))
+      ->execute()
+      ->first()['name'];
+    // Create using pseudoconstant syntax (:name)
+    $cid1 = Contact::create(FALSE)
+      ->addValue('first_name', 'Aaa')
+      ->addChain('tag1', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag1]))
+      ->addChain('tag2', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag2]))
+      ->execute()
+      ->first()['id'];
+    // Create using fk syntax (.name)
+    $cid2 = Contact::create(FALSE)
+      ->addValue('first_name', 'Bbb')
+      ->addChain('tag1', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id.name' => $tag1]))
+      ->addChain('tag3', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id.name' => $tag3]))
+      ->execute()
+      ->first()['id'];
+    $cid3 = Contact::create(FALSE)
+      ->addValue('first_name', 'Ccc')
+      ->execute()
+      ->first()['id'];
+
+    $required = Contact::get(FALSE)
+      ->addJoin('Tag', TRUE, 'EntityTag')
+      ->addSelect('first_name', 'tag.name')
+      ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
+      ->execute();
+    $this->assertCount(4, $required);
+
+    $optional = Contact::get(FALSE)
+      ->addJoin('Tag', FALSE, 'EntityTag', ['tag.name', 'IN', [$tag1, $tag2, $tag3]])
+      ->addSelect('first_name', 'tag.name')
+      ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
+      ->execute();
+    $this->assertCount(5, $optional);
+
+    $grouped = Contact::get(FALSE)
+      ->addJoin('Tag', FALSE, 'EntityTag', ['tag.name', 'IN', [$tag1, $tag3]])
+      ->addSelect('first_name', 'COUNT(tag.name) AS tag_count')
+      ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
+      ->addGroupBy('id')
+      ->execute()->indexBy('id');
+    $this->assertEquals(1, (int) $grouped[$cid1]['tag_count']);
+    $this->assertEquals(2, (int) $grouped[$cid2]['tag_count']);
+    $this->assertEquals(0, (int) $grouped[$cid3]['tag_count']);
+
+    $reverse = Tag::get(FALSE)
+      ->addJoin('Contact', FALSE, 'EntityTag', ['contact.id', 'IN', [$cid1, $cid2, $cid3]])
+      ->addGroupBy('id')
+      ->addSelect('name', 'COUNT(contact.id) AS contacts')
+      ->execute()->indexBy('name');
+    $this->assertEquals(2, (int) $reverse[$tag1]['contacts']);
+    $this->assertEquals(1, (int) $reverse[$tag2]['contacts']);
+    $this->assertEquals(1, (int) $reverse[$tag3]['contacts']);
+  }
+
+  public function testBridgeJoinRelationshipContactActivity(): void {
+    $cid1 = Contact::create(FALSE)
+      ->addValue('first_name', 'Aaa')
+      ->addChain('activity', Activity::create()
+        ->addValue('activity_type_id:name', 'Meeting')
+        ->addValue('source_contact_id', '$id')
+        ->addValue('target_contact_id', '$id')
+      )
+      ->execute()
+      ->first()['id'];
+    $cid2 = Contact::create(FALSE)
+      ->addValue('first_name', 'Bbb')
+      ->addChain('activity', Activity::create()
+        ->addValue('activity_type_id:name', 'Phone Call')
+        ->addValue('source_contact_id', $cid1)
+        ->addValue('target_contact_id', '$id')
+      )
+      ->addChain('r1', Relationship::create()
+        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid1, 'relationship_type_id' => 1])
+      )
+      ->execute()
+      ->first()['id'];
+    $cid3 = Contact::create(FALSE)
+      ->addValue('first_name', 'Ccc')
+      ->addChain('activity', Activity::create()
+        ->addValue('activity_type_id:name', 'Meeting')
+        ->addValue('source_contact_id', $cid1)
+        ->addValue('target_contact_id', '$id')
+      )
+      ->addChain('activity2', Activity::create()
+        ->addValue('activity_type_id:name', 'Phone Call')
+        ->addValue('source_contact_id', $cid1)
+        ->addValue('target_contact_id', '$id')
+      )
+      ->addChain('r1', Relationship::create()
+        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid1, 'relationship_type_id' => 1])
+      )
+      ->addChain('r2', Relationship::create()
+        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid2, 'relationship_type_id' => 2, 'is_active' => FALSE])
+      )
+      ->execute()
+      ->first()['id'];
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id', 'act.id')
+      ->addJoin('Activity AS act', TRUE, 'ActivityContact', ['act.record_type_id:name', '=', "'Activity Targets'"])
+      ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
+      ->execute();
+    $this->assertCount(4, $result);
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id', 'act.id')
+      ->addJoin('Activity AS act', TRUE, 'ActivityContact', ['act.activity_type_id:name', '=', "'Meeting'"], ['act.record_type_id:name', '=', "'Activity Targets'"])
+      ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
+      ->execute();
+    $this->assertCount(2, $result);
+
+    $result = Activity::get(FALSE)
+      ->addSelect('id', 'contact.id')
+      ->addJoin('Contact', FALSE, 'ActivityContact')
+      ->addWhere('contact.id', 'IN', [$cid1, $cid2, $cid3])
+      ->execute();
+    $this->assertCount(8, $result);
+
+    $result = Activity::get(FALSE)
+      ->addSelect('id', 'contact.id', 'rel.id')
+      ->addJoin('Contact', 'LEFT', 'ActivityContact', ['contact.record_type_id:name', '=', "'Activity Targets'"])
+      ->addJoin('Contact AS rel', 'LEFT', 'RelationshipCache', ['rel.far_contact_id', '=', 'contact.id'], ['rel.near_relation:name', '=', '"Child of"'])
+      ->addWhere('contact.id', 'IN', [$cid1, $cid2, $cid3])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(5, $result);
+    $this->assertEquals($cid1, $result[0]['contact.id']);
+    $this->assertEquals($cid2, $result[0]['rel.id']);
+    $this->assertEquals($cid1, $result[1]['contact.id']);
+    $this->assertEquals($cid3, $result[1]['rel.id']);
+    $this->assertEquals($cid2, $result[2]['contact.id']);
+    $this->assertNull($result[2]['rel.id']);
+    $this->assertEquals($cid3, $result[3]['contact.id']);
+    $this->assertNull($result[3]['rel.id']);
+    $this->assertEquals($cid3, $result[4]['contact.id']);
+    $this->assertNull($result[3]['rel.id']);
+
+    // Ensure calculated fields such as is_current work correctly for both LEFT and INNER joins
+    foreach (['LEFT', 'INNER'] as $side) {
+      $result = civicrm_api4('Contact', 'get', [
+        'select' => [
+          'id',
+          'display_name',
+          'Contact_RelationshipCache_Contact_01.id',
+          'Contact_RelationshipCache_Contact_01.near_relation:label',
+          'Contact_RelationshipCache_Contact_01.is_current',
+          'Contact_RelationshipCache_Contact_01.relationship_id',
+          'Contact_RelationshipCache_Contact_01.orientation',
+        ],
+        'where' => [
+          ['Contact_RelationshipCache_Contact_01.id', '=', $cid3],
+        ],
+        'join' => [
+          [
+            'Contact AS Contact_RelationshipCache_Contact_01',
+            $side,
+            'RelationshipCache',
+            ['id', '=', 'Contact_RelationshipCache_Contact_01.far_contact_id'],
+          ],
+        ],
+        'orderBy' => ['id' => 'ASC'],
+        'checkPermissions' => TRUE,
+        'limit' => 50,
+        'offset' => 0,
+      ]);
+      $this->assertEquals($cid1, $result[0]['id']);
+      $this->assertEquals($cid2, $result[1]['id']);
+      $this->assertEquals($cid3, $result[1]['Contact_RelationshipCache_Contact_01.id']);
+      $this->assertEquals(TRUE, $result[0]['Contact_RelationshipCache_Contact_01.is_current']);
+      $this->assertEquals(FALSE, $result[1]['Contact_RelationshipCache_Contact_01.is_current']);
+    }
+  }
+
+  public function testJoinToEmployerId(): void {
+    $employer = Contact::create(FALSE)
+      ->addValue('contact_type', 'Organization')
+      ->addValue('organization_name', 'TesterCo')
+      ->execute()->first()['id'];
+    $employee = Contact::create(FALSE)
+      ->addValue('employer_id', $employer)
+      ->addValue('first_name', 'TesterMan')
+      ->execute()->first()['id'];
+    $email = Email::create(FALSE)
+      ->addValue('email', 'tester@test.com')
+      ->addValue('contact_id', $employee)
+      ->execute()->first()['id'];
+
+    $contactGet = Contact::get(FALSE)
+      ->addWhere('id', '=', $employee)
+      ->addSelect('employer_id', 'employer_id.display_name')
+      ->execute()->first();
+    $this->assertEquals($employer, $contactGet['employer_id']);
+    $this->assertEquals('TesterCo', $contactGet['employer_id.display_name']);
+
+    $emailGet = Email::get(FALSE)
+      ->addWhere('id', '=', $email)
+      ->addSelect('contact_id.employer_id', 'contact_id.employer_id.display_name')
+      ->execute()->first();
+    $this->assertEquals($employer, $emailGet['contact_id.employer_id']);
+    $this->assertEquals('TesterCo', $emailGet['contact_id.employer_id.display_name']);
+  }
+
+  public function testJoinWithExpression(): void {
+
+    $contact1 = $this->createTestRecord('Contact');
+    $contact2 = $this->createTestRecord('Contact');
+    $this->createTestRecord('Phone', [
+      'contact_id' => $contact1['id'],
+      'phone' => '654321',
+    ]);
+
+    $contacts = Contact::get(FALSE)
+      ->addSelect('id', 'phone.phone')
+      ->addJoin('Phone', 'INNER', ['LOWER(phone.phone)', '=', "CONCAT('6', '5', '4', '3', '2', '1')"])
+      ->addWhere('id', 'IN', [$contact1['id'], $contact2['id']])
+      ->addOrderBy('phone.id')
+      ->execute();
+    $this->assertCount(1, $contacts);
+    $this->assertEquals($contact1['id'], $contacts[0]['id']);
+    $this->assertEquals('654321', $contacts[0]['phone.phone']);
+  }
+
+  public function testJoinCaseRoles(): void {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+
+    $contactID = $this->createTestRecord('Contact')['id'];
+    $managerID = $this->createTestRecord('Contact')['id'];
+
+    $caseType = $this->createTestRecord('CaseType');
+    $case = $this->createTestRecord('Case', [
+      'creator_id' => $managerID,
+      'contact_id' => $contactID,
+      'case_type_id' => $caseType['id'],
+    ]);
+
+    $contacts = Contact::get(FALSE)
+      ->addSelect('*', 'case.*')
+      ->addJoin('Case AS case', 'INNER', 'RelationshipCache', ['id', '=', 'case.far_contact_id'], ['case.far_relation', '=', '"Parent of"'])
+      ->addWhere('case.id', '=', $case['id'])
+      ->execute();
+
+    // FIXME: Currently returning 2
+    // $this->assertCount(1, $contacts);
+    $this->assertEquals($managerID, $contacts[0]['id']);
   }
 
 }

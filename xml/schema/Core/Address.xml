@@ -13,9 +13,17 @@
     <uniqueName>address_id</uniqueName>
     <type>int unsigned</type>
     <export>true</export>
+    <usage>
+      <import>false</import>
+      <export>true</export>
+      <duplicate_matching>false</duplicate_matching>
+    </usage>
     <title>Address ID</title>
     <required>true</required>
     <comment>Unique Address ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -27,6 +35,9 @@
     <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>
@@ -58,9 +69,10 @@
   </index>
   <field>
     <name>is_primary</name>
-    <title>Primary address</title>
+    <title>Is Primary</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this the primary address.</comment>
     <add>2.0</add>
     <html>
@@ -77,6 +89,7 @@
     <title>Is Billing Address</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this the billing address.</comment>
     <add>2.0</add>
     <html>
@@ -253,16 +266,20 @@
   <field>
     <name>county_id</name>
     <type>int unsigned</type>
-    <title>County</title>
+    <title>County ID</title>
     <comment>Which County does this address belong to.</comment>
     <pseudoconstant>
       <table>civicrm_county</table>
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
+      <abbrColumn>abbreviation</abbrColumn>
+      <!-- No 'name' suffix tells SearchKit to use Autocomplete. See #25053 -->
+      <suffixes>label,abbr</suffixes>
     </pseudoconstant>
     <html>
       <type>ChainSelect</type>
       <controlField>state_province_id</controlField>
+      <label>County</label>
     </html>
     <add>1.1</add>
   </field>
@@ -278,18 +295,22 @@
   </foreignKey>
   <field>
     <name>state_province_id</name>
-    <title>State/Province</title>
+    <title>State/Province ID</title>
     <type>int unsigned</type>
     <comment>Which State_Province does this address belong to.</comment>
     <pseudoconstant>
       <table>civicrm_state_province</table>
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
+      <abbrColumn>abbreviation</abbrColumn>
+      <!-- No 'name' suffix tells SearchKit to use Autocomplete. See #25053 -->
+      <suffixes>label,abbr</suffixes>
     </pseudoconstant>
     <localize_context>province</localize_context>
     <html>
       <type>ChainSelect</type>
       <controlField>country_id</controlField>
+      <label>State/Province</label>
     </html>
     <add>1.1</add>
   </field>
@@ -340,12 +361,13 @@
     <title>USPS Code</title>
     <type>varchar</type>
     <length>32</length>
+    <deprecated>true</deprecated>
     <comment>USPS Bulk mailing code.</comment>
     <add>1.1</add>
   </field>
   <field>
     <name>country_id</name>
-    <title>Country</title>
+    <title>Country ID</title>
     <type>int unsigned</type>
     <comment>Which Country does this address belong to.</comment>
     <pseudoconstant>
@@ -354,10 +376,13 @@
       <labelColumn>name</labelColumn>
       <nameColumn>iso_code</nameColumn>
       <abbrColumn>iso_code</abbrColumn>
+      <!-- No 'name' suffix tells SearchKit to use Autocomplete. See #25053 -->
+      <suffixes>label,abbr</suffixes>
     </pseudoconstant>
     <localize_context>country</localize_context>
     <html>
       <type>Select</type>
+      <label>Country</label>
     </html>
     <add>1.1</add>
   </field>
@@ -407,6 +432,7 @@
     <title>Is Manually Geocoded</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <comment>Is this a manually entered geo code</comment>
     <add>4.3</add>
     <html>
@@ -441,10 +467,13 @@
   </field>
   <field>
     <name>master_id</name>
-    <title>Master Address Belongs To</title>
+    <title>Master Address ID</title>
     <type>int unsigned</type>
     <import>true</import>
     <comment>FK to Address ID</comment>
+    <html>
+      <label>Master Address Belongs To</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>

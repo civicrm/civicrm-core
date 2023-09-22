@@ -10,7 +10,7 @@
 
 {if !$hasPetitions}
     <div class="messages status no-popup">
-        <div class="icon inform-icon"></div> &nbsp;
+        {icon icon="fa-info-circle"}{/icon}
         {ts}None found.{/ts}
     </div>
 
@@ -136,7 +136,7 @@ function searchPetitions( qfKey )
 
 function loadPetitionList( )
 {
-     var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_Campaign_Page_AJAX&fnName=petitionList' }"{literal};
+     var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_Campaign_Page_AJAX&fnName=petitionList'}"{literal};
 
      //build the search qill.
      //get the search criteria.

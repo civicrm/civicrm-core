@@ -16,7 +16,22 @@
 class api_v3_ContactTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
 
-  public function setUp() {
+  /**
+   * @var string
+   */
+  protected $subTypeIndividual;
+
+  /**
+   * @var string
+   */
+  protected $subTypeOrganization;
+
+  /**
+   * @var string
+   */
+  protected $subTypeHousehold;
+
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
     $params = [
@@ -26,7 +41,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->subTypeIndividual = $params['name'];
 
     $params = [
@@ -36,7 +51,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'parent_id' => 3,
       'is_active' => 1,
     ];
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->subTypeOrganization = $params['name'];
 
     $params = [
@@ -46,7 +61,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'parent_id' => 2,
       'is_active' => 1,
     ];
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->subTypeHousehold = $params['name'];
   }
 
@@ -111,7 +126,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'contact_sub_type' => $this->subTypeHousehold,
     ];
-    $contact = $this->callAPIFailure('contact', 'create', $contactParams);
+    $this->callAPIFailure('contact', 'create', $contactParams);
 
     // check for Type:Organization Subtype:sub_individual
     $contactParams = [
@@ -119,7 +134,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'contact_type' => 'Organization',
       'contact_sub_type' => $this->subTypeIndividual,
     ];
-    $contact = $this->callAPIFailure('contact', 'create', $contactParams);
+    $this->callAPIFailure('contact', 'create', $contactParams);
   }
 
   /**
@@ -214,7 +229,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'contact_sub_type' => $this->subTypeHousehold,
     ];
-    $updateContact = $this->callAPIFailure('contact', 'create', $updateParams);
+    $this->callAPIFailure('contact', 'create', $updateParams);
     $params = [
       'contact_id' => $contact['id'],
     ];
@@ -233,7 +248,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'contact_type' => 'Organization',
       'contact_sub_type' => $this->subTypeIndividual,
     ];
-    $updateContact = $this->callAPIFailure('contact', 'create', $updateParams);
+    $this->callAPIFailure('contact', 'create', $updateParams);
     $params = [
       'contact_id' => $contact['id'],
     ];
@@ -256,7 +271,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    $getSubtype = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $subtype = $params['name'];
 
     // check for Type:Individual subype:sub_individual
@@ -299,7 +314,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'parent_id' => 3,
       'is_active' => 1,
     ];
-    $getSubtype = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $subtype = $params['name'];
 
     // check for Type:Organization subype:sub_organization
@@ -357,7 +372,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'contact_sub_type' => $this->subTypeHousehold,
     ];
-    $updateContact = $this->callAPIFailure('contact', 'create', $updateParams);
+    $this->callAPIFailure('contact', 'create', $updateParams);
     $params = [
       'contact_id' => $contact['id'],
     ];
@@ -376,7 +391,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'contact_id' => $contact['id'],
       'contact_sub_type' => $this->subTypeIndividual,
     ];
-    $updateContact = $this->callAPIFailure('contact', 'create', $updateParams);
+    $this->callAPIFailure('contact', 'create', $updateParams);
     $params = [
       'contact_id' => $contact['id'],
     ];

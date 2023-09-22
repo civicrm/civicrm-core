@@ -1,0 +1,6 @@
+<div af-repeat-item="item" repeat-index="$index" ng-repeat="item in getItems()">
+  <ng-transclude></ng-transclude>
+  <button crm-icon="fa-ban" class="btn btn-xs af-repeat-remove-btn" ng-if="canRemove()" ng-click="removeItem($index)"></button>
+</div>
+<button crm-icon="{{ addIcon || 'fa-plus' }}" class="btn btn-sm af-repeat-add-btn" ng-if="canAdd()" ng-click="addItem()">{{ addLabel }}</button>
+<button crm-icon="{{ copyIcon || 'fa-copy' }}" class="btn btn-sm af-repeat-copy-btn" ng-if="canAdd()" ng-click="copyItem()">{{ copyLabel }}</button>

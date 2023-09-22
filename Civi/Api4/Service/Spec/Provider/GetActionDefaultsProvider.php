@@ -10,20 +10,15 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-class GetActionDefaultsProvider implements Generic\SpecProviderInterface {
+/**
+ * @service
+ * @internal
+ */
+class GetActionDefaultsProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc
@@ -32,18 +27,18 @@ class GetActionDefaultsProvider implements Generic\SpecProviderInterface {
     // Exclude deleted records from api Get by default
     $isDeletedField = $spec->getFieldByName('is_deleted');
     if ($isDeletedField) {
-      $isDeletedField->setDefaultValue('0');
+      $isDeletedField->setDefaultValue(FALSE);
     }
 
     // Exclude test records from api Get by default
     $isTestField = $spec->getFieldByName('is_test');
     if ($isTestField) {
-      $isTestField->setDefaultValue('0');
+      $isTestField->setDefaultValue(FALSE);
     }
 
     $isTemplateField = $spec->getFieldByName('is_template');
     if ($isTemplateField) {
-      $isTemplateField->setDefaultValue('0');
+      $isTemplateField->setDefaultValue(FALSE);
     }
   }
 

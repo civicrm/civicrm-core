@@ -9,7 +9,7 @@
 *}
 {* this template is used for displaying event information *}
 
-{if $registerClosed }
+{if $registerClosed}
 <div class="spacer"></div>
 <div class="messages status no-popup">
   <i class="crm-i fa-info-circle" aria-hidden="true"></i>
@@ -89,12 +89,12 @@
 
   {if $event.summary}
       <div class="crm-section event_summary-section">
-        {$event.summary}
+        {$event.summary|purify}
       </div>
   {/if}
   {if $event.description}
       <div class="crm-section event_description-section summary">
-          {$event.description}
+          {$event.description|purify}
       </div>
   {/if}
   <div class="clear"></div>
@@ -102,11 +102,17 @@
       <div class="label">{ts}When{/ts}</div>
       <div class="content">
         {strip}
-            {$event.event_start_date|crmDate}
+            {if $event.event_start_date && $event.event_end_date && ($event.event_end_date|crmDate:'%Y%m%d':0 == $event.event_start_date|crmDate:'%Y%m%d':0)}
+              {$event.event_start_date|crmDate:'Full':0}
+              &nbsp;{ts}from{/ts}&nbsp;
+              {$event.event_start_date|crmDate:0:1}
+            {else}
+              {$event.event_start_date|crmDate}
+            {/if}
             {if $event.event_end_date}
-                &nbsp;{ts}through{/ts}&nbsp;
+                &nbsp;{ts}to{/ts}&nbsp;
                 {* Only show end time if end date = start date *}
-                {if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}
+                {if $event.event_end_date|crmDate:"%Y%m%d":0 == $event.event_start_date|crmDate:"%Y%m%d":0}
                     {$event.event_end_date|crmDate:0:1}
                 {else}
                     {$event.event_end_date|crmDate}
@@ -127,9 +133,9 @@
             </div>
         {/if}
 
-      {if ( $event.is_map && $config->mapProvider &&
-          ( is_numeric($location.address.1.geo_code_1)  ||
-          ( $location.address.1.city AND $location.address.1.state_province ) ) ) }
+      {if ($event.is_map && $config->mapProvider &&
+          (is_numeric($location.address.1.geo_code_1) ||
+          ($location.address.1.city AND $location.address.1.state_province)))}
           <div class="crm-section event_map-section">
               <div class="content">
                     {assign var=showDirectly value="1"}
@@ -152,7 +158,7 @@
                     <div class="crm-eventinfo-contact-phone">
                       {* @todo This should use "{ts 1=$phone.phone_type_display 2=$phone}%1: %2{/ts}" because some language have nbsp before column *}
                       {if $phone.phone_type_id}{$phone.phone_type_display}:{else}{ts}Phone:{/ts}{/if}
-                      <span class="tel">{$phone.phone}{if $phone.phone_ext}&nbsp;{ts}ext.{/ts}&nbsp;{$phone.phone_ext}{/if}</span>
+                      <span class="tel">{$phone.phone}{if array_key_exists('phone_ext', $phone)}&nbsp;{ts}ext.{/ts}&nbsp;{$phone.phone_ext}{/if}</span>
                     </div>
                   {/if}
               {/foreach}
@@ -185,16 +191,16 @@
                         {* Skip price field label for quick_config price sets since it duplicates $event.fee_label *}
                       {else}
                       <tr>
-                          <td class="{$lClass} crm-event-label">{$feeBlock.label.$idx}</td>
-                          {if $isPriceSet & $feeBlock.isDisplayAmount.$idx}
-            <td class="fee_amount-value right">
-                              {if isset($feeBlock.tax_amount.$idx)}
-          {$feeBlock.value.$idx}
-                              {else}
-                {$feeBlock.value.$idx|crmMoney}
-                              {/if}
-            </td>
-                          {/if}
+                        <td class="{$lClass} crm-event-label">{$feeBlock.label.$idx}</td>
+                        {if $isPriceSet & $feeBlock.isDisplayAmount.$idx}
+                          <td class="fee_amount-value right">
+                            {if $feeBlock.tax_amount && $feeBlock.tax_amount.$idx}
+                              {$feeBlock.value.$idx}
+                            {else}
+                              {$feeBlock.value.$idx|crmMoney:$eventCurrency}
+                            {/if}
+                          </td>
+                        {/if}
                       </tr>
                       {/if}
                   {/foreach}
@@ -205,7 +211,7 @@
   {/if}
 
 
-    {include file="CRM/Custom/Page/CustomDataView.tpl"}
+    {include file="CRM/Custom/Page/CustomDataView.tpl" groupId = false}
 
     <div class="crm-actionlinks-bottom">
       {crmRegion name="event-page-eventinfo-actionlinks-bottom"}
@@ -216,15 +222,15 @@
         {/if}
       {/crmRegion}
     </div>
-    {if $event.is_public }
+    {if $event.is_public}
         <div class="action-link section iCal_links-section">
           {include file="CRM/Event/Page/iCalLinks.tpl"}
         </div>
     {/if}
 
-    {if $event.is_share }
+    {if $event.is_share}
         {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id=`$event.id`&amp;reset=1" a=1 fe=1 h=1}{/capture}
-        {include file="CRM/common/SocialNetwork.tpl" url=$eventUrl title=$event.title pageURL=$eventUrl}
+        {include file="CRM/common/SocialNetwork.tpl" url=$eventUrl title=$event.title pageURL=$eventUrl emailMode=true}
     {/if}
     </div>
 </div>

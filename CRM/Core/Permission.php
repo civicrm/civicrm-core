@@ -53,10 +53,19 @@ class CRM_Core_Permission {
   const AUTH_SRC_UNKNOWN = 0, AUTH_SRC_CHECKSUM = 1, AUTH_SRC_SITEKEY = 2, AUTH_SRC_LOGIN = 4;
 
   /**
-   * Get the current permission of this user.
+   * Get the maximum permission of the current user with respect to _any_ contact records.
    *
-   * @return string
-   *   the permission of the user (edit or view or null)
+   * Note: This appears to be hydrated via `CRM_Core_Permission*::group()`, which appears to run in
+   * many page-views, but I'm not certain that it's guaranteed.
+   *
+   * @return int|string|null
+   *   Highest permission held by the current user.
+   *   If the user has "edit" rights to at least 1 contact (via permission or ACL),
+   *     then CRM_Core_Permission::EDIT.
+   *   If the user has "view" rights to at least 1 contact (via permission or ACL),
+   *     then CRM_Core_Permission::VIEW.
+   *   Otherwise, NULL.
+   * @see \CRM_Core_Permission_Base::group()
    */
   public static function getPermission() {
     $config = CRM_Core_Config::singleton();
@@ -69,24 +78,24 @@ class CRM_Core_Permission {
    * Ex 1: Must have 'access CiviCRM'
    * (string) 'access CiviCRM'
    *
-   *  Ex 2: Must have 'access CiviCRM' and 'access Ajax API'
-   *    ['access CiviCRM', 'access Ajax API']
+   *  Ex 2: Must have 'access CiviCRM' and 'access AJAX API'
+   *    ['access CiviCRM', 'access AJAX API']
    *
-   * Ex 3: Must have 'access CiviCRM' or 'access Ajax API'
+   * Ex 3: Must have 'access CiviCRM' or 'access AJAX API'
    *   [
-   *     ['access CiviCRM', 'access Ajax API'],
+   *     ['access CiviCRM', 'access AJAX API'],
    *   ],
    *
-   * Ex 4: Must have 'access CiviCRM' or 'access Ajax API' AND 'access CiviEvent'
+   * Ex 4: Must have 'access CiviCRM' or 'access AJAX API' AND 'access CiviEvent'
    *   [
-   *     ['access CiviCRM', 'access Ajax API'],
+   *     ['access CiviCRM', 'access AJAX API'],
    *     'access CiviEvent',
    *   ],
    *
    * Note that in permissions.php this is keyed by the action eg.
    *   (access Civi || access AJAX) && (access CiviEvent || access CiviContribute)
    *   'myaction' => [
-   *     ['access CiviCRM', 'access Ajax API'],
+   *     ['access CiviCRM', 'access AJAX API'],
    *     ['access CiviEvent', 'access CiviContribute']
    *   ],
    *
@@ -119,9 +128,17 @@ class CRM_Core_Permission {
       }
       else {
         // This is an individual permission
-        $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permission, $userId);
-        // Call the permission_check hook to permit dynamic escalation (CRM-19256)
-        CRM_Utils_Hook::permission_check($permission, $granted, $contactId);
+        $impliedPermissions = self::getImpliedPermissionsFor($permission);
+        $impliedPermissions[] = $permission;
+        foreach ($impliedPermissions as $permissionOption) {
+          $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permissionOption, $userId);
+          // Call the permission_check hook to permit dynamic escalation (CRM-19256)
+          CRM_Utils_Hook::permission_check($permissionOption, $granted, $contactId);
+          if ($granted) {
+            break;
+          }
+        }
+
         if (
           !$granted
           && !($tempPerm && $tempPerm->check($permission))
@@ -200,25 +217,24 @@ class CRM_Core_Permission {
   }
 
   /**
+   * @param int $userId
    * @return bool
    */
-  public static function customGroupAdmin() {
-    $admin = FALSE;
-
+  public static function customGroupAdmin($userId = NULL) {
     // check if user has all powerful permission
     // or administer civicrm permission (CRM-1905)
-    if (self::check('access all custom data')) {
+    if (self::check('access all custom data', $userId)) {
       return TRUE;
     }
 
     if (
-      self::check('administer Multiple Organizations') &&
+      self::check('administer Multiple Organizations', $userId) &&
       self::isMultisiteEnabled()
     ) {
       return TRUE;
     }
 
-    if (self::check('administer CiviCRM')) {
+    if (self::check('administer CiviCRM data', $userId)) {
       return TRUE;
     }
 
@@ -226,28 +242,35 @@ class CRM_Core_Permission {
   }
 
   /**
-   * @param int $type
-   * @param bool $reset
+   * Returns the ids of all custom groups the user is permitted to perform action of "$type"
    *
-   * @return array
+   * @param int $type
+   *   Type of action e.g. CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT
+   * @param bool $reset
+   *   Flush cache
+   * @param int $userId
+   *
+   * @return int[]
    */
-  public static function customGroup($type = CRM_Core_Permission::VIEW, $reset = FALSE) {
+  public static function customGroup($type = CRM_Core_Permission::VIEW, $reset = FALSE, $userId = NULL) {
     $customGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id',
       ['fresh' => $reset]);
-    $defaultGroups = [];
 
-    // check if user has all powerful permission
-    // or administer civicrm permission (CRM-1905)
-    if (self::customGroupAdmin()) {
-      $defaultGroups = array_keys($customGroups);
+    // Administrators and users with 'access all custom data' can see all custom groups.
+    if (self::customGroupAdmin($userId)) {
+      return array_keys($customGroups);
     }
 
-    return CRM_ACL_API::group($type, NULL, 'civicrm_custom_group', $customGroups, $defaultGroups);
+    // By default, users without 'access all custom data' are permitted to see no groups.
+    $allowedGroups = [];
+
+    // Allow ACLs and hooks to grant permissions to certain groups.
+    return CRM_ACL_API::group($type, $userId, 'civicrm_custom_group', $customGroups, $allowedGroups);
   }
 
   /**
    * @param int $type
-   * @param null $prefix
+   * @param string|null $prefix
    * @param bool $reset
    *
    * @return string
@@ -327,7 +350,7 @@ class CRM_Core_Permission {
 
   /**
    * @param int $type
-   * @param null $prefix
+   * @param string $prefix
    * @param bool $returnUFGroupIds
    *
    * @return array|string
@@ -415,9 +438,7 @@ class CRM_Core_Permission {
    *   Access to specified $module is granted.
    */
   public static function access($module, $checkPermission = TRUE, $requireAllCasesPermOnCiviCase = FALSE) {
-    $config = CRM_Core_Config::singleton();
-
-    if (!in_array($module, $config->enableComponents)) {
+    if (!CRM_Core_Component::isEnabled($module)) {
       return FALSE;
     }
 
@@ -461,9 +482,7 @@ class CRM_Core_Permission {
         'CiviMember' => 'edit memberships',
         'CiviPledge' => 'edit pledges',
         'CiviContribute' => 'edit contributions',
-        'CiviGrant' => 'edit grants',
         'CiviMail' => 'access CiviMail',
-        'CiviAuction' => 'add auction items',
       ];
       $permissionName = $editPermissions[$module] ?? NULL;
     }
@@ -512,17 +531,9 @@ class CRM_Core_Permission {
     }
 
     // if component_id is present, ensure it is enabled
-    if (isset($item['component_id']) && $item['component_id']) {
-      if (!isset(Civi::$statics[__CLASS__]['componentNameId'])) {
-        Civi::$statics[__CLASS__]['componentNameId'] = array_flip(CRM_Core_Component::getComponentIDs());
-      }
-      $componentName = Civi::$statics[__CLASS__]['componentNameId'][$item['component_id']];
-
-      $config = CRM_Core_Config::singleton();
-      if (is_array($config->enableComponents) && in_array($componentName, $config->enableComponents)) {
-        // continue with process
-      }
-      else {
+    if (!empty($item['component_id'])) {
+      $componentName = CRM_Core_Component::getComponentName($item['component_id']);
+      if (!$componentName || !CRM_Core_Component::isEnabled($componentName)) {
         return FALSE;
       }
     }
@@ -536,7 +547,7 @@ class CRM_Core_Permission {
 
     // check whether the following Ajax requests submitted the right key
     // FIXME: this should be integrated into ACLs proper
-    if (CRM_Utils_Array::value('page_type', $item) == 3) {
+    if (($item['page_type'] ?? NULL) == 3) {
       if (!CRM_Core_Key::validate($_REQUEST['key'], $item['path'])) {
         return FALSE;
       }
@@ -577,54 +588,19 @@ class CRM_Core_Permission {
    *   whether to return descriptions
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  public static function assembleBasicPermissions($all = FALSE, $descriptions = FALSE) {
-    $config = CRM_Core_Config::singleton();
-    $prefix = ts('CiviCRM') . ': ';
-    $permissions = self::getCorePermissions($descriptions);
+  public static function assembleBasicPermissions($all = FALSE, $descriptions = FALSE): array {
+    $permissions = self::getCoreAndComponentPermissions($all);
 
-    if (self::isMultisiteEnabled()) {
-      $permissions['administer Multiple Organizations'] = [$prefix . ts('administer Multiple Organizations')];
-    }
-
+    // Add any permissions defined in hook_civicrm_permission implementations.
+    $module_permissions = CRM_Core_Config::singleton()->userPermissionClass->getAllModulePermissions(TRUE);
+    $permissions = array_merge($permissions, $module_permissions);
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
         $permissions[$name] = array_shift($attr);
       }
     }
-    if (!$all) {
-      $components = CRM_Core_Component::getEnabledComponents();
-    }
-    else {
-      $components = CRM_Core_Component::getComponents();
-    }
-
-    foreach ($components as $comp) {
-      $perm = $comp->getPermissions($all, $descriptions);
-      if ($perm) {
-        $info = $comp->getInfo();
-        foreach ($perm as $p => $attr) {
-
-          if (!is_array($attr)) {
-            $attr = [$attr];
-          }
-
-          $attr[0] = $info['translatedName'] . ': ' . $attr[0];
-
-          if ($descriptions) {
-            $permissions[$p] = $attr;
-          }
-          else {
-            $permissions[$p] = $attr[0];
-          }
-        }
-      }
-    }
-
-    // Add any permissions defined in hook_civicrm_permission implementations.
-    $module_permissions = $config->userPermissionClass->getAllModulePermissions($descriptions);
-    $permissions = array_merge($permissions, $module_permissions);
-    CRM_Financial_BAO_FinancialType::permissionedFinancialTypes($permissions, $descriptions);
     return $permissions;
   }
 
@@ -779,6 +755,14 @@ class CRM_Core_Permission {
       'administer reserved tags' => [
         $prefix . ts('administer reserved tags'),
       ],
+      'administer queues' => [
+        $prefix . ts('administer queues'),
+        ts('Initialize, browse, and cancel background processing queues'),
+        // At time of writing, we have specifically omitted the ability to edit fine-grained
+        // data about specific queue-tasks. Tasks are usually defined as PHP callables...
+        // and one should hesitate before allowing open-ended edits of PHP callables.
+        // However, it seems fine for web-admins to browse and cancel these things.
+      ],
       'administer dedupe rules' => [
         $prefix . ts('administer dedupe rules'),
         ts('Create and edit rules, change the supervised and unsupervised rules'),
@@ -798,7 +782,7 @@ class CRM_Core_Permission {
 
       'view all notes' => [
         $prefix . ts('view all notes'),
-        ts("View notes (for visible contacts) even if they're marked admin only"),
+        ts("View notes (for visible contacts) even if they're marked author only"),
       ],
       'add contact notes' => [
         $prefix . ts('add contact notes'),
@@ -868,6 +852,10 @@ class CRM_Core_Permission {
         $prefix . ts('administer payment processors'),
         ts('Add, Update, or Disable Payment Processors'),
       ],
+      'render templates' => [
+        $prefix . ts('render templates'),
+        ts('Render open-ended template content. (Additional constraints may apply to autoloaded records and specific notations.)'),
+      ],
       'edit message templates' => [
         $prefix . ts('edit message templates'),
       ],
@@ -893,9 +881,68 @@ class CRM_Core_Permission {
         $prefix . ts('send SMS'),
         ts('Send an SMS'),
       ],
+      'administer CiviCRM system' => [
+        'label' => $prefix . ts('administer CiviCRM System'),
+        'description' => ts('Perform all system administration tasks in CiviCRM'),
+      ],
+      'administer CiviCRM data' => [
+        'label' => $prefix . ts('administer CiviCRM Data'),
+        'description' => ts('Permit altering all restricted data options'),
+      ],
+      'all CiviCRM permissions and ACLs' => [
+        'label' => $prefix . ts('all CiviCRM permissions and ACLs'),
+        'description' => ts('Administer and use CiviCRM bypassing any other permission or ACL checks and enabling the creation of displays and forms that allow others to bypass checks. This permission should be given out with care'),
+      ],
     ];
-
+    if (self::isMultisiteEnabled()) {
+      // This could arguably be moved to the multisite extension but
+      // within core it does permit editing group-organization records.
+      $permissions['administer Multiple Organizations'] = [
+        'label' => $prefix . ts('administer Multiple Organizations'),
+        'description' => ts('Administer multiple organizations. In practice this allows editing the group organization link'),
+      ];
+    }
     return $permissions;
+  }
+
+  /**
+   * Get permissions implied by 'superset' permissions.
+   *
+   * @return array
+   */
+  public static function getImpliedAdminPermissions(): array {
+    return [
+      'administer CiviCRM' => ['implied_permissions' => ['administer CiviCRM system', 'administer CiviCRM data']],
+      'administer CiviCRM data' => ['implied_permissions' => ['edit message templates', 'administer dedupe rules']],
+      'administer CiviCRM system' => ['implied_permissions' => ['edit system workflow message templates']],
+    ];
+  }
+
+  /**
+   * Get any super-permissions that imply the given permission.
+   *
+   * @param string $permission
+   *
+   * @return array
+   */
+  public static function getImpliedPermissionsFor(string $permission): array {
+    if (in_array($permission[0], ['@', '*'], TRUE)) {
+      // Special permissions like '*always deny*' - see DynamicFKAuthorizationTest.
+      // Also '@afform - see AfformUsageTest.
+      return [];
+    }
+    $implied = Civi::cache('metadata')->get('implied_permissions', []);
+    if (isset($implied[$permission])) {
+      return $implied[$permission];
+    }
+    $implied[$permission] = ['all CiviCRM permissions and ACLs'];
+    foreach (self::getImpliedAdminPermissions() as $key => $details) {
+      if (in_array($permission, $details['implied_permissions'] ?? [], TRUE)) {
+        $implied[$permission][] = $key;
+      }
+    }
+    Civi::cache('metadata')->set('implied_permissions', $implied);
+    return $implied[$permission];
   }
 
   /**
@@ -949,9 +996,6 @@ class CRM_Core_Permission {
       'get' => [],
       // managed by _civicrm_api3_check_edit_permissions
       'update' => [],
-      'getquick' => [
-        ['access CiviCRM', 'access AJAX API'],
-      ],
       'duplicatecheck' => [
         'access CiviCRM',
       ],
@@ -1010,6 +1054,11 @@ class CRM_Core_Permission {
         'edit all contacts',
       ],
     ];
+    // Readonly relationship_cache table
+    $permissions['relationship_cache'] = [
+      // get is managed by BAO::addSelectWhereClause
+      'get' => [],
+    ];
 
     // CRM-17741 - Permissions for RelationshipType.
     $permissions['relationship_type'] = [
@@ -1062,6 +1111,7 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['case_contact'] = $permissions['case'];
+    $permissions['case_activity'] = $permissions['case'];
 
     $permissions['case_type'] = [
       'default' => ['administer CiviCase'],
@@ -1102,6 +1152,14 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['line_item'] = $permissions['contribution'];
+    $permissions['product'] = $permissions['contribution'];
+
+    $permissions['financial_item'] = $permissions['contribution'];
+    $permissions['financial_type']['get'] = $permissions['contribution']['get'];
+    $permissions['entity_financial_account']['get'] = $permissions['contribution']['get'];
+    $permissions['financial_account']['get'] = $permissions['contribution']['get'];
+    $permissions['financial_trxn']['get'] = $permissions['contribution']['get'];
+    $permissions['contribution_soft'] = $permissions['contribution'];
 
     // Payment permissions
     $permissions['payment'] = [
@@ -1172,6 +1230,7 @@ class CRM_Core_Permission {
     $permissions['job'] = [
       'process_batch_merge' => ['merge duplicate contacts'],
     ];
+    $permissions['job_log'] = ['default' => 'administer CiviCRM system'];
     $permissions['rule_group']['get'] = [['merge duplicate contacts', 'administer CiviCRM']];
     // Loc block is only used for events
     $permissions['loc_block'] = $permissions['event'];
@@ -1183,7 +1242,7 @@ class CRM_Core_Permission {
     ];
 
     // Price sets are shared by several components, user needs access to at least one of them
-    $permissions['price_set'] = [
+    $permissions['price_set'] = $permissions['price_field'] = $permissions['price_field_value'] = $permissions['price_set_entity'] = [
       'default' => [
         ['access CiviEvent', 'access CiviContribute', 'access CiviMember'],
       ],
@@ -1200,6 +1259,7 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['files_by_entity'] = $permissions['file'];
+    $permissions['entity_file'] = $permissions['file'];
 
     // Group permissions
     $permissions['group'] = [
@@ -1215,7 +1275,9 @@ class CRM_Core_Permission {
     $permissions['group_nesting'] = $permissions['group'];
     $permissions['group_organization'] = $permissions['group'];
 
-    //Group Contact permission
+    // Note: The v3 GroupContact API is nonstandard and not easy to fix, so these permissions
+    // are unnecessarily strict for v3. The v4 API overrides them.
+    // @see Civi\Api4\GroupContact::permissions
     $permissions['group_contact'] = [
       'get' => [
         'access CiviCRM',
@@ -1441,6 +1503,28 @@ class CRM_Core_Permission {
       ],
     ];
 
+    // Dashboard permissions
+    $permissions['dashboard'] = [
+      'get' => [
+        'access CiviCRM',
+      ],
+    ];
+    $permissions['dashboard_contact'] = [
+      'default' => [
+        'access CiviCRM',
+      ],
+    ];
+    $permissions['mapping'] = [
+      'default' => [
+        'access CiviCRM',
+      ],
+    ];
+    $permissions['mapping_field'] = $permissions['mapping'];
+
+    $permissions['saved_search'] = [
+      'default' => ['administer CiviCRM data'],
+    ];
+
     // Profile permissions
     $permissions['profile'] = [
       // the profile will take care of this
@@ -1477,8 +1561,26 @@ class CRM_Core_Permission {
     $permissions['option_value'] = $permissions['uf_group'];
     $permissions['option_group'] = $permissions['option_value'];
 
+    // User Job permissions - we access these using acls on the get action.
+    // For create it probably makes sense (at least initially) to be stricter
+    // as the forms doing the work can set the permission check to FALSE.
+    $permissions['user_job'] = [
+      'get' => [
+        'access CiviCRM',
+      ],
+      'default' => [
+        'administer CiviCRM',
+      ],
+    ];
+
     $permissions['custom_value'] = [
       'gettree' => ['access CiviCRM'],
+    ];
+
+    $permissions['location_type'] = [
+      'get' => ['access CiviCRM'],
+      'update' => ['administer CiviCRM data'],
+      'delete' => ['administer CiviCRM data'],
     ];
 
     $permissions['message_template'] = [
@@ -1645,6 +1747,56 @@ class CRM_Core_Permission {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Get permissions for components.
+   *
+   * @param bool $includeDisabled
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected static function getComponentPermissions(bool $includeDisabled): array {
+    if (!$includeDisabled) {
+      $components = CRM_Core_Component::getEnabledComponents();
+    }
+    else {
+      $components = CRM_Core_Component::getComponents();
+    }
+
+    $permissions = [];
+    foreach ($components as $comp) {
+      $perm = $comp->getPermissions($includeDisabled, TRUE);
+      if ($perm) {
+        $info = $comp->getInfo();
+        foreach ($perm as $p => $attr) {
+
+          if (!is_array($attr)) {
+            $attr = [$attr];
+          }
+
+          $attr[0] = $info['translatedName'] . ': ' . $attr[0];
+          $permissions[$p] = $attr;
+        }
+      }
+    }
+    return $permissions;
+  }
+
+  /**
+   * Get permissions for core functionality and for that of core components.
+   *
+   * @param bool $all
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected static function getCoreAndComponentPermissions(bool $all): array {
+    $permissions = self::getCorePermissions();
+    $permissions = array_merge($permissions, self::getComponentPermissions($all));
+    $permissions['all CiviCRM permissions and ACLs']['implied_permissions'] = array_keys($permissions);
+    return $permissions;
   }
 
 }

@@ -26,7 +26,7 @@
   </tbody>
 </table>
 
-<div class="crm-submit-buttons">{if in_array($batchStatus, array('Open', 'Reopened'))}{$form.close_batch.html}{/if} {$form.export_batch.html}</div>
+<div class="crm-submit-buttons">{if array_key_exists('close_batch', $form)}{$form.close_batch.html}{/if} {if array_key_exists('close_batch', $form)}{$form.export_batch.html}{/if}</div>
 
 {if in_array($batchStatus, array('Open', 'Reopened'))} {* Add / remove transactions only allowed for Open/Reopened batches *}
   <br /><div class="form-layout-compressed">{$form.trans_remove.html}&nbsp;{$form.rSubmit.html}</div><br/>
@@ -75,17 +75,17 @@ CRM.$(function($) {
 });
 function assignRemove(recordID, op) {
   var recordBAO = 'CRM_Batch_BAO_Batch';
-  if (op == 'assign' || op == 'remove') {
-    recordBAO = 'CRM_Batch_BAO_EntityBatch';   
+  if (op === 'assign' || op === 'remove') {
+    recordBAO = 'CRM_Batch_BAO_EntityBatch';
   }
   var entityID = {/literal}"{$entityID}"{literal};
-  if (op == 'close' || op == 'export') {
+  if (op === 'close' || op === 'export') {
     var mismatch = checkMismatch();
   }
   else {
     CRM.$('#mark_x_' + recordID).closest('tr').block({message: {/literal}'{ts escape="js"}Updating{/ts}'{literal}});
   }
-  if (op == 'close' || (op == 'export' && mismatch.length)) {
+  if (op === 'close' || (op === 'export' && mismatch.length)) {
     CRM.$("#enableDisableStatusMsg").dialog({
       title: {/literal}'{ts escape="js"}Close Batch{/ts}'{literal},
       modal: true,
@@ -114,6 +114,23 @@ function assignRemove(recordID, op) {
   }
 }
 
+function removeFromBatch(financial_trxn_id) {
+  var entityID = "{/literal}{$entityID}{literal}";
+  if (financial_trxn_id && entityID) {
+    CRM.api4("EntityBatch", "delete", {where: [
+      ["entity_id", "=", financial_trxn_id],
+      ["entity_table", "=", "civicrm_financial_trxn"],
+      ["batch_id", "=", entityID]
+    ]}).then(function(batch) {
+      buildTransactionSelectorAssign(true);
+      buildTransactionSelectorRemove();
+      batchSummary(entityID);
+    }, function(failure) {
+      CRM.alert({/literal}'{ts escape="js"}Error removing from batch.{/ts}', '{ts escape="js"}Api Error{/ts}'{literal}, 'error');
+    });
+  }
+}
+
 function noServerResponse() {
   CRM.alert({/literal}'{ts escape="js"}No response from the server. Check your internet connection and try reloading the page.{/ts}', '{ts escape="js"}Network Error{/ts}'{literal}, 'error');
 }
@@ -125,7 +142,7 @@ function saveRecord(recordID, op, recordBAO, entityID) {
   }
   var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=assignRemove'}"{literal};
   //post request and get response
-  CRM.$.post( postUrl, { records: [recordID], recordBAO: recordBAO, op:op, entityID:entityID, key: {/literal}"{crmKey name='civicrm/ajax/ar'}"{literal}  }, function( html ){
+  CRM.$.post( postUrl, { records: [recordID], recordBAO: recordBAO, op:op, entityID:entityID }, function( html ){
     //this is custom status set when record update success.
     if (html.status == 'record-updated-success') {
        if (op == 'close') {
@@ -141,7 +158,7 @@ function saveRecord(recordID, op, recordBAO, entityID) {
       CRM.alert(html.status);
     }
   },
-  'json').error(noServerResponse);
+  'json').fail(noServerResponse);
 }
 
 function batchSummary(entityID) {

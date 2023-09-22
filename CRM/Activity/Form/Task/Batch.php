@@ -40,6 +40,11 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
   protected $_userContext;
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
@@ -63,11 +68,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     $readOnlyFields['assignee_display_name'] = ts('Assigned to');
     if (!empty($contactDetails)) {
       foreach ($contactDetails as $key => $value) {
-        $assignee = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($key);
-        $assigneeContact = [];
-        foreach ($assignee as $values) {
-          $assigneeContact[] = CRM_Contact_BAO_Contact::displayName($values);
-        }
+        $assigneeContact = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames([$key], TRUE);
         $contactDetails[$key]['assignee_display_name'] = !empty($assigneeContact) ? implode(';', $assigneeContact) : NULL;
       }
     }
@@ -85,7 +86,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
       throw new CRM_Core_Exception('The profile id is missing');
     }
     $this->_title = ts('Update multiple activities') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
-    CRM_Utils_System::setTitle($this->_title);
+    $this->setTitle($this->_title);
 
     $this->addDefaultButtons(ts('Save'));
     $this->_fields = [];

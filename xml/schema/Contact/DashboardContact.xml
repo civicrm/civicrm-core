@@ -11,6 +11,9 @@
     <type>int unsigned</type>
     <title>Dashboard Contact ID</title>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.1</add>
   </field>
   <primaryKey>
@@ -20,9 +23,12 @@
   <field>
     <name>dashboard_id</name>
     <type>int unsigned</type>
-    <title>Dashboard</title>
+    <title>Dashboard ID</title>
     <required>true</required>
     <comment>Dashboard ID</comment>
+    <html>
+      <label>Dashboard</label>
+    </html>
     <add>3.1</add>
   </field>
   <foreignKey>
@@ -35,9 +41,12 @@
   <field>
     <name>contact_id</name>
     <type>int unsigned</type>
-    <title>Dashboard Contact</title>
+    <title>Contact ID</title>
     <required>true</required>
     <comment>Contact ID</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>3.1</add>
   </field>
   <foreignKey>
@@ -59,6 +68,9 @@
     <type>int</type>
     <comment>column no for this widget</comment>
     <default>0</default>
+    <html>
+      <label>Column Number</label>
+    </html>
     <add>3.1</add>
   </field>
   <field>
@@ -67,6 +79,7 @@
     <title>Dashlet is Minimized?</title>
     <comment>Is Minimized?</comment>
     <default>0</default>
+    <required>true</required>
     <add>3.1</add>
     <drop>4.7</drop>
   </field>
@@ -76,6 +89,7 @@
     <title>Dashlet is FullScreen?</title>
     <comment>Is Fullscreen?</comment>
     <default>1</default>
+    <required>true</required>
     <add>3.1</add>
     <drop>4.7</drop>
   </field>
@@ -85,6 +99,10 @@
     <title>Dashlet is Active?</title>
     <comment>Is this widget active?</comment>
     <default>0</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <add>3.1</add>
   </field>
   <field>
@@ -99,6 +117,9 @@
     <name>content</name>
     <type>longtext</type>
     <comment>dashlet content</comment>
+    <html>
+      <label>Content</label>
+    </html>
     <add>3.3</add>
     <drop>4.7</drop>
   </field>

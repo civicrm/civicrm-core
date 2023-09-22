@@ -34,10 +34,9 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
       $classType . '_Form_DataSource' => NULL,
       $classType . '_Form_MapField' => NULL,
       $classType . '_Form_Preview' => NULL,
-      $classType . '_Form_Summary' => NULL,
     ];
 
-    $this->addSequentialPages($this->_pages, $action);
+    $this->addSequentialPages($this->_pages);
   }
 
 }

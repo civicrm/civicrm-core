@@ -56,7 +56,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
 
     // If the original action was 'display' and we have values in container then we load them
     // BTW, if the page was invalid, we should later call validate() to get the errors
-    list(, $oldName) = $page->controller->getActionName();
+    [, $oldName] = $page->controller->getActionName();
     if ('display' == $oldName) {
       // If the controller is "modal" we should not allow direct access to a page
       // unless all previous pages are valid (see also bug #2323)

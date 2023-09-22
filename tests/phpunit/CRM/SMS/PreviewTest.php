@@ -8,26 +8,33 @@
 class CRM_SMS_PreviewTest extends CiviUnitTestCase {
 
   /**
+   * Reference to option value in sms_provider_name group.
+   *
+   * @var int
+   */
+  private $optionValueID;
+
+  /**
    * Set Up Function
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $option = $this->callAPISuccess('option_value', 'create', ['option_group_id' => 'sms_provider_name', 'name' => 'test_provider_name', 'label' => 'Test Provider Label', 'value' => 1]);
-    $this->option_value = $option['id'];
+    $this->optionValueID = $option['id'];
   }
 
   /**
    * Clean up after each test.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
-    $this->callAPISuccess('option_value', 'delete', ['id' => $this->option_value]);
+    $this->callAPISuccess('option_value', 'delete', ['id' => $this->optionValueID]);
   }
 
   /**
    * Test SMS preview.
    */
-  public function testSMSPreview() {
+  public function testSMSPreview(): void {
     $result = $this->callAPISuccess('SmsProvider', 'create', [
       'title' => 'test SMS provider',
       'username' => 'test',
@@ -41,10 +48,10 @@ class CRM_SMS_PreviewTest extends CiviUnitTestCase {
     $provider_id = $result['id'];
     $result = $this->callAPISuccess('Mailing', 'create', [
       'name' => "Test1",
-      'from_name' => "+12223334444",
-      'from_email' => "test@test.com",
+      'from_name' => '+12223334444',
+      'from_email' => 'test@test.com',
       'replyto_email' => "test@test.com",
-      'body_text' => "Testing body",
+      'body_text' => 'Testing body',
       'sms_provider_id' => $provider_id,
       'header_id' => NULL,
       'footer_id' => NULL,

@@ -1,0 +1,114 @@
+<div af-api4-ctrl="apiData" af-api4="['Afform', 'get', {layoutFormat: 'html', where: [['name', '=', options.name]]}]">
+
+  <div ng-if="apiData.result.length == 0">
+    {{ts('Failed to find requested form.')}}
+  </div>
+
+  <div ng-repeat="resultForm in apiData.result" ng-if="apiData.result.length > 0" class="container-fluid">
+
+    <div class="row">
+
+      <div class="col-sm-12 col-md-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">{{ts('Properties')}}</div>
+          <div class="panel-body">
+
+            <div crm-ui-debug="resultForm"></div>
+
+            <div class="form-group">
+              <label class="control-label">{{ts('Name')}}</label>
+              <p class="form-control-static">{{resultForm.name}}</p>
+            </div>
+            <div class="form-group">
+              <label class="control-label">{{ts('Title')}}</label>
+              <input ng-model="resultForm.title" type="text" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="control-label">{{ts('Description')}}</label>
+              <textarea class="form-control" ng-model="resultForm.description"></textarea>
+              <p class="help-block">{{ts('Semi-private description about the form\'s purpose.')}}</p>
+              <!-- "Semi-private": not generally public, but not audited for secrecy -->
+            </div>
+            <div class="form-group">
+              <label class="control-label">{{ts('Path')}}</label>
+              <input ng-model="resultForm.server_route" type="text" class="form-control" />
+              <p class="help-block">{{ts('Expose the form as a standalone page on the web site. (Example: "civicrm/my-form")')}}</p>
+            </div>
+            <div class="form-group" ng-if="!!resultForm.server_route">
+              <label for="af_config_form_is_public">
+                <input type="checkbox" id="af_config_form_is_public" ng-model="resultForm.is_public">
+                {{ ts('Enable frontend styling') }}
+              </label>
+              <p class="help-block">{{ts('The general look/feel should match the frontend')}}</p>
+            </div>
+            <div class="form-group" ng-if="!!resultForm.server_route">
+              <label for="af_config_form_is_token">
+                <input type="checkbox" id="af_config_form_is_token" ng-model="resultForm.is_token">
+                {{ ts('Enable email token') }}
+              </label>
+              <p class="help-block">{{ts('Allow email authors to easily link to this form')}}</p>
+            </div>
+            <div class="form-group">
+              <label for="af_config_form_is_dashlet">
+                <input type="checkbox" id="af_config_form_is_dashlet" ng-model="resultForm.is_dashlet">
+                {{ ts('Enable dashlet') }}
+              </label>
+              <p class="help-block">{{ts('Allow backend users to embed the form on the dashboard.')}}</p>
+            </div>
+            <div class="form-group">
+              <label class="control-label">{{ts('Permission')}}</label>
+              <input ng-model="resultForm.permission" type="text" class="form-control" />
+              <p class="help-block">{{ts('What permission is required to use this form?')}}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">{{ts('Submit Actions')}}</div>
+          <div class="panel-body">
+            <ng-form name="submitActions">
+              <div class="form-group" ng-class="{'has-error': !!submitActions.redirect.$error.pattern}">
+                <label class="control-label" for="af_config_redirect">{{ ts('Post-Submit Page') }}</label>
+                <input ng-model="resultForm.redirect" name="redirect" class="form-control" id="af_result_from_redirect" title="{{ ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{ ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}"/>
+                <p class="help-block">{{ts('Enter a URL or path that the form should redirect to following a successful submission.') }}</p>
+              </div>
+            </ng-form>
+          </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+      </div>
+
+      <div class="col-sm-12 col-md-8">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <div class="btn-group btn-group-xs pull-right" role="group" aria-label="{{ts('Actions')}}">
+
+              <a class="btn btn-default" target="_blank" ng-href="{{crmUrl(resultForm.server_route)}}"  ng-if="resultForm.server_route">
+                <i class="crm-i fa-location-arrow"></i>
+                {{ts('Open')}}
+              </a>
+
+              <a class="btn btn-default"
+                 af-api4-action="['Afform', 'update', {layoutFormat: 'html', where: [['name', '=', resultForm.name]], values:resultForm}]">
+                <i class="crm-i fa-floppy-o"></i>
+                {{ts('Save')}}
+              </a>
+
+            </div>
+
+            {{ts('Markup')}}
+          </div>
+          <div class="panel-body">
+            <div crm-monaco ng-model="resultForm.layout"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

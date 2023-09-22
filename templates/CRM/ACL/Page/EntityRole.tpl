@@ -7,7 +7,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/ACL/Header.tpl" step=2}
+{if $action neq 8}
+  {include file="CRM/ACL/Header.tpl" step=2}
+{/if}
 
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/ACL/Form/EntityRole.tpl"}
@@ -35,7 +37,7 @@
             <td class="crm-acl_entity_role-acl_role">{$row.acl_role}</td>
             <td class="crm-acl_entity_role-entity">{$row.entity}</td>
             <td class="crm-acl_entity_role-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td>{$row.action|replace:'xx':$row.id}</td>
+            <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
           </tr>
         {/foreach}
         </tbody>

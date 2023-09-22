@@ -10,15 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
@@ -33,8 +24,7 @@ class BasicCreateAction extends AbstractCreateAction {
 
   /**
    * @var callable
-   *
-   * Function(array $item, BasicCreateAction $thisAction) => array
+   *   Function(array $item, BasicCreateAction $thisAction): array
    */
   private $setter;
 
@@ -44,7 +34,6 @@ class BasicCreateAction extends AbstractCreateAction {
    * @param string $entityName
    * @param string $actionName
    * @param callable $setter
-   *   Function(array $item, BasicCreateAction $thisAction) => array
    */
   public function __construct($entityName, $actionName, $setter = NULL) {
     parent::__construct($entityName, $actionName);

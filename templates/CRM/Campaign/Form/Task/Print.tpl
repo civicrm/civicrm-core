@@ -11,7 +11,7 @@
      <span class="element-right">{$form.buttons.html}</span>
 </div>
 
-{if $rows }
+{if $rows}
 <p></p>
 {include file="CRM/Campaign/Form/Selector.tpl"}
 
@@ -21,7 +21,7 @@
 
 {else}
    <div class="messages status no-popup">
-     <div class="icon inform-icon"/>
+     {icon icon="fa-info-circle"}{/icon}
         {ts}There are no records selected for Print.{/ts}
    </div>
 {/if}

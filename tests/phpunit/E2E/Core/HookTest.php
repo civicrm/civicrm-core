@@ -17,7 +17,7 @@ class HookTest extends \CiviEndToEndTestCase {
    *
    * This uses the canonical form, `CRM_Utils_Hook::invoke(string[] $names...)`
    */
-  public function testSymfonyListener_names() {
+  public function testSymfonyListener_names(): void {
     $calls = 0;
     $hookExample = function ($e) use (&$calls) {
       $calls++;
@@ -39,43 +39,15 @@ class HookTest extends \CiviEndToEndTestCase {
   }
 
   /**
-   * This test ensures that CRM_Utils_Hook::invoke() dispatches via Symfony.
-   *
-   * This should be *in*addition* to dispatching through the UF event system,
-   * although the mechanics depend on the UF, so that part has to be tested per-UF.
-   *
-   * This uses the deprecated form, `CRM_Utils_Hook::invoke(int $count...)`
-   */
-  public function testSymfonyListener_int() {
-    $calls = 0;
-    $hookExample = function ($e) use (&$calls) {
-      $calls++;
-      $e->arg1['foo'] = 'a.num';
-      $e->arg2->bar = 'b.num';
-    };
-    \Civi::dispatcher()->addListener('hook_civicrm_e2eHookExample', $hookExample);
-    try {
-      $a = [];
-      $b = new \stdClass();
-      $this->hookStub(2, $a, $b);
-      $this->assertEquals(1, $calls);
-      $this->assertEquals('a.num', $a['foo']);
-      $this->assertEquals('b.num', $b->bar);
-    }
-    finally {
-      \Civi::dispatcher()->removeListener('hook_civicrm_e2eHookExample', $hookExample);
-    }
-  }
-
-  /**
    * @param mixed $names
    * @param array $a
    * @param \stdClass $b
    * @return mixed
    */
   private function hookStub($names, &$a, $b) {
+    $null = NULL;
     return \CRM_Utils_Hook::singleton()
-      ->invoke($names, $a, $b, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject, \CRM_Utils_Hook::$_nullObject,
+      ->invoke($names, $a, $b, $null, $null, $null, $null,
         'civicrm_e2eHookExample');
   }
 

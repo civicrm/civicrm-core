@@ -120,6 +120,7 @@ class CRM_Core_Config_MagicMerge {
       // renamed.
       'debug' => ['setting', 'debug_enabled'],
       'defaultContactCountry' => ['setting'],
+      'pinnedContactCountries' => ['setting'],
       'defaultContactStateProvince' => ['setting'],
       'defaultCurrency' => ['setting'],
       'defaultSearchProfileID' => ['setting'],
@@ -158,7 +159,6 @@ class CRM_Core_Config_MagicMerge {
       'moneyformat' => ['setting'],
       'moneyvalueformat' => ['setting'],
       'provinceLimit' => ['setting'],
-      'recaptchaOptions' => ['setting'],
       'recaptchaPublicKey' => ['setting'],
       'recaptchaPrivateKey' => ['setting'],
       'forceRecaptcha' => ['setting'],
@@ -170,7 +170,6 @@ class CRM_Core_Config_MagicMerge {
       'userFrameworkUsersTableName' => ['setting'],
       'verpSeparator' => ['setting'],
       'wkhtmltopdfPath' => ['setting'],
-      'wpBasePage' => ['setting'],
       'wpLoadPhp' => ['setting'],
 
       // "path" properties are managed via Civi::paths and $civicrm_paths
@@ -201,9 +200,8 @@ class CRM_Core_Config_MagicMerge {
       'userFrameworkResourceURL' => ['setting-url'],
 
       // "callback" properties are generated on-demand by calling a function.
-      // @todo remove geocodeMethod. As of Feb 2018, $config->geocodeMethod works but gives a deprecation warning.
-      'geocodeMethod' => ['callback', 'CRM_Utils_Geocode', 'getProviderClass'],
       'defaultCurrencySymbol' => ['callback', 'CRM_Core_BAO_Country', 'getDefaultCurrencySymbol'],
+      'wpBasePage' => ['callback', 'CRM_Utils_System_WordPress', 'getBasePage'],
     ];
   }
 
@@ -404,7 +402,6 @@ class CRM_Core_Config_MagicMerge {
         'inCiviCRM' => FALSE,
         'doNotResetCache' => 0,
         'keyDisable' => FALSE,
-        'initialized' => FALSE,
         'userFrameworkFrontend' => FALSE,
         'userPermissionTemp' => NULL,
       ];

@@ -36,16 +36,16 @@
       }
 
       {/literal}
-      {if $groupID}
+      {if !empty($groupID)}
         dataUrl += '&groupID=' + '{$groupID}';
       {/if}
-      {if $entityID}
+      {if !empty($entityID)}
         dataUrl += '&entityID=' + '{$entityID}';
       {/if}
-      {if $qfKey}
+      {if !empty($qfKey)}
         dataUrl += '&qf=' + '{$qfKey}';
       {/if}
-      {if $action}
+      {if !empty($action)}
         dataUrl += '&action=' + '{$action}';
       {/if}
       {literal}

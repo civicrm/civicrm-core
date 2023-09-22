@@ -9,7 +9,6 @@
 *}
 {* Template for adding/editing a CiviCRM Navigation Menu Item *}
 <div class="crm-block crm-form-block crm-navigation-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
     <tr class="crm-navigation-form-block-label">
       <td class="label">{$form.label.label}</td><td>{$form.label.html}</td>
@@ -22,7 +21,7 @@
       <td class="label">{$form.icon.label} {help id="id-menu_icon" file="CRM/Admin/Form/Navigation.hlp"}</td>
       <td>{$form.icon.html} </td>
     </tr>
-    {if $form.parent_id.html}
+    {if !empty($form.parent_id.html)}
       <tr class="crm-navigation-form-block-parent_id">
         <td class="label">{$form.parent_id.label} {help id="id-parent" file="CRM/Admin/Form/Navigation.hlp"}</td>
         <td>{$form.parent_id.html}</td>

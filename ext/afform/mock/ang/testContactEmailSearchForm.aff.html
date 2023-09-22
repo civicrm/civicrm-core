@@ -1,0 +1,9 @@
+<div af-fieldset="">
+  <af-field name="source" />
+  <div class="af-container af-layout-inline">
+    <af-field name="Contact_Email_contact_id_01.email" />
+    <af-field name="YEAR_birth_date" defn="{search_range: true}" />
+    <af-field name="Contact_Email_contact_id_01.location_type_id" defn="{input_attrs: {multiple: true}}" />
+  </div>
+  <crm-search-display-table filters="{last_name: 'AfformTest', contact_type: dummy_var}" search-name="TestContactEmailSearch" display-name="TestContactEmailDisplay"></crm-search-display-table>
+</div>

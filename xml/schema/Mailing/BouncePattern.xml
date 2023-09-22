@@ -5,11 +5,15 @@
   <class>BouncePattern</class>
   <name>civicrm_mailing_bounce_pattern</name>
   <comment>Pseudo-constant table of patterns for bounce classification</comment>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Bounce Pattern ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -17,7 +21,7 @@
   </primaryKey>
   <field>
     <name>bounce_type_id</name>
-    <title>Bounce Type</title>
+    <title>Bounce Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Type of bounce</comment>
@@ -26,6 +30,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <label>Bounce Type</label>
+    </html>
   </field>
   <foreignKey>
     <name>bounce_type_id</name>

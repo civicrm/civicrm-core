@@ -1,0 +1,124 @@
+# Helper to run bin/regen.sh to regenerate civicrm_generated.mysql
+# 1. In your civicrm-core fork on github.com, click on the Actions tab.
+#   * If you don't see an Actions tab, you may need to enable Github Actions in your fork, under Settings - Actions - General.
+# 2. Click on Regen on the left.
+#   * If you don't see Regen on the left, the master branch of your fork may be outdated. In a recent git checkout of master run `git push my-fork master`, where "my-fork" is the remote alias of your fork (see output of `git remote -v`).
+# 3. On the right you'll see a dropdown "Run workflow".
+# 4. From the Branch field in the dropdown pick your branch.
+# 5. Optionally choose to have it add a commit with the new file to your branch at the end, otherwise it will give you the file to download.
+#    Note it does not autosquash but typically this would be done at the end and is acceptable as its own commit.
+# 6. Wait about 2-3 minutes until the spinning yellow turns green.
+# 7. If you didn't choose to commit, then to get to the download click on the green.
+# 7. Scroll down to Artifacts.
+# 8. There's your file available for download.
+name: Regen
+on:
+  workflow_dispatch:
+    inputs:
+      civiver:
+        description: CiviCRM version
+        required: true
+        default: 'master'
+      autocommit:
+        description: Autocommit to branch (y or n)
+        required: false
+        default: 'n'
+permissions:
+  contents: read
+
+jobs:
+  runregen:
+    permissions:
+      contents: write  # for Git to git push
+    runs-on: ubuntu-latest
+    name: Run Regen
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: no
+          MYSQL_DATABASE: db
+          MYSQL_ROOT_PASSWORD: passpasspw
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: shivammathur/setup-php@v2
+        with:
+            php-version: 7.4
+            extensions: dom, curl, libxml, mbstring, zip, pdo, mysql, pdo_mysql, bcmath, soap, intl, gd, exif, iconv
+            coverage: none
+            tools: composer:v2
+      - name: Sanity check
+        run: |
+          if [ "$GITHUB_REPOSITORY" = "civicrm/civicrm-core" ]; then
+            echo "You need to run this in your own fork."
+            exit -1
+          fi
+      - name: Download cv
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone https://github.com/civicrm/cv.git civicrm-cv
+          cd civicrm-cv
+          # downloads-plugin is locked at 2.1 but that doesn't work with composer v2
+          rm composer.lock
+          COMPOSER_MEMORY_LIMIT=-1 composer install
+      - name: Download and install stuff
+        run: |
+          cd $GITHUB_WORKSPACE
+          export DRUPVER=`php -r '$xml = simplexml_load_file("https://updates.drupal.org/release-history/drupal/7.x"); echo $xml->releases[0]->release->version;'`
+          curl -L -o drupal.tgz https://ftp.drupal.org/files/projects/drupal-$DRUPVER.tar.gz
+          tar xzf drupal.tgz
+          mv drupal-$DRUPVER drupal
+          cd drupal
+          composer require drush/drush:'^8'
+          ./vendor/drush/drush/drush -y -l http://civi.localhost site-install standard --db-url='mysql://root:passpasspw@127.0.0.1:${{ job.services.mysql.ports[3306] }}/db' --site-name=TestCivi --account-pass=admin
+          chmod +w sites/default
+          cd sites/all/modules
+          # check out my fork's branch as selected from the dropdown
+          BRANCHNAME=${GITHUB_REF##*/}
+          echo "Cloning branch $BRANCHNAME from $GITHUB_SERVER_URL/$GITHUB_REPOSITORY"
+          git clone -b $BRANCHNAME --depth 1 $GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git civicrm
+          cd civicrm
+          git clone -b 7.x-${{ github.event.inputs.civiver }} --depth 1 https://github.com/civicrm/civicrm-drupal.git drupal
+          git clone -b ${{ github.event.inputs.civiver }} --depth 1 https://github.com/civicrm/civicrm-packages.git packages
+          COMPOSER_MEMORY_LIMIT=-1 composer install
+          npm install
+          cd xml
+          php GenCode.php
+          cd ..
+          $GITHUB_WORKSPACE/civicrm-cv/bin/cv core:install --cms-base-url=http://civi.localhost
+          # In this environment in this particular repo, we are under a workspace folder that contains the literal "civicrm-core" in the path, which makes civicrm.config.php think we are a composer install, so it gets the paths wrong.
+          echo '<?php define("CIVICRM_CONFDIR", "/home/runner/work/civicrm-core/civicrm-core/drupal/sites/default");' > settings_location.php
+      - name: regen
+        run: |
+          cd $GITHUB_WORKSPACE/drupal/sites/all/modules/civicrm/bin
+          export PATH=$PATH:$GITHUB_WORKSPACE/drupal/vendor/drush/drush
+          cp setup.conf.txt setup.conf
+          sed -i -e "s#CIVISOURCEDIR=#CIVISOURCEDIR=$GITHUB_WORKSPACE/drupal/sites/all/modules/civicrm#" setup.conf
+          sed -i -e 's/DBUSER=/DBUSER=root/' setup.conf
+          sed -i -e 's/DBPASS=/DBPASS=passpasspw/' setup.conf
+          sed -i -e 's/DBNAME=/DBNAME=db/' setup.conf
+          sed -i -e 's/DBHOST=/DBHOST=127.0.0.1/' setup.conf
+          sed -i -e 's/DBPORT=/DBPORT=${{ job.services.mysql.ports[3306] }}/' setup.conf
+          sed -i -e 's/GENCODE_CMS=""/GENCODE_CMS=Drupal/' setup.conf
+          # next two lines just make it easier to see what's going on if it fails
+          cat setup.conf
+          sed -i -e 's/set -e/set -e\nset -x/' setup.sh
+          cd ..
+          bin/regen.sh
+      - name: maybe commit
+        if: ${{ success() && github.event.inputs.autocommit == 'y' }}
+        run: |
+          cd $GITHUB_WORKSPACE/drupal/sites/all/modules/civicrm
+          git config --global user.name "$GITHUB_ACTOR"
+          git config --global user.email "regen@civicrm.org"
+          # We don't use `-a` because often there's other files that get spurious updates like composer.lock
+          git commit -m "regenerate civicrm_generated" sql/civicrm_generated.mysql
+          git remote add mine https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git
+          git push mine
+      - uses: actions/upload-artifact@v3
+        if: ${{ success() }}
+        with:
+          name: the_file_you_requested
+          path: '/home/runner/work/civicrm-core/civicrm-core/drupal/sites/all/modules/civicrm/sql/civicrm_generated.mysql'

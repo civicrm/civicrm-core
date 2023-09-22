@@ -43,7 +43,7 @@ class CRM_Utils_Request {
    */
   public static function id() {
     if (!isset(\Civi::$statics[__CLASS__]['id'])) {
-      \Civi::$statics[__CLASS__]['id'] = uniqid() . CRM_Utils_String::createRandom(CRM_Utils_String::ALPHANUMERIC, 4);
+      \Civi::$statics[__CLASS__]['id'] = uniqid() . CRM_Utils_String::createRandom(4, CRM_Utils_String::ALPHANUMERIC);
     }
     return \Civi::$statics[__CLASS__]['id'];
   }
@@ -69,7 +69,7 @@ class CRM_Utils_Request {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function retrieve($name, $type, &$store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {
+  public static function retrieve($name, $type, $store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {
 
     $value = NULL;
     switch ($method) {
@@ -130,7 +130,7 @@ class CRM_Utils_Request {
       return $method[$name];
     }
     // CRM-18384 - decode incorrect keys generated when &amp; is present in url
-    foreach ($method as $key => $value) {
+    foreach (($method ?? []) as $key => $value) {
       if (strpos($key, 'amp;') !== FALSE) {
         $method[str_replace('amp;', '', $key)] = $method[$key];
         if (isset($method[$name])) {

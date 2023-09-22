@@ -29,7 +29,7 @@
 {include file="CRM/common/status.tpl"}
 
 {crmRegion name='page-body' allowCmsOverride=0}
-  {if $isForm and isset($formTpl)}
+  {if $isForm and $formTpl}
     {include file="CRM/Form/$formTpl.tpl"}
   {else}
     {include file=$tplFile}

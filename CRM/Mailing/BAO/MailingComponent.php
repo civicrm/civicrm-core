@@ -17,37 +17,24 @@
 class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent {
 
   /**
-   * Fetch object based on array of properties.
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
-   *
-   * @return CRM_Core_BAO_LocationType.
+   * @return self|null
    */
-  public static function retrieve(&$params, &$defaults) {
-    $component = new CRM_Mailing_DAO_MailingComponent();
-    $component->copyValues($params);
-    if ($component->find(TRUE)) {
-      CRM_Core_DAO::storeValues($component, $defaults);
-      return $component;
-    }
-    return NULL;
+  public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
+    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_MailingComponent', $id, 'is_active', $is_active);
   }
 

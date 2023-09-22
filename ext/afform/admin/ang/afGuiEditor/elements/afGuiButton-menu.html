@@ -1,0 +1,10 @@
+<li>
+  <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline" >
+    <label>{{:: ts('Color:') }}</label>
+    <select class="form-control {{ getSetStyle().replace('btn', 'text') }}" ng-model="getSetStyle" ng-model-options="{getterSetter: true}" title="{{:: ts('Button color scheme') }}">
+      <option ng-repeat="(style, label) in styles" class="{{ style.replace('btn', 'bg') }}" value="{{ style }}">{{ label }}</option>
+    </select>
+  </div>
+</li>
+<li role="separator" class="divider"></li>
+<li><a href ng-click="$ctrl.deleteThis()"><span class="text-danger"><i class="crm-i fa-trash"></i> {{:: ts('Delete this button') }}</span></a></li>

@@ -17,7 +17,6 @@
  */
 class api_v3_BatchTest extends CiviUnitTestCase {
 
-  protected $_params = [];
   protected $_entity = 'batch';
 
   /**
@@ -25,26 +24,38 @@ class api_v3_BatchTest extends CiviUnitTestCase {
    *
    * This method is called before a test is executed.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
-    $this->useTransaction(TRUE);
+    $this->useTransaction();
   }
 
   /**
    * Test civicrm_batch_get - success expected.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testGet() {
+  public function testGet(int $version): void {
+    $this->_apiversion = $version;
     $params = [
       'id' => $this->batchCreate(),
     ];
-    $result = $this->callAPIAndDocument('batch', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Batch', 'get', $params);
     $this->assertEquals($params['id'], $result['id']);
   }
 
   /**
    * Test civicrm_batch_create - success expected.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testCreate() {
+  public function testCreate(int $version): void {
+    $this->_apiversion = $version;
     $params = [
       'name' => 'New_Batch_03',
       'title' => 'New Batch 03',
@@ -54,15 +65,22 @@ class api_v3_BatchTest extends CiviUnitTestCase {
       'status_id' => 1,
     ];
 
-    $result = $this->callAPIAndDocument('batch', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('batch', 'create', $params);
     $this->assertNotNull($result['id']);
-    $this->getAndCheck($params, $result['id'], $this->_entity);
+    $this->getAndCheck($params, $result['id'], 'Batch');
   }
 
   /**
    * Test civicrm_batch_create with id.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testUpdate() {
+  public function testUpdate(int $version): void {
+    $this->_apiversion = $version;
     $params = [
       'name' => 'New_Batch_04',
       'title' => 'New Batch 04',
@@ -72,31 +90,38 @@ class api_v3_BatchTest extends CiviUnitTestCase {
       'id' => $this->batchCreate(),
     ];
 
-    $result = $this->callAPIAndDocument('batch', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('batch', 'create', $params);
     $this->assertNotNull($result['id']);
     $this->getAndCheck($params, $result['id'], $this->_entity);
   }
 
   /**
    * Test civicrm_batch_delete using the old $params['batch_id'] syntax.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testBatchDeleteOldSyntax() {
+  public function testBatchDeleteOldSyntax(): void {
     $batchID = $this->batchCreate();
     $params = [
       'batch_id' => $batchID,
     ];
-    $result = $this->callAPISuccess('batch', 'delete', $params);
+    $this->callAPISuccess('Batch', 'delete', $params);
   }
 
   /**
    * Test civicrm_batch_delete using the new $params['id'] syntax.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testBatchDeleteCorrectSyntax() {
+  public function testBatchDeleteCorrectSyntax(int $version): void {
+    $this->_apiversion = $version;
     $batchID = $this->batchCreate();
     $params = [
       'id' => $batchID,
     ];
-    $result = $this->callAPIAndDocument('batch', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('Batch', 'delete', $params);
   }
 
 }

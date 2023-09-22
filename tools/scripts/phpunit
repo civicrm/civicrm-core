@@ -15,36 +15,28 @@ $argFilters = [];
 if (PHP_SAPI !== 'cli') {
   die("phpunit can only be run from command line.");
 }
-if (version_compare(PHP_VERSION, '7.1', '>=')) {
-  $phpunit = findCommand('phpunit7');
-  $argFilters[] = function ($argv) {
-    $pos = array_search('--tap', $argv);
-    if ($pos !== FALSE) {
-      array_splice($argv, $pos, 1, ['--printer', '\Civi\Test\TAP']);
-    }
-    return $argv;
-  };
+
+$phpunitCmd = pickPhpunitCommand();
+$phpunitPath = findCommand($phpunitCmd);
+switch ($phpunitCmd) {
+  case 'phpunit9':
+  case 'phpunit8':
+  case 'phpunit7':
+  case 'phpunit6':
+    $argFilters[] = function ($argv) {
+      $pos = array_search('--tap', $argv);
+      if ($pos !== FALSE) {
+        array_splice($argv, $pos, 1, ['--printer', '\Civi\Test\TAP']);
+      }
+      return $argv;
+    };
+    break;
 }
-elseif (version_compare(PHP_VERSION, '7.0', '>=')) {
-  $phpunit = findCommand('phpunit6');
-  $argFilters[] = function ($argv) {
-    $pos = array_search('--tap', $argv);
-    if ($pos !== FALSE) {
-      array_splice($argv, $pos, 1, ['--printer', '\Civi\Test\TAP']);
-    }
-    return $argv;
-  };
+
+if (!$phpunitPath) {
+  $phpunitPath = findCommand('phpunit');
 }
-elseif (version_compare(PHP_VERSION, '5.6', '>=')) {
-  $phpunit = findCommand('phpunit5');
-}
-else {
-  $phpunit = findCommand('phpunit4');
-}
-if (!$phpunit) {
-  $phpunit = findCommand('phpunit');
-}
-if (!$phpunit) {
+if (!$phpunitPath) {
   echo "Plesae ensure that:\n";
   echo " * PHPUnit is installed.\n";
   echo " * The extensions for dbunit and selenium are installed.\n" ;
@@ -91,10 +83,34 @@ $cmd =
   findPhp() // In case this system has multiple copies of PHP, use the active/preferred one.
   // . ' -ddisplay_errors=1'
   . ' '
-  . escapeshellarg($phpunit)
+  . escapeshellarg($phpunitPath)
   . ' '
   . implode(' ', array_map('escapeshellarg', $argv));
 passthru($cmd);
+
+function pickPhpunitCommand() {
+  if (getenv('PHPUNIT')) {
+    return getenv('PHPUNIT');
+  }
+  elseif (version_compare(PHP_VERSION, '7.3', '>=')) {
+    return 'phpunit9';
+  }
+  elseif (version_compare(PHP_VERSION, '7.2', '>=')) {
+    return 'phpunit8';
+  }
+  elseif (version_compare(PHP_VERSION, '7.1', '>=')) {
+    return 'phpunit7';
+  }
+  elseif (version_compare(PHP_VERSION, '7.0', '>=')) {
+    return 'phpunit6';
+  }
+  elseif (version_compare(PHP_VERSION, '5.6', '>=')) {
+    return 'phpunit5';
+  }
+  else {
+    return 'phpunit';
+  }
+}
 
 function findPhp() {
   // The autodetect behavior here is a potential point of contention. These two cases are hard to reconcile:

@@ -11,14 +11,12 @@
   {include file=$fieldSpec.template}
 {else}
   <td class="label">{$form.$fieldName.label}
-    {if $fieldSpec.help}{assign var=help value=$fieldSpec.help}{capture assign=helpFile}{if $fieldSpec.help}
-      {$fieldSpec.help}
-    {else}''{/if}
-    {/capture}{help id=$help.id file=$help.file}{/if}
-    {if $action == 2 && $fieldSpec.is_add_translate_dialog}{include file='CRM/Core/I18n/Dialog.tpl' table=$entityTable field=$fieldName id=$entityID}{/if}
+    {if $fieldSpec.help.id}{help id=$fieldSpec.help.id file=$fieldSpec.help.file}{/if}
+    {if $action == 2 && array_key_exists('is_add_translate_dialog', $fieldSpec)}{include file='CRM/Core/I18n/Dialog.tpl' table=$entityTable field=$fieldName id=$entityID}{/if}
   </td>
-  <td>{$fieldSpec.pre_html_text}{if $form.$fieldName.html}{if $fieldSpec.formatter === 'crmMoney'}{$form.$fieldName.html|crmMoney:$fieldSpec.formatterParam}{else}{$form.$fieldName.html}{/if}{else}{$fieldSpec.place_holder}{/if}{$fieldSpec.post_html_text}<br />
+  <td>
+    {if $fieldSpec.pre_html_text}{$fieldSpec.pre_html_text}{/if}{if $form.$fieldName.html}{$form.$fieldName.html}{else}{$fieldSpec.place_holder}{/if}{if $fieldSpec.post_html_text}{$fieldSpec.post_html_text}{/if}<br />
     {if $fieldSpec.description}<span class="description">{$fieldSpec.description}</span>{/if}
-    {if $fieldSpec.documentation_link}{docURL page=$fieldSpec.documentation_link.page resource=$fieldSpec.documentation_link.resource}{/if}
+    {if $fieldSpec.documentation_link.page}{docURL page=$fieldSpec.documentation_link.page resource=$fieldSpec.documentation_link.resource}{/if}
   </td>
 {/if}

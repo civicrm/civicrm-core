@@ -13,12 +13,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Group_Form_Search extends CRM_Core_Form {
 
   public function preProcess() {
+    // This variable does not appear to be set in core civicrm
+    // and is possibly obsolete? It probably relates to the multisite extension.
+    $this->expectedSmartyVariables[] = 'showOrgInfo';
     parent::preProcess();
 
     CRM_Core_Resources::singleton()->addPermissions('edit groups');
@@ -34,12 +35,20 @@ class CRM_Group_Form_Search extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-    $this->add('text', 'title', ts('Find'),
+    $this->add('text', 'title', ts('Group Name'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title')
     );
 
-    $this->add('text', 'created_by', ts('Created By'),
+    $this->add('text', 'created_by', ts('Created By (Name)'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title')
+    );
+
+    $optionTypes = [
+      '1' => ts('Smart Group'),
+      '2' => ts('Regular Group'),
+    ];
+    $this->add('select', 'saved_search', ts('Group Type'),
+      ['' => ts('- any -')] + $optionTypes
     );
 
     $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);

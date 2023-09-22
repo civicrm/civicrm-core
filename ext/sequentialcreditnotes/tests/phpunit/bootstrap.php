@@ -1,7 +1,6 @@
 <?php
 
 ini_set('memory_limit', '2G');
-ini_set('safe_mode', 0);
 // phpcs:ignore
 eval(cv('php:boot --level=classloader', 'phpcode'));
 
@@ -20,16 +19,16 @@ $loader->register();
  *   The rest of the command to send.
  * @param string $decode
  *   Ex: 'json' or 'phpcode'.
+ *
  * @return string
  *   Response output (if the command executed normally).
- * @throws \RuntimeException
- *   If the command terminates abnormally.
+ * @throws \RuntimeException If the command terminates abnormally.
  */
-function cv($cmd, $decode = 'json') {
+function cv(string $cmd, $decode = 'json'): string {
   $cmd = 'cv ' . $cmd;
-  $descriptorSpec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => STDERR);
+  $descriptorSpec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => STDERR];
   $oldOutput = getenv('CV_OUTPUT');
-  putenv("CV_OUTPUT=json");
+  putenv('CV_OUTPUT=json');
 
   // Execute `cv` in the original folder. This is a work-around for
   // phpunit/codeception, which seem to manipulate PWD.
@@ -49,7 +48,7 @@ function cv($cmd, $decode = 'json') {
 
     case 'phpcode':
       // If the last output is /*PHPCODE*/, then we managed to complete execution.
-      if (substr(trim($result), 0, 12) !== "/*BEGINPHP*/" || substr(trim($result), -10) !== "/*ENDPHP*/") {
+      if (strpos(trim($result), '/*BEGINPHP*/') !== 0 || substr(trim($result), -10) !== '/*ENDPHP*/') {
         throw new \RuntimeException("Command failed ($cmd):\n$result");
       }
       return $result;

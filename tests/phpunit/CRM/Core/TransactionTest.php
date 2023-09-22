@@ -19,7 +19,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    */
   private $cids;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->quickCleanup(['civicrm_contact', 'civicrm_activity']);
     $this->callbackLog = [];
@@ -188,7 +188,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $this->assertContactsExistByOffset([0 => FALSE, 1 => FALSE, 2 => FALSE]);
   }
 
-  public function testIsActive() {
+  public function testIsActive(): void {
     $this->assertEquals(FALSE, CRM_Core_Transaction::isActive());
     $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
     $tx = new CRM_Core_Transaction();
@@ -199,7 +199,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
   }
 
-  public function testIsActive_rollback() {
+  public function testIsActive_rollback(): void {
     $this->assertEquals(FALSE, CRM_Core_Transaction::isActive());
     $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
 
@@ -216,7 +216,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
   }
 
-  public function testCallback_commit() {
+  public function testCallback_commit(): void {
     $tx = new CRM_Core_Transaction();
 
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, [$this, '_preCommit'], [
@@ -244,7 +244,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $this->assertEquals(['_postCommit', 'uio', 'p[]'], $this->callbackLog[1]);
   }
 
-  public function testCallback_rollback() {
+  public function testCallback_rollback(): void {
     $tx = new CRM_Core_Transaction();
 
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, [$this, '_preCommit'], [
@@ -305,7 +305,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
       CRM_Core_Transaction::create(TRUE)->run(function ($tx) use (&$test, $createStyle, $commitStyle) {
         $test->createContactWithTransaction('nest-tx', $createStyle, $commitStyle);
         $test->assertContactsExistByOffset([0 => TRUE]);
-        throw new Exception("Ruh-roh");
+        throw new Exception('Ruh-roh');
       });
     }
     catch (Exception $ex) {

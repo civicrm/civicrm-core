@@ -33,18 +33,18 @@ class CRM_Utils_Mail_Logger {
   public static function filter($mailer, &$recipients, &$headers, &$body) {
     if (defined('CIVICRM_MAIL_LOG')) {
       static::log($recipients, $headers, $body);
-      if (!defined('CIVICRM_MAIL_LOG_AND_SEND') && !defined('CIVICRM_MAIL_LOG_AND SEND')) {
+      if (!defined('CIVICRM_MAIL_LOG_AND_SEND')) {
         return TRUE;
       }
     }
   }
 
   /**
-   * @param $to
-   * @param $headers
-   * @param $message
+   * @param string|string[] $to
+   * @param string[] $headers
+   * @param string $message
    */
-  public static function log(&$to, &$headers, &$message) {
+  private static function log($to, $headers, $message) {
     if (is_array($to)) {
       $toString = implode(', ', $to);
       $fileName = $to[0];
@@ -52,7 +52,7 @@ class CRM_Utils_Mail_Logger {
     else {
       $toString = $fileName = $to;
     }
-    $content = "To: " . $toString . "\n";
+    $content = 'To: ' . $toString . "\n";
     foreach ($headers as $key => $val) {
       $content .= "$key: $val\n";
     }

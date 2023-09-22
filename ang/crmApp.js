@@ -3,6 +3,7 @@
   // crmApp should not provide any significant services, and no other
   // modules should depend on it.
   var crmApp = angular.module('crmApp', CRM.angular.modules);
+
   crmApp.config(['$routeProvider',
     function($routeProvider) {
 

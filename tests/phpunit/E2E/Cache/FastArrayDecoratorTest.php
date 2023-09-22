@@ -30,23 +30,23 @@ class E2E_Cache_FastArrayDecoratorTest extends E2E_Cache_ArrayDecoratorTest {
     );
   }
 
-  public function testSetTtl() {
+  public function testSetTtl(): void {
     $this->markTestSkipped('FastArrayDecorator breaks convention: Does not track TTL locally. However, TTL is passed along to delegate.');
   }
 
-  public function testSetMultipleTtl() {
+  public function testSetMultipleTtl(): void {
     $this->markTestSkipped('FastArrayDecorator breaks convention: Does not track TTL locally. However, TTL is passed along to delegate.');
   }
 
-  public function testDoubleLifeWithDelete() {
+  public function testDoubleLifeWithDelete(): void {
     $this->markTestSkipped('FastArrayDecorator breaks convention: Does not track TTL locally. However, TTL is passed along to delegate.');
   }
 
-  public function testDoubleLifeWithClear() {
+  public function testDoubleLifeWithClear(): void {
     $this->markTestSkipped('FastArrayDecorator breaks convention: Does not track TTL locally. However, TTL is passed along to delegate.');
   }
 
-  public function testObjectDoesNotChangeInCache() {
+  public function testObjectDoesNotChangeInCache(): void {
     $this->markTestSkipped('FastArrayDecorator breaks convention: No deep-copying cache content');
   }
 

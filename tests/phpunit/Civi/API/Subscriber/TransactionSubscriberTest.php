@@ -93,7 +93,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
    * @param bool $isForceRollback
    * @param bool $isNested
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testTransactionOptions($version, $entity, $action, $params, $isTransactional, $isForceRollback, $isNested) {
     $txs = new TransactionSubscriber();
@@ -107,7 +107,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
     $this->assertEquals($isNested, $txs->isNested($apiProvider, $apiRequest), 'check isNested');
   }
 
-  public function testForceRollback() {
+  public function testForceRollback(): void {
     $result = $this->callAPISuccess('contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'Me',

@@ -6,15 +6,12 @@
  */
 class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Test setValues() and GetValues() methods with custom Date field
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testSetGetValuesDate() {
-    $params = [];
+  public function testSetGetValuesDate(): void {
     $contactID = $this->individualCreate();
 
     //create Custom Group
@@ -66,7 +63,6 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
       'custom_' . $fieldID => $badDate,
     ];
 
-    CRM_Core_TemporaryErrorScope::useException();
     $message = NULL;
     try {
       CRM_Core_BAO_CustomValueTable::setValues($params);
@@ -113,7 +109,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
   /**
    * Test setValues() and getValues() methods with custom field YesNo(Boolean) Radio
    */
-  public function testSetGetValuesYesNoRadio() {
+  public function testSetGetValuesYesNoRadio(): void {
     $contactID = $this->individualCreate();
 
     $customGroup = $this->customGroupCreate(['is_multiple' => 1]);
@@ -165,7 +161,6 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
       'custom_' . $fieldID => $badYesNo,
     ];
 
-    CRM_Core_TemporaryErrorScope::useException();
     $message = NULL;
     try {
       CRM_Core_BAO_CustomValueTable::setValues($params);

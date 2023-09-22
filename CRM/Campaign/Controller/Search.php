@@ -28,10 +28,12 @@
  */
 class CRM_Campaign_Controller_Search extends CRM_Core_Controller {
 
+  protected $entity = 'Campaign';
+
   /**
    * Class constructor.
    *
-   * @param null $title
+   * @param string $title
    * @param bool|int $action
    * @param bool $modal
    */
@@ -45,8 +47,8 @@ class CRM_Campaign_Controller_Search extends CRM_Core_Controller {
     $this->addPages($this->_stateMachine, $action);
 
     // add all the actions
-    $config = CRM_Core_Config::singleton();
     $this->addActions();
+    $this->set('entity', $this->entity);
   }
 
 }

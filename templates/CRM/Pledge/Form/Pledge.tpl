@@ -8,12 +8,12 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting pledge *}
-{if $showAdditionalInfo and $formType }
+{if $showAdditionalInfo and $formType}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 {if !$email and $action neq 8 and $context neq 'standalone'}
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
   <p>{ts}You will not be able to send an acknowledgment for this pledge because there is no email address recorded for this contact. If you want a acknowledgment to be sent when this pledge is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the pledge.{/ts}</p>
 </div>
 {/if}
@@ -26,10 +26,9 @@
     {/if}
 {/if}
 <div class="crm-block crm-form-block crm-pledge-form-block">
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    {if $action eq 8}
     <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>&nbsp;
+    {icon icon="fa-info-circle"}{/icon}
     <span class="font-red bold">{ts}WARNING: Deleting this pledge will also delete any related pledge payments.{/ts} {ts}This action cannot be undone.{/ts}</span>
     <p>{ts}Consider cancelling the pledge instead if you want to maintain an audit trail and avoid losing payment data. To set the pledge status to Cancelled and cancel any not-yet-paid pledge payments, first click Cancel on this form. Then click the more &gt; link from the pledge listing, and select the Cancel action.{/ts}</p>
     </div>
@@ -43,7 +42,7 @@
             <td class="label">{$form.amount.label}</td>
             <td>
               <span>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.amount.html|crmAddClass:eight}</span>
-              {if $originalPledgeAmount}<div class="messages status no-popup"><div class="icon inform-icon"></div>&nbsp;{ts 1=$originalPledgeAmount|crmMoney:$currency} Pledge total has changed due to payment adjustments. Original pledge amount was %1.{/ts}</div>{/if}
+              {if $originalPledgeAmount}<div class="messages status no-popup">{icon icon="fa-info-circle"}{/icon}{ts 1=$originalPledgeAmount|crmMoney:$currency} Pledge total has changed due to payment adjustments. Original pledge amount was %1.{/ts}</div>{/if}
             </td>
           </tr>
           <tr class="crm-pledge-form-block-installments">
@@ -51,7 +50,7 @@
             <td>{$form.installments.html} {ts}installments of{/ts}
               <span class='currency-symbol'>
                 {if $action eq 1 or $isPending}
-                  {$form.eachPaymentAmount.html|crmMoney:$currency}
+                  {$form.eachPaymentAmount.html}
                 {elseif $action eq 2 and !$isPending}
                   {$eachPaymentAmount|crmMoney:$currency}
                 {/if}
@@ -60,59 +59,55 @@
           </tr>
           <tr class="crm-pledge-form-block-frequency_day">
             <td class="label nowrap">{$form.frequency_day.label}</td>
-            <td>{$form.frequency_day.html} {ts}day of the period{/ts}<br />
-              <span class="description">{ts}This applies to weekly, monthly and yearly payments.{/ts}</span>
+            <td>{$form.frequency_day.html} {ts}day of the period{/ts}
             </td>
           </tr>
           <tr class="crm-pledge-form-block-create_date">
             <td class="label">{$form.create_date.label}</td>
             <td>
-              {$form.create_date.html}<br />
-              <span class="description">{ts}Date when pledge was made by the contributor.{/ts}</span>
+              {$form.create_date.html}
             </td>
           </tr>
 
           <tr class="crm-pledge-form-block-start_date">
             <td class="label">{$form.start_date.label}</td>
             <td>
-              {$form.start_date.html}<br />
-              <span class="description">{ts}Date of first pledge payment.{/ts}</span>
+              {$form.start_date.html}
             </td>
           </tr>
 
         {if $email and $outBound_option != 2}
-            {if $form.is_acknowledge }
+            {if !empty($form.is_acknowledge)}
           <tr class="crm-pledge-form-block-is_acknowledge">
             <td class="label">{$form.is_acknowledge.label}</td>
-            <td>{$form.is_acknowledge.html}<br />
+            <td>{$form.is_acknowledge.html}
               <span class="description">{ts 1=$email}Automatically email an acknowledgment of this pledge to %1?{/ts}</span>
             </td>
           </tr>
             {/if}
-        {elseif $context eq 'standalone' and $outBound_option != 2 }
+        {elseif $context eq 'standalone' and $outBound_option != 2}
           <tr id="acknowledgment-receipt" style="display:none;">
             <td class="label">{$form.is_acknowledge.label}</td>
             <td>
-              {$form.is_acknowledge.html} <span class="description">{ts 1='<span id="email-address"></span>'}Automatically email an acknowledgment of this pledge to %1?{/ts}</span>
+              {$form.is_acknowledge.html}
+              <span class="description">{ts 1='<span id="email-address"></span>'}Automatically email an acknowledgment of this pledge to %1?{/ts}</span>
             </td>
           </tr>
         {/if}
           <tr id="fromEmail" style="display:none;">
             <td class="label">{$form.from_email_address.label}</td>
-            <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+            <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
           </tr>
           <tr id="acknowledgeDate">
             <td class="label" class="crm-pledge-form-block-acknowledge_date">{$form.acknowledge_date.label}</td>
             <td>
-              {$form.acknowledge_date.html}<br />
-              <span class="description">{ts}Date when an acknowledgment of the pledge was sent.{/ts}</span>
+              {$form.acknowledge_date.html}
             </td>
           </tr>
           <tr class="crm-pledge-form-block-financial_type_id">
-            <td class="label">{$form.financial_type_id.label}</td>
-            <td>{$form.financial_type_id.html}<br />
-              <span class="description">{ts}Sets the default financial type for payments against this pledge.{/ts}</span>
-            </td>
+            <td class="label">{$form.financial_type_id.label} {help id='id-financial_type_id'}
+</td>
+            <td>{$form.financial_type_id.html}</td>
           </tr>
 
       {* CRM-7362 --add campaign *}
@@ -120,10 +115,8 @@
       campaignTrClass="crm-pledge-form-block-campaign_id"}
 
           <tr class="crm-pledge-form-block-contribution_page_id">
-            <td class="label">{$form.contribution_page_id.label}</td>
-            <td>{$form.contribution_page_id.html}<br />
-              <span class="description">{ts}Select an Online Contribution page that the user can access to make self-service pledge payments. (Only Online Contribution pages configured to include the Pledge option are listed.){/ts}</span>
-            </td>
+            <td class="label">{$form.contribution_page_id.label} {help id='id-contribution_page_id'}</td>
+            <td>{$form.contribution_page_id.html}</td>
           </tr>
 
           <tr class="crm-pledge-form-block-status">
@@ -217,14 +210,14 @@
 
      function calculatedPaymentAmount( ) {
        var thousandMarker = {/literal}{crmSetting name="monetaryThousandSeparator" group="CiviCRM Localization"}{literal};
-       var seperator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
+       var separator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
        var amount = document.getElementById("amount").value;
-       // replace all thousandMarker and change the seperator to a dot
-       amount = amount.replace(thousandMarker,'').replace(seperator,'.');
+       // replace all thousandMarker and change the separator to a dot
+       amount = amount.replace(thousandMarker,'').replace(separator,'.');
        var installments = document.getElementById("installments").value;
        if ( installments != '' && installments != NaN) {
             amount =  amount/installments;
-            var installmentAmount = formatMoney( amount, 2, seperator, thousandMarker );
+            var installmentAmount = formatMoney( amount, 2, separator, thousandMarker );
             document.getElementById("eachPaymentAmount").value = installmentAmount;
        }
      }
@@ -240,7 +233,7 @@
      };
 
     {/literal}
-    {if $context eq 'standalone' and $outBound_option != 2 }
+    {if $context eq 'standalone' and $outBound_option != 2}
     {literal}
     CRM.$(function($) {
       var $form = $("form.{/literal}{$form.formClass}{literal}");

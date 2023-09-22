@@ -97,22 +97,32 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       if (!empty($entityId)) {
         $subType = CRM_Contact_BAO_Contact::getContactSubType($entityId, ',');
       }
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, NULL, NULL, $entityId);
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, NULL, CRM_Utils_Request::retrieve('type', 'String', $this), $entityId);
       if ($this->_multiRecordDisplay) {
         $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
         $this->_tableID = $this->_entityId;
         $this->_contactType = CRM_Contact_BAO_Contact::getContactType($this->_tableID);
         $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
         $hasReachedMax = CRM_Core_BAO_CustomGroup::hasReachedMaxLimit($this->_groupID, $this->_tableID);
-        if ($hasReachedMax && $mode == 'add') {
+        if ($hasReachedMax && $mode === 'add') {
           CRM_Core_Error::statusBounce(ts('The maximum record limit is reached'));
         }
         $this->_copyValueId = CRM_Utils_Request::retrieve('copyValueId', 'Positive', $this);
 
         $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupID);
-        $mode = CRM_Utils_Request::retrieve('mode', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET');
-        $mode = ucfirst($mode);
-        CRM_Utils_System::setTitle(ts('%1 %2 Record', [1 => $mode, 2 => $groupTitle]));
+        switch ($mode) {
+          case 'add':
+            $this->setTitle(ts('Add %1', [1 => $groupTitle]));
+            break;
+
+          case 'edit':
+            $this->setTitle(ts('Edit %1', [1 => $groupTitle]));
+            break;
+
+          case 'copy':
+            $this->setTitle(ts('Copy %1', [1 => $groupTitle]));
+            break;
+        }
 
         if (!empty($_POST['hidden_custom'])) {
           $this->assign('postedInfo', TRUE);
@@ -127,8 +137,8 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     $this->_contactSubType = CRM_Contact_BAO_Contact::getContactSubType($this->_tableID, ',');
     $this->assign('contact_type', $this->_contactType);
     $this->assign('contact_subtype', $this->_contactSubType);
-    list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_tableID);
-    CRM_Utils_System::setTitle($displayName, $contactImage . ' ' . $displayName);
+    [$displayName, $contactImage] = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_tableID);
+    $this->setTitle($displayName, $contactImage . ' ' . $displayName);
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
@@ -205,7 +215,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
       if ($this->_copyValueId) {
         // cached tree is fetched
-        $groupTree = CRM_Core_BAO_CustomGroup::getTree($this->_type,
+        $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contact',
           NULL,
           $this->_entityId,
           $this->_groupID,
@@ -214,13 +224,12 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
           TRUE,
           NULL,
           FALSE,
-          TRUE,
+          CRM_Core_Permission::EDIT,
           $this->_copyValueId
         );
         $valueIdDefaults = [];
         $groupTreeValueId = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->_copyValueId, $this);
         CRM_Core_BAO_CustomGroup::setDefaults($groupTreeValueId, $valueIdDefaults, FALSE, FALSE, $this->get('action'));
-        $tableId = $groupTreeValueId[$this->_groupID]['table_id'];
         foreach ($valueIdDefaults as $valueIdElementName => $value) {
           // build defaults for COPY action for new record saving
           $valueIdElementNamePieces = explode('_', $valueIdElementName);
@@ -234,13 +243,6 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       }
       return $customDefaultValue;
     }
-
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($this->_contactType,
-      NULL,
-      $this->_tableID,
-      $this->_groupID,
-      $this->_contactSubType
-    );
 
     if (empty($_POST['hidden_custom_group_count'])) {
       // custom data building in edit mode (required to handle multi-value)

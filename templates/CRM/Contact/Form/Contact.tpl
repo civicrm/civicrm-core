@@ -15,7 +15,7 @@
     {include file="CRM/Contact/Form/Edit/Lock.tpl"}
   {/if}
   <div class="crm-form-block crm-search-form-block">
-    {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+    {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
       <a href='{crmURL p="civicrm/admin/setting/preferences/display" q="reset=1"}' title="{ts}Click here to configure the panes.{/ts}"><i class="crm-i fa-wrench" aria-hidden="true"></i></a>
     {/if}
     <span style="float:right;"><a href="#expand" id="expand">{ts}Expand all tabs{/ts}</a></span>
@@ -66,14 +66,10 @@
           </table>
 
           {*add dupe buttons *}
-          <span class="crm-button crm-button_qf_Contact_refresh_dedupe">
-            {$form._qf_Contact_refresh_dedupe.html}
-          </span>
-          {if $isDuplicate}
+          {$form._qf_Contact_refresh_dedupe.html}
+          {if !empty($isDuplicate)}
             &nbsp;&nbsp;
-              <span class="crm-button crm-button_qf_Contact_upload_duplicate">
-                {$form._qf_Contact_upload_duplicate.html}
-              </span>
+            {$form._qf_Contact_upload_duplicate.html}
           {/if}
           <div class="spacer"></div>
         </div>
@@ -81,8 +77,8 @@
     </div><!-- /.crm-accordion-wrapper -->
 
     {foreach from = $editOptions item = "title" key="name"}
-      {if $name eq 'CustomData' }
-        <div id='customData'>{include file="CRM/Contact/Form/Edit/CustomData.tpl"}</div>
+      {if $name eq 'CustomData'}
+        <div id='customData'>{include file="CRM/Contact/Form/Edit/CustomData.tpl" isSingleRecordEdit=false}</div>
       {else}
         {include file="CRM/Contact/Form/Edit/$name.tpl"}
       {/if}
@@ -212,7 +208,7 @@
     loadMultiRecordFields();
 
     {/literal}{if $oldSubtypes}{literal}
-    $('input[name=_qf_Contact_upload_view], input[name=_qf_Contact_upload_new]').click(function() {
+    $('button[name=_qf_Contact_upload_view], button[name=_qf_Contact_upload_new]').click(function() {
       var submittedSubtypes = $('#contact_sub_type').val();
       var oldSubtypes = {/literal}{$oldSubtypes}{literal};
 

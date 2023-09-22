@@ -43,7 +43,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
     $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
     $this->_displayName = $contact->display_name;
     $this->_email = $contact->email;
-    CRM_Utils_System::setTitle(ts('Create User Record for %1', [1 => $this->_displayName]));
+    $this->setTitle(ts('Create User Record for %1', [1 => $this->_displayName]));
   }
 
   /**
@@ -64,15 +64,24 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
+    $config = CRM_Core_Config::singleton();
+
     $element = $this->add('text', 'name', ts('Full Name'), ['class' => 'huge']);
     $element->freeze();
     $this->add('text', 'cms_name', ts('Username'), ['class' => 'huge']);
-    $this->addRule('cms_name', 'Username is required', 'required');
-    $this->add('password', 'cms_pass', ts('Password'), ['class' => 'huge']);
-    $this->add('password', 'cms_confirm_pass', ts('Confirm Password'), ['class' => 'huge']);
-    $this->addRule('cms_pass', 'Password is required', 'required');
-    $this->addRule(['cms_pass', 'cms_confirm_pass'], 'ERROR: Password mismatch', 'compare');
-    $this->add('text', 'email', ts('Email:'), ['class' => 'huge'])->freeze();
+    $this->addRule('cms_name', ts('Username is required'), 'required');
+
+    // WordPress may or may not require setting passwords via magic link, depending on its configuration.
+    // For other CMS, output the password fields
+    if ($config->userSystem->showPasswordFieldWhenAdminCreatesUser()) {
+      $this->add('password', 'cms_pass', ts('Password'), ['class' => 'huge']);
+      $this->add('password', 'cms_confirm_pass', ts('Confirm Password'), ['class' => 'huge']);
+      $this->addRule('cms_pass', ts('Password is required'), 'required');
+      $this->addFormRule(['CRM_Contact_Form_Task_Useradd', 'passwordMatch']);
+    }
+
+    $this->add('text', 'email', ts('Email'), ['class' => 'huge'])->freeze();
+    $this->addRule('email', ts('Email is required'), 'required');
     $this->add('hidden', 'contactID');
 
     //add a rule to check username uniqueness
@@ -101,8 +110,12 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->exportValues();
 
-    CRM_Core_BAO_CMSUser::create($params, 'email');
-    CRM_Core_Session::setStatus('', ts('User Added'), 'success');
+    if (CRM_Core_BAO_CMSUser::create($params, 'email') === FALSE) {
+      CRM_Core_Error::statusBounce(ts('Error creating CMS user account.'));
+    }
+    else {
+      CRM_Core_Session::setStatus(ts('User Added'), '', 'success');
+    }
   }
 
   /**
@@ -122,6 +135,20 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
     $config->userSystem->checkUserNameEmailExists($check_params, $errors);
 
     return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * Validation Rule.
+   *
+   * @param array $params
+   *
+   * @return array|bool
+   */
+  public static function passwordMatch($params) {
+    if ($params['cms_pass'] !== $params['cms_confirm_pass']) {
+      return ['cms_pass' => ts('Password mismatch')];
+    }
+    return TRUE;
   }
 
 }

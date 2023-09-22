@@ -14,8 +14,6 @@ disable_mandatory_tokens_check
 editor_id
 enableSSL
 enable_cart
-enable_innodb_fts
-fts_query_mode
 includeAlphabeticalPager
 includeEmailInName
 includeNickNameInName

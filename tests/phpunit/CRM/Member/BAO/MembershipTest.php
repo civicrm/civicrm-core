@@ -15,13 +15,19 @@
  */
 class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
+  private $_contactID;
+  private $_membershipStatusID;
+  private $_membershipTypeID;
 
-    $this->_contactID = $this->organizationCreate();
-    $this->_membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID]);
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \Exception
+   */
+  public function setUp(): void {
+    parent::setUp();
+    $this->_membershipTypeID = $this->membershipTypeCreate();
     // add a random number to avoid silly conflicts with old data
-    $this->_membershipStatusID = $this->membershipStatusCreate('test status' . rand(1, 1000));
+    $this->_membershipStatusID = $this->membershipStatusCreate('test status' . random_int(1, 1000));
   }
 
   /**
@@ -30,14 +36,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
-    $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
-    $this->membershipStatusDelete($this->_membershipStatusID);
-    $this->contactDelete($this->_contactID);
-
-    $this->_contactID = $this->_membershipStatusID = $this->_membershipTypeID = NULL;
+  public function tearDown(): void {
+    $this->_membershipStatusID = $this->_membershipTypeID = NULL;
     $this->quickCleanUpFinancialEntities();
-    $this->restoreMembershipTypes();
     parent::tearDown();
   }
 
@@ -46,11 +47,12 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    *
    * @param $organizationId
    * @param bool $withRelationship
+   * @param int $maxRelated
    *
    * @return array|int
    * @throws \CRM_Core_Exception
    */
-  private function createMembershipType($organizationId, $withRelationship = FALSE) {
+  private function createMembershipType($organizationId, $withRelationship = FALSE, $maxRelated = 0) {
     $membershipType = $this->callAPISuccess('MembershipType', 'create', [
       //Default domain ID
       'domain_id' => 1,
@@ -59,17 +61,22 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'duration_unit' => "year",
       'duration_interval' => 1,
       'period_type' => "rolling",
-      'name' => 'Organiation Membership Type',
+      'name' => 'Organization Membership Type',
       'relationship_type_id' => ($withRelationship) ? 5 : NULL,
       'relationship_direction' => ($withRelationship) ? 'b_a' : NULL,
+      'max_related' => $maxRelated ?: NULL,
     ]);
+
     return $membershipType["values"][$membershipType["id"]];
   }
 
   /**
    * Get count of related memberships by parent membership id.
+   *
    * @param $membershipId
+   *
    * @return array|int
+   * @throws \CRM_Core_Exception
    */
   private function getRelatedMembershipsCount($membershipId) {
     return $this->callAPISuccess("Membership", "getcount", [
@@ -78,10 +85,11 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test to delete related membership when type of parent memebrship is changed which does not have relation type associated.
-   * @throws CRM_Core_Exception
+   * Test to delete related membership when type of parent membership is changed which does not have relation type associated.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testDeleteRelatedMembershipsOnParentTypeChanged() {
+  public function testDeleteRelatedMembershipsOnParentTypeChanged(): void {
 
     $contactId = $this->individualCreate();
     $membershipOrganizationId = $this->organizationCreate();
@@ -115,7 +123,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     // Update membership by changing it's type. New membership type is without relationship.
     $membership["membership_type_id"] = $membershipTypeWithoutRelationship["id"];
-    $updatedMembership = $this->callAPISuccess("Membership", "create", $membership);
+    $this->callAPISuccess("Membership", "create", $membership);
 
     // Check count of related memberships again. It should be zero as we changed the membership type.
     $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
@@ -125,9 +133,12 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->membershipDelete($membership["id"]);
   }
 
-  public function testCreate() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreate(): void {
 
-    list($contactId, $membershipId) = $this->setupMembership();
+    [$contactId, $membershipId] = $this->setupMembership();
 
     // Now call create() to modify an existing Membership
     $params = [
@@ -141,7 +152,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     ];
-    CRM_Member_BAO_Membership::create($params);
+    $this->callAPISuccess('Membership', 'create', $params);
 
     $membershipTypeId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId,
       'membership_type_id', 'contact_id',
@@ -153,7 +164,10 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
-  public function testGetValues() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetValues(): void {
     //        $this->markTestSkipped( 'causes mysterious exit, needs fixing!' );
     //  Calculate membership dates based on the current date
     $now = time();
@@ -174,7 +188,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    CRM_Member_BAO_Membership::create($params);
+    $this->callAPISuccess('Membership', 'create', $params);
 
     $membershipId1 = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
@@ -191,7 +205,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    CRM_Member_BAO_Membership::create($params);
+    $this->callAPISuccess('Membership', 'create', $params);
 
     $membershipId2 = $this->assertDBNotNull('CRM_Member_BAO_Membership', 'source123', 'id',
       'source', 'Database check for created membership.'
@@ -210,8 +224,11 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
-  public function testRetrieve() {
-    list($contactId, $membershipId) = $this->setupMembership();
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testRetrieve(): void {
+    [$contactId, $membershipId] = $this->setupMembership();
     $params = ['id' => $membershipId];
     $values = [];
     CRM_Member_BAO_Membership::retrieve($params, $values);
@@ -221,7 +238,10 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
-  public function testActiveMembers() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testActiveMembers(): void {
     $contactId = $this->individualCreate();
 
     $params = [
@@ -235,7 +255,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    CRM_Member_BAO_Membership::create($params);
+    $this->callAPISuccess('Membership', 'create', $params);
 
     $membershipId1 = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
@@ -257,7 +277,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    CRM_Member_BAO_Membership::create($params);
+    $this->callAPISuccess('Membership', 'create', $params);
 
     $membershipId2 = $this->assertDBNotNull('CRM_Member_BAO_Membership', 'PaySource', 'id',
       'source', 'Database check for created membership.'
@@ -274,15 +294,18 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($activeMembers[$membershipId1]['id'], $membership[$membershipId1]['id'], 'Verify active membership record is retrieved.');
     $this->assertEquals($activeMembers[$membershipId2]['id'], $membership[$membershipId2]['id'], 'Verify active membership record is retrieved.');
 
-    $this->assertEquals(0, count($inActiveMembers), 'Verify No inactive membership record is retrieved.');
+    $this->assertCount(0, $inActiveMembers, 'Verify No inactive membership record is retrieved.');
 
     $this->membershipDelete($membershipId1);
     $this->membershipDelete($membershipId2);
     $this->contactDelete($contactId);
   }
 
-  public function testDeleteMembership() {
-    list($contactId, $membershipId) = $this->setupMembership();
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testDeleteMembership(): void {
+    [$contactId, $membershipId] = $this->setupMembership();
     CRM_Member_BAO_Membership::del($membershipId);
 
     $this->assertDBNull('CRM_Member_BAO_Membership', $contactId, 'id',
@@ -294,9 +317,11 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
-  public function testGetContactMembership() {
-    list($contactId, $membershipId) = $this->setupMembership();
-
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetContactMembership(): void {
+    [$contactId, $membershipId] = $this->setupMembership();
     $membership = CRM_Member_BAO_Membership::getContactMembership($contactId, $this->_membershipTypeID, FALSE);
 
     $this->assertEquals($membership['id'], $membershipId, 'Verify membership record is retrieved.');
@@ -305,12 +330,59 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
+  public function testGetAllContactMembership(): void {
+    $lifetimeTypeId = $this->membershipTypeCreate([
+      'name' => 'Lifetime',
+      'duration_unit' => 'lifetime',
+    ]);
+
+    // Contact 1 tests the "lifetimeOnly" code path.
+    $contactId = $this->individualCreate();
+
+    $pendingStatusId = array_search('Pending', CRM_Member_PseudoConstant::membershipStatus());
+    $cancelledStatusId = array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus());
+    $currentStatusId = array_search('Current', CRM_Member_PseudoConstant::membershipStatus());
+    $params = [
+      'contact_id' => $contactId,
+      'membership_type_id' => $this->_membershipTypeID,
+      'source' => 'Payment',
+      'is_override' => 1,
+      'status_id' => $pendingStatusId,
+    ];
+
+    CRM_Member_BAO_Membership::create($params);
+    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id', 'contact_id', 'Database check for created membership.');
+    $memberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
+    $this->assertEmpty($memberships, 'Verify pending membership is NOT retrieved.');
+    $this->membershipDelete($membershipId);
+
+    $params['status_id'] = $cancelledStatusId;
+    CRM_Member_BAO_Membership::create($params);
+    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id', 'contact_id', 'Database check for created membership.');
+    $memberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
+    $this->assertEmpty($memberships, 'Verify cancelled membership is NOT retrieved.');
+    $this->membershipDelete($membershipId);
+
+    // Lifetime membership.
+    $params['status_id'] = $currentStatusId;
+    $params['membership_type_id'] = $lifetimeTypeId;
+    CRM_Member_BAO_Membership::create($params);
+    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id', 'contact_id', 'Database check for created membership.');
+    $memberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
+    $this->assertEquals($membershipId, $memberships[$lifetimeTypeId]['id'], 'Verify current (lifetime) membership IS retrieved.');
+    $this->membershipDelete($membershipId);
+
+    $this->contactDelete($contactId);
+  }
+
   /**
    * Get the contribution.
    * page id from the membership record
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testgetContributionPageId() {
-    list($contactId, $membershipId) = $this->setupMembership();
+  public function testGetContributionPageId(): void {
+    [$contactId, $membershipId] = $this->setupMembership();
     $membership[$membershipId]['renewPageId'] = CRM_Member_BAO_Membership::getContributionPageId($membershipId);
 
     $this->membershipDelete($membershipId);
@@ -321,9 +393,11 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Get membership joins/renewals
    * for a specified membership
    * type.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testgetMembershipStarts() {
-    list($contactId, $membershipId) = $this->setupMembership();
+  public function testGetMembershipStarts(): void {
+    [$contactId, $membershipId] = $this->setupMembership();
     $yearStart = date('Y') . '0101';
     $currentDate = date('Ymd');
     CRM_Member_BAO_Membership::getMembershipStarts($this->_membershipTypeID, $yearStart, $currentDate);
@@ -335,9 +409,11 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   /**
    * Get a count of membership for a specified membership type,
    * optionally for a specified date.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testGetMembershipCount() {
-    list($contactId, $membershipId) = $this->setupMembership();
+  public function testGetMembershipCount(): void {
+    [$contactId, $membershipId] = $this->setupMembership();
     $currentDate = date('Ymd');
     $test = 0;
     CRM_Member_BAO_Membership::getMembershipCount($this->_membershipTypeID, $currentDate, $test);
@@ -348,8 +424,10 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Checkup sort name function.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testSortName() {
+  public function testSortName(): void {
     $contactId = $this->individualCreate();
 
     $params = [
@@ -373,9 +451,11 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Delete related memberships.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testdeleteRelatedMemberships() {
-    list($contactId, $membershipId) = $this->setupMembership();
+  public function testDeleteRelatedMemberships(): void {
+    [$contactId, $membershipId] = $this->setupMembership();
 
     CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId);
 
@@ -386,14 +466,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   /**
    * Renew membership with change in membership type.
    *
-   * @fixme Note that this test fails when today is August 29 2019 (and maybe other years?):
-   *   Verify correct end date is calculated after membership renewal
-   *   Failed asserting that two strings are equal.
-   *   Expected-'2021-03-01'
-   *   Actual+'2021-02-28'
-   *   /home/jenkins/bknix-dfl/build/core-15165-73etc/web/sites/all/modules/civicrm/tests/phpunit/CRM/Member/BAO/MembershipTest.php:609
+   * @throws \CRM_Core_Exception
    */
-  public function testRenewMembership() {
+  public function testRenewMembership(): void {
     $contactId = $this->individualCreate();
     $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -6 month"));
     $endDate = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
@@ -408,16 +483,15 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    $membership = CRM_Member_BAO_Membership::create($params);
-    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
-      'contact_id', 'Database check for created membership.'
-    );
+    $this->callAPISuccess('Membership', 'create', $params);
+
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $contactId]);
 
     $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
-      $membership->id,
+      $membership['id'],
       'id',
       'membership_id',
-      'Database checked on membershiplog record.'
+      'Database checked on membership log record.'
     );
 
     // this is a test and we dont want qfKey generation / validation
@@ -425,34 +499,21 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     $config->keyDisable = TRUE;
 
-    $isTestMembership = 0;
-    list($MembershipRenew) = CRM_Member_BAO_Membership::processMembership(
+    [$MembershipRenew] = CRM_Contribute_Form_Contribution_Confirm::unitTestAccessTolegacyProcessMembership(
       $contactId,
-      $this->_membershipTypeID,
-      $isTestMembership,
-      NULL,
-      NULL,
-      NULL,
-      1,
-      FALSE,
-      NULL,
-      NULL,
-      FALSE,
-      NULL,
-      NULL
-    );
-    $endDate = date("Y-m-d", strtotime($membership->end_date . " +1 year"));
+      $this->_membershipTypeID);
+    $endDate = date("Y-m-d", strtotime($membership['end_date'] . " +1 year"));
 
     $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
       $MembershipRenew->id,
       'id',
       'membership_id',
-      'Database checked on membershiplog record.'
+      'Database checked on membership log record.'
     );
     $this->assertEquals($this->_membershipTypeID, $MembershipRenew->membership_type_id, 'Verify membership type is changed during renewal.');
     $this->assertEquals($endDate, $MembershipRenew->end_date, 'Verify correct end date is calculated after membership renewal');
 
-    $this->membershipDelete($membershipId);
+    $this->membershipDelete($membership['id']);
     $this->contactDelete($contactId);
   }
 
@@ -460,9 +521,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Renew stale membership.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  public function testStaleMembership() {
+  public function testStaleMembership(): void {
     $statusId = 3;
     $contactId = $this->individualCreate();
     $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -1 year -15 days"));
@@ -477,51 +537,29 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $statusId,
     ];
 
-    $membership = CRM_Member_BAO_Membership::create($params);
+    $this->callAPISuccess('Membership', 'create', $params);
 
-    $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
-      'contact_id', 'Database check for created membership.'
-    );
+    $membership = $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $contactId,
+      'start_date' => $startDate,
+      'join_date' => $joinDate,
+      'end_date' => $endDate,
+    ]);
 
-    $this->assertEquals($membership->status_id, $statusId, 'Verify correct status id is calculated.');
-    $this->assertEquals($membership->membership_type_id, $this->_membershipTypeID,
-      'Verify correct membership type id.'
-    );
-
-    //verify all dates.
-    $dates = [
-      'startDate' => 'start_date',
-      'joinDate' => 'join_date',
-      'endDate' => 'end_date',
-    ];
-
-    foreach ($dates as $date => $dbDate) {
-      $this->assertEquals($membership->$dbDate, $$date,
-        "Verify correct {$date} is present."
-      );
-    }
+    $this->assertEquals($membership['status_id'], $statusId, 'Verify correct status id is calculated.');
+    $this->assertEquals($membership['membership_type_id'], $this->_membershipTypeID);
 
     $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
-      $membership->id,
+      $membership['id'],
       'id',
       'membership_id',
       'Database checked on membership log record.'
     );
 
-    list($MembershipRenew) = CRM_Member_BAO_Membership::processMembership(
+    [$MembershipRenew] = CRM_Contribute_Form_Contribution_Confirm::unitTestAccessTolegacyProcessMembership(
       $contactId,
       $this->_membershipTypeID,
-      FALSE,
-      FALSE,
-      NULL,
-      NULL,
-      NULL,
-      1,
-      NULL,
-      NULL,
-      NULL,
-      FALSE,
-      NULL
+      1
     );
 
     $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
@@ -531,16 +569,19 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'Database checked on membership log record.'
     );
 
-    $this->membershipDelete($membershipId);
+    $this->membershipDelete($membership['id']);
     $this->contactDelete($contactId);
   }
 
-  public function testUpdateAllMembershipStatusConvertExpiredOverriddenStatusToNormal() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testUpdateAllMembershipStatusConvertExpiredOverriddenStatusToNormal(): void {
     $params = [
       'contact_id' => $this->individualCreate(),
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', time()),
-      'start_date' => date('Ymd', time()),
+      'join_date' => date('Ymd'),
+      'start_date' => date('Ymd'),
       'end_date' => date('Ymd', strtotime('+1 year')),
       'source' => 'Payment',
       'is_override' => 1,
@@ -548,82 +589,86 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    $createdMembership = CRM_Member_BAO_Membership::create($params);
+    $createdMembershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
 
-    CRM_Member_BAO_Membership::updateAllMembershipStatus();
+    civicrm_api3('Job', 'process_membership');
 
     $membershipAfterProcess = civicrm_api3('Membership', 'get', [
       'sequential' => 1,
-      'id' => $createdMembership->id,
+      'id' => $createdMembershipID,
       'return' => ['id', 'is_override', 'status_override_end_date'],
     ])['values'][0];
 
-    $this->assertEquals($createdMembership->id, $membershipAfterProcess['id']);
-    $this->assertArrayNotHasKey('is_override', $membershipAfterProcess);
+    $this->assertEquals($createdMembershipID, $membershipAfterProcess['id']);
     $this->assertArrayNotHasKey('status_override_end_date', $membershipAfterProcess);
   }
 
-  public function testUpdateAllMembershipStatusHandleOverriddenWithEndOverrideDateEqualTodayAsExpired() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testUpdateAllMembershipStatusHandleOverriddenWithEndOverrideDateEqualTodayAsExpired(): void {
     $params = [
       'contact_id' => $this->individualCreate(),
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', time()),
-      'start_date' => date('Ymd', time()),
+      'join_date' => date('Ymd'),
+      'start_date' => date('Ymd'),
       'end_date' => date('Ymd', strtotime('+1 year')),
       'source' => 'Payment',
       'is_override' => 1,
-      'status_override_end_date' => date('Ymd', time()),
+      'status_override_end_date' => date('Ymd'),
       'status_id' => $this->_membershipStatusID,
     ];
 
-    $createdMembership = CRM_Member_BAO_Membership::create($params);
+    $createdMembershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
 
-    CRM_Member_BAO_Membership::updateAllMembershipStatus();
+    civicrm_api3('Job', 'process_membership');
 
     $membershipAfterProcess = civicrm_api3('Membership', 'get', [
       'sequential' => 1,
-      'id' => $createdMembership->id,
+      'id' => $createdMembershipID,
       'return' => ['id', 'is_override', 'status_override_end_date'],
     ])['values'][0];
 
-    $this->assertEquals($createdMembership->id, $membershipAfterProcess['id']);
-    $this->assertArrayNotHasKey('is_override', $membershipAfterProcess);
+    $this->assertEquals($createdMembershipID, $membershipAfterProcess['id']);
     $this->assertArrayNotHasKey('status_override_end_date', $membershipAfterProcess);
   }
 
-  public function testUpdateAllMembershipStatusDoesNotConvertOverridenMembershipWithoutEndOverrideDateToNormal() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testUpdateAllMembershipStatusDoesNotConvertOverriddenMembershipWithoutEndOverrideDateToNormal(): void {
     $params = [
       'contact_id' => $this->individualCreate(),
       'membership_type_id' => $this->_membershipTypeID,
-      'join_date' => date('Ymd', time()),
-      'start_date' => date('Ymd', time()),
+      'join_date' => date('Ymd'),
+      'start_date' => date('Ymd'),
       'end_date' => date('Ymd', strtotime('+1 year')),
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     ];
 
-    $createdMembership = CRM_Member_BAO_Membership::create($params);
+    $createdMembershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
 
-    CRM_Member_BAO_Membership::updateAllMembershipStatus();
+    $this->callAPISuccess('Job', 'process_membership');
 
     $membershipAfterProcess = civicrm_api3('Membership', 'get', [
       'sequential' => 1,
-      'id' => $createdMembership->id,
+      'id' => $createdMembershipID,
       'return' => ['id', 'is_override', 'status_override_end_date'],
     ])['values'][0];
 
-    $this->assertEquals($createdMembership->id, $membershipAfterProcess['id']);
+    $this->assertEquals($createdMembershipID, $membershipAfterProcess['id']);
     $this->assertEquals(1, $membershipAfterProcess['is_override']);
   }
 
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testMembershipPaymentForSingleContributionMultipleMembership() {
+  public function testMembershipPaymentForSingleContributionMultipleMembership(): void {
     $membershipTypeID1 = $this->membershipTypeCreate(['name' => 'Parent']);
     $membershipTypeID2 = $this->membershipTypeCreate(['name' => 'Child']);
-    $financialTypeId = $this->getFinancialTypeId('Member Dues');
+    $financialTypeId = $this->getFinancialTypeID('Member Dues');
     $priceSet = $this->callAPISuccess('price_set', 'create', [
       'is_quick_config' => 0,
       'extends' => 'CiviMember',
@@ -681,29 +726,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'payment_instrument_id' => 'Credit Card',
     ]);
 
-    $params[] = [
-      'contact_id' => $this->individualCreate(),
-      'membership_type_id' => $membershipTypeID2,
-      'contribution_recur_id' => $contributionRecur['id'],
-      'join_date' => date('Ymd', time()),
-      'start_date' => date('Ymd', time()),
-      'end_date' => date('Ymd', strtotime('+1 year')),
-      'source' => 'Payment',
-    ];
-    $params[] = [
-      'contact_id' => $this->individualCreate(),
-      'membership_type_id' => $membershipTypeID2,
-      'contribution_recur_id' => $contributionRecur['id'],
-      'join_date' => date('Ymd', time()),
-      'start_date' => date('Ymd', time()),
-      'end_date' => date('Ymd', strtotime('+1 year')),
-      'source' => 'Payment',
-    ];
-
-    foreach ($params as $key => $param) {
-      $this->callAPISuccess('membership', 'create', $param);
-    }
-
     $contribution = $this->callAPISuccess('Order', 'create', [
       'total_amount' => 150,
       'contribution_recur_id' => $contributionRecur['id'],
@@ -716,7 +738,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'line_items' => [
         [
           'line_item' => [
-            0 => [
+            [
               'price_field_id' => $priceField['id'],
               'price_field_value_id' => $priceFieldValueId[1],
               'label' => 'Parent',
@@ -727,7 +749,20 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
               'financial_type_id' => $financialTypeId,
               'entity_table' => 'civicrm_membership',
             ],
-            1 => [
+          ],
+          'params' => [
+            'contact_id' => $this->individualCreate(),
+            'membership_type_id' => $membershipTypeID2,
+            'contribution_recur_id' => $contributionRecur['id'],
+            'join_date' => date('Ymd'),
+            'start_date' => date('Ymd'),
+            'end_date' => date('Ymd', strtotime('+1 year')),
+            'source' => 'Payment',
+          ],
+        ],
+        [
+          'line_item' => [
+            [
               'price_field_id' => $priceField['id'],
               'price_field_value_id' => $priceFieldValueId[2],
               'label' => 'Child',
@@ -739,30 +774,26 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
               'entity_table' => 'civicrm_membership',
             ],
           ],
+          'params' => [
+            'contact_id' => $this->individualCreate(),
+            'membership_type_id' => $membershipTypeID2,
+            'contribution_recur_id' => $contributionRecur['id'],
+            'join_date' => date('Ymd'),
+            'start_date' => date('Ymd'),
+            'end_date' => date('Ymd', strtotime('+1 year')),
+            'source' => 'Payment',
+          ],
         ],
       ],
     ]);
-    $params[] = [
-      'contact_id' => $parentContactId,
-      'membership_type_id' => $membershipTypeID1,
-      'contribution_recur_id' => $contributionRecur['id'],
-      'join_date' => date('Ymd', time()),
-      'start_date' => date('Ymd', time()),
-      'end_date' => date('Ymd', strtotime('+1 year')),
-      'skipLineItem' => TRUE,
-      'source' => 'Payment',
-    ];
 
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $contribution['id'],
       'contribution_status_id' => 'Completed',
     ]);
-    $this->callAPISuccessGetCount('Contribution', [], 2);
-    // @todo this fails depending on what tests it is run with due some bad stuff in Membership.create
-    // It needs to be addressed but might involve the switch to ORDER. Membership BAO does bad line item stuff.
-    // $this->callAPISuccessGetCount('LineItem', [], 6);
-    $this->membershipTypeDelete(['id' => $membershipTypeID1]);
-    $this->membershipTypeDelete(['id' => $membershipTypeID2]);
+    $contributions = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1])['values'];
+    $this->assertCount(2, $contributions);
+    $this->assertEquals('Debit Card', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $contributions[1]['payment_instrument_id']));
     $this->validateAllPayments();
     $this->validateAllContributions();
   }
@@ -770,9 +801,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   /**
    * Test the buildMembershipTypeValues function.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
-  public function testBuildMembershipTypeValues() {
+  public function testBuildMembershipTypeValues(): void {
     $this->restoreMembershipTypes();
     $form = new CRM_Core_Form();
     $values = CRM_Member_BAO_Membership::buildMembershipTypeValues($form);
@@ -802,7 +833,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   /**
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected function setupMembership(): array {
     $contactId = $this->individualCreate();
@@ -818,12 +848,193 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    CRM_Member_BAO_Membership::create($params);
+    $this->callAPISuccess('Membership', 'create', $params);
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
     );
     return [$contactId, $membershipId];
+  }
+
+  /**
+   * Test done to verify bug dev/core#1854 remains fixed.
+   *
+   * Under certain special circumstances, updating a membership that had related
+   * memberships and a maximum related value, resulted in some related
+   * memberships being deleted, even though the maximum value was not reached.
+   *
+   * The problem presented itself when a membership is found for the nth contact
+   * related to the organization, the nth+1 contact didn't have a membership,
+   * and the nth+b contact does have a membership, where b > 1.
+   *
+   * This test builds that scenario and checks updating the status of the
+   * membership does not cause the deletion of memberships.
+   *
+   * https://lab.civicrm.org/dev/core/-/issues/1854
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Exception
+   */
+  public function testMembershipUpdateDoesNotDeleteRelatedMembershipsByMistake(): void {
+    $membershipOrganizationId = $this->organizationCreate();
+    $employerId = $this->organizationCreate();
+
+    // Create membership type with relationship.
+    $membershipTypeWithRelationship = $this->createMembershipType($membershipOrganizationId, TRUE, 2);
+
+    // Creating membership for employer.
+    $membership = $this->callAPISuccess("Membership", "create", [
+      'membership_type_id' => $membershipTypeWithRelationship["id"],
+      'contact_id'         => $employerId,
+      'status_id'          => $this->_membershipStatusID,
+    ]);
+    $membership = $membership['values'][$membership["id"]];
+    $this->assertEquals(0, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 0.');
+
+    // Create relationship between organization and individual contacts.
+    $employees = $this->createContacts(5);
+    foreach ($employees as $contactID) {
+      $this->callAPISuccess('Relationship', 'create', [
+        'relationship_type_id' => 5,
+        'contact_id_a'         => $contactID,
+        'contact_id_b'         => $employerId,
+        'is_active'            => 1,
+      ]);
+    }
+    $this->deleteRelatedMemberships($membership["id"]);
+    $this->assertEquals(0, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 0.');
+
+    // Create related memberships for first and last contact.
+    $relatedMembership1 = $this->createRelatedMembershipForContact($employees[0], $membership);
+    $relatedMembership2 = $this->createRelatedMembershipForContact($employees[4], $membership);
+    $this->assertEquals(2, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 2.');
+
+    // Reset statics.
+    unset(Civi::$statics[CRM_Member_BAO_Membership::class]['related_contacts']);
+
+    // Update membership by changing its status.
+    $otherStatusID = $this->membershipStatusCreate('another status ' . random_int(1, 1000));
+    $membership["status_id"] = $otherStatusID;
+    $this->callAPISuccess("Membership", "create", $membership);
+
+    // Assert nothing has changed.
+    $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
+    $this->assertEquals(2, $relatedMembershipsCount, "Related membership count should still be 2, but found $relatedMembershipsCount");
+    $this->assertMembershipExists($relatedMembership1['id']);
+    $this->assertMembershipExists($relatedMembership2['id']);
+  }
+
+  public function testRelatedMembershipWithContactReferenceCustomField(): void {
+    $relatedContactId = $this->individualCreate();
+    $customContactId = $this->individualCreate();
+    $membershipOrganizationId = $this->organizationCreate();
+    $organizationId = $this->organizationCreate();
+
+    $membershipTypeWithRelationship = $this->createMembershipType($membershipOrganizationId, TRUE);
+    $customGroup = $this->customGroupCreate(['extends' => 'Membership']);
+    $customField = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'data_type' => 'ContactReference',
+      'html_type' => 'Autocomplete-Select',
+      'default_value' => '',
+    ]);
+
+    // Creating membership of organisation
+    $membership = $this->callAPISuccess("Membership", "create", [
+      'membership_type_id' => $membershipTypeWithRelationship["id"],
+      'contact_id'         => $organizationId,
+      'status_id'          => $this->_membershipStatusID,
+      'custom_' . $customField['id'] => $customContactId,
+    ]);
+
+    $membership = $membership['values'][$membership["id"]];
+
+    // Create relationship between organization and individual contact
+    $relationship = $this->callAPISuccess('Relationship', 'create', [
+      // Employer of relationship
+      'relationship_type_id' => 5,
+      'contact_id_a'         => $relatedContactId,
+      'contact_id_b'         => $organizationId,
+      'is_active'            => 1,
+    ]);
+
+    // Check count of related memberships. It should be one for individual contact.
+    $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
+    $this->assertEquals(1, $relatedMembershipsCount, 'Related membership count should be 1.');
+
+    $relatedMembership = $this->callAPISuccess("Membership", "getsingle", [
+      'owner_membership_id' => $membership["id"],
+    ]);
+
+    $this->assertEquals($customContactId, $relatedMembership['custom_' . $customField['id'] . '_id']);
+
+    $this->callAPISuccess('Relationship', 'delete', ['id' => $relationship['id']]);
+    $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
+    $this->assertEquals(0, $relatedMembershipsCount, 'Related membership count should be 0.');
+  }
+
+  /**
+   * Creates the given amount of contacts.
+   *
+   * @param int $count
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function createContacts(int $count): array {
+    $contacts = [];
+    for ($i = 0; $i < $count; $i++) {
+      $contacts[] = $this->individualCreate();
+    }
+
+    return $contacts;
+  }
+
+  /**
+   * Deletes related memberships for given parent membership ID.
+   *
+   * @param int $parentMembershipID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function deleteRelatedMemberships(int $parentMembershipID): void {
+    $this->callAPISuccess('Membership', 'get', [
+      'owner_membership_id' => $parentMembershipID,
+      'api.Membership.delete' => ['id' => '$value.id'],
+    ]);
+  }
+
+  /**
+   * Creates a related membership for the given contact ID.
+   *
+   * @param int $contactID
+   * @param array $parentMembership
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function createRelatedMembershipForContact(int $contactID, array $parentMembership): array {
+    return $this->callAPISuccess('Membership', 'create', [
+      'membership_type_id' => $parentMembership['membership_type_id'],
+      'contact_id'         => $contactID,
+      'status_id'          => $this->_membershipStatusID,
+      'owner_membership_id' => $parentMembership['id'],
+    ]);
+  }
+
+  /**
+   * Checks the given membership ID can be found.
+   *
+   * @param int $membershipID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function assertMembershipExists(int $membershipID): void {
+    $membership = $this->callAPISuccess("Membership", "get", [
+      'id' => $membershipID,
+    ]);
+    $this->assertEquals(1, $membership['count']);
+    $this->assertEquals($membershipID, $membership['id']);
   }
 
 }

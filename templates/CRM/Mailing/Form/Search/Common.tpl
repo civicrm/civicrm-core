@@ -11,7 +11,7 @@
 </td>
 </tr>
 <tr>
-{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="mailing_job_start_date"}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="mailing_job_start_date" to='' from='' colspan='' class='' hideRelativeLabel=0}
 </tr>
 <tr>
   <td>
@@ -66,7 +66,7 @@
 </tr>
 <tr>
   <td>{* campaign in Advance search *}
-      {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
+      {include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
        campaignTrClass='crmCampaign' campaignTdClass='crmCampaignContainer'}
   </td>
 </tr>

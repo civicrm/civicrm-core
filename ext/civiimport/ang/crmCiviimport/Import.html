@@ -1,0 +1,149 @@
+<div crm-ui-debug="userJob"></div>
+<div crm-ui-debug="data"></div>
+
+
+
+<div class="help">
+  <p>{{:: ts("Review the values shown below from the first 2 rows of your import file and select the matching CiviCRM database fields from the drop-down lists in the right-hand column. Select '- do not import -' for any columns in the import file that you want ignored.") }}</p>
+  <p>{{:: ts("If you think you may be importing additional data from the same data source, check 'Save this field mapping' at the bottom of the page before continuing. The saved mapping can then be easily reused the next time data is imported.") }}</p>
+</div>
+
+<div class="crm-submit-buttons">
+  <button class="crm-form-submit cancel crm-button crm-button-type-back crm-button_qf_MapField_back" value="1" type="submit" name="_qf_MapField_back" ng-click="save" id="_qf_MapField_back-top"><i aria-hidden="true" class="crm-i fa-chevron-left"></i> Previous</button>
+  <button class="crm-form-submit default validate crm-button crm-button-type-next crm-button_qf_MapField_next" value="1" type="submit" name="_qf_MapField_next" ng-click="save($event)" id="_qf_MapField_next-top"><i aria-hidden="true" class="crm-i fa-check"></i> Continue</button>
+  <button class="crm-form-submit cancel crm-button crm-button-type-cancel crm-button_qf_MapField_cancel" value="1" type="submit" name="_qf_MapField_cancel" ng-click="save($event)" id="_qf_MapField_cancel-top"><i aria-hidden="true" class="crm-i fa-times"></i> Cancel</button>
+</div>
+
+<div class="crm-block crm-form-block crm-import-mappings-form-block">
+  <div id="crm-import-entities" class="columnheader"><h3>{{:: ts('Import to') }}</h3>
+
+    <div ng-repeat="(entityName, entity) in data.entities track by entity.id"
+         ng-class-odd="'odd-row'"
+         ng-class-even="'even-row'"
+         class="selector-rows crm-importMappings-row"
+         ng-controller="crmImportUiEntity"
+    >
+       <div class="crm-grid-cell labels">
+        <div>
+          <div>{{ entity.text }}
+            <label>
+              <input class="big" crm-ui-select='{data: entity.actions}' ng-model="entity.selected.action" ng-disabled="entity.actions.length < 2"/>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="crm-grid-cell">
+        <div>
+          <div>
+            <label ng-if="entity.is_contact && entity.selected.action !== 'ignore'">
+              {{:: ts('Contact type') }}
+              <input  class="big" ng-change="updateContactType(entity)"
+                crm-ui-select='{data: data.contactTypes, allowClear: false}' ng-model="entity.selected.contact_type" />
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="crm-grid-cell">
+        <div>
+          <div>
+            <label ng-if="entity.is_contact && entity.selected.action !== 'ignore' && entity.selected.contact_type">
+              {{:: ts('Dedupe rule') }}  <input class="big" crm-ui-select='{data: getDedupeRule}' ng-model="entity.selected.dedupe_rule" />
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="crm-grid-cell">
+        <div ng-if="entity.entity_data && entity.selected.action !== 'ignore'">
+          <div ng-repeat="(fieldName, entityField) in entity.entity_data">
+            <label>
+              {{ entityField.title }}  <input  class="big" crm-ui-select='{data: entityField.options, required : entityField.is_required}' ng-model="entity.selected[fieldName]"/>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div id="map-field">
+    {{:: ts('Data mapping') }}
+    <table class="selector">
+      <tr ng-if="data.savedMapping.name" class="columnheader-dark"><th colspan="4">
+        {{:: ts('Saved Field Mapping: %1', {1: data.savedMapping.name}) }}</th>
+      </tr>
+      <tr class="columnheader">
+        <td ng-if="data.showColumnNames" class="even-row labels">{{:: ts('Column Names') }}</td>
+        <td ng-repeat="(rowNumber, rowValues) in data.rows" class="odd-row labels">
+          {{:: ts('Import Data (row %1)', {1: $index+1}) }}
+        </td>
+        <td class="even-odd labels">{{:: ts('Matching CiviCRM Field') }}</td>
+        <td class="even-odd labels">{{:: ts('Default value') }}</td>
+      </tr>
+      <tr ng-repeat="(index, row) in data.importMappings">
+        <td ng-if="data.showColumnNames" >{{ row['header'] }}</td>
+        <td ng-repeat="(rowNumber, rowValues) in data.rows" class="odd-row">
+          <span ng-repeat="rowValue in rowValues track by $index"><span ng-if="index == $index">{{ rowValue }}</span></span>
+        </td>
+        <td class="even-row">
+          <div>
+            <div>
+              <label>
+                <input id='mapper[{{index}}][0]' name='mapper[{{index}}][0]' class="big" crm-ui-select='{data: getFields, allowClear: true, placeholder: "do not import"}' ng-model="row['selectedField']" />
+              </label>
+            </div>
+          </div>
+        </td>
+        <td class="even-row">
+          <div>
+            <div>
+              <label>
+                <input class="big" ng-model="row['defaultValue']" />
+              </label>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+<div>
+  <span ng-if="data.savedMapping.name"><input
+    id="updateMapping"
+    name="updateMapping"
+    ng-model="mappingSaving.updateFieldMapping"
+    ng-true-value="1"
+    ng-false-value="0"
+    ng-click="toggleMappingFields('updateFieldMapping')"
+    type="checkbox"
+    class="crm-form-checkbox">{{:: ts('Update this field mapping') }}</span>
+  <label>
+
+    <input id="saveMapping" name="saveMapping"
+           ng-click="toggleMappingFields('newFieldMapping')"
+           ng-true-value="1"
+           ng-false-value="0"
+           ng-model="mappingSaving.newFieldMapping" type="checkbox" value="1" class="crm-form-checkbox">{{:: ts('Save this field mapping') }}
+  </label>
+
+
+
+  <div id="saveDetails" class="form-item">
+    <table ng-show="mappingSaving.newFieldMapping" class="form-layout-compressed">
+      <tr class="crm-import-maptable-form-block-saveMappingName">
+        <td class="label">{{:: ts('Name') }}</td>
+        <td><input name="saveMappingName" type="text" value="" id="saveMappingName" class="crm-form-text"></td>
+      </tr>
+      <tr class="crm-import-maptable-form-block-saveMappingName">
+        <td class="label">{{:: ts('Description') }}</td>
+        <td><input name="saveMappingDescription" type="text" value="" id="saveMappingDesc" class="crm-form-text"></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="crm-submit-buttons">
+  <button class="crm-form-submit cancel crm-button crm-button-type-back crm-button_qf_MapField_back" value="1" type="submit" name="_qf_MapField_back" id="_qf_MapField_back-bottom"><i aria-hidden="true" class="crm-i fa-chevron-left"></i>{{:: ts('Previous') }}</button>
+  <button ng-click="save($event)" class="crm-form-submit default validate crm-button crm-button-type-next crm-button_qf_MapField_next" value="1" type="submit" name="_qf_MapField_next" id="_qf_MapField_next-bottom"><i aria-hidden="true" class="crm-i fa-check"></i>{{:: ts('Continue') }}</button>
+  <button class="crm-form-submit cancel crm-button crm-button-type-cancel crm-button_qf_MapField_cancel" value="1" type="submit" name="_qf_MapField_cancel" id="_qf_MapField_cancel-bottom"><i aria-hidden="true" class="crm-i fa-times"></i>{{:: ts('Cancel') }}</button>
+</div>
+

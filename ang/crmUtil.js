@@ -3,7 +3,7 @@
   angular.module('crmUtil', CRM.angRequires('crmUtil'));
 
   // Angular implementation of CRM.api3
-  // @link http://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface#AJAXInterface-CRM.api3
+  // @link https://docs.civicrm.org/dev/en/latest/api/interfaces/#angularjs
   //
   // Note: To mock API results in unit-tests, override crmApi.backend, e.g.
   //   var apiSpy = jasmine.createSpy('crmApi');

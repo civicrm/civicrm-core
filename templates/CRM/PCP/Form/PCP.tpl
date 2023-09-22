@@ -7,11 +7,10 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 <table class="form-layout">
-  <tr  class="crm-contribution-contributionpage-pcp-form-block-pcp_active">
-      <td class="label">&nbsp;</td>
-      <td>{$form.pcp_active.html} {$form.pcp_active.label}</td>
+  <tr class="crm-contribution-contributionpage-pcp-form-block-pcp_active">
+    <td class="label">&nbsp;</td>
+    <td>{$form.pcp_active.html} {$form.pcp_active.label}</td>
   </tr>
 </table>
 
@@ -19,7 +18,7 @@
 
 <div id="pcpFields">
 {crmRegion name="pcp-form-pcp-fields"}
-  {if $form.target_entity_type}
+  {if !empty($form.target_entity_type)}
   <table class="form-layout">
     <tr  class="crm-contribution-contributionpage-pcp-form-block-target_entity_type">
         <td class="label">{$form.target_entity_type.label} <span class="crm-marker"> *</span></td>

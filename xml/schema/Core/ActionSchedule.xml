@@ -6,11 +6,22 @@
   <name>civicrm_action_schedule</name>
   <comment>Table to store the reminders.</comment>
   <add>3.4</add>
+  <labelField>title</labelField>
+  <title>Scheduled Reminder</title>
+  <paths>
+    <browse>civicrm/admin/scheduleReminders</browse>
+    <add>civicrm/admin/scheduleReminders/edit?reset=1&amp;action=add</add>
+    <update>civicrm/admin/scheduleReminders/edit?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/admin/scheduleReminders/edit?reset=1&amp;action=delete&amp;id=[id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Action Schedule ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.4</add>
   </field>
   <primaryKey>
@@ -21,14 +32,27 @@
     <name>name</name>
     <title>Name</title>
     <type>varchar</type>
+    <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
     <length>64</length>
     <comment>Name of the action(reminder)</comment>
     <add>3.4</add>
   </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>5.65</add>
+  </index>
   <field>
     <name>title</name>
     <title>Title</title>
     <type>varchar</type>
+    <html>
+      <type>Text</type>
+    </html>
     <length>64</length>
     <comment>Title of the action(reminder)</comment>
     <add>3.4</add>
@@ -38,12 +62,28 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Recipient</comment>
+    <html>
+      <label>Limit or Add Recipients</label>
+      <type>Select</type>
+      <controlField>mapping_id</controlField>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getRecipientOptions</callback>
+    </pseudoconstant>
     <add>3.4</add>
   </field>
   <field>
     <name>limit_to</name>
-    <type>boolean</type>
+    <type>int</type>
     <comment>Is this the recipient criteria limited to OR in addition to?</comment>
+    <html>
+      <label>Limit/Add</label>
+      <type>Select</type>
+      <controlField>mapping_id</controlField>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getLimitToOptions</callback>
+    </pseudoconstant>
     <add>4.4</add>
   </field>
   <field>
@@ -51,6 +91,16 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Entity value</comment>
+    <serialize>SEPARATOR_TRIMMED</serialize>
+    <html>
+      <label>Entity Value</label>
+      <type>Select</type>
+      <multiple>1</multiple>
+      <controlField>mapping_id</controlField>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getEntityValueOptions</callback>
+    </pseudoconstant>
     <add>3.4</add>
   </field>
   <field>
@@ -58,6 +108,16 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Entity status</comment>
+    <serialize>SEPARATOR_TRIMMED</serialize>
+    <html>
+      <label>Entity Status</label>
+      <type>Select</type>
+      <multiple>1</multiple>
+      <controlField>entity_value</controlField>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getEntityStatusOptions</callback>
+    </pseudoconstant>
     <add>3.4</add>
   </field>
   <field>
@@ -65,6 +125,11 @@
     <type>int unsigned</type>
     <comment>Reminder Interval.</comment>
     <default>0</default>
+    <html>
+      <type>Number</type>
+      <min>0</min>
+      <label>Start Action Offset</label>
+    </html>
     <add>3.4</add>
   </field>
   <field>
@@ -73,11 +138,13 @@
     <length>8</length>
     <comment>Time units for reminder.</comment>
     <pseudoconstant>
-      <callback>CRM_Core_SelectValues::getRecurringFrequencyUnits</callback>
+      <callback>CRM_Core_BAO_ActionSchedule::getDateUnits</callback>
     </pseudoconstant>
     <add>3.4</add>
     <html>
       <type>Select</type>
+      <label>Start Action Unit</label>
+      <controlField>start_action_offset</controlField>
     </html>
   </field>
   <field>
@@ -85,6 +152,13 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Reminder Action</comment>
+    <html>
+      <type>Select</type>
+      <label>Start Condition</label>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::beforeAfter</callback>
+    </pseudoconstant>
     <add>3.4</add>
   </field>
   <field>
@@ -92,13 +166,25 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Entity date</comment>
+    <html>
+      <label>Start Date</label>
+      <type>Select</type>
+      <controlField>entity_value</controlField>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getActionDateOptions</callback>
+    </pseudoconstant>
     <add>3.4</add>
   </field>
   <field>
     <name>is_repeat</name>
-    <title>Repeat?</title>
+    <title>Repeat</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+    </html>
     <add>3.4</add>
   </field>
   <field>
@@ -107,11 +193,13 @@
     <length>8</length>
     <comment>Time units for repetition of reminder.</comment>
     <pseudoconstant>
-      <callback>CRM_Core_SelectValues::getRecurringFrequencyUnits</callback>
+      <callback>CRM_Core_BAO_ActionSchedule::getDateUnits</callback>
     </pseudoconstant>
     <add>3.4</add>
     <html>
       <type>Select</type>
+      <label>Repetition Frequency Unit</label>
+      <controlField>repetition_frequency_interval</controlField>
     </html>
   </field>
   <field>
@@ -119,6 +207,11 @@
     <type>int unsigned</type>
     <default>0</default>
     <comment>Time interval for repeating the reminder.</comment>
+    <html>
+      <type>Number</type>
+      <min>0</min>
+      <label>Repetition Frequency Interval</label>
+    </html>
     <add>3.4</add>
   </field>
   <field>
@@ -127,17 +220,24 @@
     <length>8</length>
     <comment>Time units till repetition of reminder.</comment>
     <pseudoconstant>
-      <callback>CRM_Core_SelectValues::getRecurringFrequencyUnits</callback>
+      <callback>CRM_Core_BAO_ActionSchedule::getDateUnits</callback>
     </pseudoconstant>
     <add>3.4</add>
     <html>
       <type>Select</type>
+      <label>End Frequency Unit</label>
+      <controlField>end_frequency_interval</controlField>
     </html>
   </field>
   <field>
     <name>end_frequency_interval</name>
     <type>int unsigned</type>
     <comment>Time interval till repeating the reminder.</comment>
+    <html>
+      <type>Number</type>
+      <min>0</min>
+      <label>End Frequency Interval</label>
+    </html>
     <add>3.4</add>
     <default>0</default>
   </field>
@@ -146,6 +246,13 @@
     <type>varchar</type>
     <length>32</length>
     <comment>Reminder Action till repeating the reminder.</comment>
+    <html>
+      <type>Select</type>
+      <label>End Condition</label>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::beforeAfter</callback>
+    </pseudoconstant>
     <add>3.4</add>
   </field>
   <field>
@@ -153,6 +260,14 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Entity end date</comment>
+    <html>
+      <label>End Date</label>
+      <type>Select</type>
+      <controlField>entity_value</controlField>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getActionDateOptions</callback>
+    </pseudoconstant>
     <add>3.4</add>
   </field>
   <field>
@@ -160,6 +275,11 @@
     <title>Schedule is Active?</title>
     <type>boolean</type>
     <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <comment>Is this option active?</comment>
     <add>3.4</add>
   </field>
@@ -167,8 +287,14 @@
     <name>recipient_manual</name>
     <title>Recipient Manual</title>
     <type>varchar</type>
+    <html>
+      <type>EntityRef</type>
+      <label>Manual Recipients</label>
+      <multiple>1</multiple>
+    </html>
     <length>128</length>
     <comment>Contact IDs to which reminder should be sent.</comment>
+    <serialize>COMMA</serialize>
     <add>3.4</add>
   </field>
   <field>
@@ -176,6 +302,16 @@
     <title>Recipient Listing</title>
     <type>varchar</type>
     <length>128</length>
+    <serialize>SEPARATOR_TRIMMED</serialize>
+    <html>
+      <label>Recipient Roles</label>
+      <type>Select</type>
+      <multiple>1</multiple>
+      <controlField>recipient</controlField>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getRecipientListingOptions</callback>
+    </pseudoconstant>
     <comment>listing based on recipient field.</comment>
     <add>4.1</add>
   </field>
@@ -183,6 +319,9 @@
     <name>body_text</name>
     <title>Reminder Text</title>
     <type>longtext</type>
+    <html>
+      <type>TextArea</type>
+    </html>
     <comment>Body of the mailing in text format.</comment>
     <add>3.4</add>
   </field>
@@ -190,6 +329,9 @@
     <name>body_html</name>
     <title>Reminder HTML</title>
     <type>longtext</type>
+    <html>
+      <type>RichTextEditor</type>
+    </html>
     <comment>Body of the mailing in html format.</comment>
     <add>3.4</add>
   </field>
@@ -197,6 +339,9 @@
     <name>sms_body_text</name>
     <title>SMS Reminder Text</title>
     <type>longtext</type>
+    <html>
+      <type>TextArea</type>
+    </html>
     <comment>Content of the SMS text.</comment>
     <add>4.5</add>
   </field>
@@ -204,38 +349,55 @@
     <name>subject</name>
     <title>Reminder Subject</title>
     <type>varchar</type>
+    <html>
+      <type>Text</type>
+    </html>
     <length>128</length>
     <comment>Subject of mailing</comment>
     <add>3.4</add>
   </field>
   <field>
     <name>record_activity</name>
-    <title>Record Activity for Reminder?</title>
+    <title>Record Activity</title>
     <type>boolean</type>
-    <default>NULL</default>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <default>0</default>
+    <required>true</required>
     <comment>Record Activity for this reminder?</comment>
     <add>3.4</add>
   </field>
   <field>
     <name>mapping_id</name>
-    <title>Reminder Mapping</title>
+    <title>Reminder For</title>
     <type>varchar</type>
     <length>64</length>
+    <html>
+      <label>Used For</label>
+      <type>Select</type>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getMappingOptions</callback>
+      <suffixes>name,label,icon</suffixes>
+    </pseudoconstant>
     <comment>Name/ID of the mapping to use on this table</comment>
     <add>3.4</add>
   </field>
   <field>
     <name>group_id</name>
-    <title>Reminder Group</title>
+    <title>Group ID</title>
     <type>int unsigned</type>
     <comment>FK to Group</comment>
     <pseudoconstant>
       <table>civicrm_group</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
+      <label>Group</label>
     </html>
     <add>3.4</add>
   </field>
@@ -247,9 +409,12 @@
   </foreignKey>
   <field>
     <name>msg_template_id</name>
-    <title>Reminder Template</title>
+    <title>Message Template ID</title>
     <type>int unsigned</type>
     <comment>FK to the message template.</comment>
+    <html>
+      <label>Message Template</label>
+    </html>
   </field>
   <foreignKey>
     <name>msg_template_id</name>
@@ -259,9 +424,12 @@
   </foreignKey>
   <field>
     <name>sms_template_id</name>
-    <title>SMS Reminder Template</title>
+    <title>SMS Template ID</title>
     <type>int unsigned</type>
     <comment>FK to the message template.</comment>
+    <html>
+      <label>SMS Template</label>
+    </html>
   </field>
   <foreignKey>
     <name>sms_template_id</name>
@@ -273,6 +441,10 @@
     <name>absolute_date</name>
     <title>Fixed Date for Reminder</title>
     <type>date</type>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
     <comment>Date on which the reminder be sent.</comment>
     <add>4.1</add>
   </field>
@@ -280,6 +452,10 @@
     <name>from_name</name>
     <title>Reminder from Name</title>
     <type>varchar</type>
+    <html>
+      <label>From Name</label>
+      <type>Text</type>
+    </html>
     <length>255</length>
     <comment>Name in "from" field</comment>
     <add>4.5</add>
@@ -288,6 +464,10 @@
     <name>from_email</name>
     <title>Reminder From Email</title>
     <type>varchar</type>
+    <html>
+      <label>From Email</label>
+      <type>Email</type>
+    </html>
     <length>255</length>
     <comment>Email address in "from" field</comment>
     <add>4.5</add>
@@ -309,12 +489,16 @@
   </field>
   <field>
     <name>sms_provider_id</name>
-    <title>SMS Provider</title>
+    <title>SMS Provider ID</title>
     <type>int unsigned</type>
     <add>4.5</add>
     <html>
       <type>Select</type>
+      <label>SMS Provider</label>
     </html>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::smsProvider</callback>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>sms_provider_id</name>
@@ -328,6 +512,9 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Used for repeating entity</comment>
+    <html>
+      <label>Used For</label>
+    </html>
     <add>4.6</add>
   </field>
   <field>
@@ -335,6 +522,15 @@
     <type>varchar</type>
     <length>128</length>
     <comment>Used for multilingual installation</comment>
+    <serialize>SEPARATOR_TRIMMED</serialize>
+    <html>
+      <type>Select</type>
+      <multiple>1</multiple>
+      <label>Recipients Language</label>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getFilterContactLanguageOptions</callback>
+    </pseudoconstant>
     <add>4.7</add>
   </field>
   <field>
@@ -342,6 +538,64 @@
     <type>varchar</type>
     <length>8</length>
     <comment>Used for multilingual installation</comment>
+    <html>
+      <type>Select</type>
+      <label>Communication Language</label>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_ActionSchedule::getCommunicationLanguageOptions</callback>
+    </pseudoconstant>
     <add>4.7</add>
+  </field>
+  <field>
+    <name>created_date</name>
+    <title>Created Date</title>
+    <uniqueName>action_schedule_created_date</uniqueName>
+    <type>timestamp</type>
+    <comment>When was the scheduled reminder created.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>CURRENT_TIMESTAMP</default>
+    <add>5.34</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <type>timestamp</type>
+    <comment>When the reminder was created or modified.</comment>
+    <required>false</required>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <html>
+      <label>Modified Date</label>
+    </html>
+    <add>5.34</add>
+    <readonly>true</readonly>
+  </field>
+  <field>
+    <name>effective_start_date</name>
+    <title>Effective start date</title>
+    <uniqueName>action_schedule_effective_start_date</uniqueName>
+    <type>timestamp</type>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
+    <comment>Earliest date to consider start events from.</comment>
+    <required>false</required>
+    <export>true</export>
+    <add>5.34</add>
+  </field>
+  <field>
+    <name>effective_end_date</name>
+    <title>Effective end date</title>
+    <uniqueName>action_schedule_effective_end_date</uniqueName>
+    <type>timestamp</type>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
+    <comment>Latest date to consider end events from.</comment>
+    <required>false</required>
+    <export>true</export>
+    <add>5.34</add>
   </field>
 </table>

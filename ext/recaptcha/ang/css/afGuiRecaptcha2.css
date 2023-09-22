@@ -1,0 +1,12 @@
+div.af-gui-recaptcha2-placeholder {
+  width: 305px;
+  height: 76px;
+  opacity: .85;
+  background-image: url('rc2-light.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+div.af-gui-recaptcha2-placeholder.rc2dark {
+  background-image: url('rc2-dark.png');
+}

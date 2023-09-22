@@ -8,10 +8,8 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-mailing-forward-form-block">
-<br />
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div><br />
 <table class="form-layout">
-<tr class="crm-mailing-forward-form-block-fromEmail"><td class="label">From</td><td>{$fromEmail}</td></tr>
+<tr class="crm-mailing-forward-form-block-fromEmail"><td class="label">{ts}From{/ts}</td><td>{$fromEmail}</td></tr>
 <tr><td colspan="2">{ts}Please enter up to 5 email addresses to receive the mailing.{/ts}</td></tr>
 <tr class="crm-mailing-forward-form-block-email_0"><td class="label" >{$form.email_0.label}</td><td>{$form.email_0.html}</td></tr>
 <tr class="crm-mailing-forward-form-block-email_1"><td class="label" >{$form.email_1.label}</td><td>{$form.email_1.html}</td></tr>

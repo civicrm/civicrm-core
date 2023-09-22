@@ -36,7 +36,7 @@
           CRM.confirm({
             message: '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal}'
           }).on('crmConfirm:yes', function() {
-            var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
+            var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0}"{literal};
             var request = $.post(postUrl, $el.data('delete_params'));
             CRM.status({/literal}"{ts escape='js'}Record Deleted{/ts}"{literal}, request);
             request.done(function() {

@@ -1,5 +1,5 @@
-{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
-{if $receipt_text}
+{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
+{if !empty($receipt_text)}
 {$receipt_text}
 {/if}
 {if $is_pay_later}
@@ -9,60 +9,54 @@
 ===========================================================
 {/if}
 
-{if $amount}
+{if {contribution.total_amount|boolean}}
 ===========================================================
 {ts}Contribution Information{/ts}
 
 ===========================================================
-{if $lineItem and $priceSetID and !$is_quick_config}
-{foreach from=$lineItem item=value key=priceset}
+{if $isShowLineItems}
+
 ---------------------------------------------------------
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
 {capture assign=ts_qty}{ts}Qty{/ts}{/capture}
 {capture assign=ts_each}{ts}Each{/ts}{/capture}
-{if $dataArray}
+{if $isShowTax && {contribution.tax_amount|boolean}}
 {capture assign=ts_subtotal}{ts}Subtotal{/ts}{/capture}
 {capture assign=ts_taxRate}{ts}Tax Rate{/ts}{/capture}
 {capture assign=ts_taxAmount}{ts}Tax Amount{/ts}{/capture}
 {/if}
 {capture assign=ts_total}{ts}Total{/ts}{/capture}
-{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if $dataArray} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"}
+{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if $isShowTax && {contribution.tax_amount|boolean}} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"}
 ----------------------------------------------------------
-{foreach from=$value item=line}
-{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney:$currency|string_format:"%10s"} {if $dataArray}{$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if $line.tax_rate != "" || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {else}                  {/if}  {/if} {$line.line_total+$line.tax_amount|crmMoney:$currency|string_format:"%10s"}
-{/foreach}
+{foreach from=$lineItems item=line}
+{capture assign=ts_item}{$line.title}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney:$currency|string_format:"%10s"} {if $isShowTax && {contribution.tax_amount|boolean}}{$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {else}                  {/if}  {/if} {$line.line_total+$line.tax_amount|crmMoney:$currency|string_format:"%10s"}
 {/foreach}
 
-{if $dataArray}
-{ts}Amount before Tax{/ts}: {$amount-$totalTaxAmount|crmMoney:$currency}
+{if $isShowTax && {contribution.tax_amount|boolean}}
+{ts}Amount before Tax:{/ts} {$amount-$totalTaxAmount|crmMoney:$currency}
+  {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
+    {if $taxRate == 0}{ts}No{/ts} {$taxTerm}{else}{$taxTerm} {$taxDetail.percentage}%{/if} : {$taxDetail.amount|crmMoney:'{contribution.currency}'}
+  {/foreach}
+{/if}
 
-{foreach from=$dataArray item=value key=priceset}
-{if $priceset || $priceset == 0}
-{$taxTerm} {$priceset|string_format:"%.2f"}%: {$value|crmMoney:$currency}
+{if $isShowTax}
+{ts}Total Tax Amount{/ts}: {contribution.tax_amount|crmMoney}
+{/if}
+
+{ts}Total Amount{/ts}: {contribution.total_amount}
 {else}
-{ts}No{/ts} {$taxTerm}: {$value|crmMoney:$currency}
-{/if}
-{/foreach}
-{/if}
-
-{if $totalTaxAmount}
-{ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
-{/if}
-
-{ts}Total Amount{/ts}: {$amount|crmMoney:$currency}
-{else}
-{ts}Amount{/ts}: {$amount|crmMoney:$currency} {if $amount_level } - {$amount_level} {/if}
+{ts}Amount{/ts}: {contribution.total_amount} {if '{contribution.amount_level}'} - {contribution.amount_level}{/if}
 {/if}
 {/if}
-{if $receive_date}
+{if !empty($receive_date)}
 
 {ts}Date{/ts}: {$receive_date|crmDate}
 {/if}
-{if $is_monetary and $trxn_id}
-{ts}Transaction #{/ts}: {$trxn_id}
+{if {contribution.trxn_id|boolean}}
+{ts}Transaction #{/ts}: {contribution.trxn_id}
 {/if}
 
-{if $is_recur}
+{if !empty($is_recur)}
 {ts}This is a recurring contribution.{/ts}
 
 {if $cancelSubscriptionUrl}
@@ -94,7 +88,7 @@
 {foreach from=$honoreeProfile item=value key=label}
 {$label}: {$value}
 {/foreach}
-{elseif $softCreditTypes and $softCredits}
+{elseif !empty($softCreditTypes) and !empty($softCredits)}
 {foreach from=$softCreditTypes item=softCreditType key=n}
 ===========================================================
 {$softCreditType}
@@ -104,7 +98,7 @@
 {/foreach}
 {/foreach}
 {/if}
-{if $pcpBlock}
+{if !empty($pcpBlock)}
 ===========================================================
 {ts}Personal Campaign Page{/ts}
 
@@ -116,7 +110,7 @@
 {if $pcp_personal_note}{ts}Personal Note{/ts}: {$pcp_personal_note}{/if}
 
 {/if}
-{if $onBehalfProfile}
+{if !empty($onBehalfProfile)}
 ===========================================================
 {ts}On Behalf Of{/ts}
 
@@ -126,7 +120,7 @@
 {/foreach}
 {/if}
 
-{if $billingName}
+{if !empty($billingName)}
 ===========================================================
 {ts}Billing Name and Address{/ts}
 
@@ -135,14 +129,14 @@
 {$address}
 
 {$email}
-{elseif $email}
+{elseif !empty($email)}
 ===========================================================
 {ts}Registered Email{/ts}
 
 ===========================================================
 {$email}
 {/if} {* End billingName or Email*}
-{if $credit_card_type}
+{if !empty($credit_card_type)}
 
 ===========================================================
 {ts}Credit Card Information{/ts}
@@ -153,7 +147,7 @@
 {ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}
 {/if}
 
-{if $selectPremium }
+{if !empty($selectPremium )}
 ===========================================================
 {ts}Premium Information{/ts}
 
@@ -171,43 +165,39 @@
 {if $end_date}
 {ts}End Date{/ts}: {$end_date|crmDate}
 {/if}
-{if $contact_email OR $contact_phone}
+{if !empty($contact_email) OR !empty($contact_phone)}
 
 {ts}For information about this premium, contact:{/ts}
 
-{if $contact_email}
+{if !empty($contact_email)}
   {$contact_email}
 {/if}
-{if $contact_phone}
+{if !empty($contact_phone)}
   {$contact_phone}
 {/if}
 {/if}
-{if $is_deductible AND $price}
+{if $is_deductible AND !empty($price)}
 
 {ts 1=$price|crmMoney:$currency}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}{/if}
 {/if}
 
-{if $customPre}
+{if !empty($customPre)}
 ===========================================================
 {$customPre_grouptitle}
 
 ===========================================================
 {foreach from=$customPre item=customValue key=customName}
-{if ( $trackingFields and ! in_array( $customName, $trackingFields ) ) or ! $trackingFields}
  {$customName}: {$customValue}
-{/if}
 {/foreach}
 {/if}
 
 
-{if $customPost}
+{if !empty($customPost)}
 ===========================================================
 {$customPost_grouptitle}
 
 ===========================================================
 {foreach from=$customPost item=customValue key=customName}
-{if ( $trackingFields and ! in_array( $customName, $trackingFields ) ) or ! $trackingFields}
  {$customName}: {$customValue}
-{/if}
 {/foreach}
 {/if}

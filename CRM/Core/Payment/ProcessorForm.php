@@ -31,16 +31,10 @@ class CRM_Core_Payment_ProcessorForm {
    * @throws Exception
    */
   public static function preProcess(&$form, $type = NULL, $mode = NULL) {
+    $type = $type ?: CRM_Utils_Request::retrieve('type', 'String', $form);
     if ($type) {
-      $form->_type = $type;
-    }
-    else {
-      $form->_type = CRM_Utils_Request::retrieve('type', 'String', $form);
-    }
-
-    if ($form->_type) {
       // @todo not sure when this would be true. Never passed in.
-      $form->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($form->_type, $form->_mode);
+      $form->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($type, $form->_mode);
     }
 
     if (empty($form->_paymentProcessor)) {
@@ -62,10 +56,15 @@ class CRM_Core_Payment_ProcessorForm {
 
     $form->assign('currency', $form->getCurrency());
 
+    $form->assign('paymentAgreementTitle', $form->_paymentProcessor['object']->getText('agreementTitle', []));
+    $form->assign('paymentAgreementText', $form->_paymentProcessor['object']->getText('agreementText', []));
+
     // also set cancel subscription url
     if (!empty($form->_paymentProcessor['is_recur']) && !empty($form->_values['is_recur'])) {
       $form->_values['cancelSubscriptionUrl'] = $form->_paymentObject->subscriptionURL(NULL, NULL, 'cancel');
     }
+
+    $paymentProcessorBillingFields = array_keys($form->_paymentProcessor['object']->getBillingAddressFields());
 
     if (!empty($form->_values['custom_pre_id'])) {
       $profileAddressFields = [];
@@ -73,7 +72,7 @@ class CRM_Core_Payment_ProcessorForm {
         NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
 
       foreach ((array) $fields as $key => $value) {
-        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, ['uf_group_id' => $form->_values['custom_pre_id']]);
+        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, ['uf_group_id' => $form->_values['custom_pre_id']], $paymentProcessorBillingFields);
       }
       if (count($profileAddressFields)) {
         $form->set('profileAddressFields', $profileAddressFields);

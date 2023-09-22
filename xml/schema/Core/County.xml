@@ -5,12 +5,16 @@
   <class>County</class>
   <name>civicrm_county</name>
   <add>1.1</add>
+  <labelField>name</labelField>
   <field>
     <name>id</name>
     <title>County ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>County ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -38,15 +42,19 @@
   </field>
   <field>
     <name>state_province_id</name>
-    <title>State</title>
+    <title>State ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID of State/Province that County belongs</comment>
+    <html>
+      <label>State</label>
+    </html>
     <add>1.1</add>
     <pseudoconstant>
       <table>civicrm_state_province</table>
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
+      <abbrColumn>abbreviation</abbrColumn>
     </pseudoconstant>
   </field>
   <foreignKey>
@@ -55,6 +63,19 @@
     <key>id</key>
     <add>1.1</add>
   </foreignKey>
+  <field>
+    <name>is_active</name>
+    <title>County Is Active</title>
+    <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+    <comment>Is this County active?</comment>
+    <add>5.35</add>
+  </field>
   <index>
     <name>UI_name_state_id</name>
     <fieldName>name</fieldName>

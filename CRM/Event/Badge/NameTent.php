@@ -56,7 +56,7 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
   }
 
   /**
-   * @param $participant
+   * @param array $participant
    */
   protected function writeOneSide(&$participant) {
     $this->pdf->SetXY(0, $this->pdf->height / 2);
@@ -71,7 +71,7 @@ class CRM_Event_Badge_NameTent extends CRM_Event_Badge {
   }
 
   /**
-   * @param $participant
+   * @param array $participant
    */
   public function generateLabel($participant) {
     $this->writeOneSide($participant);

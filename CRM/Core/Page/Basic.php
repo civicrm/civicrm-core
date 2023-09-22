@@ -19,23 +19,53 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
   protected $_action;
 
   /**
-   * Define all the abstract functions here.
-   */
-
-  /**
    * Name of the BAO to perform various DB manipulations.
    *
-   * @return string
+   * @return CRM_Core_DAO|string
    */
   abstract protected function getBAOName();
 
   /**
-   * An array of action links.
+   * Get array of action links for the "browse" page.
    *
-   * @return array
-   *   (reference)
+   * Transforms from the 'paths' in metadata to the
+   * format expected by basic pages.
+   *
+   * @return array[]
    */
-  abstract protected function &links();
+  public function &links() {
+    $baoName = $this->getBAOName();
+    if (!isset(Civi::$statics[$baoName]['actionLinks'])) {
+      Civi::$statics[$baoName]['actionLinks'] = [];
+      $title = $baoName::getEntityTitle();
+      $paths = $baoName::getEntityPaths();
+      unset($paths['add'], $paths['browse']);
+      foreach ($paths as $action => $path) {
+        $actionKey = CRM_Core_Action::map($action);
+        if ($actionKey) {
+          [$path, $query] = array_pad(explode('?', $path), 2, '');
+          Civi::$statics[$baoName]['actionLinks'][$actionKey] = [
+            'name' => CRM_Core_Action::getLabel($actionKey),
+            'title' => CRM_Core_Action::getTitle($actionKey, $title),
+            'url' => $path,
+            'qs' => str_replace(['[', ']'], '%%', $query),
+            'weight' => CRM_Core_Action::getWeight($actionKey),
+          ];
+        }
+      }
+      if (isset($baoName::getSupportedFields()['is_active'])) {
+        foreach ([CRM_Core_Action::DISABLE, CRM_Core_Action::ENABLE] as $actionKey) {
+          Civi::$statics[$baoName]['actionLinks'][$actionKey] = [
+            'name' => CRM_Core_Action::getLabel($actionKey),
+            'title' => CRM_Core_Action::getTitle($actionKey, $title),
+            'ref' => 'crm-enable-disable',
+            'weight' => CRM_Core_Action::getWeight($actionKey),
+          ];
+        }
+      }
+    }
+    return Civi::$statics[$baoName]['actionLinks'];
+  }
 
   /**
    * Name of the edit form class.
@@ -166,8 +196,6 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     // get 'id' if present
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
 
-    require_once str_replace('_', DIRECTORY_SEPARATOR, $this->getBAOName()) . ".php";
-
     if ($id) {
       if (!$this->checkPermission($id, NULL)) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to make changes to the record'));
@@ -203,67 +231,8 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     if ($action & CRM_Core_Action::ENABLE) {
       $action -= CRM_Core_Action::ENABLE;
     }
-    $baoString = $this->getBAOName();
-    $object = new $baoString();
 
-    $values = [];
-
-    // lets make sure we get the stuff sorted by name if it exists
-    $fields = &$object->fields();
-    $key = '';
-    if (!empty($fields['title'])) {
-      $key = 'title';
-    }
-    elseif (!empty($fields['label'])) {
-      $key = 'label';
-    }
-    elseif (!empty($fields['name'])) {
-      $key = 'name';
-    }
-
-    if (trim($sort)) {
-      $object->orderBy($sort);
-    }
-    elseif ($key) {
-      $object->orderBy($key . ' asc');
-    }
-
-    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, FALSE);
-    // find all objects
-    $object->find();
-    while ($object->fetch()) {
-      if (!isset($object->mapping_type_id) ||
-        // "1 for Search Builder"
-        $object->mapping_type_id != 1
-      ) {
-        $permission = CRM_Core_Permission::EDIT;
-        if ($key) {
-          $permission = $this->checkPermission($object->id, $object->$key);
-        }
-        if ($permission) {
-          $values[$object->id] = [];
-          CRM_Core_DAO::storeValues($object, $values[$object->id]);
-
-          if (is_a($object, 'CRM_Contact_DAO_RelationshipType')) {
-            if (isset($values[$object->id]['contact_type_a'])) {
-              $values[$object->id]['contact_type_a_display'] = $contactTypes[$values[$object->id]['contact_type_a']];
-            }
-            if (isset($values[$object->id]['contact_type_b'])) {
-              $values[$object->id]['contact_type_b_display'] = $contactTypes[$values[$object->id]['contact_type_b']];
-            }
-          }
-
-          // populate action links
-          $this->action($object, $action, $values[$object->id], $links, $permission);
-
-          if (isset($object->mapping_type_id)) {
-            $mappintTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Mapping', 'mapping_type_id');
-            $values[$object->id]['mapping_type'] = $mappintTypes[$object->mapping_type_id];
-          }
-        }
-      }
-    }
-    $this->assign('rows', $values);
+    $this->assign('rows', $this->getRows($sort, $action, $links));
   }
 
   /**
@@ -393,6 +362,105 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     $controller->setEmbedded(TRUE);
     $controller->process();
     $controller->run();
+  }
+
+  /**
+   * @param $sort
+   * @param $action
+   * @param array $links
+   *
+   * @return array
+   */
+  protected function getRows($sort, $action, array $links): array {
+    $baoString = $this->getBAOName();
+    $object = new $baoString();
+
+    $values = [];
+
+    // lets make sure we get the stuff sorted by name if it exists
+    $fields = &$object->fields();
+    $key = '';
+    if (!empty($fields['title'])) {
+      $key = 'title';
+    }
+    elseif (!empty($fields['label'])) {
+      $key = 'label';
+    }
+    elseif (!empty($fields['name'])) {
+      $key = 'name';
+    }
+
+    if (trim($sort ?? '')) {
+      $object->orderBy($sort);
+    }
+    elseif ($key) {
+      $object->orderBy($key . ' asc');
+    }
+
+    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, FALSE);
+    // find all objects
+    $object->find();
+    while ($object->fetch()) {
+      if (!isset($object->mapping_type_id) ||
+        // "1 for Search Builder"
+        $object->mapping_type_id != 1
+      ) {
+        $permission = CRM_Core_Permission::EDIT;
+        if ($key) {
+          $permission = $this->checkPermission($object->id, $object->$key);
+        }
+        if ($permission) {
+          $values[$object->id] = [];
+          CRM_Core_DAO::storeValues($object, $values[$object->id]);
+
+          if (is_a($object, 'CRM_Contact_DAO_RelationshipType')) {
+            if (isset($values[$object->id]['contact_type_a'])) {
+              $values[$object->id]['contact_type_a_display'] = $contactTypes[$values[$object->id]['contact_type_a']];
+            }
+            if (isset($values[$object->id]['contact_type_b'])) {
+              $values[$object->id]['contact_type_b_display'] = $contactTypes[$values[$object->id]['contact_type_b']];
+            }
+          }
+
+          // populate action links
+          $this->action($object, $action, $values[$object->id], $links, $permission);
+
+          if (isset($object->mapping_type_id)) {
+            $mappintTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Mapping', 'mapping_type_id');
+            $values[$object->id]['mapping_type'] = $mappintTypes[$object->mapping_type_id];
+          }
+        }
+      }
+    }
+    foreach ($this->getExpectedRowProperties() as $key) {
+      foreach ($values as $index => $value) {
+        if (!array_key_exists($key, $value)) {
+          $values[$index][$key] = NULL;
+        }
+      }
+    }
+    return $values;
+  }
+
+  /**
+   * Get any properties that should always be present in each row (null if no value).
+   *
+   * @return array
+   */
+  protected function getExpectedRowProperties(): array {
+    return [];
+  }
+
+  /**
+   * Get the menu path corresponding to an action on this entity
+   *
+   * @param string $linkAction
+   *   e.g. "view"
+   * @return string|null
+   *   e.g. "civicrm/activity?reset=1&action=view&id=[id]"
+   */
+  public function getLinkPath(string $linkAction): ?string {
+    return $this->getBAOName()::getEntityPaths()[$linkAction] ?? NULL;
   }
 
 }

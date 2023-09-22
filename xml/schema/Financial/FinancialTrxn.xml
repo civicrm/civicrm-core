@@ -6,11 +6,15 @@
   <name>civicrm_financial_trxn</name>
   <add>1.3</add>
   <log>true</log>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <title>Financial Transaction ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.3</add>
   </field>
   <primaryKey>
@@ -18,37 +22,9 @@
     <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
-    <name>from_account_id</name>
-    <type>int unsigned</type>
-    <comment>FK to financial_account table.</comment>
-    <add>3.2</add>
-    <drop>4.3</drop>
-  </field>
-  <foreignKey>
-    <name>from_account_id</name>
-    <table>civicrm_financial_account</table>
-    <key>id</key>
-    <add>3.2</add>
-    <drop>4.3</drop>
-  </foreignKey>
-  <field>
-    <name>to_account_id</name>
-    <type>int unsigned</type>
-    <comment>FK to financial_account table.</comment>
-    <add>3.2</add>
-    <drop>4.3</drop>
-  </field>
-  <foreignKey>
-    <name>to_account_id</name>
-    <table>civicrm_financial_account</table>
-    <key>id</key>
-    <add>3.2</add>
-    <drop>4.3</drop>
-  </foreignKey>
-  <field>
     <name>from_financial_account_id</name>
     <type>int unsigned</type>
-    <title>Financial Transaction From Account</title>
+    <title>From Account ID</title>
     <comment>FK to financial_account table.</comment>
     <add>4.3</add>
     <pseudoconstant>
@@ -58,6 +34,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>From Account</label>
     </html>
   </field>
   <foreignKey>
@@ -68,7 +45,7 @@
   </foreignKey>
   <field>
     <name>to_financial_account_id</name>
-    <title>Financial Transaction To Account</title>
+    <title>To Account ID</title>
     <type>int unsigned</type>
     <comment>FK to financial_financial_account table.</comment>
     <add>4.3</add>
@@ -79,6 +56,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>To Account</label>
     </html>
   </field>
   <foreignKey>
@@ -98,15 +76,6 @@
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
     </html>
-  </field>
-  <field>
-    <name>trxn_type</name>
-    <title>Financial Transaction Type</title>
-    <type>enum</type>
-    <values>Debit,Credit</values>
-    <required>true</required>
-    <add>1.3</add>
-    <drop>4.3</drop>
   </field>
   <field>
     <name>total_amount</name>
@@ -157,18 +126,10 @@
     <title>Is Payment?</title>
     <type>boolean</type>
     <default>0</default>
+    <required>true</required>
     <import>true</import>
     <comment>Is this entry either a payment or a reversal of a payment?</comment>
     <add>4.7</add>
-  </field>
-  <field>
-    <name>payment_processor</name>
-    <type>varchar</type>
-    <length>64</length>
-    <required>true</required>
-    <comment>derived from Processor setting in civicrm.settings.php.</comment>
-    <add>1.3</add>
-    <drop>4.3</drop>
   </field>
   <field>
     <name>trxn_id</name>
@@ -197,7 +158,7 @@
   </field>
   <field>
     <name>status_id</name>
-    <title>Financial Transaction Status Id</title>
+    <title>Financial Transaction Status ID</title>
     <type>int unsigned</type>
     <import>true</import>
     <export>true</export>
@@ -210,9 +171,18 @@
   </field>
   <field>
     <name>payment_processor_id</name>
-    <title>Payment Processor</title>
+    <title>Payment Processor ID</title>
     <type>int unsigned</type>
     <comment>Payment Processor for this financial transaction</comment>
+    <pseudoconstant>
+      <table>civicrm_payment_processor</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+      <label>Payment Processor</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>

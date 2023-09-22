@@ -21,6 +21,11 @@
 class CRM_Utils_File {
 
   /**
+   * Used to remove md5 hash that was injected into uploaded file names.
+   */
+  const HASH_REMOVAL_PATTERN = '/_[a-f0-9]{32}\./';
+
+  /**
    * Given a file name, determine if the file contents make it an ascii file
    *
    * @param string $name
@@ -46,36 +51,6 @@ class CRM_Utils_File {
 
     fclose($fd);
     return $ascii;
-  }
-
-  /**
-   * Given a file name, determine if the file contents make it an html file
-   *
-   * @param string $name
-   *   Name of file.
-   *
-   * @return bool
-   *   true if file is html
-   */
-  public static function isHtml($name) {
-    $fd = fopen($name, "r");
-    if (!$fd) {
-      return FALSE;
-    }
-
-    $html = FALSE;
-    $lineCount = 0;
-    while (!feof($fd) & $lineCount <= 5) {
-      $lineCount++;
-      $line = fgets($fd, 8192);
-      if (!CRM_Utils_String::isHtml($line)) {
-        $html = TRUE;
-        break;
-      }
-    }
-
-    fclose($fd);
-    return $html;
   }
 
   /**
@@ -120,12 +95,12 @@ class CRM_Utils_File {
    * @param bool $rmdir
    * @param bool $verbose
    *
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
+  public static function cleanDir(string $target, bool $rmdir = TRUE, bool $verbose = TRUE) {
     static $exceptions = ['.', '..'];
-    if ($target == '' || $target == '/' || !$target) {
-      throw new Exception("Overly broad deletion");
+    if (!$target || $target === '/') {
+      throw new CRM_Core_Exception('Overly broad deletion');
     }
 
     if ($dh = @opendir($target)) {
@@ -293,7 +268,7 @@ class CRM_Utils_File {
   }
 
   /**
-   * @param string|NULL $dsn
+   * @param string|null $dsn
    *   Use NULL to load the default/active connection from CRM_Core_DAO.
    *   Otherwise, give a full DSN string.
    * @param string $fileName
@@ -312,7 +287,7 @@ class CRM_Utils_File {
 
   /**
    *
-   * @param string|NULL $dsn
+   * @param string|null $dsn
    * @param string $queryString
    * @param string $prefix
    * @param bool $dieOnErrors
@@ -325,16 +300,17 @@ class CRM_Utils_File {
     }
     else {
       require_once 'DB.php';
-      $db = DB::connect($dsn);
+      $dsn = CRM_Utils_SQL::autoSwitchDSN($dsn);
+      try {
+        $options = CRM_Utils_SQL::isSSLDSN($dsn) ? ['ssl' => TRUE] : [];
+        $db = DB::connect($dsn, $options);
+      }
+      catch (Exception $e) {
+        die("Cannot open $dsn: " . $e->getMessage());
+      }
     }
 
-    if (PEAR::isError($db)) {
-      die("Cannot open $dsn: " . $db->getMessage());
-    }
-    if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
-      $db->query('SET SESSION sql_mode = STRICT_TRANS_TABLES');
-    }
-    $db->query('SET NAMES utf8');
+    $db->query('SET NAMES utf8mb4');
     $transactionId = CRM_Utils_Type::escape(CRM_Utils_Request::id(), 'String');
     $db->query('SET @uniqueID = ' . "'$transactionId'");
 
@@ -347,13 +323,15 @@ class CRM_Utils_File {
       $query = trim($query);
       if (!empty($query)) {
         CRM_Core_Error::debug_query($query);
-        $res = &$db->query($query);
-        if (PEAR::isError($res)) {
+        try {
+          $res = &$db->query($query);
+        }
+        catch (Exception $e) {
           if ($dieOnErrors) {
-            die("Cannot execute $query: " . $res->getMessage());
+            die("Cannot execute $query: " . $e->getMessage());
           }
           else {
-            echo "Cannot execute $query: " . $res->getMessage() . "<p>";
+            echo "Cannot execute $query: " . $e->getMessage() . "<p>";
           }
         }
       }
@@ -370,17 +348,16 @@ class CRM_Utils_File {
    *   stripped string
    */
   public static function stripComments($string) {
-    return preg_replace("/^(#|--).*\R*/m", "", $string);
+    return preg_replace("/^(#|--).*\R*/m", "", ($string ?? ''));
   }
 
   /**
-   * @param $ext
+   * @param string $ext
    *
    * @return bool
    */
   public static function isExtensionSafe($ext) {
-    static $extensions = NULL;
-    if (!$extensions) {
+    if (!isset(Civi::$statics[__CLASS__]['file_extensions'])) {
       $extensions = CRM_Core_OptionGroup::values('safe_file_extension', TRUE);
 
       // make extensions to lowercase
@@ -397,9 +374,11 @@ class CRM_Utils_File {
         unset($extensions['html']);
         unset($extensions['htm']);
       }
+      Civi::$statics[__CLASS__]['file_extensions'] = $extensions;
     }
+    $restricted = CRM_Utils_Constant::value('CIVICRM_RESTRICTED_UPLOADS', '/(php|php\d|phtml|phar|pl|py|cgi|asp|js|sh|exe|pcgi\d)/i');
     // support lower and uppercase file extensions
-    return (bool) isset($extensions[strtolower($ext)]);
+    return (bool) isset(Civi::$statics[__CLASS__]['file_extensions'][strtolower($ext)]) && !preg_match($restricted, strtolower($ext));
   }
 
   /**
@@ -412,18 +391,18 @@ class CRM_Utils_File {
    *   whether the file can be include()d or require()d
    */
   public static function isIncludable($name) {
-    $x = @fopen($name, 'r', TRUE);
-    if ($x) {
-      fclose($x);
-      return TRUE;
-    }
-    else {
+    $full_filepath = stream_resolve_include_path($name);
+    if ($full_filepath === FALSE) {
       return FALSE;
     }
+    return is_readable($full_filepath);
   }
 
   /**
-   * Remove the 32 bit md5 we add to the fileName also remove the unknown tag if we added it.
+   * Remove 32 bit md5 hash prepended to the file suffix.
+   *
+   * Note: if the filename was munged with an `.unknown` suffix, this removes
+   * the md5 but doesn't undo the munging or remove the `.unknown` suffix.
    *
    * @param $name
    *
@@ -431,7 +410,7 @@ class CRM_Utils_File {
    */
   public static function cleanFileName($name) {
     // replace the last 33 character before the '.' with null
-    $name = preg_replace('/(_[\w]{32})\./', '.', $name);
+    $name = preg_replace(self::HASH_REMOVAL_PATTERN, '.', $name);
     return $name;
   }
 
@@ -446,17 +425,38 @@ class CRM_Utils_File {
     $uniqID = md5(uniqid(rand(), TRUE));
     $info = pathinfo($name);
     $basename = substr($info['basename'],
-      0, -(strlen(CRM_Utils_Array::value('extension', $info)) + (CRM_Utils_Array::value('extension', $info) == '' ? 0 : 1))
+      0, -(strlen($info['extension'] ?? '') + (($info['extension'] ?? '') == '' ? 0 : 1))
     );
-    if (!self::isExtensionSafe(CRM_Utils_Array::value('extension', $info))) {
+    if (!self::isExtensionSafe($info['extension'] ?? '')) {
       // munge extension so it cannot have an embbeded dot in it
       // The maximum length of a filename for most filesystems is 255 chars.
       // We'll truncate at 240 to give some room for the extension.
-      return CRM_Utils_String::munge("{$basename}_" . CRM_Utils_Array::value('extension', $info) . "_{$uniqID}", '_', 240) . ".unknown";
+      return CRM_Utils_String::munge("{$basename}_" . ($info['extension'] ?? '') . "_{$uniqID}", '_', 240) . ".unknown";
     }
     else {
-      return CRM_Utils_String::munge("{$basename}_{$uniqID}", '_', 240) . "." . CRM_Utils_Array::value('extension', $info);
+      return CRM_Utils_String::munge("{$basename}_{$uniqID}", '_', 240) . "." . ($info['extension'] ?? '');
     }
+  }
+
+  /**
+   * CRM_Utils_String::munge() doesn't handle unicode and needs to be able
+   * to generate valid database tablenames so will sometimes generate a
+   * random string. Here what we want is a human-sensible filename that might
+   * contain unicode.
+   * Note that this does filter out emojis and such, but keeps characters that
+   * are considered alphanumeric in non-english languages.
+   *
+   * @param string $input
+   * @param string $replacementString Character or string to replace invalid characters with. Can be the empty string.
+   * @param int $cutoffLength Length to truncate the result after replacements.
+   * @return string
+   */
+  public static function makeFilenameWithUnicode(string $input, string $replacementString = '_', int $cutoffLength = 63): string {
+    $filename = preg_replace('/\W/u', $replacementString, $input);
+    if ($cutoffLength) {
+      return mb_substr($filename, 0, $cutoffLength);
+    }
+    return $filename;
   }
 
   /**
@@ -510,6 +510,11 @@ class CRM_Utils_File {
     if (!empty($dir) && is_dir($dir)) {
       $htaccess = <<<HTACCESS
 <Files "*">
+# OpenLiteSpeed 1.4.38+
+  <IfModule !authz_core_module>
+    RewriteRule .* - [F,L]
+  </IfModule>
+
 # Apache 2.2
   <IfModule !authz_core_module>
     Order allow,deny
@@ -622,38 +627,6 @@ HTACCESS;
 
   /**
    * @param $directory
-   *
-   * @return string
-   * @deprecated
-   *   Computation of a relative path requires some base.
-   *   This implementation is problematic because it relies on an
-   *   implicit base which was constructed problematically.
-   */
-  public static function relativeDirectory($directory) {
-    // Do nothing on windows
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-      return $directory;
-    }
-
-    // check if directory is relative, if so return immediately
-    if (!self::isAbsolute($directory)) {
-      return $directory;
-    }
-
-    // make everything relative from the baseFilePath
-    $basePath = self::baseFilePath();
-    // check if basePath is a substr of $directory, if so
-    // return rest of string
-    if (substr($directory, 0, strlen($basePath)) == $basePath) {
-      return substr($directory, strlen($basePath));
-    }
-
-    // return the original value
-    return $directory;
-  }
-
-  /**
-   * @param $directory
    * @param string $basePath
    *   The base path when evaluating relative paths. Should include trailing slash.
    *
@@ -750,13 +723,25 @@ HTACCESS;
    *   glob pattern, eg "*.txt".
    * @param bool $relative
    *   TRUE if paths should be made relative to $dir
+   * @param int|null $maxDepth
+   *   Maximum depth of subdirs to check.
+   *   For no limit, use NULL.
+   *
    * @return array(string)
    */
-  public static function findFiles($dir, $pattern, $relative = FALSE) {
-    if (!is_dir($dir)) {
+  public static function findFiles($dir, $pattern, $relative = FALSE, ?int $maxDepth = NULL) {
+    if (!is_dir($dir) || !is_readable($dir)) {
       return [];
     }
-    $dir = rtrim($dir, '/');
+    // Which dirs should we exclude from our searches?
+    // If not defined, we default to excluding any dirname that begins
+    // with a . which is the old behaviour and therefore excludes .git/
+    $excludeDirsPattern = defined('CIVICRM_EXCLUDE_DIRS_PATTERN')
+      ? constant('CIVICRM_EXCLUDE_DIRS_PATTERN')
+      : '@' . preg_quote(DIRECTORY_SEPARATOR) . '\.@';
+
+    $dir = rtrim($dir, '/' . DIRECTORY_SEPARATOR);
+    $baseDepth = static::findPathDepth($dir);
     $todos = [$dir];
     $result = [];
     while (!empty($todos)) {
@@ -769,20 +754,35 @@ HTACCESS;
           }
         }
       }
-      if ($dh = opendir($subdir)) {
-        while (FALSE !== ($entry = readdir($dh))) {
-          $path = $subdir . DIRECTORY_SEPARATOR . $entry;
-          if ($entry{0} == '.') {
-            // ignore
-          }
-          elseif (is_dir($path)) {
-            $todos[] = $path;
-          }
+      // Find subdirs to recurse into.
+      $depth = static::findPathDepth($subdir) - $baseDepth + 1;
+      if ($maxDepth === NULL || $depth <= $maxDepth) {
+        $subdirs = glob("$subdir/*", GLOB_ONLYDIR);
+        if (!empty($excludeDirsPattern)) {
+          $subdirs = preg_grep($excludeDirsPattern, $subdirs, PREG_GREP_INVERT);
         }
-        closedir($dh);
+        $todos = array_merge($todos, $subdirs);
       }
     }
     return $result;
+  }
+
+  /**
+   * Determine the absolute depth of a path expression.
+   *
+   * @param string $path
+   *   Ex: '/var/www/foo'
+   * @return int
+   *   Ex: 3
+   */
+  private static function findPathDepth(string $path): int {
+    // Both PHP-Unix and PHP-Windows support '/'s. Additionally, PHP-Windows also supports '\'s.
+    // They are roughly equivalent. (The differences are described by a secret book hidden in the tower of Mordor.)
+    $depth = substr_count($path, '/');
+    if (DIRECTORY_SEPARATOR !== '/') {
+      $depth += substr_count($path, DIRECTORY_SEPARATOR);
+    }
+    return $depth;
   }
 
   /**
@@ -798,7 +798,15 @@ HTACCESS;
     if ($checkRealPath) {
       $parent = realpath($parent);
       $child = realpath($child);
+      if ($parent === FALSE || $child === FALSE) {
+        return FALSE;
+      }
     }
+
+    // windows fix
+    $parent = str_replace(DIRECTORY_SEPARATOR, '/', $parent);
+    $child = str_replace(DIRECTORY_SEPARATOR, '/', $child);
+
     $parentParts = explode('/', rtrim($parent, '/'));
     $childParts = explode('/', rtrim($child, '/'));
     while (($parentPart = array_shift($parentParts)) !== NULL) {
@@ -894,8 +902,8 @@ HTACCESS;
       case 'image/x-png':
       case 'image/png':
       case 'image/jpg':
-        list($imageWidth, $imageHeight) = getimagesize($path);
-        list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
+        [$imageWidth, $imageHeight] = getimagesize($path);
+        [$imageThumbWidth, $imageThumbHeight] = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
         $url = "<a href=\"$url\" class='crm-image-popup'>
           <img src=\"$url\" width=$imageThumbWidth height=$imageThumbHeight/>
           </a>";
@@ -1051,7 +1059,7 @@ HTACCESS;
     }
     $iconClasses = Civi::$statics[__CLASS__]['mimeIcons'];
     foreach ($iconClasses as $text => $icon) {
-      if (strpos($mimeType, $text) === 0) {
+      if (strpos(($mimeType ?? ''), $text) === 0) {
         return $icon;
       }
     }
@@ -1094,6 +1102,55 @@ HTACCESS;
    */
   public static function getExtensionFromPath($path) {
     return pathinfo($path, PATHINFO_EXTENSION);
+  }
+
+  /**
+   * Wrapper for is_dir() to avoid flooding logs when open_basedir is used.
+   *
+   * Don't use this function as a swap-in replacement for is_dir() for all
+   * situations as this might silence errors that you want to know about
+   * and would help troubleshoot problems. It should only be used when
+   * doing something like iterating over a set of folders where you know some
+   * of them might not legitimately exist or might be outside open_basedir
+   * because you're trying to find the right one. If you expect the path you're
+   * checking to be inside open_basedir, then you should use the regular
+   * is_dir(). (e.g. it might not exist but might be something
+   * like a cache folder in templates_c, which can't be outside open_basedir,
+   * so there you would use regular is_dir).
+   *
+   * **** Security alert ****
+   * If you change this function so that it would be possible to return
+   * TRUE without checking the real value of is_dir() then it opens up a
+   * possible security issue.
+   * It should either return FALSE, or the value returned from is_dir().
+   *
+   * @param string|null $dir
+   * @return bool|null
+   *   In php8 the return value from is_dir() is always bool but in php7 it can be null.
+   */
+  public static function isDir(?string $dir) {
+    if ($dir === NULL) {
+      return FALSE;
+    }
+    set_error_handler(function($errno, $errstr) {
+      // If this is open_basedir-related, convert it to an exception so we
+      // can catch it.
+      if (strpos($errstr, 'open_basedir restriction in effect') !== FALSE) {
+        throw new \ErrorException($errstr, $errno);
+      }
+      // Continue with normal error handling so other errors still happen.
+      return FALSE;
+    });
+    try {
+      $is_dir = is_dir($dir);
+    }
+    catch (\ErrorException $e) {
+      $is_dir = FALSE;
+    }
+    finally {
+      restore_error_handler();
+    }
+    return $is_dir;
   }
 
 }

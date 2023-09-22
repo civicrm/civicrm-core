@@ -67,7 +67,7 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
   }
 
   public function preProcess() {
-    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    $this->_contactId = (int) CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
 
     $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);

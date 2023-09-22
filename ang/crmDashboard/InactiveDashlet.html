@@ -1,0 +1,4 @@
+<div class="crm-dashlet-header" title="{{:: $ctrl.dashlet.label }}">
+  <a href class="crm-i fa-trash" title="{{:: ts('Permanently Delete %1', {1: $ctrl.dashlet.label}) }}" aria-hidden="true" crm-confirm="$ctrl.confirmParams" on-yes="$ctrl.delete()" ng-if="$ctrl.isAdmin && !$ctrl.dashlet.is_reserved"></a>
+  <h3>{{:: $ctrl.dashlet.label }}</h3>
+</div>

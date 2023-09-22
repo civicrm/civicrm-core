@@ -1,0 +1,30 @@
+<div oauth-util-import="CRM.oauthUtil.providers" to="theProviders"></div>
+
+<div class="help">
+  <p>
+    {{ts('CiviCRM may be configured as a client that interacts with remote web-services, such as Google Mail or Microsoft Exchange. Please choose the type of web-service you wish to connect to:')}}
+  </p>
+
+  <!--
+  To do so, you must first register with the service to obtain credentials (Client ID and Client Secret). Copy the assigned credentials below.
+  -->
+</div>
+
+<table>
+  <thead>
+  <tr>
+    <th>{{ts('Name')}}</th>
+    <th>{{ts('Title')}}</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr ng-repeat="provider in theProviders">
+    <td>
+      <a ng-href="#!/?provider={{provider.name}}">{{provider.name}}</a>
+    </td>
+    <td>
+      <a ng-href="#!/?provider={{provider.name}}">{{provider.title}}</a>
+    </td>
+  </tr>
+  </tbody>
+</table>

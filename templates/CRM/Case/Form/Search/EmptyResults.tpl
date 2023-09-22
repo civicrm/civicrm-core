@@ -9,7 +9,7 @@
 *}
 {* No matches for submitted search request. *}
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>  &nbsp;
+  {icon icon="fa-info-circle"}{/icon}  &nbsp;
         {if $qill}{ts}No matches found for:{/ts}
             {include file="CRM/common/displaySearchCriteria.tpl"}
         {else}

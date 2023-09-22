@@ -10,40 +10,16 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Generic;
-
-use Civi\Api4\Utils\SelectUtil;
 
 /**
  * Base class for all `Get` api actions.
  *
  * @package Civi\Api4\Generic
- *
- * @method $this setSelect(array $selects) Set array of fields to be selected (wildcard * allowed)
- * @method array getSelect()
  */
 abstract class AbstractGetAction extends AbstractQueryAction {
 
-  /**
-   * Fields to return for each $ENTITY. Defaults to all fields `[*]`.
-   *
-   * Use the * wildcard by itself to select all available fields, or use it to match similarly-named fields.
-   * E.g. `is_*` will match fields named is_primary, is_active, etc.
-   *
-   * Set to `["row_count"]` to return only the number of $ENTITIES found.
-   *
-   * @var array
-   */
-  protected $select = [];
+  use Traits\SelectParamTrait;
 
   /**
    * Only return the number of found items.
@@ -61,9 +37,9 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    * Note: it will skip adding field defaults when fetching records by id,
    * or if that field has already been added to the where clause.
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  protected function setDefaultWhereClause() {
+  public function setDefaultWhereClause() {
     if (!$this->_itemsToGet('id')) {
       $fields = $this->entityFields();
       foreach ($fields as $field) {
@@ -72,23 +48,6 @@ abstract class AbstractGetAction extends AbstractQueryAction {
         }
       }
     }
-  }
-
-  /**
-   * Adds all fields matched by the * wildcard
-   *
-   * @throws \API_Exception
-   */
-  protected function expandSelectClauseWildcards() {
-    $wildFields = array_filter($this->select, function($item) {
-      return strpos($item, '*') !== FALSE && strpos($item, '.') === FALSE && strpos($item, '(') === FALSE && strpos($item, ' ') === FALSE;
-    });
-    foreach ($wildFields as $item) {
-      $pos = array_search($item, array_values($this->select));
-      $matches = SelectUtil::getMatchingFields($item, array_column($this->entityFields(), 'name'));
-      array_splice($this->select, $pos, 1, $matches);
-    }
-    $this->select = array_unique($this->select);
   }
 
   /**
@@ -107,7 +66,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
   protected function _itemsToGet($field) {
     foreach ($this->where as $clause) {
       // Look for exact-match operators (=, IN, or LIKE with no wildcard)
-      if ($clause[0] == $field && (in_array($clause[1], ['=', 'IN']) || ($clause[1] == 'LIKE' && !(is_string($clause[2]) && strpos($clause[2], '%') !== FALSE)))) {
+      if ($clause[0] == $field && (in_array($clause[1], ['=', 'IN'], TRUE) || ($clause[1] == 'LIKE' && !(is_string($clause[2]) && strpos($clause[2], '%') !== FALSE)))) {
         return (array) $clause[2];
       }
     }
@@ -159,16 +118,6 @@ abstract class AbstractGetAction extends AbstractQueryAction {
       }
     }
     return FALSE;
-  }
-
-  /**
-   * Add one or more fields to be selected (wildcard * allowed)
-   * @param string ...$fieldNames
-   * @return $this
-   */
-  public function addSelect(string ...$fieldNames) {
-    $this->select = array_merge($this->select, $fieldNames);
-    return $this;
   }
 
 }

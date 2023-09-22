@@ -10,13 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
@@ -30,8 +23,7 @@ class BasicUpdateAction extends AbstractUpdateAction {
 
   /**
    * @var callable
-   *
-   * Function(array $item, BasicUpdateAction $thisAction) => array
+   *   Function(array $item, BasicUpdateAction $thisAction): array
    */
   private $setter;
 
@@ -40,29 +32,27 @@ class BasicUpdateAction extends AbstractUpdateAction {
    *
    * @param string $entityName
    * @param string $actionName
-   * @param string|array $select
-   *   One or more fields to select from each matching item.
    * @param callable $setter
-   *   Function(array $item, BasicUpdateAction $thisAction) => array
    */
-  public function __construct($entityName, $actionName, $select = 'id', $setter = NULL) {
-    parent::__construct($entityName, $actionName, $select);
-    $this->setter = $setter;
+  public function __construct($entityName, $actionName, $setter = NULL) {
+    parent::__construct($entityName, $actionName);
+    // Accept setter as 4th param for now, but emit deprecated warning
+    $this->setter = func_get_args()[3] ?? NULL;
+    if ($this->setter) {
+      \CRM_Core_Error::deprecatedWarning(__CLASS__ . ' constructor received $setter as 4th param; it should be the 3rd as the $select param has been removed');
+    }
+    else {
+      $this->setter = $setter;
+    }
   }
 
   /**
-   * We pass the writeRecord function an array representing one item to update.
-   * We expect to get the same format back.
-   *
-   * @param \Civi\Api4\Generic\Result $result
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\NotImplementedException
+   * @param array $items
+   * @return array
+   * @throws \CRM_Core_Exception
    */
-  public function _run(Result $result) {
-    $this->formatWriteValues($this->values);
-    foreach ($this->getBatchRecords() as $item) {
-      $result[] = $this->writeRecord($this->values + $item);
-    }
+  protected function updateRecords(array $items): array {
+    return array_map([$this, 'writeRecord'], $items);
   }
 
   /**

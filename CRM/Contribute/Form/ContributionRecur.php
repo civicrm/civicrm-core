@@ -70,24 +70,9 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   public $_paymentProcessor = [];
 
   /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * Fields may have keys
-   *  - name (required to show in tpl from the array)
-   *  - description (optional, will appear below the field)
-   *  - not-auto-addable - this class will not attempt to add the field using addField.
-   *    (this will be automatically set if the field does not have html in it's metadata
-   *    or is not a core field on the form's entity).
-   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
-   *  - template - use a field specific template to render this field
-   * @var array
-   */
-  protected $entityFields = [];
-
-  /**
    * Details of the subscription (recurring contribution) to be altered.
    *
-   * @var array
+   * @var \CRM_Core_DAO
    */
   protected $subscriptionDetails = [];
 
@@ -179,7 +164,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   /**
    * Get details for the recurring contribution being altered.
    *
-   * @return array
+   * @return \CRM_Core_DAO
    */
   public function getSubscriptionDetails() {
     return $this->subscriptionDetails;
@@ -192,21 +177,31 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    */
   protected function getSubscriptionContactID() {
     $sub = $this->getSubscriptionDetails();
-    return $sub->contact_id ?? FALSE;
+    return $sub->contact_id ? (int) $sub->contact_id : FALSE;
+  }
+
+  /**
+   * Get the recurring contribution ID.
+   *
+   * @return int
+   */
+  protected function getContributionRecurID(): int {
+    return $this->getSubscriptionDetails()->recur_id;
   }
 
   /**
    * Is this being used by a front end user to update their own recurring.
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   protected function isSelfService() {
-    if (!is_null($this->selfService)) {
+    if ($this->selfService !== NULL) {
       return $this->selfService;
     }
     $this->selfService = FALSE;
     if (!CRM_Core_Permission::check('edit contributions')) {
-      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
+      if ($this->getSubscriptionContactID() !== $this->getContactIDIfAccessingOwnRecord()) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to cancel this recurring contribution.'));
       }
       $this->selfService = TRUE;

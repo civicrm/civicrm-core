@@ -139,7 +139,7 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
 
   /**
    * add shortcut to Create New.
-   * @param $shortCuts
+   * @param array $shortCuts
    */
   public function creatNewShortcut(&$shortCuts) {
     if (CRM_Core_Permission::check('manage campaign') ||

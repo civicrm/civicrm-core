@@ -10,18 +10,15 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
 namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
-class OptionValueCreationSpecProvider implements Generic\SpecProviderInterface {
+/**
+ * @service
+ * @internal
+ */
+class OptionValueCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc
