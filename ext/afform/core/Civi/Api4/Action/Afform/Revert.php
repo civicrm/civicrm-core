@@ -49,7 +49,7 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
     /** @var \CRM_Afform_AfformScanner $scanner */
     $scanner = \Civi::service('afform_scanner');
     $files = [
-      \CRM_Afform_AfformScanner::METADATA_FILE,
+      \CRM_Afform_AfformScanner::METADATA_JSON,
       \CRM_Afform_AfformScanner::LAYOUT_FILE,
     ];
 
