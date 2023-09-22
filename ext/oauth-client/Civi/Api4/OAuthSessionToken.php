@@ -5,6 +5,16 @@ namespace Civi\Api4;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
 
+/**
+ * OAuth Access Tokens.
+ *
+ * @see https://docs.civicrm.org/dev/en/latest/framework/oauth/#model-token
+ *
+ * @primaryKey cardinal
+ * @searchable none
+ * @since 5.67
+ * @package Civi\Api4
+ */
 class OAuthSessionToken extends Generic\AbstractEntity {
 
   const ENTITY = 'OAuthSessionToken';
