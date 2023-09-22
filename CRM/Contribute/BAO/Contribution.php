@@ -1649,22 +1649,23 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   /**
    * Create address associated with contribution record.
    *
-   * As long as there is one or more billing field in the parameters we will create the address.
+   * As long as there is one or more billing field in the parameters we will
+   * create the address.
    *
-   * (historically the decision to create or not was based on the payment 'type' but these lines are greyer than once
-   * thought).
+   * (historically the decision to create or not was based on the payment
+   * 'type' but these lines are greyer than once thought).
    *
    * @param array $params
-   * @param int $billingLocationTypeID
    *
-   * @return int
+   * @return int|null
    *   address id
+   * @throws \CRM_Core_Exception
    */
-  public static function createAddress($params, $billingLocationTypeID) {
+  public static function createAddress(array $params): ?int {
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
     [$hasBillingField, $addressParams] = self::getBillingAddressParams($params, $billingLocationTypeID);
     if ($hasBillingField) {
-      $address = CRM_Core_BAO_Address::writeRecord($addressParams);
-      return $address->id;
+      return CRM_Core_BAO_Address::writeRecord($addressParams)->id;
     }
     return NULL;
 

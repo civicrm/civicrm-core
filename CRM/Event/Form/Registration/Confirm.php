@@ -1012,11 +1012,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
     //create an contribution address
-    // The concept of contributeMode is deprecated. Elsewhere we use the function processBillingAddress() - although
-    // currently that is only inherited by back-office forms.
-    if ($form->_contributeMode != 'notify' && empty($params['is_pay_later'])) {
-      $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $form->_bltID);
-    }
+    $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params);
 
     $contribParams['skipLineItem'] = 1;
     $contribParams['skipCleanMoney'] = 1;
