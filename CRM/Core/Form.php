@@ -1312,7 +1312,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return int
    */
   public function getAction() {
-    return $this->_action;
+    if (!is_numeric($this->_action)) {
+      CRM_Core_Error::deprecatedWarning('action should be an integer');
+      return $this->_action;
+    }
+    return (int) $this->_action;
   }
 
   /**
@@ -1322,7 +1326,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   The mode we want to set the form.
    */
   public function setAction($action) {
-    $this->_action = $action;
+    if (is_numeric($action)) {
+      $this->_action = (int) $action;
+    }
+    else {
+      CRM_Core_Error::deprecatedWarning('action should be an integer');
+      $this->_action = $action;
+    }
   }
 
   /**
