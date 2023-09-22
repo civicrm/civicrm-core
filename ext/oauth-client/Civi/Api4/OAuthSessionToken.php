@@ -101,7 +101,7 @@ class OAuthSessionToken extends Generic\AbstractEntity {
     ];
   }
 
-  protected static function getEntityTitle($plural = FALSE) {
+  protected static function getEntityTitle(bool $plural = FALSE): string {
     return $plural ? ts('OAuth Session Tokens') : ts('OAuth Session Token');
   }
 
