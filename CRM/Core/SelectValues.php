@@ -919,6 +919,7 @@ class CRM_Core_SelectValues {
    */
   public static function getMailingJobStatus() {
     return [
+      'Draft' => ts('Draft'),
       'Scheduled' => ts('Scheduled'),
       'Running' => ts('Running'),
       'Complete' => ts('Complete'),

@@ -403,6 +403,47 @@
     </html>
   </field>
   <field>
+    <name>start_date</name>
+    <title>Mailing Start Date</title>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
+    <comment>When the mailing started to go out</comment>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
+    <readonly>true</readonly>
+  </field>
+  <field>
+    <name>end_date</name>
+    <title>Mailing End Date</title>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
+    <comment>When the mailing finished going out.</comment>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
+    <readonly>true</readonly>
+  </field>
+  <field>
+    <name>status</name>
+    <title>Mailing Status</title>
+    <type>varchar</type>
+    <length>12</length>
+    <comment>The status of this mailing</comment>
+    <default>'Draft'</default>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getMailingJobStatus</callback>
+    </pseudoconstant>
+    <readonly>true</readonly>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
     <name>approver_id</name>
     <title>Approved By Contact ID</title>
     <type>int unsigned</type>
