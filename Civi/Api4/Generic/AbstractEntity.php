@@ -85,19 +85,10 @@ abstract class AbstractEntity {
    *   Whether to return a plural title.
    * @return string
    */
-  protected static function getEntityTitle($plural = FALSE) {
+  protected static function getEntityTitle(bool $plural = FALSE): string {
     $name = static::getEntityName();
     $dao = \CRM_Core_DAO_AllCoreTables::getFullName($name);
     return $dao ? $dao::getEntityTitle($plural) : ($plural ? \CRM_Utils_String::pluralize($name) : $name);
-  }
-
-  /**
-   * Overridable function to return menu paths related to this entity.
-   *
-   * @return array
-   */
-  protected static function getEntityPaths() {
-    return [];
   }
 
   /**
@@ -138,7 +129,7 @@ abstract class AbstractEntity {
       'title' => static::getEntityTitle(),
       'title_plural' => static::getEntityTitle(TRUE),
       'type' => [self::stripNamespace(get_parent_class(static::class))],
-      'paths' => static::getEntityPaths(),
+      'paths' => [],
       'class' => static::class,
       'primary_key' => ['id'],
       // Entities without a @searchable annotation will default to secondary,
@@ -194,7 +185,7 @@ abstract class AbstractEntity {
    * @param string $className
    * @return string
    */
-  private static function stripNamespace($className) {
+  private static function stripNamespace(string $className): string {
     return substr($className, strrpos($className, '\\') + 1);
   }
 

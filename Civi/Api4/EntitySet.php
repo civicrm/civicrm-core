@@ -57,7 +57,7 @@ class EntitySet extends Generic\AbstractEntity {
    * @param bool $plural
    * @return string
    */
-  protected static function getEntityTitle($plural = FALSE) {
+  protected static function getEntityTitle(bool $plural = FALSE): string {
     return $plural ? ts('Entity Sets') : ts('Entity Set');
   }
 
