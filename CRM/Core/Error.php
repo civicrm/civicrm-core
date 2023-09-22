@@ -655,7 +655,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function createDebugLogger($prefix = '') {
     self::generateLogFileName($prefix);
-    return Log::singleton('file', \Civi::$statics[__CLASS__]['logger_file' . $prefix], '');
+    return Log::singleton('file', \Civi::$statics[__CLASS__]['logger_file' . $prefix], '', [
+      'timeFormat' => '%Y-%m-%d %H:%M:%S%z',
+    ]);
   }
 
   /**
