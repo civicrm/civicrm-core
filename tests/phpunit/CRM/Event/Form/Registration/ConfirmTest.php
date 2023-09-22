@@ -339,8 +339,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $amountsPaid = [300, 100, 200];
     // The first participant, as the primary participant, (only) will have the full total in the email
     $this->assertStringContainsString('$600', $mailSent[0]['body']);
-    $this->assertStringNotContainsString(600, $mailSent[1]['body']);
-    $this->assertStringNotContainsString(600, $mailSent[2]['body']);
+    $this->assertStringNotContainsString('$600', $mailSent[1]['body']);
+    $this->assertStringNotContainsString('$600', $mailSent[2]['body']);
 
     // The $100 paid by the second participant will be in the emails to the primary but and second participant
     $this->assertStringContainsString('$100', $mailSent[0]['body']);
