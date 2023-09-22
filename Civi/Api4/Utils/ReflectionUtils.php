@@ -142,9 +142,9 @@ class ReflectionUtils {
    * List all traits used by a class and its parents.
    *
    * @param object|string $class
-   * @return array
+   * @return string[]
    */
-  public static function getTraits($class) {
+  public static function getTraits($class): array {
     $traits = [];
     // Get traits of this class + parent classes
     do {

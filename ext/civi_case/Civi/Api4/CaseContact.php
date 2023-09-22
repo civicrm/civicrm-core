@@ -23,7 +23,7 @@ namespace Civi\Api4;
 class CaseContact extends Generic\DAOEntity {
   use Generic\Traits\EntityBridge;
 
-  protected static function getEntityTitle($plural = FALSE) {
+  protected static function getEntityTitle(bool $plural = FALSE): string {
     return $plural ? ts('Case Clients') : ts('Case Client');
   }
 
