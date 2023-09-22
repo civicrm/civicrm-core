@@ -473,8 +473,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params, $this->_bltID));
 
-    // The concept of contributeMode is deprecated.
-    if ($this->_contributeMode === 'direct' && empty($params['is_pay_later'])) {
+    if ($this->getSubmittedValue('credit_card_number')) {
       if (isset($params['credit_card_exp_date'])) {
         $date = CRM_Utils_Date::format($params['credit_card_exp_date']);
         $date = CRM_Utils_Date::mysqlToIso($date);
