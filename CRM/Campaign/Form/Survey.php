@@ -58,6 +58,9 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   }
 
   public function preProcess() {
+    // Multistep form doesn't play well with popups
+    $this->preventAjaxSubmit();
+
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
     }
