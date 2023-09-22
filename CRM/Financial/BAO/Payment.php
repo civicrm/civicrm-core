@@ -463,7 +463,6 @@ class CRM_Financial_BAO_Payment {
     // and assign. Note we should update the tpl to use {if $billingName}
     // and ditch contributeMode - although it might need to be deprecated rather than removed.
     $todoParams = [
-      'contributeMode',
       'billingName',
       'address',
       'credit_card_type',

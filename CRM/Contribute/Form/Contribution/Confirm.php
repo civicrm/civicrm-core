@@ -1594,15 +1594,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $pending = $membershipContribution->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
         }
         else {
-          // The concept of contributeMode is deprecated.
-          // the is_monetary concept probably should be too as it can be calculated from
-          // the existence of 'amount' & seems fragile.
-          if (((isset($this->_contributeMode)) || !empty($this->_params['is_pay_later'])
-            ) &&
-            (($this->_values['is_monetary'] && $this->_amount > 0.0))
-          ) {
-            $pending = TRUE;
-          }
           $pending = FALSE;
         }
 
