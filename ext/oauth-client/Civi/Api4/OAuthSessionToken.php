@@ -17,11 +17,9 @@ use Civi\Api4\Generic\Result;
  */
 class OAuthSessionToken extends Generic\AbstractEntity {
 
-  const ENTITY = 'OAuthSessionToken';
-
   public static function create($checkPermissions = TRUE): Generic\BasicCreateAction {
     $action = new Generic\BasicCreateAction(
-      self::ENTITY,
+      static::getEntityName(),
       __FUNCTION__,
       function ($item, $createAction) {
         $session = \CRM_Core_Session::singleton();
@@ -50,7 +48,7 @@ class OAuthSessionToken extends Generic\AbstractEntity {
    * @return Generic\BasicGetAction
    */
   public static function get($checkPermissions = TRUE): Generic\BasicGetAction {
-    $action = new Generic\BasicGetAction(self::ENTITY, __FUNCTION__, function () {
+    $action = new Generic\BasicGetAction(static::getEntityName(), __FUNCTION__, function () {
       $session = \CRM_Core_Session::singleton();
       return $session->get('OAuthSessionTokens') ?? [];
     });
@@ -62,7 +60,7 @@ class OAuthSessionToken extends Generic\AbstractEntity {
    * @return Generic\BasicGetFieldsAction
    */
   public static function getFields($checkPermissions = TRUE) {
-    $action = new Generic\BasicGetFieldsAction(self::ENTITY, __FUNCTION__, function () {
+    $action = new Generic\BasicGetFieldsAction(static::getEntityName(), __FUNCTION__, function () {
       return [
         [
           'name' => 'client_id',
