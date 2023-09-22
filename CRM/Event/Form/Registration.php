@@ -1636,9 +1636,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     foreach ($additionalIDs as $participantID => $contactId) {
       if ($participantID == $registerByID) {
-        //set as Primary Participant
-        $this->assign('isPrimary', 1);
-
         $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $this->_values, NULL, $isTest);
 
         if (count($customProfile)) {
@@ -1647,7 +1644,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         }
       }
       else {
-        $this->assign('isPrimary', 0);
         $this->assign('customProfile', NULL);
       }
 

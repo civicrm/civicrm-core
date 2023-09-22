@@ -866,8 +866,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       foreach ($additionalIDs as $participantID => $contactId) {
         $participantNum = 0;
         if ($participantID == $registerByID) {
-          //set as Primary Participant
-          $this->assign('isPrimary', 1);
           //build an array of custom profile and assigning it to template.
           $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $this->_values, NULL, $isTest);
 
@@ -887,8 +885,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $participantParams = ['id' => $participantID];
           CRM_Event_BAO_Participant::getValues($participantParams, $participantValues, $ids);
           $this->_values['participant'] = $participantValues[$participantID];
-
-          $this->assign('isPrimary', 0);
           $this->assign('customProfile', NULL);
           //Additional Participant should get only it's payment information
           if (!empty($this->_amount)) {
