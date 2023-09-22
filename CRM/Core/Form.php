@@ -1309,10 +1309,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Getter for action.
    *
-   * @return int
+   * @return int|null
    */
   public function getAction() {
     if (!is_numeric($this->_action)) {
+      if (!$this->_action) {
+        return NULL;
+      }
       CRM_Core_Error::deprecatedWarning('action should be an integer');
       return $this->_action;
     }
