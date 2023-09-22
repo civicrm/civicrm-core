@@ -32,11 +32,12 @@
           nullable: col.edit.nullable
         };
 
-        $(document).on('keydown.crmSearchDisplayEditable', function(e) {
+        $(document).on('keydown.crmSearchDisplayEditable', (e) => {
           if (e.key === 'Escape') {
-            $scope.$apply(function() {
-              ctrl.cancel();
-            });
+            $scope.$apply(() => ctrl.cancel());
+          }
+          else if (e.key === 'Enter') {
+            $scope.$apply(() => ctrl.save());
           }
         });
 
