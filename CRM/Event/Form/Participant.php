@@ -2147,6 +2147,8 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       }
     }
     $this->assign('customGroup', $customGroup);
+
+    $fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
     foreach ($this->_contactIds as $num => $contactID) {
       // Retrieve the name and email of the contact - this will be the TO for receipt email
       [, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
@@ -2235,8 +2237,8 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         $sendTemplateParams['from'] = $params['from_email_address'];
         $sendTemplateParams['toName'] = $this->getContactValue('display_name');
         $sendTemplateParams['toEmail'] = $this->_contributorEmail;
-        $sendTemplateParams['cc'] = $this->_fromEmails['cc'] ?? NULL;
-        $sendTemplateParams['bcc'] = $this->_fromEmails['bcc'] ?? NULL;
+        $sendTemplateParams['cc'] = $fromEmails['cc'] ?? NULL;
+        $sendTemplateParams['bcc'] = $fromEmails['bcc'] ?? NULL;
       }
 
       //send email with pdf invoice
