@@ -609,6 +609,22 @@ abstract class CRM_Core_Payment {
         }
         return ts('Make Contribution');
 
+      case 'eventContinueText':
+        // This use of the ts function uses the legacy interpolation of the button name to avoid translations having to be re-done.
+        if ((int) $this->_paymentProcessor['billing_mode'] === self::BILLING_MODE_NOTIFY) {
+          return ts('Click <strong>%1</strong> to checkout with %2.', [1 => ts('Register'), 2 => $this->_paymentProcessor['frontend_title']]);
+        }
+        return ts('Click <strong>%1</strong> to complete your registration.', [1 => ts('Register')]);
+
+      case 'eventConfirmText':
+        if ((int) $this->_paymentProcessor['billing_mode'] === self::BILLING_MODE_NOTIFY) {
+          return ts('Your registration payment has been submitted to %1 for processing', [1 => $this->_paymentProcessor['frontend_title']]);
+        }
+        return '';
+
+      case 'eventConfirmEmailText':
+        return ts('A registration confirmation email will be sent to %1 once the transaction is processed successfully.', [1 => $params['email']]);
+
       case 'cancelRecurDetailText':
         if ($params['mode'] === 'auto_renew') {
           return ts('Click the button below if you want to cancel the auto-renewal option for your %1 membership. This will not cancel your membership. However you will need to arrange payment for renewal when your membership expires.',
