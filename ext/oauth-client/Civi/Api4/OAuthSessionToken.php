@@ -2,9 +2,6 @@
 
 namespace Civi\Api4;
 
-use Civi\Api4\Generic\AbstractAction;
-use Civi\Api4\Generic\Result;
-
 /**
  * OAuth Access Tokens stored in the session
  *
@@ -38,15 +35,13 @@ class OAuthSessionToken extends Generic\AbstractEntity {
     return $action->setCheckPermissions($checkPermissions);
   }
 
-  public static function deleteAll($checkPermissions = TRUE): AbstractAction {
-    return (new class(self::ENTITY, __FUNCTION__) extends AbstractAction {
-
-      public function _run(Result $result) {
-        $result->exchangeArray(OAuthSessionToken::get());
-        \CRM_Core_Session::singleton()->set('OAuthSessionTokens');
-      }
-
-    })->setCheckPermissions($checkPermissions);
+  /**
+   * @param bool $checkPermissions
+   * @return Generic\BasicBatchAction
+   */
+  public static function delete($checkPermissions = TRUE): Generic\BasicBatchAction {
+    $action = new Action\OAuthSessionToken\Delete(static::getEntityName(), __FUNCTION__);
+    return $action->setCheckPermissions($checkPermissions);
   }
 
   /**

@@ -84,7 +84,7 @@ class api_v4_OAuthSessionTokenTest extends \PHPUnit\Framework\TestCase implement
       ->setValues($tokenCreateValues)
       ->execute();
 
-    \Civi\Api4\OAuthSessionToken::deleteAll(FALSE)
+    \Civi\Api4\OAuthSessionToken::delete(FALSE)
       ->execute();
 
     $retrievedTokens = \Civi\Api4\OAuthSessionToken::get(FALSE)
