@@ -62,7 +62,6 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
       'recentItemsMaxCount',
       'recentItemsProviders',
       'dedupe_default_limit',
-      'esm_loader',
       'prevNextBackend',
       'import_batch_size',
     ]);
