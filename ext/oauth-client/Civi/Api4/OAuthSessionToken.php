@@ -6,7 +6,7 @@ use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
 
 /**
- * OAuth Access Tokens.
+ * OAuth Access Tokens stored in the session
  *
  * @see https://docs.civicrm.org/dev/en/latest/framework/oauth/#model-token
  *
@@ -17,6 +17,10 @@ use Civi\Api4\Generic\Result;
  */
 class OAuthSessionToken extends Generic\AbstractEntity {
 
+  /**
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Generic\BasicCreateAction
+   */
   public static function create($checkPermissions = TRUE): Generic\BasicCreateAction {
     $action = new Generic\BasicCreateAction(
       static::getEntityName(),
