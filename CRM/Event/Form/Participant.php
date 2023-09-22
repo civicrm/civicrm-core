@@ -2090,6 +2090,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    *
    * @return array
    * @throws \CRM_Core_Exception
+   * @throws \Brick\Money\Exception\UnknownCurrencyException
    */
   protected function sendReceipts($params, array $participants, $lineItem, $additionalParticipantDetails): array {
     $sent = [];
@@ -2133,40 +2134,19 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     }
 
     $customGroup = [];
-    //format submitted data
-    $customFieldsRole = [];
-    foreach ($this->getSubmittedValue('role_id') as $roleKey) {
-      $customFieldsRole = CRM_Utils_Array::crmArrayMerge(CRM_Core_BAO_CustomField::getFields('Participant',
-        FALSE, FALSE, $roleKey, $this->_roleCustomDataTypeID), $customFieldsRole);
-    }
-    $customFieldsEvent = CRM_Core_BAO_CustomField::getFields('Participant',
-      FALSE,
-      FALSE,
-      $this->getEventID(),
-      $this->_eventNameCustomDataTypeID
-    );
-    $customFieldsEventType = CRM_Core_BAO_CustomField::getFields('Participant',
-      FALSE,
-      FALSE,
-      $this->_eventTypeId,
-      $this->_eventTypeCustomDataTypeID
-    );
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsRole,
-      CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, NULL, TRUE)
-    );
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEvent, $customFields);
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEventType, $customFields);
+    $customFieldFilters = [
+      'ParticipantRole' => $this->getSubmittedValue('role_id'),
+      'ParticipantEventName' => $this->getEventID(),
+      'ParticipantEventType' => $this->getEventValue('event_type_id'),
+    ];
+    $customFields = CRM_Core_BAO_CustomField::getViewableCustomFields('Participant', $customFieldFilters);
     foreach ($params['custom'] as $fieldID => $values) {
       foreach ($values as $fieldValue) {
-        $isPublic = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $fieldValue['custom_group_id'], 'is_public');
-        if ($isPublic) {
-          $customFields[$fieldID]['id'] = $fieldID;
-          $formattedValue = CRM_Core_BAO_CustomField::displayValue($fieldValue['value'], $fieldID, $participants[0]->id);
-          $customGroup[$customFields[$fieldID]['groupTitle']][$customFields[$fieldID]['label']] = str_replace('&nbsp;', '', $formattedValue);
-        }
+        $formattedValue = CRM_Core_BAO_CustomField::displayValue($fieldValue['value'], $fieldID, $participants[0]->id);
+        $customGroup[$customFields[$fieldID]['custom_group_id.title']][$customFields[$fieldID]['label']] = str_replace('&nbsp;', '', $formattedValue);
       }
     }
-
+    $this->assign('customGroup', $customGroup);
     foreach ($this->_contactIds as $num => $contactID) {
       // Retrieve the name and email of the contact - this will be the TO for receipt email
       [, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
@@ -2177,7 +2157,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         $this->assign('isOnWaitlist', TRUE);
       }
 
-      $this->assign('customGroup', $customGroup);
       $this->assign('contactID', $contactID);
       $this->assign('participantID', $participants[$num]->id);
 
