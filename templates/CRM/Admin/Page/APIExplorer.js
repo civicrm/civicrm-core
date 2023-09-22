@@ -11,7 +11,6 @@
     getFieldsCache = {},
     getActionsCache = {},
     params = {},
-    smartyPhp,
     entityDoc,
     fieldTpl = _.template($('#api-param-tpl').html()),
     optionsTpl = _.template($('#api-options-tpl').html()),
@@ -597,21 +596,6 @@
   }
 
   /**
-   * @param value string
-   * @param js string
-   * @param key string
-   */
-  function smartyFormat(value, js, key) {
-    var varName = 'param_' + key.replace(/[. -]/g, '_').toLowerCase();
-    // Can't pass array literals directly into smarty so we add a php snippet
-    if (_.includes(js, '[') || _.includes(js, '{')) {
-      smartyPhp.push('$this->assign("'+ varName + '", '+ phpFormat(value) +');');
-      return '$' + varName;
-    }
-    return js;
-  }
-
-  /**
    * Create the params array from user input
    * @param e
    */
@@ -716,7 +700,6 @@
         "curl '" + http.url + "?" + $.param(http.query) + "'"
         : "curl -X " + http.method + " -d '" + $.param(http.query) +"' \\\n  '" + http.url + "'"
     };
-    smartyPhp = [];
     $.each(params, function(key, value) {
       var json = JSON.stringify(value),
         // Encourage 'return' to be an array - at least in php & js
@@ -732,7 +715,7 @@
       q.json += "  \"" + key + '": ' + js;
       // smarty already defaults to sequential
       if (key !== 'sequential') {
-        q.smarty += ' ' + key + '=' + smartyFormat(value, json, key);
+        q.smarty += ' ' + key + '=' + phpFormat(value);
       }
       // FIXME: This is not totally correct cli syntax
       q.cv += key + '=' + json + ' ';
@@ -748,8 +731,6 @@
     q.smarty += "}\n{foreach from=$result.values item=" + entity.toLowerCase() + "}\n  {$" + entity.toLowerCase() + ".some_field}\n{/foreach}";
     if (!_.includes(action, 'get')) {
       q.smarty = '{* Smarty API only works with get actions *}';
-    } else if (smartyPhp.length) {
-      q.smarty = "{php}\n  " + smartyPhp.join("\n  ") + "\n{/php}\n" + q.smarty;
     }
     $('#api-rest').html(restTpl(http));
     $.each(q, function(type, val) {
