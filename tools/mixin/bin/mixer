@@ -274,7 +274,7 @@ function main($args) {
     }
   }
 
-  if (function_exists($task)) {
+  if ($task && function_exists($task)) {
     call_user_func($task, $newOptions, ...$newArgs);
   }
   else {
