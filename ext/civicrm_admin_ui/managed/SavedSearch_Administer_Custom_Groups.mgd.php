@@ -124,7 +124,7 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Fields'),
               'sortable' => TRUE,
-              'rewrite' => "{capture assign=fields}[GROUP_CONCAT_CustomGroup_CustomField_custom_group_id_01_label]{/capture}{ \$fields|replace:',':'<br>'}",
+              'rewrite' => "{capture assign=fields}[GROUP_CONCAT_CustomGroup_CustomField_custom_group_id_01_label]{/capture}{\$fields|replace:',':'<br>'}",
             ],
             [
               'size' => 'btn-xs',
