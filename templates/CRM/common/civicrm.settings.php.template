@@ -202,7 +202,22 @@ if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
 //}
 
 /**
+ * Specify a Smarty 3 autoload file.
+ *
+ * If you wish to experiment with Smarty3 you can do so by installing it
+ * to a directory using composer (composer require smarty/smarty:^3)
+ * and then defining the path to that
+ * autoload. file.
+ */
+//if (!defined('CIVICRM_SMARTY3_AUTOLOAD_PATH')) {
+//  define('CIVICRM_SMARTY3_AUTOLOAD_PATH', '/my/path/vendor/autoload.php');
+//}
+
+/**
  * Smarty escape on output.
+ *
+ * This does not currently work if you have a Smarty 3 path defined
+ * (see above).
  *
  * This tells smarty to pass all variables through the escape function
  * unless they are piped to smarty:nodefaults (eg. {$myScript|smarty:nodefaults}
