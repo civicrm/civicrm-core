@@ -184,35 +184,6 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
-   * Executes & returns or displays the template results
-   *
-   * @param string $resource_name
-   * @param string $cache_id
-   * @param string $compile_id
-   * @param bool $display
-   *
-   * @return bool|mixed|string
-   *
-   * @noinspection PhpDocMissingThrowsInspection
-   * @noinspection PhpUnhandledExceptionInspection
-   */
-  public function fetch($resource_name, $cache_id = NULL, $compile_id = NULL, $display = FALSE) {
-    if (preg_match('/^(\s+)?string:/', $resource_name)) {
-      $old_security = $this->security;
-      $this->security = TRUE;
-    }
-    try {
-      $output = parent::fetch($resource_name, $cache_id, $compile_id, $display);
-    }
-    finally {
-      if (isset($old_security)) {
-        $this->security = $old_security;
-      }
-    }
-    return $output;
-  }
-
-  /**
    * Handle smarty error in one off string.
    *
    * @param int $errorNumber
