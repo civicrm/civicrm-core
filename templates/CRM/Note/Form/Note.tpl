@@ -7,6 +7,46 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{* This tpl is empty. Since notes is a simple form, the tpl is embedded within the parent tpl *}
-{* This might change in the future *}
-{include file="CRM/Contact/Page/View/Note.tpl"}
+{* Delete action *}
+{if ($action eq 8)}
+  <div class=status>{ts}Are you sure you want to delete this note?{/ts}</div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
+{* Create/Update actions *}
+{else}
+  <div class="crm-block crm-form-block crm-note-form-block">
+    <table class="form-layout">
+      <tr>
+        <td class="label">{$form.subject.label}</td>
+        <td>
+            {$form.subject.html}
+        </td>
+      </tr>
+      <tr>
+        <td class="label">{$form.note_date.label}</td>
+        <td>{$form.note_date.html}</td>
+      </tr>
+      <tr>
+        <td class="label">{$form.privacy.label}</td>
+        <td>
+            {$form.privacy.html}
+        </td>
+      </tr>
+      <tr>
+        <td class="label">{$form.note.label}</td>
+        <td>
+            {$form.note.html}
+        </td>
+      </tr>
+      <tr class="crm-activity-form-block-attachment">
+        <td colspan="2">
+            {include file="CRM/Form/attachment.tpl"}
+        </td>
+      </tr>
+    </table>
+
+    <div class="crm-section note-buttons-section no-label">
+      <div class="content crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+      <div class="clear"></div>
+    </div>
+  </div>
+{/if}

@@ -177,12 +177,6 @@
     <page_callback>CRM_Contact_Page_View_ContactSmartGroup</page_callback>
   </item>
   <item>
-     <path>civicrm/contact/view/note</path>
-     <path_arguments>cid=%%cid%%</path_arguments>
-     <title>Notes</title>
-     <page_callback>CRM_Contact_Page_View_Note</page_callback>
-  </item>
-  <item>
      <path>civicrm/contact/view/tag</path>
      <path_arguments>cid=%%cid%%</path_arguments>
      <title>Tags</title>
