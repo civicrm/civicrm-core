@@ -11,9 +11,6 @@ isOnWaitlist:::{$isOnWaitlist}
 isRequireApproval:::{$isRequireApproval}
 {/if}
 participant_status:::{$participant_status}
-{if !empty($pricesetFieldsCount)}
-pricesetFieldsCount:::{$pricesetFieldsCount}
-{/if}
 {if !empty($isPrimary)}
 isPrimary:::{$isPrimary}
 {/if}
