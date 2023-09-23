@@ -161,6 +161,11 @@ class AfformMetadataInjector {
       }
     }
 
+    // Boolean checkbox has no options
+    if ($fieldInfo['data_type'] === 'Boolean' && $inputType === 'CheckBox') {
+      unset($fieldInfo['options'], $fieldDefn['options']);
+    }
+
     foreach ($fieldInfo as $name => $prop) {
       // Merge array props 1 level deep
       if (in_array($name, $deep) && !empty($fieldDefn[$name])) {
