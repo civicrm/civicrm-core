@@ -27,12 +27,12 @@
  *   the help html to be inserted
  */
 function smarty_function_help($params, &$smarty) {
-  if (!isset($params['id']) || !isset($smarty->_tpl_vars['config'])) {
+  if (!isset($params['id']) || !isset($smarty->get_template_vars()['config'])) {
     return NULL;
   }
 
-  if (empty($params['file']) && isset($smarty->_tpl_vars['tplFile'])) {
-    $params['file'] = $smarty->_tpl_vars['tplFile'];
+  if (empty($params['file']) && isset($smarty->get_template_vars()['tplFile'])) {
+    $params['file'] = $smarty->get_template_vars()['tplFile'];
   }
   elseif (empty($params['file'])) {
     return NULL;
