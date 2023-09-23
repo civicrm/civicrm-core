@@ -200,6 +200,7 @@ class CRM_Core_Smarty extends Smarty {
     if (preg_match('/^(\s+)?string:/', $resource_name)) {
       $old_security = $this->security;
       $this->security = TRUE;
+      CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_String::parseOneOffStringThroughSmarty');
     }
     try {
       $output = parent::fetch($resource_name, $cache_id, $compile_id, $display);

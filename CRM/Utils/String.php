@@ -382,7 +382,7 @@ class CRM_Utils_String {
     $params = explode('&', $query);
     foreach ($params as $p) {
       if (strpos($p, '=')) {
-        list($k, $v) = explode('=', $p);
+        [$k, $v] = explode('=', $p);
         if ($k == $urlVar) {
           return $v;
         }
@@ -516,7 +516,7 @@ class CRM_Utils_String {
     $values = explode("\n", $string);
     $result = [];
     foreach ($values as $value) {
-      list($n, $v) = CRM_Utils_System::explode('=', $value, 2);
+      [$n, $v] = CRM_Utils_System::explode('=', $value, 2);
       if (!empty($v)) {
         $result[trim($n)] = trim($v);
       }
@@ -721,7 +721,7 @@ class CRM_Utils_String {
    *   returns the masked Email address
    */
   public static function maskEmail($email, $maskChar = '*', $percent = 50) {
-    list($user, $domain) = preg_split("/@/", $email);
+    [$user, $domain] = preg_split("/@/", $email);
     $len = strlen($user);
     $maskCount = floor($len * $percent / 100);
     $offset = floor(($len - $maskCount) / 2);
@@ -1025,19 +1025,22 @@ class CRM_Utils_String {
    * many times it is run. This compares to it otherwise creating one file for every parsed string.
    *
    * @param string $templateString
+   * @param array $variables
+   *  Variables to assign.
    *
    * @return string
    *
    * @noinspection PhpDocRedundantThrowsInspection
    *
-   * @throws \CRM_Core_Exception
    */
-  public static function parseOneOffStringThroughSmarty($templateString) {
+  public static function parseOneOffStringThroughSmarty($templateString, $variables = []) {
     if (!CRM_Utils_String::stringContainsTokens($templateString)) {
       // Skip expensive smarty processing.
       return $templateString;
     }
+
     $smarty = CRM_Core_Smarty::singleton();
+    $smarty->pushScope($variables);
     $cachingValue = $smarty->caching;
     set_error_handler([$smarty, 'handleSmartyError'], E_USER_ERROR);
     $smarty->caching = 0;
@@ -1048,6 +1051,7 @@ class CRM_Utils_String {
     $smarty->caching = $cachingValue;
     $smarty->assign('smartySingleUseString');
     restore_error_handler();
+    $smarty->popScope();
     return $templateString;
   }
 
