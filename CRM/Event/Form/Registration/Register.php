@@ -658,6 +658,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
     else {
       // Is this reachable?
+      CRM_Core_Error::deprecatedWarning('code believed to be unreachable');
       $eventFeeBlockValues = $elements = $elementJS = [];
       foreach ($form->_feeBlock as $fee) {
         if (is_array($fee)) {
