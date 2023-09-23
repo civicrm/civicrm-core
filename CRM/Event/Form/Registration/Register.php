@@ -537,6 +537,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * Build the radio/text form elements for the amount field
    *
+   * @internal function is not currently called by any extentions in our civi
+   * 'universe' and is not supported for such use. Signature has changed & will
+   * change again.
+   *
    * @param CRM_Event_Form_Registration_Register $form
    *   Form object.
    * @param bool $required
@@ -547,7 +551,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function buildAmount(&$form, $required = TRUE, $discountId = NULL, $priceSetID = NULL) {
+  public static function buildAmount($form, $required, $discountId, $priceSetID) {
     $feeFields = $form->_values['fee'] ?? NULL;
 
     if (is_array($feeFields)) {
@@ -588,15 +592,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $form->add('hidden', 'priceSetId', $priceSetID);
 
       // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
-      $adminFieldVisible = FALSE;
-      if (CRM_Core_Permission::check('administer CiviCRM data')) {
-        $adminFieldVisible = TRUE;
-      }
-
-      $hideAdminValues = TRUE;
-      if (CRM_Core_Permission::check('edit event participants')) {
-        $hideAdminValues = FALSE;
-      }
+      $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM data');
+      $hideAdminValues = !CRM_Core_Permission::check('edit event participants');
 
       foreach ($form->_feeBlock as $field) {
         // public AND admin visibility fields are included for back-office registration and back-office change selections
