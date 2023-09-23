@@ -115,7 +115,7 @@ INSERT INTO civicrm_msg_template
 {/foreach}
 
 {php}
-  $dir = $this->_tpl_vars['gencodeXmlDir'] . '/templates/message_templates/sample';
+  $dir = $this->get_template_vars()['gencodeXmlDir'] . '/templates/message_templates/sample';
   $templates = array();
   foreach (preg_grep('/\.tpl$/', scandir($dir)) as $filename) {
     $templates[] = array('name' => basename($filename, '.tpl'), 'filename' => "$dir/$filename");

@@ -31,7 +31,7 @@
  *   the string, translated by gettext
  */
 function smarty_block_htxt($params, $text, &$smarty) {
-  if ($params['id'] == $smarty->_tpl_vars['id']) {
+  if ($params['id'] == $smarty->get_template_vars()['id']) {
     $smarty->assign('override_help_text', !empty($params['override']));
     return $text;
   }

@@ -59,5 +59,5 @@ function smarty_function_sectionTotal($params, &$smarty) {
   $totalsKey = implode(CRM_Core_DAO::VALUE_SEPARATOR, $sectionValues);
 
   // return the corresponding total
-  return $smarty->_tpl_vars['sectionTotals'][$totalsKey];
+  return $smarty->get_template_vars()['sectionTotals'][$totalsKey];
 }

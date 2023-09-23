@@ -300,11 +300,11 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   public function clearTemplateVars() {
-    foreach (array_keys($this->_tpl_vars) as $key) {
+    foreach (array_keys($this->get_template_vars()) as $key) {
       if ($key == 'config' || $key == 'session') {
         continue;
       }
-      unset($this->_tpl_vars[$key]);
+      unset($this->get_template_vars()[$key]);
     }
   }
 

@@ -94,7 +94,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
       $this->contributionCreate(['contact_id' => $contactID, 'total_amount' => 50 + $i]);
     }
     $reportObj = $this->getReportObject($reportClass, $inputParams);
-    $pager = $reportObj->getTemplate()->_tpl_vars['pager'];
+    $pager = $reportObj->getTemplate()->get_template_vars()['pager'];
     $this->assertEquals($pager->_response['numPages'], 2, "Pages in Pager");
   }
 
