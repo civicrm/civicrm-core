@@ -25,6 +25,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   use EntityLookupTrait;
   use CRM_Contact_Form_ContactFormTrait;
+  use CRM_Event_Form_EventFormTrait;
 
   /**
    * Participant ID - use getParticipantID.
@@ -93,13 +94,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @deprecated
    */
   public $_contactId;
-
-  /**
-   * Array of event values.
-   *
-   * @var array
-   */
-  protected $_event;
 
   /**
    * Are we operating in "single mode", i.e. adding / editing only
@@ -206,13 +200,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @todo add explanatory note about this
    */
   public $_onlinePendingContributionId;
-
-  /**
-   * Stored participant record.
-   *
-   * @var array
-   */
-  protected $participantRecord;
 
   /**
    * Params for creating a payment to add to the contribution.
@@ -1887,36 +1874,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function isPaymentOnExistingContribution(): bool {
     return ($this->getParticipantID() && $this->_action & CRM_Core_Action::UPDATE) && $this->_paymentId;
-  }
-
-  /**
-   * Get the value for a field relating to the event.
-   *
-   * @param string $fieldName
-   *
-   * @return mixed
-   * @throws \CRM_Core_Exception
-   */
-  protected function getEventValue(string $fieldName) {
-    if (!isset($this->_event)) {
-      $this->_event = civicrm_api3('Event', 'getsingle', ['id' => $this->_eventId]);
-    }
-    return $this->_event[$fieldName];
-  }
-
-  /**
-   * Get a value from the existing participant record (applies to edits).
-   *
-   * @param string $fieldName
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  protected function getParticipantValue($fieldName) {
-    if (!$this->participantRecord) {
-      $this->participantRecord = civicrm_api3('Participant', 'getsingle', ['id' => $this->getParticipantID()]);
-    }
-    return $this->participantRecord[$fieldName] ?? $this->participantRecord['participant_' . $fieldName];
   }
 
   /**

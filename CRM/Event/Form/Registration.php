@@ -20,20 +20,36 @@
 class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   use CRM_Financial_Form_FrontEndPaymentFormTrait;
+  use CRM_Event_Form_EventFormTrait;
 
   /**
    * The id of the event we are processing.
    *
    * @var int
+   *
+   * @deprecated access via `getEventID`
    */
   public $_eventId;
 
   /**
-   * Get the event it.
+   * Get the selected Event ID.
    *
-   * @return int
+   * @return int|null
+   *
+   * @throws \CRM_Core_Exception
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
    */
-  protected function getEventID(): int {
+  public function getEventID(): int {
+    if (!$this->_eventId) {
+      $this->_eventId = (int) CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+      // this is the first time we are hitting this, so check for permissions here
+      if (!CRM_Core_Permission::event(CRM_Core_Permission::EDIT, $this->_eventId, 'register for events')) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to register for this event'), $this->getInfoPageUrl());
+      }
+    }
     return $this->_eventId;
   }
 
@@ -179,9 +195,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $this->_eventId = (int) CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $this->setTitle($this->getEventValue('title'));
     $this->_action = CRM_Utils_Request::retrieve('action', 'Alphanumeric', $this, FALSE, CRM_Core_Action::ADD);
     //CRM-4320
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
@@ -221,20 +239,16 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->assign('showPaymentOnConfirm', $this->showPaymentOnConfirm);
 
     if (!$this->_values) {
-      // this is the first time we are hitting this, so check for permissions here
-      if (!CRM_Core_Permission::event(CRM_Core_Permission::EDIT, $this->_eventId, 'register for events')) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to register for this event'), $this->getInfoPageUrl());
-      }
 
       // get all the values from the dao object
       $this->_values = $this->_fields = [];
 
       //retrieve event information
-      $params = ['id' => $this->_eventId];
+      $params = ['id' => $this->getEventID()];
       CRM_Event_BAO_Event::retrieve($params, $this->_values['event']);
 
       // check for is_monetary status
-      $isMonetary = $this->_values['event']['is_monetary'] ?? NULL;
+      $isMonetary = $this->getEventValue('is_monetary');
       // check for ability to add contributions of type
       if ($isMonetary
         && CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
@@ -260,7 +274,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $this->set('additionalParticipantIds', $this->_additionalParticipantIds);
       }
 
-      $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId, FALSE,
+      $eventFull = CRM_Event_BAO_Participant::eventFull($this->getEventID(), FALSE,
         $this->_values['event']['has_waitlist'] ?? NULL
       );
 
@@ -287,7 +301,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $participant_role = CRM_Core_OptionGroup::values('participant_role');
         $this->_values['event']['participant_role'] = $participant_role["{$this->_values['event']['default_role_id']}"];
       }
-      $isPayLater = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'is_pay_later');
+      $isPayLater = $this->getEventValue('is_pay_later');
       $this->setPayLaterLabel($isPayLater ? $this->_values['event']['pay_later_text'] : '');
       //check for various combinations for paylater, payment
       //process with paid event.
@@ -368,8 +382,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     // The concept of contributeMode is deprecated.
     $this->_contributeMode = $this->get('contributeMode');
     $this->assign('contributeMode', $this->_contributeMode);
-
-    $this->setTitle($this->_values['event']['title']);
 
     $this->assign('paidEvent', $this->_values['event']['is_monetary']);
 
