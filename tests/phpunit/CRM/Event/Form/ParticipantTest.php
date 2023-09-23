@@ -675,7 +675,6 @@ London,',
       $isAmountPaidOnForm ? 'Total Paid: $20.00' : 'Total Paid: ',
       $isAmountPaidOnForm ? 'Balance: $1,530.55' : 'Balance: $1,550.55',
       'Financial Type: Event Fee',
-      'Paid By: Check',
       'February 15th, 2023  3:00 PM- 6:00 PM',
       'Check Number: 879',
     ]);

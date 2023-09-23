@@ -74,7 +74,7 @@
 {ts}Add event to Google Calendar{/ts} {$gCalendar}
 {/if}
 
-{if !empty($email)}
+{if {contact.email_primary.email|boolean}}
 
 ===============================================================================
 
@@ -82,7 +82,7 @@
 
 ===============================================================================
 
-{$email}
+{contact.email_primary.email}
 {/if}
 {if {event.is_monetary|boolean}} {* This section for Paid events only.*}
 
@@ -104,15 +104,14 @@
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
 {capture assign=ts_qty}{ts}Qty{/ts}{/capture}
 {capture assign=ts_each}{ts}Each{/ts}{/capture}
-{if !empty($dataArray)}
+{if $isShowTax && {contribution.tax_amount|boolean}}
 {capture assign=ts_subtotal}{ts}Subtotal{/ts}{/capture}
 {capture assign=ts_taxRate}{ts}Tax Rate{/ts}{/capture}
 {capture assign=ts_taxAmount}{ts}Tax Amount{/ts}{/capture}
 {/if}
 {capture assign=ts_total}{ts}Total{/ts}{/capture}
 {capture assign=ts_participant_total}{if !empty($pricesetFieldsCount)}{ts}Total Participants{/ts}{/if}{/capture}
-{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if !empty($dataArray)} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"} {if !empty($ts_participant_total)}{$ts_participant_total|string_format:"%10s"}{/if}
-------------------------------------------------------------------------------
+{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if $isShowTax && {contribution.tax_amount|boolean}} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"} {if !empty($ts_participant_total)}{$ts_participant_total|string_format:"%10s"}{/if}
 
 {foreach from=$value item=line}
 {if !empty($pricesetFieldsCount)}{capture assign=ts_participant_count}{$line.participant_count}{/capture}{/if}
@@ -121,7 +120,7 @@
 {/if}
 {/foreach}
 
-{if !empty($dataArray)}
+{if $isShowTax && {contribution.tax_amount|boolean}}
 {if $totalAmount and $totalTaxAmount}
 {ts}Amount before Tax:{/ts} {$totalAmount-$totalTaxAmount|crmMoney:$currency}
 {/if}
@@ -181,17 +180,17 @@
 {if {contribution.receive_date|boolean}}
 {ts}Transaction Date{/ts}: {contribution.receive_date}
 {/if}
-{if !empty($financialTypeName)}
-{ts}Financial Type{/ts}: {$financialTypeName}
+{if {contribution.financial_type_id|boolean}}
+{ts}Financial Type{/ts}: {contribution.financial_type_id:label}
 {/if}
-{if !empty($trxn_id)}
-{ts}Transaction #{/ts}: {$trxn_id}
+{if {contribution.trxn_id|boolean}}
+{ts}Transaction #{/ts}: {contribution.trxn_id}
 {/if}
-{if !empty($paidBy)}
-{ts}Paid By{/ts}: {$paidBy}
+{if {contribution.payment_instrument_id|boolean} && {contribution.paid_amount|boolean}}
+{ts}Paid By{/ts}: {contribution.payment_instrument_id:label}
 {/if}
-{if !empty($checkNumber)}
-{ts}Check Number{/ts}: {$checkNumber}
+{if {contribution.check_number|boolean}}
+{ts}Check Number{/ts}: {contribution.check_number}
 {/if}
 {if !empty($billingName)}
 

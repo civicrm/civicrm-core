@@ -173,8 +173,8 @@ You were registered by: {$payer.name}
 {if !empty($trxn_id)}
 {ts}Transaction #{/ts}: {$trxn_id}
 {/if}
-{if !empty($paidBy)}
-{ts}Paid By{/ts}: {$paidBy}
+{if {contribution.payment_instrument_id|boolean} && {contribution.paid_amount|boolean}}
+{ts}Paid By{/ts}: {contribution.payment_instrument_id:label}
 {/if}
 {if !empty($checkNumber)}
 {ts}Check Number{/ts}: {$checkNumber}

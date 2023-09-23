@@ -23,7 +23,7 @@
     {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
       <p>
         {if {contribution.contribution_page_id.receipt_text|boolean}}{contribution.contribution_page_id.receipt_text}
-        {else}{ts}Below you will find a receipt for this contribution.{/ts}{/if}
+        {elseif {contribution.paid_amount|boolean}}{ts}Below you will find a receipt for this contribution.{/ts}{/if}
       </p>
    </td>
   </tr>
@@ -166,7 +166,7 @@
       </tr>
      {/if}
 
-     {if {contribution.payment_instrument_id|boolean}}
+     {if {contribution.payment_instrument_id|boolean} && {contribution.paid_amount|boolean}}
       <tr>
        <td {$labelStyle}>
         {ts}Paid By{/ts}

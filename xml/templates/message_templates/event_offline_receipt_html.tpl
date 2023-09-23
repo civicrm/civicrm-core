@@ -64,7 +64,7 @@
       </tr>
      {/if}
 
-     {if !empty($isShowLocation)}
+     {if {event.is_show_location|boolean}}
       <tr>
        <td colspan="2" {$valueStyle}>
         {$location.address.1.display|nl2br}
@@ -148,7 +148,7 @@
       </tr>
      {/if}
 
-     {if $email}
+     {if {contact.email_primary.email|boolean}}
       <tr>
        <th {$headerStyle}>
         {ts}Registered Email{/ts}
@@ -156,7 +156,7 @@
       </tr>
       <tr>
        <td colspan="2" {$valueStyle}>
-        {$email}
+         {contact.email_primary.email|boolean}
        </td>
       </tr>
      {/if}
@@ -188,7 +188,7 @@
              <th>{ts}Item{/ts}</th>
              <th>{ts}Qty{/ts}</th>
              <th>{ts}Each{/ts}</th>
-             {if !empty($dataArray)}
+             {if $isShowTax && {contribution.tax_amount|boolean}}
               <th>{ts}SubTotal{/ts}</th>
               <th>{ts}Tax Rate{/ts}</th>
               <th>{ts}Tax Amount{/ts}</th>
@@ -321,7 +321,7 @@
        </td>
      </tr>
      {/if}
-       {if $is_pay_later}
+     {if {contribution.is_pay_later|boolean} && {contribution.balance_amount|boolean}}
         <tr>
          <td colspan="2" {$labelStyle}>
           {$pay_later_receipt}
@@ -340,57 +340,57 @@
         </tr>
        {/if}
 
-       {if !empty($receive_date)}
+       {if {contribution.receive_date|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Transaction Date{/ts}
          </td>
          <td {$valueStyle}>
-          {$receive_date|crmDate}
+           {contribution.receive_date}
          </td>
         </tr>
        {/if}
 
-       {if !empty($financialTypeName)}
+       {if {contribution.financial_type_id|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Financial Type{/ts}
          </td>
          <td {$valueStyle}>
-          {$financialTypeName}
+           {contribution.financial_type_id:label}
          </td>
         </tr>
        {/if}
 
-       {if !empty($trxn_id)}
+       {if {contribution.financial_trxn_id|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Transaction #{/ts}
          </td>
          <td {$valueStyle}>
-          {$trxn_id}
+           {contribution.financial_trxn_id}
          </td>
         </tr>
        {/if}
 
-       {if !empty($paidBy)}
+       {if {contribution.payment_instrument_id|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Paid By{/ts}
          </td>
          <td {$valueStyle}>
-         {$paidBy}
+           {contribution.payment_instrument_id:label}
          </td>
         </tr>
        {/if}
 
-       {if !empty($checkNumber)}
+       {if {contribution.check_number|boolean}}
         <tr>
          <td {$labelStyle}>
           {ts}Check Number{/ts}
          </td>
          <td {$valueStyle}>
-          {$checkNumber}
+           {contribution.check_number}
          </td>
         </tr>
        {/if}

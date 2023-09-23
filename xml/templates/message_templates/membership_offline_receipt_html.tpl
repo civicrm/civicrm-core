@@ -182,7 +182,7 @@
                   </td>
                 </tr>
               {/if}
-              {if {contribution.payment_instrument_id|boolean}}
+              {if {contribution.payment_instrument_id|boolean} && {contribution.paid_amount|boolean}}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Paid By{/ts}

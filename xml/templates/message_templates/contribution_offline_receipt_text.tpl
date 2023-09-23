@@ -2,7 +2,7 @@
 
 {if {contribution.contribution_page_id.receipt_text|boolean}}
 {contribution.contribution_page_id.receipt_text}
-{else}{ts}Below you will find a receipt for this contribution.{/ts}
+{elseif {contribution.paid_amount|boolean}} {ts}Below you will find a receipt for this contribution.{/ts}
 {/if}
 
 ===========================================================
@@ -49,7 +49,7 @@
 {if '{contribution.receipt_date}'}
 {ts}Receipt Date{/ts}: {contribution.receipt_date|crmDate:"shortdate"}
 {/if}
-{if {contribution.payment_instrument_id|boolean}}
+{if {contribution.payment_instrument_id|boolean} && {contribution.paid_amount|boolean}}
 {ts}Paid By{/ts}: {contribution.payment_instrument_id:label}
 {if '{contribution.check_number}'}
 {ts}Check Number{/ts}: {contribution.check_number}

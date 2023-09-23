@@ -700,7 +700,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     if ($isTaxed) {
       $mailUtil->checkMailLog([
         'Dear Anthony,
-Below you will find a receipt for this contribution.
+
 ===========================================================
 Contribution Information
 ===========================================================
@@ -718,14 +718,13 @@ Sales Tax 10.00% : $10.00
 Total Tax Amount : $10.00
 Total Amount : $110.00
 Contribution Date: ' . date('m/d/Y') . '
-Receipt Date: ' . date('m/d/Y') . '
-Paid By: Check',
+Receipt Date: ' . date('m/d/Y'),
       ]);
     }
     else {
       $mailUtil->checkMailLog([
         'Dear Anthony,
-Below you will find a receipt for this contribution.
+
 ===========================================================
 Contribution Information
 ===========================================================
@@ -740,8 +739,7 @@ Price Field - Price Field 1        1    $100.00       $100.00
 
 Total Amount : $100.00
 Contribution Date: ' . date('m/d/Y') . '
-Receipt Date: ' . date('m/d/Y') . '
-Paid By: Check',
+Receipt Date: ' . date('m/d/Y'),
       ],
       ['Amount before Tax', 'Tax Amount']);
     }
