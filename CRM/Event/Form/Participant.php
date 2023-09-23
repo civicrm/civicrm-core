@@ -2133,21 +2133,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       $this->assign('receive_date', $params['receive_date']);
     }
 
-    $customGroup = [];
-    $customFieldFilters = [
-      'ParticipantRole' => $this->getSubmittedValue('role_id'),
-      'ParticipantEventName' => $this->getEventID(),
-      'ParticipantEventType' => $this->getEventValue('event_type_id'),
-    ];
-    $customFields = CRM_Core_BAO_CustomField::getViewableCustomFields('Participant', $customFieldFilters);
-    foreach ($params['custom'] as $fieldID => $values) {
-      foreach ($values as $fieldValue) {
-        $formattedValue = CRM_Core_BAO_CustomField::displayValue($fieldValue['value'], $fieldID, $participants[0]->id);
-        $customGroup[$customFields[$fieldID]['custom_group_id.title']][$customFields[$fieldID]['label']] = str_replace('&nbsp;', '', $formattedValue);
-      }
-    }
-    $this->assign('customGroup', $customGroup);
-
     $fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
     foreach ($this->_contactIds as $num => $contactID) {
       // Retrieve the name and email of the contact - this will be the TO for receipt email
