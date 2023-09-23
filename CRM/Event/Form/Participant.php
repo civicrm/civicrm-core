@@ -951,10 +951,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
     $userName = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();
 
-    if ($this->_contactId) {
-      [, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
-    }
-
     //modify params according to parameter used in create
     //participant method (addParticipant)
     $this->_params['participant_status_id'] = $params['status_id'];
@@ -983,7 +979,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       // set email for primary location.
       $fields['email-Primary'] = 1;
-      $params['email-Primary'] = $params["email-{$this->_bltID}"] = $this->_contributorEmail;
+      $params['email-Primary'] = $params["email-{$this->_bltID}"] = $this->getContactValue('email_primary.email');
 
       // now set the values for the billing location.
       foreach ($this->_fields as $name => $dontCare) {
@@ -1032,7 +1028,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       // so we copy stuff over to first_name etc.
       $paymentParams = $this->_params;
       if (!empty($this->_params['send_receipt'])) {
-        $paymentParams['email'] = $this->_contributorEmail;
+        $paymentParams['email'] = $this->getContactValue('email_primary.email');
       }
 
       // The only reason for merging in the 'contact_id' rather than ensuring it is set
@@ -1533,8 +1529,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // Retrieve the name and email of the contact - form will be the TO for receipt email ( only if context is not standalone)
     if ($form->_context !== 'standalone') {
       if ($form->getContactID()) {
-        [, $form->_contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($form->_contactId);
-        $form->assign('email', $form->_contributorEmail);
+        // @todo - this is likely unneeded now.
+        $form->assign('email', $this->getContactValue('email_primary.email'));
       }
       else {
         //show email block for batch update for event
@@ -2150,9 +2146,13 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
 
     $fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
     foreach ($this->_contactIds as $num => $contactID) {
-      // Retrieve the name and email of the contact - this will be the TO for receipt email
-      [, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
-
+      [, $email, $doNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
+      if (!$email || $doNotEmail) {
+        // try to send emails only if email id is present
+        // and the do-not-email option is not checked for that contact
+        $notSent[] = $contactID;
+        continue;
+      }
       $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
       $waitingStatus = $waitStatus[$params['status_id']] ?? NULL;
       if ($waitingStatus) {
@@ -2231,15 +2231,11 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         ],
       ];
 
-      // try to send emails only if email id is present
-      // and the do-not-email option is not checked for that contact
-      if ($this->_contributorEmail and !$this->_toDoNotEmail) {
-        $sendTemplateParams['from'] = $params['from_email_address'];
-        $sendTemplateParams['toName'] = $this->getContactValue('display_name');
-        $sendTemplateParams['toEmail'] = $this->_contributorEmail;
-        $sendTemplateParams['cc'] = $fromEmails['cc'] ?? NULL;
-        $sendTemplateParams['bcc'] = $fromEmails['bcc'] ?? NULL;
-      }
+      $sendTemplateParams['from'] = $params['from_email_address'];
+      $sendTemplateParams['toName'] = $this->getContactValue('display_name');
+      $sendTemplateParams['toEmail'] = $this->getContactValue('email_primary.email');
+      $sendTemplateParams['cc'] = $fromEmails['cc'] ?? NULL;
+      $sendTemplateParams['bcc'] = $fromEmails['bcc'] ?? NULL;
 
       //send email with pdf invoice
       if (Civi::settings()->get('invoice_is_email_pdf')) {
