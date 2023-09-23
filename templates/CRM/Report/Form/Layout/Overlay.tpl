@@ -22,14 +22,14 @@
                    {if $header.colspan}
                       <td colspan={$header.colspan}>{$header.title}</td>
                       {assign var=skip value=true}
-                      {assign var=skipCount value=`$header.colspan`}
+                      {assign var=skipCount value=$header.colspan}
                       {assign var=skipMade  value=1}
                    {else}
                       <td>{$header.title}</td>
                        {assign var=skip value=false}
                    {/if}
                 {else} {* for skip case *}
-                   {assign var=skipMade value=`$skipMade+1`}
+                   {assign var=skipMade value=$skipMade+1}
                    {if $skipMade >= $skipCount}{assign var=skip value=false}{/if}
                 {/if}
             {/foreach}

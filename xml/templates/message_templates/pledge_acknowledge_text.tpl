@@ -21,11 +21,11 @@
 {/if}
 
 {if $payments}
-{assign var="count" value="1"}
+{assign var="count" value=1}
 {foreach from=$payments item=payment}
 
 {ts 1=$count}Payment %1{/ts}: {$payment.amount|crmMoney:$currency} {if $payment.status eq 1}{ts}paid{/ts} {$payment.receive_date|truncate:10:''|crmDate}{else}{ts}due{/ts} {$payment.due_date|truncate:10:''|crmDate}{/if}
-{assign var="count" value=`$count+1`}
+{assign var="count" value=$count+1}
 {/foreach}
 {/if}
 

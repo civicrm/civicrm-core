@@ -18,15 +18,15 @@
   <tr class="custom_field-row {$element.element_name}-row">
     <td class="label">{$formElement.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
     <td class="html-adjust">
-      {assign var="count" value="1"}
+      {assign var="count" value=1}
       {foreach name=outer key=key item=item from=$formElement}
         {if is_array($item) && array_key_exists('html', $item)}
           {$item.html}
           {if $count == $element.options_per_line}
             <br />
-            {assign var="count" value="1"}
+            {assign var="count" value=1}
           {else}
-            {assign var="count" value=`$count+1`}
+            {assign var="count" value=$count+1}
           {/if}
         {else}
           {* Skip because this isn't one of the numeric keyed elements that are the options to display, it's non-numeric keys like the field label and metadata. *}

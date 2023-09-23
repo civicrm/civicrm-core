@@ -98,7 +98,7 @@
           <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
             <div class="label">{$form.$n.label}</div>
             <div class="content edit-value">
-              {assign var="count" value="1"}
+              {assign var="count" value=1}
               {strip}
                 <table class="form-layout-compressed">
                 <tr>
@@ -110,9 +110,9 @@
                       {if $count == $field.options_per_line}
                       </tr>
                       <tr>
-                        {assign var="count" value="1"}
+                        {assign var="count" value=1}
                         {else}
-                        {assign var="count" value=`$count+1`}
+                        {assign var="count" value=$count+1}
                       {/if}
                     {/if}
                   {/foreach}
@@ -129,7 +129,7 @@
             </div>
             <div class="edit-value content">
               {if $n|substr:0:3 eq 'im-'}
-                {assign var="provider" value=$n|cat:"-provider_id"}
+                {assign var="provider" value="$n-provider_id"}
                 {$form.$provider.html}&nbsp;
               {/if}
               {if $n eq 'email_greeting' or  $n eq 'postal_greeting' or $n eq 'addressee'}

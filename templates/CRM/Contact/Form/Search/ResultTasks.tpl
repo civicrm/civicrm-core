@@ -34,7 +34,7 @@
   <tr>
     <td style="width: 30%;">
         {if !empty($savedSearch.name)}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
-        {ts count=$pager->_totalItems plural='%count Contacts'}%count Contact{/ts}
+        {ts count=$pager->_totalItems plural="%count Contacts"}%count Contact{/ts}
     </td>
 
     {* Search criteria are passed to tpl in the $qill array *}
@@ -48,7 +48,7 @@
     <td> {ts}Select Records{/ts}:</td>
     <td class="nowrap">
       {assign var="checked" value=$selectedContactIds|@count}
-      {$form.radio_ts.ts_all.html} <label for="{$ts_all_id}">{ts count=$pager->_totalItems plural='All %count records'}The found record{/ts}</label>
+      {$form.radio_ts.ts_all.html} <label for="{$ts_all_id}">{ts count=$pager->_totalItems plural="All %count records"}The found record{/ts}</label>
       {if $pager->_totalItems > 1}
         &nbsp; {$form.radio_ts.ts_sel.html} <label for="{$ts_sel_id}">{ts 1="<span>$checked</span>"}%1 Selected records only{/ts}</label>
       {/if}

@@ -22,7 +22,7 @@
     {math equation="x / y" x=$amount y=$installments format="%.2f" assign="currentInstallment"}
     {* Check if current Total Pledge Amount is different from original pledge amount. *}
     {if $currentInstallment NEQ $eachPaymentAmount}
-      {assign var=originalPledgeAmount value=`$installments*$eachPaymentAmount`}
+      {assign var=originalPledgeAmount value=$installments*$eachPaymentAmount}
     {/if}
 {/if}
 <div class="crm-block crm-form-block crm-pledge-form-block">
