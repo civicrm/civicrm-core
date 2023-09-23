@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* This included tpl checks if a given username is taken or available. *}
-{crmSigner var=checkUserSig for=civicrm/ajax/cmsuser}
+{crmSigner var=checkUserSig for="civicrm/ajax/cmsuser"}
 {literal}
 var lastName = null;
 cj("#checkavailability").click(function() {

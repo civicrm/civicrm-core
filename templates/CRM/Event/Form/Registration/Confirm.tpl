@@ -51,7 +51,7 @@
                 {include file="CRM/Price/Page/LineItem.tpl" context="Event"}
             {elseif $amounts || $amount == 0}
           <div class="crm-section no-label amount-item-section">
-                    {foreach from= $amounts item=amount key=level}
+                    {foreach from=$amounts item=amount key=level}
               <div class="content">
                   {$amount.amount|crmMoney}&nbsp;&nbsp;{$amount.label}
               </div>

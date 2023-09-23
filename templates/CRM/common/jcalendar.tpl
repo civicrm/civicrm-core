@@ -18,9 +18,9 @@
     {$form.$elementName.$elementIndex.html}
 {elseif $blockId and $blockSection}
     {assign var='elementId'   value=$form.$blockSection.$blockId.$elementName.id}
-    {assign var="tElement" value=`$elementName`_time}
+    {assign var="tElement" value="`$elementName`_time"}
     {$form.$blockSection.$blockId.$elementName.html}
-    {assign var="timeElement" value=`$blockSection`_`$blockId`_`$elementName`_time}
+    {assign var="timeElement" value="`$blockSection`_`$blockId`_`$elementName`_time"}
     {if $tElement}
       &nbsp;&nbsp;{$form.$blockSection.$blockId.$tElement.label}
       &nbsp;&nbsp;{$form.$blockSection.$blockId.$tElement.html|crmAddClass:six}
