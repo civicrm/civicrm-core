@@ -69,6 +69,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
       }
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
+      $defaults['privacy'] = '0';
       $defaults['note_date'] = date('Y-m-d H:i:s');
       if ($this->_entityTable === 'civicrm_note') {
         $defaults['subject'] = ts('Re: %1', [1 => CRM_Core_BAO_Note::getNoteSubject($this->_entityId)]);
@@ -115,7 +116,10 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $this->addField('subject');
     $this->addField('note_date', [], TRUE, FALSE);
     $this->addField('note', [], TRUE);
-    $this->addField('privacy');
+    $this->addField('privacy', [
+      'placeholder' => NULL,
+      'option_url' => NULL,
+    ]);
 
     // add attachments part
     CRM_Core_BAO_File::buildAttachment($this, 'civicrm_note', $this->_id, NULL, TRUE);
