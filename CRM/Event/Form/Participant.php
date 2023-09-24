@@ -385,15 +385,41 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   public function setDefaultValues(): array {
     if ($this->isOverloadFeesMode()) {
-      return CRM_Event_Form_EventFees::setDefaultValues($this);
+      if ($this->getEventID()) {
+        //get receipt text and financial type
+        $returnProperities = ['confirm_email_text', 'financial_type_id', 'campaign_id', 'start_date'];
+        CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $this->getEventID(), $details, $returnProperities);
+        if (!empty($details[$this->getEventID()]['financial_type_id'])) {
+          $defaults['financial_type_id'] = $details[$this->getEventID()]['financial_type_id'];
+        }
+        if (!empty($details[$this->getEventID()]['confirm_email_text'])) {
+          $defaults['receipt_text'] = $details[$this->getEventID()]['confirm_email_text'];
+        }
+        if (!$this->getParticipantID()) {
+          $defaults['send_receipt'] = (strtotime(CRM_Utils_Array::value('start_date', $details[$this->getEventID()])) >= time()) ? 1 : 0;
+          $defaults['receive_date'] = date('Y-m-d H:i:s');
+        }
+      }
+
+      //CRM-11601 we should keep the record contribution
+      //true by default while adding participant
+      if ($this->getAction() === CRM_Core_Action::ADD && !$this->_mode && $this->_isPaidEvent) {
+        $defaults['record_contribution'] = 1;
+      }
+
+      //CRM-13420
+      if (empty($defaults['payment_instrument_id'])) {
+        $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
+      }
+      return $defaults + CRM_Event_Form_EventFees::setDefaultValues($this);
     }
 
     $defaults = [];
 
-    if ($this->_id) {
+    if ($this->getParticipantID()) {
       $ids = [];
       $params = ['id' => $this->_id];
-
+      $defaults['send_receipt'] = 0;
       CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
       $defaults = $defaults[$this->_id];
       $sep = CRM_Core_DAO::VALUE_SEPARATOR;
