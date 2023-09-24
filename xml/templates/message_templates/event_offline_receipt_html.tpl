@@ -156,7 +156,7 @@
       </tr>
       <tr>
        <td colspan="2" {$valueStyle}>
-         {contact.email_primary.email|boolean}
+         {contact.email_primary.email}
        </td>
       </tr>
      {/if}
