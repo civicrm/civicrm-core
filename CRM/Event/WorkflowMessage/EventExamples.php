@@ -115,7 +115,8 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
     $messageTemplate->setContribution($contribution);
     $messageTemplate->setOrder($mockOrder);
     $messageTemplate->setParticipantContacts($participantContacts);
-    $messageTemplate->setParticipant(['id' => $isPrimary ? $primaryParticipantID : $otherParticipantID, 'registered_by_id' => $isPrimary ? NULL : $primaryParticipantID, 'register_date' => date('Y-m-d')]);
+    $roleID = Event::get(FALSE)->addWhere('id', '=', $example['event_id'])->addSelect('default_role_id')->execute()->first()['default_role_id'];
+    $messageTemplate->setParticipant(['id' => $isPrimary ? $primaryParticipantID : $otherParticipantID, 'registered_by_id' => $isPrimary ? NULL : $primaryParticipantID, 'register_date' => date('Y-m-d'), 'role_id' => $roleID]);
   }
 
   /**

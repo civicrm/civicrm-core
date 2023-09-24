@@ -29,14 +29,9 @@ pay_later_receipt:::{$pay_later_receipt}
 event.event_title:::{$event.event_title}
 event.event_start_date:::{$event.event_start_date|crmDate:"%A"}
 event.event_end_date:::{event.end_date|crmDate:"%Y%m%d"}
-{if !empty($event.is_monetary)}
-event.is_monetary:::{$event.is_monetary}
-{/if}
+event.is_monetary:::{event.is_monetary|boolean}
 event.fee_label:::{event.fee_label}
-{if !empty($event.participant_role)}
-  event.participant_role::{$event.participant_role}
-  defaultRole:::{$defaultRole}
-{/if}
+event.participant_role::{event.participant_role_id:label}
 {if !empty($isShowLocation)}
 isShowLocation:::{$isShowLocation}
 location.address.1.display:::{$location.address.1.display}
