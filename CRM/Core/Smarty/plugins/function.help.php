@@ -60,7 +60,7 @@ function smarty_function_help($params, &$smarty) {
     if (!array_key_exists('params', $vars)) {
       // In the unlikely event that params already exists, we don't want to
       // overwrite it, so only do this if not already set.
-      $temporary_vars[] = ['params' => []];
+      $temporary_vars += ['params' => []];
     }
     // Note fetchWith adds the temporary ones to the existing scope but then
     // will reset, unsetting them if not already present before, which is what
