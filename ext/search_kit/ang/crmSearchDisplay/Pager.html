@@ -20,7 +20,7 @@
     ></ul>
   </div>
   <div>
-    <div class="form-inline text-right" ng-if="$ctrl.settings.pager.expose_limit">
+    <div class="form-inline text-right" ng-if="$ctrl.settings.pager.expose_limit && (!$ctrl.settings.pager.hide_single || $ctrl.rowCount > $ctrl.limit)">
       <label for="crm-search-results-page-size" >
         {{:: ts('Page Size') }}
       </label>
