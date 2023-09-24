@@ -715,6 +715,7 @@ event.loc_block_id.email_id.email :event@example.com
 event.loc_block_id.phone_id.phone :456 789
 event.description :event description
 event.location :15 Walton St<br />
+up the road<br />
 Emerald City, Maine 90210<br />
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1

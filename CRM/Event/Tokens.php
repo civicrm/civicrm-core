@@ -177,7 +177,11 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
     if (!Civi::cache('metadata')->has($cacheKey)) {
       $event = Event::get($this->checkPermissions)->addWhere('id', '=', $eventID)
         ->setSelect(array_merge([
+          'loc_block_id.address_id.name',
           'loc_block_id.address_id.street_address',
+          'loc_block_id.address_id.supplemental_address_1',
+          'loc_block_id.address_id.supplemental_address_2',
+          'loc_block_id.address_id.supplemental_address_3',
           'loc_block_id.address_id.city',
           'loc_block_id.address_id.state_province_id:label',
           'loc_block_id.address_id.postal_code',
@@ -206,7 +210,11 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
         ], $this->getExposedFields()))
         ->execute()->first();
       $tokens['location']['text/plain'] = \CRM_Utils_Address::format([
+        'address_name' => $event['loc_block_id.address_id.name'],
         'street_address' => $event['loc_block_id.address_id.street_address'],
+        'supplemental_address_1' => $event['loc_block_id.address_id.supplemental_address_1'],
+        'supplemental_address_2' => $event['loc_block_id.address_id.supplemental_address_2'],
+        'supplemental_address_3' => $event['loc_block_id.address_id.supplemental_address_3'],
         'city' => $event['loc_block_id.address_id.city'],
         'state_province' => $event['loc_block_id.address_id.state_province_id:label'],
         'postal_code' => $event['loc_block_id.address_id.postal_code'],
