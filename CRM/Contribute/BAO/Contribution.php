@@ -1714,35 +1714,18 @@ WHERE      $condition
    * Online Event Registration or Online Membership signup.
    *
    * @param int $componentId
-   *   Participant/membership id.
-   * @param string $componentName
-   *   Event/Membership.
+   *   Participant id.
    *
    * @return int
    *   pending contribution id.
    */
-  public static function checkOnlinePendingContribution($componentId, $componentName) {
+  public static function checkOnlinePendingContribution($componentId) {
     $contributionId = NULL;
-    if (!$componentId ||
-      !in_array($componentName, ['Event', 'Membership'])
-    ) {
-      return $contributionId;
-    }
 
-    if ($componentName === 'Event') {
-      $idName = 'participant_id';
-      $componentTable = 'civicrm_participant';
-      $paymentTable = 'civicrm_participant_payment';
-      $source = ts('Online Event Registration');
-    }
-
-    if ($componentName === 'Membership') {
-      $idName = 'membership_id';
-      $componentTable = 'civicrm_membership';
-      $paymentTable = 'civicrm_membership_payment';
-      $source = ts('Online Contribution');
-    }
-
+    $idName = 'participant_id';
+    $componentTable = 'civicrm_participant';
+    $paymentTable = 'civicrm_participant_payment';
+    $source = ts('Online Event Registration');
     $pendingStatusId = array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'));
 
     $query = "
