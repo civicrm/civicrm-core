@@ -17,7 +17,7 @@
     <div class="crm-accordion-body">
     <table class="form-layout-compressed">
     {foreach from=$cd_edit.fields item=element key=field_id}
-            {assign var="type" value=`$element.html_type`}
+            {assign var="type" value=$element.html_type}
             {assign var="element_name" value='custom_'|cat:$field_id}
             {assign var="operator_name" value='custom_'|cat:$field_id|cat:'_operator'}
             {if $element.is_search_range}
