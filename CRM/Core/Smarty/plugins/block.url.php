@@ -34,10 +34,13 @@
  *   Contents of block.
  * @param CRM_Core_Smarty $smarty
  *   The Smarty object.
+ * @param bool $repeat
+ *   Repeat is true for the opening tag, false for the closing tag
+ *
  * @return string
  */
-function smarty_block_url($params, $text, &$smarty) {
-  if ($text === NULL) {
+function smarty_block_url($params, $text, &$smarty, &$repeat) {
+  if ($repeat || $text === NULL) {
     return NULL;
   }
 
