@@ -14,7 +14,7 @@
 {if !$email and $action neq 8 and $context neq 'standalone'}
 <div class="messages status no-popup">
   {icon icon="fa-info-circle"}{/icon}
-  <p>{ts}You will not be able to send an acknowledgment for this pledge because there is no email address recorded for this contact. If you want a acknowledgment to be sent when this pledge is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the pledge.{/ts}</p>
+  {ts}You will not be able to send an acknowledgment for this pledge because there is no email address recorded for this contact. If you want a acknowledgment to be sent when this pledge is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the pledge.{/ts}
 </div>
 {/if}
 {if $action EQ 2}
@@ -105,7 +105,7 @@
             </td>
           </tr>
           <tr class="crm-pledge-form-block-financial_type_id">
-            <td class="label">{$form.financial_type_id.label} {help id='id-financial_type_id'}
+            <td class="label">{$form.financial_type_id.label} {help id='id-financial_type_id' file="CRM/Pledge/Form/Pledge.hlp"}
 </td>
             <td>{$form.financial_type_id.html}</td>
           </tr>
@@ -115,7 +115,7 @@
       campaignTrClass="crm-pledge-form-block-campaign_id"}
 
           <tr class="crm-pledge-form-block-contribution_page_id">
-            <td class="label">{$form.contribution_page_id.label} {help id='id-contribution_page_id'}</td>
+            <td class="label">{$form.contribution_page_id.label} {help id='id-contribution_page_id' file="CRM/Pledge/Form/Pledge.hlp"}</td>
             <td>{$form.contribution_page_id.html}</td>
           </tr>
 
