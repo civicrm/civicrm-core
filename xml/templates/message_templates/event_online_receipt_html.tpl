@@ -361,13 +361,13 @@
                 </tr>
               {/if}
 
-              {if !empty($paidBy)}
+              {if {contribution.payment_instrument_id|boolean} && {contribution.paid_amount|boolean}}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Paid By{/ts}
                   </td>
                   <td {$valueStyle}>
-                    {$paidBy}
+                    {contribution.payment_instrument_id:label}
                   </td>
                 </tr>
               {/if}
