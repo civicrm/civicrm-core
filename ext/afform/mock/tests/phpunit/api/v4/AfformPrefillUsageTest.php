@@ -100,4 +100,66 @@ EOHTML;
     $this->assertTrue(empty($prefill['Individual1']['values']));
   }
 
+  public function testPrefillByRelationship(): void {
+
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual', source: 'Child + parents'}" type="Contact" name="Children" label="Individual 1" actions="{create: true, update: true}" security="RBAC" autofill="relationship:Child of" autofill-relationship="user_contact_id" />
+  <af-entity data="{contact_type: 'Individual', source: 'Child + parents'}" type="Contact" name="Parents" label="Individual 2" actions="{create: true, update: true}" security="RBAC" autofill="relationship:Parent of" autofill-relationship="Children" />
+  <fieldset af-fieldset="Children" class="af-container" af-title="Individual 1" min="1" af-repeat="Add" af-copy="Copy">
+    <afblock-name-individual></afblock-name-individual>
+  </fieldset>
+  <fieldset af-fieldset="Parents" class="af-container" af-title="Individual 2" min="1" af-repeat="Add" af-copy="Copy">
+    <afblock-name-individual></afblock-name-individual>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $uid = $this->createLoggedInUser();
+
+    $cid = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'Co', 'last_name' => 'Parent'],
+        ['first_name' => 'First', 'last_name' => 'Child'],
+        ['first_name' => 'Second', 'last_name' => 'Child'],
+        ['first_name' => 'Third', 'last_name' => 'Child'],
+      ],
+    ])->column('id');
+
+    // Create parent/child relationships
+    foreach ([1, 2, 3] as $child) {
+      $values = [
+        'contact_id_a' => $cid[$child],
+        'contact_id_b' => $cid[0],
+        'relationship_type_id:name' => 'Child of',
+      ];
+      civicrm_api4('Relationship', 'create', ['values' => $values]);
+      $values['contact_id_b'] = $uid;
+      civicrm_api4('Relationship', 'create', ['values' => $values]);
+    }
+
+    $prefill = Civi\Api4\Afform::prefill()
+      ->setName($this->formName)
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertCount(3, $prefill['Children']['values']);
+    $children = array_column($prefill['Children']['values'], 'fields');
+    $this->assertContains('First', array_column($children, 'first_name'));
+    $this->assertContains('Second', array_column($children, 'first_name'));
+    $this->assertContains('Third', array_column($children, 'first_name'));
+
+    $this->assertCount(2, $prefill['Parents']['values']);
+    $parents = array_column($prefill['Parents']['values'], 'fields');
+    $this->assertContains('Co', array_column($parents, 'first_name'));
+    $this->assertContains($uid, array_column($parents, 'id'));
+    $this->assertContains($cid[0], array_column($parents, 'id'));
+  }
+
 }
