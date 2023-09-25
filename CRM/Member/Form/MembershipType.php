@@ -53,7 +53,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       'auto_renew' => [
         'name' => 'auto_renew',
         'options' => CRM_Core_SelectValues::memberAutoRenew(),
-        'place_holder' => ts('You will need to select and configure a supported payment processor (currently Authorize.Net, PayPal Pro, or PayPal Website Standard) in order to offer automatically renewing memberships.'),
+        // Note this doesn't get used currently because the template has its own code for this field. Note also the documentation link that you see in the template is added later here down below.
+        'description' => ts('You will need to select and configure a supported payment processor (currently Authorize.Net, PayPal Pro, or PayPal Website Standard) in order to offer automatically renewing memberships.'),
       ],
       'duration_interval' => [
         'name' => 'duration_interval',
@@ -99,7 +100,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
     if (!CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(['Recurring'])) {
       $this->entityFields['auto_renew']['not-auto-addable'] = TRUE;
-      $this->entityFields['auto_renew']['documentation_link'] = ['page' => 'user/contributions/payment-processors'];
+      $this->entityFields['auto_renew']['documentation_link'] = ['page' => 'user/contributions/payment-processors', 'resource' => ''];
     }
   }
 
