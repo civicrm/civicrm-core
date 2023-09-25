@@ -32,7 +32,7 @@ class CRM_Utils_Address {
    *   The desired address format.
    * @param bool $microformat
    *   If true indicates, the address to be built in hcard-microformat standard.
-   * @param bool $mailing
+   * @param bool $unused
    *   Should ALWAYS be false.
    * @param string[] $tokenFields
    *
@@ -44,19 +44,13 @@ class CRM_Utils_Address {
     $fields,
     $format = NULL,
     $microformat = FALSE,
-    $mailing = FALSE,
+    $unused = FALSE,
     $tokenFields = NULL
   ) {
-    $mailing = FALSE;
 
     if (!$format) {
       $format = Civi::settings()->get('address_format');
     }
-
-    if ($mailing) {
-      $format = Civi::settings()->get('mailing_format');
-    }
-
     $formatted = $format;
 
     $fullPostalCode = $fields['postal_code'] ?? NULL;
@@ -75,26 +69,6 @@ class CRM_Utils_Address {
     foreach ($emptyFields as $f) {
       if (!isset($fields[$f])) {
         $fields[$f] = NULL;
-      }
-    }
-
-    //CRM-16876 Display countries in all caps when in mailing mode.
-    if ($mailing && !empty($fields['country'])) {
-      if (Civi::settings()->get('hideCountryMailingLabels')) {
-        $domain = CRM_Core_BAO_Domain::getDomain();
-        $domainLocation = CRM_Core_BAO_Location::getValues(['contact_id' => $domain->contact_id]);
-        $domainAddress = $domainLocation['address'][1];
-        $domainCountryId = $domainAddress['country_id'];
-        if ($fields['country'] == CRM_Core_PseudoConstant::country($domainCountryId)) {
-          $fields['country'] = NULL;
-        }
-        else {
-          //Capitalization display on uppercase to contries with special characters
-          $fields['country'] = mb_convert_case($fields['country'], MB_CASE_UPPER, "UTF-8");
-        }
-      }
-      else {
-        $fields['country'] = mb_convert_case($fields['country'], MB_CASE_UPPER, "UTF-8");
       }
     }
 
