@@ -179,7 +179,6 @@ trait CRM_Core_Form_EntityFormTrait {
         'post_html_text' => '',
         'description' => '',
         'documentation_link' => ['page' => '', 'resource' => ''],
-        'place_holder' => '',
       ], $fields);
     }
     $this->assign('entityFields', $this->entityFields);
