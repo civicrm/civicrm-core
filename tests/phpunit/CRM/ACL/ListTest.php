@@ -25,6 +25,15 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     $this->allowedContactsACL = [];
   }
 
+  public function testAaa(): void {
+    $this->assertTrue(TRUE);
+    $fileName = CRM_Core_Error::createDebugLogger()->_filename;
+    $contents = file_get_contents($fileName);
+    if (!empty($contents)) {
+      throw new \Exception($contents);
+    }
+  }
+
   /**
    * general test for the 'view all contacts' permission
    */
