@@ -201,6 +201,12 @@
       },
       isEditing: function(rowIndex, colIndex) {
         return this.editing && this.editing[0] === rowIndex && this.editing[1] === colIndex;
+      },
+      wasEditing: function(rowIndex, colIndex) {
+        return this.lastEdited && this.lastEdited[0] === rowIndex && this.lastEdited[1] === colIndex;
+      },
+      zeroIfEditable: function (colIndex) {
+        return this.settings.columns[colIndex].editable ? "0" : undefined;
       }
     };
   });

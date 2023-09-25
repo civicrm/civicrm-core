@@ -11,7 +11,7 @@
       cancel: '&'
     },
     templateUrl: '~/crmSearchDisplay/crmSearchDisplayEditable.html',
-    controller: function($scope, $element, crmApi4, crmStatus) {
+    controller: function($scope, $element, crmApi4, crmStatus, $timeout) {
       var ctrl = this,
         initialValue,
         col;
@@ -38,6 +38,15 @@
           }
           else if (e.key === 'Enter') {
             $scope.$apply(() => ctrl.save());
+          }
+          else if (e.key === 'Tab') {
+            // Prevent the user from tabbing outside the in-place-edit form
+            var focusBeforeTab = $(':focus');
+            $timeout(function () {
+              if ($(':focus').closest('crm-search-display-editable').length === 0) {
+                focusBeforeTab.trigger('focus');
+              }
+            });
           }
         });
 
