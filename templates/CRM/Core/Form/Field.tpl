@@ -16,7 +16,7 @@
   </td>
   <td>
     {if $form.$fieldName.html}{$form.$fieldName.html}{else}{$fieldSpec.place_holder}{/if}{if array_key_exists('post_html_text', $fieldSpec) && $fieldSpec.post_html_text}{$fieldSpec.post_html_text}{/if}<br />
-    {if $fieldSpec.description}<span class="description">{$fieldSpec.description}</span>{/if}
+    {if array_key_exists('description', $fieldSpec) && $fieldSpec.description}<span class="description">{$fieldSpec.description}</span>{/if}
     {if array_key_exists('documentation_link', $fieldSpec) && $fieldSpec.documentation_link.page}{docURL page=$fieldSpec.documentation_link.page resource=$fieldSpec.documentation_link.resource}{/if}
   </td>
 {/if}
