@@ -119,18 +119,22 @@ class CRM_Utils_Address_BatchUpdate {
     $clause = [];
     $params = [];
     if ($this->start) {
-      $clause[] = "( c.id >= %1 )";
+      $clause[] = "( c.id >= ".intval($this->start)." )";
       $params[1] = [$this->start, 'Integer'];
     }
 
     if ($this->end) {
-      $clause[] = "( c.id <= %2 )";
+      $clause[] = "( c.id <= ".intval($this->end)." )";
       $params[2] = [$this->end, 'Integer'];
     }
 
     if ($processGeocode) {
       $clause[] = '( a.geo_code_1 is null OR a.geo_code_1 = 0 )';
       $clause[] = '( a.geo_code_2 is null OR a.geo_code_2 = 0 )';
+      /**
+       * the scheduled job is ignoring trying to geocode addresses where manual_geocode is 1
+       */
+      $clause[] = '( a.manual_geo_code = 0 )';
       $clause[] = '( a.country_id is not null )';
     }
 
@@ -164,6 +168,11 @@ class CRM_Utils_Address_BatchUpdate {
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     $unparseableContactAddress = [];
+    /**
+     * track parsed contact ids and unparsed contact ids
+     */
+    $unparsedContactIds = [];
+    $parsedContactIds = [];
     while ($dao->fetch()) {
       $totalAddresses++;
       $params = [
@@ -226,6 +235,10 @@ class CRM_Utils_Address_BatchUpdate {
         // do check for all elements.
         if ($success) {
           $totalAddressParsed++;
+          /**
+           * track parsed contact ids
+           */
+          $parsedContactIds[] = $dao->id;
         }
         elseif ($dao->street_address) {
           //build contact edit url,
@@ -234,6 +247,10 @@ class CRM_Utils_Address_BatchUpdate {
           $unparseableContactAddress[] = " Contact ID: " . $dao->id . " <a href =\"$url\"> " . $dao->street_address . " </a> ";
           // reset element values.
           $parsedFields = array_fill_keys(array_keys($parsedFields), '');
+          /**
+           * track parsed contact ids and unparsed contact ids
+           */
+          $unparsedContactIds[] = $dao->id;
         }
         $addressParams = array_merge($addressParams, $parsedFields);
       }
@@ -266,7 +283,26 @@ class CRM_Utils_Address_BatchUpdate {
         }
       }
     }
-
+    foreach ($unparsedContactIds as $eachContactId) {
+      /**
+       * If an address has failed in the geocoding scheduled job i.e. no lat/long is fetched, we will update the manual_geocode field to 1. 
+      */
+      $results = \Civi\Api4\Address::update()
+        ->addValue('manual_geo_code', true)
+        ->addValue('geo_code_1', 0)
+        ->addValue('geo_code_2', 0)
+        ->addWhere('contact_id', '=', $eachContactId)
+        ->execute();
+    }
+    foreach ($parsedContactIds as $eachContactId) { 
+      /**
+       * When an address is updated, if manual_geocode is already set to 1, we get rid of that flag so that it can be geocoded again.
+      */
+      $results = \Civi\Api4\Address::update()
+        ->addValue('manual_geo_code', false)
+        ->addWhere('contact_id', '=', $eachContactId)
+        ->execute();
+    }
     return $this->returnResult();
   }
 
