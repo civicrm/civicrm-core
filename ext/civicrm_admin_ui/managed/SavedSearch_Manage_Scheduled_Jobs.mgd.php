@@ -167,7 +167,7 @@ return [
                   'icon' => 'fa-file-o',
                   'text' => E::ts('View joblog'),
                   'style' => 'default',
-                  'path' => 'civicrm/admin/joblog?jid=[id]&reset=1',
+                  'path' => 'civicrm/admin/joblog#?job_id=[id]',
                   'condition' => [],
                 ],
                 [
