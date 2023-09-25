@@ -342,7 +342,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @param string $entityName
    * @param $records
    */
-  public function replaceReferences($entityName, $records) {
+  protected function replaceReferences($entityName, $records) {
     $entityNames = array_diff(array_keys($this->_entityIds), [$entityName]);
     $entityType = $this->_formDataModel->getEntity($entityName)['type'];
     foreach ($records as $key => $record) {
@@ -369,7 +369,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @param array $records
    * @param string $entityName
    */
-  public function fillIdFields(array &$records, string $entityName): void {
+  protected function fillIdFields(array &$records, string $entityName): void {
     foreach ($records as $index => &$record) {
       if (empty($record['fields']['id']) && !empty($this->_entityIds[$entityName][$index]['id'])) {
         $record['fields']['id'] = $this->_entityIds[$entityName][$index]['id'];
