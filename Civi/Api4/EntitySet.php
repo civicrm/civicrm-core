@@ -39,6 +39,7 @@ class EntitySet extends Generic\AbstractEntity {
   }
 
   /**
+   * This isn't a "real" entity and doesn't have any fields
    * @return \Civi\Api4\Generic\BasicGetFieldsAction
    */
   public static function getFields($checkPermissions = TRUE) {
@@ -59,6 +60,13 @@ class EntitySet extends Generic\AbstractEntity {
    */
   protected static function getEntityTitle($plural = FALSE) {
     return $plural ? ts('Entity Sets') : ts('Entity Set');
+  }
+
+  public static function getInfo(): array {
+    $info = parent::getInfo();
+    // This isn't a "real" entity and doesn't have any fields, so no primary key
+    $info['primary_key'] = [];
+    return $info;
   }
 
 }
