@@ -1503,6 +1503,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         // Save the contribution ID so that I can be used in email receipts
         // For example, if you need to generate a tax receipt for the donation only.
         $form->_values['contribution_other_id'] = $membershipContribution->id;
+
+        if ($paymentResult['contribution']->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending') && empty($paymentResult['contribution']->trxn_id)) {
+          $pending = TRUE;
+        }
+      }
+      elseif (!empty($paymentResult['is_payment_failure'])) {
+        $pending = TRUE;
       }
     }
 
@@ -1590,7 +1597,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           ) {
             $pending = TRUE;
           }
-          $pending = FALSE;
+          $pending = $pending ?: FALSE;
         }
 
         [$membership, $renewalMode, $dates] = self::legacyProcessMembership(
@@ -2888,7 +2895,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $memParams = array_merge([
           'id' => $currentMembership['id'],
           'contribution' => $contribution,
-          'status_id' => $currentMembership['status_id'],
+          'status_id' => $pending ? array_search('Pending', $allStatus) : $currentMembership['status_id'],
           'start_date' => $currentMembership['start_date'],
           'end_date' => $currentMembership['end_date'],
           'line_item' => $lineItems,
