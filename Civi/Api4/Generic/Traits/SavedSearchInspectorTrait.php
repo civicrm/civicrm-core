@@ -282,7 +282,7 @@ trait SavedSearchInspectorTrait {
     foreach ($fieldNames as $fieldName) {
       $field = $this->getField($fieldName);
       $dataType = $field['data_type'] ?? NULL;
-      $operators = ($field['operators'] ?? []) ?: CoreUtil::getOperators();
+      $operators = array_values($field['operators'] ?? []) ?: CoreUtil::getOperators();
       // Array is either associative `OP => VAL` or sequential `IN (...)`
       if (is_array($value)) {
         $value = array_filter($value, [$this, 'hasValue']);
@@ -290,13 +290,15 @@ trait SavedSearchInspectorTrait {
         if (array_diff_key($value, array_flip(CoreUtil::getOperators()))) {
           // Use IN for regular fields
           if (empty($field['serialize'])) {
-            $filterClauses[] = [$fieldName, 'IN', $value];
+            $op = in_array('IN', $operators, TRUE) ? 'IN' : $operators[0];
+            $filterClauses[] = [$fieldName, $op, $value];
           }
           // Use an OR group of CONTAINS for array fields
           else {
+            $op = in_array('CONTAINS', $operators, TRUE) ? 'CONTAINS' : $operators[0];
             $orGroup = [];
             foreach ($value as $val) {
-              $orGroup[] = [$fieldName, 'CONTAINS', $val];
+              $orGroup[] = [$fieldName, $op, $val];
             }
             $filterClauses[] = ['OR', $orGroup];
           }
@@ -326,7 +328,8 @@ trait SavedSearchInspectorTrait {
         $filterClauses[] = [$fieldName, 'IN', (array) $value];
       }
       else {
-        $filterClauses[] = [$fieldName, '=', $value];
+        $op = in_array('=', $operators, TRUE) ? '=' : $operators[0];
+        $filterClauses[] = [$fieldName, $op, $value];
       }
     }
     // Single field

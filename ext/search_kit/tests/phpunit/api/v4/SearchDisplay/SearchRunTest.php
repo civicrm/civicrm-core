@@ -32,6 +32,16 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function tearDown(): void {
+    \Civi\Api4\Setting::revert(FALSE)
+      ->addSelect('geoProvider')
+      ->execute();
+    parent::tearDown();
+  }
+
+  /**
    * Test running a searchDisplay with various filters.
    */
   public function testRunWithFilters() {
@@ -2182,6 +2192,44 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals([NULL, 'fa-search', NULL], $result[0]['columns'][1]['icons']['right']);
     $this->assertEquals(['', 'crm-image-popup', ''], array_column($result[0]['columns'][1]['links'], 'style'));
     $this->assertEquals(['test_file.txt', 'test_file.png', 'test_file_foo.unknown'], array_column($result[0]['columns'][1]['links'], 'text'));
+  }
+
+  public function testRunWithAddressProximity(): void {
+    require_once __DIR__ . '/../../../../../../../tests/phpunit/CRM/Utils/Geocode/TestProvider.php';
+    $sampleData = [
+      ['geo_code_1' => \CRM_Utils_Geocode_TestProvider::GEO_CODE_1, 'geo_code_2' => \CRM_Utils_Geocode_TestProvider::GEO_CODE_2],
+      ['geo_code_1' => \CRM_Utils_Geocode_TestProvider::GEO_CODE_1 - .05, 'geo_code_2' => \CRM_Utils_Geocode_TestProvider::GEO_CODE_2 + .05],
+      ['geo_code_1' => '0', 'geo_code_2' => '0'],
+    ];
+    $addresses = $this->saveTestRecords('Address', ['records' => $sampleData])
+      ->column('id');
+
+    \Civi\Api4\Setting::set(FALSE)
+      ->addValue('geoProvider', 'TestProvider')
+      ->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Address',
+        'api_params' => [
+          'version' => 4,
+          // Hack proximity into select clause to allow filter
+          'select' => ['id', 'proximity'],
+          'where' => [
+            ['id', 'IN', $addresses],
+          ],
+        ],
+      ],
+      'display' => NULL,
+      'filters' => ['proximity' => ['distance' => 1000, 'address' => \CRM_Utils_Geocode_TestProvider::ADDRESS]],
+      'afform' => NULL,
+      'debug' => TRUE,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
   }
 
   /**
