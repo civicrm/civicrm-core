@@ -72,7 +72,9 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
   }
 
   public function testAfformAutocomplete(): void {
-    $title = uniqid();
+    // Use a numeric title to test that the "search by id" feature
+    // doesn't kick in for Afforms (which don't have a numeric "id")
+    $title = (string) rand(1000, 999999);
     Afform::create()
       ->addValue('name', $this->formName)
       ->addValue('title', $title)
