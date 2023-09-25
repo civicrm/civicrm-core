@@ -52,7 +52,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
     // WORKAROUND: CRM_Event_Tokens copies `civicrm_event` data into metadata cache. That should probably change, but that's a different scope-of-work.
     // `clear()` works around it. This should be removed if that's updated, but it will be safe either way.
     Civi::cache('metadata')->clear();
-
+    $this->revertSetting('mailing_format');
     parent::tearDown();
   }
 
@@ -716,7 +716,8 @@ event.loc_block_id.phone_id.phone :456 789
 event.description :event description
 event.location :15 Walton St<br />
 up the road<br />
-Emerald City, Maine 90210<br />
+Emerald City, Maine 90210-1234<br />
+United States<br />
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
 event.pay_later_receipt :Please transfer funds to our bank account.
@@ -1078,7 +1079,9 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       'city' => 'Emerald City',
       'state_province_id:label' => 'Maine',
       'postal_code' => 90210,
+      'postal_code_suffix' => 1234,
     ])->execute()->first()['id'];
+    \Civi::settings()->set('mailing_format', '{contact.street_address}{ }{contact.supplemental_address_1}{ }{contact.supplemental_address_2}{ }{contact.city}{ }{contact.state_province}{ }{contact.postal_code}');
     $phoneID = Phone::create()
       ->setValues(['phone' => '456 789'])
       ->execute()

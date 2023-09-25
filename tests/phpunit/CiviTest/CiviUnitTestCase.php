@@ -108,9 +108,14 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected $tempDirs;
 
   /**
-   * @var CRM_Core_Transaction|null
+   * @var CRM_Core_Transaction
    */
-  private $tx = NULL;
+  private $tx;
+
+  /**
+   * @var array
+   */
+  protected $originalSettings = [];
 
   /**
    * Array of IDs created to support the test.
@@ -333,6 +338,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->renameLabels();
     $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
     putenv('CIVICRM_SMARTY_DEFAULT_ESCAPE=1');
+    $this->originalSettings = \Civi::settings()->all();
   }
 
   /**
@@ -495,6 +501,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     }
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
     parent::tearDown();
+  }
+
+  /**
+   * @param string $setting
+   */
+  protected function revertSetting(string $setting): void {
+    \Civi::settings()->set($setting, $this->originalSettings[$setting]);
   }
 
   /**
