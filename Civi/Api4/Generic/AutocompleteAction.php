@@ -149,23 +149,29 @@ class AutocompleteAction extends AbstractAction {
     else {
       // Default search and sort field
       $labelField = $this->display['settings']['columns'][0]['key'];
-      $idField = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
+      $primaryKeys = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'primary_key');
       $this->display['settings'] += [
         'sort' => [$labelField, 'ASC'],
       ];
       // Always search on the first line of the display
       $searchFields = [$labelField];
-      // If input is an integer, search by id
-      $numericInput = $this->page == 1 && \CRM_Utils_Rule::positiveInteger($this->input);
-      if ($numericInput) {
-        $searchFields = [$idField];
+      // If input is an integer...
+      $searchById = \CRM_Utils_Rule::positiveInteger($this->input) &&
+        // ...and there is exactly one primary key (e.g. EntitySet has zero, others might have compound keys)
+        count($primaryKeys) === 1 &&
+        // ...and the primary key field is type Integer (e.g. Afform.name is a String)
+        ($this->getField($primaryKeys[0])['data_type'] ?? NULL) === 'Integer';
+      // ...then search by primary key on first page
+      $initialSearchById = $searchById && $this->page == 1;
+      if ($initialSearchById) {
+        $searchFields = $primaryKeys;
       }
-      // For subsequent pages when searching numeric input
-      elseif ($this->page > 1 && \CRM_Utils_Rule::positiveInteger($this->input)) {
+      // For subsequent pages when searching by id, subtract the "extra" first page
+      elseif ($searchById && $this->page > 1) {
         $this->page -= 1;
       }
       // If first line uses a rewrite, search on those fields too
-      if (!empty($this->display['settings']['columns'][0]['rewrite'])) {
+      if (!$initialSearchById && !empty($this->display['settings']['columns'][0]['rewrite'])) {
         $searchFields = array_merge($searchFields, $this->getTokens($this->display['settings']['columns'][0]['rewrite']));
       }
       $this->display['settings']['limit'] = $this->display['settings']['limit'] ?? \Civi::settings()->get('search_autocomplete_count');
@@ -198,7 +204,7 @@ class AutocompleteAction extends AbstractAction {
       $result[] = $item;
     }
     $result->setCountMatched($apiResult->count());
-    if (!empty($numericInput)) {
+    if (!empty($initialSearchById)) {
       // Trigger "more results" after searching by exact id
       $result->setCountMatched($apiResult->count() + 1);
     }
