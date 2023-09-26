@@ -34,7 +34,7 @@
       {/foreach}
 
       {if $element.html_type == 'Radio' and $element.is_required == 0}
-        <br /><a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+        <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
       {/if}
     </td>
   </tr>
