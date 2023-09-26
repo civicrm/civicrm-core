@@ -436,6 +436,79 @@
     };
   });
 
+  // @deprecated This code was moved from ViewRecipCtrl and is quarantined in this service.
+  // It's used to fetch data that ought to be available in other ways.
+  // It would be nice to refactor it out completely.
+  angular.module('crmMailing').factory('crmMailingLoader', function ($q, crmApi, crmFromAddresses, crmQueue) {
+
+    var mids = [];
+    var gids = [];
+    var groupNames = [];
+    var mailings = [];
+    var civimailings = [];
+    var civimails = [];
+
+    return {
+      // Populates the CRM.crmMailing.groupNames global
+      getGroupNames: function(mailing) {
+        if (-1 == mailings.indexOf(mailing.id)) {
+          mailings.push(mailing.id);
+          _.each(mailing.recipients.groups.include, function(id) {
+            if (-1 == gids.indexOf(id)) {
+              gids.push(id);
+            }
+          });
+          _.each(mailing.recipients.groups.exclude, function(id) {
+            if (-1 == gids.indexOf(id)) {
+              gids.push(id);
+            }
+          });
+          _.each(mailing.recipients.groups.base, function(id) {
+            if (-1 == gids.indexOf(id)) {
+              gids.push(id);
+            }
+          });
+          if (!_.isEmpty(gids)) {
+            CRM.api3('Group', 'get', {'id': {"IN": gids}}).then(function(result) {
+              _.each(result.values, function(grp) {
+                if (_.isEmpty(_.where(groupNames, {id: parseInt(grp.id)}))) {
+                  groupNames.push({id: parseInt(grp.id), title: grp.title, is_hidden: grp.is_hidden});
+                }
+              });
+              CRM.crmMailing.groupNames = groupNames;
+            });
+          }
+        }
+      },
+      // Populates the CRM.crmMailing.civiMails global
+      getCiviMails: function(mailing) {
+        if (-1 == civimailings.indexOf(mailing.id)) {
+          civimailings.push(mailing.id);
+          _.each(mailing.recipients.mailings.include, function(id) {
+            if (-1 == mids.indexOf(id)) {
+              mids.push(id);
+            }
+          });
+          _.each(mailing.recipients.mailings.exclude, function(id) {
+            if (-1 == mids.indexOf(id)) {
+              mids.push(id);
+            }
+          });
+          if (!_.isEmpty(mids)) {
+            CRM.api3('Mailing', 'get', {'id': {"IN": mids}}).then(function(result) {
+              _.each(result.values, function(mail) {
+                if (_.isEmpty(_.where(civimails, {id: parseInt(mail.id)}))) {
+                  civimails.push({id: parseInt(mail.id), name: mail.name});
+                }
+              });
+              CRM.crmMailing.civiMails = civimails;
+            });
+          }
+        }
+      }
+    };
+  });
+
   // The preview manager performs preview actions while putting up a visible UI (e.g. dialogs & status alerts)
   angular.module('crmMailing').factory('crmMailingPreviewMgr', function (dialogService, crmMailingMgr, crmStatus) {
     return {
