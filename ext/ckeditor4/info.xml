@@ -27,11 +27,11 @@
   </classloader>
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
-    <mixin>smarty-v2@1.0.0</mixin>
+    <mixin>smarty-v2@1.0.1</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Ckeditor4</namespace>
-    <format>23.02.0</format>
+    <format>23.02.1</format>
   </civix>
   <upgrader>CRM_Ckeditor4_Upgrader</upgrader>
 </extension>

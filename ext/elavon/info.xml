@@ -27,7 +27,7 @@
   </classloader>
   <civix>
     <namespace>CRM/Elavon</namespace>
-    <format>22.10.0</format>
+    <format>23.02.1</format>
     <angularModule>crmElavon</angularModule>
   </civix>
   <mixins>

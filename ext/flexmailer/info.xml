@@ -30,6 +30,7 @@
   </tags>
   <classloader>
     <psr4 prefix="Civi\FlexMailer\" path="src"/>
+    <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
@@ -37,6 +38,6 @@
   </mixins>
   <civix>
     <namespace>CRM/Flexmailer</namespace>
-    <format>23.02.0</format>
+    <format>23.02.1</format>
   </civix>
 </extension>
