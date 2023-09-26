@@ -135,13 +135,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected $_statusId = NULL;
 
   /**
-   * Cache all the participant statuses.
-   *
-   * @var array
-   */
-  protected $_participantStatuses;
-
-  /**
    * Participant mode.
    *
    * @var string
@@ -687,7 +680,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $notificationStatusIds = implode(',', array_keys(array_intersect($participantStatusName, $notificationStatuses)));
     $this->assign('notificationStatusIds', $notificationStatusIds);
 
-    $this->_participantStatuses = $statusOptions = CRM_Event_BAO_Participant::buildOptions('status_id', 'create');
+    $statusOptions = CRM_Event_BAO_Participant::buildOptions('status_id', 'create');
 
     // Only show refund status when editing
     if ($this->_action & CRM_Core_Action::ADD) {
