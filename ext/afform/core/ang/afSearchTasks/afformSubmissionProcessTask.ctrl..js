@@ -1,8 +1,8 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchTasks').controller('crmSearchTaskProcess', function ($scope, $timeout, crmApi4, searchTaskBaseTrait) {
-    var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+  angular.module('afSearchTasks').controller('afformSubmissionProcessTask', function ($scope, $timeout, crmApi4, searchTaskBaseTrait) {
+    var ts = $scope.ts = CRM.ts('org.civicrm.afform'),
       // Combine this controller with model properties (ids, entity, entityInfo) and searchTaskBaseTrait
       ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait);
 
