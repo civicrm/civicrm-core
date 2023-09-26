@@ -22,16 +22,38 @@ trait CRM_Contact_Form_ContactFormTrait {
    *
    * @throws \CRM_Core_Exception
    */
-  public function getContactValue($fieldName) {
+  public function getContactValue($fieldName, $escape = 'html_entities') {
     if ($this->isDefined('Contact')) {
-      return $this->lookup('Contact', $fieldName);
+      return $this->escape($this->lookup('Contact', $fieldName), $escape);
     }
     $id = $this->getContactID();
     if ($id) {
       $this->define('Contact', 'Contact', ['id' => $id]);
-      return $this->lookup('Contact', $fieldName);
+      return $this->escape($this->lookup('Contact', $fieldName), $escape);
     }
     return NULL;
+  }
+
+  /**
+   * @param $value
+   * @param $escape
+   *
+   * @return array|mixed|string
+   */
+  public function escape($value, $escape) {
+    if (is_array($value)) {
+      foreach ($value as $key => $item) {
+        $value[$key] = $this->escape($item, $escape);
+      }
+      return $value;
+    }
+    if ($escape === FALSE || empty($escape) || !is_string($value)) {
+      return $value;
+    }
+    if ($escape === 'purify') {
+      return CRM_Utils_String::purifyHTML($escape);
+    }
+    return htmlentities($escape);
   }
 
   /**
