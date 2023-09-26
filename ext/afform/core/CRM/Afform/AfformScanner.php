@@ -60,6 +60,9 @@ class CRM_Afform_AfformScanner {
       }
     }
 
+    // Scan core ang/afform directory
+    $this->appendFilePaths($paths, Civi::paths()->getPath('[civicrm.root]/ang/afform'), 'civicrm');
+    // Scan uploads/files directory
     $this->appendFilePaths($paths, $this->getSiteLocalPath(), '');
 
     if ($this->isUseCachedPaths()) {
