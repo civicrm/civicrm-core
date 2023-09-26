@@ -414,16 +414,17 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $params = ['id' => $this->_id];
 
       CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
+      $defaults = $defaults[$this->_id];
       $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-      if ($defaults[$this->_id]['role_id']) {
-        $roleIDs = explode($sep, $defaults[$this->_id]['role_id']);
+      if ($defaults['role_id']) {
+        $roleIDs = explode($sep, $defaults['role_id']);
       }
-      $this->_contactId = $defaults[$this->_id]['contact_id'];
-      $this->_statusId = $defaults[$this->_id]['participant_status_id'];
+      $this->_contactId = $defaults['contact_id'];
+      $this->_statusId = $defaults['participant_status_id'];
 
       //set defaults for note
       $noteDetails = CRM_Core_BAO_Note::getNote($this->_id, 'civicrm_participant');
-      $defaults[$this->_id]['note'] = array_pop($noteDetails);
+      $defaults['note'] = array_pop($noteDetails);
 
       // Check if this is a primaryParticipant (registered for others) and retrieve additional participants if true  (CRM-4859)
       if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
@@ -432,31 +433,31 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->assign('additionalParticipants', $additionalParticipants ?? NULL);
 
       // Get registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
-      if (!empty($defaults[$this->_id]['participant_registered_by_id'])) {
+      if (!empty($defaults['participant_registered_by_id'])) {
         $registered_by_contact_id = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
-          $defaults[$this->_id]['participant_registered_by_id'],
+          $defaults['participant_registered_by_id'],
           'contact_id', 'id'
         );
-        $this->assign('participant_registered_by_id', $defaults[$this->_id]['participant_registered_by_id']);
+        $this->assign('participant_registered_by_id', $defaults['participant_registered_by_id']);
         $this->assign('registered_by_display_name', CRM_Contact_BAO_Contact::displayName($registered_by_contact_id));
       }
       $this->assign('registered_by_contact_id', $registered_by_contact_id ?? NULL);
     }
     elseif ($this->_contactID) {
-      $defaults[$this->_id]['contact_id'] = $this->_contactID;
+      $defaults['contact_id'] = $this->_contactID;
     }
 
     //setting default register date
     if ($this->_action == CRM_Core_Action::ADD) {
       $statuses = array_flip(CRM_Event_PseudoConstant::participantStatus());
-      $defaults[$this->_id]['status_id'] = $statuses['Registered'] ?? NULL;
-      if (!empty($defaults[$this->_id]['event_id'])) {
+      $defaults['status_id'] = $statuses['Registered'] ?? NULL;
+      if (!empty($defaults['event_id'])) {
         $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
-          $defaults[$this->_id]['event_id'],
+          $defaults['event_id'],
           'financial_type_id'
         );
         if ($financialTypeID) {
-          $defaults[$this->_id]['financial_type_id'] = $financialTypeID;
+          $defaults['financial_type_id'] = $financialTypeID;
         }
       }
 
@@ -471,7 +472,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         if (empty($defaults["email-{$this->_bltID}"]) &&
           !empty($defaults['email-Primary'])
         ) {
-          $defaults[$this->_id]["email-{$this->_bltID}"] = $defaults['email-Primary'];
+          $defaults["email-{$this->_bltID}"] = $defaults['email-Primary'];
         }
       }
 
@@ -483,16 +484,16 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if (!empty($submittedEvent[0])) {
         $eventID = $submittedEvent[0];
       }
-      $defaults[$this->_id]['register_date'] = date('Y-m-d H:i:s');
+      $defaults['register_date'] = date('Y-m-d H:i:s');
     }
     else {
-      $defaults[$this->_id]['record_contribution'] = 0;
+      $defaults['record_contribution'] = 0;
 
-      if ($defaults[$this->_id]['participant_is_pay_later']) {
+      if ($defaults['participant_is_pay_later']) {
         $this->assign('participant_is_pay_later', TRUE);
       }
 
-      $eventID = $defaults[$this->_id]['event_id'];
+      $eventID = $defaults['event_id'];
 
       $this->_eventTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventID, 'event_type_id', 'id');
 
@@ -504,8 +505,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     //assign event and role id, this is needed for Custom data building
     $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-    if (!empty($defaults[$this->_id]['participant_role_id'])) {
-      $roleIDs = explode($sep, $defaults[$this->_id]['participant_role_id']);
+    if (!empty($defaults['participant_role_id'])) {
+      $roleIDs = explode($sep, $defaults['participant_role_id']);
     }
     if (isset($_POST['event_id'])) {
       $eventID = $_POST['event_id'];
@@ -520,9 +521,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         'default_role_id'
       );
       if (empty($roleIDs)) {
-        $roleIDs = (array) $defaults[$this->_id]['participant_role_id'] = $roleID;
+        $roleIDs = (array) $defaults['participant_role_id'] = $roleID;
       }
-      $defaults[$this->_id]['event_id'] = $eventID;
+      $defaults['event_id'] = $eventID;
     }
     if (!empty($eventID)) {
       $this->_eventTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventID, 'event_type_id', 'id');
@@ -533,7 +534,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $roleIDs = explode(',', $urlRoleIDS);
     }
     if (isset($roleIDs)) {
-      $defaults[$this->_id]['role_id'] = implode(',', $roleIDs);
+      $defaults['role_id'] = implode(',', $roleIDs);
     }
 
     if (isset($eventID)) {
@@ -543,8 +544,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $this->assign('eventTypeID', $this->_eventTypeId);
 
-    $this->assign('event_is_test', CRM_Utils_Array::value('event_is_test', $defaults[$this->_id]));
-    return $defaults[$this->_id];
+    $this->assign('event_is_test', CRM_Utils_Array::value('event_is_test', $defaults));
+    return $defaults;
   }
 
   /**
