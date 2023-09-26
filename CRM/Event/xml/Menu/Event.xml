@@ -271,6 +271,12 @@
      <weight>4</weight>
   </item>
   <item>
+    <path>civicrm/participant/delete</path>
+    <page_callback>CRM_Event_Form_Participant_Delete</page_callback>
+    <access_arguments>delete in CiviEvent</access_arguments>
+    <weight>4</weight>
+  </item>
+  <item>
      <path>civicrm/ajax/eventFee</path>
      <page_callback>CRM_Event_Page_AJAX::eventFee</page_callback>
      <access_arguments>access CiviCRM,access CiviEvent</access_arguments>

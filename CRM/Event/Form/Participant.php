@@ -320,14 +320,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
-    if ($this->_action & CRM_Core_Action::DELETE) {
-      // check delete permission for contribution
-      if ($this->_id && $this->_paymentId && !CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
-        CRM_Core_Error::statusBounce(ts("This Participant is linked to a contribution. You must have 'delete in CiviContribute' permission in order to delete this record."));
-      }
-      return;
-    }
-
     // when fee amount is included in form
     if (!empty($_POST['hidden_feeblock']) || !empty($_POST['send_receipt'])) {
       if ($this->_submitValues['event_id']) {
@@ -397,10 +389,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     $defaults = [];
-
-    if ($this->_action & CRM_Core_Action::DELETE) {
-      return $defaults;
-    }
 
     if ($this->_id) {
       $ids = [];
@@ -560,39 +548,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $this->assign('customDataType', 'Participant');
 
     $this->applyFilter('__ALL__', 'trim');
-
-    if ($this->_action & CRM_Core_Action::DELETE) {
-      if ($this->_single) {
-        $additionalParticipant = count(CRM_Event_BAO_Event::buildCustomProfile($this->_id,
-            NULL,
-            $this->_contactId,
-            FALSE,
-            TRUE
-          )) - 1;
-        if ($additionalParticipant) {
-          $deleteParticipants = [
-            1 => ts('Delete this participant record along with associated participant record(s).'),
-            2 => ts('Delete only this participant record.'),
-          ];
-          $this->addRadio('delete_participant', NULL, $deleteParticipants, NULL, '<br />');
-          $this->setDefaults(['delete_participant' => 1]);
-        }
-        $this->assign('additionalParticipant', $additionalParticipant);
-      }
-      $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Delete'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]);
-      return;
-    }
 
     if ($this->_single) {
       $contactField = $this->addEntityRef('contact_id', ts('Participant'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
@@ -754,13 +709,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *   list of errors to be posted back to the form
    */
   public static function formRule($values, $files, $self) {
-    // If $values['_qf_Participant_next'] is Delete or
     // $values['event_id'] is empty, then return
-    // instead of proceeding further.
-
-    if ((($values['_qf_Participant_next'] ?? NULL) === 'Delete') ||
-      empty($values['event_id'])
-    ) {
+    // instead of proceeding further - this is legacy handling
+    // and it is unclear why but perhaps relates to the form's
+    // 'multitasking' & can go once the form is not overloaded?
+    // event_id is normally a required field..
+    if (empty($values['event_id'])) {
       return TRUE;
     }
 
@@ -832,26 +786,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public function postProcess() {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
-
-    if ($this->_action & CRM_Core_Action::DELETE) {
-      if (($params['delete_participant'] ?? NULL) == 2) {
-        $additionalId = (CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_id));
-        $participantLinks = (CRM_Event_BAO_Participant::getAdditionalParticipantUrl($additionalId));
-      }
-      if (($params['delete_participant'] ?? NULL) == 1) {
-        $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_id);
-        foreach ($additionalIds as $value) {
-          CRM_Event_BAO_Participant::deleteParticipant($value);
-        }
-      }
-      CRM_Event_BAO_Participant::deleteParticipant($this->_id);
-      CRM_Core_Session::setStatus(ts('Selected participant was deleted successfully.'), ts('Record Deleted'), 'success');
-      if (!empty($participantLinks)) {
-        $status = ts('The following participants no longer have an event fee recorded. You can edit their registration and record a replacement contribution by clicking the links below:') . '<br/>' . $participantLinks;
-        CRM_Core_Session::setStatus($status, ts('Group Payment Deleted'));
-      }
-      return;
-    }
 
     $statusMsg = $this->submit($params);
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
