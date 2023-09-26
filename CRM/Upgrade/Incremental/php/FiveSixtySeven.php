@@ -21,6 +21,8 @@
  */
 class CRM_Upgrade_Incremental_php_FiveSixtySeven extends CRM_Upgrade_Incremental_Base {
 
+  const MAILING_BATCH_SIZE = 500000;
+
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     parent::setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
     if ($rev === '5.67.alpha1') {
@@ -85,11 +87,16 @@ class CRM_Upgrade_Incremental_php_FiveSixtySeven extends CRM_Upgrade_Incremental
       FOREIGN KEY (`job_id`)
       REFERENCES `civicrm_mailing_job`(`id`) ON DELETE SET NULL
     ', [], FALSE, FALSE, FALSE, FALSE);
-      CRM_Core_DAO::executeQuery('
-UPDATE  civicrm_mailing_event_queue q
-INNER JOIN civicrm_mailing_job job ON job.id = q.job_id
-SET q.mailing_id = job.mailing_id, q.is_test=job.is_test
-WHERE q.mailing_id IS NULL');
+
+      [$minId, $maxId] = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+      FROM civicrm_mailing_event_queue ")->getDatabaseResult()->fetchRow();
+      for ($startId = $minId; $startId <= $maxId; $startId += self::MAILING_BATCH_SIZE) {
+        $endId = min($maxId, $startId + self::MAILING_BATCH_SIZE - 1);
+        $task = new CRM_Queue_Task([static::class, 'fillMailingEvents'],
+          [$startId, $endId],
+          sprintf('Backfill civicrm_mailing_event_queue (%d => %d)', $startId, $endId));
+        $ctx->queue->createItem($task, ['weight' => -1]);
+      }
     }
     catch (\Civi\Core\Exception\DBQueryException $e) {
       throw new CRM_Core_Exception(
@@ -105,6 +112,20 @@ WHERE q.mailing_id IS NULL');
         . 'debug info ' . $e->getDebugInfo()
         . "\n");
     }
+    return TRUE;
+  }
+
+  public static function fillMailingEvents(CRM_Queue_TaskContext $ctx, int $startId, int $endId): bool {
+    CRM_Core_DAO::executeQuery('
+UPDATE  civicrm_mailing_event_queue q
+INNER JOIN civicrm_mailing_job job ON job.id = q.job_id
+SET q.mailing_id = job.mailing_id, q.is_test=job.is_test
+WHERE q.id >= %1 AND q.id <= %2 AND q.mailing_id IS NULL',
+      [
+        1 => [$startId, 'Int'],
+        2 => [$endId, 'Int'],
+      ]
+    );
     return TRUE;
   }
 
