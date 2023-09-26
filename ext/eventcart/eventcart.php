@@ -52,17 +52,6 @@ function eventcart_civicrm_enable() {
   _eventcart_civix_civicrm_enable();
 }
 
-/**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function eventcart_civicrm_entityTypes(&$entityTypes) {
-  _eventcart_civix_civicrm_entityTypes($entityTypes);
-}
-
 function eventcart_civicrm_tabset($name, &$tabs) {
   if ($name === 'civicrm/event/manage' && Civi::settings()->get('enable_cart')) {
     $tabs['conference'] = [

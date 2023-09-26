@@ -33,6 +33,6 @@
   </mixins>
   <civix>
     <namespace>CRM/Ewaysingle</namespace>
-    <format>22.10.0</format>
+    <format>23.02.1</format>
   </civix>
 </extension>
