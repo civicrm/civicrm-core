@@ -221,9 +221,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public static function currentPath() {
     $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    if ($path[0] == '/') {
-      $path = substr($path, 1);
-    }
+    $path = trim($path, '/');
     return $path;
   }
 
