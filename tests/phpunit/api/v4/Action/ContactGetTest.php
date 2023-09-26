@@ -59,6 +59,88 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains($del['id'], $contacts->column('id'));
   }
 
+  /**
+   * Test ordering of contact by contact_sub_type when field
+   * contains more than one type and contact_type label and name 
+   * are different enough to get sorted in different order.
+   *
+   * 
+   */
+
+   public function testGetWithOrderBy(): void {
+    $last_name = uniqid('GetWithOrderByTest');
+
+	ContactType::create(FALSE)
+        ->addValue('name', 'Membre')
+        ->addValue('label', '1.Actif')
+        ->addValue('parent_id.name', 'Individual')
+        ->execute();
+    ContactType::create(FALSE)
+        ->addValue('name', 'Proche')
+        ->addValue('label', '2.Proche')
+        ->addValue('parent_id.name', 'Individual')
+        ->execute();
+    ContactType::create(FALSE)
+        ->addValue('name', 'Soutien')
+        ->addValue('label', '3.Soutien')
+        ->addValue('parent_id.name', 'Individual')
+        ->execute();
+	ContactType::create(FALSE)
+        ->addValue('name', 'Employ_')
+        ->addValue('label', '5.Employé')
+        ->addValue('parent_id.name', 'Individual')
+        ->execute();
+	ContactType::create(FALSE)
+        ->addValue('name', 'DCD')
+        ->addValue('label', '0.Décédé')
+        ->addValue('parent_id.name', 'Individual')
+        ->execute();
+
+	$bob = Contact::create()
+      ->setValues(['first_name' => 'Bob', 'last_name' => $last_name, 'contact_sub_type' => 'Membre'])
+      ->execute()->first();
+
+	$jan = Contact::create()
+      ->setValues(['first_name' => 'Jan', 'last_name' => $last_name, 'contact_sub_type' => 'Proche'])
+      ->execute()->first();
+
+	$dan = Contact::create()
+      ->setValues(['first_name' => 'Dan', 'last_name' => $last_name, 'contact_sub_type' => 'Soutien'])
+      ->execute()->first();
+
+	$joe = Contact::create()
+      ->setValues(['first_name' => 'Joe', 'last_name' => $last_name, 'contact_sub_type' => 'MembreEmploy_'])
+      ->execute()->first();
+
+	$eli = Contact::create()
+      ->setValues(['first_name' => 'Eli', 'last_name' => $last_name, 'contact_sub_type' => 'DCDMembre'])
+      ->execute()->first();
+
+	$yan = Contact::create()
+      ->setValues(['first_name' => 'Yan', 'last_name' => $last_name, 'contact_sub_type' => ''])
+      ->execute()->first();
+
+	$contacts = \Civi\Api4\Contact::get(TRUE)
+	  ->addSelect('id', 'contact_type', 'contact_sub_type', 'contact_sub_type:label')
+	  ->addWhere('contact_type', '=', 'Individual')
+	  ->addOrderBy('contact_sub_type:label', 'ASC')
+	  ->setLimit(10)
+	  ->execute();
+
+	foreach ($contacts as $contact) {
+	  // do something
+	}
+
+    $msg = '';
+    try {
+//      $limit2->single();
+    }
+    catch (\CRM_Core_Exception $e) {
+      $msg = $e->getMessage();
+    }
+}
+
+
   public function testGetWithLimit(): void {
     $last_name = uniqid('getWithLimitTest');
 
