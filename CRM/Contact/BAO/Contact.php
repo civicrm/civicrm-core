@@ -2925,8 +2925,8 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         'key' => 'note',
         'tab' => 'note',
         'class' => 'medium-popup',
-        'href' => CRM_Utils_System::url('civicrm/contact/view/note',
-          'reset=1&action=add'
+        'href' => CRM_Utils_System::url('civicrm/note',
+          'reset=1&action=add&entity_table=civicrm_contact&entity_id=' . $contactId
         ),
         'permissions' => ['edit all contacts'],
       ],

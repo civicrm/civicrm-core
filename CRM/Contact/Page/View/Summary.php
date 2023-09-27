@@ -319,13 +319,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'icon' => 'crm-i fa-users',
       ],
       [
-        'id' => 'note',
-        'title' => ts('Notes'),
-        'class' => 'livePage',
-        'weight' => 100,
-        'icon' => 'crm-i fa-sticky-note-o',
-      ],
-      [
         'id' => 'tag',
         'title' => ts('Tags'),
         'weight' => 110,

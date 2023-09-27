@@ -171,19 +171,19 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
       $recentOther = [];
       if ($noteActions) {
         $recentOther = [
-          'editUrl' => CRM_Utils_System::url('civicrm/contact/view/note',
-            "reset=1&action=update&cid={$note->entity_id}&id={$note->id}&context=home"
+          'editUrl' => CRM_Utils_System::url('civicrm/note',
+            "reset=1&action=update&id={$note->id}&context=home"
           ),
-          'deleteUrl' => CRM_Utils_System::url('civicrm/contact/view/note',
-            "reset=1&action=delete&cid={$note->entity_id}&id={$note->id}&context=home"
+          'deleteUrl' => CRM_Utils_System::url('civicrm/note',
+            "reset=1&action=delete&id={$note->id}&context=home"
           ),
         ];
       }
 
       // add the recently created Note
       CRM_Utils_Recent::add($displayName . ' - ' . $note->subject,
-        CRM_Utils_System::url('civicrm/contact/view/note',
-          "reset=1&action=view&cid={$note->entity_id}&id={$note->id}&context=home"
+        CRM_Utils_System::url('civicrm/note',
+          "reset=1&action=view&id={$note->id}&context=home"
         ),
         $note->id,
         'Note',
@@ -376,7 +376,7 @@ ORDER BY  modified_date desc";
    *
    * @return array
    *   Nested associative array beginning with direct children of given note.
-   *
+   * @deprecated only called by deprecated APIv3
    */
   public static function getNoteTree($parentId, $maxDepth = 0, $snippet = FALSE) {
     return self::buildNoteTree($parentId, $maxDepth, $snippet);
@@ -422,6 +422,7 @@ ORDER BY  modified_date desc";
    *
    * @return array
    *   Nested associative array beginning with direct children of given note.
+   * @deprecated only called by deprecated APIv3
    */
   private static function buildNoteTree($parentId, $maxDepth = 0, $snippet = FALSE, &$tree = [], $depth = 0) {
     if ($maxDepth && $depth > $maxDepth) {

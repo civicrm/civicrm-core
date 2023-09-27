@@ -8,6 +8,12 @@
   <add>1.1</add>
   <log>true</log>
   <icon>fa-sticky-note</icon>
+  <paths>
+    <add>civicrm/note?reset=1&amp;action=add&amp;entity_table=[entity_table]&amp;entity_id=[entity_id]</add>
+    <view>civicrm/note?reset=1&amp;action=view&amp;id=[id]</view>
+    <update>civicrm/note?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/note?reset=1&amp;action=delete&amp;id=[id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Note ID</title>
