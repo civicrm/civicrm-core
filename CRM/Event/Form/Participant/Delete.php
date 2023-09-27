@@ -16,8 +16,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\API\EntityLookupTrait;
-
 /**
  * Back office participant delete form.
  */
@@ -103,12 +101,10 @@ class CRM_Event_Form_Participant_Delete extends CRM_Contribute_Form_AbstractEdit
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
-    $additionalParticipant = count(CRM_Event_BAO_Event::buildCustomProfile($this->getParticipantID(),
-        NULL,
-        $this->getParticipantValue('contact_id'),
-        FALSE,
-        TRUE
-      )) - 1;
+    $additionalParticipant = (int) CRM_Core_DAO::singleValueQuery(
+      'SELECT count(*) FROM civicrm_participant WHERE registered_by_id = %1 AND id <> registered_by_id',
+      [1 => [$this->getParticipantID(), 'Integer']]
+    );
     if ($additionalParticipant) {
       $deleteParticipants = [
         1 => ts('Delete this participant record along with associated participant record(s).'),
