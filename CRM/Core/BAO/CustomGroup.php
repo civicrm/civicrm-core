@@ -2433,8 +2433,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
   /**
    * List all possible values for `CustomGroup.extends`.
    *
-   * This includes the fake entities "Individual", "Organization", "Household"
-   * but not the extra options from `custom_data_type` used on the form ("ParticipantStatus", etc).
+   * This includes the pseudo-entities "Individual", "Organization", "Household".
    *
    * Returns a mix of hard-coded array and `cg_extend_objects` OptionValues.
    *  - 'id' return key (maps to `cg_extend_objects.value`).

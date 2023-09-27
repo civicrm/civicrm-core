@@ -87,7 +87,7 @@ abstract class AbstractEntity {
    */
   protected static function getEntityTitle(bool $plural = FALSE): string {
     $name = static::getEntityName();
-    $dao = \CRM_Core_DAO_AllCoreTables::getFullName($name);
+    $dao = self::getDaoName();
     return $dao ? $dao::getEntityTitle($plural) : ($plural ? \CRM_Utils_String::pluralize($name) : $name);
   }
 
@@ -117,6 +117,13 @@ abstract class AbstractEntity {
   }
 
   /**
+   * @return \CRM_Core_DAO|string|null
+   */
+  protected static function getDaoName(): ?string {
+    return \CRM_Core_DAO_AllCoreTables::getFullName(static::getEntityName());
+  }
+
+  /**
    * Reflection function called by Entity::get()
    *
    * @see \Civi\Api4\Action\Entity\Get
@@ -137,7 +144,7 @@ abstract class AbstractEntity {
       'searchable' => 'secondary',
     ];
     // Add info for entities with a corresponding DAO
-    $dao = \CRM_Core_DAO_AllCoreTables::getFullName($info['name']);
+    $dao = static::getDaoName();
     if ($dao) {
       $info['paths'] = $dao::getEntityPaths();
       $info['primary_key'] = $dao::$_primaryKey;

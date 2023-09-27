@@ -111,6 +111,9 @@ trait DAOActionTrait {
       }
     }
 
+    // Values specified by entity definition (e.g. 'Individual', 'Organization', 'Household' pseudo-entities specify `contact_type`)
+    $presetValues = CoreUtil::getInfoItem($this->getEntityName(), 'where') ?? [];
+
     $result = [];
     $idField = CoreUtil::getIdFieldName($this->getEntityName());
 
@@ -118,6 +121,10 @@ trait DAOActionTrait {
       $entityId = $item[$idField] ?? NULL;
       FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);
+
+      if (!$entityId) {
+        $item = $presetValues + $item;
+      }
 
       // Adjust weights for sortable entities
       if ($updateWeights) {

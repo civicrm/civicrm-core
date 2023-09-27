@@ -136,6 +136,13 @@ class CustomValue {
   }
 
   /**
+   * @return \CRM_Core_DAO|string|null
+   */
+  protected static function getDaoName(): ?string {
+    return 'CRM_Core_BAO_CustomValue';
+  }
+
+  /**
    * @see \Civi\Api4\Generic\AbstractEntity::getInfo()
    * @return array
    */
@@ -145,7 +152,7 @@ class CustomValue {
       'type' => ['CustomValue', 'DAOEntity'],
       'searchable' => 'secondary',
       'primary_key' => ['id'],
-      'dao' => 'CRM_Core_BAO_CustomValue',
+      'dao' => self::getDaoName(),
       'see' => [
         'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
         '\Civi\Api4\CustomGroup',

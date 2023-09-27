@@ -87,6 +87,12 @@ class Api4SelectQuery extends Api4Query {
     // Add ACLs first to avoid redundant subclauses
     $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $this->getEntity(), [], $this->getWhere()));
 
+    // Add required conditions if specified by entity
+    $requiredConditions = CoreUtil::getInfoItem($this->getEntity(), 'where') ?? [];
+    foreach ($requiredConditions as $requiredField => $requiredValue) {
+      $this->api->addWhere($requiredField, '=', $requiredValue);
+    }
+
     // Add explicit joins. Other joins implied by dot notation may be added later
     $this->addExplicitJoins();
   }
@@ -466,6 +472,11 @@ class Api4SelectQuery extends Api4Query {
       if ($side === 'EXCLUDE') {
         $side = 'LEFT';
         $this->api->addWhere("$alias.id", 'IS NULL');
+      }
+      // Add required conditions if specified by entity
+      $requiredConditions = CoreUtil::getInfoItem($entity, 'where') ?? [];
+      foreach ($requiredConditions as $requiredField => $requiredValue) {
+        $join[] = [$alias . '.' . $requiredField, '=', "'$requiredValue'"];
       }
       // Add all fields from joined entity to spec
       $joinEntityGet = \Civi\API\Request::create($entity, 'get', ['version' => 4, 'checkPermissions' => $this->getCheckPermissions()]);

@@ -69,7 +69,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function basicTypes($all = FALSE) {
+  public static function basicTypes($all = FALSE): array {
     return array_keys(self::basicTypeInfo($all));
   }
 
@@ -857,6 +857,16 @@ WHERE ($subtypeClause)";
       $cache->set($cacheKey, $contactTypes);
     }
     return $contactTypes;
+  }
+
+  /**
+   * Get contact type by name
+   *
+   * @param string $name
+   * @return array|null
+   */
+  public static function getContactType(string $name): ?array {
+    return self::getAllContactTypes()[$name] ?? NULL;
   }
 
   /**
