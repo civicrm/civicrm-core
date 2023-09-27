@@ -6,10 +6,9 @@
  * evaluate unassigned variables.
  *
  * @param string $tpl_source
- * @param $smarty
  * @return string
  */
-function smarty_prefilter_htxtFilter($tpl_source, &$smarty) {
+function smarty_prefilter_htxtFilter($tpl_source) {
   if (strpos($tpl_source, '{htxt') === FALSE) {
     return $tpl_source;
   }
