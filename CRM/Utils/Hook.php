@@ -1554,7 +1554,8 @@ abstract class CRM_Utils_Hook {
 
   /**
    * Deprecated: use hook_civicrm_selectWhereClause instead.
-   * @deprecated
+   * @deprecated since 5.67 will be removed around 5.85
+   * .
    * @param array &$noteValues
    */
   public static function notePrivacy(&$noteValues) {
