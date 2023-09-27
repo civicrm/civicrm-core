@@ -3000,6 +3000,33 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Should queue processing proceed.
+   *
+   * This hook is called when a background process attempts to claim an item from
+   * the queue to process. A hook could alter the status from 'active' to denote
+   * that the server is busy & hence no item should be claimed and processed at
+   * this time.
+   *
+   * @param string $status
+   *   This will be set to active. It is recommended hooks change it to 'paused'
+   *   to prevent queue processing (although currently any value other than active
+   *   is treated as inactive 'paused')
+   * @param string $queueName
+   *   The name of the queue. Equivalent to civicrm_queue.name
+   * @param array $queueSpecification
+   *   Array of information about the queue loaded from civicrm_queue.
+   *
+   * @see https://docs.civicrm.org/dev/en/latest/framework/queues/
+   */
+  public static function queueActive(string &$status, string $queueName, array $queueSpecification): void {
+    $null = NULL;
+    self::singleton()->invoke(['status', 'queueName', 'queueSpecification'], $status,
+      $queueName, $queueSpecification, $null, $null, $null,
+      'civicrm_queueActive'
+    );
+  }
+
+  /**
    * Fire `hook_civicrm_queueRun_{$runner}`.
    *
    * This event only fires if these conditions are met:

@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Core\Event\GenericHookEvent;
-
 /**
  * A queue is an object (usually backed by some persistent data store)
  * which stores a list of tasks or messages for use by other processes.
@@ -71,12 +69,7 @@ abstract class CRM_Queue_Queue {
         $status = 'paused';
       }
     }
-    $event = GenericHookEvent::create([
-      'status' => &$status,
-      'queue_name' => $this->_name,
-      'queue_spec' => $this->queueSpec,
-    ]);
-    \Civi::dispatcher()->dispatch('civi.queue.isActive', $event);
+    CRM_Utils_Hook::queueActive($status, $this->getName(), $this->queueSpec);
     // Note in future we might want to consider whether an upgrade is in progress.
     // Should we set the setting at that point?
     return ($status === 'active');
