@@ -60,6 +60,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
 
   public function testContactGetFields(): void {
     $fields = Contact::getFields(FALSE)
+      ->setAction('create')
       ->execute()
       ->indexBy('name');
     // Ensure table & column are returned
@@ -71,6 +72,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['name', 'label', 'icon'], $fields['contact_sub_type']['suffixes']);
 
     // Check `required` and `nullable`
+    $this->assertFalse($fields['is_opt_out']['required']);
     $this->assertFalse($fields['is_deleted']['required']);
     $this->assertFalse($fields['is_deleted']['nullable']);
     $this->assertFalse($fields['id']['nullable']);
