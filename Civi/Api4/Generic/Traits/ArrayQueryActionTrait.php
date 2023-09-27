@@ -112,6 +112,7 @@ trait ArrayQueryActionTrait {
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public static function filterCompare(array $row, array $condition, int $index = NULL): bool {
+    $condition = self::replaceCurrentDomainCondition($condition);
     $value = $row[$condition[0]] ?? NULL;
     $operator = $condition[1];
     $expected = $condition[2] ?? NULL;
@@ -252,6 +253,19 @@ trait ArrayQueryActionTrait {
       $values = array_slice($values, $this->getOffset() ?: 0, $this->getLimit() ?: NULL);
     }
     return $values;
+  }
+
+  private static function replaceCurrentDomainCondition(array $condition): array {
+    // Convert the conditional value of 'current_domain' into an actual value that filterCompare can work with
+    if ($condition[2] === 'current_domain') {
+      if (str_ends_with($condition[0], ':label') !== FALSE) {
+        $condition[2] = \CRM_Core_BAO_Domain::getDomain()->name;
+      }
+      else {
+        $condition[2] = \CRM_Core_Config::domainID();
+      }
+    }
+    return $condition;
   }
 
 }
