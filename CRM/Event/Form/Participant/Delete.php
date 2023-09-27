@@ -21,6 +21,7 @@
  */
 class CRM_Event_Form_Participant_Delete extends CRM_Contribute_Form_AbstractEditPayment {
   use CRM_Event_Form_EventFormTrait;
+  use CRM_Contact_Form_ContactFormTrait;
 
   /**
    * @var int
@@ -87,6 +88,7 @@ class CRM_Event_Form_Participant_Delete extends CRM_Contribute_Form_AbstractEdit
    */
   public function preProcess(): void {
     $this->setAction(CRM_Core_Action::DELETE);
+    $this->setTitle(ts('Delete participant record for %1', [1 => $this->getContactValue('display_name')]));
     $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
       $this->getParticipantID(), 'contribution_id', 'participant_id'
     );
