@@ -3581,6 +3581,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   public static function getEntityRefFilters() {
     return [
       ['key' => 'contact_type', 'value' => ts('Contact Type')],
+      ['key' => 'email', 'value' => ts('Email'), 'entity' => 'Email', 'type' => 'text'],
       ['key' => 'group', 'value' => ts('Group'), 'entity' => 'GroupContact'],
       ['key' => 'tag', 'value' => ts('Tag'), 'entity' => 'EntityTag'],
       ['key' => 'city', 'value' => ts('City'), 'type' => 'text', 'entity' => 'Address'],
