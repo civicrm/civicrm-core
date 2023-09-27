@@ -117,6 +117,10 @@ class CoreUtil {
     return NULL;
   }
 
+  public static function getCustomGroupName(string $entityName): ?string {
+    return str_starts_with($entityName, 'Custom_') ? substr($entityName, 7) : NULL;
+  }
+
   /**
    * @return string[]
    */
@@ -133,6 +137,9 @@ class CoreUtil {
 
   /**
    * For a given API Entity, return the types of custom fields it supports and the column they join to.
+   *
+   * Sort of the inverse of this function:
+   * @see \CRM_Core_BAO_CustomGroup::getEntityForGroup
    *
    * @param string $entityName
    * @return array{extends: array, column: string, grouping: mixed}|null

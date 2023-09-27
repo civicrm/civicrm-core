@@ -12,9 +12,9 @@
 namespace Civi\Api4\Provider;
 
 use Civi\Api4\CustomValue;
-use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
+use CRM_Core_BAO_CustomGroup;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -44,7 +44,7 @@ class CustomEntityProvider extends AutoService implements EventSubscriberInterfa
     $group = \CRM_Core_DAO::executeQuery($select);
     while ($group->fetch()) {
       $entityName = 'Custom_' . $group->name;
-      $baseEntity = CustomGroupJoinable::getEntityFromExtends($group->extends);
+      $baseEntity = CRM_Core_BAO_CustomGroup::getEntityFromExtends($group->extends);
       // Lookup base entity info using DAO methods not CoreUtil to avoid early-bootstrap issues
       $baseEntityDao = \CRM_Core_DAO_AllCoreTables::getFullName($baseEntity);
       $baseEntityTitle = $baseEntityDao ? $baseEntityDao::getEntityTitle(TRUE) : $baseEntity;

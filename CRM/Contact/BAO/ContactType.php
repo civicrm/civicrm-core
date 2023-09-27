@@ -849,9 +849,10 @@ WHERE ($subtypeClause)";
         $contactTypes[$name]['parent_label'] = $contactType['parent_id'] ? $parents[$contactType['parent_id']]['label'] : NULL;
         // Cast int/bool types.
         $contactTypes[$name]['id'] = (int) $contactType['id'];
-        $contactTypes[$name]['parent_id'] = $contactType['parent_id'] ? (int) $contactType['parent_id'] : NULL;
+        $contactTypes[$name]['parent_id'] = ((int) $contactType['parent_id']) ?: NULL;
         $contactTypes[$name]['is_active'] = (bool) $contactType['is_active'];
         $contactTypes[$name]['is_reserved'] = (bool) $contactType['is_reserved'];
+        $contactTypes[$name]['icon'] = $contactType['icon'] ?? $parents[$contactType['parent_id']]['icon'] ?? NULL;
       }
       $cache->set($cacheKey, $contactTypes);
     }

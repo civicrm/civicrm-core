@@ -478,13 +478,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Like select but accepts rich array data (with nesting, colors, icons, etc) as option list.
     if ($inputType === 'select2') {
       $type = 'text';
-      $options = [];
-      foreach ($attributes as $option) {
-        // Transform options from api4.getFields format
-        $option['text'] = $option['text'] ?? $option['label'];
-        unset($option['label']);
-        $options[] = $option;
-      }
+      // Options stored in $attributes. Transform from api4.getFields format if needed.
+      $options = CRM_Utils_Array::formatForSelect2($attributes ?: []);
+      // Attributes stored in $extra
       $attributes = ($extra ?: []) + ['class' => ''];
       $attributes['class'] = ltrim($attributes['class'] . ' crm-select2 crm-form-select2');
       $attributes['data-select-params'] = json_encode(['data' => $options, 'multiple' => !empty($attributes['multiple'])]);

@@ -1413,4 +1413,28 @@ class CRM_Utils_Array {
     return $filtered;
   }
 
+  /**
+   * Changes array keys to meet the expectations of select2.js
+   *
+   * @param array $options
+   * @param string $label
+   * @param string $id
+   * @return array
+   */
+  public static function formatForSelect2(array $options, string $label = 'label', string $id = 'id'): array {
+    foreach ($options as &$option) {
+      if (isset($option[$label])) {
+        $option['text'] = (string) $option[$label];
+      }
+      if (isset($option[$id])) {
+        $option['id'] = (string) $option[$id];
+      }
+      if (!empty($option['children'])) {
+        $option['children'] = self::formatForSelect2($option['children'], $label, $id);
+      }
+      $option = array_intersect_key($option, array_flip(['id', 'text', 'children', 'color', 'icon', 'description']));
+    }
+    return $options;
+  }
+
 }
