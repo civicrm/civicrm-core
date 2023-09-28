@@ -128,6 +128,14 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
 
     $this->assign('config', $config);
     $this->assign('session', $session);
+    $this->assign('debugging', [
+      'smartyDebug' => CRM_Utils_Request::retrieveValue('smartyDebug', NULL, FALSE, FALSE, $_GET),
+      'sessionReset' => CRM_Utils_Request::retrieveValue('sessionReset', NULL, FALSE, FALSE, $_GET),
+      'sessionDebug' => CRM_Utils_Request::retrieveValue('sessionDebug', NULL, FALSE, FALSE, $_GET),
+      'directoryCleanup' => CRM_Utils_Request::retrieveValue('directoryCleanup', NULL, FALSE, FALSE, $_GET),
+      'cacheCleanup' => CRM_Utils_Request::retrieveValue('cacheCleanup', NULL, FALSE, FALSE, $_GET),
+      'configReset' => CRM_Utils_Request::retrieveValue('configReset', NULL, FALSE, FALSE, $_GET),
+    ]);
 
     $tsLocale = CRM_Core_I18n::getLocale();
     $this->assign('tsLocale', $tsLocale);
