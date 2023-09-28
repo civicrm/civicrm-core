@@ -56,18 +56,16 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
       $spec->addFieldSpec($field);
 
       // Birthday field
-      if (!$spec->getValue('contact_type') || $spec->getValue('contact_type') === 'Individual') {
-        $field = new FieldSpec('next_birthday', 'Contact', 'Integer');
-        $field->setLabel(ts('Next Birthday in (days)'))
-          ->setTitle(ts('Next Birthday in (days)'))
-          ->setColumnName('birth_date')
-          ->setInputType('Number')
-          ->setDescription(ts('Number of days until next birthday'))
-          ->setType('Extra')
-          ->setReadonly(TRUE)
-          ->setSqlRenderer([__CLASS__, 'calculateBirthday']);
-        $spec->addFieldSpec($field);
-      }
+      $field = new FieldSpec('next_birthday', 'Contact', 'Integer');
+      $field->setLabel(ts('Next Birthday in (days)'))
+        ->setTitle(ts('Next Birthday in (days)'))
+        ->setColumnName('birth_date')
+        ->setInputType('Number')
+        ->setDescription(ts('Number of days until next birthday'))
+        ->setType('Extra')
+        ->setReadonly(TRUE)
+        ->setSqlRenderer([__CLASS__, 'calculateBirthday']);
+      $spec->addFieldSpec($field);
     }
 
     // Address, Email, Phone, IM primary/billing virtual fields
