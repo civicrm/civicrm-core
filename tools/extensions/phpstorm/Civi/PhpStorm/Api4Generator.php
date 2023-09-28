@@ -39,6 +39,8 @@ class Api4Generator extends AutoService implements EventSubscriberInterface {
     $builder->registerArgumentsSet('api4Entities', ...$entities);
     $builder->registerArgumentsSet('api4Actions', ...$actions);
     $builder->registerArgumentsSet('api4Properties', ...$properties);
+
+    // Define arguments for core functions
     $builder->addExpectedArguments('\civicrm_api4()', 0, 'api4Entities');
     $builder->addExpectedArguments('\civicrm_api4()', 1, 'api4Actions');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getBAOFromApiName()', 0, 'api4Entities');
@@ -53,6 +55,14 @@ class Api4Generator extends AutoService implements EventSubscriberInterface {
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::checkAccessDelegated()', 0, 'api4Entities');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::checkAccessDelegated()', 1, 'api4Actions');
     $builder->addExpectedArguments('\Civi\API\EntityLookupTrait::define()', 0, 'api4Entities');
+
+    // Define arguments for unit test functions
+    $builder->addExpectedArguments('\Civi\Test\Api4TestTrait::createTestRecord()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Test\Api4TestTrait::saveTestRecords()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Test\EntityTrait::createTestEntity()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Test\EntityTrait::setTestEntity()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Test\EntityTrait::setTestEntityID()', 0, 'api4Entities');
+
     $builder->write();
   }
 
