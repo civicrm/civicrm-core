@@ -57,11 +57,12 @@
   </index>
 
   <field>
-    <name>password</name>
+    <name>hashed_password</name>
     <type>varchar</type>
     <required>true</required>
     <length>128</length>
-    <comment>Hashed password</comment>
+    <readonly>true</readonly>
+    <comment>Hashed, not plaintext password</comment>
   </field>
 
   <field>
