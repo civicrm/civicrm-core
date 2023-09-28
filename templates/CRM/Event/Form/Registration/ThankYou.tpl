@@ -115,7 +115,7 @@
                   <div class="clear"></div>
                 </div>
             {/if}
-            {if $contributeMode ne 'notify' AND $trxn_id}
+            {if $trxn_id}
                 <div class="crm-section no-label trxn_id-section">
                     <div class="content bold">{ts}Transaction #{/ts}: {$trxn_id}</div>
                 <div class="clear"></div>

@@ -1161,8 +1161,6 @@ WHERE civicrm_event.is_active = 1
           'email' => $notifyEmail,
           'confirm_email_text' => $values['event']['confirm_email_text'] ?? NULL,
           'isShowLocation' => $values['event']['is_show_location'] ?? NULL,
-          // The concept of contributeMode is deprecated.
-          'contributeMode' => $template->_tpl_vars['contributeMode'] ?? NULL,
           'customPre' => $profilePre[0],
           'customPre_grouptitle' => empty($profilePre[1]) ? NULL : [CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $preProfileID)],
           'customPost' => $profilePost[0],
@@ -1203,8 +1201,6 @@ WHERE civicrm_event.is_active = 1
         $displayAddress = $values['address'] ?? NULL;
         if ($displayAddress) {
           $sendTemplateParams['tplParams']['address'] = $displayAddress;
-          // The concept of contributeMode is deprecated.
-          $sendTemplateParams['tplParams']['contributeMode'] = NULL;
         }
 
         // set lineItem details

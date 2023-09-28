@@ -1307,7 +1307,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $form->_values['custom_pre_id'] = $params['custom_pre_id'] ?? NULL;
     $form->_values['custom_post_id'] = $params['custom_post_id'] ?? NULL;
     $form->_values['event'] = $params['event'] ?? NULL;
-    $form->_contributeMode = $params['contributeMode'];
     $eventParams = ['id' => $params['id']];
     CRM_Event_BAO_Event::retrieve($eventParams, $form->_values['event']);
     $form->set('registerByID', $params['registerByID']);
