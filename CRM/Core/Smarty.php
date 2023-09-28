@@ -133,12 +133,12 @@ class CRM_Core_Smarty extends Smarty {
     $this->assign('config', $config);
     $this->assign('session', $session);
     $this->assign('debugging', [
-      'smartyDebug' => CRM_Utils_Request::retrieveValue('smartyDebug', NULL, FALSE, FALSE, $_GET),
-      'sessionReset' => CRM_Utils_Request::retrieveValue('sessionReset', NULL, FALSE, FALSE, $_GET),
-      'sessionDebug' => CRM_Utils_Request::retrieveValue('sessionDebug', NULL, FALSE, FALSE, $_GET),
-      'directoryCleanup' => CRM_Utils_Request::retrieveValue('directoryCleanup', NULL, FALSE, FALSE, $_GET),
-      'cacheCleanup' => CRM_Utils_Request::retrieveValue('cacheCleanup', NULL, FALSE, FALSE, $_GET),
-      'configReset' => CRM_Utils_Request::retrieveValue('configReset', NULL, FALSE, FALSE, $_GET),
+      'smartyDebug' => CRM_Utils_Request::retrieveValue('smartyDebug', 'Integer'),
+      'sessionReset' => CRM_Utils_Request::retrieveValue('sessionReset', 'Integer'),
+      'sessionDebug' => CRM_Utils_Request::retrieveValue('sessionDebug', 'Integer'),
+      'directoryCleanup' => CRM_Utils_Request::retrieveValue('directoryCleanup', 'Integer'),
+      'cacheCleanup' => CRM_Utils_Request::retrieveValue('cacheCleanup', 'Integer'),
+      'configReset' => CRM_Utils_Request::retrieveValue('configReset', 'Integer'),
     ]);
 
     $tsLocale = CRM_Core_I18n::getLocale();
