@@ -3,6 +3,7 @@ namespace Civi\Standalone;
 
 use CRM_Core_Session;
 use Civi;
+use Civi\Api4\User;
 
 /**
  * This is a single home for security related functions for Civi Standalone.
@@ -360,6 +361,22 @@ class Security {
     // @todo
     // Implement a pluggable interface here to handle some of these password types or more.
     Civi::log()->warning("Denying access to user whose stored password relies on '$algo' which we have not implemented yet.");
+    return FALSE;
+  }
+
+  /**
+   * Check a password reset token matches for a User.
+   *
+   * @param int $userID
+   * @param string $token
+   * @param bool $spend
+   *   If TRUE, and the token matches, the token is then reset; so it can only be used once.
+   *   If FALSE no changes are made.
+   *
+   * @return bool TRUE if it was valid.
+   */
+  public function checkPasswordResetToken(int $userID, string $token, bool $spend = TRUE): bool {
+    // Coming in next PR!
     return FALSE;
   }
 
