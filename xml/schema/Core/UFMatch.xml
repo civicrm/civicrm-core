@@ -64,7 +64,7 @@
     <type>varchar</type>
     <length>128</length>
     <comment>UF Name</comment>
-    <add>1.9.kabissa</add>
+    <add>1.9</add>
   </field>
   <field>
     <name>contact_id</name>
