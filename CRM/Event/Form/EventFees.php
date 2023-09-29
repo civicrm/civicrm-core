@@ -73,6 +73,8 @@ class CRM_Event_Form_EventFees {
       $params = ['id' => $form->_pId];
 
       CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
+      $defaults += $defaults[$form->_pId];
+      unset($defaults[$form->_pId]);
       if ($form->_action == CRM_Core_Action::UPDATE) {
         $discounts = [];
         if (!empty($form->_values['discount'])) {
