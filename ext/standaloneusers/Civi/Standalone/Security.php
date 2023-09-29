@@ -3,7 +3,6 @@ namespace Civi\Standalone;
 
 use CRM_Core_Session;
 use Civi;
-use Civi\Api4\User;
 
 /**
  * This is a single home for security related functions for Civi Standalone.

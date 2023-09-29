@@ -64,7 +64,7 @@ trait WriteTrait {
         throw new UnauthorizedException("Not allowed to change " . implode(' or ', array_keys($forbidden)));
       }
     }
-    if (array_key_exists('password',$record)) {
+    if (array_key_exists('password', $record)) {
       if (!empty($record['hashed_password'])) {
         throw new API_Exception("Ambiguous password parameters: Cannot pass password AND hashed_password.");
       }
