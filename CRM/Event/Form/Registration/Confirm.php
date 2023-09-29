@@ -892,6 +892,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $params = $this->get('params');
             $amount[$participantNum]['label'] = preg_replace('//', '', $params[$participantNum]['amount_level']);
             $amount[$participantNum]['amount'] = $params[$participantNum]['amount'];
+            // @todo - unused in core offline receipt template from 5.67. Remove at somepoint
             $this->assign('amounts', $amount);
           }
           if ($this->_lineItem) {

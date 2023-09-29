@@ -244,6 +244,22 @@
                 {/if}
               {/foreach}
             {/if}
+            {if !$isShowLineItems}
+              {foreach from=$participants key=index item=currentParticipant}
+                {if $isPrimary || {participant.id} === $currentParticipant.id}
+                  {foreach from=$currentParticipant.line_items key=index item=currentLineItem}
+                  <tr>
+                    <td {$valueStyle}>
+                      {$currentLineItem.label} {if $isPrimary} - {$currentParticipant.contact.display_name}{/if}
+                    </td>
+                    <td {$valueStyle}>
+                      {$currentLineItem.line_total|crmMoney:$currency}
+                    </td>
+                  </tr>
+                  {/foreach}
+                {/if}
+              {/foreach}
+            {/if}
             {if $isShowTax && {contribution.tax_amount|boolean}}
               <tr>
                 <td {$labelStyle}>
@@ -263,25 +279,12 @@
                   <td {$valueStyle}>{$taxDetail.amount|crmMoney:'{contribution.currency}'}</td>
                 </tr>
               {/foreach}
-            {/if}
-
-            {if !empty($amounts) && empty($lineItem)}
-              {foreach from=$amounts item=amnt key=level}
-                <tr>
-                  <td colspan="2" {$valueStyle}>
-                    {$amnt.amount|crmMoney:$currency} {$amnt.label}
-                  </td>
-                </tr>
-              {/foreach}
-            {/if}
-
-            {if $isShowTax && {contribution.tax_amount|boolean}}
               <tr>
                 <td {$labelStyle}>
-                  {ts}Total Tax Amount{/ts}
+                    {ts}Total Tax Amount{/ts}
                 </td>
                 <td {$valueStyle}>
-                  {if $isPrimary}{contribution.tax_amount}{else}{$participant.totals.tax_amount|crmMoney}{/if}
+                    {if $isPrimary}{contribution.tax_amount}{else}{$participant.totals.tax_amount|crmMoney}{/if}
                 </td>
               </tr>
             {/if}
