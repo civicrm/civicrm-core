@@ -55,7 +55,7 @@ CREATE TABLE `civicrm_user` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique User ID',
   `contact_id` int unsigned COMMENT 'FK to Contact - possibly redundant',
   `username` varchar(60) NOT NULL,
-  `password` varchar(128) NOT NULL COMMENT 'Hashed password',
+  `hashed_password` varchar(128) NOT NULL COMMENT 'Hashed, not plaintext password',
   `email` varchar(255) NOT NULL COMMENT 'Email (e.g. for password resets)',
   `roles` varchar(128) COMMENT 'FK to Role',
   `when_created` timestamp DEFAULT CURRENT_TIMESTAMP,
