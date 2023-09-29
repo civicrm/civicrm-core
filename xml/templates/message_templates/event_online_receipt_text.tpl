@@ -55,7 +55,7 @@
 {/if}
 
 {if !empty($isShowLocation)}
-{$location.address.1.display|strip_tags:false}
+{event.location}
 {/if}{*End of isShowLocation condition*}
 
 {if {event.loc_block_id.phone_id.phone|boolean} || {event.loc_block_id.email_id.email|boolean}}

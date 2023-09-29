@@ -67,7 +67,7 @@
      {if {event.is_show_location|boolean}}
       <tr>
        <td colspan="2" {$valueStyle}>
-        {$location.address.1.display|nl2br}
+         {event.location}
        </td>
       </tr>
      {/if}

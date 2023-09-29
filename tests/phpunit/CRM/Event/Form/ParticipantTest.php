@@ -340,11 +340,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'contribution.balance_amount|boolean:::No',
       'contribution.paid_amount|boolean:::Yes',
       '<p>Test event type - 1</p>event.location:8 Baker Street<br />
+Upstairs<br />
 London,',
-      '$location.address.1.display:<div class="location vcard"><span class="adr"><span class="street-address">8 Baker Street</span><br />
-<span class="extended-address">Upstairs</span><br />
-<span class="locality">London</span>,<br />
-</span></div>',
     ]);
 
     $this->callAPISuccess('Email', 'delete', ['id' => $email['id']]);

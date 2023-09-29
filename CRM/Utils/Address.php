@@ -55,7 +55,7 @@ class CRM_Utils_Address {
 
     $fullPostalCode = $fields['postal_code'] ?? NULL;
     if (!empty($fields['postal_code_suffix'])) {
-      $fullPostalCode .= "-$fields[postal_code_suffix]";
+      $fullPostalCode .= '-' . $fields['postal_code_suffix'];
     }
 
     // make sure that some of the fields do have values
