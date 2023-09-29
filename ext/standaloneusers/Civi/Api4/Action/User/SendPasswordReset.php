@@ -30,11 +30,11 @@ class SendPasswordReset extends AbstractAction {
     }
 
     $user = User::get(FALSE)
-      ->addSelect('id', 'email', 'username')
+      ->addSelect('id', 'uf_name', 'username')
       ->addWhere('is_active', '=', TRUE)
       ->setLimit(1)
       ->addWhere(
-        filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'username',
+        filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'uf_name' : 'username',
         '=',
         $identifier)
       ->execute()
@@ -73,21 +73,21 @@ class SendPasswordReset extends AbstractAction {
       ->setSelect(['id'])
       ->addWhere('workflow_name', '=', 'password_reset')
       ->addWhere('is_default', '=', TRUE)
-      ->addWhere('is_active',  '=', TRUE)
+      ->addWhere('is_active', '=', TRUE)
       ->execute()->first()['id'];
     if (!$tplID) {
       // Some sites may deliberately disable this, but it's unusual, so leave a notice in the log.
       Civi::log()->notice("There is no active, default password_reset message template, which has prevented emailing a reset to {username}", ['username' => $user['username']]);
       return;
     }
-    if (!filter_var($user['email'] ?? '', FILTER_VALIDATE_EMAIL)) {
+    if (!filter_var($user['uf_name'] ?? '', FILTER_VALIDATE_EMAIL)) {
       Civi::log()->warning("User $user[id] has an invalid email. Failed to send password reset.");
       return;
     }
 
     // Generate a once-use token that expires in 1 hour.
     // We'll store this on the User record, that way invalidating any previous token that may have been generated.
-    $expires = time() + 60*60;
+    $expires = time() + 60 * 60;
     $token = dechex($expires) . substr(preg_replace('@[/+=]+@', '', base64_encode(random_bytes(64))), 0, 32);
 
     User::update(FALSE)
@@ -101,12 +101,12 @@ class SendPasswordReset extends AbstractAction {
     $resetUrlHtml = htmlspecialchars($resetUrlPlaintext);
     // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml}
     $params = [
-        'id' => $tplID,
-        'template_params' => compact('resetUrlPlaintext', 'resetUrlHtml'),
-        'from' => "\"$domainFromName\" <$domainFromEmail>",
-        'to_email' => $user['email'],
-        'disable_smarty' => 1,
-      ];
+      'id' => $tplID,
+      'template_params' => compact('resetUrlPlaintext', 'resetUrlHtml'),
+      'from' => "\"$domainFromName\" <$domainFromEmail>",
+      'to_email' => $user['uf_name'],
+      'disable_smarty' => 1,
+    ];
 
     try {
       civicrm_api3('MessageTemplate', 'send', $params);
@@ -118,4 +118,5 @@ class SendPasswordReset extends AbstractAction {
         $params + ['userID' => $user['id'], 'exception' => $e]);
     }
   }
+
 }

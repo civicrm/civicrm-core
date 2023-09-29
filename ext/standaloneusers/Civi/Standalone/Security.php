@@ -3,6 +3,7 @@ namespace Civi\Standalone;
 
 use CRM_Core_Session;
 use Civi;
+use Civi\Api4\User;
 
 /**
  * This is a single home for security related functions for Civi Standalone.
@@ -130,27 +131,29 @@ class Security {
    *    - 'cms_name'
    *    - 'cms_pass' plaintext password
    *    - 'notify' boolean
-   * @param string $mailParam
+   * @param string $emailParam
    *   Name of the $param which contains the email address.
    *
    * @return int|bool
    *   uid if user was created, false otherwise
    */
-  public function createUser(&$params, $mailParam) {
+  public function createUser(&$params, $emailParam) {
     try {
-      $mail = $params[$mailParam];
-      $userID = \Civi\Api4\User::create(FALSE)
+      $email = $params[$emailParam];
+      $userID = User::create(FALSE)
         ->addValue('username', $params['cms_name'])
-        ->addValue('email', $mail)
+        ->addValue('uf_name', $email)
         ->addValue('password', $params['cms_pass'])
+        ->addValue('contact_id', $params['contact_id'] ?? NULL)
+        // ->addValue('uf_id', 0) // does not work without this.
         ->execute()->single()['id'];
     }
     catch (\Exception $e) {
-      \Civi::log()->warning("Failed to create user '$mail': " . $e->getMessage());
+      \Civi::log()->warning("Failed to create user '$email': " . $e->getMessage());
       return FALSE;
     }
 
-    // @todo This is what Drupal does, but it's unclear why.
+    // @todo This next line is what Drupal does, but it's unclear why.
     // I think it assumes we want to be logged in as this contact, and as there's no uf match, it's not in civi.
     // But I'm not sure if we are always becomming this user; I'm not sure waht calls this function.
     // CRM_Core_Config::singleton()->inCiviCRM = FALSE;
@@ -166,7 +169,7 @@ class Security {
   public function updateCMSName($ufID, $email) {
     \Civi\Api4\User::update(FALSE)
       ->addWhere('id', '=', $ufID)
-      ->addValue('email', $email)
+      ->addValue('uf_name', $email)
       ->execute();
   }
 

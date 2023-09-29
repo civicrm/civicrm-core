@@ -80,7 +80,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ->execute()->single();
 
     $this->assertEquals('user_one', $user['username']);
-    $this->assertEquals('user_one@example.org', $user['email']);
+    $this->assertEquals('user_one@example.org', $user['uf_name']);
     $this->assertStringStartsWith('$', $user['hashed_password']);
 
     $this->assertTrue($security->checkPassword('secret1', $user['hashed_password']));
@@ -89,6 +89,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
   public function testPerms() {
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
+    $ufID = \CRM_Core_BAO_UFMatch::getUFId($contactID);
+    $this->assertEquals($userID, $ufID);
 
     // Create a custom role
     $roleID = \Civi\Api4\Role::create(FALSE)
@@ -122,6 +124,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   }
 
   protected function switchToOurUFClasses() {
+    return;
     if (!empty($this->originalUFPermission)) {
       throw new \RuntimeException("are you calling switchToOurUFClasses twice?");
     }
@@ -132,6 +135,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   }
 
   protected function switchBackFromOurUFClasses($justInCase = FALSE) {
+    return;
     if (!$justInCase && empty($this->originalUFPermission)) {
       throw new \RuntimeException("are you calling switchBackFromOurUFClasses() twice?");
     }
@@ -140,21 +144,29 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $this->originalUFPermission = $this->originalUF = NULL;
   }
 
+  public function dump(string $s = '') {
+    $d = \CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_uf_match;");
+    print "\ndump---------- $s\n";
+    foreach ($d->fetchAll() as $row) {
+      print json_encode($row, JSON_UNESCAPED_SLASHES) . "\n";
+    }
+    print "--------------\n";
+  }
+
   /**
    * @return Array[int, int, \Civi\Standalone\Security]
    */
   public function createFixtureContactAndUser(): array {
-
     $contactID = \Civi\Api4\Contact::create(FALSE)
       ->setValues([
         'contact_type' => 'Individual',
         'display_name' => 'Admin McDemo',
       ])->execute()->first()['id'];
 
-    $params = ['cms_name' => 'user_one', 'cms_pass' => 'secret1', 'notify' => FALSE, 'contactID' => $contactID, 'email' => 'user_one@example.org'];
-    $this->switchToOurUFClasses();
+    $params = ['cms_name' => 'user_one', 'cms_pass' => 'secret1', 'notify' => FALSE, 'contact_id' => $contactID, 'email' => 'user_one@example.org'];
+    // $this->switchToOurUFClasses();
     $userID = \CRM_Core_BAO_CMSUser::create($params, 'email');
-    $this->switchBackFromOurUFClasses();
+    // $this->switchBackFromOurUFClasses();
     $this->assertGreaterThan(0, $userID);
     $this->contactID = $contactID;
     $this->userID = $userID;
@@ -204,7 +216,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
         'password' => 'shhh',
         'contact_id' => $stafferContactID,
         'roles:name' => ['staff'],
-        'email' => 'testuser1@example.org',
+        'uf_name' => 'testuser1@example.org',
       ])
       ->execute()->first()['id'];
     $user = User::get(FALSE)->addWhere('id', '=', $userID)->execute()->first();

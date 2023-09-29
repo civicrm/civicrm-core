@@ -17,7 +17,7 @@
 
 SET FOREIGN_KEY_CHECKS=0;
 
-DROP TABLE IF EXISTS `civicrm_user`;
+DROP TABLE IF EXISTS `civicrm_uf_match`;
 DROP TABLE IF EXISTS `civicrm_role`;
 
 SET FOREIGN_KEY_CHECKS=1;
@@ -46,26 +46,32 @@ ENGINE=InnoDB;
 
 -- /*******************************************************
 -- *
--- * civicrm_user
+-- * civicrm_uf_match
 -- *
--- * A standalone user account
+-- * Standalone User Account. In Standalone this is a superset of the original civicrm_uf_match table.
 -- *
 -- *******************************************************/
-CREATE TABLE `civicrm_user` (
+CREATE TABLE `civicrm_uf_match` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique User ID',
-  `contact_id` int unsigned COMMENT 'FK to Contact - possibly redundant',
+  `domain_id` int unsigned NOT NULL COMMENT 'Which Domain is this match entry for',
+  `uf_id` int unsigned NOT NULL DEFAULT 0 COMMENT 'UF ID. Redundant in Standalone. Needs to be identical to id.',
+  `uf_name` varchar(255) COMMENT 'Email (e.g. for password resets)',
+  `contact_id` int unsigned COMMENT 'FK to Contact ID',
   `username` varchar(60) NOT NULL,
   `hashed_password` varchar(128) NOT NULL COMMENT 'Hashed, not plaintext password',
-  `email` varchar(255) NOT NULL COMMENT 'Email (e.g. for password resets)',
   `roles` varchar(128) COMMENT 'FK to Role',
   `when_created` timestamp DEFAULT CURRENT_TIMESTAMP,
   `when_last_accessed` timestamp NULL,
   `when_updated` timestamp NULL,
   `is_active` tinyint NOT NULL DEFAULT 1,
   `timezone` varchar(32) NULL COMMENT 'User\'s timezone',
-  `language` int unsigned COMMENT 'The language for the user.',
+  `language` varchar(5) COMMENT 'UI language preferred by the given user/contact',
   PRIMARY KEY (`id`),
+  INDEX `I_civicrm_uf_match_uf_id`(uf_id),
   UNIQUE INDEX `UI_username`(username),
-  CONSTRAINT FK_civicrm_user_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
+  UNIQUE INDEX `UI_uf_name_domain_id`(uf_name, domain_id),
+  UNIQUE INDEX `UI_contact_domain_id`(contact_id, domain_id),
+  CONSTRAINT FK_civicrm_uf_match_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`),
+  CONSTRAINT FK_civicrm_uf_match_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL
 )
 ENGINE=InnoDB;
