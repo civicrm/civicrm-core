@@ -71,7 +71,7 @@
     <length>255</length>
     <comment>Email (e.g. for password resets)</comment>
     <html>
-      <type>Text</type>
+      <type>Email</type>
     </html>
   </field>
 
