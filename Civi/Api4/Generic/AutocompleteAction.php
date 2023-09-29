@@ -133,7 +133,9 @@ class AutocompleteAction extends AbstractAction {
     $this->loadSearchDisplay();
 
     // Pass-through this parameter
-    $this->display['acl_bypass'] = !$this->getCheckPermissions();
+    if (!isset($this->display['acl_bypass'])) {
+      $this->display['acl_bypass'] = !$this->getCheckPermissions();
+    }
 
     $keyField = $this->getKeyField();
     $displayFields = $this->getDisplayFields();
