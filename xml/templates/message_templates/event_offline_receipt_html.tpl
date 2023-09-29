@@ -173,10 +173,10 @@
         {if $isShowLineItems}
           {foreach from=$participants key=index item=currentParticipant}
             {if $isPrimary || {participant.id} === $currentParticipant.id}
-              {if $isPrimary && $lineItems|@count GT 1} {* Header for multi participant registration cases. *}
+              {if $isPrimary && ($participants|@count > 1)} {* Header for multi participant registration cases. *}
                 <tr>
                   <td colspan="2" {$labelStyle}>
-                      {ts 1=$currentParticipant.index}Participant %1{/ts} {$currentParticipant.contact.display_name}
+                    {$currentParticipant.contact.display_name}
                   </td>
                 </tr>
               {/if}
@@ -202,13 +202,15 @@
                         <td {$tdfirstStyle}>{$line.title}</td>
                         <td {$tdStyle} align="middle">{$line.qty}</td>
                         <td {$tdStyle}>{$line.unit_price|crmMoney:$currency}</td>
-                          {if $line.tax_rate || $line.tax_amount != ""}
+                          {if $isShowTax && {contribution.tax_amount|boolean}}
                             <td>{$line.line_total|crmMoney:$currency}</td>
-                            <td>{$line.tax_rate|string_format:"%.2f"}%</td>
-                            <td>{$line.tax_amount|crmMoney:$currency}</td>
-                          {else}
-                            <td></td>
-                            <td></td>
+                            {if $line.tax_rate || $line.tax_amount != ""}
+                              <td>{$line.tax_rate|string_format:"%.2f"}%</td>
+                              <td>{$line.tax_amount|crmMoney:$currency}</td>
+                            {else}
+                              <td></td>
+                              <td></td>
+                            {/if}
                           {/if}
                         <td {$tdStyle}>
                             {$line.line_total+$line.tax_amount|crmMoney:$currency}
@@ -218,9 +220,9 @@
                         {/if}
                       </tr>
                     {/foreach}
-                    {if $isShowTax}
+                    {if $isShowTax && $isPrimary && ($participants|@count > 1)}
                       <tr {$participantTotalStyle}>
-                        <td colspan=3>{ts}Participant Total{/ts}</td>
+                        <td colspan=3>{ts 1=$currentParticipant.contact.display_name}Total for %1{/ts}</td>
                         <td colspan=2>{$currentParticipant.totals.total_amount_exclusive|crmMoney}</td>
                         <td colspan=1>{$currentParticipant.totals.tax_amount|crmMoney}</td>
                         <td colspan=2>{$currentParticipant.totals.total_amount_inclusive|crmMoney}</td>
@@ -238,7 +240,7 @@
               {foreach from=$currentParticipant.line_items key=index item=currentLineItem}
                 <tr>
                   <td {$valueStyle}>
-                    {$currentLineItem.label} {if $isPrimary} - {$currentParticipant.contact.display_name}{/if}
+                    {$currentLineItem.label}{if $isPrimary && ($participants|@count > 1)} - {$currentParticipant.contact.display_name}{/if}
                   </td>
                   <td {$valueStyle}>
                     {$currentLineItem.line_total|crmMoney:$currency}
