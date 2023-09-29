@@ -513,7 +513,7 @@ SELECT g.*
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
     $foundGroupIDs = [];
-    $groupContactCacheClause = FALSE;
+    $groupContactCacheClause = '';
     while ($dao->fetch()) {
       $foundGroupIDs[] = $dao->id;
       if (($dao->saved_search_id || $dao->children || $dao->parents)) {
@@ -524,7 +524,7 @@ SELECT g.*
       }
     }
 
-    if ($groupIDs) {
+    if ($foundGroupIDs) {
       return "(
         `contact_a`.id $operation (
          SELECT contact_id FROM civicrm_group_contact WHERE group_id IN (" . implode(', ', $foundGroupIDs) . ") AND status = 'Added'
@@ -532,7 +532,12 @@ SELECT g.*
          )
       )";
     }
-    return '';
+    else {
+      // Edge case avoiding SQL syntax error if no $foundGroupIDs
+      return "(
+        `contact_a`.id $operation (0)
+      )";
+    }
   }
 
   public static function getObjectTableOptions(): array {
