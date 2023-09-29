@@ -32,12 +32,10 @@
  * @return string|null
  *   the string, translated by gettext
  */
-function smarty_block_htxt($params, $text, &$smarty, &$repeat) {
-  if (!$repeat && $params['id'] == $smarty->_tpl_vars['id']) {
+function smarty_block_htxt($params, $text, $smarty, &$repeat) {
+  if (!$repeat && $params['id'] == $smarty->getTemplateVars('id')) {
     $smarty->assign('override_help_text', !empty($params['override']));
     return $text;
   }
-  else {
-    return NULL;
-  }
+  return NULL;
 }
