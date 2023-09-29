@@ -28,7 +28,7 @@ class UserSpecProvider extends \Civi\Core\Service\AutoService implements Generic
     $password = new FieldSpec('password', 'User', 'String');
     $password->setTitle(ts('New password'));
     $password->setDescription('Provide a new password for this user.');
-    $password->setInputType('Text');
+    $password->setInputType('Password');
     $spec->addFieldSpec($password);
   }
 
