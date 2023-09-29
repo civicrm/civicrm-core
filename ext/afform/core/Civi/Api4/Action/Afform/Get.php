@@ -133,7 +133,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
    */
   public static function getCustomGroupBlocks($event) {
     // Early return if blocks are not requested
-    if ($event->getTypes && !in_array('block', $event->getTypes, TRUE)) {
+    if (!isset($event->getTypes) || !in_array('block', $event->getTypes, TRUE)) {
       return;
     }
 
