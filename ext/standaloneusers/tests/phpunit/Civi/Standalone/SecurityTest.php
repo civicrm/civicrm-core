@@ -50,7 +50,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
   public function tearDown():void {
     $this->deleteStuffWeMade();
-    $this->switchBackFromOurUFClasses(TRUE);
+    // $this->switchBackFromOurUFClasses(TRUE);
     parent::tearDown();
   }
 
@@ -113,14 +113,14 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ->addWhere('id', '=', $userID)
       ->execute();
 
-    $this->switchToOurUFClasses();
+    // $this->switchToOurUFClasses();
     foreach (['access CiviCRM', 'view all contacts', 'add contacts', 'edit all contacts'] as $allowed) {
       $this->assertTrue(\CRM_Core_Permission::check([$allowed], $contactID), "Should have '$allowed' permission but don't");
     }
     foreach (['administer CiviCRM', 'access uploaded files'] as $notAllowed) {
       $this->assertFalse(\CRM_Core_Permission::check([$notAllowed], $contactID), "Should NOT have '$allowed' permission but do");
     }
-    $this->switchBackFromOurUFClasses();
+    // $this->switchBackFromOurUFClasses();
   }
 
   protected function switchToOurUFClasses() {
@@ -144,7 +144,10 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $this->originalUFPermission = $this->originalUF = NULL;
   }
 
-  public function dump(string $s = '') {
+  /**
+   * Temporary debugging function
+   */
+  public function dumpUFMatch(string $s = '') {
     $d = \CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_uf_match;");
     print "\ndump---------- $s\n";
     foreach ($d->fetchAll() as $row) {
