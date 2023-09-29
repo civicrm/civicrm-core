@@ -370,11 +370,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $this->assign('totalAmount', $this->contributionAmt);
       $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
     }
-    // @todo isPrimary no longer used from 5.63 in core templates, remove
-    // once users have been 'pushed' to update their templates (via
-    // upgrade message - which we don't always do whenever we change
-    // a minor variable.
-    $this->assign('isPrimary', $this->_isPaidEvent);
+
     $this->assign('register_date', $params['register_date']);
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email

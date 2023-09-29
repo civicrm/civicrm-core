@@ -2044,11 +2044,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     $notSent = [];
     $this->assign('module', 'Event Registration');
     $this->assignEventDetailsToTpl($params['event_id'], CRM_Utils_Array::value('role_id', $params), CRM_Utils_Array::value('receipt_text', $params));
-    // @todo - this is no longer in core templates as of 5.63
-    // we should remove once we have done a 'push upgrade' on addresses - ie advised
-    // people to upgrade their templates in an upgrade message, as
-    // opposed to just updating unmodified templates.
-    $this->assign('isPrimary', (int) $this->_isPaidEvent);
     if ($this->_isPaidEvent) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       if (!$this->_mode) {
