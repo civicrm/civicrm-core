@@ -277,10 +277,10 @@
       {/foreach}
      {/if}
 
-     {if !empty($isShare)}
+     {if {contribution.contribution_page_id.is_share|boolean}}
       <tr>
         <td colspan="2" {$valueStyle}>
-            {capture assign=contributionUrl}{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$contributionPageId`" a=true fe=1 h=1}{/capture}
+            {capture assign=contributionUrl}{crmURL p='civicrm/contribute/transact' q="reset=1&id={contribution.contribution_page_id}" a=true fe=1 h=1}{/capture}
             {include file="CRM/common/SocialNetwork.tpl" emailMode=true url=$contributionUrl title=$title pageURL=$contributionUrl}
         </td>
       </tr>
