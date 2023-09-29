@@ -337,16 +337,6 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       $row['campaign'] = $allCampaigns[$result->participant_campaign_id] ?? NULL;
       $row['campaign_id'] = $result->participant_campaign_id;
 
-      // gross hack to show extra information for pending status
-      $statusClass = NULL;
-      if ((isset($row['participant_status_id'])) &&
-        ($statusId = array_search($row['participant_status_id'], $statusTypes))
-      ) {
-        $statusClass = $statusClasses[$statusId];
-      }
-
-      $row['showConfirmUrl'] = $statusClass == 'Pending';
-
       if (!empty($row['participant_is_test'])) {
         $row['participant_status'] = CRM_Core_TestEntity::appendTestText($row['participant_status']);
       }
