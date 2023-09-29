@@ -15,13 +15,6 @@ trait WriteTrait {
   protected $actorPassword;
 
   /**
-   * Password reset token.
-   *
-   * @var string
-   */
-  protected $passwordResetToken;
-
-  /**
    * At this point we don't have the records we're going to update, we just have the
    * API values we're going to SET on (each) record that gets processed.
    *
@@ -40,12 +33,7 @@ trait WriteTrait {
       // We must have a logged in user if we're checking permissions.
       $loggedInUserID = \CRM_Utils_System::getLoggedInUfID();
       if (!$loggedInUserID) {
-        // Only valid situation where a not-logged-in user is asking to change a User record
-        // is a password reset.
-        ksort($record);
-        if (empty($this->passwordResetToken) || array_keys($record) !== ['id', 'password']) {
-          throw new UnauthorizedException("Unauthorized");
-        }
+        throw new UnauthorizedException("Unauthorized");
       }
 
       // We never allow one user to directly change the hashed password of another.
@@ -101,8 +89,6 @@ trait WriteTrait {
       }
       $authenticatedAsLoggedInUser = TRUE;
     }
-    // @todo check password_reset_token
-    // elseif () { if (tokenSuppliedAndValid) $authenticatedAsLoggedInUser = TRUE; }
 
     $records = ($this->getActionName() === 'save') ? $this->records : [$this->getValues()];
     foreach ($records as $values) {
@@ -115,10 +101,7 @@ trait WriteTrait {
 
       $changingPassword = array_key_exists('password', $values);
       if (!$loggedInUserID) {
-        // Only valid change here is password, for a known ID.
-        if (empty($values['id']) || $security->checkPasswordResetToken($values['id'], $this->passwordResetToken)) {
-          throw new UnauthorizedException("Unauthorized");
-        }
+        throw new UnauthorizedException("Unauthorized");
       }
       else {
         $changingOtherUser = ($values['id'] ?? FALSE) !== $loggedInUserID;

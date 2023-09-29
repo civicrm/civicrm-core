@@ -198,4 +198,12 @@
     <unique>true</unique>
     <add>1.6</add>
   </index>
+  <field>
+    <name>password_reset_token</name>
+    <title>Password Reset Token</title>
+    <comment>The unspent token</comment>
+    <type>varchar</type>
+    <length>40</length>
+    <readonly>true</readonly>
+  </field>
 </table>

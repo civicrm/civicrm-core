@@ -31,3 +31,10 @@ function standaloneusers_civicrm_install() {
 function standaloneusers_civicrm_enable() {
   _standaloneusers_civix_civicrm_enable();
 }
+
+/**
+ * Implements hook_civicrm_permission().
+ */
+function standalone_civicrm_permission(&$permissions) {
+  $permissions['access password resets'] = ts('Allow users to access the reset password system');
+}

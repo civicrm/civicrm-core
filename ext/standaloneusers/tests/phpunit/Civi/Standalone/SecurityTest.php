@@ -74,15 +74,17 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
 
     $user = \Civi\Api4\User::get(FALSE)
-      ->addSelect('*', 'uf_match.*')
       ->addWhere('id', '=', $userID)
-      ->addJoin('UFMatch AS uf_match', 'INNER', ['uf_match.uf_id', '=', 'id'])
       ->execute()->single();
 
     $this->assertEquals('user_one', $user['username']);
+    $this->assertEquals($contactID, $user['contact_id']);
+    $this->assertEquals($userID, $user['id']);
+    $this->assertEquals($userID, $user['uf_id']);
     $this->assertEquals('user_one@example.org', $user['uf_name']);
     $this->assertStringStartsWith('$', $user['hashed_password']);
 
+    // Test that the password can be checked ok.
     $this->assertTrue($security->checkPassword('secret1', $user['hashed_password']));
     $this->assertFalse($security->checkPassword('some other password', $user['hashed_password']));
   }
@@ -123,26 +125,26 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // $this->switchBackFromOurUFClasses();
   }
 
-  protected function switchToOurUFClasses() {
-    return;
-    if (!empty($this->originalUFPermission)) {
-      throw new \RuntimeException("are you calling switchToOurUFClasses twice?");
-    }
-    $this->originalUFPermission = \CRM_Core_Config::singleton()->userPermissionClass;
-    $this->originalUF = \CRM_Core_Config::singleton()->userSystem;
-    \CRM_Core_Config::singleton()->userPermissionClass = new \CRM_Core_Permission_Standalone();
-    \CRM_Core_Config::singleton()->userSystem = new \CRM_Utils_System_Standalone();
-  }
-
-  protected function switchBackFromOurUFClasses($justInCase = FALSE) {
-    return;
-    if (!$justInCase && empty($this->originalUFPermission)) {
-      throw new \RuntimeException("are you calling switchBackFromOurUFClasses() twice?");
-    }
-    \CRM_Core_Config::singleton()->userPermissionClass = $this->originalUFPermission;
-    \CRM_Core_Config::singleton()->userSystem = $this->originalUF;
-    $this->originalUFPermission = $this->originalUF = NULL;
-  }
+  // protected function switchToOurUFClasses() {
+  //   return;
+  //   if (!empty($this->originalUFPermission)) {
+  //     throw new \RuntimeException("are you calling switchToOurUFClasses twice?");
+  //   }
+  //   $this->originalUFPermission = \CRM_Core_Config::singleton()->userPermissionClass;
+  //   $this->originalUF = \CRM_Core_Config::singleton()->userSystem;
+  //   \CRM_Core_Config::singleton()->userPermissionClass = new \CRM_Core_Permission_Standalone();
+  //   \CRM_Core_Config::singleton()->userSystem = new \CRM_Utils_System_Standalone();
+  // }
+  //
+  // protected function switchBackFromOurUFClasses($justInCase = FALSE) {
+  //   return;
+  //   if (!$justInCase && empty($this->originalUFPermission)) {
+  //     throw new \RuntimeException("are you calling switchBackFromOurUFClasses() twice?");
+  //   }
+  //   \CRM_Core_Config::singleton()->userPermissionClass = $this->originalUFPermission;
+  //   \CRM_Core_Config::singleton()->userSystem = $this->originalUF;
+  //   $this->originalUFPermission = $this->originalUF = NULL;
+  // }
 
   /**
    * Temporary debugging function
@@ -365,6 +367,53 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     }
 
     $this->deleteStuffWeMade();
+  }
+
+  public function testForgottenPassword() {
+
+    /** @var Security $security */
+    [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
+
+    // Create token.
+    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
+    $this->assertMatchesRegularExpression('/^([0-9a-f]{8}[a-zA-Z0-9]{32})([0-9a-f]+)$/', $token);
+
+    // Fake an expired token
+    $old = dechex(time() - 1);
+    $this->assertNull($security->checkPasswordResetToken($old . substr($token, 9)));
+
+    // Check token fails if contact ID is different.
+    $this->assertNull($security->checkPasswordResetToken($token . '0'));
+
+    // Check it works, but only once.
+    $extractedUserID = $security->checkPasswordResetToken($token);
+    $this->assertEquals($userID, $extractedUserID);
+    $this->assertNull($security->checkPasswordResetToken($token));
+
+    // OK, let's change that password.
+    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
+
+    // Attempt to change the user's password using this token to authenticate.
+    $result = User::PasswordReset(TRUE)
+      ->setToken($token)
+      ->setPassword('fingersCrossed')
+      ->execute();
+
+    $this->assertEquals(1, $result['success']);
+    $user = User::get(FALSE)->addWhere('id', '=', $userID)->execute()->single();
+    $this->assertTrue($security->checkPassword('fingersCrossed', $user['hashed_password']));
+
+    // Should not work a 2nd time with same token.
+    try {
+      User::PasswordReset(TRUE)
+        ->setToken($token)
+        ->setPassword('oooh')
+        ->execute();
+      $this->fail("Should not have been able to reuse token");
+    }
+    catch (\Exception $e) {
+      $this->assertEquals('Invalid token.', $e->getMessage());
+    }
   }
 
   protected function deleteStuffWeMade() {

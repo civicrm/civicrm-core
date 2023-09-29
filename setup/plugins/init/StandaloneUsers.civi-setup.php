@@ -49,7 +49,13 @@ if (!defined('CIVI_SETUP')) {
           'name' => 'everyone',
           'label' => ts('Everyone, including anonymous users'),
           // Provide default open permissions
-          'permissions' => ['CiviMail subscribe/unsubscribe pages', 'make online contributions', 'view event info', 'register for events'],
+          'permissions' => [
+            'CiviMail subscribe/unsubscribe pages',
+            'make online contributions',
+            'view event info',
+            'register for events',
+            'access password resets',
+          ],
         ],
         [
           'name' => 'admin',

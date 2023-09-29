@@ -10,13 +10,15 @@ use Civi\Api4\Generic\AbstractAction;
 
 /**
  * This is designed to be a public API
+ *
+ * @method static setIdentifier(string $identifier)
  */
 class SendPasswordReset extends AbstractAction {
 
   /**
    * Username or email of user to send email for.
    *
-   * @param string $identifier
+   * @var string
    * @default ''
    */
   protected string $identifier;
@@ -85,18 +87,9 @@ class SendPasswordReset extends AbstractAction {
       return;
     }
 
-    // Generate a once-use token that expires in 1 hour.
-    // We'll store this on the User record, that way invalidating any previous token that may have been generated.
-    $expires = time() + 60 * 60;
-    $token = dechex($expires) . substr(preg_replace('@[/+=]+@', '', base64_encode(random_bytes(64))), 0, 32);
-
-    User::update(FALSE)
-      ->setValue('password_reset_token', $token)
-      ->addWhere('id', '=', $user['id'])
-      ->execute();
+    $token = static::updateToken($user['id']);
 
     list($domainFromName, $domainFromEmail) = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
-
     $resetUrlPlaintext = \CRM_Utils_System::url('civicrm/password-reset', ['token' => $token], TRUE, NULL, FALSE, TRUE);
     $resetUrlHtml = htmlspecialchars($resetUrlPlaintext);
     // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml}
@@ -117,6 +110,31 @@ class SendPasswordReset extends AbstractAction {
       Civi::log()->error("Failed to send password_reset_token MessageTemplate (ID {tplID}) to {to_email} for user {userID}",
         $params + ['userID' => $user['id'], 'exception' => $e]);
     }
+  }
+
+  /**
+   * Generate and store a token on the User record.
+   *
+   * @param int $userID
+   *
+   * @return string
+   *   The token
+   */
+  public static function updateToken(int $userID): string {
+    // Generate a once-use token that expires in 1 hour.
+    // We'll store this on the User record, that way invalidating any previous token that may have been generated.
+    // The format is <expiry><random><userID>
+    // The UserID shouldn't need to be secret.
+    // We only store <expiry><random> on the User record.
+    $expires = time() + 60 * 60;
+    $token = dechex($expires) . substr(preg_replace('@[/+=]+@', '', base64_encode(random_bytes(64))), 0, 32);
+
+    User::update(FALSE)
+      ->addValue('password_reset_token', $token)
+      ->addWhere('id', '=', $userID)
+      ->execute();
+
+    return $token . dechex($userID);
   }
 
 }

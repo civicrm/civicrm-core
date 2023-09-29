@@ -369,27 +369,41 @@ class Security {
   /**
    * Check a password reset token matches for a User.
    *
-   * @param int $userID
    * @param string $token
    * @param bool $spend
    *   If TRUE, and the token matches, the token is then reset; so it can only be used once.
    *   If FALSE no changes are made.
    *
-   * @return bool TRUE if it was valid.
+   * @return NULL|int
+   *   If int, it's the UserID
+   *
    */
-  public function checkPasswordResetToken(int $userID, string $token, bool $spend = TRUE): bool {
-    if (!preg_match('/^([a-f0-9]{8})(.{32})$/', $token, $matches)) {
-      Civi::log()->warning("Rejected passwordResetToken with invalid syntax for user $userID.", compact('token'));
-      return FALSE;
+  public function checkPasswordResetToken(string $token, bool $spend = TRUE): ?int {
+    if (!preg_match('/^([0-9a-f]{8})([a-zA-Z0-9]{32})([0-9a-f]+)$/', $token, $matches)) {
+      // Hacker
+      Civi::log()->warning("Rejected passwordResetToken with invalid syntax.", compact('token'));
+      return NULL;
     }
+
+    $userID = hexdec($matches[3]);
+    if (!$userID > 0) {
+      // Hacker
+      Civi::log()->warning("Rejected passwordResetToken with invalid userID.", compact('token', 'userID'));
+      return NULL;
+    }
+
     $expiry = hexdec($matches[1]);
     if (time() > $expiry) {
+      // Less serious
       Civi::log()->info("Rejected expired passwordResetToken for user $userID");
-      return FALSE;
+      return NULL;
     }
+
+    $storedToken = $matches[1] . $matches[2];
     $matched = User::get(FALSE)
       ->addWhere('id', '=', $userID)
-      ->addWhere('password_reset_token', '=', $token)
+      ->addWhere('password_reset_token', '=', $storedToken)
+      ->addWhere('is_active', '=', 1)
       ->selectRowCount()
       ->execute()->countMatched() === 1;
 
@@ -400,7 +414,7 @@ class Security {
         ->execute();
     }
     Civi::log()->info(($matched ? 'Accepted' : 'Rejected') . " passwordResetToken for user $userID");
-    return $matched;
+    return $matched ? $userID : NULL;
   }
 
 }
