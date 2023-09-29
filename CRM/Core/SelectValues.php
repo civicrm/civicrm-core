@@ -1079,16 +1079,19 @@ class CRM_Core_SelectValues {
         'id' => CRM_Contact_BAO_Relationship::NONE,
         'name' => 'None',
         'label' => ts('None'),
+        'icon' => NULL,
       ],
       [
         'id' => CRM_Contact_BAO_Relationship::VIEW,
         'name' => 'View only',
         'label' => ts('View only'),
+        'icon' => 'fa-eye',
       ],
       [
         'id' => CRM_Contact_BAO_Relationship::EDIT,
         'name' => 'View and update',
         'label' => ts('View and update'),
+        'icon' => 'fa-pencil',
       ],
     ];
   }
