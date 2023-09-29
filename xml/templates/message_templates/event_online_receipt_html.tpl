@@ -216,6 +216,7 @@
                             <td {$tdStyle} align="middle">{$line.qty}</td>
                             <td {$tdStyle}>{$line.unit_price|crmMoney:$currency}</td>
                             {if $line.tax_rate || $line.tax_amount != ""}
+                              <td>{$line.line_total|crmMoney:$currency}</td>
                               <td>{$line.tax_rate|string_format:"%.2f"}%</td>
                               <td>{$line.tax_amount|crmMoney:$currency}</td>
                             {else}
