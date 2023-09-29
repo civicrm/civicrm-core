@@ -67,7 +67,7 @@
   </index>
   <field>
     <name>uf_name</name>
-    <title>CMS Unique Identifier</title>
+    <title>User Email</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Email (e.g. for password resets)</comment>
