@@ -375,8 +375,29 @@ class Security {
    * @return bool TRUE if it was valid.
    */
   public function checkPasswordResetToken(int $userID, string $token, bool $spend = TRUE): bool {
-    // Coming in next PR!
-    return FALSE;
+    if (!preg_match('/^([a-f0-9]{8})(.{32})$/', $token, $matches)) {
+      Civi::log()->warning("Rejected passwordResetToken with invalid syntax for user $userID.", compact('token'));
+      return FALSE;
+    }
+    $expiry = hexdec($matches[1]);
+    if (time() > $expiry) {
+      Civi::log()->info("Rejected expired passwordResetToken for user $userID");
+      return FALSE;
+    }
+    $matched = User::get(FALSE)
+      ->addWhere('id', '=', $userID)
+      ->addWhere('password_reset_token', '=', $token)
+      ->selectRowCount()
+      ->execute()->countMatched() === 1;
+
+    if ($matched && $spend) {
+      $matched = User::update(FALSE)
+        ->addWhere('id', '=', $userID)
+        ->addValue('password_reset_token', NULL)
+        ->execute();
+    }
+    Civi::log()->info(($matched ? 'Accepted' : 'Rejected') . " passwordResetToken for user $userID");
+    return $matched;
   }
 
 }
