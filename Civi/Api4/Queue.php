@@ -40,9 +40,13 @@ class Queue extends \Civi\Api4\Generic\DAOEntity {
   }
 
   /**
-   * Claim an item from the queue. Returns zero or one items.
+   * Claim some items from the queue. Returns zero or more items.
    *
    * Note: This is appropriate for persistent, auto-run queues.
+   *
+   * The number of items depends on the specific queue. Most notably, batch sizes are
+   * influenced by queue-driver support (`BatchQueueInterface`) and queue-configuration
+   * (`civicrm_queue.batch_limit`).
    *
    * @param bool $checkPermissions
    * @return \Civi\Api4\Action\Queue\ClaimItems
@@ -53,9 +57,13 @@ class Queue extends \Civi\Api4\Generic\DAOEntity {
   }
 
   /**
-   * Run an item from the queue.
+   * Run some items from the queue.
    *
    * Note: This is appropriate for persistent, auto-run queues.
+   *
+   * The number of items depends on the specific queue. Most notably, batch sizes are
+   * influenced by queue-driver support (`BatchQueueInterface`) and queue-configuration
+   * (`civicrm_queue.batch_limit`).
    *
    * @param bool $checkPermissions
    * @return \Civi\Api4\Action\Queue\RunItems
