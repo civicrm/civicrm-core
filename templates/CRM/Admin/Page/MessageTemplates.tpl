@@ -86,9 +86,9 @@
     {include file="CRM/common/jsortable.tpl"}
     {foreach from=$rows item=template_row key=type}
       {if (
-        $type ne 'userTemplates' and ($canEditSystemTemplates or $canEditMessageTemplates)
+        $type ne 'userTemplates' && ($canEditSystemTemplates or $canEditMessageTemplates)
       ) or (
-        $type eq 'userTemplates'and ($canEditUserDrivenMessageTemplates or $canEditMessageTemplates)
+        $type eq 'userTemplates' && ($canEditUserDrivenMessageTemplates or $canEditMessageTemplates)
       )}
       <div id="{if $type eq 'userTemplates'}user{else}workflow{/if}" class='ui-tabs-panel ui-widget-content ui-corner-bottom'>
           <div class="help">
