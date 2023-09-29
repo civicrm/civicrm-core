@@ -147,4 +147,12 @@
     <comment>The language for the user.</comment>
   </field>
 
+  <field>
+    <name>password_reset_token</name>
+    <type>varchar</type>
+    <required>false</required>
+    <length>40</length>
+    <comment>Holds a pending password reset token.</comment>
+  </field>
+
 </table>

@@ -15,6 +15,13 @@ trait WriteTrait {
   protected $actorPassword;
 
   /**
+   * Password reset token.
+   *
+   * @var string
+   */
+  protected $passwordResetToken;
+
+  /**
    * At this point we don't have the records we're going to update, we just have the
    * API values we're going to SET on (each) record that gets processed.
    *
@@ -33,8 +40,12 @@ trait WriteTrait {
       // We must have a logged in user if we're checking permissions.
       $loggedInUserID = \CRM_Utils_System::getLoggedInUfID();
       if (!$loggedInUserID) {
-        // Something weird going on. This codepath should never happen.
-        throw new UnauthorizedException("Not logged on");
+        // Only valid situation where a not-logged-in user is asking to change a User record
+        // is a password reset.
+        ksort($record);
+        if (empty($this->passwordResetToken) || array_keys($record) !== ['id', 'password']) {
+          throw new UnauthorizedException("Unauthorized");
+        }
       }
 
       // We never allow one user to directly change the hashed password of another.
@@ -53,7 +64,7 @@ trait WriteTrait {
         throw new UnauthorizedException("Not allowed to change " . implode(' or ', array_keys($forbidden)));
       }
     }
-    if (isset($record['password'])) {
+    if (array_key_exists('password',$record)) {
       if (!empty($record['hashed_password'])) {
         throw new API_Exception("Ambiguous password parameters: Cannot pass password AND hashed_password.");
       }
@@ -76,33 +87,47 @@ trait WriteTrait {
     }
     $loggedInUserID = \CRM_Utils_System::getLoggedInUfID() ?? FALSE;
     $hasAdminPermission = \CRM_Core_Permission::check(['cms:administer users']);
-    $hasAuthenticated = FALSE;
+    $authenticatedAsLoggedInUser = FALSE;
+    $security = Security::singleton();
     // Check that we have the logged-in-user's password.
-    if ($this->actorPassword) {
+    if ($this->actorPassword && $loggedInUserID) {
       $storedHashedPassword = \Civi\Api4\User::get(FALSE)
         ->addWhere('id', '=', $loggedInUserID)
         ->addSelect('hashed_password')
         ->execute()
-        ->first()['hashed_password'];
-      $security = \Civi\Standalone\Security::singleton();
+        ->single()['hashed_password'];
       if (!$security->checkPassword($this->actorPassword, $storedHashedPassword)) {
         throw new UnauthorizedException("Incorrect password");
       }
-      $hasAuthenticated = TRUE;
+      $authenticatedAsLoggedInUser = TRUE;
     }
     // @todo check password_reset_token
-    // elseif () { if (tokenSuppliedAndValid) $hasAuthenticated = TRUE; }
+    // elseif () { if (tokenSuppliedAndValid) $authenticatedAsLoggedInUser = TRUE; }
 
     $records = ($this->getActionName() === 'save') ? $this->records : [$this->getValues()];
     foreach ($records as $values) {
-      // If changing someone else's account, require 'cms:administer users'
-      if (($values['id'] ?? NULL) !== $loggedInUserID && !$hasAdminPermission) {
-        throw new UnauthorizedException("You are not permitted to change other users' accounts.");
-      }
+      // Cases:
+      // 1. Not logged in: only valid change is password, if we have a passwordResetToken.
+      // 2. Logged in: if change includes password, require $authenticatedAsLoggedInUser
+      //    2.1 if changing a different user to the logged in user, require $hasAdminPermission
+      // 3. Logged in: change is without password
+      //    3.1 if changing a different user to the logged in user, require $hasAdminPermission
 
-      // If changing a password, require user to re-authenticate as themself.
-      if (isset(($values['password'])) && !$hasAuthenticated) {
-        throw new UnauthorizedException("Unauthorized");
+      $changingPassword = array_key_exists('password', $values);
+      if (!$loggedInUserID) {
+        // Only valid change here is password, for a known ID.
+        if (empty($values['id']) || $security->checkPasswordResetToken($values['id'], $this->passwordResetToken)) {
+          throw new UnauthorizedException("Unauthorized");
+        }
+      }
+      else {
+        $changingOtherUser = ($values['id'] ?? FALSE) !== $loggedInUserID;
+        if ($changingOtherUser && !$hasAdminPermission) {
+          throw new UnauthorizedException("You are not permitted to change other users' accounts.");
+        }
+        if ($changingPassword && !$authenticatedAsLoggedInUser) {
+          throw new UnauthorizedException("Unauthorized");
+        }
       }
     }
   }
