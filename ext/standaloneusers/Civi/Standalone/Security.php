@@ -142,7 +142,7 @@ class Security {
       $userID = \Civi\Api4\User::create(FALSE)
         ->addValue('username', $params['cms_name'])
         ->addValue('email', $mail)
-        ->addValue('plaintext_password', $params['cms_pass'])
+        ->addValue('password', $params['cms_pass'])
         ->execute()->single()['id'];
     }
     catch (\Exception $e) {

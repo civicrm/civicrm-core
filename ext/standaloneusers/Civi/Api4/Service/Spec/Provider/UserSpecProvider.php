@@ -25,11 +25,11 @@ class UserSpecProvider extends \Civi\Core\Service\AutoService implements Generic
    * @inheritDoc
    */
   public function modifySpec(RequestSpec $spec) {
-    $plaintextPassword = new FieldSpec('plaintext_password', 'User', 'String');
-    $plaintextPassword->setTitle(ts('New password'));
-    $plaintextPassword->setDescription('Provide a new password for this user.');
-    $plaintextPassword->setInputType('Text');
-    $spec->addFieldSpec($plaintextPassword);
+    $password = new FieldSpec('password', 'User', 'String');
+    $password->setTitle(ts('New password'));
+    $password->setDescription('Provide a new password for this user.');
+    $password->setInputType('Text');
+    $spec->addFieldSpec($password);
   }
 
   /**

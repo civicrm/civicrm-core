@@ -82,7 +82,7 @@
           // Now submit api request.
           const userUpdateParams = {
             actorPassword: ctrl.actorPassword,
-            values: {plaintext_password: ctrl.newPassword},
+            values: {password: ctrl.newPassword},
             where: [['id', '=', ctrl.userId]]
           };
           return crmApi4('User', 'Update', userUpdateParams)

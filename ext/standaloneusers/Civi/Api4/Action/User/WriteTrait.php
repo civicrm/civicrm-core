@@ -53,11 +53,11 @@ trait WriteTrait {
         throw new UnauthorizedException("Not allowed to change " . implode(' or ', array_keys($forbidden)));
       }
     }
-    if (isset($record['plaintext_password'])) {
+    if (isset($record['password'])) {
       if (!empty($record['hashed_password'])) {
-        throw new API_Exception("Ambiguous password parameters: Cannot pass plaintext_password AND hashed_password.");
+        throw new API_Exception("Ambiguous password parameters: Cannot pass password AND hashed_password.");
       }
-      if (empty($record['plaintext_password'])) {
+      if (empty($record['password'])) {
         throw new API_Exception("Disallowing empty password.");
       }
     }
@@ -67,7 +67,7 @@ trait WriteTrait {
   /**
    * This is called with the values for a record fully loaded.
    *
-   * Note that we will now have hashed_password, as well as possibly plaintext_password.
+   * Note that we will now have hashed_password, as well as possibly password.
    *
    */
   protected function validateValues() {
@@ -101,7 +101,7 @@ trait WriteTrait {
       }
 
       // If changing a password, require user to re-authenticate as themself.
-      if (isset(($values['plaintext_password'])) && !$hasAuthenticated) {
+      if (isset(($values['password'])) && !$hasAuthenticated) {
         throw new UnauthorizedException("Unauthorized");
       }
     }
@@ -117,10 +117,10 @@ trait WriteTrait {
    */
   protected function write(array $items) {
     foreach ($items as &$item) {
-      // If given, convert plaintext_password to hashed_password now.
-      if (isset($item['plaintext_password'])) {
-        $item['hashed_password'] = Security::singleton()->hashPassword($item['plaintext_password']);
-        unset($item['plaintext_password']);
+      // If given, convert password to hashed_password now.
+      if (isset($item['password'])) {
+        $item['hashed_password'] = Security::singleton()->hashPassword($item['password']);
+        unset($item['password']);
       }
     }
     return parent::write($items);

@@ -201,7 +201,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $userID = User::create(FALSE)
       ->setValues([
         'username' => 'testuser1',
-        'plaintext_password' => 'shhh',
+        'password' => 'shhh',
         'contact_id' => $stafferContactID,
         'roles:name' => ['staff'],
         'email' => 'testuser1@example.org',
@@ -218,7 +218,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $userId = \CRM_Core_BAO_UFMatch::getUFId($stafferContactID);
     $this->assertNotNull($userId);
 
-    $this->assertArrayNotHasKey('plaintext_password', $user);
+    $this->assertArrayNotHasKey('password', $user);
     $this->assertMatchesRegularExpression('/^[$].+[$].+/', $user['hashed_password']);
 
     // Update to the loaded values should NOT result in the password being changed.
@@ -248,10 +248,10 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Now move on to tests with checkPermissions:TRUE
 
     // Check we are allowed to update this user's password if we provide our own, since we have 'cms:administer users'
-    // ...by plaintext_password
+    // ...by password
     $previousHash = $updatedUser['hashed_password'];
     $updatedUser = User::update(TRUE)
-      ->addValue('plaintext_password', 'topSecret')
+      ->addValue('password', 'topSecret')
       ->addWhere('id', '=', $user['id'])
       ->setActorPassword('secret1')
       ->setReload(TRUE)
@@ -276,7 +276,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Check that if we don't supply OUR correct password, we're not allowed to update the user's password.
     try {
       User::update(TRUE)
-        ->addValue('plaintext_password', 'anotherNewPassword')
+        ->addValue('password', 'anotherNewPassword')
         ->addWhere('id', '=', $user['id'])
         ->setActorPassword('wrong pass')
         ->execute();
@@ -289,7 +289,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Check that if we don't supply OUR password at all, we're not allowed to update the user's password.
     try {
       User::update(TRUE)
-        ->addValue('plaintext_password', 'anotherNewPassword')
+        ->addValue('password', 'anotherNewPassword')
         ->addWhere('id', '=', $user['id'])
         ->execute();
       $this->fail("Expected UnauthorizedException got none.");
@@ -304,7 +304,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Check we are allowed to update our own password if we provide the current one.
     $updatedUser = User::update(TRUE)
       ->setActorPassword('topSecret')
-      ->addValue('plaintext_password', 'ourNewSecret')
+      ->addValue('password', 'ourNewSecret')
       ->addWhere('id', '=', $user['id'])
       ->setReload(TRUE)
       ->execute()->first();
@@ -314,7 +314,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Check that if we don't supply OUR correct password, we're not allowed to update our password.
     try {
       User::update(TRUE)
-        ->addValue('plaintext_password', 'anotherNewPassword')
+        ->addValue('password', 'anotherNewPassword')
         ->addWhere('id', '=', $user['id'])
         ->setActorPassword('wrong pass')
         ->execute();
@@ -327,7 +327,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Check that if we don't supply OUR password at all, we're not allowed to update the user's password.
     try {
       User::update(TRUE)
-        ->addValue('plaintext_password', 'anotherNewPassword')
+        ->addValue('password', 'anotherNewPassword')
         ->addWhere('id', '=', $user['id'])
         ->execute();
       $this->fail("Expected UnauthorizedException got none.");
@@ -339,7 +339,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Check that we're not allowed to update the admin user's password, since we are not an admin.
     try {
       User::update(TRUE)
-        ->addValue('plaintext_password', 'anotherNewPassword')
+        ->addValue('password', 'anotherNewPassword')
         ->addWhere('id', '=', $adminUserID)
         ->setActorPassword('ourNewSecret')
         ->execute();
