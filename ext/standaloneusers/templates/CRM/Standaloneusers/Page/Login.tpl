@@ -255,8 +255,8 @@ a:hover, a:focus {
     <div class="message warning" style="display:none;" id="anonAccessDenied">{ts}You may need to login to access that.{/ts}</div>
     <form>
       <div>
-        <label for="usernameInput" class="form-label">Username</label>
-        <input type="password" class="form-control" id="usernameInput" >
+        <label for="usernameInput" name=username class="form-label">Username</label>
+        <input type="text" class="form-control" id="usernameInput" >
       </div>
       <div>
         <label for="passwordInput" class="form-label">Password</label>

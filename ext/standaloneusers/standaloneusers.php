@@ -1,5 +1,10 @@
 <?php
 
+// Define default URL to haveibeenpwned service. Set this empty in settings to disable.
+if (!defined('CIVICRM_HIBP_URL')) {
+  define('CIVICRM_HIBP_URL', 'https://api.pwnedpasswords.com/range/');
+}
+
 require_once 'standaloneusers.civix.php';
 // phpcs:disable
 use CRM_Standaloneusers_ExtensionUtil as E;

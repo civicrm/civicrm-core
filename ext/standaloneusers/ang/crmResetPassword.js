@@ -1,27 +1,29 @@
-(function (angular, $, _) {
+(function (angular) {
   "use strict";
 
-  angular.module('crmChangePassword', CRM.angRequires('crmChangePassword'));
+  angular.module('crmResetPassword', CRM.angRequires('crmResetPassword'));
 
-  angular.module('crmChangePassword').component('crmChangePassword', {
-    templateUrl: '~/crmChangePassword/crmChangePassword.html',
+  angular.module('crmResetPassword').component('crmResetPassword', {
+    templateUrl: '~/crmResetPassword/crmResetPassword.html',
     bindings: {
       // things listed here become properties on the controller using values from attributes.
       hibp: '@',
-      userId: '@'
+      token: '@'
     },
     controller: function($scope, $timeout, crmApi4) {
       var ts = $scope.ts = CRM.ts(null),
       ctrl = this;
 
-      console.log('init crmChangePassword component starting');
+      console.log('init crmResetPassword component starting');
       // $onInit gets run after the this controller is called, and after the bindings have been applied.
       // this.$onInit = function() { console.log('user', ctrl.userId); };
-      ctrl.actorPassword = '';
+      ctrl.formSubmitted = false;
       ctrl.newPassword = '';
       ctrl.newPasswordAgain = '';
+      ctrl.identifier = '';
       ctrl.busy = '';
       ctrl.pwnd = false;
+      ctrl.resetSuccessfullySubmitted = false;
 
       let updateAngular = (prop, newVal) => {
         $timeout(() => {
@@ -29,13 +31,29 @@
           ctrl[prop] = newVal;
         }, 0);
       };
+      ctrl.sendPasswordReset = () => {
+        updateAngular('busy', ts('Just a moment...'));
+        updateAngular('formSubmitted', true);
+        if (!ctrl.identifier) {
+          alert(ts('Please provide your username/email.'));
+          return;
+        }
+        crmApi4('User', 'SendPasswordReset', { identifier: ctrl.identifier })
+        .then(r => {
+          updateAngular('busy', '');
+          updateAngular('resetSuccessfullySubmitted', true);
+        })
+        .catch(e => {
+          updateAngular('busy', ts('Sorry, something went wrong. Please contact your site administrators.'));
+        });
+      };
 
       ctrl.attemptChange = () => {
         updateAngular('busy', '');
+        updateAngular('formSubmitted', true);
         updateAngular('pwnd', false);
-        updateAngular('formInactive', true);
         if (ctrl.newPassword.length < 8) {
-          alert(ts("C'mon now, you can do better than that."));
+          alert(ts("Passwords under 8 characters are simply not secure. Ideally you should use a secure password generator."));
           return;
         }
         if (ctrl.newPassword != ctrl.newPasswordAgain) {
@@ -76,19 +94,21 @@
 
         promises = promises.then(() => {
           updateAngular('busy', ctrl.busy + ts('Changing...'));
+          updateAngular('formSubmitted', true);
           // Now submit api request.
-          const userUpdateParams = {
-            actorPassword: ctrl.actorPassword,
-            values: {password: ctrl.newPassword},
-            where: [['id', '=', ctrl.userId]]
-          };
-          return crmApi4('User', 'Update', userUpdateParams)
-            .then(r => updateAngular('busy', ts('Password successfully updated')))
+          return crmApi4('User', 'PasswordReset', {
+              token: ctrl.token,
+              password: ctrl.newPassword,
+            })
+            .then(r => {
+              updateAngular('busy', ts('Password successfully updated. Redirecting to login...'));
+              $timeout(() => {
+                window.location = '/civicrm/login'
+                ctrl[prop] = newVal;
+              }, 1300);
+            })
             .catch(e => {
-              let msg = (e.error_message === 'Authorization failed') ?
-                ts("Sorry, that didn't work. Perhaps you mistyped your password?") :
-                e.error_message;
-              updateAngular('busy', msg);
+              updateAngular('token', 'invalid');
             });
         });
       };
@@ -109,4 +129,4 @@
       }
     }
   });
-})(angular, CRM.$, CRM._);
+})(angular);

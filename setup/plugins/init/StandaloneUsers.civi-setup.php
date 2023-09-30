@@ -55,6 +55,7 @@ if (!defined('CIVI_SETUP')) {
             'view event info',
             'register for events',
             'access password resets',
+            'authenticate with password', //xxx?
           ],
         ],
         [
@@ -77,9 +78,9 @@ if (!defined('CIVI_SETUP')) {
     $params = [
       'cms_name'   => $e->getModel()->extras['adminUser'],
       'cms_pass'   => $e->getModel()->extras['adminPass'],
-      'email'       => $adminEmail,
+      'email'      => $adminEmail,
       'notify'     => FALSE,
-      'contactID'  => $contactID,
+      'contact_id' => $contactID,
     ];
     $userID = \CRM_Core_BAO_CMSUser::create($params, 'email');
 

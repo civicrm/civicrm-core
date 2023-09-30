@@ -51,7 +51,7 @@ class PasswordReset extends AbstractAction {
       ->execute();
 
     $result['success'] = 1;
-    $result[] = ['success' => 1];
+    \Civi::log()->info("Changed password for user {userID} via User.PasswordReset", compact('userID'));
   }
 
 }

@@ -55,10 +55,11 @@ class User extends Generic\DAOEntity {
    * Permissions are wide on this but are checked in validateValues.
    */
   public static function permissions() {
+    $x=1;
     return [
       'default'           => ['access CiviCRM'],
-      'PasswordReset'     => ['access password resets'],
-      'SendPasswordreset' => ['access password resets'],
+      'passwordReset'     => ['access password resets'],
+      'sendPasswordReset' => ['access password resets'],
     ];
   }
 

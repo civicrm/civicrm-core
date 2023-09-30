@@ -1,6 +1,12 @@
 <?php
 namespace Civi\Api4\Action\User;
 
+// @todo
+// URL is (a) just theh path in the emails.
+// clicking button on form with proper token does nothing.
+// should redirect to login on success
+//
+
 use Civi;
 use Civi\Api4\Generic\Result;
 use API_Exception;
@@ -90,7 +96,8 @@ class SendPasswordReset extends AbstractAction {
     $token = static::updateToken($user['id']);
 
     list($domainFromName, $domainFromEmail) = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
-    $resetUrlPlaintext = \CRM_Utils_System::url('civicrm/password-reset', ['token' => $token], TRUE, NULL, FALSE, TRUE);
+    // xxx this is not generating https://blah - just the path. Why?
+    $resetUrlPlaintext = \CRM_Utils_System::url('civicrm/login/password', ['token' => $token], TRUE, NULL, FALSE);
     $resetUrlHtml = htmlspecialchars($resetUrlPlaintext);
     // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml}
     $params = [
