@@ -345,25 +345,28 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc $uploadNames = $this->get( 'uploadNames' );
-    $this->addButtons([
-        [
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'js' => ['onclick' => 'return verify( );'],
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'upload',
-          'name' => ts('Save and New'),
-          'js' => ['onclick' => 'return verify( );'],
-          'subName' => 'new',
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-    ]);
+    $buttons = [
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'js' => ['onclick' => 'return verify();'],
+        'isDefault' => TRUE,
+      ],
+    ];
+    if (!$this->_id) {
+      $buttons[] = [
+        'type' => 'upload',
+        'name' => ts('Save and New'),
+        'js' => ['onclick' => 'return verify();'],
+        'subName' => 'new',
+      ];
+    }
+    $buttons[] = [
+      'type' => 'cancel',
+      'name' => ts('Cancel'),
+    ];
 
+    $this->addButtons($buttons);
     $this->addFormRule(['CRM_Pledge_Form_Pledge', 'formRule'], $this);
 
     if ($this->_action & CRM_Core_Action::VIEW) {

@@ -389,15 +389,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     if ($this->_action & CRM_Core_Action::ADD) {
       $url = 'civicrm/admin/contribute/amount';
       $urlParams = "action=update&reset=1&id={$dao->id}";
-      // special case for 'Save and Done' consistency.
-      if ($this->controller->getButtonName('submit') == '_qf_Amount_upload_done') {
-        $url = 'civicrm/admin/contribute';
-        $urlParams = 'reset=1';
-        CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-          [1 => $this->getTitle()]
-        ), ts('Saved'), 'success');
-      }
-
       CRM_Utils_System::redirect(CRM_Utils_System::url($url, $urlParams));
     }
     parent::endPostProcess();

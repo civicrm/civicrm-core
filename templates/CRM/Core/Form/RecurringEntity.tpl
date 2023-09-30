@@ -13,11 +13,6 @@
     {ts 1=$recurringEntityType}Repeat %1{/ts}
   </div>
   <div class="crm-accordion-body">
-    {if !$recurringFormIsEmbedded}
-      <div class="crm-submit-buttons">
-        {include file="CRM/common/formButtons.tpl" location="top"}
-      </div>
-    {/if}
     <table class="form-layout-compressed">
       <tr class="crm-core-form-recurringentity-block-repetition_frequency">
         <td class="label">{$form.repetition_frequency_unit.label}&nbsp;<span class="crm-marker">*</span>  {help id="id-repeats" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>

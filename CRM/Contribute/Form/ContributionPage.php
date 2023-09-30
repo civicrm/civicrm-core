@@ -35,25 +35,11 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_pledgeBlockID;
 
   /**
-   * Are we in single form mode or wizard mode?
-   *
-   * @var bool
-   */
-  protected $_single;
-
-  /**
    * Is this the first page?
    *
    * @var bool
    */
   protected $_first = FALSE;
-
-  /**
-   * Is this the last page?
-   *
-   * @var bool
-   */
-  protected $_last = FALSE;
 
   /**
    * Store price set id.
@@ -97,10 +83,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     // setting title and 3rd level breadcrumb for html page if contrib page exists
     if ($this->_id) {
       $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-
-      if ($this->_action == CRM_Core_Action::UPDATE) {
-        $this->_single = TRUE;
-      }
     }
 
     // CRM-16776 - show edit/copy/create buttons on Profiles Tab if user has required permission.
@@ -166,57 +148,18 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       $this->addElement('hidden', 'cancelURL', $this->_cancelURL);
     }
 
-    if ($this->_single) {
-      $buttons = [
-        [
-          'type' => 'next',
-          'name' => ts('Save'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'upload',
-          'name' => ts('Save and Done'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'subName' => 'done',
-        ],
-      ];
-      if (!$this->_last) {
-        $buttons[] = [
-          'type' => 'submit',
-          'name' => ts('Save and Next'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'subName' => 'savenext',
-        ];
-      }
-      $buttons[] = [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ];
-      $this->addButtons($buttons);
-    }
-    else {
-      $buttons = [];
-      if (!$this->_first) {
-        $buttons[] = [
-          'type' => 'back',
-          'name' => ts('Previous'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        ];
-      }
-      $buttons[] = [
+    $buttons = [
+      [
         'type' => 'next',
-        'name' => ts('Continue'),
-        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'name' => ts('Save'),
         'isDefault' => TRUE,
-      ];
-      $buttons[] = [
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ];
-
-      $this->addButtons($buttons);
-    }
+      ],
+    ];
+    $this->addButtons($buttons);
 
     $session->replaceUserContext($this->_cancelURL);
 

@@ -17,10 +17,6 @@
         </div>
     {/if}
 <div class="crm-block crm-form-block crm-event-manage-fee-form-block">
-  <div class="crm-submit-buttons">
-   {include file="CRM/common/formButtons.tpl" location="top"}
-  </div>
-
     <table class="form-layout">
        <tr class="crm-event-manage-fee-form-block-title">
     <td class="label">{$form.title.label}</td>

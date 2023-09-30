@@ -892,7 +892,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         'isDefault' => TRUE,
       ],
     ];
-    if (CRM_Core_Permission::check('add contacts')) {
+    if (!$this->_contactId && CRM_Core_Permission::check('add contacts')) {
       $buttons[] = [
         'type' => 'upload',
         'name' => ts('Save and New'),

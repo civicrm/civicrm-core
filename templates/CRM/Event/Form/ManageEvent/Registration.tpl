@@ -25,9 +25,6 @@
     {help id="id-event-reg"}
   </div>
 <div class="crm-block crm-form-block crm-event-manage-registration-form-block">
-<div class="crm-submit-buttons">
-{include file="CRM/common/formButtons.tpl" location="top"}
-</div>
 
 <div id="register">
   <table class="form-layout">
