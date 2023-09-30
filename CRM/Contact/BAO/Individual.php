@@ -31,12 +31,12 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param CRM_Contact_BAO_Contact $contact
+   * @param CRM_Contact_DAO_Contact $contact
    *   Contact object.
    *
-   * @return CRM_Contact_BAO_Contact
+   * @return CRM_Contact_DAO_Contact
    */
-  public static function format(&$params, &$contact) {
+  public static function format(&$params, $contact) {
     if (!self::dataExists($params)) {
       return NULL;
     }
@@ -59,13 +59,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     $formalTitle = CRM_Utils_Array::value('formal_title', $params, '');
 
     // get prefix and suffix names
-    $prefix = $suffix = NULL;
-    if ($prefix_id) {
-      $params['individual_prefix'] = $prefix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'prefix_id', $prefix_id);
-    }
-    if ($suffix_id) {
-      $params['individual_suffix'] = $suffix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'suffix_id', $suffix_id);
-    }
+    $params['prefix_id:label'] = $prefix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'prefix_id', $prefix_id);
+    $params['suffix_id:label'] = $suffix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'suffix_id', $suffix_id);
 
     $individual = NULL;
     if ($contact->id) {
@@ -87,12 +82,12 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
           }
         }
 
-        foreach (['prefix', 'suffix'] as $name) {
-          $dbName = "{$name}_id";
-          $value = $individual->$dbName;
-          if ($value && !empty($params['preserveDBName'])) {
-            $useDBNames[] = $name;
-          }
+        if ($individual->suffix_id && !empty($params['preserveDBName'])) {
+          $useDBNames[] = 'suffix_id';
+        }
+
+        if ($individual->prefix_id && !empty($params['preserveDBName'])) {
+          $useDBNames[] = 'prefix_id';
         }
 
         if ($individual->formal_title && !empty($params['preserveDBName'])) {
@@ -168,8 +163,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         'middle_name' => $middleName,
         'last_name' => $lastName,
         'nick_name' => $nickName,
-        'individual_suffix' => $suffix,
-        'individual_prefix' => $prefix,
+        'suffix_id:label' => $suffix,
+        'prefix_id:label' => $prefix,
         'prefix_id' => $prefix_id,
         'suffix_id' => $suffix_id,
         'formal_title' => $formalTitle,

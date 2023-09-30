@@ -142,7 +142,7 @@ return [
     'name' => 'display_name_format',
     'type' => 'String',
     'html_type' => 'textarea',
-    'default' => '{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}',
+    'default' => '{contact.prefix_id:label}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.suffix_id:label}',
     'add' => '4.1',
     'title' => ts('Individual Display Name Format'),
     'is_domain' => 1,

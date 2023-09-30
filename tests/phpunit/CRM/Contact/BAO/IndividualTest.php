@@ -6,6 +6,11 @@
  */
 class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->revertSetting('display_name_format');
+    parent::tearDown();
+  }
+
   /**
    * Test case for format() with "null" value dates.
    *
@@ -30,7 +35,6 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
    *  Standard formatting is assumed.
    */
   public function testFormatDisplayName(): void {
-
     $params = [
       'contact_type' => 'Individual',
       'first_name' => 'Ben',
@@ -38,13 +42,17 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
       'individual_prefix' => 'Mr.',
       'individual_suffix' => 'Jr.',
     ];
-
     $contact = new CRM_Contact_DAO_Contact();
-
     CRM_Contact_BAO_Individual::format($params, $contact);
+    $this->assertEquals('Mr. Ben Lee Jr.', $contact->display_name);
+    $this->assertEquals('Lee, Ben', $contact->sort_name);
 
-    $this->assertEquals("Mr. Ben Lee Jr.", $contact->display_name);
-    $this->assertEquals("Lee, Ben", $contact->sort_name);
+    // Check with legacy tokens too.
+    \Civi::settings()->set('display_name_format', '{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}');
+    $contact = new CRM_Contact_DAO_Contact();
+    CRM_Contact_BAO_Individual::format($params, $contact);
+    $this->assertEquals('Mr. Ben Lee Jr.', $contact->display_name);
+    $this->assertEquals('Lee, Ben', $contact->sort_name);
   }
 
   /**
