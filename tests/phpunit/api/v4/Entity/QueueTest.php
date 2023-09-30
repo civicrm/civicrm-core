@@ -171,6 +171,49 @@ class QueueTest extends Api4TestBase {
     $this->assertEquals([6], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][2]);
   }
 
+  public function testRunLoop() {
+    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_runloop';
+    \Civi::dispatcher()->addListener('hook_civicrm_queueRun_testStuff', [$this, 'onHookQueueRun']);
+    $queue = \Civi::queue($queueName, [
+      'type' => 'SqlParallel',
+      'runner' => 'testStuff',
+      'error' => 'delete',
+      'batch_limit' => 4,
+    ]);
+    $this->assertQueueStats(0, 0, 0, $queue);
+
+    for ($i = 0; $i < 20; $i++) {
+      \Civi::queue($queueName)->createItem(['thingy' => $i]);
+    }
+
+    // 20 items ==> 4 per batch ==> 5 batches. Let's run the first 3...
+    $result = Queue::runLoop(0)->setQueue($queueName)->setMaxRequests(3)->execute();
+    $this->assertEquals([0, 1, 2, 3], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][0], 'Scope of first batch');
+    $this->assertEquals([4, 5, 6, 7], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][1], 'Scope of second batch');
+    $this->assertEquals([8, 9, 10, 11], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][2], 'Scope of third batch');
+    $this->assertEquals(12, $result[0]['item_successes']);
+    $this->assertEquals(0, $result[0]['item_errors']);
+    $this->assertEquals(3, $result[0]['loop_requests']);
+    $this->assertTrue(is_numeric($result[0]['loop_duration']));
+    $this->assertEquals('Reached request limit (3)', $result[0]['exit_message']);
+    $this->assertEquals(0, $result[0]['queue_blocked']);
+    $this->assertEquals(8, $result[0]['queue_ready'], 'Due to request limit, we left some items in queue');
+    $this->assertEquals(8, $result[0]['queue_total'], 'Due to request limit, we left some items in queue');
+
+    // And run any remaining batches...
+    $result = Queue::runLoop(0)->setQueue($queueName)->setMaxRequests(10)->execute();
+    $this->assertEquals([12, 13, 14, 15], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][3], 'Scope of fourth batch');
+    $this->assertEquals([16, 17, 18, 19], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][4], 'Scope of fifth batch');
+    $this->assertEquals(8, $result[0]['item_successes']);
+    $this->assertEquals(0, $result[0]['item_errors']);
+    $this->assertEquals(2 + 1, $result[0]['loop_requests']);
+    $this->assertTrue(is_numeric($result[0]['loop_duration']));
+    $this->assertEquals('No claimable items', $result[0]['exit_message']);
+    $this->assertEquals(0, $result[0]['queue_blocked'], 'Queue should be empty');
+    $this->assertEquals(0, $result[0]['queue_ready'], 'Queue should be empty');
+    $this->assertEquals(0, $result[0]['queue_total'], 'Queue should be empty');
+  }
+
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @see CRM_Utils_Hook::queueRun()
