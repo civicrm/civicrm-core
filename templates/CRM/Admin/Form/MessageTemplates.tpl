@@ -78,17 +78,18 @@
           <div class="clear"></div>
           <div class='html'>
             {$form.msg_html.html|crmAddClass:huge}
-            <div class="description">{ts}An HTML formatted version of this message will be sent to contacts whose Email Format preference is 'HTML' or 'Both'.{/ts}</div>
           </div>
         </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
 
-      <div id="msg_text_section" class="crm-accordion-wrapper crm-plaint_text_email-accordion ">
+      <div id="msg_text_section" class="crm-accordion-wrapper collapsed crm-plaint_text_email-accordion ">
         <div class="crm-accordion-header">
           {ts}Plain-Text Format{/ts}
         </div><!-- /.crm-accordion-header -->
         <div class="crm-accordion-body">
+          <div class="description">{ts}Most people will never see the text version but if that have configured their email to block the html version they may. recipient will see this text version. If there is no text version the html version will be converted to text by code. In most cases it is better to leave this blank. However, if you want extra formatting control you can configure it{/ts}</div>
           <div class="helpIcon" id="helptext">
+
             <input class="crm-token-selector big" data-field="msg_text" />
             {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
           </div>
