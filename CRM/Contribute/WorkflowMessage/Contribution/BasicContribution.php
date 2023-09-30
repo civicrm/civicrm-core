@@ -143,6 +143,10 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
       $this->setLineItem($mockOrder, $priceField, $priceFieldValue, $index);
     }
 
+    $contribution['address_id.name'] = 'Barbara Johnson';
+    $contribution['address_id.display'] = '790L Lincoln St S
+Baltimore, New York 10545
+United States';
     $contribution['total_amount'] = $mockOrder->getTotalAmount();
     $contribution['tax_amount'] = $mockOrder->getTotalTaxAmount() ? round($mockOrder->getTotalTaxAmount(), 2) : 0;
     $messageTemplate->setContribution($contribution);

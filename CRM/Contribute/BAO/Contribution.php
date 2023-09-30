@@ -409,6 +409,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     $billingFirstName = $params['billing_first_name'] ?? NULL;
     $billingMiddleName = $params['billing_middle_name'] ?? NULL;
     $billingLastName = $params['billing_last_name'] ?? NULL;
+    // Note this is NOT used when creating a billing address. It is probably passed
+    // the the payment processor - which is horrible & could maybe change.
     $addressParams['address_name'] = "{$billingFirstName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingMiddleName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingLastName}";
 
     foreach ($billingFields as $value) {
@@ -1664,8 +1666,13 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
     $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
     [$hasBillingField, $addressParams] = self::getBillingAddressParams($params, $billingLocationTypeID);
     if ($hasBillingField) {
-      $address = CRM_Core_BAO_Address::writeRecord($addressParams);
-      return $address->id;
+      $nameFields = [
+        $params['billing_first_name'] ?? NULL,
+        $params['billing_middle_name'] ?? NULL,
+        $params['billing_last_name'] ?? NULL,
+      ];
+      $addressParams['name'] = implode(' ', array_filter($nameFields));
+      return (int) CRM_Core_BAO_Address::writeRecord($addressParams)->id;
     }
     return NULL;
 

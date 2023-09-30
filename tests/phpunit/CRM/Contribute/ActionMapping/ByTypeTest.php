@@ -447,6 +447,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
         'contribution_page_id.pay_later_text' => 'Pay Later Text',
         'contribution_page_id.pay_later_receipt' => 'Pay Later Receipt',
         'contribution_page_id.receipt_text' => 'Receipt Text',
+        'address_id.id' => 'Address ID',
+        'address_id.name' => 'Billing Address Name',
+        'address_id.display' => 'Billing Address',
       ], $comparison);
   }
 

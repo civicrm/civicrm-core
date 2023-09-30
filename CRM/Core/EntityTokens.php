@@ -701,4 +701,35 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     return $cacheKey;
   }
 
+  /**
+   * Get metadata for tokens for a related entity joined by a field on the main entity.
+   *
+   * @param string $entity
+   * @param string $joinField
+   * @param array $tokenList
+   * @param array $hiddenTokens
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRelatedTokensForEntity(string $entity, string $joinField, array $tokenList, $hiddenTokens = []): array {
+    $apiParams = ['checkPermissions' => FALSE];
+    if ($tokenList !== ['*']) {
+      $apiParams['where'] = [['name', 'IN', $tokenList]];
+    }
+    $relatedTokens = civicrm_api4($entity, 'getFields', $apiParams);
+    $tokens = [];
+    foreach ($relatedTokens as $relatedToken) {
+      $tokens[$joinField . '.' . $relatedToken['name']] = [
+        'title' => $relatedToken['title'],
+        'name' => $joinField . '.' . $relatedToken['name'],
+        'type' => 'mapped',
+        'data_type' => $relatedToken['data_type'],
+        'input_type' => $relatedToken['input_type'],
+        'audience' => in_array($relatedToken['name'], $hiddenTokens, TRUE) ? 'hidden' : 'user',
+      ];
+    }
+    return $tokens;
+  }
+
 }

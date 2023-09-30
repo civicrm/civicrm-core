@@ -204,11 +204,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
           'custom.*',
         ], $this->getExposedFields()))
         ->execute()->first();
-      $addressValues = [
-        'address_name' => $event['loc_block_id.address_id.name'],
-        'state_province' => $event['loc_block_id.address_id.state_province_id:label'],
-        'country' => $event['loc_block_id.address_id.country_id:label'],
-      ];
+      $addressValues = ['address_name' => $event['loc_block_id.address_id.name']];
       foreach ($event as $key => $value) {
         if (strpos($key, 'loc_block_id.address_id.') === 0) {
           $addressValues[str_replace('loc_block_id.address_id.', '', $key)] = $value;
