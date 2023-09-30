@@ -151,7 +151,6 @@ trait CRM_Contact_Form_Task_PDFTrait {
     $form->assign('totalSelectedContacts', !is_null($form->_contactIds) ? count($form->_contactIds) : 0);
 
     $form->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
-
     $documentTypes = implode(',', CRM_Core_SelectValues::documentApplicationType());
     $form->addElement('file', "document_file", 'Upload Document', 'size=30 maxlength=255 accept="' . $documentTypes . '"');
     $form->addUploadElement("document_file");

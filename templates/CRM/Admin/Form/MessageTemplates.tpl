@@ -42,7 +42,7 @@
           <td>
             {$form.msg_subject.html|crmAddClass:huge}
             <input class="crm-token-selector big" data-field="msg_subject" />
-            {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
+            {help id="id-token-subject" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
           </td>
         </tr>
         <tr>
@@ -73,7 +73,7 @@
         <div class="crm-accordion-body">
           <div class="helpIcon" id="helphtml">
             <input class="crm-token-selector big" data-field="msg_html" />
-            {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
+            {help id="id-token-html" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
           </div>
           <div class="clear"></div>
           <div class='html'>
