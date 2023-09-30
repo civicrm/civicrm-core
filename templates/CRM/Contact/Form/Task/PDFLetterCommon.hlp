@@ -24,13 +24,12 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{php}$this->assign('uploadFormatsSupported', '.' . implode(', .', array_keys(CRM_Utils_PDF_Document::$ooxmlMap)));{/php}
 {htxt id="template"}
   <p>
     {ts}Select a pre-existing template, or upload a document for mail merge.{/ts}
   </p>
   <p>
-    {ts 1=$uploadFormatsSupported}Supported file formats: %1{/ts}
+    {ts 1="docx, odt"}Supported file formats: docx, odt{/ts}
   </p>
 {/htxt}
 
