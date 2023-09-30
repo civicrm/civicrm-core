@@ -27,7 +27,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   public function testSubmit(): void {
     $this->submitPaidEvent();
     $this->assertSentMailHasStrings([
-      'Dear Kim,  Thank you for your registration.  This is a confirmation that your registration has been received and your status has been updated to Registered.',
+      'Thank you for your registration.',
+      'This is a confirmation that your registration has been received and your',
+      'status has been updated to
+REGISTERED',
       'Friday September 16th, 2022 12:00 PM-Saturday September 17th, 2022 12:00 PM',
       'Add event to Google Calendar',
     ]);
@@ -375,7 +378,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ],
     ]);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
-    $mut->checkMailLog(['Comment: ' . $event['note'] . chr(0x0A)]);
+    $mut->checkMailLog(['Comment', $event['note']]);
     $mut->stop();
     $mut->clearMessages();
     //return ['contact_id' => $contact_id, 'participant_id' => $participant['id']];
@@ -614,7 +617,11 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ]
     );
     $mut->checkMailLog([
-      'Dear Bruce No Contribute,  Thank you for your registration.  This is a confirmation that your registration has been received and your status has been updated to Registered.',
+      'Dear Bruce No Contribute',
+      'Thank you for your registration.',
+      'This is a confirmation that your registration has been received',
+      'and your status has been updated to',
+      'REGISTERED.',
     ]);
     $mut->stop();
     $mut->clearMessages();
