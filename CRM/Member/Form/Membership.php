@@ -377,8 +377,8 @@ DESC limit 1");
           NULL, ['onchange' => "buildAmount( this.value );"]
         );
       }
-      $this->assign('hasPriceSets', $buildPriceSet);
     }
+    $this->assign('hasPriceSets', $buildPriceSet ?? NULL);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons([
