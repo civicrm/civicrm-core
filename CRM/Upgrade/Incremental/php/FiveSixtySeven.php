@@ -56,7 +56,29 @@ class CRM_Upgrade_Incremental_php_FiveSixtySeven extends CRM_Upgrade_Incremental
     $this->addTask('Add cache_fill_took column to Group table', 'addColumn', 'civicrm_group', 'cache_fill_took',
       'DOUBLE DEFAULT NULL COMMENT "Seconds taken to fill smart group cache, not always related to cache_date"',
       FALSE);
-    $this->addTask('Update civicrm_mailing_event_queue to permit deleting records from civicrm_mailing_job', 'updateMailingEventQueueTable', 'updateMailingEventQueueTable');
+    $this->addTask('Update civicrm_mailing_event_queue to permit deleting records from civicrm_mailing_job', 'updateMailingEventQueueTable');
+    $this->addTask('Update CiviMail menus labels', 'updateMailingMenuLabels');
+  }
+
+  /**
+   * Some time ago, the labels for Mailing menu items were simplified for new
+   * installs. Now that the old strings have been removed from Transifex, it
+   * breaks translations, so we force the update, but only if the label was not
+   * customized (if name=label).
+   */
+  public static function updateMailingMenuLabels(CRM_Queue_TaskContext $ctx): bool {
+    $changes = [
+      'Draft and Unscheduled Mailings' => 'Draft Mailings',
+      'Scheduled and Sent Mailings' => 'Sent Mailings',
+    ];
+    foreach ($changes as $old => $new) {
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_navigation SET label = %1 WHERE name = %2 AND label = %3', [
+        1 => [$new, 'String'],
+        2 => [$old, 'String'],
+        3 => [$old, 'String'],
+      ]);
+    }
+    return TRUE;
   }
 
   /**
