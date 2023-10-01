@@ -75,12 +75,20 @@
           }
         }
 
+        function isSelect2() {
+          return $element.is('.select2-container + input');
+        }
+
         // Copied from ng-list but applied conditionally if field is multi-valued
-        var parseList = function(viewValue) {
+        var parseFieldInput = function(viewValue) {
           // If the viewValue is invalid (say required but empty) it will be `undefined`
           if (_.isUndefined(viewValue)) return;
 
-          if (!multi) {
+          if ((viewValue === '1' || viewValue === '0') && ctrl.field.data_type === 'Boolean') {
+            return viewValue === '1';
+          }
+
+          if (!multi || !isSelect2()) {
             return viewValue;
           }
 
@@ -95,12 +103,20 @@
           return list;
         };
 
+        var formatViewValue = function(value) {
+          if (Array.isArray(value)) {
+            return value.join(',');
+          }
+          if (typeof value === 'boolean') {
+            return value ? '1' : '0';
+          }
+          return value;
+        };
+
         this.$onInit = function() {
           // Copied from ng-list
-          ctrl.ngModel.$parsers.push(parseList);
-          ctrl.ngModel.$formatters.push(function(value) {
-            return _.isArray(value) ? value.join(',') : value;
-          });
+          ctrl.ngModel.$parsers.push(parseFieldInput);
+          ctrl.ngModel.$formatters.push(formatViewValue);
 
           // Copied from ng-list
           ctrl.ngModel.$isEmpty = function(value) {
