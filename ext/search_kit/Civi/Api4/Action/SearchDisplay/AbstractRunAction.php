@@ -1388,14 +1388,17 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if ($filterAttr && is_string($filterAttr) && $filterAttr[0] === '{') {
       foreach (\CRM_Utils_JS::decode($filterAttr) as $filterKey => $filterVal) {
         // Automatically apply filters from the markup if they have a value
-        if ($filterVal !== NULL) {
+        // Only do this if there's one instance of the display on the form
+        if ($afform['searchDisplay']['count'] === 1 && $filterVal !== NULL) {
           unset($this->filters[$filterKey]);
           if ($this->hasValue($filterVal)) {
             $this->applyFilter(explode(',', $filterKey), $filterVal);
           }
         }
         // If it's a javascript variable it will have come back from decode() as NULL;
-        // whitelist it to allow it to be passed to this api from javascript.
+        // Or if there's more than one instance of the display on the form, they might
+        // use different filters.
+        // Just whitelist it so the value passed in will be accepted.
         else {
           $filterKeys[] = $filterKey;
         }
@@ -1423,22 +1426,37 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if (empty($afform['layout'])) {
         return FALSE;
       }
+      $afform['searchDisplay'] = NULL;
       // Get all search display fieldsets (which will have an empty value for the af-fieldset attribute)
       $fieldsets = \CRM_Utils_Array::findAll($afform['layout'], ['af-fieldset' => '']);
       // As a fallback, search the entire afform in case the search display is not in a fieldset
       $fieldsets['form'] = $afform['layout'];
-      // Validate that the afform contains this search display
+      // Search for one or more instance of this search display
       foreach ($fieldsets as $key => $fieldset) {
-        $afform['searchDisplay'] = \CRM_Utils_Array::findAll(
-            $fieldset,
-            ['#tag' => $this->display['type:name'], 'search-name' => $this->savedSearch['name'], 'display-name' => $this->display['name']]
-          )[0] ?? NULL;
+        if ($key === 'form' && $afform['searchDisplay']) {
+          // Already found in a fieldset, don't search the whole form
+          continue;
+        }
+        $displays = \CRM_Utils_Array::findAll(
+          $fieldset,
+          ['#tag' => $this->display['type:name'], 'search-name' => $this->savedSearch['name'], 'display-name' => $this->display['name']]
+        );
+        if (!$displays) {
+          continue;
+        }
+        // Already found, just increment the count
         if ($afform['searchDisplay']) {
+          $afform['searchDisplay']['count'] += count($displays);
+        }
+        else {
+          $afform['searchDisplay'] = $displays[0];
+          $afform['searchDisplay']['count'] = count($displays);
           // Set the fieldset for this display (if it is in one and we haven't fallen back to the whole form)
+          // TODO: This just uses the first fieldset, but there could be multiple. Potentially could use filters to match it.
           $afform['searchDisplay']['fieldset'] = $key === 'form' ? [] : $fieldset;
-          return $this->_afform = $afform;
         }
       }
+      $this->_afform = $afform;
     }
     return $this->_afform;
   }
