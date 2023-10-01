@@ -410,7 +410,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       ->addChain('export', OptionGroup::export()->setId('$id'))
       ->execute()->first();
     $this->assertEquals('from_email_address', $result['export'][1]['params']['values']['option_group_id.name']);
-    $this->assertNull($result['export'][1]['params']['values']['visibility_id']);
+    $this->assertArrayNotHasKey('visibility_id', $result['export'][1]['params']['values']);
     $this->assertStringStartsWith('OptionGroup_from_email_address_OptionValue_', $result['export'][1]['name']);
     // All references should be from the current domain
     foreach (array_slice($result['export'], 1) as $reference) {

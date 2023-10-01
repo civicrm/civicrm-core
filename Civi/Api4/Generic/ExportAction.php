@@ -161,6 +161,12 @@ class ExportAction extends AbstractAction {
         unset($record[$fieldName]);
       }
     }
+    // Unset values that match the default
+    foreach ($allFields as $fieldName => $field) {
+      if (($record[$fieldName] ?? NULL) === $field['default_value']) {
+        unset($record[$fieldName]);
+      }
+    }
     $export = [
       'name' => $name,
       'entity' => $entityType,
