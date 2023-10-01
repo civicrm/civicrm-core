@@ -1122,7 +1122,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     ]);
     $context['eventId'] = $this->eventCreateUnpaid([
       'title' => 'The Webinar',
-      'description' => '<p>Some online webinar thingy.</p> <p>Attendees will need to install the <a href="http://telefoo.example.com">TeleFoo</a> app.</p>',
+      'description' => '<p>Some online webinar thingy.</p><p>Attendees will need to install the <a href="http://telefoo.example.com">TeleFoo</a> app.</p>',
     ])['id'];
 
     $messages = $expected = [];
@@ -1138,15 +1138,10 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     $messages['event_text'] = 'You signed up for this event: {event.title}: {event.description}';
     $expected['event_text'] = 'You signed up for this event: The Webinar: Some online webinar thingy.
 
-Attendees will need to install the TeleFoo [1] app.
-
-
-Links:
-------
-[1] http://telefoo.example.com';
+Attendees will need to install the [TeleFoo](http://telefoo.example.com) app.';
 
     $messages['event_html'] = '<p>You signed up for this event:</p> <h3>{event.title}</h3> {event.description}';
-    $expected['event_html'] = '<p>You signed up for this event:</p> <h3>The Webinar</h3> <p>Some online webinar thingy.</p> <p>Attendees will need to install the <a href="http://telefoo.example.com">TeleFoo</a> app.</p>';
+    $expected['event_html'] = '<p>You signed up for this event:</p> <h3>The Webinar</h3> <p>Some online webinar thingy.</p><p>Attendees will need to install the <a href="http://telefoo.example.com">TeleFoo</a> app.</p>';
 
     $rendered = CRM_Core_TokenSmarty::render($messages, $context);
 

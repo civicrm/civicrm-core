@@ -445,8 +445,7 @@ class CRM_Utils_String {
    */
   public static function htmlToText($html) {
     $token_html = preg_replace('!\{([a-z_.]+)\}!i', 'token:{$1}', $html);
-    $converter = new \Html2Text\Html2Text($token_html, ['do_links' => 'table', 'width' => 75]);
-    $token_text = $converter->getText();
+    $token_text = \Soundasleep\Html2Text::convert($token_html, ['ignore_errors' => TRUE]);
     $text = preg_replace('!token\:\{([a-z_.]+)\}!i', '{$1}', $token_text);
     return $text;
   }
