@@ -87,7 +87,7 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
         ['is_reserved' => TRUE, 'is_default' => FALSE],
         ['is_reserved' => FALSE, 'is_default' => TRUE],
       ])
-      ->execute()->getArrayCopy();
+      ->execute();
 
   }
 
