@@ -316,7 +316,7 @@
     <!-- end of PCP -->
 
     {if !$payNow}
-      {include file="CRM/common/customDataBlock.tpl"}
+      {include file="CRM/common/customDataBlock.tpl" cid=$contactId}
     {/if}
 
     {literal}

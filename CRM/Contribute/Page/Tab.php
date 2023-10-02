@@ -428,7 +428,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
-    if ($context == 'standalone') {
+    if ($context === 'standalone') {
       $this->_action = CRM_Core_Action::ADD;
     }
     else {
@@ -439,11 +439,11 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
           'return' => 'contact_id',
         ]);
       }
-      $this->assign('contactId', $this->_contactId);
 
       // check logged in url permission
       CRM_Contact_Page_View::checkUserPermission($this);
     }
+    $this->assign('contactId', $this->_contactId);
     $this->assign('action', $this->_action);
 
     if ($this->_permission == CRM_Core_Permission::EDIT && !CRM_Core_Permission::check('edit contributions')) {
