@@ -47,6 +47,12 @@ class ActionNameTest extends Api4TestBase {
     // then this test will no longer be testing what it thinks it's testing!
     $this->assertFalse(method_exists(MockArrayEntity::class, 'doNothing'));
 
+    // Try it with normal case
+    $action = MockArrayEntity::doNothing();
+    // Ensure case was converted internally by the action class
+    $this->assertEquals('doNothing', $action->getActionName());
+    $this->assertEquals('MockArrayEntity', $action->getEntityName());
+
     // PHP is case-insensitive so this will work <sigh>
     $action = moCKarrayENTIty::DOnothING();
     // Ensure case was converted internally by the action class
