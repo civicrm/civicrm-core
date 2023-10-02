@@ -1,5 +1,22 @@
 <?php
 
+// Conditionally add join only if CiviCase is enabled
+$civiCaseEnabled = CRM_Core_Component::isEnabled('CiviCase');
+$joins = [
+  [
+    'Contact AS RelationshipCache_Contact_far_contact_id_01',
+    'LEFT',
+    ['far_contact_id', '=', 'RelationshipCache_Contact_far_contact_id_01.id'],
+  ],
+];
+if ($civiCaseEnabled) {
+  $joins[] = [
+    'Case AS RelationshipCache_Case_case_id_01',
+    'LEFT',
+    ['case_id', '=', 'RelationshipCache_Case_case_id_01.id'],
+  ];
+}
+
 return [
   [
     'name' => 'SavedSearch_Contact_Summary_Relationships',
@@ -30,17 +47,7 @@ return [
           'orderBy' => [],
           'where' => [],
           'groupBy' => [],
-          'join' => [
-            [
-              'Contact AS RelationshipCache_Contact_far_contact_id_01',
-              'LEFT',
-              [
-                'far_contact_id',
-                '=',
-                'RelationshipCache_Contact_far_contact_id_01.id',
-              ],
-            ],
-          ],
+          'join' => $joins,
           'having' => [],
         ],
       ],
@@ -227,6 +234,16 @@ return [
                   'style' => 'danger',
                   'path' => '',
                   'task' => '',
+                  'condition' => [],
+                ],
+                [
+                  'entity' => 'Case',
+                  'action' => 'view',
+                  'join' => 'RelationshipCache_Case_case_id_01',
+                  'target' => '',
+                  'icon' => 'fa-folder-open',
+                  'text' => ts('Manage Case'),
+                  'style' => 'default',
                   'condition' => [],
                 ],
               ],
