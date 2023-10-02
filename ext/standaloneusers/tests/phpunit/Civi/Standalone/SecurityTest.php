@@ -394,7 +394,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
 
     // Attempt to change the user's password using this token to authenticate.
-    $result = User::PasswordReset(TRUE)
+    $result = User::passwordReset(TRUE)
       ->setToken($token)
       ->setPassword('fingersCrossed')
       ->execute();
@@ -405,7 +405,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     // Should not work a 2nd time with same token.
     try {
-      User::PasswordReset(TRUE)
+      User::passwordReset(TRUE)
         ->setToken($token)
         ->setPassword('oooh')
         ->execute();

@@ -43,7 +43,7 @@
           alert(ts('Please provide your username/email.'));
           return;
         }
-        crmApi4('User', 'SendPasswordReset', { identifier: ctrl.identifier })
+        crmApi4('User', 'sendPasswordReset', { identifier: ctrl.identifier })
         .then(r => {
           updateAngular('busy', '');
           updateAngular('resetSuccessfullySubmitted', true);
@@ -101,7 +101,7 @@
           updateAngular('busy', ctrl.busy + ts('Changing...'));
           updateAngular('formSubmitted', true);
           // Now submit api request.
-          return crmApi4('User', 'PasswordReset', {
+          return crmApi4('User', 'passwordReset', {
               token: ctrl.token,
               password: ctrl.newPassword,
             })

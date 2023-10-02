@@ -59,9 +59,6 @@ class User extends Generic\DAOEntity {
       'default'           => ['access CiviCRM'],
       'passwordReset'     => ['access password resets'],
       'sendPasswordReset' => ['access password resets'],
-
-      'PasswordReset'     => ['access password resets'],
-      'SendPasswordReset' => ['access password resets'],
     ];
   }
 
