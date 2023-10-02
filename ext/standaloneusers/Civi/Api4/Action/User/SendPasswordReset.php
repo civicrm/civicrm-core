@@ -71,7 +71,6 @@ class SendPasswordReset extends AbstractAction {
 
       $workflowMessage = Security::singleton()->preparePasswordResetWorkflow($user, $token);
       if ($workflowMessage) {
-        /** @var \CRM_Standalone_WorkflowMessage_PasswordReset $workflowMessage */
         // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml} {$usernamePlaintext} {$usernameHtml}
         try {
           [$sent, /*$subject, $text, $html*/] = $workflowMessage->sendTemplate();

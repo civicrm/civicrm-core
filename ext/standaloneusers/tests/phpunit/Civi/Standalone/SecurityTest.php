@@ -417,7 +417,6 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     // Check the message template generation
     $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
-    /** @var \CRM_Standalone_WorkflowMessage_PasswordReset */
     $workflow = $security->preparePasswordResetWorkflow($user, $token);
     $result = $workflow->renderTemplate();
 

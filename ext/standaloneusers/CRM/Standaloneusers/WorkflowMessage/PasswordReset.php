@@ -9,7 +9,8 @@ use Civi\WorkflowMessage\GenericWorkflowMessage;
  * @method static setUsernameHtml(string $s)
  *
  */
-class CRM_Standalone_WorkflowMessage_PasswordReset extends GenericWorkflowMessage {
+class CRM_Standaloneusers_WorkflowMessage_PasswordReset extends GenericWorkflowMessage {
+
   public const WORKFLOW = 'password_reset';
 
   /**

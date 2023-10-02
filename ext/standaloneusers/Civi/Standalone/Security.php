@@ -5,7 +5,7 @@ use CRM_Core_Session;
 use Civi;
 use Civi\Api4\User;
 use Civi\Api4\MessageTemplate;
-use CRM_Standalone_WorkflowMessage_PasswordReset;
+use CRM_Standaloneusers_WorkflowMessage_PasswordReset;
 
 /**
  * This is a single home for security related functions for Civi Standalone.
@@ -422,9 +422,9 @@ class Security {
   /**
    * Prepare a password reset workflow email, if configured.
    *
-   * @return \CRM_Standalone_WorkflowMessage_PasswordReset|null
+   * @return \CRM_Standaloneusers_WorkflowMessage_PasswordReset|null
    */
-  public function preparePasswordResetWorkflow(array $user, string $token): ?CRM_Standalone_WorkflowMessage_PasswordReset {
+  public function preparePasswordResetWorkflow(array $user, string $token): ?CRM_Standaloneusers_WorkflowMessage_PasswordReset {
     // Find the message template
     $tplID = MessageTemplate::get(FALSE)
       ->setSelect(['id'])
@@ -445,7 +445,7 @@ class Security {
 
     // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml} {$usernamePlaintext} {$usernameHtml}
     list($domainFromName, $domainFromEmail) = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
-    $workflowMessage = (new \CRM_Standalone_WorkflowMessage_PasswordReset())
+    $workflowMessage = (new \CRM_Standaloneusers_WorkflowMessage_PasswordReset())
       ->setDataFromUser($user, $token)
       ->setFrom("\"$domainFromName\" <$domainFromEmail>");
 
