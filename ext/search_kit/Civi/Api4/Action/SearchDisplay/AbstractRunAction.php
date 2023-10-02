@@ -590,6 +590,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function getPermittedLinkAction(string $entityName, string $actionName): ?string {
     // Load api actions and cache for performance (this function may be called hundreds of times per request)
     if (!isset($this->entityActions[$entityName])) {
+      if (!CoreUtil::entityExists($entityName)) {
+        return NULL;
+      }
       $this->entityActions[$entityName] = [
         'all' => civicrm_api4($entityName, 'getActions', ['checkPermissions' => FALSE])->column('name'),
         'allowed' => civicrm_api4($entityName, 'getActions', ['checkPermissions' => TRUE])->column('name'),
@@ -668,10 +671,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       'text' => '',
       'title' => '',
       'prefix' => '',
+      'key' => '',
     ];
     $entity = $link['entity'];
-    $idKey = $this->getIdKeyName($link['entity']);
-    if ($entity) {
+    if ($entity && CoreUtil::entityExists($entity)) {
+      $idKey = $this->getIdKeyName($entity);
       // Hack to support links to relationships
       if ($entity === 'Relationship') {
         $entity = 'RelationshipCache';
@@ -715,8 +719,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $link['action'] = $task['apiBatch']['action'] ?? NULL;
         }
       }
+      $link['key'] = $link['prefix'] . $idKey;
     }
-    $link['key'] = $link['prefix'] . $idKey;
     return $link;
   }
 

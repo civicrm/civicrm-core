@@ -421,7 +421,7 @@ class Api4SelectQuery extends Api4Query {
    */
   public function checkEntityAccess($entity) {
     if (!$this->getCheckPermissions()) {
-      return TRUE;
+      return CoreUtil::entityExists($entity);
     }
     if (!isset($this->entityAccess[$entity])) {
       try {
@@ -431,7 +431,8 @@ class Api4SelectQuery extends Api4Query {
         ])->first();
       }
       // Anonymous users might not even be allowed to use 'getActions'
-      catch (UnauthorizedException $e) {
+      // Or tne entity might not exist
+      catch (\CRM_Core_Exception $e) {
         $this->entityAccess[$entity] = FALSE;
       }
     }
