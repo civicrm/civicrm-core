@@ -67,4 +67,19 @@ class WordPress implements AuthxInterface {
     return empty($id) ? NULL : $id;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function getUserStatus($userId) {
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getUserIsBlocked($userId) {
+    // ToDo
+    return FALSE;
+  }
+
 }
