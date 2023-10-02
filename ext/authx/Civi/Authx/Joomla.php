@@ -95,4 +95,12 @@ class Joomla implements AuthxInterface {
     return ($user->guest) ? NULL : $user->id;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function getUserIsBlocked($userId) {
+    // ToDo
+    return FALSE;
+  }
+
 }

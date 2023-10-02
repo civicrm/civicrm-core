@@ -262,6 +262,10 @@ class Authenticator extends AutoService implements HookInterface {
       return !empty($a) && (string) $a === (string) $b;
     };
 
+    if ($this->authxUf->getUserIsBlocked($tgt->userId)) {
+      $this->reject('Cannot login. User is blocked.');
+    }
+
     if (\CRM_Core_Session::getLoggedInContactID() || $this->authxUf->getCurrentUserId()) {
       if ($isSameValue(\CRM_Core_Session::getLoggedInContactID(), $tgt->contactId)  && $isSameValue($this->authxUf->getCurrentUserId(), $tgt->userId)) {
         // Already logged in. Post-condition met - but by unusual means.
