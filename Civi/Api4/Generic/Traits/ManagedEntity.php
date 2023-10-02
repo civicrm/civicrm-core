@@ -27,8 +27,7 @@ trait ManagedEntity {
    */
   public static function revert($checkPermissions = TRUE) {
     return (new BasicBatchAction(static::getEntityName(), __FUNCTION__, function($item, BasicBatchAction $action) {
-      $params = ['entity_type' => $action->getEntityName(), 'entity_id' => $item['id']];
-      if (\CRM_Core_ManagedEntities::singleton()->revert($params)) {
+      if (\CRM_Core_ManagedEntities::singleton()->revert($action->getEntityName(), $item['id'])) {
         return $item;
       }
       else {

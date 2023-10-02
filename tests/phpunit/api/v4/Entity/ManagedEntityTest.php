@@ -85,6 +85,17 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
    * @throws \CRM_Core_Exception
    */
   public function testRevertSavedSearch(): void {
+    $originalState = [
+      'name' => 'TestManagedSavedSearch',
+      'label' => 'Test Saved Search',
+      'description' => 'Original state',
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id'],
+        'orderBy' => ['id', 'ASC'],
+      ],
+    ];
     $this->_managedEntities[] = [
       // Setting module to 'civicrm' works for the test but not sure we should actually support that
       // as it's probably better to package stuff in a core extension instead of core itself.
@@ -95,17 +106,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       'update' => 'never',
       'params' => [
         'version' => 4,
-        'values' => [
-          'name' => 'TestManagedSavedSearch',
-          'label' => 'Test Saved Search',
-          'description' => 'Original state',
-          'api_entity' => 'Contact',
-          'api_params' => [
-            'version' => 4,
-            'select' => ['id'],
-            'orderBy' => ['id', 'ASC'],
-          ],
-        ],
+        'values' => $originalState,
       ],
     ];
 
@@ -113,20 +114,24 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
 
     $search = SavedSearch::get(FALSE)
       ->addWhere('name', '=', 'TestManagedSavedSearch')
-      ->addSelect('description', 'local_modified_date')
+      ->addSelect('*', 'local_modified_date')
       ->execute()->single();
-    $this->assertEquals('Original state', $search['description']);
+    foreach ($originalState as $fieldName => $originalValue) {
+      $this->assertEquals($originalValue, $search[$fieldName]);
+    }
+    $this->assertNull($search['expires_date']);
     $this->assertNull($search['local_modified_date']);
 
     SavedSearch::update(FALSE)
       ->addValue('id', $search['id'])
       ->addValue('description', 'Altered state')
+      ->addValue('expires_date', 'now + 1 year')
       ->execute();
 
     $time = $this->getCurrentTimestamp();
     $search = SavedSearch::get(FALSE)
       ->addWhere('name', '=', 'TestManagedSavedSearch')
-      ->addSelect('description', 'has_base', 'base_module', 'local_modified_date')
+      ->addSelect('*', 'has_base', 'base_module', 'local_modified_date')
       ->execute()->single();
     $this->assertEquals('Altered state', $search['description']);
     // Check calculated fields
@@ -135,6 +140,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     // local_modified_date should reflect the update just made
     $this->assertGreaterThanOrEqual($time, $search['local_modified_date']);
     $this->assertLessThanOrEqual($this->getCurrentTimestamp(), $search['local_modified_date']);
+    $this->assertGreaterThan($time, $search['expires_date']);
 
     SavedSearch::revert(FALSE)
       ->addWhere('name', '=', 'TestManagedSavedSearch')
@@ -143,10 +149,13 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     // Entity should be revered to original state
     $result = SavedSearch::get(FALSE)
       ->addWhere('name', '=', 'TestManagedSavedSearch')
-      ->addSelect('description', 'has_base', 'base_module', 'local_modified_date')
+      ->addSelect('*', 'has_base', 'base_module', 'local_modified_date')
       ->execute();
     $search = $result->single();
-    $this->assertEquals('Original state', $search['description']);
+    foreach ($originalState as $fieldName => $originalValue) {
+      $this->assertEquals($originalValue, $search[$fieldName]);
+    }
+    $this->assertNull($search['expires_date']);
     // Check calculated fields
     $this->assertTrue($search['has_base']);
     $this->assertEquals('civicrm', $search['base_module']);
