@@ -14,16 +14,21 @@
       var ts = $scope.ts = CRM.ts(null),
       ctrl = this;
 
-      console.log('init crmResetPassword component starting');
+      // console.log('init crmResetPassword component starting');
       // $onInit gets run after the this controller is called, and after the bindings have been applied.
       // this.$onInit = function() { console.log('user', ctrl.userId); };
-      ctrl.formSubmitted = false;
-      ctrl.newPassword = '';
-      ctrl.newPasswordAgain = '';
-      ctrl.identifier = '';
-      ctrl.busy = '';
-      ctrl.pwnd = false;
-      ctrl.resetSuccessfullySubmitted = false;
+
+      ctrl.completeReset = () => {
+        ctrl.busy='';
+        ctrl.formSubmitted = false;
+        ctrl.identifier = '';
+        ctrl.newPassword = '';
+        ctrl.newPasswordAgain = '';
+        ctrl.pwnd = false;
+        ctrl.resetSuccessfullySubmitted=false;
+        ctrl.token='';
+      };
+      ctrl.completeReset();
 
       let updateAngular = (prop, newVal) => {
         $timeout(() => {

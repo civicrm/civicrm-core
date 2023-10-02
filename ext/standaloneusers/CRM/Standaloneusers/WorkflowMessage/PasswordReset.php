@@ -58,21 +58,19 @@ class CRM_Standaloneusers_WorkflowMessage_PasswordReset extends GenericWorkflowM
    * Generate/regenerate a token for the user and load the tplParams
    */
   public function setDataFromUser(array $user, string $token) {
-    // xxx this is not generating https://blah - just the path. Why?
     $resetUrlPlaintext = \CRM_Utils_System::url('civicrm/login/password', ['token' => $token], TRUE, NULL, FALSE);
     $resetUrlHtml = htmlspecialchars($resetUrlPlaintext);
-    $usernamePlaintext = $user['name'];
-    $usernameHtml = htmlspecialchars($user['name']);
     $this->logParams = [
-      'userID' => $user['id'],
-      'username' => $usernamePlaintext,
-      'email' => $user['uf_name'],
+      'userID'   => $user['id'],
+      'username' => $user['username'],
+      'email'    => $user['uf_name'],
+      'url'      => $resetUrlPlaintext,
     ];
     $this
       ->setResetUrlPlaintext($resetUrlPlaintext)
       ->setResetUrlHtml($resetUrlHtml)
-      ->setUsernamePlaintext($usernamePlaintext)
-      ->setUsernameHtml($usernameHtml)
+      ->setUsernamePlaintext($user['username'])
+      ->setUsernameHtml(htmlspecialchars($user['username']))
       ->setTo($user['uf_name']);
     return $this;
   }
