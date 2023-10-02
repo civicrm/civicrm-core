@@ -113,6 +113,7 @@
     <name>hashed_password</name>
     <type>varchar</type>
     <required>true</required>
+    <default>""</default>
     <length>128</length>
     <readonly>true</readonly>
     <comment>Hashed, not plaintext password</comment>
