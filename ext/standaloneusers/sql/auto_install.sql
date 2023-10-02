@@ -58,7 +58,7 @@ CREATE TABLE `civicrm_uf_match` (
   `uf_name` varchar(255) COMMENT 'Email (e.g. for password resets)',
   `contact_id` int unsigned COMMENT 'FK to Contact ID',
   `username` varchar(60) NOT NULL,
-  `hashed_password` varchar(128) NOT NULL COMMENT 'Hashed, not plaintext password',
+  `hashed_password` varchar(128) NOT NULL DEFAULT "" COMMENT 'Hashed, not plaintext password',
   `roles` varchar(128) COMMENT 'FK to Role',
   `when_created` timestamp DEFAULT CURRENT_TIMESTAMP,
   `when_last_accessed` timestamp NULL,
