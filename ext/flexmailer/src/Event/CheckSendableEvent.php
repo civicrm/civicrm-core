@@ -30,7 +30,7 @@ class CheckSendableEvent extends \Civi\Core\Event\GenericHookEvent {
    *   Ex: array('subject' => 'The Subject field is blank').
    *   Example keys: 'subject', 'name', 'from_name', 'from_email', 'body', 'body_html:unsubscribeUrl'.
    */
-  protected $errors = array();
+  protected $errors = [];
 
   /**
    * CheckSendableEvent constructor.

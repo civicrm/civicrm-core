@@ -29,27 +29,27 @@ class Services {
     $apiOverrides = $container->setDefinition('civi_flexmailer_api_overrides', new Definition('Civi\API\Provider\ProviderInterface'))->setPublic(TRUE);
     self::applyStaticFactory($apiOverrides, __CLASS__, 'createApiOverrides');
 
-    $container->setDefinition('civi_flexmailer_required_fields', new Definition('Civi\FlexMailer\Listener\RequiredFields', array(
-      array(
+    $container->setDefinition('civi_flexmailer_required_fields', new Definition('Civi\FlexMailer\Listener\RequiredFields', [
+      [
         'subject',
         'name',
         'from_name',
         'from_email',
         '(body_html|body_text)',
-      ),
-    )))->setPublic(TRUE);
-    $container->setDefinition('civi_flexmailer_required_tokens', new Definition('Civi\FlexMailer\Listener\RequiredTokens', array(
-      array('traditional'),
-      array(
+      ],
+    ]))->setPublic(TRUE);
+    $container->setDefinition('civi_flexmailer_required_tokens', new Definition('Civi\FlexMailer\Listener\RequiredTokens', [
+      ['traditional'],
+      [
         'domain.address' => ts("Domain address - displays your organization's postal address."),
-        'action.optOutUrl or action.unsubscribeUrl' => array(
+        'action.optOutUrl or action.unsubscribeUrl' => [
           'action.optOut' => ts("'Opt out via email' - displays an email address for recipients to opt out of receiving emails from your organization."),
           'action.optOutUrl' => ts("'Opt out via web page' - creates a link for recipients to click if they want to opt out of receiving emails from your organization. Alternatively, you can include the 'Opt out via email' token."),
           'action.unsubscribe' => ts("'Unsubscribe via email' - displays an email address for recipients to unsubscribe from the specific mailing list used to send this message."),
           'action.unsubscribeUrl' => ts("'Unsubscribe via web page' - creates a link for recipients to unsubscribe from the specific mailing list used to send this message. Alternatively, you can include the 'Unsubscribe via email' token or one of the Opt-out tokens."),
-        ),
-      ),
-    )))->setPublic(TRUE);
+        ],
+      ],
+    ]))->setPublic(TRUE);
 
     $container->setDefinition('civi_flexmailer_abdicator', new Definition('Civi\FlexMailer\Listener\Abdicator'))->setPublic(TRUE);
     $container->setDefinition('civi_flexmailer_default_batcher', new Definition('Civi\FlexMailer\Listener\DefaultBatcher'))->setPublic(TRUE);
@@ -70,7 +70,7 @@ class Services {
       $container->findDefinition('dispatcher')->addMethodCall('addListenerService', $listenerSpec);
     }
 
-    $container->findDefinition('civi_api_kernel')->addMethodCall('registerApiProvider', array(new Reference('civi_flexmailer_api_overrides')));
+    $container->findDefinition('civi_api_kernel')->addMethodCall('registerApiProvider', [new Reference('civi_flexmailer_api_overrides')]);
   }
 
   /**
@@ -84,27 +84,27 @@ class Services {
    *   Arguments to pass to addListenerService($eventName, $callbackSvc, $priority).
    */
   protected static function getListenerSpecs() {
-    $listenerSpecs = array();
+    $listenerSpecs = [];
 
-    $listenerSpecs[] = array(Validator::EVENT_CHECK_SENDABLE, array('civi_flexmailer_abdicator', 'onCheckSendable'), FM::WEIGHT_START);
-    $listenerSpecs[] = array(Validator::EVENT_CHECK_SENDABLE, array('civi_flexmailer_required_fields', 'onCheckSendable'), FM::WEIGHT_MAIN);
-    $listenerSpecs[] = array(Validator::EVENT_CHECK_SENDABLE, array('civi_flexmailer_required_tokens', 'onCheckSendable'), FM::WEIGHT_MAIN);
+    $listenerSpecs[] = [Validator::EVENT_CHECK_SENDABLE, ['civi_flexmailer_abdicator', 'onCheckSendable'], FM::WEIGHT_START];
+    $listenerSpecs[] = [Validator::EVENT_CHECK_SENDABLE, ['civi_flexmailer_required_fields', 'onCheckSendable'], FM::WEIGHT_MAIN];
+    $listenerSpecs[] = [Validator::EVENT_CHECK_SENDABLE, ['civi_flexmailer_required_tokens', 'onCheckSendable'], FM::WEIGHT_MAIN];
 
-    $listenerSpecs[] = array(FM::EVENT_RUN, array('civi_flexmailer_default_composer', 'onRun'), FM::WEIGHT_MAIN);
-    $listenerSpecs[] = array(FM::EVENT_RUN, array('civi_flexmailer_abdicator', 'onRun'), FM::WEIGHT_END);
+    $listenerSpecs[] = [FM::EVENT_RUN, ['civi_flexmailer_default_composer', 'onRun'], FM::WEIGHT_MAIN];
+    $listenerSpecs[] = [FM::EVENT_RUN, ['civi_flexmailer_abdicator', 'onRun'], FM::WEIGHT_END];
 
-    $listenerSpecs[] = array(FM::EVENT_WALK, array('civi_flexmailer_default_batcher', 'onWalk'), FM::WEIGHT_END);
+    $listenerSpecs[] = [FM::EVENT_WALK, ['civi_flexmailer_default_batcher', 'onWalk'], FM::WEIGHT_END];
 
-    $listenerSpecs[] = array(FM::EVENT_COMPOSE, array('civi_flexmailer_basic_headers', 'onCompose'), FM::WEIGHT_PREPARE);
-    $listenerSpecs[] = array(FM::EVENT_COMPOSE, array('civi_flexmailer_to_header', 'onCompose'), FM::WEIGHT_PREPARE);
-    $listenerSpecs[] = array(FM::EVENT_COMPOSE, array('civi_flexmailer_bounce_tracker', 'onCompose'), FM::WEIGHT_PREPARE);
-    $listenerSpecs[] = array(FM::EVENT_COMPOSE, array('civi_flexmailer_default_composer', 'onCompose'), FM::WEIGHT_MAIN - 100);
-    $listenerSpecs[] = array(FM::EVENT_COMPOSE, array('civi_flexmailer_attachments', 'onCompose'), FM::WEIGHT_ALTER);
-    $listenerSpecs[] = array(FM::EVENT_COMPOSE, array('civi_flexmailer_open_tracker', 'onCompose'), FM::WEIGHT_ALTER);
-    $listenerSpecs[] = array(FM::EVENT_COMPOSE, array('civi_flexmailer_test_prefix', 'onCompose'), FM::WEIGHT_ALTER);
-    $listenerSpecs[] = array(FM::EVENT_COMPOSE, array('civi_flexmailer_hooks', 'onCompose'), FM::WEIGHT_ALTER - 100);
+    $listenerSpecs[] = [FM::EVENT_COMPOSE, ['civi_flexmailer_basic_headers', 'onCompose'], FM::WEIGHT_PREPARE];
+    $listenerSpecs[] = [FM::EVENT_COMPOSE, ['civi_flexmailer_to_header', 'onCompose'], FM::WEIGHT_PREPARE];
+    $listenerSpecs[] = [FM::EVENT_COMPOSE, ['civi_flexmailer_bounce_tracker', 'onCompose'], FM::WEIGHT_PREPARE];
+    $listenerSpecs[] = [FM::EVENT_COMPOSE, ['civi_flexmailer_default_composer', 'onCompose'], FM::WEIGHT_MAIN - 100];
+    $listenerSpecs[] = [FM::EVENT_COMPOSE, ['civi_flexmailer_attachments', 'onCompose'], FM::WEIGHT_ALTER];
+    $listenerSpecs[] = [FM::EVENT_COMPOSE, ['civi_flexmailer_open_tracker', 'onCompose'], FM::WEIGHT_ALTER];
+    $listenerSpecs[] = [FM::EVENT_COMPOSE, ['civi_flexmailer_test_prefix', 'onCompose'], FM::WEIGHT_ALTER];
+    $listenerSpecs[] = [FM::EVENT_COMPOSE, ['civi_flexmailer_hooks', 'onCompose'], FM::WEIGHT_ALTER - 100];
 
-    $listenerSpecs[] = array(FM::EVENT_SEND, array('civi_flexmailer_default_sender', 'onSend'), FM::WEIGHT_END);
+    $listenerSpecs[] = [FM::EVENT_SEND, ['civi_flexmailer_default_sender', 'onSend'], FM::WEIGHT_END];
 
     return $listenerSpecs;
   }
@@ -132,7 +132,7 @@ class Services {
    */
   protected static function applyStaticFactory($def, $factoryClass, $factoryMethod) {
     if (method_exists($def, 'setFactory')) {
-      $def->setFactory(array($factoryClass, $factoryMethod));
+      $def->setFactory([$factoryClass, $factoryMethod]);
     }
     else {
       $def->setFactoryClass($factoryClass)->setFactoryMethod($factoryMethod);

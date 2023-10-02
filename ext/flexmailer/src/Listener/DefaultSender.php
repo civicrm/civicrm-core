@@ -29,7 +29,7 @@ class DefaultSender extends BaseListener {
     $job_date = \CRM_Utils_Date::isoToMysql($job->scheduled_date);
     $mailer = \Civi::service('pear_mail');
 
-    $targetParams = $deliveredParams = array();
+    $targetParams = $deliveredParams = [];
     $count = 0;
     $retryBatch = FALSE;
 
@@ -188,11 +188,11 @@ class DefaultSender extends BaseListener {
    * @param string $errorMessage
    */
   protected function recordBounce($job, $task, $errorMessage) {
-    $params = array(
+    $params = [
       'event_queue_id' => $task->getEventQueueId(),
       'job_id' => $job->id,
       'hash' => $task->getHash(),
-    );
+    ];
     $params = array_merge($params,
       \CRM_Mailing_BAO_BouncePattern::match($errorMessage)
     );
