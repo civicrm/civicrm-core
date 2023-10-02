@@ -77,4 +77,19 @@ class CoreUtilTest extends CustomTestBase {
     $this->assertEquals('Civi\Api4\CustomValue', CoreUtil::getApiClass('Custom_' . $multiGroup['name']));
   }
 
+  public function getNamespaceExamples(): array {
+    return [
+      ['\Foo', 'Foo'],
+      ['\Foo\Bar', 'Bar'],
+      ['Baz', 'Baz'],
+    ];
+  }
+
+  /**
+   * @dataProvider getNamespaceExamples
+   */
+  public function testStripNamespace($input, $expected): void {
+    $this->assertEquals($expected, CoreUtil::stripNamespace($input));
+  }
+
 }

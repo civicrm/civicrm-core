@@ -437,4 +437,14 @@ class CoreUtil {
     }
   }
 
+  /**
+   * Strips leading namespace from a classname
+   * @param string $className
+   * @return string
+   */
+  public static function stripNamespace(string $className): string {
+    $slashPos = strrpos($className, '\\');
+    return $slashPos === FALSE ? $className : substr($className, $slashPos + 1);
+  }
+
 }
