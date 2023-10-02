@@ -4,6 +4,7 @@ namespace Civi\Api4;
 use Civi\Api4\Action\User\Create;
 use Civi\Api4\Action\User\Save;
 use Civi\Api4\Action\User\Update;
+use Civi\Api4\Action\User\SendPasswordReset;
 
 /**
  * User entity.
@@ -42,10 +43,23 @@ class User extends Generic\DAOEntity {
   }
 
   /**
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\User\SendPasswordReset
+   */
+  public static function sendPasswordReset($checkPermissions = TRUE): SendPasswordReset {
+    return (new SendPasswordReset(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
    * Permissions are wide on this but are checked in validateValues.
    */
   public static function permissions() {
-    return ['default' => ['access CiviCRM']];
+    return [
+      'default'           => ['access CiviCRM'],
+      'passwordReset'     => ['access password resets'],
+      'sendPasswordReset' => ['access password resets'],
+    ];
   }
 
 }

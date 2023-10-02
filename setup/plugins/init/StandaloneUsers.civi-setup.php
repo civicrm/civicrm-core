@@ -49,7 +49,14 @@ if (!defined('CIVI_SETUP')) {
           'name' => 'everyone',
           'label' => ts('Everyone, including anonymous users'),
           // Provide default open permissions
-          'permissions' => ['CiviMail subscribe/unsubscribe pages', 'make online contributions', 'view event info', 'register for events'],
+          'permissions' => [
+            'CiviMail subscribe/unsubscribe pages',
+            'make online contributions',
+            'view event info',
+            'register for events',
+            'access password resets',
+            'authenticate with password',
+          ],
         ],
         [
           'name' => 'admin',
@@ -71,9 +78,9 @@ if (!defined('CIVI_SETUP')) {
     $params = [
       'cms_name'   => $e->getModel()->extras['adminUser'],
       'cms_pass'   => $e->getModel()->extras['adminPass'],
-      'email'       => $adminEmail,
+      'email'      => $adminEmail,
       'notify'     => FALSE,
-      'contactID'  => $contactID,
+      'contact_id' => $contactID,
     ];
     $userID = \CRM_Core_BAO_CMSUser::create($params, 'email');
 

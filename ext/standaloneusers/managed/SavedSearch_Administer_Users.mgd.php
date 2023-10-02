@@ -21,7 +21,7 @@ return [
           'select' => [
             'id',
             'username',
-            'email',
+            'uf_name',
             'is_active',
             'when_created',
             'when_last_accessed',
@@ -82,7 +82,7 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'email',
+              'key' => 'uf_name',
               'dataType' => 'String',
               'label' => E::ts('Email'),
               'sortable' => TRUE,

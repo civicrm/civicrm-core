@@ -255,11 +255,11 @@ a:hover, a:focus {
     <div class="message warning" style="display:none;" id="anonAccessDenied">{ts}You may need to login to access that.{/ts}</div>
     <form>
       <div>
-        <label for="exampleInputEmail1" class="form-label">Username</label>
-        <input type="email" class="form-control" id="usernameInput" aria-describedby="emailHelp">
+        <label for="usernameInput" name=username class="form-label">Username</label>
+        <input type="text" class="form-control" id="usernameInput" >
       </div>
       <div>
-        <label for="exampleInputPassword1" class="form-label">Password</label>
+        <label for="passwordInput" class="form-label">Password</label>
         <input type="password" class="form-control" id="passwordInput">
       </div>
       <div id="error" style="display:none;" class="form-alert">Your username and password do not match</div>

@@ -50,7 +50,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
   public function tearDown():void {
     $this->deleteStuffWeMade();
-    $this->switchBackFromOurUFClasses(TRUE);
+    // $this->switchBackFromOurUFClasses(TRUE);
     parent::tearDown();
   }
 
@@ -74,21 +74,25 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
 
     $user = \Civi\Api4\User::get(FALSE)
-      ->addSelect('*', 'uf_match.*')
       ->addWhere('id', '=', $userID)
-      ->addJoin('UFMatch AS uf_match', 'INNER', ['uf_match.uf_id', '=', 'id'])
       ->execute()->single();
 
     $this->assertEquals('user_one', $user['username']);
-    $this->assertEquals('user_one@example.org', $user['email']);
+    $this->assertEquals($contactID, $user['contact_id']);
+    $this->assertEquals($userID, $user['id']);
+    $this->assertEquals($userID, $user['uf_id']);
+    $this->assertEquals('user_one@example.org', $user['uf_name']);
     $this->assertStringStartsWith('$', $user['hashed_password']);
 
+    // Test that the password can be checked ok.
     $this->assertTrue($security->checkPassword('secret1', $user['hashed_password']));
     $this->assertFalse($security->checkPassword('some other password', $user['hashed_password']));
   }
 
   public function testPerms() {
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
+    $ufID = \CRM_Core_BAO_UFMatch::getUFId($contactID);
+    $this->assertEquals($userID, $ufID);
 
     // Create a custom role
     $roleID = \Civi\Api4\Role::create(FALSE)
@@ -111,50 +115,63 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ->addWhere('id', '=', $userID)
       ->execute();
 
-    $this->switchToOurUFClasses();
+    // $this->switchToOurUFClasses();
     foreach (['access CiviCRM', 'view all contacts', 'add contacts', 'edit all contacts'] as $allowed) {
       $this->assertTrue(\CRM_Core_Permission::check([$allowed], $contactID), "Should have '$allowed' permission but don't");
     }
     foreach (['administer CiviCRM', 'access uploaded files'] as $notAllowed) {
       $this->assertFalse(\CRM_Core_Permission::check([$notAllowed], $contactID), "Should NOT have '$allowed' permission but do");
     }
-    $this->switchBackFromOurUFClasses();
+    // $this->switchBackFromOurUFClasses();
   }
 
-  protected function switchToOurUFClasses() {
-    if (!empty($this->originalUFPermission)) {
-      throw new \RuntimeException("are you calling switchToOurUFClasses twice?");
-    }
-    $this->originalUFPermission = \CRM_Core_Config::singleton()->userPermissionClass;
-    $this->originalUF = \CRM_Core_Config::singleton()->userSystem;
-    \CRM_Core_Config::singleton()->userPermissionClass = new \CRM_Core_Permission_Standalone();
-    \CRM_Core_Config::singleton()->userSystem = new \CRM_Utils_System_Standalone();
-  }
+  // protected function switchToOurUFClasses() {
+  //   return;
+  //   if (!empty($this->originalUFPermission)) {
+  //     throw new \RuntimeException("are you calling switchToOurUFClasses twice?");
+  //   }
+  //   $this->originalUFPermission = \CRM_Core_Config::singleton()->userPermissionClass;
+  //   $this->originalUF = \CRM_Core_Config::singleton()->userSystem;
+  //   \CRM_Core_Config::singleton()->userPermissionClass = new \CRM_Core_Permission_Standalone();
+  //   \CRM_Core_Config::singleton()->userSystem = new \CRM_Utils_System_Standalone();
+  // }
+  //
+  // protected function switchBackFromOurUFClasses($justInCase = FALSE) {
+  //   return;
+  //   if (!$justInCase && empty($this->originalUFPermission)) {
+  //     throw new \RuntimeException("are you calling switchBackFromOurUFClasses() twice?");
+  //   }
+  //   \CRM_Core_Config::singleton()->userPermissionClass = $this->originalUFPermission;
+  //   \CRM_Core_Config::singleton()->userSystem = $this->originalUF;
+  //   $this->originalUFPermission = $this->originalUF = NULL;
+  // }
 
-  protected function switchBackFromOurUFClasses($justInCase = FALSE) {
-    if (!$justInCase && empty($this->originalUFPermission)) {
-      throw new \RuntimeException("are you calling switchBackFromOurUFClasses() twice?");
+  /**
+   * Temporary debugging function
+   */
+  public function dumpUFMatch(string $s = '') {
+    $d = \CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_uf_match;");
+    print "\ndump---------- $s\n";
+    foreach ($d->fetchAll() as $row) {
+      print json_encode($row, JSON_UNESCAPED_SLASHES) . "\n";
     }
-    \CRM_Core_Config::singleton()->userPermissionClass = $this->originalUFPermission;
-    \CRM_Core_Config::singleton()->userSystem = $this->originalUF;
-    $this->originalUFPermission = $this->originalUF = NULL;
+    print "--------------\n";
   }
 
   /**
    * @return Array[int, int, \Civi\Standalone\Security]
    */
   public function createFixtureContactAndUser(): array {
-
     $contactID = \Civi\Api4\Contact::create(FALSE)
       ->setValues([
         'contact_type' => 'Individual',
         'display_name' => 'Admin McDemo',
       ])->execute()->first()['id'];
 
-    $params = ['cms_name' => 'user_one', 'cms_pass' => 'secret1', 'notify' => FALSE, 'contactID' => $contactID, 'email' => 'user_one@example.org'];
-    $this->switchToOurUFClasses();
+    $params = ['cms_name' => 'user_one', 'cms_pass' => 'secret1', 'notify' => FALSE, 'contact_id' => $contactID, 'email' => 'user_one@example.org'];
+    // $this->switchToOurUFClasses();
     $userID = \CRM_Core_BAO_CMSUser::create($params, 'email');
-    $this->switchBackFromOurUFClasses();
+    // $this->switchBackFromOurUFClasses();
     $this->assertGreaterThan(0, $userID);
     $this->contactID = $contactID;
     $this->userID = $userID;
@@ -204,7 +221,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
         'password' => 'shhh',
         'contact_id' => $stafferContactID,
         'roles:name' => ['staff'],
-        'email' => 'testuser1@example.org',
+        'uf_name' => 'testuser1@example.org',
       ])
       ->execute()->first()['id'];
     $user = User::get(FALSE)->addWhere('id', '=', $userID)->execute()->first();
@@ -350,6 +367,63 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     }
 
     $this->deleteStuffWeMade();
+  }
+
+  public function testForgottenPassword() {
+
+    /** @var Security $security */
+    [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
+
+    // Create token.
+    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
+    $this->assertMatchesRegularExpression('/^([0-9a-f]{8}[a-zA-Z0-9]{32})([0-9a-f]+)$/', $token);
+
+    // Fake an expired token
+    $old = dechex(time() - 1);
+    $this->assertNull($security->checkPasswordResetToken($old . substr($token, 9)));
+
+    // Check token fails if contact ID is different.
+    $this->assertNull($security->checkPasswordResetToken($token . '0'));
+
+    // Check it works, but only once.
+    $extractedUserID = $security->checkPasswordResetToken($token);
+    $this->assertEquals($userID, $extractedUserID);
+    $this->assertNull($security->checkPasswordResetToken($token));
+
+    // OK, let's change that password.
+    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
+
+    // Attempt to change the user's password using this token to authenticate.
+    $result = User::passwordReset(TRUE)
+      ->setToken($token)
+      ->setPassword('fingersCrossed')
+      ->execute();
+
+    $this->assertEquals(1, $result['success']);
+    $user = User::get(FALSE)->addWhere('id', '=', $userID)->execute()->single();
+    $this->assertTrue($security->checkPassword('fingersCrossed', $user['hashed_password']));
+
+    // Should not work a 2nd time with same token.
+    try {
+      User::passwordReset(TRUE)
+        ->setToken($token)
+        ->setPassword('oooh')
+        ->execute();
+      $this->fail("Should not have been able to reuse token");
+    }
+    catch (\Exception $e) {
+      $this->assertEquals('Invalid token.', $e->getMessage());
+    }
+
+    // Check the message template generation
+    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
+    $workflow = $security->preparePasswordResetWorkflow($user, $token);
+    $this->assertNotNull($workflow);
+    $result = $workflow->renderTemplate();
+
+    $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['text']);
+    $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['html']);
+    $this->assertEquals('Password reset link for Demonstrators Anonymous', $result['subject']);
   }
 
   protected function deleteStuffWeMade() {

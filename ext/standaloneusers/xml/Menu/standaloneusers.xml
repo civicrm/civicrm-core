@@ -17,4 +17,10 @@
     <title>Change Password</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/login/password</path>
+    <page_callback>CRM_Standaloneusers_Page_ResetPassword</page_callback>
+    <title>Reset Password</title>
+    <access_arguments>access password resets</access_arguments>
+  </item>
 </menu>

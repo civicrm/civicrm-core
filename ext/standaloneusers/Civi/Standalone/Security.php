@@ -3,6 +3,9 @@ namespace Civi\Standalone;
 
 use CRM_Core_Session;
 use Civi;
+use Civi\Api4\User;
+use Civi\Api4\MessageTemplate;
+use CRM_Standaloneusers_WorkflowMessage_PasswordReset;
 
 /**
  * This is a single home for security related functions for Civi Standalone.
@@ -130,27 +133,29 @@ class Security {
    *    - 'cms_name'
    *    - 'cms_pass' plaintext password
    *    - 'notify' boolean
-   * @param string $mailParam
+   * @param string $emailParam
    *   Name of the $param which contains the email address.
    *
    * @return int|bool
    *   uid if user was created, false otherwise
    */
-  public function createUser(&$params, $mailParam) {
+  public function createUser(&$params, $emailParam) {
     try {
-      $mail = $params[$mailParam];
-      $userID = \Civi\Api4\User::create(FALSE)
+      $email = $params[$emailParam];
+      $userID = User::create(FALSE)
         ->addValue('username', $params['cms_name'])
-        ->addValue('email', $mail)
+        ->addValue('uf_name', $email)
         ->addValue('password', $params['cms_pass'])
+        ->addValue('contact_id', $params['contact_id'] ?? NULL)
+        // ->addValue('uf_id', 0) // does not work without this.
         ->execute()->single()['id'];
     }
     catch (\Exception $e) {
-      \Civi::log()->warning("Failed to create user '$mail': " . $e->getMessage());
+      \Civi::log()->warning("Failed to create user '$email': " . $e->getMessage());
       return FALSE;
     }
 
-    // @todo This is what Drupal does, but it's unclear why.
+    // @todo This next line is what Drupal does, but it's unclear why.
     // I think it assumes we want to be logged in as this contact, and as there's no uf match, it's not in civi.
     // But I'm not sure if we are always becomming this user; I'm not sure waht calls this function.
     // CRM_Core_Config::singleton()->inCiviCRM = FALSE;
@@ -166,7 +171,7 @@ class Security {
   public function updateCMSName($ufID, $email) {
     \Civi\Api4\User::update(FALSE)
       ->addWhere('id', '=', $ufID)
-      ->addValue('email', $email)
+      ->addValue('uf_name', $email)
       ->execute();
   }
 
@@ -366,17 +371,85 @@ class Security {
   /**
    * Check a password reset token matches for a User.
    *
-   * @param int $userID
    * @param string $token
    * @param bool $spend
    *   If TRUE, and the token matches, the token is then reset; so it can only be used once.
    *   If FALSE no changes are made.
    *
-   * @return bool TRUE if it was valid.
+   * @return NULL|int
+   *   If int, it's the UserID
+   *
    */
-  public function checkPasswordResetToken(int $userID, string $token, bool $spend = TRUE): bool {
-    // Coming in next PR!
-    return FALSE;
+  public function checkPasswordResetToken(string $token, bool $spend = TRUE): ?int {
+    if (!preg_match('/^([0-9a-f]{8})([a-zA-Z0-9]{32})([0-9a-f]+)$/', $token, $matches)) {
+      // Hacker
+      Civi::log()->warning("Rejected passwordResetToken with invalid syntax.", compact('token'));
+      return NULL;
+    }
+
+    $userID = hexdec($matches[3]);
+    if (!$userID > 0) {
+      // Hacker
+      Civi::log()->warning("Rejected passwordResetToken with invalid userID.", compact('token', 'userID'));
+      return NULL;
+    }
+
+    $expiry = hexdec($matches[1]);
+    if (time() > $expiry) {
+      // Less serious
+      Civi::log()->info("Rejected expired passwordResetToken for user $userID");
+      return NULL;
+    }
+
+    $storedToken = $matches[1] . $matches[2];
+    $matched = User::get(FALSE)
+      ->addWhere('id', '=', $userID)
+      ->addWhere('password_reset_token', '=', $storedToken)
+      ->addWhere('is_active', '=', 1)
+      ->selectRowCount()
+      ->execute()->countMatched() === 1;
+
+    if ($matched && $spend) {
+      $matched = User::update(FALSE)
+        ->addWhere('id', '=', $userID)
+        ->addValue('password_reset_token', NULL)
+        ->execute();
+    }
+    Civi::log()->info(($matched ? 'Accepted' : 'Rejected') . " passwordResetToken for user $userID");
+    return $matched ? $userID : NULL;
+  }
+
+  /**
+   * Prepare a password reset workflow email, if configured.
+   *
+   * @return \CRM_Standaloneusers_WorkflowMessage_PasswordReset|null
+   */
+  public function preparePasswordResetWorkflow(array $user, string $token): ?CRM_Standaloneusers_WorkflowMessage_PasswordReset {
+    // Find the message template
+    $tplID = MessageTemplate::get(FALSE)
+      ->setSelect(['id'])
+      ->addWhere('workflow_name', '=', 'password_reset')
+      ->addWhere('is_default', '=', TRUE)
+      ->addWhere('is_reserved', '=', FALSE)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->first()['id'];
+    if (!$tplID) {
+      // Some sites may deliberately disable this, but it's unusual, so leave a notice in the log.
+      Civi::log()->notice("There is no active, default password_reset message template, which has prevented emailing a reset to {username}", ['username' => $user['username']]);
+      return NULL;
+    }
+    if (!filter_var($user['uf_name'] ?? '', \FILTER_VALIDATE_EMAIL)) {
+      Civi::log()->warning("User $user[id] has an invalid email. Failed to send password reset.");
+      return NULL;
+    }
+
+    // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml} {$usernamePlaintext} {$usernameHtml}
+    list($domainFromName, $domainFromEmail) = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+    $workflowMessage = (new \CRM_Standaloneusers_WorkflowMessage_PasswordReset())
+      ->setDataFromUser($user, $token)
+      ->setFrom("\"$domainFromName\" <$domainFromEmail>");
+
+    return $workflowMessage;
   }
 
 }

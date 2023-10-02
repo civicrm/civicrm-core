@@ -539,8 +539,7 @@ AND    domain_id    = %4
   }
 
   /**
-   * Get the next unused uf_id value, since the standalone UF doesn't
-   * have id's (it uses OpenIDs, which go in a different field).
+   * Get the next unused uf_id value
    *
    * @deprecated
    * @return int
