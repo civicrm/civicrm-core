@@ -10,6 +10,9 @@
   <icon>fa-folder-open</icon>
   <labelField>subject</labelField>
   <component>CiviCase</component>
+  <paths>
+    <view>civicrm/contact/view/case?action=view&amp;reset=1&amp;id=[id]</view>
+  </paths>
   <field>
     <name>id</name>
     <type>int unsigned</type>
