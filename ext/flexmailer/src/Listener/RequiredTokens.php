@@ -66,21 +66,21 @@ class RequiredTokens extends BaseListener {
       return;
     }
 
-    foreach (array('body_html', 'body_text') as $field) {
+    foreach (['body_html', 'body_text'] as $field) {
       $str = $e->getFullBody($field);
       if (empty($str)) {
         continue;
       }
       foreach ($this->findMissingTokens($str) as $token => $desc) {
         $e->setError("{$field}:{$token}", E::ts('This message is missing a required token - {%1}: %2',
-          array(1 => $token, 2 => $desc)
+          [1 => $token, 2 => $desc]
         ));
       }
     }
   }
 
   public function findMissingTokens($str) {
-    $missing = array();
+    $missing = [];
     foreach ($this->getRequiredTokens() as $token => $value) {
       if (!is_array($value)) {
         if (!preg_match('/(^|[^\{])' . preg_quote('{' . $token . '}') . '/', $str)) {

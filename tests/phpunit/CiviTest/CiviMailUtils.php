@@ -221,7 +221,7 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
     $this->_ut->assertEquals(
       $expectedRecipients,
       $recipients,
-      "Incorrect recipients: " . print_r(array('expected' => $expectedRecipients, 'actual' => $recipients), TRUE)
+      "Incorrect recipients: " . print_r(['expected' => $expectedRecipients, 'actual' => $recipients], TRUE)
     );
   }
 
@@ -242,7 +242,7 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
     $this->_ut->assertEquals(
       $expectedSubjects,
       $subjects,
-      "Incorrect subjects: " . print_r(array('expected' => $expectedSubjects, 'actual' => $subjects), TRUE)
+      "Incorrect subjects: " . print_r(['expected' => $expectedSubjects, 'actual' => $subjects], TRUE)
     );
   }
 

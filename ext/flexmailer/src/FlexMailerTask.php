@@ -59,7 +59,7 @@ class FlexMailerTask {
    * @see MailParams
    * @see \CRM_Utils_Hook::alterMailParams()
    */
-  private $mailParams = array();
+  private $mailParams = [];
 
   /**
    * FlexMailerTask constructor.

@@ -187,8 +187,8 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
     // The following code is exactly the same as runMailingSuccess() except that we store the ID of the mailing.
     $mailing_1 = $this->callAPISuccess('Mailing', 'create', $mailingParams);
-    $mut->assertRecipients(array());
-    $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
+    $mut->assertRecipients([]);
+    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $mut->getAllMessages('ezc');
     $this->assertCount(1, $allMessages);
@@ -300,8 +300,8 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
     // The following code is exactly the same as runMailingSuccess() except that we store the ID of the mailing.
     $mailing_1 = $this->callAPISuccess('mailing', 'create', $mailingParams);
-    $mut->assertRecipients(array());
-    $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
+    $mut->assertRecipients([]);
+    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $mut->getAllMessages('ezc');
     // There are exactly two contacts produced by setUp().
@@ -325,7 +325,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
       'body_text'      => 'Please just {action.unsubscribeUrl}',
     ];
     $this->callAPISuccess('mailing', 'create', $mailingParams);
-    $_ = $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
+    $_ = $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $mut->getAllMessages('ezc');
     // We should have 2+2 messages sent by the mail system now.
