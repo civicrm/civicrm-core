@@ -177,7 +177,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       default:
         if (!empty($data[$key])) {
           $item = $this->getSelectExpression($key);
-          if ($item['expr'] instanceof SqlField && $item['fields'][$key]['fk_entity'] === 'File') {
+          if ($item['expr'] instanceof SqlField && isset($item['fields'][$key]) && $item['fields'][$key]['fk_entity'] === 'File') {
             return $this->generateFileUrl($data[$key]);
           }
         }

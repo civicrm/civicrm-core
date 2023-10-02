@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Contact;
 use Civi\Api4\MockBasicEntity;
+use Civi\Api4\EntitySet;
 use Civi\Api4\SavedSearch;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\HookInterface;
@@ -329,6 +330,30 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->setInput(substr((string) $cid, 0, 1))
       ->execute();
     $this->assertNotContains($cid, $result->column('id'));
+  }
+
+  public function testMailingAutocompleteNoDisabledGroups(): void {
+    $this->createTestRecord('Group', [
+      'title' => 'Second Star',
+      'frontend_title' => 'Second Star',
+      'name' => 'Second_Star',
+      'group_type:name' => 'Mailing List',
+    ]);
+    $this->createTestRecord('Group', [
+      'title' => 'Second',
+      'frontend_title' => 'Second',
+      'name' => 'Second',
+      'group_type:name' => 'Mailing List',
+      'is_active' => 0,
+    ]);
+
+    $result = EntitySet::autocomplete()
+      ->setInput('')
+      ->setFieldName('Mailing.recipients_include')
+      ->setFormName('crmMailing.1')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('Second Star', $result[0]['label']);
   }
 
 }
