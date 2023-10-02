@@ -55,7 +55,7 @@ if (!defined('CIVI_SETUP')) {
             'view event info',
             'register for events',
             'access password resets',
-            'authenticate with password', //xxx?
+            'authenticate with password',
           ],
         ],
         [

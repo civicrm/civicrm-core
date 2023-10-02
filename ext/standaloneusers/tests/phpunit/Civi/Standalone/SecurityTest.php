@@ -414,6 +414,16 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     catch (\Exception $e) {
       $this->assertEquals('Invalid token.', $e->getMessage());
     }
+
+    // Check the message template generation
+    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
+    /** @var \CRM_Standalone_WorkflowMessage_PasswordReset */
+    $workflow = $security->preparePasswordResetWorkflow($user, $token);
+    $result = $workflow->renderTemplate();
+
+    $this->assertStringContainsString($token, $result['text']);
+    $this->assertStringContainsString(htmlspecialchars($token), $result['html']);
+    $this->assertEquals('x', $result['subject']);
   }
 
   protected function deleteStuffWeMade() {

@@ -103,8 +103,7 @@
             .then(r => {
               updateAngular('busy', ts('Password successfully updated. Redirecting to login...'));
               $timeout(() => {
-                window.location = '/civicrm/login'
-                ctrl[prop] = newVal;
+                window.location = '/civicrm/login';
               }, 1300);
             })
             .catch(e => {

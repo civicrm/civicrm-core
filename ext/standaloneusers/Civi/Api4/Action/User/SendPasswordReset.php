@@ -5,14 +5,17 @@ namespace Civi\Api4\Action\User;
 // URL is (a) just theh path in the emails.
 // clicking button on form with proper token does nothing.
 // should redirect to login on success
-//
 
 use Civi;
 use Civi\Api4\Generic\Result;
 use API_Exception;
 use Civi\Api4\User;
-use Civi\Api4\MessageTemplate;
+use Civi\Standalone\Security;
 use Civi\Api4\Generic\AbstractAction;
+
+/**
+ * @class API_Exception
+ */
 
 /**
  * This is designed to be a public API
@@ -50,11 +53,10 @@ class SendPasswordReset extends AbstractAction {
     $userID = $user['id'] ?? 0;
 
     try {
-      // Allow flood control.
-      $ip = \CRM_Utils_System::ipAddress();
+      // Allow flood control by extensions. (e.g. Moat).
       $event = \Civi\Core\Event\GenericHookEvent::create([
-        'identifiers' => ["ip:$ip", "user:$userID"],
         'action'      => 'send_password_reset',
+        'identifiers' => ["user:$userID"],
       ]);
       \Civi::dispatcher()->dispatch('civi.flood.drip', $event);
     }
@@ -64,7 +66,24 @@ class SendPasswordReset extends AbstractAction {
     }
 
     if ($userID) {
-      $this->sendResetEmail($user);
+      // (Re)generate token and store on User.
+      $token = static::updateToken($userID);
+
+      $workflowMessage = Security::singleton()->preparePasswordResetWorkflow($user, $token);
+      if ($workflowMessage) {
+        /** @var \CRM_Standalone_WorkflowMessage_PasswordReset $workflowMessage */
+        // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml} {$usernamePlaintext} {$usernameHtml}
+        try {
+          [$sent, /*$subject, $text, $html*/] = $workflowMessage->sendTemplate();
+          if (!$sent) {
+            throw new \RuntimeException("sendTemplate() returned unsent.");
+          }
+          Civi::log()->info("Successfully sent password reset to user {userID} ({username}) to {email}", $workflowMessage->getParamsForLog());
+        }
+        catch (\Exception $e) {
+          Civi::log()->error("Failed to send password reset to user {userID} ({username}) to {email}", $workflowMessage->getParamsForLog() + ['exception' => $e]);
+        }
+      }
     }
 
     // Ensure we took at least 0.25s. The assumption is that it takes
@@ -73,50 +92,6 @@ class SendPasswordReset extends AbstractAction {
     // thwart concerted timing attacks, but in combination with flood
     // control, it might help.
     usleep(1000000 * max(0, $endNoSoonerThan - microtime(TRUE)));
-  }
-
-  protected function sendResetEmail(array $user) {
-    // Find the message template
-    $tplID = MessageTemplate::get(FALSE)
-      ->setSelect(['id'])
-      ->addWhere('workflow_name', '=', 'password_reset')
-      ->addWhere('is_default', '=', TRUE)
-      ->addWhere('is_active', '=', TRUE)
-      ->execute()->first()['id'];
-    if (!$tplID) {
-      // Some sites may deliberately disable this, but it's unusual, so leave a notice in the log.
-      Civi::log()->notice("There is no active, default password_reset message template, which has prevented emailing a reset to {username}", ['username' => $user['username']]);
-      return;
-    }
-    if (!filter_var($user['uf_name'] ?? '', FILTER_VALIDATE_EMAIL)) {
-      Civi::log()->warning("User $user[id] has an invalid email. Failed to send password reset.");
-      return;
-    }
-
-    $token = static::updateToken($user['id']);
-
-    list($domainFromName, $domainFromEmail) = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
-    // xxx this is not generating https://blah - just the path. Why?
-    $resetUrlPlaintext = \CRM_Utils_System::url('civicrm/login/password', ['token' => $token], TRUE, NULL, FALSE);
-    $resetUrlHtml = htmlspecialchars($resetUrlPlaintext);
-    // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml}
-    $params = [
-      'id' => $tplID,
-      'template_params' => compact('resetUrlPlaintext', 'resetUrlHtml'),
-      'from' => "\"$domainFromName\" <$domainFromEmail>",
-      'to_email' => $user['uf_name'],
-      'disable_smarty' => 1,
-    ];
-
-    try {
-      civicrm_api3('MessageTemplate', 'send', $params);
-      Civi::log()->info("Sent password_reset_token MessageTemplate (ID {tplID}) to {to_email} for user {userID}",
-        $params + ['userID' => $user['id']]);
-    }
-    catch (\Exception $e) {
-      Civi::log()->error("Failed to send password_reset_token MessageTemplate (ID {tplID}) to {to_email} for user {userID}",
-        $params + ['userID' => $user['id'], 'exception' => $e]);
-    }
   }
 
   /**

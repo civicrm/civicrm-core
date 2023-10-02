@@ -4,6 +4,8 @@ namespace Civi\Standalone;
 use CRM_Core_Session;
 use Civi;
 use Civi\Api4\User;
+use Civi\Api4\MessageTemplate;
+use CRM_Standalone_WorkflowMessage_PasswordReset;
 
 /**
  * This is a single home for security related functions for Civi Standalone.
@@ -415,6 +417,39 @@ class Security {
     }
     Civi::log()->info(($matched ? 'Accepted' : 'Rejected') . " passwordResetToken for user $userID");
     return $matched ? $userID : NULL;
+  }
+
+  /**
+   * Prepare a password reset workflow email, if configured.
+   *
+   * @return \CRM_Standalone_WorkflowMessage_PasswordReset|null
+   */
+  public function preparePasswordResetWorkflow(array $user, string $token): ?CRM_Standalone_WorkflowMessage_PasswordReset {
+    // Find the message template
+    $tplID = MessageTemplate::get(FALSE)
+      ->setSelect(['id'])
+      ->addWhere('workflow_name', '=', 'password_reset')
+      ->addWhere('is_default', '=', TRUE)
+      ->addWhere('is_reserved', '=', FALSE)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->first()['id'];
+    if (!$tplID) {
+      // Some sites may deliberately disable this, but it's unusual, so leave a notice in the log.
+      Civi::log()->notice("There is no active, default password_reset message template, which has prevented emailing a reset to {username}", ['username' => $user['username']]);
+      return NULL;
+    }
+    if (!filter_var($user['uf_name'] ?? '', \FILTER_VALIDATE_EMAIL)) {
+      Civi::log()->warning("User $user[id] has an invalid email. Failed to send password reset.");
+      return NULL;
+    }
+
+    // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml} {$usernamePlaintext} {$usernameHtml}
+    list($domainFromName, $domainFromEmail) = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+    $workflowMessage = (new \CRM_Standalone_WorkflowMessage_PasswordReset())
+      ->setDataFromUser($user, $token)
+      ->setFrom("\"$domainFromName\" <$domainFromEmail>");
+
+    return $workflowMessage;
   }
 
 }

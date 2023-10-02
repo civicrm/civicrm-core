@@ -18,7 +18,7 @@ class CRM_Standaloneusers_Page_ResetPassword extends CRM_Core_Page {
     Civi::service('angularjs.loader')->addModules('crmResetPassword');
 
     // If we have a password reset token, validate it without 'spending' it.
-    $token = CRM_Utils_Request::retrieveValue('token', 'String',NULL, FALSE, $method = 'GET');
+    $token = CRM_Utils_Request::retrieveValue('token', 'String', NULL, FALSE, $method = 'GET');
     if ($token) {
       if (!Security::singleton()->checkPasswordResetToken($token, FALSE)) {
         $token = 'invalid';
