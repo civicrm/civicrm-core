@@ -14,7 +14,6 @@ namespace Civi\Afform;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
- * Class AfformMetadataInjector
  * @package Civi\Afform
  */
 class AfformMetadataInjector {
@@ -30,8 +29,8 @@ class AfformMetadataInjector {
           $module = \Civi::service('angular')->getModule(basename($path, '.aff.html'));
           $meta = \Civi\Api4\Afform::get(FALSE)->addWhere('name', '=', $module['_afform'])->setSelect(['join_entity', 'entity_type'])->execute()->first();
 
-          // Add ngForm directive to afForm controllers
-          foreach (pq('af-form[ctrl]') as $afForm) {
+          // Add ngForm directive to afForm controller (using loop but there should be only one)
+          foreach (pq('af-form[ctrl]', $doc) as $afForm) {
             pq($afForm)->attr('ng-form', $module['_afform']);
           }
         }

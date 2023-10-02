@@ -28,6 +28,7 @@ a.af-api4-action-idle {
 
 af-form {
   display: block;
+  position: relative;
 }
 
 #bootstrap-theme .input-group .crm-af-field {
@@ -83,4 +84,15 @@ af-form {
 }
 #bootstrap-theme .af-container-style-pane.af-collapsed > .af-title {
   margin-bottom: 0;
+}
+
+/* Admin edit links */
+af-form a.af-admin-edit-form-link {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: none;
+}
+af-form:hover a.af-admin-edit-form-link {
+  display: block;
 }

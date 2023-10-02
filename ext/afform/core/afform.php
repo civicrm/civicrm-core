@@ -391,7 +391,7 @@ function afform_civicrm_alterMenu(&$items) {
   try {
     $afforms = \Civi\Api4\Afform::get(FALSE)
       ->addWhere('server_route', 'IS NOT EMPTY')
-      ->addSelect('name', 'server_route', 'is_public')
+      ->addSelect('name', 'server_route', 'is_public', 'title')
       ->execute()->indexBy('name');
   }
   catch (Exception $e) {
@@ -402,6 +402,7 @@ function afform_civicrm_alterMenu(&$items) {
   foreach ($afforms as $name => $meta) {
     if (!empty($meta['server_route'])) {
       $items[$meta['server_route']] = [
+        'title' => $meta['title'],
         'page_callback' => 'CRM_Afform_Page_AfformBase',
         'page_arguments' => 'afform=' . urlencode($name),
         'access_arguments' => [["@afform:$name"], 'and'],
