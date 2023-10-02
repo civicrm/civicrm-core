@@ -418,11 +418,12 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Check the message template generation
     $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
     $workflow = $security->preparePasswordResetWorkflow($user, $token);
+    $this->assertNotNull($workflow);
     $result = $workflow->renderTemplate();
 
-    $this->assertStringContainsString($token, $result['text']);
-    $this->assertStringContainsString(htmlspecialchars($token), $result['html']);
-    $this->assertEquals('x', $result['subject']);
+    $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['text']);
+    $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['html']);
+    $this->assertEquals('Password reset link for Demonstrators Anonymous', $result['subject']);
   }
 
   protected function deleteStuffWeMade() {

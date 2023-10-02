@@ -81,16 +81,13 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
     ];
 
     // Create a "reserved" template. This is a pristine copy provided for reference.
-    MessageTemplate::create(FALSE)
-      ->setValues([
-        'values' => $baseTpl + ['is_reserved' => 1, 'is_default' => 0],
-      ]);
-
-    // Create a default template. This is live. The administrator may edit/customize.
-    MessageTemplate::create(FALSE)
-      ->setValues([
-        'values' => $baseTpl + ['is_reserved' => 0, 'is_default' => 1],
-      ]);
+    MessageTemplate::save(FALSE)
+      ->setDefaults($baseTpl)
+      ->setRecords([
+        ['is_reserved' => TRUE, 'is_default' => FALSE],
+        ['is_reserved' => FALSE, 'is_default' => TRUE],
+      ])
+      ->execute()->getArrayCopy();
 
   }
 
