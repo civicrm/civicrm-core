@@ -113,8 +113,10 @@ class Contact extends Generic\DAOEntity {
     $contactType = static::getEntityName();
     // Adjust info for child classes (Individual, Organization, Household)
     if ($contactType !== 'Contact') {
-      $info['icon'] = \CRM_Contact_BAO_ContactType::getContactType($contactType)['icon'] ?? $info['icon'];
+      $contactTypeInfo = \CRM_Contact_BAO_ContactType::getContactType($contactType);
+      $info['icon'] = $contactTypeInfo['icon'] ?? $info['icon'];
       $info['type'] = ['DAOEntity', 'ContactType'];
+      $info['description'] = ts('Contacts of type %1.', [1 => $contactTypeInfo['label']]);
       // This forces the value into get and create api actions
       $info['where'] = ['contact_type' => $contactType];
     }
