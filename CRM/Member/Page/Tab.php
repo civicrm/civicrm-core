@@ -240,7 +240,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       // Refresh other tabs with related data
       $this->ajaxResponse['updateTabs'] = [
         '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
-        '#tab_rel' => CRM_Contact_BAO_Contact::getCountComponent('rel', $this->_contactId),
       ];
       if (CRM_Core_Permission::access('CiviContribute')) {
         $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
