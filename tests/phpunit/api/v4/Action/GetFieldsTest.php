@@ -162,6 +162,8 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($actFields['subject']['nullable']);
     $this->assertFalse($actFields['subject']['deprecated']);
     $this->assertTrue($actFields['phone_id']['deprecated']);
+    $this->assertEquals('now', $actFields['created_date']['default_value']);
+    $this->assertEquals('now', $actFields['activity_date_time']['default_value']);
 
     $getFields = Activity::getFields(FALSE)
       ->setAction('get')
