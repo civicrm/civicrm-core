@@ -429,7 +429,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
     try {
       $cmd = 'cv ev -v ' . escapeshellarg("return require \"$outFile\";");
-      $descriptorSpec = array(0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']);
+      $descriptorSpec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
       $oldOutput = getenv('CV_OUTPUT');
       putenv("CV_OUTPUT=json");
       $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__);

@@ -54,7 +54,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $sql = $query->searchQuery($start, $prefillLimit, $sort, FALSE, $query->_includeContactIds,
       FALSE, TRUE, TRUE);
     $selectSQL = "SELECT DISTINCT %1, contact_a.id, contact_a.sort_name";
-    $sql = str_replace(array("SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"), $selectSQL, $sql);
+    $sql = str_replace(["SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"], $selectSQL, $sql);
 
     $this->assertTrue(
       $this->prevNext->fillWithSql($this->cacheKey, $sql, [1 => [$this->cacheKey, 'String']]),

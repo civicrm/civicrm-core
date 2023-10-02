@@ -275,28 +275,28 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    */
   public function testCaseReassignForCustomFiles(): void {
     $individual = $this->individualCreate();
-    $customGroup = $this->customGroupCreate(array(
+    $customGroup = $this->customGroupCreate([
       'extends' => 'Case',
-    ));
+    ]);
     $customGroup = $customGroup['values'][$customGroup['id']];
 
-    $customFileFieldA = $this->customFieldCreate(array(
+    $customFileFieldA = $this->customFieldCreate([
       'custom_group_id' => $customGroup['id'],
       'html_type'       => 'File',
       'is_active'       => 1,
       'default_value'   => 'null',
       'label'           => 'Custom File A',
       'data_type'       => 'File',
-    ));
+    ]);
 
-    $customFileFieldB = $this->customFieldCreate(array(
+    $customFileFieldB = $this->customFieldCreate([
       'custom_group_id' => $customGroup['id'],
       'html_type'       => 'File',
       'is_active'       => 1,
       'default_value'   => 'null',
       'label'           => 'Custom File B',
       'data_type'       => 'File',
-    ));
+    ]);
 
     // Create two files to attach to the new case
     $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
@@ -309,11 +309,11 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $caseObj = $this->createCase($individual);
 
-    $this->callAPISuccess('Case', 'create', array(
+    $this->callAPISuccess('Case', 'create', [
       'id'                                => $caseObj->id,
       'custom_' . $customFileFieldA['id'] => $fileA['id'],
       'custom_' . $customFileFieldB['id'] => $fileB['id'],
-    ));
+    ]);
 
     $reassignIndividual = $this->individualCreate();
     $this->createLoggedInUser();
