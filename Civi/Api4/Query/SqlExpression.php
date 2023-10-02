@@ -11,6 +11,8 @@
 
 namespace Civi\Api4\Query;
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Base class for SqlColumn, SqlString, SqlBool, and SqlFunction classes.
  *
@@ -174,8 +176,7 @@ abstract class SqlExpression {
    * @return string
    */
   public function getType(): string {
-    $className = get_class($this);
-    return substr($className, strrpos($className, '\\') + 1);
+    return CoreUtil::stripNamespace(get_class($this));
   }
 
   /**

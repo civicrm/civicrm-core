@@ -12,6 +12,7 @@
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
 
 /**
@@ -75,7 +76,7 @@ abstract class AbstractEntity {
    * @return string
    */
   public static function getEntityName(): string {
-    return self::stripNamespace(static::class);
+    return CoreUtil::stripNamespace(static::class);
   }
 
   /**
@@ -128,7 +129,7 @@ abstract class AbstractEntity {
       'name' => $entityName,
       'title' => static::getEntityTitle(),
       'title_plural' => static::getEntityTitle(TRUE),
-      'type' => [self::stripNamespace(get_parent_class(static::class))],
+      'type' => [CoreUtil::stripNamespace(get_parent_class(static::class))],
       'paths' => [],
       'class' => static::class,
       'primary_key' => ['id'],
@@ -148,7 +149,7 @@ abstract class AbstractEntity {
       $info['icon_field'] = (array) ($dao::fields()['icon']['name'] ?? NULL);
     }
     foreach (ReflectionUtils::getTraits(static::class) as $trait) {
-      $info['type'][] = self::stripNamespace($trait);
+      $info['type'][] = CoreUtil::stripNamespace($trait);
     }
     // Get DocBlock from APIv4 Entity class
     $reflection = new \ReflectionClass(static::class);
@@ -177,16 +178,6 @@ abstract class AbstractEntity {
     }
 
     return $info;
-  }
-
-  /**
-   * Remove namespace prefix from a class name
-   *
-   * @param string $className
-   * @return string
-   */
-  private static function stripNamespace(string $className): string {
-    return substr($className, strrpos($className, '\\') + 1);
   }
 
 }
