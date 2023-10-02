@@ -649,9 +649,6 @@ function afform_shortcode_content($content, $atts, $args, $context) {
 /**
  * Implements hook_civicrm_searchKitTasks().
  *
- * @param array[] $tasks
- * @param bool $checkPermissions
- * @param int|null $userID
  */
 function afform_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userID) {
   $tasks['AfformSubmission']['process'] = [
