@@ -1807,14 +1807,7 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
-   * Wrapper for contact relationship selector.
-   *
-   * @param array $params
-   *   Associated array for params record id.
-   *
-   * @return array
-   *   associated array of contact relationships
-   * @throws \Exception
+   * DELETEME only-used-by-user-dashboard
    */
   public static function getContactRelationshipSelector(&$params) {
     // format the params
@@ -1957,7 +1950,7 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
-   * @return array
+   * DELETEME only-used-by-user-dashboard
    */
   public static function getColumnHeaders() {
     return [

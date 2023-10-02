@@ -39,12 +39,3 @@
 {ts 1=$permDisplayName 2=$otherDisplayName}<strong>%1</strong> can view information about <strong>%2</strong>.{/ts}
 {/if}
 {/if}
-
-{* Used for legend on relationships tab *}
-{if $afterText}
-{if $permType eq 1}
-{ts}This contact can be edited by the other.{/ts}
-{else}
-{ts}This contact can be viewed by the other.{/ts}
-{/if}
-{/if}
