@@ -130,14 +130,15 @@ class SpecFormatter {
    * @return string
    */
   private static function getDataType(array $data) {
-    if (isset($data['data_type'])) {
-      return !empty($data['time_format']) ? 'Timestamp' : $data['data_type'];
+    $dataType = $data['data_type'] ?? $data['dataType'] ?? NULL;
+    if (isset($dataType)) {
+      return !empty($data['time_format']) ? 'Timestamp' : $dataType;
     }
 
     $dataTypeInt = $data['type'] ?? NULL;
     $dataTypeName = \CRM_Utils_Type::typeToString($dataTypeInt);
 
-    return $dataTypeName;
+    return $dataTypeName === 'Int' ? 'Integer' : $dataTypeName;
   }
 
   /**
@@ -303,10 +304,10 @@ class SpecFormatter {
       self::setLegacyDateFormat($inputAttrs);
     }
     // Number input for numeric fields
-    if ($inputType === 'Text' && in_array($dataTypeName, ['Int', 'Float'], TRUE)) {
+    if ($inputType === 'Text' && in_array($dataTypeName, ['Integer', 'Float'], TRUE)) {
       $inputType = 'Number';
       // Todo: make 'step' configurable for the custom field
-      $inputAttrs['step'] = $dataTypeName === 'Int' ? 1 : .01;
+      $inputAttrs['step'] = $dataTypeName === 'Integer' ? 1 : .01;
     }
     // Date/time settings from custom fields
     if ($inputType == 'Date' && !empty($data['custom_group_id'])) {

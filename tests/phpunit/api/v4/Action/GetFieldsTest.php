@@ -29,6 +29,7 @@ use Civi\Api4\Contribution;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
+use Civi\Api4\OptionValue;
 use Civi\Api4\UserJob;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\TransactionalInterface;
@@ -161,6 +162,8 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($actFields['subject']['nullable']);
     $this->assertFalse($actFields['subject']['deprecated']);
     $this->assertTrue($actFields['phone_id']['deprecated']);
+    $this->assertEquals('now', $actFields['created_date']['default_value']);
+    $this->assertEquals('now', $actFields['activity_date_time']['default_value']);
 
     $getFields = Activity::getFields(FALSE)
       ->setAction('get')
@@ -176,6 +179,12 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($aclFields['is_active']['default_value']);
     $this->assertFalse($aclFields['is_active']['nullable']);
     $this->assertFalse($aclFields['is_active']['required']);
+
+    $optionValueFields = OptionValue::getFields(FALSE)
+      ->setAction('create')
+      ->execute()->indexBy('name');
+    $this->assertIsInt($optionValueFields['filter']['default_value']);
+    $this->assertEquals(0, $optionValueFields['filter']['default_value']);
   }
 
   public function testGetSuffixes(): void {

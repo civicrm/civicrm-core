@@ -401,9 +401,16 @@ class FormattingUtil {
         case 'Float':
           return (float) $value;
 
+        case 'Timestamp':
         case 'Date':
+          // Convert mysql-style default to api-style default
+          if (str_contains($value, 'CURRENT_TIMESTAMP')) {
+            return 'now';
+          }
           // Strip time from date-only fields
-          return substr($value, 0, 10);
+          if ($dataType === 'Date' && $value) {
+            return substr($value, 0, 10);
+          }
       }
     }
     return $value;

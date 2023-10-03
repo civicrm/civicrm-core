@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Api4\Managed;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * The ManagedEntities system allows modules to add records to the database
@@ -116,12 +117,14 @@ class CRM_Core_ManagedEntities {
 
   /**
    * Force-revert a record back to its original state.
-   * @param array $params
-   *   Key->value properties of CRM_Core_DAO_Managed used to match an existing record
+   * @param string $entityType
+   * @param $entityId
+   * @return bool
    */
-  public function revert(array $params) {
+  public function revert(string $entityType, $entityId): bool {
     $mgd = new \CRM_Core_DAO_Managed();
-    $mgd->copyValues($params);
+    $mgd->entity_type = $entityType;
+    $mgd->entity_id = $entityId;
     $mgd->find(TRUE);
     $declarations = $this->getDeclarations([$mgd->module]);
     $declarations = CRM_Utils_Array::findAll($declarations, [
@@ -130,10 +133,37 @@ class CRM_Core_ManagedEntities {
       'entity' => $mgd->entity_type,
     ]);
     if ($mgd->id && isset($declarations[0])) {
-      $this->updateExistingEntity(['update' => 'always'] + $declarations[0] + $mgd->toArray());
+      $item = ['update' => 'always'] + $declarations[0] + $mgd->toArray();
+      $this->backfillDefaults($item);
+      $this->updateExistingEntity($item);
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Backfill default values to restore record to a pristine state
+   *
+   * @param array $item Managed APIv4 record
+   */
+  private function backfillDefaults(array &$item): void {
+    if ($item['params']['version'] != 4) {
+      return;
+    }
+    // Fetch default values for fields that are writeable
+    $condition = [['type', '=', 'Field'], ['readonly', 'IS EMPTY'], ['default_value', '!=', 'now']];
+    // Exclude "weight" as that auto-adjusts
+    if (in_array('SortableEntity', CoreUtil::getInfoItem($item['entity_type'], 'type'), TRUE)) {
+      $weightCol = CoreUtil::getInfoItem($item['entity_type'], 'order_by');
+      $condition[] = ['name', '!=', $weightCol];
+    }
+    $getFields = civicrm_api4($item['entity_type'], 'getFields', [
+      'checkPermissions' => FALSE,
+      'action' => 'create',
+      'where' => $condition,
+    ]);
+    $defaultValues = $getFields->indexBy('name')->column('default_value');
+    $item['params']['values'] += $defaultValues;
   }
 
   /**
@@ -332,7 +362,7 @@ class CRM_Core_ManagedEntities {
 
       case 'unused':
         if (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
-          $getRefCount = \Civi\Api4\Utils\CoreUtil::getRefCount($item['entity_type'], $item['entity_id']);
+          $getRefCount = CoreUtil::getRefCount($item['entity_type'], $item['entity_id']);
         }
         else {
           $getRefCount = civicrm_api3($item['entity_type'], 'getrefcount', [
