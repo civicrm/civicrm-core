@@ -11,8 +11,8 @@
 namespace Civi\Api4;
 
 use Civi\Api4\Action\Queue\ClaimItems;
+use Civi\Api4\Action\Queue\RunAll;
 use Civi\Api4\Action\Queue\RunItems;
-use Civi\Api4\Action\Queue\RunLoop;
 
 /**
  * Track a list of durable/scannable queues.
@@ -71,13 +71,13 @@ class Queue extends \Civi\Api4\Generic\DAOEntity {
    *
    * Note: This is appropriate for persistent, auto-run queues.
    *
-   * Note: `runLoop()` executes several units-of-work. It may handle multiple batches.
+   * Note: `runAll()` executes several units-of-work. It may handle multiple batches.
    *
    * @param bool $checkPermissions
-   * @return \Civi\Api4\Action\Queue\RunLoop
+   * @return \Civi\Api4\Action\Queue\RunAll
    */
-  public static function runLoop($checkPermissions = TRUE) {
-    return (new RunLoop(static::getEntityName(), __FUNCTION__))
+  public static function runAll($checkPermissions = TRUE) {
+    return (new RunAll(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
