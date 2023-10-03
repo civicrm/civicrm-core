@@ -25,6 +25,8 @@ use Civi\Api4\ContactType;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Event;
+use Civi\Api4\Individual;
+use Civi\Api4\Organization;
 use Civi\Api4\Participant;
 
 /**
@@ -88,11 +90,11 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       ->addValue('parent_id:name', 'Individual')
       ->execute();
 
-    $contact1 = Contact::create(FALSE)
+    $contact1 = Individual::create(FALSE)
       ->execute()->first();
-    $contact2 = Contact::create(FALSE)->addValue('contact_sub_type', [$this->subTypeName])
+    $contact2 = Individual::create(FALSE)->addValue('contact_sub_type', [$this->subTypeName])
       ->execute()->first();
-    $org = Contact::create(FALSE)->addValue('contact_type', 'Organization')
+    $org = Organization::create(FALSE)
       ->execute()->first();
 
     // Individual sub-type custom group
@@ -141,12 +143,33 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $this->assertArrayNotHasKey('org_group.sub_field', $fieldsWithSubtype);
     $this->assertArrayHasKey('always.on', $fieldsWithSubtype);
 
+    $fieldsWithSubtype = Individual::getFields(FALSE)
+      ->addValue('id', $contact2['id'])
+      ->execute()->indexBy('name');
+    $this->assertArrayHasKey('contact_sub.sub_field', $fieldsWithSubtype);
+    $this->assertArrayNotHasKey('org_group.sub_field', $fieldsWithSubtype);
+    $this->assertArrayHasKey('always.on', $fieldsWithSubtype);
+
+    $fieldsWithSubtype = Contact::getFields(FALSE)
+      ->addValue('id', $contact2['id'])
+      ->execute()->indexBy('name');
+    $this->assertArrayHasKey('contact_sub.sub_field', $fieldsWithSubtype);
+    $this->assertArrayNotHasKey('org_group.sub_field', $fieldsWithSubtype);
+    $this->assertArrayHasKey('always.on', $fieldsWithSubtype);
+
     $fieldsNoSubtype = Contact::getFields(FALSE)
       ->addValue('id', $contact1['id'])
       ->execute()->indexBy('name');
     $this->assertArrayNotHasKey('contact_sub.sub_field', $fieldsNoSubtype);
     $this->assertArrayNotHasKey('org_group.sub_field', $fieldsNoSubtype);
     $this->assertArrayHasKey('always.on', $fieldsNoSubtype);
+
+    $groupFields = Organization::getFields(FALSE)
+      ->addValue('id', $org['id'])
+      ->execute()->indexBy('name');
+    $this->assertArrayNotHasKey('contact_sub.sub_field', $groupFields);
+    $this->assertArrayHasKey('org_group.sub_field', $groupFields);
+    $this->assertArrayHasKey('always.on', $groupFields);
 
     $groupFields = Contact::getFields(FALSE)
       ->addValue('id', $org['id'])

@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
+use Civi\Api4\Email;
 use Civi\Api4\Relationship;
 use Civi\Test\TransactionalInterface;
 
@@ -419,6 +420,66 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('prefix_id:name', 'IN', ['Msssss.'])
       ->execute();
     $this->assertCount(0, $resultCount);
+  }
+
+  public function testContactPseudoEntityGet(): void {
+    $allCids = [];
+    $cids = [];
+    // Create a different number of contacts of each type
+    $contactTypes = [
+      'Individual' => 1,
+      'Organization' => 2,
+      'Household' => 3,
+    ];
+    foreach ($contactTypes as $contactType => $count) {
+      $saved = $this->saveTestRecords($contactType, ['records' => $count])->column('id');
+      $allCids = array_merge($allCids, $saved);
+      $cids[$contactType] = $saved;
+    }
+    $getAll = Contact::get(FALSE)
+      ->addWhere('id', 'IN', $allCids)
+      ->execute();
+    $this->assertCount(6, $getAll);
+    // Each pseudo-entity will only return contacts of that type
+    foreach ($contactTypes as $contactType => $count) {
+      $get[$contactType] = civicrm_api4($contactType, 'get', [
+        'where' => [['id', 'IN', $allCids]],
+        'debug' => TRUE,
+      ]);
+      $this->assertStringContainsString("`contact_type` = \"$contactType\"", $get[$contactType]->debug['sql'][0]);
+      $this->assertCount($count, $get[$contactType]);
+    }
+    // Ensure fields are returned appropriate to contact type: Individual
+    $this->assertArrayHasKey('first_name', $get['Individual'][0]);
+    $this->assertArrayNotHasKey('organization_name', $get['Individual'][0]);
+    $this->assertArrayNotHasKey('household_name', $get['Individual'][0]);
+    // Ensure fields are returned appropriate to contact type: Organization
+    $this->assertArrayNotHasKey('first_name', $get['Organization'][0]);
+    $this->assertArrayHasKey('organization_name', $get['Organization'][0]);
+    $this->assertArrayNotHasKey('household_name', $get['Organization'][0]);
+    // Ensure fields are returned appropriate to contact type: Household
+    $this->assertArrayNotHasKey('first_name', $get['Household'][0]);
+    $this->assertArrayNotHasKey('organization_name', $get['Household'][0]);
+    $this->assertArrayHasKey('household_name', $get['Household'][0]);
+
+    // Ensure contact type condition is added to the ON clause
+    foreach ($allCids as $cid) {
+      $emails[] = $this->createTestRecord('Email', ['contact_id' => $cid])['id'];
+    }
+    $getAll = Email::get(FALSE)
+      ->addWhere('id', 'IN', $emails)
+      ->addJoin('Contact AS contact', 'INNER', ['contact_id', '=', 'contact.id'])
+      ->execute();
+    $this->assertCount(6, $getAll);
+    foreach ($contactTypes as $contactType => $count) {
+      $get = Email::get(FALSE)
+        ->addWhere('id', 'IN', $emails)
+        ->addJoin("$contactType AS contact", 'INNER', ['contact_id', '=', 'contact.id'])
+        ->setDebug(TRUE)
+        ->execute();
+      $this->assertStringContainsString("`contact`.`contact_type` = \"$contactType\"", $get->debug['sql'][0]);
+      $this->assertCount($count, $get);
+    }
   }
 
 }

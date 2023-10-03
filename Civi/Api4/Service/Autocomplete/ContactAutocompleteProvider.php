@@ -13,6 +13,7 @@
 namespace Civi\Api4\Service\Autocomplete;
 
 use Civi\API\Event\PrepareEvent;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\HookInterface;
 
@@ -49,7 +50,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
   public static function on_civi_search_defaultDisplay(GenericHookEvent $e) {
-    if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || $e->savedSearch['api_entity'] !== 'Contact') {
+    if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || !CoreUtil::isContact($e->savedSearch['api_entity'])) {
       return;
     }
     $e->display['settings'] = [

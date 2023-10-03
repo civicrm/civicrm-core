@@ -91,7 +91,7 @@ class SpecGatherer extends AutoService {
     $DAOFields = $this->getDAOFields($entityName);
 
     foreach ($DAOFields as $DAOField) {
-      if (array_key_exists('contactType', $DAOField) && $spec->getValue('contact_type') && $DAOField['contactType'] != $spec->getValue('contact_type')) {
+      if (isset($DAOField['contactType']) && $spec->getValue('contact_type') && $DAOField['contactType'] !== $spec->getValue('contact_type')) {
         continue;
       }
       if (!empty($DAOField['component']) && !\CRM_Core_Component::isEnabled($DAOField['component'])) {
@@ -146,13 +146,24 @@ class SpecGatherer extends AutoService {
    * @see \CRM_Core_SelectValues::customGroupExtends
    */
   private function addCustomFields(string $entity, RequestSpec $spec, bool $checkPermissions) {
+    $values = $spec->getValues();
+
+    // Handle contact type pseudo-entities
+    $contactTypes = \CRM_Contact_BAO_ContactType::basicTypes();
+    // If contact type is given
+    if ($entity === 'Contact' && !empty($values['contact_type'])) {
+      $entity = $values['contact_type'];
+    }
+
     $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entity);
     if (!$customInfo) {
       return;
     }
-    $values = $spec->getValues();
     $extends = $customInfo['extends'];
     $grouping = $customInfo['grouping'];
+    if ($entity === 'Contact' || in_array($entity, $contactTypes, TRUE)) {
+      $grouping = 'contact_sub_type';
+    }
 
     $query = CustomField::get(FALSE)
       ->setSelect(['custom_group_id.name', 'custom_group_id.title', '*'])
@@ -169,17 +180,6 @@ class SpecGatherer extends AutoService {
       $query->addWhere('custom_group_id', 'IN', $allowedGroups);
     }
 
-    // Contact custom groups are extra complicated because contact_type can be a value for extends
-    if ($entity === 'Contact') {
-      if (array_key_exists('contact_type', $values)) {
-        $extends = ['Contact'];
-        if ($values['contact_type']) {
-          $extends[] = $values['contact_type'];
-        }
-      }
-      // Now grouping can be treated normally
-      $grouping = 'contact_sub_type';
-    }
     if (is_string($grouping) && array_key_exists($grouping, $values)) {
       if (empty($values[$grouping])) {
         $query->addWhere('custom_group_id.extends_entity_column_value', 'IS EMPTY');

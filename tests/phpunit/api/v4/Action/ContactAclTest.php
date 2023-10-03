@@ -22,7 +22,9 @@ namespace api\v4\Action;
 use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
+use Civi\Api4\Individual;
 use Civi\Api4\LocationType;
+use Civi\Api4\Organization;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 
@@ -33,6 +35,17 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
 
   use \Civi\Test\ACLPermissionTrait;
 
+  public function testPermissionInfo(): void {
+    foreach (['Contact', 'Individual', 'Organization', 'Household'] as $entity) {
+      $apiClass = '\Civi\Api4\\' . $entity;
+      $permissions = $apiClass::permissions();
+      $this->assertEquals([], $permissions['get']);
+      $this->assertContains('add contacts', $permissions['create']);
+      $this->assertContains('delete contacts', $permissions['delete']);
+      $this->assertContains('merge duplicate contacts', $permissions['merge']);
+    }
+  }
+
   public function testBasicContactPermissions(): void {
     $this->createLoggedInUser();
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
@@ -40,7 +53,7 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
       'view all contacts',
     ];
 
-    $this->createTestRecord('Contact');
+    $this->createTestRecord('Individual');
 
     $result = Contact::get()->execute();
     $this->assertGreaterThan(0, $result->count());
@@ -53,10 +66,16 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
 
     $result = Contact::get()->execute();
     $this->assertCount(0, $result);
+
+    $result = Individual::get()->execute();
+    $this->assertCount(0, $result);
+
+    $result = Organization::get()->execute();
+    $this->assertCount(0, $result);
   }
 
-  public function testContactAclForRelatedEntity() {
-    $cid = $this->saveTestRecords('Contact', ['records' => 4])
+  public function testContactAclForRelatedEntity(): void {
+    $cid = $this->saveTestRecords('Individual', ['records' => 4])
       ->column('id');
     $email = $this->saveTestRecords('Email', [
       'records' => [
@@ -79,8 +98,8 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertEquals(1, substr_count($allowedEmails->debug['sql'][0], 'civicrm_acl_contact_cache'));
   }
 
-  public function testContactAclClauseDedupe() {
-    $cid = $this->saveTestRecords('Contact', ['records' => 4])
+  public function testContactAclClauseDedupe(): void {
+    $cid = $this->saveTestRecords('Individual', ['records' => 4])
       ->column('id');
     $locationType = $this->createTestRecord('LocationType');
     $email = $this->saveTestRecords('Email', [
@@ -97,8 +116,21 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view debug output'];
     \CRM_Utils_Hook::singleton()->setHook('civicrm_aclWhereClause', [$this, 'aclWhereMultipleContacts']);
 
+    // Should now have access to 3 contacts
+    $this->assertCount(3, Individual::get()->execute());
+
     // Acl clause is added only once and shared by the joined entities
     $contactGet = Contact::get()->setDebug(TRUE)
+      ->addSelect('email.id')
+      ->addJoin('Email AS email', 'LEFT', ['email.contact_id', '=', 'id'])
+      ->execute();
+    $this->assertCount(3, $contactGet);
+    $this->assertEquals(array_slice($email, 1), $contactGet->column('email.id'));
+    // ACL clause should have been inserted once
+    $this->assertEquals(1, substr_count($contactGet->debug['sql'][0], 'civicrm_acl_contact_cache'));
+
+    // Same should work with Individual api as Contact
+    $contactGet = Individual::get()->setDebug(TRUE)
       ->addSelect('email.id')
       ->addJoin('Email AS email', 'LEFT', ['email.contact_id', '=', 'id'])
       ->execute();
