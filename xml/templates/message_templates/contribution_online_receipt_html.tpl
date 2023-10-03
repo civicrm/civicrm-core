@@ -71,7 +71,7 @@
                   {/if}
                 {/if}
                 <td>
-                  {$line.line_total+$line.tax_amount|crmMoney:$currency}
+                  {$line.line_total_inclusive|crmMoney:$currency}
                 </td>
               </tr>
             {/foreach}

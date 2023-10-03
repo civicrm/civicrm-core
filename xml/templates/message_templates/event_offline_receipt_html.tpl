@@ -212,7 +212,7 @@
                             {/if}
                           {/if}
                         <td {$tdStyle}>
-                            {$line.line_total+$line.tax_amount|crmMoney:$currency}
+                            {$line.line_total_inclusive|crmMoney:$currency}
                         </td>
                         {if $isShowParticipantCount}
                           <td {$tdStyle}>{$line.participant_count}</td>

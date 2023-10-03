@@ -913,6 +913,7 @@ class CRM_Financial_BAO_Order {
         $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
       }
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
+      $lineItem['line_total_inclusive'] = $lineItem['line_total'] + $lineItem['tax_amount'];
     }
     return $lineItems;
   }

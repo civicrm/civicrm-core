@@ -40,7 +40,7 @@
 --------------------------------------------------------------------------------------------------
 
 {foreach from=$lineItems item=line}
-{line.title} {$line.line_total|crmMoney|string_format:"%10s"}  {if $isShowTax && {contribution.tax_amount|boolean}} {$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"}  {else}                  {/if}   {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {/if} {$line.membership.start_date|string_format:"%20s"} {$line.membership.end_date|string_format:"%20s"}
+{line.title} {$line.line_total|crmMoney|string_format:"%10s"}  {if $isShowTax && {contribution.tax_amount|boolean}} {$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"}  {else}                  {/if}   {$line.line_total_inclusive|crmMoney|string_format:"%10s"} {/if} {$line.membership.start_date|string_format:"%20s"} {$line.membership.end_date|string_format:"%20s"}
 {/foreach}
 
 {if $isShowTax && {contribution.tax_amount|boolean}}
