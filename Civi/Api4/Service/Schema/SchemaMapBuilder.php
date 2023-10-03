@@ -16,6 +16,7 @@ use Civi\Api4\Entity;
 use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Service\AutoService;
 use Civi\Core\CiviEventDispatcherInterface;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
@@ -142,7 +143,7 @@ class SchemaMapBuilder extends AutoService {
       }
 
       if ($fieldData->data_type === 'EntityReference' && isset($fieldData->fk_entity)) {
-        $targetTable = AllCoreTables::getTableForEntityName($fieldData->fk_entity);
+        $targetTable = self::getTableName($fieldData->fk_entity);
         $joinable = new Joinable($targetTable, 'id', $fieldData->name);
         $customTable->addTableLink($fieldData->column_name, $joinable);
       }
@@ -160,6 +161,17 @@ class SchemaMapBuilder extends AutoService {
       $joinable = new CustomGroupJoinable($link['tableName'], $alias, $link['isMultiple'], $link['columns']);
       $baseTable->addTableLink($customInfo['column'], $joinable);
     }
+  }
+
+  /**
+   * @param string $entityName
+   * @return string
+   */
+  private static function getTableName(string $entityName) {
+    if (CoreUtil::isContact($entityName)) {
+      return 'civicrm_contact';
+    }
+    return AllCoreTables::getTableForEntityName($entityName);
   }
 
 }
