@@ -5,6 +5,12 @@ use Civi\Test\HookInterface;
 
 return new class() extends EventCheck implements HookInterface {
 
+  // There are several properties named "$grandfatherdXyz". These mark itmes which
+  // pass through hook_civicrm_links but deviate from the plain interpretation of the docs.
+  // Auditing or cleaning each would be its own separate project. Please feel free to
+  // do that audit and figure how to normalize it. But for now, the goal of this file is
+  // to limit the chaos - and prevent new/un-documented deviations.
+
   /**
    * These are $objectNames that deviate from the normal "CamelCase" convention.
    * They're allowed for backward-compatibility.
@@ -29,6 +35,16 @@ return new class() extends EventCheck implements HookInterface {
     'membershipType.manage.action::MembershipType',
     'messageTemplate.manage.action::MessageTemplate',
     'basic.CRM_Core_BAO_MessageTemplate.page::CRM_Core_BAO_MessageTemplate',
+  ];
+
+  /**
+   * These variants have anomalous keys that are not documented and do not
+   * appear in most flavors of "hook_civicrm_links".
+   *
+   * @var \string[][]
+   */
+  protected $grandfatheredInvalidKeys = [
+    'pledge.selector.row' => ['is_active'],
   ];
 
   /**
@@ -110,9 +126,12 @@ return new class() extends EventCheck implements HookInterface {
         $this->assertTrue((bool) preg_match(';^fa-[-a-z0-9]+$;', $link['icon']), "$msg: Icon ({$link['icon']}) should be FontAwesome icon class");
       }
 
-      $expectKeys = ['name', 'url', 'qs', 'title', 'extra', 'bit', 'ref', 'class', 'weight', 'accessKey', 'icon'];
+      $expectKeys = array_merge(
+        ['name', 'url', 'qs', 'title', 'extra', 'bit', 'ref', 'class', 'weight', 'accessKey', 'icon'],
+        $this->grandfatheredInvalidKeys[$op] ?? []
+      );
       $extraKeys = array_diff(array_keys($link), $expectKeys);
-      $this->assertEquals([], $extraKeys, "$msg: Link has unrecognized keys: " . json_encode($extraKeys));
+      $this->assertEquals([], $extraKeys, "$msg: Link has unrecognized keys: " . json_encode(array_values($extraKeys)));
     }
   }
 
