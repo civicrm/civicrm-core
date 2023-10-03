@@ -41,6 +41,11 @@
           this.search_operator = this.defn.search_operator;
         }
 
+        // Ensure boolean options are truly boolean
+        if (this.defn.data_type === 'Boolean' && this.defn.options) {
+          this.defn.options.forEach((option) => option.id = !!option.id);
+        }
+
         // is_primary field - watch others in this afRepeat block to ensure only one is selected
         if (ctrl.fieldName === 'is_primary' && 'repeatIndex' in $scope.dataProvider) {
           $scope.$watch('dataProvider.afRepeat.getEntityController().getData()', function (items, prev) {
@@ -167,7 +172,7 @@
       this.isMultiple = function() {
         return (
           (['Select', 'EntityRef', 'ChainSelect'].includes(ctrl.defn.input_type) && ctrl.defn.input_attrs.multiple) ||
-          (ctrl.defn.input_type === 'CheckBox' && ctrl.defn.options)
+          (ctrl.defn.input_type === 'CheckBox' && ctrl.defn.data_type !== 'Boolean')
         );
       };
 

@@ -124,7 +124,7 @@
 
       $scope.hasOptions = function() {
         var inputType = $scope.getProp('input_type');
-        return _.contains(['CheckBox', 'Radio', 'Select'], inputType) && !(inputType === 'CheckBox' && !ctrl.getDefn().options);
+        return _.contains(['CheckBox', 'Radio', 'Select'], inputType) && !(inputType === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean');
       };
 
       this.getOptions = function() {
@@ -142,7 +142,7 @@
           }
           return entityRefOptions;
         }
-        return ctrl.getDefn().options || ($scope.getProp('input_type') === 'CheckBox' ? null : yesNo);
+        return ctrl.getDefn().options || (ctrl.getDefn().data_type === 'Boolean' ? yesNo : null);
       };
 
       $scope.resetOptions = function() {
@@ -341,6 +341,10 @@
             if (ctrl.node.defn && ctrl.node.defn.input_attrs && 'multiple' in ctrl.node.defn.input_attrs && !ctrl.canBeMultiple()) {
               delete ctrl.node.defn.input_attrs.multiple;
               clearOut(ctrl.node, ['defn', 'input_attrs']);
+            }
+            // Boolean checkbox has no options
+            if (val === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean' && ctrl.node.defn) {
+              delete ctrl.node.defn.options;
             }
           }
           setFieldDefn();
