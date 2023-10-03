@@ -214,6 +214,43 @@ class QueueTest extends Api4TestBase {
     $this->assertEquals(0, $result[0]['queue_total'], 'Queue should be empty');
   }
 
+  public function testRunLoop_abort() {
+    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_runloopabort';
+    $queue = \Civi::queue($queueName, [
+      'type' => 'Sql',
+      'runner' => 'task',
+      'error' => 'abort',
+    ]);
+    $this->assertQueueStats(0, 0, 0, $queue);
+
+    \Civi::queue($queueName)->createItem(new \CRM_Queue_Task([__CLASS__, 'dummyTask'], ['ok'])); /*A*/
+    \Civi::queue($queueName)->createItem(new \CRM_Queue_Task([__CLASS__, 'dummyTask'], ['ok'])); /*B*/
+    \Civi::queue($queueName)->createItem(new \CRM_Queue_Task([__CLASS__, 'dummyTask'], ['ok'])); /*C*/
+    \Civi::queue($queueName)->createItem(new \CRM_Queue_Task([__CLASS__, 'dummyTask'], ['exception'])); /*D*/
+    \Civi::queue($queueName)->createItem(new \CRM_Queue_Task([__CLASS__, 'dummyTask'], ['ok']));  /*E*/
+
+    // 20 items ==> 4 per batch ==> 5 batches. Let's run the first 3...
+    $result = Queue::runLoop(0)->setQueue($queueName)->execute();
+    $this->assertEquals(3, $result[0]['item_successes'], "Executed A+B+C");
+    $this->assertEquals(1, $result[0]['item_errors'], "Exception on D");
+    $this->assertEquals(4, $result[0]['loop_requests'], "Attempted A+B+C+D");
+    $this->assertTrue(is_numeric($result[0]['loop_duration']));
+    $this->assertEquals('Queue is not active (status => aborted)', $result[0]['exit_message']);
+    $this->assertEquals(0, $result[0]['queue_blocked'], 'No tasks are time-blocked (future-scheduled)');
+    $this->assertEquals(2, $result[0]['queue_ready'], 'Need to try D+E');
+    $this->assertEquals(2, $result[0]['queue_total'], 'Need to try D+E');
+  }
+
+  public static function dummyTask(\CRM_Queue_TaskContext $ctx, string $outcome): bool {
+    if ($outcome === 'exception') {
+      throw new \Exception("dummyTask simulated an exception!");
+    }
+    if ($outcome === 'ok') {
+      return TRUE;
+    }
+    static::fail('dummyTask has unrecognized outcome: ' . $outcome);
+  }
+
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @see CRM_Utils_Hook::queueRun()

@@ -67,6 +67,7 @@ class RunLoop extends \Civi\Api4\Generic\AbstractAction {
 
     while (TRUE) {
       if (!$queue->isActive()) {
+        $message = sprintf('Queue is not active (status => %s)', $queue->getStatus());
         break;
       }
 
