@@ -30,11 +30,22 @@ return new class() extends EventCheck implements HookInterface {
   protected $grandfatheredNoUrl = [
     'basic.CRM_Core_BAO_LocationType.page::CRM_Core_BAO_LocationType',
     'case.tab.row::Activity',
+    'financialItem.batch.row::FinancialItem',
     'group.selector.row::Group',
     'job.manage.action::Job',
     'membershipType.manage.action::MembershipType',
     'messageTemplate.manage.action::MessageTemplate',
     'basic.CRM_Core_BAO_MessageTemplate.page::CRM_Core_BAO_MessageTemplate',
+  ];
+
+  /**
+   * These are deviant values with appear as `$link['bit']` fields. They are documented
+   * (and generally practiced) as integers.
+   *
+   * @var \string[][]
+   */
+  protected $grandfatheredInvalidBits = [
+    'financialItem.batch.row' => ['view', 'assign'],
   ];
 
   /**
@@ -110,7 +121,12 @@ return new class() extends EventCheck implements HookInterface {
         $this->assertType('string', $link['extra'], "$msg: extra should be a string");
       }
       if (isset($link['bit'])) {
-        $this->assertType('integer', $link['bit'], "$msg: bit should be an int");
+        if (in_array($link['bit'], $this->grandfatheredInvalidBits[$op] ?? [])) {
+          // Exception
+        }
+        else {
+          $this->assertType('integer', $link['bit'], "$msg: bit should be an int" . $link['bit']);
+        }
       }
       if (isset($link['ref'])) {
         $this->assertType('string', $link['ref'], "$msg: ref should be an string");
