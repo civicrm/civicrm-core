@@ -59,6 +59,15 @@ abstract class CRM_Queue_Queue {
    * @throws \CRM_Core_Exception
    */
   public function isActive(): bool {
+    return ($this->getStatus() === 'active');
+  }
+
+  /**
+   * @return string|null
+   * @throws \CRM_Core_Exception
+   * @see \CRM_Queue_BAO_Queue::getStatuses()
+   */
+  public function getStatus() {
     // Queues work with concurrent processes. We want to make sure status info is up-to-date (never cached).
     $status = CRM_Core_DAO::getFieldValue('CRM_Queue_DAO_Queue', $this->_name, 'status', 'name', TRUE);
     if ($status === 'active') {
@@ -72,7 +81,7 @@ abstract class CRM_Queue_Queue {
     CRM_Utils_Hook::queueActive($status, $this->getName(), $this->queueSpec);
     // Note in future we might want to consider whether an upgrade is in progress.
     // Should we set the setting at that point?
-    return ($status === 'active');
+    return $status;
   }
 
   /**

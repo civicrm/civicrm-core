@@ -12,6 +12,7 @@ namespace Civi\Api4;
 
 use Civi\Api4\Action\Queue\ClaimItems;
 use Civi\Api4\Action\Queue\RunItems;
+use Civi\Api4\Action\Queue\Run;
 
 /**
  * Track a list of durable/scannable queues.
@@ -70,6 +71,21 @@ class Queue extends \Civi\Api4\Generic\DAOEntity {
    */
   public static function runItems($checkPermissions = TRUE) {
     return (new RunItems(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * Run a series of items from a queue.
+   *
+   * This is a lightweight main-loop for development/testing. It may have some limited utility for
+   * sysadmins who want to fine-tune runners on a specific queue. See the class docblock for
+   * more information.
+   *
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\Queue\Run
+   */
+  public static function run($checkPermissions = TRUE) {
+    return (new Run(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
