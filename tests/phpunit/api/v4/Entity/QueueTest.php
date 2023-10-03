@@ -187,7 +187,7 @@ class QueueTest extends Api4TestBase {
     }
 
     // 20 items ==> 4 per batch ==> 5 batches. Let's run the first 3...
-    $result = Queue::runLoop(0)->setQueue($queueName)->setMaxRequests(3)->execute();
+    $result = Queue::run(0)->setQueue($queueName)->setMaxRequests(3)->execute();
     $this->assertEquals([0, 1, 2, 3], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][0], 'Scope of first batch');
     $this->assertEquals([4, 5, 6, 7], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][1], 'Scope of second batch');
     $this->assertEquals([8, 9, 10, 11], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][2], 'Scope of third batch');
@@ -201,7 +201,7 @@ class QueueTest extends Api4TestBase {
     $this->assertEquals(8, $result[0]['queue_total'], 'Due to request limit, we left some items in queue');
 
     // And run any remaining batches...
-    $result = Queue::runLoop(0)->setQueue($queueName)->setMaxRequests(10)->execute();
+    $result = Queue::run(0)->setQueue($queueName)->setMaxRequests(10)->execute();
     $this->assertEquals([12, 13, 14, 15], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][3], 'Scope of fourth batch');
     $this->assertEquals([16, 17, 18, 19], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][4], 'Scope of fifth batch');
     $this->assertEquals(8, $result[0]['item_successes']);
@@ -230,7 +230,7 @@ class QueueTest extends Api4TestBase {
     \Civi::queue($queueName)->createItem(new \CRM_Queue_Task([__CLASS__, 'dummyTask'], ['ok']));  /*E*/
 
     // 20 items ==> 4 per batch ==> 5 batches. Let's run the first 3...
-    $result = Queue::runLoop(0)->setQueue($queueName)->execute();
+    $result = Queue::run(0)->setQueue($queueName)->execute();
     $this->assertEquals(3, $result[0]['item_successes'], "Executed A+B+C");
     $this->assertEquals(1, $result[0]['item_errors'], "Exception on D");
     $this->assertEquals(4, $result[0]['loop_requests'], "Attempted A+B+C+D");

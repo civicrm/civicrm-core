@@ -31,7 +31,7 @@ use Civi\Api4\Queue;
  * @method ?int getMaxDuration()
  * @method $this setMaxDuration(?int $maxDuration)
  */
-class RunLoop extends \Civi\Api4\Generic\AbstractAction {
+class Run extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * Name of the target queue.
