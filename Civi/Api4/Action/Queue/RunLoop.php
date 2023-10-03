@@ -8,14 +8,21 @@ use Civi\Api4\Queue;
 /**
  * Run a series of items from a queue.
  *
- * This is a lightweight main-loop for development/testing. It may have some limited utility for
- * sysadmins who want to fine-tune runners on a specific queue.
+ * This is a lightweight main-loop for development/testing. It repeatedly runs tasks, until:
  *
- * Basically, this runs until the queue is empty -- or until you reach one of the limits.
+ * - The queue is empty, or...
+ * - The queue encounters an abortive error, or...
+ * - The queue is externally paused/disabled, or...
+ * - The runner reaches an execution limit (such as `$maxDuration` or `$maxRequests`).
  *
- * For more functionality (queue auto-detection, fatal recovery, more tunable limits,
- * process pooling, privilege separation, wait-support), you should look to `coworker` or
- * write a custom main-loop.
+ * This main-loop is similar to the older helpers, `CRM_Queue_Runner::runAll()` and
+ * `civicrm_api_job_runspecificqueue` (devdocs-template) -- except this implementation supports
+ * newer hooks and configuration flags, and it requires persistent `civicrm_queue` metadata.
+ *
+ * This main-loop may have some utility for sysadmins who want to fine-tune runners on a
+ * specific queue, but it is not a full/system-level agent. It lacks support for
+ * multi-queue, privilege-separation (`runAs`), process-pooling, PHP-fatal recovery, etc.
+ * (For a full/system-level agent, see `coworker`.)
  *
  * @method ?string getQueue
  * @method $this setQueue(?string $queue)
