@@ -76,12 +76,14 @@ class CRM_Utils_Address {
       // replacements in case of Individual Name Format
       $replacements = [
         'contact.display_name' => $fields['display_name'] ?? NULL,
-        'contact.individual_prefix' => $fields['individual_prefix'] ?? NULL,
         'contact.formal_title' => $fields['formal_title'] ?? NULL,
         'contact.first_name' => $fields['first_name'] ?? NULL,
         'contact.middle_name' => $fields['middle_name'] ?? NULL,
         'contact.last_name' => $fields['last_name'] ?? NULL,
-        'contact.individual_suffix' => $fields['individual_suffix'] ?? NULL,
+        'contact.individual_prefix' => $fields['prefix_id:label'] ?? ($fields['individual_prefix'] ?? NULL),
+        'contact.prefix_id:label' => $fields['prefix_id:label'] ?? ($fields['individual_prefix'] ?? NULL),
+        'contact.individual_suffix' => $fields['suffix_id:label'] ?? ($fields['individual_suffix'] ?? NULL),
+        'contact.suffix_id:label' => $fields['suffix_id:label'] ?? ($fields['individual_suffix'] ?? NULL),
         'contact.address_name' => $fields['address_name'] ?? NULL,
         'contact.street_address' => $fields['street_address'] ?? NULL,
         'contact.supplemental_address_1' => $fields['supplemental_address_1'] ?? NULL,
