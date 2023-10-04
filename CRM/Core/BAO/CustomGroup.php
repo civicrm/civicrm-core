@@ -550,6 +550,7 @@ ORDER BY civicrm_custom_group.weight,
       $cacheString .= "_Inline";
     }
 
+    $multipleFieldGroups = [];
     $cacheKey = "CRM_Core_DAO_CustomGroup_Query " . md5($cacheString);
     $multipleFieldGroupCacheKey = "CRM_Core_DAO_CustomGroup_QueryMultipleFields " . md5($cacheString);
     $cache = CRM_Utils_Cache::singleton();
