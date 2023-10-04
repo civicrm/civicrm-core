@@ -383,7 +383,7 @@ class CRM_Extension_Mapper {
   public function getKeysByPath($pattern) {
     $keys = [];
 
-    if (CRM_Utils_String::endsWith($pattern, '*')) {
+    if (str_ends_with($pattern, '*')) {
       $prefix = rtrim($pattern, '*');
       foreach ($this->container->getKeys() as $key) {
         $path = CRM_Utils_File::addTrailingSlash($this->container->getPath($key));

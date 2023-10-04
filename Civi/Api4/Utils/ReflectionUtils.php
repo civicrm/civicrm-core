@@ -206,7 +206,7 @@ class ReflectionUtils {
 
       yield from [];
       foreach ($clazz->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
-        if (\CRM_Utils_String::startsWith($m->getName(), $prefix)) {
+        if (str_starts_with($m->getName(), $prefix)) {
           yield $m;
         }
       }
