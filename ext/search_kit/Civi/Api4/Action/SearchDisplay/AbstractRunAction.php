@@ -519,8 +519,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $link['url'] = $this->getUrl($path);
       $keys = ['url', 'text', 'title', 'target', 'icon', 'style', 'autoOpen'];
     }
-    else {
+    elseif (!empty($link['task'])) {
       $keys = ['task', 'text', 'title', 'icon', 'style'];
+    }
+    else {
+      return NULL;
     }
     $link = array_intersect_key($link, array_flip($keys));
     return array_filter($link, function($value) {
