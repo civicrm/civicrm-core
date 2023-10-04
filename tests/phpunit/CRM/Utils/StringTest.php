@@ -191,43 +191,6 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertSame($expected, $actual);
   }
 
-  /**
-   * Data provider for checking how strings start and end.
-   *
-   * @noinspection SpellCheckingInspection
-   */
-  public function startEndCases(): array {
-    $cases = [];
-    $cases[] = ['startsWith', 'foo', '', TRUE];
-    $cases[] = ['startsWith', 'foo', 'f', TRUE];
-    $cases[] = ['startsWith', 'foo', 'fo', TRUE];
-    $cases[] = ['startsWith', 'foo', 'foo', TRUE];
-    $cases[] = ['startsWith', 'foo', 'fooo', FALSE];
-    $cases[] = ['startsWith', 'foo', 'o', FALSE];
-    $cases[] = ['endsWith', 'foo', 'f', FALSE];
-    $cases[] = ['endsWith', 'foo', '', TRUE];
-    $cases[] = ['endsWith', 'foo', 'o', TRUE];
-    $cases[] = ['endsWith', 'foo', 'oo', TRUE];
-    $cases[] = ['endsWith', 'foo', 'foo', TRUE];
-    $cases[] = ['endsWith', 'foo', 'fooo', FALSE];
-    $cases[] = ['endsWith', 'foo*', '*', TRUE];
-    return $cases;
-  }
-
-  /**
-   * @param string $function
-   *   One of: 'startsWith' or 'endsWith'.
-   * @param $string
-   * @param $fragment
-   * @param $expectedResult
-   *
-   * @dataProvider startEndCases
-   */
-  public function testStartEndWith(string $function, $string, $fragment, $expectedResult): void {
-    $actualResult = CRM_Utils_String::$function($string, $fragment);
-    $this->assertEquals($expectedResult, $actualResult, "Checking $function($string,$fragment)");
-  }
-
   public function wildcardCases(): array {
     $cases = [];
     $cases[] = ['*', ['foo.bar.1', 'foo.bar.2', 'foo.whiz', 'bang.bang']];

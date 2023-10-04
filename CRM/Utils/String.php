@@ -876,7 +876,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Determine if $string starts with $fragment.
+   * @deprecated
    *
    * @param string $string
    *   The long string.
@@ -885,15 +885,12 @@ class CRM_Utils_String {
    * @return bool
    */
   public static function startsWith($string, $fragment) {
-    if ($fragment === '') {
-      return TRUE;
-    }
-    $len = strlen($fragment ?? '');
-    return substr(($string ?? ''), 0, $len) === $fragment;
+    CRM_Core_Error::deprecatedFunctionWarning('str_starts_with');
+    return str_starts_with((string) $string, (string) $fragment);
   }
 
   /**
-   * Determine if $string ends with $fragment.
+   * @deprecated
    *
    * @param string $string
    *   The long string.
@@ -902,11 +899,8 @@ class CRM_Utils_String {
    * @return bool
    */
   public static function endsWith($string, $fragment) {
-    if ($fragment === '') {
-      return TRUE;
-    }
-    $len = strlen($fragment ?? '');
-    return substr(($string ?? ''), -1 * $len) === $fragment;
+    CRM_Core_Error::deprecatedFunctionWarning('str_ends_with');
+    return str_ends_with((string) $string, (string) $fragment);
   }
 
   /**
@@ -920,7 +914,7 @@ class CRM_Utils_String {
     $patterns = (array) $patterns;
     $result = [];
     foreach ($patterns as $pattern) {
-      if (!\CRM_Utils_String::endsWith($pattern, '*')) {
+      if (!str_ends_with($pattern, '*')) {
         if ($allowNew || in_array($pattern, $allStrings)) {
           $result[] = $pattern;
         }
@@ -928,7 +922,7 @@ class CRM_Utils_String {
       else {
         $prefix = rtrim($pattern, '*');
         foreach ($allStrings as $key) {
-          if (\CRM_Utils_String::startsWith($key, $prefix)) {
+          if (str_starts_with($key, $prefix)) {
             $result[] = $key;
           }
         }

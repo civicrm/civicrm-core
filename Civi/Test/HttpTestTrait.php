@@ -75,7 +75,7 @@ trait HttpTestTrait {
    * @return mixed
    */
   protected function callApi4AjaxSuccess(string $entity, string $action, $params = []) {
-    $method = \CRM_Utils_String::startsWith($action, 'get') ? 'GET' : 'POST';
+    $method = str_starts_with($action, 'get') ? 'GET' : 'POST';
     $response = $this->createGuzzle()->request($method, "civicrm/ajax/api4/$entity/$action", [
       'headers' => ['X-Requested-With' => 'XMLHttpRequest'],
       // This should probably be 'form_params', but 'query' is more representative of frontend.
@@ -99,7 +99,7 @@ trait HttpTestTrait {
    * @return mixed
    */
   protected function callApi4AjaxError(string $entity, string $action, $params = []) {
-    $method = \CRM_Utils_String::startsWith($action, 'get') ? 'GET' : 'POST';
+    $method = str_starts_with($action, 'get') ? 'GET' : 'POST';
     $response = $this->createGuzzle()->request($method, "civicrm/ajax/api4/$entity/$action", [
       'headers' => ['X-Requested-With' => 'XMLHttpRequest'],
       // This should probably be 'form_params', but 'query' is more representative of frontend.

@@ -1319,7 +1319,7 @@ Expires: ',
     $discountedItems = 0;
     foreach ($lineItemResult['values'] as $lineItem) {
       $this->assertEquals(round($lineItem['line_total'] * .1, 2), $lineItem['tax_amount']);
-      if (CRM_Utils_String::startsWith($lineItem['label'], 'Long Haired Goat')) {
+      if (str_starts_with($lineItem['label'], 'Long Haired Goat')) {
         $this->assertEquals(15.0, $lineItem['line_total']);
         $this->assertEquals('Long Haired Goat - one leg free!', $lineItem['label']);
         $discountedItems++;

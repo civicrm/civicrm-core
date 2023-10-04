@@ -73,7 +73,7 @@ function _authx_redact(array $keys) {
 function _authx_reload($route, $queryString) {
   parse_str($queryString, $query);
   foreach (array_keys($query) as $key) {
-    if (CRM_Utils_String::startsWith($key, '_authx')) {
+    if (str_starts_with($key, '_authx')) {
       unset($query[$key]);
     }
   }
