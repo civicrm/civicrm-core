@@ -371,6 +371,7 @@
   <page_callback>CRM_Contact_Form_Task_SMS</page_callback>
   <access_arguments>send SMS</access_arguments>
 </item>
+  <!-- DELETEME only-used-by-user-dashboard -->
   <item>
     <path>civicrm/ajax/contactrelationships</path>
     <page_callback>CRM_Contact_Page_AJAX::getContactRelationships</page_callback>

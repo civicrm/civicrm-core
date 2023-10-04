@@ -403,10 +403,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Refresh contact tabs which might have been affected
     $this->ajaxResponse = [
       'reloadBlocks' => ['#crm-contactinfo-content'],
-      'updateTabs' => [
-        '#tab_member' => CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId),
-        '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
-      ],
     ];
   }
 

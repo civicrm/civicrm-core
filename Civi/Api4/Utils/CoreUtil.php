@@ -20,6 +20,10 @@ use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class CoreUtil {
 
+  public static function entityExists(string $entityName): bool {
+    return (bool) self::getInfoItem($entityName, 'name');
+  }
+
   /**
    * @param $entityName
    *

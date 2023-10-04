@@ -61,11 +61,6 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
         CRM_Contact_Page_View::checkUserPermission($this);
       }
     }
-    else {
-      if ($this->_action & CRM_Core_Action::VIEW) {
-        CRM_Core_Error::statusBounce(ts('Contact Id is required for view action.'));
-      }
-    }
 
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType();
 

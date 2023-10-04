@@ -34,6 +34,14 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   /**
    * @inheritDoc
    */
+  protected function setUp(): void {
+    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
+    parent::setUp();
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function tearDown(): void {
     \Civi\Api4\Setting::revert(FALSE)
       ->addSelect('geoProvider')
@@ -321,10 +329,11 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testRelationshipCacheLinks():void {
+    $case = $this->createTestRecord('Case');
     $relationships = $this->saveTestRecords('Relationship', [
       'records' => [
         ['contact_id_a' => $this->createTestRecord('Contact')['id'], 'is_active' => TRUE],
-        ['contact_id_a' => $this->createTestRecord('Contact')['id'], 'is_active' => FALSE],
+        ['contact_id_a' => $this->createTestRecord('Contact')['id'], 'is_active' => FALSE, 'case_id' => $case['id']],
       ],
     ]);
     $params = [
@@ -336,6 +345,13 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           'version' => 4,
           'select' => ['near_contact_id.display_name'],
           'where' => [['relationship_id', 'IN', $relationships->column('id')]],
+          'join' => [
+            [
+              'Case AS RelationshipCache_Case_case_id_01',
+              'LEFT',
+              ['case_id', '=', 'RelationshipCache_Case_case_id_01.id'],
+            ],
+          ],
         ],
       ],
       'display' => [
@@ -375,6 +391,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
                   'task' => 'disable',
                   'condition' => ['is_active', '=', TRUE],
                 ],
+                [
+                  'entity' => 'Case',
+                  'action' => 'view',
+                  'join' => 'RelationshipCache_Case_case_id_01',
+                  'text' => 'Manage Case',
+                ],
               ],
             ],
           ],
@@ -387,6 +409,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(4, $result);
     $this->assertCount(3, $result[0]['columns'][1]['links']);
+    $this->assertCount(4, $result[2]['columns'][1]['links']);
     // 1st link is to a quickform-based action
     $this->assertArrayNotHasKey('task', $result[0]['columns'][1]['links'][0]);
     $this->assertStringContainsString('id=' . $relationships[0]['id'], $result[0]['columns'][1]['links'][0]['url']);
@@ -402,6 +425,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('enable', $result[2]['columns'][1]['links'][2]['task']);
     $this->assertEquals('enable', $result[3]['columns'][1]['links'][2]['task']);
     $this->assertStringContainsString('Enable', $result[3]['columns'][1]['links'][2]['title']);
+    // 4th link is to the case, and only for the relevant entity
+    $this->assertEquals('Manage Case', $result[2]['columns'][1]['links'][3]['text']);
+    $this->assertStringContainsString('civicrm', $result[3]['columns'][1]['links'][3]['url']);
   }
 
   /**

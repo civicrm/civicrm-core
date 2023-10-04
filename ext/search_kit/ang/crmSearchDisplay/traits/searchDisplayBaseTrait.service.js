@@ -51,7 +51,8 @@
             // Update totalCount only if no user filters are set
             if (typeof rowCount === 'number' && angular.equals({}, ctrl.getAfformFilters())) {
               ctrl.totalCount = rowCount;
-              if (contactTab) {
+              // The first display in a tab gets to control the count
+              if (contactTab && $element.is($('#' + contactTab + ' [search][display]').first())) {
                 CRM.tabHeader.updateCount(contactTab.replace('contact-', '#tab_'), rowCount);
               }
             }

@@ -979,7 +979,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * Retrieve contact relationships.
+   * DELETEME only-used-by-user-dashboard
    */
   public static function getContactRelationships() {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
