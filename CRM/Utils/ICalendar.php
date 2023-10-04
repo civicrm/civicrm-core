@@ -216,7 +216,7 @@ class CRM_Utils_ICalendar {
   }
 
   /**
-   * @param array | NULL $info
+   * @param array|NULL $info
    *   Information of the events to create an iCal file for, as returned by
    *   CRM_Event_BAO_Event::getCompleteInfo().
    *
@@ -260,7 +260,7 @@ class CRM_Utils_ICalendar {
   }
 
   /**
-   * @param int | NULL $event_id
+   * @param int|NULL $event_id
    *   The CiviCRM Event ID of the event to render an iCal file for.
    *
    * @return string
