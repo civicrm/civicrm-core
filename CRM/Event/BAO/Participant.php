@@ -269,8 +269,8 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
         );
       }
       if (CRM_Core_Permission::check('delete in CiviEvent')) {
-        $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/participant',
-          "action=delete&reset=1&id={$participant->id}&cid={$participant->contact_id}&context=home"
+        $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/participant/delete',
+          "reset=1&id={$participant->id}"
         );
       }
 

@@ -200,7 +200,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     if ($compContext) {
       $extraParams .= "&compContext={$compContext}";
     }
-    elseif ($context == 'search') {
+    elseif ($context === 'search') {
       $extraParams .= '&compContext=participant';
     }
 
@@ -226,8 +226,8 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/contact/view/participant',
-          'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
+          'url' => 'civicrm/participant/delete',
+          'qs' => 'reset=1&id=%%id%%' . $extraParams,
           'title' => ts('Delete Participation'),
           'weight' => 100,
         ],
