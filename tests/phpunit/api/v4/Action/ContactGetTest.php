@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
+use Civi\Api4\ContactType;
 use Civi\Api4\Relationship;
 use Civi\Test\TransactionalInterface;
 
@@ -70,7 +71,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
    public function testGetWithOrderBy(): void {
     $last_name = uniqid('GetWithOrderByTest');
 
-	ContactType::create(FALSE)
+	  ContactType::create(FALSE)
         ->addValue('name', 'Membre')
         ->addValue('label', '1.Actif')
         ->addValue('parent_id.name', 'Individual')
@@ -85,42 +86,42 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
         ->addValue('label', '3.Soutien')
         ->addValue('parent_id.name', 'Individual')
         ->execute();
-	ContactType::create(FALSE)
+	  ContactType::create(FALSE)
         ->addValue('name', 'Employ_')
         ->addValue('label', '5.Employé')
         ->addValue('parent_id.name', 'Individual')
         ->execute();
-	ContactType::create(FALSE)
+	  ContactType::create(FALSE)
         ->addValue('name', 'DCD')
         ->addValue('label', '0.Décédé')
         ->addValue('parent_id.name', 'Individual')
         ->execute();
 
-	$bob = Contact::create()
+	  $bob = Contact::create()
       ->setValues(['first_name' => 'Bob', 'last_name' => $last_name, 'contact_sub_type' => 'Membre'])
       ->execute()->first();
 
-	$jan = Contact::create()
+	  $jan = Contact::create()
       ->setValues(['first_name' => 'Jan', 'last_name' => $last_name, 'contact_sub_type' => 'Proche'])
       ->execute()->first();
 
-	$dan = Contact::create()
+	  $dan = Contact::create()
       ->setValues(['first_name' => 'Dan', 'last_name' => $last_name, 'contact_sub_type' => 'Soutien'])
       ->execute()->first();
 
-	$joe = Contact::create()
+	  $joe = Contact::create()
       ->setValues(['first_name' => 'Joe', 'last_name' => $last_name, 'contact_sub_type' => 'MembreEmploy_'])
       ->execute()->first();
 
-	$eli = Contact::create()
+	  $eli = Contact::create()
       ->setValues(['first_name' => 'Eli', 'last_name' => $last_name, 'contact_sub_type' => 'DCDMembre'])
       ->execute()->first();
 
-	$yan = Contact::create()
+	  $yan = Contact::create()
       ->setValues(['first_name' => 'Yan', 'last_name' => $last_name, 'contact_sub_type' => ''])
       ->execute()->first();
 
-	$contacts = \Civi\Api4\Contact::get(TRUE)
+	  $contacts = \Civi\Api4\Contact::get(TRUE)
 	  ->addSelect('id', 'contact_type', 'contact_sub_type', 'contact_sub_type:label')
 	  ->addWhere('contact_type', '=', 'Individual')
 	  ->addOrderBy('contact_sub_type:label', 'ASC')
