@@ -12,7 +12,7 @@ use Civi\Api4\Contact;
  */
 class SavedSearchMappingTest extends AbstractMappingTest {
 
-  protected array $savedSearch = [];
+  protected $savedSearch = [];
 
   protected function setUp(): void {
     parent::setUp();
