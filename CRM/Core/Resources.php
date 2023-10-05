@@ -429,7 +429,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     $e->mimeType = 'application/javascript';
     $params = $e->params;
     $params += [
-      'contactSearch' => json_encode($params['includeEmailInName'] ? ts('Search by name/email or id...') : ts('Search by name or id...')),
+      'contactSearch' => json_encode(!empty($params['includeEmailInName']) ? ts('Search by name/email or id...') : ts('Search by name or id...')),
       'otherSearch' => json_encode(ts('Enter search term or id...')),
       'entityRef' => self::getEntityRefMetadata(),
     ];
