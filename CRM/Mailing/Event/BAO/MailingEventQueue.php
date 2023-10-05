@@ -287,10 +287,39 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
   }
 
   /**
+   * Bulk save multiple records.
+   *
+   * For performance reasons hooks are not called here.
+   *
+   * @param array[] $records
+   *
+   * @return array
+   */
+  public static function writeRecords(array $records): array {
+    $rows = [];
+    foreach ($records as $record) {
+      $record['hash'] = self::hash();
+      $rows[] = $record;
+      if (count($rows) >= CRM_Core_DAO::BULK_INSERT_COUNT) {
+        CRM_Utils_SQL_Insert::into('civicrm_mailing_event_queue')->rows($rows)->execute();
+        $rows = [];
+      }
+    }
+    if ($rows) {
+      CRM_Utils_SQL_Insert::into('civicrm_mailing_event_queue')->rows($rows)->execute();
+    }
+    // No point returning a big array but the standard function signature is to return an array
+    // records
+    return [];
+  }
+
+  /**
+   * @deprecated
    * @param array $params
    * @param null $now
    */
   public static function bulkCreate($params, $now = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecords');
     if (!$now) {
       $now = time();
     }

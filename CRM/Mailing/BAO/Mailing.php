@@ -816,10 +816,11 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
    *
    * @param array $testParams
    *   Contains form values.
+   * @param int $mailingID
    *
-   * @return void
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function getTestRecipients($testParams) {
+  public static function getTestRecipients(array $testParams, int $mailingID): void {
     if (!empty($testParams['test_group']) && array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
       $contacts = civicrm_api('contact', 'get', [
         'version' => 3,
@@ -852,6 +853,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
             'job_id' => $testParams['job_id'],
             'email_id' => $dao->email_id,
             'contact_id' => $groupContact,
+            'mailing_id' => $mailingID,
+            'is_test' => TRUE,
           ];
           CRM_Mailing_Event_BAO_MailingEventQueue::create($params);
         }
@@ -908,7 +911,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $fields = [];
     $fields[] = 'Message-ID';
     // CRM-17754 check if Resent-Message-id is set also if not add it in when re-laying reply email
-    if ($prefix == 'r') {
+    if ($prefix === 'r') {
       $fields[] = 'Resent-Message-ID';
     }
     foreach ($fields as $field) {
@@ -916,7 +919,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $headers[$field] = '<' . implode($config->verpSeparator,
             [
               $localpart . $prefix,
-              $job_id,
               $event_queue_id,
               $hash,
             ]
