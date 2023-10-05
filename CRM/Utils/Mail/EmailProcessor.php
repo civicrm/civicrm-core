@@ -85,7 +85,7 @@ class CRM_Utils_Mail_EmailProcessor {
     $sourceFields = array_filter(explode(",", $dao->activity_source));
     // create an array of all of to, from, cc, bcc that are in use for this Mail Account, so we don't create contacts for emails we aren't adding to the activity.
     $emailFields = array_merge($targetFields, $assigneeFields, $sourceFields);
-    $createContact = !($dao->is_contact_creation_disabled_if_no_match);
+    $createContact = !($dao->is_contact_creation_disabled_if_no_match) && !$isBounceProcessing;
     $bounceActivityTypeID = $activityTypeID = (int) $dao->activity_type_id;
     $activityTypes = Activity::getFields(TRUE)
       ->setLoadOptions(['id', 'name'])
