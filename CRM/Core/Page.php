@@ -132,6 +132,8 @@ class CRM_Core_Page {
     // in 'body.tpl
     'suppressForm',
     'beginHookFormElements',
+    // This is checked in validate.tpl
+    'snippet_type',
   ];
 
   /**

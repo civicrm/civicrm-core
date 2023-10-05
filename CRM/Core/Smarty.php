@@ -136,6 +136,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       'cacheCleanup' => CRM_Utils_Request::retrieveValue('cacheCleanup', 'Integer'),
       'configReset' => CRM_Utils_Request::retrieveValue('configReset', 'Integer'),
     ]);
+    $this->assign('snippet_type', CRM_Utils_Request::retrieveValue('snippet', 'String'));
 
     $tsLocale = CRM_Core_I18n::getLocale();
     $this->assign('tsLocale', $tsLocale);
