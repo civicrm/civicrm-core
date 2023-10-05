@@ -163,14 +163,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         // Default header
         "Sample Header for TEXT formatted content.\n" .
         //  body_html, filtered
-        "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
-        "\n" .
-        "\n" .
-        "Links:\n" .
-        "------\n" .
-        "\\[1\\] http://example.net/first\\?cs=[0-9a-f_]+\n" .
-        "\\[2\\] http.*civicrm/mailing/optout.*\n" .
-        "\n" .
+        "You can go to \\[Google\\]\\(http://example.net/first\?cs=[0-9a-f_]+\\) or \\[opt out\\]\\(http.*civicrm/mailing/optout.*\\)\\.\n" .
         // Default footer
         "to unsubscribe: http.*civicrm/mailing/optout" .
         ";",
@@ -217,14 +210,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertMatchesRegularExpression(
         ";" .
         //  body_html, filtered
-        "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
-        "\n" .
-        "\n" .
-        "Links:\n" .
-        "------\n" .
-        "\\[1\\] http.*(extern/url.php|civicrm/mailing/url)(\?|&)u=\d+&qid=\d+\n" .
-        "\\[2\\] http.*civicrm/mailing/optout.*\n" .
-        "\n" .
+        "You can go to \\[Google\\]\\(http.*(extern/url.php|civicrm/mailing/url)(\?|&)u=\d+&qid=\d+\\) or \\[opt out\\]\\(http.*civicrm/mailing/optout.*\\)\\.\n" .
         // Default footer
         "to unsubscribe: http.*civicrm/mailing/optout" .
         ";",
@@ -249,20 +235,20 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     $cases[0] = [
       '<p><a href="http://example.net/">Foo</a></p>',
       ';<p><a href="http://example\.net/">Foo</a></p>;',
-      ';\\[1\\] http://example\.net/;',
+      ';\\(http://example\.net/\\);',
       ['url_tracking' => 0],
     ];
     $cases[1] = [
       '<p><a href="http://example.net/?id={contact.contact_id}">Foo</a></p>',
       // FIXME: Legacy tracker adds extra quote after URL
       ';<p><a href="http://example\.net/\?id=\d+""?>Foo</a></p>;',
-      ';\\[1\\] http://example\.net/\?id=\d+;',
+      ';\\(http://example\.net/\?id=\d+\\);',
       ['url_tracking' => 0],
     ];
     $cases[2] = [
       '<p><a href="{action.optOutUrl}">Foo</a></p>',
       ';<p><a href="http.*civicrm/mailing/optout.*">Foo</a></p>;',
-      ';\\[1\\] http.*civicrm/mailing/optout.*;',
+      ';\\(http.*civicrm/mailing/optout.*\\);',
       ['url_tracking' => 0],
     ];
     $cases[3] = [
@@ -284,13 +270,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     $cases[5] = [
       '<p><a href="http://example.net/">Foo</a></p>',
       ';<p><a href=[\'"].*(extern/url.php|civicrm/mailing/url)(\?|&amp\\;)u=\d+.*[\'"]>Foo</a></p>;',
-      ';\\[1\\] .*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*;',
+      ';\\(.*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*\\);',
       ['url_tracking' => 1],
     ];
     $cases['url_trackin_enabled'] = [
       '<p><a href="http://example.net/?id={contact.contact_id}">Foo</a></p>',
       ';<p><a href=[\'"].*(extern/url.php|civicrm/mailing/url)(\?|&amp\\;)u=\d+.*&amp\\;id=\d+.*[\'"]>Foo</a></p>;',
-      ';\\[1\\] .*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*&id=\d+.*;',
+      ';\\(.*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*&id=\d+.*\\);',
       ['url_tracking' => 1],
     ];
 
@@ -298,7 +284,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       // It would be redundant/slow to track the action URLs?
       '<p><a href="{action.optOutUrl}">Foo</a></p>',
       ';<p><a href="http.*civicrm/mailing/optout.*">Foo</a></p>;',
-      ';\\[1\\] http.*civicrm/mailing/optout.*;',
+      ';\\(http.*civicrm/mailing/optout.*\\);',
       ['url_tracking' => 1],
     ];
     $cases[8] = [

@@ -524,7 +524,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $testCases['TextMessages with HtmlData'] = [
       'text/plain',
       [
-        'This is {my_rich_text.and_such}...' => 'This is TESTING & SUCH...',
+        'This is {my_rich_text.and_such}...' => 'This is testing & such...',
         'This is {my_rich_text.and_such|lower}...' => 'This is testing & such...',
         'This is {my_rich_text.and_such|upper}!' => 'This is TESTING & SUCH!',
       ],
