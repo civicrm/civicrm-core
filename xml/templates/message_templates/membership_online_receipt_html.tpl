@@ -530,7 +530,6 @@
        </th>
       </tr>
       {foreach from=$customPost item=customValue key=customName}
-       {if (!empty($trackingFields) and ! in_array($customName, $trackingFields)) or empty($trackingFields)}
         <tr>
          <td {$labelStyle}>
           {$customName}
@@ -539,7 +538,6 @@
           {$customValue}
          </td>
         </tr>
-       {/if}
       {/foreach}
      {/if}
 
