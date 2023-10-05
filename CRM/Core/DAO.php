@@ -3142,7 +3142,16 @@ SELECT contact_id
       // Prevent infinite recursion
       $subquery = $table === static::getTableName() ? NULL : CRM_Utils_SQL::mergeSubquery($ent);
       if ($subquery) {
-        $relatedClauses[] = "= '$table' AND {{$entityIdField}} " . implode(" AND {{$entityIdField}} ", $subquery);
+        foreach ($subquery as $index => $condition) {
+          // Join OR clauses
+          if (is_array($condition)) {
+            $subquery[$index] = "(({{$entityIdField}} " . implode(") OR ({{$entityIdField}} ", $condition) . '))';
+          }
+          else {
+            $subquery[$index] = "{{$entityIdField}} $condition";
+          }
+        }
+        $relatedClauses[] = "= '$table' AND " . implode(" AND ", $subquery);
       }
       // If it's the only value with no conditions, don't need to add it
       elseif (!$entityTableValues || count($relatedEntities) > 1) {

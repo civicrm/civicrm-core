@@ -583,10 +583,10 @@ class CRM_Contact_BAO_Query {
       // Unit test coverage in api_v3_FinancialTypeACLTest::testGetACLContribution.
       $clauses = [];
       if ($component === 'contribution') {
-        $clauses = CRM_Contribute_BAO_Contribution::getSelectWhereClause();
+        $clauses = array_filter(CRM_Contribute_BAO_Contribution::getSelectWhereClause());
       }
       if ($component === 'membership') {
-        $clauses = CRM_Member_BAO_Membership::getSelectWhereClause();
+        $clauses = array_filter(CRM_Member_BAO_Membership::getSelectWhereClause());
       }
       if ($clauses) {
         $this->_whereClause .= ' AND ' . implode(' AND ', $clauses);
