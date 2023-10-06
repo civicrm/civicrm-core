@@ -192,7 +192,7 @@
                         <th>{ts}Tax Amount{/ts}</th>
                       {/if}
                       <th>{ts}Total{/ts}</th>
-                        {if $iShowParticipantCount}
+                        {if $isShowParticipantCount}
                           <th>{ts}Total Participants{/ts}</th>
                         {/if}
                     </tr>
@@ -285,19 +285,31 @@
               {ts}Total Amount{/ts}
             </td>
             <td {$valueStyle}>
-              {contribution.total_amount} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
+              {contribution.total_amount}
             </td>
           </tr>
+          {if {contribution.balance_amount|boolean} && {contribution.paid_amount|boolean}}
+            <tr>
+              <td {$labelStyle}>{ts}Total Paid{/ts}</td>
+              <td {$valueStyle}>
+                {contribution.paid_amount|crmMoney}
+              </td>
+            </tr>
+            <tr>
+              <td {$labelStyle}>{ts}Balance{/ts}</td>
+              <td {$valueStyle}>{contribution.balance_amount}</td>
+            </tr>
+          {/if}
           {if $isShowParticipantCount}
             <tr>
               <td {$labelStyle}>{ts}Total Participants{/ts}</td>
               <td {$valueStyle}>{$line.participant_count}</td>
             </tr>
           {/if}
-          {if {contribution.is_pay_later|boolean} && {contribution.balance_amount|boolean}}
+          {if {contribution.is_pay_later|boolean} && {contribution.balance_amount|boolean} && {event.pay_later_receipt|boolean}}
             <tr>
               <td colspan="2" {$labelStyle}>
-                {$pay_later_receipt}
+                {event.pay_later_receipt}
               </td>
             </tr>
           {/if}
