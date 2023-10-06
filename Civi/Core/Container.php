@@ -182,6 +182,7 @@ class Container {
       'fields' => 'contact fields',
       'contactTypes' => 'contactTypes',
       'metadata' => 'metadata',
+      'menu' => 'menu',
     ];
     $verSuffixCaches = ['metadata'];
     $verSuffix = '_' . preg_replace(';[^0-9a-z_];', '_', \CRM_Utils_System::version());

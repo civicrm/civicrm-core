@@ -22,13 +22,6 @@
 class CRM_Core_Menu {
 
   /**
-   * The list of menu items.
-   *
-   * @var array
-   */
-  public static $_items = NULL;
-
-  /**
    * The list of permissioned menu items.
    *
    * @var array
@@ -55,7 +48,7 @@ class CRM_Core_Menu {
    * @return array
    */
   public static function &xmlItems($fetchFromXML = FALSE) {
-    if (!self::$_items || $fetchFromXML) {
+    if (!\Civi::cache('menu')->has('items') || $fetchFromXML) {
       // We needs this until Core becomes a component
       $coreMenuFilesNamespace = 'CRM_Core_xml_Menu';
       $coreMenuFilesPath = str_replace('_', DIRECTORY_SEPARATOR, $coreMenuFilesNamespace);
@@ -70,15 +63,16 @@ class CRM_Core_Menu {
       // lets call a hook and get any additional files if needed
       CRM_Utils_Hook::xmlMenu($files);
 
-      self::$_items = [];
+      $items = [];
       foreach ($files as $file) {
-        self::read($file, self::$_items);
+        self::read($file, $items);
       }
 
-      CRM_Utils_Hook::alterMenu(self::$_items);
+      CRM_Utils_Hook::alterMenu($items);
+      \Civi::cache('menu')->set('items', $items);
     }
-
-    return self::$_items;
+    $items ?: \Civi::cache('menu')->get('items');
+    return $items;
   }
 
   /**
