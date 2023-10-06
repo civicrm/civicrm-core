@@ -201,7 +201,7 @@
             '<=': ('' + value).split('-')[1] || '',
           };
         }
-        else if (_.isString(value) && isMultiple()) {
+        else if (_.isString(value) && ctrl.isMultiple()) {
           value = value.split(',');
         }
         $scope.getSetValue(value);
