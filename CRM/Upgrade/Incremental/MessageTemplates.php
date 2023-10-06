@@ -359,6 +359,15 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'petition_sign', 'type' => 'subject'],
         ],
       ],
+      [
+        'version' => '5.68.alpha1',
+        'upgrade_descriptor' => ts('Significant changes to the template and available variables. Text version is discontinued'),
+        'templates' => [
+          ['name' => 'event_offline_receipt', 'type' => 'text'],
+          ['name' => 'event_offline_receipt', 'type' => 'html'],
+          ['name' => 'event_offline_receipt', 'type' => 'subject'],
+        ],
+      ],
     ];
   }
 
