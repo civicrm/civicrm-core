@@ -190,7 +190,7 @@ class CRM_Utils_Mail {
       $htmlMessage = FALSE;
     }
     $attachments = $params['attachments'] ?? NULL;
-    if (!empty($params['text'])) {
+    if (!empty($params['text']) && trim($params['text'])) {
       $textMessage = $params['text'];
     }
     else {
