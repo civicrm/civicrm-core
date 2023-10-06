@@ -860,7 +860,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           )
           && (
             $field['custom_group_id.extends'] === $extends
-            || ($field['extends'] === 'Contact' && in_array($extends, ['Individual', 'Organization', 'Household']))
+            || ($field['custom_group_id.extends'] === 'Contact' && in_array($extends, ['Individual', 'Organization', 'Household']))
           )
         ) {
           \Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey][(int) $field['id']] = $field;
