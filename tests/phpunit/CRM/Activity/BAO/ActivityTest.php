@@ -1226,10 +1226,17 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSendEmailBasic(): void {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+
     $contactId = $this->getContactID();
 
     // create a logged in USER since the code references it for sendEmail user.
     $this->createLoggedInUser();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+      'access my cases and activities',
+    ];
 
     $contactDetailsIntersectKeys = [
       'contact_id' => '',
@@ -1256,7 +1263,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activity = Activity::get()
       ->addSelect('activity_type_id:label', 'subject', 'details')
       ->addWhere('activity_type_id:name', '=', 'Email')
-      ->execute()->first();
+      ->execute()->single();
 
     $details = '-ALTERNATIVE ITEM 0-
 ' . __FUNCTION__ . ' html ' . $contact['display_name'] . ' Housing Support
@@ -1322,6 +1329,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     // create a logged in USER since the code references it for sendEmail user.
     $this->createLoggedInUser();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts', 'access CiviCRM'];
 
     $subject = __FUNCTION__ . ' subject';
     $html = __FUNCTION__ . ' html';
@@ -1334,10 +1342,17 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $form->postProcess();
 
-    $activity = Activity::get()
+    // FIXME: This test was failing because the above postProcess is filing
+    // the activity on a case. I don't think it's supposed to be doing that,
+    // and it doesn't do it when you run this test in isolation, only when running
+    // all tests in this file. So it's probably caused by some static caching somewhere.
+    // Fixed the test by disabling permission checks on this activity.get call.
+    // Because otherwise the fake logged in user doesn't have access to case activities.
+    $activityGet = Activity::get(FALSE)
       ->addSelect('activity_type_id:label', 'subject', 'details')
       ->addWhere('activity_type_id:name', '=', 'Email')
-      ->execute()->first();
+      ->execute();
+    $activity = $activityGet->single();
 
     $details = "-ALTERNATIVE ITEM 0-
 $html
@@ -1363,10 +1378,16 @@ $text
   public function testSendEmailWithCampaign(): void {
     // Create a contact and contactDetails array.
     $contactId = $this->individualCreate();
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
 
     // create a logged in USER since the code references it for sendEmail user.
     $this->createLoggedInUser();
-    $this->enableCiviCampaign();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'view all contacts',
+      'access CiviCRM',
+      'access my cases and activities',
+    ];
 
     // Create a campaign.
     $result = $this->civicrm_api('Campaign', 'create', [
@@ -1388,7 +1409,7 @@ $text
     $activity = Activity::get()
       ->addSelect('activity_type_id:label', 'subject', 'details', 'campaign_id')
       ->addWhere('activity_type_id:name', '=', 'Email')
-      ->execute()->first();
+      ->execute()->single();
 
     $this->assertEquals($activity['campaign_id'], $campaign_id, 'Activity campaign_id does not match.');
   }
