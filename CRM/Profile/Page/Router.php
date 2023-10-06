@@ -29,6 +29,19 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
    * @return string|void
    */
   public function run($args = NULL) {
+    
+    
+    /* TT Encircle 2022-10-06 - fix for https://lab.civicrm.org/dev/core/-/issues/4289
+        - in CRM/Core/Invoke.php on line 296 (in runItem() function):
+            $newArgs = explode('/', $_GET[$config->userFrameworkURLVar]);
+        - That's the line that creates the $args array.
+        - Because the $_GET['q'] parameter starts with a / - this is what adds that first empty element to the array.
+        - This additional check, compensates for this issue. 
+    */
+    if($args && $args[0]===""){
+      array_shift($args);
+    }
+    
     if ($args[1] !== 'profile') {
       return NULL;
     }
