@@ -189,7 +189,26 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     // get the participant values from EventFees.php, CRM-4320
     if ($this->_allowConfirmation) {
-      CRM_Event_Form_EventFees::preProcess($this);
+      $this->eventFeeWrangling($this);
+    }
+  }
+
+  /**
+   * This is previously shared code which is probably of little value.
+   *
+   * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function eventFeeWrangling($form) {
+    $form->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $form);
+    $form->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $form);
+
+    //CRM-6907 set event specific currency.
+    if ($this->getEventID() &&
+      ($currency = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'currency'))
+    ) {
+      CRM_Core_Config::singleton()->defaultCurrency = $currency;
     }
   }
 
