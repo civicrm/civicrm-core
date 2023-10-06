@@ -417,6 +417,18 @@ WHERE li.contribution_id = %1";
         if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
+
+        // Try to ensure we're not creating a duplicate line item.
+        if (!empty($line['entity_id']) && !empty($line['price_field_value_id']) && !empty($line['contribution_id'])) {
+          $pkeys = array_fill_keys(['entity_id', 'entity_table', 'price_field_id', 'price_field_value_id', 'contribution_id'], 1);
+          $exparams = array_intersect_key($line, $pkeys);
+
+          $existing = CRM_Price_BAO_LineItem::retrieve($exparams);
+          if ($existing) {
+            $line['id'] = $existing->id;
+          }
+        }
+
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
         if (!$update && $contributionDetails) {
           $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails);

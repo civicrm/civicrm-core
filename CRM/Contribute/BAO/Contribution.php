@@ -2594,6 +2594,60 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $values['contributionId'] = $ids['contribution'];
       }
 
+      $totalTaxAmount = 0;
+      $dataArray = [];
+
+      $participantCount = 0;
+      // Fill in line item data for each participant.
+      if (isset($values['lineItem'])) {
+        foreach ($values['lineItem'] as $k => $vItem) {
+          foreach ($vItem as $lineData) {
+            if ($lineData['entity_table'] != 'civicrm_participant') {
+              continue;
+            }
+            $participant = new CRM_Event_BAO_Participant();
+            $participant->id = $lineData['entity_id'];
+            $participant->find(TRUE);
+
+            $values['part'][$k]['info'] = CRM_Contact_BAO_Contact::displayName($participant->contact_id);
+
+            if (CRM_Invoicing_Utils::isInvoicingEnabled() && isset($lineData['tax_amount']) && isset($lineData['tax_rate'])) {
+              // Add Tax data to the totals. This also triggers the template to show this information in the line items
+              $totalTaxAmount += $lineData['tax_amount'];
+
+              $dataArray[$lineData['tax_rate']] = $lineData['tax_amount'] + ($dataArray[$lineData['tax_rate']] ?? 0);
+            }
+
+            if ($participant->id == $this->_relatedObjects['participant']->id) {
+              $values['isPrimary'] = TRUE;
+            }
+            $participantCount++;
+          }
+        }
+      }
+
+      if ($totalTaxAmount || !empty($dataArray)) {
+        $values['totalTaxAmount'] = $totalTaxAmount;
+        $values['dataArray'] = $dataArray;
+      }
+
+      if ($participantCount > 1) {
+        // Profile data for additional participants.
+        $additionalParticipantProfile = new CRM_Core_BAO_UFJoin();
+        $additionalParticipantProfile->entity_id = $this->_relatedObjects['participant']->event_id;
+        $additionalParticipantProfile->module = 'CiviEvent_Additional';
+        $additionalParticipantProfile->find();
+        while ($additionalParticipantProfile->fetch()) {
+          $values['additional_custom_pre_id'][$additionalParticipantProfile->id] = $additionalParticipantProfile->uf_group_id;
+        }
+      }
+
+      $customProfile = CRM_Event_BAO_Event::buildCustomProfile($ids['participant'], $values, $ids['contact']);
+
+      if (count($customProfile)) {
+        $values['customProfile'] = $customProfile;
+      }
+
       return CRM_Event_BAO_Event::sendMail($ids['contact'], $values,
         $participantID, $this->is_test, $returnMessageText
       );
@@ -2959,7 +3013,19 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       //build an array of cId/pId of participants
       $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($this->_relatedObjects['participant']->id, NULL, $this->_relatedObjects['contact']->id, $isTest, TRUE);
       unset($additionalIDs[$this->_relatedObjects['participant']->id]);
-      //send receipt to additional participant if exists
+      $participantLine = NULL;
+
+      // Build an array of participant line items keyed my participant ID
+      if (is_array($values['lineItem'])) {
+        // Flatten the lineItem Array of Arrays
+        foreach (array_merge(...$values['lineItem']) as $itemdata) {
+          if (($itemdata['entity_table'] ?? NULL) == 'civicrm_participant') {
+            $participantLine[$itemdata['entity_id']] = $itemdata;
+          }
+        }
+      }
+
+      // Send receipt to additional participant if exists
       if (count($additionalIDs)) {
         $template->assign('isPrimary', 0);
         $template->assign('customProfile', NULL);
@@ -2989,7 +3055,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             'amount' => $additional->fee_amount,
           ];
           $additional->save();
+
           $template->assign('amount', $amount);
+
+          $line = $participantLine[$pId];
+          $template->assign('totalAmount', $amount[0]['amount']);
+
+          if (CRM_Invoicing_Utils::isInvoicingEnabled() && isset($line['tax_amount']) && isset($line['tax_rate'])) {
+            // Add Tax data to the totals. This also triggers the template to show this information in the line items
+            $template->assign('totalTaxAmount', $line['tax_amount']);
+            $dataArray = [$line['tax_rate'] => $line['tax_amount'] ?? 0];
+
+            $template->assign('dataArray', $dataArray);
+          }
+
           CRM_Event_BAO_Event::sendMail($cId, $values, $pId, $isTest, $returnMessageText);
         }
       }
@@ -3005,6 +3084,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $values['params']['additionalParticipant'] = FALSE;
       $template->assign('isPrimary', 1);
       $template->assign('amount', $primaryAmount);
+      $template->assign('totalAmount', $this->total_amount);
       $template->assign('register_date', CRM_Utils_Date::isoToMysql($this->_relatedObjects['participant']->register_date));
       if ($this->payment_instrument_id) {
         $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
