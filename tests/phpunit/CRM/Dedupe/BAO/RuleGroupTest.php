@@ -321,7 +321,6 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
     ];
 
     $count = 1;
-    $contact_id;
     foreach ($params as $param) {
       $contact = $this->callAPISuccess('contact', 'create', $param);
       $this->contactIDs[$count++] = $contact['id'];
