@@ -1,5 +1,6 @@
 <?php
 
+use Civi\API\EntityLookupTrait;
 use Civi\Api4\Event;
 use Civi\Api4\PriceSetEntity;
 use Civi\Api4\WorkflowMessage;
@@ -14,6 +15,8 @@ use Civi\Api4\PriceFieldValue;
  * @noinspection PhpUnused
  */
 class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
+
+  use EntityLookupTrait;
 
   /**
    * IDs of events permitting multiple participants.
@@ -44,6 +47,19 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
           'is_multiple_registrations' => $priceSet['is_multiple_registrations'],
           'is_primary' => TRUE,
           'price_set_id' => $priceSet['id'],
+          'is_partially_paid' => FALSE,
+        ];
+        yield [
+          'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'] . '_partially_paid',
+          'title' => ts('Partially Paid Registration') . ($priceSet['is_multiple_registrations'] ? ' ' . ts('primary participant') : '') . ' : ' . $priceSet['title'],
+          'tags' => ['preview'],
+          'workflow' => $workflow,
+          'is_show_line_items' => !$priceSet['is_quick_config'],
+          'event_id' => $priceSet['event_id'],
+          'is_multiple_registrations' => $priceSet['is_multiple_registrations'],
+          'is_primary' => TRUE,
+          'price_set_id' => $priceSet['id'],
+          'is_partially_paid' => TRUE,
         ];
         if ($priceSet['is_multiple_registrations']) {
           yield [
@@ -56,6 +72,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
             'is_multiple_registrations' => $priceSet['is_multiple_registrations'],
             'is_primary' => FALSE,
             'price_set_id' => $priceSet['id'],
+            'is_partially_paid' => FALSE,
           ];
         }
       }
@@ -87,6 +104,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function addExampleData(GenericWorkflowMessage $messageTemplate, array $example): void {
+    $this->define('Event', 'event_' . $example['event_id'], ['id' => $example['event_id']]);
     $messageTemplate->setContact(\Civi\Test::example('entity/Contact/Barb'));
     $messageTemplate->setEventID($example['event_id']);
     $isPrimary = $example['is_primary'];
@@ -112,6 +130,9 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
     $contribution['total_amount'] = $mockOrder->getTotalAmount();
     $contribution['tax_amount'] = $mockOrder->getTotalTaxAmount() ? round($mockOrder->getTotalTaxAmount(), 2) : 0;
     $contribution['tax_exclusive_amount'] = $contribution['total_amount'] - $contribution['tax_amount'];
+    $contribution['is_pay_later'] = $example['is_partially_paid'] && $this->lookup('event_' . $example['event_id'], 'is_pay_later');
+    $contribution['paid_amount'] = $example['is_partially_paid'] ? $contribution['total_amount'] / 2 : 0;
+    $contribution['balance_amount'] = $contribution['total_amount'] - $contribution['paid_amount'];
     $messageTemplate->setContribution($contribution);
     $messageTemplate->setOrder($mockOrder);
     $messageTemplate->setParticipantContacts($participantContacts);
