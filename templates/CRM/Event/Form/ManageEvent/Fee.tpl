@@ -216,7 +216,7 @@
 
     function warnDiscountDel( ) {
         if ( ! document.getElementsByName('is_discount')[0].checked ) {
-            CRM.alert('{/literal}{ts escape="js"}If you uncheck "Discounts by Signup Date" and Save this form, any existing discount sets will be deleted.{/ts} {ts escape="js"}This action cannot be undone.{/ts} {ts escape="js"}If this is NOT what you want to do, you can check "Discounts by Signup Date" again.{/ts}', '{ts escape="js}Warning{/ts}{literal}', 'alert', {expires: 0});
+            CRM.alert('{/literal}{ts escape="js"}If you uncheck "Discounts by Signup Date" and Save this form, any existing discount sets will be deleted.{/ts} {ts escape="js"}This action cannot be undone.{/ts} {ts escape="js"}If this is NOT what you want to do, you can check "Discounts by Signup Date" again.{/ts}', '{ts escape="js"}Warning{/ts}{literal}', 'alert', {expires: 0});
         }
     }
 
