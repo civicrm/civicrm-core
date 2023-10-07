@@ -290,7 +290,7 @@ class CRM_Admin_Page_AJAX {
     $result = [];
 
     $whereClauses = ['is_tagset <> 1'];
-    $orderColumn = 'name';
+    $orderColumn = 'label';
 
     // fetch all child tags in Array('parent_tag' => array('child_tag_1', 'child_tag_2', ...)) format
     $childTagIDs = CRM_Core_BAO_Tag::getChildTags($substring);
@@ -300,7 +300,7 @@ class CRM_Admin_Page_AJAX {
       $whereClauses[] = "parent_id = $parent";
     }
     elseif ($substring) {
-      $whereClauses['substring'] = " name LIKE '%$substring%' ";
+      $whereClauses['substring'] = " label LIKE '%$substring%' ";
       if (!empty($parentIDs)) {
         $whereClauses['substring'] = sprintf(" %s OR id IN (%s) ", $whereClauses['substring'], implode(',', $parentIDs));
       }
@@ -328,7 +328,7 @@ class CRM_Admin_Page_AJAX {
         $usedFor = (array) explode(',', $dao->used_for);
         $tag = [
           'id' => $dao->id,
-          'text' => $dao->name,
+          'text' => $dao->label,
           'a_attr' => [
             'class' => 'crm-tag-item',
           ],

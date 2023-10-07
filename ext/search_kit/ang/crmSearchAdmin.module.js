@@ -55,7 +55,7 @@
         modules.push({text: label, id: key});
       }, []), 'text');
       this.getTags = function() {
-        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
+        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'label', ['color', 'description'])};
       };
 
       this.getPrimaryEntities = function() {

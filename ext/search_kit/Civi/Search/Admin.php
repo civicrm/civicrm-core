@@ -53,7 +53,7 @@ class Admin {
         ->setLoadOptions(['id', 'label'])
         ->execute()->first()['options'],
       'tags' => Tag::get()
-        ->addSelect('id', 'name', 'color', 'is_selectable', 'description')
+        ->addSelect('id', 'label', 'color', 'is_selectable', 'description')
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
         ->execute(),
     ];

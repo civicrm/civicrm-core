@@ -125,7 +125,7 @@ trait Api3TestTrait {
    * @param null $extraOutput
    * @return array|int
    */
-  public function callAPIFailure($entity, $action, $params, $expectedErrorMessage = NULL, $extraOutput = NULL) {
+  public function callAPIFailure($entity, $action, $params = [], $expectedErrorMessage = NULL, $extraOutput = NULL) {
     if (is_array($params)) {
       $params += [
         'version' => $this->_apiversion,

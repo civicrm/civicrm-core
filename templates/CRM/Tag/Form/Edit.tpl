@@ -12,8 +12,8 @@
   {if $action eq 1 or $action eq 2}
     <table class="form-layout-compressed">
        <tr class="crm-tag-form-block-label">
-          <td class="label">{$form.name.label}</td>
-          <td>{$form.name.html}</td>
+          <td class="label">{$form.label.label}</td>
+          <td>{$form.label.html}</td>
        </tr>
        <tr class="crm-tag-form-block-description">
           <td class="label">{$form.description.label}</td>

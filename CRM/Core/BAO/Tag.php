@@ -311,7 +311,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
         'sort' => "name ASC",
       ],
       'is_tagset' => 0,
-      'return' => ['name', 'description', 'parent_id', 'color', 'is_selectable', 'used_for'],
+      'return' => ['label', 'description', 'parent_id', 'color', 'is_selectable', 'used_for'],
     ];
     if ($usedFor) {
       $params['used_for'] = ['LIKE' => "%$usedFor%"];
@@ -322,7 +322,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     $allTags = [];
     foreach (CRM_Utils_Array::value('values', civicrm_api3('Tag', 'get', $params)) as $id => $tag) {
       $allTags[$id] = [
-        'text' => $tag['name'],
+        'text' => $tag['label'],
         'id' => $id,
         'description' => $tag['description'] ?? NULL,
         'parent_id' => $tag['parent_id'] ?? NULL,
@@ -366,8 +366,16 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    */
   public static function add(&$params, $ids = []) {
     $id = $params['id'] ?? $ids['tag'] ?? NULL;
-    if (!$id && !self::dataExists($params)) {
-      return NULL;
+    if (!$id) {
+      // Make label from name if missing.
+      if (CRM_Utils_System::isNull($params['label'] ?? NULL)) {
+        // If name is also missing, cannot create object.
+        if (CRM_Utils_System::isNull($params['name'] ?? NULL)) {
+          // FIXME: Throw exception
+          return NULL;
+        }
+        $params['label'] = $params['name'];
+      }
     }
 
     // Check permission to create or modify reserved tag
@@ -401,7 +409,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     // save creator id and time
     if (!$id) {
       $params['created_id'] = $params['created_id'] ?? CRM_Core_Session::getLoggedInContactID();
-      $params['created_date'] = $params['created_date'] ?? date('YmdHis');
     }
 
     $tag = self::writeRecord($params);
@@ -423,23 +430,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Check if there is data to create the object.
-   *
-   * @param array $params
-   *
-   * @return bool
-   */
-  public static function dataExists($params) {
-    // Disallow empty values except for the number zero.
-    // TODO: create a utility for this since it's needed in many places
-    if (!empty($params['name']) || (string) $params['name'] === '0') {
-      return TRUE;
-    }
-
-    return FALSE;
-  }
-
-  /**
    * Get the tag sets for a entity object.
    *
    * @param string $entityTable
@@ -450,7 +440,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    */
   public static function getTagSet($entityTable) {
     $tagSets = [];
-    $query = "SELECT name, id FROM civicrm_tag
+    $query = "SELECT label, id FROM civicrm_tag
               WHERE is_tagset=1 AND parent_id IS NULL and used_for LIKE %1";
     $dao = CRM_Core_DAO::executeQuery($query, [
       1 => [
@@ -459,7 +449,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       ],
     ], TRUE, NULL, FALSE, FALSE);
     while ($dao->fetch()) {
-      $tagSets[$dao->id] = $dao->name;
+      $tagSets[$dao->id] = $dao->label;
     }
     return $tagSets;
   }

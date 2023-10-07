@@ -96,7 +96,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
    */
   public function testCreateEmptyParams($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPIFailure('tag', 'create', [], 'name');
+    $result = $this->callAPIFailure('tag', 'create');
   }
 
   /**
