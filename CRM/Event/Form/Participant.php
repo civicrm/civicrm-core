@@ -2025,9 +2025,13 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     $this->assign('customGroup', $customGroup);
 
     $fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
-    foreach ($this->_contactIds as $num => $contactID) {
-      [, $email, $doNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
-      if (!$email || $doNotEmail) {
+    foreach ($participants as $num => $participant) {
+      $participantID = $participant->id;
+      $contactID = $participant->contact_id;
+      $key = 'contact_' . $contactID;
+
+      $this->define('Contact', $key, ['id' => $contactID]);
+      if (!$this->lookup($key, 'email_primary.email') || $this->lookup($key, 'do_not_email')) {
         // try to send emails only if email id is present
         // and the do-not-email option is not checked for that contact
         $notSent[] = $contactID;
@@ -2040,10 +2044,10 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       }
 
       $this->assign('contactID', $contactID);
-      $this->assign('participantID', $participants[$num]->id);
+      $this->assign('participantID', $participantID);
 
       $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-        $participants[$num]->id, 'contribution_id', 'participant_id'
+        $participantID, 'contribution_id', 'participant_id'
       );
       $totalAmount = 0;
       if ($contributionID) {
@@ -2055,7 +2059,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         );
       }
       $this->assign('totalAmount', $params['total_amount'] ?? $totalAmount);
-      $this->_id = $participants[$num]->id;
+      $this->_id = $participantID;
 
       if ($this->_isPaidEvent) {
         // fix amount for each of participants ( for bulk mode )
@@ -2105,15 +2109,15 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         'isTest' => !empty($this->_defaultValues['is_test']),
         'PDFFilename' => ts('confirmation') . '.pdf',
         'modelProps' => [
-          'participantID' => $this->_id,
+          'participantID' => $participantID,
           'eventID' => $params['event_id'],
           'contributionID' => $contributionID,
         ],
       ];
 
       $sendTemplateParams['from'] = $params['from_email_address'];
-      $sendTemplateParams['toName'] = $this->getContactValue('display_name');
-      $sendTemplateParams['toEmail'] = $this->getContactValue('email_primary.email');
+      $sendTemplateParams['toName'] = $this->lookup($key, 'display_name');
+      $sendTemplateParams['toEmail'] = $this->lookup($key, 'email_primary.email');
       $sendTemplateParams['cc'] = $fromEmails['cc'] ?? NULL;
       $sendTemplateParams['bcc'] = $fromEmails['bcc'] ?? NULL;
 
@@ -2125,13 +2129,8 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       [$mailSent] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       if ($mailSent) {
         $sent[] = $contactID;
-        foreach ($participants as $ids => $values) {
-          if ($values->contact_id == $contactID) {
-            $values->details = $params['receipt_text'] ?? NULL;
-            CRM_Activity_BAO_Activity::addActivity($values, 'Email');
-            break;
-          }
-        }
+        $participant->details = $this->getSubmittedValue('receipt_text');
+        CRM_Activity_BAO_Activity::addActivity($participant, 'Email');
       }
       else {
         $notSent[] = $contactID;
