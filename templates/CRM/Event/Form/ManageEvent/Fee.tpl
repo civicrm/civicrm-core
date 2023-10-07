@@ -18,10 +18,6 @@
     {/if}
 <div class="crm-block crm-form-block crm-event-manage-fee-form-block">
     <table class="form-layout">
-       <tr class="crm-event-manage-fee-form-block-title">
-    <td class="label">{$form.title.label}</td>
-    <td>{$form.title.html}</td>
-       </tr>
        <tr class="crm-event-manage-fee-form-block-is_monetary">
           <td class="label">{$form.is_monetary.label}</td>
           <td>{$form.is_monetary.html}</td>
