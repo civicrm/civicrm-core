@@ -57,4 +57,16 @@ class Drupal8 implements AuthxInterface {
     return $user && $user->getAccount()->id() ? $user->getAccount()->id() : NULL;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function getUserIsBlocked($userId) {
+    $user = \Drupal\user\Entity\User::load($userId);
+    // The user will not be blocked if there is no existence.
+    if (!$user) {
+      return FALSE;
+    }
+    return $user->isBlocked();
+  }
+
 }
