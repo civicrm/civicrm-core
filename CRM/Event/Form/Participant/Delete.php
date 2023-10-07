@@ -19,7 +19,7 @@
 /**
  * Back office participant delete form.
  */
-class CRM_Event_Form_Participant_Delete extends CRM_Contribute_Form_AbstractEditPayment {
+class CRM_Event_Form_Participant_Delete extends CRM_Core_Form {
   use CRM_Event_Form_EventFormTrait;
   use CRM_Contact_Form_ContactFormTrait;
 
