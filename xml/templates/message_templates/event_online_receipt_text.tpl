@@ -184,7 +184,7 @@ You were registered by: {$payer.name}
 {if !empty($checkNumber)}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
-{if !empty($billingName)}
+{if {contribution.address_id.display|boolean}}
 
 ===============================================================================
 
@@ -192,8 +192,8 @@ You were registered by: {$payer.name}
 
 ===============================================================================
 
-{$billingName}
-{$address}
+{contribution.address_id.name}
+{contribution.address_id.display}
 {/if}
 
 {if !empty($credit_card_type)}

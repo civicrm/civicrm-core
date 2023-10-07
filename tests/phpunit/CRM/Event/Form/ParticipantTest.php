@@ -217,7 +217,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->setCurrencySeparators($thousandSeparator);
     $_REQUEST['mode'] = 'live';
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
-    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
+    $form = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
+    $this->assertStringContainsStrings($form->getFirstMailBody(), [
+      'Junko Adams<br/>',
+      '790L Lincoln St S<br />
+Baltimore, New York 10545<br />
+United States<br />',
+    ]);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $this->assertEquals('2018-09-04 00:00:00', $participant['participant_register_date']);
     $this->assertEquals('Offline Registration for Event: Annual CiviCRM meet by: ', $participant['participant_source']);

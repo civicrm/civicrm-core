@@ -112,6 +112,10 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
     $contribution['total_amount'] = $mockOrder->getTotalAmount();
     $contribution['tax_amount'] = $mockOrder->getTotalTaxAmount() ? round($mockOrder->getTotalTaxAmount(), 2) : 0;
     $contribution['tax_exclusive_amount'] = $contribution['total_amount'] - $contribution['tax_amount'];
+    $contribution['address_id.name'] = 'Barbara Johnson';
+    $contribution['address_id.display'] = '790L Lincoln St S
+Baltimore, New York 10545
+United States';
     $messageTemplate->setContribution($contribution);
     $messageTemplate->setOrder($mockOrder);
     $messageTemplate->setParticipantContacts($participantContacts);

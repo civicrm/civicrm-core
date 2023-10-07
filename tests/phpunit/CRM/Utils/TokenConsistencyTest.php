@@ -281,7 +281,29 @@ contribution.contribution_page_id.receipt_text :Text in
       'locale' => 'nb_NO',
     ]);
     $tokenProcessor->evaluate();
-    $this->assertEquals('€ 5 990,99', $tokenProcessor->getRow(0)->render('html'));
+    $this->assertEquals('€ 5 990,99', $tokenProcessor->getRow(0)
+      ->render('html'));
+  }
+
+  /**
+   * Test various contribution tokens.
+   *
+   * There is additional testing for contribution tokens in CRM_Contribute_ActionMapping_ByTypeTest
+   * so this does not attempt to be complete.
+   */
+  public function testContributionTokens(): void {
+    $this->createTestEntity('Address', ['name' => 'Bob Smith', 'street_address' => '123 Sesame Street', 'country_id' => 1058, 'supplemental_address_1' => 'The End']);
+    $contributionID = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'address_id' => $this->ids['Address']['default']]);
+    $tokenString = '{contribution.address_id.name} ---- {contribution.address_id.display}';
+    $html = $this->renderText(['contributionId' => $contributionID], $tokenString);
+    $this->assertEquals('Bob Smith ---- 123 Sesame Street<br />
+The End<br />
+Czech Republic<br />', $html);
+    $text = $this->renderText(['contributionId' => $contributionID], $tokenString, [], FALSE);
+    $this->assertEquals('Bob Smith ---- 123 Sesame Street
+The End
+Czech Republic
+', $text);
   }
 
   /**
@@ -1165,17 +1187,18 @@ Attendees will need to install the [TeleFoo](http://telefoo.example.com) app.';
    * @param array $rowContext
    * @param string $text
    * @param array $context
+   * @param bool $isHtml
    *
    * @return string
    */
-  protected function renderText(array $rowContext, string $text, array $context = []): string {
+  protected function renderText(array $rowContext, string $text, array $context = [], $isHtml = TRUE): string {
     $context['schema'] = $context['schema'] ?? [];
     foreach (array_keys($rowContext) as $key) {
       $context['schema'][] = $key;
     }
     $tokenProcessor = $this->getTokenProcessor($context);
     $tokenProcessor->addRow($rowContext);
-    $tokenProcessor->addMessage('text', $text, 'text/html');
+    $tokenProcessor->addMessage('text', $text, 'text/' . ($isHtml ? 'html' : 'plain'));
     $tokenProcessor->evaluate();
     return $tokenProcessor->getRow(0)->render('text');
   }

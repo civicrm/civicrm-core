@@ -98,9 +98,7 @@ paidBy:::{$paidBy}
 {if isset($checkNumber)}
 checkNumber:::{$checkNumber}
 {/if}
-{if isset($billingName)}
-billingName:::{$billingName}
-{/if}
+billingName:::{contribution.address_id.name}
 {if isset($credit_card_type)}
 credit_card_type:::{$credit_card_type}
 credit_card_number:::{$credit_card_number}

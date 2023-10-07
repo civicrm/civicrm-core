@@ -192,7 +192,7 @@
 {if {contribution.check_number|boolean}}
 {ts}Check Number{/ts}: {contribution.check_number}
 {/if}
-{if !empty($billingName)}
+{if {contribution.address_id.display|boolean}}
 
 ===============================================================================
 
@@ -200,8 +200,8 @@
 
 ===============================================================================
 
-{$billingName}
-{$address}
+{contribution.address_id.name}
+{contribution.address_id.display}
 {/if}
 
 {if !empty($credit_card_type)}
