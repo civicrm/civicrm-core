@@ -526,10 +526,9 @@ London,',
    * @dataProvider getBooleanDataProvider
    *
    * @param bool $isQuickConfig
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSubmitPartialPayment(bool $isQuickConfig): void {
+    $this->swapMessageTemplateForInput('event_offline_receipt', '', 'text');
     $email = $this->submitForm(['is_monetary' => 1, 'start_date' => '2023-02-15 15:00', 'end_date' => '2023-02-15 18:00'], [
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       'total_amount' => '20',
@@ -669,17 +668,23 @@ London,',
       'From: "FIXME" <info@EXAMPLE.ORG>',
       'To: "Mr. Anthony Anderson II" <anthony_anderson@civicrm.org>',
       'Subject: Event Confirmation - Annual CiviCRM meet - Mr. Anthony Anderson II',
-      'Dear Anthony,Contact the Development Department if you need to make any changes to your registration.',
+      'Dear Anthony',
+      'Contact the Development Department if you need to make any changes to your registration.',
       'Event Information and Location',
       'Annual CiviCRM meet',
       'Registered Email',
       'Contact the Development Department if you need to make any changes to your registration.',
-      $isQuickConfig ? $this->formatMoneyInput(1550.55) . ' Family Deal - 1' : 'Fundraising Dinner - Family...',
-      $isAmountPaidOnForm ? 'Total Paid: $20.00' : 'Total Paid: ',
-      $isAmountPaidOnForm ? 'Balance: $1,530.55' : 'Balance: $1,550.55',
-      'Financial Type: Event Fee',
+      $this->formatMoneyInput(1550.55),
+      $isQuickConfig ? ' Family Deal' : 'Fundraising Dinner - Family Deal',
+      $isAmountPaidOnForm ? 'Total Paid' : '',
+      $isAmountPaidOnForm ? $this->formatMoneyInput(20.00) : '',
+      'Balance',
+      $isAmountPaidOnForm ? $this->formatMoneyInput(1530.55) : $this->formatMoneyInput(1550.55),
+      'Financial Type',
+      'Event Fee',
       'February 15th, 2023  3:00 PM- 6:00 PM',
-      'Check Number: 879',
+      'Check Number',
+      '879',
     ]);
   }
 
