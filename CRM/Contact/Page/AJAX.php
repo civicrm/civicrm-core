@@ -951,7 +951,7 @@ LIMIT {$offset}, {$rowCount}
   public static function toggleDedupeSelect() {
     $pnid = $_REQUEST['pnid'];
     $isSelected = CRM_Utils_Type::escape($_REQUEST['is_selected'], 'Boolean');
-    $cacheKeyString = CRM_Utils_Request::retrieve('cacheKey', 'Alphanumeric', $null, FALSE);
+    $cacheKeyString = CRM_Utils_Request::retrieve('cacheKey', 'Alphanumeric', NULL, FALSE);
 
     $params = [
       1 => [$isSelected, 'Boolean'],
