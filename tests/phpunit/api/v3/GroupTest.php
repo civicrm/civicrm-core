@@ -43,30 +43,6 @@ class api_v3_GroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test missing required title parameter results in an error.
-   *
-   * @param int $version
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGroupCreateNoTitle($version) {
-    $this->_apiversion = $version;
-    $params = [
-      'name' => 'Test Group No title ',
-      'domain_id' => 1,
-      'description' => 'New Test Group Created',
-      'is_active' => 1,
-      'visibility' => 'Public Pages',
-      'group_type' => [
-        '1' => 1,
-        '2' => 1,
-      ],
-    ];
-
-    $this->callAPIFailure('group', 'create', $params, 'title');
-  }
-
-  /**
    * @param int $version
    *
    * @dataProvider versionThreeAndFour

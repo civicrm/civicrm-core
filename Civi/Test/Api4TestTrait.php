@@ -130,9 +130,9 @@ trait Api4TestTrait {
     foreach ($requiredFields as $fieldName => $field) {
       if (
         !isset($values[$fieldName]) &&
-        ($field['required'] || AbstractAction::evaluateCondition($field['required_if'], $values + $extraValues))
+        ($field['required'] || AbstractAction::evaluateCondition($field['required_if'], ['values' => $values + $extraValues]))
       ) {
-        $extraValues[$fieldName] = $this->getRequiredValue($field, $requiredFields);
+        $extraValues[$fieldName] = $this->getRequiredValue($field);
       }
     }
 
