@@ -91,6 +91,9 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       if ($getSearchDisplays) {
         $afforms[$name]['search_displays'] = $this->getSearchDisplays($afforms[$name]['layout']);
       }
+      if (!isset($afforms[$name]['placement']) && $this->_isFieldSelected('placement')) {
+        self::convertLegacyPlacement($afforms[$name]);
+      }
     }
 
     if ($getLayout && $this->layoutFormat !== 'html') {
@@ -177,9 +180,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'requires' => [],
         'title' => E::ts('%1 block', [1 => $custom['title']]),
         'description' => '',
-        'is_dashlet' => FALSE,
         'is_public' => FALSE,
-        'is_token' => FALSE,
         'permission' => ['access CiviCRM'],
         'join_entity' => 'Custom_' . $custom['name'],
         'entity_type' => $custom['extends'],
@@ -214,6 +215,20 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       }
     }
     return $searchDisplays;
+  }
+
+  private static function convertLegacyPlacement(array &$afform): void {
+    $afform['placement'] = [];
+    if (!empty($afform['is_dashlet'])) {
+      $afform['placement'][] = 'dashboard_dashlet';
+    }
+    if (!empty($afform['is_token'])) {
+      $afform['placement'][] = 'msg_token';
+    }
+    if (!empty($afform['contact_summary'])) {
+      $afform['placement'][] = 'contact_summary_' . $afform['contact_summary'];
+    }
+    unset($afform['is_dashlet'], $afform['is_token'], $afform['contact_summary']);
   }
 
 }

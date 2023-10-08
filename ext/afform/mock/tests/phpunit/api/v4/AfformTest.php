@@ -31,8 +31,8 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
   public function getBasicDirectives() {
     return [
-      ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page', 'permission' => ['access Foobar'], 'is_dashlet' => TRUE, 'submit_enabled' => TRUE]],
-      ['mockBareFile', ['title' => '', 'description' => '', 'permission' => ['access CiviCRM'], 'is_dashlet' => FALSE, 'submit_enabled' => TRUE]],
+      ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page', 'permission' => ['access Foobar'], 'placement' => ['dashboard_dashlet'], 'submit_enabled' => TRUE]],
+      ['mockBareFile', ['title' => '', 'description' => '', 'permission' => ['access CiviCRM'], 'placement' => [], 'submit_enabled' => TRUE]],
       ['mockFoo', ['title' => '', 'description' => '', 'permission' => ['access CiviCRM']], 'submit_enabled' => TRUE],
       ['mock-weird-name', ['title' => 'Weird Name', 'description' => '', 'permission' => ['access CiviCRM']], 'submit_enabled' => TRUE],
     ];
@@ -55,7 +55,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       $dashlet = Dashboard::get(FALSE)
         ->addWhere('name', '=', $formName)
         ->execute();
-      if (!empty($afform['is_dashlet'])) {
+      if (in_array('dashboard_dashlet', $afform['placement'] ?? [], TRUE)) {
         $this->assertCount(1, $dashlet);
       }
       else {
@@ -73,7 +73,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
     $this->assertEquals($get($originalMetadata, 'description'), $get($result[0], 'description'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
-    $this->assertEquals($get($originalMetadata, 'is_dashlet'), $get($result[0], 'is_dashlet'), $message);
+    $this->assertEquals($get($originalMetadata, 'placement') ?? [], $get($result[0], 'placement'), $message);
     $this->assertEquals($get($originalMetadata, 'permission'), $get($result[0], 'permission'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
     $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
@@ -86,7 +86,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       ->addWhere('name', '=', $formName)
       ->addValue('description', 'The temporary description')
       ->addValue('permission', ['access foo', 'access bar'])
-      ->addValue('is_dashlet', empty($originalMetadata['is_dashlet']))
+      ->addValue('placement', empty($originalMetadata['placement']) ? ['dashboard_dashlet'] : [])
       ->execute();
     $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals('The temporary description', $result[0]['description'], $message);
@@ -98,7 +98,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
     $this->assertEquals('The temporary description', $get($result[0], 'description'), $message);
-    $this->assertEquals(empty($originalMetadata['is_dashlet']), $get($result[0], 'is_dashlet'), $message);
+    $this->assertNotEquals($get($originalMetadata, 'placement'), $get($result[0], 'placement'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
     $this->assertEquals(['access foo', 'access bar'], $get($result[0], 'permission'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
@@ -117,7 +117,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals($get($originalMetadata, 'description'), $get($result[0], 'description'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
     $this->assertEquals($get($originalMetadata, 'permission'), $get($result[0], 'permission'), $message);
-    $this->assertEquals($get($originalMetadata, 'is_dashlet'), $get($result[0], 'is_dashlet'), $message);
+    $this->assertEquals($get($originalMetadata, 'placement') ?? [], $get($result[0], 'placement'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
     $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
     $this->assertEquals(FALSE, $get($result[0], 'has_local'), $message);

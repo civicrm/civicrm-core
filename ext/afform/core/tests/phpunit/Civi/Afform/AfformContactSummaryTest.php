@@ -43,25 +43,25 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
     Afform::create()
       ->addValue('name', $this->formNames[0])
       ->addValue('title', 'Test B')
-      ->addValue('contact_summary', 'tab')
+      ->addValue('placement', ['contact_summary_tab'])
       ->addValue('summary_contact_type', ['Organization'])
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[1])
       ->addValue('title', 'Test C')
-      ->addValue('contact_summary', 'tab')
+      ->addValue('placement', ['contact_summary_tab'])
       ->addValue('summary_contact_type', ['FooBar'])
       ->addValue('icon', 'smiley-face')
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[2])
       ->addValue('title', 'Test A')
-      ->addValue('contact_summary', 'tab')
+      ->addValue('placement', ['contact_summary_tab'])
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[3])
       ->addValue('title', 'Test D')
-      ->addValue('contact_summary', 'tab')
+      ->addValue('placement', ['contact_summary_tab'])
       ->addValue('summary_contact_type', ['Individual'])
       ->addValue('summary_weight', 99)
       ->execute();
@@ -116,14 +116,14 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
       ->addValue('name', $this->formNames[0])
       ->addValue('title', 'Test B')
       ->addValue('type', 'search')
-      ->addValue('contact_summary', 'block')
+      ->addValue('placement', ['contact_summary_block'])
       ->addValue('summary_contact_type', ['Individual', 'Household'])
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[1])
       ->addValue('title', 'Test C')
       ->addValue('type', 'form')
-      ->addValue('contact_summary', 'block')
+      ->addValue('placement', ['contact_summary_block'])
       ->addValue('summary_contact_type', ['Farm'])
       ->addValue('icon', 'smiley-face')
       ->execute();
@@ -131,13 +131,13 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
       ->addValue('name', $this->formNames[2])
       ->addValue('type', 'form')
       ->addValue('title', 'Test A')
-      ->addValue('contact_summary', 'block')
+      ->addValue('placement', ['contact_summary_block'])
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[3])
       ->addValue('type', 'form')
       ->addValue('title', 'A Weight Test')
-      ->addValue('contact_summary', 'block')
+      ->addValue('placement', ['contact_summary_block'])
       ->addValue('summary_weight', 99)
       ->execute();
 

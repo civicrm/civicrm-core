@@ -141,7 +141,7 @@
           });
         },
 
-        meta: CRM.afGuiEditor,
+        meta: _.extend(CRM.afGuiEditor, CRM.afAdmin),
 
         getEntity: function(entityName) {
           return CRM.afGuiEditor.entities[entityName];
