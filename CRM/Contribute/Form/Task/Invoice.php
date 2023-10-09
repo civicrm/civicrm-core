@@ -471,6 +471,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       // condition to check for download PDF Invoice or email Invoice
       if ($isCreatePDF) {
+        // email_comment is an optional variable in this case, and won't usually be present, but allow it to be.
+        $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => ($params['email_comment'] ?? '')]);
         [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         if (isset($params['forPage'])) {
           return $html;
