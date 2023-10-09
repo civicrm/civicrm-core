@@ -119,7 +119,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
           // CRM-7925
           throw new CRM_Core_Exception(ts('The Contact Sub Type does not match the Contact type for this record'));
         }
-        $params['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
       }
     }
 
