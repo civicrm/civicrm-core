@@ -83,6 +83,8 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
       $invoiceHTML[current($contributionID)] = CRM_Contribute_Form_Task_Invoice::printPDF($contributionID, $params, $contactIds);
     }
 
+    $this->assertStringNotContainsString('Undefined array key', $invoiceHTML[$result['id']]);
+
     $this->assertStringNotContainsString('Due Date', $invoiceHTML[$result['id']]);
     $this->assertStringNotContainsString('PAYMENT ADVICE', $invoiceHTML[$result['id']]);
     $this->assertStringContainsString('Mr. Anthony Anderson II', $invoiceHTML[$result['id']]);
