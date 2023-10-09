@@ -83,6 +83,9 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
       $invoiceHTML[current($contributionID)] = CRM_Contribute_Form_Task_Invoice::printPDF($contributionID, $params, $contactIds);
     }
 
+    // For some reason php warnings are in the html output, not triggering test fails, so manually check.
+    $this->assertStringNotContainsString('Warning: ', $invoiceHTML[$result['id']]);
+
     $this->assertStringNotContainsString('Due Date', $invoiceHTML[$result['id']]);
     $this->assertStringNotContainsString('PAYMENT ADVICE', $invoiceHTML[$result['id']]);
     $this->assertStringContainsString('Mr. Anthony Anderson II', $invoiceHTML[$result['id']]);
