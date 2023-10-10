@@ -95,10 +95,6 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    * @var bool
    */
   protected $isBackoffice = FALSE;
-  /**
-   * @var string
-   */
-  protected $_userContext;
 
   /**
    * Set variables up before form is built based on participant ID from URL
@@ -107,13 +103,9 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    */
-  public function preProcess() {
-    $config = CRM_Core_Config::singleton();
-    $session = CRM_Core_Session::singleton();
-    $this->_userContext = $session->readUserContext();
+  public function preProcess(): void {
     $participant = $values = [];
     $this->_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
-    $this->_userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
     $this->isBackoffice = (CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, FALSE, 'REQUEST') && CRM_Core_Permission::check('edit event participants')) ?? FALSE;
     $params = ['id' => $this->_participant_id];
     $this->_participant = CRM_Event_BAO_Participant::getValues($params, $values, $participant);
@@ -123,8 +115,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $this->_event_id = $this->_part_values['event_id'];
     $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}");
     $this->_contact_id = $this->_part_values['participant_contact_id'];
-    $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($this->_contact_id, $this->_userChecksum);
-    if (!$validUser && !CRM_Core_Permission::check('edit all events')) {
+    if (!$this->getAuthenticatedCheckSumContactID() && !CRM_Core_Permission::check('edit all events')) {
       CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to transfer/cancel this participant.'), $url);
     }
     $this->assign('action', $this->_action);
@@ -149,12 +140,6 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     }
     $details = array_merge($details, $selfServiceDetails);
     $this->assign('details', $details);
-    $this->selfsvcupdateUrl = CRM_Utils_System::url('civicrm/event/selfsvcupdate', "reset=1&id={$this->_participant_id}&id=0");
-    $this->selfsvcupdateText = ts('Update');
-    $this->selfsvcupdateButtonText = ts('Update');
-    // Based on those ids retrieve event and verify it is eligible
-    // for self update (event.start_date > today, event can be 'self_updated'
-    // retrieve contact name and email, and let user verify his/her identity
   }
 
   /**
@@ -233,14 +218,14 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    *
    * return @void
    */
-  public function transferParticipant($params) {
+  public function transferParticipant(): void {
     CRM_Utils_System::redirect(CRM_Utils_System::url(
       'civicrm/event/selfsvctransfer',
       [
         'reset' => 1,
         'action' => 'add',
         'pid' => $this->_participant_id,
-        'cs' => $this->_userChecksum,
+        'cs' => CRM_Utils_Request::retrieve('cs', 'String', $this),
         'is_backoffice' => $this->isBackoffice,
       ]
     ));
