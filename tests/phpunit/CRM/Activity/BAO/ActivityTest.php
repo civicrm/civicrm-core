@@ -44,6 +44,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'civicrm_email',
       'civicrm_file',
       'civicrm_entity_file',
+      'civicrm_case_activity',
+      'civicrm_case_contact',
+      'civicrm_case',
     ];
     $this->quickCleanup($tablesToTruncate);
     $this->cleanUpAfterACLs();
@@ -1342,13 +1345,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $form->postProcess();
 
-    // FIXME: This test was failing because the above postProcess is filing
-    // the activity on a case. I don't think it's supposed to be doing that,
-    // and it doesn't do it when you run this test in isolation, only when running
-    // all tests in this file. So it's probably caused by some static caching somewhere.
-    // Fixed the test by disabling permission checks on this activity.get call.
-    // Because otherwise the fake logged in user doesn't have access to case activities.
-    $activityGet = Activity::get(FALSE)
+    $activityGet = Activity::get()
       ->addSelect('activity_type_id:label', 'subject', 'details')
       ->addWhere('activity_type_id:name', '=', 'Email')
       ->execute();
