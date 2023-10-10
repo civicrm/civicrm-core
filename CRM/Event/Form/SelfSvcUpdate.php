@@ -95,6 +95,10 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    * @var bool
    */
   protected $isBackoffice = FALSE;
+  /**
+   * @var string
+   */
+  protected $_userContext;
 
   /**
    * Set variables up before form is built based on participant ID from URL
