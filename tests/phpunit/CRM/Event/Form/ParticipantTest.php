@@ -353,7 +353,7 @@ London,',
     $this->callAPISuccess('Email', 'delete', ['id' => $email['id']]);
   }
 
-  public function assertStringContainsStrings($string, $expectedStrings) {
+  public function assertStringContainsStrings(string $string, array $expectedStrings): void {
     foreach ($expectedStrings as $expectedString) {
       $this->assertStringContainsString($expectedString, $string);
     }
@@ -368,8 +368,8 @@ London,',
    *
    * @return \Civi\Test\FormWrappers\EventFormParticipant
    *
-   *
    * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
   protected function getForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE): EventFormParticipant {
     $submittedValues['contact_id'] = $this->ids['Contact']['event'] = $this->individualCreate();
@@ -549,8 +549,6 @@ London,',
    * @dataProvider getBooleanDataProvider
    *
    * @param bool $isQuickConfig
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSubmitPendingPartiallyPaidAddPayment(bool $isQuickConfig): void {
     $message = $this->submitForm(['is_monetary' => 1, 'start_date' => '2023-02-15 15:00', 'end_date' => '2023-02-15 18:00'], [], $isQuickConfig)->getFirstMail();
@@ -564,17 +562,16 @@ London,',
   }
 
   /**
-   * Test submitting a partially paid event registration, recording a pending contribution.
+   * Test submitting a pending contribution on an event and then adding a partial payment.
    *
    * This tests
    *
    * @dataProvider getBooleanDataProvider
    *
    * @param bool $isQuickConfig
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSubmitPendingAddPayment(bool $isQuickConfig): void {
+    $this->swapMessageTemplateForInput('event_offline_receipt', '', 'text');
     $message = $this->submitForm(['is_monetary' => 1, 'start_date' => '2023-02-15 15:00', 'end_date' => '2023-02-15 18:00'], [], $isQuickConfig)->getFirstMail();
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $this->callAPISuccessGetValue('Contribution', ['return' => 'id']),
@@ -588,10 +585,12 @@ London,',
   /**
    * @param bool $isQuickConfig
    * @param array $message
-   * @param bool $isAmountPaidOnForm
-   *   Was the amount paid entered on the form (if so this should be on the receipt)
+   * @param bool $isPartPaymentMadeOnParticipantForm
+   *   Was a completed contribution entered on the participant form.
+   *   If an amount that is less than the total owing was paid on the participant form
+   *   then any receipt triggered from that form would have the amount paid and balance.
    */
-  protected function assertPartialPaymentResult(bool $isQuickConfig, array $message, bool $isAmountPaidOnForm = TRUE): void {
+  protected function assertPartialPaymentResult(bool $isQuickConfig, array $message, bool $isPartPaymentMadeOnParticipantForm = TRUE): void {
     $paymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $expected = [
@@ -676,10 +675,10 @@ London,',
       'Contact the Development Department if you need to make any changes to your registration.',
       $this->formatMoneyInput(1550.55),
       $isQuickConfig ? ' Family Deal' : 'Fundraising Dinner - Family Deal',
-      $isAmountPaidOnForm ? 'Total Paid' : '',
-      $isAmountPaidOnForm ? $this->formatMoneyInput(20.00) : '',
-      'Balance',
-      $isAmountPaidOnForm ? $this->formatMoneyInput(1530.55) : $this->formatMoneyInput(1550.55),
+      $isPartPaymentMadeOnParticipantForm ? 'Total Paid' : '',
+      $isPartPaymentMadeOnParticipantForm ? $this->formatMoneyInput(20.00) : '',
+      $isPartPaymentMadeOnParticipantForm ? 'Balance' : '',
+      $isPartPaymentMadeOnParticipantForm ? $this->formatMoneyInput(1530.55) : $this->formatMoneyInput(1550.55),
       'Financial Type',
       'Event Fee',
       'February 15th, 2023  3:00 PM- 6:00 PM',
