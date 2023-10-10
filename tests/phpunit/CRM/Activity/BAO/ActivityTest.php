@@ -44,6 +44,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'civicrm_email',
       'civicrm_file',
       'civicrm_entity_file',
+      'civicrm_case_activity',
+      'civicrm_case_contact',
+      'civicrm_case',
     ];
     $this->quickCleanup($tablesToTruncate);
     $this->cleanUpAfterACLs();
@@ -1226,10 +1229,17 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSendEmailBasic(): void {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+
     $contactId = $this->getContactID();
 
     // create a logged in USER since the code references it for sendEmail user.
     $this->createLoggedInUser();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+      'access my cases and activities',
+    ];
 
     $contactDetailsIntersectKeys = [
       'contact_id' => '',
@@ -1256,7 +1266,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activity = Activity::get()
       ->addSelect('activity_type_id:label', 'subject', 'details')
       ->addWhere('activity_type_id:name', '=', 'Email')
-      ->execute()->first();
+      ->execute()->single();
 
     $details = '-ALTERNATIVE ITEM 0-
 ' . __FUNCTION__ . ' html ' . $contact['display_name'] . ' Housing Support
@@ -1322,6 +1332,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     // create a logged in USER since the code references it for sendEmail user.
     $this->createLoggedInUser();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts', 'access CiviCRM'];
 
     $subject = __FUNCTION__ . ' subject';
     $html = __FUNCTION__ . ' html';
@@ -1334,10 +1345,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $form->postProcess();
 
-    $activity = Activity::get()
+    $activityGet = Activity::get()
       ->addSelect('activity_type_id:label', 'subject', 'details')
       ->addWhere('activity_type_id:name', '=', 'Email')
-      ->execute()->first();
+      ->execute();
+    $activity = $activityGet->single();
 
     $details = "-ALTERNATIVE ITEM 0-
 $html
@@ -1363,10 +1375,16 @@ $text
   public function testSendEmailWithCampaign(): void {
     // Create a contact and contactDetails array.
     $contactId = $this->individualCreate();
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
 
     // create a logged in USER since the code references it for sendEmail user.
     $this->createLoggedInUser();
-    $this->enableCiviCampaign();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'view all contacts',
+      'access CiviCRM',
+      'access my cases and activities',
+    ];
 
     // Create a campaign.
     $result = $this->civicrm_api('Campaign', 'create', [
@@ -1388,7 +1406,7 @@ $text
     $activity = Activity::get()
       ->addSelect('activity_type_id:label', 'subject', 'details', 'campaign_id')
       ->addWhere('activity_type_id:name', '=', 'Email')
-      ->execute()->first();
+      ->execute()->single();
 
     $this->assertEquals($activity['campaign_id'], $campaign_id, 'Activity campaign_id does not match.');
   }

@@ -3019,31 +3019,45 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @inheritDoc
    */
   public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+    $administerCases = CRM_Core_Permission::check('administer CiviCase', $userId);
+    $viewMyCases = CRM_Core_Permission::check('access my cases and activities', $userId);
+    $viewAllCases = CRM_Core_Permission::check('access all cases and activities', $userId);
+
     // We always return an array with these keys, even if they are empty,
     // because this tells the query builder that we have considered these fields for acls
     $clauses = [
       'id' => [],
       // Only case admins can view deleted cases
-      'is_deleted' => CRM_Core_Permission::check('administer CiviCase') ? [] : ["= 0"],
+      'is_deleted' => $administerCases ? [] : ['= 0'],
     ];
-    // Ensure the user has permission to view the case client
-    $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
-    if ($contactClause) {
-      $contactClause = implode(' AND contact_id ', $contactClause);
-      $clauses['id'][] = "IN (SELECT case_id FROM civicrm_case_contact WHERE contact_id $contactClause)";
+
+    // No CiviCase access
+    if (!$viewAllCases && !$viewMyCases) {
+      $clauses['id'][] = 'IS NULL';
     }
-    // The api gatekeeper ensures the user has at least "access my cases and activities"
-    // so if they do not have permission to see all cases we'll assume they can only access their own
-    if (!CRM_Core_Permission::check('access all cases and activities')) {
-      $user = (int) CRM_Core_Session::getLoggedInContactID();
-      $clauses['id'][] = "IN (
-        SELECT r.case_id FROM civicrm_relationship r, civicrm_case_contact cc WHERE r.is_active = 1 AND cc.case_id = r.case_id AND (
-          (r.contact_id_a = cc.contact_id AND r.contact_id_b = $user) OR (r.contact_id_b = cc.contact_id AND r.contact_id_a = $user)
-        )
-      )";
+    else {
+      // Enforce permission to view the case client
+      $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
+      if ($contactClause) {
+        $contactClause = implode(' AND contact_id ', $contactClause);
+        $clauses['id'][] = "IN (SELECT case_id FROM civicrm_case_contact WHERE contact_id $contactClause)";
+      }
+      // User can only access their own cases
+      if (!$viewAllCases) {
+        $clauses['id'][] = self::getAccessMyCasesClause($userId);
+      }
     }
     CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
+  }
+
+  private static function getAccessMyCasesClause(int $userId = NULL): string {
+    $user = $userId ?? (int) CRM_Core_Session::getLoggedInContactID();
+    return "IN (
+      SELECT r.case_id FROM civicrm_relationship r, civicrm_case_contact cc WHERE r.is_active = 1 AND cc.case_id = r.case_id AND (
+        (r.contact_id_a = cc.contact_id AND r.contact_id_b = $user) OR (r.contact_id_b = cc.contact_id AND r.contact_id_a = $user)
+      )
+    )";
   }
 
   /**

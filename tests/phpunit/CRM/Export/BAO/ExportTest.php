@@ -89,7 +89,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'civicrm_case_activity',
       'civicrm_campaign',
     ]);
-    OptionValue::update()->addWhere('name', '=', 'Much Much longer than just phone')->setValues(['label' => 'Mobile'])->execute();
+    OptionValue::update(FALSE)->addWhere('name', '=', 'Much Much longer than just phone')->setValues(['label' => 'Mobile'])->execute();
 
     if (!empty($this->locationTypes)) {
       $this->callAPISuccess('LocationType', 'delete', ['id' => $this->locationTypes['Whare Kai']['id']]);
