@@ -161,6 +161,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->addElement('checkbox', 'is_public', ts('Public Event'));
     $this->addElement('checkbox', 'is_share', ts('Add footer region with Twitter, Facebook and LinkedIn share buttons and scripts?'));
     $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location'));
+    $this->addElement('checkbox', 'is_show_calendar_links', ts('Show Calendar Links'));
 
     $this->add('datepicker', 'start_date', ts('Start'), [], !$this->_isTemplate, ['time' => TRUE]);
     $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);
@@ -222,6 +223,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $params['is_active'] = $params['is_active'] ?? FALSE;
     $params['is_public'] = $params['is_public'] ?? FALSE;
     $params['is_share'] = $params['is_share'] ?? FALSE;
+    $params['is_show_calendar_links'] = $params['is_show_calendar_links'] ?? FALSE;
     $params['default_role_id'] = $params['default_role_id'] ?? FALSE;
     $params['id'] = $this->_id;
     //merge params with defaults from templates
