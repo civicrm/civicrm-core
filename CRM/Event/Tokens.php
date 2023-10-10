@@ -204,6 +204,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
           'pay_later_text',
           'pay_later_receipt',
           'fee_label',
+          'is_show_calendar_links:label',
           'custom.*',
         ], $this->getExposedFields()))
         ->execute()->first();
@@ -271,6 +272,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       'confirm_email_text',
       'is_monetary',
       'fee_label',
+      'is_show_calendar_links',
     ];
   }
 
@@ -287,10 +289,11 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
    */
   protected function getTokenMetadataOverrides(): array {
     return [
-      'is_public' => ['audience' => 'sysadmin'],
-      'is_show_location' => ['audience' => 'sysadmin'],
-      'is_monetary' => ['audience' => 'sysadmin'],
       'allow_selfcancelxfer' => ['audience' => 'sysadmin'],
+      'is_monetary' => ['audience' => 'sysadmin'],
+      'is_public' => ['audience' => 'sysadmin'],
+      'is_show_calendar_links' => ['audience' => 'sysadmin'],
+      'is_show_location' => ['audience' => 'sysadmin'],
       'selfcancelxfer_time' => ['audience' => 'sysadmin'],
     ];
   }

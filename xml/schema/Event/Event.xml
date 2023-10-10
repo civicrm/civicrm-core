@@ -929,4 +929,16 @@
       <type>CheckBox</type>
     </html>
   </field>
+  <field>
+    <name>is_show_calendar_links</name>
+    <title>Are calendar links shown?</title>
+    <type>boolean</type>
+    <required>true</required>
+    <default>1</default>
+    <comment>If true then calendar links are shown for this event.</comment>
+    <add>5.68</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
 </table>
