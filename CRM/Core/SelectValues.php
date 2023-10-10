@@ -1130,6 +1130,7 @@ class CRM_Core_SelectValues {
       'address_primary.street_address' => ts('Street Address'),
       'address_primary.city' => ts('City'),
       'address_primary.postal_code' => ts('Postal Code'),
+      'employer_id.sort_name' => ts('Current Employer'),
       'job_title' => ts('Job Title'),
     ];
     $custom = civicrm_api4('CustomField', 'get', [
