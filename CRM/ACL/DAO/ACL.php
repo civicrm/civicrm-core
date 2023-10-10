@@ -188,6 +188,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
    */
   public static function &fields() {
     if (!isset(Civi::$statics[__CLASS__]['fields'])) {
+      self::executeQuery('ALTER TABLE `civicrm_acl` CHANGE `is_active` `is_active` TINYINT(4) NOT NULL DEFAULT "1" COMMENT "Is this property active?"');
       Civi::$statics[__CLASS__]['fields'] = [
         'id' => [
           'name' => 'id',
@@ -432,6 +433,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
             'token' => FALSE,
           ],
           'where' => 'civicrm_acl.is_active',
+          'default' => '1',
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',
