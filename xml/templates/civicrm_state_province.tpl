@@ -2397,7 +2397,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (3959, 1161, "19", "Troms"),
 (3960, 1161, "10", "Vest-Agder"),
 (3961, 1161, "07", "Vestfold"),
-(3962. 1161, "46", "Vestland")
+(3962, 1161, "46", "Vestland")
 (3963, 1161, "01", "Østfold"),
 (3964, 1161, "22", "Jan Mayen"),
 (3965, 1161, "21", "Svalbard"),
