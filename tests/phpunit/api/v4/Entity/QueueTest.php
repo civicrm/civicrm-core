@@ -171,6 +171,26 @@ class QueueTest extends Api4TestBase {
     $this->assertEquals([6], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][2]);
   }
 
+  public function testReset() {
+    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_reset';
+    \Civi::dispatcher()->addListener('hook_civicrm_queueRun_testStuff', [$this, 'onHookQueueRun']);
+    $queue = \Civi::queue($queueName, [
+      'type' => 'SqlParallel',
+      'runner' => 'testStuff',
+      'error' => 'delete',
+      'batch_limit' => 4,
+    ]);
+    $this->assertQueueStats(0, 0, 0, $queue);
+
+    for ($i = 0; $i < 20; $i++) {
+      \Civi::queue($queueName)->createItem(['thingy' => $i]);
+    }
+    $this->assertQueueStats(20, 20, 0, $queue);
+    $result = Queue::reset(FALSE)->setQueue($queueName)->execute();
+    $this->assertEquals(20, $result[0]['items']);
+    $this->assertQueueStats(0, 0, 0, $queue);
+  }
+
   public function testRunLoop() {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_runloop';
     \Civi::dispatcher()->addListener('hook_civicrm_queueRun_testStuff', [$this, 'onHookQueueRun']);
