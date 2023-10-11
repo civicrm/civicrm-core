@@ -157,11 +157,6 @@
     // load panes function calls for snippet based on id of crm-accordion-header
     function loadPanes( id ) {
       var url = "{/literal}{crmURL p='civicrm/contact/view/pledge' q='snippet=4&formType=' h=0}{literal}" + id;
-      {/literal}
-        {if $contributionMode}
-          url = url + "&mode={$contributionMode}";
-        {/if}
-      {literal}
       if ( ! $('div.'+id).html() ) {
         var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
         $('div.'+id).html(loading);

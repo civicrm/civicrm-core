@@ -147,9 +147,11 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * Build the form object for PaymentReminders Information.
    *
+   * @deprecated since 5.68 will be removed around 5.78.
    * @param CRM_Core_Form $form
    */
   public static function buildPaymentReminders(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative, will be removed around 5.78');
     //PaymentReminders section
     $form->add('hidden', 'hidden_PaymentReminders', 1);
     $form->add('text', 'initial_reminder_day', ts('Send Initial Reminder'), ['size' => 3]);

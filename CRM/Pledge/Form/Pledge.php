@@ -195,33 +195,28 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $contactField->freeze();
     }
 
-    $showAdditionalInfo = FALSE;
-    $formType = CRM_Utils_Request::retrieveValue('form_type', 'String');
-    $defaults = [];
+    $formType = CRM_Utils_Request::retrieveValue('formType', 'String');
 
-    $paneNames = [
-      ts('Payment Reminders') => 'PaymentReminders',
+    $allPanes[ts('Payment Reminders')] = [
+      'open' => 'false',
+      'id' => 'PaymentReminders',
     ];
-    foreach ($paneNames as $name => $type) {
-      $urlParams = "snippet=4&formType={$type}";
-      $allPanes[$name] = [
-        'url' => CRM_Utils_System::url('civicrm/contact/view/pledge', $urlParams),
-        'open' => 'false',
-        'id' => $type,
-      ];
-      // see if we need to include this paneName in the current form
-      if ($formType == $type || !empty($_POST["hidden_{$type}"]) ||
-        !empty($defaults["hidden_{$type}"])
-      ) {
-        $showAdditionalInfo = TRUE;
-        $allPanes[$name]['open'] = 'true';
-      }
-      $fnName = "build{$type}";
-      CRM_Contribute_Form_AdditionalInfo::$fnName($this);
+    // see if we need to include this paneName in the current form
+    if ($formType === 'PaymentReminders' || !empty($_POST['hidden_PaymentReminders'])
+    ) {
+      $allPanes[ts('Payment Reminders')]['open'] = 'true';
     }
 
+    $this->add('hidden', 'hidden_PaymentReminders', 1);
+    $this->add('text', 'initial_reminder_day', ts('Send Initial Reminder'), ['size' => 3]);
+    $this->addRule('initial_reminder_day', ts('Please enter a valid reminder day.'), 'positiveInteger');
+    $this->add('text', 'max_reminders', ts('Send up to'), ['size' => 3]);
+    $this->addRule('max_reminders', ts('Please enter a valid No. of reminders.'), 'positiveInteger');
+    $this->add('text', 'additional_reminder_day', ts('Send additional reminders'), ['size' => 3]);
+    $this->addRule('additional_reminder_day', ts('Please enter a valid additional reminder day.'), 'positiveInteger');
+
     $this->assign('allPanes', $allPanes);
-    $this->assign('showAdditionalInfo', $showAdditionalInfo);
+    $this->assign('showAdditionalInfo', TRUE);
 
     $this->assign('formType', $formType);
     if ($formType) {
@@ -297,8 +292,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $frequencyUnit->freeze();
       $frequencyDay->freeze();
       $eachPaymentAmount = $this->_values['original_installment_amount'];
-      $this->assign('eachPaymentAmount', $eachPaymentAmount);
     }
+    $this->assign('eachPaymentAmount', $eachPaymentAmount ?? NULL);
 
     if (($this->_values['status_id'] ?? NULL) !=
       CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Cancelled')
