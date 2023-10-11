@@ -35,3 +35,4 @@ civi_member
 civi_pledge
 civi_report
 scheduled_communications
+user_dashboard
