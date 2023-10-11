@@ -53,28 +53,33 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/contribute/managePremiums',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
           'url' => 'civicrm/admin/contribute/managePremiums',
           'qs' => 'action=preview&id=%%id%%',
           'title' => ts('Preview Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::PREVIEW),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/contribute/managePremiums',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -125,7 +130,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
         $action -= CRM_Core_Action::DISABLE;
       }
 
-      $premiums[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(),
+      $premiums[$dao->id]['action'] = CRM_Core_Action::formLink($this->links(),
         $action,
         ['id' => $dao->id],
         ts('more'),
