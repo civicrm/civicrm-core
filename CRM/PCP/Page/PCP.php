@@ -54,18 +54,21 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
           'url' => 'civicrm/pcp/info',
           'qs' => 'action=update&reset=1&id=%%id%%&context=dashboard',
           'title' => ts('Edit Personal Campaign Page'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::RENEW => [
           'name' => ts('Approve'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=renew&id=%%id%%',
           'title' => ts('Approve Personal Campaign Page'),
+          'weight' => 30,
         ],
         CRM_Core_Action::REVERT => [
           'name' => ts('Reject'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=revert&id=%%id%%',
           'title' => ts('Reject Personal Campaign Page'),
+          'weight' => 30,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
@@ -73,18 +76,21 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
           'qs' => 'action=delete&id=%%id%%',
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
           'title' => ts('Delete Personal Campaign Page'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=enable&id=%%id%%',
           'title' => ts('Enable'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'url' => 'civicrm/admin/pcp',
           'qs' => 'action=disable&id=%%id%%',
           'title' => ts('Disable'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
       ];
     }
@@ -296,7 +302,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
         'page_title' => $title,
         'page_url' => $pageUrl,
         'page_type' => $page_type,
-        'action' => CRM_Core_Action::formLink(self::links(), $action,
+        'action' => CRM_Core_Action::formLink($this->links(), $action,
           ['id' => $pcp->id], ts('more'), FALSE, 'contributionpage.pcp.list', 'PCP', $pcp->id
         ),
         'title' => $pcp->title,
