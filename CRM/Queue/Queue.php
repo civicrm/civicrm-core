@@ -143,6 +143,14 @@ abstract class CRM_Queue_Queue {
   abstract public function existsQueue();
 
   /**
+   * Delete all items in the queue.
+   */
+  public function resetQueue(): void {
+    $this->deleteQueue();
+    $this->createQueue();
+  }
+
+  /**
    * Add a new item to the queue.
    *
    * @param mixed $data
