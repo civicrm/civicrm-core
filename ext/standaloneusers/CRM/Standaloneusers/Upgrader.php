@@ -63,16 +63,16 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
     $baseTpl = [
       'workflow_name' => 'password_reset',
       'msg_title' => 'Password reset',
-      'msg_subject' => 'Password reset link for {domain.name}',
+      'msg_subject' => '{ts}Password reset link for{/ts} {domain.name}',
       'msg_text' => <<<TXT
-        A password reset link was requested for this account.  If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.
+        {ts}A password reset link was requested for this account.  If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.{/ts}
 
         {\$resetUrlPlaintext}
 
         {domain.name}
         TXT,
       'msg_html' => <<<HTML
-        <p>A password reset link was requested for this account.&nbsp; If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.</p>
+        <p>{ts}A password reset link was requested for this account.&nbsp; If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.{/ts}</p>
 
         <p><a href="{\$resetUrlHtml}">{\$resetUrlHtml}</a></p>
 
