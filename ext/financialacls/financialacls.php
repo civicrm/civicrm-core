@@ -391,6 +391,9 @@ function financialacls_civicrm_alterMenu(array &$menu): void {
  * Implements hook_civicrm_links()
  */
 function financialacls_civicrm_links(string $op, ?string $objectName, $objectID, array &$links, ?int &$mask, array &$values) {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return;
+  }
   if ($objectName === 'MembershipType') {
     $financialType = CRM_Core_PseudoConstant::getName('CRM_Member_BAO_MembershipType', 'financial_type_id', CRM_Member_BAO_MembershipType::getMembershipType($objectID)['financial_type_id']);
     $hasEditPermission = CRM_Core_Permission::check('edit contributions of type ' . $financialType);
