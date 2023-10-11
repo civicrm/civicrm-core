@@ -1702,12 +1702,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // CRM-11124
     CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, NULL, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
 
-    // process soft credit / pcp pages
-    if (!empty($params['pcp_made_through_id'])) {
-      CRM_Contribute_BAO_ContributionSoft::formatSoftCreditParams($params, $form);
-      CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
-    }
-
     $transaction->commit();
 
     return $contribution;
