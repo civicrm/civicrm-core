@@ -14,29 +14,13 @@ class Manager {
   protected $res = NULL;
 
   /**
-   * Modules.
+   * Static cache of html partials.
    *
-   * @var array|null
-   *   Each item has some combination of these keys:
-   *   - ext: string
-   *     The Civi extension which defines the Angular module.
-   *   - js: array(string $relativeFilePath)
-   *     List of JS files (relative to the extension).
-   *   - css: array(string $relativeFilePath)
-   *     List of CSS files (relative to the extension).
-   *   - partials: array(string $relativeFilePath)
-   *     A list of partial-HTML folders (relative to the extension).
-   *     This will be mapped to "~/moduleName" by crmResource.
-   *   - settings: array(string $key => mixed $value)
-   *     List of settings to preload.
-   *   - settingsFactory: callable
-   *     Callback function to fetch settings.
-   *   - permissions: array
-   *     List of permissions to make available client-side
-   *   - requires: array
-   *     List of other modules required
+   * Stashing it here because it's too big to store in SqlCache
+   * FIXME: So that probably means we shouldn't be storing in memory either!
+   * @var array
    */
-  protected $modules = NULL;
+  private $partials = [];
 
   /**
    * @var \CRM_Utils_Cache_Interface
@@ -68,7 +52,7 @@ class Manager {
    */
   public function clear() {
     $this->cache->clear();
-    $this->modules = NULL;
+    $this->partials = [];
     $this->changeSets = NULL;
     // Force-refresh assetBuilder files
     \Civi::container()->get('asset_builder')->clear(FALSE);
@@ -93,14 +77,15 @@ class Manager {
    *     List of settings to preload.
    */
   public function getModules() {
-    if ($this->modules === NULL) {
+    $moduleNames = $this->cache->get('moduleNames');
+    $angularModules = [];
+    // Cache not set, fetch fresh list of modules and store in cache
+    if (!$moduleNames) {
       $config = \CRM_Core_Config::singleton();
       global $civicrm_root;
 
       // Note: It would be nice to just glob("$civicrm_root/ang/*.ang.php"), but at time
       // of writing CiviMail and CiviCase have special conditionals.
-
-      $angularModules = [];
       $angularModules['angularFileUpload'] = include "$civicrm_root/ang/angularFileUpload.ang.php";
       $angularModules['checklist-model'] = include "$civicrm_root/ang/checklist-model.ang.php";
       $angularModules['crmApp'] = include "$civicrm_root/ang/crmApp.ang.php";
@@ -150,17 +135,26 @@ class Manager {
           }
         }
       }
-      $this->modules = $this->resolvePatterns($angularModules);
+      $angularModules = $this->resolvePatterns($angularModules);
+      $this->cache->set('moduleNames', array_keys($angularModules));
+      foreach ($angularModules as $moduleName => $moduleInfo) {
+        $this->cache->set("module $moduleName", $moduleInfo);
+      }
+    }
+    // Rehydrate modules from cache
+    else {
+      foreach ($moduleNames as $moduleName) {
+        $angularModules[$moduleName] = $this->cache->get("module $moduleName");
+      }
     }
 
-    return $this->modules;
+    return $angularModules;
   }
 
   /**
    * Get the descriptor for an Angular module.
    *
-   * @param string $name
-   *   Module name.
+   * @param string $moduleName
    * @return array
    *   Details about the module:
    *   - ext: string, the name of the Civi extension which defines the module
@@ -169,12 +163,12 @@ class Manager {
    *   - partials: array(string $relativeFilePath).
    * @throws \Exception
    */
-  public function getModule($name) {
-    $modules = $this->getModules();
-    if (!isset($modules[$name])) {
+  public function getModule($moduleName) {
+    $module = $this->cache->get("module $moduleName") ?? $this->getModules()[$moduleName] ?? NULL;
+    if (!isset($module)) {
       throw new \Exception("Unrecognized Angular module");
     }
-    return $modules[$name];
+    return $module;
   }
 
   /**
@@ -292,13 +286,10 @@ class Manager {
    *   Invalid partials configuration.
    */
   public function getPartials($name) {
-    $cacheKey = "angular-partials_$name";
-    $cacheValue = $this->cache->get($cacheKey);
-    if ($cacheValue === NULL) {
-      $cacheValue = ChangeSet::applyResourceFilters($this->getChangeSets(), 'partials', $this->getRawPartials($name));
-      $this->cache->set($cacheKey, $cacheValue);
+    if (!isset($this->partials[$name])) {
+      $this->partials[$name] = ChangeSet::applyResourceFilters($this->getChangeSets(), 'partials', $this->getRawPartials($name));
     }
-    return $cacheValue;
+    return $this->partials[$name];
   }
 
   /**

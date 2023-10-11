@@ -54,7 +54,7 @@ function afform_civicrm_config(&$config) {
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'processGenericEntity'], 0);
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'preprocessContact'], 10);
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'processRelationships'], 1);
-  $dispatcher->addListener('hook_civicrm_angularModules', ['\Civi\Afform\AngularDependencyMapper', 'autoReq'], -1000);
+  $dispatcher->addListener('hook_civicrm_angularModules', '_afform_hook_civicrm_angularModules', -1000);
   $dispatcher->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
   $dispatcher->addListener('hook_civicrm_check', ['\Civi\Afform\StatusChecks', 'hook_civicrm_check']);
   $dispatcher->addListener('civi.afform.get', ['\Civi\Api4\Action\Afform\Get', 'getCustomGroupBlocks']);
@@ -135,7 +135,7 @@ function afform_civicrm_managed(&$entities, $modules) {
         'values' => [
           'name' => $afform['name'],
           'label' => $afform['navigation']['label'] ?: $afform['title'],
-          'permission' => $afform['permission'],
+          'permission' => (array) (empty($afform['permission']) ? 'access CiviCRM' : $afform['permission']),
           'permission_operator' => $afform['permission_operator'] ?? 'AND',
           'weight' => $afform['navigation']['weight'] ?? 0,
           'url' => $afform['server_route'],
@@ -301,17 +301,22 @@ function _afform_get_contact_types(array $mixedTypes): array {
 }
 
 /**
- * Implements hook_civicrm_angularModules().
+ * Late-listener for Angular modules: adds all Afforms and their dependencies.
  *
- * Generate a list of Afform Angular modules.
+ * Must run last so that all other modules are present for reverse-dependency mapping.
+ *
+ * @implements CRM_Utils_Hook::angularModules
+ * @param \Civi\Core\Event\GenericHookEvent $e
  */
-function afform_civicrm_angularModules(&$angularModules) {
+function _afform_hook_civicrm_angularModules($e) {
   $afforms = \Civi\Api4\Afform::get(FALSE)
-    ->setSelect(['name', 'requires', 'module_name', 'directive_name'])
+    ->setSelect(['name', 'requires', 'module_name', 'directive_name', 'layout'])
+    ->setLayoutFormat('html')
     ->execute();
 
+  // 1st pass, add each Afform as angular module
   foreach ($afforms as $afform) {
-    $angularModules[$afform['module_name']] = [
+    $e->angularModules[$afform['module_name']] = [
       'ext' => E::LONG_NAME,
       'js' => ['assetBuilder://afform.js?name=' . urlencode($afform['name'])],
       'requires' => $afform['requires'],
@@ -324,6 +329,12 @@ function afform_civicrm_angularModules(&$angularModules) {
         $afform['directive_name'] => 'E',
       ],
     ];
+  }
+
+  // 2nd pass, now that all Angular modules are declared, add reverse dependencies
+  $dependencyMapper = new \Civi\Afform\AngularDependencyMapper($e->angularModules);
+  foreach ($afforms as $afform) {
+    $e->angularModules[$afform['module_name']]['requires'] = $dependencyMapper->autoReq($afform);
   }
 }
 
@@ -433,31 +444,18 @@ function afform_civicrm_permission(&$permissions) {
  * @see CRM_Utils_Hook::permission_check()
  */
 function afform_civicrm_permission_check($permission, &$granted, $contactId) {
-  if ($permission[0] !== '@') {
+  if (!str_starts_with($permission, '@afform:') || strlen($permission) < 9) {
     // Micro-optimization - this function may get hit a lot.
     return;
   }
-
-  if (preg_match('/^@afform:(.*)/', $permission, $m)) {
-    $name = $m[1];
-
-    $afform = \Civi\Api4\Afform::get(FALSE)
-      ->addWhere('name', '=', $name)
-      ->addSelect('permission', 'permission_operator')
-      ->execute()
-      ->first();
-    // No permissions found... this shouldn't happen but just in case, set default.
-    if ($afform && empty($afform['permission'])) {
-      $afform['permission'] = ['access CiviCRM'];
-    }
-    if ($afform) {
-      $check = (array) $afform['permission'];
-      if ($afform['permission_operator'] === 'OR') {
-        $check = [$check];
-      }
-      $granted = CRM_Core_Permission::check($check, $contactId);
-    }
-  }
+  [, $name] = explode(':', $permission, 2);
+  // Delegate permission check to APIv4
+  $check = \Civi\Api4\Afform::checkAccess()
+    ->addValue('name', $name)
+    ->setAction('get')
+    ->execute()
+    ->first();
+  $granted = $check['access'];
 }
 
 /**
