@@ -3,7 +3,7 @@
 use Civi\Api4\Afform;
 
 /**
- * Test case for Afform.prefill and Afform.submit.
+ * Test case for Afform.checkAccess, Afform.prefill and Afform.submit.
  *
  * @group headless
  */
@@ -196,6 +196,31 @@ EOHTML;
     $this->assertEquals('Register A site', $contact['source']);
     // Check that the contact and the activity were correctly linked up as per the form.
     $this->callAPISuccessGetSingle('ActivityContact', ['contact_id' => $contact['id'], 'activity_id' => $activity['id']]);
+  }
+
+  public function testCheckAccess(): void {
+    $this->useValues([
+      'layout' => self::$layouts['aboutMe'],
+      'permission' => ['access CiviCRM'],
+    ]);
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionTemp = NULL;
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access Contact Dashboard',
+    ];
+    $check = Afform::checkAccess()
+      ->addValue('name', $this->formName)
+      ->setAction('get')
+      ->execute()->first();
+    $this->assertFalse($check['access']);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+    ];
+    $check = Afform::checkAccess()
+      ->addValue('name', $this->formName)
+      ->setAction('get')
+      ->execute()->first();
+    $this->assertTrue($check['access']);
   }
 
   public function testAboutMeForbidden(): void {
