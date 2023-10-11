@@ -11,6 +11,11 @@ class CRM_Case_Form_CaseViewTest extends CiviCaseTestCase {
   public function testSearchFilterDropdown(): void {
     $client_id = $this->individualCreate([], 0, TRUE);
     $caseObj = $this->createCase($client_id, $this->getLoggedInUser());
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+      'access my cases and activities',
+    ];
 
     $form = $this->getFormObject('CRM_Case_Form_CaseView');
     $form->set('cid', $client_id);

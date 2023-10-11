@@ -80,7 +80,8 @@ class Joiner {
     $prefix = empty($field['explicit_join']) ? '' : $field['explicit_join'] . '.';
     $prefix .= (empty($field['implicit_join']) ? '' : $field['implicit_join'] . '.');
     $idField = $query->getField($prefix . $field['name'] . '.id');
-    return $idField['sql_name'];
+    // If permission denied to join, SELECT NULL
+    return $idField['sql_name'] ?? 'NULL';
   }
 
 }

@@ -71,7 +71,7 @@ class CRM_Utils_SQL {
           }
           // Arrays of arrays get joined with OR (similar to CRM_Core_Permission::check)
           elseif (is_array($formattedClause)) {
-            $subClauses[] = "($fieldName " . implode(" OR $fieldName ", $formattedClause) . ')';
+            $subClauses[] = "(($fieldName " . implode(") OR ($fieldName ", $formattedClause) . '))';
           }
           else {
             $subClauses[] = "$fieldName $formattedClause";
