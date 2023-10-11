@@ -46,7 +46,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    *
    * @var int
    */
-  protected $_priceSetID = NULL;
+  protected $_priceSetID;
 
   protected $_values;
 
@@ -68,11 +68,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Set variables up before form is built.
    */
   public function preProcess() {
-    // current contribution page id
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE, NULL, 'REQUEST'
-    );
-    $this->assign('contributionPageID', $this->_id);
+    $this->assign('contributionPageID', $this->getContributionPageID());
 
     // get the requested action
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
@@ -258,10 +254,8 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
       // get price set of type contributions
       //this is the value for stored in db if price set extends contribution
-      $usedFor = 2;
-      $this->_priceSetID = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id, $usedFor, 1);
-      if ($this->_priceSetID) {
-        $defaults['price_set_id'] = $this->_priceSetID;
+      if ($this->getPriceSetID()) {
+        $defaults['price_set_id'] = $this->getPriceSetID();
       }
     }
     else {
@@ -404,6 +398,38 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       self::$_template->assign('isForm', FALSE);
       return 'CRM/Contribute/Form/ContributionPage/Tab.tpl';
     }
+  }
+
+  /**
+   * Get the price set ID for the event.
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getContributionPageID(): ?int {
+    if (!$this->_id) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    }
+    return $this->_id ? (int) $this->_id : NULL;
+  }
+
+  /**
+   * Get the price set ID for the contribution page.
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getPriceSetID(): ?int {
+    if (!$this->_priceSetID && $this->getContributionPageID()) {
+      $this->_priceSetID = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->getContributionPageID());
+    }
+    return $this->_priceSetID ? (int) $this->_priceSetID : NULL;
   }
 
 }
