@@ -285,7 +285,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     // Q. what does this do? Why do we only include this for maintenance?
     if ($maintenance) {
       $smarty = CRM_Core_Smarty::singleton();
-      echo implode('', $smarty->_tpl_vars['pageHTMLHead']);
+      echo implode('', $smarty->getTemplateVars('pageHTMLHead'));
     }
 
     // @todo Add variables from the body tag? (for Shoreditch)
