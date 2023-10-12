@@ -86,6 +86,7 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
 
     // CRM-11480, CRM-11682
     // Preload libraries required by the "Questions" tab
+    $this->assign('perm', (bool) CRM_Core_Permission::check('administer CiviCRM'));
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
     CRM_UF_Page_ProfileEditor::registerSchemas(['IndividualModel', 'ActivityModel']);
 

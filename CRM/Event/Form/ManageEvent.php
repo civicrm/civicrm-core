@@ -177,6 +177,9 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     if (CRM_Core_Permission::check($checkPermission) || !empty($ufCreate) || !empty($ufEdit)) {
       $this->assign('perm', TRUE);
     }
+    else {
+      $this->assign('perm', FALSE);
+    }
 
     // also set up tabs
     CRM_Event_Form_ManageEvent_TabHeader::build($this);
