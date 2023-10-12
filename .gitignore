@@ -35,6 +35,7 @@
 !/ext/civi_pledge
 !/ext/civi_report
 !/ext/scheduled_communications
+!/ext/user_dashboard
 backdrop/
 bower_components
 CRM/Case/xml/configuration
