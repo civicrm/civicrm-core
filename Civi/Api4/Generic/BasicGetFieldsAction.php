@@ -138,7 +138,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       if (array_key_exists('label', $fieldDefaults)) {
         $field['label'] = $field['label'] ?? $field['title'] ?? $field['name'];
       }
-      if (!empty($field['options']) && is_array($field['options']) && empty($field['suffixes']) && array_key_exists('suffixes', $field)) {
+      if (isset($field['options']) && is_array($field['options']) && empty($field['suffixes']) && array_key_exists('suffixes', $field)) {
         $this->setFieldSuffixes($field);
       }
       if (isset($defaults['options'])) {
@@ -156,13 +156,14 @@ class BasicGetFieldsAction extends BasicGetAction {
    * @param array $field
    */
   private function formatOptionList(&$field) {
-    if (empty($field['options'])) {
+    $optionsExist = isset($field['options']) && is_array($field['options']);
+    if (!isset($field['options'])) {
       $field['options'] = !empty($field['pseudoconstant']);
     }
     if (!empty($field['pseudoconstant']['optionGroupName'])) {
       $field['suffixes'] = CoreUtil::getOptionValueFields($field['pseudoconstant']['optionGroupName']);
     }
-    if (!$this->loadOptions || !$field['options']) {
+    if (!$this->loadOptions || (!$optionsExist && empty($field['pseudoconstant']))) {
       $field['options'] = (bool) $field['options'];
       return;
     }

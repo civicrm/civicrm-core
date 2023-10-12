@@ -74,7 +74,7 @@ class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService impleme
         $value = array_unique(array_merge($value, $tagTree[$tagID]));
       }
     }
-    $tags = \CRM_Utils_Type::validate(implode(',', $value), 'CommaSeparatedIntegers');
+    $tags = $value ? \CRM_Utils_Type::validate(implode(',', $value), 'CommaSeparatedIntegers') : '0';
     return "$fieldAlias $operator (SELECT entity_id FROM `civicrm_entity_tag` WHERE entity_table = '$tableName' AND tag_id IN ($tags))";
   }
 

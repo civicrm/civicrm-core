@@ -30,6 +30,7 @@ use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
 use Civi\Api4\OptionValue;
+use Civi\Api4\Tag;
 use Civi\Api4\UserJob;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\TransactionalInterface;
@@ -230,6 +231,20 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->indexBy('name');
     $this->assertEquals('Contact', $tagFields['entity_id']['fk_entity']);
     $this->assertContains('SavedSearch', $tagFields['entity_id']['dfk_entities']);
+  }
+
+  public function testEmptyOptionListIsReturnedAsAnArray(): void {
+    Tag::delete(FALSE)
+      ->addWhere('used_for', '=', 'civicrm_activity')
+      ->execute();
+    $field = EntityTag::getFields(FALSE)
+      ->addValue('entity_table', 'civicrm_activity')
+      ->addWhere('name', '=', 'tag_id')
+      ->setLoadOptions(TRUE)
+      ->execute()->single();
+    // There are no tags for Activity but it should still be returned as an array
+    $this->assertIsArray($field['options']);
+    $this->assertEmpty($field['options']);
   }
 
   public function testFiltersAreReturned(): void {

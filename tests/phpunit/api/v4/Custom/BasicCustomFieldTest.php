@@ -584,7 +584,7 @@ class BasicCustomFieldTest extends CustomTestBase {
       ->addWhere('name', '=', 'extends_entity_column_id')
       ->addValue('extends', 'Contact')
       ->execute()->first();
-    $this->assertFalse($fieldFilteredByContact['options']);
+    $this->assertEquals([], $fieldFilteredByContact['options']);
   }
 
   public function testExtendsMetadata(): void {
