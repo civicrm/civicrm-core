@@ -161,7 +161,7 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     }
 
     return \CRM_Utils_System::url('civicrm/afform/submission/verify',
-      ['token' => $token], TRUE, NULL, FALSE);
+      ['token' => $token], TRUE, NULL, FALSE, TRUE);
   }
 
   /**
