@@ -791,9 +791,11 @@ WHERE  id = %1";
    * @param bool $validFieldsOnly
    *
    * @return void
-   * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 5.68. Will be removed around 5.80.
    */
   public static function buildPriceSet(&$form, $component = NULL, $validFieldsOnly = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('copy & paste ....');
     $priceSetId = $form->get('priceSetId');
     if (!$priceSetId) {
       return;
@@ -840,7 +842,49 @@ WHERE  id = %1";
     // Call the buildAmount hook.
     CRM_Utils_Hook::buildAmount($component ?? 'contribution', $form, $feeBlock);
 
-    self::addPriceFieldsToForm($form, $feeBlock, $validFieldsOnly, $className, $validPriceFieldIds);
+    $hideAdminValues = !CRM_Core_Permission::check('edit contributions');
+    // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
+    $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
+    $checklifetime = FALSE;
+    foreach ($feeBlock as $id => $field) {
+      if (($field['visibility'] ?? NULL) == 'public' ||
+        (($field['visibility'] ?? NULL) == 'admin' && $adminFieldVisible == TRUE) ||
+        !$validFieldsOnly
+      ) {
+        $options = $field['options'] ?? NULL;
+        if ($className == 'CRM_Contribute_Form_Contribution_Main' && $component = 'membership') {
+          $contactId = $form->getVar('_membershipContactID');
+          if ($contactId && $options) {
+            $checklifetime = $checklifetime ?: self::checkCurrentMembership($options, $contactId);
+          }
+        }
+
+        $formClasses = ['CRM_Contribute_Form_Contribution', 'CRM_Member_Form_Membership'];
+
+        if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
+          continue;
+        }
+        elseif ($hideAdminValues && !in_array($className, $formClasses)) {
+          foreach ($options as $key => $currentOption) {
+            if ($currentOption['visibility_id'] == CRM_Price_BAO_PriceField::getVisibilityOptionID('admin')) {
+              unset($options[$key]);
+            }
+          }
+        }
+        if (!empty($options)) {
+          CRM_Price_BAO_PriceField::addQuickFormElement($form,
+            'price_' . $field['id'],
+            $field['id'],
+            FALSE,
+            CRM_Utils_Array::value('is_required', $field, FALSE),
+            NULL,
+            $options
+          );
+        }
+      }
+    }
+    $form->assign('ispricelifetime', $checklifetime);
+
   }
 
   /**
@@ -1616,13 +1660,18 @@ WHERE     ct.id = cp.financial_type_id AND
   /**
    * Add the relevant price fields to the form.
    *
+   * DO NOT use form outside core tested code - function is public for
+   * refactoring purposes only.
+   *
+   * @internal
+   *
    * @param \CRM_Core_Form $form
    * @param array $feeBlock
    * @param bool $validFieldsOnly
    * @param string $className
    * @param array $validPriceFieldIds
    */
-  protected static function addPriceFieldsToForm(CRM_Core_Form $form, $feeBlock, bool $validFieldsOnly, string $className, array $validPriceFieldIds) {
+  public static function addPriceFieldsToForm(CRM_Core_Form $form, $feeBlock, bool $validFieldsOnly, string $className, array $validPriceFieldIds) {
     $hideAdminValues = !CRM_Core_Permission::check('edit contributions');
     // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
     $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');

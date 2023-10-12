@@ -349,7 +349,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // build price set form.
       $this->set('priceSetId', $this->_priceSetId);
       if (empty($this->_ccid)) {
-        CRM_Price_BAO_PriceSet::buildPriceSet($this, $this->getFormContext());
+        $this->buildPriceSet($this, $this->getFormContext());
       }
       if ($this->_values['is_monetary'] &&
         $this->_values['is_recur'] && empty($this->_values['pledge_id'])
@@ -466,6 +466,55 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $this->addFormRule(['CRM_Contribute_Form_Contribution_Main', 'formRule'], $this);
+  }
+
+  /**
+   * Build the price set form.
+   *
+   * @param CRM_Core_Form $form
+   * @param string|null $component
+   * @param bool $validFieldsOnly
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  private function buildPriceSet(&$form, $component = NULL, $validFieldsOnly = TRUE) {
+    $priceSetId = $this->getPriceSetID();
+    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
+    $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
+    $validPriceFieldIds = array_keys($form->_priceSet['fields']);
+
+    // Mark which field should have the auto-renew checkbox, if any. CRM-18305
+    if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {
+      $autoRenewMembershipTypes = [];
+      foreach ($form->_membershipTypeValues as $membershipTypeValue) {
+        if ($membershipTypeValue['auto_renew']) {
+          $autoRenewMembershipTypes[] = $membershipTypeValue['id'];
+        }
+      }
+      foreach ($form->_priceSet['fields'] as $field) {
+        if (array_key_exists('options', $field) && is_array($field['options'])) {
+          foreach ($field['options'] as $option) {
+            if (!empty($option['membership_type_id'])) {
+              if (in_array($option['membership_type_id'], $autoRenewMembershipTypes)) {
+                $form->_priceSet['auto_renew_membership_field'] = $field['id'];
+                // Only one field can offer auto_renew memberships, so break here.
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+    $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetId;
+    $form->assign('priceSet', $form->_priceSet);
+
+    $feeBlock = &$form->_values['fee'];
+
+    // Call the buildAmount hook.
+    CRM_Utils_Hook::buildAmount($component ?? 'contribution', $form, $feeBlock);
+
+    CRM_Price_BAO_PriceSet::addPriceFieldsToForm($form, $feeBlock, $validFieldsOnly, __CLASS__, $validPriceFieldIds);
   }
 
   /**
