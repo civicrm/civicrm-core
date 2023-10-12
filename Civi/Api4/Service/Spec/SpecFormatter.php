@@ -164,7 +164,7 @@ class SpecFormatter {
     $bao = CoreUtil::getBAOFromApiName($spec->getEntity());
     $optionLabels = $bao::buildOptions($fieldName, NULL, $values);
 
-    if (!is_array($optionLabels) || !$optionLabels) {
+    if (!is_array($optionLabels)) {
       $options = FALSE;
     }
     else {
