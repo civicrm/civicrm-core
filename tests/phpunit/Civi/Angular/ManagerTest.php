@@ -47,7 +47,6 @@ class ManagerTest extends \CiviUnitTestCase {
       'js' => 0,
       'css' => 0,
       'partials' => 0,
-      'settings' => 0,
       'settingsFactory' => 0,
     ];
 
@@ -75,12 +74,7 @@ class ManagerTest extends \CiviUnitTestCase {
           $counts['partials']++;
         }
       }
-      if (isset($module['settings'])) {
-        $this->assertTrue(is_array($module['settings']));
-        foreach ($module['settings'] as $name => $value) {
-          $counts['settings']++;
-        }
-      }
+      $this->assertArrayNotHasKey('settings', $module);
       if (isset($module['settingsFactory'])) {
         $this->assertTrue(is_callable($module['settingsFactory']));
         $counts['settingsFactory']++;
@@ -91,7 +85,6 @@ class ManagerTest extends \CiviUnitTestCase {
     $this->assertTrue($counts['css'] > 0, 'Expect to find at least one CSS file');
     $this->assertTrue($counts['partials'] > 0, 'Expect to find at least one partial HTML file');
     $this->assertTrue($counts['settingsFactory'] > 0, 'Expect to find at least one settingsFactory');
-    $this->assertEquals(0, $counts['settings'], 'Angular settings are deprecated in favor of settingsFactory');
   }
 
   /**
