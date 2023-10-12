@@ -473,14 +473,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @param CRM_Core_Form $form
    * @param string|null $component
-   * @param bool $validFieldsOnly
    *
    * @return void
    * @throws \CRM_Core_Exception
    */
-  private function buildPriceSet(&$form, $component = NULL, $validFieldsOnly = TRUE) {
+  private function buildPriceSet(&$form, $component = NULL) {
     $priceSetId = $this->getPriceSetID();
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
+    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, TRUE);
     $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
     $validPriceFieldIds = array_keys($form->_priceSet['fields']);
 
@@ -514,14 +513,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // Call the buildAmount hook.
     CRM_Utils_Hook::buildAmount($component ?? 'contribution', $form, $feeBlock);
 
-    $hideAdminValues = !CRM_Core_Permission::check('edit contributions');
     // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
     $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
     $checklifetime = FALSE;
     foreach ($feeBlock as $id => $field) {
-      if (($field['visibility'] ?? NULL) == 'public' ||
-        (($field['visibility'] ?? NULL) == 'admin' && $adminFieldVisible == TRUE) ||
-        !$validFieldsOnly
+      if ($field['visibility'] === 'public' ||
+        ($field['visibility'] === 'admin' && $adminFieldVisible)
       ) {
         $options = $field['options'] ?? NULL;
         $contactId = $form->getVar('_membershipContactID');
@@ -536,7 +533,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
           continue;
         }
-        elseif ($hideAdminValues) {
+        if (!CRM_Core_Permission::check('edit contributions')) {
           foreach ($options as $key => $currentOption) {
             if ($currentOption['visibility_id'] == CRM_Price_BAO_PriceField::getVisibilityOptionID('admin')) {
               unset($options[$key]);

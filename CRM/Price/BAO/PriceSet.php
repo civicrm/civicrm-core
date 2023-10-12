@@ -795,7 +795,6 @@ WHERE  id = %1";
    * @deprecated since 5.68. Will be removed around 5.80.
    */
   public static function buildPriceSet(&$form, $component = NULL, $validFieldsOnly = TRUE) {
-    CRM_Core_Error::deprecatedFunctionWarning('copy & paste ....');
     $priceSetId = $form->get('priceSetId');
     if (!$priceSetId) {
       return;
