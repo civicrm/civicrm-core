@@ -78,4 +78,24 @@ class Utils {
     ];
   }
 
+  public static function shouldReconcileManaged(array $updatedAfform, array $originalAfform = []): bool {
+    $isChanged = function($field) use ($updatedAfform, $originalAfform) {
+      return ($updatedAfform[$field] ?? NULL) !== ($originalAfform[$field] ?? NULL);
+    };
+
+    return $isChanged('placement') ||
+      $isChanged('navigation') ||
+      (!empty($updatedAfform['placement']) && $isChanged('title')) ||
+      (!empty($updatedAfform['navigation']) && ($isChanged('title') || $isChanged('permission') || $isChanged('icon') || $isChanged('server_route')));
+  }
+
+  public static function shouldClearMenuCache(array $updatedAfform, array $originalAfform = []): bool {
+    $isChanged = function($field) use ($updatedAfform, $originalAfform) {
+      return ($updatedAfform[$field] ?? NULL) !== ($originalAfform[$field] ?? NULL);
+    };
+
+    return $isChanged('server_route') ||
+      (!empty($updatedAfform['server_route']) && $isChanged('title'));
+  }
+
 }

@@ -6,7 +6,7 @@ return [
   'permission' => [
     'access CiviCRM',
   ],
-  'contact_summary' => 'tab',
+  'placement' => ['contact_summary_tab'],
   'icon' => 'fa-handshake-o',
   'summary_weight' => 80,
   'permission_operator' => 'AND',

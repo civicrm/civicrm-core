@@ -226,9 +226,6 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
           'type' => 'search',
           'title' => $importSearch['label'],
           'base_module' => E::LONG_NAME,
-          'is_dashlet' => FALSE,
-          'is_public' => FALSE,
-          'is_token' => FALSE,
           'permission' => 'access CiviCRM',
           'requires' => ['crmSearchDisplayTable'],
           'layout' => '<div af-fieldset="">

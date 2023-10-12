@@ -150,9 +150,7 @@ class CRM_Afform_AfformScanner {
       'requires' => [],
       'title' => '',
       'description' => '',
-      'is_dashlet' => FALSE,
       'is_public' => FALSE,
-      'is_token' => FALSE,
       'permission' => ['access CiviCRM'],
       'type' => 'system',
     ];

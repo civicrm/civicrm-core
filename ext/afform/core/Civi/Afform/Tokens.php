@@ -176,8 +176,8 @@ class Tokens extends AutoService implements EventSubscriberInterface {
    */
   public static function getTokenForms() {
     if (!isset(\Civi::$statics[__CLASS__]['tokenForms'])) {
-      $tokenForms = (array) \Civi\Api4\Afform::get(0)
-        ->addWhere('is_token', '=', TRUE)
+      $tokenForms = (array) \Civi\Api4\Afform::get(FALSE)
+        ->addWhere('placement', 'CONTAINS', 'msg_token')
         ->addSelect('name', 'title', 'server_route', 'is_public')
         ->execute()
         ->indexBy('name');

@@ -99,10 +99,10 @@
           delete editor.afform.name;
           delete editor.afform.server_route;
           delete editor.afform.navigation;
-          editor.afform.is_dashlet = false;
           editor.afform.title += ' ' + ts('(copy)');
         }
         editor.afform.icon = editor.afform.icon || 'fa-list-alt';
+        editor.afform.placement = editor.afform.placement || [];
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
         $scope.entities = {};
@@ -332,14 +332,16 @@
         return filter ? _.filter($scope.entities, filter) : _.toArray($scope.entities);
       };
 
-      this.toggleContactSummary = function() {
-        if (editor.afform.contact_summary) {
-          editor.afform.contact_summary = null;
+      this.isContactSummary = function() {
+        return editor.afform.placement.includes('contact_summary_block') || editor.afform.placement.includes('contact_summary_tab');
+      };
+
+      this.onChangePlacement = function() {
+        if (!editor.isContactSummary()) {
           _.each(editor.searchDisplays, function(searchDisplay) {
             delete searchDisplay.element.filters;
           });
         } else {
-          editor.afform.contact_summary = 'block';
           _.each(editor.searchDisplays, function(searchDisplay) {
             var filterOptions = getSearchFilterOptions(searchDisplay.settings);
             if (filterOptions.length) {

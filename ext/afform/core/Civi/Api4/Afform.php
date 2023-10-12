@@ -166,28 +166,10 @@ class Afform extends Generic\AbstractEntity {
           'title' => E::ts('Description'),
         ],
         [
-          'name' => 'is_dashlet',
-          'title' => E::ts('Dashboard Dashlet'),
-          'data_type' => 'Boolean',
-        ],
-        [
-          'name' => 'is_public',
-          'title' => E::ts('Is Public'),
-          'data_type' => 'Boolean',
-        ],
-        [
-          'name' => 'is_token',
-          'title' => E::ts('Generate Tokens'),
-          'data_type' => 'Boolean',
-        ],
-        [
-          'name' => 'contact_summary',
-          'title' => E::ts('Contact Summary'),
-          'data_type' => 'String',
-          'options' => [
-            'block' => E::ts('Contact Summary Block'),
-            'tab' => E::ts('Contact Summary Tab'),
-          ],
+          'name' => 'placement',
+          'title' => E::ts('Placement'),
+          'pseudoconstant' => ['optionGroupName' => 'afform_placement'],
+          'data_type' => 'Array',
         ],
         [
           'name' => 'summary_contact_type',
@@ -208,6 +190,11 @@ class Afform extends Generic\AbstractEntity {
         [
           'name' => 'server_route',
           'title' => E::ts('Page Route'),
+        ],
+        [
+          'name' => 'is_public',
+          'title' => E::ts('Is Public'),
+          'data_type' => 'Boolean',
         ],
         [
           'name' => 'permission',

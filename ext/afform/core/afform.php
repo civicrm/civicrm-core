@@ -105,7 +105,11 @@ function afform_civicrm_managed(&$entities, $modules) {
     if (empty($afform['name'])) {
       continue;
     }
+    // Backward-compat with legacy `is_dashlet`
     if (!empty($afform['is_dashlet'])) {
+      $afform['placement'][] = 'dashboard_dashlet';
+    }
+    if (in_array('dashboard_dashlet', $afform['placement'] ?? [], TRUE)) {
       $entities[] = [
         'module' => E::LONG_NAME,
         'name' => 'afform_dashlet_' . $afform['name'],
@@ -141,7 +145,7 @@ function afform_civicrm_managed(&$entities, $modules) {
             'weight' => $afform['navigation']['weight'] ?? 0,
             'url' => $afform['server_route'],
             'is_active' => 1,
-            'icon' => 'crm-i ' . $afform['icon'],
+            'icon' => !empty($afform['icon']) ? 'crm-i ' . $afform['icon'] : '',
             'domain_id' => $domain['id'],
           ],
           'match' => ['domain_id', 'name'],
@@ -174,7 +178,7 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
   $contactTypes = array_merge((array) ($context['contact_type'] ?? []), $context['contact_sub_type'] ?? []);
   $afforms = Civi\Api4\Afform::get(FALSE)
     ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type', 'summary_weight')
-    ->addWhere('contact_summary', '=', 'tab')
+    ->addWhere('placement', 'CONTAINS', 'contact_summary_tab')
     ->addOrderBy('title')
     ->execute();
   $weight = 111;
@@ -213,7 +217,7 @@ function afform_civicrm_pageRun(&$page) {
   }
   $afforms = Civi\Api4\Afform::get(FALSE)
     ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type')
-    ->addWhere('contact_summary', '=', 'block')
+    ->addWhere('placement', 'CONTAINS', 'contact_summary_block')
     ->addOrderBy('summary_weight')
     ->addOrderBy('title')
     ->execute();
@@ -257,7 +261,7 @@ function afform_civicrm_pageRun(&$page) {
 function afform_civicrm_contactSummaryBlocks(&$blocks) {
   $afforms = \Civi\Api4\Afform::get(FALSE)
     ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'type:icon', 'type:label', 'summary_contact_type'])
-    ->addWhere('contact_summary', '=', 'block')
+    ->addWhere('placement', 'CONTAINS', 'contact_summary_block')
     ->addOrderBy('title')
     ->execute();
   foreach ($afforms as $index => $afform) {

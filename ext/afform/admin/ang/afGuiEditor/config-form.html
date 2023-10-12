@@ -43,7 +43,7 @@
       <label for="af_config_form_server_route">
         {{:: ts('Page Route') }}
       </label>
-      <input ng-model="editor.afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}" ng-model-options="editor.debounceMode">
+      <input ng-model="editor.afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}" placeholder="{{:: ts('None') }}" ng-model-options="editor.debounceMode">
       <p class="help-block">{{:: ts('Expose the form as a standalone webpage. (Example: "civicrm/my-form")') }}</p>
     </div>
 
@@ -52,14 +52,6 @@
         <input type="checkbox" ng-model="editor.afform.is_public">
         {{:: ts('Accessible on front-end of website') }}
       </label>
-    </div>
-
-    <div class="form-group" ng-if="!!editor.afform.server_route">
-      <label>
-        <input type="checkbox" ng-model="editor.afform.is_token">
-        {{:: ts('Provide Email Token') }}
-      </label>
-      <p class="help-block">{{:: ts('Allows CiviMail authors to easily link to this page') }}</p>
     </div>
 
     <div class="form-group">
@@ -92,33 +84,22 @@
     </div>
 
     <div class="form-group">
+      <label for="afform_placement">
+        {{:: ts('Expose To') }}
+      </label>
+      <input ng-list crm-ui-select="{multiple: true, data: editor.meta.afform_placement, placeholder: ts('None')}" class="form-control" id="afform_placement" ng-model="editor.afform.placement" ng-change="editor.onChangePlacement()">
+      <p class="help-block">{{:: ts('Additional contexts in which the form can be embedded') }}</p>
+    </div>
+
+    <div class="form-group" ng-if="editor.afform.placement.includes('contact_summary_block') || editor.afform.placement.includes('contact_summary_tab')">
       <div class="form-inline">
-        <label>
-          <input type="checkbox" ng-checked="editor.afform.contact_summary" ng-click="editor.toggleContactSummary()">
-          {{:: ts('Add to Contact Summary Page') }}
-        </label>
-        <select class="form-control" ng-model="editor.afform.contact_summary" ng-if="editor.afform.contact_summary">
-          <option value="block">{{:: ts('As Block') }}</option>
-          <option value="tab">{{:: ts('As Tab') }}</option>
-        </select>
-      </div>
-      <div class="form-inline" ng-if="editor.afform.contact_summary">
-        <label for="afform_summary_weight">{{:: ts('Position') }}</label>
-        <input class="form-control" type="number" id="afform_summary_weight" ng-model="editor.afform.summary_weight" placeholder="{{:: ts('Auto') }}">
         <label for="afform_summary_contact_type">{{:: ts('For') }}</label>
         <input class="form-control" crm-autocomplete="'ContactType'" id="afform_summary_contact_type" ng-model="editor.afform.summary_contact_type" auto-open="true" multi="true" crm-autocomplete-params="{key: 'name'}" placeholder="{{:: ts('Any contact type') }}">
       </div>
-      <p class="help-block" ng-show="editor.afform.contact_summary">
-        {{:: ts('Placement can be configured using the Contact Layout Editor.') }}
-      </p>
-    </div>
-
-    <div class="form-group">
-      <label>
-        <input type="checkbox" ng-model="editor.afform.is_dashlet">
-        {{:: ts('Add to Dashboard') }}
-      </label>
-      <p class="help-block">{{:: ts('Allow CiviCRM users to add the form to their home dashboard.') }}</p>
+      <div class="form-inline">
+        <label for="afform_summary_weight">{{:: ts('Position') }}</label>
+        <input class="form-control" type="number" id="afform_summary_weight" ng-model="editor.afform.summary_weight" placeholder="{{:: ts('Auto') }}">
+      </div>
     </div>
 
   </fieldset>
