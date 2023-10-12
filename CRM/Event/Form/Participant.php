@@ -782,6 +782,22 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
+   * Get order related params.
+   *
+   * In practice these are contribution params but later they cann be used with the Order api.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getOrderParams(): array {
+    return [
+      'financial_type_id' => $this->getSubmittedValue('financial_type_id') ? : $this->getEventValue('financial_type_id'),
+      'campaign_id' => $this->getSubmittedValue('campaign_id'),
+    ];
+  }
+
+  /**
    * Process the form submission.
    */
   public function postProcess() {
@@ -819,15 +835,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Submit form.
    *
-   * @internal will be made protected / decommissioned once tests
-   * in core & line item editor are fixed to not call it.
-   *
    * @param array $params
    *
    * @return string
-   * @throws \CRM_Core_Exception
+   * @internal will be made protected / decommissioned once tests
+   * in core & line item editor are fixed to not call it.
+   *
    */
-  public function submit($params) {
+  public function submit(array $params): string {
     if ($this->_mode && !$this->_isPaidEvent) {
       CRM_Core_Error::statusBounce(ts('Selected Event is not Paid Event '));
     }
@@ -1076,13 +1091,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $contributionParams['contact_id'] = $this->_contactID;
         $contributionParams['receive_date'] = !(empty($params['receive_date'])) ? $params['receive_date'] : $now;
 
-        $recordContribution = [
-          'financial_type_id',
+        $recordContribution = $this->getOrderParams() + [
           'payment_instrument_id',
           'trxn_id',
           'contribution_status_id',
           'check_number',
-          'campaign_id',
           'pan_truncation',
           'card_type_id',
         ];
@@ -1644,9 +1657,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // CRM-20264: fetch CC type ID and number (last 4 digit) and assign it back to $params
     CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
 
-    $contribParams = [
+    $contribParams = $this->getOrderParams() + [
       'contact_id' => $contactID,
-      'financial_type_id' => !empty($form->_values['event']['financial_type_id']) ? $form->_values['event']['financial_type_id'] : $params['financial_type_id'],
       'receive_date' => $now,
       'total_amount' => $params['amount'],
       'tax_amount' => $params['tax_amount'],
@@ -1655,7 +1667,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'currency' => $params['currencyID'],
       'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
       'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
-      'campaign_id' => $params['campaign_id'] ?? NULL,
       'card_type_id' => $params['card_type_id'] ?? NULL,
       'pan_truncation' => $params['pan_truncation'] ?? NULL,
     ];
@@ -1746,10 +1757,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'registered_by_id' => $params['registered_by_id'] ?? NULL,
       'discount_id' => $params['discount_id'] ?? NULL,
       'fee_currency' => $params['currencyID'] ?? NULL,
-      'campaign_id' => $params['campaign_id'] ?? NULL,
+      'campaign_id' => $this->getSubmittedValue('campaign_id'),
     ];
 
-    if ($form->_action & CRM_Core_Action::PREVIEW || ($params['mode'] ?? NULL) == 'test') {
+    if ($form->_action & CRM_Core_Action::PREVIEW || ($params['mode'] ?? NULL) === 'test') {
       $participantParams['is_test'] = 1;
     }
     else {
@@ -1871,7 +1882,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return array
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function getFeeDetails($participantIds, $hasLineItems = FALSE) {
+  public function getFeeDetails($participantIds, $hasLineItems = FALSE): array {
     $feeDetails = [];
     if (!is_array($participantIds) || empty($participantIds)) {
       return $feeDetails;
