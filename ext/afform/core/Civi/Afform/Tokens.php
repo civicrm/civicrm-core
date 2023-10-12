@@ -36,6 +36,7 @@ class Tokens extends AutoService implements EventSubscriberInterface {
       'hook_civicrm_alterMailContent' => 'applyCkeditorWorkaround',
       'hook_civicrm_tokens' => 'hook_civicrm_tokens',
       'hook_civicrm_tokenValues' => 'hook_civicrm_tokenValues',
+      'civi.token.list' => 'listTokens',
       'civi.token.eval' => 'evaluateTokens',
     ];
   }
@@ -66,9 +67,6 @@ class Tokens extends AutoService implements EventSubscriberInterface {
       $e->tokens['afform']["afform.{$tokenName}Url"] = E::ts('%1 (URL)', [1 => $afform['title'] ?? $afform['name']]);
       $e->tokens['afform']["afform.{$tokenName}Link"] = E::ts('%1 (Full Hyperlink)', [1 => $afform['title'] ?? $afform['name']]);
     }
-
-    $e->tokens['afform']["afform.validateSubmissionUrl"] = E::ts('Validate Submission URL');
-    $e->tokens['afform']["afform.validateSubmissionLink"] = E::ts('Validate Submission (Full Hyperlink)');
   }
 
   /**
@@ -112,9 +110,15 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     }
   }
 
+  public static function listTokens(\Civi\Token\Event\TokenRegisterEvent $e) {
+    $e->entity('afformSubmission')
+      ->register('validateSubmissionUrl', E::ts('Validate Submission URL'))
+      ->register('validateSubmissionLink', E::ts('Validate Submission (Full Hyperlink)'));
+  }
+
   public static function evaluateTokens(\Civi\Token\Event\TokenValueEvent $e) {
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();
-    if (empty($messageTokens['afform'])) {
+    if (empty($messageTokens['afformSubmission'])) {
       return;
     }
 
@@ -133,8 +137,8 @@ class Tokens extends AutoService implements EventSubscriberInterface {
       htmlentities(ts('verify your email address')));
 
     foreach ($e->getRows() as $row) {
-      $row->format('text/plain')->tokens('afform', 'validateSubmissionUrl', $url);
-      $row->format('text/html')->tokens('afform', 'validateSubmissionLink', $link);
+      $row->format('text/plain')->tokens('afformSubmission', 'validateSubmissionUrl', $url);
+      $row->format('text/html')->tokens('afformSubmission', 'validateSubmissionLink', $link);
     }
   }
 
