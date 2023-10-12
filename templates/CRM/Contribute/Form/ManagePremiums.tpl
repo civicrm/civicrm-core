@@ -73,12 +73,12 @@
      <span class="description">{ts}The market value of this premium (e.g. retail price). For tax-deductible contributions, this amount will be used to set the non-deductible amount in the contribution record and receipt.{/ts}</span>
        </td>
     </tr>
-    <tr class="crm-contribution-form-block-cost">
-       <td class="label">{$form.cost.label}</td>
-       <td class="html-adjust">{$form.cost.html}<br />
-        <span class="description">{ts}You may optionally record the actual cost of this premium to your organization. This may be useful when evaluating net return for this incentive.{/ts}</span>
-       </td>
-    </tr>
+      <tr class="crm-contribution-form-block-cost">
+         <td class="label">{$form.cost.label}</td>
+         <td class="html-adjust">{$form.cost.html}<br />
+          <span class="description">{ts}You may optionally record the actual cost of this premium to your organization. This may be useful when evaluating net return for this incentive.{/ts}</span>
+         </td>
+      </tr>
      <tr class="crm-contribution-form-block-financial_type">
        <td class="label">{$form.financial_type_id.label}</td>
        <td class="html-adjust">
