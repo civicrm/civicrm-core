@@ -138,7 +138,6 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     }
   }
 
-
   private static function generateEmailVerificationUrl(int $submissionId): string {
     // 10 minutes
     $expires = \CRM_Utils_Time::time() + (10 * 60);
