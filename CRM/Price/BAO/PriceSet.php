@@ -855,7 +855,11 @@ WHERE  id = %1";
         if ($className == 'CRM_Contribute_Form_Contribution_Main' && $component = 'membership') {
           $contactId = $form->getVar('_membershipContactID');
           if ($contactId && $options) {
-            $checklifetime = $checklifetime ?: self::checkCurrentMembership($options, $contactId);
+            $contactsLifetimeMemberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
+            $contactsLifetimeMembershipTypes = array_column($contactsLifetimeMemberships, 'membership_type_id');
+            $memTypeIdsInPriceField = array_column($options, 'membership_type_id');
+            $isCurrentMember = (bool) array_intersect($memTypeIdsInPriceField, $contactsLifetimeMembershipTypes);
+            $checklifetime = $checklifetime ?: $isCurrentMember;
           }
         }
 
@@ -885,21 +889,6 @@ WHERE  id = %1";
     }
     $form->assign('ispricelifetime', $checklifetime);
 
-  }
-
-  /**
-   * Check for lifetime membership types this contact has that are in this price field.
-   *
-   * @param array $options
-   * @param int $contactId
-   *
-   * @return bool
-   */
-  private static function checkCurrentMembership(array $options, int $contactId) : bool {
-    $contactsLifetimeMemberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
-    $contactsLifetimeMembershipTypes = array_column($contactsLifetimeMemberships, 'membership_type_id');
-    $memTypeIdsInPriceField = array_column($options, 'membership_type_id');
-    return (bool) array_intersect($memTypeIdsInPriceField, $contactsLifetimeMembershipTypes);
   }
 
   /**
@@ -1655,65 +1644,6 @@ WHERE     ct.id = cp.financial_type_id AND
         break;
     }
     return [$params, $lineItem];
-  }
-
-  /**
-   * Add the relevant price fields to the form.
-   *
-   * DO NOT use form outside core tested code - function is public for
-   * refactoring purposes only.
-   *
-   * @internal
-   *
-   * @param \CRM_Core_Form $form
-   * @param array $feeBlock
-   * @param bool $validFieldsOnly
-   * @param string $className
-   * @param array $validPriceFieldIds
-   */
-  public static function addPriceFieldsToForm(CRM_Core_Form $form, $feeBlock, bool $validFieldsOnly, string $className, array $validPriceFieldIds) {
-    $hideAdminValues = !CRM_Core_Permission::check('edit contributions');
-    // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
-    $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
-    $checklifetime = FALSE;
-    foreach ($feeBlock as $id => $field) {
-      if (($field['visibility'] ?? NULL) == 'public' ||
-        (($field['visibility'] ?? NULL) == 'admin' && $adminFieldVisible == TRUE) ||
-        !$validFieldsOnly
-      ) {
-        $options = $field['options'] ?? NULL;
-        if ($className == 'CRM_Contribute_Form_Contribution_Main' && $component = 'membership') {
-          $contactId = $form->getVar('_membershipContactID');
-          if ($contactId && $options) {
-            $checklifetime = $checklifetime ?: self::checkCurrentMembership($options, $contactId);
-          }
-        }
-
-        $formClasses = ['CRM_Contribute_Form_Contribution', 'CRM_Member_Form_Membership'];
-
-        if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
-          continue;
-        }
-        elseif ($hideAdminValues && !in_array($className, $formClasses)) {
-          foreach ($options as $key => $currentOption) {
-            if ($currentOption['visibility_id'] == CRM_Price_BAO_PriceField::getVisibilityOptionID('admin')) {
-              unset($options[$key]);
-            }
-          }
-        }
-        if (!empty($options)) {
-          CRM_Price_BAO_PriceField::addQuickFormElement($form,
-            'price_' . $field['id'],
-            $field['id'],
-            FALSE,
-            CRM_Utils_Array::value('is_required', $field, FALSE),
-            NULL,
-            $options
-          );
-        }
-      }
-    }
-    $form->assign('ispricelifetime', $checklifetime);
   }
 
   /**
