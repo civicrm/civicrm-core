@@ -9,40 +9,34 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 /**
- * `CRM_Queue_BasicHandler` is a base-class that helps to execute queue-items.
+ * `CRM_Queue_BasicHandlerTrait` is a base-class that helps to execute queue-items.
  * It takes a batch of items and executes them 1-by-1. It enforces the
  * queue configuration options, such as `retry_limit=>5` and `error=>abort`.
  *
  * This class will have an incubation period circa Oct 2023 - Apr 2024. Unless otherwise
  * noted, it should be considered stable at that point.
  */
-abstract class CRM_Queue_BasicHandler extends AutoService implements EventSubscriberInterface {
-
-  public static function getSubscribedEvents() {
-    return [
-      '&hook_civicrm_queueRun_' . static::getTypeName() => 'runBatch',
-    ];
-  }
-
-  abstract public static function getTypeName(): string;
+trait CRM_Queue_BasicHandlerTrait {
 
   /**
    * Do a unit of work with one item from the queue.
    *
+   * This should emit an exception if there is a problem handling the item.
+   * If runItem() encounters a fatal, then
+   *
    * @param $item
    * @param \CRM_Queue_Queue $queue
+   * @api
    */
-  abstract protected function runItem($item, $queue): void;
+  abstract protected function runItem($item, \CRM_Queue_Queue $queue): void;
 
   /**
    * Get a nice title for the item.
    *
    * @param \CRM_Queue_DAO_QueueItem $item
    * @return string
+   * @api
    */
   protected function getItemTitle($item): string {
     return ($item instanceof CRM_Queue_DAO_QueueItem)
@@ -55,6 +49,7 @@ abstract class CRM_Queue_BasicHandler extends AutoService implements EventSubscr
    *
    * @param $item
    * @return array
+   * @api
    */
   protected function getItemDetails($item): array {
     return [];
@@ -68,6 +63,7 @@ abstract class CRM_Queue_BasicHandler extends AutoService implements EventSubscr
    * @param array $outcomes
    * @throws \CRM_Core_Exception
    * @see CRM_Utils_Hook::queueRun()
+   * @api
    */
   final public function runBatch(CRM_Queue_Queue $queue, array $items, array &$outcomes): void {
     $todos = array_keys($items);
@@ -204,6 +200,11 @@ abstract class CRM_Queue_BasicHandler extends AutoService implements EventSubscr
     }
   }
 
+  /**
+   * @param $item
+   * @return bool
+   * @api
+   */
   protected function validateItem($item): bool {
     return TRUE;
   }
