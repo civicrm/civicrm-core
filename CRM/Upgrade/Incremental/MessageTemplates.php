@@ -581,7 +581,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           continue;
         }
         $content = file_get_contents($filePath);
-        if ($content) {
+        if ($content !== FALSE) {
           CRM_Core_DAO::executeQuery(
             "UPDATE civicrm_msg_template SET msg_{$type} = %1 WHERE id = %2", [
               1 => [$content, 'String'],
