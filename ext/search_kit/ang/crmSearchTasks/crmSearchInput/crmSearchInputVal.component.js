@@ -125,7 +125,7 @@
       this.getTemplate = function() {
         var field = ctrl.field || {};
 
-        if (_.includes(['LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP'], ctrl.op)) {
+        if (_.includes(['LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP', 'REGEXP BINARY', 'NOT REGEXP BINARY'], ctrl.op)) {
           return '~/crmSearchTasks/crmSearchInput/text.html';
         }
 

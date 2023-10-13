@@ -215,19 +215,77 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ->setValues(['first_name' => 'Jane', 'last_name' => $last_name])
       ->execute()->first();
 
+    $holly = Contact::create()
+      ->setValues(['first_name' => 'holly', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $meg = Contact::create()
+      ->setValues(['first_name' => 'meg', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $jess = Contact::create()
+      ->setValues(['first_name' => 'jess', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $amy = Contact::create()
+      ->setValues(['first_name' => 'amy', 'last_name' => $last_name])
+      ->execute()->first();
+
     $result = Contact::get(FALSE)
       ->addWhere('last_name', '=', $last_name)
       ->addWhere('first_name', 'REGEXP', '^A')
       ->execute()->indexBy('id');
-    $this->assertCount(2, $result);
+    $this->assertCount(3, $result);
     $this->assertArrayHasKey($alice['id'], (array) $result);
     $this->assertArrayHasKey($alex['id'], (array) $result);
+    $this->assertArrayHasKey($amy['id'], (array) $result);
 
     $result = Contact::get(FALSE)
       ->addWhere('last_name', '=', $last_name)
       ->addWhere('first_name', 'NOT REGEXP', '^A')
       ->execute()->indexBy('id');
-    $this->assertCount(1, $result);
+    $this->assertCount(4, $result);
+    $this->assertArrayHasKey($jane['id'], (array) $result);
+    $this->assertArrayHasKey($holly['id'], (array) $result);
+    $this->assertArrayHasKey($meg['id'], (array) $result);
+    $this->assertArrayHasKey($jess['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'REGEXP BINARY', '^[A-Z]')
+      ->execute()->indexBy('id');
+    $this->assertCount(3, $result);
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+    $this->assertArrayHasKey($alex['id'], (array) $result);
+    $this->assertArrayHasKey($jane['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'REGEXP BINARY', '^[a-z]')
+      ->execute()->indexBy('id');
+    $this->assertCount(4, $result);
+    $this->assertArrayHasKey($holly['id'], (array) $result);
+    $this->assertArrayHasKey($meg['id'], (array) $result);
+    $this->assertArrayHasKey($jess['id'], (array) $result);
+    $this->assertArrayHasKey($amy['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'NOT REGEXP BINARY', '^[A-Z]')
+      ->execute()->indexBy('id');
+    $this->assertCount(4, $result);
+    $this->assertArrayHasKey($holly['id'], (array) $result);
+    $this->assertArrayHasKey($meg['id'], (array) $result);
+    $this->assertArrayHasKey($jess['id'], (array) $result);
+    $this->assertArrayHasKey($amy['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'NOT REGEXP BINARY', '^[a-z]')
+      ->execute()->indexBy('id');
+    $this->assertCount(3, $result);
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+    $this->assertArrayHasKey($alex['id'], (array) $result);
     $this->assertArrayHasKey($jane['id'], (array) $result);
   }
 
