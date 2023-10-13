@@ -34,20 +34,17 @@ class CRM_Queue_TaskRunner {
   public function run(CRM_Queue_Queue $queue, $item): string {
     $this->assertType($item->data, ['CRM_Queue_Task'], 'Cannot run. Invalid task given.');
 
-    /** @var \CRM_Queue_Task $task */
-    $task = $item->data;
-
     /** @var string $outcome One of 'ok', 'retry', 'delete', 'abort' */
 
     if (is_numeric($queue->getSpec('retry_limit')) && $item->run_count > 1 + $queue->getSpec('retry_limit')) {
-      \Civi::log()->debug("Skipping exhausted task: " . $task->title);
+      \Civi::log()->debug("Skipping exhausted task: " . $this->getItemTitle($item));
       $outcome = $queue->getSpec('error');
-      $exception = new \CRM_Core_Exception(sprintf('Skipping exhausted task after %d tries: %s', $item->run_count, print_r($task, 1)), 'queue_retry_exhausted');
+      $exception = new \CRM_Core_Exception(sprintf('Skipping exhausted task after %d tries: %s', $item->run_count, print_r($this->getItemDetails($item), 1)), 'queue_retry_exhausted');
     }
     else {
-      \Civi::log()->debug("Running task: " . $task->title);
+      \Civi::log()->debug("Running task: " . $this->getItemTitle($item));
       try {
-        $runResult = $task->run($this->createContext($queue));
+        $runResult = $this->runItem($item, $queue);
         $outcome = $runResult ? 'ok' : $queue->getSpec('error');
         $exception = ($outcome === 'ok') ? NULL : new \CRM_Core_Exception('Queue task returned false', 'queue_false');
       }
@@ -72,7 +69,7 @@ class CRM_Queue_TaskRunner {
 
     $logDetails = [
       'id' => $queue->getName() . '#' . $item->id,
-      'task' => CRM_Utils_Array::subset((array) $task, ['title', 'callback', 'arguments']),
+      'task' => $this->getItemDetails($item),
       'outcome' => $outcome,
       'message' => $exception ? $exception->getMessage() : NULL,
       'exception' => $exception,
@@ -101,6 +98,38 @@ class CRM_Queue_TaskRunner {
     }
 
     return $outcome;
+  }
+
+  /**
+   * Do a unit of work with one item from the queue.
+   *
+   * @param $item
+   * @param $queue
+   * @return mixed
+   *   Boolean-ish. TRUE for success. FALSE for failure.
+   */
+  protected function runItem($item, $queue) {
+    return $item->data->run($this->createContext($queue));
+  }
+
+  /**
+   * Get a nice title for the item.
+   *
+   * @param $item
+   * @return string|null
+   */
+  protected function getItemTitle($item): ?string {
+    return $item->data->title;
+  }
+
+  /**
+   * Get detailed info about the item. This is used for debugging.
+   *
+   * @param $item
+   * @return array
+   */
+  protected function getItemDetails($item) {
+    return CRM_Utils_Array::subset((array) $item->data, ['title', 'callback', 'arguments']);
   }
 
   /**
