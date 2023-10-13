@@ -9,18 +9,80 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Service\AutoService;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 /**
- * `CRM_Queue_TaskRunner`  a list tasks from a queue. It is designed to supported background
- * tasks which run automatically.
+ * `CRM_Queue_BasicHandler` is a base-class that helps to execute queue-items.
+ * It takes a batch of items and executes them 1-by-1. It enforces the
+ * queue configuration options, such as `retry_limit=>5` and `error=>abort`.
  *
- * This runner is not appropriate for all queues or workloads, so you might choose or create
- * a different runner. For example, `CRM_Queue_Runner` is geared toward background task lists.
- *
- * @see CRM_Queue_Runner
+ * This class will have an incubation period circa Oct 2023 - Apr 2024. Unless otherwise
+ * noted, it should be considered stable at that point.
  */
-class CRM_Queue_TaskRunner {
+abstract class CRM_Queue_BasicHandler extends AutoService implements EventSubscriberInterface {
+
+  public static function getSubscribedEvents() {
+    return [
+      '&hook_civicrm_queueRun_' . static::getTypeName() => 'runBatch',
+    ];
+  }
+
+  abstract public static function getTypeName(): string;
 
   /**
+   * Do a unit of work with one item from the queue.
+   *
+   * @param $item
+   * @param $queue
+   * @return mixed
+   *   Boolean-ish. TRUE for success. FALSE for failure.
+   *   Same as CRM_Queue_Task::run()
+   */
+  abstract protected function runItem($item, $queue);
+
+  /**
+   * Get a nice title for the item.
+   *
+   * @param \CRM_Queue_DAO_QueueItem $item
+   * @return string
+   */
+  protected function getItemTitle($item): string {
+    return ($item instanceof CRM_Queue_DAO_QueueItem)
+      ? $item->queue_name . '#' . $item->id
+      : $item->id;
+  }
+
+  /**
+   * Get detailed info about the item. This is used for debugging.
+   *
+   * @param $item
+   * @return array
+   */
+  protected function getItemDetails($item): array {
+    return [];
+  }
+
+  /**
+   * Run a batch of items, one-by-one.
+   *
+   * @param \CRM_Queue_Queue $queue
+   * @param array $items
+   * @param array $outcomes
+   * @throws \CRM_Core_Exception
+   * @see CRM_Utils_Hook::queueRun()
+   */
+
+  final public function runBatch(CRM_Queue_Queue $queue, array $items, array &$outcomes): void {
+    foreach ($items as $itemPos => $item) {
+      $outcomes[$itemPos] = $this->run($queue, $item);
+    }
+    // TODO: If an item has outcome==abort, then release the rest of the items.
+  }
+
+  /**
+   * Run a specific item. Determine its status. Update the others.
+   *
    * @param \CRM_Queue_Queue $queue
    * @param $item
    * @return string
@@ -31,7 +93,7 @@ class CRM_Queue_TaskRunner {
    *    - 'abort': Task encountered an error. Will not try again later. Stopped the queue.
    * @throws \CRM_Core_Exception
    */
-  public function run(CRM_Queue_Queue $queue, $item): string {
+  final public function run(CRM_Queue_Queue $queue, $item): string {
     $this->assertType($item->data, ['CRM_Queue_Task'], 'Cannot run. Invalid task given.');
 
     /** @var string $outcome One of 'ok', 'retry', 'delete', 'abort' */
@@ -100,59 +162,16 @@ class CRM_Queue_TaskRunner {
     return $outcome;
   }
 
-  /**
-   * Do a unit of work with one item from the queue.
-   *
-   * @param $item
-   * @param $queue
-   * @return mixed
-   *   Boolean-ish. TRUE for success. FALSE for failure.
-   */
-  protected function runItem($item, $queue) {
-    return $item->data->run($this->createContext($queue));
-  }
-
-  /**
-   * Get a nice title for the item.
-   *
-   * @param $item
-   * @return string|null
-   */
-  protected function getItemTitle($item): ?string {
-    return $item->data->title;
-  }
-
-  /**
-   * Get detailed info about the item. This is used for debugging.
-   *
-   * @param $item
-   * @return array
-   */
-  protected function getItemDetails($item) {
-    return CRM_Utils_Array::subset((array) $item->data, ['title', 'callback', 'arguments']);
-  }
-
-  /**
-   * @param \CRM_Queue_Queue $queue
-   * return CRM_Queue_TaskContext;
-   */
-  private function createContext(\CRM_Queue_Queue $queue): \CRM_Queue_TaskContext {
-    $taskCtx = new \CRM_Queue_TaskContext();
-    $taskCtx->queue = $queue;
-    $taskCtx->log = \CRM_Core_Error::createDebugLogger();
-    return $taskCtx;
-  }
-
-  private function assertType($object, array $types, string $message) {
+  final protected function assertType($object, array $types, string $message) {
     foreach ($types as $type) {
-      if ($object instanceof  $type) {
+      if ($object instanceof $type) {
         return;
       }
     }
     throw new \Exception($message);
   }
 
-  private function isRetriable(\CRM_Queue_Queue $queue, $item): bool {
+  final protected function isRetriable(\CRM_Queue_Queue $queue, $item): bool {
     return property_exists($item, 'run_count')
       && is_numeric($queue->getSpec('retry_limit'))
       && $queue->getSpec('retry_limit') + 1 > $item->run_count;
