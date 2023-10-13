@@ -24,7 +24,7 @@ class MailingPreview {
 
     /** @var \CRM_Mailing_BAO_Mailing $mailing */
     $mailing = new \CRM_Mailing_BAO_Mailing();
-    $mailingID = \CRM_Utils_Array::value('id', $params);
+    $mailingID = $params['id'] ?? NULL;
     if ($mailingID) {
       $mailing->id = $mailingID;
       $mailing->find(TRUE);
