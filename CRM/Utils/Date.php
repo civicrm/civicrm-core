@@ -280,16 +280,16 @@ class CRM_Utils_Date {
    * @return int
    */
   public static function unixTime($string) {
-    if (empty($string)) {
+    if (!$string) {
       return 0;
     }
     $parsedDate = date_parse($string);
-    return mktime(CRM_Utils_Array::value('hour', $parsedDate),
-      CRM_Utils_Array::value('minute', $parsedDate),
+    return mktime($parsedDate['hour'],
+       $parsedDate['minute'],
       59,
-      CRM_Utils_Array::value('month', $parsedDate),
-      CRM_Utils_Array::value('day', $parsedDate),
-      CRM_Utils_Array::value('year', $parsedDate)
+       $parsedDate['month'],
+       $parsedDate['day'],
+       $parsedDate['year']
     );
   }
 
