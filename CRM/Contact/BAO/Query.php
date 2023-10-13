@@ -4247,7 +4247,7 @@ WHERE  $smartGroupClause
           if (!empty($relQill)) {
             $relQill .= ' OR ';
           }
-          $relQill .= CRM_Utils_Array::value($rel, $allRelationshipType);
+          $relQill .= $allRelationshipType[$rel] ?? '';
         }
         $this->_qill[$grouping][] = 'Relationship Type(s) ' . $relQill . " ( " . implode(", ", $qillNames) . " )";
       }
@@ -6202,7 +6202,7 @@ AND   displayRelType.is_active = 1
       $pseudoOptions = CRM_Core_PseudoConstant::worldRegion();
     }
     elseif ($daoName == 'CRM_Event_DAO_Event' && $fieldName == 'id') {
-      $checkPermission = CRM_Utils_Array::value('check_permission', $pseudoExtraParam, TRUE);
+      $checkPermission = $pseudoExtraParam['check_permission'] ?? TRUE;
       $pseudoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, $checkPermission, TRUE);
     }
     elseif ($fieldName == 'contribution_product_id') {
@@ -6437,7 +6437,7 @@ AND   displayRelType.is_active = 1
       // is not declared for them.
       // @todo so far only integer fields are being handled. If we add string fields we need to look at
       // escaping.
-      $pseudoConstantMetadata = CRM_Utils_Array::value('pseudoconstant', $fieldSpec, FALSE);
+      $pseudoConstantMetadata = $fieldSpec['pseudoconstant'] ?? FALSE;
       if (!empty($pseudoConstantMetadata)
       ) {
         if (!empty($pseudoConstantMetadata['optionGroupName'])

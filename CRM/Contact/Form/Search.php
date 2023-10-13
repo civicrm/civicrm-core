@@ -668,7 +668,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       }
     }
     $this->assign('id',
-      CRM_Utils_Array::value('uf_group_id', $this->_formValues)
+      $this->_formValues['uf_group_id'] ?? NULL
     );
     $operator = CRM_Utils_Array::value('operator', $this->_formValues, CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND);
     $this->set('queryOperator', $operator);

@@ -501,10 +501,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         // make we require one primary block, CRM-5505
         if ($updateMode) {
           if (!$hasPrimary) {
-            $hasPrimary = CRM_Utils_Array::value(
-              'is_primary',
-              CRM_Utils_Array::value($instance, $defaults[$name])
-            );
+            $hasPrimary = !empty($defaults[$name][$instance]['is_primary']);
           }
           continue;
         }
@@ -1060,7 +1057,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     if (array_key_exists('CommunicationPreferences', $this->_editOptions)) {
       // this is a chekbox, so mark false if we dont get a POST value
-      $params['is_opt_out'] = CRM_Utils_Array::value('is_opt_out', $params, FALSE);
+      $params['is_opt_out'] = $params['is_opt_out'] ?? FALSE;
 
       CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
     }
@@ -1294,15 +1291,15 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         for ($i = 0; $i < count($contactLinks['rows']); $i++) {
           $row .= '  <tr>   ';
           $row .= '    <td class="matching-contacts-name"> ';
-          $row .= CRM_Utils_Array::value('display_name', $contactLinks['rows'][$i]);
+          $row .= $contactLinks['rows'][$i]['display_name'] ?? '';
           $row .= '    </td>';
           $row .= '    <td class="matching-contacts-email"> ';
-          $row .= CRM_Utils_Array::value('primary_email', $contactLinks['rows'][$i]);
+          $row .= $contactLinks['rows'][$i]['primary_email'] ?? '';
           $row .= '    </td>';
           $row .= '    <td class="action-items"> ';
-          $row .= CRM_Utils_Array::value('view', $contactLinks['rows'][$i]);
-          $row .= CRM_Utils_Array::value('edit', $contactLinks['rows'][$i]);
-          $row .= CRM_Utils_Array::value('merge', $contactLinks['rows'][$i]);
+          $row .= $contactLinks['rows'][$i]['view'] ?? '';
+          $row .= $contactLinks['rows'][$i]['edit'] ?? '';
+          $row .= $contactLinks['rows'][$i]['merge'] ?? '';
           $row .= '    </td>';
           $row .= '  </tr>   ';
         }
@@ -1413,7 +1410,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
               $streetAddress .= ' ';
             }
           }
-          $streetAddress .= CRM_Utils_Array::value($fld, $address);
+          $streetAddress .= $address[$fld] ?? '';
         }
         $address['street_address'] = trim($streetAddress);
         $parseSuccess[$instance] = TRUE;
