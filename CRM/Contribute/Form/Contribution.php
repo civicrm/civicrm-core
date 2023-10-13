@@ -18,6 +18,7 @@ use Civi\Payment\Exception\PaymentProcessorException;
  */
 class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditPayment {
   use CRM_Contact_Form_ContactFormTrait;
+  use CRM_Contribute_Form_ContributeFormTrait;
 
   /**
    * The id of the contribution that we are processing.
@@ -240,8 +241,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('action', $this->_action);
 
     // Get the contribution id if update
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive');
-    $this->assign('isUsePaymentBlock', !empty($this->_id));
+    $this->assign('isUsePaymentBlock', (bool) $this->getContributionID());
     if (!empty($this->_id)) {
       $this->assignPaymentInfoBlock();
       $this->assign('contribID', $this->_id);
@@ -2132,12 +2132,32 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   }
 
   /**
-   * Get the contribution ID.
+   * Get the selected Contribution ID.
    *
-   * @return int|null
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function getContributionID(): ?int {
-    return $this->_id;
+  public function getContributionID(): ?int {
+    if (!$this->_id) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive');
+    }
+    return $this->_id ? (int) $this->_id : NULL;
+  }
+
+  /**
+   * Get id of contribution page being acted on.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getContributionPageID(): ?int {
+    return $this->getContributionID() ? $this->getContributionValue('contribution_page_id') : NULL;
   }
 
   /**
