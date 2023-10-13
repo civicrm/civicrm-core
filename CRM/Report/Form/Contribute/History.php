@@ -424,9 +424,9 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
             }
           }
@@ -661,7 +661,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
       $total = [];
       $total['civicrm_contact_sort_name'] = ts('Total');
       foreach ($summaryYears as $year) {
-        $total[$year] = CRM_Utils_Array::value($year, $primaryRow, 0);
+        $total[$year] = $primaryRow[$year] ?? 0;
       }
 
       $relatedContact = FALSE;
@@ -673,7 +673,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
         $relatedContact = TRUE;
         $relatedRow = $relatedContributions[$relcid];
         foreach ($summaryYears as $year) {
-          $total[$year] += CRM_Utils_Array::value($year, $relatedRow, 0);
+          $total[$year] += $relatedRow[$year] ?? 0;
         }
 
         foreach (array_keys($this->_relationshipColumns) as $col) {

@@ -1084,7 +1084,7 @@ class CRM_Report_Form extends CRM_Core_Form {
             $order_by = [
               'column' => $fieldName,
               'order' => CRM_Utils_Array::value('default_order', $field, 'ASC'),
-              'section' => CRM_Utils_Array::value('default_is_section', $field, 0),
+              'section' => $field['default_is_section'] ?? 0,
             ];
 
             if (!empty($field['default_weight'])) {
@@ -3531,8 +3531,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                     $val[$key] = $options[$valIds];
                   }
                 }
-                $pair[$op] = (count($val) == 1) ? (($op == 'notin' || $op ==
-                  'mnot') ? ts('Is Not') : ts('Is')) : CRM_Utils_Array::value($op, $pair);
+                $pair[$op] = (count($val) == 1) ?
+                  (($op == 'notin' || $op == 'mnot') ? ts('Is Not') : ts('Is')) :
+                  ($pair[$op] ?? '');
                 $val = implode(', ', $val);
                 $value = "{$pair[$op]} " . $val;
               }
@@ -3540,8 +3541,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 isset($field['options']) &&
                 is_array($field['options']) && !empty($field['options'])
               ) {
-                $value = ($pair[$op] ?? '') . " " .
-                  CRM_Utils_Array::value($val, $field['options'], $val);
+                $value = ($pair[$op] ?? '') . ' ' . ($field['options'][$val] ?? $val);
               }
               elseif ($val || $val == '0') {
                 $value = ($pair[$op] ?? '') . " " . $val;
@@ -3649,8 +3649,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   public function compileContent() {
     $templateFile = $this->getHookedTemplateFileName();
     return ($this->_formValues['report_header'] ?? '') .
-    CRM_Core_Form::$_template->fetch($templateFile) .
-    CRM_Utils_Array::value('report_footer', $this->_formValues);
+      CRM_Core_Form::$_template->fetch($templateFile) .
+      ($this->_formValues['report_footer'] ?? '');
   }
 
   /**
@@ -5038,7 +5038,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'is_deceased' => [
         'title' => ts('Deceased'),
         'type' => CRM_Utils_Type::T_BOOLEAN,
-        'default' => CRM_Utils_Array::value('deceased', $defaults, 0),
+        'default' => $defaults['deceased'] ?? 0,
       ],
       'do_not_email' => [
         'title' => ts('Do not email'),
