@@ -418,22 +418,29 @@ class CRM_Utils_File {
    * Make a valid file name.
    *
    * @param string $name
+   * @param bool $unicode
    *
    * @return string
    */
-  public static function makeFileName($name) {
+  public static function makeFileName($name, bool $unicode = FALSE) {
     $uniqID = md5(uniqid(rand(), TRUE));
     $info = pathinfo($name);
     $basename = substr($info['basename'],
       0, -(strlen($info['extension'] ?? '') + (($info['extension'] ?? '') == '' ? 0 : 1))
     );
     if (!self::isExtensionSafe($info['extension'] ?? '')) {
+      if ($unicode) {
+        return self::makeFilenameWithUnicode("{$basename}_" . ($info['extension'] ?? '') . "_{$uniqID}", '_', 240) . ".unknown";
+      }
       // munge extension so it cannot have an embbeded dot in it
       // The maximum length of a filename for most filesystems is 255 chars.
       // We'll truncate at 240 to give some room for the extension.
       return CRM_Utils_String::munge("{$basename}_" . ($info['extension'] ?? '') . "_{$uniqID}", '_', 240) . ".unknown";
     }
     else {
+      if ($unicode) {
+        return self::makeFilenameWithUnicode("{$basename}_{$uniqID}", '_', 240) . "." . ($info['extension'] ?? '');
+      }
       return CRM_Utils_String::munge("{$basename}_{$uniqID}", '_', 240) . "." . ($info['extension'] ?? '');
     }
   }

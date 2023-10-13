@@ -276,7 +276,13 @@ class CRM_Utils_Mail {
           TRUE,
           'base64',
           'attachment',
-          (isset($attach['charset']) ? $attach['charset'] : '')
+          (isset($attach['charset']) ? $attach['charset'] : ''),
+          '',
+          '',
+          NULL,
+          NULL,
+          '',
+          'utf-8'
         );
       }
     }
