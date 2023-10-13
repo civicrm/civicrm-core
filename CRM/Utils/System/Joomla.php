@@ -136,8 +136,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
 
-    $name = CRM_Utils_Array::value('name', $params);
-    $email = CRM_Utils_Array::value('mail', $params);
+    $name = $params['name'] ?? NULL;
+    $email = $params['mail'] ?? NULL;
     //don't allow the special characters and min. username length is two
     //regex \\ to match a single backslash would become '/\\\\/'
     $isNotValid = (bool) preg_match('/[\<|\>|\"|\'|\%|\;|\(|\)|\&|\\\\|\/]/im', $name);
