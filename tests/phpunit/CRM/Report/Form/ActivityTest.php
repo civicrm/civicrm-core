@@ -97,11 +97,11 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
     ]);
 
     // create dummy activity type
-    $activityTypeID = CRM_Utils_Array::value('id', $this->callAPISuccess('option_value', 'create', [
+    $activityTypeID = $this->callAPISuccess('option_value', 'create', [
       'option_group_id' => 'activity_type',
       'name' => 'Test activity type',
       'label' => 'Test activity type',
-    ]));
+    ])['id'];
     // create activity
     $result = $this->callAPISuccess('activity', 'create', [
       'subject' => 'Make-it-Happen Meeting',

@@ -494,54 +494,54 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
     $contactIDPhoneRecords = [
       $contactID1 => [
-        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', [
+        'primary_phone_id' => $this->callAPISuccess('Phone', 'create', [
           'contact_id' => $contactID1,
           'phone' => "01 01",
           'location_type_id' => "Home",
           'phone_type_id' => "Mobile",
           'is_primary' => 1,
-        ])),
-        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', [
+        ])['id'],
+        'other_phone_id' => $this->callAPISuccess('Phone', 'create', [
           'contact_id' => $contactID1,
           'phone' => "01 02",
           'location_type_id' => "Work",
           'phone_type_id' => "Mobile",
           'is_primary' => 0,
-        ])),
+        ])['id'],
       ],
       // Create the non-primary with a lower ID than the primary, to test CRM-21320
       $contactID2 => [
-        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', [
+        'other_phone_id' => $this->callAPISuccess('Phone', 'create', [
           'contact_id' => $contactID2,
           'phone' => "02 01",
           'location_type_id' => "Home",
           'phone_type_id' => "Mobile",
           'is_primary' => 0,
-        ])),
-        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', [
+        ])['id'],
+        'primary_phone_id' => $this->callAPISuccess('Phone', 'create', [
           'contact_id' => $contactID2,
           'phone' => "02 02",
           'location_type_id' => "Work",
           'phone_type_id' => "Mobile",
           'is_primary' => 1,
-        ])),
+        ])['id'],
       ],
       // Create primary that cant recieve SMS but a secondary that can, to test core/384
       $contactID3 => [
-        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', [
+        'other_phone_id' => $this->callAPISuccess('Phone', 'create', [
           'contact_id' => $contactID3,
           'phone' => "03 01",
           'location_type_id' => "Home",
           'phone_type_id' => "Mobile",
           'is_primary' => 0,
-        ])),
-        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', [
+        ])['id'],
+        'primary_phone_id' => $this->callAPISuccess('Phone', 'create', [
           'contact_id' => $contactID3,
           'phone' => "03 02",
           'location_type_id' => "Work",
           'phone_type_id' => "Phone",
           'is_primary' => 1,
-        ])),
+        ])['id'],
       ],
     ];
 

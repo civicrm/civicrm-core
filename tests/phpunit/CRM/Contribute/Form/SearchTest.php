@@ -147,7 +147,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       // assert the contribution IDs
       $this->checkArrayEquals($case['expected_contribution'], $contributions);
       // get and assert qill string
-      $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
+      $qill = trim(implode($query->getOperator(), $query->qill()[0]));
       $this->assertEquals($case['expected_qill'], $qill);
     }
   }
@@ -249,7 +249,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       // assert the contribution IDs
       $this->checkArrayEquals($case['expected_contribution'], $contributions);
       // get and assert qill string
-      $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
+      $qill = trim(implode($query->getOperator(), $query->qill()[0]));
       $this->assertEquals($case['expected_qill'], $qill);
     }
   }
@@ -346,7 +346,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       // assert the contribution IDs
       $this->checkArrayEquals($case['expected_contribution'], $contributions);
       // get and assert qill string
-      $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
+      $qill = trim(implode($query->getOperator(), $query->qill()[0]));
       $this->assertEquals($case['expected_qill'], $qill);
     }
   }
@@ -401,7 +401,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $this->assertEquals($expectedCount, count($contacts));
     // get and assert qill string
     $qill = $query->qill();
-    $qillString = !empty($qill[1]) ? $qill[1] : CRM_Utils_Array::value(0, $qill);
+    $qillString = !empty($qill[1]) ? $qill[1] : $qill[0];
     $qill = trim(implode($query->getOperator(), $qillString));
     $this->assertEquals($expectedQill, $qill);
 
@@ -490,7 +490,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       // assert the contribution IDs
       $this->checkArrayEquals($case['expected_contribution'], $contributions);
       // get and assert qill string
-      $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
+      $qill = trim(implode($query->getOperator(), $query->qill()[0]));
       $this->assertEquals($case['expected_qill'], $qill);
     }
   }

@@ -88,8 +88,8 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
       $actual = [];
       CRM_Utils_String::extractName($case['full_name'], $actual);
       $this->assertEquals($actual['first_name'], $case['first_name']);
-      $this->assertEquals(CRM_Utils_Array::value('last_name', $actual), CRM_Utils_Array::value('last_name', $case));
-      $this->assertEquals(CRM_Utils_Array::value('middle_name', $actual), CRM_Utils_Array::value('middle_name', $case));
+      $this->assertEquals($actual['last_name'] ?? NULL, $case['last_name'] ?? NULL);
+      $this->assertEquals($actual['middle_name'] ?? NULL, $case['middle_name'] ?? NULL);
     }
   }
 
