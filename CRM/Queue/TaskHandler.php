@@ -35,7 +35,10 @@ class CRM_Queue_TaskHandler extends CRM_Queue_BasicHandler {
    * @param $queue
    */
   protected function runItem($item, $queue): void {
-    $runResult = $item->data->run($this->createContext($queue));
+    $taskCtx = new \CRM_Queue_TaskContext();
+    $taskCtx->queue = $queue;
+    $taskCtx->log = \CRM_Core_Error::createDebugLogger();
+    $runResult = $item->data->run($taskCtx);
     if (!$runResult) {
       throw new \CRM_Core_Exception('Queue task returned false', 'queue_false');
     }
@@ -63,17 +66,6 @@ class CRM_Queue_TaskHandler extends CRM_Queue_BasicHandler {
    */
   protected function getItemDetails($item): array {
     return CRM_Utils_Array::subset((array) $item->data, ['title', 'callback', 'arguments']);
-  }
-
-  /**
-   * @param \CRM_Queue_Queue $queue
-   * return CRM_Queue_TaskContext;
-   */
-  private function createContext(\CRM_Queue_Queue $queue): \CRM_Queue_TaskContext {
-    $taskCtx = new \CRM_Queue_TaskContext();
-    $taskCtx->queue = $queue;
-    $taskCtx->log = \CRM_Core_Error::createDebugLogger();
-    return $taskCtx;
   }
 
 }
