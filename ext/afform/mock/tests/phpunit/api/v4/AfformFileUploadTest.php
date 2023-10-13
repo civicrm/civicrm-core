@@ -5,6 +5,12 @@
  *
  * @group headless
  */
+
+use Civi\Api4\Afform;
+use Civi\Api4\Contact;
+use Civi\Api4\CustomField;
+use Civi\Api4\CustomGroup;
+
 require_once __DIR__ . '/AfformTestCase.php';
 require_once __DIR__ . '/AfformUsageTestCase.php';
 class api_v4_AfformFileUploadTest extends api_v4_AfformUsageTestCase {
@@ -38,11 +44,11 @@ EOHTML;
    */
   public function testSubmitFile(): void {
     // Single-value set
-    \Civi\Api4\CustomGroup::create(FALSE)
+    CustomGroup::create(FALSE)
       ->addValue('name', 'MyInfo')
       ->addValue('title', 'My Info')
       ->addValue('extends', 'Contact')
-      ->addChain('fields', \Civi\Api4\CustomField::save()
+      ->addChain('fields', CustomField::save()
         ->addDefault('custom_group_id', '$id')
         ->setRecords([
           ['name' => 'single_file_field', 'label' => 'A File', 'data_type' => 'File', 'html_type' => 'File'],
@@ -51,14 +57,14 @@ EOHTML;
       ->execute();
 
     // Multi-record set
-    \Civi\Api4\CustomGroup::create(FALSE)
+    CustomGroup::create(FALSE)
       ->addValue('name', 'MyFiles')
       ->addValue('title', 'My Files')
       ->addValue('style', 'Tab with table')
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', TRUE)
       ->addValue('max_multiple', 3)
-      ->addChain('fields', \Civi\Api4\CustomField::save()
+      ->addChain('fields', CustomField::save()
         ->addDefault('custom_group_id', '$id')
         ->setRecords([
           ['name' => 'my_file', 'label' => 'My File', 'data_type' => 'File', 'html_type' => 'File'],
@@ -100,14 +106,14 @@ EOHTML;
         ],
       ],
     ];
-    $submission = Civi\Api4\Afform::submit()
+    $submission = Afform::submit()
       ->setName($this->formName)
       ->setValues($values)
       ->execute()->first();
 
     foreach ([0, 1] as $entityIndex) {
       $this->mockUploadFile();
-      Civi\Api4\Afform::submitFile()
+      Afform::submitFile()
         ->setName($this->formName)
         ->setToken($submission['token'])
         ->setModelName('Individual1')
@@ -117,7 +123,7 @@ EOHTML;
 
       foreach ([0, 1] as $joinIndex) {
         $this->mockUploadFile();
-        Civi\Api4\Afform::submitFile()
+        Afform::submitFile()
           ->setName($this->formName)
           ->setToken($submission['token'])
           ->setModelName('Individual1')
@@ -129,7 +135,7 @@ EOHTML;
       }
     }
 
-    $contacts = \Civi\Api4\Contact::get(FALSE)
+    $contacts = Contact::get(FALSE)
       ->addWhere('last_name', '=', $lastName)
       ->addJoin('Custom_MyFiles AS MyFiles', 'LEFT', ['id', '=', 'MyFiles.entity_id'])
       ->addSelect('first_name', 'MyInfo.single_file_field', 'MyFiles.my_file')

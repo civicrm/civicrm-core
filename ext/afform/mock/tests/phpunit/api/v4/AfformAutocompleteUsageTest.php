@@ -1,7 +1,12 @@
 <?php
 
+use Civi\Api4\Afform;
 use Civi\Api4\Contact;
+use Civi\Api4\CustomField;
+use Civi\Api4\CustomGroup;
+use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
+use Civi\Api4\SavedSearch;
 
 /**
  * Test case for Afform with autocomplete.
@@ -32,7 +37,7 @@ EOHTML;
     ]);
 
     // Saved search for filtering
-    \Civi\Api4\SavedSearch::create(FALSE)
+    SavedSearch::create(FALSE)
       ->setValues([
         'name' => 'the_unit_test_search',
         'label' => 'the_unit_test_search',
@@ -84,7 +89,7 @@ EOHTML;
       ],
     ];
     try {
-      Civi\Api4\Afform::submit()
+      Afform::submit()
         ->setName($this->formName)
         ->setValues($values)
         ->execute();
@@ -96,7 +101,7 @@ EOHTML;
 
     // Submit with a valid ID, it should work
     $values['Individual1'][0]['fields']['id'] = $contacts['B'];
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues($values)
       ->execute();
@@ -126,17 +131,17 @@ EOHTML;
       ->execute()->indexBy('first_name')->column('id');
 
     // Place contacts A & B in the group, but not contact C
-    $group = \Civi\Api4\Group::create(FALSE)
+    $group = Group::create(FALSE)
       ->addValue('name', $lastName)
       ->addValue('title', $lastName)
       ->addChain('A', GroupContact::create()->addValue('group_id', '$id')->addValue('contact_id', $contacts['A']))
       ->addChain('B', GroupContact::create()->addValue('group_id', '$id')->addValue('contact_id', $contacts['B']))
       ->execute()->single();
 
-    \Civi\Api4\CustomGroup::create(FALSE)
+    CustomGroup::create(FALSE)
       ->addValue('title', 'test_af_fields')
       ->addValue('extends', 'Contact')
-      ->addChain('fields', \Civi\Api4\CustomField::save()
+      ->addChain('fields', CustomField::save()
         ->addDefault('custom_group_id', '$id')
         ->setRecords([
           ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete', 'filter' => 'action=get&group=' . $group['id']],
@@ -184,7 +189,7 @@ EOHTML;
       ],
     ];
     try {
-      Civi\Api4\Afform::submit()
+      Afform::submit()
         ->setName($this->formName)
         ->setValues($values)
         ->execute();
@@ -196,7 +201,7 @@ EOHTML;
 
     // Submit with a valid ID, it should work
     $values['Individual1'][0]['fields']['test_af_fields.contact_ref'] = $contacts['B'];
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues($values)
       ->execute();
@@ -224,10 +229,10 @@ EOHTML;
       ->setRecords($sampleData)
       ->execute()->indexBy('first_name')->column('id');
 
-    \Civi\Api4\CustomGroup::create(FALSE)
+    CustomGroup::create(FALSE)
       ->addValue('title', 'test_address_fields')
       ->addValue('extends', 'Address')
-      ->addChain('fields', \Civi\Api4\CustomField::save()
+      ->addChain('fields', CustomField::save()
         ->addDefault('custom_group_id', '$id')
         ->setRecords([
           ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete', 'filter' => 'action=get&source=in'],
@@ -282,7 +287,7 @@ EOHTML;
       ],
     ];
     try {
-      Civi\Api4\Afform::submit()
+      Afform::submit()
         ->setName($this->formName)
         ->setValues($values)
         ->execute();
@@ -294,7 +299,7 @@ EOHTML;
 
     // Submit with a valid ID, it should work
     $values['Individual1'][0]['joins']['Address'][0]['test_address_fields.contact_ref'] = $contacts['A'];
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues($values)
       ->execute();

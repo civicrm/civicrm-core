@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/AfformTestCase.php';
-require_once __DIR__ . '/AfformUsageTestCase.php';
+
+use Civi\Api4\Afform;
 
 /**
  * Test case for Afform.prefill and Afform.submit.
@@ -87,7 +87,7 @@ EOHTML;
     CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
 
     // Autofill form with current user. See `Civi\Afform\Behavior\ContactAutofill`
-    $prefill = Civi\Api4\Afform::prefill()
+    $prefill = Afform::prefill()
       ->setName($this->formName)
       ->execute()
       ->indexBy('name');
@@ -98,7 +98,7 @@ EOHTML;
       ['fields' => ['first_name' => 'Firsty', 'last_name' => 'Lasty']],
     ];
 
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues(['me' => $submission])
       ->execute();
@@ -115,7 +115,7 @@ EOHTML;
     ]);
 
     // Get states for USA
-    $result = Civi\Api4\Afform::getOptions()
+    $result = Afform::getOptions()
       ->setName($this->formName)
       ->setModelName('me')
       ->setFieldName('state_province_id')
@@ -125,7 +125,7 @@ EOHTML;
     $this->assertEquals('Alabama', $result[0]['label']);
 
     // Get states for UK
-    $result = Civi\Api4\Afform::getOptions()
+    $result = Afform::getOptions()
       ->setName($this->formName)
       ->setModelName('me')
       ->setFieldName('state_province_id')
@@ -165,7 +165,7 @@ EOHTML;
         ],
       ],
     ];
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues($values)
       ->execute();
@@ -208,7 +208,7 @@ EOHTML;
     CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
 
     try {
-      Civi\Api4\Afform::prefill()
+      Afform::prefill()
         ->setName($this->formName)
         ->setArgs([])
         ->execute()
@@ -220,7 +220,7 @@ EOHTML;
     }
 
     try {
-      Civi\Api4\Afform::submit()
+      Afform::submit()
         ->setName($this->formName)
         ->setArgs([])
         ->setValues([
@@ -262,7 +262,7 @@ EOHTML;
         ],
       ],
     ];
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues($values)
       ->execute();
@@ -301,7 +301,7 @@ EOHTML;
         ],
       ],
     ];
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues($values)
       ->execute();
@@ -347,7 +347,7 @@ EOHTML;
         ],
       ],
     ];
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues($values)
       ->execute();
@@ -415,7 +415,7 @@ EOHTML;
         ],
       ],
     ];
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues($values)
       ->execute();
@@ -448,7 +448,7 @@ EOHTML;
     ];
 
     try {
-      Civi\Api4\Afform::submit()
+      Afform::submit()
         ->setName($this->formName)
         ->setValues($values)
         ->execute();
@@ -484,7 +484,7 @@ EOHTML;
     ];
 
     try {
-      Civi\Api4\Afform::submit()
+      Afform::submit()
         ->setName($this->formName)
         ->setValues($values)
         ->execute();
@@ -514,26 +514,26 @@ EOHTML;
     ];
 
     // Submit twice
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues(['me' => $submitValues])
       ->execute();
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues(['me' => $submitValues])
       ->execute();
 
     // Autofilling form works because limit hasn't been reached
-    Civi\Api4\Afform::prefill()->setName($this->formName)->execute();
+    Afform::prefill()->setName($this->formName)->execute();
 
     // Last time
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues(['me' => $submitValues])
       ->execute();
 
     // Stats should report that we've reached the submission limit
-    $stats = \Civi\Api4\Afform::get(FALSE)
+    $stats = Afform::get(FALSE)
       ->addSelect('submit_enabled', 'submission_count', 'submit_currently_open')
       ->addWhere('name', '=', $this->formName)
       ->execute()->single();
@@ -543,13 +543,13 @@ EOHTML;
 
     // Prefilling and submitting are no longer allowed.
     try {
-      Civi\Api4\Afform::prefill()->setName($this->formName)->execute();
+      Afform::prefill()->setName($this->formName)->execute();
       $this->fail();
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
     }
     try {
-      Civi\Api4\Afform::submit()
+      Afform::submit()
         ->setName($this->formName)
         ->setValues(['me' => $submitValues])
         ->execute();

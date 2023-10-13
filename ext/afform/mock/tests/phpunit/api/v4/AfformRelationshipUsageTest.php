@@ -1,6 +1,9 @@
 <?php
 
+use Civi\Api4\Afform;
+use Civi\Api4\Contact;
 use Civi\Api4\Relationship;
+use Civi\Api4\RelationshipType;
 
 /**
  * Test case for Afform.prefill and Afform.submit.
@@ -46,7 +49,7 @@ EOHTML;
       ],
     ];
 
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues($submission)
       ->execute();
@@ -98,7 +101,7 @@ EOHTML;
     $typeIds = [];
 
     foreach ($types as $type) {
-      $typeIds[] = \Civi\Api4\RelationshipType::create(FALSE)
+      $typeIds[] = RelationshipType::create(FALSE)
         ->addValue('contact_type_a', 'Organization')
         ->addValue('contact_type_b', 'Individual')
         ->addValue('name_a_b', $type)
@@ -121,7 +124,7 @@ EOHTML;
       ],
     ];
 
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues($submission)
       ->execute();
@@ -162,7 +165,7 @@ EOHTML;
       'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
-    $contact = \Civi\Api4\Contact::save(FALSE)
+    $contact = Contact::save(FALSE)
       ->addRecord(['first_name' => 'Child1'])
       ->addRecord(['first_name' => 'Child2', 'is_deleted' => TRUE])
       ->addRecord(['first_name' => 'Parent'])
@@ -181,7 +184,7 @@ EOHTML;
       ->addRecord(['contact_id_a' => $contact[6], 'contact_id_b' => $contact[2], 'relationship_type_id:name' => 'Child of'])
       ->execute();
 
-    $prefill = Civi\Api4\Afform::prefill(FALSE)
+    $prefill = Afform::prefill(FALSE)
       ->setName($this->formName)
       ->setArgs(['Organization1' => $contact[3]])
       ->execute()
