@@ -1808,7 +1808,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $view = $field['is_view'];
     $required = ($mode == CRM_Profile_Form::MODE_SEARCH) ? FALSE : $field['is_required'];
     $search = $mode == CRM_Profile_Form::MODE_SEARCH;
-    $isShared = CRM_Utils_Array::value('is_shared', $field, 0);
+    $isShared = $field['is_shared'] ?? 0;
 
     // do not display view fields in drupal registration form
     // CRM-4632
@@ -1958,7 +1958,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       ], $required);
     }
     elseif ($fieldName === 'contact_sub_type') {
-      $gId = $form->get('gid') ? $form->get('gid') : CRM_Utils_Array::value('group_id', $field);
+      $gId = $form->get('gid') ?:  $field['group_id'] ?? NULL;
       if ($usedFor == 'onbehalf') {
         $profileType = 'Organization';
       }
@@ -1992,7 +1992,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif (in_array($fieldName, CRM_Contact_BAO_Contact::$_greetingTypes)) {
       // Get contact type for greeting selector
-      $gId = $form->get('gid') ?: CRM_Utils_Array::value('group_id', $field);
+      $gId = $form->get('gid') ?:  $field['group_id'] ?? NULL;
       $profileType = CRM_Core_BAO_UFField::getProfileType($gId, TRUE, FALSE, TRUE);
 
       if (!$profileType || in_array($profileType, ['Contact', 'Contribution', 'Participant', 'Membership'])) {
