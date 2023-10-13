@@ -303,7 +303,7 @@ United States<br />',
     ]);
     $oldMsg = $result['values'][0]['msg_html'];
     $pos = strpos($oldMsg, 'Please print this confirmation');
-    $newMsg = substr_replace($oldMsg, '<p>Test event type - {$event.event_type_id}</p>', $pos, 0);
+    $newMsg = substr_replace($oldMsg, '<p>Test event type - {event.event_type_id}</p>', $pos, 0);
     $this->callAPISuccess('MessageTemplate', 'create', [
       'id' => $result['id'],
       'msg_html' => $newMsg,
