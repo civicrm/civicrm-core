@@ -16,6 +16,7 @@ use Civi\Api4\Pledge;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
+use Civi\Test\FormTrait;
 
 /**
  *  Test APIv3 civicrm_contribute_* functions
@@ -31,6 +32,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   use CRMTraits_Financial_OrderTrait;
   use CRMTraits_Financial_TaxTrait;
   use CRMTraits_Financial_PriceSetTrait;
+  use FormTrait;
 
   protected $individualID;
   protected $_contribution;
@@ -867,7 +869,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @dataProvider getThousandSeparators
    */
-  public function testCreateDefaultNow($thousandSeparator) {
+  public function testCreateDefaultNow(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $params = $this->_params;
     unset($params['receive_date'], $params['net_amount']);
@@ -1159,9 +1161,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Check handling of financial type.
    *
    * In the interests of removing financial type / contribution type checks from
-   * legacy format function lets test that the api is doing this for us
-   *
-   * @throws \CRM_Core_Exception
+   * legacy format function lets test that the api is doing this for us.
    */
   public function testValidNamedFinancialType(): void {
     $params = $this->_params;
@@ -3503,11 +3503,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'status_id' => 'Scheduled',
     ]);
     $this->assertEquals(1, $activity['count']);
-    $_REQUEST['id'] = $this->getContributionID();
-    $_REQUEST['action'] = 'update';
-    // change pending contribution to completed
-    /** @var CRM_Contribute_Form_Contribution $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
+    $submittedValues = [
       'total_amount' => 20,
       'net_amount' => 20,
       'fee_amount' => 0,
@@ -3531,9 +3527,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'contribution_page_id' => $this->_ids['contribution_page'],
       'source' => 'Membership Signup and Renewal',
+    ];
+    // Change pending contribution to completed.
+    $form = $this->getTestForm('CRM_Contribute_Form_Contribution', $submittedValues, [
+      'id' => $this->getContributionID(),
+      'action' => 'update',
     ]);
-    $form->buildForm();
-    $form->postProcess();
+    $form->processForm();
 
     // Case 2: After successful payment for Pending backoffice there are three activities created
     //  2.a Update status of existing Scheduled Membership Signup (created in step 1) to Completed
@@ -3566,10 +3566,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->setUpPendingContribution($this->_ids['price_field_value'][0], 'second', [], ['entity_id' => $this->getMembershipID()], ['id' => $this->getMembershipID()]);
 
     //Update it to Failed.
-    $form->_params['id'] = $this->getContributionID('second');
-    $form->_params['contribution_status_id'] = 4;
-
-    $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
+    $submittedValues['contribution_status_id'] = 4;
+    $form = $this->getTestForm('CRM_Contribute_Form_Contribution', $submittedValues, [
+      'id' => $this->getContributionID('second'),
+      'action' => 'update',
+    ]);
+    $form->processForm();
     //Existing membership should not get updated to expired.
     $membership = $this->callAPISuccess('Membership', 'getsingle', ['id' => $this->_ids['membership']]);
     $this->assertNotEquals(4, $membership['status_id']);
@@ -3974,7 +3976,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @return null|string
    */
-  public function _getFinancialTrxnAmount($contId) {
+  public function _getFinancialTrxnAmount(int $contId): ?string {
     $query = "SELECT
      SUM( ft.total_amount ) AS total
      FROM civicrm_financial_trxn AS ft

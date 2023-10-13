@@ -1558,8 +1558,20 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @throws \CRM_Core_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
+   *
+   * @deprecated since 5.68 will be removed around 5.80.
+   *
+   * Try something like
+   *  use   use \Civi\Test\FormTrait;
+   *  $form = $this->getTestForm('CRM_Contribute_Form_Contribution', $submittedValues, [
+   *   'id' =>  4;
+   *   'action' => 'update',
+   * ]);
+   * $form->processForm();
    */
   public function testSubmit($params, $action, $creditCardMode = NULL) {
+    // Note that this is really used from tests - so adding noisy deprecations would make them
+    // fail straight away.
     $defaults = [
       'soft_credit_contact_id' => [],
       'receive_date' => date('Y-m-d H:i:s'),
@@ -1605,7 +1617,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->_fields = [];
     return $this->submit(array_merge($defaults, $params), $action, CRM_Utils_Array::value('pledge_payment_id', $params));
-
   }
 
   /**
