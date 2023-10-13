@@ -254,9 +254,9 @@ class CRM_Campaign_Page_AJAX {
       TRUE, FALSE,
       FALSE, FALSE,
       FALSE,
-      CRM_Utils_Array::value('whereClause', $voterClause),
+      $voterClause['whereClause'] ?? NULL,
       NULL,
-      CRM_Utils_Array::value('fromClause', $voterClause)
+      $voterClause['fromClause'] ?? NULL
     );
 
     $iTotal = $searchCount;
@@ -287,9 +287,9 @@ class CRM_Campaign_Page_AJAX {
         FALSE, FALSE,
         FALSE, FALSE,
         FALSE,
-        CRM_Utils_Array::value('whereClause', $voterClause),
+        $voterClause['whereClause'] ?? NULL,
         $sortOrder,
-        CRM_Utils_Array::value('fromClause', $voterClause)
+        $voterClause['fromClause'] ?? NULL
       );
       while ($result->fetch()) {
         $contactID = $result->contact_id;

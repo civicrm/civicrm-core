@@ -674,7 +674,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
         );
         $menuLinks[] = sprintf('<a href="%s" class="action-item crm-hover-button" title="%s">%s</a>',
           $urlPath,
-          CRM_Utils_Array::value('title', $link),
+          $link['title'] ?? NULL,
           $link['title']
         );
       }
