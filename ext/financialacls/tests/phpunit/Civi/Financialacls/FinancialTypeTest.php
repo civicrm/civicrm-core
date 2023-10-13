@@ -3,6 +3,9 @@
 namespace Civi\Financialacls;
 
 use Civi;
+use Civi\Api4\PriceField;
+use Civi\Api4\PriceFieldValue;
+use Civi\Api4\PriceSet;
 use CRM_Core_Session;
 
 // I fought the Autoloader and the autoloader won.
@@ -47,7 +50,10 @@ class FinancialTypeTest extends BaseTestClass {
       foreach ($actions as $action => $action_ts) {
         $this->assertEquals(
           [
-            ts('CiviCRM: %1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+            ts('CiviCRM: %1 contributions of type %2', [
+              1 => $action_ts,
+              2 => $type,
+            ]),
             ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
           ],
           $permissions[$action . ' contributions of type ' . $type]
@@ -69,6 +75,86 @@ class FinancialTypeTest extends BaseTestClass {
     $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
     $type = \CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
     $this->assertEquals([1 => 'Donation'], $type);
+  }
+
+  /**
+   * Check method testCheckPermissionedLineItems()
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCheckPermissionedLineItems(): void {
+    $priceSetID = PriceSet::create()->setValues([
+      'title' => 'Price Set Financial ACLS',
+      'name' => 'test_price_set',
+      'extends' => 1,
+      'financial_type_id:name' => 'Donation',
+    ])->execute()->first()['id'];
+
+    $paramsField = [
+      'label' => 'Price Field',
+      'name' => 'test_price_field',
+      'html_type' => 'CheckBox',
+      'is_display_amounts' => 1,
+      'weight' => 1,
+      'options_per_line' => 1,
+      'price_set_id' => $priceSetID,
+      'is_enter_qty' => 1,
+      'financial_type_id:name' => 'Donation',
+    ];
+    $priceFieldID = PriceField::create()
+      ->setValues($paramsField)
+      ->execute()
+      ->first()['id'];
+    $priceFieldValueID = PriceFieldValue::create()->setValues([
+      'price_field_id' => $priceFieldID,
+      'amount' => 100,
+      'name' => 'price_field_value',
+      'label' => 'Price Field 1',
+      'financial_type_id:name' => 'Donation',
+      'weight' => 1,
+    ])->execute()->first()['id'];
+    $contributionParams = [
+      'total_amount' => 300,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'financial_type_id' => 'Donation',
+      'line_items' => [
+        [
+          'line_item' => [
+            [
+              'price_field_id' => $priceFieldID,
+              'price_field_value_id' => $priceFieldValueID,
+              'qty' => 3,
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $contribution = $this->callAPISuccess('Order', 'create', $contributionParams);
+    Civi::settings()->set('acl_financial_type', TRUE);
+
+    $this->setPermissions([
+      'view contributions of type Member Dues',
+    ]);
+
+    try {
+      \CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contribution['id'], 'view');
+      $this->fail('Missed expected exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertEquals('You do not have permission to access this page.', $e->getMessage());
+    }
+
+    $this->setPermissions([
+      'view contributions of type Donation',
+    ]);
+    try {
+      \CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contribution['id'], 'view');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail('permissions should be established');
+    }
   }
 
 }
