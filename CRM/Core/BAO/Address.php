@@ -1312,7 +1312,7 @@ SELECT is_primary,
     }
     CRM_Core_BAO_Block::sortPrimaryFirst($params['address']);
 
-    $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
+    $updateBlankLocInfo = $params['updateBlankLocInfo'] ?? FALSE;
     $contactId = $params['contact_id'];
     //get all the addresses for this contact
     $addresses = self::allAddress($contactId);

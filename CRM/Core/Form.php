@@ -789,7 +789,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $this->submitOnce = TRUE;
       }
 
-      $attrs = ['class' => 'crm-form-submit'] + (array) CRM_Utils_Array::value('js', $button);
+      $attrs = ['class' => 'crm-form-submit'] + ($button['js'] ?? []);
 
       // A lot of forms use the hacky method of looking at
       // `$params['button name']` (dating back to them being inputs with a
@@ -1844,7 +1844,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
       if ($context == 'search') {
         $widget = $widget == 'Select2' ? $widget : 'Select';
-        $props['multiple'] = CRM_Utils_Array::value('multiple', $props, TRUE);
+        $props['multiple'] = $props['multiple'] ?? TRUE;
       }
       elseif (!empty($fieldSpec['serialize'])) {
         $props['multiple'] = TRUE;
