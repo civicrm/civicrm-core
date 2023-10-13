@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Afform;
+
 /**
  * Test case for Afform with autocomplete.
  *
@@ -55,7 +57,7 @@ EOHTML;
       ],
     ]);
 
-    $prefill = Civi\Api4\Afform::prefill()
+    $prefill = Afform::prefill()
       ->setName($this->formName)
       ->setArgs(['Individual1' => $cid])
       ->execute()
@@ -81,7 +83,7 @@ EOHTML;
     $this->assertEmpty($prefill['Individual1']['values'][1]['joins']['Phone']);
 
     // Prefill a specific contact for the af-repeat entity
-    $prefill = Civi\Api4\Afform::prefill()
+    $prefill = Afform::prefill()
       ->setName($this->formName)
       ->setArgs(['Individual1' => [1 => $cid[3]]])
       ->execute()
@@ -93,7 +95,7 @@ EOHTML;
     $this->assertEquals('3-1', $prefill['Individual1']['values'][1]['joins']['Phone'][0]['phone']);
 
     // Form entity has `max="3"` so a forth contact (index 3) is out-of-bounds
-    $prefill = Civi\Api4\Afform::prefill()
+    $prefill = Afform::prefill()
       ->setName($this->formName)
       ->setArgs(['Individual1' => [3 => $cid[0]]])
       ->execute();
@@ -144,7 +146,7 @@ EOHTML;
       civicrm_api4('Relationship', 'create', ['values' => $values]);
     }
 
-    $prefill = Civi\Api4\Afform::prefill()
+    $prefill = Afform::prefill()
       ->setName($this->formName)
       ->execute()
       ->indexBy('name');

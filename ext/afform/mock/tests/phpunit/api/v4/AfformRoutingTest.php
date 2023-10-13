@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Afform;
+
 /**
  * Ensure that the routes created by Afform are working.
  * @group e2e
@@ -16,7 +18,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
 
   public function setUp(): void {
     parent::setUp();
-    Civi\Api4\Afform::revert()
+    Afform::revert()
       ->setCheckPermissions(FALSE)
       ->addWhere('name', '=', $this->formName)
       ->execute();
@@ -24,7 +26,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
 
   public function tearDown(): void {
     parent::tearDown();
-    Civi\Api4\Afform::revert()
+    Afform::revert()
       ->setCheckPermissions(FALSE)
       ->addWhere('name', '=', $this->formName)
       ->execute();
@@ -39,7 +41,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
     $result = $http->get($url('civicrm/mock-page'));
     $this->assertNotAuthorized($result, 'mock-page');
 
-    Civi\Api4\Afform::update()
+    Afform::update()
       ->setCheckPermissions(FALSE)
       ->addWhere('name', '=', $this->formName)
       ->addValue('permission', CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION)
@@ -55,7 +57,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
       return CRM_Utils_System::url($path, $query, TRUE, NULL, FALSE);
     };
 
-    Civi\Api4\Afform::update()
+    Afform::update()
       ->setCheckPermissions(FALSE)
       ->addWhere('name', '=', $this->formName)
       ->addValue('permission', CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION)
@@ -64,7 +66,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
     $this->assertOpensPage($http->get($url('civicrm/mock-page')), 'mock-page');
     $this->assertNotAuthorized($http->get($url('civicrm/mock-page-renamed')), 'mock-page');
 
-    Civi\Api4\Afform::update()
+    Afform::update()
       ->setCheckPermissions(FALSE)
       ->addWhere('name', '=', $this->formName)
       ->addValue('server_route', 'civicrm/mock-page-renamed')

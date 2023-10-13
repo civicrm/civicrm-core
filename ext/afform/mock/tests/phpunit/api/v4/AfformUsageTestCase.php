@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Afform;
+
 /**
  * Test case for Afform.prefill and Afform.submit.
  *
@@ -15,14 +17,14 @@ abstract class api_v4_AfformUsageTestCase extends api_v4_AfformTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    Civi\Api4\Afform::revert(FALSE)
+    Afform::revert(FALSE)
       ->addWhere('type', '=', 'block')
       ->execute();
     $this->formName = 'mock' . rand(0, 100000);
   }
 
   public function tearDown(): void {
-    Civi\Api4\Afform::revert(FALSE)
+    Afform::revert(FALSE)
       ->addWhere('name', '=', $this->formName)
       ->execute();
     parent::tearDown();
@@ -34,7 +36,7 @@ abstract class api_v4_AfformUsageTestCase extends api_v4_AfformTestCase {
       'name' => $this->formName,
     ];
     $full = array_merge($defaults, $values);
-    Civi\Api4\Afform::create(FALSE)
+    Afform::create(FALSE)
       ->setLayoutFormat('html')
       ->setValues($full)
       ->execute();

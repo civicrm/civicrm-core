@@ -1,5 +1,10 @@
 <?php
 
+use Civi\Api4\Afform;
+use Civi\Api4\Contact;
+use Civi\Api4\CustomField;
+use Civi\Api4\CustomGroup;
+
 /**
  * Test case for Afform.prefill and Afform.submit.
  *
@@ -31,14 +36,14 @@ EOHTML;
    * which can be submitted multiple times
    */
   public function testMultiRecordCustomBlock(): void {
-    \Civi\Api4\CustomGroup::create(FALSE)
+    CustomGroup::create(FALSE)
       ->addValue('name', 'MyThings')
       ->addValue('title', 'My Things')
       ->addValue('style', 'Tab with table')
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', TRUE)
       ->addValue('max_multiple', 2)
-      ->addChain('fields', \Civi\Api4\CustomField::save()
+      ->addChain('fields', CustomField::save()
         ->addDefault('custom_group_id', '$id')
         ->setRecords([
           ['name' => 'my_text', 'label' => 'My Text', 'data_type' => 'String', 'html_type' => 'Text'],
@@ -48,7 +53,7 @@ EOHTML;
       ->execute();
 
     // Creating a custom group should automatically create an afform block
-    $block = \Civi\Api4\Afform::get()
+    $block = Afform::get()
       ->addWhere('name', '=', 'afblockCustom_MyThings')
       ->addSelect('layout', 'directive_name')
       ->setLayoutFormat('shallow')
@@ -83,11 +88,11 @@ EOHTML;
         ],
       ],
     ];
-    Civi\Api4\Afform::submit()
+    Afform::submit()
       ->setName($this->formName)
       ->setValues($values)
       ->execute();
-    $contact = \Civi\Api4\Contact::get(FALSE)
+    $contact = Contact::get(FALSE)
       ->addWhere('first_name', '=', $firstName)
       ->addJoin('Custom_MyThings AS Custom_MyThings', 'LEFT', ['id', '=', 'Custom_MyThings.entity_id'])
       ->addSelect('Custom_MyThings.my_text', 'Custom_MyThings.my_friend')
