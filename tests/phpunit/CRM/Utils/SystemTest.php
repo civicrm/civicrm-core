@@ -71,9 +71,9 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function hook_civicrm_alterRedirect($urlQuery, $context) {
-    $this->assertEquals(CRM_Utils_Array::value('scheme', $context['expected']), $urlQuery->getScheme());
-    $this->assertEquals(CRM_Utils_Array::value('host', $context['expected']), $urlQuery->getHost());
-    $this->assertEquals(CRM_Utils_Array::value('query', $context['expected']), $urlQuery->getQuery());
+    $this->assertEquals($context['expected']['scheme'] ?? NULL, $urlQuery->getScheme());
+    $this->assertEquals($context['expected']['host'] ?? NULL, $urlQuery->getHost());
+    $this->assertEquals($context['expected']['query'] ?? NULL, $urlQuery->getQuery());
     $this->assertEquals($context['original'], CRM_Utils_Url::unparseUrl($urlQuery));
 
     throw new CRM_Core_Exception(ts('hook called'));

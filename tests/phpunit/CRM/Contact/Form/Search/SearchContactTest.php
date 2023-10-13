@@ -78,7 +78,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     $expectedResult = [$contacts['id']];
     $this->checkArrayEquals($expectedResult, $contactsResult);
     // get and assert qill string
-    $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
+    $qill = trim(implode($query->getOperator(), $query->qill()[0]));
     $this->assertEquals("Contact Type In IndividualANDContact Subtype Like {$contactSubType}", $qill);
   }
 

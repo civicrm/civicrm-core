@@ -84,7 +84,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('profile', 'get', $params)['values'];
     foreach ($expected as $profileField => $value) {
-      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result));
+      $this->assertEquals($value, $result[$profileField]);
     }
   }
 
@@ -122,7 +122,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('profile', 'get', $params)['values'];
     foreach ($expected as $profileField => $value) {
-      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result[$this->_profileID]), ' error message: ' . "missing/mismatching value for $profileField");
+      $this->assertEquals($value, $result[$this->_profileID][$profileField], ' error message: ' . "missing/mismatching value for $profileField");
     }
     $this->assertEquals('abc1', $result[1]['first_name'], ' error message: ' . 'missing/mismatching value for first name');
     $this->assertArrayNotHasKey('email-Primary', $result[1], 'profile 1 does not include email');
@@ -293,7 +293,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('profile', 'get', $params);
 
     foreach ($expected as $profileField => $value) {
-      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result['values']), ' error message: ' . "missing/mismatching value for $profileField"
+      $this->assertEquals($value, $result['values'][$profileField], ' error message: ' . "missing/mismatching value for $profileField"
       );
     }
   }
@@ -446,7 +446,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $profileDetails = $this->callAPISuccess('profile', 'get', $getParams);
 
     foreach ($updateParams as $profileField => $value) {
-      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $profileDetails['values']), "missing/mismatching value for $profileField"
+      $this->assertEquals($value, $profileDetails['values'][$profileField], "missing/mismatching value for $profileField"
       );
     }
     unset($params['email-primary']);
@@ -548,7 +548,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $profileDetails = $this->callAPISuccess('profile', 'get', $getParams);
 
     foreach ($updateParams as $profileField => $value) {
-      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $profileDetails['values']), 'In line ' . __LINE__ . ' error message: ' . "missing/mismatching value for $profileField"
+      $this->assertEquals($value, $profileDetails['values'][$profileField], 'In line ' . __LINE__ . ' error message: ' . "missing/mismatching value for $profileField"
       );
     }
   }
@@ -628,7 +628,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('profile', 'get', $params)['values'];
 
     foreach ($updateParams as $profileField => $value) {
-      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result), ' error message: ' . "missing/mismatching value for $profileField"
+      $this->assertEquals($value, $result[$profileField], ' error message: ' . "missing/mismatching value for $profileField"
       );
     }
   }
@@ -702,14 +702,14 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     ];
 
     foreach ($expected['contact'] as $field => $value) {
-      $this->assertEquals($value, CRM_Utils_Array::value($field, $result['values']), "missing/mismatching value for $field"
+      $this->assertEquals($value, $result['values'][$field], "missing/mismatching value for $field"
       );
     }
 
     foreach (['email', 'phone', 'address'] as $fieldType) {
       $typeValues = array_pop($result['values'][$fieldType]);
       foreach ($expected[$fieldType] as $field => $value) {
-        $this->assertEquals($value, CRM_Utils_Array::value($field, $typeValues), "missing/mismatching value for $field ($fieldType)"
+        $this->assertEquals($value, $typeValues[$field], "missing/mismatching value for $field ($fieldType)"
         );
       }
     }

@@ -959,7 +959,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         else {
           foreach ($field['sample'] as $key => $value) {
             $this->assertArrayHasKey($key, $optionValues, $message);
-            $this->assertEquals(CRM_Utils_Array::value($key, $optionValues), $value, $message);
+            $this->assertEquals($optionValues[$key], $value, $message);
           }
         }
 
@@ -969,7 +969,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         }
 
         // Ensure count of optionValues is not extraordinarily high.
-        $max = CRM_Utils_Array::value('max', $field, 20);
+        $max = $field['max'] ?? 20;
         $this->assertLessThanOrEqual($max, count($optionValues), $message);
       }
     }

@@ -69,7 +69,7 @@ class api_v3_APIWrapperTest_Impl implements API_Wrapper {
    */
   public function fromApiInput($apiRequest) {
     if ($apiRequest['entity'] == 'Contact' && $apiRequest['action'] == 'create') {
-      if ('Invalid' == CRM_Utils_Array::value('contact_type', $apiRequest['params'])) {
+      if ('Invalid' == $apiRequest['params']['contact_type']) {
         $apiRequest['params']['contact_type'] = 'Individual';
       }
     }

@@ -1797,10 +1797,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $fields = $this->callAPISuccess($entity, 'getfields', ['version' => 3, 'action' => 'get']);
     foreach ($fields['values'] as $field => $settings) {
       if (array_key_exists($field, $result)) {
-        $keys[CRM_Utils_Array::value('name', $settings, $field)] = $field;
+        $keys[($settings['name'] ?? $field)] = $field;
       }
       else {
-        $keys[CRM_Utils_Array::value('name', $settings, $field)] = CRM_Utils_Array::value('name', $settings, $field);
+        $keys[($settings['name'] ?? $field)] = ($settings['name'] ?? $field);
       }
       $type = $settings['type'] ?? NULL;
       if ($type === CRM_Utils_Type::T_DATE) {
@@ -1837,7 +1837,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       }
       if (in_array($key, $dateTimeFields, TRUE)) {
         $value = date('Y-m-d H:i:s', strtotime($value));
-        $result[$keys[$key]] = date('Y-m-d H:i:s', strtotime(CRM_Utils_Array::value($keys[$key], $result, CRM_Utils_Array::value($key, $result))));
+        $result[$keys[$key]] = date('Y-m-d H:i:s', strtotime(($result[$keys[$key]] ?? $result[$key])));
       }
       $this->assertEquals($value, $result[$keys[$key]], $key . " GetandCheck function determines that for key {$key} value: " . print_r($value, TRUE) . " doesn't match " . print_r($result[$keys[$key]], TRUE) . $errorText);
     }
@@ -2602,7 +2602,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if ($context !== 'online' && $context !== 'payLater') {
       $compareParams = [
         'to_financial_account_id' => 6,
-        'total_amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
+        'total_amount' => (float) ($params['total_amount'] ?? 100.00),
         'status_id' => 1,
       ];
     }
@@ -2612,15 +2612,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     elseif ($context === 'online') {
       $compareParams = [
         'to_financial_account_id' => 12,
-        'total_amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
+        'total_amount' => (float) ($params['total_amount'] ?? 100.00),
         'status_id' => 1,
-        'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params, 1),
+        'payment_instrument_id' => $params['payment_instrument_id'] ?? 1,
       ];
     }
     elseif ($context === 'payLater') {
       $compareParams = [
         'to_financial_account_id' => 7,
-        'total_amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
+        'total_amount' => (float) ($params['total_amount'] ?? 100.00),
         'status_id' => 2,
       ];
     }
@@ -2634,15 +2634,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'id' => $entityTrxn['entity_id'],
     ];
     $compareParams = [
-      'amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
+      'amount' => (float) ($params['total_amount'] ?? 100.00),
       'status_id' => 1,
-      'financial_account_id' => CRM_Utils_Array::value('financial_account_id', $params, 1),
+      'financial_account_id' => $params['financial_account_id'] ?? 1,
     ];
     if ($context === 'payLater') {
       $compareParams = [
-        'amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
+        'amount' => (float) ($params['total_amount'] ?? 100.00),
         'status_id' => 3,
-        'financial_account_id' => CRM_Utils_Array::value('financial_account_id', $params, 1),
+        'financial_account_id' => $params['financial_account_id'] ?? 1,
       ];
     }
     $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);

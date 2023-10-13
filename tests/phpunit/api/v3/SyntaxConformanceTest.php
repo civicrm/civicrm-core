@@ -1370,7 +1370,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
             $entity[$fieldName] = ['sort_name' => "SortName2"];
           }
           else {
-            $entity[$fieldName] = substr('New String', 0, CRM_Utils_Array::Value('maxlength', $specs, 100));
+            $entity[$fieldName] = substr('New String', 0, $specs['maxlength'] ?? 100);
             if ($fieldName == 'email') {
               $entity[$fieldName] = strtolower($entity[$fieldName]);
             }
@@ -1424,7 +1424,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           $entity[$field] = 'warm.beer.com';
       }
       if (empty($specs['FKClassName']) && (!empty($specs['pseudoconstant']) || !empty($specs['options']))) {
-        $options = CRM_Utils_Array::value('options', $specs, []);
+        $options = $specs['options'] ?? [];
         if (!$options) {
           //eg. pdf_format id doesn't ship with any
           if (isset($specs['pseudoconstant']['optionGroupName'])) {
@@ -1434,7 +1434,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
               'sequential' => 1,
             ]);
             $optionValue = $optionValue['values'];
-            $keyColumn = CRM_Utils_Array::value('keyColumn', $specs['pseudoconstant'], 'value');
+            $keyColumn = $specs['pseudoconstant']['keyColumn'] ?? 'value';
             $options[$optionValue[0][$keyColumn]] = 'new option value';
           }
         }

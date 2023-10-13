@@ -244,7 +244,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     }
 
     foreach ($sqlOps as $op) {
-      $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
+      $qillOp = CRM_Core_SelectValues::getSearchBuilderOperators([$op], $op);
       switch ($op) {
         case '=':
           $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customId => (is_array($selectedValue) ? implode(CRM_Core_DAO::VALUE_SEPARATOR, $selectedValue) : $selectedValue)]);
