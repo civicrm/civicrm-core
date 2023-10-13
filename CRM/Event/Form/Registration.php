@@ -618,7 +618,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       if (!empty($form->_priceSet['fields'])) {
         foreach ($form->_priceSet['fields'] as $field) {
           foreach ($field['options'] as $option) {
-            $count = CRM_Utils_Array::value('count', $option, 0);
+            $count = $option['count'] ?? 0;
             $optionsCountDetails['fields'][$field['id']]['options'][$option['id']] = $count;
           }
         }
@@ -633,7 +633,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if (!empty($form->_priceSet['fields'])) {
       foreach ($form->_priceSet['fields'] as $field) {
         foreach ($field['options'] as $option) {
-          $maxVal = CRM_Utils_Array::value('max_value', $option, 0);
+          $maxVal = $option['max_value'] ?? 0;
           $optionsMaxValueDetails['fields'][$field['id']]['options'][$option['id']] = $maxVal;
           $optionsMaxValueTotal += $maxVal;
         }

@@ -2019,7 +2019,7 @@ WHERE  ce.loc_block_id = $locBlockId";
     $participant = new CRM_Event_DAO_Participant();
     $participant->copyValues($params);
 
-    $participant->is_test = CRM_Utils_Array::value('is_test', $params, 0);
+    $participant->is_test = $params['is_test'] ?? 0;
     $participant->selectAdd();
     $participant->selectAdd('status_id');
     if ($participant->find(TRUE) && array_key_exists($participant->status_id, $statusTypes)) {
