@@ -3,6 +3,6 @@
 CRM.$(function($) {
   var emptyMsg = $('.crm-empty-table');
   if (emptyMsg.length) {
-    $('.action-link a.button', '#crm-container').click();
+    $('.action-link a.button', '.crm-container').click();
   }
 });

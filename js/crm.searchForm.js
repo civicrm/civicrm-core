@@ -105,7 +105,7 @@
     $('.crm-form-text:input:visible:first', 'form.crm-search-form').focus();
 
     // Handle user interactions with search results
-    $('#crm-container')
+    $('.crm-container')
       // When toggling between "all records" and "selected records only"
       .on('change', '[name=radio_ts]', function() {
         clearTaskMenu();

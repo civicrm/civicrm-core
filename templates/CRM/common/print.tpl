@@ -23,7 +23,7 @@
 {if $config->debug}
   {include file="CRM/common/debug.tpl"}
 {/if}
-<div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
+<div class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 {crmRegion name='page-header' allowCmsOverride=0}{/crmRegion}
 {* Check for Status message for the page (stored in session->getStatus). Status is cleared on retrieval. *}
 {include file="CRM/common/status.tpl"}

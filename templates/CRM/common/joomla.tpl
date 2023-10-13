@@ -11,7 +11,7 @@
 {include file="CRM/common/debug.tpl"}
 {/if}
 
-<div id="crm-container" class="crm-container{if !empty($urlIsPublic)} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
+<div class="crm-container{if !empty($urlIsPublic)} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 
 <table border="0" cellpadding="0" cellspacing="0" id="crm-content">
   <tr>

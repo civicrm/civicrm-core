@@ -1598,7 +1598,7 @@ if (!CRM.vars) CRM.vars = {};
     $.blockUI.defaults.message = null;
     $.blockUI.defaults.ignoreIfBlocked = true;
 
-    if ($('#crm-container').hasClass('crm-public')) {
+    if ($('.crm-container').hasClass('crm-public')) {
       $.fn.select2.defaults.dropdownCssClass = $.ui.dialog.prototype.options.dialogClass = 'crm-container crm-public';
     }
 
@@ -1608,7 +1608,7 @@ if (!CRM.vars) CRM.vars = {};
     if ($('#crm-notification-container').length) {
       // Initialize notifications
       $('#crm-notification-container').notify();
-      messagesFromMarkup.call($('#crm-container'));
+      messagesFromMarkup.call($('.crm-container'));
     }
 
     $('body')

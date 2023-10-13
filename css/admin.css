@@ -1,20 +1,20 @@
 /* Styles specific to admin pages/forms */
 
 /* Config Task List */
-#crm-container td.tasklist a {
+.crm-container td.tasklist a {
   font-weight: bold;
 }
 
-#crm-container table.selector td.tasklist {
+.crm-container table.selector td.tasklist {
   border-right: 1px solid #dddddd;
   width: 20%;
 }
 
-#crm-container td.tasklist a:link {
+.crm-container td.tasklist a:link {
   color: #ff0105;
 }
 
-#crm-container td.tasklist a:visited {
+.crm-container td.tasklist a:visited {
   color: green;
 }
 
@@ -38,7 +38,7 @@
   color: #e43d2b !important;
 }
 
-#crm-container .crm-extensions-upgrade {
+.crm-container .crm-extensions-upgrade {
   background: #ffb;
   border: 1px solid #000;
   text-align: center;
@@ -60,17 +60,17 @@
 }
 
 @media screen and (min-width: 480px) {
-  #crm-container .admin-section-items {
+  .crm-container .admin-section-items {
     column-count: 2;
     column-gap: 1em;
   }
-  #crm-container .admin-section-items dl {
+  .crm-container .admin-section-items dl {
     -webkit-column-break-inside: avoid;
     page-break-inside: avoid;
     break-inside: avoid;
     margin: 0 1em;
   }
-  #crm-container .admin-section-items dt {
+  .crm-container .admin-section-items dt {
     font-weight: bold;
   }
 }

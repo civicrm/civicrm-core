@@ -32,7 +32,7 @@
   {if $action eq 1 or $action eq 2 or $action eq 4}
   <div id="crm-profile-block" class="crm-container crm-public">
     {else}
-  <div id="crm-container" class="crm-container crm-public" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
+  <div class="crm-container crm-public" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
   {/if}
 
   {if $showSaveDuplicateButton}

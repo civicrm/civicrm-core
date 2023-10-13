@@ -135,7 +135,7 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $html = $e->errorData['html'];
-      $this->assertStringContainsString('<div id="crm-container">
+      $this->assertStringContainsString('<div class="crm-container">
 Unknown token:
     </div>', $html);
       return;
