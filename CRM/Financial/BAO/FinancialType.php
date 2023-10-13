@@ -347,6 +347,8 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
   /**
    * Function to check if lineitems present in a contribution have permissioned FTs.
    *
+   * @deprecated since 5.68 not part of core - to be handled within financialacls extension
+   *
    * @param int $id
    *   contribution id
    * @param string $op
