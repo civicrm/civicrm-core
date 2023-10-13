@@ -211,7 +211,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
         'is_contact_creation_disabled_if_no_match',
         'is_active',
       ])) {
-        $params[$f] = CRM_Utils_Array::value($f, $formValues, FALSE);
+        $params[$f] = $formValues[$f] ?? FALSE;
       }
       else {
         $params[$f] = $formValues[$f] ?? NULL;
