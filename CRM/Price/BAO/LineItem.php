@@ -311,7 +311,7 @@ WHERE li.contribution_id = %1";
       $qty = (float) $qty;
       $price = (float) ($amount_override === NULL ? $options[$oid]['amount'] : $amount_override);
 
-      $participantsPerField = (int) CRM_Utils_Array::value('count', $options[$oid], 0);
+      $participantsPerField = (int) ($options[$oid]['count'] ?? 0);
 
       $values[$oid] = [
         'price_field_id' => $fid,
@@ -329,7 +329,7 @@ WHERE li.contribution_id = %1";
         'auto_renew' => $options[$oid]['auto_renew'] ?? NULL,
         'html_type' => $fields['html_type'],
         'financial_type_id' => $options[$oid]['financial_type_id'] ?? NULL,
-        'tax_amount' => CRM_Utils_Array::value('tax_amount', $options[$oid], 0),
+        'tax_amount' => $options[$oid]['tax_amount'] ?? 0,
         'non_deductible_amount' => $options[$oid]['non_deductible_amount'] ?? NULL,
       ];
 
