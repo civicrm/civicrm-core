@@ -250,7 +250,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         if (!empty($fv['location_type_id'])) {
           foreach ($valuesothers as $vals) {
             if (($vals['location_type_id'] ?? NULL) ==
-              CRM_Utils_Array::value('location_type_id', $fv)
+              ($fv['location_type_id'] ?? NULL)
             ) {
               foreach ($vals as $k => $v) {
                 if (in_array($k, [
