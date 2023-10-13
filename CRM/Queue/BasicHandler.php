@@ -34,12 +34,9 @@ abstract class CRM_Queue_BasicHandler extends AutoService implements EventSubscr
    * Do a unit of work with one item from the queue.
    *
    * @param $item
-   * @param $queue
-   * @return mixed
-   *   Boolean-ish. TRUE for success. FALSE for failure.
-   *   Same as CRM_Queue_Task::run()
+   * @param \CRM_Queue_Queue $queue
    */
-  abstract protected function runItem($item, $queue);
+  abstract protected function runItem($item, $queue): void;
 
   /**
    * Get a nice title for the item.
@@ -122,9 +119,8 @@ abstract class CRM_Queue_BasicHandler extends AutoService implements EventSubscr
     else {
       \Civi::log()->debug("Running task: " . $this->getItemTitle($item));
       try {
-        $runResult = $this->runItem($item, $queue);
-        $outcome = $runResult ? 'ok' : $queue->getSpec('error');
-        $exception = ($outcome === 'ok') ? NULL : new \CRM_Core_Exception('Queue task returned false', 'queue_false');
+        $this->runItem($item, $queue);
+        $outcome = 'ok';
       }
       catch (\Exception $e) {
         $outcome = $queue->getSpec('error');

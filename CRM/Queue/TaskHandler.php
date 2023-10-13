@@ -33,11 +33,12 @@ class CRM_Queue_TaskHandler extends CRM_Queue_BasicHandler {
    *
    * @param $item
    * @param $queue
-   * @return mixed
-   *   Boolean-ish. TRUE for success. FALSE for failure.
    */
-  protected function runItem($item, $queue) {
-    return $item->data->run($this->createContext($queue));
+  protected function runItem($item, $queue): void {
+    $runResult = $item->data->run($this->createContext($queue));
+    if (!$runResult) {
+      throw new \CRM_Core_Exception('Queue task returned false', 'queue_false');
+    }
   }
 
   /**
