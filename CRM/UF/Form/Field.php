@@ -725,11 +725,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
-    $is_required = CRM_Utils_Array::value('is_required', $fields, FALSE);
-    $is_registration = CRM_Utils_Array::value('is_registration', $fields, FALSE);
-    $is_view = CRM_Utils_Array::value('is_view', $fields, FALSE);
-    $in_selector = CRM_Utils_Array::value('in_selector', $fields, FALSE);
-    $is_active = CRM_Utils_Array::value('is_active', $fields, FALSE);
+    $is_required = $fields['is_required'] ?? FALSE;
+    $is_registration = $fields['is_registration'] ?? FALSE;
+    $is_view = $fields['is_view'] ?? FALSE;
+    $in_selector = $fields['in_selector'] ?? FALSE;
+    $is_active = $fields['is_active'] ?? FALSE;
 
     $errors = [];
     if ($is_view && $is_registration) {

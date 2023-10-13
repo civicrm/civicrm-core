@@ -398,7 +398,7 @@ class CRM_Dedupe_MergeHandler {
 
         foreach ($block as $blkCount => $values) {
           $otherBlockId = $migrationInfo['other_details']['location_blocks'][$name][$blkCount]['id'] ?? NULL;
-          $mainBlockId = CRM_Utils_Array::value('mainContactBlockId', $migrationInfo['location_blocks'][$name][$blkCount], 0);
+          $mainBlockId = $migrationInfo['location_blocks'][$name][$blkCount]['mainContactBlockId'] ?? 0;
           if (!$otherBlockId) {
             continue;
           }
