@@ -201,7 +201,7 @@ function financialacls_civicrm_buildAmount($component, $form, &$feeBlock) {
 
   foreach ($feeBlock as $key => $value) {
     foreach ($value['options'] as $k => $options) {
-      if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
+      if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Core_PseudoConstant::getName('CRM_Contribute_DAO_Contribution', 'financial_type_id', $options['financial_type_id']))) {
         unset($feeBlock[$key]['options'][$k]);
       }
     }
@@ -382,6 +382,23 @@ function financialacls_civicrm_alterMenu(array &$menu): void {
     return;
   }
   $menu['civicrm/admin/financial/financialType']['access_arguments'] = [['administer CiviCRM Financial Types']];
+}
+
+/**
+ * @param string $formName
+ * @param \CRM_Core_Form $form
+ */
+function financialacls_civicrm_preProcess(string $formName, \CRM_Core_Form $form): void {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return;
+  }
+  if (str_starts_with($formName, 'CRM_Contribute_Form_Contribution_')) {
+    /* @var \CRM_Contribute_Form_Contribution_Main $form */
+    if (!CRM_Core_Permission::check('add contributions of type ' . $form->getContributionPageValue('financial_type_id:name'))) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+    }
+  }
+
 }
 
 /**
