@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Service\AutoService;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 /**
  * `CRM_Queue_TaskHandler`  a list tasks from a queue. It is designed to supported background
  * tasks which run automatically.
@@ -18,10 +21,14 @@
  *
  * @service civi.queue.task_handler
  */
-class CRM_Queue_TaskHandler extends CRM_Queue_BasicHandler {
+class CRM_Queue_TaskHandler extends AutoService implements EventSubscriberInterface {
 
-  public static function getTypeName(): string {
-    return 'task';
+  use CRM_Queue_BasicHandlerTrait;
+
+  public static function getSubscribedEvents() {
+    return [
+      '&hook_civicrm_queueRun_task' => 'runBatch',
+    ];
   }
 
   protected function validateItem($item): bool {
@@ -34,7 +41,7 @@ class CRM_Queue_TaskHandler extends CRM_Queue_BasicHandler {
    * @param $item
    * @param $queue
    */
-  protected function runItem($item, $queue): void {
+  protected function runItem($item, \CRM_Queue_Queue $queue): void {
     $taskCtx = new \CRM_Queue_TaskContext();
     $taskCtx->queue = $queue;
     $taskCtx->log = \CRM_Core_Error::createDebugLogger();
@@ -42,20 +49,6 @@ class CRM_Queue_TaskHandler extends CRM_Queue_BasicHandler {
     if (!$runResult) {
       throw new \CRM_Core_Exception('Queue task returned false', 'queue_false');
     }
-  }
-
-  /**
-   * Get a nice title for the item.
-   *
-   * @param $item
-   * @return string|null
-   */
-  protected function getItemTitle($item): string {
-    $title = parent::getItemTitle($item);
-    if (isset($item->data->title)) {
-      $title .= '(' . $item->data->title . ')';
-    }
-    return $title;
   }
 
   /**
