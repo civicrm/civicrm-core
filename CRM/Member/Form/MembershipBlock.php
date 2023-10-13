@@ -416,7 +416,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
           }
           $membetype = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($memType);
           $fieldParams['option_label'][$rowCount] = $membetype['name'] ?? NULL;
-          $fieldParams['option_amount'][$rowCount] = CRM_Utils_Array::value('minimum_fee', $membetype, 0);
+          $fieldParams['option_amount'][$rowCount] = $membetype['minimum_fee'] ?? 0;
           $fieldParams['option_weight'][$rowCount] = $membetype['weight'] ?? NULL;
           $fieldParams['option_description'][$rowCount] = $membetype['description'] ?? NULL;
           $fieldParams['default_option'] = $params['membership_type_default'] ?? NULL;
@@ -435,15 +435,15 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         $deletePriceSet = 1;
       }
 
-      $params['is_required'] = CRM_Utils_Array::value('is_required', $params, FALSE);
-      $params['is_active'] = CRM_Utils_Array::value('member_is_active', $params, FALSE);
+      $params['is_required'] = $params['is_required'] ?? FALSE;
+      $params['is_active'] = $params['member_is_active'] ?? FALSE;
 
       if ($priceSetID) {
         $params['membership_types'] = 'null';
         $params['membership_type_default'] = CRM_Utils_Array::value('membership_type_default', $params, 'null');
         $params['membership_types'] = serialize($membershipTypes);
-        $params['display_min_fee'] = CRM_Utils_Array::value('display_min_fee', $params, FALSE);
-        $params['is_separate_payment'] = CRM_Utils_Array::value('is_separate_payment', $params, FALSE);
+        $params['display_min_fee'] = $params['display_min_fee'] ?? FALSE;
+        $params['is_separate_payment'] = $params['is_separate_payment'] ?? FALSE;
       }
       $params['entity_table'] = 'civicrm_contribution_page';
       $params['entity_id'] = $this->_id;

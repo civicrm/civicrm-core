@@ -344,7 +344,7 @@ DESC limit 1");
           continue;
         }
         foreach ($pField['options'] as $opId => $opValues) {
-          $optionsMembershipTypes[$opId] = CRM_Utils_Array::value('membership_type_id', $opValues, 0);
+          $optionsMembershipTypes[$opId] = $opValues['membership_type_id'] ?? 0;
         }
       }
 
@@ -1260,7 +1260,7 @@ DESC limit 1");
         foreach ($lineItem[$this->_priceSetId] as $value) {
           if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
             if (isset($dataArray[$value['tax_rate']])) {
-              $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
+              $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + ($value['tax_amount'] ?? 0);
             }
             else {
               $dataArray[$value['tax_rate']] = $value['tax_amount'] ?? NULL;
