@@ -119,7 +119,7 @@ class CRM_Queue_Runner {
     $this->title = CRM_Utils_Array::value('title', $runnerSpec, ts('Queue Runner'));
     $this->queue = $runnerSpec['queue'];
     $this->errorMode = CRM_Utils_Array::value('errorMode', $runnerSpec, $this->pickErrorMode($this->queue));
-    $this->isMinimal = CRM_Utils_Array::value('isMinimal', $runnerSpec, FALSE);
+    $this->isMinimal = $runnerSpec['isMinimal'] ?? FALSE;
     $this->onEnd = $runnerSpec['onEnd'] ?? NULL;
     $this->onEndUrl = $runnerSpec['onEndUrl'] ?? NULL;
     $this->pathPrefix = CRM_Utils_Array::value('pathPrefix', $runnerSpec, 'civicrm/queue');
