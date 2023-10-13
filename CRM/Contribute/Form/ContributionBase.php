@@ -20,6 +20,7 @@
  */
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   use CRM_Financial_Form_FrontEndPaymentFormTrait;
+  use CRM_Contribute_Form_ContributeFormTrait;
 
   /**
    * The id of the contribution page that we are processing.
@@ -274,6 +275,28 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Get id of contribution page being acted on.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int
+   */
+  public function getContributionPageID(): int {
+    if (!$this->_id) {
+      /** @noinspection PhpUnhandledExceptionInspection */
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+      if (!$this->_id) {
+        // seems like the session is corrupted and/or we lost the id trail
+        // lets just bump this to a regular session error and redirect user to main page
+        $this->controller->invalidKeyRedirect();
+      }
+    }
+    return $this->_id;
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Contribute_Exception_InactiveContributionPageException
@@ -282,13 +305,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public function preProcess() {
 
     // current contribution page id
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->getContributionPageID();
     $this->_ccid = CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
-    if (!$this->_id) {
-      // seems like the session is corrupted and/or we lost the id trail
-      // lets just bump this to a regular session error and redirect user to main page
-      $this->controller->invalidKeyRedirect();
-    }
     $this->_emailExists = $this->get('emailExists');
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
