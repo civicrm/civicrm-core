@@ -12,7 +12,7 @@
 namespace Civi\Afform;
 
 /**
- * Class AngularDependencyMapper
+ * Class used to calculate Afform Angular dependencies.
  * @package Civi\Afform
  */
 class AngularDependencyMapper {
