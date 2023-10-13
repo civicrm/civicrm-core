@@ -989,7 +989,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
             'price_' . $field['id'],
             $field['id'],
             FALSE,
-            CRM_Utils_Array::value('is_required', $field, FALSE),
+            $field['is_required'] ?? FALSE,
             NULL,
             $options
           );
@@ -1284,7 +1284,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $contributionParams,
       $financialType,
       $this->_bltID,
-      CRM_Utils_Array::value('is_recur', $this->_params)
+      $this->_params['is_recur'] ?? NULL
     );
 
     $paymentParams['contributionID'] = $contribution->id;
@@ -1632,7 +1632,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->getPriceSetID() && $action & CRM_Core_Action::UPDATE) {
       $line = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
       $lineID = key($line);
-      $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('price_field_id', $line[$lineID]), 'price_set_id');
+      $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $line[$lineID]['price_field_id'] ?? NULL, 'price_set_id');
       $quickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
       // Why do we do this? Seems like a like a wrapper for old functionality - but single line price sets & quick
       // config should be treated the same.
@@ -1781,7 +1781,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $submittedValues['total_amount'] = $this->_values['total_amount'] ?? NULL;
       // Avoid tax amount deduction on edit form and keep it original, because this will lead to error described in CRM-20676
       if (!$this->_id) {
-        $submittedValues['total_amount'] -= CRM_Utils_Array::value('tax_amount', $this->_values, 0);
+        $submittedValues['total_amount'] -= $this->_values['tax_amount'] ?? 0;
       }
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
@@ -1969,9 +1969,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $contribution->id,
       ($formValues['option_type'] ?? 0) == 2,
       $formValues['total_amount'],
-      CRM_Utils_Array::value('total_amount', $this->_defaults),
+      $this->_defaults['total_amount'] ?? NULL,
       $formValues['contribution_status_id'],
-      CRM_Utils_Array::value('contribution_status_id', $this->_defaults)
+      $this->_defaults['contribution_status_id'] ?? NULL
     );
     return $contribution;
   }
@@ -1993,7 +1993,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     foreach ($lineItem as $key => $value) {
       foreach ($value as $v) {
         if (isset($taxRate[(string) CRM_Utils_Array::value('tax_rate', $v)])) {
-          $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
+          $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + ($v['tax_amount'] ?? 0);
         }
         else {
           if (isset($v['tax_rate'])) {

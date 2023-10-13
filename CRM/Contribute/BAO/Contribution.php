@@ -3366,7 +3366,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     // record line items and financial items
     if (empty($params['skipLineItem'])) {
-      CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $isUpdate);
+      CRM_Price_BAO_LineItem::processPriceSet($entityId, $params['line_item'] ?? NULL, $params['contribution'], $entityTable, $isUpdate);
     }
 
     // create batch entry if batch_id is passed and
@@ -3490,7 +3490,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             'version' => 3,
             'id' => ($props['contribution_page_id']),
           ]);
-          $types = (array) CRM_Utils_Array::value('payment_processor', $page, 0);
+          $types = (array) $page['payment_processor'] ?? 0;
           $params['condition'] = 'id IN (' . implode(',', $types) . ')';
         }
         break;
@@ -3954,7 +3954,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // if we are still empty see if we can use anything from a contribution page.
     if (!empty($pageValues['receipt_from_email'])) {
       return [
-        CRM_Utils_Array::value('receipt_from_name', $pageValues),
+        $pageValues['receipt_from_name'] ?? NULL,
         $pageValues['receipt_from_email'],
       ];
     }

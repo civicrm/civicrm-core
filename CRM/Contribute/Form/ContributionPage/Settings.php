@@ -69,8 +69,8 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
               $defaults['honoree_profile'] = $ufGroupDAO->id;
             }
             $defaults['soft_credit_types'] = [
-              CRM_Utils_Array::value('in_honor_of', $soft_credit_types),
-              CRM_Utils_Array::value('in_memory_of', $soft_credit_types),
+              $soft_credit_types['in_honor_of'] ?? NULL,
+              $soft_credit_types['in_memory_of'] ?? NULL,
             ];
           }
           else {
@@ -92,8 +92,8 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         $defaults['honoree_profile'] = $ufGroupDAO->id;
       }
       $defaults['soft_credit_types'] = [
-        CRM_Utils_Array::value('in_honor_of', $soft_credit_types),
-        CRM_Utils_Array::value('in_memory_of', $soft_credit_types),
+        $soft_credit_types['in_honor_of'] ?? NULL,
+        $soft_credit_types['in_memory_of'] ?? NULL,
       ];
     }
 
@@ -311,11 +311,11 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $params['currency'] = $config->defaultCurrency;
     }
 
-    $params['is_confirm_enabled'] = CRM_Utils_Array::value('is_confirm_enabled', $params, FALSE);
-    $params['is_share'] = CRM_Utils_Array::value('is_share', $params, FALSE);
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['is_credit_card_only'] = CRM_Utils_Array::value('is_credit_card_only', $params, FALSE);
-    $params['honor_block_is_active'] = CRM_Utils_Array::value('honor_block_is_active', $params, FALSE);
+    $params['is_confirm_enabled'] = $params['is_confirm_enabled'] ?? FALSE;
+    $params['is_share'] = $params['is_share'] ?? FALSE;
+    $params['is_active'] = $params['is_active'] ?? FALSE;
+    $params['is_credit_card_only'] = $params['is_credit_card_only'] ?? FALSE;
+    $params['honor_block_is_active'] = $params['honor_block_is_active'] ?? FALSE;
     $params['is_for_organization'] = !empty($params['is_organization']) ? CRM_Utils_Array::value('is_for_organization', $params, FALSE) : 0;
     $params['goal_amount'] = CRM_Utils_Rule::cleanMoney($params['goal_amount']);
 

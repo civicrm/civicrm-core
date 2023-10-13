@@ -517,7 +517,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     //assign cancelSubscription URL to templates
     $this->assign('cancelSubscriptionUrl',
-      CRM_Utils_Array::value('cancelSubscriptionUrl', $this->_values)
+      $this->_values['cancelSubscriptionUrl'] ?? NULL
     );
 
     $title = $this->_values['frontend_title'];

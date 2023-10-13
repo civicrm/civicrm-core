@@ -545,7 +545,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             'price_' . $field['id'],
             $field['id'],
             FALSE,
-            CRM_Utils_Array::value('is_required', $field, FALSE),
+            $field['is_required'] ?? FALSE,
             NULL,
             $options
           );
