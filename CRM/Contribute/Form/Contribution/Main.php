@@ -349,7 +349,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // build price set form.
       $this->set('priceSetId', $this->_priceSetId);
       if (empty($this->_ccid)) {
-        CRM_Price_BAO_PriceSet::buildPriceSet($this, $this->getFormContext());
+        $this->buildPriceSet($this, $this->getFormContext());
       }
       if ($this->_values['is_monetary'] &&
         $this->_values['is_recur'] && empty($this->_values['pledge_id'])
@@ -466,6 +466,93 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $this->addFormRule(['CRM_Contribute_Form_Contribution_Main', 'formRule'], $this);
+  }
+
+  /**
+   * Build the price set form.
+   *
+   * @param CRM_Core_Form $form
+   * @param string|null $component
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  private function buildPriceSet(&$form, $component = NULL) {
+    $priceSetId = $this->getPriceSetID();
+    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, TRUE);
+    $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
+    $validPriceFieldIds = array_keys($form->_priceSet['fields']);
+
+    // Mark which field should have the auto-renew checkbox, if any. CRM-18305
+    if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {
+      $autoRenewMembershipTypes = [];
+      foreach ($form->_membershipTypeValues as $membershipTypeValue) {
+        if ($membershipTypeValue['auto_renew']) {
+          $autoRenewMembershipTypes[] = $membershipTypeValue['id'];
+        }
+      }
+      foreach ($form->_priceSet['fields'] as $field) {
+        if (array_key_exists('options', $field) && is_array($field['options'])) {
+          foreach ($field['options'] as $option) {
+            if (!empty($option['membership_type_id'])) {
+              if (in_array($option['membership_type_id'], $autoRenewMembershipTypes)) {
+                $form->_priceSet['auto_renew_membership_field'] = $field['id'];
+                // Only one field can offer auto_renew memberships, so break here.
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+    $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetId;
+    $form->assign('priceSet', $form->_priceSet);
+
+    $feeBlock = &$form->_values['fee'];
+
+    // Call the buildAmount hook.
+    CRM_Utils_Hook::buildAmount($component ?? 'contribution', $form, $feeBlock);
+
+    // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
+    $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
+    $checklifetime = FALSE;
+    foreach ($feeBlock as $id => $field) {
+      if ($field['visibility'] === 'public' ||
+        ($field['visibility'] === 'admin' && $adminFieldVisible)
+      ) {
+        $options = $field['options'] ?? NULL;
+        $contactId = $form->getVar('_membershipContactID');
+        if ($contactId && $options) {
+          $contactsLifetimeMemberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
+          $contactsLifetimeMembershipTypes = array_column($contactsLifetimeMemberships, 'membership_type_id');
+          $memTypeIdsInPriceField = array_column($options, 'membership_type_id');
+          $isCurrentMember = (bool) array_intersect($memTypeIdsInPriceField, $contactsLifetimeMembershipTypes);
+          $checklifetime = $checklifetime ?: $isCurrentMember;
+        }
+
+        if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
+          continue;
+        }
+        if (!CRM_Core_Permission::check('edit contributions')) {
+          foreach ($options as $key => $currentOption) {
+            if ($currentOption['visibility_id'] == CRM_Price_BAO_PriceField::getVisibilityOptionID('admin')) {
+              unset($options[$key]);
+            }
+          }
+        }
+        if (!empty($options)) {
+          CRM_Price_BAO_PriceField::addQuickFormElement($form,
+            'price_' . $field['id'],
+            $field['id'],
+            FALSE,
+            CRM_Utils_Array::value('is_required', $field, FALSE),
+            NULL,
+            $options
+          );
+        }
+      }
+    }
+    $form->assign('ispricelifetime', $checklifetime);
   }
 
   /**
