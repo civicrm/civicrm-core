@@ -191,6 +191,9 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
           'loc_block_id.phone_2_id.phone_ext',
           'loc_block_id.phone_2_id.phone_type_id:label',
           'is_show_location:label',
+          'allow_selfcancelxfer',
+          'allow_selfcancelxfer:label',
+          'selfcancelxfer_time',
           'is_public:label',
           'is_share',
           'is_share:label',
@@ -263,6 +266,8 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       'description',
       'is_show_location',
       'is_public',
+      'allow_selfcancelxfer',
+      'selfcancelxfer_time',
       'confirm_email_text',
       'is_monetary',
       'fee_label',
@@ -285,6 +290,8 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       'is_public' => ['audience' => 'sysadmin'],
       'is_show_location' => ['audience' => 'sysadmin'],
       'is_monetary' => ['audience' => 'sysadmin'],
+      'allow_selfcancelxfer' => ['audience' => 'sysadmin'],
+      'selfcancelxfer_time' => ['audience' => 'sysadmin'],
     ];
   }
 
