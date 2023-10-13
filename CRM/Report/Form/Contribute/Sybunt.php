@@ -370,9 +370,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
               if (($fieldName == 'contribution_status_id' ||
                   $fieldName == 'financial_type_id') && !empty($clause)
@@ -526,13 +526,13 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
     foreach ($rows as $key => $row) {
       $display["upto_{$upto}"]
-        = CRM_Utils_Array::value("upto_{$upto}", $display) + CRM_Utils_Array::value("civicrm_upto_{$upto}", $row);
+        = ($display["upto_{$upto}"] ?? 0) + ($row["civicrm_upto_{$upto}"] ?? 0);
       $display[$previous_year]
-        = CRM_Utils_Array::value($previous_year, $display) + CRM_Utils_Array::value($previous_year, $row);
+        = ($display[$previous_year] ?? 0) + ($row[$previous_year] ?? 0);
       $display[$previous_two_year]
-        = CRM_Utils_Array::value($previous_two_year, $display) + CRM_Utils_Array::value($previous_two_year, $row);
+        = ($display[$previous_two_year] ?? 0) + ($row[$previous_two_year] ?? 0);
       $display[$previous_three_year]
-        = CRM_Utils_Array::value($previous_three_year, $display) + CRM_Utils_Array::value($previous_three_year, $row);
+        = ($display[$previous_three_year] ?? 0) + ($row[$previous_three_year] ?? 0);
     }
 
     $graphRows['value'] = $display;
