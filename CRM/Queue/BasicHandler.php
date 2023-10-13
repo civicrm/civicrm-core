@@ -106,11 +106,15 @@ abstract class CRM_Queue_BasicHandler extends AutoService implements EventSubscr
    * @throws \CRM_Core_Exception
    */
   final public function run(CRM_Queue_Queue $queue, $item): string {
-    $this->assertType($item->data, ['CRM_Queue_Task'], 'Cannot run. Invalid task given.');
-
     /** @var string $outcome One of 'ok', 'retry', 'delete', 'abort' */
 
-    if (is_numeric($queue->getSpec('retry_limit')) && $item->run_count > 1 + $queue->getSpec('retry_limit')) {
+    if (!$this->validateItem($item)) {
+      // Invalid item. Do not collect $200. Do not pass go. Go directly to fail.
+      \Civi::log()->debug("Skipping invalid item: " . $this->getItemTitle($item));
+      $outcome = $queue->getSpec('error');
+      $exception = new \Exception('Cannot run. Received invalid queue item.');
+    }
+    elseif (is_numeric($queue->getSpec('retry_limit')) && $item->run_count > 1 + $queue->getSpec('retry_limit')) {
       \Civi::log()->debug("Skipping exhausted task: " . $this->getItemTitle($item));
       $outcome = $queue->getSpec('error');
       $exception = new \CRM_Core_Exception(sprintf('Skipping exhausted task after %d tries: %s', $item->run_count, print_r($this->getItemDetails($item), 1)), 'queue_retry_exhausted');
@@ -204,13 +208,8 @@ abstract class CRM_Queue_BasicHandler extends AutoService implements EventSubscr
     }
   }
 
-  final protected function assertType($object, array $types, string $message) {
-    foreach ($types as $type) {
-      if ($object instanceof $type) {
-        return;
-      }
-    }
-    throw new \Exception($message);
+  protected function validateItem($item): bool {
+    return TRUE;
   }
 
   final protected function isRetriable(\CRM_Queue_Queue $queue, $item): bool {

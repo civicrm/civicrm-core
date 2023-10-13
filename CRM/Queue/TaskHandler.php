@@ -24,6 +24,10 @@ class CRM_Queue_TaskHandler extends CRM_Queue_BasicHandler {
     return 'task';
   }
 
+  protected function validateItem($item): bool {
+    return $item->data instanceof CRM_Queue_Task;
+  }
+
   /**
    * Do a unit of work with one item from the queue.
    *
