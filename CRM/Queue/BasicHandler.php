@@ -72,12 +72,24 @@ abstract class CRM_Queue_BasicHandler extends AutoService implements EventSubscr
    * @throws \CRM_Core_Exception
    * @see CRM_Utils_Hook::queueRun()
    */
-
   final public function runBatch(CRM_Queue_Queue $queue, array $items, array &$outcomes): void {
-    foreach ($items as $itemPos => $item) {
-      $outcomes[$itemPos] = $this->run($queue, $item);
+    $todos = array_keys($items);
+
+    while (count($todos)) {
+      $itemPos = array_shift($todos);
+      $outcomes[$itemPos] = $this->run($queue, $items[$itemPos]);
+      if ($outcomes[$itemPos] === 'abort') {
+        break;
+      }
     }
-    // TODO: If an item has outcome==abort, then release the rest of the items.
+
+    // If we aborted without finishing some things, then we prefer to return them gracefully.
+    if (count($todos)) {
+      $this->relinquishItems($queue, CRM_Utils_Array::subset($items, $todos));
+      foreach ($todos as $itemPos) {
+        $outcomes[$itemPos] = 'relinquish';
+      }
+    }
   }
 
   /**
@@ -160,6 +172,36 @@ abstract class CRM_Queue_BasicHandler extends AutoService implements EventSubscr
     }
 
     return $outcome;
+  }
+
+  /**
+   * If the batch of items encounters an 'abort', then any subsequent items
+   * (within the same batch) should be returned to the queue for future work.
+   *
+   * @param \CRM_Queue_Queue|\CRM_Queue_Queue_BatchQueueInterface $queue
+   * @param array $items
+   *   The items that were not attempted.
+   */
+  private function relinquishItems(CRM_Queue_Queue $queue, $items): void {
+    $batchRelinquish = is_callable([$queue, 'relinquishItems']);
+
+    foreach ($items as $item) {
+      $logDetails = [
+        'id' => $queue->getName() . '#' . $item->id,
+        'task' => $this->getItemDetails($item),
+        'outcome' => 'relinquish',
+      ];
+      \Civi::log('queue')->error('Task "{id}" was relinquished due to preceding failure.', $logDetails);
+
+      if (!$batchRelinquish) {
+        // Old/third-party driver.
+        $queue->releaseItem($item);
+      }
+    }
+
+    if ($batchRelinquish) {
+      $queue->relinquishItems($items);
+    }
   }
 
   final protected function assertType($object, array $types, string $message) {
