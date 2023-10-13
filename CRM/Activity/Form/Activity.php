@@ -550,12 +550,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if (isset($this->_activityId)) {
 
       if ($this->_context !== 'standalone') {
-        $this->assign('target_contact_value',
-          CRM_Utils_Array::value('target_contact_value', $defaults)
-        );
-        $this->assign('assignee_contact_value',
-          CRM_Utils_Array::value('assignee_contact_value', $defaults)
-        );
+        $this->assign('target_contact_value', $defaults['target_contact_value'] ?? NULL);
+        $this->assign('assignee_contact_value', CRM_Utils_Array::value('assignee_contact_value', $defaults));
       }
 
       // Fixme: why are we getting the wrong keys from upstream?
