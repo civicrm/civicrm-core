@@ -820,6 +820,8 @@ Receipt Date: ' . date('m/d/Y'),
 
   /**
    * Test the submit function on the contribution page.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitWithNoteCreditCard(): void {
     $this->submitContributionForm([
@@ -830,9 +832,10 @@ Receipt Date: ' . date('m/d/Y'),
       'contribution_status_id' => 1,
       'note' => 'Super cool and interesting stuff',
     ] + $this->getCreditCardParams());
-    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
     $note = $this->callAPISuccessGetSingle('note', ['entity_table' => 'civicrm_contribution']);
     $this->assertEquals('Super cool and interesting stuff', $note['note']);
+    $this->assertEquals($contribution['id'], $this->getDeprecatedProperty('_contributionID'));
   }
 
   /**

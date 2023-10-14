@@ -81,4 +81,16 @@ trait FormTrait {
     }
   }
 
+  /**
+   * Retrieve a deprecated property, ensuring a deprecation notice is thrown.
+   *
+   * @param string $property
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDeprecatedProperty(string $property) {
+    return $this->form->getDeprecatedProperty($property);
+  }
+
 }

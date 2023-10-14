@@ -348,4 +348,25 @@ class FormWrapper {
     \Civi::settings()->set('mailing_backend', $this->originalMailSetting);
   }
 
+  /**
+   * Retrieve a deprecated property, ensuring a deprecation notice is thrown.
+   *
+   * @param string $property
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  public function getDeprecatedProperty(string $property) {
+    try {
+      $this->form->$property;
+    }
+    catch (\Exception $e) {
+      $oldErrorLevel = error_reporting(0);
+      $value = $this->form->$property;
+      error_reporting($oldErrorLevel);
+      return $value;
+    }
+    throw new \CRM_Core_Exception('Deprecation should have been triggered');
+  }
+
 }
