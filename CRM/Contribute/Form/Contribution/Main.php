@@ -541,12 +541,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
         if (!empty($options)) {
+          $label = (!empty($this->_membershipBlock) && $field['name'] === 'contribution_amount') ? ts('Additional Contribution') : $field['label'];
           CRM_Price_BAO_PriceField::addQuickFormElement($form,
             'price_' . $field['id'],
             $field['id'],
             FALSE,
-            CRM_Utils_Array::value('is_required', $field, FALSE),
-            NULL,
+            $field['is_required'] ?? FALSE,
+            $label,
             $options
           );
         }

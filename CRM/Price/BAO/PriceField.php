@@ -256,7 +256,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       /* FIXME: failure! */
       return NULL;
     }
-
+    $label = $label ?: $field['label'];
     $is_pay_later = 0;
     $isQuickConfig = CRM_Price_BAO_PriceSet::isQuickConfig($field->price_set_id);
     if (isset($qf->_mode) && empty($qf->_mode)) {
@@ -273,10 +273,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     $qf->assign('currency', $config->defaultCurrency);
     // get currency name for price field and option attributes
     $currencyName = $config->defaultCurrency;
-
-    if (!isset($label)) {
-      $label = (!empty($qf->_membershipBlock) && $field->name === 'contribution_amount') ? ts('Additional Contribution') : $field->label;
-    }
 
     if (isset($qf->_online) && $qf->_online) {
       $useRequired = FALSE;
