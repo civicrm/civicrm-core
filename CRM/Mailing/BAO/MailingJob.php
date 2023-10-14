@@ -45,7 +45,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       throw new CRM_Core_Exception("Failed to create job: Unknown mailing ID");
     }
     $op = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($op, 'MailingJob', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($op, 'MailingJob', $params['id'] ?? NULL, $params);
 
     $jobDAO = new CRM_Mailing_BAO_MailingJob();
     $jobDAO->copyValues($params);
