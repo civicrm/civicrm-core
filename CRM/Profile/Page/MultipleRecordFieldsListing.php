@@ -228,7 +228,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         if ($returnValues['data_type'] == 'Date') {
           $dateFields[$fieldIDs[$key]] = 1;
           $actualPHPFormats = CRM_Utils_Date::datePluginToPHPFormats();
-          $dateFormat = (array) CRM_Utils_Array::value($returnValues['date_format'], $actualPHPFormats);
+          $dateFormat = (array) ($actualPHPFormats[$returnValues['date_format']] ?? []);
           $timeFormat = $returnValues['time_format'] ?? NULL;
         }
 
