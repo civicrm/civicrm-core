@@ -199,12 +199,7 @@
 {literal}
 <script type="text/javascript">
 
-   var futurePaymentProcessorMapper = [];
-   {/literal}{if $futurePaymentProcessor}
-   {foreach from=$futurePaymentProcessor item="futurePaymentProcessor" key="index"}{literal}
-     futurePaymentProcessorMapper[{/literal}{$index}{literal}] = '{/literal}{$futurePaymentProcessor}{literal}';
-   {/literal}{/foreach}
-   {literal}
+   {/literal}{if $futurePaymentProcessor}{literal}
    CRM.$(function($) {
      var defId = $('input[name="pledge_default_toggle"][value="contribution_date"]').attr('id');
      var calId = $('input[name="pledge_default_toggle"][value="calendar_date"]').attr('id');
@@ -382,13 +377,13 @@
     function showAdjustRecurring( paymentProcessorIds ) {
         var display = true;
         cj.each(paymentProcessorIds, function(k, id){
-            if( cj.inArray(id, futurePaymentProcessorMapper) == -1 ) {
-                display = false;
-            }
+           if( cj.inArray(parseInt(id), {/literal}{$futurePaymentProcessor}{literal}) == -1 ) {
+              display = false;
+          }
         });
 
         if(display) {
-            cj( '#adjustRecurringFields' ).show( );
+            cj('#adjustRecurringFields').show();
         } else {
             if ( cj( '#adjust_recur_start_date' ).prop('checked' ) ) {
                 cj( '#adjust_recur_start_date' ).prop('checked', false);

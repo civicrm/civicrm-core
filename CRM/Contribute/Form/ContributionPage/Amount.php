@@ -98,9 +98,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     if (count($recurringPaymentProcessor)) {
       $this->assign('recurringPaymentProcessor', $recurringPaymentProcessor);
     }
-    if (count($futurePaymentProcessor)) {
-      $this->assign('futurePaymentProcessor', $futurePaymentProcessor);
-    }
+    $this->assign('futurePaymentProcessor', json_encode($futurePaymentProcessor ?? [], TRUE));
     if (count($paymentProcessor)) {
       $this->assign('paymentProcessor', $paymentProcessor);
     }
@@ -144,7 +142,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     else {
       $this->assign('price', TRUE);
     }
-
+    $this->assign('isQuick', $this->isQuickConfig());
     $this->addSelect('price_set_id', [
       'entity' => 'PriceSet',
       'option_url' => 'civicrm/admin/price',
@@ -208,12 +206,10 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     if (empty($defaults['pay_later_text'])) {
       $defaults['pay_later_text'] = ts('I will send payment by check');
     }
-
     if (!empty($defaults['amount_block_is_active'])) {
 
       if ($priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id, NULL)) {
-        if ($isQuick = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config')) {
-          $this->assign('isQuick', $isQuick);
+        if ($this->isQuickConfig()) {
           //$priceField = CRM_Core_DAO::getFieldValue( 'CRM_Price_DAO_PriceField', $priceSetId, 'id', 'price_set_id' );
           $options = $pFIDs = [];
           $priceFieldParams = ['price_set_id' => $priceSetId];
@@ -826,6 +822,15 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       }
     }
     parent::endPostProcess();
+  }
+
+  /**
+   * Is the price set quick config.
+   *
+   * @return bool
+   */
+  private function isQuickConfig(): bool {
+    return $this->getPriceSetID() && CRM_Price_BAO_PriceSet::isQuickConfig($this->getPriceSetID());
   }
 
   /**
