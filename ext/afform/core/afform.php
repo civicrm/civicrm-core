@@ -469,6 +469,27 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
 }
 
 /**
+ * @implements CRM_Utils_Hook::post
+ */
+function afform_civicrm_post($action, $entity, $id, $object, $params) {
+  // When manually deleting from the navigation menu, also delete it from the Afform
+  // so it doesn't auto-respawn.
+  if ($action === 'delete' && $entity === 'Navigation') {
+    civicrm_api4('Afform', 'update', [
+      'checkPermissions' => FALSE,
+      'where' => [
+        ['server_route', '=', $object->url],
+        ['navigation', 'IS NOT EMPTY'],
+        ['has_local', '=', TRUE],
+      ],
+      'values' => [
+        'navigation' => NULL,
+      ],
+    ]);
+  }
+}
+
+/**
  * Implements hook_civicrm_permissionList().
  *
  * @see CRM_Utils_Hook::permissionList()
