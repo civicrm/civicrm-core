@@ -27,7 +27,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
    */
   public static function create($params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'GroupNesting', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'GroupNesting', $params['id'] ?? NULL, $params);
     $dao = new CRM_Contact_BAO_GroupNesting();
     $dao->copyValues($params);
     if (empty($params['id'])) {

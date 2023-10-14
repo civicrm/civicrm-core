@@ -384,7 +384,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $cc,
       $bcc,
       $additionalDetails,
-      CRM_Utils_Array::value('campaign_id', $formValues),
+      $formValues['campaign_id'] ?? NULL,
       $this->getCaseID()
     );
 

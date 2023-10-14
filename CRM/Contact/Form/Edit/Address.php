@@ -296,7 +296,7 @@ class CRM_Contact_Form_Edit_Address {
                 $streetAddress .= ' ';
               }
             }
-            $streetAddress .= CRM_Utils_Array::value($fld, $address);
+            $streetAddress .= $address[$fld] ?? '';
           }
           $streetAddress = trim($streetAddress);
           if (!empty($streetAddress)) {
