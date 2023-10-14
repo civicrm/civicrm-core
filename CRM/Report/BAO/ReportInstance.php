@@ -240,7 +240,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
       // When deleting a report, also delete from navigation menu
       $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $event->id, 'navigation_id');
       if ($navId) {
-        CRM_Core_BAO_Navigation::processDelete($navId);
+        CRM_Core_BAO_Navigation::deleteRecord(['id' => $navId]);
         CRM_Core_BAO_Navigation::resetNavigation();
       }
     }
