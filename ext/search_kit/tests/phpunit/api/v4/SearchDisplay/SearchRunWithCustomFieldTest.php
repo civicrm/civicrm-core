@@ -502,4 +502,90 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     $this->assertEquals('Dewey', $result[0]['columns'][0]['val']);
   }
 
+  public function testJoinWithCustomFieldEndingIn_() {
+    $subject = uniqid(__FUNCTION__);
+
+    $contact = Contact::create(FALSE)
+      ->execute()->single();
+
+    // CustomGroup based on Activity Type
+    CustomGroup::create(FALSE)
+      ->addValue('extends', 'Activity')
+      ->addValue('title', 'testactivity2')
+      ->addChain('field', CustomField::create()
+        ->addValue('custom_group_id', '$id')
+        ->addValue('label', 'testactivity_')
+        ->addValue('data_type', 'Boolean')
+        ->addValue('html_type', 'Radio')
+      )
+      ->execute();
+
+    $sampleData = [
+      ['activity_type_id:name' => 'Meeting', 'testactivity2.testactivity_' => TRUE],
+    ];
+    $this->saveTestRecords('Activity', [
+      'defaults' => ['subject' => $subject, 'source_contact_id', $contact['id']],
+      'records' => $sampleData,
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'GROUP_CONCAT(DISTINCT Contact_ActivityContact_Activity_01.testactivity2.testactivity_:label) AS GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label',
+          ],
+          'orderBy' => [],
+          'where' => [['contact_type:name', '=', 'Individual']],
+          'groupBy' => ['id'],
+          'join' => [
+            ['Activity AS Contact_ActivityContact_Activity_01', 'INNER', 'ActivityContact',
+              ['id', '=', 'Contact_ActivityContact_Activity_01.contact_id'],
+              ['Contact_ActivityContact_Activity_01.record_type_id:name', '=', '"Activity Source"'],
+              ['Contact_ActivityContact_Activity_01.activity_type_id:name', '=', '"Meeting"'],
+            ],
+          ],
+          'having' => [],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'dataType' => 'Integer',
+              'label' => 'Contact ID',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label',
+              'dataType' => 'Boolean',
+              'label' => '(List) Contact Activities: testactivity2: testactivity_',
+              'sortable' => TRUE,
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+
+    $this->assertArrayHasKey('GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label', $result[0]['data']);
+    $this->assertEquals('Yes', $result[0]['data']['GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label'][0]);
+  }
+
 }

@@ -68,6 +68,26 @@ abstract class SqlExpression {
 
   abstract protected function initialize();
 
+  private static function munge($name, $char = '_', $len = 63) {
+    // Replace all white space and non-alpha numeric with $char
+    // we only use the ascii character set since mysql does not create table names / field names otherwise
+    // CRM-11744
+    $name = preg_replace('/[^a-zA-Z0-9_]+/', $char, trim($name));
+
+    // If there are no ascii characters present.
+    if (!strlen(trim($name, $char))) {
+      $name = \CRM_Utils_String::createRandom($len, \CRM_Utils_String::ALPHANUMERIC);
+    }
+
+    if ($len) {
+      // lets keep variable names short
+      return substr($name, 0, $len);
+    }
+    else {
+      return $name;
+    }
+  }
+
   /**
    * Converts a string to a SqlExpression object.
    *
@@ -82,7 +102,7 @@ abstract class SqlExpression {
   public static function convert(string $expression, $parseAlias = FALSE, $mustBe = []) {
     $as = $parseAlias ? strrpos($expression, ' AS ') : FALSE;
     $expr = $as ? substr($expression, 0, $as) : $expression;
-    $alias = $as ? \CRM_Utils_String::munge(substr($expression, $as + 4), '_', 256) : NULL;
+    $alias = $as ? self::munge(substr($expression, $as + 4), '_', 256) : NULL;
     $bracketPos = strpos($expr, '(');
     $firstChar = substr($expr, 0, 1);
     $lastChar = substr($expr, -1);
