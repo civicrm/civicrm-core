@@ -318,7 +318,7 @@ class CRM_Report_Form_Instance {
       // Delete navigation if exists.
       $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instanceID, 'navigation_id', 'id');
       if ($navId) {
-        CRM_Core_BAO_Navigation::processDelete($navId);
+        CRM_Core_BAO_Navigation::deleteRecord(['id' => $navId]);
         CRM_Core_BAO_Navigation::resetNavigation();
       }
     }
