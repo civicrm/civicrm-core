@@ -846,7 +846,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $params['total_amount'] = CRM_Utils_Rule::cleanMoney($params['total_amount']);
     }
     if ($this->_isPaidEvent) {
-      [$contributionParams, $lineItem, $additionalParticipantDetails, $params] = $this->preparePaidEventProcessing($params);
+      [$contributionParams, $lineItem, $params] = $this->preparePaidEventProcessing($params);
     }
 
     $this->_params = $params;
@@ -1202,7 +1202,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     if (!empty($params['send_receipt'])) {
-      $result = $this->sendReceipts($params, $participants, $lineItem[0] ?? [], $additionalParticipantDetails ?? []);
+      $result = $this->sendReceipts($params, $participants);
     }
 
     // set the participant id if it is not set
@@ -1531,7 +1531,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
 
-    return [$contributionParams, $lineItem, $additionalParticipantDetails, $params];
+    return [$contributionParams, $lineItem, $params];
   }
 
   /**
@@ -1887,14 +1887,12 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
   /**
    * @param $params
    * @param array $participants
-   * @param $lineItem
-   * @param $additionalParticipantDetails
    *
    * @return array
    * @throws \CRM_Core_Exception
    * @throws \Brick\Money\Exception\UnknownCurrencyException
    */
-  protected function sendReceipts($params, array $participants, $lineItem, $additionalParticipantDetails): array {
+  protected function sendReceipts($params, array $participants): array {
     $sent = [];
     $notSent = [];
     $this->assignEventDetailsToTpl($params['event_id'], CRM_Utils_Array::value('role_id', $params), CRM_Utils_Array::value('receipt_text', $params));
