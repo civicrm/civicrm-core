@@ -97,10 +97,6 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
       $params['weight'] = self::calculateWeight(CRM_Utils_Array::value('parent_id', $params));
     }
 
-    if (array_key_exists('permission', $params) && is_array($params['permission'])) {
-      $params['permission'] = implode(',', $params['permission']);
-    }
-
     return self::writeRecord($params);
   }
 
@@ -594,6 +590,7 @@ ORDER BY weight";
    * @deprecated  - use API
    */
   public static function processRename($nodeID, $label) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     self::writeRecord(['id' => $nodeID, 'label' => $label]);
   }
 
@@ -604,6 +601,7 @@ ORDER BY weight";
    * @deprecated - use API
    */
   public static function processDelete($nodeID) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     self::deleteRecord(['id' => $nodeID]);
   }
 
