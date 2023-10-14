@@ -120,6 +120,9 @@
           else if (urlArgs && (ctrl.fieldName in urlArgs)) {
             setValue(urlArgs[ctrl.fieldName]);
           }
+          else if (ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
+            setValue(ctrl.afFieldset.getStoredValue(ctrl.fieldName));
+          }
           // Set default value based on field defn
           else if ('afform_default' in ctrl.defn) {
             setValue(ctrl.defn.afform_default);
