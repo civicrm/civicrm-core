@@ -291,7 +291,13 @@ class CRM_Core_ManagedEntities {
     }
     elseif ($doUpdate && $item['params']['version'] == 4) {
       $params = ['checkPermissions' => FALSE] + $item['params'];
-      $params['values']['id'] = $item['entity_id'];
+      $idField = CoreUtil::getIdFieldName($item['entity_type']);
+      $params['values'][$idField] = $item['entity_id'];
+      // Exclude "weight" as that auto-adjusts
+      if (in_array('SortableEntity', CoreUtil::getInfoItem($item['entity_type'], 'type'), TRUE)) {
+        $weightCol = CoreUtil::getInfoItem($item['entity_type'], 'order_by');
+        unset($params['values'][$weightCol]);
+      }
       // 'match' param doesn't apply to "update" action
       unset($params['match']);
       try {
