@@ -211,9 +211,16 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
     if (!$this->participant) {
       $this->participant = Participant::get(FALSE)
         ->addWhere('id', '=', $this->participantID)
-        ->addSelect('registered_by_id')->execute()->first();
+        ->setSelect($this->getFieldsToLoadForParticipant())->execute()->first();
     }
     return $this->participant;
+  }
+
+  /**
+   * Get the participant fields we need to load.
+   */
+  protected function getFieldsToLoadForParticipant(): array {
+    return ['registered_by_id'];
   }
 
   /**

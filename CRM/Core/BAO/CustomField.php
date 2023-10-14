@@ -856,6 +856,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           && $field['custom_group_id.is_public']
           && (
             !empty($entityValueMatches)
+            || empty($entityFilters)
             || empty($field['custom_group_id.extends_entity_column_id'])
           )
           && (
