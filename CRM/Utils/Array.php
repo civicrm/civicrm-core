@@ -43,18 +43,22 @@ class CRM_Utils_Array {
   }
 
   /**
-   * Returns $list[$key] if such element exists, or a default value otherwise.
+   * Returns $list[$key] if such element exists, or $default otherwise.
    *
-   * If $list is not actually an array at all, then the default value is
-   * returned. We hope to deprecate this behaviour.
+   * If $list is not an array or ArrayAccess object, $default is returned.
    *
+   * This function behaves exactly like:
+   *   $list[$key] ?? $default
+   * except that when $list[$key] exists and is NULL, this function will always
+   * return NULL.
    *
    * @param string $key
    *   Key value to look up in the array.
    * @param array|ArrayAccess $list
    *   Array from which to look up a value.
    * @param mixed $default
-   *   (optional) Value to return $list[$key] does not exist.
+   *   (optional) Value to return when $list[$key] does not exist. If $default
+   *   is not specified, NULL is used.
    *
    * @return mixed
    *   Can return any type, since $list might contain anything.
@@ -64,7 +68,6 @@ class CRM_Utils_Array {
       return array_key_exists($key, $list) ? $list[$key] : $default;
     }
     if ($list instanceof ArrayAccess) {
-      // ArrayAccess requires offsetExists is implemented for the equivalent to array_key_exists.
       return $list->offsetExists($key) ? $list[$key] : $default;
     }
     // @todo - eliminate these from core & uncomment this line.

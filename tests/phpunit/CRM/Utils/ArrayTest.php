@@ -513,4 +513,19 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals(0, $todoCount);
   }
 
+  public function testValue() {
+    $list = ['a' => 'apple', 'b' => 'banana', 'c' => NULL];
+
+    // array key exists; value is not null
+    $this->assertEquals('apple', CRM_Utils_Array::value('a', $list, 'fruit'));
+
+    // array key does not exist
+    $this->assertEquals('fruit', CRM_Utils_Array::value(999, $list, 'fruit'));
+
+    // array key exists; value is null
+    // This is the one situation in which the function's behavior differs from
+    // that of PHP's null-coalescing operator (??)
+    $this->assertEquals(NULL, CRM_Utils_Array::value('c', $list, 'fruit'));
+  }
+
 }
