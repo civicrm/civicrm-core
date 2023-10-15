@@ -550,12 +550,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if (isset($this->_activityId)) {
 
       if ($this->_context !== 'standalone') {
-        $this->assign('target_contact_value',
-          CRM_Utils_Array::value('target_contact_value', $defaults)
-        );
-        $this->assign('assignee_contact_value',
-          CRM_Utils_Array::value('assignee_contact_value', $defaults)
-        );
+        $this->assign('target_contact_value', $defaults['target_contact_value'] ?? NULL);
+        $this->assign('assignee_contact_value', $defaults['assignee_contact_value'] ?? NULL);
       }
 
       // Fixme: why are we getting the wrong keys from upstream?
@@ -596,7 +592,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     if ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::RENEW)) {
-      $this->assign('delName', CRM_Utils_Array::value('subject', $defaults));
+      $this->assign('delName', $defaults['subject'] ?? NULL);
     }
 
     if ($this->_activityTypeFile) {
@@ -679,13 +675,13 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           $this->addEntityRef($field, $values['label'], $attribute, $required);
         }
         else {
-          $this->add($values['type'], $field, $values['label'], $attribute, $required, CRM_Utils_Array::value('extra', $values));
+          $this->add($values['type'], $field, $values['label'], $attribute, $required, $values['extra'] ?? NULL);
         }
       }
     }
 
     // CRM-7362 --add campaigns.
-    CRM_Campaign_BAO_Campaign::addCampaign($this, CRM_Utils_Array::value('campaign_id', $this->_values));
+    CRM_Campaign_BAO_Campaign::addCampaign($this, $this->_values['campaign_id'] ?? NULL);
 
     // Add engagement level CRM-7775
     $buildEngagementLevel = FALSE;
