@@ -236,6 +236,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *
    * @param null $fieldOptions
    * @param array $freezeOptions
+   * @param array $extra
+   *   Passed through to the add element function, use to add js.
    *
    * @return null
    */
@@ -247,7 +249,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     $useRequired = TRUE,
     $label = NULL,
     $fieldOptions = NULL,
-    $freezeOptions = []
+    $freezeOptions = [],
+    array $extra = []
   ) {
 
     $field = new CRM_Price_DAO_PriceField();
@@ -256,9 +259,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       /* FIXME: failure! */
       return NULL;
     }
-    $label = $label ?: $field['label'];
+    $label = $label ?: $field->label;
     $is_pay_later = 0;
     $isQuickConfig = CRM_Price_BAO_PriceSet::isQuickConfig($field->price_set_id);
+    // @todo - pass is_pay_later in rather than checking form properties
     if (isset($qf->_mode) && empty($qf->_mode)) {
       $is_pay_later = 1;
     }
@@ -274,6 +278,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     // get currency name for price field and option attributes
     $currencyName = $config->defaultCurrency;
 
+    // @todo - pass useRequired in rather than checking form properties
     if (isset($qf->_online) && $qf->_online) {
       $useRequired = FALSE;
     }
@@ -306,21 +311,16 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $max_value,
         ]);
 
-        $extra = [];
         if (!empty($fieldOptions[$optionKey]['label'])) {
           //check for label.
           $label = $fieldOptions[$optionKey]['label'];
         }
+        // @todo - move this back to the only calling function on Contribution_Form_Main.php
         if ($isQuickConfig && $field->name === 'other_amount') {
           if (!empty($qf->_membershipBlock)) {
             $useRequired = 0;
           }
           $label .= '  ' . $currencySymbol;
-          $qf->assign('priceset', $elementName);
-          $extra = [
-            'onclick' => 'useAmountOther();',
-            'autocomplete' => 'off',
-          ];
         }
 
         $element = &$qf->add('text', $elementName, $label,
@@ -359,10 +359,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       case 'Radio':
         $choice = [];
 
-        if ($isQuickConfig && $field->name === 'contribution_amount') {
-          $qf->assign('contriPriceset', $elementName);
-        }
-
         foreach ($customOption as $opId => $opt) {
           $priceOptionText = self::buildPriceOptionText($opt, $field->is_display_amounts, $valueFieldName);
           if (isset($opt['visibility_id'])) {
@@ -371,16 +367,14 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           else {
             $visibility_id = self::getVisibilityOptionID('public');
           }
-          $extra = [
+          $extra += [
             'price' => json_encode([$elementName, $priceOptionText['priceVal']]),
             'data-amount' => $opt[$valueFieldName],
             'data-currency' => $currencyName,
             'data-price-field-values' => json_encode($customOption),
             'visibility' => $visibility_id,
           ];
-          if ($isQuickConfig && $field->name == 'contribution_amount') {
-            $extra += ['onclick' => 'clearAmountOther();'];
-          }
+          // @todo - move this back to the only calling function on Contribution_Form_Main.php
           if ($field->name == 'membership_amount') {
             $extra += [
               'onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
@@ -395,6 +389,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $qf->add('text', 'txt-' . $elementName, $label, ['size' => '4']);
           }
         }
+        // @todo - move this back to the only calling function on Contribution_Form_Main.php
         if (!empty($qf->_membershipBlock) && $field->name == 'contribution_amount') {
           $choice['-1'] = ts('No thank you');
           $choiceAttrs['-1'] = [
@@ -431,6 +426,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
 
         // make contribution field required for quick config when membership block is enabled
+        // @todo - move this back to the only calling function on Contribution_Form_Main.php
         if (($field->name == 'membership_amount' || $field->name == 'contribution_amount')
           && !empty($qf->_membershipBlock) && !$field->is_required
         ) {
@@ -524,6 +520,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
         break;
     }
+    // @todo - move this action back to the calling function
     if (isset($qf->_online) && $qf->_online) {
       $element->freeze();
     }
@@ -733,7 +730,7 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
         }
       }
 
-      list($componentName) = explode(':', $fields['_qf_default']);
+      [$componentName] = explode(':', $fields['_qf_default']);
       // now we have all selected amount in hand.
       $totalAmount = array_sum($selectedAmounts);
       // The form offers a field to enter the amount paid. This may differ from the amount that is due to complete the purchase
