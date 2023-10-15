@@ -20,6 +20,11 @@ use Civi\Test\FormWrappers\EventFormParticipant;
 trait FormTrait {
 
   /**
+   * @var \Civi\Test\FormWrapper
+   */
+  private $form;
+
+  /**
    * @param $formName
    * @param $submittedValues
    * @param array $urlParameters
@@ -27,13 +32,65 @@ trait FormTrait {
    * @return \Civi\Test\FormWrapper
    */
   public function getTestForm($formName, $submittedValues, array $urlParameters = []) {
+    $this->form = NULL;
     if ($formName === 'CRM_Event_Form_Participant') {
-      return new EventFormParticipant($formName, $submittedValues, $urlParameters);
+      $this->form = new EventFormParticipant($formName, $submittedValues, $urlParameters);
     }
     if ($formName === 'CRM_Event_Form_Registration_Register') {
-      return new EventFormOnline($formName, $submittedValues, $urlParameters);
+      $this->form = new EventFormOnline($formName, $submittedValues, $urlParameters);
     }
-    return new FormWrapper($formName, $submittedValues, $urlParameters);
+    if (!$this->form) {
+      $this->form = new FormWrapper($formName, $submittedValues, $urlParameters);
+    }
+    return $this->form;
+  }
+
+  /**
+   * Assert that the sent mail included the supplied strings.
+   *
+   * @param array $strings
+   * @param int $mailIndex
+   */
+  protected function assertMailSentContainingStrings(array $strings, int $mailIndex = 0): void {
+    foreach ($strings as $string) {
+      $this->assertMailSentContainingString($string, $mailIndex);
+    }
+  }
+
+  /**
+   * Assert that the sent mail included the supplied string.
+   *
+   * @param string $string
+   * @param int $mailIndex
+   */
+  protected function assertMailSentContainingString(string $string, int $mailIndex = 0): void {
+    $mail = $this->form->getMail()[$mailIndex];
+    $this->assertStringContainsString($string, $mail['body']);
+  }
+
+  /**
+   * Assert that the sent mail included the supplied strings.
+   *
+   * @param array $recipients
+   * @param int $mailIndex
+   */
+  protected function assertMailSentTo(array $recipients, int $mailIndex = 0): void {
+    $mail = $this->form->getMail()[$mailIndex];
+    foreach ($recipients as $string) {
+      $this->assertStringContainsString($string, $mail['headers']);
+    }
+  }
+
+  /**
+   * Retrieve a deprecated property, ensuring a deprecation notice is thrown.
+   *
+   * @param string $property
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDeprecatedProperty(string $property) {
+    return $this->form->getDeprecatedProperty($property);
   }
 
 }

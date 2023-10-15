@@ -210,10 +210,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $payment_instrument_id;
 
   /**
+   * @var bool
+   */
+  private $_payNow;
+
+  /**
    * Explicitly declare the form context.
    */
   public function getDefaultContext() {
     return 'create';
+  }
+
+  public function __get($name) {
+    if ($name === '_contributionID') {
+      CRM_Core_Error::deprecatedWarning('_contributionID is not a form property - use getContributionID()');
+      return $this->getContributionID();
+    }
+    return NULL;
   }
 
   /**
@@ -306,7 +319,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // Set title
     if ($this->_mode && $this->_id) {
       $this->_payNow = TRUE;
-      $this->assign('payNow', $this->_payNow);
       $this->setTitle(ts('Pay with Credit Card'));
     }
     elseif ($this->_values['is_template']) {
@@ -318,6 +330,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     else {
       $this->setPageTitle($this->_ppID ? ts('Pledge Payment') : ts('Contribution'));
     }
+    $this->assign('payNow', $this->_payNow);
   }
 
   private function preProcessPledge(): void {
@@ -1468,9 +1481,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $smarty->assign('dataArray', $dataArray);
         $smarty->assign('totalTaxAmount', $params['tax_amount'] ?? NULL);
       }
-
-      // lets store it in the form variable so postProcess hook can get to this and use it
-      $form->_contributionID = $contribution->id;
     }
 
     // process soft credit / pcp params first

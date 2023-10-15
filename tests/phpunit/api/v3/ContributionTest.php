@@ -1173,8 +1173,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Tests that additional financial records are created.
    *
    * Checks when online contribution with pay later option is created
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateContributionPayLaterOnline(): void {
     $this->pageParams['is_pay_later'] = 1;
@@ -1238,8 +1236,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test that BAO defaults work.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateBAODefaults(): void {
     unset($this->_params['contribution_source_id'], $this->_params['payment_instrument_id']);
@@ -1256,8 +1252,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test that getsingle can be chained with delete.
-   *
-   * @throws CRM_Core_Exception
    */
   public function testDeleteChainedGetSingle(): void {
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
@@ -1393,8 +1387,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Function tests that financial records are added when Contribution is Refunded.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateContributionRefund(): void {
     $contributionParams = [
@@ -1686,8 +1678,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Function tests that financial records are added when Financial Type is Changed.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateContributionChangeFinancialType(): void {
     $contributionParams = [
@@ -2635,7 +2625,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function contributionStatusProvider() {
+  public function contributionStatusProvider(): array {
     $contributionStatuses = civicrm_api3('OptionValue', 'get', [
       'return' => ['id', 'name'],
       'option_group_id' => 'contribution_status',
@@ -3783,10 +3773,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @param CiviMailUtils $mut
    * @param int $contributionID Contribution ID
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function checkCreditCardDetails($mut, $contributionID) {
+  public function checkCreditCardDetails(CiviMailUtils $mut, int $contributionID): void {
     $this->callAPISuccess('contribution', 'create', $this->_params);
     $this->callAPISuccess('contribution', 'sendconfirmation', [
       'id' => $contributionID,
@@ -3991,8 +3979,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param int $contId
    *
    * @return null|string
+   * @throws \CRM_Core_Exception
    */
-  public function _getFinancialItemAmount($contId) {
+  public function _getFinancialItemAmount(int $contId): ?string {
     $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
     $query = "SELECT
      SUM(amount)
@@ -4536,10 +4525,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test sending a mail via the API.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testSendMailWithRepeatTransactionAPIFalltoDomain(): void {
+  public function testSendMailWithRepeatTransactionAPIFailtoDomain(): void {
     $this->createLoggedInUser();
     $mut = new CiviMailUtils($this, TRUE);
     $contribution = $this->setUpRepeatTransaction([], 'single');
@@ -4828,8 +4815,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param string $op
    * @param string $objectName
    * @param int|null $objectId
-   *
-   * @throws \CRM_Core_Exception
    */
   public function civicrmPostContributionCustom(string $op, string $objectName, ?int $objectId): void {
     if ($objectName === 'Contribution' && $op === 'create') {
