@@ -202,9 +202,6 @@
         "path": "bower_components/es-module-shims/dist/es-module-shims.js",
         "_comment": "See also https://github.com/guybedford/es-module-shims/. MIT license."
       },
-      "es6-promise": {
-        "url": "https://github.com/components/es6-promise/archive/v4.2.4.zip"
-      },
       "ext-greenwich-bootstrap3": {
         "url": "https://github.com/twbs/bootstrap-sass/archive/v{$version}.zip",
         "path": "ext/greenwich/extern/bootstrap3",
