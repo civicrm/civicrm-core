@@ -261,7 +261,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         if ($gId) {
           $email = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gId, 'notify');
           if ($email) {
-            $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $contactID, CRM_Utils_Array::value($key, $params), TRUE);
+            $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $contactID, $params[$key] ?? NULL, TRUE);
             CRM_Core_BAO_UFGroup::commonSendMail($contactID, $val);
           }
         }

@@ -30,7 +30,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    */
   public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'ContributionSoft', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'ContributionSoft', $params['id'] ?? NULL, $params);
 
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
     $contributionSoft->copyValues($params);

@@ -529,7 +529,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     }
 
     $tplParams['credit_card_exp_date'] = isset($params['credit_card_exp_date']) ? CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($params['credit_card_exp_date'])) : NULL;
-    $tplParams['credit_card_type'] = CRM_Utils_Array::value('credit_card_type', $params);
+    $tplParams['credit_card_type'] = $params['credit_card_type'] ?? NULL;
     $tplParams['credit_card_number'] = CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $params));
     return $tplParams;
   }

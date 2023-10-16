@@ -83,7 +83,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $values['contribution_page_title'] = '';
     if (!empty($values['contribution_page_id'])) {
       $contribPages = CRM_Contribute_PseudoConstant::contributionPage(NULL, TRUE);
-      $values['contribution_page_title'] = CRM_Utils_Array::value(CRM_Utils_Array::value('contribution_page_id', $values), $contribPages);
+      $values['contribution_page_title'] = $contribPages[$values['contribution_page_id']] ?? '';
     }
 
     // get received into i.e to_financial_account_id from last trxn

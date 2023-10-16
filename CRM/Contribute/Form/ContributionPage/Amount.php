@@ -443,7 +443,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       if (array_key_exists(CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor', 'AuthNet',
           'id', 'payment_processor_type_id'
         ),
-        CRM_Utils_Array::value('payment_processor', $params)
+        ($params['payment_processor'] ?? NULL)
       )) {
         CRM_Core_Session::setStatus(ts(' Please note that the Authorize.net payment processor only allows recurring contributions and auto-renew memberships with payment intervals from 7-365 days or 1-12 months (i.e. not greater than 1 year).'), '', 'alert');
       }
@@ -497,8 +497,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       $params['recur_frequency_unit'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
         array_keys($params['recur_frequency_unit'])
       );
-      $params['is_recur_interval'] = CRM_Utils_Array::value('is_recur_interval', $params, FALSE);
-      $params['is_recur_installments'] = CRM_Utils_Array::value('is_recur_installments', $params, FALSE);
+      $params['is_recur_interval'] = $params['is_recur_interval'] ?? FALSE;
+      $params['is_recur_installments'] = $params['is_recur_installments'] ?? FALSE;
     }
 
     if (!empty($params['adjust_recur_start_date'])) {
@@ -814,7 +814,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       }
 
       if ($deleteAmountBlk) {
-        $priceField = !empty($params['price_field_id']) ? $params['price_field_id'] : CRM_Utils_Array::value('price_field_other', $params);
+        $priceField = !empty($params['price_field_id']) ? $params['price_field_id'] : $params['price_field_other'] ?? NULL;
         if ($priceField) {
           $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $priceField, 'price_set_id');
           CRM_Price_BAO_PriceSet::setIsQuickConfig($priceSetID, 0);

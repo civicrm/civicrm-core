@@ -287,12 +287,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionID);
       foreach ($lineItem as $taxRate) {
         if (isset($dataArray[(string) $taxRate['tax_rate']])) {
-          $dataArray[(string) $taxRate['tax_rate']] = $dataArray[(string) $taxRate['tax_rate']] + CRM_Utils_Array::value('tax_amount', $taxRate);
+          $dataArray[(string) $taxRate['tax_rate']] = $dataArray[(string) $taxRate['tax_rate']] + ($taxRate['tax_amount'] ?? 0);
         }
         else {
           $dataArray[(string) $taxRate['tax_rate']] = $taxRate['tax_amount'] ?? NULL;
         }
-        $subTotal += CRM_Utils_Array::value('subTotal', $taxRate);
+        $subTotal += $taxRate['subTotal'] ?? 0;
       }
 
       // to email the invoice
