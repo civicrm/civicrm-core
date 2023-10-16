@@ -92,7 +92,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    */
   public static function formRule($params, $files, $self) {
     $errors = [];
-    if (!empty($params['is_active'])) {
+    if (!empty($params['pcp_active'])) {
 
       if (!empty($params['is_tellfriend_enabled']) &&
         (CRM_Utils_Array::value('tellfriend_limit', $params) <= 0)

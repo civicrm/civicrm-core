@@ -392,7 +392,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
       $form->assign('profile', $profile);
     }
 
-    $form->add('select', 'supporter_profile_id', ts('Supporter Profile'), ['' => ts('- select -')] + $profile, TRUE, ['class' => 'crm-select2']);
+    $form->add('select', 'supporter_profile_id', ts('Supporter Profile'), ['' => ts('- select -')] + $profile, FALSE, ['class' => 'crm-select2']);
 
     //CRM-15821 - To add new option for PCP "Owner" notification
     $ownerNotifications = CRM_Core_OptionGroup::values('pcp_owner_notify');
