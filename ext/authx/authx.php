@@ -127,20 +127,3 @@ function authx_civicrm_permission(&$permissions) {
   $permissions['generate any authx credential'] = E::ts('Authx: Generate new JWT credentials for other users via the API');
   $permissions['validate any authx credential'] = E::ts('Authx: Validate credentials for other users via the API');
 }
-
-/**
- * Implements hook_civicrm_navigationMenu().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu
- */
-function authx_civicrm_navigationMenu(&$menu) {
-  _authx_civix_insert_navigation_menu($menu, 'Administer/System Settings', [
-    'label' => E::ts('Authentication'),
-    'name' => 'authx_admin',
-    'url' => 'civicrm/admin/setting/authx',
-    'permission' => 'administer CiviCRM',
-    'operator' => 'OR',
-    'separator' => 0,
-  ]);
-  _authx_civix_navigationMenu($menu);
-}

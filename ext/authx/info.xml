@@ -2,7 +2,7 @@
 <extension key="authx" type="module">
   <file>authx</file>
   <name>AuthX</name>
-  <description>Extended authentication services</description>
+  <description>Extended authentication for external systems</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Tim Otten</author>
@@ -32,9 +32,11 @@
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
+    <mixin>setting-admin@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Authx</namespace>
     <format>23.02.1</format>
+    <setting-page-title>Authentication</setting-page-title>
   </civix>
 </extension>
