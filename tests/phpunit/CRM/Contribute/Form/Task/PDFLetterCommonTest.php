@@ -294,7 +294,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     <style type="text/css">@import url(' . CRM_Core_Config::singleton()->userFrameworkResourceURL . 'css/print.css);</style>
 ' . "    \n" . '  </head>
   <body>
-    <div id="crm-container">
+    <div class="crm-container">
 id : 1
 total_amount : €9,999.99
 fee_amount : €1,111.11

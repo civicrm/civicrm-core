@@ -138,10 +138,10 @@
           message: '{/literal}{ts escape='js'}This will add links for all currently active reports to the "Reports" menu under the relevant component. If you have added report instances to other menus, they will be moved to "Reports".  Are you sure?{/ts}{literal}'
         })
           .on('crmConfirm:yes', function() {
-            $('#crm-container').block();
+            $('.crm-container').block();
             CRM.api3('Navigation', 'reset', {'for': 'report'}, true)
               .then(function() {
-                $('#crm-container').unblock();
+                $('.crm-container').unblock();
                 $("#navigation-tree").jstree(true).refresh();
                 refreshMenubar();
               });

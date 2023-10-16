@@ -84,7 +84,7 @@
     });
   };
 
-  $('#crm-container').on('crmLoad', function() {
+  $('.crm-container').on('crmLoad', function() {
     $('.crm-profile-selector:not(.rendered)', this).each(function() {
       $(this).crmProfileSelector({
         groupTypeFilter: $(this).data('groupType'),

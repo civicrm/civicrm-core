@@ -298,7 +298,7 @@ CRM.$(function($) {
     return false;
   });
 
-  $('#crm-container').on('click', 'a.action-item[href="#"]', function(event) {
+  $('.crm-container').on('click', 'a.action-item[href="#"]', function(event) {
     event.stopImmediatePropagation();
     editRecords([$(this).closest('tr').attr('data-id')], $(this).attr('rel'));
     return false;

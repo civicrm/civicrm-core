@@ -12,7 +12,7 @@
     {if $overlayProfile}
         {include file="CRM/Profile/Page/Overlay.tpl"}
     {else}
-        <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
+        <div class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
             <div class="crm-profile-name-{$ufGroupName}">
             {crmRegion name="profile-view-`$ufGroupName`"}
             {foreach from=$profileFields item=field key=rowName}

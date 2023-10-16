@@ -27,13 +27,13 @@ img {
   border: 0;
 }
 /* Added in CiviCRM 2.0 to alleviate tiny font issues. */
-#crm-container tr,
-#crm-container tr td {
+.crm-container tr,
+.crm-container tr td {
   font-size: 1em;
 }
 
 /* Added in CiviCRM 2.1 to overwrite tiny font in TinyMCE editor. */
-#crm-container #content table.mceLayout td {
+.crm-container #content table.mceLayout td {
   font-size: 0em;
 }
 
@@ -110,13 +110,13 @@ br.clear {
   list-style: disc;
 }
 /* Override .9em field help size from civicrm.css - CiviCRM 2.0 */
-#crm-container div.description,
-#crm-container span.description,
-#crm-container dd.description {
+.crm-container div.description,
+.crm-container span.description,
+.crm-container dd.description {
   font-size: 1em;
 }
-#crm-container div.description,
-#crm-container span.description {
+.crm-container div.description,
+.crm-container span.description {
   margin: 2px 0 15px 0;
   display: block;
 }
@@ -333,13 +333,13 @@ div#toolbar-box div.m {
   padding-bottom: 0;
   border: 1px solid #999 !important;
 }
-#crm-container {
+.crm-container {
   font-size: 11px;
 }
-#crm-container .col1 {
+.crm-container .col1 {
   margin: 0;
 }
-#crm-container .footer {
+.crm-container .footer {
   font-size: 1em;
 }
 .ac_results .ac_odd {
@@ -374,12 +374,12 @@ div#toolbar-box div.m {
   font-weight: normal;
 }
 
-#crm-container .form-layout td.label,
+.crm-container .form-layout td.label,
 .crm-container .form-layout td.label {
   width: inherit;
 }
 
-#crm-container .crm-event-form-fee-block .label {
+.crm-container .crm-event-form-fee-block .label {
   background-color: inherit;
   width: inherit;
   display: block;

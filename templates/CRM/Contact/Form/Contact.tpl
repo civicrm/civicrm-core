@@ -113,7 +113,7 @@
       $('.crm-accordion-wrapper').not('.crm-accordion-wrapper .crm-accordion-wrapper').each(function() {
         highlightTabs(this);
       });
-      $('#crm-container').on('change click', '.crm-accordion-body :input, .crm-accordion-body a', function() {
+      $('.crm-container').on('change click', '.crm-accordion-body :input, .crm-accordion-body a', function() {
         highlightTabs($(this).parents('.crm-accordion-wrapper'));
       });
     }

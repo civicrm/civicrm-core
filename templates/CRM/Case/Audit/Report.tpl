@@ -16,7 +16,7 @@
 </head>
 
 <body>
-<div id="crm-container" class="crm-container">
+<div class="crm-container">
 <h1>{$pageTitle}</h1>
 <div id="report-date">{$reportDate}</div>
 {if $case}
