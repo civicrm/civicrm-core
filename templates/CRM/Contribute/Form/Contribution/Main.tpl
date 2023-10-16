@@ -17,12 +17,10 @@
   <script type="text/javascript">
 
     // Putting these functions directly in template so they are available for standalone forms
-    function useAmountOther() {
-      var priceset = {/literal}{if $contriPriceset}'{$contriPriceset}'{else}0{/if}{literal};
-
-      for( i=0; i < document.Main.elements.length; i++ ) {
+    function useAmountOther(mainPriceFieldName) {
+     for( i=0; i < document.Main.elements.length; i++ ) {
         element = document.Main.elements[i];
-        if ( element.type == 'radio' && element.name == priceset ) {
+        if ( element.type == 'radio' && element.name === mainPriceFieldName ) {
           if (element.value == '0' ) {
             element.click();
           }
@@ -33,12 +31,9 @@
       }
     }
 
-    function clearAmountOther() {
-      var priceset = {/literal}{if $priceset}'#{$priceset}'{else}0{/if}{literal}
-      if( priceset ){
-        cj(priceset).val('');
-        cj(priceset).blur();
-      }
+    function clearAmountOther(otherPriceFieldName) {
+      cj('#' + otherPriceFieldName).val('');
+      cj('#' + otherPriceFieldName).blur();
       if (document.Main.amount_other == null) return; // other_amt field not present; do nothing
       document.Main.amount_other.value = "";
     }
@@ -71,7 +66,7 @@
     </div>
     {include file="CRM/common/cidzero.tpl"}
 
-    {if $islifetime or $ispricelifetime}
+    {if $isShowMembershipBlock && ($islifetime or $ispricelifetime)}
       <div class="help">{ts}You have a current Lifetime Membership which does not need to be renewed.{/ts}</div>
     {/if}
 
@@ -118,13 +113,13 @@
               {$form.pledge_frequency_unit.html}<span id="pledge_installments_num">&nbsp;{ts}for{/ts}&nbsp;{$form.pledge_installments.html}&nbsp;{ts}installments.{/ts}</span>
             </div>
             <div class="clear"></div>
-            {if $start_date_editable}
+            {if array_key_exists('start_date', $form) && $start_date_editable}
               {if $is_date}
                 <div class="label">{$form.start_date.label}</div><div class="content">{$form.start_date.html}</div>
               {else}
                 <div class="label">{$form.start_date.label}</div><div class="content">{$form.start_date.html}</div>
               {/if}
-            {else}
+            {elseif array_key_exists('start_date', $form)}
               <div class="label">{$form.start_date.label}</div>
               <div class="content">{$start_date_display|crmDate:'%b %e, %Y'}</div>
             {/if}

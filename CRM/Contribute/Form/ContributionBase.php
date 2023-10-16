@@ -115,6 +115,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Pcp id
    *
    * @var int
+   *
+   * @internal use getPcpID().
    */
   public $_pcpId;
 
@@ -468,10 +470,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->set('membershipBlock', $this->getMembershipBlock());
 
     // Handle PCP
-    $pcpId = CRM_Utils_Request::retrieve('pcpId', 'Positive', $this);
-    if ($pcpId) {
+    $pcpId = $this->getPcpID();
+    if ($this->getPcpID()) {
       $pcp = CRM_PCP_BAO_PCP::handlePcp($pcpId, 'contribute', $this->_values);
-      $this->_pcpId = $pcp['pcpId'];
       $this->_pcpBlock = $pcp['pcpBlock'];
       $this->_pcpInfo = $pcp['pcpInfo'];
     }
@@ -800,8 +801,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           }
         }
 
-        $this->assign($name, $fields);
-
         if ($profileContactType && count($viewOnlyFileValues[$profileContactType])) {
           $this->assign('viewOnlyPrefixFileValues', $viewOnlyFileValues);
         }
@@ -810,6 +809,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
       }
     }
+    $this->assign($name, $fields ?? NULL);
   }
 
   /**
@@ -987,7 +987,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               ];
             }
             $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', $args, FALSE, NULL, FALSE);
-            $form->assign('locDataURL', $locDataURL);
           }
           if (count($organizations) > 0) {
             $form->add('select', 'onbehalfof_id', '', CRM_Utils_Array::collect('name', $organizations));
@@ -1022,7 +1021,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           CRM_Core_Permission::CREATE, NULL
         );
 
-        $form->assign('onBehalfOfFields', $profileFields);
         if (!empty($form->_submitValues['onbehalf'])) {
           if (!empty($form->_submitValues['onbehalfof_id'])) {
             $form->assign('submittedOnBehalf', $form->_submitValues['onbehalfof_id']);
@@ -1055,6 +1053,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
       }
     }
+    $form->assign('locDataURL', $locDataURL ?? NULL);
+    $form->assign('onBehalfOfFields', $profileFields ?? NULL);
 
   }
 
@@ -1404,6 +1404,18 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $lineItems[$id]['id'] = $id;
     }
     return $lineItems;
+  }
+
+  /**
+   * Get the PCP ID being contributed to.
+   *
+   * @return int|null
+   */
+  protected function getPcpID(): ?int {
+    if ($this->_pcpId === NULL) {
+      $this->_pcpId = CRM_Utils_Request::retrieve('pcpId', 'Positive', $this);
+    }
+    return $this->_pcpId ? (int) $this->_pcpId : NULL;
   }
 
 }

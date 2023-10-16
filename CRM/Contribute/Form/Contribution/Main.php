@@ -126,14 +126,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // remove component related fields
       foreach ($this->_fields as $name => $fieldInfo) {
         //don't set custom data Used for Contribution (CRM-1344)
-        if (substr($name, 0, 7) == 'custom_') {
+        if (substr($name, 0, 7) === 'custom_') {
           $id = substr($name, 7);
           if (!CRM_Core_BAO_CustomGroup::checkCustomField($id, ['Contribution', 'Membership'])) {
             continue;
           }
           // ignore component fields
         }
-        elseif (array_key_exists($name, $contribFields) || (substr($name, 0, 11) == 'membership_') || (substr($name, 0, 13) == 'contribution_')) {
+        elseif (array_key_exists($name, $contribFields) || (substr($name, 0, 11) === 'membership_') || (substr($name, 0, 13) == 'contribution_')) {
           continue;
         }
         $fields[$name] = $fieldInfo;
@@ -146,8 +146,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $billingDefaults = $this->getProfileDefaults('Billing', $contactID);
       $this->_defaults = array_merge($this->_defaults, $billingDefaults);
     }
-    if (!empty($this->_ccid) && !empty($this->_pendingAmount)) {
-      $this->_defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->_pendingAmount);
+    $balance = $this->getContributionBalance();
+    if ($balance) {
+      $this->_defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($balance);
     }
 
     /*
@@ -401,10 +402,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         CRM_Core_BAO_CMSUser::buildForm($this, $profileID, TRUE);
       }
     }
-    if ($this->_pcpId && empty($this->_ccid)) {
+    if ($this->getPcpID() && empty($this->_ccid)) {
       if (CRM_PCP_BAO_PCP::displayName($this->_pcpId)) {
         $pcp_supporter_text = CRM_PCP_BAO_PCP::getPcpSupporterText($this->_pcpId, $this->_id, 'contribute');
-        $this->assign('pcpSupporterText', $pcp_supporter_text);
       }
       $prms = ['id' => $this->_pcpId];
       CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $prms, $pcpInfo);
@@ -420,6 +420,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $this->addField('pcp_personal_note', ['entity' => 'ContributionSoft', 'context' => 'create', 'style' => 'height: 3em; width: 40em;']);
       }
     }
+    $this->assign('pcpSupporterText', $pcp_supporter_text ?? NULL);
     if (empty($this->_values['fee']) && empty($this->_ccid)) {
       throw new CRM_Core_Exception(ts('This page does not have any price fields configured or you may not have permission for them. Please contact the site administrator for more details.'));
     }
@@ -541,18 +542,75 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
         if (!empty($options)) {
+          $label = (!empty($this->_membershipBlock) && $field['name'] === 'contribution_amount') ? ts('Additional Contribution') : $field['label'];
+          $extra = [];
+          $fieldID = (int) $field['id'];
+          if ($fieldID === $this->getPriceFieldOtherID()) {
+            $extra = [
+              'onclick' => 'useAmountOther("price_' . $this->getPriceFieldMainID() . '");',
+              'autocomplete' => 'off',
+            ];
+          }
+          if ($fieldID === $this->getPriceFieldMainID()) {
+            $extra = [
+              'onclick' => 'clearAmountOther("price_' . $this->getPriceFieldOtherID() . '");',
+            ];
+          }
+
           CRM_Price_BAO_PriceField::addQuickFormElement($form,
-            'price_' . $field['id'],
+            'price_' . $fieldID,
             $field['id'],
             FALSE,
-            CRM_Utils_Array::value('is_required', $field, FALSE),
-            NULL,
-            $options
+            $field['is_required'] ?? FALSE,
+            $label,
+            $options,
+            [],
+            $extra
           );
         }
       }
     }
     $form->assign('ispricelifetime', $checklifetime);
+  }
+
+  /**
+   * Get the idea of the other amount field if the form is configured to offer it.
+   *
+   * The other amount field is an alternative to the configured radio options,
+   * specific to this form.
+   *
+   * @return int|null
+   */
+  private function getPriceFieldOtherID(): ?int {
+    if (!$this->isQuickConfig()) {
+      return NULL;
+    }
+    foreach ($this->order->getPriceFieldsMetadata() as $field) {
+      if ($field['name'] === 'other_amount') {
+        return (int) $field['id'];
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Get the idea of the other amount field if the form is configured to offer an other amount.
+   *
+   * The other amount field is an alternative to the configured radio options,
+   * specific to this form.
+   *
+   * @return int|null
+   */
+  private function getPriceFieldMainID(): ?int {
+    if (!$this->isQuickConfig() || !$this->getPriceFieldOtherID()) {
+      return NULL;
+    }
+    foreach ($this->order->getPriceFieldsMetadata() as $field) {
+      if ($field['name'] !== 'other_amount') {
+        return (int) $field['id'];
+      }
+    }
+    return NULL;
   }
 
   /**
@@ -999,7 +1057,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     if (isset($fields['selectProduct']) &&
-      $fields['selectProduct'] != 'no_thanks'
+      $fields['selectProduct'] !== 'no_thanks'
     ) {
       $productDAO = new CRM_Contribute_DAO_Product();
       $productDAO->id = $fields['selectProduct'];
@@ -1222,9 +1280,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
     }
-
-    if (!empty($this->_ccid) && !empty($this->_pendingAmount)) {
-      $params['amount'] = $this->_pendingAmount;
+    $balance = $this->getContributionBalance();
+    if ($balance) {
+      $params['amount'] = $balance;
     }
     else {
       // from here on down, $params['amount'] holds a monetary value (or null) rather than an option ID
@@ -1424,24 +1482,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
     $this->assign('dummyTitle', $dummyTitle);
-
+    $this->assign('pendingAmount', $this->getContributionBalance());
     if (empty($this->getExistingContributionID())) {
       return;
     }
-    if (!$this->getContactID()) {
-      CRM_Core_Error::statusBounce(ts("Returning since there is no contact attached to this contribution id."));
-    }
-
-    $paymentBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_ccid);
-    //bounce if the contribution is not pending.
-    if ((float) $paymentBalance <= 0) {
-      CRM_Core_Error::statusBounce(ts("Returning since contribution has already been handled."));
-    }
-    if (!empty($paymentBalance)) {
-      $this->_pendingAmount = $paymentBalance;
-      $this->assign('pendingAmount', $this->_pendingAmount);
-    }
-
+    // @todo - all this stuff is likely obsolete.
     if ($taxAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_ccid, 'tax_amount')) {
       $this->assign('taxAmount', $taxAmount);
     }
@@ -1450,6 +1495,29 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->assign('lineItem', [$this->getPriceSetID() => $lineItems]);
     $this->assign('is_quick_config', $this->isQuickConfig());
     $this->assign('priceSetID', $this->getPriceSetID());
+  }
+
+  /**
+   * Get the balance amount if an existing contribution is being paid.
+   *
+   * @return float|null
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function getContributionBalance(): ?float {
+    if (empty($this->getExistingContributionID())) {
+      return NULL;
+    }
+    if (!$this->getContactID()) {
+      CRM_Core_Error::statusBounce(ts('Returning since there is no contact attached to this contribution id.'));
+    }
+
+    $paymentBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_ccid);
+    //bounce if the contribution is not pending.
+    if ((float) $paymentBalance <= 0) {
+      CRM_Core_Error::statusBounce(ts('Returning since contribution has already been handled.'));
+    }
+    return $paymentBalance;
   }
 
   /**
@@ -1473,7 +1541,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @param array $params
    *
-   * @return mixed
+   * @return bool
    * @throws \CRM_Core_Exception
    */
   protected function hasSeparateMembershipPaymentAmount($params) {
