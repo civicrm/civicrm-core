@@ -14,7 +14,12 @@
     <td class="html-adjust description">{$element.help_pre}</td>
   </tr>
 {/if}
-{if $element.options_per_line}
+{if $element.html_type === 'Hidden'}
+  {* Hidden field - render in hidden row *}
+  <tr class="custom_field-row {$element.element_name}-row hiddenElement">
+    <td>{$formElement.html}</td>
+  </tr>
+{elseif $element.options_per_line}
   <tr class="custom_field-row {$element.element_name}-row">
     <td class="label">{$formElement.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
     <td class="html-adjust">

@@ -58,10 +58,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * @var array[]
    */
   public static $_dataToHTML = [
-    'String' => ['Text', 'Select', 'Radio', 'CheckBox', 'Autocomplete-Select'],
-    'Int' => ['Text', 'Select', 'Radio'],
-    'Float' => ['Text', 'Select', 'Radio'],
-    'Money' => ['Text', 'Select', 'Radio'],
+    'String' => ['Text', 'Select', 'Radio', 'CheckBox', 'Autocomplete-Select', 'Hidden'],
+    'Int' => ['Text', 'Select', 'Radio', 'Hidden'],
+    'Float' => ['Text', 'Select', 'Radio', 'Hidden'],
+    'Money' => ['Text', 'Select', 'Radio', 'Hidden'],
     'Memo' => ['TextArea', 'RichTextEditor'],
     'Date' => ['Select Date'],
     'Boolean' => ['Radio'],

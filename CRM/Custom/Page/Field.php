@@ -133,27 +133,9 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
         $action -= CRM_Core_Action::DISABLE;
       }
 
-      switch ($customFieldBAO->data_type) {
-        case "String":
-        case "Int":
-        case "Float":
-        case "Money":
-          // if Multi Select field is selected in custom field
-          if ($customFieldBAO->html_type == 'Text') {
-            $action -= CRM_Core_Action::BROWSE;
-          }
-          break;
-
-        case "ContactReference":
-        case "Memo":
-        case "Date":
-        case "Boolean":
-        case "StateProvince":
-        case "Country":
-        case "File":
-        case "Link":
-          $action -= CRM_Core_Action::BROWSE;
-          break;
+      // Remove link to edit option group if there isn't one
+      if (!$customFieldBAO->option_group_id) {
+        $action -= CRM_Core_Action::BROWSE;
       }
 
       $customFieldDataType = array_column(CRM_Core_BAO_CustomField::dataType(), 'label', 'id');

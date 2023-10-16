@@ -270,7 +270,7 @@
       }
 
       if (_.includes(['String', 'Int', 'Float', 'Money'], dataType)) {
-        if (htmlType !== "Text") {
+        if (!['Text', 'Hidden'].includes(htmlType)) {
           $("#showoption, #searchable", $form).show();
           $("#hideDefault, #hideDesc, #searchByRange", $form).hide();
         } else {
@@ -289,7 +289,7 @@
         $("#showoption").hide();
       }
 
-      if (_.includes(['String', 'Int', 'Float', 'Money'], dataType) && htmlType !== 'Text') {
+      if (_.includes(['String', 'Int', 'Float', 'Money'], dataType) && !['Text', 'Hidden'].includes(htmlType)) {
         if (serialize) {
           $('div[id^=checkbox]', '#optionField').show();
           $('div[id^=radio]', '#optionField').hide();
