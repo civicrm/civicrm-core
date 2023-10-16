@@ -33,7 +33,7 @@ class CRM_Temporary_Schema {
           //   not have good visibility. It's sipler to just re-implement equivalent behavior.
           // - For all other fields, do a conditional sync (DATETIME<=>TIMESTAMP).
 
-          if (mb_strpos($field['default'], 'CURRENT_TIMESTAMP') !== FALSE) {
+          if (mb_strpos($field['default'] ?? '', 'CURRENT_TIMESTAMP') !== FALSE) {
             $onInsert = ["SET NEW.{$gmtField} = UTC_TIMESTAMP();"];
           }
           else {
@@ -46,7 +46,7 @@ class CRM_Temporary_Schema {
             ];
           }
 
-          if (mb_strtoupper($field['default']) === 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP') {
+          if (mb_strtoupper($field['default'] ?? '') === 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP') {
             $onUpdate = ["SET NEW.{$gmtField} = UTC_TIMESTAMP();"];
           }
           else {
@@ -142,7 +142,6 @@ class CRM_Temporary_Schema {
       }
 
       $desc = [];
-      $desc[] = empty($field['required']) ? 'NULL' : 'NOT NULL';
       if (!empty($field['default']) && ($expectGmt xor $expectTs)) {
         $desc[] = sprintf('DEFAULT %s', $field['default']);
       }
@@ -151,12 +150,18 @@ class CRM_Temporary_Schema {
       }
 
       if (!$gmtFieldExists && $expectGmt) {
-        $plan[] = sprintf('ALTER TABLE %s ADD COLUMN `%s` datetime ', $table, $gmtField) . implode(' ', $desc);
+        $plan[] = sprintf('ALTER TABLE %s ADD COLUMN `%s` datetime NULL ', $table, $gmtField) . implode(' ', $desc);
         $plan[] = sprintf('UPDATE %s SET %s = CONVERT_TZ(%s, @@time_zone, "+0:00")', $table, $gmtField, $tsField);
+        if (!empty($field['required'])) {
+          $plan[] = sprintf('ALTER TABLE %s MODIFY COLUMN `%s` datetime NOT NULL ', $table, $gmtField) . implode(' ', $desc);
+        }
       }
       if (!$tsFieldExists && $expectTs) {
-        $plan[] = sprintf('ALTER TABLE %s ADD COLUMN `%s` timestamp ', $table, $tsField) . implode(' ', $desc);
+        $plan[] = sprintf('ALTER TABLE %s ADD COLUMN `%s` timestamp NULL ', $table, $tsField) . implode(' ', $desc);
         $plan[] = sprintf('UPDATE %s SET %s = CONVERT_TZ(%s, @@time_zone, "+0:00")', $table, $tsField, $gmtField);
+        if (!empty($field['required'])) {
+          $plan[] = sprintf('ALTER TABLE %s MODIFY COLUMN `%s` timestamp NOT NULL ', $table, $tsField) . implode(' ', $desc);
+        }
       }
 
       if ($gmtFieldExists && !$expectGmt) {
