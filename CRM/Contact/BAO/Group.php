@@ -344,9 +344,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       'parents' => NULL,
     ];
 
+    // Fill title and frontend_title if not supplied
+    if (empty($params['id']) && empty($params['title'])) {
+      $params['title'] = $params['frontend_title'] ?? $params['name'];
+    }
     if (empty($params['id']) && empty($params['frontend_title'])) {
-      // If we were calling writeRecord it would handle this, but we need
-      // to migrate the other bits of magic.
       $params['frontend_title'] = $params['title'];
     }
     $hook = empty($params['id']) ? 'create' : 'edit';
@@ -388,6 +390,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     // form the name only if missing: CRM-627
     $nameParam = $params['name'] ?? NULL;
+    // If we were calling writeRecord it would handle this, but we need
+    // to migrate the other bits of magic.
     if (!$nameParam && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }

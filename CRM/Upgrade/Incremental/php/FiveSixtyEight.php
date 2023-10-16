@@ -28,6 +28,10 @@ class CRM_Upgrade_Incremental_php_FiveSixtyEight extends CRM_Upgrade_Incremental
    *   The version number matching this function name
    */
   public function upgrade_5_68_alpha1($rev): void {
+    // Add column prior to updating it via runSql
+    $this->addTask('Add Tag.label field', 'addColumn', 'civicrm_tag', 'label', "varchar(64) NOT NULL COMMENT 'User-facing tag name' AFTER `name`");
+    $this->addTask('Update Tag.name field', 'alterColumn', 'civicrm_tag', 'name', "varchar(64) NOT NULL COMMENT 'Unique machine name'");
+    $this->addTask('Update Tag.created_date field', 'alterColumn', 'civicrm_tag', 'created_date', "datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Date and time that tag was created.'");
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 

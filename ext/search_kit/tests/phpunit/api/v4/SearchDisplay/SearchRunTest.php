@@ -83,7 +83,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'table',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'limit' => 20,
           'pager' => TRUE,
@@ -197,7 +197,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'table',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'limit' => 20,
           'pager' => TRUE,
@@ -270,7 +270,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'table',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'actions' => TRUE,
           'pager' => [],
@@ -356,7 +356,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'table',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'actions' => TRUE,
           'pager' => [],
@@ -466,7 +466,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'table',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'limit' => 20,
           'pager' => TRUE,
@@ -556,7 +556,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'table',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'limit' => 20,
           'pager' => FALSE,
@@ -802,7 +802,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           'saved_search_id' => '$id',
           'name' => $displayName,
           'type' => 'table',
-          'label' => '',
+          'label' => 'TestDisplay',
           'acl_bypass' => TRUE,
           'settings' => [
             'limit' => 20,
@@ -979,7 +979,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'list',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'limit' => 20,
           'pager' => TRUE,
@@ -1496,7 +1496,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'table',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'actions' => TRUE,
           'pager' => [],
@@ -1861,7 +1861,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'table',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'actions' => TRUE,
           'pager' => [],
@@ -1914,7 +1914,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'table',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'limit' => 20,
           'pager' => TRUE,
@@ -1952,7 +1952,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'table',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'actions' => TRUE,
           'pager' => [],
@@ -2072,7 +2072,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'table',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'actions' => TRUE,
           'pager' => [],
@@ -2162,7 +2162,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
       'display' => [
         'type' => 'table',
-        'label' => '',
+        'label' => 'tesdDisplay',
         'settings' => [
           'limit' => 20,
           'pager' => TRUE,

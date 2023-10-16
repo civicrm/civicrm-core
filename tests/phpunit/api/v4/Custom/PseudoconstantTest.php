@@ -272,6 +272,7 @@ class PseudoconstantTest extends CustomTestBase {
     $options = array_column($options, NULL, 'name');
     $this->assertEquals('colorful', $options[$tag]['description']);
     $this->assertEquals('#aabbcc', $options[$tag]['color']);
+    $this->assertEquals($tag, $options[$tag]['name']);
     $this->assertEquals($tag, $options[$tag]['label']);
   }
 

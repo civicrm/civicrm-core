@@ -45,7 +45,6 @@ function civicrm_api3_tag_create($params) {
  */
 function _civicrm_api3_tag_create_spec(&$params) {
   $params['used_for']['api.default'] = 'civicrm_contact';
-  $params['name']['api.required'] = 1;
   $params['id']['api.aliases'] = ['tag'];
 }
 
