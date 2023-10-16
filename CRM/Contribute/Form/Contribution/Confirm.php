@@ -2857,7 +2857,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $statusFormat = '%Y-%m-%d';
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
     $dates = [];
-    $ids = [];
 
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
@@ -2921,7 +2920,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
 
         if (!empty($currentMembership['id'])) {
-          $ids['membership'] = $currentMembership['id'];
+          $memParams['id'] = $currentMembership['id'];
         }
         $memParams = array_merge($currentMembership, $memParams);
         $memParams['membership_type_id'] = $membershipTypeID;
@@ -2963,7 +2962,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
 
         if (!empty($currentMembership['id'])) {
-          $ids['membership'] = $currentMembership['id'];
+          $memParams['id'] = $currentMembership['id'];
         }
         $memParams['membership_activity_status'] = ($pending || $isPayLater) ? 'Scheduled' : 'Completed';
       }
@@ -3031,15 +3030,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // @todo this param is likely unused now.
       $memParams['is_for_organization'] = TRUE;
     }
-    $params['modified_id'] = $modifiedID ?? $contactID;
 
     $memParams['contribution'] = $contribution;
     $memParams['custom'] = $customFieldsFormatted;
     // Load all line items & process all in membership. Don't do in contribution.
     // Relevant tests in api_v3_ContributionPageTest.
     $memParams['line_item'] = $lineItems;
-    // @todo stop passing $ids (membership and userId may be set by this point)
-    $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
+    $membership = CRM_Member_BAO_Membership::create($memParams);
 
     // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
     // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072

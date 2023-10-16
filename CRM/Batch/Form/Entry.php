@@ -1041,7 +1041,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $changeToday = NULL;
     $numRenewTerms = 1;
     $format = '%Y%m%d';
-    $ids = [];
     $isPayLater = NULL;
     $memParams = $this->getCurrentRowMembershipParams();
     $currentMembership = $this->getCurrentMembership();
@@ -1061,7 +1060,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $memParams[$dateType] = $memParams[$dateType] ?: ($dates[$dateType] ?? NULL);
       }
 
-      $ids['membership'] = $currentMembership['id'];
+      $memParams['id'] = $currentMembership['id'];
 
       //set the log start date.
       $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
@@ -1091,7 +1090,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
 
       if (!empty($currentMembership['id'])) {
-        $ids['membership'] = $currentMembership['id'];
+        $memParams['id'] = $currentMembership['id'];
       }
       $memParams['membership_activity_status'] = $isPayLater ? 'Scheduled' : 'Completed';
     }
@@ -1111,7 +1110,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     // Load all line items & process all in membership. Don't do in contribution.
     // Relevant tests in api_v3_ContributionPageTest.
     // @todo stop passing $ids (membership and userId may be set by this point)
-    $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
+    $membership = CRM_Member_BAO_Membership::create($memParams);
 
     // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
     // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072

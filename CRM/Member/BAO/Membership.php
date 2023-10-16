@@ -229,15 +229,13 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param array $ids
-   *   Deprecated parameter The array that holds all the db ids.
    *
    * @return CRM_Member_BAO_Membership|CRM_Core_Error
    * @throws \CRM_Core_Exception
    *
    * @throws CRM_Core_Exception
    */
-  public static function create(&$params, $ids = []) {
+  public static function create(&$params) {
     $isLifeTime = FALSE;
     if (!empty($params['membership_type_id'])) {
       $memTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($params['membership_type_id']);
@@ -322,7 +320,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     $transaction = new CRM_Core_Transaction();
 
-    $params['id'] = $params['id'] ?? $ids['membership'] ?? NULL;
+    $params['id'] = $params['id'] ?? NULL;
     $membership = self::add($params);
 
     if (is_a($membership, 'CRM_Core_Error')) {
@@ -340,19 +338,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // once we are rid of direct calls to the BAO::create from core
     // we will deprecate this stuff into the v3 api.
     if (($params['version'] ?? 0) !== 4) {
-      // @todo further cleanup required to remove use of $ids['contribution'] from here
-      if (isset($ids['membership'])) {
-        $contributionID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
-          $membership->id,
-          'contribution_id',
-          'membership_id'
-        );
-        // @todo this is a temporary step to removing $ids['contribution'] completely
-        if (empty($params['contribution_id']) && !empty($contributionID)) {
-          $params['contribution_id'] = $contributionID;
-        }
-      }
-
       // This code ensures a line item is created but it is recommended you pass in 'skipLineItem' or 'line_item'
       if (empty($params['line_item']) && !empty($params['membership_type_id']) && empty($params['skipLineItem'])) {
         CRM_Price_BAO_LineItem::getLineItemArray($params, NULL, 'membership', $params['membership_type_id']);
@@ -374,8 +359,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
           $params['line_item'] = $params['lineItems'];
         }
         // do cleanup line items if membership edit the Membership type.
-        if (!empty($ids['membership'])) {
-          CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
+        if (!empty($params['membership_id'])) {
+          CRM_Price_BAO_LineItem::deleteLineItems($params['membership_id'], 'civicrm_membership');
         }
         // @todo - we should ONLY do the below if a contribution is created. Let's
         // get some deprecation notices in here & see where it's hit & work to eliminate.
@@ -1800,7 +1785,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     $statusFormat = '%Y-%m-%d';
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
     $dates = [];
-    $ids = [];
 
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
@@ -1864,7 +1848,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         }
 
         if (!empty($currentMembership['id'])) {
-          $ids['membership'] = $currentMembership['id'];
+          $memParams['id'] = $currentMembership['id'];
         }
         $memParams = array_merge($currentMembership, $memParams);
         $memParams['membership_type_id'] = $membershipTypeID;
@@ -1906,7 +1890,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         }
 
         if (!empty($currentMembership['id'])) {
-          $ids['membership'] = $currentMembership['id'];
+          $memParams['id'] = $currentMembership['id'];
         }
         $memParams['membership_activity_status'] = ($pending || $isPayLater) ? 'Scheduled' : 'Completed';
       }
@@ -1974,15 +1958,13 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       // @todo this param is likely unused now.
       $memParams['is_for_organization'] = TRUE;
     }
-    $params['modified_id'] = $modifiedID ?? $contactID;
 
     $memParams['contribution'] = $contribution;
     $memParams['custom'] = $customFieldsFormatted;
     // Load all line items & process all in membership. Don't do in contribution.
     // Relevant tests in api_v3_ContributionPageTest.
     $memParams['line_item'] = $lineItems;
-    // @todo stop passing $ids (membership and userId may be set by this point)
-    $membership = self::create($memParams, $ids);
+    $membership = self::create($memParams);
 
     // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
     // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072

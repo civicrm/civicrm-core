@@ -120,19 +120,15 @@ function civicrm_api3_membership_create($params) {
   }
 
   // Fixme: This code belongs in the BAO
-  $ids = [];
   if (empty($params['id'])) {
     $params['action'] = CRM_Core_Action::ADD;
   }
   else {
     // edit mode
     $params['action'] = CRM_Core_Action::UPDATE;
-    // @todo remove $ids['membership'] is required in CRM_Price_BAO_LineItem::processPriceSet
-    $ids['membership'] = $params['id'];
   }
 
-  // @todo stop passing $ids (membership and userId may be set above)
-  $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids);
+  $membershipBAO = CRM_Member_BAO_Membership::create($params);
 
   if (property_exists($membershipBAO, 'is_error')) {
     // In case of no valid status for given dates, $membershipBAO

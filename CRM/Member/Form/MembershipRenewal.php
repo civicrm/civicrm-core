@@ -726,7 +726,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    */
   public function processMembership($memParams, $changeToday, $numRenewTerms, $pending) {
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
-    $ids = [];
     $currentMembership = civicrm_api3('Membership', 'getsingle', ['id' => $memParams['id']]);
 
     // Do NOT do anything.
@@ -758,12 +757,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if ($isMembershipCurrent) {
       // CURRENT Membership
       if (!empty($currentMembership['id'])) {
-        $ids['membership'] = $currentMembership['id'];
+        $memParams['id'] = $currentMembership['id'];
       }
     }
 
     // @todo stop passing $ids (membership and userId may be set by this point)
-    $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
+    $membership = CRM_Member_BAO_Membership::create($memParams);
 
     // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
     // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072
