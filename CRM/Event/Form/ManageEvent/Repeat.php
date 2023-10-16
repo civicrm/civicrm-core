@@ -205,7 +205,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    *
    * @return array
    */
-  public static function checkRegistrationForEvents($eventID) {
+  public static function checkRegistrationForEvents($eventID): array {
     $eventIdsWithNoRegistration = [];
     if ($eventID) {
       $getRelatedEntities = CRM_Core_BAO_RecurringEntity::getEntitiesFor($eventID, 'civicrm_event', TRUE);
@@ -218,8 +218,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
         }
       }
     }
-    CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted = $eventIdsWithNoRegistration;
-    return CRM_Core_BAO_RecurringEntity::$_entitiesToBeDeleted;
+    return $eventIdsWithNoRegistration;
   }
 
 }
