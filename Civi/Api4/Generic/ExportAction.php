@@ -140,8 +140,11 @@ class ExportAction extends AbstractAction {
       }
     }
     $name = ($parentName ?? '') . $entityType . '_' . ($record['name'] ?? count($this->exportedEntities[$entityType]));
-    // Ensure safe characters, max length
-    $name = \CRM_Utils_String::munge($name, '_', 127);
+    // Ensure safe characters, max length.
+    // This is used for the value of `civicrm_managed.name` which has a maxlength of 255, but is also used
+    // to generate a file by civix, and many filesystems have a maxlength of 255 including the suffix, so
+    // 255 - strlen('.mgd.php') = 247
+    $name = \CRM_Utils_String::munge($name, '_', 247);
     // Include option group with custom field
     if ($entityType === 'CustomField') {
       if (
