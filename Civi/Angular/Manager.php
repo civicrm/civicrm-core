@@ -352,7 +352,14 @@ class Manager {
   }
 
   /**
-   * Get resources for one or more modules.
+   * Get resources for one or more modules, applying any changesets.
+   *
+   * NOTE: The output of this function is a little quirky; depending on the type of resource requested,
+   * the results will either be a non-associative array (for path and url-type resources)
+   * or an array indexed by moduleName (for pass-thru resources like settingsFactory, requires, permissions, bundles).
+   *
+   * Note: ChangeSets will be applied
+   * @see \CRM_Utils_Hook::alterAngular()
    *
    * @param string|array $moduleNames
    *   List of module names.
@@ -361,15 +368,20 @@ class Manager {
    * @param string $refType
    *   Type of reference to the resource ('cacheUrl', 'rawUrl', 'path', 'settings').
    * @return array
-   *   List of URLs or paths.
+   *   Indexed or non-associative array, depending on resource requested (see note)
    * @throws \CRM_Core_Exception
    */
   public function getResources($moduleNames, $resType, $refType) {
     $result = [];
-    $moduleNames = (array) $moduleNames;
-    foreach ($moduleNames as $moduleName) {
+    // Properties that do not require interpolation - they are added to the output keyed by moduleName
+    $passThru = ['settings', 'settingsFactory', 'requires', 'permissions', 'bundles'];
+
+    foreach ((array) $moduleNames as $moduleName) {
       $module = $this->getModule($moduleName);
-      if (isset($module[$resType])) {
+      if (isset($module[$resType]) && in_array($resType, $passThru, TRUE)) {
+        $result[$moduleName] = $module[$resType];
+      }
+      elseif (isset($module[$resType])) {
         foreach ($module[$resType] as $file) {
           $refTypeSuffix = '';
           if (is_string($file) && preg_match(';^(assetBuilder|ext)://;', $file)) {
@@ -414,16 +426,6 @@ class Manager {
 
             case 'cacheUrl-ext':
               $result[] = $this->res->getUrl(parse_url($file, PHP_URL_HOST), ltrim(parse_url($file, PHP_URL_PATH), '/'), TRUE);
-              break;
-
-            case 'settings':
-            case 'settingsFactory':
-            case 'requires':
-            case 'permissions':
-            case 'bundles':
-              if (!empty($module[$resType])) {
-                $result[$moduleName] = $module[$resType];
-              }
               break;
 
             default:
