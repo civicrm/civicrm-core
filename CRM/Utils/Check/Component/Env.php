@@ -1106,4 +1106,25 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  public function checkAngularModuleSettings() {
+    $messages = [];
+    $modules = Civi::container()->get('angular')->getModules();
+    foreach ($modules as $name => $module) {
+      if (!empty($module['settings'])) {
+        $messages[] = new CRM_Utils_Check_Message(
+          __FUNCTION__ . $name,
+          ts('The Angular file "%1" from extension "%2" must be updated to use "settingsFactory" instead of "settings". <a %3>Developer info...</a>', [
+            1 => $name,
+            2 => $module['ext'],
+            3 => 'target="_blank" href="https://github.com/civicrm/civicrm-core/pull/19052"',
+          ]),
+          ts('Unsupported Angular Setting'),
+          \Psr\Log\LogLevel::WARNING,
+          'fa-code'
+        );
+      }
+    }
+    return $messages;
+  }
+
 }
