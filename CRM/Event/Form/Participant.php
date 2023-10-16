@@ -904,7 +904,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $params["address_name-{$this->_bltID}"]
         = ($params['billing_first_name'] ?? '') . ' ' .
         ($params['billing_middle_name'] ?? '') . ' ' .
-        CRM_Utils_Array::value('billing_last_name', $params);
+         ($params['billing_last_name'] ?? '');
 
       $params["address_name-{$this->_bltID}"] = trim($params["address_name-{$this->_bltID}"]);
       $fields["address_name-{$this->_bltID}"] = 1;
@@ -1178,7 +1178,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
               }
               $lineItem[$this->_priceSetId][$lineKey] = $line;
             }
-            CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, CRM_Utils_Array::value($num, $contributions, NULL), 'civicrm_participant');
+            CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, $contributions[$num] ?? NULL, 'civicrm_participant');
           }
         }
       }
@@ -1479,7 +1479,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       //also add additional participant's fee level/priceset
       if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
         $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_id);
-        $hasLineItems = CRM_Utils_Array::value('priceSetId', $params, FALSE);
+        $hasLineItems = $params['priceSetId'] ?? FALSE;
         $additionalParticipantDetails = $this->getFeeDetails($additionalIds, $hasLineItems);
       }
     }
@@ -1586,7 +1586,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
       'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
-      'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
+      'is_pay_later' => $params['is_pay_later'] ?? 0,
       'campaign_id' => $params['campaign_id'] ?? NULL,
       'card_type_id' => $params['card_type_id'] ?? NULL,
       'pan_truncation' => $params['pan_truncation'] ?? NULL,
@@ -1667,7 +1667,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $participantFields['participant_source']['maxlength']
       ),
       'fee_level' => $params['amount_level'] ?? NULL,
-      'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
+      'is_pay_later' => $params['is_pay_later'] ?? 0,
       'fee_amount' => $params['fee_amount'] ?? NULL,
       'registered_by_id' => $params['registered_by_id'] ?? NULL,
       'discount_id' => $params['discount_id'] ?? NULL,
