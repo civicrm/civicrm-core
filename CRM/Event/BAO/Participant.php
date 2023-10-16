@@ -1744,8 +1744,8 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     $contactId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantId, 'contact_id');
 
     $date = CRM_Utils_Date::currentDBDate();
-    $event = CRM_Event_BAO_Event::getEvents(0, $eventId);
-    $subject = sprintf("Registration selections changed for %s", CRM_Utils_Array::value($eventId, $event));
+    $title = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventId, 'title');
+    $subject = ts('Registration selections changed for %1', [1 => $title]);
 
     // activity params
     $activityParams = [
