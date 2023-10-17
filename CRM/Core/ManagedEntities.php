@@ -436,30 +436,6 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param array $moduleIndex
-   * @param array $declarations
-   *
-   * @return array
-   *   indexed by module,name
-   */
-  protected function createDeclarationIndex($moduleIndex, $declarations) {
-    $result = [];
-    if (!isset($moduleIndex[TRUE])) {
-      return $result;
-    }
-    foreach ($moduleIndex[TRUE] as $moduleName => $module) {
-      if ($module->is_active) {
-        // need an empty array() for all active modules, even if there are no current $declarations
-        $result[$moduleName] = [];
-      }
-    }
-    foreach ($declarations as $declaration) {
-      $result[$declaration['module']][$declaration['name']] = $declaration;
-    }
-    return $result;
-  }
-
-  /**
    * @param array $declarations
    *
    * @throws CRM_Core_Exception
