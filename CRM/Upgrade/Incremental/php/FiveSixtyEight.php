@@ -37,6 +37,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyEight extends CRM_Upgrade_Incremental
     $this->addTask('Update civicrm_managed.module', 'alterColumn', 'civicrm_managed', 'module', "varchar(255) NOT NULL COMMENT 'Name of the module which declared this object (soft FK to civicrm_extension.full_name)'");
     $this->addTask('Update civicrm_managed.name', 'alterColumn', 'civicrm_managed', 'name', "varchar(255) NOT NULL COMMENT 'Symbolic name used by the module to identify the object'");
     $this->addTask('Update civicrm_managed.cleanup', 'alterColumn', 'civicrm_managed', 'cleanup', "varchar(16) NOT NULL DEFAULT 'always' COMMENT 'Policy on when to cleanup entity (always, never, unused)'");
+    $this->addTask('Update civicrm_acl.is_active', 'alterColumn', 'civicrm_acl', 'is_active', "tinyint NOT NULL DEFAULT 1 COMMENT 'Is this property active?'");
   }
 
 }

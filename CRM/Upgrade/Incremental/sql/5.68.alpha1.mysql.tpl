@@ -1,5 +1,7 @@
 {* file to handle db changes in 5.68.alpha1 during upgrade *}
 
+UPDATE `civicrm_acl` SET `is_active` = 0 WHERE `is_active` IS NULL;
+
 UPDATE `civicrm_tag` SET `label` = `name` WHERE `label` = '';
 
 {* This column is now required. Delete any null values; a managed entity without a name is useless *}
