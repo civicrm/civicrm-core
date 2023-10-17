@@ -1436,7 +1436,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // We may no longer need to set params['is_recur'] - it used to be used in processRecurringContribution
     $params['is_recur'] = $isRecur;
     $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
-    $recurringContributionID = !$isRecur ? NULL : CRM_Contribute_Form_Contribution_Confirm::processRecurringContribution($form, $params, [
+    $recurringContributionID = !$isRecur ? NULL : $this->processRecurringContribution($form, $params, [
       'contact_id' => $contactID,
       'financial_type_id' => $financialType->id,
     ]);
@@ -1514,6 +1514,64 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $transaction->commit();
     return $contribution;
+  }
+
+  /**
+   * Create the recurring contribution record.
+   *
+   * @param CRM_Core_Form $form
+   * @param array $params
+   * @param array $recurParams
+   *
+   * @return int|null
+   */
+  private function processRecurringContribution($form, $params, $recurParams) {
+    // @todo - previously shared code - many items may be irrelevant.
+    $recurParams['amount'] = $params['amount'] ?? NULL;
+    $recurParams['auto_renew'] = $params['auto_renew'] ?? NULL;
+    $recurParams['frequency_unit'] = $params['frequency_unit'] ?? NULL;
+    $recurParams['frequency_interval'] = $params['frequency_interval'] ?? NULL;
+    $recurParams['installments'] = $params['installments'] ?? NULL;
+    $recurParams['currency'] = $params['currency'] ?? NULL;
+    $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
+
+    // CRM-14354: For an auto-renewing membership with an additional contribution,
+    // if separate payments is not enabled, make sure only the membership fee recurs
+    if (!empty($this->_membershipBlock)
+      && $this->_membershipBlock['is_separate_payment'] === '0'
+      && isset($params['selectMembership'])
+      && $form->_values['is_allow_other_amount'] == '1'
+      // CRM-16331
+      && !empty($form->_membershipTypeValues)
+      && !empty($form->_membershipTypeValues[$params['selectMembership']]['minimum_fee'])
+    ) {
+      $recurParams['amount'] = $form->_membershipTypeValues[$params['selectMembership']]['minimum_fee'];
+    }
+
+    $recurParams['is_test'] = 0;
+    if (($form->_action & CRM_Core_Action::PREVIEW) ||
+      (isset($form->_mode) && ($form->_mode == 'test'))
+    ) {
+      $recurParams['is_test'] = 1;
+    }
+
+    $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = date('YmdHis');
+    if (!empty($params['receive_date'])) {
+      $recurParams['start_date'] = date('YmdHis', strtotime($params['receive_date']));
+    }
+    $recurParams['invoice_id'] = $params['invoiceID'] ?? NULL;
+    $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $recurParams['payment_processor_id'] = $params['payment_processor_id'] ?? NULL;
+    $recurParams['is_email_receipt'] = (bool) ($params['is_email_receipt'] ?? FALSE);
+    // We set trxn_id=invoiceID specifically for paypal IPN. It is reset this when paypal sends us the real trxn id, CRM-2991
+    $recurParams['processor_id'] = $recurParams['trxn_id'] = ($params['trxn_id'] ?? $params['invoiceID']);
+
+    $campaignId = $params['campaign_id'] ?? $form->_values['campaign_id'] ?? NULL;
+    $recurParams['campaign_id'] = $campaignId;
+    $recurring = CRM_Contribute_BAO_ContributionRecur::add($recurParams);
+    $form->_params['contributionRecurID'] = $recurring->id;
+
+    return $recurring->id;
   }
 
   /**
