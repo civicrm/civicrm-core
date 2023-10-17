@@ -292,7 +292,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // CRM-18399: used by template to pass pre profile id as a url arg
       $this->assign('custom_pre_id', $this->_values['custom_pre_id']);
 
-      $this->buildComponentForm($this->_id, $this);
+      $this->buildComponentForm();
     }
 
     // Build payment processor form
@@ -1564,6 +1564,188 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     // It seems like this might be un=reachable as there should always be a processor...
     return NULL;
+  }
+
+  /**
+   * Add onbehalf/honoree profile fields and native module fields.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function buildComponentForm(): void {
+    $contactID = $this->getContactID();
+
+    foreach (['soft_credit', 'on_behalf'] as $module) {
+      if ($module === 'soft_credit') {
+        if (empty($this->_values['honoree_profile_id'])) {
+          continue;
+        }
+
+        if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_values['honoree_profile_id'], 'is_active')) {
+          CRM_Core_Error::statusBounce(ts('This contribution page has been configured for contribution on behalf of honoree and the selected honoree profile is either disabled or not found.'));
+        }
+
+        $profileContactType = CRM_Core_BAO_UFGroup::getContactType($this->_values['honoree_profile_id']);
+        $requiredProfileFields = [
+          'Individual' => ['first_name', 'last_name'],
+          'Organization' => ['organization_name', 'email'],
+          'Household' => ['household_name', 'email'],
+        ];
+        $validProfile = CRM_Core_BAO_UFGroup::checkValidProfile($this->_values['honoree_profile_id'], $requiredProfileFields[$profileContactType]);
+        if (!$validProfile) {
+          CRM_Core_Error::statusBounce(ts('This contribution page has been configured for contribution on behalf of honoree and the required fields of the selected honoree profile are disabled or doesn\'t exist.'));
+        }
+
+        foreach (['honor_block_title', 'honor_block_text'] as $name) {
+          $this->assign($name, $this->_values[$name]);
+        }
+
+        $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
+
+        // radio button for Honor Type
+        foreach ($this->_values['soft_credit_types'] as $value) {
+          $honorTypes[$value] = $softCreditTypes[$value];
+        }
+        $this->addRadio('soft_credit_type_id', NULL, $honorTypes, ['allowClear' => TRUE]);
+
+        $honoreeProfileFields = CRM_Core_BAO_UFGroup::getFields(
+          $this->_values['honoree_profile_id'], FALSE,
+          NULL, NULL,
+          NULL, FALSE,
+          NULL, TRUE,
+          NULL, CRM_Core_Permission::CREATE
+        );
+        $this->assign('honoreeProfileFields', $honoreeProfileFields);
+
+        // add the form elements
+        foreach ($honoreeProfileFields as $name => $field) {
+          // If soft credit type is not chosen then make omit requiredness from honoree profile fields
+          if (count($this->_submitValues) &&
+            empty($this->_submitValues['soft_credit_type_id']) &&
+            !empty($field['is_required'])
+          ) {
+            $field['is_required'] = FALSE;
+          }
+          CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE, NULL, FALSE, FALSE, NULL, 'honor');
+        }
+      }
+      else {
+        if (empty($this->_values['onbehalf_profile_id'])) {
+          continue;
+        }
+
+        if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_values['onbehalf_profile_id'], 'is_active')) {
+          CRM_Core_Error::statusBounce(ts('This contribution page has been configured for contribution on behalf of an organization and the selected onbehalf profile is either disabled or not found.'));
+        }
+
+        $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
+        if (empty($member['is_active'])) {
+          $msg = ts('Mixed profile not allowed for on behalf of registration/sign up.');
+          $onBehalfProfile = CRM_Core_BAO_UFGroup::profileGroups($this->_values['onbehalf_profile_id']);
+          foreach (
+            [
+              'Individual',
+              'Organization',
+              'Household',
+            ] as $contactType
+          ) {
+            if (in_array($contactType, $onBehalfProfile) &&
+              (in_array('Membership', $onBehalfProfile) ||
+                in_array('Contribution', $onBehalfProfile)
+              )
+            ) {
+              CRM_Core_Error::statusBounce($msg);
+            }
+          }
+        }
+
+        if ($contactID) {
+          // retrieve all permissioned organizations of contact $contactID
+          $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($contactID, NULL, NULL, 'Organization');
+
+          if (count($organizations)) {
+            // Related org url - pass checksum if needed
+            $args = [
+              'ufID' => $this->_values['onbehalf_profile_id'],
+              'cid' => '',
+            ];
+            if (!empty($_GET['cs'])) {
+              $args = [
+                'ufID' => $this->_values['onbehalf_profile_id'],
+                'uid' => $this->_contactID,
+                'cs' => $_GET['cs'],
+                'cid' => '',
+              ];
+            }
+            $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', $args, FALSE, NULL, FALSE);
+          }
+          if (count($organizations) > 0) {
+            $this->add('select', 'onbehalfof_id', '', CRM_Utils_Array::collect('name', $organizations));
+
+            $orgOptions = [
+              0 => ts('Select an existing organization'),
+              1 => ts('Enter a new organization'),
+            ];
+            $this->addRadio('org_option', ts('options'), $orgOptions);
+            $this->setDefaults(['org_option' => 0]);
+          }
+        }
+
+        $this->assign('fieldSetTitle', CRM_Core_BAO_UFGroup::getFrontEndTitle($this->_values['onbehalf_profile_id']));
+
+        if (!empty($this->_values['is_for_organization'])) {
+          if ($this->_values['is_for_organization'] == 2) {
+            $this->assign('onBehalfRequired', TRUE);
+          }
+          else {
+            $this->addElement('checkbox', 'is_for_organization',
+              $this->_values['for_organization'],
+              NULL
+            );
+          }
+        }
+
+        $profileFields = CRM_Core_BAO_UFGroup::getFields(
+          $this->_values['onbehalf_profile_id'],
+          FALSE, CRM_Core_Action::VIEW, NULL,
+          NULL, FALSE, NULL, FALSE, NULL,
+          CRM_Core_Permission::CREATE, NULL
+        );
+
+        if (!empty($this->_submitValues['onbehalf'])) {
+          if (!empty($this->_submitValues['onbehalfof_id'])) {
+            $this->assign('submittedOnBehalf', $this->_submitValues['onbehalfof_id']);
+          }
+          $this->assign('submittedOnBehalfInfo', json_encode(str_replace('"', '\"', $this->_submitValues['onbehalf']), JSON_HEX_APOS));
+        }
+
+        $fieldTypes = ['Contact', 'Organization'];
+        if (!empty($this->_membershipBlock)) {
+          $fieldTypes = array_merge($fieldTypes, ['Membership']);
+        }
+        $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
+        $fieldTypes = array_merge($fieldTypes, $contactSubType);
+
+        foreach ($profileFields as $name => $field) {
+          if (in_array($field['field_type'], $fieldTypes)) {
+            [$prefixName, $index] = CRM_Utils_System::explode('-', $name, 2);
+            if (in_array($prefixName, ['organization_name', 'email']) && empty($field['is_required'])) {
+              $field['is_required'] = 1;
+            }
+            if (count($this->_submitValues) &&
+              empty($this->_submitValues['is_for_organization']) &&
+              $this->_values['is_for_organization'] == 1 &&
+              !empty($field['is_required'])
+            ) {
+              $field['is_required'] = FALSE;
+            }
+            CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, NULL, FALSE, 'onbehalf', NULL, 'onbehalf');
+          }
+        }
+      }
+    }
+    $this->assign('locDataURL', $locDataURL ?? NULL);
+    $this->assign('onBehalfOfFields', $profileFields ?? NULL);
+
   }
 
 }
