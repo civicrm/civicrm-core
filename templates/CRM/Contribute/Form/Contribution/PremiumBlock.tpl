@@ -114,7 +114,7 @@
     {literal}
     <script>
       CRM.$(function($) {
-        var is_separate_payment = {/literal}{if $membershipBlock.is_separate_payment}{$membershipBlock.is_separate_payment}{else}0{/if}{literal};
+        var is_separate_payment = {/literal}{if $isShowMembershipBlock && $membershipBlock.is_separate_payment}{$membershipBlock.is_separate_payment}{else}0{/if}{literal};
 
         // select a new premium
         function select_premium(premium_id) {
