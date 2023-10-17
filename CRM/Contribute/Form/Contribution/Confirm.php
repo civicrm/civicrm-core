@@ -565,23 +565,20 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->assign('is_separate_payment', $this->isSeparateMembershipPayment());
 
     $this->assign('priceSetID', $this->_priceSetId);
-
-    // The concept of contributeMode is deprecated.
-    if ($this->_contributeMode === 'notify' ||
-      $this->_amount <= 0.0 || $this->_params['is_pay_later']
-    ) {
-      $contribButton = ts('Continue');
-    }
-    elseif (!empty($this->_ccid)) {
-      $contribButton = ts('Make Payment');
-    }
-    else {
-      $contribButton = ts('Make Contribution');
-    }
-    $this->assign('button', $contribButton);
+    $contributionButtonText = $this->getPaymentProcessorObject()->getText('contributionPageButtonText', [
+      'is_payment_to_existing' => !empty($this->_ccid),
+      'amount' => $this->_amount,
+    ]);
+    $this->assign('button', $contributionButtonText);
 
     $this->assign('continueText',
       $this->getPaymentProcessorObject()->getText('contributionPageContinueText', [
+        'is_payment_to_existing' => !empty($this->_ccid),
+        'amount' => $this->_amount,
+      ])
+    );
+    $this->assign('confirmText',
+      $this->getPaymentProcessorObject()->getText('contributionPageConfirmText', [
         'is_payment_to_existing' => !empty($this->_ccid),
         'amount' => $this->_amount,
       ])
@@ -590,7 +587,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->addButtons([
       [
         'type' => 'next',
-        'name' => $contribButton,
+        'name' => $contributionButtonText,
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
       ],

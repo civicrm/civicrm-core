@@ -276,14 +276,10 @@
     </fieldset>
   {/if}
 
-  {if $contributeMode NEQ 'notify' and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 )} {* In 'notify mode, contributor is taken to processor payment forms next *}
+  {if $confirmText}
     <div class="messages status continue_instructions-section">
       <p>
-        {if $is_pay_later OR $amount LE 0.0}
-          {ts 1=$button}Your transaction will not be completed until you click the <strong>%1</strong> button. Please click the button one time only.{/ts}
-        {else}
-          {ts 1=$button}Your contribution will not be completed until you click the <strong>%1</strong> button. Please click the button one time only.{/ts}
-        {/if}
+        {$confirmText}
       </p>
     </div>
   {/if}
