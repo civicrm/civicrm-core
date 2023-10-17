@@ -252,7 +252,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     $freezeOptions = [],
     array $extra = []
   ) {
-
+    $incomingExtra = $extra;
     $field = new CRM_Price_DAO_PriceField();
     $field->id = $fieldId;
     if (!$field->find(TRUE)) {
@@ -367,13 +367,13 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           else {
             $visibility_id = self::getVisibilityOptionID('public');
           }
-          $extra += [
+          $extra = [
             'price' => json_encode([$elementName, $priceOptionText['priceVal']]),
             'data-amount' => $opt[$valueFieldName],
             'data-currency' => $currencyName,
             'data-price-field-values' => json_encode($customOption),
             'visibility' => $visibility_id,
-          ];
+          ] + $incomingExtra;
           // @todo - move this back to the only calling function on Contribution_Form_Main.php
           if ($field->name == 'membership_amount') {
             $extra += [
