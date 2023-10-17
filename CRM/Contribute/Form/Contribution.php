@@ -1519,7 +1519,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * Create the recurring contribution record.
    *
-   * @param CRM_Core_Form $form
+   * @param self $form
    * @param array $params
    * @param array $recurParams
    *
@@ -1534,19 +1534,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $recurParams['installments'] = $params['installments'] ?? NULL;
     $recurParams['currency'] = $params['currency'] ?? NULL;
     $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
-
-    // CRM-14354: For an auto-renewing membership with an additional contribution,
-    // if separate payments is not enabled, make sure only the membership fee recurs
-    if (!empty($this->_membershipBlock)
-      && $this->_membershipBlock['is_separate_payment'] === '0'
-      && isset($params['selectMembership'])
-      && $form->_values['is_allow_other_amount'] == '1'
-      // CRM-16331
-      && !empty($form->_membershipTypeValues)
-      && !empty($form->_membershipTypeValues[$params['selectMembership']]['minimum_fee'])
-    ) {
-      $recurParams['amount'] = $form->_membershipTypeValues[$params['selectMembership']]['minimum_fee'];
-    }
 
     $recurParams['is_test'] = 0;
     if (($form->_action & CRM_Core_Action::PREVIEW) ||
