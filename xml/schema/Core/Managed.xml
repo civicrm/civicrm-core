@@ -63,8 +63,7 @@
     <name>entity_id</name>
     <title>Entity ID</title>
     <type>int unsigned</type>
-    <required>true</required>
-    <comment>Foreign key to the referenced item.</comment>
+    <comment>Soft foreign key to the referenced item.</comment>
     <add>4.2</add>
   </field>
   <field>

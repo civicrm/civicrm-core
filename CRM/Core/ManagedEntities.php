@@ -200,12 +200,18 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Create a new entity.
+   * Create a new entity (if policy allows).
    *
    * @param array $item
    *   Entity specification (per hook_civicrm_managedEntities).
    */
   protected function insertNewEntity(array $item) {
+    // If entity has previously been created, only re-insert if 'update' policy is 'always'
+    // NOTE: $item[id] is the id of the `civicrm_managed` row not the entity itself
+    // If that id exists, then we know the entity was inserted previously and subsequently deleted.
+    if (!empty($item['id']) && $item['update'] !== 'always') {
+      return;
+    }
     $params = $item['params'];
     // APIv4
     if ($params['version'] == 4) {
@@ -233,6 +239,8 @@ class CRM_Core_ManagedEntities {
     }
 
     $dao = new CRM_Core_DAO_Managed();
+    // If re-inserting the entity, we'll update instead of create the managed record.
+    $dao->id = $item['id'] ?? NULL;
     $dao->module = $item['module'];
     $dao->name = $item['name'];
     $dao->entity_type = $item['entity_type'];
@@ -567,29 +575,20 @@ class CRM_Core_ManagedEntities {
     $plan = [];
     foreach ($managedEntities as $managedEntity) {
       $key = "{$managedEntity['module']}_{$managedEntity['name']}_{$managedEntity['entity_type']}";
-      // Set to disable or delete if module is disabled or missing - it will be overwritten below module is active.
+      // Set to disable or delete if module is disabled or missing - it will be overwritten below if module is active.
       $action = $this->isModuleDisabled($managedEntity['module']) ? 'disable' : 'delete';
       $plan[$key] = array_merge($managedEntity, ['managed_action' => $action]);
     }
     foreach ($declarations as $declaration) {
       $key = "{$declaration['module']}_{$declaration['name']}_{$declaration['entity']}";
-      if (isset($plan[$key])) {
-        $plan[$key]['params'] = $declaration['params'];
-        $plan[$key]['managed_action'] = 'update';
-        $plan[$key]['cleanup'] = $declaration['cleanup'] ?? NULL;
-        $plan[$key]['update'] = $declaration['update'] ?? 'always';
-      }
-      else {
-        $plan[$key] = [
-          'module' => $declaration['module'],
-          'name' => $declaration['name'],
-          'entity_type' => $declaration['entity'],
-          'managed_action' => 'create',
-          'params' => $declaration['params'],
-          'cleanup' => $declaration['cleanup'] ?? NULL,
-          'update' => $declaration['update'] ?? 'always',
-        ];
-      }
+      // Set action to update if already managed
+      $plan[$key]['managed_action'] = empty($plan[$key]['entity_id']) ? 'create' : 'update';
+      $plan[$key]['module'] = $declaration['module'];
+      $plan[$key]['name'] = $declaration['name'];
+      $plan[$key]['entity_type'] = $declaration['entity'];
+      $plan[$key]['params'] = $declaration['params'];
+      $plan[$key]['cleanup'] = $declaration['cleanup'] ?? NULL;
+      $plan[$key]['update'] = $declaration['update'] ?? 'always';
     }
     return $plan;
   }
