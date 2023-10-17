@@ -97,8 +97,6 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       ],
     ];
     $this->_managedEntities[] = [
-      // Setting module to 'civicrm' works for the test but not sure we should actually support that
-      // as it's probably better to package stuff in a core extension instead of core itself.
       'module' => 'civicrm',
       'name' => 'testSavedSearch',
       'entity' => 'SavedSearch',
@@ -226,8 +224,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertCount(0, $search);
 
     // Restore managed entity
-    $this->_managedEntities = [];
-    $this->_managedEntities[] = $autoUpdateSearch;
+    $this->_managedEntities = [$autoUpdateSearch];
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
     // Entity should be restored
@@ -251,8 +248,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
 
     // Update packaged version
     $autoUpdateSearch['params']['values']['description'] = 'New packaged state';
-    $this->_managedEntities = [];
-    $this->_managedEntities[] = $autoUpdateSearch;
+    $this->_managedEntities = [$autoUpdateSearch];
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
     // Because the entity was not modified, it will be updated to match the new packaged version
@@ -271,8 +267,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
 
     // Update packaged version
     $autoUpdateSearch['params']['values']['description'] = 'Newer packaged state';
-    $this->_managedEntities = [];
-    $this->_managedEntities[] = $autoUpdateSearch;
+    $this->_managedEntities = [$autoUpdateSearch];
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
     // Because the entity was  modified, it will not be updated
@@ -299,6 +294,47 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertEquals('civicrm', $search['base_module']);
     // local_modified_date should be reset by the revert action
     $this->assertNull($search['local_modified_date']);
+
+    // Delete by user
+    SavedSearch::delete(FALSE)
+      ->addWhere('name', '=', 'TestAutoUpdateSavedSearch')
+      ->execute();
+    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    // Because update policy is 'unmodified' the search won't be re-created
+    $search = SavedSearch::get(FALSE)
+      ->addWhere('name', '=', 'TestAutoUpdateSavedSearch')
+      ->execute();
+    $this->assertCount(0, $search);
+
+    // But the managed record is still hanging around with a null entity_id
+    $managed = Managed::get(FALSE)
+      ->addWhere('name', '=', 'testAutoUpdate')
+      ->addWhere('module', '=', 'civicrm')
+      ->execute();
+    $this->assertCount(1, $managed);
+    $this->assertNull($managed[0]['entity_id']);
+    $managedId = $managed[0]['id'];
+
+    // Change update policy to 'always'
+    $autoUpdateSearch['update'] = 'always';
+    $this->_managedEntities = [$autoUpdateSearch];
+    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    // Because update policy is 'always' the search will be re-created
+    $search = SavedSearch::get(FALSE)
+      ->addWhere('name', '=', 'TestAutoUpdateSavedSearch')
+      ->execute();
+    $this->assertCount(1, $search);
+
+    // But the managed record is still hanging around with a null id
+    $managed = Managed::get(FALSE)
+      ->addWhere('name', '=', 'testAutoUpdate')
+      ->addWhere('module', '=', 'civicrm')
+      ->execute();
+    $this->assertCount(1, $managed);
+    $this->assertEquals($search[0]['id'], $managed[0]['entity_id']);
+    $this->assertEquals($managedId, $managed[0]['id']);
   }
 
   /**
@@ -656,7 +692,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
   }
 
   /**
-   * Tests a scenario where a record may already exist and we want to make it a managed entity.@dataProvider
+   * Tests a scenario where a record may already exist and we want to make it a managed entity.
    *
    * @throws \CRM_Core_Exception
    */
