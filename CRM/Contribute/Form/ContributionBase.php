@@ -487,10 +487,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->assign('linkText', $linkText);
     }
 
-    //set pledge block if block id is set
-    if (!empty($this->_values['pledge_block_id'])) {
-      $this->assign('pledgeBlock', TRUE);
-    }
+    $this->assign('pledgeBlock', !empty($this->_values['pledge_block_id']));
 
     // @todo - move this check to `getMembershipBlock`
     if (!$this->isFormSupportsNonMembershipContributions() &&
