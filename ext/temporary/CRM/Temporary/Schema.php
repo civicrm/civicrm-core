@@ -33,31 +33,27 @@ class CRM_Temporary_Schema {
           //   not have good visibility. It's sipler to just re-implement equivalent behavior.
           // - For all other fields, do a conditional sync (DATETIME<=>TIMESTAMP).
 
+          $onInsert = [];
+          $onInsert[] = "IF NEW.{$gmtField} IS NULL AND NEW.{$tsField} IS NOT NULL THEN";
+          $onInsert[] = "  SET NEW.{$gmtField} = CONVERT_TZ(NEW.{$tsField}, @@time_zone, '+0:00');";
+          $onInsert[] = "ELSEIF NEW.{$tsField} IS NULL AND NEW.{$gmtField} IS NOT NULL THEN";
+          $onInsert[] = "  SET NEW.{$tsField} = CONVERT_TZ(NEW.{$gmtField}, '+0:00', @@time_zone);";
           if (mb_strpos($field['default'] ?? '', 'CURRENT_TIMESTAMP') !== FALSE) {
-            $onInsert = ["SET NEW.{$gmtField} = UTC_TIMESTAMP();"];
+            $onInsert[] = "ELSEIF NEW.{$tsField} IS NULL AND NEW.{$gmtField} IS NULL THEN";
+            $onInsert[] = "  SET NEW.{$gmtField} = UTC_TIMESTAMP();";
           }
-          else {
-            $onInsert = [
-              "IF NEW.{$gmtField} IS NULL AND NEW.{$tsField} IS NOT NULL THEN",
-              "  SET NEW.{$gmtField} = CONVERT_TZ(NEW.{$tsField}, @@time_zone, '+0:00');",
-              "ELSEIF NEW.{$tsField} IS NULL AND NEW.{$gmtField} IS NOT NULL THEN",
-              "  SET NEW.{$tsField} = CONVERT_TZ(NEW.{$gmtField}, '+0:00', @@time_zone);",
-              "END IF;",
-            ];
-          }
+          $onInsert[] = "END IF;";
 
+          $onUpdate = [];
+          $onUpdate[] = "IF NEW.{$tsField} <> OLD.{$tsField} THEN";
+          $onUpdate[] = "  SET NEW.{$gmtField} = CONVERT_TZ(NEW.{$tsField}, @@time_zone, '+0:00');";
+          $onUpdate[] = "ELSEIF NEW.{$gmtField} <> OLD.{$gmtField} THEN";
+          $onUpdate[] = "  SET NEW.{$tsField} = CONVERT_TZ(NEW.{$gmtField}, '+0:00', @@time_zone);";
           if (mb_strtoupper($field['default'] ?? '') === 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP') {
-            $onUpdate = ["SET NEW.{$gmtField} = UTC_TIMESTAMP();"];
+            $onUpdate[] = "ELSEIF NEW.{$tsField} IS NULL AND NEW.{$gmtField} IS NULL THEN";
+            $onUpdate[] = "  SET NEW.{$gmtField} = UTC_TIMESTAMP();";
           }
-          else {
-            $onUpdate = [
-              "IF NEW.{$tsField} <> OLD.{$tsField} THEN",
-              "  SET NEW.{$gmtField} = CONVERT_TZ(NEW.{$tsField}, @@time_zone, '+0:00');",
-              "ELSEIF NEW.{$gmtField} <> OLD.{$gmtField} THEN",
-              "  SET NEW.{$tsField} = CONVERT_TZ(NEW.{$gmtField}, '+0:00', @@time_zone);",
-              "END IF;",
-            ];
-          }
+          $onUpdate[] = "END IF;";
 
           $info[] = [
             'table' => $table,
