@@ -1547,7 +1547,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $recurParams['start_date'] = date('YmdHis', strtotime($params['receive_date']));
     }
     $recurParams['invoice_id'] = $params['invoiceID'] ?? NULL;
-    $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Pending');
     $recurParams['payment_processor_id'] = $params['payment_processor_id'] ?? NULL;
     $recurParams['is_email_receipt'] = (bool) ($params['is_email_receipt'] ?? FALSE);
     // We set trxn_id=invoiceID specifically for paypal IPN. It is reset this when paypal sends us the real trxn id, CRM-2991
