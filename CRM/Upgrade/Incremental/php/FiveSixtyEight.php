@@ -28,10 +28,12 @@ class CRM_Upgrade_Incremental_php_FiveSixtyEight extends CRM_Upgrade_Incremental
    *   The version number matching this function name
    */
   public function upgrade_5_68_alpha1($rev): void {
+    $this->addSnapshotTask('queue', CRM_Utils_SQL_Select::from('civicrm_queue')->select('*'));
     // Add column prior to updating it via runSql
     $this->addTask('Add Tag.label field', 'addColumn', 'civicrm_tag', 'label', "varchar(64) NOT NULL COMMENT 'User-facing tag name' AFTER `name`");
     $this->addTask('Update Tag.name field', 'alterColumn', 'civicrm_tag', 'name', "varchar(64) NOT NULL COMMENT 'Unique machine name'");
     $this->addTask('Update Tag.created_date field', 'alterColumn', 'civicrm_tag', 'created_date', "datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'Date and time that tag was created.'");
+    $this->addTask('Rename Queue.runner to Queue.payload', 'renameColumn', 'civicrm_queue', 'runner', 'payload', "varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Name of the task runner'");
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Update civicrm_managed.entity_id', 'alterColumn', 'civicrm_managed', 'entity_id', "int unsigned COMMENT 'Soft foreign key to the referenced item.'");
     $this->addTask('Update civicrm_managed.module', 'alterColumn', 'civicrm_managed', 'module', "varchar(255) NOT NULL COMMENT 'Name of the module which declared this object (soft FK to civicrm_extension.full_name)'");

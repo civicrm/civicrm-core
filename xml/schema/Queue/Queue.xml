@@ -65,16 +65,17 @@
     <drop>5.48</drop>
   </field>
   <field>
-    <name>runner</name>
-    <title>Runner</title>
+    <name>payload</name>
+    <title>Payload</title>
     <type>varchar</type>
     <length>64</length>
     <required>false</required>
-    <comment>Name of the task runner</comment>
+    <comment>Type of payload handled by this queue.</comment>
     <html>
       <type>Text</type>
     </html>
-    <add>5.48</add>
+    <!-- Originally called "runner" in 5.48. Renamed to "payload" in 5.68. -->
+    <add>5.68</add>
   </field>
   <field>
     <name>batch_limit</name>
