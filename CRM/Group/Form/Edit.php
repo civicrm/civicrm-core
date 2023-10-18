@@ -201,6 +201,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       }
     }
 
+    $parentGroupIds = explode(',', $this->_groupValues['parents']);
+    $defaults['parents'] = $parentGroupIds;
     if (empty($defaults['parents'])) {
       $defaults['parents'] = CRM_Core_BAO_Domain::getGroupId();
     }
@@ -402,9 +404,6 @@ WHERE  title = %1
         $parentGroups[$parentGroupId] = $groupNames[$parentGroupId];
         if (array_key_exists($parentGroupId, $groupNames)) {
           $parentGroupElements[$parentGroupId] = $groupNames[$parentGroupId];
-          $form->addElement('checkbox', "remove_parent_group_$parentGroupId",
-            $groupNames[$parentGroupId]
-          );
         }
       }
     }
@@ -412,6 +411,8 @@ WHERE  title = %1
 
     if (isset($form->_id)) {
       $potentialParentGroupIds = CRM_Contact_BAO_GroupNestingCache::getPotentialCandidates($form->_id, $groupNames);
+      // put back current groups because they are selected by default
+      $potentialParentGroupIds = array_merge($potentialParentGroupIds, $parentGroupIds);
     }
     else {
       $potentialParentGroupIds = array_keys($groupNames);
@@ -431,7 +432,7 @@ WHERE  title = %1
       else {
         $required = FALSE;
       }
-      $form->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required, ['class' => 'crm-select2', 'multiple' => TRUE]);
+      $form->add('select', 'parents', ts('Parents'), $parentGroupSelectValues, $required, ['class' => 'crm-select2', 'multiple' => TRUE]);
     }
 
     return $parentGroups;
