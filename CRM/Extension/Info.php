@@ -261,6 +261,9 @@ class CRM_Extension_Info {
     // and deeper into arrays. An exception for URLS section, since
     // we want them in special format.
     foreach ($info as $attr => $val) {
+      if (!property_exists($this, $attr)) {
+        continue;
+      }
       if (!count($val->children())) {
         $this->$attr = is_array($this->$attr) ? [] : trim((string) $val);
       }
