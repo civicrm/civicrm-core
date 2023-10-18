@@ -1125,6 +1125,28 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     trigger_error($message, E_USER_DEPRECATED);
   }
 
+  /**
+   * Temporarily suspend deprecation warnings while executing a function.
+   * This is intended for unit-tests, where you want to run some small
+   * piece of code to ensure that deprecated functionality still works.
+   *
+   * @internal
+   * @param callable $callable
+   * @return mixed
+   *   The result of running $callable()
+   */
+  public static function ignoreDeprecation($callable) {
+    $oldLevel = error_reporting();
+    $ignoreUserDeprecatedErrors = $oldLevel & ~E_USER_DEPRECATED;
+    try {
+      error_reporting($ignoreUserDeprecatedErrors);
+      return $callable();
+    }
+    finally {
+      error_reporting($oldLevel);
+    }
+  }
+
 }
 
 $e = new PEAR_ErrorStack('CRM');
