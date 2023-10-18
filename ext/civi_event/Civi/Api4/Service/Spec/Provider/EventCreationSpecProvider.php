@@ -29,6 +29,8 @@ class EventCreationSpecProvider extends \Civi\Core\Service\AutoService implement
     $spec->getFieldByName('title')->setRequiredIf('empty($values.is_template)');
     $spec->getFieldByName('start_date')->setRequiredIf('empty($values.is_template)');
     $spec->getFieldByName('template_title')->setRequiredIf('!empty($values.is_template)');
+    // Arguably this is a bad default in the schema
+    $spec->getFieldByName('is_active')->setRequired(FALSE)->setDefaultValue(TRUE);
 
     $template_id = (new FieldSpec('template_id', 'Event', 'Integer'))
       ->setTitle(ts('Event Template'))
