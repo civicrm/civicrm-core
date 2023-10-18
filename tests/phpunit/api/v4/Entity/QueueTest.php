@@ -114,7 +114,7 @@ class QueueTest extends Api4TestBase {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
-      'runner' => 'task',
+      'payload' => 'task',
       'error' => 'delete',
       'retry_limit' => 2,
       'retry_interval' => 4,
@@ -166,7 +166,7 @@ class QueueTest extends Api4TestBase {
 
   public function testBasicParallelPolling(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_parallel';
-    $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']);
+    $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'payload' => 'task', 'error' => 'delete']);
     $this->assertQueueStats(0, 0, 0, $queue);
 
     \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
@@ -208,7 +208,7 @@ class QueueTest extends Api4TestBase {
     \Civi::dispatcher()->addListener('hook_civicrm_queueRun_testStuff', [$this, 'onHookQueueRun']);
     $queue = \Civi::queue($queueName, [
       'type' => 'SqlParallel',
-      'runner' => 'testStuff',
+      'payload' => 'testStuff',
       'error' => 'delete',
       'batch_limit' => 3,
     ]);
@@ -236,7 +236,7 @@ class QueueTest extends Api4TestBase {
     \Civi::dispatcher()->addListener('hook_civicrm_queueRun_testStuff', [$this, 'onHookQueueRun']);
     $queue = \Civi::queue($queueName, [
       'type' => 'SqlParallel',
-      'runner' => 'testStuff',
+      'payload' => 'testStuff',
       'error' => 'delete',
       'batch_limit' => 4,
     ]);
@@ -256,7 +256,7 @@ class QueueTest extends Api4TestBase {
     \Civi::dispatcher()->addListener('hook_civicrm_queueRun_testStuff', [$this, 'onHookQueueRun']);
     $queue = \Civi::queue($queueName, [
       'type' => 'SqlParallel',
-      'runner' => 'testStuff',
+      'payload' => 'testStuff',
       'error' => 'delete',
       'batch_limit' => 4,
     ]);
@@ -298,7 +298,7 @@ class QueueTest extends Api4TestBase {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_runloopabort';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
-      'runner' => 'task',
+      'payload' => 'task',
       'error' => 'abort',
     ]);
     $this->assertQueueStats(0, 0, 0, $queue);
@@ -351,7 +351,7 @@ class QueueTest extends Api4TestBase {
 
   public function testSelect(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_parallel';
-    $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']);
+    $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'payload' => 'task', 'error' => 'delete']);
     $this->assertQueueStats(0, 0, 0, $queue);
 
     \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
@@ -368,7 +368,7 @@ class QueueTest extends Api4TestBase {
 
   public function testSelectRunAs(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_select';
-    $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']);
+    $queue = \Civi::queue($queueName, ['type' => 'SqlParallel', 'payload' => 'task', 'error' => 'delete']);
     $this->assertQueueStats(0, 0, 0, $queue);
 
     $task = new \CRM_Queue_Task([QueueTest::class, 'doSomething'], ['first']);
@@ -384,7 +384,7 @@ class QueueTest extends Api4TestBase {
 
   public function testEmptyPoll(): void {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
-    $queue = \Civi::queue($queueName, ['type' => 'Sql', 'runner' => 'task', 'error' => 'delete']);
+    $queue = \Civi::queue($queueName, ['type' => 'Sql', 'payload' => 'task', 'error' => 'delete']);
     $this->assertQueueStats(0, 0, 0, $queue);
 
     $startResult = Queue::claimItems()->setQueue($queueName)->execute();
@@ -393,9 +393,9 @@ class QueueTest extends Api4TestBase {
 
   public function getDelayableDrivers(): array {
     return [
-      'Sql' => [['type' => 'Sql', 'runner' => 'task', 'error' => 'delete']],
-      'SqlParallel' => [['type' => 'SqlParallel', 'runner' => 'task', 'error' => 'delete']],
-      'Memory' => [['type' => 'Memory', 'runner' => 'task', 'error' => 'delete']],
+      'Sql' => [['type' => 'Sql', 'payload' => 'task', 'error' => 'delete']],
+      'SqlParallel' => [['type' => 'SqlParallel', 'payload' => 'task', 'error' => 'delete']],
+      'Memory' => [['type' => 'Memory', 'payload' => 'task', 'error' => 'delete']],
     ];
   }
 
@@ -443,7 +443,7 @@ class QueueTest extends Api4TestBase {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
-      'runner' => 'task',
+      'payload' => 'task',
       'error' => $errorMode,
       'retry_limit' => 2,
       'retry_interval' => 1,
@@ -485,7 +485,7 @@ class QueueTest extends Api4TestBase {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
-      'runner' => 'task',
+      'payload' => 'task',
       'error' => 'delete',
       'retry_limit' => 2,
       'retry_interval' => 0,
@@ -531,7 +531,7 @@ class QueueTest extends Api4TestBase {
     $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_linear';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
-      'runner' => 'task',
+      'payload' => 'task',
       'error' => $errorMode,
       'retry_limit' => 2,
       'retry_interval' => 0,
@@ -587,7 +587,7 @@ class QueueTest extends Api4TestBase {
 
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
-      'runner' => 'task',
+      'payload' => 'task',
       'error' => 'delete',
     ]);
     $this->assertQueueStats(0, 0, 0, $queue);
@@ -643,7 +643,7 @@ class QueueTest extends Api4TestBase {
 
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
-      'runner' => 'task',
+      'payload' => 'task',
       'error' => 'delete',
     ]);
     $this->assertQueueStats(0, 0, 0, $queue);

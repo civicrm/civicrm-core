@@ -88,7 +88,7 @@ class RunItems extends \Civi\Api4\Generic\AbstractAction {
     \CRM_Utils_Hook::queueRun($queue, $items, $outcomes);
     if (empty($outcomes)) {
       throw new \CRM_Core_Exception(sprintf('Failed to run queue items (name=%s, runner=%s, itemCount=%d, outcomeCount=%d)',
-        $queue->getName(), $queue->getSpec('runner'), count($items), count($outcomes)));
+        $queue->getName(), $queue->getSpec('payload'), count($items), count($outcomes)));
     }
     foreach ($items as $itemPos => $item) {
       $result[] = ['outcome' => $outcomes[$itemPos], 'item' => $this->createItemStub($item)];

@@ -78,11 +78,11 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * If the queue has an automatic background runner (`runner`), then it
    * must also have an `error` policy.
    */
-  public function testRunnerRequiresErrorPolicy(): void {
+  public function testPayloadRequiresErrorPolicy(): void {
     try {
       $q1 = Civi::queue('test/incomplete/1', [
         'type' => 'Sql',
-        'runner' => 'task',
+        'payload' => 'task',
       ]);
       $this->fail('Should fail without error policy');
     }
@@ -92,16 +92,39 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
 
     $q2 = Civi::queue('test/complete/2', [
       'type' => 'Sql',
-      'runner' => 'task',
+      'payload' => 'task',
       'error' => 'delete',
     ]);
     $this->assertTrue($q2 instanceof CRM_Queue_Queue_Sql);
   }
 
+  public function testRunnerRequiresErrorPolicy_deprecated(): void {
+    // We'll leave around one test to make sure that Civi::queue($name, $params) accepts 'runner'.
+    CRM_Core_Error::ignoreDeprecation(function() {
+      try {
+        $q1 = Civi::queue('test/incomplete/1', [
+          'type' => 'Sql',
+          'runner' => 'task',
+        ]);
+        $this->fail('Should fail without error policy');
+      }
+      catch (CRM_Core_Exception $e) {
+        $this->assertMatchesRegularExpression('/Invalid error mode/', $e->getMessage());
+      }
+
+      $q2 = Civi::queue('test/complete/2', [
+        'type' => 'Sql',
+        'runner' => 'task',
+        'error' => 'delete',
+      ]);
+      $this->assertTrue($q2 instanceof CRM_Queue_Queue_Sql);
+    });
+  }
+
   public function testStatuses(): void {
     $q1 = Civi::queue('test/valid/default', [
       'type' => 'Sql',
-      'runner' => 'task',
+      'payload' => 'task',
       'error' => 'delete',
     ]);
     $this->assertTrue($q1 instanceof CRM_Queue_Queue_Sql);
@@ -110,7 +133,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     foreach (['draft', 'active', 'completed', 'aborted'] as $n => $exampleStatus) {
       $q1 = Civi::queue("test/valid/$n", [
         'type' => 'Sql',
-        'runner' => 'task',
+        'payload' => 'task',
         'error' => 'delete',
         'status' => $exampleStatus,
       ]);
@@ -124,7 +147,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
       'is_template' => TRUE,
       'name' => 'test/template',
       'type' => 'SqlParallel',
-      'runner' => 'task',
+      'payload' => 'task',
       'error' => 'delete',
     ])->execute();
     $this->assertDBQuery(1, "SELECT is_template FROM civicrm_queue WHERE name = 'test/template'");
@@ -134,7 +157,10 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals('test/my-active', $qActive->getName());
     $this->assertEquals('SqlParallel', $qActive->getSpec('type'));
-    $this->assertEquals('task', $qActive->getSpec('runner'));
+    $this->assertEquals('task', $qActive->getSpec('payload'));
+    CRM_Core_Error::ignoreDeprecation(function() use ($qActive) {
+      $this->assertEquals('task', $qActive->getSpec('runner'));
+    });
     $this->assertEquals('delete', $qActive->getSpec('error'));
     $this->assertDBQuery('active', "SELECT status FROM civicrm_queue WHERE name = 'test/my-active'");
     $this->assertDBQuery(0, "SELECT is_template FROM civicrm_queue WHERE name = 'test/my-active'");
@@ -145,7 +171,10 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals('test/my-draft', $qDraft->getName());
     $this->assertEquals('SqlParallel', $qDraft->getSpec('type'));
-    $this->assertEquals('task', $qDraft->getSpec('runner'));
+    $this->assertEquals('task', $qDraft->getSpec('payload'));
+    CRM_Core_Error::ignoreDeprecation(function() use ($qDraft) {
+      $this->assertEquals('task', $qDraft->getSpec('runner'));
+    });
     $this->assertEquals('delete', $qDraft->getSpec('error'));
     $this->assertDBQuery('draft', "SELECT status FROM civicrm_queue WHERE name = 'test/my-draft'");
     $this->assertDBQuery(0, "SELECT is_template FROM civicrm_queue WHERE name = 'test/my-active'");

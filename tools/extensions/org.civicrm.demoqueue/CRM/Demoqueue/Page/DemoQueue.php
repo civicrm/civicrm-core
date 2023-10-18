@@ -12,7 +12,7 @@ class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
 
     $queue = Civi::queue($queueName, [
       'type' => 'Sql',
-      'runner' => 'task',
+      'payload' => 'task',
       'error' => 'abort',
     ]);
 

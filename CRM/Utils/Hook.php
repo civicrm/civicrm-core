@@ -3062,7 +3062,7 @@ abstract class CRM_Utils_Hook {
    * @throws CRM_Core_Exception
    */
   public static function queueRun(CRM_Queue_Queue $queue, array $items, &$outcomes) {
-    $runner = $queue->getSpec('runner');
+    $runner = $queue->getSpec('payload');
     if (empty($runner) || !preg_match(';^[A-Za-z0-9_]+$;', $runner)) {
       throw new \CRM_Core_Exception("Cannot autorun queue: " . $queue->getName());
     }
