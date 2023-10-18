@@ -43,7 +43,7 @@ class CRM_Queue_Service {
    * @var string[]
    * @readonly
    */
-  private static $commonFields = ['name', 'type', 'runner', 'status', 'error', 'batch_limit', 'lease_time', 'retry_limit', 'retry_interval'];
+  private static $commonFields = ['name', 'type', 'payload', 'status', 'error', 'batch_limit', 'lease_time', 'retry_limit', 'retry_interval'];
 
   /**
    * FIXME: Singleton pattern should be removed when dependency-injection
@@ -88,9 +88,10 @@ class CRM_Queue_Service {
    *     flushed; default to TRUE
    *   - (additional keys depending on the queue provider).
    *   - is_persistent: bool, optional; if true, then this queue is loaded from `civicrm_queue` list
-   *   - runner: string, optional; if given, then items in this queue can run
+   *   - payload: string, optional; if given, then items in this queue can run
    *     automatically via `hook_civicrm_queueRun_{$runner}`
-   *   - status: string, required for runnable-queues; specify whether the runner is currently active
+   *   - runner: string, deprecated; setting this implies eponymous payload and run=>bg.
+   *   - status: string, required for runnable-queues; specify whether the queue is currently active
    *     ex: 'active', 'draft', 'completed'
    *   - error: string, required for runnable-queues; specify what to do with unhandled errors
    *     ex: "drop" or "abort"
@@ -104,6 +105,7 @@ class CRM_Queue_Service {
     if (is_object($this->queues[$queueSpec['name']] ?? NULL) && empty($queueSpec['reset'])) {
       return $this->queues[$queueSpec['name']];
     }
+    CRM_Queue_BAO_Queue::normalizeQueueSpec($queueSpec);
 
     if (!empty($queueSpec['is_persistent'])) {
       $queueSpec = $this->findCreateQueueSpec($queueSpec);
@@ -161,7 +163,9 @@ class CRM_Queue_Service {
     $dao = new CRM_Queue_DAO_Queue();
     $dao->name = $queueSpec['name'];
     if ($dao->find(TRUE)) {
-      return array_merge($queueSpec, CRM_Utils_Array::subset($dao->toArray(), static::$commonFields));
+      $asArray = $dao->toArray();
+      CRM_Queue_BAO_Queue::normalizeQueueSpec($asArray);
+      return array_merge($queueSpec, CRM_Utils_Array::subset($asArray, static::$commonFields));
     }
     else {
       return NULL;
@@ -184,6 +188,7 @@ class CRM_Queue_Service {
     if (is_object($this->queues[$queueSpec['name']] ?? NULL)) {
       return $this->queues[$queueSpec['name']];
     }
+    CRM_Queue_BAO_Queue::normalizeQueueSpec($queueSpec);
     if (!empty($queueSpec['is_persistent'])) {
       $queueSpec = $this->findCreateQueueSpec($queueSpec);
     }
@@ -241,7 +246,7 @@ class CRM_Queue_Service {
     }
 
     // The rest of the validations only apply to persistent, runnable queues.
-    if (empty($queueSpec['is_persistent']) || empty($queueSpec['runner'])) {
+    if (empty($queueSpec['is_persistent']) || empty($queueSpec['payload'])) {
       return;
     }
 
@@ -253,7 +258,7 @@ class CRM_Queue_Service {
 
     $errorModes = CRM_Queue_BAO_Queue::getErrorModes();
     $errorMode = $queueSpec['error'] ?? NULL;
-    if ($queueSpec['runner'] === 'task' && !isset($errorModes[$errorMode])) {
+    if ($queueSpec['payload'] === 'task' && !isset($errorModes[$errorMode])) {
       $throw('Invalid error mode "%s".', $errorMode);
     }
   }

@@ -41,6 +41,66 @@ class QueueTest extends Api4TestBase {
     parent::setUp();
   }
 
+  public function tearDown(): void {
+    parent::tearDown();
+    \CRM_Core_DAO::executeQuery('DELETE FROM civicrm_queue WHERE name LIKE "QueueTest_%"');
+  }
+
+  public function testDeprecatedRunner(): void {
+    $queueName = 'QueueTest_' . md5(random_bytes(32)) . '_depr';
+    $defaults = ['name' => $queueName, 'type' => 'Sql', 'error' => 'delete'];
+
+    // Create and read deprecated field 'runner'. Then, read supported field 'payload'.
+    \CRM_Core_Error::ignoreDeprecation(function() use ($defaults, $queueName) {
+      \Civi\Api4\Queue::create(FALSE)
+        ->setValues($defaults + ['runner' => 'xxx'])
+        ->execute();
+      $this->assertApiValue(['name' => $queueName], ['runner' => 'xxx']);
+    });
+    $this->assertApiValue(['name' => $queueName], ['payload' => 'xxx']);
+
+    // Update and read deprecated field 'runner'. Then, read supported field 'payload'.
+    \CRM_Core_Error::ignoreDeprecation(function() use ($queueName) {
+      \Civi\Api4\Queue::update(FALSE)
+        ->addWhere('name', '=', $queueName)
+        ->addValue('runner', 'yyy')
+        ->execute();
+      $this->assertApiValue(['name' => $queueName], ['runner' => 'yyy']);
+    });
+    $this->assertApiValue(['name' => $queueName], ['payload' => 'yyy']);
+
+    // Search by runner
+    \CRM_Core_Error::ignoreDeprecation(function() use ($queueName) {
+      $this->assertApiValue(['runner' => 'yyy'], ['name' => $queueName, 'runner' => 'yyy']);
+    });
+    $this->assertApiValue(['payload' => 'yyy'], ['name' => $queueName, 'payload' => 'yyy']);
+  }
+
+  /**
+   * Check the registration record for a queue. Assert that it has a certain key-value.
+   *
+   * @param array $where
+   *   Ex: ['name' => 'mail']
+   * @param array $expect
+   *   Ex: ['payload' => 'rfc822']
+   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function assertApiValue(array $where, array $expect): void {
+    $get = \Civi\Api4\Queue::get(FALSE);
+    foreach ($where as $key => $value) {
+      $get->addWhere($key, '=', $value)->addSelect($key);
+    }
+    foreach ($expect as $key => $value) {
+      $get->addSelect($key);
+    }
+    $record = $get->execute()->single();
+    foreach ($expect as $field => $value) {
+      $this->assertEquals($value, $record[$field]);
+    }
+  }
+
   /**
    * Setup a queue with a line of back-to-back tasks.
    *

@@ -31,6 +31,40 @@ class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue implements \Civi\Core\Hook
   }
 
   /**
+   * Event fired before modifying an IM.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (!in_array($event->action, ['create', 'edit'])) {
+      return;
+    }
+    static::normalizeQueueSpec($event->params);
+  }
+
+  /**
+   * Find old properties. Translate to new properties.
+   *
+   * @param array $queueSpec
+   * @internal
+   */
+  public static function normalizeQueueSpec(array &$queueSpec): void {
+    if (array_key_exists('runner', $queueSpec)) {
+      $queueName = $queueSpec['name'] ?? $queueSpec['id'] ?? 'unknown';
+      CRM_Core_Error::deprecatedWarning(sprintf('Queue spec (%s) has deprecated property "%s". Use "%s".', $queueName, 'runner', 'payload'));
+
+      if (!array_key_exists('agent', $queueSpec)) {
+        $queueSpec['agent'] = 'server';
+      }
+
+      if (!array_key_exists('payload', $queueSpec)) {
+        $queueSpec['payload'] = $queueSpec['runner'];
+      }
+
+      unset($queueSpec['runner']);
+    }
+  }
+
+  /**
    * Get a list of valid statuses.
    *
    * The status determines whether automatic background-execution may proceed.
