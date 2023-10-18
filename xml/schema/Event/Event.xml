@@ -294,6 +294,7 @@
     <title>Is Active</title>
     <type>boolean</type>
     <required>true</required>
+    <!-- FIXME - nonstandard default for is_active -->
     <default>0</default>
     <comment>Is this Event enabled or disabled/cancelled?</comment>
     <add>1.7</add>

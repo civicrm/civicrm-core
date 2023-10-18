@@ -182,6 +182,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
   protected function checkFields($entityName) {
     $fields = civicrm_api4($entityName, 'getFields', [
       'checkPermissions' => FALSE,
+      'action' => 'create',
       'where' => [['type', '=', 'Field']],
     ])->indexBy('name');
 
@@ -192,6 +193,12 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
     $this->assertArrayHasKey($idField, $fields, $errMsg);
     // Hmm, not true of every primary key... what about Afform.name?
     $this->assertEquals('Integer', $fields[$idField]['data_type']);
+
+    // The underlying schema is not 100% consistent, but this is the standard in APIv4
+    if (isset($fields['is_active'])) {
+      $this->assertTrue($fields['is_active']['default_value']);
+      $this->assertFalse($fields['is_active']['required']);
+    }
 
     // Ensure that the getFields (FieldSpec) format is generally consistent.
     foreach ($fields as $field) {
