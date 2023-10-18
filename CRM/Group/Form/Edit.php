@@ -412,7 +412,9 @@ WHERE  title = %1
     if (isset($form->_id)) {
       $potentialParentGroupIds = CRM_Contact_BAO_GroupNestingCache::getPotentialCandidates($form->_id, $groupNames);
       // put back current groups because they are selected by default
-      $potentialParentGroupIds = array_merge($potentialParentGroupIds, $parentGroupIds);
+      if (!empty($parentGroupIds)) {
+        $potentialParentGroupIds = array_merge($potentialParentGroupIds, $parentGroupIds);
+      }
     }
     else {
       $potentialParentGroupIds = array_keys($groupNames);
