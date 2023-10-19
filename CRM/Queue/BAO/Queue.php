@@ -86,4 +86,16 @@ class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue implements \Civi\Core\Hook
     ];
   }
 
+  /**
+   * Get a list of valid agents.
+   *
+   * @return string[]
+   */
+  public static function getAgents($context = NULL) {
+    return [
+      'server' => ts('Server-managed background agent'),
+      'browser' => ts('Browser-managed foreground agent'),
+    ];
+  }
+
 }

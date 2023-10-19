@@ -65,6 +65,19 @@
     <drop>5.48</drop>
   </field>
   <field>
+    <name>agent</name>
+    <title>Agent</title>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <comment>Agent(s) that should poll this queue (comma-separated list)</comment>
+    <serialize>COMMA</serialize>
+    <add>5.68</add>
+    <pseudoconstant>
+      <callback>CRM_Queue_BAO_Queue::getAgents</callback>
+    </pseudoconstant>
+  </field>
+  <field>
     <name>payload</name>
     <title>Payload</title>
     <type>varchar</type>
