@@ -19,7 +19,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   /**
    * Get a list of setup-actions.
    *
-   * @return array
+   * @return array{array{title:string, callback: mixed, url: string}}
    *   List of available actions. See description in the hook-docs.
    * @see CRM_Utils_Hook::mailSetupActions()
    */
@@ -31,6 +31,13 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     ];
 
     CRM_Utils_Hook::mailSetupActions($setupActions);
+
+    foreach ($setupActions as $key => &$setupAction) {
+      if (!isset($setupAction['url'])) {
+        $setupAction['url'] = (string) Civi::url('//civicrm/ajax/setupMailAccount')->addQuery(['type' => $key]);
+      }
+    }
+
     return $setupActions;
   }
 

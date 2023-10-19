@@ -1145,6 +1145,9 @@ abstract class CRM_Utils_Hook {
    *     - title: string
    *     - callback: string|array, the function which starts the setup process.
    *        The function is expected to return a 'url' for the config screen.
+   *     - url: string (optional), a URL which starts the setup process.
+   *        If omitted, then a default URL is generated. The effect of opening the URL is
+   *        to invoke the `callback`.
    * @return mixed
    */
   public static function mailSetupActions(&$setupActions) {
