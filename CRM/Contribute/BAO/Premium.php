@@ -114,6 +114,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
           else {
             CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
           }
+          $products[$productDAO->id] += ['thumbnail' => '', 'image' => ''];
         }
         $options = $temp = [];
         $temp = explode(',', $productDAO->options);
@@ -127,10 +128,10 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
       if (count($products)) {
         $form->assign('showPremium', $formItems);
         $form->assign('showSelectOptions', $formItems);
-        $form->assign('products', $products);
         $form->assign('premiumBlock', $premiumBlock);
       }
     }
+    $form->assign('products', $products ?? NULL);
   }
 
   /**
