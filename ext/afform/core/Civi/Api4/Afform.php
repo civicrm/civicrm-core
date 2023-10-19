@@ -140,6 +140,7 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'type',
           'title' => E::ts('Type'),
           'pseudoconstant' => ['optionGroupName' => 'afform_type'],
+          'default_value' => 'form',
         ],
         [
           'name' => 'requires',
@@ -195,16 +196,19 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'is_public',
           'title' => E::ts('Is Public'),
           'data_type' => 'Boolean',
+          'default_value' => FALSE,
         ],
         [
           'name' => 'permission',
           'title' => E::ts('Permission'),
           'data_type' => 'Array',
+          'default_value' => ['access CiviCRM'],
         ],
         [
           'name' => 'permission_operator',
           'title' => E::ts('Permission Operator'),
           'data_type' => 'String',
+          'default_value' => 'AND',
           'options' => \CRM_Core_SelectValues::andOr(),
         ],
         [
