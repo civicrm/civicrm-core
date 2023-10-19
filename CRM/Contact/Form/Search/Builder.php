@@ -365,14 +365,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     // get it from controller only if form has been submitted, else preProcess has set this
     if (!empty($_POST)) {
       $this->_formValues = $this->controller->exportValues($this->_name);
-
-      // set the group if group is submitted
-      if (!empty($this->_formValues['uf_group_id'])) {
-        $this->set('id', $this->_formValues['uf_group_id']);
-      }
-      else {
-        $this->set('id', '');
-      }
+      $this->set('uf_group_id', $this->_formValues['uf_group_id'] ?? '');
     }
 
     // we dont want to store the sortByCharacter in the formValue, it is more like
