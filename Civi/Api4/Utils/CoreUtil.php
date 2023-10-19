@@ -91,6 +91,20 @@ class CoreUtil {
   }
 
   /**
+   * Check if entity is of given type.
+   *
+   * @param string $entityName
+   *   e.g. 'Contact'
+   * @param string $entityType
+   *   e.g. 'SortableEntity'
+   * @return bool
+   */
+  public static function isType(string $entityName, string $entityType): bool {
+    $entityTypes = (array) self::getInfoItem($entityName, 'type');
+    return in_array($entityType, $entityTypes, TRUE);
+  }
+
+  /**
    * Get name of unique identifier, typically "id"
    * @param string $entityName
    * @return string

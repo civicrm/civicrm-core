@@ -34,11 +34,13 @@ class Api4Generator extends AutoService implements EventSubscriberInterface {
     $entities = Entity::get(FALSE)->addSelect('name')->execute()->column('name');
     $actions = ['get', 'save', 'create', 'update', 'delete', 'replace', 'revert', 'export', 'autocomplete', 'getFields', 'getActions', 'checkAccess'];
     $properties = Entity::getFields(FALSE)->addOrderBy('name')->execute()->column('name');
+    $entityTypes = Entity::getFields(FALSE)->addWhere('name', '=', 'type')->setLoadOptions(TRUE)->execute()->first()['options'] ?? [];
 
     $builder = new PhpStormMetadata('api4', __CLASS__);
     $builder->registerArgumentsSet('api4Entities', ...$entities);
     $builder->registerArgumentsSet('api4Actions', ...$actions);
     $builder->registerArgumentsSet('api4Properties', ...$properties);
+    $builder->registerArgumentsSet('api4EntityTypes', ...array_values($entityTypes));
 
     // Define arguments for core functions
     $builder->addExpectedArguments('\civicrm_api4()', 0, 'api4Entities');
@@ -52,6 +54,8 @@ class Api4Generator extends AutoService implements EventSubscriberInterface {
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getTableName()', 0, 'api4Entities');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getCustomGroupExtends()', 0, 'api4Entities');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getRefCount()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::isType()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::isType()', 1, 'api4EntityTypes');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::checkAccessDelegated()', 0, 'api4Entities');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::checkAccessDelegated()', 1, 'api4Actions');
     $builder->addExpectedArguments('\Civi\API\EntityLookupTrait::define()', 0, 'api4Entities');

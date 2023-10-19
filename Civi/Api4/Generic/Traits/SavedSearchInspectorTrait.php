@@ -148,7 +148,7 @@ trait SavedSearchInspectorTrait {
    */
   private function getQuery() {
     if (!isset($this->_selectQuery) && !empty($this->savedSearch['api_entity'])) {
-      if (!in_array('DAOEntity', CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'type'), TRUE)) {
+      if (!CoreUtil::isType($this->savedSearch['api_entity'], 'DAOEntity')) {
         return $this->_selectQuery = FALSE;
       }
       $api = Request::create($this->savedSearch['api_entity'], 'get', $this->savedSearch['api_params']);
