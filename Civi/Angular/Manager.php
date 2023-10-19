@@ -135,6 +135,9 @@ class Manager {
       foreach ($angularModules as $module => $info) {
         // Merge in defaults
         $angularModules[$module] += ['basePages' => ['civicrm/a']];
+        if (!empty($info['settings'])) {
+          \CRM_Core_Error::deprecatedWarning('Angular "settings" is not supported. See https://github.com/civicrm/civicrm-core/pull/19052');
+        }
         // Validate settingsFactory callables
         if (isset($info['settingsFactory'])) {
           // To keep the cache small, we want `settingsFactory` to contain the string names of class & function, not an object

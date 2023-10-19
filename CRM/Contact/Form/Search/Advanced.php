@@ -226,6 +226,10 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     $this->set('isAdvanced', '1');
 
     $this->setFormValues();
+    if (is_numeric($_POST['id'] ?? NULL)) {
+      $this->_formValues['contact_id'] = (int) $_POST['id'];
+    }
+    $this->set('formValues', $this->_formValues);
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
     if (!empty($_POST)) {
@@ -238,13 +242,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
         }
       }
 
-      // set the group if group is submitted
-      if (!empty($this->_formValues['uf_group_id'])) {
-        $this->set('id', $this->_formValues['uf_group_id']);
-      }
-      else {
-        $this->set('id', '');
-      }
+      $this->set('uf_group_id', $this->_formValues['uf_group_id'] ?? '');
     }
 
     // retrieve ssID values only if formValues is null, i.e. form has never been posted
