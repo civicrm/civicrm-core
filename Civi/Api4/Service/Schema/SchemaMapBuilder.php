@@ -41,13 +41,13 @@ class SchemaMapBuilder extends AutoService {
    */
   public function __construct(CiviEventDispatcherInterface $dispatcher) {
     $this->dispatcher = $dispatcher;
-    $this->apiEntities = array_keys((array) Entity::get(FALSE)->addSelect('name')->execute()->indexBy('name'));
+    $this->apiEntities = Entity::get(FALSE)->addSelect('name')->execute()->column('name');
   }
 
   /**
    * @return SchemaMap
    */
-  public function build() {
+  public function build(): SchemaMap {
     $map = new SchemaMap();
     $this->loadTables($map);
 
