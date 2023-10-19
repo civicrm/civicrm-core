@@ -2034,7 +2034,11 @@ WHERE  id IN ( $deleteIDString )
     $result = CRM_Core_DAO::executeQuery($query[1] . ' LIMIT ' . (int) $limit);
     CRM_Core_DAO::reenableFullGroupByMode();
     while ($result->fetch()) {
-      $rows[] = $this->buildRow($query[0], $result, $outputColumns, [], []);
+      $row = $this->buildRow($query[0], $result, $outputColumns, [], []);
+      foreach ($row as $rowColumn => $value) {
+        $row[$rowColumn] = $this->formatLocal($value, $rowColumn);
+      }
+      $rows[] = $row;
     }
     return $rows;
   }
@@ -2280,13 +2284,47 @@ LIMIT $offset, $limit
         $row = [];
 
         foreach (array_keys($sqlColumns) as $column) {
-          $row[$column] = $dao->$column;
+          $row[$column] = $this->formatLocal($dao->$column, $column);
         }
         $componentDetails[] = $row;
       }
       $this->writeRows($headerRows, $componentDetails);
 
       $offset += $limit;
+    }
+  }
+
+  /**
+   * Format mysql value by field and default locale.
+   *
+   * @param mixed $value Mysql value
+   * @param string $fieldName Field name
+   *
+   * @return mixed|string
+   *  Returns formatted value or mysql value if field isn't localizable.
+   */
+  protected function formatLocal(mixed $value, string $fieldName): mixed {
+    $fieldMetaData = $this->getMetaDataForField($fieldName);
+
+    if (!isset($fieldMetaData['type'])) {
+      return $value;
+    }
+
+    switch($fieldMetaData['type']) {
+      case CRM_Utils_Type::T_DATE:
+      case CRM_Utils_Type::T_TIME:
+      case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
+        $formatType = $fieldMetaData['html']['formatType'] ?? NULL;
+        $value = CRM_Utils_Date::setDateDefaults($value, $formatType);
+        return match ($fieldMetaData['type']) {
+          CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME => $value[0] . ' ' . $value[1],
+          CRM_Utils_Type::T_TIME => $value[1],
+          default => $value[0],
+        };
+      case CRM_Utils_Type::T_MONEY:
+        return CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($value);
+      default:
+        return $value;
     }
   }
 
