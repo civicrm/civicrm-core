@@ -141,6 +141,7 @@ class CRM_Afform_AfformScanner {
    */
   public function getMeta(string $name, bool $getLayout = FALSE): ?array {
     $defn = [];
+    $mtime = NULL;
 
     $jsonFile = $this->findFilePath($name, self::METADATA_JSON);
     $htmlFile = $this->findFilePath($name, self::LAYOUT_FILE);
@@ -149,15 +150,18 @@ class CRM_Afform_AfformScanner {
     // Json takes priority because local overrides are always saved in that format.
     if ($jsonFile !== NULL) {
       $defn = json_decode(file_get_contents($jsonFile), 1);
+      $mtime = filemtime($jsonFile);
     }
     // Extensions may provide afform definitions in php files
     else {
       $phpFile = $this->findFilePath($name, self::METADATA_PHP);
       if ($phpFile !== NULL) {
         $defn = include $phpFile;
+        $mtime = filemtime($phpFile);
       }
     }
     if ($htmlFile !== NULL) {
+      $mtime = max($mtime, filemtime($htmlFile));
       if ($getLayout) {
         // If the defn file included a layout, the html file overrides
         $defn['layout'] = file_get_contents($htmlFile);
@@ -168,6 +172,7 @@ class CRM_Afform_AfformScanner {
       return NULL;
     }
     $defn['name'] = $name;
+    $defn['modified_date'] = date('Y-m-d H:i:s', $mtime);
     return $defn;
   }
 
