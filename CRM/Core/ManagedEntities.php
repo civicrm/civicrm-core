@@ -153,7 +153,7 @@ class CRM_Core_ManagedEntities {
     // Fetch default values for fields that are writeable
     $condition = [['type', '=', 'Field'], ['readonly', 'IS EMPTY'], ['default_value', '!=', 'now']];
     // Exclude "weight" as that auto-adjusts
-    if (in_array('SortableEntity', CoreUtil::getInfoItem($item['entity_type'], 'type'), TRUE)) {
+    if (CoreUtil::isType($item['entity_type'], 'SortableEntity')) {
       $weightCol = CoreUtil::getInfoItem($item['entity_type'], 'order_by');
       $condition[] = ['name', '!=', $weightCol];
     }
@@ -302,7 +302,7 @@ class CRM_Core_ManagedEntities {
       $idField = CoreUtil::getIdFieldName($item['entity_type']);
       $params['values'][$idField] = $item['entity_id'];
       // Exclude "weight" as that auto-adjusts
-      if (in_array('SortableEntity', CoreUtil::getInfoItem($item['entity_type'], 'type'), TRUE)) {
+      if (CoreUtil::isType($item['entity_type'], 'SortableEntity')) {
         $weightCol = CoreUtil::getInfoItem($item['entity_type'], 'order_by');
         unset($params['values'][$weightCol]);
       }

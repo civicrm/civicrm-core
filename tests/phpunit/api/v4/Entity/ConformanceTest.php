@@ -441,7 +441,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
       $deleteResult = $deleteAction->execute();
     });
 
-    if (in_array('DAOEntity', CoreUtil::getInfoItem($entityName, 'type'))) {
+    if (CoreUtil::isType($entityName, 'DAOEntity')) {
       // We should have emitted an event.
       $hookEntity = ($entityName === 'Contact') ? 'Individual' : $entityName;/* ooph */
       $this->assertContains("pre.{$hookEntity}.delete", $log, "$entityName should emit hook_civicrm_pre() for deletions");
@@ -520,7 +520,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    * @return bool
    */
   protected function isReadOnly($entityName) {
-    return in_array('ReadOnlyEntity', CoreUtil::getInfoItem($entityName, 'type'), TRUE);
+    return CoreUtil::isType($entityName, 'ReadOnlyEntity');
   }
 
   /**

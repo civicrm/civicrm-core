@@ -102,7 +102,7 @@ trait DAOActionTrait {
   protected function writeObjects($items) {
     $updateWeights = FALSE;
     // Adjust weights for sortable entities
-    if (in_array('SortableEntity', CoreUtil::getInfoItem($this->getEntityName(), 'type'))) {
+    if (CoreUtil::isType($this->getEntityName(), 'SortableEntity')) {
       $weightField = CoreUtil::getInfoItem($this->getEntityName(), 'order_by');
       // Only take action if updating a single record, or if no weights are specified in any record
       // This avoids messing up a bulk update with multiple recalculations

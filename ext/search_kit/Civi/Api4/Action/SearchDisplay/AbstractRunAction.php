@@ -1147,7 +1147,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     // Add primary key field if actions are enabled
     // (only needed for non-dao entities, as Api4SelectQuery will auto-add the id)
-    if (!in_array('DAOEntity', CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'type')) &&
+    if (!CoreUtil::isType($this->savedSearch['api_entity'], 'DAOEntity') &&
       (!empty($this->display['settings']['actions']) || !empty($this->display['settings']['draggable']))
     ) {
       $this->addSelectExpression(CoreUtil::getIdFieldName($this->savedSearch['api_entity']));
