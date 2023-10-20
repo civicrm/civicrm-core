@@ -258,7 +258,11 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'contact_sub_type' => $sub_contact_type,
     ];
     $contact = CRM_Contact_BAO_Contact::add($params);
-    $this->assertSame($sub_contact_type, $contact->contact_sub_type, 'Wrong contact sub-type saved.');
+    $this->assertSame(
+      CRM_Core_DAO::serializeField($sub_contact_type, $contact->fields()['contact_sub_type']['serialize']),
+      $contact->contact_sub_type,
+      'Wrong contact sub-type saved.'
+    );
   }
 
   /**
