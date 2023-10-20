@@ -382,6 +382,9 @@
   name        : Detlev Sieber
   organization: Digitalcourage
 
+- github      : devappsoftware
+  organization: DevApp
+
 - github      : devarun
   name        : Arun Singh
 
@@ -1213,6 +1216,9 @@
 - github      : prondubuisi
   name        : Onyemenam Ndubuisi
 
+- github      : PrzemyslawTabor
+  name        : Przemysław Tabor
+
 - name        : Richard Edgar
 
 - github      : ogomez78
@@ -1721,5 +1727,5 @@
 - github      : mikeybeck
   name        : Mike Beck
   organization: Fuzion
-
+  
 - github      : ziljah
