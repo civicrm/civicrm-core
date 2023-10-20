@@ -276,8 +276,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
         }
       }
     }
-    $this->assign('registerClosed', !empty($values['event']['is_online_registration']) && !$isEventOpenForRegistration);
 
+    $this->assign('registerClosed', !empty($values['event']['is_online_registration']) && !$isEventOpenForRegistration && CRM_Core_Permission::check('register for events'));
     $this->assign('allowRegistration', $allowRegistration);
 
     $session = CRM_Core_Session::singleton();
