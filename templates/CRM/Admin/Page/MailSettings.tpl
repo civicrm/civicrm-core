@@ -61,7 +61,7 @@
             <select id="crm-mail-setup" name="crm-mail-setup" class="crm-select2 crm-form-select" aria-label="{ts}Add Mail Account{/ts}">
                 <option value="" aria-hidden="true">{ts}Add Mail Account{/ts}</option>
                 {foreach from=$setupActions key=setupActionsName item=setupAction}
-                    <option value="{$setupActionsName|escape}">{$setupAction.title|escape}</option>
+                    <option data-url="{$setupAction.url|escape}" value="{$setupActionsName|escape}">{$setupAction.title|escape}</option>
                 {/foreach}
             </select>
         </form>
@@ -80,8 +80,7 @@
                 return;
             }
             event.stopPropagation();
-            var url = CRM.url('civicrm/ajax/setupMailAccount', {type: event.val});
-            window.location = url;
+            window.location = cj(event.choice.element).data('url');
         });
     </script>
 {/literal}
