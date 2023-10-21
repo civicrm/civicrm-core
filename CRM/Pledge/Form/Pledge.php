@@ -107,7 +107,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $defaults = $this->_values;
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      return $defaults;
+      return $defaults ?? [];
     }
 
     if (!empty($defaults['is_test'])) {
