@@ -108,22 +108,24 @@
   },
   "scripts": {
     "post-install-cmd": [
-      "bash tools/scripts/composer/dompdf-cleanup.sh",
-      "bash tools/scripts/composer/tcpdf-cleanup.sh",
-      "bash tools/scripts/composer/pear-exception-fix.sh",
-      "bash tools/scripts/composer/net-smtp-fix.sh",
-      "bash tools/scripts/composer/pear-mail-fix.sh",
-      "bash tools/scripts/composer/phpword-jquery.sh",
-      "bash tools/scripts/composer/guzzle-mockhandler-fix.sh"
+      "rm -rf tools tests .github .gitlab",
+      "bash bin/composer/dompdf-cleanup.sh",
+      "bash bin/composer/tcpdf-cleanup.sh",
+      "bash bin/composer/pear-exception-fix.sh",
+      "bash bin/composer/net-smtp-fix.sh",
+      "bash bin/composer/pear-mail-fix.sh",
+      "bash bin/composer/phpword-jquery.sh",
+      "bash bin/composer/guzzle-mockhandler-fix.sh"
     ],
     "post-update-cmd": [
-      "bash tools/scripts/composer/dompdf-cleanup.sh",
-      "bash tools/scripts/composer/tcpdf-cleanup.sh",
-      "bash tools/scripts/composer/pear-exception-fix.sh",
-      "bash tools/scripts/composer/net-smtp-fix.sh",
-      "bash tools/scripts/composer/pear-mail-fix.sh",
-      "bash tools/scripts/composer/phpword-jquery.sh",
-      "bash tools/scripts/composer/guzzle-mockhandler-fix.sh"
+      "rm -rf tools tests .github .gitlab",
+      "bash bin/composer/dompdf-cleanup.sh",
+      "bash bin/composer/tcpdf-cleanup.sh",
+      "bash bin/composer/pear-exception-fix.sh",
+      "bash bin/composer/net-smtp-fix.sh",
+      "bash bin/composer/pear-mail-fix.sh",
+      "bash bin/composer/phpword-jquery.sh",
+      "bash bin/composer/guzzle-mockhandler-fix.sh"
     ]
   },
   "extra": {
