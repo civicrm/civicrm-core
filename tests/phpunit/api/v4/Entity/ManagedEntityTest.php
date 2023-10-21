@@ -56,6 +56,8 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
 
   public function tearDown(): void {
     \Civi::settings()->revert('debug_enabled');
+    // Disable multisite
+    \Civi::settings()->revert('is_enabled');
     parent::tearDown();
   }
 
@@ -661,6 +663,58 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       ->addWhere('name', '=', 'Test_Parent')
       ->execute()->first();
     $this->assertEquals(TRUE, $nav['is_active']);
+  }
+
+  /**
+   * Test multisite managed entities
+   * @see \Civi\Managed\MultisiteManaged
+   */
+  public function testMultiDomainNavigation(): void {
+    $this->_managedEntities[] = [
+      'module' => 'unit.test.fake.ext',
+      'name' => 'Navigation_Test_Domains',
+      'entity' => 'Navigation',
+      'cleanup' => 'unused',
+      'update' => 'unmodified',
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'label' => 'Test Domains',
+          'name' => 'Test_Domains',
+          'url' => 'civicrm/foo/bar',
+          'icon' => 'crm-i test',
+          'permission' => ['access CiviCRM'],
+          'weight' => 50,
+          'domain_id' => 'current_domain',
+        ],
+      ],
+    ];
+    $managedRecords = [];
+    \CRM_Utils_Hook::managed($managedRecords, ['unit.test.fake.ext']);
+    $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains']);
+    $this->assertCount(1, $result);
+
+    // Enable multisite with multiple domains
+    \Civi::settings()->set('is_enabled', TRUE);
+    Domain::create(FALSE)
+      ->addValue('name', 'Another domain')
+      ->addValue('version', CRM_Utils_System::version())
+      ->execute()->single();
+    $allDomains = Domain::get(FALSE)->addSelect('id')->addOrderBy('id')->execute();
+    $this->assertGreaterThan(1, $allDomains->count());
+
+    $managedRecords = [];
+    \CRM_Utils_Hook::managed($managedRecords, ['unit.test.fake.ext']);
+
+    // Base entity should not have been renamed
+    $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains']);
+    $this->assertCount(1, $result);
+
+    // New item should have been inserted for extra domains
+    foreach (array_slice($allDomains->column('id'), 1) as $domain) {
+      $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains_' . $domain]);
+      $this->assertCount(1, $result);
+    }
   }
 
   /**
