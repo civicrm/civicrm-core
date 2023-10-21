@@ -6,7 +6,7 @@ return [
   [
     'name' => 'Navigation_Experimental',
     'entity' => 'Navigation',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -20,7 +20,7 @@ return [
           'access CiviCRM',
         ],
         'permission_operator' => 'AND',
-        'parent_id' => NULL,
+        'parent_id.name' => 'Search',
         'is_active' => TRUE,
         'has_separator' => 0,
         'weight' => 113,
