@@ -43,7 +43,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * The Pledge values if an existing pledge.
    * @var array
    */
-  public $_values;
+  public $_values = [];
 
   /**
    * The Pledge frequency Units.
@@ -107,7 +107,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $defaults = $this->_values;
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      return $defaults ?? [];
+      return $defaults;
     }
 
     if (!empty($defaults['is_test'])) {
