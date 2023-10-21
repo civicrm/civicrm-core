@@ -261,8 +261,11 @@ class CRM_Extension_Info {
     // and deeper into arrays. An exception for URLS section, since
     // we want them in special format.
     foreach ($info as $attr => $val) {
-      if (count($val->children()) == 0) {
-        $this->$attr = trim((string) $val);
+      if (!property_exists($this, $attr)) {
+        continue;
+      }
+      if (!count($val->children())) {
+        $this->$attr = is_array($this->$attr) ? [] : trim((string) $val);
       }
       elseif ($attr === 'urls') {
         $this->urls = [];
@@ -335,7 +338,7 @@ class CRM_Extension_Info {
   public function filterRequirements($requirements) {
     $filtered = [];
     $compatInfo = CRM_Extension_System::getCompatibilityInfo();
-    foreach ($requirements->ext as $ext) {
+    foreach ($requirements->ext ?? [] as $ext) {
       $ext = (string) $ext;
       if (empty($compatInfo[$ext]['obsolete'])) {
         $filtered[] = $ext;
