@@ -41,7 +41,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * The Pledge values if an existing pledge.
    * @var array
    */
-  public $_values;
+  public $_values = [];
 
   /**
    * The Pledge frequency Units.
