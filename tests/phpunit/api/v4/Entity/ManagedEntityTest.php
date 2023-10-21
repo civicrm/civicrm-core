@@ -451,23 +451,6 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testExportOptionGroupWithDomain(): void {
-    $result = OptionGroup::get(FALSE)
-      ->addWhere('name', '=', 'from_email_address')
-      ->addChain('export', OptionGroup::export()->setId('$id'))
-      ->execute()->first();
-    $this->assertEquals('from_email_address', $result['export'][1]['params']['values']['option_group_id.name']);
-    $this->assertArrayNotHasKey('visibility_id', $result['export'][1]['params']['values']);
-    $this->assertStringStartsWith('OptionGroup_from_email_address_OptionValue_', $result['export'][1]['name']);
-    // All references should be from the current domain
-    foreach (array_slice($result['export'], 1) as $reference) {
-      $this->assertEquals('current_domain', $reference['params']['values']['domain_id']);
-    }
-  }
-
-  /**
-   * @throws \CRM_Core_Exception
-   */
   public function testManagedNavigationWeights(): void {
     $managedEntities = [
       [
@@ -599,6 +582,10 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertEquals(2, $nav['export'][2]['params']['values']['has_separator']);
     // Weight should not be included in export of children, leaving it to be auto-managed
     $this->assertArrayNotHasKey('weight', $nav['export'][1]['params']['values']);
+    // Domain is auto-managed & should not be included in export
+    $this->assertArrayNotHasKey('domain_id', $nav['export'][1]['params']['values']);
+    $this->assertArrayNotHasKey('domain_id.name', $nav['export'][1]['params']['values']);
+    $this->assertArrayNotHasKey('domain_id:name', $nav['export'][1]['params']['values']);
 
     // Children should have been assigned correct auto-weights
     $children = Navigation::get(FALSE)
@@ -615,9 +602,10 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       ->setId($decoys[0]['id'])
       ->execute();
     $this->assertCount(4, $decoyExport);
-    $this->assertEquals('Decoy domain', $decoyExport[0]['params']['values']['domain_id.name']);
-    $this->assertEquals('Decoy domain', $decoyExport[1]['params']['values']['domain_id.name']);
     $this->assertArrayNotHasKey('weight', $decoyExport[1]['params']['values']);
+    $this->assertArrayNotHasKey('domain_id', $decoyExport[1]['params']['values']);
+    $this->assertArrayNotHasKey('domain_id.name', $decoyExport[1]['params']['values']);
+    $this->assertArrayNotHasKey('domain_id:name', $decoyExport[1]['params']['values']);
 
     // Refresh managed entities with module disabled
     $allModules = [
