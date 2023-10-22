@@ -308,11 +308,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
     parent::__construct();
   }
 
-  public function preProcess() {
-    parent::preProcess();
-  }
-
-  public function select() {
+  public function select(): void {
     $select = [];
     $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
@@ -381,19 +377,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
     $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
   }
 
-  /**
-   * @param array $fields
-   * @param array $files
-   * @param CRM_Core_Form $self
-   *
-   * @return array
-   */
-  public static function formRule($fields, $files, $self) {
-    $errors = $grouping = [];
-    return $errors;
-  }
-
-  public function from() {
+  public function from(): void {
     $alias_constituent = 'constituentname';
     $alias_creditor = 'contact_civireport';
     $this->_from = "
