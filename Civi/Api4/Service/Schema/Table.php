@@ -13,6 +13,7 @@
 namespace Civi\Api4\Service\Schema;
 
 use Civi\Api4\Service\Schema\Joinable\Joinable;
+use Civi\Api4\Utils\CoreUtil;
 
 class Table {
 
@@ -50,6 +51,14 @@ class Table {
     $this->name = $name;
 
     return $this;
+  }
+
+  /**
+   * Get API entity for this table
+   * @return string|null
+   */
+  public function getEntityName(): ?string {
+    return CoreUtil::getApiNameFromTableName($this->name);
   }
 
   /**
