@@ -58,6 +58,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
+    $batches = CRM_Batch_BAO_Batch::getBatches();
     $this->_columns = [
       'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -342,6 +343,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
     $this->addCampaignFields('civicrm_contribution', TRUE);
 
+    if (!$batches) {
+      unset($this->_columns['civicrm_batch']);
+    }
     // Add charts support
     $this->_charts = [
       '' => ts('Tabular'),
@@ -383,7 +387,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
               case 'FISCALYEAR':
                 $config = CRM_Core_Config::singleton();
                 $fy = $config->fiscalYearStart;
-                $fiscal = self::fiscalYearOffset($field['dbAlias']);
+                $fiscal = $this->fiscalYearOffset($field['dbAlias']);
 
                 $select[] = "DATE_ADD(MAKEDATE({$fiscal}, 1), INTERVAL ({$fy['M']})-1 MONTH) AS {$tableName}_{$fieldName}_start";
                 $select[] = "{$fiscal} AS {$tableName}_{$fieldName}_subtotal";
@@ -750,7 +754,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
       foreach ($currencies as $currency) {
         $softTotalAmount[] = CRM_Utils_Money::format($currSoftAmount[$currency], $currency) .
-          " (" . $currSoftCount[$currency] . ")";
+          ' (' . $currSoftCount[$currency] . ')';
         $softAverage[] = CRM_Utils_Money::format(($currSoftAverage[$currency] / $averageSoftCount[$currency]), $currency);
       }
     }
