@@ -349,7 +349,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $type = 'money';
         }
         else {
-          $message = ts('%1 must be a number (with or without decimal point).', [1 => $label]);
+          $message = ts('%1 must be a number (with or without decimals).', [1 => $label]);
           $type = 'numeric';
         }
         // integers will have numeric rule applied to them.
