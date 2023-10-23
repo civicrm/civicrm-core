@@ -355,7 +355,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       if ($this->_values['is_monetary'] &&
         $this->_values['is_recur'] && empty($this->_values['pledge_id'])
       ) {
-        self::buildRecur($this);
+        $this->buildRecur();
       }
     }
 
@@ -767,15 +767,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Build elements to collect information for recurring contributions.
    *
-   *
-   * @param CRM_Core_Form $form
+   * Previously shared function.
    */
-  public static function buildRecur(&$form) {
+  private function buildRecur(): void {
+    $form = $this;
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur');
-    $className = get_class($form);
 
-    $form->assign('is_recur_interval', CRM_Utils_Array::value('is_recur_interval', $form->_values));
-    $form->assign('is_recur_installments', CRM_Utils_Array::value('is_recur_installments', $form->_values));
+    $form->assign('is_recur_interval', $this->getContributionPageValue('is_recur_interval'));
+    $form->assign('is_recur_installments', $this->getContributionPageValue('is_recur_installments'));
     $paymentObject = $form->getVar('_paymentObject');
     if ($paymentObject) {
       $form->assign('recurringHelpText', $paymentObject->getText('contributionPageRecurringHelp', [
@@ -786,13 +785,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $frUnits = $form->_values['recur_frequency_unit'] ?? NULL;
     $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, TRUE);
-    if (empty($frUnits) &&
-      $className == 'CRM_Contribute_Form_Contribution'
-    ) {
-      $frUnits = implode(CRM_Core_DAO::VALUE_SEPARATOR,
-        CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, FALSE, NULL, 'value')
-      );
-    }
 
     $unitVals = explode(CRM_Core_DAO::VALUE_SEPARATOR, $frUnits);
 
@@ -813,7 +805,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if (count($unitVals) == 1) {
       $form->assign('one_frequency_unit', TRUE);
       $form->add('hidden', 'frequency_unit', $unitVals[0]);
-      if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
+      if (!empty($form->_values['is_recur_interval'])) {
         $unit = CRM_Contribute_BAO_Contribution::getUnitLabelWithPlural($unitVals[0]);
         $form->assign('frequency_unit', $unit);
       }
@@ -830,7 +822,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       foreach ($unitVals as $key => $val) {
         if (array_key_exists($val, $frequencyUnits)) {
           $units[$val] = $frequencyUnits[$val];
-          if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
+          if (!empty($form->_values['is_recur_interval'])) {
             $units[$val] = CRM_Contribute_BAO_Contribution::getUnitLabelWithPlural($val);
             $unit = ts('Every');
           }
@@ -839,7 +831,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $frequencyUnit = &$form->add('select', 'frequency_unit', NULL, $units, FALSE, ['aria-label' => ts('Frequency Unit'), 'class' => 'crm-select2 eight']);
     }
 
-    if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
+    if (!empty($form->_values['is_recur_interval'])) {
       $form->add('text', 'frequency_interval', $unit, $attributes['frequency_interval'] + ['aria-label' => ts('Every'), 'class' => 'two']);
       $form->addRule('frequency_interval', ts('Frequency must be a whole number (EXAMPLE: Every 3 months).'), 'integer');
     }
