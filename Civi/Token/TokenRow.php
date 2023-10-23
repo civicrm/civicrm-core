@@ -187,7 +187,7 @@ class TokenRow {
       'return' => $customFieldName,
       'id' => $entityID,
     ]);
-    $fieldValue = \CRM_Utils_Array::value($customFieldName, $record, '');
+    $fieldValue = $record[$customFieldName] ?? '';
     $originalValue = $fieldValue;
     // format the raw custom field value into proper display value
     if (isset($fieldValue)) {
@@ -281,7 +281,7 @@ class TokenRow {
               if ($entity == 'activity' && $field == 'details') {
                 $htmlTokens[$entity][$field] = $value;
               }
-              elseif (\CRM_Utils_Array::value('data_type', \CRM_Utils_Array::value($field, $entityFields['values'])) == 'Memo') {
+              elseif (($entityFields['values'][$field]['data_type'] ?? NULL) === 'Memo') {
                 // Memo fields aka custom fields of type Note are html.
                 $htmlTokens[$entity][$field] = \CRM_Utils_String::purifyHTML($value);
               }
