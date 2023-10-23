@@ -123,7 +123,7 @@
       </tr>
     {/if}
   </table>
-  {include file="CRM/common/customDataBlock.tpl"}
+  {include file="CRM/common/customDataBlock.tpl" entityID=$eventID}
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
