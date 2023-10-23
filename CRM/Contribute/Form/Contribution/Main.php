@@ -542,7 +542,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
     }
-    $form->assign('ispricelifetime', $checklifetime);
+    $form->assign('hasExistingLifetimeMembership', $checklifetime);
   }
 
   /**
@@ -688,7 +688,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
                 if ($membership["membership_type_id.duration_unit:name"] === 'lifetime') {
                   unset($radio[$memType['id']]);
                   unset($radioOptAttrs[$memType['id']]);
-                  $this->assign('islifetime', TRUE);
+                  $this->assign('hasExistingLifetimeMembership', TRUE);
                   continue;
                 }
                 $this->assign('renewal_mode', TRUE);
