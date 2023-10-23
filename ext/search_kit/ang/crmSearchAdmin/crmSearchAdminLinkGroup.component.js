@@ -32,8 +32,10 @@
       this.getField = searchMeta.getField;
 
       this.fields = function() {
-        var selectFields = ctrl.crmSearchAdmin.getSelectFields();
-        var permissionField = [{
+        let selectFields = ctrl.crmSearchAdmin.getSelectFields();
+        // Use machine names not labels for option matching
+        selectFields.forEach((field) => field.id = field.id.replace(':label', ':name'));
+        let permissionField = [{
           text: ts('Current User Permission'),
           id: 'check user permission',
           description: ts('Check permission of logged-in user')
