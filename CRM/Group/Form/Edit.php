@@ -256,15 +256,9 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     //build custom data
     CRM_Custom_Form_CustomData::buildQuickForm($this);
 
-    $doParentCheck = FALSE;
-    if (CRM_Core_Permission::isMultisiteEnabled()) {
-      $doParentCheck = !($this->_id && CRM_Core_BAO_Domain::isDomainGroup($this->_id));
-    }
-
     $options = [
       'selfObj' => $this,
       'parentGroups' => $parentGroups,
-      'doParentCheck' => $doParentCheck,
     ];
     $this->addFormRule(['CRM_Group_Form_Edit', 'formRule'], $options);
   }
@@ -283,28 +277,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
   public static function formRule($fields, $fileParams, $options) {
     $errors = [];
 
-    $doParentCheck = $options['doParentCheck'];
     $self = &$options['selfObj'];
-
-    if ($doParentCheck) {
-      $parentGroups = $options['parentGroups'];
-
-      $grpRemove = 0;
-      foreach ($fields as $key => $val) {
-        if (substr($key, 0, 20) == 'remove_parent_group_') {
-          $grpRemove++;
-        }
-      }
-
-      $grpAdd = 0;
-      if (!empty($fields['parents'])) {
-        $grpAdd++;
-      }
-
-      if ((count($parentGroups) >= 1) && (($grpRemove - $grpAdd) >= count($parentGroups))) {
-        $errors['parents'] = ts('Make sure at least one parent group is set.');
-      }
-    }
 
     // do check for both name and title uniqueness
     if (!empty($fields['title'])) {
