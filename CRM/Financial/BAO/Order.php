@@ -683,10 +683,10 @@ class CRM_Financial_BAO_Order {
           if (!empty($option['membership_type_id'])) {
             $membershipType = CRM_Member_BAO_MembershipType::getMembershipType((int) $option['membership_type_id']);
             $metadata[$index]['options'][$optionID]['auto_renew'] = (int) $membershipType['auto_renew'];
-            if ($membershipType['auto_renew'] && empty($this->priceSetMetadata['auto_renew_membership_type'])) {
+            if ($membershipType['auto_renew'] && empty($this->priceSetMetadata['auto_renew_membership_field'])) {
               // Quick form layer supports one auto-renew membership type per price set. If we
               // want more for any reason we can add another array property.
-              $this->priceSetMetadata['auto_renew_membership_type'] = (int) $option['membership_type_id'];
+              $this->priceSetMetadata['auto_renew_membership_field'] = (int) $option['membership_type_id'];
             }
           }
         }
@@ -711,6 +711,7 @@ class CRM_Financial_BAO_Order {
     if (empty($this->priceSetMetadata)) {
       $this->priceSetMetadata = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($this->getPriceSetID());
       $this->priceSetMetadata['id'] = $this->getPriceSetID();
+      $this->priceSetMetadata['auto_renew_membership_field'] = NULL;
       $this->setPriceFieldMetadata($this->priceSetMetadata['fields']);
       unset($this->priceSetMetadata['fields']);
     }
