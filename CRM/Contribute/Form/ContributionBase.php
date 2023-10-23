@@ -555,12 +555,27 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       if ($form->_action & CRM_Core_Action::UPDATE) {
         $form->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($form->_id, 'contribution');
       }
-
-      $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId);
-      $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
-      $form->_values['fee'] = $form->_priceSet['fields'] ?? NULL;
+      $form->_priceSet = [$this->getPriceSetID() => $this->order->getPriceSetMetadata()];
+      $this->setPriceFieldMetaData($this->order->getPriceFieldsMetadata());
       $form->set('priceSet', $form->_priceSet);
     }
+  }
+
+  /**
+   * @param array $metadata
+   */
+  public function setPriceFieldMetaData(array $metadata): void {
+    $this->_values['fee'] = $this->_priceSet['fields'] = $metadata;
+  }
+
+  public function getPriceFieldMetaData() {
+    if (!empty($this->_values['fee'])) {
+      return $this->_values['fee'];
+    }
+    if (!empty($this->_priceSet['fields'])) {
+      return $this->_priceSet['fields'];
+    }
+    return $this->order->getPriceFieldsMetadata();
   }
 
   /**
