@@ -66,7 +66,7 @@
     </div>
     {include file="CRM/common/cidzero.tpl"}
 
-    {if $isShowMembershipBlock && ($islifetime or $ispricelifetime)}
+    {if $isShowMembershipBlock && $hasExistingLifetimeMembership}
       <div class="help">{ts}You have a current Lifetime Membership which does not need to be renewed.{/ts}</div>
     {/if}
 
