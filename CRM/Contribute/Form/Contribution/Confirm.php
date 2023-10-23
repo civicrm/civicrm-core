@@ -803,22 +803,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Overwrite action.
-   *
-   * Since we are only showing elements in frozen mode no help display needed.
-   *
-   * @return int
-   */
-  public function getAction() {
-    if ($this->_action & CRM_Core_Action::PREVIEW) {
-      return CRM_Core_Action::VIEW | CRM_Core_Action::PREVIEW;
-    }
-    else {
-      return CRM_Core_Action::VIEW;
-    }
-  }
-
-  /**
    * Set default values for the form.
    *
    * Note that in edit/view mode
