@@ -156,12 +156,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'default' => [1],
             'type' => CRM_Utils_Type::T_INT,
           ],
-          'contribution_page_id' => [
-            'title' => ts('Contribution Page'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionPage(),
-            'type' => CRM_Utils_Type::T_INT,
-          ],
           'currency' => [
             'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -277,7 +271,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'batch_id' => [
             'title' => ts('Batch Title'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Batch_BAO_Batch::getBatches(),
+            'options' => $batches,
             'type' => CRM_Utils_Type::T_INT,
           ],
         ],
