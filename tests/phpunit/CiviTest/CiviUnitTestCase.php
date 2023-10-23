@@ -25,7 +25,7 @@
  *   License along with this program.  If not, see
  *   <http://www.gnu.org/licenses/>.
  */
-
+declare(strict_types = 1);
 use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
