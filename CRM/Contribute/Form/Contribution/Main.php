@@ -479,52 +479,24 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @throws \CRM_Core_Exception
    */
   private function buildPriceSet(&$form, $component = NULL) {
-    $priceSetId = $this->getPriceSetID();
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, TRUE);
-    $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
-    $validPriceFieldIds = array_keys($form->_priceSet['fields']);
-
-    // Mark which field should have the auto-renew checkbox, if any. CRM-18305
-    if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {
-      $autoRenewMembershipTypes = [];
-      foreach ($form->_membershipTypeValues as $membershipTypeValue) {
-        if ($membershipTypeValue['auto_renew']) {
-          $autoRenewMembershipTypes[] = $membershipTypeValue['id'];
-        }
-      }
-      foreach ($form->_priceSet['fields'] as $field) {
-        if (array_key_exists('options', $field) && is_array($field['options'])) {
-          foreach ($field['options'] as $option) {
-            if (!empty($option['membership_type_id'])) {
-              if (in_array($option['membership_type_id'], $autoRenewMembershipTypes)) {
-                $form->_priceSet['auto_renew_membership_field'] = $field['id'];
-                // Only one field can offer auto_renew memberships, so break here.
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-    $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetId;
+    $validPriceFieldIds = array_keys($this->getPriceFieldMetaData());
     $form->assign('priceSet', $form->_priceSet);
 
+    // @todo - this hook wrangling can be done earlier if we set the form on $this->>order.
     $feeBlock = &$form->_values['fee'];
-
     // Call the buildAmount hook.
     CRM_Utils_Hook::buildAmount($component ?? 'contribution', $form, $feeBlock);
 
     // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
     $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
     $checklifetime = FALSE;
-    foreach ($feeBlock as $id => $field) {
+    foreach ($this->getPriceFieldMetaData() as $id => $field) {
       if ($field['visibility'] === 'public' ||
         ($field['visibility'] === 'admin' && $adminFieldVisible)
       ) {
         $options = $field['options'] ?? NULL;
-        $contactId = $form->getVar('_membershipContactID');
-        if ($contactId && $options) {
-          $contactsLifetimeMemberships = CRM_Member_BAO_Membership::getAllContactMembership($contactId, FALSE, TRUE);
+        if ($this->_membershipContactID && $options) {
+          $contactsLifetimeMemberships = CRM_Member_BAO_Membership::getAllContactMembership($this->_membershipContactID, FALSE, TRUE);
           $contactsLifetimeMembershipTypes = array_column($contactsLifetimeMemberships, 'membership_type_id');
           $memTypeIdsInPriceField = array_column($options, 'membership_type_id');
           $isCurrentMember = (bool) array_intersect($memTypeIdsInPriceField, $contactsLifetimeMembershipTypes);
@@ -625,7 +597,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   private function buildMembershipBlock() {
     $cid = $this->_membershipContactID;
-    $isTest = (bool) ($this->_action & CRM_Core_Action::PREVIEW);
+    $isTest = (bool) ($this->getAction() & CRM_Core_Action::PREVIEW);
     $separateMembershipPayment = FALSE;
     $this->addOptionalQuickFormElement('auto_renew');
     if ($this->_membershipBlock) {
@@ -640,7 +612,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       $separateMembershipPayment = $this->_membershipBlock['is_separate_payment'] ?? NULL;
 
-      foreach ($this->_priceSet['fields'] as $pField) {
+      foreach ($this->getPriceFieldMetaData() as $pField) {
         if (empty($pField['options'])) {
           continue;
         }
