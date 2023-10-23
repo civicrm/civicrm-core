@@ -374,6 +374,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if ($this->getPriceSetID()) {
       $this->order = new CRM_Financial_BAO_Order();
       $this->order->setPriceSetID($this->getPriceSetID());
+      $this->order->setIsExcludeExpiredFields(TRUE);
     }
     else {
       CRM_Core_Error::deprecatedFunctionWarning('forms require a price set ID');
@@ -562,13 +563,28 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Set price field metadata.
+   *
    * @param array $metadata
    */
   public function setPriceFieldMetaData(array $metadata): void {
     $this->_values['fee'] = $this->_priceSet['fields'] = $metadata;
   }
 
-  public function getPriceFieldMetaData() {
+  /**
+   * Get price field metadata.
+   *
+   * The returned value is an array of arrays where each array
+   * is an id-keyed price field and an 'options' key has been added to that
+   * arry for any options.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return array
+   */
+  public function getPriceFieldMetaData(): array {
     if (!empty($this->_values['fee'])) {
       return $this->_values['fee'];
     }

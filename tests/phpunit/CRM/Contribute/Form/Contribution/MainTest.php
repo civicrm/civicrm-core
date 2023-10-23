@@ -10,6 +10,8 @@
  */
 
 use Civi\Api4\PriceField;
+use Civi\Test\FormTrait;
+use Civi\Test\FormWrapper;
 
 /**
  *  Test APIv3 civicrm_contribute_* functions
@@ -19,6 +21,8 @@ use Civi\Api4\PriceField;
  * @group headless
  */
 class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
+
+  use FormTrait;
 
   /**
    * The id of the contribution page's payment processor.
@@ -105,12 +109,13 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
   /**
    * Get a contribution form object for testing.
    *
-   * @params array $submittedValues
-   * @params array $params
+   * @param array $submittedValues
+   * @param array $params
+   * @param int $formState
    *
-   * @return \CRM_Contribute_Form_Contribution_Main
+   * @return \Civi\Test\FormWrapper
    */
-  protected function getContributionForm(array $submittedValues = [], $params = []): CRM_Contribute_Form_Contribution_Main {
+  protected function getContributionForm(array $submittedValues = [], array $params = [], int $formState = FormWrapper::VALIDATED): FormWrapper {
     try {
       $this->ids['PriceSet']['membership'] = $params['priceSetID'] ?? $this->callAPISuccessGetValue('PriceSet', [
         'name' => 'default_membership_type_amount',
@@ -122,6 +127,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
         'payment_processor_type_id' => 'Dummy',
         'is_test' => 0,
       ]);
+      $this->paymentProcessorId = $paymentProcessor;
       $this->supportPreApproval();
 
       $contributionPageParams = (array_merge($params, [
@@ -142,12 +148,8 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
         'price_' . $this->ids['PriceField']['membership'] => $this->getPriceFieldValue($this->ids['MembershipType']['test']),
       ], $submittedValues);
       $submittedValues['id'] = $_REQUEST['id'] = (int) $contributionPage['id'];
-      /** @var \CRM_Contribute_Form_Contribution_Main $form */
-      $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Main', $submittedValues);
-      $form->preProcess();
-      $form->buildQuickForm();
-      // Need these values to create more realistic submit params (in getSubmitParams).
-      $this->paymentProcessorId = $paymentProcessor;
+      $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues);
+      $form->processForm($formState);
       return $form;
     }
     catch (CRM_Core_Exception $e) {
@@ -209,18 +211,9 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
     }
 
     $form = $this->getContributionForm([], ['priceSetID' => $priceSet['id']]);
-    foreach ($form->_priceSet['fields'] as $priceField) {
-      foreach ($priceField['options'] as $opValues) {
-        $membershipTypeIds[$opValues['membership_type_id']] = $opValues['membership_type_id'];
-      }
-    }
-    $form->_membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($form, $membershipTypeIds);
-
-    //This function should not update form priceSet with the expired one.
-    CRM_Price_BAO_PriceSet::buildPriceSet($form);
-
-    $this->assertCount(1, $form->_priceSet['fields']);
-    $field = current($form->_priceSet['fields']);
+    $allFields = $form->getPriceFieldMetadata();
+    $this->assertCount(1, $allFields);
+    $field = current($allFields);
     $this->assertEquals('test_valid_price_field', $field['name']);
   }
 
