@@ -87,6 +87,58 @@ class SortableEntityTest extends Api4TestBase implements TransactionalInterface 
     $this->assertNull($optionTres['next.label']);
     $this->assertEquals('Tres', $optionTres['label']);
     $this->assertEquals('Dos', $optionTres['previous.label']);
+
+    // Insert new option into the es group, before the last item
+    OptionValue::create(FALSE)
+      ->addValue('option_group_id:name', 'esGroup')
+      ->addValue('name', 'option_4')
+      ->addValue('label', 'El Extra')
+      ->addValue('next.name', 'option_3')
+      ->execute();
+    $options = OptionValue::get(FALSE)
+      ->addSelect('weight', 'label', 'value', 'previous.name', 'next.name')
+      ->addWhere('option_group_id:name', '=', 'esGroup')
+      ->addOrderBy('weight')
+      ->execute();
+    $this->assertEquals([1, 2, 4, 3], $options->column('value'));
+    $this->assertEquals([1, 2, 3, 4], $options->column('weight'));
+    $this->assertEquals(['Uno', 'Dos', 'El Extra', 'Tres'], $options->column('label'));
+    $this->assertEquals([NULL, 'option_1', 'option_2', 'option_4'], $options->column('previous.name'));
+    $this->assertEquals(['option_2', 'option_4', 'option_3', NULL], $options->column('next.name'));
+
+    // Insert new option into the es group with invalid next.name
+    // Since weight does not resolve it will become the last option
+    OptionValue::create(FALSE)
+      ->addValue('option_group_id:name', 'esGroup')
+      ->addValue('name', 'option_5')
+      ->addValue('label', 'El Fin')
+      ->addValue('next.name', 'does not exist')
+      ->execute();
+    $options = OptionValue::get(FALSE)
+      ->addSelect('weight', 'label', 'value', 'previous.name', 'next.name')
+      ->addWhere('option_group_id:name', '=', 'esGroup')
+      ->addOrderBy('weight')
+      ->execute();
+    $this->assertEquals([1, 2, 4, 3, 5], $options->column('value'));
+    $this->assertEquals(['Uno', 'Dos', 'El Extra', 'Tres', 'El Fin'], $options->column('label'));
+
+    // Insert new option into the en group, after the first item
+    OptionValue::create(FALSE)
+      ->addValue('previous.name', 'option_1')
+      ->addValue('option_group_id.name', 'enGroup')
+      ->addValue('name', 'option_4')
+      ->addValue('label', 'Extra')
+      ->execute();
+    $options = OptionValue::get(FALSE)
+      ->addSelect('weight', 'label', 'value', 'previous.name', 'next.name')
+      ->addWhere('option_group_id.name', '=', 'enGroup')
+      ->addOrderBy('weight')
+      ->execute();
+    $this->assertEquals([1, 4, 2, 3], $options->column('value'));
+    $this->assertEquals([1, 2, 3, 4], $options->column('weight'));
+    $this->assertEquals(['One', 'Extra', 'Two', 'Three'], $options->column('label'));
+    $this->assertEquals([NULL, 'option_1', 'option_4', 'option_2'], $options->column('previous.name'));
+    $this->assertEquals(['option_4', 'option_2', 'option_3', NULL], $options->column('next.name'));
   }
 
 }

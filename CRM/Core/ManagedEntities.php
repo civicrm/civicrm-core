@@ -305,6 +305,12 @@ class CRM_Core_ManagedEntities {
       if (CoreUtil::isType($item['entity_type'], 'SortableEntity')) {
         $weightCol = CoreUtil::getInfoItem($item['entity_type'], 'order_by');
         unset($params['values'][$weightCol]);
+        // Also exclude "previous" and "next" which evaluate to weight
+        foreach (array_keys($params['values']) as $key) {
+          if (str_starts_with($key, 'previous.') || str_starts_with($key, 'next.')) {
+            unset($params['values'][$key]);
+          }
+        }
       }
       // 'match' param doesn't apply to "update" action
       unset($params['match']);
