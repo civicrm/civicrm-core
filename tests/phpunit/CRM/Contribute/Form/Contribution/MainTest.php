@@ -214,7 +214,44 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
     $allFields = $form->getPriceFieldMetadata();
     $this->assertCount(1, $allFields);
     $field = current($allFields);
-    $this->assertEquals('test_valid_price_field', $field['name']);
+    $expectedValues = [
+      'name' => 'test_valid_price_field',
+      'label' => 'test valid price field',
+      'html_type' => 'Radio',
+      'is_enter_qty' => 1,
+      'weight' => TRUE,
+      'is_display_amounts' => TRUE,
+      'options_per_line' => 1,
+      'is_active' => TRUE,
+      'active_on' => NULL,
+      'expire_on' => NULL,
+      'javascript' => NULL,
+      'visibility_id:name' => 'public',
+      'visibility_id' => 1,
+      'is_required' => TRUE,
+    ];
+    foreach ($expectedValues as $key => $value) {
+      $this->assertEquals($value, $field[$key]);
+    }
+
+    $option = reset($field['options']);
+    $expectedValues = [
+      'name' => 'rye grass',
+      'label' => 'juicy and healthy',
+      'amount' => 1,
+      'weight' => 1,
+      'membership_type_id' => $this->ids['MembershipType']['test'],
+      'membership_num_terms' => 2,
+      'is_default' => FALSE,
+      'is_active' => TRUE,
+      'financial_type_id' => '1',
+      'non_deductible_amount' => 0,
+      'visibility_id' => '1',
+    ];
+    foreach ($expectedValues as $key => $value) {
+      $this->assertEquals($value, $option[$key]);
+    }
+
   }
 
   /**

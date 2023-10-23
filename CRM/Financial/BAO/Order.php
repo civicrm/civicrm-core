@@ -711,8 +711,6 @@ class CRM_Financial_BAO_Order {
     if (empty($this->priceSetMetadata)) {
       $this->priceSetMetadata = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($this->getPriceSetID());
       $this->priceSetMetadata['id'] = $this->getPriceSetID();
-      // @todo - make sure this is an array - commented out for now as this PR is against the rc.
-      // $priceSetMetadata['extends'] = explode(CRM_Core_DAO::VALUE_SEPARATOR, $priceSetMetadata['extends']);
       $this->setPriceFieldMetadata($this->priceSetMetadata['fields']);
       unset($this->priceSetMetadata['fields']);
     }
@@ -725,8 +723,7 @@ class CRM_Financial_BAO_Order {
     }
     // Access the property if set, to avoid a potential loop when the hook is called.
     $priceSetMetadata = $this->priceSetMetadata ?: $this->getPriceSetMetadata();
-    $extends = explode(CRM_Core_DAO::VALUE_SEPARATOR, $priceSetMetadata['extends']);
-    return in_array(CRM_Core_Component::getComponentID('CiviMember'), $extends, FALSE);
+    return in_array(CRM_Core_Component::getComponentID('CiviMember'), $priceSetMetadata['extends'], FALSE);
   }
 
   /**

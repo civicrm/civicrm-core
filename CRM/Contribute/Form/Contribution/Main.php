@@ -491,8 +491,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
     $checklifetime = FALSE;
     foreach ($this->getPriceFieldMetaData() as $id => $field) {
-      if ($field['visibility'] === 'public' ||
-        ($field['visibility'] === 'admin' && $adminFieldVisible)
+      if ($field['visibility_id:name'] === 'public' ||
+        ($field['visibility_id:name'] === 'admin' && $adminFieldVisible)
       ) {
         $options = $field['options'] ?? NULL;
         if ($this->_membershipContactID && $options) {
@@ -508,7 +508,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
         if (!CRM_Core_Permission::check('edit contributions')) {
           foreach ($options as $key => $currentOption) {
-            if ($currentOption['visibility_id'] == CRM_Price_BAO_PriceField::getVisibilityOptionID('admin')) {
+            if ($currentOption['visibility_id:name'] === 'admin') {
               unset($options[$key]);
             }
           }
