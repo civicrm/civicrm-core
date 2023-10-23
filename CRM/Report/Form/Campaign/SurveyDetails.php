@@ -318,9 +318,9 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
             }
           }
@@ -357,11 +357,11 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
 
   public function compileContent() {
     $coverSheet = $this->_surveyCoverSheet() .
-        "<div style=\"page-break-after: always\"></div>";
+      "<div style=\"page-break-after: always\"></div>";
     $templateFile = $this->getHookedTemplateFileName();
     return $coverSheet .
       CRM_Core_Form::$_template->fetch($templateFile) .
-      CRM_Utils_Array::value('report_footer', $this->_formValues);
+      ($this->_formValues['report_footer'] ?? '');
   }
 
   /**

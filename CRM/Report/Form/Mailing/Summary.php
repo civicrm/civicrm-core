@@ -436,9 +436,9 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
               else {
                 $clause = $this->whereClause($field,
                   $op,
-                  CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                  $this->_params["{$fieldName}_value"] ?? NULL,
+                  $this->_params["{$fieldName}_min"] ?? NULL,
+                  $this->_params["{$fieldName}_max"] ?? NULL
                 );
               }
             }

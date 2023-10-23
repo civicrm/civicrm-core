@@ -485,8 +485,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                   $clause = $this->whereClause($field,
                     $op,
                     $contactTypes,
-                    CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                    CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                    $this->_params["{$fieldName}_min"] ?? NULL,
+                    $this->_params["{$fieldName}_max"] ?? NULL
                   );
                 }
 
@@ -496,8 +496,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                   $subTypeClause = $this->whereClause($field,
                     $op,
                     $contactSubTypes,
-                    CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                    CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                    $this->_params["{$fieldName}_min"] ?? NULL,
+                    $this->_params["{$fieldName}_max"] ?? NULL
                   );
                   if ($clause) {
                     $clause = '(' . $clause . ' OR ' . $subTypeClause . ')';
@@ -514,9 +514,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                 else {
                   $clause = $this->whereClause($field,
                     $op,
-                    CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                    CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                    CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                    $this->_params["{$fieldName}_value"] ?? NULL,
+                    $this->_params["{$fieldName}_min"] ?? NULL,
+                    $this->_params["{$fieldName}_max"] ?? NULL
                   );
                 }
               }
