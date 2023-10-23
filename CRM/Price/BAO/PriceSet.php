@@ -449,7 +449,7 @@ AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
 
     $visibility = CRM_Core_PseudoConstant::visibility('name');
     while ($dao->fetch()) {
-      $fieldID = $dao->id;
+      $fieldID = (int) $dao->id;
 
       $setTree[$setID]['fields'][$fieldID] = [];
       $setTree[$setID]['fields'][$fieldID]['id'] = $fieldID;
@@ -459,7 +459,7 @@ AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
           continue;
         }
 
-        if ($field == 'visibility_id') {
+        if ($field === 'visibility_id') {
           $setTree[$setID]['fields'][$fieldID]['visibility'] = $visibility[$dao->$field];
         }
         $setTree[$setID]['fields'][$fieldID][$field] = $dao->$field;
@@ -475,11 +475,11 @@ WHERE  id = %1";
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     if ($dao->fetch()) {
       $setTree[$setID]['extends'] = $dao->extends;
-      $setTree[$setID]['financial_type_id'] = $dao->financial_type_id;
+      $setTree[$setID]['financial_type_id'] = (int) $dao->financial_type_id;
       $setTree[$setID]['help_pre'] = $dao->help_pre;
       $setTree[$setID]['help_post'] = $dao->help_post;
-      $setTree[$setID]['is_quick_config'] = $dao->is_quick_config;
-      $setTree[$setID]['min_amount'] = $dao->min_amount;
+      $setTree[$setID]['is_quick_config'] = (bool) $dao->is_quick_config;
+      $setTree[$setID]['min_amount'] = (float) $dao->min_amount;
     }
     return $setTree;
   }

@@ -675,7 +675,7 @@ class CRM_Financial_BAO_Order {
       if ($this->isExcludeExpiredFields && !empty($priceField['active_on']) && time() < strtotime($priceField['active_on'])) {
         unset($metadata[$index]);
       }
-      elseif ($this->isExcludeExpiredFields && !empty($priceField['expires_on']) && strtotime($priceField['expires_on']) < time()) {
+      elseif ($this->isExcludeExpiredFields && !empty($priceField['expire_on']) && strtotime($priceField['expire_on']) < time()) {
         unset($metadata[$index]);
       }
       elseif (!empty($priceField['options'])) {
