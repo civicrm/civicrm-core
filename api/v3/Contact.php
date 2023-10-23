@@ -35,7 +35,7 @@
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_create($params) {
-  $contactID = CRM_Utils_Array::value('contact_id', $params, CRM_Utils_Array::value('id', $params));
+  $contactID = CRM_Utils_Array::value('contact_id', $params, $params['id'] ?? NULL);
 
   if ($contactID && !empty($params['check_permissions']) && !CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::EDIT)) {
     throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
@@ -55,13 +55,14 @@ function civicrm_api3_contact_create($params) {
 
   if (!$contactID) {
     // If we get here, we're ready to create a new contact
-    if (($email = CRM_Utils_Array::value('email', $params)) && !is_array($params['email'])) {
+    $email = $params['email'] ?? NULL;
+    if ($email && !is_array($params['email'])) {
       $defLocType = CRM_Core_BAO_LocationType::getDefault();
       $params['email'] = [
         1 => [
           'email' => $email,
           'is_primary' => 1,
-          'location_type_id' => ($defLocType->id) ? $defLocType->id : 1,
+          'location_type_id' => $defLocType->id ?: 1,
         ],
       ];
     }
@@ -471,8 +472,7 @@ function civicrm_api3_contact_delete($params) {
   if ($skipUndelete && CRM_Financial_BAO_FinancialItem::checkContactPresent([$contactID], $error)) {
     throw new CRM_Core_Exception($error['_qf_default']);
   }
-  if (CRM_Contact_BAO_Contact::deleteContact($contactID, $restore, $skipUndelete,
-    CRM_Utils_Array::value('check_permissions', $params))) {
+  if (CRM_Contact_BAO_Contact::deleteContact($contactID, $restore, $skipUndelete, $params['check_permissions'] ?? FALSE)) {
     return civicrm_api3_create_success();
   }
   throw new CRM_Core_Exception('Could not delete contact');
@@ -763,7 +763,7 @@ function civicrm_api3_contact_merge($params) {
     [],
     $params['mode'],
     FALSE,
-    CRM_Utils_Array::value('check_permissions', $params)
+    $params['check_permissions'] ?? FALSE
     )) != FALSE) {
 
     return civicrm_api3_create_success($result, $params);
@@ -1204,9 +1204,9 @@ function civicrm_api3_contact_duplicatecheck($params) {
     $params['match'],
     $params['match']['contact_type'],
     $params['rule_type'] ?? '',
-    CRM_Utils_Array::value('exclude', $params, []),
-    CRM_Utils_Array::value('check_permissions', $params),
-    CRM_Utils_Array::value('dedupe_rule_id', $params)
+    $params['exclude'] ?? [],
+    $params['check_permissions'] ?? FALSE,
+    $params['dedupe_rule_id'] ?? NULL
   );
   $values = [];
   if ($dupes && !empty($params['return'])) {

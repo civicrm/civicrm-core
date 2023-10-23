@@ -50,7 +50,7 @@ function civicrm_api3_group_contact_get($params) {
     //ie. id passed in so we have to return something
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
-  $status = CRM_Utils_Array::value('status', $params, 'Added');
+  $status = $params['status'] ?? 'Added';
 
   $groupId = $params['group_id'] ?? NULL;
   $values = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], $status, NULL, FALSE, TRUE, FALSE, TRUE, $groupId);
@@ -217,8 +217,8 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
     }
   }
 
-  $method = CRM_Utils_Array::value('method', $params, 'API');
-  $status = CRM_Utils_Array::value('status', $params, $op);
+  $method = $params['method'] ?? 'API';
+  $status = $params['status'] ?? $op;
   $tracking = $params['tracking'] ?? NULL;
 
   if ($op == 'Added' || $op == 'Pending') {
@@ -274,9 +274,9 @@ function civicrm_api3_group_contact_update_status($params) {
   CRM_Contact_BAO_GroupContact::addContactsToGroup(
     [$params['contact_id']],
     $params['group_id'],
-    CRM_Utils_Array::value('method', $params, 'API'),
+    $params['method'] ?? 'API',
     'Added',
-    CRM_Utils_Array::value('tracking', $params)
+    $params['tracking'] ?? NULL
   );
 
   return TRUE;
