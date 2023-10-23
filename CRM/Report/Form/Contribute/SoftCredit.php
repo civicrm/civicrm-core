@@ -376,7 +376,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
         }
       }
     }
-    $this->selectClause = $select;
+    $this->_selectClauses = $select;
 
     $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
   }
@@ -457,7 +457,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
 
   public function groupBy() {
     $this->_rollup = 'WITH ROLLUP';
-    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->selectClause, ["{$this->_aliases['civicrm_contribution_soft']}.contact_id", "constituentname.id"]);
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, ["{$this->_aliases['civicrm_contribution_soft']}.contact_id", "constituentname.id"]);
     $this->_groupBy = "
 GROUP BY {$this->_aliases['civicrm_contribution_soft']}.contact_id, constituentname.id {$this->_rollup}";
   }
