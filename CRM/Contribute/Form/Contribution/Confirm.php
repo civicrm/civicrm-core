@@ -328,7 +328,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           [$field, $locType] = explode('-', $loc);
         }
 
-        if (in_array($field, $addressBlocks)) {
+        if (in_array($field, $addressBlocks) && !empty($value)) {
           if ($locType === 'Primary') {
             $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
             $locType = $defaultLocationType->id;
