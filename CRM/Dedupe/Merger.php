@@ -1544,7 +1544,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $rows["move_$field"] = [
         'main' => self::getFieldValueAndLabel($field, $main, $checkPermissions)['label'],
         'other' => self::getFieldValueAndLabel($field, $other, $checkPermissions)['label'],
-        'title' => $fields[$field]['label'],
+        'title' => $fields[$field]['label'] . (in_array($field, self::useLatestValueFields()) ? ' (prioritize latest option)' : ''),
       ];
 
       $value = self::getFieldValueAndLabel($field, $other, $checkPermissions)['value'];
@@ -1561,8 +1561,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $value[1] = NULL;
       }
 
-      // Display a checkbox to migrate, only if the values are different
-      if ($value != $main[$field]) {
+      // Display a checkbox to migrate, only if the values are different, should check type also for true value
+      if ($value !== $main[$field]) {
         // Don't check source if main is empty, because the source of the other contact is not the source of the merged contact
         $isChecked = ($field === 'source') ? FALSE : (!isset($main[$field]) || $main[$field] === '');
         $elements[] = [
@@ -1572,8 +1572,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           3 => NULL,
           4 => NULL,
           5 => $value,
-          'is_checked' => $isChecked,
-        ];
+          'is_checked' => in_array($field, self::useLatestValueFields()) ? TRUE : $isChecked,
+          ];
       }
 
       $migrationInfo["move_$field"] = $value;
@@ -2558,6 +2558,8 @@ ORDER BY civicrm_custom_group.weight,
             || ($migrationInfo['rows'][$key]['main'] === '0' && substr($key, 0, 12) === 'move_custom_')
           )
           && $migrationInfo['rows'][$key]['main'] != $migrationInfo['rows'][$key]['other']
+          // no need to mark $keysToUseLatest as conflict, will force to use the latest value
+          && !in_array(substr($key, 5), self::useLatestValueFields())
         ) {
 
           // note it down & lets wait for response from the hook.
@@ -2767,6 +2769,21 @@ ORDER BY civicrm_custom_group.weight,
     return $keysToIgnore[$type];
   }
 
+  /**
+   * default use latest value no need to double check, based on ticket T345206
+   * @param string $type
+   * @return array
+   */
+  protected static function useLatestValueFields(string $type = 'contact'): array {
+    $keysToUseLatest = [
+      'contact' => [
+        // T345206 prioritize the option from the latest CID over the older one
+        'is_opt_out',
+      ],
+    ];
+    return $keysToUseLatest[$type];
+  }
+  
   /**
    * Get the field value & label for the given field.
    *
