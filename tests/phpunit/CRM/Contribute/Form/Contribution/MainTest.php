@@ -22,15 +22,10 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
 
   /**
    * The id of the contribution page's payment processor.
+   *
    * @var int
    */
   private $paymentProcessorId;
-
-  /**
-   * The price set of the contribution page.
-   * @var int
-   */
-  private $priceSetId;
 
   /**
    * Clean up DB.
@@ -127,6 +122,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
         'payment_processor_type_id' => 'Dummy',
         'is_test' => 0,
       ]);
+      $this->supportPreApproval();
 
       $contributionPageParams = (array_merge($params, [
         'currency' => 'NZD',
@@ -149,7 +145,6 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       /** @var \CRM_Contribute_Form_Contribution_Main $form */
       $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Main', $submittedValues);
       $form->preProcess();
-      $form->_paymentProcessor['object']->setSupports(['PreApproval' => TRUE, 'BackOffice' => TRUE]);
       $form->buildQuickForm();
       // Need these values to create more realistic submit params (in getSubmitParams).
       $this->paymentProcessorId = $paymentProcessor;
@@ -235,6 +230,22 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
   protected function assertIsRecur(?int $expected): void {
     $isRecur = \Civi::$statics['CRM_Core_Payment_Dummy']['doPreApproval']['is_recur'] ?? NULL;
     $this->assertEquals($expected, $isRecur);
+  }
+
+  /**
+   * Set the dummy processor to support preApproval.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function supportPreApproval(): void {
+    $processors = CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('live');
+    $cacheKey = 'CRM_Financial_BAO_Payment_Processor_live__' . CRM_Core_Config::domainID();
+    foreach ($processors as $processor) {
+      if ($processor['payment_processor_type'] === 'Dummy') {
+        $processor['object']->setSupports(['PreApproval' => TRUE]);
+      }
+    }
+    CRM_Utils_Cache::singleton()->set($cacheKey, $processors);
   }
 
 }
