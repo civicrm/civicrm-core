@@ -207,9 +207,9 @@ function _civicrm_api3_attachment_delete_spec(&$spec) {
   $spec['entity_table'] = $entityFileFields['entity_table'];
   // Historically this field had no pseudoconstant and APIv3 can't handle it
   $spec['entity_table']['pseudoconstant'] = NULL;
-  $spec['entity_table']['title'] = CRM_Utils_Array::value('title', $spec['entity_table'], 'Entity Table') . ' (write-once)';
+  $spec['entity_table']['title'] = ($spec['entity_table']['title'] ?? 'Entity Table') . ' (write-once)';
   $spec['entity_id'] = $entityFileFields['entity_id'];
-  $spec['entity_id']['title'] = CRM_Utils_Array::value('title', $spec['entity_id'], 'Entity ID') . ' (write-once)';
+  $spec['entity_id']['title'] = ($spec['entity_id']['title'] ?? 'Entity ID') . ' (write-once)';
 }
 
 /**
@@ -469,10 +469,10 @@ function _civicrm_api3_attachment_getfields() {
   // Historically this field had no pseudoconstant and APIv3 can't handle it
   $spec['entity_table']['pseudoconstant'] = NULL;
   // Would be hard to securely handle changes.
-  $spec['entity_table']['title'] = CRM_Utils_Array::value('title', $spec['entity_table'], 'Entity Table') . ' (write-once)';
+  $spec['entity_table']['title'] = ($spec['entity_table']['title'] ?? 'Entity Table') . ' (write-once)';
   $spec['entity_id'] = $entityFileFields['entity_id'];
   // would be hard to securely handle changes
-  $spec['entity_id']['title'] = CRM_Utils_Array::value('title', $spec['entity_id'], 'Entity ID') . ' (write-once)';
+  $spec['entity_id']['title'] = ($spec['entity_id']['title'] ?? 'Entity ID') . ' (write-once)';
   $spec['url'] = [
     'title' => 'URL (read-only)',
     'description' => 'URL for downloading the file (not searchable, expire-able)',
