@@ -1009,7 +1009,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         }
       }
     }
-    $form->assign('ispricelifetime', $checklifetime);
   }
 
   /**
