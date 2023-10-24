@@ -198,14 +198,15 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     // Instead of recursively making mysql queries, we'll make one big
     // query and build the hierarchy with the algorithm below.
     $args = [1 => ['%' . $usedFor . '%', 'String']];
-    $query = "SELECT id, name, parent_id, is_tagset, is_selectable
+    $query = "SELECT id, name, label, parent_id, is_tagset, is_selectable
                   FROM civicrm_tag
               WHERE used_for LIKE %1";
     if ($parentId) {
       $query .= " AND parent_id = %2";
       $args[2] = [$parentId, 'Integer'];
     }
-    $query .= " ORDER BY name";
+    $query .= " ORDER BY label";
+    // @todo when it becomes localizable then we might need the i18nrewrite
     $dao = CRM_Core_DAO::executeQuery($query, $args, TRUE, NULL, FALSE, FALSE);
 
     // Sort the tags into the correct storage by the parent_id/is_tagset
@@ -231,6 +232,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
           'prefix' => '',
           'name' => $dao->name,
           'idPrefix' => $idPrefix,
+          'label' => $dao->label,
         ];
       }
       else {
@@ -240,6 +242,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
           'name' => $dao->name,
           'parent_id' => $dao->parent_id,
           'idPrefix' => $idPrefix,
+          'label' => $dao->label,
         ];
       }
     }
@@ -257,6 +260,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
         $root['prefix'],
         $root['name'],
         $root['idPrefix'],
+        $root['label'],
       ];
 
       // As you find the children, append them to the end of the new set
@@ -270,6 +274,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
               'prefix' => $tags[$root['id']][0] . $separator,
               'name' => $row['name'],
               'idPrefix' => $row['idPrefix'],
+              'label' => $row['label'],
             ];
             unset($rows[$key]);
           }
@@ -290,7 +295,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       if (!empty($tag[2])) {
         $key = $tag[2] . "-" . $key;
       }
-      $formattedTags[$key] = $tag[0] . $tag[1];
+      $formattedTags[$key] = $tag[0] . $tag[3];
     }
 
     $tags = $formattedTags;
