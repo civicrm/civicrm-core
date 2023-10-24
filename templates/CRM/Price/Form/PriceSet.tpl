@@ -102,7 +102,7 @@
                       <div class='label'></div>
                       <div class='content' id="auto_renew_section">
                         {if $form.auto_renew}
-                          {$form.auto_renew.html}&nbsp;{$form.auto_renew.label|escape}
+                          {$form.auto_renew.html}&nbsp;{$form.auto_renew.label|smarty:nodefaults|purify}
                         {/if}
                       </div>
                       <div class='content' id="force_renew" style='display: none'>{ts}Membership will renew automatically.{/ts}</div>
