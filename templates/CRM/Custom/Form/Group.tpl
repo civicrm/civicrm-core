@@ -172,7 +172,7 @@ CRM.$(function($) {
   // When changing or initializing the `is_multiple` field
   // Check if this set supports multiple records and adjust other options accordingly
   function handleMultiple() {
-    if ($(this).is(':checked')) {
+    if ($(this).is(':checked') || ($(this).attr('type') === 'hidden' && $(this).val() === '1')) {
       $('tr.field-max_multiple', $form).show();
       if (tabWithTableOption) {
         $('select[name=style]', $form).append(tabWithTableOption);
