@@ -951,29 +951,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
     $validPriceFieldIds = array_keys($form->_priceSet['fields']);
 
-    // @todo - this code is from previously shared function - can probaly go.
-    // Mark which field should have the auto-renew checkbox, if any. CRM-18305
-    if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {
-      $autoRenewMembershipTypes = [];
-      foreach ($form->_membershipTypeValues as $membershipTypeValue) {
-        if ($membershipTypeValue['auto_renew']) {
-          $autoRenewMembershipTypes[] = $membershipTypeValue['id'];
-        }
-      }
-      foreach ($form->_priceSet['fields'] as $field) {
-        if (array_key_exists('options', $field) && is_array($field['options'])) {
-          foreach ($field['options'] as $option) {
-            if (!empty($option['membership_type_id'])) {
-              if (in_array($option['membership_type_id'], $autoRenewMembershipTypes)) {
-                $form->_priceSet['auto_renew_membership_field'] = $field['id'];
-                // Only one field can offer auto_renew memberships, so break here.
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
     $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetId;
     $form->assign('priceSet', $form->_priceSet);
 
