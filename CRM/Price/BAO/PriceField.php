@@ -313,7 +313,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         if (!empty($fieldOptions[$optionKey]['label'])) {
           //check for label.
-          $label = $fieldOptions[$optionKey]['label'];
+          $label = CRM_Utils_String::purifyHTML($fieldOptions[$optionKey]['label']);
         }
         // @todo - move this back to the only calling function on Contribution_Form_Main.php
         if ($isQuickConfig && $field->name === 'other_amount') {
@@ -383,7 +383,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $qf->assign('membershipFieldID', $field->id);
           }
 
-          $choice[$opt['id']] = $priceOptionText['label'];
+          $choice[$opt['id']] = CRM_Utils_String::purifyHTML($priceOptionText['label']);
           $choiceAttrs[$opt['id']] = $extra;
           if ($is_pay_later) {
             $qf->add('text', 'txt-' . $elementName, $label, ['size' => '4']);
@@ -771,12 +771,12 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
    */
   public static function buildPriceOptionText($opt, $isDisplayAmounts, $valueFieldName) {
     $preHelpText = $postHelpText = '';
-    $optionLabel = !empty($opt['label']) ? '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' : '';
-    if (!empty($opt['help_pre'])) {
-      $preHelpText = '<span class="crm-price-amount-help-pre description">' . $opt['help_pre'] . '</span><span class="crm-price-amount-help-pre-separator">:&nbsp;</span>';
+    $optionLabel = !empty($opt['label']) ? '<span class="crm-price-amount-label">' . CRM_Utils_String::purifyHTML($opt['label']) . '</span>' : '';
+    if (CRM_Utils_String::purifyHTML($opt['help_pre'] ?? '')) {
+      $preHelpText = '<span class="crm-price-amount-help-pre description">' . CRM_Utils_String::purifyHTML($opt['help_pre']) . '</span><span class="crm-price-amount-help-pre-separator">:&nbsp;</span>';
     }
-    if (!empty($opt['help_post'])) {
-      $postHelpText = '<span class="crm-price-amount-help-post-separator">:&nbsp;</span><span class="crm-price-amount-help-post description">' . $opt['help_post'] . '</span>';
+    if (CRM_Utils_String::purifyHTML($opt['help_post'] ?? '')) {
+      $postHelpText = '<span class="crm-price-amount-help-post-separator">:&nbsp;</span><span class="crm-price-amount-help-post description">' . CRM_Utils_String::purifyHTML($opt['help_post']) . '</span>';
     }
 
     $invoicing = Civi::settings()->get('invoicing');
