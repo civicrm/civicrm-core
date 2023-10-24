@@ -943,9 +943,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   private function buildPriceSet(): void {
     $priceSetId = $this->getPriceSetID();
     $form = $this;
-    $validFieldsOnly = FALSE;
     $component = 'contribution';
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
+    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, FALSE);
     $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
     $validPriceFieldIds = array_keys($form->_priceSet['fields']);
 
@@ -962,26 +961,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
     $checklifetime = FALSE;
     foreach ($feeBlock as $id => $field) {
-      if (($field['visibility'] ?? NULL) == 'public' ||
-        (($field['visibility'] ?? NULL) == 'admin' && $adminFieldVisible == TRUE) ||
-        !$validFieldsOnly
-      ) {
-        $options = $field['options'] ?? NULL;
+      $options = $field['options'] ?? NULL;
 
-        if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
-          continue;
-        }
+      if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
+        continue;
+      }
 
-        if (!empty($options)) {
-          CRM_Price_BAO_PriceField::addQuickFormElement($form,
-            'price_' . $field['id'],
-            $field['id'],
-            FALSE,
-            $field['is_required'] ?? FALSE,
-            NULL,
-            $options
-          );
-        }
+      if (!empty($options)) {
+        CRM_Price_BAO_PriceField::addQuickFormElement($form,
+          'price_' . $field['id'],
+          $field['id'],
+          FALSE,
+          $field['is_required'] ?? FALSE,
+          NULL,
+          $options
+        );
       }
     }
   }
