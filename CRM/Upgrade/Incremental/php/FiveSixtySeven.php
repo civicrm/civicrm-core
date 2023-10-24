@@ -61,6 +61,17 @@ class CRM_Upgrade_Incremental_php_FiveSixtySeven extends CRM_Upgrade_Incremental
   }
 
   /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_67_beta2($rev): void {
+    // Repeat step from 5.66 because it was added late in the release-cycle
+    $this->addTask('Make ActionSchedule.name required', 'alterColumn', 'civicrm_action_schedule', 'name', "varchar(128) NOT NULL COMMENT 'Name of the scheduled action'");
+  }
+
+  /**
    * Some time ago, the labels for Mailing menu items were simplified for new
    * installs. Now that the old strings have been removed from Transifex, it
    * breaks translations, so we force the update, but only if the label was not
