@@ -1289,7 +1289,7 @@ SELECT is_primary,
       }
     }
     catch (CRM_Core_Exception $e) {
-      \Civi::log()->error('Geocoding error:' . $e->getMessage());
+      \Civi::log()->error('Geocoding error:' . $e->getMessage(), ['geocoder' => get_class($provider), 'input' => $params]);
     }
     // dev/core#2379 - Limit geocode length to 14 characters to avoid validation error on save in UI.
     foreach (['geo_code_1', 'geo_code_2'] as $geocode) {
