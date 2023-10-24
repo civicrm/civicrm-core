@@ -31,6 +31,16 @@ class CRM_Mailing_Event_BAO_MailingEventQueue extends CRM_Mailing_Event_DAO_Mail
     if (empty($params['id']) && empty($params['hash'])) {
       $eq->hash = self::hash();
     }
+    if (empty($params['id']) && !empty($params['job_id']) && empty($params['mailing_id'])) {
+      // mailing_id is a new field in 5.67. Calling code should pass it in going forwards
+      // but temporary handling will set it. (We should make the field required
+      // when we remove this in future)
+      CRM_Core_Error::deprecatedWarning('mailing_id should be passed into EventQueue create calls. Temporary handling has set it for now');
+      $query = CRM_Core_DAO::executeQuery('SELECT mailing_id, is_test
+        FROM civicrm_mailing_job job LEFT JOIN civicrm_mailing m ON m.id = mailing_id WHERE job.id = %1', [1 => [$params['job_id'], 'Integer']]);
+      $eq->mailing_id = $query->mailing_id;
+      $eq->is_test = $query->is_test;
+    }
     $eq->save();
     return $eq;
   }
