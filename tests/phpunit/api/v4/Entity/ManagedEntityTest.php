@@ -56,6 +56,8 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
 
   public function tearDown(): void {
     \Civi::settings()->revert('debug_enabled');
+    // Disable multisite
+    \Civi::settings()->revert('is_enabled');
     parent::tearDown();
   }
 
@@ -449,23 +451,6 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testExportOptionGroupWithDomain(): void {
-    $result = OptionGroup::get(FALSE)
-      ->addWhere('name', '=', 'from_email_address')
-      ->addChain('export', OptionGroup::export()->setId('$id'))
-      ->execute()->first();
-    $this->assertEquals('from_email_address', $result['export'][1]['params']['values']['option_group_id.name']);
-    $this->assertArrayNotHasKey('visibility_id', $result['export'][1]['params']['values']);
-    $this->assertStringStartsWith('OptionGroup_from_email_address_OptionValue_', $result['export'][1]['name']);
-    // All references should be from the current domain
-    foreach (array_slice($result['export'], 1) as $reference) {
-      $this->assertEquals('current_domain', $reference['params']['values']['domain_id']);
-    }
-  }
-
-  /**
-   * @throws \CRM_Core_Exception
-   */
   public function testManagedNavigationWeights(): void {
     $managedEntities = [
       [
@@ -597,6 +582,10 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertEquals(2, $nav['export'][2]['params']['values']['has_separator']);
     // Weight should not be included in export of children, leaving it to be auto-managed
     $this->assertArrayNotHasKey('weight', $nav['export'][1]['params']['values']);
+    // Domain is auto-managed & should not be included in export
+    $this->assertArrayNotHasKey('domain_id', $nav['export'][1]['params']['values']);
+    $this->assertArrayNotHasKey('domain_id.name', $nav['export'][1]['params']['values']);
+    $this->assertArrayNotHasKey('domain_id:name', $nav['export'][1]['params']['values']);
 
     // Children should have been assigned correct auto-weights
     $children = Navigation::get(FALSE)
@@ -613,9 +602,10 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       ->setId($decoys[0]['id'])
       ->execute();
     $this->assertCount(4, $decoyExport);
-    $this->assertEquals('Decoy domain', $decoyExport[0]['params']['values']['domain_id.name']);
-    $this->assertEquals('Decoy domain', $decoyExport[1]['params']['values']['domain_id.name']);
     $this->assertArrayNotHasKey('weight', $decoyExport[1]['params']['values']);
+    $this->assertArrayNotHasKey('domain_id', $decoyExport[1]['params']['values']);
+    $this->assertArrayNotHasKey('domain_id.name', $decoyExport[1]['params']['values']);
+    $this->assertArrayNotHasKey('domain_id:name', $decoyExport[1]['params']['values']);
 
     // Refresh managed entities with module disabled
     $allModules = [
@@ -661,6 +651,58 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       ->addWhere('name', '=', 'Test_Parent')
       ->execute()->first();
     $this->assertEquals(TRUE, $nav['is_active']);
+  }
+
+  /**
+   * Test multisite managed entities
+   * @see \Civi\Managed\MultisiteManaged
+   */
+  public function testMultiDomainNavigation(): void {
+    $this->_managedEntities[] = [
+      'module' => 'unit.test.fake.ext',
+      'name' => 'Navigation_Test_Domains',
+      'entity' => 'Navigation',
+      'cleanup' => 'unused',
+      'update' => 'unmodified',
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'label' => 'Test Domains',
+          'name' => 'Test_Domains',
+          'url' => 'civicrm/foo/bar',
+          'icon' => 'crm-i test',
+          'permission' => ['access CiviCRM'],
+          'weight' => 50,
+          'domain_id' => 'current_domain',
+        ],
+      ],
+    ];
+    $managedRecords = [];
+    \CRM_Utils_Hook::managed($managedRecords, ['unit.test.fake.ext']);
+    $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains']);
+    $this->assertCount(1, $result);
+
+    // Enable multisite with multiple domains
+    \Civi::settings()->set('is_enabled', TRUE);
+    Domain::create(FALSE)
+      ->addValue('name', 'Another domain')
+      ->addValue('version', CRM_Utils_System::version())
+      ->execute()->single();
+    $allDomains = Domain::get(FALSE)->addSelect('id')->addOrderBy('id')->execute();
+    $this->assertGreaterThan(1, $allDomains->count());
+
+    $managedRecords = [];
+    \CRM_Utils_Hook::managed($managedRecords, ['unit.test.fake.ext']);
+
+    // Base entity should not have been renamed
+    $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains']);
+    $this->assertCount(1, $result);
+
+    // New item should have been inserted for extra domains
+    foreach (array_slice($allDomains->column('id'), 1) as $domain) {
+      $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains_' . $domain]);
+      $this->assertCount(1, $result);
+    }
   }
 
   /**

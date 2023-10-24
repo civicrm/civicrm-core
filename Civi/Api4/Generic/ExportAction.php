@@ -121,24 +121,6 @@ class ExportAction extends AbstractAction {
     }
     // The get api always returns ID, but it should not be included in an export
     unset($record['id']);
-    // Should references be limited to the current domain?
-    $limitRefsByDomain = $entityType === 'OptionGroup' && \CRM_Core_OptionGroup::isDomainOptionGroup($record['name']) ? \CRM_Core_BAO_Domain::getDomain()->id : FALSE;
-    foreach ($allFields as $fieldName => $field) {
-      if (($field['fk_entity'] ?? NULL) === 'Domain') {
-        $alias = $fieldName . '.name';
-        if (isset($record[$alias])) {
-          // If this entity is for a specific domain, limit references to that same domain
-          if ($fieldName === 'domain_id') {
-            $limitRefsByDomain = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $record[$alias], 'id', 'name');
-          }
-          // Swap current domain for special API keyword
-          if ($record[$alias] === \CRM_Core_BAO_Domain::getDomain()->name) {
-            unset($record[$alias]);
-            $record[$fieldName] = 'current_domain';
-          }
-        }
-      }
-    }
     $name = ($parentName ?? '') . $entityType . '_' . ($record['name'] ?? count($this->exportedEntities[$entityType]));
     // Ensure safe characters, max length.
     // This is used for the value of `civicrm_managed.name` which has a maxlength of 255, but is also used
@@ -196,15 +178,6 @@ class ExportAction extends AbstractAction {
         // Custom fields don't really "belong" to option groups despite the reference
         if ($refEntity === 'CustomField' && $entityType === 'OptionGroup') {
           continue;
-        }
-        // Limit references by domain
-        if (property_exists($reference, 'domain_id')) {
-          if (!isset($reference->domain_id)) {
-            $reference->find(TRUE);
-          }
-          if (isset($reference->domain_id) && $reference->domain_id != $limitRefsByDomain) {
-            continue;
-          }
         }
         $references[$refEntity][] = $reference;
       }
@@ -284,6 +257,8 @@ class ExportAction extends AbstractAction {
       ['type', 'IN', ['Field', 'Custom']],
       ['readonly', '!=', TRUE],
     ];
+    // Domains are handled automatically
+    $excludeFields[] = 'domain_id';
     if ($excludeFields) {
       $conditions[] = ['name', 'NOT IN', $excludeFields];
     }
