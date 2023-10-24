@@ -96,7 +96,7 @@
 
             {/if}
               {if !empty($extends) && $extends eq "Membership"}
-                {if (!empty($priceSet) && $element.id == $priceSet.auto_renew_membership_field) || (empty($priceSet) && $element.name == 'membership_amount')}
+                {if ($element.id == $priceSet.auto_renew_membership_field)}
                   <div id="allow_auto_renew">
                     <div class='crm-section auto-renew'>
                       <div class='label'></div>
