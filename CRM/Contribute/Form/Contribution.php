@@ -618,7 +618,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $getOnlyPriceSetElements = FALSE;
       }
 
-      $this->buildPriceSet($this, 'contribution', FALSE);
+      $this->buildPriceSet();
 
       // get only price set form elements.
       if ($getOnlyPriceSetElements) {
@@ -939,14 +939,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * Build the price set form.
-   *
-   * @param CRM_Core_Form $form
-   * @param string|null $component
-   * @param bool $validFieldsOnly
    */
-  private function buildPriceSet($form, $component = NULL, $validFieldsOnly = TRUE): void {
+  private function buildPriceSet(): void {
     $priceSetId = $this->getPriceSetID();
-
+    $form = $this;
+    $validFieldsOnly = FALSE;
+    $component = 'contribution';
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
     $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
     $validPriceFieldIds = array_keys($form->_priceSet['fields']);
