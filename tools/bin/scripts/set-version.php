@@ -91,6 +91,10 @@ foreach ($infoXmls as $infoXml) {
     foreach ($dom->getElementsByTagName('version') as $tag) {
       $tag->textContent = $newVersion;
     }
+    // Update release date
+    foreach ($dom->getElementsByTagName('releaseDate') as $tag) {
+      $tag->textContent = date('Y-m-d');
+    }
     // Update compatability - set to major version of core
     /** @var \DOMNode $compat */
     foreach ($dom->getElementsByTagName('compatibility') as $compat) {
