@@ -69,6 +69,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtySeven extends CRM_Upgrade_Incremental
   public function upgrade_5_67_beta2($rev): void {
     // Repeat step from 5.66 because it was added late in the release-cycle
     $this->addTask('Make ActionSchedule.name required', 'alterColumn', 'civicrm_action_schedule', 'name', "varchar(128) NOT NULL COMMENT 'Name of the scheduled action'");
+    $this->addTask('Make Discount.entity_table required', 'alterColumn', 'civicrm_discount', 'entity_table', "varchar(64) NOT NULL COMMENT 'physical tablename for entity being joined to discount, e.g. civicrm_event'");
   }
 
   /**
