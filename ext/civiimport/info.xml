@@ -9,10 +9,10 @@
     <email>info@civicrm.org</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://civicrm.org</url>
-    <url desc="Documentation">http://civicrm.org</url>
-    <url desc="Support">http://civicrm.org</url>
-    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+    <url desc="Main Extension Page">https://civicrm.org</url>
+    <url desc="Documentation">https://civicrm.org</url>
+    <url desc="Support">https://civicrm.org</url>
+    <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2022-08-11</releaseDate>
   <version>5.68.alpha1</version>
@@ -20,7 +20,7 @@
   <compatibility>
     <ver>5.68</ver>
   </compatibility>
-  <comments>Core extension for us to start moving import logic into, has more functionality</comments>
+  <comments>This extension provides additional import functionality. It is recommended that this is enabled to improve the importing experience.</comments>
   <requires>
     <ext>org.civicrm.afform</ext>
     <ext>org.civicrm.search_kit</ext>
