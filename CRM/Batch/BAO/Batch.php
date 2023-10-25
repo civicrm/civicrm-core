@@ -314,7 +314,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
       if (!empty($values['payment_instrument_id'])) {
         $values['payment_instrument'] = $paymentInstrument[$values['payment_instrument_id']];
       }
-      $tokens = ['id' => $values['id'], 'status' => $values['status_id']];
+      $tokens = ['id' => $values['id'], 'status' => $values['status_id'], 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName())];
       if ($values['status_id'] == array_search('Exported', $batchStatusByName)) {
         $aid = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Export Accounting Batch');
         $activityParams = ['source_record_id' => $values['id'], 'activity_type_id' => $aid];
@@ -487,7 +487,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
         CRM_Core_Action::COPY => [
           'name' => ts('Enter records'),
           'url' => 'civicrm/batch/entry',
-          'qs' => 'id=%%id%%&reset=1',
+          'qs' => 'id=%%id%%&reset=1&qfKey=%%key%%',
           'title' => ts('Batch Data Entry'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
         ],

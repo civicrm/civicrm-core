@@ -64,7 +64,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
         CRM_Core_Action::COPY => [
           'name' => ts('Make a Copy'),
           'url' => CRM_Utils_System::currentPath(),
-          'qs' => 'action=copy&gid=%%id%%',
+          'qs' => 'action=copy&gid=%%id%%&qfKey=%%key%%',
           'title' => ts('Make a Copy of CiviCRM Contribution Page'),
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
@@ -318,12 +318,13 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
       $this->assign('CiviMember', CRM_Core_Component::isEnabled('CiviMember'));
     }
     elseif ($action & CRM_Core_Action::COPY) {
-      // @todo Unused local variable can be safely removed.
-      // But are there any side effects of CRM_Core_Session::singleton() that we
-      // need to preserve?
-      $session = CRM_Core_Session::singleton();
-      CRM_Core_Session::setStatus(ts('A copy of the contribution page has been created'), ts('Successfully Copied'), 'success');
+      $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+      CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+      if (!$key) {
+        CRM_Core_Controller::invalidKeyCommon();
+      }
       $this->copy();
+      CRM_Core_Session::setStatus(ts('A copy of the contribution page has been created'), ts('Successfully Copied'), 'success');
     }
     elseif ($action & CRM_Core_Action::DELETE) {
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
@@ -497,7 +498,7 @@ ORDER BY is_active desc, title asc
       $sectionsInfo = CRM_Utils_Array::value($dao->id, $contriPageSectionInfo, []);
       $contributions[$dao->id]['configureActionLinks'] = CRM_Core_Action::formLink(self::formatConfigureLinks($sectionsInfo),
         $action,
-        ['id' => $dao->id],
+        ['id' => $dao->id, 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName($this))],
         ts('Configure'),
         TRUE,
         'contributionpage.configure.actions',
