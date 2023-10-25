@@ -111,6 +111,11 @@ class Tokens extends AutoService implements EventSubscriberInterface {
   }
 
   public static function listTokens(\Civi\Token\Event\TokenRegisterEvent $e) {
+    // this tokens should be available only in contact context i.e. in Message Templates (add/edit)
+    if (!in_array('contactId', $e->getTokenProcessor()->getContextValues('schema')[0])) {
+      return;
+    }
+
     $e->entity('afformSubmission')
       ->register('validateSubmissionUrl', E::ts('Validate Submission URL'))
       ->register('validateSubmissionLink', E::ts('Validate Submission (Full Hyperlink)'));
