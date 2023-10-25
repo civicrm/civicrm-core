@@ -367,7 +367,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //don't build pledge block when mid is passed
     if (!$this->getRenewalMembershipID() && empty($this->_ccid)) {
       if (CRM_Core_Component::isEnabled('CiviPledge') && !empty($this->_values['pledge_block_id'])) {
-        CRM_Pledge_BAO_PledgeBlock::buildPledgeBlock($this);
+        $this->buildPledgeBlock();
       }
     }
 
@@ -1716,6 +1716,168 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // @todo - this is horrible - we are accessing a value in the POST rather than via QF. _submitValues is 'raw'
     $this->assign('submittedOnBehalf', $this->_submitValues['onbehalfof_id'] ?? NULL);
     $this->assign('submittedOnBehalfInfo', empty($this->_submitValues['onbehalf']) ? NULL : json_encode(str_replace('"', '\"', $this->_submitValues['onbehalf']), JSON_HEX_APOS));
+  }
+
+  /**
+   * Build Pledge Block in Contribution Pages.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function buildPledgeBlock() {
+    //build pledge payment fields.
+    if (!empty($this->_values['pledge_id'])) {
+      //get all payments required details.
+      $allPayments = [];
+      $returnProperties = [
+        'status_id',
+        'scheduled_date',
+        'scheduled_amount',
+        'currency',
+      ];
+      CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'pledge_id',
+        $this->_values['pledge_id'], $allPayments, $returnProperties
+      );
+      // get all status
+      $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+
+      $nextPayment = [];
+      $isNextPayment = FALSE;
+      $overduePayments = [];
+      foreach ($allPayments as $payID => $value) {
+        if ($allStatus[$value['status_id']] == 'Overdue') {
+          $overduePayments[$payID] = [
+            'id' => $payID,
+            'scheduled_amount' => CRM_Utils_Rule::cleanMoney($value['scheduled_amount']),
+            'scheduled_amount_currency' => $value['currency'],
+            'scheduled_date' => CRM_Utils_Date::customFormat($value['scheduled_date'],
+              '%B %d'
+            ),
+          ];
+        }
+        elseif (!$isNextPayment &&
+          $allStatus[$value['status_id']] == 'Pending'
+        ) {
+          // get the next payment.
+          $nextPayment = [
+            'id' => $payID,
+            'scheduled_amount' => CRM_Utils_Rule::cleanMoney($value['scheduled_amount']),
+            'scheduled_amount_currency' => $value['currency'],
+            'scheduled_date' => CRM_Utils_Date::customFormat($value['scheduled_date'],
+              '%B %d'
+            ),
+          ];
+          $isNextPayment = TRUE;
+        }
+      }
+
+      // build check box array for payments.
+      $payments = [];
+      if (!empty($overduePayments)) {
+        foreach ($overduePayments as $id => $payment) {
+          $label = ts("%1 - due on %2 (overdue)", [
+            1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $payment), CRM_Utils_Array::value('scheduled_amount_currency', $payment)),
+            2 => $payment['scheduled_date'] ?? NULL,
+          ]);
+          $paymentID = $payment['id'] ?? NULL;
+          $payments[] = $this->createElement('checkbox', $paymentID, NULL, $label, ['amount' => CRM_Utils_Array::value('scheduled_amount', $payment)]);
+        }
+      }
+
+      if (!empty($nextPayment)) {
+        $label = ts("%1 - due on %2", [
+          1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $nextPayment), CRM_Utils_Array::value('scheduled_amount_currency', $nextPayment)),
+          2 => $nextPayment['scheduled_date'] ?? NULL,
+        ]);
+        $paymentID = $nextPayment['id'] ?? NULL;
+        $payments[] = $this->createElement('checkbox', $paymentID, NULL, $label, ['amount' => CRM_Utils_Array::value('scheduled_amount', $nextPayment)]);
+      }
+      // give error if empty or build form for payment.
+      if (empty($payments)) {
+        throw new CRM_Core_Exception(ts('Oops. It looks like there is no valid payment status for online payment.'));
+      }
+      $this->addGroup($payments, 'pledge_amount', ts('Make Pledge Payment(s):'), '<br />');
+    }
+    else {
+      $pledgeBlock = [];
+
+      $dao = new CRM_Pledge_DAO_PledgeBlock();
+      $dao->entity_table = 'civicrm_contribution_page';
+      $dao->entity_id = $pageID;
+      if ($dao->find(TRUE)) {
+        CRM_Core_DAO::storeValues($dao, $pledgeBlock);
+      }
+      // build form for pledge creation.
+      $pledgeOptions = [
+        '0' => ts('I want to make a one-time contribution'),
+        '1' => ts('I pledge to contribute this amount every'),
+      ];
+      $this->addRadio('is_pledge', ts('Pledge Frequency Interval'), $pledgeOptions,
+        NULL, ['<br/>']
+      );
+      $this->addElement('text', 'pledge_installments', ts('Installments'), ['size' => 3, 'aria-label' => ts('Installments')]);
+
+      if (!empty($pledgeBlock['is_pledge_interval'])) {
+        $this->addElement('text', 'pledge_frequency_interval', NULL, ['size' => 3, 'aria-label' => ts('Frequency Intervals')]);
+      }
+      else {
+        $this->add('hidden', 'pledge_frequency_interval', 1);
+      }
+      // Frequency unit drop-down label suffixes switch from *ly to *(s)
+      $freqUnitVals = explode(CRM_Core_DAO::VALUE_SEPARATOR, $pledgeBlock['pledge_frequency_unit']);
+      $freqUnits = [];
+      $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
+      foreach ($freqUnitVals as $key => $val) {
+        if (array_key_exists($val, $frequencyUnits)) {
+          $freqUnits[$val] = !empty($pledgeBlock['is_pledge_interval']) ? "{$frequencyUnits[$val]}(s)" : $frequencyUnits[$val];
+        }
+      }
+      $this->addElement('select', 'pledge_frequency_unit', NULL, $freqUnits, ['aria-label' => ts('Frequency Units')]);
+      // CRM-18854
+      if (!empty($pledgeBlock['is_pledge_start_date_visible'])) {
+        if (!empty($pledgeBlock['pledge_start_date'])) {
+          $defaults = [];
+          $date = (array) json_decode($pledgeBlock['pledge_start_date']);
+          foreach ($date as $field => $value) {
+            switch ($field) {
+              case 'contribution_date':
+                $this->add('datepicker', 'start_date', ts('First installment payment'), [], FALSE, ['time' => FALSE]);
+                $paymentDate = $value = date('Y-m-d');
+                $defaults['start_date'] = $value;
+                $this->assign('is_date', TRUE);
+                break;
+
+              case 'calendar_date':
+                $this->add('datepicker', 'start_date', ts('First installment payment'), [], FALSE, ['time' => FALSE]);
+                $defaults['start_date'] = $value;
+                $this->assign('is_date', TRUE);
+                $paymentDate = $value;
+                break;
+
+              case 'calendar_month':
+                $month = CRM_Utils_Date::getCalendarDayOfMonth();
+                $this->add('select', 'start_date', ts('Day of month installments paid'), $month);
+                $paymentDate = CRM_Pledge_BAO_Pledge::getPaymentDate($value);
+                $defaults['start_date'] = $paymentDate;
+                break;
+
+              default:
+                break;
+
+            }
+            $this->setDefaults($defaults);
+            $this->assign('start_date_display', $paymentDate);
+            $this->assign('start_date_editable', FALSE);
+            if (!empty($pledgeBlock['is_pledge_start_date_editable'])) {
+              $this->assign('start_date_editable', TRUE);
+              if ($field == 'calendar_month') {
+                $this->assign('is_date', FALSE);
+                $this->setDefaults(['start_date' => $value]);
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
 }
