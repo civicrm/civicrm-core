@@ -168,7 +168,7 @@ trait CRMTraits_Financial_PriceSetTrait {
       ], $membershipTypeParams);
       $this->ids['MembershipType'] = [$this->membershipTypeCreate($membershipTypeParams)];
     }
-    $priceField = $this->callAPISuccess('price_field', 'create', [
+    $priceField = $this->callAPISuccess('PriceField', 'create', [
       'price_set_id' => $this->ids['PriceSet']['membership_block'],
       'name' => 'membership_amount',
       'label' => 'Membership Amount',
