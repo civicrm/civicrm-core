@@ -36,8 +36,8 @@
     <html>
       <type>Text</type>
     </html>
-    <length>64</length>
-    <comment>Name of the action(reminder)</comment>
+    <length>128</length>
+    <comment>Name of the scheduled action</comment>
     <add>3.4</add>
   </field>
   <index>
