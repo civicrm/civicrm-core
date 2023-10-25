@@ -583,11 +583,6 @@ class CRM_Import_ImportProcessor {
   public function getSavedQuickformDefaultsForColumn($column) {
     $fieldMapping = [];
 
-    // $sel1 is either unmapped, a relationship or a target field.
-    if ($this->getFieldName($column) === 'do_not_import') {
-      return $fieldMapping;
-    }
-
     if ($this->getValidRelationshipKey($column)) {
       $fieldMapping[] = $this->getValidRelationshipKey($column);
     }
