@@ -11,8 +11,20 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
 
   public function setUp(): void {
     parent::setUp();
+    CRM_Core_I18n::singleton()->setLocale('en_US');
+    CRM_Core_Config::singleton()->defaultCurrency = 'USD';
+    CRM_Core_Config::singleton()->monetaryThousandSeparator = ',';
+    CRM_Core_Config::singleton()->monetaryDecimalPoint = '.';
     $this->custom_group = $this->customGroupCreate(['extends' => 'Case']);
     $this->custom_group = $this->custom_group['values'][$this->custom_group['id']];
+  }
+
+  public function tearDown(): void {
+    parent::tearDown();
+    CRM_Core_Config::singleton()->defaultCurrency = 'USD';
+    CRM_Core_Config::singleton()->monetaryThousandSeparator = ',';
+    CRM_Core_Config::singleton()->monetaryDecimalPoint = '.';
+    CRM_Core_I18n::singleton()->setLocale('en_US');
   }
 
   /**
@@ -93,11 +105,6 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
     CRM_Core_Config::singleton()->monetaryDecimalPoint = ',';
 
     $this->testChangeCustomDataFormattedDetails($input, $expected);
-
-    CRM_Core_Config::singleton()->defaultCurrency = 'USD';
-    CRM_Core_Config::singleton()->monetaryThousandSeparator = ',';
-    CRM_Core_Config::singleton()->monetaryDecimalPoint = '.';
-    CRM_Core_I18n::singleton()->setLocale('en_US');
   }
 
   /**
