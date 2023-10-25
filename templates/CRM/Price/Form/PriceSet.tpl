@@ -10,7 +10,7 @@
 {crmRegion name="price-set-1"}
 <div id="priceset" class="crm-section price_set-section">
     {if $priceSet.help_pre}
-        <div class="messages help">{$priceSet.help_pre|escape}</div>
+        <div class="messages help">{$priceSet.help_pre|purify}</div>
     {/if}
 
     {assign var='adminFld' value=false}
@@ -28,7 +28,7 @@
     {foreach from=$priceSet.fields item=element key=field_id}
         {* Skip 'Admin' visibility price fields WHEN this tpl is used in online registration unless user has administer CiviCRM permission. *}
         {if $element.visibility EQ 'public' || ($element.visibility EQ 'admin' && $adminFld EQ true) || $context eq 'standalone' || $context eq 'advanced' || $context eq 'search' || $context eq 'participant' || $context eq 'dashboard'}
-            {if $element.help_pre}<span class="content description">{$element.help_pre|escape}</span><br />{/if}
+            {if $element.help_pre}<span class="content description">{$element.help_pre|purify}</span><br />{/if}
             <div class="crm-section {$element.name|escape}-section crm-price-field-id-{$field_id}">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
               {assign var="element_name" value="price_`$field_id`"}
@@ -53,14 +53,14 @@
                   {/if}
                 {/foreach}
                 {if $element.help_post}
-                  <div class="description">{$element.help_post|escape}</div>
+                  <div class="description">{$element.help_post|purify}</div>
                 {/if}
               </div>
             {else}
 
                 {assign var="element_name" value="price_"|cat:$field_id}
 
-                <div class="label">{$form.$element_name.label|escape}</div>
+                <div class="label">{$form.$element_name.label|purify}</div>
                 <div class="content {$element.name|escape}-content">
                   {$form.$element_name.html}
                   {if $element.html_type eq 'Text'}
@@ -91,7 +91,7 @@
                       {/if}
                     {/if}
                   {/if}
-                  {if $element.help_post}<br /><span class="description">{$element.help_post|escape}</span>{/if}
+                  {if $element.help_post}<br /><span class="description">{$element.help_post|purify}</span>{/if}
                 </div>
 
             {/if}
@@ -116,7 +116,7 @@
     {/foreach}
 
     {if $priceSet.help_post}
-      <div class="messages help">{$priceSet.help_post|escape}</div>
+      <div class="messages help">{$priceSet.help_post|purify}</div>
     {/if}
 
     {include file="CRM/Price/Form/Calculate.tpl"}
