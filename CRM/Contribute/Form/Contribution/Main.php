@@ -829,7 +829,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   public static function formRule($fields, $files, $self) {
     $errors = [];
-    $amount = self::computeAmount($fields, $self->_values);
+    $amount = $self->computeAmount($fields, $self->_values);
     if (!empty($fields['auto_renew']) && empty($fields['payment_processor_id'])) {
       $errors['auto_renew'] = ts('You cannot have auto-renewal on if you are paying later.');
     }
@@ -1141,7 +1141,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @return int|mixed|null|string
    */
-  public static function computeAmount($params, $formValues) {
+  private function computeAmount($params, $formValues) {
     $amount = 0;
     // First clean up the other amount field if present.
     if (isset($params['amount_other'])) {
@@ -1250,7 +1250,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     else {
       // from here on down, $params['amount'] holds a monetary value (or null) rather than an option ID
-      $params['amount'] = self::computeAmount($params, $this->_values);
+      $params['amount'] = $this->computeAmount($params, $this->_values);
     }
 
     $params['separate_amount'] = $params['amount'];
