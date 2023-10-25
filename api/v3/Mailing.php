@@ -663,8 +663,10 @@ function civicrm_api3_mailing_send_test($params) {
         civicrm_api3('MailingEventQueue', 'create',
           [
             'job_id' => $job['id'],
+            'is_test' => TRUE,
             'email_id' => $emailId,
             'contact_id' => $contactId,
+            'mailing_id' => $params['mailing_id'],
           ]
         );
       }

@@ -35,12 +35,12 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
    *   The version number matching this function name
    */
   public function upgrade_5_66_alpha1($rev): void {
+    // Increase column length before the upgrade sql writes to it
+    $this->addTask('Increase ActionSchedule.name length', 'alterColumn', 'civicrm_action_schedule', 'name', "varchar(128) COMMENT 'Name of the scheduled action'");
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    // These run after the sql file
     $this->addTask('Make Contribution.tax_amount required', 'alterColumn', 'civicrm_contribution', 'tax_amount', "decimal(20,2) DEFAULT 0 NOT NULL COMMENT 'Total tax amount of this contribution.'");
     $this->addTask('Make LineItem.tax_amount required', 'alterColumn', 'civicrm_line_item', 'tax_amount', "decimal(20,2) DEFAULT 0 NOT NULL COMMENT 'tax of each item'");
-    // These run after the sql file
-    $this->addTask('Make Discount.entity_table required', 'alterColumn', 'civicrm_discount', 'entity_table', "varchar(64) NOT NULL COMMENT 'Name of the action(reminder)'");
-    $this->addTask('Make ActionSchedule.name required', 'alterColumn', 'civicrm_action_schedule', 'name', "varchar(64) NOT NULL COMMENT 'physical tablename for entity being joined to discount, e.g. civicrm_event'");
     $this->addTask(ts('Create index %1', [1 => 'civicrm_action_schedule.UI_name']), 'addIndex', 'civicrm_action_schedule', 'name', 'UI');
     $this->addTask('Add fields to civicrm_mail_settings to allow more flexibility for email to activity', 'addMailSettingsFields');
     $this->addTask('Move serialized contents of civicrm_survey.recontact_interval into civicrm_option_value.filter', 'migrateRecontactInterval');
