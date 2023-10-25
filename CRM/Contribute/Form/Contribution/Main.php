@@ -1290,11 +1290,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->set('amount_level', CRM_Utils_Array::value('amount_level', $params));
     }
 
-    $priceSetId = $params['priceSetId'] ?? NULL;
+    $priceSetID = $this->getPriceSetID();
     if (!empty($this->_ccid)) {
       $this->set('lineItem', [$this->getPriceSetID() => $this->getExistingContributionLineItems()]);
     }
-    elseif ($priceSetId) {
+    elseif ($priceSetID) {
       $lineItem = [];
       if ($this->isQuickConfig()) {
         foreach ($this->_values['fee'] as $key => & $val) {
@@ -1314,17 +1314,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
 
       if ($this->_membershipBlock) {
-        $this->processAmountAndGetAutoRenew($this->_values['fee'], $params, $lineItem[$priceSetId], $priceSetId);
+        $this->processAmountAndGetAutoRenew($this->_values['fee'], $params, $lineItem[$priceSetID]);
       }
       else {
-        CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetId], $priceSetId);
+        CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetID], $priceSetID);
       }
 
       if ($proceFieldAmount) {
-        $lineItem[$params['priceSetId']][$fieldOption]['unit_price'] = $proceFieldAmount;
-        $lineItem[$params['priceSetId']][$fieldOption]['line_total'] = $proceFieldAmount;
-        if (isset($lineItem[$params['priceSetId']][$fieldOption]['tax_amount'])) {
-          $proceFieldAmount += $lineItem[$params['priceSetId']][$fieldOption]['tax_amount'];
+        $lineItem[$priceSetID][$fieldOption]['unit_price'] = $proceFieldAmount;
+        $lineItem[$priceSetID][$fieldOption]['line_total'] = $proceFieldAmount;
+        if (isset($lineItem[$priceSetID][$fieldOption]['tax_amount'])) {
+          $proceFieldAmount += $lineItem[$priceSetID][$fieldOption]['tax_amount'];
         }
         if (!$this->_membershipBlock['is_separate_payment']) {
           //require when separate membership not used

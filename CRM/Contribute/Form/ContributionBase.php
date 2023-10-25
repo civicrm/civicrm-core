@@ -1093,10 +1093,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *   Params reflecting form input e.g with fields 'price_5' => 7, 'price_8' => array(7, 8)
    * @param $lineItems
    *   Line item array to be altered.
-   * @param int $priceSetID
    */
-  public function processAmountAndGetAutoRenew($fields, &$params, &$lineItems, $priceSetID = NULL) {
-    CRM_Price_BAO_PriceSet::processAmount($fields, $params, $lineItems, $priceSetID);
+  public function processAmountAndGetAutoRenew($fields, &$params, &$lineItems) {
+    CRM_Price_BAO_PriceSet::processAmount($fields, $params, $lineItems, $this->getPriceSetID());
     $autoRenew = [];
     $autoRenew[0] = $autoRenew[1] = $autoRenew[2] = 0;
     foreach ($lineItems as $lineItem) {
@@ -1255,6 +1254,27 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->_pcpId = CRM_Utils_Request::retrieve('pcpId', 'Positive', $this);
     }
     return $this->_pcpId ? (int) $this->_pcpId : NULL;
+  }
+
+  /**
+   * Get the selected Contribution ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getContributionID(): ?int {
+    if ($this->getExistingContributionID()) {
+      return $this->getExistingContributionID();
+    }
+    if (property_exists($this, '_contributionID')) {
+      // Available on Confirm form (which is tested), so this avoids
+      // accessing that directly & will work for ThankYou in time.
+      return $this->_contributionID;
+    }
+    return NULL;
   }
 
 }
