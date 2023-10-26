@@ -62,6 +62,11 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
               'type' => 'field',
               'rewrite' => '[duration] [subject]',
             ],
+            // This column ought to be removed by the download action
+            [
+              'type' => 'links',
+              'links' => [],
+            ],
             [
               'key' => 'details',
               'label' => 'Details',
