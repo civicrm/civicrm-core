@@ -134,6 +134,11 @@ class Entity extends Generic\AbstractEntity {
       'description' => 'When joining entities in the UI, which fields should be presented by default in the ON clause',
     ],
     [
+      'name' => 'match_fields',
+      'data_type' => 'Array',
+      'description' => 'Combination of fields used for unique matching',
+    ],
+    [
       'name' => 'group_weights_by',
       'data_type' => 'Array',
       'description' => 'For sortable entities, what field groupings are used to order by weight',
