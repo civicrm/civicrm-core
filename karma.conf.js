@@ -20,7 +20,7 @@ var angularTempFile = cv(['php:eval', '-U', _CV.ADMIN_USER, cmd]);
 module.exports = function(config) {
   config.set({
     autoWatch: true,
-    browsers: ['PhantomJS'],
+    browsers: ['ChromeHeadless'],
     exclude: [
       'ang/api4Explorer/Explorer.js'
     ],
