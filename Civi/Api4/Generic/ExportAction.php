@@ -24,7 +24,7 @@ use Civi\Api4\Utils\CoreUtil;
  * @method $this setId(int $id)
  * @method int getId()
  * @method $this setMatch(array $match) Specify fields to match for update.
- * @method bool getMatch()
+ * @method array getMatch()
  * @method $this setCleanup(string $cleanup)
  * @method string getCleanup()
  * @method $this setUpdate(string $update)
@@ -40,17 +40,14 @@ class ExportAction extends AbstractAction {
   protected $id;
 
   /**
-   * Specify fields to match when managed records are being reconciled.
+   * Fields to match when managed records are being reconciled.
    *
-   * To prevent "DB Error: Already Exists" errors, it's generally a good idea to set this
-   * value to whatever unique fields this entity has (for most entities it's "name").
-   * The managed system will then check if a record with that name already exists before
-   * trying to create a new one.
+   * By default this will be set automatically based on the entity's unique fields.
    *
    * @var array
    * @optionsCallback getMatchFields
    */
-  protected $match = ['name'];
+  protected $match;
 
   /**
    * Specify rule for auto-updating managed entity
@@ -76,18 +73,17 @@ class ExportAction extends AbstractAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
-    $this->exportRecord($this->getEntityName(), $this->id, $result, $this->match);
+    $this->exportRecord($this->getEntityName(), $this->id, $result);
   }
 
   /**
    * @param string $entityType
    * @param int $entityId
    * @param \Civi\Api4\Generic\Result $result
-   * @param array $matchFields
    * @param string $parentName
    * @param array $excludeFields
    */
-  private function exportRecord(string $entityType, int $entityId, Result $result, array $matchFields, $parentName = NULL, $excludeFields = []) {
+  private function exportRecord(string $entityType, int $entityId, Result $result, $parentName = NULL, $excludeFields = []) {
     if (isset($this->exportedEntities[$entityType][$entityId])) {
       throw new \CRM_Core_Exception("Circular reference detected: attempted to export $entityType id $entityId multiple times.");
     }
@@ -134,7 +130,7 @@ class ExportAction extends AbstractAction {
         // Sometimes fields share an option group; only export it once.
         empty($this->exportedEntities['OptionGroup'][$record['option_group_id']])
       ) {
-        $this->exportRecord('OptionGroup', $record['option_group_id'], $result, $matchFields);
+        $this->exportRecord('OptionGroup', $record['option_group_id'], $result);
       }
     }
     // Don't use joins/pseudoconstants if null or if it has the same value as the original
@@ -162,8 +158,13 @@ class ExportAction extends AbstractAction {
         'values' => $record,
       ],
     ];
-    foreach (array_unique(array_intersect($matchFields, array_keys($allFields))) as $match) {
-      $export['params']['match'][] = $match;
+    $matchFields = $this->match;
+    // Calculate $match param if not passed explicitly
+    if (!isset($matchFields)) {
+      $matchFields = (array) CoreUtil::getInfoItem($entityType, 'match_fields');
+    }
+    if ($matchFields) {
+      $export['params']['match'] = $matchFields;
     }
     $result[] = $export;
     // Export entities that reference this one
@@ -201,18 +202,8 @@ class ExportAction extends AbstractAction {
             return $a->$weightCol < $b->$weightCol ? -1 : 1;
           });
         }
-        $referenceMatchFields = $matchFields;
-        // Add back-reference to "match" fields to enforce uniqueness
-        // See https://lab.civicrm.org/dev/core/-/issues/4286
-        if ($referenceMatchFields) {
-          foreach ($reference::fields() as $field) {
-            if (($field['FKClassName'] ?? '') === $daoName) {
-              $referenceMatchFields[] = $field['name'];
-            }
-          }
-        }
         foreach ($records as $record) {
-          $this->exportRecord($refEntity, $record->id, $result, $referenceMatchFields, $name . '_', $exclude);
+          $this->exportRecord($refEntity, $record->id, $result, $name . '_', $exclude);
         }
       }
     }
