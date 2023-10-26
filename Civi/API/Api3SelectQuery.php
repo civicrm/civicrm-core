@@ -157,8 +157,8 @@ class Api3SelectQuery extends SelectQuery {
     }
     foreach ($this->apiFieldSpec as $field) {
       if (
-        $fieldName == \CRM_Utils_Array::value('uniqueName', $field) ||
-        array_search($fieldName, \CRM_Utils_Array::value('api.aliases', $field, [])) !== FALSE
+        $fieldName == ($field['uniqueName'] ?? NULL) ||
+        array_search($fieldName, $field['api.aliases'] ?? []) !== FALSE
       ) {
         return $field;
       }
