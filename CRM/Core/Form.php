@@ -3049,6 +3049,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
       return CRM_Utils_Rule::cleanMoney($value);
     }
+    else {
+      // Numeric fields are not in submittableMoneyFields (for now)
+      $fieldRules = $this->_rules[$fieldName] ?? [];
+      foreach ($fieldRules as $rule) {
+        if ('money' === $rule['type']) {
+          return CRM_Utils_Rule::cleanMoney($value);
+        }
+      }
+    }
     return $value;
   }
 
