@@ -47,9 +47,10 @@ class CRM_Utils_Array {
    *
    * If $list is not an array or ArrayAccess object, $default is returned.
    *
-   * This function behaves exactly like:
+   * @deprecated
+   * In most cases this can be replaced with
    *   $list[$key] ?? $default
-   * except that when $list[$key] exists and is NULL, this function will always
+   * with the minor difference that when $list[$key] exists and is NULL, this function will always
    * return NULL.
    *
    * @param string $key
