@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Test\ContributionPageTestTrait;
 
 /**
  *  Test APIv3 civicrm_contribute_recur* functions
@@ -20,6 +21,7 @@ use Civi\Api4\Contribution;
  */
 class api_v3_ContributionPageTest extends CiviUnitTestCase {
   use CRMTraits_Financial_PriceSetTrait;
+  use ContributionPageTestTrait;
 
   protected $testAmount = 34567;
   protected $params;
@@ -79,13 +81,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Tear down after test.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    foreach ($this->contactIds as $id) {
-      $this->callAPISuccess('contact', 'delete', ['id' => $id]);
-    }
     $this->quickCleanup(['civicrm_system_log']);
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
@@ -112,13 +109,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testGetBasicContributionPage(int $version): void {
     $this->_apiversion = $version;
-    $createResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $this->id = $createResult['id'];
+    $this->callAPISuccess('ContributionPage', 'create', $this->params);
     $getParams = [
       'currency' => 'NZD',
       'financial_type_id' => 1,
     ];
-    $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
+    $getResult = $this->callAPISuccess('ContributionPage', 'get', $getParams);
     $this->assertEquals(1, $getResult['count']);
   }
 
@@ -126,8 +122,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Test get with amount as a parameter.
    */
   public function testGetContributionPageByAmount(): void {
-    $createResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $this->id = $createResult['id'];
+    $this->callAPISuccess($this->_entity, 'create', $this->params);
     $getParams = [
       // 3456
       'amount' => '' . $this->testAmount,
@@ -152,18 +147,14 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test getfields function.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetFieldsContributionPage(): void {
-    $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
+    $result = $this->callAPISuccess('ContributionPage', 'getfields', ['action' => 'create']);
     $this->assertEquals(12, $result['values']['start_date']['type']);
   }
 
   /**
    * Test form submission with basic price set.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSubmit(): void {
     $this->setUpContributionPage();
@@ -177,8 +168,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test form submission with basic price set.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSubmitZeroDollar(): void {
     $this->setUpContributionPage();
@@ -191,7 +180,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'payment_processor_id' => '',
     ];
 
-    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contribution_page_id' => $this->_ids['contribution_page'],
       'return' => ['non_deductible_amount', 'total_amount'],
@@ -204,8 +193,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test form submission with billing first & last name where the contact does NOT
    * otherwise have one.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSubmitNewBillingNameData(): void {
     $this->setUpContributionPage();
@@ -225,8 +212,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test form submission with billing first & last name where the contact does
    * otherwise have one and should not be overwritten.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSubmitNewBillingNameDoNotOverwrite(): void {
     $this->setUpContributionPage();
@@ -1856,8 +1841,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function hook_civicrm_alterPaymentProcessorParams($paymentObj, $rawParams, $cookedParams): void {
     // Ensure total_amount are the same if they're both given.
-    $total_amount = $rawParams['total_amount'] ?? NULL;
-    $amount = $rawParams['amount'] ?? NULL;
+    $total_amount = !empty($rawParams['total_amount']) ? (float) $rawParams['total_amount'] : NULL;
+    $amount = !empty($rawParams['amount']) ? (float) $rawParams['amount'] : NULL;
     if (!empty($total_amount) && !empty($amount) && round($total_amount, 2) !== round($amount, 2)) {
       throw new CRM_Core_Exception("total_amount '$total_amount' and amount '$amount' differ.");
     }
