@@ -3,7 +3,7 @@ use CRM_AfformAdmin_ExtensionUtil as E;
 
 return [
   [
-    'name' => 'Navigation_afform_admin_domain',
+    'name' => 'Navigation_afform_admin',
     'entity' => 'Navigation',
     'cleanup' => 'always',
     'update' => 'unmodified',

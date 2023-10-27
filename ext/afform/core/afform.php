@@ -99,7 +99,6 @@ function afform_civicrm_managed(&$entities, $modules) {
     // This AfformScanner instance only lives during this method call, and it feeds off the regular cache.
     $scanner = new CRM_Afform_AfformScanner();
   }
-  $domains = NULL;
 
   foreach ($scanner->getMetas() as $afform) {
     if (empty($afform['name'])) {
@@ -120,8 +119,6 @@ function afform_civicrm_managed(&$entities, $modules) {
         'params' => [
           'version' => 4,
           'values' => [
-            // Q: Should we loop through all domains?
-            'domain_id' => 'current_domain',
             'is_active' => TRUE,
             'name' => $afform['name'],
             'label' => $afform['title'] ?? E::ts('(Untitled)'),
@@ -133,35 +130,30 @@ function afform_civicrm_managed(&$entities, $modules) {
       ];
     }
     if (!empty($afform['navigation']) && !empty($afform['server_route'])) {
-      $domains = $domains ?: \Civi\Api4\Domain::get(FALSE)->addSelect('id')->execute();
-      foreach ($domains as $domain) {
-        $params = [
-          'version' => 4,
-          'values' => [
-            'name' => $afform['name'],
-            'label' => $afform['navigation']['label'] ?: $afform['title'],
-            'permission' => $afform['permission'],
-            'permission_operator' => $afform['permission_operator'] ?? 'AND',
-            'weight' => $afform['navigation']['weight'] ?? 0,
-            'url' => $afform['server_route'],
-            'is_active' => 1,
-            'icon' => !empty($afform['icon']) ? 'crm-i ' . $afform['icon'] : '',
-            'domain_id' => $domain['id'],
-          ],
-          'match' => ['domain_id', 'name'],
-        ];
-        if (!empty($afform['navigation']['parent'])) {
-          $params['values']['parent_id.name'] = $afform['navigation']['parent'];
-        }
-        $entities[] = [
-          'module' => E::LONG_NAME,
-          'name' => 'navigation_' . $afform['name'] . '_' . $domain['id'],
-          'cleanup' => 'always',
-          'update' => 'unmodified',
-          'entity' => 'Navigation',
-          'params' => $params,
-        ];
+      $params = [
+        'version' => 4,
+        'values' => [
+          'name' => $afform['name'],
+          'label' => $afform['navigation']['label'] ?: $afform['title'],
+          'permission' => $afform['permission'],
+          'permission_operator' => $afform['permission_operator'] ?? 'AND',
+          'weight' => $afform['navigation']['weight'] ?? 0,
+          'url' => $afform['server_route'],
+          'icon' => !empty($afform['icon']) ? 'crm-i ' . $afform['icon'] : '',
+        ],
+        'match' => ['domain_id', 'name'],
+      ];
+      if (!empty($afform['navigation']['parent'])) {
+        $params['values']['parent_id.name'] = $afform['navigation']['parent'];
       }
+      $entities[] = [
+        'module' => E::LONG_NAME,
+        'name' => 'navigation_' . $afform['name'],
+        'cleanup' => 'always',
+        'update' => 'unmodified',
+        'entity' => 'Navigation',
+        'params' => $params,
+      ];
     }
   }
 }

@@ -3,7 +3,7 @@ use CRM_Search_ExtensionUtil as E;
 
 return [
   [
-    'name' => 'Navigation_search_kit_domain',
+    'name' => 'Navigation_search_kit',
     'entity' => 'Navigation',
     'cleanup' => 'always',
     'update' => 'unmodified',
