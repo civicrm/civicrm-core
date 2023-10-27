@@ -591,6 +591,24 @@ abstract class CRM_Core_Payment {
       case 'contributionPageContinueText':
         return ts('Click the <strong>Continue</strong> button to proceed with the payment.');
 
+      case 'contributionPageConfirmText':
+        if ($params['amount'] <= 0.0) {
+          return '';
+        }
+        if ((int) $this->_paymentProcessor['billing_mode'] !== 4) {
+          return ts('Your contribution will not be completed until you click the <strong>%1</strong> button. Please click the button one time only.', [1 => ts('Make Contribution')]);
+        }
+        return '';
+
+      case 'contributionPageButtonText':
+        if ($params['amount'] <= 0.0 || (int) $this->_paymentProcessor['billing_mode'] === 4) {
+          return ts('Continue');
+        }
+        if ($params['is_payment_to_existing']) {
+          return ts('Make Payment');
+        }
+        return ts('Make Contribution');
+
       case 'cancelRecurDetailText':
         if ($params['mode'] === 'auto_renew') {
           return ts('Click the button below if you want to cancel the auto-renewal option for your %1 membership. This will not cancel your membership. However you will need to arrange payment for renewal when your membership expires.',
