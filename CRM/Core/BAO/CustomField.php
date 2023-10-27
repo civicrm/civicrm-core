@@ -1153,11 +1153,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'Float':
         if ($field->is_search_range && $search) {
-          $qf->addRule($elementName . '_from', ts('%1 From must be a number (with or without decimals).', [1 => $label]), 'numeric');
-          $qf->addRule($elementName . '_to', ts('%1 To must be a number (with or without decimals).', [1 => $label]), 'numeric');
+          $qf->addRule($elementName . '_from', ts('%1 From must be a number (with or without decimals).', [1 => $label]), 'money');
+          $qf->addRule($elementName . '_to', ts('%1 To must be a number (with or without decimals).', [1 => $label]), 'money');
         }
         elseif ($widget == 'Text') {
-          $qf->addRule($elementName, ts('%1 must be a number (with or without decimals).', [1 => $label]), 'numeric');
+          $qf->addRule($elementName, ts('%1 must be a number (with or without decimals).', [1 => $label]), 'money');
         }
         break;
 
