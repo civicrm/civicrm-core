@@ -70,7 +70,7 @@ return [
     'add' => '5.23',
     'type' => CRM_Utils_Type::T_STRING,
     'title' => ts('Invoice Prefix'),
-    'description' => ts('Enter prefix to be be preprended when creating an invoice number'),
+    'description' => ts('Enter prefix to be be pre-pended when creating an invoice number'),
     'is_domain' => 1,
     'is_contact' => 0,
   ],
@@ -79,6 +79,7 @@ return [
     'name' => 'invoice_due_date',
     'html_type' => 'text',
     'title' => ts('Due Date'),
+    'description' => '',
     'add' => '5.23',
     'type' => CRM_Utils_Type::T_INT,
     'is_domain' => 1,
@@ -133,6 +134,7 @@ return [
     'type' => CRM_Utils_Type::T_STRING,
     'is_domain' => 1,
     'is_contact' => 0,
+    'description' => '',
   ],
   'tax_display_settings' => [
     'default' => 'Inclusive',
@@ -143,6 +145,7 @@ return [
     'title' => ts('Tax Display Settings'),
     'is_domain' => 1,
     'is_contact' => 0,
+    'description' => '',
     'pseudoconstant' => ['callback' => 'CRM_Core_SelectValues::taxDisplayOptions'],
   ],
   'deferred_revenue_enabled' => [
