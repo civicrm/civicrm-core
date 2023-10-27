@@ -48,6 +48,8 @@ trait ContributionPageTestTrait {
       'name' => 'default_page',
       'financial_type_id:name' => 'Donation',
       'is_email_receipt' => TRUE,
+      'is_pay_later' => $contributionPageValues['is_monetary'] ?: FALSE,
+      'pay_later_text' => 'Send Money Now',
     ];
     $contributionPageValues += $contributionPageDefaults;
     return $this->createTestEntity('ContributionPage', $contributionPageValues, $identifier);

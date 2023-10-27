@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\PriceSetEntity;
+use Civi\Test\ContributionPageTestTrait;
 use Civi\Test\FormTrait;
 
 /**
@@ -23,6 +24,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_PriceSetTrait;
   use FormTrait;
+  use ContributionPageTestTrait;
 
   /**
    * Clean up DB.
