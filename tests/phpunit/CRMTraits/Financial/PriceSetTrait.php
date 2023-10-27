@@ -28,7 +28,12 @@ trait CRMTraits_Financial_PriceSetTrait {
    * @return int
    */
   protected function getPriceSetID(string $key = 'membership'):int {
-    return $this->ids['PriceSet'][$key];
+    if (isset($this->ids['PriceSet'][$key])) {
+      return $this->ids['PriceSet'][$key];
+    }
+    if (count($this->ids['PriceSet']) === 1) {
+      return reset($this->ids['PriceSet']);
+    }
   }
 
   /**
