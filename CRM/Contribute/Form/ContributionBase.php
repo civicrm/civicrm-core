@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\PriceSet;
+
 /**
  * This class generates form components for processing a contribution.
  */
@@ -270,6 +272,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
       else {
         $this->_priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id);
+      }
+      if (!$this->_priceSetId) {
+        if ($this->isShowMembershipBlock()) {
+          $this->_priceSetId = PriceSet::get(FALSE)
+            ->addWhere('name', '=', 'default_membership_type_amount')
+            ->execute()
+            ->first()['id'];
+        }
       }
       $this->set('priceSetId', $this->_priceSetId);
     }
