@@ -22,6 +22,8 @@ use Civi\Token\TokenProcessor;
  */
 class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
+  protected $retrieveMethod = 'api4';
+
   /**
    * @return string
    */
