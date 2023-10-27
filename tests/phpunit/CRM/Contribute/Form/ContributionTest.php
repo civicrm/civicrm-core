@@ -13,7 +13,6 @@ use Civi\Api4\MembershipBlock;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceSet;
 use Civi\Api4\PriceSetEntity;
-use Civi\Payment\Exception\PaymentProcessorException;
 use Civi\Test\FormTrait;
 use Civi\Test\FormWrapper;
 
@@ -148,62 +147,55 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   /**
    * Test the submit function on the contribution page.
    */
-  public function testSubmitCreditCardPayPal(): void {
-    $paymentProcessorID = $this->paymentProcessorCreate(['is_test' => 0]);
-    $error = FALSE;
-    try {
-      $form = $this->submitContributionForm([
-        'total_amount' => 50,
-        'financial_type_id' => 1,
-        'contact_id' => $this->_individualId,
-        'contribution_status_id' => 1,
-        'credit_card_number' => 4444333322221111,
-        'cvv2' => 123,
-        'credit_card_exp_date' => [
-          'M' => 9,
-          'Y' => 2025,
-        ],
-        'credit_card_type' => 'Visa',
-        'billing_first_name' => 'Junko',
-        'billing_middle_name' => '',
-        'billing_last_name' => 'Adams',
-        'billing_street_address-5' => '790L Lincoln St S',
-        'billing_city-5' => 'Mary Knoll',
-        'billing_state_province_id-5' => 1031,
-        'billing_postal_code-5' => 10545,
-        'billing_country_id-5' => 1228,
-        'frequency_interval' => 1,
-        'frequency_unit' => 'month',
-        'installments' => '',
-        'hidden_AdditionalDetail' => 1,
-        'hidden_Premium' => 1,
-        'from_email_address' => '"civi45" <civi45@civicrm.com>',
-        'is_email_receipt' => TRUE,
-        'receipt_date' => '',
-        'receipt_date_time' => '',
-        'payment_processor_id' => $paymentProcessorID,
-        'currency' => 'USD',
-        'source' => 'bob sled race',
-      ], NULL, 'Live');
-      $this->assertEquals(1, $form->getMailCount());
-    }
-    catch (PaymentProcessorException $e) {
-      $error = TRUE;
-    }
+  public function testSubmitCreditCardDummyProcessor(): void {
+    $form = $this->submitContributionForm([
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'contribution_status_id' => 1,
+      'credit_card_number' => 4444333322221111,
+      'cvv2' => 123,
+      'credit_card_exp_date' => [
+        'M' => 9,
+        'Y' => 2025,
+      ],
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'Junko',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'Adams',
+      'billing_street_address-5' => '790L Lincoln St S',
+      'billing_city-5' => 'Mary Knoll',
+      'billing_state_province_id-5' => 1031,
+      'billing_postal_code-5' => 10545,
+      'billing_country_id-5' => 1228,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'installments' => '',
+      'hidden_AdditionalDetail' => 1,
+      'hidden_Premium' => 1,
+      'from_email_address' => '"civi45" <civi45@civicrm.com>',
+      'is_email_receipt' => TRUE,
+      'receipt_date' => '',
+      'receipt_date_time' => '',
+      'payment_processor_id' => $this->paymentProcessorID,
+      'currency' => 'USD',
+      'source' => 'bob sled race',
+    ], NULL, 'Live');
+    $this->assertEquals(1, $form->getMailCount());
 
     $contribution = $this->callAPISuccess('Contribution', 'get', [
-      'contact_id' => $this->_individualId,
-      'contribution_status_id' => $error ? 'Failed' : 'Completed',
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'contribution_status_id' => 'Completed',
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', [
         'return' => 'payment_instrument_id',
-        'id' => $paymentProcessorID,
+        'id' => $this->paymentProcessorID,
       ]),
     ]);
 
     $this->assertEquals(1, $contribution['count'], 'Contribution count should be one.');
     $this->assertNotEmpty($contribution['values'][$contribution['id']]['receipt_date'], 'Receipt date should not be blank.');
 
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->_individualId]);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->ids['Contact']['individual_0']]);
     $this->assertArrayNotHasKey('source', $contact);
   }
 
