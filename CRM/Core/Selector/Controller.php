@@ -325,7 +325,7 @@ class CRM_Core_Selector_Controller {
     }
     else {
       // output requires paging/sorting capability
-      $rows = self::getRows($this);
+      $rows = $this->getRows($this);
       CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $rows, $this);
       $reorderedHeaders = [];
       $noWeightHeaders = [];
