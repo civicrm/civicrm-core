@@ -467,7 +467,7 @@ class CRM_Queue_Runner {
       throw new \CRM_Core_Exception($prefix . ' It does not support upgrade mode.');
     }
 
-    if (!$this->queue->getSpec('runner')) {
+    if (!$this->queue->getSpec('payload')) {
       throw new \CRM_Core_Exception($prefix . ' The "civicrm_queue.runner" property is missing.');
     }
 
@@ -494,7 +494,7 @@ class CRM_Queue_Runner {
   protected function assertRequirementsWeb(): void {
     $prefix = sprintf('Cannot execute queue "%s".', $this->queue->getName());
 
-    $runnerType = $this->queue->getSpec('runner');
+    $runnerType = $this->queue->getSpec('payload');
     if ($runnerType && $runnerType !== 'task') {
       // The AJAX frontend doesn't read `runner` (so it's not required here); but
       // it only truly support `task` data (at time of writing). Anything else indicates confusion.

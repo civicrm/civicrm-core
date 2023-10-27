@@ -297,7 +297,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
     $queueName = 'seeing-double';
     $queue = \Civi::queue($queueName, [
       'type' => 'Sql',
-      'runner' => 'task',
+      'payload' => 'task',
       'retry_limit' => 3,
       'retry_interval' => 20,
       'error' => 'abort',

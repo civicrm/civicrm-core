@@ -113,12 +113,12 @@ class Civi {
    *
    * @param string $name
    *   The name of a persistent/registered queue (stored in `civicrm_queue`)
-   * @param array{type: string, is_autorun: bool, reset: bool, is_persistent: bool} $params
+   * @param array{type: string, agent: string, payload: string, reset: bool, is_persistent: bool} $params
    *   Specification for a queue.
    *   This is not required for accessing an existing queue.
    *   Specify this if you wish to auto-create the queue or to include advanced options (eg `reset`).
-   *   Example: ['type' => 'Sql', 'error' => 'abort']
-   *   Example: ['type' => 'SqlParallel', 'error' => 'delete']
+   *   Example: ['type' => 'Sql', 'agent' => 'browser', 'payload' => 'task', 'error' => 'abort']
+   *   Example: ['type' => 'SqlParallel', 'agent' => 'server', 'payload' => 'email', 'error' => 'delete']
    *   Defaults: ['reset'=>FALSE, 'is_persistent'=>TRUE, 'is_autorun'=>FALSE]
    * @return \CRM_Queue_Queue
    * @see \CRM_Queue_Service

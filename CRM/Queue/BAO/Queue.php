@@ -31,6 +31,40 @@ class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue implements \Civi\Core\Hook
   }
 
   /**
+   * Event fired before modifying an IM.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (!in_array($event->action, ['create', 'edit'])) {
+      return;
+    }
+    static::normalizeQueueSpec($event->params);
+  }
+
+  /**
+   * Find old properties. Translate to new properties.
+   *
+   * @param array $queueSpec
+   * @internal
+   */
+  public static function normalizeQueueSpec(array &$queueSpec): void {
+    if (array_key_exists('runner', $queueSpec)) {
+      $queueName = $queueSpec['name'] ?? $queueSpec['id'] ?? 'unknown';
+      CRM_Core_Error::deprecatedWarning(sprintf('Queue spec (%s) has deprecated property "%s". Use "%s".', $queueName, 'runner', 'payload'));
+
+      if (!array_key_exists('agent', $queueSpec)) {
+        $queueSpec['agent'] = 'server';
+      }
+
+      if (!array_key_exists('payload', $queueSpec)) {
+        $queueSpec['payload'] = $queueSpec['runner'];
+      }
+
+      unset($queueSpec['runner']);
+    }
+  }
+
+  /**
    * Get a list of valid statuses.
    *
    * The status determines whether automatic background-execution may proceed.
@@ -87,23 +121,15 @@ class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue implements \Civi\Core\Hook
   }
 
   /**
-   * Queues which contain `CRM_Queue_Task` records should use the `task` runner to evaluate them.
+   * Get a list of valid agents.
    *
-   * @code
-   * $q = Civi::queue('do-stuff', ['type' => 'Sql', 'runner' => 'task']);
-   * $q->createItem(new CRM_Queue_Task('my_callback_func', [1,2,3]));
-   * @endCode
-   *
-   * @param \CRM_Queue_Queue $queue
-   * @param array $items
-   * @param array $outcomes
-   * @throws \CRM_Core_Exception
-   * @see CRM_Utils_Hook::queueRun()
+   * @return string[]
    */
-  public static function hook_civicrm_queueRun_task(CRM_Queue_Queue $queue, array $items, array &$outcomes) {
-    foreach ($items as $itemPos => $item) {
-      $outcomes[$itemPos] = (new \CRM_Queue_TaskRunner())->run($queue, $item);
-    }
+  public static function getAgents($context = NULL) {
+    return [
+      'server' => ts('Server-managed background agent'),
+      'browser' => ts('Browser-managed foreground agent'),
+    ];
   }
 
 }

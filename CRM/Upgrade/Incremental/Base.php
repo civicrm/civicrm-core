@@ -728,4 +728,49 @@ class CRM_Upgrade_Incremental_Base {
     return TRUE;
   }
 
+  /**
+   * Rename a MySQL column.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @param string $oldColumn
+   * @param string $newColumn
+   * @param string $properties
+   *   For older versions of MySQL, you must redeclare the properties of the column.
+   *   Ex: "varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Foo bar whiz bang'"
+   * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function renameColumn(CRM_Queue_TaskContext $ctx, string $table, string $oldColumn, string $newColumn, string $properties): bool {
+    $hasOld = CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $oldColumn, FALSE);
+    $hasNew = CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $newColumn, FALSE);
+
+    if ($hasOld && !$hasNew) {
+      $sql = 'ALTER TABLE %1 CHANGE %2 %3 ' . $properties;
+      // $sql = 'ALTER TABLE %1 RENAME COLUMN %2 TO %3';
+      // Note: "RENAME COLUMN" would simplify this method signature a lot...
+      // But requires MySQL 8.0+ or MariaDB 10.5+. Not supported on MySQL 5.7.
+      $params = [
+        1 => [$table, 'MysqlColumnNameOrAlias'],
+        2 => [$oldColumn, 'MysqlColumnNameOrAlias'],
+        3 => [$newColumn, 'MysqlColumnNameOrAlias'],
+      ];
+      CRM_Core_DAO::executeQuery($sql, $params, TRUE, NULL, TRUE, FALSE);
+      return TRUE;
+    }
+    if ($hasOld && $hasNew) {
+      throw new \CRM_Core_Exception("Cannot update \"$table.$oldColumn\": New column name \"$newColumn\" is conflicted.");
+    }
+    if (!$hasOld && $hasNew) {
+      $ctx->log->info("Column \"$table.$oldColumn\" has already been renamed to \"$newColumn\".");
+      return TRUE;
+    }
+    if (!$hasOld && !$hasNew) {
+      throw new \CRM_Core_Exception("Cannot update \"$table.$oldColumn\": Column is missing.");
+    }
+
+    throw new \CRM_Core_Exception("Impossible! All scenarios were already handled! Unless someone did something sneaky...");
+  }
+
 }

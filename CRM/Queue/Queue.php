@@ -117,6 +117,10 @@ abstract class CRM_Queue_Queue {
    * @return mixed|null
    */
   public function getSpec(string $field) {
+    if ($field === 'runner') {
+      CRM_Core_Error::deprecatedWarning('Queue property "runner" was renamed to "payload".');
+      $field = 'payload';
+    }
     return $this->queueSpec[$field] ?? NULL;
   }
 
@@ -141,6 +145,14 @@ abstract class CRM_Queue_Queue {
    * @return bool
    */
   abstract public function existsQueue();
+
+  /**
+   * Delete all items in the queue.
+   */
+  public function resetQueue(): void {
+    $this->deleteQueue();
+    $this->createQueue();
+  }
 
   /**
    * Add a new item to the queue.
