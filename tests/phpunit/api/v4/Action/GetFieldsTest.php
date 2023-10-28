@@ -188,6 +188,34 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(0, $optionValueFields['filter']['default_value']);
   }
 
+  public function testActivityTagGetFields(): void {
+    Tag::delete(FALSE)
+      ->addWhere('used_for:name', 'CONTAINS', 'Activity')
+      ->execute();
+
+    $tagField = Activity::getFields(FALSE)
+      ->addWhere('name', '=', 'tags')
+      ->setLoadOptions(['id', 'name', 'label', 'description', 'color'])
+      ->execute()->single();
+    $this->assertEquals([], $tagField['options']);
+
+    Tag::create(FALSE)
+      ->addValue('used_for:name', ['Activity'])
+      ->addValue('label', 'Act Tag')
+      ->addValue('description', 'Test tag for activities')
+      ->addValue('color', '#aaaaaa')
+      ->execute();
+
+    $tagField = Activity::getFields(FALSE)
+      ->addWhere('name', '=', 'tags')
+      ->setLoadOptions(['id', 'name', 'label', 'description', 'color'])
+      ->execute()->single();
+    $this->assertCount(1, $tagField['options']);
+    $this->assertEquals('Act_Tag', $tagField['options'][0]['name']);
+    $this->assertEquals('Test tag for activities', $tagField['options'][0]['description']);
+    $this->assertEquals('#aaaaaa', $tagField['options'][0]['color']);
+  }
+
   public function testGetSuffixes(): void {
     $actFields = Activity::getFields(FALSE)
       ->execute()->indexBy('name');
