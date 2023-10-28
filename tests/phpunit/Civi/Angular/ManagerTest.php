@@ -56,7 +56,11 @@ class ManagerTest extends \CiviUnitTestCase {
       if (isset($module['js'])) {
         $this->assertTrue(is_array($module['js']));
         foreach ($module['js'] as $file) {
-          $this->assertTrue(file_exists($this->res->getPath($module['ext'], $file)), "File '$file' not found for " . $module['ext']);
+          $filePath = $this->res->getPath($module['ext'], $file);
+          // Some files aren't real paths, like assetBuilder://afform.js?...
+          if ($filePath !== FALSE) {
+            $this->assertTrue(file_exists($filePath), "File '$file' not found for " . $module['ext']);
+          }
           $counts['js']++;
         }
       }
