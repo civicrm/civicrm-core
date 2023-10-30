@@ -57,6 +57,15 @@ abstract class AbstractEntity {
   }
 
   /**
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\GetLinks
+   */
+  public static function getLinks($checkPermissions = TRUE) {
+    return (new \Civi\Api4\Action\GetLinks(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
    * Returns a list of permissions needed to access the various actions in this api.
    *
    * @return array
