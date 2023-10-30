@@ -457,16 +457,16 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
         'entity_table' => 'civicrm_case',
         'tag_id.parent_id.is_tagset' => 1,
         'options' => ['limit' => 0],
-        'return' => ["tag_id.parent_id", "tag_id.parent_id.name", "tag_id.name"],
+        'return' => ["tag_id.parent_id", "tag_id.parent_id.label", "tag_id.label"],
       ]);
       foreach ($tagSetItems['values'] as $tag) {
         $tagSetTags += [
           $tag['tag_id.parent_id'] => [
-            'name' => $tag['tag_id.parent_id.name'],
+            'label' => $tag['tag_id.parent_id.label'],
             'items' => [],
           ],
         ];
-        $tagSetTags[$tag['tag_id.parent_id']]['items'][] = $tag['tag_id.name'];
+        $tagSetTags[$tag['tag_id.parent_id']]['items'][] = $tag['tag_id.label'];
       }
     }
     $this->assign('tagSetTags', $tagSetTags);
