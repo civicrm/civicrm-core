@@ -11,8 +11,9 @@
   <component>CiviMail</component>
   <labelField>name</labelField>
   <paths>
-    <add>civicrm/a/#/mailing/new</add>
-    <update>civicrm/a/#/mailing/[id]</update>
+    <add>civicrm/mailing/send</add>
+    <update>civicrm/mailing/send?mid=[id]&amp;continue=true</update>
+    <copy>civicrm/mailing/send?mid=[id]</copy>
     <view>civicrm/mailing/report?mid=[id]&amp;reset=1</view>
     <preview>civicrm/mailing/view?id=[id]&amp;reset=1</preview>
   </paths>
