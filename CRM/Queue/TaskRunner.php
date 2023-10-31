@@ -111,6 +111,7 @@ class CRM_Queue_TaskRunner {
     $taskCtx = new \CRM_Queue_TaskContext();
     $taskCtx->queue = $queue;
     $taskCtx->log = \CRM_Core_Error::createDebugLogger();
+    $taskCtx->log->setLocale(CRM_Core_I18n::getLocale());
     return $taskCtx;
   }
 

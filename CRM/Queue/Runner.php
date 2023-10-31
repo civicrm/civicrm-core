@@ -404,6 +404,7 @@ class CRM_Queue_Runner {
       $this->taskCtx->queue = $this->queue;
       // $this->taskCtx->log = CRM_Core_Config::getLog();
       $this->taskCtx->log = CRM_Core_Error::createDebugLogger();
+      $this->taskCtx->log->setLocale(CRM_Core_I18n::getLocale());
     }
     return $this->taskCtx;
   }
