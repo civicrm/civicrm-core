@@ -345,13 +345,15 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     $tag_name = Civi::settings()->get('tag_unconfirmed');
 
     if ($tag_name) {
-      // Check if contact 'email confirmed' tag exists, else create one
+      // Check if contact 'Unconfirmed' tag exists, else create one
       // This should be in the petition module initialise code to create a default tag for this
       $tag_params['name'] = $tag_name;
       $tag_params['version'] = 3;
       $tag = civicrm_api('tag', 'get', $tag_params);
       if ($tag['count'] == 0) {
         //create tag
+        $tag_params['label'] = ts('Unconfirmed');
+        $tag_params['color'] = '#ffdd00';
         $tag_params['description'] = $tag_name;
         $tag_params['is_reserved'] = 1;
         $tag_params['used_for'] = 'civicrm_contact';
