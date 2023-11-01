@@ -1807,7 +1807,9 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
-   * DELETEME only-used-by-user-dashboard
+   * @deprecated since 5.68. Will be removed around 5.74.
+   *
+   * Only-used-by-user-dashboard.
    */
   public static function getContactRelationshipSelector(&$params) {
     // format the params
@@ -1950,7 +1952,9 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
-   * DELETEME only-used-by-user-dashboard
+   * @deprecated since 5.68. Will be removed around 5.74.
+   *
+   * Only-used-by-user-dashboard.
    */
   public static function getColumnHeaders() {
     return [
