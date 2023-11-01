@@ -55,19 +55,6 @@ class CRM_Event_Form_EventFees {
   public static function setDefaultValues(&$form) {
     $defaults = [];
 
-    if ($form->_eventId) {
-      //get receipt text and financial type
-      $returnProperities = ['confirm_email_text', 'financial_type_id', 'campaign_id', 'start_date'];
-      $details = [];
-      CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $form->_eventId, $details, $returnProperities);
-      if (!empty($details[$form->_eventId]['financial_type_id'])) {
-        $defaults['financial_type_id'] = $details[$form->_eventId]['financial_type_id'];
-      }
-      if (!empty($details[$form->_eventId]['confirm_email_text'])) {
-        $defaults['receipt_text'] = $details[$form->_eventId]['confirm_email_text'];
-      }
-    }
-
     if ($form->_pId) {
       $ids = [];
       $params = ['id' => $form->_pId];
@@ -91,23 +78,8 @@ class CRM_Event_Form_EventFees {
         $form->assign('fee_amount', CRM_Utils_Array::value('fee_amount', $defaults));
         $form->assign('fee_level', CRM_Utils_Array::value('fee_level', $defaults));
       }
-      $defaults['send_receipt'] = 0;
-    }
-    else {
-      $defaults['send_receipt'] = (strtotime(CRM_Utils_Array::value('start_date', $details[$form->_eventId])) >= time()) ? 1 : 0;
-      $defaults['receive_date'] = date('Y-m-d H:i:s');
     }
 
-    //CRM-11601 we should keep the record contribution
-    //true by default while adding participant
-    if ($form->_action == CRM_Core_Action::ADD && !$form->_mode && $form->_isPaidEvent) {
-      $defaults['record_contribution'] = 1;
-    }
-
-    //CRM-13420
-    if (empty($defaults['payment_instrument_id'])) {
-      $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
-    }
     if ($form->_mode) {
       $config = CRM_Core_Config::singleton();
       // set default country from config if no country set
