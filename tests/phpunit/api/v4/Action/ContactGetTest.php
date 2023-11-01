@@ -253,6 +253,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $result = Contact::get(FALSE)
       ->addWhere('last_name', '=', $last_name)
       ->addWhere('first_name', 'REGEXP BINARY', '^[A-Z]')
+      ->setDebug(TRUE)
       ->execute()->indexBy('id');
     $this->assertCount(3, $result);
     $this->assertArrayHasKey($alice['id'], (array) $result);
