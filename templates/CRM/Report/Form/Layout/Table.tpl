@@ -97,7 +97,7 @@
                     {assign var=fieldLink value=$field|cat:"_link"}
                     {assign var=fieldHover value=$field|cat:"_hover"}
                     {assign var=fieldClass value=$field|cat:"_class"}
-                    <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
+                    <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif array_key_exists($field, $row) && $row.$field eq 'Subtotal'} report-label{/if}">
                         {if array_key_exists($fieldLink, $row) && $row.$fieldLink}
                             <a href="{$row.$fieldLink}"
                                {if array_key_exists($fieldHover, $row)}title="{$row.$fieldHover|escape}"{/if}
@@ -105,11 +105,11 @@
                             >
                         {/if}
 
-                        {if is_array($row.$field)}
+                        {if array_key_exists($field, $row) && is_array($row.$field)}
                             {foreach from=$row.$field item=fieldrow key=fieldid}
                                 <div class="crm-report-{$field}-row-{$fieldid}">{$fieldrow}</div>
                             {/foreach}
-                        {elseif $row.$field eq 'Subtotal'}
+                        {elseif array_key_exists($field, $row) && $row.$field eq 'Subtotal'}
                             {$row.$field}
                         {elseif $header.type & 4 OR $header.type & 256}
                             {if $header.group_by eq 'MONTH' or $header.group_by eq 'QUARTER'}
@@ -129,7 +129,7 @@
                             {else}
                                 <span class="nowrap">{$row.$field|crmMoney}</span>
                            {/if}
-                        {else}
+                        {elseif array_key_exists($field, $row)}
                             {$row.$field|smarty:nodefaults|purify}
                         {/if}
 
@@ -150,7 +150,7 @@
                             {else}
                                 {$grandStat.$field|crmMoney}
                             {/if}
-                        {else}
+                        {elseif array_key_exists($field, $grandStat)}
                             {$grandStat.$field}
                         {/if}
                     </td>
