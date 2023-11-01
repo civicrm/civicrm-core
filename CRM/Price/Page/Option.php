@@ -110,6 +110,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @return void
    */
   public function browse(): void {
+    $this->assign('usedBy', NULL);
     $priceOptions = civicrm_api3('PriceFieldValue', 'get', [
       'price_field_id' => $this->_fid,
          // Explicitly do not check permissions so we are not
@@ -162,6 +163,8 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         }
       }
       $customOption[$id]['order'] = $customOption[$id]['weight'];
+      $customOption[$id]['help_pre'] = $customOption[$id]['help_pre'] ?? NULL;
+      $customOption[$id]['help_post'] = $customOption[$id]['help_post'] ?? NULL;
       $customOption[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
         [
           'oid' => $id,
@@ -210,6 +213,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
 
       $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($sid);
     }
+    $this->assign('usedBy', $usedBy ?? NULL);
     // set the userContext stack
     $session = CRM_Core_Session::singleton();
 
@@ -229,7 +233,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         $url
       );
       $this->assign('usedPriceSetTitle', CRM_Price_BAO_PriceFieldValue::getOptionLabel($oid));
-      $this->assign('usedBy', $usedBy);
       $comps = [
         'Event' => 'civicrm_event',
         'Contribution' => 'civicrm_contribution_page',
