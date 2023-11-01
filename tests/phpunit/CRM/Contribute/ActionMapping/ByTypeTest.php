@@ -163,6 +163,18 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
     ];
 
     $cs[] = [
+      '2015-02-02 00:00:00',
+      'addAliceDues addBobDonation scheduleForDonationWithAbsoluteDate useHelloFirstName',
+      [
+        [
+          'time' => '2015-02-02 00:00:00',
+          'to' => ['bob@example.org'],
+          'subject' => '/Hello, Bob.*via subject/',
+        ],
+      ],
+    ];
+
+    $cs[] = [
       '2015-02-03 00:00:00',
       'addAliceDues addBobDonation scheduleForSoftCreditor startWeekAfter useHelloFirstName',
       [
@@ -244,6 +256,16 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
   public function scheduleForDonation(): void {
     $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
+    $this->schedule->entity_value = CRM_Utils_Array::implodePadded([2]);
+    $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
+  }
+
+  /**
+   * Schedule message delivery for contribution with an absolute date.
+   */
+  public function scheduleForDonationWithAbsoluteDate(): void {
+    $this->schedule->mapping_id = 'contribtype';
+    $this->schedule->absolute_date = date('Y-m-d', strtotime($this->targetDate));
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded([2]);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
   }
