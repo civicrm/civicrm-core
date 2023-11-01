@@ -2324,6 +2324,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['data-select-params'] = json_encode($props['select']);
     $props['data-api-params'] = json_encode($props['api']);
     $props['data-api-entity'] = $props['entity'];
+    if (!empty($props['select']['quickAdd'])) {
+      Civi::service('angularjs.loader')->addModules(['af']);
+    }
     CRM_Utils_Array::remove($props, 'select', 'api', 'entity');
     return $this->add('text', $name, $label, $props, $required);
   }

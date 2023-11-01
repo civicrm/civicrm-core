@@ -538,7 +538,23 @@ if (!CRM.vars) CRM.vars = {};
     });
   }
 
-  function getStaticOptionMarkup(staticItems) {
+  function renderQuickAddMarkup(quickAddLinks) {
+    if (!quickAddLinks || !quickAddLinks.length) {
+      return '';
+    }
+    let markup = '<div class="crm-entityref-links crm-entityref-quick-add">';
+    CRM.config.quickAdd.forEach((link) => {
+      if (quickAddLinks.includes(link.path)) {
+        markup += ' <a class="crm-hover-button" href="' + _.escape(CRM.url(link.path)) + '">' +
+          '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
+          _.escape(link.title) + '</a>';
+      }
+    });
+    markup += '</div>';
+    return markup;
+  }
+
+  function renderStaticOptionMarkup(staticItems) {
     if (!staticItems.length) {
       return '';
     }
@@ -559,9 +575,11 @@ if (!CRM.vars) CRM.vars = {};
     }
     select2Options = select2Options || {};
     return $(this).each(function() {
-      var $el = $(this).off('.crmEntity'),
-        staticItems = getStaticOptions(select2Options.static),
-        multiple = !!select2Options.multiple;
+      const $el = $(this).off('.crmEntity');
+      let staticItems = getStaticOptions(select2Options.static),
+        quickAddLinks = select2Options.quickAdd,
+        multiple = !!select2Options.multiple,
+        key = apiParams.key || 'id';
 
       $el.crmSelect2(_.extend({
         ajax: {
@@ -604,18 +622,25 @@ if (!CRM.vars) CRM.vars = {};
           }
         },
         formatInputTooShort: function() {
-          var txt = _.escape($.fn.select2.defaults.formatInputTooShort.call(this));
-          txt += getStaticOptionMarkup(staticItems);
-          return txt;
+          let html = _.escape($.fn.select2.defaults.formatInputTooShort.call(this));
+          html += renderStaticOptionMarkup(staticItems);
+          html += renderQuickAddMarkup(quickAddLinks);
+          return html;
+        },
+        formatNoMatches: function() {
+          let html = _.escape($.fn.select2.defaults.formatNoMatches);
+          html += renderQuickAddMarkup(quickAddLinks);
+          return html;
         }
       }, select2Options));
 
-      $el.on('select2-open.crmEntity', function() {
+      $el.on('select2-open.crmEntity', function(){
         var $el = $(this);
         $('#select2-drop')
           .off('.crmEntity')
-          .on('click.crmEntity', '.crm-entityref-links-static a', function(e) {
-            var id = $(this).attr('href').substr(1),
+          // Add static item to selection when clicking static links
+          .on('click.crmEntity', '.crm-entityref-links-static a', function() {
+            let id = $(this).attr('href').substring(1),
               item = _.findWhere(staticItems, {id: id});
             $el.select2('close');
             if (multiple) {
@@ -627,6 +652,34 @@ if (!CRM.vars) CRM.vars = {};
             } else {
               $el.select2('data', item, true);
             }
+            return false;
+          })
+          // Pop-up Afform when clicking quick-add links
+          .on('click.crmEntity', '.crm-entityref-quick-add a', function() {
+            let url = $(this).attr('href');
+            $el.select2('close');
+            CRM.loadForm(url).on('crmFormSuccess', (e, data) => {
+              // Quick-add Afform has been submitted, parse submission data for id of created entity
+              const response = data.submissionResponse && data.submissionResponse[0];
+              let createdId;
+              if (typeof response === 'object') {
+                // Loop through entities created by the afform (there should be only one)
+                Object.keys(response).forEach((entity) => {
+                  if (Array.isArray(response[entity]) && response[entity][0] && response[entity][0][key]) {
+                    createdId = response[entity][0][key];
+                  }
+                });
+              }
+              // Update field value with new id and the widget will automatically fetch the label
+              if (createdId) {
+                if (multiple && $el.val()) {
+                  // Select2 v3 uses a string instead of array for multiple values
+                  $el.val($el.val() + ',' + createdId).change();
+                } else {
+                  $el.val('' + createdId).change();
+                }
+              }
+            });
             return false;
           });
       });

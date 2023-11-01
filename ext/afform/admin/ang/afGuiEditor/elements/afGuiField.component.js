@@ -47,6 +47,19 @@
             inputTypes.push(type);
           }
         });
+        // Quick-add links for autocompletes
+        this.quickAddLinks = [];
+        let allowedEntity = (ctrl.getFkEntity() || {}).entity;
+        let allowedEntities = (allowedEntity === 'Contact') ? ['Individual', 'Household', 'Organization'] : [allowedEntity];
+        (CRM.config.quickAdd || []).forEach((link) => {
+          if (allowedEntities.includes(link.entity)) {
+            this.quickAddLinks.push({
+              id: link.path,
+              icon: link.icon,
+              text: link.title,
+            });
+          }
+        });
         this.searchOperators = CRM.afAdmin.search_operators;
         // If field has limited operators, set appropriately
         if (ctrl.fieldDefn.operators && ctrl.fieldDefn.operators.length) {
