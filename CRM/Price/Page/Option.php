@@ -71,28 +71,33 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
           'url' => 'civicrm/admin/price/field/option/edit',
           'qs' => 'reset=1&action=update&oid=%%oid%%&fid=%%fid%%&sid=%%sid%%',
           'title' => ts('Edit Price Option'),
+          'weight' => -50,
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('View'),
           'url' => 'civicrm/admin/price/field/option/edit',
           'qs' => 'action=view&oid=%%oid%%',
           'title' => ts('View Price Option'),
+          'weight' => CRM_Core_Action::getLabel(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Price Option'),
+          'weight' => CRM_Core_Action::getLabel(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Price Option'),
+          'weight' => CRM_Core_Action::getLabel(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/price/field/option/edit',
           'qs' => 'action=delete&oid=%%oid%%',
           'title' => ts('Disable Price Option'),
+          'weight' => CRM_Core_Action::getLabel(CRM_Core_Action::DELETE),
         ],
       ];
     }
