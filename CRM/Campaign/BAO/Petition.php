@@ -38,12 +38,12 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
    * Takes an associative array and creates a petition signature activity.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   an assoc array of name/value pairs.
    *
    * @return mixed
    *   CRM_Campaign_BAO_Petition or NULl or void
    */
-  public function createSignature(&$params) {
+  public function createSignature($params) {
     if (empty($params)) {
       return NULL;
     }
