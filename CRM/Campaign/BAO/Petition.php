@@ -38,12 +38,12 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
    * Takes an associative array and creates a petition signature activity.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   an assoc array of name/value pairs.
    *
    * @return mixed
    *   CRM_Campaign_BAO_Petition or NULl or void
    */
-  public function createSignature(&$params) {
+  public function createSignature($params) {
     if (empty($params)) {
       return NULL;
     }
@@ -102,33 +102,24 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
    * @return bool
    */
   public function confirmSignature($activity_id, $contact_id, $petition_id) {
-    // change activity status to completed (status_id = 2)
-    // I wonder why do we need contact_id when we have activity_id anyway? [chastell]
-    $sql = 'UPDATE civicrm_activity SET status_id = 2 WHERE id = %1';
-    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
-    $params = [
-      1 => [$activity_id, 'Integer'],
-      2 => [$contact_id, 'Integer'],
-      3 => [$sourceID, 'Integer'],
-    ];
-    CRM_Core_DAO::executeQuery($sql, $params);
+    // change activity status to completed
+    \Civi\Api4\Activity::update(FALSE)
+      ->addValue('status_id:name', 'Completed')
+      ->addWhere('id', '=', $activity_id)
+      ->execute();
+    \Civi\Api4\ActivityContact::update(FALSE)
+      ->addValue('contact_id', $contact_id)
+      ->addWhere('activity_id', '=', $activity_id)
+      ->addWhere('record_type_id:name', '=', 'Activity Source')
+      ->execute();
 
-    $sql = 'UPDATE civicrm_activity_contact SET contact_id = %2 WHERE activity_id = %1 AND record_type_id = %3';
-    CRM_Core_DAO::executeQuery($sql, $params);
     // remove 'Unconfirmed' tag for this contact
-    $tag_name = Civi::settings()->get('tag_unconfirmed');
+    \Civi\Api4\EntityTag::delete(FALSE)
+      ->addWhere('tag_id:name', '=', Civi::settings()->get('tag_unconfirmed'))
+      ->addWhere('entity_table', '=', 'civicrm_contact')
+      ->addWhere('entity_id', '=', $contact_id)
+      ->execute();
 
-    $sql = "
-DELETE FROM civicrm_entity_tag
-WHERE       entity_table = 'civicrm_contact'
-AND         entity_id = %1
-AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
-    $params = [
-      1 => [$contact_id, 'Integer'],
-      2 => [$tag_name, 'String'],
-    ];
-    CRM_Core_DAO::executeQuery($sql, $params);
     // validate arguments to setcookie are numeric to prevent header manipulation
     if (isset($petition_id) && is_numeric($petition_id)
       && isset($activity_id) && is_numeric($activity_id)) {
