@@ -754,10 +754,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     ];
     CRM_Utils_Hook::pre('edit', $contact->contact_type, $contact->id, $updateParams);
 
-    $params = [1 => [$contact->id, 'Integer']];
-    $query = 'DELETE FROM civicrm_uf_match WHERE contact_id = %1';
-    CRM_Core_DAO::executeQuery($query, $params);
-
     $contact->copyValues($updateParams);
     $contact->save();
     CRM_Core_BAO_Log::register($contact->id, 'civicrm_contact', $contact->id);
