@@ -50,7 +50,7 @@ return [
         'saved_search_id.name' => 'Administer_Contact_Types',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',

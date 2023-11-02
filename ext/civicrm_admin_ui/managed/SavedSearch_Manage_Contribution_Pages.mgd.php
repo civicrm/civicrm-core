@@ -51,7 +51,7 @@ return [
         'saved_search_id.name' => 'Manage_Contribution_Pages',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
