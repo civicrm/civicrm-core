@@ -113,7 +113,10 @@ return [
               'editable' => TRUE,
             ],
             [
+              'text' => '',
+              'style' => 'default',
               'size' => 'btn-xs',
+              'icon' => 'fa-bars',
               'links' => [
                 [
                   'entity' => 'ContactType',
@@ -141,7 +144,7 @@ return [
                   ],
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
               'alignment' => 'text-right',
             ],
           ],
