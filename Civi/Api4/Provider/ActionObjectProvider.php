@@ -161,11 +161,20 @@ class ActionObjectProvider extends AutoService implements EventSubscriberInterfa
       // Allow extensions to modify the list of entities
       $event = GenericHookEvent::create(['entities' => &$entities]);
       \Civi::dispatcher()->dispatch('civi.api4.entityTypes', $event);
+      $this->fillEntityDefaults($entities);
       ksort($entities);
       $cache->set('api4.entities.info', $entities);
     }
 
     return $entities;
+  }
+
+  public function fillEntityDefaults(array &$entities) {
+    foreach ($entities as &$entity) {
+      if (!isset($entity['search_fields'])) {
+        $entity['search_fields'] = (array) ($entity['label_field'] ?? NULL);
+      }
+    }
   }
 
   /**
