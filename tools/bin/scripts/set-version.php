@@ -82,8 +82,8 @@ updateFile("sql/test_data_second_domain.mysql", function ($content) use ($newVer
   return str_replace($oldVersion, $newVersion, $content);
 });
 
-// Update core extension info
-$infoXmls = findCoreInfoXml();
+// Update core extensions if this is a stable release
+$infoXmls = isPreReleaseIncrement($newVersion) ? [] : findCoreInfoXml();
 foreach ($infoXmls as $infoXml) {
   updateXmlFile($infoXml, function (DOMDocument $dom) use ($newVersion) {
     // Update extension version
@@ -190,6 +190,10 @@ function makeVerName($version) {
 
 function isVersionValid($v) {
   return $v && preg_match('/^[0-9a-z\.\-]+$/', $v);
+}
+
+function isPreReleaseIncrement(string $v): bool {
+  return (bool) preg_match('/(alpha|beta)/', $v) && !preg_match('/(beta1|alpha1)$/', $v);
 }
 
 /**
