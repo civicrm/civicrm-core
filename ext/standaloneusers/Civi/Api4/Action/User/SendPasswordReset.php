@@ -30,7 +30,7 @@ class SendPasswordReset extends AbstractAction {
    * @var string
    * @default ''
    */
-  protected string $identifier;
+  protected $identifier;
 
   public function _run(Result $result) {
     $endNoSoonerThan = 0.25 + microtime(TRUE);
