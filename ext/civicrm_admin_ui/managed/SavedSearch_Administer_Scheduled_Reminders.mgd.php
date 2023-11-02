@@ -181,7 +181,7 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'actions' => FALSE,
+          'actions' => TRUE,
           'classes' => [
             'table',
             'table-striped',

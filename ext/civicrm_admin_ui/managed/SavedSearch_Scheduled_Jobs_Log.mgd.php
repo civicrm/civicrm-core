@@ -53,6 +53,7 @@ return [
         'saved_search_id.name' => 'Scheduled_Jobs_Log',
         'type' => 'table',
         'settings' => [
+          'actions' => TRUE,
           'description' => NULL,
           'sort' => [
             [
@@ -88,7 +89,6 @@ return [
               'rewrite' => '<b>' . E::ts("Summary:") . '</b> [description]<br><b>' . E::ts("Details:") . '</b><pre>[data]</pre>',
             ],
           ],
-          'actions' => FALSE,
           'classes' => [
             'table',
             'table-striped',

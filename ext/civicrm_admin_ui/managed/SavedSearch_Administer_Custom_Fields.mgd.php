@@ -55,7 +55,7 @@ return [
         'saved_search_id.name' => 'Administer_Custom_Fields',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',

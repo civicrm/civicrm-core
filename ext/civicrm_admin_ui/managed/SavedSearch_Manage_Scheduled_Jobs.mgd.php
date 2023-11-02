@@ -56,6 +56,7 @@ return [
         'saved_search_id.name' => 'Scheduled_Jobs',
         'type' => 'table',
         'settings' => [
+          'actions' => TRUE,
           'description' => NULL,
           'sort' => [
             [
@@ -237,7 +238,6 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'actions' => FALSE,
           'classes' => [
             'table',
             'table-striped',

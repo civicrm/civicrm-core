@@ -66,6 +66,7 @@ return [
         'saved_search_id.name' => 'ACL_Roles',
         'type' => 'table',
         'settings' => [
+          'actions' => TRUE,
           'description' => NULL,
           'sort' => [],
           'limit' => 50,
@@ -165,7 +166,6 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'actions' => FALSE,
           'classes' => [
             'table',
             'table-striped',

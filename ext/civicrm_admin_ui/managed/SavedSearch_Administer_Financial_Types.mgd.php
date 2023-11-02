@@ -72,7 +72,7 @@ return [
         'saved_search_id.name' => 'Administer_Financial_Types',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',

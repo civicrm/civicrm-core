@@ -56,6 +56,7 @@ return [
         'saved_search_id.name' => 'Manage_ACLs',
         'type' => 'table',
         'settings' => [
+          'actions' => TRUE,
           'description' => NULL,
           'sort' => [
             [
