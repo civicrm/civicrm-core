@@ -87,6 +87,7 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
     $header = array_shift($download);
 
     $this->assertEquals('Duration Subject', $header[0]);
+    $this->assertEquals('Details', $header[1]);
 
     foreach ($download as $rowNum => $data) {
       $this->assertEquals($sampleData[$rowNum]['duration'] . ' ' . $subject, $data[0]);
