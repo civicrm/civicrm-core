@@ -1492,22 +1492,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
     ];
     $lineItem = [];
-    $additionalParticipantDetails = [];
 
     if ($this->isPaymentOnExistingContribution()) {
-      $contributionParams['total_amount'] = $this->getParticipantValue('fee_amount');
-
       $params['discount_id'] = NULL;
       //re-enter the values for UPDATE mode
       $params['fee_level'] = $params['amount_level'] = $this->getParticipantValue('fee_level');
       $params['fee_amount'] = $this->getParticipantValue('fee_amount');
-
-      //also add additional participant's fee level/priceset
-      if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
-        $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_id);
-        $hasLineItems = $params['priceSetId'] ?? FALSE;
-        $additionalParticipantDetails = $this->getFeeDetails($additionalIds, $hasLineItems);
-      }
     }
     else {
 
@@ -1528,7 +1518,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       //when financial_type_id is passed in form, update the
       //lineitems with the financial type selected in form
       $submittedFinancialType = $params['financial_type_id'] ?? NULL;
-      $isPaymentRecorded = $params['record_contribution'] ?? NULL;
+      $isPaymentRecorded = $this->getSubmittedValue('record_contribution');
       if ($isPaymentRecorded && $this->isQuickConfig() && $submittedFinancialType) {
         foreach ($lineItem[0] as &$values) {
           $values['financial_type_id'] = $submittedFinancialType;
@@ -1551,9 +1541,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if (isset($params['priceSetId'])) {
       if (!empty($lineItem[0])) {
         $this->set('lineItem', $lineItem);
-
         $this->_lineItem = $lineItem;
-        $lineItem = array_merge($lineItem, $additionalParticipantDetails);
       }
     }
 
