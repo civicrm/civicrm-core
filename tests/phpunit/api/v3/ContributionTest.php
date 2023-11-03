@@ -1696,8 +1696,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Function tets that financial records are correctly added when financial type is changed
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateContributionWithFeeAmountChangeFinancialType(): void {
     $contributionParams = [
@@ -2224,9 +2222,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test repeat contribution successfully creates line item.
    *
+   * Disable CiviMember to provide cover for that situation.
+   *
    * This is just testing a contribution which matches the recurring.
    */
   public function testRepeatTransaction(): void {
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviMember');
     $originalContribution = $this->setUpRepeatTransaction([], 'single', ['total_amount' => 500, 'net_amount' => 495]);
     $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
@@ -2307,8 +2308,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test repeat contribution successfully creates line items (plural).
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionLineItems(): void {
     // CRM-19309
@@ -2359,8 +2358,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test repeat contribution successfully creates is_test transaction.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionIsTest(): void {
     $this->_params['is_test'] = 1;
@@ -2456,8 +2453,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test repeat contribution accepts recur_id instead of
    * original_contribution_id.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionPreviousContributionRefunded(): void {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
@@ -3377,8 +3372,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * Note that we are creating a logged in user because email goes out from
    * that person
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCompleteTransactionWithParticipantRecord(): void {
     $mut = new CiviMailUtils($this, TRUE);
@@ -3777,8 +3770,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param int $pageID Page ID
    * @param int $contributionID Contribution ID
    * @param array $pageParams
-   *
-   * @throws \CRM_Core_Exception
    */
   public function checkReceiptDetails($mut, $pageID, $contributionID, $pageParams): void {
     $pageReceipt = [
@@ -3911,9 +3902,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Create a pending contribution & linked pending participant record (along
    * with an event).
    *
-   * @throws \CRM_Core_Exception
+   * @return int
    */
-  public function createPendingParticipantContribution() {
+  public function createPendingParticipantContribution(): int {
     $this->_ids['event']['test'] = $this->eventCreatePaid(['is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org', 'confirm_email_text' => ''])['id'];
     $participantID = $this->participantCreate(['event_id' => $this->_ids['event']['test'], 'status_id' => 6, 'contact_id' => $this->individualID]);
     $this->_ids['participant'] = $participantID;
@@ -3931,7 +3922,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'entity_table' => 'civicrm_participant',
       ],
     ]);
-    return $contribution['id'];
+    return (int) $contribution['id'];
   }
 
   /**
@@ -4037,12 +4028,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check correct financial transaction entries were created for the change in payment instrument.
+   * Check correct financial transaction entries were created for the change in
+   * payment instrument.
    *
    * @param int $contributionID
    * @param int $originalInstrumentID
    * @param int $newInstrumentID
    * @param int $amount
+   *
+   * @throws \CRM_Core_Exception
    */
   public function checkFinancialTrxnPaymentInstrumentChange($contributionID, $originalInstrumentID, $newInstrumentID, $amount = 100): void {
 
