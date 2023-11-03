@@ -67,8 +67,12 @@
         }
         setDateOptions();
 
-        if (ctrl.getDefn().input_type == 'Date' && !getSet('default_date_type')) {
-          ctrl.defaultDateType = getSet('default_date_type', 'fixed');
+        if (ctrl.getDefn().input_type == 'Date') {
+          if (!getSet('default_date_type')) {
+            ctrl.defaultDateType = getSet('default_date_type', 'fixed');
+          } else {
+            ctrl.defaultDateType = getSet("default_date_type");
+          }
         }
       };
 
