@@ -1573,7 +1573,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           4 => NULL,
           5 => $value,
           'is_checked' => $isChecked,
-          ];
+        ];
       }
 
       $migrationInfo["move_$field"] = $value;
@@ -2766,7 +2766,7 @@ ORDER BY civicrm_custom_group.weight,
     ];
     return $keysToIgnore[$type];
   }
-  
+
   /**
    * Get the field value & label for the given field.
    *
