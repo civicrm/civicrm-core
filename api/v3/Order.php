@@ -162,8 +162,6 @@ function civicrm_api3_order_create(array $params): array {
     }
   }
 
-  $params['line_item'][$order->getPriceSetID()] = $order->getLineItems();
-
   $contributionParams = $params;
   // If this is nested we need to set sequential to 0 as sequential handling is done
   // in create_success & id will be miscalculated...
