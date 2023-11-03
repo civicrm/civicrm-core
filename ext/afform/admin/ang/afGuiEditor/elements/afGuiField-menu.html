@@ -59,8 +59,8 @@
 <li ng-if="$ctrl.fieldDefn.input_type === 'Date' && $ctrl.hasDefaultValue">
   <div ng-click="setDefaultDateType(); $event.stopPropagation(); $event.target.blur();" class="af-gui-field-select-in-dropdown form-inline">
     <select class="form-control" ng-model="getSet('default_date_type')" ng-model-options="{getterSetter: true}">
-      <option value="fixed_date">{{:: ts('Fixed Date') }}</option>
-      <option value="current_date">{{:: ts('Current Date') }}</option>
+      <option value="fixed">{{:: ts('Pick Date') }}</option>
+      <option value="now">{{:: ts('Now') }}</option>
     </select>
   </div>
 </li>

@@ -55,7 +55,7 @@
         setDateOptions();
 
         if (ctrl.getDefn().input_type == 'Date' && !getSet('default_date_type')) {
-          ctrl.defaultDateType = getSet('default_date_type', 'fixed_date');
+          ctrl.defaultDateType = getSet('default_date_type', 'fixed');
         }
       };
 
