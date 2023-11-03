@@ -1688,6 +1688,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->organizeOptionValues();
     CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviMember');
     // @fixme this parameter is leaking - it should not be defined as a class static
     // but for now we just handle in tear down.
     CRM_Contribute_BAO_Query::$_contribOrSoftCredit = 'only contribs';

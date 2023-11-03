@@ -793,9 +793,13 @@ WHERE  id = %1";
         // Add in visibility because Smarty templates expect it and it is hard to adjust them to colon format.
         $field['visibility'] = $field['visibility_id:name'];
       }
+      $select = ['*', 'visibility_id:name'];
+      if (CRM_Core_Component::isEnabled('CiviMember')) {
+        $select[] = 'membership_type_id.name';
+      }
       $options = PriceFieldValue::get(FALSE)
         ->addWhere('price_field_id', 'IN', array_keys($data['fields']))
-        ->addSelect('*', 'membership_type_id.name', 'visibility_id:name')
+        ->setSelect($select)
         ->execute();
       foreach ($options as $option) {
         // Add in visibility because Smarty templates expect it and it is hard to adjust them to colon format.
