@@ -33,7 +33,7 @@
 {/foreach}
 
 {if $isShowTax && {contribution.tax_amount|boolean}}
-{ts}Amount before Tax:{/ts} {$amount-$totalTaxAmount|crmMoney:$currency}
+{ts}Amount before Tax:{/ts} {contribution.tax_exclusive_amount}
   {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
     {if $taxRate == 0}{ts}No{/ts} {$taxTerm}{else}{$taxTerm} {$taxDetail.percentage}%{/if} : {$taxDetail.amount|crmMoney:'{contribution.currency}'}
   {/foreach}
