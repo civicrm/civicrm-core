@@ -123,6 +123,10 @@
           else if (ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
             setValue(ctrl.afFieldset.getStoredValue(ctrl.fieldName));
           }
+          else if ('default_date_type' in ctrl.defn && ctrl.defn.default_date_type === 'now') {
+            let currentDate = new Date();
+            setValue(currentDate.toISOString().split('T')[0]);
+          }
           // Set default value based on field defn
           else if ('afform_default' in ctrl.defn) {
             setValue(ctrl.defn.afform_default);
