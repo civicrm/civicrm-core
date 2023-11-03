@@ -56,6 +56,7 @@ return [
         'saved_search_id.name' => 'Manage_ACLs',
         'type' => 'table',
         'settings' => [
+          'actions' => TRUE,
           'description' => NULL,
           'sort' => [
             [
@@ -136,7 +137,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit ACL'),
+                  'text' => E::ts('Edit'),
                   'style' => 'default',
                   'path' => '',
                   'condition' => [],
@@ -165,7 +166,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete ACL'),
+                  'text' => E::ts('Delete'),
                   'style' => 'danger',
                   'path' => '',
                   'condition' => [],

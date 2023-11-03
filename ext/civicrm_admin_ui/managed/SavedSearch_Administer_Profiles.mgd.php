@@ -68,7 +68,7 @@ return [
         'saved_search_id.name' => 'User_defined_Profiles',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
