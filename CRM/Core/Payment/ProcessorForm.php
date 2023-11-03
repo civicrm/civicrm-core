@@ -25,13 +25,11 @@ class CRM_Core_Payment_ProcessorForm {
 
   /**
    * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register|CRM_Financial_Form_Payment $form
-   * @param null $type
-   * @param null $mode
    *
    * @throws Exception
    */
-  public static function preProcess(&$form, $type = NULL, $mode = NULL) {
-    $type = $type ?: CRM_Utils_Request::retrieve('type', 'String', $form);
+  public static function preProcess($form) {
+    $type = CRM_Utils_Request::retrieve('type', 'String', $form);
     if ($type) {
       // @todo not sure when this would be true. Never passed in.
       $form->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($type, $form->_mode);
