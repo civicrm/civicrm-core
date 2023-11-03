@@ -23,6 +23,7 @@ use Civi\Api4\PriceSet;
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   use CRM_Financial_Form_FrontEndPaymentFormTrait;
   use CRM_Contribute_Form_ContributeFormTrait;
+  use CRM_Financial_Form_PaymentProcessorFormTrait;
 
   /**
    * The id of the contribution page that we are processing.
@@ -59,8 +60,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var array
    */
   public $_paymentProcessor;
-
-  public $_paymentObject = NULL;
 
   /**
    * Order object, used to calculate amounts, line items etc.
@@ -869,8 +868,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // The concept of contributeMode is deprecated.
     // The payment processor object can provide info about the fields it shows.
-    if ($isMonetary && $this->_paymentProcessor['object'] instanceof \CRM_Core_Payment) {
-      $paymentProcessorObject = $this->_paymentProcessor['object'];
+    if ($isMonetary) {
+      $paymentProcessorObject = $this->getPaymentProcessorObject();
       $this->assign('paymentAgreementTitle', $paymentProcessorObject->getText('agreementTitle', []));
       $this->assign('paymentAgreementText', $paymentProcessorObject->getText('agreementText', []));
       $paymentFields = $paymentProcessorObject->getPaymentFormFields();
@@ -1053,18 +1052,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       // If we don't have that and the membership type is auto recur or opt into recur set is_recur to 0.
       $this->_params['is_recur'] = $this->_values['is_recur'] = 0;
     }
-  }
-
-  /**
-   * Get the payment processor object for the submission, returning the manual one for offline payments.
-   *
-   * @return CRM_Core_Payment
-   */
-  protected function getPaymentProcessorObject() {
-    if (!empty($this->_paymentProcessor)) {
-      return $this->_paymentProcessor['object'];
-    }
-    return new CRM_Core_Payment_Manual();
   }
 
   /**

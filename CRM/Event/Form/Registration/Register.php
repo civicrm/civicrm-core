@@ -18,6 +18,7 @@
  * This class generates form components for processing Event.
  */
 class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
+  use CRM_Financial_Form_PaymentProcessorFormTrait;
 
   /**
    * The fields involved in this page.

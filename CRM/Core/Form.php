@@ -945,8 +945,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         ) {
           $this->_paymentProcessor = $paymentProcessorDetail;
           $this->assign('paymentProcessor', $this->_paymentProcessor);
-          // Setting this is a bit of a legacy overhang.
-          $this->_paymentObject = $paymentProcessorDetail['object'];
         }
       }
       // It's not clear why we set this on the form.
