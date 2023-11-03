@@ -2,6 +2,10 @@
 
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
+if (!CRM_Core_Component::isEnabled('CiviMail')) {
+  return [];
+}
+
 $columns = [
   [
     'type' => 'field',
@@ -19,6 +23,7 @@ $columns = [
     'sortable' => TRUE,
     'icons' => [],
     'cssRules' => [],
+    'empty_value' => E::ts('Draft'),
   ],
 ];
 
@@ -79,19 +84,54 @@ $columns = array_merge($columns, [
 ]);
 
 // campaign only if component is enabled
-if (CRM_Campaign_BAO_Campaign::isComponentEnabled()) {
+if (CRM_Core_Component::isEnabled('CiviCampaign')) {
   $columns[] = [
     'type' => 'field',
-    'key' => 'campaign_id:title',
+    'key' => 'campaign_id:label',
     'dataType' => 'String',
-    'label' => E::ts('Language'),
+    'label' => E::ts('Campaign'),
     'sortable' => TRUE,
   ];
 }
 
 $columns = array_merge($columns, [
   [
+    'text' => '',
+    'type' => 'menu',
+    'alignment' => 'text-right',
+    'style' => 'default',
+    'size' => 'btn-xs',
+    'icon' => 'fa-bars',
     'links' => [
+      [
+        'entity' => 'Mailing',
+        'action' => 'update',
+        'join' => '',
+        'target' => '',
+        'icon' => 'fa-pencil',
+        'text' => E::ts('Continue'),
+        'style' => 'default',
+        'path' => '',
+        'condition' => [
+          'is_draft',
+          '=',
+          TRUE,
+        ],
+      ],
+      [
+        'icon' => 'fa-clone',
+        'text' => E::ts('Copy'),
+        'style' => 'default',
+        'condition' => [
+          'Mailing_MailingJob_mailing_id_01.status:name',
+          'NOT IN',
+          ['Paused', 'Scheduled', 'Running'],
+        ],
+        'entity' => 'Mailing',
+        'action' => 'copy',
+        'join' => '',
+        'target' => '',
+      ],
       [
         'entity' => 'Mailing',
         'action' => 'view',
@@ -109,7 +149,7 @@ $columns = array_merge($columns, [
         'text' => E::ts('Resume'),
         'style' => 'default',
         'condition' => [
-          'Mailing_MailingJob_mailing_id_01.status:label',
+          'Mailing_MailingJob_mailing_id_01.status:name',
           '=',
           'Paused',
         ],
@@ -124,47 +164,15 @@ $columns = array_merge($columns, [
         'text' => E::ts('Cancel'),
         'style' => 'default',
         'condition' => [
-          'Mailing_MailingJob_mailing_id_01.status:label',
+          'Mailing_MailingJob_mailing_id_01.status:name',
           'IN',
-          [
-            'Scheduled',
-            'Running',
-          ],
+          ['Scheduled', 'Running'],
         ],
         'entity' => '',
         'action' => '',
         'join' => '',
         'target' => '',
       ],
-      [
-        'path' => 'civicrm/mailing/send?mid=[id]&reset=1',
-        'icon' => 'fa-external-link',
-        'text' => E::ts('Copy'),
-        'style' => 'default',
-        'condition' => [
-          'Mailing_MailingJob_mailing_id_01.status:label',
-          'NOT IN',
-          [
-            'Paused',
-            'Scheduled',
-            'Running',
-          ],
-        ],
-        'entity' => '',
-        'action' => '',
-        'join' => '',
-        'target' => '',
-      ],
-    ],
-    'type' => 'links',
-    'alignment' => 'text-right',
-  ],
-  [
-    'text' => '',
-    'style' => 'default',
-    'size' => 'btn-xs',
-    'icon' => 'fa-bars',
-    'links' => [
       [
         'entity' => 'Mailing',
         'action' => 'preview',
@@ -182,12 +190,9 @@ $columns = array_merge($columns, [
         'text' => E::ts('Pause'),
         'style' => 'default',
         'condition' => [
-          'Mailing_MailingJob_mailing_id_01.status:label',
+          'Mailing_MailingJob_mailing_id_01.status:name',
           'IN',
-          [
-            'Scheduled',
-            'Running',
-          ],
+          ['Scheduled', 'Running'],
         ],
         'entity' => '',
         'action' => '',
@@ -200,11 +205,9 @@ $columns = array_merge($columns, [
         'text' => E::ts('Cancel'),
         'style' => 'default',
         'condition' => [
-          'Mailing_MailingJob_mailing_id_01.status:label',
-          'IN',
-          [
-            'Paused',
-          ],
+          'Mailing_MailingJob_mailing_id_01.status:name',
+          '=',
+          'Paused',
         ],
         'entity' => '',
         'action' => '',
@@ -212,10 +215,10 @@ $columns = array_merge($columns, [
         'target' => '',
       ],
       [
-        'entity' => '',
-        'action' => '',
+        'entity' => 'Mailing',
+        'action' => 'delete',
         'join' => '',
-        'target' => '',
+        'target' => 'crm-popup',
         'icon' => 'fa-trash',
         'text' => E::ts('Delete'),
         'style' => 'danger',
@@ -223,26 +226,20 @@ $columns = array_merge($columns, [
         'condition' => [],
       ],
     ],
-    'type' => 'menu',
-    'alignment' => 'text-right',
   ],
 ]);
 
-
 return [
   [
-    'name' => 'SavedSearch_Mailings_Browse_Scheduled',
+    'name' => 'SavedSearch_Mailings_Browse',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
-    'update' => 'always',
+    'cleanup' => 'always',
+    'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'Mailings_Browse_Scheduled',
-        'label' => E::ts('Mailings Browse Scheduled'),
-        'form_values' => NULL,
-        'mapping_id' => NULL,
-        'search_custom_id' => NULL,
+        'name' => 'Mailings_Browse',
+        'label' => E::ts('Mailings'),
         'api_entity' => 'Mailing',
         'api_params' => [
           'version' => 4,
@@ -250,6 +247,7 @@ return [
             'id',
             'name',
             'language:label',
+            'campaign_id:label',
             'created_id.display_name',
             'created_date',
             'scheduled_id.display_name',
@@ -259,22 +257,19 @@ return [
             'Mailing_MailingJob_mailing_id_01.status:label',
           ],
           'orderBy' => [],
-          'where' => [],
+          'where' => [
+            ['sms_provider_id', 'IS EMPTY'],
+          ],
           'groupBy' => [],
           'join' => [
             [
               'MailingJob AS Mailing_MailingJob_mailing_id_01',
-              'INNER',
-              [
-                'id',
-                '=',
-                'Mailing_MailingJob_mailing_id_01.mailing_id',
-              ],
+              'LEFT',
+              ['id', '=', 'Mailing_MailingJob_mailing_id_01.mailing_id'],
             ],
           ],
           'having' => [],
         ],
-        'expires_date' => NULL,
         'description' => NULL,
       ],
       'match' => [
@@ -285,14 +280,14 @@ return [
   [
     'name' => 'SavedSearch_Mailings_Browse_Scheduled_SearchDisplay_Mailings_Table',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
-    'update' => 'always',
+    'cleanup' => 'always',
+    'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
         'name' => 'Mailings_Table',
-        'label' => E::ts('Mailings Table'),
-        'saved_search_id.name' => 'Mailings_Browse_Scheduled',
+        'label' => E::ts('Mailings'),
+        'saved_search_id.name' => 'Mailings_Browse',
         'type' => 'table',
         'settings' => [
           'description' => NULL,
@@ -303,7 +298,11 @@ return [
             ],
           ],
           'limit' => 50,
-          'pager' => [],
+          'pager' => [
+            'show_count' => FALSE,
+            'expose_limit' => FALSE,
+            'hide_single' => TRUE,
+          ],
           'placeholder' => 5,
           'columns' => $columns,
           'actions' => TRUE,
@@ -328,17 +327,18 @@ return [
               'bg-success',
               'Mailing_MailingJob_mailing_id_01.status:name',
               'IN',
-              [
-                'Scheduled',
-                'Running',
-              ],
+              ['Scheduled', 'Running'],
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/mailing/send',
-            'text' => E::ts('Add Mailing'),
-            'icon' => 'fa-plus',
-            'target' => '',
+          'toolbar' => [
+            [
+              'entity' => 'Mailing',
+              'action' => 'add',
+              'text' => E::ts('Add Mailing'),
+              'icon' => 'fa-plus',
+              'style' => 'primary',
+              'target' => '',
+            ],
           ],
         ],
         'acl_bypass' => FALSE,
