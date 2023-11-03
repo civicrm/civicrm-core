@@ -1802,7 +1802,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       $dao = new CRM_Pledge_DAO_PledgeBlock();
       $dao->entity_table = 'civicrm_contribution_page';
-      $dao->entity_id = $pageID;
+      $dao->entity_id = $this->getContributionPageID();
       if ($dao->find(TRUE)) {
         CRM_Core_DAO::storeValues($dao, $pledgeBlock);
       }
@@ -1869,7 +1869,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             $this->assign('start_date_editable', FALSE);
             if (!empty($pledgeBlock['is_pledge_start_date_editable'])) {
               $this->assign('start_date_editable', TRUE);
-              if ($field == 'calendar_month') {
+              if ($field === 'calendar_month') {
                 $this->assign('is_date', FALSE);
                 $this->setDefaults(['start_date' => $value]);
               }
