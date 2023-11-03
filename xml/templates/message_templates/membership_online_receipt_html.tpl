@@ -211,7 +211,7 @@
           {ts}Amount Before Tax:{/ts}
          </td>
          <td {$valueStyle}>
-          {$amount-$totalTaxAmount|crmMoney}
+           {contribution.tax_exclusive_amount}
          </td>
         </tr>
         {foreach from=$dataArray item=value key=priceset}

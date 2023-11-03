@@ -85,7 +85,7 @@
             {ts} Amount before Tax : {/ts}
           </td>
           <td {$valueStyle}>
-            {$amount-$totalTaxAmount|crmMoney:$currency}
+            {contribution.tax_exclusive_amount}
           </td>
         </tr>
 
