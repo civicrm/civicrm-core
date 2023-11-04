@@ -19,6 +19,7 @@
 namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\Mailing;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -33,29 +34,53 @@ class MailingEventTest extends Api4TestBase implements TransactionalInterface {
     $eid2 = $this->createTestRecord('Email', ['contact_id' => $cid2])['id'];
     $mid1 = $this->createTestRecord('Mailing')['id'];
     $mid2 = $this->createTestRecord('Mailing')['id'];
-    $parentJobIDs = $this->saveTestRecords('MailingJob',
-      [
-        'records' => [
-          ['mailing_id' => $mid1, 'is_test' => 'false'],
-          ['mailing_id' => $mid2, 'is_test' => 'false'],
-        ],
-      ])->column('id');
+    $parentJobIDs = $this->saveTestRecords('MailingJob', [
+      'records' => [
+        ['mailing_id' => $mid1, 'is_test' => FALSE],
+        ['mailing_id' => $mid2, 'is_test' => TRUE],
+      ],
+    ])->column('id');
+
+    // Test is_draft field
+    $mailings = Mailing::get(FALSE)
+      ->addSelect('id', 'is_draft')
+      ->addWhere('id', 'IN', [$mid1, $mid2])
+      ->execute()->indexBy('id');
+    $this->assertFalse($mailings[$mid1]['is_draft']);
+    $this->assertTrue($mailings[$mid2]['is_draft']);
+
+    Mailing::update(FALSE)
+      ->addWhere('id', '=', $mid2)
+      ->addValue('scheduled_id', $cid1)
+      ->execute();
+
+    $mailings = Mailing::get(FALSE)
+      ->addSelect('id', 'is_draft')
+      ->addWhere('id', 'IN', [$mid1, $mid2])
+      ->execute()->indexBy('id');
+    $this->assertFalse($mailings[$mid1]['is_draft']);
+    $this->assertFalse($mailings[$mid2]['is_draft']);
+
+    $parentJobIDs[] = $this->createTestRecord('MailingJob', [
+      'mailing_id' => $mid2,
+      'is_test' => FALSE,
+    ])['id'];
 
     $childJobIDs = $this->saveTestRecords('MailingJob',
       [
         'records' => [
           ['mailing_id' => $mid1, 'parent_id' => $parentJobIDs[0], 'job_type' => 'child', 'is_test' => 'false'],
-          ['mailing_id' => $mid2, 'parent_id' => $parentJobIDs[1], 'job_type' => 'child', 'is_test' => 'false'],
+          ['mailing_id' => $mid2, 'parent_id' => $parentJobIDs[2], 'job_type' => 'child', 'is_test' => 'false'],
         ],
       ])->column('id');
 
     $queueIDs = $this->saveTestRecords('MailingEventQueue',
       [
         'records' => [
-          ['job_id' => $childJobIDs[0], 'contact_id' => $cid1, 'email_id' => $eid1],
-          ['job_id' => $childJobIDs[0], 'contact_id' => $cid2, 'email_id' => $eid2],
-          ['job_id' => $childJobIDs[1], 'contact_id' => $cid1, 'email_id' => $eid1],
-          ['job_id' => $childJobIDs[1], 'contact_id' => $cid2, 'email_id' => $eid2],
+          ['job_id' => $childJobIDs[0], 'mailing_id' => $mid1, 'contact_id' => $cid1, 'email_id' => $eid1],
+          ['job_id' => $childJobIDs[0], 'mailing_id' => $mid1, 'contact_id' => $cid2, 'email_id' => $eid2],
+          ['job_id' => $childJobIDs[1], 'mailing_id' => $mid2, 'contact_id' => $cid1, 'email_id' => $eid1],
+          ['job_id' => $childJobIDs[1], 'mailing_id' => $mid2, 'contact_id' => $cid2, 'email_id' => $eid2],
         ],
       ])->column('id');
 
@@ -108,10 +133,10 @@ class MailingEventTest extends Api4TestBase implements TransactionalInterface {
         ],
       ]);
 
-    $mailings = \Civi\Api4\Mailing::get(FALSE)
+    $mailings = Mailing::get(FALSE)
       ->addSelect('stats_intended_recipients', 'stats_successful', 'stats_opens_total', 'stats_opens_unique',
         'stats_clicks_total', 'stats_clicks_unique', 'stats_bounces', 'stats_unsubscribes', 'stats_optouts',
-        'stats_optouts_and_unsubscribes', 'stats_forwards', 'stats_replies')
+        'stats_optouts_and_unsubscribes', 'stats_forwards', 'stats_replies', 'is_draft')
       ->addWhere('id', 'IN', [$mid1, $mid2])
       ->addOrderBy('id', 'ASC')
       ->execute();
@@ -140,6 +165,8 @@ class MailingEventTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(0, $mailings[1]['stats_optouts']);
     $this->assertEquals(2, $mailings[0]['stats_optouts_and_unsubscribes']);
     $this->assertEquals(0, $mailings[1]['stats_optouts_and_unsubscribes']);
+    $this->assertFalse($mailings[0]['is_draft']);
+    $this->assertFalse($mailings[1]['is_draft']);
   }
 
 }
