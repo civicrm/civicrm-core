@@ -4,6 +4,7 @@
     <af-field name="created_date" defn="{input_type: 'Select', search_range: true}" />
     <af-field name="created_id.display_name,scheduled_id.display_name" defn="{label: ts('Created or Sent by'), input_attrs: {}, input_type: 'Text'}" />
     <af-field name="Mailing_MailingJob_mailing_id_01.status" defn="{input_attrs: {multiple: true}, label: ts('Status')}" />
+    <af-field name="is_draft" defn="{label: ts('Draft'), input_type: 'Radio'}"/>
     <af-field name="is_archived" defn="{label: ts('Archived'), input_type: 'Radio'}"/>
   </div>
   <crm-search-display-table search-name="Mailings_Browse" display-name="Mailings_Table"></crm-search-display-table>
