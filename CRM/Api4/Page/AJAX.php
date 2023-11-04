@@ -140,7 +140,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       if (CRM_Core_Permission::check('view debug output') || ($e->getErrorData()['show_detailed_error'] ?? FALSE)) {
         $response['error_code'] = $e->getCode();
         $response['error_message'] = $e->getMessage();
-        if (!empty($params['debug'])) {
+        if (!empty($params['debug']) && CRM_Core_Permission::check('view debug output')) {
           if (method_exists($e, 'getUserInfo')) {
             $response['debug']['info'] = $e->getUserInfo();
           }

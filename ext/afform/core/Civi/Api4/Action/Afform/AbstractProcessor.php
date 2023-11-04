@@ -63,12 +63,15 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   public function _run(Result $result) {
     $this->_afform = civicrm_api4('Afform', 'get', [
-      'where' => [['name', '=', $this->name], ['submit_currently_open', '=', TRUE]],
+      'select' => ['*', 'submit_currently_open'],
+      'where' => [['name', '=', $this->name]],
     ])->first();
+    // Either the form doesn't exist or user lacks permission
     if (!$this->_afform) {
-      // Either the form doesn't exist, user lacks permission,
-      // or submit_currently_open = false.
-      throw new UnauthorizedException(E::ts('You do not have permission to submit this form'));
+      throw new UnauthorizedException(E::ts('You do not have permission to submit this form'), ['show_detailed_error' => TRUE]);
+    }
+    if (empty($this->_afform['submit_currently_open'])) {
+      throw new UnauthorizedException(E::ts('This form is not currently open for submissions.'), ['show_detailed_error' => TRUE]);
     }
     $this->_formDataModel = new FormDataModel($this->_afform['layout']);
     $this->loadEntities();

@@ -77,12 +77,7 @@
                 });
               });
             }, (error) => {
-              if (error.status === 403) {
-                // Permission denied
-                disableForm();
-              } else {
-                // Unknown server error. What to do?
-              }
+              disableForm(error.error_message);
             });
         }
         // Clear existing contact selection
@@ -162,11 +157,11 @@
         return valid;
       }
 
-      function disableForm() {
-        CRM.alert(ts('This form is not currently open for submissions.'), ts('Sorry'), 'error');
+      function disableForm(errorMsg) {
         $('af-form[ng-form="' + ctrl.getFormMeta().name + '"]')
           .addClass('disabled')
           .find('button[ng-click="afform.submit()"]').prop('disabled', true);
+        CRM.alert(errorMsg, ts('Sorry'), 'error');
       }
 
       this.submit = function() {
