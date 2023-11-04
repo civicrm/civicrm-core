@@ -16,6 +16,7 @@
     <copy>civicrm/mailing/send?mid=[id]</copy>
     <view>civicrm/mailing/report?mid=[id]&amp;reset=1</view>
     <preview>civicrm/mailing/view?id=[id]&amp;reset=1</preview>
+    <delete>civicrm/mailing/browse?action=delete&amp;mid=[id]&amp;reset=1</delete>
   </paths>
   <field>
     <name>id</name>
@@ -152,6 +153,7 @@
     <length>128</length>
     <comment>Mailing Name.</comment>
     <html>
+      <label>Name</label>
       <type>Text</type>
     </html>
   </field>
@@ -176,6 +178,7 @@
     <length>128</length>
     <comment>From Header of mailing</comment>
     <html>
+      <label>From Name</label>
       <type>Text</type>
     </html>
   </field>
@@ -186,6 +189,7 @@
     <length>128</length>
     <comment>From Email of mailing</comment>
     <html>
+      <label>From Email</label>
       <type>Text</type>
     </html>
   </field>
@@ -349,6 +353,7 @@
     <comment>Date and time this mailing was created.</comment>
     <add>3.0</add>
     <html>
+      <label>Created Date</label>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
     </html>
@@ -363,6 +368,7 @@
    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
     <html>
       <label>Modified Date</label>
+      <type>Select Date</type>
     </html>
     <readonly>true</readonly>
    <add>4.7</add>
@@ -391,6 +397,7 @@
     <comment>Date and time this mailing was scheduled.</comment>
     <add>3.3</add>
     <html>
+      <label>Scheduled Date</label>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
     </html>
@@ -470,6 +477,7 @@
     </pseudoconstant>
     <add>3.3</add>
     <html>
+      <label>Visibility</label>
       <type>Select</type>
     </html>
   </field>
