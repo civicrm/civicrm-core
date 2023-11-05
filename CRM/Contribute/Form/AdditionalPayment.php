@@ -85,11 +85,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_contributionId = $this->_id;
     }
 
-    $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, TRUE);
     $paymentAmt = $this->getAmountDue();
-
-    $this->_amtPaid = $paymentDetails['paid'];
-    $this->_amtTotal = $paymentDetails['total'];
 
     if ($paymentAmt >= 0) {
       $this->_owed = $paymentAmt;
@@ -468,11 +464,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if (!empty($params['contribution_id'])) {
       $this->_contributionId = $params['contribution_id'];
 
-      $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_contributionId, $entityType, FALSE, TRUE);
-
       $paymentAmount = $this->getAmountDue();
-      $this->_amtPaid = $paymentDetails['paid'];
-      $this->_amtTotal = $paymentDetails['total'];
 
       if ($paymentAmount > 0) {
         $this->_owed = $paymentAmount;
