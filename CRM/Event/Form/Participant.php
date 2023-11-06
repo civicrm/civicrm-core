@@ -872,7 +872,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $params['total_amount'] = CRM_Utils_Rule::cleanMoney($params['total_amount']);
     }
     if ($this->_isPaidEvent) {
-      [$contributionParams, $lineItem, $params] = $this->preparePaidEventProcessing($params);
+      [$lineItem, $params] = $this->preparePaidEventProcessing($params);
     }
 
     $this->_params = $params;
@@ -883,11 +883,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       unset($params['amount']);
     }
     $params['contact_id'] = $this->_contactId;
-
-    // overwrite actual payment amount if entered
-    if (!empty($params['total_amount'])) {
-      $contributionParams['total_amount'] = $params['total_amount'] ?? NULL;
-    }
 
     $now = date('YmdHis');
 
@@ -1033,6 +1028,22 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       $contributions = [];
       if (!empty($params['record_contribution'])) {
+        $contributionParams = [
+          'skipLineItem' => 1,
+          'skipCleanMoney' => TRUE,
+          'total_amount' => $this->getSubmittedValue('total_amount'),
+          'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
+          'source' => $this->getSourceText(),
+          'non_deductible_amount' => 'null',
+          'financial_type_id' => $this->getSubmittedValue('financial_type_id'),
+          'payment_instrument_id' => $this->getSubmittedValue('payment_instrument_id'),
+          'trxn_id' => $this->getSubmittedValue('trxn_id'),
+          'contribution_status_id' => $this->getSubmittedValue('contribution_status_id'),
+          'check_number' => $this->getSubmittedValue('check_number'),
+          'campaign_id' => $this->getSubmittedValue('campaign_id'),
+          'pan_truncation' => $this->getSubmittedValue('pan_truncation'),
+          'card_type_id' => $this->getSubmittedValue('card_type_id'),
+        ];
         if (!empty($params['id'])) {
           if ($this->_onlinePendingContributionId) {
             $contributionParams['id'] = $this->_onlinePendingContributionId;
@@ -1046,28 +1057,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           }
         }
         unset($params['note']);
-        $contributionParams['source'] = $this->getSourceText();
         $contributionParams['currency'] = $config->defaultCurrency;
-        $contributionParams['non_deductible_amount'] = 'null';
         $contributionParams['receipt_date'] = !empty($params['send_receipt']) ? CRM_Utils_Array::value('receive_date', $params) : 'null';
         $contributionParams['contact_id'] = $this->_contactID;
         $contributionParams['receive_date'] = !(empty($params['receive_date'])) ? $params['receive_date'] : $now;
 
-        $recordContribution = [
-          'financial_type_id',
-          'payment_instrument_id',
-          'trxn_id',
-          'contribution_status_id',
-          'check_number',
-          'campaign_id',
-          'pan_truncation',
-          'card_type_id',
-        ];
-
-        foreach ($recordContribution as $f) {
-          $contributionParams[$f] = $this->_params[$f] ?? NULL;
-        }
-        $contributionParams['skipLineItem'] = 1;
         if ($this->_id) {
           $contributionParams['contribution_mode'] = 'participant';
           $contributionParams['participant_id'] = $this->_id;
@@ -1442,10 +1436,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function preparePaidEventProcessing($params): array {
     $participantStatus = CRM_Event_PseudoConstant::participantStatus();
-    $contributionParams = [
-      'skipCleanMoney' => TRUE,
-      'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
-    ];
     $lineItem = [];
 
     if ($this->isPaymentOnExistingContribution()) {
@@ -1481,7 +1471,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       $params['fee_level'] = $params['amount_level'];
-      $contributionParams['total_amount'] = $params['amount'];
       if ($this->isQuickConfig() && !empty($params['total_amount']) &&
         $params['status_id'] != array_search('Partially paid', $participantStatus)
       ) {
@@ -1500,7 +1489,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
 
-    return [$contributionParams, $lineItem, $params];
+    return [$lineItem, $params];
   }
 
   /**
