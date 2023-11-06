@@ -1798,6 +1798,9 @@ class CRM_Utils_Token {
           '$participant_status_id' => 'participant.status_id',
 
         ],
+        'event_online_receipt' => [
+          '`$participant.id`' => 'participant.id',
+        ],
         'pledge_acknowledgement' => [
           '$domain' => ts('no longer available / relevant'),
           '$contact' => ts('no longer available / relevant'),
