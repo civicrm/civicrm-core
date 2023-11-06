@@ -1487,7 +1487,7 @@ abstract class CRM_Utils_Hook {
       $count++;
     }
     $defaultFlags = ['civicrm' => FALSE, 'uf' => FALSE, 'instances' => $count];
-    $flags = array_merge($defaultFlags, $flags);
+    $flags = array_merge($defaultFlags, $flags ?? []);
     $null = NULL;
     return self::singleton()->invoke(['config', 'flags'], $config,
       $flags, $null, $null, $null, $null,
