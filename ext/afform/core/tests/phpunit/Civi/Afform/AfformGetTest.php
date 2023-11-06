@@ -34,6 +34,10 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertEquals($this->formName, $result['name']);
     $this->assertArrayNotHasKey('directive_name', $result);
     $this->assertArrayNotHasKey('has_base', $result);
+    // Check modified date is reasonable
+    $this->assertGreaterThan('2023-01-01 12:00:00', $result['modified_date']);
+    // Hopefully this test won't need updating for the next 2000 years or so...
+    $this->assertLessThan('4000-01-01 12:00:00', $result['modified_date']);
 
     // Select * should also return regular fields only
     $result = Afform::get()
