@@ -52,13 +52,6 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
     ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
-    $this->_id = CRM_Utils_Request::retrieve('id', 'String',
-      $this, FALSE, 0
-    );
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String',
-      $this, FALSE, 0
-    );
-
     return parent::run();
   }
 
