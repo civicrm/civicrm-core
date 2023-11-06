@@ -230,6 +230,9 @@ United States<br />',
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(20, $contribution['total_amount']);
     $this->assertEquals('Debit Card', $contribution['payment_instrument']);
+    $this->assertNotEmpty($contribution['receive_date']);
+    // Just check it's not something weird like 1970 without getting into flakey-precise.
+    $this->assertGreaterThan(strtotime('yesterday'), strtotime($contribution['receive_date']));
     $lineItem = $this->callAPISuccessGetSingle('LineItem', []);
     $expected = [
       'contribution_id' => $contribution['id'],

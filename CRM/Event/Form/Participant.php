@@ -17,6 +17,7 @@
  */
 
 use Civi\API\EntityLookupTrait;
+use Civi\Api4\Contribution;
 
 /**
  * Back office participant form.
@@ -968,15 +969,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->_params = array_merge($this->_params, $result);
       }
 
-      $this->_params['receive_date'] = $now;
-
-      if (!empty($this->_params['send_receipt'])) {
-        $this->_params['receipt_date'] = $now;
-      }
-      else {
-        $this->_params['receipt_date'] = NULL;
-      }
-
       //add contribution record
       $this->_params['mode'] = $this->_mode;
 
@@ -1034,6 +1026,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           'campaign_id' => $this->getSubmittedValue('campaign_id'),
           'pan_truncation' => $this->getSubmittedValue('pan_truncation'),
           'card_type_id' => $this->getSubmittedValue('card_type_id'),
+          'receive_date' => $this->getSubmittedValue('receive_date') ?: $now,
         ];
         if (!empty($params['id'])) {
           if ($this->_onlinePendingContributionId) {
@@ -1049,9 +1042,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
         unset($params['note']);
         $contributionParams['currency'] = $config->defaultCurrency;
-        $contributionParams['receipt_date'] = !empty($params['send_receipt']) ? CRM_Utils_Array::value('receive_date', $params) : 'null';
         $contributionParams['contact_id'] = $this->_contactID;
-        $contributionParams['receive_date'] = !(empty($params['receive_date'])) ? $params['receive_date'] : $now;
 
         if ($this->_id) {
           $contributionParams['contribution_mode'] = 'participant';
@@ -1516,7 +1507,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $transaction = new CRM_Core_Transaction();
 
     $now = date('YmdHis');
-    $receiptDate = NULL;
 
     // CRM-20264: fetch CC type ID and number (last 4 digit) and assign it back to $params
     CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
@@ -1524,7 +1514,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $contribParams = [
       'contact_id' => $contactID,
       'financial_type_id' => $this->getEventValue('financial_type_id'),
-      'receive_date' => $now,
+      'receive_date' => $this->getSubmittedValue('receive_date') ?: $now,
       'total_amount' => $params['amount'],
       'tax_amount' => $params['tax_amount'],
       'amount_level' => $params['amount_level'],
@@ -1546,7 +1536,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $contribParams += [
         'fee_amount' => $result['fee_amount'] ?? NULL,
         'trxn_id' => $result['trxn_id'],
-        'receipt_date' => $receiptDate,
       ];
     }
 
@@ -1877,6 +1866,12 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       }
       [$mailSent] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       if ($mailSent) {
+        if ($contributionID) {
+          Contribution::update(FALSE)
+            ->addWhere('id', '=', $contributionID)
+            ->setValues(['receipt_date', '=', 'now'])
+            ->execute();
+        }
         $sent[] = $contactID;
         $participant->details = $this->getSubmittedValue('receipt_text');
         CRM_Activity_BAO_Activity::addActivity($participant, 'Email');
