@@ -1626,7 +1626,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'fee_level' => $params['amount_level'] ?? NULL,
       'is_pay_later' => FALSE,
       'fee_amount' => $params['fee_amount'] ?? NULL,
-      'registered_by_id' => $params['registered_by_id'] ?? NULL,
       'discount_id' => $params['discount_id'] ?? NULL,
       'fee_currency' => $params['currencyID'] ?? NULL,
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
