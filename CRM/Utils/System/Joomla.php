@@ -88,6 +88,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $register = $model->register($values);
 
     $ufID = JUserHelper::getUserId($values['username']);
+    JUserHelper::addUserToGroup($ufID, $userType);
+
     return $ufID;
   }
 
