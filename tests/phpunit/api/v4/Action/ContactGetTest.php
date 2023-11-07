@@ -61,7 +61,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains($del['id'], $contacts->column('id'));
   }
 
-  /**
+/**
    * Test ordering of contact by contact_sub_type when field
    * contains more than one type and contact_type label and name
    * are different enough to get sorted in different order.
@@ -81,7 +81,6 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
     //Print ("\nCreating contact sub type\n");
     foreach ($cntctType as $cntctT) {
-      //print ($cntctT[0] . " : " . $cntctT[1] . "\n");
       ContactType::create(FALSE)
         ->addValue('name', $cntctT[0])
         ->addValue('label', $cntctT[1])
@@ -101,24 +100,21 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
     // Query Contact sub type, order by label
     $qrContactTypes = \Civi\Api4\ContactType::get(TRUE)
-     ->addSelect('name', 'label', 'parent_id.name')
-     ->addWhere('parent_id.name', '=', 'Individual')
-     ->addOrderBy('label', 'ASC')
-     ->setLimit(5)
-     ->execute();
+      ->addSelect('name', 'label', 'parent_id.name')
+      ->addWhere('parent_id.name', '=', 'Individual')
+      ->addOrderBy('label', 'ASC')
+      ->setLimit(5)
+      ->execute();
 
-	  $this->assertCount(5, $qrContactTypes);
+    $this->assertCount(5, $qrContactTypes);
 
     //Print ("\nAssert sorted query results equals sorted dataset #1 array\n");
     $cntctT = reset($cntctType);
     foreach ($qrContactTypes as $contactType) {
-      //print ($contactType['name'] . " = " . $cntctT[0] . " : ");
-      //print ($contactType['label'] . " = " . $cntctT[1] . "\n");
       $this->assertEquals($contactType['name'], $cntctT[0]);
       $this->assertEquals($contactType['label'], $cntctT[1]);
       $cntctT = next($cntctType);
-	   }
-	  //print ("\n" );
+    }
 
     // Test dataset #2 : Contact first_name, contact_sub_type:label
     $cntctData = [
@@ -129,7 +125,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ['Eli', ['0.Décédé', '1.Actif']],
       ['Yan', []],
     ];
-          
+
     //Print ("\nCreating contact using dataset #2\n");
     $last_name = "Series2";
     foreach ($cntctData as $cntctD) {
@@ -143,7 +139,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
           ->execute();
       }
     }
-      
+
     //Print ("\nQuery contact, order by contact_sub_type:label\n");
     $qrContacts = \Civi\Api4\Contact::get(TRUE)
       ->addSelect('id', 'contact_type', 'contact_sub_type', 'contact_sub_type:label', 'first_name', 'last_name')
@@ -186,13 +182,13 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       }
       if ($qrContact['contact_sub_type:label']) {
         $stQr = $qrContact['contact_sub_type:label'][0];
-      } 
+      }
       $this->assertEquals($qrContact['first_name'], $cntctD[0]);
       $this->assertEquals($stQR, $stCn);
       //print ($qrContact['first_name'] . " : " . $stQr . " = " . $cntctD[0] . " : " . $stCn . "\n");
       $cntctD = next($cntctData);
-	   }
-	
+    }
+
     $msg = '';
     try {
       //  $limit2->single();
