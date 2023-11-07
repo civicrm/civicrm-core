@@ -305,7 +305,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     //consider total amount.
     $this->assign('isAmountzero', $this->_totalAmount <= 0);
 
-    $contribButton = ts('Register');
     $this->addButtons([
       [
         'type' => 'back',
@@ -313,7 +312,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       ],
       [
         'type' => 'next',
-        'name' => $contribButton,
+        'name' => ts('Register'),
         'isDefault' => TRUE,
       ],
     ]);
