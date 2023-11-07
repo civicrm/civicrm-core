@@ -1872,6 +1872,20 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Checks if payment processor supports not returning to the form processing.
+   *
+   * The exists to support historical event form logic where emails are sent
+   * & the form postProcess hook is called before redirecting the browser where
+   * the user is redirected.
+   *
+   * @return bool
+   */
+  public function supportsNoReturn(): bool {
+    $billingMode = (int) $this->_paymentProcessor['billing_mode'];
+    return $billingMode === self::BILLING_MODE_NOTIFY || $billingMode === self::BILLING_MODE_BUTTON;
+  }
+
+  /**
    * Checks if payment processor supports recurring contributions
    *
    * @return bool

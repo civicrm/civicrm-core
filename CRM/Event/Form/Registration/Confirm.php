@@ -550,8 +550,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if (!empty($value['is_pay_later']) ||
           $value['amount'] == 0 ||
           // The concept of contributeMode is deprecated.
-          $this->_contributeMode == 'checkout' ||
-          $this->_contributeMode == 'notify'
+          $this->getPaymentProcessorObject()->supports('noReturn')
         ) {
           if ($value['amount'] != 0) {
             $pending = TRUE;
@@ -749,8 +748,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     // for Transfer checkout.
     // The concept of contributeMode is deprecated.
-    if (($this->_contributeMode == 'checkout' ||
-        $this->_contributeMode == 'notify'
+    if (($this->getPaymentProcessorObject()->supports('noReturn')
       ) && empty($params[0]['is_pay_later']) &&
       !$this->_allowWaitlist && !$this->_requireApproval &&
       $this->_totalAmount > 0
