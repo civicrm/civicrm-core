@@ -71,11 +71,12 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
   public function testGetWithOrderBy(): void {
 
     // Test dataset #1 : Contact sub type name, label
-    $cntctType = [['Membre', '1.Actif'],
-                  ['Proche', '2.Proche'],
-                  ['Soutien', '3.Soutien'],
-                  ['Employ_', '5.Employé'],
-                  ['DCD', '0.Décédé'],
+    $cntctType = [
+      ['Membre', '1.Actif'],
+      ['Proche', '2.Proche'],
+      ['Soutien', '3.Soutien'],
+      ['Employ_', '5.Employé'],
+      ['DCD', '0.Décédé'],
     ];
 
     //Print ("\nCreating contact sub type\n");
@@ -120,12 +121,13 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 	  //print ("\n" );
 
     // Test dataset #2 : Contact first_name, contact_sub_type:label
-    $cntctData = [['Bob', ['1.Actif']],
-                 ['Jan', ['2.Proche']],
-                 ['Dan', ['3.Soutien']],
-                 ['Joe', ['5.Employé', '1.Actif']],
-                 ['Eli', ['0.Décédé', '1.Actif']],
-                 ['Yan', []],
+    $cntctData = [
+      ['Bob', ['1.Actif']],
+      ['Jan', ['2.Proche']],
+      ['Dan', ['3.Soutien']],
+      ['Joe', ['5.Employé', '1.Actif']],
+      ['Eli', ['0.Décédé', '1.Actif']],
+      ['Yan', []],
     ];
           
     //Print ("\nCreating contact using dataset #2\n");
