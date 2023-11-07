@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
+use Civi\Api4\ContactType;
 use Civi\Api4\Email;
 use Civi\Api4\Individual;
 use Civi\Api4\Relationship;
@@ -59,6 +60,95 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     // Putting is_deleted anywhere in the where clause will disable the default
     $contacts = Contact::get()->addClause('OR', ['last_name', '=', $last_name], ['is_deleted', '=', 0])->addSelect('id')->execute();
     $this->assertContains($del['id'], $contacts->column('id'));
+  }
+
+  /**
+   * Test ordering of contact by contact_sub_type when field
+   * contains more than one type and contact_type label and name
+   * are different enough to get sorted in different order.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetWithOrderBy(): void {
+    $contactSubTypes = [
+      ['name' => 'Membre', 'label' => '1.Actif'],
+      ['name' => 'Proche', 'label' => '2.Proche'],
+      ['name' => 'Soutien', 'label' => '3.Soutien'],
+      ['name' => 'Employ_', 'label' => '5.Employé'],
+      ['name' => 'DCD', 'label' => '0.Décédé'],
+    ];
+
+    foreach ($contactSubTypes as $contactSubType) {
+      ContactType::create(FALSE)
+        ->setValues($contactSubType)
+        ->addValue('parent_id.name', 'Individual')
+        ->execute();
+    }
+
+    $contactSubTypesSortedByLabel = [
+      ['name' => 'DCD', 'label' => '0.Décédé'],
+      ['name' => 'Membre', 'label' => '1.Actif'],
+      ['name' => 'Proche', 'label' => '2.Proche'],
+      ['name' => 'Soutien', 'label' => '3.Soutien'],
+      ['name' => 'Employ_', 'label' => '5.Employé'],
+    ];
+
+    // Query Contact sub type, order by label
+    $retrievedContactTypes = ContactType::get(TRUE)
+      ->addSelect('name', 'label', 'parent_id.name')
+      ->addWhere('parent_id.name', '=', 'Individual')
+      ->addOrderBy('label', 'ASC')
+      ->setLimit(5)
+      ->execute();
+
+    $this->assertCount(5, $retrievedContactTypes);
+
+    // Assert sorted query results equals sorted dataset #1.
+    foreach ($retrievedContactTypes as $index => $contactType) {
+      $this->assertEquals($contactType['name'], $contactSubTypesSortedByLabel[$index]['name']);
+      $this->assertEquals($contactType['label'], $contactSubTypesSortedByLabel[$index]['label']);
+    }
+
+    // Test dataset #2 : Contact first_name, contact_sub_type:label
+    $contactData = [
+      ['first_name' => 'Bob', 'contact_sub_type:label' => ['1.Actif']],
+      ['first_name' => 'Jan', 'contact_sub_type:label' => ['2.Proche']],
+      ['first_name' => 'Dan', 'contact_sub_type:label' => ['3.Soutien']],
+      ['first_name' => 'Joe', 'contact_sub_type:label' => ['5.Employé', '1.Actif']],
+      ['first_name' => 'Eli', 'contact_sub_type:label' => ['0.Décédé', '1.Actif']],
+      ['first_name' => 'Yan', 'contact_sub_type:label' => []],
+    ];
+
+    // Creating contact using dataset #2.
+    foreach ($contactData as $contact) {
+      $this->createTestRecord('Contact',
+        $contact + ['last_name' => 'Series2']);
+    }
+
+    // Query contact, order by contact_sub_type:label
+    $result = Contact::get(TRUE)
+      ->addSelect('id', 'contact_type', 'contact_sub_type', 'contact_sub_type:label', 'first_name', 'last_name')
+      ->addWhere('contact_type', '=', 'Individual')
+      ->addWhere('last_name', '=', 'Series2')
+      ->addOrderBy('contact_sub_type:label', 'ASC')
+      ->setLimit(10)
+      ->execute();
+
+    $this->assertCount(6, $result);
+
+    $contactsSortedBySubtypeLabel = [
+      ['first_name' => 'Yan', 'contact_sub_type:label' => []],
+      ['first_name' => 'Eli', 'contact_sub_type:label' => ['0.Décédé', '1.Actif']],
+      ['first_name' => 'Bob', 'contact_sub_type:label' => ['1.Actif']],
+      ['first_name' => 'Joe', 'contact_sub_type:label' => ['1.Actif', '5.Employé']],
+      ['first_name' => 'Jan', 'contact_sub_type:label' => ['2.Proche',]],
+      ['first_name' => 'Dan', 'contact_sub_type:label' => ['3.Soutien']]
+    ];
+
+    // Assert contact query results equals sorted dataset #2.
+    foreach ($result as $index => $contact) {
+      $this->assertEquals($contact['first_name'], $contactsSortedBySubtypeLabel[$index]['first_name']);
+    }
   }
 
   public function testGetWithLimit(): void {
