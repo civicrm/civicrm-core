@@ -918,9 +918,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @return int
+   * @return int|null
    */
-  public function getPaymentProcessorID(): int {
+  public function getPaymentProcessorID(): ?int {
     return (int) $this->_paymentProcessorID;
   }
 
