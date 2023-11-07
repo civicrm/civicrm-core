@@ -12,7 +12,6 @@
 
 namespace Civi\Api4\Service\Spec\Provider;
 
-use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
 
@@ -28,14 +27,6 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    * @throws \CRM_Core_Exception
    */
   public function modifySpec(RequestSpec $spec): void {
-    $field = new FieldSpec('is_draft', 'Mailing', 'Boolean');
-    $field->setLabel(ts('Is Draft'))
-      ->setDescription(ts('True if mailing has not been scheduled or sent'))
-      ->setColumnName('id')
-      ->setReadonly(TRUE)
-      ->setSqlRenderer([__CLASS__, 'isDraft']);
-    $spec->addFieldSpec($field);
-
     $field = new FieldSpec('stats_intended_recipients', 'Mailing', 'Integer');
     $field->setLabel(ts('Stats: Intended Recipients'))
       ->setDescription(ts('Total emails sent'))
@@ -141,19 +132,6 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    */
   public function applies($entity, $action): bool {
     return $entity === 'Mailing' && $action === 'get';
-  }
-
-  /**
-   * Check if mailing has not been scheduled by anyone and has no record in MailingJob table.
-   *
-   * @param array $idField
-   * @param \Civi\Api4\Query\Api4SelectQuery $query
-   * @return string
-   */
-  public static function isDraft(array $idField, Api4SelectQuery $query): string {
-    $id = $idField['sql_name'];
-    $scheduled_id = $query->getFieldSibling($idField, 'scheduled_id')['sql_name'];
-    return "IF($scheduled_id OR EXISTS (SELECT 1 FROM civicrm_mailing_job WHERE is_test = 0 AND mailing_id = $id), 0, 1)";
   }
 
   /**
