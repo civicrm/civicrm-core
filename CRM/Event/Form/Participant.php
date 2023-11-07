@@ -892,11 +892,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
     $userName = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();
 
-    //modify params according to parameter used in create
-    //participant method (addParticipant)
-    $this->_params['participant_status_id'] = $params['status_id'];
-    $this->_params['participant_role_id'] = $this->getSubmittedValue('role_id');
-
     $now = date('YmdHis');
 
     if ($this->_mode) {
@@ -1025,23 +1020,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       // add participant record
       $participants = [];
-      if (!empty($this->_params['role_id']) && is_array($this->_params['role_id'])) {
-        $this->_params['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
-          $this->_params['role_id']
-        );
-      }
 
       //CRM-15372 patch to fix fee amount replacing amount
       $this->_params['fee_amount'] = $this->_params['amount'];
 
-      $participants[] = $this->addParticipant($this, $this->_params, $contactID);
-
-      //add custom data for participant
-      CRM_Core_BAO_CustomValueTable::postProcess($this->_params,
-        'civicrm_participant',
-        $participants[0]->id,
-        'Participant'
-      );
+      $participants[] = $this->addParticipant($this->_params, $contactID);
 
       // Add participant payment
       $participantPaymentParams = [
@@ -1600,8 +1583,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
       'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
-      'is_pay_later' => $params['is_pay_later'] ?? 0,
-      'campaign_id' => $params['campaign_id'] ?? NULL,
+      'is_pay_later' => FALSE,
+      'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'card_type_id' => $params['card_type_id'] ?? NULL,
       'pan_truncation' => $params['pan_truncation'] ?? NULL,
     ];
@@ -1656,52 +1639,37 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Process the participant.
    *
-   * @param CRM_Core_Form $form
    * @param array $params
    * @param int $contactID
    *
    * @return \CRM_Event_BAO_Participant
    * @throws \CRM_Core_Exception
    */
-  protected function addParticipant(&$form, $params, $contactID) {
+  protected function addParticipant($params, $contactID) {
     $transaction = new CRM_Core_Transaction();
 
     $participantFields = CRM_Event_DAO_Participant::fields();
     $participantParams = [
       'id' => $params['participant_id'] ?? NULL,
       'contact_id' => $contactID,
-      'event_id' => $form->_eventId ? $form->_eventId : $params['event_id'],
-      'status_id' => CRM_Utils_Array::value('participant_status',
-        $params, 1
-      ),
-      'role_id' => CRM_Utils_Array::value('participant_role_id', $params) ?: CRM_Event_BAO_Participant::getDefaultRoleID(),
-      'register_date' => $params['register_date'],
+      'event_id' => $this->getEventID(),
+      'status_id' => $this->getSubmittedValue('status_id'),
+      'role_id' => $this->getSubmittedValue('role_id'),
+      'register_date' => $this->getSubmittedValue('register_date'),
       'source' => CRM_Utils_String::ellipsify(
         isset($params['participant_source']) ? CRM_Utils_Array::value('participant_source', $params) : CRM_Utils_Array::value('description', $params),
         $participantFields['participant_source']['maxlength']
       ),
       'fee_level' => $params['amount_level'] ?? NULL,
-      'is_pay_later' => $params['is_pay_later'] ?? 0,
+      'is_pay_later' => FALSE,
       'fee_amount' => $params['fee_amount'] ?? NULL,
       'registered_by_id' => $params['registered_by_id'] ?? NULL,
       'discount_id' => $params['discount_id'] ?? NULL,
       'fee_currency' => $params['currencyID'] ?? NULL,
-      'campaign_id' => $params['campaign_id'] ?? NULL,
+      'campaign_id' => $this->getSubmittedValue('campaign_id'),
+      'note' => $this->getSubmittedValue('note'),
+      'is_test' => ($this->_mode === 'test)'),
     ];
-
-    if ($form->_action & CRM_Core_Action::PREVIEW || ($params['mode'] ?? NULL) == 'test') {
-      $participantParams['is_test'] = 1;
-    }
-    else {
-      $participantParams['is_test'] = 0;
-    }
-
-    if (!empty($form->_params['note'])) {
-      $participantParams['note'] = $form->_params['note'];
-    }
-    elseif (!empty($form->_params['participant_note'])) {
-      $participantParams['note'] = $form->_params['participant_note'];
-    }
 
     // reuse id if one already exists for this one (can happen
     // with back button being hit etc)
@@ -1713,14 +1681,17 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       );
       $participantParams['id'] = $pID;
     }
-    $participantParams['discount_id'] = CRM_Core_BAO_Discount::findSet($form->_eventId, 'civicrm_event');
-
-    if (!$participantParams['discount_id']) {
-      $participantParams['discount_id'] = "null";
-    }
+    $participantParams['discount_id'] = CRM_Core_BAO_Discount::findSet($this->getEventID(), 'civicrm_event') ?: 'null';
 
     $participant = CRM_Event_BAO_Participant::create($participantParams);
 
+    // Add custom data for participant
+    $submittedValues = $this->getSubmittedValues();
+    CRM_Core_BAO_CustomValueTable::postProcess($submittedValues,
+      'civicrm_participant',
+      $participant->id,
+      'Participant'
+    );
     $transaction->commit();
 
     return $participant;
