@@ -2718,7 +2718,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!empty($form->_paymentProcessor)) {
         try {
           $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
-          if ($form->_contributeMode == 'notify') {
+          if ($this->getPaymentProcessorObject()->supports('noReturn')) {
             // We want to get rid of this & make it generic - eg. by making payment processing the last thing
             // and always calling it first.
             $form->postProcessHook();
