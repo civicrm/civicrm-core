@@ -1006,8 +1006,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       $this->set('params', $this->_params);
       //add contribution record
-      $this->_params['financial_type_id']
-        = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'financial_type_id');
       $this->_params['mode'] = $this->_mode;
 
       //add contribution record
@@ -1566,16 +1564,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $now = date('YmdHis');
     $receiptDate = NULL;
 
-    if (!empty($form->_values['event']['is_email_confirm'])) {
-      $receiptDate = $now;
-    }
-
     // CRM-20264: fetch CC type ID and number (last 4 digit) and assign it back to $params
     CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
 
     $contribParams = [
       'contact_id' => $contactID,
-      'financial_type_id' => !empty($form->_values['event']['financial_type_id']) ? $form->_values['event']['financial_type_id'] : $params['financial_type_id'],
+      'financial_type_id' => $this->getEventValue('financial_type_id'),
       'receive_date' => $now,
       'total_amount' => $params['amount'],
       'tax_amount' => $params['tax_amount'],
