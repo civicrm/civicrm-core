@@ -76,7 +76,8 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
                   ['Proche', '2.Proche'],
                   ['Soutien', '3.Soutien'],
                   ['Employ_', '5.Employé'],
-                  ['DCD', '0.Décédé']];
+                  ['DCD', '0.Décédé']
+    ];
     
     //Print ("\nCreating contact sub type\n");
     foreach ($cntctType as $cntctT) {
@@ -91,7 +92,8 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     //Print ("\nSort contact sub type array on label\n");
     //usort($cntctType, fn($a, $b) => $a[1] <=> $b[1]);
     usort($cntctType, function($a, $b) {
-      if ($a[1] == $b[1]) { return 0 ; }
+      if ($a[1] == $b[1]) {
+        return 0 ;}
       return ($a[1] < $b[1]) ? -1 : 1 ;
       });
 
@@ -106,7 +108,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 	  $this->assertCount(5, $qrContactTypes);
  
     //Print ("\nAssert sorted query results equals sorted dataset #1 array\n");
-    $cntctT = reset ($cntctType);
+    $cntctT = reset($cntctType);
     foreach ($qrContactTypes as $contactType) {
       //print ($contactType['name'] . " = " . $cntctT[0] . " : ");
       //print ($contactType['label'] . " = " . $cntctT[1] . "\n");
@@ -120,9 +122,10 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $cntctData = [['Bob', ['1.Actif']],
                  ['Jan', ['2.Proche']],
                  ['Dan', ['3.Soutien']],
-                 ['Joe', ['5.Employé','1.Actif']],
-                 ['Eli', ['0.Décédé','1.Actif']],
-                 ['Yan', []]];
+                 ['Joe', ['5.Employé', '1.Actif']],
+                 ['Eli', ['0.Décédé', '1.Actif']],
+                 ['Yan', []]
+    ];
               
     //Print ("\nCreating contact using dataset #2\n");
     $last_name = "Series2";
@@ -151,25 +154,30 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
     //print ("\nSort CntcData2 contact_sub_type:label sub array\n");
     foreach ($cntctData as &$contact) {
-	    if ($contact[1]) { sort($contact[1]); }
+      if ($contact[1]) {
+        sort($contact[1]);}
     }
 
     //print ("\nSort CntcData2 on contact_sub_type:label value\n");
     usort($cntctData, function($a, $b) {
       $ara = "";
       $arb = "";
-      if (array_key_exists(0, $a[1])) { $ara = $a[1][0]; }
-      if (array_key_exists(0, $b[1])) { $arb = $b[1][0]; }
+      if (array_key_exists(0, $a[1])) {
+        $ara = $a[1][0];}
+      if (array_key_exists(0, $b[1])) {
+        $arb = $b[1][0];}
       return $ara <=> $arb;
     });
 
     //Print ("\nAssert contact query results equals sorted dataset #2 array\n");
-    $cntctD = reset ($cntctData);
+    $cntctD = reset($cntctData);
     foreach ($qrContacts as $qrContact) {
       $stCn = "NULL";
       $stQr = "NULL";
-      if (array_key_exists(0, $cntctD[1])) { $stCn = $cntctD[1][0]; }
-      if ($qrContact['contact_sub_type:label']) { $stQr = $qrContact['contact_sub_type:label'][0]; } 
+      if (array_key_exists(0, $cntctD[1])) {
+        $stCn = $cntctD[1][0];}
+      if ($qrContact['contact_sub_type:label']) {
+        $stQr = $qrContact['contact_sub_type:label'][0];} 
       $this->assertEquals($qrContact['first_name'], $cntctD[0]);
       $this->assertEquals($stQR, $stCn);
       //print ($qrContact['first_name'] . " : " . $stQr . " = " . $cntctD[0] . " : " . $stCn . "\n");
