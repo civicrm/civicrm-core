@@ -136,7 +136,7 @@ class Manager {
         // Merge in defaults
         $angularModules[$module] += ['basePages' => ['civicrm/a']];
         if (!empty($info['settings'])) {
-          \CRM_Core_Error::deprecatedWarning('Angular "settings" is not supported. See https://github.com/civicrm/civicrm-core/pull/19052');
+          \CRM_Core_Error::deprecatedWarning(sprintf('The Angular file "%s" from extension "%s" must be updated to use "settingsFactory" instead of "settings". See https://github.com/civicrm/civicrm-core/pull/19052', $info['module'], $info['ext']));
         }
         // Validate settingsFactory callables
         if (isset($info['settingsFactory'])) {
