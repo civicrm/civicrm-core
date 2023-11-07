@@ -1,9 +1,7 @@
 <?php
-// This file declares an Angular module which can be autoloaded
-// ODDITY: Only loads if you have CiviMail permissions.
+// This file declares crmMailingAB Angular module.
 
 return [
-  'ext' => 'civicrm',
   'js' => [
     'ang/crmMailingAB.js',
     'ang/crmMailingAB/*.js',
