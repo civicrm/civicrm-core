@@ -89,8 +89,11 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     }
 
     //Print ("\nSort contact sub type array on label\n");
-    // Sort contact sub type multidimensional array on label
-    usort($cntctType, fn($a, $b) => $a[1] <=> $b[1]);
+    //usort($cntctType, fn($a, $b) => $a[1] <=> $b[1]);
+    usort($cntctType, function($a, $b) {
+      if ($a[1] == $b[1]) { return 0 ; }
+      return ($a[1] < $b[1]) ? -1 : 1 ;
+      });
 
     // Query Contact sub type, order by label
 	  $qrContactTypes = \Civi\Api4\ContactType::get(TRUE)
