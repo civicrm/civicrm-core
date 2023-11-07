@@ -54,4 +54,51 @@ trait CRM_Financial_Form_PaymentProcessorFormTrait {
     return new CRM_Core_Payment_Manual();
   }
 
+  /**
+   * Get the value for a field relating to the in-use payment processor.
+   *
+   * All values returned in apiv4 format. Escaping may be required.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @param string $fieldName
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  public function getPaymentProcessorValue(string $fieldName) {
+    if ($this->isDefined('PaymentProcessor')) {
+      return $this->lookup('PaymentProcessor', $fieldName);
+    }
+    $id = $this->getPaymentProcessorID();
+    if ($id === 0) {
+      $manualProcessor = [
+        'payment_processor_type_id' => 0,
+        'payment_processor_type_id.name' => 'Manual',
+        'payment_processor_type_id.class_name' => 'Payment_Manual',
+      ];
+      return $manualProcessor[$fieldName] ?? NULL;
+    }
+    if ($id) {
+      $this->define('PaymentProcessor', 'PaymentProcessor', ['id' => $id]);
+      return $this->lookup('PaymentProcessor', $fieldName);
+    }
+    return NULL;
+  }
+
+  /**
+   * Get the ID for the in-use payment processor.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int|null
+   */
+  public function getPaymentProcessorID(): ?int {
+    return isset($this->_paymentProcessor['id']) ? (int) $this->_paymentProcessor['id'] : NULL;
+  }
+
 }

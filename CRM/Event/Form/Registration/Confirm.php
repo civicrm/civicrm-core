@@ -124,7 +124,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @throws \CRM_Core_Exception
    */
   private function preProcessExpress() {
-    if ($this->_contributeMode !== 'express') {
+    if ($this->getPaymentProcessorValue('payment_processor_type_id:name') !== 'PayPal_Express') {
       return FALSE;
     }
     $params = [];
@@ -1008,12 +1008,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $contribParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
       }
     }
-    //create an contribution address
-    // The concept of contributeMode is deprecated. Elsewhere we use the function processBillingAddress() - although
-    // currently that is only inherited by back-office forms.
-    if ($form->_contributeMode != 'notify' && empty($params['is_pay_later'])) {
-      $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params);
-    }
+    $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params);
 
     $contribParams['skipLineItem'] = 1;
     $contribParams['skipCleanMoney'] = 1;

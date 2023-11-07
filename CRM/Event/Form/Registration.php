@@ -21,6 +21,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   use CRM_Financial_Form_FrontEndPaymentFormTrait;
   use CRM_Event_Form_EventFormTrait;
+  use CRM_Financial_Form_PaymentProcessorFormTrait;
 
   /**
    * The id of the event we are processing.
