@@ -66,6 +66,14 @@
           this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
         }
         setDateOptions();
+
+        if (ctrl.getDefn().input_type == 'Date') {
+          if (!getSet('default_date_type')) {
+            ctrl.defaultDateType = getSet('default_date_type', 'fixed');
+          } else {
+            ctrl.defaultDateType = getSet("default_date_type");
+          }
+        }
       };
 
       this.getFkEntity = function() {
@@ -278,6 +286,10 @@
         } else {
           ctrl.hasDefaultValue = true;
         }
+      };
+
+      $scope.setDefaultDateType = function() {
+        ctrl.defaultDateType = getSet('default_date_type');
       };
 
       $scope.defaultValueContains = function(val) {
