@@ -162,8 +162,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
           ) {
             $this->_paymentProcessor = $paymentProcessorDetail;
             $this->assign('paymentProcessor', $this->_paymentProcessor);
-            // Setting this is a bit of a legacy overhang.
-            $this->_paymentObject = $paymentProcessorDetail['object'];
           }
         }
         // It's not clear why we set this on the form.

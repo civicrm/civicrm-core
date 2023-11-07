@@ -19,6 +19,7 @@ use Civi\Payment\Exception\PaymentProcessorException;
 class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditPayment {
   use CRM_Contact_Form_ContactFormTrait;
   use CRM_Contribute_Form_ContributeFormTrait;
+  use CRM_Financial_Form_PaymentProcessorFormTrait;
 
   /**
    * The id of the contribution that we are processing.
@@ -1154,8 +1155,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_lineItem = $lineItem;
     }
 
-    $this->_paymentObject = Civi\Payment\System::singleton()->getById($submittedValues['payment_processor_id']);
-    $this->_paymentProcessor = $this->_paymentObject->getPaymentProcessor();
+    $paymentObject = Civi\Payment\System::singleton()->getById($submittedValues['payment_processor_id']);
+    $this->_paymentProcessor = $paymentObject->getPaymentProcessor();
 
     // Set source if not set
     if (empty($submittedValues['source'])) {
@@ -2363,7 +2364,7 @@ WHERE  contribution_id = {$id}
 
     $form->assign('is_recur_interval', $form->_values['is_recur_interval'] ?? NULL);
     $form->assign('is_recur_installments', $form->_values['is_recur_installments'] ?? NULL);
-    $paymentObject = $form->getVar('_paymentObject');
+    $paymentObject = $this->getPaymentProcessorObject();
     if ($paymentObject) {
       $form->assign('recurringHelpText', $paymentObject->getText('contributionPageRecurringHelp', [
         'is_recur_installments' => !empty($form->_values['is_recur_installments']),

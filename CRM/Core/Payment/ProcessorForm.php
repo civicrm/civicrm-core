@@ -40,14 +40,14 @@ class CRM_Core_Payment_ProcessorForm {
       return;
     }
     $form->set('paymentProcessor', $form->_paymentProcessor);
-    $form->_paymentObject = System::singleton()->getByProcessor($form->_paymentProcessor);
+    $paymentObject = System::singleton()->getByProcessor($form->_paymentProcessor);
     if ($form->paymentInstrumentID) {
-      $form->_paymentObject->setPaymentInstrumentID($form->paymentInstrumentID);
+      $paymentObject->setPaymentInstrumentID($form->paymentInstrumentID);
     }
-    $form->_paymentObject->setBackOffice($form->isBackOffice);
+    $paymentObject->setBackOffice($form->isBackOffice);
     $form->assign('isBackOffice', $form->isBackOffice);
 
-    $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
+    $form->assign('suppressSubmitButton', $paymentObject->isSuppressSubmitButtons());
 
     CRM_Financial_Form_Payment::addCreditCardJs($form->getPaymentProcessorID());
     $form->assign('paymentProcessorID', $form->getPaymentProcessorID());
@@ -59,7 +59,7 @@ class CRM_Core_Payment_ProcessorForm {
 
     // also set cancel subscription url
     if (!empty($form->_paymentProcessor['is_recur']) && !empty($form->_values['is_recur'])) {
-      $form->_values['cancelSubscriptionUrl'] = $form->_paymentObject->subscriptionURL(NULL, NULL, 'cancel');
+      $form->_values['cancelSubscriptionUrl'] = $paymentObject->subscriptionURL(NULL, NULL, 'cancel');
     }
 
     $paymentProcessorBillingFields = array_keys($form->_paymentProcessor['object']->getBillingAddressFields());
@@ -108,7 +108,7 @@ class CRM_Core_Payment_ProcessorForm {
 
     if (!empty($form->_membershipBlock) && !empty($form->_membershipBlock['is_separate_payment']) &&
       (!empty($form->_paymentProcessor['class_name']) &&
-        !$form->_paymentObject->supports('MultipleConcurrentPayments')
+        !$paymentObject->supports('MultipleConcurrentPayments')
       )
     ) {
 
