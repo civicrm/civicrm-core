@@ -161,7 +161,7 @@
       this.changeArg = function(index) {
         var val = ctrl.args[index].value;
         // Delete empty value
-        if (index && !val && ctrl.args.length > ctrl.fn.params[0].min_expr) {
+        if (index && !val && val !== 0 && ctrl.args.length > ctrl.fn.params[0].min_expr) {
           ctrl.args.splice(index, 1);
         }
         ctrl.writeExpr();
@@ -176,7 +176,7 @@
       this.writeExpr = function() {
         if (ctrl.fnName) {
           var args = _.transform(ctrl.args, function(args, arg, index) {
-            if (arg.value || arg.flag_before) {
+            if (arg.value || arg.value === 0 || arg.flag_before) {
               var prefix = arg.flag_before || arg.name ? (index ? ' ' : '') + (arg.flag_before || arg.name) + (arg.value ? ' ' : '') : (index ? ', ' : '');
               args.push(prefix + (arg.type === 'string' ? JSON.stringify(arg.value) : arg.value));
             }
