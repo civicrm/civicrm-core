@@ -38,6 +38,16 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   public $_drilldownReport = ['contribute/detail' => 'Link to Detail Report'];
 
   /**
+   * @var string
+   */
+  protected $_outerCluase = '';
+
+  /**
+   * @var string
+   */
+  protected $_groupLimit = '';
+
+  /**
    */
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
