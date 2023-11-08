@@ -135,7 +135,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'Total Fee: $100.00',
       'This Payment Amount: $70.00',
       'Billing Name and Address',
-      'Vancouver, AE 1321312',
+      'Vancouver, BC 1321312',
       'Visa',
       '***********1111',
       'Expires: May 2025',
@@ -249,7 +249,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'Paid By: Credit Card',
       '***********1111',
       'Billing Name and Address',
-      'Vancouver, AE 1321312',
+      'Vancouver, BC 1321312',
       'Expires: May 2025',
 
     ]);
@@ -364,6 +364,11 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     ];
     if ($mode) {
       $_REQUEST['mode'] = $mode;
+      $stateProvinceBC = \Civi\Api4\StateProvince::get()
+        ->addWhere('abbreviation', '=', 'BC')
+        ->addWhere('country_id', '=', 1039)
+        ->execute()
+        ->single();
       $submitParams += [
         'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments, TRUE),
         'payment_processor_id' => $this->paymentProcessorID,
@@ -372,7 +377,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
         'cvv2' => 234,
         'credit_card_type' => 'Visa',
         'billing_city-5' => 'Vancouver',
-        'billing_state_province_id-5' => 1059,
+        'billing_state_province_id-5' => $stateProvinceBC['id'],
         'billing_postal_code-5' => 1321312,
         'billing_country_id-5' => 1228,
       ];

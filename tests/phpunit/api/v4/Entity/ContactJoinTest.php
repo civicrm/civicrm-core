@@ -141,12 +141,13 @@ class ContactJoinTest extends Api4TestBase {
       'address_billing.country_id:abbr' => 'NG',
     ]);
     $addr = Address::get(FALSE)
+      ->addSelect('country_id:label', 'state_province_id:label')
       ->addWhere('contact_id', '=', $contact['id'])
-      ->execute();
-    $this->assertCount(1, $addr);
+      ->execute()
+      ->single();
     $this->assertEquals('Hello', $contact['address_billing.city']);
-    $this->assertEquals(3885, $contact['address_billing.state_province_id']);
-    $this->assertEquals(1157, $contact['address_billing.country_id']);
+    $this->assertEquals('Akwa Ibom', $addr['state_province_id:label']);
+    $this->assertEquals('Nigeria', $addr['country_id:label']);
     $emails = Email::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute();
