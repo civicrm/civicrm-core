@@ -457,21 +457,21 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     //unset the skip participant from params.
     //build the $participantCount array.
     //maintain record for all participants.
-    foreach ($params as $participantNum => $record) {
-      if ($record === 'skip') {
+    foreach ($params as $participantNum => $participantRecord) {
+      if ($participantRecord === 'skip') {
         unset($params[$participantNum]);
         $participantCount[$participantNum] = 'skip';
       }
       elseif ($participantNum) {
         $participantCount[$participantNum] = 'participant';
       }
-      $totalTaxAmount += $record['tax_amount'] ?? 0;
-      if (!empty($record['is_primary'])) {
+      $totalTaxAmount += $participantRecord['tax_amount'] ?? 0;
+      if (!empty($participantRecord['is_primary'])) {
         $taxAmount = &$params[$participantNum]['tax_amount'];
       }
       //lets get additional participant id to cancel.
       if ($this->_allowConfirmation && is_array($cancelledIds)) {
-        $additionalId = $record['participant_id'] ?? NULL;
+        $additionalId = $participantRecord['participant_id'] ?? NULL;
         if ($additionalId && $key = array_search($additionalId, $cancelledIds)) {
           unset($cancelledIds[$key]);
         }
@@ -482,59 +482,48 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
     $fields = [];
-    foreach ($params as $value) {
-      CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
-      if ($this->_allowWaitlist
-        || $this->_requireApproval
-        || (!empty($value['is_pay_later']) && !$this->_isBillingAddressRequiredForPayLater)
-        || empty($value['is_primary'])
-      ) {
-        // This is confusing because unnecessary code around it has been removed. It is not
-        // clear why we do this / whether we should.
-        if (!empty($value['is_pay_later'])) {
-          $this->_values['params']['is_pay_later'] = TRUE;
-        }
-      }
+    foreach ($params as $participantRecord) {
+      CRM_Event_Form_Registration_Confirm::fixLocationFields($participantRecord, $fields, $this);
 
       //Unset ContactID for additional participants and set RegisterBy Id.
-      if (empty($value['is_primary'])) {
-        $contactID = $value['contact_id'] ?? NULL;
+      if (empty($participantRecord['is_primary'])) {
+        $contactID = $participantRecord['contact_id'] ?? NULL;
         $registerByID = $this->get('registerByID');
         if ($registerByID) {
-          $value['registered_by_id'] = $registerByID;
+          $participantRecord['registered_by_id'] = $registerByID;
         }
       }
       else {
-        $value['amount'] = $this->_totalAmount;
+        $participantRecord['amount'] = $this->_totalAmount;
       }
 
-      $contactID = CRM_Event_Form_Registration_Confirm::updateContactFields($contactID, $value, $fields, $this);
+      $contactID = CRM_Event_Form_Registration_Confirm::updateContactFields($contactID, $participantRecord, $fields, $this);
 
       // lets store the contactID in the session
       // we dont store in userID in case the user is doing multiple
       // transactions etc
       // for things like tell a friend
-      if (!$this->getContactID() && !empty($value['is_primary'])) {
+      if (!$this->getContactID() && !empty($participantRecord['is_primary'])) {
         CRM_Core_Session::singleton()->set('transaction.userID', $contactID);
       }
 
-      $value['description'] = ts('Online Event Registration') . ': ' . $this->_values['event']['title'];
-      $value['accountingCode'] = $this->_values['event']['accountingCode'] ?? NULL;
+      $participantRecord['description'] = ts('Online Event Registration') . ': ' . $this->_values['event']['title'];
+      $participantRecord['accountingCode'] = $this->_values['event']['accountingCode'] ?? NULL;
 
       $pending = FALSE;
       if ($this->_allowWaitlist || $this->_requireApproval) {
         //get the participant statuses.
         $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
         if ($this->_allowWaitlist) {
-          $value['participant_status_id'] = $value['participant_status'] = array_search('On waitlist', $waitingStatuses);
+          $participantRecord['participant_status_id'] = $participantRecord['participant_status'] = array_search('On waitlist', $waitingStatuses);
         }
         else {
-          $value['participant_status_id'] = $value['participant_status'] = array_search('Awaiting approval', $waitingStatuses);
+          $participantRecord['participant_status_id'] = $participantRecord['participant_status'] = array_search('Awaiting approval', $waitingStatuses);
         }
 
         //there might be case user selected pay later and
         //now becomes part of run time waiting list.
-        $value['is_pay_later'] = FALSE;
+        $participantRecord['is_pay_later'] = FALSE;
       }
       elseif ($this->_values['event']['is_monetary']) {
         // required only if paid event
@@ -543,113 +532,113 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
         if (!empty($this->_paymentProcessor) &&  $this->_paymentProcessor['object']->supports('preApproval')) {
           $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
-          $value = array_merge($value, $preApprovalParams);
+          $participantRecord = array_merge($participantRecord, $preApprovalParams);
         }
         $doPaymentResult = NULL;
 
-        if (!empty($value['is_pay_later']) ||
-          $value['amount'] == 0 ||
+        if (!empty($participantRecord['is_pay_later']) ||
+          $participantRecord['amount'] == 0 ||
           // The concept of contributeMode is deprecated.
           $this->_contributeMode == 'checkout' ||
           $this->_contributeMode == 'notify'
         ) {
-          if ($value['amount'] != 0) {
+          if ($participantRecord['amount'] != 0) {
             $pending = TRUE;
             //get the participant statuses.
             $pendingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'");
-            $status = !empty($value['is_pay_later']) ? 'Pending from pay later' : 'Pending from incomplete transaction';
-            $value['participant_status_id'] = $value['participant_status'] = array_search($status, $pendingStatuses);
+            $status = !empty($participantRecord['is_pay_later']) ? 'Pending from pay later' : 'Pending from incomplete transaction';
+            $participantRecord['participant_status_id'] = $participantRecord['participant_status'] = array_search($status, $pendingStatuses);
           }
         }
-        elseif (!empty($value['is_primary'])) {
-          CRM_Core_Payment_Form::mapParams($this->_bltID, $value, $value, TRUE);
+        elseif (!empty($participantRecord['is_primary'])) {
+          CRM_Core_Payment_Form::mapParams($this->_bltID, $participantRecord, $participantRecord, TRUE);
           // payment email param can be empty for _bltID mapping
           // thus provide mapping for it with a different email value
-          if (empty($value['email'])) {
-            $value['email'] = CRM_Utils_Array::valueByRegexKey('/^email-/', $value);
+          if (empty($participantRecord['email'])) {
+            $participantRecord['email'] = CRM_Utils_Array::valueByRegexKey('/^email-/', $participantRecord);
           }
 
           if (is_object($payment)) {
             // If registering from waitlist participant_id is set but contact_id is not.
             // We need a contact ID to process the payment so set the "primary" contact ID.
-            $value['contactID'] = empty($value['contact_id']) ? (int) $contactID : (int) $value['contact_id'];
+            $participantRecord['contactID'] = empty($participantRecord['contact_id']) ? (int) $contactID : (int) $participantRecord['contact_id'];
             // contactID is the correct parameter to pass to the processor.
             // However, we still pass contact_id as the same value as was previously being assigned,
             // in case some processors are expecting that.
             // (especially since this was recently not passing the correct value).
             // https://docs.civicrm.org/dev/en/latest/extensions/payment-processors/create/#getpaymentformfields
-            if (empty($value['contact_id'])) {
-              $value['contact_id'] = $value['contactID'];
+            if (empty($participantRecord['contact_id'])) {
+              $participantRecord['contact_id'] = $participantRecord['contactID'];
             }
-            [$doPaymentResult, $value] = $this->processPayment($payment, $value);
+            [$doPaymentResult, $participantRecord] = $this->processPayment($payment, $participantRecord);
           }
           else {
             throw new CRM_Core_Exception($paymentObjError);
           }
         }
 
-        $value['receive_date'] = $now;
+        $participantRecord['receive_date'] = $now;
         if ($this->_allowConfirmation) {
-          $value['participant_register_date'] = $this->_values['participant']['register_date'];
+          $participantRecord['participant_register_date'] = $this->_values['participant']['register_date'];
         }
 
-        $createContrib = $value['amount'] != 0;
+        $createContrib = $participantRecord['amount'] != 0;
         // force to create zero amount contribution, CRM-5095
-        if (!$createContrib && ($value['amount'] == 0)
+        if (!$createContrib && ($participantRecord['amount'] == 0)
           && $this->_priceSetId && $this->_lineItem
         ) {
           $createContrib = TRUE;
         }
 
-        if ($createContrib && !empty($value['is_primary']) &&
+        if ($createContrib && !empty($participantRecord['is_primary']) &&
           !$this->_allowWaitlist && !$this->_requireApproval
         ) {
           // if paid event add a contribution record
           //if primary participant contributing additional amount
           //append (multiple participants) to its fee level. CRM-4196.
           if (count($params) > 1) {
-            $value['amount_level'] .= ts(' (multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
+            $participantRecord['amount_level'] .= ts(' (multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
           }
 
           //passing contribution id is already registered.
-          $contribution = $this->processContribution($value, $doPaymentResult, $contactID, $pending);
-          $value['contributionID'] = $contribution->id;
-          $value['receive_date'] = $contribution->receive_date;
-          $value['trxn_id'] = $contribution->trxn_id;
-          $value['contributionID'] = $contribution->id;
+          $contribution = $this->processContribution($participantRecord, $doPaymentResult, $contactID, $pending);
+          $participantRecord['contributionID'] = $contribution->id;
+          $participantRecord['receive_date'] = $contribution->receive_date;
+          $participantRecord['trxn_id'] = $contribution->trxn_id;
+          $participantRecord['contributionID'] = $contribution->id;
         }
-        $value['contactID'] = $contactID;
-        $value['eventID'] = $this->getEventID();
-        $value['item_name'] = $value['description'];
+        $participantRecord['contactID'] = $contactID;
+        $participantRecord['eventID'] = $this->getEventID();
+        $participantRecord['item_name'] = $participantRecord['description'];
       }
 
-      if (!empty($value['contributionID'])) {
-        $this->_values['contributionId'] = $value['contributionID'];
+      if (!empty($participantRecord['contributionID'])) {
+        $this->_values['contributionId'] = $participantRecord['contributionID'];
       }
 
       //CRM-4453.
-      if (!empty($value['is_primary'])) {
-        $primaryCurrencyID = $value['currencyID'] ?? NULL;
+      if (!empty($participantRecord['is_primary'])) {
+        $primaryCurrencyID = $participantRecord['currencyID'] ?? NULL;
       }
-      if (empty($value['currencyID'])) {
-        $value['currencyID'] = $primaryCurrencyID;
+      if (empty($participantRecord['currencyID'])) {
+        $participantRecord['currencyID'] = $primaryCurrencyID;
       }
 
       // CRM-11182 - Confirmation page might not be monetary
       if ($this->_values['event']['is_monetary']) {
-        if (!$pending && !empty($value['is_primary']) &&
+        if (!$pending && !empty($participantRecord['is_primary']) &&
           !$this->_allowWaitlist && !$this->_requireApproval
         ) {
           // transactionID & receive date required while building email template
-          $this->assign('trxn_id', $value['trxn_id'] ?? NULL);
-          $this->assign('receive_date', CRM_Utils_Date::mysqlToIso($value['receive_date'] ?? NULL));
-          $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($value['receive_date'] ?? NULL));
-          $this->set('trxnId', $value['trxn_id'] ?? NULL);
+          $this->assign('trxn_id', $participantRecord['trxn_id'] ?? NULL);
+          $this->assign('receive_date', CRM_Utils_Date::mysqlToIso($participantRecord['receive_date'] ?? NULL));
+          $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($participantRecord['receive_date'] ?? NULL));
+          $this->set('trxnId', $participantRecord['trxn_id'] ?? NULL);
         }
       }
 
-      $value['fee_amount'] = $value['amount'] ?? NULL;
-      $this->set('value', $value);
+      $participantRecord['fee_amount'] = $participantRecord['amount'] ?? NULL;
+      $this->set('value', $participantRecord);
 
       // handle register date CRM-4320
       if ($this->_allowConfirmation) {
