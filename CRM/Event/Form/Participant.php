@@ -889,24 +889,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $contributionParams['total_amount'] = $params['total_amount'] ?? NULL;
     }
 
-    // Retrieve the name and email of the current user - this will be the FROM for the receipt email
-    $userName = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();
-
     $now = date('YmdHis');
 
     if ($this->_mode) {
-      // set source if not set
-      if (empty($params['source'])) {
-        $this->_params['participant_source'] = ts('Offline Registration for Event: %2 by: %1', [
-          1 => $userName,
-          2 => $this->getEventValue('title'),
-        ]);
-      }
-      else {
-        $this->_params['participant_source'] = $params['source'];
-      }
-      $this->_params['description'] = $this->_params['participant_source'];
-
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_params['payment_processor_id'],
         $this->_mode
       );
@@ -978,6 +963,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       // CRM-15622: fix for incorrect contribution.fee_amount
       $paymentParams['fee_amount'] = NULL;
+      $paymentParams['description'] = $this->getSourceText();
       try {
         $result = $payment->doPayment($paymentParams);
       }
@@ -1040,6 +1026,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $participants = [];
       foreach ($this->_contactIds as $contactID) {
         $commonParams = $params;
+        $commonParams['source'] = $this->getSourceText();
         $commonParams['contact_id'] = $contactID;
         $participants[] = CRM_Event_BAO_Participant::create($commonParams);
       }
@@ -1059,20 +1046,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           }
         }
         unset($params['note']);
-
-        //build contribution params
-        if (!$this->_onlinePendingContributionId) {
-          if (empty($params['source'])) {
-            $contributionParams['source'] = ts('%1 : Offline registration (by %2)', [
-              1 => $this->getEventValue('title'),
-              2 => $userName,
-            ]);
-          }
-          else {
-            $contributionParams['source'] = $params['source'];
-          }
-        }
-
+        $contributionParams['source'] = $this->getSourceText();
         $contributionParams['currency'] = $config->defaultCurrency;
         $contributionParams['non_deductible_amount'] = 'null';
         $contributionParams['receipt_date'] = !empty($params['send_receipt']) ? CRM_Utils_Array::value('receive_date', $params) : 'null';
@@ -1576,7 +1550,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'amount_level' => $params['amount_level'],
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
-      'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
+      'source' => $this->getSourceText(),
       'is_pay_later' => FALSE,
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'card_type_id' => $params['card_type_id'] ?? NULL,
@@ -1641,8 +1615,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function addParticipant($params, $contactID) {
     $transaction = new CRM_Core_Transaction();
-
-    $participantFields = CRM_Event_DAO_Participant::fields();
     $participantParams = [
       'id' => $params['participant_id'] ?? NULL,
       'contact_id' => $contactID,
@@ -1650,10 +1622,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'status_id' => $this->getSubmittedValue('status_id'),
       'role_id' => $this->getSubmittedValue('role_id'),
       'register_date' => $this->getSubmittedValue('register_date'),
-      'source' => CRM_Utils_String::ellipsify(
-        isset($params['participant_source']) ? CRM_Utils_Array::value('participant_source', $params) : CRM_Utils_Array::value('description', $params),
-        $participantFields['participant_source']['maxlength']
-      ),
+      'source' => $this->getSourceText(),
       'fee_level' => $params['amount_level'] ?? NULL,
       'is_pay_later' => FALSE,
       'fee_amount' => $params['fee_amount'] ?? NULL,
@@ -2039,6 +2008,22 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       $this->_contactID = $contactID ? (int) $contactID : NULL;
     }
     return $this->_contactID;
+  }
+
+  /**
+   * Get the text for the participant & contribution source fields.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function getSourceText(): string {
+    $maxLength = CRM_Event_DAO_Participant::fields()['participant_source']['maxlength'];
+    if ($this->getSubmittedValue('source')) {
+      return CRM_Utils_String::ellipsify($this->getSubmittedValue('source'), $maxLength);
+    }
+    return CRM_Utils_String::ellipsify(ts('Offline Registration for Event: %2 by: %1', [
+      1 => CRM_Core_Session::singleton()->getLoggedInContactDisplayName(),
+      2 => $this->getEventValue('title'),
+    ]), $maxLength);
   }
 
 }
