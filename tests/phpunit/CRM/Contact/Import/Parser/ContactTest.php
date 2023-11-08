@@ -774,6 +774,10 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('Update', $address['custom_' . $ids['custom_field_id']]);
   }
 
+  public function testAddressWithID() {
+    [$contactValues] = $this->setUpBaseContact();
+  }
+
   /**
    * Test gender works when you specify the label.
    *

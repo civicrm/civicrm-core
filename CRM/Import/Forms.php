@@ -17,6 +17,8 @@
 
 use Civi\Api4\Mapping;
 use Civi\Api4\UserJob;
+use Civi\Core\ClassScanner;
+use Civi\Import\DataSource\DataSourceInterface;
 use League\Csv\Writer;
 
 /**
@@ -269,7 +271,8 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getDataSources(): array {
     $dataSources = [];
-    foreach (['CRM_Import_DataSource_SQL', 'CRM_Import_DataSource_CSV'] as $dataSourceClass) {
+    $classes = ClassScanner::get(['interface' => DataSourceInterface::class]);
+    foreach ($classes as $dataSourceClass) {
       $object = new $dataSourceClass();
       if ($object->checkPermission()) {
         $dataSources[$dataSourceClass] = $object->getInfo()['title'];
@@ -388,11 +391,10 @@ class CRM_Import_Forms extends CRM_Core_Form {
   /**
    * Get the relevant datasource object.
    *
-   * @return \CRM_Import_DataSource|null
-   *
+   * @return \Civi\Import\DataSource\DataSourceInterface|null
    * @throws \CRM_Core_Exception
    */
-  protected function getDataSourceObject(): ?CRM_Import_DataSource {
+  protected function getDataSourceObject(): ?DataSourceInterface {
     $className = $this->getDataSourceClassName();
     if ($className) {
       return new $className($this->getUserJobID());
