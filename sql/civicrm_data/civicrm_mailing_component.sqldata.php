@@ -24,8 +24,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_mailing_component')
       'name' => ts("Mailing Footer"),
       "component_type" => "Footer",
       'subject' => ts("Descriptive Title for this Footer."),
-      'body_html' => ts('Sample Footer for HTML formatted content<br/><a href="{action.optOutUrl}">Unsubscribe</a>  <br/> {domain.address}'),
-      'body_text' => ts("to unsubscribe: {action.optOutUrl}\n{domain.address}"),
+      'body_html' => ts('Sample Footer for HTML formatted content<br/><a href="{action.optOutUrl}">Opt out of any future emails</a>  <br/> {domain.address}'),
+      'body_text' => ts("Opt out of any future emails: {action.optOutUrl}\n{domain.address}"),
     ],
     [
       'name' => ts('Subscribe Message'),
