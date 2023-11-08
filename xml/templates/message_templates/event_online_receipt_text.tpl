@@ -70,7 +70,7 @@
 {if {event.loc_block_id.email_2_id.email|boolean}}
 {ts}Email {/ts}{event.loc_block_id.email_2_id.email}{/if}
 {/if}
-{if {event.is_public|boolean}}
+{if {event.is_public|boolean} and {event.is_show_calendar_links|boolean}}
 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
 {ts}Download iCalendar entry for this event.{/ts} {$icalFeed}
 {capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
