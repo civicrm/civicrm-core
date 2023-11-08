@@ -1256,7 +1256,7 @@ WHERE li.contribution_id = %1";
    * @return string
    */
   protected function getSalesTaxTerm() {
-    return CRM_Contribute_BAO_Contribution::checkContributeSettings('tax_term');
+    return \Civi::settings()->get('tax_term');
   }
 
   /**

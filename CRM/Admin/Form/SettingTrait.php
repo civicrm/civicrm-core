@@ -150,21 +150,7 @@ trait CRM_Admin_Form_SettingTrait {
    */
   protected function getSettingsOrderedByWeight() {
     $settingMetaData = $this->getSettingsMetaData();
-    $filter = $this->getSettingPageFilter();
-
-    usort($settingMetaData, function ($a, $b) use ($filter) {
-      // Handle cases in which a comparison is impossible. Such will be considered ties.
-      if (
-        // A comparison can't be made unless both setting weights are declared.
-        !isset($a['settings_pages'][$filter]['weight'], $b['settings_pages'][$filter]['weight'])
-        // A pair of settings might actually have the same weight.
-        || $a['settings_pages'][$filter]['weight'] === $b['settings_pages'][$filter]['weight']
-      ) {
-        return 0;
-      }
-
-      return $a['settings_pages'][$filter]['weight'] > $b['settings_pages'][$filter]['weight'] ? 1 : -1;
-    });
+    $settingMetaData = $this->filterMetadataByWeight($settingMetaData);
 
     return $settingMetaData;
   }
@@ -410,6 +396,30 @@ trait CRM_Admin_Form_SettingTrait {
         $this->_settings[$key] = $setting;
       }
     }
+  }
+
+  /**
+   * @param array $settingMetaData
+   *
+   * @return array
+   */
+  protected function filterMetadataByWeight(array $settingMetaData): array {
+    $filter = $this->getSettingPageFilter();
+
+    usort($settingMetaData, function ($a, $b) use ($filter) {
+      // Handle cases in which a comparison is impossible. Such will be considered ties.
+      if (
+        // A comparison can't be made unless both setting weights are declared.
+        !isset($a['settings_pages'][$filter]['weight'], $b['settings_pages'][$filter]['weight'])
+        // A pair of settings might actually have the same weight.
+        || $a['settings_pages'][$filter]['weight'] === $b['settings_pages'][$filter]['weight']
+      ) {
+        return 0;
+      }
+
+      return $a['settings_pages'][$filter]['weight'] > $b['settings_pages'][$filter]['weight'] ? 1 : -1;
+    });
+    return $settingMetaData;
   }
 
 }

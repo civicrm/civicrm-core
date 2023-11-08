@@ -4135,13 +4135,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * settings we will live with an inconsistency because it's too hard to change for now.
    * https://github.com/civicrm/civicrm-core/pull/8562#issuecomment-227874245
    *
-   *
    * @param string $name
    *
    * @return string
    *
+   * @deprecated since 5.68 will be removed around 5.74.
    */
   public static function checkContributeSettings($name) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use \Civi::settings()->get() with the actual setting name');
     $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
     return $contributeSettings[$name] ?? NULL;
   }
