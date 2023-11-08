@@ -165,7 +165,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         //  body_html, filtered
         "You can go to \\[Google\\]\\(http://example.net/first\?cs=[0-9a-f_]+\\) or \\[opt out\\]\\(http.*civicrm/mailing/optout.*\\)\\.\n" .
         // Default footer
-        "to unsubscribe: http.*civicrm/mailing/optout" .
+        "Opt out of any future emails: http.*civicrm/mailing/optout" .
         ";",
         $textPart->text
       );
