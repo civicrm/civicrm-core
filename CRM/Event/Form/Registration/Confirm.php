@@ -260,9 +260,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
 
-      if (CRM_Invoicing_Utils::isInvoicingEnabled()) {
+      if (\Civi::settings()->get('invoicing')) {
         $this->assign('totalTaxAmount', $taxAmount);
-        $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
+        $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
         $this->assign('individual', $individual);
         $this->set('individual', $individual);
       }
@@ -371,10 +371,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   public static function formRule($fields, $files, $form) {
     $errors = [];
-    $eventFull = CRM_Event_BAO_Participant::eventFull($form->_eventId, FALSE, $form->_values['event']['has_waitlist'] ?? FALSE);
+    $eventFull = CRM_Event_BAO_Participant::eventFull($form->getEventID(), FALSE, $form->_values['event']['has_waitlist'] ?? FALSE);
     if ($eventFull && empty($form->_allowConfirmation)) {
       if (empty($form->_allowWaitlist)) {
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "reset=1&id={$form->_eventId}", FALSE, NULL, FALSE, TRUE));
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "reset=1&id={$form->getEventID()}", FALSE, NULL, FALSE, TRUE));
       }
     }
     $form->_feeBlock = $form->_values['fee'];
@@ -482,7 +482,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
     $fields = [];
-    foreach ($params as $key => $value) {
+    foreach ($params as $value) {
       CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
       if ($this->_allowWaitlist
         || $this->_requireApproval
@@ -545,7 +545,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
           $value = array_merge($value, $preApprovalParams);
         }
-        $result = NULL;
+        $doPaymentResult = NULL;
 
         if (!empty($value['is_pay_later']) ||
           $value['amount'] == 0 ||
@@ -570,9 +570,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           if (is_object($payment)) {
-            // Not quite sure why we don't just user $value since it contains the data
-            // from result
-            // @todo ditch $result & retest.
             // If registering from waitlist participant_id is set but contact_id is not.
             // We need a contact ID to process the payment so set the "primary" contact ID.
             $value['contactID'] = empty($value['contact_id']) ? (int) $contactID : (int) $value['contact_id'];
@@ -584,7 +581,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             if (empty($value['contact_id'])) {
               $value['contact_id'] = $value['contactID'];
             }
-            [$result, $value] = $this->processPayment($payment, $value);
+            [$doPaymentResult, $value] = $this->processPayment($payment, $value);
           }
           else {
             throw new CRM_Core_Exception($paymentObjError);
@@ -615,14 +612,14 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           //passing contribution id is already registered.
-          $contribution = $this->processContribution($value, $result, $contactID, $pending);
+          $contribution = $this->processContribution($value, $doPaymentResult, $contactID, $pending);
           $value['contributionID'] = $contribution->id;
           $value['receive_date'] = $contribution->receive_date;
           $value['trxn_id'] = $contribution->trxn_id;
           $value['contributionID'] = $contribution->id;
         }
         $value['contactID'] = $contactID;
-        $value['eventID'] = $this->_eventId;
+        $value['eventID'] = $this->getEventID();
         $value['item_name'] = $value['description'];
       }
 
@@ -707,7 +704,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $lineItem[$this->_priceSetId] = $value;
           CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, $entityTable);
         }
-        if (CRM_Invoicing_Utils::isInvoicingEnabled()) {
+        if (\Civi::settings()->get('invoicing')) {
           foreach ($value as $line) {
             if (isset($line['tax_amount']) && isset($line['tax_rate'])) {
               $totalTaxAmount = $line['tax_amount'] + $totalTaxAmount;
@@ -816,7 +813,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           //get event custom field information
-          $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, $this->_eventId, 0, $this->_values['event']['event_type_id']);
+          $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, $this->getEventID(), 0, $this->_values['event']['event_type_id']);
           $primaryParticipant['eventCustomFields'] = $groupTree;
 
           // call postprocess hook before leaving
@@ -900,7 +897,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             if ($lineItemValue = ($lineItems[$participantNum] ?? NULL)) {
               $lineItem[] = $lineItemValue;
             }
-            if (CRM_Invoicing_Utils::isInvoicingEnabled()) {
+            if (\Civi::settings()->get('invoicing')) {
               $individual = $this->get('individual');
               $dataArray[key($dataArray)] = $individual[$participantNum]['totalTaxAmt'];
               $this->assign('dataArray', $dataArray);
@@ -982,7 +979,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       ];
     }
 
-    $allStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $allStatuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
     $contribParams['contribution_status_id'] = array_search('Completed', $allStatuses);
     if ($pending) {
       $contribParams['contribution_status_id'] = array_search('Pending', $allStatuses);
@@ -1014,7 +1011,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
     // CRM-11124
-    CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, NULL, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
+    CRM_Event_BAO_Participant::createDiscountTrxn($form->getEventID(), $contribParams, NULL, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
 
     $transaction->commit();
 
@@ -1306,20 +1303,20 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * Process the payment, redirecting back to the page on error.
    *
    * @param \CRM_Core_Payment $payment
-   * @param $value
+   * @param array $value
    *
    * @return array
    */
-  private function processPayment($payment, $value) {
+  private function processPayment(\CRM_Core_Payment $payment, array $value): array {
     try {
       $params = $this->prepareParamsForPaymentProcessor($value);
-      $result = $payment->doPayment($params, 'event');
-      return [$result, $value];
+      $doPaymentResult = $payment->doPayment($params, 'event');
+      return [$doPaymentResult, $value];
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
       Civi::log()->error('Payment processor exception: ' . $e->getMessage());
       CRM_Core_Session::singleton()->setStatus($e->getMessage());
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->getEventID()}"));
     }
     return [];
   }
