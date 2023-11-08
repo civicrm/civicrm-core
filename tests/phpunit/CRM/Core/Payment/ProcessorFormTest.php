@@ -169,10 +169,8 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
    * indicates whether the billing block can be hidden, or not.
    */
   public function checkPaymentProcessorWithProfile($processorClass, $case): bool {
-    $whichProcessor = $case . 'ProcessorID';
     $profileID = $this->ids['UFGroup'][$case . '_billing'];
     $processor = new $processorClass();
-    $processor->id = $this->$whichProcessor;
 
     $missingBillingFields = [];
 
