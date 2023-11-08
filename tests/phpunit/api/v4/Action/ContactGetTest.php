@@ -62,12 +62,11 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
   }
 
   /**
-  * Test ordering of contact by contact_sub_type when field
-  * contains more than one type and contact_type label and name
-  * are different enough to get sorted in different order.
-  *
-  *
-  */
+   * Test ordering of contact by contact_sub_type when field
+   * contains more than one type and contact_type label and name
+   * are different enough to get sorted in different order.
+   *
+   */
   public function testGetWithOrderBy(): void {
 
     // Test dataset #1 : Contact sub type name, label
