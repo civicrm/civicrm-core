@@ -26,6 +26,7 @@ use Civi\Api4\IM;
 use Civi\Api4\LocationType;
 use Civi\Api4\OpenID;
 use Civi\Api4\Phone;
+use Civi\Api4\Queue;
 use Civi\Api4\Relationship;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\UserJob;
@@ -1238,6 +1239,10 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       CRM_Import_Forms::outputCSV();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
+      UserJob::delete()->addWhere('id', '=', $dataSource->getUserJobID())->execute();
+      $this->assertCount(0, Queue::get()
+        ->addWhere('name', '=', 'user_job_' . $dataSource->getUserJobID())
+        ->execute());
       // For now just check it got this far without error.
       ob_end_clean();
       return;
