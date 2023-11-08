@@ -442,9 +442,8 @@ AND       CEF.entity_id    = %2";
     // Assign maxAttachments count to template for help message
     $form->assign('maxAttachments', $numAttachments);
 
-    $config = CRM_Core_Config::singleton();
     // set default max file size as 2MB
-    $maxFileSize = $config->maxFileSize ? $config->maxFileSize : 2;
+    $maxFileSize = \Civi::settings()->get('maxFileSize') ?: 2;
 
     $currentAttachmentInfo = self::getEntityFile($entityTable, $entityID, TRUE);
     $totalAttachments = $currentAttachmentInfo ? count($currentAttachmentInfo) : 0;

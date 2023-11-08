@@ -48,9 +48,13 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   /**
    * Basic setup.
    */
-  public function preProcess() {
-    // check for post max size
-    CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
+  public function preProcess(): void {
+    $maxImportFileSize = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'));
+    $postMaxSize = CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'));
+    if ($maxImportFileSize > $postMaxSize) {
+      CRM_Core_Session::setStatus(ts("Note: Upload max filesize ('upload_max_filesize') should not exceed Post max size ('post_max_size') as defined in PHP.ini, please check with your system administrator."), ts("Warning"), "alert");
+    }
+
     // This is a temp hack for the fact we really don't need to hard-code each setting in the tpl but
     // we haven't worked through NOT doing that. These settings have been un-hardcoded.
     $this->assign('pure_config_settings', [
@@ -100,8 +104,8 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     $errors = [];
 
     // validate max file size
-    $iniBytes = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), FALSE);
-    $inputBytes = CRM_Utils_Number::formatUnitSize($fields['maxFileSize'] . 'M', FALSE);
+    $iniBytes = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'));
+    $inputBytes = ((int) $fields['maxFileSize']) * 1024 * 1024;
 
     if ($inputBytes > $iniBytes) {
       $errors['maxFileSize'] = ts("Maximum file size cannot exceed limit defined in \"php.ini\" (\"upload_max_filesize=%1\").", [
