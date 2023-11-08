@@ -121,8 +121,8 @@ class CRM_Utils_PDF_Utils {
   public static function _html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName) {
     $options = self::getDompdfOptions();
     $dompdf = new DOMPDF($options);
-    $dompdf->set_paper($paper_size, $orientation);
-    $dompdf->load_html($html);
+    $dompdf->setPaper($paper_size, $orientation);
+    $dompdf->loadHtml($html);
     $dompdf->render();
 
     if ($output) {
