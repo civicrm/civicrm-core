@@ -48,12 +48,12 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
 
-    $uploadFileSize = CRM_Utils_Number::formatUnitSize(Civi::settings()->get('maxFileSize') . 'm', TRUE);
+    $uploadFileSize = $uploadSize = \Civi::settings()->get('maxFileSize');
     //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
     if (empty($uploadFileSize)) {
-      $uploadFileSize = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), TRUE);
+      $uploadFileSize = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'));
+      $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
     }
-    $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
     $form->assign('uploadSize', $uploadSize);
     $form->add('File', 'uploadFile', ts('Import Data File'), NULL, TRUE);
     $form->add('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2], TRUE);
