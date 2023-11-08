@@ -664,8 +664,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL, $isTest = NULL) {
     $separateMembershipPayment = FALSE;
     if ($this->_membershipBlock) {
-      $this->_currentMemberships = [];
-
       $membershipTypeIds = $membershipTypes = [];
       $membershipPriceset = (!empty($this->_priceSetId) && $this->_useForMember);
 
@@ -730,7 +728,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
                 if ($membership->find(TRUE)) {
                   $this->assign('renewal_mode', TRUE);
                   $memType['current_membership'] = $membership->end_date;
-                  $this->_currentMemberships[$membership->membership_type_id] = $membership->membership_type_id;
                 }
               }
               $membershipTypes[] = $memType;
@@ -761,7 +758,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
               if ($membership && $membership['membership_type_id.duration_unit:name'] !== 'lifetime') {
                 $this->assign('renewal_mode', TRUE);
-                $this->_currentMemberships[$membership['membership_type_id']] = $membership['membership_type_id'];
                 $memType['current_membership'] = $membership['end_date'];
                 if (!$endDate) {
                   $endDate = $memType['current_membership'];
