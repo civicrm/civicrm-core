@@ -81,42 +81,18 @@ class Manager {
     $angularModules = [];
     // Cache not set, fetch fresh list of modules and store in cache
     if (!$moduleNames) {
-      $config = \CRM_Core_Config::singleton();
-      global $civicrm_root;
-
-      // Note: It would be nice to just glob("$civicrm_root/ang/*.ang.php"), but at time
-      // of writing CiviMail and CiviCase have special conditionals.
-      $angularModules['angularFileUpload'] = include "$civicrm_root/ang/angularFileUpload.ang.php";
-      $angularModules['checklist-model'] = include "$civicrm_root/ang/checklist-model.ang.php";
-      $angularModules['crmApp'] = include "$civicrm_root/ang/crmApp.ang.php";
-      $angularModules['crmAttachment'] = include "$civicrm_root/ang/crmAttachment.ang.php";
-      $angularModules['crmAutosave'] = include "$civicrm_root/ang/crmAutosave.ang.php";
-      $angularModules['crmCxn'] = include "$civicrm_root/ang/crmCxn.ang.php";
-      $angularModules['crmDialog'] = include "$civicrm_root/ang/crmDialog.ang.php";
-      $angularModules['crmMonaco'] = include "$civicrm_root/ang/crmMonaco.ang.php";
-      $angularModules['crmResource'] = include "$civicrm_root/ang/crmResource.ang.php";
-      $angularModules['crmRouteBinder'] = include "$civicrm_root/ang/crmRouteBinder.ang.php";
-      $angularModules['crmUi'] = include "$civicrm_root/ang/crmUi.ang.php";
-      $angularModules['crmUtil'] = include "$civicrm_root/ang/crmUtil.ang.php";
-      $angularModules['dialogService'] = include "$civicrm_root/ang/dialogService.ang.php";
-      $angularModules['jsonFormatter'] = include "$civicrm_root/ang/jsonFormatter.ang.php";
-      $angularModules['ngRoute'] = include "$civicrm_root/ang/ngRoute.ang.php";
-      $angularModules['ngSanitize'] = include "$civicrm_root/ang/ngSanitize.ang.php";
-      $angularModules['ui.bootstrap'] = include "$civicrm_root/ang/ui.bootstrap.ang.php";
-      $angularModules['ui.sortable'] = include "$civicrm_root/ang/ui.sortable.ang.php";
-      $angularModules['unsavedChanges'] = include "$civicrm_root/ang/unsavedChanges.ang.php";
-      $angularModules['crmQueueMonitor'] = include "$civicrm_root/ang/crmQueueMonitor.ang.php";
-      $angularModules['crmStatusPage'] = include "$civicrm_root/ang/crmStatusPage.ang.php";
-      $angularModules['exportui'] = include "$civicrm_root/ang/exportui.ang.php";
-      $angularModules['api4Explorer'] = include "$civicrm_root/ang/api4Explorer.ang.php";
-      $angularModules['api4'] = include "$civicrm_root/ang/api4.ang.php";
-      $angularModules['crmDashboard'] = include "$civicrm_root/ang/crmDashboard.ang.php";
-      $angularModules['crmD3'] = include "$civicrm_root/ang/crmD3.ang.php";
-
-      foreach (\CRM_Core_Component::getEnabledComponents() as $component) {
-        $angularModules = array_merge($angularModules, $component->getAngularModules());
+      // Load all modules from CiviCRM core
+      $files = (array) glob(\Civi::paths()->getPath('[civicrm.root]/ang/*.ang.php'));
+      foreach ($files as $file) {
+        $name = basename($file, '.ang.php');
+        $module = include $file;
+        $module['ext'] = 'civicrm';
+        $angularModules[$name] = $module;
       }
+
+      // Load all modules from extensions
       \CRM_Utils_Hook::angularModules($angularModules);
+
       foreach ($angularModules as $module => $info) {
         // Merge in defaults
         $angularModules[$module] += ['basePages' => ['civicrm/a']];
