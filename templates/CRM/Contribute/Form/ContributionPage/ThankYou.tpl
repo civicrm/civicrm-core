@@ -73,5 +73,5 @@
  {/literal}
 </script>
 {/crmRegion}
-{crmRegion name="contribute-form-contributionpage-thankyou-post}
+{crmRegion name="contribute-form-contributionpage-thankyou-post"}
 {/crmRegion}
