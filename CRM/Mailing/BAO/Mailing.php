@@ -2870,12 +2870,14 @@ ORDER BY civicrm_mailing.id DESC";
           'qs' => "reset=1&id=%%mkey%%&cid=%%cid%%&cs=%%cs%%",
           'title' => ts('View Mailing'),
           'class' => 'crm-popup',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::BROWSE => [
           'name' => ts('Mailing Report'),
           'url' => 'civicrm/mailing/report',
           'qs' => "mid=%%mid%%&reset=1&cid=%%cid%%&context=mailing",
           'title' => ts('View Mailing Report'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::BROWSE),
         ],
       ];
 
