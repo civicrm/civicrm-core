@@ -87,7 +87,8 @@ class CoreUtil {
    */
   public static function getInfoItem(string $entityName, string $keyToReturn) {
     $provider = \Civi::service('action_object_provider');
-    return $provider->getEntities()[$entityName][$keyToReturn] ?? NULL;
+    $entities = $provider->getEntities();
+    return $entities[$entityName][$keyToReturn] ?? NULL;
   }
 
   /**
