@@ -31,6 +31,12 @@ class CRM_Upgrade_Incremental_php_FiveSixtyNine extends CRM_Upgrade_Incremental_
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add is_show_calendar_links column to Event table', 'addColumn', 'civicrm_event', 'is_show_calendar_links',
       'tinyint NOT NULL DEFAULT 1 COMMENT "If true, calendar links are shown for this event"');
+    $this->addTask('fix crmDate for installs that existed pre-5.43 - start date',
+      'updatePrintLabelToken', 'event.start_date|crmDate:"%B %E%f}"', 'event.start_date|crmDate:\\\"%B %E%f\\\"}"', $rev
+    );
+    $this->addTask('fix crmDate for installs that existed pre-5.43 - end date',
+      'updatePrintLabelToken', 'event.end_date|crmDate:"%B %E%f}"', 'event.end_date|crmDate:\\\"%B %E%f\\\"}"', $rev
+    );
   }
 
 }
