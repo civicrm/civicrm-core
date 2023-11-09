@@ -413,7 +413,7 @@ function afform_civicrm_alterMenu(&$items) {
         'page_callback' => 'CRM_Afform_Page_AfformBase',
         'page_arguments' => 'afform=' . urlencode($name),
         'access_arguments' => [["@afform:$name"], 'and'],
-        'is_public' => $meta['is_public'],
+        'is_public' => $meta['is_public'] ?? FALSE,
       ];
     }
   }
