@@ -48,20 +48,16 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
 
-    $uploadFileSize = $uploadSize = \Civi::settings()->get('maxFileSize');
-    //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
-    if (empty($uploadFileSize)) {
-      $uploadFileSize = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'));
-      $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
-    }
-    $form->assign('uploadSize', $uploadSize);
+    $maxFileSizeMegaBytes = CRM_Utils_File::getMaxFileSize();
+    $maxFileSizeBytes = $maxFileSizeMegaBytes * 1024 * 1024;
+    $form->assign('uploadSize', $maxFileSizeMegaBytes);
     $form->add('File', 'uploadFile', ts('Import Data File'), NULL, TRUE);
     $form->add('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2], TRUE);
-    $form->setMaxFileSize($uploadFileSize);
+    $form->setMaxFileSize($maxFileSizeBytes);
     $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
-      1 => $uploadSize,
-      2 => $uploadFileSize,
-    ]), 'maxfilesize', $uploadFileSize);
+      1 => $maxFileSizeMegaBytes,
+      2 => $maxFileSizeBytes,
+    ]), 'maxfilesize', $maxFileSizeBytes);
     $form->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
     $form->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
     $form->setDataSourceDefaults($this->getDefaultValues());

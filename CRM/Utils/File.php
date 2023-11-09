@@ -1160,4 +1160,23 @@ HTACCESS;
     return $is_dir;
   }
 
+  /**
+   * Get the maximum file size permitted for upload.
+   *
+   * This function contains logic to check the server setting if none
+   * is configured. It is unclear if this is still relevant but perhaps it is no
+   * harm-no-foul.
+   *
+   * @return int
+   *   Size in mega-bytes.
+   */
+  public static function getMaxFileSize(): int {
+    $maxFileSizeMegaBytes = \Civi::settings()->get('maxFileSize');
+    //Fetch maxFileSizeMegaBytes from php_ini when $config->maxFileSize is set to "no limit".
+    if (empty($maxFileSizeMegaBytes)) {
+      $maxFileSizeMegaBytes = round((CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize')) / (1024 * 1024)), 2);
+    }
+    return $maxFileSizeMegaBytes;
+  }
+
 }
