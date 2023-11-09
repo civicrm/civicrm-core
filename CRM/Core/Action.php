@@ -314,7 +314,7 @@ class CRM_Core_Action {
     $url = [];
 
     usort($seqLinks, static function ($a, $b) {
-      return (int) ((int) ($a['weight']) > (int) ($b['weight']));
+      return (int) ((int) ($a['weight'] ?? 0) > (int) ($b['weight'] ?? 0));
     });
 
     foreach ($seqLinks as $i => $link) {
