@@ -404,6 +404,7 @@ class Kernel {
       }
     }
 
+    require_once "api/v3/utils.php";
     $data = \civicrm_api3_create_error($msg, $data);
 
     if (isset($apiRequest['params']) && is_array($apiRequest['params']) && !empty($apiRequest['params']['api.has_parent'])) {
