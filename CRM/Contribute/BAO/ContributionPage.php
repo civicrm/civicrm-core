@@ -413,7 +413,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'isTest' => $isTest,
         'PDFFilename' => 'receipt.pdf',
       ];
-
+      if (!$sendTemplateParams['tokenContext']['contributionId']) {
+        CRM_Core_Error::deprecatedWarning('contribution ID should be set');
+      }
       if ($returnMessageText) {
         [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         return [
