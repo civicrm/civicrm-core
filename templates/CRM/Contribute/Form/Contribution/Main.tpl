@@ -62,7 +62,7 @@
     {/crmRegion}
 
     <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
-      {$intro_text}
+      {$intro_text|purify}
     </div>
     {include file="CRM/common/cidzero.tpl"}
 
