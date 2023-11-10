@@ -4,7 +4,6 @@ use Civi\Api4\ActionSchedule;
 use Civi\Api4\MessageTemplate;
 
 /**
- * Class CRM_UF_Page_ProfileEditorTest
  * @group headless
  */
 class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
@@ -12,32 +11,28 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_saved_search', 'civicrm_action_schedule']);
+    $this->revertTemplateToReservedTemplate();
     parent::tearDown();
   }
 
   /**
    * Test message upgrade process.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMessageTemplateUpgrade(): void {
-    $workFlowID = $this->callAPISuccessGetValue('OptionValue', ['return' => 'id', 'name' => 'membership_online_receipt', 'options' => ['limit' => 1, 'sort' => 'id DESC']]);
-
-    $templates = $this->callAPISuccess('MessageTemplate', 'get', ['workflow_id' => $workFlowID])['values'];
+    $templates = $this->callAPISuccess('MessageTemplate', 'get', ['workflow_name' => 'membership_online_receipt'])['values'];
     foreach ($templates as $template) {
-      $originalText = $template['msg_text'];
-      $this->callAPISuccess('MessageTemplate', 'create', ['msg_text' => 'great what a cool member you are', 'id' => $template['id']]);
-      $msg_text = $this->callAPISuccessGetValue('MessageTemplate', ['id' => $template['id'], 'return' => 'msg_text']);
-      $this->assertEquals('great what a cool member you are', $msg_text);
+      $this->callAPISuccess('MessageTemplate', 'create', ['msg_html' => 'great what a cool member you are', 'id' => $template['id']]);
+      $msg_html = $this->callAPISuccessGetValue('MessageTemplate', ['id' => $template['id'], 'return' => 'msg_html']);
+      $this->assertEquals('great what a cool member you are', $msg_html);
     }
     $messageTemplateObject = new CRM_Upgrade_Incremental_MessageTemplates('5.4.alpha1');
     $messageTemplateObject->updateTemplates();
 
     foreach ($templates as $template) {
-      $msg_text = $this->callAPISuccessGetValue('MessageTemplate', ['id' => $template['id'], 'return' => 'msg_text']);
-      $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}', $msg_text);
-      if ($msg_text !== $originalText) {
-        // Reset value for future tests.
-        $this->callAPISuccess('MessageTemplate', 'create', ['msg_text' => $originalText, 'id' => $template['id']]);
-      }
+      $msg_html = MessageTemplate::get()->addWhere('id', '=', $template['id'])->execute()->first()['msg_html'];
+      $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}', $msg_html);
     }
   }
 
@@ -98,42 +93,36 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
    * Test message upgrade process only edits the default if the template is customised.
    */
   public function testMessageTemplateUpgradeAlreadyCustomised(): void {
-    $workFlowID = civicrm_api3('OptionValue', 'getvalue', ['return' => 'id', 'name' => 'membership_online_receipt', 'options' => ['limit' => 1, 'sort' => 'id DESC']]);
-
-    $templates = $this->callAPISuccess('MessageTemplate', 'get', ['workflow_id' => $workFlowID])['values'];
+    $templates = $this->callAPISuccess('MessageTemplate', 'get', ['workflow_name' => 'membership_online_receipt'])['values'];
     foreach ($templates as $template) {
       if ($template['is_reserved']) {
-        $originalText = $template['msg_text'];
-        $this->callAPISuccess('MessageTemplate', 'create', ['msg_text' => 'great what a cool member you are', 'id' => $template['id']]);
+        $this->callAPISuccess('MessageTemplate', 'create', ['msg_html' => 'great what a cool member you are', 'id' => $template['id']]);
       }
       else {
-        $this->callAPISuccess('MessageTemplate', 'create', ['msg_text' => 'great what a silly sausage you are', 'id' => $template['id']]);
+        $this->callAPISuccess('MessageTemplate', 'create', ['msg_html' => 'great what a silly sausage you are', 'id' => $template['id']]);
       }
     }
     $messageTemplateObject = new CRM_Upgrade_Incremental_MessageTemplates('5.4.alpha1');
     $messageTemplateObject->updateTemplates();
 
     foreach ($templates as $template) {
-      $msg_text = $this->callAPISuccessGetValue('MessageTemplate', ['id' => $template['id'], 'return' => 'msg_text']);
+      $msg_html = MessageTemplate::get()->addWhere('id', '=', $template['id'])->execute()->first()['msg_html'];
       if ($template['is_reserved']) {
-        $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}', $msg_text);
+        $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}', $msg_html);
       }
       else {
-        $this->assertEquals('great what a silly sausage you are', $msg_text);
-      }
-
-      if ($msg_text !== $originalText) {
-        // Reset value for future tests.
-        $this->callAPISuccess('MessageTemplate', 'create', ['msg_text' => $originalText, 'id' => $template['id']]);
+        $this->assertEquals('great what a silly sausage you are', $msg_html);
       }
     }
   }
 
   /**
    * Test function for messages on upgrade.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMessageTemplateGetUpgradeMessages(): void {
-    \Civi\Api4\MessageTemplate::update(FALSE)
+    MessageTemplate::update(FALSE)
       ->addValue('msg_text', 'Edited text')
       ->addWhere('workflow_name', '=', 'contribution_online_receipt')
       ->addWhere('is_default', '=', TRUE)
@@ -181,7 +170,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   /**
    * Test Multiple Relative Date conversions
    */
-  public function testSmartGroupMultipleRelatvieDateConversions(): void {
+  public function testSmartGroupMultipleRelativeDateConversions(): void {
     $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => [
         ['membership_join_date_low', '=', '20190903000000'],
@@ -554,7 +543,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
       'name' => $name,
     ]);
     // API is hardened to strip the spaces to lets re-add in now
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_group SET name = %1 WHERE id = %2", [
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_option_group SET name = %1 WHERE id = %2', [
       1 => [$name, 'String'],
       2 => [$optionGroup['id'], 'Positive'],
     ]);
@@ -578,7 +567,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
       'name' => $name,
     ]);
     // API is hardened to strip the spaces to lets re-add in now
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_group SET name = %1 WHERE id = %2", [
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_option_group SET name = %1 WHERE id = %2', [
       1 => [$name, 'String'],
       2 => [$optionGroup['id'], 'Positive'],
     ]);
