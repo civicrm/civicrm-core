@@ -1449,19 +1449,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         if (!empty($membershipParams['auto_renew'])) {
           $isRecurForFirstTransaction = FALSE;
         }
+        $membershipParams['total_amount'] = $totalAmount;
+        $membershipParams['skipLineItem'] = 0;
+        CRM_Price_BAO_LineItem::getLineItemArray($membershipParams);
       }
-
-      if (!$isProcessSeparateMembershipTransaction) {
+      else {
         // Skip line items in the contribution processing transaction.
         // We will create them with the membership for proper linking.
         $membershipParams['skipLineItem'] = 1;
       }
-      else {
-        $membershipParams['total_amount'] = $totalAmount;
-        $membershipParams['skipLineItem'] = 0;
-        CRM_Price_BAO_LineItem::getLineItemArray($membershipParams);
 
-      }
       $paymentResult = $this->processConfirm(
         $membershipParams,
         $contactID,
