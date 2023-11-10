@@ -197,40 +197,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * Test the confirm form with a separate membership payment configured.
    */
   public function testSeparatePaymentConfirm(): void {
-    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE]);
-    $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID], FALSE);
-    $this->setUpMembershipBlockPriceSet(['minimum_fee' => 100]);
-    $this->createTestEntity('PriceSetEntity', [
-      'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => $contributionPageID,
-      'price_set_id' => $this->ids['PriceSet']['membership_block'],
-    ]);
-    $this->callAPISuccess('MembershipBlock', 'create', [
-      'entity_id' => $contributionPageID,
-      'entity_table' => 'civicrm_contribution_page',
-      'is_required' => TRUE,
-      'is_active' => TRUE,
-      'is_separate_payment' => TRUE,
-      'membership_type_default' => $this->ids['MembershipType'],
-    ]);
-
-    $submittedValues = [
-      'credit_card_number' => 4111111111111111,
-      'cvv2' => 234,
-      'credit_card_exp_date' => [
-        'M' => 2,
-        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
-      ],
-      'price_' . $this->ids['PriceField']['membership'] => $this->ids['PriceFieldValue']['membership_general'],
-      'other_amount' => 100,
-      'priceSetId' => $this->ids['PriceSet']['membership_block'],
-      'credit_card_type' => 'Visa',
-      'email-5' => 'test@test.com',
-      'payment_processor_id' => $paymentProcessorID,
-      'year' => 2021,
-      'month' => 2,
-    ];
-    $form = $this->submitOnlineContributionForm($submittedValues, $contributionPageID);
+    $isSeparateMembershipPayment = TRUE;
+    $form = $this->submitFormWithMembershipAndContribution($isSeparateMembershipPayment);
     $financialTrxnId = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_id' => $form->getContributionID(), 'entity_table' => 'civicrm_contribution', 'sequential' => 1])['values'][0]['financial_trxn_id'];
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', [
       'id' => $financialTrxnId,
@@ -239,6 +207,27 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(1, $financialTrxn['card_type_id']);
     $assignedVariables = $form->getTemplateVariables();
     $this->assertTrue($assignedVariables['is_separate_payment']);
+    // Two emails were sent - check both. The first is a contribution
+    // online receipt & the second is the membership online receipt.
+    $this->assertMailSentContainingStrings([
+      'Contribution Information',
+      '<td style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;">
+         Amount        </td>
+        <td style="padding: 4px; border-bottom: 1px solid #999;">
+         $1,000.00         </td>
+       </tr>',
+      '************1111',
+    ]);
+    $this->assertMailSentContainingStrings([
+      'Membership Information',
+      'Membership Type       </td>
+       <td style="padding: 4px; border-bottom: 1px solid #999;">
+        General
+       </td>',
+      '$1,000.00',
+      'Membership Start Date',
+      '************1111',
+    ], 1);
   }
 
   /**
@@ -262,6 +251,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'is_allow_other_amount' => 1,
       'min_amount' => 20,
       'max_amount' => 2000,
+      'is_email_receipt' => TRUE,
     ], $params))['id'];
     if ($isDefaultContributionPriceSet) {
       PriceSetEntity::create(FALSE)->setValues([
@@ -283,6 +273,53 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues, ['id' => $contributionPageID])
       ->addSubsequentForm('CRM_Contribute_Form_Contribution_Confirm');
     $form->processForm();
+    return $form;
+  }
+
+  /**
+   * @param bool $isSeparateMembershipPayment
+   *
+   * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
+   */
+  private function submitFormWithMembershipAndContribution(bool $isSeparateMembershipPayment) {
+    $paymentProcessorID = $this->paymentProcessorCreate([
+      'payment_processor_type_id' => 'Dummy',
+      'is_test' => FALSE,
+    ]);
+    $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID], FALSE);
+    $this->setUpMembershipBlockPriceSet(['minimum_fee' => 1000]);
+    $this->createTestEntity('PriceSetEntity', [
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $contributionPageID,
+      'price_set_id' => $this->ids['PriceSet']['membership_block'],
+    ]);
+
+    $this->callAPISuccess('MembershipBlock', 'create', [
+      'entity_id' => $contributionPageID,
+      'entity_table' => 'civicrm_contribution_page',
+      'is_required' => TRUE,
+      'is_active' => TRUE,
+      'is_separate_payment' => $isSeparateMembershipPayment,
+      'membership_type_default' => $this->ids['MembershipType'],
+    ]);
+
+    $submittedValues = [
+      'credit_card_number' => 4111111111111111,
+      'cvv2' => 234,
+      'credit_card_exp_date' => [
+        'M' => 2,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+      'price_' . $this->ids['PriceField']['membership'] => $this->ids['PriceFieldValue']['membership_general'],
+      'other_amount' => 100,
+      'priceSetId' => $this->ids['PriceSet']['membership_block'],
+      'credit_card_type' => 'Visa',
+      'email-5' => 'test@test.com',
+      'payment_processor_id' => $paymentProcessorID,
+      'year' => 2021,
+      'month' => 2,
+    ];
+    $form = $this->submitOnlineContributionForm($submittedValues, $contributionPageID);
     return $form;
   }
 
