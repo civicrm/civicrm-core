@@ -104,8 +104,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if (!empty($this->_pcpInfo['id']) && !empty($this->_pcpInfo['intro_text'])) {
       $this->assign('intro_text', $this->_pcpInfo['intro_text']);
     }
-    elseif (!empty($this->_values['intro_text'])) {
-      $this->assign('intro_text', $this->_values['intro_text']);
+    else {
+      $this->assign('intro_text', $this->getContributionPageValue('intro_text'));
     }
 
     $qParams = "reset=1&amp;id={$this->_id}";
