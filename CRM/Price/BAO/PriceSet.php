@@ -801,9 +801,12 @@ WHERE  id = %1";
         ->addWhere('price_field_id', 'IN', array_keys($data['fields']))
         ->setSelect($select)
         ->execute();
+      $taxRates = CRM_Core_PseudoConstant::getTaxRates();
       foreach ($options as $option) {
         // Add in visibility because Smarty templates expect it and it is hard to adjust them to colon format.
         $option['visibility'] = $option['visibility_id:name'];
+        $option['tax_rate'] = (float) ($taxRates[$option['financial_type_id']] ?? 0);
+        $option['tax_amount'] = (float) ($option['tax_rate'] ? CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($option['amount'], $option['tax_rate'])['tax_amount'] : 0);
         $data['fields'][$option['price_field_id']]['options'][$option['id']] = $option;
       }
       $cache->set($cacheKey, $data);
