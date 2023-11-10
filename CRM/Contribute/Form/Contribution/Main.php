@@ -70,12 +70,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    */
   public function preProcess() {
     parent::preProcess();
 
     $this->_paymentProcessors = $this->get('paymentProcessors');
     $this->preProcessPaymentOptions();
+    // If the in-use payment processor is the Dummy processor we assign the name so that a test warning is displayed.
+    $this->assign('dummyTitle', $this->getPaymentProcessorValue('payment_processor_type_id.class') === 'CRM_Dummy' ? $this->getPaymentProcessorValue('payment_processor_type_id.front_end_title') : '');
 
     $this->assignFormVariablesByContributionID();
 
@@ -1438,14 +1443,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Set form variables if contribution ID is found
    */
   public function assignFormVariablesByContributionID(): void {
-    $dummyTitle = 0;
-    foreach ($this->_paymentProcessors as $pp) {
-      if ($pp['class_name'] === 'Payment_Dummy') {
-        $dummyTitle = $pp['name'];
-        break;
-      }
-    }
-    $this->assign('dummyTitle', $dummyTitle);
+    $this->assign('isPaymentOnExistingContribution', (bool) $this->getExistingContributionID());
     $this->assign('pendingAmount', $this->getContributionBalance());
     if (empty($this->getExistingContributionID())) {
       return;
@@ -1457,8 +1455,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $lineItems = $this->getExistingContributionLineItems();
     $this->assign('lineItem', [$this->getPriceSetID() => $lineItems]);
-    $this->assign('is_quick_config', $this->isQuickConfig());
     $this->assign('priceSetID', $this->getPriceSetID());
+    $this->assign('is_quick_config', $this->isQuickConfig());
   }
 
   /**
