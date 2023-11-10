@@ -1111,30 +1111,62 @@ class CRM_Core_SelectValues {
     return $optionValues;
   }
 
-  /**
-   * Dropdown options for quicksearch in the menu
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public static function quicksearchOptions() {
+  public static function getQuicksearchOptions(): array {
     $includeEmail = civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']);
     $options = [
-      'sort_name' => $includeEmail ? ts('Name/Email') : ts('Name'),
-      'id' => ts('Contact ID'),
-      'external_identifier' => ts('External ID'),
-      'first_name' => ts('First Name'),
-      'last_name' => ts('Last Name'),
-      'email_primary.email' => ts('Email'),
-      'phone_primary.phone_numeric' => ts('Phone'),
-      'address_primary.street_address' => ts('Street Address'),
-      'address_primary.city' => ts('City'),
-      'address_primary.postal_code' => ts('Postal Code'),
-      'job_title' => ts('Job Title'),
+      [
+        'key' => 'sort_name',
+        'label' => $includeEmail ? ts('Name/Email') : ts('Name'),
+      ],
+      [
+        'key' => 'id',
+        'label' => ts('Contact ID'),
+      ],
+      [
+        'key' => 'external_identifier',
+        'label' => ts('External ID'),
+      ],
+      [
+        'key' => 'first_name',
+        'label' => ts('First Name'),
+      ],
+      [
+        'key' => 'last_name',
+        'label' => ts('Last Name'),
+      ],
+      [
+        'key' => 'email_primary.email',
+        'label' => ts('Email'),
+        'adv_search_legacy' => 'email',
+      ],
+      [
+        'key' => 'phone_primary.phone_numeric',
+        'label' => ts('Phone'),
+        'adv_search_legacy' => 'phone_numeric',
+      ],
+      [
+        'key' => 'address_primary.street_address',
+        'label' => ts('Street Address'),
+        'adv_search_legacy' => 'street_address',
+      ],
+      [
+        'key' => 'address_primary.city',
+        'label' => ts('City'),
+        'adv_search_legacy' => 'city',
+      ],
+      [
+        'key' => 'address_primary.postal_code',
+        'label' => ts('Postal Code'),
+        'adv_search_legacy' => 'postal_code',
+      ],
+      [
+        'key' => 'job_title',
+        'label' => ts('Job Title'),
+      ],
     ];
     $custom = civicrm_api4('CustomField', 'get', [
       'checkPermissions' => FALSE,
-      'select' => ['name', 'label', 'custom_group_id.name', 'custom_group_id.title', 'option_group_id'],
+      'select' => ['id', 'name', 'label', 'custom_group_id.name', 'custom_group_id.title', 'option_group_id'],
       'where' => [
         ['custom_group_id.extends', 'IN', array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes())],
         ['data_type', 'NOT IN', ['ContactReference', 'Date', 'File']],
@@ -1148,9 +1180,23 @@ class CRM_Core_SelectValues {
       ],
     ]);
     foreach ($custom as $field) {
-      $options[$field['custom_group_id.name'] . '.' . $field['name'] . ($field['option_group_id'] ? ':label' : '')] = $field['custom_group_id.title'] . ': ' . $field['label'];
+      $options[] = [
+        'key' => $field['custom_group_id.name'] . '.' . $field['name'] . ($field['option_group_id'] ? ':label' : ''),
+        'label' => $field['custom_group_id.title'] . ': ' . $field['label'],
+        'adv_search_legacy' => 'custom_' . $field['id'],
+      ];
     }
     return $options;
+  }
+
+  /**
+   * Dropdown options for quicksearch in the menu
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public static function quicksearchOptions() {
+    return array_column(self::getQuicksearchOptions(), 'label', 'key');
   }
 
   /**

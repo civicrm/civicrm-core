@@ -388,6 +388,7 @@
           return false;
         }
         var $menu = $('#crm-qsearch-input').autocomplete('widget');
+        // If only one contact was returned, go directly to that contact page
         if ($('li.ui-menu-item', $menu).length === 1) {
           var cid = $('li.ui-menu-item', $menu).data('ui-autocomplete-item').value;
           if (cid > 0) {
@@ -404,7 +405,8 @@
       function setQuickSearchValue() {
         var $selection = $('.crm-quickSearchField input:checked'),
           label = $selection.parent().text(),
-          value = $selection.val();
+          // Set name because the mini-form submits directly to adv search
+          value = $selection.data('advSearchLegacy') || $selection.val();
         $('#crm-qsearch-input').attr({name: value, placeholder: '\uf002 ' + label});
       }
       $('.crm-quickSearchField').click(function() {
@@ -464,7 +466,7 @@
         '</a>' +
         '<ul>' +
           '<% _.forEach(items, function(item) { %>' +
-            '<li><a href="#" class="crm-quickSearchField"><label><input type="radio" value="<%= item.key %>" name="quickSearchField"> <%- item.value %></label></a></li>' +
+            '<li><a href="#" class="crm-quickSearchField"><label><input type="radio" value="<%= item.key %>" name="quickSearchField" data-adv-search-legacy="<%= item.adv_search_legacy %>"> <%- item.value %></label></a></li>' +
           '<% }) %>' +
         '</ul>' +
       '</li>',

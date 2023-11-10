@@ -36,7 +36,7 @@ class CRM_Admin_Page_AJAX {
 
       $output = [
         'menu' => $menu,
-        'search' => CRM_Utils_Array::makeNonAssociative(self::getSearchOptions()),
+        'search' => self::getSearchOptions(),
       ];
       // Encourage browsers to cache for a long time - 1 year
       $ttl = 60 * 60 * 24 * 364;
@@ -80,15 +80,14 @@ class CRM_Admin_Page_AJAX {
 
   public static function getSearchOptions() {
     $searchOptions = Civi::settings()->get('quicksearch_options');
-    $labels = CRM_Core_SelectValues::quicksearchOptions();
+    $allOptions = array_column(CRM_Core_SelectValues::getQuicksearchOptions(), NULL, 'key');
     $result = [];
     foreach ($searchOptions as $key) {
-      $label = $labels[$key];
-      if (strpos($key, 'custom_') === 0) {
-        $key = 'custom_' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', substr($key, 7), 'id', 'name');
-        $label = array_slice(explode(': ', $label, 2), -1);
-      }
-      $result[$key] = $label;
+      $result[] = [
+        'key' => $key,
+        'value' => $allOptions[$key]['label'],
+        'adv_search_legacy' => $allOptions[$key]['adv_search_legacy'],
+      ];
     }
     return $result;
   }
