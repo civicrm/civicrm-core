@@ -124,43 +124,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     if ($headers) {
       //need to get original headers.
       $result['column_headers'] = $firstrow;
-
-      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-      $columns = array_map($strtolower, $firstrow);
-      $columns = array_map('trim', $columns);
-      $columns = str_replace(' ', '_', $columns);
-      $columns = preg_replace('/[^a-z_]/', '', $columns);
-
-      // need to take care of null as well as duplicate col names.
-      $duplicateColName = FALSE;
-      if (count($columns) != count(array_unique($columns))) {
-        $duplicateColName = TRUE;
-      }
-
-      // need to truncate values per mysql field name length limits
-      // mysql allows 64, but we need to account for appending colKey
-      // CRM-9079
-      foreach ($columns as $colKey => & $colName) {
-        if (strlen($colName) > 58) {
-          $colName = substr($colName, 0, 58);
-        }
-      }
-
-      if (in_array('', $columns) || $duplicateColName) {
-        foreach ($columns as $colKey => & $colName) {
-          if (!$colName) {
-            $colName = "col_$colKey";
-          }
-          elseif ($duplicateColName) {
-            $colName .= "_$colKey";
-          }
-        }
-      }
-
-      // CRM-4881: we need to quote column names, as they may be MySQL reserved words
-      foreach ($columns as & $column) {
-        $column = "`$column`";
-      }
+      $columns = $this->getColumnNamesFromHeaders($firstrow);
     }
     else {
       $columns = [];
@@ -268,6 +232,47 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       'skipColumnHeader' => 1,
     ];
 
+  }
+
+  /**
+   * Get the column names from the headers, turning them into something sql-suitable.
+   *
+   * @param $headers
+   * @return array
+   */
+  private function getColumnNamesFromHeaders($headers): array {
+    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
+    $columns = array_map($strtolower, $headers);
+    $columns = array_map('trim', $columns);
+    $columns = str_replace(' ', '_', $columns);
+    $columns = preg_replace('/[^a-z_]/', '', $columns);
+
+    // need to truncate values per mysql field name length limits
+    // mysql allows 64, but we need to account for appending colKey
+    // CRM-9079
+    foreach ($columns as &$columnName) {
+      if (strlen($columnName) > 58) {
+        $columnName = substr($columnName, 0, 58);
+      }
+    }
+
+    $hasNonUniqueColumnNames = count($columns) !== count(array_unique($columns));
+    if ($hasNonUniqueColumnNames || in_array('', $columns, TRUE)) {
+      foreach ($columns as $colKey => & $colName) {
+        if (!$colName) {
+          $colName = "col_$colKey";
+        }
+        elseif ($hasNonUniqueColumnNames) {
+          $colName .= "_$colKey";
+        }
+      }
+    }
+
+    // CRM-4881: we need to quote column names, as they may be MySQL reserved words
+    foreach ($columns as & $column) {
+      $column = "`$column`";
+    }
+    return $columns;
   }
 
 }
