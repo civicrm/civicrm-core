@@ -73,7 +73,9 @@
 {/literal}
 </div>
 
-{if $membershipBlock AND $is_quick_config}
+{if $isPaymentOnExistingContribution && $membershipBlock && $is_quick_config}
+    {* This code is hit only when ccid is in the url to pay on an existing contribution and it is quick config *}
+    {* Removing the contents of this if does not result in any apparent change & it may be removable *}
     {strip}
       <table id="membership-listings">
           {foreach from=$membershipTypes item=row}
