@@ -21,8 +21,6 @@
 class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_ContributionRecur {
   protected $_mode = NULL;
 
-  protected $_subscriptionDetails = NULL;
-
   public $_bltID = NULL;
 
   /**
