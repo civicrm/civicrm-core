@@ -108,6 +108,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected $currentRowExistingMembership;
 
   /**
+   * @var array
+   */
+  protected $_priceSet;
+
+  /**
    * Get the contribution id for the current row.
    *
    * @return int
@@ -915,7 +920,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * Send email receipt.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Batch_Form_Entry $form
    *   Form object.
    * @param array $formValues
    *
@@ -952,22 +957,22 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
     $form->assign('membership_name', CRM_Member_PseudoConstant::membershipType($membership->membership_type_id));
 
-    [$form->_contributorDisplayName, $form->_contributorEmail]
+    [$contributorDisplayName, $contributorEmail]
       = CRM_Contact_BAO_Contact_Location::getEmailDetails($formValues['contact_id']);
-    $form->_receiptContactId = $formValues['contact_id'];
+    $receiptContactId = $formValues['contact_id'];
 
     CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'workflow' => 'membership_offline_receipt',
         'from' => $this->getFromEmailAddress(),
-        'toName' => $form->_contributorDisplayName,
-        'toEmail' => $form->_contributorEmail,
+        'toName' => $contributorDisplayName,
+        'toEmail' => $contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
         'modelProps' => [
           'contributionID' => $this->getCurrentRowContributionID(),
-          'contactID' => $form->_receiptContactId,
+          'contactID' => $receiptContactId,
           'membershipID' => $this->getCurrentRowMembershipID(),
         ],
       ]
