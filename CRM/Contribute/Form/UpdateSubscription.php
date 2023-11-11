@@ -25,8 +25,6 @@ use Civi\Payment\Exception\PaymentProcessorException;
  */
 class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_ContributionRecur {
 
-  protected $_subscriptionDetails = NULL;
-
   public $_paymentProcessor = NULL;
 
   public $_paymentProcessorObj = NULL;

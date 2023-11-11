@@ -84,6 +84,14 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   protected $selfService;
 
   /**
+   * Used by `CRM_Contribute_Form_UpdateSubscription`
+   *
+   * @var CRM_Core_DAO
+   * @deprecated This is being set temporarily - we should eventually just use the getter fn.
+   */
+  protected $_subscriptionDetails = NULL;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
