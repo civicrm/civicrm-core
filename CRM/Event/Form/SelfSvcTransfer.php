@@ -125,7 +125,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->_event_id = $this->_part_values['event_id'];
     $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}");
     $this->define('Contact', 'ContactFrom', ['id' => (int) $this->_part_values['participant_contact_id']]);
-    if (!$this->getAuthenticatedCheckSumContactID() && !CRM_Core_Permission::check('edit all events')) {
+    if (!$this->validateAuthenticatedCheckSumContactID($this->getDefinition('ContactFrom')['id']) && !CRM_Core_Permission::check('edit all events')) {
       CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to transfer/cancel this participant.'), $url);
     }
     $this->assign('action', $this->_action);
