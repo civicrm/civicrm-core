@@ -349,7 +349,7 @@ class Api4SelectQuery extends Api4Query {
       [$fieldExpr, $operator, $valueExpr, $isExpr] = array_pad((array) $condition, 4, NULL);
       if (in_array($operator, ['=', 'IN'], TRUE)) {
         // If flag is set then value must be parsed as an expression
-        if ($isExpr) {
+        if ($isExpr && is_string($valueExpr)) {
           $expr = SqlExpression::convert($valueExpr);
           $valueExpr = in_array($expr->getType(), ['SqlString', 'SqlNumber'], TRUE) ? $expr->getExpr() : NULL;
         }
