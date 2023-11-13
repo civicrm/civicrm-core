@@ -768,17 +768,19 @@ HERESQL;
 
     $caseTypes = CRM_Case_PseudoConstant::caseType();
     $caseStatuses = CRM_Case_PseudoConstant::caseStatus();
-    $caseTypes = array_flip($caseTypes);
 
     // get statuses as headers for the table
     $url = CRM_Utils_System::url('civicrm/case/search', "reset=1&force=1&all=1&case_status_id=");
-    foreach ($caseStatuses as $key => $name) {
-      $caseSummary['headers'][$key]['status'] = $name;
+    $rows = [];
+    foreach ($caseStatuses as $key => $caseStatusLabel) {
+      $caseSummary['headers'][$key]['status'] = $caseStatusLabel;
       $caseSummary['headers'][$key]['url'] = $url . $key;
+      foreach ($caseTypes as $caseTypeLabel) {
+        $rows[$caseTypeLabel][$caseStatusLabel] = ['count' => NULL, 'url' => NULL];
+      }
     }
 
     // build rows with actual data
-    $rows = [];
     $myGroupByClause = $mySelectClause = $myCaseFromClause = $myCaseWhereClauseA = $myCaseWhereClauseB = '';
 
     if ($allCases) {
@@ -827,10 +829,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
 
     $res = CRM_Core_DAO::executeQuery($query);
     while ($res->fetch()) {
-      if (!isset($rows[$res->case_type])) {
-        $rows[$res->case_type] = array_fill_keys($caseStatuses, []);
-      }
-      if (!empty($rows[$res->case_type]) && !empty($rows[$res->case_type][$res->case_status])) {
+      if (!empty($rows[$res->case_type][$res->case_status]['count'])) {
         $rows[$res->case_type][$res->case_status]['count'] = $rows[$res->case_type][$res->case_status]['count'] + 1;
       }
       else {
@@ -842,7 +841,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
         ];
       }
     }
-    $caseSummary['rows'] = array_merge($caseTypes, $rows);
+    $caseSummary['rows'] = $rows;
 
     return $caseSummary;
   }
