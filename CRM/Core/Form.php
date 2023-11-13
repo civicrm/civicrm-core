@@ -2550,8 +2550,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   protected function validateAuthenticatedCheckSumContactID(?int $contactID): int {
     $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
-    if ($userChecksum && CRM_Contact_BAO_Contact_Utils::validChecksum($requestedContactID, $userChecksum)) {
-      return $requestedContactID;
+    if ($userChecksum && CRM_Contact_BAO_Contact_Utils::validChecksum($contactID, $userChecksum)) {
+      return $contactID;
     }
     return 0;
   }
