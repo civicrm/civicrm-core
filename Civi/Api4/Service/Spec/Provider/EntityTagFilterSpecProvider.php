@@ -53,6 +53,9 @@ class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService impleme
     if ($action !== 'get') {
       return FALSE;
     }
+    if (CoreUtil::isContact($entity)) {
+      return TRUE;
+    }
     $usedFor = \CRM_Core_OptionGroup::values('tag_used_for', FALSE, FALSE, FALSE, NULL, 'name');
     return in_array($entity, $usedFor, TRUE);
   }
