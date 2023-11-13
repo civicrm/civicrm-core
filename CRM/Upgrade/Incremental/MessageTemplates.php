@@ -519,10 +519,10 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   /**
    * Update message templates.
    */
-  public function updateTemplates() {
+  public function updateTemplates(): void {
     $templates = $this->getTemplatesToUpdate();
     foreach ($templates as $template) {
-      $workFlowID = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) as id FROM civicrm_option_value WHERE name = %1", [
+      $workFlowID = CRM_Core_DAO::singleValueQuery('SELECT MAX(id) as id FROM civicrm_option_value WHERE name = %1', [
         1 => [$template['name'], 'String'],
       ]);
       $content = file_get_contents(\Civi::paths()->getPath('[civicrm.root]/xml/templates/message_templates/' . $template['name'] . '_' . $template['type'] . '.tpl'));

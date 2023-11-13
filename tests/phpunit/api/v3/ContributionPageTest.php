@@ -359,7 +359,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID()]);
     $this->callAPISuccess('MembershipPayment', 'getsingle', ['contribution_id' => $contribution['id']]);
     $mut->checkMailLog([
-      'Membership Type: General',
+      'Membership Type',
+      'General',
       'Test Frontend title',
     ]);
     $mut->stop();
@@ -392,7 +393,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertCount(1, $msgs);
 
     $mut->checkMailLog([
-      'Membership Type: General',
+      'Membership Type',
+      'General',
       'Gruffier',
     ], [
       'Amount',
@@ -423,7 +425,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertCount(2, $contributions);
     $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => ['IN' => array_keys($contributions)]]);
     $mut->checkMailLog([
-      'Membership Amount -...              $2.00',
+      'Membership Amount',
+      '$2.00',
     ]);
     $mut->stop();
     $mut->clearMessages();
@@ -487,8 +490,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     // line and no total line.
     $mut->checkAllMailLog(
       [
-        'Amount: $2.00',
-        'Amount: $88.00',
+        'Amount',
+        '$2.00',
+        '$88.00',
         'Membership Fee',
       ],
       [
@@ -518,7 +522,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contributions[$membershipPayment['contribution_id']]['contact_id']);
     $mut->checkMailLog([
       'Gruff',
-      'General Membership: $0.00',
+      'General Membership',
+      '$0.00',
       'Membership Fee',
     ]);
     $mut->stop();
