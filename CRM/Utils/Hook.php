@@ -3116,7 +3116,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function queueTaskError(CRM_Queue_Queue $queue, $item, &$outcome, ?Throwable $exception) {
     $null = NULL;
-    return self::singleton()->invoke(['job', 'params'], $queue, $item,
+    return self::singleton()->invoke(['queue', 'item', 'outcome', 'exception'], $queue, $item,
       $outcome, $exception, $null, $null,
       'civicrm_queueTaskError'
     );
