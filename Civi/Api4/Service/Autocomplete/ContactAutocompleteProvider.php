@@ -13,6 +13,7 @@
 namespace Civi\Api4\Service\Autocomplete;
 
 use Civi\API\Event\PrepareEvent;
+use Civi\Api4\Setting;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\HookInterface;
@@ -78,22 +79,48 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
     // as the menubar autocomplete does not support descriptions
     if (($e->context['formName'] ?? NULL) === 'crmMenubar' && ($e->context['fieldName'] ?? NULL) === 'crm-qsearch-input') {
       $column = ['type' => 'field'];
-      // If doing a search by a field other than the default
+      // Map contact_autocomplete_options settings to v4 format
+      $autocompleteOptionsMap = [
+        2 => 'email_primary.email',
+        3 => 'phone_primary.phone',
+        4 => 'address_primary.street_address',
+        5 => 'address_primary.city',
+        6 => 'address_primary.state_province_id:abbr',
+        7 => 'address_primary.country_id:label',
+        8 => 'address_primary.postal_code',
+      ];
+      // If doing a search by a field other than the default,
+      // add that field to the main column
       if (!empty($e->context['filters'])) {
         $filterField = array_keys($e->context['filters'])[0];
       }
       elseif (\Civi::settings()->get('includeEmailInName')) {
         $filterField = 'email_primary.email';
       }
-      if ($filterField) {
+      // Search on name + filter/email
+      if (!empty($filterField)) {
         $column['key'] = $filterField;
         $column['rewrite'] = "[sort_name] :: [$filterField]";
         $column['empty_value'] = '[sort_name]';
+        $autocompleteOptionsMap = array_diff($autocompleteOptionsMap, [$filterField]);
       }
+      // No filter & email search disabled: search on name only
       else {
         $column['key'] = 'sort_name';
       }
       $e->display['settings']['columns'] = [$column];
+      // Add exta columns based on search preferences
+      $autocompleteOptions = Setting::get(FALSE)
+        ->addSelect('contact_autocomplete_options')->execute()
+        ->first();
+      foreach ($autocompleteOptions['value'] ?? [] as $option) {
+        if (isset($autocompleteOptionsMap[$option])) {
+          $e->display['settings']['columns'][] = [
+            'type' => 'field',
+            'key' => $autocompleteOptionsMap[$option],
+          ];
+        }
+      }
     }
   }
 
