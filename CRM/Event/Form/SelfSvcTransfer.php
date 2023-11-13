@@ -125,7 +125,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->_event_id = $this->_part_values['event_id'];
     $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}");
     $this->define('Contact', 'ContactFrom', ['id' => (int) $this->_part_values['participant_contact_id']]);
-    if (!$this->getAuthenticatedCheckSumContactID() && !CRM_Core_Permission::check('edit all events')) {
+    if (!$this->validateAuthenticatedCheckSumContactID($this->lookup('ContactFrom', 'id')) && !CRM_Core_Permission::check('edit all events')) {
       CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to transfer/cancel this participant.'), $url);
     }
     $this->assign('action', $this->_action);
@@ -154,9 +154,14 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
     // for front-end user show and use the basic three fields used to create a contact
     else {
-      $this->add('text', 'email', ts('To Email'), $this->lookup('ContactFrom', 'email_primary.email'), TRUE);
-      $this->add('text', 'last_name', ts('To Last Name'), $this->_to_contact_last_name, TRUE);
-      $this->add('text', 'first_name', ts('To First Name'), $this->_to_contact_first_name, TRUE);
+      $this->add('text', 'email', ts('To Email'), NULL, TRUE);
+      $this->add('text', 'last_name', ts('To Last Name'), NULL, TRUE);
+      $this->add('text', 'first_name', ts('To First Name'), NULL, TRUE);
+      $this->setDefaults([
+        'email' => $this->lookup('ContactFrom', 'email_primary.email'),
+        'last_name' => $this->_to_contact_last_name,
+        'first_name' => $this->_to_contact_first_name,
+      ]);
     }
 
     $this->addButtons([

@@ -2477,7 +2477,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Ideally the forms would override this so only the cid in the url
    * would be checked in the shared form function.
    *
-   * @return int
+   * @return int|null
    * @throws \CRM_Core_Exception
    */
   public function getRequestedContactID(): ?int {
@@ -2526,9 +2526,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   protected function getAuthenticatedCheckSumContactID(): int {
     $requestedContactID = $this->getRequestedContactID();
+    return $this->validateAuthenticatedCheckSumContactID($requestedContactID);
+  }
+
+  /**
+   * Verify that a contact ID is authenticated as a valid contact by checksum
+   *
+   * @param int|null $contactID
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateAuthenticatedCheckSumContactID(?int $contactID): int {
     $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
-    if ($userChecksum && CRM_Contact_BAO_Contact_Utils::validChecksum($requestedContactID, $userChecksum)) {
-      return $requestedContactID;
+    if ($userChecksum && CRM_Contact_BAO_Contact_Utils::validChecksum($contactID, $userChecksum)) {
+      return $contactID;
     }
     return 0;
   }
