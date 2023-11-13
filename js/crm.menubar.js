@@ -297,12 +297,16 @@
             } else {
               params.filters[option.val()] = request.term;
             }
+            // Specialized Autocomplete SearchDisplay: @see ContactAutocompleteProvider
             CRM.api4('Contact', 'autocomplete', params).then(function(result) {
               var ret = [];
               if (result.length > 0) {
                 $('#crm-qsearch-input').autocomplete('widget').menu('option', 'disabled', false);
                 $.each(result, function(key, item) {
-                  ret.push({value: item.id, label: item.label});
+                  // Add extra items from the description (see contact_autocomplete_options setting)
+                  let description = (item.description || []).filter((v) => v);
+                  let extra = description.length ? ' :: ' + description.join(' :: ') : '';
+                  ret.push({value: item.id, label: item.label + extra});
                 });
               } else {
                 $('#crm-qsearch-input').autocomplete('widget').menu('option', 'disabled', true);
