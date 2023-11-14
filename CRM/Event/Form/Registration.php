@@ -1581,10 +1581,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->set('participantInfo', $this->_participantInfo);
     }
 
-    //send mail Confirmation/Receipt
-    if ($this->_contributeMode != 'checkout' ||
-      $this->_contributeMode != 'notify'
+    if ($this->getPaymentProcessorObject()->supports('noReturn')
     ) {
+      // Send mail Confirmation/Receipt.
       $this->sendMails($params, $registerByID, $participantCount);
     }
   }
