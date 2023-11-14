@@ -29,8 +29,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public $_mode;
 
-  public $_contributeMode = 'direct';
-
   protected $_memTypeSelected;
 
   /**

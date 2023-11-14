@@ -153,8 +153,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    */
   public $_pledgeValues;
 
-  public $_contributeMode = 'direct';
-
   public $_context;
 
   public $_compId;
