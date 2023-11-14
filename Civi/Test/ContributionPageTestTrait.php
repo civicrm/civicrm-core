@@ -11,6 +11,10 @@
 
 namespace Civi\Test;
 
+use Civi\Api4\UFField;
+use Civi\Api4\UFGroup;
+use Civi\Api4\UFJoin;
+
 /**
  * Helper for event tests.
  *
@@ -52,7 +56,9 @@ trait ContributionPageTestTrait {
       'pay_later_text' => 'Send Money Now',
     ];
     $contributionPageValues += $contributionPageDefaults;
-    return $this->createTestEntity('ContributionPage', $contributionPageValues, $identifier);
+    $return = $this->createTestEntity('ContributionPage', $contributionPageValues, $identifier);
+    $this->addProfilesToContributionPage();
+    return $return;
   }
 
   /**
@@ -252,6 +258,72 @@ trait ContributionPageTestTrait {
       'amount' => 55,
       'name' => 'check_box',
     ], 'check_box');
+  }
+
+  /**
+   * Add profiles to the event.
+   *
+   * This function is designed to reflect the
+   * normal use case where events do have profiles.
+   *
+   * Note if any classes do not want profiles, or want something different,
+   * the thinking is they should override this. Once that arises we can review
+   * making it protected rather than private & checking we are happy with the
+   * signature.
+   *
+   * @param string $identifier
+   */
+  private function addProfilesToContributionPage(string $identifier = 'ContributionPage'): void {
+    $profiles = [
+      ['name' => '_pre', 'title' => 'Page Pre Profile', 'weight' => 1, 'fields' => ['email']],
+      ['name' => '_post', 'title' => 'Page Post Profile', 'weight' => 2, 'fields' => ['first_name', 'last_name']],
+    ];
+    foreach ($profiles as $profile) {
+      $this->createContributionPageProfile($profile, $identifier);
+    }
+  }
+
+  /**
+   * Create a profile attached to an event.
+   *
+   * @param array $profile
+   * @param string $identifier
+   */
+  private function createContributionPageProfile(array $profile, string $identifier): void {
+    $profileName = $identifier . $profile['name'];
+    $profileIdentifier = $profileName;
+    try {
+      $this->setTestEntity('UFGroup', UFGroup::create(FALSE)->setValues([
+        'group_type' => 'Individual,Contact',
+        'name' => $profileName,
+        'title' => $profile['title'],
+        'frontend_title' => 'Public ' . $profile['title'],
+      ])->execute()->first(),
+        $profileIdentifier);
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail('UF group creation failed for ' . $profileName . ' with error ' . $e->getMessage());
+    }
+    foreach ($profile['fields'] as $field) {
+      $this->setTestEntity('UFField', UFField::create(FALSE)
+        ->setValues([
+          'uf_group_id:name' => $profileName,
+          'field_name' => $field,
+          'label' => $field,
+        ])
+        ->execute()
+        ->first(), $field . '_' . $profileIdentifier);
+    }
+    try {
+      $this->setTestEntity('UFJoin', UFJoin::create(FALSE)->setValues([
+        'module' => 'CiviContribute',
+        'uf_group_id:name' => $profileName,
+        'entity_id' => $this->getContributionPageID($identifier),
+      ])->execute()->first(), $profileIdentifier);
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail('UF join creation failed for UF Group ' . $profileName . ' with error ' . $e->getMessage());
+    }
   }
 
 }

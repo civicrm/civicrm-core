@@ -355,7 +355,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'id' => $this->getContributionPageID(),
       'first_name' => 'J',
       'last_name' => 'T',
-      'email' => 'JT@ohcanada.ca',
+      'email-5' => 'JT@ohcanada.ca',
       'receive_date' => date('Y-m-d H:i:s'),
       'payment_processor_id' => 0,
       'priceSetId' => $this->getPriceSetID('ContributionPage'),
@@ -385,6 +385,13 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $lineItems = LineItem::get()->addWhere('contribution_id', '=', $contribution['id'])->execute();
     $this->assertEquals($lineItems[0]['line_total'] + $lineItems[1]['line_total'] + $lineItems[2]['line_total'], round($totalAmount, 2), 'Line Item Total is incorrect.');
     $this->assertEquals(round($lineItems[0]['tax_amount'] + $lineItems[1]['tax_amount'] + $lineItems[2]['tax_amount'], 2), round($taxAmount, 2), 'Wrong Sales Tax Amount is calculated and stored.');
+    $mailUtil = new CiviMailUtils($this);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => round($totalAmount + $taxAmount, 2),
+      'payment_instrument_id' => 'Check',
+    ]);
+    $mailUtil->checkMailLog([\Civi::format()->money(337.55), 'Tax Rate', 'Subtotal']);
   }
 
 }
