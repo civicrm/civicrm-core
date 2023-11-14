@@ -22,11 +22,7 @@
         {ts 1=$register}Click <strong>%1</strong> to submit your registration for approval.{/ts}
     {else}
         {ts}Please verify your information.{/ts}
-        {if $contributeMode EQ 'notify' and !$is_pay_later and !$isAmountzero}
-            {ts 1=$register 2=$paymentProcessor.frontend_title}Click <strong>%1</strong> to checkout with %2.{/ts}
-        {else}
-            {ts 1=$register}Click <strong>%1</strong> to complete your registration.{/ts}
-        {/if}
+        {$verifyText}
     {/if}
     </p></div>
     {if $is_pay_later and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}

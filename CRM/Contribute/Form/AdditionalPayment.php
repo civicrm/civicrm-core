@@ -321,7 +321,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     if ($this->_mode) {
       // process credit card
-      $this->assign('contributeMode', 'direct');
       $this->processCreditCard();
     }
 
