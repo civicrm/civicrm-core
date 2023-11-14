@@ -326,4 +326,26 @@ trait ContributionPageTestTrait {
     }
   }
 
+  /**
+   * Get suitable values for submitting the contribution form with a billing block.
+   *
+   * @param string $processorIdentifier
+   *
+   * @return array
+   */
+  protected function getBillingSubmitValues(string $processorIdentifier = 'dummy'): array {
+    // @todo determine the fields from the processor.
+    return [
+      'billing_first_name' => 'Dave',
+      'billing_middle_name' => 'Joseph',
+      'billing_last_name' => 'Wong',
+      'email' => 'dave@example.com',
+      'payment_processor_id' => $this->ids['PaymentProcessor'][$processorIdentifier],
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
+      'cvv2' => 123,
+    ];
+  }
+
 }
