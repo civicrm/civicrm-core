@@ -25,14 +25,16 @@ function civi_case_civicrm_managed(&$entities, $modules) {
  */
 function civi_case_civicrm_selectWhereClause($entityName, &$clauses, $userId, $conditions) {
   if ($entityName === 'Activity') {
+    $casePerms = CRM_Utils_SQL::mergeSubquery('Case');
+    if (!$casePerms) {
+      // Unrestricted access to CiviCase
+      return;
+    }
     // OR group: either it's a non-case activity OR case permissions apply
     $orGroup = [
       'NOT IN (SELECT activity_id FROM civicrm_case_activity)',
+      'IN (SELECT activity_id FROM civicrm_case_activity WHERE case_id ' . implode(' AND case_id ', $casePerms) . ')',
     ];
-    $casePerms = CRM_Utils_SQL::mergeSubquery('Case');
-    if ($casePerms) {
-      $orGroup[] = 'IN (SELECT activity_id FROM civicrm_case_activity WHERE case_id ' . implode(' AND case_id ', $casePerms) . ')';
-    }
     $clauses['id'][] = $orGroup;
   }
 }
