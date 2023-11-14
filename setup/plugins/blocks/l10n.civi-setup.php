@@ -15,7 +15,7 @@ if (!defined('CIVI_SETUP')) {
     $ctrl->blocks['l10n'] = array(
       'is_active' => TRUE,
       'file' => __DIR__ . DIRECTORY_SEPARATOR . 'l10n.tpl.php',
-      'class' => 'if-no-errors',
-      'weight' => 30,
+      'class' => '',
+      'weight' => 10,
     );
   }, \Civi\Setup::PRIORITY_PREPARE);
