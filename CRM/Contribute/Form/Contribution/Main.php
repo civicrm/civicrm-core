@@ -752,7 +752,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $form->assign('is_recur_interval', $this->getContributionPageValue('is_recur_interval'));
     $form->assign('is_recur_installments', $this->getContributionPageValue('is_recur_installments'));
-    $paymentObject = $this->_paymentProcessor['object'];
+    $paymentObject = $this->getPaymentProcessorObject();
     if ($paymentObject) {
       $form->assign('recurringHelpText', $paymentObject->getText('contributionPageRecurringHelp', [
         'is_recur_installments' => !empty($form->_values['is_recur_installments']),
