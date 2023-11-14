@@ -174,19 +174,20 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(2, $result[0]['count']);
     $this->assertEquals(1, $result[1]['count']);
 
-    $result = Contribution::get(FALSE)
-      ->addGroupBy('contact_id')
-      ->addGroupBy('receive_date')
-      ->addSelect('contact_id')
-      ->addSelect('receive_date')
-      ->addSelect('SUM(total_amount)')
-      ->addOrderBy('receive_date')
-      ->addWhere('contact_id', '=', $cid)
-      ->addHaving('SUM(total_amount)', '>', 300)
-      ->execute();
+    $result = (array) civicrm_api4('Contribution', 'get', [
+      'checkPermissions' => FALSE,
+      'groupBy' => ['contact_id', 'receive_date'],
+      'select' => ['contact_id', 'DATE(receive_date)', 'SUM(total_amount)'],
+      'orderBy' => ['receive_date' => 'ASC'],
+      'where' => [
+        ['contact_id', '=', $cid],
+      ],
+      'having' => [
+        ['SUM(total_amount)', '>', 300],
+      ],
+    ], ['DATE:receive_date' => 'SUM:total_amount']);
     $this->assertCount(1, $result);
-    $this->assertStringStartsWith('2020-04-04', $result[0]['receive_date']);
-    $this->assertEquals(400, $result[0]['SUM:total_amount']);
+    $this->assertEquals(['2020-04-04' => 400], $result);
   }
 
   public function testComparisonFunctions(): void {
