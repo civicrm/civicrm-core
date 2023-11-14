@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\LineItem;
 use Civi\Api4\PriceSetEntity;
 use Civi\Test\ContributionPageTestTrait;
 use Civi\Test\FormTrait;
@@ -321,6 +322,76 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ];
     $form = $this->submitOnlineContributionForm($submittedValues, $contributionPageID);
     return $form;
+  }
+
+  /**
+   * Test Tax Amount is calculated properly when using PriceSet with Field Type = Text/Numeric Quantity
+   *
+   * This test creates a pending (pay later) contribution with 3 line items
+   *
+   * |qty  | unit_price| line_total| tax |total including tax|
+   * | 1   | 10        | 10        | 0     |     10 |
+   * | 180   | 16.95   | 3051      |305.1  |  3356.1|
+   * | 110   | 2.95    | 324.5     | 32.45 |   356.95|
+   *
+   * Contribution total = 3723.05
+   *  made up of  tax 337.55
+   *          non tax 3385.5
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @dataProvider getThousandSeparators
+   */
+  public function testSubmitContributionPageWithPriceSetQuantity(string $thousandSeparator): void {
+    $this->setCurrencySeparators($thousandSeparator);
+    $this->enableTaxAndInvoicing();
+    $this->contributionPageWithPriceSetCreate([], ['is_quick_config' => FALSE]);
+    // This function sets the Tax Rate at 10% - it currently has no way to pass Tax Rate into it - so let's work with 10%
+    $this->addTaxAccountToFinancialType($this->ids['FinancialType']['second']);
+    $submitParams = [
+      'id' => $this->getContributionPageID(),
+      'first_name' => 'J',
+      'last_name' => 'T',
+      'email-5' => 'JT@ohcanada.ca',
+      'receive_date' => date('Y-m-d H:i:s'),
+      'payment_processor_id' => 0,
+      'priceSetId' => $this->getPriceSetID('ContributionPage'),
+    ];
+
+    // Add Existing PriceField
+    // qty = 1; unit_price = $10.00. No sales tax.
+    $submitParams['price_' . $this->ids['PriceField']['radio_field']] = $this->ids['PriceFieldValue']['10_dollars'];
+
+    // Set quantity for our 16.95 text field to 180 - ie 180 * 16.95 is the code and 180 * 16.95 * 0.10 is the tax.
+    $submitParams['price_' . $this->ids['PriceField']['text_field_16.95']] = 180;
+
+    // Set quantity for our 2.95 text field to 110 - ie 180 * 2.95 is the code and 110 * 2.95 * 0.10 is the tax.
+    $submitParams['price_' . $this->ids['PriceField']['text_field_2.95']] = 110;
+
+    // This is the correct Tax Amount - use it later to compare to what the CiviCRM Core came up with at the LineItem level
+    $taxAmount = ((180 * 16.95 * 0.10) + (110 * 2.95 * 0.10));
+    $totalAmount = 10 + (180 * 16.95) + (110 * 2.95);
+
+    $this->submitOnlineContributionForm($submitParams, $this->getContributionPageID());
+    $this->validateAllContributions();
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contribution_page_id' => $this->getContributionPageID(),
+    ]);
+
+    $lineItems = LineItem::get()->addWhere('contribution_id', '=', $contribution['id'])->execute();
+    $this->assertEquals($lineItems[0]['line_total'] + $lineItems[1]['line_total'] + $lineItems[2]['line_total'], round($totalAmount, 2), 'Line Item Total is incorrect.');
+    $this->assertEquals(round($lineItems[0]['tax_amount'] + $lineItems[1]['tax_amount'] + $lineItems[2]['tax_amount'], 2), round($taxAmount, 2), 'Wrong Sales Tax Amount is calculated and stored.');
+    $mailUtil = new CiviMailUtils($this);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => round($totalAmount + $taxAmount, 2),
+      'payment_instrument_id' => 'Check',
+    ]);
+    $mailUtil->checkMailLog([\Civi::format()->money(337.55), 'Tax Rate', 'Subtotal']);
   }
 
 }
