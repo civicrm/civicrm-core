@@ -179,7 +179,6 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addGroupBy('receive_date')
       ->addSelect('contact_id')
       ->addSelect('receive_date')
-      ->addSelect('SUM(total_amount)')
       ->addOrderBy('receive_date')
       ->addWhere('contact_id', '=', $cid)
       ->addHaving('SUM(total_amount)', '>', 300)
@@ -187,6 +186,21 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(1, $result);
     $this->assertStringStartsWith('2020-04-04', $result[0]['receive_date']);
     $this->assertEquals(400, $result[0]['SUM:total_amount']);
+
+    // check we can use index param instead of select with a HAVING clause
+    $result = (array) civicrm_api4('Contribution', 'get', [
+      'checkPermissions' => FALSE,
+      'groupBy' => ['contact_id', 'receive_date'],
+      'orderBy' => ['receive_date' => 'ASC'],
+      'where' => [
+        ['contact_id', '=', $cid],
+      ],
+      'having' => [
+        ['SUM(total_amount)', '>', 300],
+      ],
+    ], ['receive_date' => 'contact_id']);
+    $this->assertCount(1, $result);
+    $this->assertEquals(['2020-04-04 00:00:00' => $cid], $result);
   }
 
   public function testComparisonFunctions(): void {
