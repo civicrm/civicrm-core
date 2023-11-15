@@ -14,6 +14,7 @@
         status,
         args,
         submissionResponse,
+        ts = CRM.ts('org.civicrm.afform'),
         ctrl = this;
 
       this.$onInit = function() {
@@ -112,7 +113,8 @@
 
         $element.trigger('crmFormSuccess', {
           afform: metaData,
-          data: data
+          data: data,
+          submissionResponse: submissionResponse,
         });
 
         status.resolve();
@@ -197,10 +199,9 @@
           }
         })
         .catch(function(error) {
-          status.resolve();
-          status = CRM.status(error.error_message, 'error');
+          status.reject();
           $element.unblock();
-          CRM.alert(error.error_message, ts('Form Error'));
+          CRM.alert(error.error_message || '', ts('Form Error'));
         });
       };
     }

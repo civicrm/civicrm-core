@@ -13,7 +13,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
-    'help' => ['id' => 'acl_financial_type'],
+    'help' => ['id' => 'acl_financial_type', 'file' => 'CRM/Admin/Form/Preferences/Contribute.hlp'],
     'settings_pages' => ['contribute' => ['weight' => 30]],
     'on_change' => [
       'financialacls_toggle',

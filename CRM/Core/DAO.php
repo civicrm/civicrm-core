@@ -780,6 +780,10 @@ class CRM_Core_DAO extends DB_DataObject {
           }
         }
         elseif (is_array($value) && !empty($field['serialize'])) {
+          if (!empty($field['pseudoconstant'])) {
+            // Pseudoconstant implies 1-1 option matching; duplicates would not make sense
+            $value = array_unique($value);
+          }
           $this->$dbName = CRM_Core_DAO::serializeField($value, $field['serialize']);
           $allNull = FALSE;
         }

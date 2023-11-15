@@ -65,6 +65,8 @@ class Download extends AbstractRunAction {
         \CRM_Utils_Array::remove($settings['columns'][$index], 'link', 'editable', 'icons', 'cssClass');
       }
     }
+    // Reset indexes as some items may have been removed
+    $settings['columns'] = array_values($settings['columns']);
 
     // Displays are only exportable if they have actions enabled
     if (empty($settings['actions'])) {

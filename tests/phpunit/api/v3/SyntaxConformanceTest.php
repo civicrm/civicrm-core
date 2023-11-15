@@ -102,6 +102,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Logging',
     ];
     $this->toBeImplemented['create'] = [
+      'Afform',
       'Cxn',
       'CxnApp',
       'SurveyRespondant',
@@ -845,6 +846,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     if ($entityName === 'Note') {
       $this->markTestIncomplete('Note can not be processed here because of a vagary in the note api, it adds entity_table=contact to the get params when id is not present - which makes sense almost always but kills this test');
     }
+    elseif ($entityName === 'Afform') {
+      $this->markTestSkipped('Not necessary.');
+    }
     $this->quickCleanup(['civicrm_uf_match']);
     // so subsidiary activities are created
     $this->createLoggedInUser();
@@ -1096,7 +1100,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $toBeIgnored = array_merge($this->toBeImplemented['get'],
       $this->getDeprecatedAPIs(),
       $this->toBeSkipped_get(TRUE),
-      $this->toBeSkippedGetByID()
+      $this->toBeSkippedGetByID(),
+      ['Afform']
     );
     if (in_array($entityName, $toBeIgnored)) {
       return;

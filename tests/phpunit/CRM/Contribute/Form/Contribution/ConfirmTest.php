@@ -9,7 +9,11 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+use Civi\Api4\LineItem;
 use Civi\Api4\PriceSetEntity;
+use Civi\Test\ContributionPageTestTrait;
+use Civi\Test\FormTrait;
 
 /**
  *  Test APIv3 civicrm_contribute_* functions
@@ -21,6 +25,8 @@ use Civi\Api4\PriceSetEntity;
 class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_PriceSetTrait;
+  use FormTrait;
+  use ContributionPageTestTrait;
 
   /**
    * Clean up DB.
@@ -193,61 +199,51 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * Test the confirm form with a separate membership payment configured.
    */
   public function testSeparatePaymentConfirm(): void {
-    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE]);
-    $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
-    $this->setUpMembershipBlockPriceSet(['minimum_fee' => 100]);
-    $this->callAPISuccess('membership_block', 'create', [
-      'entity_id' => $contributionPageID,
-      'entity_table' => 'civicrm_contribution_page',
-      'is_required' => TRUE,
-      'is_active' => TRUE,
-      'is_separate_payment' => TRUE,
-      'membership_type_default' => $this->ids['MembershipType'],
-    ]);
-    /** @var CRM_Contribute_Form_Contribution_Confirm $form */
-    $_REQUEST['id'] = $contributionPageID;
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Confirm', [
-      'credit_card_number' => 4111111111111111,
-      'cvv2' => 234,
-      'credit_card_exp_date' => [
-        'M' => 2,
-        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
-      ],
-      $this->getPriceFieldLabelForContributionPage($contributionPageID) => 100,
-      'priceSetId' => $this->ids['PriceSet']['contribution_page' . $contributionPageID],
-      'credit_card_type' => 'Visa',
-      'email-5' => 'test@test.com',
-      'payment_processor_id' => $paymentProcessorID,
-      'year' => 2021,
-      'month' => 2,
-    ]);
-    // @todo - the way amount is handled is crazy so we have to set here
-    // but it should be calculated from submit variables.
-    $form->set('amount', 100);
-    $form->preProcess();
-    $form->buildQuickForm();
-    $form->postProcess();
-    $financialTrxnId = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_id' => $form->_contributionID, 'entity_table' => 'civicrm_contribution', 'sequential' => 1])['values'][0]['financial_trxn_id'];
+    $isSeparateMembershipPayment = TRUE;
+    $form = $this->submitFormWithMembershipAndContribution($isSeparateMembershipPayment);
+    $financialTrxnId = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_id' => $form->getContributionID(), 'entity_table' => 'civicrm_contribution', 'sequential' => 1])['values'][0]['financial_trxn_id'];
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', [
       'id' => $financialTrxnId,
     ])['values'][$financialTrxnId];
     $this->assertEquals('1111', $financialTrxn['pan_truncation']);
     $this->assertEquals(1, $financialTrxn['card_type_id']);
-    $assignedVariables = $form->get_template_vars();
+    $assignedVariables = $form->getTemplateVariables();
     $this->assertTrue($assignedVariables['is_separate_payment']);
+    // Two emails were sent - check both. The first is a contribution
+    // online receipt & the second is the membership online receipt.
+    $this->assertMailSentContainingStrings([
+      'Contribution Information',
+      '<td style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;">
+         Amount        </td>
+        <td style="padding: 4px; border-bottom: 1px solid #999;">
+         $1,000.00         </td>
+       </tr>',
+      '************1111',
+    ]);
+    $this->assertMailSentContainingStrings([
+      'Membership Information',
+      'Membership Type       </td>
+       <td style="padding: 4px; border-bottom: 1px solid #999;">
+        General
+       </td>',
+      '$1,000.00',
+      'Membership Start Date',
+      '************1111',
+    ], 1);
   }
 
   /**
    * Create a basic contribution page.
    *
    * @param array $params
+   * @param bool $isDefaultContributionPriceSet
    *
    * @return int
    *
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function createContributionPage(array $params): int {
+  protected function createContributionPage(array $params, bool $isDefaultContributionPriceSet = TRUE): int {
     $contributionPageID = (int) $this->callAPISuccess('ContributionPage', 'create', array_merge([
       'title' => 'Test Contribution Page',
       'financial_type_id' => 'Campaign Contribution',
@@ -257,13 +253,196 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'is_allow_other_amount' => 1,
       'min_amount' => 20,
       'max_amount' => 2000,
+      'is_email_receipt' => TRUE,
     ], $params))['id'];
-    PriceSetEntity::create(FALSE)->setValues([
+    if ($isDefaultContributionPriceSet) {
+      PriceSetEntity::create(FALSE)->setValues([
+        'entity_table' => 'civicrm_contribution_page',
+        'entity_id' => $contributionPageID,
+        'price_set_id:name' => 'default_contribution_amount',
+      ])->execute();
+    }
+    return $contributionPageID;
+  }
+
+  /**
+   * @param array $submittedValues
+   * @param int $contributionPageID
+   *
+   * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
+   */
+  protected function submitOnlineContributionForm(array $submittedValues, int $contributionPageID) {
+    $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues, ['id' => $contributionPageID])
+      ->addSubsequentForm('CRM_Contribute_Form_Contribution_Confirm');
+    $form->processForm();
+    return $form;
+  }
+
+  /**
+   * @param bool $isSeparateMembershipPayment
+   *
+   * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
+   */
+  private function submitFormWithMembershipAndContribution(bool $isSeparateMembershipPayment) {
+    $paymentProcessorID = $this->paymentProcessorCreate([
+      'payment_processor_type_id' => 'Dummy',
+      'is_test' => FALSE,
+    ]);
+    $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID], FALSE);
+    $this->setUpMembershipBlockPriceSet(['minimum_fee' => 1000]);
+    $this->createTestEntity('PriceSetEntity', [
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $contributionPageID,
-      'price_set_id:name' => 'default_contribution_amount',
-    ])->execute();
-    return $contributionPageID;
+      'price_set_id' => $this->ids['PriceSet']['membership_block'],
+    ]);
+
+    $this->callAPISuccess('MembershipBlock', 'create', [
+      'entity_id' => $contributionPageID,
+      'entity_table' => 'civicrm_contribution_page',
+      'is_required' => TRUE,
+      'is_active' => TRUE,
+      'is_separate_payment' => $isSeparateMembershipPayment,
+      'membership_type_default' => $this->ids['MembershipType'],
+    ]);
+
+    $submittedValues = [
+      'credit_card_number' => 4111111111111111,
+      'cvv2' => 234,
+      'credit_card_exp_date' => [
+        'M' => 2,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+      'price_' . $this->ids['PriceField']['membership'] => $this->ids['PriceFieldValue']['membership_general'],
+      'other_amount' => 100,
+      'priceSetId' => $this->ids['PriceSet']['membership_block'],
+      'credit_card_type' => 'Visa',
+      'email-5' => 'test@test.com',
+      'payment_processor_id' => $paymentProcessorID,
+      'year' => 2021,
+      'month' => 2,
+    ];
+    return $this->submitOnlineContributionForm($submittedValues, $contributionPageID);
+  }
+
+  /**
+   * Test Tax Amount is calculated properly when using PriceSet with Field Type = Text/Numeric Quantity
+   *
+   * This test creates a pending (pay later) contribution with 3 line items
+   *
+   * |qty  | unit_price| line_total| tax |total including tax|
+   * | 1   | 10        | 10        | 0     |     10 |
+   * | 180   | 16.95   | 3051      |305.1  |  3356.1|
+   * | 110   | 2.95    | 324.5     | 32.45 |   356.95|
+   *
+   * Contribution total = 3723.05
+   *  made up of  tax 337.55
+   *          non tax 3385.5
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @dataProvider getThousandSeparators
+   */
+  public function testSubmitContributionComplexPriceSetPayLater(string $thousandSeparator): void {
+    $this->setCurrencySeparators($thousandSeparator);
+    $this->enableTaxAndInvoicing();
+    $this->contributionPageWithPriceSetCreate([], ['is_quick_config' => FALSE]);
+    // This function sets the Tax Rate at 10% - it currently has no way to pass Tax Rate into it - so let's work with 10%
+    $this->addTaxAccountToFinancialType($this->ids['FinancialType']['second']);
+    $submitParams = [
+      'id' => $this->getContributionPageID(),
+      'first_name' => 'J',
+      'last_name' => 'T',
+      'email-5' => 'JT@ohcanada.ca',
+      'receive_date' => date('Y-m-d H:i:s'),
+      'payment_processor_id' => 0,
+      'priceSetId' => $this->getPriceSetID('ContributionPage'),
+    ];
+
+    // Add Existing PriceField
+    // qty = 1; unit_price = $10.00. No sales tax.
+    $submitParams['price_' . $this->ids['PriceField']['radio_field']] = $this->ids['PriceFieldValue']['10_dollars'];
+
+    // Set quantity for our 16.95 text field to 180 - ie 180 * 16.95 is the code and 180 * 16.95 * 0.10 is the tax.
+    $submitParams['price_' . $this->ids['PriceField']['text_field_16.95']] = 180;
+
+    // Set quantity for our 2.95 text field to 110 - ie 180 * 2.95 is the code and 110 * 2.95 * 0.10 is the tax.
+    $submitParams['price_' . $this->ids['PriceField']['text_field_2.95']] = 110;
+
+    // This is the correct Tax Amount - use it later to compare to what the CiviCRM Core came up with at the LineItem level
+    $taxAmount = ((180 * 16.95 * 0.10) + (110 * 2.95 * 0.10));
+    $totalAmount = 10 + (180 * 16.95) + (110 * 2.95);
+
+    $this->submitOnlineContributionForm($submitParams, $this->getContributionPageID());
+    $this->validateAllContributions();
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contribution_page_id' => $this->getContributionPageID(),
+    ]);
+
+    $lineItems = LineItem::get()->addWhere('contribution_id', '=', $contribution['id'])->execute();
+    $this->assertEquals($lineItems[0]['line_total'] + $lineItems[1]['line_total'] + $lineItems[2]['line_total'], round($totalAmount, 2), 'Line Item Total is incorrect.');
+    $this->assertEquals(round($lineItems[0]['tax_amount'] + $lineItems[1]['tax_amount'] + $lineItems[2]['tax_amount'], 2), round($taxAmount, 2), 'Wrong Sales Tax Amount is calculated and stored.');
+    $mailUtil = new CiviMailUtils($this);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => round($totalAmount + $taxAmount, 2),
+      'payment_instrument_id' => 'Check',
+    ]);
+    $mailUtil->checkMailLog([\Civi::format()->money(337.55), 'Tax Rate', 'Subtotal']);
+  }
+
+  /**
+   * Test form submission with multiple option price set.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitContributionPageWithPriceSetTaxEnabled(string $thousandSeparator): void {
+    $this->setCurrencySeparators($thousandSeparator);
+    $this->enableTaxAndInvoicing();
+    $this->contributionPageWithPriceSetCreate([], ['is_quick_config' => FALSE]);
+    // This function sets the Tax Rate at 10% - it currently has no way to pass Tax Rate into it - so let's work with 10%
+    $this->addTaxAccountToFinancialType($this->ids['FinancialType']['second']);
+    $this->submitOnlineContributionForm([
+      'id' => $this->getContributionPageID(),
+      'first_name' => 'Billy',
+      'last_name' => 'Gruff',
+      'email-5' => 'billy@goat.gruff',
+      'receive_date' => date('Y-m-d H:i:s'),
+      'payment_processor_id' => 0,
+      'priceSetId' => $this->getPriceSetID('ContributionPage'),
+      // qty = 1 * unit_price = $10.00 = 10. No sales tax.
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
+      // qty = 2 * unit_price = $16.95 = 33.90. Tax = $3.39.
+      'price_' . $this->ids['PriceField']['text_field_16.95'] => 2,
+    ] + $this->getBillingSubmitValues(),
+      $this->getContributionPageID()
+    );
+
+    $contribution = Contribution::get()->addWhere('contribution_page_id', '=', $this->getContributionPageID())->execute()->first();
+    $this->assertEquals(47.29, $contribution['total_amount']);
+    $lineItems = $this->callAPISuccess('LineItem', 'get', [
+      'contribution_id' => $contribution['id'],
+    ]);
+    $this->assertEquals(2, $lineItems['count']);
+    $totalLineAmount = 0;
+    foreach ($lineItems['values'] as $lineItem) {
+      $totalLineAmount += $lineItem['line_total'];
+    }
+    $this->assertEquals(43.90, $totalLineAmount);
+    $this->assertMailSentContainingStrings([
+      \Civi::format()->money(3.39),
+      'Tax Rate',
+      'Subtotal',
+    ]);
+
   }
 
 }

@@ -66,14 +66,13 @@ class CRM_Utils_Number {
   }
 
   /**
-   * Some kind of numbery-looky-printy thing.
+   * Convert a file size value from the formats allowed in php_ini to the number of bytes.
    *
    * @param string $size
-   * @param bool $checkForPostMax
    *
    * @return int
    */
-  public static function formatUnitSize($size, $checkForPostMax = FALSE) {
+  public static function formatUnitSize($size): int {
     if ($size) {
       $last = strtolower($size[strlen($size) - 1]);
       $size = (int) $size;
@@ -86,19 +85,6 @@ class CRM_Utils_Number {
           $size *= 1024;
         case 'k':
           $size *= 1024;
-      }
-
-      if ($checkForPostMax) {
-        $maxImportFileSize = self::formatUnitSize(ini_get('upload_max_filesize'));
-        $postMaxSize = self::formatUnitSize(ini_get('post_max_size'));
-        if ($maxImportFileSize > $postMaxSize && $postMaxSize == $size) {
-          CRM_Core_Session::setStatus(ts("Note: Upload max filesize ('upload_max_filesize') should not exceed Post max size ('post_max_size') as defined in PHP.ini, please check with your system administrator."), ts("Warning"), "alert");
-        }
-        // respect php.ini upload_max_filesize
-        if ($size > $maxImportFileSize && $size !== $postMaxSize) {
-          $size = $maxImportFileSize;
-          CRM_Core_Session::setStatus(ts("Note: Please verify your configuration for Maximum File Size (in MB) <a href='%1'>Administrator >> System Settings >> Misc</a>. It should support 'upload_max_size' as defined in PHP.ini.Please check with your system administrator.", [1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1')]), ts("Warning"), "alert");
-        }
       }
       return $size;
     }

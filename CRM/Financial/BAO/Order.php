@@ -683,10 +683,10 @@ class CRM_Financial_BAO_Order {
           if (!empty($option['membership_type_id'])) {
             $membershipType = CRM_Member_BAO_MembershipType::getMembershipType((int) $option['membership_type_id']);
             $metadata[$index]['options'][$optionID]['auto_renew'] = (int) $membershipType['auto_renew'];
-            if ($membershipType['auto_renew'] && empty($this->priceSetMetadata['auto_renew_membership_type'])) {
+            if ($membershipType['auto_renew'] && empty($this->priceSetMetadata['auto_renew_membership_field'])) {
               // Quick form layer supports one auto-renew membership type per price set. If we
               // want more for any reason we can add another array property.
-              $this->priceSetMetadata['auto_renew_membership_type'] = (int) $option['membership_type_id'];
+              $this->priceSetMetadata['auto_renew_membership_field'] = (int) $option['price_field_id'];
             }
           }
         }
@@ -711,8 +711,7 @@ class CRM_Financial_BAO_Order {
     if (empty($this->priceSetMetadata)) {
       $this->priceSetMetadata = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($this->getPriceSetID());
       $this->priceSetMetadata['id'] = $this->getPriceSetID();
-      // @todo - make sure this is an array - commented out for now as this PR is against the rc.
-      // $priceSetMetadata['extends'] = explode(CRM_Core_DAO::VALUE_SEPARATOR, $priceSetMetadata['extends']);
+      $this->priceSetMetadata['auto_renew_membership_field'] = NULL;
       $this->setPriceFieldMetadata($this->priceSetMetadata['fields']);
       unset($this->priceSetMetadata['fields']);
     }
@@ -725,8 +724,7 @@ class CRM_Financial_BAO_Order {
     }
     // Access the property if set, to avoid a potential loop when the hook is called.
     $priceSetMetadata = $this->priceSetMetadata ?: $this->getPriceSetMetadata();
-    $extends = explode(CRM_Core_DAO::VALUE_SEPARATOR, $priceSetMetadata['extends']);
-    return in_array(CRM_Core_Component::getComponentID('CiviMember'), $extends, FALSE);
+    return in_array(CRM_Core_Component::getComponentID('CiviMember'), $priceSetMetadata['extends'], FALSE);
   }
 
   /**

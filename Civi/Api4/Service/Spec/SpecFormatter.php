@@ -169,7 +169,7 @@ class SpecFormatter {
     }
     else {
       $options = \CRM_Utils_Array::makeNonAssociative($optionLabels, 'id', 'label');
-      if (is_array($returnFormat)) {
+      if (is_array($returnFormat) && $options) {
         self::addOptionProps($options, $spec, $bao, $fieldName, $values, $returnFormat);
       }
     }

@@ -262,8 +262,8 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
    * @param string $output
    *   What should the result set include (web/email/csv).
    *
-   * @return int
-   *   the total number of rows for this action
+   * @return array
+   *   Rows number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     $result = $this->_query->searchQuery($offset, $rowCount, $sort,
@@ -275,9 +275,6 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
 
     // process the result of the query
     $rows = [];
-
-    // get all pledge status
-    $pledgeStatuses = CRM_Pledge_BAO_Pledge::buildOptions('status_id');
 
     // get all campaigns.
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
@@ -302,29 +299,30 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
 
       // the columns we are interested in
       foreach (self::$_properties as $property) {
-        if (isset($result->$property)) {
-          $row[$property] = $result->$property;
+        if (in_array($property, ['pledge_amount', 'pledge_total_paid', 'pledge_next_pay_amount', 'pledge_outstanding_amount'])) {
+          $row[$property] = $result->$property ? (float) $result->$property : 0;
+        }
+        else {
+          $row[$property] = $result->$property ?? NULL;
         }
       }
 
       // carry campaign on selectors.
       $row['campaign'] = $allCampaigns[$result->pledge_campaign_id] ?? NULL;
       $row['campaign_id'] = $result->pledge_campaign_id;
-
-      // add pledge status name
-      if (!empty($row['pledge_status_id'])) {
-        $row['pledge_status_name'] = CRM_Utils_Array::value($row['pledge_status_id'],
-          $pledgeStatuses
-        );
+      if (isset($row['pledge_total_paid'])) {
+        $row['pledge_balance_amount'] = $row['pledge_amount'] - $row['pledge_total_paid'];
       }
+      // add pledge status name
+      $statusID = $row['pledge_status_id'] ?? NULL;
+      $row['pledge_status_name'] = CRM_Core_PseudoConstant::getLabel('CRM_Pledge_BAO_Pledge', 'status_id', $statusID);
+
       // append (test) to status label
       if (!empty($row['pledge_is_test'])) {
         $row['pledge_status'] = CRM_Core_TestEntity::appendTestText($row['pledge_status']);
       }
       $hideOption = [];
-      if (CRM_Utils_Array::key('Cancelled', $row) ||
-        CRM_Utils_Array::key('Completed', $row)
-      ) {
+      if (in_array(CRM_Core_PseudoConstant::getName('CRM_Pledge_BAO_Pledge', 'status_id', $statusID), ['Completed', 'Cancelled'])) {
         $hideOption[] = 'Cancel';
       }
 

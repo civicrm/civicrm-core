@@ -56,6 +56,7 @@ return [
         'saved_search_id.name' => 'Scheduled_Jobs',
         'type' => 'table',
         'settings' => [
+          'actions' => TRUE,
           'description' => NULL,
           'sort' => [
             [
@@ -187,7 +188,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit Job'),
+                  'text' => E::ts('Edit'),
                   'style' => 'default',
                   'path' => '',
                   'condition' => [],
@@ -227,7 +228,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete Job'),
+                  'text' => E::ts('Delete'),
                   'style' => 'danger',
                   'path' => '',
                   'condition' => [],
@@ -237,7 +238,6 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'actions' => FALSE,
           'classes' => [
             'table',
             'table-striped',

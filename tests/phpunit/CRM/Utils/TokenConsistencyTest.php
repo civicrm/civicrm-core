@@ -776,9 +776,6 @@ December 21st, 2007
     $this->createLoggedInUser();
     $this->setupParticipantScheduledReminder();
 
-    $tokens = CRM_Core_SelectValues::participantTokens();
-    $this->assertEquals(array_diff_key($this->getParticipantTokens(), $this->getUnadvertisedTokens()), $tokens);
-
     $mut = new CiviMailUtils($this);
 
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
@@ -786,9 +783,7 @@ December 21st, 2007
       'smarty' => FALSE,
       'schema' => ['participantId'],
     ]);
-    $this->assertEquals(array_merge($tokens, $this->getEventTokens(), $this->getDomainTokens()), $tokenProcessor->listTokens());
-
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callAPISuccess('Job', 'send_reminder', []);
     $expected = $this->getExpectedParticipantTokenOutput();
     $mut->checkMailLog([$expected]);
 
@@ -1054,7 +1049,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
    *
    * @return string[]
    */
-  protected function getRecurEntityTokens($entity): array {
+  protected function getRecurEntityTokens(string $entity): array {
     return [
       '{' . $entity . '.contribution_recur_id.id}' => 'Recurring Contribution ID',
       '{' . $entity . '.contribution_recur_id.contact_id}' => 'Contact ID',

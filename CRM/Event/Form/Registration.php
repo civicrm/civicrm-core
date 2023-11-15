@@ -21,6 +21,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   use CRM_Financial_Form_FrontEndPaymentFormTrait;
   use CRM_Event_Form_EventFormTrait;
+  use CRM_Financial_Form_PaymentProcessorFormTrait;
 
   /**
    * The id of the event we are processing.
@@ -381,10 +382,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
     // The concept of contributeMode is deprecated.
     $this->_contributeMode = $this->get('contributeMode');
-    $this->assign('contributeMode', $this->_contributeMode);
 
-    $this->assign('paidEvent', $this->_values['event']['is_monetary']);
-
+    $this->assign('paidEvent', $this->getEventValue('is_monetary'));
     // we do not want to display recently viewed items on Registration pages
     $this->assign('displayRecent', FALSE);
 
@@ -1580,10 +1579,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->set('participantInfo', $this->_participantInfo);
     }
 
-    //send mail Confirmation/Receipt
-    if ($this->_contributeMode != 'checkout' ||
-      $this->_contributeMode != 'notify'
+    if ($this->getPaymentProcessorObject()->supports('noReturn')
     ) {
+      // Send mail Confirmation/Receipt.
       $this->sendMails($params, $registerByID, $participantCount);
     }
   }

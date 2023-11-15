@@ -279,8 +279,9 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     // The default mockPage has 1 explicit requirement + 2 automatic requirements.
     Afform::revert()->addWhere('name', '=', $formName)->execute();
     $angModule = Civi::service('angular')->getModule($formName);
-    $this->assertEquals(['afCore', 'mockBespoke', 'mockBareFile', 'mockFoo'], $angModule['requires']);
+    sort($angModule['requires']);
     $storedRequires = Afform::get()->addWhere('name', '=', $formName)->addSelect('requires')->execute();
+    $this->assertEquals(['afCore', 'mockBareFile', 'mockBespoke', 'mockFoo'], $angModule['requires']);
     $this->assertEquals(['mockBespoke'], $storedRequires[0]['requires']);
 
     // Knock down to 1 explicit + 1 automatic.
@@ -290,8 +291,9 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       ->setValues(['layout' => '<div>The bare file says "<mock-bare-file/>"</div>'])
       ->execute();
     $angModule = Civi::service('angular')->getModule($formName);
-    $this->assertEquals(['afCore', 'mockBespoke', 'mockBareFile'], $angModule['requires']);
+    sort($angModule['requires']);
     $storedRequires = Afform::get()->addWhere('name', '=', $formName)->addSelect('requires')->execute();
+    $this->assertEquals(['afCore', 'mockBareFile', 'mockBespoke'], $angModule['requires']);
     $this->assertEquals(['mockBespoke'], $storedRequires[0]['requires']);
 
     // Remove the last explict and implicit requirements.
@@ -310,7 +312,8 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
     Afform::revert()->addWhere('name', '=', $formName)->execute();
     $angModule = Civi::service('angular')->getModule($formName);
-    $this->assertEquals(['afCore', 'mockBespoke', 'mockBareFile', 'mockFoo'], $angModule['requires']);
+    sort($angModule['requires']);
+    $this->assertEquals(['afCore', 'mockBareFile', 'mockBespoke', 'mockFoo'], $angModule['requires']);
   }
 
 }

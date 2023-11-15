@@ -154,6 +154,15 @@ abstract class AbstractEntity {
       $info['dao'] = $dao;
       $info['table_name'] = $dao::$_tableName;
       $info['icon_field'] = (array) ($dao::fields()['icon']['name'] ?? NULL);
+      if (method_exists($dao, 'indices')) {
+        foreach (\CRM_Utils_Array::findAll($dao::indices(FALSE), ['unique' => TRUE, 'localizable' => FALSE]) as $index) {
+          foreach ($index['field'] as $field) {
+            // Trim `field(length)` to just `field`
+            [$field] = explode('(', $field);
+            $info['match_fields'][] = $field;
+          }
+        }
+      }
     }
     foreach (ReflectionUtils::getTraits(static::class) as $trait) {
       $info['type'][] = CoreUtil::stripNamespace($trait);

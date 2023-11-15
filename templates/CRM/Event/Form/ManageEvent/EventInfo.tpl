@@ -105,6 +105,10 @@
       <td>&nbsp;</td>
       <td>{$form.is_active.html} {$form.is_active.label}</td>
     </tr>
+    <tr class="crm-event-manage-eventinfo-form-block-is_show_calendar_links">
+      <td>&nbsp;</td>
+      <td>{$form.is_show_calendar_links.html} {$form.is_show_calendar_links.label}</td>
+    </tr>
 
     {if $eventID AND !$isTemplate}
       <tr class="crm-event-manage-eventinfo-form-block-info_link">

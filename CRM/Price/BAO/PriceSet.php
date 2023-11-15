@@ -15,6 +15,10 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\PriceField;
+use Civi\Api4\PriceFieldValue;
+use Civi\Api4\PriceSet;
+
 /**
  * Business object for managing price sets.
  *
@@ -757,30 +761,57 @@ WHERE  id = %1";
   }
 
   /**
-   * Wrapper for getSetDetail with caching.
+   * Get PriceSet + Fields + FieldValues nested, with caching.
+   *
+   * This gets the same values as getSet but uses apiv4 for more
+   * predictability & better variable typing.
    *
    * We seem to be passing this array around in a painful way - presumably to avoid the hit
    * of loading it - so lets make it callable with caching.
    *
-   * Why not just add caching to the other function? We could do - it just seemed a bit unclear the best caching pattern
-   * & the function was already pretty fugly. Also, I feel like we need to migrate the interaction with price-sets into
-   * a more granular interaction - ie. retrieve specific data using specific functions on this class & have the form
-   * think less about the price sets.
-   *
    * @param int $priceSetID
    *
    * @return array
+   *
+   * @noinspection PhpUnhandledExceptionInspection
    */
-  public static function getCachedPriceSetDetail($priceSetID) {
+  public static function getCachedPriceSetDetail(int $priceSetID): array {
     $cacheKey = __CLASS__ . __FUNCTION__ . '_' . $priceSetID;
     $cache = CRM_Utils_Cache::singleton();
-    $values = $cache->get($cacheKey);
-    if (empty($values)) {
-      $data = self::getSetDetail($priceSetID);
-      $values = $data[$priceSetID];
-      $cache->set($cacheKey, $values);
+    $data = $cache->get($cacheKey);
+    if (empty($data)) {
+      $data = PriceSet::get(FALSE)
+        ->addWhere('id', '=', $priceSetID)
+        ->addSelect('*', 'visibility_id:name', 'extends:name')
+        ->execute()->first();
+      $data['fields'] = (array) PriceField::get(FALSE)
+        ->addWhere('price_set_id', '=', $priceSetID)
+        ->addSelect('*', 'visibility_id:name')
+        ->execute()->indexBy('id');
+      foreach ($data['fields'] as &$field) {
+        $field['options'] = [];
+        // Add in visibility because Smarty templates expect it and it is hard to adjust them to colon format.
+        $field['visibility'] = $field['visibility_id:name'];
+      }
+      $select = ['*', 'visibility_id:name'];
+      if (CRM_Core_Component::isEnabled('CiviMember')) {
+        $select[] = 'membership_type_id.name';
+      }
+      $options = PriceFieldValue::get(FALSE)
+        ->addWhere('price_field_id', 'IN', array_keys($data['fields']))
+        ->setSelect($select)
+        ->execute();
+      $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+      foreach ($options as $option) {
+        // Add in visibility because Smarty templates expect it and it is hard to adjust them to colon format.
+        $option['visibility'] = $option['visibility_id:name'];
+        $option['tax_rate'] = (float) ($taxRates[$option['financial_type_id']] ?? 0);
+        $option['tax_amount'] = (float) ($option['tax_rate'] ? CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($option['amount'], $option['tax_rate'])['tax_amount'] : 0);
+        $data['fields'][$option['price_field_id']]['options'][$option['id']] = $option;
+      }
+      $cache->set($cacheKey, $data);
     }
-    return $values;
+    return $data;
   }
 
   /**

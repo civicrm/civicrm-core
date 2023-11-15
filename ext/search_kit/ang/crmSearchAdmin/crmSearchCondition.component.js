@@ -7,6 +7,7 @@
       clause: '<',
       format: '<',
       optionKey: '<',
+      fields: '<',
       offset: '<'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchCondition.html',
@@ -16,6 +17,20 @@
       this.operators = {};
 
       this.$onInit = function() {
+        if (this.fields) {
+          let val = getValue();
+          // WHERE clause has an explicit flag if input type is a field
+          if (this.format !== 'json') {
+            this.inputMode = this.clause[2 + ctrl.offset] ? 'field' : 'value';
+          }
+          // ON clause will be quoted json-style if not a field
+          else {
+            if (typeof val === 'string' && /^[a-zA-Z]/.test(val)) {
+              this.inputMode = 'field';
+            }
+          }
+        }
+        this.inputMode = this.inputMode || 'value';
         $scope.$watch('$ctrl.field', updateOperators);
       };
 
@@ -52,6 +67,18 @@
           setValue(val);
         }
         return getValue();
+      };
+
+      // ngChange handler for the field/value mode toggle
+      this.changeInputMode = function() {
+        setValue('');
+        if (ctrl.format !== 'json') {
+          if (ctrl.inputMode === 'field') {
+            this.clause[2 + ctrl.offset] = true;
+          } else {
+            delete this.clause[2 + ctrl.offset];
+          }
+        }
       };
 
       // Return a list of operators allowed for the current field

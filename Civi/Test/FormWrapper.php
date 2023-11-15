@@ -63,6 +63,13 @@ class FormWrapper {
     return $this->getFirstMail()['body'] ?? '';
   }
 
+  /**
+   * @return array
+   */
+  public function getTemplateVariables(): array {
+    return $this->templateVariables;
+  }
+
   private $redirects;
 
   private $mailSpoolID;
@@ -112,6 +119,7 @@ class FormWrapper {
     if ($state > self::VALIDATED) {
       $this->postProcess();
     }
+    $this->templateVariables = $this->form->get_template_vars();
     return $this;
   }
 

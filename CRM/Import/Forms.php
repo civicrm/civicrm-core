@@ -638,6 +638,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
 
   /**
    * Outputs and downloads the csv of outcomes from an import job.
+   * Function is accessed from civicrm/import/outcome path.
    *
    * This gets the rows from the temp table that match the relevant status
    * and output them as a csv.

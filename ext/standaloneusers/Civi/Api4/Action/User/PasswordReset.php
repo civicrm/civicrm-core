@@ -20,7 +20,7 @@ class PasswordReset extends AbstractAction {
    * @var string
    * @required
    */
-  protected string $token;
+  protected $token;
 
   /**
    * New password.
@@ -28,7 +28,7 @@ class PasswordReset extends AbstractAction {
    * @var string
    * @required
    */
-  protected string $password;
+  protected $password;
 
   public function _run(Result $result) {
 

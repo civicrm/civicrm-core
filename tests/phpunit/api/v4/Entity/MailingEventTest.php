@@ -33,29 +33,27 @@ class MailingEventTest extends Api4TestBase implements TransactionalInterface {
     $eid2 = $this->createTestRecord('Email', ['contact_id' => $cid2])['id'];
     $mid1 = $this->createTestRecord('Mailing')['id'];
     $mid2 = $this->createTestRecord('Mailing')['id'];
-    $parentJobIDs = $this->saveTestRecords('MailingJob',
-      [
-        'records' => [
-          ['mailing_id' => $mid1, 'is_test' => 'false'],
-          ['mailing_id' => $mid2, 'is_test' => 'false'],
-        ],
-      ])->column('id');
+    $parentJobIDs = $this->saveTestRecords('MailingJob', [
+      'records' => [
+        ['mailing_id' => $mid1, 'is_test' => FALSE],
+        ['mailing_id' => $mid2, 'is_test' => TRUE],
+      ],
+    ])->column('id');
 
-    $childJobIDs = $this->saveTestRecords('MailingJob',
-      [
-        'records' => [
-          ['mailing_id' => $mid1, 'parent_id' => $parentJobIDs[0], 'job_type' => 'child', 'is_test' => 'false'],
-          ['mailing_id' => $mid2, 'parent_id' => $parentJobIDs[1], 'job_type' => 'child', 'is_test' => 'false'],
-        ],
-      ])->column('id');
+    $childJobIDs = $this->saveTestRecords('MailingJob', [
+      'records' => [
+        ['mailing_id' => $mid1, 'parent_id' => $parentJobIDs[0], 'job_type' => 'child', 'is_test' => 'false'],
+        ['mailing_id' => $mid2, 'parent_id' => $parentJobIDs[1], 'job_type' => 'child', 'is_test' => 'false'],
+      ],
+    ])->column('id');
 
     $queueIDs = $this->saveTestRecords('MailingEventQueue',
       [
         'records' => [
-          ['job_id' => $childJobIDs[0], 'contact_id' => $cid1, 'email_id' => $eid1],
-          ['job_id' => $childJobIDs[0], 'contact_id' => $cid2, 'email_id' => $eid2],
-          ['job_id' => $childJobIDs[1], 'contact_id' => $cid1, 'email_id' => $eid1],
-          ['job_id' => $childJobIDs[1], 'contact_id' => $cid2, 'email_id' => $eid2],
+          ['job_id' => $childJobIDs[0], 'mailing_id' => $mid1, 'contact_id' => $cid1, 'email_id' => $eid1],
+          ['job_id' => $childJobIDs[0], 'mailing_id' => $mid1, 'contact_id' => $cid2, 'email_id' => $eid2],
+          ['job_id' => $childJobIDs[1], 'mailing_id' => $mid2, 'contact_id' => $cid1, 'email_id' => $eid1],
+          ['job_id' => $childJobIDs[1], 'mailing_id' => $mid2, 'contact_id' => $cid2, 'email_id' => $eid2],
         ],
       ])->column('id');
 

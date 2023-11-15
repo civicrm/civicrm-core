@@ -1153,21 +1153,21 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'Float':
         if ($field->is_search_range && $search) {
-          $qf->addRule($elementName . '_from', ts('%1 From must be a number (with or without decimal point).', [1 => $label]), 'numeric');
-          $qf->addRule($elementName . '_to', ts('%1 To must be a number (with or without decimal point).', [1 => $label]), 'numeric');
+          $qf->addRule($elementName . '_from', ts('%1 From must be a number (with or without decimals).', [1 => $label]), 'money');
+          $qf->addRule($elementName . '_to', ts('%1 To must be a number (with or without decimals).', [1 => $label]), 'money');
         }
         elseif ($widget == 'Text') {
-          $qf->addRule($elementName, ts('%1 must be a number (with or without decimal point).', [1 => $label]), 'numeric');
+          $qf->addRule($elementName, ts('%1 must be a number (with or without decimals).', [1 => $label]), 'money');
         }
         break;
 
       case 'Money':
         if ($field->is_search_range && $search) {
-          $qf->addRule($elementName . '_from', ts('%1 From must in proper money format. (decimal point/comma/space is allowed).', [1 => $label]), 'money');
-          $qf->addRule($elementName . '_to', ts('%1 To must in proper money format. (decimal point/comma/space is allowed).', [1 => $label]), 'money');
+          $qf->addRule($elementName . '_from', ts('%1 From must in money format (a number with or without decimals, ex: %2).', [1 => $label, 2 => Civi::format()->number(123.98)]), 'money');
+          $qf->addRule($elementName . '_to', ts('%1 To must in money format (a number with or without decimals, ex: %2).', [1 => $label, 2 => Civi::format()->number(123.98)]), 'money');
         }
         elseif ($widget == 'Text') {
-          $qf->addRule($elementName, ts('%1 must be in proper money format. (decimal point/comma/space is allowed).', [1 => $label]), 'money');
+          $qf->addRule($elementName, ts('%1 must be in money format (a number with or without decimals, ex: %2).', [1 => $label, 2 => Civi::format()->number(123.98)]), 'money');
         }
         break;
 
@@ -2754,30 +2754,22 @@ WHERE      f.id IN ($ids)";
       switch ($dataType) {
         case 'Int':
           $ruleName = 'integer';
-          $errorMsg = ts('%1 must be an integer (whole number).',
-            [1 => $fieldTitle]
-          );
+          $errorMsg = ts('%1 must be an integer (whole number).', [1 => $fieldTitle]);
           break;
 
         case 'Money':
           $ruleName = 'money';
-          $errorMsg = ts('%1 must in proper money format. (decimal point/comma/space is allowed).',
-            [1 => $fieldTitle]
-          );
+          $errorMsg = ts('%1 must be in money format (a number with or without decimals, ex: %2).', [1 => $fieldTitle, 2 => Civi::format()->number(123.98)]);
           break;
 
         case 'Float':
           $ruleName = 'numeric';
-          $errorMsg = ts('%1 must be a number (with or without decimal point).',
-            [1 => $fieldTitle]
-          );
+          $errorMsg = ts('%1 must be a number (with or without decimals).', [1 => $fieldTitle]);
           break;
 
         case 'Link':
           $ruleName = 'wikiURL';
-          $errorMsg = ts('%1 must be valid Website.',
-            [1 => $fieldTitle]
-          );
+          $errorMsg = ts('%1 must be valid Website.', [1 => $fieldTitle]);
           break;
       }
 

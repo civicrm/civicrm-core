@@ -36,20 +36,21 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
   public function testMenuItemWillBeCreatedAndDeleted(): void {
     ContactType::create(FALSE)
       ->addValue('name', 'Tester')
-      ->addValue('label', 'Tester')
+      ->addValue('label', 'Tèstër')
       ->addValue('parent_id.name', 'Individual')
       ->execute();
     // Menu item should have been auto-created
-    $this->assertCount(1, Navigation::get(FALSE)->addWhere('name', '=', 'New Tester')->execute());
+    $nav = Navigation::get(FALSE)->addWhere('name', '=', 'New Tester')->execute()->single();
+    $this->assertEquals('New Tèstër', $nav['label']);
 
     ContactType::update(FALSE)
       ->addWhere('name', '=', 'Tester')
-      ->addValue('label', 'Tested')
+      ->addValue('label', 'Wëll Téstęd!')
       ->execute();
 
     // Menu item should have been updated
     $nav = Navigation::get(FALSE)->addWhere('name', '=', 'New Tester')->execute()->single();
-    $this->assertEquals('New Tested', $nav['label']);
+    $this->assertEquals('New Wëll Téstęd!', $nav['label']);
 
     ContactType::delete(FALSE)
       ->addWhere('name', '=', 'Tester')

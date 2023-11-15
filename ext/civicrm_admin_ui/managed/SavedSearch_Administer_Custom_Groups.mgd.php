@@ -68,7 +68,7 @@ return [
         'saved_search_id.name' => 'Administer_Custom_Groups',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -167,7 +167,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-eye',
-                  'text' => E::ts('Preview Group'),
+                  'text' => E::ts('Preview'),
                   'style' => 'default',
                   'path' => '',
                   'condition' => [],
@@ -196,7 +196,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete Group'),
+                  'text' => E::ts('Delete'),
                   'style' => 'danger',
                   'path' => '',
                   'condition' => [],

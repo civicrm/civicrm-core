@@ -38,6 +38,11 @@ else {
      */
     private $tx;
 
+    /**
+     * @var \CRM_Core_TemporaryErrorScope|null
+     */
+    public $errorScope;
+
     public function startTestSuite(\PHPUnit\Framework\TestSuite $suite) {
       $byInterface = $this->indexTestsByInterface($suite->tests());
       $this->validateGroups($byInterface);

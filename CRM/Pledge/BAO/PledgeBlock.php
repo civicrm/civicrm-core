@@ -118,8 +118,11 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @param CRM_Core_Form $form
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 5.68 will be removed around 5.74
    */
   public static function buildPledgeBlock($form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     //build pledge payment fields.
     if (!empty($form->_values['pledge_id'])) {
       //get all payments required details.

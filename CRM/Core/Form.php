@@ -319,6 +319,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Required for footer.tpl,
     // See CRM_Activity_Form_ActivityTest:testInboundEmailDisplaysWithLineBreaks.
     'footer_status_severity',
+    // Required for some profiles (e.g on the Main page of the contribution form flow).
+    // A bit tricky to add closer to the usage due to conditionality of inclusion
+    'showCMS',
   ];
 
   /**
@@ -918,9 +921,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * @return int
+   * @return int|null
    */
-  public function getPaymentProcessorID(): int {
+  public function getPaymentProcessorID(): ?int {
     return (int) $this->_paymentProcessorID;
   }
 
@@ -945,8 +948,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         ) {
           $this->_paymentProcessor = $paymentProcessorDetail;
           $this->assign('paymentProcessor', $this->_paymentProcessor);
-          // Setting this is a bit of a legacy overhang.
-          $this->_paymentObject = $paymentProcessorDetail['object'];
         }
       }
       // It's not clear why we set this on the form.
@@ -2324,6 +2325,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['data-select-params'] = json_encode($props['select']);
     $props['data-api-params'] = json_encode($props['api']);
     $props['data-api-entity'] = $props['entity'];
+    if (!empty($props['select']['quickAdd'])) {
+      Civi::service('angularjs.loader')->addModules(['af']);
+    }
     CRM_Utils_Array::remove($props, 'select', 'api', 'entity');
     return $this->add('text', $name, $label, $props, $required);
   }
@@ -2485,7 +2489,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Ideally the forms would override this so only the cid in the url
    * would be checked in the shared form function.
    *
-   * @return int
+   * @return int|null
    * @throws \CRM_Core_Exception
    */
   public function getRequestedContactID(): ?int {
@@ -2534,9 +2538,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   protected function getAuthenticatedCheckSumContactID(): int {
     $requestedContactID = $this->getRequestedContactID();
+    return $this->validateAuthenticatedCheckSumContactID($requestedContactID);
+  }
+
+  /**
+   * Verify that a contact ID is authenticated as a valid contact by checksum
+   *
+   * @param int|null $contactID
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateAuthenticatedCheckSumContactID(?int $contactID): int {
     $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
-    if ($userChecksum && CRM_Contact_BAO_Contact_Utils::validChecksum($requestedContactID, $userChecksum)) {
-      return $requestedContactID;
+    if ($userChecksum && CRM_Contact_BAO_Contact_Utils::validChecksum($contactID, $userChecksum)) {
+      return $contactID;
     }
     return 0;
   }
@@ -3048,6 +3064,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $value = $this->exportedValues[$fieldName] ?? NULL;
     if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
       return CRM_Utils_Rule::cleanMoney($value);
+    }
+    else {
+      // Numeric fields are not in submittableMoneyFields (for now)
+      $fieldRules = $this->_rules[$fieldName] ?? [];
+      foreach ($fieldRules as $rule) {
+        if ('money' === $rule['type']) {
+          return CRM_Utils_Rule::cleanMoney($value);
+        }
+      }
     }
     return $value;
   }

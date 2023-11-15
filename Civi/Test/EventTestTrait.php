@@ -22,10 +22,6 @@ use Civi\Api4\UFJoin;
 /**
  * Helper for event tests.
  *
- * WARNING - this trait ships with core from 5.63 but I wasn't able to resolve
- * all the core tests onto it for 5.63 - hence the signatures may not yet be stable
- * and it is worth assuming that they will not be stable until 5.65.
- *
  * This provides functions to set up valid events
  * for unit tests.
  *

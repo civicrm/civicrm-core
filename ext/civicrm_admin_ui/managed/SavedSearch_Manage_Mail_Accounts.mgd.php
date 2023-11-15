@@ -59,6 +59,7 @@ return [
         'saved_search_id.name' => 'Mail_Accounts',
         'type' => 'table',
         'settings' => [
+          'actions' => TRUE,
           'description' => NULL,
           'sort' => [],
           'limit' => 50,
@@ -173,7 +174,6 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'actions' => FALSE,
           'classes' => [
             'table',
             'table-striped',

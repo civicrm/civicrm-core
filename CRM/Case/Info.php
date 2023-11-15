@@ -42,17 +42,6 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   */
-  public function getAngularModules() {
-    global $civicrm_root;
-
-    $result = [];
-    $result['crmCaseType'] = include "$civicrm_root/ang/crmCaseType.ang.php";
-    return $result;
-  }
-
-  /**
-   * @inheritDoc
    * @param bool $getAllUnconditionally
    * @param bool $descriptions
    *   Whether to return permission descriptions

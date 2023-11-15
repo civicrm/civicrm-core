@@ -231,6 +231,41 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test case for add( ) with duplicated sub contact types.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAddWithDuplicatedSubContactType(): void {
+    // Sub contact-type as array
+    $sub_contact_type = ['Staff', 'Parent', 'Staff'];
+    $params = [
+      'first_name' => 'Duplicated sub contact-type as array',
+      'contact_type' => 'Individual',
+      'contact_sub_type' => $sub_contact_type,
+    ];
+    $contact = CRM_Contact_BAO_Contact::add($params);
+    $this->assertSame(
+      CRM_Core_DAO::serializeField((array_unique($sub_contact_type)), $contact->fields()['contact_sub_type']['serialize']),
+      $contact->contact_sub_type,
+      'Contact sub-type not deduplicated.'
+    );
+
+    // Sub contact-type as string
+    $sub_contact_type = 'Staff';
+    $params = [
+      'first_name' => 'Sub contact-type as string',
+      'contact_type' => 'Individual',
+      'contact_sub_type' => $sub_contact_type,
+    ];
+    $contact = CRM_Contact_BAO_Contact::add($params);
+    $this->assertSame(
+      CRM_Core_DAO::serializeField($sub_contact_type, $contact->fields()['contact_sub_type']['serialize']),
+      $contact->contact_sub_type,
+      'Wrong contact sub-type saved.'
+    );
+  }
+
+  /**
    * Test case for create.
    *
    * Test with missing params.

@@ -1,15 +1,10 @@
 <?php
 
-use Civi\Api4\Domain;
 use CRM_Legacycustomsearches_ExtensionUtil as E;
 
-$menuItems = [];
-$domains = Domain::get(FALSE)
-  ->addSelect('id')
-  ->execute();
-foreach ($domains as $domain) {
-  $menuItems[] = [
-    'name' => 'Custom Searches' . $domain['id'],
+return [
+  [
+    'name' => 'Custom Searches',
     'entity' => 'Navigation',
     'cleanup' => 'always',
     'update' => 'unmodified',
@@ -25,13 +20,12 @@ foreach ($domains as $domain) {
         'is_active' => TRUE,
         'has_separator' => 2,
         'weight' => 15,
-        'domain_id' => $domain['id'],
       ],
       'match' => ['domain_id', 'name'],
     ],
-  ];
-  $menuItems[] = [
-    'name' => 'Manage Custom Searches' . $domain['id'],
+  ],
+  [
+    'name' => 'Manage Custom Searches',
     'entity' => 'Navigation',
     'cleanup' => 'always',
     'update' => 'unmodified',
@@ -46,10 +40,8 @@ foreach ($domains as $domain) {
         'parent_id.name' => 'Customize Data and Screens',
         'is_active' => TRUE,
         'weight' => 15,
-        'domain_id' => $domain['id'],
       ],
       'match' => ['domain_id', 'name'],
     ],
-  ];
-}
-return $menuItems;
+  ],
+];

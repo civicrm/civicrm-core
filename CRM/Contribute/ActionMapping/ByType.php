@@ -119,11 +119,13 @@ class CRM_Contribute_ActionMapping_ByType extends CRM_Contribute_ActionMapping {
     $query['casContactTableAlias'] = NULL;
 
     // $schedule->start_action_date is user-supplied data. validate.
-    if (!array_key_exists($schedule->start_action_date, $this->getDateFields())) {
+    if (empty($schedule->absolute_date) && !array_key_exists($schedule->start_action_date, $this->getDateFields())) {
       throw new CRM_Core_Exception("Invalid date field");
     }
-    $query['casDateField'] = $schedule->start_action_date;
-
+    $query['casDateField'] = $schedule->start_action_date ?? '';
+    if (empty($query['casDateField']) && $schedule->absolute_date) {
+      $query['casDateField'] = "'" . CRM_Utils_Type::escape($schedule->absolute_date, 'String') . "'";
+    }
     // build where clause
     if (!empty($selectedValues)) {
       $query->where("e.financial_type_id IN (@selectedValues)")

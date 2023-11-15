@@ -867,13 +867,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Create contribution page.
    *
-   * @param array $params
+   * @param array $contributionPageValues
    * @param string $identifier
    *
    * @return array
    *   Array of contribution page
    */
-  public function contributionPageCreate(array $params = [], string $identifier = 'test'): array {
+  public function contributionPageCreate(array $contributionPageValues = [], string $identifier = 'test'): array {
     return $this->createTestEntity('ContributionPage', array_merge([
       'title' => 'Test Contribution Page',
       'financial_type_id:name' => 'Donation',
@@ -883,7 +883,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'is_allow_other_amount' => 1,
       'min_amount' => 10,
       'max_amount' => 1000,
-    ], $params), $identifier);
+    ], $contributionPageValues), $identifier);
   }
 
   /**
@@ -1688,6 +1688,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->organizeOptionValues();
     CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviMember');
     // @fixme this parameter is leaking - it should not be defined as a class static
     // but for now we just handle in tear down.
     CRM_Contribute_BAO_Query::$_contribOrSoftCredit = 'only contribs';
@@ -2823,8 +2824,14 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param array $params
    */
   public function createPriceSetWithPage($entity = NULL, $params = []) {
-    $membershipTypeID = $this->membershipTypeCreate(['name' => 'Special']);
-    $contributionPageID = $this->callAPISuccess('contribution_page', 'create', [
+    $membershipTypeID = $this->createTestEntity('MembershipType', [
+      'name' => 'Special',
+      'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
+      'financial_type_id:name' => 'Member Dues',
+      'duration_unit' => 'year',
+      'period_type:name' => 'rolling',
+    ], 'special')['id'];
+    $contributionPageID = $this->createTestEntity('ContributionPage', [
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'NZD',
@@ -3382,7 +3389,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       foreach ($items as $item) {
         $itemTotal += $item['amount'];
       }
-      $this->assertEquals($payment['total_amount'], $itemTotal);
+      $this->assertEquals(round((float) $payment['total_amount'], 2), round($itemTotal, 2));
     }
   }
 

@@ -261,7 +261,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
       [
         ['name' => 'do_not_import', 'contact_type' => 'Individual', 'column_number' => 0],
         "swapOptions(document.forms.MapField, 'mapper[0]', 0, 4, 'hs_mapper_0_');\n",
-        ['mapper[0]' => []],
+        ['mapper[0]' => ['do_not_import']],
       ],
     ];
   }

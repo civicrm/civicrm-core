@@ -15,12 +15,15 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\PriceSet;
+
 /**
  * This class generates form components for processing a contribution.
  */
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   use CRM_Financial_Form_FrontEndPaymentFormTrait;
   use CRM_Contribute_Form_ContributeFormTrait;
+  use CRM_Financial_Form_PaymentProcessorFormTrait;
 
   /**
    * The id of the contribution page that we are processing.
@@ -57,8 +60,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var array
    */
   public $_paymentProcessor;
-
-  public $_paymentObject = NULL;
 
   /**
    * Order object, used to calculate amounts, line items etc.
@@ -270,6 +271,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
       else {
         $this->_priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id);
+      }
+      if (!$this->_priceSetId) {
+        if ($this->isShowMembershipBlock()) {
+          $this->_priceSetId = PriceSet::get(FALSE)
+            ->addWhere('name', '=', 'default_membership_type_amount')
+            ->execute()
+            ->first()['id'];
+        }
       }
       $this->set('priceSetId', $this->_priceSetId);
     }
@@ -502,7 +511,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->set('amount_block_is_active', $this->isFormSupportsNonMembershipContributions());
 
     $this->_contributeMode = $this->get('contributeMode');
-    $this->assign('contributeMode', $this->_contributeMode);
 
     //assigning is_monetary and is_email_receipt to template
     $this->assign('is_monetary', $this->_values['is_monetary']);
@@ -556,7 +564,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       if ($form->_action & CRM_Core_Action::UPDATE) {
         $form->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($form->_id, 'contribution');
       }
-      $form->_priceSet = [$this->getPriceSetID() => $this->order->getPriceSetMetadata()];
+      $form->_priceSet = $this->order->getPriceSetMetadata();
       $this->setPriceFieldMetaData($this->order->getPriceFieldsMetadata());
       $form->set('priceSet', $form->_priceSet);
     }
@@ -860,8 +868,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // The concept of contributeMode is deprecated.
     // The payment processor object can provide info about the fields it shows.
-    if ($isMonetary && $this->_paymentProcessor['object'] instanceof \CRM_Core_Payment) {
-      $paymentProcessorObject = $this->_paymentProcessor['object'];
+    if ($isMonetary) {
+      $paymentProcessorObject = $this->getPaymentProcessorObject();
       $this->assign('paymentAgreementTitle', $paymentProcessorObject->getText('agreementTitle', []));
       $this->assign('paymentAgreementText', $paymentProcessorObject->getText('agreementText', []));
       $paymentFields = $paymentProcessorObject->getPaymentFormFields();
@@ -1047,18 +1055,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Get the payment processor object for the submission, returning the manual one for offline payments.
-   *
-   * @return CRM_Core_Payment
-   */
-  protected function getPaymentProcessorObject() {
-    if (!empty($this->_paymentProcessor)) {
-      return $this->_paymentProcessor['object'];
-    }
-    return new CRM_Core_Payment_Manual();
-  }
-
-  /**
    * Get the amount for the main contribution.
    *
    * The goal is to expand this function so that all the argy-bargy of figuring out the amount
@@ -1093,10 +1089,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *   Params reflecting form input e.g with fields 'price_5' => 7, 'price_8' => array(7, 8)
    * @param $lineItems
    *   Line item array to be altered.
-   * @param int $priceSetID
    */
-  public function processAmountAndGetAutoRenew($fields, &$params, &$lineItems, $priceSetID = NULL) {
-    CRM_Price_BAO_PriceSet::processAmount($fields, $params, $lineItems, $priceSetID);
+  public function processAmountAndGetAutoRenew($fields, &$params, &$lineItems) {
+    CRM_Price_BAO_PriceSet::processAmount($fields, $params, $lineItems, $this->getPriceSetID());
     $autoRenew = [];
     $autoRenew[0] = $autoRenew[1] = $autoRenew[2] = 0;
     foreach ($lineItems as $lineItem) {
@@ -1255,6 +1250,27 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->_pcpId = CRM_Utils_Request::retrieve('pcpId', 'Positive', $this);
     }
     return $this->_pcpId ? (int) $this->_pcpId : NULL;
+  }
+
+  /**
+   * Get the selected Contribution ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getContributionID(): ?int {
+    if ($this->getExistingContributionID()) {
+      return $this->getExistingContributionID();
+    }
+    if (property_exists($this, '_contributionID')) {
+      // Available on Confirm form (which is tested), so this avoids
+      // accessing that directly & will work for ThankYou in time.
+      return $this->_contributionID;
+    }
+    return NULL;
   }
 
 }

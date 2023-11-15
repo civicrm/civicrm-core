@@ -19,6 +19,7 @@ use Civi\Payment\Exception\PaymentProcessorException;
 class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditPayment {
   use CRM_Contact_Form_ContactFormTrait;
   use CRM_Contribute_Form_ContributeFormTrait;
+  use CRM_Financial_Form_PaymentProcessorFormTrait;
 
   /**
    * The id of the contribution that we are processing.
@@ -618,7 +619,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $getOnlyPriceSetElements = FALSE;
       }
 
-      $this->buildPriceSet($this, 'contribution', FALSE);
+      $this->buildPriceSet();
 
       // get only price set form elements.
       if ($getOnlyPriceSetElements) {
@@ -939,41 +940,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * Build the price set form.
-   *
-   * @param CRM_Core_Form $form
-   * @param string|null $component
-   * @param bool $validFieldsOnly
    */
-  private function buildPriceSet($form, $component = NULL, $validFieldsOnly = TRUE): void {
+  private function buildPriceSet(): void {
     $priceSetId = $this->getPriceSetID();
-
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
+    $form = $this;
+    $component = 'contribution';
+    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, FALSE);
     $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
     $validPriceFieldIds = array_keys($form->_priceSet['fields']);
 
-    // @todo - this code is from previously shared function - can probaly go.
-    // Mark which field should have the auto-renew checkbox, if any. CRM-18305
-    if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {
-      $autoRenewMembershipTypes = [];
-      foreach ($form->_membershipTypeValues as $membershipTypeValue) {
-        if ($membershipTypeValue['auto_renew']) {
-          $autoRenewMembershipTypes[] = $membershipTypeValue['id'];
-        }
-      }
-      foreach ($form->_priceSet['fields'] as $field) {
-        if (array_key_exists('options', $field) && is_array($field['options'])) {
-          foreach ($field['options'] as $option) {
-            if (!empty($option['membership_type_id'])) {
-              if (in_array($option['membership_type_id'], $autoRenewMembershipTypes)) {
-                $form->_priceSet['auto_renew_membership_field'] = $field['id'];
-                // Only one field can offer auto_renew memberships, so break here.
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
     $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetId;
     $form->assign('priceSet', $form->_priceSet);
 
@@ -987,26 +962,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
     $checklifetime = FALSE;
     foreach ($feeBlock as $id => $field) {
-      if (($field['visibility'] ?? NULL) == 'public' ||
-        (($field['visibility'] ?? NULL) == 'admin' && $adminFieldVisible == TRUE) ||
-        !$validFieldsOnly
-      ) {
-        $options = $field['options'] ?? NULL;
+      $options = $field['options'] ?? NULL;
 
-        if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
-          continue;
-        }
+      if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
+        continue;
+      }
 
-        if (!empty($options)) {
-          CRM_Price_BAO_PriceField::addQuickFormElement($form,
-            'price_' . $field['id'],
-            $field['id'],
-            FALSE,
-            $field['is_required'] ?? FALSE,
-            NULL,
-            $options
-          );
-        }
+      if (!empty($options)) {
+        CRM_Price_BAO_PriceField::addQuickFormElement($form,
+          'price_' . $field['id'],
+          $field['id'],
+          FALSE,
+          $field['is_required'] ?? FALSE,
+          NULL,
+          $options
+        );
       }
     }
   }
@@ -1117,7 +1087,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
     // Get the submitted form values.
-    $submittedValues = $this->controller->exportValues($this->_name);
+    $submittedValues = $this->getSubmittedValues();
     if ($this->_values['is_template']) {
       // If we are a template contribution we don't allow the contribution_status_id to be set
       //   on the form but we need it for the submit function.
@@ -1185,8 +1155,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_lineItem = $lineItem;
     }
 
-    $this->_paymentObject = Civi\Payment\System::singleton()->getById($submittedValues['payment_processor_id']);
-    $this->_paymentProcessor = $this->_paymentObject->getPaymentProcessor();
+    $paymentObject = Civi\Payment\System::singleton()->getById($submittedValues['payment_processor_id']);
+    $this->_paymentProcessor = $paymentObject->getPaymentProcessor();
 
     // Set source if not set
     if (empty($submittedValues['source'])) {
@@ -1800,7 +1770,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
         if (empty($componentDetails['membership']) && empty($componentDetails['participant'])) {
           if (!($this->_action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $submittedValues['contribution_status_id'])))) {
-            $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('total_amount', $submittedValues));
+            $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = $this->getSubmittedValue('total_amount');
           }
         }
 
@@ -2394,7 +2364,7 @@ WHERE  contribution_id = {$id}
 
     $form->assign('is_recur_interval', $form->_values['is_recur_interval'] ?? NULL);
     $form->assign('is_recur_installments', $form->_values['is_recur_installments'] ?? NULL);
-    $paymentObject = $form->getVar('_paymentObject');
+    $paymentObject = $this->getPaymentProcessorObject();
     if ($paymentObject) {
       $form->assign('recurringHelpText', $paymentObject->getText('contributionPageRecurringHelp', [
         'is_recur_installments' => !empty($form->_values['is_recur_installments']),

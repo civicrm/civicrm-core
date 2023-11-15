@@ -729,6 +729,7 @@
           crmAutocompleteParams: '<',
           multi: '<',
           autoOpen: '<',
+          quickAdd: '<',
           staticOptions: '<'
         },
         link: function(scope, element, attr, ctrl) {
@@ -791,6 +792,7 @@
                 // Only auto-open if there are no static options
                 minimumInputLength: ctrl.autoOpen && _.isEmpty(ctrl.staticOptions) ? 0 : 1,
                 static: ctrl.staticOptions || [],
+                quickAdd: ctrl.quickAdd,
               });
             });
           };

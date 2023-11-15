@@ -243,6 +243,12 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Array',
           'description' => 'HTML form layout; format is controlled by layoutFormat param',
         ],
+        [
+          'name' => 'modified_date',
+          'title' => E::ts('Date Modified'),
+          'data_type' => 'Timestamp',
+          'readonly' => TRUE,
+        ],
       ];
       // Calculated fields returned by get action
       if ($self->getAction() === 'get') {

@@ -1283,8 +1283,13 @@ SELECT is_primary,
     catch (CRM_Core_Exception $e) {
       $providerExists = FALSE;
     }
-    if ($providerExists) {
-      $provider::format($params);
+    try {
+      if ($providerExists) {
+        $provider::format($params);
+      }
+    }
+    catch (CRM_Core_Exception $e) {
+      \Civi::log()->error('Geocoding error:' . $e->getMessage(), ['geocoder' => get_class($provider), 'input' => $params]);
     }
     // dev/core#2379 - Limit geocode length to 14 characters to avoid validation error on save in UI.
     foreach (['geo_code_1', 'geo_code_2'] as $geocode) {
@@ -1292,6 +1297,8 @@ SELECT is_primary,
         // ensure that if the geocoding provider (Google, OSM etc) has returned the string 'null' because they can't geocode, ensure that contacts are not placed on null island 0,0
         if ($params[$geocode] !== 'null') {
           $params[$geocode] = (float) substr($params[$geocode], 0, 14);
+          //set manual_geo_code to 0
+          $params['manual_geo_code'] = FALSE;
         }
       }
     }

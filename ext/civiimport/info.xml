@@ -14,13 +14,13 @@
     <url desc="Support">http://civicrm.org</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2022-08-11</releaseDate>
-  <version>5.68.alpha1</version>
+  <releaseDate>2023-11-02</releaseDate>
+  <version>5.69.alpha1</version>
   <develStage>alpha</develStage>
   <compatibility>
-    <ver>5.68</ver>
+    <ver>5.69</ver>
   </compatibility>
-  <comments>Core extension for us to start moving import logic into, has more functionality</comments>
+  <comments>This extension contains import functionality which was previously in CiviCRM Core. If you use the import functionality it is recommended to enable this extension.</comments>
   <requires>
     <ext>org.civicrm.afform</ext>
     <ext>org.civicrm.search_kit</ext>

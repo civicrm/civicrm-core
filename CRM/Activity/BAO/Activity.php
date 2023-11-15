@@ -1830,6 +1830,9 @@ AND cl.modified_id  = c.id
     $followupParams['activity_type_id'] = $params['followup_activity_type_id'];
     // Get Subject of Follow-up Activiity, CRM-4491
     $followupParams['subject'] = $params['followup_activity_subject'] ?? NULL;
+    if (!is_array($params['followup_assignee_contact_id']) && !empty($params['followup_assignee_contact_id'])) {
+      $params['followup_assignee_contact_id'] = explode(",", $params['followup_assignee_contact_id']);
+    }
     $followupParams['assignee_contact_id'] = $params['followup_assignee_contact_id'] ?? NULL;
 
     // Create target contact for followup.

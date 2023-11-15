@@ -57,8 +57,16 @@ class ExportCustomGroupTest extends CustomTestBase {
       ->setId($customGroup['id'])
       ->execute();
 
-    // 1 custom group + 3 fields + 1 option group + 3 options
+    // 1 custom group + 1 option group + 3 options + 3 fields
     $this->assertCount(8, $export);
+    $this->assertEquals('CustomGroup', $export[0]['entity']);
+    $this->assertEquals('OptionGroup', $export[1]['entity']);
+    $this->assertEquals('OptionValue', $export[2]['entity']);
+    $this->assertEquals('OptionValue', $export[3]['entity']);
+    $this->assertEquals('OptionValue', $export[4]['entity']);
+    $this->assertEquals('CustomField', $export[5]['entity']);
+    $this->assertEquals('CustomField', $export[6]['entity']);
+    $this->assertEquals('CustomField', $export[7]['entity']);
     // 2 fields share an option group
     $this->assertEquals($export[5]['params']['values']['option_group_id.name'], $export[7]['params']['values']['option_group_id.name']);
     // Option group name matches
@@ -69,6 +77,17 @@ class ExportCustomGroupTest extends CustomTestBase {
     $this->assertTrue(!isset($export[6]['params']['values']['option_group_id']));
     $this->assertArrayNotHasKey('option_group_id.name', $export[6]['params']['values']);
     $this->assertArrayNotHasKey('option_values', $export[6]['params']['values']);
+
+    // Match customGroup by name
+    $this->assertEquals(['name'], $export[0]['params']['match']);
+    // Match optionGroup by name
+    $this->assertEquals(['name'], $export[1]['params']['match']);
+    // Match optionValue by name and option_group_id
+    sort($export[2]['params']['match']);
+    $this->assertEquals(['name', 'option_group_id'], $export[2]['params']['match']);
+    // Match customField by name and custom_group_id
+    sort($export[5]['params']['match']);
+    $this->assertEquals(['custom_group_id', 'name'], $export[5]['params']['match']);
   }
 
 }

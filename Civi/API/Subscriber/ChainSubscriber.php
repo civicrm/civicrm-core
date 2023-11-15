@@ -162,17 +162,16 @@ class ChainSubscriber implements EventSubscriberInterface {
               $defaultSubParams[$lowercase_entity . "_id"] = $parentAPIValues['id'];
             }
           }
-          // @todo remove strtolower: $subEntity is already lower case
-          if ($entity != 'Contact' && \CRM_Utils_Array::value(strtolower($subEntity . "_id"), $parentAPIValues)) {
+          if ($entity !== 'Contact' && !empty($parentAPIValues[$subEntity . '_id'])) {
             //e.g. if event_id is in the values returned & subentity is event
             //then pass in event_id as 'id' don't do this for contact as it
             //does some weird things like returning primary email &
             //thus limiting the ability to chain email
             //TODO - this might need the camel treatment
-            $defaultSubParams['id'] = $parentAPIValues[$subEntity . "_id"];
+            $defaultSubParams['id'] = $parentAPIValues[$subEntity . '_id'];
           }
 
-          if (\CRM_Utils_Array::value('entity_table', $result['values'][$idIndex]) == $subEntity) {
+          if (($result['values'][$idIndex]['entity_table'] ?? NULL) == $subEntity) {
             $defaultSubParams['id'] = $result['values'][$idIndex]['entity_id'];
           }
           // if we are dealing with the same entity pass 'id' through

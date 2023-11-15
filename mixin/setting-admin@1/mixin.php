@@ -194,7 +194,10 @@ return function ($mixInfo, $bootCache) {
 
     // Skip if we're already in the menu. (Ignore optional suffix `?reset=1`)
     $found = Nav::walk($menu, function(&$item) use ($about) {
-      return strpos($item['attribute']['url'], $about->getPath()) === 0 ? 'found' : NULL;
+      if (!isset($item['attributes']['url'])) {
+        return NULL;
+      }
+      return strpos($item['attributes']['url'], $about->getPath()) === 0 ? 'found' : NULL;
     });
     if ($found) {
       return;

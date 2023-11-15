@@ -812,7 +812,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments, TRUE),
       'check_number' => 'check-12345',
     ];
-    $form->cid = $this->_individualId;
     $form->testSubmit($submitParams);
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     // check the membership status after additional payment, if its changed to 'New'

@@ -35,6 +35,13 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
   public $_componentClause;
 
   /**
+   * The context this page is being rendered in
+   *
+   * @var string
+   */
+  protected $_context;
+
+  /**
    * Build all the data structures needed to build the form.
    *
    * @return void

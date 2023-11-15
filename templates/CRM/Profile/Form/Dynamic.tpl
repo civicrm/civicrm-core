@@ -67,8 +67,8 @@
           <div {if $context neq 'dialog'}id="profilewrap{$field.group_id}"{/if}>
           <fieldset><legend>{$field.groupTitle}</legend>
         {/if}
-        {assign var=fieldset  value=`$field.groupTitle`}
-        {assign var=groupHelpPost  value=`$field.groupHelpPost`}
+        {assign var=fieldset  value=$field.groupTitle}
+        {assign var=groupHelpPost  value=$field.groupHelpPost}
         {if $field.groupHelpPre}
           <div class="messages help">{$field.groupHelpPre}</div>
         {/if}

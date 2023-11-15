@@ -28,7 +28,12 @@ trait CRMTraits_Financial_PriceSetTrait {
    * @return int
    */
   protected function getPriceSetID(string $key = 'membership'):int {
-    return $this->ids['PriceSet'][$key];
+    if (isset($this->ids['PriceSet'][$key])) {
+      return $this->ids['PriceSet'][$key];
+    }
+    if (count($this->ids['PriceSet']) === 1) {
+      return reset($this->ids['PriceSet']);
+    }
   }
 
   /**
@@ -168,7 +173,7 @@ trait CRMTraits_Financial_PriceSetTrait {
       ], $membershipTypeParams);
       $this->ids['MembershipType'] = [$this->membershipTypeCreate($membershipTypeParams)];
     }
-    $priceField = $this->callAPISuccess('price_field', 'create', [
+    $priceField = $this->callAPISuccess('PriceField', 'create', [
       'price_set_id' => $this->ids['PriceSet']['membership_block'],
       'name' => 'membership_amount',
       'label' => 'Membership Amount',
