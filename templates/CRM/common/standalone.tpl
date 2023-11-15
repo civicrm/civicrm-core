@@ -66,10 +66,6 @@
       {/crmRegion}
     </div>
 
-    {if isset($localTasks)}
-      {include file="CRM/common/localNav.tpl"}
-    {/if}
-
     {crmRegion name='page-footer'}
       {if !empty($urlIsPublic)}
         {include file="CRM/common/publicFooter.tpl"}
