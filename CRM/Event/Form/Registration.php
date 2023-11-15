@@ -380,8 +380,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
       CRM_Utils_System::redirect($url);
     }
-    // The concept of contributeMode is deprecated.
-    $this->_contributeMode = $this->get('contributeMode');
 
     $this->assign('paidEvent', $this->getEventValue('is_monetary'));
     // we do not want to display recently viewed items on Registration pages

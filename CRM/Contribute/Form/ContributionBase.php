@@ -166,22 +166,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_action;
 
   /**
-   * Contribution mode.
-   *
-   * In general we are trying to deprecate this parameter but some templates and processors still
-   * require it to denote whether the processor redirects offsite (notify) or not.
-   *
-   * The intent is that this knowledge should not be required and all contributions should
-   * be created in a pending state and updated based on the payment result without needing to be
-   * aware of the processor workings.
-   *
-   * @var string
-   *
-   * @deprecated
-   */
-  public $_contributeMode;
-
-  /**
    * Contribution page supports memberships
    * @var bool
    */
@@ -509,8 +493,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // This can probably go as nothing it 'getting it' anymore since the values data is loaded
     // on every form, rather than being passed from form to form.
     $this->set('amount_block_is_active', $this->isFormSupportsNonMembershipContributions());
-
-    $this->_contributeMode = $this->get('contributeMode');
 
     //assigning is_monetary and is_email_receipt to template
     $this->assign('is_monetary', $this->_values['is_monetary']);
