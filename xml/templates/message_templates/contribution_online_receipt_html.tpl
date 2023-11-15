@@ -61,7 +61,7 @@
                 <td>{$line.qty}</td>
                 <td>{$line.unit_price|crmMoney:$currency}</td>
                 {if $isShowTax && {contribution.tax_amount|boolean}}
-                  <td>{$line.unit_price*$line.qty|crmMoney:$currency}</td>
+                  <td>{$line.line_total|crmMoney:$currency}</td>
                   {if $line.tax_rate || $line.tax_amount != ""}
                     <td>{$line.tax_rate|string_format:"%.2f"}%</td>
                     <td>{$line.tax_amount|crmMoney:$currency}</td>
