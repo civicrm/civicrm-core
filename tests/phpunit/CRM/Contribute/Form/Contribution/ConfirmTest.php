@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\PriceSetEntity;
 use Civi\Test\ContributionPageTestTrait;
@@ -242,7 +243,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function createContributionPage(array $params, $isDefaultContributionPriceSet = TRUE): int {
+  protected function createContributionPage(array $params, bool $isDefaultContributionPriceSet = TRUE): int {
     $contributionPageID = (int) $this->callAPISuccess('ContributionPage', 'create', array_merge([
       'title' => 'Test Contribution Page',
       'financial_type_id' => 'Campaign Contribution',
@@ -320,8 +321,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'year' => 2021,
       'month' => 2,
     ];
-    $form = $this->submitOnlineContributionForm($submittedValues, $contributionPageID);
-    return $form;
+    return $this->submitOnlineContributionForm($submittedValues, $contributionPageID);
   }
 
   /**
@@ -345,7 +345,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    *
    * @dataProvider getThousandSeparators
    */
-  public function testSubmitContributionPageWithPriceSetQuantity(string $thousandSeparator): void {
+  public function testSubmitContributionComplexPriceSetPayLater(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
     $this->contributionPageWithPriceSetCreate([], ['is_quick_config' => FALSE]);
@@ -392,6 +392,57 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'payment_instrument_id' => 'Check',
     ]);
     $mailUtil->checkMailLog([\Civi::format()->money(337.55), 'Tax Rate', 'Subtotal']);
+  }
+
+  /**
+   * Test form submission with multiple option price set.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitContributionPageWithPriceSetTaxEnabled(string $thousandSeparator): void {
+    $this->setCurrencySeparators($thousandSeparator);
+    $this->enableTaxAndInvoicing();
+    $this->contributionPageWithPriceSetCreate([], ['is_quick_config' => FALSE]);
+    // This function sets the Tax Rate at 10% - it currently has no way to pass Tax Rate into it - so let's work with 10%
+    $this->addTaxAccountToFinancialType($this->ids['FinancialType']['second']);
+    $this->submitOnlineContributionForm([
+      'id' => $this->getContributionPageID(),
+      'first_name' => 'Billy',
+      'last_name' => 'Gruff',
+      'email-5' => 'billy@goat.gruff',
+      'receive_date' => date('Y-m-d H:i:s'),
+      'payment_processor_id' => 0,
+      'priceSetId' => $this->getPriceSetID('ContributionPage'),
+      // qty = 1 * unit_price = $10.00 = 10. No sales tax.
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
+      // qty = 2 * unit_price = $16.95 = 33.90. Tax = $3.39.
+      'price_' . $this->ids['PriceField']['text_field_16.95'] => 2,
+    ] + $this->getBillingSubmitValues(),
+      $this->getContributionPageID()
+    );
+
+    $contribution = Contribution::get()->addWhere('contribution_page_id', '=', $this->getContributionPageID())->execute()->first();
+    $this->assertEquals(47.29, $contribution['total_amount']);
+    $lineItems = $this->callAPISuccess('LineItem', 'get', [
+      'contribution_id' => $contribution['id'],
+    ]);
+    $this->assertEquals(2, $lineItems['count']);
+    $totalLineAmount = 0;
+    foreach ($lineItems['values'] as $lineItem) {
+      $totalLineAmount += $lineItem['line_total'];
+    }
+    $this->assertEquals(43.90, $totalLineAmount);
+    $this->assertMailSentContainingStrings([
+      \Civi::format()->money(3.39),
+      'Tax Rate',
+      'Subtotal',
+    ]);
+
   }
 
 }

@@ -1542,44 +1542,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test form submission with multiple option price set.
-   *
-   * @param string $thousandSeparator
-   *   punctuation used to refer to thousands.
-   *
-   * @dataProvider getThousandSeparators
-   */
-  public function testSubmitContributionPageWithPriceSet(string $thousandSeparator): void {
-    $this->setCurrencySeparators($thousandSeparator);
-    $this->setUpContributionPage([], ['is_quick_config' => FALSE]);
-    $submitParams = [
-      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
-      'id' => $this->getContributionPageID(),
-      'first_name' => 'Billy',
-      'last_name' => 'Gruff',
-      'email' => 'billy@goat.gruff',
-      'is_pay_later' => TRUE,
-    ];
-    $this->addPriceFields($submitParams);
-
-    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
-    $contribution = $this->callAPISuccessGetSingle('contribution', [
-      'contribution_page_id' => $this->getContributionPageID(),
-      'contribution_status_id' => 'Pending',
-    ]);
-    $this->assertEquals(80, $contribution['total_amount']);
-    $lineItems = $this->callAPISuccess('LineItem', 'get', [
-      'contribution_id' => $contribution['id'],
-    ]);
-    $this->assertEquals(3, $lineItems['count']);
-    $totalLineAmount = 0;
-    foreach ($lineItems['values'] as $lineItem) {
-      $totalLineAmount += $lineItem['line_total'];
-    }
-    $this->assertEquals(80, $totalLineAmount);
-  }
-
-  /**
    * Function to add additional price fields to price set.
    *
    * @param array $params
