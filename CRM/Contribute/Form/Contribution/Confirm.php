@@ -1974,15 +1974,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // It can be blank with a $0 transaction - then no processor needs to be selected
       $form->_paymentProcessor = $form->_paymentProcessors[$form->_params['payment_processor_id']];
     }
-    if (!empty($params['payment_processor_id'])) {
-      // The concept of contributeMode is deprecated as is the billing_mode concept.
-      if ($form->_paymentProcessor['billing_mode'] == 1) {
-        $form->_contributeMode = 'direct';
-      }
-      else {
-        $form->_contributeMode = 'notify';
-      }
-    }
 
     if (!empty($params['useForMember'])) {
       $form->set('useForMember', 1);
