@@ -46,10 +46,7 @@ class CRM_Core_Form_Tag {
     $form->assign('isTagset', FALSE);
     $mode = NULL;
 
-    foreach ($parentNames as &$parentNameItem) {
-      // get the parent id for tag list input for keyword
-      $parentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $parentNameItem, 'id', 'name');
-
+    foreach ($parentNames as $parentId => $parentNameItem) {
       // check if parent exists
       if ($parentId) {
         $tagsetItem = $tagsetElementName . 'parentId_' . $parentId;
