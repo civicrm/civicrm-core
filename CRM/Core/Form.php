@@ -319,6 +319,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Required for footer.tpl,
     // See CRM_Activity_Form_ActivityTest:testInboundEmailDisplaysWithLineBreaks.
     'footer_status_severity',
+    // Required for some profiles (e.g on the Main page of the contribution form flow).
+    // A bit tricky to add closer to the usage due to conditionality of inclusion
+    'showCMS',
   ];
 
   /**
