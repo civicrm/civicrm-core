@@ -81,7 +81,6 @@ class Joomla implements AuthxInterface {
     // In any event, this work-around passes `AllFlowsTest::testMultipleStateless`.
 
     \JFactory::getSession()->destroy();
-    \JFactory::getSession()->setHandler(new \CRM_Utils_FakeJoomlaSession('CIVISCRIPT'));
     $user = new \JUser($userId);
     $session = \JFactory::getSession();
     $session->set('user', $user);
