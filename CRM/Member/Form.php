@@ -583,10 +583,15 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $this->order = new CRM_Financial_BAO_Order();
     $this->order->setForm($this);
     $this->order->setPriceSelectionFromUnfilteredInput($formValues);
+
     if (isset($formValues['total_amount'])) {
       $this->order->setOverrideTotalAmount((float) $formValues['total_amount']);
     }
-    $this->order->setOverrideFinancialTypeID((int) $formValues['financial_type_id']);
+
+    if (empty($formValues['price_set_id'])) {
+      $this->order->setOverrideFinancialTypeID((int) $formValues['financial_type_id']);
+    }
+
     return $formValues;
   }
 
