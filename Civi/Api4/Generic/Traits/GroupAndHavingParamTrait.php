@@ -60,6 +60,18 @@ trait GroupAndHavingParamTrait {
       throw new \CRM_Core_Exception('Unsupported operator');
     }
     $this->having[] = [$expr, $op, $value];
+    $this->addSelect($expr);
+    return $this;
+  }
+
+  /**
+   * Overrides the default setter magic function to ensure we add having clauses to the select
+   */
+  public function setHaving(array $clauses) {
+    $this->having = [];
+    foreach ($clauses as $clause) {
+      $this->addHaving(...$clause);
+    }
     return $this;
   }
 

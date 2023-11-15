@@ -85,6 +85,10 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
       if ($indexField && $indexField != $indexCol) {
         $apiCall->addSelect($indexField);
       }
+      // reset having to ensure having fields are re-added to select
+      if (!empty($params['having'])) {
+        $apiCall->setHaving($params['having']);
+      }
     }
   }
 
