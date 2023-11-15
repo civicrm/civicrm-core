@@ -37,7 +37,7 @@
 
     <div class="clear"></div>
 
-    {if $localTasks}
+    {if !empty($localTasks)}
         {include file="CRM/common/localNav.tpl"}
     {/if}
 
