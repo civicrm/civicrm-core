@@ -200,7 +200,7 @@ return [
                   'condition' => [],
                 ],
                 [
-                  'path' => 'civicrm/admin/contribute?action=copy&gid=[id]',
+                  'path' => 'civicrm/admin/contribute/manage?action=copy&gid=[id]',
                   'icon' => 'fa-clone',
                   'text' => E::ts('Clone'),
                   'style' => 'secondary',
@@ -230,7 +230,7 @@ return [
                 ],
                 [
                   'entity' => 'ContributionPage',
-                  'action' => 'delete',
+                  'action' => '',
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
@@ -238,6 +238,7 @@ return [
                   'style' => 'danger',
                   'path' => '',
                   'condition' => [],
+                  'task' => 'delete',
                 ],
               ],
               'type' => 'buttons',
