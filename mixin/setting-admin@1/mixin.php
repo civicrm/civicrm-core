@@ -24,7 +24,7 @@
  *
  * @mixinName setting-admin
  * @mixinVersion 1.0.0
- * @since 5.67
+ * @since 5.68
  */
 
 namespace Civi\Mixin\SettingAdminV1;
