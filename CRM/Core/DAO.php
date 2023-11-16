@@ -3412,27 +3412,43 @@ SELECT contact_id
       // No label supplied, do nothing
       return;
     }
-    $maxLen = static::getSupportedFields()['name']['maxlength'] ?? 255;
-    // Strip unsafe characters and trim to max length (-3 characters leaves room for a unique suffix)
-    $name = CRM_Utils_String::munge($label, '_', $maxLen - 3);
 
-    // Find existing records with the same name
+    // Strip unsafe characters and trim to max length, allowing room for a
+    // unique suffix composed of an underscore + 4 alphanumeric chars,
+    // supporting up to 36^4=1,679,616 unique names for any given value of
+    // $label. Half that amount could be considered the working limit, as
+    // much above that the time to find a non-existent value becomes
+    // unacceptable.
+    $maxSuffixLen = 5;
+    $maxLen = static::getSupportedFields()['name']['maxlength'] ?? 255;
+    $name = CRM_Utils_String::munge($label, '_', $maxLen - $maxSuffixLen);
+    $name_lc = strtolower($name);
+
+    // Find existing records with the same name.
+    // The default 'name' column collation, and thus the index on which it is
+    // based, is case-insensitive, so we'll use the lower-case version of $name
+    // from now on to avoid confusion and to support the unexpected case of a
+    // name column with case-sensitive collation.
     $sql = new CRM_Utils_SQL_Select($this::getTableName());
     $sql->select(['id', 'name']);
-    $sql->where('name LIKE @name', ['@name' => $name . '%']);
+    $sql->where('name LIKE @name', ['@name' => $name_lc . '%']);
     // Include all fields that are part of the index
     foreach (array_diff($indexNameWith, ['name']) as $field) {
       $sql->where("`$field` = @val", ['@val' => $this->$field]);
     }
     $query = $sql->toSQL();
     $existing = self::executeQuery($query)->fetchMap('id', 'name');
-    $dupes = 0;
     $suffix = '';
-    // Add unique suffix if existing records have the same name
-    while (in_array($name . $suffix, $existing)) {
-      $suffix = '_' . ++$dupes;
+
+    // Add a unique suffix if there exists a record having the same name. The
+    // comparison is performed case-insensitive to support both case-sensitive
+    // and insensitive collation.
+    $existing_lc = array_map('strtolower', $existing);
+
+    while (in_array($name_lc . $suffix, $existing_lc)) {
+      $suffix = '_' . CRM_Utils_String::createRandom($maxSuffixLen - 1, 'abcdefghijklmnopqrstuvwxyz0123456789');
     }
-    $this->name = $name . $suffix;
+    $this->name = $name_lc . $suffix;
   }
 
   /**
