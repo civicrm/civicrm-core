@@ -928,7 +928,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_params = $this->prepareParamsForPaymentProcessor($this->_params);
       $this->_params['amount'] = $params['fee_amount'];
       $this->_params['amount_level'] = $params['amount_level'];
-      $this->_params['currencyID'] = $config->defaultCurrency;
       $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
 
       // at this point we've created a contact and stored its address etc
@@ -1041,7 +1040,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           }
         }
         unset($params['note']);
-        $contributionParams['currency'] = $config->defaultCurrency;
+        $contributionParams['currency'] = \Civi::settings()->get('defaultCurrency');;
         $contributionParams['contact_id'] = $this->_contactID;
 
         if ($this->_id) {
@@ -1434,7 +1433,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       //lets carry currency, CRM-4453
-      $params['fee_currency'] = CRM_Core_Config::singleton()->defaultCurrency;
+      $params['fee_currency'] = \Civi::settings()->get('defaultCurrency');
       if (!isset($lineItem[0])) {
         $lineItem[0] = [];
       }
@@ -1519,7 +1518,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'tax_amount' => $params['tax_amount'],
       'amount_level' => $params['amount_level'],
       'invoice_id' => $params['invoiceID'],
-      'currency' => $params['currencyID'],
+      'currency' => \Civi::settings()->get('defaultCurrency'),
       'source' => $this->getSourceText(),
       'is_pay_later' => FALSE,
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
@@ -1596,7 +1595,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'is_pay_later' => FALSE,
       'fee_amount' => $params['fee_amount'] ?? NULL,
       'discount_id' => $params['discount_id'] ?? NULL,
-      'fee_currency' => $params['currencyID'] ?? NULL,
+      'fee_currency' => \Civi::settings()->get('defaultCurrency'),
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'note' => $this->getSubmittedValue('note'),
       'is_test' => ($this->_mode === 'test)'),
@@ -1869,7 +1868,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         if ($contributionID) {
           Contribution::update(FALSE)
             ->addWhere('id', '=', $contributionID)
-            ->setValues(['receipt_date', '=', 'now'])
+            ->setValues(['receipt_date' => 'now'])
             ->execute();
         }
         $sent[] = $contactID;
