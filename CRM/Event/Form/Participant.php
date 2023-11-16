@@ -977,7 +977,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->_params['receipt_date'] = NULL;
       }
 
-      $this->set('params', $this->_params);
       //add contribution record
       $this->_params['mode'] = $this->_mode;
 
