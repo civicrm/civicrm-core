@@ -118,6 +118,13 @@ abstract class SqlFunction extends SqlExpression {
     if (static::$dataType) {
       $dataType = static::$dataType;
     }
+    elseif (static::$category === self::CATEGORY_AGGREGATE) {
+      $exprArgs = $this->getArgs();
+      // If the first expression is a SqlFunction/SqlEquation, allow it to control the aggregate dataType
+      if (method_exists($exprArgs[0]['expr'][0], 'formatOutputValue')) {
+        $exprArgs[0]['expr'][0]->formatOutputValue($dataType, $values, $key);
+      }
+    }
     if (isset($values[$key]) && $this->suffix && $this->suffix !== 'id') {
       $dataType = 'String';
       $value =& $values[$key];
@@ -162,7 +169,7 @@ abstract class SqlFunction extends SqlExpression {
    * @return string
    */
   protected function renderExpression(string $output): string {
-    return $this->getName() . '(' . $output . ')';
+    return $this->getName() . "($output)";
   }
 
   /**
