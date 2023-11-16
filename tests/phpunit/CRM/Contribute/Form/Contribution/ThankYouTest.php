@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Test\ContributionPageTestTrait;
+
 /**
  *  Test CRM_Contribute_Form_Contribution_ThankYou
  *
@@ -17,6 +19,8 @@
  * @group headless
  */
 class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
+
+  use ContributionPageTestTrait;
 
   /**
    * Clean up DB.
@@ -60,13 +64,16 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
   /**
    * Get CRM_Contribute_Form_Contribution_ThankYou form with attached contribution.
    *
-   * @param $paymentProcessorID
+   * @param int $paymentProcessorID
    * @param bool $withPendingContribution
    * @param bool $isTestContribution
    * @return CRM_Contribute_Form_Contribution_ThankYou
    */
-  private function getThankYouFormWithContribution($paymentProcessorID, $withPendingContribution = FALSE, $isTestContribution = FALSE) {
+  private function getThankYouFormWithContribution(int $paymentProcessorID, $withPendingContribution = FALSE, $isTestContribution = FALSE) {
     $pageContribution = $this->getPageContribution((($withPendingContribution) ? 2 : 1), $isTestContribution);
+    if (!isset($this->ids['ContributionPage'])) {
+      $this->contributionPageCreatePaid(['payment_processor' => $paymentProcessorID])['id'];
+    }
     $form = $this->getThankYouForm();
     $form->_lineItem = [];
     $form->_bltID = 5;
@@ -76,8 +83,9 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
     $form->_params['email-5'] = 'demo@example.com';
     $form->_params['payment_processor_id'] = $paymentProcessorID;
     if ($isTestContribution) {
-      $form->_mode = 'test';
+      $_REQUEST['action'] = 1024;
     }
+
     $form->_values = [
       'custom_pre_id' => NULL,
       'custom_post_id' => NULL,
@@ -116,9 +124,8 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
    * @return CRM_Contribute_Form_Contribution_ThankYou
    */
   private function getThankYouForm() {
-    $form = new CRM_Contribute_Form_Contribution_ThankYou();
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $form->controller = new CRM_Contribute_Controller_Contribution();
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution_ThankYou', [], ['id' => $this->getContributionPageID()]);
+    $form->preProcess();
     return $form;
   }
 
