@@ -352,7 +352,7 @@ class CRM_Core_Action {
           $classes .= " small-popup";
         }
 
-        $linkContent = $link['name'];
+        $linkContent = $link['title'] ?? $link['name'];
         if (!empty($link['icon'])) {
           if ($iconMode === 'icon') {
             $linkContent = CRM_Core_Page::crmIcon($link['icon'], $link['name'], TRUE, ['title' => '']);
