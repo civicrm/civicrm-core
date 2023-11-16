@@ -79,9 +79,9 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
   if ($index && is_array($index)) {
     $indexCol = reset($index);
     $indexField = key($index);
-    // Index array indicates only 1 or 2 fields need to be selected (except for oddball "Setting" api)
-    if ($entity !== 'Setting' && property_exists($apiCall, 'select')) {
-      $apiCall->setSelect([$indexCol]);
+    // Automatically add index fields(s) to the SELECT clause
+    if ($entity !== 'Setting' && method_exists($apiCall, 'addSelect')) {
+      $apiCall->addSelect($indexCol);
       if ($indexField && $indexField != $indexCol) {
         $apiCall->addSelect($indexField);
       }
