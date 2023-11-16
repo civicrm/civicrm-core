@@ -69,6 +69,17 @@ trait FormTrait {
   }
 
   /**
+   * Assert that the sent mail included the supplied string.
+   *
+   * @param string $string
+   * @param int $mailIndex
+   */
+  protected function assertMailSentContainingHeaderString(string $string, int $mailIndex = 0): void {
+    $mail = $this->form->getMail()[$mailIndex];
+    $this->assertStringContainsString($string, $mail['headers']);
+  }
+
+  /**
    * Assert that the sent mail included the supplied strings.
    *
    * @param array $recipients
