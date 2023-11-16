@@ -40,11 +40,7 @@ class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndI
   }
 
   public function setUp(): void {
-    $quirks = [
-      'Joomla' => ['sendsExcessCookies', 'authErrorShowsForm'],
-      'WordPress' => ['sendsExcessCookies'],
-    ];
-    $this->quirks = $quirks[CIVICRM_UF] ?? [];
+    $this->quirks = $this->findQuirks();
 
     parent::setUp();
     $this->settingsBackup = [];
@@ -81,15 +77,18 @@ class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndI
   }
 
   /**
-   * Filter a request, applying the given authentication options
+   * Apply authentication options to a prepared HTTP request.
    *
    * @param \Psr\Http\Message\RequestInterface $request
+   *   The original HTTP request (without any authentication options).
    * @param string $credType
    *   Ex: 'pass', 'jwt', 'api_key'
    * @param string $flowType
    *   Ex: 'param', 'header', 'xheader'
    * @param int $cid
+   *   Authenticate as a specific contact (contact ID#).
    * @return \Psr\Http\Message\RequestInterface
+   *   The new HTTP request (with authentication options).
    */
   protected function applyAuth($request, $credType, $flowType, $cid) {
     $credFunc = 'cred' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $credType));
@@ -114,7 +113,7 @@ class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndI
   }
 
   /**
-   * Assert the AJAX request provided the expected contact.
+   * Assert the AJAX response provided the expected contact.
    *
    * @param int $cid
    *   The expected contact ID
@@ -371,6 +370,17 @@ class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndI
       \Civi::$statics[__CLASS__]['lebowskiCID'] = $contact['id'];
     }
     return \Civi::$statics[__CLASS__]['lebowskiCID'];
+  }
+
+  /**
+   * @return array|string[]
+   */
+  protected function findQuirks(): array {
+    $quirks = [
+      'Joomla' => ['sendsExcessCookies', 'authErrorShowsForm'],
+      'WordPress' => ['sendsExcessCookies'],
+    ];
+    return $quirks[CIVICRM_UF] ?? [];
   }
 
 }
