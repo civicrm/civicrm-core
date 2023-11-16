@@ -19,7 +19,9 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
     for ($i = 0; $i < count($matches[0]); $i++) {
       $langs[$matches[1][$i]] = $matches[2][$i];
     }
+    // @todo Somewhere in 2024 or beyond, deprecate the old installer
     file_put_contents('../install/langs.php', "<?php \$langs = " . var_export($langs, TRUE) . ";");
+    file_put_contents('../setup/res/languages.php', "<?php\n\n\Civi\Setup::assertRunning();\n\n\$langs = " . var_export($langs, TRUE) . ";");
   }
 
   public function generateSchemaStructure(): void {
