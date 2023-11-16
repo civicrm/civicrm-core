@@ -1,4 +1,5 @@
 <?php
+namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Api4\Dashboard;
@@ -8,7 +9,7 @@ use Civi\Api4\Dashboard;
  * This is a generic test class implemented with PHPUnit.
  * @group headless
  */
-class api_v4_AfformTest extends api_v4_AfformTestCase {
+class AfformTest extends AfformTestCase {
   use \Civi\Test\Api3TestTrait;
   use \Civi\Test\ContactTestTrait;
 
@@ -131,7 +132,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
   public function getFormatExamples() {
     $ex = [];
     $formats = ['html', 'shallow', 'deep'];
-    foreach (glob(__DIR__ . '/formatExamples/*.php') as $exampleFile) {
+    foreach (glob(__DIR__ . '/../formatExamples/*.php') as $exampleFile) {
       $example = require $exampleFile;
       if (isset($example['deep'])) {
         foreach ($formats as $updateFormat) {
@@ -227,7 +228,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
   public function getWhitespaceExamples() {
     $ex = [];
-    foreach (glob(__DIR__ . '/formatExamples/*.php') as $exampleFile) {
+    foreach (glob(__DIR__ . '/../formatExamples/*.php') as $exampleFile) {
       $example = require $exampleFile;
       if (isset($example['pretty'])) {
         $ex[] = ['mockBareFile', $example, $exampleFile];
@@ -278,7 +279,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
     // The default mockPage has 1 explicit requirement + 2 automatic requirements.
     Afform::revert()->addWhere('name', '=', $formName)->execute();
-    $angModule = Civi::service('angular')->getModule($formName);
+    $angModule = \Civi::service('angular')->getModule($formName);
     sort($angModule['requires']);
     $storedRequires = Afform::get()->addWhere('name', '=', $formName)->addSelect('requires')->execute();
     $this->assertEquals(['afCore', 'mockBareFile', 'mockBespoke', 'mockFoo'], $angModule['requires']);
@@ -290,7 +291,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       ->setLayoutFormat('html')
       ->setValues(['layout' => '<div>The bare file says "<mock-bare-file/>"</div>'])
       ->execute();
-    $angModule = Civi::service('angular')->getModule($formName);
+    $angModule = \Civi::service('angular')->getModule($formName);
     sort($angModule['requires']);
     $storedRequires = Afform::get()->addWhere('name', '=', $formName)->addSelect('requires')->execute();
     $this->assertEquals(['afCore', 'mockBareFile', 'mockBespoke'], $angModule['requires']);
@@ -305,13 +306,13 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
         'requires' => [],
       ])
       ->execute();
-    $angModule = Civi::service('angular')->getModule($formName);
+    $angModule = \Civi::service('angular')->getModule($formName);
     $this->assertEquals(['afCore'], $angModule['requires']);
     $storedRequires = Afform::get()->addWhere('name', '=', $formName)->addSelect('requires')->execute();
     $this->assertEquals([], $storedRequires[0]['requires']);
 
     Afform::revert()->addWhere('name', '=', $formName)->execute();
-    $angModule = Civi::service('angular')->getModule($formName);
+    $angModule = \Civi::service('angular')->getModule($formName);
     sort($angModule['requires']);
     $this->assertEquals(['afCore', 'mockBareFile', 'mockBespoke', 'mockFoo'], $angModule['requires']);
   }
