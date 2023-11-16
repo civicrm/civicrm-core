@@ -59,10 +59,9 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
       throw new \CRM_Core_Exception("Entity name is required to get autocomplete default display.");
     }
     $idField = CoreUtil::getIdFieldName($entityName);
-    $searchFields = CoreUtil::getSearchFields($entityName);
-    if (!$searchFields) {
-      throw new \CRM_Core_Exception("Entity $entityName has no default label field.");
-    }
+
+    // If there's no label field, fall back on id. That's a pretty lame autocomplete but better than nothing.
+    $searchFields = CoreUtil::getSearchFields($entityName) ?: [$idField];
 
     // Default sort order
     $e->display['settings']['sort'] = self::getDefaultSort($entityName);
