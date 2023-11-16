@@ -1064,6 +1064,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       if ($paidByName === 'Check') {
         $val['check_number'] = $resultDAO->check_number;
       }
+      else {
+        $val['check_number'] = NULL;
+      }
       $rows[] = $val;
     }
     return $rows;
