@@ -241,7 +241,7 @@ return [
                   'task' => 'delete',
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
               'alignment' => 'text-right',
             ],
           ],
