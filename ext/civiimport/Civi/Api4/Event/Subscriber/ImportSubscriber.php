@@ -214,7 +214,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
     }
     $forms = [];
     try {
-      $importSearches = SearchDisplay::get()
+      $importSearches = SearchDisplay::get(FALSE)
         ->addWhere('saved_search_id.name', 'LIKE', 'Import\_Summary\_%')
         ->addWhere('saved_search_id.expires_date', '>', 'now')
         ->addSelect('name', 'label')
