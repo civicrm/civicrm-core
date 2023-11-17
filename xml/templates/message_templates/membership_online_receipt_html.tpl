@@ -100,145 +100,84 @@
             </td>
           </tr>
         {/if}
-      {elseif empty($useForMember) && !empty($lineItem) and $priceSetID and empty($is_quick_config)}
-        {foreach from=$lineItem item=value key=priceset}
-          <tr>
-            <td colspan="2" {$valueStyle}>
-              <table>
-                <tr>
-                  <th>{ts}Item{/ts}</th>
-                  <th>{ts}Qty{/ts}</th>
-                  <th>{ts}Each{/ts}</th>
-                  <th>{ts}Total{/ts}</th>
-                </tr>
-                {foreach from=$value item=line}
-                  <tr>
-                    <td>
-                      {$line.description|truncate:30:"..."}
-                    </td>
-                    <td>
-                      {$line.qty}
-                    </td>
-                    <td>
-                      {$line.unit_price|crmMoney}
-                    </td>
-                    <td>
-                      {$line.line_total|crmMoney}
-                    </td>
-                  </tr>
-                {/foreach}
-              </table>
-            </td>
-          </tr>
-        {/foreach}
+      {elseif $isShowLineItems}
         <tr>
-          <td {$labelStyle}>
-            {ts}Total Amount{/ts}
-          </td>
-          <td {$valueStyle}>
-            {$amount|crmMoney}
+          <td colspan="2" {$valueStyle}>
+            <table>
+              <tr>
+                <th>{ts}Item{/ts}</th>
+                <th>{ts}Fee{/ts}</th>
+                {if $isShowTax && {contribution.tax_amount|boolean}}
+                  <th>{ts}SubTotal{/ts}</th>
+                  <th>{ts}Tax Rate{/ts}</th>
+                  <th>{ts}Tax Amount{/ts}</th>
+                  <th>{ts}Total{/ts}</th>
+                {/if}
+                <th>{ts}Membership Start Date{/ts}</th>
+                <th>{ts}Membership Expiration Date{/ts}</th>
+              </tr>
+              {foreach from=$lineItems item=line}
+                <tr>
+                  <td>{$line.title}</td>
+                  <td>
+                    {$line.line_total|crmMoney}
+                  </td>
+                  {if $isShowTax && {contribution.tax_amount|boolean}}
+                    <td>
+                      {$line.line_total|crmMoney:'{contribution.currency}'}
+                    </td>
+                    {if $line.tax_rate || $line.tax_amount != ""}
+                      <td>
+                        {$line.tax_rate|string_format:"%.2f"}%
+                      </td>
+                      <td>
+                        {$line.tax_amount|crmMoney:'{contribution.currency}'}
+                      </td>
+                    {else}
+                      <td></td>
+                      <td></td>
+                    {/if}
+                    <td>
+                      {$line.line_total_inclusive|crmMoney:'{contribution.currency}'}
+                    </td>
+                  {/if}
+                  <td>
+                    {$line.membership.start_date|crmDate:"Full"}
+                  </td>
+                  <td>
+                    {$line.membership.end_date|crmDate:"Full"}
+                  </td>
+                </tr>
+              {/foreach}
+            </table>
           </td>
         </tr>
 
-      {else}
-        {if $useForMember && $lineItem and empty($is_quick_config)}
-           {foreach from=$lineItem item=value key=priceset}
-             <tr>
-               <td colspan="2" {$valueStyle}>
-                <table>
-                  <tr>
-                    <th>{ts}Item{/ts}</th>
-                    <th>{ts}Fee{/ts}</th>
-                    {if !empty($dataArray)}
-                      <th>{ts}SubTotal{/ts}</th>
-                      <th>{ts}Tax Rate{/ts}</th>
-                      <th>{ts}Tax Amount{/ts}</th>
-                      <th>{ts}Total{/ts}</th>
-                    {/if}
-                    <th>{ts}Membership Start Date{/ts}</th>
-                    <th>{ts}Membership Expiration Date{/ts}</th>
-                  </tr>
-                  {foreach from=$value item=line}
-                    <tr>
-                      <td>
-                        {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div>{$line.description|truncate:30:"..."}</div>{/if}
-                      </td>
-                      <td>
-                        {$line.line_total|crmMoney}
-                      </td>
-                      {if !empty($dataArray)}
-                        <td>
-                          {$line.unit_price*$line.qty|crmMoney}
-                        </td>
-                        {if ($line.tax_rate || $line.tax_amount != "")}
-                          <td>
-                            {$line.tax_rate|string_format:"%.2f"}%
-                          </td>
-                          <td>
-                           {$line.tax_amount|crmMoney}
-                          </td>
-                        {else}
-                          <td></td>
-                          <td></td>
-                        {/if}
-                        <td>
-                          {$line.line_total+$line.tax_amount|crmMoney}
-                        </td>
-                      {/if}
-                      <td>
-                        {$line.start_date}
-                      </td>
-                      <td>
-                        {$line.end_date}
-                      </td>
-                    </tr>
-                  {/foreach}
-                </table>
-               </td>
-             </tr>
-           {/foreach}
-           {if !empty($dataArray)}
+        {if $isShowTax && {contribution.tax_amount|boolean}}
+          <tr>
+            <td {$labelStyle}>
+                {ts}Amount Before Tax:{/ts}
+            </td>
+            <td {$valueStyle}>
+                {contribution.tax_exclusive_amount}
+            </td>
+          </tr>
+          {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
             <tr>
-             <td {$labelStyle}>
-              {ts}Amount Before Tax:{/ts}
-             </td>
-             <td {$valueStyle}>
-               {contribution.tax_exclusive_amount}
-             </td>
+              <td {$labelStyle}>{if $taxRate == 0}{ts}No{/ts} {$taxTerm}{else} {$taxTerm} {$taxDetail.percentage}%{/if}</td>
+              <td {$valueStyle}>{$taxDetail.amount|crmMoney:'{contribution.currency}'}</td>
             </tr>
-            {foreach from=$dataArray item=value key=priceset}
-             <tr>
-             {if $priceset || $priceset == 0}
-               <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
-               <td>&nbsp;{$value|crmMoney:$currency}</td>
-             {else}
-               <td>&nbsp;{ts}NO{/ts} {$taxTerm}</td>
-               <td>&nbsp;{$value|crmMoney:$currency}</td>
-             {/if}
-             </tr>
-            {/foreach}
-           {/if}
-         {/if}
-        {if $totalTaxAmount}
-           <tr>
-             <td {$labelStyle}>
-               {ts}Total Tax Amount{/ts}
-             </td>
-             <td {$valueStyle}>
-               {$totalTaxAmount|crmMoney:$currency}
-             </td>
-           </tr>
-         {/if}
-        <tr>
-           <td {$labelStyle}>
-             {ts}Amount{/ts}
-           </td>
-           <td {$valueStyle}>
-             {$amount|crmMoney} {if isset($amount_level)} - {$amount_level}{/if}
-           </td>
-         </tr>
+          {/foreach}
+        {/if}
       {/if}
-
+      <tr>
+        <td {$labelStyle}>
+            {ts}Amount{/ts}
+        </td>
+        <td {$valueStyle}>
+            {contribution.total_amount} {if isset($amount_level)} - {$amount_level}{/if}
+        </td>
+      </tr>
     {elseif isset($membership_amount)}
       <tr>
         <th {$headerStyle}>

@@ -425,7 +425,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertCount(2, $contributions);
     $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => ['IN' => array_keys($contributions)]]);
     $mut->checkMailLog([
-      'Membership Amount',
+      'Membership Fee',
       '$2.00',
     ]);
     $mut->stop();
