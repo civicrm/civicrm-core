@@ -1,4 +1,5 @@
 <?php
+namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 
@@ -7,7 +8,7 @@ use Civi\Api4\Afform;
  *
  * @group headless
  */
-class api_v4_AfformPrefillUsageTest extends api_v4_AfformUsageTestCase {
+class AfformPrefillUsageTest extends AfformUsageTestCase {
   use \Civi\Test\Api4TestTrait;
 
   /**
@@ -35,7 +36,7 @@ EOHTML;
 
     $this->useValues([
       'layout' => $layout,
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $cid = $this->saveTestRecords('Contact', [
@@ -120,7 +121,7 @@ EOHTML;
 
     $this->useValues([
       'layout' => $layout,
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $uid = $this->createLoggedInUser();

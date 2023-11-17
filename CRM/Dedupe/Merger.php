@@ -1561,8 +1561,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $value[1] = NULL;
       }
 
-      // Display a checkbox to migrate, only if the values are different
-      if ($value != $main[$field]) {
+      // Display a checkbox to migrate, only if the values are different, should check type also for true value
+      if ($value !== $main[$field]) {
         // Don't check source if main is empty, because the source of the other contact is not the source of the merged contact
         $isChecked = ($field === 'source') ? FALSE : (!isset($main[$field]) || $main[$field] === '');
         $elements[] = [

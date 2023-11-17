@@ -1,4 +1,5 @@
 <?php
+namespace api\v4\Afform;
 
 /**
  * Test case for Afform.prefill and Afform.submit.
@@ -13,7 +14,7 @@ use Civi\Api4\CustomGroup;
 
 require_once __DIR__ . '/AfformTestCase.php';
 require_once __DIR__ . '/AfformUsageTestCase.php';
-class api_v4_AfformFileUploadTest extends api_v4_AfformUsageTestCase {
+class AfformFileUploadTest extends AfformUsageTestCase {
 
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
@@ -74,7 +75,7 @@ EOHTML;
 
     $this->useValues([
       'layout' => self::$layouts['customFiles'],
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $lastName = uniqid(__FUNCTION__);

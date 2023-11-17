@@ -1,19 +1,18 @@
 <?php
 
 ini_set('memory_limit', '2G');
+
 // phpcs:disable
 eval(cv('php:boot --level=classloader', 'phpcode'));
 // phpcs:enable
-
 // Allow autoloading of PHPUnit helper classes in this extension.
-foreach ([__DIR__] as $dir) {
-  $loader = new \Composer\Autoload\ClassLoader();
-  $loader->add('CRM_', $dir);
-  $loader->add('Civi\\', $dir);
-  $loader->add('api_', $dir);
-  $loader->add('api\\', $dir);
-  $loader->register();
-}
+$loader = new \Composer\Autoload\ClassLoader();
+$loader->add('CRM_', [__DIR__ . '/../..', __DIR__]);
+$loader->addPsr4('Civi\\', [__DIR__ . '/../../Civi', __DIR__ . '/Civi']);
+$loader->add('api_', [__DIR__ . '/../..', __DIR__]);
+$loader->addPsr4('api\\', [__DIR__ . '/../../api', __DIR__ . '/api']);
+
+$loader->register();
 
 /**
  * Call the "cv" command.
@@ -22,16 +21,17 @@ foreach ([__DIR__] as $dir) {
  *   The rest of the command to send.
  * @param string $decode
  *   Ex: 'json' or 'phpcode'.
- * @return string
+ * @return mixed
  *   Response output (if the command executed normally).
+ *   For 'raw' or 'phpcode', this will be a string. For 'json', it could be any JSON value.
  * @throws \RuntimeException
  *   If the command terminates abnormally.
  */
-function cv($cmd, $decode = 'json') {
+function cv(string $cmd, string $decode = 'json') {
   $cmd = 'cv ' . $cmd;
-  $descriptorSpec = [0 => ["pipe", "r"], 1 => ["pipe", "w"], 2 => STDERR];
+  $descriptorSpec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => STDERR];
   $oldOutput = getenv('CV_OUTPUT');
-  putenv("CV_OUTPUT=json");
+  putenv('CV_OUTPUT=json');
 
   // Execute `cv` in the original folder. This is a work-around for
   // phpunit/codeception, which seem to manipulate PWD.
@@ -51,7 +51,7 @@ function cv($cmd, $decode = 'json') {
 
     case 'phpcode':
       // If the last output is /*PHPCODE*/, then we managed to complete execution.
-      if (substr(trim($result), 0, 12) !== "/*BEGINPHP*/" || substr(trim($result), -10) !== "/*ENDPHP*/") {
+      if (substr(trim($result), 0, 12) !== '/*BEGINPHP*/' || substr(trim($result), -10) !== '/*ENDPHP*/') {
         throw new \RuntimeException("Command failed ($cmd):\n$result");
       }
       return $result;

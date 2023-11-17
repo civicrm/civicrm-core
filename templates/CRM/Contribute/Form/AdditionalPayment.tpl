@@ -107,9 +107,6 @@
 
     {literal}
     <script type="text/javascript">
-
-    var url = {/literal}{$dataUrl|@json_encode}{literal};
-
       CRM.$(function($) {
         showHideByValue( 'is_email_receipt', '', 'notice', 'table-row', 'radio', false );
         showHideByValue( 'is_email_receipt', '', 'fromEmail', 'table-row', 'radio', false );

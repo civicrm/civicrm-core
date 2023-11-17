@@ -33,7 +33,7 @@
       </div>
 
       <div class="display-block">
-        {if $lineItem and $isDisplayLineItems}
+        {if $isDisplayLineItems && $lineItem}
           {if !$amount}{assign var="amount" value=0}{/if}
           {assign var="totalAmount" value=$amount}
           {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}

@@ -1,4 +1,5 @@
 <?php
+namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
@@ -10,7 +11,7 @@ use Civi\Api4\RelationshipType;
  *
  * @group headless
  */
-class api_v4_AfformRelationshipUsageTest extends api_v4_AfformUsageTestCase {
+class AfformRelationshipUsageTest extends AfformUsageTestCase {
 
   /**
    * Tests creating a relationship between multiple contacts
@@ -34,7 +35,7 @@ EOHTML;
 
     $this->useValues([
       'layout' => $layout,
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $lastName = uniqid(__FUNCTION__);
@@ -91,7 +92,7 @@ EOHTML;
 
     $this->useValues([
       'layout' => $layout,
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $types = [
@@ -162,7 +163,7 @@ EOHTML;
 
     $this->useValues([
       'layout' => $layout,
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $contact = Contact::save(FALSE)

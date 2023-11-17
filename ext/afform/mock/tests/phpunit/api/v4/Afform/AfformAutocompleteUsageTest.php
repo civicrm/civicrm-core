@@ -1,4 +1,5 @@
 <?php
+namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
@@ -13,7 +14,7 @@ use Civi\Api4\SavedSearch;
  *
  * @group headless
  */
-class api_v4_AfformAutocompleteUsageTest extends api_v4_AfformUsageTestCase {
+class AfformAutocompleteUsageTest extends AfformUsageTestCase {
 
   /**
    * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch
@@ -33,7 +34,7 @@ EOHTML;
 
     $this->useValues([
       'layout' => $layout,
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     // Saved search for filtering
@@ -95,7 +96,7 @@ EOHTML;
         ->execute();
       $this->fail();
     }
-    catch (CRM_Core_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->assertEquals('Validation Error', $e->getMessage());
     }
 
@@ -163,7 +164,7 @@ EOHTML;
 
     $this->useValues([
       'layout' => $layout,
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $result = Contact::autocomplete()
@@ -195,7 +196,7 @@ EOHTML;
         ->execute();
       $this->fail();
     }
-    catch (CRM_Core_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->assertEquals('Validation Error', $e->getMessage());
     }
 
@@ -257,7 +258,7 @@ EOHTML;
 
     $this->useValues([
       'layout' => $layout,
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $result = Contact::autocomplete()
@@ -293,7 +294,7 @@ EOHTML;
         ->execute();
       $this->fail();
     }
-    catch (CRM_Core_Exception $e) {
+    catch (\CRM_Core_Exception $e) {
       $this->assertEquals('Validation Error', $e->getMessage());
     }
 

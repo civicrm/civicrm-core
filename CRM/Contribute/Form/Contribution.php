@@ -96,8 +96,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public $_pledgeValues;
 
-  public $_contributeMode = 'direct';
-
   public $_context;
 
   /**

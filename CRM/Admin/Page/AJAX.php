@@ -86,7 +86,7 @@ class CRM_Admin_Page_AJAX {
       $result[] = [
         'key' => $key,
         'value' => $allOptions[$key]['label'],
-        'adv_search_legacy' => $allOptions[$key]['adv_search_legacy'],
+        'adv_search_legacy' => $allOptions[$key]['adv_search_legacy'] ?? '',
       ];
     }
     return $result;

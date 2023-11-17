@@ -1,4 +1,5 @@
 <?php
+namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 
@@ -7,7 +8,7 @@ use Civi\Api4\Afform;
  *
  * @group headless
  */
-abstract class api_v4_AfformUsageTestCase extends api_v4_AfformTestCase {
+abstract class AfformUsageTestCase extends AfformTestCase {
   use \Civi\Test\Api3TestTrait;
   use \Civi\Test\ContactTestTrait;
 
