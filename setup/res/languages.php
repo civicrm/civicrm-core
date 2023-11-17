@@ -1,7 +1,5 @@
 <?php
-
 \Civi\Setup::assertRunning();
-
 $langs = [
   'af_ZA' => 'Afrikaans',
   'sq_AL' => 'Albanian',
