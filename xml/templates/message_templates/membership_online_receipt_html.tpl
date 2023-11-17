@@ -247,26 +247,6 @@
        </tr>
 
       {/if}
-
-
-     {elseif isset($membership_amount)}
-
-
-      <tr>
-       <th {$headerStyle}>
-        {ts}Membership Fee{/ts}
-       </th>
-      </tr>
-      <tr>
-       <td {$labelStyle}>
-        {ts 1=$membership_name}%1 Membership{/ts}
-       </td>
-       <td {$valueStyle}>
-        {$membership_amount|crmMoney}
-       </td>
-      </tr>
-
-
      {/if}
 
      {if !empty($receive_date)}
