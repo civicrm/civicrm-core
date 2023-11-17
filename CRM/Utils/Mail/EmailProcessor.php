@@ -118,7 +118,14 @@ class CRM_Utils_Mail_EmailProcessor {
     // process fifty at a time, CRM-4002
     while ($mails = $store->fetchNext(MAIL_BATCH_SIZE)) {
       foreach ($mails as $key => $mail) {
-        $incomingMail = new CRM_Utils_Mail_IncomingMail($mail, (string) $dao->domain, (string) $dao->localpart);
+        try {
+          $incomingMail = new CRM_Utils_Mail_IncomingMail($mail, (string) $dao->domain, (string) $dao->localpart);
+        }
+        catch (CRM_Core_Exception $e) {
+          $store->markIgnored($key);
+          continue;
+        }
+
         $action = $incomingMail->getAction();
         $job = $incomingMail->getJobID();
         $queue = $incomingMail->getQueueID();
