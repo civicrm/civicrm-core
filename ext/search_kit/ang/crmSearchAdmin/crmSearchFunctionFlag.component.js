@@ -13,13 +13,13 @@
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
-      this.$onInit = function() {
+      this.getWidget = function() {
         if (!ctrl.param || !ctrl.param[ctrl.flag]) {
-          this.widget = null;
+          return null;
         } else if (_.keys(ctrl.param[ctrl.flag]).length === 2 && '' in ctrl.param[ctrl.flag]) {
-          this.widget = 'checkbox';
+          return 'checkbox';
         } else {
-          this.widget = 'select';
+          return 'select';
         }
       };
     }

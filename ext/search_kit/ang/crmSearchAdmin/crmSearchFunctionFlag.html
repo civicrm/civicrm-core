@@ -1,4 +1,4 @@
-<span ng-switch="$ctrl.widget">
+<span ng-switch="$ctrl.getWidget()">
   <span ng-switch-when="checkbox">
     <label ng-repeat="(val, label) in $ctrl.param[$ctrl.flag]" ng-if="val">
       <input type="checkbox" ng-checked="$ctrl.arg[$ctrl.flag] === val" ng-click="$ctrl.arg[$ctrl.flag] = ($ctrl.arg[$ctrl.flag] === val ? null : val); $ctrl.writeExpr();" >
