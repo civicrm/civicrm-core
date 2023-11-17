@@ -1,1 +1,1 @@
-{if '{contribution.contribution_status_id:name}' === 'Pending'}{ts}Invoice{/ts}{else}{ts}Receipt{/ts}{/if} - {$title} - {contact.display_name}
+{if '{contribution.contribution_status_id:name}' === 'Pending'}{ts}Invoice{/ts}{else}{ts}Receipt{/ts}{/if} - Member {if empty('{latestcurrentmembership.status}') or '{latestcurrentmembership.status}' == 'New'}Signup{else}Renewal{/if}: {$membership_name} - {contact.display_name}

@@ -41,6 +41,14 @@
       </tr>
       <tr>
        <td {$labelStyle}>
+        {ts}Membership Status{/ts}
+       </td>
+       <td {$valueStyle}>
+         Member {if empty('{latestcurrentmembership.status}') or '{latestcurrentmembership.status}' == 'New'}Signup{else}Renewal{/if}
+       </td>
+      </tr>
+      <tr>
+       <td {$labelStyle}>
         {ts}Membership Type{/ts}
        </td>
        <td {$valueStyle}>
