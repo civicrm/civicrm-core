@@ -78,6 +78,8 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     // FIXME: Some of this code is identical to Confirm.php and should be broken out into a shared function
@@ -109,10 +111,10 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
           }
         }
       }
-      $this->assign('getTaxDetails', $getTaxDetails);
-      $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
-      $this->assign('totalTaxAmount', $params['tax_amount']);
     }
+    $this->assign('getTaxDetails', (bool) $this->order->getTotalTaxAmount());
+    $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
+    $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
 
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $this->assign('lineItem', $tplLineItems);

@@ -368,6 +368,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->order = new CRM_Financial_BAO_Order();
       $this->order->setPriceSetID($this->getPriceSetID());
       $this->order->setIsExcludeExpiredFields(TRUE);
+      $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
     }
     else {
       CRM_Core_Error::deprecatedFunctionWarning('forms require a price set ID');
@@ -1209,6 +1210,48 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   protected function getExistingContributionID(): ?int {
     return $this->_ccid ?: CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
+  }
+
+  /**
+   * Get the submitted value, accessing it from whatever form in the flow it is
+   * submitted on.
+   *
+   * @param string $fieldName
+   *
+   * @return mixed|null
+   */
+  public function getSubmittedValue(string $fieldName) {
+    $value = $this->controller->exportValue('Main', $fieldName);
+    if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
+      return CRM_Utils_Rule::cleanMoney($value);
+    }
+
+    // Numeric fields are not in submittableMoneyFields (for now)
+    $fieldRules = $this->_rules[$fieldName] ?? [];
+    foreach ($fieldRules as $rule) {
+      if ('money' === $rule['type']) {
+        return CRM_Utils_Rule::cleanMoney($value);
+      }
+    }
+    return $value;
+  }
+
+  /**
+   * Get the fields that can be submitted in this form flow.
+   *
+   * This is overridden to make the fields submitted on the first
+   * form (Contribution_Main) available from the others in the same flow
+   * (Contribution_Confirm, Contribution_ThankYou).
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return string[]
+   */
+  protected function getSubmittableFields(): array {
+    $fieldNames = array_keys($this->controller->exportValues('Main'));
+    return array_fill_keys($fieldNames, $this->_name);
   }
 
   /**
