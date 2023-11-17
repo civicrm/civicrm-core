@@ -167,7 +167,7 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
   private function getPriceSet(): ?array {
     if (!$this->priceSets) {
       $priceSets = (array) PriceSet::get(FALSE)
-        ->addWhere('extends', '=', CRM_Core_Component::getComponentID('CiviMember'))
+        ->addWhere('extends:name', 'CONTAINS', 'CiviMember')
         ->addOrderBy('is_quick_config', 'DESC')
         ->execute()->indexBy('id');
       $priceSetEntities = PriceSetEntity::get(FALSE)
