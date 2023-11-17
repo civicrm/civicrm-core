@@ -1,4 +1,5 @@
 <?php
+namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
@@ -10,7 +11,7 @@ use Civi\Api4\CustomGroup;
  *
  * @group headless
  */
-class api_v4_AfformCustomFieldUsageTest extends api_v4_AfformUsageTestCase {
+class AfformCustomFieldUsageTest extends AfformUsageTestCase {
 
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
@@ -68,7 +69,7 @@ EOHTML;
 
     $this->useValues([
       'layout' => self::$layouts['customMulti'],
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
     $firstName = uniqid(__FUNCTION__);
     $values = [
