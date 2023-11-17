@@ -5,6 +5,7 @@
     bindings: {
       arg: '<',
       param: '<',
+      flag: '@',
       writeExpr: '&'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchFunctionFlag.html',
@@ -13,9 +14,9 @@
         ctrl = this;
 
       this.$onInit = function() {
-        if (!ctrl.param || !ctrl.param.flag_before) {
+        if (!ctrl.param || !ctrl.param[ctrl.flag]) {
           this.widget = null;
-        } else if (_.keys(ctrl.param.flag_before).length === 2 && '' in ctrl.param.flag_before) {
+        } else if (_.keys(ctrl.param[ctrl.flag]).length === 2 && '' in ctrl.param[ctrl.flag]) {
           this.widget = 'checkbox';
         } else {
           this.widget = 'select';
