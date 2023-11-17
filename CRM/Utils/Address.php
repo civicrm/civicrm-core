@@ -387,6 +387,14 @@ class CRM_Utils_Address {
       }
     }
 
+    if (!empty($fields['id'])) {
+      // Render additional custom token that are not handled yet.
+      $additionalTokenFormatting = CRM_Core_TokenSmarty::render(
+        ['labels' => $formatted],
+        ['contactId' => $fields['id'], 'smarty' => FALSE]);
+      $formatted = $additionalTokenFormatting['labels'];
+    }
+
     // drop any {...} constructs from lines' ends
     $formatted = "\n$formatted\n";
 
