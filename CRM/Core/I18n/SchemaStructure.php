@@ -121,6 +121,8 @@ class CRM_Core_I18n_SchemaStructure {
           'frontend_title' => "varchar(255) NOT NULL DEFAULT ''  COMMENT 'Name of processor when shown to users making a payment.'",
         ],
         'civicrm_membership_type' => [
+          'title' => "varchar(255) NOT NULL DEFAULT ''  COMMENT 'Membership Type title. For top of page display'",
+          'frontend_title' => "varchar(255) NOT NULL DEFAULT ''  COMMENT 'Membership Type Public title'",
           'name' => "varchar(128) NOT NULL DEFAULT ''  COMMENT 'Name of Membership Type'",
           'description' => "varchar(255) COMMENT 'Description of Membership Type'",
         ],
@@ -230,6 +232,15 @@ class CRM_Core_I18n_SchemaStructure {
             'name' => 'UI_title',
             'field' => [
               'title',
+            ],
+            'unique' => 1,
+          ],
+        ],
+        'civicrm_membership_type' => [
+          'UI_name' => [
+            'name' => 'UI_name',
+            'field' => [
+              'name',
             ],
             'unique' => 1,
           ],
@@ -509,6 +520,14 @@ class CRM_Core_I18n_SchemaStructure {
           ],
         ],
         'civicrm_membership_type' => [
+          'title' => [
+            'type' => "Text",
+            'required' => "true",
+          ],
+          'frontend_title' => [
+            'type' => "Text",
+            'required' => "true",
+          ],
           'name' => [
             'type' => "Text",
             'label' => "Name",

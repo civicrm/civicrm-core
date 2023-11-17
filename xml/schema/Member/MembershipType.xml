@@ -47,6 +47,32 @@
     <add>3.0</add>
   </foreignKey>
   <field>
+    <name>title</name>
+    <title>Membership Type title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <required>true</required>
+    <comment>Membership Type title. For top of page display</comment>
+    <add>5.69</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>frontend_title</name>
+    <title>Public Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <required>true</required>
+    <comment>Membership Type Public title</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.69</add>
+  </field>
+  <field>
     <name>name</name>
     <uniqueName>membership_type</uniqueName>
     <title>Membership Type</title>
@@ -62,6 +88,12 @@
     </html>
     <add>1.5</add>
   </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>5.69</add>
+  </index>
   <field>
     <name>description</name>
     <title>Description</title>
