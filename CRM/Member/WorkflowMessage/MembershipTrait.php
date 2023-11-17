@@ -31,7 +31,7 @@ trait CRM_Member_WorkflowMessage_MembershipTrait {
   public function setMembership(array $membership): self {
     $this->membership = $membership;
     if (!empty($membership['id'])) {
-      $this->membershipId = $membership['id'];
+      $this->membershipID = $membership['id'];
     }
     return $this;
   }
