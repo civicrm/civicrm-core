@@ -822,8 +822,12 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       $dao->whereAdd('is_test = 0');
     }
 
-    //avoid pending membership as current membership: CRM-3027
-    $statusIds = [array_search('Pending', CRM_Member_PseudoConstant::membershipStatus())];
+    // Avoid pending and expired membership as current membership: CRM-3027
+    $statusIds = \Civi\Api4\MembershipStatus::get(TRUE)
+      ->addSelect('id')
+      ->addWhere('name', 'IN', ['expired', 'pending'])
+      ->execute()
+      ->column('id');
     if (!$membershipId) {
       // CRM-15475
       $statusIds[] = array_search(
