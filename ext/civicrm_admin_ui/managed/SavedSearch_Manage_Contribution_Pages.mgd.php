@@ -242,6 +242,7 @@ return [
                 ],
               ],
               'type' => 'menu',
+              'icon' => 'fa-bars',
               'alignment' => 'text-right',
             ],
           ],
