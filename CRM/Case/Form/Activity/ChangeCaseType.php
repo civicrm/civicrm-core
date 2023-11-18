@@ -21,7 +21,7 @@
 class CRM_Case_Form_Activity_ChangeCaseType {
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    *
    * @throws Exception
    */
@@ -36,7 +36,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    *
    * For edit/view mode the default values are retrieved from the database.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    *
    * @return array
    */
@@ -52,7 +52,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    */
   public static function buildQuickForm(&$form) {
     $form->removeElement('status_id');
@@ -82,7 +82,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    *   Posted values of the form.
    *
    * @param $files
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -95,7 +95,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    * Process the form submission.
    *
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    * @param array $params
    */
   public static function beginPostProcess(&$form, &$params) {
@@ -112,7 +112,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    * Process the form submission.
    *
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    * @param array $params
    * @param $activity
    */
