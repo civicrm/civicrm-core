@@ -11,6 +11,7 @@
 
 namespace Civi\Test;
 
+use Civi\API\EntityLookupTrait;
 use Civi\Api4\UFField;
 use Civi\Api4\UFGroup;
 use Civi\Api4\UFJoin;
@@ -33,6 +34,7 @@ use Civi\Api4\UFJoin;
  */
 trait ContributionPageTestTrait {
   use EntityTrait;
+  use EntityLookupTrait;
 
   /**
    * Create a contribution page for test purposes.
@@ -57,6 +59,7 @@ trait ContributionPageTestTrait {
     ];
     $contributionPageValues += $contributionPageDefaults;
     $return = $this->createTestEntity('ContributionPage', $contributionPageValues, $identifier);
+    $this->define('ContributionPage', 'ContributionPage_' . $identifier, $return);
     $this->addProfilesToContributionPage();
     return $return;
   }
@@ -261,6 +264,128 @@ trait ContributionPageTestTrait {
   }
 
   /**
+   * Set up a contribution page configured with quick config.
+   *
+   * The created price set has up to 3 fields.
+   *
+   * - Radio field (key = 'contribution_amount') with 3 options ('contribution_amount_25','contribution_amount_15','contribution_amount_0'), financial type ID matches the page financial type.
+   * - Text field ('other_amount') with amount = 1 - ie if qty is 2 then amount is 2, financial type ID matches the page financial type.
+   * - Radio field (key = 'membership_amount') with one option per enabled membership type (General will be created if not exists).
+   *
+   * @param array $contributionPageParameters
+   * @param array $priceSetParameters
+   * @param bool $isSeparatePayment
+   * @param bool $membershipAmountField
+   *  - use false to suppress the creation of this field.
+   * @param bool $contributionAmountField
+   * - use false to suppress the creation of this field.
+   * @param bool $otherAmountField
+   * - use false to suppress the creation of this field.
+   * @param string $identifier
+   *
+   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function contributionPageQuickConfigCreate(array $contributionPageParameters = [], array $priceSetParameters = [], bool $isSeparatePayment = FALSE, bool $membershipAmountField = TRUE, bool $contributionAmountField = TRUE, bool $otherAmountField = TRUE, string $identifier = 'QuickConfig'): void {
+    $this->contributionPageCreatePaid($contributionPageParameters, $priceSetParameters, $identifier);
+    $priceSetID = $this->ids['PriceSet']['QuickConfig'];
+    if ($membershipAmountField !== FALSE) {
+      $priceField = $this->createTestEntity('PriceField', [
+        'price_set_id' => $priceSetID,
+        'label' => 'Membership Amount',
+        'html_type' => 'Radio',
+        'name' => 'membership_amount',
+      ], 'membership_amount');
+      $membershipTypes = \CRM_Member_BAO_MembershipType::getAllMembershipTypes();
+      if (empty($membershipTypes)) {
+        $this->createTestEntity('MembershipType', [
+          'name' => 'General',
+          'duration_unit' => 'year',
+          'duration_interval' => 1,
+          'period_type' => 'rolling',
+          'member_of_contact_id' => \CRM_Core_BAO_Domain::getDomain()->contact_id,
+          'domain_id' => 1,
+          'financial_type_id:name' => 'Member Dues',
+          'is_active' => 1,
+          'sequential' => 1,
+          'minimum_fee' => 100,
+          'visibility' => 'Public',
+        ]);
+        $membershipTypes = \CRM_Member_BAO_MembershipType::getAllMembershipTypes();
+      }
+      foreach ($membershipTypes as $membershipType) {
+        $name = 'membership_' . strtolower($membershipType['name']);
+        $this->createTestEntity('PriceFieldValue', [
+          'name' => 'membership_' . $name,
+          'label' => 'Membership Amount',
+          'amount' => $membershipType['minimum_fee'],
+          'financial_type_id:name' => 'Member Dues',
+          'format.only_id' => TRUE,
+          'membership_type_id' => $membershipType['id'],
+          'price_field_id' => $priceField['id'],
+        ], $name);
+      }
+      $this->createTestEntity('MembershipBlock', [
+        'entity_id' => $this->getContributionPageID(),
+        'entity_table' => 'civicrm_contribution_page',
+        'is_required' => TRUE,
+        'is_active' => TRUE,
+        'is_separate_payment' => $isSeparatePayment,
+        'membership_type_default' => reset($this->ids['MembershipType']),
+        'membership_types' => array_fill_keys(array_keys($membershipTypes), 1),
+      ]);
+    }
+    if ($contributionAmountField !== FALSE) {
+      $priceField = $this->createTestEntity('PriceField', [
+        'price_set_id' => $priceSetID,
+        'label' => 'Contribution Amount',
+        'html_type' => 'Radio',
+        'name' => 'contribution_amount',
+      ], 'contribution_amount');
+      $this->createTestEntity('PriceFieldValue', [
+        'price_field_id' => $priceField['id'],
+        'label' => 'Fifteen',
+        'name' => 'contribution_amount_15',
+        'amount' => 15,
+        'non_deductible_amount' => 0,
+        'financial_type_id' => $this->lookup('ContributionPage_' . $identifier, 'financial_type_id'),
+      ], 'contribution_amount_15');
+      $this->createTestEntity('PriceFieldValue', [
+        'price_field_id' => $priceField['id'],
+        'label' => 'Twenty Five',
+        'name' => 'contribution_amount_25',
+        'amount' => 25,
+        'non_deductible_amount' => 0,
+        'financial_type_id' => $this->lookup('ContributionPage_' . $identifier, 'financial_type_id'),
+      ], 'contribution_amount_25');
+      $this->createTestEntity('PriceFieldValue', [
+        'price_field_id' => $priceField['id'],
+        'label' => 'Nothing',
+        'name' => 'contribution_amount_0',
+        'amount' => 0,
+        'non_deductible_amount' => 0,
+        'financial_type_id' => $this->lookup('ContributionPage_' . $identifier, 'financial_type_id'),
+      ], 'contribution_amount_0');
+    }
+    if ($otherAmountField !== FALSE) {
+      $priceField = $this->createTestEntity('PriceField', [
+        'price_set_id' => $priceSetID,
+        'label' => 'Other Amount',
+        'html_type' => 'Text',
+        'name' => 'other_amount',
+      ], 'other_amount');
+      $this->createTestEntity('PriceFieldValue', [
+        'price_field_id' => $priceField['id'],
+        'label' => 'Other Amount',
+        'name' => 'other_amount',
+        'amount' => 1,
+        'non_deductible_amount' => 0,
+        'financial_type_id' => $this->lookup('ContributionPage_' . $identifier, 'financial_type_id'),
+      ], 'other_amount');
+    }
+  }
+
+  /**
    * Add profiles to the event.
    *
    * This function is designed to reflect the
@@ -339,7 +464,7 @@ trait ContributionPageTestTrait {
       'billing_first_name' => 'Dave',
       'billing_middle_name' => 'Joseph',
       'billing_last_name' => 'Wong',
-      'email' => 'dave@example.com',
+      'email-' . \CRM_Core_BAO_LocationType::getBilling() => 'dave@example.com',
       'payment_processor_id' => $this->ids['PaymentProcessor'][$processorIdentifier],
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',

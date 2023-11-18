@@ -274,7 +274,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->get('amount');
     if (isset($this->_params['amount'])) {
-      $this->setFormAmountFields($this->_params['priceSetId']);
+      $this->setFormAmountFields($this->getPriceSetID());
     }
 
     $this->_useForMember = $this->get('useForMember');
@@ -1855,7 +1855,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $priceSetID
    */
   public function setFormAmountFields($priceSetID) {
-    $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_params['priceSetId'], 'is_quick_config');
     $priceField = new CRM_Price_DAO_PriceField();
     $priceField->price_set_id = $priceSetID;
     $priceField->orderBy('weight');
@@ -1866,7 +1865,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if ($priceField->name == "contribution_amount") {
         $paramWeDoNotUnderstand = $priceField->id;
       }
-      if ($isQuickConfig && !empty($this->_params["price_{$priceField->id}"])) {
+      if ($this->isQuickConfig() && !empty($this->_params["price_{$priceField->id}"])) {
         if ($this->_values['fee'][$priceField->id]['html_type'] != 'Text') {
           // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
           // function to get correct amount level consistently. Remove setting of the amount level in
