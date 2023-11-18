@@ -25,7 +25,7 @@
      <p>{$receipt_text|htmlize}</p>
     {/if}
 
-    {if $is_pay_later}
+    {if '{contribution.contribution_status_id:name}' === 'Pending' && {contribution.is_pay_later|boolean}}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
 
@@ -38,6 +38,14 @@
        <th {$headerStyle}>
         {ts}Membership Information{/ts}
        </th>
+      </tr>
+      <tr>
+       <td {$labelStyle}>
+        {ts}Membership Status{/ts}
+       </td>
+       <td {$valueStyle}>
+         Member {if empty('{latestcurrentmembership.status}') or '{latestcurrentmembership.status}' == 'New'}Signup{else}Renewal{/if}
+       </td>
       </tr>
       <tr>
        <td {$labelStyle}>
