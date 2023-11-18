@@ -29,6 +29,13 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
   protected $_donorEmail = '';
 
   /**
+   * The contributor display name (for emails)
+   *
+   * @var string
+   */
+  protected $_donorDisplayName = '';
+
+  /**
    * Should custom data be suppressed on this form.
    *
    * We override to suppress custom data because historically it has not been
