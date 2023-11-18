@@ -1215,7 +1215,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if ($this->isQuickConfig()) {
       $priceField = new CRM_Price_DAO_PriceField();
-      $priceField->price_set_id = $params['priceSetId'];
+      $priceField->price_set_id = $this->getPriceSetID();
       $priceField->orderBy('weight');
       $priceField->find();
 
