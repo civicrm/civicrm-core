@@ -44,6 +44,13 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
   public $_contactID;
 
   /**
+   * The contributor email
+   *
+   * @var string
+   */
+  protected $_donorEmail = '';
+
+  /**
    * Pre-processing for the form.
    *
    * @throws \Exception
@@ -112,7 +119,8 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $this->assign('editableScheduleFields', array_diff($this->editableScheduleFields, $alreadyHardCodedFields));
 
     if ($this->_subscriptionDetails->contact_id) {
-      [$this->_donorDisplayName, $this->_donorEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
+      $contactDetails = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
+      $this->_donorEmail = $contactDetails[1];
     }
 
     $this->setTitle(ts('Update Recurring Contribution'));
