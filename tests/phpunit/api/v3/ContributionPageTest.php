@@ -31,12 +31,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   protected $contribution_result;
 
   /**
-   * Payment processor details.
-   * @var array
-   */
-  protected $_paymentProcessor = [];
-
-  /**
    * @var array
    *   - contribution_page
    *   - price_set
@@ -108,14 +102,14 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Test get with amount as a parameter.
    */
   public function testGetContributionPageByAmount(): void {
-    $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $this->callAPISuccess('ContributionPage', 'create', $this->params);
     $getParams = [
       // 3456
       'amount' => '' . $this->testAmount,
       'currency' => 'NZD',
       'financial_type_id' => 1,
     ];
-    $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
+    $getResult = $this->callAPISuccess('ContributionPage', 'get', $getParams);
     $this->assertEquals(1, $getResult['count']);
   }
 
@@ -245,7 +239,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $processor = $dummyPP->getPaymentProcessor();
     $this->callAPISuccess('ContributionPage', 'create', [
       'id' => $this->getContributionPageID(),
-      'payment_processor' => [$paymentProcessor2ID, $this->_ids['payment_processor']],
+      'payment_processor' => [$paymentProcessor2ID, $this->ids['PaymentProcessor']['dummy']],
     ]);
 
     $priceFieldID = reset($this->_ids['price_field']);
@@ -304,12 +298,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmitMembershipBlockNotSeparatePaymentProcessorInstantRenew(): void {
     $this->setUpMembershipContributionPage();
-    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $dummyPP->setDoDirectPaymentResult(['payment_status_id' => 1]);
     $submitParams = $this->getSubmitParamsContributionPlusMembership(TRUE);
     $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID()]);
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => $contribution['id'], 'return' => 'membership_id']);
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID()]);
+    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['contribution_id' => $contribution['id'], 'return' => 'membership_id']);
     $this->callAPISuccessGetCount('LineItem', [
       'entity_table' => 'civicrm_membership',
       'entity_id' => $membershipPayment['id'],
@@ -348,7 +342,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_last_name' => 'Gruff',
       'selectMembership' => $this->ids['MembershipType'][0],
       'email-Primary' => 'billy-goat@the-bridge.net',
-      'payment_processor_id' => $this->_paymentProcessor['id'],
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
@@ -513,7 +507,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->addProfile('supporter_profile', $this->getContributionPageID());
 
     $submitParams = $this->getSubmitParamsContributionPlusMembership();
-    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
     $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $this->getContributionPageID(), 'return' => 'contact_id'])['values'];
     $this->assertCount(2, $contributions);
     $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['return' => ['contribution_id', 'membership_id']]);
@@ -565,19 +559,19 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNow(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->setUpMembershipContributionPage(TRUE);
-    $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
+    $processor = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $processor->setDoDirectPaymentResult(['payment_status_id' => 1, 'fee_amount' => .72]);
     $submitParams = $this->getSubmitParamsContributionPlusMembership(TRUE);
 
     $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
-    $contributions = $this->callAPISuccess('contribution', 'get', [
+    $contributions = $this->callAPISuccess('Contribution', 'get', [
       'contribution_page_id' => $this->getContributionPageID(),
       'contribution_status_id' => 1,
     ]);
     $this->assertCount(2, $contributions['values']);
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', ['return' => ['contribution_id', 'membership_id']]);
+    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['return' => ['contribution_id', 'membership_id']]);
     $this->assertArrayHasKey($membershipPayment['contribution_id'], $contributions['values']);
-    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['membership_id']]);
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_table' => 'civicrm_membership']);
     $this->assertEquals($membership['id'], $lineItem['entity_id']);
@@ -612,7 +606,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNowChargesCorrectAmounts(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $this->setUpMembershipContributionPage(TRUE);
-    $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
+    $processor = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $processor->setDoDirectPaymentResult(['fee_amount' => .72]);
     $testKey = 'unique key for test hook';
     $submitParams = $this->getSubmitParamsContributionPlusMembership(TRUE);
@@ -757,7 +751,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       $durationUnit = NULL;
     }
     $this->setUpMembershipContributionPage(FALSE, FALSE, $membershipTypeParams);
-    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $dummyPP->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
     $processor = $dummyPP->getPaymentProcessor();
 
@@ -830,7 +824,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     // Add a membership so membership & contribution are not both 1.
     $preExistingMembershipID = $this->contactMembershipCreate(['contact_id' => $this->ids['Contact']['individual_0']]);
     $this->setUpMembershipContributionPage(FALSE, FALSE, $membershipTypeParams);
-    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $dummyPP->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
     $processor = $dummyPP->getPaymentProcessor();
 
@@ -882,7 +876,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->addSecondOrganizationMembershipToPriceSet();
     $this->setupPaymentProcessor();
 
-    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $dummyPP->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
     $processor = $dummyPP->getPaymentProcessor();
 
@@ -993,7 +987,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmitMembershipPriceSetPaymentPaymentProcessorSeparatePaymentRecurInstantPayment(): void {
     $this->setUpMembershipContributionPage(TRUE);
-    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $dummyPP->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
     // Set Hook to check contributionRecurID is set
     $this->hookClass->setHook('civicrm_alterPaymentProcessorParams', [$this, 'hookCheckRecurID']);
@@ -1048,7 +1042,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->params['is_recur'] = 1;
     $this->params['recur_frequency_unit'] = 'year';
     $this->setUpMembershipContributionPage();
-    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $dummyPP->setDoDirectPaymentResult(['payment_status_id' => 2]);
     $this->membershipTypeCreate(['name' => 'Student']);
 
@@ -1083,7 +1077,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'completetransaction', [
       'id' => $contribution['id'],
       'trxn_id' => 'ipn_called',
-      'payment_processor_id' => $this->_paymentProcessor['id'],
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
     ]);
     $line = $this->callAPISuccess('line_item', 'getsingle', ['contribution_id' => $contribution['id']]);
     $this->assertEquals('civicrm_membership', $line['entity_table']);
@@ -1126,7 +1120,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmitMembershipIsSeparatePaymentNotRecur(): void {
     $this->setUpMembershipContributionPage(TRUE, TRUE);
-    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $dummyPP->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
     $submitParams = array_merge($this->getSubmitParamsMembership(TRUE), [
       'frequency_interval' => 1,
@@ -1289,7 +1283,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function setUpMultiIntervalMembershipContributionPage(): void {
     $this->setupPaymentProcessor();
-    $contributionPage = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $contributionPage = $this->callAPISuccess('ContributionPage', 'create', $this->params);
     $this->ids['ContributionPage']['Membership'] = $contributionPage['id'];
 
     $this->ids['MembershipTypeMonth'] = $this->membershipTypeCreate([
@@ -1377,7 +1371,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'first_name' => 'Billy',
       'last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
-      'payment_processor_id' => $this->_ids['payment_processor'],
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
@@ -1410,12 +1404,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Create a payment processor instance.
    */
   protected function setupPaymentProcessor(): void {
-    $this->params['payment_processor_id'] = $this->_ids['payment_processor'] = $this->paymentProcessorCreate([
+    $this->params['payment_processor_id'] = $this->paymentProcessorCreate([
       'payment_processor_type_id' => 'Dummy',
       'class_name' => 'Payment_Dummy',
       'billing_mode' => 1,
-    ]);
-    $this->_paymentProcessor = $this->callAPISuccess('payment_processor', 'getsingle', ['id' => $this->params['payment_processor_id']]);
+    ], 'dummy');
   }
 
   /**
@@ -1429,11 +1422,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->setupPaymentProcessor();
     $this->setUpContributionPage([
       'adjust_recur_start_date' => TRUE,
-      'processor_id' => [$this->ids['PaymentProcessor']['test']],
+      'processor_id' => [$this->ids['PaymentProcessor']['dummy']],
       'is_pay_later' => FALSE,
     ]);
     $this->setUpPledgeBlock();
-    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+    $dummyPP = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $dummyPP->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
 
     $submitParams = [
@@ -1443,7 +1436,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
-      'payment_processor_id' => 1,
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
@@ -1458,7 +1451,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
 
     // Check if contribution created.
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', [
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
       'contribution_page_id' => $this->getContributionPageID(),
       // Will be pending when actual payment processor is used (dummy processor does not support future payments).
       'contribution_status_id' => 'Completed',
@@ -1626,7 +1619,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     // Ensure total_amount are the same if they're both given.
     $total_amount = !empty($rawParams['total_amount']) ? (float) $rawParams['total_amount'] : NULL;
     $amount = !empty($rawParams['amount']) ? (float) $rawParams['amount'] : NULL;
-    if (!empty($total_amount) && !empty($amount) && round($total_amount, 2) !== round($amount, 2)) {
+    if ($total_amount !== NULL && $amount !== NULL && round($total_amount, 2) !== round($amount, 2)) {
       throw new CRM_Core_Exception("total_amount '$total_amount' and amount '$amount' differ.");
     }
 
@@ -1693,7 +1686,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
     if ($isCardPayment) {
       $params = array_merge([
-        'payment_processor_id' => $this->_paymentProcessor['id'],
+        'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
         'credit_card_number' => '4111111111111111',
         'credit_card_type' => 'Visa',
         'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
@@ -1773,7 +1766,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   private function submitSecondContribution(int $contact_id, array $submitParams, int $originalContributionID): array {
     $submitParams['contact_id'] = $contact_id;
-    \Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor)->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_second_success']);
+    \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy'])->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_second_success']);
     $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
     return $this->callAPISuccess('Contribution', 'getsingle', [
       'id' => ['NOT IN' => [$originalContributionID]],

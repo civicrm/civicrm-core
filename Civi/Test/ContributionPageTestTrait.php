@@ -37,8 +37,8 @@ trait ContributionPageTestTrait {
   /**
    * Create a contribution page for test purposes.
    *
-   * Only call this directly for unpaid contribution pages.
-   * Otherwise use contributionPageCreatePaid.
+   * Generally this function is not called directly -
+   * use contributionPageCreatePaid.
    *
    * @param array $contributionPageValues
    * @param string $identifier
