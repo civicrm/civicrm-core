@@ -31,6 +31,11 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   protected $_redactionStringRules = [];
 
   /**
+   * @var array
+   */
+  public $_redactionRegexRules;
+
+  /**
    */
   public function __construct() {
   }
@@ -725,7 +730,7 @@ LIMIT  1
    * @param int $caseID
    * @param string $activitySetName
    * @param array $params
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_XMLProcessor_Report $form
    *
    * @return CRM_Core_Smarty
    */
