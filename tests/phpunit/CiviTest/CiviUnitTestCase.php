@@ -2146,7 +2146,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return int $result['id'] payment processor id
    */
-  public function paymentProcessorCreate(array $params = [], $identifier = 'test'): int {
+  public function paymentProcessorCreate(array $params = [], string $identifier = 'test'): int {
     $params = array_merge([
       'title' => $params['name'] ?? 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
