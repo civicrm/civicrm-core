@@ -230,6 +230,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'Membership Start Date',
       '************1111',
     ], 1);
+    $this->assertMailSentContainingHeaderString('Test Contribution Page', 0);
+    $this->assertMailSentContainingHeaderString('Test Contribution Page', 1);
   }
 
   /**
