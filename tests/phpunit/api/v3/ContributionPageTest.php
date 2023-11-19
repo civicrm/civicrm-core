@@ -309,42 +309,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test submit with a membership block in place.
    */
-  public function testSubmitMembershipBlockNotSeparatePaymentWithEmail(): void {
-    $mut = new CiviMailUtils($this, TRUE);
-    $this->setUpMembershipContributionPage();
-    $this->addProfile('supporter_profile', $this->getContributionPageID());
-
-    $submitParams = [
-      $this->getPriceFieldLabel('contribution') => 1,
-      $this->getPriceFieldLabel('membership') => $this->getPriceFieldValue('general'),
-      'id' => $this->getContributionPageID(),
-      'billing_first_name' => 'Billy',
-      'billing_middle_name' => 'Goat',
-      'billing_last_name' => 'Gruff',
-      'selectMembership' => $this->ids['MembershipType'][0],
-      'email-Primary' => 'billy-goat@the-bridge.net',
-      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
-      'credit_card_number' => '4111111111111111',
-      'credit_card_type' => 'Visa',
-      'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
-      'cvv2' => 123,
-    ];
-
-    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID()]);
-    $this->callAPISuccess('MembershipPayment', 'getsingle', ['contribution_id' => $contribution['id']]);
-    $mut->checkMailLog([
-      'Membership Type',
-      'General',
-      'Test Frontend title',
-    ]);
-    $mut->stop();
-    $mut->clearMessages();
-  }
-
-  /**
-   * Test submit with a membership block in place.
-   */
   public function testSubmitMembershipBlockNotSeparatePaymentZeroDollarsWithEmail(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->setUpMembershipContributionPage(FALSE, FALSE, ['minimum_fee' => 0]);

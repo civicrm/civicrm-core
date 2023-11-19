@@ -526,6 +526,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'Membership Fee',
       'Amount $100.00',
     ]);
+    $this->assertMailSentContainingHeaderString('Test Frontend title');
   }
 
 }
