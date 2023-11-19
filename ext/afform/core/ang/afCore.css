@@ -26,6 +26,7 @@ a.af-api4-action-idle {
   width: 100%;
 }
 
+.afform-directive,
 af-form {
   display: block;
   position: relative;
@@ -87,12 +88,13 @@ af-form {
 }
 
 /* Admin edit links */
-af-form a.af-admin-edit-form-link {
-  position: absolute;
+.afform-directive .af-admin-edit-form-link {
+  position: absolute !important;
   right: 0;
   top: 0;
-  display: none;
+  opacity: .5;
 }
-af-form:hover a.af-admin-edit-form-link {
-  display: block;
+.afform-directive .af-admin-edit-form-link.open,
+.afform-directive:hover .af-admin-edit-form-link {
+  opacity: 1;
 }
