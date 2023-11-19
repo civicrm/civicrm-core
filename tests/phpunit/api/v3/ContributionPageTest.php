@@ -307,42 +307,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit with a membership block in place.
-   */
-  public function testSubmitMembershipBlockNotSeparatePaymentZeroDollarsWithEmail(): void {
-    $mut = new CiviMailUtils($this, TRUE);
-    $this->setUpMembershipContributionPage(FALSE, FALSE, ['minimum_fee' => 0]);
-    $this->addProfile('supporter_profile', $this->getContributionPageID());
-
-    $submitParams = [
-      $this->getPriceFieldLabel('membership') => $this->getPriceFieldValue('general'),
-      'id' => $this->getContributionPageID(),
-      'billing_first_name' => 'Billy',
-      'billing_middle_name' => 'Goat',
-      'billing_last_name' => 'Gruffier',
-      'email-Primary' => 'billy-goat@the-new-bridge.net',
-      'payment_processor_id' => $this->params['payment_processor_id'],
-    ];
-
-    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID()]);
-    $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => $contribution['id']]);
-    //Assert only one mail is being sent.
-    $msgs = $mut->getAllMessages();
-    $this->assertCount(1, $msgs);
-
-    $mut->checkMailLog([
-      'Membership Type',
-      'General',
-      'Gruffier',
-    ], [
-      'Amount',
-    ]);
-    $mut->stop();
-    $mut->clearMessages();
-  }
-
-  /**
    * Test submit with a pay later and check line item in mails.
    */
   public function testSubmitMembershipBlockIsSeparatePaymentPayLaterWithEmail(): void {

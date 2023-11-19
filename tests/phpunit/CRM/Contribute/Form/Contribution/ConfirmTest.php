@@ -529,4 +529,41 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertMailSentContainingHeaderString('Test Frontend title');
   }
 
+  /**
+   * Test a zero dollar membership (quick config, not separate payment).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitMembershipBlockNotSeparatePaymentZeroDollarsWithEmail(): void {
+    $this->createTestEntity('MembershipType', [
+      'min_amount' => 0,
+      'name' => 'Free',
+      'duration_unit' => 'year',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
+      'financial_type_id:name' => 'Member Dues',
+      'is_active' => 1,
+      'sequential' => 1,
+      'visibility' => 'Public',
+    ], 'free');
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
+    $this->submitOnlineContributionForm([
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => -1,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_free'],
+      'id' => $this->getContributionPageID(),
+    ] + $this->getBillingSubmitValues(),
+    $this->getContributionPageID());
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID()]);
+    $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $contribution['id']]);
+    //Assert only one mail is being sent.
+    $this->assertMailSentCount(1);
+    $this->assertMailSentContainingStrings([
+      'Free',
+    ]);
+    $this->assertMailSentNotContainingString('Amount');
+  }
+
 }
