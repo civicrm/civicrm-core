@@ -272,25 +272,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit with a membership block in place.
-   */
-  public function testSubmitMembershipBlockNotSeparatePayment(): void {
-    $this->setUpMembershipContributionPage(FALSE, FALSE, ['minimum_fee' => 0]);
-    $submitParams = [
-      $this->getPriceFieldLabel('membership') => $this->getPriceFieldValue('general'),
-      'id' => $this->getContributionPageID(),
-      'billing_first_name' => 'Billy',
-      'billing_middle_name' => 'Goat',
-      'billing_last_name' => 'Gruff',
-    ];
-
-    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
-    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID()]);
-    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['contribution_id' => $contribution['id']]);
-    $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id'], 'entity_id' => $membershipPayment['id']]);
-  }
-
-  /**
    * Test submit with a membership block in place works with renewal.
    *
    * @throws \CRM_Core_Exception

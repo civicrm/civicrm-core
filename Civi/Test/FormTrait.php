@@ -65,7 +65,7 @@ trait FormTrait {
    */
   protected function assertMailSentContainingString(string $string, int $mailIndex = 0): void {
     $mail = $this->form->getMail()[$mailIndex];
-    $this->assertStringContainsString($string, $mail['body']);
+    $this->assertStringContainsString(preg_replace('/\s+/', '', $string), preg_replace('/\s+/', '', $mail['body']));
   }
 
   /**

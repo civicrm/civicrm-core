@@ -500,4 +500,33 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ], 1);
   }
 
+  /**
+   * Test submit opting for the membership and not the contribution.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitMembershipBlockNotSeparatePaymentMembershipOnly(): void {
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
+    $this->submitOnlineContributionForm([
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => -1,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'id' => $this->getContributionPageID(),
+    ] + $this->getBillingSubmitValues(),
+    $this->getContributionPageID());
+
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID()]);
+    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['contribution_id' => $contribution['id']]);
+    $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id'], 'entity_id' => $membershipPayment['id']]);
+    $this->assertMailSentContainingStrings([
+      'Dear Dave,',
+      'Membership Information',
+      'Membership Type General',
+      'Membership Start Date',
+      'Membership Expiration',
+      'Membership Fee',
+      'Amount $100.00',
+    ]);
+  }
+
 }
