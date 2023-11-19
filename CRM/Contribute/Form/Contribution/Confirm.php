@@ -464,6 +464,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     // FIXME: Some of this code is identical to Thankyou.php and should be broken out into a shared function
@@ -484,21 +486,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $this->assign('receiptFromEmail', $this->_values['receipt_from_email'] ?? NULL);
     $this->assign('amount_block_is_active', $this->isFormSupportsNonMembershipContributions());
-
-    // Make a copy of line items array to use for display only
-    $tplLineItems = $this->_lineItem;
-    if (CRM_Invoicing_Utils::isInvoicingEnabled()) {
-      $taxAmount = 0;
-      foreach ($tplLineItems ?? [] as $lineItems) {
-        foreach ($lineItems as $lineItem) {
-          $taxAmount += (float) ($lineItem['tax_amount'] ?? 0);
-        }
-      }
-
-      $this->assign('totalTaxAmount', $taxAmount);
-      $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
-    }
-
+    $this->assign('taxTerm', \Civi::settings()->get('taxTerm'));
+    $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
     $isDisplayLineItems = $this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
     $this->assign('isDisplayLineItems', $isDisplayLineItems);
 
@@ -509,7 +498,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_params['is_quick_config'] = 1;
     }
     else {
-      $this->assignLineItemsToTemplate($tplLineItems);
+      $this->assignLineItemsToTemplate([$this->getPriceSetID() => $this->order->getLineItems()]);
     }
 
     if (!empty($params['selectProduct']) && $params['selectProduct'] !== 'no_thanks') {
