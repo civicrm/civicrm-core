@@ -34,6 +34,8 @@
     function clearAmountOther(otherPriceFieldName) {
       cj('#' + otherPriceFieldName).val('');
       cj('#' + otherPriceFieldName).blur();
+      // @todo - remove the next 2 lines - they seems to relate to a field that is never present
+      // as amount_other will be (e.g) price_4
       if (document.Main.amount_other == null) return; // other_amt field not present; do nothing
       document.Main.amount_other.value = "";
     }

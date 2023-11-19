@@ -444,7 +444,89 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'Tax Rate',
       'Subtotal',
     ]);
+  }
 
+  /**
+   * Test submit with a membership block in place.
+   *
+   * This test uses a quick config price set - which means line items
+   * do not show on the receipts. Separate payments are only supported
+   * with quick config.
+   *
+   * We are expecting a separate payment for the membership vs the contribution.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNow(): void {
+    $this->contributionPageQuickConfigCreate([], [], TRUE, TRUE, TRUE, TRUE);
+    $processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
+    $processor->setDoDirectPaymentResult(['payment_status_id' => 1, 'fee_amount' => .72]);
+    $this->submitOnlineContributionForm([
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => $this->ids['PriceFieldValue']['contribution_amount_15'],
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'id' => $this->getContributionPageID(),
+    ] + $this->getBillingSubmitValues(),
+    $this->getContributionPageID());
+
+    $contributions = $this->callAPISuccess('Contribution', 'get', [
+      'contribution_page_id' => $this->getContributionPageID(),
+      'contribution_status_id' => 1,
+    ])['values'];
+    $this->assertCount(2, $contributions);
+    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['return' => ['contribution_id', 'membership_id']]);
+    $this->assertArrayHasKey($membershipPayment['contribution_id'], $contributions);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['membership_id']]);
+    $this->assertEquals($membership['contact_id'], $contributions[$membershipPayment['contribution_id']]['contact_id']);
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_table' => 'civicrm_membership']);
+    $this->assertEquals($membership['id'], $lineItem['entity_id']);
+    $this->assertEquals($membershipPayment['contribution_id'], $lineItem['contribution_id']);
+    $this->assertEquals(1, $lineItem['qty']);
+    $this->assertEquals(100, $lineItem['unit_price']);
+    $this->assertEquals(100, $lineItem['line_total']);
+    foreach ($contributions as $contribution) {
+      $this->assertEquals(.72, $contribution['fee_amount']);
+      $this->assertEquals($contribution['total_amount'] - .72, $contribution['net_amount']);
+    }
+    $this->assertMailSentContainingStrings(['$15.00', 'Contribution Information'], 0);
+    $this->assertMailSentContainingStrings([
+      'Membership Information',
+      'Membership Type',
+      'General',
+      'Membership Start Date',
+      'Membership Fee',
+      '$100',
+    ], 1);
+  }
+
+  /**
+   * Test submit opting for the membership and not the contribution.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitMembershipBlockNotSeparatePaymentMembershipOnly(): void {
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
+    $this->submitOnlineContributionForm([
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => -1,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'id' => $this->getContributionPageID(),
+    ] + $this->getBillingSubmitValues(),
+    $this->getContributionPageID());
+
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID()]);
+    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['contribution_id' => $contribution['id']]);
+    $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id'], 'entity_id' => $membershipPayment['id']]);
+    $this->assertMailSentContainingStrings([
+      'Dear Dave,',
+      'Membership Information',
+      'Membership Type General',
+      'Membership Start Date',
+      'Membership Expiration',
+      'Membership Fee',
+      'Amount $100.00',
+    ]);
   }
 
 }

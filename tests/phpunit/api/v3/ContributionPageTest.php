@@ -272,25 +272,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit with a membership block in place.
-   */
-  public function testSubmitMembershipBlockNotSeparatePayment(): void {
-    $this->setUpMembershipContributionPage(FALSE, FALSE, ['minimum_fee' => 0]);
-    $submitParams = [
-      $this->getPriceFieldLabel('membership') => $this->getPriceFieldValue('general'),
-      'id' => $this->getContributionPageID(),
-      'billing_first_name' => 'Billy',
-      'billing_middle_name' => 'Goat',
-      'billing_last_name' => 'Gruff',
-    ];
-
-    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
-    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID()]);
-    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['contribution_id' => $contribution['id']]);
-    $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id'], 'entity_id' => $membershipPayment['id']]);
-  }
-
-  /**
    * Test submit with a membership block in place works with renewal.
    *
    * @throws \CRM_Core_Exception
@@ -542,52 +523,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($contributions[1]['id'], $membershipPayment['contribution_id']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id'], 'return' => 'contact_id']);
     $this->assertEquals($membership['contact_id'], $contributions[1]['contact_id']);
-  }
-
-  /**
-   * Test submit with a membership block in place.
-   *
-   * This test uses a quick config price set - which means line items
-   * do not show on the receipts. Separate payments are only supported
-   * with quick config.
-   *
-   * We are expecting a separate payment for the membership vs the contribution.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   */
-  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNow(): void {
-    $mut = new CiviMailUtils($this, TRUE);
-    $this->setUpMembershipContributionPage(TRUE);
-    $processor = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
-    $processor->setDoDirectPaymentResult(['payment_status_id' => 1, 'fee_amount' => .72]);
-    $submitParams = $this->getSubmitParamsContributionPlusMembership(TRUE);
-
-    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
-    $contributions = $this->callAPISuccess('Contribution', 'get', [
-      'contribution_page_id' => $this->getContributionPageID(),
-      'contribution_status_id' => 1,
-    ]);
-    $this->assertCount(2, $contributions['values']);
-    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['return' => ['contribution_id', 'membership_id']]);
-    $this->assertArrayHasKey($membershipPayment['contribution_id'], $contributions['values']);
-    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['membership_id']]);
-    $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
-    $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_table' => 'civicrm_membership']);
-    $this->assertEquals($membership['id'], $lineItem['entity_id']);
-    $this->assertEquals($membershipPayment['contribution_id'], $lineItem['contribution_id']);
-    $this->assertEquals(1, $lineItem['qty']);
-    $this->assertEquals(2, $lineItem['unit_price']);
-    $this->assertEquals(2, $lineItem['line_total']);
-    foreach ($contributions['values'] as $contribution) {
-      $this->assertEquals(.72, $contribution['fee_amount']);
-      $this->assertEquals($contribution['total_amount'] - .72, $contribution['net_amount']);
-    }
-    // The total string is currently absent & it seems worse with - although at some point
-    // it may have been intended
-    $mut->checkAllMailLog(['$2.00', 'Contribution Information', '$88.00'], ['Total:']);
-    $mut->stop();
-    $mut->clearMessages();
   }
 
   /**

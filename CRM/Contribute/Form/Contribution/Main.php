@@ -551,7 +551,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * Get the idea of the other amount field if the form is configured to offer it.
+   * Get the ID of the other amount field if the form is configured to offer it.
    *
    * The other amount field is an alternative to the configured radio options,
    * specific to this form.
@@ -571,7 +571,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * Get the idea of the other amount field if the form is configured to offer an other amount.
+   * Get the ID of the main amount field if the form is configured to offer an other amount.
    *
    * The other amount field is an alternative to the configured radio options,
    * specific to this form.
@@ -1215,7 +1215,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if ($this->isQuickConfig()) {
       $priceField = new CRM_Price_DAO_PriceField();
-      $priceField->price_set_id = $params['priceSetId'];
+      $priceField->price_set_id = $this->getPriceSetID();
       $priceField->orderBy('weight');
       $priceField->find();
 
