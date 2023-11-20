@@ -368,6 +368,15 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'event_offline_receipt', 'type' => 'subject'],
         ],
       ],
+      [
+        'version' => '5.69.alpha1',
+        'upgrade_descriptor' => ts('Significant changes to the template and available variables. Text version is discontinued'),
+        'templates' => [
+          ['name' => 'membership_online_receipt', 'type' => 'text'],
+          ['name' => 'membership_online_receipt', 'type' => 'html'],
+          ['name' => 'membership_online_receipt', 'type' => 'subject'],
+        ],
+      ],
     ];
   }
 

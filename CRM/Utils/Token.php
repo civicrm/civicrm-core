@@ -1779,6 +1779,9 @@ class CRM_Utils_Token {
         ],
         'membership_online_receipt' => [
           '$dataArray' => ts('found within $taxBreakDown'),
+          '$mem_start_date' => 'membership.start_date',
+          '$mem_end_date' => 'membership.end_date',
+          '$mem_join_date' => 'membership.join_date',
         ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),

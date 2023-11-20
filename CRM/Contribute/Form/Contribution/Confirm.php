@@ -1533,10 +1533,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         );
 
         $this->set('renewal_mode', $renewalMode);
-        if (!empty($dates)) {
-          $this->assign('mem_start_date', CRM_Utils_Date::customFormat($dates['start_date'], '%Y%m%d'));
-          $this->assign('mem_end_date', CRM_Utils_Date::customFormat($dates['end_date'], '%Y%m%d'));
-        }
 
         if (!empty($membershipContribution)) {
           // Next line is probably redundant. Checks prevent it happening twice.
