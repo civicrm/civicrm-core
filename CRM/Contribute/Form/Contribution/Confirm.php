@@ -845,7 +845,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // assigning Premium information to receipt tpl
     $selectProduct = $premiumParams['selectProduct'] ?? NULL;
     if ($selectProduct &&
-      $selectProduct != 'no_thanks'
+      $selectProduct !== 'no_thanks'
     ) {
       $startDate = $endDate = "";
       $this->assign('selectPremium', TRUE);
@@ -1463,7 +1463,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     $membership = NULL;
-    if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) {
+    if (!empty($membershipContribution)) {
       $membershipContributionID = $membershipContribution->id;
     }
 
@@ -1624,7 +1624,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
               ]);
             }
             catch (CRM_Core_Exception $e) {
-              if ($e->getErrorCode() != 'contribution_completed') {
+              if ($e->getErrorCode() !== 'contribution_completed') {
                 \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::completeTransaction CRM_Core_Exception: ' . $e->getMessage());
                 throw new CRM_Core_Exception('Failed to update contribution in database');
               }
@@ -1648,7 +1648,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       //CRM-18071, where on selecting $0 free membership payment section got hidden and
       // also it reset any payment processor selection result into pending free membership
       // so its a kind of hack to complete free membership at this point since there is no $form->_paymentProcessor info
-      if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) {
+      if (!empty($membershipContribution)) {
         if (empty($this->_paymentProcessor)) {
           // @todo this can maybe go now we are setting payment_processor_id = 0 more reliably.
           $paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_values['payment_processor'] ?? NULL);
@@ -2361,7 +2361,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $premiumParams
    * @param array $formLineItems
    */
-  protected function doMembershipProcessing($contactID, $membershipParams, $premiumParams, $formLineItems) {
+  protected function doMembershipProcessing($contactID, $membershipParams, $premiumParams, $formLineItems): void {
     if (!$this->_useForMember) {
       $this->set('membershipTypeID', $this->_params['selectMembership']);
     }
