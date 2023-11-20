@@ -1122,6 +1122,18 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Set the line item array.
+   *
+   * This is mostly useful when they have been calculated & stored
+   * on the form & we want to rebuild the line item object.
+   *
+   * @param array $lineItems
+   */
+  public function setLineItems(array $lineItems): void {
+    $this->lineItems = $lineItems;
+  }
+
+  /**
    * @param int|string $index
    *
    * @return string

@@ -365,10 +365,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // In tests price set id is not always set - it is unclear if this is just
     // poor test set up or it is possible in 'the real world'
     if ($this->getPriceSetID()) {
-      $this->order = new CRM_Financial_BAO_Order();
-      $this->order->setPriceSetID($this->getPriceSetID());
-      $this->order->setIsExcludeExpiredFields(TRUE);
-      $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
+      $this->initializeOrder();
     }
     else {
       CRM_Core_Error::deprecatedFunctionWarning('forms require a price set ID');
@@ -528,6 +525,108 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->_isBillingAddressRequiredForPayLater = $this->_values['is_billing_required'] ?? NULL;
       $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
     }
+  }
+
+  /**
+   * Set the selected line items.
+   *
+   * This returns all selected line items, even if they will
+   * be split to a secondary contribution.
+   *
+   * @api Supported for external use.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getLineItems(): array {
+    return $this->order->getLineItems();
+  }
+
+  /**
+   * Set the selected line items.
+   *
+   * This returns all selected line items, even if they will
+   * be split to a secondary contribution.
+   *
+   * @api Supported for external use.
+   */
+  public function setLineItems($lineItems): void {
+    $this->order->setLineItems($lineItems);
+    $this->set('_lineItem', $lineItems);
+  }
+
+  /**
+   * Set the selected line items.
+   *
+   * @internal
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMainContributionLineItems(): array {
+    $membershipLineItems = $this->getSecondaryMembershipContributionLineItems();
+    $allLineItems = $this->getOrder()->getLineItems();
+    if (!$membershipLineItems || $allLineItems === $membershipLineItems) {
+      return $allLineItems;
+    }
+    $mainContributionLineItems = [];
+    foreach ($allLineItems as $index => $lineItem) {
+      if (empty($lineItem['membership_type_id'])) {
+        $mainContributionLineItems[$index] = $lineItem;
+      }
+    }
+    return $mainContributionLineItems;
+  }
+
+  /**
+   * Set the line items for the secondary membership contribution.
+   *
+   * Return false if the page is not configured for separate contributions,
+   * or if only the membership or the contribution has been selected.
+   *
+   * @internal
+   *
+   * @return array|false
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getSecondaryMembershipContributionLineItems() {
+    if (!$this->isSeparateMembershipPayment()) {
+      return FALSE;
+    }
+    $lineItems = [];
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      if (!empty($lineItem['membership_type_id'])) {
+        $lineItems[$index] = $lineItem;
+      }
+    }
+    if (empty($lineItems) || count($lineItems) === $this->getLineItems()) {
+      return FALSE;
+    }
+    return $lineItems;
+  }
+
+  /**
+   * Get membership line items.
+   *
+   * Get all line items relating to membership, regardless of primary or secondary membership.
+   *
+   * @internal
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMembershipLineItems(): array {
+    $lineItems = [];
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      if (!empty($lineItem['membership_type_id'])) {
+        $lineItems[$index] = $lineItem;
+      }
+    }
+    return $lineItems;
   }
 
   /**
@@ -1296,6 +1395,27 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       return $this->_contributionID;
     }
     return NULL;
+  }
+
+  protected function getOrder(): CRM_Financial_BAO_Order {
+    if (!$this->order) {
+      $this->initializeOrder();
+    }
+    return $this->order;
+  }
+
+  protected function initializeOrder(): void {
+    $this->order = new CRM_Financial_BAO_Order();
+    $this->order->setPriceSetID($this->getPriceSetID());
+    $this->order->setIsExcludeExpiredFields(TRUE);
+    if ($this->get('lineItem')) {
+      $this->order->setLineItems($this->get('lineItem')[$this->getPriceSetID()]);
+    }
+    if ($this->getExistingContributionID()) {
+      $this->order->setTemplateContributionID($this->getExistingContributionID());
+    }
+    $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
+    $this->order->setForm($this);
   }
 
 }

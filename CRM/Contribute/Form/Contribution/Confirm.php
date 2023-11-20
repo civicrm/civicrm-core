@@ -1900,16 +1900,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
 
-    $order = new CRM_Financial_BAO_Order();
-    $order->setPriceSetIDByContributionPageID($params['id']);
-    $order->setPriceSelectionFromUnfilteredInput($params);
+    $form->order = new CRM_Financial_BAO_Order();
+    $form->order->setPriceSetIDByContributionPageID($params['id']);
+    $form->order->setPriceSelectionFromUnfilteredInput($params);
     if (isset($params['amount']) && !$form->isSeparateMembershipPayment()) {
       // @todo deprecate receiving amount, calculate on the form.
-      $order->setOverrideTotalAmount((float) $params['amount']);
+      $form->order->setOverrideTotalAmount((float) $params['amount']);
     }
-    $amount = $order->getTotalAmount();
+    $amount = $form->order->getTotalAmount();
     if ($form->isSeparateMembershipPayment()) {
-      $amount -= $order->getMembershipTotalAmount();
+      $amount -= $form->order->getMembershipTotalAmount();
     }
     $form->_amount = $params['amount'] = $form->_params['amount'] = $amount;
     // hack these in for test support.
@@ -1948,9 +1948,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $priceFields = $priceFields[$priceSetID]['fields'];
 
-    $form->_lineItem = [$priceSetID => $order->getLineItems()];
+    $form->_lineItem = [$priceSetID => $form->order->getLineItems()];
     $membershipPriceFieldIDs = [];
-    foreach ($order->getLineItems() as $lineItem) {
+    foreach ($form->order->getLineItems() as $lineItem) {
       if (!empty($lineItem['membership_type_id'])) {
         $form->set('useForMember', 1);
         $form->_useForMember = 1;
