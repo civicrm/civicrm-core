@@ -1166,11 +1166,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $amountID = $params['amount'] ?? NULL;
 
         if ($amountID) {
-          // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
-          // function to get correct amount level consistently. Remove setting of the amount level in
-          // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
-          // to cover all variants.
-          $params['amount_level'] = $formValues[$amountID]['label'] ?? NULL;
           $amount = $formValues[$amountID]['value'] ?? NULL;
         }
       }
