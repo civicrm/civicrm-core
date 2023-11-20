@@ -1368,7 +1368,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->postProcessMembership($membershipParams, $contactID, $premiumParams, $customFieldsFormatted, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $financialTypeID,
       $membershipLineItems);
 
-    $this->assign('membership_assign', TRUE);
     $this->set('membershipTypeID', $membershipParams['selectMembership']);
   }
 
@@ -1637,7 +1636,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     $emailValues = array_merge($membershipParams, $this->_values);
-    $emailValues['membership_assign'] = 1;
     $emailValues['useForMember'] = !empty($this->_useForMember);
     $emailValues['membership_id'] = !empty($membership) ? $membership->id : NULL;
 
@@ -2365,7 +2363,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   protected function doMembershipProcessing($contactID, $membershipParams, $premiumParams, $formLineItems) {
     if (!$this->_useForMember) {
-      $this->assign('membership_assign', TRUE);
       $this->set('membershipTypeID', $this->_params['selectMembership']);
     }
 
