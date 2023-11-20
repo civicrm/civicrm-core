@@ -498,7 +498,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_params['is_quick_config'] = 1;
     }
     else {
-      $this->assignLineItemsToTemplate([$this->getPriceSetID() => $this->order->getLineItems()]);
+      $this->assign('lineItem', [$this->getPriceSetID() => $this->order->getLineItems()]);
     }
 
     if (!empty($params['selectProduct']) && $params['selectProduct'] !== 'no_thanks') {

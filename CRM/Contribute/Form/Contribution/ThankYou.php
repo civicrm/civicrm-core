@@ -41,7 +41,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     parent::preProcess();
 
     $this->_params = $this->get('params');
-    $this->_lineItem = $this->get('lineItem');
     $this->_useForMember = $this->get('useForMember');
     $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->_values));
     $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $this->_values));
@@ -95,31 +94,11 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     }
 
     $params = $this->_params;
-    $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
-    // Make a copy of line items array to use for display only
-    $tplLineItems = $this->_lineItem;
-    if ($invoicing) {
-      $getTaxDetails = FALSE;
-      foreach ($this->_lineItem as $key => $value) {
-        foreach ($value as $k => $v) {
-          if (isset($v['tax_rate'])) {
-            if ($v['tax_rate'] != '') {
-              $getTaxDetails = TRUE;
-              // Cast to float to display without trailing zero decimals
-              $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
-            }
-          }
-        }
-      }
-    }
     $this->assign('getTaxDetails', (bool) $this->order->getTotalTaxAmount());
     $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
     $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
-
-    if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-      $this->assign('lineItem', $tplLineItems);
-    }
-    else {
+    $this->assign('lineItem', $this->isQuickConfig() ? NULL : $this->order->getLineItems());
+    if (!$this->isQuickConfig()) {
       if (is_array($membershipTypeID)) {
         $membershipTypeID = current($membershipTypeID);
       }
