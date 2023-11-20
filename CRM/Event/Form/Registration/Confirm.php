@@ -681,7 +681,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       $entityTable = 'civicrm_participant';
       $totalTaxAmount = 0;
-      $dataArray = [];
       foreach ($this->_lineItem as $key => $value) {
         if ($value == 'skip') {
           continue;
@@ -698,17 +697,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           foreach ($value as $line) {
             if (isset($line['tax_amount']) && isset($line['tax_rate'])) {
               $totalTaxAmount = $line['tax_amount'] + $totalTaxAmount;
-              if (isset($dataArray[$line['tax_rate']])) {
-                $dataArray[$line['tax_rate']] = $dataArray[$line['tax_rate']] + ($line['tax_amount'] ?? 0);
-              }
-              else {
-                $dataArray[$line['tax_rate']] = $line['tax_amount'] ?? NULL;
-              }
             }
           }
         }
       }
-      $this->assign('dataArray', $dataArray);
       $this->assign('totalTaxAmount', $totalTaxAmount);
     }
 
@@ -888,8 +880,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             }
             if (\Civi::settings()->get('invoicing')) {
               $individual = $this->get('individual');
-              $dataArray[key($dataArray)] = $individual[$participantNum]['totalTaxAmt'];
-              $this->assign('dataArray', $dataArray);
               $this->assign('totalAmount', $individual[$participantNum]['totalAmtWithTax']);
               $this->assign('totalTaxAmount', $individual[$participantNum]['totalTaxAmt']);
               $this->assign('individual', [$individual[$participantNum]]);

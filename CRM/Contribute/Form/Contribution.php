@@ -1429,23 +1429,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
 
       if (Civi::settings()->get('invoicing')) {
-        $dataArray = [];
-        // @todo - interrogate the line items passed in on the params array.
-        // No reason to assume line items will be set on the form.
-        foreach ($form->_lineItem as $lineItemKey => $lineItemValue) {
-          foreach ($lineItemValue as $key => $value) {
-            if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
-              if (isset($dataArray[$value['tax_rate']])) {
-                $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + $value['tax_amount'];
-              }
-              else {
-                $dataArray[$value['tax_rate']] = $value['tax_amount'];
-              }
-            }
-          }
-        }
         $smarty = CRM_Core_Smarty::singleton();
-        $smarty->assign('dataArray', $dataArray);
+        // @todo - probably this assign is no longer needed as we use a token.
         $smarty->assign('totalTaxAmount', $params['tax_amount'] ?? NULL);
       }
     }
@@ -2026,11 +2011,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     foreach ($lineItem as $key => $value) {
       foreach ($value as $v) {
         if (isset($taxRate[(string) CRM_Utils_Array::value('tax_rate', $v)])) {
-          $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + ($v['tax_amount'] ?? 0);
         }
         else {
           if (isset($v['tax_rate'])) {
-            $taxRate[(string) $v['tax_rate']] = $v['tax_amount'] ?? NULL;
             $getTaxDetails = TRUE;
           }
         }
@@ -2039,14 +2022,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     if ($action & CRM_Core_Action::UPDATE) {
       $totalTaxAmount = $submittedValues['tax_amount'] ?? $this->_values['tax_amount'];
+      // Assign likely replaced by a token
       $this->assign('totalTaxAmount', $totalTaxAmount);
-      $this->assign('dataArray', $taxRate);
     }
     else {
       if (!empty($submittedValues['price_set_id'])) {
         $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
         $this->assign('getTaxDetails', $getTaxDetails);
-        $this->assign('dataArray', $taxRate);
       }
       else {
         $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));

@@ -24,9 +24,8 @@
     {if !empty($receipt_text)}
      <p>{$receipt_text|htmlize}</p>
     {/if}
-
-    {if $is_pay_later}
-     <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
+    {if {contribution.balance_amount|boolean} && {contribution.is_pay_later|boolean}}
+      <p>{contribution.pay_later_receipt}</p>
     {/if}
 
    </td>

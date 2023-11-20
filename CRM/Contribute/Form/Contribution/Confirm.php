@@ -464,6 +464,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     // FIXME: Some of this code is identical to Thankyou.php and should be broken out into a shared function
@@ -484,21 +486,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $this->assign('receiptFromEmail', $this->_values['receipt_from_email'] ?? NULL);
     $this->assign('amount_block_is_active', $this->isFormSupportsNonMembershipContributions());
-
-    // Make a copy of line items array to use for display only
-    $tplLineItems = $this->_lineItem;
-    if (CRM_Invoicing_Utils::isInvoicingEnabled()) {
-      $taxAmount = 0;
-      foreach ($tplLineItems ?? [] as $lineItems) {
-        foreach ($lineItems as $lineItem) {
-          $taxAmount += (float) ($lineItem['tax_amount'] ?? 0);
-        }
-      }
-
-      $this->assign('totalTaxAmount', $taxAmount);
-      $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
-    }
-
+    $this->assign('taxTerm', \Civi::settings()->get('taxTerm'));
+    $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
     $isDisplayLineItems = $this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
     $this->assign('isDisplayLineItems', $isDisplayLineItems);
 
@@ -509,7 +498,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_params['is_quick_config'] = 1;
     }
     else {
-      $this->assignLineItemsToTemplate($tplLineItems);
+      $this->assignLineItemsToTemplate([$this->getPriceSetID() => $this->order->getLineItems()]);
     }
 
     if (!empty($params['selectProduct']) && $params['selectProduct'] !== 'no_thanks') {
@@ -1064,26 +1053,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $contributionParams['total_amount'] = $params['amount'];
 
       $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
-
-      if (Civi::settings()->get('invoicing')) {
-        $dataArray = [];
-        // @todo - interrogate the line items passed in on the params array.
-        // No reason to assume line items will be set on the form.
-        foreach ($form->_lineItem as $lineItemKey => $lineItemValue) {
-          foreach ($lineItemValue as $key => $value) {
-            if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
-              if (isset($dataArray[$value['tax_rate']])) {
-                $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + $value['tax_amount'];
-              }
-              else {
-                $dataArray[$value['tax_rate']] = $value['tax_amount'];
-              }
-            }
-          }
-        }
-        $smarty = CRM_Core_Smarty::singleton();
-        $smarty->assign('dataArray', $dataArray);
-      }
 
       // lets store it in the form variable so postProcess hook can get to this and use it
       $form->_contributionID = $contribution->id;

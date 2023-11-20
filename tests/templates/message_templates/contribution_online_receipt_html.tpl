@@ -133,12 +133,7 @@
   {/foreach}
  {/foreach}
  {/if}
- {if !empty($dataArray)}
- {foreach from=$dataArray item=value key=priceset}
-    dataArray: priceset:::$priceset
-    dataArray: value:::$value
- {/foreach}
- {/if}
+
  {if !empty($honoreeProfile)}
  {foreach from=$honoreeProfile item=value key=label}
     honoreeProfile: label:::$label

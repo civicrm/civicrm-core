@@ -36,7 +36,7 @@
         {if $isDisplayLineItems && $lineItem}
           {if !$amount}{assign var="amount" value=0}{/if}
           {assign var="totalAmount" value=$amount}
-          {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+          {include file="CRM/Price/Page/LineItem.tpl" context="Contribution" displayLineItemFinancialType=false pricesetFieldsCount=false currencySymbol='' hookDiscount=''}
         {elseif $is_separate_payment}
           {if $amount AND $minimum_fee}
             {$membership_name} {ts}Membership{/ts}:
