@@ -36,8 +36,10 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    */
-  public function preProcess() {
+  public function preProcess(): void {
     parent::preProcess();
 
     $this->_params = $this->get('params');
@@ -130,7 +132,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('useForMember', $this->get('useForMember'));
 
     if (!empty($this->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
-      $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
+      $softCreditTypes = CRM_Core_OptionGroup::values('soft_credit_type', FALSE);
 
       $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
       CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor']);
@@ -184,7 +186,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     }
 
     $this->_separateMembershipPayment = $this->get('separateMembershipPayment');
-    $this->assign("is_separate_payment", $this->_separateMembershipPayment);
+    $this->assign('is_separate_payment', $this->_separateMembershipPayment);
 
     if (empty($this->_ccid)) {
       $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
@@ -220,7 +222,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $defaults = [];
     $fields = [];
     foreach ($this->_fields as $name => $dontCare) {
-      if ($name != 'onbehalf' || $name != 'honor') {
+      if ($name !== 'onbehalf' || $name !== 'honor') {
         $fields[$name] = 1;
       }
     }
@@ -349,7 +351,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
         }
 
         $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIds);
-        $this->_membershipTypeValues = $membershipTypeValues;
         $endDate = NULL;
 
         // Check if we support auto-renew on this contribution page
