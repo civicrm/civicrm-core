@@ -40,6 +40,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   protected $_snippet;
 
   /**
+   * Variable for legacy paypal express implementation.
+   *
+   * @var string
+   *
+   * @internal - only to be used by legacy paypal express implementation.
+   */
+  public $_expressButtonName;
+
+  /**
    * Get the active UFGroups (profiles) on this form
    * Many forms load one or more UFGroups (profiles).
    * This provides a standard function to retrieve the IDs of those profiles from the form
