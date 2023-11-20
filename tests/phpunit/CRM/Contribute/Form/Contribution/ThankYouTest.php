@@ -31,7 +31,10 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that correct contribution status is fetched for both live and test contributions.
+   * Test that correct contribution status is fetched for both live and test
+   * contributions.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testLiveAndTestContributionStatus(): void {
     $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy']);
@@ -69,15 +72,12 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
    * @param bool $isTestContribution
    * @return CRM_Contribute_Form_Contribution_ThankYou
    */
-  private function getThankYouFormWithContribution(int $paymentProcessorID, $withPendingContribution = FALSE, $isTestContribution = FALSE) {
+  private function getThankYouFormWithContribution(int $paymentProcessorID, bool $withPendingContribution = FALSE, bool $isTestContribution = FALSE) {
     $pageContribution = $this->getPageContribution((($withPendingContribution) ? 2 : 1), $isTestContribution);
     if (!isset($this->ids['ContributionPage'])) {
       $this->contributionPageCreatePaid(['payment_processor' => $paymentProcessorID])['id'];
     }
     $form = $this->getThankYouForm();
-    $form->_lineItem = [];
-    $form->_bltID = 5;
-
     $form->_params['contributionID'] = $pageContribution['contribution_id'];
     $form->_params['invoiceID'] = $pageContribution['invoice_id'];
     $form->_params['email-5'] = 'demo@example.com';
@@ -85,11 +85,6 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
     if ($isTestContribution) {
       $_REQUEST['action'] = 1024;
     }
-
-    $form->_values = [
-      'custom_pre_id' => NULL,
-      'custom_post_id' => NULL,
-    ];
 
     return $form;
   }
