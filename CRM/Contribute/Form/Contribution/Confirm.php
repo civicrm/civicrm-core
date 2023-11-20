@@ -1437,7 +1437,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membershipContribution = NULL;
     $isTest = $membershipParams['is_test'] ?? FALSE;
     $errors = $paymentResults = [];
-    $this->_values['isMembership'] = TRUE;
+
     $isRecurForFirstTransaction = $this->_params['is_recur'] ?? $membershipParams['is_recur'] ?? NULL;
 
     $totalAmount = $membershipParams['amount'];
@@ -1586,7 +1586,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
           //CRM-15232: Check if membership is created and on the basis of it use
           //membership receipt template to send payment receipt
-          $this->_values['isMembership'] = TRUE;
+          $this->_values['membership_id'] = $membership->id;
         }
       }
       if ($this->_priceSetId && !empty($this->_useForMember) && !empty($this->_lineItem)) {
@@ -1670,6 +1670,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $emailValues = array_merge($membershipParams, $this->_values);
     $emailValues['membership_assign'] = 1;
     $emailValues['useForMember'] = !empty($this->_useForMember);
+    $emailValues['membership_id'] = !empty($membership) ? $membership->id : NULL;
 
     // Finally send an email receipt for pay-later scenario (although it might sometimes be caught above!)
     if ($totalAmount == 0) {

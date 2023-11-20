@@ -224,8 +224,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'Membership Information',
       'Membership Type       </td>
        <td style="padding: 4px; border-bottom: 1px solid #999;">
-        General
-       </td>',
+         General       </td>',
       '$1,000.00',
       'Membership Start Date',
       '************1111',

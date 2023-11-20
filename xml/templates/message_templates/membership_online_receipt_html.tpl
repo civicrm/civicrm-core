@@ -33,7 +33,7 @@
   </tr>
   </table>
   <table style="width:100%; max-width:500px; border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
-    {if $membership_assign && !$useForMember}
+    {if {membership.id|boolean} && !$isShowLineItems}
       <tr>
        <th {$headerStyle}>
         {ts}Membership Information{/ts}
@@ -44,26 +44,26 @@
         {ts}Membership Type{/ts}
        </td>
        <td {$valueStyle}>
-        {$membership_name}
+         {ts}{membership.membership_type_id:name}{/ts}
        </td>
       </tr>
-      {if $mem_start_date}
+      {if {membership.start_date|boolean}}
        <tr>
         <td {$labelStyle}>
          {ts}Membership Start Date{/ts}
         </td>
         <td {$valueStyle}>
-         {$mem_start_date|crmDate}
+          {membership.start_date}
         </td>
        </tr>
       {/if}
-      {if $mem_end_date}
+      {if {membership.end_date|boolean}}
        <tr>
         <td {$labelStyle}>
          {ts}Membership Expiration Date{/ts}
         </td>
         <td {$valueStyle}>
-          {$mem_end_date|crmDate}
+          {membership.end_date}
         </td>
        </tr>
       {/if}
