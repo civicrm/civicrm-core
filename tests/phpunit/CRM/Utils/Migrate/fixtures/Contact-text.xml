@@ -33,6 +33,8 @@
       <column_name>name1_1</column_name>
       <serialize>0</serialize>
       <in_selector>0</in_selector>
+      <fk_entity_on_delete>set_null</fk_entity_on_delete>
+      <is_on_delete_includes_soft_delete>0</is_on_delete_includes_soft_delete>
       <custom_group_name>example</custom_group_name>
     </CustomField>
   </CustomFields>

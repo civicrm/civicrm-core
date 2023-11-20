@@ -2559,6 +2559,13 @@ WHERE      f.id IN ($ids)";
     return is_object($field) ? !empty($field->serialize) : !empty($field['serialize']);
   }
 
+  public static function getFkEntityOnDeleteOptions(): array {
+    return [
+      'set_null' => ts('Delete reference'),
+      'cascade' => ts('Delete entity'),
+    ];
+  }
+
   /**
    * Get api3 entity name for this field
    * @deprecated

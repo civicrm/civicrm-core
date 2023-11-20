@@ -345,6 +345,39 @@
     <comment>Name of entity being referenced.</comment>
     <add>5.60</add>
   </field>
+  <field>
+    <name>fk_entity_on_delete</name>
+    <type>varchar</type>
+    <title>On Referenced Entity Delete</title>
+    <length>255</length>
+    <default>'set_null'</default>
+    <required>true</required>
+    <comment>Behavior if referenced entity is deleted.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_CustomField::getFkEntityOnDeleteOptions</callback>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>is_on_delete_includes_soft_delete</name>
+    <type>boolean</type>
+    <title>On Delete Includes Soft Delete?</title>
+    <default>0</default>
+    <comment>Behavior for referenced entity delete is applied on soft delete, too.</comment>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <index>
+    <name>index_data_type</name>
+    <fieldName>data_type</fieldName>
+  </index>
+  <index>
+    <name>index_fk_entity</name>
+    <fieldName>fk_entity</fieldName>
+  </index>
   <index>
     <name>UI_label_custom_group_id</name>
     <fieldName>label</fieldName>

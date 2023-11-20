@@ -34,6 +34,8 @@
       <column_name>our_select_field_1</column_name>
       <in_selector>0</in_selector>
       <option_group_name>our_select_field_20130818044104</option_group_name>
+      <fk_entity_on_delete>set_null</fk_entity_on_delete>
+      <is_on_delete_includes_soft_delete>0</is_on_delete_includes_soft_delete>
       <custom_group_name>example</custom_group_name>
     </CustomField>
   </CustomFields>

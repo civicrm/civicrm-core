@@ -170,6 +170,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $defaults['note_columns'] = 60;
       $defaults['note_rows'] = 4;
       $defaults['is_view'] = 0;
+      $defaults['fk_entity_on_delete'] = CRM_Core_DAO_CustomField::fields()['fk_entity_on_delete']['default'];
+      $defaults['is_on_delete_includes_soft_delete'] = CRM_Core_DAO_CustomField::fields()['is_on_delete_includes_soft_delete']['default'];
 
       if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple')) {
         $defaults['in_selector'] = 1;
@@ -237,6 +239,9 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       'entity' => 'Entity',
       'select' => ['minimumInputLength' => 0],
     ]);
+
+    $this->addField('fk_entity_on_delete');
+    $this->addField('is_on_delete_includes_soft_delete');
 
     $isUpdateAction = $this->_action == CRM_Core_Action::UPDATE;
     if ($isUpdateAction) {
