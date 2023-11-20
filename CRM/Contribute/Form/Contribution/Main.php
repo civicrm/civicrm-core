@@ -1259,9 +1259,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $params['separate_amount'] = $params['amount'];
-    // @todo - stepping through the code indicates that amount is always set before this point so it never matters.
-    // Move more of the above into this function...
-    $params['amount'] = $this->getMainContributionAmount($params);
     //If the membership & contribution is used in contribution page & not separate payment
     $memPresent = $membershipLabel = $fieldOption = NULL;
     $proceFieldAmount = 0;

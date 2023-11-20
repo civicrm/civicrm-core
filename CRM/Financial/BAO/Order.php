@@ -854,6 +854,26 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get line items that so not relate to memberships.
+   *
+   * This is used for the contribution page separate payment functionality
+   * and is not supported for any other use.
+   *
+   * return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getNonMembershipLineItems():array {
+    $lines = $this->getLineItems();
+    foreach ($lines as $index => $line) {
+      if (!empty($line['membership_type_id'])) {
+        unset($lines[$index]);
+      }
+    }
+    return $lines;
+  }
+
+  /**
    * Get an array of all membership types included in the order.
    *
    * @return array
@@ -993,6 +1013,27 @@ class CRM_Financial_BAO_Order {
   public function getMembershipTotalAmount() :float {
     $amount = 0.0;
     foreach ($this->getMembershipLineItems() as $lineItem) {
+      $amount += ($lineItem['line_total'] ?? 0.0) + ($lineItem['tax_amount'] ?? 0.0);
+    }
+    return $amount;
+  }
+
+  /**
+   * Get the total amount relating to the non-membership part of the order.
+   *
+   * Get line items that so not relate to memberships.
+   *
+   * This is used for the contribution page separate payment functionality
+   * and is not supported for any other use.
+   *
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getNonMembershipTotalAmount() :float {
+    $amount = 0.0;
+    foreach ($this->getNonMembershipLineItems() as $lineItem) {
       $amount += ($lineItem['line_total'] ?? 0.0) + ($lineItem['tax_amount'] ?? 0.0);
     }
     return $amount;

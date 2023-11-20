@@ -1038,27 +1038,20 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Get the amount for the main contribution.
+   * Get the total amount for the main contribution.
    *
-   * The goal is to expand this function so that all the argy-bargy of figuring out the amount
-   * winds up here as the main spaghetti shrinks.
-   *
-   * If there is a separate membership contribution this is the 'other one'. Otherwise there
-   * is only one.
-   *
-   * @param $params
+   * This consists of the full amount of the order in most cases but
+   * when the form is configured for a separate payment and there is a membership
+   * amount then it is the contribution portion only.
    *
    * @return float
-   *
    * @throws \CRM_Core_Exception
    */
-  protected function getMainContributionAmount($params) {
-    if (!empty($params['selectMembership'])) {
-      if (empty($params['amount']) && !$this->_separateMembershipPayment) {
-        return CRM_Member_BAO_MembershipType::getMembershipType($params['selectMembership'])['minimum_fee'] ?? 0;
-      }
+  protected function getMainContributionAmount(): float {
+    if ($this->getSeparatePaymentMembershipAmount()) {
+      return $this->order->getNonMembershipTotalAmount();
     }
-    return $params['amount'] ?? 0;
+    return $this->order->getTotalAmount();
   }
 
   /**
@@ -1183,6 +1176,42 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   protected function isSeparateMembershipPayment(): bool {
     return $this->getMembershipBlock() && $this->getMembershipBlock()['is_separate_payment'];
+  }
+
+  /**
+   * Get the tax-inclusive total amount for membership in a quick config context.
+   *
+   * @return false|float
+   * @throws \CRM_Core_Exception
+   */
+  protected function getSeparatePaymentMembershipAmount() {
+    if (!$this->isSeparateMembershipPayment()) {
+      return FALSE;
+    }
+    return $this->getMembershipAmount();
+  }
+
+  /**
+   * Get the tax-inclusive total amount for membership in a quick config context.
+   *
+   * @return false|float
+   * @throws \CRM_Core_Exception
+   */
+  protected function getQuickConfigMembershipAmount() {
+    if (!$this->isQuickConfig()) {
+      return FALSE;
+    }
+    return $this->getMembershipAmount();
+  }
+
+  /**
+   * Get the total amount (including tax) for memberships.
+   *
+   * @return float
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMembershipAmount(): float {
+    return $this->order->getMembershipTotalAmount();
   }
 
   /**
