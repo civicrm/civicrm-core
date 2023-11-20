@@ -712,6 +712,15 @@ class CRM_Financial_BAO_Order {
       $this->priceSetMetadata = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($this->getPriceSetID());
       $this->priceSetMetadata['id'] = $this->getPriceSetID();
       $this->priceSetMetadata['auto_renew_membership_field'] = NULL;
+      if ($this->getOverrideFinancialTypeID()) {
+        foreach ($this->priceSetMetadata['fields'] as &$field) {
+          foreach ($field['options'] as &$option) {
+            $option['financial_type_id'] = $this->getOverrideFinancialTypeID();
+            $option['tax_rate'] = $this->getTaxRate($this->getFinancialTypeID());
+            $option['tax_amount'] = $option['tax_rate'] * $option['amount'];
+          }
+        }
+      }
       $this->setPriceFieldMetadata($this->priceSetMetadata['fields']);
       unset($this->priceSetMetadata['fields']);
     }
