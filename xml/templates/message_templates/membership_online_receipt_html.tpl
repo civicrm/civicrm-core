@@ -95,7 +95,7 @@
               {ts}Total{/ts}
             </td>
             <td {$valueStyle}>
-              {$amount+$membership_amount|crmMoney}
+              {contribution.total_amount}
             </td>
           </tr>
         {/if}
