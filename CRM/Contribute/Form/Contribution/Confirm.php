@@ -1452,7 +1452,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           unset($membershipParams['is_recur']);
         }
         [$membershipContribution, $secondPaymentResult] = $this->processSecondaryFinancialTransaction($contactID, array_merge($membershipParams, ['skipLineItem' => 1]),
-          $isTest, $unprocessedLineItems, $membershipDetails['minimum_fee'] ?? 0, $membershipDetails['financial_type_id'] ?? NULL);
+          $isTest, $membershipDetails['minimum_fee'] ?? 0, $membershipDetails['financial_type_id'] ?? NULL);
         $paymentResults[] = ['contribution_id' => $membershipContribution->id, 'result' => $secondPaymentResult];
         $totalAmount = $membershipContribution->total_amount;
       }
@@ -1684,7 +1684,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $contactID
    * @param array $tempParams
    * @param bool $isTest
-   * @param array $lineItems
    * @param $minimumFee
    * @param int $financialTypeID
    *
@@ -1693,7 +1692,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  private function processSecondaryFinancialTransaction($contactID, $tempParams, $isTest, $lineItems, $minimumFee,
+  private function processSecondaryFinancialTransaction($contactID, $tempParams, $isTest, $minimumFee,
                                                    $financialTypeID): array {
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeID;
@@ -1722,7 +1721,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_params['separate_membership_payment'] = 1;
     $contributionParams = [
       'contact_id' => $contactID,
-      'line_item' => $lineItems,
+      'line_item' => [$this->getPriceSetID() => $this->getSecondaryMembershipContributionLineItems()],
       'is_test' => $isTest,
       'campaign_id' => $tempParams['campaign_id'] ?? $this->_values['campaign_id'] ?? NULL,
       'contribution_page_id' => $this->_id,
