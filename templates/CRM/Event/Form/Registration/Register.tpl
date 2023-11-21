@@ -135,7 +135,9 @@
     {/if}
 
     <div class="crm-public-form-item crm-section custom_post-section">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}
+      {foreach from=$postPageProfiles item=customPost}
+        {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}
+      {/foreach}
     </div>
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">
