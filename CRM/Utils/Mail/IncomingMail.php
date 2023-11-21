@@ -217,7 +217,7 @@ class CRM_Utils_Mail_IncomingMail {
         'id' => $queue->id,
         'hash' => $queue->hash,
         'contact_id' => $queue->contact_id,
-        'job_id' => $queue->contact_id,
+        'job_id' => $queue->job_id,
       ]);
       $this->define('Mailing', 'Mailing', [
         'id' => MailingJob::get(FALSE)
