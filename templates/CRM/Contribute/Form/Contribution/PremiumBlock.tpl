@@ -51,15 +51,15 @@
       {foreach from=$products item=row}
         <div class="premium {if $showPremium}premium-selectable{/if}" id="premium_id-{$row.id}" min_contribution="{$row.min_contribution}">
           <div class="premium-short">
-            {if $row.thumbnail}<div class="premium-short-thumbnail"><img src="{$row.thumbnail}" alt="{$row.name|escape}" /></div>{/if}
-            <div class="premium-short-content">{$row.name}</div>
+            {if $row.thumbnail}<div class="premium-short-thumbnail"><img src="{$row.thumbnail|purify}" alt="{$row.name|escape}" /></div>{/if}
+            <div class="premium-short-content">{$row.name|escape}</div>
             <div style="clear:both"></div>
           </div>
 
           <div class="premium-full">
-            <div class="premium-full-image">{if $row.image}<img src="{$row.image}" alt="{$row.name|escape}" />{/if}</div>
+            <div class="premium-full-image">{if $row.image}<img src="{$row.image|escape}" alt="{$row.name|escape}" />{/if}</div>
             <div class="premium-full-content">
-              <div class="premium-full-title">{$row.name}</div>
+              <div class="premium-full-title">{$row.name|escape}</div>
               <div class="premium-full-disabled">
                 {ts 1=$row.min_contribution|crmMoney}You must contribute at least %1 to get this item{/ts}<br/>
                 <button type="button" amount="{$row.min_contribution}">
@@ -67,7 +67,7 @@
                 </button>
               </div>
               <div class="premium-full-description">
-                {$row.description}
+                {$row.description|escape}
               </div>
               {if $showSelectOptions}
                 {assign var="pid" value="options_"|cat:$row.id}
@@ -78,7 +78,7 @@
                 {/if}
               {else}
                 <div class="premium-full-options">
-                  <p><strong>{$row.options}</strong></p>
+                  <p><strong>{$row.options|purify}</strong></p>
                 </div>
               {/if}
               {if (($premiumBlock.premiums_display_min_contribution AND $context EQ "makeContribution") OR $preview EQ 1) AND $row.min_contribution GT 0}
