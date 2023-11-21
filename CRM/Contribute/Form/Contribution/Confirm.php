@@ -690,7 +690,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
 
         $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIds);
-        $this->_membershipTypeValues = $membershipTypeValues;
         $endDate = NULL;
 
         // Check if we support auto-renew on this contribution page
@@ -1130,15 +1129,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // CRM-14354: For an auto-renewing membership with an additional contribution,
     // if separate payments is not enabled, make sure only the membership fee recurs
-    if (!empty($this->_membershipBlock)
-      && $this->_membershipBlock['is_separate_payment'] === '0'
+    if ($this->isSeparateMembershipPayment()
       && isset($params['selectMembership'])
-      && $this->_values['is_allow_other_amount'] == '1'
+      && $this->getContributionPageValue('is_allow_other_amount')
       // CRM-16331
-      && !empty($this->_membershipTypeValues)
-      && !empty($this->_membershipTypeValues[$params['selectMembership']]['minimum_fee'])
+      && !empty($this->order->getMembershipTotalAmount())
     ) {
-      $recurParams['amount'] = $this->_membershipTypeValues[$params['selectMembership']]['minimum_fee'];
+      $recurParams['amount'] = $this->order->getMembershipTotalAmount();
     }
 
     $recurParams['is_test'] = 0;
