@@ -72,7 +72,7 @@
         <th {$headerStyle}>{ts}Membership Fee{/ts}</th>
       </tr>
 
-      {if !$useForMember and isset($membership_amount) and !empty($is_quick_config)}
+      {if !$isShowLineItems && {contribution.total_amount|boolean}}
         <tr>
           <td {$labelStyle}>
             {ts 1=$membership_name}%1 Membership{/ts}
@@ -175,20 +175,6 @@
         </td>
         <td {$valueStyle}>
             {contribution.total_amount} {if isset($amount_level)} - {$amount_level}{/if}
-        </td>
-      </tr>
-    {elseif isset($membership_amount)}
-      <tr>
-        <th {$headerStyle}>
-          {ts}Membership Fee{/ts}
-        </th>
-      </tr>
-      <tr>
-        <td {$labelStyle}>
-          {ts 1=$membership_name}%1 Membership{/ts}
-        </td>
-        <td {$valueStyle}>
-          {$membership_amount|crmMoney}
         </td>
       </tr>
     {/if}
