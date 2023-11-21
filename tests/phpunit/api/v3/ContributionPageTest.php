@@ -425,9 +425,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contributions[$membershipPayment['contribution_id']]['contact_id']);
     $mut->checkMailLog([
       'Gruff',
-      'General Membership',
-      '$0.00',
-      'Membership Fee',
+      'General',
+      'Membership Information',
+      'Membership Type',
     ]);
     $mut->stop();
     $mut->clearMessages();

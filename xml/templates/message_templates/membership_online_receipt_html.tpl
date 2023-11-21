@@ -179,18 +179,18 @@
       </tr>
     {/if}
 
-    {if !empty($receive_date)}
+    {if {contribution.receive_date|boolean}}
       <tr>
         <td {$labelStyle}>
           {ts}Date{/ts}
         </td>
         <td {$valueStyle}>
-          {$receive_date|crmDate}
+          {contribution.receive_date}
         </td>
       </tr>
     {/if}
 
-    {if !empty($is_monetary) and !empty($trxn_id)}
+    {if !empty($trxn_id)}
       <tr>
        <td {$labelStyle}>
         {ts}Transaction #{/ts}
