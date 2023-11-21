@@ -48,16 +48,14 @@
     {/if}
 </div>
 {else}
-  {if $showForm eq false}
-    <div class="messages status no-popup">
-      {if $products ne null}
-        {icon icon="fa-info-circle"}{/icon}
-        {capture assign=crmURL}{crmURL p='civicrm/admin/contribute/addProductToPage' q="reset=1&action=update&id=$id"}{/capture}
-        {ts 1=$crmURL}There are no premiums offered on this contribution page yet. You can <a href='%1'>add one</a>.{/ts}
-      {else}
-        {icon icon="fa-info-circle"}{/icon}
-        {ts 1=$managePremiumsURL}There are no active premiums for your site. You can <a href='%1'>create and/or enable premiums here</a>.{/ts}
-      {/if}
-    </div>
-  {/if}
+  <div class="messages status no-popup">
+    {if $products ne null}
+      {icon icon="fa-info-circle"}{/icon}
+      {capture assign=crmURL}{crmURL p='civicrm/admin/contribute/addProductToPage' q="reset=1&action=update&id=$id"}{/capture}
+      {ts 1=$crmURL}There are no premiums offered on this contribution page yet. You can <a href='%1'>add one</a>.{/ts}
+    {else}
+      {icon icon="fa-info-circle"}{/icon}
+      {ts 1=$managePremiumsURL}There are no active premiums for your site. You can <a href='%1'>create and/or enable premiums here</a>.{/ts}
+    {/if}
+  </div>
 {/if}
