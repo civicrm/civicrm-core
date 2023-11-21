@@ -28,14 +28,14 @@
         </tr>
         {foreach from=$rows item=row}
         <tr class="{cycle values='odd-row,even-row'}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
-          <td class="crm-contribution-form-block-product_name">{$row.product_name}</td>
-          <td class="crm-contribution-form-block-sku">{$row.sku}</td>
+          <td class="crm-contribution-form-block-product_name">{$row.product_name|escape}</td>
+          <td class="crm-contribution-form-block-sku">{$row.sku|escape}</td>
           <td class="crm-contribution-form-block-price">{$row.price|crmMoney}</td>
           <td class="crm-contribution-form-block-min_contribution">{$row.min_contribution|crmMoney}</td>
           <td class="crm-contribution-form-block-cost">{$row.cost|crmMoney}</td>
-          <td class="crm-contribution-form-block-financial_type">{$row.financial_type}</td>
+          <td class="crm-contribution-form-block-financial_type">{$row.financial_type|escape}</td>
           <td class="nowrap crm-contribution-form-block-weight">{$row.weight|smarty:nodefaults}</td>
-          <td class="crm-contribution-form-block-action">{$row.action}</td>
+          <td class="crm-contribution-form-block-action">{$row.action|smarty:nodefaults}</td>
         </tr>
         {/foreach}
         </table>
