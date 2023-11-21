@@ -2057,29 +2057,29 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!empty($this->_values['onbehalf_profile_id']) && empty($this->_ccid)) {
       $behalfOrganization = [];
       $orgFields = ['organization_name', 'organization_id', 'org_option'];
-      foreach ($orgFields as $fld) {
-        if (array_key_exists($fld, $params)) {
-          $behalfOrganization[$fld] = $params[$fld];
-          unset($params[$fld]);
+      foreach ($orgFields as $organizationField) {
+        if (array_key_exists($organizationField, $params)) {
+          $behalfOrganization[$organizationField] = $params[$organizationField];
+          unset($params[$organizationField]);
         }
       }
 
       if (is_array($params['onbehalf']) && !empty($params['onbehalf'])) {
-        foreach ($params['onbehalf'] as $fld => $values) {
-          if (strstr($fld, 'custom_')) {
-            $behalfOrganization[$fld] = $values;
+        foreach ($params['onbehalf'] as $onBehalfField => $values) {
+          if (str_contains($onBehalfField, 'custom_')) {
+            $behalfOrganization[$onBehalfField] = $values;
           }
-          elseif (!(strstr($fld, '-'))) {
-            if (in_array($fld, [
+          elseif (!(str_contains($onBehalfField, '-') !== FALSE)) {
+            if (in_array($onBehalfField, [
               'contribution_campaign_id',
               'member_campaign_id',
             ])) {
-              $fld = 'campaign_id';
+              $onBehalfField = 'campaign_id';
             }
             else {
-              $behalfOrganization[$fld] = $values;
+              $behalfOrganization[$onBehalfField] = $values;
             }
-            $this->_params[$fld] = $values;
+            $this->_params[$onBehalfField] = $values;
           }
         }
       }
@@ -2087,7 +2087,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (array_key_exists('onbehalf_location', $params) && is_array($params['onbehalf_location'])) {
         foreach ($params['onbehalf_location'] as $block => $vals) {
           //fix for custom data (of type checkbox, multi-select)
-          if (substr($block, 0, 7) == 'custom_') {
+          if (str_starts_with($block, 0, 'custom_')) {
             continue;
           }
           // fix the index of block elements
@@ -2232,7 +2232,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         is_array($paymentParams['onbehalf'])
       ) {
         foreach ($paymentParams['onbehalf'] as $key => $value) {
-          if (strstr($key, 'custom_')) {
+          if (str_contains($key, 'custom_')) {
             $this->_params[$key] = $value;
           }
         }
@@ -2368,7 +2368,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       is_array($membershipParams['onbehalf'])
     ) {
       foreach ($membershipParams['onbehalf'] as $key => $value) {
-        if (strstr($key, 'custom_')) {
+        if (str_contains($key, 'custom_')) {
           $customFieldId = explode('_', $key);
           CRM_Core_BAO_CustomField::formatCustomField(
             $customFieldId[1],
