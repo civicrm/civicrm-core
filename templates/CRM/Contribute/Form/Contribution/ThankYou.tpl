@@ -82,7 +82,7 @@
         {if $lineItem and $priceSetID}
           {if !$amount}{assign var="amount" value=0}{/if}
           {assign var="totalAmount" value=$amount}
-          {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+          {include file="CRM/Price/Page/LineItem.tpl" context="Contribution" displayLineItemFinancialType=false pricesetFieldsCount=false currencySymbol='' hookDiscount=''}
         {elseif $membership_amount}
           {$membership_name} {ts}Membership{/ts}: <strong>{$membership_amount|crmMoney}</strong><br />
           {if $amount}
