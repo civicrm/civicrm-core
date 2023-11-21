@@ -206,18 +206,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $params
    * @param CRM_Financial_BAO_FinancialType $financialType
    * @param bool $online
-   * @param CRM_Contribute_Form_Contribution_Confirm $form
    *
    * @return array
    */
-  private function getNonDeductibleAmount($params, $financialType, $online, $form) {
+  private function getNonDeductibleAmount($params, $financialType, $online) {
     if (isset($params['non_deductible_amount']) && (!empty($params['non_deductible_amount']))) {
       return $params['non_deductible_amount'];
     }
     $priceSetId = $params['priceSetId'] ?? NULL;
     // return non-deductible amount if it is set at the price field option level
-    if ($priceSetId && !empty($form->_lineItem)) {
-      $nonDeductibleAmount = CRM_Price_BAO_PriceSet::getNonDeductibleAmountFromPriceSet($priceSetId, $form->_lineItem);
+    if ($priceSetId && !empty($this->getLineItems())) {
+      $nonDeductibleAmount = CRM_Price_BAO_PriceSet::getNonDeductibleAmountFromPriceSet($priceSetId, [$this->getPriceSetID() => $this->getLineItems()]);
     }
 
     if (!empty($nonDeductibleAmount)) {
@@ -1554,7 +1553,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
     }
-    $this->assign('lineItem', $this->isQuickConfig() ? NULL : $this->getLineItems());
+    $this->assign('lineItem', $this->isQuickConfig() ? NULL : [$this->getPriceSetID() => $this->getLineItems()]);
 
     if (!empty($errors)) {
       $message = $this->compileErrorMessage($errors);
@@ -2235,7 +2234,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $paymentParams['skipLineItem'] = 0;
 
       if (!isset($paymentParams['line_item'])) {
-        $paymentParams['line_item'] = $this->_lineItem;
+        $paymentParams['line_item'] = [$this->getPriceSetID() => $this->getLineItems()];
       }
 
       if (!empty($paymentParams['onbehalf']) &&
@@ -2410,8 +2409,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         foreach ($this->_values['fee'] as $key => $feeValues) {
           if ($feeValues['name'] == 'membership_amount') {
             $fieldId = $this->_params['price_' . $key];
-            $membershipLineItems[$this->_priceSetId][$fieldId] = $this->_lineItem[$this->_priceSetId][$fieldId];
             unset($this->_lineItem[$this->_priceSetId][$fieldId]);
+            $membershipLineItems[$this->_priceSetId][$fieldId] = $this->getLineItems()[$fieldId];
             break;
           }
         }
