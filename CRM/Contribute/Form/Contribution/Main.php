@@ -223,7 +223,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $entityId = $memtypeID = NULL;
     if ($this->_priceSetId) {
-      if (($this->isMembershipPriceSet() && !empty($this->_currentMemberships)) || $this->_defaultMemTypeId) {
+      if (($this->isMembershipPriceSet() && !$this->isDefined('CurrentMembership')) || $this->_defaultMemTypeId) {
         $selectedCurrentMemTypes = [];
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
@@ -239,7 +239,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               break;
             }
             elseif ($opMemTypeId &&
-              in_array($opMemTypeId, $this->_currentMemberships) &&
+              in_array($opMemTypeId, $this->lookup('CurrentMembership', 'membership_type_id')) &&
               !in_array($opMemTypeId, $selectedCurrentMemTypes)
             ) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
@@ -615,7 +615,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $separateMembershipPayment = FALSE;
     $this->addOptionalQuickFormElement('auto_renew');
     if ($this->_membershipBlock) {
-      $this->_currentMemberships = [];
 
       $membershipTypeIds = $membershipTypes = $radio = $radioOptAttrs = [];
       // This is always true if this line is reachable - remove along with the upcoming if.
@@ -706,7 +705,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
                   continue;
                 }
                 $this->assign('renewal_mode', TRUE);
-                $this->_currentMemberships[$membership['membership_type_id']] = $membership['membership_type_id'];
+                $this->define('Membership', 'CurrentMembership', $membership);
                 $memType['current_membership'] = $membership['end_date'];
                 if (!$endDate) {
                   $endDate = $memType['current_membership'];
