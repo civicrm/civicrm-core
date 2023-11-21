@@ -210,7 +210,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @return array
    */
-  public static function getNonDeductibleAmount($params, $financialType, $online, $form) {
+  private function getNonDeductibleAmount($params, $financialType, $online, $form) {
     if (isset($params['non_deductible_amount']) && (!empty($params['non_deductible_amount']))) {
       return $params['non_deductible_amount'];
     }
@@ -1046,7 +1046,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       );
 
       $contributionParams['payment_processor'] = $result ? ($result['payment_processor'] ?? NULL) : NULL;
-      $contributionParams['non_deductible_amount'] = self::getNonDeductibleAmount($params, $financialType, TRUE, $form);
+      $contributionParams['non_deductible_amount'] = $this->getNonDeductibleAmount($params, $financialType, TRUE, $form);
       $contributionParams['skipCleanMoney'] = TRUE;
       // @todo this is the wrong place for this - it should be done as close to form submission
       // as possible
