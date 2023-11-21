@@ -97,7 +97,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('getTaxDetails', (bool) $this->order->getTotalTaxAmount());
     $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
     $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
-    $this->assign('lineItem', $this->isQuickConfig() ? NULL : $this->order->getLineItems());
+    $this->assign('lineItem', $this->isQuickConfig() ? NULL : [$this->getPriceSetID() => $this->order->getLineItems()]);
     if (!$this->isQuickConfig()) {
       if (is_array($membershipTypeID)) {
         $membershipTypeID = current($membershipTypeID);
