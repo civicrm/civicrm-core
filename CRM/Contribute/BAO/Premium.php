@@ -112,9 +112,9 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
             }
           }
           else {
+            // Why? should we not skip if not found?
             CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
           }
-          $products[$productDAO->id] += ['thumbnail' => '', 'image' => ''];
         }
         $options = $temp = [];
         $temp = explode(',', $productDAO->options);
