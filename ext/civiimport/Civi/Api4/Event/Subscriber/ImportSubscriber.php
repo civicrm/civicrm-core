@@ -208,34 +208,29 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
    * @throws \CRM_Core_Exception
    */
   public static function getImportForms(): array {
-    $cacheKey = 'civiimport_forms_' . \CRM_Core_Config::domainID() . '_' . (int) \CRM_Core_Session::getLoggedInContactID();
+    $cacheKey = 'civiimport_search_forms';
     if (\Civi::cache('metadata')->has($cacheKey)) {
       return \Civi::cache('metadata')->get($cacheKey);
     }
     $forms = [];
-    try {
-      $importSearches = SearchDisplay::get()
-        ->addWhere('saved_search_id.name', 'LIKE', 'Import\_Summary\_%')
-        ->addWhere('saved_search_id.expires_date', '>', 'now')
-        ->addSelect('name', 'label')
-        ->execute();
-      foreach ($importSearches as $importSearch) {
-        $userJobID = str_replace('Import_Summary_', '', $importSearch['name']);
-        $forms[$importSearch['name']] = [
-          'name' => $importSearch['name'],
-          'type' => 'search',
-          'title' => $importSearch['label'],
-          'base_module' => E::LONG_NAME,
-          'permission' => 'access CiviCRM',
-          'requires' => ['crmSearchDisplayTable'],
-          'layout' => '<div af-fieldset="">
-  <crm-search-display-table search-name="Import_Summary_' . $userJobID . '" display-name="Import_Summary_' . $userJobID . '">
+    $importSearches = SearchDisplay::get(FALSE)
+      ->addWhere('saved_search_id.name', 'LIKE', 'Import\_Summary\_%')
+      ->addWhere('saved_search_id.expires_date', '>', 'now')
+      ->addSelect('name', 'label')
+      ->execute();
+    foreach ($importSearches as $importSearch) {
+      $userJobID = str_replace('Import_Summary_', '', $importSearch['name']);
+      $forms[$importSearch['name']] = [
+        'name' => $importSearch['name'],
+        'type' => 'search',
+        'title' => $importSearch['label'],
+        'base_module' => E::LONG_NAME,
+        'permission' => ['import contacts'],
+        'requires' => ['crmSearchDisplayTable'],
+        'layout' => '<div af-fieldset="">
+<crm-search-display-table search-name="Import_Summary_' . $userJobID . '" display-name="Import_Summary_' . $userJobID . '">
 </crm-search-display-table></div>',
-        ];
-      }
-    }
-    catch (UnauthorizedException $e) {
-      // No access - return the empty array.
+      ];
     }
     \Civi::cache('metadata')->set($cacheKey, $forms);
     return $forms;
