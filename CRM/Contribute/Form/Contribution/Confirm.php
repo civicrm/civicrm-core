@@ -1533,10 +1533,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         );
 
         $this->set('renewal_mode', $renewalMode);
-        if (!empty($dates)) {
-          $this->assign('mem_start_date', CRM_Utils_Date::customFormat($dates['start_date'], '%Y%m%d'));
-          $this->assign('mem_end_date', CRM_Utils_Date::customFormat($dates['end_date'], '%Y%m%d'));
-        }
 
         if (!empty($membershipContribution)) {
           // Next line is probably redundant. Checks prevent it happening twice.
@@ -1557,21 +1553,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $this->_values['membership_id'] = $membership->id;
         }
       }
-      if ($this->_priceSetId && !empty($this->_useForMember) && !empty($this->_lineItem)) {
-        foreach ($this->_lineItem[$this->_priceSetId] as & $priceFieldOp) {
-          if (!empty($priceFieldOp['membership_type_id']) && $membership->membership_type_id == $priceFieldOp['membership_type_id']) {
-            $membershipOb = $membership;
-            $priceFieldOp['start_date'] = $membershipOb->start_date ? CRM_Utils_Date::formatDateOnlyLong($membershipOb->start_date) : '-';
-            $priceFieldOp['end_date'] = $membershipOb->end_date ? CRM_Utils_Date::formatDateOnlyLong($membershipOb->end_date) : '-';
-          }
-          else {
-            $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
-          }
-        }
-        $this->_values['lineItem'] = $this->_lineItem;
-        $this->assign('lineItem', $this->_lineItem);
-      }
     }
+    $this->assign('lineItem', $this->isQuickConfig() ? NULL : $this->getLineItems());
 
     if (!empty($errors)) {
       $message = $this->compileErrorMessage($errors);
@@ -2661,12 +2644,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       if (isset($paymentParams['contribution_source'])) {
         $form->_params['source'] = $paymentParams['contribution_source'];
-      }
-
-      // get the price set values for receipt.
-      if ($form->_priceSetId && $form->_lineItem) {
-        $form->_values['lineItem'] = $form->_lineItem;
-        $form->_values['priceSetID'] = $form->_priceSetId;
       }
 
       $form->_values['contribution_id'] = $contribution->id;
