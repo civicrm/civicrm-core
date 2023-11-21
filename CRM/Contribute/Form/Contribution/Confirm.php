@@ -267,7 +267,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     parent::preProcess();
 
     // lineItem isn't set until Register postProcess
-    $this->_lineItem = $this->get('lineItem');
+    $this->_lineItem = [$this->getPriceSetID() => $this->getLineItems()];;
     $this->_ccid = $this->get('ccid');
 
     $this->_params = $this->controller->exportValues('Main');
@@ -2224,7 +2224,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // store the fact that this is a membership and membership type is selected
     if ($this->isMembershipSelected($membershipParams)) {
-      $this->doMembershipProcessing($contactID, $membershipParams, $premiumParams, $this->_lineItem);
+      $this->doMembershipProcessing($contactID, $membershipParams, $premiumParams);
     }
     else {
       // at this point we've created a contact and stored its address etc
@@ -2341,9 +2341,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $contactID
    * @param array $membershipParams
    * @param array $premiumParams
-   * @param array $formLineItems
    */
-  protected function doMembershipProcessing($contactID, $membershipParams, $premiumParams, $formLineItems) {
+  protected function doMembershipProcessing($contactID, $membershipParams, $premiumParams) {
     if (!$this->_useForMember) {
       $this->set('membershipTypeID', $this->_params['selectMembership']);
     }
@@ -2405,7 +2404,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membershipParams = $this->getMembershipParamsFromPriceSet($membershipParams);
     if (!empty($membershipParams['selectMembership'])) {
       // CRM-12233
-      $membershipLineItems = $formLineItems;
+      $membershipLineItems = [$this->getPriceSetID() => $this->getLineItems()];;
       if ($this->_separateMembershipPayment && $this->isFormSupportsNonMembershipContributions()) {
         $membershipLineItems = [];
         foreach ($this->_values['fee'] as $key => $feeValues) {
