@@ -1474,29 +1474,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     //@todo it should no longer be possible for it to get to this point & membership to not be an array
     if (is_array($membershipTypeIDs) && !empty($membershipContributionID)) {
       $typesTerms = $membershipParams['types_terms'] ?? [];
-
-      $membershipLines = $nonMembershipLines = [];
-      foreach ($unprocessedLineItems as $priceSetID => $lines) {
-        foreach ($lines as $line) {
-          if (!empty($line['membership_type_id'])) {
-            $membershipLines[$line['membership_type_id']] = $line['price_field_value_id'];
-          }
-        }
-      }
-
-      $i = 1;
       $this->_params['createdMembershipIDs'] = [];
-      foreach ($membershipTypeIDs as $memType) {
-        $membershipLineItems = [];
-        if ($i < count($membershipTypeIDs)) {
-          $membershipLineItems[$priceSetID][$membershipLines[$memType]] = $unprocessedLineItems[$priceSetID][$membershipLines[$memType]];
-          unset($unprocessedLineItems[$priceSetID][$membershipLines[$memType]]);
-        }
-        else {
-          $membershipLineItems = $unprocessedLineItems;
-        }
-        $i++;
-        $numTerms = $typesTerms[$memType] ?? 1;
+      $firstMembershipTypeID = reset($membershipTypeIDs);
+      foreach ($membershipTypeIDs as $membershipTypeID) {
+        $membershipLineItems = [$this->getPriceSetID() => $this->getLineItemsForMembershipCreate((int) $membershipTypeID, $firstMembershipTypeID)];
+        $numTerms = $typesTerms[$membershipTypeID] ?? 1;
         $contributionRecurID = $this->_params['contributionRecurID'] ?? NULL;
 
         $membershipSource = NULL;
@@ -1524,7 +1506,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
 
         [$membership, $renewalMode, $dates] = self::legacyProcessMembership(
-          $contactID, $memType, $isTest,
+          $contactID, $membershipTypeID, $isTest,
           date('YmdHis'), $membershipParams['cms_contactID'] ?? NULL,
           $customFieldsFormatted,
           $numTerms, $membershipID, $pending,
@@ -2949,6 +2931,38 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membership->find(TRUE);
 
     return [$membership, $renewalMode, $dates];
+  }
+
+  /**
+   * Get the line items for the membership create call.
+   *
+   * This form follows a legacy code path - rather than creating the membership
+   * and then creating the contribution / order with the right line items it
+   * creates the contribution and then the membership & uses some old code in
+   * the membership BAO to create the line items. In order to do this it needs to
+   * separate out the line items into the separate membership create calls.
+   * However, any non-membership lines need to be assigned to one & only one
+   * of these line item splits.
+   *
+   * Where we have separate payments enabled then we should ignore any non-membership
+   * line items as they will have been processed as part of the non-membership
+   * contribution.
+   *
+   * @param int $membershipTypeID
+   * @param int $defaultMembershipTypeID
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getLineItemsForMembershipCreate(int $membershipTypeID, int $defaultMembershipTypeID): array {
+    $lineItemSplit = [];
+    foreach ($this->getLineItems() as $lineItem) {
+      if (empty($lineItem['membership_type_id']) && $this->isSeparateMembershipPayment()) {
+        continue;
+      }
+      $lineItemSplit[$lineItem['membership_type_id'] ?: $defaultMembershipTypeID][$lineItem['price_field_id']] = $lineItem;
+    }
+    return $lineItemSplit[$membershipTypeID];
   }
 
 }
