@@ -72,7 +72,7 @@
         <th {$headerStyle}>{ts}Membership Fee{/ts}</th>
       </tr>
 
-      {if !$useForMember and isset($membership_amount) and !empty($is_quick_config)}
+      {if !$isShowLineItems && {contribution.total_amount|boolean}}
         <tr>
           <td {$labelStyle}>
             {ts 1=$membership_name}%1 Membership{/ts}
@@ -177,34 +177,20 @@
             {contribution.total_amount} {if isset($amount_level)} - {$amount_level}{/if}
         </td>
       </tr>
-    {elseif isset($membership_amount)}
-      <tr>
-        <th {$headerStyle}>
-          {ts}Membership Fee{/ts}
-        </th>
-      </tr>
-      <tr>
-        <td {$labelStyle}>
-          {ts 1=$membership_name}%1 Membership{/ts}
-        </td>
-        <td {$valueStyle}>
-          {$membership_amount|crmMoney}
-        </td>
-      </tr>
     {/if}
 
-    {if !empty($receive_date)}
+    {if {contribution.receive_date|boolean}}
       <tr>
         <td {$labelStyle}>
           {ts}Date{/ts}
         </td>
         <td {$valueStyle}>
-          {$receive_date|crmDate}
+          {contribution.receive_date}
         </td>
       </tr>
     {/if}
 
-    {if !empty($is_monetary) and !empty($trxn_id)}
+    {if !empty($trxn_id)}
       <tr>
        <td {$labelStyle}>
         {ts}Transaction #{/ts}
