@@ -1414,7 +1414,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $isRecurForFirstTransaction = FALSE;
         }
         $membershipParams['skipLineItem'] = 0;
-        CRM_Price_BAO_LineItem::getLineItemArray($membershipParams);
+        $membershipParams['line_item'] = [$this->getPriceSetID() => $this->getMainContributionLineItems()];
       }
       else {
         // Skip line items in the contribution processing transaction.
@@ -1442,7 +1442,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if ($this->isSeparatePaymentSelected()) {
       try {
-        $this->_lineItem = $unprocessedLineItems;
         if (empty($this->_params['auto_renew']) && !empty($membershipParams['is_recur'])) {
           unset($membershipParams['is_recur']);
         }
@@ -2372,18 +2371,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membershipParams = $this->getMembershipParamsFromPriceSet($membershipParams);
     if ($this->isMembershipSelected()) {
       // CRM-12233
-      $membershipLineItems = [$this->getPriceSetID() => $this->getLineItems()];;
-      if ($this->isSeparatePaymentSelected()) {
-        $membershipLineItems = [];
-        foreach ($this->_values['fee'] as $key => $feeValues) {
-          if ($feeValues['name'] == 'membership_amount') {
-            $fieldId = $this->_params['price_' . $key];
-            unset($this->_lineItem[$this->_priceSetId][$fieldId]);
-            $membershipLineItems[$this->_priceSetId][$fieldId] = $this->getLineItems()[$fieldId];
-            break;
-          }
-        }
-      }
+      $membershipLineItems = [$this->getPriceSetID() => $this->getMainContributionLineItems()];
+      $membershipLineItems['total_amount'] = $this->getMainContributionAmount();
       try {
         $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams, $membershipLineItems);
       }
