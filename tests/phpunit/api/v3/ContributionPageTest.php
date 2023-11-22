@@ -976,12 +976,14 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test non-recur contribution with membership payment
+   * Test non-recur contribution with membership payment selected.
+   *
+   * In this scenario the contribution option was not selected so only
+   * one contribution is actually created.
    *
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testSubmitMembershipIsSeparatePaymentNotRecur(): void {
+  public function testSubmitMembershipIsSeparatePaymentNotRecurMembershipOnly(): void {
     $this->setUpMembershipContributionPage(TRUE, TRUE);
     $dummyPP = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $dummyPP->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);

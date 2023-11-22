@@ -581,6 +581,16 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Is the form separate payment AND has the user selected 2 options,
+   * resulting in 2 payments.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function isSeparatePaymentSelected(): bool {
+    return (bool) $this->getSecondaryMembershipContributionLineItems();
+  }
+
+  /**
    * Set the line items for the secondary membership contribution.
    *
    * Return false if the page is not configured for separate contributions,
@@ -602,7 +612,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         $lineItems[$index] = $lineItem;
       }
     }
-    if (empty($lineItems) || count($lineItems) === $this->getLineItems()) {
+    if (empty($lineItems) || count($lineItems) === count($this->getLineItems())) {
       return FALSE;
     }
     return $lineItems;
