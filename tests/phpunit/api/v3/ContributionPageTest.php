@@ -1683,10 +1683,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'contribution_id' => $id,
     ])['values'];
     $this->assertCount(3, $lines);
-    $this->assertEquals('civicrm_membership', $lines[0]['entity_table']);
-    $this->assertEquals($preExistingMembershipID + 1, $lines[0]['entity_id']);
-    $this->assertEquals('civicrm_contribution', $lines[1]['entity_table']);
-    $this->assertEquals($id, $lines[1]['entity_id']);
+    $this->assertEquals('civicrm_membership', $lines[1]['entity_table']);
+    $this->assertEquals($preExistingMembershipID + 1, $lines[1]['entity_id']);
+    $this->assertEquals('civicrm_contribution', $lines[0]['entity_table']);
+    $this->assertEquals($id, $lines[0]['entity_id']);
     $this->assertEquals('civicrm_membership', $lines[2]['entity_table']);
     return $lines;
   }
