@@ -147,7 +147,7 @@
       {/if}
 
       <div id="editCaseRoleDialog" class="hiddenElement">
-        <div><label for="edit_role_contact_id">{ts}Change To{/ts}:</label></div>
+        <div><label for="edit_role_contact_id">{ts}Change To{/ts} <span class="crm-marker">*</span></label></div>
         <div><input name="edit_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
       </div>
       <div id="caseRoles-selector-show-active">

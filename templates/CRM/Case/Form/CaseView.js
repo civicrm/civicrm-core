@@ -97,6 +97,8 @@
     },
     '#editCaseRoleDialog': {
       pre: function(data) {
+        // Clear stale value since this form can be reused multiple times
+        $('[name=edit_role_contact_id]', this).val('');
         prepareRelationshipField(data.rel_type, $('[name=edit_role_contact_id]', this));
       },
       post: function(data) {
