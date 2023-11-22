@@ -59,7 +59,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     if ($this->_params['is_pay_later']) {
       $this->assign('pay_later_receipt', $this->_values['pay_later_receipt']);
     }
-    $this->assign('is_for_organization', CRM_Utils_Array::value('is_for_organization', $this->_params));
+    $this->assign('is_for_organization', $this->_params['is_for_organization'] ?? NULL);
   }
 
   /**
@@ -155,8 +155,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
       $this->buildMembershipBlock(
         $this->_membershipContactID,
-        $membershipTypeID,
-        NULL
+        $membershipTypeID
       );
 
       if (!empty($params['auto_renew'])) {
@@ -253,12 +252,12 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     if ($tellAFriend) {
       if ($this->_action & CRM_Core_Action::PREVIEW) {
-        $url = CRM_Utils_System::url("civicrm/friend",
+        $url = CRM_Utils_System::url('civicrm/friend',
           "reset=1&action=preview&{$subUrl}"
         );
       }
       else {
-        $url = CRM_Utils_System::url("civicrm/friend",
+        $url = CRM_Utils_System::url('civicrm/friend',
           "reset=1&{$subUrl}"
         );
       }
@@ -282,14 +281,13 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
    *   Contact checked for having a current membership for a particular membership.
    * @param int|array $selectedMembershipTypeID
    *   Selected membership id.
-   * @param null $isTest
    *
    * @return bool
    *   Is this a separate membership payment
    *
    * @throws \CRM_Core_Exception
    */
-  private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL, $isTest = NULL) {
+  private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL) {
     $separateMembershipPayment = FALSE;
     if ($this->_membershipBlock) {
 
@@ -371,7 +369,10 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
                 ->addWhere('contact_id', '=', $cid)
                 ->addWhere('membership_type_id', '=', $memType['id'])
                 ->addWhere('status_id:name', 'NOT IN', ['Cancelled', 'Pending'])
-                ->addWhere('is_test', '=', (bool) $isTest)
+                // @todo - this FALSE is dubious but respects the previous code behaviour.
+                // This code is from a previously shared function & likely not relevant on the
+                // thank you form anyway....
+                ->addWhere('is_test', '=', FALSE)
                 ->addOrderBy('end_date', 'DESC')
                 ->execute()
                 ->first();
