@@ -177,6 +177,12 @@
     });
   }
 
+  function showHideInactiveRoles() {
+    let showInactive = $('#role_inactive').prop('checked');
+    $('[id^=caseRoles-selector] tbody tr').not('.disabled').toggle(!showInactive);
+    $('[id^=caseRoles-selector] tbody tr.disabled').toggle(showInactive);
+  }
+
   $('#crm-container').on('crmLoad', '#crm-main-content-wrapper', detachMiniForms);
 
   $(document).ready(function() {
@@ -224,6 +230,9 @@
           $('#case_id_' + id).dataTable().api().draw();
         });
       })
+      // Toggle to show/hide inactive case roles
+      .on('crmLoad', 'table#caseRoles-selector-' + caseId(), showHideInactiveRoles)
+      .on('change', '#role_inactive', showHideInactiveRoles)
       .on('click', 'a.case-miniform', function(e) {
         var dialog,
           $el = $(this),

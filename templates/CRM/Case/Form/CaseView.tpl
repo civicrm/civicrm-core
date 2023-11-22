@@ -154,23 +154,7 @@
         {* Add checkbox to show inactive roles. For open cases, default value is unchecked, i.e. show active roles. For closed cases default is checked. *}
         <label><input type="checkbox" id="role_inactive" name="role_inactive[]"{if $caseDetails.status_class neq 'Opened'} checked="checked"{/if}>{ts}Show Inactive relationships{/ts}</label>
       </div>
-      {literal}
-        <script type="text/javascript">
-            (function($) {
-                // hide the inactive role when checkbox is checked
-                $('input[type=checkbox][id=role_inactive]').change(function() {
-                  if (this.checked == true) {
-                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').hide();
-                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').show();
-                  } else if (this.checked == false) {
-                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').show();
-                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').hide();
-                  }
-                });
-            })(CRM.$);
-        </script>
-      {/literal}
-      <table id="caseRoles-selector-{$caseID}"  class="report-layout crm-ajax-table" data-page-length="10">
+      <table id="caseRoles-selector-{$caseID}" class="report-layout crm-ajax-table" data-page-length="10">
         <thead>
           <tr>
             <th data-data="relation">{ts}Case Role{/ts}</th>
@@ -188,19 +172,9 @@
         <script type="text/javascript">
           (function($) {
             var caseId = {/literal}{$caseID}{literal};
-            CRM.$('table#caseRoles-selector-' + caseId).data({
+            $('table#caseRoles-selector-' + caseId).data({
               "ajax": {
                 "url": {/literal}'{crmURL p="civicrm/ajax/caseroles" h=0 q="snippet=4&caseID=$caseId&cid=$contactID&userID=$userID"}'{literal},
-                "complete" : function(){
-                  if (CRM.$('input[type=checkbox][id=role_inactive]').prop('checked')) {
-                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').hide();
-                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').show();
-                  }
-                  else {
-                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').show();
-                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').hide();
-                  }
-                }
               }
             });
           })(CRM.$);
