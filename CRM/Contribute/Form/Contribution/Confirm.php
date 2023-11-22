@@ -194,68 +194,49 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Get non-deductible amount.
+   * Get non-deductible amount for a quick config contribution page.
    *
-   * This is a bit too much about wierd form interpretation to be this deep.
+   * Note that the Main Form requires that the contribution amount
+   * (excluding any membership amount) is greater than the premium min_amount.
    *
-   * @see https://issues.civicrm.org/jira/browse/CRM-11885
-   *  if non_deductible_amount exists i.e. Additional Details fieldset was opened [and staff typed something] -> keep
-   * it.
+   * The contribution amount derives it's financial_type_id from the contribution page.
    *
-   * @param array $params
-   * @param CRM_Financial_BAO_FinancialType $financialType
-   * @param bool $online
+   * So we are calculating that if the contribution page financial type ID is deductible
+   * then the non-deductible amount is the total amount, less the price of the product, to
+   * a maximum of the contribution total amount.
    *
-   * @return array
+   * Note this function has been cleaned up as an interim fix but in fact there is
+   * still a problem in that the relevant line item is not upated to have the deductible value.
+   * The next phase of a fix is to move this function to the Main form and update
+   * the deductible amount directly in the line item.
+   *
+   * @param float $contributionTotalAmount
+   *
+   * @return float
    */
-  private function getNonDeductibleAmount($params, $financialType, $online) {
-    if (isset($params['non_deductible_amount']) && (!empty($params['non_deductible_amount']))) {
-      return $params['non_deductible_amount'];
+  private function getNonDeductibleAmount(float $contributionTotalAmount): float {
+    if ($this->getContributionPageValue('financial_type_id.is_deductible')) {
+      $selectProduct = $this->getSubmittedValue('selectProduct');
+      // if there is a product - compare the value to the contribution amount
+      if ($selectProduct &&
+        $selectProduct !== 'no_thanks'
+      ) {
+        $productDAO = new CRM_Contribute_DAO_Product();
+        $productDAO->id = $selectProduct;
+        $productDAO->find(TRUE);
+        // product value exceeds contribution amount
+        if ($contributionTotalAmount < $productDAO->price) {
+          return $contributionTotalAmount;
+        }
+        // product value does NOT exceed contribution amount
+        return (float) $productDAO->price;
+      }
+      // contribution is deductible - but there is no product
+      return 0.00;
     }
-    $priceSetId = $params['priceSetId'] ?? NULL;
-    // return non-deductible amount if it is set at the price field option level
-    if ($priceSetId && !empty($this->getLineItems())) {
-      $nonDeductibleAmount = CRM_Price_BAO_PriceSet::getNonDeductibleAmountFromPriceSet($priceSetId, [$this->getPriceSetID() => $this->getLineItems()]);
-    }
+    // contribution is NOT deductible
 
-    if (!empty($nonDeductibleAmount)) {
-      return $nonDeductibleAmount;
-    }
-    else {
-      if ($financialType->is_deductible) {
-        if ($online && isset($params['selectProduct'])) {
-          $selectProduct = $params['selectProduct'] ?? NULL;
-        }
-        if (!$online && isset($params['product_name'][0])) {
-          $selectProduct = $params['product_name'][0];
-        }
-        // if there is a product - compare the value to the contribution amount
-        if (isset($selectProduct) &&
-          $selectProduct !== 'no_thanks'
-        ) {
-          $productDAO = new CRM_Contribute_DAO_Product();
-          $productDAO->id = $selectProduct;
-          $productDAO->find(TRUE);
-          // product value exceeds contribution amount
-          if ($params['amount'] < $productDAO->price) {
-            $nonDeductibleAmount = $params['amount'];
-            return $nonDeductibleAmount;
-          }
-          // product value does NOT exceed contribution amount
-          else {
-            return $productDAO->price;
-          }
-        }
-        // contribution is deductible - but there is no product
-        else {
-          return '0.00';
-        }
-      }
-      // contribution is NOT deductible
-      else {
-        return $params['amount'];
-      }
-    }
+    return $contributionTotalAmount;
   }
 
   /**
@@ -1032,7 +1013,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       );
 
       $contributionParams['payment_processor'] = $result ? ($result['payment_processor'] ?? NULL) : NULL;
-      $contributionParams['non_deductible_amount'] = $this->getNonDeductibleAmount($params, $financialType, TRUE, $form);
+      if (empty($contributionParams['non_deductible_amount'])) {
+        $contributionParams['non_deductible_amount'] = $this->isQuickConfig() ? $this->getNonDeductibleAmount((float) $params['amount']) : $this->order->getNonDeductibleAmount();
+      }
+      else {
+        CRM_Core_Error::deprecatedWarning('the above if it believed to be always true & can be removed if no-one hits this');
+      }
       $contributionParams['skipCleanMoney'] = TRUE;
       // @todo this is the wrong place for this - it should be done as close to form submission
       // as possible

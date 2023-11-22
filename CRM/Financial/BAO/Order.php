@@ -984,6 +984,23 @@ class CRM_Financial_BAO_Order {
    *
    * @throws \CRM_Core_Exception
    */
+  public function getNonDeductibleAmount() :float {
+    $amount = 0.0;
+    foreach ($this->getLineItems() as $lineItem) {
+      if ($lineItem['non_deductible_amount'] > 0 && $lineItem['qty'] > 0) {
+        $amount += ($lineItem['non_deductible_amount'] * $lineItem['qty']);
+      }
+    }
+    return $amount;
+  }
+
+  /**
+   * Get the total amount for the order.
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function getTotalAmount() :float {
     $amount = 0.0;
     foreach ($this->getLineItems() as $lineItem) {

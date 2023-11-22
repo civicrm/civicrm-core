@@ -194,9 +194,9 @@ trait ContributionPageTestTrait {
    * @param array $priceSetParameters
    */
   public function contributionPageWithPriceSetCreate(array $contributionPageParameters = [], array $priceSetParameters = []): void {
-    $this->contributionPageCreatePaid($contributionPageParameters, $priceSetParameters);
+    $this->contributionPageCreatePaid($contributionPageParameters, $priceSetParameters + ['is_quick_config' => FALSE]);
     $priceSetID = $this->ids['PriceSet']['ContributionPage'];
-    $this->createTestEntity('FinancialType', ['name' => 'Financial Type 1'], 'first');
+    $this->createTestEntity('FinancialType', ['name' => 'Financial Type 1', 'is_deductible' => TRUE], 'first');
     $this->createTestEntity('FinancialType', ['name' => 'Financial Type 2'], 'second');
     $this->createTestEntity('FinancialType', ['name' => 'Financial Type 3'], 'third');
     $priceField = $this->createTestEntity('PriceField', [
