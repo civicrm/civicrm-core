@@ -14,13 +14,16 @@
       if (!ctrl.conditions.length) {
         delete ctrl.node['af-if'];
       } else {
-        ctrl.node['af-if'] = '(' + JSON.stringify(ctrl.conditions) + ')';
+        ctrl.node['af-if'] = '(' + JSON.stringify(ctrl.conditions).replace(/"/g, '&quot;') + ')';
       }
       dialogService.close('afformGuiConditionalDialog');
     };
 
     function parseConditions() {
-      var ngIf = _.trim(ctrl.node['af-if']);
+      if (!ctrl.node['af-if']) {
+        return [];
+      }
+      var ngIf = _.trim(ctrl.node['af-if'].replace(/&quot;/g, '"'));
       if (!_.startsWith(ngIf, '(')) {
         return [];
       }
