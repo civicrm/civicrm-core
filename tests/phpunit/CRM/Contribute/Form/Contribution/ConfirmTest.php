@@ -28,6 +28,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   use FormTrait;
   use ContributionPageTestTrait;
 
+  public $_apiversion = 4;
+
   /**
    * Clean up DB.
    */
