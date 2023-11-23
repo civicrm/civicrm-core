@@ -314,7 +314,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
         'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
       ],
       'price_' . $this->ids['PriceField']['membership'] => $this->ids['PriceFieldValue']['membership_general'],
-      'other_amount' => 100,
+      'price_' . $this->ids['PriceField']['contribution'] => $this->ids['PriceFieldValue']['contribution'],
       'priceSetId' => $this->ids['PriceSet']['membership_block'],
       'credit_card_type' => 'Visa',
       'email-5' => 'test@test.com',
