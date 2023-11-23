@@ -2881,10 +2881,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   private function validateChainSelectFields() {
     foreach ($this->_chainSelectFields as $control => $target) {
       if ($this->elementExists($control) && $this->elementExists($target)) {
-        $controlValue = (array) $this->getElementValue($control);
+        $controlValue = (array) $this->getSubmitValue($control);
         $targetField = $this->getElement($target);
         $controlType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'stateProvince' : 'country';
-        $targetValue = array_filter((array) $targetField->getValue());
+        $targetValue = array_filter((array) $this->getSubmitValue($target));
         if ($targetValue || $this->getElementError($target)) {
           $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
           if ($targetValue) {
