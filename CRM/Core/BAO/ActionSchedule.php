@@ -691,6 +691,7 @@ FROM civicrm_action_schedule cas
       'subject' => $tokenRow->render('subject'),
       'entity' => 'action_schedule',
       'entity_id' => $schedule->id,
+      'contactId' => $toContactID,
     ];
     $body_text = $tokenRow->render('body_text');
     $mailParams['html'] = $tokenRow->render('body_html');
