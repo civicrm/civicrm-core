@@ -101,10 +101,10 @@ class CRM_Utils_PDF_Utils {
     </div>
   </body>
 </html>";
-    if (CRM_Core_Config::singleton()->weasyprintPath) {
+    if (\Civi::settings()->get('weasyprintPath')) {
       return self::_html2pdf_weasyprint($paper_size, $orientation, $margins, $html, $output, $fileName);
     }
-    elseif (CRM_Core_Config::singleton()->wkhtmltopdfPath) {
+    elseif (\Civi::settings()->get('wkhtmltopdfPath')) {
       return self::_html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName);
     }
     else {
@@ -155,8 +155,7 @@ class CRM_Utils_PDF_Utils {
    */
   public static function _html2pdf_weasyprint($paper_size, $orientation, $margins, $html, $output, $fileName) {
     require_once 'php-weasyprint/src/autoload.php';
-    $config = CRM_Core_Config::singleton();
-    $weasyprint = new Pontedilana\PhpWeasyPrint\Pdf($config->weasyprintPath);
+    $weasyprint = new Pontedilana\PhpWeasyPrint\Pdf(\Civi::settings()->get('weasyprintPath'));
     $weasyprint->setOption("page-width", $paper_size[2] . "pt");
     $weasyprint->setOption("page-height", $paper_size[3] . "pt");
     $weasyprint->setOption("orientation", $orientation);
@@ -185,8 +184,7 @@ class CRM_Utils_PDF_Utils {
    */
   public static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
     require_once 'snappy/src/autoload.php';
-    $config = CRM_Core_Config::singleton();
-    $snappy = new Knp\Snappy\Pdf($config->wkhtmltopdfPath);
+    $snappy = new Knp\Snappy\Pdf(\Civi::settings()->get('wkhtmltopdfPath'));
     $snappy->setOption("page-width", $paper_size[2] . "pt");
     $snappy->setOption("page-height", $paper_size[3] . "pt");
     $snappy->setOption("orientation", $orientation);
