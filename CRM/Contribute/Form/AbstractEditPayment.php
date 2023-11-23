@@ -404,15 +404,17 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     $this->assign_by_ref('paymentProcessor', $this->_paymentProcessor);
   }
 
+
   /**
-   * Get current currency from DB or use default currency.
+   * Get the currency in use.
    *
-   * @param array $submittedValues
+   * This just defaults to getting the default currency
+   * where the form does not have better currency support.
    *
    * @return string
    */
-  public function getCurrency($submittedValues = []) {
-    return $submittedValues['currency'] ?? $this->_values['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency;
+  public function getCurrency(): string {
+    return (string) \Civi::settings()->get('defaultCurrency');
   }
 
   /**

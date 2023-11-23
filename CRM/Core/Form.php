@@ -2937,14 +2937,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * historic, possible handling in here. As we clean that up we should
    * add deprecation notices into here.
    *
-   * @param array $submittedValues
-   *   Array allowed so forms inheriting this class do not break.
-   *   Ideally we would make a clear standard around how submitted values
-   *   are stored (is $this->_values consistently doing that?).
-   *
    * @return string
    */
-  public function getCurrency($submittedValues = []) {
+  public function getCurrency() {
     $currency = $this->_values['currency'] ?? NULL;
     // For event forms, currency is in a different spot
     if (empty($currency)) {
