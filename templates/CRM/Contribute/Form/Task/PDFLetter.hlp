@@ -21,5 +21,5 @@
   {ts}Print and Email Options{/ts}
 {/htxt}
 {htxt id="id-contribution-email-print"}
-  <p>{ts}You can choose to send thank-you letters as emails to contacts who are able to receive email. If you choose to do this, you can also decide whether to only print PDF's for the remaining contacts OR generate PDF's for all.{/ts}</p>
+  <p>{ts}You can choose to send thank-you letters as emails to contacts who are able to receive email. If you choose to do this, you can also decide whether to only print PDFs for the remaining contacts OR generate PDFs for all.{/ts}</p>
 {/htxt}
