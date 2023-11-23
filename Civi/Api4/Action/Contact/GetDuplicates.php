@@ -72,7 +72,7 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
 
     $this->formatDedupeParams($item, $dedupeParams);
 
-    $match = \CRM_Contact_BAO_Contact::getDuplicateContacts($item, $ruleGroup['contact_type'], 'Unsupervised', [], [],$ruleGroup['id'],[]);
+    $match = \CRM_Contact_BAO_Contact::getDuplicateContacts($item, $ruleGroup['contact_type'], 'Unsupervised', [], [], $ruleGroup['id'], []);
     if (count($match) > 0) {
       $result[] = ['id' => $match[0]];
     }
