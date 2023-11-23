@@ -228,6 +228,41 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Provide support for extensions that are used to being able to retrieve _lineItem
+   *
+   * Note extension should call getPriceSetID() and getLineItems() directly.
+   * They are supported for external use per the api annotation.
+   *
+   * @param string $name
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function __get($name) {
+    if ($name === '_lineItem') {
+      // At some point add a deprecation notice here.
+      return [$this->getPriceSetID() => $this->getLineItems()];
+    }
+    CRM_Core_Error::deprecatedWarning('attempt to access invalid property :' . $name);
+  }
+
+  /**
+   * Provide support for extensions that are used to being able to retrieve _lineItem
+   *
+   * Note extension should call getPriceSetID() and getLineItems() directly.
+   * They are supported for external use per the api annotation.
+   *
+   * @param string $name
+   * @param mixed $value
+   */
+  public function __set($name, $value) {
+    if ($name === '_lineItem') {
+      $this->order->setLineItems($value[$this->getPriceSetID()]);
+      return;
+    }
+    CRM_Core_Error::deprecatedWarning('attempt to set invalid property :' . $name);
+  }
+
+  /**
    * Is the form being submitted in test mode.
    *
    * @api this function is supported for external use.
@@ -246,6 +281,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * form. It does not confer meaningful performance benefits & adds confusion.
    *
    * Out of caution we still allow `get`, `set` to take precedence.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
    *
    * @return int|null
    * @throws \CRM_Core_Exception
@@ -724,7 +763,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     foreach ($vars as $v) {
       if (isset($this->_params[$v])) {
-        if ($v == "amount" && $this->_params[$v] === 0) {
+        if ($v === 'amount' && $this->_params[$v] === 0) {
           $this->_params[$v] = CRM_Utils_Money::format($this->_params[$v], NULL, NULL, TRUE);
         }
         $this->assign($v, $this->_params[$v]);
