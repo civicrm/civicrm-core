@@ -41,16 +41,12 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
    * @return string[]
    */
   protected function getRuleGroupNames() {
-    $rules = [];
-    $contactTypes = $this->getEntityName() === 'Contact' ? \CRM_Contact_BAO_ContactType::basicTypes() : [$this->getEntityName()];
-    foreach ($contactTypes as $contactType) {
-      $rules[] = $contactType . '.Unsupervised';
-      $rules[] = $contactType . '.Supervised';
-    }
-    $specific = DedupeRuleGroup::get(FALSE)
+    //CRM_Contact_BAO_Contact::getDuplicateContacts only works on non-General rule groups
+    $rules = DedupeRuleGroup::get(FALSE)
       ->addSelect('name')
+      ->addWhere('used', '!=', 'General')
       ->execute()->column('name');
-    return array_merge($rules, $specific);
+    return $rules;
   }
 
   /**
@@ -64,30 +60,21 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
 
     $this->formatWriteValues($item);
 
-    if (strpos($this->dedupeRule, '.Unsupervised') || strpos($this->dedupeRule, '.Supervised')) {
-      [$contactType, $ruleType] = explode('.', $this->dedupeRule);
-      if (!empty($item['contact_type']) && $contactType !== $item['contact_type']) {
-        throw new \CRM_Core_Exception('Mismatched contact type.');
-      }
-      $item['contact_type'] = $contactType;
-      $dedupeParams['rule'] = $ruleType;
-    }
-    else {
-      $ruleGroup = DedupeRuleGroup::get(FALSE)
-        ->addWhere('name', '=', $this->dedupeRule)
-        ->addSelect('id', 'contact_type')
-        ->execute()->single();
-      if (!empty($item['contact_type']) && $ruleGroup['contact_type'] !== $item['contact_type']) {
-        throw new \CRM_Core_Exception('Mismatched contact type.');
-      }
-      $item['contact_type'] = $ruleGroup['contact_type'];
-      $dedupeParams['rule_group_id'] = $ruleGroup['id'];
+    // Get rule id, contact type and used params from selected rule
+
+    $ruleGroup = DedupeRuleGroup::get(FALSE)
+      ->addWhere('name', '=', $this->dedupeRule)
+      ->execute()->single();
+
+    if (!empty($item['contact_type']) && $ruleGroup['contact_type'] !== $item['contact_type']) {
+      throw new \CRM_Core_Exception('Mismatched contact type.');
     }
 
     $this->formatDedupeParams($item, $dedupeParams);
 
-    foreach (\CRM_Contact_BAO_Contact::findDuplicates($dedupeParams) as $id) {
-      $result[] = ['id' => $id];
+    $match = \CRM_Contact_BAO_Contact::getDuplicateContacts($item, $ruleGroup['contact_type'], 'Unsupervised', [], [],$ruleGroup['id'],[]);
+    if (count($match) > 0) {
+      $result[] = ['id' => $match[0]];
     }
   }
 
