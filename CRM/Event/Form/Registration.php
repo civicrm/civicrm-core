@@ -468,7 +468,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
 
-    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params, $this->_bltID));
+    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params));
 
     if ($this->getSubmittedValue('credit_card_number')) {
       if (isset($params['credit_card_exp_date'])) {

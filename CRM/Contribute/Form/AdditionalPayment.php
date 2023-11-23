@@ -387,10 +387,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_params['invoiceID'] = $this->_params['invoice_id'];
     }
 
-    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-      $this->_params,
-      $this->_bltID
-    ));
+    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
     //Add common data to formatted params
     $params = $this->_params;

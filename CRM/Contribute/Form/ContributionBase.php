@@ -757,10 +757,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
 
-    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-      $this->_params,
-      $this->_bltID
-    ));
+    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params,));
 
     if (!empty($this->_params['onbehalf_profile_id']) && !empty($this->_params['onbehalf'])) {
       $this->assign('onBehalfName', $this->_params['organization_name']);
