@@ -617,10 +617,10 @@ return [
     'help_text' => NULL,
     'add' => '5.43',
   ],
-  'weasyprintPath' => [
+  'weasyprint_path' => [
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
-    'name' => 'weasyprintPath',
+    'name' => 'weasyprint_path',
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_attributes' => [

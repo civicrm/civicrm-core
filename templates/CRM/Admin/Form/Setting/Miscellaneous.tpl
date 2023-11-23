@@ -74,9 +74,9 @@
           <p class="description">{ts}Enable the use of remote images. By default this is enabled, but if not using remote images you may wish to turn it off for security reasons.{/ts}</p>
         </td>
       </tr>
-      <tr class="crm-miscellaneous-form-block-weasyprintPath">
-        <td class="label">{$form.weasyprintPath.label}</td>
-        <td>{$form.weasyprintPath.html}<br />
+      <tr class="crm-miscellaneous-form-block-weasyprint_path">
+        <td class="label">{$form.weasyprint_path.label}</td>
+        <td>{$form.weasyprint_path.html}<br />
           <p class="description">{ts 1="https://weasyprint.org/"}<a href="%1">weasyprint is an alternative utility for generating PDFs</a> which is a successor to the discontinued wkhtmltopdf. Your system administrator will need to download and install this utility, and enter the executable path here.{/ts}</p>
         </td>
       </tr>
