@@ -34,8 +34,7 @@
   {if !empty($is_quick_config)}
   is_quick_config:::{$is_quick_config}
   {/if}
-  {if !empty($getTaxDetails)}
-  getTaxDetails:::{$getTaxDetails}
+  {if !empty($totalTaxAmount)}
   totalTaxAmount:::{$totalTaxAmount}
   {/if}
   {if !empty($is_monetary)}
