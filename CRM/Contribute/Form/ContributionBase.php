@@ -1109,25 +1109,20 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Get the amount for the main contribution.
    *
-   * The goal is to expand this function so that all the argy-bargy of figuring out the amount
-   * winds up here as the main spaghetti shrinks.
-   *
    * If there is a separate membership contribution this is the 'other one'. Otherwise there
    * is only one.
-   *
-   * @param $params
    *
    * @return float
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getMainContributionAmount($params) {
-    if (!empty($params['selectMembership'])) {
-      if (empty($params['amount']) && !$this->_separateMembershipPayment) {
-        return CRM_Member_BAO_MembershipType::getMembershipType($params['selectMembership'])['minimum_fee'] ?? 0;
-      }
+  protected function getMainContributionAmount(): float {
+    $amount = 0;
+    foreach ($this->getMainContributionLineItems() as $lineItem) {
+      // Line total inclusive should really be always set but this is a safe fall back.
+      $amount += $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
     }
-    return $params['amount'] ?? 0;
+    return $amount;
   }
 
   /**

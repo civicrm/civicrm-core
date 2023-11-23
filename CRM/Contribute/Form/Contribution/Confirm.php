@@ -2396,32 +2396,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Get the amount for the main contribution.
-   *
-   * The goal is to expand this function so that all the argy-bargy of figuring out the amount
-   * winds up here as the main spaghetti shrinks.
-   *
-   * If there is a separate membership contribution this is the 'other one'. Otherwise there
-   * is only one.
-   *
-   * @todo - move this to the parent, replace existing (some tests to fight).
-   *
-   * @param $params
-   *
-   * @return float
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getMainContributionAmount($params = []) {
-    $amount = 0;
-    foreach ($this->getMainContributionLineItems() as $lineItem) {
-      // Line total inclusive should really be always set but this is a safe fall back.
-      $amount += $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
-    }
-    return $amount;
-  }
-
-  /**
    * Complete transaction if payment has been processed.
    *
    * Check the result for a success outcome & if paid then complete the transaction.
