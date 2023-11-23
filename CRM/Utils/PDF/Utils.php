@@ -101,7 +101,10 @@ class CRM_Utils_PDF_Utils {
     </div>
   </body>
 </html>";
-    if (CRM_Core_Config::singleton()->wkhtmltopdfPath) {
+    if (CRM_Core_Config::singleton()->weasyprintPath) {
+      return self::_html2pdf_weasyprint($paper_size, $orientation, $margins, $html, $output, $fileName);
+    }
+    elseif (CRM_Core_Config::singleton()->wkhtmltopdfPath) {
       return self::_html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName);
     }
     else {
@@ -140,6 +143,36 @@ class CRM_Utils_PDF_Utils {
       ]);
     }
     $dompdf->stream($fileName);
+  }
+
+  /**
+   * @param float|int[] $paper_size
+   * @param string $orientation
+   * @param array $margins
+   * @param string $html
+   * @param bool $output
+   * @param string $fileName
+   */
+  public static function _html2pdf_weasyprint($paper_size, $orientation, $margins, $html, $output, $fileName) {
+    require_once 'php-weasyprint/src/autoload.php';
+    $config = CRM_Core_Config::singleton();
+    $weasyprint = new Pontedilana\PhpWeasyPrint\Pdf($config->weasyprintPath);
+    $weasyprint->setOption("page-width", $paper_size[2] . "pt");
+    $weasyprint->setOption("page-height", $paper_size[3] . "pt");
+    $weasyprint->setOption("orientation", $orientation);
+    $weasyprint->setOption("margin-top", $margins[1] . $margins[0]);
+    $weasyprint->setOption("margin-right", $margins[2] . $margins[0]);
+    $weasyprint->setOption("margin-bottom", $margins[3] . $margins[0]);
+    $weasyprint->setOption("margin-left", $margins[4] . $margins[0]);
+    $pdf = $weasyprint->getOutputFromHtml($html);
+    if ($output) {
+      return $pdf;
+    }
+    else {
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/pdf');
+      CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+      echo $pdf;
+    }
   }
 
   /**
