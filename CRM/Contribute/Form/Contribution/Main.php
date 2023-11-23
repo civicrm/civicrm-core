@@ -703,7 +703,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
                   $this->assign('hasExistingLifetimeMembership', TRUE);
                   continue;
                 }
-                $this->assign('renewal_mode', TRUE);
                 $this->define('Membership', 'CurrentMembership', $membership);
                 $memType['current_membership'] = $membership['end_date'];
                 if (!$endDate) {
@@ -723,6 +722,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       $this->assign('membershipBlock', $this->_membershipBlock);
       $this->assign('showRadio', TRUE);
+      $this->assign('renewal_mode', $this->isDefined('CurrentMembership'));
       $this->assign('membershipTypes', $membershipTypes);
       $this->assign('allowAutoRenewMembership', $allowAutoRenewMembership);
       $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
