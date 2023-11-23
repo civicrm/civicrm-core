@@ -59,6 +59,11 @@ return [
                 '=',
                 '"Added"',
               ],
+              [
+                'Group_GroupContact_Contact_01.is_deleted',
+                '=',
+                FALSE,
+              ],
             ],
           ],
           'having' => [],
