@@ -228,6 +228,17 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Is the form being submitted in test mode.
+   *
+   * @api this function is supported for external use.
+   *
+   * @return bool
+   */
+  public function isTest(): bool {
+    return (bool) ($this->getAction() & CRM_Core_Action::PREVIEW);
+  }
+
+  /**
    * Get the price set for the contribution page.
    *
    * Note that we use the `get` from the form as a legacy method but

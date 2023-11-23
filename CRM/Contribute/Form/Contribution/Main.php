@@ -610,7 +610,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   private function buildMembershipBlock() {
     $cid = $this->_membershipContactID;
-    $isTest = (bool) ($this->getAction() & CRM_Core_Action::PREVIEW);
     $separateMembershipPayment = FALSE;
     $this->addOptionalQuickFormElement('auto_renew');
     if ($this->_membershipBlock) {
@@ -691,7 +690,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
                 ->addWhere('contact_id', '=', $cid)
                 ->addWhere('membership_type_id', '=', $memType['id'])
                 ->addWhere('status_id:name', 'NOT IN', ['Cancelled', 'Pending'])
-                ->addWhere('is_test', '=', (bool) $isTest)
+                ->addWhere('is_test', '=', $this->isTest())
                 ->addOrderBy('end_date', 'DESC')
                 ->execute()
                 ->first();
@@ -855,8 +854,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     ) {
 
       // appears to be unreachable - selectMembership never set...
-      $isTest = $self->_action & CRM_Core_Action::PREVIEW;
-      $lifeMember = CRM_Member_BAO_Membership::getAllContactMembership($self->_membershipContactID, $isTest, TRUE);
+      $lifeMember = CRM_Member_BAO_Membership::getAllContactMembership($self->_membershipContactID, $self->isTest(), TRUE);
 
       $membershipOrgDetails = CRM_Member_BAO_MembershipType::getAllMembershipTypes();
       $unallowedOrgs = [];
