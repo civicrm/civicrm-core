@@ -2933,24 +2933,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Get the currency for the form.
    *
-   * @todo this should be overriden on the forms rather than having this
-   * historic, possible handling in here. As we clean that up we should
-   * add deprecation notices into here.
-   *
    * @return string
    */
   public function getCurrency() {
-    $currency = $this->_values['currency'] ?? NULL;
-    // For event forms, currency is in a different spot
-    if (empty($currency)) {
-      $currency = CRM_Utils_Array::value('currency', CRM_Utils_Array::value('event', $this->_values));
+    if ($this->getSubmittedValue('currency')) {
+      return $this->getSubmittedValue('currency');
     }
-    if (empty($currency)) {
-      $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
+    $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
+    if ($currency) {
+      return $currency;
     }
-    // @todo If empty there is a problem - we should probably put in a deprecation notice
-    // to warn if that seems to be happening.
-    return $currency;
+    return \Civi::settings()->get('defaultCurrency');
   }
 
   /**

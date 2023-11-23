@@ -556,15 +556,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   }
 
   /**
-   * Get submitted currency, or use default.
-   *
-   * @return string
-   */
-  public function getCurrency(): string {
-    return (string) $this->getSubmittedValue('currency') ?: CRM_Core_Config::singleton()->defaultCurrency;
-  }
-
-  /**
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
