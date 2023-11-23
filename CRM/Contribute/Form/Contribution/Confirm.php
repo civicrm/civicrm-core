@@ -1407,7 +1407,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $totalAmount = $membershipParams['amount'];
 
     if ($isPaidMembership) {
-      if ($isProcessSeparateMembershipTransaction) {
+      if ($this->isSeparatePaymentSelected()) {
         // If we have 2 transactions only one can use the invoice id.
         $membershipParams['invoiceID'] .= '-2';
         if (!empty($membershipParams['auto_renew'])) {
@@ -1441,9 +1441,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
 
-    if ($isProcessSeparateMembershipTransaction) {
+    if ($this->isSeparatePaymentSelected()) {
       try {
-        $this->_lineItem = $unprocessedLineItems;
         if (empty($this->_params['auto_renew']) && !empty($membershipParams['is_recur'])) {
           unset($membershipParams['is_recur']);
         }
@@ -1562,7 +1561,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       // If this is a single membership-related contribution, it won't have
       // be performed yet, so do it now.
-      if ($isPaidMembership && !$isProcessSeparateMembershipTransaction) {
+      if ($isPaidMembership && !$this->isSeparatePaymentSelected()) {
         $paymentActionResult = $payment->doPayment($paymentParams);
         $paymentResults[] = ['contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult];
       }
@@ -1852,7 +1851,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form->_id = $params['id'];
 
     CRM_Contribute_BAO_ContributionPage::setValues($form->_id, $form->_values);
-    $form->_separateMembershipPayment = $form->isSeparateMembershipPayment();
     //this way the mocked up controller ignores the session stuff
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Contribute_Controller_Contribution();
@@ -1907,8 +1905,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->_useForMember = 1;
     }
     $priceFields = $priceFields[$priceSetID]['fields'];
-
-    $form->_lineItem = [$priceSetID => $form->order->getLineItems()];
     $membershipPriceFieldIDs = [];
     foreach ($form->order->getLineItems() as $lineItem) {
       if (!empty($lineItem['membership_type_id'])) {
@@ -2201,7 +2197,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_useForMember = $this->get('useForMember');
 
     // store the fact that this is a membership and membership type is selected
-    if ($this->isMembershipSelected($membershipParams)) {
+    if ($this->isMembershipSelected()) {
       $this->doMembershipProcessing($contactID, $membershipParams, $premiumParams);
     }
     else {
@@ -2266,20 +2262,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   /**
    * Return True/False if we have a membership selected on the contribution page
-   * @param array $membershipParams
    *
    * @return bool
    */
-  private function isMembershipSelected($membershipParams) {
-    $priceFieldIds = $this->get('memberPriceFieldIDS');
-    if ((!empty($membershipParams['selectMembership']) && $membershipParams['selectMembership'] != 'no_thanks')
-        && empty($priceFieldIds)) {
-      return TRUE;
-    }
-    else {
-      $membershipParams = $this->getMembershipParamsFromPriceSet($membershipParams);
-    }
-    return !empty($membershipParams['selectMembership']);
+  private function isMembershipSelected(): bool {
+    return !empty($this->getMembershipLineItems());
   }
 
   /**
@@ -2380,21 +2367,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     $membershipParams = $this->getMembershipParamsFromPriceSet($membershipParams);
-    if (!empty($membershipParams['selectMembership'])) {
-      // CRM-12233
-      $membershipLineItems = [$this->getPriceSetID() => $this->getLineItems()];;
-      if ($this->_separateMembershipPayment && $this->isFormSupportsNonMembershipContributions()) {
-        $membershipLineItems = [];
-        foreach ($this->_values['fee'] as $key => $feeValues) {
-          if ($feeValues['name'] == 'membership_amount') {
-            $fieldId = $this->_params['price_' . $key];
-            unset($this->_lineItem[$this->_priceSetId][$fieldId]);
-            $membershipLineItems[$this->_priceSetId][$fieldId] = $this->getLineItems()[$fieldId];
-            break;
-          }
-        }
-      }
+    if ($this->isMembershipSelected()) {
+      // CRM-12233.
       try {
+        $membershipLineItems = [$this->getPriceSetID() => $this->getMainContributionLineItems()];
+        $membershipParams['amount'] = $this->getMainContributionAmount();
         $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams, $membershipLineItems);
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
@@ -2418,6 +2395,32 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         );
       }
     }
+  }
+
+  /**
+   * Get the amount for the main contribution.
+   *
+   * The goal is to expand this function so that all the argy-bargy of figuring out the amount
+   * winds up here as the main spaghetti shrinks.
+   *
+   * If there is a separate membership contribution this is the 'other one'. Otherwise there
+   * is only one.
+   *
+   * @todo - move this to the parent, replace existing (some tests to fight).
+   *
+   * @param $params
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMainContributionAmount($params = []) {
+    $amount = 0;
+    foreach ($this->getMainContributionLineItems() as $lineItem) {
+      // Line total inclusive should really be always set but this is a safe fall back.
+      $amount += $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
+    }
+    return $amount;
   }
 
   /**
