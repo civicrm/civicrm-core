@@ -1390,8 +1390,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if ($this->getExistingContributionID()) {
       $this->order->setTemplateContributionID($this->getExistingContributionID());
     }
-    $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
     $this->order->setForm($this);
+    foreach ($this->getPriceFieldMetaData() as $priceField) {
+      if ($priceField['html_type'] === 'Text') {
+        $this->submittableMoneyFields[] = 'price_' . $priceField['id'];
+      }
+    }
+    $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
   }
 
   protected function defineRenewalMembership(): void {
