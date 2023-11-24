@@ -578,7 +578,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       return NULL;
     }
     foreach ($this->order->getPriceFieldsMetadata() as $field) {
-      if ($field['name'] !== 'other_amount') {
+      if ($field['name'] === 'contribution_amount') {
         return (int) $field['id'];
       }
     }
