@@ -1297,6 +1297,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $priceSetID = $this->getPriceSetID();
     if (!empty($this->_ccid)) {
+      // @todo - verify that this is the same as `$this->>getLineItems()` which it should be & consolidate
       $this->set('lineItem', [$this->getPriceSetID() => $this->getExistingContributionLineItems()]);
     }
     elseif ($priceSetID) {
@@ -1336,7 +1337,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $params['amount'] = $proceFieldAmount;
         }
       }
-      $this->set('lineItem', $lineItem);
+      $this->set('lineItem', [$this->getPriceSetID() => $this->getLineItems()]);
     }
 
     if ($params['amount'] != 0 && (($this->_values['is_pay_later'] &&
