@@ -446,6 +446,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $params = $this->processPcp($this, $this->_params);
       $this->_params = $params;
     }
+    else {
+      $this->assign('pcpBlock');
+    }
     $this->_params['invoiceID'] = $this->get('invoiceID');
 
     //carry campaign from profile.
@@ -482,6 +485,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $fieldTypes[] = CRM_Core_BAO_UFGroup::getContactType($this->_values['honoree_profile_id']);
       $this->buildCustom($this->_values['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
     }
+    else {
+      $this->assign('honoreeProfileFields');
+    }
     $this->assign('receiptFromEmail', $this->_values['receipt_from_email'] ?? NULL);
     $this->assign('amount_block_is_active', $this->isFormSupportsNonMembershipContributions());
     $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
@@ -507,6 +513,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       );
       $this->set('productID', $productID);
       $this->set('option', $option);
+    }
+    else {
+      $this->assign('products');
     }
     if (CRM_Core_Component::isEnabled('CiviMember') && empty($this->_ccid)) {
       if (isset($params['selectMembership']) &&
@@ -546,6 +555,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
 
       $this->buildCustom($this->_values['onbehalf_profile_id'], 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
+    }
+    else {
+      $this->assign('onbehalfProfile');
     }
 
     $this->_separateMembershipPayment = $this->isSeparateMembershipPayment();
