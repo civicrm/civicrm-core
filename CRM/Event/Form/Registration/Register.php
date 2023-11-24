@@ -1051,7 +1051,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     if ($this->_values['event']['is_monetary']) {
       // we first reset the confirm page so it accepts new values
-      $this->controller->resetPage('Confirm');
+      // $this->controller->resetPage('Confirm');
 
       //added for discount
       $discountId = CRM_Core_BAO_Discount::findSet($this->_eventId, 'civicrm_event');
