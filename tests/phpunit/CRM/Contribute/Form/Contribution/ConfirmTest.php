@@ -119,6 +119,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
         'id' => $processConfirmResult['contribution']->id,
         'trxn_date' => date('Y-m-d'),
         'payment_processor_id' => $paymentProcessorID,
+        'version' => 3,
       ]);
     }
 
@@ -126,22 +127,22 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'id' => $form->_params['contribution_id'],
       'return' => [
         'contribution_page_id',
-        'contribution_status',
-        'contribution_source',
+        'contribution_status_id:name',
+        'source',
       ],
     ]);
 
     // check that contribution page ID isn't changed
     $this->assertEquals($contributionPageID1, $contribution['contribution_page_id']);
     // check that paid later information is present in contribution's source
-    $this->assertMatchesRegularExpression("/Paid later via page ID: $contributionPageID2/", $contribution['contribution_source']);
+    $this->assertMatchesRegularExpression("/Paid later via page ID: $contributionPageID2/", $contribution['source']);
     // check that contribution status is changed to 'Completed' from 'Pending'
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
 
     // Delete contribution.
     // @todo - figure out why & document properly. If this is just to partially
     // re-use some test set up then split into 2 tests.
-    $this->callAPISuccess('contribution', 'delete', [
+    $this->callAPISuccess('Contribution', 'delete', [
       'id' => $processConfirmResult['contribution']->id,
     ]);
 
@@ -175,12 +176,14 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'contact_id' => $form->_params['onbehalf_contact_id'],
       'activity_type_id' => 'Contribution',
       'return' => 'target_contact_id',
+      'version' => 3,
     ]);
     $this->assertEquals([$form->_params['contact_id']], $activity['target_contact_id']);
     $this->assertEquals($individualID, $activity['source_contact_id']);
     $repeatContribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $contribution['id'],
       'contribution_status_id' => 'Pending',
+      'version' => 3,
       'api.Payment.create' => [
         'total_amount' => 100,
         'payment_processor_id' => $paymentProcessorID,
@@ -245,38 +248,50 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   /**
    * Test the tax calculation when using a quick config price set with a membership selection & a contribution (radio) selection.
    *
-   * Expected amount is $100 non-tax deductible + $100 with an additional $10 tax.
+   * Expected total amount is $200 - ie
+   * - $100 non-tax deductible
+   * + $100 entered in 'other_amount' which we treat as inclusive..
+   *
+   * $100 inclusive reverse-engineers to $90.91 + 10% tax of $9.09 = 100
    */
   public function testSeparatePaymentWithTaxOtherAmount(): void {
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'));
     $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
     $this->submitOnlineContributionForm([
-        'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
-        'price_' . $this->ids['PriceField']['other_amount'] => 100,
-        'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
-        'id' => $this->getContributionPageID(),
-      ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['other_amount'] => 100,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'id' => $this->getContributionPageID(),
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
-    $this->assertEquals(10, $contribution['tax_amount']);
-    $this->assertEquals(210, $contribution['total_amount']);
+    $this->assertEquals(9.09, $contribution['tax_amount']);
+    $this->assertEquals(200, $contribution['total_amount']);
   }
 
   /**
    * Test the confirm form with a separate membership payment configured.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSeparatePaymentConfirm(): void {
-    $isSeparateMembershipPayment = TRUE;
-    $form = $this->submitFormWithMembershipAndContribution($isSeparateMembershipPayment);
-    $financialTrxnId = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_id' => $form->getContributionID(), 'entity_table' => 'civicrm_contribution', 'sequential' => 1])['values'][0]['financial_trxn_id'];
+    $this->contributionPageQuickConfigCreate([], [], TRUE, TRUE, TRUE, TRUE);
+    $form = $this->submitOnlineContributionForm([
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['other_amount'] => 100,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'id' => $this->getContributionPageID(),
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
+    $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $this->getContributionPageID(), 'sequential' => TRUE])['values'];
+    $financialTrxnId = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_id' => $contributions[0]['id'], 'entity_table' => 'civicrm_contribution', 'sequential' => 1])['values'][0]['financial_trxn_id'];
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', [
       'id' => $financialTrxnId,
     ])['values'][$financialTrxnId];
     $this->assertEquals('1111', $financialTrxn['pan_truncation']);
     $this->assertEquals(1, $financialTrxn['card_type_id']);
-    $assignedVariables = $form->getTemplateVariables();
-    $this->assertTrue($assignedVariables['is_separate_payment']);
+
+    $form->checkTemplateVariable('is_separate_payment', TRUE);
     // Two emails were sent - check both. The first is a contribution
     // online receipt & the second is the membership online receipt.
     $this->assertMailSentContainingStrings(
@@ -285,7 +300,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
         '<td style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;">
            Amount        </td>
           <td style="padding: 4px; border-bottom: 1px solid #999;">
-           $352.00         </td>
+           $100.00         </td>
          </tr>',
         '************1111',
       ],
@@ -295,12 +310,12 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'Membership Type       </td>
        <td style="padding: 4px; border-bottom: 1px solid #999;">
          General       </td>',
-      '$1,000.00',
+      '$100.00',
       'Membership Start Date',
       '************1111',
     ], 1);
-    $this->assertMailSentContainingHeaderString('Test Contribution Page', 0);
-    $this->assertMailSentContainingHeaderString('Test Contribution Page', 1);
+    $this->assertMailSentContainingHeaderString('Test Frontend title', 0);
+    $this->assertMailSentContainingHeaderString('Test Frontend title', 1);
   }
 
   /**
