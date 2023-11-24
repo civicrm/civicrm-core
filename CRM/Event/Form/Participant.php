@@ -970,7 +970,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       //add contribution record
       $contributions[] = $contribution = $this->processContribution(
-        $this, $this->_params,
+        $this->_params,
         $result, $contactID,
         FALSE,
         $this->_paymentProcessor
@@ -1484,7 +1484,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Process the contribution.
    *
-   * @param CRM_Core_Form $form
    * @param array $params
    * @param array $result
    * @param int $contactID
@@ -1495,8 +1494,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @throws \CRM_Core_Exception
    */
-  protected function processContribution(
-    &$form, $params, $result, $contactID,
+  protected function processContribution($params, $result, $contactID,
     $pending = FALSE,
     $paymentProcessor = NULL
   ) {
@@ -1542,7 +1540,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     $contribParams['is_test'] = 0;
-    if ($form->_action & CRM_Core_Action::PREVIEW || ($this->_mode ?? NULL) === 'test') {
+    if ($this->getAction() & CRM_Core_Action::PREVIEW || ($this->_mode ?? NULL) === 'test') {
       $contribParams['is_test'] = 1;
     }
 
@@ -1562,7 +1560,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
     // CRM-11124
-    CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, NULL, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
+    CRM_Event_BAO_Participant::createDiscountTrxn($this->getEventID(), $contribParams, NULL, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
 
     $transaction->commit();
 
