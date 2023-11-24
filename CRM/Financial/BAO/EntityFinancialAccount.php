@@ -45,7 +45,7 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
    * @param array $params
    *   Reference array contains the values submitted by the form.
    * @param array $ids
-   *   Reference array contains one possible value
+   *   Deprecated array contains one possible value
    *   - entityFinancialAccount.
    *
    * @return CRM_Financial_DAO_EntityFinancialAccount
@@ -53,20 +53,20 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
    * @throws \CRM_Core_Exception
    */
   public static function add(&$params, $ids = NULL) {
-    // action is taken depending upon the mode
-    $financialTypeAccount = new CRM_Financial_DAO_EntityFinancialAccount();
+    // action is taken depending upon the mode - which is wrong wrong wrong & should be like other add functions
     if ($params['entity_table'] !== 'civicrm_financial_type') {
+      $financialTypeAccount = new CRM_Financial_DAO_EntityFinancialAccount();
       $financialTypeAccount->entity_id = $params['entity_id'];
       $financialTypeAccount->entity_table = $params['entity_table'];
       $financialTypeAccount->find(TRUE);
+      $params['id'] = $financialTypeAccount->id;
     }
     if (!empty($ids['entityFinancialAccount'])) {
-      $financialTypeAccount->id = $ids['entityFinancialAccount'];
-      $financialTypeAccount->find(TRUE);
+      $params['id'] = $ids['entityFinancialAccount'];
+      CRM_Core_Error::deprecatedWarning('passing ids is deprecated');
     }
-    $financialTypeAccount->copyValues($params);
+    $financialTypeAccount = parent::writeRecord($params);
     self::validateRelationship($financialTypeAccount);
-    $financialTypeAccount->save();
     unset(Civi::$statics['CRM_Core_PseudoConstant']['taxRates']);
     return $financialTypeAccount;
   }

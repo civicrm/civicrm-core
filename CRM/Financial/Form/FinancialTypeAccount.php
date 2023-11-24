@@ -284,12 +284,11 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
       CRM_Core_Session::setStatus(ts('Selected financial type account has been deleted.'));
     }
     else {
-      $ids = [];
       // store the submitted values in an array
       $params = $this->exportValues();
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
-        $ids['entityFinancialAccount'] = $this->_id;
+        $params['id'] = $this->_id;
       }
       if ($this->_action & CRM_Core_Action::ADD || $this->_action & CRM_Core_Action::UPDATE) {
         $params['financial_account_id'] = $this->_submitValues['financial_account_id'];
@@ -299,7 +298,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
         $params['entity_id'] = $this->_aid;
       }
       try {
-        $financialTypeAccount = CRM_Financial_BAO_EntityFinancialAccount::add($params, $ids);
+        CRM_Financial_BAO_EntityFinancialAccount::add($params);
         CRM_Core_Session::setStatus(ts('The financial type Account has been saved.'), ts('Saved'), 'success');
       }
       catch (CRM_Core_Exception $e) {
