@@ -47,6 +47,8 @@ class OptionValueAutocompleteProvider extends \Civi\Core\Service\AutoService imp
         [
           'type' => 'field',
           'key' => 'description',
+          'rewrite' => '#[value] [description]',
+          'empty_value' => '#[value]',
         ],
       ],
     ];
