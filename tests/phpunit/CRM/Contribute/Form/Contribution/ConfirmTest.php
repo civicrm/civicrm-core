@@ -245,22 +245,22 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   /**
    * Test the tax calculation when using a quick config price set with a membership selection & a contribution (radio) selection.
    *
-   * Expected amount is $100 non-tax deductible + $100 with an additional $10 tax.
+   * Expected amount is $100 non-tax deductible + $100 entered in 'other_amount' which we treat as inclusive..
    */
   public function testSeparatePaymentWithTaxOtherAmount(): void {
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'));
     $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
     $this->submitOnlineContributionForm([
-        'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
-        'price_' . $this->ids['PriceField']['other_amount'] => 100,
-        'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
-        'id' => $this->getContributionPageID(),
-      ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['other_amount'] => 100,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'id' => $this->getContributionPageID(),
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
-    $this->assertEquals(10, $contribution['tax_amount']);
-    $this->assertEquals(210, $contribution['total_amount']);
+    $this->assertEquals(9, $contribution['tax_amount']);
+    $this->assertEquals(200, $contribution['total_amount']);
   }
 
   /**
