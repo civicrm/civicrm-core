@@ -969,9 +969,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       //add contribution record
-      $this->_params['mode'] = $this->_mode;
-
-      //add contribution record
       $contributions[] = $contribution = $this->processContribution(
         $this, $this->_params,
         $result, $contactID,
@@ -1545,7 +1542,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     $contribParams['is_test'] = 0;
-    if ($form->_action & CRM_Core_Action::PREVIEW || ($params['mode'] ?? NULL) === 'test') {
+    if ($form->_action & CRM_Core_Action::PREVIEW || ($this->_mode ?? NULL) === 'test') {
       $contribParams['is_test'] = 1;
     }
 
