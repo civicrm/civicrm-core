@@ -144,6 +144,16 @@ class CRM_Core_Page {
   public $_permission;
 
   /**
+   * @var int
+   */
+  protected $_action;
+
+  /**
+   * @var int
+   */
+  protected $_id;
+
+  /**
    * Class constructor.
    *
    * @param string $title
