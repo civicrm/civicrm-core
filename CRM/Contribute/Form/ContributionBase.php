@@ -912,6 +912,79 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Build Premium Block im Contribution Pages.
+   *
+   * @param bool $formItems
+   * @param int $selectedProductID
+   * @param string $selectedOption
+   */
+  protected function buildPremiumsBlock($formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
+    $this->add('hidden', "selectProduct", $selectedProductID, ['id' => 'selectProduct']);
+
+    $premiumDao = new CRM_Contribute_DAO_Premium();
+    $premiumDao->entity_table = 'civicrm_contribution_page';
+    $premiumDao->entity_id = $this->getContributionPageID();
+    $premiumDao->premiums_active = 1;
+
+    if ($premiumDao->find(TRUE)) {
+      $premiumID = $premiumDao->id;
+      $premiumBlock = [];
+      CRM_Core_DAO::storeValues($premiumDao, $premiumBlock);
+
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
+      $addWhere = "financial_type_id IN (0)";
+      if (!empty($financialTypes)) {
+        $addWhere = "financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
+      }
+      $addWhere = "{$addWhere} OR financial_type_id IS NULL";
+
+      $premiumsProductDao = new CRM_Contribute_DAO_PremiumsProduct();
+      $premiumsProductDao->premiums_id = $premiumID;
+      $premiumsProductDao->whereAdd($addWhere);
+      $premiumsProductDao->orderBy('weight');
+      $premiumsProductDao->find();
+
+      $products = [];
+      while ($premiumsProductDao->fetch()) {
+        $productDAO = new CRM_Contribute_DAO_Product();
+        $productDAO->id = $premiumsProductDao->product_id;
+        $productDAO->is_active = 1;
+        if ($productDAO->find(TRUE)) {
+          if ($selectedProductID != NULL) {
+            if ($selectedProductID == $productDAO->id) {
+              if ($selectedOption) {
+                $productDAO->options = ts('Selected Option') . ': ' . $selectedOption;
+              }
+              else {
+                $productDAO->options = NULL;
+              }
+              CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
+            }
+          }
+          else {
+            // Why? should we not skip if not found?
+            CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
+          }
+        }
+        $options = $temp = [];
+        $temp = explode(',', $productDAO->options);
+        foreach ($temp as $value) {
+          $options[trim($value)] = trim($value);
+        }
+        if ($temp[0] != '') {
+          $this->addElement('select', 'options_' . $productDAO->id, NULL, $options);
+        }
+      }
+      if (count($products)) {
+        $this->assign('showPremium', $formItems);
+        $this->assign('showSelectOptions', $formItems);
+        $this->assign('premiumBlock', $premiumBlock);
+      }
+    }
+    $this->assign('products', $products ?? NULL);
+  }
+
+  /**
    * Assign payment field information to the template.
    *
    * @throws \CRM_Core_Exception

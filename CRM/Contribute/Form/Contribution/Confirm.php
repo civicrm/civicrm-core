@@ -508,7 +508,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!empty($params['selectProduct']) && $params['selectProduct'] !== 'no_thanks') {
       $option = $params['options_' . $params['selectProduct']] ?? NULL;
       $productID = $params['selectProduct'];
-      CRM_Contribute_BAO_Premium::buildPremiumBlock($this, $this->_id, FALSE,
+      $this->buildPremiumsBlock(FALSE,
         $productID, $option
       );
       $this->set('productID', $productID);

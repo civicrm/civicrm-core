@@ -73,6 +73,8 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   /**
    * Build Premium Block im Contribution Pages.
    *
+   * @deprecated since 5.69 will be removed around 5.75
+   *
    * @param CRM_Core_Form $form
    * @param int $pageID
    * @param bool $formItems
@@ -80,6 +82,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param string $selectedOption
    */
   public static function buildPremiumBlock(&$form, $pageID, $formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $form->add('hidden', "selectProduct", $selectedProductID, ['id' => 'selectProduct']);
 
     $premiumDao = new CRM_Contribute_DAO_Premium();
