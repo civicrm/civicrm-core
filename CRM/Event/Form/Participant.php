@@ -880,7 +880,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $now = date('YmdHis');
 
     if ($this->_mode) {
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_params['payment_processor_id'],
+      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->getSubmittedValue('payment_processor_id'),
         $this->_mode
       );
       $fields = [];
@@ -1103,7 +1103,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
 
         // CRM-11124
-        if ($this->_params['discount_id']) {
+        if ($this->getSubmittedValue('discount_id')) {
           CRM_Event_BAO_Participant::createDiscountTrxn(
             $this->_eventId,
             $contributionParams,
@@ -1297,7 +1297,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $discounts[$key] = $value['name'];
         }
 
-        $element = $form->add('select', 'discount_id',
+        $form->add('select', 'discount_id',
           ts('Discount Set'),
           [
             0 => ts('- select -'),
@@ -1420,18 +1420,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $lineItem = [];
 
     if ($this->isPaymentOnExistingContribution()) {
-      $params['discount_id'] = NULL;
       //re-enter the values for UPDATE mode
       $params['fee_level'] = $params['amount_level'] = $this->getParticipantValue('fee_level');
       $params['fee_amount'] = $this->getParticipantValue('fee_amount');
     }
     else {
-
-      // check that discount_id is set
-      if (empty($params['discount_id'])) {
-        $params['discount_id'] = 'null';
-      }
-
       //lets carry currency, CRM-4453
       $params['fee_currency'] = \Civi::settings()->get('defaultCurrency');
       if (!isset($lineItem[0])) {
@@ -1594,7 +1587,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'fee_level' => $params['amount_level'] ?? NULL,
       'is_pay_later' => FALSE,
       'fee_amount' => $params['fee_amount'] ?? NULL,
-      'discount_id' => $params['discount_id'] ?? NULL,
       'fee_currency' => \Civi::settings()->get('defaultCurrency'),
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'note' => $this->getSubmittedValue('note'),
@@ -1611,7 +1603,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       );
       $participantParams['id'] = $pID;
     }
-    $participantParams['discount_id'] = CRM_Core_BAO_Discount::findSet($this->getEventID(), 'civicrm_event') ?: 'null';
+    $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
 
     $participant = CRM_Event_BAO_Participant::create($participantParams);
 
@@ -1895,6 +1887,9 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function getDiscountID(): ?int {
+    if ($this->getSubmittedValue('discount_id')) {
+      return $this->getSubmittedValue('discount_id');
+    }
     if ($this->_discountId === NULL) {
       if ($this->getParticipantID()) {
         $this->_discountId = (int) CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->getParticipantID(), 'discount_id');
