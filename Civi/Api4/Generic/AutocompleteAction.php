@@ -285,6 +285,10 @@ class AutocompleteAction extends AbstractAction {
    */
   private function getKeyField() {
     $entityName = $this->savedSearch['api_entity'];
+    // Temp hack for 5.67. Fixed in 5.68. See https://github.com/civicrm/civicrm-core/pull/28283
+    if ($entityName === 'OptionValue' && $this->key === 'value') {
+      return 'value';
+    }
     if ($this->key) {
       /** @var \CRM_Core_DAO $dao */
       $dao = CoreUtil::getInfoItem($entityName, 'dao');
