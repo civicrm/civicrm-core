@@ -211,15 +211,17 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertTrue($assignedVariables['is_separate_payment']);
     // Two emails were sent - check both. The first is a contribution
     // online receipt & the second is the membership online receipt.
-    $this->assertMailSentContainingStrings([
-      'Contribution Information',
-      '<td style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;">
-         Amount        </td>
-        <td style="padding: 4px; border-bottom: 1px solid #999;">
-         $352.00         </td>
-       </tr>',
-      '************1111',
-    ]);
+    $this->assertMailSentContainingStrings(
+      [
+        'Contribution Information',
+        '<td style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;">
+           Amount        </td>
+          <td style="padding: 4px; border-bottom: 1px solid #999;">
+           $352.00         </td>
+         </tr>',
+        '************1111',
+      ],
+    );
     $this->assertMailSentContainingStrings([
       'Membership Information',
       'Membership Type       </td>
