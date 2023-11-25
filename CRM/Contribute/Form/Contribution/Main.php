@@ -1262,34 +1262,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // @todo - stepping through the code indicates that amount is always set before this point so it never matters.
     // Move more of the above into this function...
     $params['amount'] = $this->getMainContributionAmount();
-    //If the membership & contribution is used in contribution page & not separate payment
-    $memPresent = $membershipLabel = $fieldOption = NULL;
-    $proceFieldAmount = 0;
-    if (property_exists($this, '_separateMembershipPayment') && $this->_separateMembershipPayment == 0) {
-      if ($this->isQuickConfig()) {
-        foreach ($this->_priceSet['fields'] as $fieldKey => $fieldVal) {
-          if ($fieldVal['name'] == 'membership_amount' && !empty($params['price_' . $fieldKey])) {
-            $fieldId = $fieldVal['id'];
-            $fieldOption = $params['price_' . $fieldId];
-            $proceFieldAmount += $fieldVal['options'][$this->_submitValues['price_' . $fieldId]]['amount'];
-            $memPresent = TRUE;
-          }
-          else {
-            if (!empty($params['price_' . $fieldKey]) && $memPresent && ($fieldVal['name'] == 'other_amount' || $fieldVal['name'] == 'contribution_amount')) {
-              $fieldId = $fieldVal['id'];
-              if ($fieldVal['name'] == 'other_amount') {
-                $proceFieldAmount += $this->_submitValues['price_' . $fieldId];
-              }
-              elseif ($fieldVal['name'] == 'contribution_amount' && $this->_submitValues['price_' . $fieldId] > 0) {
-                $proceFieldAmount += $fieldVal['options'][$this->_submitValues['price_' . $fieldId]]['amount'];
-              }
-              unset($params['price_' . $fieldId]);
-              break;
-            }
-          }
-        }
-      }
-    }
 
     if (!isset($params['amount_other'])) {
       $this->set('amount_level', CRM_Utils_Array::value('amount_level', $params));
@@ -1297,6 +1269,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $priceSetID = $this->getPriceSetID();
     if (!empty($this->_ccid)) {
+      // @todo - verify that this is the same as `$this->>getLineItems()` which it should be & consolidate
       $this->set('lineItem', [$this->getPriceSetID() => $this->getExistingContributionLineItems()]);
     }
     elseif ($priceSetID) {
@@ -1325,18 +1298,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetID], $priceSetID);
       }
 
-      if ($proceFieldAmount) {
-        $lineItem[$priceSetID][$fieldOption]['unit_price'] = $proceFieldAmount;
-        $lineItem[$priceSetID][$fieldOption]['line_total'] = $proceFieldAmount;
-        if (isset($lineItem[$priceSetID][$fieldOption]['tax_amount'])) {
-          $proceFieldAmount += $lineItem[$priceSetID][$fieldOption]['tax_amount'];
-        }
-        if (!$this->_membershipBlock['is_separate_payment']) {
-          //require when separate membership not used
-          $params['amount'] = $proceFieldAmount;
-        }
-      }
-      $this->set('lineItem', $lineItem);
+      $this->set('lineItem', [$this->getPriceSetID() => $this->getLineItems()]);
     }
 
     if ($params['amount'] != 0 && (($this->_values['is_pay_later'] &&

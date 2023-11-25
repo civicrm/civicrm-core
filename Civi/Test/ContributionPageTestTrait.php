@@ -283,7 +283,6 @@ trait ContributionPageTestTrait {
    * - use false to suppress the creation of this field.
    * @param string $identifier
    *
-   * @throws \CRM_Core_Exception
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function contributionPageQuickConfigCreate(array $contributionPageParameters = [], array $priceSetParameters = [], bool $isSeparatePayment = FALSE, bool $membershipAmountField = TRUE, bool $contributionAmountField = TRUE, bool $otherAmountField = TRUE, string $identifier = 'QuickConfig'): void {
