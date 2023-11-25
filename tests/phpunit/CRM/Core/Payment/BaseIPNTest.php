@@ -125,7 +125,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $msg = $contribution->composeMessageArray($this->input, $this->ids);
     $this->assertIsArray($msg, 'Message returned as an array in line');
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertStringContainsString('Membership Type: General', $msg['body']);
+    $this->assertStringContainsString('General', $msg['html']);
   }
 
   /**
@@ -141,7 +141,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input, $this->ids);
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertStringContainsString('Membership Type: General', $msg['body']);
+    $this->assertStringContainsString('General', $msg['html']);
 
     $this->ids['contact'] = $this->_contactId = $this->individualCreate(['prefix_id' => 'Dr.', 'first_name' => 'Donald', 'last_name' => 'Duck', 'email' => 'the-don@duckville.com']);
     $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_contributionParams, ['invoice_id' => 'abc']));
@@ -154,7 +154,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input, $this->ids);
     $this->assertEquals('Dr. Donald Duck II', $msg['to']);
-    $this->assertStringContainsString('Membership Type: Fowl', $msg['body']);
+    $this->assertStringContainsString('Fowl', $msg['html']);
   }
 
   /**
@@ -169,7 +169,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $msg = $contribution->composeMessageArray($this->input, $this->ids);
     $this->assertIsArray($msg, 'Message not returned as an array');
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertStringContainsString('Membership Type: General', $msg['body']);
+    $this->assertStringContainsString('General', $msg['html']);
   }
 
   /**

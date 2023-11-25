@@ -41,8 +41,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
       $this->set('type', 'Event');
-      $this->set('subType', CRM_Utils_Array::value('event_type_id', $_POST));
-      $this->assign('customDataSubType', CRM_Utils_Array::value('event_type_id', $_POST));
+      $this->set('subType', $_POST['event_type_id'] ?? '');
+      $this->assign('customDataSubType', $_POST['event_type_id'] ?? '');
       $this->set('entityId', $entityID);
 
       CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_eventType, 1, 'Event', $entityID);
@@ -88,12 +88,12 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $showHideBlocks->addToTemplate();
     $this->assign('elemType', 'table-row');
 
-    $this->assign('description', CRM_Utils_Array::value('description', $defaults));
+    $this->assign('description', $defaults['description'] ?? '');
 
     // Provide suggested text for event full and waitlist messages if they're empty
-    $defaults['event_full_text'] = CRM_Utils_Array::value('event_full_text', $defaults, ts('This event is currently full.'));
+    $defaults['event_full_text'] = $defaults['event_full_text'] ?? ts('This event is currently full.');
 
-    $defaults['waitlist_text'] = CRM_Utils_Array::value('waitlist_text', $defaults, ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.'));
+    $defaults['waitlist_text'] = $defaults['waitlist_text'] ?? ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.');
     $defaults['template_id'] = $this->_templateId;
 
     return $defaults;
@@ -161,6 +161,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->addElement('checkbox', 'is_public', ts('Public Event'));
     $this->addElement('checkbox', 'is_share', ts('Add footer region with Twitter, Facebook and LinkedIn share buttons and scripts?'));
     $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location'));
+    $this->addElement('checkbox', 'is_show_calendar_links', ts('Show Calendar Links'));
 
     $this->add('datepicker', 'start_date', ts('Start'), [], !$this->_isTemplate, ['time' => TRUE]);
     $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);
@@ -222,9 +223,9 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $params['is_active'] = $params['is_active'] ?? FALSE;
     $params['is_public'] = $params['is_public'] ?? FALSE;
     $params['is_share'] = $params['is_share'] ?? FALSE;
+    $params['is_show_calendar_links'] = $params['is_show_calendar_links'] ?? FALSE;
     $params['default_role_id'] = $params['default_role_id'] ?? FALSE;
     $params['id'] = $this->_id;
-
     //merge params with defaults from templates
     if (!empty($params['template_id'])) {
       $params = array_merge(CRM_Event_BAO_Event::getTemplateDefaultValues($params['template_id']), $params);

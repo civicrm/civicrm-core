@@ -257,13 +257,6 @@ WHERE li.contribution_id = %1";
         $getTaxDetails = TRUE;
       }
     }
-    if (Civi::settings()->get('invoicing')) {
-      // @todo - this is an inappropriate place to be doing form level assignments.
-      $taxTerm = Civi::settings()->get('tax_term');
-      $smarty = CRM_Core_Smarty::singleton();
-      $smarty->assign('taxTerm', $taxTerm);
-      $smarty->assign('getTaxDetails', $getTaxDetails);
-    }
     return $lineItems;
   }
 
@@ -1256,7 +1249,7 @@ WHERE li.contribution_id = %1";
    * @return string
    */
   protected function getSalesTaxTerm() {
-    return CRM_Contribute_BAO_Contribution::checkContributeSettings('tax_term');
+    return \Civi::settings()->get('tax_term');
   }
 
   /**

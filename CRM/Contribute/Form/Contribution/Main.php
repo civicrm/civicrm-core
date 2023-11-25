@@ -40,6 +40,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   protected $_snippet;
 
   /**
+   * Variable for legacy paypal express implementation.
+   *
+   * @var string
+   *
+   * @internal - only to be used by legacy paypal express implementation.
+   */
+  public $_expressButtonName;
+
+  /**
    * Get the active UFGroups (profiles) on this form
    * Many forms load one or more UFGroups (profiles).
    * This provides a standard function to retrieve the IDs of those profiles from the form
@@ -70,12 +79,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    */
   public function preProcess() {
     parent::preProcess();
 
     $this->_paymentProcessors = $this->get('paymentProcessors');
     $this->preProcessPaymentOptions();
+    // If the in-use payment processor is the Dummy processor we assign the name so that a test warning is displayed.
+    $this->assign('dummyTitle', $this->getPaymentProcessorValue('payment_processor_type_id.class') === 'CRM_Dummy' ? $this->getPaymentProcessorValue('payment_processor_type_id.front_end_title') : '');
 
     $this->assignFormVariablesByContributionID();
 
@@ -99,8 +113,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if (!empty($this->_pcpInfo['id']) && !empty($this->_pcpInfo['intro_text'])) {
       $this->assign('intro_text', $this->_pcpInfo['intro_text']);
     }
-    elseif (!empty($this->_values['intro_text'])) {
-      $this->assign('intro_text', $this->_values['intro_text']);
+    else {
+      $this->assign('intro_text', $this->getContributionPageValue('intro_text'));
     }
 
     $qParams = "reset=1&amp;id={$this->_id}";
@@ -209,7 +223,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $entityId = $memtypeID = NULL;
     if ($this->_priceSetId) {
-      if (($this->isMembershipPriceSet() && !empty($this->_currentMemberships)) || $this->_defaultMemTypeId) {
+      if (($this->isMembershipPriceSet() && !$this->isDefined('CurrentMembership')) || $this->_defaultMemTypeId) {
         $selectedCurrentMemTypes = [];
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
@@ -225,7 +239,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               break;
             }
             elseif ($opMemTypeId &&
-              in_array($opMemTypeId, $this->_currentMemberships) &&
+              in_array($opMemTypeId, $this->lookup('CurrentMembership', 'membership_type_id')) &&
               !in_array($opMemTypeId, $selectedCurrentMemTypes)
             ) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
@@ -350,7 +364,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // build price set form.
       $this->set('priceSetId', $this->_priceSetId);
       if (empty($this->_ccid)) {
-        $this->buildPriceSet($this, $this->getFormContext());
+        $this->buildPriceSet($this);
       }
       if ($this->_values['is_monetary'] &&
         $this->_values['is_recur'] && empty($this->_values['pledge_id'])
@@ -473,19 +487,18 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Build the price set form.
    *
    * @param CRM_Core_Form $form
-   * @param string|null $component
    *
    * @return void
    * @throws \CRM_Core_Exception
    */
-  private function buildPriceSet(&$form, $component = NULL) {
+  private function buildPriceSet($form) {
     $validPriceFieldIds = array_keys($this->getPriceFieldMetaData());
     $form->assign('priceSet', $form->_priceSet);
 
     // @todo - this hook wrangling can be done earlier if we set the form on $this->>order.
     $feeBlock = &$form->_values['fee'];
     // Call the buildAmount hook.
-    CRM_Utils_Hook::buildAmount($component ?? 'contribution', $form, $feeBlock);
+    CRM_Utils_Hook::buildAmount($this->getFormContext(), $form, $feeBlock);
 
     // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
     $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
@@ -546,7 +559,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * Get the idea of the other amount field if the form is configured to offer it.
+   * Get the ID of the other amount field if the form is configured to offer it.
    *
    * The other amount field is an alternative to the configured radio options,
    * specific to this form.
@@ -566,7 +579,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
-   * Get the idea of the other amount field if the form is configured to offer an other amount.
+   * Get the ID of the main amount field if the form is configured to offer an other amount.
    *
    * The other amount field is an alternative to the configured radio options,
    * specific to this form.
@@ -578,7 +591,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       return NULL;
     }
     foreach ($this->order->getPriceFieldsMetadata() as $field) {
-      if ($field['name'] !== 'other_amount') {
+      if ($field['name'] === 'contribution_amount') {
         return (int) $field['id'];
       }
     }
@@ -597,11 +610,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   private function buildMembershipBlock() {
     $cid = $this->_membershipContactID;
-    $isTest = (bool) ($this->getAction() & CRM_Core_Action::PREVIEW);
     $separateMembershipPayment = FALSE;
     $this->addOptionalQuickFormElement('auto_renew');
     if ($this->_membershipBlock) {
-      $this->_currentMemberships = [];
 
       $membershipTypeIds = $membershipTypes = $radio = $radioOptAttrs = [];
       // This is always true if this line is reachable - remove along with the upcoming if.
@@ -679,7 +690,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
                 ->addWhere('contact_id', '=', $cid)
                 ->addWhere('membership_type_id', '=', $memType['id'])
                 ->addWhere('status_id:name', 'NOT IN', ['Cancelled', 'Pending'])
-                ->addWhere('is_test', '=', (bool) $isTest)
+                ->addWhere('is_test', '=', $this->isTest())
                 ->addOrderBy('end_date', 'DESC')
                 ->execute()
                 ->first();
@@ -692,7 +703,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
                   continue;
                 }
                 $this->assign('renewal_mode', TRUE);
-                $this->_currentMemberships[$membership['membership_type_id']] = $membership['membership_type_id'];
+                $this->define('Membership', 'CurrentMembership', $membership);
                 $memType['current_membership'] = $membership['end_date'];
                 if (!$endDate) {
                   $endDate = $memType['current_membership'];
@@ -747,7 +758,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $form->assign('is_recur_interval', $this->getContributionPageValue('is_recur_interval'));
     $form->assign('is_recur_installments', $this->getContributionPageValue('is_recur_installments'));
-    $paymentObject = $form->getVar('_paymentObject');
+    $paymentObject = $this->getPaymentProcessorObject();
     if ($paymentObject) {
       $form->assign('recurringHelpText', $paymentObject->getText('contributionPageRecurringHelp', [
         'is_recur_installments' => !empty($form->_values['is_recur_installments']),
@@ -843,8 +854,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     ) {
 
       // appears to be unreachable - selectMembership never set...
-      $isTest = $self->_action & CRM_Core_Action::PREVIEW;
-      $lifeMember = CRM_Member_BAO_Membership::getAllContactMembership($self->_membershipContactID, $isTest, TRUE);
+      $lifeMember = CRM_Member_BAO_Membership::getAllContactMembership($self->_membershipContactID, $self->isTest(), TRUE);
 
       $membershipOrgDetails = CRM_Member_BAO_MembershipType::getAllMembershipTypes();
       $unallowedOrgs = [];
@@ -1161,11 +1171,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $amountID = $params['amount'] ?? NULL;
 
         if ($amountID) {
-          // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
-          // function to get correct amount level consistently. Remove setting of the amount level in
-          // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
-          // to cover all variants.
-          $params['amount_level'] = $formValues[$amountID]['label'] ?? NULL;
           $amount = $formValues[$amountID]['value'] ?? NULL;
         }
       }
@@ -1210,7 +1215,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if ($this->isQuickConfig()) {
       $priceField = new CRM_Price_DAO_PriceField();
-      $priceField->price_set_id = $params['priceSetId'];
+      $priceField->price_set_id = $this->getPriceSetID();
       $priceField->orderBy('weight');
       $priceField->find();
 
@@ -1256,7 +1261,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $params['separate_amount'] = $params['amount'];
     // @todo - stepping through the code indicates that amount is always set before this point so it never matters.
     // Move more of the above into this function...
-    $params['amount'] = $this->getMainContributionAmount($params);
+    $params['amount'] = $this->getMainContributionAmount();
     //If the membership & contribution is used in contribution page & not separate payment
     $memPresent = $membershipLabel = $fieldOption = NULL;
     $proceFieldAmount = 0;
@@ -1438,14 +1443,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Set form variables if contribution ID is found
    */
   public function assignFormVariablesByContributionID(): void {
-    $dummyTitle = 0;
-    foreach ($this->_paymentProcessors as $pp) {
-      if ($pp['class_name'] === 'Payment_Dummy') {
-        $dummyTitle = $pp['name'];
-        break;
-      }
-    }
-    $this->assign('dummyTitle', $dummyTitle);
+    $this->assign('isPaymentOnExistingContribution', (bool) $this->getExistingContributionID());
     $this->assign('pendingAmount', $this->getContributionBalance());
     if (empty($this->getExistingContributionID())) {
       return;
@@ -1457,8 +1455,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $lineItems = $this->getExistingContributionLineItems();
     $this->assign('lineItem', [$this->getPriceSetID() => $lineItems]);
-    $this->assign('is_quick_config', $this->isQuickConfig());
     $this->assign('priceSetID', $this->getPriceSetID());
+    $this->assign('is_quick_config', $this->isQuickConfig());
   }
 
   /**
@@ -1802,7 +1800,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       $dao = new CRM_Pledge_DAO_PledgeBlock();
       $dao->entity_table = 'civicrm_contribution_page';
-      $dao->entity_id = $pageID;
+      $dao->entity_id = $this->getContributionPageID();
       if ($dao->find(TRUE)) {
         CRM_Core_DAO::storeValues($dao, $pledgeBlock);
       }
@@ -1869,7 +1867,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             $this->assign('start_date_editable', FALSE);
             if (!empty($pledgeBlock['is_pledge_start_date_editable'])) {
               $this->assign('start_date_editable', TRUE);
-              if ($field == 'calendar_month') {
+              if ($field === 'calendar_month') {
                 $this->assign('is_date', FALSE);
                 $this->setDefaults(['start_date' => $value]);
               }

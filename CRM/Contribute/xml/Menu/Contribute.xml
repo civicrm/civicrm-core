@@ -201,7 +201,7 @@
     <weight>588</weight>
   </item>
   <item>
-    <path>civicrm/contribute/manage</path>
+    <path>civicrm/admin/contribute/manage</path>
     <title>Manage Contribution Pages</title>
     <page_callback>CRM_Contribute_Page_ContributionPage</page_callback>
     <access_arguments>administer CiviCRM,access CiviContribute</access_arguments>

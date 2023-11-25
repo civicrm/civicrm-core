@@ -129,54 +129,50 @@ class CRM_Afform_AfformScanner {
   }
 
   /**
-   * Get the effective metadata for a form.
+   * Get metadata and optionally the layout for a file-based Afform.
    *
    * @param string $name
    *   Ex: 'afformViewIndividual'
-   * @return array
-   *   An array with some mix of the following keys: name, title, description, server_route, requires, is_public.
-   *   NOTE: This is only data available in *.aff.json. It does *NOT* include layout.
-   *   Ex: [
-   *     'name' => 'afformViewIndividual',
-   *     'title' => 'View an individual contact',
-   *     'server_route' => 'civicrm/view-individual',
-   *     'requires' => ['afform'],
-   *   ]
+   * @param bool $getLayout
+   *   Whether to fetch 'layout' from the related html file.
+   * @return array|null
+   *   An array with some mix of the keys supported by getFields
+   * @see \Civi\Api4\Afform::getFields
    */
-  public function getMeta(string $name): ?array {
-    // FIXME error checking
-
-    $defaults = [
-      'requires' => [],
-      'title' => '',
-      'description' => '',
-      'is_public' => FALSE,
-      'permission' => ['access CiviCRM'],
-      'type' => 'system',
-    ];
+  public function getMeta(string $name, bool $getLayout = FALSE): ?array {
     $defn = [];
+    $mtime = NULL;
 
-    // If there is a local file it will be json - read from that first
     $jsonFile = $this->findFilePath($name, self::METADATA_JSON);
+    $htmlFile = $this->findFilePath($name, self::LAYOUT_FILE);
+
+    // Meta file can be either php or json format.
+    // Json takes priority because local overrides are always saved in that format.
     if ($jsonFile !== NULL) {
       $defn = json_decode(file_get_contents($jsonFile), 1);
+      $mtime = filemtime($jsonFile);
     }
     // Extensions may provide afform definitions in php files
     else {
       $phpFile = $this->findFilePath($name, self::METADATA_PHP);
       if ($phpFile !== NULL) {
         $defn = include $phpFile;
+        $mtime = filemtime($phpFile);
       }
     }
-    // A form must have at least a layout file (if no metadata file, just use defaults)
-    if (!$defn && !$this->findFilePath($name, self::LAYOUT_FILE)) {
+    if ($htmlFile !== NULL) {
+      $mtime = max($mtime, filemtime($htmlFile));
+      if ($getLayout) {
+        // If the defn file included a layout, the html file overrides
+        $defn['layout'] = file_get_contents($htmlFile);
+      }
+    }
+    // All 3 files don't exist!
+    elseif (!$defn) {
       return NULL;
     }
-    $defn = array_merge($defaults, $defn, ['name' => $name]);
-    // Previous revisions of GUI allowed permission==''. array_merge() doesn't catch all forms of missing-ness.
-    if (empty($defn['permission'])) {
-      $defn['permission'] = $defaults['permission'];
-    }
+    $defn['name'] = $name;
+    $defn['modified_date'] = date('Y-m-d H:i:s', $mtime);
     return $defn;
   }
 
@@ -198,13 +194,10 @@ class CRM_Afform_AfformScanner {
   }
 
   /**
-   * @param string $formName
-   *   Ex: 'view-individual'
-   * @return string|NULL
-   *   Ex: '<em>Hello world!</em>'
-   *   NULL if no layout exists
+   * @deprecated unused function
    */
   public function getLayout($formName) {
+    CRM_Core_Error::deprecatedFunctionWarning('APIv4');
     $filePath = $this->findFilePath($formName, self::LAYOUT_FILE);
     return $filePath === NULL ? NULL : file_get_contents($filePath);
   }
@@ -214,7 +207,7 @@ class CRM_Afform_AfformScanner {
    *
    * @return array
    *   A list of all forms, keyed by form name.
-   *   NOTE: This is only data available in metadata files. It does *NOT* include layout.
+   *   NOTE: This is only data available in *.aff.(json|php) files. It does *NOT* include layout.
    *   Ex: ['afformViewIndividual' => ['title' => 'View an individual contact', ...]]
    */
   public function getMetas(): array {

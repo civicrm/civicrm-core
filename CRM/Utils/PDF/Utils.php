@@ -121,8 +121,8 @@ class CRM_Utils_PDF_Utils {
   public static function _html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName) {
     $options = self::getDompdfOptions();
     $dompdf = new DOMPDF($options);
-    $dompdf->set_paper($paper_size, $orientation);
-    $dompdf->load_html($html);
+    $dompdf->setPaper($paper_size, $orientation);
+    $dompdf->loadHtml($html);
     $dompdf->render();
 
     if ($output) {
@@ -258,8 +258,35 @@ class CRM_Utils_PDF_Utils {
         $settings[$setting] = $value;
       }
     }
+
+    // core#4791 - Set cache dir to prevent files being generated in font dir
+    $cacheDir = self::getCacheDir($settings);
+    if ($cacheDir !== "") {
+      $settings['font_cache'] = $cacheDir;
+    }
     $options->set($settings);
     return $options;
+  }
+
+  /**
+   * Get location of cache folder.
+   *
+   * @param array $settings
+   * @return string
+   */
+  private static function getCacheDir(array $settings): string {
+    // Use subfolder of custom font dir if it is writable
+    if (isset($settings['font_dir']) && is_writable($settings['font_dir'])) {
+      $cacheDir = $settings['font_dir'] . DIRECTORY_SEPARATOR . 'font_cache';
+    }
+    else {
+      $cacheDir = Civi::paths()->getPath('[civicrm.files]/upload/font_cache');
+    }
+    // Try to create dir if it doesn't exist or return empty string
+    if ((!is_dir($cacheDir)) && (!mkdir($cacheDir))) {
+      $cacheDir = "";
+    }
+    return $cacheDir;
   }
 
 }

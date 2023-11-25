@@ -38,6 +38,11 @@
     <input crm-ui-select="{data: $ctrl.editor.securityModes}" ng-model="getSet('security')" ng-model-options="{getterSetter: true}" class="form-control">
   </div>
 </li>
+<li ng-if="$ctrl.fieldDefn.input_type === 'EntityRef'" title="{{:: ts('Allow a new entity to be created via quick-add popup') }}">
+  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <input crm-ui-select="{data: $ctrl.quickAddLinks, multiple: true, placeholder: ts('Quick Add')}" ng-model="getSet('input_attrs.quickAdd')" ng-model-options="{getterSetter: true}" ng-list class="form-control">
+  </div>
+</li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'EntityRef'">
   <a href ng-click="toggleAttr('input_attrs.autoOpen'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show autocomplete results without typing') }}">
     <i class="crm-i fa-{{ getProp('input_attrs.autoOpen') ? 'check-' : '' }}square-o"></i>
@@ -56,7 +61,15 @@
     {{:: ts('Default value') }}
   </a>
 </li>
-<li ng-if="$ctrl.hasDefaultValue">
+<li ng-if="$ctrl.fieldDefn.input_type === 'Date' && $ctrl.hasDefaultValue">
+  <div ng-click="setDefaultDateType(); $event.stopPropagation(); $event.target.blur();" class="af-gui-field-select-in-dropdown form-inline">
+    <select class="form-control" ng-model="getSet('default_date_type')" ng-model-options="{getterSetter: true}">
+      <option value="fixed">{{:: ts('Pick Date') }}</option>
+      <option value="now">{{:: ts('Now') }}</option>
+    </select>
+  </div>
+</li>
+<li ng-if="$ctrl.hasDefaultValue && $ctrl.defaultDateType !== 'now'">
   <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
     <input class="form-control" af-gui-field-value="$ctrl.fieldDefn" ng-model="getSet('afform_default')" ng-model-options="{getterSetter: true}" >
   </form>

@@ -23,6 +23,7 @@ class LoaderTest extends \CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_angularModules', [$this, 'hook_angularModules']);
     self::$dummy_callback_count = 0;
     $this->createLoggedInUser();
+    \Civi::container()->get('angular')->clear();
   }
 
   public function factoryScenarios() {

@@ -349,7 +349,7 @@ class Api4SelectQuery extends Api4Query {
       [$fieldExpr, $operator, $valueExpr, $isExpr] = array_pad((array) $condition, 4, NULL);
       if (in_array($operator, ['=', 'IN'], TRUE)) {
         // If flag is set then value must be parsed as an expression
-        if ($isExpr) {
+        if ($isExpr && is_string($valueExpr)) {
           $expr = SqlExpression::convert($valueExpr);
           $valueExpr = in_array($expr->getType(), ['SqlString', 'SqlNumber'], TRUE) ? $expr->getExpr() : NULL;
         }
@@ -833,9 +833,9 @@ class Api4SelectQuery extends Api4Query {
             return;
           }
         }
-        if ($link->isDeprecated()) {
+        if ($link->isDeprecatedBy()) {
           $deprecatedAlias = $link->getAlias();
-          \CRM_Core_Error::deprecatedWarning("Deprecated join alias '$deprecatedAlias' used in APIv4 get. Should be changed to '{$deprecatedAlias}_id'");
+          \CRM_Core_Error::deprecatedWarning("Deprecated join alias '$deprecatedAlias' used in APIv4 {$this->getEntity()} join to $joinEntity. Should be changed to '{$link->isDeprecatedBy()}'.");
         }
         $virtualField = $link->getSerialize();
         $baseTableAlias = $joinTreeNode['#table_alias'];

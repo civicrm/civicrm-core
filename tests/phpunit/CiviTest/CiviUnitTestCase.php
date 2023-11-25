@@ -1688,6 +1688,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->organizeOptionValues();
     CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviMember');
     // @fixme this parameter is leaking - it should not be defined as a class static
     // but for now we just handle in tear down.
     CRM_Contribute_BAO_Query::$_contribOrSoftCredit = 'only contribs';
@@ -2145,7 +2146,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return int $result['id'] payment processor id
    */
-  public function paymentProcessorCreate(array $params = [], $identifier = 'test'): int {
+  public function paymentProcessorCreate(array $params = [], string $identifier = 'test'): int {
     $params = array_merge([
       'title' => $params['name'] ?? 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
@@ -2982,6 +2983,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         break;
 
       case 'CRM_Contribute_Form_Contribution_Confirm':
+      case 'CRM_Contribute_Form_Contribution_ThankYou':
         $form->controller = new CRM_Contribute_Controller_Contribution();
         $form->controller->setStateMachine(new CRM_Contribute_StateMachine_Contribution($form->controller));
         // The submitted values are on the Main form.
@@ -3388,7 +3390,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       foreach ($items as $item) {
         $itemTotal += $item['amount'];
       }
-      $this->assertEquals($payment['total_amount'], $itemTotal);
+      $this->assertEquals(round((float) $payment['total_amount'], 2), round($itemTotal, 2));
     }
   }
 

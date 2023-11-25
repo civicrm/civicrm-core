@@ -1762,17 +1762,26 @@ class CRM_Utils_Token {
       'WorkFlowMessageTemplates' => [
         'contribution_invoice_receipt' => [
           '$display_name' => 'contact.display_name',
+          '$dataArray' => ts('found within $taxBreakDown'),
         ],
         'contribution_online_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
           '$first_name' => 'contact.first_name',
           '$last_name' => 'contact.last_name',
           '$displayName' => 'contact.display_name',
+          '$dataArray' => ts('found within $taxBreakDown'),
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
           'receipt_text_renewal' => 'receipt_text',
           '$isAmountZero' => ts('no longer available / relevant'),
+          '$dataArray' => ts('found within $taxBreakDown'),
+        ],
+        'membership_online_receipt' => [
+          '$dataArray' => ts('found within $taxBreakDown'),
+          '$mem_start_date' => 'membership.start_date',
+          '$mem_end_date' => 'membership.end_date',
+          '$mem_join_date' => 'membership.join_date',
         ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
@@ -1797,6 +1806,10 @@ class CRM_Utils_Token {
           '$trxn_id' => 'contribution.trxn_id',
           '$participant_status_id' => 'participant.status_id',
 
+        ],
+        'event_online_receipt' => [
+          '`$participant.id`' => 'participant.id',
+          '$dataArray' => ts('found within $taxBreakDown'),
         ],
         'pledge_acknowledgement' => [
           '$domain' => ts('no longer available / relevant'),

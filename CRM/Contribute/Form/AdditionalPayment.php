@@ -19,7 +19,6 @@
  * This form records additional payments needed when event/contribution is partially paid.
  */
 class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_AbstractEditPayment {
-  public $_contributeMode = 'direct';
 
   /**
    * Id of the component entity
@@ -85,11 +84,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_contributionId = $this->_id;
     }
 
-    $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, TRUE);
     $paymentAmt = $this->getAmountDue();
-
-    $this->_amtPaid = $paymentDetails['paid'];
-    $this->_amtTotal = $paymentDetails['total'];
 
     if ($paymentAmt >= 0) {
       $this->_owed = $paymentAmt;
@@ -325,7 +320,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     if ($this->_mode) {
       // process credit card
-      $this->assign('contributeMode', 'direct');
       $this->processCreditCard();
     }
 
@@ -393,10 +387,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_params['invoiceID'] = $this->_params['invoice_id'];
     }
 
-    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-      $this->_params,
-      $this->_bltID
-    ));
+    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
     //Add common data to formatted params
     $params = $this->_params;
@@ -468,11 +459,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if (!empty($params['contribution_id'])) {
       $this->_contributionId = $params['contribution_id'];
 
-      $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_contributionId, $entityType, FALSE, TRUE);
-
       $paymentAmount = $this->getAmountDue();
-      $this->_amtPaid = $paymentDetails['paid'];
-      $this->_amtTotal = $paymentDetails['total'];
 
       if ($paymentAmount > 0) {
         $this->_owed = $paymentAmount;

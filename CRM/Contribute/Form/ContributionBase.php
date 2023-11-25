@@ -23,6 +23,7 @@ use Civi\Api4\PriceSet;
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   use CRM_Financial_Form_FrontEndPaymentFormTrait;
   use CRM_Contribute_Form_ContributeFormTrait;
+  use CRM_Financial_Form_PaymentProcessorFormTrait;
 
   /**
    * The id of the contribution page that we are processing.
@@ -59,8 +60,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var array
    */
   public $_paymentProcessor;
-
-  public $_paymentObject = NULL;
 
   /**
    * Order object, used to calculate amounts, line items etc.
@@ -167,22 +166,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_action;
 
   /**
-   * Contribution mode.
-   *
-   * In general we are trying to deprecate this parameter but some templates and processors still
-   * require it to denote whether the processor redirects offsite (notify) or not.
-   *
-   * The intent is that this knowledge should not be required and all contributions should
-   * be created in a pending state and updated based on the payment result without needing to be
-   * aware of the processor workings.
-   *
-   * @var string
-   *
-   * @deprecated
-   */
-  public $_contributeMode;
-
-  /**
    * Contribution page supports memberships
    * @var bool
    */
@@ -242,6 +225,17 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public function isQuickConfig(): bool {
     return $this->getPriceSetID() && CRM_Price_BAO_PriceSet::isQuickConfig($this->getPriceSetID());
+  }
+
+  /**
+   * Is the form being submitted in test mode.
+   *
+   * @api this function is supported for external use.
+   *
+   * @return bool
+   */
+  public function isTest(): bool {
+    return (bool) ($this->getAction() & CRM_Core_Action::PREVIEW);
   }
 
   /**
@@ -322,46 +316,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_emailExists = $this->get('emailExists');
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
-    $this->getRenewalMembershipID();
 
     if ($this->getRenewalMembershipID()) {
-      $membership = new CRM_Member_DAO_Membership();
-      $membership->id = $this->getRenewalMembershipID();
-
-      if ($membership->find(TRUE)) {
-        $this->_defaultMemTypeId = $membership->membership_type_id;
-        if ($membership->contact_id != $this->_contactID) {
-          $validMembership = FALSE;
-          $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), NULL, NULL, 'Organization');
-          if (!empty($organizations) && array_key_exists($membership->contact_id, $organizations)) {
-            $this->_membershipContactID = $membership->contact_id;
-            $this->assign('membershipContactID', $this->_membershipContactID);
-            $this->assign('membershipContactName', $organizations[$this->_membershipContactID]['name']);
-            $validMembership = TRUE;
-          }
-          else {
-            $membershipType = new CRM_Member_BAO_MembershipType();
-            $membershipType->id = $membership->membership_type_id;
-            if ($membershipType->find(TRUE)) {
-              // CRM-14051 - membership_type.relationship_type_id is a CTRL-A padded string w one or more ID values.
-              // Convert to comma separated list.
-              $inheritedRelTypes = implode(',', CRM_Utils_Array::explodePadded($membershipType->relationship_type_id));
-              $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), $membershipType->relationship_type_id);
-              if (array_key_exists($membership->contact_id, $permContacts)) {
-                $this->_membershipContactID = $membership->contact_id;
-                $validMembership = TRUE;
-              }
-            }
-          }
-          if (!$validMembership) {
-            CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
-          }
-        }
-      }
-      else {
-        CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
-      }
-      unset($membership);
+      $this->defineRenewalMembership();
     }
 
     // we do not want to display recently viewed items, so turn off
@@ -382,9 +339,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // In tests price set id is not always set - it is unclear if this is just
     // poor test set up or it is possible in 'the real world'
     if ($this->getPriceSetID()) {
-      $this->order = new CRM_Financial_BAO_Order();
-      $this->order->setPriceSetID($this->getPriceSetID());
-      $this->order->setIsExcludeExpiredFields(TRUE);
+      $this->initializeOrder();
     }
     else {
       CRM_Core_Error::deprecatedFunctionWarning('forms require a price set ID');
@@ -511,8 +466,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // on every form, rather than being passed from form to form.
     $this->set('amount_block_is_active', $this->isFormSupportsNonMembershipContributions());
 
-    $this->_contributeMode = $this->get('contributeMode');
-
     //assigning is_monetary and is_email_receipt to template
     $this->assign('is_monetary', $this->_values['is_monetary']);
     $this->assign('is_email_receipt', $this->_values['is_email_receipt']);
@@ -546,6 +499,118 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->_isBillingAddressRequiredForPayLater = $this->_values['is_billing_required'] ?? NULL;
       $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
     }
+  }
+
+  /**
+   * Set the selected line items.
+   *
+   * This returns all selected line items, even if they will
+   * be split to a secondary contribution.
+   *
+   * @api Supported for external use.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getLineItems(): array {
+    return $this->order->getLineItems();
+  }
+
+  /**
+   * Set the selected line items.
+   *
+   * This returns all selected line items, even if they will
+   * be split to a secondary contribution.
+   *
+   * @api Supported for external use.
+   */
+  public function setLineItems($lineItems): void {
+    $this->order->setLineItems($lineItems);
+    $this->set('_lineItem', $lineItems);
+  }
+
+  /**
+   * Set the selected line items.
+   *
+   * @internal
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMainContributionLineItems(): array {
+    $membershipLineItems = $this->getSecondaryMembershipContributionLineItems();
+    $allLineItems = $this->getOrder()->getLineItems();
+    if (!$membershipLineItems || $allLineItems === $membershipLineItems) {
+      return $allLineItems;
+    }
+    $mainContributionLineItems = [];
+    foreach ($allLineItems as $index => $lineItem) {
+      if (empty($lineItem['membership_type_id'])) {
+        $mainContributionLineItems[$index] = $lineItem;
+      }
+    }
+    return $mainContributionLineItems;
+  }
+
+  /**
+   * Is the form separate payment AND has the user selected 2 options,
+   * resulting in 2 payments.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function isSeparatePaymentSelected(): bool {
+    return (bool) $this->getSecondaryMembershipContributionLineItems();
+  }
+
+  /**
+   * Set the line items for the secondary membership contribution.
+   *
+   * Return false if the page is not configured for separate contributions,
+   * or if only the membership or the contribution has been selected.
+   *
+   * @internal
+   *
+   * @return array|false
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getSecondaryMembershipContributionLineItems() {
+    if (!$this->isSeparateMembershipPayment()) {
+      return FALSE;
+    }
+    $lineItems = [];
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      if (!empty($lineItem['membership_type_id'])) {
+        $lineItems[$index] = $lineItem;
+      }
+    }
+    if (empty($lineItems) || count($lineItems) === count($this->getLineItems())) {
+      return FALSE;
+    }
+    return $lineItems;
+  }
+
+  /**
+   * Get membership line items.
+   *
+   * Get all line items relating to membership, regardless of primary or secondary membership.
+   *
+   * @internal
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMembershipLineItems(): array {
+    $lineItems = [];
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      if (!empty($lineItem['membership_type_id'])) {
+        $lineItems[$index] = $lineItem;
+      }
+    }
+    return $lineItems;
   }
 
   /**
@@ -666,10 +731,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
 
-    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-      $this->_params,
-      $this->_bltID
-    ));
+    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
     if (!empty($this->_params['onbehalf_profile_id']) && !empty($this->_params['onbehalf'])) {
       $this->assign('onBehalfName', $this->_params['organization_name']);
@@ -869,8 +931,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // The concept of contributeMode is deprecated.
     // The payment processor object can provide info about the fields it shows.
-    if ($isMonetary && $this->_paymentProcessor['object'] instanceof \CRM_Core_Payment) {
-      $paymentProcessorObject = $this->_paymentProcessor['object'];
+    if ($isMonetary) {
+      $paymentProcessorObject = $this->getPaymentProcessorObject();
       $this->assign('paymentAgreementTitle', $paymentProcessorObject->getText('agreementTitle', []));
       $this->assign('paymentAgreementText', $paymentProcessorObject->getText('agreementText', []));
       $paymentFields = $paymentProcessorObject->getPaymentFormFields();
@@ -1056,39 +1118,22 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Get the payment processor object for the submission, returning the manual one for offline payments.
-   *
-   * @return CRM_Core_Payment
-   */
-  protected function getPaymentProcessorObject() {
-    if (!empty($this->_paymentProcessor)) {
-      return $this->_paymentProcessor['object'];
-    }
-    return new CRM_Core_Payment_Manual();
-  }
-
-  /**
    * Get the amount for the main contribution.
-   *
-   * The goal is to expand this function so that all the argy-bargy of figuring out the amount
-   * winds up here as the main spaghetti shrinks.
    *
    * If there is a separate membership contribution this is the 'other one'. Otherwise there
    * is only one.
-   *
-   * @param $params
    *
    * @return float
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getMainContributionAmount($params) {
-    if (!empty($params['selectMembership'])) {
-      if (empty($params['amount']) && !$this->_separateMembershipPayment) {
-        return CRM_Member_BAO_MembershipType::getMembershipType($params['selectMembership'])['minimum_fee'] ?? 0;
-      }
+  protected function getMainContributionAmount(): float {
+    $amount = 0;
+    foreach ($this->getMainContributionLineItems() as $lineItem) {
+      // Line total inclusive should really be always set but this is a safe fall back.
+      $amount += $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
     }
-    return $params['amount'] ?? 0;
+    return $amount;
   }
 
   /**
@@ -1243,6 +1288,48 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Get the submitted value, accessing it from whatever form in the flow it is
+   * submitted on.
+   *
+   * @param string $fieldName
+   *
+   * @return mixed|null
+   */
+  public function getSubmittedValue(string $fieldName) {
+    $value = $this->controller->exportValue('Main', $fieldName);
+    if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
+      return CRM_Utils_Rule::cleanMoney($value);
+    }
+
+    // Numeric fields are not in submittableMoneyFields (for now)
+    $fieldRules = $this->_rules[$fieldName] ?? [];
+    foreach ($fieldRules as $rule) {
+      if ('money' === $rule['type']) {
+        return CRM_Utils_Rule::cleanMoney($value);
+      }
+    }
+    return $value;
+  }
+
+  /**
+   * Get the fields that can be submitted in this form flow.
+   *
+   * This is overridden to make the fields submitted on the first
+   * form (Contribution_Main) available from the others in the same flow
+   * (Contribution_Confirm, Contribution_ThankYou).
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return string[]
+   */
+  protected function getSubmittableFields(): array {
+    $fieldNames = array_keys($this->controller->exportValues('Main'));
+    return array_fill_keys($fieldNames, $this->_name);
+  }
+
+  /**
    * @return array
    */
   protected function getExistingContributionLineItems(): array {
@@ -1284,6 +1371,71 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       return $this->_contributionID;
     }
     return NULL;
+  }
+
+  protected function getOrder(): CRM_Financial_BAO_Order {
+    if (!$this->order) {
+      $this->initializeOrder();
+    }
+    return $this->order;
+  }
+
+  protected function initializeOrder(): void {
+    $this->order = new CRM_Financial_BAO_Order();
+    $this->order->setPriceSetID($this->getPriceSetID());
+    $this->order->setIsExcludeExpiredFields(TRUE);
+    if ($this->get('lineItem')) {
+      $this->order->setLineItems($this->get('lineItem')[$this->getPriceSetID()]);
+    }
+    if ($this->getExistingContributionID()) {
+      $this->order->setTemplateContributionID($this->getExistingContributionID());
+    }
+    $this->order->setForm($this);
+    foreach ($this->getPriceFieldMetaData() as $priceField) {
+      if ($priceField['html_type'] === 'Text') {
+        $this->submittableMoneyFields[] = 'price_' . $priceField['id'];
+      }
+    }
+    $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
+  }
+
+  protected function defineRenewalMembership(): void {
+    $membership = new CRM_Member_DAO_Membership();
+    $membership->id = $this->getRenewalMembershipID();
+
+    if ($membership->find(TRUE)) {
+      $this->_defaultMemTypeId = $membership->membership_type_id;
+      if ($membership->contact_id != $this->_contactID) {
+        $validMembership = FALSE;
+        $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), NULL, NULL, 'Organization');
+        if (!empty($organizations) && array_key_exists($membership->contact_id, $organizations)) {
+          $this->_membershipContactID = $membership->contact_id;
+          $this->assign('membershipContactID', $this->_membershipContactID);
+          $this->assign('membershipContactName', $organizations[$this->_membershipContactID]['name']);
+          $validMembership = TRUE;
+        }
+        else {
+          $membershipType = new CRM_Member_BAO_MembershipType();
+          $membershipType->id = $membership->membership_type_id;
+          if ($membershipType->find(TRUE)) {
+            // CRM-14051 - membership_type.relationship_type_id is a CTRL-A padded string w one or more ID values.
+            // Convert to comma separated list.
+            $inheritedRelTypes = implode(',', CRM_Utils_Array::explodePadded($membershipType->relationship_type_id));
+            $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), $membershipType->relationship_type_id);
+            if (array_key_exists($membership->contact_id, $permContacts)) {
+              $this->_membershipContactID = $membership->contact_id;
+              $validMembership = TRUE;
+            }
+          }
+        }
+        if (!$validMembership) {
+          CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
+        }
+      }
+    }
+    else {
+      CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
+    }
   }
 
 }

@@ -59,6 +59,11 @@ return [
                 '=',
                 '"Added"',
               ],
+              [
+                'Group_GroupContact_Contact_01.is_deleted',
+                '=',
+                FALSE,
+              ],
             ],
           ],
           'having' => [],
@@ -225,7 +230,7 @@ return [
                   'target' => 'crm-popup',
                 ],
               ],
-              'type' => 'links',
+              'type' => 'buttons',
               'alignment' => 'text-right',
             ],
             [
@@ -258,7 +263,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Remove Group'),
+                  'text' => E::ts('Delete'),
                   'style' => 'danger',
                   'path' => '',
                   'condition' => [],
@@ -268,7 +273,7 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'actions' => FALSE,
+          'actions' => TRUE,
           'classes' => [
             'table',
             'table-striped',

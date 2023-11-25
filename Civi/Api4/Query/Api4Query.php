@@ -404,7 +404,7 @@ abstract class Api4Query {
     }
 
     if ($operator == 'REGEXP' || $operator == 'NOT REGEXP' || $operator == 'REGEXP BINARY' || $operator == 'NOT REGEXP BINARY') {
-      return sprintf('%s %s "%s"', $fieldAlias, $operator, \CRM_Core_DAO::escapeString($value));
+      return sprintf('%s %s "%s"', (str_ends_with($operator, 'BINARY') ? 'CAST(' . $fieldAlias . ' AS BINARY)' : $fieldAlias), $operator, \CRM_Core_DAO::escapeString($value));
     }
 
     if (!$value && ($operator === 'IN' || $operator === 'NOT IN')) {

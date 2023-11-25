@@ -37,10 +37,6 @@
 
     <div class="clear"></div>
 
-    {if $localTasks}
-        {include file="CRM/common/localNav.tpl"}
-    {/if}
-
     <div id="crm-main-content-wrapper">
       {include file="CRM/common/status.tpl"}
       {crmRegion name='page-body'}

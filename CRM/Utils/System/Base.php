@@ -108,12 +108,12 @@ abstract class CRM_Utils_System_Base {
    *   The url to post the form.
    */
   public function postURL($action) {
-    $config = CRM_Core_Config::singleton();
     if (!empty($action)) {
       return $action;
     }
 
-    return $this->url(CRM_Utils_Array::value($config->userFrameworkURLVar, $_GET),
+    $current_path = CRM_Utils_System::currentPath();
+    return $this->url($current_path,
       NULL, TRUE, NULL, FALSE
     );
   }

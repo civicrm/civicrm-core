@@ -129,7 +129,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     // Relationship section
     // FIXME - this used to share code with the contact summary "Relationships" tab
     // now that tab has been switched to use SearchKit, and this ought to be switched as well;
-    // then remove all code commented with "DELETEME only-used-by-user-dashboard"
+    // then remove all code commented with "only-used-by-user-dashboard"
     if (!empty($dashboardOptions['Permissioned Orgs']) && CRM_Core_Permission::check('view my contact')) {
       $columnHeaders = CRM_Contact_BAO_Relationship::getColumnHeaders();
       $contactRelationships = $selector = NULL;

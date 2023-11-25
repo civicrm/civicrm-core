@@ -82,6 +82,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   protected $_contextMenu;
 
   /**
+   * The search context
+   *
+   * @var string
+   */
+  public $_context;
+
+  /**
    * Params is the array in a value used by the search query creator
    *
    * @var array

@@ -793,13 +793,20 @@ WHERE  id = %1";
         // Add in visibility because Smarty templates expect it and it is hard to adjust them to colon format.
         $field['visibility'] = $field['visibility_id:name'];
       }
+      $select = ['*', 'visibility_id:name'];
+      if (CRM_Core_Component::isEnabled('CiviMember')) {
+        $select[] = 'membership_type_id.name';
+      }
       $options = PriceFieldValue::get(FALSE)
         ->addWhere('price_field_id', 'IN', array_keys($data['fields']))
-        ->addSelect('*', 'membership_type_id.name', 'visibility_id:name')
+        ->setSelect($select)
         ->execute();
+      $taxRates = CRM_Core_PseudoConstant::getTaxRates();
       foreach ($options as $option) {
         // Add in visibility because Smarty templates expect it and it is hard to adjust them to colon format.
         $option['visibility'] = $option['visibility_id:name'];
+        $option['tax_rate'] = (float) ($taxRates[$option['financial_type_id']] ?? 0);
+        $option['tax_amount'] = (float) ($option['tax_rate'] ? CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($option['amount'], $option['tax_rate'])['tax_amount'] : 0);
         $data['fields'][$option['price_field_id']]['options'][$option['id']] = $option;
       }
       $cache->set($cacheKey, $data);

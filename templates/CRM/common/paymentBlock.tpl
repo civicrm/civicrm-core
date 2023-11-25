@@ -52,8 +52,7 @@
    */
   function skipPaymentMethod() {
     var isHide = false;
-    var isMultiple = {/literal}{$event.is_multiple_registrations|@json_encode}{literal};
-    var alwaysShowFlag = (isMultiple && cj("#additional_participants").val());
+    var alwaysShowFlag = (cj("#additional_participants").val());
     var alwaysHideFlag = (cj("#bypass_payment").val() == 1);
     var total_amount_tmp =  cj('#pricevalue').data('raw-total');
     // Hide billing questions if this is free

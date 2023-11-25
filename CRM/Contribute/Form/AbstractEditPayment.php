@@ -71,13 +71,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $_paymentProcessors = [];
 
   /**
-   * Instance of the payment processor object.
-   *
-   * @var CRM_Core_Payment
-   */
-  protected $_paymentObject;
-
-  /**
    * Entity that $this->_id relates to.
    *
    * If set the contact id is not required in the url.
@@ -159,8 +152,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @var array
    */
   public $_pledgeValues;
-
-  public $_contributeMode = 'direct';
 
   public $_context;
 

@@ -282,16 +282,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $amountDue = ($input['amount'] - $amountPaid);
 
       // retrieving the subtotal and sum of same tax_rate
-      $dataArray = [];
       $subTotal = 0;
       $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionID);
       foreach ($lineItem as $taxRate) {
-        if (isset($dataArray[(string) $taxRate['tax_rate']])) {
-          $dataArray[(string) $taxRate['tax_rate']] = $dataArray[(string) $taxRate['tax_rate']] + ($taxRate['tax_amount'] ?? 0);
-        }
-        else {
-          $dataArray[(string) $taxRate['tax_rate']] = $taxRate['tax_amount'] ?? NULL;
-        }
         $subTotal += $taxRate['subTotal'] ?? 0;
       }
 
@@ -385,8 +378,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'notes' => $invoiceNotes,
         // @todo not used in shipped template from 5.53
         'lineItem' => $lineItem,
-        // @todo not used in shipped template from 5.53
-        'dataArray' => $dataArray,
         // @todo not used in shipped template from 5.52
         'refundedStatusId' => $refundedStatusId,
         // @todo not used in shipped template from 5.52

@@ -21,6 +21,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   use CRM_Financial_Form_FrontEndPaymentFormTrait;
   use CRM_Event_Form_EventFormTrait;
+  use CRM_Financial_Form_PaymentProcessorFormTrait;
 
   /**
    * The id of the event we are processing.
@@ -379,12 +380,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
       CRM_Utils_System::redirect($url);
     }
-    // The concept of contributeMode is deprecated.
-    $this->_contributeMode = $this->get('contributeMode');
-    $this->assign('contributeMode', $this->_contributeMode);
 
-    $this->assign('paidEvent', $this->_values['event']['is_monetary']);
-
+    $this->assign('paidEvent', $this->getEventValue('is_monetary'));
     // we do not want to display recently viewed items on Registration pages
     $this->assign('displayRecent', FALSE);
 
@@ -471,7 +468,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
 
-    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params, $this->_bltID));
+    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params));
 
     if ($this->getSubmittedValue('credit_card_number')) {
       if (isset($params['credit_card_exp_date'])) {
@@ -503,8 +500,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param string $name
    */
   public function buildCustom($id, $name) {
+    if ($name === 'customPost') {
+      $this->assign('postPageProfiles', []);
+    }
+    $this->assign($name, []);
     if (!$id) {
-      $this->assign($name, []);
       return;
     }
 
@@ -563,6 +563,16 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     ) {
       CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
     }
+    if ($name === 'customPost') {
+      $postPageProfiles = [];
+      foreach ($fields as $fieldName => $field) {
+        $postPageProfiles[$field['groupName']][$fieldName] = $field;
+      }
+      $this->assign('postPageProfiles', $postPageProfiles);
+    }
+    // We still assign the customPost in the way we used to because we haven't ruled out being
+    // used after the register form - but in the register form it is overwritten by a for-each
+    // with the smarty code.
     $this->assign($name, $fields);
     if (is_array($fields)) {
       $button = substr($this->controller->getButtonName(), -4);
@@ -1580,10 +1590,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->set('participantInfo', $this->_participantInfo);
     }
 
-    //send mail Confirmation/Receipt
-    if ($this->_contributeMode != 'checkout' ||
-      $this->_contributeMode != 'notify'
+    if ($this->getPaymentProcessorObject()->supports('noReturn')
     ) {
+      // Send mail Confirmation/Receipt.
       $this->sendMails($params, $registerByID, $participantCount);
     }
   }

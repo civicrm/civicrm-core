@@ -227,7 +227,9 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   }
 
   /**
-   * DELETEME only-used-by-user-dashboard
+   * @deprecated since 5.68. Will be removed around 5.74.
+   *
+   * Only-used-by-user-dashboard.
    *
    * @return array
    *   (reference) of action links

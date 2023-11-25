@@ -44,6 +44,28 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test mail does not have calendar links if 'is_show_calendar_links = FALSE'
+   */
+  public function testNoCalendarLinks() : void {
+    $this->submitPaidEvent(['is_show_calendar_links' => FALSE]);
+    $this->assertSentMailNotHasStrings([
+      'Download iCalendar entry for this event',
+      'Add event to Google Calendar',
+      'civicrm/event/ical',
+    ]);
+  }
+
+  public function assertSentMailNotHasStrings(array $strings): void {
+    foreach ($strings as $string) {
+      $this->assertSentMailNotHasString($string);
+    }
+  }
+
+  public function assertSentMailNotHasString(string $string): void {
+    $this->assertStringNotContainsString($string, $this->sentMail[0]);
+  }
+
+  /**
    * Initial test of submit function for paid event.
    *
    * @param string $thousandSeparator
@@ -557,12 +579,13 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   /**
    * Submit a paid event with some default values.
    *
+   * @param array $eventParams
    * @param array $submitValues
    */
-  protected function submitPaidEvent(array $submitValues = []): void {
+  protected function submitPaidEvent(array $eventParams = [], array $submitValues = []): void {
     $mailUtil = new CiviMailUtils($this, TRUE);
     $this->dummyProcessorCreate();
-    $event = $this->eventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']], 'confirm_email_text' => '', 'is_pay_later' => FALSE, 'start_date' => '2022-09-16 12:00', 'end_date' => '2022-09-17 12:00']);
+    $event = $this->eventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']], 'confirm_email_text' => '', 'is_pay_later' => FALSE, 'start_date' => '2022-09-16 12:00', 'end_date' => '2022-09-17 12:00'] + $eventParams);
     $this->submitForm($event['id'], array_merge([
       'email-Primary' => 'demo@example.com',
       'credit_card_number' => '4111111111111111',

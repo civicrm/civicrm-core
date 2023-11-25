@@ -56,7 +56,7 @@ return [
         'saved_search_id.name' => 'Administer_Financial_Accounts',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -184,7 +184,8 @@ return [
                   'condition' => ['is_reserved', '=', FALSE],
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
+              'icon' => 'fa-bars',
               'alignment' => 'text-right',
             ],
           ],

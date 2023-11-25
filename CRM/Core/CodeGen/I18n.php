@@ -19,7 +19,13 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
     for ($i = 0; $i < count($matches[0]); $i++) {
       $langs[$matches[1][$i]] = $matches[2][$i];
     }
+    // @todo Somewhere in 2024 or beyond, deprecate the old installer
     file_put_contents('../install/langs.php', "<?php \$langs = " . var_export($langs, TRUE) . ";");
+
+    // The `Template` helper provides PHP code cleanup.
+    $tpl = new CRM_Core_CodeGen_Util_Template('php');
+    $tpl->assign('langs', var_export($langs, TRUE));
+    $tpl->run('languages_setup.tpl', '../setup/res/languages.php');
   }
 
   public function generateSchemaStructure(): void {

@@ -78,7 +78,7 @@ class Joinable {
   /**
    * @var bool
    */
-  protected $deprecated = FALSE;
+  protected $deprecatedBy = FALSE;
 
   /**
    * @param $targetTable
@@ -282,17 +282,16 @@ class Joinable {
   /**
    * @return bool
    */
-  public function isDeprecated() {
-    return $this->deprecated;
+  public function isDeprecatedBy() {
+    return $this->deprecatedBy;
   }
 
   /**
-   * @param bool $deprecated
-   *
+   * @param string|null $deprecatedBy
    * @return $this
    */
-  public function setDeprecated(bool $deprecated = TRUE) {
-    $this->deprecated = $deprecated;
+  public function setDeprecatedBy(string $deprecatedBy = NULL) {
+    $this->deprecatedBy = $deprecatedBy ?? $this->alias . '_id';
     return $this;
   }
 

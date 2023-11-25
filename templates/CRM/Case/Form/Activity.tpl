@@ -14,10 +14,8 @@
   <div class="messages status no-popup">
     <i class="crm-i fa-info-circle" aria-hidden="true"></i> &nbsp;
     {if $action eq 8}
-      {* activityTypeName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label) *}
       {ts 1=$activityTypeNameAndLabel.displayLabel|escape}Click Delete to move this &quot;%1&quot; activity to the Trash.{/ts}
     {else}
-      {* activityTypeName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label) *}
       {ts 1=$activityTypeNameAndLabel.displayLabel|escape}Click Restore to retrieve this &quot;%1&quot; activity from the Trash.{/ts}
     {/if}
   </div><br />
@@ -89,8 +87,7 @@
 
                 <tr class="crm-case-activity-form-block-activityTypeName">
                   <td class="label">{ts}Activity Type{/ts}</td>
-                  {* activityTypeName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label) *}
-                  <td class="view-value bold">{$activityTypeNameAndLabel.label|escape}</td>
+                  <td class="view-value bold">{$activityTypeNameAndLabel.displayLabel|escape}</td>
                 </tr>
                 <tr class="crm-case-activity-form-block-source_contact_id">
                   <td class="label">{$form.source_contact_id.label}</td>

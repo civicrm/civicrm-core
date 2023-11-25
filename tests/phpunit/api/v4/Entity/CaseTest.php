@@ -257,10 +257,11 @@ class CaseTest extends Api4TestBase {
     $this->assertCount(1, $result);
     $this->assertEquals($case1, $result[0]);
 
-    // CiviCase permission for all  cases
+    // CiviCase permission for all contacts and cases
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'access CiviCRM',
       'view all contacts',
+      'access deleted contacts',
       'access all cases and activities',
       'administer CiviCase',
     ];

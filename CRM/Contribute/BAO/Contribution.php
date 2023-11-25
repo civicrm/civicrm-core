@@ -1064,6 +1064,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       if ($paidByName === 'Check') {
         $val['check_number'] = $resultDAO->check_number;
       }
+      else {
+        $val['check_number'] = NULL;
+      }
       $rows[] = $val;
     }
     return $rows;
@@ -2629,16 +2632,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         foreach ($this->_relatedObjects['membership'] as $membership) {
           if ($membership->id) {
             $values['membership_id'] = $membership->id;
-            $values['isMembership'] = TRUE;
-            $values['membership_assign'] = TRUE;
-
             // need to set the membership values here
             $template->assign('membership_name',
               CRM_Member_PseudoConstant::membershipType($membership->membership_type_id)
             );
-            $template->assign('mem_start_date', $membership->start_date);
-            $template->assign('mem_join_date', $membership->join_date);
-            $template->assign('mem_end_date', $membership->end_date);
             $membership_status = CRM_Member_PseudoConstant::membershipStatus($membership->status_id, NULL, 'label');
             $template->assign('mem_status', $membership_status);
             if ($membership_status === 'Pending' && $membership->is_pay_later == 1) {
@@ -4135,13 +4132,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * settings we will live with an inconsistency because it's too hard to change for now.
    * https://github.com/civicrm/civicrm-core/pull/8562#issuecomment-227874245
    *
-   *
    * @param string $name
    *
    * @return string
    *
+   * @deprecated since 5.68 will be removed around 5.74.
    */
   public static function checkContributeSettings($name) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use \Civi::settings()->get() with the actual setting name');
     $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
     return $contributeSettings[$name] ?? NULL;
   }

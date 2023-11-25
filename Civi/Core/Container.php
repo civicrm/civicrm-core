@@ -427,7 +427,14 @@ class Container {
    * @return \Civi\Angular\Manager
    */
   public function createAngularManager() {
-    return new \Civi\Angular\Manager(\CRM_Core_Resources::singleton());
+    $moduleEnvId = md5(\CRM_Core_Config_Runtime::getId());
+    $angCache = \CRM_Utils_Cache::create([
+      'name' => substr('angular_' . $moduleEnvId, 0, 32),
+      'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
+      'withArray' => 'fast',
+      'prefetch' => TRUE,
+    ]);
+    return new \Civi\Angular\Manager(\CRM_Core_Resources::singleton(), $angCache);
   }
 
   /**

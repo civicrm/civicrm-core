@@ -1,9 +1,11 @@
 <?php
 
+use Civi\Api4\ContributionPage;
 use Civi\Api4\MembershipType;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
+use Civi\Api4\PriceSetEntity;
 use Civi\Api4\WorkflowMessage;
 use Civi\Test;
 use Civi\WorkflowMessage\GenericWorkflowMessage;
@@ -15,6 +17,10 @@ use Civi\WorkflowMessage\WorkflowMessageExample;
  * @noinspection PhpUnused
  */
 class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageExample {
+
+  private $priceSets;
+
+  private $contributionPages;
 
   /**
    * Get the examples this class is able to deliver.
@@ -35,15 +41,23 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
 
     foreach ($workflows as $workflow) {
       foreach ($priceSets as $priceSet) {
+        if (!$priceSet['contribution_page_id'] && $workflow === 'membership_online_receipt' & count($priceSets) > 1) {
+          // Generally the online receipt is used with a contribution page so lets' focus
+          // on those examples for it - unless none exist. It could also be used
+          // on other contributions via the send receipt method so we do want to show it if
+          // there are not better examples.
+          continue;
+        }
         yield [
           'name' => 'workflow/' . $workflow . '/' . strtolower($membershipType['name']) . '_' . strtolower($priceSet['name']) . '_' . strtolower($defaultCurrency),
-          'title' => $priceSet['title'] . ' - ' . $membershipType['name'] . ' : ' . $defaultCurrency,
+          'title' => ($priceSet['contribution_page_id'] ? $this->getContributionPage($priceSet['contribution_page_id'])['title'] : $priceSet['title']) . ' - ' . $membershipType['name'] . ' : ' . $defaultCurrency,
           'tags' => ['preview'],
           'workflow' => $workflow,
           'membership_type' => $membershipType,
           'currency' => $defaultCurrency,
           'price_set_id' => $priceSet['id'],
-          'is_show_line_items' => !$priceSets['is_quick_config'],
+          'contribution_page_id' => $priceSet['contribution_page_id'],
+          'is_show_line_items' => !$priceSet['is_quick_config'],
         ];
       }
     }
@@ -96,11 +110,17 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
       'fee_amount' => .99,
       'net_amount' => $example['membership_type']['minimum_amount'] - .99,
       'currency' => $example['currency'],
+      'contribution_page_id' => $example['contribution_page_id'],
       'trxn_id' => 123,
       'invoice_id' => 'I-123',
       'contribution_status_id:name' => 'Completed',
       'contribution_status_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
     ];
+    if ($example['contribution_page_id']) {
+      foreach ($this->getContributionPage($example['contribution_page_id']) as $pageKey => $pageValue) {
+        $contribution['contribution_page_id.' . $pageKey] = $pageValue;
+      }
+    }
     $contribution['contribution_status_id:label'] = \CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']);
 
     if (isset($example['contribution_params'])) {
@@ -145,10 +165,23 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
    * @throws \CRM_Core_Exception
    */
   private function getPriceSet(): ?array {
-    return (array) PriceSet::get(FALSE)
-      ->addWhere('extends', '=', CRM_Core_Component::getComponentID('CiviMember'))
-      ->addOrderBy('is_quick_config', 'DESC')
-      ->execute()->indexBy('id');
+    if (!$this->priceSets) {
+      $priceSets = (array) PriceSet::get(FALSE)
+        ->addWhere('extends:name', 'CONTAINS', 'CiviMember')
+        ->addOrderBy('is_quick_config', 'DESC')
+        ->execute()->indexBy('id');
+      $priceSetEntities = PriceSetEntity::get(FALSE)
+        ->addWhere('price_set_id', 'IN', array_keys($priceSets))
+        ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+        ->addOrderBy('entity_id')
+        ->addSelect('price_set_id', 'entity_id')
+        ->execute();
+      foreach ($priceSetEntities as $priceSetEntity) {
+        $priceSets[$priceSetEntity['price_set_id']]['contribution_page_id'] = $priceSetEntity['entity_id'];
+      }
+      $this->priceSets = $priceSets;
+    }
+    return $this->priceSets;
   }
 
   /**
@@ -176,6 +209,23 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
       $lineItem['membership'] = ['start_date' => $membership['start_date'], 'end_date' => $membership['end_date']];
     }
     $mockOrder->setLineItem($lineItem, $index);
+  }
+
+  /**
+   * @param int $id
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function getContributionPage(int $id): array {
+    if (!isset($this->contributionPages[$id])) {
+      $this->contributionPages[$id] = ContributionPage::get(FALSE)
+        ->addWhere('id', '=', $id)
+        ->execute()->first();
+    }
+    return $this->contributionPages[$id];
   }
 
 }

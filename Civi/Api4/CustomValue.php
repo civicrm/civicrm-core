@@ -29,6 +29,17 @@ class CustomValue {
   /**
    * @param string $customGroup
    * @param bool $checkPermissions
+   * @return \Civi\Api4\Generic\AutocompleteAction
+   * @throws \API_Exception
+   */
+  public static function autocomplete(string $customGroup, $checkPermissions = TRUE) {
+    return (new \Civi\Api4\Generic\AutocompleteAction("Custom_$customGroup", __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Get
    * @throws \CRM_Core_Exception
    */

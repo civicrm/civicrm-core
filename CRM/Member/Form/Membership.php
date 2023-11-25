@@ -29,8 +29,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public $_mode;
 
-  public $_contributeMode = 'direct';
-
   protected $_memTypeSelected;
 
   /**
@@ -1255,21 +1253,6 @@ DESC limit 1");
           $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
         }
       }
-      if (Civi::settings()->get('invoicing')) {
-        $dataArray = [];
-        foreach ($lineItem[$this->_priceSetId] as $value) {
-          if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
-            if (isset($dataArray[$value['tax_rate']])) {
-              $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
-            }
-            else {
-              $dataArray[$value['tax_rate']] = $value['tax_amount'] ?? NULL;
-            }
-          }
-        }
-
-        $this->assign('dataArray', $dataArray);
-      }
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
@@ -1510,10 +1493,7 @@ DESC limit 1");
 
     if ($this->_mode) {
       // @todo move this outside shared code as Batch entry just doesn't
-      $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-        $this->_params,
-        $this->_bltID
-      ));
+      $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
       $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);

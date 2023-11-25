@@ -60,6 +60,17 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
+   * Whitelist of possible values for the entity_table field
+   *
+   * @return array
+   */
+  public static function entityTables(): array {
+    return [
+      'civicrm_contribution_page' => ts('Contribution Page'),
+    ];
+  }
+
+  /**
    * Build Premium Block im Contribution Pages.
    *
    * @param CRM_Core_Form $form
@@ -112,9 +123,9 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
             }
           }
           else {
+            // Why? should we not skip if not found?
             CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
           }
-          $products[$productDAO->id] += ['thumbnail' => '', 'image' => ''];
         }
         $options = $temp = [];
         $temp = explode(',', $productDAO->options);

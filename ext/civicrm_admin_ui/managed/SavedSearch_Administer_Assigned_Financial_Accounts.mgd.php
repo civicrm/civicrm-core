@@ -64,7 +64,7 @@ return [
         'saved_search_id.name' => 'Administer_Assigned_Financial_Accounts',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -152,7 +152,8 @@ return [
                   'target' => 'crm-popup',
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
+              'icon' => 'fa-bars',
               'alignment' => 'text-right',
             ],
           ],

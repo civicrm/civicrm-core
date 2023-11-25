@@ -947,6 +947,9 @@ class CRM_Financial_BAO_Order {
       elseif ($taxRate) {
         $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
       }
+      if (!empty($lineItem['membership_type_id'])) {
+        $lineItem['entity_table'] = 'civicrm_membership';
+      }
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
       $lineItem['line_total_inclusive'] = $lineItem['line_total'] + $lineItem['tax_amount'];
     }
@@ -1119,6 +1122,18 @@ class CRM_Financial_BAO_Order {
    */
   public function setLineItemValue(string $name, $value, $index): void {
     $this->lineItems[$index][$name] = $value;
+  }
+
+  /**
+   * Set the line item array.
+   *
+   * This is mostly useful when they have been calculated & stored
+   * on the form & we want to rebuild the line item object.
+   *
+   * @param array $lineItems
+   */
+  public function setLineItems(array $lineItems): void {
+    $this->lineItems = $lineItems;
   }
 
   /**

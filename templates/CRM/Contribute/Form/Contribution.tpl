@@ -358,8 +358,6 @@
           }
         }
 
-        var url = {/literal}{$dataUrl|@json_encode}{literal};
-
         {/literal}
         {if $context eq 'standalone' and $outBound_option != 2}
         {literal}

@@ -432,8 +432,45 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
       'contactSearch' => json_encode(!empty($params['includeEmailInName']) ? ts('Search by name/email or id...') : ts('Search by name or id...')),
       'otherSearch' => json_encode(ts('Enter search term or id...')),
       'entityRef' => self::getEntityRefMetadata(),
+      'quickAdd' => self::getQuickAddForms($e->params['cid']),
     ];
     $e->content = CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $params);
+  }
+
+  /**
+   * Gets links to "Quick Add" forms, for use in Autocomplete widgets
+   *
+   * @param int|null $cid
+   * @return array
+   */
+  private static function getQuickAddForms(?int $cid): array {
+    $forms = [];
+    try {
+      $contactTypes = CRM_Contact_BAO_ContactType::getAllContactTypes();
+      $routes = \Civi\Api4\Route::get(FALSE)
+        ->addSelect('path', 'title', 'access_arguments')
+        ->addWhere('path', 'LIKE', 'civicrm/quick-add/%')
+        ->execute();
+      foreach ($routes as $route) {
+        // Ensure user has permission to use the form
+        if (!empty($route['access_arguments'][0]) && !CRM_Core_Permission::check($route['access_arguments'][0], $cid)) {
+          continue;
+        }
+        // Ensure API entity exists
+        [, , $entityType] = array_pad(explode('/', $route['path']), 3, '*');
+        if (\Civi\Api4\Utils\CoreUtil::entityExists($entityType)) {
+          $forms[] = [
+            'entity' => $entityType,
+            'path' => $route['path'],
+            'title' => $route['title'],
+            'icon' => \Civi\Api4\Utils\CoreUtil::getInfoItem($entityType, 'icon'),
+          ];
+        }
+      }
+    }
+    catch (CRM_Core_Exception $e) {
+    }
+    return $forms;
   }
 
   /**
