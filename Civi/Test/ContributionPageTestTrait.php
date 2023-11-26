@@ -122,6 +122,7 @@ trait ContributionPageTestTrait {
       'description' => '5 dollars worth of monopoly money',
       'options' => 'White, Black, Green',
       'price' => 1,
+      'is_active' => TRUE,
       'min_contribution' => 5,
       'cost' => .05,
     ], '5_dollars');
@@ -130,6 +131,7 @@ trait ContributionPageTestTrait {
       'description' => '10 dollars worth of monopoly money',
       'options' => 'White, Black, Green',
       'price' => 2,
+      'is_active' => TRUE,
       'min_contribution' => 10,
       'cost' => .05,
     ], '10_dollars');
@@ -137,6 +139,7 @@ trait ContributionPageTestTrait {
       'entity_id' => $this->getContributionPageID($identifier),
       'entity_table' => 'civicrm_contribution_page',
       'premiums_intro_title' => 'Get free monopoly money with your donation',
+      'premiums_active' => TRUE,
     ], $identifier);
     $this->createTestEntity('PremiumsProduct', [
       'premiums_id' => $this->ids['Premium'][$identifier],

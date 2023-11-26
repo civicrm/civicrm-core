@@ -268,7 +268,7 @@
     {/if}
     {/crmRegion}
 
-  {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="confirmContribution"}
+  {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="confirmContribution" showPremiumSelectionFields=false preview=false}
 
   {if $customPost}
     <fieldset class="label-left crm-profile-view">

@@ -1662,6 +1662,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'civicrm_price_set_entity',
       'civicrm_price_field_value',
       'civicrm_price_field',
+      'civicrm_product',
+      'civicrm_premiums',
+      'civicrm_premiums_product',
     ];
     $this->quickCleanup($tablesToTruncate);
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_membership_status WHERE name NOT IN('New', 'Current', 'Grace', 'Expired', 'Pending', 'Cancelled', 'Deceased')");

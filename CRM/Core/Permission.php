@@ -1152,7 +1152,8 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['line_item'] = $permissions['contribution'];
-    $permissions['product'] = $permissions['contribution'];
+    $permissions['product'] = $permissions['premiums'] = $permissions['premiums_product'] = $permissions['contribution'];
+    $permissions['product']['get'] = $permissions['premiums']['get'] = $permissions['premiums_product']['get'] = [['access CiviCRM', 'access CiviContribute', 'make online contributions']];
 
     $permissions['financial_item'] = $permissions['contribution'];
     $permissions['financial_type']['get'] = $permissions['contribution']['get'];
