@@ -676,7 +676,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
         $displayName = civicrm_api3('contact', 'getvalue', ['id' => $this->getContactID(), 'return' => 'display_name']);
       }
     }
-    $this->assign('displayName', $displayName) ?? NULL;
+    $this->assign('displayName', $displayName ?? NULL);
   }
 
   protected function assignContactID(): void {
