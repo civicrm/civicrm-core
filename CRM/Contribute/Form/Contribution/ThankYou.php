@@ -92,7 +92,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('receiptFromEmail', CRM_Utils_Array::value('receipt_from_email', $this->_values));
 
     if ($productID) {
-      CRM_Contribute_BAO_Premium::buildPremiumBlock($this, $this->_id, FALSE, $productID, $option);
+      $this->buildPremiumsBlock(FALSE, $productID, $option);
     }
 
     $params = $this->_params;

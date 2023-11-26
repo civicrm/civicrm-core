@@ -375,7 +375,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     //we allow premium for pledge during pledge creation only.
     if (empty($this->_values['pledge_id']) && empty($this->_ccid)) {
-      CRM_Contribute_BAO_Premium::buildPremiumBlock($this, $this->_id, TRUE);
+      $this->buildPremiumsBlock(TRUE);
     }
 
     //don't build pledge block when mid is passed
