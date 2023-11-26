@@ -1431,6 +1431,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         // Skip line items in the contribution processing transaction.
         // We will create them with the membership for proper linking.
         $membershipParams['skipLineItem'] = 1;
+        // Since we are not letting Contribution::create set up the line items
+        // we need to specify the tax.
+        $membershipParams['tax_amount'] = $this->order->getTotalTaxAmount();
       }
 
       $paymentResult = $this->processConfirm(
