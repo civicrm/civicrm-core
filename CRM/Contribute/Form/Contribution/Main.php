@@ -1012,7 +1012,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $errors['_qf_default'] = ts('Please select at least one membership option.');
         }
       }
-
+      // @todo - processAmount is to be deprectated - can we use getTotalAmount or
+      // a function of self->order here?
       CRM_Price_BAO_PriceSet::processAmount($self->_values['fee'],
         $fields, $lineItem
       );
@@ -1214,6 +1215,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     if ($this->isQuickConfig()) {
+      // @todo - this is silly cruft - we can likely remove it.
       $priceField = new CRM_Price_DAO_PriceField();
       $priceField->price_set_id = $this->getPriceSetID();
       $priceField->orderBy('weight');
@@ -1227,77 +1229,28 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             case 'membership_amount':
               $this->_params['selectMembership'] = $params['selectMembership'] = $priceOptions[$selectedPriceOptionID]['membership_type_id'] ?? NULL;
               $this->set('selectMembership', $params['selectMembership']);
-
-            case 'contribution_amount':
-              $params['amount'] = $selectedPriceOptionID;
-              if ($priceField->name == 'contribution_amount' ||
-                  ($priceField->name == 'membership_amount' &&
-                    ($this->_membershipBlock['is_separate_payment'] ?? NULL) == 0)
-              ) {
-                $this->_values['amount'] = $priceOptions[$selectedPriceOptionID]['amount'] ?? NULL;
-              }
-              $this->_values[$selectedPriceOptionID]['value'] = $priceOptions[$selectedPriceOptionID]['amount'] ?? NULL;
-              $this->_values[$selectedPriceOptionID]['label'] = $priceOptions[$selectedPriceOptionID]['label'] ?? NULL;
-              $this->_values[$selectedPriceOptionID]['amount_id'] = $priceOptions[$selectedPriceOptionID]['id'] ?? NULL;
-              $this->_values[$selectedPriceOptionID]['weight'] = $priceOptions[$selectedPriceOptionID]['weight'] ?? NULL;
               break;
 
             case 'other_amount':
+              // Only used now when deciding whether to assign
+              // amount_level to the template in subsequent screens.
               $params['amount_other'] = $selectedPriceOptionID;
               break;
           }
         }
       }
     }
-    $balance = $this->getContributionBalance();
-    if ($balance) {
-      $params['amount'] = $balance;
-    }
-    else {
-      // from here on down, $params['amount'] holds a monetary value (or null) rather than an option ID
-      $params['amount'] = $this->computeAmount($params, $this->_values);
-    }
 
-    $params['separate_amount'] = $params['amount'];
-    // @todo - stepping through the code indicates that amount is always set before this point so it never matters.
-    // Move more of the above into this function...
     $params['amount'] = $this->getMainContributionAmount();
-
-    if (!isset($params['amount_other'])) {
-      $this->set('amount_level', CRM_Utils_Array::value('amount_level', $params));
-    }
-
-    $priceSetID = $this->getPriceSetID();
+    $this->set('amount_level', $this->order->getAmountLevel());
     if (!empty($this->_ccid)) {
       // @todo - verify that this is the same as `$this->>getLineItems()` which it should be & consolidate
       $this->set('lineItem', [$this->getPriceSetID() => $this->getExistingContributionLineItems()]);
     }
-    elseif ($priceSetID) {
-      $lineItem = [];
-      if ($this->isQuickConfig()) {
-        foreach ($this->_values['fee'] as $key => & $val) {
-          if ($val['name'] == 'other_amount' && $val['html_type'] == 'Text' && !empty($params['price_' . $key])) {
-            // Clean out any currency symbols.
-            $params['price_' . $key] = CRM_Utils_Rule::cleanMoney($params['price_' . $key]);
-            if ($params['price_' . $key] != 0) {
-              foreach ($val['options'] as $optionKey => & $options) {
-                $options['amount'] = $params['price_' . $key] ?? NULL;
-                break;
-              }
-            }
-            $params['price_' . $key] = 1;
-            break;
-          }
-        }
-      }
-
+    else {
       if ($this->_membershipBlock) {
-        $this->processAmountAndGetAutoRenew($this->_values['fee'], $params, $lineItem[$priceSetID]);
+        $this->processAmountAndGetAutoRenew($params);
       }
-      else {
-        CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetID], $priceSetID);
-      }
-
       $this->set('lineItem', [$this->getPriceSetID() => $this->getLineItems()]);
     }
 
@@ -1314,13 +1267,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     // Would be nice to someday understand the point of this set.
     $this->set('is_pay_later', $params['is_pay_later']);
-
-    if ($this->_membershipBlock && $this->_membershipBlock['is_separate_payment'] && !empty($params['separate_amount'])) {
-      $this->set('amount', $params['separate_amount']);
-    }
-    else {
-      $this->set('amount', $params['amount']);
-    }
+    $this->set('amount', $this->getMainContributionAmount());
 
     // generate and set an invoiceID for this transaction
     $invoiceID = md5(uniqid(rand(), TRUE));

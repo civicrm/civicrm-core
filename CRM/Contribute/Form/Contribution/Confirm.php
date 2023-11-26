@@ -1787,6 +1787,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * This function sets the fields.
    *
+   * The results of it are likely unused.
+   *
    * - $this->_params['amount_level']
    * - $this->_params['selectMembership']
    * And under certain circumstances sets
@@ -1811,10 +1813,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           // function to get correct amount level consistently. Remove setting of the amount level in
           // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
           // to cover all variants.
+          // We expect this to be ignored.
           $this->_params['amount_level'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
             $this->_params["price_{$priceField->id}"], 'label');
         }
         if ($priceField->name == "membership_amount") {
+          // We expect this to be ignored.
           $this->_params['selectMembership'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
             $this->_params["price_{$priceField->id}"], 'membership_type_id');
         }
@@ -1833,6 +1837,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         && ($this->_params["price_{$paramWeDoNotUnderstand}"] ?? NULL) < 1
         && empty($this->_params["price_{$priceField->id}"])
       ) {
+        // We expect this to be ignored.
         $this->_params['amount'] = NULL;
       }
 
@@ -1846,6 +1851,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         && ($this->_values['fee'][$priceField->id]['name'] ?? NULL) == 'contribution_amount'
         && ($this->_params["price_{$priceField->id}"] ?? NULL) == '-1'
       ) {
+        // We expect this to be ignored.
         $this->_params['amount'] = NULL;
       }
     }

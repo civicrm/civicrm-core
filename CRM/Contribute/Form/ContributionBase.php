@@ -1212,20 +1212,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Wrapper for processAmount that also sets autorenew.
    *
-   * @param $fields
-   *   This is the output of the function CRM_Price_BAO_PriceSet::getSetDetail($priceSetID, FALSE, FALSE);
-   *   And, it would make sense to introduce caching into that function and call it from here rather than
-   *   require the $fields array which is passed from pillar to post around the form in order to pass it in here.
    * @param array $params
    *   Params reflecting form input e.g with fields 'price_5' => 7, 'price_8' => array(7, 8)
-   * @param $lineItems
-   *   Line item array to be altered.
    */
-  public function processAmountAndGetAutoRenew($fields, &$params, &$lineItems) {
-    CRM_Price_BAO_PriceSet::processAmount($fields, $params, $lineItems, $this->getPriceSetID());
+  public function processAmountAndGetAutoRenew(&$params) {
     $autoRenew = [];
     $autoRenew[0] = $autoRenew[1] = $autoRenew[2] = 0;
-    foreach ($lineItems as $lineItem) {
+    foreach ($this->getLineItems() as $lineItem) {
       if (!empty($lineItem['auto_renew']) &&
         is_numeric($lineItem['auto_renew'])
       ) {
