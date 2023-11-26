@@ -220,6 +220,27 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the tax calculation when using a quick config price set with a membership selection & a contribution (radio) selection.
+   *
+   * Expected amount is $100 non-tax deductible + $25 with an additional $2.50 tax.
+   */
+  public function testSeparatePaymentWithTax(): void {
+    $this->enableTaxAndInvoicing();
+    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'));
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
+    $this->submitOnlineContributionForm([
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => $this->ids['PriceFieldValue']['contribution_amount_25'],
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'id' => $this->getContributionPageID(),
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
+    $this->assertEquals(2.5, $contribution['tax_amount']);
+    $this->assertEquals(127.5, $contribution['total_amount']);
+  }
+
+  /**
    * Test the confirm form with a separate membership payment configured.
    */
   public function testSeparatePaymentConfirm(): void {
