@@ -416,7 +416,44 @@ class CRM_Core_Component {
   }
 
   /**
-   * Callback for the "enable_components" setting
+   * Callback for the "enable_components" setting (pre change)
+   *
+   * Before a component is disabled, disable reverse-dependencies (all extensions dependent on it).
+   *
+   * This is imperfect because it only goes one-level deep:
+   * it doesn't deal with any extensions that depend on the ones being disabled.
+   * The proper fix for that would probably be something like a CASCADE mode for
+   * disabling an extension with all its reverse dependencies (which would render this function moot).
+   *
+   * @param array $oldValue
+   *   List of component names.
+   * @param array $newValue
+   *   List of component names.
+   *
+   * @throws \CRM_Core_Exception.
+   */
+  public static function preToggleComponents($oldValue, $newValue): void {
+    if (is_array($oldValue) && is_array($newValue)) {
+      $disabledComponents = array_diff($oldValue, $newValue);
+    }
+    if (empty($disabledComponents)) {
+      return;
+    }
+    $disabledExtensions = array_map(['CRM_Utils_String', 'convertStringToSnakeCase'], $disabledComponents);
+    $manager = CRM_Extension_System::singleton()->getManager();
+    $extensions = $manager->getStatuses();
+    foreach ($extensions as $extension => $status) {
+      if ($status === CRM_Extension_Manager::STATUS_INSTALLED) {
+        $info = $manager->mapper->keyToInfo($extension);
+        if (array_intersect($info->requires, $disabledExtensions)) {
+          $manager->disable($extension);
+        }
+      }
+    }
+  }
+
+  /**
+   * Callback for the "enable_components" setting (post change)
    *
    * When a component is enabled or disabled, ensure the corresponding module-extension is also enabled/disabled.
    *
@@ -427,7 +464,7 @@ class CRM_Core_Component {
    *
    * @throws \CRM_Core_Exception.
    */
-  public static function onToggleComponents($oldValue, $newValue): void {
+  public static function postToggleComponents($oldValue, $newValue): void {
     if (CRM_Core_Config::isUpgradeMode()) {
       return;
     }

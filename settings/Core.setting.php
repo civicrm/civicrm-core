@@ -800,9 +800,10 @@ return [
     'help_text' => NULL,
     'on_change' => [
       'CRM_Case_Info::onToggleComponents',
+      'CRM_Core_Component::preToggleComponents',
     ],
     'post_change' => [
-      'CRM_Core_Component::onToggleComponents',
+      'CRM_Core_Component::postToggleComponents',
     ],
     'pseudoconstant' => [
       'callback' => 'CRM_Core_SelectValues::getComponentSelectValues',
