@@ -987,6 +987,34 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get Amount Level text.
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public function getAmountLevel() : string {
+    $amount_level = [];
+    $totalParticipant = 0;
+    foreach ($this->getLineItems() as $lineItem) {
+      if ($lineItem['label'] !== ts('Contribution Amount')) {
+        $amount_level[] = $lineItem['label'] . ' - ' . (float) $lineItem['qty'];
+      }
+      $totalParticipant += (float) ($lineItem['participant_count'] ?? 0);
+    }
+    $displayParticipantCount = '';
+    if ($totalParticipant > 0) {
+      $displayParticipantCount = ' Participant Count -' . $totalParticipant;
+    }
+    if (!empty($amount_level)) {
+      $amountString = CRM_Utils_Array::implodePadded($amount_level);
+      if (!empty($displayParticipantCount)) {
+        $amountString = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
+    }
+    return $amountString ?? '';
+  }
+
+  /**
    * Get the total amount relating to memberships for the order.
    *
    * @return float
