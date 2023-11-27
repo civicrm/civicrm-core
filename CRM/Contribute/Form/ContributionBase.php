@@ -714,9 +714,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       ]);
     }
 
-    // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
-    // function to get correct amount level consistently. Remove setting of the amount level in
-    // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
+    // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
     // to cover all variants.
     if (isset($this->_params['amount_other']) || isset($this->_params['selectMembership'])) {
       $this->_params['amount_level'] = '';
