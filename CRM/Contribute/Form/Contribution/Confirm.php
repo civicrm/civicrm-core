@@ -1809,10 +1809,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       if ($this->isQuickConfig() && !empty($this->_params["price_{$priceField->id}"])) {
         if ($this->_values['fee'][$priceField->id]['html_type'] != 'Text') {
-          // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
-          // function to get correct amount level consistently. Remove setting of the amount level in
-          // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
-          // to cover all variants.
+          // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
           // We expect this to be ignored.
           $this->_params['amount_level'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
             $this->_params["price_{$priceField->id}"], 'label');
