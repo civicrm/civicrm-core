@@ -534,7 +534,7 @@ WHERE      a.id = %1
           if ($value) {
             // Note: this is already taken care in getDisplayValue above, but sometimes
             // strings like '^A^A' creates problem. So to fix this special case -
-            if (strstr($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
+            if (str_contains($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
               $value = trim($value, CRM_Core_DAO::VALUE_SEPARATOR);
             }
             if (($typeValue['type'] ?? NULL) == 'String' ||

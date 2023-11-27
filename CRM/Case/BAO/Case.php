@@ -639,7 +639,7 @@ HERESQL;
 
     $order = NULL;
     if (!empty($params['sortBy'])) {
-      if (strstr($params['sortBy'], 'date ')) {
+      if (str_contains($params['sortBy'], 'date ')) {
         $params['sortBy'] = str_replace('date', 'activity_date_time', $params['sortBy']);
       }
       $order = "ORDER BY " . $params['sortBy'];

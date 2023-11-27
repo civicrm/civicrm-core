@@ -322,7 +322,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $blocks = ['email', 'phone', 'im', 'url', 'openid'];
       foreach ($this->_params['onbehalf'] as $loc => $value) {
         $field = $typeId = NULL;
-        if (strstr($loc, '-')) {
+        if (str_contains($loc, '-')) {
           [$field, $locType] = explode('-', $loc);
         }
 
@@ -411,7 +411,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             }
           }
         }
-        elseif (strstr($loc, 'custom')) {
+        elseif (str_contains($loc, 'custom')) {
           if ($value && isset($this->_params['onbehalf']["{$loc}_id"])) {
             $value = $this->_params['onbehalf']["{$loc}_id"];
           }

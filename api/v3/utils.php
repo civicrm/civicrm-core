@@ -637,7 +637,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $extraSql 
 
   //accept filters like filter.activity_date_time_high
   // std is now 'filters' => ..
-  if (strstr(implode(',', array_keys($params)), 'filter')) {
+  if (str_contains(implode(',', array_keys($params)), 'filter')) {
     if (isset($params['filters']) && is_array($params['filters'])) {
       foreach ($params['filters'] as $paramkey => $paramvalue) {
         _civicrm_api3_apply_filters_to_dao($paramkey, $paramvalue, $dao);
@@ -645,7 +645,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $extraSql 
     }
     else {
       foreach ($params as $paramkey => $paramvalue) {
-        if (strstr($paramkey, 'filter')) {
+        if (str_contains($paramkey, 'filter')) {
           _civicrm_api3_apply_filters_to_dao(substr($paramkey, 7), $paramvalue, $dao);
         }
       }
@@ -723,11 +723,11 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $extraSql 
  *   DAO object.
  */
 function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
-  if (strstr($filterField, 'high')) {
+  if (str_contains($filterField, 'high')) {
     $fieldName = substr($filterField, 0, -5);
     $dao->whereAdd("($fieldName <= $filterValue )");
   }
-  if (strstr($filterField, 'low')) {
+  if (str_contains($filterField, 'low')) {
     $fieldName = substr($filterField, 0, -4);
     $dao->whereAdd("($fieldName >= $filterValue )");
   }
@@ -2489,7 +2489,7 @@ function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
 
   if (!empty($fieldValue) && is_array($fieldValue) &&
     (array_search(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators()) ||
-      $type == 'String' && strstr(key($fieldValue), 'EMPTY'))
+      $type == 'String' && str_contains(key($fieldValue), 'EMPTY'))
   ) {
     $op = key($fieldValue);
     $fieldValue = $fieldValue[$op] ?? NULL;

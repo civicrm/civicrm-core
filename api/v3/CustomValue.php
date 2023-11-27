@@ -122,7 +122,7 @@ function civicrm_api3_custom_value_get($params) {
     'entityID' => $params['entity_id'],
     'entityType' => $params['entity_table'] ?? '',
   ];
-  if (strstr($getParams['entityType'], 'civicrm_')) {
+  if (str_contains($getParams['entityType'], 'civicrm_')) {
     $getParams['entityType'] = ucfirst(substr($getParams['entityType'], 8));
   }
   unset($params['entity_id'], $params['entity_table']);

@@ -183,7 +183,7 @@ class CRM_Grant_BAO_Query extends CRM_Contact_BAO_Query_Interface {
       case 'grant_status_id':
       case 'grant_status':
 
-        if (strstr($name, 'type')) {
+        if (str_contains($name, 'type')) {
           $name = 'grant_type_id';
           $label = E::ts('Grant Type(s)');
         }
