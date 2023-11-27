@@ -538,12 +538,14 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
       $clauses['entity_table'] = [$relatedClauses];
     }
     // Enforce note privacy setting
-    if (!CRM_Core_Permission::check('view all notes')) {
+    if (!CRM_Core_Permission::check('view all notes', $userId)) {
+      // It was ok to have $userId = NULL for the permission check but must be an int for the query
+      $cid = $userId ?? (int) CRM_Core_Session::getLoggedInContactID();
       $clauses['privacy'] = [
         [
           '= 0',
           // OR
-          '= 1 AND {contact_id} = ' . (int) CRM_Core_Session::getLoggedInContactID(),
+          "= 1 AND {contact_id} = $cid",
         ],
       ];
     }
