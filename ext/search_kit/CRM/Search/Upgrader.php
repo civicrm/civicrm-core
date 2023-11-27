@@ -40,7 +40,7 @@ class CRM_Search_Upgrader extends CRM_Extension_Upgrader_Base {
     foreach ($savedSearches as $savedSearch) {
       $newAliases = [];
       foreach ($savedSearch['api_params']['select'] ?? [] as $i => $select) {
-        if (strstr($select, '(') && !strstr($select, ' AS ')) {
+        if (str_contains($select, '(') && !str_contains($select, ' AS ')) {
           $alias = CRM_Utils_String::munge(str_replace(')', '', $select), '_', 256);
           $newAliases[$select] = $alias;
           $savedSearch['api_params']['select'][$i] = $select . ' AS ' . $alias;

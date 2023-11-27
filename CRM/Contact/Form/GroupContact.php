@@ -107,7 +107,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
     if (count($groupSelect) > 1) {
       $session = CRM_Core_Session::singleton();
       // user dashboard
-      if (strstr($session->readUserContext(), 'user')) {
+      if (str_contains($session->readUserContext(), 'user')) {
         $msg = ts('Join a Group');
       }
       else {

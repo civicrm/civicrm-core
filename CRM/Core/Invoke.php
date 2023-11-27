@@ -303,11 +303,11 @@ class CRM_Core_Invoke {
           unset($pageArgs['mode']);
         }
         $title = $item['title'] ?? NULL;
-        if (strstr($item['page_callback'], '_Page') || strstr($item['page_callback'], '\\Page\\')) {
+        if (str_contains($item['page_callback'], '_Page') || str_contains($item['page_callback'], '\\Page\\')) {
           $object = new $item['page_callback']($title, $mode);
           $object->urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
         }
-        elseif (strstr($item['page_callback'], '_Controller') || strstr($item['page_callback'], '\\Controller\\')) {
+        elseif (str_contains($item['page_callback'], '_Controller') || str_contains($item['page_callback'], '\\Controller\\')) {
           $addSequence = 'false';
           if (isset($pageArgs['addSequence'])) {
             $addSequence = $pageArgs['addSequence'];

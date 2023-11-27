@@ -91,7 +91,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     $this->_matchingContacts = FALSE;
     if (($values['radio_ts'] ?? NULL) == 'ts_sel') {
       foreach ($values as $key => $value) {
-        if (strstr($key, 'mark_x')) {
+        if (str_contains($key, 'mark_x')) {
           $count++;
         }
         if ($count > 2) {

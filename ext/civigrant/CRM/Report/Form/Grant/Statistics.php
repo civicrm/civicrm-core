@@ -421,7 +421,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       }
 
       foreach ($values as $customField => $customValue) {
-        if (strstr($customField, 'civicrm_value_')) {
+        if (str_contains($customField, 'civicrm_value_')) {
           $customFieldTitle = $this->_columnHeaders[$customField]['title'] ?? NULL;
           $customGroupTitle = explode('_custom', strstr($customField, 'civicrm_value_'));
           $customGroupTitle = $this->_columns[$customGroupTitle[0]]['group_title'];

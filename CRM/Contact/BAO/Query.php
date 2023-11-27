@@ -3364,7 +3364,7 @@ WHERE  $smartGroupClause
       elseif ($op == '!=') {
         $this->_where[$grouping][] = "{$etTable}.entity_id NOT IN (SELECT entity_id FROM civicrm_entity_tag cet WHERE cet.entity_table = 'civicrm_contact' AND " . self::buildClause("cet.tag_id", '=', $value, 'Int') . ")";
       }
-      elseif ($op == '=' || strstr($op, 'IN')) {
+      elseif ($op == '=' || str_contains($op, 'IN')) {
         $op = ($op == '=') ? 'IN' : $op;
         $this->_where[$grouping][] = "{$etTable}.tag_id $op ( $value )";
       }
@@ -4116,7 +4116,7 @@ WHERE  $smartGroupClause
 
     if (self::caseImportant($op)) {
       $value = implode("[[:cntrl:]]|[[:cntrl:]]", (array) $value);
-      $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
+      $op = (str_contains($op, '!') || str_contains($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
       $value = "[[:cntrl:]]" . $value . "[[:cntrl:]]";
     }
 
@@ -5364,7 +5364,7 @@ civicrm_relationship.start_date > {$today}
       }
 
       $date = $format = NULL;
-      if (strstr($op, 'IN')) {
+      if (str_contains($op, 'IN')) {
         $format = [];
         foreach ($value as &$date) {
           $date = CRM_Utils_Date::processDate($date, NULL, FALSE, $dateFormat);

@@ -115,7 +115,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
         $el['html'] = $date . '<input type="hidden" value="' . $element->getValue() . '" name="' . $element->getAttribute('name') . '">';
       }
       // Render html for wysiwyg textareas
-      if ($el['type'] == 'textarea' && isset($element->_attributes['class']) && strstr($element->_attributes['class'], 'wysiwyg')) {
+      if ($el['type'] == 'textarea' && isset($element->_attributes['class']) && str_contains($element->_attributes['class'], 'wysiwyg')) {
         $el['html'] = '<span class="crm-frozen-field">' . $el['value'] . '</span>';
       }
       else {
