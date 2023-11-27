@@ -381,6 +381,9 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     if (!self::isAjaxMode()) {
       $this->addBundle('coreResources');
       $this->addCoreStyles($region);
+      // This ensures that if a popup link requires AngularJS, it will always be available.
+      // Additional Ang modules required by popups will be loaded on-the-fly by Civi\Angular\AngularLoader
+      Civi::service('angularjs.loader')->addModules(['crmResource']);
     }
     return $this;
   }
