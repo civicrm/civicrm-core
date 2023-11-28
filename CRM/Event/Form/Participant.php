@@ -1244,12 +1244,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $form->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $form);
     $form->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $form);
 
-    //CRM-6907 set event specific currency.
-    if ($form->_eventId &&
-      ($currency = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'currency'))
-    ) {
-      CRM_Core_Config::singleton()->defaultCurrency = $currency;
-    }
     if ($form->_eventId) {
       $form->_isPaidEvent = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'is_monetary');
       if ($form->_isPaidEvent) {
@@ -1484,6 +1478,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function assignEventDetailsToTpl($eventID, $participantRoles, $receiptText): void {
     $this->assign('event', ['confirm_email_text' => $receiptText]);
+  }
+
+  /**
+   * Get the currency for the event.
+   *
+   * @return string
+   */
+  public function getCurrency() {
+    return $this->getEventValue('currency') ?: \Civi::settings()->get('defaultCurrency');
   }
 
   /**
