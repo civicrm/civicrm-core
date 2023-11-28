@@ -315,12 +315,13 @@ class CRM_Core_Payment_Form {
   /**
    * Map address fields.
    *
-   * @param int $id
+   * @param int $id unused
    * @param array $src
    * @param array $dst
    * @param bool $reverse
    */
   public static function mapParams($id, $src, &$dst, $reverse = FALSE) {
+    $id = CRM_Core_BAO_LocationType::getBilling();
     $map = [
       'first_name' => 'billing_first_name',
       'middle_name' => 'billing_middle_name',

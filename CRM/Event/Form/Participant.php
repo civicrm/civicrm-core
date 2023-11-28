@@ -934,7 +934,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       // all the payment processors expect the name and address to be in the
       // so we copy stuff over to first_name etc.
       $paymentParams = $this->_params;
-      if (!empty($this->_params['send_receipt'])) {
+      if ($this->getSubmittedValue('send_receipt')) {
         $paymentParams['email'] = $this->getContactValue('email_primary.email');
       }
 
@@ -943,8 +943,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       // so more conservative approach is called for.
       // In fact the use of $params and $this->_params & $this->_contactId vs $contactID
       // needs rationalising.
-      $mapParams = array_merge(['contact_id' => $contactID], $this->_params);
-      CRM_Core_Payment_Form::mapParams($this->_bltID, $mapParams, $paymentParams, TRUE);
+      $mapParams = array_merge(['contact_id' => $contactID], $this->getSubmittedValues());
+      CRM_Core_Payment_Form::mapParams(NULL, $mapParams, $paymentParams, TRUE);
 
       $payment = $this->_paymentProcessor['object'];
 
