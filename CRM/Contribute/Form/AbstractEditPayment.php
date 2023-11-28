@@ -405,17 +405,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Get current currency from DB or use default currency.
-   *
-   * @param array $submittedValues
-   *
-   * @return string
-   */
-  public function getCurrency($submittedValues = []) {
-    return $submittedValues['currency'] ?? $this->_values['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency;
-  }
-
-  /**
    * @param array $submittedValues
    *
    * @return mixed

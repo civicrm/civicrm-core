@@ -1963,7 +1963,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $params = [
         'contact_id' => $this->_contactID,
-        'currency' => $this->getCurrency($submittedValues),
+        'currency' => $this->getCurrency(),
         'skipCleanMoney' => TRUE,
         'id' => $this->_id,
       ];

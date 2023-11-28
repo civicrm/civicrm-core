@@ -1037,7 +1037,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           }
         }
         unset($params['note']);
-        $contributionParams['currency'] = \Civi::settings()->get('defaultCurrency');;
+        $contributionParams['currency'] = $this->getCurrency();
         $contributionParams['contact_id'] = $this->_contactID;
 
         if ($this->_id) {
@@ -1423,7 +1423,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     else {
       //lets carry currency, CRM-4453
-      $params['fee_currency'] = \Civi::settings()->get('defaultCurrency');
+      $params['fee_currency'] = $this->getCurrency();
       if (!isset($lineItem[0])) {
         $lineItem[0] = [];
       }
@@ -1506,7 +1506,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'tax_amount' => $params['tax_amount'],
       'amount_level' => $params['amount_level'],
       'invoice_id' => $params['invoiceID'],
-      'currency' => \Civi::settings()->get('defaultCurrency'),
+      'currency' => $this->getCurrency(),
       'source' => $this->getSourceText(),
       'is_pay_later' => FALSE,
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
@@ -1582,7 +1582,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'fee_level' => $params['amount_level'] ?? NULL,
       'is_pay_later' => FALSE,
       'fee_amount' => $params['fee_amount'] ?? NULL,
-      'fee_currency' => \Civi::settings()->get('defaultCurrency'),
+      'fee_currency' => $this->getCurrency(),
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'note' => $this->getSubmittedValue('note'),
       'is_test' => ($this->_mode === 'test)'),
