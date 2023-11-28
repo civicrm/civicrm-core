@@ -691,9 +691,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     foreach ($result as $id => $activity) {
       $isBulkActivity = (!$bulkActivityTypeID || ($bulkActivityTypeID === $activity['activity_type_id']));
       foreach ($mappingParams as $apiKey => $expectedName) {
-        if (in_array($apiKey, [
-          'target_contact_name',
-        ])) {
+        if (in_array($apiKey, ['target_contact_name'])) {
 
           if ($isBulkActivity) {
             // @todo  - how is this used? Couldn't we use 'is_bulk' or something clearer?

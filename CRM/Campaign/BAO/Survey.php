@@ -266,10 +266,7 @@ SELECT  survey.id    as id,
 
     $select = $from = [];
     foreach ($returnProperties as $property => $ignore) {
-      $value = (in_array($property, [
-        'city',
-        'street_address',
-      ])) ? 'address' : $property;
+      $value = (in_array($property, ['city', 'street_address'])) ? 'address' : $property;
       switch ($property) {
         case 'sort_name':
         case 'contact_type':

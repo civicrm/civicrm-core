@@ -50,10 +50,7 @@ function smarty_function_simpleActivityContacts($params, &$smarty) {
     $baseContactParams['return.' . $field] = 1;
   }
 
-  foreach ([
-    'target',
-    'assignee',
-  ] as $role) {
+  foreach (['target', 'assignee'] as $role) {
     $contact = [];
     if (!empty($activity[$role . '_contact_id'])) {
       $contact_id = array_shift($activity[$role . '_contact_id']);

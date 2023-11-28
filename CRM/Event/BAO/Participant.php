@@ -211,10 +211,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
     }
     $noteValue = NULL;
     $hasNoteField = FALSE;
-    foreach ([
-      'note',
-      'participant_note',
-    ] as $noteFld) {
+    foreach (['note', 'participant_note'] as $noteFld) {
       if (array_key_exists($noteFld, $params)) {
         $noteValue = $params[$noteFld];
         $hasNoteField = TRUE;

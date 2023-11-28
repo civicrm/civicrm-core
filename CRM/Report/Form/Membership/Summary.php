@@ -319,11 +319,7 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     $this->assign('statistics', $this->statistics($rows));
 
     if (!empty($this->_params['charts'])) {
-      foreach ([
-        'receive_date',
-        $this->_interval,
-        'value',
-      ] as $ignore) {
+      foreach (['receive_date', $this->_interval, 'value'] as $ignore) {
         unset($graphRows[$ignore][$count - 1]);
       }
 

@@ -292,10 +292,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // Check for required permissions, CRM-6264.
     if ($this->_activityId &&
-      in_array($this->_action, [
-        CRM_Core_Action::UPDATE,
-        CRM_Core_Action::VIEW,
-      ]) &&
+      in_array($this->_action, [CRM_Core_Action::UPDATE, CRM_Core_Action::VIEW]) &&
       !CRM_Activity_BAO_Activity::checkPermission($this->_activityId, $this->_action)
     ) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
@@ -406,13 +403,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
       $this->assign('searchKey', $qfKey);
     }
-    elseif (in_array($this->_context, [
-      'standalone',
-      'home',
-      'dashlet',
-      'dashletFullscreen',
-    ])
-    ) {
+    elseif (in_array($this->_context, ['standalone', 'home', 'dashlet', 'dashletFullscreen'])) {
       $urlParams = 'reset=1';
       $urlString = 'civicrm/dashboard';
     }

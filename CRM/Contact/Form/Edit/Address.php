@@ -283,10 +283,7 @@ class CRM_Contact_Form_Edit_Address {
             'street_name',
             'street_unit',
           ] as $fld) {
-            if (in_array($fld, [
-              'street_name',
-              'street_unit',
-            ])) {
+            if (in_array($fld, ['street_name', 'street_unit'])) {
               $streetAddress .= ' ';
             }
             // CRM-17619 - if the street number suffix begins with a number, add a space

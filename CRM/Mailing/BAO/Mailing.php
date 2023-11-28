@@ -616,11 +616,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
 
       $this->preparedTemplates = [];
 
-      foreach ([
-        'html',
-        'text',
-        'subject',
-      ] as $key) {
+      foreach (['html', 'text', 'subject'] as $key) {
         if (!isset($templates[$key])) {
           continue;
         }

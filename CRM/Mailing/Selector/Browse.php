@@ -378,14 +378,8 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
             $actionMask = CRM_Core_Action::PREVIEW;
           }
         }
-        if (in_array($row['status'], [
-          'Scheduled',
-          'Running',
-          'Paused',
-        ])) {
-          if ($allAccess ||
-            ($showApprovalLinks && $showCreateLinks && $showScheduleLinks)
-          ) {
+        if (in_array($row['status'], ['Scheduled', 'Running', 'Paused'])) {
+          if ($allAccess || ($showApprovalLinks && $showCreateLinks && $showScheduleLinks)) {
 
             $actionMask |= CRM_Core_Action::DISABLE;
             if ($row['status'] === "Paused") {

@@ -1380,10 +1380,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
               $entity[$fieldName] = strtolower($entity[$fieldName]);
             }
             // typecast with array to satisfy changes made in CRM-13160
-            if ($entityName == 'MembershipType' && in_array($fieldName, [
-              'relationship_type_id',
-              'relationship_direction',
-            ])) {
+            if ($entityName == 'MembershipType' && in_array($fieldName, ['relationship_type_id', 'relationship_direction'])) {
               $entity[$fieldName] = (array) $entity[$fieldName];
             }
           }

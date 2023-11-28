@@ -1272,12 +1272,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       $fields = CRM_Contact_DAO_Contact::import();
 
       // get the fields thar are meant for contact types
-      if (in_array($contactType, [
-        'Individual',
-        'Household',
-        'Organization',
-        'All',
-      ])) {
+      if (in_array($contactType, ['Individual', 'Household', 'Organization', 'All'])) {
         $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
       }
 
@@ -1431,12 +1426,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
         $fields = CRM_Contact_DAO_Contact::export();
 
         // The fields are meant for contact types.
-        if (in_array($contactType, [
-          'Individual',
-          'Household',
-          'Organization',
-          'All',
-        ])) {
+        if (in_array($contactType, ['Individual', 'Household', 'Organization', 'All'])) {
           $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
         }
         // add current employer for individuals
@@ -3057,10 +3047,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
           continue;
         }
         // build directly accessible action menu.
-        if (in_array($values['ref'], [
-          'view-contact',
-          'edit-contact',
-        ])) {
+        if (in_array($values['ref'], ['view-contact', 'edit-contact'])) {
           $contextMenu['primaryActions'][$key] = [
             'title' => $values['title'],
             'ref' => $values['ref'],
@@ -3169,9 +3156,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         ) {
           $hasAllPermissions = TRUE;
         }
-        elseif (in_array($menuOptions['ref'], [
-          'new-email',
-        ])) {
+        elseif (in_array($menuOptions['ref'], ['new-email'])) {
           // grant permissions for these tasks.
           $hasAllPermissions = TRUE;
         }

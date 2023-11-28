@@ -4272,14 +4272,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   protected function isFieldFiltered($prop) {
     if (!empty($prop['filters']) && $this->_customGroupFilters) {
       foreach ($prop['filters'] as $fieldAlias => $val) {
-        foreach ([
-          'value',
-          'min',
-          'max',
-          'relative',
-          'from',
-          'to',
-        ] as $attach) {
+        foreach (['value', 'min', 'max', 'relative', 'from', 'to'] as $attach) {
           if (isset($this->_params[$fieldAlias . '_' . $attach]) &&
             (!empty($this->_params[$fieldAlias . '_' . $attach])
               || ($attach != 'relative' &&

@@ -146,10 +146,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
       $InvalidTokens = ['action.forward' => ts("This token can only be used in send mailing context (body, header, footer)..")];
     }
     $errors = [];
-    foreach ([
-      'text',
-      'html',
-    ] as $type) {
+    foreach (['text', 'html'] as $type) {
       $dataErrors = [];
       foreach ($InvalidTokens as $token => $desc) {
         if ($params['body_' . $type]) {

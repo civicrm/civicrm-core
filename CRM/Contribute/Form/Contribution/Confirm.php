@@ -427,11 +427,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     elseif (!empty($this->_values['is_for_organization'])) {
       // no on behalf of an organization, CRM-5519
       // so reset loc blocks from main params.
-      foreach ([
-        'phone',
-        'email',
-        'address',
-      ] as $blk) {
+      foreach (['phone', 'email', 'address'] as $blk) {
         if (isset($this->_params[$blk])) {
           unset($this->_params[$blk]);
         }

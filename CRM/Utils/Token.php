@@ -1135,11 +1135,7 @@ class CRM_Utils_Token {
         }
 
         // special case for greeting replacement
-        foreach ([
-          'email_greeting',
-          'postal_greeting',
-          'addressee',
-        ] as $val) {
+        foreach (['email_greeting', 'postal_greeting', 'addressee'] as $val) {
           if (!empty($contactDetails[$contactID][$val])) {
             $contactDetails[$contactID][$val] = $contactDetails[$contactID]["{$val}_display"];
           }
@@ -1258,11 +1254,7 @@ class CRM_Utils_Token {
   public static function flattenTokens(&$tokens) {
     $flattenTokens = [];
 
-    foreach ([
-      'html',
-      'text',
-      'subject',
-    ] as $prop) {
+    foreach (['html', 'text', 'subject'] as $prop) {
       if (!isset($tokens[$prop])) {
         continue;
       }

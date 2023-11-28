@@ -259,10 +259,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues['is_template'] = 0;
     }
 
-    foreach ([
-      'contribution_amount_low',
-      'contribution_amount_high',
-    ] as $f) {
+    foreach (['contribution_amount_low', 'contribution_amount_high'] as $f) {
       if (isset($this->_formValues[$f])) {
         // @todo - stop changing formValues - respect submitted form values, change a working array.
         $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);

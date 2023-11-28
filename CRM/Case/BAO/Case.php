@@ -2541,11 +2541,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         //has permissions.
         if (!empty($hasPermissions)) {
           //need to check activity object specific.
-          if (in_array($operation, [
-            'view',
-            'edit',
-          ])
-          ) {
+          if (in_array($operation, ['view', 'edit'])) {
             // Check for super permission.
             if (in_array('access all cases and activities', $hasPermissions[$operation])) {
               $allowOperations[$operation] = $allow = TRUE;
