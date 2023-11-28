@@ -263,9 +263,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public function preProcess() {
     parent::preProcess();
-
-    // lineItem isn't set until Register postProcess
-    $this->_lineItem = [$this->getPriceSetID() => $this->getLineItems()];;
     $this->_ccid = $this->get('ccid');
 
     $this->_params = $this->controller->exportValues('Main');
