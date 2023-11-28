@@ -1253,7 +1253,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       CRM_Event_BAO_Event::retrieve($params, $event);
 
       //retrieve custom information
-      $form->_values = [];
+      $this->_values = [];
+      $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'participant');
       CRM_Event_Form_Registration::initEventFee($form, FALSE, $this->getPriceSetID());
       if ($form->_context === 'standalone' || $form->_context === 'participant') {
         $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($event['id'], 'civicrm_event');
