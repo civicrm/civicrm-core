@@ -257,7 +257,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
 
   public function where() {
     $clauses = [];
-    $this->_tempClause = $this->_outerCluase = $this->_groupLimit = '';
+    $this->_outerCluase = $this->_groupLimit = '';
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
