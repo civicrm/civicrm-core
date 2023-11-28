@@ -279,6 +279,10 @@
       // Getter/Setter function for most fields (except select & entityRef)
       $scope.getSetValue = function(val) {
         var currentVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
+        // boolean custom fields uses 0/1 as radio button values
+        if (ctrl.defn.data_type === 'Boolean' && currentVal !== undefined && ctrl.fieldName.includes('.')) {
+          currentVal = currentVal ? 1 : 0;
+        }
         // Setter
         if (arguments.length) {
           if (ctrl.search_operator) {
