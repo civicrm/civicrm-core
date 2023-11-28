@@ -20,6 +20,7 @@ use Civi\Core\Event\GenericHookEvent;
  * @internal
  */
 class ContactLinksProvider extends \Civi\Core\Service\AutoSubscriber {
+  use LinksProviderTrait;
 
   public static function getSubscribedEvents(): array {
     return [
@@ -34,19 +35,22 @@ class ContactLinksProvider extends \Civi\Core\Service\AutoSubscriber {
         if (in_array($link['ui_action'], ['view', 'update'], TRUE)) {
           $e->links[$index]['target'] = '';
         }
-        // Unset the generic "add" link and replace it with links per contact-type and sub-type
-        if ($link['ui_action'] === 'add') {
-          $addTemplate = $link;
-          unset($e->links[$index]);
-        }
       }
-      if ($e->entity === 'Contact') {
-        foreach (\CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
-          self::addLinks($contactType, $addTemplate, $e);
+      // Unset the generic "add" link and replace it with links per contact-type and sub-type
+      $addLinkIndex = self::getActionIndex($e->links, 'add');
+      if ($addLinkIndex !== NULL) {
+        $addTemplate = $e->links[$addLinkIndex];
+        unset($e->links[$addLinkIndex]);
+        // For contact entity, add links for every contact type
+        if ($e->entity === 'Contact') {
+          foreach (\CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
+            self::addLinks($contactType, $addTemplate, $e);
+          }
         }
-      }
-      else {
-        self::addLinks($e->entity, $addTemplate, $e);
+        // For Individual, Organization, Household entity
+        else {
+          self::addLinks($e->entity, $addTemplate, $e);
+        }
       }
     }
   }
