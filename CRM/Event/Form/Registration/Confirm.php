@@ -245,9 +245,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           $this->_amount[$k]['label'] = preg_replace('//', '', $v['amount_level']) . '  -  ' . $append;
-          $this->_part[$k]['info'] = ($v['first_name'] ?? '') . ' ' . ($v['last_name'] ?? '');
+          $participantDetails[$k]['info'] = ($v['first_name'] ?? '') . ' ' . ($v['last_name'] ?? '');
           if (empty($v['first_name'])) {
-            $this->_part[$k]['info'] = $append;
+            $participantDetails[$k]['info'] = $append;
           }
 
           /*CRM-16320 */
@@ -267,8 +267,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $this->set('individual', $individual);
       }
 
-      $this->assign('part', $this->_part);
-      $this->set('part', $this->_part);
+      $this->assign('part', $participantDetails);
+      $this->set('part', $participantDetails);
       $this->assign('amounts', $this->_amount);
       $this->assign('totalAmount', $this->_totalAmount);
       $this->set('totalAmount', $this->_totalAmount);
@@ -1032,12 +1032,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     // Add the billing names to the billing address, if a billing name is set
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
     if (!empty($params['billing_first_name'])) {
-      $params["address_name-{$form->_bltID}"] = $params['billing_first_name'] . ' ' . ($params['billing_middle_name'] ?? '') . ' ' . ($params['billing_last_name'] ?? '');
-      $fields["address_name-{$form->_bltID}"] = 1;
+      $params["address_name-{$billingLocationTypeID}"] = $params['billing_first_name'] . ' ' . ($params['billing_middle_name'] ?? '') . ' ' . ($params['billing_last_name'] ?? '');
+      $fields["address_name-{$billingLocationTypeID}"] = 1;
     }
 
-    $fields["email-{$form->_bltID}"] = 1;
+    $fields["email-{$billingLocationTypeID}"] = 1;
     $fields['email-Primary'] = 1;
 
     //if its pay later or additional participant set email address as primary.
@@ -1045,9 +1046,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         !$form->_values['event']['is_monetary'] ||
         $form->_allowWaitlist ||
         $form->_requireApproval
-      ) && !empty($params["email-{$form->_bltID}"])
+      ) && !empty($params["email-{$billingLocationTypeID}"])
     ) {
-      $params['email-Primary'] = $params["email-{$form->_bltID}"];
+      $params['email-Primary'] = $params["email-{$billingLocationTypeID}"];
     }
   }
 
@@ -1155,7 +1156,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     //get email primary first if exist
     $subscriptionEmail = ['email' => $params['email-Primary'] ?? NULL];
     if (!$subscriptionEmail['email']) {
-      $subscriptionEmail['email'] = $params["email-{$form->_bltID}"] ?? NULL;
+      $subscriptionEmail['email'] = $params['email-' . CRM_Core_BAO_LocationType::getBilling()] ?? NULL;
     }
     // subscribing contact to groups
     if (!empty($subscribeGroupIds) && $subscriptionEmail['email']) {

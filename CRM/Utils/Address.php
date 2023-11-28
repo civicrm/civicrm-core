@@ -451,17 +451,17 @@ class CRM_Utils_Address {
    * Extract the billing fields from the form submission and format them for display.
    *
    * @param array $params
-   * @param int $billingLocationTypeID
    *
    * @return string
    */
-  public static function getFormattedBillingAddressFieldsFromParameters($params, $billingLocationTypeID) {
+  public static function getFormattedBillingAddressFieldsFromParameters(array $params): string {
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
     $addressParts = [
-      "street_address" => "billing_street_address-{$billingLocationTypeID}",
-      "city" => "billing_city-{$billingLocationTypeID}",
-      "postal_code" => "billing_postal_code-{$billingLocationTypeID}",
-      "state_province" => "state_province-{$billingLocationTypeID}",
-      "country" => "country-{$billingLocationTypeID}",
+      'street_address' => "billing_street_address-{$billingLocationTypeID}",
+      'city' => "billing_city-{$billingLocationTypeID}",
+      'postal_code' => "billing_postal_code-{$billingLocationTypeID}",
+      'state_province' => "state_province-{$billingLocationTypeID}",
+      'country' => "country-{$billingLocationTypeID}",
     ];
 
     $addressFields = [];
@@ -478,12 +478,12 @@ class CRM_Utils_Address {
           $value = $params[$alternateName];
         }
       }
-      if (is_numeric($value) && ($name == 'state_province' || $name == 'country')) {
-        if ($name == 'state_province') {
+      if (is_numeric($value) && ($name === 'state_province' || $name === 'country')) {
+        if ($name === 'state_province') {
           $addressFields[$name] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($value);
           $addressFields[$name . '_name'] = CRM_Core_PseudoConstant::stateProvince($value);
         }
-        if ($name == 'country') {
+        if ($name === 'country') {
           $addressFields[$name] = CRM_Core_PseudoConstant::countryIsoCode($value);
         }
       }
@@ -491,7 +491,7 @@ class CRM_Utils_Address {
         $addressFields[$name] = $value;
       }
     }
-    return CRM_Utils_Address::format($addressFields);
+    return (string) CRM_Utils_Address::format($addressFields);
   }
 
   /**

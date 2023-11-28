@@ -1010,7 +1010,7 @@ class CRM_Export_BAO_ExportProcessor {
         if ($field == 'provider_id' || $field == 'im_provider') {
           $fieldValue = $imProviders[$fieldValue] ?? NULL;
         }
-        elseif (strstr($field, 'master_id')) {
+        elseif (str_contains($field, 'master_id')) {
           // @todo - why not just $field === 'master_id'  - what else would it be?
           $masterAddressId = $iterationDAO->$field ?? NULL;
           // get display name of contact that address is shared.

@@ -278,6 +278,10 @@
 - name        : Cheryl Chase
   organization: Mathias Consulting
 
+- github      : chriscant
+  organization: PHD Computer Consultants Ltd
+  name        : Chris Cant
+
 - github      : chrisgaraffa
   name        : Chris Garaffa
   organization: AGH Strategies
@@ -1071,6 +1075,9 @@
 
 - name        : Mick Collopy
 
+- github      : midtsveen
+  name        : Erik Midtsveen
+
 - github      : mihaelmladenov
   name        : Mihael Mladenov
 
@@ -1288,6 +1295,8 @@
 
 - github      : quimgil
   name        : Quim Gil
+
+- github      : ranjit-git
 
 - name        : Rareș Pamfil
 
@@ -1513,6 +1522,9 @@
 
 - name        : Bashar Makhay
 
+- github      : TomRosenbloom
+  name        : Tom Rosenbloom
+
 - github      : trakos
   name        : Piotr Stankowski
 
@@ -1727,5 +1739,5 @@
 - github      : mikeybeck
   name        : Mike Beck
   organization: Fuzion
-  
+
 - github      : ziljah

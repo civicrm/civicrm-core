@@ -30,6 +30,8 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
    */
   public function preProcess() {
     $id = $this->getContributionID();
+    $this->assign('taxTerm', Civi::settings()->get('tax_term'));
+    $this->assign('getTaxDetails', \Civi::settings()->get('invoicing'));
 
     // Check permission for action.
     $actionMapping = [

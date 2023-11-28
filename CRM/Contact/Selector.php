@@ -198,8 +198,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       );
       self::$_columnHeaders = NULL;
 
-      $this->_customFields = CRM_Core_BAO_CustomField::getFieldsForImport('Individual');
-
       $this->_returnProperties = CRM_Contact_BAO_Contact::makeHierReturnProperties($this->_fields);
       $this->_returnProperties['contact_type'] = 1;
       $this->_returnProperties['contact_sub_type'] = 1;

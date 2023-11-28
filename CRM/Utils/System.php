@@ -126,7 +126,7 @@ class CRM_Utils_System {
       $qs = explode('&', str_replace('&amp;', '&', $_SERVER['QUERY_STRING']));
       for ($i = 0, $cnt = count($qs); $i < $cnt; $i++) {
         // check first if exist a pair
-        if (strstr($qs[$i], '=') !== FALSE) {
+        if (str_contains($qs[$i], '=')) {
           [$name, $value] = explode('=', $qs[$i]);
           if ($name != $urlVar) {
             $name = rawurldecode($name);
@@ -260,20 +260,20 @@ class CRM_Utils_System {
     $query = self::makeQueryString($query);
 
     // Legacy handling for when the system passes around html escaped strings
-    if (strstr($query, '&amp;')) {
+    if (str_contains($query, '&amp;')) {
       $query = html_entity_decode($query);
     }
 
     // Extract fragment from path or query if munged together
-    if ($query && strstr($query, '#')) {
+    if ($query && str_contains($query, '#')) {
       [$path, $fragment] = explode('#', $query);
     }
-    if ($path && strstr($path, '#')) {
+    if ($path && str_contains($path, '#')) {
       [$path, $fragment] = explode('#', $path);
     }
 
     // Extract query from path if munged together
-    if ($path && strstr($path, '?')) {
+    if ($path && str_contains($path, '?')) {
       [$path, $extraQuery] = explode('?', $path);
       $query = $extraQuery . ($query ? "&$query" : '');
     }
@@ -493,7 +493,7 @@ class CRM_Utils_System {
 
     if ($referer && !empty($names)) {
       foreach ($names as $name) {
-        if (strstr($referer, $name)) {
+        if (str_contains($referer, $name)) {
           $url = $referer;
           break;
         }
@@ -1290,7 +1290,7 @@ class CRM_Utils_System {
     // convert ipV6 to ipV4
     if ($strictIPV4) {
       // this converts 'IPV4 mapped IPV6 address' to IPV4
-      if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && strstr($address, '::ffff:')) {
+      if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && str_contains($address, '::ffff:')) {
         $address = ltrim($address, '::ffff:');
       }
     }

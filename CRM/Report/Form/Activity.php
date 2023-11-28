@@ -432,12 +432,12 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     if ($recordType == 'target') {
       // @todo - fix up the way the tables are declared in construct & remove this.
       foreach ($this->_selectClauses as $key => $clause) {
-        if (strstr($clause, 'civicrm_contact_assignee.') ||
-          strstr($clause, 'civicrm_contact_source.') ||
-          strstr($clause, 'civicrm_email_assignee.') ||
-          strstr($clause, 'civicrm_email_source.') ||
-          strstr($clause, 'civicrm_phone_assignee.') ||
-          strstr($clause, 'civicrm_phone_source.')
+        if (str_contains($clause, 'civicrm_contact_assignee.') ||
+          str_contains($clause, 'civicrm_contact_source.') ||
+          str_contains($clause, 'civicrm_email_assignee.') ||
+          str_contains($clause, 'civicrm_email_source.') ||
+          str_contains($clause, 'civicrm_phone_assignee.') ||
+          str_contains($clause, 'civicrm_phone_source.')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -447,13 +447,13 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     elseif ($recordType == 'assignee') {
       // @todo - fix up the way the tables are declared in construct & remove this.
       foreach ($this->_selectClauses as $key => $clause) {
-        if (strstr($clause, 'civicrm_contact_target.') ||
-          strstr($clause, 'civicrm_contact_source.') ||
-          strstr($clause, 'civicrm_email_target.') ||
-          strstr($clause, 'civicrm_email_source.') ||
-          strstr($clause, 'civicrm_phone_target.') ||
-          strstr($clause, 'civicrm_phone_source.') ||
-          strstr($clause, 'civicrm_address_')
+        if (str_contains($clause, 'civicrm_contact_target.') ||
+          str_contains($clause, 'civicrm_contact_source.') ||
+          str_contains($clause, 'civicrm_email_target.') ||
+          str_contains($clause, 'civicrm_email_source.') ||
+          str_contains($clause, 'civicrm_phone_target.') ||
+          str_contains($clause, 'civicrm_phone_source.') ||
+          str_contains($clause, 'civicrm_address_')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -463,13 +463,13 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     elseif ($recordType == 'source') {
       // @todo - fix up the way the tables are declared in construct & remove this.
       foreach ($this->_selectClauses as $key => $clause) {
-        if (strstr($clause, 'civicrm_contact_target.') ||
-          strstr($clause, 'civicrm_contact_assignee.') ||
-          strstr($clause, 'civicrm_email_target.') ||
-          strstr($clause, 'civicrm_email_assignee.') ||
-          strstr($clause, 'civicrm_phone_target.') ||
-          strstr($clause, 'civicrm_phone_assignee.') ||
-          strstr($clause, 'civicrm_address_')
+        if (str_contains($clause, 'civicrm_contact_target.') ||
+          str_contains($clause, 'civicrm_contact_assignee.') ||
+          str_contains($clause, 'civicrm_email_target.') ||
+          str_contains($clause, 'civicrm_email_assignee.') ||
+          str_contains($clause, 'civicrm_phone_target.') ||
+          str_contains($clause, 'civicrm_phone_assignee.') ||
+          str_contains($clause, 'civicrm_address_')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -480,16 +480,16 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       $this->_selectClauses = $this->_selectAliasesTotal;
       foreach ($this->_selectClauses as $key => $clause) {
         // @todo - fix up the way the tables are declared in construct & remove this.
-        if (strstr($clause, 'civicrm_contact_contact_target') ||
-          strstr($clause, 'civicrm_contact_contact_assignee') ||
-          strstr($clause, 'civicrm_contact_contact_source') ||
-          strstr($clause, 'civicrm_phone_contact_source_phone') ||
-          strstr($clause, 'civicrm_phone_contact_assignee_phone') ||
-          strstr($clause, 'civicrm_email_contact_source_email') ||
-          strstr($clause, 'civicrm_email_contact_assignee_email') ||
-          strstr($clause, 'civicrm_email_contact_target_email') ||
-          strstr($clause, 'civicrm_phone_contact_target_phone') ||
-          strstr($clause, 'civicrm_address_')
+        if (str_contains($clause, 'civicrm_contact_contact_target') ||
+          str_contains($clause, 'civicrm_contact_contact_assignee') ||
+          str_contains($clause, 'civicrm_contact_contact_source') ||
+          str_contains($clause, 'civicrm_phone_contact_source_phone') ||
+          str_contains($clause, 'civicrm_phone_contact_assignee_phone') ||
+          str_contains($clause, 'civicrm_email_contact_source_email') ||
+          str_contains($clause, 'civicrm_email_contact_assignee_email') ||
+          str_contains($clause, 'civicrm_email_contact_target_email') ||
+          str_contains($clause, 'civicrm_phone_contact_target_phone') ||
+          str_contains($clause, 'civicrm_address_')
         ) {
           $this->_selectClauses[$key] = "GROUP_CONCAT(DISTINCT $clause SEPARATOR ';') as $clause";
         }

@@ -196,6 +196,51 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that submitting other amount works with non-english currency formatting.
+   *
+   * @dataProvider getThousandSeparators
+   *
+   * @param string $thousandSeparator
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testOtherAmountConfirm(string $thousandSeparator) : void {
+    $this->setCurrencySeparators($thousandSeparator);
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
+    $processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
+    $processor->setDoDirectPaymentResult(['payment_status_id' => 1, 'fee_amount' => .72]);
+    $this->submitOnlineContributionForm([
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['other_amount'] => $this->formatMoneyInput(555.00),
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'id' => $this->getContributionPageID(),
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
+    $this->assertEquals(655, $contribution['total_amount']);
+  }
+
+  /**
+   * Test the tax calculation when using a quick config price set with a membership selection & a contribution (radio) selection.
+   *
+   * Expected amount is $100 non-tax deductible + $25 with an additional $2.50 tax.
+   */
+  public function testSeparatePaymentWithTax(): void {
+    $this->enableTaxAndInvoicing();
+    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'));
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
+    $this->submitOnlineContributionForm([
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => $this->ids['PriceFieldValue']['contribution_amount_25'],
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'id' => $this->getContributionPageID(),
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
+    $this->assertEquals(2.5, $contribution['tax_amount']);
+    $this->assertEquals(127.5, $contribution['total_amount']);
+  }
+
+  /**
    * Test the confirm form with a separate membership payment configured.
    */
   public function testSeparatePaymentConfirm(): void {
@@ -211,15 +256,17 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertTrue($assignedVariables['is_separate_payment']);
     // Two emails were sent - check both. The first is a contribution
     // online receipt & the second is the membership online receipt.
-    $this->assertMailSentContainingStrings([
-      'Contribution Information',
-      '<td style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;">
-         Amount        </td>
-        <td style="padding: 4px; border-bottom: 1px solid #999;">
-         $352.00         </td>
-       </tr>',
-      '************1111',
-    ]);
+    $this->assertMailSentContainingStrings(
+      [
+        'Contribution Information',
+        '<td style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;">
+           Amount        </td>
+          <td style="padding: 4px; border-bottom: 1px solid #999;">
+           $352.00         </td>
+         </tr>',
+        '************1111',
+      ],
+    );
     $this->assertMailSentContainingStrings([
       'Membership Information',
       'Membership Type       </td>
@@ -281,6 +328,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
   /**
    * @param bool $isSeparateMembershipPayment
+   *
+   * @deprecated see testSeparatePaymentWithTax for preferred way to get valid config.
    *
    * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
    */

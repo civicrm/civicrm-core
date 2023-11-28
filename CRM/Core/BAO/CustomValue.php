@@ -172,7 +172,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
       }
       elseif (($htmlType == 'TextArea' ||
           ($htmlType == 'Text' && $dataType == 'String')
-        ) && strstr($formValues[$key], '%')
+        ) && str_contains($formValues[$key], '%')
       ) {
         $formValues[$key] = ['LIKE' => $formValues[$key]];
       }

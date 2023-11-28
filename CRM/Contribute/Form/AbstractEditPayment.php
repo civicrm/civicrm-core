@@ -405,17 +405,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Get current currency from DB or use default currency.
-   *
-   * @param array $submittedValues
-   *
-   * @return string
-   */
-  public function getCurrency($submittedValues = []) {
-    return $submittedValues['currency'] ?? $this->_values['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency;
-  }
-
-  /**
    * @param array $submittedValues
    *
    * @return mixed
@@ -669,14 +658,14 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     return $title;
   }
 
-  protected function assignContactEmailDetails() {
+  protected function assignContactEmailDetails(): void {
     if ($this->getContactID()) {
       [$displayName] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->getContactID());
       if (!$displayName) {
         $displayName = civicrm_api3('contact', 'getvalue', ['id' => $this->getContactID(), 'return' => 'display_name']);
       }
-      $this->assign('displayName', $displayName);
     }
+    $this->assign('displayName', $displayName ?? NULL);
   }
 
   protected function assignContactID(): void {

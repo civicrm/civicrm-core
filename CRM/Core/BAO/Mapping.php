@@ -606,7 +606,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
           }
 
           // CRM-14983: verify if values are comma separated convert to array
-          if (!is_array($value) && strstr($params['operator'][$key][$k], 'IN')) {
+          if (!is_array($value) && str_contains($params['operator'][$key][$k], 'IN')) {
             $value = explode(',', $value);
             $value = [$params['operator'][$key][$k] => $value];
           }

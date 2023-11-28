@@ -228,6 +228,17 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Is the form being submitted in test mode.
+   *
+   * @api this function is supported for external use.
+   *
+   * @return bool
+   */
+  public function isTest(): bool {
+    return (bool) ($this->getAction() & CRM_Core_Action::PREVIEW);
+  }
+
+  /**
    * Get the price set for the contribution page.
    *
    * Note that we use the `get` from the form as a legacy method but
@@ -305,46 +316,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_emailExists = $this->get('emailExists');
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
-    $this->getRenewalMembershipID();
 
     if ($this->getRenewalMembershipID()) {
-      $membership = new CRM_Member_DAO_Membership();
-      $membership->id = $this->getRenewalMembershipID();
-
-      if ($membership->find(TRUE)) {
-        $this->_defaultMemTypeId = $membership->membership_type_id;
-        if ($membership->contact_id != $this->_contactID) {
-          $validMembership = FALSE;
-          $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), NULL, NULL, 'Organization');
-          if (!empty($organizations) && array_key_exists($membership->contact_id, $organizations)) {
-            $this->_membershipContactID = $membership->contact_id;
-            $this->assign('membershipContactID', $this->_membershipContactID);
-            $this->assign('membershipContactName', $organizations[$this->_membershipContactID]['name']);
-            $validMembership = TRUE;
-          }
-          else {
-            $membershipType = new CRM_Member_BAO_MembershipType();
-            $membershipType->id = $membership->membership_type_id;
-            if ($membershipType->find(TRUE)) {
-              // CRM-14051 - membership_type.relationship_type_id is a CTRL-A padded string w one or more ID values.
-              // Convert to comma separated list.
-              $inheritedRelTypes = implode(',', CRM_Utils_Array::explodePadded($membershipType->relationship_type_id));
-              $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), $membershipType->relationship_type_id);
-              if (array_key_exists($membership->contact_id, $permContacts)) {
-                $this->_membershipContactID = $membership->contact_id;
-                $validMembership = TRUE;
-              }
-            }
-          }
-          if (!$validMembership) {
-            CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
-          }
-        }
-      }
-      else {
-        CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
-      }
-      unset($membership);
+      $this->defineRenewalMembership();
     }
 
     // we do not want to display recently viewed items, so turn off
@@ -740,9 +714,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       ]);
     }
 
-    // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
-    // function to get correct amount level consistently. Remove setting of the amount level in
-    // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
+    // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
     // to cover all variants.
     if (isset($this->_params['amount_other']) || isset($this->_params['selectMembership'])) {
       $this->_params['amount_level'] = '';
@@ -757,10 +729,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
 
-    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-      $this->_params,
-      $this->_bltID
-    ));
+    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
     if (!empty($this->_params['onbehalf_profile_id']) && !empty($this->_params['onbehalf'])) {
       $this->assign('onBehalfName', $this->_params['organization_name']);
@@ -938,6 +907,79 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
     $this->assign($name, $fields ?? NULL);
+  }
+
+  /**
+   * Build Premium Block im Contribution Pages.
+   *
+   * @param bool $formItems
+   * @param int $selectedProductID
+   * @param string $selectedOption
+   */
+  protected function buildPremiumsBlock($formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
+    $this->add('hidden', "selectProduct", $selectedProductID, ['id' => 'selectProduct']);
+
+    $premiumDao = new CRM_Contribute_DAO_Premium();
+    $premiumDao->entity_table = 'civicrm_contribution_page';
+    $premiumDao->entity_id = $this->getContributionPageID();
+    $premiumDao->premiums_active = 1;
+
+    if ($premiumDao->find(TRUE)) {
+      $premiumID = $premiumDao->id;
+      $premiumBlock = [];
+      CRM_Core_DAO::storeValues($premiumDao, $premiumBlock);
+
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
+      $addWhere = "financial_type_id IN (0)";
+      if (!empty($financialTypes)) {
+        $addWhere = "financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
+      }
+      $addWhere = "{$addWhere} OR financial_type_id IS NULL";
+
+      $premiumsProductDao = new CRM_Contribute_DAO_PremiumsProduct();
+      $premiumsProductDao->premiums_id = $premiumID;
+      $premiumsProductDao->whereAdd($addWhere);
+      $premiumsProductDao->orderBy('weight');
+      $premiumsProductDao->find();
+
+      $products = [];
+      while ($premiumsProductDao->fetch()) {
+        $productDAO = new CRM_Contribute_DAO_Product();
+        $productDAO->id = $premiumsProductDao->product_id;
+        $productDAO->is_active = 1;
+        if ($productDAO->find(TRUE)) {
+          if ($selectedProductID != NULL) {
+            if ($selectedProductID == $productDAO->id) {
+              if ($selectedOption) {
+                $productDAO->options = ts('Selected Option') . ': ' . $selectedOption;
+              }
+              else {
+                $productDAO->options = NULL;
+              }
+              CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
+            }
+          }
+          else {
+            // Why? should we not skip if not found?
+            CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
+          }
+        }
+        $options = $temp = [];
+        $temp = explode(',', $productDAO->options);
+        foreach ($temp as $value) {
+          $options[trim($value)] = trim($value);
+        }
+        if ($temp[0] != '') {
+          $this->addElement('select', 'options_' . $productDAO->id, NULL, $options);
+        }
+      }
+      if (count($products)) {
+        $this->assign('showPremium', $formItems);
+        $this->assign('showSelectOptions', $formItems);
+        $this->assign('premiumBlock', $premiumBlock);
+      }
+    }
+    $this->assign('products', $products ?? NULL);
   }
 
   /**
@@ -1149,44 +1191,32 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Get the amount for the main contribution.
    *
-   * The goal is to expand this function so that all the argy-bargy of figuring out the amount
-   * winds up here as the main spaghetti shrinks.
-   *
    * If there is a separate membership contribution this is the 'other one'. Otherwise there
    * is only one.
-   *
-   * @param $params
    *
    * @return float
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getMainContributionAmount($params) {
-    if (!empty($params['selectMembership'])) {
-      if (empty($params['amount']) && !$this->_separateMembershipPayment) {
-        return CRM_Member_BAO_MembershipType::getMembershipType($params['selectMembership'])['minimum_fee'] ?? 0;
-      }
+  protected function getMainContributionAmount(): float {
+    $amount = 0;
+    foreach ($this->getMainContributionLineItems() as $lineItem) {
+      // Line total inclusive should really be always set but this is a safe fall back.
+      $amount += $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
     }
-    return $params['amount'] ?? 0;
+    return $amount;
   }
 
   /**
    * Wrapper for processAmount that also sets autorenew.
    *
-   * @param $fields
-   *   This is the output of the function CRM_Price_BAO_PriceSet::getSetDetail($priceSetID, FALSE, FALSE);
-   *   And, it would make sense to introduce caching into that function and call it from here rather than
-   *   require the $fields array which is passed from pillar to post around the form in order to pass it in here.
    * @param array $params
    *   Params reflecting form input e.g with fields 'price_5' => 7, 'price_8' => array(7, 8)
-   * @param $lineItems
-   *   Line item array to be altered.
    */
-  public function processAmountAndGetAutoRenew($fields, &$params, &$lineItems) {
-    CRM_Price_BAO_PriceSet::processAmount($fields, $params, $lineItems, $this->getPriceSetID());
+  public function processAmountAndGetAutoRenew(&$params) {
     $autoRenew = [];
     $autoRenew[0] = $autoRenew[1] = $autoRenew[2] = 0;
-    foreach ($lineItems as $lineItem) {
+    foreach ($this->getLineItems() as $lineItem) {
       if (!empty($lineItem['auto_renew']) &&
         is_numeric($lineItem['auto_renew'])
       ) {
@@ -1424,8 +1454,73 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if ($this->getExistingContributionID()) {
       $this->order->setTemplateContributionID($this->getExistingContributionID());
     }
-    $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
     $this->order->setForm($this);
+    foreach ($this->getPriceFieldMetaData() as $priceField) {
+      if ($priceField['html_type'] === 'Text') {
+        $this->submittableMoneyFields[] = 'price_' . $priceField['id'];
+      }
+    }
+    $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
+  }
+
+  protected function defineRenewalMembership(): void {
+    $membership = new CRM_Member_DAO_Membership();
+    $membership->id = $this->getRenewalMembershipID();
+
+    if ($membership->find(TRUE)) {
+      $this->_defaultMemTypeId = $membership->membership_type_id;
+      if ($membership->contact_id != $this->_contactID) {
+        $validMembership = FALSE;
+        $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), NULL, NULL, 'Organization');
+        if (!empty($organizations) && array_key_exists($membership->contact_id, $organizations)) {
+          $this->_membershipContactID = $membership->contact_id;
+          $this->assign('membershipContactID', $this->_membershipContactID);
+          $this->assign('membershipContactName', $organizations[$this->_membershipContactID]['name']);
+          $validMembership = TRUE;
+        }
+        else {
+          $membershipType = new CRM_Member_BAO_MembershipType();
+          $membershipType->id = $membership->membership_type_id;
+          if ($membershipType->find(TRUE)) {
+            // CRM-14051 - membership_type.relationship_type_id is a CTRL-A padded string w one or more ID values.
+            // Convert to comma separated list.
+            $inheritedRelTypes = implode(',', CRM_Utils_Array::explodePadded($membershipType->relationship_type_id));
+            $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), $membershipType->relationship_type_id);
+            if (array_key_exists($membership->contact_id, $permContacts)) {
+              $this->_membershipContactID = $membership->contact_id;
+              $validMembership = TRUE;
+            }
+          }
+        }
+        if (!$validMembership) {
+          CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
+        }
+      }
+    }
+    else {
+      CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
+    }
+  }
+
+  /**
+   * Get the currency for the form.
+   *
+   * Rather historic - might have unneeded stuff
+   *
+   * @return string
+   */
+  public function getCurrency() {
+    $currency = $this->_values['currency'] ?? NULL;
+    // For event forms, currency is in a different spot
+    if (empty($currency)) {
+      $currency = CRM_Utils_Array::value('currency', CRM_Utils_Array::value('event', $this->_values));
+    }
+    if (empty($currency)) {
+      $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
+    }
+    // @todo If empty there is a problem - we should probably put in a deprecation notice
+    // to warn if that seems to be happening.
+    return (string) $currency;
   }
 
 }

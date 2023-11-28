@@ -2587,7 +2587,7 @@ AND      default_value IS NOT NULL";
    * @return array
    */
   public static function postProcess(
-    &$params,
+    $params,
     $entityID,
     $customFieldExtends,
     $inline = FALSE,

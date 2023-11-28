@@ -322,7 +322,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $blocks = ['email', 'phone', 'im', 'url', 'openid'];
       foreach ($this->_params['onbehalf'] as $loc => $value) {
         $field = $typeId = NULL;
-        if (strstr($loc, '-')) {
+        if (str_contains($loc, '-')) {
           [$field, $locType] = explode('-', $loc);
         }
 
@@ -411,7 +411,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             }
           }
         }
-        elseif (strstr($loc, 'custom')) {
+        elseif (str_contains($loc, 'custom')) {
           if ($value && isset($this->_params['onbehalf']["{$loc}_id"])) {
             $value = $this->_params['onbehalf']["{$loc}_id"];
           }
@@ -445,6 +445,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if ($this->_pcpId) {
       $params = $this->processPcp($this, $this->_params);
       $this->_params = $params;
+    }
+    else {
+      $this->assign('pcpBlock');
     }
     $this->_params['invoiceID'] = $this->get('invoiceID');
 
@@ -482,6 +485,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $fieldTypes[] = CRM_Core_BAO_UFGroup::getContactType($this->_values['honoree_profile_id']);
       $this->buildCustom($this->_values['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
     }
+    else {
+      $this->assign('honoreeProfileFields');
+    }
     $this->assign('receiptFromEmail', $this->_values['receipt_from_email'] ?? NULL);
     $this->assign('amount_block_is_active', $this->isFormSupportsNonMembershipContributions());
     $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
@@ -502,11 +508,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!empty($params['selectProduct']) && $params['selectProduct'] !== 'no_thanks') {
       $option = $params['options_' . $params['selectProduct']] ?? NULL;
       $productID = $params['selectProduct'];
-      CRM_Contribute_BAO_Premium::buildPremiumBlock($this, $this->_id, FALSE,
+      $this->buildPremiumsBlock(FALSE,
         $productID, $option
       );
       $this->set('productID', $productID);
       $this->set('option', $option);
+    }
+    else {
+      $this->assign('products');
     }
     if (CRM_Core_Component::isEnabled('CiviMember') && empty($this->_ccid)) {
       if (isset($params['selectMembership']) &&
@@ -546,6 +555,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
 
       $this->buildCustom($this->_values['onbehalf_profile_id'], 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
+    }
+    else {
+      $this->assign('onbehalfProfile');
     }
 
     $this->_separateMembershipPayment = $this->isSeparateMembershipPayment();
@@ -1419,6 +1431,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         // Skip line items in the contribution processing transaction.
         // We will create them with the membership for proper linking.
         $membershipParams['skipLineItem'] = 1;
+        // Since we are not letting Contribution::create set up the line items
+        // we need to specify the tax.
+        $membershipParams['tax_amount'] = $this->order->getTotalTaxAmount();
       }
 
       $paymentResult = $this->processConfirm(
@@ -1772,6 +1787,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * This function sets the fields.
    *
+   * The results of it are likely unused.
+   *
    * - $this->_params['amount_level']
    * - $this->_params['selectMembership']
    * And under certain circumstances sets
@@ -1792,14 +1809,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       if ($this->isQuickConfig() && !empty($this->_params["price_{$priceField->id}"])) {
         if ($this->_values['fee'][$priceField->id]['html_type'] != 'Text') {
-          // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
-          // function to get correct amount level consistently. Remove setting of the amount level in
-          // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
-          // to cover all variants.
+          // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
+          // We expect this to be ignored.
           $this->_params['amount_level'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
             $this->_params["price_{$priceField->id}"], 'label');
         }
         if ($priceField->name == "membership_amount") {
+          // We expect this to be ignored.
           $this->_params['selectMembership'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
             $this->_params["price_{$priceField->id}"], 'membership_type_id');
         }
@@ -1818,6 +1834,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         && ($this->_params["price_{$paramWeDoNotUnderstand}"] ?? NULL) < 1
         && empty($this->_params["price_{$priceField->id}"])
       ) {
+        // We expect this to be ignored.
         $this->_params['amount'] = NULL;
       }
 
@@ -1831,6 +1848,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         && ($this->_values['fee'][$priceField->id]['name'] ?? NULL) == 'contribution_amount'
         && ($this->_params["price_{$priceField->id}"] ?? NULL) == '-1'
       ) {
+        // We expect this to be ignored.
         $this->_params['amount'] = NULL;
       }
     }
@@ -2039,29 +2057,29 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!empty($this->_values['onbehalf_profile_id']) && empty($this->_ccid)) {
       $behalfOrganization = [];
       $orgFields = ['organization_name', 'organization_id', 'org_option'];
-      foreach ($orgFields as $fld) {
-        if (array_key_exists($fld, $params)) {
-          $behalfOrganization[$fld] = $params[$fld];
-          unset($params[$fld]);
+      foreach ($orgFields as $organizationField) {
+        if (array_key_exists($organizationField, $params)) {
+          $behalfOrganization[$organizationField] = $params[$organizationField];
+          unset($params[$organizationField]);
         }
       }
 
       if (is_array($params['onbehalf']) && !empty($params['onbehalf'])) {
-        foreach ($params['onbehalf'] as $fld => $values) {
-          if (strstr($fld, 'custom_')) {
-            $behalfOrganization[$fld] = $values;
+        foreach ($params['onbehalf'] as $onBehalfField => $values) {
+          if (str_contains($onBehalfField, 'custom_')) {
+            $behalfOrganization[$onBehalfField] = $values;
           }
-          elseif (!(strstr($fld, '-'))) {
-            if (in_array($fld, [
+          elseif (!str_contains($onBehalfField, '-')) {
+            if (in_array($onBehalfField, [
               'contribution_campaign_id',
               'member_campaign_id',
             ])) {
-              $fld = 'campaign_id';
+              $onBehalfField = 'campaign_id';
             }
             else {
-              $behalfOrganization[$fld] = $values;
+              $behalfOrganization[$onBehalfField] = $values;
             }
-            $this->_params[$fld] = $values;
+            $this->_params[$onBehalfField] = $values;
           }
         }
       }
@@ -2069,7 +2087,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (array_key_exists('onbehalf_location', $params) && is_array($params['onbehalf_location'])) {
         foreach ($params['onbehalf_location'] as $block => $vals) {
           //fix for custom data (of type checkbox, multi-select)
-          if (substr($block, 0, 7) == 'custom_') {
+          if (str_starts_with($block, 0, 'custom_')) {
             continue;
           }
           // fix the index of block elements
@@ -2214,7 +2232,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         is_array($paymentParams['onbehalf'])
       ) {
         foreach ($paymentParams['onbehalf'] as $key => $value) {
-          if (strstr($key, 'custom_')) {
+          if (str_contains($key, 'custom_')) {
             $this->_params[$key] = $value;
           }
         }
@@ -2350,7 +2368,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       is_array($membershipParams['onbehalf'])
     ) {
       foreach ($membershipParams['onbehalf'] as $key => $value) {
-        if (strstr($key, 'custom_')) {
+        if (str_contains($key, 'custom_')) {
           $customFieldId = explode('_', $key);
           CRM_Core_BAO_CustomField::formatCustomField(
             $customFieldId[1],
@@ -2393,32 +2411,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         );
       }
     }
-  }
-
-  /**
-   * Get the amount for the main contribution.
-   *
-   * The goal is to expand this function so that all the argy-bargy of figuring out the amount
-   * winds up here as the main spaghetti shrinks.
-   *
-   * If there is a separate membership contribution this is the 'other one'. Otherwise there
-   * is only one.
-   *
-   * @todo - move this to the parent, replace existing (some tests to fight).
-   *
-   * @param $params
-   *
-   * @return float
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getMainContributionAmount($params = []) {
-    $amount = 0;
-    foreach ($this->getMainContributionLineItems() as $lineItem) {
-      // Line total inclusive should really be always set but this is a safe fall back.
-      $amount += $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
-    }
-    return $amount;
   }
 
   /**

@@ -651,7 +651,6 @@ WHERE  id = %1";
    */
   public static function processAmount($fields, &$params, &$lineItem, $priceSetID = NULL) {
     // using price set
-    $totalPrice = $totalTax = 0;
     foreach ($fields as $id => $field) {
       if (empty($params["price_{$id}"]) ||
         (empty($params["price_{$id}"]) && $params["price_{$id}"] == NULL)
@@ -662,49 +661,11 @@ WHERE  id = %1";
 
       [$params, $lineItem] = self::getLine($params, $lineItem, $priceSetID, $field, $id);
     }
-
-    $amount_level = [];
-    $totalParticipant = 0;
-    if (is_array($lineItem)) {
-      foreach ($lineItem as $values) {
-        $totalPrice += $values['line_total'] + $values['tax_amount'];
-        $totalTax += $values['tax_amount'];
-        $totalParticipant += $values['participant_count'];
-        // This is a bit nasty. The logic of 'quick config' was because price set configuration was
-        // (and still is) too difficult to replace the 'quick config' price set configuration on the contribution
-        // page.
-        //
-        // However, because the quick config concept existed all sorts of logic was hung off it
-        // and function behaviour sometimes depends on whether 'price set' is set - although actually it
-        // is always set at the functional level. In this case we are dealing with the default 'quick config'
-        // price set having a label of 'Contribution Amount' which could wind up creating a 'funny looking' label.
-        // The correct answer is probably for it to have an empty label in the DB - the label is never shown so it is a
-        // place holder.
-        //
-        // But, in the interests of being careful when capacity is low - avoiding the known default value
-        // will get us by.
-        // Crucially a test has been added so a better solution can be implemented later with some comfort.
-        // @todo - stop setting amount level in this function & call the getAmountLevel function to retrieve it.
-        if ($values['label'] !== ts('Contribution Amount')) {
-          $amount_level[] = $values['label'] . ' - ' . (float) $values['qty'];
-        }
-      }
-    }
-
-    $displayParticipantCount = '';
-    if ($totalParticipant > 0) {
-      $displayParticipantCount = ' Participant Count -' . $totalParticipant;
-    }
-    // @todo - stop setting amount level in this function & call the getAmountLevel function to retrieve it.
-    if (!empty($amount_level)) {
-      $params['amount_level'] = CRM_Utils_Array::implodePadded($amount_level);
-      if (!empty($displayParticipantCount)) {
-        $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
-      }
-    }
-
-    $params['amount'] = $totalPrice;
-    $params['tax_amount'] = $totalTax;
+    $order = new CRM_Financial_BAO_Order();
+    $order->setLineItems($lineItem);
+    $params['amount_level'] = $order->getAmountLevel();
+    $params['amount'] = $order->getTotalAmount();
+    $params['tax_amount'] = $order->getTotalTaxAmount();
   }
 
   /**
