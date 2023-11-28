@@ -1602,19 +1602,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'note' => $this->getSubmittedValue('note'),
       'is_test' => ($this->_mode === 'test)'),
     ];
-
-    // reuse id if one already exists for this one (can happen
-    // with back button being hit etc)
-    if (!$participantParams['id'] && !empty($params['contributionID'])) {
-      $pID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-        $params['contributionID'],
-        'participant_id',
-        'contribution_id'
-      );
-      $participantParams['id'] = $pID;
-    }
     $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
-
     $participant = CRM_Event_BAO_Participant::create($participantParams);
 
     // Add custom data for participant
