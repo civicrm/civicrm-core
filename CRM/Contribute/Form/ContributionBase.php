@@ -239,7 +239,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public function __get($name) {
     if ($name === '_lineItem') {
-      // At some point add a deprecation notice here.
+      CRM_Core_Error::deprecatedWarning('attempt to access undefined property _lineItem - use externally supported function getLineItems()');
       return [$this->getPriceSetID() => $this->getLineItems()];
     }
     CRM_Core_Error::deprecatedWarning('attempt to access invalid property :' . $name);
@@ -256,6 +256,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public function __set($name, $value) {
     if ($name === '_lineItem') {
+      CRM_Core_Error::deprecatedWarning('attempt to access undefined property _lineItem - use externally supported function setLineItems()');
       $this->order->setLineItems($value[$this->getPriceSetID()]);
       return;
     }
