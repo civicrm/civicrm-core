@@ -10,8 +10,8 @@
   <descriptionField>email</descriptionField>
   <log>true</log>
   <paths>
-    <add>civicrm/user</add>
-    <update>civicrm/user/#?User1=[id]</update>
+    <add>civicrm/admin/user</add>
+    <update>civicrm/admin/user/#?User1=[id]</update>
   </paths>
 
   <field>
