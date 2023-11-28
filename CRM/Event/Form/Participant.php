@@ -295,7 +295,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if (CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $_GET['eventId'], 'is_monetary')) {
         $this->assign('feeBlockPaid', TRUE);
       }
-      CRM_Event_Form_EventFees::preProcess($this);
       return;
     }
 
@@ -318,7 +317,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if ($this->_submitValues['event_id']) {
         $this->_eventId = (int) $this->_submitValues['event_id'];
       }
-      CRM_Event_Form_EventFees::preProcess($this);
       $this->buildEventFeeForm($this);
       CRM_Event_Form_EventFees::setDefaultValues($this);
     }
@@ -1238,6 +1236,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @throws \Exception
    */
   public function buildEventFeeForm($form) {
+    //as when call come from register.php
+    if (!$form->_eventId) {
+      $form->_eventId = CRM_Utils_Request::retrieve('eventId', 'Positive', $form);
+    }
+
+    $form->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $form);
+    $form->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $form);
+
     if ($form->_eventId) {
       $form->_isPaidEvent = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'is_monetary');
       if ($form->_isPaidEvent) {
@@ -1472,6 +1478,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function assignEventDetailsToTpl($eventID, $participantRoles, $receiptText): void {
     $this->assign('event', ['confirm_email_text' => $receiptText]);
+  }
+
+  /**
+   * Get the currency for the event.
+   *
+   * @return string
+   */
+  public function getCurrency() {
+    return $this->getEventValue('currency') ?: \Civi::settings()->get('defaultCurrency');
   }
 
   /**
