@@ -2069,7 +2069,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           if (str_contains($onBehalfField, 'custom_')) {
             $behalfOrganization[$onBehalfField] = $values;
           }
-          elseif (!(str_contains($onBehalfField, '-') !== FALSE)) {
+          elseif (!str_contains($onBehalfField, '-')) {
             if (in_array($onBehalfField, [
               'contribution_campaign_id',
               'member_campaign_id',
