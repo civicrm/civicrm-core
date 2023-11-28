@@ -2502,7 +2502,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     $actionOperations = ['view', 'edit', 'delete'];
     if (in_array($operation, $actionOperations)) {
 
-      //do cache when user has non/supper permission.
+      // Do cache when user has non-super permission.
       static $allowOperations;
 
       if (!is_array($allowOperations) ||
@@ -2546,7 +2546,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
             'edit',
           ])
           ) {
-            //do we have supper permission.
+            // Check for super permission.
             if (in_array('access all cases and activities', $hasPermissions[$operation])) {
               $allowOperations[$operation] = $allow = TRUE;
             }
@@ -2608,8 +2608,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         }
       }
       else {
-        //use cache.
-        //here contact might have supper/non permission.
+        // Use cache; user might have non-super permission.
         $allow = $allowOperations[$operation];
       }
     }
