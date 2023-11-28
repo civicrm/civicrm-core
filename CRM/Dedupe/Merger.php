@@ -2945,6 +2945,7 @@ ORDER BY civicrm_custom_group.weight,
         // Add this value to the table rows
         $rows["move_location_{$blockName}_{$count}"]['other'] = $displayValue;
         $rows["move_location_{$blockName}_{$count}"]['location_entity'] = $blockName;
+        $rows["move_location_{$blockName}_{$count}"]['location_block_index'] = $count;
 
         // CRM-17556 Only display 'main' contact value if it's the same location + type
         // Look it up from main values...
