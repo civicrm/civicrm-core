@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Membership;
+
 /**
  * This class generates form components for processing a Contribution.
  */
@@ -47,6 +49,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @internal - only to be used by legacy paypal express implementation.
    */
   public $_expressButtonName;
+
+  /**
+   * Existing memberships the contact has.
+   *
+   * @var array
+   */
+  private $existingMemberships;
 
   /**
    * Get the active UFGroups (profiles) on this form
@@ -239,7 +248,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               break;
             }
             elseif ($opMemTypeId &&
-              in_array($opMemTypeId, $this->lookup('CurrentMembership', 'membership_type_id')) &&
+              !empty($this->getExistingMemberships()[$opMemTypeId]) &&
               !in_array($opMemTypeId, $selectedCurrentMemTypes)
             ) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
@@ -635,6 +644,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
 
+      //because we take first membership record id for renewal
+      $memberships = $this->getExistingMemberships();
       if (!empty($membershipTypeIds)) {
         $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIds);
         $this->_membershipTypeValues = $membershipTypeValues;
@@ -671,22 +682,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             $radioOptAttrs[$memType['id']] = $javascriptMethod;
             if ($cid) {
               //show current membership, skip pending and cancelled membership records,
-              //because we take first membership record id for renewal
-              $membership = \Civi\Api4\Membership::get(FALSE)
-                ->addSelect('end_date', 'membership_type_id', 'membership_type_id.duration_unit:name')
-                ->addWhere('contact_id', '=', $cid)
-                ->addWhere('membership_type_id', '=', $memType['id'])
-                ->addWhere('status_id:name', 'NOT IN', ['Cancelled', 'Pending'])
-                ->addWhere('is_test', '=', $this->isTest())
-                ->addOrderBy('end_date', 'DESC')
-                ->execute()
-                ->first();
-
+              $membership = $memberships[$memType['id']] ?? NULL;
               if ($membership) {
                 if ($membership["membership_type_id.duration_unit:name"] === 'lifetime') {
                   unset($radio[$memType['id']]);
                   unset($radioOptAttrs[$memType['id']]);
                   $this->assign('hasExistingLifetimeMembership', TRUE);
+                  unset($memberships[$memType['id']]);
                   continue;
                 }
                 $this->define('Membership', 'CurrentMembership', $membership);
@@ -708,7 +710,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       $this->assign('membershipBlock', $this->_membershipBlock);
       $this->assign('showRadio', TRUE);
-      $this->assign('renewal_mode', $this->isDefined('CurrentMembership'));
+      $this->assign('renewal_mode', !empty($memberships));
       $this->assign('membershipTypes', $membershipTypes);
       $this->assign('allowAutoRenewMembership', $allowAutoRenewMembership);
       $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
@@ -1772,6 +1774,42 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
     }
+  }
+
+  /**
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function getExistingMemberships(): array {
+    if ($this->existingMemberships === NULL) {
+      $availableMembershipTypeIDs = $this->getAvailableMembershipTypeIDs();
+      if (!empty($availableMembershipTypeIDs)) {
+        $this->existingMemberships = (array) Membership::get(FALSE)
+          ->addSelect('*', 'membership_type_id.duration_unit:name')
+          ->addWhere('contact_id', '=', $this->_membershipContactID)
+          ->addWhere('membership_type_id', 'IN', $availableMembershipTypeIDs)
+          ->addWhere('status_id:name', 'NOT IN', ['Cancelled', 'Pending'])
+          ->addWhere('is_test', '=', $this->isTest())
+          ->addOrderBy('end_date', 'DESC')
+          ->execute();
+      }
+    }
+    return $this->existingMemberships;
+  }
+
+  /**
+   * Get the membership type IDs available in the price set.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function getAvailableMembershipTypeIDs(): array {
+    $membershipTypeIDs = [];
+    foreach ($this->getMembershipLineItems() as $lineItem) {
+      $membershipTypeIDs[$lineItem['membership_type_id']] = $lineItem['membership_type_id'];
+    }
+    return $membershipTypeIDs;
   }
 
 }
