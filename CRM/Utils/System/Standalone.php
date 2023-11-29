@@ -35,18 +35,18 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     return !class_exists(\Civi\Standalone\Security::class);
   }
 
-  /**
-   * Start a new session.
-   */
-  public function sessionStart() {
-    parent::sessionStart();
-    if ($this->missingStandaloneExtension()) {
-      // Provide a fake contact and user ID, otherwise we don't get a menu.
-      $session = CRM_Core_Session::singleton();
-      $session->set('userID', 1);
-      $session->set('ufID', 1);
+  public function initialize() {
+    parent::initialize();
+    // Initialize the session if it looks like there might be one.
+    // Case 1: user sends no session cookie: do NOT start the session. May be anon access that does not require session data. Good for caching.
+    // Case 2: user sends a session cookie: start the session, so we can access data like lcMessages for localization (which occurs early in the boot process).
+    // Case 3: user sends a session cookie but it's invalid: start the session, it will be empty and a new cookie will be sent.
+    if (isset($_COOKIE['PHPSESSID'])) {
+      // Note: passing $isRead = FALSE in the arguments will cause the session to be started.
+      CRM_Core_Session::singleton()->initialize(FALSE);
     }
   }
+
 
   /**
    * @inheritdoc
