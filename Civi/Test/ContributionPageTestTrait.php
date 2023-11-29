@@ -117,6 +117,37 @@ trait ContributionPageTestTrait {
       'entity_id' => $contributionPageResult['id'],
       'price_set_id' => $this->ids['PriceSet'][$identifier],
     ]);
+    $this->createTestEntity('Product', [
+      'name' => '5_dollars',
+      'description' => '5 dollars worth of monopoly money',
+      'options' => 'White, Black, Green',
+      'price' => 1,
+      'min_contribution' => 5,
+      'cost' => .05,
+    ], '5_dollars');
+    $this->createTestEntity('Product', [
+      'name' => '10_dollars',
+      'description' => '10 dollars worth of monopoly money',
+      'options' => 'White, Black, Green',
+      'price' => 2,
+      'min_contribution' => 10,
+      'cost' => .05,
+    ], '10_dollars');
+    $this->createTestEntity('Premium', [
+      'entity_id' => $this->getContributionPageID($identifier),
+      'entity_table' => 'civicrm_contribution_page',
+      'premiums_intro_title' => 'Get free monopoly money with your donation',
+    ], $identifier);
+    $this->createTestEntity('PremiumsProduct', [
+      'premiums_id' => $this->ids['Premium'][$identifier],
+      'product_id' => $this->ids['Product']['5_dollars'],
+      'weight' => 1,
+    ]);
+    $this->createTestEntity('PremiumsProduct', [
+      'premiums_id' => $this->ids['Premium'][$identifier],
+      'product_id' => $this->ids['Product']['10_dollars'],
+      'weight' => 2,
+    ]);
     return $contributionPageResult;
   }
 
