@@ -3226,7 +3226,7 @@ WHERE  $smartGroupClause
     $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
     $tTable = "`civicrm_tag-" . uniqid() . "`";
 
-    if ($useAllTagTypes[2]) {
+    if ($useAllTagTypes && $useAllTagTypes[2]) {
       $this->_tables[$etTable] = $this->_whereTables[$etTable]
         = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id)
             LEFT JOIN civicrm_tag {$tTable} ON ( {$etTable}.tag_id = {$tTable}.id  )";
