@@ -5,7 +5,7 @@ return [
   'type' => 'search',
   'title' => E::ts('CiviCRM Queues'),
   'icon' => 'fa-list-alt',
-  'server_route' => 'civicrm/queues',
+  'server_route' => 'civicrm/admin/queue',
   'permission' => ['administer queues'],
   'placement' => [],
   'permission_operator' => "AND",
