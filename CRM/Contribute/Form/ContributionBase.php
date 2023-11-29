@@ -1020,7 +1020,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public function assignPaymentFields() {
     //fix for CRM-3767
     $isMonetary = FALSE;
-    if ($this->_amount > 0.0) {
+    if ($this->order->getTotalAmount() > 0.0) {
       $isMonetary = TRUE;
     }
     elseif (!empty($this->_params['selectMembership'])) {
@@ -1064,9 +1064,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
       }
       $this->assign('paymentFieldsetLabel', CRM_Core_Payment_Form::getPaymentLabel($paymentProcessorObject));
-      $this->assign('paymentFields', $paymentFields);
-
     }
+    $this->assign('paymentFields', $paymentFields ?? []);
   }
 
   /**
