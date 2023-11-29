@@ -2405,7 +2405,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @return int|null
    */
   protected function getPriceSetID() {
-    return $this->getSubmittedValue('price_set_id');
+    return $this->getSubmittedValue('price_set_id') ?: CRM_Utils_Request::retrieve('priceSetId', 'Integer');
   }
 
   /**
