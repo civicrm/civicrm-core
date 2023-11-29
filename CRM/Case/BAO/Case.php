@@ -2704,13 +2704,9 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       return FALSE;
     }
 
-    if (CRM_Core_Permission::check('access my cases and activities') ||
-      CRM_Core_Permission::check('access all cases and activities')
-    ) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return CRM_Core_Permission::check([
+      ['access my cases and activities', /* OR */ 'access all cases and activities'],
+    ]);
   }
 
   /**

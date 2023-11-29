@@ -431,11 +431,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $path = $_GET[$urlVar] ?? NULL;
     }
 
-    if ($path && preg_match('/^civicrm\/upgrade(\/.*)?$/', $path)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return ($path && preg_match('/^civicrm\/upgrade(\/.*)?$/', $path));
   }
 
   /**

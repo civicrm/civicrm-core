@@ -777,11 +777,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
 
     $parsingSupportedLocales = ['en_US', 'en_CA', 'fr_CA'];
 
-    if (in_array($locale, $parsingSupportedLocales)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return in_array($locale, $parsingSupportedLocales);
   }
 
   /**
