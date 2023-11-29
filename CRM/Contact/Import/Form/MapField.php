@@ -82,6 +82,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function preProcess(): void {
+    // Don't mess up the fields for related contacts
+    $this->shouldSortMapperFields = FALSE;
+
     parent::preProcess();
     //format custom field names, CRM-2676
     $contactType = $this->getContactType();
