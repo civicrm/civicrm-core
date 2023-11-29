@@ -578,12 +578,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *   List of errors to be posted back to the form.
    */
   public static function formRuleSubType($fieldType, $groupType, &$errors) {
-    if (in_array($fieldType, [
-      'Participant',
-      'Contribution',
-      'Membership',
-      'Activity',
-    ])) {
+    if (in_array($fieldType, ['Participant', 'Contribution', 'Membership', 'Activity'])) {
       $individualSubTypes = CRM_Contact_BAO_ContactType::subTypes('Individual');
       foreach ($groupType as $value) {
         if (!in_array($value, $individualSubTypes) &&
@@ -744,12 +739,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $errors['field_name'] = ts('Please select a field name');
     }
 
-    if ($in_selector && in_array($entityName, [
-      'Contribution',
-      'Participant',
-      'Membership',
-      'Activity',
-    ])
+    if ($in_selector && in_array($entityName, ['Contribution', 'Participant', 'Membership', 'Activity'])
     ) {
       $errors['in_selector'] = ts("'Results Column' cannot be checked for %1 fields.", [1 => $entityName]);
     }
@@ -979,10 +969,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   protected function setMessageIfCountryNotAboveState($fieldName, $locationTypeID, $weight, $ufGroupID) {
     $message = ts('For best results, the Country field should precede the State-Province field in your Profile form. You can use the up and down arrows on field listing page for this profile to change the order of these fields or manually edit weight for Country/State-Province Field.');
 
-    if (in_array($fieldName, [
-      'country',
-      'state_province',
-    ]) && count(CRM_Core_Config::singleton()->countryLimit) > 1
+    if (in_array($fieldName, ['country', 'state_province']) &&
+      count(CRM_Core_Config::singleton()->countryLimit) > 1
     ) {
       // get state or country field weight if exists
       $ufFieldDAO = new CRM_Core_DAO_UFField();

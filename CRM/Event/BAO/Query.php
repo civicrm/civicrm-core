@@ -434,11 +434,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
       case 'event_type_id':
       case 'event_title':
         $qillName = $name;
-        if (in_array($name, [
-          'event_id',
-          'event_title',
-          'event_is_public',
-        ])) {
+        if (in_array($name, ['event_id', 'event_title', 'event_is_public'])) {
           $name = str_replace('event_', '', $name);
         }
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';

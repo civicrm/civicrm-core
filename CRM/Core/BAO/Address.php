@@ -720,10 +720,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     ];
 
     // overwriting $streetUnitFormats for 'en_CA' and 'fr_CA' locale
-    if (in_array($locale, [
-      'en_CA',
-      'fr_CA',
-    ])) {
+    if (in_array($locale, ['en_CA', 'fr_CA'])) {
       $streetUnitFormats = ['APT', 'APP', 'SUITE', 'BUREAU', 'UNIT'];
     }
     //@todo per CRM-14459 this regex picks up words with the string in them - e.g APT picks up

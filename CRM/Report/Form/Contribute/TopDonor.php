@@ -226,11 +226,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $op = $fields['total_range_op'] ?? NULL;
     $val = $fields['total_range_value'] ?? NULL;
 
-    if (!in_array($op, [
-      'eq',
-      'lte',
-    ])
-    ) {
+    if (!in_array($op, ['eq', 'lte'])) {
       $errors['total_range_op'] = ts("Please select 'Is equal to' OR 'Is Less than or equal to' operator");
     }
 

@@ -473,11 +473,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
           }
 
         }
-        elseif (!empty($this->_multiRecordFields)
-          && (!$this->_multiRecord || !in_array($this->_multiRecord, [
-            CRM_Core_Action::DELETE,
-            CRM_Core_Action::UPDATE,
-          ]))
+        elseif (!empty($this->_multiRecordFields) &&
+          (!$this->_multiRecord || !in_array($this->_multiRecord, [CRM_Core_Action::DELETE, CRM_Core_Action::UPDATE]))
         ) {
           CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
           //multi-record listing page

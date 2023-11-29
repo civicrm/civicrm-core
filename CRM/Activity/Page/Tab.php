@@ -184,10 +184,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
         'Print PDF Letter'
       );
 
-      if (in_array($activityTypeId, [
-        $emailTypeValue,
-        $letterTypeValue,
-      ])) {
+      if (in_array($activityTypeId, [$emailTypeValue, $letterTypeValue])) {
         return;
       }
     }

@@ -298,11 +298,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
     $membershipTypeDetails = self::getMembershipTypeDetails($membershipTypeId);
 
     // Convert all dates to 'Y-m-d' format.
-    foreach ([
-      'joinDate',
-      'startDate',
-      'endDate',
-    ] as $dateParam) {
+    foreach (['joinDate', 'startDate', 'endDate'] as $dateParam) {
       if (!empty($$dateParam)) {
         $$dateParam = CRM_Utils_Date::processDate($$dateParam, NULL, FALSE, 'Y-m-d');
       }

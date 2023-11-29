@@ -481,11 +481,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $errors = $self->customDataFormRule($fields, $ignoreFields);
 
     if (empty($fields['fields']['total_amount'])) {
-      foreach ([
-        'total_count_value',
-        'total_sum_value',
-        'total_avg_value',
-      ] as $val) {
+      foreach (['total_count_value', 'total_sum_value', 'total_avg_value'] as $val) {
         if (!empty($fields[$val])) {
           $errors[$val] = ts("Please select the Amount Statistics");
         }

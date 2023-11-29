@@ -137,11 +137,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
 
     $locType = CRM_Core_BAO_LocationType::getDefault();
-    foreach ([
-      'phone',
-      'email',
-      'address',
-    ] as $locFld) {
+    foreach (['phone', 'email', 'address'] as $locFld) {
       if (!empty($this->_defaults[$locFld]) && $this->_defaults[$locFld][1]['location_type_id']) {
         $params[$locFld][1]['is_primary'] = $this->_defaults[$locFld][1]['is_primary'];
         $params[$locFld][1]['location_type_id'] = $this->_defaults[$locFld][1]['location_type_id'];

@@ -216,10 +216,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $taxAmount += $v['tax_amount'];
         if (is_array($v)) {
           $this->cleanMoneyFields($v);
-          foreach ([
-            'first_name',
-            'last_name',
-          ] as $name) {
+          foreach (['first_name', 'last_name'] as $name) {
             if (isset($v['billing_' . $name]) &&
               !isset($v[$name])
             ) {
