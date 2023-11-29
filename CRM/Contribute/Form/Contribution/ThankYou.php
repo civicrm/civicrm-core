@@ -104,10 +104,10 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       if (is_array($membershipTypeID)) {
         $membershipTypeID = current($membershipTypeID);
       }
-      $this->assign('is_quick_config', 1);
       $this->_params['is_quick_config'] = 1;
     }
-    $this->assign('priceSetID', $this->_priceSetId);
+    $this->assign('is_quick_config', $this->isQuickConfig());
+    $this->assign('priceSetID', $this->getPriceSetID());
     $this->assign('useForMember', $this->get('useForMember'));
 
     if (!empty($this->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
