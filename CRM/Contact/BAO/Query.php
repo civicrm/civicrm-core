@@ -3213,7 +3213,7 @@ WHERE  $smartGroupClause
    *
    * @throws \CRM_Core_Exception
    */
-  public function tagSearch(&$values) {
+  public function tagSearch($values) {
     [$name, $op, $value, $grouping, $wildcard] = $values;
 
     $op = "LIKE";
