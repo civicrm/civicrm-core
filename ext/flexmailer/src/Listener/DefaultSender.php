@@ -167,15 +167,15 @@ class DefaultSender extends BaseListener {
       return FALSE;
     }
 
-    if (strpos($message, 'Failed to set sender') !== FALSE) {
+    if (str_contains($message, 'Failed to set sender')) {
       return TRUE;
     }
 
-    if (strpos($message, 'Failed to add recipient') !== FALSE) {
+    if (str_contains($message, 'Failed to add recipient')) {
       return TRUE;
     }
 
-    if (strpos($message, 'Failed to send data') !== FALSE) {
+    if (str_contains($message, 'Failed to send data')) {
       return TRUE;
     }
 

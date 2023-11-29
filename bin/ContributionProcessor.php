@@ -450,11 +450,7 @@ class CiviContributeProcessor {
     }
 
     $contribution = CRM_Contribute_BAO_Contribution::create($params);
-    if (!$contribution->id) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (bool) $contribution->id;
   }
 
   /**

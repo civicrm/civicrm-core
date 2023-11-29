@@ -217,11 +217,7 @@ class CRM_Utils_File {
 
     $written = fwrite($file, $contents);
     $closed = fclose($file);
-    if ($written === FALSE or !$closed) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return !($written === FALSE or !$closed);
   }
 
   /**

@@ -763,7 +763,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     // SMTP response code is buried in the message.
     $code = preg_match('/ \(code: (.+), response: /', $message, $matches) ? $matches[1] : '';
 
-    if (strpos($message, 'Failed to write to socket') !== FALSE) {
+    if (str_contains($message, 'Failed to write to socket')) {
       return TRUE;
     }
 
@@ -772,15 +772,15 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       return FALSE;
     }
 
-    if (strpos($message, 'Failed to set sender') !== FALSE) {
+    if (str_contains($message, 'Failed to set sender')) {
       return TRUE;
     }
 
-    if (strpos($message, 'Failed to add recipient') !== FALSE) {
+    if (str_contains($message, 'Failed to add recipient')) {
       return TRUE;
     }
 
-    if (strpos($message, 'Failed to send data') !== FALSE) {
+    if (str_contains($message, 'Failed to send data')) {
       return TRUE;
     }
 
