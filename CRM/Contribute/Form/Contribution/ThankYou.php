@@ -52,7 +52,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     // Link (button) for users to create their own Personal Campaign page
     if ($linkText = CRM_PCP_BAO_PCP::getPcpBlockStatus($this->getContributionPageID(), 'contribute')) {
       $linkTextUrl = CRM_Utils_System::url('civicrm/contribute/campaign',
-        "action=add&reset=1&pageId=' . $this->getContributionPageID() . '&component=contribute",
+        'action=add&reset=1&pageId=' . $this->getContributionPageID() . '&component=contribute',
         FALSE, NULL, TRUE
       );
     }
