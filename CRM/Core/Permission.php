@@ -234,11 +234,7 @@ class CRM_Core_Permission {
       return TRUE;
     }
 
-    if (self::check('administer CiviCRM data', $userId)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return self::check('administer CiviCRM data', $userId);
   }
 
   /**

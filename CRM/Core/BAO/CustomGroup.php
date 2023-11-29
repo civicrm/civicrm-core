@@ -2008,11 +2008,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     $query = "SELECT count(id) FROM {$tableName} WHERE id IS NOT NULL LIMIT 1";
     $value = CRM_Core_DAO::singleValueQuery($query);
 
-    if (empty($value)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return empty($value);
   }
 
   /**

@@ -266,11 +266,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * @return bool
    */
   public static function dataExists($params) {
-    if ($params['contact_type'] == 'Individual') {
-      return TRUE;
-    }
-
-    return FALSE;
+    return $params['contact_type'] == 'Individual';
   }
 
 }
