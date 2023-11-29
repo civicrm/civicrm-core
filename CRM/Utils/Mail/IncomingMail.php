@@ -161,13 +161,13 @@ class CRM_Utils_Mail_IncomingMail {
     $twoDigitString = $twoDigitStringMin . $verpSeparator;
 
     // a common-for-all-actions regex to handle CiviCRM 2.2 address patterns
-    $regex = '/^' . $emailLocalPart . '(b|c|e|o|r|u)' . $twoDigitString . '([0-9a-f]{16})@' . $emailDomain . '$/';
+    $regex = '/^' . $emailLocalPart . '(b|c|e|o|r|u)' . $twoDigitString . '([0-9a-z]{16})@' . $emailDomain . '$/';
 
     // a tighter regex for finding bounce info in soft bounces’ mail bodies
-    $rpRegex = '/Return-Path:\s*' . $emailLocalPart . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . $emailDomain . '/';
+    $rpRegex = '/Return-Path:\s*' . $emailLocalPart . '(b)' . $twoDigitString . '([0-9a-z]{16})@' . $emailDomain . '/';
 
     // a regex for finding bound info X-Header
-    $rpXHeaderRegex = '/X-CiviMail-Bounce: ' . $emailLocalPart . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . $emailDomain . '/i';
+    $rpXHeaderRegex = '/X-CiviMail-Bounce: ' . $emailLocalPart . '(b)' . $twoDigitString . '([0-9a-z]{16})@' . $emailDomain . '/i';
     // CiviMail in regex and Civimail in header !!!
     $matches = NULL;
     foreach ($this->mail->to as $address) {
