@@ -374,7 +374,7 @@ class CRM_Contact_Form_Search_Criteria {
       'job_title' => ['name' => 'job_title'],
       'preferred_language' => ['name' => 'preferred_language'],
       'contact_id' => [
-        'name' => 'contact_id',
+        'name' => 'id',
         'help' => ['id' => 'id-contact-id', 'file' => 'CRM/Contact/Form/Contact'],
       ],
       'external_identifier' => [
