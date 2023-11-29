@@ -636,19 +636,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
 
       if (!empty($membershipTypeIds)) {
-        //set status message if wrong membershipType is included in membershipBlock
-        // @todo - this appears to be unreachable - it seems likely it has been broken for
-        // a while so remove may be an OK alternative to fix
-        if ($this->getRenewalMembershipID() && !$membershipPriceset) {
-          $membershipTypeID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-            $this->getRenewalMembershipID(),
-            'membership_type_id'
-          );
-          if (!in_array($membershipTypeID, $membershipTypeIds)) {
-            CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Invalid Membership'), 'error');
-          }
-        }
-
         $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIds);
         $this->_membershipTypeValues = $membershipTypeValues;
         $endDate = NULL;
