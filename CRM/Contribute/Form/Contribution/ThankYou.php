@@ -132,9 +132,9 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $qParams = "reset=1&amp;id={$this->_id}";
     //pcp elements
+    $this->assign('pcpBlock', FALSE);
     if ($this->_pcpId) {
       $qParams .= "&amp;pcpId={$this->_pcpId}";
-      $this->assign('pcpBlock', FALSE);
 
       // display honor roll data only if it's enabled for the PCP page
       if (!empty($this->_pcpInfo['is_honor_roll'])) {
