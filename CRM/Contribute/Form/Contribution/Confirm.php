@@ -2065,7 +2065,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (array_key_exists('onbehalf_location', $params) && is_array($params['onbehalf_location'])) {
         foreach ($params['onbehalf_location'] as $block => $vals) {
           //fix for custom data (of type checkbox, multi-select)
-          if (str_starts_with($block, 0, 'custom_')) {
+          if (str_starts_with($block, 'custom_')) {
             continue;
           }
           // fix the index of block elements
