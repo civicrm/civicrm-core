@@ -320,7 +320,7 @@ class SpecFormatter {
       $inputAttrs['maxlength'] = (int) $data['maxlength'];
     }
     if ($inputType == 'TextArea') {
-      foreach (['rows', 'cols', 'note_rows', 'note_cols'] as $prop) {
+      foreach (['rows', 'cols', 'note_rows', 'note_columns'] as $prop) {
         if (!empty($data[$prop])) {
           $inputAttrs[str_replace('note_', '', $prop)] = (int) $data[$prop];
         }
