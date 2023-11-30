@@ -1560,15 +1560,11 @@ abstract class CRM_Core_Payment {
       return FALSE;
     }
 
-    if (isset($_GET['payment_date']) &&
+    return (isset($_GET['payment_date']) &&
       isset($_GET['merchant_return_link']) &&
       ($_GET['payment_status'] ?? NULL) == 'Completed' &&
       $paymentProcessor['payment_processor_type'] == "PayPal_Standard"
-    ) {
-      return TRUE;
-    }
-
-    return FALSE;
+    );
   }
 
   /**

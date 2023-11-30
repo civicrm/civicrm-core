@@ -693,11 +693,7 @@ LIMIT 1";
 
     $relationshipCount = CRM_Core_DAO::singleValueQuery($relationshipQuery);
 
-    if (!empty($relationshipCount)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return (bool) $relationshipCount;
   }
 
   /**
