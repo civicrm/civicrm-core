@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\PremiumsProduct;
 use Civi\Api4\PriceSet;
 
 /**
@@ -945,72 +946,55 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Build Premium Block im Contribution Pages.
    *
    * @param bool $formItems
-   * @param int $selectedProductID
    * @param string $selectedOption
+   *
+   * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function buildPremiumsBlock($formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
-    $this->add('hidden', "selectProduct", $selectedProductID, ['id' => 'selectProduct']);
-
-    $premiumDao = new CRM_Contribute_DAO_Premium();
-    $premiumDao->entity_table = 'civicrm_contribution_page';
-    $premiumDao->entity_id = $this->getContributionPageID();
-    $premiumDao->premiums_active = 1;
-
-    if ($premiumDao->find(TRUE)) {
-      $premiumID = $premiumDao->id;
-      $premiumBlock = [];
-      CRM_Core_DAO::storeValues($premiumDao, $premiumBlock);
-
-      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
-      $addWhere = "financial_type_id IN (0)";
-      if (!empty($financialTypes)) {
-        $addWhere = "financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
-      }
-      $addWhere = "{$addWhere} OR financial_type_id IS NULL";
-
-      $premiumsProductDao = new CRM_Contribute_DAO_PremiumsProduct();
-      $premiumsProductDao->premiums_id = $premiumID;
-      $premiumsProductDao->whereAdd($addWhere);
-      $premiumsProductDao->orderBy('weight');
-      $premiumsProductDao->find();
-
-      $products = [];
-      while ($premiumsProductDao->fetch()) {
-        $productDAO = new CRM_Contribute_DAO_Product();
-        $productDAO->id = $premiumsProductDao->product_id;
-        $productDAO->is_active = 1;
-        if ($productDAO->find(TRUE)) {
-          if ($selectedProductID != NULL) {
-            if ($selectedProductID == $productDAO->id) {
-              if ($selectedOption) {
-                $productDAO->options = ts('Selected Option') . ': ' . $selectedOption;
-              }
-              else {
-                $productDAO->options = NULL;
-              }
-              CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
-            }
+  protected function buildPremiumsBlock(bool $formItems = FALSE, $selectedOption = NULL): void {
+    $selectedProductID = $this->getProductID();
+    $this->add('hidden', 'selectProduct', $selectedProductID, ['id' => 'selectProduct']);
+    $premiumProducts = PremiumsProduct::get()
+      ->addSelect('product_id.*')
+      ->addSelect('product_id')
+      ->addSelect('premiums_id.*')
+      ->addWhere('product_id.is_active', '=', TRUE)
+      ->addWhere('premiums_id.entity_id', '=', $this->getContributionPageID())
+      ->addWhere('premiums_id.entity_table', '=', 'civicrm_contribution_page')
+      ->addOrderBy('weight')
+      ->execute();
+    $products = [];
+    $premium = [];
+    foreach ($premiumProducts as $premiumProduct) {
+      $product = ['options' => NULL];
+      foreach ($premiumProduct as $key => $value) {
+        if (str_starts_with($key, 'product_id.')) {
+          if ($key === 'product_id.options' && $selectedProductID === $product['id'] && $selectedOption) {
+            // In this case we are on the thank you or confirm page so assign
+            // the selected option to the page for display.
+            $product['options'] = ts('Selected Option') . ': ' . $selectedOption;
           }
           else {
-            // Why? should we not skip if not found?
-            CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
+            $product[str_replace('product_id.', '', $key)] = $value;
           }
         }
-        $options = $temp = [];
-        $temp = explode(',', $productDAO->options);
-        foreach ($temp as $value) {
-          $options[trim($value)] = trim($value);
-        }
-        if ($temp[0] != '') {
-          $this->addElement('select', 'options_' . $productDAO->id, NULL, $options);
+        if (str_starts_with($key, 'premiums_id.')) {
+          $premium[str_replace('premiums_id.', '', $key)] = $value;
         }
       }
-      if (count($products)) {
-        $this->assign('showPremium', $formItems);
-        $this->assign('showSelectOptions', $formItems);
-        $this->assign('premiumBlock', $premiumBlock);
+      $options = array_filter(explode(',', $product['options']));
+      $productOptions = [];
+      foreach ($options as $option) {
+        $optionValue = trim($option);
+        if ($optionValue) {
+          $productOptions[$optionValue] = $optionValue;
+        }
       }
+      if (!empty($options)) {
+        $this->addElement('select', 'options_' . $product['id'], NULL, $productOptions);
+      }
+      $products[$premiumProduct['product_id']] = $product;
     }
+    $this->assign('premiumBlock', $premium);
     $this->assign('products', $products ?? NULL);
   }
 
@@ -1381,6 +1365,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   protected function getExistingContributionID(): ?int {
     return $this->_ccid ?: CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
+  }
+
+  /**
+   * @return int|bool
+   */
+  protected function getProductID() {
+    $productID = $this->getSubmittedValue('selectProduct') ? (int) $this->getSubmittedValue('selectProduct') : FALSE;
+    $this->set('productID', $productID);
+    return $productID;
   }
 
   /**

@@ -136,19 +136,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test form submission with basic price set.
    */
-  public function testSubmit(): void {
-    $this->setUpContributionPage();
-    $submitParams = $this->getBasicSubmitParams();
-
-    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
-    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID(), 'return' => ['non_deductible_amount']]);
-    //assert non-deductible amount
-    $this->assertEquals(5.00, $contribution['non_deductible_amount']);
-  }
-
-  /**
-   * Test form submission with basic price set.
-   */
   public function testSubmitZeroDollar(): void {
     $this->setUpContributionPage();
     $priceFieldID = reset($this->_ids['price_field']);

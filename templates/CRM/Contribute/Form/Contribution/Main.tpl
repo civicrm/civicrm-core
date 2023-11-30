@@ -185,7 +185,7 @@
         {include file="CRM/common/CMSUser.tpl"}
       </div>
       <div class="crm-public-form-item crm-section premium_block-section">
-        {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="makeContribution" preview=false}
+        {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="makeContribution" preview=false showPremiumSelectionFields=true}
       </div>
 
       {if $honoreeProfileFields && $honoreeProfileFields|@count}

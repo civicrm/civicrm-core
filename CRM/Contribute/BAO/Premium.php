@@ -140,7 +140,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
         }
       }
       if (count($products)) {
-        $form->assign('showPremium', $formItems);
+        $form->assign('showPremiumSelectionFields', $formItems);
         $form->assign('showSelectOptions', $formItems);
         $form->assign('premiumBlock', $premiumBlock);
       }

@@ -315,12 +315,13 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
   /**
    * @param array $submittedValues
-   * @param int $contributionPageID
+   * @param int|null $contributionPageID
+   *   Will default to calling $this->>getContributionPageID()
    *
    * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
    */
-  protected function submitOnlineContributionForm(array $submittedValues, int $contributionPageID) {
-    $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues, ['id' => $contributionPageID])
+  protected function submitOnlineContributionForm(array $submittedValues, ?int $contributionPageID = NULL) {
+    $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues, ['id' => $contributionPageID ?: $this->getContributionPageID()])
       ->addSubsequentForm('CRM_Contribute_Form_Contribution_Confirm');
     $form->processForm();
     return $form;
@@ -442,6 +443,25 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'payment_instrument_id' => 'Check',
     ]);
     $mailUtil->checkMailLog([\Civi::format()->money(337.55), 'Tax Rate', 'Subtotal']);
+  }
+
+  /**
+   * Test form submission with basic price set.
+   */
+  public function testSubmit(): void {
+    $this->contributionPageWithPriceSetCreate();
+    $this->submitOnlineContributionForm([
+      'id' => $this->getContributionPageID(),
+      'first_name' => 'J',
+      'last_name' => 'T',
+      'email-5' => 'JT@ohcanada.ca',
+      'receive_date' => date('Y-m-d H:i:s'),
+      'payment_processor_id' => 0,
+      'priceSetId' => $this->getPriceSetID('ContributionPage'),
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
+    ]);
+    $contribution = $this->getCreatedContribution();
+    $this->assertEquals(5.00, $contribution['non_deductible_amount']);
   }
 
   /**
@@ -613,6 +633,18 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'Free',
     ]);
     $this->assertMailSentNotContainingString('Amount');
+  }
+
+  /**
+   * Get the just-created contribution.
+   *
+   * @return array
+   */
+  protected function getCreatedContribution(): array {
+    return $this->callAPISuccessGetSingle('Contribution', [
+      'contribution_page_id' => $this->getContributionPageID(),
+      'version' => 4,
+    ]);
   }
 
 }

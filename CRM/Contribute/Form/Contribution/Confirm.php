@@ -500,11 +500,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (!empty($params['selectProduct']) && $params['selectProduct'] !== 'no_thanks') {
       $option = $params['options_' . $params['selectProduct']] ?? NULL;
-      $productID = $params['selectProduct'];
-      $this->buildPremiumsBlock(FALSE,
-        $productID, $option
-      );
-      $this->set('productID', $productID);
+      $this->buildPremiumsBlock(FALSE, $option);
       $this->set('option', $option);
     }
     else {

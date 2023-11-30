@@ -95,13 +95,12 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     // FIXME: Some of this code is identical to Confirm.php and should be broken out into a shared function
     $this->assignToTemplate();
     $this->_ccid = $this->get('ccid');
-    $productID = $this->get('productID');
     $option = $this->get('option');
     $membershipTypeID = $this->get('membershipTypeID');
     $this->assign('receiptFromEmail', CRM_Utils_Array::value('receipt_from_email', $this->_values));
 
-    if ($productID) {
-      $this->buildPremiumsBlock(FALSE, $productID, $option);
+    if ($this->getProductID()) {
+      $this->buildPremiumsBlock(FALSE, $option);
     }
 
     $params = $this->_params;
