@@ -231,14 +231,14 @@
 
   {* Show credit or debit card section for 'direct' mode, except for PayPal Express (detected because credit card number is empty) *}
     {crmRegion name="contribution-confirm-billing-block"}
-    {if in_array('credit_card_number', $form) || in_array('bank_account_number', $form)}
+    {if in_array('credit_card_number', $paymentFields) || in_array('bank_account_number', $paymentFields)}
       <div class="crm-group credit_card-group">
         {if $paymentFieldsetLabel}
           <div class="header-dark">
             {$paymentFieldsetLabel}
           </div>
         {/if}
-        {if in_array('bank_account_number', $form) && $bank_account_number}
+        {if in_array('bank_account_number', $paymentFields) && $bank_account_number}
           <div class="display-block">
             {ts}Account Holder{/ts}: {$account_holder}<br/>
             {ts}Bank Account Number{/ts}: {$bank_account_number}<br/>
@@ -256,7 +256,7 @@
             </div>
           {/if}
         {/if}
-        {if in_array('credit_card_number', $form) && $credit_card_number}
+        {if in_array('credit_card_number', $paymentFields) && $credit_card_number}
           <div class="crm-section no-label credit_card_details-section">
             <div class="content">{$credit_card_type}</div>
             <div class="content">{$credit_card_number}</div>

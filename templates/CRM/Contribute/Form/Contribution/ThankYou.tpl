@@ -273,7 +273,7 @@
     </div>
   {/if}
 
-  {if in_array('credit_card_number', $form) || in_array('bank_account_number', $form) && ($amount GT 0 OR $minimum_fee GT 0)}
+  {if in_array('credit_card_number', $paymentFields) || in_array('bank_account_number', $paymentFields) && ($amount GT 0 OR $minimum_fee GT 0)}
     {crmRegion name="contribution-thankyou-billing-block"}
       <div class="crm-group credit_card-group">
         {if $paymentFieldsetLabel}
@@ -281,7 +281,7 @@
             {$paymentFieldsetLabel}
           </div>
         {/if}
-          {if in_array('bank_account_number', $form) && $bank_account_number}
+          {if in_array('bank_account_number', $paymentFields) && $bank_account_number}
           <div class="display-block">
             {ts}Account Holder{/ts}: {$account_holder}<br />
             {ts}Bank Identification Number{/ts}: {$bank_identification_number}<br />
