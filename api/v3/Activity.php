@@ -336,12 +336,14 @@ function _civicrm_api3_activity_get_extraFilters(&$params, &$sql) {
       'join' => '!joinType civicrm_entity_file !alias ON (!alias.entity_table = "civicrm_activity" AND !alias.entity_id = a.id)',
       'column' => 'file_id',
     ],
-    'case_id' => [
+  ];
+  if (\CRM_Core_Component::isEnabled('CiviCase')) {
+    $rels['case_id'] = [
       'subquery' => 'a.id IN (SELECT activity_id FROM civicrm_case_activity WHERE !clause)',
       'join' => '!joinType civicrm_case_activity !alias ON (!alias.activity_id = a.id)',
       'column' => 'case_id',
-    ],
-  ];
+    ];
+  }
   foreach ($rels as $filter => $relSpec) {
     if (!empty($params[$filter])) {
       if (!is_array($params[$filter])) {
