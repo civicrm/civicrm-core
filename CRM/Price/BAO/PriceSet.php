@@ -1660,4 +1660,18 @@ WHERE     ct.id = cp.financial_type_id AND
     return $result;
   }
 
+  public static function hook_civicrm_post($op, $objectName, $objectId, &$objectRef): void {
+    if (in_array($objectName, ['PriceField', 'PriceFieldValue', 'PriceSet'], TRUE)) {
+      self::flushPriceSets();
+    }
+  }
+
+  public static function flushPriceSets(): void {
+    $cache = CRM_Utils_Cache::singleton();
+    foreach (PriceSet::get(FALSE)->addSelect('id')->execute() as $priceSet) {
+      $cacheKey = 'CRM_Price_BAO_PriceSetgetCachedPriceSetDetail_' . $priceSet['id'];
+      $cache->delete($cacheKey);
+    }
+  }
+
 }

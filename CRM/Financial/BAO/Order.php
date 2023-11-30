@@ -672,6 +672,9 @@ class CRM_Financial_BAO_Order {
    */
   protected function setPriceFieldMetadata(array $metadata): void {
     foreach ($metadata as $index => $priceField) {
+      if ($this->isExcludeExpiredFields && !$priceField['is_active']) {
+        unset($metadata[$index]);
+      }
       if ($this->isExcludeExpiredFields && !empty($priceField['active_on']) && time() < strtotime($priceField['active_on'])) {
         unset($metadata[$index]);
       }
@@ -680,7 +683,10 @@ class CRM_Financial_BAO_Order {
       }
       elseif (!empty($priceField['options'])) {
         foreach ($priceField['options'] as $optionID => $option) {
-          if (!empty($option['membership_type_id'])) {
+          if (!$option['is_active']) {
+            unset($metadata[$index]['options'][$optionID]);
+          }
+          elseif (!empty($option['membership_type_id'])) {
             $membershipType = CRM_Member_BAO_MembershipType::getMembershipType((int) $option['membership_type_id']);
             $metadata[$index]['options'][$optionID]['auto_renew'] = (int) $membershipType['auto_renew'];
             if ($membershipType['auto_renew'] && empty($this->priceSetMetadata['auto_renew_membership_field'])) {
