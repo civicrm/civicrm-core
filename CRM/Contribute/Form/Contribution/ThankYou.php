@@ -152,12 +152,11 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     }
 
     $this->assign('qParams', $qParams);
-
+    $this->assign('membershipBlock', $this->_membershipBlock);
+    $this->assign('membership_trx_id', $this->get('membership_trx_id'));
     if ($membershipTypeID) {
-      $transactionID = $this->get('membership_trx_id');
       $membershipAmount = $this->get('membership_amount');
       $renewalMode = $this->get('renewal_mode');
-      $this->assign('membership_trx_id', $transactionID);
       $this->assign('membership_amount', $membershipAmount);
       $this->assign('renewal_mode', $renewalMode);
 
@@ -396,7 +395,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
         }
       }
 
-      $this->assign('membershipBlock', $this->_membershipBlock);
       $this->assign('showRadio', FALSE);
       $this->assign('membershipTypes', $membershipTypes);
       $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
