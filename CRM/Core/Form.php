@@ -2991,7 +2991,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param string $default
    *
-   * @throws \CRM_Core_Exception
+   *
+   * @noinspection PhpUnhandledExceptionInspection
    */
   public function setSelectedChild($default = NULL) {
     $selectedChild = CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $this, FALSE, $default);
