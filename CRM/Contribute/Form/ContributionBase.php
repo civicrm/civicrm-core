@@ -1210,6 +1210,33 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Get the amount level description for the main contribution.
+   *
+   * If there is a separate membership contribution this is the 'other one'. Otherwise there
+   * is only one.
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMainContributionAmountLevel(): string {
+    $amountLevel = [];
+    if ($this->getSecondaryMembershipContributionLineItems()) {
+      // This is really only needed transitionally because the
+      // test ConfirmTest::testSeparatePaymentConfirm has some set up configuration
+      // issues that will take a bit longer to work through (the labels
+      // should be Contribution Amount or Other Amount but in that test set up they are not.
+      return '';
+    }
+    foreach ($this->getMainContributionLineItems() as $lineItem) {
+      if ($lineItem['label'] !== ts('Contribution Amount') && $lineItem['label'] !== ts('Other Amount')) {
+        $amountLevel[] = $lineItem['label'] . ' - ' . (float) $lineItem['qty'];
+      }
+    }
+    return empty($amountLevel) ? '' : CRM_Utils_Array::implodePadded($amountLevel);
+  }
+
+  /**
    * Wrapper for processAmount that also sets autorenew.
    *
    * @param array $params

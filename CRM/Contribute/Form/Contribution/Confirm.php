@@ -157,7 +157,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'financial_type_id' => $financialTypeID,
       'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
       'tax_amount' => $params['tax_amount'] ?? NULL,
-      'amount_level' => $params['amount_level'] ?? NULL,
+      'amount_level' => $this->getMainContributionAmountLevel(),
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
       'is_pay_later' => $params['is_pay_later'] ?? 0,
