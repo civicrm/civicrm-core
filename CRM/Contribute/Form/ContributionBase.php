@@ -711,55 +711,25 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public function assignToTemplate() {
     $this->set('name', $this->assignBillingName($this->_params));
+    $this->assign('currencyID', $this->_params['currencyID'] ?? NULL);
+    $this->assign('credit_card_type', $this->_params['credit_card_type'] ?? NULL);
+    $this->assign('trxn_id', $this->_params['trxn_id'] ?? NULL);
+    $this->assign('amount_level', $this->order->getAmountLevel());
+    $this->assign('amount', $this->getMainContributionAmount() > 0 ? CRM_Utils_Money::format($this->getMainContributionAmount(), NULL, NULL, TRUE) : NULL);
 
-    $this->assign('paymentProcessor', $this->_paymentProcessor);
-    $vars = [
-      'amount',
-      'currencyID',
-      'credit_card_type',
-      'trxn_id',
-      'amount_level',
-    ];
-
-    if (isset($this->_values['is_recur']) && !empty($this->_paymentProcessor['is_recur'])) {
-      $this->assign('is_recur_enabled', 1);
-      $vars = array_merge($vars, [
-        'is_recur',
-        'frequency_interval',
-        'frequency_unit',
-        'installments',
-      ]);
-    }
-
-    if (CRM_Core_Component::isEnabled('CiviPledge') &&
-      !empty($this->_params['is_pledge'])
-    ) {
-      // TODO: Assigned variable appears to be unused
-      $this->assign('pledge_enabled', 1);
-
-      $vars = array_merge($vars, [
-        'is_pledge',
-        'pledge_frequency_interval',
-        'pledge_frequency_unit',
-        'pledge_installments',
-      ]);
-    }
-
-    // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
-    // to cover all variants.
-    if (isset($this->_params['amount_other']) || isset($this->_params['selectMembership'])) {
-      $this->_params['amount_level'] = '';
-    }
-
-    foreach ($vars as $v) {
-      if (isset($this->_params[$v])) {
-        if ($v === 'amount' && $this->_params[$v] === 0) {
-          $this->_params[$v] = CRM_Utils_Money::format($this->_params[$v], NULL, NULL, TRUE);
-        }
-        $this->assign($v, $this->_params[$v]);
-      }
-    }
-
+    $isRecurEnabled = isset($this->_values['is_recur']) && !empty($this->_paymentProcessor['is_recur']);
+    $this->assign('is_recur_enabled', $isRecurEnabled);
+    $this->assign('is_recur', $isRecurEnabled ? ($this->_params['is_recur'] ?? NULL) : NULL);
+    $this->assign('frequency_interval', $isRecurEnabled ? ($this->_params['frequency_interval'] ?? NULL) : NULL);
+    $this->assign('frequency_unit', $isRecurEnabled ? ($this->_params['frequency_unit'] ?? NULL) : NULL);
+    $this->assign('installments', $isRecurEnabled ? ($this->_params['installments'] ?? NULL) : NULL);
+    $isPledgeEnabled = CRM_Core_Component::isEnabled('CiviPledge') && !empty($this->_params['is_pledge']);
+    // @todo Assigned pledge_enabled variable appears to be unused
+    $this->assign('pledge_enabled', $isPledgeEnabled);
+    $this->assign('is_pledge', $isPledgeEnabled ? ($this->_params['is_pledge'] ?? NULL) : NULL);
+    $this->assign('pledge_frequency_interval', $isPledgeEnabled ? ($this->_params['pledge_frequency_interval'] ?? NULL) : NULL);
+    $this->assign('pledge_frequency_unit', $isPledgeEnabled ? ($this->_params['pledge_frequency_unit'] ?? NULL) : NULL);
+    $this->assign('pledge_installments', $isPledgeEnabled ? ($this->_params['pledge_installments'] ?? NULL) : NULL);
     $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
     $isDisplayOnBehalf = !empty($this->_params['onbehalf_profile_id']) && !empty($this->_params['onbehalf']);
@@ -1220,6 +1190,33 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $amount += $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
     }
     return $amount;
+  }
+
+  /**
+   * Get the amount level description for the main contribution.
+   *
+   * If there is a separate membership contribution this is the 'other one'. Otherwise there
+   * is only one.
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMainContributionAmountLevel(): string {
+    $amountLevel = [];
+    if ($this->getSecondaryMembershipContributionLineItems()) {
+      // This is really only needed transitionally because the
+      // test ConfirmTest::testSeparatePaymentConfirm has some set up configuration
+      // issues that will take a bit longer to work through (the labels
+      // should be Contribution Amount or Other Amount but in that test set up they are not.
+      return '';
+    }
+    foreach ($this->getMainContributionLineItems() as $lineItem) {
+      if ($lineItem['label'] !== ts('Contribution Amount') && $lineItem['label'] !== ts('Other Amount')) {
+        $amountLevel[] = $lineItem['label'] . ' - ' . (float) $lineItem['qty'];
+      }
+    }
+    return empty($amountLevel) ? '' : CRM_Utils_Array::implodePadded($amountLevel);
   }
 
   /**
