@@ -112,8 +112,8 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
       // 1. this custom search has slightly different structure ,
       // 2. we are in constructor right now,
       // we 'll use a small hack -
-      $rowCount = CRM_Utils_Array::value('crmRowCount', $_REQUEST, Civi::settings()->get('default_pager_size'));
-      $pageId = CRM_Utils_Array::value('crmPID', $_REQUEST, 1);
+      $rowCount = $_REQUEST['crmRowCount'] ?? Civi::settings()->get('default_pager_size');
+      $pageId = $_REQUEST['crmPID'] ?? 1;
       $offset = ($pageId - 1) * $rowCount;
       $this->_limitClause = NULL;
       $this->_limitRowClause = [$rowCount, NULL];
@@ -137,7 +137,7 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
   public function getFieldValue(array $formValues, string $field, $type, $default = NULL) {
     $value = $formValues[$field] ?? NULL;
     if (!$value) {
-      return CRM_Utils_Request::retrieve($field, $type, CRM_Core_DAO::$_nullObject, FALSE, $default);
+      return CRM_Utils_Request::retrieve($field, $type, NULL, FALSE, $default);
     }
     return $value;
   }
@@ -377,8 +377,6 @@ WHERE      t.table_name = 'Activity' AND
     }
     $dao = CRM_Core_DAO::executeQuery($sql);
 
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
-    $roleIds = CRM_Event_PseudoConstant::participantRole();
     while ($dao->fetch()) {
       $row = [];
       foreach ($this->_tableFields as $name => $dontCare) {
@@ -386,14 +384,14 @@ WHERE      t.table_name = 'Activity' AND
           $row[$name] = $dao->$name;
         }
         else {
-          $row['activity_type'] = $activityTypes[$dao->$name] ?? NULL;
+          $row['activity_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $dao->$name);
         }
       }
       if (isset($row['participant_role'])) {
         $participantRole = explode(CRM_Core_DAO::VALUE_SEPARATOR, $row['participant_role']);
         $viewRoles = [];
         foreach ($participantRole as $v) {
-          $viewRoles[] = $roleIds[$v];
+          $viewRoles[] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'role_id', $v);
         }
         $row['participant_role'] = implode(', ', $viewRoles);
       }
