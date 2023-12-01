@@ -272,7 +272,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
 
     if ($tee) {
       $tee->stop();
-      $content = file_get_contents($tee->getFileName(), NULL, NULL, NULL, 5);
+      $content = file_get_contents($tee->getFileName(), FALSE, NULL, 0, 5);
       if (empty($content)) {
         throw new \CRM_Core_Exception("Failed to capture document content (type=$type)!");
       }
