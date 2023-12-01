@@ -45,6 +45,7 @@
 
 - github      : AHowiller
   name        : Andreas Howiller
+  organization: civiservice.de
 
 - github      : ajdavis
   name        : A. Jesse Jiryu Davis
@@ -384,7 +385,7 @@
 
 - github      : detsieber
   name        : Detlev Sieber
-  organization: Digitalcourage
+  organization: civiservice.de
 
 - github      : devappsoftware
   organization: DevApp
@@ -985,7 +986,8 @@
 - name        : Manish Zope
 
 - github      : mariav0
-  name        : Maria
+  name        : Maria Vogel
+  organization: civiservice.de
 
 - github      : marcusjwilson
   name        : Marcus J Wilson
@@ -1431,10 +1433,6 @@
   name        : Sean Madsen
   organization: Left Join Labs
 
-- github      : sebalis
-  name        : Sebastian Lisken
-  organization: civiservice.de
-
 - github      : semseysandor
   name        : Sandor Semsey
   organization: Reflexive Communications
@@ -1547,6 +1545,7 @@
 
 - github      : TobiasVoigt
   name        : Tobias Voigt
+  organization: civiservice.de
 
 - name        : Thomas Mannell
   organization: Registered Nurses' Association of Ontario
