@@ -879,7 +879,7 @@ emo
       'do_not_trade' => 1,
       'is_opt_out' => 1,
       'external_identifier' => 'blah',
-      'sort_name' => 'Smith, Robert',
+      'sort_name' => 'Smith, Robert II',
       'display_name' => 'Robert Smith',
       'nick_name' => 'Bob',
       'image_URL' => 'https://example.com',
@@ -1071,7 +1071,7 @@ do_not_sms:1
 do_not_trade:1
 is_opt_out:1
 external_identifier:blah
-sort_name:Smith, Robert
+sort_name:Smith, Robert II
 display_name:Mr. Robert Smith II
 nick_name:Bob
 image_URL:https://example.com
@@ -1170,7 +1170,7 @@ do_not_sms:label |Yes
 do_not_trade:label |Yes
 is_opt_out:label |Yes
 external_identifier |blah
-sort_name |Smith, Robert
+sort_name |Smith, Robert II
 display_name |Mr. Robert Smith II
 nick_name |Bob
 image_URL |https://example.com

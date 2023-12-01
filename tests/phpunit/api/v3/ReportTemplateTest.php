@@ -602,7 +602,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => ['metadata' => ['sql']],
     ]);
     $this->assertEquals(
-      "<a href='/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=" . $contactID2 . "'>Anderson, Anthony</a> $ 5.00",
+      "<a href='/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=" . $contactID2 . "'>Anderson, Anthony II</a> $ 5.00",
       $rows['values'][0]['civicrm_contribution_soft_credits']
     );
   }
@@ -1209,9 +1209,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     $rows = $this->callAPISuccess('report_template', 'getrows', $params)['values'];
     $expected = [
-      'civicrm_contact_contact_source' => 'Łąchowski-Roberts, Anthony',
-      'civicrm_contact_contact_assignee' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony</a>',
-      'civicrm_contact_contact_target' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3\'>Brzęczysław, Anthony</a>; <a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony</a>',
+      'civicrm_contact_contact_source' => 'Łąchowski-Roberts, Anthony II',
+      'civicrm_contact_contact_assignee' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony II</a>',
+      'civicrm_contact_contact_target' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3\'>Brzęczysław, Anthony II</a>; <a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony II</a>',
       'civicrm_contact_contact_source_id' => $this->contactIDs[2],
       'civicrm_contact_contact_assignee_id' => $this->contactIDs[1],
       'civicrm_contact_contact_target_id' => $this->contactIDs[0] . ';' . $this->contactIDs[1],

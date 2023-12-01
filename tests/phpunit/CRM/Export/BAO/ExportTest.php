@@ -192,7 +192,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $row = $this->csv->fetchOne(1);
     $this->assertEquals(95, $row['Net Amount']);
     $this->assertEquals(5, $row['Soft Credit Amount']);
-    $this->assertEquals('Anderson, Anthony', $row['Soft Credit For']);
+    $this->assertEquals('Anderson, Anthony II', $row['Soft Credit For']);
     $this->assertEquals($this->contributionIDs[0], $row['Soft Credit For Contribution ID']);
 
     // Ideally we would use a randomised temp table name & use generic temp cleanup for cleanup - but
@@ -230,7 +230,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'No Bulk Emails (User Opt Out)' => '',
       'Legal Identifier' => '',
       'External Identifier' => '',
-      'Sort Name' => 'Anderson, Anthony',
+      'Sort Name' => 'Anderson, Anthony II',
       'Display Name' => 'Mr. Anthony Anderson II',
       'Nickname' => '',
       'Legal Name' => '',
@@ -1082,7 +1082,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'No Bulk Emails (User Opt Out)' => '',
       'Legal Identifier' => '',
       'External Identifier' => '',
-      'Sort Name' => 'Anderson, Anthony',
+      'Sort Name' => 'Anderson, Anthony II',
       'Display Name' => 'Mr. Anthony Anderson II',
       'Nickname' => '',
       'Legal Name' => '',

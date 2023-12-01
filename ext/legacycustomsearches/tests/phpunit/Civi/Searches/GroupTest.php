@@ -300,7 +300,7 @@ class GroupTest extends TestCase implements HeadlessInterface, HookInterface, Tr
         $full[] = [
           'contact_id' => $this->ids['Contact'][$id],
           'contact_type' => 'Individual',
-          'sort_name' => 'Contact ' . $id . ', Test',
+          'sort_name' => 'Contact ' . $id . ', Test II',
         ];
       }
     }
