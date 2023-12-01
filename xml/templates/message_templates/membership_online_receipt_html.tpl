@@ -43,7 +43,7 @@
         {ts}Membership Type{/ts}
        </td>
        <td {$valueStyle}>
-         {ts}{membership.membership_type_id:name}{/ts}
+         {ts}{membership.membership_type_id:label}{/ts}
        </td>
       </tr>
       {if {membership.start_date|boolean}}
@@ -67,38 +67,26 @@
        </tr>
       {/if}
     {/if}
-    {if $amount}
+    {if {contribution.total_amount|boolean}}
       <tr>
         <th {$headerStyle}>{ts}Membership Fee{/ts}</th>
       </tr>
 
       {if !$isShowLineItems && {contribution.total_amount|boolean}}
-        <tr>
-          <td {$labelStyle}>
-            {ts 1=$membership_name}%1 Membership{/ts}
-          </td>
-          <td {$valueStyle}>
-            {$membership_amount|crmMoney}
-          </td>
-        </tr>
-        {if $amount && !$is_separate_payment}
+        {foreach from=$lineItems item=line}
           <tr>
             <td {$labelStyle}>
-              {ts}Contribution Amount{/ts}
+              {if $line.membership_type_id}
+                {ts 1="{membership.membership_type_id:label}"}%1 Membership{/ts}
+              {else}
+                {ts}Contribution Amount{/ts}
+              {/if}
             </td>
             <td {$valueStyle}>
-              {$amount|crmMoney}
+              {$line.line_total_inclusive|crmMoney:'{contribution.currency}'}
             </td>
           </tr>
-          <tr>
-            <td {$labelStyle}>
-              {ts}Total{/ts}
-            </td>
-            <td {$valueStyle}>
-              {contribution.total_amount}
-            </td>
-          </tr>
-        {/if}
+        {/foreach}
       {elseif $isShowLineItems}
         <tr>
           <td colspan="2" {$valueStyle}>
@@ -174,7 +162,7 @@
             {ts}Amount{/ts}
         </td>
         <td {$valueStyle}>
-            {contribution.total_amount} {if isset($amount_level)} - {$amount_level}{/if}
+            {contribution.total_amount}
         </td>
       </tr>
     {/if}
@@ -190,28 +178,18 @@
       </tr>
     {/if}
 
-    {if !empty($trxn_id)}
+    {if {contribution.trxn_id|boolean}}
       <tr>
        <td {$labelStyle}>
         {ts}Transaction #{/ts}
        </td>
        <td {$valueStyle}>
-        {$trxn_id}
-       </td>
-      </tr>
-     {/if}
-
-    {if !empty($membership_trx_id)}
-      <tr>
-       <td {$labelStyle}>
-         {ts}Membership Transaction #{/ts}
-       </td>
-       <td {$valueStyle}>
-         {$membership_trx_id}
+         {contribution.trxn_id}
        </td>
       </tr>
     {/if}
-    {if !empty($is_recur)}
+
+    {if {contribution.contribution_recur_id|boolean}}
       <tr>
         <td colspan="2" {$labelStyle}>
           {ts}This membership will be renewed automatically.{/ts}
@@ -301,7 +279,7 @@
       {/foreach}
     {/if}
 
-    {if !empty($billingName)}
+    {if {contribution.address_id.display|boolean}}
       <tr>
         <th {$headerStyle}>
           {ts}Billing Name and Address{/ts}
@@ -309,12 +287,12 @@
       </tr>
       <tr>
         <td colspan="2" {$valueStyle}>
-          {$billingName}<br />
-          {$address|nl2br}<br />
-          {$email}
+          {contribution.address_id.name}<br/>
+          {contribution.address_id.display}
         </td>
       </tr>
-    {elseif !empty($email)}
+    {/if}
+    {if {contact.email_primary.email|boolean}}
       <tr>
         <th {$headerStyle}>
           {ts}Registered Email{/ts}
@@ -322,7 +300,7 @@
       </tr>
       <tr>
         <td colspan="2" {$valueStyle}>
-          {$email}
+          {contact.email_primary.email}
         </td>
       </tr>
     {/if}

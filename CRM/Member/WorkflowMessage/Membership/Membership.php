@@ -106,7 +106,6 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
       'contact_id' => 100,
       'financial_type_id' => $example['membership_type']['financial_type_id'],
       'receive_date' => '2021-07-23 15:39:20',
-      'total_amount' => $example['membership_type']['minimum_amount'],
       'fee_amount' => .99,
       'net_amount' => $example['membership_type']['minimum_amount'] - .99,
       'currency' => $example['currency'],
@@ -131,8 +130,14 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
     $mockOrder->setTemplateContributionID(50);
 
     if (empty($example['is_show_line_items'])) {
-      $mockOrder->setPriceSetToDefault('membership');
-      $mockOrder->setOverrideTotalAmount($example['membership_type']['minimum_fee']);
+      if (empty($example['contribution_page_id'])) {
+        $mockOrder->setOverrideTotalAmount($example['membership_type']['minimum_fee']);
+        $mockOrder->setPriceSetToDefault('membership');
+      }
+      else {
+        $priceSet = $this->getPriceSet()[$example['price_set_id']];
+        $mockOrder->setPriceSetID($priceSet['id']);
+      }
       $mockOrder->setDefaultFinancialTypeID($example['membership_type']['financial_type_id']);
     }
     else {
@@ -144,15 +149,14 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
     }
     foreach (PriceField::get()->addWhere('price_set_id', '=', $mockOrder->getPriceSetID())->execute() as $index => $priceField) {
       $priceFieldValue = PriceFieldValue::get()->addWhere('price_field_id', '=', $priceField['id'])->execute()->first();
-      if (empty($example['is_show_line_items'])) {
-        $priceFieldValue['amount'] = $contribution['total_amount'];
-        $priceFieldValue['financial_type_id'] = $contribution['financial_type_id'];
-      }
       $this->setLineItem($mockOrder, $priceField, $priceFieldValue, $index, $membership);
     }
 
     $contribution['total_amount'] = $mockOrder->getTotalAmount();
     $contribution['tax_amount'] = $mockOrder->getTotalTaxAmount() ? round($mockOrder->getTotalTaxAmount(), 2) : 0;
+    $contribution['amount_level'] = $mockOrder->getAmountLevel();
+    $contribution['address_id.name'] = 'Barbara Mary Jones';
+    $contribution['address_id.display'] = "123 Main Street\nMega City";
     $messageTemplate->setContribution($contribution);
     $messageTemplate->setOrder($mockOrder);
     $messageTemplate->setContribution($contribution);
@@ -204,6 +208,7 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
       'label' => $priceFieldValue['label'],
       'financial_type_id' => $priceFieldValue['financial_type_id'],
       'non_deductible_amount' => $priceFieldValue['non_deductible_amount'],
+      'membership_type_id' => $priceFieldValue['membership_type_id'],
     ];
     if (!empty($priceFieldValue['membership_type_id'])) {
       $lineItem['membership'] = ['start_date' => $membership['start_date'], 'end_date' => $membership['end_date']];
