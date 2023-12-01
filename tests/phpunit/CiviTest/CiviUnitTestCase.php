@@ -202,6 +202,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected $formController;
 
   /**
+   * @var \CRM_Utils_AutoClean
+   */
+  private $frozenTime;
+
+  /**
    *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
@@ -457,6 +462,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected function tearDown(): void {
     $this->_apiversion = 3;
     $this->resetLabels();
+    $this->frozenTime = NULL;
 
     error_reporting(E_ALL & ~E_NOTICE);
     $this->resetHooks();
@@ -916,6 +922,19 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $params = array_merge($defaults, $params);
     $result = $this->callAPISuccess('Tag', 'create', $params);
     return $result['values'][$result['id']];
+  }
+
+  /**
+   * Temporarily freeze time, as perceived through `CRM_Utils_Time`.
+   */
+  protected function useFrozenTime(): void {
+    $oldTimeFunc = getenv('TIME_FUNC');
+    putenv('TIME_FUNC=frozen');
+    CRM_Utils_Time::setTime(date('Y-m-d H:i:s'));
+    $this->frozenTime = CRM_Utils_AutoClean::with(function () use ($oldTimeFunc) {
+      putenv($oldTimeFunc === NULL ? 'TIME_FUNC' : "TIME_FUNC=$oldTimeFunc");
+      CRM_Utils_Time::resetTime();
+    });
   }
 
   /**
