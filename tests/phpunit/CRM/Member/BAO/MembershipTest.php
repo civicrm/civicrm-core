@@ -15,7 +15,6 @@
  */
 class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
-  private $_contactID;
   private $_membershipStatusID;
   private $_membershipTypeID;
 
@@ -57,17 +56,17 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       //Default domain ID
       'domain_id' => 1,
       'member_of_contact_id' => $organizationId,
-      'financial_type_id' => "Member Dues",
-      'duration_unit' => "year",
+      'financial_type_id' => 'Member Dues',
+      'duration_unit' => 'year',
       'duration_interval' => 1,
-      'period_type' => "rolling",
+      'period_type' => 'rolling',
       'name' => 'Organization Membership Type',
       'relationship_type_id' => ($withRelationship) ? 5 : NULL,
       'relationship_direction' => ($withRelationship) ? 'b_a' : NULL,
       'max_related' => $maxRelated ?: NULL,
     ]);
 
-    return $membershipType["values"][$membershipType["id"]];
+    return $membershipType['values'][$membershipType["id"]];
   }
 
   /**
@@ -808,31 +807,34 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $form = new CRM_Core_Form();
     $values = CRM_Member_BAO_Membership::buildMembershipTypeValues($form);
     $this->assertEquals([
-      'id' => '1',
-      'minimum_fee' => '100.000000000',
+      'id' => 1,
+      'minimum_fee' => 100.00,
       'name' => 'General',
-      'is_active' => '1',
+      'is_active' => 1,
       'description' => 'Regular annual membership.',
-      'financial_type_id' => '2',
-      'auto_renew' => '0',
+      'financial_type_id' => 2,
+      'auto_renew' => 0,
       'member_of_contact_id' => $values[1]['member_of_contact_id'],
       'relationship_type_id' => [7],
       'relationship_direction' => ['b_a'],
       'max_related' => NULL,
       'duration_unit' => 'year',
-      'duration_interval' => '2',
-      'domain_id' => '1',
+      'duration_interval' => 2,
+      'domain_id' => 1,
       'period_type' => 'rolling',
       'visibility' => 'Public',
-      'weight' => '1',
+      'weight' => 1,
       'tax_rate' => 0.0,
       'minimum_fee_with_tax' => 100.0,
+      'fixed_period_start_day' => NULL,
+      'fixed_period_rollover_day' => NULL,
+      'receipt_text_signup' => NULL,
+      'receipt_text_renewal' => NULL,
     ], $values[1]);
   }
 
   /**
    * @return array
-   * @throws \CRM_Core_Exception
    */
   protected function setupMembership(): array {
     $contactId = $this->individualCreate();
@@ -1026,11 +1028,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Checks the given membership ID can be found.
    *
    * @param int $membershipID
-   *
-   * @throws \CRM_Core_Exception
    */
   private function assertMembershipExists(int $membershipID): void {
-    $membership = $this->callAPISuccess("Membership", "get", [
+    $membership = $this->callAPISuccess('Membership', "get", [
       'id' => $membershipID,
     ]);
     $this->assertEquals(1, $membership['count']);
