@@ -26,7 +26,8 @@ class E2E_Extern_WidgetTest extends CiviEndToEndTestCase {
    * Return widget Javascript.
    */
   public function testWidget(): void {
-    if (CIVICRM_UF !== 'Drupal8') {
+    if (!in_array(CIVICRM_UF, ['Drupal8', 'Standalone'])) {
+      // Skip the traditional tests for Drupal8+ and Standalone as these are unsupported.
       $endpoints['traditional'] = CRM_Core_Resources::singleton()->getUrl('civicrm', 'extern/widget.php');
     }
     $endpoints['normal'] = CRM_Utils_System::url('civicrm/contribute/widget', NULL, TRUE, NULL, FALSE, TRUE);
