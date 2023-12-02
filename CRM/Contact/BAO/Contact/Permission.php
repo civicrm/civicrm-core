@@ -92,7 +92,7 @@ class CRM_Contact_BAO_Contact_Permission {
 
     // get logged in user
     $contactID = CRM_Core_Session::getLoggedInContactID();
-    if (empty($contactID)) {
+    if (!$contactID) {
       return [];
     }
 
@@ -327,7 +327,7 @@ AND    $operationClause
       }
     }
 
-    $contactID = (int) CRM_Core_Session::getLoggedInContactID();
+    $contactID = CRM_Core_Session::getLoggedInContactID();
     self::cache($contactID);
 
     if (is_array($contactAlias) && !empty($contactAlias)) {
@@ -360,7 +360,7 @@ AND    $operationClause
    */
   public static function cacheSubquery() {
     if (!CRM_Core_Permission::check([['view all contacts', 'edit all contacts']])) {
-      $contactID = (int) CRM_Core_Session::getLoggedInContactID();
+      $contactID = CRM_Core_Session::getLoggedInContactID();
       self::cache($contactID);
       return "IN (SELECT contact_id FROM civicrm_acl_contact_cache WHERE user_id = $contactID)";
     }

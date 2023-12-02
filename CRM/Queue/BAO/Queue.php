@@ -23,7 +23,7 @@ class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue implements \Civi\Core\Hook
   public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     if (!\CRM_Core_Permission::check('administer queues')) {
-      $cid = (int) CRM_Core_Session::getLoggedInContactID();
+      $cid = CRM_Core_Session::getLoggedInContactID();
       $clauses['id'] = "IN (SELECT queue_id FROM `civicrm_user_job` WHERE created_id = $cid)";
     }
     CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);

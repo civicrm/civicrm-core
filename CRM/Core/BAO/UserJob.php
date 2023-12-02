@@ -160,7 +160,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
     $clauses = [];
     if (!\CRM_Core_Permission::check('administer queues', $userId)) {
       // It was ok to have $userId = NULL for the permission check but must be an int for the query
-      $cid = $userId ?? (int) CRM_Core_Session::getLoggedInContactID();
+      $cid = $userId ?? CRM_Core_Session::getLoggedInContactID();
       // Only allow access to users' own jobs (or templates)
       $clauses['created_id'][] = "= $cid OR {is_template} = 1";
     }

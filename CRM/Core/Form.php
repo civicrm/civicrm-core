@@ -2521,7 +2521,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($this->authenticatedContactID === NULL) {
       $this->authenticatedContactID = $this->getAuthenticatedCheckSumContactID();
       if (!$this->authenticatedContactID) {
-        $this->authenticatedContactID = (int) CRM_Core_Session::getLoggedInContactID();
+        $this->authenticatedContactID = CRM_Core_Session::getLoggedInContactID();
       }
     }
     return $this->authenticatedContactID;

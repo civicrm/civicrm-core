@@ -92,7 +92,7 @@ abstract class AbstractSaveAction extends AbstractAction {
     if ($this->checkPermissions) {
       foreach ($this->records as $record) {
         $action = empty($record[$idField]) ? 'create' : 'update';
-        if (!CoreUtil::checkAccessDelegated($this->getEntityName(), $action, $record, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
+        if (!CoreUtil::checkAccessDelegated($this->getEntityName(), $action, $record, \CRM_Core_Session::getLoggedInContactID())) {
           throw new UnauthorizedException("ACL check failed");
         }
       }

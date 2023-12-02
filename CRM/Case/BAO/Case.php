@@ -3042,7 +3042,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   private static function getAccessMyCasesClause(int $userId = NULL): string {
-    $user = $userId ?? (int) CRM_Core_Session::getLoggedInContactID();
+    $user = $userId ?? CRM_Core_Session::getLoggedInContactID();
     return "IN (
       SELECT r.case_id FROM civicrm_relationship r, civicrm_case_contact cc WHERE r.is_active = 1 AND cc.case_id = r.case_id AND (
         (r.contact_id_a = cc.contact_id AND r.contact_id_b = $user) OR (r.contact_id_b = cc.contact_id AND r.contact_id_a = $user)

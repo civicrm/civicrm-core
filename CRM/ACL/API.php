@@ -46,12 +46,6 @@ class CRM_ACL_API {
     if ($contactID == NULL) {
       $contactID = CRM_Core_Session::getLoggedInContactID();
     }
-
-    if (!$contactID) {
-      // anonymous user
-      $contactID = 0;
-    }
-
     return CRM_ACL_BAO_ACL::check($str, $contactID);
   }
 

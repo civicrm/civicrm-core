@@ -87,7 +87,7 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
     // Update a single record by primary key (if this entity has a single primary key)
     if (count($this->where) === 1 && count($primaryKeys) === 1 && $primaryKeys === $this->getSelect() && $this->where[0][0] === $id && $this->where[0][1] === '=' && !empty($this->where[0][2])) {
       $this->values[$id] = $this->where[0][2];
-      if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $this->values, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
+      if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $this->values, \CRM_Core_Session::getLoggedInContactID())) {
         throw new UnauthorizedException("ACL check failed");
       }
       $items = [$this->values];
@@ -100,7 +100,7 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
     $items = $this->getBatchRecords();
     foreach ($items as &$item) {
       $item = $this->values + $item;
-      if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $item, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
+      if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $item, \CRM_Core_Session::getLoggedInContactID())) {
         throw new UnauthorizedException("ACL check failed");
       }
     }

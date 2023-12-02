@@ -177,7 +177,7 @@ class CRM_Core_Resources_Common {
    */
   protected static function coreResourceList($region) {
     $settings = Civi::settings();
-    $contactID = (int) CRM_Core_Session::getLoggedInContactID();
+    $contactID = CRM_Core_Session::getLoggedInContactID();
 
     // Scripts needed by everyone, everywhere
     // FIXME: This is too long; list needs finer-grained segmentation

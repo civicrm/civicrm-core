@@ -2239,7 +2239,7 @@ AND cl.modified_id  = c.id
    * @return array
    */
   protected static function getPermittedActivityTypes() {
-    $userID = (int) CRM_Core_Session::getLoggedInContactID();
+    $userID = CRM_Core_Session::getLoggedInContactID();
     if (!isset(Civi::$statics[__CLASS__]['permitted_activity_types'][$userID])) {
       $permittedActivityTypes = [];
       $components = self::activityComponents(FALSE);

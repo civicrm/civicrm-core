@@ -141,7 +141,7 @@ class Render extends \Civi\Api4\Generic\AbstractAction {
       foreach ($fields as $fieldName => $fieldSpec) {
         $fieldValue = $record[$fieldName] ?? NULL;
         if ($fieldSpec->getFkEntity() && !empty($fieldValue)) {
-          if (!empty($params['check_permissions']) && !\Civi\Api4\Utils\CoreUtil::checkAccessDelegated($fieldSpec->getFkEntity(), 'get', ['id' => $fieldValue], CRM_Core_Session::getLoggedInContactID() ?: 0)) {
+          if (!empty($params['check_permissions']) && !\Civi\Api4\Utils\CoreUtil::checkAccessDelegated($fieldSpec->getFkEntity(), 'get', ['id' => $fieldValue], CRM_Core_Session::getLoggedInContactID())) {
             $e->addError($recordKey, $fieldName, 'nonexistent_id', ts('Referenced record does not exist or is not visible (%1).', [
               1 => $this->getWorkflow() . '::' . $fieldName,
             ]));

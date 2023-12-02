@@ -19,7 +19,7 @@ trait ActiveUserTrait {
    * @return $this
    */
   protected function setUser(int $userID) {
-    $loggedInContactID = \CRM_Core_Session::getLoggedInContactID() ?: 0;
+    $loggedInContactID = \CRM_Core_Session::getLoggedInContactID();
     if ($userID !== $loggedInContactID) {
       throw new \RuntimeException("The API subsystem does not yet fully support variable user IDs.");
       // Traditionally, the API events did not emit information about the current user; it was assumed

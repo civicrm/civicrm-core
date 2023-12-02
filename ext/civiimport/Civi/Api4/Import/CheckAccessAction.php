@@ -32,7 +32,7 @@ class CheckAccessAction extends \Civi\Api4\Generic\CheckAccessAction {
     // Prevent circular checks
     $action = $this->action;
     $entity = $this->getEntityName();
-    $userID = \CRM_Core_Session::getLoggedInContactID() ?: 0;
+    $userID = \CRM_Core_Session::getLoggedInContactID();
     if ($action === 'checkAccess') {
       $granted = TRUE;
     }
