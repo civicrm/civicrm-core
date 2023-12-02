@@ -10,27 +10,25 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\WorkflowMessage\GenericWorkflowMessage;
+
 /**
- * Class CRM_Event_Tokens
+ * Receipt sent when confirming contribution add payment.
  *
- * Generate "event.*" tokens.
+ * @method int getEventID()
+ *
+ * @support template-only
+ * @see CRM_Financial_BAO_Payment::sendConfirmation()
  */
-class CRM_Financial_FinancialTrxnTokens extends CRM_Core_EntityTokens {
+class CRM_Contribute_WorkflowMessage_PaymentOrRefundNotification extends GenericWorkflowMessage {
+  use CRM_Contribute_WorkflowMessage_ContributionTrait;
+  public const WORKFLOW = 'payment_or_refund_notification';
 
   /**
-   * Get the entity name for api v4 calls.
+   * @var int
    *
-   * @return string
+   * @scope tokenContext as eventId, tplParams as eventID
    */
-  protected function getApiEntityName(): string {
-    return 'FinancialTrxn';
-  }
-
-  /**
-   * @return array
-   */
-  public function getCurrencyFieldName(): array {
-    return ['currency'];
-  }
+  public $eventID;
 
 }
