@@ -295,8 +295,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     parent::setUp();
     CRM_Core_Session::singleton()->set('userID');
 
-    $this->_apiversion = 3;
-
     //  Use a temporary file for STDIN
     $GLOBALS['stdin'] = tmpfile();
     if ($GLOBALS['stdin'] === FALSE) {
