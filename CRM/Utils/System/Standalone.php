@@ -48,6 +48,19 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function sessionStart() {
+    parent::sessionStart();
+
+    // for anonymous user sessions we need to set explicit 0 rather than NULL
+    $session = CRM_Core_Session::singleton();
+    if (!$session->get('userID')) {
+      $session->set('userID', 0);
+    }
+  }
+
+  /**
    * @inheritdoc
    */
   public function getDefaultFileStorage() {
