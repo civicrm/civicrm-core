@@ -76,7 +76,7 @@ if (!defined('CIVI_SETUP')) {
         foreach ($e->getModel()->moFiles as $moFile => $url) {
           $l10DownloadFile = str_replace('[locale]', $lang, $url);
           \Civi\Setup::log()
-            ->info("Download translation '.$moFile.' from " . $l10DownloadFile . ' into ' . $downloadDir);
+            ->info("Download translation '$moFile' from " . $l10DownloadFile . ' into ' . $downloadDir);
           $client = new \GuzzleHttp\Client();
           $response = $client->get($l10DownloadFile);
           if ($response->getStatusCode() == 200) {
