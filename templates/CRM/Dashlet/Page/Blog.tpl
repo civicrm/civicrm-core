@@ -11,7 +11,7 @@
 <style type="text/css">
   #civicrm-news-feed {
     border: 0 none;
-    font-family: inherit; /* Stops JQueryUI from making everything Verdana */
+    font-family: inherit; // Stops JQueryUI's attempt to make this section Verdana
   }
   #civicrm-news-feed .crm-news-feed-unread .crm-news-feed-item-title {
     font-weight: bold;
@@ -61,7 +61,8 @@
   {/foreach}
   {if !$feeds}
     <div class="messages status no-popup">
-      Sorry but we aren't able to provide this at the moment.
+      {icon icon="fa-info-circle"}{/icon}
+      {ts}Sorry but we are not able to provide this at the moment.{/ts}
     </div>
   {/if}
 </div>
