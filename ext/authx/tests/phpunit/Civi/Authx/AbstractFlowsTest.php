@@ -379,6 +379,7 @@ class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndI
     $quirks = [
       'Joomla' => ['sendsExcessCookies', 'authErrorShowsForm'],
       'WordPress' => ['sendsExcessCookies'],
+      'Standalone' => ['sendsExcessCookies'],
     ];
     return $quirks[CIVICRM_UF] ?? [];
   }

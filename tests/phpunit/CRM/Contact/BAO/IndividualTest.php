@@ -45,14 +45,14 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
     $contact = new CRM_Contact_DAO_Contact();
     CRM_Contact_BAO_Individual::format($params, $contact);
     $this->assertEquals('Mr. Ben Lee Jr.', $contact->display_name);
-    $this->assertEquals('Lee, Ben', $contact->sort_name);
+    $this->assertEquals('Lee, Ben Jr.', $contact->sort_name);
 
     // Check with legacy tokens too.
     \Civi::settings()->set('display_name_format', '{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}');
     $contact = new CRM_Contact_DAO_Contact();
     CRM_Contact_BAO_Individual::format($params, $contact);
     $this->assertEquals('Mr. Ben Lee Jr.', $contact->display_name);
-    $this->assertEquals('Lee, Ben', $contact->sort_name);
+    $this->assertEquals('Lee, Ben Jr.', $contact->sort_name);
   }
 
   /**

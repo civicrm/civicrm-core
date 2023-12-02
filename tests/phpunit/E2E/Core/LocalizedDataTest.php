@@ -57,6 +57,7 @@ class LocalizedDataTest extends \CiviEndToEndTestCase {
       'WordPress' => [$this, '_getSqlFile'],
       'Backdrop' => [$this, '_getSqlFile'],
       'Joomla' => [$this, '_getSqlFile'],
+      'Standalone' => [$this, '_getSqlFile'],
     ];
     if (isset($installerTypes[$uf])) {
       return $installerTypes[$uf];

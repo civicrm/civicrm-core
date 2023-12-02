@@ -166,7 +166,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
    */
   public function testParticipantDetails(): void {
     $participant = $this->callAPISuccess('Participant', 'create', ['contact_id' => $this->ids['Contact']['individual_0'], 'event_id' => $this->getEventID()]);
-    $params = ['name' => 'Anderson, Anthony', 'title' => 'Annual CiviCRM meet'];
+    $params = ['name' => 'Anderson, Anthony II', 'title' => 'Annual CiviCRM meet'];
 
     $participantDetails = CRM_Event_BAO_Participant::participantDetails($participant['id']);
 

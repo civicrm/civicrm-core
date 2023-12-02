@@ -13,7 +13,10 @@ class CRM_Standaloneusers_Page_ResetPassword extends CRM_Core_Page {
 
   public function run() {
 
+    $this->assign('logoUrl', E::url('images/civicrm-logo.png'));
     $this->assign('hibp', CIVICRM_HIBP_URL);
+    $this->assign('pageTitle', '');
+    $this->assign('breadcrumb', NULL);
     // $this->assign('loggedInUserID', CRM_Utils_System::getLoggedInUfID());
     Civi::service('angularjs.loader')->addModules('crmResetPassword');
 
