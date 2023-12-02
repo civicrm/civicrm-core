@@ -313,15 +313,13 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
     if (!isset($runOnce)) {
       $runOnce = TRUE;
+    }
+    else {
       return TRUE;
     }
 
-    $root = rtrim($this->cmsRootPath(), '/' . DIRECTORY_SEPARATOR);
-    if (empty($root) || !is_dir($root) || !chdir($root)) {
-      return FALSE;
-    }
-
-    require_once $root . '/../vendor/autoload.php'; /* assumes $root to be the _web_ root path, not the project root path. */
+    global $civicrm_paths;
+    require_once $civicrm_paths['civicrm.vendor']['path'] . '/autoload.php';
 
     // seems like we've bootstrapped drupal
     $config = CRM_Core_Config::singleton();
@@ -352,7 +350,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       // if given username we expect a correct password.
       $user = $security->loadUserByName($params['name']);
       if ($user) {
-        if (!$security->checkPassword($params['pass'], $user['password'] ?? '')) {
+        if (!$security->checkPassword($params['pass'], $user['hashed_password'] ?? '')) {
           return FALSE;
         }
       }
