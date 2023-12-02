@@ -547,13 +547,13 @@ class CRM_Core_Session {
   /**
    * Retrieve contact id of the logged in user.
    *
-   * @return int|null
-   *   contact ID of logged in user
+   * @return int
+   *   contact ID of logged in user OR 0 if no logged-in user
    */
   public static function getLoggedInContactID() {
     $session = CRM_Core_Session::singleton();
     if (!is_numeric($session->get('userID'))) {
-      return NULL;
+      return 0;
     }
     return (int) $session->get('userID');
   }
