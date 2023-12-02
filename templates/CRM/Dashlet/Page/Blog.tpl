@@ -46,7 +46,7 @@
   {foreach from=$feeds item="channel"}
     <div id="civicrm-news-feed-{$channel.name}">
     {foreach from=$channel.items item=article}
-      <details class="crm-accordion-wrapper" {if $rows}open=""{/if}">
+      <details class="crm-accordion-wrapper">
         <summary class="crm-accordion-header">
           <span class="crm-news-feed-item-title">{$article.title|smarty:nodefaults|purify}</span>
           <span class="crm-news-feed-item-preview"> - {if function_exists('mb_substr')}{$article.description|smarty:nodefaults|strip_tags|mb_substr:0:150}{else}{$article.description|smarty:nodefaults|strip_tags}{/if}</span>
