@@ -55,7 +55,9 @@ if (!defined('CIVI_SETUP')) {
       }
       if (!is_dir($e->getModel()->paths['civicrm.l10n']['path'])) {
         \Civi\Setup::log()->info("Creating directory: " . $e->getModel()->paths['civicrm.l10n']['path']);
-        \CRM_Utils_File::createDir($e->getModel()->paths['civicrm.l10n']['path'], FALSE);
+        if (!mkdir($e->getModel()->paths['civicrm.l10n']['path'], 0777, TRUE)) {
+          $e->addError('system', 'l10nWritable', sprintf('Unable to create l10n directory "%s"', $e->getModel()->paths['civicrm.l10n']['path']));
+        }
       }
     }
   }, \Civi\Setup::PRIORITY_MAIN);
@@ -67,7 +69,9 @@ if (!defined('CIVI_SETUP')) {
       $downloadDir = $e->getModel()->paths['civicrm.l10n']['path'] . DIRECTORY_SEPARATOR . $lang . DIRECTORY_SEPARATOR . 'LC_MESSAGES';
       if (!is_dir($downloadDir)) {
         \Civi\Setup::log()->info("Creating directory: " . $downloadDir);
-        \CRM_Utils_File::createDir($downloadDir, FALSE);
+        if (!mkdir($downloadDir, 0777, TRUE)) {
+          $e->addError('system', 'l10nWritable', sprintf('Unable to create language directory "%s"', $downloadDir));
+        }
 
         foreach ($e->getModel()->moFiles as $moFile => $url) {
           $l10DownloadFile = str_replace('[locale]', $lang, $url);
