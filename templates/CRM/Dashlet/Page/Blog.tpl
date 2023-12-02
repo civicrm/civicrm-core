@@ -11,6 +11,7 @@
 <style type="text/css">
   #civicrm-news-feed {
     border: 0 none;
+    font-family: inherit; /* Stops JQueryUI from making everything Verdana */
   }
   #civicrm-news-feed .crm-news-feed-unread .crm-news-feed-item-title {
     font-weight: bold;
@@ -45,23 +46,22 @@
   {foreach from=$feeds item="channel"}
     <div id="civicrm-news-feed-{$channel.name}">
     {foreach from=$channel.items item=article}
-      <div class="crm-accordion-wrapper collapsed">
-        <div class="crm-accordion-header">
+      <details class="crm-accordion-wrapper" {if $rows}open=""{/if}">
+        <summary class="crm-accordion-header">
           <span class="crm-news-feed-item-title">{$article.title|smarty:nodefaults|purify}</span>
           <span class="crm-news-feed-item-preview"> - {if function_exists('mb_substr')}{$article.description|smarty:nodefaults|strip_tags|mb_substr:0:150}{else}{$article.description|smarty:nodefaults|strip_tags}{/if}</span>
-        </div>
+        </summary>
         <div class="crm-accordion-body">
           <div>{$article.description|smarty:nodefaults|purify}</div>
           <p class="crm-news-feed-item-link"><a target="_blank" href="{$article.link|smarty:nodefaults|purify}" title="{$article.title|smarty:nodefaults|escape}"><i class="crm-i fa-external-link" aria-hidden="true"></i> {ts}read more{/ts}…</a></p>
         </div>
-      </div>
+      </details>
     {/foreach}
     </div>
   {/foreach}
   {if !$feeds}
     <div class="messages status no-popup">
-      {icon icon="fa-info-circle"}{/icon}
-      {ts}Sorry but we are not able to provide this at the moment.{/ts}
+      Sorry but we aren't able to provide this at the moment.
     </div>
   {/if}
 </div>
