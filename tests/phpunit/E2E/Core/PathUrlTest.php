@@ -91,6 +91,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
       case 'Drupal':
       case 'Drupal8':
       case 'Backdrop':
+      case 'Standalone':
         $urlPatterns[] = [';/civicrm/event/info\?reset=1&id=9;', \Civi::url('frontend://civicrm/event/info?reset=1')->addQuery('id=9')];
         $urlPatterns[] = [';/civicrm/admin\?reset=1;', \Civi::url('backend://civicrm/admin')->addQuery(['reset' => 1])];
         break;
