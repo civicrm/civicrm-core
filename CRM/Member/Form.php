@@ -208,7 +208,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       // all possible statuses are disabled - redirect back to contact form
       CRM_Core_Error::statusBounce(ts('There are no configured membership statuses. You cannot add this membership until your membership statuses are correctly configured'));
     }
-
+    // This should be overwritten from the contribution....
+    $this->assign('currency', \Civi::settings()->get('defaultCurrency'));
     parent::preProcess();
     $params = [];
     $params['context'] = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'membership');
