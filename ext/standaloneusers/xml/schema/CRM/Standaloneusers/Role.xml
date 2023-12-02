@@ -7,6 +7,11 @@
   <comment>A Role holds a set of permissions. Roles may be granted to Users.</comment>
   <log>true</log>
 
+  <paths>
+    <add>civicrm/admin/role</add>
+    <update>civicrm/admin/role#?Role1=[id]</update>
+  </paths>
+
   <field>
     <name>id</name>
     <type>int unsigned</type>

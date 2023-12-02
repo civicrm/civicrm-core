@@ -207,14 +207,14 @@ class CRM_Core_BAO_ConfigSetting {
 
     }
     else {
-
       // CRM-11993 - Use default when it's a single-language install.
       $chosenLocale = $defaultLocale;
-
     }
 
-    if (!$session->isEmpty()) {
-      // Always assign the chosen locale to the session.
+    if ($chosenLocale && ($requestLocale ?? NULL) === $chosenLocale) {
+      // If the locale is passed in via lcMessages key on GET or POST data,
+      // and it's valid against our configured locales, we require the session
+      // to store this, even if that means starting an anonymous session.
       $session->set('lcMessages', $chosenLocale);
     }
 
