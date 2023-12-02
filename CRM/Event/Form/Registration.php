@@ -963,6 +963,17 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get id of participant being acted on.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getParticipantID(): ?int {
+    return $this->_participantId;
+  }
+
+  /**
    * Format user submitted price set params.
    *
    * Convert price set each param as an array.
