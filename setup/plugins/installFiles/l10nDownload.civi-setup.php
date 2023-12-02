@@ -16,22 +16,38 @@ if (!defined('CIVI_SETUP')) {
   ->addListener('civi.setup.checkRequirements', function(\Civi\Setup\Event\CheckRequirementsEvent $e) {
     $lang = \Civi\Setup::instance()->getModel()->lang;
     if ($lang && $lang != 'en_US') {
-      // Use CiviCRM Core directory as a fall back.
-      $baseDir = $e->getModel()->srcPath;
-      if (isset($e->getModel()->paths['civicrm.private']['path'])) {
-        // If the civicrm files directory is set use this as the base path.
-        $baseDir = $e->getModel()->paths['civicrm.private']['path'];
+      // build list of candidate folders in preferred order
+      $candidates = [];
+      // if it's already set, that's our pref
+      if (isset($e->getModel()->paths['civicrm.l10n']['path'])) {
+        $candidates[] = $e->getModel()->paths['civicrm.l10n']['path'];
       }
-      // Set l10n basedir as a define. The GenCode.php tries to locate the l10n files
+      // Now check CIVICRM_L10N_BASEDIR via either define or env.
+      // The GenCode.php tries to locate the l10n files
       // from this location if other than l10n in the civicrm core directory.
-      if (!isset($e->getModel()->paths['civicrm.l10n']['path'])) {
-        if (\CRM_Utils_Constant::value('CIVICRM_L10N_BASEDIR')) {
-          $e->getModel()->paths['civicrm.l10n']['path'] = \CRM_Utils_Constant::value('CIVICRM_L10N_BASEDIR');
-        }
-        else {
-          $e->getModel()->paths['civicrm.l10n']['path'] = $baseDir . DIRECTORY_SEPARATOR . 'l10n';
+      $civicrm_l10n_basedir = CRM_Utils_Constant::value('CIVICRM_L10N_BASEDIR');
+      if ($civicrm_l10n_basedir) {
+        $candidates[] = $civicrm_l10n_basedir . DIRECTORY_SEPARATOR . 'l10n';
+      }
+      elseif (isset($e->getModel()->paths['civicrm.private']['path'])) {
+        // If the civicrm files directory is set use this as the base path.
+        $candidates[] = $e->getModel()->paths['civicrm.private']['path'] . DIRECTORY_SEPARATOR . 'l10n';
+      }
+      // Use CiviCRM Core directory as a fall back.
+      $candidates[] = $e->getModel()->srcPath . DIRECTORY_SEPARATOR . 'l10n';
+
+      // Now see if any of the folders already exist.
+      foreach ($candidates as $candidate) {
+        if (is_dir($candidate)) {
+          $e->getModel()->paths['civicrm.l10n']['path'] = $candidate;
+          break;
         }
       }
+      // If none existed, then take our first preference. We know there's always at least one.
+      if (!isset($e->getModel()->paths['civicrm.l10n']['path'])) {
+        $e->getModel()->paths['civicrm.l10n']['path'] = $candidates[0];
+      }
+
       if (getenv('CIVICRM_L10N_BASEDIR') === FALSE) {
         // Set the environment variable CIVICRM_L10N_BASEDIR which is used in xml/GenCode.php
         // to create the localized sql files.
