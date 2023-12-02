@@ -26,10 +26,6 @@
               {ts}Click <em>Submit Credit Card Membership</em> to process a Membership on behalf of the member using their credit card.{/ts}
             {/if}
         </div>
-
-        <div class="action-link">
-          {include file="CRM/common/formButtons.tpl" location="top"}
-        </div>
     {/if}
     {if NOT ($activeMembers or $inActiveMembers) and $action ne 2 and $action ne 1 and $action ne 8 and $action ne 4 and $action ne 32768}
          <div class="messages status no-popup">
