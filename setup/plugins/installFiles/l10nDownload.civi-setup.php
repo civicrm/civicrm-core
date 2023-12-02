@@ -68,18 +68,18 @@ if (!defined('CIVI_SETUP')) {
       if (!is_dir($downloadDir)) {
         \Civi\Setup::log()->info("Creating directory: " . $downloadDir);
         \CRM_Utils_File::createDir($downloadDir, FALSE);
-      }
 
-      foreach ($e->getModel()->moFiles as $moFile => $url) {
-        $l10DownloadFile = str_replace('[locale]', $lang, $url);
-        \Civi\Setup::log()
-          ->info("Download translation '.$moFile.' from " . $l10DownloadFile . ' into ' . $downloadDir);
-        $client = new \GuzzleHttp\Client();
-        $response = $client->get($l10DownloadFile);
-        if ($response->getStatusCode() == 200) {
-          $success = file_put_contents($downloadDir . DIRECTORY_SEPARATOR . $moFile, $response->getBody());
-          if (!$success) {
-            $e->addError('l10n', 'download', 'Unable to download translation file');
+        foreach ($e->getModel()->moFiles as $moFile => $url) {
+          $l10DownloadFile = str_replace('[locale]', $lang, $url);
+          \Civi\Setup::log()
+            ->info("Download translation '.$moFile.' from " . $l10DownloadFile . ' into ' . $downloadDir);
+          $client = new \GuzzleHttp\Client();
+          $response = $client->get($l10DownloadFile);
+          if ($response->getStatusCode() == 200) {
+            $success = file_put_contents($downloadDir . DIRECTORY_SEPARATOR . $moFile, $response->getBody());
+            if (!$success) {
+              $e->addError('l10n', 'download', 'Unable to download translation file');
+            }
           }
         }
       }
