@@ -91,7 +91,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('1', $contact->do_not_trade, 'Check for do_not_trade creation.');
     $this->assertEquals('1', $contact->is_opt_out, 'Check for is_opt_out creation.');
     $this->assertEquals($params['external_identifier'], $contact->external_identifier, 'Check for external_identifier creation.');
-    $this->assertEquals($params['last_name'] . ', ' . $params['first_name'], $contact->sort_name, 'Check for sort_name creation.');
+    $this->assertEquals($params['last_name'] . ', ' . $params['first_name'] . ' Sr.', $contact->sort_name, 'Check for sort_name creation.');
 
     $this->assertEquals($params['contact_source'], $contact->source, 'Check for contact_source creation.');
     $this->assertEquals($params['prefix_id'], $contact->prefix_id, 'Check for prefix_id creation.');

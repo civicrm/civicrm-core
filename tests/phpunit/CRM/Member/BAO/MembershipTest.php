@@ -443,7 +443,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $membership = $this->callAPISuccess('Membership', 'create', $params);
 
-    $this->assertEquals('Anderson, Anthony', CRM_Member_BAO_Membership::sortName($membership['id']));
+    $this->assertEquals('Anderson, Anthony II', CRM_Member_BAO_Membership::sortName($membership['id']));
 
     $this->membershipDelete($membership['id']);
     $this->contactDelete($contactId);

@@ -35,7 +35,7 @@ class CRM_Pledge_Form_SearchTest extends CiviUnitTestCase {
     $rows = $form->controller->get('rows');
     $this->assertEquals([
       'contact_id' => '3',
-      'sort_name' => 'Anderson, Anthony',
+      'sort_name' => 'Anderson, Anthony II',
       'display_name' => 'Mr. Anthony Anderson II',
       'pledge_id' => '1',
       'pledge_amount' => 100.00,
