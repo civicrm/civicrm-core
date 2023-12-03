@@ -17,6 +17,30 @@
 class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
 
   /**
+   * @var array
+   * @internal
+   */
+  public $activityTypes;
+
+  /**
+   * @var array
+   * @internal
+   */
+  public $activityStatuses;
+
+  /**
+   * @var array
+   * @internal
+   */
+  public $has_grouping;
+
+  /**
+   * @var array
+   * @internal
+   */
+  public $has_activity_type;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
