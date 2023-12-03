@@ -42,6 +42,13 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   protected $_moneyFields = ['amount', 'non_deductible_amount'];
 
   /**
+   * price_set_id being edited
+   *
+   * @var int
+   */
+  protected $_sid;
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
@@ -147,7 +154,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       ) {
         $this->_sid = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'price_set_id', 'id');
       }
-      $this->isEvent = FALSE;
       $extendComponentId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'extends', 'id');
       $this->assign('showMember', FALSE);
       if ($this->isComponentPriceOption($extendComponentId, 'CiviMember')) {
@@ -161,7 +167,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       }
       else {
         if ($this->isComponentPriceOption($extendComponentId, 'CiviEvent')) {
-          $this->isEvent = TRUE;
           // count
           $this->add('number', 'count', ts('Participant Count'));
           $this->addRule('count', ts('Please enter a valid Max Participants.'), 'positiveInteger');
