@@ -77,7 +77,11 @@ class PathUrlTest extends \CiviEndToEndTestCase {
     // Make some requests for actual URLs
     $this->assertUrlContentRegex(';MIT-LICENSE.txt;', \Civi::url('[civicrm.packages]/jquery/plugins/jquery.timeentry.js', 'a'));
     $this->assertUrlContentRegex(';MIT-LICENSE.txt;', \Civi::url('asset://[civicrm.packages]/jquery/plugins/jquery.timeentry.js', 'a'));
-    $this->assertUrlContentRegex(';Please enter a valid email address;', \Civi::url('assetBuilder://crm-l10n.js?locale=en_US', 'a'));
+    // crm-10n.js needs a fair few url params
+    $this->assertUrlContentRegex(
+        ';Please enter a valid email address;',
+         \Civi::url('assetBuilder://crm-l10n.js', 'a')->addQuery(\CRM_Core_Resources::getL10nJsParams())
+    );
     $this->assertUrlContentRegex(';.module..crmSearchAdmin;', \Civi::url('ext://org.civicrm.search_kit/ang/crmSearchAdmin.module.js', 'a'));
     $this->assertUrlContentRegex(';crm-section event_date_time-section;', \Civi::url('frontend://civicrm/event/info?id=1', 'a'));
 
