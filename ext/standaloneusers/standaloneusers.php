@@ -17,6 +17,15 @@ use CRM_Standaloneusers_ExtensionUtil as E;
  */
 function standaloneusers_civicrm_config(&$config) {
   _standaloneusers_civix_civicrm_config($config);
+  $sess = CRM_Core_Session::singleton();
+
+  if (!empty($sess->get('ufID'))) {
+    // Logged in user is making a request.
+    if (empty($sess->get('lastAccess')) || (time() - $sess->get('lastAccess')) >= 60) {
+      // Once a minute, update the when_last_accessed field
+      CRM_Standaloneusers_BAO_User::updateLastAccessed();
+    }
+  }
 }
 
 /**
