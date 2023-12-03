@@ -16,8 +16,6 @@
          {ts}Are you sure you want to delete this Grant?{/ts} {ts}This action cannot be undone.{/ts}</p>
          <p>{include file="CRM/Grant/Form/Task.tpl"}</p>
      </div>
-  {elseif $action eq 4}
-      {include file="CRM/Grant/Form/GrantView.tpl"}
   {else}
      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
       <table class="form-layout-compressed">
