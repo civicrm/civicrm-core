@@ -24,9 +24,12 @@ class CRM_Search_BAO_SearchDisplay extends CRM_Search_DAO_SearchDisplay {
    * @return bool
    */
   public static function _checkAccess(string $entityName, string $action, array $record, int $userCID) {
-    // If we hit this function at all, the user is not a super-admin
-    // But they must be at least a SearchKit administrator
-    if (!CRM_Core_Permission::check([['administer CiviCRM data', 'administer search_kit']])) {
+    // Super-admins can do anything with search displays
+    if (CRM_Core_Permission::check('all CiviCRM permissions and ACLs', $userCID)) {
+      return TRUE;
+    }
+    // Must be at least a SearchKit administrator
+    if (!CRM_Core_Permission::check([['administer CiviCRM data', 'administer search_kit']], $userCID)) {
       return FALSE;
     }
     if (in_array($action, ['create', 'update'], TRUE)) {
