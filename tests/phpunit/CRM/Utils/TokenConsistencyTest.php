@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\FinancialTrxn;
 use Civi\Token\TokenProcessor;
 use Civi\Api4\LocBlock;
 use Civi\Api4\Email;
@@ -304,6 +305,9 @@ Czech Republic<br />', $html);
 The End
 Czech Republic
 ', $text);
+    $financialTrxn = FinancialTrxn::get()->addWhere('is_payment', '=', TRUE)->execute()->first();
+    $text = $this->renderText(['financial_trxnId' => $financialTrxn['id']], '{financial_trxn.total_amount}', [], FALSE);
+    $this->assertEquals('$100.00', $text);
   }
 
   /**

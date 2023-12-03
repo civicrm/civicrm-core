@@ -288,13 +288,18 @@ class CRM_Financial_BAO_Payment {
     $entities = self::loadRelatedEntities($params['id']);
 
     $sendTemplateParams = [
-      'groupName' => 'msg_tpl_workflow_contribution',
       'workflow' => 'payment_or_refund_notification',
       'PDFFilename' => ts('notification') . '.pdf',
-      'contactId' => $entities['contact']['id'],
       'toName' => $entities['contact']['display_name'],
       'toEmail' => $entities['contact']['email'],
       'tplParams' => self::getConfirmationTemplateParameters($entities),
+      'modelProps' => array_filter([
+        'contributionID' => $entities['contribution']['id'],
+        'contactID' => $entities['contact']['id'],
+        'financialTrxnID' => $params['id'],
+        'eventID' => $entities['event']['id'] ?? NULL,
+        'participantID' => $entities['participant']['id'] ?? NULL,
+      ]),
     ];
     if (!empty($params['from']) && !empty($params['check_permissions'])) {
       // Filter from against permitted emails.
@@ -365,7 +370,8 @@ class CRM_Financial_BAO_Payment {
       'sequential' => 1,
     ])['values'];
     if (!empty($participantRecords)) {
-      $entities['event'] = civicrm_api3('Event', 'getsingle', ['id' => $participantRecords[0]['api.Participant.get']['values'][0]['event_id']]);
+      $entities['participant'] = $participantRecords[0]['api.Participant.get']['values'][0];
+      $entities['event'] = civicrm_api3('Event', 'getsingle', ['id' => $entities['participant']['event_id']]);
       if (!empty($entities['event']['is_show_location'])) {
         $locationParams = [
           'entity_id' => $entities['event']['id'],
@@ -395,6 +401,9 @@ class CRM_Financial_BAO_Payment {
   /**
    * @param array $entities
    *   Related entities as an array keyed by the various entities.
+   *
+   * @deprecated these template variables no longer used in the core template
+   * from 5.69 - stop assigning them.
    *
    * @return array
    *   Values required for the notification

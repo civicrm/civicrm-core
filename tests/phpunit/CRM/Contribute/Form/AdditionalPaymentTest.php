@@ -132,13 +132,14 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'From: site@something.com',
       'Dear Anthony,',
       'Payment Details',
-      'Total Fee: $100.00',
-      'This Payment Amount: $70.00',
+      'Total Fee',
+      '$100.00',
+      'This Payment Amount',
+      '$70.00',
       'Billing Name and Address',
       'Vancouver, BC 1321312',
       'Visa',
       '***********1111',
-      'Expires: May 2025',
     ]);
   }
 
@@ -215,11 +216,16 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'Dear Anthony,',
       'Below you will find a receipt for this payment.',
-      'Total Fee: $100.00',
-      'This Payment Amount: $50.00',
-      'Balance Owed: $20.00 ',
-      'Paid By: Check',
-      'Check Number: check-12345',
+      'Total Fee',
+      '$100.00',
+      'This Payment Amount',
+      '$50.00',
+      'Balance Owed',
+      '$20.00',
+      'Paid By',
+      'Check',
+      'Check Number',
+      'check-12345',
     ],
     [
       'Billing Name and Address',
@@ -244,14 +250,15 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $mut->checkMailLog([
       'Below you will find a receipt for this payment.',
-      'Total Fee: $100.00',
-      'This Payment Amount: $100.00',
-      'Paid By: Credit Card',
+      'Total Fee',
+      '$100.00',
+      'This Payment Amount',
+      '$100.00',
+      'Paid By',
+      'Credit Card',
       '***********1111',
       'Billing Name and Address',
       'Vancouver, BC 1321312',
-      'Expires: May 2025',
-
     ]);
     $mut->stop();
     $mut->clearMessages();
