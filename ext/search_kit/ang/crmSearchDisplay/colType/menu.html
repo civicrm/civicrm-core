@@ -1,4 +1,4 @@
-<div class="btn-group" role="group">
+<div class="btn-group" role="group" ng-if="colData.links.length">
   <button type="button" class="dropdown-toggle btn {{:: $ctrl.settings.columns[colIndex].size }} btn-{{:: $ctrl.settings.columns[colIndex].style }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="colData.open = true">
     <i ng-if=":: $ctrl.settings.columns[colIndex].icon" class="crm-i {{:: $ctrl.settings.columns[colIndex].icon }}"></i>
     {{:: colData.text }}
