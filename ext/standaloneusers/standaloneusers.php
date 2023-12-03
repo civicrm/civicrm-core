@@ -11,6 +11,22 @@ use CRM_Standaloneusers_ExtensionUtil as E;
 // phpcs:enable
 
 /**
+ * Hide the inherit CMS language on the Settings - Localization form.
+ *
+ * Implements hook_civicrm_buildForm().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildForm/
+ */
+function standaloneusers_civicrm_buildForm($formName, CRM_Core_Form $form) {
+  // Administer / Localization / Languages, Currency, Locations
+  if ($formName == 'CRM_Admin_Form_Setting_Localization') {
+    if ($inheritLocaleElement = $form->getElement('inheritLocale')) {
+      $inheritLocaleElement->freeze();
+    }
+  }
+}
+
+/**
  * Implements hook_civicrm_config().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
