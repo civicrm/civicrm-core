@@ -120,7 +120,7 @@ class Run extends AbstractRunAction {
         $result->setCountMatched($apiResult->countFetched());
         $apiResult = array_slice((array) $apiResult, 0, $apiParams['limit'] - 1);
       }
-      if ($pagerMode === 'page') {
+      else {
         $result->toolbar = $this->formatToolbar();
       }
       $result->exchangeArray($this->formatResult($apiResult));
