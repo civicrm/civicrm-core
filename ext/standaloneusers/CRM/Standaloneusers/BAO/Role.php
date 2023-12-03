@@ -14,4 +14,25 @@ class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implemen
     Civi::cache('metadata')->clear();
   }
 
+  /**
+   * Check access permission
+   *
+   * @param string $entityName
+   * @param string $action
+   * @param array $record
+   * @param integer|null $userID
+   * @return boolean
+   * @see CRM_Core_DAO::checkAccess
+   */
+  public static function _checkAccess(string $entityName, string $action, array $record, ?int $userID): bool {
+    // Prevent users from updating or deleting the admin and everyone roles
+    if (in_array($action, ['delete', 'update'], TRUE)) {
+      $name = $record['name'] ?? CRM_Core_DAO::getFieldValue(self::class, $record['id']);
+      if (in_array($name, ['admin', 'everyone'], TRUE)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
 }
