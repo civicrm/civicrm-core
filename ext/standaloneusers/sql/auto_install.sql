@@ -39,7 +39,7 @@ CREATE TABLE `civicrm_role` (
   `name` varchar(60) NOT NULL COMMENT 'Machine name for this role',
   `label` varchar(128) NOT NULL COMMENT 'Human friendly name for this role',
   `permissions` text NOT NULL COMMENT 'List of permissions granted by this role',
-  `is_active` tinyint DEFAULT 1 COMMENT 'Only active roles grant permissions',
+  `is_active` tinyint NOT NULL DEFAULT 1 COMMENT 'Only active roles grant permissions',
   PRIMARY KEY (`id`)
 )
 ENGINE=InnoDB;
