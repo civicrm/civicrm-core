@@ -101,7 +101,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     $financialAccountType->account_relationship = array_search('Credit/Contra Revenue Account is', $accountRelationships);
     $financialAccountType->financial_account_id = array_search('Liability', $financialAccount);
     try {
-      CRM_Financial_BAO_EntityFinancialAccount::validateRelationship($financialAccountType);
+      CRM_Financial_BAO_EntityFinancialAccount::writeRecord($financialAccountType->toArray());
       $this->fail("Missed expected exception");
     }
     catch (Exception $e) {

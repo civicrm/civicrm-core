@@ -9,12 +9,14 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\HookInterface;
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityFinancialAccount {
+class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityFinancialAccount implements HookInterface {
 
   /**
    * Fetch object based on array of properties.
@@ -66,7 +68,6 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
       CRM_Core_Error::deprecatedWarning('passing ids is deprecated');
     }
     $financialTypeAccount = parent::writeRecord($params);
-    self::validateRelationship($financialTypeAccount);
     unset(Civi::$statics['CRM_Core_PseudoConstant']['taxRates']);
     return $financialTypeAccount;
   }
@@ -91,6 +92,19 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
    * @throws CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    $account = $event->params;
+    // Validate account relationship with financial account type
+    if (
+      $event->action === 'create' ||
+      ($event->action === 'edit' && !empty($account['financial_account_id']) && !empty($account['account_relationship']))
+    ) {
+      $financialAccountLinks = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
+      $financialAccountType = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $account['financial_account_id'], 'financial_account_type_id');
+      if (($financialAccountLinks[$account['account_relationship']] ?? NULL) != $financialAccountType) {
+        $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
+        throw new CRM_Core_Exception(ts("This financial account cannot have '%1' relationship.", [1 => $accountRelationships[$account['account_relationship']]]));
+      }
+    }
     if ($event->action === 'delete' && $event->id) {
       $financialTypeAccountId = $event->id;
 
@@ -253,22 +267,6 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
       $titles = [];
     }
     return $titles;
-  }
-
-  /**
-   * Validate account relationship with financial account type
-   *
-   * @param CRM_Financial_DAO_EntityFinancialAccount $financialTypeAccount of CRM_Financial_DAO_EntityFinancialAccount
-   *
-   * @throws CRM_Core_Exception
-   */
-  public static function validateRelationship($financialTypeAccount) {
-    $financialAccountLinks = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
-    $financialAccountType = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialTypeAccount->financial_account_id, 'financial_account_type_id');
-    if (($financialAccountLinks[$financialTypeAccount->account_relationship] ?? NULL) != $financialAccountType) {
-      $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
-      throw new CRM_Core_Exception(ts("This financial account cannot have '%1' relationship.", [1 => $accountRelationships[$financialTypeAccount->account_relationship]]));
-    }
   }
 
   /**
