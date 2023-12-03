@@ -2184,7 +2184,8 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container .crm-collapsible .collapsible-title,
 .crm-container span.collapsed,
 .crm-container a.collapsed,
-.crm-container .crm-expand-row {
+.crm-container .crm-expand-row,
+.crm-container summary {
   cursor: pointer;
 }
 
@@ -2193,6 +2194,12 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 /* Specific types of headers */
+
+.crm-container summary:not(.crm-master-accordion-header, .crm-accordion-header) 
+/* For older CMS themes not styling summary */ {
+  font-weight: bold;
+  padding: 0.75rem 0;
+}
 
 #crm-container .widget-content .crm-accordion-header {
   background-color: #efefe5;
