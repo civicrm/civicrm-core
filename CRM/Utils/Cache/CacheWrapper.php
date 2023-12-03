@@ -95,11 +95,10 @@ class CRM_Utils_Cache_CacheWrapper implements CRM_Utils_Cache_Interface {
     // FIXME: When would name ever be empty?
     if ($this->cacheName) {
       $hookParams = [
-        'cacheName' => $this->cacheName,
         'items' => $keys,
       ];
       $event = \Civi\Core\Event\GenericHookEvent::create($hookParams);
-      Civi::dispatcher()->dispatch('civi.cache.clear', $event);
+      Civi::dispatcher()->dispatch("civi.cache.$this->cacheName.clear", $event);
     }
   }
 
