@@ -81,7 +81,7 @@ class Security {
     return \Civi\Api4\User::get(FALSE)
       ->addWhere('username', '=', $username)
       ->execute()
-      ->single()['id'] ?? NULL;
+      ->first()['id'] ?? NULL;
   }
 
   /**
