@@ -99,7 +99,8 @@
 
       $scope.tags = {
         div: ts('Container'),
-        fieldset: ts('Fieldset')
+        fieldset: ts('Fieldset'),
+        details: ts('Collapsible')
       };
 
       // Block settings
