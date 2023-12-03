@@ -27,7 +27,6 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $context);
@@ -52,8 +51,10 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
     ];
 
     foreach ($grantTokens as $token) {
-      $this->assign($token, CRM_Utils_Array::value($token, $values));
+      $this->assign($token, $values[$token] ?? NULL);
     }
+    $displayName = CRM_Contact_BAO_Contact::displayName($values['contact_id']);
+    $this->assign('displayName', $displayName);
 
     if (isset($this->_id)) {
       $noteDAO = new CRM_Core_BAO_Note();
@@ -69,8 +70,8 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
     }
 
     // add Grant to Recent Items
-    $url = CRM_Utils_System::url('civicrm/grant/add',
-      "action=view&reset=1&id={$values['id']}&cid={$values['contact_id']}"
+    $url = CRM_Utils_System::url('civicrm/grant/view',
+      "action=view&reset=1&id={$values['id']}"
     );
 
     $title = CRM_Contact_BAO_Contact::displayName($values['contact_id']) . ' - ' . ts('Grant') . ': ' . CRM_Utils_Money::format($values['amount_total']) . ' (' . $grantType[$values['grant_type_id']] . ')';
