@@ -208,7 +208,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       return Civi::paths()->getUrl("[cms.root]/{$path}?{$query}$fragment", 'absolute');
     }
     else {
-      return "/{$path}?{$query}$fragment";
+      return Civi::paths()->getUrl("[cms.root]/{$path}?{$query}$fragment");
     }
   }
 
