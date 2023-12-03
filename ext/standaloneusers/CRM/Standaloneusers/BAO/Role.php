@@ -3,28 +3,15 @@
 use CRM_Standaloneusers_ExtensionUtil as E;
 // phpcs:enable
 
-class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role {
+class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implements \Civi\Core\HookInterface {
 
   /**
-   * Create a new Role based on array-data
-   *
-   * @param array $params key-value pairs
-   * @return CRM_Standaloneusers_DAO_Role|NULL
+   * Event fired after an action is taken on a Role record.
+   * @param \Civi\Core\Event\PostEvent $event
    */
-  /*
-  public static function create($params) {
-  $className = 'CRM_Standaloneusers_DAO_Role';
-  $entityName = 'Role';
-  $hook = empty($params['id']) ? 'create' : 'edit';
-
-  CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
-  $instance = new $className();
-  $instance->copyValues($params);
-  $instance->save();
-  CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
-
-  return $instance;
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    // Reset cache
+    Civi::cache('metadata')->clear();
   }
-   */
 
 }
