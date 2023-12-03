@@ -183,6 +183,12 @@
     <type>varchar</type>
     <length>5</length>
     <comment>UI language preferred by the given user/contact</comment>
+    <pseudoconstant>
+      <callback>CRM_Standaloneusers_BAO_User::getPreferredLanguages</callback>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>2.1</add>
   </field>
   <index>

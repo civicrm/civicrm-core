@@ -29,4 +29,8 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
     $sess->set('lastAccess', time());
   }
 
+  public static function getPreferredLanguages(): array {
+    return CRM_Core_I18n::uiLanguages(FALSE);
+  }
+
 }
