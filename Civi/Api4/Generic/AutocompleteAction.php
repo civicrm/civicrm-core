@@ -36,6 +36,7 @@ use Civi\Core\Event\GenericHookEvent;
  */
 class AutocompleteAction extends AbstractAction {
   use Traits\SavedSearchInspectorTrait;
+  use Traits\GetSetValueTrait;
 
   /**
    * Autocomplete search input for search mode
@@ -87,6 +88,17 @@ class AutocompleteAction extends AbstractAction {
    * @var string
    */
   protected $key;
+
+  /**
+   * Known entity values.
+   *
+   * Value will be populated by the form based on data entered at the time.
+   * They can be used by hooks for contextual filtering.
+   *
+   * Format: [fieldName => value][]
+   * @var array
+   */
+  protected $values = [];
 
   /**
    * Search conditions that will be automatically added to the WHERE or HAVING clauses
