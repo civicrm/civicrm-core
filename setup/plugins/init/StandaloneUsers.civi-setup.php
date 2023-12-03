@@ -50,7 +50,7 @@ if (!defined('CIVI_SETUP')) {
           'label' => ts('Everyone, including anonymous users'),
           // Provide default open permissions
           'permissions' => [
-            'CiviMail subscribe/unsubscribe pages',
+            'access CiviMail subscribe/unsubscribe pages',
             'make online contributions',
             'view event info',
             'register for events',
