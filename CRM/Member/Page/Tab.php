@@ -372,13 +372,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $this->assign('accessContribution', TRUE);
 
       //show associated soft credit when contribution payment is paid by different person
-      if ($this->_id && $this->_contactId) {
-        $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $this->_id);
-        if (!empty($softCreditList)) {
-          $this->assign('softCredit', TRUE);
-          $this->assign('softCreditRows', $softCreditList);
-        }
-      }
+      $softCreditList = ($this->_id && $this->_contactId) ? CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $this->_id) : FALSE;
+      $this->assign('softCredit', (bool) $softCreditList);
+      $this->assign('softCreditRows', $softCreditList);
     }
     else {
       $this->_accessContribution = FALSE;
