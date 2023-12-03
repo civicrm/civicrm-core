@@ -116,7 +116,7 @@ CRM.$(function($) {
         {$paneName}
       </summary>
     <div class="crm-accordion-body {$paneValue.id}"></div>
-    </details><!-- Surplus /div is required (not sure why but breakage is obvious when you remove it) -->
+    </details>
   {/foreach}
   <div class="spacer"></div>
 
