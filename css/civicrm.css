@@ -2195,8 +2195,7 @@ div.crm-master-accordion-header a.helpicon {
 
 /* Specific types of headers */
 
-.crm-container summary:not(.crm-master-accordion-header, .crm-accordion-header) 
-/* For older CMS themes not styling summary */ {
+.crm-container summary:not(.crm-master-accordion-header, .crm-accordion-header) /* For older CMS themes not styling summary */ {
   font-weight: bold;
   padding: 0.75rem 0;
 }
