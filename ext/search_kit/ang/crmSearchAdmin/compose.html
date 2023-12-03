@@ -77,7 +77,7 @@
 <details id="crm-search-build-functions">
   <summary ng-click="controls.showFunctions = !controls.showFunctions">
     {{:: ts('Field Transformations') }}
-  </sumary>
+  </summary>
   <div ng-if="!!controls.showFunctions">
     <!-- Must use track by $index with an array of primitives, and manually refresh this loop when indexes change -->
     <fieldset ng-repeat="col in $ctrl.savedSearch.api_params.select track by $index" ng-if="!$ctrl.isPseudoField(col)">
