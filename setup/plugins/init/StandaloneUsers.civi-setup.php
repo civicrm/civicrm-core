@@ -149,7 +149,9 @@ if (!defined('CIVI_SETUP')) {
         [
           'name' => 'admin',
           'label' => ts('Administrator'),
-          'permissions' => array_keys(\CRM_Core_SelectValues::permissions()),
+          'permissions' => [
+            'all CiviCRM permissions and ACLs',
+          ],
         ],
       ])
       ->execute()->indexBy('name');
