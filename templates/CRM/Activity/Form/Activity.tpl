@@ -12,7 +12,7 @@
     <div class="crm-block crm-content-block crm-activity-view-block">
   {else}
     {if $activityTypeDescription}
-      <div class="help">{$activityTypeDescription}</div>
+      <div class="help">{$activityTypeDescription|purify}</div>
     {/if}
     <div class="crm-block crm-form-block crm-activity-form-block">
   {/if}
@@ -29,7 +29,7 @@
 
   {if $action eq 4}
     {if $activityTypeDescription}
-    <div class="help">{$activityTypeDescription}</div>
+    <div class="help">{$activityTypeDescription|purify}</div>
     {/if}
   {else}
     {if $context eq 'standalone' or $context eq 'search' or $context eq 'smog'}
