@@ -60,13 +60,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       if (is_array($extendsChildType)) {
         foreach ($extendsChildType as $childType) {
           if (!array_key_exists($childType, $registeredSubTypes) && !in_array($childType, $registeredSubTypes, TRUE)) {
-            throw new CRM_Core_Exception('Supplied Sub type is not valid for the specified entitiy');
+            throw new CRM_Core_Exception('Supplied Sub type is not valid for the specified entity');
           }
         }
       }
       else {
         if (!array_key_exists($extendsChildType, $registeredSubTypes) && !in_array($extendsChildType, $registeredSubTypes, TRUE)) {
-          throw new CRM_Core_Exception('Supplied Sub type is not valid for the specified entitiy');
+          throw new CRM_Core_Exception('Supplied Sub type is not valid for the specified entity');
         }
         $extendsChildType = [$extendsChildType];
       }

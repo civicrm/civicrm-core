@@ -175,7 +175,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
 
-    $result = $this->callAPIFailure('custom_group', 'create', $params, 'Supplied Sub type is not valid for the specified entitiy');
+    $result = $this->callAPIFailure('custom_group', 'create', $params, 'Supplied Sub type is not valid for the specified entity');
   }
 
   /**
