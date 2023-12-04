@@ -169,6 +169,8 @@ class AutocompleteAction extends AbstractAction {
       // For subsequent pages when searching by id, subtract the "extra" first page
       elseif ($searchById && $this->page > 1) {
         $this->page -= 1;
+        // Record with that id was already returned on page one so exclude it from subsequent pages
+        $this->savedSearch['api_params']['where'][] = [$primaryKeys[0], '!=', $this->input];
       }
       // If first line uses a rewrite, search on those fields too
       if (!$initialSearchById && !empty($this->display['settings']['columns'][0]['rewrite'])) {
