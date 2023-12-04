@@ -101,7 +101,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
         break;
 
       case 'Joomla':
-        $urlPats[] = [';/index.php\?.*task=civicrm/event/info&reset=1&id=9;', \Civi::url('frontend://civicrm/event/inof?reset=1')->addQuery('id=9')];
+        $urlPats[] = [';/index.php\?.*task=civicrm/event/info&reset=1&id=9;', \Civi::url('frontend://civicrm/event/info?reset=1')->addQuery('id=9')];
         $urlPats[] = [';/administrator/.*task=civicrm/admin/reset=1;', \Civi::url('backend://civicrm/admin')->addQuery('reset=1')];
         break;
 
