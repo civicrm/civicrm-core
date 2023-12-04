@@ -7,26 +7,30 @@
 
   angular.module('crmUi', CRM.angRequires('crmUi'))
 
-    // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
-    // WISHLIST: crmCollapsed should support two-way/continuous binding
+    // example <div crm-ui-accordion="{title: ts('My Title'), collapsed: true}">...content...</div>
+    // @deprecated: just use <details><summary> markup
     .directive('crmUiAccordion', function() {
       return {
         scope: {
           crmUiAccordion: '='
         },
-        template: '<div ng-class="cssClasses"><div class="crm-accordion-header">{{crmUiAccordion.title}} <a crm-ui-help="help" ng-if="help"></a></div><div class="crm-accordion-body" ng-transclude></div></div>',
+        template: '<details class="crm-accordion-wrapper"><summary class="crm-accordion-header">{{crmUiAccordion.title}} <a crm-ui-help="help" ng-if="help"></a></summary><div class="crm-accordion-body" ng-transclude></div></details>',
         transclude: true,
         link: function (scope, element, attrs) {
-          scope.cssClasses = {
-            'crm-accordion-wrapper': true,
-            collapsed: scope.crmUiAccordion.collapsed
-          };
           scope.help = null;
-          scope.$watch('crmUiAccordion', function(crmUiAccordion) {
-            if (crmUiAccordion && crmUiAccordion.help) {
-              scope.help = crmUiAccordion.help.clone({}, {
-                title: crmUiAccordion.title
-              });
+          let openSet = false;
+          scope.$watch('crmUiAccordion', function(crmUiAccordion, oldVal) {
+            if (crmUiAccordion) {
+              // Only process this once
+              if (!openSet) {
+                $(element).children('details').prop('open', !crmUiAccordion.collapsed);
+                openSet = true;
+              }
+              if (crmUiAccordion.help) {
+                scope.help = crmUiAccordion.help.clone({}, {
+                  title: crmUiAccordion.title
+                });
+              }
             }
           });
         }
