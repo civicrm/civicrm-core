@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  * This form records additional payments needed when event/contribution is partially paid.
  */
@@ -48,7 +50,14 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   protected $_paymentType = NULL;
 
-  protected $_contributionId = NULL;
+  /**
+   * Internal property for contribution ID - use getContributionID().
+   *
+   * @var int
+   *
+   * @internal
+   */
+  protected $_contributionId;
 
   protected $fromEmailId = NULL;
 
@@ -72,16 +81,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('id', $this->_id);
     $this->assign('suppressPaymentFormButtons', $this->isBeingCalledFromSelectorContext());
 
-    if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
+    if ($this->_view === 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
       $title = $this->assignPaymentInfoBlock();
       $this->setTitle($title);
       return;
-    }
-    if ($this->_component == 'event') {
-      $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'contribution_id', 'participant_id');
-    }
-    else {
-      $this->_contributionId = $this->_id;
     }
 
     $paymentAmt = $this->getAmountDue();
@@ -96,7 +99,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       throw new CRM_Core_Exception(ts('Credit card payment is not for Refund payments use'));
     }
 
-    list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+    [$this->_contributorDisplayName, $this->_contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
 
     $this->assign('contributionMode', $this->_mode);
     $this->assign('contactId', $this->_contactID);
@@ -134,7 +137,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
-    if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
+    if ($this->_view === 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
       return NULL;
     }
     $defaults = [];
@@ -309,9 +312,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   public function submit($submittedValues) {
     $this->_params = $submittedValues;
     $this->beginPostProcess();
-    // _contributorContactID may no longer need to be set - setting it here
-    // was for use in processBillingAddress
-    $this->_contributorContactID = $this->_contactID;
     $this->processBillingAddress($this->_contactID, (string) $this->_contributorEmail);
     $participantId = NULL;
     if ($this->_component === 'event') {
@@ -334,13 +334,13 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $trxnsData['is_send_contribution_notification'] = FALSE;
     $paymentID = civicrm_api3('Payment', 'create', $trxnsData)['id'];
 
-    if ($this->_contributionId && CRM_Core_Permission::access('CiviMember')) {
+    if ($this->getContributionID() && CRM_Core_Permission::access('CiviMember')) {
       $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', ['contribution_id' => $this->_contributionId]);
       if ($membershipPaymentCount) {
         $this->ajaxResponse['updateTabs']['#tab_member'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactID);
       }
     }
-    if ($this->_contributionId && CRM_Core_Permission::access('CiviEvent')) {
+    if ($this->getContributionID() && CRM_Core_Permission::access('CiviEvent')) {
       $participantPaymentCount = civicrm_api3('ParticipantPayment', 'getCount', ['contribution_id' => $this->_contributionId]);
       if ($participantPaymentCount) {
         $this->ajaxResponse['updateTabs']['#tab_participant'] = CRM_Contact_BAO_Contact::getCountComponent('participant', $this->_contactID);
@@ -359,7 +359,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
   }
 
-  public function processCreditCard() {
+  public function processCreditCard(): ?array {
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
 
@@ -409,11 +409,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     if ($paymentParams['amount'] > 0.0) {
       try {
-        // force a reset of the payment processor in case the form changed it, CRM-7179
-        $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+        // Re-retrieve the payment processor in case the form changed it, CRM-7179
+        $payment = \Civi\Payment\System::singleton()->getById($this->getPaymentProcessorID());
         $result = $payment->doPayment($paymentParams);
       }
-      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      catch (PaymentProcessorException $e) {
         Civi::log()->error('Payment processor exception: ' . $e->getMessage());
         $urlParams = "action=add&cid={$this->_contactId}&id={$this->_contributionId}&component={$this->_component}&mode={$this->_mode}";
         CRM_Core_Error::statusBounce($e->getMessage(), CRM_Utils_System::url('civicrm/payment/add', $urlParams));
@@ -425,19 +425,17 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     $this->set('params', $this->_params);
-
-    // set source if not set
-    if (empty($this->_params['source'])) {
-      $userID = $session->get('userID');
-      $userSortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID,
-        'sort_name'
-      );
-      $this->_params['source'] = ts('Submit Credit Card Payment by: %1', [1 => $userSortName]);
-    }
+    return [
+      'fee_amount' => $result['fee_amount'] ?? 0,
+      'trxn_id' => $result['trxn_id'] ?? NULL,
+      'trxn_result_code' => $result['trxn_result_code'] ?? NULL,
+    ];
   }
 
   /**
    * Wrapper for unit testing the post process submit function.
+   *
+   * @deprecated since 5.69 will be removed around 5.75
    *
    * @param array $params
    * @param string|null $creditCardMode
@@ -446,6 +444,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * @throws \CRM_Core_Exception
    */
   public function testSubmit($params, $creditCardMode = NULL, $entityType = 'contribute') {
+    CRM_Core_Error::deprecatedFunctionWarning('use FormTrait in tests');
     $this->_bltID = 5;
     // Required because processCreditCard calls set method on this.
     $_SERVER['REQUEST_METHOD'] = 'GET';
@@ -516,9 +515,40 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    */
   protected function getAmountDue(): float {
     if (!isset($this->amountDue)) {
-      $this->amountDue = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId);
+      $this->amountDue = CRM_Contribute_BAO_Contribution::getContributionBalance($this->getContributionID());
     }
     return $this->amountDue;
+  }
+
+  /**
+   * Get the selected Contribution ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getContributionID(): int {
+    if (!$this->_contributionId) {
+      $component = CRM_Utils_Request::retrieve('component', 'String', $this, FALSE, 'contribution');
+      if ($component === 'event') {
+        $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'contribution_id', 'participant_id');
+      }
+      else {
+        $this->_contributionId = $this->_id;
+      }
+    }
+    return (int) $this->_contributionId;
+  }
+
+  /**
+   * Get the payment processor ID.
+   *
+   * @return int
+   */
+  public function getPaymentProcessorID(): int {
+    return (int) ($this->getSubmittedValue('payment_processor_id') ?: $this->_paymentProcessor['id']);
   }
 
 }
