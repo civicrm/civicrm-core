@@ -1,3 +1,11 @@
 <div af-fieldset="">
+  <div class="af-markup">
+    <div class="help">
+    <div>{{:: ts('CiviMember automatically calculates the current status of each contact\'s membership based on the status names and rules configured here. The status \'rule\' tells CiviMember what status to assign based on the start and end dates of a given membership. For example, the default Grace status rule says: \'assign Grace status if the membership period ended sometime within the past month.\'') }} <a class="crm-doc-link no-popup" href="https://docs.civicrm.org/user/en/latest/membership/defining-memberships/" target="_blank" title="Opens documentation in a new window.">{{:: ts('(Learn more...)') }}</a></div>
+
+    <div>{{:: ts('The status rules provided by default may be sufficient for your organization. However, you can easily change the status names and\/or adjust the rules by clicking the Edit links below. Or you can add a new status and rule.') }}</div>
+    </div>
+
+  </div>
   <crm-search-display-table search-name="Membership_Status_Rules" display-name="Membership_Status_Rules"></crm-search-display-table>
 </div>
