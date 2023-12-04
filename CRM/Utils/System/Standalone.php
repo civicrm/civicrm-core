@@ -577,9 +577,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       CRM_Core_Error::statusBounce(ts("Access denied"), CRM_Utils_System::url('civicrm'));
     }
     else {
-      CRM_Utils_System::redirect('/civicrm/login?anonAccessDenied');
+      CRM_Utils_System::redirect('/civicrm/login?accessDenied=anon');
     }
-
     // TODO: Prettier error page
   }
 

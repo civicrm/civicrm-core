@@ -17,6 +17,10 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
     // Remove breadcrumb for login page.
     $this->assign('breadcrumb', NULL);
 
+    if ('anon' === CRM_Utils_Request::retrieve('accessDenied', 'String')) {
+      // should this be 401?
+      http_response_code(403);
+    }
     parent::run();
   }
 
@@ -26,7 +30,7 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
   public static function logout() {
     Security::singleton()->logoutUser();
     // Dump them back on the log-IN page.
-    CRM_Utils_System::redirect('/civicrm/login?justLoggedOut');
+    CRM_Utils_System::redirect('/civicrm/login?justLoggedOut=1');
   }
 
 }

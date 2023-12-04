@@ -26,12 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
         password = document.getElementById('passwordInput'),
         loggedOutNotice = document.getElementById('loggedOutNotice');
 
-  // Special messages.
-  if (window.location.search === '?justLoggedOut') {
+  // Get special messages from url params
+  const url = new URL(window.location);
+
+  if (url.searchParams.get('justLoggedOut')) {
     loggedOutNotice.style.display = '';
     console.log("successful logout");
   }
-  else if (window.location.search === '?anonAccessDenied') {
+  if ('anon' === url.searchParams.get('accessDenied')) {
     anonAccessDenied.style.display = '';
   }
 
