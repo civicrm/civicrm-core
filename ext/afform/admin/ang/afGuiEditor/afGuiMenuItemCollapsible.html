@@ -1,5 +1,4 @@
-<-- Show the following if Element dropdown is collapsible -->
-<a href ng-click="$ctrl.toggleCollapsed(); $event.stopPropagation();" class="btn btn-sm btn-default" ng-class="{invisible: !$ctrl.isCollapsible()}">
-  <i class="crm-i fa-caret-{{ $ctrl.isCollapsed() ? 'right' : 'down' }}"></i>
-  {{ $ctrl.isCollapsed() ? ts('Closed') : ts('Open') }}
-</a>
+<label ng-click="$ctrl.toggleCollapsed(); $event.stopPropagation();">
+  <i class="crm-i fa{{ $ctrl.isCollapsed() ? '-check' : '' }}-square-o"></i>
+  {{:: ts('Collapsed') }}
+</label>
