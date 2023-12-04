@@ -2,6 +2,7 @@
 
 namespace E2E\AfformMock;
 
+use Civi;
 use CRM_Core_DAO;
 
 /**
@@ -16,6 +17,11 @@ use CRM_Core_DAO;
 class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
 
   protected $formName = 'mockPublicForm';
+
+  protected function setUp(): void {
+    parent::setUp();
+    Civi::settings()->revert('afform_mail_auth_token');
+  }
 
   public function testGetPage() {
     $r = $this->createGuzzle()->get('civicrm/mock-public-form');
