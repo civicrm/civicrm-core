@@ -327,7 +327,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       'contribution_id' => $this->getContributionID(),
       'payment_processor_id' => $this->getPaymentProcessorID(),
       'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type')),
-      'pan_truncation' => substr($this->getSubmittedValue('credit_card_number'), -4),
+      'pan_truncation' => substr((string) $this->getSubmittedValue('credit_card_number'), -4),
       'trxn_result_code' => $paymentResult['trxn_result_code'] ?? NULL,
       'payment_instrument_id' => $this->getSubmittedValue('payment_instrument_id'),
       'trxn_id' => $paymentResult['trxn_id'] ?? NULL,
@@ -369,18 +369,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->assign('displayName', $displayName);
     }
 
-    if (empty($this->_params['invoice_id'])) {
-      $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
-    }
-    else {
-      $this->_params['invoiceID'] = $this->_params['invoice_id'];
-    }
-
     $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
-    //Add common data to formatted params
-    $params = $this->_params;
-    CRM_Contribute_Form_AdditionalInfo::postProcessCommon($params, $this->_params, $this);
     // at this point we've created a contact and stored its address etc
     // all the payment processors expect the name and address to be in the
     // so we copy stuff over to first_name etc.
