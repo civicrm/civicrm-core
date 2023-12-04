@@ -1,5 +1,5 @@
 <!DOCTYPE html >
-<html lang="{$config->lcMessages|substr:0:2}">
+<html lang="{$config->lcMessages|substr:0:2}" class="crm-standalone" >
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,13 +21,6 @@
 {/if}
 
   <title>{if isset($docTitle)}{$docTitle}{else}CiviCRM{/if}</title>
-
-  <style>
-  {literal}
-  body { margin:0; padding:0; }
-  body>.crm-container { padding: 1rem; }
-  {/literal}
-  </style>
 </head>
 <body>
   {if $config->debug}

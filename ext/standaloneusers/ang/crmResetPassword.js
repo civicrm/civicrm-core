@@ -62,6 +62,7 @@
           return;
         }
         if (ctrl.newPassword != ctrl.newPasswordAgain) {
+          updateAngular('formSubmitted', false);
           alert(ts("Passwords do not match"));
           return;
         }
