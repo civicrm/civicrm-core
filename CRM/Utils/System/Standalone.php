@@ -482,18 +482,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * Function to return current language.
-   *
-   * @return string
-   */
-  public function getCurrentLanguage() {
-    if ($this->missingStandaloneExtension()) {
-      return NULL;
-    }
-    return Security::singleton()->getCurrentLanguage();
-  }
-
-  /**
    * I don't know why this needs to be here? Does it even?
    *
    * Helper function to extract path, query and route name from Civicrm URLs.

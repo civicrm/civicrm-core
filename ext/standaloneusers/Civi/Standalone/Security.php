@@ -248,12 +248,6 @@ class Security {
     return !empty($this->getLoggedInUfID());
   }
 
-  public function getCurrentLanguage() {
-    // @todo
-    \Civi::log()->debug('CRM_Utils_System_Standalone::getCurrentLanguage: not implemented');
-    return NULL;
-  }
-
   /**
    * This is the (perhaps temporary location for) the implementation of CRM_Utils_System_Standalone method.
    */
