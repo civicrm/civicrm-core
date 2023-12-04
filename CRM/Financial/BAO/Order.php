@@ -953,7 +953,8 @@ class CRM_Financial_BAO_Order {
       elseif ($taxRate) {
         $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
       }
-      if (!empty($lineItem['membership_type_id'])) {
+      $lineItem['membership_type_id'] = $lineItem['membership_type_id'] ?? NULL;
+      if ($lineItem['membership_type_id']) {
         $lineItem['entity_table'] = 'civicrm_membership';
       }
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
