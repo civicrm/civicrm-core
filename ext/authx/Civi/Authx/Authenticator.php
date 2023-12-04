@@ -125,6 +125,7 @@ class Authenticator extends AutoService implements HookInterface {
       'cred' => $details['cred'] ?? NULL,
       'siteKey' => $details['siteKey'] ?? NULL,
       'useSession' => $details['useSession'] ?? FALSE,
+      'requestPath' => empty($e->args) ? '*' : implode('/', $e->args),
     ]);
 
     if (isset($tgt->cred)) {
@@ -161,6 +162,7 @@ class Authenticator extends AutoService implements HookInterface {
       'cred' => $details['cred'] ?? NULL,
       'siteKey' => $details['siteKey'] ?? NULL,
       'useSession' => $details['useSession'] ?? FALSE,
+      'requestPath' => $details['requestPath'] ?? '*',
     ]);
 
     if ($principal = $this->checkCredential($tgt)) {
@@ -186,7 +188,7 @@ class Authenticator extends AutoService implements HookInterface {
     // 1. Accept the cred, which stops event propagation and further checks;
     // 2. Reject the cred, which stops event propagation and further checks;
     // 3. Neither accept nor reject, letting the event continue on to the next.
-    $checkEvent = new CheckCredentialEvent($tgt->cred);
+    $checkEvent = new CheckCredentialEvent($tgt->cred, $tgt->requestPath);
     \Civi::dispatcher()->dispatch('civi.authx.checkCredential', $checkEvent);
 
     if ($checkEvent->getRejection()) {
@@ -344,6 +346,12 @@ class AuthenticatorTarget {
   public $flow;
 
   /**
+   * @var string|null
+   *   Ex: 'civicrm/dashboard'
+   */
+  public $requestPath;
+
+  /**
    * @var bool
    */
   public $useSession;
@@ -396,7 +404,13 @@ class AuthenticatorTarget {
    * @return $this
    */
   public static function create($args = []) {
-    return (new static())->set($args);
+    $tgt = (new static())->set($args);
+    if ($tgt->useSession || $tgt->requestPath === NULL) {
+      // If requesting access to a session (or using anything that isn't specifically tied
+      // to an HTTP route), then we are effectively asking for any/all routes.
+      $tgt->requestPath = '*';
+    }
+    return $tgt;
   }
 
   /**
@@ -470,6 +484,7 @@ class AuthenticatorTarget {
       // omit: cred
       // omit: siteKey
       'flow' => $this->flow,
+      'requestPath' => $this->requestPath,
       'credType' => $this->credType,
       'jwt' => $this->jwt,
       'useSession' => $this->useSession,

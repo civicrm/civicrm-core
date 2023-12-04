@@ -32,6 +32,16 @@ class CheckCredentialEvent extends \Civi\Core\Event\GenericHookEvent {
   public $credValue;
 
   /**
+   * @var string
+   *   Ex: 'civicrm/dashboard' or '*'
+   *
+   *   This identifies the path(s) that the requestor wants to access.
+   *   For a stateless HTTP request, that's a specific path.
+   *   For stateful HTTP session or CLI pipe, that's a wildcard.
+   */
+  protected $requestPath;
+
+  /**
    * Authenticated principal.
    *
    * @var array|null
@@ -49,9 +59,16 @@ class CheckCredentialEvent extends \Civi\Core\Event\GenericHookEvent {
   /**
    * @param string $cred
    *   Ex: 'Basic ABCD1234' or 'Bearer ABCD1234'
+   * @param string $requestPath
+   *   Ex: 'civicrm/dashboard' or '*'
+   *
+   *   This identifies the path(s) that the requestor wants to access.
+   *   For a stateless HTTP request, that's a specific path.
+   *   For stateful HTTP session or CLI pipe, that's a wildcard.
    */
-  public function __construct(string $cred) {
+  public function __construct(string $cred, string $requestPath) {
     [$this->credFormat, $this->credValue] = explode(' ', $cred, 2);
+    $this->requestPath = $requestPath;
   }
 
   /**
@@ -121,6 +138,14 @@ class CheckCredentialEvent extends \Civi\Core\Event\GenericHookEvent {
 
   public function getRejection(): ?string {
     return $this->rejection;
+  }
+
+  /**
+   * @return string
+   *   Ex: 'civicrm/dashboard'
+   */
+  public function getRequestPath(): string {
+    return $this->requestPath;
   }
 
 }
