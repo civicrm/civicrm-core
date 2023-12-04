@@ -41,13 +41,6 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   public function preProcess() {
     $this->preProcessPDF();
 
-    // store case id if present
-    $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'CommaSeparatedIntegers', $this, FALSE);
-    if (!empty($this->_caseId) && strpos($this->_caseId, ',')) {
-      $this->_caseIds = explode(',', $this->_caseId);
-      unset($this->_caseId);
-    }
-
     // retrieve contact ID if this is 'single' mode
     $cid = CRM_Utils_Request::retrieve('cid', 'CommaSeparatedIntegers', $this, FALSE);
 
@@ -100,12 +93,36 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
    */
   public function listTokens() {
     $tokens = CRM_Core_SelectValues::contactTokens();
-    if (isset($this->_caseId) || isset($this->_caseIds)) {
+    if ($this->getCaseID()) {
       // For a single case, list tokens relevant for only that case type
-      $caseTypeId = isset($this->_caseId) ? CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $this->_caseId, 'case_type_id') : NULL;
+      $caseTypeId = $this->getCaseID() ? CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $this->getCaseID(), 'case_type_id') : NULL;
       $tokens += CRM_Core_SelectValues::caseTokens($caseTypeId);
     }
     return $tokens;
+  }
+
+  /**
+   * Get the case ID.
+   *
+   * @api supported for external use.
+   *
+   * @return int|null
+   */
+  public function getCaseID(): ?int {
+    $id = CRM_Utils_Request::retrieve('caseid', 'CommaSeparatedIntegers', $this, FALSE);
+    if (!$id || str_contains($id, ',')) {
+      return NULL;
+    }
+    return (int) $id;
+  }
+
+  protected function getCaseIDs(): array {
+    $ids = [];
+    $id = CRM_Utils_Request::retrieve('caseid', 'CommaSeparatedIntegers', $this, FALSE);
+    if ($id && str_contains($id, ',')) {
+      $ids = explode(',', $id);
+    }
+    return $ids;
   }
 
   /**
@@ -121,9 +138,9 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   protected function getRows(): array {
     $rows = [];
     foreach ($this->_contactIds as $index => $contactID) {
-      $caseID = $this->getVar('_caseId');
-      if (empty($caseID) && !empty($this->_caseIds[$index])) {
-        $caseID = $this->_caseIds[$index];
+      $caseID = $this->getCaseID();
+      if (!empty($this->getCaseIDs()[$index])) {
+        $caseID = $this->getCaseIDs()[$index];
       }
       $rows[] = ['contact_id' => $contactID, 'schema' => ['caseId' => $caseID, 'contactId' => $contactID]];
     }
