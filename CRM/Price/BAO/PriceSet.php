@@ -646,6 +646,22 @@ WHERE  id = %1";
    *   Line item array to be altered.
    * @param int $priceSetID
    *
+   * @deprecated since 5.69 will be removed around 5.85. This function is still in use but marking deprecated to make it clear that
+   * we are moving away from it. There is no function that has the guaranteed stable signature
+   * that would allow us to support if from outside of core so if using this or the core alternative
+   * from an extension you need to rely on unit tests to keep your code stable. Within core we
+   * already have good test cover on code that calls this.
+   *
+   * The recommended approach within core is something like
+   *
+   * private function initializeOrder(): void {
+   *  $this->order = new CRM_Financial_BAO_Order();
+   *  $this->order->setForm($this);
+   *  $this->order->setPriceSelectionFromUnfilteredInput($this->>getSubmittedValues());
+   * }
+   *
+   * $lineItems = $this->order->getLineItems();
+   *
    * @todo $priceSetID is a pseudoparam for permit override - we should stop passing it where we
    * don't specifically need it & find a better way where we do.
    */
