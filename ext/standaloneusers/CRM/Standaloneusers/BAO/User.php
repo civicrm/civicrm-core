@@ -33,4 +33,12 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
     return CRM_Core_I18n::uiLanguages(FALSE);
   }
 
+  public static function getTimeZones(): array {
+    $timeZones = [];
+    foreach (\DateTimeZone::listIdentifiers() as $timezoneId) {
+      $timeZones[$timezoneId] = $timezoneId;
+    }
+    return $timeZones;
+  }
+
 }
