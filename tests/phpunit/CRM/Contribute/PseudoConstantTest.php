@@ -15,6 +15,8 @@
  */
 class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
 
+  use CRMTraits_PCP_PCPTestTrait;
+
   /**
    * Clean up after tests.
    */
@@ -71,6 +73,17 @@ class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
         $this->assertEquals('Deposit Bank Account', $financialAccounts[$financialAccountID]['name']);
       }
     }
+  }
+
+  public function testPcPages(): void {
+    $blockParams = $this->pcpBlockParams();
+    $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord($blockParams);
+
+    $params = $this->pcpParams();
+    $params['pcp_block_id'] = $pcpBlock->id;
+    CRM_PCP_BAO_PCP::writeRecord($params);
+    $result = \CRM_Contribute_PseudoConstant::pcPage();
+    $this->assertCount(1, $result);
   }
 
 }
