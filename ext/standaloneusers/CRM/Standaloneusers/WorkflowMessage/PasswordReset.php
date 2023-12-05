@@ -3,10 +3,10 @@ use Civi\WorkflowMessage\GenericWorkflowMessage;
 
 /**
  *
- * @method static setResetUrlPlaintext(string $s)
- * @method static setResetUrlHtml(string $s)
- * @method static setUsernamePlaintext(string $s)
- * @method static setUsernameHtml(string $s)
+ * @method $this setResetUrlPlaintext(string $s)
+ * @method $this setResetUrlHtml(string $s)
+ * @method $this setUsernamePlaintext(string $s)
+ * @method $this setUsernameHtml(string $s)
  *
  */
 class CRM_Standaloneusers_WorkflowMessage_PasswordReset extends GenericWorkflowMessage {
@@ -62,6 +62,7 @@ class CRM_Standaloneusers_WorkflowMessage_PasswordReset extends GenericWorkflowM
     $resetUrlHtml = htmlspecialchars($resetUrlPlaintext);
     $this->logParams = [
       'userID'   => $user['id'],
+      'contactID' => $user['contact_id'],
       'username' => $user['username'],
       'email'    => $user['uf_name'],
       'url'      => $resetUrlPlaintext,
@@ -71,7 +72,8 @@ class CRM_Standaloneusers_WorkflowMessage_PasswordReset extends GenericWorkflowM
       ->setResetUrlHtml($resetUrlHtml)
       ->setUsernamePlaintext($user['username'])
       ->setUsernameHtml(htmlspecialchars($user['username']))
-      ->setTo($user['uf_name']);
+      ->setTo(['name' => $user['username'], 'email' => $user['uf_name']])
+      ->setContactID($user['contact_id']);
     return $this;
   }
 
