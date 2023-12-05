@@ -432,6 +432,52 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertStringContainsString('Case ID : 1234', $message);
   }
 
+  public function testSendToEmail_variantA(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    $cid = $this->individualCreate();
+
+    $msg = \Civi\WorkflowMessage\WorkflowMessage::create('petition_sign', [
+      'from' => '"The Sender" <sender-a@example.com>',
+      'toEmail' => 'demo-a@example.com',
+      'contactId' => 204,
+    ]);
+    $msg->sendTemplate([
+      'messageTemplate' => [
+        'msg_subject' => 'Hello world',
+        'msg_text' => 'Hello',
+        'msg_html' => '<p>Hello</p>',
+      ],
+    ]);
+    $mut->checkMailLog([
+      'From: "The Sender" <sender-a@example.com>',
+      'To: <demo-a@example.com>',
+      "Subject: Hello world",
+    ]);
+    $mut->stop();
+  }
+
+  public function testSendToEmail_variantB(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    $cid = $this->individualCreate();
+
+    \Civi\WorkflowMessage\WorkflowMessage::create('petition_sign')
+      ->setFrom(['name' => 'The Sender', 'email' => 'sender-b@example.com'])
+      ->setTo(['name' => 'The Recipient', 'email' => 'demo-b@example.com'])
+      ->setContactID($cid)
+      ->setTemplate([
+        'msg_subject' => 'Bonjour le monde',
+        'msg_text' => 'Ça va',
+        'msg_html' => '<p>Ça va</p>',
+      ])
+      ->sendTemplate();
+    $mut->checkMailLog([
+      'From: The Sender <sender-b@example.com>',
+      'To: The Recipient <demo-b@example.com>',
+      "Subject: Bonjour le monde",
+    ]);
+    $mut->stop();
+  }
+
   /**
    * Test rendering of domain tokens.
    *
