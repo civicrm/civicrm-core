@@ -440,6 +440,9 @@ class Admin {
             ];
           }
         }
+        foreach (_getSearchKitEntityDisplays() as $display) {
+
+        }
       }
     }
     return $joins;

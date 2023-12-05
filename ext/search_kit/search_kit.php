@@ -125,12 +125,13 @@ function _getSearchKitEntityDisplays(): array {
   // Can't use the API to fetch search displays because this is called by pre-boot hooks
   $select = CRM_Utils_SQL_Select::from('civicrm_search_display')
     ->where('type = "entity"')
-    ->select(['id', 'name', 'label', 'settings']);
+    ->select(['id', 'name', 'label', 'settings', 'saved_search_id']);
   try {
     $display = CRM_Core_DAO::executeQuery($select->toSQL());
     while ($display->fetch()) {
       $displays[] = [
         'id' => $display->id,
+        'saved_search_id' => $display->saved_search_id,
         'label' => $display->label,
         'name' => $display->name,
         'entityName' => 'SK_' . $display->name,
