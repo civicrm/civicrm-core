@@ -19,6 +19,8 @@ return [
             'id',
             'username',
             'uf_name',
+            'contact_id',
+            'contact_id.display_name',
             'is_active',
             'when_created',
             'when_last_accessed',
@@ -86,6 +88,19 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Roles'),
               'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'contact_id.display_name',
+              'dataType' => 'String',
+              'label' => E::ts('Linked Contact'),
+              'sortable' => TRUE,
+              'link' => [
+                'entity' => 'Contact',
+                'action' => 'view',
+                'join' => 'contact_id',
+                'target' => '_blank',
+              ],
             ],
             [
               'type' => 'field',

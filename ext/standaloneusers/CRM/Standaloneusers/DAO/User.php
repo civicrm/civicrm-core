@@ -318,6 +318,7 @@ class CRM_Standaloneusers_DAO_User extends CRM_Core_DAO {
           'localizable' => 0,
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'html' => [
+            'type' => 'EntityRef',
             'label' => E::ts("Contact"),
           ],
           'add' => '1.1',
