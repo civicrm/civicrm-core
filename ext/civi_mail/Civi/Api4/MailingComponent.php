@@ -14,7 +14,7 @@ namespace Civi\Api4;
  * MailingComponent
  *
  * @searchable secondary
- * @since 5.70
+ * @since 5.69
  * @package Civi\Api4
  */
 class MailingComponent extends Generic\DAOEntity {
