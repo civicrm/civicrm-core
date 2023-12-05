@@ -77,7 +77,7 @@ return [
               'size' => 'btn-xs',
               'links' => [
                 [
-                  'path' => 'civicrm/report/instance/[id]',
+                  'path' => 'civicrm/report/instance/[id]?force=1&reset=1',
                   'icon' => 'fa-external-link',
                   'text' => E::ts('View results'),
                   'style' => 'default',
