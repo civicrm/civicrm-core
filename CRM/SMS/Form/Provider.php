@@ -28,7 +28,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
 
   public function preProcess() {
 
-    $this->_id = $this->get('id');
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this);
 
     $this->setPageTitle(ts('SMS Provider'));
 
