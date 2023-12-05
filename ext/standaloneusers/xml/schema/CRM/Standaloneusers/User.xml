@@ -163,6 +163,7 @@
     <required>true</required>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
   </field>
 

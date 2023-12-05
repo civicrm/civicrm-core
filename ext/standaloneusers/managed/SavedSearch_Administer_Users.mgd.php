@@ -91,7 +91,7 @@ return [
               'type' => 'field',
               'key' => 'is_active',
               'dataType' => 'Boolean',
-              'label' => E::ts('Active?'),
+              'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
