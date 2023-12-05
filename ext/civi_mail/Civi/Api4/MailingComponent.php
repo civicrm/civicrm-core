@@ -12,7 +12,7 @@ namespace Civi\Api4;
 
 /**
  * MailingComponent
- * 
+ *
  * @searchable secondary
  * @since 5.70
  * @package Civi\Api4
