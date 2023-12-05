@@ -1837,6 +1837,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         'PDFFilename' => ts('confirmation') . '.pdf',
         'modelProps' => [
           'participantID' => $participantID,
+          'userEnteredText' => $this->getSubmittedValue('receipt_text'),
           'eventID' => $params['event_id'],
           'contributionID' => $contributionID,
         ],

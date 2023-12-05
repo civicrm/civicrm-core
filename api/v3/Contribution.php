@@ -401,8 +401,15 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'receipt_text',
     'pay_later_receipt',
     'payment_processor_id',
+    'model',
   ];
   $input = array_intersect_key($params, array_flip($allowedParams));
+  if (!isset($input['model'])) {
+    $input['model'] = [
+      // Pass through legacy receipt_text.
+      'userEnteredText' => $input['tplParams']['receipt_text'] ?? NULL,
+    ];
+  }
   CRM_Contribute_BAO_Contribution::sendMail($input, [], $params['id']);
   return [];
 }
