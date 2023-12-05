@@ -3,7 +3,7 @@ use CRM_Standaloneusers_ExtensionUtil as E;
 
 return [
   'type' => 'search',
-  'title' => E::ts('User Roles'),
+  'title' => E::ts('Administer Roles'),
   'description' => E::ts('List of roles defined on the system.'),
   'icon' => 'fa-graduation-cap',
   'server_route' => 'civicrm/admin/roles',
