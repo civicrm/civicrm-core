@@ -10,7 +10,7 @@
       },
       require: {
         ngModel: 'ngModel',
-        editor: '^^afGuiEditor'
+        editor: '?^^afGuiEditor'
       },
       controller: function ($element, $timeout) {
         var ts = CRM.ts('org.civicrm.afform_admin'),
@@ -41,7 +41,7 @@
               if (field.fk_entity === 'Contact' && (!filters.contact_type || filters.contact_type === 'Individual')) {
                 options.push('user_contact_id');
               }
-              _.each(ctrl.editor.getEntities({type: field.fk_entity}), function(entity) {
+              _.each(ctrl.editor ? ctrl.editor.getEntities({type: field.fk_entity}) : [], function(entity) {
                 // Check if field filters match entity data (e.g. contact_type)
                 var filtersMatch = true;
                 _.each(filters, function(value, key) {

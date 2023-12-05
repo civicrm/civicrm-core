@@ -561,7 +561,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       [$select, $from, $where, $having] = $queryObj->query();
       $dao = CRM_Core_DAO::executeQuery("$select $from $where $having");
       $dao->fetch();
-      $this->assertEquals('Anderson, Anthony', $dao->sort_name);
+      $this->assertEquals('Anderson, Anthony II', $dao->sort_name);
     }
     catch (PEAR_Exception $e) {
       $err = $e->getCause();

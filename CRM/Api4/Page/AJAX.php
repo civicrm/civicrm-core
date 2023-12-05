@@ -137,10 +137,10 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       $status = $statusMap[get_class($e)] ?? 500;
       // Send error code (but don't overwrite success code if there are multiple calls and one was successful)
       $this->httpResponseCode = $this->httpResponseCode ?: $status;
-      if (CRM_Core_Permission::check('view debug output') || ($e->getErrorData()['show_detailed_error'] ?? FALSE)) {
+      if (CRM_Core_Permission::check('view debug output') || (method_exists($e, 'getErrorData') && ($e->getErrorData()['show_detailed_error'] ?? FALSE))) {
         $response['error_code'] = $e->getCode();
         $response['error_message'] = $e->getMessage();
-        if (!empty($params['debug'])) {
+        if (!empty($params['debug']) && CRM_Core_Permission::check('view debug output')) {
           if (method_exists($e, 'getUserInfo')) {
             $response['debug']['info'] = $e->getUserInfo();
           }

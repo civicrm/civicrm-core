@@ -127,10 +127,7 @@ class CRM_Campaign_Page_AJAX {
     }
 
     //format multi-select group and contact types.
-    foreach ([
-      'group',
-      'contact_type',
-    ] as $param) {
+    foreach (['group', 'contact_type'] as $param) {
       $paramValue = $params[$param] ?? NULL;
       if ($paramValue) {
         unset($params[$param]);

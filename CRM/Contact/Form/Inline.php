@@ -157,6 +157,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('contactId', $cid);
     $smarty->assign('external_identifier', CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'external_identifier'));
+    $smarty->assign('created_date', CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'created_date'));
     $smarty->assign('lastModified', CRM_Core_BAO_Log::lastModified($cid, 'civicrm_contact'));
     $viewOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'contact_view_options', TRUE

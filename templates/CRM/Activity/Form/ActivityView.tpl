@@ -9,7 +9,7 @@
 *}
 <div class="crm-block crm-content-block crm-activity-view-block">
       {if $activityTypeDescription}
-        <div class="help">{$activityTypeDescription}</div>
+        <div class="help">{$activityTypeDescription|purify}</div>
       {/if}
       <table class="crm-info-panel">
         <tr>

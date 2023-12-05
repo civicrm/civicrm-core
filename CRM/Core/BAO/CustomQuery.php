@@ -256,7 +256,7 @@ class CRM_Core_BAO_CustomQuery {
                 $value = str_replace(",", "$sp|$sp", $value);
                 $value = str_replace(['[:comma:]', '(', ')'], [',', '[(]', '[)]'], $value);
 
-                $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
+                $op = (str_contains($op, '!') || str_contains($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
                 $value = $sp . $value . $sp;
                 if (!$wildcard) {
                   foreach (explode("|", $value) as $val) {

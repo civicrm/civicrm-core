@@ -21,6 +21,20 @@
 class CRM_Activity_Page_Tab extends CRM_Core_Page {
 
   /**
+   * Case ID, passed in via query param.
+   *
+   * @var int
+   */
+  public $_caseId;
+
+  /**
+   * Contact ID, passed in via query param
+   *
+   * @var int
+   */
+  public $_contactId;
+
+  /**
    * Browse all activities for a particular contact.
    */
   public function browse() {
@@ -111,7 +125,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
     $this->assign('contactID', $this->_contactId);
 
     // check logged in url permission
-    CRM_Contact_Page_View::checkUserPermission($this);
+    CRM_Contact_Page_View::checkUserPermission($this, $this->_contactId);
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->assign('action', $this->_action);
@@ -184,10 +198,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
         'Print PDF Letter'
       );
 
-      if (in_array($activityTypeId, [
-        $emailTypeValue,
-        $letterTypeValue,
-      ])) {
+      if (in_array($activityTypeId, [$emailTypeValue, $letterTypeValue])) {
         return;
       }
     }

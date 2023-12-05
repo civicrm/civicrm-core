@@ -1706,7 +1706,7 @@ if (!CRM.vars) CRM.vars = {};
         e.stopPropagation();
       })
       // Handle accordions
-      .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
+      .on('click.crmAccordions', 'div.crm-accordion-header, fieldset.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
         var action = 'open';
         if ($(this).parent().hasClass('collapsed')) {
           $(this).next().css('display', 'none').slideDown(200);

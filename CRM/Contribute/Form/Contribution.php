@@ -96,8 +96,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public $_pledgeValues;
 
-  public $_contributeMode = 'direct';
-
   public $_context;
 
   /**
@@ -1181,10 +1179,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $this->_params['amount'] = $this->_params['total_amount'];
-    // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
-    // function to get correct amount level consistently. Remove setting of the amount level in
-    // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
-    // to cover all variants.
+    // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
     $this->_params['amount_level'] = 0;
     $this->_params['description'] = ts("Contribution submitted by a staff person using contributor's credit card");
     $this->_params['currencyID'] = CRM_Utils_Array::value('currency',
@@ -1417,12 +1412,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (isset($params['amount'])) {
-      $contributionParams = array_merge(CRM_Contribute_Form_Contribution_Confirm::getContributionParams(
-        $params, $financialType->id,
-        NULL, $receiptDate,
+      $contributionParams = array_merge($this->getContributionParams(
+        $params, $financialType->id, $receiptDate,
         $recurringContributionID), $contributionParams
       );
-      $contributionParams['non_deductible_amount'] = CRM_Contribute_Form_Contribution_Confirm::getNonDeductibleAmount($params, $financialType, FALSE, $form);
+      $contributionParams['non_deductible_amount'] = $this->getNonDeductibleAmount($params, $financialType, FALSE, $form);
       $contributionParams['skipCleanMoney'] = TRUE;
       // @todo this is the wrong place for this - it should be done as close to form submission
       // as possible
@@ -1431,23 +1425,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
 
       if (Civi::settings()->get('invoicing')) {
-        $dataArray = [];
-        // @todo - interrogate the line items passed in on the params array.
-        // No reason to assume line items will be set on the form.
-        foreach ($form->_lineItem as $lineItemKey => $lineItemValue) {
-          foreach ($lineItemValue as $key => $value) {
-            if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
-              if (isset($dataArray[$value['tax_rate']])) {
-                $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + $value['tax_amount'];
-              }
-              else {
-                $dataArray[$value['tax_rate']] = $value['tax_amount'];
-              }
-            }
-          }
-        }
         $smarty = CRM_Core_Smarty::singleton();
-        $smarty->assign('dataArray', $dataArray);
+        // @todo - probably this assign is no longer needed as we use a token.
         $smarty->assign('totalTaxAmount', $params['tax_amount'] ?? NULL);
       }
     }
@@ -1483,6 +1462,75 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $transaction->commit();
     return $contribution;
+  }
+
+  /**
+   * Get non-deductible amount.
+   *
+   * Previously shared function - was quite broken in the other flow.
+   * Maybe here too
+   *
+   * This is a bit too much about wierd form interpretation to be this deep.
+   *
+   * @see https://issues.civicrm.org/jira/browse/CRM-11885
+   *  if non_deductible_amount exists i.e. Additional Details fieldset was opened [and staff typed something] -> keep
+   * it.
+   *
+   * @param array $params
+   * @param CRM_Financial_BAO_FinancialType $financialType
+   * @param bool $online
+   * @param CRM_Contribute_Form_Contribution_Confirm $form
+   *
+   * @return array
+   */
+  private function getNonDeductibleAmount($params, $financialType, $online, $form) {
+    if (isset($params['non_deductible_amount']) && (!empty($params['non_deductible_amount']))) {
+      return $params['non_deductible_amount'];
+    }
+    $priceSetId = $params['priceSetId'] ?? NULL;
+    // return non-deductible amount if it is set at the price field option level
+    if ($priceSetId && !empty($form->_lineItem)) {
+      $nonDeductibleAmount = CRM_Price_BAO_PriceSet::getNonDeductibleAmountFromPriceSet($priceSetId, $form->_lineItem);
+    }
+
+    if (!empty($nonDeductibleAmount)) {
+      return $nonDeductibleAmount;
+    }
+    else {
+      if ($financialType->is_deductible) {
+        if ($online && isset($params['selectProduct'])) {
+          $selectProduct = $params['selectProduct'] ?? NULL;
+        }
+        if (!$online && isset($params['product_name'][0])) {
+          $selectProduct = $params['product_name'][0];
+        }
+        // if there is a product - compare the value to the contribution amount
+        if (isset($selectProduct) &&
+          $selectProduct !== 'no_thanks'
+        ) {
+          $productDAO = new CRM_Contribute_DAO_Product();
+          $productDAO->id = $selectProduct;
+          $productDAO->find(TRUE);
+          // product value exceeds contribution amount
+          if ($params['amount'] < $productDAO->price) {
+            $nonDeductibleAmount = $params['amount'];
+            return $nonDeductibleAmount;
+          }
+          // product value does NOT exceed contribution amount
+          else {
+            return $productDAO->price;
+          }
+        }
+        // contribution is deductible - but there is no product
+        else {
+          return '0.00';
+        }
+      }
+      // contribution is NOT deductible
+      else {
+        return $params['amount'];
+      }
+    }
   }
 
   /**
@@ -1528,6 +1576,61 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $form->_params['contributionRecurID'] = $recurring->id;
 
     return $recurring->id;
+  }
+
+  /**
+   * Set the parameters to be passed to contribution create function.
+   *
+   * Previously shared function.
+   *
+   * @param array $params
+   * @param int $financialTypeID
+   * @param string $receiptDate
+   * @param int $recurringContributionID
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function getContributionParams(
+    $params, $financialTypeID, $receiptDate, $recurringContributionID) {
+    $contributionParams = [
+      'financial_type_id' => $financialTypeID,
+      'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
+      'tax_amount' => $params['tax_amount'] ?? NULL,
+      'amount_level' => $params['amount_level'] ?? NULL,
+      'invoice_id' => $params['invoiceID'],
+      'currency' => $params['currencyID'],
+      'is_pay_later' => $params['is_pay_later'] ?? 0,
+      //configure cancel reason, cancel date and thankyou date
+      //from 'contribution' type profile if included
+      'cancel_reason' => $params['cancel_reason'] ?? 0,
+      'cancel_date' => isset($params['cancel_date']) ? CRM_Utils_Date::format($params['cancel_date']) : NULL,
+      'thankyou_date' => isset($params['thankyou_date']) ? CRM_Utils_Date::format($params['thankyou_date']) : NULL,
+      //setting to make available to hook - although seems wrong to set on form for BAO hook availability
+      'skipLineItem' => $params['skipLineItem'] ?? 0,
+    ];
+
+    if (!empty($params["is_email_receipt"])) {
+      $contributionParams += [
+        'receipt_date' => $receiptDate,
+      ];
+    }
+
+    if ($recurringContributionID) {
+      $contributionParams['contribution_recur_id'] = $recurringContributionID;
+    }
+
+    $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    if (isset($contributionParams['invoice_id'])) {
+      $contributionParams['id'] = CRM_Core_DAO::getFieldValue(
+        'CRM_Contribute_DAO_Contribution',
+        $contributionParams['invoice_id'],
+        'id',
+        'invoice_id'
+      );
+    }
+
+    return $contributionParams;
   }
 
   /**
@@ -1860,7 +1963,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $params = [
         'contact_id' => $this->_contactID,
-        'currency' => $this->getCurrency($submittedValues),
+        'currency' => $this->getCurrency(),
         'skipCleanMoney' => TRUE,
         'id' => $this->_id,
       ];
@@ -1871,7 +1974,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $fields = [
         'financial_type_id',
-        'contribution_status_id',
         'payment_instrument_id',
         'cancel_reason',
         'source',
@@ -1881,6 +1983,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ];
       foreach ($fields as $f) {
         $params[$f] = $formValues[$f] ?? NULL;
+      }
+      if ($this->_id && $action & CRM_Core_Action::UPDATE) {
+        // Can only be updated to contribution which is handled via Payment.create
+        $params['contribution_status_id'] = $this->getSubmittedValue('contribution_status_id');
+
+        // Set is_pay_later flag for back-office offline Pending status contributions CRM-8996
+        // else if contribution_status is changed to Completed is_pay_later flag is changed to 0, CRM-15041
+        if ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
+          $params['is_pay_later'] = 1;
+        }
+        elseif ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
+          // @todo - if the contribution is new then it should be Pending status & then we use
+          // Payment.create to update to Completed.
+          $params['is_pay_later'] = 0;
+        }
       }
 
       $params['revenue_recognition_date'] = NULL;
@@ -1900,17 +2017,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       else {
         $params['cancel_date'] = $params['cancel_reason'] = 'null';
-      }
-
-      // Set is_pay_later flag for back-office offline Pending status contributions CRM-8996
-      // else if contribution_status is changed to Completed is_pay_later flag is changed to 0, CRM-15041
-      if ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
-        $params['is_pay_later'] = 1;
-      }
-      elseif ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
-        // @todo - if the contribution is new then it should be Pending status & then we use
-        // Payment.create to update to Completed.
-        $params['is_pay_later'] = 0;
       }
 
       // Add Additional common information to formatted params.
@@ -1933,21 +2039,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (!empty($params['note']) && !empty($submittedValues['note'])) {
         unset($params['note']);
       }
-      $contribution = CRM_Contribute_BAO_Contribution::create($params);
-
       $previousStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->_values['contribution_status_id'] ?? NULL);
       // process associated membership / participant, CRM-4395
-      if ($contribution->id && $action & CRM_Core_Action::UPDATE
+      if ($this->getContributionID() && $this->getAction() & CRM_Core_Action::UPDATE
         && in_array($previousStatus, ['Pending', 'Partially paid'], TRUE)
         && 'Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'))) {
-        // @todo use Payment.create to do this, remove transitioncomponents function
-        // if contribution is being created with a completed status it should be
-        // created pending & then Payment.create adds the payment
-        CRM_Contribute_BAO_Contribution::transitionComponents([
-          'contribution_id' => $contribution->id,
-          'receive_date' => $contribution->receive_date,
+        // @todo make users use add payment form.
+        civicrm_api3('Payment', 'create', [
+          'contribution_id' => $this->getContributionID(),
+          'total_amount' => $this->getContributionValue('balance_amount'),
+          'currency' => $this->getSubmittedValue('currency'),
+          'payment_instrument_id' => $this->getSubmittedValue('payment_instrument_id'),
+          'check_number' => $this->getSubmittedValue('check_number'),
         ]);
       }
+      $contribution = CRM_Contribute_BAO_Contribution::create($params);
 
       array_unshift($this->statusMessage, ts('The contribution record has been saved.'));
 
@@ -2028,11 +2134,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     foreach ($lineItem as $key => $value) {
       foreach ($value as $v) {
         if (isset($taxRate[(string) CRM_Utils_Array::value('tax_rate', $v)])) {
-          $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + ($v['tax_amount'] ?? 0);
         }
         else {
           if (isset($v['tax_rate'])) {
-            $taxRate[(string) $v['tax_rate']] = $v['tax_amount'] ?? NULL;
             $getTaxDetails = TRUE;
           }
         }
@@ -2041,14 +2145,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     if ($action & CRM_Core_Action::UPDATE) {
       $totalTaxAmount = $submittedValues['tax_amount'] ?? $this->_values['tax_amount'];
+      // Assign likely replaced by a token
       $this->assign('totalTaxAmount', $totalTaxAmount);
-      $this->assign('dataArray', $taxRate);
     }
     else {
       if (!empty($submittedValues['price_set_id'])) {
         $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
         $this->assign('getTaxDetails', $getTaxDetails);
-        $this->assign('dataArray', $taxRate);
       }
       else {
         $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
@@ -2305,7 +2408,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @return int|null
    */
   protected function getPriceSetID() {
-    return $this->getSubmittedValue('price_set_id');
+    return $this->getSubmittedValue('price_set_id') ?: CRM_Utils_Request::retrieve('priceSetId', 'Integer');
   }
 
   /**

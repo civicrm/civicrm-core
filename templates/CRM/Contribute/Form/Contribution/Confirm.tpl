@@ -33,10 +33,10 @@
       </div>
 
       <div class="display-block">
-        {if $lineItem and $isDisplayLineItems}
+        {if $isDisplayLineItems && $lineItem}
           {if !$amount}{assign var="amount" value=0}{/if}
           {assign var="totalAmount" value=$amount}
-          {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+          {include file="CRM/Price/Page/LineItem.tpl" context="Contribution" getTaxDetails=$totalTaxAmount displayLineItemFinancialType=false pricesetFieldsCount=false currencySymbol='' hookDiscount=''}
         {elseif $is_separate_payment}
           {if $amount AND $minimum_fee}
             {$membership_name} {ts}Membership{/ts}:
@@ -231,14 +231,14 @@
 
   {* Show credit or debit card section for 'direct' mode, except for PayPal Express (detected because credit card number is empty) *}
     {crmRegion name="contribution-confirm-billing-block"}
-    {if in_array('credit_card_number', $form) || in_array('bank_account_number', $form)}
+    {if in_array('credit_card_number', $paymentFields) || in_array('bank_account_number', $paymentFields)}
       <div class="crm-group credit_card-group">
         {if $paymentFieldsetLabel}
           <div class="header-dark">
             {$paymentFieldsetLabel}
           </div>
         {/if}
-        {if in_array('bank_account_number', $form) && $bank_account_number}
+        {if in_array('bank_account_number', $paymentFields) && $bank_account_number}
           <div class="display-block">
             {ts}Account Holder{/ts}: {$account_holder}<br/>
             {ts}Bank Account Number{/ts}: {$bank_account_number}<br/>
@@ -256,7 +256,7 @@
             </div>
           {/if}
         {/if}
-        {if in_array('credit_card_number', $form) && $credit_card_number}
+        {if in_array('credit_card_number', $paymentFields) && $credit_card_number}
           <div class="crm-section no-label credit_card_details-section">
             <div class="content">{$credit_card_type}</div>
             <div class="content">{$credit_card_number}</div>
@@ -268,7 +268,7 @@
     {/if}
     {/crmRegion}
 
-  {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="confirmContribution"}
+  {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="confirmContribution" showPremiumSelectionFields=false preview=false}
 
   {if $customPost}
     <fieldset class="label-left crm-profile-view">

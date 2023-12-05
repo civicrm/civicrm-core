@@ -57,12 +57,13 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
   if (!financialacls_is_acl_limiting_enabled()) {
     return;
   }
-  if ($objectName === 'LineItem' && !empty($params['check_permissions'])) {
+  if (in_array($objectName, ['LineItem', 'Product'], TRUE) && !empty($params['check_permissions'])) {
+    if (empty($params['financial_type_id']) && !empty($params['id'])) {
+      $dao = CRM_Core_DAO_AllCoreTables::getFullName($objectName);
+      $params['financial_type_id'] = CRM_Core_DAO::getFieldValue($dao, $params['id'], 'financial_type_id');
+    }
     $operationMap = ['delete' => CRM_Core_Action::DELETE, 'edit' => CRM_Core_Action::UPDATE, 'create' => CRM_Core_Action::ADD];
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $operationMap[$op]);
-    if (empty($params['financial_type_id'])) {
-      $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $params['id'], 'financial_type_id');
-    }
     if (!array_key_exists($params['financial_type_id'], $types)) {
       throw new CRM_Core_Exception('You do not have permission to ' . $op . ' this line item');
     }
@@ -93,6 +94,7 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
     case 'MembershipType':
     case 'ContributionRecur':
     case 'Contribution':
+    case 'Product':
       $clauses['financial_type_id'][] = _financialacls_civicrm_get_type_clause();
       break;
 
@@ -173,7 +175,7 @@ function _financialacls_civicrm_get_accessible_financial_types(): array {
  *
  * @return string
  *
- * @throws \CRM_Core_Exception
+ * @noinspection PhpUnhandledExceptionInspection
  */
 function _financialacls_civicrm_get_membership_type_clause(): string {
   $financialTypes = _financialacls_civicrm_get_accessible_financial_types();

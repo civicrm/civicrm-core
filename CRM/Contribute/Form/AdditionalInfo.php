@@ -367,10 +367,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $form->assign('ccContribution', $ccContribution);
     if ($ccContribution) {
       $form->assignBillingName($params);
-      $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-        $params,
-        $form->_bltID
-      ));
+      $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params));
 
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
       $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);

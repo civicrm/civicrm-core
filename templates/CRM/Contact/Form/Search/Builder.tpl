@@ -8,7 +8,11 @@
  +--------------------------------------------------------------------+
 *}
 {* Search Builder *}
-
+<div class="messages status no-popup">
+  {icon icon="fa-info-circle"}{/icon}
+  {capture assign='skUrl'}{crmURL p='civicrm/admin/search'}{/capture}
+  {ts 1="href='$skUrl'"}Search Builder is a legacy part of CiviCRM. It is recommended to <a %1>use SearchKit instead</a>.{/ts}
+</div>
 <div class="crm-form-block crm-search-form-block">
   <div class="crm-accordion-wrapper crm-search_builder-accordion {if $rows and !$showSearchForm}collapsed{/if}">
     <div class="crm-accordion-header crm-master-accordion-header">

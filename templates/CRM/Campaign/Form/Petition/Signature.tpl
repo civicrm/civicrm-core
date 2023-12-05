@@ -38,7 +38,7 @@
   {if $duplicate}
     <p>{ts}Thank you for your support.{/ts}</p>
     {if $is_share}
-      {include file="CRM/Campaign/Page/Petition/SocialNetwork.tpl" petition_id=$survey_id petitionTitle=$petitionTitle}
+      {include file="CRM/Campaign/Page/Petition/SocialNetwork.tpl" petition_id=$survey_id petitionTitle=$petitionTitle emailMode=false}
     {/if}
   {else}
     <div class="crm-section crm-petition-contact-profile">

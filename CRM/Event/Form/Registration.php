@@ -380,12 +380,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
       CRM_Utils_System::redirect($url);
     }
-    // The concept of contributeMode is deprecated.
-    $this->_contributeMode = $this->get('contributeMode');
-    $this->assign('contributeMode', $this->_contributeMode);
 
-    $this->assign('paidEvent', $this->_values['event']['is_monetary']);
-
+    $this->assign('paidEvent', $this->getEventValue('is_monetary'));
     // we do not want to display recently viewed items on Registration pages
     $this->assign('displayRecent', FALSE);
 
@@ -472,7 +468,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
 
-    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params, $this->_bltID));
+    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params));
 
     if ($this->getSubmittedValue('credit_card_number')) {
       if (isset($params['credit_card_exp_date'])) {
@@ -504,8 +500,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param string $name
    */
   public function buildCustom($id, $name) {
+    if ($name === 'customPost') {
+      $this->assign('postPageProfiles', []);
+    }
+    $this->assign($name, []);
     if (!$id) {
-      $this->assign($name, []);
       return;
     }
 
@@ -564,6 +563,16 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     ) {
       CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
     }
+    if ($name === 'customPost') {
+      $postPageProfiles = [];
+      foreach ($fields as $fieldName => $field) {
+        $postPageProfiles[$field['groupName']][$fieldName] = $field;
+      }
+      $this->assign('postPageProfiles', $postPageProfiles);
+    }
+    // We still assign the customPost in the way we used to because we haven't ruled out being
+    // used after the register form - but in the register form it is overwritten by a for-each
+    // with the smarty code.
     $this->assign($name, $fields);
     if (is_array($fields)) {
       $button = substr($this->controller->getButtonName(), -4);
@@ -951,6 +960,17 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     return $totalCount;
+  }
+
+  /**
+   * Get id of participant being acted on.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getParticipantID(): ?int {
+    return $this->_participantId;
   }
 
   /**
@@ -1716,6 +1736,27 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function isQuickConfig(): bool {
     return $this->getPriceSetID() && CRM_Price_BAO_PriceSet::isQuickConfig($this->getPriceSetID());
+  }
+
+  /**
+   * Get the currency for the form.
+   *
+   * Rather historic - might have unneeded stuff
+   *
+   * @return string
+   */
+  public function getCurrency() {
+    $currency = $this->_values['currency'] ?? NULL;
+    // For event forms, currency is in a different spot
+    if (empty($currency)) {
+      $currency = CRM_Utils_Array::value('currency', CRM_Utils_Array::value('event', $this->_values));
+    }
+    if (empty($currency)) {
+      $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
+    }
+    // @todo If empty there is a problem - we should probably put in a deprecation notice
+    // to warn if that seems to be happening.
+    return $currency;
   }
 
 }

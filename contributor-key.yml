@@ -45,6 +45,7 @@
 
 - github      : AHowiller
   name        : Andreas Howiller
+  organization: civiservice.de
 
 - github      : ajdavis
   name        : A. Jesse Jiryu Davis
@@ -278,6 +279,10 @@
 - name        : Cheryl Chase
   organization: Mathias Consulting
 
+- github      : chriscant
+  organization: PHD Computer Consultants Ltd
+  name        : Chris Cant
+
 - github      : chrisgaraffa
   name        : Chris Garaffa
   organization: AGH Strategies
@@ -380,7 +385,7 @@
 
 - github      : detsieber
   name        : Detlev Sieber
-  organization: Digitalcourage
+  organization: civiservice.de
 
 - github      : devappsoftware
   organization: DevApp
@@ -981,7 +986,8 @@
 - name        : Manish Zope
 
 - github      : mariav0
-  name        : Maria
+  name        : Maria Vogel
+  organization: civiservice.de
 
 - github      : marcusjwilson
   name        : Marcus J Wilson
@@ -1071,6 +1077,9 @@
 
 - name        : Mick Collopy
 
+- github      : midtsveen
+  name        : Erik Midtsveen
+
 - github      : mihaelmladenov
   name        : Mihael Mladenov
 
@@ -1097,6 +1106,10 @@
 - github      : mlutfy
   name        : Mathieu Lutfy
   organization: Coop SymbioTIC
+
+  github      : 19ATf72
+  name        : Micah Hobby
+  organization: Circle Interactive
 
 - github      : michau
   name        : Michal Mach
@@ -1289,6 +1302,8 @@
 - github      : quimgil
   name        : Quim Gil
 
+- github      : ranjit-git
+
 - name        : Rareș Pamfil
 
 - github      : Rar9
@@ -1422,10 +1437,6 @@
   name        : Sean Madsen
   organization: Left Join Labs
 
-- github      : sebalis
-  name        : Sebastian Lisken
-  organization: civiservice.de
-
 - github      : semseysandor
   name        : Sandor Semsey
   organization: Reflexive Communications
@@ -1513,6 +1524,9 @@
 
 - name        : Bashar Makhay
 
+- github      : TomRosenbloom
+  name        : Tom Rosenbloom
+
 - github      : trakos
   name        : Piotr Stankowski
 
@@ -1535,6 +1549,7 @@
 
 - github      : TobiasVoigt
   name        : Tobias Voigt
+  organization: civiservice.de
 
 - name        : Thomas Mannell
   organization: Registered Nurses' Association of Ontario
@@ -1727,5 +1742,5 @@
 - github      : mikeybeck
   name        : Mike Beck
   organization: Fuzion
-  
+
 - github      : ziljah

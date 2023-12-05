@@ -1,13 +1,16 @@
 <?php
+namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
+use Civi\Api4\AfformSubmission;
+use Civi\Api4\Contact;
 
 /**
  * Test case for Afform.checkAccess, Afform.prefill and Afform.submit.
  *
  * @group headless
  */
-class api_v4_AfformContactUsageTest extends api_v4_AfformUsageTestCase {
+class AfformContactUsageTest extends AfformUsageTestCase {
 
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
@@ -80,11 +83,11 @@ EOHTML;
   public function testAboutMeAllowed(): void {
     $this->useValues([
       'layout' => self::$layouts['aboutMe'],
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $cid = $this->createLoggedInUser();
-    CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
 
     // Autofill form with current user. See `Civi\Afform\Behavior\ContactAutofill`
     $prefill = Afform::prefill()
@@ -103,7 +106,7 @@ EOHTML;
       ->setValues(['me' => $submission])
       ->execute();
 
-    $contact = Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $cid)->execute()->first();
+    $contact = Contact::get(FALSE)->addWhere('id', '=', $cid)->execute()->first();
     $this->assertEquals('Firsty', $contact['first_name']);
     $this->assertEquals('Lasty', $contact['last_name']);
   }
@@ -111,7 +114,7 @@ EOHTML;
   public function testChainSelect(): void {
     $this->useValues([
       'layout' => self::$layouts['aboutMe'],
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     // Get states for USA
@@ -120,7 +123,7 @@ EOHTML;
       ->setModelName('me')
       ->setFieldName('state_province_id')
       ->setJoinEntity('Address')
-      ->setValues(['country_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', 'United States', 'id', 'name')])
+      ->setValues(['country_id' => \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', 'United States', 'id', 'name')])
       ->execute();
     $this->assertEquals('Alabama', $result[0]['label']);
 
@@ -130,7 +133,7 @@ EOHTML;
       ->setModelName('me')
       ->setFieldName('state_province_id')
       ->setJoinEntity('Address')
-      ->setValues(['country_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', 'United Kingdom', 'id', 'name')])
+      ->setValues(['country_id' => \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', 'United Kingdom', 'id', 'name')])
       ->execute();
     $this->assertEquals('Aberdeen City', $result[0]['label']);
   }
@@ -138,7 +141,7 @@ EOHTML;
   public function testCheckEntityReferenceFieldsReplacement(): void {
     $this->useValues([
       'layout' => self::$layouts['registerSite'],
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
       'create_submission' => TRUE,
     ]);
 
@@ -170,7 +173,7 @@ EOHTML;
       ->setValues($values)
       ->execute();
 
-    $submission = Civi\Api4\AfformSubmission::get(FALSE)
+    $submission = AfformSubmission::get(FALSE)
       ->addOrderBy('id', 'DESC')
       ->execute()->first();
 
@@ -204,8 +207,8 @@ EOHTML;
       'permission' => ['access CiviCRM'],
     ]);
     $this->createLoggedInUser();
-    CRM_Core_Config::singleton()->userPermissionTemp = NULL;
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+    \CRM_Core_Config::singleton()->userPermissionTemp = NULL;
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'access Contact Dashboard',
     ];
     $check = Afform::checkAccess()
@@ -213,7 +216,7 @@ EOHTML;
       ->setAction('get')
       ->execute()->first();
     $this->assertFalse($check['access']);
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'access CiviCRM',
     ];
     $check = Afform::checkAccess()
@@ -226,11 +229,11 @@ EOHTML;
   public function testAboutMeForbidden(): void {
     $this->useValues([
       'layout' => self::$layouts['aboutMe'],
-      'permission' => CRM_Core_Permission::ALWAYS_DENY_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_DENY_PERMISSION,
     ]);
 
     $this->createLoggedInUser();
-    CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
 
     try {
       Afform::prefill()
@@ -262,7 +265,7 @@ EOHTML;
   public function testEmployerReference(): void {
     $this->useValues([
       'layout' => self::$layouts['employer'],
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $firstName = uniqid(__FUNCTION__);
@@ -303,7 +306,7 @@ EOHTML;
   public function testEmptyEmployerReference(): void {
     $this->useValues([
       'layout' => self::$layouts['employer'],
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $firstName = uniqid(__FUNCTION__);
@@ -342,12 +345,12 @@ EOHTML;
     $this->useValues([
       'layout' => self::$layouts['employer'],
       'create_submission' => TRUE,
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $individualEmail = uniqid('individual@') . '.test';
     $orgEmail = uniqid('org@') . '.test';
-    $locationType = CRM_Core_BAO_LocationType::getDefault()->id;
+    $locationType = \CRM_Core_BAO_LocationType::getDefault()->id;
     $values = [
       'Individual1' => [
         [
@@ -413,7 +416,7 @@ EOHTML;
 EOHTML;
     $this->useValues([
       'layout' => $layout,
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $lastName = uniqid(__FUNCTION__);
@@ -423,7 +426,7 @@ EOHTML;
       ->addValue('email_primary.email', '123@example.com')
       ->execute()->single();
 
-    $locationType = CRM_Core_BAO_LocationType::getDefault()->id;
+    $locationType = \CRM_Core_BAO_LocationType::getDefault()->id;
     $values = [
       'Individual1' => [
         [
@@ -455,7 +458,7 @@ EOHTML;
   public function testFormValidationEntityFields(): void {
     $this->useValues([
       'layout' => self::$layouts['updateInfo'],
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $values = [
@@ -491,7 +494,7 @@ EOHTML;
   public function testFormValidationEntityJoinFields(): void {
     $this->useValues([
       'layout' => self::$layouts['updateInfo'],
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $values = [
@@ -526,13 +529,13 @@ EOHTML;
   public function testSubmissionLimit() {
     $this->useValues([
       'layout' => self::$layouts['aboutMe'],
-      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
       'create_submission' => TRUE,
       'submit_limit' => 3,
     ]);
 
     $cid = $this->createLoggedInUser();
-    CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
 
     $submitValues = [
       ['fields' => ['first_name' => 'Firsty', 'last_name' => 'Lasty']],

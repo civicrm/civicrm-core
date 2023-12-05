@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  * Class contains functions for individual contact type.
  */
@@ -185,19 +187,18 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         }
       }
 
-      //build the sort name.
-      $format = Civi::settings()->get('sort_name_format');
-      $sortName = CRM_Utils_Address::format($formatted, $format,
-        FALSE, FALSE, $tokenFields
-      );
-      $sortName = trim($sortName);
-
-      //build the display name.
-      $format = Civi::settings()->get('display_name_format');
-      $displayName = CRM_Utils_Address::format($formatted, $format,
-        FALSE, FALSE, $tokenFields
-      );
-      $displayName = trim($displayName);
+      $formatted['id'] = $contact->id ?? $params['id'] ?? 0;
+      $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+        'class' => __CLASS__,
+        'schema' => ['contactId'],
+      ]);
+      $tokenProcessor->addRow(['contactId' => $contactFields['id'] ?? 0, 'contact' => $formatted]);
+      $tokenProcessor->addMessage('sort_name', Civi::settings()->get('sort_name_format'), 'text/plain');
+      $tokenProcessor->addMessage('display_name', Civi::settings()->get('display_name_format'), 'text/plain');
+      $tokenProcessor->evaluate();
+      $row = $tokenProcessor->getRow(0);
+      $sortName = trim($row->render('sort_name'));
+      $displayName = trim($row->render('display_name'));
     }
 
     //start further check for email.
@@ -266,11 +267,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * @return bool
    */
   public static function dataExists($params) {
-    if ($params['contact_type'] == 'Individual') {
-      return TRUE;
-    }
-
-    return FALSE;
+    return $params['contact_type'] == 'Individual';
   }
 
 }

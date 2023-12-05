@@ -82,6 +82,10 @@ updateFile("sql/test_data_second_domain.mysql", function ($content) use ($newVer
   return str_replace($oldVersion, $newVersion, $content);
 });
 
+updateFile("js/version.json", function () use ($newVersion) {
+  return json_encode($newVersion) . '\n';
+});
+
 // Update core extensions if this is a stable release
 $infoXmls = isPreReleaseIncrement($newVersion) ? [] : findCoreInfoXml();
 foreach ($infoXmls as $infoXml) {

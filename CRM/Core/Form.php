@@ -319,6 +319,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Required for footer.tpl,
     // See CRM_Activity_Form_ActivityTest:testInboundEmailDisplaysWithLineBreaks.
     'footer_status_severity',
+    // Required for some profiles (e.g on the Main page of the contribution form flow).
+    // A bit tricky to add closer to the usage due to conditionality of inclusion
+    'showCMS',
   ];
 
   /**
@@ -623,10 +626,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->postProcessHook();
 
     // Respond with JSON if in AJAX context (also support legacy value '6')
-    if ($allowAjax && !empty($_REQUEST['snippet']) && in_array($_REQUEST['snippet'], [
-      CRM_Core_Smarty::PRINT_JSON,
-      6,
-    ])) {
+    if ($allowAjax && !empty($_REQUEST['snippet']) && in_array($_REQUEST['snippet'], [CRM_Core_Smarty::PRINT_JSON, 6])) {
       $this->ajaxResponse['buttonName'] = str_replace('_qf_' . $this->getAttribute('id') . '_', '', $this->controller->getButtonName());
       $this->ajaxResponse['action'] = $this->_action;
       if (isset($this->_id) || isset($this->id)) {
@@ -2322,9 +2322,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['data-select-params'] = json_encode($props['select']);
     $props['data-api-params'] = json_encode($props['api']);
     $props['data-api-entity'] = $props['entity'];
-    if (!empty($props['select']['quickAdd'])) {
-      Civi::service('angularjs.loader')->addModules(['af']);
-    }
+
     CRM_Utils_Array::remove($props, 'select', 'api', 'entity');
     return $this->add('text', $name, $label, $props, $required);
   }
@@ -2878,10 +2876,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   private function validateChainSelectFields() {
     foreach ($this->_chainSelectFields as $control => $target) {
       if ($this->elementExists($control) && $this->elementExists($target)) {
-        $controlValue = (array) $this->getElementValue($control);
+        $controlValue = (array) $this->getSubmitValue($control);
         $targetField = $this->getElement($target);
         $controlType = $targetField->getAttribute('data-callback') == 'civicrm/ajax/jqCounty' ? 'stateProvince' : 'country';
-        $targetValue = array_filter((array) $targetField->getValue());
+        $targetValue = array_filter((array) $this->getSubmitValue($target));
         if ($targetValue || $this->getElementError($target)) {
           $options = CRM_Core_BAO_Location::getChainSelectValues($controlValue, $controlType, TRUE);
           if ($targetValue) {
@@ -2930,29 +2928,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Get the currency for the form.
    *
-   * @todo this should be overriden on the forms rather than having this
-   * historic, possible handling in here. As we clean that up we should
-   * add deprecation notices into here.
-   *
-   * @param array $submittedValues
-   *   Array allowed so forms inheriting this class do not break.
-   *   Ideally we would make a clear standard around how submitted values
-   *   are stored (is $this->_values consistently doing that?).
-   *
    * @return string
    */
-  public function getCurrency($submittedValues = []) {
-    $currency = $this->_values['currency'] ?? NULL;
-    // For event forms, currency is in a different spot
-    if (empty($currency)) {
-      $currency = CRM_Utils_Array::value('currency', CRM_Utils_Array::value('event', $this->_values));
+  public function getCurrency() {
+    if ($this->getSubmittedValue('currency')) {
+      return $this->getSubmittedValue('currency');
     }
-    if (empty($currency)) {
-      $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
+    $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
+    if ($currency) {
+      return $currency;
     }
-    // @todo If empty there is a problem - we should probably put in a deprecation notice
-    // to warn if that seems to be happening.
-    return $currency;
+    return \Civi::settings()->get('defaultCurrency');
   }
 
   /**
@@ -3003,7 +2989,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param string $default
    *
-   * @throws \CRM_Core_Exception
+   *
+   * @noinspection PhpUnhandledExceptionInspection
    */
   public function setSelectedChild($default = NULL) {
     $selectedChild = CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $this, FALSE, $default);

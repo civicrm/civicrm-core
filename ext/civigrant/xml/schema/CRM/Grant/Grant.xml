@@ -10,7 +10,7 @@
   <icon>fa-money</icon>
   <paths>
     <add>civicrm/grant/add?reset=1&amp;action=add&amp;cid=[contact_id]</add>
-    <view>civicrm/grant/add?reset=1&amp;action=view&amp;id=[id]</view>
+    <view>civicrm/grant/view?reset=1&amp;action=view&amp;id=[id]</view>
     <update>civicrm/grant/add?reset=1&amp;action=update&amp;id=[id]</update>
     <delete>civicrm/grant/add?reset=1&amp;action=delete&amp;id=[id]</delete>
   </paths>

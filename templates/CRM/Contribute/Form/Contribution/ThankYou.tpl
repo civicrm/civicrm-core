@@ -82,7 +82,7 @@
         {if $lineItem and $priceSetID}
           {if !$amount}{assign var="amount" value=0}{/if}
           {assign var="totalAmount" value=$amount}
-          {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+          {include file="CRM/Price/Page/LineItem.tpl" context="Contribution" displayLineItemFinancialType=false pricesetFieldsCount=false currencySymbol='' hookDiscount=''}
         {elseif $membership_amount}
           {$membership_name} {ts}Membership{/ts}: <strong>{$membership_amount|crmMoney}</strong><br />
           {if $amount}
@@ -273,7 +273,7 @@
     </div>
   {/if}
 
-  {if in_array('credit_card_number', $form) || in_array('bank_account_number', $form) && ($amount GT 0 OR $minimum_fee GT 0)}
+  {if in_array('credit_card_number', $paymentFields) || in_array('bank_account_number', $paymentFields) && ($amount GT 0 OR $minimum_fee GT 0)}
     {crmRegion name="contribution-thankyou-billing-block"}
       <div class="crm-group credit_card-group">
         {if $paymentFieldsetLabel}
@@ -281,7 +281,7 @@
             {$paymentFieldsetLabel}
           </div>
         {/if}
-          {if in_array('bank_account_number', $form) && $bank_account_number}
+          {if in_array('bank_account_number', $paymentFields) && $bank_account_number}
           <div class="display-block">
             {ts}Account Holder{/ts}: {$account_holder}<br />
             {ts}Bank Identification Number{/ts}: {$bank_identification_number}<br />
@@ -300,7 +300,7 @@
     {/crmRegion}
   {/if}
 
-  {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="thankContribution"}
+  {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="thankContribution" showPremiumSelectionFields=false preview=false}
 
   {if $customPost}
     <fieldset class="label-left crm-profile-view">
@@ -315,6 +315,6 @@
   </div>
   {if $isShare}
     {capture assign=contributionUrl}{crmURL p='civicrm/contribute/transact' q="$qParams" a=1 fe=1 h=1}{/capture}
-    {include file="CRM/common/SocialNetwork.tpl" url=$contributionUrl title=$title pageURL=$contributionUrl}
+    {include file="CRM/common/SocialNetwork.tpl" url=$contributionUrl title=$title pageURL=$contributionUrl emailMode=false}
   {/if}
 </div>

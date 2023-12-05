@@ -213,6 +213,10 @@
           previewDialog();
         }
       }
+      else {
+        // Avoid jquery validation on required fields if they are visible
+        $('#recurring-entity-block :input').removeClass('required');
+      }
     });
 
     // Enable/disable form buttons when not embedded in another form

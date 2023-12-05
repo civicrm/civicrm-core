@@ -82,6 +82,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function preProcess(): void {
+    // Don't mess up the fields for related contacts
+    $this->shouldSortMapperFields = FALSE;
+
     parent::preProcess();
     //format custom field names, CRM-2676
     $contactType = $this->getContactType();
@@ -275,7 +278,12 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         $last_key = array_key_last($mapper[$i]);
       }
       elseif ($this->getSubmittedValue('savedMapping') && $processor->getFieldName($i)) {
-        $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
+        $defaultField = $processor->getSavedQuickformDefaultsForColumn($i);
+        if (!array_key_exists($defaultField[0], $this->_mapperFields)) {
+          $defaultField = ['do_not_import'];
+          CRM_Core_Session::setStatus(ts('Data was configured to be imported to column %1 but it is not available. The field has been set to "%2"', [1 => $columnHeader, 2 => $this->_mapperFields['do_not_import']]));
+        }
+        $defaults["mapper[$i]"] = $defaultField;
         $last_key = array_key_last($defaults["mapper[$i]"]) ?? 0;
       }
       else {

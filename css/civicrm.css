@@ -2252,7 +2252,7 @@ div.crm-master-accordion-header a.helpicon {
 /* Collapse icon */
 
 /* General icon settings for all collapsible things */
-.crm-container .crm-accordion-header:before,
+.crm-container div.crm-accordion-header:before,
 .crm-container .crm-collapsible .collapsible-title:before,
 .crm-container span.collapsed:before,
 .crm-container a.collapsed:before,
@@ -2265,7 +2265,7 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 /* Collapsed icon */
-.crm-container .collapsed .crm-accordion-header:before,
+.crm-container .collapsed div.crm-accordion-header:before,
 .crm-container .crm-collapsible.collapsed .collapsible-title:before,
 .crm-container span.collapsed:before,
 .crm-container a.collapsed:before,
@@ -2274,7 +2274,7 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 /* Expanded icon */
-.crm-container .crm-accordion-header:before,
+.crm-container div.crm-accordion-header:before,
 .crm-container .crm-collapsible .collapsible-title:before,
 .crm-container span.expanded:before,
 .crm-container a.expanded:before,

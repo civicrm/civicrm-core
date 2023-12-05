@@ -628,10 +628,7 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
       if ($responseField->option_group_id) {
         //show value for print and pdf.
         $value = $responseField->label;
-        if (in_array($this->_outputMode, [
-          'print',
-          'pdf',
-        ])) {
+        if (in_array($this->_outputMode, ['print', 'pdf'])) {
           $value = $responseField->value;
         }
         $fieldValueMap[$responseField->option_group_id][$responseField->value] = $value;

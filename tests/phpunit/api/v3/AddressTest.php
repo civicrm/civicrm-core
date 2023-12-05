@@ -490,11 +490,18 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     // Now try it in Liberia
     $params = $this->_params;
     $params['sequential'] = 1;
-    // Liberia country id
-    $params['country_id'] = '1122';
+    $params['country_id'] = \Civi\Api4\Country::get()
+      ->addWhere('name', '=', 'Liberia')
+      ->execute()
+      ->single()['id'];
     $params['state_province_id'] = 'Maryland';
     $address2 = $this->callAPISuccess('address', 'create', $params);
-    $this->assertEquals('3497', $address2['values'][0]['state_province_id']);
+    $liberia_maryland_id = \Civi\Api4\StateProvince::get()
+      ->addWhere('country_id', '=', $params['country_id'])
+      ->addWhere('name', '=', 'Maryland')
+      ->execute()
+      ->single()['id'];
+    $this->assertEquals($liberia_maryland_id, $address2['values'][0]['state_province_id']);
   }
 
   public function getSymbolicCountryStateExamples() {

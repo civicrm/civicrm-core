@@ -1116,18 +1116,23 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           );
 
         }
-        elseif ($field->data_type == 'EntityReference') {
-          $fieldAttributes['entity'] = $field->fk_entity;
-          $fieldAttributes['api']['fieldName'] = $field->getEntity() . '.' . $groupName . '.' . $field->name;
-          $element = $qf->addAutocomplete($elementName, $label, $fieldAttributes, $useRequired && !$search);
-        }
-        // Autocomplete for field with option values
         else {
-          $fieldAttributes['entity'] = 'OptionValue';
-          $fieldAttributes['placeholder'] = $placeholder;
-          $fieldAttributes['api']['fieldName'] = $field->getEntity() . '.' . $groupName . '.' . $field->name;
-          $fieldAttributes['select']['multiple'] = $search ? TRUE : !empty($field->serialize);
-          $fieldAttributes['select']['minimumInputLength'] = 0;
+          $entityName = $field->getEntityName();
+          // Format fieldName attribute: convention is `EntityName.field_name`
+          // For normal entities, `field_name` is a combination of `customGroupName.customFieldName`
+          // But form multi-record custom groups, the EntityName already includes the customGroupName so field_name stands alone
+          $fieldAttributes['api']['fieldName'] = $entityName . (str_starts_with($entityName, 'Custom_') ? '' : ".$groupName") . ".$field->name";
+          // Autocomplete for FK fields
+          if ($field->data_type == 'EntityReference') {
+            $fieldAttributes['entity'] = $field->fk_entity;
+          }
+          // Autocomplete for field with option values
+          else {
+            $fieldAttributes['entity'] = 'OptionValue';
+            $fieldAttributes['placeholder'] = $placeholder;
+            $fieldAttributes['select']['multiple'] = $search ? TRUE : !empty($field->serialize);
+            $fieldAttributes['select']['minimumInputLength'] = 0;
+          }
           $element = $qf->addAutocomplete($elementName, $label, $fieldAttributes, $useRequired && !$search);
         }
 
@@ -2582,7 +2587,7 @@ AND      default_value IS NOT NULL";
    * @return array
    */
   public static function postProcess(
-    &$params,
+    $params,
     $entityID,
     $customFieldExtends,
     $inline = FALSE,
@@ -2863,13 +2868,26 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
   }
 
   /**
-   * Get api entity for this field
-   *
+   * Get api3 entity name for this field
+   * @deprecated
    * @return string
    */
   public function getEntity() {
     $entity = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'extends');
     return in_array($entity, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE) ? 'Contact' : $entity;
+  }
+
+  /**
+   * Get api4 entity name for this field
+   * @return string
+   */
+  public function getEntityName(): string {
+    $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'is_multiple');
+    if ($isMultiple) {
+      $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'name');
+      return "Custom_$groupName";
+    }
+    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'extends');
   }
 
   /**

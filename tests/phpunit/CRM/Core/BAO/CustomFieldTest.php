@@ -982,6 +982,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    * Check that outputting the display value for a file field with No description doesn't generate error
    */
   public function testFileDisplayValueNoDescription(): void {
+    $this->useFrozenTime();
     $customGroup = $this->customGroupCreate([
       'extends' => 'Individual',
       'title' => 'Test Contact File Custom Group',
@@ -996,7 +997,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $file = $this->callAPISuccess('File', 'create', [
       'uri' => $filePath,
     ]);
-    $individual = $this->individualCreate(['custom_' . $fileField['id'] => $file['id']]);
+    $this->individualCreate(['custom_' . $fileField['id'] => $file['id']]);
     $expectedDisplayValue = CRM_Core_BAO_File::paperIconAttachment('*', $file['id'])[$file['id']];
     $this->assertEquals($expectedDisplayValue, CRM_Core_BAO_CustomField::displayValue($file['id'], $fileField['id']));
   }

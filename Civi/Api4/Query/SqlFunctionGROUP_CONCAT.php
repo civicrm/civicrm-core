@@ -25,7 +25,7 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'flag_before' => ['' => NULL, 'DISTINCT' => ts('Distinct Value'), 'UNIQUE' => ts('Unique Record')],
+        'flag_before' => ['' => ts('All'), 'DISTINCT' => ts('Distinct Value'), 'UNIQUE' => ts('Unique Record')],
         'max_expr' => 1,
         'must_be' => ['SqlField', 'SqlFunction', 'SqlEquation'],
         'optional' => FALSE,

@@ -1010,7 +1010,7 @@ class CRM_Export_BAO_ExportProcessor {
         if ($field == 'provider_id' || $field == 'im_provider') {
           $fieldValue = $imProviders[$fieldValue] ?? NULL;
         }
-        elseif (strstr($field, 'master_id')) {
+        elseif (str_contains($field, 'master_id')) {
           // @todo - why not just $field === 'master_id'  - what else would it be?
           $masterAddressId = $iterationDAO->$field ?? NULL;
           // get display name of contact that address is shared.
@@ -1126,11 +1126,7 @@ class CRM_Export_BAO_ExportProcessor {
 
         return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
       }
-      elseif (in_array($field, [
-        'email_greeting',
-        'postal_greeting',
-        'addressee',
-      ])) {
+      elseif (in_array($field, ['email_greeting', 'postal_greeting', 'addressee'])) {
         //special case for greeting replacement
         $fldValue = "{$field}_display";
         return $iterationDAO->$fldValue;
@@ -2138,11 +2134,9 @@ WHERE  id IN ( $deleteIDString )
           $fieldValue = $imProviders[$relationValue] ?? NULL;
         }
         // CRM-13995
-        elseif (is_object($relDAO) && in_array($relationField, [
-          'email_greeting',
-          'postal_greeting',
-          'addressee',
-        ])) {
+        elseif (is_object($relDAO) &&
+          in_array($relationField, ['email_greeting', 'postal_greeting', 'addressee'])
+        ) {
           //special case for greeting replacement
           $fldValue = "{$relationField}_display";
           $fieldValue = $relDAO->$fldValue;

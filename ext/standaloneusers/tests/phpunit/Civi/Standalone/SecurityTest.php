@@ -426,6 +426,12 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $this->assertEquals('Password reset link for Demonstrators Anonymous', $result['subject']);
   }
 
+  public function testGetUserIDFromUsername() {
+    [$contactID, $adminUserID, $security] = $this->createFixtureContactAndUser();
+    $this->assertEquals($adminUserID, $security->getUserIDFromUsername('user_one'), 'Should return admin user ID');
+    $this->assertNull($security->getUserIDFromUsername('user_unknown'), 'Should return NULL for non-existent user');
+  }
+
   protected function deleteStuffWeMade() {
     User::delete(FALSE)->addWhere('username', '=', 'testuser1')->execute();
   }

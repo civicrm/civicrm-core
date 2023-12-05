@@ -1064,6 +1064,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       if ($paidByName === 'Check') {
         $val['check_number'] = $resultDAO->check_number;
       }
+      else {
+        $val['check_number'] = NULL;
+      }
       $rows[] = $val;
     }
     return $rows;
@@ -2629,16 +2632,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         foreach ($this->_relatedObjects['membership'] as $membership) {
           if ($membership->id) {
             $values['membership_id'] = $membership->id;
-            $values['isMembership'] = TRUE;
-            $values['membership_assign'] = TRUE;
-
             // need to set the membership values here
             $template->assign('membership_name',
               CRM_Member_PseudoConstant::membershipType($membership->membership_type_id)
             );
-            $template->assign('mem_start_date', $membership->start_date);
-            $template->assign('mem_join_date', $membership->join_date);
-            $template->assign('mem_end_date', $membership->end_date);
             $membership_status = CRM_Member_PseudoConstant::membershipStatus($membership->status_id, NULL, 'label');
             $template->assign('mem_status', $membership_status);
             if ($membership_status === 'Pending' && $membership->is_pay_later == 1) {
@@ -4215,11 +4212,7 @@ LIMIT 1;";
       }
       // @todo remove all this stuff in favour of letting the api call further down handle in
       // (it is a duplication of what the api does).
-      $dates = array_fill_keys([
-        'join_date',
-        'start_date',
-        'end_date',
-      ], NULL);
+      $dates = [];
       if ($currentMembership) {
         /*
          * Fixed FOR CRM-4433
@@ -4242,9 +4235,9 @@ LIMIT 1;";
       }
       else {
         //get the status for membership.
-        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'],
-          $dates['end_date'],
-          $dates['join_date'],
+        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'] ?? NULL,
+          $dates['end_date'] ?? NULL,
+          $dates['join_date'] ?? NULL,
           'now',
          TRUE,
           $membershipParams['membership_type_id'],
@@ -4258,7 +4251,23 @@ LIMIT 1;";
       //so make status override false.
       $membershipParams['is_override'] = FALSE;
       $membershipParams['status_override_end_date'] = 'null';
-      civicrm_api3('Membership', 'create', $membershipParams);
+      $membership = civicrm_api3('Membership', 'create', $membershipParams);
+      $membership = $membership['values'][$membership['id']];
+      // Update activity to Completed.
+      // Perhaps this should be in Membership::create? Test cover in
+      // api_v3_ContributionTest.testPendingToCompleteContribution.
+      $priorMembershipStatus = $memberships[$membership['id']]['status_id'] ?? NULL;
+      Activity::update(FALSE)->setValues([
+        'status_id:name' => 'Completed',
+        'subject' => ts('Status changed from %1 to %2'), [
+          1 => CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $priorMembershipStatus),
+          2 => CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']),
+        ],
+
+      ])->addWhere('source_record_id', '=', $membership['id'])
+        ->addWhere('status_id:name', '=', 'Scheduled')
+        ->addWhere('activity_type_id:name', 'IN', ['Membership Signup', 'Membership Renewal'])
+        ->execute();
     }
   }
 

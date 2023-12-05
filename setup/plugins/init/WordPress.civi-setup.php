@@ -47,6 +47,7 @@ if (!defined('CIVI_SETUP')) {
       $model->settingsPath = $preferredSettingsPath;
     }
 
+    $model->paths['civicrm.private']['path'] = implode(DIRECTORY_SEPARATOR, [$uploadDir['basedir'], 'civicrm']);
     $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$uploadDir['basedir'], 'civicrm', 'templates_c']);
 
     // Compute DSN.

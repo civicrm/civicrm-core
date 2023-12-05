@@ -229,7 +229,11 @@ United States<br />',
     $this->assertEquals('Offline Registration for Event: Annual CiviCRM meet by: ', $participant['participant_source']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(20, $contribution['total_amount']);
+    $this->assertEquals(['Family Deal - 1'], $contribution['amount_level']);
     $this->assertEquals('Debit Card', $contribution['payment_instrument']);
+    $this->assertNotEmpty($contribution['receipt_date']);
+    // Just check it's not something weird like 1970 without getting into flakey-precise.
+    $this->assertGreaterThan(strtotime('yesterday'), strtotime($contribution['receipt_date']));
     $lineItem = $this->callAPISuccessGetSingle('LineItem', []);
     $expected = [
       'contribution_id' => $contribution['id'],

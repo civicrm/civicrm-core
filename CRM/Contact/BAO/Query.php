@@ -3213,27 +3213,28 @@ WHERE  $smartGroupClause
    *
    * @throws \CRM_Core_Exception
    */
-  public function tagSearch(&$values) {
+  public function tagSearch(array $values): void {
     [$name, $op, $value, $grouping, $wildcard] = $values;
 
-    $op = "LIKE";
+    $op = 'LIKE';
     $value = "%{$value}%";
     $escapedValue = CRM_Utils_Type::escape("%{$value}%", 'String');
 
     $useAllTagTypes = $this->getWhereValues('all_tag_types', $grouping);
     $tagTypesText = $this->getWhereValues('tag_types_text', $grouping);
 
-    $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
-    $tTable = "`civicrm_tag-" . uniqid() . "`";
-
-    if ($useAllTagTypes[2]) {
+    $etTable = '`civicrm_entity_tag-' . uniqid() . '`';
+    $tTable = '`civicrm_tag-' . uniqid() . '`';
+    // All Tag Types will only be added as a field on the form if tags are available
+    // for entities other than contact
+    if ($useAllTagTypes && $useAllTagTypes[2]) {
       $this->_tables[$etTable] = $this->_whereTables[$etTable]
         = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id)
             LEFT JOIN civicrm_tag {$tTable} ON ( {$etTable}.tag_id = {$tTable}.id  )";
 
       // search tag in cases
-      $etCaseTable = "`civicrm_entity_case_tag-" . uniqid() . "`";
-      $tCaseTable = "`civicrm_case_tag-" . uniqid() . "`";
+      $etCaseTable = '`civicrm_entity_case_tag-' . uniqid() . '`';
+      $tCaseTable = '`civicrm_case_tag-' . uniqid() . '`';
       $this->_tables[$etCaseTable] = $this->_whereTables[$etCaseTable]
         = " LEFT JOIN civicrm_case_contact ON civicrm_case_contact.contact_id = contact_a.id
             LEFT JOIN civicrm_case
@@ -3242,8 +3243,8 @@ WHERE  $smartGroupClause
             LEFT JOIN civicrm_entity_tag {$etCaseTable} ON ( {$etCaseTable}.entity_table = 'civicrm_case' AND {$etCaseTable}.entity_id = civicrm_case.id )
             LEFT JOIN civicrm_tag {$tCaseTable} ON ( {$etCaseTable}.tag_id = {$tCaseTable}.id  )";
       // search tag in activities
-      $etActTable = "`civicrm_entity_act_tag-" . uniqid() . "`";
-      $tActTable = "`civicrm_act_tag-" . uniqid() . "`";
+      $etActTable = '`civicrm_entity_act_tag-' . uniqid() . '`';
+      $tActTable = '`civicrm_act_tag-' . uniqid() . '`';
       $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
@@ -3260,8 +3261,8 @@ WHERE  $smartGroupClause
       $this->_qill[$grouping][] = ts('Tag %1 %2', [1 => $tagTypesText[2], 2 => $op]) . ' ' . $value;
     }
     else {
-      $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
-      $tTable = "`civicrm_tag-" . uniqid() . "`";
+      $etTable = '`civicrm_entity_tag-' . uniqid() . "`";
+      $tTable = '`civicrm_tag-' . uniqid() . '`';
       $this->_tables[$etTable] = $this->_whereTables[$etTable] = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id  AND
       {$etTable}.entity_table = 'civicrm_contact' )
                 LEFT JOIN civicrm_tag {$tTable} ON ( {$etTable}.tag_id = {$tTable}.id  ) ";
@@ -3364,7 +3365,7 @@ WHERE  $smartGroupClause
       elseif ($op == '!=') {
         $this->_where[$grouping][] = "{$etTable}.entity_id NOT IN (SELECT entity_id FROM civicrm_entity_tag cet WHERE cet.entity_table = 'civicrm_contact' AND " . self::buildClause("cet.tag_id", '=', $value, 'Int') . ")";
       }
-      elseif ($op == '=' || strstr($op, 'IN')) {
+      elseif ($op == '=' || str_contains($op, 'IN')) {
         $op = ($op == '=') ? 'IN' : $op;
         $this->_where[$grouping][] = "{$etTable}.tag_id $op ( $value )";
       }
@@ -4116,7 +4117,7 @@ WHERE  $smartGroupClause
 
     if (self::caseImportant($op)) {
       $value = implode("[[:cntrl:]]|[[:cntrl:]]", (array) $value);
-      $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
+      $op = (str_contains($op, '!') || str_contains($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
       $value = "[[:cntrl:]]" . $value . "[[:cntrl:]]";
     }
 
@@ -5364,7 +5365,7 @@ civicrm_relationship.start_date > {$today}
       }
 
       $date = $format = NULL;
-      if (strstr($op, 'IN')) {
+      if (str_contains($op, 'IN')) {
         $format = [];
         foreach ($value as &$date) {
           $date = CRM_Utils_Date::processDate($date, NULL, FALSE, $dateFormat);

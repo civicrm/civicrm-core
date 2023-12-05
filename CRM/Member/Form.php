@@ -208,7 +208,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       // all possible statuses are disabled - redirect back to contact form
       CRM_Core_Error::statusBounce(ts('There are no configured membership statuses. You cannot add this membership until your membership statuses are correctly configured'));
     }
-
+    // This should be overwritten from the contribution....
+    $this->assign('currency', \Civi::settings()->get('defaultCurrency'));
     parent::preProcess();
     $params = [];
     $params['context'] = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'membership');
@@ -583,11 +584,25 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $this->order = new CRM_Financial_BAO_Order();
     $this->order->setForm($this);
     $this->order->setPriceSelectionFromUnfilteredInput($formValues);
+
     if (isset($formValues['total_amount'])) {
       $this->order->setOverrideTotalAmount((float) $formValues['total_amount']);
     }
-    $this->order->setOverrideFinancialTypeID((int) $formValues['financial_type_id']);
+
+    if ($this->isQuickConfig()) {
+      $this->order->setOverrideFinancialTypeID((int) $formValues['financial_type_id']);
+    }
+
     return $formValues;
+  }
+
+  /**
+   * Is the price set quick config.
+   *
+   * @return bool
+   */
+  private function isQuickConfig(): bool {
+    return $this->_priceSetId && CRM_Price_BAO_PriceSet::isQuickConfig($this->_priceSetId);
   }
 
   /**
@@ -626,21 +641,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       'processPriceSet' => TRUE,
       'tax_amount' => $this->order->getTotalTaxAmount(),
     ];
-  }
-
-  /**
-   * Get the currency in use.
-   *
-   * This just defaults to getting the default currency
-   * as other currencies are not supported on the membership
-   * forms at the moment.
-   *
-   * @param array $submittedValues
-   *
-   * @return string
-   */
-  public function getCurrency($submittedValues = []): string {
-    return CRM_Core_Config::singleton()->defaultCurrency;
   }
 
   /**

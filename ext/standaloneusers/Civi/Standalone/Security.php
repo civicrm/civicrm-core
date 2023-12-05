@@ -81,7 +81,7 @@ class Security {
     return \Civi\Api4\User::get(FALSE)
       ->addWhere('username', '=', $username)
       ->execute()
-      ->single()['id'] ?? NULL;
+      ->first()['id'] ?? NULL;
   }
 
   /**
@@ -210,6 +210,8 @@ class Security {
       return FALSE;
     }
 
+    $this->applyLocaleFromUser($user);
+
     // Note: random_int is more appropriate for cryptographical use than mt_rand
     // The long number is the max 32 bit value.
     return [$user['contact_id'], $user['id'], random_int(0, 2147483647)];
@@ -235,6 +237,7 @@ class Security {
       ])['values'][0]['contact_id'] ?? NULL;
       // Confusingly, Civi stores it's *Contact* ID as *userID* on the session.
       $session->set('userID', $contactID);
+      $this->applyLocaleFromUser($user);
     }
   }
 
@@ -243,12 +246,6 @@ class Security {
    */
   public function isUserLoggedIn(): bool {
     return !empty($this->getLoggedInUfID());
-  }
-
-  public function getCurrentLanguage() {
-    // @todo
-    \Civi::log()->debug('CRM_Utils_System_Standalone::getCurrentLanguage: not implemented');
-    return NULL;
   }
 
   /**
@@ -450,6 +447,19 @@ class Security {
       ->setFrom("\"$domainFromName\" <$domainFromEmail>");
 
     return $workflowMessage;
+  }
+
+  /**
+   * Applies the locale from the user record.
+   *
+   * @param array $user
+   * @return void
+   */
+  private function applyLocaleFromUser(array $user) {
+    $session = CRM_Core_Session::singleton();
+    if (!empty($user['language'])) {
+      $session->set('lcMessages', $user['language']);
+    }
   }
 
 }

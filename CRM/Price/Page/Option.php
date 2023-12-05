@@ -189,7 +189,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     $this->assign('customOption', $customOption);
     $this->assign('sid', $this->_sid);
     $this->assign('isEvent', $isEvent);
-    $this->assignSalesTaxTermToTemplate();
+    $this->assign('taxTerm', $this->getSalesTaxTerm());
   }
 
   /**

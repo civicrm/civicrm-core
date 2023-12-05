@@ -23,8 +23,8 @@
  *   <civix><setting-page-title>My Custom Title</setting-page-title></civix>
  *
  * @mixinName setting-admin
- * @mixinVersion 1.0.0
- * @since 5.67
+ * @mixinVersion 1.1.0
+ * @since 5.68
  */
 
 namespace Civi\Mixin\SettingAdminV1;

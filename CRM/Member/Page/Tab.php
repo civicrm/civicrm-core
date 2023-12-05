@@ -25,7 +25,15 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   public static $_membershipTypesLinks = NULL;
 
   public $_permission = NULL;
-  public $_contactId = NULL;
+
+  /**
+   * Contact ID.
+   *
+   * @var int
+   *
+   * @deprecated
+   */
+  public $_contactId;
 
   /**
    * @var bool
@@ -332,8 +340,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $this->_action = CRM_Core_Action::ADD;
     }
     else {
-      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-      $this->assign('contactId', $this->_contactId);
+      $contactID = $this->getContactID();
+      $this->assign('contactId', $contactID);
+      CRM_Contact_Form_Inline::renderFooter($contactID, FALSE);
 
       // check logged in url permission
       CRM_Contact_Page_View::checkUserPermission($this);
@@ -372,13 +381,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $this->assign('accessContribution', TRUE);
 
       //show associated soft credit when contribution payment is paid by different person
-      if ($this->_id && $this->_contactId) {
-        $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $this->_id);
-        if (!empty($softCreditList)) {
-          $this->assign('softCredit', TRUE);
-          $this->assign('softCreditRows', $softCreditList);
-        }
-      }
+      $softCreditList = ($this->_id && $this->_contactId) ? CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $this->_id) : FALSE;
+      $this->assign('softCredit', (bool) $softCreditList);
+      $this->assign('softCreditRows', $softCreditList);
     }
     else {
       $this->_accessContribution = FALSE;
@@ -667,6 +672,19 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     if (!CRM_Core_Permission::check('delete contributions of type ' . $finType)) {
       unset($links[CRM_Core_Action::DELETE]);
     }
+  }
+
+  /**
+   * Get the contact ID.
+   *
+   * @api Supported for external use.
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getContactID(): ?int {
+    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    return $this->_contactId;
   }
 
 }

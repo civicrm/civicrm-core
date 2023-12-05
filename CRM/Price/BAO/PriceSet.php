@@ -646,12 +646,27 @@ WHERE  id = %1";
    *   Line item array to be altered.
    * @param int $priceSetID
    *
+   * @deprecated since 5.69 will be removed around 5.85. This function is still in use but marking deprecated to make it clear that
+   * we are moving away from it. There is no function that has the guaranteed stable signature
+   * that would allow us to support if from outside of core so if using this or the core alternative
+   * from an extension you need to rely on unit tests to keep your code stable. Within core we
+   * already have good test cover on code that calls this.
+   *
+   * The recommended approach within core is something like
+   *
+   * private function initializeOrder(): void {
+   *  $this->order = new CRM_Financial_BAO_Order();
+   *  $this->order->setForm($this);
+   *  $this->order->setPriceSelectionFromUnfilteredInput($this->>getSubmittedValues());
+   * }
+   *
+   * $lineItems = $this->order->getLineItems();
+   *
    * @todo $priceSetID is a pseudoparam for permit override - we should stop passing it where we
    * don't specifically need it & find a better way where we do.
    */
   public static function processAmount($fields, &$params, &$lineItem, $priceSetID = NULL) {
     // using price set
-    $totalPrice = $totalTax = 0;
     foreach ($fields as $id => $field) {
       if (empty($params["price_{$id}"]) ||
         (empty($params["price_{$id}"]) && $params["price_{$id}"] == NULL)
@@ -662,49 +677,11 @@ WHERE  id = %1";
 
       [$params, $lineItem] = self::getLine($params, $lineItem, $priceSetID, $field, $id);
     }
-
-    $amount_level = [];
-    $totalParticipant = 0;
-    if (is_array($lineItem)) {
-      foreach ($lineItem as $values) {
-        $totalPrice += $values['line_total'] + $values['tax_amount'];
-        $totalTax += $values['tax_amount'];
-        $totalParticipant += $values['participant_count'];
-        // This is a bit nasty. The logic of 'quick config' was because price set configuration was
-        // (and still is) too difficult to replace the 'quick config' price set configuration on the contribution
-        // page.
-        //
-        // However, because the quick config concept existed all sorts of logic was hung off it
-        // and function behaviour sometimes depends on whether 'price set' is set - although actually it
-        // is always set at the functional level. In this case we are dealing with the default 'quick config'
-        // price set having a label of 'Contribution Amount' which could wind up creating a 'funny looking' label.
-        // The correct answer is probably for it to have an empty label in the DB - the label is never shown so it is a
-        // place holder.
-        //
-        // But, in the interests of being careful when capacity is low - avoiding the known default value
-        // will get us by.
-        // Crucially a test has been added so a better solution can be implemented later with some comfort.
-        // @todo - stop setting amount level in this function & call the getAmountLevel function to retrieve it.
-        if ($values['label'] !== ts('Contribution Amount')) {
-          $amount_level[] = $values['label'] . ' - ' . (float) $values['qty'];
-        }
-      }
-    }
-
-    $displayParticipantCount = '';
-    if ($totalParticipant > 0) {
-      $displayParticipantCount = ' Participant Count -' . $totalParticipant;
-    }
-    // @todo - stop setting amount level in this function & call the getAmountLevel function to retrieve it.
-    if (!empty($amount_level)) {
-      $params['amount_level'] = CRM_Utils_Array::implodePadded($amount_level);
-      if (!empty($displayParticipantCount)) {
-        $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
-      }
-    }
-
-    $params['amount'] = $totalPrice;
-    $params['tax_amount'] = $totalTax;
+    $order = new CRM_Financial_BAO_Order();
+    $order->setLineItems($lineItem);
+    $params['amount_level'] = $order->getAmountLevel();
+    $params['amount'] = $order->getTotalAmount();
+    $params['tax_amount'] = $order->getTotalTaxAmount();
   }
 
   /**
@@ -1697,6 +1674,20 @@ WHERE     ct.id = cp.financial_type_id AND
       ];
     }
     return $result;
+  }
+
+  public static function hook_civicrm_post($op, $objectName, $objectId, &$objectRef): void {
+    if (in_array($objectName, ['PriceField', 'PriceFieldValue', 'PriceSet'], TRUE)) {
+      self::flushPriceSets();
+    }
+  }
+
+  public static function flushPriceSets(): void {
+    $cache = CRM_Utils_Cache::singleton();
+    foreach (PriceSet::get(FALSE)->addSelect('id')->execute() as $priceSet) {
+      $cacheKey = 'CRM_Price_BAO_PriceSetgetCachedPriceSetDetail_' . $priceSet['id'];
+      $cache->delete($cacheKey);
+    }
   }
 
 }

@@ -655,10 +655,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $lineItem = [];
         CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'], $value, $lineItem[$priceSetId]);
 
-        // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
-        // function to get correct amount level consistently. Remove setting of the amount level in
-        // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
-        // to cover all variants.
+        // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
         unset($value['amount_level']);
 
         //CRM-11529 for back office transactions

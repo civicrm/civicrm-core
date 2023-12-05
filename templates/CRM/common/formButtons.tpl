@@ -27,8 +27,9 @@
     <a class="button{if array_key_exists('class', $linkButton)} {$linkButton.class}{/if}" {$linkname} href="{crmURL p=$linkButton.url q=$linkButton.qs}" {$accessKey} {if array_key_exists('extra', $linkButton)}{$linkButton.extra}>{/if}<span>{$icon|smarty:nodefaults}{$linkButton.title}</span></a>
   {/foreach}
 {/if}
-
-{foreach from=$form.buttons item=button key=key name=btns}
+{if $form}
+  {* This could be called from Membership View - which is a page not a form but uses it for the links above *}
+  {foreach from=$form.buttons item=button key=key name=btns}
   {if $key|substring:0:4 EQ '_qf_'}
     {if $location}
       {$form.buttons.$key.html|crmReplace:id:"$key-$location"}
@@ -37,4 +38,5 @@
     {/if}
   {/if}
 {/foreach}
+{/if}
 {/crmRegion}

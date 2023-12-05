@@ -1,4 +1,5 @@
 <?php
+namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 
@@ -6,7 +7,7 @@ use Civi\Api4\Afform;
  * Ensure that the routes created by Afform are working.
  * @group e2e
  */
-class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \Civi\Test\EndToEndInterface {
+class AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \Civi\Test\EndToEndInterface {
 
   protected $formName = 'mockPage';
 
@@ -35,7 +36,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
   public function testChangingPermissions(): void {
     $http = new \GuzzleHttp\Client(['http_errors' => FALSE]);
     $url = function ($path, $query = NULL) {
-      return CRM_Utils_System::url($path, $query, TRUE, NULL, FALSE);
+      return \CRM_Utils_System::url($path, $query, TRUE, NULL, FALSE);
     };
 
     $result = $http->get($url('civicrm/mock-page'));
@@ -44,7 +45,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
     Afform::update()
       ->setCheckPermissions(FALSE)
       ->addWhere('name', '=', $this->formName)
-      ->addValue('permission', CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION)
+      ->addValue('permission', \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION)
       ->execute();
 
     $result = $http->get($url('civicrm/mock-page'));
@@ -54,13 +55,13 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
   public function testChangingPath(): void {
     $http = new \GuzzleHttp\Client(['http_errors' => FALSE]);
     $url = function ($path, $query = NULL) {
-      return CRM_Utils_System::url($path, $query, TRUE, NULL, FALSE);
+      return \CRM_Utils_System::url($path, $query, TRUE, NULL, FALSE);
     };
 
     Afform::update()
       ->setCheckPermissions(FALSE)
       ->addWhere('name', '=', $this->formName)
-      ->addValue('permission', CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION)
+      ->addValue('permission', \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION)
       ->execute();
 
     $this->assertOpensPage($http->get($url('civicrm/mock-page')), 'mock-page');
@@ -77,10 +78,10 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
   }
 
   /**
-   * @param $result
+   * @param \Psr\Http\Message\ResponseInterface $result
    * @param string $directive
    */
-  private function assertNotAuthorized(Psr\Http\Message\ResponseInterface $result, $directive) {
+  private function assertNotAuthorized(\Psr\Http\Message\ResponseInterface $result, string $directive) {
     $contents = $result->getBody()->getContents();
     $this->assertEquals(403, $result->getStatusCode());
     $this->assertMatchesRegularExpression(';You are not authorized to access;', $contents);
@@ -88,11 +89,11 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
   }
 
   /**
-   * @param $result
+   * @param \Psr\Http\Message\ResponseInterface $result
    * @param string $directive
    *   The name of the directive which auto-opens.
    */
-  private function assertOpensPage(Psr\Http\Message\ResponseInterface $result, $directive) {
+  private function assertOpensPage(\Psr\Http\Message\ResponseInterface $result, string $directive) {
     $contents = $result->getBody()->getContents();
     $this->assertEquals(200, $result->getStatusCode());
     $this->assertDoesNotMatchRegularExpression(';You are not authorized to access;', $contents);

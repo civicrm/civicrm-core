@@ -34,8 +34,7 @@
   {if !empty($is_quick_config)}
   is_quick_config:::{$is_quick_config}
   {/if}
-  {if !empty($getTaxDetails)}
-  getTaxDetails:::{$getTaxDetails}
+  {if !empty($totalTaxAmount)}
   totalTaxAmount:::{$totalTaxAmount}
   {/if}
   {if !empty($is_monetary)}
@@ -133,12 +132,7 @@
   {/foreach}
  {/foreach}
  {/if}
- {if !empty($dataArray)}
- {foreach from=$dataArray item=value key=priceset}
-    dataArray: priceset:::$priceset
-    dataArray: value:::$value
- {/foreach}
- {/if}
+
  {if !empty($honoreeProfile)}
  {foreach from=$honoreeProfile item=value key=label}
     honoreeProfile: label:::$label

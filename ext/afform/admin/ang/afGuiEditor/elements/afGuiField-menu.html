@@ -92,6 +92,7 @@
     {{:: ts('Post help text') }}
   </a>
 </li>
+
 <li role="separator" class="divider" ng-if="$ctrl.canBeRange() || $ctrl.canBeMultiple()"></li>
 <li ng-if="$ctrl.canBeMultiple()" ng-click="$event.stopPropagation()">
   <a href ng-click="toggleMultiple()" title="{{:: ts('Search multiple values') }}">
@@ -121,6 +122,9 @@
     </select>
   </div>
 </li>
+
+<li af-gui-conditional-menu="$ctrl.node" ng-if="$ctrl.editor.getEntities().length"></li>
+
 <li role="separator" class="divider" ng-if="hasOptions()"></li>
 <li ng-if="hasOptions()" ng-click="$event.stopPropagation()">
   <a href ng-click="resetOptions()" title="{{:: ts('Reset the option list for this field') }}">
@@ -134,6 +138,7 @@
     {{:: ts('Customize options') }}
   </a>
 </li>
+
 <li role="separator" class="divider"></li>
 <li>
   <a href ng-click="$ctrl.deleteThis()" title="{{:: ts('Remove field from form') }}">

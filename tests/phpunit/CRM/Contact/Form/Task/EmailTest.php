@@ -114,7 +114,6 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
     $form->_contactIds[$deceasedContactID] = $deceasedContactID;
 
     $form->_allContactIds = $form->_toContactIds = $form->_contactIds;
-    $form->_fromEmails = [$loggedInEmail['id'] => 'mickey@mouse.com'];
     $form->isSearchContext = FALSE;
     $form->buildForm();
     $this->assertEquals([

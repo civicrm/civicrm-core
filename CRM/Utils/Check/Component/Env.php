@@ -1127,4 +1127,54 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  public function checkForMultipleL10NDirs() {
+    $messages = [];
+    $dirs = [];
+
+    // This is what civi thinks is the current l10n path.
+    // Even if the site is currently en_US, we still want to do this check
+    // since they could change the language later.
+    $current_l10n = self::normalizePath(\Civi::Paths()->getPath('[civicrm.l10n]/'));
+    if (is_dir($current_l10n)) {
+      // use array keys instead of values to automatically dedupe paths
+      $dirs[$current_l10n] = 1;
+    }
+
+    // check the traditional path under civicrm_root
+    $traditional = self::normalizePath(\Civi::Paths()->getPath('[civicrm.root]/l10n'));
+    if (is_dir($traditional)) {
+      $dirs[$traditional] = 1;
+    }
+
+    $private = self::normalizePath(\Civi::Paths()->getPath('[civicrm.private]/l10n'));
+    if (is_dir($private)) {
+      $dirs[$private] = 1;
+    }
+
+    // @todo where else to check? CIVICRM_L10N_BASEDIR is covered by [civicrm.l10n] above.
+
+    if (count($dirs) > 1) {
+      $dirlist = '';
+      foreach (array_keys($dirs) as $dir) {
+        $dirlist .= '<li>' . htmlspecialchars($dir) . '</li>';
+      }
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('There are multiple l10n directories, listed below. The one that appears to be in use is %1. You may wish to remove the others to avoid confusion when updating translation files.', [1 => $current_l10n])
+          . '<p><ul>' . $dirlist . '</ul></p>',
+        ts('Multiple l10n Directories'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-files-o'
+      );
+    }
+    return $messages;
+  }
+
+  /**
+   * Avoid issues with trailing slashes and mixed separators on windows.
+   */
+  private static function normalizePath($path) {
+    return rtrim(str_replace(DIRECTORY_SEPARATOR, '/', $path), '/');
+  }
+
 }

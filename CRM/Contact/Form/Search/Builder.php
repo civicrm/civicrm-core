@@ -65,8 +65,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       }
     }
 
-    $this->_loadedMappingId = $this->get('savedMapping');
-
     if ($this->get('showSearchForm')) {
       $this->assign('showSearchForm', TRUE);
     }
@@ -201,7 +199,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
             $fldType = $fldValue['type'] ?? NULL;
             $type = CRM_Utils_Type::typeToString($fldType);
 
-            if (strstr($v[1], 'IN')) {
+            if (str_contains($v[1], 'IN')) {
               if (empty($v[2])) {
                 $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter a value.");
               }
@@ -221,7 +219,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
           if ($type && empty($errorMsg)) {
             // check for valid format while using IN Operator
-            if (strstr($v[1], 'IN')) {
+            if (str_contains($v[1], 'IN')) {
               if (!is_array($v[2])) {
                 $inVal = trim($v[2]);
                 //checking for format to avoid db errors

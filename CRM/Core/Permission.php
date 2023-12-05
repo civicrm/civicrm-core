@@ -234,11 +234,7 @@ class CRM_Core_Permission {
       return TRUE;
     }
 
-    if (self::check('administer CiviCRM data', $userId)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return self::check('administer CiviCRM data', $userId);
   }
 
   /**
@@ -1152,7 +1148,11 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['line_item'] = $permissions['contribution'];
-    $permissions['product'] = $permissions['contribution'];
+    $permissions['product'] = $permissions['premiums'] = $permissions['premiums_product'] = $permissions['contribution'];
+    // Add 'make online contributions' permissions to allow anon users to access these entities
+    // (permissions are controlled by financial ACLs)
+    $permissions['product']['get'] = $permissions['premium']['get'] = $permissions['premiums_product']['get'] = [['access CiviCRM', 'access CiviContribute', 'make online contributions']];
+    $permissions['product']['meta'] = $permissions['premium']['meta'] = $permissions['premiums_product']['meta'] = [['access CiviCRM', 'access CiviContribute', 'make online contributions']];
 
     $permissions['financial_item'] = $permissions['contribution'];
     $permissions['financial_type']['get'] = $permissions['contribution']['get'];

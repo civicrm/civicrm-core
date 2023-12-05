@@ -680,10 +680,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
             if (!empty($blockValues['is_primary'])) {
               $hasPrimary[] = $instance;
               if (!$primaryID &&
-                in_array($name, [
-                  'email',
-                  'openid',
-                ]) && !empty($blockValues[$name])
+                in_array($name, ['email', 'openid']) &&
+                !empty($blockValues[$name])
               ) {
                 $primaryID = $blockValues[$name];
               }
@@ -1397,10 +1395,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           'street_name',
           'street_unit',
         ] as $fld) {
-          if (in_array($fld, [
-            'street_name',
-            'street_unit',
-          ])) {
+          if (in_array($fld, ['street_name', 'street_unit'])) {
             $streetAddress .= ' ';
           }
           // CRM-17619 - if the street number suffix begins with a number, add a space

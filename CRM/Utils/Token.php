@@ -1135,11 +1135,7 @@ class CRM_Utils_Token {
         }
 
         // special case for greeting replacement
-        foreach ([
-          'email_greeting',
-          'postal_greeting',
-          'addressee',
-        ] as $val) {
+        foreach (['email_greeting', 'postal_greeting', 'addressee'] as $val) {
           if (!empty($contactDetails[$contactID][$val])) {
             $contactDetails[$contactID][$val] = $contactDetails[$contactID]["{$val}_display"];
           }
@@ -1258,11 +1254,7 @@ class CRM_Utils_Token {
   public static function flattenTokens(&$tokens) {
     $flattenTokens = [];
 
-    foreach ([
-      'html',
-      'text',
-      'subject',
-    ] as $prop) {
+    foreach (['html', 'text', 'subject'] as $prop) {
       if (!isset($tokens[$prop])) {
         continue;
       }
@@ -1762,17 +1754,26 @@ class CRM_Utils_Token {
       'WorkFlowMessageTemplates' => [
         'contribution_invoice_receipt' => [
           '$display_name' => 'contact.display_name',
+          '$dataArray' => ts('found within $taxBreakDown'),
         ],
         'contribution_online_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
           '$first_name' => 'contact.first_name',
           '$last_name' => 'contact.last_name',
           '$displayName' => 'contact.display_name',
+          '$dataArray' => ts('found within $taxBreakDown'),
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
           'receipt_text_renewal' => 'receipt_text',
           '$isAmountZero' => ts('no longer available / relevant'),
+          '$dataArray' => ts('found within $taxBreakDown'),
+        ],
+        'membership_online_receipt' => [
+          '$dataArray' => ts('found within $taxBreakDown'),
+          '$mem_start_date' => 'membership.start_date',
+          '$mem_end_date' => 'membership.end_date',
+          '$mem_join_date' => 'membership.join_date',
         ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
@@ -1800,6 +1801,7 @@ class CRM_Utils_Token {
         ],
         'event_online_receipt' => [
           '`$participant.id`' => 'participant.id',
+          '$dataArray' => ts('found within $taxBreakDown'),
         ],
         'pledge_acknowledgement' => [
           '$domain' => ts('no longer available / relevant'),

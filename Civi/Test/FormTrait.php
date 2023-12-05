@@ -58,6 +58,18 @@ trait FormTrait {
   }
 
   /**
+   * Assert that the sent mail included the supplied strings.
+   *
+   * @param array $strings
+   * @param int $mailIndex
+   */
+  protected function assertMailSentNotContainStrings(array $strings, int $mailIndex = 0): void {
+    foreach ($strings as $string) {
+      $this->assertMailSentNotContainingString($string, $mailIndex);
+    }
+  }
+
+  /**
    * Assert that the sent mail included the supplied string.
    *
    * @param string $string
@@ -65,7 +77,38 @@ trait FormTrait {
    */
   protected function assertMailSentContainingString(string $string, int $mailIndex = 0): void {
     $mail = $this->form->getMail()[$mailIndex];
-    $this->assertStringContainsString($string, $mail['body']);
+    $this->assertStringContainsString(preg_replace('/\s+/', '', $string), preg_replace('/\s+/', '', $mail['body']), 'String not found: ' . $string . "\n" . $mail['body']);
+  }
+
+  /**
+   * Assert that the sent mail included the supplied string.
+   *
+   * @param string $string
+   * @param int $mailIndex
+   */
+  protected function assertMailSentNotContainingString(string $string, int $mailIndex = 0): void {
+    $mail = $this->form->getMail()[$mailIndex];
+    $this->assertStringNotContainsString(preg_replace('/\s+/', '', $string), preg_replace('/\s+/', '', $mail['body']));
+  }
+
+  /**
+   * Assert that the sent mail included the supplied string.
+   *
+   * @param string $string
+   * @param int $mailIndex
+   */
+  protected function assertMailSentContainingHeaderString(string $string, int $mailIndex = 0): void {
+    $mail = $this->form->getMail()[$mailIndex];
+    $this->assertStringContainsString($string, $mail['headers']);
+  }
+
+  /**
+   * Assert the right number of mails were sent.
+   *
+   * @param int $count
+   */
+  protected function assertMailSentCount(int $count): void {
+    $this->assertCount($count, $this->form->getMail());
   }
 
   /**

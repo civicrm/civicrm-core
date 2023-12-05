@@ -1561,8 +1561,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $value[1] = NULL;
       }
 
-      // Display a checkbox to migrate, only if the values are different
-      if ($value != $main[$field]) {
+      // Display a checkbox to migrate, only if the values are different, should check type also for true value
+      if ($value !== $main[$field]) {
         // Don't check source if main is empty, because the source of the other contact is not the source of the merged contact
         $isChecked = ($field === 'source') ? FALSE : (!isset($main[$field]) || $main[$field] === '');
         $elements[] = [
@@ -2945,6 +2945,7 @@ ORDER BY civicrm_custom_group.weight,
         // Add this value to the table rows
         $rows["move_location_{$blockName}_{$count}"]['other'] = $displayValue;
         $rows["move_location_{$blockName}_{$count}"]['location_entity'] = $blockName;
+        $rows["move_location_{$blockName}_{$count}"]['location_block_index'] = $count;
 
         // CRM-17556 Only display 'main' contact value if it's the same location + type
         // Look it up from main values...

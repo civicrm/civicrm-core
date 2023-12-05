@@ -153,8 +153,6 @@
       if ( !memTypeId ) memTypeId = cj('input:radio[name='+priceSetName+']:checked').attr('membership-type');
 
       //does this page has only one membership type.
-      var singleMembership = {/literal}'{$singleMembership}'{literal};
-      if ( !memTypeId && singleMembership ) memTypeId = cj("input:radio[name="+priceSetName+"]").attr('membership-type');
       var renewOptions  = {/literal}{$autoRenewMembershipTypeOptions}{literal};
       var currentOption = eval( "renewOptions." + 'autoRenewMembershipType_' + memTypeId );
       var autoRenew = cj('#auto_renew_section');

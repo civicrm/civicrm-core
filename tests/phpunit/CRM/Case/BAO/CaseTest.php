@@ -111,16 +111,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $caseRoles = CRM_Case_BAO_Case::getCaseRoles($loggedInUser, $caseId);
 
     $this->assertEquals($caseCount, $upcomingCases, 'Upcoming case count must be ' . $caseCount);
-    if ($caseCount === 0) {
-      // If there really are 0 cases then there won't be any subelements for
-      // status and count, so we get a false error if we use the assertEquals
-      // check since it tries to get a subelement on type int. In this case
-      // the summary rows are just the case type pseudoconstant list.
-      $this->assertSame(array_flip(CRM_Case_PseudoConstant::caseType()), $summary['rows']);
-    }
-    else {
-      $this->assertEquals($caseCount, $summary['rows']['Housing Support']['Ongoing']['count'], 'Housing Support Ongoing case summary must be ' . $caseCount);
-    }
+    $this->assertEquals($caseCount, (int) $summary['rows']['Housing Support']['Ongoing']['count'], 'Housing Support Ongoing case summary must be ' . $caseCount);
     $this->assertEquals($caseCount, count($caseRoles), 'Total case roles for logged in users must be ' . $caseCount);
   }
 
@@ -366,7 +357,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $client_id_2 = $this->individualCreate([], 1);
     $caseObj_2 = $this->createCase($client_id_2, $loggedInUser);
     $case_id_2 = $caseObj_2->id;
-
+    $_REQUEST['action'] = 'add';
     $form = $this->getFormObject('CRM_Case_Form_Activity', [
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Link Cases'),
       'link_to_case_id' => $case_id_2,

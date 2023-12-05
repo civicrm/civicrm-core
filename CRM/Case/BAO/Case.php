@@ -639,7 +639,7 @@ HERESQL;
 
     $order = NULL;
     if (!empty($params['sortBy'])) {
-      if (strstr($params['sortBy'], 'date ')) {
+      if (str_contains($params['sortBy'], 'date ')) {
         $params['sortBy'] = str_replace('date', 'activity_date_time', $params['sortBy']);
       }
       $order = "ORDER BY " . $params['sortBy'];
@@ -768,17 +768,19 @@ HERESQL;
 
     $caseTypes = CRM_Case_PseudoConstant::caseType();
     $caseStatuses = CRM_Case_PseudoConstant::caseStatus();
-    $caseTypes = array_flip($caseTypes);
 
     // get statuses as headers for the table
     $url = CRM_Utils_System::url('civicrm/case/search', "reset=1&force=1&all=1&case_status_id=");
-    foreach ($caseStatuses as $key => $name) {
-      $caseSummary['headers'][$key]['status'] = $name;
+    $rows = [];
+    foreach ($caseStatuses as $key => $caseStatusLabel) {
+      $caseSummary['headers'][$key]['status'] = $caseStatusLabel;
       $caseSummary['headers'][$key]['url'] = $url . $key;
+      foreach ($caseTypes as $caseTypeLabel) {
+        $rows[$caseTypeLabel][$caseStatusLabel] = ['count' => NULL, 'url' => NULL];
+      }
     }
 
     // build rows with actual data
-    $rows = [];
     $myGroupByClause = $mySelectClause = $myCaseFromClause = $myCaseWhereClauseA = $myCaseWhereClauseB = '';
 
     if ($allCases) {
@@ -827,10 +829,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
 
     $res = CRM_Core_DAO::executeQuery($query);
     while ($res->fetch()) {
-      if (!isset($rows[$res->case_type])) {
-        $rows[$res->case_type] = array_fill_keys($caseStatuses, []);
-      }
-      if (!empty($rows[$res->case_type]) && !empty($rows[$res->case_type][$res->case_status])) {
+      if (!empty($rows[$res->case_type][$res->case_status]['count'])) {
         $rows[$res->case_type][$res->case_status]['count'] = $rows[$res->case_type][$res->case_status]['count'] + 1;
       }
       else {
@@ -842,7 +841,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
         ];
       }
     }
-    $caseSummary['rows'] = array_merge($caseTypes, $rows);
+    $caseSummary['rows'] = $rows;
 
     return $caseSummary;
   }
@@ -2503,7 +2502,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     $actionOperations = ['view', 'edit', 'delete'];
     if (in_array($operation, $actionOperations)) {
 
-      //do cache when user has non/supper permission.
+      // Do cache when user has non-super permission.
       static $allowOperations;
 
       if (!is_array($allowOperations) ||
@@ -2542,12 +2541,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         //has permissions.
         if (!empty($hasPermissions)) {
           //need to check activity object specific.
-          if (in_array($operation, [
-            'view',
-            'edit',
-          ])
-          ) {
-            //do we have supper permission.
+          if (in_array($operation, ['view', 'edit'])) {
+            // Check for super permission.
             if (in_array('access all cases and activities', $hasPermissions[$operation])) {
               $allowOperations[$operation] = $allow = TRUE;
             }
@@ -2609,8 +2604,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         }
       }
       else {
-        //use cache.
-        //here contact might have supper/non permission.
+        // Use cache; user might have non-super permission.
         $allow = $allowOperations[$operation];
       }
     }
@@ -2710,13 +2704,9 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       return FALSE;
     }
 
-    if (CRM_Core_Permission::check('access my cases and activities') ||
-      CRM_Core_Permission::check('access all cases and activities')
-    ) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return CRM_Core_Permission::check([
+      ['access my cases and activities', /* OR */ 'access all cases and activities'],
+    ]);
   }
 
   /**

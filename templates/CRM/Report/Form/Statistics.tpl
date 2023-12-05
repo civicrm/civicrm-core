@@ -37,9 +37,9 @@
         <tr>
           <th class="statistics" scope="row">{$row.title}</th>
           <td>
-            {if $row.type eq 1024}
+            {if array_key_exists('type', $row) && $row.type eq 1024}
               {$row.value|crmMoney|escape}
-            {elseif $row.type eq 2}
+            {elseif array_key_exists('type', $row) && $row.type eq 2}
               {$row.value|purify}
             {else}
                {$row.value|crmNumberFormat|escape}

@@ -656,11 +656,7 @@ class CRM_Utils_REST {
       // <header> Browsers often retain list of credentials and re-send automatically.
     ];
 
-    if (!empty($authx) && in_array($authx['flow'], $allowFlows)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return (!empty($authx) && in_array($authx['flow'], $allowFlows));
   }
 
 }

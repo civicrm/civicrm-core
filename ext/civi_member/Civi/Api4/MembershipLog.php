@@ -1,4 +1,5 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
@@ -6,13 +7,19 @@
  | permitted exceptions and without any warranty. For full license    |
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*}
-{* Displays local tasks (secondary menu) for any pages that have them *}
-<div class="tabs">
-    <ul class="tabs primary">
-    {foreach from=$localTasks item=task}
-        <li {if $task.class}class="{$task.class}"{/if}><a href="{$task.url}" {if $task.class}class="{$task.class}"{/if}>{$task.title}</a></li>
-    {/foreach}
-   </ul>
-</div>
-<br class="clear" />
+ */
+namespace Civi\Api4;
+
+use Civi\Api4\Generic\DAOEntity;
+use Civi\Api4\Generic\Traits\ReadOnlyEntity;
+
+/**
+ * MembershipLog entity.
+ *
+ * @since 5.69
+ * @package Civi\Api4
+ */
+class MembershipLog extends DAOEntity {
+  use ReadOnlyEntity;
+
+}

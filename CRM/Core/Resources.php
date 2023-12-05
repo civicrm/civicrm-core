@@ -381,6 +381,9 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     if (!self::isAjaxMode()) {
       $this->addBundle('coreResources');
       $this->addCoreStyles($region);
+      // This ensures that if a popup link requires AngularJS, it will always be available.
+      // Additional Ang modules required by popups will be loaded on-the-fly by Civi\Angular\AngularLoader
+      Civi::service('angularjs.loader')->addModules(['crmResource']);
     }
     return $this;
   }
@@ -420,7 +423,30 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
   }
 
   /**
+   * Get the params used to render crm-l10n.js
+   * Gets called above the caching layer and then used
+   * in the render function below
+   */
+  public static function getL10nJsParams(): array {
+    $settings = Civi::settings();
+    return [
+      'cid' => CRM_Core_Session::getLoggedInContactID() ?: 0,
+      'includeEmailInName' => (bool) $settings->get('includeEmailInName'),
+      'ajaxPopupsEnabled' => (bool) $settings->get('ajaxPopupsEnabled'),
+      'allowAlertAutodismissal' => (bool) $settings->get('allow_alert_autodismissal'),
+      'resourceCacheCode' => Civi::resources()->getCacheCode(),
+      'locale' => CRM_Core_I18n::getLocale(),
+      'lcMessages' => $settings->get('lcMessages'),
+      'dateInputFormat' => $settings->get('dateInputFormat'),
+      'timeInputFormat' => $settings->get('timeInputFormat'),
+      'moneyFormat' => CRM_Utils_Money::format(1234.56),
+    ];
+  }
+
+  /**
    * Create dynamic script for localizing js widgets.
+   * Params come from the function above
+   * @see getL10nJsParams
    */
   public static function renderL10nJs(GenericHookEvent $e) {
     if ($e->asset !== 'crm-l10n.js') {

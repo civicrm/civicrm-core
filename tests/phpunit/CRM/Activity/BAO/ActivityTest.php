@@ -217,7 +217,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activityGetParams += ['contact_id' => $contactId];
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($activityGetParams);
     // Assert that we have sensible data to display in the contact tab
-    $this->assertEquals('Anderson, Anthony', $activities['data'][0]['source_contact_name']);
+    $this->assertEquals('Anderson, Anthony II', $activities['data'][0]['source_contact_name']);
     // Note that because there is a target contact but it is not accessible the output is an empty string not n/a
     $this->assertEquals('', $activities['data'][0]['target_contact_name']);
     // verify that doing the underlying query shows we get a target contact_id
@@ -709,9 +709,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activities = CRM_Activity_BAO_Activity::getActivities($params);
     //verify target count
     $this->assertEquals($targetCount, $activities[1]['target_contact_count']);
-    $this->assertEquals([$targetContactIDs[0] => 'Anderson, Anthony'], $activities[1]['target_contact_name']);
-    $this->assertEquals('Anderson, Anthony', $activities[1]['source_contact_name']);
-    $this->assertEquals('Anderson, Anthony', $activities[1]['assignee_contact_name'][4]);
+    $this->assertEquals([$targetContactIDs[0] => 'Anderson, Anthony II'], $activities[1]['target_contact_name']);
+    $this->assertEquals('Anderson, Anthony II', $activities[1]['source_contact_name']);
+    $this->assertEquals('Anderson, Anthony II', $activities[1]['assignee_contact_name'][4]);
   }
 
   /**

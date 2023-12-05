@@ -959,8 +959,6 @@ Receipt Date: ' . date('m/d/Y'),
 
   /**
    * Test the submit function that completes the partially paid payment using Credit Card
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testPartialPaymentWithCreditCard(): void {
     // create a partially paid contribution by using back-office form
@@ -979,11 +977,7 @@ Receipt Date: ' . date('m/d/Y'),
     $this->callAPISuccess('Payment', 'create', ['contribution_id' => $contribution['id'], 'total_amount' => 10, 'payment_instrument_id' => 'Cash']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertEquals('Partially paid', $contribution['contribution_status']);
-    // pay additional amount by using Credit Card
-    $form = new CRM_Contribute_Form_AdditionalPayment();
-    $form->testSubmit([
-      'contribution_id' => $contribution['id'],
-      'contact_id' => $this->_individualId,
+    $form = $this->getTestForm('CRM_Contribute_Form_AdditionalPayment', [
       'total_amount' => 40,
       'currency' => 'USD',
       'financial_type_id' => 1,
@@ -998,7 +992,8 @@ Receipt Date: ' . date('m/d/Y'),
       'billing_postal_code-5' => 1321312,
       'billing_country_id-5' => 1228,
       'trxn_date' => '2017-04-11 13:05:11',
-    ], 'live');
+    ], ['id' => $contribution['id'], 'mode' => 'live'])->processForm();
+    $this->assertEquals($contribution['id'], $form->getContributionID());
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertNotEmpty($contribution);
     $this->assertEquals('Completed', $contribution['contribution_status']);

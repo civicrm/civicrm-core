@@ -101,8 +101,10 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
     );
 
     $instance = \Civi::service('TestNamedProperty');
-    $this->assertInstanceOf(\CRM_Utils_Cache_SqlGroup::class, $instance->cache);
-    $this->assertEquals('extension_browser', Invasive::get([$instance->cache, 'group']));
+    $this->assertInstanceOf(\CRM_Utils_Cache_CacheWrapper::class, $instance->cache);
+    $cacheClass = Invasive::get([$instance->cache, 'delegate']);
+    $this->assertInstanceOf(\CRM_Utils_Cache_SqlGroup::class, $cacheClass);
+    $this->assertEquals('extension_browser', Invasive::get([$instance->cache, 'cacheName']));
   }
 
   /**
@@ -178,8 +180,11 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
 
     $instance = \Civi::service('TestInjectConstructor');
     $this->assertInstanceOf(LoggerInterface::class, Invasive::get([$instance, 'log']));
-    $this->assertInstanceOf(\CRM_Utils_Cache_SqlGroup::class, Invasive::get([$instance, 'cache']));
-    $this->assertEquals('extension_browser', Invasive::get([Invasive::get([$instance, 'cache']), 'group']));
+    $cacheWrapper = Invasive::get([$instance, 'cache']);
+    $cacheClass = Invasive::get([$cacheWrapper, 'delegate']);
+    $this->assertInstanceOf(\CRM_Utils_Cache_SqlGroup::class, $cacheClass);
+    $this->assertEquals('extension_browser', Invasive::get([$cacheWrapper, 'cacheName']));
+    $this->assertEquals('extension_browser', Invasive::get([$cacheClass, 'group']));
   }
 
   /**

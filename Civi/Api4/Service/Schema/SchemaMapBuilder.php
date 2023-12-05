@@ -127,6 +127,15 @@ class SchemaMapBuilder extends AutoService {
       $customTable = $map->getTableByName($tableName);
       if (!$customTable) {
         $customTable = new Table($tableName);
+        // Add entity_id join from multi-record custom group to the
+        if (!empty($fieldData->is_multiple)) {
+          $newJoin = new Joinable($baseTable->getName(), $customInfo['column'], 'entity_id');
+          $customTable->addTableLink('entity_id', $newJoin);
+          // Deprecated "contact" join name
+          $oldJoin = new Joinable($baseTable->getName(), $customInfo['column'], AllCoreTables::convertEntityNameToLower($entityName));
+          $oldJoin->setDeprecatedBy('entity_id');
+          $customTable->addTableLink('entity_id', $oldJoin);
+        }
       }
 
       $map->addTable($customTable);
@@ -135,12 +144,6 @@ class SchemaMapBuilder extends AutoService {
       $links[$alias]['tableName'] = $tableName;
       $links[$alias]['isMultiple'] = !empty($fieldData->is_multiple);
       $links[$alias]['columns'][$fieldData->name] = $fieldData->column_name;
-
-      // Add backreference
-      if (!empty($fieldData->is_multiple)) {
-        $joinable = new Joinable($baseTable->getName(), $customInfo['column'], AllCoreTables::convertEntityNameToLower($entityName));
-        $customTable->addTableLink('entity_id', $joinable);
-      }
 
       if ($fieldData->data_type === 'EntityReference' && isset($fieldData->fk_entity)) {
         $targetTable = self::getTableName($fieldData->fk_entity);

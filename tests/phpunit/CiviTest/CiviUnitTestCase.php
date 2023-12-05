@@ -202,6 +202,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected $formController;
 
   /**
+   * @var \CRM_Utils_AutoClean
+   */
+  private $frozenTime;
+
+  /**
    *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
@@ -289,8 +294,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     CRM_Core_I18n::clearLocale();
     parent::setUp();
     CRM_Core_Session::singleton()->set('userID');
-
-    $this->_apiversion = 3;
 
     //  Use a temporary file for STDIN
     $GLOBALS['stdin'] = tmpfile();
@@ -457,6 +460,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected function tearDown(): void {
     $this->_apiversion = 3;
     $this->resetLabels();
+    $this->frozenTime = NULL;
 
     error_reporting(E_ALL & ~E_NOTICE);
     $this->resetHooks();
@@ -916,6 +920,19 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $params = array_merge($defaults, $params);
     $result = $this->callAPISuccess('Tag', 'create', $params);
     return $result['values'][$result['id']];
+  }
+
+  /**
+   * Temporarily freeze time, as perceived through `CRM_Utils_Time`.
+   */
+  protected function useFrozenTime(): void {
+    $oldTimeFunc = getenv('TIME_FUNC');
+    putenv('TIME_FUNC=frozen');
+    CRM_Utils_Time::setTime(date('Y-m-d H:i:s'));
+    $this->frozenTime = CRM_Utils_AutoClean::with(function () use ($oldTimeFunc) {
+      putenv($oldTimeFunc === NULL ? 'TIME_FUNC' : "TIME_FUNC=$oldTimeFunc");
+      CRM_Utils_Time::resetTime();
+    });
   }
 
   /**
@@ -1662,6 +1679,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'civicrm_price_set_entity',
       'civicrm_price_field_value',
       'civicrm_price_field',
+      'civicrm_product',
+      'civicrm_premiums',
+      'civicrm_premiums_product',
     ];
     $this->quickCleanup($tablesToTruncate);
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_membership_status WHERE name NOT IN('New', 'Current', 'Grace', 'Expired', 'Pending', 'Cancelled', 'Deceased')");
@@ -2146,7 +2166,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return int $result['id'] payment processor id
    */
-  public function paymentProcessorCreate(array $params = [], $identifier = 'test'): int {
+  public function paymentProcessorCreate(array $params = [], string $identifier = 'test'): int {
     $params = array_merge([
       'title' => $params['name'] ?? 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
@@ -2983,6 +3003,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         break;
 
       case 'CRM_Contribute_Form_Contribution_Confirm':
+      case 'CRM_Contribute_Form_Contribution_ThankYou':
         $form->controller = new CRM_Contribute_Controller_Contribution();
         $form->controller->setStateMachine(new CRM_Contribute_StateMachine_Contribution($form->controller));
         // The submitted values are on the Main form.
@@ -3389,7 +3410,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       foreach ($items as $item) {
         $itemTotal += $item['amount'];
       }
-      $this->assertEquals($payment['total_amount'], $itemTotal);
+      $this->assertEquals(round((float) $payment['total_amount'], 2), round($itemTotal, 2));
     }
   }
 

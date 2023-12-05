@@ -190,7 +190,7 @@
         function getKeyword(whitelist) {
           var keyword;
           _.each(_.filter(whitelist), function(flag) {
-            if (argString.indexOf(flag + ' ') === 0) {
+            if (argString.indexOf(flag + ' ') === 0 || argString === flag) {
               keyword = flag;
               argString = _.trim(argString.substr(flag.length));
               return false;
@@ -241,7 +241,7 @@
               }
               getKeyword([',']);
             }
-            if (expr && !_.isEmpty(expr.flag_after)) {
+            if (info.args.length && !_.isEmpty(param.flag_after)) {
               _.last(info.args).flag_after = getKeyword(_.keys(param.flag_after));
             }
           } else if (param.flag_before && !param.optional) {

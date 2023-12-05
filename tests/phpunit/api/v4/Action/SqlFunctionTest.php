@@ -104,6 +104,24 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains('1, ' . $cid . ', 100.00', $agg['GROUP_CONCAT:financial_type_id_contact_id_total_amount']);
     $this->assertEquals([TRUE, TRUE, FALSE, FALSE], $agg['is_donation']);
     $this->assertEquals(['January', 'February', 'March', 'April'], $agg['months']);
+
+    // Test GROUP_FIRST
+    $agg = Contribution::get(FALSE)
+      ->addGroupBy('contact_id')
+      ->addWhere('contact_id', '=', $cid)
+      ->addSelect('GROUP_FIRST(financial_type_id:name ORDER BY id) AS financial_type_1')
+      ->addSelect("GROUP_FIRST((financial_type_id = 1) ORDER BY id) AS is_donation_1")
+      ->addSelect("GROUP_FIRST((financial_type_id = 1) ORDER BY id DESC) AS is_donation_4")
+      ->addSelect("GROUP_FIRST(MONTH(receive_date):label ORDER BY id) AS months")
+      ->addSelect('COUNT(*) AS count')
+      ->execute()
+      ->first();
+
+    $this->assertTrue(4 === $agg['count']);
+    $this->assertEquals('Donation', $agg['financial_type_1']);
+    $this->assertEquals('January', $agg['months']);
+    $this->assertTrue($agg['is_donation_1']);
+    $this->assertFalse($agg['is_donation_4']);
   }
 
   public function testGroupConcatUnique(): void {
@@ -174,19 +192,20 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(2, $result[0]['count']);
     $this->assertEquals(1, $result[1]['count']);
 
-    $result = Contribution::get(FALSE)
-      ->addGroupBy('contact_id')
-      ->addGroupBy('receive_date')
-      ->addSelect('contact_id')
-      ->addSelect('receive_date')
-      ->addSelect('SUM(total_amount)')
-      ->addOrderBy('receive_date')
-      ->addWhere('contact_id', '=', $cid)
-      ->addHaving('SUM(total_amount)', '>', 300)
-      ->execute();
+    $result = (array) civicrm_api4('Contribution', 'get', [
+      'checkPermissions' => FALSE,
+      'groupBy' => ['contact_id', 'receive_date'],
+      'select' => ['contact_id', 'DATE(receive_date)', 'SUM(total_amount)'],
+      'orderBy' => ['receive_date' => 'ASC'],
+      'where' => [
+        ['contact_id', '=', $cid],
+      ],
+      'having' => [
+        ['SUM(total_amount)', '>', 300],
+      ],
+    ], ['DATE:receive_date' => 'SUM:total_amount']);
     $this->assertCount(1, $result);
-    $this->assertStringStartsWith('2020-04-04', $result[0]['receive_date']);
-    $this->assertEquals(400, $result[0]['SUM:total_amount']);
+    $this->assertEquals(['2020-04-04' => 400], $result);
   }
 
   public function testComparisonFunctions(): void {

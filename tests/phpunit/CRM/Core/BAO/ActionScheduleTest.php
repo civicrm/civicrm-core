@@ -2411,7 +2411,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * It 'steals and deletes entities that are part of the 'stock build'.
    *
    * In general this causes weird stuff and is worse that competing functions
-   * like individualCreate() eventCreateUnpaid() or createTestEntitiy().
+   * like individualCreate() eventCreateUnpaid() or createTestEntity().
    *
    * @param $daoName
    * @param array $params

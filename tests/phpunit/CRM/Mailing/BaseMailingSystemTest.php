@@ -115,7 +115,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         "Sample Header for TEXT formatted content.\n" .
         "BEWARE children need regular infusions of toys. Santa knows your .*\\. There is no http.*civicrm/mailing/optout.*\\.\n" .
         // Default footer
-        "to unsubscribe: http.*civicrm/mailing/optout" .
+        "Opt out of any future emails: http.*civicrm/mailing/optout" .
         ";",
         $message->body->text
       );
@@ -165,7 +165,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         //  body_html, filtered
         "You can go to \\[Google\\]\\(http://example.net/first\?cs=[0-9a-f_]+\\) or \\[opt out\\]\\(http.*civicrm/mailing/optout.*\\)\\.\n" .
         // Default footer
-        "to unsubscribe: http.*civicrm/mailing/optout" .
+        "Opt out of any future emails: http.*civicrm/mailing/optout" .
         ";",
         $textPart->text
       );
@@ -212,7 +212,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         //  body_html, filtered
         "You can go to \\[Google\\]\\(http.*(extern/url.php|civicrm/mailing/url)(\?|&)u=\d+&qid=\d+\\) or \\[opt out\\]\\(http.*civicrm/mailing/optout.*\\)\\.\n" .
         // Default footer
-        "to unsubscribe: http.*civicrm/mailing/optout" .
+        "Opt out of any future emails: http.*civicrm/mailing/optout" .
         ";",
         $textPart->text
       );

@@ -331,7 +331,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
     $contributionID = $this->callAPISuccess('Contribution', 'create', $param)['id'];
     // Display sort name during Update multiple contributions.
-    $this->assertEquals('Watson, Shane', CRM_Contribute_BAO_Contribution::sortName($contributionID));
+    $this->assertEquals('Watson, Shane II', CRM_Contribute_BAO_Contribution::sortName($contributionID));
   }
 
   /**

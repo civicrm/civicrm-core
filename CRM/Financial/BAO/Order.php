@@ -672,6 +672,9 @@ class CRM_Financial_BAO_Order {
    */
   protected function setPriceFieldMetadata(array $metadata): void {
     foreach ($metadata as $index => $priceField) {
+      if ($this->isExcludeExpiredFields && !$priceField['is_active']) {
+        unset($metadata[$index]);
+      }
       if ($this->isExcludeExpiredFields && !empty($priceField['active_on']) && time() < strtotime($priceField['active_on'])) {
         unset($metadata[$index]);
       }
@@ -680,7 +683,10 @@ class CRM_Financial_BAO_Order {
       }
       elseif (!empty($priceField['options'])) {
         foreach ($priceField['options'] as $optionID => $option) {
-          if (!empty($option['membership_type_id'])) {
+          if (!$option['is_active']) {
+            unset($metadata[$index]['options'][$optionID]);
+          }
+          elseif (!empty($option['membership_type_id'])) {
             $membershipType = CRM_Member_BAO_MembershipType::getMembershipType((int) $option['membership_type_id']);
             $metadata[$index]['options'][$optionID]['auto_renew'] = (int) $membershipType['auto_renew'];
             if ($membershipType['auto_renew'] && empty($this->priceSetMetadata['auto_renew_membership_field'])) {
@@ -947,6 +953,10 @@ class CRM_Financial_BAO_Order {
       elseif ($taxRate) {
         $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
       }
+      $lineItem['membership_type_id'] = $lineItem['membership_type_id'] ?? NULL;
+      if ($lineItem['membership_type_id']) {
+        $lineItem['entity_table'] = 'civicrm_membership';
+      }
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
       $lineItem['line_total_inclusive'] = $lineItem['line_total'] + $lineItem['tax_amount'];
     }
@@ -981,6 +991,34 @@ class CRM_Financial_BAO_Order {
       $amount += ($lineItem['line_total'] ?? 0.0) + ($lineItem['tax_amount'] ?? 0.0);
     }
     return $amount;
+  }
+
+  /**
+   * Get Amount Level text.
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public function getAmountLevel() : string {
+    $amount_level = [];
+    $totalParticipant = 0;
+    foreach ($this->getLineItems() as $lineItem) {
+      if ($lineItem['label'] !== ts('Contribution Amount')) {
+        $amount_level[] = $lineItem['label'] . ' - ' . (float) $lineItem['qty'];
+      }
+      $totalParticipant += (float) ($lineItem['participant_count'] ?? 0);
+    }
+    $displayParticipantCount = '';
+    if ($totalParticipant > 0) {
+      $displayParticipantCount = ' Participant Count -' . $totalParticipant;
+    }
+    if (!empty($amount_level)) {
+      $amountString = CRM_Utils_Array::implodePadded($amount_level);
+      if (!empty($displayParticipantCount)) {
+        $amountString = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
+    }
+    return $amountString ?? '';
   }
 
   /**
@@ -1122,6 +1160,18 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Set the line item array.
+   *
+   * This is mostly useful when they have been calculated & stored
+   * on the form & we want to rebuild the line item object.
+   *
+   * @param array $lineItems
+   */
+  public function setLineItems(array $lineItems): void {
+    $this->lineItems = $lineItems;
+  }
+
+  /**
    * @param int|string $index
    *
    * @return string
@@ -1192,6 +1242,8 @@ class CRM_Financial_BAO_Order {
     }
     else {
       $lineItem['line_total'] = $this->getOverrideTotalAmount();
+      $lineItem['tax_amount'] = 0.0;
+      $lineItem['line_total_inclusive'] = $lineItem['line_total'];
     }
     if (!empty($lineItem['qty'])) {
       $lineItem['unit_price'] = $lineItem['line_total'] / $lineItem['qty'];

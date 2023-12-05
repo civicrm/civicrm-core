@@ -483,10 +483,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
         $val = $defaultVal;
       }
 
-      if (in_array($field, [
-        'min_amount',
-        'max_amount',
-      ])) {
+      if (in_array($field, ['min_amount', 'max_amount'])) {
         $val = CRM_Utils_Rule::cleanMoney($val);
       }
 

@@ -170,6 +170,9 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
    * @internal
    */
   protected function getEventTokenValues(int $eventID = NULL): array {
+    if (!$eventID) {
+      return [];
+    }
     $cacheKey = __CLASS__ . 'event_tokens' . $eventID . '_' . CRM_Core_I18n::getLocale();
     if ($this->checkPermissions) {
       $cacheKey .= '__' . CRM_Core_Session::getLoggedInContactID();

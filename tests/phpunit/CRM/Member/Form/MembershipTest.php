@@ -21,6 +21,7 @@ use Civi\Api4\FinancialType;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
 use Civi\Api4\PriceFieldValue;
+use Civi\Test\FormTrait;
 
 /**
  *  Test CRM_Member_Form_Membership functions.
@@ -32,6 +33,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_OrderTrait;
   use CRMTraits_Financial_PriceSetTrait;
+  use FormTrait;
 
   /**
    * @var int
@@ -799,20 +801,18 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // Step 2: submit the other half of the partial payment
     //  via AdditionalPayment form to complete the related contribution
-    $form = new CRM_Contribute_Form_AdditionalPayment();
-    $submitParams = [
-      'contribution_id' => $contribution['contribution_id'],
-      'contact_id' => $this->_individualId,
-      'total_amount' => $this->formatMoneyInput(25),
-      'currency' => 'USD',
-      'financial_type_id' => 2,
-      'receive_date' => '2015-04-21 23:27:00',
+    $this->getTestForm('CRM_Contribute_Form_AdditionalPayment', [
+      'total_amount' => 150.00,
       'trxn_date' => '2017-04-11 13:05:11',
-      'payment_processor_id' => 0,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments, TRUE),
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', 'Check'),
       'check_number' => 'check-12345',
-    ];
-    $form->testSubmit($submitParams);
+      'trxn_id' => '',
+      'currency' => 'USD',
+      'fee_amount' => '',
+      'net_amount' => '',
+      'payment_processor_id' => 0,
+      'contact_id' => $this->_individualId,
+    ], ['id' => $contribution['id']])->processForm();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     // check the membership status after additional payment, if its changed to 'New'
     $this->assertEquals(array_search('New', CRM_Member_PseudoConstant::membershipStatus(), TRUE), $membership['status_id']);
@@ -1109,7 +1109,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // Check if Membership is updated to New.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
-    $this->assertEquals($membership['status_id'], array_search('New', $memStatus));
+    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
   }
 
   /**
@@ -1511,7 +1511,7 @@ Expires: ',
       'price_' . $fieldOption['price_field_id'] => $fieldOption['id'],
       'total_amount' => 55,
       'receive_date' => date('Y-m-d') . ' 20:36:00',
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments, TRUE),
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       //Member dues, see data.xml
       'financial_type_id' => 2,
@@ -1648,16 +1648,15 @@ Expires: ',
       'contact_id' => $this->_individualId,
     ]);
     $endDate = (new DateTime(date('Y-m-d')))->modify('+3 years')->modify('-1 day');
-    $endDate = $endDate->format("Y-m-d");
+    $endDate = $endDate->format('Y-m-d');
 
     $this->assertEquals($endDate, $membership['end_date'], 'Membership Expiration Date should be ' . $endDate);
-    $this->assertEquals(1, count($contribution['values']), 'Pending contribution should be created.');
+    $this->assertCount(1, $contribution['values'], 'Pending contribution should be created.');
     $contribution = $contribution['values'][$contribution['id']];
-    $additionalPaymentForm = new CRM_Contribute_Form_AdditionalPayment();
-    $additionalPaymentForm->testSubmit([
+    $this->getTestForm('CRM_Contribute_Form_AdditionalPayment', [
       'total_amount' => 150.00,
-      'trxn_date' => date("Y-m-d H:i:s"),
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'trxn_date' => date('Y-m-d H:i:s'),
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', 'Check'),
       'check_number' => 'check-12345',
       'trxn_id' => '',
       'currency' => 'USD',
@@ -1666,8 +1665,7 @@ Expires: ',
       'net_amount' => '',
       'payment_processor_id' => 0,
       'contact_id' => $this->_individualId,
-      'contribution_id' => $contribution['id'],
-    ]);
+    ], ['id' => $contribution['id']])->processForm();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'contact_id' => $this->_individualId,

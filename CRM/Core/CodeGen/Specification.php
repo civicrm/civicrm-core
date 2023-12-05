@@ -552,11 +552,7 @@ class CRM_Core_CodeGen_Specification {
    */
   private function getPhpNullable($fieldXML) {
     $required = $this->value('required', $fieldXML);
-    if ($required) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return !$required;
   }
 
   /**

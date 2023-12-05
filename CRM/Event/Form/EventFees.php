@@ -24,11 +24,14 @@ class CRM_Event_Form_EventFees {
   /**
    * Set variables up before form is built.
    *
+   * @deprecated since 5.69 will be removed around 5.74
+   *
    * @param CRM_Core_Form $form
    *
    * @throws \CRM_Core_Exception
    */
   public static function preProcess(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     //as when call come from register.php
     if (!$form->_eventId) {
       $form->_eventId = CRM_Utils_Request::retrieve('eventId', 'Positive', $form);

@@ -51,12 +51,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     }
 
     $session = CRM_Core_Session::singleton();
-    if (!in_array($context, [
-      'home',
-      'dashlet',
-      'dashletFullscreen',
-    ])
-    ) {
+    if (!in_array($context, ['home', 'dashlet', 'dashletFullscreen'])) {
       $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=activity");
     }
     else {

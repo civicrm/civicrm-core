@@ -70,10 +70,6 @@ part:::{foreach from=$part item=value key=key}
 {/foreach}
 {/if}
 
-{if !empty($dataArray)}
-dataArray:::{$dataArray}
-{/if}
-
 {if isset($totalTaxAmount)}
 totalTaxAmount:::{$totalTaxAmount}
 {/if}

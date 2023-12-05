@@ -23,7 +23,7 @@
   <table class="form-layout">
     {if $activityTypeDescription}
       <tr>
-        <div class="help">{$activityTypeDescription}</div>
+        <div class="help">{$activityTypeDescription|purify}</div>
       </tr>
     {/if}
     {* Block for change status, case type and start date. *}
