@@ -151,7 +151,7 @@
         <p class="help-block">{{:: ts('The data can be processed via email verification. Email field should be included in the form for this functionality.') }}</p>
         <div class="form-inline" ng-if="editor.afform.allow_verification_by_email">
           <label>{{:: ts('Email template') }}</label>
-          <input class="form-control" crm-autocomplete="'MessageTemplate'" ng-model="editor.afform.email_confirmation_template_id" auto-open="true" placeholder="{{:: ts('- select -') }}">
+          <input class="form-control" crm-autocomplete="'MessageTemplate'" id="afform_email_confirmation_template_id" ng-model="editor.afform.email_confirmation_template_id" auto-open="true" placeholder="{{:: ts('- select -') }}">
         </div>
       </div>
 

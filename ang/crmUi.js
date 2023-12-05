@@ -787,7 +787,7 @@
           this.$onChanges = function() {
             // Timeout is to wait for `placeholder="{{ ts(...) }}"` to be resolved
             $timeout(function() {
-              $element.crmAutocomplete(ctrl.entity, ctrl.crmAutocompleteParams, {
+              $element.crmAutocomplete(ctrl.entity, ctrl.crmAutocompleteParams || {}, {
                 multiple: ctrl.multi,
                 // Only auto-open if there are no static options
                 minimumInputLength: ctrl.autoOpen && _.isEmpty(ctrl.staticOptions) ? 0 : 1,
