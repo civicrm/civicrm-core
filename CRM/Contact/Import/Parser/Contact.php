@@ -155,7 +155,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
 
-      [$formatted, $params] = $this->processContact($params, $formatted, TRUE);
+      $formatted['id'] = $params['id'] = $this->processContact($params, TRUE);
 
       //format common data, CRM-4062
       $this->formatCommonData($params, $formatted);
@@ -177,7 +177,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
       //relationship contact insert
       foreach ($this->getRelatedContactsParams($params) as $key => $field) {
-        [$formatting, $field] = $this->processContact($field, $field, FALSE);
+        $field['id'] = $this->processContact($field, FALSE);
+        $formatting = $field;
         //format common data, CRM-4062
         $this->formatCommonData($field, $formatting);
         $isUpdate = empty($formatting['id']) ? 'new' : 'updated';
@@ -1546,25 +1547,24 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
   /**
    * @param array $params
-   * @param array $formatted
    * @param bool $isMainContact
    *
-   * @return array[]
+   * @return int|null
    * @throws \CRM_Core_Exception
    */
-  protected function processContact(array $params, array $formatted, bool $isMainContact): array {
-    $params['id'] = $formatted['id'] = $this->lookupContactID($params, $isMainContact);
-    if ($params['id'] && !empty($params['contact_sub_type'])) {
+  protected function processContact(array $params, bool $isMainContact): ?int {
+    $contactID = $this->lookupContactID($params, $isMainContact);
+    if ($contactID && !empty($params['contact_sub_type'])) {
       $contactSubType = Contact::get(FALSE)
-        ->addWhere('id', '=', $params['id'])
+        ->addWhere('id', '=', $contactID)
         ->addSelect('contact_sub_type')
         ->execute()
         ->first()['contact_sub_type'];
-      if (!empty($contactSubType) && $contactSubType[0] !== $params['contact_sub_type'] && !CRM_Contact_BAO_ContactType::isAllowEdit($params['id'], $contactSubType[0])) {
+      if (!empty($contactSubType) && $contactSubType[0] !== $params['contact_sub_type'] && !CRM_Contact_BAO_ContactType::isAllowEdit($contactID, $contactSubType[0])) {
         throw new CRM_Core_Exception('Mismatched contact SubTypes :', CRM_Import_Parser::NO_MATCH);
       }
     }
-    return [$formatted, $params];
+    return $contactID;
   }
 
   /**
