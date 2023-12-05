@@ -2632,13 +2632,12 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         return CRM_Case_BAO_Case::caseCount($contactId);
 
       case 'activity':
-        $input = [
-          'contact_id' => $contactId,
-          'admin' => FALSE,
-          'caseId' => NULL,
-          'context' => 'activity',
-        ];
-        return CRM_Activity_BAO_Activity::getActivitiesCount($input);
+        return \Civi\Api4\Activity::get(TRUE)
+          ->addJoin('ActivityContact AS activity_contact', 'INNER')
+          ->addWhere('activity_contact.contact_id', '=', $contactId)
+          ->addWhere('is_test', '=', FALSE)
+          ->execute()
+          ->count();
 
       case 'mailing':
         $params = ['contact_id' => $contactId];
