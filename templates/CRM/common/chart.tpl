@@ -7,10 +7,10 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<script src="{$config->resourceBase}/bower_components/d3/d3.min.js"></script>
+<script src="{$config->resourceBase}/vendor/mbostock/d3/d3.min.js"></script>
 <script src="{$config->resourceBase}/bower_components/crossfilter2/crossfilter.min.js"></script>
-<script src="{$config->resourceBase}/bower_components/dc-2.1.x/dc.min.js"></script>
-<style src="{$config->resourceBase}/bower_components/dc-2.1.x/dc.min.css"></style>
+<script src="{$config->resourceBase}/bower_components/dc.js/dc.min.js"></script>
+<style src="{$config->resourceBase}/bower_components/dc.js/dc.min.css"></style>
 {literal}
 <style>
   .dc-chart path.domain {

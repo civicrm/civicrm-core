@@ -6,7 +6,7 @@ return [
   'basePages' => [],
   'js' => [
     'ang/crmD3.js',
-    'bower_components/d3/d3.min.js',
+    'vendor/mbostock/d3/d3.min.js',
   ],
   'requires' => [],
 ];

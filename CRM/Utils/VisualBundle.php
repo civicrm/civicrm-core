@@ -37,9 +37,9 @@ class CRM_Utils_VisualBundle {
     }
 
     $files = [
-      'crossfilter' => '[civicrm.bower]/crossfilter-1.3.x/crossfilter.min.js',
-      'd3' => '[civicrm.bower]/d3-3.5.x/d3.min.js',
-      'dc' => '[civicrm.bower]/dc-2.1.x/dc.min.js',
+      'crossfilter' => '[civicrm.bower]/crossfilter2/crossfilter.min.js',
+      'd3' => '[civicrm.vendor]/mbostock/d3/d3.min.js',
+      'dc' => '[civicrm.bower]/dc.js/dc.min.js',
     ];
 
     $content = [];
