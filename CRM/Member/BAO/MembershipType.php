@@ -54,11 +54,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    * @return \CRM_Member_DAO_MembershipType
    * @throws \CRM_Core_Exception
    */
-  public static function add(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
+  public static function add($params) {
     $membershipTypeID = $params['id'] ?? NULL;
-    CRM_Utils_Hook::pre($hook, 'MembershipType', $membershipTypeID, $params);
-
     if (!$membershipTypeID && !isset($params['domain_id'])) {
       $params['domain_id'] = CRM_Core_Config::domainID();
     }
@@ -68,10 +65,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
     if ($membershipTypeID) {
       $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipTypeID, 'member_of_contact_id');
     }
-
-    $membershipType = new CRM_Member_DAO_MembershipType();
-    $membershipType->copyValues($params);
-    $membershipType->save();
+    $membershipType = self::writeRecord($params);
 
     if ($membershipTypeID) {
       // on update we may need to retrieve some details for the price field function - otherwise we get e-notices on attempts to retrieve
@@ -83,9 +77,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
     if ($membershipTypeID) {
       self::updateAllPriceFieldValue($membershipTypeID, $params);
     }
-
-    CRM_Utils_Hook::post($hook, 'MembershipType', $membershipType->id, $membershipType);
-
     self::flush();
     return $membershipType;
   }
