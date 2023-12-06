@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MembershipType;
+
 /**
  *
  * @package CRM
@@ -796,28 +798,13 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   public static function getAllMembershipTypes(): array {
     $cacheString = __CLASS__ . __FUNCTION__ . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
     if (!Civi::cache('metadata')->has($cacheString)) {
-      $types = civicrm_api3('MembershipType', 'get', ['options' => ['limit' => 0, 'sort' => 'weight']])['values'];
+      $types = (array) MembershipType::get(FALSE)->addOrderBy('weight')->execute()->indexBy('id');
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-      $keys = ['description', 'relationship_type_id', 'relationship_direction', 'max_related', 'auto_renew'];
-      // In order to avoid down-stream e-notices we undo api v3 filtering of NULL values. This is covered
-      // in Unit tests & ideally we might switch to apiv4 but I would argue we should build caching
-      // of metadata entities like this directly into apiv4.
       foreach ($types as $id => $type) {
-        foreach ($keys as $key) {
-          if (!isset($type[$key])) {
-            $types[$id][$key] = NULL;
-          }
-        }
-        if (isset($type['contribution_type_id'])) {
-          unset($types[$id]['contribution_type_id']);
-        }
         $types[$id]['tax_rate'] = (float) ($taxRates[$type['financial_type_id']] ?? 0.0);
         $multiplier = 1;
         if ($types[$id]['tax_rate'] !== 0.0) {
           $multiplier += ($types[$id]['tax_rate'] / 100);
-        }
-        if (!array_key_exists('minimum_fee', $types[$id])) {
-          $types[$id]['minimum_fee'] = 0;
         }
         $types[$id]['minimum_fee_with_tax'] = (float) $types[$id]['minimum_fee'] * $multiplier;
       }
