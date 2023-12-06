@@ -2219,6 +2219,12 @@ div.crm-master-accordion-header a.helpicon {
   border-radius: 4px 4px 0 0;
 }
 
+.crm-container summary {
+  display: list-item;
+  list-style: none;
+  cursor: pointer;
+}
+
 .crm-container .collapsed .crm-accordion-header {
   border-radius: 4px;
 }
@@ -2259,10 +2265,12 @@ div.crm-master-accordion-header a.helpicon {
 
 /* General icon settings for all collapsible things */
 .crm-container div.crm-accordion-header:before,
+.crm-container .collapsed .crm-accordion-header:before,
 .crm-container .crm-collapsible .collapsible-title:before,
 .crm-container span.collapsed:before,
 .crm-container a.collapsed:before,
-.crm-container .crm-expand-row:before {
+.crm-container .crm-expand-row:before,
+.crm-container details > summary:before {
   font-family: "FontAwesome";
   display: inline-block;
   width: 1em;
@@ -2270,21 +2278,13 @@ div.crm-master-accordion-header a.helpicon {
   font-size: 13px;
 }
 
-/* Collapsed icon */
-.crm-container .collapsed div.crm-accordion-header:before,
-.crm-container .crm-collapsible.collapsed .collapsible-title:before,
-.crm-container span.collapsed:before,
-.crm-container a.collapsed:before,
-.crm-container .crm-expand-row:before {
-  content: "\f0da";
-}
-
 /* Expanded icon */
 .crm-container div.crm-accordion-header:before,
 .crm-container .crm-collapsible .collapsible-title:before,
 .crm-container span.expanded:before,
 .crm-container a.expanded:before,
-.crm-container .crm-expand-row.expanded:before {
+.crm-container .crm-expand-row.expanded:before,
+.crm-container details[open] > summary:before  {
   font-family: "FontAwesome";
   content: "\f0d7";
 }
