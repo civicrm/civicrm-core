@@ -71,7 +71,7 @@ class SpecFormatter {
       $field->setLabel($data['html']['label'] ?? NULL);
       $field->setLocalizable($data['localizable'] ?? FALSE);
       if (!empty($data['DFKEntities'])) {
-        $field->setDfkEntities(array_values($data['DFKEntities']));
+        $field->setDfkEntities($data['DFKEntities']);
       }
       if (!empty($data['pseudoconstant'])) {
         // Do not load options if 'prefetch' is disabled

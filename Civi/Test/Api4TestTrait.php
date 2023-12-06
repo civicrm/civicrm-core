@@ -246,7 +246,7 @@ trait Api4TestTrait {
       return $this->getFkID($field['fk_entity']);
     }
     if (!empty($field['dfk_entities'])) {
-      return $this->getFkID($field['dfk_entities'][0]);
+      return $this->getFkID(reset($field['dfk_entities']));
     }
     if (isset($field['default_value'])) {
       return $field['default_value'];
