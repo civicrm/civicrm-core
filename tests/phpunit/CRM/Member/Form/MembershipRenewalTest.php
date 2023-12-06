@@ -95,7 +95,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'fixed_period_start_day' => '101',
       'fixed_period_rollover_day' => '1231',
       'relationship_type_id' => 20,
-      'min_fee' => 100,
+      'minimum_fee' => 100,
       'financial_type_id' => $this->financialTypeID,
       'max_related' => 10,
     ])['id'];
@@ -357,6 +357,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'duration_unit' => 'month',
       'duration_interval' => 1,
       'auto_renew' => 1,
+      'minimum_fee' => 10,
     ]);
     $this->createLoggedInUser();
     $form = $this->getForm(array_merge($this->getBaseSubmitParams(), ['is_recur' => 1, 'auto_renew' => '1']));
