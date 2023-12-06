@@ -12,7 +12,7 @@
     {include file="CRM/Admin/Form/Extensions.tpl"}
 {else}
   <div class="crm-content-block crm-block">
-    {if $action ne 1 and $action ne 2}a
+    {if $action ne 1 and $action ne 2}
         {include file="CRM/Admin/Page/Extensions/Refresh.tpl"}
     {/if}
 
