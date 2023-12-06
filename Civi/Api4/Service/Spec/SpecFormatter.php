@@ -320,9 +320,12 @@ class SpecFormatter {
       $inputAttrs['maxlength'] = (int) $data['maxlength'];
     }
     if ($inputType == 'TextArea') {
-      foreach (['rows', 'cols', 'note_rows', 'note_cols'] as $prop) {
+      foreach (['rows', 'cols', 'note_rows', 'note_columns'] as $prop) {
         if (!empty($data[$prop])) {
-          $inputAttrs[str_replace('note_', '', $prop)] = (int) $data[$prop];
+          $key = str_replace('note_', '', $prop);
+          // per @colemanw https://github.com/civicrm/civicrm-core/pull/28388#issuecomment-1835717428
+          $key = str_replace('columns', 'cols', $key);
+          $inputAttrs[$key] = (int) $data[$prop];
         }
       }
     }

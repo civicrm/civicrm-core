@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types = 1);
 use Civi\Api4\Address;
 use Civi\Api4\Event;
 use Civi\Api4\LineItem;
@@ -306,8 +307,7 @@ United States<br />',
       'is_default' => 1,
     ]);
     $oldMsg = $result['values'][0]['msg_html'];
-    $pos = strpos($oldMsg, 'Please print this confirmation');
-    $newMsg = substr_replace($oldMsg, '<p>Test event type - {event.event_type_id}</p>', $pos, 0);
+    $newMsg = substr_replace($oldMsg, '<p>Test event type - {event.event_type_id}</p>', 0, 0);
     $this->callAPISuccess('MessageTemplate', 'create', [
       'id' => $result['id'],
       'msg_html' => $newMsg,
@@ -393,6 +393,7 @@ London,',
       $event = $this->eventCreateUnpaid($eventParams);
     }
     $submittedValues['event_id'] = $event['id'];
+    $submittedValues['receipt_text'] = 'Contact the Development Department if you need to make any changes to your registration.';
     return $this->getTestForm('CRM_Event_Form_Participant', $submittedValues, ['cid' => $submittedValues['contact_id']])->processForm(FormWrapper::BUILT);
   }
 

@@ -3443,9 +3443,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'membership_id' => $this->getMembershipID(),
     ]);
     $this->assertEquals(4, $logs['count']);
-    //Assert only three activities are created.
+    //Assert activities are created.
     $activityNames = (array) ActivityContact::get(FALSE)
-      ->addWhere('contact_id', '=', $this->_ids['contact'])
+      ->addWhere('contact_id', '=', $membership['contact_id'])
       ->addSelect('activity_id.activity_type_id:name')->execute()->indexBy('activity_id.activity_type_id:name');
     $this->assertArrayHasKey('Contribution', $activityNames);
     $this->assertArrayHasKey('Membership Signup', $activityNames);
@@ -3458,7 +3458,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testPendingToCompleteContribution(): void {
     $this->createPriceSetWithPage('membership');
-    $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
+    $this->setUpPendingContribution($this->_ids['price_field_value'][0], 'new');
     $this->callAPISuccess('membership', 'getsingle', ['id' => $this->_ids['membership']]);
     // Case 1: Assert that Membership Signup Activity is created on Pending to Completed Contribution via backoffice
     $activity = $this->callAPISuccess('Activity', 'get', [
@@ -3575,11 +3575,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d', strtotime('yesterday + 5 years')), $membership['end_date']);
   }
 
-  public function cleanUpAfterPriceSets(): void {
-    $this->quickCleanUpFinancialEntities();
-    $this->contactDelete($this->_ids['contact']);
-  }
-
   /**
    * Set up a pending transaction with a specific price field id.
    *
@@ -3590,7 +3585,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param array $membershipParams
    */
   public function setUpPendingContribution(int $priceFieldValueID, string $key = 'first', array $contributionParams = [], array $lineParams = [], array $membershipParams = []): void {
-    $contactID = $this->individualCreate();
+    $contactID = $this->ids['Contact']['individual_0'] ?? $this->individualCreate();
     $membershipParams = array_merge([
       'contact_id' => $contactID,
       'membership_type_id' => $this->_ids['membership_type'],
@@ -3629,8 +3624,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ],
     ], $contributionParams));
 
-    $this->_ids['contact'] = $contactID;
-    $this->ids['contribution'][$key] = $contribution['id'];
+    $this->ids['Contribution'][$key] = $contribution['id'];
     $this->_ids['membership'] = $this->callAPISuccessGetValue('MembershipPayment', ['return' => 'membership_id', 'contribution_id' => $contribution['id']]);
   }
 
@@ -5113,7 +5107,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @return int
    */
   protected function getContributionID(string $key = 'first'): int {
-    return (int) $this->ids['contribution'][$key];
+    if (count($this->ids['Contribution']) === 1) {
+      return reset($this->ids['Contribution']);
+    }
+    return (int) $this->ids['Contribution'][$key];
   }
 
   /**

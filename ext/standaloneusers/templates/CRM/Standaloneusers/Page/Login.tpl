@@ -2,7 +2,13 @@
     <div class="message info" style="display:none;" id="loggedOutNotice">{ts}You have been logged out.{/ts}</div>
     <div class="message warning" style="display:none;" id="anonAccessDenied">{ts}You may need to login to access that.{/ts}</div>
     <form>
-      <div>
+      {if $justLoggedOut}
+      <div class="help message info" >{ts}You have been logged out.{/ts}</div>
+      {/if}
+      {if $anonAccessDenied}
+      <div class="help message warning" >{ts}You do not have permission to access that, you may need to login.{/ts}</div>
+      {/if}
+      <div class="input-wrapper">
         <label for="usernameInput" name=username class="form-label">Username</label>
         <input type="text" class="form-control" id="usernameInput" >
       </div>
@@ -12,8 +18,8 @@
       </div>
       <div id="error" style="display:none;" class="form-alert">Your username and password do not match</div>
       <div class="flex">
-      <a href="{$forgottenPasswordURL}">Forgotten password?</a>
-      <button id="loginSubmit" type="submit" class="btn btn-secondary crm-button">Submit</button>
+        <a href="{$forgottenPasswordURL}">Forgotten password?</a>
+        <button id="loginSubmit" type="submit" class="btn btn-secondary crm-button">Submit</button>
       </div>
     </form>
   {include file='CRM/Standaloneusers/Page/_contentFoot.tpl'}
@@ -23,17 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const submitBtn = document.getElementById('loginSubmit'),
         username = document.getElementById('usernameInput'),
-        password = document.getElementById('passwordInput'),
-        loggedOutNotice = document.getElementById('loggedOutNotice');
+        password = document.getElementById('passwordInput');
 
-  // Special messages.
-  if (window.location.search === '?justLoggedOut') {
-    loggedOutNotice.style.display = '';
-    console.log("successful logout");
-  }
-  else if (window.location.search === '?anonAccessDenied') {
-    anonAccessDenied.style.display = '';
-  }
 
   submitBtn.addEventListener('click', async e => {
     e.preventDefault();

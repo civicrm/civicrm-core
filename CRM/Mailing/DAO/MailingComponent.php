@@ -37,8 +37,9 @@ class CRM_Mailing_DAO_MailingComponent extends CRM_Core_DAO {
    * @var string[]
    */
   protected static $_paths = [
-    'add' => 'civicrm/admin/component?action=add&reset=1',
-    'update' => 'civicrm/admin/component?action=update&id=[id]&reset=1',
+    'add' => 'civicrm/admin/component/edit?action=add&reset=1',
+    'update' => 'civicrm/admin/component/edit?action=update&id=[id]&reset=1',
+    'browse' => 'civicrm/admin/component?action=browse&id=[id]&reset=1',
   ];
 
   /**

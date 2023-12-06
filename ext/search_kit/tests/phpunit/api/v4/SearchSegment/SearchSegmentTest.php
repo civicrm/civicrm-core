@@ -6,6 +6,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\Individual;
 use Civi\Api4\Relationship;
 use Civi\Api4\SearchSegment;
 use Civi\Test\HeadlessInterface;
@@ -245,7 +246,7 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ['birth_date' => 'now - 33 year - 1 month'],
       [],
     ];
-    Contact::save(FALSE)
+    Individual::save(FALSE)
       ->setRecords($sampleData)
       ->addChain('rel', Relationship::create()
         ->addValue('relationship_type_id', 1)
@@ -273,6 +274,11 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
         ],
       ])
       ->execute();
+
+    $field = Individual::getFields(FALSE)
+      ->addWhere('name', '=', 'segment_Age_Range')
+      ->execute()->single();
+    $this->assertEquals('Age Range', $field['label']);
 
     $params = [
       'checkPermissions' => FALSE,

@@ -926,7 +926,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_params = $this->prepareParamsForPaymentProcessor($this->_params);
       $this->_params['amount'] = $params['fee_amount'];
       $this->_params['amount_level'] = $params['amount_level'];
-      $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
 
       // at this point we've created a contact and stored its address etc
       // all the payment processors expect the name and address to be in the
@@ -950,6 +949,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $paymentParams['fee_amount'] = NULL;
       $paymentParams['description'] = $this->getSourceText();
       try {
+        $paymentParams['invoiceID'] = $this->getInvoiceID();
         $result = $payment->doPayment($paymentParams);
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
@@ -1259,7 +1259,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       CRM_Event_BAO_Event::retrieve($params, $event);
 
       //retrieve custom information
-      $form->_values = [];
+      $this->_values = [];
+      $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'participant');
       CRM_Event_Form_Registration::initEventFee($form, FALSE, $this->getPriceSetID());
       if ($form->_context === 'standalone' || $form->_context === 'participant') {
         $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($event['id'], 'civicrm_event');
@@ -1520,7 +1521,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'total_amount' => $params['amount'],
       'tax_amount' => $params['tax_amount'],
       'amount_level' => $params['amount_level'],
-      'invoice_id' => $params['invoiceID'],
+      'invoice_id' => $this->getInvoiceID(),
       'currency' => $this->getCurrency(),
       'source' => $this->getSourceText(),
       'is_pay_later' => FALSE,
@@ -1837,6 +1838,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         'PDFFilename' => ts('confirmation') . '.pdf',
         'modelProps' => [
           'participantID' => $participantID,
+          'userEnteredText' => $this->getSubmittedValue('receipt_text'),
           'eventID' => $params['event_id'],
           'contributionID' => $contributionID,
         ],
@@ -1990,6 +1992,16 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       1 => CRM_Core_Session::singleton()->getLoggedInContactDisplayName(),
       2 => $this->getEventValue('title'),
     ]), $maxLength);
+  }
+
+  /**
+   * @return string
+   */
+  public function getInvoiceID(): string {
+    if (!$this->invoiceID) {
+      $this->invoiceID = md5(uniqid(rand(), TRUE));
+    }
+    return $this->invoiceID;
   }
 
 }

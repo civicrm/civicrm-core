@@ -16,23 +16,19 @@
  */
 
 /**
- * This class generates form components for processing a Grant
- *
+ * Not a real form: displays a grant in view mode.
+ * Fixme: Just use a frozen form instead of this ballyhoo
  */
 class CRM_Grant_Form_GrantView extends CRM_Core_Form {
 
   /**
-   * Set variables up before form is built.
-   *
    * @return void
    */
   public function preProcess() {
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
-    $this->assign('context', $context);
-
+    $params = [
+      'id' => CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE),
+    ];
     $values = [];
-    $params['id'] = $this->_id;
     CRM_Grant_BAO_Grant::retrieve($params, $values);
     $grantType = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id');
     $grantStatus = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id');
@@ -56,17 +52,14 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
     $displayName = CRM_Contact_BAO_Contact::displayName($values['contact_id']);
     $this->assign('displayName', $displayName);
 
-    if (isset($this->_id)) {
-      $noteDAO = new CRM_Core_BAO_Note();
-      $noteDAO->entity_table = 'civicrm_grant';
-      $noteDAO->entity_id = $this->_id;
-      if ($noteDAO->find(TRUE)) {
-        $this->_noteId = $noteDAO->id;
-      }
+    $noteDAO = new CRM_Core_BAO_Note();
+    $noteDAO->entity_table = 'civicrm_grant';
+    $noteDAO->entity_id = $values['id'];
+    if ($noteDAO->find(TRUE)) {
+      $this->assign('note', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $noteDAO->id, 'note'));
     }
-
-    if (isset($this->_noteId)) {
-      $this->assign('note', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $this->_noteId, 'note'));
+    else {
+      $this->assign('note', '');
     }
 
     // add Grant to Recent Items
@@ -96,15 +89,14 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
       $recentOther
     );
 
-    $attachment = CRM_Core_BAO_File::attachmentInfo('civicrm_grant', $this->_id);
+    $attachment = CRM_Core_BAO_File::attachmentInfo('civicrm_grant', $values['id']);
     $this->assign('attachment', $attachment);
 
-    $grantType = CRM_Core_DAO::getFieldValue("CRM_Grant_DAO_Grant", $this->_id, "grant_type_id");
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree("Grant", NULL, $this->_id, 0, $grantType, NULL,
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree("Grant", NULL, $values['id'], 0, $values['grant_type_id'], NULL,
       TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->_id);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $values['id']);
 
-    $this->assign('id', $this->_id);
+    $this->assign('id', $values['id']);
 
     $this->setPageTitle(ts('Grant'));
   }
@@ -115,14 +107,6 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    $this->addButtons([
-      [
-        'type' => 'cancel',
-        'name' => ts('Done'),
-        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        'isDefault' => TRUE,
-      ],
-    ]);
   }
 
 }

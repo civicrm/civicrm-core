@@ -9,7 +9,9 @@
   <log>true</log>
   <title>Date Preference</title>
   <paths>
-    <update>civicrm/admin/setting/preferences/date?reset=1&amp;action=update&amp;id=[id]</update>
+    <add>civicrm/admin/setting/preferences/date/edit?reset=1&amp;action=add</add>
+    <browse>civicrm/admin/setting/preferences/date?reset=1</browse>
+    <update>civicrm/admin/setting/preferences/date/edit?reset=1&amp;action=update&amp;id=[id]</update>
   </paths>
   <field>
     <name>id</name>

@@ -427,6 +427,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'tplParams' => $tplParams,
         'PDFFilename' => $pdfFileName,
         'tokenContext' => ['contributionId' => $contribution->id, 'contactId' => $contribution->contact_id],
+        'modelProps' => [
+          'userEnteredText' => $params['email_comment'] ?? NULL,
+        ],
       ];
 
       // from email address
@@ -495,10 +498,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $fileName = self::putFile($html, $pdfFileName, $pdfFormat);
         self::addActivities($subject, $contribution->contact_id, $fileName, $params, $contribution->id);
       }
-      elseif ($component == 'event') {
+      elseif ($component === 'event') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
 
-        $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => $params['email_comment']]);
+        $sendTemplateParams['tplParams'] = $tplParams;
         $sendTemplateParams['from'] = $fromEmailAddress;
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = $values['cc_confirm'] ?? NULL;

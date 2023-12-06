@@ -86,44 +86,45 @@ class PathUrlTest extends \CiviEndToEndTestCase {
     $this->assertUrlContentRegex(';crm-section event_date_time-section;', \Civi::url('frontend://civicrm/event/info?id=1', 'a'));
 
     // Check for well-formedness of some URLs
-    $urlPats = [];
+    $urlPatterns = [];
     switch (CIVICRM_UF) {
       case 'Drupal':
       case 'Drupal8':
       case 'Backdrop':
-        $urlPats[] = [';/civicrm/event/info\?reset=1&id=9;', \Civi::url('frontend://civicrm/event/info?reset=1')->addQuery('id=9')];
-        $urlPats[] = [';/civicrm/admin\?reset=1;', \Civi::url('backend://civicrm/admin')->addQuery(['reset' => 1])];
+      case 'Standalone':
+        $urlPatterns[] = [';/civicrm/event/info\?reset=1&id=9;', \Civi::url('frontend://civicrm/event/info?reset=1')->addQuery('id=9')];
+        $urlPatterns[] = [';/civicrm/admin\?reset=1;', \Civi::url('backend://civicrm/admin')->addQuery(['reset' => 1])];
         break;
 
       case 'WordPress':
-        $urlPats[] = [';civiwp=CiviCRM.*civicrm.*event.*info.*reset=1&id=9;', \Civi::url('frontend://civicrm/event/info?reset=1')->addQuery('id=9')];
-        $urlPats[] = [';/wp-admin.*civicrm.*admin.*reset=1;', \Civi::url('backend://civicrm/admin?reset=1')];
+        $urlPatterns[] = [';civiwp=CiviCRM.*civicrm.*event.*info.*reset=1&id=9;', \Civi::url('frontend://civicrm/event/info?reset=1')->addQuery('id=9')];
+        $urlPatterns[] = [';/wp-admin.*civicrm.*admin.*reset=1;', \Civi::url('backend://civicrm/admin?reset=1')];
         break;
 
       case 'Joomla':
-        $urlPats[] = [';/index.php\?.*task=civicrm/event/info&reset=1&id=9;', \Civi::url('frontend://civicrm/event/inof?reset=1')->addQuery('id=9')];
-        $urlPats[] = [';/administrator/.*task=civicrm/admin/reset=1;', \Civi::url('backend://civicrm/admin')->addQuery('reset=1')];
+        $urlPatterns[] = [';/index.php\?.*task=civicrm/event/info&reset=1&id=9;', \Civi::url('frontend://civicrm/event/info?reset=1')->addQuery('id=9')];
+        $urlPatterns[] = [';/administrator/.*task=civicrm/admin/reset=1;', \Civi::url('backend://civicrm/admin')->addQuery('reset=1')];
         break;
 
       default:
         $this->fail('Unrecognized UF: ' . CIVICRM_UF);
     }
 
-    $urlPats[] = [';^https?://.*civicrm;', \Civi::url('frontend://civicrm/event/info?reset=1', 'a')];
-    $urlPats[] = [';^https://.*civicrm;', \Civi::url('frontend://civicrm/event/info?reset=1', 'as')];
-    $urlPats[] = [';civicrm(/|%2F)a(/|%2F).*#/mailing/new\?angularDebug=1;', \Civi::url('backend://civicrm/a/#/mailing/new?angularDebug=1')];
-    $urlPats[] = [';/jquery.timeentry.js\?r=.*#foo;', \Civi::url('asset://[civicrm.packages]/jquery/plugins/jquery.timeentry.js', 'c')->addFragment('foo')];
-    $urlPats[] = [';/stuff.js\?r=.*#foo;', \Civi::url('ext://org.civicrm.search_kit/stuff.js', 'c')->addFragment('foo')];
-    $urlPats[] = [';#foo;', \Civi::url('assetBuilder://crm-l10n.js?locale=en_US')->addFragment('foo')];
+    $urlPatterns[] = [';^https?://.*civicrm;', \Civi::url('frontend://civicrm/event/info?reset=1', 'a')];
+    $urlPatterns[] = [';^https://.*civicrm;', \Civi::url('frontend://civicrm/event/info?reset=1', 'as')];
+    $urlPatterns[] = [';civicrm(/|%2F)a(/|%2F).*#/mailing/new\?angularDebug=1;', \Civi::url('backend://civicrm/a/#/mailing/new?angularDebug=1')];
+    $urlPatterns[] = [';/jquery.timeentry.js\?r=.*#foo;', \Civi::url('asset://[civicrm.packages]/jquery/plugins/jquery.timeentry.js', 'c')->addFragment('foo')];
+    $urlPatterns[] = [';/stuff.js\?r=.*#foo;', \Civi::url('ext://org.civicrm.search_kit/stuff.js', 'c')->addFragment('foo')];
+    $urlPatterns[] = [';#foo;', \Civi::url('assetBuilder://crm-l10n.js?locale=en_US')->addFragment('foo')];
 
     // Some test-harnesses have HTTP_HOST. Some don't. It's pre-req for truly relative URLs.
     if (!empty($_SERVER['HTTP_HOST'])) {
-      $urlPats[] = [';^/.*civicrm.*ajax.*api4.*Contact.*get;', \Civi::url('backend://civicrm/ajax/api4/Contact/get', 'r')];
+      $urlPatterns[] = [';^/.*civicrm.*ajax.*api4.*Contact.*get;', \Civi::url('backend://civicrm/ajax/api4/Contact/get', 'r')];
     }
 
-    $this->assertNotEmpty($urlPats);
-    foreach ($urlPats as $urlPat) {
-      $this->assertRegExp($urlPat[0], $urlPat[1]);
+    $this->assertNotEmpty($urlPatterns);
+    foreach ($urlPatterns as $urlPattern) {
+      $this->assertRegExp($urlPattern[0], $urlPattern[1]);
     }
   }
 

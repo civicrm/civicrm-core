@@ -1512,13 +1512,14 @@ abstract class CRM_Core_Payment {
   /**
    * Refunds payment
    *
-   * Payment processors should set payment_status_id if it set the status to Refunded in case the transaction is successful
-   *
    * @param array $params
    *
-   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   * @return array
+   *   Result array (containing at least the key refund_status)
    */
-  public function doRefund(&$params) {}
+  public function doRefund(&$params) {
+    return ['refund_status' => 'Completed'];
+  }
 
   /**
    * Query payment processor for details about a transaction.
