@@ -2215,6 +2215,9 @@ div.crm-master-accordion-header a.helpicon {
   display: list-item;
   list-style: none;
   cursor: pointer;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  font-weight: bold;
 }
 
 .crm-container .crm-accordion-header,
@@ -2234,12 +2237,16 @@ div.crm-master-accordion-header a.helpicon {
   border-radius: 4px 4px 0 0;
 }
 
-.crm-container .crm-accordion-header.active {
+.crm-container .crm-accordion-header.active,
+.crm-container .crm-accordion-bold > summary.active {
   font-weight: bold;
   background-color: #3e3e3e;
 }
 
-.crm-container .crm-accordion-header:hover {
+.crm-container .crm-accordion-header:hover,
+.crm-container .crm-accordion-header:focus,
+.crm-container .crm-accordion-bold > summary:hover,
+.crm-container .crm-accordion-bold > summary:focus {
   background-color: #2f2f2e;
 }
 
