@@ -2211,7 +2211,7 @@ div.crm-master-accordion-header a.helpicon {
   color: #3e3e3e;
 }
 
-.crm-container summary {
+.crm-container summary { /* default summary setting*/
   display: list-item;
   list-style: none;
   cursor: pointer;
@@ -2223,7 +2223,7 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container .crm-accordion-header,
 .crm-container .collapsed .crm-accordion-header,
 .crm-container .crm-accordion-bold > summary,
-.crm-container details > .crm-accordion-header {
+.crm-container details > .crm-accordion-header { /* applies civi's default accordion header to summary & .crm-accrdion-bold */
   color: #f5f6f1;
   font-weight: normal;
   padding: 4px 8px;
@@ -2233,12 +2233,12 @@ div.crm-master-accordion-header a.helpicon {
 
 .crm-container div.crm-accordion-header,
 .crm-container details[open] > .crm-accordion-header,
-.crm-container .crm-accordion-bold[open] > summary {
-  border-radius: 4px 4px 0 0;
+.crm-container .crm-accordion-bold[open] > summary { /* open version of that */
+  border-radius: 4px 4px 0 0; 
 }
 
 .crm-container .crm-accordion-header.active,
-.crm-container .crm-accordion-bold > summary.active {
+.crm-container .crm-accordion-bold > summary.active { /* active version of that */
   font-weight: bold;
   background-color: #3e3e3e;
 }
@@ -2246,7 +2246,7 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container .crm-accordion-header:hover,
 .crm-container .crm-accordion-header:focus,
 .crm-container .crm-accordion-bold > summary:hover,
-.crm-container .crm-accordion-bold > summary:focus {
+.crm-container .crm-accordion-bold > summary:focus { /* hover version of that */
   background-color: #2f2f2e;
 }
 
@@ -2254,17 +2254,20 @@ div.crm-master-accordion-header a.helpicon {
   background-color: #e8e8de;
 }
 
-.crm-container .crm-accordion-wrapper .crm-master-accordion-header {
+.crm-container .crm-accordion-wrapper .crm-master-accordion-header,
+.crm-container .crm-accordion-light > summary { /* adds a utility class to match civi's transparent accordion header style */
   background-color: transparent;
+  font-weight: normal;
   color: #3e3e3e;
-}
-
-.crm-container .crm-accordion-wrapper .crm-master-accordion-header {
-  font-size: 16px;
+  font-size: 1rem;
 }
 
 .crm-container .crm-master-accordion-header.crm-accordion-header:hover,
-.crm-container .crm-collapsible .collapsible-title:hover {
+.crm-container .crm-accordion-light > summary:hover,
+.crm-container .crm-collapsible .collapsible-title:hover,
+.crm-container .crm-master-accordion-header.crm-accordion-header:focus,
+.crm-container .crm-accordion-light > summary:focus,
+.crm-container .crm-collapsible .collapsible-title:focus { /* hover state for this */
   color: #121a2d;
 }
 
