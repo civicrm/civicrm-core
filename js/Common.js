@@ -1730,10 +1730,10 @@ if (!CRM.vars) CRM.vars = {};
     $(this).each(function () {
       var action = 'open';
       if ($(this).hasClass('collapsed')) {
-        $('.crm-accordion-body', this).first().css('display', 'none').slideDown(speed);
+        $('div.crm-accordion-wrapper > .crm-accordion-body', this).first().css('display', 'none').slideDown(speed);
       }
       else {
-        $('.crm-accordion-body', this).first().css('display', 'block').slideUp(speed);
+        $('div.crm-accordion-wrapper > .crm-accordion-body', this).first().css('display', 'block').slideUp(speed);
         action = 'close';
       }
       $(this).toggleClass('collapsed').trigger('crmAccordion:' + action);
