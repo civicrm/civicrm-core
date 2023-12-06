@@ -525,6 +525,12 @@ London, 90210
     $tokenData = $this->getOldContactTokens();
     $address = $this->setupContactFromTokeData($tokenData);
     $advertisedTokens = CRM_Core_SelectValues::contactTokens();
+
+    // let's unset specical afform submission tokens which are kind of related to contact
+    // but not exactly as contact is not yet created
+    unset($advertisedTokens['{afformSubmission.validateSubmissionUrl}']);
+    unset($advertisedTokens['{afformSubmission.validateSubmissionLink}']);
+
     $this->assertEquals($this->getAdvertisedTokens(), $advertisedTokens);
 
     CRM_Core_Smarty::singleton()->assign('pre_assigned_smarty', 'woo');
