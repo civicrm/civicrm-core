@@ -82,6 +82,11 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           'type' => CRM_Utils_Type::T_STRING,
           'operator' => 'like',
         ],
+        'is_archived' => [
+          'name' => 'is_archived',
+          'title' => ts('Is archived?'),
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+        ],
       ],
       'order_bys' => [
         'mailing_name' => [
