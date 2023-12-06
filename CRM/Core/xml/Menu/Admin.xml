@@ -333,6 +333,11 @@
      <weight>60</weight>
   </item>
   <item>
+     <path>civicrm/admin/labelFormats/edit</path>
+     <title>Label Page Formats</title>
+     <page_callback>CRM_Admin_Page_LabelFormats</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/pdfFormats</path>
      <title>Print Page (PDF) Formats</title>
      <desc>Configure PDF Page Formats that can be assigned to Message Templates when creating PDF letters.</desc>

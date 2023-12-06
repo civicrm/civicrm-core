@@ -51,19 +51,19 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
       self::$_links = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/labelFormats',
+          'url' => 'civicrm/admin/labelFormats/edit',
           'qs' => 'action=update&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Edit Label Format'),
         ],
         CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
-          'url' => 'civicrm/admin/labelFormats',
+          'url' => 'civicrm/admin/labelFormats/edit',
           'qs' => 'action=copy&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Copy Label Format'),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/labelFormats',
+          'url' => 'civicrm/admin/labelFormats/edit',
           'qs' => 'action=delete&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Delete Label Format'),
         ],
