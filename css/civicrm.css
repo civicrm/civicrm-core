@@ -2273,7 +2273,7 @@ div.crm-master-accordion-header a.helpicon {
   color: #121a2d;
 }
 
-.crm-container .collapsed .crm-accordion-body,
+.crm-container div.collapsed .crm-accordion-body,
 .crm-container .crm-collapsible.collapsed .collapsible-title + * {
   display: none;
 }
