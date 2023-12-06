@@ -1,12 +1,12 @@
 <?php
-use CRM_CivicrmSearchUi_ExtensionUtil as E;
+use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
   'type' => 'search',
   'title' => E::ts('Label Formats'),
   'description' => E::ts('Label Formats'),
   'icon' => 'fa-list-alt',
-  'server_route' => 'civicrm/searchkit_ui/admin/labelFormats',
+  'server_route' => 'civicrm/admin/labelFormats',
   'permission' => [
     'administer CiviCRM',
   ],

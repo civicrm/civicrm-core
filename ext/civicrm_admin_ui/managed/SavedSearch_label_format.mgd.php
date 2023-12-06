@@ -1,5 +1,5 @@
 <?php
-use CRM_CivicrmSearchUi_ExtensionUtil as E;
+use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
   [
@@ -11,7 +11,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'label_format',
-        'label' => E::ts('label format'),
+        'label' => E::ts('Label Format'),
         'api_entity' => 'OptionGroup',
         'api_params' => [
           'version' => 4,
@@ -19,7 +19,7 @@ return [
             'OptionGroup_OptionValue_option_group_id_01.label',
             'title',
             'description',
-            'is_reserved',
+            'OptionGroup_OptionValue_option_group_id_01.is_reserved',
             'OptionGroup_OptionValue_option_group_id_01.grouping',
             'OptionGroup_OptionValue_option_group_id_01.is_default',
           ],
@@ -63,7 +63,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'label_format_Table_1',
-        'label' => E::ts('label format Table 1'),
+        'label' => E::ts('Label Format Table 1'),
         'saved_search_id.name' => 'label_format',
         'type' => 'table',
         'settings' => [
@@ -119,7 +119,7 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'is_reserved',
+              'key' => 'OptionGroup_OptionValue_option_group_id_01.is_reserved',
               'dataType' => 'Boolean',
               'label' => E::ts('Reserved'),
               'sortable' => TRUE,
@@ -153,6 +153,22 @@ return [
                   'action' => '',
                   'join' => '',
                   'target' => 'crm-popup',
+                ],
+                [
+                  'entity' => 'OptionValue',
+                  'action' => 'delete',
+                  'join' => 'OptionGroup_OptionValue_option_group_id_01',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-trash',
+                  'text' => E::ts('Delete'),
+                  'style' => 'danger',
+                  'path' => '',
+                  'task' => '',
+                  'condition' => [
+                    'OptionGroup_OptionValue_option_group_id_01.is_reserved',
+                    '=',
+                    FALSE,
+                  ],
                 ],
               ],
               'type' => 'menu',
