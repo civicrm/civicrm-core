@@ -1458,28 +1458,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       $params['group_type'] = implode(',', $params['group_type']);
     }
 
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'UFGroup', ($params['id'] ?? NULL), $params);
-
-    $ufGroup = new CRM_Core_DAO_UFGroup();
-    $ufGroup->copyValues($params);
-
-    $ufGroupID = CRM_Utils_Array::value('ufgroup', $ids, CRM_Utils_Array::value('id', $params));
-    if (!$ufGroupID && empty($params['name'])) {
-      $ufGroup->name = CRM_Utils_String::munge($ufGroup->title, '_', 56);
-    }
-    $ufGroup->id = $ufGroupID;
-
-    $ufGroup->save();
-
-    if (!$ufGroupID && empty($params['name'])) {
-      $ufGroup->name = $ufGroup->name . "_{$ufGroup->id}";
-      $ufGroup->save();
-    }
-
-    CRM_Utils_Hook::post($hook, 'UFGroup', $ufGroup->id, $ufGroup);
-
-    return $ufGroup;
+    return self::writeRecord($params);
   }
 
   /**
