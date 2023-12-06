@@ -21,7 +21,7 @@ SELECT @priceSetId := max(id) FROM `civicrm_price_set` WHERE name = 'help_suppor
 
 INSERT INTO `civicrm_price_field` (`price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `visibility_id`)
 VALUES ( @priceSetId, 'contribution_amount', 'Contribution Amount', 'Radio', 0, 2, 1, 1, 1, 0, 1),
-( @priceSetId, 'other_amount', 'Other Amount', 'Text', 0, 3, 0, 1, 1, 0, 1);
+( @priceSetId, 'other_amount', 'Additional Amount', 'Text', 0, 3, 0, 1, 1, 0, 1);
 
 INSERT INTO `civicrm_price_set_entity` (`entity_table`,`entity_id`,`price_set_id`)
          VALUES ('civicrm_contribution_page', 1, @priceSetId);
@@ -75,8 +75,7 @@ VALUES
 
 INSERT INTO civicrm_pledge_block ( entity_table, entity_id, pledge_frequency_unit, is_pledge_interval, max_reminders, initial_reminder_day, additional_reminder_day)
 VALUES
-    ('civicrm_contribution_page', 3, 'weekmonthyear', 1, 1, 5, 5),
-    ('civicrm_contribution_page', 1, 'weekmonthyear', 0, 2, 5, 5);
+    ('civicrm_contribution_page', 3, 'weekmonthyear', 1, 1, 5, 5);
 
 INSERT INTO civicrm_premiums
     VALUES (1, 'civicrm_contribution_page', 1, 1, 'Thank-you Gifts', 'We appreciate your support and invite you to choose from the exciting collection of thank-you gifts below. Minimum contribution amounts for each selection are included in the descriptions. (NOTE: These gifts are shown as examples only. No gifts will be sent to donors.)', 'premiums@example.org', NULL, 1, 'No thank-you', 1);
