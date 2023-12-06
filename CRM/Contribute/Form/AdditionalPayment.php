@@ -313,25 +313,28 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->_params = $submittedValues;
     $this->beginPostProcess();
     $this->processBillingAddress($this->_contactID, (string) $this->_contributorEmail);
-    $participantId = NULL;
-    if ($this->_component === 'event') {
-      $participantId = $this->_id;
-    }
-
+    $paymentResult = [];
     if ($this->_mode) {
       // process credit card
-      $this->processCreditCard();
+      $paymentResult = $this->processCreditCard();
     }
 
-    // @todo we should clean $ on the form & pass in skipCleanMoney
-    $trxnsData = $this->_params;
-    if ($this->isARefund()) {
-      $trxnsData['total_amount'] = -$trxnsData['total_amount'];
-    }
-    $trxnsData['participant_id'] = $participantId;
-    $trxnsData['contribution_id'] = $this->_contributionId;
-    // From the
-    $trxnsData['is_send_contribution_notification'] = FALSE;
+    $totalAmount = $this->getSubmittedValue('total_amount');
+    $trxnsData = [
+      'total_amount' => $this->isARefund() ? -$totalAmount : $totalAmount,
+      'check_number' => $this->getSubmittedValue('check_number'),
+      'fee_amount' => $paymentResult['fee_amount'] ?? 0,
+      'contribution_id' => $this->getContributionID(),
+      'payment_processor_id' => $this->getPaymentProcessorID(),
+      'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type')),
+      'pan_truncation' => substr((string) $this->getSubmittedValue('credit_card_number'), -4),
+      'trxn_result_code' => $paymentResult['trxn_result_code'] ?? NULL,
+      'payment_instrument_id' => $this->getSubmittedValue('payment_instrument_id'),
+      'trxn_id' => $paymentResult['trxn_id'] ?? NULL,
+      'trxn_date' => $this->getSubmittedValue('trxn_date'),
+      // This form sends payment notification only, for historical reasons.
+      'is_send_contribution_notification' => FALSE,
+    ];
     $paymentID = civicrm_api3('Payment', 'create', $trxnsData)['id'];
 
     if ($this->getContributionID() && CRM_Core_Permission::access('CiviMember')) {
@@ -360,41 +363,22 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   }
 
   public function processCreditCard(): ?array {
-    $config = CRM_Core_Config::singleton();
-    $session = CRM_Core_Session::singleton();
-
     // we need to retrieve email address
     if ($this->_context === 'standalone' && !empty($this->_params['is_email_receipt'])) {
       [$displayName] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
       $this->assign('displayName', $displayName);
     }
 
-    $this->_params['amount'] = $this->_params['total_amount'];
-    // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
-    $this->_params['amount_level'] = 0;
-    $this->_params['currencyID'] = CRM_Utils_Array::value('currency',
-      $this->_params,
-      $config->defaultCurrency
-    );
-
-    if (empty($this->_params['invoice_id'])) {
-      $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
-    }
-    else {
-      $this->_params['invoiceID'] = $this->_params['invoice_id'];
-    }
-
     $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
-    //Add common data to formatted params
-    $params = $this->_params;
-    CRM_Contribute_Form_AdditionalInfo::postProcessCommon($params, $this->_params, $this);
     // at this point we've created a contact and stored its address etc
     // all the payment processors expect the name and address to be in the
     // so we copy stuff over to first_name etc.
     $paymentParams = $this->_params;
     $paymentParams['contactID'] = $this->_contactId;
-    CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
+    $paymentParams['amount'] = $this->getSubmittedValue('total_amount');
+    $paymentParams['currency'] = $this->getCurrency();
+    CRM_Core_Payment_Form::mapParams($this->_bltID, $this->getSubmittedValues(), $paymentParams, TRUE);
 
     $paymentParams['contributionPageID'] = NULL;
     if (!empty($this->_params['is_email_receipt'])) {
@@ -419,7 +403,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         CRM_Core_Error::statusBounce($e->getMessage(), CRM_Utils_System::url('civicrm/payment/add', $urlParams));
       }
     }
-
     if (!empty($result)) {
       $this->_params = array_merge($this->_params, $result);
     }
