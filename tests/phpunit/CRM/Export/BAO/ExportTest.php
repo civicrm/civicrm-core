@@ -2986,9 +2986,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       [
         'first_name' => 'Joe',
         'last_name' => 'Miller',
-        'Home-street_address' => '',
-        'Home-city' => '',
-        'Home-country' => '',
+        'Home-street_address' => 'Ambachtstraat 23',
+        'Home-city' => 'Brummen',
+        'Home-country' => 'Netherlands',
         'Home-email' => 'joe_miller@civicrm.org',
       ],
     ], $result);
