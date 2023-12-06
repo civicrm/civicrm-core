@@ -24,6 +24,7 @@ CRM.$(function($) {
     var header = $(this).parent();
     header.next().html('');
     header.removeClass('active');
+    header.parent('.crm-ajax-accordion:not(.collapsed)').crmAccordionToggle();
     // Reset results-display mode if it depends on this pane
     var mode = modes[$('#component_mode').val()] || null;
     if (mode && header.attr('id') == mode) {
@@ -110,7 +111,7 @@ CRM.$(function($) {
     </div>
   </details>
   {foreach from=$allPanes key=paneName item=paneValue}
-    <details class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion">
+    <details class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || array_key_exists($paneName, $openedPanes)} {else}collapsed{/if}">
       <summary class="crm-accordion-header" id="{$paneValue.id}">
         {$paneName}
       </summary>
