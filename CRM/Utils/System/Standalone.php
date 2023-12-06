@@ -16,6 +16,7 @@
  */
 
 use Civi\Standalone\Security;
+use Civi\Standalone\SessionHandler;
 
 /**
  * Standalone specific stuff goes here.
@@ -588,6 +589,25 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     }
 
     // TODO: Prettier error page
+  }
+
+  /**
+   * Start a new session.
+   */
+  public function sessionStart() {
+    $session_handler = new SessionHandler();
+    session_set_save_handler($session_handler);
+
+    $session_max_lifetime = Civi::settings()->get('standaloneusers_session_max_lifetime');
+
+    session_start([
+      'cookie_httponly'  => 1,
+      'gc_maxlifetime'   => $session_max_lifetime,
+      'name'             => 'CIVISOSESSID',
+      'use_cookies'      => 1,
+      'use_only_cookies' => 1,
+      'use_strict_mode'  => 1,
+    ]);
   }
 
 }
