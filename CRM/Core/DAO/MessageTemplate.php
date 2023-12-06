@@ -24,6 +24,13 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
   public static $_tableName = 'civicrm_msg_template';
 
   /**
+   * Icon associated with this entity.
+   *
+   * @var string
+   */
+  public static $_icon = 'fa-newspaper-o';
+
+  /**
    * Field to show when displaying a record.
    *
    * @var string
