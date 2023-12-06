@@ -10,6 +10,5 @@ return [
     'ang/afSearchTasks',
   ],
   'css' => [],
-  'settings' => [],
   'requires' => [],
 ];
