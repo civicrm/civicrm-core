@@ -1114,9 +1114,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Contact is in Trash' => '',
       'Created Date' => '2019-07-11 10:28:15',
       'Modified Date' => '2019-07-11 10:28:15',
-      'Addressee' => 'Mr. Anthony J. Anderson II, Dr. Sarah J. Smith II',
-      'Email Greeting' => 'Dear Anthony, Sarah',
-      'Postal Greeting' => 'Dear Anthony, Sarah',
+      'Addressee' => 'Mr. Anthony J. Anderson II, Mr. Joe M. Miller II',
+      'Email Greeting' => 'Dear Anthony, Joe',
+      'Postal Greeting' => 'Dear Anthony, Joe',
       'Current Employer' => '',
       'Location Type' => 'Home',
       'Street Address' => 'Ambachtstraat 23',
@@ -1189,9 +1189,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ],
     ]);
     $this->assertExpectedOutput([
-      'Addressee' => 'random string Mr. Anthony Anderson II, Dr. Sarah Smith II',
-      'Email Greeting' => 'II Anderson and first is Anthony , II Smith Sarah ',
-      'Postal Greeting' => 'II Anderson and first is Anthony , II Smith Sarah ',
+      'Addressee' => 'random string Mr. Anthony Anderson II, Mr. Joe Miller II',
+      'Email Greeting' => 'II Anderson and first is Anthony , II Miller Joe ',
+      'Postal Greeting' => 'II Anderson and first is Anthony , II Miller Joe ',
     ], $this->csv->fetchOne());
     // 3 contacts merged to 2.
     $this->assertCount(2, $this->csv);
@@ -3004,7 +3004,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => $contact3,
       'location_type_id' => 'Home',
-      'street_address' => 'Ambachtstraat 23',
+      'street_address' => 'A different address',
       'postal_code' => '6971 BN',
       'country_id' => '1152',
       'city' => 'Brummen',
