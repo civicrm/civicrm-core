@@ -102,14 +102,14 @@ return [
               'icon' => 'fa-bars',
               'links' => [
                 [
-                  'path' => 'civicrm/admin/mapping?action=update&reset=1&id=[id]',
-                  'icon' => 'fa-external-link',
+                  'path' => '',
+                  'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
-                  'entity' => '',
-                  'action' => '',
+                  'entity' => 'Mapping',
+                  'action' => 'update',
                   'join' => '',
                   'target' => 'crm-popup',
                 ],
