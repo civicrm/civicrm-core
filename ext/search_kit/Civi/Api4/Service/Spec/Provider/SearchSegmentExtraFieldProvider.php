@@ -62,6 +62,11 @@ class SearchSegmentExtraFieldProvider implements Generic\SpecProviderInterface {
       }
       foreach ($searchSegments as $set) {
         \Civi::$statics['all_search_segments'][$set['entity_name']]['segment_' . $set['name']] = $set;
+        if ($set['entity_name'] === 'Contact') {
+          foreach (\CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
+            \Civi::$statics['all_search_segments'][$contactType]['segment_' . $set['name']] = $set;
+          }
+        }
       }
     }
     return \Civi::$statics['all_search_segments'][$entity] ?? [];
