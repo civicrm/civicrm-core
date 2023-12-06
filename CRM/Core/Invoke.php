@@ -237,6 +237,10 @@ class CRM_Core_Invoke {
         CRM_Core_Error::statusBounce(ts('Bad menu record in database'));
       }
 
+      if (strpos($item['page_callback'], 'CRM_Admin') !== FALSE) {
+        throw new \Exception('aha!');
+      }
+
       // check that we are permissioned to access this page
       if (!CRM_Core_Permission::checkMenuItem($item)) {
         CRM_Utils_System::permissionDenied();

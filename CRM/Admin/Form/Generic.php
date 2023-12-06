@@ -49,12 +49,17 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
     return $this->_defaults;
   }
 
+  public function preProcess() {
+    throw new \Exception('aha!');
+  }
+
   /**
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
+    throw new \Exception('aha!');
     $this->assign('entityInClassFormat', 'setting');
     $this->addFieldsDefinedInSettingsMetadata();
 
@@ -77,6 +82,7 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
    * Process the form submission.
    */
   public function postProcess() {
+    throw new \Exception('aha!');
     $params = $this->controller->exportValues($this->_name);
     try {
       $this->saveMetadataDefinedSettings($params);

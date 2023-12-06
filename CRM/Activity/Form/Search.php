@@ -65,6 +65,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * @throws \CRM_Core_Exception
    */
   public function preProcess(): void {
+    throw new \Exception('aha!');
     $this->set('searchFormName', 'Search');
 
     // set the button names
@@ -115,6 +116,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
+    throw new \Exception('aha!');
     parent::buildQuickForm();
     $this->addSortNameField();
 
@@ -147,6 +149,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * @throws \CRM_Core_Exception
    */
   public function postProcess(): void {
+    throw new \Exception('aha!');
     if ($this->_done) {
       return;
     }

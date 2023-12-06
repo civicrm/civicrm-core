@@ -34,6 +34,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
+    throw new \Exception('aha!');
     // @todo - it's likely the only 'current' code in this function is the line
     // $this->addFieldsDefinedInSettingsMetadata(); and this class is no different to CRM_Admin_Form_Setting
     // in any meaningful way.
@@ -82,6 +83,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
+    throw new \Exception('aha!');
     parent::buildQuickForm();
     $this->assign('entityInClassFormat', 'setting');
 
@@ -106,6 +108,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    * Process the form submission.
    */
   public function postProcess() {
+    throw new \Exception('aha!');
     if ($this->_action == CRM_Core_Action::VIEW) {
       return;
     }

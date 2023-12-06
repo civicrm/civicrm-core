@@ -354,6 +354,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $name = NULL
   ) {
 
+    if (substr(get_class($this), 0, 9) == 'CRM_Admin') {
+      throw new \Exception('aha!');
+    }
     if ($name) {
       $this->_name = $name;
     }

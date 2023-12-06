@@ -164,6 +164,9 @@ class CRM_Core_Page {
    * @return CRM_Core_Page
    */
   public function __construct($title = NULL, $mode = NULL) {
+    if (substr(get_class($this), 0, 9) == 'CRM_Admin') {
+      throw new \Exception('aha!');
+    }
     $this->_name = CRM_Utils_System::getClassName($this);
     $this->_title = $title;
     $this->_mode = $mode;

@@ -44,12 +44,17 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     return $this->_defaults;
   }
 
+  public function preProcess() {
+    throw new \Exception('aha!');
+  }
+
   /**
    * Build the form object.
    *
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
+    throw new \Exception('aha!');
     CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
     $this->addButtons([
       [
@@ -70,6 +75,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    * Process the form submission.
    */
   public function postProcess() {
+    throw new \Exception('aha!');
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
 
