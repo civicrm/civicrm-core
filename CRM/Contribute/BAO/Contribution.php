@@ -1778,11 +1778,14 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * Use api contribute.completetransaction
    * For failures use failPayment (preferably exposing by api in the process).
    *
+   * @deprecated since 5.69 Will be remvoed ASAP since this is old & crufty &
+   * should never have been used outside core.
    */
   public static function transitionComponents($params) {
     // @todo fix the one place that calls this function to use Payment.create
     // remove this.
     // get minimum required values.
+    CRM_Core_Error::deprecatedFunctionWarning('use Payment.create api');
     $contributionId = $params['contribution_id'];
 
     // we process only ( Completed, Cancelled, or Failed ) contributions.
