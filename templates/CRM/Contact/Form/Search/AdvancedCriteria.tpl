@@ -85,7 +85,7 @@ CRM.$(function($) {
 {/if}
 
 {strip}
-  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
+  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion" open>
     <summary class="crm-accordion-header">
       {ts}Display Settings For Results{/ts}
     </summary>
@@ -93,7 +93,7 @@ CRM.$(function($) {
       {include file="CRM/Contact/Form/Search/Criteria/DisplaySettings.tpl"}
     </div>
   </details>
-  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
+  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion" open>
     <summary class="crm-accordion-header">
       {ts}Search Settings{/ts}
     </summary>
@@ -101,7 +101,7 @@ CRM.$(function($) {
       {include file="CRM/Contact/Form/Search/Criteria/SearchSettings.tpl"}
     </div>
   </details>
-  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
+  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion" open>
     <summary class="crm-accordion-header">
       {ts}Basic Criteria{/ts}
     </summary>
