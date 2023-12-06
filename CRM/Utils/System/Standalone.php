@@ -540,6 +540,13 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function getTimeZoneString() {
     $timezone = date_default_timezone_get();
+    $userId = Security::singleton()->getLoggedInUfID();
+    if ($userId) {
+      $user = Security::singleton()->loadUserByID($userId);
+      if ($user && !empty($user['timezone'])) {
+        $timezone = $user['timezone'];
+      }
+    }
     return $timezone;
   }
 
