@@ -2211,22 +2211,27 @@ div.crm-master-accordion-header a.helpicon {
   color: #3e3e3e;
 }
 
-.crm-container .crm-accordion-header {
-  color: #f5f6f1;
-  font-weight: normal;
-  padding: 4px 8px;
-  background-color: #5d677b;
-  border-radius: 4px 4px 0 0;
-}
-
 .crm-container summary {
   display: list-item;
   list-style: none;
   cursor: pointer;
 }
 
-.crm-container .collapsed .crm-accordion-header {
+.crm-container .crm-accordion-header,
+.crm-container .collapsed .crm-accordion-header,
+.crm-container .crm-accordion-bold > summary,
+.crm-container details > .crm-accordion-header {
+  color: #f5f6f1;
+  font-weight: normal;
+  padding: 4px 8px;
+  background-color: #5d677b;
   border-radius: 4px;
+}
+
+.crm-container div.crm-accordion-header,
+.crm-container details[open] > .crm-accordion-header,
+.crm-container .crm-accordion-bold[open] > summary {
+  border-radius: 4px 4px 0 0;
 }
 
 .crm-container .crm-accordion-header.active {
@@ -2265,7 +2270,7 @@ div.crm-master-accordion-header a.helpicon {
 
 /* General icon settings for all collapsible things */
 .crm-container div.crm-accordion-header:before,
-.crm-container .collapsed .crm-accordion-header:before,
+.crm-container .collapsed div.crm-accordion-header:before,
 .crm-container .crm-collapsible .collapsible-title:before,
 .crm-container span.collapsed:before,
 .crm-container a.collapsed:before,
