@@ -2184,8 +2184,7 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container .crm-collapsible .collapsible-title,
 .crm-container span.collapsed,
 .crm-container a.collapsed,
-.crm-container .crm-expand-row,
-.crm-container summary {
+.crm-container .crm-expand-row {
   cursor: pointer;
 }
 
@@ -2195,9 +2194,17 @@ div.crm-master-accordion-header a.helpicon {
 
 /* Specific types of headers */
 
-.crm-container summary:not(.crm-master-accordion-header, .crm-accordion-header) /* For older CMS themes not styling summary */ {
+.crm-container summary { /* default summary setting*/
+  display: list-item;
+  list-style: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.5rem;
   font-weight: bold;
-  padding: 0.75rem 0;
+}
+
+.crm-container summary::-webkit-details-marker { /* Safari fix to remove summary icon */
+  display: none; 
 }
 
 #crm-container .widget-content .crm-accordion-header {
@@ -2211,13 +2218,8 @@ div.crm-master-accordion-header a.helpicon {
   color: #3e3e3e;
 }
 
-.crm-container summary { /* default summary setting*/
-  display: list-item;
-  list-style: none;
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 0.5rem 0;
-  font-weight: bold;
+.crm-container details .crm-accordion-body {
+  display: block; /* Fix for old JS trying to hide crm-accordion-body */
 }
 
 .crm-container .crm-accordion-header,
@@ -2274,6 +2276,10 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container .collapsed .crm-accordion-body,
 .crm-container .crm-collapsible.collapsed .collapsible-title + * {
   display: none;
+}
+
+.crm-container details details {
+  padding: 0 0.25rem; /* adds padding for nested accordions */
 }
 
 /* Collapse icon */
