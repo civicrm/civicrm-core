@@ -914,22 +914,21 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         }
       }
       else {
-        if (is_array($params[$key]) ?? FALSE) {
-          foreach ($params[$key] as $innerKey => $value) {
-            if ($modeFill) {
-              $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $key);
-              if (isset($getValue)) {
-                foreach ($getValue as $cnt => $values) {
-                  if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params[$key][$innerKey]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params[$key][$innerKey]['location_type_id']) {
-                    unset($params[$key][$innerKey]);
-                  }
+
+        foreach ($value as $innerKey => $locationValues) {
+          if ($modeFill) {
+            $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $key);
+            if (isset($getValue)) {
+              foreach ($getValue as $cnt => $values) {
+                if ((!empty($getValue[$cnt]['location_type_id']) && !empty($params[$key][$innerKey]['location_type_id'])) && $getValue[$cnt]['location_type_id'] == $params[$key][$innerKey]['location_type_id']) {
+                  unset($params[$key][$innerKey]);
                 }
               }
             }
           }
-          if (count($params[$key]) == 0) {
-            unset($params[$key]);
-          }
+        }
+        if (count($params[$key]) == 0) {
+          unset($params[$key]);
         }
       }
     }
