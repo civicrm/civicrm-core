@@ -6,6 +6,9 @@
   <comment>able - stores "product info" for premiums and can be used for non-incentive products </comment>
   <name>civicrm_product</name>
   <add>1.4</add>
+  <paths>
+    <preview>civicrm/admin/contribute/managePremiums?action=preview&amp;reset=1&amp;id=[id]</preview>
+  </paths>
   <log>true</log>
   <component>CiviContribute</component>
   <labelField>name</labelField>
