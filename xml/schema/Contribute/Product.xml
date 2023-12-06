@@ -9,6 +9,12 @@
   <log>true</log>
   <component>CiviContribute</component>
   <labelField>name</labelField>
+  <paths>
+    <add>civicrm/admin/contribute/managePremiums/edit?action=add&amp;reset=1</add>
+    <update>civicrm/admin/contribute/managePremiums/edit?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/contribute/managePremiums/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+    <browse>civicrm/admin/contribute/managePremiums/</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>Product ID</title>

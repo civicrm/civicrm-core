@@ -66,7 +66,7 @@
     {if $action ne 1 and $action ne 2}
     <div class="messages status no-popup">
         <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
-        {capture assign=crmURL}{crmURL p='civicrm/admin/contribute/managePremiums' q="action=add&reset=1"}{/capture}
+        {capture assign=crmURL}{crmURL p='civicrm/admin/contribute/managePremiums/edit' q="action=add&reset=1"}{/capture}
         {ts 1=$crmURL}No premium products have been created for your site. You can <a href='%1'>add one</a>.{/ts}
     </div>
     {/if}
