@@ -173,8 +173,11 @@
     <length>32</length>
     <required>false</required>
     <comment>User's timezone</comment>
+    <pseudoconstant>
+      <callback>CRM_Standaloneusers_BAO_User::getTimeZones</callback>
+    </pseudoconstant>
     <html>
-      <type>Text</type>
+      <type>Select</type>
     </html>
   </field>
 
