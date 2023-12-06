@@ -146,4 +146,23 @@ trait WriteTrait {
     return $saved;
   }
 
+  public function isAuthorized(): bool {
+    if (parent::isAuthorized()) {
+      return TRUE;
+    }
+    $isPermittedAction = in_array($this->getActionName(), [
+      'update',
+      'save',
+    ]);
+    $isPermittedValueSubset = array_intersect_key(array_keys($this->getValues()), [
+      'password',
+    ]) == array_keys($this->getValues());
+    if ($isPermittedValueSubset && $isPermittedAction) {
+      // we rely on validateValues() to further lock down access to password
+      // updates based on permissions or verification of actorPassword
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }

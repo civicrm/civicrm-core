@@ -56,7 +56,7 @@ class User extends Generic\DAOEntity {
    */
   public static function permissions() {
     return [
-      'default'           => ['access CiviCRM'],
+      'default'           => ['cms:administer users'],
       'passwordReset'     => ['access password resets'],
       'sendPasswordReset' => ['access password resets'],
     ];
