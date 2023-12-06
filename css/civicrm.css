@@ -2204,7 +2204,7 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 .crm-container summary::-webkit-details-marker { /* Safari fix to remove summary icon */
-  display: none; 
+  display: none;
 }
 
 #crm-container .widget-content .crm-accordion-header {
@@ -2236,7 +2236,7 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container div.crm-accordion-header,
 .crm-container details[open] > .crm-accordion-header,
 .crm-container .crm-accordion-bold[open] > summary { /* open version of that */
-  border-radius: 4px 4px 0 0; 
+  border-radius: 4px 4px 0 0;
 }
 
 .crm-container .crm-accordion-header.active,
@@ -2305,7 +2305,7 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container span.expanded:before,
 .crm-container a.expanded:before,
 .crm-container .crm-expand-row.expanded:before,
-.crm-container details[open] > summary:before  {
+.crm-container details[open] > summary:before {
   font-family: "FontAwesome";
   content: "\f0d7";
 }
