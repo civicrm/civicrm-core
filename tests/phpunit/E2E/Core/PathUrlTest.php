@@ -115,7 +115,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
     $urlPatterns[] = [';civicrm(/|%2F)a(/|%2F).*#/mailing/new\?angularDebug=1;', \Civi::url('backend://civicrm/a/#/mailing/new?angularDebug=1')];
     $urlPatterns[] = [';/jquery.timeentry.js\?r=.*#foo;', \Civi::url('asset://[civicrm.packages]/jquery/plugins/jquery.timeentry.js', 'c')->addFragment('foo')];
     $urlPatterns[] = [';/stuff.js\?r=.*#foo;', \Civi::url('ext://org.civicrm.search_kit/stuff.js', 'c')->addFragment('foo')];
-    $urlPatterns[] = [';#foo;', \Civi::url('assetBuilder://crm-l10n.js?locale=en_US')->addFragment('foo')];
+    $urlPatterns[] = [';#foo;', \Civi::url('assetBuilder://crm-l10n.js?locale=en_US')->addFragment('foo')->addQuery(\CRM_Core_Resources::getL10nJsParams())];
 
     // Some test-harnesses have HTTP_HOST. Some don't. It's pre-req for truly relative URLs.
     if (!empty($_SERVER['HTTP_HOST'])) {
