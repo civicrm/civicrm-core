@@ -432,6 +432,40 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Legacy ARB Invoice Num format
+   * dev/core#4833
+   */
+  public function testLegacyInvoiceNum(): void {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    $this->setupRecurringPaymentProcessorTransaction([
+      'installments' => 3,
+    ], []);
+    $this->assertRecurStatus('Pending');
+
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
+    $IPN->main();
+    $this->assertRecurStatus('In Progress');
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->ids['Contribution']['default']]);
+    $this->assertEquals(1, $contribution['contribution_status_id']);
+    $this->assertEquals('6511143069', $contribution['trxn_id']);
+    // source gets set by processor
+    $this->assertSame(strpos($contribution['contribution_source'], 'Online Contribution:'), 0);
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $this->ids['Contribution']['default'],
+      'trxn_id' => '512def29489e1bdc8856,6511143069',
+    ]);
+
+    $this->assertRecurStatus('In Progress');
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN(array_merge(['receive_date' => '2010-07-01'], $this->getRecurSubsequentTransaction(['x_invoice_num' => '512def29489e1bdc8856'])));
+    $IPN->main();
+    $contribution = $this->callAPISuccess('contribution', 'get', [
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'sequential' => 1,
+    ]);
+    $this->assertEquals(2, $contribution['count']);
+  }
+
+  /**
    * Get detail for recurring transaction.
    *
    * @param array $params
