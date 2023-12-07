@@ -584,10 +584,17 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       CRM_Core_Error::statusBounce(ts("Access denied"), CRM_Utils_System::url('civicrm'));
     }
     else {
-      CRM_Utils_System::redirect('/civicrm/login?anonAccessDenied');
-    }
+      http_response_code(403);
 
-    // TODO: Prettier error page
+      // render a login page
+      if (class_exists('CRM_Standaloneusers_Page_Login')) {
+        $loginPage = new CRM_Standaloneusers_Page_Login();
+        $loginPage->assign('anonAccessDenied', TRUE);
+        return $loginPage->run();
+      }
+
+      throw new CRM_Core_Exception('Access denied. Standaloneusers extension not found');
+    }
   }
 
 }
