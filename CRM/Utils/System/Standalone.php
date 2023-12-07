@@ -590,6 +590,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
     session_start([
       'cookie_httponly'  => 1,
+      'cookie_secure'    => !empty($_SERVER['HTTPS']),
       'gc_maxlifetime'   => $session_max_lifetime,
       'name'             => 'SESSCIVISO',
       'use_cookies'      => 1,
