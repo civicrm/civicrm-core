@@ -79,8 +79,12 @@
               }
               var fieldDefault = null;
 
-              if (Boolean(importMappings)) {
+              if (Boolean(importMappings) && importMappings.hasOwnProperty(index)) {
                 // If this form has already been used for the job, load from what it saved.
+                // Note we also checked the importMapping was defined. This would be FALSE
+                // if a csv is being imported with more fields than the are in the original
+                // mapping. We check for that so it will skip gracefully.
+                // (The user will see a warning.)
                 fieldName = importMappings[index].name;
                 fieldDefault = importMappings[index].default_value;
               }
@@ -265,7 +269,7 @@
               // For now we just hard-code this - mapping to soft_credit a bit undefined - but
               // we are mimicking getMappingFieldFromMapperInput on the php layer.
               // Could get it from entity_data but .... later.
-              entityConfig = {'soft_credit': $scope.userJob.metadata.entity_configuration[selectedEntity].entity.entity_data};
+              entityConfig = {'soft_credit': $scope.userJob.metadata.entity_configuration[selectedEntity]};
             }
 
             $scope.userJob.metadata.import_mappings.push({

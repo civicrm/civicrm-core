@@ -13,13 +13,13 @@
     <tr>
       <td colspan="5">
         <div class="crm-submit-buttons">
-          {include file="CRM/common/formButtons.tpl"}
+          {include file="CRM/common/formButtons.tpl" location=''}
         </div>
       </td>
     </tr>
     <tr>
       <td>{ts}Phone{/ts}&nbsp;
-      {if $actualBlockCount lt 5 }
+      {if $actualBlockCount lt 5}
         <span id="add-more-phone" title="{ts}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
       {/if}
       </td>
@@ -31,7 +31,7 @@
     {section name='i' start=1 loop=$totalBlocks}
     {assign var='blockId' value=$smarty.section.i.index}
     <tr id="Phone_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
-        <td>{$form.phone.$blockId.phone.html} {$form.phone.$blockId.phone_ext.label}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</td>
+        <td>{$form.phone.$blockId.phone.html}<span class="crm-phone-ext"> {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</span></td>
         <td>{$form.phone.$blockId.location_type_id.html}</td>
         <td>{$form.phone.$blockId.phone_type_id.html}</td>
         <td align="center" class="crm-phone-is_primary">{$form.phone.$blockId.is_primary.1.html}</td>

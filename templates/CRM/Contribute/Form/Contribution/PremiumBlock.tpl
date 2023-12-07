@@ -12,11 +12,11 @@
     {if $context EQ "makeContribution"}
       <fieldset class="crm-group premiums_select-group">
       {if $premiumBlock.premiums_intro_title}
-        <legend>{$premiumBlock.premiums_intro_title}</legend>
+        <legend>{$premiumBlock.premiums_intro_title|escape}</legend>
       {/if}
       {if $premiumBlock.premiums_intro_text}
         <div id="premiums-intro" class="crm-section premiums_intro-section">
-          {$premiumBlock.premiums_intro_text}
+          {$premiumBlock.premiums_intro_text|escape}
         </div>
       {/if}
     {/if}
@@ -25,7 +25,7 @@
     <div class="crm-group premium_display-group">
       <div class="header-dark">
         {if $premiumBlock.premiums_intro_title}
-          {$premiumBlock.premiums_intro_title}
+          {$premiumBlock.premiums_intro_title|escape}
         {else}
           {ts}Your Premium Selection{/ts}
         {/if}
@@ -33,33 +33,33 @@
     {/if}
 
     {if $preview}
-      {assign var="showSelectOptions" value="1"}
+      {assign var="showPremiumSelectionFields" value="1"}
     {/if}
 
     {strip}
       <div id="premiums-listings">
-      {if $showPremium AND !$preview AND $premiumBlock.premiums_nothankyou_position EQ 1}
+      {if $showPremiumSelectionFields AND !$preview AND $premiumBlock.premiums_nothankyou_position EQ 1}
         <div class="premium premium-no_thanks" id="premium_id-no_thanks" min_contribution="0">
           <div class="premium-short">
-            <input type="checkbox" disabled="disabled" /> {$premiumBlock.premiums_nothankyou_label}
+            <input type="checkbox" disabled="disabled" /> {$premiumBlock.premiums_nothankyou_label|escape}
           </div>
           <div class="premium-full">
-            <input type="checkbox" checked="checked" disabled="disabled" /> {$premiumBlock.premiums_nothankyou_label}
+            <input type="checkbox" checked="checked" disabled="disabled" /> {$premiumBlock.premiums_nothankyou_label|escape}
           </div>
         </div>
       {/if}
       {foreach from=$products item=row}
-        <div class="premium {if $showPremium}premium-selectable{/if}" id="premium_id-{$row.id}" min_contribution="{$row.min_contribution}">
+        <div class="premium {if $showPremiumSelectionFields}premium-selectable{/if}" id="premium_id-{$row.id}" min_contribution="{$row.min_contribution}">
           <div class="premium-short">
-            {if $row.thumbnail}<div class="premium-short-thumbnail"><img src="{$row.thumbnail}" alt="{$row.name|escape}" /></div>{/if}
-            <div class="premium-short-content">{$row.name}</div>
+            {if $row.thumbnail}<div class="premium-short-thumbnail"><img src="{$row.thumbnail|purify}" alt="{$row.name|escape}" /></div>{/if}
+            <div class="premium-short-content">{$row.name|escape}</div>
             <div style="clear:both"></div>
           </div>
 
           <div class="premium-full">
-            <div class="premium-full-image">{if $row.image}<img src="{$row.image}" alt="{$row.name|escape}" />{/if}</div>
+            <div class="premium-full-image">{if $row.image}<img src="{$row.image|escape}" alt="{$row.name|escape}" />{/if}</div>
             <div class="premium-full-content">
-              <div class="premium-full-title">{$row.name}</div>
+              <div class="premium-full-title">{$row.name|escape}</div>
               <div class="premium-full-disabled">
                 {ts 1=$row.min_contribution|crmMoney}You must contribute at least %1 to get this item{/ts}<br/>
                 <button type="button" amount="{$row.min_contribution}">
@@ -67,21 +67,19 @@
                 </button>
               </div>
               <div class="premium-full-description">
-                {$row.description}
+                {$row.description|escape}
               </div>
-              {if $showSelectOptions }
-                {assign var="pid" value="options_"|cat:$row.id}
-                {if $pid}
+              {if $showPremiumSelectionFields}
+                {assign var="premium_option" value="options_"|cat:$row.id}
                   <div class="premium-full-options">
-                    <p>{$form.$pid.html}</p>
+                    <p>{$form.$premium_option.html}</p>
                   </div>
-                {/if}
               {else}
                 <div class="premium-full-options">
-                  <p><strong>{$row.options}</strong></p>
+                  <p><strong>{$row.options|purify}</strong></p>
                 </div>
               {/if}
-              {if ( ($premiumBlock.premiums_display_min_contribution AND $context EQ "makeContribution") OR $preview EQ 1) AND $row.min_contribution GT 0 }
+              {if (($premiumBlock.premiums_display_min_contribution AND $context EQ "makeContribution") OR $preview EQ 1) AND $row.min_contribution GT 0}
                 <div class="premium-full-min">{ts 1=$row.min_contribution|crmMoney}Minimum: %1{/ts}</div>
               {/if}
             <div style="clear:both"></div>
@@ -90,13 +88,13 @@
           <div style="clear:both"></div>
         </div>
       {/foreach}
-      {if $showPremium AND !$preview AND $premiumBlock.premiums_nothankyou_position EQ 2}
+      {if $showPremiumSelectionFields AND !$preview AND $premiumBlock.premiums_nothankyou_position EQ 2}
         <div class="premium premium-no_thanks" id="premium_id-no_thanks" min_contribution="0">
           <div class="premium-short">
-            <input type="checkbox" disabled="disabled" /> {$premiumBlock.premiums_nothankyou_label}
+            <input type="checkbox" disabled="disabled" /> {$premiumBlock.premiums_nothankyou_label|escape}
           </div>
           <div class="premium-full">
-            <input type="checkbox" checked="checked" disabled="disabled" /> {$premiumBlock.premiums_nothankyou_label}
+            <input type="checkbox" checked="checked" disabled="disabled" /> {$premiumBlock.premiums_nothankyou_label|escape}
           </div>
         </div>
       {/if}
@@ -114,7 +112,7 @@
     {literal}
     <script>
       CRM.$(function($) {
-        var is_separate_payment = {/literal}{if $membershipBlock.is_separate_payment}{$membershipBlock.is_separate_payment}{else}0{/if}{literal};
+        var is_separate_payment = {/literal}{if $isShowMembershipBlock && $membershipBlock.is_separate_payment}{$membershipBlock.is_separate_payment}{else}0{/if}{literal};
 
         // select a new premium
         function select_premium(premium_id) {

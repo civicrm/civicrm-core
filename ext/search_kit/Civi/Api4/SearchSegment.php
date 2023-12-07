@@ -4,6 +4,7 @@ namespace Civi\Api4;
 /**
  * Data segmentation sets for searches.
  *
+ * @since 5.50
  * @package Civi\Api4
  */
 class SearchSegment extends Generic\DAOEntity {

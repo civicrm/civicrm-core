@@ -11,7 +11,9 @@
 
 namespace Civi\Authx;
 
-use Civi\Crypto\Exception\CryptoException;
+use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\HookInterface;
+use Civi\Core\Service\AutoService;
 use GuzzleHttp\Psr7\Response;
 
 /**
@@ -19,8 +21,49 @@ use GuzzleHttp\Psr7\Response;
  * checks if current policy accepts this credential, and logs in as the target person.
  *
  * @package Civi\Authx
+ * @service authx.authenticator
  */
-class Authenticator {
+class Authenticator extends AutoService implements HookInterface {
+
+  /**
+   * When 'CRM_Core_Invoke' fires 'civi.invoke.auth', we should check for credentials.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   * @return bool|void
+   * @throws \Exception
+   */
+  public function on_civi_invoke_auth(GenericHookEvent $e) {
+    $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
+    $siteKey = $_SERVER['HTTP_X_CIVI_KEY'] ?? $params['_authxSiteKey'] ?? NULL;
+
+    if (!empty($_SERVER['HTTP_X_CIVI_AUTH'])) {
+      return $this->auth($e, ['flow' => 'xheader', 'cred' => $_SERVER['HTTP_X_CIVI_AUTH'], 'siteKey' => $siteKey]);
+    }
+
+    if (!empty($_SERVER['HTTP_AUTHORIZATION']) && !empty(\Civi::settings()->get('authx_header_cred'))) {
+      return $this->auth($e, ['flow' => 'header', 'cred' => $_SERVER['HTTP_AUTHORIZATION'], 'siteKey' => $siteKey]);
+    }
+
+    if (!empty($params['_authx'])) {
+      if ((implode('/', $e->args) === 'civicrm/authx/login')) {
+        $this->auth($e, ['flow' => 'login', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey]);
+        _authx_redact(['_authx']);
+      }
+      elseif (!empty($params['_authxSes'])) {
+        $this->auth($e, ['flow' => 'auto', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey]);
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+          _authx_reload(implode('/', $e->args), $_SERVER['QUERY_STRING']);
+        }
+        else {
+          _authx_redact(['_authx', '_authxSes']);
+        }
+      }
+      else {
+        $this->auth($e, ['flow' => 'param', 'cred' => $params['_authx'], 'siteKey' => $siteKey]);
+        _authx_redact(['_authx']);
+      }
+    }
+  }
 
   /**
    * @var \Civi\Authx\AuthxInterface
@@ -100,6 +143,35 @@ class Authenticator {
   }
 
   /**
+   * Determine whether credentials are valid. This is similar to `auth()`
+   * but stops short of performing an actual login.
+   *
+   * @param array $details
+   * @return array{flow: string, credType: string, jwt: ?array, useSession: bool, userId: ?int, contactId: ?int}
+   *   Description of the validated principal (redacted).
+   * @throws \Civi\Authx\AuthxException
+   */
+  public function validate(array $details): array {
+    if (!isset($details['flow'])) {
+      $this->reject('Authentication logic error: Must specify "flow".');
+    }
+
+    $tgt = AuthenticatorTarget::create([
+      'flow' => $details['flow'],
+      'cred' => $details['cred'] ?? NULL,
+      'siteKey' => $details['siteKey'] ?? NULL,
+      'useSession' => $details['useSession'] ?? FALSE,
+    ]);
+
+    if ($principal = $this->checkCredential($tgt)) {
+      $tgt->setPrincipal($principal);
+    }
+
+    $this->checkPolicy($tgt);
+    return $tgt->createRedacted();
+  }
+
+  /**
    * Assess the credential ($tgt->cred) and determine the matching principal.
    *
    * @param \Civi\Authx\AuthenticatorTarget $tgt
@@ -110,44 +182,18 @@ class Authenticator {
    * @see \Civi\Authx\AuthenticatorTarget::setPrincipal()
    */
   protected function checkCredential($tgt) {
-    [$credFmt, $credValue] = explode(' ', $tgt->cred, 2);
+    // In order of priority, each subscriber will either:
+    // 1. Accept the cred, which stops event propagation and further checks;
+    // 2. Reject the cred, which stops event propagation and further checks;
+    // 3. Neither accept nor reject, letting the event continue on to the next.
+    $checkEvent = new CheckCredentialEvent($tgt->cred);
+    \Civi::dispatcher()->dispatch('civi.authx.checkCredential', $checkEvent);
 
-    switch ($credFmt) {
-      case 'Basic':
-        [$user, $pass] = explode(':', base64_decode($credValue), 2);
-        if ($userId = $this->authxUf->checkPassword($user, $pass)) {
-          return ['userId' => $userId, 'credType' => 'pass'];
-        }
-        break;
-
-      case 'Bearer':
-        $c = \CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_contact WHERE api_key = %1', [
-          1 => [$credValue, 'String'],
-        ]);
-        if ($c) {
-          return ['contactId' => $c, 'credType' => 'api_key'];
-        }
-
-        try {
-          $claims = \Civi::service('crypto.jwt')->decode($credValue);
-          $scopes = isset($claims['scope']) ? explode(' ', $claims['scope']) : [];
-          if (!in_array('authx', $scopes)) {
-            $this->reject('JWT does not permit general authentication');
-          }
-          if (empty($claims['sub']) || substr($claims['sub'], 0, 4) !== 'cid:') {
-            $this->reject('JWT does not specify the contact ID (sub)');
-          }
-          $contactId = substr($claims['sub'], 4);
-          return ['contactId' => $contactId, 'credType' => 'jwt', 'jwt' => $claims];
-        }
-        catch (CryptoException $e) {
-          // Invalid JWT. Proceed to check any other token sources.
-        }
-
-        break;
+    if ($checkEvent->getRejection()) {
+      $this->reject($checkEvent->getRejection());
     }
 
-    return NULL;
+    return $checkEvent->getPrincipal();
   }
 
   /**

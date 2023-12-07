@@ -75,6 +75,16 @@ class CRM_Utils_Time {
   }
 
   /**
+   * Get the simulation offset.
+   *
+   * @return int
+   *   Seconds between logical time and real time.
+   */
+  public static function delta(): int {
+    return self::$callback === NULL ? 0 : (call_user_func(self::$callback) - time());
+  }
+
+  /**
    * Get the time.
    *
    * @param string $returnFormat

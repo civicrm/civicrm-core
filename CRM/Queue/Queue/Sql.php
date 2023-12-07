@@ -47,47 +47,38 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     $lease_time = $lease_time ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;
 
     $result = NULL;
-    $dao = CRM_Core_DAO::executeQuery('LOCK TABLES civicrm_queue_item WRITE;');
-    $sql = "
+    CRM_Core_DAO::executeQuery('LOCK TABLES civicrm_queue_item WRITE;');
+    $sql = '
         SELECT first_in_queue.* FROM (
           SELECT id, queue_name, submit_time, release_time, run_count, data
           FROM civicrm_queue_item
           WHERE queue_name = %1
-          ORDER BY weight ASC, id ASC
+          ORDER BY weight, id
           LIMIT 1
         ) first_in_queue
-        WHERE release_time IS NULL OR release_time < %2
-      ";
+        WHERE release_time IS NULL OR UNIX_TIMESTAMP(release_time) < %2
+      ';
     $params = [
       1 => [$this->getName(), 'String'],
-      2 => [CRM_Utils_Time::getTime(), 'Timestamp'],
+      2 => [CRM_Utils_Time::time(), 'Integer'],
     ];
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
-    if (is_a($dao, 'DB_Error')) {
-      // FIXME - Adding code to allow tests to pass
-      throw new CRM_Core_Exception('Unable to claim queue item');
-    }
 
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       $dao->run_count++;
-      $sql = "UPDATE civicrm_queue_item SET release_time = %1, run_count = %3 WHERE id = %2";
+      $sql = 'UPDATE civicrm_queue_item SET release_time = from_unixtime(unix_timestamp() + %1), run_count = %3 WHERE id = %2';
       $sqlParams = [
-        '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
+        '1' => [CRM_Utils_Time::delta() + $lease_time, 'Integer'],
         '2' => [$dao->id, 'Integer'],
         '3' => [$dao->run_count, 'Integer'],
       ];
       CRM_Core_DAO::executeQuery($sql, $sqlParams);
-      // (Comment by artfulrobot Sep 2019: Not sure what the below comment means, should be removed/clarified?)
-      // work-around: inconsistent date-formatting causes unintentional breakage
-      #        $dao->submit_time = date('YmdHis', strtotime($dao->submit_time));
-      #        $dao->release_time = date('YmdHis', $nowEpoch + $lease_time);
-      #        $dao->save();
       $dao->data = unserialize($dao->data);
       $result = $dao;
     }
 
-    $dao = CRM_Core_DAO::executeQuery('UNLOCK TABLES;');
+    CRM_Core_DAO::executeQuery('UNLOCK TABLES;');
 
     return $result;
   }
@@ -118,8 +109,8 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       $dao->run_count++;
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", [
-        '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = from_unixtime(unix_timestamp() + %1) WHERE id = %2", [
+        '1' => [CRM_Utils_Time::delta() + $lease_time, 'Integer'],
         '2' => [$dao->id, 'Integer'],
       ]);
       $dao->data = unserialize($dao->data);

@@ -1,9 +1,9 @@
 <?php
 namespace Civi\Afform\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Civi\Core\Event\GenericHookEvent;
 
-abstract class AfformBaseEvent extends Event {
+abstract class AfformBaseEvent extends GenericHookEvent {
 
   /**
    * @var array

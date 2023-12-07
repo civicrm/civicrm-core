@@ -95,17 +95,15 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     $this->assign('action', $this->_action);
 
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
-    if ($this->_id) {
+    if ($this->getEventID()) {
       $this->_isRepeatingEvent = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
       $this->assign('eventId', $this->_id);
-      if (!empty($this->_addBlockName) && empty($this->_addProfileBottom) && empty($this->_addProfileBottomAdd)) {
-        $this->add('hidden', 'id', $this->_id);
-      }
       $this->_single = TRUE;
 
-      $params = ['id' => $this->_id];
-      CRM_Event_BAO_Event::retrieve($params, $eventInfo);
+      $eventInfo = \Civi\Api4\Event::get(FALSE)
+        ->addWhere('id', '=', $this->_id)
+        ->execute()
+        ->first();
 
       // its an update mode, do a permission check
       if (!CRM_Event_BAO_Event::checkPermission($this->_id, CRM_Core_Permission::EDIT)) {
@@ -113,15 +111,14 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       }
 
       $participantListingID = $eventInfo['participant_listing_id'] ?? NULL;
-      //CRM_Core_DAO::getFieldValue( 'CRM_Event_DAO_Event', $this->_id, 'participant_listing_id' );
       if ($participantListingID) {
         $participantListingURL = CRM_Utils_System::url('civicrm/event/participant',
           "reset=1&id={$this->_id}",
-          TRUE, NULL, TRUE, TRUE
+          FALSE, NULL, TRUE, TRUE
         );
-        $this->assign('participantListingURL', $participantListingURL);
       }
-
+      $this->assign('participantListingURL', $participantListingURL ?? NULL);
+      $this->assign('participantListingID', $participantListingID);
       $this->assign('isOnlineRegistration', CRM_Utils_Array::value('is_online_registration', $eventInfo));
 
       $this->assign('id', $this->_id);
@@ -141,11 +138,11 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     $title = NULL;
     if ($this->_id) {
       if ($this->_isTemplate) {
-        $title = ts('Edit Event Template') . ' - ' . CRM_Utils_Array::value('template_title', $eventInfo);
+        $title = ts('Edit Event Template') . ' - ' . ($eventInfo['template_title'] ?? '');
       }
       else {
         $configureText = $this->_isRepeatingEvent ? ts('Configure Repeating Event') : ts('Configure Event');
-        $title = $configureText . ' - ' . CRM_Utils_Array::value('title', $eventInfo);
+        $title = $configureText . ' - ' . ($eventInfo['title'] ?? '');
       }
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
@@ -165,11 +162,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     $this->_templateId = (int) CRM_Utils_Request::retrieve('template_id', 'Integer', $this);
 
-    //Is a repeating event
-    if ($this->_isRepeatingEvent) {
-      $isRepeatingEntity = TRUE;
-      $this->assign('isRepeatingEntity', $isRepeatingEntity);
-    }
+    $this->assign('isRepeatingEntity', $this->_isRepeatingEvent);
 
     // CRM-16776 - show edit/copy/create buttons for Profiles if user has required permission.
     $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
@@ -184,41 +177,37 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     if (CRM_Core_Permission::check($checkPermission) || !empty($ufCreate) || !empty($ufEdit)) {
       $this->assign('perm', TRUE);
     }
+    else {
+      $this->assign('perm', FALSE);
+    }
 
     // also set up tabs
     CRM_Event_Form_ManageEvent_TabHeader::build($this);
 
     // Set Done button URL and breadcrumb. Templates go back to Manage Templates,
     // otherwise go to Manage Event for new event or ManageEventEdit if event if exists.
-    $breadCrumb = [];
     if (!$this->_isTemplate) {
+      $breadCrumb = ['title' => ts('Manage Events')];
       if ($this->_id) {
-        $this->_doneUrl = CRM_Utils_System::url(CRM_Utils_System::currentPath(),
+        $breadCrumb['url'] = CRM_Utils_System::url(CRM_Utils_System::currentPath(),
           "action=update&reset=1&id={$this->_id}"
         );
       }
       else {
-        $this->_doneUrl = CRM_Utils_System::url('civicrm/event/manage',
+        $breadCrumb['url'] = CRM_Utils_System::url('civicrm/event/manage',
           'reset=1'
         );
-        $breadCrumb = [
-          [
-            'title' => ts('Manage Events'),
-            'url' => $this->_doneUrl,
-          ],
-        ];
       }
+      CRM_Utils_System::appendBreadCrumb([$breadCrumb]);
     }
     else {
-      $this->_doneUrl = CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1');
-      $breadCrumb = [
+      CRM_Utils_System::appendBreadCrumb([
         [
           'title' => ts('Manage Event Templates'),
-          'url' => $this->_doneUrl,
+          'url' => CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1'),
         ],
-      ];
+      ]);
     }
-    CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
 
   /**
@@ -228,15 +217,15 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     $defaults = [];
+    $event = \Civi\Api4\Event::get(FALSE);
     if (isset($this->_id)) {
-      $params = ['id' => $this->_id];
-      CRM_Event_BAO_Event::retrieve($params, $defaults);
-
+      $event->addWhere('id', '=', $this->_id);
+      $defaults = $event->execute()->first();
       $this->_campaignID = $defaults['campaign_id'] ?? NULL;
     }
     elseif ($this->_templateId) {
-      $params = ['id' => $this->_templateId];
-      CRM_Event_BAO_Event::retrieve($params, $defaults);
+      $event->addWhere('id', '=', $this->_templateId);
+      $defaults = $event->execute()->first();
       $defaults['is_template'] = $this->_isTemplate;
       $defaults['template_id'] = $defaults['id'];
       unset($defaults['id']);
@@ -282,12 +271,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
           'type' => 'upload',
           'name' => ts('Save'),
           'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'upload',
-          'name' => ts('Save and Done'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'subName' => 'done',
         ],
         [
           'type' => 'cancel',
@@ -397,6 +380,17 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public static function addProfileEditScripts() {
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
     CRM_UF_Page_ProfileEditor::registerSchemas(['IndividualModel', 'ParticipantModel']);
+  }
+
+  /**
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getEventID() {
+    if (!$this->_id) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
+    }
+    return $this->_id ? (int) $this->_id : NULL;
   }
 
 }

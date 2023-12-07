@@ -79,5 +79,20 @@ INSERT INTO civicrm_option_value
 VALUES
     (@option_group_id_activity_type, {localize}'{ts escape="sql"}Change Custom Data{/ts}'{/localize},{localize}''{/localize}, (SELECT @max_val := @max_val+1), 'Change Custom Data', (SELECT @max_wt := @max_wt+1), 0, @caseCompId);
 
+
+If you are inserting an option value row that might already exist (for example, a Relative Date Filter could have already been added manually), we should only insert it if it doesn't already exist.
+
+Here's an example which adds a Relative Date Filter with localization, the next available weight and does not insert if the value already exists (FROM DUAL is required for MariaDB)
+------------------------------------------------------------------------------
+SELECT @option_group_id_date_filter := max(id) from civicrm_option_group where name = 'relative_date_filters';
+
+SELECT @max_wt := max(weight) from civicrm_option_value where option_group_id = @option_group_id_date_filter;
+INSERT INTO
+  `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
+SELECT
+  @option_group_id_date_filter, {localize}'{ts escape="sql"}Previous 2 fiscal years{/ts}'{/localize}, 'previous_2.fiscal_year', 'previous_2.fiscal_year', NULL, NULL, 0, (SELECT @max_wt := @max_wt+1), {localize}NULL{/localize}, 0, 0, 1, NULL, NULL, NULL
+FROM DUAL
+WHERE NOT EXISTS (SELECT * FROM civicrm_option_value WHERE `value`='previous_2.fiscal_year' AND `option_group_id` = @option_group_id_date_filter);
+
 ------------------------------------------------------------------------------
 More details: https://docs.civicrm.org/dev/en/latest/translation/database/#localised-fields-schema-changes

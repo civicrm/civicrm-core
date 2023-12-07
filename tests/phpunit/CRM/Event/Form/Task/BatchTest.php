@@ -12,7 +12,7 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
   /**
    * Test the the submit function on the event participant submit function.
    */
-  public function testSubmit() {
+  public function testSubmit(): void {
     $group = $this->customGroupCreate(['extends' => 'Participant', 'title' => 'Participant']);
     $field = $this->customFieldCreate(['custom_group_id' => $group['id'], 'html_type' => 'CheckBox', 'option_values' => ['two' => 'A couple', 'three' => 'A few', 'four' => 'Too Many']]);
     $participantID = $this->participantCreate();

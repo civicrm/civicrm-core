@@ -16,6 +16,7 @@ class CiviTestSMSProvider extends CRM_SMS_Provider {
   protected $sentMessage;
   protected $_id = 0;
   static private $_singleton = [];
+  protected $provider;
 
   public function __construct($provider, $skipAuth = TRUE) {
     $this->provider = $provider;
@@ -23,7 +24,7 @@ class CiviTestSMSProvider extends CRM_SMS_Provider {
 
   public static function &singleton($providerParams = [], $force = FALSE) {
     if (isset($providerParams['provider'])) {
-      $providers = CRM_SMS_BAO_Provider::getProviders(NULL, array('name' => $providerParams['provider']));
+      $providers = CRM_SMS_BAO_Provider::getProviders(NULL, ['name' => $providerParams['provider']]);
       $provider = current($providers);
       $providerID = $provider['id'] ?? NULL;
     }

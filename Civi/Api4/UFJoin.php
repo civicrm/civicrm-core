@@ -14,7 +14,7 @@ namespace Civi\Api4;
  * UFJoin entity - links profiles to the components/extensions they are used for.
  *
  * @see \Civi\Api4\UFGroup
- * @searchable none
+ * @searchable secondary
  * @since 5.19
  * @package Civi\Api4
  */

@@ -35,6 +35,12 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
   public $_contactType = NULL;
 
+  public $_customGroupId = NULL;
+
+  public $_DTparams = [];
+
+  public $_total = NULL;
+
   /**
    * Get BAO Name.
    *
@@ -64,20 +70,23 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       $links[CRM_Core_Action::VIEW] = [
         'name' => ts('View'),
         'title' => ts('View %1', [1 => $this->_customGroupTitle . ' record']),
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
       ];
 
       $links[CRM_Core_Action::UPDATE] = [
         'name' => ts('Edit'),
         'title' => ts('Edit %1', [1 => $this->_customGroupTitle . ' record']),
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
       ];
 
       $links[CRM_Core_Action::DELETE] = [
         'name' => ts('Delete'),
         'title' => ts('Delete %1', [1 => $this->_customGroupTitle . ' record']),
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
       ];
 
       // urls and queryStrings
-      if ($this->_pageViewType == 'profileDataView') {
+      if ($this->_pageViewType === 'profileDataView') {
         $links[CRM_Core_Action::VIEW]['url'] = 'civicrm/profile/view';
         $links[CRM_Core_Action::VIEW]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$view}";
 
@@ -88,7 +97,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         $links[CRM_Core_Action::DELETE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$delete}";
 
       }
-      elseif ($this->_pageViewType == 'customDataView') {
+      elseif ($this->_pageViewType === 'customDataView') {
         // custom data specific view links
         $links[CRM_Core_Action::VIEW]['url'] = 'civicrm/contact/view/cd';
         $links[CRM_Core_Action::VIEW]['qs'] = 'reset=1&gid=%%gid%%&cid=%%cid%%&recId=%%recId%%&cgcount=%%cgcount%%&multiRecordDisplay=single&mode=view';
@@ -104,6 +113,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
           'title' => ts('Copy %1', [1 => $this->_customGroupTitle . ' record']),
           'url' => 'civicrm/contact/view/cd/edit',
           'qs' => 'reset=1&type=%%type%%&groupID=%%groupID%%&entityID=%%entityID%%&cgcount=%%newCgCount%%&multiRecordDisplay=single&copyValueId=%%cgcount%%&mode=copy',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
         ];
       }
 
@@ -148,12 +158,12 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    * Browse the listing.
    *
    */
-  public function browse() {
+  public function browse(): array {
     $dateFields = NULL;
     $newCgCount = $cgcount = 0;
     $attributes = $result = $headerAttr = [];
     $dateFieldsVals = NULL;
-    if ($this->_pageViewType == 'profileDataView' && $this->_profileId) {
+    if ($this->_pageViewType === 'profileDataView' && $this->_profileId) {
       $fields = CRM_Core_BAO_UFGroup::getFields($this->_profileId, FALSE, NULL,
         NULL, NULL,
         FALSE, NULL,
@@ -218,7 +228,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         if ($returnValues['data_type'] == 'Date') {
           $dateFields[$fieldIDs[$key]] = 1;
           $actualPHPFormats = CRM_Utils_Date::datePluginToPHPFormats();
-          $dateFormat = (array) CRM_Utils_Array::value($returnValues['date_format'], $actualPHPFormats);
+          $dateFormat = (array) ($actualPHPFormats[$returnValues['date_format']] ?? []);
           $timeFormat = $returnValues['time_format'] ?? NULL;
         }
 
@@ -259,7 +269,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       unset($result['count']);
       unset($result['sortedResult']);
 
-      if ($this->_pageViewType == 'profileDataView') {
+      if ($this->_pageViewType === 'profileDataView') {
         if (!empty($fieldIDs)) {
           //get the group info of multi rec fields in listing view
           $fieldInput = $fieldIDs;
@@ -284,8 +294,8 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       $cgcount = 1;
       $newCgCount = (!$reached) ? $resultCount + 1 : NULL;
       if (!empty($result) && empty($this->_headersOnly)) {
-        $links = self::links();
-        if ($this->_pageViewType == 'profileDataView') {
+        $links = $this->links();
+        if ($this->_pageViewType === 'profileDataView') {
           $pageCheckSum = $this->get('pageCheckSum');
           if ($pageCheckSum) {
             foreach ($links as $key => $link) {
@@ -398,6 +408,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 $links[CRM_Core_Action::DELETE]['url'] = '#';
                 $links[CRM_Core_Action::DELETE]['extra'] = ' data-delete_params="' . htmlspecialchars(json_encode($deleteData)) . '"';
                 $links[CRM_Core_Action::DELETE]['class'] = 'delete-custom-row';
+                $links[CRM_Core_Action::DELETE]['weight'] = CRM_Core_Action::getWeight(CRM_Core_Action::DELETE);
               }
               if (!empty($pageCheckSum)) {
                 $actionParams['cs'] = $pageCheckSum;

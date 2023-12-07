@@ -54,6 +54,9 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $modeValue = CRM_Contact_Form_Search::getModeValue(CRM_Utils_Array::value('component_mode', $values, CRM_Contact_BAO_Query::MODE_CONTACTS));
     $className = $modeValue['taskClassName'];
     $this->_task = $values['task'] ?? NULL;
+
+    // Add group custom data
+    CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Group');
   }
 
   /**
@@ -105,6 +108,9 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     CRM_Group_Form_Edit::buildParentGroups($this);
     CRM_Group_Form_Edit::buildGroupOrganizations($this);
 
+    // Build custom data
+    CRM_Custom_Form_CustomData::buildQuickForm($this);
+
     // get the group id for the saved search
     $groupID = NULL;
     if (isset($this->_id)) {
@@ -145,7 +151,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
         $mappingParams = [
           'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Search Builder'),
         ];
-        $mapping = CRM_Core_BAO_Mapping::add($mappingParams);
+        $mapping = CRM_Core_BAO_Mapping::writeRecord($mappingParams);
         $mappingId = $mapping->id;
       }
       else {
@@ -210,6 +216,8 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       $params['id'] = CRM_Contact_BAO_SavedSearch::getName($this->_id, 'id');
     }
 
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($formValues, $this->_id, 'Group');
+
     $group = CRM_Contact_BAO_Group::create($params);
 
     // Update mapping with the name and description of the group.
@@ -220,7 +228,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
         'description' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $group->id, 'description', 'id'),
         'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Search Builder'),
       ];
-      CRM_Core_BAO_Mapping::add($mappingParams);
+      CRM_Core_BAO_Mapping::writeRecord($mappingParams);
     }
 
     // CRM-9464
@@ -242,6 +250,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     if (empty($defaults['parents'])) {
       $defaults['parents'] = CRM_Core_BAO_Domain::getGroupId();
     }
+    $defaults += CRM_Custom_Form_CustomData::setDefaultValues($this);
     return $defaults;
   }
 

@@ -2,7 +2,7 @@
   <form ng-controller="crmSearchTaskDownload as $ctrl">
     <p>
       <strong ng-if="$ctrl.ids.length">{{:: ts('Download %1 %2', {1: $ctrl.ids.length, 2: $ctrl.entityTitle}) }}</strong>
-      <strong ng-if="!$ctrl.ids.length">{{:: ts('Download %1 %2', {1: $ctrl.displayController.rowCount, 2: $ctrl.entityTitle}) }}</strong>
+      <strong ng-if="!$ctrl.ids.length">{{:: ts('Download %1 %2', {1: $ctrl.taskManager.getRowCount(), 2: $ctrl.entityTitle}) }}</strong>
     </p>
     <div class="form-inline">
       <label for="crmSearchTaskDownload-format">{{:: ts('Format') }}</label>

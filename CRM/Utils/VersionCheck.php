@@ -139,8 +139,11 @@ class CRM_Utils_VersionCheck {
     // Non-alpha versions get the full treatment
     if ($this->localVersion && !strpos($this->localVersion, 'alpha')) {
       $this->stats += [
+        // Remove the hash after 2024-09-01 to allow the transition to sid
         'hash' => md5($siteKey . $config->userFrameworkBaseURL),
+        'sid' => Civi::settings()->get('site_id'),
         'uf' => $config->userFramework,
+        'environment' => CRM_Core_Config::environment(),
         'lang' => $config->lcMessages,
         'co' => $config->defaultContactCountry,
         'ufv' => $config->userSystem->getVersion(),
@@ -201,8 +204,10 @@ class CRM_Utils_VersionCheck {
       'CRM_Member_DAO_MembershipBlock' => 'is_active = 1',
       'CRM_Pledge_DAO_Pledge' => 'is_test = 0',
       'CRM_Pledge_DAO_PledgeBlock' => NULL,
-      'CRM_Mailing_Event_DAO_Delivered' => NULL,
+      'CRM_Mailing_Event_DAO_MailingEventDelivered' => NULL,
     ];
+    // Provide continuity in wire format.
+    $compat = ['MailingEventDelivered' => 'Delivered'];
     foreach ($tables as $daoName => $where) {
       if (class_exists($daoName)) {
         /** @var \CRM_Core_DAO $dao */
@@ -212,7 +217,7 @@ class CRM_Utils_VersionCheck {
         }
         $short_name = substr($daoName, strrpos($daoName, '_') + 1);
         $this->stats['entities'][] = [
-          'name' => $short_name,
+          'name' => $compat[$short_name] ?? $short_name,
           'size' => $dao->count(),
         ];
       }
@@ -225,8 +230,7 @@ class CRM_Utils_VersionCheck {
    */
   private function getExtensionStats() {
     // Core components
-    $config = CRM_Core_Config::singleton();
-    foreach ($config->enableComponents as $comp) {
+    foreach (Civi::settings()->get('enable_components') as $comp) {
       $this->stats['extensions'][] = [
         'name' => 'org.civicrm.component.' . strtolower($comp),
         'enabled' => 1,

@@ -119,6 +119,7 @@
     <add>2.0</add>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
   </field>
 </table>

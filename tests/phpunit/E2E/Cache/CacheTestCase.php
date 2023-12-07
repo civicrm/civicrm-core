@@ -14,22 +14,22 @@
  *
  * @group e2e
  */
-abstract class E2E_Cache_CacheTestCase extends \Cache\IntegrationTests\SimpleCacheTest implements \Civi\Test\EndToEndInterface {
+abstract class E2E_Cache_CacheTestCase extends CiviSimpleCacheTest implements \Civi\Test\EndToEndInterface {
 
   const MAX_KEY = 255;
 
   public static function setUpBeforeClass(): void {
     CRM_Core_Config::singleton(1, 1);
-    CRM_Utils_System::loadBootStrap(array(
+    CRM_Utils_System::loadBootStrap([
       'name' => $GLOBALS['_CV']['ADMIN_USER'],
       'pass' => $GLOBALS['_CV']['ADMIN_PASS'],
-    ));
+    ]);
     CRM_Utils_System::synchronizeUsers();
 
     parent::setUpBeforeClass();
   }
 
-  public function testBasicUsageWithLongKey() {
+  public function testBasicUsageWithLongKey(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }

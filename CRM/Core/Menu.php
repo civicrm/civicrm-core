@@ -281,6 +281,44 @@ class CRM_Core_Menu {
   }
 
   /**
+   * Determine whether a route should canonically use a frontend or backend UI.
+   *
+   * @param string $path
+   *   Ex: 'civicrm/contribute/transact'
+   * @return bool
+   *   TRUE if the route is marked with 'is_public=1'.
+   * @internal
+   *   We may wish to revise the metadata to allow more distinctions. In that case, `isPublicRoute()`
+   *   would probably get replaced by something else.
+   */
+  public static function isPublicRoute(string $path): bool {
+    // A page-view may include hundreds of links - so don't hit DB for every link. Use cache.
+    // In default+demo builds, the list of public routes is much smaller than the list of
+    // private routes (roughly 1:10; ~50 entries vs ~450 entries). Cache the smaller list.
+    $cache = Civi::cache('long');
+    $index = $cache->get('PublicRouteIndex');
+    if ($index === NULL) {
+      $routes = CRM_Core_DAO::executeQuery('SELECT id, path FROM civicrm_menu WHERE is_public = 1')
+        ->fetchMap('id', 'path');
+      if (empty($routes)) {
+        Civi::log()->warning('isPublicRoute() should not be called before the menu has been built.');
+        return FALSE;
+      }
+      $index = array_fill_keys(array_values($routes), TRUE);
+      $cache->set('PublicRouteIndex', $index);
+    }
+
+    $parts = explode('/', $path);
+    while (count($parts) > 1) {
+      if (isset($index[implode('/', $parts)])) {
+        return TRUE;
+      }
+      array_pop($parts);
+    }
+    return FALSE;
+  }
+
+  /**
    * This function recomputes menu from xml and populates civicrm_menu.
    *
    * @param bool $truncate
@@ -291,6 +329,7 @@ class CRM_Core_Menu {
       $query = 'TRUNCATE civicrm_menu';
       CRM_Core_DAO::executeQuery($query);
     }
+    Civi::cache('long')->delete('PublicRouteIndex');
     $menuArray = self::items($truncate);
 
     self::build($menuArray);
@@ -522,7 +561,7 @@ class CRM_Core_Menu {
           'id', 'name'
         );
       }
-      $menu[$path]['component_id'] = $componentId ? $componentId : NULL;
+      $menu[$path]['component_id'] = $componentId ?: NULL;
       $cache[$compPath] = $menu[$path]['component_id'];
     }
   }
@@ -596,7 +635,7 @@ UNION (
       }
     }
 
-    if (strstr($path, 'report/instance')) {
+    if (str_contains($path, 'report/instance')) {
       $args = explode('/', $path);
       if (is_numeric(end($args))) {
         $menuPath['path'] .= '/' . end($args);

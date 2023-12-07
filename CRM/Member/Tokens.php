@@ -10,6 +10,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ContributionRecur;
+
 /**
  * Class CRM_Member_Tokens
  *
@@ -62,7 +64,7 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     if ($field === 'fee') {
       $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($this->getFieldValue($row, 'membership_type_id'));
-      $row->tokens($entity, $field, \CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($membershipType['minimum_fee']));
+      $row->tokens($entity, $field, \CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($membershipType['minimum_fee'] ?? 0));
     }
     else {
       parent::evaluateToken($row, $entity, $field, $prefetch);
@@ -120,6 +122,29 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
         'audience' => 'user',
       ],
     ];
+  }
+
+  /**
+   * Get related tokens related to membership e.g. recurring contribution tokens
+   */
+  protected function getRelatedTokens(): array {
+    $tokens = [];
+    if (!in_array('ContributionRecur', array_keys(\Civi::service('action_object_provider')->getEntities()))) {
+      return $tokens;
+    }
+    $hiddenTokens = ['modified_date', 'create_date', 'trxn_id', 'invoice_id', 'is_test', 'payment_token_id', 'payment_processor_id', 'payment_instrument_id', 'cycle_day', 'installments', 'processor_id', 'next_sched_contribution_date', 'failure_count', 'failure_retry_date', 'auto_renew', 'is_email_receipt', 'contribution_status_id'];
+    $contributionRecurFields = ContributionRecur::getFields(FALSE)->setLoadOptions(TRUE)->execute();
+    foreach ($contributionRecurFields as $contributionRecurField) {
+      $tokens['contribution_recur_id.' . $contributionRecurField['name']] = [
+        'title' => $contributionRecurField['title'],
+        'name' => 'contribution_recur_id.' . $contributionRecurField['name'],
+        'type' => 'mapped',
+        'options' => $contributionRecurField['options'] ?? NULL,
+        'data_type' => $contributionRecurField['data_type'],
+        'audience' => in_array($contributionRecurField['name'], $hiddenTokens) ? 'hidden' : 'user',
+      ];
+    }
+    return $tokens;
   }
 
 }

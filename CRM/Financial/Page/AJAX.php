@@ -35,7 +35,7 @@ class CRM_Financial_Page_AJAX {
       CRM_Utils_System::civiExit();
     }
     $defaultId = NULL;
-    if ($_GET['_value'] == 'select') {
+    if ($_GET['_value'] === 'select') {
       $result = CRM_Contribute_PseudoConstant::financialAccount();
     }
     else {
@@ -78,7 +78,7 @@ class CRM_Financial_Page_AJAX {
       CRM_Utils_System::civiExit();
     }
 
-    if ($_GET['_value'] != 'select') {
+    if ($_GET['_value'] !== 'select') {
       $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations(TRUE);
       $financialAccountId = CRM_Utils_Request::retrieve('_value', 'Positive');
       $financialAccountTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountId, 'financial_account_type_id');
@@ -201,7 +201,7 @@ class CRM_Financial_Page_AJAX {
 
         if (method_exists($recordBAO, $methods[$op]) & !empty($params)) {
           try {
-            $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params));
+            $updated = call_user_func_array([$recordBAO, $methods[$op]], [&$params]);
           }
           catch (\CRM_Core_Exception $e) {
             $errorMessage = $e->getMessage();
@@ -287,7 +287,7 @@ class CRM_Financial_Page_AJAX {
       'amount' => ts('Amount'),
       'trxn_id' => ts('Trxn ID'),
       'transaction_date' => ts('Transaction Date'),
-      'receive_date' => ts('Received'),
+      'receive_date' => ts('Contribution Date'),
       'payment_method' => ts('Payment Method'),
       'status' => ts('Status'),
       'name' => ts('Type'),
@@ -341,12 +341,12 @@ class CRM_Financial_Page_AJAX {
     while ($financialItem->fetch()) {
       $row[$financialItem->id] = [];
       foreach ($columnHeader as $columnKey => $columnValue) {
-        if ($financialItem->contact_sub_type && $columnKey == 'contact_type') {
+        if ($financialItem->contact_sub_type && $columnKey === 'contact_type') {
           $row[$financialItem->id][$columnKey] = $financialItem->contact_sub_type;
           continue;
         }
         $row[$financialItem->id][$columnKey] = $financialItem->$columnKey;
-        if ($columnKey == 'sort_name' && $financialItem->$columnKey && $financialItem->contact_id) {
+        if ($columnKey === 'sort_name' && $financialItem->$columnKey && $financialItem->contact_id) {
           $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=" . $financialItem->contact_id);
           $row[$financialItem->id][$columnKey] = '<a href=' . $url . '>' . $financialItem->$columnKey . '</a>';
         }

@@ -6,6 +6,13 @@
   <name>civicrm_price_field_value</name>
   <add>3.3</add>
   <component>CiviContribute</component>
+  <paths>
+    <add>civicrm/admin/price/field/option/edit?reset=1&amp;action=add&amp;fid=[price_field_id]&amp;sid=[price_field_id.price_set_id]</add>
+    <view>civicrm/admin/price/field/option/edit?reset=1&amp;action=view&amp;oid=[id]&amp;fid=[price_field_id]&amp;sid=[price_field_id.price_set_id]</view>
+    <update>civicrm/admin/price/field/option/edit?reset=1&amp;action=update&amp;oid=[id]&amp;fid=[price_field_id]&amp;sid=[price_field_id.price_set_id]</update>
+    <delete>civicrm/admin/price/field/option/edit?reset=1&amp;action=delete&amp;oid=[id]&amp;fid=[price_field_id]&amp;sid=[price_field_id.price_set_id]</delete>
+    <browse>civicrm/admin/price/field/option</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>Price Field Value ID</title>
@@ -28,6 +35,7 @@
     <required>true</required>
     <comment>FK to civicrm_price_field</comment>
     <html>
+      <type>EntityRef</type>
       <label>Price Field</label>
     </html>
     <add>3.3</add>
@@ -158,7 +166,7 @@
     <default>NULL</default>
     <comment>FK to Membership Type</comment>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Membership Type</label>
     </html>
     <add>3.4</add>
@@ -188,10 +196,11 @@
     <comment>Is this default price field option</comment>
     <default>0</default>
     <required>true</required>
-    <add>3.3</add>
     <html>
       <type>CheckBox</type>
+      <label>Default</label>
     </html>
+    <add>3.3</add>
   </field>
   <field>
     <name>is_active</name>
@@ -200,6 +209,10 @@
     <comment>Is this price field value active</comment>
     <default>1</default>
     <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <add>3.3</add>
   </field>
   <field>

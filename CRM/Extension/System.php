@@ -17,6 +17,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Extension_System {
+
+  public const DEFAULT_MAX_DEPTH = 3;
+
   private static $singleton;
 
   private $cache = NULL;
@@ -82,6 +85,7 @@ class CRM_Extension_System {
    */
   public function __construct($parameters = []) {
     $config = CRM_Core_Config::singleton();
+    $parameters['maxDepth'] = CRM_Utils_Array::value('maxDepth', $parameters, \Civi::settings()->get('ext_max_depth'));
     $parameters['extensionsDir'] = CRM_Utils_Array::value('extensionsDir', $parameters, $config->extensionsDir);
     $parameters['extensionsURL'] = CRM_Utils_Array::value('extensionsURL', $parameters, $config->extensionsURL);
     $parameters['resourceBase'] = CRM_Utils_Array::value('resourceBase', $parameters, $config->resourceBase);
@@ -115,12 +119,18 @@ class CRM_Extension_System {
         $containers['default'] = $this->getDefaultContainer();
       }
 
-      $containers['civiroot'] = new CRM_Extension_Container_Basic(
-        $this->parameters['civicrm_root'],
-        $this->parameters['resourceBase'],
-        $this->getCache(),
-        'civiroot'
-      );
+      $civiSubDirs = defined('CIVICRM_TEST')
+        ? ['ext', 'tools', 'tests']
+        : ['ext', 'tools'];
+      foreach ($civiSubDirs as $civiSubDir) {
+        $containers["civicrm_$civiSubDir"] = new CRM_Extension_Container_Basic(
+          CRM_Utils_File::addTrailingSlash($this->parameters['civicrm_root']) . $civiSubDir,
+          CRM_Utils_File::addTrailingSlash($this->parameters['resourceBase'], '/') . $civiSubDir,
+          $this->getCache(),
+          "civicrm_$civiSubDir",
+          $this->parameters['maxDepth']
+        );
+      }
 
       // TODO: CRM_Extension_Container_Basic( /sites/all/modules )
       // TODO: CRM_Extension_Container_Basic( /sites/$domain/modules
@@ -135,7 +145,8 @@ class CRM_Extension_System {
             $vendorPath,
             CRM_Utils_File::addTrailingSlash($this->parameters['userFrameworkBaseURL'], '/') . 'vendor',
             $this->getCache(),
-            'cmsvendor'
+            'cmsvendor',
+            $this->parameters['maxDepth']
           );
         }
       }
@@ -329,6 +340,7 @@ class CRM_Extension_System {
       $extensionRow['path'] = '';
     }
     $extensionRow['status'] = $manager->getStatus($obj->key);
+    $requiredExtensions = $mapper->getKeysByTag('mgmt:required');
 
     switch ($extensionRow['status']) {
       case CRM_Extension_Manager::STATUS_UNINSTALLED:
@@ -359,6 +371,9 @@ class CRM_Extension_System {
     }
     if ($manager->isIncompatible($obj->key)) {
       $extensionRow['statusLabel'] = ts('Obsolete') . ($extensionRow['statusLabel'] ? (' - ' . $extensionRow['statusLabel']) : '');
+    }
+    elseif (in_array($obj->key, $requiredExtensions)) {
+      $extensionRow['statusLabel'] = ts('Required');
     }
     return $extensionRow;
   }

@@ -403,7 +403,8 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
         );
       }
 
-      if ($type = CRM_Utils_Array::value('civicrm_contact_contact_type', $values)) {
+      $type = $values['civicrm_contact_contact_type'] ?? NULL;
+      if ($type) {
         $grantStatistics['civicrm_contact_contact_type']['title'] = ts('By Contact Type');
         $title = "Total Number of {$type}(s)";
         self::getStatistics($grantStatistics['civicrm_contact_contact_type'], $title, $values,
@@ -420,7 +421,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       }
 
       foreach ($values as $customField => $customValue) {
-        if (strstr($customField, 'civicrm_value_')) {
+        if (str_contains($customField, 'civicrm_value_')) {
           $customFieldTitle = $this->_columnHeaders[$customField]['title'] ?? NULL;
           $customGroupTitle = explode('_custom', strstr($customField, 'civicrm_value_'));
           $customGroupTitle = $this->_columns[$customGroupTitle[0]]['group_title'];

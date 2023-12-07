@@ -1,0 +1,79 @@
+<!--
+Controller: CaseTypeListsCtrl
+Required vars: caseTypes
+-->
+<h1 crm-page-title>{{:: ts('Case Types') }}</h1>
+
+<div class="help">
+  {{:: ts('A Case Type describes a group of related tasks, interactions, or processes.') }}
+</div>
+
+<div class="crm-content-block crm-block">
+
+  <table class="display">
+    <thead>
+    <tr>
+      <th>{{:: ts('Title') }}</th>
+      <th>{{:: ts('Name') }}</th>
+      <th>{{:: ts('Description') }}</th>
+      <th>{{:: ts('Enabled?') }}</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="caseType in caseTypes"
+        class="crm-entity"
+        ng-class-even="'even-row even'"
+        ng-class-odd="'odd-row odd'"
+        ng-class="{disabled: 0==caseType.is_active, forked: 1==caseType.is_forked}">
+      <td>{{caseType.title}}</td>
+      <td>{{caseType.name}}</td>
+      <td>{{caseType.description}}</td>
+      <td>{{caseType.is_active == 1 ? ts('Yes') : ts('No')}}</td>
+      <!-- FIXME: Can't figure out how styling in other tables gets the nowrap effect... in absence of a consistent fix, KISS -->
+      <td style="white-space: nowrap">
+        <span>
+          <a class="action-item crm-hover-button" ng-href="#/caseType/{{caseType.id}}">{{:: ts('Edit') }}</a>
+
+          <!-- The variables used in ng-show below can take on any of the values from the set {0, 1, "0", "1", undefined}, so use explicit ==1 or !=1 to cover all possibilities properly. -->
+          <span class="more-panel btn-slide crm-hover-button" ng-show="caseType.is_reserved!=1 || (caseType.is_active!=1 || caseType.is_forked==1)">
+            {{:: ts('more') }}
+            <ul class="panel" style="display: none;">
+              <li class="panel-item-enable" ng-hide="caseType.is_active==1">
+                <a class="action-item crm-hover-button" ng-click="toggleCaseType(caseType)">
+                  {{:: ts('Enable') }}
+                </a>
+              </li>
+              <li class="panel-item-disable" ng-show="caseType.is_active==1 && caseType.is_reserved!=1">
+                <a class="action-item crm-hover-button"
+                   crm-confirm="{type: 'disable', obj: caseType}"
+                   on-yes="toggleCaseType(caseType)">
+                  {{:: ts('Disable') }}
+                </a>
+              </li>
+              <li class="panel-item-revert" ng-show="caseType.is_forked==1">
+                <a class="action-item crm-hover-button"
+                   crm-confirm="{type: 'revert', obj: caseType}"
+                   on-yes="revertCaseType(caseType)">
+                  {{:: ts('Revert') }}
+                </a>
+              </li>
+              <li class="panel-item-delete" ng-show="caseType.is_reserved!=1">
+                <a class="action-item crm-hover-button"
+                   crm-confirm="{type: 'delete', obj: caseType}"
+                   on-yes="deleteCaseType(caseType)">
+                  {{:: ts('Delete') }}
+                </a>
+              </li>
+            </ul>
+          </span>
+        </span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="crm-submit-buttons">
+    <a href="#/caseType/new" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {{:: ts('New Case Type') }}</span></a>
+  </div>
+</div>

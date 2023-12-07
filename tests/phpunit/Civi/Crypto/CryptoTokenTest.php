@@ -25,7 +25,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_crypto', [$this, 'registerExampleKeys']);
   }
 
-  public function testIsPlainText() {
+  public function testIsPlainText(): void {
     $token = \Civi::service('crypto.token');
 
     $this->assertFalse($token->isPlainText(chr(2)));
@@ -37,14 +37,14 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     $this->assertTrue($token->isPlainText("\n"));
   }
 
-  public function testDecryptInvalid() {
+  public function testDecryptInvalid(): void {
     $cryptoToken = \Civi::service('crypto.token');
     try {
       $cryptoToken->decrypt(chr(2) . 'CTK0' . chr(2));
       $this->fail("Expected CryptoException");
     }
     catch (CryptoException $e) {
-      $this->assertRegExp(';Cannot decrypt token. Invalid format.;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Cannot decrypt token. Invalid format.;', $e->getMessage());
     }
 
     $goodExample = $cryptoToken->encrypt('mess with me', 'UNIT-TEST');
@@ -57,7 +57,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
       $this->fail("Expected CryptoException");
     }
     catch (CryptoException $e) {
-      $this->assertRegExp(';Cannot decrypt token. Invalid format.;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Cannot decrypt token. Invalid format.;', $e->getMessage());
     }
   }
 
@@ -84,7 +84,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
    */
   public function testRoundtrip($inputText, $inputKeyIdOrTag, $expectTokenRegex, $expectTokenLen, $expectPlain) {
     $token = \Civi::service('crypto.token')->encrypt($inputText, $inputKeyIdOrTag);
-    $this->assertRegExp($expectTokenRegex, $token);
+    $this->assertMatchesRegularExpression($expectTokenRegex, $token);
     $this->assertEquals($expectTokenLen, strlen($token));
     $this->assertEquals($expectPlain, \Civi::service('crypto.token')->isPlainText($token));
 
@@ -92,14 +92,14 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     $this->assertEquals($inputText, $actualText);
   }
 
-  public function testRekeyCiphertext() {
+  public function testRekeyCiphertext(): void {
     /** @var \Civi\Crypto\CryptoRegistry $cryptoRegistry */
     $cryptoRegistry = \Civi::service('crypto.registry');
     /** @var \Civi\Crypto\CryptoToken $cryptoToken */
     $cryptoToken = \Civi::service('crypto.token');
 
     $first = $cryptoToken->encrypt("hello world", 'UNIT-TEST');
-    $this->assertRegExp(';k=asdf-key-1;', $first);
+    $this->assertMatchesRegularExpression(';k=asdf-key-1;', $first);
     $this->assertEquals('hello world', $cryptoToken->decrypt($first));
 
     // If the keys haven't changed yet, then rekey() is a null-op.
@@ -113,12 +113,12 @@ class CryptoTokenTest extends \CiviUnitTestCase {
       'id' => 'new-key',
     ]);
     $third = $cryptoToken->rekey($first, 'UNIT-TEST');
-    $this->assertNotRegExp(';k=asdf-key-1;', $third);
-    $this->assertRegExp(';k=new-key;', $third);
+    $this->assertDoesNotMatchRegularExpression(';k=asdf-key-1;', $third);
+    $this->assertMatchesRegularExpression(';k=new-key;', $third);
     $this->assertEquals('hello world', $cryptoToken->decrypt($third));
   }
 
-  public function testRekeyUpgradeDowngradePlaintext() {
+  public function testRekeyUpgradeDowngradePlaintext(): void {
     /** @var \Civi\Crypto\CryptoRegistry $cryptoRegistry */
     $cryptoRegistry = \Civi::service('crypto.registry');
     /** @var \Civi\Crypto\CryptoToken $cryptoToken */
@@ -141,7 +141,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
       'id' => 'interim-key',
     ]);
     $third = $cryptoToken->rekey($first, 'APPLE');
-    $this->assertRegExp(';k=interim-key;', $third);
+    $this->assertMatchesRegularExpression(';k=interim-key;', $third);
     $this->assertEquals('hello world', $cryptoToken->decrypt($third));
 
     // But if we add another key with earlier priority,
@@ -152,7 +152,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
 
   }
 
-  public function testReadPlainTextWithoutRegistry() {
+  public function testReadPlainTextWithoutRegistry(): void {
     // This is performance optimization - don't initialize crypto.registry unless
     // you actually need it.
     $this->assertFalse(\Civi::container()->initialized('crypto.registry'));

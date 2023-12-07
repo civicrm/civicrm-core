@@ -39,6 +39,20 @@ use Civi\Api4\Utils\ReflectionUtils;
  */
 trait ReflectiveWorkflowTrait {
 
+  public function getWorkflowName(): ?string {
+    return $this->_extras['envelope']['workflow'] ?? \CRM_Utils_Constant::value(static::CLASS . '::WORKFLOW');
+  }
+
+  /**
+   * @return string|null
+   * @deprecated
+   *   It is not recommended that new things depend on the group-name. However, the plumbing still
+   *   passes-through the group-name.
+   */
+  public function getGroupName(): ?string {
+    return $this->_extras['envelope']['groupName'] ?? \CRM_Utils_Constant::value(static::CLASS . '::GROUP');
+  }
+
   /**
    * The extras are an open-ended list of fields that will be passed-through to
    * tpl, tokenContext, etc. This is the storage of last-resort for imported
@@ -63,7 +77,7 @@ trait ReflectiveWorkflowTrait {
         /** @var \ReflectionProperty $property */
         $parsed = ReflectionUtils::getCodeDocs($property, 'Property');
         $field = new \Civi\WorkflowMessage\FieldSpec();
-        $field->setName($property->getName())->loadArray($parsed);
+        $field->setName($property->getName())->loadArray($parsed, TRUE);
         $cache[$field->getName()] = $field;
       }
     }

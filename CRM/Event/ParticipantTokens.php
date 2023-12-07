@@ -54,7 +54,7 @@ class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
   public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e): void {
     // When targeting `civicrm_participant` records, we enable both `{participant.*}` (per usual) and the related `{event.*}`.
     parent::alterActionScheduleQuery($e);
-    if ($e->mapping->getEntity() === $this->getExtendableTableName()) {
+    if ($e->mapping->getEntityTable($e->actionSchedule) === $this->getExtendableTableName()) {
       $e->query->select('e.event_id AS tokenContext_eventId');
     }
   }

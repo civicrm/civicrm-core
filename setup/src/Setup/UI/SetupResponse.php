@@ -64,10 +64,11 @@ class SetupResponse implements \ArrayAccess {
     ];
   }
 
-  public function offsetExists($offset) {
+  public function offsetExists($offset): bool {
     return isset($this->oldFieldMap[$offset]);
   }
 
+  #[\ReturnTypeWillChange]
   public function &offsetGet($offset) {
     if (isset($this->oldFieldMap[$offset])) {
       $field = $this->oldFieldMap[$offset];
@@ -78,14 +79,14 @@ class SetupResponse implements \ArrayAccess {
     }
   }
 
-  public function offsetSet($offset, $value) {
+  public function offsetSet($offset, $value): void {
     if (isset($this->oldFieldMap[$offset])) {
       $field = $this->oldFieldMap[$offset];
       $this->{$field} = $value;
     }
   }
 
-  public function offsetUnset($offset) {
+  public function offsetUnset($offset): void {
     if (isset($this->oldFieldMap[$offset])) {
       $field = $this->oldFieldMap[$offset];
       unset($this->{$field});

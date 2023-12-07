@@ -7,8 +7,8 @@
 <body>
 
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
-{capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
-{capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=labelStyle}style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
+{capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
   <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
@@ -21,11 +21,10 @@
   <tr>
    <td>
     {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
-    {if !empty($formValues.receipt_text)}
-     <p>{$formValues.receipt_text|htmlize}</p>
-    {else}
-     <p>{ts}Below you will find a receipt for this contribution.{/ts}</p>
-    {/if}
+      <p>
+        {if {contribution.contribution_page_id.receipt_text|boolean}}{contribution.contribution_page_id.receipt_text}
+        {elseif {contribution.paid_amount|boolean}}{ts}Below you will find a receipt for this contribution.{/ts}{/if}
+      </p>
    </td>
   </tr>
   <tr>
@@ -63,7 +62,7 @@
            <th>{ts}Item{/ts}</th>
            <th>{ts}Qty{/ts}</th>
            <th>{ts}Each{/ts}</th>
-           {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+           {if $isShowTax && {contribution.tax_amount|boolean}}
              <th>{ts}Subtotal{/ts}</th>
              <th>{ts}Tax Rate{/ts}</th>
              <th>{ts}Tax Amount{/ts}</th>
@@ -81,9 +80,9 @@
             <td>
              {$line.unit_price|crmMoney:'{contribution.currency}'}
             </td>
-            {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+            {if $isShowTax && {contribution.tax_amount|boolean}}
               <td>
-                {$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'}
+                {$line.line_total|crmMoney:'{contribution.currency}'}
               </td>
               {if $line.tax_rate || $line.tax_amount != ""}
                 <td>
@@ -98,7 +97,7 @@
               {/if}
             {/if}
             <td>
-             {$line.line_total+$line.tax_amount|crmMoney:'{contribution.currency}'}
+             {$line.line_total_inclusive|crmMoney:'{contribution.currency}'}
             </td>
            </tr>
           {/foreach}
@@ -107,13 +106,13 @@
        </tr>
 
      {/if}
-     {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+     {if $isShowTax && {contribution.tax_amount|boolean}}
        <tr>
          <td {$labelStyle}>
            {ts} Amount before Tax : {/ts}
          </td>
          <td {$valueStyle}>
-           {$formValues.total_amount-$totalTaxAmount|crmMoney:'{contribution.currency}'}
+           {contribution.tax_exclusive_amount}
          </td>
        </tr>
 
@@ -148,7 +147,7 @@
      {if '{contribution.receive_date}'}
        <tr>
        <td {$labelStyle}>
-        {ts}Date Received{/ts}
+        {ts}Contribution Date{/ts}
        </td>
        <td {$valueStyle}>
          {contribution.receive_date|crmDate:"shortdate"}
@@ -167,7 +166,7 @@
       </tr>
      {/if}
 
-     {if '{contribution.payment_instrument_id}' and empty($formValues.hidden_CreditCard)}
+     {if {contribution.payment_instrument_id|boolean} && {contribution.paid_amount|boolean}}
       <tr>
        <td {$labelStyle}>
         {ts}Paid By{/ts}

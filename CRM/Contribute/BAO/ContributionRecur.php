@@ -38,14 +38,16 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * Takes an associative array and creates a contribution object.
    *
    * the function extract all the params it needs to initialize the create a
-   * contribution object. the params array could contain additional unused name/value
-   * pairs
+   * contribution object. the params array could contain additional unused
+   * name/value pairs
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return \CRM_Contribute_BAO_ContributionRecur|\CRM_Core_Error
-   * @todo move hook calls / extended logic to create - requires changing calls to call create not add
+   * @return \CRM_Contribute_BAO_ContributionRecur
+   * @throws \CRM_Core_Exception
+   * @todo move hook calls / extended logic to create - requires changing calls
+   *   to call create not add
    */
   public static function add(&$params) {
     if (!empty($params['id'])) {
@@ -59,14 +61,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     // or invoice ID as an existing recurring contribution
     $duplicates = [];
     if (self::checkDuplicate($params, $duplicates)) {
-      $error = CRM_Core_Error::singleton();
-      $d = implode(', ', $duplicates);
-      $error->push(CRM_Core_Error::DUPLICATE_CONTRIBUTION,
-        'Fatal',
-        [$d],
-        "Found matching recurring contribution(s): $d"
-      );
-      return $error;
+      throw new CRM_Core_Exception('Found matching recurring contribution(s): ' . implode(', ', $duplicates));
     }
 
     $recurring = new CRM_Contribute_BAO_ContributionRecur();
@@ -229,6 +224,8 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *
    * @param array $ids
    *   (reference ) an array of recurring contribution ids.
+   *
+   * @deprecated use the api.
    *
    * @return array
    *   an array of recurring ids count
@@ -847,7 +844,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $form->assign('contribution_recur_pane_open', FALSE);
     foreach (self::getRecurringFields() as $key) {
       if ($key === 'contribution_recur_payment_made' && !empty($form->_formValues) &&
-        !CRM_Utils_System::isNull(CRM_Utils_Array::value($key, $form->_formValues))
+        !CRM_Utils_System::isNull($form->_formValues[$key] ?? NULL)
       ) {
         $form->assign('contribution_recur_pane_open', TRUE);
         break;
@@ -971,6 +968,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     if (!empty($existing['installments']) && self::isComplete($recurringContributionID, $existing['installments'])) {
       $params['contribution_status_id'] = 'Completed';
       $params['next_sched_contribution_date'] = 'null';
+      $params['end_date'] = 'now';
     }
     else {
       // Only update next sched date if it's empty or up to 48 hours away because payment processors may be managing
@@ -994,21 +992,24 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @param \CRM_Contribute_DAO_Contribution $contribution
    *
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function updateOnTemplateUpdated(CRM_Contribute_DAO_Contribution $contribution) {
-    if (empty($contribution->contribution_recur_id)) {
+  public static function updateOnTemplateUpdated(CRM_Contribute_DAO_Contribution $contribution): void {
+    if ($contribution->is_template === '0' || empty($contribution->contribution_recur_id)) {
       return;
     }
+
+    if ($contribution->total_amount === NULL || $contribution->currency === NULL || $contribution->is_template === NULL) {
+      // The contribution has not been fully loaded, so fetch a full copy now.
+      $contribution->find(TRUE);
+    }
+    if (!$contribution->is_template) {
+      return;
+    }
+
     $contributionRecur = ContributionRecur::get(FALSE)
       ->addWhere('id', '=', $contribution->contribution_recur_id)
       ->execute()
       ->first();
-
-    if ($contribution->total_amount === NULL || $contribution->currency === NULL) {
-      // The contribution has not been fully loaded, so fetch a full copy now.
-      $contribution->find(TRUE);
-    }
 
     if ($contribution->currency !== $contributionRecur['currency'] || !CRM_Utils_Money::equals($contributionRecur['amount'], $contribution->total_amount, $contribution->currency)) {
       ContributionRecur::update(FALSE)

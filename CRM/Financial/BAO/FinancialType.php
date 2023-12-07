@@ -32,33 +32,24 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
   public static $_statusACLFt = [];
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialType', $id, 'is_active', $is_active);
   }
 
@@ -68,23 +59,17 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @param array $params
    *
    * @return \CRM_Financial_DAO_FinancialType
+   * @deprecated
    */
   public static function create(array $params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'FinancialType', $params['id'] ?? NULL, $params);
-    $financialType = self::add($params);
-    CRM_Utils_Hook::post($hook, 'FinancialType', $financialType->id, $financialType);
-    return $financialType;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
    * Add the financial types.
    *
-   * Note that add functions are being deprecated in favour of create.
-   * The steps here are to remove direct calls to this function from
-   * core & then move the innids of the function to the create function.
-   * This function would remain for 6 months or so as a wrapper of create with
-   * a deprecation notice.
+   * Note that $ids isn't passed anywhere except tests, which pass an empty array.
    *
    * @param array $params
    *   Values from the database object.
@@ -92,18 +77,11 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    *   Array that we wish to deprecate and remove.
    *
    * @return object
+   * @deprecated
    */
   public static function add(array $params, $ids = []) {
-    // @todo deprecate this function, move the code to create & call create from add.
-    $financialType = new CRM_Financial_DAO_FinancialType();
-    $financialType->copyValues($params);
-    $financialType->save();
-    // CRM-12470
-    if (empty($ids['financialType']) && empty($params['id'])) {
-      $titles = CRM_Financial_BAO_FinancialTypeAccount::createDefaultFinancialAccounts($financialType);
-      $financialType->titles = $titles;
-    }
-    return $financialType;
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return self::writeRecord($params);
   }
 
   /**
@@ -114,6 +92,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @return array|bool
    */
   public static function del($financialTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     try {
       static::deleteRecord(['id' => $financialTypeId]);
       return TRUE;
@@ -158,6 +137,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @param \Civi\Core\Event\PostEvent $event
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'create') {
+      $titles = CRM_Financial_BAO_EntityFinancialAccount::createDefaultFinancialAccounts($event->object);
+      $event->object->titles = $titles;
+    }
     if ($event->action === 'delete') {
       \Civi\Api4\EntityFinancialAccount::delete(FALSE)
         ->addWhere('entity_id', '=', $event->id)
@@ -194,6 +177,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
           '=',
           'financial_type.id',
         ])
+        ->addWhere('financial_type.is_active', '=', '1')
         ->execute()->indexBy('entity_id');
       Civi::$statics[__CLASS__][$key] = [];
       foreach ($types as $type) {
@@ -362,6 +346,8 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
 
   /**
    * Function to check if lineitems present in a contribution have permissioned FTs.
+   *
+   * @deprecated since 5.68 not part of core - to be handled within financialacls extension
    *
    * @param int $id
    *   contribution id

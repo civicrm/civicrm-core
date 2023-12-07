@@ -21,63 +21,6 @@
 class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityContact {
 
   /**
-   * Add activity assignment.
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return object
-   *   activity type of object that is added
-   */
-  public static function create(&$params) {
-    $assignment = new CRM_Activity_BAO_ActivityContact();
-    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-
-    $assignment->copyValues($params);
-    $assignment->record_type_id = $assigneeID;
-
-    return $assignment->save();
-  }
-
-  /**
-   * Retrieve assignee_id by activity_id.
-   *
-   * @param int $activity_id
-   *
-   * @return array
-   */
-  public static function retrieveAssigneeIdsByActivityId($activity_id) {
-    $assigneeArray = [];
-    if (!CRM_Utils_Rule::positiveInteger($activity_id)) {
-      return $assigneeArray;
-    }
-
-    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-
-    $sql = "
-SELECT     contact_id
-FROM       civicrm_activity_contact
-INNER JOIN civicrm_contact ON contact_id = civicrm_contact.id
-WHERE      activity_id = %1
-AND        record_type_id = $assigneeID
-AND        civicrm_contact.is_deleted = 0
-";
-    $assignment = CRM_Core_DAO::executeQuery($sql, [
-      1 => [
-        $activity_id,
-        'Integer',
-      ],
-    ]);
-    while ($assignment->fetch()) {
-      $assigneeArray[] = $assignment->contact_id;
-    }
-
-    return $assigneeArray;
-  }
-
-  /**
    * Retrieve assignee names by activity_id.
    *
    * @param array $activityIDs

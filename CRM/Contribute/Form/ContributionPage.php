@@ -35,13 +35,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_pledgeBlockID;
 
   /**
-   * Are we in single form mode or wizard mode?
-   *
-   * @var bool
-   */
-  protected $_single;
-
-  /**
    * Is this the first page?
    *
    * @var bool
@@ -49,18 +42,11 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_first = FALSE;
 
   /**
-   * Is this the last page?
-   *
-   * @var bool
-   */
-  protected $_last = FALSE;
-
-  /**
    * Store price set id.
    *
    * @var int
    */
-  protected $_priceSetID = NULL;
+  protected $_priceSetID;
 
   protected $_values;
 
@@ -82,11 +68,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
    * Set variables up before form is built.
    */
   public function preProcess() {
-    // current contribution page id
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE, NULL, 'REQUEST'
-    );
-    $this->assign('contributionPageID', $this->_id);
+    $this->assign('contributionPageID', $this->getContributionPageID());
 
     // get the requested action
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
@@ -97,16 +79,9 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     // setting title and 3rd level breadcrumb for html page if contrib page exists
     if ($this->_id) {
       $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-
-      if ($this->_action == CRM_Core_Action::UPDATE) {
-        $this->_single = TRUE;
-      }
     }
 
-    // CRM-16776 - show edit/copy/create buttons on Profiles Tab if user has required permission.
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $this->assign('perm', TRUE);
-    }
+    $this->assign('perm', (bool) CRM_Core_Permission::check('administer CiviCRM'));
     // set up tabs
     CRM_Contribute_Form_ContributionPage_TabHeader::build($this);
 
@@ -166,57 +141,18 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       $this->addElement('hidden', 'cancelURL', $this->_cancelURL);
     }
 
-    if ($this->_single) {
-      $buttons = [
-        [
-          'type' => 'next',
-          'name' => ts('Save'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'upload',
-          'name' => ts('Save and Done'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'subName' => 'done',
-        ],
-      ];
-      if (!$this->_last) {
-        $buttons[] = [
-          'type' => 'submit',
-          'name' => ts('Save and Next'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'subName' => 'savenext',
-        ];
-      }
-      $buttons[] = [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ];
-      $this->addButtons($buttons);
-    }
-    else {
-      $buttons = [];
-      if (!$this->_first) {
-        $buttons[] = [
-          'type' => 'back',
-          'name' => ts('Previous'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        ];
-      }
-      $buttons[] = [
+    $buttons = [
+      [
         'type' => 'next',
-        'name' => ts('Continue'),
-        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'name' => ts('Save'),
         'isDefault' => TRUE,
-      ];
-      $buttons[] = [
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ];
-
-      $this->addButtons($buttons);
-    }
+      ],
+    ];
+    $this->addButtons($buttons);
 
     $session->replaceUserContext($this->_cancelURL);
 
@@ -260,8 +196,10 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       $this->set('values', $this->_values);
     }
     $defaults = $this->_values;
+    // These fields are not exposed on the form and 'name' is exposed on amount, with a different meaning.
+    // see https://lab.civicrm.org/dev/core/-/issues/4453.
+    unset($defaults['name'], $defaults['created_id'], $defaults['created_date']);
 
-    $config = CRM_Core_Config::singleton();
     if (isset($this->_id)) {
 
       //set defaults for pledgeBlock values.
@@ -285,7 +223,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       ];
       foreach ($pledgeBlock as $key) {
         $defaults[$key] = $pledgeBlockDefaults[$key] ?? NULL;
-        if ($key == 'pledge_start_date' && !empty($pledgeBlockDefaults[$key])) {
+        if ($key === 'pledge_start_date' && !empty($pledgeBlockDefaults[$key])) {
           $defaultPledgeDate = (array) json_decode($pledgeBlockDefaults['pledge_start_date']);
           $pledgeDateFields = [
             'pledge_calendar_date' => 'calendar_date',
@@ -313,10 +251,8 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
       // get price set of type contributions
       //this is the value for stored in db if price set extends contribution
-      $usedFor = 2;
-      $this->_priceSetID = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id, $usedFor, 1);
-      if ($this->_priceSetID) {
-        $defaults['price_set_id'] = $this->_priceSetID;
+      if ($this->getPriceSetID()) {
+        $defaults['price_set_id'] = $this->getPriceSetID();
       }
     }
     else {
@@ -459,6 +395,38 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       self::$_template->assign('isForm', FALSE);
       return 'CRM/Contribute/Form/ContributionPage/Tab.tpl';
     }
+  }
+
+  /**
+   * Get the price set ID for the event.
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getContributionPageID(): ?int {
+    if (!$this->_id) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    }
+    return $this->_id ? (int) $this->_id : NULL;
+  }
+
+  /**
+   * Get the price set ID for the contribution page.
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getPriceSetID(): ?int {
+    if (!$this->_priceSetID && $this->getContributionPageID()) {
+      $this->_priceSetID = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->getContributionPageID());
+    }
+    return $this->_priceSetID ? (int) $this->_priceSetID : NULL;
   }
 
 }

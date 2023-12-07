@@ -13,7 +13,7 @@
     <tr>
       <td>
         <div class="crm-submit-buttons">
-          {include file="CRM/common/formButtons.tpl"}
+          {include file="CRM/common/formButtons.tpl" location=''}
           {if $addressId}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <a class="button delete-button" href="#" style="display:inline-block;float:none;"><div class="icon delete-icon"></div> {ts}Delete{/ts}</a>
@@ -43,9 +43,9 @@
         <table id="address_table_{$blockId}" class="form-layout-compressed">
            {* build address block w/ address sequence. *}
            {foreach item=addressElement from=$addressSequence}
-            {include file=CRM/Contact/Form/Edit/Address/$addressElement.tpl}
+            {include file="CRM/Contact/Form/Edit/Address/`$addressElement`.tpl"}
            {/foreach}
-           {include file=CRM/Contact/Form/Edit/Address/geo_code.tpl}
+           {include file="CRM/Contact/Form/Edit/Address/geo_code.tpl"}
        </table>
       </td>
      </tr>

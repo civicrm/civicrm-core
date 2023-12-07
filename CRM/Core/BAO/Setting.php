@@ -288,7 +288,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
     else {
       $cb = Civi\Core\Resolver::singleton()->get($fieldSpec['validate_callback']);
-      if (!call_user_func_array($cb, array(&$value, $fieldSpec))) {
+      if (!call_user_func_array($cb, [&$value, $fieldSpec])) {
         throw new CRM_Core_Exception("validation failed for {$fieldSpec['name']} = $value  based on callback {$fieldSpec['validate_callback']}");
       }
     }

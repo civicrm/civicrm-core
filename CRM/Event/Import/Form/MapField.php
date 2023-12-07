@@ -21,6 +21,15 @@
 class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    return 'participant_import';
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
@@ -55,7 +64,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function buildQuickForm() {
     $this->addSavedMappingFields();
-    $this->addFormRule(array('CRM_Event_Import_Form_MapField', 'formRule'), $this);
+    $this->addFormRule(['CRM_Event_Import_Form_MapField', 'formRule'], $this);
     $this->addMapper();
     $this->addFormButtons();
   }
@@ -83,10 +92,10 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         $importKeys[] = $mapperPart[0];
       }
       // FIXME: should use the schema titles, not redeclare them
-      $requiredFields = array(
+      $requiredFields = [
         'contact_id' => ts('Contact ID'),
         'event_id' => ts('Event ID'),
-      );
+      ];
 
       $contactFieldsBelowWeightMessage = self::validateRequiredContactMatchFields($self->getContactType(), $importKeys);
 
@@ -107,7 +116,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
           }
           elseif (!in_array('event_title', $importKeys)) {
             $errors['_qf_default'] .= ts('Missing required field: Provide %1 or %2',
-                array(1 => $title, 2 => 'Event Title')
+                [1 => $title, 2 => 'Event Title']
               ) . '<br />';
           }
         }

@@ -26,10 +26,60 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   private $_mergeCases = FALSE;
 
   /**
+   * Related case view
+   *
+   * @var bool
+   * @internal
+   */
+  public $_showRelatedCases = FALSE;
+
+  /**
+   * Does user have capabilities to access all cases and activities
+   *
+   * @var bool
+   * @internal
+   */
+  public $_hasAccessToAllCases = FALSE;
+
+  /**
+   * ID of contact being viewed
+   *
+   * @var int
+   * @internal
+   */
+  public $_contactID;
+
+  private $_caseClients;
+
+  /**
+   * ID of case being viewed
+   *
+   * @var int
+   * @internal
+   */
+  public $_caseID;
+
+  /**
+   * Various case details, for use in the template
+   *
+   * @var array
+   * @internal
+   */
+  public $_caseDetails = [];
+
+  /**
+   * The name of the type associated with the current case
+   *
+   * @var string
+   * @internal
+   */
+  public $_caseType;
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $this->_showRelatedCases = $_GET['relatedCases'] ?? NULL;
+    $this->_showRelatedCases = (bool) ($_GET['relatedCases'] ?? FALSE);
 
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
     $isMultiClient = $xmlProcessorProcess->getAllowMultipleCaseClients();
@@ -40,7 +90,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     if ($this->_showRelatedCases) {
       $relatedCases = $this->get('relatedCases');
       if (!isset($relatedCases)) {
-        $cId = CRM_Utils_Request::retrieve('cid', 'Integer');
         $caseId = CRM_Utils_Request::retrieve('id', 'Integer');
         $relatedCases = CRM_Case_BAO_Case::getRelatedCases($caseId);
       }
@@ -53,8 +102,20 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $this->_hasAccessToAllCases = CRM_Core_Permission::check('access all cases and activities');
     $this->assign('hasAccessToAllCases', $this->_hasAccessToAllCases);
 
-    $this->assign('contactID', $this->_contactID = (int) $this->get('cid'));
     $this->assign('caseID', $this->_caseID = (int) $this->get('id'));
+
+    $this->_caseClients = CRM_Case_BAO_Case::getContactNames($this->_caseID);
+
+    $cid = $this->get('cid');
+
+    // If no cid supplied, use first case client
+    if (!$cid) {
+      $cid = array_keys($this->_caseClients)[0];
+    }
+    elseif (!isset($this->_caseClients[$cid])) {
+      CRM_Core_Error::statusBounce("Contact $cid not a client of case " . $this->_caseID);
+    }
+    $this->assign('contactID', $this->_contactID = (int) $cid);
 
     // Access check.
     if (!CRM_Case_BAO_Case::accessCase($this->_caseID, FALSE)) {
@@ -100,7 +161,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       "action=view&reset=1&id={$this->_caseID}&cid={$this->_contactID}&context=home"
     );
 
-    $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactID);
+    $displayName = $this->_caseClients[$this->_contactID]['display_name'];
     $this->assign('displayName', $displayName);
 
     $this->setTitle($displayName . ' - ' . $caseType);
@@ -319,7 +380,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $this->assign('caseRelationships', $caseRelationships);
 
     //also add client as role. CRM-4438
-    $caseRoles['client'] = CRM_Case_BAO_Case::getContactNames($this->_caseID);
+    $caseRoles['client'] = $this->_caseClients;
 
     $this->assign('caseRoles', $caseRoles);
 
@@ -396,16 +457,16 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
         'entity_table' => 'civicrm_case',
         'tag_id.parent_id.is_tagset' => 1,
         'options' => ['limit' => 0],
-        'return' => ["tag_id.parent_id", "tag_id.parent_id.name", "tag_id.name"],
+        'return' => ["tag_id.parent_id", "tag_id.parent_id.label", "tag_id.label"],
       ]);
       foreach ($tagSetItems['values'] as $tag) {
         $tagSetTags += [
           $tag['tag_id.parent_id'] => [
-            'name' => $tag['tag_id.parent_id.name'],
+            'label' => $tag['tag_id.parent_id.label'],
             'items' => [],
           ],
         ];
-        $tagSetTags[$tag['tag_id.parent_id']]['items'][] = $tag['tag_id.name'];
+        $tagSetTags[$tag['tag_id.parent_id']]['items'][] = $tag['tag_id.label'];
       }
     }
     $this->assign('tagSetTags', $tagSetTags);
@@ -505,7 +566,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $form->add('datepicker', 'activity_date_high_' . $form->_caseID, ts('To'), [], FALSE, ['time' => FALSE]);
 
     if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $form->add('checkbox', 'activity_deleted', ts('Deleted Activities'), '', FALSE, ['id' => 'activity_deleted_' . $form->_caseID]);
+      $form->add('checkbox', 'activity_deleted', ts('Deleted Activities'), ['id' => 'activity_deleted_' . $form->_caseID], FALSE);
     }
   }
 

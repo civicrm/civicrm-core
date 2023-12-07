@@ -18,11 +18,12 @@
  *   - Class files never have multiple dots in the name. ("CRM/Foo.php" is a class; "CRM/Foo.bar.php" is not).
  *   - The ONLY files which match these patterns are STRICTLY class files.
  *   - The ONLY classes which match these patterns are SAFE/INTENDED for use with `hook_scanClasses`.
+ *   - Test directories are not scanned in version 1.1+. See https://github.com/civicrm/civicrm-core/pull/26157
  *
  * To minimize unintended activations, this only loads Civi interfaces. It skips other interfaces.
  *
  * @mixinName scan-classes
- * @mixinVersion 1.0.0
+ * @mixinVersion 1.1.0
  * @since 5.52
  *
  * @param CRM_Extension_MixInfo $mixInfo
@@ -35,6 +36,9 @@
  * @param \CRM_Extension_MixInfo $mixInfo
  * @param \CRM_Extension_BootCache $bootCache
  */
+
+use Civi\Core\ClassScanner;
+
 return function ($mixInfo, $bootCache) {
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event
@@ -44,20 +48,16 @@ return function ($mixInfo, $bootCache) {
       return;
     }
 
-    $cache = \Civi\Core\ClassScanner::cache('structure');
+    $cache = ClassScanner::cache('structure');
     $cacheKey = $mixInfo->longName;
     $all = $cache->get($cacheKey);
     if ($all === NULL) {
       $baseDir = CRM_Utils_File::addTrailingSlash($mixInfo->getPath());
       $all = [];
 
-      \Civi\Core\ClassScanner::scanFolders($all, $baseDir, 'CRM', '_');
-      \Civi\Core\ClassScanner::scanFolders($all, $baseDir, 'Civi', '\\');
-      if (defined('CIVICRM_TEST')) {
-        \Civi\Core\ClassScanner::scanFolders($all, "$baseDir/tests/phpunit", 'CRM', '_');
-        \Civi\Core\ClassScanner::scanFolders($all, "$baseDir/tests/phpunit", 'Civi', '\\');
-      }
-      $cache->set($cacheKey, $all, \Civi\Core\ClassScanner::TTL);
+      ClassScanner::scanFolders($all, $baseDir, 'CRM', '_');
+      ClassScanner::scanFolders($all, $baseDir, 'Civi', '\\');
+      $cache->set($cacheKey, $all, ClassScanner::TTL);
     }
 
     $event->classes = array_merge($event->classes, $all);

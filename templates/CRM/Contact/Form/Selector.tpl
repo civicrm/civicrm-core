@@ -36,7 +36,7 @@
 
   {counter start=0 skip=1 print=false}
 
-  { if $id }
+  {if $id}
       {foreach from=$rows item=row}
         <tr id='rowid{$row.contact_id}' class="{cycle values='odd-row,even-row'}">
             {assign var=cbName value=$row.checkbox}
@@ -52,9 +52,9 @@
             {foreach from=$row item=value key=key}
                {if ($key neq "checkbox") and ($key neq "action") and ($key neq "contact_type") and ($key neq "contact_type_orig") and ($key neq "status") and ($key neq "sort_name") and ($key neq "contact_id")}
               <td>
-                {if $key EQ "household_income_total" }
+                {if $key EQ "household_income_total"}
                     {$value|crmMoney}
-                {elseif strpos( $key, '_date' ) !== false }
+                {elseif strpos( $key, '_date' ) !== false}
                     {$value|crmDate}
                 {else}
                     {$value}
@@ -78,7 +78,7 @@
                 {$row.status}</td>
             {/if}
             <td>{$row.contact_type}</td>
-            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`&context=`$context`"}">{if !empty($row.is_deleted)}<del>{/if}{$row.sort_name}{if !empty($row.is_deleted)}</del>{/if}</a></td>
+            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`&context=`$context`"}">{if $row.contact_is_deleted}<del>{/if}{$row.sort_name}{if $row.contact_is_deleted}</del>{/if}</a></td>
             {if $action eq 512 or $action eq 256}
               {if !empty($columnHeaders.street_address)}
           <td><span title="{$row.street_address|escape}">{$row.street_address|mb_truncate:22:"...":true}{privacyFlag field=do_not_mail condition=$row.do_not_mail}</span></td>

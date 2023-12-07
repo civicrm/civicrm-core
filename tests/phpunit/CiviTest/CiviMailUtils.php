@@ -37,6 +37,11 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
   protected $_outBound_option = NULL;
 
   /**
+   * @var CiviUnitTestCase
+   */
+  protected $_ut;
+
+  /**
    * Constructor.
    *
    * @param CiviUnitTestCase $unit_test The currently running test
@@ -119,9 +124,10 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
    * @param string $type
    *   'raw'|'ezc'.
    *
-   * @throws CRM_Core_Exception
-   *
    * @return array(ezcMail)|array(string)
+   *
+   * @noinspection PhpMissingReturnTypeInspection
+   * @noinspection PhpDocMissingThrowsInspection
    */
   public function getAllMessages($type = 'raw') {
     $msgs = [];
@@ -215,7 +221,7 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
     $this->_ut->assertEquals(
       $expectedRecipients,
       $recipients,
-      "Incorrect recipients: " . print_r(array('expected' => $expectedRecipients, 'actual' => $recipients), TRUE)
+      "Incorrect recipients: " . print_r(['expected' => $expectedRecipients, 'actual' => $recipients], TRUE)
     );
   }
 
@@ -236,7 +242,7 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
     $this->_ut->assertEquals(
       $expectedSubjects,
       $subjects,
-      "Incorrect subjects: " . print_r(array('expected' => $expectedSubjects, 'actual' => $subjects), TRUE)
+      "Incorrect subjects: " . print_r(['expected' => $expectedSubjects, 'actual' => $subjects], TRUE)
     );
   }
 

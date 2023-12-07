@@ -78,7 +78,7 @@ class Joinable {
   /**
    * @var bool
    */
-  protected $deprecated = FALSE;
+  protected $deprecatedBy = FALSE;
 
   /**
    * @param $targetTable
@@ -104,13 +104,15 @@ class Joinable {
    */
   public function getConditionsForJoin(string $baseTableAlias, string $targetTableAlias) {
     $conditions = [];
-    $conditions[] = sprintf(
-      '`%s`.`%s` =  `%s`.`%s`',
-      $baseTableAlias,
-      $this->baseColumn,
-      $targetTableAlias,
-      $this->targetColumn
-    );
+    if ($this->baseColumn && $this->targetColumn) {
+      $conditions[] = sprintf(
+        '`%s`.`%s` =  `%s`.`%s`',
+        $baseTableAlias,
+        $this->baseColumn,
+        $targetTableAlias,
+        $this->targetColumn
+      );
+    }
     $this->addExtraJoinConditions($conditions, $baseTableAlias, $targetTableAlias);
     return $conditions;
   }
@@ -280,17 +282,16 @@ class Joinable {
   /**
    * @return bool
    */
-  public function isDeprecated() {
-    return $this->deprecated;
+  public function isDeprecatedBy() {
+    return $this->deprecatedBy;
   }
 
   /**
-   * @param bool $deprecated
-   *
+   * @param string|null $deprecatedBy
    * @return $this
    */
-  public function setDeprecated(bool $deprecated = TRUE) {
-    $this->deprecated = $deprecated;
+  public function setDeprecatedBy(string $deprecatedBy = NULL) {
+    $this->deprecatedBy = $deprecatedBy ?? $this->alias . '_id';
     return $this;
   }
 

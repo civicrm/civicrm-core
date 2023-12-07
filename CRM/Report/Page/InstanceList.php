@@ -161,7 +161,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         continue;
       }
 
-      if (trim($dao->title)) {
+      if (trim($dao->title ?? '')) {
         if ($this->ovID) {
           $this->title = ts("Report(s) created from the template: %1", [1 => $dao->label]);
         }

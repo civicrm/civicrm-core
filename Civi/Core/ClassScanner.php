@@ -137,18 +137,13 @@ class ClassScanner {
 
     $civicrmRoot = \Civi::paths()->getPath('[civicrm.root]/');
 
-    // TODO: Consider expanding this search.
+    // Scan all core classes that might implement an interface we're looking for.
+    // Excludes internal and legacy classes, upgraders, pages & other classes that don't need to be scanned.
     $classes = [];
     static::scanFolders($classes, $civicrmRoot, 'Civi/Test/ExampleData', '\\');
-    static::scanFolders($classes, $civicrmRoot, 'CRM/*/WorkflowMessage', '_');
-    static::scanFolders($classes, $civicrmRoot, 'CRM/*/Import', '_');
+    // Most older CRM_ stuff doesn't implement event listeners & services so can be skipped.
+    static::scanFolders($classes, $civicrmRoot, 'CRM', '_', ';(Upgrade|Utils|Exception|_DAO|_Page|_Form|_Controller|_StateMachine|_Selector|_CodeGen|_QuickForm);');
     static::scanFolders($classes, $civicrmRoot, 'Civi', '\\', ';\\\(Security|Test)\\\;');
-    if (\CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests') {
-      if (strpos(get_include_path(), $civicrmRoot . 'tests/phpunit') !== FALSE) {
-        static::scanFolders($classes, $civicrmRoot . 'tests/phpunit', 'CRM/*/WorkflowMessage', '_');
-        static::scanFolders($classes, $civicrmRoot . 'tests/phpunit', 'Civi/*/WorkflowMessage', '\\');
-      }
-    }
 
     $cache->set($cacheKey, $classes, static::TTL);
     return $classes;

@@ -28,8 +28,6 @@ class CRM_Profile_Form_Dynamic extends CRM_Profile_Form {
   /**
    * Pre processing work done here.
    *
-   * @param
-   *
    */
   public function preProcess(): void {
     if ($this->get('register')) {

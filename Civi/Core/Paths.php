@@ -256,10 +256,7 @@ class Paths {
     $value = rtrim($this->getVariable($defaultContainer, 'url'), '/') . ($isDot ? '' : "/$value");
 
     if ($preferFormat === 'relative') {
-      $parsed = parse_url($value);
-      if (isset($_SERVER['HTTP_HOST']) && isset($parsed['host']) && $_SERVER['HTTP_HOST'] == $parsed['host']) {
-        $value = $parsed['path'];
-      }
+      $value = \CRM_Utils_Url::toRelative($value);
     }
 
     if ($ssl || ($ssl === NULL && \CRM_Utils_System::isSSL())) {

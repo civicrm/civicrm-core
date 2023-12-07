@@ -18,35 +18,13 @@
  *  - The receipt-date, cancel-date, or thankyou-date.
  *  - The page on which the contribution was made.
  */
-class CRM_Contribute_ActionMapping_ByPage implements \Civi\ActionSchedule\MappingInterface {
-
-  /**
-   * The value for civicrm_action_schedule.mapping_id which identifies the
-   * "Contribution Page" mapping.
-   */
-  const MAPPING_ID = 'contribpage';
-
-  /**
-   * Register Activity-related action mappings.
-   *
-   * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
-   */
-  public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
-    $registrations->register(new static());
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getId() {
-    return self::MAPPING_ID;
-  }
+class CRM_Contribute_ActionMapping_ByPage extends CRM_Contribute_ActionMapping {
 
   /**
    * @return string
    */
-  public function getEntity() {
-    return 'civicrm_contribution';
+  public function getName(): string {
+    return 'contribpage';
   }
 
   /**
@@ -54,26 +32,14 @@ class CRM_Contribute_ActionMapping_ByPage implements \Civi\ActionSchedule\Mappin
    *
    * @return string
    */
-  public function getLabel() {
+  public function getLabel(): string {
     return ts('Contribution Page');
   }
 
-  /**
-   * Get a printable label to use as the header on the 'value' filter.
-   *
-   * @return string
-   */
-  public function getValueHeader() {
-    return ts('Contribution Page');
-  }
-
-  /**
-   * Get a printable label to use as the header on the 'status' filter.
-   *
-   * @return string
-   */
-  public function getStatusHeader() {
-    return ts('Contribution Status');
+  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    parent::modifySpec($spec);
+    $spec->getFieldByName('entity_value')
+      ->setLabel(ts('Contribution Page'));
   }
 
   /**
@@ -84,82 +50,8 @@ class CRM_Contribute_ActionMapping_ByPage implements \Civi\ActionSchedule\Mappin
    *   Ex: array(123 => 'Phone Call', 456 => 'Meeting').
    * @throws CRM_Core_Exception
    */
-  public function getValueLabels() {
+  public function getValueLabels(): array {
     return CRM_Contribute_BAO_Contribution::buildOptions('contribution_page_id', 'get', []);
-  }
-
-  /**
-   * Get a list of status options.
-   *
-   * @param string|int $value
-   *   The list of status options may be contingent upon the selected filter value.
-   *   This is the selected filter value.
-   * @return array
-   *   Array(string $value => string $label).
-   *   Ex: Array(123 => 'Completed', 456 => 'Scheduled').
-   * @throws CRM_Core_Exception
-   */
-  public function getStatusLabels($value) {
-    return CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'get', []);
-  }
-
-  /**
-   * Get a list of available date fields.
-   *
-   * @return array
-   *   Array(string $fieldName => string $fieldLabel).
-   */
-  public function getDateFields() {
-    return [
-      'receive_date' => ts('Receive Date'),
-      'cancel_date' => ts('Cancel Date'),
-      'receipt_date' => ts('Receipt Date'),
-      'thankyou_date' => ts('Thank You Date'),
-    ];
-  }
-
-  /**
-   * Get a list of recipient types.
-   *
-   * Note: A single schedule may filter on *zero* or *one* recipient types.
-   * When an admin chooses a value, it's stored in $schedule->recipient.
-   *
-   * @return array
-   *   array(string $value => string $label).
-   *   Ex: array('assignee' => 'Activity Assignee').
-   */
-  public function getRecipientTypes() {
-    return [];
-  }
-
-  /**
-   * Get a list of recipients which match the given type.
-   *
-   * Note: A single schedule may filter on *multiple* recipients.
-   * When an admin chooses value(s), it's stored in $schedule->recipient_listing.
-   *
-   * @param string $recipientType
-   *   Ex: 'participant_role'.
-   * @return array
-   *   Array(mixed $name => string $label).
-   *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
-   * @see getRecipientTypes
-   */
-  public function getRecipientListing($recipientType) {
-    return [];
-  }
-
-  /**
-   * Determine whether a schedule based on this mapping is sufficiently
-   * complete.
-   *
-   * @param \CRM_Core_DAO_ActionSchedule $schedule
-   * @return array
-   *   Array (string $code => string $message).
-   *   List of error messages.
-   */
-  public function validateSchedule($schedule) {
-    return [];
   }
 
   /**
@@ -175,7 +67,7 @@ class CRM_Contribute_ActionMapping_ByPage implements \Civi\ActionSchedule\Mappin
    * @see RecipientBuilder
    * @throws CRM_Core_Exception
    */
-  public function createQuery($schedule, $phase, $defaultParams) {
+  public function createQuery($schedule, $phase, $defaultParams): CRM_Utils_SQL_Select {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
@@ -186,10 +78,13 @@ class CRM_Contribute_ActionMapping_ByPage implements \Civi\ActionSchedule\Mappin
     $query['casContactTableAlias'] = NULL;
 
     // $schedule->start_action_date is user-supplied data. validate.
-    if (!array_key_exists($schedule->start_action_date, $this->getDateFields())) {
+    if (empty($schedule->absolute_date) && !array_key_exists($schedule->start_action_date, $this->getDateFields())) {
       throw new CRM_Core_Exception("Invalid date field");
     }
-    $query['casDateField'] = $schedule->start_action_date;
+    $query['casDateField'] = $schedule->start_action_date ?? '';
+    if (empty($query['casDateField']) && $schedule->absolute_date) {
+      $query['casDateField'] = "'" . CRM_Utils_Type::escape($schedule->absolute_date, 'String') . "'";
+    }
 
     // build where clause
     if (!empty($selectedValues)) {
@@ -202,26 +97,6 @@ class CRM_Contribute_ActionMapping_ByPage implements \Civi\ActionSchedule\Mappin
     }
 
     return $query;
-  }
-
-  /**
-   * Determine whether a schedule based on this mapping should
-   * reset the reminder state if the trigger date changes.
-   *
-   * @return bool
-   *
-   * @param \CRM_Core_DAO_ActionSchedule $schedule
-   */
-  public function resetOnTriggerDateChange($schedule) {
-    return FALSE;
-  }
-
-  /**
-   * Determine whether a schedule based on this mapping should
-   * send to additional contacts.
-   */
-  public function sendToAdditional($entityId): bool {
-    return TRUE;
   }
 
 }

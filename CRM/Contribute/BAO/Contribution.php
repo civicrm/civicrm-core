@@ -11,11 +11,13 @@
 
 use Civi\Api4\Activity;
 use Civi\Api4\ActivityContact;
+use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\PaymentProcessor;
+use Civi\Core\Event\PostEvent;
 
 /**
  *
@@ -407,6 +409,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     $billingFirstName = $params['billing_first_name'] ?? NULL;
     $billingMiddleName = $params['billing_middle_name'] ?? NULL;
     $billingLastName = $params['billing_last_name'] ?? NULL;
+    // Note this is NOT used when creating a billing address. It is probably passed
+    // the the payment processor - which is horrible & could maybe change.
     $addressParams['address_name'] = "{$billingFirstName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingMiddleName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingLastName}";
 
     foreach ($billingFields as $value) {
@@ -603,9 +607,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
   /**
    * Event fired after modifying a contribution.
+   *
    * @param \Civi\Core\Event\PostEvent $event
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+  public static function self_hook_civicrm_post(PostEvent $event): void {
     if ($event->action === 'edit') {
       CRM_Contribute_BAO_ContributionRecur::updateOnTemplateUpdated($event->object);
     }
@@ -914,7 +921,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       return CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['payment_processor_id'], NULL, 'civicrm_payment_processor');
     }
     if (!empty($params['payment_instrument_id'])) {
-      return CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($contribution['payment_instrument_id']);
+      return CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($contribution['payment_instrument_id']);
     }
     else {
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
@@ -1024,6 +1031,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
             'class' => 'medium-popup',
             'qs' => "reset=1&id=%%id%%&contribution_id=%%contribution_id%%",
             'title' => ts('Edit Payment'),
+            'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
           ],
         ];
         $paymentEditLink = CRM_Core_Action::formLink(
@@ -1055,6 +1063,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       ];
       if ($paidByName === 'Check') {
         $val['check_number'] = $resultDAO->check_number;
+      }
+      else {
+        $val['check_number'] = NULL;
       }
       $rows[] = $val;
     }
@@ -1147,7 +1158,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
      $financialTypeACLJoin
      WHERE  $whereCond
-       AND  ( is_test = 0 OR is_test IS NULL )
+       AND  is_test = 0
        AND  contact.is_deleted = 0
   GROUP BY  currency
 ";
@@ -1458,8 +1469,10 @@ GROUP BY p.id
    * @todo - this is a confusing function called from one place. It has a test. It would be
    * nice to deprecate it.
    *
+   * @deprecated
    */
   public static function getHonorContacts($honorId) {
+    CRM_Core_Error::deprecatedFunctionWarning('apiv4');
     $params = [];
     $honorDAO = new CRM_Contribute_DAO_ContributionSoft();
     $honorDAO->contact_id = $honorId;
@@ -1648,16 +1661,21 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
    * thought).
    *
    * @param array $params
-   * @param int $billingLocationTypeID
    *
    * @return int
    *   address id
    */
-  public static function createAddress($params, $billingLocationTypeID) {
+  public static function createAddress($params) {
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
     [$hasBillingField, $addressParams] = self::getBillingAddressParams($params, $billingLocationTypeID);
     if ($hasBillingField) {
-      $address = CRM_Core_BAO_Address::add($addressParams, FALSE);
-      return $address->id;
+      $nameFields = [
+        $params['billing_first_name'] ?? NULL,
+        $params['billing_middle_name'] ?? NULL,
+        $params['billing_last_name'] ?? NULL,
+      ];
+      $addressParams['name'] = implode(' ', array_filter($nameFields));
+      return (int) CRM_Core_BAO_Address::writeRecord($addressParams)->id;
     }
     return NULL;
 
@@ -1698,8 +1716,7 @@ WHERE      $condition
     $dao = CRM_Core_DAO::executeQuery($query);
 
     while ($dao->fetch()) {
-      $params = ['id' => $dao->id];
-      CRM_Core_BAO_Block::blockDelete('Address', $params);
+      Address::delete(FALSE)->addWhere('id', '=', $dao->id)->execute();
     }
   }
 
@@ -1708,35 +1725,18 @@ WHERE      $condition
    * Online Event Registration or Online Membership signup.
    *
    * @param int $componentId
-   *   Participant/membership id.
-   * @param string $componentName
-   *   Event/Membership.
+   *   Participant id.
    *
    * @return int
    *   pending contribution id.
    */
-  public static function checkOnlinePendingContribution($componentId, $componentName) {
+  public static function checkOnlinePendingContribution($componentId) {
     $contributionId = NULL;
-    if (!$componentId ||
-      !in_array($componentName, ['Event', 'Membership'])
-    ) {
-      return $contributionId;
-    }
 
-    if ($componentName === 'Event') {
-      $idName = 'participant_id';
-      $componentTable = 'civicrm_participant';
-      $paymentTable = 'civicrm_participant_payment';
-      $source = ts('Online Event Registration');
-    }
-
-    if ($componentName === 'Membership') {
-      $idName = 'membership_id';
-      $componentTable = 'civicrm_membership';
-      $paymentTable = 'civicrm_membership_payment';
-      $source = ts('Online Contribution');
-    }
-
+    $idName = 'participant_id';
+    $componentTable = 'civicrm_participant';
+    $paymentTable = 'civicrm_participant_payment';
+    $source = ts('Online Event Registration');
     $pendingStatusId = array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'));
 
     $query = "
@@ -1778,18 +1778,18 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * Use api contribute.completetransaction
    * For failures use failPayment (preferably exposing by api in the process).
    *
+   * @deprecated since 5.69 Will be remvoed ASAP since this is old & crufty &
+   * should never have been used outside core.
    */
   public static function transitionComponents($params) {
-    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id']);
-    $previousStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['previous_contribution_status_id']);
     // @todo fix the one place that calls this function to use Payment.create
     // remove this.
     // get minimum required values.
+    CRM_Core_Error::deprecatedFunctionWarning('use Payment.create api');
     $contributionId = $params['contribution_id'];
-    $contributionStatusId = $params['contribution_status_id'];
 
     // we process only ( Completed, Cancelled, or Failed ) contributions.
-    if (!$contributionId || $contributionStatus !== 'Completed') {
+    if (!$contributionId) {
       return;
     }
 
@@ -1833,7 +1833,23 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       }
     }
 
-    $contribution->loadRelatedObjects($input, $ids);
+    $paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $input, CRM_Utils_Array::value(
+      'paymentProcessor',
+      $ids
+    ));
+
+    if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $contribution->contribution_page_id) {
+      $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
+        $contribution->contribution_page_id,
+        'payment_processor'
+      );
+      if ($paymentProcessorID) {
+        $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage;
+      }
+    }
+
+    $contribution->loadRelatedObjects($paymentProcessorID, $ids);
+    unset($ids);
 
     $memberships = $contribution->_relatedObjects['membership'] ?? [];
     $participant = $contribution->_relatedObjects['participant'] ?? [];
@@ -1856,12 +1872,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         $participant->id,
         'status_id'
       );
-    }
-
-    // only pending contribution related object processed.
-    if (!in_array($previousStatus, ['Pending', 'Partially paid'])) {
-      // this is case when we already processed contribution object.
-      return;
     }
 
     if (is_array($memberships)) {
@@ -2017,7 +2027,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     }
 
     if ($pledgePayment) {
-      CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $pledgePaymentIDs, $contributionStatusId);
+      CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $pledgePaymentIDs, CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'));
     }
 
   }
@@ -2050,7 +2060,10 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       LEFT JOIN civicrm_participant         p    ON pp.participant_id  = p.id
       LEFT JOIN civicrm_membership          m    ON m.id  = mp.membership_id
       LEFT JOIN civicrm_pledge_payment      pgp  ON pgp.contribution_id  = c.id
-      WHERE     c.id = $contributionId";
+      WHERE     c.id = $contributionId
+      -- only get the primary recipient
+      AND (p.registered_by_id IS NULL OR p.registered_by_id = 0)
+      ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
     $componentDetails = [];
@@ -2133,6 +2146,11 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   /**
    * Repeat a transaction as part of a recurring series.
    *
+   * @internal NOT supported to be called from outside of core. Note this function
+   * was made public to be called from the v3 api which IS supported so we can
+   * amend it without regards to possible external callers as this warning
+   * was added in the same commit as it was made public rather than protected.
+   *
    * The ideal flow is
    * 1) Processor calls contribution.repeattransaction with contribution_status_id = Pending
    * 2) The repeattransaction loads the 'template contribution' and calls a hook to allow altering of it .
@@ -2144,25 +2162,71 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * Gaps in the above (
    *
    * @param array $input
-   *    Keys are all optional, if not supplied the template contribution's values are used.
-   *    The template contribution is either the actual template or the latest added contribution
-   *    for the ContributionRecur specified in $contributionParams['contribution_recur_id'].
    *    - total_amount
    *    - financial_type_id
    *    - campaign_id
    *
-   * @param array $contributionParams
+   *    These keys are all optional, and are combined with the values from the contribution_recur
+   *    record to override values from the template contribution. Overrides are
+   *    subject to the following limitations
+   *    1) the campaign id & is_test always apply (is_test is available on the recurring but not as input)
+   *    2) the total amount & financial type ID overrides ONLY apply if the contribution has
+   *    only one line item.
+   *
+   *    The template contribution is derived from a contribution linked to
+   *    the recurring contribution record. A true template contribution is only used
+   *    as a template and is_template is set to TRUE. If this cannot be found the latest added contribution
+   *    is used.
+   *
+   * @param int $recurringContributionID
    *
    * @return bool|array
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @todo
-   *  1) many processors still call repeattransaction with contribution_status_id = Completed
-   *  2) repeattransaction code is current munged into completeTransaction code for historical bad coding reasons
+   *
+   *  2) repeattransaction code is callable from completeTransaction code for historical bad coding reasons
    *  3) Repeat transaction duplicates rather than calls Order.create
    *  4) Use of payment.create still limited - completetransaction is more common.
    */
-  protected static function repeatTransaction(array $input, array $contributionParams) {
+  public static function repeatTransaction(array $input, int $recurringContributionID) {
+    // @todo - this was shared with `completeOrder` and not all necessarily apply.
+    $inputContributionWhiteList = [
+      'fee_amount',
+      'net_amount',
+      'trxn_id',
+      'check_number',
+      'payment_instrument_id',
+      'is_test',
+      'campaign_id',
+      'receive_date',
+      'receipt_date',
+      'contribution_status_id',
+      'card_type_id',
+      'pan_truncation',
+    ];
+
+    $paymentProcessorId = $input['payment_processor_id'] ?? NULL;
+
+    $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+
+    // @todo this was taken from completeContribution - it may be this just duplicates
+    // upcoming filtering & can go.
+    $contributionParams = array_merge([
+      'contribution_status_id' => $completedContributionStatusID,
+    ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
+    ));
+
+    $contributionParams['payment_processor'] = $paymentProcessorId;
+
+    if (empty($contributionParams['payment_instrument_id']) && $paymentProcessorId) {
+      $contributionParams['payment_instrument_id'] = PaymentProcessor::get(FALSE)->addWhere('id', '=', $paymentProcessorId)->addSelect('payment_instrument_id')->execute()->first()['payment_instrument_id'];
+    }
+
+    if ($recurringContributionID) {
+      $contributionParams['contribution_recur_id'] = $recurringContributionID;
+    }
+    $isCompleted = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionParams['contribution_status_id']) === 'Completed';
     $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution(
       (int) $contributionParams['contribution_recur_id'],
       [
@@ -2174,7 +2238,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $contributionParams['line_item'] = $templateContribution['line_item'];
     $contributionParams['status_id'] = 'Pending';
 
-    foreach (['contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount'] as $fieldName) {
+    foreach (['contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'contribution_page_id', 'total_amount'] as $fieldName) {
       if (isset($templateContribution[$fieldName])) {
         $contributionParams[$fieldName] = $templateContribution[$fieldName];
       }
@@ -2190,6 +2254,10 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($createContribution['id'], $contributionParams['contribution_recur_id'],
       $contributionParams['status_id'], $contributionParams['total_amount']);
 
+    if ($isCompleted) {
+      // Ideally add deprecation notice here & only accept pending for repeattransaction.
+      return self::completeOrder($input, NULL, $createContribution['id']);
+    }
     return $createContribution;
   }
 
@@ -2310,38 +2378,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * Note that the unit test for the BaseIPN class tests this function
    *
-   * @param array $input
-   *   Input as delivered from Payment Processor.
+   * @param int $paymentProcessorID
+   *   Payment Processor ID.
    * @param array $ids
    *   Ids as Loaded by Payment Processor.
    *
    * @return bool
    * @throws CRM_Core_Exception
    */
-  public function loadRelatedObjects($input, &$ids) {
-    // @todo deprecate this function - the steps should be
-    // 1) add additional functions like 'getRelatedMemberships'
-    // 2) switch all calls that refer to ->_relatedObjects to
-    // using the helper functions
-    // 3) make ->_relatedObjects noisy in some way (deprecation won't work for properties - hmm
-    // 4) make ->_relatedObjects protected
-    // 5) hone up the individual functions to not use rely on this having been called
-    // 6) deprecate like mad
-
-    $paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $input, CRM_Utils_Array::value(
-      'paymentProcessor',
-      $ids
-    ));
-
-    if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $this->contribution_page_id) {
-      $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
-        $this->contribution_page_id,
-        'payment_processor'
-      );
-      if ($paymentProcessorID) {
-        $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage;
-      }
-    }
+  public function loadRelatedObjects($paymentProcessorID, &$ids) {
+    // @todo deprecate this function - we are slowly returning the functionality to
+    // the calling functions so this can be unravelled. It is only called from
+    // tests, composeMessage & transitionComponents. The last of these is itself
+    // deprecated, to be replaced by using Payment.create. Many parts of this are
+    // used by only one, or neither, of the actual calling functions.
 
     $ids['contributionType'] = $this->financial_type_id;
     $ids['financialType'] = $this->financial_type_id;
@@ -2448,19 +2498,16 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   messages
    * @throws \CRM_Core_Exception
    */
-  public function composeMessageArray(&$input, &$ids, &$values, $returnMessageText = TRUE) {
+  public function composeMessageArray($input, $ids, $values = [], $returnMessageText = TRUE) {
     $ids = array_merge(self::getComponentDetails($this->id), $ids);
     if (empty($ids['contact']) && isset($this->contact_id)) {
       $ids['contact'] = $this->contact_id;
     }
-
-    if (empty($this->_component)) {
-      if (!empty($ids['event'])) {
-        $this->_component = 'event';
-      }
-      else {
-        $this->_component = strtolower(CRM_Utils_Array::value('component', $input, 'contribute'));
-      }
+    if (!empty($ids['event'])) {
+      $this->_component = 'event';
+    }
+    else {
+      $this->_component = 'contribute';
     }
 
     // If the object is not fully populated then make sure it is - this is a more about legacy paths & cautious
@@ -2468,14 +2515,26 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (empty($this->financial_type_id)) {
       $this->find(TRUE);
     }
-    $this->loadRelatedObjects($input, $ids);
 
-    if (empty($this->_component)) {
-      $this->_component = $input['component'] ?? NULL;
+    $paymentProcessorID = $input['payment_processor_id'] ?? $ids['paymentProcessor'] ?? NULL;
+
+    if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $this->contribution_page_id) {
+      $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
+        $this->contribution_page_id,
+        'payment_processor'
+      );
+      if ($paymentProcessorID) {
+        $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage;
+      }
     }
 
+    $this->loadRelatedObjects($paymentProcessorID, $ids);
+    $paymentProcessor = $this->_relatedObjects['paymentProcessor'] ?? NULL;
+    $eventID = isset($ids['event']) ? (int) $ids['event'] : NULL;
+    $participantID = isset($ids['participant']) ? (int) $ids['participant'] : NULL;
+
     //not really sure what params might be passed in but lets merge em into values
-    $values = array_merge($this->_gatherMessageValues($input, $values, $ids), $values);
+    $values = array_merge($this->_gatherMessageValues($values, $eventID, $participantID), $values);
     $values['is_email_receipt'] = !$returnMessageText;
     foreach (['receipt_date', 'cc_receipt', 'bcc_receipt', 'receipt_from_name', 'receipt_from_email', 'receipt_text', 'pay_later_receipt'] as $fld) {
       if (!empty($input[$fld])) {
@@ -2486,8 +2545,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template = $this->_assignMessageVariablesToTemplate($values, $input, $returnMessageText);
     //what does recur 'mean here - to do with payment processor return functionality but
     // what is the importance
-    if (!empty($this->contribution_recur_id) && !empty($this->_relatedObjects['paymentProcessor'])) {
-      $paymentObject = Civi\Payment\System::singleton()->getByProcessor($this->_relatedObjects['paymentProcessor']);
+    if (!empty($this->contribution_recur_id) && !empty($paymentProcessor)) {
+      $paymentObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
 
       $entityID = $entity = NULL;
       if (isset($ids['contribution'])) {
@@ -2495,7 +2554,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $entityID = $ids['contribution'];
       }
       if (!empty($ids['membership'])) {
-        //not sure whether is is possible for this not to be an array - load related contacts loads an array but this code was expecting a string
+        // not sure whether it is possible for this not to be an array - load related contacts loads an array but this code was expecting a string
         // the addition of the casting is in case it could get here & be a string. Added in 4.6 - maybe remove later? This AuthorizeNetIPN & PaypalIPN tests hit this
         // line having loaded an array
         $ids['membership'] = (array) $ids['membership'];
@@ -2507,16 +2566,16 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $template->assign('updateSubscriptionBillingUrl', $paymentObject->subscriptionURL($entityID, $entity, 'billing'));
       $template->assign('updateSubscriptionUrl', $paymentObject->subscriptionURL($entityID, $entity, 'update'));
     }
-    // todo remove strtolower - check consistency
-    if (strtolower($this->_component) === 'event') {
-      $eventParams = ['id' => $this->_relatedObjects['participant']->event_id];
+
+    if ($this->_component === 'event') {
+      $eventParams = ['id' => $eventID];
       $values['event'] = [];
 
       CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
 
       //get location details
       $locationParams = [
-        'entity_id' => $this->_relatedObjects['participant']->event_id,
+        'entity_id' => $eventID,
         'entity_table' => 'civicrm_event',
       ];
       $values['location'] = CRM_Core_BAO_Location::getValues($locationParams);
@@ -2549,7 +2608,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
 
       return CRM_Event_BAO_Event::sendMail($ids['contact'], $values,
-        $this->_relatedObjects['participant']->id, $this->is_test, $returnMessageText
+        $participantID, $this->is_test, $returnMessageText
       );
     }
     else {
@@ -2576,16 +2635,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         foreach ($this->_relatedObjects['membership'] as $membership) {
           if ($membership->id) {
             $values['membership_id'] = $membership->id;
-            $values['isMembership'] = TRUE;
-            $values['membership_assign'] = TRUE;
-
             // need to set the membership values here
             $template->assign('membership_name',
               CRM_Member_PseudoConstant::membershipType($membership->membership_type_id)
             );
-            $template->assign('mem_start_date', $membership->start_date);
-            $template->assign('mem_join_date', $membership->join_date);
-            $template->assign('mem_end_date', $membership->end_date);
             $membership_status = CRM_Member_PseudoConstant::membershipStatus($membership->status_id, NULL, 'label');
             $template->assign('mem_status', $membership_status);
             if ($membership_status === 'Pending' && $membership->is_pay_later == 1) {
@@ -2625,16 +2678,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * as part of CRM-9996 refactoring as a step towards simplifying the composeMessage function
    * Values related to the contribution in question are gathered
    *
-   * @param array $input
-   *   Input into function (probably from payment processor).
    * @param array $values
-   * @param array $ids
-   *   The set of ids related to the input.
+   * @param int|null $eventID
+   * @param int|null $participantID
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function _gatherMessageValues($input, &$values, $ids = []) {
+  public function _gatherMessageValues($values, ?int $eventID, ?int $participantID) {
     // set display address of contributor
     $values['billingName'] = '';
     if ($this->address_id) {
@@ -2663,11 +2714,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         // This is a call we want to use less, in favour of loading related objects.
         $values = $this->addContributionPageValuesToValuesHeavyHandedly($values);
         if ($this->contribution_page_id) {
-          // This is precautionary as there are some legacy flows, but it should really be
-          // loaded by now.
-          if (!isset($this->_relatedObjects['contributionPage'])) {
-            $this->loadRelatedEntitiesByID(['contributionPage' => $this->contribution_page_id]);
-          }
           CRM_Contribute_BAO_Contribution_Utils::overrideDefaultCurrency($values);
         }
       }
@@ -2715,11 +2761,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       );
       // if this is onbehalf of contribution then set related contact
       if (!empty($relatedContact['individual_id'])) {
-        $values['related_contact'] = $ids['related_contact'] = $relatedContact['individual_id'];
+        $values['related_contact'] = $relatedContact['individual_id'];
       }
     }
     else {
-      $values = array_merge($values, $this->loadEventMessageTemplateParams((int) $ids['event'], (int) $this->_relatedObjects['participant']->id, $this->id));
+      $values = array_merge($values, $this->loadEventMessageTemplateParams($eventID, $participantID, $this->id));
     }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', NULL, $this->id);
@@ -3051,7 +3097,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $additionalParticipantId = [];
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id'] ?? NULL);
 
-    if (CRM_Utils_Array::value('contribution_mode', $params) === 'participant') {
+    if (($params['contribution_mode'] ?? NULL) === 'participant') {
       $entityId = $params['participant_id'];
       $entityTable = 'civicrm_participant';
       $additionalParticipantId = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
@@ -3104,11 +3150,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         ]);
       }
       elseif (!empty($params['payment_instrument_id'])) {
-        $params['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($params['payment_instrument_id']);
+        $params['to_financial_account_id'] = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($params['payment_instrument_id']);
       }
       // dev/financial#160 - If this is a contribution update, also check for an existing payment_instrument_id.
       elseif ($isUpdate && $params['prevContribution']->payment_instrument_id) {
-        $params['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount((int) $params['prevContribution']->payment_instrument_id);
+        $params['to_financial_account_id'] = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount((int) $params['prevContribution']->payment_instrument_id);
       }
       else {
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
@@ -3320,7 +3366,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     // record line items and financial items
     if (empty($params['skipLineItem'])) {
-      CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $isUpdate);
+      CRM_Price_BAO_LineItem::processPriceSet($entityId, $params['line_item'] ?? NULL, $params['contribution'], $entityTable, $isUpdate);
     }
 
     // create batch entry if batch_id is passed and
@@ -3367,25 +3413,18 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   /**
    * Check status validation on update of a contribution.
    *
-   * @param array $values
+   * @param array $oldContributionValues
    *   Previous form values before submit.
    *
-   * @param array $fields
+   * @param array $newContributionValues
    *   The input form values.
    *
-   * @param array $errors
-   *   List of errors.
-   *
-   * @return bool
+   * @throws \CRM_Core_Exception
    */
-  public static function checkStatusValidation($values, &$fields, &$errors) {
-    if (CRM_Utils_System::isNull($values) && !empty($fields['id'])) {
-      $values['contribution_status_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $fields['id'], 'contribution_status_id');
-      if ($values['contribution_status_id'] == $fields['contribution_status_id']) {
-        return FALSE;
-      }
-    }
-    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+  public static function checkStatusValidation(array $oldContributionValues, array $newContributionValues): void {
+    $newContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $newContributionValues['contribution_status_id']);
+    $oldContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $oldContributionValues['contribution_status_id']);
+
     $checkStatus = [
       'Cancelled' => ['Completed', 'Refunded'],
       'Completed' => ['Cancelled', 'Refunded', 'Chargeback'],
@@ -3396,14 +3435,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'Pending refund' => ['Completed', 'Refunded'],
       'Failed' => ['Pending'],
     ];
+    $validNewStatues = $checkStatus[$oldContributionStatus] ?? [];
 
-    if (!in_array($contributionStatuses[$fields['contribution_status_id']],
-      CRM_Utils_Array::value($contributionStatuses[$values['contribution_status_id']], $checkStatus, []))
-    ) {
-      $errors['contribution_status_id'] = ts("Cannot change contribution status from %1 to %2.", [
-        1 => $contributionStatuses[$values['contribution_status_id']],
-        2 => $contributionStatuses[$fields['contribution_status_id']],
-      ]);
+    if (!in_array($newContributionStatus, $validNewStatues, TRUE)) {
+      throw new CRM_Core_Exception(ts('Cannot change contribution status from %1 to %2.', [
+        1 => $oldContributionStatus,
+        2 => $newContributionStatus,
+      ]));
     }
   }
 
@@ -3452,7 +3490,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             'version' => 3,
             'id' => ($props['contribution_page_id']),
           ]);
-          $types = (array) CRM_Utils_Array::value('payment_processor', $page, 0);
+          $types = (array) $page['payment_processor'] ?? 0;
           $params['condition'] = 'id IN (' . implode(',', $types) . ')';
         }
         break;
@@ -3506,7 +3544,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    */
   public static function addActivityForPayment($targetCid, $activityType, $title, $contributionId, $totalAmount, $currency, $trxn_date) {
     $paymentAmount = CRM_Utils_Money::format($totalAmount, $currency);
-    $subject = "{$paymentAmount} - Offline {$activityType} for {$title}";
+    $subject = "{$paymentAmount} - {$activityType} for {$title}";
     $date = CRM_Utils_Date::isoToMysql($trxn_date);
     // source record id would be the contribution id
     $srcRecId = $contributionId;
@@ -3600,7 +3638,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $info['transaction'] = self::getContributionTransactionInformation($contributionId, $contribution['financial_type_id']);
     }
 
-    $info['payment_links'] = self::getContributionPaymentLinks($id, $info['contribution_status']);
+    $info['payment_links'] = self::getContributionPaymentLinks($contributionId, $info['contribution_status']);
     return $info;
   }
 
@@ -3765,6 +3803,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CRM_Core_Exception
    */
   public static function completeOrder($input, $recurringContributionID, $contributionID, $isPostPaymentCreate = FALSE) {
+    if (!$contributionID) {
+      CRM_Core_Error::deprecatedFunctionWarning('v3api Contribution.repeattransaction. This handling will be removed around 5.70 (calling this function directly has never been supported outside core anyway)');
+      return self::repeatTransaction($input, $recurringContributionID);
+    }
     $transaction = new CRM_Core_Transaction();
 
     $inputContributionWhiteList = [
@@ -3801,16 +3843,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
     }
 
-    if (!$contributionID) {
-      $contributionResult = self::repeatTransaction($input, $contributionParams);
-      $contributionID = $contributionResult['id'];
-      if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
-        // Ideally add deprecation notice here & only accept pending for repeattransaction.
-        return self::completeOrder($input, NULL, $contributionID);
-      }
-      return $contributionResult;
-    }
-
     if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
       self::updateMembershipBasedOnCompletionOfContribution(
         $contributionID,
@@ -3830,9 +3862,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $contributionParams['id'] = $contributionID;
     $contributionParams['is_post_payment_create'] = $isPostPaymentCreate;
 
-    if (empty($contributionResult)) {
-      $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
-    }
+    $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
 
     $transaction->commit();
     \Civi::log()->info("Contribution {$contributionParams['id']} updated successfully");
@@ -3924,7 +3954,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // if we are still empty see if we can use anything from a contribution page.
     if (!empty($pageValues['receipt_from_email'])) {
       return [
-        CRM_Utils_Array::value('receipt_from_name', $pageValues),
+        $pageValues['receipt_from_name'] ?? NULL,
         $pageValues['receipt_from_email'],
       ];
     }
@@ -4105,13 +4135,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * settings we will live with an inconsistency because it's too hard to change for now.
    * https://github.com/civicrm/civicrm-core/pull/8562#issuecomment-227874245
    *
-   *
    * @param string $name
    *
    * @return string
    *
+   * @deprecated since 5.68 will be removed around 5.74.
    */
   public static function checkContributeSettings($name) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use \Civi::settings()->get() with the actual setting name');
     $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
     return $contributeSettings[$name] ?? NULL;
   }
@@ -4184,11 +4215,7 @@ LIMIT 1;";
       }
       // @todo remove all this stuff in favour of letting the api call further down handle in
       // (it is a duplication of what the api does).
-      $dates = array_fill_keys([
-        'join_date',
-        'start_date',
-        'end_date',
-      ], NULL);
+      $dates = [];
       if ($currentMembership) {
         /*
          * Fixed FOR CRM-4433
@@ -4211,9 +4238,9 @@ LIMIT 1;";
       }
       else {
         //get the status for membership.
-        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'],
-          $dates['end_date'],
-          $dates['join_date'],
+        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'] ?? NULL,
+          $dates['end_date'] ?? NULL,
+          $dates['join_date'] ?? NULL,
           'now',
          TRUE,
           $membershipParams['membership_type_id'],
@@ -4227,7 +4254,23 @@ LIMIT 1;";
       //so make status override false.
       $membershipParams['is_override'] = FALSE;
       $membershipParams['status_override_end_date'] = 'null';
-      civicrm_api3('Membership', 'create', $membershipParams);
+      $membership = civicrm_api3('Membership', 'create', $membershipParams);
+      $membership = $membership['values'][$membership['id']];
+      // Update activity to Completed.
+      // Perhaps this should be in Membership::create? Test cover in
+      // api_v3_ContributionTest.testPendingToCompleteContribution.
+      $priorMembershipStatus = $memberships[$membership['id']]['status_id'] ?? NULL;
+      Activity::update(FALSE)->setValues([
+        'status_id:name' => 'Completed',
+        'subject' => ts('Status changed from %1 to %2'), [
+          1 => CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $priorMembershipStatus),
+          2 => CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']),
+        ],
+
+      ])->addWhere('source_record_id', '=', $membership['id'])
+        ->addWhere('status_id:name', '=', 'Scheduled')
+        ->addWhere('activity_type_id:name', 'IN', ['Membership Signup', 'Membership Renewal'])
+        ->execute();
     }
   }
 
@@ -4269,6 +4312,7 @@ LIMIT 1;";
         'is_refund' => 0,
       ],
       'extra' => '',
+      'weight' => 0,
     ];
 
     if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
@@ -4286,6 +4330,7 @@ LIMIT 1;";
           'mode' => 'live',
         ],
         'extra' => '',
+        'weight' => 0,
       ];
     }
     if ($contributionStatus !== 'Pending') {
@@ -4302,6 +4347,7 @@ LIMIT 1;";
           'is_refund' => 1,
         ],
         'extra' => '',
+        'weight' => 0,
       ];
     }
 
@@ -4558,9 +4604,6 @@ LIMIT 1;";
     $entities = [
       'contact' => 'CRM_Contact_BAO_Contact',
       'contributionRecur' => 'CRM_Contribute_BAO_ContributionRecur',
-      'contributionType' => 'CRM_Financial_BAO_FinancialType',
-      'financialType' => 'CRM_Financial_BAO_FinancialType',
-      'contributionPage' => 'CRM_Contribute_BAO_ContributionPage',
     ];
     foreach ($entities as $entity => $bao) {
       if (!empty($ids[$entity])) {
@@ -4606,6 +4649,7 @@ LIMIT 1;";
     $messageToken,
     $escapeSmarty
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the TokenProcessor');
     if (empty($contributionIds)) {
       return [];
     }

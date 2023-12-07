@@ -12,11 +12,11 @@ namespace Civi\Shimmy\Mixins;
  */
 class ScanClassesTest extends \PHPUnit\Framework\Assert {
 
-  public function testPreConditions($cv) {
+  public function testPreConditions($cv): void {
     $this->assertFileExists(static::getPath('/CRM/Shimmy/ShimmyMessage.php'), 'The shimmy extension must have example PHP files.');
   }
 
-  public function testInstalled($cv) {
+  public function testInstalled($cv): void {
     // Assert that WorkflowMessageInterface's are registered.
     $items = $cv->api4('WorkflowMessage', 'get', ['where' => [['name', '=', 'shimmy_message_example']]]);
     $this->assertEquals('CRM_Shimmy_ShimmyMessage', $items[0]['class']);
@@ -33,7 +33,7 @@ class ScanClassesTest extends \PHPUnit\Framework\Assert {
     $this->assertEquals($expectHookData, $hookData);
   }
 
-  public function testDisabled($cv) {
+  public function testDisabled($cv): void {
     // Assert that WorkflowMessageInterface's are removed.
     $items = $cv->api4('WorkflowMessage', 'get', ['where' => [['name', '=', 'shimmy_message_example']]]);
     $this->assertEmpty($items);
@@ -43,7 +43,7 @@ class ScanClassesTest extends \PHPUnit\Framework\Assert {
     $this->assertEquals([], $hookData);
   }
 
-  public function testUninstalled($cv) {
+  public function testUninstalled($cv): void {
     // Assert that WorkflowMessageInterface's are removed.
     $items = $cv->api4('WorkflowMessage', 'get', ['where' => [['name', '=', 'shimmy_message_example']]]);
     $this->assertEmpty($items);

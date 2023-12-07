@@ -69,25 +69,7 @@ class CRM_Event_ICalendar {
       $calendar = $template->fetch('CRM/Core/Calendar/GData.tpl');
     }
     else {
-      if (count($info) > 0) {
-        $date_min = min(
-          array_map(function ($event) {
-            return strtotime($event['start_date']);
-          }, $info)
-        );
-        $date_max = max(
-          array_map(function ($event) {
-            return strtotime($event['end_date'] ?? $event['start_date']);
-          }, $info)
-        );
-        $template->assign('timezones', CRM_Utils_ICalendar::generate_timezones($timezones, $date_min, $date_max));
-      }
-      else {
-        $template->assign('timezones', NULL);
-      }
-
-      $calendar = $template->fetch('CRM/Core/Calendar/ICal.tpl');
-      $calendar = preg_replace('/(?<!\r)\n/', "\r\n", $calendar);
+      $calendar = CRM_Utils_ICalendar::createCalendarFile($info);
     }
 
     // Push output for feed or download

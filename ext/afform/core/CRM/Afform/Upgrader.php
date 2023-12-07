@@ -4,7 +4,7 @@ use CRM_Afform_ExtensionUtil as E;
 /**
  * Collection of upgrade steps.
  */
-class CRM_Afform_Upgrader extends CRM_Afform_Upgrader_Base {
+class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * Update names of blocks and joins
@@ -45,7 +45,7 @@ class CRM_Afform_Upgrader extends CRM_Afform_Upgrader_Base {
       'join' => 'join_entity',
       'block' => 'entity_type',
     ];
-    foreach (glob("$localDir/*." . $scanner::METADATA_FILE) as $fileName) {
+    foreach (glob("$localDir/*." . $scanner::METADATA_JSON) as $fileName) {
       $meta = json_decode(file_get_contents($fileName), TRUE);
       foreach ($replacements as $oldKey => $newKey) {
         if (isset($meta[$oldKey])) {
@@ -85,6 +85,17 @@ class CRM_Afform_Upgrader extends CRM_Afform_Upgrader_Base {
     $scanner = new CRM_Afform_AfformScanner();
     $this->updateBlockMetadata($scanner);
 
+    return TRUE;
+  }
+
+  /**
+   * Upgrade 1003 - add status column to afform submissions
+   * @see https://lab.civicrm.org/dev/core/-/issues/4232
+   * @return bool
+   */
+  public function upgrade_1003(): bool {
+    $this->ctx->log->info('Applying update 1003 - add status column to afform submissions.');
+    $this->addColumn('civicrm_afform_submission', 'status_id', "INT UNSIGNED NOT NULL  DEFAULT 1 COMMENT 'fk to Afform Submission Status options in civicrm_option_values'");
     return TRUE;
   }
 

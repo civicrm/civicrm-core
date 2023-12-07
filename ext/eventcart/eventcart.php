@@ -1,9 +1,7 @@
 <?php
 
 require_once 'eventcart.civix.php';
-// phpcs:disable
-use CRM_Eventcart_ExtensionUtil as E;
-// phpcs:enable
+use CRM_Event_Cart_ExtensionUtil as E;
 
 /**
  * Implements hook_civicrm_config().
@@ -33,21 +31,16 @@ function eventcart_civicrm_install() {
 }
 
 /**
- * Implements hook_civicrm_postInstall().
+ * Add the conference session variable to the template.
  *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
+ * @param array $params
+ * @param string $template
  */
-function eventcart_civicrm_postInstall() {
-  _eventcart_civix_civicrm_postInstall();
-}
-
-/**
- * Implements hook_civicrm_uninstall().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_uninstall
- */
-function eventcart_civicrm_uninstall() {
-  _eventcart_civix_civicrm_uninstall();
+function eventcart_civicrm_alterMailParams(&$params, $template) {
+  $workflow = $params['workflow'] ?? '';
+  if (($workflow === 'event_online_receipt' || $workflow === 'participant_confirm') && !empty($params['tokenContact']['participant']['id'])) {
+    $params['tplParams']['conference_sessions'] = CRM_Event_Cart_BAO_Conference::get_participant_sessions($params['tokenContact']['participant']['id']);
+  }
 }
 
 /**
@@ -59,31 +52,17 @@ function eventcart_civicrm_enable() {
   _eventcart_civix_civicrm_enable();
 }
 
-/**
- * Implements hook_civicrm_disable().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_disable
- */
-function eventcart_civicrm_disable() {
-  _eventcart_civix_civicrm_disable();
-}
-
-/**
- * Implements hook_civicrm_upgrade().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
- */
-function eventcart_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _eventcart_civix_civicrm_upgrade($op, $queue);
-}
-
-/**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function eventcart_civicrm_entityTypes(&$entityTypes) {
-  _eventcart_civix_civicrm_entityTypes($entityTypes);
+function eventcart_civicrm_tabset($name, &$tabs) {
+  if ($name === 'civicrm/event/manage' && Civi::settings()->get('enable_cart')) {
+    $tabs['conference'] = [
+      'title' => E::ts('Conference Slots'),
+      'link' => NULL,
+      'valid' => TRUE,
+      'active' => TRUE,
+      'current' => FALSE,
+      'class' => 'ajaxForm',
+      'url' => 'civicrm/event/manage/conference',
+      'field' => 'slot_label_id',
+    ];
+  }
 }

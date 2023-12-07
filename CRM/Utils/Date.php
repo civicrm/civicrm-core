@@ -83,20 +83,20 @@ class CRM_Utils_Date {
     $date['d'] = sprintf('%02d', $date['d']);
 
     $time = '';
-    if (CRM_Utils_Array::value('H', $date) != NULL ||
-      CRM_Utils_Array::value('h', $date) != NULL ||
-      CRM_Utils_Array::value('i', $date) != NULL ||
-      CRM_Utils_Array::value('s', $date) != NULL
+    if (!empty($date['H']) ||
+      !empty($date['h']) ||
+      !empty($date['i']) ||
+      !empty($date['s'])
     ) {
       // we have time too..
       if (!empty($date['h'])) {
-        if (CRM_Utils_Array::value('A', $date) == 'PM' or CRM_Utils_Array::value('a', $date) == 'pm') {
+        if (($date['A'] ?? NULL) == 'PM' or ($date['a'] ?? NULL) == 'pm') {
           if ($date['h'] != 12) {
             $date['h'] = $date['h'] + 12;
           }
         }
-        if ((CRM_Utils_Array::value('A', $date) == 'AM' or CRM_Utils_Array::value('a', $date) == 'am') &&
-          CRM_Utils_Array::value('h', $date) == 12
+        if ((($date['A'] ?? NULL) == 'AM' or ($date['a'] ?? NULL) == 'am') &&
+          ($date['h'] ?? NULL) == 12
         ) {
           $date['h'] = '00';
         }
@@ -232,21 +232,16 @@ class CRM_Utils_Date {
   public static function &getAbbrMonthNames($month = FALSE) {
     $key = 'abbrMonthNames_' . \CRM_Core_I18n::getLocale();
     if (empty(\Civi::$statics[__CLASS__][$key])) {
-      $intl_formatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, NULL, IntlDateFormatter::GREGORIAN, 'MMM');
-      \Civi::$statics[__CLASS__][$key] = [
-        1 => $intl_formatter->format(strtotime('1 January')),
-        2 => $intl_formatter->format(strtotime('1 February')),
-        3 => $intl_formatter->format(strtotime('1 March')),
-        4 => $intl_formatter->format(strtotime('1 April')),
-        5 => $intl_formatter->format(strtotime('1 May')),
-        6 => $intl_formatter->format(strtotime('1 June')),
-        7 => $intl_formatter->format(strtotime('1 July')),
-        8 => $intl_formatter->format(strtotime('1 August')),
-        9 => $intl_formatter->format(strtotime('1 September')),
-        10 => $intl_formatter->format(strtotime('1 October')),
-        11 => $intl_formatter->format(strtotime('1 November')),
-        12 => $intl_formatter->format(strtotime('1 December')),
-      ];
+      // Note: IntlDateFormatter provides even more strings than `strftime()` or `l10n/*/civicrm.mo`.
+      // Note: Consistently use UTC for all requests in resolving these names. Avoid edge-cases where TZ support is inconsistent.
+      $intlFormatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, 'UTC', IntlDateFormatter::GREGORIAN, 'MMM');
+      $monthNums = range(1, 12);
+      \Civi::$statics[__CLASS__][$key] = array_combine($monthNums, array_map(
+        function(int $monthNum) use ($intlFormatter) {
+          return $intlFormatter->format(gmmktime(0, 0, 0, $monthNum, 1));
+        },
+        $monthNums
+      ));
     }
     if ($month) {
       return \Civi::$statics[__CLASS__][$key][$month];
@@ -264,23 +259,16 @@ class CRM_Utils_Date {
   public static function &getFullMonthNames() {
     $key = 'fullMonthNames_' . \CRM_Core_I18n::getLocale();
     if (empty(\Civi::$statics[__CLASS__][$key])) {
-      // Not relying on strftime because it depends on the operating system
-      // and most people will not have a non-US locale configured out of the box
-      // Ignoring other date names for now, since less visible by default
-      \Civi::$statics[__CLASS__][$key] = [
-        1 => ts('January'),
-        2 => ts('February'),
-        3 => ts('March'),
-        4 => ts('April'),
-        5 => ts('May'),
-        6 => ts('June'),
-        7 => ts('July'),
-        8 => ts('August'),
-        9 => ts('September'),
-        10 => ts('October'),
-        11 => ts('November'),
-        12 => ts('December'),
-      ];
+      // Note: IntlDateFormatter provides even more strings than `strftime()` or `l10n/*/civicrm.mo`.
+      // Note: Consistently use UTC for all requests in resolving these names. Avoid edge-cases where TZ support is inconsistent.
+      $intlFormatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, 'UTC', IntlDateFormatter::GREGORIAN, 'MMMM');
+      $monthNums = range(1, 12);
+      \Civi::$statics[__CLASS__][$key] = array_combine($monthNums, array_map(
+        function(int $monthNum) use ($intlFormatter) {
+          return $intlFormatter->format(gmmktime(0, 0, 0, $monthNum, 1));
+        },
+        $monthNums
+      ));
     }
 
     return \Civi::$statics[__CLASS__][$key];
@@ -292,16 +280,16 @@ class CRM_Utils_Date {
    * @return int
    */
   public static function unixTime($string) {
-    if (empty($string)) {
+    if (!$string) {
       return 0;
     }
     $parsedDate = date_parse($string);
-    return mktime(CRM_Utils_Array::value('hour', $parsedDate),
-      CRM_Utils_Array::value('minute', $parsedDate),
+    return mktime($parsedDate['hour'],
+       $parsedDate['minute'],
       59,
-      CRM_Utils_Array::value('month', $parsedDate),
-      CRM_Utils_Array::value('day', $parsedDate),
-      CRM_Utils_Array::value('year', $parsedDate)
+       $parsedDate['month'],
+       $parsedDate['day'],
+       $parsedDate['year']
     );
   }
 
@@ -862,9 +850,9 @@ class CRM_Utils_Date {
    * Find whether today's date lies in
    * the given range
    *
-   * @param date $startDate
+   * @param Date $startDate
    *   Start date for the range.
-   * @param date $endDate
+   * @param Date $endDate
    *   End date for the range.
    *
    * @return bool
@@ -927,9 +915,9 @@ class CRM_Utils_Date {
   /**
    * Calculate Age in Years if greater than one year else in months.
    *
-   * @param date $birthDate
+   * @param Date $birthDate
    *   Birth Date.
-   * @param date $targetDate
+   * @param Date $targetDate
    *   Target Date. (show age on specific date)
    *
    * @return array
@@ -1140,7 +1128,7 @@ class CRM_Utils_Date {
    *   start date and end date for the relative time frame
    */
   public static function relativeToAbsolute($relativeTerm, $unit) {
-    $now = getdate();
+    $now = getdate(CRM_Utils_Time::time());
     $from = $to = $dateRange = [];
     $from['H'] = $from['i'] = $from['s'] = 0;
     $relativeTermParts = explode('_', $relativeTerm);
@@ -1316,11 +1304,12 @@ class CRM_Utils_Date {
             }
             else {
               $from['Y'] = $fYear - $relativeTermSuffix;
-              $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
+              $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + $relativeTermSuffix);
               $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
               $to['d'] = $fiscalEnd['2'];
               $to['M'] = $fiscalEnd['1'];
-              $to['Y'] = $fYear;
+              // We need the year from FiscalEnd, instead of just fYear, because these differ if the FY starts on Jan 1
+              $to['Y'] = $fiscalEnd['0'];
               $to['H'] = 23;
               $to['i'] = $to['s'] = 59;
             }
@@ -1927,8 +1916,8 @@ class CRM_Utils_Date {
    *   $fy       Current Fiscal Year
    */
   public static function calculateFiscalYear($fyDate, $fyMonth) {
-    $date = date("Y-m-d");
-    $currentYear = date("Y");
+    $date = date("Y-m-d", CRM_Utils_Time::time());
+    $currentYear = date("Y", CRM_Utils_Time::time());
 
     // recalculate the date because month 4::04 make the difference
     $fiscalYear = explode('-', date("Y-m-d", mktime(0, 0, 0, $fyMonth, $fyDate, $currentYear)));
@@ -1998,6 +1987,7 @@ class CRM_Utils_Date {
           $field['smarty_view_format'] = $dateAttributes['smarty_view_format'];
         }
         $field['datepicker']['extra'] = self::getDatePickerExtra($field);
+        $field['datepicker']['extra']['time'] = $fieldMetaData['type'] == CRM_Utils_Type::T_TIMESTAMP || $fieldMetaData['type'] == (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME);
         $field['datepicker']['attributes'] = self::getDatePickerAttributes($field);
       }
     }
@@ -2019,10 +2009,10 @@ class CRM_Utils_Date {
     }
     $thisYear = date('Y');
     if (isset($field['start_date_years'])) {
-      $extra['minDate'] = date('Y-m-d', strtotime('-' . ($thisYear - $field['start_date_years']) . ' years'));
+      $extra['minDate'] = date('Y-m-d', strtotime((-1 * ($thisYear - $field['start_date_years'])) . ' years'));
     }
     if (isset($field['end_date_years'])) {
-      $extra['maxDate'] = date('Y-m-d', strtotime('-' . ($thisYear - $field['end_date_years']) . ' years'));
+      $extra['maxDate'] = date('Y-m-d', strtotime((-1 * ($thisYear - $field['end_date_years'])) . ' years'));
     }
     return $extra;
   }
@@ -2242,7 +2232,7 @@ class CRM_Utils_Date {
   /**
    * Print out a date object in specified format in local timezone
    *
-   * @param DateTimeObject $dateObject
+   * @param DateTimeInterface $dateObject
    * @param string $format
    * @return string
    */

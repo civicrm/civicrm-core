@@ -28,14 +28,14 @@
         </tr>
         {foreach from=$rows item=row}
         <tr class="{cycle values='odd-row,even-row'}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
-          <td class="crm-contribution-form-block-product_name">{$row.product_name}</td>
-          <td class="crm-contribution-form-block-sku">{$row.sku}</td>
+          <td class="crm-contribution-form-block-product_name">{$row.product_name|escape}</td>
+          <td class="crm-contribution-form-block-sku">{$row.sku|escape}</td>
           <td class="crm-contribution-form-block-price">{$row.price|crmMoney}</td>
           <td class="crm-contribution-form-block-min_contribution">{$row.min_contribution|crmMoney}</td>
           <td class="crm-contribution-form-block-cost">{$row.cost|crmMoney}</td>
-          <td class="crm-contribution-form-block-financial_type">{$row.financial_type}</td>
+          <td class="crm-contribution-form-block-financial_type">{$row.financial_type|escape}</td>
           <td class="nowrap crm-contribution-form-block-weight">{$row.weight|smarty:nodefaults}</td>
-          <td class="crm-contribution-form-block-action">{$row.action}</td>
+          <td class="crm-contribution-form-block-action">{$row.action|smarty:nodefaults}</td>
         </tr>
         {/foreach}
         </table>
@@ -48,16 +48,14 @@
     {/if}
 </div>
 {else}
-  {if $showForm eq false}
-    <div class="messages status no-popup">
-      {if $products ne null }
-        {icon icon="fa-info-circle"}{/icon}
-        {capture assign=crmURL}{crmURL p='civicrm/admin/contribute/addProductToPage' q="reset=1&action=update&id=$id"}{/capture}
-        {ts 1=$crmURL}There are no premiums offered on this contribution page yet. You can <a href='%1'>add one</a>.{/ts}
-      {else}
-        {icon icon="fa-info-circle"}{/icon}
-        {ts 1=$managePremiumsURL}There are no active premiums for your site. You can <a href='%1'>create and/or enable premiums here</a>.{/ts}
-      {/if}
-    </div>
-  {/if}
+  <div class="messages status no-popup">
+    {if $products ne null}
+      {icon icon="fa-info-circle"}{/icon}
+      {capture assign=crmURL}{crmURL p='civicrm/admin/contribute/addProductToPage' q="reset=1&action=update&id=$id"}{/capture}
+      {ts 1=$crmURL}There are no premiums offered on this contribution page yet. You can <a href='%1'>add one</a>.{/ts}
+    {else}
+      {icon icon="fa-info-circle"}{/icon}
+      {ts 1=$managePremiumsURL}There are no active premiums for your site. You can <a href='%1'>create and/or enable premiums here</a>.{/ts}
+    {/if}
+  </div>
 {/if}

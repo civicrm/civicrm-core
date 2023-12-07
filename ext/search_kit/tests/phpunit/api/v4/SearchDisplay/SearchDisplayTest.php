@@ -22,7 +22,7 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       'api_entity' => 'Contact',
       'api_params' => [
         'version' => 4,
-        'select' => ['first_name', 'last_name', 'contact_sub_type:label', 'gender_id'],
+        'select' => ['first_name', 'display_name', 'contact_sub_type:label', 'gender_id'],
         'where' => [],
       ],
     ];
@@ -37,6 +37,17 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertEquals('fa-table', $display['type:icon']);
     $this->assertEquals('Contact', $display['saved_search_id.api_entity']);
     $this->assertEquals('Contacts', $display['saved_search_id.api_entity:label']);
+
+    // Default sort order should have been added
+    $this->assertEquals([['sort_name', 'ASC']], $display['settings']['sort']);
+
+    // `display_name` column should have a link
+    $this->assertEquals('Contact', $display['settings']['columns'][1]['link']['entity']);
+    $this->assertEquals('view', $display['settings']['columns'][1]['link']['action']);
+    $this->assertEmpty($display['settings']['columns'][1]['link']['join']);
+
+    // `first_name` column should not have a link
+    $this->assertArrayNotHasKey('link', $display['settings']['columns'][0]);
   }
 
   public function testGetDefaultNoEntity() {
@@ -63,10 +74,12 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->addValue('label', 'My test search')
       ->execute()->first();
     // Name will be created from munged label
-    $this->assertEquals('My_test_search', $savedSearch0['name']);
-    // Name will have _1, _2, etc. appended to ensure it's unique
-    $this->assertEquals('My_test_search_1', $savedSearch1['name']);
-    $this->assertEquals('My_test_search_2', $savedSearch2['name']);
+    $this->assertEquals('My_test_search', $savedSearch0['name'], "SavedSearch 0");
+    // Name will have _r appended to ensure it's unique, where r is a string of
+    // random chars.
+    $this->assertEquals('My_test_search_', substr($savedSearch1['name'], 0, 15), "SavedSearch 1");
+    $this->assertEquals('My_test_search_', substr($savedSearch2['name'], 0, 15), "SavedSearch 2");
+    $this->assertNotSame($savedSearch1['name'], $savedSearch2['name'], "SavedSearch 1,2");
 
     $display0 = SearchDisplay::create()
       ->addValue('saved_search_id', $savedSearch0['id'])
@@ -84,11 +97,12 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->addValue('type', 'table')
       ->execute()->first();
     // Name will be created from munged label
-    $this->assertEquals('My_test_display', $display0['name']);
-    // Name will have _1 appended to ensure it's unique to savedSearch0
-    $this->assertEquals('My_test_display_1', $display1['name']);
-    // This is for a different saved search so doesn't need a number appended
-    $this->assertEquals('My_test_display', $display2['name']);
+    $this->assertEquals('My_test_display', $display0['name'], "SearchDisplay 0");
+    // Name will have _r appended (r is random string) to ensure it's unique to
+    // savedSearch0.
+    $this->assertEquals('My_test_display_', substr($display1['name'], 0, 16), "SearchDisplay 1");
+    // This is for a different saved search so doesn't need a suffix appended
+    $this->assertEquals('My_test_display', $display2['name'], "SearchDisplay 2");
   }
 
 }

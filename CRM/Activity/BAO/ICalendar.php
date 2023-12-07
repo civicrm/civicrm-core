@@ -21,18 +21,25 @@
 class CRM_Activity_BAO_ICalendar {
 
   /**
-   * @var \CRM_Activity_BAO_ICalendar
    * The activity for which we're generating ical.
+   *
+   * @var CRM_Activity_BAO_Activity
    */
   protected $activity;
 
   /**
+   * Path to temporary unique file,
+   * to hold generated .ics file
+   *
+   * @var string
+   */
+  protected $icsfile;
+
+  /**
    * Constructor.
    *
-   * @param object $act
+   * @param CRM_Activity_BAO_Activity $act
    *   Reference to an activity object.
-   *
-   * @return \CRM_Activity_BAO_ICalendar
    */
   public function __construct(&$act) {
     $this->activity = $act;

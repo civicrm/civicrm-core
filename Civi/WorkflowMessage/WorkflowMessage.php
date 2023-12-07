@@ -126,11 +126,16 @@ class WorkflowMessage {
   public static function exportAll(WorkflowMessageInterface $model): array {
     // The format is defined to match the traditional format of CRM_Core_BAO_MessageTemplate::sendTemplate().
     // At the top level, it is an "envelope", but it also has keys for other sections.
+    $swapLocale = !$model->getLocale() ? NULL : \CRM_Utils_AutoClean::swapLocale($model->getLocale());
+
     $values = $model->export('envelope');
     $values['tplParams'] = $model->export('tplParams');
     $values['tokenContext'] = $model->export('tokenContext');
     if (isset($values['tokenContext']['contactId'])) {
       $values['contactId'] = $values['tokenContext']['contactId'];
+    }
+    if ($swapLocale) {
+      $swapLocale->cleanup();
     }
     return $values;
   }

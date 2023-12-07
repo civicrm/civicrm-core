@@ -102,10 +102,16 @@ function civicrm_api3_message_template_send($params) {
     // the 'wrong' BAO ones. It works, it's tested &
     // we can do better in apiv4 once we get a suitable
     // api there.
-    if ($spec['name'] !== 'workflow' && isset($spec['api.aliases']) && array_key_exists($field, $params)) {
+    if (($spec['name'] ?? '') !== 'workflow' && isset($spec['api.aliases']) && array_key_exists($field, $params)) {
       $params[CRM_Utils_Array::first($spec['api.aliases'])] = $params[$field];
       unset($params[$field]);
     }
+  }
+  if (!isset($params['model'])) {
+    $params['model'] = [
+      // Pass through legacy receipt_text.
+      'userEnteredText' => $params['tplParams']['receipt_text'] ?? NULL,
+    ];
   }
   if (empty($params['messageTemplateID'])) {
     if (empty($params['workflow'])) {

@@ -19,6 +19,10 @@ return [
         'is_active' => TRUE,
         'grouping' => 'grant_type_id',
       ],
+      'match' => [
+        'name',
+        'option_group_id',
+      ],
     ],
   ],
 ];

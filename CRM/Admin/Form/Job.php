@@ -19,7 +19,6 @@
  * Class for configuring jobs.
  */
 class CRM_Admin_Form_Job extends CRM_Admin_Form {
-  public $_id = NULL;
 
   /**
    * @var bool
@@ -27,26 +26,50 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   public $submitOnce = TRUE;
 
   public function preProcess() {
-
     parent::preProcess();
     $this->setContext();
 
-    $this->setTitle(ts('Manage - Scheduled Jobs'));
+    if ($this->_action == CRM_Core_Action::DELETE) {
+      $this->setTitle(ts('Delete Scheduled Job'));
+    }
+    elseif ($this->_action == CRM_Core_Action::ADD) {
+      $this->setTitle(ts('New Scheduled Job'));
+    }
+    elseif ($this->_action == CRM_Core_Action::UPDATE) {
+      $this->setTitle(ts('Edit Scheduled Job'));
+    }
+    elseif ($this->_action == CRM_Core_Action::VIEW) {
+      $this->setTitle(ts('Execute Scheduled Job'));
+    }
+
+    CRM_Utils_System::appendBreadCrumb([
+      [
+        'title' => ts('Scheduled Jobs'),
+        'url' => CRM_Utils_System::url('civicrm/admin/job', 'reset=1'),
+      ],
+    ]);
 
     if ($this->_id) {
-      $refreshURL = CRM_Utils_System::url('civicrm/admin/job',
+      $refreshURL = CRM_Utils_System::url('civicrm/admin/job/edit',
         "reset=1&action=update&id={$this->_id}",
         FALSE, NULL, FALSE
       );
     }
     else {
-      $refreshURL = CRM_Utils_System::url('civicrm/admin/job',
+      $refreshURL = CRM_Utils_System::url('civicrm/admin/job/add',
         "reset=1&action=add",
         FALSE, NULL, FALSE
       );
     }
 
     $this->assign('refreshURL', $refreshURL);
+  }
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Job';
   }
 
   /**
@@ -122,23 +145,20 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    * @throws CRM_Core_Exception
    */
   public static function formRule($fields) {
-
     $errors = [];
 
-    require_once 'api/api.php';
-
-    /** @var \Civi\API\Kernel $apiKernel */
-    $apiKernel = \Civi::service('civi_api_kernel');
-    $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], ['version' => 3]);
     try {
+      $apiParams = CRM_Core_BAO_Job::parseParameters($fields['parameters']);
+      /** @var \Civi\API\Kernel $apiKernel */
+      $apiKernel = \Civi::service('civi_api_kernel');
+      $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], $apiParams);
       $apiKernel->resolve($apiRequest);
     }
     catch (\Civi\API\Exception\NotImplementedException $e) {
       $errors['api_action'] = ts('Given API command is not defined.');
     }
-
-    if (!empty($errors)) {
-      return $errors;
+    catch (CRM_Core_Exception $e) {
+      $errors['parameters'] = ts('Parameters must be formatted as key=value on separate lines');
     }
 
     return empty($errors) ? TRUE : $errors;
@@ -171,11 +191,9 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       $defaults['scheduled_run_date'] = date("Y-m-d H:i:s", $ts);
     }
 
-    // CRM-10708
-    // job entity thats shipped with core is all lower case.
-    // this makes sure camel casing is followed for proper working of default population.
+    // Legacy data might use lowercase api entity name, but it should always be CamelCase
     if (!empty($defaults['api_entity'])) {
-      $defaults['api_entity'] = ucfirst($defaults['api_entity']);
+      $defaults['api_entity'] = CRM_Utils_String::convertStringToCamel($defaults['api_entity']);
     }
 
     return $defaults;
@@ -189,7 +207,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     CRM_Utils_System::flushCache();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Core_BAO_Job::del($this->_id);
+      CRM_Core_BAO_Job::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus("", ts('Scheduled Job Deleted.'), "success");
       return;
     }
@@ -225,7 +243,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $dao->api_entity = $values['api_entity'];
     $dao->api_action = $values['api_action'];
     $dao->description = $values['description'];
-    $dao->is_active = CRM_Utils_Array::value('is_active', $values, 0);
+    $dao->is_active = $values['is_active'] ?? 0;
 
     // CRM-17686
     $ts = strtotime($values['scheduled_run_date']);
@@ -233,7 +251,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     if ($ts > time()) {
       $dao->scheduled_run_date = CRM_Utils_Date::currentDBDate($ts);
       // warn about monthly/quarterly scheduling, if applicable
-      if (($dao->run_frequency == 'Monthly') || ($dao->run_frequency == 'Quarter')) {
+      if (($dao->run_frequency === 'Monthly') || ($dao->run_frequency === 'Quarter')) {
         $info = getdate($ts);
         if ($info['mday'] > 28) {
           CRM_Core_Session::setStatus(
@@ -254,7 +272,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $dao->save();
 
     // CRM-11143 - Give warning message if update_greetings is Enabled (is_active) since it generally should not be run automatically via execute action or runjobs url.
-    if ($values['api_action'] == 'update_greeting' && CRM_Utils_Array::value('is_active', $values) == 1) {
+    if ($values['api_action'] == 'update_greeting' && ($values['is_active'] ?? NULL) == 1) {
       $docLink = CRM_Utils_System::docURL2("user/initial-set-up/scheduled-jobs/#job_update_greeting");
       $msg = ts('The update greeting job can be very resource intensive and is typically not necessary to run on a regular basis. If you do choose to enable the job, we recommend you do not run it with the force=1 option, which would rebuild greetings on all records. Leaving that option absent, or setting it to force=0, will only rebuild greetings for contacts that do not currently have a value stored. %1', [1 => $docLink]);
       CRM_Core_Session::setStatus($msg, ts('Warning: Update Greeting job enabled'), 'alert');
@@ -273,6 +291,15 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $action = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $id, 'api_action');
     $name = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $id, 'name');
     return $name . ' (' . $entity . '.' . $action . ')';
+  }
+
+  /**
+   * Override parent to do nothing - since we don't use this array.
+   *
+   * @return array
+   */
+  protected function retrieveValues(): array {
+    return [];
   }
 
 }

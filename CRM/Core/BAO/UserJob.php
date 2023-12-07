@@ -15,14 +15,18 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Mapping;
+use Civi\Api4\Queue;
 use Civi\Api4\UserJob;
 use Civi\Core\ClassScanner;
+use Civi\Core\Event\PreEvent;
+use Civi\Core\HookInterface;
 use Civi\UserJob\UserJobInterface;
 
 /**
  * This class contains user jobs functionality.
  */
-class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface {
 
   /**
    * Check on the status of a queue.
@@ -63,6 +67,61 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
     }
   }
 
+  /**
+   * Enforce template expectations by unsetting non-template variables.
+   *
+   * Also delete the template if the Mapping is deleted.
+   *
+   * @param \Civi\Core\Event\PreEvent $event
+   *
+   * @noinspection PhpUnused
+   * @throws \CRM_Core_Exception
+   */
+  public static function on_hook_civicrm_pre(PreEvent $event): void {
+    if ($event->entity === 'UserJob' &&
+      (!empty($event->params['is_template'])
+      || ($event->action === 'edit' && self::isTemplate($event->params['id']))
+    )) {
+      $params = &$event->params;
+      if (empty($params['name']) && empty($params['id'])) {
+        throw new CRM_Core_Exception('Name is required for template user job');
+      }
+      if ($params['metadata']['submitted_values']['dataSource'] ?? NULL === 'CRM_Import_DataSource_SQL') {
+        // This contains path information that we are better to ditch at this point.
+        // Ideally we wouldn't save this in submitted values - but just use it.
+        unset($params['metadata']['submitted_values']['uploadFile']);
+      }
+      // This contains information about the import-specific data table.
+      unset($params['metadata']['DataSource']['table_name']);
+      // Do not keep values about updating the Mapping/UserJob template.
+      unset($params['metadata']['MapField']['saveMapping'], $params['metadata']['MapField']['updateMapping']);
+    }
+
+    // If the related mapping is deleted then delete the UserJob template
+    // This almost never happens in practice...
+    if ($event->entity === 'Mapping' && $event->action === 'delete') {
+      $mappingName = Mapping::get(FALSE)->addWhere('id', '=', $event->id)->addSelect('name')->execute()->first()['name'];
+      UserJob::delete(FALSE)->addWhere('name', '=', 'import_' . $mappingName)->execute();
+    }
+    if ($event->entity === 'UserJob' && $event->action === 'delete') {
+      Queue::delete(FALSE)->addWhere('name', '=', 'user_job_' . $event->id)->execute();
+    }
+  }
+
+  /**
+   * Is this id a Template.
+   *
+   * @param int $id
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  private static function isTemplate(int $id) : bool {
+    return (bool) UserJob::get(FALSE)->addWhere('id', '=', $id)
+      ->addWhere('is_template', '=', 1)
+      ->selectRowCount()->execute()->rowCount;
+  }
+
   private static function findUserJobId(string $queueName): ?int {
     if (CRM_Core_Config::isUpgradeMode()) {
       return NULL;
@@ -92,14 +151,20 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
    * use an existing permission? a new permission ? do they require
    * 'view all contacts' etc.
    *
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(): array {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses = [];
-    if (!\CRM_Core_Permission::check('administer queues')) {
-      $clauses['created_id'] = '= ' . (int) CRM_Core_Session::getLoggedInContactID();
+    if (!\CRM_Core_Permission::check('administer queues', $userId)) {
+      // It was ok to have $userId = NULL for the permission check but must be an int for the query
+      $cid = $userId ?? (int) CRM_Core_Session::getLoggedInContactID();
+      // Only allow access to users' own jobs (or templates)
+      $clauses['created_id'][] = "= $cid OR {is_template} = 1";
     }
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
   }
 
@@ -142,11 +207,12 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
    *   -label
    *   -class
    *   -entity
+   *   -url
    *
    * @return array
    */
   public static function getTypes(): array {
-    $types = Civi::cache()->get('UserJobTypes');
+    $types = Civi::cache('metadata')->get('UserJobTypes');
     if ($types === NULL) {
       $types = [];
       $classes = ClassScanner::get(['interface' => UserJobInterface::class]);
@@ -158,10 +224,40 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements \Civi\Core\Ho
         }
         $types = array_merge($types, $declaredTypes);
       }
-      Civi::cache()->set('UserJobTypes', $types);
+      Civi::cache('metadata')->set('UserJobTypes', $types);
     }
     // Rekey to numeric to prevent https://lab.civicrm.org/dev/core/-/issues/3719
     return array_values($types);
+  }
+
+  /**
+   * Get user job type.
+   *
+   * @param string $type
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public static function getType(string $type): array {
+    foreach (self::getTypes() as $importType) {
+      if ($importType['id'] === $type) {
+        return $importType;
+      }
+    }
+    throw new CRM_Core_Exception($type . 'not found');
+  }
+
+  /**
+   * Get the specified value for the import job type.
+   *
+   * @param string $type
+   * @param string $key
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  public static function getTypeValue(string $type, string $key) {
+    return self::getType($type)[$key];
   }
 
 }

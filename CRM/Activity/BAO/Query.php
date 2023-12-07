@@ -152,7 +152,6 @@ class CRM_Activity_BAO_Query {
         if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
-        $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
     }

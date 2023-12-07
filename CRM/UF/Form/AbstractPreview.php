@@ -37,20 +37,11 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
    * @param bool $isSingleField
    * @param bool $flag
    */
-  public function setProfile($fields, $isSingleField = FALSE, $flag = FALSE) {
-    if ($isSingleField) {
-      $this->assign('previewField', $isSingleField);
-    }
-
-    if ($flag) {
-      $this->assign('viewOnly', FALSE);
-    }
-    else {
-      $this->assign('viewOnly', TRUE);
-    }
-
+  public function setProfile(array $fields, bool $isSingleField = FALSE, bool $flag = FALSE): void {
+    $this->assign('previewField', $isSingleField);
+    $this->assign('viewOnly', !$flag);
     $this->set('fieldId', NULL);
-    $this->assign("fields", $fields);
+    $this->assign('fields', $fields);
     $this->_fields = $fields;
   }
 

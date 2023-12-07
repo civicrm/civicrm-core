@@ -17,7 +17,7 @@ namespace Civi\FlexMailer;
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
-use Symfony\Component\EventDispatcher\Event;
+use Civi\Core\Event\GenericHookEvent;
 
 // For compat w/v4.6 phpunit
 require_once 'tests/phpunit/CRM/Mailing/BaseMailingSystemTest.php';
@@ -43,24 +43,23 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
-      $manager->install(array('org.civicrm.flexmailer'));
+      $manager->install(['org.civicrm.flexmailer']);
     }
 
     parent::setUp();
-    \Civi::settings()->set('flexmailer_traditional', 'flexmailer');
 
     $dispatcher = \Civi::service('dispatcher');
     foreach (FlexMailer::getEventTypes() as $event => $class) {
-      $dispatcher->addListener($event, array($this, 'handleEvent'));
+      $dispatcher->addListener($event, [$this, 'handleEvent']);
     }
 
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
-      array($this, 'hook_alterMailParams'));
-    $this->counts = array();
+      [$this, 'hook_alterMailParams']);
+    $this->counts = [];
   }
 
-  public function handleEvent(Event $e) {
+  public function handleEvent(GenericHookEvent $e) {
     // We keep track of the events that fire during mail delivery.
     // At the end, we'll ensure that the correct events fired.
     $clazz = get_class($e);
@@ -108,28 +107,6 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
     $params
   ): void {
     parent::testUrlTracking($inputHtml, $htmlUrlRegex, $textUrlRegex, $params);
-  }
-
-  /**
-   *
-   * This takes CiviMail's own ones, but removes one that tested for a
-   * non-feature (i.e. that tokenised links are not handled).
-   *
-   * @return array
-   */
-  public function urlTrackingExamples() {
-    $cases = parent::urlTrackingExamples();
-
-    // When it comes to URLs with embedded tokens, support diverges - Flexmailer
-    // can track them, but BAO mailer cannot.
-    $cases[6] = [
-      '<p><a href="http://example.net/?id={contact.contact_id}">Foo</a></p>',
-      ';<p><a href=[\'"].*(extern/url.php|civicrm/mailing/url)(\?|&amp\\;)u=\d+.*&amp\\;id=\d+.*[\'"]>Foo</a></p>;',
-      ';\\[1\\] .*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*&id=\d+.*;',
-      ['url_tracking' => 1],
-    ];
-
-    return $cases;
   }
 
   public function testBasicHeaders(): void {

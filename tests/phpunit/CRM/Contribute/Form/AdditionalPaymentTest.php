@@ -132,13 +132,14 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'From: site@something.com',
       'Dear Anthony,',
       'Payment Details',
-      'Total Fee: $100.00',
-      'This Payment Amount: $70.00',
+      'Total Fee',
+      '$100.00',
+      'This Payment Amount',
+      '$70.00',
       'Billing Name and Address',
-      'Vancouver, AE 1321312',
+      'Vancouver, BC 1321312',
       'Visa',
       '***********1111',
-      'Expires: May 2025',
     ]);
   }
 
@@ -179,8 +180,8 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'return' => ['target_contact_id', 'assignee_contact_id', 'subject'],
     ])['values'];
     $this->assertCount(3, $activities);
-    $this->assertEquals('$ 50.00 - Offline Payment for Contribution', $activities[1]['subject']);
-    $this->assertEquals('$ 20.00 - Offline Payment for Contribution', $activities[2]['subject']);
+    $this->assertEquals('$ 50.00 - Payment for Contribution', $activities[1]['subject']);
+    $this->assertEquals('$ 20.00 - Payment for Contribution', $activities[2]['subject']);
     $this->assertEquals(CRM_Core_Session::singleton()->getLoggedInContactID(), $activities[0]['source_contact_id']);
     $this->assertEquals([$this->_individualId], $activities[0]['target_contact_id']);
     $this->assertEquals([], $activities[0]['assignee_contact_id']);
@@ -215,11 +216,16 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'Dear Anthony,',
       'Below you will find a receipt for this payment.',
-      'Total Fee: $100.00',
-      'This Payment Amount: $50.00',
-      'Balance Owed: $20.00 ',
-      'Paid By: Check',
-      'Check Number: check-12345',
+      'Total Fee',
+      '$100.00',
+      'This Payment Amount',
+      '$50.00',
+      'Balance Owed',
+      '$20.00',
+      'Paid By',
+      'Check',
+      'Check Number',
+      'check-12345',
     ],
     [
       'Billing Name and Address',
@@ -244,14 +250,15 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $mut->checkMailLog([
       'Below you will find a receipt for this payment.',
-      'Total Fee: $100.00',
-      'This Payment Amount: $100.00',
-      'Paid By: Credit Card',
+      'Total Fee',
+      '$100.00',
+      'This Payment Amount',
+      '$100.00',
+      'Paid By',
+      'Credit Card',
       '***********1111',
       'Billing Name and Address',
-      'Vancouver, AE 1321312',
-      'Expires: May 2025',
-
+      'Vancouver, BC 1321312',
     ]);
     $mut->stop();
     $mut->clearMessages();
@@ -364,6 +371,11 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     ];
     if ($mode) {
       $_REQUEST['mode'] = $mode;
+      $stateProvinceBC = \Civi\Api4\StateProvince::get()
+        ->addWhere('abbreviation', '=', 'BC')
+        ->addWhere('country_id', '=', 1039)
+        ->execute()
+        ->single();
       $submitParams += [
         'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments, TRUE),
         'payment_processor_id' => $this->paymentProcessorID,
@@ -372,7 +384,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
         'cvv2' => 234,
         'credit_card_type' => 'Visa',
         'billing_city-5' => 'Vancouver',
-        'billing_state_province_id-5' => 1059,
+        'billing_state_province_id-5' => $stateProvinceBC['id'],
         'billing_postal_code-5' => 1321312,
         'billing_country_id-5' => 1228,
       ];

@@ -20,6 +20,8 @@
  */
 class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
+  use CRM_Activity_Form_ActivityFormTrait;
+
   /**
    * The id of the object being edited / created
    *
@@ -65,7 +67,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   protected $_sourceContactId;
   protected $_targetContactId;
-  protected $_asigneeContactId;
 
   protected $_single;
 
@@ -126,6 +127,13 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   protected $supportsActivitySeparation = TRUE;
 
   public $submitOnce = TRUE;
+
+  /**
+   * @var array
+   */
+  public $_groupTree;
+
+  public $_entityTagValues;
 
   /**
    * Explicitly declare the entity api name.
@@ -259,36 +267,19 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->assign('context', $this->_context);
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
-
-    if ($this->_action & CRM_Core_Action::DELETE) {
+    if ($this->getAction() & CRM_Core_Action::DELETE) {
       if (!CRM_Core_Permission::check('delete activities')) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
     }
 
-    // CRM-6957
-    // When we come from contact search, activity id never comes.
-    // So don't try to get from object, it might gives you wrong one.
-
-    // if we're not adding new one, there must be an id to
-    // an activity we're trying to work on.
-    if ($this->_action != CRM_Core_Action::ADD &&
-      get_class($this->controller) !== 'CRM_Contact_Controller_Search'
-    ) {
-      $this->_activityId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    }
-
-    $this->_activityTypeId = CRM_Utils_Request::retrieve('atype', 'Positive', $this);
+    $this->_activityTypeId = $this->getActivityValue('activity_type_id') ?: CRM_Utils_Request::retrieve('atype', 'Positive', $this);
     $this->assign('atype', $this->_activityTypeId);
-
     $this->assign('activityId', $this->_activityId);
 
     // Check for required permissions, CRM-6264.
-    if ($this->_activityId &&
-      in_array($this->_action, [
-        CRM_Core_Action::UPDATE,
-        CRM_Core_Action::VIEW,
-      ]) &&
+    if ($this->getActivityID() &&
+      in_array($this->_action, [CRM_Core_Action::UPDATE, CRM_Core_Action::VIEW]) &&
       !CRM_Activity_BAO_Activity::checkPermission($this->_activityId, $this->_action)
     ) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
@@ -298,13 +289,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     ) {
       $this->assign('permission', 'edit');
       $this->assign('allow_edit_inbound_emails', CRM_Activity_BAO_Activity::checkEditInboundEmailsPermissions());
-    }
-
-    if (!$this->_activityTypeId && $this->_activityId) {
-      $this->_activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity',
-        $this->_activityId,
-        'activity_type_id'
-      );
     }
 
     $this->assignActivityType();
@@ -366,11 +350,13 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     $activityTypeDescription = NULL;
     if ($this->_activityTypeId) {
-      list($this->_activityTypeName, $activityTypeDescription) = CRM_Core_BAO_OptionValue::getActivityTypeDetails($this->_activityTypeId);
+      [$this->_activityTypeName, $activityTypeDescription] = CRM_Core_BAO_OptionValue::getActivityTypeDetails($this->_activityTypeId);
     }
 
-    // Set activity type name and description to template.
-    $this->assign('activityTypeName', $this->_activityTypeName ?? FALSE);
+    // Set activity type name and description to template. Type should no longer be used anywhere
+    // except the case_activity workflow template - unsure how to test that... We want to remove
+    // it due to mis-naming of the variable. The workflow template can use a token...
+    $this->assign('activityTypeName', $this->_activityTypeName);
     $this->assign('activityTypeDescription', $activityTypeDescription ?? FALSE);
 
     // set user context
@@ -399,13 +385,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
       $this->assign('searchKey', $qfKey);
     }
-    elseif (in_array($this->_context, [
-      'standalone',
-      'home',
-      'dashlet',
-      'dashletFullscreen',
-    ])
-    ) {
+    elseif (in_array($this->_context, ['standalone', 'home', 'dashlet', 'dashletFullscreen'])) {
       $urlParams = 'reset=1';
       $urlString = 'civicrm/dashboard';
     }
@@ -543,12 +523,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if (isset($this->_activityId)) {
 
       if ($this->_context !== 'standalone') {
-        $this->assign('target_contact_value',
-          CRM_Utils_Array::value('target_contact_value', $defaults)
-        );
-        $this->assign('assignee_contact_value',
-          CRM_Utils_Array::value('assignee_contact_value', $defaults)
-        );
+        $this->assign('target_contact_value', $defaults['target_contact_value'] ?? NULL);
+        $this->assign('assignee_contact_value', $defaults['assignee_contact_value'] ?? NULL);
       }
 
       // Fixme: why are we getting the wrong keys from upstream?
@@ -589,7 +565,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     if ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::RENEW)) {
-      $this->assign('delName', CRM_Utils_Array::value('subject', $defaults));
+      $this->assign('delName', $defaults['subject'] ?? NULL);
     }
 
     if ($this->_activityTypeFile) {
@@ -672,13 +648,13 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           $this->addEntityRef($field, $values['label'], $attribute, $required);
         }
         else {
-          $this->add($values['type'], $field, $values['label'], $attribute, $required, CRM_Utils_Array::value('extra', $values));
+          $this->add($values['type'], $field, $values['label'], $attribute, $required, $values['extra'] ?? NULL);
         }
       }
     }
 
     // CRM-7362 --add campaigns.
-    CRM_Campaign_BAO_Campaign::addCampaign($this, CRM_Utils_Array::value('campaign_id', $this->_values));
+    CRM_Campaign_BAO_Campaign::addCampaign($this, $this->_values['campaign_id'] ?? NULL);
 
     // Add engagement level CRM-7775
     $buildEngagementLevel = FALSE;
@@ -921,7 +897,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // store the submitted values in an array
     if (!$params) {
-      $params = $this->controller->exportValues($this->_name);
+      $params = $this->getSubmittedValues();
+    }
+    else {
+      CRM_Core_Error::deprecatedWarning('passing params into postProcess is deprecated. Match parent function');
     }
 
     // Set activity type id.
@@ -1266,8 +1245,29 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         }
       }
     }
-
     $this->assign('activityTypeNameAndLabel', $activityTypeNameAndLabel);
+  }
+
+  /**
+   * Get the activity ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getActivityID(): ?int {
+    // CRM-6957
+    // When we come from contact search, activity id never comes.
+    // So don't try to get from object, it might gives you wrong one.
+    if ($this->controller instanceof \CRM_Contact_Controller_Search) {
+      return NULL;
+    }
+    if (!isset($this->_activityId) && $this->_action != CRM_Core_Action::ADD) {
+      $this->_activityId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    }
+    return $this->_activityId ? (int) $this->_activityId : FALSE;
   }
 
 }

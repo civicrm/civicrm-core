@@ -156,7 +156,7 @@ class CRM_Utils_SQL_TempTable {
   /**
    * Create the empty table.
    *
-   * @parma string $columns
+   * @param string $columns
    *   SQL column listing.
    *   Ex: 'id int(10), name varchar(64)'.
    * @return CRM_Utils_SQL_TempTable

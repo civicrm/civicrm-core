@@ -22,7 +22,7 @@ require_once 'Mail/mime.php';
 /**
  * Class CRM_Mailing_BAO_Mailing
  */
-class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
+class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\Core\HookInterface {
 
   /**
    * An array that holds the complete templates
@@ -459,6 +459,25 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     // Create parent job if not yet created.
     // Condition on the existence of a scheduled date.
     if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
+
+      if (!isset($params['is_completed']) || $params['is_completed'] !== 1) {
+        $mailingGroups = \Civi\Api4\MailingGroup::get()
+          ->addSelect('group.id')
+          ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
+          ->addWhere('mailing_id', '=', $mailing->id)
+          ->addWhere('entity_table', '=', 'civicrm_group')
+          ->addWhere('group_type', 'IN', ['Include', 'Exclude'])
+          ->addClause('OR', ['group.saved_search_id', 'IS NOT NULL'], ['group.children', 'IS NOT NULL'])
+          ->execute();
+        foreach ($mailingGroups as $mailingGroup) {
+          CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($mailingGroup['group.id']);
+          $group = new CRM_Contact_DAO_Group();
+          $group->find(TRUE);
+          $group->id = $mailingGroup['group.id'];
+          CRM_Contact_BAO_GroupContactCache::load($group);
+        }
+      }
+
       $job = new CRM_Mailing_BAO_MailingJob();
       $job->mailing_id = $mailing->id;
       // If we are creating a new Completed mailing (e.g. import from another system) set the job to completed.
@@ -597,11 +616,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
       $this->preparedTemplates = [];
 
-      foreach ([
-        'html',
-        'text',
-        'subject',
-      ] as $key) {
+      foreach (['html', 'text', 'subject'] as $key) {
         if (!isset($templates[$key])) {
           continue;
         }
@@ -797,10 +812,11 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
    *
    * @param array $testParams
    *   Contains form values.
+   * @param int $mailingID
    *
-   * @return void
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function getTestRecipients($testParams) {
+  public static function getTestRecipients(array $testParams, int $mailingID): void {
     if (!empty($testParams['test_group']) && array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
       $contacts = civicrm_api('contact', 'get', [
         'version' => 3,
@@ -833,8 +849,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
             'job_id' => $testParams['job_id'],
             'email_id' => $dao->email_id,
             'contact_id' => $groupContact,
+            'mailing_id' => $mailingID,
+            'is_test' => TRUE,
           ];
-          CRM_Mailing_Event_BAO_Queue::create($params);
+          CRM_Mailing_Event_BAO_MailingEventQueue::create($params);
         }
       }
     }
@@ -889,7 +907,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $fields = [];
     $fields[] = 'Message-ID';
     // CRM-17754 check if Resent-Message-id is set also if not add it in when re-laying reply email
-    if ($prefix == 'r') {
+    if ($prefix === 'r') {
       $fields[] = 'Resent-Message-ID';
     }
     foreach ($fields as $field) {
@@ -897,7 +915,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $headers[$field] = '<' . implode($config->verpSeparator,
             [
               $localpart . $prefix,
-              $job_id,
               $event_queue_id,
               $hash,
             ]
@@ -998,12 +1015,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $verp['reply'] = "\"{$this->from_name}\" <{$this->from_email}>";
     }
 
+    // Generating URLs is expensive, so we only call it once for each of these 5 URLs.
+    $genericURL = CRM_Utils_System::url('civicrm/mailing/genericUrlPath', "reset=1&jid={$job_id}&qid={$event_queue_id}&h={$hash}", TRUE, NULL, TRUE, TRUE);
     $urls = [
-      'forward' => CRM_Utils_System::url('civicrm/mailing/forward', "reset=1&jid={$job_id}&qid={$event_queue_id}&h={$hash}", TRUE, NULL, TRUE, TRUE),
-      'unsubscribeUrl' => CRM_Utils_System::url('civicrm/mailing/unsubscribe', "reset=1&jid={$job_id}&qid={$event_queue_id}&h={$hash}", TRUE, NULL, TRUE, TRUE),
-      'resubscribeUrl' => CRM_Utils_System::url('civicrm/mailing/resubscribe', "reset=1&jid={$job_id}&qid={$event_queue_id}&h={$hash}", TRUE, NULL, TRUE, TRUE),
-      'optOutUrl' => CRM_Utils_System::url('civicrm/mailing/optout', "reset=1&jid={$job_id}&qid={$event_queue_id}&h={$hash}", TRUE, NULL, TRUE, TRUE),
-      'subscribeUrl' => CRM_Utils_System::url('civicrm/mailing/subscribe', 'reset=1', TRUE, NULL, TRUE, TRUE),
+      'forward' => str_replace('genericUrlPath', 'forward', $genericURL),
+      'unsubscribeUrl' => str_replace('genericUrlPath', 'unsubscribe', $genericURL),
+      'resubscribeUrl' => str_replace('genericUrlPath', 'resubscribe', $genericURL),
+      'optOutUrl' => str_replace('genericUrlPath', 'optout', $genericURL),
+      'subscribeUrl' => str_replace('genericUrlPath', 'subscribe', $genericURL),
     ];
 
     $headers = [
@@ -1366,7 +1385,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       if ($this->url_tracking && !empty($this->id)) {
         // ensure that Google CSS and any .css files are not tracked.
         if (!(strpos($token, 'css?family') || strpos($token, '.css'))) {
-          $data = CRM_Mailing_BAO_TrackableURL::getTrackerURL($token, $this->id, $event_queue_id);
+          $data = CRM_Mailing_BAO_MailingTrackableURL::getTrackerURL($token, $this->id, $event_queue_id);
           if (!empty($html)) {
             $data = htmlentities($data, ENT_NOQUOTES);
           }
@@ -1747,15 +1766,15 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'mailing_group' => CRM_Mailing_DAO_MailingGroup::getTableName(),
       'group' => CRM_Contact_BAO_Group::getTableName(),
       'job' => CRM_Mailing_BAO_MailingJob::getTableName(),
-      'queue' => CRM_Mailing_Event_BAO_Queue::getTableName(),
-      'delivered' => CRM_Mailing_Event_BAO_Delivered::getTableName(),
-      'opened' => CRM_Mailing_Event_BAO_Opened::getTableName(),
-      'reply' => CRM_Mailing_Event_BAO_Reply::getTableName(),
-      'unsubscribe' => CRM_Mailing_Event_BAO_Unsubscribe::getTableName(),
-      'bounce' => CRM_Mailing_Event_BAO_Bounce::getTableName(),
-      'forward' => CRM_Mailing_Event_BAO_Forward::getTableName(),
-      'url' => CRM_Mailing_BAO_TrackableURL::getTableName(),
-      'urlopen' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTableName(),
+      'queue' => CRM_Mailing_Event_BAO_MailingEventQueue::getTableName(),
+      'delivered' => CRM_Mailing_Event_BAO_MailingEventDelivered::getTableName(),
+      'opened' => CRM_Mailing_Event_BAO_MailingEventOpened::getTableName(),
+      'reply' => CRM_Mailing_Event_BAO_MailingEventReply::getTableName(),
+      'unsubscribe' => CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTableName(),
+      'bounce' => CRM_Mailing_Event_BAO_MailingEventBounce::getTableName(),
+      'forward' => CRM_Mailing_Event_BAO_MailingEventForward::getTableName(),
+      'url' => CRM_Mailing_BAO_MailingTrackableURL::getTableName(),
+      'urlopen' => CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTableName(),
       'component' => CRM_Mailing_BAO_MailingComponent::getTableName(),
       'spool' => CRM_Mailing_BAO_Spool::getTableName(),
     ];
@@ -1785,7 +1804,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     //get the campaign
-    if ($campaignId = CRM_Utils_Array::value('campaign_id', $report['mailing'])) {
+    $campaignId = $report['mailing']['campaign_id'] ?? NULL;
+    if ($campaignId) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $report['mailing']['campaign'] = $campaigns[$campaignId];
     }
@@ -1953,17 +1973,17 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
       // compute open total separately to discount duplicates
       // CRM-1258
-      $row['opened'] = CRM_Mailing_Event_BAO_Opened::getTotalCount($mailing_id, $mailing->id, TRUE);
+      $row['opened'] = CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount($mailing_id, $mailing->id, TRUE);
       $report['event_totals']['opened'] += $row['opened'];
-      $row['total_opened'] = CRM_Mailing_Event_BAO_Opened::getTotalCount($mailing_id, $mailing->id);
+      $row['total_opened'] = CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount($mailing_id, $mailing->id);
       $report['event_totals']['total_opened'] += $row['total_opened'];
 
       // compute unsub total separately to discount duplicates
       // CRM-1783
-      $row['unsubscribe'] = CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($mailing_id, $mailing->id, TRUE, TRUE);
+      $row['unsubscribe'] = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTotalCount($mailing_id, $mailing->id, TRUE, TRUE);
       $report['event_totals']['unsubscribe'] += $row['unsubscribe'];
 
-      $row['optout'] = CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($mailing_id, $mailing->id, TRUE, FALSE);
+      $row['optout'] = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTotalCount($mailing_id, $mailing->id, TRUE, FALSE);
       $report['event_totals']['optout'] += $row['optout'];
 
       foreach (array_keys(CRM_Mailing_BAO_MailingJob::fields()) as $field) {
@@ -2008,7 +2028,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['jobs'][] = $row;
     }
 
-    $report['event_totals']['queue'] = CRM_Mailing_BAO_Recipients::mailingSize($mailing_id);
+    $report['event_totals']['queue'] = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing_id);
 
     if (!empty($report['event_totals']['queue'])) {
       $report['event_totals']['delivered_rate'] = (100.0 * $report['event_totals']['delivered']) / $report['event_totals']['queue'];
@@ -2119,21 +2139,23 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
         case 'opened':
           // do not use group by clause in report, because same report used for total and unique open
-          $reportFilter .= "&distinct=0";
+          $reportFilter .= '&distinct=0';
         case 'opened_unique':
-          $url = "mailing/opened";
-          $searchFilter .= "&mailing_open_status=Y";
+          $url = 'mailing/opened';
+          $searchFilter .= '&mailing_open_status=Y';
           break;
 
         case 'clicks':
         case 'clicks_unique':
-          $url = "mailing/clicks";
-          $searchFilter .= "&mailing_click_status=Y";
+          $url = 'mailing/clicks';
+          $searchFilter .= '&mailing_click_status=Y';
           break;
       }
       $actionLinks[CRM_Core_Action::VIEW]['url'] = CRM_Report_Utils_Report::getNextUrl($url, $reportFilter, FALSE, TRUE);
+      $actionLinks[CRM_Core_Action::VIEW]['weight'] = -20;
       if (array_key_exists(CRM_Core_Action::ADVANCED, $actionLinks)) {
         $actionLinks[CRM_Core_Action::ADVANCED]['qs'] = $searchFilter;
+        $actionLinks[CRM_Core_Action::ADVANCED]['weight'] = 10;
       }
       $report['event_totals']['actionlinks'][$key] = CRM_Core_Action::formLink(
         $actionLinks,
@@ -2152,8 +2174,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
   /**
    * Get the count of mailings.
-   *
-   * @param
    *
    * @return int
    *   Count
@@ -2403,26 +2423,24 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    *   Id of the mail to delete.
    *
    * @return void
+   *
+   * @deprecated
    */
   public static function del($id) {
-    if (empty($id)) {
-      throw new CRM_Core_Exception(ts('No id passed to mailing del function'));
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    static::deleteRecord(['id' => $id]);
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
+      // Delete all file attachments
+      CRM_Core_BAO_File::deleteEntityFile('civicrm_mailing', $event->id);
     }
-
-    CRM_Utils_Hook::pre('delete', 'Mailing', $id);
-
-    // delete all file attachments
-    CRM_Core_BAO_File::deleteEntityFile('civicrm_mailing',
-      $id
-    );
-
-    $dao = new CRM_Mailing_DAO_Mailing();
-    $dao->id = $id;
-    $dao->delete();
-
-    CRM_Core_Session::setStatus(ts('Selected mailing has been deleted.'), ts('Deleted'), 'success');
-
-    CRM_Utils_Hook::post('delete', 'Mailing', $id, $dao);
   }
 
   /**
@@ -2441,7 +2459,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
     CRM_Core_Error::deprecatedWarning('This function is deprecated, use CRM_Mailing_BAO_MailingJob::del instead');
 
-    CRM_Mailing_BAO_MailingJob::del($id);
+    CRM_Mailing_BAO_MailingJob::deleteRecord(['id' => $id]);
   }
 
   /**
@@ -2472,7 +2490,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     }
 
     $returnProperties = [];
-    $returnProperties['display_name'] = $returnProperties['contact_id'] = $returnProperties['preferred_mail_format'] = $returnProperties['hash'] = 1;
+    $returnProperties['display_name'] = $returnProperties['contact_id'] = $returnProperties['hash'] = 1;
 
     foreach ($properties as $p) {
       $returnProperties[$p] = 1;
@@ -2558,14 +2576,11 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
         $form->add('select', "{$prefix}template", ts('Use Template'),
           ['' => ts('- select -')] + $templates[$prefix], FALSE,
-          ['onChange' => "selectValue( this.value, '{$prefix}');"]
+          ['onChange' => "selectValue( this.value, '{$prefix}');", 'class' => 'crm-select2 huge']
         );
       }
       $form->add('checkbox', "{$prefix}updateTemplate", ts('Update Template'), NULL);
-
-      $form->add('checkbox', "{$prefix}saveTemplate", ts('Save As New Template'), NULL, FALSE,
-        ['onclick' => "showSaveDetails(this, '{$prefix}');"]
-      );
+      $form->add('checkbox', "{$prefix}saveTemplate", ts('Save As New Template'), ['onclick' => "showSaveDetails(this, '{$prefix}');"]);
       $form->add('text', "{$prefix}saveTemplateName", ts('Template Title'));
     }
 
@@ -2737,7 +2752,7 @@ WHERE  civicrm_mailing_job.id = %1
     }
 
     // Split up the parent jobs into multiple child jobs
-    $mailerJobSize = Civi::settings()->get('mailerJobSize');
+    $mailerJobSize = (int) Civi::settings()->get('mailerJobSize');
     CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs(NULL, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs_post($mode);
@@ -2789,7 +2804,7 @@ AND    e.id NOT IN ( SELECT email_id FROM civicrm_mailing_recipients mr WHERE ma
 SELECT civicrm_mailing.id, civicrm_mailing.name, civicrm_mailing_job.end_date
 FROM   civicrm_mailing
 INNER JOIN civicrm_mailing_job ON civicrm_mailing.id = civicrm_mailing_job.mailing_id {$where}
-ORDER BY civicrm_mailing.name";
+ORDER BY civicrm_mailing.id DESC";
       $mailing = CRM_Core_DAO::executeQuery($query);
 
       while ($mailing->fetch()) {
@@ -2824,8 +2839,8 @@ ORDER BY civicrm_mailing.name";
 
     //CRM-12814
     if (!empty($mailings)) {
-      $openCounts = CRM_Mailing_Event_BAO_Opened::getMailingContactCount(array_keys($mailings), $params['contact_id']);
-      $clickCounts = CRM_Mailing_Event_BAO_TrackableURLOpen::getMailingContactCount(array_keys($mailings), $params['contact_id']);
+      $openCounts = CRM_Mailing_Event_BAO_MailingEventOpened::getMailingContactCount(array_keys($mailings), $params['contact_id']);
+      $clickCounts = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getMailingContactCount(array_keys($mailings), $params['contact_id']);
     }
 
     // format params and add links
@@ -2844,7 +2859,7 @@ ORDER BY civicrm_mailing.name";
       $mailing['openstats'] = "Opens: " .
         CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0) .
         "<br />Clicks: " .
-        CRM_Utils_Array::value($values['mailing_id'], $clickCounts, 0);
+        $clickCounts[$values['mailing_id']] ?? 0;
 
       $actionLinks = [
         CRM_Core_Action::VIEW => [
@@ -2853,12 +2868,14 @@ ORDER BY civicrm_mailing.name";
           'qs' => "reset=1&id=%%mkey%%&cid=%%cid%%&cs=%%cs%%",
           'title' => ts('View Mailing'),
           'class' => 'crm-popup',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::BROWSE => [
           'name' => ts('Mailing Report'),
           'url' => 'civicrm/mailing/report',
           'qs' => "mid=%%mid%%&reset=1&cid=%%cid%%&context=mailing",
           'title' => ts('View Mailing Report'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::BROWSE),
         ],
       ];
 

@@ -4,9 +4,10 @@
   <base>CRM/Search</base>
   <class>SearchDisplay</class>
   <name>civicrm_search_display</name>
-  <comment>Search Kit - saved search displays</comment>
+  <comment>SearchKit - saved search displays</comment>
   <log>true</log>
   <icon>fa-clone</icon>
+  <labelField>label</labelField>
 
   <field>
     <name>id</name>

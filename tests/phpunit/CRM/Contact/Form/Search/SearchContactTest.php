@@ -22,7 +22,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContactSubtype() {
+  public function testContactSubtype(): void {
     foreach (['Contact_sub_type', 'Contact2__sub__type'] as $contactSubType) {
       $subType = $this->callAPISuccess('ContactType', 'create', [
         'name' => $contactSubType,
@@ -78,7 +78,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     $expectedResult = [$contacts['id']];
     $this->checkArrayEquals($expectedResult, $contactsResult);
     // get and assert qill string
-    $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
+    $qill = trim(implode($query->getOperator(), $query->qill()[0]));
     $this->assertEquals("Contact Type In IndividualANDContact Subtype Like {$contactSubType}", $qill);
   }
 
@@ -88,7 +88,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContactSearchOnGroupType() {
+  public function testContactSearchOnGroupType(): void {
     $groupTypes = $this->callAPISuccess('OptionValue', 'get', [
       'return' => ['id', 'name'],
       'option_group_id' => 'group_type',

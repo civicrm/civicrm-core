@@ -1,4 +1,4 @@
-# Form builder (afform)
+# FormBuilder (afform)
 
 ![Screenshot](docs/sandbox/3-Free-Blocks-Parent.png)
 

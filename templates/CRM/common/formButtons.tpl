@@ -12,29 +12,31 @@
 {* Loops through $linkButtons and assigns html "a" (link) buttons to the template. Used for additional entity functions such as "Move to Case" or "Renew Membership" *}
 {if $linkButtons}
   {foreach from=$linkButtons item=linkButton}
-    {if $linkButton.accessKey}
+    {if array_key_exists('accessKey', $linkButton) && $linkButton.accessKey}
       {capture assign=accessKey}accesskey="{$linkButton.accessKey}"{/capture}
     {else}{assign var="accessKey" value=""}
     {/if}
-    {if $linkButton.icon}
+    {if array_key_exists('icon', $linkButton) && $linkButton.icon}
       {capture assign=icon}<i class="crm-i {$linkButton.icon}" aria-hidden="true"></i> {/capture}
     {else}{assign var="icon" value=""}
     {/if}
-    {if $linkButton.ref}
+    {if array_key_exists('ref', $linkButton) && $linkButton.ref}
       {capture assign=linkname}name="{$linkButton.ref}"{/capture}
-    {else}{capture assign=linkname}name="{$linkButton.name}"{/capture}
+    {else}{capture assign=linkname}{if array_key_exists('name', $linkButton)}name="{$linkButton.name}"{/if}{/capture}
     {/if}
-    <a class="button{if array_key_exists('class', $linkButton)} {$linkButton.class}{/if}" {$linkname} href="{crmURL p=$linkButton.url q=$linkButton.qs}" {$accessKey} {$linkButton.extra}><span>{$icon|smarty:nodefaults}{$linkButton.title}</span></a>
+    <a class="button{if array_key_exists('class', $linkButton)} {$linkButton.class}{/if}" {$linkname} href="{crmURL p=$linkButton.url q=$linkButton.qs}" {$accessKey} {if array_key_exists('extra', $linkButton)}{$linkButton.extra}>{/if}<span>{$icon|smarty:nodefaults}{$linkButton.title}</span></a>
   {/foreach}
 {/if}
-
-{foreach from=$form.buttons item=button key=key name=btns}
+{if $form}
+  {* This could be called from Membership View - which is a page not a form but uses it for the links above *}
+  {foreach from=$form.buttons item=button key=key name=btns}
   {if $key|substring:0:4 EQ '_qf_'}
-    {if !empty($location)}
+    {if $location}
       {$form.buttons.$key.html|crmReplace:id:"$key-$location"}
     {else}
       {$form.buttons.$key.html}
     {/if}
   {/if}
 {/foreach}
+{/if}
 {/crmRegion}

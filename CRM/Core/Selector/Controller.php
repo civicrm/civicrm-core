@@ -158,6 +158,8 @@ class CRM_Core_Selector_Controller {
    */
   protected $_dynamicAction = FALSE;
 
+  protected $_case;
+
   /**
    * Class constructor.
    *
@@ -181,8 +183,8 @@ class CRM_Core_Selector_Controller {
   public function __construct($object, $pageID, $sortID, $action, $store = NULL, $output = self::TEMPLATE, $prefix = NULL, $case = NULL) {
 
     $this->_object = $object;
-    $this->_pageID = $pageID ? $pageID : 1;
-    $this->_sortID = $sortID ? $sortID : NULL;
+    $this->_pageID = $pageID ?: 1;
+    $this->_sortID = $sortID ?: NULL;
     $this->_action = $action;
     $this->_store = $store;
     $this->_output = $output;
@@ -323,7 +325,7 @@ class CRM_Core_Selector_Controller {
     }
     else {
       // output requires paging/sorting capability
-      $rows = self::getRows($this);
+      $rows = $this->getRows($this);
       CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $rows, $this);
       $reorderedHeaders = [];
       $noWeightHeaders = [];

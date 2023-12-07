@@ -11,14 +11,16 @@
       parent: '^crmSearchAdminDisplay'
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayTable.html',
-    controller: function($scope, searchMeta, formatForSelect2) {
+    controller: function($scope, searchMeta, formatForSelect2, crmUiHelp) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
+      $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Display'});
 
       this.tableClasses = [
         {name: 'table', label: ts('Row Borders')},
         {name: 'table-bordered', label: ts('Column Borders')},
-        {name: 'table-striped', label: ts('Even/Odd Stripes')}
+        {name: 'table-striped', label: ts('Even/Odd Stripes')},
+        {name: 'crm-sticky-header', label: ts('Sticky Header')}
       ];
 
       // Check if array contains item
@@ -42,12 +44,14 @@
         }
       };
 
+      this.getColTypes = function() {
+        return ctrl.parent.colTypes;
+      };
+
       this.$onInit = function () {
         if (!ctrl.display.settings) {
           ctrl.display.settings = _.extend({}, _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings), {columns: null, pager: {}});
-          if (searchMeta.getEntity(ctrl.apiEntity).order_by) {
-            ctrl.display.settings.sort.push([searchMeta.getEntity(ctrl.apiEntity).order_by, 'ASC']);
-          }
+          ctrl.display.settings.sort = ctrl.parent.getDefaultSort();
         }
         // Displays created prior to 5.43 may not have this property
         ctrl.display.settings.classes = ctrl.display.settings.classes || [];

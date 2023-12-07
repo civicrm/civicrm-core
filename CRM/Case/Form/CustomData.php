@@ -39,27 +39,35 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
   protected $_subTypeID;
 
   /**
+   * @var string
+   */
+  private $customGroupTitle;
+
+  /**
    * Pre processing work done here.
    *
-   * gets session variables for table name, id of entity in table, type of entity and stores them.
+   * gets session variables for table name, id of entity in table, type of
+   * entity and stores them.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function preProcess() {
-    $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
+  public function preProcess(): void {
+    $groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
     $this->_entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', $this, TRUE);
     $this->_subTypeID = CRM_Utils_Request::retrieve('subType', 'Positive', $this, TRUE);
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Case',
       NULL,
       $this->_entityID,
-      $this->_groupID,
+      $groupID,
       $this->_subTypeID
     );
     // simplified formatted groupTree
     $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $this);
     // Array contains only one item
     foreach ($groupTree as $groupValues) {
-      $this->_customTitle = $groupValues['title'];
+      $this->customGroupTitle = $groupValues['title'];
       $this->setTitle(ts('Edit %1', [1 => $groupValues['title']]));
     }
 
@@ -71,16 +79,16 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
 
     //need to assign custom data type and subtype to the template
     $this->assign('entityID', $this->_entityID);
-    $this->assign('groupID', $this->_groupID);
+    $this->assign('groupID', $groupID);
     $this->assign('subType', $this->_subTypeID);
-    $this->assign('contactID', $this->_contactID);
+    $this->assign('contactID', $contactID);
     $this->assign('cgCount');
   }
 
   /**
    * Build the form object.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc
     $this->addButtons([
@@ -98,9 +106,11 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
 
   /**
    * Process the user submitted custom data values.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function postProcess() {
-    $params = $this->controller->exportValues($this->_name);
+  public function postProcess(): void {
+    $params = $this->getSubmittedValues();
 
     $transaction = new CRM_Core_Transaction();
 
@@ -109,9 +119,10 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
       $this->_entityID,
       'Case'
     );
+    $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
     $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/case', "reset=1&id={$this->_entityID}&cid={$this->_contactID}&action=view"));
+    $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/case', "reset=1&id={$this->_entityID}&cid={$contactID}&action=view"));
 
     $formattedDetails = $this->formatCustomDataChangesForDetail($params);
     if (!empty($formattedDetails)) {
@@ -120,9 +131,9 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
         'activity_type_id' => $activityTypeID,
         'source_contact_id' => $session->get('userID'),
         'is_auto' => TRUE,
-        'subject' => $this->_customTitle . " : change data",
+        'subject' => $this->customGroupTitle . ' : change data',
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
-        'target_contact_id' => $this->_contactID,
+        'target_contact_id' => $contactID,
         'details' => $formattedDetails,
         'activity_date_time' => date('YmdHis'),
       ];
@@ -146,16 +157,16 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    * @return string
    * @throws \CRM_Core_Exception
    */
-  public function formatCustomDataChangesForDetail($params) {
+  public function formatCustomDataChangesForDetail(array $params): string {
     $formattedDetails = [];
     foreach ($params as $customField => $newCustomValue) {
-      if (substr($customField, 0, 7) === 'custom_') {
+      if (strpos($customField, 'custom_') === 0) {
         if (($this->_defaults[$customField] ?? '') === $newCustomValue) {
           // Don't show values that did not change
           continue;
         }
         // We need custom field ID from custom_XX_1
-        list($_, $customFieldId, $_) = explode('_', $customField);
+        [, $customFieldId] = explode('_', $customField);
 
         if (!empty($customFieldId) && is_numeric($customFieldId)) {
           // Got a custom field ID
@@ -166,7 +177,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
           // want to try to convert it.
           $oldValue = $this->_defaults[$customField] ?? '';
           $newValue = $newCustomValue;
-          if ('Money' !== civicrm_api3('CustomField', 'getvalue', ['id' => $customFieldId, 'return' => 'data_type'])) {
+          if ('Money' !== (string) civicrm_api3('CustomField', 'getvalue', ['id' => $customFieldId, 'return' => 'data_type'])) {
             $oldValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
               'custom_field_id' => $customFieldId,
               'entity_id' => $this->_entityID,

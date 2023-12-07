@@ -13,12 +13,13 @@ namespace Civi\WorkflowMessage;
 
 /**
  * @group headless
+ * @group msgtpl
  */
 class FieldSpecTest extends \CiviUnitTestCase {
 
   protected function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   public function getScopeExamples() {

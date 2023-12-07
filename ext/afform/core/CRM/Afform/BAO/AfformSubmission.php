@@ -8,12 +8,28 @@ class CRM_Afform_BAO_AfformSubmission extends CRM_Afform_DAO_AfformSubmission {
    * @return array
    */
   public static function getAllAfformsByName() {
-    return \Civi\Api4\Afform::get(FALSE)
-      ->addSelect('name', 'title')
+    $suffixMap = [
+      'id' => 'name',
+      'name' => 'module_name',
+      'abbr' => 'directive_name',
+      'label' => 'title',
+      'description' => 'description',
+      'icon' => 'icon',
+      'url' => 'server_route',
+    ];
+    $afforms = \Civi\Api4\Afform::get(FALSE)
+      ->setSelect(array_values($suffixMap))
       ->addOrderBy('title')
-      ->execute()
-      ->indexBy('name')
-      ->column('title');
+      ->execute();
+    $result = [];
+    foreach ($afforms as $afform) {
+      $formattedAfform = [];
+      foreach ($suffixMap as $suffix => $field) {
+        $formattedAfform[$suffix] = $afform[$field] ?? NULL;
+      }
+      $result[] = $formattedAfform;
+    }
+    return $result;
   }
 
 }

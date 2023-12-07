@@ -12,7 +12,6 @@
 <div class="help">
     <p>{ts}Use this form to configure the thank-you message and receipting options.{/ts} {help id="id_thank"}</p>
 </div>
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
     <tr class="crm-contribution-contributionpage-thankyou-form-block-thankyou_title">
        <td class="label">{$form.thankyou_title.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='thankyou_title' id=$contributionPageID}{/if} {help id="id_thankyou-title"}</td>
@@ -74,5 +73,5 @@
  {/literal}
 </script>
 {/crmRegion}
-{crmRegion name="contribute-form-contributionpage-thankyou-post}
+{crmRegion name="contribute-form-contributionpage-thankyou-post"}
 {/crmRegion}

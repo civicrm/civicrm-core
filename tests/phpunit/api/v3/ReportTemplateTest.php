@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
+use Civi\Test\ACLPermissionTrait;
+
 /**
  *  Test APIv3 civicrm_report_instance_* functions
  *
@@ -18,21 +21,28 @@
  */
 class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
-  use Civi\Test\ACLPermissionTrait;
+  use ACLPermissionTrait;
   use CRMTraits_PCP_PCPTestTrait;
   use CRMTraits_Custom_CustomDataTrait;
 
   protected $contactIDs = [];
 
+  protected $aclGroupID;
+
+  /**
+   * @var int
+   */
+  protected $activityID;
+
   /**
    * Our group reports use an alter so transaction cleanup won't work.
-   *
-   * @throws \Exception
    */
   public function tearDown(): void {
+    Civi::settings()->set('logging', 0);
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group'], TRUE);
     (new CRM_Logging_Schema())->dropAllLogTables();
+    CRM_Utils_Hook::singleton()->reset();
     parent::tearDown();
   }
 
@@ -41,7 +51,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testReportTemplate() {
+  public function testReportTemplate(): void {
     /** @noinspection SpellCheckingInspection */
     $result = $this->callAPISuccess('ReportTemplate', 'create', [
       'label' => 'Example Form',
@@ -117,11 +127,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @dataProvider getReportTemplatesSupportingSelectWhere
    *
-   * @param $reportID
-   *
-   * @throws \CRM_Core_Exception
+   * @param string $reportID
    */
-  public function testReportTemplateSelectWhere($reportID): void {
+  public function testReportTemplateSelectWhere(string $reportID): void {
     $this->hookClass->setHook('civicrm_selectWhereClause', [$this, 'hookSelectWhere']);
     $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $reportID,
@@ -142,7 +150,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function getReportTemplatesSupportingSelectWhere() {
+  public function getReportTemplatesSupportingSelectWhere(): array {
     $allTemplates = self::getReportTemplates();
     // Exclude all that do not work as of test being written. I have not dug into why not.
     $currentlyExcluded = [
@@ -166,7 +174,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ];
     foreach ($allTemplates as $index => $template) {
       $reportID = $template[0];
-      if (in_array($reportID, $currentlyExcluded, TRUE) || stripos($reportID, 'has existing issues') !== FALSE) {
+      if (in_array($reportID, $currentlyExcluded, TRUE)) {
         unset($allTemplates[$index]);
       }
     }
@@ -174,10 +182,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param \CRM_Core_DAO $entity
+   * @param string $entity
    * @param array $clauses
    */
-  public function hookSelectWhere($entity, &$clauses) {
+  public function hookSelectWhere(string $entity, array &$clauses): void {
     // Restrict access to cases by type
     if ($entity === 'Contact') {
       $clauses['contact_type'][] = " =  'Organization' ";
@@ -186,10 +194,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test getrows on contact summary report.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testReportTemplateGetRowsContactSummary() {
+  public function testReportTemplateGetRowsContactSummary(): void {
     $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'contact/summary',
       'options' => ['metadata' => ['labels', 'title']],
@@ -212,33 +218,32 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   /**
    * Test getrows on Mailing Opened report.
    */
-  public function testReportTemplateGetRowsMailingUniqueOpened() {
-    $description = 'Retrieve rows from a mailing opened report template.';
+  public function testReportTemplateGetRowsMailingUniqueOpened(): void {
     $this->loadXMLDataSet(__DIR__ . '/../../CRM/Mailing/BAO/queryDataset.xml');
 
     // Check total rows without distinct
     global $_REQUEST;
     $_REQUEST['distinct'] = 0;
-    $result = $this->callAPIAndDocument('report_template', 'getrows', [
+    $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
-    ], __FUNCTION__, __FILE__, $description, 'Getrows');
+    ]);
     $this->assertEquals(14, $result['count']);
 
     // Check total rows with distinct
     $_REQUEST['distinct'] = 1;
-    $result = $this->callAPIAndDocument('report_template', 'getrows', [
+    $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
-    ], __FUNCTION__, __FILE__, $description, 'Getrows');
+    ]);
     $this->assertEquals(5, $result['count']);
 
     // Check total rows with distinct by passing NULL value to distinct parameter
     $_REQUEST['distinct'] = NULL;
-    $result = $this->callAPIAndDocument('report_template', 'getrows', [
+    $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
-    ], __FUNCTION__, __FILE__, $description, 'Getrows');
+    ]);
     $this->assertEquals(5, $result['count']);
   }
 
@@ -247,15 +252,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @dataProvider getReportTemplates
    *
-   * @param $reportID
-   *
-   * @throws \CRM_Core_Exception
+   * @param string $reportID
    */
-  public function testReportTemplateGetRowsAllReports($reportID) {
-    //$reportID = 'logging/contact/summary';
-    if (stripos($reportID, 'has existing issues') !== FALSE) {
-      $this->markTestIncomplete($reportID);
-    }
+  public function testReportTemplateGetRowsAllReports(string $reportID): void {
     if (strpos($reportID, 'logging') === 0) {
       Civi::settings()->set('logging', 1);
     }
@@ -263,19 +262,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $reportID,
     ]);
-    if (strpos($reportID, 'logging') === 0) {
-      Civi::settings()->set('logging', 0);
-    }
   }
 
   /**
    * Test logging report when a custom data table has a table removed by hook.
    *
    * Here we are checking that no fatal is triggered.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testLoggingReportWithHookRemovalOfCustomDataTable() {
+  public function testLoggingReportWithHookRemovalOfCustomDataTable(): void {
     Civi::settings()->set('logging', 1);
     $group1 = $this->customGroupCreate();
     $group2 = $this->customGroupCreate(['name' => 'second_one', 'title' => 'second one', 'table_name' => 'civicrm_value_second_one']);
@@ -286,9 +280,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'logging/contact/summary',
     ]);
-    Civi::settings()->set('logging', 0);
-    $this->customGroupDelete($group1['id']);
-    $this->customGroupDelete($group2['id']);
   }
 
   /**
@@ -296,7 +287,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @param array $logTableSpec
    */
-  public function alterLogTablesRemoveCustom(&$logTableSpec) {
+  public function alterLogTablesRemoveCustom(array &$logTableSpec): void {
     unset($logTableSpec['civicrm_value_second_one']);
   }
 
@@ -308,14 +299,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @dataProvider getReportTemplates
    *
    * @param $reportID
-   *
-   * @throws \PHPUnit\Framework\IncompleteTestError
-   * @throws \CRM_Core_Exception
    */
-  public function testReportTemplateGetRowsAllReportsACL($reportID) {
-    if (stripos($reportID, 'has existing issues') !== FALSE) {
-      $this->markTestIncomplete($reportID);
-    }
+  public function testReportTemplateGetRowsAllReportsACL($reportID): void {
     if (strpos($reportID, 'logging') === 0) {
       Civi::settings()->set('logging', 1);
     }
@@ -323,9 +308,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $reportID,
     ]);
-    if (strpos($reportID, 'logging') === 0) {
-      Civi::settings()->set('logging', 0);
-    }
   }
 
   /**
@@ -333,36 +315,30 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @dataProvider getReportTemplates
    *
-   * @param $reportID
+   * @param string $reportID
    *
-   * @throws \PHPUnit\Framework\IncompleteTestError
    */
-  public function testReportTemplateGetStatisticsAllReports($reportID) {
-    if (stripos($reportID, 'has existing issues') !== FALSE) {
-      $this->markTestIncomplete($reportID);
-    }
+  public function testReportTemplateGetStatisticsAllReports(string $reportID): void {
     if (in_array($reportID, ['contribute/softcredit', 'contribute/bookkeeping'])) {
-      $this->markTestIncomplete($reportID . ' has non enotices when calling statistics fn');
+      $this->markTestIncomplete($reportID . ' has non e-notices when calling statistics fn');
     }
     if (strpos($reportID, 'logging') === 0) {
       Civi::settings()->set('logging', 1);
     }
-    $description = "Get Statistics from a report (note there isn't much data to get in the test DB).";
     if ($reportID === 'contribute/summary') {
       $this->hookClass->setHook('civicrm_alterReportVar', [$this, 'alterReportVarHook']);
     }
-    $this->callAPIAndDocument('report_template', 'getstatistics', [
+    $this->callAPISuccess('report_template', 'getstatistics', [
       'report_id' => $reportID,
-    ], __FUNCTION__, __FILE__, $description, 'Getstatistics');
-    if (strpos($reportID, 'logging') === 0) {
-      Civi::settings()->set('logging', 0);
-    }
+    ]);
   }
 
   /**
    * Implements hook_civicrm_alterReportVar().
+   *
+   * @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection
    */
-  public function alterReportVarHook($varType, &$var, &$object) {
+  public function alterReportVarHook($varType, &$var, &$object): void {
     if ($varType === 'sql' && $object instanceof CRM_Report_Form_Contribute_Summary) {
       $from = $var->getVar('_from');
       $from .= ' LEFT JOIN civicrm_financial_type as temp ON temp.id = contribution_civireport.financial_type_id';
@@ -381,7 +357,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getReportTemplates() {
+  public static function getReportTemplates(): array {
     $reportTemplates = [];
     $reportsToSkip = [
       'event/income' => "This report overrides buildQuery() so doesn't seem compatible with this test and you get a syntax error `WHERE civicrm_event.id IN( ) GROUP BY civicrm_event.id`",
@@ -391,9 +367,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     foreach ($reports['values'] as $report) {
       if (empty($reportsToSkip[$report['value']])) {
         $reportTemplates[] = [$report['value']];
-      }
-      else {
-        $reportTemplates[] = [$report['value'] . ' has existing issues :  ' . $reportsToSkip[$report['value']]];
       }
     }
 
@@ -405,7 +378,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * These templates require minimal data config.
    */
-  public static function getContributionReportTemplates() {
+  public static function getContributionReportTemplates(): array {
     return [['contribute/summary'], ['contribute/detail'], ['contribute/repeat'], ['topDonor' => 'contribute/topDonor']];
   }
 
@@ -413,8 +386,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Get contribution templates that work with basic filter tests.
    *
    * These templates require minimal data config.
+   *
+   * @return array
    */
-  public static function getMembershipReportTemplates() {
+  public static function getMembershipReportTemplates(): array {
     return [['member/detail']];
   }
 
@@ -423,7 +398,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public static function getMembershipAndContributionReportTemplatesForGroupTests() {
+  public static function getMembershipAndContributionReportTemplatesForGroupTests(): array {
     $templates = array_merge(self::getContributionReportTemplates(), self::getMembershipReportTemplates());
     foreach ($templates as $key => $value) {
       if (array_key_exists('topDonor', $value)) {
@@ -435,12 +410,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     return $templates;
   }
 
+  public static function getContactMembershipAndContributionReportTemplatesForACLGroupTests(): array {
+    return array_merge([['contact/summary']], self::getMembershipAndContributionReportTemplatesForGroupTests());
+  }
+
   /**
    * Test Lybunt report to check basic inclusion of a contact who gave in the year before the chosen year.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testLybuntReportWithData() {
+  public function testLybuntReportWithData(): void {
     $inInd = $this->individualCreate();
     $outInd = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $inInd, 'receive_date' => '2014-03-01']);
@@ -456,10 +433,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test Lybunt report applies ACLs.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testLybuntReportWithDataAndACLFilter() {
+  public function testLybuntReportWithDataAndACLFilter(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM'];
     $inInd = $this->individualCreate();
     $outInd = $this->individualCreate();
@@ -482,10 +457,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test Lybunt report to check basic inclusion of a contact who gave in the year before the chosen year.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testLybuntReportWithFYData() {
+  public function testLybuntReportWithFYData(): void {
     $inInd = $this->individualCreate();
     $outInd = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $inInd, 'receive_date' => '2014-10-01']);
@@ -518,16 +491,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
           AND ( contribution_civireport.contribution_status_id IN (1) )
       GROUP BY contact_civireport.id');
     // Exclude whitespace in comparison as we don't care if it changes & this allows us to make the above readable.
-    $whitespacelessSql = preg_replace('/\s+/', ' ', $rows['metadata']['sql'][0]);
-    $this->assertStringContainsString($expected, $whitespacelessSql);
+    $whitespaceFreeSql = preg_replace('/\s+/', ' ', $rows['metadata']['sql'][0]);
+    $this->assertStringContainsString($expected, $whitespaceFreeSql);
   }
 
   /**
    * Test Lybunt report to check basic inclusion of a contact who gave in the year before the chosen year.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testLybuntReportWithFYDataOrderByLastYearAmount() {
+  public function testLybuntReportWithFYDataOrderByLastYearAmount(): void {
     $inInd = $this->individualCreate();
     $outInd = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $inInd, 'receive_date' => '2014-10-01']);
@@ -584,7 +555,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryWithNotINSmartGroupFilter($template): void {
+  public function testContributionSummaryWithNotINSmartGroupFilter(string $template): void {
     $groupID = $this->setUpPopulatedSmartGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'contribute/summary',
@@ -600,7 +571,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCaseDetailsCaseTypeHeader() {
+  public function testCaseDetailsCaseTypeHeader(): void {
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'case/detail',
       'fields' => ['subject' => 1, 'client_sort_name' => 1],
@@ -619,7 +590,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionDetailSoftCredits() {
+  public function testContributionDetailSoftCredits(): void {
     $contactID = $this->individualCreate();
     $contactID2 = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
@@ -631,7 +602,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => ['metadata' => ['sql']],
     ]);
     $this->assertEquals(
-      "<a href='/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=" . $contactID2 . "'>Anderson, Anthony</a> $ 5.00",
+      "<a href='/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=" . $contactID2 . "'>Anderson, Anthony II</a> $ 5.00",
       $rows['values'][0]['civicrm_contribution_soft_credits']
     );
   }
@@ -641,7 +612,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionDetailSoftCreditsOnly() {
+  public function testContributionDetailSoftCreditsOnly(): void {
     $contactID = $this->individualCreate();
     $contactID2 = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
@@ -673,11 +644,36 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testReportsWithNonSmartGroupFilter($template) {
+  public function testReportsWithNonSmartGroupFilter(string $template): void {
     $groupID = $this->setUpPopulatedGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
       'gid_value' => [$groupID],
+      'gid_op' => 'in',
+      'options' => ['metadata' => ['sql']],
+    ]);
+    $this->assertNumberOfContactsInResult(1, $rows, $template);
+  }
+
+  /**
+   * Test the group filter works on various reports when ACLed user is in play
+   *
+   * @dataProvider getContactMembershipAndContributionReportTemplatesForACLGroupTests
+   *
+   * @param string $template
+   *   Report template unique identifier.
+   */
+  public function testReportsWithNonSmartGroupFilterWithACL(string $template): void {
+    $this->aclGroupID = $this->setUpPopulatedGroup();
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+    $this->callAPISuccessGetCount('Group', ['check_permissions' => 1], 0);
+    $this->hookClass->setHook('civicrm_aclGroup', [$this, 'aclGroupOnly']);
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclGroupContactsOnly']);
+    unset(Civi::$statics['CRM_ACL_API']);
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => $template,
+      'gid_value' => [$this->aclGroupID],
       'gid_op' => 'in',
       'options' => ['metadata' => ['sql']],
     ]);
@@ -694,7 +690,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *   Rows returned from the report.
    * @param string $template
    */
-  protected function assertNumberOfContactsInResult($numberExpected, $rows, $template) {
+  protected function assertNumberOfContactsInResult(int $numberExpected, array $rows, string $template): void {
     if (isset($rows['values'][0]['civicrm_contribution_total_amount_count'])) {
       $this->assertEquals($numberExpected, $rows['values'][0]['civicrm_contribution_total_amount_count'], 'wrong row count in ' . $template);
     }
@@ -708,7 +704,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryWithTwoGroups() {
+  public function testContributionSummaryWithTwoGroups(): void {
     $groupID = $this->setUpPopulatedGroup();
     $groupID2 = $this->setUpPopulatedSmartGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', [
@@ -725,7 +721,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryGroupByContributionStatus() {
+  public function testContributionSummaryGroupByContributionStatus(): void {
     $params = [
       'report_id' => 'contribute/summary',
       'fields' => ['total_amount' => 1, 'country_id' => 1],
@@ -743,7 +739,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryGroupByYearFrequency() {
+  public function testContributionSummaryGroupByYearFrequency(): void {
     $params = [
       'report_id' => 'contribute/summary',
       'fields' => ['total_amount' => 1, 'country_id' => 1],
@@ -759,10 +755,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test we don't get a fatal grouping with QUARTER frequency.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryGroupByYearQuarterFrequency() {
+  public function testContributionSummaryGroupByYearQuarterFrequency(): void {
     $params = [
       'report_id' => 'contribute/summary',
       'fields' => ['total_amount' => 1, 'country_id' => 1],
@@ -778,10 +772,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test we don't get a fatal grouping with QUARTER frequency.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryGroupByDateFrequency() {
+  public function testContributionSummaryGroupByDateFrequency(): void {
     $params = [
       'report_id' => 'contribute/summary',
       'fields' => ['total_amount' => 1, 'country_id' => 1],
@@ -797,10 +789,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test we don't get a fatal grouping with QUARTER frequency.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryGroupByWeekFrequency() {
+  public function testContributionSummaryGroupByWeekFrequency(): void {
     $params = [
       'report_id' => 'contribute/summary',
       'fields' => ['total_amount' => 1, 'country_id' => 1],
@@ -816,11 +806,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * CRM-20640: Test the group filter works on the contribution summary when a single contact in 2 groups.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testContributionSummaryWithSingleContactsInTwoGroups(): void {
-    [$groupID1, $individualID] = $this->setUpPopulatedGroup(TRUE);
+    $groupID1 = $this->setUpPopulatedGroup();
+    $individualID = $this->ids['Contact']['primary'];
     // create second group and add the individual to it.
     $groupID2 = $this->groupCreate(['name' => 'test_group', 'title' => 'test_title']);
     $this->callAPISuccess('GroupContact', 'create', [
@@ -941,14 +930,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * This gives us a range of scenarios for testing contacts are included only once
    * whenever they are hard-added or in the criteria.
    *
-   * @param bool $returnAddedContact
-   *
    * @return int
-   * @throws \CRM_Core_Exception
    */
-  public function setUpPopulatedGroup($returnAddedContact = FALSE) {
+  public function setUpPopulatedGroup(): int {
     $individual1ID = $this->individualCreate();
-    $individualID = $this->individualCreate();
+    $individualID = $this->ids['Contact']['primary'] = $this->individualCreate();
     $individualIDRemoved = $this->individualCreate();
     $groupID = $this->groupCreate(['name' => uniqid(), 'title' => uniqid()]);
     $this->callAPISuccess('GroupContact', 'create', [
@@ -969,11 +955,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
     CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($groupID);
-
-    if ($returnAddedContact) {
-      return [$groupID, $individualID];
-    }
-
     return $groupID;
   }
 
@@ -982,7 +963,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function setUpIntersectingGroups() {
+  public function setUpIntersectingGroups(): array {
     $groupID = $this->setUpPopulatedGroup();
     $groupID2 = $this->setUpPopulatedSmartGroup();
     $addedToBothIndividualID = $this->individualCreate();
@@ -1047,16 +1028,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test Deferred Revenue Report.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testDeferredRevenueReport(): void {
-    $indv1 = $this->individualCreate();
-    $indv2 = $this->individualCreate();
+    $this->individualCreate([], 'first');
+    $this->individualCreate([], 'second');
     Civi::settings()->set('deferred_revenue_enabled', TRUE);
     $this->contributionCreate(
       [
-        'contact_id' => $indv1,
+        'contact_id' => $this->ids['Contact']['first'],
         'receive_date' => '2016-10-01',
         'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+3 month')),
         'financial_type_id' => 2,
@@ -1064,7 +1043,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     );
     $this->contributionCreate(
       [
-        'contact_id' => $indv1,
+        'contact_id' => $this->ids['Contact']['first'],
         'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+22 month')),
         'financial_type_id' => 4,
         'trxn_id' => NULL,
@@ -1073,7 +1052,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     );
     $this->contributionCreate(
       [
-        'contact_id' => $indv2,
+        'contact_id' => $this->ids['Contact']['second'],
         'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+1 month')),
         'financial_type_id' => 4,
         'trxn_id' => NULL,
@@ -1082,7 +1061,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     );
     $this->contributionCreate(
       [
-        'contact_id' => $indv2,
+        'contact_id' => $this->ids['Contact']['second'],
         'receive_date' => '2016-03-01',
         'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+4 month')),
         'financial_type_id' => 2,
@@ -1107,12 +1086,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @param string $template
    *   Report template unique identifier.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testReportsCustomDataOrderBy($template) {
-    $this->entity = 'Contact';
+  public function testReportsCustomDataOrderBy(string $template): void {
     $this->createCustomGroupWithFieldOfType();
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
@@ -1131,7 +1106,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testReportsWithNoTInSmartGroupFilter($template) {
+  public function testReportsWithNoTInSmartGroupFilter(string $template): void {
     $groupID = $this->setUpPopulatedGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
@@ -1144,10 +1119,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test we don't get a fatal grouping with various frequencies.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testActivitySummaryGroupByFrequency() {
+  public function testActivitySummaryGroupByFrequency(): void {
     $this->createContactsWithActivities();
     foreach (['MONTH', 'YEARWEEK', 'QUARTER', 'YEAR'] as $frequency) {
       $params = [
@@ -1182,10 +1155,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test activity details report - requiring all current fields to be output.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testActivityDetails() {
+  public function testActivityDetails(): void {
     $this->createContactsWithActivities();
     $fields = [
       'contact_source' => '1',
@@ -1238,9 +1209,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     $rows = $this->callAPISuccess('report_template', 'getrows', $params)['values'];
     $expected = [
-      'civicrm_contact_contact_source' => 'Łąchowski-Roberts, Anthony',
-      'civicrm_contact_contact_assignee' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony</a>',
-      'civicrm_contact_contact_target' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3\'>Brzęczysław, Anthony</a>; <a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony</a>',
+      'civicrm_contact_contact_source' => 'Łąchowski-Roberts, Anthony II',
+      'civicrm_contact_contact_assignee' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony II</a>',
+      'civicrm_contact_contact_target' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3\'>Brzęczysław, Anthony II</a>; <a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony II</a>',
       'civicrm_contact_contact_source_id' => $this->contactIDs[2],
       'civicrm_contact_contact_assignee_id' => $this->contactIDs[1],
       'civicrm_contact_contact_target_id' => $this->contactIDs[0] . ';' . $this->contactIDs[1],
@@ -1292,10 +1263,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Activity Details report has some whack-a-mole to fix when filtering on null/not null.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testActivityDetailsNullFilters() {
+  public function testActivityDetailsNullFilters(): void {
     $this->createContactsWithActivities();
     $params = [
       'report_id' => 'activity',
@@ -1322,7 +1291,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testActivityDetailsContactFilter() {
+  public function testActivityDetailsContactFilter(): void {
     $this->createContactsWithActivities();
     $params = [
       'report_id' => 'activity',
@@ -1336,10 +1305,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Set up some activity data..... use some chars that challenge our utf handling.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function createContactsWithActivities() {
+  public function createContactsWithActivities(): void {
     $this->contactIDs[] = $this->individualCreate(['last_name' => 'Brzęczysław', 'email' => 'techo@spying.com']);
     $this->contactIDs[] = $this->individualCreate(['last_name' => 'Łąchowski-Roberts']);
     $this->contactIDs[] = $this->individualCreate(['last_name' => 'Łąchowski-Roberts']);
@@ -1360,10 +1327,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test the group filter works on the contribution summary.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testContributionDetailTotalHeader() {
+  public function testContributionDetailTotalHeader(): void {
     $contactID = $this->individualCreate();
     $contactID2 = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
@@ -1387,10 +1352,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test contact subtype filter on summary report.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testContactSubtypeNotNull() {
+  public function testContactSubtypeNotNull(): void {
     $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
     $this->individualCreate();
 
@@ -1406,10 +1369,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test contact subtype filter on summary report.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testContactSubtypeNull() {
+  public function testContactSubtypeNull(): void {
     $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
     $this->individualCreate();
 
@@ -1425,10 +1386,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test contact subtype filter on summary report.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testContactSubtypeIn() {
+  public function testContactSubtypeIn(): void {
     $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
     $this->individualCreate();
 
@@ -1444,10 +1403,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test contact subtype filter on summary report.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testContactSubtypeNotIn() {
+  public function testContactSubtypeNotIn(): void {
     $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
     $this->individualCreate();
 
@@ -1466,10 +1423,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testPcpReportTotals() {
+  public function testPcpReportTotals(): void {
     $donor1ContactId = $this->individualCreate();
-    $donor2ContactId = $this->individualCreate();
-    $donor3ContactId = $this->individualCreate();
+    $donor2ContactId = $this->individualCreate(['last_name' => 'Black']);
+    $donor3ContactId = $this->individualCreate(['last_name' => 'Cherry']);
 
     // We are going to create two PCP pages. We will create two contributions
     // on the first PCP page and one contribution on the second PCP page.
@@ -1485,7 +1442,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     // pcpBLockParams creates a contribution page and returns the parameters
     // necessary to create a PBP Block.
     $blockParams = $this->pcpBlockParams();
-    $pcpBlock = CRM_PCP_BAO_PCPBlock::create($blockParams);
+    $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord($blockParams);
 
     // Keep track of the contribution page id created. We will use this
     // contribution page id for all the PCP pages.
@@ -1499,17 +1456,18 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $pcpParams['pcp_block_id'] = $pcpBlock->id;
     $pcpParams['page_id'] = $contribution_page_id;
     $pcpParams['page_type'] = 'contribute';
-    $pcp1 = CRM_PCP_BAO_PCP::create($pcpParams);
+    $pcp1 = CRM_PCP_BAO_PCP::writeRecord($pcpParams);
 
     // Nice work. Now, let's create a second PCP page.
     $pcpParams = $this->pcpParams();
     // Keep track of the owner of the page.
     $pcpOwnerContact2Id = $pcpParams['contact_id'];
+    Contact::update()->addWhere('id', '=', $pcpOwnerContact2Id)->setValues(['last_name' => 'Green'])->execute();
     // We're using the same pcpBlock id and contribution page that we created above.
     $pcpParams['pcp_block_id'] = $pcpBlock->id;
     $pcpParams['page_id'] = $contribution_page_id;
     $pcpParams['page_type'] = 'contribute';
-    $pcp2 = CRM_PCP_BAO_PCP::create($pcpParams);
+    $pcp2 = CRM_PCP_BAO_PCP::writeRecord($pcpParams);
 
     // Get soft credit types, with the name column as the key.
     $soft_credit_types = CRM_Core_PseudoConstant::get('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', ['flip' => TRUE, 'labelColumn' => 'name']);
@@ -1560,15 +1518,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ];
     $c3 = $this->contributionCreate($contribution3params);
     // Now the soft contribution.
-    $p = [
+    $this->callAPISuccess('ContributionSoft', 'create', [
       'contribution_id' => $c3,
       'pcp_id' => $pcp2->id,
       'contact_id' => $pcpOwnerContact2Id,
       'amount' => 200.00,
       'currency' => 'USD',
       'soft_credit_type_id' => $pcp_soft_credit_type_id,
-    ];
-    $this->callAPISuccess('contribution_soft', 'create', $p);
+    ]);
 
     $template = 'contribute/pcp';
     $rows = $this->callAPISuccess('report_template', 'getrows', [
@@ -1586,10 +1543,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test a report that uses getAddressColumns();
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testGetAddressColumns() {
+  public function testGetAddressColumns(): void {
     $template = 'event/participantlisting';
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
@@ -1604,7 +1559,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Test that the contribution aggregate by relationship report filters
    * by financial type.
    */
-  public function testContributionAggregateByRelationship() {
+  public function testContributionAggregateByRelationship(): void {
     $contact = $this->individualCreate();
     // Two contributions with different financial types.
     // We don't really care which types, just different.
@@ -1630,10 +1585,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   /**
    * Basic test of the repeat contributions report.
    */
-  public function testRepeatContributions() {
+  public function testRepeatContributions(): void {
     // our sorting options are limited in this report - default is last name so let's ensure order
-    $contact1 = $this->individualCreate(['last_name' => 'aaaaa']);
-    $contact2 = $this->individualCreate(['last_name' => 'zzzzz']);
+    $contact1 = $this->individualCreate(['last_name' => 'Aardvark']);
+    $contact2 = $this->individualCreate(['last_name' => 'Zebra']);
     $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => (date('Y') - 1) . '-07-01', 'financial_type_id' => 1, 'total_amount' => '10']);
     $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => (date('Y') - 1) . '-08-01', 'financial_type_id' => 1, 'total_amount' => '20']);
     $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => date('Y') . '-01-01', 'financial_type_id' => 1, 'total_amount' => '40']);
@@ -1675,8 +1630,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * In practice, besides some setup and trigger-wrangling, the report isn't
    * useful for activities, so we're checking activity_contact records, and
    * because of how an activity update works that's actually a delete+insert.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testLoggingDetail() {
+  public function testLoggingDetail(): void {
     \Civi::settings()->set('logging', 1);
     $this->createContactsWithActivities();
     $this->doQuestionableStuffInASeparateFunctionSoNobodyNotices();
@@ -1765,6 +1722,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * On the plus side, this doesn't affect other tests since if they enable
    * logging then that'll just recreate the variable and triggers.
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   private function doQuestionableStuffInASeparateFunctionSoNobodyNotices(): void {
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_setting WHERE name='logging_uniqueid_date'");
@@ -1772,6 +1731,43 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     // every trigger.
     CRM_Core_Config::singleton(TRUE, TRUE);
     \Civi::service('sql_triggers')->rebuild(NULL, TRUE);
+  }
+
+  /**
+   * Implement hook to restrict to test group 1.
+   *
+   * @implements hook_aclGroups
+   *
+   * @param string $type
+   * @param int $contactID
+   * @param string $tableName
+   * @param array $allGroups
+   * @param array $ids
+   *
+   * @noinspection PhpUnusedParameterInspection
+   */
+  public function aclGroupOnly(string $type, int $contactID, string $tableName, array $allGroups, array &$ids): void {
+    if ($tableName === 'civicrm_group') {
+      $ids = [$this->aclGroupID];
+    }
+  }
+
+  /**
+   * Implements hook to limit to contacts only in the aclGroup
+   *
+   * @param string $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int|null $contactID
+   * @param string|null $where
+   *
+   * @noinspection PhpUnusedParameterInspection
+   */
+  public function aclGroupContactsOnly(string $type, array &$tables, array &$whereTables, ?int &$contactID, ?string &$where): void {
+    if (!empty($where)) {
+      $where .= ' AND ';
+    }
+    $where .= 'contact_a.id IN (SELECT contact_id FROM civicrm_group_contact WHERE status = \'Added\' AND group_id = ' . $this->aclGroupID . ')';
   }
 
 }

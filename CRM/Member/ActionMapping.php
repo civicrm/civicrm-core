@@ -11,50 +11,55 @@
 
 
 /**
- * Class CRM_Member_ActionMapping
- *
  * This defines the scheduled-reminder functionality for CiviMember
  * memberships. It allows one to target reminders based on join date
  * or end date, with additional filtering based on membership-type.
  */
-class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
+class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
 
   /**
-   * The value for civicrm_action_schedule.mapping_id which identifies the
-   * "Membership Type" mapping.
-   *
-   * Note: This value is chosen to match legacy DB IDs.
+   * Note: This value is an integer for legacy reasons; but going forward any new
+   * action mapping classes should return a string from `getId` instead of using a constant.
    */
   const MEMBERSHIP_TYPE_MAPPING_ID = 4;
 
-  /**
-   * Register CiviMember-related action mappings.
-   *
-   * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
-   */
-  public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
-    $registrations->register(CRM_Member_ActionMapping::create([
-      'id' => CRM_Member_ActionMapping::MEMBERSHIP_TYPE_MAPPING_ID,
-      'entity' => 'civicrm_membership',
-      'entity_label' => ts('Membership'),
-      'entity_value' => 'civicrm_membership_type',
-      'entity_value_label' => ts('Membership Type'),
-      'entity_status' => 'auto_renew_options',
-      'entity_status_label' => ts('Auto Renew Options'),
-    ]));
+  public function getId() {
+    return self::MEMBERSHIP_TYPE_MAPPING_ID;
   }
 
-  /**
-   * Get a list of available date fields.
-   *
-   * @return array
-   *   Array(string $fieldName => string $fieldLabel).
-   */
-  public function getDateFields() {
+  public function getName(): string {
+    return 'membership_type';
+  }
+
+  public function getEntityName(): string {
+    return 'Membership';
+  }
+
+  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    $spec->getFieldByName('entity_value')
+      ->setLabel(ts('Membership Type'));
+    $spec->getFieldByName('entity_status')
+      ->setLabel(ts('Auto Renew Options'));
+  }
+
+  public function getValueLabels(): array {
+    return CRM_Member_PseudoConstant::membershipType();
+  }
+
+  public function getStatusLabels(?array $entityValue): array {
+    foreach ($entityValue ?? [] as $membershipType) {
+      if (\CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipType, 'auto_renew')) {
+        return \CRM_Core_OptionGroup::values('auto_renew_options');
+      }
+    }
+    return [];
+  }
+
+  public function getDateFields(?array $entityValue = NULL): array {
     return [
-      'join_date' => ts('Membership Join Date'),
+      'join_date' => ts('Member Since'),
       'start_date' => ts('Membership Start Date'),
-      'end_date' => ts('Membership End Date'),
+      'end_date' => ts('Membership Expiration Date'),
     ];
   }
 
@@ -71,11 +76,11 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @return \CRM_Utils_SQL_Select
    * @see RecipientBuilder
    */
-  public function createQuery($schedule, $phase, $defaultParams) {
+  public function createQuery($schedule, $phase, $defaultParams): CRM_Utils_SQL_Select {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
-    $query = \CRM_Utils_SQL_Select::from("{$this->entity} e")->param($defaultParams);
+    $query = \CRM_Utils_SQL_Select::from('civicrm_membership e')->param($defaultParams);
     $query['casAddlCheckFrom'] = 'civicrm_membership e';
     $query['casContactIdField'] = 'e.contact_id';
     $query['casEntityIdField'] = 'e.id';
@@ -115,7 +120,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
     // scheduling another kind of reminder might not expect members to be
     // excluded if they have status overrides.  Ideally there would be some kind
     // of setting per reminder.
-    $query->where("( e.is_override IS NULL OR e.is_override = 0 )");
+    $query->where("e.is_override = 0");
 
     // FIXME: Similarly to overrides, excluding contacts who can't edit the
     // primary member makes sense in the context of renewals (see CRM-11342) but
@@ -159,21 +164,13 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
    *
    * @param \CRM_Core_DAO_ActionSchedule $schedule
    */
-  public function resetOnTriggerDateChange($schedule) {
+  public function resetOnTriggerDateChange($schedule): bool {
     if ($schedule->absolute_date !== NULL) {
       return FALSE;
     }
     else {
       return TRUE;
     }
-  }
-
-  /**
-   * Determine whether a schedule based on this mapping should
-   * send to additional contacts.
-   */
-  public function sendToAdditional($entityId): bool {
-    return TRUE;
   }
 
 }

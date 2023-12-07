@@ -52,7 +52,7 @@ if (getenv('J5PACK')) {
 if (getenv('D5PACK')) {
   $data['tar']['Drupal'] = "civicrm-$DM_VERSION-drupal.tar.gz";
 }
-if (getenv('WPPACK')) {
+if (getenv('WP5PACK')) {
   $data['tar']['WordPress'] = "civicrm-$DM_VERSION-wordpress.zip";
 }
 if (getenv('L10NPACK')) {

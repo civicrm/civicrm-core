@@ -97,9 +97,12 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken {
   }
 
   /**
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
 
@@ -109,13 +112,13 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken {
     }
     // With 'manage my' permission, limit to just the current user
     elseif ($loggedInContactID && CRM_Core_Permission::check(['manage my OAuth contact tokens'])) {
-      $clauses['contact_id'] = "= $loggedInContactID";
+      $clauses['contact_id'][] = "= $loggedInContactID";
     }
     // No permission, return nothing
     else {
-      $clauses['contact_id'] = "= -1";
+      $clauses['contact_id'][] = "= -1";
     }
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
   }
 

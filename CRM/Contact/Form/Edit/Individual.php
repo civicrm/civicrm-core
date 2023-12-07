@@ -72,11 +72,7 @@ class CRM_Contact_Form_Edit_Individual {
       $form->addField('job_title', ['size' => '30']);
 
       //Current Employer Element
-      $props = [
-        'api' => ['params' => ['contact_type' => 'Organization']],
-        'create' => TRUE,
-      ];
-      $form->addField('employer_id', $props);
+      $form->addField('employer_id', ['create' => TRUE]);
       $form->addField('contact_source', ['class' => 'big']);
     }
 

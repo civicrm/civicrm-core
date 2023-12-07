@@ -50,35 +50,41 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
           'url' => 'civicrm/admin/price/field',
           'qs' => 'reset=1&action=browse&sid=%%sid%%',
           'title' => ts('View and Edit Price Fields'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
-          'url' => 'civicrm/admin/price',
+          'url' => 'civicrm/admin/price/edit',
           'qs' => 'action=preview&reset=1&sid=%%sid%%',
           'title' => ts('Preview Price Set'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::PREVIEW),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Settings'),
-          'url' => 'civicrm/admin/price',
+          'url' => 'civicrm/admin/price/edit',
           'qs' => 'action=update&reset=1&sid=%%sid%%',
           'title' => ts('Edit Price Set'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Price Set'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Price Set'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/price',
+          'url' => 'civicrm/admin/price/edit',
           'qs' => 'action=delete&reset=1&sid=%%sid%%',
           'title' => ts('Delete Price Set'),
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::COPY => [
           'name' => ts('Copy Price Set'),
@@ -86,6 +92,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
           'qs' => 'action=copy&sid=%%sid%%',
           'title' => ts('Make a Copy of Price Set'),
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
+          'weight' => 120,
         ],
       ];
     }

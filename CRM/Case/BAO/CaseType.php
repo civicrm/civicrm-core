@@ -57,10 +57,12 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
 
     $caseTypeName = (isset($params['name'])) ? $params['name'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $params['id'], 'name', 'id', TRUE);
 
-    // function to format definition column
+    // Format definition column
     if (isset($params['definition']) && is_array($params['definition'])) {
       $params['definition'] = self::convertDefinitionToXML($caseTypeName, $params['definition']);
-      CRM_Core_ManagedEntities::scheduleReconciliation();
+      // Ensure entities declared in the definition get created.
+      // @see CRM_Case_ManagedEntities
+      CRM_Core_ManagedEntities::scheduleReconciliation(['civicrm']);
     }
 
     $caseTypeDAO->copyValues($params);
@@ -439,6 +441,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
    * @return CRM_Case_DAO_CaseType
    */
   public static function del($caseTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return static::deleteRecord(['id' => $caseTypeId]);
   }
 

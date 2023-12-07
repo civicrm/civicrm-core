@@ -226,7 +226,7 @@ class CRM_Case_Audit_AuditConfig {
     }
 
     $this->sortRegion = $r;
-    uasort($f, array(&$this, "compareFields"));
+    uasort($f, [&$this, "compareFields"]);
   }
 
   /**

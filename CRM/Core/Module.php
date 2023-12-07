@@ -25,6 +25,13 @@ class CRM_Core_Module {
   public $name;
 
   /**
+   * Pretty name of the module
+   *
+   * @var string
+   */
+  public $label;
+
+  /**
    * Is the module enabled.
    *
    * @var bool
@@ -35,11 +42,15 @@ class CRM_Core_Module {
    * Class constructor.
    *
    * @param string $name
+   *   Unique machine name of the module
    * @param bool $is_active
+   * @param string|null $label
+   *   Pretty name of the module. If omitted, fallback to $name.
    */
-  public function __construct($name, $is_active) {
+  public function __construct($name, $is_active, ?string $label = NULL) {
     $this->name = $name;
     $this->is_active = $is_active;
+    $this->label = $label ?: $name;
   }
 
   /**
@@ -55,7 +66,7 @@ class CRM_Core_Module {
     if ($fresh || !is_array($result)) {
       $result = CRM_Extension_System::singleton()->getMapper()->getModules();
       // pseudo-module for core
-      $result[] = new CRM_Core_Module('civicrm', TRUE);
+      $result[] = new CRM_Core_Module('civicrm', TRUE, ts('CiviCRM Core'));
 
       $config = CRM_Core_Config::singleton();
       $result = array_merge($result, $config->userSystem->getModules());

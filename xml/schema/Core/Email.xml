@@ -67,7 +67,7 @@
     <type>varchar</type>
     <length>254</length>
     <html>
-      <type>Text</type>
+      <type>Email</type>
       <size>30</size>
     </html>
     <import>true</import>
@@ -84,7 +84,7 @@
   </index>
   <field>
     <name>is_primary</name>
-    <title>Primary email</title>
+    <title>Is Primary</title>
     <type>boolean</type>
     <default>0</default>
     <required>true</required>

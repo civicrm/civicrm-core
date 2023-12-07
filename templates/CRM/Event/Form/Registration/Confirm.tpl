@@ -11,29 +11,22 @@
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
 {/if}
 
-{include file="CRM/common/TrackingFields.tpl"}
-
 <div class="crm-event-id-{$event.id} crm-block crm-event-confirm-form-block">
+    <div class="messages status section continue_message-section"><p>
+    {capture assign=register}{ts}Register{/ts}{/capture}
     {if $isOnWaitlist}
-        <div class="help">
-            {ts}Please verify the information below. <span class="bold">Then click 'Continue' to be added to the WAIT LIST for this event</span>. If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}
-        </div>
+        {ts}Please verify your information.{/ts} <strong>{ts}If space becomes available you will receive an email with a link to complete your registration.{/ts}</strong>
+        {ts 1=$register}Click <strong>%1</strong> to be added to the WAIT LIST for this event.{/ts}
     {elseif $isRequireApproval}
-        <div class="help">
-            {ts}Please verify the information below. Then click 'Continue' to submit your registration. <span class="bold">Once approved, you will receive an email with a link to a web page where you can complete the registration process.</span>{/ts}
-        </div>
+        {ts}Please verify your information.{/ts} <strong>{ts}Once approved, you will receive an email with a link to complete the registration process.{/ts}</strong>
+        {ts 1=$register}Click <strong>%1</strong> to submit your registration for approval.{/ts}
     {else}
-        <div class="help">
-        {ts}Please verify the information below. Click the <strong>Go Back</strong> button below if you need to make changes.{/ts}
-        {if $contributeMode EQ 'notify' and !$is_pay_later and ! $isAmountzero }
-          {ts 1=$paymentProcessor.name}Click the <strong>Continue</strong> button to checkout to %1, where you will select your payment method and complete the registration.{/ts}
-        {else}
-            {ts}Otherwise, click the <strong>Continue</strong> button below to complete your registration.{/ts}
-        {/if}
-        </div>
-        {if $is_pay_later and !$isAmountzero}
-            <div class="bold">{$pay_later_receipt}</div>
-        {/if}
+        {ts}Please verify your information.{/ts}
+        {$verifyText}
+    {/if}
+    </p></div>
+    {if $is_pay_later and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+    <div class="bold pay-later-receipt-instructions">{$pay_later_receipt}</div>
     {/if}
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">
@@ -46,37 +39,6 @@
         </div>
     {/if}
 
-    <div class="crm-group event_info-group">
-        <div class="header-dark">
-            {ts}Event Information{/ts}
-        </div>
-        <div class="display-block">
-            {include file="CRM/Event/Form/Registration/EventInfoBlock.tpl"}
-        </div>
-    </div>
-
-    {if $pcpBlock && $pcp_display_in_roll}
-    <div class="crm-group pcp_display-group">
-        <div class="header-dark">
-           {ts}Contribution Honor Roll{/ts}
-        </div>
-        <div class="display-block">
-          {ts}List my contribution{/ts}
-          {if $pcp_is_anonymous}
-              <strong>{ts}anonymously{/ts}.</strong>
-          {else}
-            {ts}under the name{/ts}: <strong>{$pcp_roll_nickname}</strong><br/>
-            {if $pcp_personal_note}
-                {ts}With the personal note{/ts}: <strong>{$pcp_personal_note}</strong>
-            {else}
-             <strong>{ts}With no personal note{/ts}</strong>
-             {/if}
-          {/if}
-          <br />
-        </div>
-    </div>
-    {/if}
-
     {if $paidEvent && !$isRequireApproval && !$isOnWaitlist}
         <div class="crm-group event_fees-group">
             <div class="header-dark">
@@ -86,7 +48,7 @@
                 {include file="CRM/Price/Page/LineItem.tpl" context="Event"}
             {elseif $amounts || $amount == 0}
           <div class="crm-section no-label amount-item-section">
-                    {foreach from= $amounts item=amount key=level}
+                    {foreach from=$amounts item=amount key=level}
               <div class="content">
                   {$amount.amount|crmMoney}&nbsp;&nbsp;{$amount.label}
               </div>
@@ -115,6 +77,48 @@
         </div>
     {/if}
 
+    {if $showPaymentOnConfirm}
+    <div class="crm-group event_info-group">
+      <div class="header-dark">
+          {ts}Payment details{/ts}
+      </div>
+    {if !empty($form.payment_processor_id.label)}
+      <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
+        <legend>{ts}Payment Options{/ts}</legend>
+        <div class="crm-section payment_processor-section">
+          <div class="label">{$form.payment_processor_id.label}</div>
+          <div class="content">{$form.payment_processor_id.html}</div>
+          <div class="clear"></div>
+        </div>
+      </fieldset>
+    {/if}
+        {include file='CRM/Core/BillingBlockWrapper.tpl'}
+    {literal}<script>function calculateTotalFee() { return {/literal}{$totalAmount}{literal} }</script>{/literal}
+    </div>
+    {/if}
+
+    {if $pcpBlock && $pcp_display_in_roll}
+    <div class="crm-group pcp_display-group">
+        <div class="header-dark">
+           {ts}Contribution Honor Roll{/ts}
+        </div>
+        <div class="display-block">
+          {ts}List my contribution{/ts}
+          {if $pcp_is_anonymous}
+              <strong>{ts}anonymously{/ts}.</strong>
+          {else}
+            {ts}under the name{/ts}: <strong>{$pcp_roll_nickname}</strong><br/>
+            {if $pcp_personal_note}
+                {ts}With the personal note{/ts}: <strong>{$pcp_personal_note}</strong>
+            {else}
+             <strong>{ts}With no personal note{/ts}</strong>
+             {/if}
+          {/if}
+          <br />
+        </div>
+    </div>
+    {/if}
+
     {if $event.participant_role neq 'Attendee' and $defaultRole}
         <div class="crm-group participant_role-group">
             <div class="header-dark">
@@ -131,7 +135,7 @@
 
     {include file="CRM/Event/Form/Registration/DisplayProfile.tpl"}
 
-    {if $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $paidEvent and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+    {if $billingName or $address}
       <div class="crm-group billing_name_address-group">
             <div class="header-dark">
                 {ts}Billing Name and Address{/ts}
@@ -163,13 +167,14 @@
       {/crmRegion}
     {/if}
 
-    {if $contributeMode NEQ 'notify'} {* In 'notify mode, contributor is taken to processor payment forms next *}
-    <div class="messages status section continue_message-section">
-        <p>
-        {ts}Your registration will not be submitted until you click the <strong>Continue</strong> button. Please click the button one time only. If you need to change any details, click the Go Back button below to return to the previous screen.{/ts}
-        </p>
+    <div class="crm-group event_info-group">
+        <div class="header-dark">
+            {ts}Event Information{/ts}
+        </div>
+        <div class="display-block">
+            {include file="CRM/Event/Form/Registration/EventInfoBlock.tpl"}
+        </div>
     </div>
-    {/if}
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">
       {include file="CRM/common/formButtons.tpl" location="bottom"}

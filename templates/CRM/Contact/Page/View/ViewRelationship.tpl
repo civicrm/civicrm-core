@@ -18,7 +18,7 @@
             <tr><td class="label">{ts}Description{/ts}</td><td>{$row.description}</td></tr>
           {/if}
           {foreach from=$viewNote item="rec"}
-              {if $rec }
+              {if $rec}
                 <tr><td class="label">{ts}Note{/ts}</td><td>{$rec}</td></tr>
               {/if}
           {/foreach}

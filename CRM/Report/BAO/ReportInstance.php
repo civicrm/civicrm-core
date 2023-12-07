@@ -47,7 +47,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
     }
 
     if (!$instanceID || !isset($params['id'])) {
-      $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
+      $params['is_reserved'] = $params['is_reserved'] ?? FALSE;
       $params['domain_id'] = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
       // CRM-17256 set created_id on report creation.
       $params['created_id'] = $params['created_id'] ?? CRM_Core_Session::getLoggedInContactID();
@@ -77,7 +77,8 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
     }
 
     if (!$instanceID) {
-      if ($reportID = CRM_Utils_Array::value('report_id', $params)) {
+      $reportID = $params['report_id'] ?? NULL;
+      if ($reportID) {
         $instance->report_id = $reportID;
       }
       elseif ($instanceID) {
@@ -135,7 +136,8 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
       $navigationParams['parent_id'] = $params['parent_id'] ?? NULL;
       $navigationParams['is_active'] = 1;
 
-      if ($permission = CRM_Utils_Array::value('permission', $params)) {
+      $permission = $params['permission'] ?? NULL;
+      if ($permission) {
         $navigationParams['permission'][] = $permission;
       }
 
@@ -157,7 +159,8 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
         'label' => $params['title'],
         'is_active' => 1,
       ];
-      if ($permission = CRM_Utils_Array::value('permission', $params)) {
+      $permission = $params['permission'] ?? NULL;
+      if ($permission) {
         $dashletParams['permission'][] = $permission;
       }
     }
@@ -223,6 +226,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
    * @return mixed
    */
   public static function del($id = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     self::deleteRecord(['id' => $id]);
     return 1;
   }
@@ -236,24 +240,17 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
       // When deleting a report, also delete from navigation menu
       $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $event->id, 'navigation_id');
       if ($navId) {
-        CRM_Core_BAO_Navigation::processDelete($navId);
+        CRM_Core_BAO_Navigation::deleteRecord(['id' => $navId]);
         CRM_Core_BAO_Navigation::resetNavigation();
       }
     }
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
@@ -325,7 +322,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
       CRM_Core_Error::statusBounce($statusMessage, $bounceTo);
     }
 
-    CRM_Report_BAO_ReportInstance::del($instanceId);
+    CRM_Report_BAO_ReportInstance::deleteRecord(['id' => $instanceId]);
 
     CRM_Core_Session::setStatus(ts('Selected report has been deleted.'), ts('Deleted'), 'success');
     if ($successRedirect) {

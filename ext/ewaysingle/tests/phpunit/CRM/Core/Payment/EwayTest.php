@@ -23,6 +23,18 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
   use \Civi\Test\GuzzleTestTrait;
   use \Civi\Test\Api3TestTrait;
 
+  /**
+   * Instance of CRM_Core_Payment_eWay|null
+   * @var CRM_Core_Payment_eWay
+   */
+  protected $processor;
+
+  /**
+   * Created Object Ids
+   * @var array
+   */
+  public $ids;
+
   public function setUpHeadless() {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
     // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest
@@ -128,6 +140,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
   public function setUpEwayProcessor(): void {
     $params = [
       'name' => 'demo',
+      'title' => 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
       'payment_processor_type_id' => 'eWAY',
       'is_active' => 1,

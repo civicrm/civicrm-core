@@ -6,7 +6,12 @@
  */
 class CRM_Utils_LazyArrayTest extends CiviUnitTestCase {
 
-  public function testAssoc() {
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
+  public function testAssoc(): void {
     $l = $this->createFruitBasket();
     $this->assertFalse($l->isLoaded());
 
@@ -33,7 +38,7 @@ class CRM_Utils_LazyArrayTest extends CiviUnitTestCase {
     $this->assertEquals(['a', 'b', 'c', 'd'], array_keys(CRM_Utils_Array::cast($l)));
   }
 
-  public function testNumeric() {
+  public function testNumeric(): void {
     $l = $this->createSeaRecords();
     $this->assertFalse($l->isLoaded());
 
@@ -60,7 +65,7 @@ class CRM_Utils_LazyArrayTest extends CiviUnitTestCase {
     $this->assertEquals([0, 1, 2, 3], array_keys(CRM_Utils_Array::cast($l)));
   }
 
-  public function testBasicInspections() {
+  public function testBasicInspections(): void {
     $l = $this->createFruitBasket();
     $this->assertFalse($l->isLoaded());
 
@@ -75,7 +80,7 @@ class CRM_Utils_LazyArrayTest extends CiviUnitTestCase {
     $this->assertTrue($l->isLoaded());
   }
 
-  public function testCopy() {
+  public function testCopy(): void {
     $l = $this->createFruitBasket();
     $copy = $l->getArrayCopy();
     $copy['d'] = 'date';

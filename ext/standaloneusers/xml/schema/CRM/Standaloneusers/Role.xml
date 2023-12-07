@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Standaloneusers</base>
+  <class>Role</class>
+  <name>civicrm_role</name>
+  <comment>A Role holds a set of permissions. Roles may be granted to Users.</comment>
+  <log>true</log>
+
+  <paths>
+    <add>civicrm/admin/role</add>
+    <update>civicrm/admin/role#?Role1=[id]</update>
+  </paths>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique Role ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>name</name>
+    <comment>Machine name for this role</comment>
+    <type>varchar</type>
+    <length>60</length>
+    <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>label</name>
+    <comment>Human friendly name for this role</comment>
+    <type>varchar</type>
+    <length>128</length>
+    <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>permissions</name>
+    <comment>List of permissions granted by this role</comment>
+    <type>text</type>
+    <required>true</required>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::permissions</callback>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
+  </field>
+
+  <field>
+    <name>is_active</name>
+    <title>Role is active</title>
+    <comment>Only active roles grant permissions</comment>
+    <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
+  </field>
+
+</table>

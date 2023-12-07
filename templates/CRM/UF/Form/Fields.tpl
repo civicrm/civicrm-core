@@ -12,63 +12,37 @@
     {assign var="rowIdentifier" value=$field.name}
   {/if}
 
-  {if $field.groupTitle != $fieldset}
-    {if $fieldset != $zeroField}
-      {if $groupHelpPost && $action neq 4}
-        <div class="messages help">{$groupHelpPost}</div>
-      {/if}
-      {if $mode ne 8}
-        </fieldset>
-      {/if}
-    {/if}
-
-    {if $mode ne 8 && $action ne 1028 && $action ne 4 && !$hideFieldset}
-      <fieldset class="crm-profile crm-profile-id-{$field.group_id} crm-profile-name-{$field.groupName}"><legend>{$field.groupDisplayTitle}</legend>
-    {/if}
-
-    {if ($form.formName eq 'Confirm' OR $form.formName eq 'ThankYou') AND $prefix neq 'honor'}
-      <div class="header-dark">{$field.groupDisplayTitle} </div>
-    {/if}
-    {assign var=fieldset  value=`$field.groupTitle`}
-    {assign var=groupHelpPost  value=`$field.groupHelpPost`}
-    {if $field.groupHelpPre && $action neq 4 && $action neq 1028}
-      <div class="messages help">{$field.groupHelpPre}</div>
-    {/if}
-  {/if}
-
   {if $field.field_type eq "Formatting"}
-    {if $action neq 4 && $action neq 1028}
+    {if $action neq 4}
       {$field.help_pre}
     {/if}
   {elseif $profileFieldName}
-    {* Show explanatory text for field if not in 'view' or 'preview' modes *}
-    {if $field.help_pre && $action neq 4 && $action neq 1028}
+    {* Show explanatory text for field if not in 'view' mode *}
+    {if $field.help_pre && $action neq 4}
       <div class="crm-section helprow-{$profileFieldName}-section helprow-pre" id="helprow-{$rowIdentifier}">
         <div class="content description">{$field.help_pre}</div>
       </div>
     {/if}
-    {if $field.options_per_line != 0}
+    {if array_key_exists('options_per_line', $field) && $field.options_per_line != 0}
       <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$rowIdentifier}">
         <div class="label option-label">{$formElement.label}</div>
         <div class="content 3">
 
-          {assign var="count" value="1"}
+          {assign var="count" value=1}
           {strip}
             <table class="form-layout-compressed">
               <tr>
                 {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                {assign var="index" value="1"}
                 {foreach name=outer key=key item=item from=$formElement}
-                {if $index < 10}
-                {assign var="index" value=`$index+1`}
-                {else}
+                  {* There are both numeric and non-numeric keys mixed in here, where the non-numeric are metadata that aren't arrays with html members. *}
+                  {if is_array($item) && array_key_exists('html', $item)}
                 <td class="labels font-light">{$formElement.$key.html}</td>
                 {if $count == $field.options_per_line}
               </tr>
               <tr>
-                {assign var="count" value="1"}
+                {assign var="count" value=1}
                 {else}
-                {assign var="count" value=`$count+1`}
+                {assign var="count" value=$count+1}
                 {/if}
                 {/if}
                 {/foreach}
@@ -93,7 +67,7 @@
             {include file="CRM/Profile/Form/GreetingType.tpl"}
           {elseif ($profileFieldName eq 'group' && $form.group) || ($profileFieldName eq 'tag' && $form.tag)}
             {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$profileFieldName title=null context="profile"}
-          {elseif $field.is_datetime_field && $action & 4}
+          {elseif array_key_exists('is_datetime_field', $field) && $field.is_datetime_field && $action & 4}
             <span class="crm-frozen-field">
               {$formElement.value|crmDate:$field.smarty_view_format}
               <input type="hidden"
@@ -143,8 +117,8 @@
         <div class="clear"></div>
       </div>
     {/if}
-    {* Show explanatory text for field if not in 'view' or 'preview' modes *}
-    {if $field.help_post && $action neq 4 && $action neq 1028}
+    {* Show explanatory text for field if not in 'view' mode *}
+    {if $field.help_post && $action neq 4}
       <div class="crm-section helprow-{$profileFieldName}-section helprow-post" id="helprow-{$rowIdentifier}">
         <div class="content description">{$field.help_post}</div>
       </div>

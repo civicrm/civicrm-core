@@ -25,8 +25,9 @@ class E2E_Extern_WidgetTest extends CiviEndToEndTestCase {
   /**
    * Return widget Javascript.
    */
-  public function testWidget() {
-    if (CIVICRM_UF !== 'Drupal8') {
+  public function testWidget(): void {
+    if (!in_array(CIVICRM_UF, ['Drupal8', 'Standalone'])) {
+      // Skip the traditional tests for Drupal8+ and Standalone as these are unsupported.
       $endpoints['traditional'] = CRM_Core_Resources::singleton()->getUrl('civicrm', 'extern/widget.php');
     }
     $endpoints['normal'] = CRM_Utils_System::url('civicrm/contribute/widget', NULL, TRUE, NULL, FALSE, TRUE);
@@ -100,7 +101,7 @@ class E2E_Extern_WidgetTest extends CiviEndToEndTestCase {
    *   Array of contribution page
    */
   public function contributionPageCreate($params = []) {
-    $this->_pageParams = array_merge([
+    $pageParams = array_merge([
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'USD',
@@ -111,7 +112,7 @@ class E2E_Extern_WidgetTest extends CiviEndToEndTestCase {
       'max_amount' => 1000,
       'goal_amount' => '10000',
     ], $params);
-    return $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
+    return $this->callAPISuccess('contribution_page', 'create', $pageParams);
   }
 
 }

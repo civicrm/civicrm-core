@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\EntityFinancialAccount;
+
 /**
  * This class generates form components for Financial Type Account
  */
@@ -61,7 +63,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
     $url = CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts',
       "reset=1&action=browse&aid={$this->_aid}");
 
-    $this->_BAOName = 'CRM_Financial_BAO_FinancialTypeAccount';
+    $this->_BAOName = 'CRM_Financial_BAO_EntityFinancialAccount';
     if ($this->_aid && ($this->_action & CRM_Core_Action::ADD)) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_aid, 'name');
       $this->setTitle($this->_title . ' - ' . ts('Financial Accounts'));
@@ -132,7 +134,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
 
     if (isset($this->_id)) {
       $params = ['id' => $this->_id];
-      CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
+      CRM_Financial_BAO_EntityFinancialAccount::retrieve($params, $defaults);
       $this->setDefaults($defaults);
       $financialAccountTitle = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $defaults['financial_account_id'], 'name');
     }
@@ -210,7 +212,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
     $errorFlag = FALSE;
     if ($self->_action == CRM_Core_Action::DELETE) {
       $relationValues = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
-      if (CRM_Utils_Array::value('financial_account_id', $values) != 'select') {
+      if (($values['financial_account_id'] ?? NULL) != 'select') {
         if ($relationValues[$values['account_relationship']] == 'Premiums Inventory Account is' || $relationValues[$values['account_relationship']] == 'Cost of Sales Account is') {
           $premiumsProduct = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_PremiumsProduct', $values['financial_type_id'], 'product_id', 'financial_type_id');
           $product = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Product', $values['financial_type_id'], 'name', 'financial_type_id');
@@ -220,10 +222,10 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
         }
       }
     }
-    if (CRM_Utils_Array::value('account_relationship', $values) == 'select') {
+    if (($values['account_relationship'] ?? NULL) == 'select') {
       $errorMsg['account_relationship'] = 'Financial Account relationship is a required field.';
     }
-    if (CRM_Utils_Array::value('financial_account_id', $values) == 'select') {
+    if (($values['financial_account_id'] ?? NULL) == 'select') {
       $errorMsg['financial_account_id'] = 'Financial Account is a required field.';
     }
     if (!empty($values['account_relationship']) && !empty($values['financial_account_id'])) {
@@ -242,7 +244,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
             $errorMsg['financial_account_id'] = ts('Is Tax? must be set for respective financial account');
           }
         }
-        $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
+        $result = CRM_Financial_BAO_EntityFinancialAccount::retrieve($params, $defaults);
         if ($result) {
           $errorFlag = TRUE;
         }
@@ -253,7 +255,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
         }
         else {
           $params['financial_account_id'] = $values['financial_account_id'];
-          $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
+          $result = CRM_Financial_BAO_EntityFinancialAccount::retrieve($params, $defaults);
           if ($result) {
             $errorFlag = TRUE;
           }
@@ -270,13 +272,19 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
   /**
    * Process the form submission.
    */
-  public function postProcess() {
+  public function postProcess(): void {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Financial_BAO_FinancialTypeAccount::del($this->_id, $this->_aid);
+      try {
+        EntityFinancialAccount::delete()->addWhere('id', '=', $this->_id)->execute();
+      }
+      catch (CRM_Core_Exception $e) {
+        CRM_Core_Session::setStatus($e->getMessage());
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', "reset=1&action=browse&aid={$this->_aid}"));
+      }
       CRM_Core_Session::setStatus(ts('Selected financial type account has been deleted.'));
     }
     else {
-      $params = $ids = [];
+      $ids = [];
       // store the submitted values in an array
       $params = $this->exportValues();
 
@@ -291,7 +299,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
         $params['entity_id'] = $this->_aid;
       }
       try {
-        $financialTypeAccount = CRM_Financial_BAO_FinancialTypeAccount::add($params, $ids);
+        $financialTypeAccount = CRM_Financial_BAO_EntityFinancialAccount::add($params, $ids);
         CRM_Core_Session::setStatus(ts('The financial type Account has been saved.'), ts('Saved'), 'success');
       }
       catch (CRM_Core_Exception $e) {

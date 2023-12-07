@@ -64,7 +64,7 @@ class CRM_Report_FormTest extends CiviUnitTestCase {
   /**
    * Test that getFromTo returns the correct dates.
    */
-  public function testGetFromTo() {
+  public function testGetFromTo(): void {
     $cases = $this->fromToData();
     foreach ($cases as $caseDescription => $case) {
       $obj = new CRM_Report_Form();

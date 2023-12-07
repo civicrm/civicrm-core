@@ -12,16 +12,7 @@
 {/if}
 
 <div id="crm-container" class="crm-container{if !empty($urlIsPublic)} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
-
-<table border="0" cellpadding="0" cellspacing="0" id="crm-content">
-  <tr>
-{if $sidebarLeft}
-    <td id="sidebar-left" valign="top">
-        <div id="civi-sidebar-logo" style="margin: 0 0 .25em .25em"><img src="{$config->resourceBase}i/logo_words_small.png" title="{ts}CiviCRM{/ts}"/></div><div class="spacer"></div>
-       {$sidebarLeft}
-    </td>
-{/if}
-    <td id="content-right" valign="top">
+  <div id ="crm-content">
     {if $breadcrumb}
     <div class="breadcrumb">
       {foreach from=$breadcrumb item=crumb key=key}
@@ -33,22 +24,18 @@
     </div>
     {/if}
 
-{if $pageTitle}
-  <div class="crm-title">
-    <h1 class="title">{if $isDeleted}<del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
-  </div>
-{/if}
+    {if $pageTitle}
+      <div class="crm-title">
+        <h1 class="title">{if $isDeleted}<del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
+      </div>
+    {/if}
 
     {crmRegion name='page-header'}
     {/crmRegion}
 
-{*{include file="CRM/common/langSwitch.tpl"}*}
+    {*{include file="CRM/common/langSwitch.tpl"}*}
 
     <div class="clear"></div>
-
-    {if $localTasks}
-        {include file="CRM/common/localNav.tpl"}
-    {/if}
 
     <div id="crm-main-content-wrapper">
       {include file="CRM/common/status.tpl"}
@@ -68,9 +55,5 @@
       {include file="CRM/common/footer.tpl"}
     {/if}
     {/crmRegion}
-
-    </td>
-
-  </tr>
-</table>
+  </div>
 </div> {* end crm-container div *}

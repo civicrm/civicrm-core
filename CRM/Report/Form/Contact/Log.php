@@ -18,6 +18,8 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
+  protected $activityTypes = [];
+
   /**
    * Class constructor.
    */
@@ -179,7 +181,7 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          if (CRM_Utils_Array::value('operatorType', $field) & CRM_Report_Form::OP_DATE
+          if (($field['operatorType'] ?? 0) & CRM_Report_Form::OP_DATE
           ) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
@@ -192,9 +194,9 @@ class CRM_Report_Form_Contact_Log extends CRM_Report_Form {
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
             }
           }

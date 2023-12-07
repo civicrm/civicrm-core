@@ -17,11 +17,13 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
+use Civi\Core\Event\PostEvent;
+use Civi\Core\HookInterface;
 
 /**
  * This class contains Contribution Page related functions.
  */
-class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_ContributionPage {
+class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_ContributionPage implements HookInterface {
 
   /**
    * Creates a contribution page.
@@ -31,41 +33,32 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @return CRM_Contribute_DAO_ContributionPage
    */
   public static function create($params) {
-    $financialTypeId = NULL;
-    if (!empty($params['id']) && !CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id'], NULL, 1)) {
-      $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $params['id'], 'financial_type_id');
-    }
-
+    // @todo  - this implode is probably handled by writeRecord - test & remove.
     if (isset($params['payment_processor']) && is_array($params['payment_processor'])) {
       $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['payment_processor']);
     }
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'ContributionPage', CRM_Utils_Array::value('id', $params), $params);
-    $dao = new CRM_Contribute_DAO_ContributionPage();
-    $dao->copyValues($params);
-    $dao->save();
-    if ($financialTypeId && !empty($params['financial_type_id']) && $financialTypeId != $params['financial_type_id']) {
-      CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_contribution_page', $params['financial_type_id']);
-    }
-    CRM_Utils_Hook::post($hook, 'ContributionPage', $dao->id, $dao);
-    CRM_Core_PseudoConstant::flush();
-    return $dao;
+    return self::writeRecord($params);
   }
 
   /**
-   * Update the is_active flag in the db.
+   * Callback for hook_civicrm_post().
    *
+   * @param \Civi\Core\Event\PostEvent $event
+   *
+   * @noinspection PhpUnusedParameterInspection
+   */
+  public static function self_hook_civicrm_post(PostEvent $event): void {
+    CRM_Core_PseudoConstant::flush();
+  }
+
+  /**
    * @deprecated - this bypasses hooks.
-   *
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_ContributionPage', $id, 'is_active', $is_active);
   }
 
@@ -154,7 +147,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       'customPre_grouptitle',
       'customPost_grouptitle',
       'useForMember',
-      'membership_assign',
       'amount',
       'receipt_date',
       'is_pay_later',
@@ -268,7 +260,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         if ($gId) {
           $email = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gId, 'notify');
           if ($email) {
-            $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $contactID, CRM_Utils_Array::value($key, $params), TRUE);
+            $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $contactID, $params[$key] ?? NULL, TRUE);
             CRM_Core_BAO_UFGroup::commonSendMail($contactID, $val);
           }
         }
@@ -298,7 +290,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       //profile is of Individual ( including the custom data of membership/contribution )
       //IF Individual type not present in profile then it is consider as Organization data.
       $userID = $contactID;
-      if ($preID = CRM_Utils_Array::value('custom_pre_id', $values)) {
+      $preID = $values['custom_pre_id'] ?? NULL;
+      if ($preID) {
         if (!empty($values['related_contact'])) {
           $preProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($preID);
           if (in_array('Individual', $preProfileTypes) || in_array('Contact', $preProfileTypes)) {
@@ -309,7 +302,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         [$values['customPre_grouptitle'], $values['customPre']] = self::getProfileNameAndFields($preID, $userID, $params['custom_pre_id']);
       }
       $userID = $contactID;
-      if ($postID = CRM_Utils_Array::value('custom_post_id', $values)) {
+      $postID = $values['custom_post_id'] ?? NULL;
+      if ($postID) {
         if (!empty($values['related_contact'])) {
           $postProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($postID);
           if (in_array('Individual', $postProfileTypes) || in_array('Contact', $postProfileTypes)) {
@@ -356,7 +350,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'customPost' => $values['customPost'],
         'customPost_grouptitle' => $values['customPost_grouptitle'],
         'useForMember' => $values['useForMember'],
-        'membership_assign' => $values['membership_assign'],
         'amount' => $values['amount'],
         'is_pay_later' => $values['is_pay_later'],
         'receipt_date' => !$values['receipt_date'] ? NULL : date('YmdHis', strtotime($values['receipt_date'])),
@@ -374,12 +367,14 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $tplParams['contributionTypeName'] = $tplParams['financialTypeName'];
       }
 
-      if ($contributionPageId = CRM_Utils_Array::value('id', $values)) {
+      $contributionPageId = $values['id'] ?? NULL;
+      if ($contributionPageId) {
         $tplParams['contributionPageId'] = $contributionPageId;
       }
 
       // address required during receipt processing (pdf and email receipt)
-      if ($displayAddress = CRM_Utils_Array::value('address', $values)) {
+      $displayAddress = $values['address'] ?? NULL;
+      if ($displayAddress) {
         $tplParams['address'] = $displayAddress;
       }
 
@@ -408,11 +403,18 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
 
       // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not
+      $tokenContext = ['contactId' => (int) $contactID];
+      if (!empty($tplParams['contributionID'])) {
+        $tokenContext['contributionId'] = $tplParams['contributionID'];
+      }
+      if (!empty($values['membership_id'])) {
+        $tokenContext['membershipId'] = $values['membership_id'];
+      }
       $sendTemplateParams = [
-        'workflow' => !empty($values['isMembership']) ? 'membership_online_receipt' : 'contribution_online_receipt',
+        'workflow' => !empty($values['membership_id']) ? 'membership_online_receipt' : 'contribution_online_receipt',
         'contactId' => $contactID,
         'tplParams' => $tplParams,
-        'tokenContext' => $tplParams['contributionID'] ? ['contributionId' => (int) $tplParams['contributionID'], 'contactId' => $contactID] : ['contactId' => $contactID],
+        'tokenContext' => $tokenContext,
         'isTest' => $isTest,
         'PDFFilename' => 'receipt.pdf',
       ];
@@ -432,7 +434,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
 
       if ($values['is_email_receipt']) {
-        $sendTemplateParams['from'] = CRM_Utils_Array::value('receipt_from_name', $values) . ' <' . $values['receipt_from_email'] . '>';
+        $sendTemplateParams['from'] = ($values['receipt_from_name'] ?? '') . ' <' . $values['receipt_from_email'] . '>';
         $sendTemplateParams['toName'] = $displayName;
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = $values['cc_receipt'] ?? NULL;
@@ -718,7 +720,7 @@ WHERE entity_table = 'civicrm_contribution_page'
 
     $copy->save();
 
-    CRM_Utils_Hook::copy('ContributionPage', $copy);
+    CRM_Utils_Hook::copy('ContributionPage', $copy, $id);
 
     return $copy;
   }
@@ -946,8 +948,10 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    *
    * @return bool
    *   isSeparateMembershipPayment
+   * @deprecated
    */
   public static function getIsMembershipPayment($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     $membershipBlocks = civicrm_api3('membership_block', 'get', [
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $id,

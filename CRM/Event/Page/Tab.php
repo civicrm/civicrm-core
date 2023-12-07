@@ -101,16 +101,8 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
   }
 
   public function delete() {
-    $controller = new CRM_Core_Controller_Simple(
-      'CRM_Event_Form_Participant',
-      ts('Delete Participant'),
-      $this->_action
-    );
-
-    $controller->setEmbedded(TRUE);
-    $controller->set('id', $this->_id);
-    $controller->set('cid', $this->_contactId);
-    $controller->run();
+    CRM_Core_Error::deprecatedFunctionWarning('use civicrm/participant/delete / CRM_Event_Form_Participant_Delete');
+    CRM_Utils_System::redirect('civicrm/participant/delete', ['id' => CRM_Utils_Request::retrieveValue('id', NULL, TRUE), 'reset' => 1]);
   }
 
   public function preProcess() {
@@ -118,7 +110,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
-    if (($context == 'standalone' || $context === 'search') && $this->_action !== CRM_Core_Action::VIEW) {
+    if (($context == 'standalone' || $context === 'search') && ($this->_action !== CRM_Core_Action::VIEW && $this->_action !== CRM_Core_Action::UPDATE)) {
       $this->_action = CRM_Core_Action::ADD;
     }
     else {

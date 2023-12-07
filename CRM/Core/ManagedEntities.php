@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Api4\Managed;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * The ManagedEntities system allows modules to add records to the database
@@ -43,14 +44,15 @@ class CRM_Core_ManagedEntities {
 
   /**
    * Perform an asynchronous reconciliation when the transaction ends.
+   * @param array|null $modules
    */
-  public static function scheduleReconciliation() {
+  public static function scheduleReconciliation(array $modules = NULL) {
     CRM_Core_Transaction::addCallback(
       CRM_Core_Transaction::PHASE_POST_COMMIT,
-      function () {
-        CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+      function ($modules) {
+        CRM_Core_ManagedEntities::singleton(TRUE)->reconcile($modules);
       },
-      [],
+      [$modules],
       'ManagedEntities::reconcile'
     );
   }
@@ -89,7 +91,7 @@ class CRM_Core_ManagedEntities {
         $result = civicrm_api3($dao->entity_type, 'getsingle', $params);
       }
       catch (Exception $e) {
-        $this->onApiError($dao->entity_type, 'getsingle', $params, $result);
+        $this->onApiError($dao->module, $dao->name, 'getsingle', $result['error_message'], $e);
       }
       return $result;
     }
@@ -115,12 +117,14 @@ class CRM_Core_ManagedEntities {
 
   /**
    * Force-revert a record back to its original state.
-   * @param array $params
-   *   Key->value properties of CRM_Core_DAO_Managed used to match an existing record
+   * @param string $entityType
+   * @param $entityId
+   * @return bool
    */
-  public function revert(array $params) {
+  public function revert(string $entityType, $entityId): bool {
     $mgd = new \CRM_Core_DAO_Managed();
-    $mgd->copyValues($params);
+    $mgd->entity_type = $entityType;
+    $mgd->entity_id = $entityId;
     $mgd->find(TRUE);
     $declarations = $this->getDeclarations([$mgd->module]);
     $declarations = CRM_Utils_Array::findAll($declarations, [
@@ -129,10 +133,37 @@ class CRM_Core_ManagedEntities {
       'entity' => $mgd->entity_type,
     ]);
     if ($mgd->id && isset($declarations[0])) {
-      $this->updateExistingEntity(['update' => 'always'] + $declarations[0] + $mgd->toArray());
+      $item = ['update' => 'always'] + $declarations[0] + $mgd->toArray();
+      $this->backfillDefaults($item);
+      $this->updateExistingEntity($item);
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Backfill default values to restore record to a pristine state
+   *
+   * @param array $item Managed APIv4 record
+   */
+  private function backfillDefaults(array &$item): void {
+    if ($item['params']['version'] != 4) {
+      return;
+    }
+    // Fetch default values for fields that are writeable
+    $condition = [['type', '=', 'Field'], ['readonly', 'IS EMPTY'], ['default_value', '!=', 'now']];
+    // Exclude "weight" as that auto-adjusts
+    if (CoreUtil::isType($item['entity_type'], 'SortableEntity')) {
+      $weightCol = CoreUtil::getInfoItem($item['entity_type'], 'order_by');
+      $condition[] = ['name', '!=', $weightCol];
+    }
+    $getFields = civicrm_api4($item['entity_type'], 'getFields', [
+      'checkPermissions' => FALSE,
+      'action' => 'create',
+      'where' => $condition,
+    ]);
+    $defaultValues = $getFields->indexBy('name')->column('default_value');
+    $item['params']['values'] += $defaultValues;
   }
 
   /**
@@ -169,12 +200,18 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Create a new entity.
+   * Create a new entity (if policy allows).
    *
    * @param array $item
    *   Entity specification (per hook_civicrm_managedEntities).
    */
   protected function insertNewEntity(array $item) {
+    // If entity has previously been created, only re-insert if 'update' policy is 'always'
+    // NOTE: $item[id] is the id of the `civicrm_managed` row not the entity itself
+    // If that id exists, then we know the entity was inserted previously and subsequently deleted.
+    if (!empty($item['id']) && $item['update'] !== 'always') {
+      return;
+    }
     $params = $item['params'];
     // APIv4
     if ($params['version'] == 4) {
@@ -182,24 +219,33 @@ class CRM_Core_ManagedEntities {
       // Use "save" instead of "create" action to accommodate a "match" param
       $params['records'] = [$params['values']];
       unset($params['values']);
-      $result = civicrm_api4($item['entity_type'], 'save', $params);
+      try {
+        $result = civicrm_api4($item['entity_type'], 'save', $params);
+      }
+      catch (CRM_Core_Exception $e) {
+        $this->onApiError($item['module'], $item['name'], 'save', $e->getMessage(), $e);
+        return;
+      }
       $id = $result->first()['id'];
     }
     // APIv3
     else {
       $result = civicrm_api($item['entity_type'], 'create', $params);
       if (!empty($result['is_error'])) {
-        $this->onApiError($item['entity_type'], 'create', $params, $result);
+        $this->onApiError($item['module'], $item['name'], 'create', $result['error_message']);
+        return;
       }
       $id = $result['id'];
     }
 
     $dao = new CRM_Core_DAO_Managed();
+    // If re-inserting the entity, we'll update instead of create the managed record.
+    $dao->id = $item['id'] ?? NULL;
     $dao->module = $item['module'];
     $dao->name = $item['name'];
     $dao->entity_type = $item['entity_type'];
     $dao->entity_id = $id;
-    $dao->cleanup = $item['cleanup'] ?? NULL;
+    $dao->cleanup = $item['cleanup'] ?? 'always';
     $dao->save();
   }
 
@@ -247,15 +293,28 @@ class CRM_Core_ManagedEntities {
 
       $result = civicrm_api($item['entity_type'], 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($item['entity_type'], 'create', $params, $result);
+        $this->onApiError($item['module'], $item['name'], 'create', $result['error_message']);
+        return;
       }
     }
     elseif ($doUpdate && $item['params']['version'] == 4) {
       $params = ['checkPermissions' => FALSE] + $item['params'];
-      $params['values']['id'] = $item['entity_id'];
+      $idField = CoreUtil::getIdFieldName($item['entity_type']);
+      $params['values'][$idField] = $item['entity_id'];
+      // Exclude "weight" as that auto-adjusts
+      if (CoreUtil::isType($item['entity_type'], 'SortableEntity')) {
+        $weightCol = CoreUtil::getInfoItem($item['entity_type'], 'order_by');
+        unset($params['values'][$weightCol]);
+      }
       // 'match' param doesn't apply to "update" action
       unset($params['match']);
-      civicrm_api4($item['entity_type'], 'update', $params);
+      try {
+        civicrm_api4($item['entity_type'], 'update', $params);
+      }
+      catch (CRM_Core_Exception $e) {
+        $this->onApiError($item['module'], $item['name'], 'update', $e->getMessage(), $e);
+        return;
+      }
     }
 
     if (isset($item['cleanup']) || $doUpdate) {
@@ -287,7 +346,8 @@ class CRM_Core_ManagedEntities {
       ];
       $result = civicrm_api($item['entity_type'], 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($item['entity_type'], 'create', $params, $result);
+        $this->onApiError($item['module'], $item['name'], 'create', $result['error_message']);
+        return;
       }
       // Reset the `entity_modified_date` timestamp to indicate that the entity has not been modified by the user.
       $dao = new CRM_Core_DAO_Managed();
@@ -316,7 +376,7 @@ class CRM_Core_ManagedEntities {
 
       case 'unused':
         if (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
-          $getRefCount = \Civi\Api4\Utils\CoreUtil::getRefCount($item['entity_type'], $item['entity_id']);
+          $getRefCount = CoreUtil::getRefCount($item['entity_type'], $item['entity_id']);
         }
         else {
           $getRefCount = civicrm_api3($item['entity_type'], 'getrefcount', [
@@ -339,29 +399,24 @@ class CRM_Core_ManagedEntities {
 
     // Delete the entity and the managed record
     if ($doDelete) {
-      // APIv4 delete
-      if (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
-        civicrm_api4($item['entity_type'], 'delete', [
-          'checkPermissions' => FALSE,
-          'where' => [['id', '=', $item['entity_id']]],
-        ]);
-      }
-      // APIv3 delete
-      else {
-        $params = [
-          'version' => 3,
-          'id' => $item['entity_id'],
-        ];
-        $check = civicrm_api3($item['entity_type'], 'get', $params);
-        if ($check['count']) {
-          $result = civicrm_api($item['entity_type'], 'delete', $params);
-          if ($result['is_error']) {
-            if (isset($item['name'])) {
-              $params['name'] = $item['name'];
-            }
-            $this->onApiError($item['entity_type'], 'delete', $params, $result);
+      try {
+        // APIv4 delete
+        if (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
+          civicrm_api4($item['entity_type'], 'delete', [
+            'checkPermissions' => FALSE,
+            'where' => [['id', '=', $item['entity_id']]],
+          ]);
+        }
+        // APIv3 delete
+        else {
+          $check = civicrm_api3($item['entity_type'], 'get', ['id' => $item['entity_id']]);
+          if ($check['count']) {
+            civicrm_api3($item['entity_type'], 'delete', ['id' => $item['entity_id']]);
           }
         }
+      }
+      catch (CRM_Core_Exception $e) {
+        $this->onApiError($item['module'], $item['name'], 'delete', $e->getMessage(), $e);
       }
       // Ensure managed record is deleted.
       // Note: in many cases CRM_Core_BAO_Managed::on_hook_civicrm_post() will take care of
@@ -384,30 +439,6 @@ class CRM_Core_ManagedEntities {
     $result = [];
     foreach ($modules as $module) {
       $result[$module->is_active][$module->name] = $module;
-    }
-    return $result;
-  }
-
-  /**
-   * @param array $moduleIndex
-   * @param array $declarations
-   *
-   * @return array
-   *   indexed by module,name
-   */
-  protected function createDeclarationIndex($moduleIndex, $declarations) {
-    $result = [];
-    if (!isset($moduleIndex[TRUE])) {
-      return $result;
-    }
-    foreach ($moduleIndex[TRUE] as $moduleName => $module) {
-      if ($module->is_active) {
-        // need an empty array() for all active modules, even if there are no current $declarations
-        $result[$moduleName] = [];
-      }
-    }
-    foreach ($declarations as $declaration) {
-      $result[$declaration['module']][$declaration['name']] = $declaration;
     }
     return $result;
   }
@@ -465,23 +496,22 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param string $entity
-   * @param string $action
-   * @param array $params
-   * @param array $result
-   *
-   * @throws Exception
+   * @param string $moduleName
+   * @param string $managedEntityName
+   * @param string $actionName
+   * @param string $errorMessage
+   * @param Throwable|null $exception
    */
-  protected function onApiError($entity, $action, $params, $result) {
-    CRM_Core_Error::debug_var('ManagedEntities_failed', [
-      'entity' => $entity,
-      'action' => $action,
-      'params' => $params,
-      'result' => $result,
-    ]);
-    throw new Exception('API error: ' . $result['error_message'] . ' on ' . $entity . '.' . $action
-      . (!empty($params['name']) ? '( entity name ' . $params['name'] . ')' : '')
-    );
+  protected function onApiError(string $moduleName, string $managedEntityName, string $actionName, string $errorMessage, ?Throwable $exception = NULL): void {
+    // During install/upgrade this problem might be due to an about-to-be-installed extension
+    // So only log the error if it persists outside of upgrade mode
+    if (CRM_Core_Config::isUpgradeMode() || defined('CIVI_SETUP')) {
+      return;
+    }
+
+    $message = sprintf('(%s) Unable to %s managed entity "%s": %s', $moduleName, $actionName, $managedEntityName, $errorMessage);
+    $context = $exception ? ['exception' => $exception] : [];
+    Civi::log()->error($message, $context);
   }
 
   /**
@@ -514,16 +544,18 @@ class CRM_Core_ManagedEntities {
    */
   protected function getDeclarations($modules = NULL): array {
     $declarations = [];
-    // Exclude components if given a module name.
-    if (!$modules || $modules === ['civicrm']) {
-      foreach (CRM_Core_Component::getEnabledComponents() as $component) {
-        $declarations = array_merge($declarations, $component->getManagedEntities());
-      }
-    }
     CRM_Utils_Hook::managed($declarations, $modules);
     $this->validate($declarations);
-    foreach (array_keys($declarations) as $name) {
-      $declarations[$name] += ['name' => $name];
+    // FIXME: Some well-meaning developer added this a long time ago to support associative arrays
+    // that use the array index as the declaration name. But it probably never worked, because by the time it gets to this point,
+    // lots of implementations of `hook_civicrm_managed()` would have run `$declarations = array_merge($declarations, [...])`
+    // which would have reset the indexes.
+    // Adding a noisy deprecation notice for now, then we should remove this block:
+    foreach ($declarations as $index => $declaration) {
+      if (empty($declaration['name'])) {
+        CRM_Core_Error::deprecatedWarning(sprintf('Managed entity "%s" declared by extension "%s" without a name.', $index, $declaration['module']));
+        $declarations[$index] += ['name' => $index];
+      }
     }
     return $declarations;
   }
@@ -543,29 +575,20 @@ class CRM_Core_ManagedEntities {
     $plan = [];
     foreach ($managedEntities as $managedEntity) {
       $key = "{$managedEntity['module']}_{$managedEntity['name']}_{$managedEntity['entity_type']}";
-      // Set to disable or delete if module is disabled or missing - it will be overwritten below module is active.
+      // Set to disable or delete if module is disabled or missing - it will be overwritten below if module is active.
       $action = $this->isModuleDisabled($managedEntity['module']) ? 'disable' : 'delete';
       $plan[$key] = array_merge($managedEntity, ['managed_action' => $action]);
     }
     foreach ($declarations as $declaration) {
       $key = "{$declaration['module']}_{$declaration['name']}_{$declaration['entity']}";
-      if (isset($plan[$key])) {
-        $plan[$key]['params'] = $declaration['params'];
-        $plan[$key]['managed_action'] = 'update';
-        $plan[$key]['cleanup'] = $declaration['cleanup'] ?? NULL;
-        $plan[$key]['update'] = $declaration['update'] ?? 'always';
-      }
-      else {
-        $plan[$key] = [
-          'module' => $declaration['module'],
-          'name' => $declaration['name'],
-          'entity_type' => $declaration['entity'],
-          'managed_action' => 'create',
-          'params' => $declaration['params'],
-          'cleanup' => $declaration['cleanup'] ?? NULL,
-          'update' => $declaration['update'] ?? 'always',
-        ];
-      }
+      // Set action to update if already managed
+      $plan[$key]['managed_action'] = empty($plan[$key]['entity_id']) ? 'create' : 'update';
+      $plan[$key]['module'] = $declaration['module'];
+      $plan[$key]['name'] = $declaration['name'];
+      $plan[$key]['entity_type'] = $declaration['entity'];
+      $plan[$key]['params'] = $declaration['params'];
+      $plan[$key]['cleanup'] = $declaration['cleanup'] ?? NULL;
+      $plan[$key]['update'] = $declaration['update'] ?? 'always';
     }
     return $plan;
   }

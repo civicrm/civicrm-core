@@ -30,26 +30,8 @@ class Abdicator {
    * @return bool
    */
   public static function isFlexmailPreferred($mailing) {
-    if ($mailing->sms_provider_id) {
-      return FALSE;
-    }
-
-    // Use FlexMailer for new-style email blasts (with custom `template_type`).
-    if ($mailing->template_type && $mailing->template_type !== 'traditional') {
-      return TRUE;
-    }
-
-    switch (\Civi::settings()->get('flexmailer_traditional')) {
-      case 'bao':
-        return FALSE;
-
-      case 'auto':
-      case 'flexmailer':
-        return TRUE;
-
-      default:
-        throw new \RuntimeException("Unrecognized value for setting 'flexmailer_traditional'");
-    }
+    // Yes for CiviMail - no for CiviSMS
+    return empty($mailing->sms_provider_id);
   }
 
   /**
@@ -87,7 +69,7 @@ class Abdicator {
     $errors = \CRM_Mailing_BAO_Mailing::checkSendable($e->getMailing());
     if (is_array($errors)) {
       foreach ($errors as $key => $message) {
-        $e->setError($key, $message);;
+        $e->setError($key, $message);
       }
     }
   }

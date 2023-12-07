@@ -35,14 +35,24 @@ class CRM_Extension_Browser {
   const SINGLE_FILE_PATH = '/single';
 
   /**
-   * Timeout for when the connection or the server is slow
-   */
-  const CHECK_TIMEOUT = 5;
-
-  /**
    * @var GuzzleHttp\Client
    */
   protected $guzzleClient;
+
+  /**
+   * @var string
+   */
+  public $repoUrl;
+
+  /**
+   * @var string
+   */
+  public $indexPath;
+
+  /**
+   * @var array
+   */
+  protected $_remotesDiscovered;
 
   /**
    * @return \GuzzleHttp\Client
@@ -194,7 +204,7 @@ class CRM_Extension_Browser {
    * @throws \CRM_Extension_Exception
    */
   private function grabRemoteJson() {
-    set_error_handler(array('CRM_Extension_Browser', 'downloadError'));
+    set_error_handler(['CRM_Extension_Browser', 'downloadError']);
 
     if (FALSE === $this->getRepositoryUrl()) {
       // don't check if the user has configured civi not to check an external
@@ -204,9 +214,11 @@ class CRM_Extension_Browser {
 
     $url = $this->getRepositoryUrl() . $this->indexPath;
     $client = $this->getGuzzleClient();
+    // Timeout should be a minimum of 10 seconds. See https://lab.civicrm.org/infra/ops/-/issues/1009.
+    $timeout = max(10, \Civi::settings()->get('http_timeout'));
     try {
       $response = $client->request('GET', $url, [
-        'timeout' => \Civi::settings()->get('http_timeout'),
+        'timeout' => $timeout,
       ]);
     }
     catch (GuzzleException $e) {

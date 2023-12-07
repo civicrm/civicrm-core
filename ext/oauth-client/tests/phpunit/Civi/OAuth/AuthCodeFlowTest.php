@@ -19,6 +19,8 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
 
   private $providers = [];
 
+  protected $ids = [];
+
   public function setUpHeadless() {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
     // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest

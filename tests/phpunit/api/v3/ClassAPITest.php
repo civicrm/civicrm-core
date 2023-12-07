@@ -20,7 +20,7 @@ class class_api_test extends CiviUnitTestCase {
   /**
    * Test that error doesn't occur for non-existent file.
    */
-  public function testConstructor() {
+  public function testConstructor(): void {
     require_once 'api/class.api.php';
 
     // Check no params is local

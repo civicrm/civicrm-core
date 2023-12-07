@@ -141,6 +141,20 @@ class CRM_Utils_PDF_Label extends TCPDF {
   public $countY = 0;
 
   /**
+   * Custom method for generating label, called against $this->generatorObject
+   *
+   * @var string|null
+   */
+  protected $generatorMethod = NULL;
+
+  /**
+   * Custom object used for generating label, used alongside $this->generatorMethod
+   *
+   * @var object
+   */
+  protected $generatorObject;
+
+  /**
    * Constructor.
    *
    * @param $format

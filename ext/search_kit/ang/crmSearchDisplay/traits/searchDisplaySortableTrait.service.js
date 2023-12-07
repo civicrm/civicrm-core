@@ -37,7 +37,7 @@
           this.sort.push([col.key, dir]);
         }
         if (this.results || !this.settings.button) {
-          this.getResults();
+          this.getResultsPronto();
         }
       }
 

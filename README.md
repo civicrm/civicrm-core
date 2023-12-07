@@ -9,8 +9,8 @@ meet the needs of advocacy, non-profit and non-governmental groups.
 It is an open source project, licensed under GNU AGPL 3, and
 coordinated by CiviCRM LLC. The project website is https://civicrm.org/
 
-CiviCRM is released as a module that runs within the Drupal, Joomla,
-and WordPress content management systems.
+CiviCRM is released as a module that runs within the Backdrop,
+Drupal, Joomla, and WordPress content management systems.
 
 
 Installation

@@ -10,7 +10,7 @@
  */
 
 /**
- * Dear God Why Do I Have To Write This (Dumb SQL Builder)
+ * Object-oriented SQL builder for DELETE queries.
  *
  * Usage:
  * ```

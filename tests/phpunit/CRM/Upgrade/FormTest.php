@@ -10,7 +10,7 @@ class CRM_Upgrade_FormTest extends CiviUnitTestCase {
    * "php" requirement (composer.json) should match
    * CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER.
    */
-  public function testComposerRequirementMatch() {
+  public function testComposerRequirementMatch(): void {
     global $civicrm_root;
     $composerJsonPath = "{$civicrm_root}/composer.json";
     $this->assertFileExists($composerJsonPath);

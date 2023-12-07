@@ -22,7 +22,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
-    $this->useTransaction(TRUE);
+    $this->useTransaction();
     $this->_contactID = $this->organizationCreate();
   }
 
@@ -33,11 +33,9 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    *
-   * @param bool $version
-   *
-   * @throws \CRM_Core_Exception
+   * @param int $version
    */
-  public function testGetWithoutId($version) {
+  public function testGetWithoutID(int $version): void {
     $this->_apiversion = $version;
     $params = [
       'name' => '60+ Membership',
@@ -50,7 +48,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     ];
 
     $membershipType = $this->callAPISuccess('membership_type', 'get', $params);
-    $this->assertEquals($membershipType['count'], 0);
+    $this->assertEquals(0, $membershipType['count']);
   }
 
   /**
@@ -58,19 +56,20 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    *
-   * @param bool $version
+   * @param int $version
    */
-  public function testGet($version) {
+  public function testGet(int $version): void {
     $this->_apiversion = $version;
     $id = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID]);
     $params = ['id' => $id];
-    $membershipType = $this->callAPIAndDocument('membership_type', 'get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($membershipType['values'][$id]['name'], 'General');
-    $this->assertEquals($membershipType['values'][$id]['member_of_contact_id'], $this->_contactID);
-    $this->assertEquals($membershipType['values'][$id]['financial_type_id'], $this->getFinancialTypeId('Member Dues'));
-    $this->assertEquals($membershipType['values'][$id]['duration_unit'], 'year');
-    $this->assertEquals($membershipType['values'][$id]['duration_interval'], '1');
-    $this->assertEquals($membershipType['values'][$id]['period_type'], 'rolling');
+    $membershipType = $this->callAPISuccess('membership_type', 'get', $params);
+    $membershipType = $membershipType['values'][$id];
+    $this->assertEquals('General', $membershipType['name']);
+    $this->assertEquals($membershipType['member_of_contact_id'], $this->_contactID);
+    $this->assertEquals('Member Dues', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_MembershipType', 'financial_type_id', $membershipType['financial_type_id']));
+    $this->assertEquals('year', $membershipType['duration_unit']);
+    $this->assertEquals('1', $membershipType['duration_interval']);
+    $this->assertEquals('rolling', $membershipType['period_type']);
     $this->membershipTypeDelete($params);
   }
 
@@ -79,9 +78,9 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    *
-   * @param bool $version
+   * @param int $version
    */
-  public function testCreateWithoutMemberOfContactId($version) {
+  public function testCreateWithoutMemberOfContactID(int $version): void {
     $this->_apiversion = $version;
     $params = [
       'name' => '60+ Membership',
@@ -104,9 +103,9 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    *
-   * @param bool $version
+   * @param int $version
    */
-  public function testCreate($version) {
+  public function testCreate(int $version): void {
     $this->_apiversion = $version;
     $params = [
       'name' => '40+ Membership',
@@ -121,7 +120,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'public',
     ];
 
-    $membershipType = $this->callAPIAndDocument('membership_type', 'create', $params, __FUNCTION__, __FILE__);
+    $membershipType = $this->callAPISuccess('membership_type', 'create', $params);
     $this->assertNotNull($membershipType['values']);
     $this->membershipTypeDelete(['id' => $membershipType['id']]);
   }
@@ -132,11 +131,9 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    *
-   * @param bool $version
-   *
-   * @throws \CRM_Core_Exception
+   * @param int $version
    */
-  public function testCreateWithoutDomainId($version) {
+  public function testCreateWithoutDomainID(int $version): void {
     $this->_apiversion = $version;
     $params = [
       'name' => '60+ Membership',
@@ -169,9 +166,9 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    *
-   * @param bool $version
+   * @param int $version
    */
-  public function testMemberTypePeriodTypeRequired($version) {
+  public function testMemberTypePeriodTypeRequired(int $version): void {
     $this->_apiversion = $version;
     $this->callAPIFailure('MembershipType', 'create', [
       'domain_id' => 'Default Domain Name',
@@ -207,11 +204,9 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    *
-   * @param bool $version
-   *
-   * @throws \CRM_Core_Exception
+   * @param int $version
    */
-  public function testUpdate($version) {
+  public function testUpdate(int $version): void {
     $this->_apiversion = $version;
     $id = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID, 'financial_type_id' => 2]);
     $newMemberOrgParams = [
@@ -240,21 +235,23 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    *
-   * @param bool $version
+   * @param int $version
    */
-  public function testDelete($version) {
+  public function testDelete(int $version): void {
     $this->_apiversion = $version;
     $membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->organizationCreate()]);
     $params = ['id' => $membershipTypeID];
-    $this->callAPIAndDocument('membership_type', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('membership_type', 'delete', $params);
   }
 
   /**
    * Delete test that could do with a decent comment block.
    *
    * I can't skim this & understand it so if anyone does explain it here.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testDeleteRelationshipTypesUsedByMembershipType() {
+  public function testDeleteRelationshipTypesUsedByMembershipType(): void {
     $rel1 = $this->relationshipTypeCreate([
       'name_a_b' => 'abcde',
       'name_b_a' => 'abcde',
@@ -285,14 +282,14 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('RelationshipType', 'delete', ['id' => $rel3]);
     $newValues = $this->callAPISuccess('MembershipType', 'getsingle', ['id' => $id]);
-    $this->assertTrue(empty($newValues['relationship_type_id']));
+    $this->assertArrayNotHasKey('relationship_type_id', $newValues);
     $this->assertTrue(empty($newValues['relationship_direction']));
   }
 
   /**
    * Test that membership type getlist returns an array of enabled membership types.
    */
-  public function testMembershipTypeGetList() {
+  public function testMembershipTypeGetList(): void {
     $this->membershipTypeCreate();
     $this->membershipTypeCreate(['name' => 'cheap-skates']);
     $this->membershipTypeCreate(['name' => 'disabled cheap-skates', 'is_active' => 0]);
@@ -306,7 +303,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    * Test priceField values are correctly created for membership type
    * selected in contribution pages.
    */
-  public function testEnableMembershipTypeOnContributionPage() {
+  public function testEnableMembershipTypeOnContributionPage(): void {
     $memType = [];
     $memType[1] = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID, 'minimum_fee' => 100]);
     $priceSet = $this->callAPISuccess('price_set', 'create', [

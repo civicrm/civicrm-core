@@ -16,7 +16,7 @@
 <div id="groupContact">
  <p>
     <div class="form-item">
-    {if $groupCount > 0 }
+    {if $groupCount > 0}
        <table>
        <tr class="columnheader"><th>{ts}Group Listings{/ts}</th><th>{ts}In Date{/ts}</th><th>{ts}Out Date{/ts}</th><th></th></tr>
        {foreach from=$groupContact item=row}

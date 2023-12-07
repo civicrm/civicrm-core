@@ -34,26 +34,33 @@ use Civi\Api4\UserJob;
 class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
 
+  const MEMBERSHIP_TYPE_NAME = 'Mickey Mouse Club Member';
+
   /**
    * @var int
    */
   protected $userJobID;
 
   /**
-   * Membership type name used in test function.
+   * Membership type id used in test function.
    *
-   * @var string
+   * @var int
    */
-  protected $_membershipTypeName = NULL;
+  protected $membershipTypeID;
 
   /**
    * Membership type id used in test function.
    *
-   * @var string
+   * @var int
    */
-  protected $_membershipTypeID;
+  protected $relationshipTypeID;
 
-  protected $entity = 'Membership';
+  /**
+   * Membership type id used in test function.
+   *
+   * @var int
+   */
+  protected $membershipStatusID;
 
   /**
    * Set up for test.
@@ -69,21 +76,19 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'name_a_b' => 'Test Employee of',
       'name_b_a' => 'Test Employer of',
     ];
-    $this->_relationshipTypeId = $this->relationshipTypeCreate($params);
-    $this->_orgContactID = $this->organizationCreate();
-    $this->_financialTypeId = 1;
+    $this->relationshipTypeID = $this->relationshipTypeCreate($params);
+    $organizationContactID = $this->organizationCreate();
     $this->restoreMembershipTypes();
-    $this->_membershipTypeName = 'Mickey Mouse Club Member';
     $params = [
-      'name' => $this->_membershipTypeName,
+      'name' => self::MEMBERSHIP_TYPE_NAME,
       'description' => NULL,
       'minimum_fee' => 10,
       'duration_unit' => 'year',
-      'member_of_contact_id' => $this->_orgContactID,
+      'member_of_contact_id' => $organizationContactID,
       'period_type' => 'fixed',
       'duration_interval' => 1,
-      'financial_type_id' => $this->_financialTypeId,
-      'relationship_type_id' => $this->_relationshipTypeId,
+      'financial_type_id' => 1,
+      'relationship_type_id' => $this->relationshipTypeID,
       'visibility' => 'Public',
       'is_active' => 1,
       'fixed_period_start_day' => 101,
@@ -91,9 +96,9 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ];
 
     $membershipType = CRM_Member_BAO_MembershipType::add($params);
-    $this->_membershipTypeID = $membershipType->id;
+    $this->membershipTypeID = (int) $membershipType->id;
 
-    $this->_mebershipStatusID = $this->membershipStatusCreate('test status');
+    $this->membershipStatusID = $this->membershipStatusCreate('test status');
   }
 
   /**
@@ -114,9 +119,9 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'civicrm_queue',
       'civicrm_queue_item',
     ];
-    $this->relationshipTypeDelete($this->_relationshipTypeId);
-    $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
-    $this->membershipStatusDelete($this->_mebershipStatusID);
+    $this->relationshipTypeDelete($this->relationshipTypeID);
+    $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
+    $this->membershipStatusDelete($this->membershipStatusID);
     $this->quickCleanup($tablesToTruncate, TRUE);
     parent::tearDown();
   }
@@ -143,13 +148,13 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $params = [
       [
         'anthony_anderson@civicrm.org',
-        $this->_membershipTypeID,
+        $this->membershipTypeID,
         date('Y-m-d'),
         date('Y-m-d'),
       ],
       [
         $contact2Params['email'],
-        $this->_membershipTypeName,
+        self::MEMBERSHIP_TYPE_NAME,
         $startDate2,
         $joinDate2,
       ],
@@ -179,7 +184,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
     $importValues = [
       'anthony_anderson2@civicrm.org',
-      $this->_membershipTypeID,
+      $this->membershipTypeID,
       date('Y-m-d'),
       TRUE,
     ];
@@ -209,7 +214,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
     $importValues = [
       'anthony_anderson3@civicrm.org',
-      $this->_membershipTypeID,
+      $this->membershipTypeID,
       date('Y-m-d'),
       TRUE,
       'New',
@@ -229,7 +234,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
     $importValues = [
       'anthony_anderson4@civicrm.org',
-      $this->_membershipTypeID,
+      $this->membershipTypeID,
       date('Y-m-d'),
       TRUE,
       'New',
@@ -255,7 +260,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'General',
       date('Y-m-d'),
       1,
-      $this->_mebershipStatusID,
+      $this->membershipStatusID,
       'abc',
     ];
     try {
@@ -292,7 +297,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
     $importValues = [
       'anthony_anderson3@civicrm.org',
-      $this->_membershipTypeID,
+      $this->membershipTypeID,
       date('Y-m-d'),
       TRUE,
       'New-renamed',
@@ -365,8 +370,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test importing to a custom field.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testImportCustomData(): void {
     $donaldDuckID = $this->individualCreate(['first_name' => 'Donald', 'last_name' => 'Duck']);
@@ -380,7 +383,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ]);
     $importValues = [
       $donaldDuckID,
-      $this->_membershipTypeID,
+      $this->membershipTypeID,
       date('Y-m-d'),
       'blah',
       'Red',
@@ -432,7 +435,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * Test dates are parsed.
    */
   public function testUpdateWithCustomDates(): void {
-    $this->createCustomGroupWithFieldOfType([], 'date');
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Membership'], 'date');
     $contactID = $this->individualCreate(['external_identifier' => 'ext-1']);
     $this->callAPISuccess('Membership', 'create', [
       'contact_id' => $contactID,

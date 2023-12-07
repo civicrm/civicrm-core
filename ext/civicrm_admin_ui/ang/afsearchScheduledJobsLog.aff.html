@@ -1,0 +1,15 @@
+<div af-fieldset="">
+  <div class="btn-group pull-right">
+    
+    
+    
+    <a class="btn btn-primary" ng-href="{{:: crmUrl('civicrm/admin/job', {reset: 1}) }}">
+      <i class="crm-i fa-list-alt"/>
+      {{:: ts('Scheduled Jobs Listing') }}
+    </a>
+  
+  
+  
+  </div>
+  <crm-search-display-table search-name="Scheduled_Jobs_Log" display-name="Scheduled_Jobs_Log_Table_1" filters="{job_id: routeParams.job_id}"></crm-search-display-table>
+</div>

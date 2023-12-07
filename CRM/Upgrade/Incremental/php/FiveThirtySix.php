@@ -49,20 +49,20 @@ class CRM_Upgrade_Incremental_php_FiveThirtySix extends CRM_Upgrade_Incremental_
   public function upgrade_5_36_alpha1(string $rev): void {
     // Not used // $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
-    $this->addTask('core-issue#2422 - Add created_id to civicrm_saved_search', 'addColumn',
+    $this->addTask('dev/core#2422 - Add created_id to civicrm_saved_search', 'addColumn',
       'civicrm_saved_search', 'created_id', "int(10) unsigned DEFAULT NULL COMMENT 'FK to contact table.'");
-    $this->addTask('core-issue#2422 - Add modified_id to civicrm_saved_search', 'addColumn',
+    $this->addTask('dev/core#2422 - Add modified_id to civicrm_saved_search', 'addColumn',
       'civicrm_saved_search', 'modified_id', "int(10) unsigned DEFAULT NULL COMMENT 'FK to contact table.'");
-    $this->addTask('core-issue#2422 - Add expires_date to civicrm_saved_search', 'addColumn',
+    $this->addTask('dev/core#2422 - Add expires_date to civicrm_saved_search', 'addColumn',
       'civicrm_saved_search', 'expires_date', "timestamp NULL DEFAULT NULL COMMENT 'Optional date after which the search is not needed'");
-    $this->addTask('core-issue#2422 - Add created_date to civicrm_saved_search', 'addColumn',
+    $this->addTask('dev/core#2422 - Add created_date to civicrm_saved_search', 'addColumn',
       'civicrm_saved_search', 'created_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When the search was created.'");
-    $this->addTask('core-issue#2422 - Add modified_date to civicrm_saved_search', 'addColumn',
+    $this->addTask('dev/core#2422 - Add modified_date to civicrm_saved_search', 'addColumn',
       'civicrm_saved_search', 'modified_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the search was last modified.'");
-    $this->addTask('core-issue#2422 - Add description to civicrm_saved_search', 'addColumn',
+    $this->addTask('dev/core#2422 - Add description to civicrm_saved_search', 'addColumn',
       'civicrm_saved_search', 'description', "text DEFAULT NULL");
 
-    $this->addTask('core-issue#2422 - Add constraints to civicrm_saved_search', 'taskAddConstraints');
+    $this->addTask('dev/core#2422 - Add constraints to civicrm_saved_search', 'taskAddConstraints');
   }
 
   /**

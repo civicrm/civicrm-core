@@ -54,6 +54,9 @@ class BasicBatchAction extends AbstractBatchAction {
       \CRM_Core_Error::deprecatedWarning(__CLASS__ . ' constructor received $doer as 4th param; it should be the 3rd as the $select param has been removed');
     }
     else {
+      if ($doer && !is_callable($doer)) {
+        \CRM_Core_Error::deprecatedWarning(__CLASS__ . ' constructor received $doer as a non-callable; the 3rd param as the $select param has been removed');
+      }
       $this->doer = $doer;
     }
   }

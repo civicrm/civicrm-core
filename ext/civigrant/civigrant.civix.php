@@ -24,7 +24,7 @@ class CRM_Grant_ExtensionUtil {
    *   Translated text.
    * @see ts
    */
-  public static function ts($text, $params = []) {
+  public static function ts($text, $params = []): string {
     if (!array_key_exists('domain', $params)) {
       $params['domain'] = [self::LONG_NAME, NULL];
     }
@@ -41,7 +41,7 @@ class CRM_Grant_ExtensionUtil {
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo'.
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo/css/foo.css'.
    */
-  public static function url($file = NULL) {
+  public static function url($file = NULL): string {
     if ($file === NULL) {
       return rtrim(CRM_Core_Resources::singleton()->getUrl(self::LONG_NAME), '/');
     }
@@ -84,54 +84,117 @@ use CRM_Grant_ExtensionUtil as E;
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config
  */
-function _civigrant_civix_civicrm_config(&$config = NULL) {
+function _civigrant_civix_civicrm_config($config = NULL) {
   static $configured = FALSE;
   if ($configured) {
     return;
   }
   $configured = TRUE;
 
-  $template = CRM_Core_Smarty::singleton();
-
   $extRoot = __DIR__ . DIRECTORY_SEPARATOR;
-  $extDir = $extRoot . 'templates';
-
-  if (is_array($template->template_dir)) {
-    array_unshift($template->template_dir, $extDir);
-  }
-  else {
-    $template->template_dir = [$extDir, $template->template_dir];
-  }
-
   $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
   set_include_path($include_path);
+  // Based on <compatibility>, this does not currently require mixin/polyfill.php.
 }
 
 /**
- * (Delegated) Implements hook_civicrm_alterSettingsFolders().
+ * Implements hook_civicrm_install().
  *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
  */
-function _civigrant_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  $settingsDir = __DIR__ . DIRECTORY_SEPARATOR . 'settings';
-  if (!in_array($settingsDir, $metaDataFolders) && is_dir($settingsDir)) {
-    $metaDataFolders[] = $settingsDir;
+function _civigrant_civix_civicrm_install() {
+  _civigrant_civix_civicrm_config();
+  // Based on <compatibility>, this does not currently require mixin/polyfill.php.
+}
+
+/**
+ * (Delegated) Implements hook_civicrm_enable().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
+ */
+function _civigrant_civix_civicrm_enable(): void {
+  _civigrant_civix_civicrm_config();
+  // Based on <compatibility>, this does not currently require mixin/polyfill.php.
+}
+
+/**
+ * Inserts a navigation menu item at a given place in the hierarchy.
+ *
+ * @param array $menu - menu hierarchy
+ * @param string $path - path to parent of this item, e.g. 'my_extension/submenu'
+ *    'Mailing', or 'Administer/System Settings'
+ * @param array $item - the item to insert (parent/child attributes will be
+ *    filled for you)
+ *
+ * @return bool
+ */
+function _civigrant_civix_insert_navigation_menu(&$menu, $path, $item) {
+  // If we are done going down the path, insert menu
+  if (empty($path)) {
+    $menu[] = [
+      'attributes' => array_merge([
+        'label' => $item['name'] ?? NULL,
+        'active' => 1,
+      ], $item),
+    ];
+    return TRUE;
+  }
+  else {
+    // Find an recurse into the next level down
+    $found = FALSE;
+    $path = explode('/', $path);
+    $first = array_shift($path);
+    foreach ($menu as $key => &$entry) {
+      if ($entry['attributes']['name'] == $first) {
+        if (!isset($entry['child'])) {
+          $entry['child'] = [];
+        }
+        $found = _civigrant_civix_insert_navigation_menu($entry['child'], implode('/', $path), $item);
+      }
+    }
+    return $found;
   }
 }
 
 /**
- * (Delegated) Implements hook_civicrm_entityTypes().
- *
- * Find any *.entityType.php files, merge their content, and return.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
+ * (Delegated) Implements hook_civicrm_navigationMenu().
  */
-function _civigrant_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, [
-    'CRM_Grant_DAO_Grant' => [
-      'name' => 'Grant',
-      'class' => 'CRM_Grant_DAO_Grant',
-      'table' => 'civicrm_grant',
-    ],
-  ]);
+function _civigrant_civix_navigationMenu(&$nodes) {
+  if (!is_callable(['CRM_Core_BAO_Navigation', 'fixNavigationMenu'])) {
+    _civigrant_civix_fixNavigationMenu($nodes);
+  }
+}
+
+/**
+ * Given a navigation menu, generate navIDs for any items which are
+ * missing them.
+ */
+function _civigrant_civix_fixNavigationMenu(&$nodes) {
+  $maxNavID = 1;
+  array_walk_recursive($nodes, function($item, $key) use (&$maxNavID) {
+    if ($key === 'navID') {
+      $maxNavID = max($maxNavID, $item);
+    }
+  });
+  _civigrant_civix_fixNavigationMenuItems($nodes, $maxNavID, NULL);
+}
+
+function _civigrant_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parentID) {
+  $origKeys = array_keys($nodes);
+  foreach ($origKeys as $origKey) {
+    if (!isset($nodes[$origKey]['attributes']['parentID']) && $parentID !== NULL) {
+      $nodes[$origKey]['attributes']['parentID'] = $parentID;
+    }
+    // If no navID, then assign navID and fix key.
+    if (!isset($nodes[$origKey]['attributes']['navID'])) {
+      $newKey = ++$maxNavID;
+      $nodes[$origKey]['attributes']['navID'] = $newKey;
+      $nodes[$newKey] = $nodes[$origKey];
+      unset($nodes[$origKey]);
+      $origKey = $newKey;
+    }
+    if (isset($nodes[$origKey]['child']) && is_array($nodes[$origKey]['child'])) {
+      _civigrant_civix_fixNavigationMenuItems($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
+    }
+  }
 }

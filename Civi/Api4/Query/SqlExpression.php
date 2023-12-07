@@ -11,6 +11,8 @@
 
 namespace Civi\Api4\Query;
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Base class for SqlColumn, SqlString, SqlBool, and SqlFunction classes.
  *
@@ -21,7 +23,8 @@ namespace Civi\Api4\Query;
 abstract class SqlExpression {
 
   /**
-   * @var array
+   * Field names used in this expression
+   * @var string[]
    */
   protected $fields = [];
 
@@ -65,6 +68,26 @@ abstract class SqlExpression {
 
   abstract protected function initialize();
 
+  private static function munge($name, $char = '_', $len = 63) {
+    // Replace all white space and non-alpha numeric with $char
+    // we only use the ascii character set since mysql does not create table names / field names otherwise
+    // CRM-11744
+    $name = preg_replace('/[^a-zA-Z0-9_]+/', $char, trim($name));
+
+    // If there are no ascii characters present.
+    if (!strlen(trim($name, $char))) {
+      $name = \CRM_Utils_String::createRandom($len, \CRM_Utils_String::ALPHANUMERIC);
+    }
+
+    if ($len) {
+      // lets keep variable names short
+      return substr($name, 0, $len);
+    }
+    else {
+      return $name;
+    }
+  }
+
   /**
    * Converts a string to a SqlExpression object.
    *
@@ -79,7 +102,7 @@ abstract class SqlExpression {
   public static function convert(string $expression, $parseAlias = FALSE, $mustBe = []) {
     $as = $parseAlias ? strrpos($expression, ' AS ') : FALSE;
     $expr = $as ? substr($expression, 0, $as) : $expression;
-    $alias = $as ? \CRM_Utils_String::munge(substr($expression, $as + 4), '_', 256) : NULL;
+    $alias = $as ? self::munge(substr($expression, $as + 4), '_', 256) : NULL;
     $bracketPos = strpos($expr, '(');
     $firstChar = substr($expr, 0, 1);
     $lastChar = substr($expr, -1);
@@ -88,7 +111,7 @@ abstract class SqlExpression {
       $className = 'SqlEquation';
     }
     // If there are brackets but not the first character, we have a function
-    elseif ($bracketPos && $lastChar === ')') {
+    elseif ($bracketPos && preg_match('/^\w+\(.*\)(:[a-z]+)?$/', $expr)) {
       $fnName = substr($expr, 0, $bracketPos);
       if ($fnName !== strtoupper($fnName)) {
         throw new \CRM_Core_Exception('Sql function must be uppercase.');
@@ -101,6 +124,9 @@ abstract class SqlExpression {
     }
     elseif ($expr === 'NULL') {
       $className = 'SqlNull';
+    }
+    elseif ($expr === 'TRUE' || $expr === 'FALSE') {
+      $className = 'SqlBool';
     }
     elseif ($expr === '*') {
       $className = 'SqlWild';
@@ -140,10 +166,13 @@ abstract class SqlExpression {
   /**
    * Renders expression to a sql string, replacing field names with column names.
    *
-   * @param Civi\Api4\Query\Api4SelectQuery $query
+   * @param \Civi\Api4\Query\Api4Query $query
+   * @param bool $includeAlias
    * @return string
    */
-  abstract public function render(Api4SelectQuery $query): string;
+  public function render(Api4Query $query, bool $includeAlias = FALSE): string {
+    return $this->expr . ($includeAlias ? " AS `{$this->getAlias()}`" : '');
+  }
 
   /**
    * @return string
@@ -167,8 +196,7 @@ abstract class SqlExpression {
    * @return string
    */
   public function getType(): string {
-    $className = get_class($this);
-    return substr($className, strrpos($className, '\\') + 1);
+    return CoreUtil::stripNamespace(get_class($this));
   }
 
   /**
@@ -224,7 +252,7 @@ abstract class SqlExpression {
   protected function captureExpressions(string &$arg, array $mustBe, int $max) {
     $captured = [];
     $arg = ltrim($arg);
-    while ($arg) {
+    while (strlen($arg)) {
       $item = $this->captureExpression($arg);
       $arg = ltrim(substr($arg, strlen($item)));
       $expr = self::convert($item, FALSE, $mustBe);

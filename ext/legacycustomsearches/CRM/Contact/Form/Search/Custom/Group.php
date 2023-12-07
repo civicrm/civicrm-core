@@ -68,6 +68,60 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
   protected $_aclWhere = NULL;
 
   /**
+   * Include Groups
+   * @var array
+   */
+  protected $_includeGroups;
+
+  /**
+   * Exclude Groups
+   * @var array
+   */
+  protected $_excludeGroups;
+
+  /**
+   * Include Tags
+   * @var array
+   */
+  protected $_includeTags;
+
+  /**
+   * Exclude Tags
+   * @var array
+   */
+  protected $_excludeTags;
+
+  /**
+   * All Search
+   * @var bool
+   */
+  protected $_allSearch;
+
+  /**
+   * Does this search use groups
+   * @var bool
+   */
+  protected $_groups;
+
+  /**
+   * Does this search use tags
+   * @var bool
+   */
+  protected $_tags;
+
+  /**
+   * Is this search And or OR search
+   * @var string
+   */
+  protected $_andOr;
+
+  /**
+   * Search Columns
+   * @var array
+   */
+  protected $_columns;
+
+  /**
    * Class constructor.
    *
    * @param array $formValues
@@ -191,7 +245,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
   ) {
 
     if ($justIDs) {
-      $selectClause = "contact_a.id as contact_id";
+      $selectClause = 'contact_a.id as contact_id';
     }
     else {
       $selectClause = "contact_a.id as contact_id,
@@ -221,7 +275,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
     $where = $this->where($includeContactIDs);
 
     if (!$justIDs && !$this->_allSearch) {
-      $groupBy = " GROUP BY contact_a.id";
+      $groupBy = ' GROUP BY contact_a.id';
     }
     else {
       // CRM-10850
@@ -238,19 +292,19 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
     if (!$justIDs) {
       if (!empty($sort)) {
         if (is_string($sort)) {
-          $sort = CRM_Utils_Type::escape($sort, 'String');
+          $sort = \CRM_Utils_Type::escape($sort, 'String');
           $sql .= " ORDER BY $sort ";
         }
         else {
-          $sql .= " ORDER BY " . trim($sort->orderBy());
+          $sql .= ' ORDER BY ' . trim($sort->orderBy());
         }
       }
       else {
-        $sql .= " ORDER BY contact_id ASC";
+        $sql .= ' ORDER BY contact_id ASC';
       }
     }
     else {
-      $sql .= " ORDER BY contact_a.id ASC";
+      $sql .= ' ORDER BY contact_a.id ASC';
     }
 
     if ($offset >= 0 && $rowcount > 0) {

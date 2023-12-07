@@ -133,7 +133,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $isSelectedContacts = (self::$_searchFormValues['radio_ts'] ?? NULL) === 'ts_sel';
     $form->assign('isSelectedContacts', $isSelectedContacts);
     // all contacts or action = save a search
-    if ((CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_all') ||
+    if (((self::$_searchFormValues['radio_ts'] ?? NULL) == 'ts_all') ||
       ($form->_task == CRM_Contact_Task::SAVE_SEARCH)
     ) {
       // since we don't store all contacts in prevnextcache, when user selects "all" use query to retrieve contacts
@@ -186,7 +186,8 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
 
     //contact type for pick up profiles as per selected contact types with subtypes
     //CRM-5521
-    if ($selectedTypes = CRM_Utils_Array::value('contact_type', self::$_searchFormValues)) {
+    $selectedTypes = self::$_searchFormValues['contact_type'] ?? NULL;
+    if ($selectedTypes) {
       if (!is_array($selectedTypes)) {
         $selectedTypes = explode(' ', $selectedTypes);
       }
@@ -261,7 +262,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       $queryOperator = 'AND';
     }
     $dao = $selector->contactIDQuery($params, $sortID,
-      CRM_Utils_Array::value('display_relationship_type', $fv),
+      $fv['display_relationship_type'] ?? NULL,
       $queryOperator
     );
 

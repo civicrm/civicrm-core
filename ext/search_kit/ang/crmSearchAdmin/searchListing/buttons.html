@@ -1,12 +1,18 @@
-<div class="btn-group btn-group-xs">
-  <a class="btn btn-primary" href="#/edit/{{:: row.data.id }}" ng-if=":: row.permissionToEdit">
-    <i class="crm-i fa-pencil"></i>
-    {{:: ts('Edit') }}
+<div class="btn-group btn-group-xs crm-search-admin-search-listing-buttons">
+  <a class="btn btn-primary" ng-href="#/edit/{{:: row.data.id }}" ng-if=":: row.permissionToEdit" title="{{:: ts('Edit search and displays') }}">
+    <i class="crm-i fa-pencil fa-fw"></i>
   </a>
   <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="row.menuOpen = true">
     <i class="crm-i fa-bars"></i>
+    <span class="caret"></span>
   </button>
   <ul class="dropdown-menu dropdown-menu-right" ng-if=":: row.menuOpen">
+    <li ng-if=":: row.permissionToEdit" title="{{:: ts('Edit search and displays') }}">
+      <a ng-href="#/edit/{{:: row.data.id }}">
+        <i class="crm-i fa-pencil fa-fw"></i>
+        {{:: ts('Edit') }}
+      </a>
+    </li>
     <li title="{{:: ts('View search results table') }}">
       <a ng-href="{{:: $ctrl.searchDisplayPath + '#/display/' + row.data.name }}" target="_blank">
         <i class="crm-i fa-table"></i>
@@ -14,7 +20,7 @@
       </a>
     </li>
     <li title="{{:: ts('Create a new search based on this one') }}">
-      <a href="#/create/{{:: row.data.api_entity + '?params=' + $ctrl.encode(row.data.api_params) }}">
+      <a ng-href="#/create/{{:: row.data.api_entity + '?params=' + $ctrl.encode(row.data.api_params) }}">
         <i class="crm-i fa-copy"></i>
         {{:: ts('Clone...') }}
       </a>
@@ -28,13 +34,13 @@
     <li ng-if="!row.data['base_module:label']" title="{{:: ts('Delete search along with any displays and forms') }}">
       <a href ng-click="$ctrl.deleteOrRevert(row)">
         <i class="crm-i fa-trash"></i>
-        {{:: ts('Delete...') }}
+        {{:: ts('Delete') }}
       </a>
     </li>
     <li ng-if="row.data['base_module:label'] && row.data['local_modified_date']" title="{{:: ts('Revert search to its packaged state') }}">
       <a href ng-click="$ctrl.deleteOrRevert(row)">
         <i class="crm-i fa-undo"></i>
-        {{:: ts('Revert...') }}
+        {{:: ts('Revert') }}
       </a>
     </li>
   </ul>

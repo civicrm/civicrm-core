@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+use Civi\Api4\ContributionRecur;
+
 /**
  *
  * @package CRM
@@ -18,112 +21,86 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
 
   /**
    * called when action is browse.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function listContribution() {
-    $rows = civicrm_api3('Contribution', 'get', [
-      'options' => [
-        'limit' => 12,
-        'sort' => 'receive_date DESC',
-      ],
-      'sequential' => 1,
-      'contact_id' => $this->_contactId,
-      'return' => [
-        'total_amount',
-        'contribution_recur_id',
-        'financial_type',
-        'receive_date',
-        'receipt_date',
-        'contribution_status',
-        'currency',
-        'amount_level',
-        'contact_id,',
-        'contribution_source',
-      ],
-    ])['values'];
+  public function listContribution(): void {
+    $contributions = $this->getContributions();
 
-    // We want oldest first, just among the most recent contributions
-    $rows = array_reverse($rows);
-
-    foreach ($rows as $index => &$row) {
+    foreach ($contributions as &$row) {
       // This is required for tpl logic. We should move away from hard-code this to adding an array of actions to the row
       // which the tpl can iterate through - this should allow us to cope with competing attempts to add new buttons
       // and allow extensions to assign new ones through the pageRun hook
-      $row['balance_amount'] = CRM_Contribute_BAO_Contribution::getContributionBalance($row['contribution_id']);
-      $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $row['contribution_status_id']);
-
-      if (in_array($contributionStatus, ['Pending', 'Partially paid'])) {
+      // We could check for balance_amount > 0 here? It feels more correct but this seems to be working.
+      if (in_array($row['contribution_status_id:name'], ['Pending', 'Partially paid'], TRUE)
+        && Civi::settings()->get('default_invoice_page')
+      ) {
         $row['buttons']['pay'] = [
           'class' => 'button',
           'label' => ts('Pay Now'),
           'url' => CRM_Utils_System::url('civicrm/contribute/transact', [
             'reset' => 1,
             'id' => Civi::settings()->get('default_invoice_page'),
-            'ccid' => $row['contribution_id'],
+            'ccid' => $row['id'],
             'cs' => $this->getUserChecksum(),
             'cid' => $row['contact_id'],
           ]),
         ];
       }
     }
+    unset($row);
 
-    $this->assign('contribute_rows', $rows);
+    $this->assign('contribute_rows', $contributions);
     $this->assign('contributionSummary', ['total_amount' => civicrm_api3('Contribution', 'getcount', ['contact_id' => $this->_contactId])]);
 
     //add honor block
-    $params = CRM_Contribute_BAO_Contribution::getHonorContacts($this->_contactId);
+    $softCreditContributions = $this->getContributions(TRUE);
+    $this->assign('soft_credit_contributions', $softCreditContributions);
 
-    if (!empty($params)) {
-      // assign vars to templates
-      $this->assign('honorRows', $params);
-      $this->assign('honor', TRUE);
-    }
-
-    $recur = new CRM_Contribute_DAO_ContributionRecur();
-    $recur->contact_id = $this->_contactId;
-    $recur->is_test = 0;
-    $recur->find();
-
-    $recurStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
+    $recurringContributions = (array) ContributionRecur::get(FALSE)
+      ->addWhere('contact_id', '=', $this->_contactId)
+      ->addWhere('is_test', '=', 0)
+      ->setSelect([
+        '*',
+        'contribution_status_id:label',
+      ])->execute();
 
     $recurRow = [];
     $recurIDs = [];
-    while ($recur->fetch()) {
-      if (empty($recur->payment_processor_id)) {
+    foreach ($recurringContributions as $recur) {
+      if (empty($recur['payment_processor_id'])) {
         // it's not clear why we continue here as any without a processor id would likely
         // be imported from another system & still seem valid.
         continue;
       }
 
-      require_once 'api/v3/utils.php';
-      //@todo calling api functions directly is not supported
-      _civicrm_api3_object_to_array($recur, $values);
+      // Cast to something Smarty-friendly.
+      $recur['recur_status'] = $recur['contribution_status_id:label'];
+      $recurRow[$recur['id']] = $recur;
 
-      $values['recur_status'] = $recurStatus[$values['contribution_status_id']];
-      $recurRow[$values['id']] = $values;
+      $action = array_sum(array_keys(CRM_Contribute_Page_Tab::dashboardRecurLinks((int) $recur['id'], (int) $recur['contact_id'])));
 
-      $action = array_sum(array_keys(CRM_Contribute_Page_Tab::dashboardRecurLinks((int) $recur->id, (int) $recur->contact_id)));
-
-      $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recur->id, 'recur');
+      $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recur['id'], 'recur');
       $hideUpdate = $details->membership_id & $details->auto_renew;
 
       if ($hideUpdate) {
         $action -= CRM_Core_Action::UPDATE;
       }
 
-      $recurRow[$values['id']]['action'] = CRM_Core_Action::formLink(CRM_Contribute_Page_Tab::dashboardRecurLinks((int) $recur->id, (int) $this->_contactId),
+      $recurRow[$recur['id']]['action'] = CRM_Core_Action::formLink(CRM_Contribute_Page_Tab::dashboardRecurLinks((int) $recur['id'], (int) $this->_contactId),
         $action, [
           'cid' => $this->_contactId,
-          'crid' => $values['id'],
+          'crid' => $recur['id'],
           'cxt' => 'contribution',
         ],
         ts('more'),
         FALSE,
         'contribution.dashboard.recurring',
         'Contribution',
-        $values['id']
+        $recur['id']
       );
 
-      $recurIDs[] = $values['id'];
+      $recurIDs[] = $recur['id'];
     }
     if (is_array($recurIDs) && !empty($recurIDs)) {
       $getCount = CRM_Contribute_BAO_ContributionRecur::getCount($recurIDs);
@@ -136,12 +113,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     }
 
     $this->assign('recurRows', $recurRow);
-    if (!empty($recurRow)) {
-      $this->assign('recur', TRUE);
-    }
-    else {
-      $this->assign('recur', FALSE);
-    }
+
   }
 
   /**
@@ -163,11 +135,68 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
   /**
    * the main function that is called when the page
    * loads, it decides the which action has to be taken for the page.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function run() {
     $this->assign('isIncludeInvoiceLinks', $this->isIncludeInvoiceLinks());
     parent::preProcess();
     $this->listContribution();
+  }
+
+  /**
+   * Get the contact's contributions.
+   *
+   * @param bool $isSoftCredit
+   *   Return contributions for which the contact is the soft credit contact instead.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContributions(bool $isSoftCredit = FALSE): array {
+    $apiQuery = Contribution::get(FALSE)
+      ->addOrderBy('receive_date', 'DESC')
+      ->setLimit(12)
+      ->setSelect([
+        'total_amount',
+        'contribution_recur_id',
+        'receive_date',
+        'receipt_date',
+        'cancel_date',
+        'amount_level',
+        'contact_id',
+        'contact_id.display_name',
+        'contribution_status_id:name',
+        'contribution_status_id:label',
+        'financial_type_id:label',
+        'currency',
+        'amount_level',
+        'contact_id,',
+        'source',
+        'balance_amount',
+        'id',
+      ]);
+
+    if ($isSoftCredit) {
+      $apiQuery->addJoin('ContributionSoft AS contribution_soft', 'INNER');
+      $apiQuery->addWhere('contribution_soft.contact_id', '=', $this->_contactId);
+      $apiQuery->addSelect('contribution_soft.soft_credit_type_id:label');
+    }
+    else {
+      $apiQuery->addWhere('contact_id', '=', $this->_contactId);
+    }
+    $contributions = (array) $apiQuery->execute();
+    foreach ($contributions as $index => $contribution) {
+      // QuickForm can't cope with the colons & dots ... cast to a legacy or simplified key.
+      $contributions[$index]['financial_type'] = $contribution['financial_type_id:label'];
+      $contributions[$index]['contribution_status'] = $contribution['contribution_status_id:label'];
+      $contributions[$index]['contribution_status_name'] = $contribution['contribution_status_id:name'];
+      $contributions[$index]['display_name'] = $contribution['contact_id.display_name'];
+      $contributions[$index]['soft_credit_type'] = $contribution['contribution_soft.soft_credit_type_id:label'] ?? NULL;
+      // Add in the api-v3 style naming just in case any extensions are still looking for it.
+      $contributions[$index]['contribution_id'] = $contribution['id'];
+    }
+    return $contributions;
   }
 
 }

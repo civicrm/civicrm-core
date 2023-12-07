@@ -55,10 +55,11 @@ class Display {
    * @param string|bool $addLabel
    *   Pass a string to supply a custom label, TRUE to use the default,
    *   or FALSE to keep the %1 placeholders in the text (used for the admin UI)
-   * @return array[]|null
+   * @return array[]
    */
-  public static function getEntityLinks(string $entity, $addLabel = FALSE) {
-    $paths = CoreUtil::getInfoItem($entity, 'paths');
+  public static function getEntityLinks(string $entity, $addLabel = FALSE): array {
+    $paths = CoreUtil::getInfoItem($entity, 'paths') ?? [];
+    $links = [];
     // Hack to support links to relationships
     if ($entity === 'RelationshipCache') {
       $entity = 'Relationship';
@@ -66,55 +67,35 @@ class Display {
     if ($addLabel === TRUE) {
       $addLabel = CoreUtil::getInfoItem($entity, 'title');
     }
-    $label = $addLabel ? [1 => $addLabel] : [];
-    if ($paths) {
-      $links = [
-        'view' => [
-          'action' => 'view',
-          'entity' => $entity,
-          'text' => E::ts('View %1', $label),
-          'icon' => 'fa-external-link',
-          'style' => 'default',
-          // Contacts and cases are too cumbersome to view in a popup
-          'target' => in_array($entity, ['Contact', 'Case']) ? '_blank' : 'crm-popup',
-        ],
-        'preview' => [
-          'action' => 'preview',
-          'entity' => $entity,
-          'text' => E::ts('Preview %1', $label),
-          'icon' => 'fa-eye',
-          'style' => 'default',
-          'target' => 'crm-popup',
-        ],
-        'update' => [
-          'action' => 'update',
-          'entity' => $entity,
-          'text' => E::ts('Edit %1', $label),
-          'icon' => 'fa-pencil',
-          'style' => 'default',
-          // Contacts and cases are too cumbersome to edit in a popup
-          'target' => in_array($entity, ['Contact', 'Case']) ? '_blank' : 'crm-popup',
-        ],
-        'move' => [
-          'action' => 'move',
-          'entity' => $entity,
-          'text' => E::ts('Move %1', $label),
-          'icon' => 'fa-random',
-          'style' => 'default',
-          'target' => 'crm-popup',
-        ],
-        'delete' => [
-          'action' => 'delete',
-          'entity' => $entity,
-          'text' => E::ts('Delete %1', $label),
-          'icon' => 'fa-trash',
-          'style' => 'danger',
-          'target' => 'crm-popup',
-        ],
+    // If addLabel is false the placeholder needs to be passed through to javascript
+    $label = $addLabel ?: '%1';
+    $styles = [
+      'delete' => 'danger',
+      'add' => 'primary',
+    ];
+    foreach (array_keys($paths) as $actionName) {
+      $actionKey = \CRM_Core_Action::mapItem($actionName);
+      $link = [
+        'action' => $actionName,
+        'entity' => $entity,
+        'text' => \CRM_Core_Action::getTitle($actionKey, $label),
+        'icon' => \CRM_Core_Action::getIcon($actionKey),
+        'weight' => \CRM_Core_Action::getWeight($actionKey),
+        'style' => $styles[$actionName] ?? 'default',
+        'target' => 'crm-popup',
       ];
-      return array_intersect_key($links, $paths) ?: NULL;
+      // Contacts and cases are too cumbersome to view in a popup
+      if (in_array($entity, ['Contact', 'Case']) && in_array($actionName, ['view', 'update'])) {
+        $link['target'] = '_blank';
+      }
+      $links[$actionName] = $link;
     }
-    return NULL;
+    // Sort by weight, then discard it
+    uasort($links, ['CRM_Utils_Sort', 'cmpFunc']);
+    foreach ($links as $index => $link) {
+      unset($links[$index]['weight']);
+    }
+    return $links;
   }
 
 }

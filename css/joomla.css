@@ -6,11 +6,9 @@
 div#toolbar-box .icon-48-generic {
   display: none;
 }
-
 div#toolbar-box {
   height: 26px;
 }
-
 fieldset {
   margin-bottom: 1em;
   padding: .5em;
@@ -31,12 +29,10 @@ img {
 #crm-container tr td {
   font-size: 1em;
 }
-
 /* Added in CiviCRM 2.1 to overwrite tiny font in TinyMCE editor. */
 #crm-container #content table.mceLayout td {
   font-size: 0em;
 }
-
 th {
   text-align: left;
   padding-right: 1em;
@@ -52,11 +48,9 @@ tr.light {
   border-bottom: 1px solid #ccc;
   padding: 0.1em 0.6em;
 }
-
 td.active {
   background-color: #ddd;
 }
-
 td.label {
   background: none;
   color: #3e3e3e;
@@ -67,7 +61,7 @@ td.label {
 ** Other common styles
 */
 .breadcrumb {
-  padding-bottom: .5em
+  padding-bottom: .5em;
 }
 .block ul {
   margin: 0;
@@ -228,19 +222,9 @@ br.clear {
   border-color: red;
   color: red;
 }
-#sidebar-left,
-#sidebar-right {
-  background-color: #ddd;
-  width: 16em;
-  /* padding in px not ex because IE messes up 100% width tables otherwise */
-  padding: 20px;
-  vertical-align: top;
+#crm-content {
+  padding: 1rem;
 }
-
-#content-right {
-  background-color: #ffffff;
-}
-
 #footer {
   padding: 1em;
   font-size: 0.8em;
@@ -289,7 +273,6 @@ br.clear {
 .box .title {
   font-size: 1.1em;
 }
-
 #module-status,
 .version {
   font-size: 11px;
@@ -304,19 +287,16 @@ br.clear {
 /* Joomla Admin Menu alterations */
 /* Moved from civicrm.css in v3.2 */
 
-
 div#toolbar-box div.m {
   padding: 0px !important;
   min-height: 0;
   border: 0;
   margin-top: 8px;
 }
-
 div#toolbar-box,
 div#toolbar-box div.m {
   height: auto;
 }
-
 .crm-tab-button,
 .ui-tabs .ui-tabs-nav li {
   border: 1px;
@@ -333,9 +313,6 @@ div#toolbar-box div.m {
   padding-bottom: 0;
   border: 1px solid #999 !important;
 }
-#crm-container {
-  font-size: 11px;
-}
 #crm-container .col1 {
   margin: 0;
 }
@@ -345,11 +322,9 @@ div#toolbar-box div.m {
 .ac_results .ac_odd {
   background-color: #444;
 }
-
 #crm-notification-container {
   top: 100px;
 }
-
 .crm-container textarea,
 .crm-container input,
 .crm-container select {
@@ -369,22 +344,18 @@ div#toolbar-box div.m {
 .crm-container button[type=submit] {
   height: auto;
 }
-
 .crm-container .disabled {
   font-weight: normal;
 }
-
 #crm-container .form-layout td.label,
 .crm-container .form-layout td.label {
   width: inherit;
 }
-
 #crm-container .crm-event-form-fee-block .label {
   background-color: inherit;
   width: inherit;
   display: block;
 }
-
 /* dev/core#874 the width:auto styling above causes the menubar colour picker to be squeezed */
 .crm-container input.crm-form-color {
   width: 3.6em;
@@ -405,10 +376,6 @@ body.admin.com_civicrm.task-civicrmupgrade .container-fluid.container-main {
 body.admin.com_civicrm #crm-nav-menu-container {
   padding-bottom: 0 !important;
 }
-body.admin.com_civicrm #content-right {
-  padding: 12px;
-}
-
 /* Make footer admin bar hide behind popup windows (CRM-15723) */
 body.ui-dialog-open #status {
   z-index: 100 !important;
@@ -416,18 +383,12 @@ body.ui-dialog-open #status {
 
 /* Joomla 4 */
 
-body.admin.com_civicrm.layout-default #content {
-  padding: 0;
-}
-
 body.admin.com_civicrm.layout-default #subhead-container {
   display: none;
 }
-
 body.admin.com_civicrm.layout-default .crm-container .crm-dashlet {
   max-width: 50vw; /* fixes over-wide news dashlet */
 }
-
 body.admin.com_civicrm.layout-default .crm-container .content {
   padding: inherit; /* overrides J4 duplicated padding */
 }
@@ -437,11 +398,9 @@ body.admin.com_civicrm.layout-default .crm-container .content {
 body.admin.com_civicrm.layout-default .crm-container.ui-dialog.ui-resizable {
   z-index: 1021;
 }
-
 body.admin.com_civicrm.layout-default .ui-widget-overlay {
   z-index: 1;
 }
-
 body.admin.com_civicrm.layout-default .crm-container .modal-dialog {
   max-width: inherit;
   padding: 0;

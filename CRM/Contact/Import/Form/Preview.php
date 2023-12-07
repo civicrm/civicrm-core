@@ -24,9 +24,18 @@ use Civi\Api4\Tag;
 class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    return 'contact_import';
+  }
+
+  /**
    * Build the form object.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->addElement('text', 'newGroupName', ts('Name for new group'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title'));
     $this->addElement('text', 'newGroupDesc', ts('Description of new group'));
     $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
@@ -38,11 +47,11 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       );
     }
 
-    $groups = CRM_Core_PseudoConstant::nestedGroup();;
+    $groups = CRM_Core_PseudoConstant::nestedGroup();
 
     if (!empty($groups)) {
       $this->addElement('select', 'groups', ts('Add imported records to existing group(s)'), $groups, [
-        'multiple' => "multiple",
+        'multiple' => 'multiple',
         'class' => 'crm-select2',
       ]);
     }
@@ -70,47 +79,31 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @param $files
-   * @param self $self
-   *
    * @return array|bool
    *   list of errors to be posted back to the form
    */
-  public static function formRule($fields, $files, $self) {
+  public static function formRule(array $fields) {
     $errors = [];
-    $invalidTagName = $invalidGroupName = FALSE;
-
-    if (!empty($fields['newTagName'])) {
-      if (!CRM_Utils_Rule::objectExists(trim($fields['newTagName']),
-        ['CRM_Core_DAO_Tag']
-      )
-      ) {
-        $errors['newTagName'] = ts('Tag \'%1\' already exists.',
-          [1 => $fields['newTagName']]
-        );
-        $invalidTagName = TRUE;
-      }
+    if (!empty($fields['newTagName'])
+      && !CRM_Utils_Rule::objectExists(trim($fields['newTagName']), ['CRM_Core_DAO_Tag'])
+    ) {
+      $errors['newTagName'] = ts('Tag \'%1\' already exists.', [1 => $fields['newTagName']]);
     }
 
     if (!empty($fields['newGroupName'])) {
       $title = trim($fields['newGroupName']);
       $name = CRM_Utils_String::titleToVar($title);
       $query = 'SELECT COUNT(*) FROM civicrm_group WHERE name LIKE %1 OR title LIKE %2';
-      $grpCnt = CRM_Core_DAO::singleValueQuery(
+      if (CRM_Core_DAO::singleValueQuery(
         $query,
         [
           1 => [$name, 'String'],
           2 => [$title, 'String'],
         ]
-      );
-      if ($grpCnt) {
-        $invalidGroupName = TRUE;
+      )) {
         $errors['newGroupName'] = ts('Group \'%1\' already exists.', [1 => $fields['newGroupName']]);
       }
     }
-
-    $self->assign('invalidTagName', $invalidTagName);
-    $self->assign('invalidGroupName', $invalidGroupName);
 
     return empty($errors) ? TRUE : $errors;
   }

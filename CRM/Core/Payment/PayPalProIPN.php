@@ -197,22 +197,20 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    *   Data type.
    *   - String
    *   - Integer
-   * @param string $location
-   *   Deprecated.
    * @param bool $abort
    *   Abort if empty.
    *
    * @throws CRM_Core_Exception
    * @return mixed
    */
-  public function retrieve($name, $type, $location = 'POST', $abort = TRUE) {
+  public function retrieve($name, $type, $abort = TRUE) {
     $value = CRM_Utils_Type::validate(
       CRM_Utils_Array::value($name, $this->_inputParameters),
       $type,
       FALSE
     );
     if ($abort && $value === NULL) {
-      throw new CRM_Core_Exception("Could not find an entry for $name in $location");
+      throw new CRM_Core_Exception("Could not find an entry for $name");
     }
     return $value;
   }
@@ -230,60 +228,29 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     $first = !$this->isContributionCompleted();
     $recur = $this->getContributionRecurObject();
     if (!isset($input['txnType'])) {
-      Civi::log()->debug('PayPalProIPN: Could not find txn_type in input request.');
+      Civi::log('paypal_pro')->debug('PayPalProIPN: Could not find txn_type in input request.');
       echo 'Failure: Invalid parameters<p>';
-      return;
-    }
-
-    // make sure the invoice ids match
-    // make sure the invoice is valid and matches what we have in
-    // the contribution record
-    if ($recur->invoice_id != $input['invoice']) {
-      Civi::log()->debug('PayPalProIPN: Invoice values dont match between database and IPN request recur is ' . $recur->invoice_id . ' input is ' . $input['invoice']);
-      echo 'Failure: Invoice values dont match between database and IPN request recur is ' . $recur->invoice_id . " input is " . $input['invoice'];
       return;
     }
 
     $now = date('YmdHis');
 
-    $sendNotification = FALSE;
-    $subscriptionPaymentStatus = NULL;
-    //List of Transaction Type
-    /*
-    recurring_payment_profile_created          RP Profile Created
-    recurring_payment           RP Successful Payment
-    recurring_payment_failed                               RP Failed Payment
-    recurring_payment_profile_cancel           RP Profile Cancelled
-    recurring_payment_expired         RP Profile Expired
-    recurring_payment_skipped        RP Profile Skipped
-    recurring_payment_outstanding_payment      RP Successful Outstanding Payment
-    recurring_payment_outstanding_payment_failed          RP Failed Outstanding Payment
-    recurring_payment_suspended        RP Profile Suspended
-    recurring_payment_suspended_due_to_max_failed_payment  RP Profile Suspended due to Max Failed Payment
-     */
-
-    //set transaction type
     $txnType = $this->retrieve('txn_type', 'String');
-    //Changes for paypal pro recurring payment
+
     switch ($txnType) {
       case 'recurring_payment_profile_created':
-        if (in_array(CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $recur->contribution_status_id), [
-          'Pending', 'In Progress',
-        ], TRUE)
-          && !empty($recur->processor_id)
+        if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $recur->contribution_status_id) === 'In Progress'
         ) {
-          echo 'already handled';
+          Civi::log('paypal_pro')->debug('already handled');
           return;
         }
-        $recur->create_date = $now;
-        $recur->contribution_status_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Pending');
-        $recur->processor_id = $this->retrieve('recurring_payment_id', 'String');
-        $recur->trxn_id = $recur->processor_id;
-        $subscriptionPaymentStatus = CRM_Core_Payment::RECURRING_PAYMENT_START;
-        $sendNotification = TRUE;
-        break;
+        $this->processProfileCreated();
+        return;
 
       case 'recurring_payment':
+        $recur->processor_id = $this->retrieve('recurring_payment_id', 'String');
+        $recur->trxn_id = $recur->processor_id;
+        $recur->save();
         if (!$first) {
           if ($input['paymentStatus'] !== 'Completed') {
             throw new CRM_Core_Exception('Ignore all IPN payments that are not completed');
@@ -291,7 +258,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
           // In future moving to create pending & then complete, but this OK for now.
           // Also consider accepting 'Failed' like other processors.
-          $input['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Completed');
+          $input['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
           $input['invoice_id'] = md5(uniqid(rand(), TRUE));
           $input['original_contribution_id'] = $this->getContributionID();
           $input['contribution_recur_id'] = $this->getContributionRecurID();
@@ -308,29 +275,18 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
           }
           $recur->contribution_status_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Completed');
           $recur->end_date = $now;
-          $sendNotification = TRUE;
-          $subscriptionPaymentStatus = CRM_Core_Payment::RECURRING_PAYMENT_END;
+          $recur->save();
+          //send recurring Notification email for user
+          CRM_Contribute_BAO_ContributionPage::recurringNotify(
+            $this->getContributionID(),
+            CRM_Core_Payment::RECURRING_PAYMENT_END,
+            $recur
+          );
         }
-
+        $this->single($input);
         break;
     }
 
-    $recur->save();
-
-    if ($sendNotification) {
-      //send recurring Notification email for user
-      CRM_Contribute_BAO_ContributionPage::recurringNotify(
-        $this->getContributionID(),
-        $subscriptionPaymentStatus,
-        $recur
-      );
-    }
-
-    if ($txnType !== 'recurring_payment') {
-      return;
-    }
-
-    $this->single($input);
   }
 
   /**
@@ -357,11 +313,11 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         'cancel_date' => 'now',
         'contribution_status_id:name' => 'Failed',
       ])->addWhere('id', '=', $this->getContributionID())->execute();
-      Civi::log()->debug('Setting contribution status to Failed');
+      Civi::log('paypal_pro')->debug('Setting contribution status to Failed');
       return;
     }
     if ($status === 'Pending') {
-      Civi::log()->debug('Returning since contribution status is Pending');
+      Civi::log('paypal_pro')->debug('Returning since contribution status is Pending');
       return;
     }
     if ($status === 'Refunded' || $status === 'Reversed') {
@@ -369,16 +325,16 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         'cancel_date' => 'now',
         'contribution_status_id:name' => 'Cancelled',
       ])->addWhere('id', '=', $this->getContributionID())->execute();
-      Civi::log()->debug('Setting contribution status to Cancelled');
+      Civi::log('paypal_pro')->debug('Setting contribution status to Cancelled');
       return;
     }
     if ($status !== 'Completed') {
-      Civi::log()->debug('Returning since contribution status is not handled');
+      Civi::log('paypal_pro')->debug('Returning since contribution status is not handled');
       return;
     }
 
     if ($this->isContributionCompleted()) {
-      Civi::log()->debug('PayPalProIPN: Returning since contribution has already been handled.');
+      Civi::log('paypal_pro')->debug('PayPalProIPN: Returning since contribution has already been handled.');
       echo 'Success: Contribution has already been handled<p>';
       return;
     }
@@ -398,7 +354,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     // entirely). The only thing the IPN class should really do is extract data from the request, validate it
     // & call completetransaction or call fail? (which may not exist yet).
 
-    Civi::log()->warning('Unreliable method used to get payment_processor_id for PayPal Pro IPN - this will cause problems if you have more than one instance');
+    Civi::log('paypal_pro')->warning('Unreliable method used to get payment_processor_id for PayPal Pro IPN - this will cause problems if you have more than one instance');
 
     $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
       'PayPal', 'id', 'name'
@@ -451,7 +407,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       $this->single($input);
     }
     catch (Exception $e) {
-      Civi::log()->debug($e->getMessage() . ' input {input}', ['input' => $input]);
+      Civi::log('paypal_pro')->debug($e->getMessage() . ' input {input}', ['input' => $input]);
       echo 'Invalid or missing data';
     }
   }
@@ -465,15 +421,15 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   public function getInput(&$input) {
     $billingID = CRM_Core_BAO_LocationType::getBilling();
 
-    $input['txnType'] = self::retrieve('txn_type', 'String', 'POST', FALSE);
-    $input['paymentStatus'] = self::retrieve('payment_status', 'String', 'POST', FALSE);
+    $input['txnType'] = $this->retrieve('txn_type', 'String', FALSE);
+    $input['paymentStatus'] = $this->retrieve('payment_status', 'String', FALSE);
 
-    $input['amount'] = self::retrieve('mc_gross', 'Money', 'POST', FALSE);
-    $input['reasonCode'] = self::retrieve('ReasonCode', 'String', 'POST', FALSE);
+    $input['amount'] = $this->retrieve('mc_gross', 'Money', FALSE);
+    $input['reasonCode'] = $this->retrieve('ReasonCode', 'String', FALSE);
 
     $lookup = [
-      "first_name" => 'first_name',
-      "last_name" => 'last_name',
+      'first_name' => 'first_name',
+      'last_name' => 'last_name',
       "street_address-{$billingID}" => 'address_street',
       "city-{$billingID}" => 'address_city',
       "state-{$billingID}" => 'address_state',
@@ -481,15 +437,15 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       "country-{$billingID}" => 'address_country_code',
     ];
     foreach ($lookup as $name => $paypalName) {
-      $value = self::retrieve($paypalName, 'String', 'POST', FALSE);
-      $input[$name] = $value ? $value : NULL;
+      $value = $this->retrieve($paypalName, 'String', FALSE);
+      $input[$name] = $value ?: NULL;
     }
 
-    $input['is_test'] = self::retrieve('test_ipn', 'Integer', 'POST', FALSE);
-    $input['fee_amount'] = self::retrieve('mc_fee', 'Money', 'POST', FALSE);
-    $input['net_amount'] = self::retrieve('settle_amount', 'Money', 'POST', FALSE);
-    $input['trxn_id'] = self::retrieve('txn_id', 'String', 'POST', FALSE);
-    $input['payment_date'] = $input['receive_date'] = self::retrieve('payment_date', 'String', 'POST', FALSE);
+    $input['is_test'] = $this->retrieve('test_ipn', 'Integer', FALSE);
+    $input['fee_amount'] = $this->retrieve('mc_fee', 'Money', FALSE);
+    $input['net_amount'] = $this->retrieve('settle_amount', 'Money', FALSE);
+    $input['trxn_id'] = $this->retrieve('txn_id', 'String', FALSE);
+    $input['payment_date'] = $input['receive_date'] = $this->retrieve('payment_date', 'String', FALSE);
     $input['total_amount'] = $input['amount'];
   }
 
@@ -563,6 +519,15 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       if (!$contributionRecur->find(TRUE)) {
         throw new CRM_Core_Exception('Failure: Could not find contribution recur record');
       }
+
+      // make sure the invoice ids match
+      // make sure the invoice is valid and matches what we have in
+      // the contribution record
+      $invoice = (string) $this->getValue('i');
+      if ((string) $contributionRecur->invoice_id !== $invoice) {
+        Civi::log('paypal_pro')->debug('PayPalProIPN: Invoice values dont match between database and IPN request recur is ' . $contributionRecur->invoice_id . ' input is ' . $invoice);
+        throw new CRM_Core_Exception('Failure: Invoice values dont match between database and IPN request recur is ' . $contributionRecur->invoice_id . " input is " . $invoice);
+      }
       return $this->contributionRecurObject = $contributionRecur;
     }
     return $this->contributionRecurObject;
@@ -607,6 +572,32 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   private function isContributionCompleted(): bool {
     $status = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getContributionObject()->contribution_status_id);
     return $status === 'Completed';
+  }
+
+  /**
+   * Update a recurring contribution to in progress based on an ipn profile_create notification.
+   *
+   * recurring_payment_profile_created is called when the
+   * subscription has been authorized and confirmed by the user,
+   * but before a payment has been taken.
+   * The recurring_payment_id is POSTed to the IPN
+   * and we store it in the recurring contribution's processor_id.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function processProfileCreated(): void {
+    $recur = $this->getContributionRecurObject();
+    $recur->create_date = date('YmdHis');
+    $recur->contribution_status_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Pending');
+    $recur->processor_id = $this->retrieve('recurring_payment_id', 'String');
+    $recur->trxn_id = $recur->processor_id;
+    $recur->save();
+    //send recurring Notification email for user
+    CRM_Contribute_BAO_ContributionPage::recurringNotify(
+      $this->getContributionID(),
+      CRM_Core_Payment::RECURRING_PAYMENT_START,
+      $recur
+    );
   }
 
 }

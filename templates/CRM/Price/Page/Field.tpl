@@ -11,30 +11,22 @@
   {include file="CRM/Price/Form/Field.tpl"}
 {elseif $action eq 8 and !$usedBy and !$isReserved}
   {include file="CRM/Price/Form/DeleteField.tpl"}
-{elseif $action eq 1024 }
+{elseif $action eq 1024}
   {include file="CRM/Price/Form/Preview.tpl"}
-{elseif ($usedBy and $action eq 8) or $usedBy.civicrm_event or $usedBy.civicrm_contribution_page}
+{elseif $usedBy}
   <div id="price_set_used_by" class="messages status no-popup">
     {icon icon="fa-info-circle"}{/icon}
     {if $action eq 8}
       {ts 1=$usedPriceSetTitle}Unable to delete the '%1' Price Field - it is currently in use by one or more active events or contribution pages or contributions  or event templates.{/ts}
     {/if}
 
-    {if $usedBy.civicrm_event or $usedBy.civicrm_contribution_page or $usedBy.civicrm_event_template}
-      {include file="CRM/Price/Page/table.tpl"}
-    {/if}
+    {include file="CRM/Price/Page/table.tpl"}
   </div>
 {/if}
 
 {* priceField is set when e.g. in browse mode *}
 {if $action NEQ 8 and !empty($priceField)}
 <div class="crm-content-block crm-block">
-  <div class="action-link">
-    {if !$isReserved}
-      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
-    {/if}
-      {crmButton p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field" icon="television"}{ts}Preview (all fields){/ts}{/crmButton}
-  </div>
   <div id="field_page">
   {strip}
   {* handle enable/disable actions*}
@@ -72,7 +64,7 @@
                     {$taxTerm} ({$row.tax_rate|string_format:"%.2f"}%)
                 {/if}
       </td>
-            <td>{if $row.html_type eq "Text / Numeric Quantity" }{$row.tax_amount|crmMoney}{/if}</td>
+            <td>{if $row.html_type eq "Text / Numeric Quantity"}{$row.tax_amount|crmMoney}{/if}</td>
         {/if}
         <td class="field-action">{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
       </tr>
@@ -82,9 +74,9 @@
   </div>
   <div class="action-link">
     {if !$isReserved}
-      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price/field/edit" q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
     {/if}
-    {crmButton p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field" icon="television"}{ts}Preview (all fields){/ts}{/crmButton}
+    {crmButton p="civicrm/admin/price/field/edit" q="action=preview&sid=`$sid`&reset=1&context=field" icon="television"}{ts}Preview (all fields){/ts}{/crmButton}
   </div>
 </div>
 {else}
@@ -94,7 +86,7 @@
       {ts}None found.{/ts}
     </div>
     <div class="action-link">
-      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price/field/edit" q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
     </div>
   {/if}
 {/if}

@@ -26,21 +26,21 @@ class CRM_Upgrade_Incremental_General {
    * The point release will be dropped in recommendations unless it's .1 or
    * higher.
    */
-  const RECOMMENDED_PHP_VER = '7.4.0';
+  const RECOMMENDED_PHP_VER = '8.1.0';
 
   /**
    * The minimum recommended PHP version.
    *
    * A site running an earlier version will be told to upgrade.
    */
-  const MIN_RECOMMENDED_PHP_VER = '7.3.0';
+  const MIN_RECOMMENDED_PHP_VER = '8.0.0';
 
   /**
    * The minimum PHP version required to install Civi.
    *
    * @see install/index.php
    */
-  const MIN_INSTALL_PHP_VER = '7.2.0';
+  const MIN_INSTALL_PHP_VER = '7.3.0';
 
   /**
    * The minimum recommended MySQL version.
@@ -178,10 +178,9 @@ class CRM_Upgrade_Incremental_General {
       return sprintf("<li><em>%s</em> - %s</li>", htmlentities($k), htmlentities($v));
     }, array_keys($messages), $messages);
 
-    $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", [
-      1 => 'https://docs.civicrm.org/user/en/latest/email/message-templates/#modifying-system-workflow-message-templates',
-      2 => '<ul>' . implode('', $messagesHtml) . '</ul>',
-    ]);
+    $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a %1>View detailed instructions</a>.", [
+      1 => 'href="https://docs.civicrm.org/user/en/latest/email/message-templates/#modifying-system-workflow-message-templates" target="_blank"',
+    ]) . '<ul>' . implode('', $messagesHtml) . '</ul>';
 
     $messageObj->updateTemplates();
   }

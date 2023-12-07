@@ -22,6 +22,9 @@ class CRM_Event_Page_ParticipantListing_Simple extends CRM_Core_Page {
 
   protected $_eventTitle;
 
+  /**
+   * @var CRM_Utils_Pager
+   */
   protected $_pager;
 
   public function preProcess() {

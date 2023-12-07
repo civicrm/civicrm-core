@@ -13,13 +13,13 @@
     <tr>
       <td colspan="5">
         <div class="crm-submit-buttons">
-          {include file="CRM/common/formButtons.tpl"}
+          {include file="CRM/common/formButtons.tpl" location=''}
         </div>
       </td>
     </tr>
     <tr>
       <td>{ts}Instant Messenger{/ts}&nbsp;
-      {if $actualBlockCount lt 5 }
+      {if $actualBlockCount lt 5}
         <span id="add-more-im" title="{ts}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
       {/if}
       </td>

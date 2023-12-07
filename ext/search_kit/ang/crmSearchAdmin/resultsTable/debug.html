@@ -1,17 +1,17 @@
-<fieldset id="crm-search-admin-debug">
-  <legend ng-click="$ctrl.showDebug = !$ctrl.showDebug">
-    <i class="crm-i fa-caret-{{ !$ctrl.showDebug ? 'right' : 'down' }}"></i>
+<details id="crm-search-admin-debug">
+  <summary>
     {{:: ts('Query Info') }}
-  </legend>
-  <div ng-if="$ctrl.showDebug">
+  </summary>
+  <div>
     <pre ng-if="$ctrl.debug.timeIndex">{{ ts('Request took %1 seconds.', {1: $ctrl.debug.timeIndex}) }}</pre>
     <div>
       <strong>API:</strong>
     </div>
     <pre>{{ $ctrl.debug.apiParams }}</pre>
-    <div ng-if="$ctrl.debug.sql">
+    <div ng-if="$ctrl.perm.viewDebugOutput">
       <strong>SQL:</strong>
+      <pre ng-if="!$ctrl.debug.sql">{{:: ts('Run search to view SQL') }}</pre>
+      <pre ng-repeat="query in $ctrl.debug.sql">{{ query }}</pre>
     </div>
-    <pre ng-repeat="query in $ctrl.debug.sql">{{ query }}</pre>
   </div>
-</fieldset>
+</details>

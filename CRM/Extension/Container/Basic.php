@@ -78,6 +78,12 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   protected $filters = [];
 
   /**
+   * @var int|null
+   *   Maximum number of subdirectories to search.
+   */
+  protected $maxDepth;
+
+  /**
    * @param string $baseDir
    *   Local path to the container.
    * @param string $baseUrl
@@ -86,12 +92,15 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
    *   Cache in which to store extension metadata.
    * @param string $cacheKey
    *   Unique name for this container.
+   * @param int|null $maxDepth
+   *   Maximum number of subdirectories to search.
    */
-  public function __construct($baseDir, $baseUrl, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
+  public function __construct($baseDir, $baseUrl, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, ?int $maxDepth = NULL) {
     $this->cache = $cache;
     $this->cacheKey = $cacheKey;
     $this->baseDir = rtrim($baseDir, '/');
     $this->baseUrl = rtrim($baseUrl, '/');
+    $this->maxDepth = $maxDepth;
   }
 
   /**
@@ -198,17 +207,18 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
       }
       if (!is_array($this->relPaths)) {
         $this->relPaths = [];
-        $infoPaths = CRM_Utils_File::findFiles($this->baseDir, 'info.xml');
+        $infoPaths = CRM_Utils_File::findFiles($this->baseDir, 'info.xml', FALSE, $this->maxDepth);
         foreach ($infoPaths as $infoPath) {
           $relPath = CRM_Utils_File::relativize(dirname($infoPath), $this->baseDir);
           try {
             $info = CRM_Extension_Info::loadFromFile($infoPath);
           }
           catch (CRM_Extension_Exception_ParseException $e) {
-            CRM_Core_Session::setStatus(ts('Parse error in extension: %1', [
-              1 => $e->getMessage(),
+            CRM_Core_Session::setStatus(ts('Parse error in extension %1: %2', [
+              1 => ltrim($relPath, '/'),
+              2 => $e->getMessage(),
             ]), '', 'error');
-            CRM_Core_Error::debug_log_message("Parse error in extension: " . $e->getMessage());
+            CRM_Core_Error::debug_log_message("Parse error in extension " . ltrim($relPath, '/') . ": " . $e->getMessage());
             continue;
           }
           $visible = TRUE;

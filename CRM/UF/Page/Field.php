@@ -54,28 +54,33 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
           'url' => 'civicrm/admin/uf/group/field/update',
           'qs' => 'reset=1&action=update&id=%%id%%&gid=%%gid%%',
           'title' => ts('Edit CiviCRM Profile Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
-          'url' => 'civicrm/admin/uf/group/field',
-          'qs' => 'action=preview&id=%%id%%&field=1',
+          'url' => 'civicrm/admin/uf/group/preview',
+          'qs' => 'action=preview&gid=%%gid%%&fieldId=%%id%%',
           'title' => ts('Preview CiviCRM Profile Field'),
+          'weight' => 0,
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable CiviCRM Profile Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable CiviCRM Profile Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/uf/group/field',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Enable CiviCRM Profile Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -259,6 +264,9 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
   /**
    * Preview custom field.
    *
+   * @deprecated
+   *   Links should point directly to civicrm/admin/uf/group/preview
+   *
    * @param int $fieldId
    *   Custom field id.
    * @param int $groupId
@@ -272,7 +280,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
       'reset=1&action=browse&gid=' . $this->_gid
     ));
     $controller->set('fieldId', $fieldId);
-    $controller->set('id', $groupId);
+    $controller->set('gid', $groupId);
     $controller->setEmbedded(TRUE);
     $controller->process();
     $controller->run();

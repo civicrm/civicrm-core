@@ -177,17 +177,10 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
@@ -201,6 +194,7 @@ WHERE     pledge_id = %1
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 
@@ -228,7 +222,7 @@ WHERE     pledge_id = %1
         if ($payment->contribution_id) {
           CRM_Contribute_BAO_Contribution::deleteContribution($payment->contribution_id);
         }
-        self::del($payment->id);
+        self::deleteRecord(['id' => $payment->id]);
       }
     }
 

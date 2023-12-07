@@ -361,17 +361,15 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       }
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__ . "missingroles",
-        ts("<p>The following roles listed in your case type definitions do not match any relationship type defined in the system: <em>%1</em>.</p>"
-          . "<p>This might be because of a mismatch if you are using external xml files to manage case types. If using xml files, then use either the name_a_b or name_b_a value from the following table. (Out of the box you would use name_b_a, which lists them on the case from the client perspective.) If you are not using xml files, you can edit your case types at Administer - CiviCase - Case Types.</p>"
-          . "<table>
-            <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>"
+        '<p>' . ts("The following roles listed in your case type definitions do not match any relationship type defined in the system: <em>%1</em>.", [1 => htmlspecialchars(implode(', ', $missing))]) . '</p>'
+          . "<p>" . ts("This might be because of a mismatch if you are using external xml files to manage case types. If using xml files, then use either the name_a_b or name_b_a value from the following table. (Out of the box you would use name_b_a, which lists them on the case from the client perspective.) If you are not using xml files, you can edit your case types at Administer - CiviCase - Case Types.") . '</p>'
+          . '<table>'
+          . '<tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>'
           . implode("\n", $tableRows)
-          . "</table>", [
-            1 => htmlspecialchars(implode(', ', $missing)),
-          ]) .
-          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#missing-roles', TRUE) . '">' .
-          ts('Read more about this warning') .
-          '</a>',
+          . '</table>'
+          . '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#missing-roles', TRUE) . '">'
+          . ts('Read more about this warning')
+          . '</a>',
         ts('Missing Roles'),
         \Psr\Log\LogLevel::ERROR,
         'fa-exclamation'

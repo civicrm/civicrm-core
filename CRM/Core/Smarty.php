@@ -19,14 +19,13 @@
  * Fix for bug CRM-392. Not sure if this is the best fix or it will impact
  * other similar PEAR packages. doubt it
  */
-if (!class_exists('Smarty')) {
-  require_once 'Smarty/Smarty.class.php';
-}
+
+use Civi\Core\Event\SmartyErrorEvent;
 
 /**
  *
  */
-class CRM_Core_Smarty extends Smarty {
+class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
   const
     // use print.tpl and bypass the CMS. Civi prints a valid html file
     PRINT_PAGE = 1,
@@ -62,6 +61,16 @@ class CRM_Core_Smarty extends Smarty {
    * @var array
    */
   private $backupFrames = [];
+
+  /**
+   * This is a sentinel-object that indicates an undefined value.
+   *
+   * It lacks any substantive content; but it has unique identity that cannot be mistaken for
+   * organic values like `null`, `string`, `false`, or similar.
+   *
+   * @var object
+   */
+  private static $UNDEFINED_VALUE;
 
   private function initialize() {
     $config = CRM_Core_Config::singleton();
@@ -117,8 +126,17 @@ class CRM_Core_Smarty extends Smarty {
     // add the session and the config here
     $session = CRM_Core_Session::singleton();
 
-    $this->assign_by_ref('config', $config);
-    $this->assign_by_ref('session', $session);
+    $this->assign('config', $config);
+    $this->assign('session', $session);
+    $this->assign('debugging', [
+      'smartyDebug' => CRM_Utils_Request::retrieveValue('smartyDebug', 'Integer'),
+      'sessionReset' => CRM_Utils_Request::retrieveValue('sessionReset', 'Integer'),
+      'sessionDebug' => CRM_Utils_Request::retrieveValue('sessionDebug', 'Integer'),
+      'directoryCleanup' => CRM_Utils_Request::retrieveValue('directoryCleanup', 'Integer'),
+      'cacheCleanup' => CRM_Utils_Request::retrieveValue('cacheCleanup', 'Integer'),
+      'configReset' => CRM_Utils_Request::retrieveValue('configReset', 'Integer'),
+    ]);
+    $this->assign('snippet_type', CRM_Utils_Request::retrieveValue('snippet', 'String'));
 
     $tsLocale = CRM_Core_I18n::getLocale();
     $this->assign('tsLocale', $tsLocale);
@@ -128,8 +146,12 @@ class CRM_Core_Smarty extends Smarty {
       $this->assign('langSwitch', CRM_Core_I18n::uiLanguages());
     }
 
-    $this->register_function('crmURL', ['CRM_Utils_System', 'crmURL']);
-    if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
+    if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')
+      && !CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH')) {
+      // Currently DEFAULT escape does not work with Smarty3
+      // dunno why - thought it would be the default with Smarty3 - but
+      // getting onto Smarty 3 is higher priority.
+      // The include below loads the v2 version which is why id doesn't work.
       // When default escape is enabled if the core escape is called before
       // any custom escaping is done the modifier_escape function is not
       // found, so require_once straight away. Note this was hit on the basic
@@ -141,6 +163,7 @@ class CRM_Core_Smarty extends Smarty {
       $this->default_modifiers[] = 'escape:"htmlall"';
     }
     $this->load_filter('pre', 'resetExtScope');
+    $this->load_filter('pre', 'htxtFilter');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
 
@@ -158,6 +181,9 @@ class CRM_Core_Smarty extends Smarty {
    * @return \CRM_Core_Smarty
    */
   public static function &singleton() {
+    if (static::$UNDEFINED_VALUE === NULL) {
+      static::$UNDEFINED_VALUE = new stdClass();
+    }
     if (!isset(self::$_singleton)) {
       self::$_singleton = new CRM_Core_Smarty();
       self::$_singleton->initialize();
@@ -168,32 +194,18 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
-   * Executes & returns or displays the template results
+   * Handle smarty error in one off string.
    *
-   * @param string $resource_name
-   * @param string $cache_id
-   * @param string $compile_id
-   * @param bool $display
+   * @param int $errorNumber
+   * @param string $errorMessage
    *
-   * @return bool|mixed|string
-   *
-   * @noinspection PhpDocMissingThrowsInspection
-   * @noinspection PhpUnhandledExceptionInspection
+   * @throws \CRM_Core_Exception
    */
-  public function fetch($resource_name, $cache_id = NULL, $compile_id = NULL, $display = FALSE) {
-    if (preg_match('/^(\s+)?string:/', $resource_name)) {
-      $old_security = $this->security;
-      $this->security = TRUE;
-    }
-    try {
-      $output = parent::fetch($resource_name, $cache_id, $compile_id, $display);
-    }
-    finally {
-      if (isset($old_security)) {
-        $this->security = $old_security;
-      }
-    }
-    return $output;
+  public function handleSmartyError(int $errorNumber, string $errorMessage): void {
+    $event = new SmartyErrorEvent($errorNumber, $errorMessage);
+    \Civi::dispatcher()->dispatch('civi.smarty.error', $event);
+    restore_error_handler();
+    throw new \CRM_Core_Exception('Message was not parsed due to invalid smarty syntax : ' . $errorMessage);
   }
 
   /**
@@ -283,16 +295,28 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
-   * @param $path
+   * Add template directory(s).
+   *
+   * @param string|array $template_dir directory(s) of template sources
+   * @param string $key (Smarty3+) of the array element to assign the template dir to
+   * @param bool $isConfig (Smarty3+) true for config_dir
+   *
+   * @return Smarty          current Smarty instance for chaining
    */
-  public function addTemplateDir($path) {
+  public function addTemplateDir($template_dir, $key = NULL, $isConfig = FALSE) {
+    if (method_exists('parent', 'addTemplateDir')) {
+      // More recent versions of Smarty have this method.
+      return parent::addTemplateDir($template_dir, $key, $isConfig);
+    }
     if (is_array($this->template_dir)) {
-      array_unshift($this->template_dir, $path);
+      if (!in_array($template_dir, $this->template_dir)) {
+        array_unshift($this->template_dir, $template_dir);
+      }
     }
     else {
-      $this->template_dir = [$path, $this->template_dir];
+      $this->template_dir = [$template_dir, $this->template_dir];
     }
-
+    return $this;
   }
 
   /**
@@ -316,7 +340,7 @@ class CRM_Core_Smarty extends Smarty {
     $oldVars = $this->get_template_vars();
     $backupFrame = [];
     foreach ($vars as $key => $value) {
-      $backupFrame[$key] = $oldVars[$key] ?? NULL;
+      $backupFrame[$key] = array_key_exists($key, $oldVars) ? $oldVars[$key] : static::$UNDEFINED_VALUE;
     }
     $this->backupFrames[] = $backupFrame;
 
@@ -343,7 +367,12 @@ class CRM_Core_Smarty extends Smarty {
    */
   public function assignAll($vars) {
     foreach ($vars as $key => $value) {
-      $this->assign($key, $value);
+      if ($value !== static::$UNDEFINED_VALUE) {
+        $this->assign($key, $value);
+      }
+      else {
+        $this->clear_assign($key);
+      }
     }
     return $this;
   }
@@ -455,7 +484,7 @@ class CRM_Core_Smarty extends Smarty {
 
     $value = smarty_modifier_escape($string, $esc_type, $char_set);
     if ($value !== $string) {
-      Civi::log()->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
+      Civi::log('smarty')->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
         'original' => $string,
         'escaped' => $value,
         'type' => $esc_type,

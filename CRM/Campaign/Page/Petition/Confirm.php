@@ -58,10 +58,12 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
     $pparams['id'] = $petition_id;
     $this->petition = [];
     CRM_Campaign_BAO_Survey::retrieve($pparams, $this->petition);
-    $this->assign('is_share', CRM_Utils_Array::value('is_share', $this->petition));
-    $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->petition));
-    $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $this->petition));
-    CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->petition));
+    $this->assign('is_share', $this->petition['is_share'] ?? FALSE);
+    $this->assign('thankyou_title', $this->petition['thankyou_title'] ?? '');
+    $this->assign('thankyou_text', $this->petition['thankyou_text'] ?? '');
+    if (!empty($this->petition['thankyou_title'])) {
+      CRM_Utils_System::setTitle($this->petition['thankyou_title']);
+    }
 
     // send thank you email
     $params['contactId'] = $contact_id;
@@ -90,7 +92,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
    *   True on success
    */
   public static function confirm($contact_id, $subscribe_id, $hash, $activity_id, $petition_id) {
-    $se = CRM_Mailing_Event_BAO_Subscribe::verify($contact_id, $subscribe_id, $hash);
+    $se = CRM_Mailing_Event_BAO_MailingEventSubscribe::verify($contact_id, $subscribe_id, $hash);
 
     if (!$se) {
       return FALSE;
@@ -98,7 +100,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
 
     $transaction = new CRM_Core_Transaction();
 
-    $ce = new CRM_Mailing_Event_BAO_Confirm();
+    $ce = new CRM_Mailing_Event_BAO_MailingEventConfirm();
     $ce->event_subscribe_id = $se->id;
     $ce->time_stamp = date('YmdHis');
     $ce->save();

@@ -28,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  */
 class ResultTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testJsonSerialize() {
+  public function testJsonSerialize(): void {
     $result = Contact::getFields(FALSE)->addWhere('type', '=', 'Field')->execute();
     $json = json_encode($result);
     $this->assertStringStartsWith('[{"', $json);
@@ -42,7 +42,7 @@ class ResultTest extends Api4TestBase implements TransactionalInterface {
    * @see https://issues.civicrm.org/jira/browse/CRM-11532
    * @see https://lab.civicrm.org/dev/core/-/issues/1328
    */
-  public function testNoDataCorruptionThroughEncoding() {
+  public function testNoDataCorruptionThroughEncoding(): void {
 
     $original = 'hello < you';
     $result = Contact::create(FALSE)

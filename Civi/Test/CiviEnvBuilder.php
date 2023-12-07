@@ -28,7 +28,7 @@ class CiviEnvBuilder {
    */
   private $targetSignature = NULL;
 
-  public function __construct($name) {
+  public function __construct(string $name = 'CiviEnvBuilder') {
     $this->name = $name;
   }
 

@@ -41,7 +41,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $this->_docTypes = CRM_Core_SelectValues::documentApplicationType();
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
-      array($this, 'hook_alterMailParams'));
+      [$this, 'hook_alterMailParams']);
   }
 
   /**
@@ -159,7 +159,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     ];
 
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter');
-    [$contributions, $contacts] = $form->buildContributionArray('contact_id', $contributionIDs, $returnProperties, TRUE, TRUE, $messageToken, 'test', '**', FALSE);
+    [$contributions, $contacts] = $form->buildContributionArray('contact_id', $contributionIDs, $returnProperties, $messageToken, '**', FALSE);
 
     $this->assertEquals('Anthony', $contacts[$this->_individualId]['first_name']);
     $this->assertEquals('Donation', $contributions[$result['id']]['financial_type']);
@@ -205,7 +205,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       ];
 
       $contributionId = $this->createContribution();
-      /** @var $form CRM_Contribute_Form_Task_PDFLetter */
+      /** @var CRM_Contribute_Form_Task_PDFLetter $form */
       $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
       $form->setContributionIds([$contributionId]);
       $format = Civi::settings()->get('dateformatFull');
@@ -244,7 +244,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'html_message' => '{contact.display_name}',
       'document_type' => 'pdf',
     ];
-    /** @var $form CRM_Contribute_Form_Task_PDFLetter */
+    /** @var CRM_Contribute_Form_Task_PDFLetter $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds([$this->createContribution()]);
     try {
@@ -277,7 +277,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       $formValues['html_message'] .= "$token : {contribution.$token}\n";
     }
     $formValues['html_message'] .= '{emoji.favourite_emoticon}';
-    /** @var $form CRM_Contribute_Form_Task_PDFLetter */
+    /** @var CRM_Contribute_Form_Task_PDFLetter $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds([$this->createContribution(array_merge(['campaign_id' => $tokens['campaign_id:label']], $tokens))]);
     try {

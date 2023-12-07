@@ -2,8 +2,12 @@
 
 namespace Civi\Api4\Generic\Traits;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
+use Civi\Api4\Query\SqlEquation;
 use Civi\Api4\Query\SqlExpression;
+use Civi\Api4\Query\SqlField;
+use Civi\Api4\Query\SqlFunction;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\Utils\CoreUtil;
 
@@ -44,21 +48,69 @@ trait SavedSearchInspectorTrait {
   private $_searchEntityFields;
 
   /**
-   * If SavedSearch is supplied as a string, this will load it as an array
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
+   * @var array
    */
-  protected function loadSavedSearch() {
-    if (is_string($this->savedSearch)) {
+  private $_joinMap;
+
+  /**
+   * If SavedSearch is supplied as a string, this will load it as an array
+   * @param int|null $id
+   * @throws UnauthorizedException
+   * @throws \CRM_Core_Exception
+   */
+  protected function loadSavedSearch(int $id = NULL) {
+    if ($id || is_string($this->savedSearch)) {
       $this->savedSearch = SavedSearch::get(FALSE)
-        ->addWhere('name', '=', $this->savedSearch)
+        ->addWhere($id ? 'id' : 'name', '=', $id ?: $this->savedSearch)
         ->execute()->single();
     }
     if (is_array($this->savedSearch)) {
-      $this->savedSearch += ['api_params' => []];
+      // Ensure array keys are always defined even for unsaved "preview" mode
+      $this->savedSearch += [
+        'id' => NULL,
+        'name' => NULL,
+        'api_params' => [],
+      ];
       $this->savedSearch['api_params'] += ['version' => 4, 'select' => [], 'where' => []];
     }
+    // Reset internal cached metadata
+    $this->_selectQuery = $this->_selectClause = $this->_searchEntityFields = $this->_joinMap = NULL;
     $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => []];
+  }
+
+  /**
+   * Loads display if not already an array
+   */
+  protected function loadSearchDisplay(): void {
+    // Display name given
+    if (is_string($this->display)) {
+      $this->display = \Civi\Api4\SearchDisplay::get(FALSE)
+        ->setSelect(['*', 'type:name'])
+        ->addWhere('name', '=', $this->display)
+        ->addWhere('saved_search_id', '=', $this->savedSearch['id'])
+        ->execute()->single();
+    }
+    // Null given - use default display
+    elseif (is_null($this->display)) {
+      $this->display = \Civi\Api4\SearchDisplay::getDefault(FALSE)
+        ->addSelect('*', 'type:name')
+        ->setSavedSearch($this->savedSearch)
+        ->setContext([
+          'filters' => $this->filters ?? NULL,
+          'formName' => $this->formName ?? NULL,
+          'fieldName' => $this->fieldName ?? NULL,
+        ])
+        // Set by AutocompleteAction
+        ->setType($this->_displayType ?? 'table')
+        ->execute()->first();
+    }
+    if (is_array($this->display)) {
+      // Ensure array keys are always defined even for unsaved "preview" mode
+      $this->display += [
+        'id' => NULL,
+        'name' => NULL,
+      ];
+    }
   }
 
   /**
@@ -74,11 +126,12 @@ trait SavedSearchInspectorTrait {
   }
 
   /**
-   * @param $joinAlias
+   * @param string $joinAlias
+   *   Alias of the join, with or without the trailing dot
    * @return array{entity: string, alias: string, table: string, bridge: string|NULL}|NULL
    */
-  protected function getJoin($joinAlias) {
-    return $this->getQuery() ? $this->getQuery()->getExplicitJoin($joinAlias) : NULL;
+  protected function getJoin(string $joinAlias) {
+    return $this->getQuery() ? $this->getQuery()->getExplicitJoin(rtrim($joinAlias, '.')) : NULL;
   }
 
   /**
@@ -95,7 +148,7 @@ trait SavedSearchInspectorTrait {
    */
   private function getQuery() {
     if (!isset($this->_selectQuery) && !empty($this->savedSearch['api_entity'])) {
-      if (!in_array('DAOEntity', CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'type'), TRUE)) {
+      if (!CoreUtil::isType($this->savedSearch['api_entity'], 'DAOEntity')) {
         return $this->_selectQuery = FALSE;
       }
       $api = Request::create($this->savedSearch['api_entity'], 'get', $this->savedSearch['api_params']);
@@ -122,7 +175,7 @@ trait SavedSearchInspectorTrait {
    *
    * @return array{fields: array, expr: SqlExpression, dataType: string}[]
    */
-  protected function getSelectClause() {
+  public function getSelectClause() {
     if (!isset($this->_selectClause)) {
       $this->_selectClause = [];
       foreach ($this->_apiParams['select'] as $selectExpr) {
@@ -181,6 +234,17 @@ trait SavedSearchInspectorTrait {
     return !in_array($idField, $apiParams['groupBy']);
   }
 
+  private function renameIfAggregate(string $fieldPath, bool $asSelect = FALSE): string {
+    $renamed = $fieldPath;
+    if ($this->canAggregate($fieldPath)) {
+      $renamed = 'GROUP_CONCAT_' . str_replace(['.', ':'], '_', $fieldPath);
+      if ($asSelect) {
+        $renamed = "GROUP_CONCAT(UNIQUE $fieldPath) AS $renamed";
+      }
+    }
+    return $renamed;
+  }
+
   /**
    * @param string|array $fieldName
    *   If multiple field names are given they will be combined in an OR clause
@@ -218,6 +282,7 @@ trait SavedSearchInspectorTrait {
     foreach ($fieldNames as $fieldName) {
       $field = $this->getField($fieldName);
       $dataType = $field['data_type'] ?? NULL;
+      $operators = array_values($field['operators'] ?? []) ?: CoreUtil::getOperators();
       // Array is either associative `OP => VAL` or sequential `IN (...)`
       if (is_array($value)) {
         $value = array_filter($value, [$this, 'hasValue']);
@@ -225,13 +290,15 @@ trait SavedSearchInspectorTrait {
         if (array_diff_key($value, array_flip(CoreUtil::getOperators()))) {
           // Use IN for regular fields
           if (empty($field['serialize'])) {
-            $filterClauses[] = [$fieldName, 'IN', $value];
+            $op = in_array('IN', $operators, TRUE) ? 'IN' : $operators[0];
+            $filterClauses[] = [$fieldName, $op, $value];
           }
           // Use an OR group of CONTAINS for array fields
           else {
+            $op = in_array('CONTAINS', $operators, TRUE) ? 'CONTAINS' : $operators[0];
             $orGroup = [];
             foreach ($value as $val) {
-              $orGroup[] = [$fieldName, 'CONTAINS', $val];
+              $orGroup[] = [$fieldName, $op, $val];
             }
             $filterClauses[] = ['OR', $orGroup];
           }
@@ -245,17 +312,24 @@ trait SavedSearchInspectorTrait {
           $filterClauses[] = ['AND', $andGroup];
         }
       }
-      elseif (!empty($field['serialize'])) {
+      elseif (!empty($field['serialize']) && in_array('CONTAINS', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, 'CONTAINS', $value];
       }
-      elseif (!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) {
+      elseif ((!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) && in_array('=', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, '=', $value];
       }
-      elseif ($prefixWithWildcard) {
+      elseif ($prefixWithWildcard && in_array('CONTAINS', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, 'CONTAINS', $value];
       }
-      else {
+      elseif (in_array('LIKE', $operators, TRUE)) {
         $filterClauses[] = [$fieldName, 'LIKE', $value . '%'];
+      }
+      elseif (in_array('IN', $operators, TRUE)) {
+        $filterClauses[] = [$fieldName, 'IN', (array) $value];
+      }
+      else {
+        $op = in_array('=', $operators, TRUE) ? '=' : $operators[0];
+        $filterClauses[] = [$fieldName, $op, $value];
       }
     }
     // Single field
@@ -278,6 +352,98 @@ trait SavedSearchInspectorTrait {
    */
   protected function hasValue($value) {
     return $value !== '' && $value !== NULL && (!is_array($value) || array_filter($value, [$this, 'hasValue']));
+  }
+
+  /**
+   * Search a string for all square bracket tokens and return their contents (without the brackets)
+   *
+   * @param string $str
+   * @return array
+   */
+  protected function getTokens(string $str): array {
+    if (strpos($str, '[') === FALSE) {
+      return [];
+    }
+    $tokens = [];
+    preg_match_all('/\\[([^]]+)\\]/', $str, $tokens);
+    return array_unique($tokens[1]);
+  }
+
+  /**
+   * Only SearchKit admins can use unsecured "preview mode" and pass an array for savedSearch or display
+   *
+   * @throws UnauthorizedException
+   */
+  protected function checkPermissionToLoadSearch() {
+    if (
+      (is_array($this->savedSearch) || (isset($this->display) && is_array($this->display))) && $this->checkPermissions &&
+      !\CRM_Core_Permission::check([['administer CiviCRM data', 'administer search_kit']])
+    ) {
+      throw new UnauthorizedException('Access denied');
+    }
+  }
+
+  /**
+   * @param \Civi\Api4\Query\SqlExpression $expr
+   * @return string
+   */
+  protected function getColumnLabel(SqlExpression $expr) {
+    if ($expr instanceof SqlFunction) {
+      $args = [];
+      foreach ($expr->getArgs() as $arg) {
+        foreach ($arg['expr'] ?? [] as $ex) {
+          $args[] = $this->getColumnLabel($ex);
+        }
+      }
+      return '(' . $expr->getTitle() . ')' . ($args ? ' ' . implode(',', array_filter($args)) : '');
+    }
+    if ($expr instanceof SqlEquation) {
+      $args = [];
+      foreach ($expr->getArgs() as $arg) {
+        if (is_array($arg) && !empty($arg['expr'])) {
+          $args[] = $this->getColumnLabel(SqlExpression::convert($arg['expr']));
+        }
+      }
+      return '(' . implode(',', array_filter($args)) . ')';
+    }
+    elseif ($expr instanceof SqlField) {
+      $field = $this->getField($expr->getExpr());
+      $label = '';
+      if (!empty($field['explicit_join'])) {
+        $label = $this->getJoinLabel($field['explicit_join']) . ': ';
+      }
+      if (!empty($field['implicit_join']) && empty($field['custom_field_id'])) {
+        $field = $this->getField(substr($expr->getAlias(), 0, -1 - strlen($field['name'])));
+      }
+      return $label . $field['label'];
+    }
+    else {
+      return NULL;
+    }
+  }
+
+  /**
+   * @param string $joinAlias
+   * @return string
+   */
+  protected function getJoinLabel($joinAlias) {
+    if (!isset($this->_joinMap)) {
+      $this->_joinMap = [];
+      $joinCount = [$this->savedSearch['api_entity'] => 1];
+      foreach ($this->savedSearch['api_params']['join'] ?? [] as $join) {
+        [$entityName, $alias] = explode(' AS ', $join[0]);
+        $num = '';
+        if (!empty($joinCount[$entityName])) {
+          $num = ' ' . (++$joinCount[$entityName]);
+        }
+        else {
+          $joinCount[$entityName] = 1;
+        }
+        $label = CoreUtil::getInfoItem($entityName, 'title');
+        $this->_joinMap[$alias] = $label . $num;
+      }
+    }
+    return $this->_joinMap[$joinAlias];
   }
 
 }

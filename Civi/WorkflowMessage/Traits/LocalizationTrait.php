@@ -20,6 +20,27 @@ trait LocalizationTrait {
   protected $locale;
 
   /**
+   * The language that was requested to be rendered.
+   *
+   * This may not be the rendered locale - as the requested language
+   * might be available. This is primarily for extensions to use in
+   * custom workflow messages.
+   *
+   * The use-case is a bit like this:
+   *
+   * 1. Your organization serves many similar locales (eg es_MX+es_CR+es_HN or en_GB+en_US+en_NZ).
+   * 2. You want to write one message (es_MX) for several locales (es_MX+es_CR+es_HN)
+   * 3. You want to include some conditional content that adapts the recipient's requested locale
+   *    (es_CR) -- _even though_ the template was stored as es_MX. For example your front end
+   *    website has more nuanced translations than your workflow messages and you wish
+   *    to redirect the user to a page on your website.
+   *
+   * @var string|null
+   * @scope tokenContext
+   */
+  protected $requestedLocale;
+
+  /**
    * @return string
    */
   public function getLocale(): ?string {
@@ -32,6 +53,31 @@ trait LocalizationTrait {
    */
   public function setLocale(?string $locale) {
     $this->locale = $locale;
+    return $this;
+  }
+
+  /**
+   * Get the requested locale.
+   *
+   * This may differ from the rendered locale (e.g. if a translation is not
+   * available). It is not used in core but extensions may leverage this
+   * information.
+   *
+   * @return string
+   */
+  public function getRequestedLocale(): ?string {
+    return $this->locale;
+  }
+
+  /**
+   * Set the requested locale.
+   *
+   * @param string|null $requestedLocale
+   *
+   * @return $this
+   */
+  public function setRequestedLocale(?string $requestedLocale): self {
+    $this->requestedLocale = $requestedLocale;
     return $this;
   }
 

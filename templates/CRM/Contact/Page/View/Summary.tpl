@@ -64,7 +64,7 @@
           {/if}
 
         {elseif call_user_func(array('CRM_Core_Permission','check'), 'delete contacts')}
-          <li class="crm-delete-action crm-contact-delete">
+          <li class="crm-contact-delete">
             {crmButton p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId" class="delete" icon="trash"}
               {ts}Delete Contact{/ts}
             {/crmButton}

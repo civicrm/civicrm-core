@@ -19,7 +19,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   /**
    * Get a list of setup-actions.
    *
-   * @return array
+   * @return array{array{title:string, callback: mixed, url: string}}
    *   List of available actions. See description in the hook-docs.
    * @see CRM_Utils_Hook::mailSetupActions()
    */
@@ -31,12 +31,19 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     ];
 
     CRM_Utils_Hook::mailSetupActions($setupActions);
+
+    foreach ($setupActions as $key => &$setupAction) {
+      if (!isset($setupAction['url'])) {
+        $setupAction['url'] = (string) Civi::url('//civicrm/ajax/setupMailAccount')->addQuery(['type' => $key]);
+      }
+    }
+
     return $setupActions;
   }
 
   public static function setupStandardAccount($setupAction) {
     return [
-      'url' => CRM_Utils_System::url('civicrm/admin/mailSettings', 'action=add&reset=1', TRUE, NULL, FALSE),
+      'url' => CRM_Utils_System::url('civicrm/admin/mailSettings/edit', 'action=add&reset=1', TRUE, NULL, FALSE),
     ];
   }
 
@@ -103,19 +110,13 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
@@ -135,8 +136,8 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     }
 
     if (empty($params['id'])) {
-      $params['is_ssl'] = CRM_Utils_Array::value('is_ssl', $params, FALSE);
-      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+      $params['is_ssl'] = $params['is_ssl'] ?? FALSE;
+      $params['is_default'] = $params['is_default'] ?? FALSE;
     }
 
     //handle is_default.

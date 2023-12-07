@@ -6,16 +6,23 @@
  * @group headless
  */
 class api_v3_CaseContactTest extends CiviCaseTestCase {
-  protected $_params;
-  protected $_entity;
-  protected $_cid;
-  protected $_cid2;
+
+  /**
+   * @var array
+   */
+  protected $params;
+
+  /**
+   * @var int
+   */
+  protected $contactID;
+
   /**
    * Activity ID of created case.
    *
-   * @var int
+   * @var array
    */
-  protected $_caseActivityId;
+  protected $case;
 
   /**
    * Test setup for every test.
@@ -24,38 +31,36 @@ class api_v3_CaseContactTest extends CiviCaseTestCase {
    * and redirect stdin to a temporary file.
    */
   public function setUp(): void {
-    $this->_entity = 'case';
-
     parent::setUp();
 
-    $this->_cid = $this->individualCreate();
-    $this->_cid2 = $this->individualCreate([], 1);
+    $this->contactID = $this->individualCreate();
+    $contactID2 = $this->individualCreate([], 1);
 
-    $this->_case = $this->callAPISuccess('case', 'create', [
+    $this->case = $this->callAPISuccess('case', 'create', [
       'case_type_id' => $this->caseTypeId,
       'subject' => __CLASS__,
-      'contact_id' => $this->_cid,
+      'contact_id' => $this->contactID,
     ]);
 
-    $this->_params = [
-      'case_id' => $this->_case['id'],
-      'contact_id' => $this->_cid2,
+    $this->params = [
+      'case_id' => $this->case['id'],
+      'contact_id' => $contactID2,
     ];
   }
 
-  public function testCaseContactGet() {
-    $result = $this->callAPIAndDocument('CaseContact', 'get', [
-      'contact_id' => $this->_cid,
-    ], __FUNCTION__, __FILE__);
-    $this->assertEquals($this->_case['id'], $result['id']);
+  public function testCaseContactGet(): void {
+    $result = $this->callAPISuccess('CaseContact', 'get', [
+      'contact_id' => $this->contactID,
+    ]);
+    $this->assertEquals($this->case['id'], $result['id']);
   }
 
   /**
    * Test create function with valid parameters.
    */
-  public function testCaseContactCreate() {
-    $params = $this->_params;
-    $result = $this->callAPIAndDocument('CaseContact', 'create', $params, __FUNCTION__, __FILE__);
+  public function testCaseContactCreate(): void {
+    $params = $this->params;
+    $result = $this->callAPISuccess('CaseContact', 'create', $params);
     $id = $result['id'];
 
     // Check result

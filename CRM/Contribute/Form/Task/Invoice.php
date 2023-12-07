@@ -138,7 +138,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $this->preventAjaxSubmit();
     $this->assign('isAdmin', CRM_Core_Permission::check('administer CiviCRM'));
 
-    $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE);
+    $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE, ['class' => 'crm-select2 huge']);
     if ($this->_selectedOutput != 'email') {
       $this->addElement('radio', 'output', NULL, ts('Email Invoice'), 'email_invoice');
       $this->addElement('radio', 'output', NULL, ts('PDF Invoice'), 'pdf_invoice');
@@ -149,13 +149,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $this->addRule('from_email_address', ts('From Email Address is required'), 'required');
     }
 
-    $attributes = ['class' => 'huge'];
     $this->addEntityRef('cc_id', ts('CC'), [
       'entity' => 'Email',
       'multiple' => TRUE,
     ]);
-    $this->add('text', 'subject', ts('Subject'), $attributes + ['placeholder' => ts('Optional')]);
-    $this->add('wysiwyg', 'email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), [
+    $this->add('text', 'subject', ts('Replace Subject'), ['class' => 'huge', 'placeholder' => ts('Optional')]);
+    $this->add('wysiwyg', 'email_comment', ts('Additional Message'), [
       'rows' => 2,
       'cols' => 40,
     ]);
@@ -233,10 +232,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $refundedStatusId = CRM_Utils_Array::key('Refunded', $contributionStatusID);
     $cancelledStatusId = CRM_Utils_Array::key('Cancelled', $contributionStatusID);
     $pendingStatusId = CRM_Utils_Array::key('Pending', $contributionStatusID);
-    $pdfFormat = CRM_Core_BAO_PdfFormat::getByName('default_invoice_pdf_format');
-
+    $pdfFormat = CRM_Core_BAO_MessageTemplate::getPDFFormatForTemplate('contribution_invoice_receipt');
     foreach ($elementDetails as $contributionID => $detail) {
-      $input = $ids = [];
+      $input = [];
       if (in_array($detail['contact'], $excludedContactIDs)) {
         continue;
       }
@@ -284,17 +282,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $amountDue = ($input['amount'] - $amountPaid);
 
       // retrieving the subtotal and sum of same tax_rate
-      $dataArray = [];
       $subTotal = 0;
       $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionID);
       foreach ($lineItem as $taxRate) {
-        if (isset($dataArray[(string) $taxRate['tax_rate']])) {
-          $dataArray[(string) $taxRate['tax_rate']] = $dataArray[(string) $taxRate['tax_rate']] + CRM_Utils_Array::value('tax_amount', $taxRate);
-        }
-        else {
-          $dataArray[(string) $taxRate['tax_rate']] = $taxRate['tax_amount'] ?? NULL;
-        }
-        $subTotal += CRM_Utils_Array::value('subTotal', $taxRate);
+        $subTotal += $taxRate['subTotal'] ?? 0;
       }
 
       // to email the invoice
@@ -387,8 +378,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'notes' => $invoiceNotes,
         // @todo not used in shipped template from 5.53
         'lineItem' => $lineItem,
-        // @todo not used in shipped template from 5.53
-        'dataArray' => $dataArray,
         // @todo not used in shipped template from 5.52
         'refundedStatusId' => $refundedStatusId,
         // @todo not used in shipped template from 5.52
@@ -438,6 +427,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'tplParams' => $tplParams,
         'PDFFilename' => $pdfFileName,
         'tokenContext' => ['contributionId' => $contribution->id, 'contactId' => $contribution->contact_id],
+        'modelProps' => [
+          'userEnteredText' => $params['email_comment'] ?? NULL,
+        ],
       ];
 
       // from email address
@@ -506,10 +498,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $fileName = self::putFile($html, $pdfFileName, $pdfFormat);
         self::addActivities($subject, $contribution->contact_id, $fileName, $params, $contribution->id);
       }
-      elseif ($component == 'event') {
+      elseif ($component === 'event') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
 
-        $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => $params['email_comment']]);
+        $sendTemplateParams['tplParams'] = $tplParams;
         $sendTemplateParams['from'] = $fromEmailAddress;
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = $values['cc_confirm'] ?? NULL;

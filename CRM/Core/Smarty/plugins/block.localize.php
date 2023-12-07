@@ -26,17 +26,26 @@
  *   {ts} block contents from the template.
  * @param CRM_Core_Smarty $smarty
  *   The Smarty object.
+ * @param bool $repeat
+ *   Confusing variable that means it's either the opening tag or you can use
+ *   it to signal back not to repeat.
  *
  * @return string
  *   multilingualized query
  */
-function smarty_block_localize($params, $text, &$smarty) {
-  if (!array_key_exists('multilingual', $smarty->_tpl_vars) || !$smarty->_tpl_vars['multilingual']) {
+function smarty_block_localize($params, $text, $smarty, &$repeat) {
+  if ($repeat) {
+    // For opening tag text is always null
+    return '';
+  }
+  $multiLingual = method_exists($smarty, 'get_template_vars') ? $smarty->get_template_vars('multilingual') : $smarty->getTemplateVars('multilingual');
+  if (!$multiLingual) {
     return $text;
   }
 
   $lines = [];
-  foreach ($smarty->_tpl_vars['locales'] as $locale) {
+  $locales = (array) (method_exists($smarty, 'get_template_vars') ? $smarty->get_template_vars('locales') : $smarty->getTemplateVars('locales'));
+  foreach ($locales as $locale) {
     $line = $text;
     if (isset($params['field'])) {
       $fields = explode(',', $params['field']);

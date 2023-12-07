@@ -83,12 +83,16 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
           break;
 
         case 'callback':
-          $args = $snippet['arguments'] ?? array(&$snippet, &$html);
+          $args = $snippet['arguments'] ?? [&$snippet, &$html];
           $html .= call_user_func_array($snippet['callback'], $args);
           break;
 
         case 'scriptUrl':
-          if (!$allowCmsOverride || !$cms->addScriptUrl($snippet['scriptUrl'], $this->_name)) {
+          // ECMAScript Modules (ESMs) are basically Javascript files, but they require a slightly different incantation.
+          if (!empty($snippet['esm'])) {
+            $html .= Civi::service('esm.loader')->renderModule($snippet);
+          }
+          elseif (!$allowCmsOverride || !$cms->addScriptUrl($snippet['scriptUrl'], $this->_name)) {
             $html .= sprintf("<script type=\"text/javascript\" src=\"%s\">\n</script>\n", $snippet['scriptUrl']);
           }
           break;
@@ -107,7 +111,11 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
           break;
 
         case 'script':
-          if (!$allowCmsOverride || !$cms->addScript($snippet['script'], $this->_name)) {
+          // ECMAScript Modules (ESMs) are basically Javascript files, but they require a slightly different incantation.
+          if (!empty($snippet['esm'])) {
+            $html .= Civi::service('esm.loader')->renderModule($snippet);
+          }
+          elseif (!$allowCmsOverride || !$cms->addScript($snippet['script'], $this->_name)) {
             $html .= sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $snippet['script']);
           }
           break;

@@ -22,10 +22,6 @@ use Civi\Api4\CustomGroup;
  */
 class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
-  const PATH = 'civicrm/import/custom';
-
-  const IMPORT_ENTITY = 'Multi value custom data';
-
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
    *
@@ -99,20 +95,11 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    * @throws \CRM_Core_Exception
    */
   public function setDefaultValues(): array {
-    $config = CRM_Core_Config::singleton();
-    $defaults = [
+    return array_merge(parent::setDefaultValues(), [
       'contactType' => 'Individual',
-      'fieldSeparator' => $config->fieldSeparator,
       // Perhaps never used, but permits url passing of the group.
       'multipleCustomData' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
-    ];
-
-    $loadedMapping = $this->get('loadedMapping');
-    if ($loadedMapping) {
-      $defaults['savedMapping'] = $loadedMapping;
-    }
-
-    return $defaults;
+    ]);
   }
 
   /**

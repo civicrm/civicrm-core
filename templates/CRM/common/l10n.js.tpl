@@ -24,6 +24,7 @@
   CRM.config.ajaxPopupsEnabled = {$ajaxPopupsEnabled|@json_encode};
   CRM.config.allowAlertAutodismissal = {$allowAlertAutodismissal|@json_encode};
   CRM.config.resourceCacheCode = {$resourceCacheCode|@json_encode};
+  CRM.config.quickAdd = {$quickAdd|@json_encode};
 
   // Merge entityRef settings
   CRM.config.entityRef = $.extend({ldelim}{rdelim}, {$entityRef|@json_encode}, CRM.config.entityRef || {ldelim}{rdelim});
@@ -124,11 +125,6 @@
     params: {},
     functions: []
   };
-
-  // Load polyfill
-  if (!('Promise' in window)) {
-    CRM.loadScript(CRM.config.resourceBase + 'bower_components/es6-promise/es6-promise.auto.min.js');
-  }
 
 })(jQuery);
 {/literal}

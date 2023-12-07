@@ -96,6 +96,81 @@ class CRM_Extension_Info {
   public $upgrader = NULL;
 
   /**
+   * @var array|null
+   */
+  public $civix;
+
+  /**
+   * @var string|null
+   */
+  public $comments;
+
+  /**
+   * @var array
+   *   Ex: ['ver' => '5.50']
+   */
+  public $compatibility;
+
+  /**
+   * @var string|null
+   */
+  public $description;
+
+  /**
+   * @var string|null
+   *   Ex: 'stable', 'alpha', 'beta'
+   */
+  public $develStage;
+
+  /**
+   * Full URL of the zipball for this extension/version.
+   *
+   * This property is (usually) only provided on the feed of new/available extensions.
+   *
+   * @var string|null
+   */
+  public $downloadUrl;
+
+  /**
+   * @var string|null
+   *   Ex: 'GPL-3.0'
+   */
+  public $license;
+
+  /**
+   * @var string|null
+   *   Ex: '2025-01-02'
+   */
+  public $releaseDate;
+
+  /**
+   * @var array|null
+   *   Ex: ['Documentation' => 'https://example.org/my-extension/docs']
+   */
+  public $urls;
+
+  /**
+   * @var string|null
+   *   Ex: '1.2.3'
+   */
+  public $version;
+
+  /**
+   * @var array
+   */
+  public $typeInfo;
+
+  /**
+   * @var string
+   */
+  public $url;
+
+  /**
+   * @var string
+   */
+  public $category;
+
+  /**
    * Load extension info an XML file.
    *
    * @param string $file
@@ -104,7 +179,7 @@ class CRM_Extension_Info {
    * @return CRM_Extension_Info
    */
   public static function loadFromFile($file) {
-    list ($xml, $error) = CRM_Utils_XML::parseFile($file);
+    [$xml, $error] = CRM_Utils_XML::parseFile($file);
     if ($xml === FALSE) {
       throw new CRM_Extension_Exception_ParseException("Failed to parse info XML: $error");
     }
@@ -124,7 +199,7 @@ class CRM_Extension_Info {
    * @return CRM_Extension_Info
    */
   public static function loadFromString($string) {
-    list ($xml, $error) = CRM_Utils_XML::parseString($string);
+    [$xml, $error] = CRM_Utils_XML::parseString($string);
     if ($xml === FALSE) {
       throw new CRM_Extension_Exception_ParseException("Failed to parse info XML: $string");
     }
@@ -186,8 +261,11 @@ class CRM_Extension_Info {
     // and deeper into arrays. An exception for URLS section, since
     // we want them in special format.
     foreach ($info as $attr => $val) {
-      if (count($val->children()) == 0) {
-        $this->$attr = trim((string) $val);
+      if (!property_exists($this, $attr)) {
+        continue;
+      }
+      if (!count($val->children())) {
+        $this->$attr = is_array($this->$attr) ? [] : trim((string) $val);
       }
       elseif ($attr === 'urls') {
         $this->urls = [];
@@ -260,7 +338,7 @@ class CRM_Extension_Info {
   public function filterRequirements($requirements) {
     $filtered = [];
     $compatInfo = CRM_Extension_System::getCompatibilityInfo();
-    foreach ($requirements->ext as $ext) {
+    foreach ($requirements->ext ?? [] as $ext) {
       $ext = (string) $ext;
       if (empty($compatInfo[$ext]['obsolete'])) {
         $filtered[] = $ext;

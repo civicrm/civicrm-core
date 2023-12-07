@@ -48,8 +48,8 @@ class CRM_Financial_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
 
     // Save to entity_financial_trxn table.
     $entityFinancialTrxnParams = [
-      'entity_table' => CRM_Utils_Array::value('entity_table', $params, 'civicrm_contribution'),
-      'entity_id' => CRM_Utils_Array::value('entity_id', $params, CRM_Utils_Array::value('contribution_id', $params)),
+      'entity_table' => $params['entity_table'] ?? 'civicrm_contribution',
+      'entity_id' => $params['entity_id'] ?? $params['contribution_id'] ?? NULL,
       'financial_trxn_id' => $trxn->id,
       'amount' => $params['total_amount'],
     ];

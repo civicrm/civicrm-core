@@ -1,0 +1,176 @@
+<?php
+// CRM-8358
+return CRM_Core_CodeGen_SqlData::create('civicrm_job')
+  ->addDefaults([
+    'is_active' => 0,
+    'domain_id' => new CRM_Utils_SQL_Literal('@domainID'),
+    'last_run' => NULL,
+    'parameters' => NULL,
+  ])
+  ->addValues([
+    [
+      'run_frequency' => 'Daily',
+      'name' => 'CiviCRM Update Check',
+      'description' => 'Checks for version updates. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_version_check',
+      'api_entity' => 'Job',
+      'api_action' => 'version_check',
+      'is_active' => 1,
+    ],
+    [
+      'run_frequency' => 'Always',
+      'name' => 'Send Scheduled Mailings',
+      'description' => 'Sends out scheduled mailings. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_process_mailing',
+      'api_entity' => 'Job',
+      'api_action' => 'process_mailing',
+    ],
+    [
+      'run_frequency' => 'Hourly',
+      'name' => 'Fetch Bounces',
+      'description' => 'Fetches bounces from mailings. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_fetch_bounces',
+      'api_entity' => 'Job',
+      'api_action' => 'fetch_bounces',
+      'parameters' => 'is_create_activities=0',
+    ],
+    [
+      'run_frequency' => 'Hourly',
+      'name' => 'Process Inbound Emails',
+      'description' => 'Inserts activity for a contact or a case by retrieving inbound emails. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_fetch_activities',
+      'api_entity' => 'Job',
+      'api_action' => 'fetch_activities',
+    ],
+    [
+      'run_frequency' => 'Daily',
+      'name' => 'Process Pledges',
+      'description' => 'Updates pledge records and sends out reminders. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_process_pledge',
+      'api_entity' => 'Job',
+      'api_action' => 'process_pledge',
+      'parameters' => 'send_reminders=0',
+    ],
+    [
+      'run_frequency' => 'Daily',
+      'name' => 'Geocode and Parse Addresses',
+      'description' => 'Geocodes and/or parses street addresses. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_geocode',
+      'api_entity' => 'Job',
+      'api_action' => 'geocode',
+      'parameters' => 'geocoding=1
+      parse=0
+      throttle=0',
+    ],
+    [
+      'run_frequency' => 'Daily',
+      'name' => 'Update Individual Email Greeting',
+      'description' => 'Update Individual Email Greeting. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_update_greeting',
+      'api_entity' => 'Job',
+      'api_action' => 'update_greeting',
+      'parameters' => 'ct=Individual
+gt=email_greeting',
+    ],
+    [
+      'run_frequency' => 'Daily',
+      'name' => 'Update Individual Postal Greeting',
+      'description' => 'Update Individual Postal Greeting. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_update_greeting',
+      'api_entity' => 'Job',
+      'api_action' => 'update_greeting',
+      'parameters' => 'ct=Individual
+gt=postal_greeting',
+    ],
+    [
+      'run_frequency' => 'Daily',
+      'name' => 'Update Individual Addressee',
+      'description' => 'Update Individual Addressee. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_update_greeting',
+      'api_entity' => 'Job',
+      'api_action' => 'update_greeting',
+      'parameters' => 'ct=Individual
+gt=addressee',
+    ],
+    [
+      'run_frequency' => 'Daily',
+      'name' => 'Mail Reports',
+      'description' => 'Generates and sends out reports via email. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_mail_report',
+      'api_entity' => 'Job',
+      'api_action' => 'mail_report',
+      'parameters' => '',
+    ],
+    [
+      'run_frequency' => 'Hourly',
+      'name' => 'Send Scheduled Reminders',
+      'description' => 'Sends out scheduled reminders via email. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_send_reminder',
+      'api_entity' => 'Job',
+      'api_action' => 'send_reminder',
+    ],
+    [
+      'run_frequency' => 'Always',
+      'name' => 'Update Participant Statuses',
+      'description' => 'Updates pending event participant statuses based on time. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_process_participant',
+      'api_entity' => 'Job',
+      'api_action' => 'process_participant',
+    ],
+    [
+      'run_frequency' => 'Daily',
+      'name' => 'Update Membership Statuses',
+      'description' => 'Updates membership statuses. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_process_membership',
+      'api_entity' => 'Job',
+      'api_action' => 'process_membership',
+    ],
+    [
+      'run_frequency' => 'Always',
+      'name' => 'Process Survey Respondents',
+      'description' => 'Releases reserved survey respondents. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_process_respondent',
+      'api_entity' => 'Job',
+      'api_action' => 'process_respondent',
+    ],
+    [
+      'run_frequency' => 'Monthly',
+      'name' => 'Clean-up Temporary Data and Files',
+      'description' => 'Removes temporary data and files. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_cleanup',
+      'api_entity' => 'Job',
+      'api_action' => 'cleanup',
+      'parameters' => 'session=0',
+    ],
+    [
+      'run_frequency' => 'Always',
+      'name' => 'Send Scheduled SMS',
+      'description' => 'Sends out scheduled SMS. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_process_sms',
+      'api_entity' => 'Job',
+      'api_action' => 'process_sms',
+    ],
+    [
+      'run_frequency' => 'Hourly',
+      'name' => 'Rebuild Smart Group Cache',
+      'description' => 'Rebuilds the smart group cache. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_group_rebuild',
+      'api_entity' => 'Job',
+      'api_action' => 'group_rebuild',
+      'parameters' => 'limit=0',
+    ],
+    [
+      'run_frequency' => 'Hourly',
+      'name' => 'Group Cache Flush',
+      'description' => 'Purges aged smart group cache data. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_group_cache_flush',
+      'api_entity' => 'Job',
+      'api_action' => 'group_cache_flush',
+      'parameters' => '',
+    ],
+    [
+      'run_frequency' => 'Daily',
+      'name' => 'Disable expired relationships',
+      'description' => 'Disables relationships that have expired. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_disable_expired_relationships',
+      'api_entity' => 'Job',
+      'api_action' => 'disable_expired_relationships',
+    ],
+    [
+      'run_frequency' => 'Daily',
+      'name' => 'Validate Email Address from Mailings.',
+      'description' => 'Updates the reset_date on an email address. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#mailing_update_email_resetdate',
+      'api_entity' => 'Mailing',
+      'api_action' => 'update_email_resetdate',
+      'parameters' => 'minDays=5
+      maxDays=60',
+    ],
+    [
+      'run_frequency' => 'Daily',
+      'name' => 'Dedupe Contacts',
+      'description' => 'Executes the Individual, Unsupervised redupe rule. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_process_batch_merge',
+      'api_entity' => 'Job',
+      'api_action' => 'process_batch_merge',
+    ],
+  ]);

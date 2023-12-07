@@ -15,9 +15,15 @@ namespace Civi\Api4\Utils;
 use Civi\API\Exception\NotImplementedException;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
+use Civi\Api4\Generic\AbstractAction;
+use Civi\Api4\Service\Schema\SchemaMap;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class CoreUtil {
+
+  public static function entityExists(string $entityName): bool {
+    return (bool) self::getInfoItem($entityName, 'name');
+  }
 
   /**
    * @param $entityName
@@ -26,24 +32,51 @@ class CoreUtil {
    *   The BAO name for use in static calls. Return doc block is hacked to allow
    *   auto-completion of static methods
    */
-  public static function getBAOFromApiName($entityName) {
+  public static function getBAOFromApiName($entityName): ?string {
+    // TODO: It would be nice to just call self::getInfoItem($entityName, 'dao')
+    // but that currently causes test failures, probably due to early-bootstrap issues.
     if ($entityName === 'CustomValue' || strpos($entityName, 'Custom_') === 0) {
-      return 'CRM_Core_BAO_CustomValue';
+      $dao = \Civi\Api4\CustomValue::getInfo()['dao'];
     }
-    $dao = AllCoreTables::getFullName($entityName);
+    else {
+      $dao = AllCoreTables::getFullName($entityName);
+    }
+    if (!$dao && self::isContact($entityName)) {
+      $dao = 'CRM_Contact_DAO_Contact';
+    }
     return $dao ? AllCoreTables::getBAOClassName($dao) : NULL;
   }
 
   /**
-   * @param $entityName
-   * @return string|\Civi\Api4\Generic\AbstractEntity
+   * Returns API entity name given an BAO/DAO class name
+   *
+   * Returns null if the API has not been implemented
+   *
+   * @param $baoClassName
+   * @return string|null
    */
-  public static function getApiClass($entityName) {
+  public static function getApiNameFromBAO($baoClassName): ?string {
+    $briefName = AllCoreTables::getBriefName($baoClassName);
+    return $briefName && self::getApiClass($briefName) ? $briefName : NULL;
+  }
+
+  /**
+   * @param string $entityName
+   * @return string|\Civi\Api4\Generic\AbstractEntity|null
+   */
+  public static function getApiClass(string $entityName): ?string {
     $className = 'Civi\Api4\\' . $entityName;
     if (class_exists($className)) {
       return $className;
     }
     return self::getInfoItem($entityName, 'class');
+  }
+
+  /**
+   * Returns TRUE if `entityName` is 'Contact', 'Individual', 'Organization' or 'Household'
+   */
+  public static function isContact(string $entityName): bool {
+    return $entityName === 'Contact' || in_array($entityName, \CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE);
   }
 
   /**
@@ -55,7 +88,22 @@ class CoreUtil {
    */
   public static function getInfoItem(string $entityName, string $keyToReturn) {
     $provider = \Civi::service('action_object_provider');
-    return $provider->getEntities()[$entityName][$keyToReturn] ?? NULL;
+    $entities = $provider->getEntities();
+    return $entities[$entityName][$keyToReturn] ?? NULL;
+  }
+
+  /**
+   * Check if entity is of given type.
+   *
+   * @param string $entityName
+   *   e.g. 'Contact'
+   * @param string $entityType
+   *   e.g. 'SortableEntity'
+   * @return bool
+   */
+  public static function isType(string $entityName, string $entityType): bool {
+    $entityTypes = (array) self::getInfoItem($entityName, 'type');
+    return in_array($entityType, $entityTypes, TRUE);
   }
 
   /**
@@ -68,23 +116,32 @@ class CoreUtil {
   }
 
   /**
+   * Get name of field(s) to display in search context
+   * @param string $entityName
+   * @return array
+   */
+  public static function getSearchFields(string $entityName): array {
+    return self::getInfoItem($entityName, 'search_fields') ?: [];
+  }
+
+  /**
    * Get table name of given entity
    *
    * @param string $entityName
    *
-   * @return string
+   * @return string|null
    */
-  public static function getTableName($entityName) {
+  public static function getTableName(string $entityName): ?string {
     return self::getInfoItem($entityName, 'table_name');
   }
 
   /**
    * Given a sql table name, return the name of the api entity.
    *
-   * @param $tableName
+   * @param string $tableName
    * @return string|NULL
    */
-  public static function getApiNameFromTableName($tableName) {
+  public static function getApiNameFromTableName($tableName): ?string {
     $provider = \Civi::service('action_object_provider');
     foreach ($provider->getEntities() as $entityName => $info) {
       if (($info['table_name'] ?? NULL) === $tableName) {
@@ -94,31 +151,49 @@ class CoreUtil {
     return NULL;
   }
 
+  public static function getCustomGroupName(string $entityName): ?string {
+    return str_starts_with($entityName, 'Custom_') ? substr($entityName, 7) : NULL;
+  }
+
   /**
    * @return string[]
    */
-  public static function getOperators() {
+  public static function getOperators(): array {
     $operators = \CRM_Core_DAO::acceptedSQLOperators();
     $operators[] = 'CONTAINS';
+    $operators[] = 'NOT CONTAINS';
     $operators[] = 'IS EMPTY';
     $operators[] = 'IS NOT EMPTY';
     $operators[] = 'REGEXP';
     $operators[] = 'NOT REGEXP';
+    $operators[] = 'REGEXP BINARY';
+    $operators[] = 'NOT REGEXP BINARY';
     return $operators;
   }
 
   /**
    * For a given API Entity, return the types of custom fields it supports and the column they join to.
    *
+   * Sort of the inverse of this function:
+   * @see \CRM_Core_BAO_CustomGroup::getEntityForGroup
+   *
    * @param string $entityName
    * @return array{extends: array, column: string, grouping: mixed}|null
    */
-  public static function getCustomGroupExtends(string $entityName) {
+  public static function getCustomGroupExtends(string $entityName): ?array {
+    $contactTypes = \CRM_Contact_BAO_ContactType::basicTypes();
     // Custom_group.extends pretty much maps 1-1 with entity names, except for Contact.
+    if (in_array($entityName, $contactTypes, TRUE)) {
+      return [
+        'extends' => ['Contact', $entityName],
+        'column' => 'id',
+        'grouping' => ['contact_type', 'contact_sub_type'],
+      ];
+    }
     switch ($entityName) {
       case 'Contact':
         return [
-          'extends' => array_merge(['Contact'], array_keys(\CRM_Core_SelectValues::contactType())),
+          'extends' => array_merge(['Contact'], $contactTypes),
           'column' => 'id',
           'grouping' => ['contact_type', 'contact_sub_type'],
         ];
@@ -149,7 +224,7 @@ class CoreUtil {
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  public static function isCustomEntity($customGroupName) {
+  public static function isCustomEntity($customGroupName): bool {
     return $customGroupName && \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupName, 'is_multiple', 'name');
   }
 
@@ -158,14 +233,14 @@ class CoreUtil {
    *
    * @param \Civi\Api4\Generic\AbstractAction $apiRequest
    * @param array $record
-   * @param int|string $userID
-   *   Contact ID of the user we are testing,. 0 for the anonymous user.
-   * @return bool
+   * @param int|null $userID
+   *   Contact ID of the user we are testing, 0 for the anonymous user.
+   * @return bool|null
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\NotImplementedException
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function checkAccessRecord(\Civi\Api4\Generic\AbstractAction $apiRequest, array $record, int $userID) {
+  public static function checkAccessRecord(AbstractAction $apiRequest, array $record, int $userID = NULL): ?bool {
+    $userID = $userID ?? \CRM_Core_Session::getLoggedInContactID() ?? 0;
+    $idField = self::getIdFieldName($apiRequest->getEntityName());
 
     // Super-admins always have access to everything
     if (\CRM_Core_Permission::check('all CiviCRM permissions and ACLs', $userID)) {
@@ -175,8 +250,8 @@ class CoreUtil {
     // For get actions, just run a get and ACLs will be applied to the query.
     // It's a cheap trick and not as efficient as not running the query at all,
     // but BAO::checkAccess doesn't consistently check permissions for the "get" action.
-    if (is_a($apiRequest, '\Civi\Api4\Generic\DAOGetAction')) {
-      return (bool) $apiRequest->addSelect('id')->addWhere('id', '=', $record['id'])->execute()->count();
+    if (is_a($apiRequest, '\Civi\Api4\Generic\AbstractGetAction')) {
+      return (bool) $apiRequest->addSelect($idField)->addWhere($idField, '=', $record[$idField])->execute()->count();
     }
 
     $event = new \Civi\Api4\Event\AuthorizeRecordEvent($apiRequest, $record, $userID);
@@ -227,7 +302,7 @@ class CoreUtil {
   /**
    * @return \Civi\Api4\Service\Schema\SchemaMap
    */
-  public static function getSchemaMap() {
+  public static function getSchemaMap(): SchemaMap {
     $cache = \Civi::cache('metadata');
     $schemaMap = $cache->get('api4.schema.map');
     if (!$schemaMap) {
@@ -246,7 +321,7 @@ class CoreUtil {
    * @return array{name: string, type: string, count: int, table: string|null, key: string|null}[]
    * @throws NotImplementedException
    */
-  public static function getRefCount(string $entityName, $entityId) {
+  public static function getRefCount(string $entityName, $entityId): array {
     $daoName = self::getInfoItem($entityName, 'dao');
     if (!$daoName) {
       throw new NotImplementedException("Cannot getRefCount for $entityName - dao not found.");
@@ -303,6 +378,118 @@ class CoreUtil {
       return ['name', 'label', 'description'];
     }
     return explode(',', $fields);
+  }
+
+  /**
+   * Transforms a raw option list (which could be either a flat or non-associative array)
+   * into an APIv4-compatible format.
+   *
+   * @param array|bool $options
+   * @param array|bool $format
+   * @return array|bool
+   */
+  public static function formatOptionList($options, $format) {
+    if (!$options || !is_array($options)) {
+      return $options ?? FALSE;
+    }
+
+    $formatted = [];
+    $first = reset($options);
+    // Flat array requested
+    if ($format === TRUE) {
+      // Convert non-associative to flat array
+      if (is_array($first) && isset($first['id'])) {
+        foreach ($options as $option) {
+          $formatted[$option['id']] = $option['label'] ?? $option['name'] ?? $option['id'];
+        }
+        return $formatted;
+      }
+      return $options;
+    }
+    // Non-associative array of multiple properties requested
+    foreach ($options as $id => $option) {
+      // Transform a flat list
+      if (!is_array($option)) {
+        $option = [
+          'id' => $id,
+          'name' => $id,
+          'label' => $option,
+        ];
+      }
+      $formatted[] = array_intersect_key($option, array_flip($format));
+    }
+    return $formatted;
+  }
+
+  /**
+   * Gets info about all available sql functions
+   * @return array
+   */
+  public static function getSqlFunctions(): array {
+    $fns = [];
+    $path = 'Civi/Api4/Query/SqlFunction*.php';
+    // Search CiviCRM core + all active extensions
+    $directories = [\Civi::paths()->getPath("[civicrm.root]/$path")];
+    foreach (\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
+      $directories[] = \CRM_Utils_File::addTrailingSlash(dirname($ext['filePath'])) . $path;
+    }
+    foreach ($directories as $directory) {
+      foreach (glob($directory) as $file) {
+        $matches = [];
+        if (preg_match('/(SqlFunction[A-Z_]+)\.php$/', $file, $matches)) {
+          $className = '\Civi\Api4\Query\\' . $matches[1];
+          if (is_subclass_of($className, '\Civi\Api4\Query\SqlFunction')) {
+            $fns[] = [
+              'name' => $className::getName(),
+              'title' => $className::getTitle(),
+              'description' => $className::getDescription(),
+              'params' => $className::getParams(),
+              'category' => $className::getCategory(),
+              'dataType' => $className::getDataType(),
+              'options' => CoreUtil::formatOptionList($className::getOptions(), ['id', 'name', 'label']),
+            ];
+          }
+        }
+      }
+    }
+    return $fns;
+  }
+
+  /**
+   * Sorts fields so that control fields are ordered before the fields they control.
+   *
+   * @param array[] $fields
+   * @return void
+   */
+  public static function topSortFields(array &$fields): void {
+    $indexedFields = array_column($fields, NULL, 'name');
+    $needsSort = [];
+    foreach ($indexedFields as $fieldName => $field) {
+      if (!empty($field['input_attrs']['control_field']) && array_key_exists($field['input_attrs']['control_field'], $indexedFields)) {
+        $needsSort[$fieldName] = [$field['input_attrs']['control_field']];
+      }
+    }
+    // Only fire up the Topological sorter if we actually need it...
+    if ($needsSort) {
+      $fields = [];
+      $sorter = new \MJS\TopSort\Implementations\FixedArraySort();
+      foreach ($indexedFields as $fieldName => $field) {
+        $sorter->add($fieldName, $needsSort[$fieldName] ?? []);
+      }
+      foreach ($sorter->sort() as $fieldName) {
+        $fields[] = $indexedFields[$fieldName];
+      }
+    }
+  }
+
+  /**
+   * Strips leading namespace from a classname
+   * @param string $className
+   * @return string
+   */
+  public static function stripNamespace(string $className): string {
+    $slashPos = strrpos($className, '\\');
+    return $slashPos === FALSE ? $className : substr($className, $slashPos + 1);
   }
 
 }

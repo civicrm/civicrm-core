@@ -1,31 +1,23 @@
 <?php
 
-use Civi\Api4\Entity;
 use Civi\BAO\Import;
 use CRM_Civiimport_ExtensionUtil as E;
-
-// Check if SearchKit is enabled before adding SavedSearches.
-try {
-  if (!Entity::get(FALSE)
-    ->addWhere('name', '=', 'SearchDisplay')
-    ->selectRowCount()
-    ->execute()->count()) {
-    return [];
-  }
-}
-catch (CRM_Core_Exception $e) {
-  return [];
-}
 
 $managedEntities = [];
 $importEntities = Import::getImportTables();
 foreach ($importEntities as $importEntity) {
   try {
-    $fields = array_merge(['_id' => TRUE, '_status' => TRUE, '_status_message' => TRUE], Import::getFieldsForUserJobID($importEntity['user_job_id'], FALSE));
+    $fields = array_merge(['_id' => TRUE, '_status' => TRUE, '_entity_id' => TRUE, '_status_message' => TRUE], Import::getFieldsForUserJobID($importEntity['user_job_id'], FALSE));
   }
   catch (CRM_Core_Exception $e) {
     continue;
   }
+  $fields['_entity_id']['link'] = [
+    'entity' => $fields['_entity_id']['fk_entity'],
+    'action' => 'view',
+    'target' => '_blank',
+    'join' => '_entity_id',
+  ];
   $createdBy = empty($importEntity['created_by']) ? '' : ' (' . E::ts('Created by %1', [$importEntity['created_by'], 'String']) . ')';
   $managedEntities[] = [
     'name' => 'SavedSearch_Import' . $importEntity['user_job_id'],
@@ -52,6 +44,9 @@ foreach ($importEntities as $importEntity) {
         'created_id' => $importEntity['created_id'],
         'description' => ts('Temporary import data'),
         'mapping_id' => NULL,
+      ],
+      'match' => [
+        'name',
       ],
     ],
   ];
@@ -81,6 +76,9 @@ foreach ($importEntities as $importEntity) {
         'description' => ts('Temporary import data'),
         'mapping_id' => NULL,
       ],
+      'match' => [
+        'name',
+      ],
     ],
   ];
   $columns = [];
@@ -92,6 +90,7 @@ foreach ($importEntities as $importEntity) {
       'label' => $field['title'] ?? $field['label'],
       'sortable' => TRUE,
       'editable' => strpos($field['name'], '_') !== 0,
+      'link' => $field['link'] ?? NULL,
     ];
   }
   $managedEntities[] = [
@@ -121,6 +120,10 @@ foreach ($importEntities as $importEntity) {
           'columns' => $columns,
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ];
@@ -175,6 +178,10 @@ foreach ($importEntities as $importEntity) {
           ],
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ];

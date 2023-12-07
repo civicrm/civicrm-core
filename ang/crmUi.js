@@ -399,24 +399,28 @@
         require: '?ngModel',
         link: function (scope, elm, attr, ngModel) {
 
-          var editor = CRM.wysiwyg.create(elm);
-          if (!ngModel) {
-            return;
-          }
+          // Wait for #id to stabilize so the wysiwyg doesn't init with an id like `cke_{{:: fieldId }}`
+          $timeout(function() {
+            var editor = CRM.wysiwyg.create(elm);
 
-          if (attr.ngBlur) {
-            $(elm).on('blur', function() {
-              $timeout(function() {
-                scope.$eval(attr.ngBlur);
+            if (!ngModel) {
+              return;
+            }
+
+            if (attr.ngBlur) {
+              $(elm).on('blur', function() {
+                $timeout(function() {
+                  scope.$eval(attr.ngBlur);
+                });
               });
-            });
-          }
+            }
 
-          ngModel.$render = function(value) {
-            editor.done(function() {
-              CRM.wysiwyg.setVal(elm, ngModel.$viewValue || '');
-            });
-          };
+            ngModel.$render = function(value) {
+              editor.done(function() {
+                CRM.wysiwyg.setVal(elm, ngModel.$viewValue || '');
+              });
+            };
+          });
         }
       };
     })
@@ -716,23 +720,82 @@
     .directive('crmAutocomplete', function () {
       return {
         require: {
+          crmAutocomplete: 'crmAutocomplete',
           ngModel: '?ngModel'
         },
+        priority: 100,
         bindToController: {
-          crmAutocomplete: '<',
-          crmAutocompleteParams: '<'
+          entity: '<crmAutocomplete',
+          crmAutocompleteParams: '<',
+          multi: '<',
+          autoOpen: '<',
+          quickAdd: '<',
+          staticOptions: '<'
+        },
+        link: function(scope, element, attr, ctrl) {
+          // Copied from ng-list but applied conditionally if field is multi-valued
+          var parseList = function(viewValue) {
+            // If the viewValue is invalid (say required but empty) it will be `undefined`
+            if (_.isUndefined(viewValue)) return;
+
+            if (!ctrl.crmAutocomplete.multi) {
+              return viewValue;
+            }
+
+            var list = [];
+
+            if (viewValue) {
+              _.each(viewValue.split(','), function(value) {
+                if (value) {
+                  list.push(_.trim(value));
+                }
+              });
+            }
+
+            return list;
+          };
+
+          if (ctrl.ngModel) {
+            // Ensure widget is updated when model changes
+            ctrl.ngModel.$render = function() {
+              // Trigger change so the Select2 renders the current value,
+              // but only if the value has actually changed (to avoid recursion)
+              // We need to coerce null|false in the model to '' and numbers to strings.
+              // We need 0 not to be equivalent to null|false|''
+              const newValue = (ctrl.ngModel.$viewValue === null || ctrl.ngModel.$viewValue === undefined || ctrl.ngModel.$viewValue === false) ? '' : ctrl.ngModel.$viewValue.toString();
+              if (newValue !== element.val().toString()) {
+                element.val(newValue).change();
+              }
+            };
+
+            // Copied from ng-list
+            ctrl.ngModel.$parsers.push(parseList);
+            ctrl.ngModel.$formatters.push(function(value) {
+              return _.isArray(value) ? value.join(',') : value;
+            });
+
+            // Copied from ng-list
+            ctrl.ngModel.$isEmpty = function(value) {
+              return !value || !value.length;
+            };
+          }
         },
         controller: function($element, $timeout) {
           var ctrl = this;
-          $timeout(function() {
-            $element.crmAutocomplete(ctrl.crmAutocomplete, ctrl.crmAutocompleteParams);
-            // Ensure widget is updated when model changes
-            if (ctrl.ngModel) {
-              ctrl.ngModel.$render = function() {
-                $element.val(ctrl.ngModel.$viewValue || '').change();
-              };
-            }
-          });
+
+          // Intitialize widget, and re-render it every time params change
+          this.$onChanges = function() {
+            // Timeout is to wait for `placeholder="{{ ts(...) }}"` to be resolved
+            $timeout(function() {
+              $element.crmAutocomplete(ctrl.entity, ctrl.crmAutocompleteParams || {}, {
+                multiple: ctrl.multi,
+                // Only auto-open if there are no static options
+                minimumInputLength: ctrl.autoOpen && _.isEmpty(ctrl.staticOptions) ? 0 : 1,
+                static: ctrl.staticOptions || [],
+                quickAdd: ctrl.quickAdd,
+              });
+            });
+          };
         }
       };
     })
@@ -1180,7 +1243,7 @@
           var ts = CRM.ts();
 
           function read() {
-            var htmlVal = element.html();
+            var htmlVal = element.text();
             if (!htmlVal) {
               htmlVal = scope.defaultValue || '';
               element.text(htmlVal);
@@ -1227,6 +1290,19 @@
             });
           });
         }
+      };
+    })
+
+    // Reformat an array of objects for compatibility with select2
+    .factory('formatForSelect2', function() {
+      return function(input, key, label, extra) {
+        return _.transform(input, function(result, item) {
+          var formatted = {id: item[key], text: item[label]};
+          if (extra) {
+            _.merge(formatted, _.pick(item, extra));
+          }
+          result.push(formatted);
+        }, []);
       };
     })
 

@@ -28,8 +28,8 @@
     </thead>
     {if $rows and is_array($rows)}
       {foreach from=$rows item=row}
-        <tr id="action_schedule-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
-          <td class="crm-scheduleReminders-title crm-editable" data-field="title">{$row.title}</td>
+        <tr id="action_schedule-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+          <td class="crm-scheduleReminders-title crm-editable" data-field="title">{$row.title|smarty:nodefaults|purify}</td>
           <td class="crm-scheduleReminders-value">{$row.entity} - {$row.value}</td>
           <td class="crm-scheduleReminders-description">{if $row.absolute_date}{$row.absolute_date|crmDate}{else}{$row.start_action_offset}&nbsp;{$row.start_action_unit}{if $row.start_action_offset > 1}{ts}(s){/ts}{/if}&nbsp;{$row.start_action_condition}&nbsp;{$row.entityDate}{/if}</td>
           <td class="crm-scheduleReminders-title">{$row.status}</td>

@@ -3,6 +3,7 @@ namespace Civi\Setup;
 
 /**
  * Class Model
+ *
  * @package Civi\Setup
  *
  * The `Model` defines the main options and inputs that are used to configure
@@ -32,6 +33,8 @@ namespace Civi\Setup;
  *   Ex: ['::abcd1234ABCD9876'].
  * @property string[] $signKeys
  *   Ex: ['jwt-hs256::abcd1234ABCD9876'].
+ * @property string $deployID
+ *   Ex: '1234ABCD9876'.
  * @property string|NULL $lang
  *   The language of the default dataset.
  *   Ex: 'fr_FR'.
@@ -60,6 +63,10 @@ namespace Civi\Setup;
  *   Keys should be prefixed based on which plugin manages the field.
  *   Values must only be scalars (bool/int/string) and arrays.
  *   Ex: ['opt-in.version-check' => TRUE].
+ * @property array $moFiles
+ *   Open-ended list translations files which should be downloaded. Each entry is a url of an mo-file.
+ *   Provide each entry with en_US langugae code. That code will be replaced with the actual language.
+ *   The default is: ['https://download.civicrm.org/civicrm-l10n-core/mo/en_US/civicrm.mo']
  */
 class Model {
 
@@ -169,6 +176,14 @@ class Model {
       'name' => 'extras',
       'type' => 'array',
       'value' => array(),
+    ));
+    $this->addField(array(
+      'description' => 'l10n download files. The [locale] will be replaced with the selected language.',
+      'name' => 'moFiles',
+      'type' => 'array',
+      'value' => array(
+        'civicrm.mo' => 'https://download.civicrm.org/civicrm-l10n-core/mo/[locale]/civicrm.mo',
+      ),
     ));
   }
 

@@ -21,7 +21,7 @@
 class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
 
   /**
-   * Survet id
+   * Survey id
    *
    * @var int
    */
@@ -50,11 +50,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
     $this->_interviewToRelease = $this->get('interviewToRelease');
     if ($this->_interviewToRelease) {
       //user came from interview form.
-      foreach ([
-        'surveyId',
-        'contactIds',
-        'interviewerId',
-      ] as $fld) {
+      foreach (['surveyId', 'contactIds', 'interviewerId'] as $fld) {
         $this->{"_$fld"} = $this->get($fld);
       }
 

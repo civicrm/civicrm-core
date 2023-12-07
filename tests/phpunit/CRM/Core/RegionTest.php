@@ -40,7 +40,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * When a {crmRegion} is blank and when there are no extra snippets, the
    * output is blank.
    */
-  public function testBlank() {
+  public function testBlank(): void {
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testBlank}{/crmRegion}');
     $expected = '';
@@ -51,7 +51,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * When a {crmRegion} is not blank and when there are no extra snippets,
    * the output is only determined by the {crmRegion} block.
    */
-  public function testDefault() {
+  public function testDefault(): void {
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testDefault}default<br/>{/crmRegion}');
     $expected = 'default<br/>';
@@ -61,7 +61,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Disable the normal content of a {crmRegion} and apply different content from a snippet
    */
-  public function testOverride() {
+  public function testOverride(): void {
     CRM_Core_Region::instance('testOverride')->update('default', [
       'disabled' => TRUE,
     ]);
@@ -78,7 +78,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Test that each of the major content formats are correctly evaluated.
    */
-  public function testAllTypes() {
+  public function testAllTypes(): void {
     CRM_Core_Region::instance('testAllTypes')->add([
       'markup' => 'some-markup<br/>',
     ]);
@@ -136,10 +136,60 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
+  public function esmLoaders(): array {
+    return [
+      ['browser'],
+      ['shim-slow'],
+      ['shim-fast'],
+    ];
+  }
+
+  /**
+   * @dataProvider esmLoaders
+   * @param string $loader
+   */
+  public function testEsm(string $loader) {
+    Civi::settings()->set('esm_loader', $loader);
+
+    $expected = [];
+    $expected['browser'] = "default<br/>" .
+      "<script type=\"module\" src=\"/my%20module.mjs\">\n</script>\n"
+      . "<script type=\"module\">\nimport foo from \"./foobar.mjs\";\n</script>\n";
+    $expected['shim-fast'] = $expected['browser'];
+    $expected['shim-slow'] = "default<br/>" .
+      "<script type=\"module-shim\" src=\"/my%20module.mjs\">\n</script>\n"
+      . "<script type=\"module-shim\">\nimport foo from \"./foobar.mjs\";\n</script>\n";
+
+    CRM_Core_Region::instance('testEsm')->add([
+      'scriptUrl' => '/my%20module.mjs',
+      'esm' => TRUE,
+    ]);
+    CRM_Core_Region::instance('testEsm')->add([
+      'script' => 'import foo from "./foobar.mjs";',
+      'esm' => TRUE,
+    ]);
+
+    $smarty = CRM_Core_Smarty::singleton();
+    $actual = $smarty->fetch('string:{crmRegion name=testEsm}default<br/>{/crmRegion}');
+    $this->assertEquals($expected[$loader], $actual);
+
+    $header = CRM_Core_Region::instance('html-header')->render('');
+    switch ($loader) {
+      case 'shim-fast':
+      case 'shim-slow':
+        $this->assertTrue(str_contains($header, 'es-module-shims'), 'HTML header should have shim');
+        break;
+
+      default:
+        $this->assertFalse(str_contains($header, 'es-module-shims'), 'HTML header should not have shim');
+        break;
+    }
+  }
+
   /**
    * Test of nested arrangement in which one {crmRegion} directly includes another {crmRegion}
    */
-  public function testDirectNest() {
+  public function testDirectNest(): void {
     CRM_Core_Region::instance('testDirectNestOuter')->add([
       'template' => 'string:O={$snippet.weight} ',
       'weight' => -5,
@@ -167,7 +217,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Test of nested arrangement in which one {crmRegion} is enhanced with a snippet which, in turn, includes another {crmRegion}
    */
-  public function testIndirectNest() {
+  public function testIndirectNest(): void {
     CRM_Core_Region::instance('testIndirectNestOuter')->add([
       // Note: all three $snippet references are bound to the $snippet which caused this template to be included,
       // regardless of any nested {crmRegion}s
@@ -187,7 +237,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Output from an inner-region should not be executed verbatim; this is obvious but good to verify
    */
-  public function testNoInjection() {
+  public function testNoInjection(): void {
     CRM_Core_Region::instance('testNoInjectionOuter')->add([
       'template' => 'string:{$snippet.scarystuff} ',
       'scarystuff' => '{$is_outer_scary}',
@@ -210,7 +260,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * Make sure that standard Smarty variables ($smarty->assign(...)) as well
    * as the magical $snippet variable both evaluate correctly.
    */
-  public function testSmartyVars() {
+  public function testSmartyVars(): void {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('extrainfo', 'one');
     CRM_Core_Region::instance('testSmartyVars')->add([
@@ -227,7 +277,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function testWeight() {
+  public function testWeight(): void {
     CRM_Core_Region::instance('testWeight')->add([
       'markup' => 'prepend-5<br/>',
       'weight' => -5,

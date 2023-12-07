@@ -31,6 +31,41 @@ trait CRM_Core_Form_EntityFormTrait {
   protected $_entitySubTypeId = NULL;
 
   /**
+   * Deletion message to be assigned to the form.
+   *
+   * Depending on the screen, the deletionMessage may be plain-text (`{$deletionMessage|escape}`)
+   * or HTML (`{$deletionMessage|smarty:nodefaults}`). Be sure your controller+template agree.
+   *
+   * @var string
+   */
+  protected $deleteMessage;
+
+  /**
+   * Fields for the entity to be assigned to the template.
+   *
+   * Fields may have keys
+   *  - name (required to show in tpl from the array)
+   *  - description (optional, will appear below the field)
+   *  - not-auto-addable - this class will not attempt to add the field using addField.
+   *    (this will be automatically set if the field does not have html in it's metadata
+   *    or is not a core field on the form's entity).
+   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
+   *  - template - use a field specific template to render this field
+   *  - required
+   *  - is_freeze (field should be frozen).
+   *
+   * @var array
+   */
+  protected $entityFields = [];
+
+  /**
+   * Metadata from getfields API call for the current entity.
+   *
+   * @var array
+   */
+  protected $metadata = [];
+
+  /**
    * Get entity fields for the entity to be added to the form.
    *
    * @return array
@@ -138,13 +173,12 @@ trait CRM_Core_Form_EntityFormTrait {
     $this->applyFilter('__ALL__', 'trim');
     $this->addEntityFieldsToTemplate();
     foreach ($this->entityFields as $index => $fields) {
-      $this->entityFields[$index] = array_merge([
+      $this->entityFields[$index] = array_replace_recursive([
         'template' => '',
-        'help' => [],
-        'pre_html_text' => '',
+        'help' => ['id' => '', 'file' => ''],
         'post_html_text' => '',
         'description' => '',
-        'documentation_link' => '',
+        'documentation_link' => ['page' => '', 'resource' => ''],
       ], $fields);
     }
     $this->assign('entityFields', $this->entityFields);
@@ -213,7 +247,7 @@ trait CRM_Core_Form_EntityFormTrait {
         $defaults[$fieldSpec['name']] = $value;
       }
       // Store a list of fields with money formatters
-      if (CRM_Utils_Array::value('formatter', $fieldSpec) == 'crmMoney') {
+      if (($fieldSpec['formatter'] ?? NULL) == 'crmMoney') {
         $moneyFields[] = $entityFieldName;
       }
     }

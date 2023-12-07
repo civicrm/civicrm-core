@@ -133,7 +133,7 @@
   <field>
     <name>source</name>
     <uniqueName>membership_source</uniqueName>
-    <title>Source</title>
+    <title>Membership Source</title>
     <import>true</import>
     <headerPattern>/^(member(ship?))?source$/i</headerPattern>
     <type>varchar</type>
@@ -296,7 +296,7 @@
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
-      <prefetch>FALSE</prefetch>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
   </field>
   <foreignKey>

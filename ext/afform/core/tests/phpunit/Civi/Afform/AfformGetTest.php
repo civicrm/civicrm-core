@@ -13,7 +13,7 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
   private $formName = 'abc_123_test';
 
   public function setUpHeadless() {
-    return \Civi\Test::headless()->installMe(__DIR__)->apply();
+    return \Civi\Test::headless()->installMe(__DIR__)->install('org.civicrm.search_kit')->apply();
   }
 
   public function tearDown(): void {
@@ -34,6 +34,10 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertEquals($this->formName, $result['name']);
     $this->assertArrayNotHasKey('directive_name', $result);
     $this->assertArrayNotHasKey('has_base', $result);
+    // Check modified date is reasonable
+    $this->assertGreaterThan('2023-01-01 12:00:00', $result['modified_date']);
+    // Hopefully this test won't need updating for the next 2000 years or so...
+    $this->assertLessThan('4000-01-01 12:00:00', $result['modified_date']);
 
     // Select * should also return regular fields only
     $result = Afform::get()
@@ -55,8 +59,26 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertArrayNotHasKey('base_module', $result);
   }
 
+  public function testGetLayoutWithEmptyNode() {
+    Afform::create(FALSE)
+      ->addValue('name', $this->formName)
+      ->addValue('title', 'Test Form')
+      ->addValue('layout', '<af-form><af-entity name="a"></af-entity><div></div></af-form>')
+      ->execute();
+
+    $layout = Afform::get(FALSE)
+      ->addWhere('name', '=', $this->formName)
+      ->execute()->single()['layout'];
+
+    // Ensure container elements like <div> always have #children even if empty
+    $this->assertEquals([], $layout[0]['#children'][1]['#children']);
+    $this->assertArrayNotHasKey('#children', $layout[0]['#children'][0]);
+  }
+
   public function testAfformAutocomplete(): void {
-    $title = uniqid();
+    // Use a numeric title to test that the "search by id" feature
+    // doesn't kick in for Afforms (which don't have a numeric "id")
+    $title = (string) rand(1000, 999999);
     Afform::create()
       ->addValue('name', $this->formName)
       ->addValue('title', $title)

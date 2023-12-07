@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Enduser Tell-a-Friend form. *}
-{if $status eq 'thankyou' } {* Form has been submitted. *}
+{if $status eq 'thankyou'} {* Form has been submitted. *}
     <div class="crm-section tell_friend_thankyou-section">
         {$thankYouText}
     </div>
@@ -81,5 +81,5 @@
   {else}
     {capture assign=pageURL}{crmURL p='civicrm/contribute/transact' q="reset=1&amp;id=`$entityID`" a=1 fe=1 h=1}{/capture}
   {/if}
-  {include file="CRM/common/SocialNetwork.tpl" url=$pageURL title=$title pageURL=$pageURL}
+  {include file="CRM/common/SocialNetwork.tpl" url=$pageURL title=$title pageURL=$pageURL emailMode=false}
 {/if}

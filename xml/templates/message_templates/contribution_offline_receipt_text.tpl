@@ -1,8 +1,9 @@
 {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
 
-{if !empty($formValues.receipt_text)}
-{$formValues.receipt_text}
-{else}{ts}Below you will find a receipt for this contribution.{/ts}{/if}
+{if {contribution.contribution_page_id.receipt_text|boolean}}
+{contribution.contribution_page_id.receipt_text}
+{elseif {contribution.paid_amount|boolean}} {ts}Below you will find a receipt for this contribution.{/ts}
+{/if}
 
 ===========================================================
 {ts}Contribution Information{/ts}
@@ -17,22 +18,22 @@
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
 {capture assign=ts_qty}{ts}Qty{/ts}{/capture}
 {capture assign=ts_each}{ts}Each{/ts}{/capture}
-{if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+{if $isShowTax && {contribution.tax_amount|boolean}}
 {capture assign=ts_subtotal}{ts}Subtotal{/ts}{/capture}
 {capture assign=ts_taxRate}{ts}Tax Rate{/ts}{/capture}
 {capture assign=ts_taxAmount}{ts}Tax Amount{/ts}{/capture}
 {/if}
 {capture assign=ts_total}{ts}Total{/ts}{/capture}
-{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"}
+{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if $isShowTax && {contribution.tax_amount|boolean}} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"}
 ----------------------------------------------------------
 {foreach from=$lineItems item=line}
-{capture assign=ts_item}{$line.title}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}{$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""} {$line.tax_rate|string_format:"%.2f"} %   {$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"} {else}                  {/if} {/if}   {$line.line_total+$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"}
+{capture assign=ts_item}{$line.title}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $isShowTax && {contribution.tax_amount|boolean}}{$line.line_total|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""} {$line.tax_rate|string_format:"%.2f"} %   {$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"} {else}                  {/if} {/if}   {$line.line_total_inclusive|crmMoney:'{contribution.currency}'|string_format:"%10s"}
 {/foreach}
 {/if}
 
 
-{if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
-{ts}Amount before Tax{/ts} : {$formValues.total_amount-$totalTaxAmount|crmMoney:$currency}
+{if $isShowTax && {contribution.tax_amount|boolean}}
+{ts}Amount before Tax{/ts} : {contribution.tax_exclusive_amount}
 {/if}
 {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
 {if $taxRate == 0}{ts}No{/ts} {$taxTerm}{else}{$taxTerm} {$taxDetail.percentage}%{/if} : {$taxDetail.amount|crmMoney:'{contribution.currency}'}
@@ -43,12 +44,12 @@
 {/if}
 {ts}Total Amount{/ts} : {contribution.total_amount}
 {if '{contribution.receive_date}'}
-{ts}Date Received{/ts}: {contribution.receive_date|crmDate:"shortdate"}
+{ts}Contribution Date{/ts}: {contribution.receive_date|crmDate:"shortdate"}
 {/if}
 {if '{contribution.receipt_date}'}
 {ts}Receipt Date{/ts}: {contribution.receipt_date|crmDate:"shortdate"}
 {/if}
-{if '{contribution.payment_instrument_id}' and empty($formValues.hidden_CreditCard)}
+{if {contribution.payment_instrument_id|boolean} && {contribution.paid_amount|boolean}}
 {ts}Paid By{/ts}: {contribution.payment_instrument_id:label}
 {if '{contribution.check_number}'}
 {ts}Check Number{/ts}: {contribution.check_number}

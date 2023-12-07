@@ -9,6 +9,6 @@
 {ts}Membership Status{/ts}: {$membership_status}
 {if $mem_start_date}{ts}Membership Start Date{/ts}: {$mem_start_date|crmDate}
 {/if}
-{if $mem_end_date}{ts}Membership End Date{/ts}: {$mem_end_date|crmDate}
+{if $mem_end_date}{ts}Membership Expiration Date{/ts}: {$mem_end_date|crmDate}
 {/if}
 

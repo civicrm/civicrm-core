@@ -23,11 +23,10 @@ class TextClickTrackerTest extends \CiviUnitTestCase {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
-      $manager->install(array('org.civicrm.flexmailer'));
+      $manager->install(['org.civicrm.flexmailer']);
     }
 
     parent::setUp();
-    \Civi::settings()->set('flexmailer_traditional', 'flexmailer');
   }
 
   public function getHrefExamples() {
@@ -46,19 +45,14 @@ class TextClickTrackerTest extends \CiviUnitTestCase {
       '<p><a href=\'tracking(https://sub.example.com/foo.php?whiz=%2Fbang%2F&pie[fruit]=apple)\' rel=\'nofollow\'>Foo</a></p>',
     ];
     $exs[] = [
-      // Messy looking URL, designed to trip-up quote handling
+      // Messy looking URL, designed to trip-up quote handling, no tracking as no http
       '<p><a href="javascript:alert(\'Cheese\')">Foo</a></p>',
-      '<p><a href="tracking(javascript:alert(\'Cheese\'))" rel=\'nofollow\'>Foo</a></p>',
+      '<p><a href="javascript:alert(\'Cheese\')" rel=\'nofollow\'>Foo</a></p>',
     ];
     $exs[] = [
-      // Messy looking URL, designed to trip-up quote handling
+      // Messy looking URL, designed to trip-up quote handling, no tracking as no http
       '<p><a href=\'javascript:alert("Cheese")\'>Foo</a></p>',
-      '<p><a href=\'tracking(javascript:alert("Cheese"))\' rel=\'nofollow\'>Foo</a></p>',
-    ];
-    $exs[] = [
-      // Messy looking URL, funny whitespace
-      '<p><a href="http://example.com/' . "\n" . 'weird">Foo</a></p>',
-      '<p><a href="tracking(http://example.com/' . "\n" . 'weird)" rel=\'nofollow\'>Foo</a></p>',
+      '<p><a href=\'javascript:alert("Cheese")\' rel=\'nofollow\'>Foo</a></p>',
     ];
     $exs[] = [
       // Messy looking URL, funny whitespace
@@ -70,7 +64,11 @@ class TextClickTrackerTest extends \CiviUnitTestCase {
       '<p><a href="http://example.com/1">First</a><a href="http://example.com/2">Second</a><a href=\'http://example.com/3\'>Third</a><a href="http://example.com/4">Fourth</a></p>',
       '<p><a href="tracking(http://example.com/1)" rel=\'nofollow\'>First</a><a href="tracking(http://example.com/2)" rel=\'nofollow\'>Second</a><a href=\'tracking(http://example.com/3)\' rel=\'nofollow\'>Third</a><a href="tracking(http://example.com/4)" rel=\'nofollow\'>Fourth</a></p>',
     ];
-
+    $exs[] = [
+      // Messy looking URL, including hyphens
+      '<p><a href=\'https://sub.example-url.com/foo-bar.php?whiz=%2Fbang%2F&pie[fruit]=apple-pie\'>Foo</a></p>',
+      '<p><a href=\'tracking(https://sub.example-url.com/foo-bar.php?whiz=%2Fbang%2F&pie[fruit]=apple-pie)\' rel=\'nofollow\'>Foo</a></p>',
+    ];
     return $exs;
   }
 

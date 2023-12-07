@@ -28,6 +28,13 @@ use Civi\Payment\Exception\PaymentProcessorException;
 class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
 
   /**
+   * Payment Processor Mode
+   *   either test or live
+   * @var string
+   */
+  protected $_mode;
+
+  /**
    * Constructor.
    *
    * @param string $mode

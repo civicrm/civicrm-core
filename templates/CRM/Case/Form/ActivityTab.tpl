@@ -31,12 +31,12 @@
         </tr>
         <tr>
           <td class="crm-case-caseview-form-block-activity_date_low">
-            {assign var=activitylow  value=activity_date_low_$caseID}
+            {assign var=activitylow  value="activity_date_low_`$caseID`"}
             {$form.$activitylow.label}<br />
             {$form.$activitylow.html}
           </td>
           <td class="crm-case-caseview-form-block-activity_date_high">
-            {assign var=activityhigh  value=activity_date_high_$caseID}
+            {assign var=activityhigh  value="activity_date_high_`$caseID`"}
             {$form.$activityhigh.label}<br />
             {$form.$activityhigh.html}
           </td>

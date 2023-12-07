@@ -170,12 +170,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
     $groups = [];
 
-    foreach ([
-      'name',
-      'group_id',
-      'is_sms',
-      'sms_provider_id',
-    ] as $n) {
+    foreach (['name', 'group_id', 'is_sms', 'sms_provider_id'] as $n) {
       if (!empty($values[$n])) {
         $params[$n] = $values[$n];
         if ($n == 'sms_provider_id') {
@@ -237,10 +232,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       $mailingTableName = CRM_Mailing_BAO_Mailing::getTableName();
 
       // delete previous includes/excludes, if mailing already existed
-      foreach ([
-        'groups',
-        'mailings',
-      ] as $entity) {
+      foreach (['groups', 'mailings'] as $entity) {
         $mg = new CRM_Mailing_DAO_MailingGroup();
         $mg->mailing_id = $ids['mailing_id'];
         $mg->entity_table = ($entity == 'groups') ? $groupTableName : $mailingTableName;
@@ -264,7 +256,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     // also compute the recipients and store them in the mailing recipients table
     CRM_Mailing_BAO_Mailing::getRecipients($mailing->id);
 
-    $count = CRM_Mailing_BAO_Recipients::mailingSize($mailing->id);
+    $count = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing->id);
     $this->set('count', $count);
     $this->assign('count', $count);
     $this->set('groups', $groups);

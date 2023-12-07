@@ -234,32 +234,34 @@ class CRM_Core_Permission {
       return TRUE;
     }
 
-    if (self::check('administer CiviCRM data', $userId)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return self::check('administer CiviCRM data', $userId);
   }
 
   /**
+   * Returns the ids of all custom groups the user is permitted to perform action of "$type"
+   *
    * @param int $type
+   *   Type of action e.g. CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT
    * @param bool $reset
+   *   Flush cache
    * @param int $userId
    *
-   * @return array
+   * @return int[]
    */
   public static function customGroup($type = CRM_Core_Permission::VIEW, $reset = FALSE, $userId = NULL) {
     $customGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id',
       ['fresh' => $reset]);
-    $defaultGroups = [];
 
-    // check if user has all powerful permission
-    // or administer civicrm permission (CRM-1905)
+    // Administrators and users with 'access all custom data' can see all custom groups.
     if (self::customGroupAdmin($userId)) {
       return array_keys($customGroups);
     }
 
-    return CRM_ACL_API::group($type, $userId, 'civicrm_custom_group', $customGroups, $defaultGroups);
+    // By default, users without 'access all custom data' are permitted to see no groups.
+    $allowedGroups = [];
+
+    // Allow ACLs and hooks to grant permissions to certain groups.
+    return CRM_ACL_API::group($type, $userId, 'civicrm_custom_group', $customGroups, $allowedGroups);
   }
 
   /**
@@ -525,17 +527,9 @@ class CRM_Core_Permission {
     }
 
     // if component_id is present, ensure it is enabled
-    if (isset($item['component_id']) && $item['component_id']) {
-      if (!isset(Civi::$statics[__CLASS__]['componentNameId'])) {
-        Civi::$statics[__CLASS__]['componentNameId'] = array_flip(CRM_Core_Component::getComponentIDs());
-      }
-      $componentName = Civi::$statics[__CLASS__]['componentNameId'][$item['component_id']];
-
-      $config = CRM_Core_Config::singleton();
-      if (is_array($config->enableComponents) && in_array($componentName, $config->enableComponents)) {
-        // continue with process
-      }
-      else {
+    if (!empty($item['component_id'])) {
+      $componentName = CRM_Core_Component::getComponentName($item['component_id']);
+      if (!$componentName || !CRM_Core_Component::isEnabled($componentName)) {
         return FALSE;
       }
     }
@@ -549,7 +543,7 @@ class CRM_Core_Permission {
 
     // check whether the following Ajax requests submitted the right key
     // FIXME: this should be integrated into ACLs proper
-    if (CRM_Utils_Array::value('page_type', $item) == 3) {
+    if (($item['page_type'] ?? NULL) == 3) {
       if (!CRM_Core_Key::validate($_REQUEST['key'], $item['path'])) {
         return FALSE;
       }
@@ -784,7 +778,7 @@ class CRM_Core_Permission {
 
       'view all notes' => [
         $prefix . ts('view all notes'),
-        ts("View notes (for visible contacts) even if they're marked admin only"),
+        ts("View notes (for visible contacts) even if they're marked author only"),
       ],
       'add contact notes' => [
         $prefix . ts('add contact notes'),
@@ -998,9 +992,6 @@ class CRM_Core_Permission {
       'get' => [],
       // managed by _civicrm_api3_check_edit_permissions
       'update' => [],
-      'getquick' => [
-        ['access CiviCRM', 'access AJAX API'],
-      ],
       'duplicatecheck' => [
         'access CiviCRM',
       ],
@@ -1157,7 +1148,11 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['line_item'] = $permissions['contribution'];
-    $permissions['product'] = $permissions['contribution'];
+    $permissions['product'] = $permissions['premiums'] = $permissions['premiums_product'] = $permissions['contribution'];
+    // Add 'make online contributions' permissions to allow anon users to access these entities
+    // (permissions are controlled by financial ACLs)
+    $permissions['product']['get'] = $permissions['premium']['get'] = $permissions['premiums_product']['get'] = [['access CiviCRM', 'access CiviContribute', 'make online contributions']];
+    $permissions['product']['meta'] = $permissions['premium']['meta'] = $permissions['premiums_product']['meta'] = [['access CiviCRM', 'access CiviContribute', 'make online contributions']];
 
     $permissions['financial_item'] = $permissions['contribution'];
     $permissions['financial_type']['get'] = $permissions['contribution']['get'];
@@ -1247,7 +1242,7 @@ class CRM_Core_Permission {
     ];
 
     // Price sets are shared by several components, user needs access to at least one of them
-    $permissions['price_set'] = [
+    $permissions['price_set'] = $permissions['price_field'] = $permissions['price_field_value'] = $permissions['price_set_entity'] = [
       'default' => [
         ['access CiviEvent', 'access CiviContribute', 'access CiviMember'],
       ],
@@ -1264,6 +1259,7 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['files_by_entity'] = $permissions['file'];
+    $permissions['entity_file'] = $permissions['file'];
 
     // Group permissions
     $permissions['group'] = [
@@ -1518,6 +1514,12 @@ class CRM_Core_Permission {
         'access CiviCRM',
       ],
     ];
+    $permissions['mapping'] = [
+      'default' => [
+        'access CiviCRM',
+      ],
+    ];
+    $permissions['mapping_field'] = $permissions['mapping'];
 
     $permissions['saved_search'] = [
       'default' => ['administer CiviCRM data'],
@@ -1573,6 +1575,12 @@ class CRM_Core_Permission {
 
     $permissions['custom_value'] = [
       'gettree' => ['access CiviCRM'],
+    ];
+
+    $permissions['location_type'] = [
+      'get' => ['access CiviCRM'],
+      'update' => ['administer CiviCRM data'],
+      'delete' => ['administer CiviCRM data'],
     ];
 
     $permissions['message_template'] = [

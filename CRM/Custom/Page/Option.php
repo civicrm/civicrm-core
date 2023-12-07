@@ -68,22 +68,26 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
           'url' => 'civicrm/admin/custom/group/field/option',
           'qs' => 'action=view&id=%%id%%&fid=%%fid%%',
           'title' => ts('View Multiple Choice Option'),
+          'weight' => -20,
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Multiple Choice Option'),
+          'weight' => 40,
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Multiple Choice Option'),
+          'weight' => 30,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/custom/group/field/option',
           'qs' => 'action=delete&id=%%id%%&fid=%%fid%%',
           'title' => ts('Delete Multiple Choice Option'),
+          'weight' => 100,
         ],
       ];
     }
@@ -163,8 +167,8 @@ WHERE  option_group_id = %1";
         [1 => $reusedNames]
       );
       CRM_Utils_System::setTitle($newTitle);
-      $this->assign('reusedNames', $reusedNames);
     }
+    $this->assign('reusedNames', !empty($reusedNames) ? $reusedNames : NULL);
     $this->assign('optionGroupID', $optionGroupID);
   }
 

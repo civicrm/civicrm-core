@@ -63,6 +63,7 @@ class CRM_Batch_BAO_EntityBatch extends CRM_Batch_DAO_EntityBatch {
    * @return CRM_Batch_DAO_EntityBatch
    */
   public static function del($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     if (!is_array($params)) {
       $params = ['id' => $params];
     }

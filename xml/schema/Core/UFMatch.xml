@@ -58,13 +58,19 @@
     <fieldName>uf_id</fieldName>
     <add>3.3</add>
   </index>
+  <index>
+    <name>UI_uf_match_uf_id_domain_id</name>
+    <fieldName>uf_id</fieldName>
+    <fieldName>domain_id</fieldName>
+    <add>5.69</add>
+  </index>
   <field>
     <name>uf_name</name>
     <title>CMS Unique Identifier</title>
     <type>varchar</type>
     <length>128</length>
     <comment>UF Name</comment>
-    <add>1.9.kabissa</add>
+    <add>1.9</add>
   </field>
   <field>
     <name>contact_id</name>

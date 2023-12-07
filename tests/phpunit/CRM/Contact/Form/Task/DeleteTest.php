@@ -41,7 +41,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
   /**
    * Test delete to trash.
    */
-  public function testDeleteToTrash() {
+  public function testDeleteToTrash(): void {
     $old_undelete_setting = Civi::settings()->get('contact_undelete');
     Civi::settings()->set('contact_undelete', '1');
 
@@ -66,7 +66,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
   /**
    * Test restore from trash.
    */
-  public function testRestoreFromTrash() {
+  public function testRestoreFromTrash(): void {
     // First, put in trash.
     $this->testDeleteToTrash();
     // Clear session status
@@ -100,7 +100,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
    * This is different from testDeleteWithoutTrash. This is where you have
    * trash enabled and first move to trash, then delete from the trash.
    */
-  public function testDeletePermanently() {
+  public function testDeletePermanently(): void {
     // First, put in trash.
     $this->testDeleteToTrash();
     // Clear session status
@@ -134,7 +134,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
    * This is different from testDeletePermanently. This is where trash is
    * not enabled at all.
    */
-  public function testDeleteWithoutTrash() {
+  public function testDeleteWithoutTrash(): void {
     $old_undelete_setting = Civi::settings()->get('contact_undelete');
     Civi::settings()->set('contact_undelete', '0');
 

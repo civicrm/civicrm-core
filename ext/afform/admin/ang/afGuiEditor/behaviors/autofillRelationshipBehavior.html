@@ -1,0 +1,8 @@
+<input title="{{:: behavior.title }}" crm-ui-select="{data: behavior.options, placeholder: ts('None')}" class="form-control" ng-model="$ctrl.entity[behavior.key]">
+
+<p class="help-block" ng-show="!$ctrl.entity.autofill">{{:: behavior.description }}</p>
+
+<div ng-if="$ctrl.entity.autofill && $ctrl.entity.autofill.indexOf('relationship:') === 0">
+  <autofill-relationship-behavior-form entity="$ctrl.entity" rel-types="behavior.modes" selected-type="$ctrl.entity.autofill">
+  </autofill-relationship-behavior-form>
+</div>

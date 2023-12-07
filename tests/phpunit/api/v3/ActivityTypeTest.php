@@ -44,16 +44,16 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_type_get().
    */
-  public function testActivityTypeGet() {
+  public function testActivityTypeGet(): void {
     $params = [];
-    $result = $this->callAPIAndDocument('activity_type', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('activity_type', 'get', $params);
     $this->assertEquals($result['values']['1'], 'Meeting');
   }
 
   /**
    * Test civicrm_activity_type_create().
    */
-  public function testActivityTypeCreate() {
+  public function testActivityTypeCreate(): void {
     $params = [
       'weight' => '2',
       'label' => 'send out letters',
@@ -62,13 +62,13 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
       'is_optgroup' => 1,
       'is_default' => 0,
     ];
-    $result = $this->callAPIAndDocument('activity_type', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('activity_type', 'create', $params);
   }
 
   /**
    * Test civicrm_activity_type_create - check id
    */
-  public function testActivityTypecreatecheckId() {
+  public function testActivityTypecreatecheckId(): void {
     $params = [
       'label' => 'type_create',
       'weight' => '2',
@@ -81,7 +81,7 @@ class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_type_delete()
    */
-  public function testActivityTypeDelete() {
+  public function testActivityTypeDelete(): void {
     $params = [
       'label' => 'type_create_delete',
       'weight' => '2',

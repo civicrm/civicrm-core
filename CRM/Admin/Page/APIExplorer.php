@@ -21,29 +21,6 @@
 class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
 
   /**
-   * Return unique paths for checking for examples.
-   * @return array
-   */
-  private static function uniquePaths() {
-    // Ensure that paths with trailing slashes are properly dealt with
-    $paths = explode(PATH_SEPARATOR, get_include_path());
-    foreach ($paths as $id => $rawPath) {
-      $pathParts = explode(DIRECTORY_SEPARATOR, $rawPath);
-      foreach ($pathParts as $partId => $part) {
-        if (empty($part)) {
-          unset($pathParts[$partId]);
-        }
-      }
-      $newRawPath = implode(DIRECTORY_SEPARATOR, $pathParts);
-      if ($newRawPath != $rawPath) {
-        $paths[$id] = DIRECTORY_SEPARATOR . $newRawPath;
-      }
-    }
-    $paths = array_unique($paths);
-    return $paths;
-  }
-
-  /**
    * Run page.
    *
    * @return string
@@ -57,23 +34,6 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
 
     $this->assign('operators', CRM_Core_DAO::acceptedSQLOperators());
 
-    // List example directories
-    // use get_include_path to ensure that extensions are captured.
-    $examples = [];
-    $paths = self::uniquePaths();
-    foreach ($paths as $path) {
-      $dir = \CRM_Utils_File::addTrailingSlash($path) . 'api' . DIRECTORY_SEPARATOR . 'v3' . DIRECTORY_SEPARATOR . 'examples';
-      if (\CRM_Utils_File::isDir($dir)) {
-        foreach (scandir($dir) as $item) {
-          if ($item && strpos($item, '.') === FALSE && array_search($item, $examples) === FALSE) {
-            $examples[] = $item;
-          }
-        }
-      }
-    }
-    sort($examples);
-    $this->assign('examples', $examples);
-
     return parent::run();
   }
 
@@ -85,44 +45,6 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
    */
   public function userContext() {
     return 'civicrm/api';
-  }
-
-  /**
-   * AJAX callback to fetch examples.
-   */
-  public static function getExampleFile() {
-    if (!empty($_GET['entity']) && strpos($_GET['entity'], '.') === FALSE) {
-      $examples = [];
-      $paths = self::uniquePaths();
-      foreach ($paths as $path) {
-        $dir = \CRM_Utils_File::addTrailingSlash($path) . 'api' . DIRECTORY_SEPARATOR . 'v3' . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . $_GET['entity'];
-        if (\CRM_Utils_File::isDir($dir)) {
-          foreach (scandir($dir) as $item) {
-            $item = str_replace('.ex.php', '', $item);
-            if ($item && strpos($item, '.') === FALSE) {
-              $examples[] = ['key' => $item, 'value' => $item];
-            }
-          }
-        }
-      }
-      CRM_Utils_JSON::output($examples);
-    }
-    if (!empty($_GET['file']) && strpos($_GET['file'], '.') === FALSE) {
-      $paths = self::uniquePaths();
-      $fileFound = FALSE;
-      foreach ($paths as $path) {
-        $fileName = \CRM_Utils_File::addTrailingSlash($path) . 'api' . DIRECTORY_SEPARATOR . 'v3' . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . $_GET['file'] . '.ex.php';
-        if (!$fileFound && file_exists($fileName)) {
-          $fileFound = TRUE;
-          echo file_get_contents($fileName);
-        }
-      }
-      if (!$fileFound) {
-        echo "Not found.";
-      }
-      CRM_Utils_System::civiExit();
-    }
-    CRM_Utils_System::permissionDenied();
   }
 
   /**

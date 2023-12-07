@@ -5,6 +5,8 @@
  */
 class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
 
+  public $locales;
+
   /**
    * CRM_Core_CodeGen_Schema constructor.
    *

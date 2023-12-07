@@ -8,8 +8,8 @@ class CRM_Mailing_MailStoreTest extends \CiviUnitTestCase {
   protected $workDir;
 
   public function setUp(): void {
-    $this->useTransaction(TRUE);
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->workDir = tempnam(sys_get_temp_dir(), 'mailstoretest');
     @unlink($this->workDir);
   }
@@ -24,7 +24,7 @@ class CRM_Mailing_MailStoreTest extends \CiviUnitTestCase {
   /**
    * Create an example store (maildir) using default behaviors (no hooks).
    */
-  public function testMaildirBasic() {
+  public function testMaildirBasic(): void {
     $this->createMaildirSettings([
       'name' => __FUNCTION__,
     ]);
@@ -35,7 +35,7 @@ class CRM_Mailing_MailStoreTest extends \CiviUnitTestCase {
   /**
    * Create an example store (maildir) and change the driver via hook.
    */
-  public function testMaildirHook() {
+  public function testMaildirHook(): void {
     // This hook swaps out the implementation used for 'Maildir' stores.
     Civi::dispatcher()
       ->addListener('hook_civicrm_alterMailStore', function ($e) {

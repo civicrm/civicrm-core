@@ -26,7 +26,7 @@
   </td>
 </tr>
 <tr>
-  <td>{$form.member_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"} &nbsp;{$form.member_test.html}
+  <td>{$form.member_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"} {$form.member_test.html}
   </td>
   <td>
     {$form.member_is_primary.label} {help id="id-member_is_primary" file="CRM/Member/Form/Search.hlp"} {$form.member_is_primary.html}
@@ -44,7 +44,7 @@
       {$form.member_auto_renew.html}
     {/if}
   </td>
-  <td>{$form.member_is_override.label}{help id="id-member_is_override" file="CRM/Member/Form/Search.hlp"}{$form.member_is_override.html}</td>
+  <td>{$form.member_is_override.label} {help id="id-member_is_override" file="CRM/Member/Form/Search.hlp"} {$form.member_is_override.html}</td>
 </tr>
 <tr>
   {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="membership_join_date" to='' from='' colspan='2' class='' hideRelativeLabel=0}

@@ -29,13 +29,15 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
 
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['object_type'] = 1;
+      $defaults['deny'] = 0;
+      $defaults['priority'] = 1 + CRM_Utils_Weight::getMax(CRM_ACL_DAO_ACL::class, NULL, 'priority');
     }
 
     $showHide = new CRM_Core_ShowHideBlocks();
 
     if (isset($defaults['object_table'])) {
       switch ($defaults['object_table']) {
-        case 'civicrm_saved_search':
+        case 'civicrm_group':
           $defaults['group_id'] = $defaults['object_id'];
           $defaults['object_type'] = 1;
           $showHide->addShow("id-group-acl");
@@ -93,8 +95,6 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $this->setPageTitle(ts('ACL'));
-
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -130,7 +130,6 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     $label = ts('Role');
     $role = [
       '-1' => ts('- select role -'),
-      '0' => ts('Everyone'),
     ] + CRM_Core_OptionGroup::values('acl_role');
     $this->add('select', 'entity_id', $label, $role, TRUE);
 
@@ -152,7 +151,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     $event = [
       '-1' => ts('- select event -'),
       '0' => ts('All Events'),
-    ] + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
+    ] + CRM_Event_PseudoConstant::event(NULL, FALSE, "is_template = 0");
 
     $this->add('select', 'group_id', ts('Group'), $group);
     $this->add('select', 'custom_group_id', ts('Custom Data'), $customGroup);
@@ -160,6 +159,11 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     $this->add('select', 'event_id', ts('Event'), $event);
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $this->addRadio('deny', ts('Mode'), [
+      0 => ts('Allow'),
+      1 => ts('Deny'),
+    ], [], NULL, TRUE);
+    $this->add('number', 'priority', ts('Priority'), ['min' => 1], TRUE);
 
     $this->addFormRule(['CRM_ACL_Form_ACL', 'formRule']);
   }
@@ -247,19 +251,18 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     CRM_Core_BAO_Cache::resetCaches();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_ACL_BAO_ACL::del($this->_id);
+      CRM_ACL_BAO_ACL::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts('Selected ACL has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
       $params = $this->controller->exportValues($this->_name);
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['deny'] = 0;
+      $params['is_active'] = $params['is_active'] ?? FALSE;
       $params['entity_table'] = 'civicrm_acl_role';
 
       // Figure out which type of object we're permissioning on and set object_table and object_id.
       switch ($params['object_type']) {
         case 1:
-          $params['object_table'] = 'civicrm_saved_search';
+          $params['object_table'] = 'civicrm_group';
           $params['object_id'] = $params['group_id'];
           break;
 
@@ -283,8 +286,16 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
         $params['id'] = $this->_id;
       }
 
-      CRM_ACL_BAO_ACL::create($params);
+      $params['priority'] = \CRM_Utils_Weight::updateOtherWeights(CRM_ACL_DAO_ACL::class, $this->_values['priority'] ?? NULL, $params['priority'], NULL, 'priority');
+      CRM_ACL_BAO_ACL::writeRecord($params);
     }
+  }
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'ACL';
   }
 
 }

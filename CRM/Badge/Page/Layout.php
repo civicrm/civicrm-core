@@ -51,22 +51,26 @@ class CRM_Badge_Page_Layout extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/badgelayout',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Badge Layout'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Badge Layout'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Badge Layout'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/badgelayout',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Badge Layout'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }

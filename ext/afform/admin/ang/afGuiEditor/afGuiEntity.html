@@ -56,5 +56,10 @@
 
 <fieldset ng-if="!$ctrl.entity.loading && $ctrl.editor.allowEntityConfig">
   <legend>{{:: ts('Options') }}</legend>
-  <div ng-include=":: getAdminTpl()"></div>
+  <div ng-include="'~/afGuiEditor/entityConfig/Options.html'"></div>
+</fieldset>
+
+<fieldset ng-repeat="behavior in $ctrl.behaviors">
+  <legend>{{:: behavior.title }}</legend>
+  <div ng-include="behavior.template || '~/afGuiEditor/behaviors/afGuiDefaultBehaviorTemplate.html'"></div>
 </fieldset>

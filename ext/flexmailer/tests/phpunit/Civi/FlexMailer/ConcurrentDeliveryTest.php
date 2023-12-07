@@ -37,23 +37,10 @@ class ConcurrentDeliveryTest extends \api_v3_JobProcessMailingTest {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
-      $manager->install(array('org.civicrm.flexmailer'));
+      $manager->install(['org.civicrm.flexmailer']);
     }
 
     parent::setUp();
-
-    \Civi::settings()->set('flexmailer_traditional', 'flexmailer');
-  }
-
-  public function tearDown(): void {
-    // We're building on someone else's test and don't fully trust them to
-    // protect our settings. Make sure they did.
-    $ok = ('flexmailer' == \Civi::settings()->get('flexmailer_traditional'))
-      && ('s:10:"flexmailer";' === \CRM_Core_DAO::singleValueQuery('SELECT value FROM civicrm_setting WHERE name ="flexmailer_traditional"'));
-
-    parent::tearDown();
-
-    $this->assertTrue($ok, 'FlexMailer remained active during testing');
   }
 
   // ---- Boilerplate ----

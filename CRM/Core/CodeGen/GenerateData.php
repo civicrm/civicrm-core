@@ -1051,8 +1051,8 @@ class CRM_Core_CodeGen_GenerateData {
    * @return string
    */
   private function _individualEmail($contact, $domain = NULL) {
-    $first = $contact->first_name;
-    $last = $contact->last_name;
+    $first = $contact->first_name ?? ($this->probability(.5) ? $this->randomItem('male_name') : $this->randomItem('female_name'));
+    $last = $contact->last_name ?? $this->randomItem('last_name');
     $f = $first[0];
     $l = $last[0];
     $m = $contact->middle_name ? $contact->middle_name[0] . '.' : '';
@@ -1141,7 +1141,7 @@ class CRM_Core_CodeGen_GenerateData {
     // add the 3 groups first
     foreach ($this->sampleData['group'] as $groupName) {
       $group = new CRM_Contact_BAO_Group();
-      $group->name = $group->title = $groupName;
+      $group->name = $group->title = $group->frontend_title = $groupName;
       $group->group_type = "12";
       $group->visibility = 'Public Pages';
       $group->is_active = 1;
@@ -2181,7 +2181,7 @@ ORDER BY cc.id; ";
     $select = 'SELECT contribution.id contribution_id, cli.id as line_item_id, contribution.contact_id, contribution.receive_date, contribution.total_amount, contribution.currency, cli.label,
       cli.financial_type_id,  cefa.financial_account_id, contribution.payment_instrument_id, contribution.check_number, contribution.trxn_id';
     $where = 'WHERE cefa.account_relationship = 1';
-    $financialAccountId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(4);
+    $financialAccountId = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount(4);
     foreach ($components as $component) {
       if ($component == 'contribution') {
         $from = 'FROM `civicrm_contribution` contribution';

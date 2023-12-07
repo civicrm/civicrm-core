@@ -71,6 +71,10 @@ class ClaimItems extends \Civi\Api4\Generic\AbstractAction {
           $array['data'] = (array) $item->data;
           break;
 
+        case 'run_as':
+          $array['run_as'] = ($item->data instanceof \CRM_Queue_Task) ? $item->data->runAs : NULL;
+          break;
+
         case 'queue':
           $array['queue'] = $this->queue;
           break;

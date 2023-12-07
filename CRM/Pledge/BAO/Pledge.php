@@ -24,19 +24,13 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   public static $_exportableFields = NULL;
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
@@ -190,7 +184,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     }
 
     $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
-    $title = CRM_Contact_BAO_Contact::displayName($pledge->contact_id) . ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format($pledge->amount, $pledge->currency) . ' - ' . CRM_Utils_Array::value($pledge->financial_type_id, $contributionTypes) . ')';
+    $title = CRM_Contact_BAO_Contact::displayName($pledge->contact_id) . ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format($pledge->amount, $pledge->currency) . ' - ' . ($contributionTypes[$pledge->financial_type_id] ?? '') . ')';
 
     // add the recently created Pledge
     CRM_Utils_Recent::add($title,
@@ -870,14 +864,8 @@ SELECT  pledge.contact_id              as contact_id,
     }
 
     if ($sendReminders) {
-      // retrieve domain tokens
-      $tokens = [
-        'domain' => ['name', 'phone', 'address', 'email'],
-        'contact' => CRM_Core_SelectValues::contactTokens(),
-      ];
 
       // retrieve contact tokens
-
       // this function does NOT return Deceased contacts since we don't want to send them email
       $contactDetails = civicrm_api3('Contact', 'get', [
         'is_deceased' => 0,
@@ -934,7 +922,7 @@ SELECT  pledge.contact_id              as contact_id,
           // 2. send acknowledgement mail
           if ($toEmail && !($doNotEmail || $onHold)) {
             // assign value to template
-            $template->assign('amount_paid', $details['amount_paid'] ? $details['amount_paid'] : 0);
+            $template->assign('amount_paid', $details['amount_paid'] ?: 0);
             $template->assign('next_payment', $details['scheduled_date']);
             $template->assign('amount_due', $details['amount_due']);
             $template->assign('checksumValue', $details['checksumValue']);

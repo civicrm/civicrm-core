@@ -142,6 +142,7 @@
     <comment>Is this entry active?</comment>
     <html>
       <type>CheckBox</type>
+      <label>Enabled</label>
     </html>
     <add>2.2</add>
   </field>

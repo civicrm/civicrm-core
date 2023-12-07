@@ -146,7 +146,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     CRM_Core_Session::setStatus($status, ts('Relationship created.', [
       'count' => $outcome['valid'],
       'plural' => 'Relationships created.',
-    ]), 'success', ['expires' => 0]);
+    ]), 'success');
 
   }
 
@@ -179,7 +179,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
 
     if (!empty($params['relationship_type_id'])) {
       $relationshipType = new CRM_Contact_DAO_RelationshipType();
-      list($rid, $direction) = explode('_', $params['relationship_type_id'], 2);
+      [$rid, $direction] = explode('_', $params['relationship_type_id'], 2);
 
       $relationshipType->id = $rid;
       if ($relationshipType->find(TRUE)) {

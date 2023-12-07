@@ -1,6 +1,9 @@
 <?php
 
 class CRM_Utils_Geocode_TestProvider {
+  public const ADDRESS = '600 Pennsylvania Avenue NW, Washington';
+  public const GEO_CODE_1 = '38.897957';
+  public const GEO_CODE_2 = '-77.036560';
 
   public static function format(&$values, $stateName = FALSE) {
     $address = ($values['street_address'] ?? '') . ($values['city'] ?? '');
@@ -18,8 +21,8 @@ class CRM_Utils_Geocode_TestProvider {
   }
 
   public static function getCoordinates($address): array {
-    if (strpos($address, '600 Pennsylvania Avenue NW, Washington') === 0) {
-      return ['geo_code_1' => '38.897957', 'geo_code_2' => '-77.036560'];
+    if (str_starts_with($address, self::ADDRESS)) {
+      return ['geo_code_1' => self::GEO_CODE_1, 'geo_code_2' => self::GEO_CODE_2];
     }
     return [];
   }

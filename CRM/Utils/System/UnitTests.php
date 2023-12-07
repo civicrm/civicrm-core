@@ -38,6 +38,14 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
   }
 
   /**
+   * @internal
+   * @return bool
+   */
+  public function isLoaded(): bool {
+    return TRUE;
+  }
+
+  /**
    * @param string $name
    * @param string $value
    */
@@ -58,6 +66,22 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
    */
   public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     return TRUE;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getCiviSourceStorage(): array {
+    global $civicrm_root;
+
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+
+    return [
+      'url' => CRM_Utils_File::addTrailingSlash('', '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+    ];
   }
 
   /**
@@ -84,8 +108,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE,
-    $htmlize = TRUE
+    $forceBackend = FALSE
   ) {
     $config = CRM_Core_Config::singleton();
     static $script = 'index.php';
@@ -100,12 +123,10 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     }
     $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
 
-    $separator = ($htmlize && $frontend) ? '&amp;' : '&';
-
     if (!$config->cleanURL) {
       if ($path !== NULL && $path !== '' && $path !== FALSE) {
         if ($query !== NULL && $query !== '' && $query !== FALSE) {
-          return $base . $script . '?q=' . $path . $separator . $query . $fragment;
+          return $base . $script . '?q=' . $path . '&' . $query . $fragment;
         }
         else {
           return $base . $script . '?q=' . $path . $fragment;

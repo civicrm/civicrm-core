@@ -190,9 +190,9 @@ class RecipientBuilder {
       ->merge($this->prepareAddlFilter('c.id'))
       ->where("c.id NOT IN (
              SELECT rem.contact_id
-             FROM civicrm_action_log rem INNER JOIN {$this->mapping->getEntity()} e ON rem.entity_id = e.id
+             FROM civicrm_action_log rem INNER JOIN {$this->getMappingTable()} e ON rem.entity_id = e.id
              WHERE rem.action_schedule_id = {$this->actionSchedule->id}
-             AND rem.entity_table = '{$this->mapping->getEntity()}'
+             AND rem.entity_table = '{$this->getMappingTable()}'
              )")
       // Where does e.id come from here? ^^^
       ->groupBy("c.id")
@@ -276,14 +276,13 @@ class RecipientBuilder {
     $defaultParams = [
       'casActionScheduleId' => $this->actionSchedule->id,
       'casMappingId' => $this->mapping->getId(),
-      'casMappingEntity' => $this->mapping->getEntity(),
+      'casMappingEntity' => $this->getMappingTable(),
       'casNow' => $this->now,
     ];
 
-    /** @var \CRM_Utils_SQL_Select $query */
     $query = $this->mapping->createQuery($this->actionSchedule, $phase, $defaultParams);
 
-    if ($this->actionSchedule->limit_to /*1*/) {
+    if ($this->actionSchedule->limit_to == 1) {
       $query->merge($this->prepareContactFilter($query['casContactIdField']));
     }
 
@@ -403,7 +402,7 @@ class RecipientBuilder {
       $date = $operator . "(!casDateField, INTERVAL {$actionSchedule->start_action_offset} {$actionSchedule->start_action_unit})";
       $startDateClauses[] = "'!casNow' >= {$date}";
       // This is weird. Waddupwidat?
-      if ($this->mapping->getEntity() == 'civicrm_participant') {
+      if ($this->getMappingTable() == 'civicrm_participant') {
         $startDateClauses[] = $operator . "(!casNow, INTERVAL 1 DAY ) {$op} " . '!casDateField';
       }
       else {
@@ -468,7 +467,7 @@ WHERE      $group.id = {$groupId}
    */
   protected function prepareAddlFilter($contactIdField) {
     $contactAddlFilter = NULL;
-    if ($this->actionSchedule->limit_to !== NULL && !$this->actionSchedule->limit_to /*0*/) {
+    if ($this->actionSchedule->limit_to == 2) {
       $contactAddlFilter = $this->prepareContactFilter($contactIdField);
     }
     return $contactAddlFilter;
@@ -567,7 +566,7 @@ WHERE      $group.id = {$groupId}
     switch ($for) {
       case 'rel':
         $contactIdField = $query['casContactIdField'];
-        $entityName = $this->mapping->getEntity();
+        $entityName = $this->getMappingTable();
         $entityIdField = $query['casEntityIdField'];
         break;
 
@@ -607,6 +606,10 @@ reminder.action_schedule_id = {$this->actionSchedule->id}";
    */
   protected function resetOnTriggerDateChange() {
     return $this->mapping->resetOnTriggerDateChange($this->actionSchedule);
+  }
+
+  protected function getMappingTable(): string {
+    return $this->mapping->getEntityTable($this->actionSchedule);
   }
 
 }

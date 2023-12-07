@@ -239,7 +239,7 @@ class SettingsManager {
    */
   protected function getMandatory($entity) {
     if ($this->mandatory === NULL) {
-      $this->mandatory = self::parseMandatorySettings(\CRM_Utils_Array::value('civicrm_setting', $GLOBALS));
+      $this->mandatory = self::parseMandatorySettings($GLOBALS['civicrm_setting'] ?? NULL);
     }
     return $this->mandatory[$entity];
   }
@@ -344,6 +344,7 @@ class SettingsManager {
       case 'domain':
         $defaults = [
           'installed' => FALSE,
+          // The default list of components should be kept in sync with "civicrm_extension.sqldata.php".
           'enable_components' => ['CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'],
           'customFileUploadDir' => '[civicrm.files]/custom/',
           'imageUploadDir' => '[civicrm.files]/persist/contribute/',
@@ -351,6 +352,7 @@ class SettingsManager {
           'imageUploadURL' => '[civicrm.files]/persist/contribute/',
           'extensionsDir' => '[civicrm.files]/ext/',
           'extensionsURL' => '[civicrm.files]/ext/',
+          'ext_max_depth' => \CRM_Extension_System::DEFAULT_MAX_DEPTH,
           'resourceBase' => '[civicrm.root]/',
           'userFrameworkResourceURL' => '[civicrm.root]/',
         ];

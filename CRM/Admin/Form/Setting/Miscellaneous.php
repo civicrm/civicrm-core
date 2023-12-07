@@ -42,14 +42,19 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'remote_profile_submissions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'allow_alert_autodismissal' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'prevNextBackend' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'import_batch_size' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
   ];
 
   /**
    * Basic setup.
    */
-  public function preProcess() {
-    // check for post max size
-    CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
+  public function preProcess(): void {
+    $maxImportFileSize = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'));
+    $postMaxSize = CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'));
+    if ($maxImportFileSize > $postMaxSize) {
+      CRM_Core_Session::setStatus(ts("Note: Upload max filesize ('upload_max_filesize') should not exceed Post max size ('post_max_size') as defined in PHP.ini, please check with your system administrator."), ts("Warning"), "alert");
+    }
+
     // This is a temp hack for the fact we really don't need to hard-code each setting in the tpl but
     // we haven't worked through NOT doing that. These settings have been un-hardcoded.
     $this->assign('pure_config_settings', [
@@ -62,6 +67,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
       'recentItemsProviders',
       'dedupe_default_limit',
       'prevNextBackend',
+      'import_batch_size',
     ]);
   }
 
@@ -98,8 +104,8 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     $errors = [];
 
     // validate max file size
-    $iniBytes = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), FALSE);
-    $inputBytes = CRM_Utils_Number::formatUnitSize($fields['maxFileSize'] . 'M', FALSE);
+    $iniBytes = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'));
+    $inputBytes = ((int) $fields['maxFileSize']) * 1024 * 1024;
 
     if ($inputBytes > $iniBytes) {
       $errors['maxFileSize'] = ts("Maximum file size cannot exceed limit defined in \"php.ini\" (\"upload_max_filesize=%1\").", [
@@ -113,7 +119,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     }
 
     if (!empty($fields['wkhtmltopdfPath'])) {
-      // check and ensure that thi leads to the wkhtmltopdf binary
+      // check and ensure that this path leads to the wkhtmltopdf binary
       // and it is a valid executable binary
       // Only check the first space separated piece to allow for a value
       // such as /usr/bin/xvfb-run -- wkhtmltopdf (CRM-13292)

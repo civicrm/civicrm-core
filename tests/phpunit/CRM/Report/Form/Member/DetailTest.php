@@ -18,11 +18,15 @@ use Civi\Api4\ContributionRecur;
  */
 class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
 
+  /**
+   * @var int
+   */
+  private $membershipTypeID;
+
   public function setUp(): void {
     parent::setUp();
-    $this->_financialTypeId = 1;
-    $this->_membershipStatusID = $this->membershipStatusCreate('test status');
-    $this->_membershipTypeID = $this->membershipTypeCreate(['name' => 'Test Member']);
+    $this->membershipStatusCreate('test status');
+    $this->membershipTypeID = $this->membershipTypeCreate(['name' => 'Test Member']);
   }
 
   /**
@@ -46,7 +50,7 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
     ];
     $recur1 = ContributionRecur::create()->setValues($recurParams)->execute()->first();
     $memParams = [
-      'membership_type_id' => $this->_membershipTypeID,
+      'membership_type_id' => $this->membershipTypeID,
       'contact_id' => $indContactID1,
       'status_id:name' => 'test status',
       'contribution_recur_id' => $recur1['id'],
@@ -70,7 +74,7 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
       'fields' => ['autorenew_status_id'],
       'filters' => [
         'tid_op' => 'in',
-        'tid_value' => $this->_membershipTypeID,
+        'tid_value' => $this->membershipTypeID,
         'autorenew_status_id_op' => 'in',
         'autorenew_status_id_value' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'In Progress'),
       ],

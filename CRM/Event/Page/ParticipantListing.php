@@ -41,7 +41,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
       $this->_id,
       'title'
     );
-    CRM_Utils_System::setTitle(ts('%1 - Participants', array(1 => $this->_eventTitle)));
+    CRM_Utils_System::setTitle(ts('%1 - Participants', [1 => $this->_eventTitle]));
 
     // we do not want to display recently viewed contacts since this is potentially a public page
     $this->assign('displayRecent', FALSE);
@@ -65,7 +65,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
     );
     if ($className == 'CRM_Event_Page_ParticipantListing') {
       CRM_Core_Error::statusBounce(ts("Participant listing code file cannot be '%1'",
-        array(1 => $className)
+        [1 => $className]
       ));
     }
 

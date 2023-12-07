@@ -12,11 +12,11 @@
     template: function() {
       // Dynamic template generates switch condition for each display type
       var html =
-        '<div ng-include="\'~/crmSearchAdmin/crmSearchAdminDisplay.html\'"></div>\n' +
         '<div ng-switch="$ctrl.display.type">\n';
       _.each(CRM.crmSearchAdmin.displayTypes, function(type) {
         html +=
           '<div ng-switch-when="' + type.id + '">\n' +
+          '  <div class="help-block"><i class="crm-i ' + type.icon + '"></i> ' + _.escape(type.description) + '</div>' +
           '  <search-admin-display-' + type.id + ' api-entity="$ctrl.savedSearch.api_entity" api-params="$ctrl.savedSearch.api_params" display="$ctrl.display"></search-admin-display-' + type.id + '>\n' +
           '  <hr>\n' +
           '  <button type="button" class="btn btn-{{ !$ctrl.stale ? \'success\' : $ctrl.preview ? \'warning\' : \'primary\' }}" ng-click="$ctrl.previewDisplay()" ng-disabled="!$ctrl.stale">\n' +
@@ -54,7 +54,7 @@
           label: ts('Buttons'),
           icon: 'fa-square-o',
           defaults: {
-            size: 'btn-sm',
+            size: 'btn-xs',
             links: []
           }
         },
@@ -62,9 +62,9 @@
           label: ts('Menu'),
           icon: 'fa-bars',
           defaults: {
-            text: ts('Actions'),
+            text: '',
             style: 'default',
-            size: 'btn-sm',
+            size: 'btn-xs',
             icon: 'fa-bars',
             links: []
           }
@@ -248,7 +248,28 @@
 
       this.getLinks = function(columnKey) {
         if (!ctrl.links) {
-          ctrl.links = {'*': ctrl.crmSearchAdmin.buildLinks(), '0': []};
+          ctrl.links = {
+            '*': ctrl.crmSearchAdmin.buildLinks(true),
+            '0': []
+          };
+          ctrl.links[''] = _.filter(ctrl.links['*'], {join: ''});
+          searchMeta.getSearchTasks(ctrl.savedSearch.api_entity).then(function(tasks) {
+            _.each(tasks, function (task) {
+              if (task.number === '> 0' || task.number === '=== 1') {
+                var link = {
+                  text: task.title,
+                  icon: task.icon,
+                  task: task.name,
+                  entity: task.entity,
+                  target: 'crm-popup',
+                  join: '',
+                  style: task.name === 'delete' ? 'danger' : 'default'
+                };
+                ctrl.links['*'].push(link);
+                ctrl.links[''].push(link);
+              }
+            });
+          });
         }
         if (!columnKey) {
           return ctrl.links['*'];
@@ -269,25 +290,6 @@
         searchMeta.pickIcon().then(function(icon) {
           model[key] = icon;
         });
-      };
-
-      this.toggleAddButton = function() {
-        if (ctrl.display.settings.addButton && ctrl.display.settings.addButton.path) {
-          delete ctrl.display.settings.addButton;
-        } else {
-          var entity = searchMeta.getBaseEntity();
-          ctrl.display.settings.addButton = {
-            path: entity.addPath || 'civicrm/',
-            text: ts('Add %1', {1: entity.title}),
-            icon: 'fa-plus'
-          };
-        }
-      };
-
-      this.onChangeAddButtonPath = function() {
-        if (!ctrl.display.settings.addButton.path) {
-          delete ctrl.display.settings.addButton;
-        }
       };
 
       // Helper function to sort active from hidden columns and initialize each column with defaults
@@ -324,6 +326,19 @@
             ctrl.preview = true;
           }, 100);
         }
+      };
+
+      this.getDefaultLimit = function() {
+        return CRM.crmSearchAdmin.defaultPagerSize;
+      };
+
+      this.getDefaultSort = function() {
+        var apiEntity = ctrl.savedSearch.api_entity,
+          sort = [];
+        if (searchMeta.getEntity(apiEntity).order_by) {
+          sort.push([searchMeta.getEntity(apiEntity).order_by, 'ASC']);
+        }
+        return sort;
       };
 
       this.fieldsForSort = function() {

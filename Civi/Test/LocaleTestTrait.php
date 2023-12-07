@@ -19,9 +19,13 @@ namespace Civi\Test;
 trait LocaleTestTrait {
 
   /**
-   * @var string
+   * Get the default system locale.
+   *
+   * @return string
    */
-  private static $defaultSystemLocale = 'en_US';
+  protected function getDefaultSystemLocale(): string {
+    return 'en_US';
+  }
 
   /**
    * Temporarily use multilingual.
@@ -56,16 +60,16 @@ trait LocaleTestTrait {
    */
   public function enableMultilingual(?array $addLocales = NULL): void {
     $this->callAPISuccess('Setting', 'create', [
-      'lcMessages' => static::$defaultSystemLocale,
+      'lcMessages' => $this->getDefaultSystemLocale(),
       'languageLimit' => [
-        static::$defaultSystemLocale => 1,
+        $this->getDefaultSystemLocale() => 1,
       ],
     ]);
 
-    \CRM_Core_I18n_Schema::makeMultilingual(static::$defaultSystemLocale);
+    \CRM_Core_I18n_Schema::makeMultilingual($this->getDefaultSystemLocale());
 
     global $dbLocale;
-    $dbLocale = '_' . static::$defaultSystemLocale;
+    $dbLocale = '_' . $this->getDefaultSystemLocale();
 
     if ($addLocales !== NULL) {
       $languageLimit = \Civi::settings()->get('languageLimit');
@@ -80,8 +84,8 @@ trait LocaleTestTrait {
   }
 
   public function disableMultilingual(): void {
-    \CRM_Core_I18n::singleton()->setLocale(static::$defaultSystemLocale);
-    \CRM_Core_I18n_Schema::makeSinglelingual(static::$defaultSystemLocale);
+    \CRM_Core_I18n::singleton()->setLocale($this->getDefaultSystemLocale());
+    \CRM_Core_I18n_Schema::makeSinglelingual($this->getDefaultSystemLocale());
     \Civi::settings()->revert('languageLimit');
     \Civi::$statics['CRM_Core_I18n']['singleton'] = [];
   }

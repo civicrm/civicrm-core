@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{assign var=isRecordPayment value=1 }
+{assign var=isRecordPayment value=1}
 {capture assign="isShowBillingBlock"}{if $action neq 2}1{else}0{/if}{/capture}
 {if $paid} {* We retrieve this tpl when event is selected - keep it empty if event is not paid *}
     <table class="form-layout">
@@ -40,10 +40,10 @@
           <fieldset id="priceset" class="crm-group priceset-group">
             <tr class="crm-event-eventfees-form-block-price_set_amount">
             <td class="label" style="padding-top: 10px;">{$form.amount.label}</td>
-            <td class="view-value"><table class="form-layout">{include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}</td>
+            <td class="view-value"><table class="form-layout">{include file="CRM/Price/Form/PriceSet.tpl" extends="Event" hideTotal=false}</td>
           </fieldset>
         {else}
-          {assign var=isRecordPayment value=0 }
+          {assign var=isRecordPayment value=0}
           <div class='messages status'>{ts}No active price fields found for this event!{/ts}</div>
         {/if}
         </table>
@@ -52,13 +52,11 @@
       </tr>
     {/if}
 
-    {if $accessContribution and ! $participantMode and ($action neq 2 or !$rows.0.contribution_id or $onlinePendingContributionId) and $isRecordPayment and ! $registeredByParticipantId }
+    {if $accessContribution and ! $participantMode and ($action neq 2 or !$rows.0.contribution_id or $onlinePendingContributionId) and $isRecordPayment and ! $registeredByParticipantId}
       {assign var=isShowBillingBlock value=true}
         <tr class="crm-event-eventfees-form-block-record_contribution">
             <td class="label">{$form.record_contribution.label}</td>
-            <td>{$form.record_contribution.html}<br />
-                <span class="description">{ts}Check this box to enter payment information. You will also be able to generate a customized receipt.{/ts}</span>
-            </td>
+            <td>{$form.record_contribution.html}</td>
         </tr>
         <tr id="payment_information" class="crm-event-eventfees-form-block-payment_information">
            <td class ='html-adjust' colspan=2>
@@ -66,14 +64,14 @@
              <table id="recordContribution" class="form-layout" style="width:auto;">
                 <tr class="crm-event-eventfees-form-block-financial_type_id">
                     <td class="label">{$form.financial_type_id.label}<span class="crm-marker"> *</span></td>
-                    <td>{$form.financial_type_id.html}<br /><span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
+                    <td>{$form.financial_type_id.html}</td>
                 </tr>
                 <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html}</td></tr>
                 <tr>
                     <td class="label" >{$form.receive_date.label}</td>
                     <td>{$form.receive_date.html}</td>
                 </tr>
-                {if $showTransactionId }
+                {if $showTransactionId}
                     <tr class="crm-event-eventfees-form-block-trxn_id"><td class="label">{$form.trxn_id.label}</td><td>{$form.trxn_id.html}</td></tr>
                 {/if}
                 <tr class="crm-event-eventfees-form-block-contribution_status_id"><td class="label">{$form.contribution_status_id.label}</td><td>{$form.contribution_status_id.html}</td></tr>
@@ -96,11 +94,13 @@
       <table class="form-layout" style="width:auto;">
          <tr class="crm-event-eventfees-form-block-send_receipt">
             <td class="label">{if $paid}{ts}Send Confirmation and Receipt{/ts}{else}{ts}Send Confirmation{/ts}{/if}</td>
-            <td>{$form.send_receipt.html}<br>
-              {if $paid}
-                <span class="description">{ts 1=$email}Automatically email a confirmation and receipt to %1?{/ts}</span></td>
-              {else}
-                <span class="description">{ts 1=$email}Automatically email a confirmation to %1?{/ts}</span></td>
+            <td>{$form.send_receipt.html}
+              {if $email}
+                {if $paid}
+                  <span class="description">{ts 1=$email}Automatically email a confirmation and receipt to %1?{/ts}</span></td>
+                {else}
+                  <span class="description">{ts 1=$email}Automatically email a confirmation to %1?{/ts}</span></td>
+                {/if}
               {/if}
         </tr>
         <tr id="from-email" class="crm-event-eventfees-form-block-from_email_address">
@@ -109,20 +109,20 @@
         </tr>
         <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
         <td class="label">{$form.receipt_text.label}</td>
-          <td><span class="description">
-             {ts}Enter a message you want included at the beginning of the confirmation email. EXAMPLE: 'Thanks for registering for this event.'{/ts}
-             </span><br />
-             {$form.receipt_text.html|crmAddClass:huge}
+          <td>{$form.receipt_text.html|crmAddClass:huge}<br />
+             <span class="description">
+             {ts}Enter a message you want included at the beginning of the confirmation email.{/ts}
+             </span>
           </td>
         </tr>
       </table>
     </fieldset>
-{elseif $context eq 'standalone' and $outBound_option != 2 }
+{elseif $context eq 'standalone' and $outBound_option != 2}
     <fieldset id="email-receipt" style="display:none;"><legend>{if $paid}{ts}Registration Confirmation and Receipt{/ts}{else}{ts}Registration Confirmation{/ts}{/if}</legend>
       <table class="form-layout" style="width:auto;">
        <tr class="crm-event-eventfees-form-block-send_receipt">
           <td class="label">{if $paid}{ts}Send Confirmation and Receipt{/ts}{else}{ts}Send Confirmation{/ts}{/if}</td>
-          <td>{$form.send_receipt.html}<br>
+          <td>{$form.send_receipt.html}
             {if $paid}
               <span class="description">{ts 1='<span id="email-address"></span>'}Automatically email a confirmation and receipt to %1?{/ts}</span>
             {else}
@@ -136,16 +136,17 @@
       </tr>
       <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
         <td class="label">{$form.receipt_text.label}</td>
-        <td><span class="description">
-          {ts}Enter a message you want included at the beginning of the confirmation email. EXAMPLE: 'Thanks for registering for this event.'{/ts}
-           </span><br />
-          {$form.receipt_text.html|crmAddClass:huge}</td>
+          <td>{$form.receipt_text.html|crmAddClass:huge}<br />
+             <span class="description">
+             {ts}Enter a message you want included at the beginning of the confirmation email.{/ts}
+             </span>
+          </td>
         </tr>
       </table>
     </fieldset>
 {/if}
 
-{if ($email and $outBound_option != 2) OR $context eq 'standalone' } {* Send receipt field only present if contact has a valid email address. *}
+{if ($email and $outBound_option != 2) OR $context eq 'standalone'} {* Send receipt field only present if contact has a valid email address. *}
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="send_receipt"
     trigger_value       =""
@@ -164,7 +165,7 @@
 }
 {/if}
 
-{if $context eq 'standalone' and $outBound_option != 2 }
+{if $context eq 'standalone' and $outBound_option != 2}
 <script type="text/javascript">
 {literal}
   CRM.$(function($) {

@@ -19,13 +19,6 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
   public $useLivePageJS = TRUE;
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
    * Get BAO Name.
    *
    * @return string
@@ -33,42 +26,6 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    */
   public function getBAOName() {
     return 'CRM_ACL_BAO_ACL';
-  }
-
-  /**
-   * Get action Links.
-   *
-   * @return array
-   *   (reference) of action links
-   */
-  public function &links() {
-    if (!(self::$_links)) {
-      self::$_links = [
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'url' => 'civicrm/acl',
-          'qs' => 'reset=1&action=update&id=%%id%%',
-          'title' => ts('Edit ACL'),
-        ],
-        CRM_Core_Action::DISABLE => [
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable ACL'),
-        ],
-        CRM_Core_Action::ENABLE => [
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable ACL'),
-        ],
-        CRM_Core_Action::DELETE => [
-          'name' => ts('Delete'),
-          'url' => 'civicrm/acl',
-          'qs' => 'reset=1&action=delete&id=%%id%%',
-          'title' => ts('Delete ACL'),
-        ],
-      ];
-    }
-    return self::$_links;
   }
 
   /**
@@ -96,12 +53,7 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
   public function browse() {
     // get all acl's sorted by weight
     $acl = [];
-    $query = "
-  SELECT *
-    FROM civicrm_acl
-   WHERE ( object_table IN ( 'civicrm_saved_search', 'civicrm_uf_group', 'civicrm_custom_group', 'civicrm_event' ) )
-ORDER BY entity_id
-";
+    $query = "SELECT * FROM civicrm_acl";
     $dao = CRM_Core_DAO::executeQuery($query);
 
     $roles = CRM_Core_OptionGroup::values('acl_role');
@@ -133,6 +85,8 @@ ORDER BY entity_id
       $acl[$dao->id]['object_table'] = $dao->object_table;
       $acl[$dao->id]['object_id'] = $dao->object_id;
       $acl[$dao->id]['is_active'] = $dao->is_active;
+      $acl[$dao->id]['deny'] = $dao->deny;
+      $acl[$dao->id]['priority'] = $dao->priority;
 
       if ($acl[$dao->id]['entity_id']) {
         $acl[$dao->id]['entity'] = $roles[$acl[$dao->id]['entity_id']] ?? NULL;
@@ -142,7 +96,7 @@ ORDER BY entity_id
       }
 
       switch ($acl[$dao->id]['object_table']) {
-        case 'civicrm_saved_search':
+        case 'civicrm_group':
           $acl[$dao->id]['object'] = $group[$acl[$dao->id]['object_id']] ?? NULL;
           $acl[$dao->id]['object_name'] = ts('Group');
           break;
@@ -161,6 +115,9 @@ ORDER BY entity_id
           $acl[$dao->id]['object'] = $event[$acl[$dao->id]['object_id']] ?? NULL;
           $acl[$dao->id]['object_name'] = ts('Event');
           break;
+
+        default:
+          $acl[$dao->id]['object'] = $acl[$dao->id]['object_name'] = NULL;
       }
 
       // form all action links

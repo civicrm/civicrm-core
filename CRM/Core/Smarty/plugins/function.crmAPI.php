@@ -26,22 +26,17 @@ function smarty_function_crmAPI($params, &$smarty) {
     $smarty->trigger_error("assign: missing 'entity' parameter");
     return "crmAPI: missing 'entity' parameter";
   }
-  $errorScope = CRM_Core_TemporaryErrorScope::create(['CRM_Utils_REST', 'fatal']);
   $entity = $params['entity'];
   $action = CRM_Utils_Array::value('action', $params, 'get');
   $params['sequential'] = CRM_Utils_Array::value('sequential', $params, 1);
   $var = $params['var'] ?? NULL;
   CRM_Utils_Array::remove($params, 'entity', 'action', 'var');
-  $params['version'] = 3;
-  require_once 'api/api.php';
-  $result = civicrm_api($entity, $action, $params);
-  unset($errorScope);
-  if ($result === FALSE) {
-    $smarty->trigger_error("Unknown error");
+  try {
+    $result = civicrm_api3($entity, $action, $params);
   }
-
-  if (!empty($result['is_error'])) {
-    $smarty->trigger_error("{crmAPI} " . $result["error_message"]);
+  catch (Exception $e) {
+    $smarty->trigger_error('{crmAPI} ' . $e->getMessage());
+    return NULL;
   }
 
   if (!$var) {

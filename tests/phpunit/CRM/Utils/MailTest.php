@@ -2,46 +2,51 @@
 
 /**
  * Class CRM_Utils_MailTest
+ *
  * @group headless
  */
 class CRM_Utils_MailTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
-   * Test case for add( )
    * test with empty params.
    */
   public function testFormatRFC822(): void {
 
     $values = [
       [
-        'name' => "Test User",
-        'email' => "foo@bar.com",
-        'result' => "Test User <foo@bar.com>",
+        'name' => 'Test User',
+        'email' => 'foo@bar.com',
+        'result' => 'Test User <foo@bar.com>',
       ],
       [
         'name' => '"Test User"',
-        'email' => "foo@bar.com",
-        'result' => "Test User <foo@bar.com>",
+        'email' => 'foo@bar.com',
+        'result' => 'Test User <foo@bar.com>',
       ],
       [
-        'name' => "User, Test",
-        'email' => "foo@bar.com",
+        'name' => 'User, Test',
+        'email' => 'foo@bar.com',
         'result' => '"User, Test" <foo@bar.com>',
       ],
       [
         'name' => '"User, Test"',
-        'email' => "foo@bar.com",
+        'email' => 'foo@bar.com',
         'result' => '"User, Test" <foo@bar.com>',
       ],
       [
         'name' => '"Test User"',
-        'email' => "foo@bar.com",
+        'email' => 'foo@bar.com',
         'result' => '"Test User" <foo@bar.com>',
         'useQuote' => TRUE,
       ],
       [
-        'name' => "User, Test",
-        'email' => "foo@bar.com",
+        'name' => 'User, Test',
+        'email' => 'foo@bar.com',
         'result' => '"User, Test" <foo@bar.com>',
         'useQuote' => TRUE,
       ],
@@ -70,6 +75,19 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
 
     $this->assertFalse(CRM_Utils_Mail::send($params));
     $this->assertEquals('Unable to send email. Please report this message to the site administrator', CRM_Core_Session::singleton()->getStatus()[0]['text']);
+  }
+
+  public function testEmptyText(): void {
+    $mailHelper = new CiviMailUtils($this);
+    $params = [
+      'toEmail' => 'a@example.com',
+      'from' => 'b@example.com',
+      'html' => '<p>hi</p><p>How are <b>you</b></p>',
+      'text' => " \n\t",
+      'subject' => 'hey',
+    ];
+    CRM_Utils_Mail::send($params);
+    $mailHelper->checkAllMailLog(['How are you']);
   }
 
   /**

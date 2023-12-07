@@ -11,7 +11,6 @@
     {ts}These settings define the CMS variables that are used with CiviCRM.{/ts}
 </div>
 <div class="crm-block crm-form-block crm-uf-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
       <table class="form-layout-compressed">
         {if $userFrameworkUsersTableNameEnabled}
         <tr class="crm-uf-form-block-userFrameworkUsersTableName">
@@ -34,12 +33,11 @@
         </table>
             <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 <div class="spacer"></div>
-{if $tablePrefixes}
+{if $viewsIntegration}
 <div class="form-item">
 <fieldset>
     <legend>{ts}Views integration settings{/ts}</legend>
-    <div>{ts}To enable CiviCRM Views integration, add or update the following item in the <code>settings.php</code> file:{/ts}</div>
-    <pre>{$tablePrefixes}</pre>
+    <div>{$viewsIntegration}</div>
 </fieldset>
 </div>
 {/if}

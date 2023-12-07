@@ -25,6 +25,11 @@ use Civi\Token\TokenProcessor;
 class CRM_Badge_BAO_Badge {
 
   /**
+   * @var CRM_Utils_PDF_Label
+   */
+  public $pdf;
+
+  /**
    * @var bool
    */
   public $debug = FALSE;
@@ -168,9 +173,6 @@ class CRM_Badge_BAO_Badge {
    * @param int $cellspacing
    */
   public function labelCreator($formattedRow, $cellspacing = 0) {
-    $this->lMarginLogo = 18;
-    $this->tMarginName = 20;
-
     $x = $this->pdf->GetAbsX();
     $y = $this->pdf->getY();
 
@@ -199,7 +201,7 @@ class CRM_Badge_BAO_Badge {
 
     if (!empty($formattedRow['participant_image'])) {
       $imageAlign = 0;
-      switch (CRM_Utils_Array::value('alignment_participant_image', $formattedRow)) {
+      switch ($formattedRow['alignment_participant_image'] ?? NULL) {
         case 'R':
           $imageAlign = 68;
           break;
@@ -363,10 +365,8 @@ class CRM_Badge_BAO_Badge {
       $y = $this->pdf->GetY();
     }
 
-    $this->imgRes = 300;
-
     if ($img) {
-      [$w, $h] = self::getImageProperties($img, $this->imgRes, $w, $h);
+      [$w, $h] = self::getImageProperties($img, 300, $w, $h);
       $this->pdf->Image($img, $x, $y, $w, $h, '', '', '', FALSE, 72, '', FALSE,
         FALSE, $this->debug, FALSE, FALSE, FALSE);
     }

@@ -28,7 +28,7 @@ use api\v4\Api4TestBase;
  */
 class RequestSpecTest extends Api4TestBase {
 
-  public function testRequiredFieldFetching() {
+  public function testRequiredFieldFetching(): void {
     $spec = new RequestSpec('Contact', 'get');
     $requiredField = new FieldSpec('name', 'Contact');
     $requiredField->setRequired(TRUE);
@@ -43,7 +43,7 @@ class RequestSpecTest extends Api4TestBase {
     $this->assertEquals('name', array_shift($requiredFields)->getName());
   }
 
-  public function testGettingFieldNames() {
+  public function testGettingFieldNames(): void {
     $spec = new RequestSpec('Contact', 'get');
     $nameField = new FieldSpec('name', 'Contact');
     $ageField = new FieldSpec('age', 'Contact', 'Integer');

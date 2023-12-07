@@ -41,7 +41,7 @@ class CRM_PCP_StateMachine_PCP extends CRM_Core_StateMachine {
       'CRM_PCP_Form_Campaign' => NULL,
     ];
 
-    $this->addSequentialPages($this->_pages, $action);
+    $this->addSequentialPages($this->_pages);
   }
 
 }

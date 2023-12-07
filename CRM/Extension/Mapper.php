@@ -355,8 +355,8 @@ class CRM_Extension_Mapper {
     // TODO optimization/caching
     $urls = [];
     $urls['civicrm'] = $this->keyToUrl('civicrm');
+    /** @var CRM_Core_Module $module */
     foreach ($this->getModules() as $module) {
-      /** @var $module CRM_Core_Module */
       if ($module->is_active) {
         try {
           $urls[$module->name] = $this->keyToUrl($module->name);
@@ -383,7 +383,7 @@ class CRM_Extension_Mapper {
   public function getKeysByPath($pattern) {
     $keys = [];
 
-    if (CRM_Utils_String::endsWith($pattern, '*')) {
+    if (str_ends_with($pattern, '*')) {
       $prefix = rtrim($pattern, '*');
       foreach ($this->container->getKeys() as $key) {
         $path = CRM_Utils_File::addTrailingSlash($this->container->getPath($key));
@@ -452,10 +452,11 @@ class CRM_Extension_Mapper {
         $this->keyToInfo($key);
       }
       catch (CRM_Extension_Exception_ParseException $e) {
-        CRM_Core_Session::setStatus(ts('Parse error in extension: %1', [
-          1 => $e->getMessage(),
+        CRM_Core_Session::setStatus(ts('Parse error in extension %1: %2', [
+          1 => $key,
+          2 => $e->getMessage(),
         ]), '', 'error');
-        CRM_Core_Error::debug_log_message("Parse error in extension: " . $e->getMessage());
+        CRM_Core_Error::debug_log_message("Parse error in extension " . $key . ": " . $e->getMessage());
         continue;
       }
     }
@@ -488,7 +489,7 @@ class CRM_Extension_Mapper {
     $dao->type = 'module';
     $dao->find();
     while ($dao->fetch()) {
-      $result[] = new CRM_Core_Module($dao->full_name, $dao->is_active);
+      $result[] = new CRM_Core_Module($dao->full_name, $dao->is_active, $dao->label);
     }
     return $result;
   }
@@ -515,7 +516,7 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * Given te class, provides the template name.
+   * Given the class, provides the template name.
    * @todo consider multiple templates, support for one template for now
    *
    *
@@ -576,10 +577,11 @@ class CRM_Extension_Mapper {
         $info = $this->keyToInfo($key);
       }
       catch (CRM_Extension_Exception_ParseException $e) {
-        CRM_Core_Session::setStatus(ts('Parse error in extension: %1', [
-          1 => $e->getMessage(),
+        CRM_Core_Session::setStatus(ts('Parse error in extension %1: %2', [
+          1 => $key,
+          2 => $e->getMessage(),
         ]), '', 'error');
-        CRM_Core_Error::debug_log_message("Parse error in extension: " . $e->getMessage());
+        CRM_Core_Error::debug_log_message("Parse error in extension " . $key . ": " . $e->getMessage());
         return NULL;
       }
 

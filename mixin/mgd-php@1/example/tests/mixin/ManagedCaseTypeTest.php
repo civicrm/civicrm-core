@@ -12,11 +12,11 @@ namespace Civi\Shimmy\Mixins;
  */
 class ManagedCaseTypeTest extends \PHPUnit\Framework\Assert {
 
-  public function testPreConditions($cv) {
+  public function testPreConditions($cv): void {
     $this->assertFileExists(static::getPath('/CRM/BunnyDance.mgd.php'), 'The shimmy extension must have a Case MGD file.');
   }
 
-  public function testInstalled($cv) {
+  public function testInstalled($cv): void {
     $items = $cv->api4('CaseType', 'get', ['where' => [['name', '=', 'BunnyDance']]]);
     $this->assertEquals('The mysterious case of the dancing bunny', $items[0]['description']);
     $this->assertEquals('BunnyDance', $items[0]['name']);
@@ -24,16 +24,14 @@ class ManagedCaseTypeTest extends \PHPUnit\Framework\Assert {
     $this->assertEquals(TRUE, $items[0]['is_active']);
     $this->assertEquals(1, count($items));
 
-    // FIXME: The example is partially disabled - because the full example causes a crash.
-    // Hence, these assertions don't yet pass.
-    // $actTypes = $cv->api4('OptionValue', 'get', [
-    //   'where' => [['option_group_id:name', '=', 'activity_type'], ['name', '=', 'Nibble']],
-    // ]);
-    // $this->assertEquals('Nibble', $actTypes[0]['name'], 'ActivityType "Nibble" should be auto enabled. It\'s missing.');
-    // $this->assertEquals(TRUE, $actTypes[0]['is_active'], 'ActivityType "Nibble" should be auto enabled. It\'s inactive.');
+    $actTypes = $cv->api4('OptionValue', 'get', [
+      'where' => [['option_group_id:name', '=', 'activity_type'], ['name', '=', 'Nibble']],
+    ]);
+    $this->assertEquals('Nibble', $actTypes[0]['name'], 'ActivityType "Nibble" should be auto enabled. It\'s missing.');
+    $this->assertEquals(TRUE, $actTypes[0]['is_active'], 'ActivityType "Nibble" should be auto enabled. It\'s inactive.');
   }
 
-  public function testDisabled($cv) {
+  public function testDisabled($cv): void {
     $items = $cv->api4('CaseType', 'get', ['where' => [['name', '=', 'BunnyDance']]]);
     $this->assertEquals('The mysterious case of the dancing bunny', $items[0]['description']);
     $this->assertEquals('BunnyDance', $items[0]['name']);
@@ -42,7 +40,7 @@ class ManagedCaseTypeTest extends \PHPUnit\Framework\Assert {
     $this->assertEquals(1, count($items));
   }
 
-  public function testUninstalled($cv) {
+  public function testUninstalled($cv): void {
     $items = $cv->api4('CaseType', 'get', ['where' => [['name', '=', 'BunnyDance']]]);
     $this->assertEquals(0, count($items));
 

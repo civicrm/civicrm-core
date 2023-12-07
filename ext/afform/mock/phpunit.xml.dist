@@ -1,11 +1,8 @@
 <?xml version="1.0"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" convertDeprecationsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="tests/phpunit/bootstrap.php" cacheResult="false">
+<phpunit backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" convertDeprecationsToExceptions="true" processIsolation="false" stopOnFailure="false" cacheResult="false" bootstrap="tests/phpunit/bootstrap.php">
   <testsuites>
     <testsuite name="My Test Suite">
       <directory>./tests/phpunit</directory>
-    </testsuite>
-    <testsuite name="form-tests">
-      <directory suffix=".test.php">./ang</directory>
     </testsuite>
   </testsuites>
   <filter>

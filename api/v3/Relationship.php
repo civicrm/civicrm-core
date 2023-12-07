@@ -56,22 +56,11 @@ function _civicrm_api3_relationship_create_spec(&$params) {
  *
  * @return array
  *   API Result Array
+ *
+ * @throws \CRM_Core_Exception
  */
-function civicrm_api3_relationship_delete($params) {
-
-  if (!CRM_Utils_Rule::integer($params['id'])) {
-    return civicrm_api3_create_error('Invalid value for relationship ID');
-  }
-
-  $relationBAO = new CRM_Contact_BAO_Relationship();
-  $relationBAO->id = $params['id'];
-  if (!$relationBAO->find(TRUE)) {
-    return civicrm_api3_create_error('Relationship id is not valid');
-  }
-  else {
-    $relationBAO->del($params['id']);
-    return civicrm_api3_create_success('Deleted relationship successfully');
-  }
+function civicrm_api3_relationship_delete(array $params): array {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -98,10 +87,10 @@ function civicrm_api3_relationship_get($params) {
   }
   else {
     $relationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
-      CRM_Utils_Array::value('status_id', $params),
+      $params['status_id'] ?? 0,
       0,
-      CRM_Utils_Array::value('is_count', $options),
-      CRM_Utils_Array::value('id', $params),
+      $options['is_count'] ?? 0,
+      $params['id'] ?? 0,
       NULL,
       NULL,
       FALSE,
@@ -113,7 +102,7 @@ function civicrm_api3_relationship_get($params) {
     return ['count' => $relationships];
   }
   foreach ($relationships as $relationshipId => $values) {
-    _civicrm_api3_custom_data_get($relationships[$relationshipId], CRM_Utils_Array::value('check_permissions', $params), 'Relationship', $relationshipId, NULL, CRM_Utils_Array::value('relationship_type_id', $values));
+    _civicrm_api3_custom_data_get($relationships[$relationshipId], $params['check_permissions'] ?? 0, 'Relationship', $relationshipId, NULL, $values['relationship_type_id'] ?? NULL);
   }
   return civicrm_api3_create_success($relationships, $params);
 }

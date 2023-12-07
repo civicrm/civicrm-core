@@ -11,7 +11,7 @@
      <span class="element-right">{$form.buttons.html}</span>
 </div>
 
-{if $rows }
+{if $rows}
 <p></p>
 {include file="CRM/Campaign/Form/Selector.tpl"}
 

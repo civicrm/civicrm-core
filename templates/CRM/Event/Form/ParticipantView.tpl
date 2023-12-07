@@ -12,20 +12,16 @@
     <div class="action-link">
         <div class="crm-submit-buttons">
             {if call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
-         {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&selectedChild=event"}
+         {assign var='editUrlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&selectedChild=event"}
          {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
-         {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&selectedChild=event&key=$searchKey"}
+         {assign var='editUrlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&selectedChild=event&key=$searchKey"}
          {/if}
-               <a class="button" href="{crmURL p='civicrm/contact/view/participant' q=$urlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
-            {/if}
-            {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviEvent')}
-                {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context&selectedChild=event"}
-          {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
-          {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context&selectedChild=event&key=$searchKey"}
+             <a class="button" href="{crmURL p='civicrm/contact/view/participant' q=$editUrlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
           {/if}
-                <a class="button" href="{crmURL p='civicrm/contact/view/participant' q=$urlParams}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
-            {/if}
-            {include file="CRM/common/formButtons.tpl" location="top"}
+          {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviEvent')}
+            <a class="button" href="{crmURL p='civicrm/participant/delete' q="reset=1&id=$id"}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
+          {/if}
+
         </div>
     </div>
     <table class="crm-info-panel">
@@ -71,7 +67,7 @@
       <td class="label">{ts}Participant Role{/ts}</td>
       <td>{$role}</td></tr>
         <tr class="crm-event-participantview-form-block-register_date">
-      <td class="label">{ts}Registration Date and Time{/ts}</td>
+      <td class="label">{ts}Registration Date{/ts}</td>
       <td>{$register_date|crmDate}&nbsp;</td>
   </tr>
     <tr class="crm-event-participantview-form-block-status">
@@ -83,7 +79,7 @@
   </tr>
     {if $source}
         <tr class="crm-event-participantview-form-block-event_source">
-        <td class="label">{ts}Event Source{/ts}</td><td>{$source}&nbsp;</td>
+        <td class="label">{ts}Participant Source{/ts}</td><td>{$source}&nbsp;</td>
       </tr>
     {/if}
     {if $participantId and $hasPayment}
@@ -99,7 +95,9 @@
                 <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event"}
                 {if call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
                     {if $hasPayment or $parentHasPayment}
-                        <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
+                      <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
+                    {else}
+                      <a class="action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/participant" q=$editUrlParams}'><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
                     {/if}
                     {if $transferOrCancelLink}
                       <a class="action-item crm-hover-button" href={$transferOrCancelLink}><i class="crm-i fa-times" aria-hidden="true"></i> {ts}Transfer or Cancel{/ts}</a>
@@ -113,7 +111,7 @@
         </tr>
     {/if}
     {foreach from=$note item="rec"}
-      {if $rec }
+      {if $rec}
             <tr><td class="label">{ts}Note{/ts}</td><td>{$rec|nl2br}</td></tr>
       {/if}
     {/foreach}
@@ -126,21 +124,12 @@
         {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
     {/if}
     <div class="crm-submit-buttons">
-        {if call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
-    {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&selectedChild=event"}
-    {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
-    {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&selectedChild=event&key=$searchKey"}
-    {/if}
-
-           <a class="button" href="{crmURL p='civicrm/contact/view/participant' q=$urlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
-        {/if}
-        {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviEvent')}
-    {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context&selectedChild=event"}
-    {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
-    {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context&selectedChild=event&key=$searchKey"}
-    {/if}
-            <a class="button" href="{crmURL p='civicrm/contact/view/participant' q=$urlParams}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
-        {/if}
-        {include file="CRM/common/formButtons.tpl" location="bottom"}
+      {if call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
+        <a class="button" href="{crmURL p='civicrm/contact/view/participant' q=$editUrlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
+      {/if}
+      {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviEvent')}
+        <a class="button" href="{crmURL p='civicrm/participant/delete' q="reset=1&id=$id"}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
+      {/if}
+      {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
 </div>

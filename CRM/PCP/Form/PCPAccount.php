@@ -125,7 +125,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
           CRM_Core_Action::DELETE => [
             'name' => ts('Delete Contact Image'),
             'url' => 'civicrm/contact/image',
-            'qs' => 'reset=1&cid=' . $this->_contactID . '&action=delete',
+            'qs' => 'reset=1&cid=%%id%%&action=delete&qfKey=%%key%%&pcp=1',
             'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
           ],
         ];
@@ -133,6 +133,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
           CRM_Core_Action::DELETE,
           [
             'id' => $this->_contactID,
+            'key' => $this->controller->_key,
           ],
           ts('more'),
           FALSE,
@@ -295,8 +296,13 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
-
-    $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
+    $ufGroupID = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
+    $addToGroupId = \Civi\Api4\UFGroup::get(FALSE)
+      ->addSelect('add_to_group_id')
+      ->addWhere('id', '=', $ufGroupID)
+      ->execute()
+      ->first()['add_to_group_id'] ?? NULL;
+    $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID, $addToGroupId);
     $this->set('contactID', $contactID);
 
     if (!empty($params['email'])) {

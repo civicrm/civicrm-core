@@ -10,11 +10,10 @@
 {* this template is used for adding/editing ACL EntityRole objects *}
 <div class="crm-block crm-form-block crm-acl-entityrole-form-block">
 <fieldset><legend>{if $action eq 1}{ts}Assign ACL Role{/ts}{elseif $action eq 2}{ts}Assign ACL Role{/ts}{else}{ts}Delete ACL Role Assignment{/ts}{/if}</legend>
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 {if $action eq 8}
   <div class="messages status no-popup">
-  {icon icon="fa-info-circle"}{/icon}
-       {ts}WARNING: Deleting this option will remove this ACL Role Assignment.{/ts} {ts}Do you want to continue?{/ts}
+    {icon icon="fa-info-circle"}{/icon}
+    {ts}WARNING: Deleting this option will remove this ACL Role Assignment.{/ts} {ts}Do you want to continue?{/ts}
   </div>
 {else}
     <table class="form-layout-compressed">

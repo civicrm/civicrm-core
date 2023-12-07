@@ -10,13 +10,14 @@ use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Test\CiviEnvBuilder;
 
 /**
  * @group headless
  */
 class SearchRunWithCustomFieldTest extends CustomTestBase {
 
-  public function setUpHeadless() {
+  public function setUpHeadless(): CiviEnvBuilder {
     return \Civi\Test::headless()
       ->installMe(__DIR__)
       ->apply();
@@ -359,9 +360,9 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
       'value_key' => 'meeting_phone.sub_field',
       'record' => ['id' => $activity[0]['id']],
       'action' => 'update',
-      'value' => 'Abc',
+      'value_path' => 'meeting_phone.sub_field',
     ];
-    $expectedSubjectEdit = ['value_key' => 'subject', 'value' => $subject] + $expectedCustomFieldEdit;
+    $expectedSubjectEdit = ['value_key' => 'subject', 'value_path' => 'subject'] + $expectedCustomFieldEdit;
 
     // First Activity
     $this->assertEquals($expectedSubjectEdit, $result[0]['columns'][0]['edit']);
@@ -371,7 +372,6 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     // Second Activity
     $expectedSubjectEdit['record']['id'] = $activity[1]['id'];
     $expectedCustomFieldEdit['record']['id'] = $activity[1]['id'];
-    $expectedCustomFieldEdit['value'] = NULL;
     $this->assertEquals($expectedSubjectEdit, $result[1]['columns'][0]['edit']);
     $this->assertEquals($expectedCustomFieldEdit, $result[1]['columns'][1]['edit']);
     $this->assertEquals($activityTypes['Phone Call'], $result[1]['data']['activity_type_id']);
@@ -381,6 +381,211 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     $this->assertEquals($expectedSubjectEdit, $result[2]['columns'][0]['edit']);
     $this->assertTrue(!isset($result[2]['columns'][1]['edit']));
     $this->assertEquals($activityTypes['Email'], $result[2]['data']['activity_type_id']);
+  }
+
+  public function testMultiValuedFields():void {
+    CustomGroup::create(FALSE)
+      ->addValue('extends', 'Contact')
+      ->addValue('title', 'my_test')
+      ->addChain('field', CustomField::create()
+        ->addValue('custom_group_id', '$id')
+        ->addValue('label', 'my_field')
+        ->addValue('html_type', 'Select')
+        ->addValue('serialize', 1)
+        ->addValue('option_values', ['zero', 'one', 'two', 'three'])
+      )
+      ->execute();
+
+    $lastName = uniqid(__FUNCTION__);
+
+    $sampleContacts = [
+      ['first_name' => 'A', 'my_test.my_field' => [0, 2, 3]],
+      ['first_name' => 'B', 'my_test.my_field' => [0]],
+    ];
+    Contact::save(FALSE)
+      ->setRecords($sampleContacts)
+      ->addDefault('last_name', $lastName)
+      ->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'last_name'],
+          'where' => [['last_name', '=', $lastName]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'First',
+              'dataType' => 'String',
+              'type' => 'field',
+            ],
+            [
+              'key' => 'last_name',
+              'label' => 'Last',
+              'dataType' => 'String',
+              'type' => 'field',
+              'rewrite' => '[last_name] [my_test.my_field:label]',
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+
+    $this->assertEquals(['zero', 'two', 'three'], $result[0]['data']['my_test.my_field:label']);
+    $this->assertEquals("$lastName zero, two, three", $result[0]['columns'][1]['val']);
+    $this->assertEquals(['zero'], $result[1]['data']['my_test.my_field:label']);
+    $this->assertEquals("$lastName zero", $result[1]['columns'][1]['val']);
+  }
+
+  public function testEntityReferenceJoins() {
+    CustomGroup::create()->setValues([
+      'title' => 'EntityRefFields',
+      'extends' => 'Individual',
+    ])->execute();
+    CustomField::create()->setValues([
+      'label' => 'Favorite Nephew',
+      'name' => 'favorite_nephew',
+      'custom_group_id.name' => 'EntityRefFields',
+      'html_type' => 'Autocomplete-Select',
+      'data_type' => 'EntityReference',
+      'fk_entity' => 'Contact',
+    ])->execute();
+    $nephewId = $this->createTestRecord('Contact', ['first_name' => 'Dewey', 'last_name' => 'Duck'])['id'];
+    $uncleId = $this->createTestRecord('Contact', ['first_name' => 'Donald', 'last_name' => 'Duck', 'EntityRefFields.favorite_nephew' => $nephewId])['id'];
+    $contact = Contact::get(FALSE)
+      ->addSelect('first_name', 'EntityRefFields.favorite_nephew.first_name')
+      ->addWhere('id', '=', $uncleId)
+      ->execute()
+      ->first();
+    $this->assertEquals('Donald', $contact['first_name']);
+    $this->assertEquals('Dewey', $contact['EntityRefFields.favorite_nephew.first_name']);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['EntityRefFields.favorite_nephew.first_name'],
+          'where' => [['id', '=', $uncleId]],
+        ],
+        "join" => [
+          [
+            "Contact+AS+Contact_Contact_favorite_nephew_01",
+            "LEFT",
+            [
+              "EntityRefFields.favorite_nephew",
+              "=",
+              "Contact_Contact_favorite_nephew_01.id",
+            ],
+          ],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertEquals('Dewey', $result[0]['columns'][0]['val']);
+  }
+
+  public function testJoinWithCustomFieldEndingIn_() {
+    $subject = uniqid(__FUNCTION__);
+
+    $contact = Contact::create(FALSE)
+      ->execute()->single();
+
+    // CustomGroup based on Activity Type
+    CustomGroup::create(FALSE)
+      ->addValue('extends', 'Activity')
+      ->addValue('title', 'testactivity2')
+      ->addChain('field', CustomField::create()
+        ->addValue('custom_group_id', '$id')
+        ->addValue('label', 'testactivity_')
+        ->addValue('data_type', 'Boolean')
+        ->addValue('html_type', 'Radio')
+      )
+      ->execute();
+
+    $sampleData = [
+      ['activity_type_id:name' => 'Meeting', 'testactivity2.testactivity_' => TRUE],
+    ];
+    $this->saveTestRecords('Activity', [
+      'defaults' => ['subject' => $subject, 'source_contact_id', $contact['id']],
+      'records' => $sampleData,
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'GROUP_CONCAT(DISTINCT Contact_ActivityContact_Activity_01.testactivity2.testactivity_:label) AS GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label',
+          ],
+          'orderBy' => [],
+          'where' => [['contact_type:name', '=', 'Individual']],
+          'groupBy' => ['id'],
+          'join' => [
+            ['Activity AS Contact_ActivityContact_Activity_01', 'INNER', 'ActivityContact',
+              ['id', '=', 'Contact_ActivityContact_Activity_01.contact_id'],
+              ['Contact_ActivityContact_Activity_01.record_type_id:name', '=', '"Activity Source"'],
+              ['Contact_ActivityContact_Activity_01.activity_type_id:name', '=', '"Meeting"'],
+            ],
+          ],
+          'having' => [],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'dataType' => 'Integer',
+              'label' => 'Contact ID',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label',
+              'dataType' => 'Boolean',
+              'label' => '(List) Contact Activities: testactivity2: testactivity_',
+              'sortable' => TRUE,
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+
+    $this->assertArrayHasKey('GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label', $result[0]['data']);
+    $this->assertEquals('Yes', $result[0]['data']['GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label'][0]);
   }
 
 }

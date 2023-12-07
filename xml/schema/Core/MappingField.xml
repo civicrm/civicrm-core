@@ -74,6 +74,7 @@
     <comment>Location type of this mapping, if required</comment>
     <html>
       <label>Location type</label>
+      <type>Select</type>
     </html>
     <add>1.2</add>
     <pseudoconstant>

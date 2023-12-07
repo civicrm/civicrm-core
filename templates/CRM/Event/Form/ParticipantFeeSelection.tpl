@@ -114,20 +114,19 @@ CRM.$(function($) {
       <table class='form-layout'>
         <tr class="crm-event-eventfees-form-block-price_set_amount">
           <td class="label" style="padding-top: 10px;">{$form.amount.label}</td>
-          <td class="view-value"><table class="form-layout">{include file="CRM/Price/Form/PriceSet.tpl" extends="Event" noCalcValueDisplay=0 context="participant"}</table></td>
+          <td class="view-value"><table class="form-layout">{include file="CRM/Price/Form/PriceSet.tpl" extends="Event" hideTotal=false context="participant"}</table></td>
         </tr>
      {if $paymentInfo}
        <tr><td></td><td>
          <div class='crm-section'>
-         <div class='label'>{ts}Updated Fee(s){/ts}</div><div id="pricevalue" class='content updated-fee'></div>
+         <div class='label'>{ts}Updated Fee(s){/ts}</div><div id="pricevalue" class='content updated-fee'>&nbsp;</div>
          <div class='label'>{ts}Total Paid{/ts}</div>
          <div class='content'>
-           {$paymentInfo.paid|crmMoney}<br/>
-           <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'><i class="crm-i fa-list-alt" aria-hidden="true"></i> {ts}view payments{/ts}</a>
+           {$paymentInfo.paid|crmMoney} <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'><i class="crm-i fa-list-alt" aria-hidden="true"></i> {ts}view payments{/ts}</a>
          </div>
          <div class='label'><strong>{ts}Balance Owed{/ts}</strong></div><div class='content'><strong id='balance-fee'></strong></div>
           </div>
-       {include file='CRM/Price/Form/Calculate.tpl' currencySymbol=$currencySymbol noCalcValueDisplay=1 displayOveride='true'}
+       {include file='CRM/Price/Form/Calculate.tpl' currencySymbol=$currencySymbol hideTotal=1 displayOveride='true'}
        {/if}
       </table>
     </fieldset>
@@ -137,8 +136,7 @@ CRM.$(function($) {
       <table class="form-layout" style="width:auto;">
        <tr class="crm-event-eventfees-form-block-send_receipt">
           <td class="label">{ts}Send Confirmation{/ts}</td>
-          <td>{$form.send_receipt.html}<br>
-             <span class="description">{ts 1=$email}Automatically email a confirmation to %1?{/ts}</span>
+          <td>{$form.send_receipt.html} <span class="description">{ts 1=$email}Automatically email a confirmation to %1?{/ts}</span>
           </td>
        </tr>
        <tr id="from-email" class="crm-event-eventfees-form-block-from_email_address">

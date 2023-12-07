@@ -12,7 +12,7 @@
 <div id="wizard-steps">
    <ul class="wizard-bar{if $wizard.style.barClass}-{$wizard.style.barClass}{/if}">
     {section name=step loop=$wizard.steps}
-        {if count ( $wizard.steps ) > 5 }
+        {if count ( $wizard.steps ) > 5}
             {* truncate step titles so header isn't too wide *}
             {assign var="title" value=$wizard.steps[step].title|crmFirstWord}
         {else}

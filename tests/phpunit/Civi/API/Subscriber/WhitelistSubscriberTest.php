@@ -3,7 +3,7 @@ namespace Civi\API\Subscriber;
 
 use Civi\API\Kernel;
 use Civi\API\WhitelistRule;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Civi\Core\CiviEventDispatcher;
 
 /**
  * The WhitelistSubscriber enforces security policies
@@ -371,7 +371,7 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
 
     $whitelist = WhitelistRule::createAll($rules);
 
-    $dispatcher = new EventDispatcher();
+    $dispatcher = new CiviEventDispatcher();
     $kernel = new Kernel($dispatcher);
     $kernel->registerApiProvider($sprocketProvider);
     $kernel->registerApiProvider($widgetProvider);
@@ -388,7 +388,7 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
     }
     else {
       $this->assertAPIFailure($result);
-      $this->assertRegExp('/The request does not match any active API authorizations./', $result['error_message']);
+      $this->assertMatchesRegularExpression('/The request does not match any active API authorizations./', $result['error_message']);
     }
   }
 

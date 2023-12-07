@@ -30,7 +30,7 @@ class DbUtil {
     return array(
       'server' => $server,
       'username' => $parsed['user'] ?: NULL,
-      'password' => $parsed['pass'] ?: NULL,
+      'password' => $parsed['pass'] ?? NULL,
       'database' => $database,
       'ssl_params' => self::parseSSL($parsed['query'] ?? NULL),
     );
@@ -87,6 +87,11 @@ class DbUtil {
    * @throws SqlException
    */
   public static function connect($db) {
+    // During installation, we need to test proposed credentials. Ensure that tests report failure the same way on php7+php8.
+    if (version_compare(PHP_VERSION, '8', '>=')) {
+      mysqli_report(MYSQLI_REPORT_OFF);
+    }
+
     $conn = self::softConnect($db);
     if (mysqli_connect_errno()) {
       throw new SqlException(sprintf("Connection failed: %s\n", mysqli_connect_error()));
@@ -311,8 +316,8 @@ class DbUtil {
     $sql = sprintf("SELECT table_name FROM information_schema.TABLES  WHERE TABLE_SCHEMA='%s' AND TABLE_TYPE = 'BASE TABLE'",
       $conn->escape_string($databaseName));
 
-    return array_map(function($arr) {
-      return $arr['table_name'];
+    return array_map(function ($arr) {
+      return $arr['table_name'] ?? $arr['TABLE_NAME'];
     }, self::fetchAll($conn, $sql));
   }
 

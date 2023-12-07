@@ -25,18 +25,14 @@
  * @return int|string|null
  */
 function smarty_function_crmSetting($params, &$smarty) {
-
-  $errorScope = CRM_Core_TemporaryErrorScope::create(['CRM_Utils_REST', 'fatal']);
   unset($params['method']);
   unset($params['assign']);
-  $params['version'] = 3;
 
-  require_once 'api/api.php';
-  $result = civicrm_api('setting', 'getvalue', $params);
-  unset($errorScope);
-  // Core-688 FALSE is returned by Boolean settings, thus giving false errors.
-  if ($result === NULL) {
-    $smarty->trigger_error("Unknown error");
+  try {
+    $result = civicrm_api3('setting', 'getvalue', $params);
+  }
+  catch (Exception $e) {
+    $smarty->trigger_error('{crmAPI} ' . $e->getMessage());
     return NULL;
   }
 

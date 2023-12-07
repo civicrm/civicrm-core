@@ -6,10 +6,14 @@
  */
 class CRM_Utils_FileTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->callAPISuccess('OptionValue', 'get', ['option_group_id' => 'safe_file_extension', 'value' => 17, 'api.option_value.delete' => ['id' => "\$value.id"]]);
+  }
+
   /**
    * Test is child path.
    */
-  public function testIsChildPath() {
+  public function testIsChildPath(): void {
     $testCases = [];
     $testCases[] = ['/ab/cd/ef', '/ab/cd', FALSE];
     $testCases[] = ['/ab/cd', '/ab/cd/ef', TRUE];
@@ -39,7 +43,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
   }
 
-  public function testStripComment() {
+  public function testStripComment(): void {
     $strings = [
       "\nab\n-- cd\nef" => "\nab\nef",
       "ab\n-- cd\nef" => "ab\nef",
@@ -148,7 +152,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   /**
    * Check a few variations of isIncludable
    */
-  public function testIsIncludable() {
+  public function testIsIncludable(): void {
     $path = \Civi::paths()->getPath('[civicrm.private]/');
     $bare_filename = 'afile' . time() . '.php';
     $file = "$path/$bare_filename";
@@ -209,7 +213,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * Just trying to include some of the same tests as php itself and
    * this doesn't fit in well to a dataprovider so is separate.
    */
-  public function testIsDirMkdir() {
+  public function testIsDirMkdir(): void {
     $a_dir = sys_get_temp_dir() . '/testIsDir';
     // I think temp is global to the test node, so if any test failed on this
     // in the past it doesn't get cleaned up and so already exists.
@@ -227,7 +231,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   /**
    * testIsDirSlashVariations
    */
-  public function testIsDirSlashVariations() {
+  public function testIsDirSlashVariations(): void {
     $a_dir = sys_get_temp_dir() . '/testIsDir';
     // I think temp is global to the test node, so if any test failed on this
     // in the past it doesn't get cleaned up and so already exists.
@@ -272,7 +276,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * Test hard and soft links with isDir
    * Note hard links to directories aren't allowed so can only test with file.
    */
-  public function testIsDirLinks() {
+  public function testIsDirLinks(): void {
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
       $this->markTestSkipped('Windows has links but not the same.');
     }
@@ -318,10 +322,9 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * @param bool $expected
    */
   public function testIsDirWithOpenBasedir(?string $input, bool $expected) {
-    $originalOpenBasedir = ini_get('open_basedir');
-
     // This might not always be under cms root, but let's see how it goes.
-    $a_dir = \Civi::paths()->getPath('[civicrm.compile]/');
+    $a_dir = \Civi::paths()->getPath('[civicrm.compile]/.');
+
     if (file_exists("{$a_dir}/isDirTest/ok/ok.txt")) {
       unlink("{$a_dir}/isDirTest/ok/ok.txt");
     }
@@ -339,36 +342,112 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     // For now let's try this, assuming a drupal 7 structure where we know
     // where this file is:
     $cms_root = realpath(__DIR__ . '/../../../../../../../..');
-    // We also need temp dir because phpunit creates files in there as it does stuff before we can reset basedir.
-    ini_set('open_basedir', $cms_root . PATH_SEPARATOR . sys_get_temp_dir());
 
-    $this->assertTrue(mkdir("{$a_dir}/isDirTest"));
-    $this->assertTrue(mkdir("{$a_dir}/isDirTest/ok"));
+    // NOTE: The `[civicrm.compile]` does not necessarily live under the public `[cms.root] -- e.g. if you have a private data-folder.
+    $open_base_dirs = implode(PATH_SEPARATOR, [$cms_root, dirname($a_dir)]);
+
+    // This test requires tightening `open_basedir` settings, which is a one-way change.
+    // Therefore, we have to do that part of the test in a sub-process.
+    // If you run directly in the same-process, then (eg) `phpunit` will have trouble writing error-data to JUnit XML files.
+    [$exitCode, $stdout, $stderr] = $this->runStaticMethodAsScript(__CLASS__, 'doIsDirWithOpenBasedir', [$a_dir, $open_base_dirs, $input, $expected]);
+    $this->assertEquals('"OK"', trim($stdout), 'doIsDirWithOpenBasedir() should return OK');
+    $this->assertEquals('', trim($stderr), 'doIsDirWithOpenBasedir() should not generate warnings');
+    $this->assertEquals(0, $exitCode, 'doIsDirWithOpenBasedir() should exit normally');
+
+    unlink("{$a_dir}/isDirTest/ok/ok.txt");
+    rmdir("{$a_dir}/isDirTest/ok");
+    rmdir("{$a_dir}/isDirTest");
+  }
+
+  /**
+   * @param string $a_dir
+   * @param string $open_base_dirs
+   * @param string|null $input
+   * @param bool $expected
+   * @return string
+   * @throws \ErrorException
+   */
+  public static function doIsDirWithOpenBasedir(string $a_dir, string $open_base_dirs, ?string $input, bool $expected): string {
+    // We also need temp dir because phpunit creates files in there as it does stuff before we can reset basedir.
+    ini_set('open_basedir', $open_base_dirs . PATH_SEPARATOR . sys_get_temp_dir());
+
+    if (!mkdir("{$a_dir}/isDirTest")) {
+      return "Failed to make isDirTest";
+    }
+
+    if (!mkdir("{$a_dir}/isDirTest/ok")) {
+      return "Failed to make isDirTest/ok";
+    }
+
     file_put_contents("{$a_dir}/isDirTest/ok/ok.txt", 'Hello World!');
     // hmm the "bad" isn't going to work the same way php's own tests work. We
     // need to find a directory outside both cms_root and the sys temp dir.
     // Let's just use some known unix files that always exist instead.
     // mkdir("{$a_dir}/isDirTest/bad");
 
-    $old_cwd = getcwd();
-    $this->assertTrue(chdir("{$a_dir}/isDirTest/ok"));
+    if (!chdir("{$a_dir}/isDirTest/ok")) {
+      return 'Failed to chdir to isDirTest/ok';
+    }
 
     clearstatcache();
-    if ($expected) {
-      $this->assertTrue(CRM_Utils_File::isDir($input));
-    }
-    else {
+    $actual = CRM_Utils_File::isDir($input); /* Should pass */
+    // $actual = is_dir($input); /* Should fail */
+    if ($expected !== $actual) {
+      return sprintf("isDir returned incorrect result. Expected=%s Actual=%s", json_encode($expected), json_encode($actual));
       // Note that except for 'ok.txt', the real is_dir() would give an
       // error for these. For 'ok.txt' it would return false, but no error.
       // So this is what we are changing about the real function.
-      $this->assertFalse(CRM_Utils_File::isDir($input));
     }
 
-    ini_set('open_basedir', $originalOpenBasedir);
-    $this->assertTrue(chdir($old_cwd));
-    unlink("{$a_dir}/isDirTest/ok/ok.txt");
-    rmdir("{$a_dir}/isDirTest/ok");
-    rmdir("{$a_dir}/isDirTest");
+    return 'OK';
+  }
+
+  protected function runStaticMethodAsScript(string $class, string $method, $args = []) {
+    $func = new ReflectionMethod($class, $method);
+    $outClass = 'Wrapper' . time();
+    $ignoreStdErr = ';^Xdebug:;';
+
+    $inFile = $func->getFileName();
+    $inFileLines = explode("\n", file_get_contents($inFile));
+
+    $lines = array_merge(
+      [
+        '<' . '?php',
+        "class $outClass {",
+      ],
+      array_slice($inFileLines, $func->getStartLine() - 1, $func->getEndLine() - $func->getStartLine() + 1),
+      [
+        '}',
+        sprintf('$args = %s;', var_export($args, 1)),
+        sprintf('return %s::%s(...$args);', $outClass, $method),
+      ]
+    );
+    $tmpSrc = implode("\n", $lines);
+
+    $outFile = tempnam(sys_get_temp_dir(), 'test-script-') . '.php';
+    file_put_contents($outFile, $tmpSrc);
+
+    try {
+      $cmd = 'cv ev -v ' . escapeshellarg("return require \"$outFile\";");
+      $descriptorSpec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
+      $oldOutput = getenv('CV_OUTPUT');
+      putenv("CV_OUTPUT=json");
+      $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__);
+      putenv("CV_OUTPUT=$oldOutput");
+      fclose($pipes[0]);
+      $stdout = stream_get_contents($pipes[1]);
+      $stderr = stream_get_contents($pipes[2]);
+      fclose($pipes[1]);
+      fclose($pipes[2]);
+
+      $stderr = implode("\n", preg_grep($ignoreStdErr, explode("\n", $stderr), PREG_GREP_INVERT));
+      $exitCode = proc_close($process);
+
+      return [$exitCode, $stdout, $stderr];
+    }
+    finally {
+      unlink($outFile);
+    }
   }
 
   /**
@@ -536,6 +615,69 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     else {
       $this->assertSame($expected, CRM_Utils_File::makeFilenameWithUnicode($input, $replacementCharacter, $cutoffLength));
     }
+  }
+
+  public function trueOrFalse(): array {
+    return [
+      'TRUE' => [TRUE],
+      'FALSE' => [FALSE],
+    ];
+  }
+
+  /**
+   * @param bool $isRelative
+   * @dataProvider trueOrFalse
+   */
+  public function testFindFilesDepth(bool $isRelative) {
+    $CRM = Civi::paths()->getPath('[civicrm.root]/CRM');
+    $depthResults[0] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 0);
+    $depthResults[1] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 1);
+    $depthResults[2] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 2);
+    $depthResults[3] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 3);
+    $depthResults[NULL] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative);
+
+    $expectPrefix = $isRelative ? '' : $CRM . '/';
+
+    $expectFiles['Contact/BAO/Contact.php'] = [0 => FALSE, 1 => FALSE, 2 => TRUE, 3 => TRUE, NULL => TRUE];
+    $expectFiles['Contact/Import/Parser/Contact.php'] = [0 => FALSE, 1 => FALSE, 2 => FALSE, 3 => TRUE, NULL => TRUE];
+
+    foreach ($expectFiles as $expectFile => $expectMatches) {
+      $actualMatches = [];
+      foreach ($expectMatches as $depth => $expectMatch) {
+        $actualMatches[$depth] = in_array($expectPrefix . $expectFile, $depthResults[$depth]);
+      }
+      $this->assertEquals($expectMatches, $actualMatches, "The file $expectFile should be found as follows:");
+    }
+  }
+
+  /**
+   * Generate examples to test the safe file extension
+   * @return array
+   */
+  public static function safeFileExtensionExamples(): array {
+    $cases = [
+      'PDF File Extension' => ['pdf', TRUE, TRUE],
+      'PHP File Extension' => ['php', FALSE, FALSE],
+      'PHAR' => ['phar', FALSE, FALSE],
+      'PHP5 File Extension' => ['php5', FALSE, FALSE],
+    ];
+    return $cases;
+  }
+
+  /**
+   * Test that modifying the safe File Extension option group still ensures some are blocked
+   * @dataProvider safeFileExtensionExamples
+   */
+  public function testSafeFileExtensionValidation($extension, $standardInstallCheck, $afterModificationCheck): void {
+    $this->assertEquals($standardInstallCheck, CRM_Utils_File::isExtensionSafe($extension));
+    $optionValue = $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => 'safe_file_extension',
+      'label' => $extension,
+      'name' => $extension,
+      'value' => 17,
+    ]);
+    unset(Civi::$statics['CRM_Utils_File']['file_extensions']);
+    $this->assertEquals($standardInstallCheck, CRM_Utils_File::isExtensionSafe($extension));
   }
 
 }

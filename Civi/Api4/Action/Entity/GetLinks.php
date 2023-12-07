@@ -36,7 +36,7 @@ class GetLinks extends \Civi\Api4\Generic\BasicGetAction {
           'links' => [],
         ];
         foreach ($table->getTableLinks() as $link) {
-          if (!$link->isDeprecated()) {
+          if (!$link->isDeprecatedBy()) {
             $item['links'][] = $link->toArray();
           }
         }

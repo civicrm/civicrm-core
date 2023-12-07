@@ -28,7 +28,7 @@ use api\v4\Api4TestBase;
  */
 class SubscriptionHistoryTest extends Api4TestBase {
 
-  public function testGet() {
+  public function testGet(): void {
     $contact = $this->createTestRecord('Contact');
     $group = $this->createTestRecord('Group');
     $timeAdded = time();
@@ -60,6 +60,55 @@ class SubscriptionHistoryTest extends Api4TestBase {
     $this->assertCount(1, $historyRemoved);
     $this->assertGreaterThanOrEqual($timeRemoved, strtotime($historyRemoved->single()['date']));
     $this->assertLessThanOrEqual(time(), strtotime($historyRemoved->single()['date']));
+
+    $timeDeleted = time();
+    GroupContact::delete()
+      ->addWhere('id', '=', $groupContact['id'])
+      ->execute();
+    $historyDeleted = SubscriptionHistory::get()
+      ->addSelect('*')
+      ->addWhere('group_id', '=', $group['id'])
+      ->addWhere('status', '=', 'Deleted')
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->execute();
+    $this->assertCount(1, $historyDeleted);
+    $this->assertGreaterThanOrEqual($timeDeleted, strtotime($historyDeleted->single()['date']));
+    $this->assertLessThanOrEqual(time(), strtotime($historyDeleted->single()['date']));
+  }
+
+  public function testGetPermissions(): void {
+    $this->createLoggedInUser();
+
+    $contact = $this->createTestRecord('Contact');
+    $group = $this->createTestRecord('Group');
+    $groupContact = $this->createTestRecord('GroupContact', [
+      'group_id' => $group['id'],
+      'contact_id' => $contact['id'],
+    ]);
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+    ];
+
+    $historyAdded = SubscriptionHistory::get()
+      ->addSelect('*')
+      ->addWhere('group_id', '=', $group['id'])
+      ->addWhere('status', '=', 'Added')
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->execute();
+    $this->assertCount(1, $historyAdded);
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    $historyAdded = SubscriptionHistory::get()
+      ->addSelect('*')
+      ->addWhere('group_id', '=', $group['id'])
+      ->addWhere('status', '=', 'Added')
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->execute();
+    $this->assertCount(0, $historyAdded);
+
   }
 
 }

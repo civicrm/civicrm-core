@@ -304,7 +304,7 @@
     },
     refresh: function() {
       var that = this,
-        hash = this.options.url.split('#')[1];
+        hash = this.options.url.split('#')[1],
         url = this._formatUrl(this.options.url, 'json');
       $(this.element).data('urlHash', hash);
       if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
@@ -578,7 +578,8 @@
       settings.dialog.height = 300;
     }
     else if ($el.hasClass('medium-popup')) {
-      settings.dialog.width = settings.dialog.height = '50%';
+      settings.dialog.width = '50%';
+      settings.dialog.height = '30%';
     }
     var dialog = popup(url, settings);
     // Trigger events from the dialog on the original link element

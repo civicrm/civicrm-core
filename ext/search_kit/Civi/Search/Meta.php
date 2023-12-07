@@ -29,8 +29,11 @@ class Meta {
    * @return array
    */
   public static function getCalcFields($apiEntity, $apiParams): array {
-    $calcFields = [];
     $api = \Civi\API\Request::create($apiEntity, 'get', $apiParams);
+    if (!is_a($api, '\Civi\Api4\Generic\DAOGetAction')) {
+      return [];
+    }
+    $calcFields = [];
     $selectQuery = new \Civi\Api4\Query\Api4SelectQuery($api);
     $joinMap = $joinCount = [];
     foreach ($apiParams['join'] ?? [] as $join) {
@@ -54,7 +57,7 @@ class Meta {
     ];
 
     foreach ($apiParams['select'] ?? [] as $select) {
-      if (strstr($select, ' AS ')) {
+      if (str_contains($select, ' AS ')) {
         $expr = SqlExpression::convert($select, TRUE);
         $label = $expr::getTitle();
         foreach ($expr->getFields() as $num => $fieldName) {
@@ -70,12 +73,18 @@ class Meta {
           $dataType = $field['data_type'] ?? 'String';
           $inputType = $field['input_type'] ?? $dataTypeToInputType[$dataType] ?? 'Text';
         }
+        $options = FALSE;
+        if ($expr->getType() === 'SqlFunction' && $expr::getOptions()) {
+          $inputType = 'Select';
+          $options = CoreUtil::formatOptionList($expr::getOptions(), ['id', 'label']);
+        }
 
         $calcFields[] = [
           'name' => $expr->getAlias(),
           'label' => $label,
           'input_type' => $inputType,
           'data_type' => $dataType,
+          'options' => $options,
         ];
       }
     }

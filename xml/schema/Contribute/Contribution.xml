@@ -88,6 +88,7 @@
     <pseudoconstant>
       <table>civicrm_contribution_page</table>
       <keyColumn>id</keyColumn>
+      <nameColumn>name</nameColumn>
       <labelColumn>title</labelColumn>
     </pseudoconstant>
     <html>
@@ -127,12 +128,11 @@
   </index>
   <field>
     <name>receive_date</name>
-    <title>Date Received</title>
+    <title>Contribution Date</title>
     <type>datetime</type>
     <import>true</import>
     <headerPattern>/receive(.?date)?/i</headerPattern>
     <dataPattern>/^\d{4}-?\d{2}-?\d{2} ?(\d{2}:?\d{2}:?(\d{2})?)?$/</dataPattern>
-    <comment>Date contribution was received - not necessarily the creation date of the record</comment>
     <add>1.3</add>
     <html>
      <type>Select Date</type>
@@ -368,6 +368,7 @@
     <readonly>true</readonly>
     <html>
       <label>Recurring Contribution</label>
+      <type>EntityRef</type>
     </html>
     <add>1.4</add>
   </field>
@@ -479,7 +480,7 @@
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
-      <prefetch>FALSE</prefetch>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
     <html>
       <type>EntityRef</type>
@@ -512,6 +513,8 @@
     <headerPattern>/tax(.?am(ou)?nt)?/i</headerPattern>
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <comment>Total tax amount of this contribution.</comment>
+    <default>0</default>
+    <required>true</required>
     <add>4.6</add>
     <html>
       <type>Text</type>

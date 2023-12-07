@@ -38,7 +38,7 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  public function testHookAlterMailer() {
+  public function testHookAlterMailer(): void {
     $test = $this;
     $mockMailer = new CRM_Utils_FakeObject([
       'send' => function ($recipients, $headers, $body) use ($test) {

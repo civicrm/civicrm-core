@@ -44,10 +44,10 @@
     <name>url</name>
     <title>Website</title>
     <type>varchar</type>
-    <length>128</length>
+    <length>255</length>
     <html>
       <type>Text</type>
-      <size>30</size>
+      <size>45</size>
     </html>
     <import>true</import>
     <headerPattern>/Website/i</headerPattern>

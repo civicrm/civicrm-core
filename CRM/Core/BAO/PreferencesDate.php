@@ -17,19 +17,13 @@
 class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
@@ -51,9 +45,12 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    *
    * @param int $id
    * @throws CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function del($id) {
     throw new CRM_Core_Exception('Cannot call del function');
+    // Stop this showing up when we're looking for undeprecated del's by keeping this: static::deleteRecord(
   }
 
   /**

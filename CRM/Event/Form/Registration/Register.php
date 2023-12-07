@@ -35,13 +35,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   protected $_requireApprovalMsg;
 
   /**
-   * Deprecated parameter that we hope to remove.
-   *
-   * @var bool
-   */
-  public $_quickConfig;
-
-  /**
    * Skip duplicate check.
    *
    * This can be set using hook_civicrm_buildForm() to override the registration dupe check.
@@ -93,14 +86,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
     elseif (!empty($fields['amount']) &&
       (isset($form->_values['discount'][$fields['amount']])
-        && CRM_Utils_Array::value('value', $form->_values['discount'][$fields['amount']]) == 0
+        && ($form->_values['discount'][$fields['amount']]['value'] ?? NULL) == 0
       )
     ) {
       $isZeroAmount = TRUE;
     }
     elseif (!empty($fields['amount']) &&
       (isset($form->_values['fee'][$fields['amount']])
-        && CRM_Utils_Array::value('value', $form->_values['fee'][$fields['amount']]) == 0
+        && ($form->_values['fee'][$fields['amount']]['value'] ?? NULL) == 0
       )
     ) {
       $isZeroAmount = TRUE;
@@ -196,7 +189,26 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     // get the participant values from EventFees.php, CRM-4320
     if ($this->_allowConfirmation) {
-      CRM_Event_Form_EventFees::preProcess($this);
+      $this->eventFeeWrangling($this);
+    }
+  }
+
+  /**
+   * This is previously shared code which is probably of little value.
+   *
+   * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function eventFeeWrangling($form) {
+    $form->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $form);
+    $form->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $form);
+
+    //CRM-6907 set event specific currency.
+    if ($this->getEventID() &&
+      ($currency = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'currency'))
+    ) {
+      CRM_Core_Config::singleton()->defaultCurrency = $currency;
     }
   }
 
@@ -317,7 +329,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($this->_allowConfirmation) {
       $this->_contactId = $contactID;
       $this->_discountId = $discountId;
-      $forcePayLater = CRM_Utils_Array::value('is_pay_later', $this->_defaults, FALSE);
+      $forcePayLater = $this->_defaults['is_pay_later'] ?? FALSE;
       $this->_defaults = array_merge($this->_defaults, CRM_Event_Form_EventFees::setDefaultValues($this));
       $this->_defaults['is_pay_later'] = $forcePayLater;
 
@@ -354,17 +366,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     // CRM-18399: used by template to pass pre profile id as a url arg
     $this->assign('custom_pre_id', $this->_values['custom_pre_id']);
-
-    // Required for currency formatting in the JS layer
-
-    // Required for currency formatting in the JS layer
-    // this is a temporary fix intended to resolve a regression quickly
-    // And assigning moneyFormat for js layer formatting
-    // will only work until that is done.
-    // https://github.com/civicrm/civicrm-core/pull/19151
-    $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56));
-
-    CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
 
     $contactID = $this->getContactID();
     $this->assign('contact_id', $contactID);
@@ -432,20 +433,30 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->assign('isAdditionalParticipants', $isAdditionalParticipants);
 
     if ($this->_values['event']['is_monetary']) {
-      self::buildAmount($this);
+      // Required for currency formatting in the JS layer
+      // this is a temporary fix intended to resolve a regression quickly
+      // And assigning moneyFormat for js layer formatting
+      // will only work until that is done.
+      // https://github.com/civicrm/civicrm-core/pull/19151
+      $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56));
+      // build amount only when needed, skip incase of event full and waitlisting is enabled
+      // and few other conditions check preProcess()
+      if (!$this->_noFees) {
+        self::buildAmount($this, TRUE, NULL, $this->_priceSetId);
+      }
+      if (!$this->showPaymentOnConfirm) {
+        CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+        $this->addPaymentProcessorFieldsToForm();
+      }
     }
-
-    if ($contactID === 0 && !$this->_values['event']['is_multiple_registrations']) {
+    $isSelectContactID = ($contactID === 0 && !$this->_values['event']['is_multiple_registrations']);
+    $this->assign('nocid', $isSelectContactID);
+    if ($isSelectContactID) {
       //@todo we are blocking for multiple registrations because we haven't tested
       $this->addCIDZeroOptions();
     }
 
-    if ($this->_values['event']['is_monetary']) {
-      $this->addPaymentProcessorFieldsToForm();
-    }
-
     $this->addElement('hidden', 'bypass_payment', NULL, ['id' => 'bypass_payment']);
-
     $this->assign('bypassPayment', $bypassPayment);
 
     if (!$contactID) {
@@ -477,6 +488,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       if ($createCMSUser) {
         CRM_Core_BAO_CMSUser::buildForm($this, $profileID, TRUE);
       }
+      else {
+        $this->assign('showCMS', FALSE);
+      }
+    }
+    else {
+      $this->assign('showCMS', FALSE);
     }
 
     //we have to load confirm contribution button in template
@@ -513,11 +530,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
       ];
-      if (
-        !$this->_values['event']['is_multiple_registrations']
-        && !$this->_values['event']['is_monetary']
-        && !$this->_values['event']['is_confirm_enabled']
-      ) {
+      if (!$this->_values['event']['is_monetary'] && !$this->_values['event']['is_confirm_enabled']) {
         $buttonParams['name'] = ts('Register');
       }
       else {
@@ -535,34 +548,29 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($this->_pcpId) {
       CRM_PCP_BAO_PCP::buildPcp($this->_pcpId, $this);
     }
+    else {
+      $this->assign('pcp', FALSE);
+    }
   }
 
   /**
    * Build the radio/text form elements for the amount field
    *
+   * @internal function is not currently called by any extentions in our civi
+   * 'universe' and is not supported for such use. Signature has changed & will
+   * change again.
+   *
    * @param CRM_Event_Form_Registration_Register $form
    *   Form object.
    * @param bool $required
    *   True if you want to add formRule.
-   * @param int $discountId
+   * @param int|null $discountId
    *   Discount id for the event.
+   * @param int|null $priceSetID
    *
    * @throws \CRM_Core_Exception
    */
-  public static function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
-    // build amount only when needed, skip incase of event full and waitlisting is enabled
-    // and few other conditions check preProcess()
-    if (property_exists($form, '_noFees') && $form->_noFees) {
-      return;
-    }
-
-    //if payment done, no need to build the fee block.
-    if (!empty($form->_paymentId)) {
-      //fix to display line item in update mode.
-      $form->assign('priceSet', $form->_priceSet ?? NULL);
-      return;
-    }
-
+  public static function buildAmount($form, $required, $discountId, $priceSetID) {
     $feeFields = $form->_values['fee'] ?? NULL;
 
     if (is_array($feeFields)) {
@@ -595,31 +603,21 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $className = CRM_Utils_System::getClassName($form);
 
     //build the priceset fields.
-    if (isset($form->_priceSetId) && $form->_priceSetId) {
+    if ($priceSetID) {
 
       //format price set fields across option full.
       self::formatFieldsForOptionFull($form);
-
-      if (!empty($form->_priceSet['is_quick_config'])) {
-        $form->_quickConfig = $form->_priceSet['is_quick_config'];
-      }
-      $form->add('hidden', 'priceSetId', $form->_priceSetId);
+      // This is probably not required now - normally loaded from event ....
+      $form->add('hidden', 'priceSetId', $priceSetID);
 
       // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
-      $adminFieldVisible = FALSE;
-      if (CRM_Core_Permission::check('administer CiviCRM data')) {
-        $adminFieldVisible = TRUE;
-      }
-
-      $hideAdminValues = TRUE;
-      if (CRM_Core_Permission::check('edit event participants')) {
-        $hideAdminValues = FALSE;
-      }
+      $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM data');
+      $hideAdminValues = !CRM_Core_Permission::check('edit event participants');
 
       foreach ($form->_feeBlock as $field) {
         // public AND admin visibility fields are included for back-office registration and back-office change selections
-        if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
-          (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == TRUE) ||
+        if (($field['visibility'] ?? NULL) == 'public' ||
+          (($field['visibility'] ?? NULL) == 'admin' && $adminFieldVisible == TRUE) ||
           $className == 'CRM_Event_Form_Participant' ||
           $className === 'CRM_Event_Form_Task_Register' ||
           $className == 'CRM_Event_Form_ParticipantFeeSelection'
@@ -671,10 +669,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           }
         }
       }
-      $form->_priceSet['id'] = $form->_priceSet['id'] ?? $form->_priceSetId;
+      $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetID;
       $form->assign('priceSet', $form->_priceSet);
     }
     else {
+      // Is this reachable?
+      CRM_Core_Error::deprecatedWarning('code believed to be unreachable');
       $eventFeeBlockValues = $elements = $elementJS = [];
       foreach ($form->_feeBlock as $fee) {
         if (is_array($fee)) {
@@ -754,10 +754,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
       foreach ($field['options'] as & $option) {
         $optId = $option['id'];
-        $count = CRM_Utils_Array::value('count', $option, 0);
-        $maxValue = CRM_Utils_Array::value('max_value', $option, 0);
-        $dbTotalCount = CRM_Utils_Array::value($optId, $recordedOptionsCount, 0);
-        $currentTotalCount = CRM_Utils_Array::value($optId, $currentOptionsCount, 0);
+        $count = $option['count'] ?? 0;
+        $maxValue = $option['max_value'] ?? 0;
+        $dbTotalCount = $recordedOptionsCount[$optId] ?? 0;
+        $currentTotalCount = $currentOptionsCount[$optId] ?? 0;
 
         $totalCount = $currentTotalCount + $dbTotalCount;
         $isFull = FALSE;
@@ -769,7 +769,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           $optionFullIds[$optId] = $optId;
           if ($field['html_type'] != 'Select') {
             if (in_array($optId, $defaultPricefieldIds)) {
-              $optionFullTotalAmount += CRM_Utils_Array::value('amount', $option);
+              $optionFullTotalAmount += $option['amount'] ?? 0;
             }
           }
           else {
@@ -899,7 +899,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
-      if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
+      $greetingType = $fields[$greeting] ?? NULL;
+      if ($greetingType) {
         $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $greeting . '_id', 'Customized');
         if ($customizedValue == $greetingType && empty($fields[$greeting . '_custom'])) {
           $errors[$greeting . '_custom'] = ts('Custom %1 is a required field if %1 is of type Customized.',
@@ -913,7 +914,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($form->_values['event']['is_monetary']) {
       if (empty($form->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 &&
         !isset($fields['payment_processor_id'])) {
-        $errors['payment_processor_id'] = ts('Please select a Payment Method');
+        if (!$form->showPaymentOnConfirm) {
+          $errors['payment_processor_id'] = ts('Please select a Payment Method');
+        }
       }
 
       if (self::isZeroAmount($fields, $form)) {
@@ -926,12 +929,15 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       ) {
         return empty($errors) ? TRUE : $errors;
       }
-      CRM_Core_Payment_Form::validatePaymentInstrument(
-        $fields['payment_processor_id'],
-        $fields,
-        $errors,
-        (!$form->_isBillingAddressRequiredForPayLater ? NULL : 'billing')
-      );
+
+      if (!$form->showPaymentOnConfirm) {
+        CRM_Core_Payment_Form::validatePaymentInstrument(
+          $fields['payment_processor_id'],
+          $fields,
+          $errors,
+          (!$form->_isBillingAddressRequiredForPayLater ? NULL : 'billing')
+        );
+      }
     }
 
     return empty($errors) ? TRUE : $errors;
@@ -982,7 +988,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->set('is_pay_later', $params['is_pay_later']);
 
     // assign pay later stuff
-    $this->_params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
+    $this->_params['is_pay_later'] = $params['is_pay_later'] ?? FALSE;
     $this->assign('is_pay_later', $params['is_pay_later']);
     $this->assign('pay_later_text', $params['is_pay_later'] ? $this->_values['event']['pay_later_text'] : NULL);
     $this->assign('pay_later_receipt', $params['is_pay_later'] ? $this->_values['event']['pay_later_receipt'] : NULL);
@@ -1055,6 +1061,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
       }
       elseif (empty($params['priceSetId'])) {
+        CRM_Core_Error::deprecatedWarning('unreachable code price set is always set here - passed as a hidden field although we could just load...');
         if (!empty($params['amount'])) {
           $params['amount'] = $this->_values['fee'][$params['amount']]['value'];
         }

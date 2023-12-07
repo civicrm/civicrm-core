@@ -12,6 +12,17 @@ if (file_exists('/etc/timezone')) {
   }
 }
 
+$GLOBALS['CIVICRM_FORCE_MODULES'][] = 'civitest';
+
+function civitest_civicrm_scanClasses(array &$classes): void {
+  $phpunit = \Civi::paths()->getPath('[civicrm.root]/tests/phpunit');
+  if (strpos(get_include_path(), $phpunit) !== FALSE) {
+    \Civi\Core\ClassScanner::scanFolders($classes, $phpunit, 'CRM/*/WorkflowMessage', '_', '/Test$/');
+    \Civi\Core\ClassScanner::scanFolders($classes, $phpunit, 'Civi/*/WorkflowMessage', '\\', '/Test$/');
+    // Exclude all `*Test.php` files - if we load them, then phpunit gets confused.
+  }
+}
+
 # Crank up the memory
 ini_set('memory_limit', '2G');
 define('CIVICRM_TEST', 1);
@@ -68,7 +79,7 @@ function _phpunit_mockoloader($prefix, $base_dir, $class) {
  */
 function cv($cmd, $decode = 'json') {
   $cmd = 'cv ' . $cmd;
-  $descriptorSpec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => STDERR);
+  $descriptorSpec = [0 => ["pipe", "r"], 1 => ["pipe", "w"], 2 => STDERR];
   $oldOutput = getenv('CV_OUTPUT');
   putenv("CV_OUTPUT=json");
   $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__);

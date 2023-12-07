@@ -29,9 +29,16 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
 
   protected $_text = NULL;
 
-  protected $_table = NULL;
+  protected $_table;
 
-  protected $_tableName = NULL;
+  protected $tableName;
+
+  /**
+   * @return mixed
+   */
+  public function getTableName() {
+    return $this->tableName;
+  }
 
   protected $_entityIDTableName = NULL;
 
@@ -53,7 +60,7 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
    *
    * @var array|null
    */
-  protected $_limitRowClause = NULL;
+  protected $_limitRowClause;
 
   /**
    * Limit detail clause.
@@ -105,8 +112,8 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
       // 1. this custom search has slightly different structure ,
       // 2. we are in constructor right now,
       // we 'll use a small hack -
-      $rowCount = CRM_Utils_Array::value('crmRowCount', $_REQUEST, Civi::settings()->get('default_pager_size'));
-      $pageId = CRM_Utils_Array::value('crmPID', $_REQUEST, 1);
+      $rowCount = $_REQUEST['crmRowCount'] ?? Civi::settings()->get('default_pager_size');
+      $pageId = $_REQUEST['crmPID'] ?? 1;
       $offset = ($pageId - 1) * $rowCount;
       $this->_limitClause = NULL;
       $this->_limitRowClause = [$rowCount, NULL];
@@ -119,16 +126,18 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
   /**
    * Get a value from $formValues. If missing, get it from the request.
    *
-   * @param $formValues
-   * @param $field
+   * @param array $formValues
+   * @param string $field
    * @param $type
    * @param null $default
+   *
    * @return mixed|null
+   * @throws \CRM_Core_Exception
    */
-  public function getFieldValue($formValues, $field, $type, $default = NULL) {
+  public function getFieldValue(array $formValues, string $field, $type, $default = NULL) {
     $value = $formValues[$field] ?? NULL;
     if (!$value) {
-      return CRM_Utils_Request::retrieve($field, $type, CRM_Core_DAO::$_nullObject, FALSE, $default);
+      return CRM_Utils_Request::retrieve($field, $type, NULL, FALSE, $default);
     }
     return $value;
   }
@@ -148,9 +157,9 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
     }
   }
 
-  public function buildTempTable() {
+  public function buildTempTable(): void {
     $table = CRM_Utils_SQL_TempTable::build()->setCategory('custom')->setMemory();
-    $this->_tableName = $table->getName();
+    $this->tableName = $table->getName();
 
     $this->_tableFields = [
       'id' => 'int unsigned NOT NULL AUTO_INCREMENT',
@@ -209,33 +218,29 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
       $sql .= "$name $desc,\n";
     }
 
-    $sql .= "
+    $sql .= '
   PRIMARY KEY ( id )
-";
+';
     $table->createWithColumns($sql);
 
     $entityIdTable = CRM_Utils_SQL_TempTable::build()->setCategory('custom')->setMemory();
     $this->_entityIDTableName = $entityIdTable->getName();
-    $sql = "
+    $sql = '
   id int unsigned NOT NULL AUTO_INCREMENT,
   entity_id int unsigned NOT NULL,
 
   UNIQUE INDEX unique_entity_id ( entity_id ),
   PRIMARY KEY ( id )
-";
+';
     $entityIdTable->createWithColumns($sql);
-
-    if (!empty($this->_formValues['is_unit_test'])) {
-      $this->_tableNameForTest = $this->_tableName;
-    }
   }
 
-  public function fillTable() {
+  public function fillTable(): void {
+    /** @var CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery $partialQuery */
     foreach ($this->_partialQueries as $partialQuery) {
-      /** @var $partialQuery CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery */
       if (!$this->_table || $this->_table == $partialQuery->getName()) {
         if ($partialQuery->isActive()) {
-          $result = $partialQuery->fillTempTable($this->_text, $this->_entityIDTableName, $this->_tableName, $this->_limitClause, $this->_limitDetailClause);
+          $result = $partialQuery->fillTempTable($this->_text, $this->_entityIDTableName, $this->tableName, $this->_limitClause, $this->_limitDetailClause);
           $this->_foundRows[$partialQuery->getName()] = $result['count'];
         }
       }
@@ -244,9 +249,9 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
     $this->filterACLContacts();
   }
 
-  public function filterACLContacts() {
+  public function filterACLContacts(): void {
     if (CRM_Core_Permission::check('view all contacts')) {
-      CRM_Core_DAO::executeQuery("DELETE FROM {$this->_tableName} WHERE contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)");
+      CRM_Core_DAO::executeQuery("DELETE FROM {$this->tableName} WHERE contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)");
       return;
     }
 
@@ -262,7 +267,7 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
 
     $sql = "
 DELETE     t.*
-FROM       {$this->_tableName} t
+FROM       {$this->tableName} t
 WHERE      NOT EXISTS ( SELECT c.contact_id
                         FROM civicrm_acl_contact_cache c
                         WHERE c.user_id = %1 AND t.contact_id = c.contact_id )
@@ -271,7 +276,7 @@ WHERE      NOT EXISTS ( SELECT c.contact_id
 
     $sql = "
 DELETE     t.*
-FROM       {$this->_tableName} t
+FROM       {$this->tableName} t
 WHERE      t.table_name = 'Activity' AND
            NOT EXISTS ( SELECT c.contact_id
                         FROM civicrm_acl_contact_cache c
@@ -281,7 +286,7 @@ WHERE      t.table_name = 'Activity' AND
 
     $sql = "
 DELETE     t.*
-FROM       {$this->_tableName} t
+FROM       {$this->tableName} t
 WHERE      t.table_name = 'Activity' AND
            NOT EXISTS ( SELECT c.contact_id
                         FROM civicrm_acl_contact_cache c
@@ -301,8 +306,8 @@ WHERE      t.table_name = 'Activity' AND
 
     // also add a select box to allow the search to be constrained
     $tables = ['' => ts('All tables')];
+    /** @var CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery $partialQuery */
     foreach ($this->_partialQueries as $partialQuery) {
-      /** @var $partialQuery CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery */
       if ($partialQuery->isActive()) {
         $tables[$partialQuery->getName()] = $partialQuery->getLabel();
       }
@@ -360,35 +365,33 @@ WHERE      t.table_name = 'Activity' AND
     $this->initialize();
 
     $summary = [];
+    /** @var CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery $partialQuery */
     foreach ($this->_partialQueries as $partialQuery) {
-      /** @var $partialQuery CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery */
       $summary[$partialQuery->getName()] = [];
     }
 
     // now iterate through the table and add entries to the relevant section
-    $sql = "SELECT * FROM {$this->_tableName}";
+    $sql = "SELECT * FROM {$this->tableName}";
     if ($this->_table) {
       $sql .= " {$this->toLimit($this->_limitRowClause)} ";
     }
     $dao = CRM_Core_DAO::executeQuery($sql);
 
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
-    $roleIds = CRM_Event_PseudoConstant::participantRole();
     while ($dao->fetch()) {
       $row = [];
       foreach ($this->_tableFields as $name => $dontCare) {
-        if ($name != 'activity_type_id') {
+        if ($name !== 'activity_type_id') {
           $row[$name] = $dao->$name;
         }
         else {
-          $row['activity_type'] = $activityTypes[$dao->$name] ?? NULL;
+          $row['activity_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $dao->$name);
         }
       }
       if (isset($row['participant_role'])) {
         $participantRole = explode(CRM_Core_DAO::VALUE_SEPARATOR, $row['participant_role']);
         $viewRoles = [];
         foreach ($participantRole as $v) {
-          $viewRoles[] = $roleIds[$v];
+          $viewRoles[] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'role_id', $v);
         }
         $row['participant_role'] = implode(', ', $viewRoles);
       }
@@ -430,7 +433,7 @@ WHERE      t.table_name = 'Activity' AND
       return $this->_foundRows[$this->_table];
     }
     else {
-      return CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM {$this->_tableName}");
+      return CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM {$this->tableName}");
     }
   }
 
@@ -444,13 +447,7 @@ WHERE      t.table_name = 'Activity' AND
    */
   public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     $this->initialize();
-
-    if ($returnSQL) {
-      return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
-    }
-    else {
-      return CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM {$this->_tableName}");
-    }
+    return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
   /**
@@ -477,7 +474,7 @@ WHERE      t.table_name = 'Activity' AND
 
     $sql = "
 SELECT $select
-FROM   {$this->_tableName} contact_a
+FROM   {$this->tableName} contact_a
        {$this->toLimit($this->_limitRowClause)}
 ";
     return $sql;
@@ -509,7 +506,7 @@ FROM   {$this->_tableName} contact_a
   /**
    * @return array
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     return [];
   }
 
@@ -525,16 +522,16 @@ FROM   {$this->_tableName} contact_a
    *   SQL
    * @see CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery::toLimit
    */
-  public function toLimit($limit) {
+  public function toLimit($limit): string {
     if (is_array($limit)) {
-      list ($limit, $offset) = $limit;
+      [$limit, $offset] = $limit;
     }
     if (empty($limit)) {
       return '';
     }
     $result = "LIMIT {$limit}";
     if ($offset) {
-      $result .= " OFFSET {$offset}";
+      $result .= " OFFSET $offset";
     }
     return $result;
   }

@@ -107,7 +107,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    */
   public static function formRule($fields) {
     $errors = [];
-    if (CRM_Utils_Array::value('monetaryThousandSeparator', $fields) ==
+    if (($fields['monetaryThousandSeparator'] ?? NULL) ==
       CRM_Utils_Array::value('monetaryDecimalPoint', $fields)
     ) {
       $errors['monetaryThousandSeparator'] = ts('Thousands Separator and Decimal Delimiter can not be the same.');

@@ -535,11 +535,10 @@ function civicrm_api3_job_process_batch_merge($params) {
       'options' => ['limit' => 1],
     ]);
   }
-  $rgid = $params['rgid'] ?? NULL;
   $gid = $params['gid'] ?? NULL;
-  $mode = CRM_Utils_Array::value('mode', $params, 'safe');
+  $mode = $params['mode'] ?? 'safe';
 
-  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, 1, 2, CRM_Utils_Array::value('criteria', $params, []), CRM_Utils_Array::value('check_permissions', $params), NULL, $params['search_limit']);
+  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, 1, 2, $params['criteria'] ?? [], $params['check_permissions'] ?? FALSE, NULL, $params['search_limit']);
 
   return civicrm_api3_create_success($result, $params);
 }
@@ -622,15 +621,15 @@ function civicrm_api3_job_run_payment_cron($params) {
  * @return array
  */
 function civicrm_api3_job_cleanup($params) {
-  $session   = CRM_Utils_Array::value('session', $params, TRUE);
-  $tempTable = CRM_Utils_Array::value('tempTables', $params, TRUE);
-  $jobLog    = CRM_Utils_Array::value('jobLog', $params, TRUE);
-  $expired   = CRM_Utils_Array::value('expiredDbCache', $params, TRUE);
-  $prevNext  = CRM_Utils_Array::value('prevNext', $params, TRUE);
-  $dbCache   = CRM_Utils_Array::value('dbCache', $params, FALSE);
-  $memCache  = CRM_Utils_Array::value('memCache', $params, FALSE);
-  $tplCache  = CRM_Utils_Array::value('tplCache', $params, FALSE);
-  $wordRplc  = CRM_Utils_Array::value('wordRplc', $params, FALSE);
+  $session = $params['session'] ?? TRUE;
+  $tempTable = $params['tempTables'] ?? TRUE;
+  $jobLog = $params['jobLog'] ?? TRUE;
+  $expired = $params['expiredDbCache'] ?? TRUE;
+  $prevNext = $params['prevNext'] ?? TRUE;
+  $dbCache = $params['dbCache'] ?? FALSE;
+  $memCache = $params['memCache'] ?? FALSE;
+  $tplCache = $params['tplCache'] ?? FALSE;
+  $wordRplc = $params['wordRplc'] ?? FALSE;
 
   if ($session || $tempTable || $prevNext || $expired) {
     CRM_Core_BAO_Cache::cleanup($session, $tempTable, $prevNext, $expired);

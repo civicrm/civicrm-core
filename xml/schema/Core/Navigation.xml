@@ -7,6 +7,7 @@
   <comment>Table to store navigation.</comment>
   <add>3.0</add>
   <labelField>label</labelField>
+  <title>Menu Item</title>
   <field>
     <name>id</name>
     <title>Navigation ID</title>
@@ -126,6 +127,10 @@
     <type>boolean</type>
     <comment>Is this navigation item active?</comment>
     <default>1</default>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled</label>
+    </html>
     <required>true</required>
     <add>3.0</add>
   </field>

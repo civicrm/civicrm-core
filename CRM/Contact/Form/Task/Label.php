@@ -95,20 +95,13 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    * @param array|null $params
    */
   public function postProcess($params = NULL) {
+    if (!empty($params)) {
+      CRM_Core_Error::deprecatedWarning('params parameter is deprecated');
+    }
     $fv = $params ?: $this->controller->exportValues($this->_name);
     $locName = NULL;
-    //get the address format sequence from the config file
-    $mailingFormat = Civi::settings()->get('mailing_format');
 
-    $sequence = CRM_Utils_Address::sequence($mailingFormat);
-
-    foreach ($sequence as $v) {
-      $address[$v] = 1;
-    }
-
-    if (array_key_exists('postal_code', $address)) {
-      $address['postal_code_suffix'] = 1;
-    }
+    $addressReturnProperties = CRM_Contact_Form_Task_LabelCommon::getAddressReturnProperties();
 
     //build the returnproperties
     $returnProperties = ['display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1];
@@ -158,13 +151,13 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     if (!empty($fv['location_type_id'])) {
       $locType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       $locName = $locType[$fv['location_type_id']];
-      $location = ['location' => ["{$locName}" => $address]];
+      $location = ['location' => ["{$locName}" => $addressReturnProperties]];
       $returnProperties = array_merge($returnProperties, $location);
       $params[] = ['location_type', '=', [1 => $fv['location_type_id']], 0, 0];
       $primaryLocationOnly = FALSE;
     }
     else {
-      $returnProperties = array_merge($returnProperties, $address);
+      $returnProperties = array_merge($returnProperties, $addressReturnProperties);
       $primaryLocationOnly = TRUE;
     }
 
@@ -256,8 +249,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         $valuesothers = CRM_Core_BAO_Location::getValues($paramsothers, $valuesothers);
         if (!empty($fv['location_type_id'])) {
           foreach ($valuesothers as $vals) {
-            if (CRM_Utils_Array::value('location_type_id', $vals) ==
-              CRM_Utils_Array::value('location_type_id', $fv)
+            if (($vals['location_type_id'] ?? NULL) ==
+              ($fv['location_type_id'] ?? NULL)
             ) {
               foreach ($vals as $k => $v) {
                 if (in_array($k, [
@@ -304,7 +297,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
     // format the addresses according to CIVICRM_ADDRESS_FORMAT (CRM-1327)
     foreach ($rows as $id => $row) {
-      if ($commMethods = CRM_Utils_Array::value('preferred_communication_method', $row)) {
+      $commMethods = $row['preferred_communication_method'] ?? NULL;
+      if ($commMethods) {
         $val = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
         $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
         $temp = [];
@@ -316,10 +310,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $row['id'] = $id;
       $formatted = CRM_Utils_Address::formatMailingLabel($row, 'mailing_format', FALSE, TRUE, $tokenFields);
       $rows[$id] = [$formatted];
-    }
-
-    if (!empty($fv['is_unit_testing'])) {
-      return $rows;
     }
 
     //call function to create labels
@@ -353,10 +343,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    *   Associated array of contact data.
    * @param string $format
    *   Format in which labels needs to be printed.
-   * @param string $fileName
-   *   The name of the file to save the label in.
    */
-  private function createLabel($contactRows, $format, $fileName = 'MailingLabels_CiviCRM.pdf') {
+  private function createLabel(array $contactRows, $format) {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
     $pdf->Open();
     $pdf->AddPage();
@@ -371,7 +359,10 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $pdf->AddPdfLabel($val);
       $val = '';
     }
-    $pdf->Output($fileName, 'D');
+    if (CIVICRM_UF === 'UnitTests') {
+      throw new CRM_Core_Exception_PrematureExitException('pdf output called', ['contactRows' => $contactRows, 'format' => $format, 'pdf' => $pdf]);
+    }
+    $pdf->Output('MailingLabels_CiviCRM.pdf', 'D');
   }
 
 }

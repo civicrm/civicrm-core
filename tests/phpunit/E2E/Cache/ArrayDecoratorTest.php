@@ -30,7 +30,7 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
     );
   }
 
-  public function testDoubleLifeWithDelete() {
+  public function testDoubleLifeWithDelete(): void {
     $this->assertFalse($this->a->has('foo'));
     $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
 
@@ -50,7 +50,7 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
     $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
   }
 
-  public function testDoubleLifeWithClear() {
+  public function testDoubleLifeWithClear(): void {
     $this->assertFalse($this->a->has('foo'));
     $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
 
@@ -65,7 +65,7 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
     $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
   }
 
-  public function testSetTtl() {
+  public function testSetTtl(): void {
     // This test has exhibited some flakiness. It is overridden to
     // dump more detailed information about failures; however, it should be
     // substantively the same.

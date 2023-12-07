@@ -66,14 +66,17 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $tabs = [];
     $tabs['settings'] = ['title' => ts('Info and Settings'), 'class' => 'ajaxForm livePage'] + $default;
     $tabs['location'] = ['title' => ts('Event Location')] + $default;
-    $tabs['fee'] = ['title' => ts('Fees')] + $default;
+    // If CiviContribute is active, create the Fees tab.
+    if (CRM_Core_Component::isEnabled('CiviContribute')) {
+      $tabs['fee'] = ['title' => ts('Fees')] + $default;
+    }
     $tabs['registration'] = ['title' => ts('Online Registration')] + $default;
     // @fixme I don't understand the event permissions check here - can we just get rid of it?
     $permissions = CRM_Event_BAO_Event::getAllPermissions();
     if (CRM_Core_Permission::check('administer CiviCRM data') || !empty($permissions[CRM_Core_Permission::EDIT])) {
       $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage'] + $default;
     }
-    $tabs['conference'] = ['title' => ts('Conference Slots')] + $default;
+
     $tabs['friend'] = ['title' => ts('Tell a Friend')] + $default;
     $tabs['pcp'] = ['title' => ts('Personal Campaigns')] + $default;
     $tabs['repeat'] = ['title' => ts('Repeat')] + $default;
@@ -83,18 +86,9 @@ class CRM_Event_Form_ManageEvent_TabHeader {
       unset($tabs['repeat']['class']);
     }
 
-    // @todo Move to eventcart extension
-    // check if we're in shopping cart mode for events
-    if (!(bool) Civi::settings()->get('enable_cart')) {
-      unset($tabs['conference']);
-    }
-
     $eventID = $form->getVar('_id');
     if ($eventID) {
       // disable tabs based on their configuration status
-      $eventNameMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([
-        'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
-      ]));
       $sql = "
 SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.is_active as is_pcp, sch.id as is_reminder, re.id as is_repeating_event
 FROM       civicrm_event e
@@ -108,11 +102,11 @@ WHERE      e.id = %1
       CRM_Core_BAO_RecurringEntity::getParentFor($eventID, 'civicrm_event');
       $params = [
         1 => [$eventID, 'Integer'],
-        2 => [$eventNameMapping->getId(), 'Integer'],
+        2 => [CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID, 'Integer'],
       ];
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if (!$dao->fetch()) {
-        throw new CRM_Core_Exception('Unable to determine Event information');;
+        throw new CRM_Core_Exception('Unable to determine Event information');
       }
       if (!$dao->is_location) {
         $tabs['location']['valid'] = FALSE;
@@ -220,14 +214,14 @@ WHERE      e.id = %1
 
     if (is_array($tabs)) {
       foreach ($tabs as $subPage => $pageVal) {
-        if (CRM_Utils_Array::value('current', $pageVal) === TRUE) {
+        if (($pageVal['current'] ?? NULL) === TRUE) {
           $current = $subPage;
           break;
         }
       }
     }
 
-    $current = $current ? $current : 'settings';
+    $current = $current ?: 'settings';
     return $current;
   }
 

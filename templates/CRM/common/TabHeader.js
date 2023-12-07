@@ -20,7 +20,7 @@
         var tabId = ui.newTab.attr('id');
         if (tabId && tabId.length) {
           tabId = tabId.slice(4); // Remove leading 'tab_'
-          history.replaceState(null, '', updateUrlParameter('selectedChild', tabId));
+          updateUrlParameter('selectedChild', tabId);
         }
       })
       .on('tabsbeforeload', function(e, ui) {

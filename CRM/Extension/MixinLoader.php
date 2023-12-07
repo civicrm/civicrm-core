@@ -64,8 +64,8 @@ class CRM_Extension_MixinLoader {
       }
     }
 
+    /** @var \CRM_Extension_MixInfo $ext */
     foreach ($mixInfos as $ext) {
-      /** @var \CRM_Extension_MixInfo $ext */
       foreach ($ext->mixins as $verExpr) {
         $doneId = $ext->longName . '::' . $verExpr;
         if (isset($this->done[$doneId])) {

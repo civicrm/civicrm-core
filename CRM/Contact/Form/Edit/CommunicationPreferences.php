@@ -136,7 +136,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     $greetings = self::getGreetingFields($self->_contactType);
     foreach ($greetings as $greeting => $details) {
       $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $details['field'], 'Customized');
-      if (CRM_Utils_Array::value($details['field'], $fields) == $customizedValue && empty($fields[$details['customField']])) {
+      if (($fields[$details['field']] ?? NULL) == $customizedValue && empty($fields[$details['customField']])) {
         $errors[$details['customField']] = ts('Custom  %1 is a required field if %1 is of type Customized.',
           [1 => $details['label']]
         );
@@ -170,14 +170,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
 
     if (empty($defaults['communication_style_id'])) {
       $defaults['communication_style_id'] = array_pop(CRM_Core_OptionGroup::values('communication_style', TRUE, NULL, NULL, 'AND is_default = 1'));
-    }
-
-    // CRM-17778 -- set preferred_mail_format to default if unset
-    if (empty($defaults['preferred_mail_format'])) {
-      $defaults['preferred_mail_format'] = 'Both';
-    }
-    else {
-      $defaults['preferred_mail_format'] = array_search($defaults['preferred_mail_format'], CRM_Core_SelectValues::pmf());
     }
 
     //set default from greeting types CRM-4575, CRM-9739

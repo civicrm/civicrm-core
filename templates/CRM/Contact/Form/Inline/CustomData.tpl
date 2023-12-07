@@ -11,7 +11,7 @@
 {$form.oplock_ts.html}
 <div class="crm-inline-edit-form">
   <div class="crm-inline-button">
-    {include file="CRM/common/formButtons.tpl"}
+    {include file="CRM/common/formButtons.tpl" location=''}
   </div>
   {include file="CRM/Custom/Form/CustomData.tpl" skipTitle=true}
 </div> <!-- end of main -->

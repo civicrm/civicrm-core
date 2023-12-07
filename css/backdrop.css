@@ -34,3 +34,26 @@
   background: transparent url(../i/logo_sm.png) 5% center no-repeat;
   background-size: 16px;
 }
+
+/* Fix title bar icons in crm-popups*/
+.crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-print::before,
+.crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-print::after,
+.crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-compress::before,
+.crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-compress::after,
+.crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-expand::before,
+.crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-expand::after {
+  transform: none;
+  background: none;
+}
+
+.crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-expand::before {
+  content: "\f065";
+}
+
+.crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-print::before {
+  content: "\f02f";
+}
+
+.crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-compress::before {
+  content: "\f066";
+}

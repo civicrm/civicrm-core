@@ -9,7 +9,7 @@
 *}
 {ts 1=$totalSelectedPledges}Number of selected pledges: %1{/ts}
 
-{if $rows }
+{if $rows}
 <div class="crm-block crm-form-block crm-pledge-task-form-block">
 <table width="30%">
   <tr class="columnheader">

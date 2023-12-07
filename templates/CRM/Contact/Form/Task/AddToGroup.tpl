@@ -9,7 +9,7 @@
 *}
 <div class="crm-block crm-form-block crm-contact-task-addtogroup-form-block">
 <table class="form-layout">
-    {if $group.id}
+    {if $form.group_id.value}
        <tr class="crm-contact-task-addtogroup-form-block-group_id">
           <td class="label">{ts}Group{/ts}</td>
           <td>{$form.group_id.html}</td>
@@ -54,7 +54,7 @@
 </div>
 {include file="CRM/common/showHide.tpl"}
 
-{if !$group.id}
+{if !$form.group_id.value}
 {literal}
 <script type="text/javascript">
 showElements();

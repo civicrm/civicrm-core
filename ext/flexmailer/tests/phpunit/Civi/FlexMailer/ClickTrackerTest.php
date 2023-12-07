@@ -29,15 +29,15 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     // Mock the getTrackerURL call; we don't need to test creating a row in a table.
     // If you want this to work without runkit, then either (a) make the dummy rows or (b) switch this to a hook/event that is runtime-configurable.
     require_once 'CRM/Mailing/BAO/TrackableURL.php';
-    \runkit7_method_rename('\CRM_Mailing_BAO_TrackableURL', 'getBasicTrackerURL', 'orig_getBasicTrackerURL');
-    \runkit7_method_add('\CRM_Mailing_BAO_TrackableURL', 'getBasicTrackerURL', '$a, $b, $c', 'return \'http://example.com/extern?u=1&qid=1\';', RUNKIT7_ACC_STATIC | RUNKIT7_ACC_PRIVATE);
+    \runkit7_method_rename('\CRM_Mailing_BAO_MailingTrackableURL', 'getBasicTrackerURL', 'orig_getBasicTrackerURL');
+    \runkit7_method_add('\CRM_Mailing_BAO_MailingTrackableURL', 'getBasicTrackerURL', '$a, $b, $c', 'return \'http://example.com/extern?u=1&qid=1\';', RUNKIT7_ACC_STATIC | RUNKIT7_ACC_PRIVATE);
     parent::setUp();
   }
 
   public function tearDown(): void {
     // Reset the class.
-    \runkit7_method_remove('\CRM_Mailing_BAO_TrackableURL', 'getBasicTrackerURL');
-    \runkit7_method_rename('\CRM_Mailing_BAO_TrackableURL', 'orig_getBasicTrackerURL', 'getBasicTrackerURL');
+    \runkit7_method_remove('\CRM_Mailing_BAO_MailingTrackableURL', 'getBasicTrackerURL');
+    \runkit7_method_rename('\CRM_Mailing_BAO_MailingTrackableURL', 'orig_getBasicTrackerURL', 'getBasicTrackerURL');
     parent::tearDown();
   }
 

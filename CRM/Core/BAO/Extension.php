@@ -21,19 +21,13 @@
 class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
@@ -44,11 +38,12 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    *   Id of the extension to be deleted.
    *
    * @return mixed
+   *
+   * @deprecated
    */
   public static function del($id) {
-    $extension = new CRM_Core_DAO_Extension();
-    $extension->id = $id;
-    return $extension->delete();
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return (bool) static::deleteRecord(['id' => $id]);
   }
 
   /**

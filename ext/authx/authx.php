@@ -5,47 +5,6 @@ require_once 'authx.civix.php';
 use CRM_Authx_ExtensionUtil as E;
 // phpcs:enable
 
-Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
-  $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
-  $siteKey = $_SERVER['HTTP_X_CIVI_KEY'] ?? $params['_authxSiteKey'] ?? NULL;
-
-  if (!empty($_SERVER['HTTP_X_CIVI_AUTH'])) {
-    return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'xheader', 'cred' => $_SERVER['HTTP_X_CIVI_AUTH'], 'siteKey' => $siteKey]);
-  }
-
-  if (!empty($_SERVER['HTTP_AUTHORIZATION']) && !empty(Civi::settings()->get('authx_header_cred'))) {
-    return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'header', 'cred' => $_SERVER['HTTP_AUTHORIZATION'], 'siteKey' => $siteKey]);
-  }
-
-  if (!empty($params['_authx'])) {
-    if ((implode('/', $e->args) === 'civicrm/authx/login')) {
-      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'login', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey]);
-      _authx_redact(['_authx']);
-    }
-    elseif (!empty($params['_authxSes'])) {
-      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'auto', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey]);
-      if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        _authx_reload(implode('/', $e->args), $_SERVER['QUERY_STRING']);
-      }
-      else {
-        _authx_redact(['_authx', '_authxSes']);
-      }
-    }
-    else {
-      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'param', 'cred' => $params['_authx'], 'siteKey' => $siteKey]);
-      _authx_redact(['_authx']);
-    }
-  }
-
-  // Accept legacy auth (?key=...&api_key=...) for 'civicrm/ajax/rest' and 'civicrm/ajax/api4/*'.
-  // The use of `?key=` could clash on some endpoints. Only accept on a small list of endpoints that are compatible with it.
-  if (count($e->args) > 2 && $e->args[1] === 'ajax' && in_array($e->args[2], ['rest', 'api4'])) {
-    if ((!empty($_REQUEST['api_key']) || !empty($_REQUEST['key']))) {
-      return (new \Civi\Authx\LegacyRestAuthenticator())->auth($e, ['flow' => 'legacyrest', 'cred' => 'Bearer ' . $_REQUEST['api_key'] ?? '', 'siteKey' => $_REQUEST['key'] ?? NULL]);
-    }
-  }
-});
-
 /**
  * Perform a system login.
  *
@@ -114,7 +73,7 @@ function _authx_redact(array $keys) {
 function _authx_reload($route, $queryString) {
   parse_str($queryString, $query);
   foreach (array_keys($query) as $key) {
-    if (CRM_Utils_String::startsWith($key, '_authx')) {
+    if (str_starts_with($key, '_authx')) {
       unset($query[$key]);
     }
   }
@@ -142,24 +101,6 @@ function authx_civicrm_install() {
 }
 
 /**
- * Implements hook_civicrm_postInstall().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
- */
-function authx_civicrm_postInstall() {
-  _authx_civix_civicrm_postInstall();
-}
-
-/**
- * Implements hook_civicrm_uninstall().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_uninstall
- */
-function authx_civicrm_uninstall() {
-  _authx_civix_civicrm_uninstall();
-}
-
-/**
  * Implements hook_civicrm_enable().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
@@ -176,35 +117,6 @@ function authx_civicrm_enable() {
 }
 
 /**
- * Implements hook_civicrm_disable().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_disable
- */
-function authx_civicrm_disable() {
-  _authx_civix_civicrm_disable();
-}
-
-/**
- * Implements hook_civicrm_upgrade().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
- */
-function authx_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _authx_civix_civicrm_upgrade($op, $queue);
-}
-
-/**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function authx_civicrm_entityTypes(&$entityTypes) {
-  _authx_civix_civicrm_entityTypes($entityTypes);
-}
-
-/**
  * Implements hook_civicrm_permission().
  *
  * @see CRM_Utils_Hook::permission()
@@ -212,32 +124,6 @@ function authx_civicrm_entityTypes(&$entityTypes) {
 function authx_civicrm_permission(&$permissions) {
   $permissions['authenticate with password'] = E::ts('AuthX: Authenticate to services with password');
   $permissions['authenticate with api key'] = E::ts('AuthX: Authenticate to services with API key');
-}
-
-// --- Functions below this ship commented out. Uncomment as required. ---
-
-/**
- * Implements hook_civicrm_preProcess().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_preProcess
- */
-//function authx_civicrm_preProcess($formName, &$form) {
-//
-//}
-
-/**
- * Implements hook_civicrm_navigationMenu().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu
- */
-function authx_civicrm_navigationMenu(&$menu) {
-  _authx_civix_insert_navigation_menu($menu, 'Administer/System Settings', [
-    'label' => E::ts('Authentication'),
-    'name' => 'authx_admin',
-    'url' => 'civicrm/admin/setting/authx',
-    'permission' => 'administer CiviCRM',
-    'operator' => 'OR',
-    'separator' => 0,
-  ]);
-  _authx_civix_navigationMenu($menu);
+  $permissions['generate any authx credential'] = E::ts('Authx: Generate new JWT credentials for other users via the API');
+  $permissions['validate any authx credential'] = E::ts('Authx: Validate credentials for other users via the API');
 }

@@ -49,7 +49,7 @@
  </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
 
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 </div>
 
 </div>

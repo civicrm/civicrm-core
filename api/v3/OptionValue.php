@@ -91,7 +91,7 @@ function _civicrm_api3_option_value_create_spec(&$params) {
 function civicrm_api3_option_value_delete($params) {
   // We will get the option group id before deleting so we can flush pseudoconstants.
   $optionGroupID = civicrm_api('option_value', 'getvalue', ['version' => 3, 'id' => $params['id'], 'return' => 'option_group_id']);
-  $result = CRM_Core_BAO_OptionValue::del($params['id']);
+  $result = CRM_Core_BAO_OptionValue::deleteRecord($params);
   if ($result) {
     civicrm_api('option_value', 'getfields', ['version' => 3, 'cache_clear' => 1, 'option_group_id' => $optionGroupID]);
     return civicrm_api3_create_success();

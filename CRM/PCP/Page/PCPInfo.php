@@ -62,17 +62,6 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     $pcpStatus = CRM_Core_OptionGroup::values("pcp_status");
     $approvedId = CRM_Core_PseudoConstant::getKey('CRM_PCP_BAO_PCP', 'status_id', 'Approved');
 
-    // check if PCP is created by anonymous user
-    $anonymousPCP = CRM_Utils_Request::retrieve('ap', 'Boolean', $this);
-    if ($anonymousPCP) {
-      $loginURL = $config->userSystem->getLoginURL();
-      $anonMessage = ts('Once you\'ve received your new account welcome email, you can <a href=%1>click here</a> to login and promote your campaign page.', [1 => $loginURL]);
-      CRM_Core_Session::setStatus($anonMessage, ts('Success'), 'success');
-    }
-    else {
-      $statusMessage = ts('The personal campaign page you requested is currently unavailable. However you can still support the campaign by making a contribution here.');
-    }
-
     $pcpBlock = new CRM_PCP_DAO_PCPBlock();
     $pcpBlock->entity_table = CRM_PCP_BAO_PCP::getPcpEntityTable($pcpInfo['page_type']);
     $pcpBlock->entity_id = $pcpInfo['page_id'];
@@ -84,6 +73,21 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     }
     elseif ($pcpInfo['page_type'] == 'event') {
       $urlBase = 'civicrm/event/register';
+    }
+
+    // check if PCP is created by anonymous user
+    $anonymousPCP = CRM_Utils_Request::retrieve('ap', 'Boolean', $this);
+    if ($anonymousPCP) {
+      $loginURL = $config->userSystem->getLoginURL();
+      $anonMessage = ts('Once you\'ve received your new account welcome email, you can <a href=%1>click here</a> to login and promote your campaign page.', [1 => $loginURL]);
+      CRM_Core_Session::setStatus($anonMessage, ts('Success'), 'success');
+      CRM_Utils_System::redirect(CRM_Utils_System::url($urlBase,
+          "reset=1&id=" . $pcpInfo['page_id'],
+          FALSE, NULL, FALSE, TRUE
+      ));
+    }
+    else {
+      $statusMessage = ts('The personal campaign page you requested is currently unavailable. However you can still support the campaign by making a contribution here.');
     }
 
     if ($pcpInfo['status_id'] != $approvedId || !$pcpInfo['is_active']) {
@@ -160,7 +164,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
         'pageComponent' => $this->_component,
       ];
 
-      if (!$pcpBlock->is_tellfriend_enabled || CRM_Utils_Array::value('status_id', $pcpInfo) != $approvedId) {
+      if (!$pcpBlock->is_tellfriend_enabled || ($pcpInfo['status_id'] ?? NULL) != $approvedId) {
         unset($link['all'][CRM_Core_Action::DETACH]);
       }
 
@@ -202,12 +206,12 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
         TRUE, NULL, TRUE,
         TRUE
       );
-      $this->assign('linkTextUrl', $linkTextUrl);
-      $this->assign('linkText', $pcpBlock->link_text);
     }
+    $this->assign('linkTextUrl', $linkTextUrl ?? NULL);
+    $this->assign('linkText', $pcpBlock->link_text ?? NULL);
 
     $this->assign('honor', $honor);
-    $this->assign('total', $totalAmount ? $totalAmount : '0.0');
+    $this->assign('total', $totalAmount ?: '0.0');
     $this->assign('achieved', $achieved <= 100 ? $achieved : 100);
 
     if ($achieved <= 100) {
@@ -215,12 +219,12 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     }
     // make sure that we are between contribution page start and end dates OR registration start date and end dates if they are set
     if ($pcpBlock->entity_table == 'civicrm_event') {
-      $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_start_date', $pageInfo));
-      $endDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_end_date', $pageInfo));
+      $startDate = CRM_Utils_Date::unixTime($pageInfo['registration_start_date'] ?? '');
+      $endDate = CRM_Utils_Date::unixTime($pageInfo['registration_end_date'] ?? '');
     }
     else {
-      $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('start_date', $pageInfo));
-      $endDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('end_date', $pageInfo));
+      $startDate = CRM_Utils_Date::unixTime($pageInfo['start_date'] ?? '');
+      $endDate = CRM_Utils_Date::unixTime($pageInfo['end_date'] ?? '');
     }
 
     $now = time();

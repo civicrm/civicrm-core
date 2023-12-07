@@ -1,3 +1,4 @@
+<div ng-include="'~/crmSearchAdmin/crmSearchAdminDisplayHeader.html'"></div>
 <fieldset ng-if="!$ctrl.display.settings.draggable" ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
 <fieldset>
   <div ng-if="$ctrl.canBeDraggable" class="form-inline">
@@ -9,12 +10,9 @@
     </div>
   </div>
   <div class="form-inline">
-    <div class="checkbox-inline form-control">
-      <label>
-        <input type="checkbox" ng-model="$ctrl.display.settings.actions">
-        <span>{{:: ts('Enable Actions') }}</span>
-      </label>
-    </div>
+    <search-admin-tasks-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-tasks-config>
+  </div>
+  <div class="form-inline">
     <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
   </div>
   <div class="form-inline">
@@ -33,6 +31,7 @@
     <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
     <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
   </div>
+  <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
   <div class="form-inline">
     <div class="checkbox-inline form-control" title="{{:: ts('Shows grand totals or other statistics, configured per-column.') }}">
       <label>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="civicrm_admin_ui" type="module">
   <file>civicrm_admin_ui</file>
-  <name>CiviCRM Administration UI</name>
+  <name>AdminUI</name>
   <description>Administration screens for managing CiviCRM settings, options, custom data, etc.</description>
   <license>AGPL-3.0</license>
   <maintainer>
@@ -9,16 +9,16 @@
     <email>coleman@civicrm.org</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://FIXME</url>
-    <url desc="Documentation">http://FIXME</url>
-    <url desc="Support">http://FIXME</url>
+    <url desc="Main Extension Page">https://lab.civicrm.org/dev/core/-/issues/3912</url>
+    <url desc="Documentation">https://lab.civicrm.org/dev/core/-/issues/3912</url>
+    <url desc="Support">https://lab.civicrm.org/dev/core/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2022-01-02</releaseDate>
-  <version>5.56.alpha1</version>
-  <develStage>alpha</develStage>
+  <releaseDate>2023-11-02</releaseDate>
+  <version>5.69.alpha1</version>
+  <develStage>beta</develStage>
   <compatibility>
-    <ver>5.56</ver>
+    <ver>5.69</ver>
   </compatibility>
   <requires>
     <ext>org.civicrm.search_kit</ext>
@@ -32,8 +32,10 @@
   <civix>
     <namespace>CRM/CivicrmAdminUi</namespace>
     <angularModule>crmCivicrmAdminUi</angularModule>
+    <format>23.02.1</format>
   </civix>
   <mixins>
-    <mixin>mgd-php@1.1.0</mixin>
+    <mixin>mgd-php@1.0.0</mixin>
   </mixins>
+  <upgrader>CRM_CivicrmAdminUi_Upgrader</upgrader>
 </extension>

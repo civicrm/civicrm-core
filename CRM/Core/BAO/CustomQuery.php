@@ -177,9 +177,7 @@ class CRM_Core_BAO_CustomQuery {
     foreach ($this->_ids as $id => $values) {
 
       // Fixed for Issue CRM 607
-      if (CRM_Utils_Array::value($id, $this->_fields) === NULL ||
-        !$values
-      ) {
+      if (!isset($this->_fields[$id]) || !$values) {
         continue;
       }
 
@@ -195,8 +193,8 @@ class CRM_Core_BAO_CustomQuery {
         // fix $value here to escape sql injection attacks
         $qillValue = NULL;
         if (!is_array($value)) {
-          $value = CRM_Core_DAO::escapeString(trim($value));
-          $qillValue = CRM_Core_BAO_CustomField::displayValue($value, $id);
+          $escapedValue = CRM_Core_DAO::escapeString(trim($value));
+          $qillValue = CRM_Core_BAO_CustomField::displayValue($escapedValue, $id);
         }
         elseif (count($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $op = key($value);
@@ -207,7 +205,7 @@ class CRM_Core_BAO_CustomQuery {
           $qillValue = CRM_Core_BAO_CustomField::displayValue($value, $id);
         }
 
-        $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
+        $qillOp = CRM_Core_SelectValues::getSearchBuilderOperators()[$op] ?? $op;
 
         // Ensure the table is joined in (eg if in where but not select).
         $this->joinCustomTableForField($field);
@@ -223,7 +221,7 @@ class CRM_Core_BAO_CustomQuery {
             else {
               // fix $value here to escape sql injection attacks
               if (!is_array($value)) {
-                if ($field['data_type'] == 'String') {
+                if ($field['data_type'] === 'String') {
                   $value = CRM_Utils_Type::escape($value, 'String');
                 }
                 elseif ($value) {
@@ -242,7 +240,7 @@ class CRM_Core_BAO_CustomQuery {
                 foreach ($value as $key => $val) {
                   $value[$key] = str_replace(['[', ']', ','], ['\[', '\]', '[:comma:]'], $val);
                   $value[$key] = str_replace('|', '[:separator:]', $value[$key]);
-                  if ($field['data_type'] == 'String') {
+                  if ($field['data_type'] === 'String') {
                     $value[$key] = CRM_Utils_Type::escape($value[$key], 'String');
                   }
                   elseif ($value) {
@@ -258,7 +256,7 @@ class CRM_Core_BAO_CustomQuery {
                 $value = str_replace(",", "$sp|$sp", $value);
                 $value = str_replace(['[:comma:]', '(', ')'], [',', '[(]', '[)]'], $value);
 
-                $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
+                $op = (str_contains($op, '!') || str_contains($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
                 $value = $sp . $value . $sp;
                 if (!$wildcard) {
                   foreach (explode("|", $value) as $val) {
@@ -273,7 +271,7 @@ class CRM_Core_BAO_CustomQuery {
               }
               else {
                 //FIX for custom data query fired against no value(NULL/NOT NULL)
-                $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
+                $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String', TRUE);
               }
               $this->_qill[$grouping][] = $field['label'] . " $qillOp $qillValue";
             }
@@ -281,12 +279,12 @@ class CRM_Core_BAO_CustomQuery {
 
           case 'Int':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
-            $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
+            $this->_qill[$grouping][] = ts('%1 %2 %3', [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
             break;
 
           case 'Boolean':
             if (!is_array($value)) {
-              if (strtolower($value) == 'yes' || strtolower($value) == strtolower(ts('Yes'))) {
+              if (mb_strtolower($value) === 'yes' || mb_strtolower($value) === mb_strtolower(ts('Yes'))) {
                 $value = 1;
               }
               else {

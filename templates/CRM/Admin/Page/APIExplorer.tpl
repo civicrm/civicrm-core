@@ -23,8 +23,7 @@
     max-height: 50em;
   }
   pre#api-result,
-  div#doc-result,
-  pre#example-result {
+  div#doc-result {
     padding:1em;
     border: 1px solid lightgrey;
     margin-top: 1em;
@@ -234,9 +233,6 @@
     <li class="ui-corner-all" title="GUI to build and execute API calls">
       <a href="#explorer-tab"><i class="crm-i fa-search" aria-hidden="true"></i> {ts}Explorer{/ts}</a>
     </li>
-    <li class="ui-corner-all" title="Auto-generated examples from the test suite">
-      <a href="#examples-tab"><i class="crm-i fa-book" aria-hidden="true"></i> {ts}Examples{/ts}</a>
-    </li>
     <li class="ui-corner-all" title="API source-code and code-level documentation">
       <a href="#docs-tab"><i class="crm-i fa-code" aria-hidden="true"></i> {ts}Code Docs{/ts}</a>
     </li>
@@ -314,30 +310,6 @@
       </div>
 
 <pre id="api-result" class="linenums">
-{ts}Results are displayed here.{/ts}
-</pre>
-    </form>
-  </div>
-  </div>
-
-  <div id="examples-tab">
-    <div class="crm-block crm-form-block">
-    <form id="api-examples">
-      <label for="example-entity">{ts}Entity{/ts}:</label>
-      <select class="crm-form-select big required" id="example-entity" name="entity">
-        <option value="" selected="selected">{ts}Choose{/ts}...</option>
-        {foreach from=$examples item=entity}
-          <option value="{$entity}" {if !empty($entities.deprecated) && in_array($entity, $entities.deprecated)}class="strikethrough"{/if}>
-            {$entity}
-          </option>
-        {/foreach}
-      </select>
-      &nbsp;&nbsp;
-      <label for="example-action">{ts}Example{/ts}:</label>
-      <select class="crm-form-select big crm-select2" id="example-action" name="action">
-        <option value="" selected="selected">{ts}Choose{/ts}...</option>
-      </select>
-<pre id="example-result" class="linenums lang-php" placeholder="{ts escape='html'}Results are displayed here.{/ts}">
 {ts}Results are displayed here.{/ts}
 </pre>
     </form>

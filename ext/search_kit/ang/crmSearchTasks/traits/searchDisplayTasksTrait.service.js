@@ -1,9 +1,96 @@
-(function(angular, $, _) {
+ (function(angular, $, _) {
   "use strict";
 
   // Trait shared by any search display controllers which use tasks
-  angular.module('crmSearchDisplay').factory('searchDisplayTasksTrait', function(crmApi4) {
+  angular.module('crmSearchTasks').factory('searchDisplayTasksTrait', function($rootScope, $window, crmApi4, dialogService) {
     var ts = CRM.ts('org.civicrm.search_kit');
+
+    // TaskManager object is responsible for fetching task metadata for a SearchDispaly
+    // and handles the running of tasks.
+    function TaskManager(displayCtrl, $element) {
+      var mngr = this;
+      var fetchedMetadata;
+      this.tasks = null;
+      this.entityInfo = null;
+
+      this.getMetadata = function() {
+        if (!fetchedMetadata) {
+          fetchedMetadata = crmApi4({
+            entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural', 'primary_key'], where: [['name', '=', mngr.getEntityName()]]}, 0],
+            tasks: ['SearchDisplay', 'getSearchTasks', {savedSearch: displayCtrl.search, display: displayCtrl.display}]
+          }).then(function(result) {
+            mngr.entityInfo = result.entityInfo;
+            mngr.tasks = result.tasks;
+          }, function(failure) {
+            mngr.tasks = [];
+            mngr.entityInfo = [];
+          });
+        }
+        return fetchedMetadata;
+      };
+
+      this.getEntityName = function() {
+        return displayCtrl.apiEntity === 'RelationshipCache' ? 'Relationship' : displayCtrl.apiEntity;
+      };
+      this.getApiParams = function() {
+        return displayCtrl.getApiParams();
+      };
+      this.getRowCount = function() {
+        return displayCtrl.rowCount;
+      };
+      this.isDisplayReady = function() {
+        return !displayCtrl.loading && displayCtrl.results && displayCtrl.results.length;
+      };
+      this.getTaskInfo = function(taskName) {
+        return _.findWhere(mngr.tasks, {name: taskName});
+      };
+
+      this.doTask = function(task, ids) {
+        var data = {
+          ids: ids,
+          entity: mngr.getEntityName(),
+          search: displayCtrl.search,
+          display: displayCtrl.display,
+          taskManager: mngr,
+          entityInfo: mngr.entityInfo,
+          taskTitle: task.title,
+          apiBatch: _.cloneDeep(task.apiBatch)
+        };
+        // If task uses a crmPopup form
+        if (task.crmPopup) {
+          var path = $rootScope.$eval(task.crmPopup.path, data),
+            query = task.crmPopup.query && $rootScope.$eval(task.crmPopup.query, data);
+          CRM.loadForm(CRM.url(path, query), {post: task.crmPopup.data && $rootScope.$eval(task.crmPopup.data, data)})
+            .on('crmFormSuccess', mngr.refreshAfterTask);
+        }
+        else if (task.redirect) {
+          var redirectPath = $rootScope.$eval(task.redirect.path, data),
+            redirectQuery = task.redirect.query && $rootScope.$eval(task.redirect.query, data) && $rootScope.$eval(task.redirect.data, data);
+          $window.open(CRM.url(redirectPath, redirectQuery), '_blank');
+        }
+        // If task uses dialogService
+        else {
+          var options = CRM.utils.adjustDialogDefaults({
+            autoOpen: false,
+            dialogClass: 'crm-search-task-dialog',
+            title: task.title
+          });
+          dialogService.open('crmSearchTask', (task.uiDialog && task.uiDialog.templateUrl) || '~/crmSearchTasks/crmSearchTaskApiBatch.html', data, options)
+            // Reload results on success, do nothing on cancel
+            .then(mngr.refreshAfterTask, _.noop);
+        }
+      };
+
+      this.refreshAfterTask = function() {
+        displayCtrl.selectedRows = [];
+        displayCtrl.allRowsSelected = false;
+        displayCtrl.rowCount = null;
+        displayCtrl.getResultsPronto();
+        // Trigger all other displays in the same form to update.
+        // This display won't update twice because of the debounce in getResultsPronto()
+        $element.trigger('crmPopupFormSuccess');
+      };
+    }
 
     // Trait properties get mixed into display controller using angular.extend()
     return {
@@ -105,28 +192,49 @@
           (!this.allRowsSelected && this.selectedRows && this.selectedRows.length === this.results.length);
       },
 
-      refreshAfterTask: function() {
-        this.selectedRows = [];
-        this.allRowsSelected = false;
-        this.rowCount = undefined;
-        this.runSearch();
+      // If link is to a task rather than an ordinary href, run the task
+      onClickLink: function(link, id, event) {
+        if (link.task) {
+          const mngr = this.taskManager;
+          event.preventDefault();
+          mngr.getMetadata().then(function() {
+            mngr.doTask(_.extend({title: link.title}, mngr.getTaskInfo(link.task)), [id]);
+          });
+        }
       },
 
-      // Add onChangeFilters callback (gets merged with others via angular.extend)
+      // onInitialize callback
+      onInitialize: [function($scope, $element) {
+        // Instantiate task manager object
+        if (!this.taskManager) {
+          this.taskManager = new TaskManager(this, $element);
+        }
+      }],
+
+      // onChangeFilters callback
       onChangeFilters: [function() {
         // Reset selection when filters are changed
         this.selectedRows = [];
         this.allRowsSelected = false;
       }],
 
-      // Add onPostRun callback (gets merged with others via angular.extend)
-      onPostRun: [function(results, status, editedRow) {
+      // onPostRun callback (gets merged with others via angular.extend)
+      onPostRun: [function(apiResults, status, editedRow) {
         if (editedRow && status === 'success' && this.selectedRows) {
           // If edited row disappears (because edits cause it to not meet search criteria), deselect it
           var index = this.selectedRows.indexOf(editedRow.key);
-          if (index > -1 && !_.findWhere(results, {key: editedRow.key})) {
+          if (index > -1 && !_.findWhere(apiResults.run, {key: editedRow.key})) {
             this.selectedRows.splice(index, 1);
           }
+        }
+        else if (status === 'success' && !editedRow && apiResults.run && apiResults.run[0]) {
+          const mngr = this.taskManager;
+          // If results contain a link to a task, prefetch task info to prevent latency when clicking the link
+          _.each(apiResults.run[0].columns, function(column) {
+            if ((column.link && column.link.task) || _.find(column.links || [], 'task')) {
+              mngr.getMetadata();
+            }
+          });
         }
       }]
 

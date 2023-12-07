@@ -12,7 +12,7 @@
       fieldName: '@name',
       defn: '='
     },
-    controller: function($scope, $element, crmApi4, $timeout, $location) {
+    controller: function($scope, $element, crmApi4, $timeout) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform'),
         ctrl = this,
         // Prefix used for SearchKit explicit joins
@@ -29,12 +29,21 @@
       this.$onInit = function() {
         var closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
         $scope.dataProvider = closestController.is('[af-repeat-item]') ? ctrl.afRepeatItem : ctrl.afJoin || ctrl.afFieldset;
-        $scope.fieldId = ctrl.fieldName + '-' + id++;
+        $scope.fieldId = _.kebabCase(ctrl.fieldName) + '-' + id++;
 
         $element.addClass('af-field-type-' + _.kebabCase(ctrl.defn.input_type));
 
         if (this.defn.name !== this.fieldName) {
           namePrefix = this.fieldName.substr(0, this.fieldName.length - this.defn.name.length);
+        }
+
+        if (this.defn.search_operator) {
+          this.search_operator = this.defn.search_operator;
+        }
+
+        // Ensure boolean options are truly boolean
+        if (this.defn.data_type === 'Boolean' && this.defn.options) {
+          this.defn.options.forEach((option) => option.id = !!option.id);
         }
 
         // is_primary field - watch others in this afRepeat block to ensure only one is selected
@@ -98,21 +107,28 @@
           var entityName = ctrl.afFieldset.getName(),
             joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null,
             uniquePrefix = '',
-            urlArgs = $location.search();
+            urlArgs = $scope.$parent.routeParams;
           if (entityName) {
             var index = ctrl.getEntityIndex();
             uniquePrefix = entityName + (index ? index + 1 : '') + (joinEntity ? '.' + joinEntity : '') + '.';
           }
           // Set default value from url with uniquePrefix + fieldName
-          if (urlArgs && urlArgs[uniquePrefix + ctrl.fieldName]) {
+          if (urlArgs && ((uniquePrefix + ctrl.fieldName) in urlArgs)) {
             setValue(urlArgs[uniquePrefix + ctrl.fieldName]);
           }
           // Set default value from url with fieldName only
-          else if (urlArgs && urlArgs[ctrl.fieldName]) {
-            $scope.dataProvider.getFieldData()[ctrl.fieldName] = urlArgs[ctrl.fieldName];
+          else if (urlArgs && (ctrl.fieldName in urlArgs)) {
+            setValue(urlArgs[ctrl.fieldName]);
+          }
+          else if (ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
+            setValue(ctrl.afFieldset.getStoredValue(ctrl.fieldName));
+          }
+          else if ('default_date_type' in ctrl.defn && ctrl.defn.default_date_type === 'now') {
+            let currentDate = new Date();
+            setValue(currentDate.toISOString().split('T')[0]);
           }
           // Set default value based on field defn
-          else if (ctrl.defn.afform_default) {
+          else if ('afform_default' in ctrl.defn) {
             setValue(ctrl.defn.afform_default);
           }
 
@@ -138,8 +154,40 @@
         });
       };
 
+      // correct the type for the value, make sure numbers are numbers and not string
+      function correctValueType(value, dataType) {
+        // let's skip type correction for null values
+        if (value === null) {
+          return value;
+        }
+
+        // if value is a number than change it to number
+        if (Array.isArray(value)) {
+          var newValue = [];
+          value.forEach((v, index) => {
+            newValue[index] = correctValueType(v);
+          });
+          return newValue;
+        } else if (dataType === 'Integer') {
+          return +value;
+        } else if (dataType === 'Boolean') {
+          return (value == 1);
+        }
+        return value;
+      }
+
+      this.isMultiple = function() {
+        return (
+          (['Select', 'EntityRef', 'ChainSelect'].includes(ctrl.defn.input_type) && ctrl.defn.input_attrs.multiple) ||
+          (ctrl.defn.input_type === 'CheckBox' && ctrl.defn.data_type !== 'Boolean')
+        );
+      };
+
       // Set default value; ensure data type matches input type
       function setValue(value) {
+        // correct the value type
+        value = correctValueType(value, ctrl.defn.data_type);
+
         if (ctrl.defn.input_type === 'Number' && ctrl.defn.search_range) {
           if (!_.isPlainObject(value)) {
             value = {
@@ -160,7 +208,10 @@
             '<=': ('' + value).split('-')[1] || '',
           };
         }
-        $scope.dataProvider.getFieldData()[ctrl.fieldName] = value;
+        else if (_.isString(value) && ctrl.isMultiple()) {
+          value = value.split(',');
+        }
+        $scope.getSetValue(value);
       }
 
       // Get the repeat index of the entity fieldset (not the join)
@@ -173,12 +224,25 @@
         }
       };
 
+      ctrl.isReadonly = function() {
+        if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
+          return ctrl.afFieldset.getEntity().actions[ctrl.defn.input_attrs.autofill] === false;
+        }
+        // TODO: Not actually used, but could be used if we wanted to render displayOnly
+        // fields as more than just raw data. I think we probably ought to do so for entityRef fields
+        // Since the ids are kind of meaningless. Making that change would require adding a function
+        // to get the widget template rather than just concatenating the input_type into an ngInclude.
+        return ctrl.defn.input_type === 'DisplayOnly';
+      };
+
       // ngChange callback from Existing entity field
-      ctrl.onSelectExisting = function() {
-        var val = $scope.getSetSelect();
-        var entity = ctrl.afFieldset.modelName;
-        var index = ctrl.getEntityIndex();
-        ctrl.afFieldset.afFormCtrl.loadData(entity, index, val);
+      ctrl.onSelectEntity = function() {
+        if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
+          var val = $scope.getSetSelect();
+          var entity = ctrl.afFieldset.modelName;
+          var index = ctrl.getEntityIndex();
+          ctrl.afFieldset.afFormCtrl.loadData(entity, index, val, ctrl.defn.name);
+        }
       };
 
       // Params for the Afform.submitFile API when uploading a file field
@@ -190,6 +254,10 @@
           entityIndex: ctrl.getEntityIndex(),
           joinIndex: ctrl.afJoin && $scope.dataProvider.repeatIndex || null
         };
+      };
+
+      ctrl.getAutocompleteFieldName = function() {
+        return ctrl.afFieldset.modelName + (ctrl.afJoin ? ('+' + ctrl.afJoin.entity) : '') + ':' + ctrl.fieldName;
       };
 
       $scope.getOptions = function () {
@@ -204,10 +272,34 @@
         };
       };
 
+      this.onChangeOperator = function() {
+        $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
+      };
+
+      // Getter/Setter function for most fields (except select & entityRef)
+      $scope.getSetValue = function(val) {
+        var currentVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
+        // Setter
+        if (arguments.length) {
+          if (ctrl.search_operator) {
+            if (typeof currentVal !== 'object') {
+              $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
+            }
+            return ($scope.dataProvider.getFieldData()[ctrl.fieldName][ctrl.search_operator] = val);
+          }
+          return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val);
+        }
+        // Getter
+        if (ctrl.search_operator) {
+          return (currentVal || {})[ctrl.search_operator];
+        }
+        return currentVal;
+      };
+
       // Getter/Setter function for fields of type select or entityRef.
       $scope.getSetSelect = function(val) {
         var currentVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
-        // Setter
+        // Setter - transform raw string/array from Select2 into correct data type
         if (arguments.length) {
           if (ctrl.defn.is_date) {
             // The '{}' string is a placeholder for "choose date range"
@@ -219,22 +311,34 @@
           else if (ctrl.defn.search_range) {
             return ($scope.dataProvider.getFieldData()[ctrl.fieldName]['>='] = val);
           }
-          // A multi-select needs to split string value into an array
-          if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.multiple) {
-            val = val ? val.split(',') : [];
+          else if (ctrl.search_operator) {
+            if (typeof currentVal !== 'object') {
+              $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
+            }
+            return ($scope.dataProvider.getFieldData()[ctrl.fieldName][ctrl.search_operator] = val);
+          }
+          if (ctrl.defn.data_type === 'Boolean') {
+            return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = (val === 'true'));
+          }
+          if (ctrl.defn.data_type === 'Integer' && typeof val === 'string') {
+            return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val.length ? +val : null);
           }
           return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val);
         }
-        // Getter
-        if (_.isArray(currentVal)) {
-          return currentVal.join(',');
-        }
+        // Getter - transform data into a simple string or array for Select2
         if (ctrl.defn.is_date) {
           return _.isPlainObject(currentVal) ? '{}' : currentVal;
         }
         // If search_range, this select is the "low" value (the high value uses ng-model without a getterSetter fn)
         else if (ctrl.defn.search_range) {
           return currentVal['>='];
+        }
+        else if (ctrl.search_operator) {
+          return (currentVal || {})[ctrl.search_operator];
+        }
+        // Convert false to "false" and 0 to "0"
+        else if (!ctrl.isMultiple() && typeof currentVal !== 'string') {
+          return JSON.stringify(currentVal);
         }
         return currentVal;
       };

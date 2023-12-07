@@ -19,13 +19,6 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
   public $useLivePageJS = TRUE;
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
    * Get BAO Name.
    *
    * @return string
@@ -33,42 +26,6 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
    */
   public function getBAOName() {
     return 'CRM_ACL_BAO_ACLEntityRole';
-  }
-
-  /**
-   * Get action Links.
-   *
-   * @return array
-   *   (reference) of action links
-   */
-  public function &links() {
-    if (!(self::$_links)) {
-      self::$_links = [
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'url' => 'civicrm/acl/entityrole',
-          'qs' => 'action=update&id=%%id%%',
-          'title' => ts('Edit ACL Role Assignment'),
-        ],
-        CRM_Core_Action::DISABLE => [
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable ACL Role Assignment'),
-        ],
-        CRM_Core_Action::ENABLE => [
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable ACL Role Assignment'),
-        ],
-        CRM_Core_Action::DELETE => [
-          'name' => ts('Delete'),
-          'url' => 'civicrm/acl/entityrole',
-          'qs' => 'action=delete&id=%%id%%',
-          'title' => ts('Delete ACL Role Assignment'),
-        ],
-      ];
-    }
-    return self::$_links;
   }
 
   /**

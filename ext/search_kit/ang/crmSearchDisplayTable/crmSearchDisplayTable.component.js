@@ -8,27 +8,28 @@
       display: '<',
       settings: '<',
       filters: '<',
-      totalCount: '<'
+      totalCount: '=?'
     },
     require: {
       afFieldset: '?^^afFieldset'
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
-    controller: function($scope, $element, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait, crmApi4, crmStatus) {
+    controller: function($scope, $element, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait, crmApi4) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        // Mix in traits to this controller
-        ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait);
+        // Mix in copies of traits to this controller
+        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplaySortableTrait));
 
       this.$onInit = function() {
         var tallyParams;
 
+        // Copy API params from the run and adapt them in a secondary `tally` call for the "Totals" row
         if (ctrl.settings.tally) {
-          ctrl.onPreRun.push(function (apiParams) {
+          ctrl.onPreRun.push(function (apiCalls) {
             ctrl.tally = null;
-            tallyParams = _.cloneDeep(apiParams);
+            tallyParams = _.cloneDeep(apiCalls.run[2]);
           });
 
-          ctrl.onPostRun.push(function (results, status) {
+          ctrl.onPostRun.push(function (apiResults, status) {
             ctrl.tally = null;
             if (status === 'success' && tallyParams) {
               tallyParams.return = 'tally';
@@ -65,7 +66,7 @@
                   updateParams = {where: [['id', '=', movedItem.data.id]], values: {}};
                 if (newPosition > -1 && oldPosition !== newPosition) {
                   updateParams.values[weightColumn] = displacedItem.data[weightColumn];
-                  ctrl.runSearch([[ctrl.apiEntity, 'update', updateParams]], {}, movedItem);
+                  ctrl.runSearch({updateWeight: [ctrl.apiEntity, 'update', updateParams]}, {}, movedItem);
                 }
               });
             }

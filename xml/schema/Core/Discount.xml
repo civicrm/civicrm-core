@@ -27,6 +27,10 @@
     <title>Entity Table</title>
     <type>varchar</type>
     <length>64</length>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_Discount::entityTables</callback>
+    </pseudoconstant>
+    <required>true</required>
     <comment>physical tablename for entity being joined to discount, e.g. civicrm_event</comment>
     <add>2.1</add>
   </field>
@@ -64,6 +68,8 @@
     <comment>FK to civicrm_price_set</comment>
     <html>
       <label>Price Set</label>
+      <type>Select</type>
+      <controlField>entity_id</controlField>
     </html>
     <add>4.3</add>
   </field>

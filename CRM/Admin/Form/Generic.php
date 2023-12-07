@@ -24,7 +24,6 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
   use CRM_Admin_Form_SettingTrait;
 
   protected $_settings = [];
-  public $_defaults = [];
 
   /**
    * @var bool
@@ -52,8 +51,11 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
+    $this->assign('entityInClassFormat', 'setting');
     $this->addFieldsDefinedInSettingsMetadata();
 
     // @todo - do we still like this redirect?

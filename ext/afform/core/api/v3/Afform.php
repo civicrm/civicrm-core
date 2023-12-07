@@ -65,9 +65,8 @@ function _civicrm_api3_afform_get_spec(&$fields) {
     'title' => 'Type',
     'type' => CRM_Utils_Type::T_STRING,
   ];
-  $fields['is_dashlet'] = [
-    'title' => 'Dashlet',
-    'type' => CRM_Utils_Type::T_BOOLEAN,
+  $fields['placement'] = [
+    'title' => 'Placement',
   ];
   $fields['is_public'] = [
     'title' => 'Public',

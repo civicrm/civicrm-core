@@ -8,11 +8,16 @@
  */
 class CRM_Utils_Check_Component_EnvTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * File check test should fail if reached maximum timeout.
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  public function testResourceUrlCheck() {
+  public function testResourceUrlCheck(): void {
     $check = new \CRM_Utils_Check_Component_Env();
     $failRequest = $check->fileExists('https://civicrm.org', 0.001);
     $successRequest = $check->fileExists('https://civicrm.org', 0);

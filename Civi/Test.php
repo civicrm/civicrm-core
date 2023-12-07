@@ -110,7 +110,7 @@ class Test {
    */
   public static function headless() {
     $civiRoot = dirname(__DIR__);
-    $builder = new \Civi\Test\CiviEnvBuilder('CiviEnvBuilder');
+    $builder = new \Civi\Test\CiviEnvBuilder();
     $builder
       ->callback(function ($ctx) {
         if (CIVICRM_UF !== 'UnitTests') {
@@ -125,6 +125,7 @@ class Test {
       ->callback(function ($ctx) {
         \Civi\Test::data()->populate();
       }, 'populate');
+    $builder->install(['org.civicrm.search_kit', 'org.civicrm.afform', 'authx']);
     return $builder;
   }
 
@@ -139,7 +140,7 @@ class Test {
    * @return \Civi\Test\CiviEnvBuilder
    */
   public static function e2e() {
-    $builder = new \Civi\Test\CiviEnvBuilder('CiviEnvBuilder');
+    $builder = new \Civi\Test\CiviEnvBuilder();
     $builder
       ->callback(function ($ctx) {
         if (CIVICRM_UF === 'UnitTests') {

@@ -218,11 +218,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     $this->fixFormValues();
 
-    // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['member_test']) && $this->_force) {
-      $this->_formValues["member_test"] = 0;
-    }
-
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
 
     $this->set('queryParams', $this->_queryParams);

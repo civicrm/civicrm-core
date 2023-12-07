@@ -11,7 +11,7 @@ class SettingsStyleTest extends \CiviUnitTestCase {
   /**
    * Scan all known settings
    */
-  public function testConformance() {
+  public function testConformance(): void {
     $errors = [];
     $assert = function (string $setting, bool $condition, string $message) use (&$errors) {
       if (!$condition) {
@@ -30,7 +30,7 @@ class SettingsStyleTest extends \CiviUnitTestCase {
     $this->assertTrue(count($all) > 10);
     foreach ($all as $key => $spec) {
       $assert($key, preg_match(';^\d+\.\d+(\.\d+)?$;', $spec['add'] ?? NULL), 'Should have well-formed \"add\" property');
-      $assert($key, $spec['is_domain'] xor $spec['is_contact'], 'Should be is_domain xor is_contact');
+      $assert($key, !($spec['is_domain'] && $spec['is_contact']), 'Cannot be both is_domain and is_contact');
       $assert($key, $key === $spec['name'], 'Should have matching name');
       $type = $spec['type'] ?? 'UNKNOWN';
       $assert($key, in_array($type, $validTypes), 'Should have known type. Found: ' . $type);

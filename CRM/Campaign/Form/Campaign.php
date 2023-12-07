@@ -235,14 +235,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
         'isDefault' => TRUE,
       ],
     ];
-    // Skip this button when adding a new campaign from an entityRef
-    if (empty($_GET['snippet']) || empty($_GET['returnExtra'])) {
-      $buttons[] = [
-        'type' => 'upload',
-        'name' => ts('Save and New'),
-        'subName' => 'new',
-      ];
-    }
     $buttons[] = [
       'type' => 'cancel',
       'name' => ts('Cancel'),
@@ -287,7 +279,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
     if (!empty($params['id'])) {
       if ($this->_action & CRM_Core_Action::DELETE) {
-        CRM_Campaign_BAO_Campaign::del($params['id']);
+        CRM_Campaign_BAO_Campaign::deleteRecord(['id' => $params['id']]);
         CRM_Core_Session::setStatus(ts('Campaign has been deleted.'), ts('Record Deleted'), 'success');
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
         return;
@@ -299,7 +291,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       $params['created_date'] = date('YmdHis');
     }
     // format params
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $params['is_active'] = $params['is_active'] ?? FALSE;
     $params['last_modified_id'] = $session->get('userID');
     $params['last_modified_date'] = date('YmdHis');
     $result = self::submit($params, $this);

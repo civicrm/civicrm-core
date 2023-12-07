@@ -21,19 +21,25 @@
  */
 class CRM_Contact_SelectorTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->quickCleanup(['civicrm_tag', 'civicrm_entity_tag']);
+    parent::tearDown();
+  }
+
   /**
-   * Test the query from the selector class is consistent with the dataset expectation.
+   * Test the query from the selector class is consistent with the dataset
+   * expectation.
    *
    * @param array $dataSet
-   *   The data set to be tested. Note that when adding new datasets often only form_values and expected where
-   *   clause will need changing.
+   *   The data set to be tested. Note that when adding new datasets often only
+   *   form_values and expected where clause will need changing.
    *
    * @dataProvider querySets
-   * @throws \Exception
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function testSelectorQuery($dataSet) {
+  public function testSelectorQuery(array $dataSet): void {
     $tag = $this->callAPISuccess('Tag', 'create', [
-      'name' => 'Test Tag Name' . uniqid(),
+      'name' => 'Test Tag Name',
       'parent_id' => 1,
     ]);
     if (!empty($dataSet['limitedPermissions'])) {
@@ -43,7 +49,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
       ];
     }
     $params = CRM_Contact_BAO_Query::convertFormValues($dataSet['form_values'], 0, FALSE, NULL, []);
-    $isDeleted = in_array(['deleted_contacts', '=', 1, 0, 0], $params);
+    $isDeleted = in_array(['deleted_contacts', '=', 1, 0, 0], $params, TRUE);
     foreach ($dataSet['settings'] as $setting) {
       $this->callAPISuccess('Setting', 'create', [$setting['name'] => $setting['value']]);
     }
@@ -61,7 +67,6 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     // Make sure there is no fail on alphabet query.
     $selector->alphabetQuery()->fetchAll();
     $sql = $queryObject->query(FALSE, FALSE, FALSE, $isDeleted);
-    $this->wrangleDefaultClauses($dataSet['expected_query']);
     foreach ($dataSet['expected_query'] as $index => $queryString) {
       $this->assertLike($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
     }
@@ -94,7 +99,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'country_id' => 'IN',
         ]);
         $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
-        $this->assertEquals(1, count($rows));
+        $this->assertCount(1, $rows);
 
         CRM_Core_DAO::reenableFullGroupByMode();
         $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
@@ -111,15 +116,14 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     if (!empty($dataSet['limitedPermissions'])) {
       $this->cleanUpAfterACLs();
     }
-    $this->callAPISuccess('Tag', 'delete', ['id' => $tag['id']]);
   }
 
   /**
    * Test advanced search results by uf_group_id.
    */
-  public function testSearchByProfile() {
+  public function testSearchByProfile(): void {
     //Create search profile for contacts.
-    $ufGroup = $this->callAPISuccess('uf_group', 'create', [
+    $this->setTestEntityID('UFGroup', $this->callAPISuccess('UFGroup', 'create', [
       'group_type' => 'Contact',
       'name' => 'test_search_profile',
       'title' => 'Test Search Profile',
@@ -132,7 +136,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'in_selector' => 1,
         ],
       ],
-    ]);
+    ])['id'], 'test_profile');
     $contactID = $this->individualCreate(['email' => 'mickey@mouseville.com']);
     //Put the email on hold.
     $email = $this->callAPISuccess('Email', 'get', [
@@ -148,7 +152,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
       'description' => 'Normal default behaviour',
       'class' => 'CRM_Contact_Selector',
       'settings' => [],
-      'form_values' => ['email' => 'mickey@mouseville.com', 'uf_group_id' => $ufGroup['id']],
+      'form_values' => ['email' => 'mickey@mouseville.com', 'uf_group_id' => $this->ids['UFGroup']['test_profile']],
       'params' => [],
       'return_properties' => NULL,
       'context' => 'advanced',
@@ -169,13 +173,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
       $dataSet['context']
     );
     $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
-    $this->assertEquals(1, count($rows));
+    $this->assertCount(1, $rows);
     $this->assertEquals($contactID, key($rows));
 
     //Check if email column contains (On Hold) string.
     foreach ($rows[$contactID] as $key => $value) {
       if (strpos($key, 'email') !== FALSE) {
-        $this->assertStringContainsString("(On Hold)", (string) $value);
+        $this->assertStringContainsString('(On Hold)', (string) $value);
       }
     }
   }
@@ -183,7 +187,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
   /**
    * Test the civicrm_prevnext_cache entry if it correctly stores the search query result
    */
-  public function testPrevNextCache() {
+  public function testPrevNextCache(): void {
     $contactID = $this->individualCreate(['email' => 'mickey@mouseville.com']);
     $dataSet = [
       'description' => 'Normal default behaviour',
@@ -216,23 +220,22 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
       $dataSet['context']
     );
     // set cache key
-    $key = substr(sha1(rand()), 0, 7);
-    $selector->setKey($key);
+    $selector->setKey('abc');
 
     // fetch row and check the result
     $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
-    $this->assertEquals(1, count($rows));
+    $this->assertCount(1, $rows);
     $this->assertEquals($contactID, key($rows));
 
     // build cache key and use to it to fetch prev-next cache record
-    $cacheKey = 'civicrm search ' . $key;
+    $cacheKey = 'civicrm search abc';
     $contacts = CRM_Utils_SQL_Select::from('civicrm_prevnext_cache')
       ->select(['entity_id1', 'cachekey'])
-      ->where("cachekey = @key")
+      ->where('cachekey = @key')
       ->param('key', $cacheKey)
       ->execute()
       ->fetchAll();
-    $this->assertEquals(1, count($contacts));
+    $this->assertCount(1, $contacts);
     // check the prevNext record matches
     $expectedEntry = [
       'entity_id1' => $contactID,
@@ -244,9 +247,9 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
   /**
    * Data sets for testing.
    */
-  public function querySets() {
+  public function querySets(): array {
     return [
-      [
+      'Empty group test' => [
         [
           'description' => 'Empty group test',
           'class' => 'CRM_Contact_Selector',
@@ -261,7 +264,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'expected_query' => [],
         ],
       ],
-      [
+      'Tag Equals Test' => [
         [
           'description' => 'Tag Equals Test',
           'class' => 'CRM_Contact_Selector',
@@ -274,10 +277,10 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [],
-          'where_contains' => 'tag_id IN ( 1,@tagid )',
+          'where_contains' => 'tag_id IN ( @tagid )',
         ],
       ],
-      [
+      'Normal default behaviour' => [
         [
           'description' => 'Normal default behaviour',
           'class' => 'CRM_Contact_Selector',
@@ -290,13 +293,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
-            0 => 'default',
-            1 => 'default',
+            0 => self::getDefaultSelectString(),
+            1 => self::getDefaultFromString(),
             2 => "WHERE  ( civicrm_email.email LIKE '%mickey@mouseville.com%' )  AND ( 1 ) AND (contact_a.is_deleted = 0)",
           ],
         ],
       ],
-      [
+      'Normal default + user added wildcard' => [
         [
           'description' => 'Normal default + user added wildcard',
           'class' => 'CRM_Contact_Selector',
@@ -309,13 +312,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
-            0 => 'default',
-            1 => 'default',
+            0 => self::getDefaultSelectString(),
+            1 => self::getDefaultFromString(),
             2 => "WHERE  ( civicrm_email.email LIKE '%mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE '%Mouse%' ) OR ( civicrm_email.email LIKE '%Mouse%' ) ) ) ) AND ( 1 ) AND (contact_a.is_deleted = 0)",
           ],
         ],
       ],
-      [
+      'Site set to not pre-pend wildcard' => [
         [
           'description' => 'Site set to not pre-pend wildcard',
           'class' => 'CRM_Contact_Selector',
@@ -328,13 +331,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
-            0 => 'default',
-            1 => 'default',
+            0 => self::getDefaultSelectString(),
+            1 => self::getDefaultFromString(),
             2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND ( 1 ) AND (contact_a.is_deleted = 0)",
           ],
         ],
       ],
-      [
+      'Site set to not pre-pend wildcard and check that trash value is respected' => [
         [
           'description' => 'Site set to not pre-pend wildcard and check that trash value is respected',
           'class' => 'CRM_Contact_Selector',
@@ -347,13 +350,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
-            0 => 'default',
-            1 => 'default',
+            0 => self::getDefaultSelectString(),
+            1 => self::getDefaultFromString(),
             2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND ( 1 ) AND (contact_a.is_deleted)",
           ],
         ],
       ],
-      [
+      'Ensure that the Join to the acl contact cache is correct' => [
         [
           'description' => 'Ensure that the Join to the acl contact cache is correct and that if we are searching in deleted contacts appropriate where clause is added',
           'class' => 'CRM_Contact_Selector',
@@ -367,13 +370,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'searchDescendentGroups' => FALSE,
           'limitedPermissions' => TRUE,
           'expected_query' => [
-            0 => 'default',
+            0 => self::getDefaultSelectString(),
             1 => 'FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1) LEFT JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1) LEFT JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id INNER JOIN civicrm_acl_contact_cache aclContactCache ON contact_a.id = aclContactCache.contact_id',
             2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND  aclContactCache.user_id = 0 AND (contact_a.is_deleted)",
           ],
         ],
       ],
-      [
+      'Ensure that the Join to the acl contact cache is correct, no deleted contacts' => [
         [
           'description' => 'Ensure that the Join to the acl contact cache is correct and that if we are not searching in the trash trashed contacts are not returned',
           'class' => 'CRM_Contact_Selector',
@@ -387,13 +390,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'searchDescendentGroups' => FALSE,
           'limitedPermissions' => TRUE,
           'expected_query' => [
-            0 => 'default',
+            0 => self::getDefaultSelectString(),
             1 => 'FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1) LEFT JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1) LEFT JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id INNER JOIN civicrm_acl_contact_cache aclContactCache ON contact_a.id = aclContactCache.contact_id',
             2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND  aclContactCache.user_id = 0 AND (contact_a.is_deleted = 0)",
           ],
         ],
       ],
-      [
+      'Use of quotes for exact string' => [
         [
           'description' => 'Use of quotes for exact string',
           'use_case_comments' => 'This is something that was in the code but seemingly not working. No UI info on it though!',
@@ -407,13 +410,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
-            0 => 'default',
-            1 => 'default',
+            0 => self::getDefaultSelectString(),
+            1 => self::getDefaultFromString(),
             2 => "WHERE  ( civicrm_email.email = 'mickey@mouseville.com'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND ( 1 ) AND (contact_a.is_deleted = 0)",
           ],
         ],
       ],
-      [
+      'Normal search builder behaviour' => [
         [
           'description' => 'Normal search builder behaviour',
           'class' => 'CRM_Contact_Selector',
@@ -436,7 +439,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           ],
         ],
       ],
-      [
+      'Search builder behaviour for Activity' => [
         [
           'description' => 'Search builder behaviour for Activity',
           'class' => 'CRM_Contact_Selector',
@@ -452,11 +455,11 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
             0 => 'SELECT contact_a.id as contact_id, source_contact.id as source_contact_id',
-            2 => 'WHERE ( source_contact.id IS NOT NULL ) AND ( 1 ) AND (contact_a.is_deleted = 0)',
           ],
+          'where_contains' => 'WHERE ( source_contact.id IS NOT NULL ) AND ( 1 ) AND (contact_a.is_deleted = 0)',
         ],
       ],
-      [
+      'Test display relationships' => [
         [
           'description' => 'Test display relationships',
           'class' => 'CRM_Contact_Selector',
@@ -469,7 +472,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [
-            0 => 'SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, contact_a.display_name as `display_name`, contact_a.do_not_email as `do_not_email`, contact_a.do_not_phone as `do_not_phone`, contact_a.do_not_mail as `do_not_mail`, contact_a.do_not_sms as `do_not_sms`, contact_a.do_not_trade as `do_not_trade`, contact_a.is_opt_out as `is_opt_out`, contact_a.legal_identifier as `legal_identifier`, contact_a.external_identifier as `external_identifier`, contact_a.nick_name as `nick_name`, contact_a.legal_name as `legal_name`, contact_a.image_URL as `image_URL`, contact_a.preferred_communication_method as `preferred_communication_method`, contact_a.preferred_language as `preferred_language`, contact_a.first_name as `first_name`, contact_a.middle_name as `middle_name`, contact_a.last_name as `last_name`, contact_a.prefix_id as `prefix_id`, contact_a.suffix_id as `suffix_id`, contact_a.formal_title as `formal_title`, contact_a.communication_style_id as `communication_style_id`, contact_a.job_title as `job_title`, contact_a.gender_id as `gender_id`, contact_a.birth_date as `birth_date`, contact_a.is_deceased as `is_deceased`, contact_a.deceased_date as `deceased_date`, contact_a.household_name as `household_name`, IF ( contact_a.contact_type = \'Individual\', NULL, contact_a.organization_name ) as organization_name, contact_a.sic_code as `sic_code`, contact_a.is_deleted as `contact_is_deleted`, IF ( contact_a.contact_type = \'Individual\', contact_a.organization_name, NULL ) as current_employer, civicrm_address.id as address_id, civicrm_address.street_address as `street_address`, civicrm_address.supplemental_address_1 as `supplemental_address_1`, civicrm_address.supplemental_address_2 as `supplemental_address_2`, civicrm_address.supplemental_address_3 as `supplemental_address_3`, civicrm_address.city as `city`, civicrm_address.postal_code_suffix as `postal_code_suffix`, civicrm_address.postal_code as `postal_code`, civicrm_address.geo_code_1 as `geo_code_1`, civicrm_address.geo_code_2 as `geo_code_2`, civicrm_address.state_province_id as state_province_id, civicrm_address.country_id as country_id, civicrm_phone.id as phone_id, civicrm_phone.phone_type_id as phone_type_id, civicrm_phone.phone as `phone`, civicrm_email.id as email_id, civicrm_email.email as `email`, civicrm_email.on_hold as `on_hold`, civicrm_im.id as im_id, civicrm_im.provider_id as provider_id, civicrm_im.name as `im`, civicrm_worldregion.id as worldregion_id, civicrm_worldregion.name as `world_region`',
+            0 => 'SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, contact_a.display_name as `display_name`, contact_a.external_identifier as `external_identifier`, IF ( contact_a.contact_type = \'Individual\', NULL, contact_a.organization_name ) as organization_name, contact_a.first_name as `first_name`, contact_a.middle_name as `middle_name`, contact_a.last_name as `last_name`, contact_a.do_not_email as `do_not_email`, contact_a.do_not_phone as `do_not_phone`, contact_a.do_not_mail as `do_not_mail`, contact_a.do_not_sms as `do_not_sms`, contact_a.do_not_trade as `do_not_trade`, contact_a.is_opt_out as `is_opt_out`, contact_a.legal_identifier as `legal_identifier`, contact_a.nick_name as `nick_name`, contact_a.legal_name as `legal_name`, contact_a.image_URL as `image_URL`, contact_a.preferred_communication_method as `preferred_communication_method`, contact_a.preferred_language as `preferred_language`, contact_a.prefix_id as `prefix_id`, contact_a.suffix_id as `suffix_id`, contact_a.formal_title as `formal_title`, contact_a.communication_style_id as `communication_style_id`, contact_a.job_title as `job_title`, contact_a.gender_id as `gender_id`, contact_a.birth_date as `birth_date`, contact_a.is_deceased as `is_deceased`, contact_a.deceased_date as `deceased_date`, contact_a.household_name as `household_name`, contact_a.sic_code as `sic_code`, contact_a.is_deleted as `contact_is_deleted`, IF ( contact_a.contact_type = \'Individual\', contact_a.organization_name, NULL ) as current_employer, civicrm_address.id as address_id, civicrm_address.street_address as `street_address`, civicrm_address.supplemental_address_1 as `supplemental_address_1`, civicrm_address.supplemental_address_2 as `supplemental_address_2`, civicrm_address.supplemental_address_3 as `supplemental_address_3`, civicrm_address.city as `city`, civicrm_address.postal_code_suffix as `postal_code_suffix`, civicrm_address.postal_code as `postal_code`, civicrm_address.geo_code_1 as `geo_code_1`, civicrm_address.geo_code_2 as `geo_code_2`, civicrm_address.state_province_id as state_province_id, civicrm_address.country_id as country_id, civicrm_phone.id as phone_id, civicrm_phone.phone_type_id as phone_type_id, civicrm_phone.phone as `phone`, civicrm_email.id as email_id, civicrm_email.email as `email`, civicrm_email.on_hold as `on_hold`, civicrm_im.id as im_id, civicrm_im.provider_id as provider_id, civicrm_im.name as `im`, civicrm_worldregion.id as worldregion_id, civicrm_worldregion.name as `world_region`',
             2 => 'WHERE displayRelType.relationship_type_id = 1
 AND   displayRelType.is_active = 1
 AND ( 1 ) AND (contact_a.is_deleted = 0)',
@@ -482,7 +485,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Test the contact ID query does not fail on country search.
    */
-  public function testContactIDQuery() {
+  public function testContactIDQuery(): void {
     $params = [
       [
         0 => 'country-1',
@@ -500,7 +503,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Test the Search Builder using Non ASCII location type for email filter
    */
-  public function testSelectorQueryOnNonASCIIlocationType() {
+  public function testSelectorQueryOnNonASCILocationType(): void {
     $contactID = $this->individualCreate();
     $locationTypeID = $this->locationTypeCreate([
       'name' => 'Non ASCII Location Type',
@@ -546,16 +549,16 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
     $sql = $selector->getQueryObject()->query();
 
     $expectedQuery = [
-      0 => "SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, `Non_ASCII_Location_Type-location_type`.id as `Non_ASCII_Location_Type-location_type_id`, `Non_ASCII_Location_Type-location_type`.name as `Non_ASCII_Location_Type-location_type`, `Non_ASCII_Location_Type-address`.id as `Non_ASCII_Location_Type-address_id`, `Non_ASCII_Location_Type-email`.id as `Non_ASCII_Location_Type-email_id`, `Non_ASCII_Location_Type-email`.email as `Non_ASCII_Location_Type-email`",
+      0 => 'SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, `Non_ASCII_Location_Type-location_type`.id as `Non_ASCII_Location_Type-location_type_id`, `Non_ASCII_Location_Type-location_type`.name as `Non_ASCII_Location_Type-location_type`, `Non_ASCII_Location_Type-address`.id as `Non_ASCII_Location_Type-address_id`, `Non_ASCII_Location_Type-email`.id as `Non_ASCII_Location_Type-email_id`, `Non_ASCII_Location_Type-email`.email as `Non_ASCII_Location_Type-email`',
       // @TODO these FROM clause doesn't matches due to extra spaces or special character
-      2 => "WHERE  (  ( `Non_ASCII_Location_Type-email`.email IS NOT NULL )  )  AND ( 1 ) AND (contact_a.is_deleted = 0)",
+      2 => 'WHERE  (  ( `Non_ASCII_Location_Type-email`.email IS NOT NULL )  )  AND ( 1 ) AND (contact_a.is_deleted = 0)',
     ];
     foreach ($expectedQuery as $index => $queryString) {
       $this->assertEquals($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
     }
 
     $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
-    $this->assertEquals(1, count($rows));
+    $this->assertCount(1, $rows);
     $this->assertEquals($contactID, key($rows));
     $this->assertEquals('test@test.com', $rows[$contactID]['Non_ASCII_Location_Type-email']);
   }
@@ -563,7 +566,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Test the value use in where clause if it's case sensitive or not against each MySQL operators
    */
-  public function testWhereClauseByOperator() {
+  public function testWhereClauseByOperator(): void {
     $contactID = $this->individualCreate(['first_name' => 'Adam']);
 
     $filters = [
@@ -609,7 +612,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
       $this->assertEquals(TRUE, strpos($sql[2], $filtersByWhereClause[$op]));
 
       $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
-      $this->assertEquals(1, count($rows));
+      $this->assertCount(1, $rows);
       $this->assertEquals($contactID, key($rows));
     }
   }
@@ -617,8 +620,10 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Test if custom table is added in from clause when
    * search results are ordered by a custom field.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testSelectorQueryOrderByCustomField() {
+  public function testSelectorQueryOrderByCustomField(): void {
     //Search for any params.
     $params = [
       [
@@ -632,14 +637,14 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
 
     //Create a test custom group and field.
     $customGroup = $this->callAPISuccess('CustomGroup', 'create', [
-      'title' => "test custom group",
-      'extends' => "Individual",
+      'title' => 'test custom group',
+      'extends' => 'Individual',
     ]);
     $cgTableName = $customGroup['values'][$customGroup['id']]['table_name'];
     $customField = $this->callAPISuccess('CustomField', 'create', [
       'custom_group_id' => $customGroup['id'],
-      'label' => "test field",
-      'html_type' => "Text",
+      'label' => 'test field',
+      'html_type' => 'Text',
     ]);
     $customFieldId = $customField['id'];
 
@@ -647,7 +652,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
     $sortParams = [
       1 => [
         'name' => 'test field',
-        'sort' => "custom_{$customFieldId}",
+        'sort' => "custom_$customFieldId",
       ],
     ];
     $sort = new CRM_Utils_Sort($sortParams, '1_d');
@@ -659,14 +664,11 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
       FALSE, TRUE, TRUE, NULL,
       'AND'
     );
-    $query->searchQuery(0, 0, $sort,
-      FALSE, FALSE, FALSE,
-      FALSE, FALSE
-    );
+    $query->searchQuery(0, 0, $sort);
     //Check if custom table is included in $query->_tables.
-    $this->assertTrue(array_key_exists($cgTableName, $query->_tables));
+    $this->assertArrayHasKey($cgTableName, $query->_tables);
     //Assert if from clause joins the custom table.
-    $this->assertTrue(strpos($query->_fromClause, $cgTableName) !== FALSE);
+    $this->assertNotFalse(strpos($query->_fromClause, $cgTableName));
     $this->callAPISuccess('CustomField', 'delete', ['id' => $customField['id']]);
     $this->callAPISuccess('CustomGroup', 'delete', ['id' => $customGroup['id']]);
   }
@@ -674,14 +676,13 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Check where clause of a date custom field when 'IS NOT EMPTY' operator is used
    */
-  public function testCustomDateField() {
+  public function testCustomDateField(): void {
     $contactID = $this->individualCreate();
     //Create a test custom group and field.
     $customGroup = $this->callAPISuccess('CustomGroup', 'create', [
-      'title' => "test custom group",
-      'extends' => "Individual",
+      'title' => 'test custom group',
+      'extends' => 'Individual',
     ]);
-    $customTableName = $this->callAPISuccess('CustomGroup', 'getValue', ['id' => $customGroup['id'], 'return' => 'table_name']);
     $customGroupTableName = $customGroup['values'][$customGroup['id']]['table_name'];
 
     $createdField = $this->callAPISuccess('customField', 'create', [
@@ -719,28 +720,30 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
     );
 
     $whereClause = $selector->getQueryObject()->query()[2];
-    $expectedClause = sprintf("( %s.%s IS NOT NULL )", $customGroupTableName, $customFieldColumnName);
+    $expectedClause = sprintf('( %s.%s IS NOT NULL )', $customGroupTableName, $customFieldColumnName);
     // test the presence of expected date clause
     $this->assertEquals(TRUE, strpos($whereClause, $expectedClause));
 
     $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
-    $this->assertEquals(1, count($rows));
+    $this->assertCount(1, $rows);
   }
 
   /**
    * Get the default select string since this is generally consistent.
    */
-  public function getDefaultSelectString() {
+  public static function getDefaultSelectString(): string {
     return 'SELECT contact_a.id as contact_id, contact_a.contact_type  as `contact_type`, contact_a.contact_sub_type  as `contact_sub_type`, contact_a.sort_name  as `sort_name`,'
-      . ' contact_a.display_name  as `display_name`, contact_a.do_not_email  as `do_not_email`, contact_a.do_not_phone as `do_not_phone`, contact_a.do_not_mail  as `do_not_mail`,'
-      . ' contact_a.do_not_sms  as `do_not_sms`, contact_a.do_not_trade as `do_not_trade`, contact_a.is_opt_out  as `is_opt_out`, contact_a.legal_identifier  as `legal_identifier`,'
-      . ' contact_a.external_identifier  as `external_identifier`, contact_a.nick_name  as `nick_name`, contact_a.legal_name  as `legal_name`, contact_a.image_URL  as `image_URL`,'
-      . ' contact_a.preferred_communication_method  as `preferred_communication_method`, contact_a.preferred_language  as `preferred_language`,'
+      . ' contact_a.display_name  as `display_name`, contact_a.external_identifier  as `external_identifier`,'
+      . ' IF ( contact_a.contact_type = \'Individual\', NULL, contact_a.organization_name ) as organization_name,'
       . ' contact_a.first_name  as `first_name`, contact_a.middle_name  as `middle_name`, contact_a.last_name  as `last_name`,'
+      . ' contact_a.do_not_email  as `do_not_email`, contact_a.do_not_phone as `do_not_phone`, contact_a.do_not_mail  as `do_not_mail`,'
+      . ' contact_a.do_not_sms  as `do_not_sms`, contact_a.do_not_trade as `do_not_trade`, contact_a.is_opt_out  as `is_opt_out`, contact_a.legal_identifier  as `legal_identifier`,'
+      . ' contact_a.nick_name  as `nick_name`, contact_a.legal_name  as `legal_name`, contact_a.image_URL  as `image_URL`,'
+      . ' contact_a.preferred_communication_method  as `preferred_communication_method`, contact_a.preferred_language  as `preferred_language`,'
       . ' contact_a.prefix_id  as `prefix_id`, contact_a.suffix_id  as `suffix_id`, contact_a.formal_title  as `formal_title`, contact_a.communication_style_id  as `communication_style_id`,'
       . ' contact_a.job_title  as `job_title`, contact_a.gender_id  as `gender_id`, contact_a.birth_date  as `birth_date`, contact_a.is_deceased  as `is_deceased`,'
       . ' contact_a.deceased_date  as `deceased_date`, contact_a.household_name  as `household_name`,'
-      . ' IF ( contact_a.contact_type = \'Individual\', NULL, contact_a.organization_name ) as organization_name, contact_a.sic_code  as `sic_code`, contact_a.is_deleted  as `contact_is_deleted`,'
+      . ' contact_a.sic_code  as `sic_code`, contact_a.is_deleted  as `contact_is_deleted`,'
       . ' IF ( contact_a.contact_type = \'Individual\', contact_a.organization_name, NULL ) as current_employer, civicrm_address.id as address_id,'
       . ' civicrm_address.street_address as `street_address`, civicrm_address.supplemental_address_1 as `supplemental_address_1`, '
       . 'civicrm_address.supplemental_address_2 as `supplemental_address_2`, civicrm_address.supplemental_address_3 as `supplemental_address_3`, civicrm_address.city as `city`, civicrm_address.postal_code_suffix as `postal_code_suffix`, '
@@ -753,7 +756,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   /**
    * Get the default from string since this is generally consistent.
    */
-  public function getDefaultFromString() {
+  public static function getDefaultFromString(): string {
     return ' FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )'
       . ' LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) '
       . ' LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1)'
@@ -769,25 +772,8 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
    *
    * @return string
    */
-  public function strWrangle($string) {
+  public function strWrangle(string $string): string {
     return trim(str_replace('  ', ' ', $string));
-  }
-
-  /**
-   * Swap out default parts of the query for the actual string.
-   *
-   * Note that it seems to make more sense to resolve this earlier & pass it in from a clean code point of
-   * view, but the output on fail includes long sql statements that are of low relevance then.
-   *
-   * @param array $expectedQuery
-   */
-  public function wrangleDefaultClauses(&$expectedQuery) {
-    if (CRM_Utils_Array::value(0, $expectedQuery) == 'default') {
-      $expectedQuery[0] = $this->getDefaultSelectString();
-    }
-    if (CRM_Utils_Array::value(1, $expectedQuery) == 'default') {
-      $expectedQuery[1] = $this->getDefaultFromString();
-    }
   }
 
 }

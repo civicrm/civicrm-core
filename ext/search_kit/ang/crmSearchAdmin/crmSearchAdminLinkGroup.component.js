@@ -15,11 +15,12 @@
     controller: function ($scope, $element, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
-        linkProps = ['path', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'condition'];
+        linkProps = ['path', 'task', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'condition'];
 
       ctrl.permissionOperators = [
-        {key: '=', value: ts('Has')},
-        {key: '!=', value: ts('Lacks')}
+        {key: 'CONTAINS', value: ts('Includes')},
+        {key: '=', value: ts('Has All')},
+        {key: '!=', value: ts('Lacks All')}
       ];
 
       this.styles = CRM.crmSearchAdmin.styles;
@@ -31,8 +32,10 @@
       this.getField = searchMeta.getField;
 
       this.fields = function() {
-        var selectFields = ctrl.crmSearchAdmin.getSelectFields();
-        var permissionField = [{
+        let selectFields = ctrl.crmSearchAdmin.getSelectFields();
+        // Use machine names not labels for option matching
+        selectFields.forEach((field) => field.id = field.id.replace(':label', ':name'));
+        let permissionField = [{
           text: ts('Current User Permission'),
           id: 'check user permission',
           description: ts('Check permission of logged-in user')
@@ -98,7 +101,7 @@
           path: 'civicrm/'
         });
         var defaultLinks = _.filter(ctrl.links, function(link) {
-          return !link.join;
+          return link.action && !link.join;
         });
         _.each(ctrl.group, function(item) {
           setDefaults(item, item);

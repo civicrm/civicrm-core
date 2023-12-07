@@ -35,7 +35,7 @@
 </table>
 </div>
 
-{/if }
+{/if}
 
 
 {* print survey response set option value and label *}
@@ -66,7 +66,7 @@
    {* clean separation of each response question *}
    <tr><td><br /></td></tr>
 
-     {assign var=resFldCnt value=`$resFldCnt+1`}
+     {assign var=resFldCnt value=$resFldCnt+1}
      {/foreach}
 
 </table>

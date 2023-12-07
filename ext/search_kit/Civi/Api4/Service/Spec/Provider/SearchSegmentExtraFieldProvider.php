@@ -13,7 +13,6 @@
 namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Query\Api4SelectQuery;
-use Civi\Api4\SearchSegment;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
 
@@ -30,6 +29,7 @@ class SearchSegmentExtraFieldProvider implements Generic\SpecProviderInterface {
       $field->setOptions(array_column($set['items'], 'label'));
       $field->setSuffixes(['label']);
       $field->setSqlRenderer([__CLASS__, 'renderSql']);
+      $field->setInputType('Select');
       $spec->addFieldSpec($field);
     }
   }
@@ -49,14 +49,24 @@ class SearchSegmentExtraFieldProvider implements Generic\SpecProviderInterface {
     if (!isset(\Civi::$statics['all_search_segments'])) {
       \Civi::$statics['all_search_segments'] = [];
       try {
-        $searchSegments = SearchSegment::get(FALSE)->addOrderBy('label')->execute();
+        // Use api wrapper instead of calling SearchSegment class directly to avoid "class not found"
+        // errors that may occur during installs and upgrades
+        $searchSegments = civicrm_api4('SearchSegment', 'get', [
+          'checkPermissions' => FALSE,
+          'orderBy' => ['label' => 'ASC'],
+        ]);
       }
-      // Suppress SearchSegment BAO/table not found error e.g. during upgrade mode
+      // Suppress SearchSegment class/table not found error e.g. during upgrade mode
       catch (\Exception $e) {
         return [];
       }
       foreach ($searchSegments as $set) {
         \Civi::$statics['all_search_segments'][$set['entity_name']]['segment_' . $set['name']] = $set;
+        if ($set['entity_name'] === 'Contact') {
+          foreach (\CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
+            \Civi::$statics['all_search_segments'][$contactType]['segment_' . $set['name']] = $set;
+          }
+        }
       }
     }
     return \Civi::$statics['all_search_segments'][$entity] ?? [];
@@ -66,7 +76,7 @@ class SearchSegmentExtraFieldProvider implements Generic\SpecProviderInterface {
    * Generates the sql case statement with a clause for each item.
    *
    * @param array $field
-   * @param Civi\Api4\Query\Api4SelectQuery $query
+   * @param \Civi\Api4\Query\Api4SelectQuery $query
    * @return string
    */
   public static function renderSql(array $field, Api4SelectQuery $query): string {

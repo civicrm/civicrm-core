@@ -26,6 +26,10 @@ return [
         'is_reserved' => TRUE,
         'is_active' => TRUE,
       ],
+      'match' => [
+        'name',
+        'option_group_id',
+      ],
     ],
   ],
 ];

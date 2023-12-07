@@ -22,13 +22,12 @@ use Civi\Api4\Utils\CoreUtil;
  *
  * Perform joins on other related entities using a dot notation.
  *
- * @method $this setHaving(array $clauses)
- * @method array getHaving()
  * @method $this setTranslationMode(string|null $mode)
  * @method string|null getTranslationMode()
  */
 class DAOGetAction extends AbstractGetAction {
   use Traits\DAOActionTrait;
+  use Traits\GroupAndHavingParamTrait;
 
   /**
    * Fields to return. Defaults to all standard (non-custom, non-extra) fields `['*']`.
@@ -65,22 +64,6 @@ class DAOGetAction extends AbstractGetAction {
    * @see \Civi\Api4\Generic\Traits\EntityBridge
    */
   protected $join = [];
-
-  /**
-   * Field(s) by which to group the results.
-   *
-   * @var array
-   */
-  protected $groupBy = [];
-
-  /**
-   * Clause for filtering results after grouping and filters are applied.
-   *
-   * Each expression should correspond to an item from the SELECT array.
-   *
-   * @var array
-   */
-  protected $having = [];
 
   /**
    * Should we automatically overload the result with translated data?
@@ -157,46 +140,6 @@ class DAOGetAction extends AbstractGetAction {
       throw new \CRM_Core_Exception('Unsupported operator');
     }
     $this->where[] = [$fieldName, $op, $value, $isExpression];
-    return $this;
-  }
-
-  /**
-   * @return array
-   */
-  public function getGroupBy(): array {
-    return $this->groupBy;
-  }
-
-  /**
-   * @param array $groupBy
-   * @return $this
-   */
-  public function setGroupBy(array $groupBy) {
-    $this->groupBy = $groupBy;
-    return $this;
-  }
-
-  /**
-   * @param string $field
-   * @return $this
-   */
-  public function addGroupBy(string $field) {
-    $this->groupBy[] = $field;
-    return $this;
-  }
-
-  /**
-   * @param string $expr
-   * @param string $op
-   * @param mixed $value
-   * @return $this
-   * @throws \CRM_Core_Exception
-   */
-  public function addHaving(string $expr, string $op, $value = NULL) {
-    if (!in_array($op, CoreUtil::getOperators())) {
-      throw new \CRM_Core_Exception('Unsupported operator');
-    }
-    $this->having[] = [$expr, $op, $value];
     return $this;
   }
 

@@ -40,7 +40,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     ], $maxTimeouts);
   }
 
-  public function testDoubleLifeWithDelete() {
+  public function testDoubleLifeWithDelete(): void {
     $this->assertFalse($this->a->has('foo'));
     $this->assertFalse($this->b->has('foo'));
     $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
@@ -70,7 +70,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->assertEquals('dfl-2', $this->b->get('foo', 'dfl-2'));
   }
 
-  public function testDoubleLifeWithClear() {
+  public function testDoubleLifeWithClear(): void {
     $this->assertFalse($this->a->has('foo'));
     $this->assertFalse($this->b->has('foo'));
     $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
@@ -92,7 +92,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->assertEquals('dfl-2', $this->b->get('foo', 'dfl-2'));
   }
 
-  public function testTieredTimeout_default() {
+  public function testTieredTimeout_default(): void {
     $start = CRM_Utils_Time::getTimeRaw();
     $this->cache = $this->createSimpleCache([100, 1000]);
 
@@ -111,7 +111,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->assertApproxEquals($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
   }
 
-  public function testTieredTimeout_explicitLow() {
+  public function testTieredTimeout_explicitLow(): void {
     $start = CRM_Utils_Time::getTimeRaw();
     $this->cache = $this->createSimpleCache([100, 1000]);
 
@@ -130,7 +130,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->assertApproxEquals($start + 50, $this->b->getExpires('foo'), self::TOLERANCE);
   }
 
-  public function testTieredTimeout_explicitMedium() {
+  public function testTieredTimeout_explicitMedium(): void {
     $start = CRM_Utils_Time::getTimeRaw();
     $this->cache = $this->createSimpleCache([100, 1000]);
 
@@ -149,7 +149,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->assertApproxEquals($start + 500, $this->b->getExpires('foo'), self::TOLERANCE);
   }
 
-  public function testTieredTimeout_explicitHigh_lateReoad() {
+  public function testTieredTimeout_explicitHigh_lateReoad(): void {
     $start = CRM_Utils_Time::getTimeRaw();
     $this->cache = $this->createSimpleCache([100, 1000]);
 

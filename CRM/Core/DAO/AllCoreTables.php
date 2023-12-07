@@ -309,13 +309,13 @@ class CRM_Core_DAO_AllCoreTables {
    * @param string $tableName
    * @return string|CRM_Core_DAO|NULL
    */
-  public static function getClassForTable($tableName) {
+  public static function getClassForTable(string $tableName) {
     //CRM-19677: on multilingual setup, trim locale from $tableName to fetch class name
     if (CRM_Core_I18n::isMultilingual()) {
       global $dbLocale;
       $tableName = str_replace($dbLocale, '', $tableName);
     }
-    return CRM_Utils_Array::value($tableName, self::tables());
+    return self::tables()[$tableName] ?? NULL;
   }
 
   /**
@@ -358,9 +358,9 @@ class CRM_Core_DAO_AllCoreTables {
    *
    * @param string $briefName
    *
-   * @return FALSE|string
+   * @return string
    */
-  public static function getTableForEntityName($briefName) {
+  public static function getTableForEntityName($briefName): string {
     self::init();
     return self::$entityTypes[$briefName]['table'];
   }

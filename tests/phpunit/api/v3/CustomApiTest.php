@@ -35,7 +35,7 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
    * This api is a bit 'special' in that it has a composite primary key rather
    * than using 'id', make sure that works too....
    */
-  public function testCustomApi() {
+  public function testCustomApi(): void {
     $this->installApi();
     $this->callAPISuccess('MailingProviderData', 'create', [
       'contact_identifier' => 'xyz',

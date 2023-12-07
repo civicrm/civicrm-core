@@ -5,6 +5,8 @@ class SettingsBagTest extends \CiviUnitTestCase {
 
   protected $origSetting;
 
+  public $mandates;
+
   protected function setUp(): void {
     $this->origSetting = $GLOBALS['civicrm_setting'];
 
@@ -22,7 +24,7 @@ class SettingsBagTest extends \CiviUnitTestCase {
   /**
    * CRM-19610 - Ensure InnoDb FTS doesn't break search preferenes when disabled.
    */
-  public function testInnoDbFTS() {
+  public function testInnoDbFTS(): void {
 
     $settingsBag = \Civi::settings();
 
@@ -34,7 +36,7 @@ class SettingsBagTest extends \CiviUnitTestCase {
    * The setting "contribution_invoice_settings" is actually a virtual value built on other settings.
    * Check that various updates work as expected.
    */
-  public function testVirtualContributionSetting_explicit() {
+  public function testVirtualContributionSetting_explicit(): void {
     $s = \Civi::settings();
 
     $this->assertEquals(10, $s->get('contribution_invoice_settings')['due_date']);
@@ -63,7 +65,7 @@ class SettingsBagTest extends \CiviUnitTestCase {
    * The setting "contribution_invoice_settings" is actually a virtual value built on other settings.
    * Check that mandatory values ($civicrm_settings) are respected.
    */
-  public function testVirtualContributionSetting_mandatory() {
+  public function testVirtualContributionSetting_mandatory(): void {
     $s = \Civi::settings();
     $this->assertEquals(10, $s->get('contribution_invoice_settings')['due_date']);
     $this->assertEquals(10, $s->get('invoice_due_date'));

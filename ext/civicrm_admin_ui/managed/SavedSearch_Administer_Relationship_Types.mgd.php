@@ -5,7 +5,7 @@ return [
   [
     'name' => 'SavedSearch_Administer_Relationship_Types',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -19,8 +19,8 @@ return [
         'api_params' => [
           'version' => 4,
           'select' => [
-            'name_a_b',
-            'name_b_a',
+            'label_a_b',
+            'label_b_a',
             'contact_type_a:label',
             'contact_type_b:label',
             'is_active',
@@ -34,12 +34,15 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
+      'match' => [
+        'name',
+      ],
     ],
   ],
   [
     'name' => 'SavedSearch_Administer_Relationship_Types_SearchDisplay_Administer_Relationship_Types_Table_1',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -49,19 +52,23 @@ return [
         'saved_search_id.name' => 'Administer_Relationship_Types',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
             'table-striped',
           ],
-          'pager' => [],
+          'pager' => [
+            'show_count' => TRUE,
+            'expose_limit' => TRUE,
+            'hide_single' => TRUE,
+          ],
           'placeholder' => 5,
           'sort' => [],
           'columns' => [
             [
               'type' => 'field',
-              'key' => 'name_a_b',
+              'key' => 'label_a_b',
               'dataType' => 'String',
               'label' => E::ts('Relationship A to B'),
               'sortable' => TRUE,
@@ -69,7 +76,7 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'name_b_a',
+              'key' => 'label_b_a',
               'dataType' => 'String',
               'label' => E::ts('Relationship B to A'),
               'sortable' => TRUE,
@@ -98,7 +105,7 @@ return [
               'editable' => TRUE,
             ],
             [
-              'size' => 'btn-sm',
+              'size' => 'btn-xs',
               'links' => [
                 [
                   'entity' => 'RelationshipType',
@@ -123,6 +130,24 @@ return [
                   'condition' => [],
                 ],
                 [
+                  'task' => 'enable',
+                  'entity' => 'RelationshipType',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-on',
+                  'text' => E::ts('Enable'),
+                  'style' => 'default',
+                  'condition' => ['is_active', '=', FALSE],
+                ],
+                [
+                  'task' => 'disable',
+                  'entity' => 'RelationshipType',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-off',
+                  'text' => E::ts('Disable'),
+                  'style' => 'default',
+                  'condition' => ['is_active', '=', TRUE],
+                ],
+                [
                   'entity' => 'RelationshipType',
                   'action' => 'delete',
                   'join' => '',
@@ -134,14 +159,20 @@ return [
                   'condition' => [],
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
+              'icon' => 'fa-bars',
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/reltype/edit?action=add&reset=1',
-            'text' => E::ts('Add Relationship Type'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'RelationshipType',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Relationship Type'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [
@@ -153,6 +184,10 @@ return [
           ],
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ],

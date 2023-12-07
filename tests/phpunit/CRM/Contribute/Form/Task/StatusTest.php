@@ -79,7 +79,7 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
   /**
    * Test update pending contribution without sending a confirmation mail.
    */
-  public function testUpdatePendingContributionWithoutSendingEmail() {
+  public function testUpdatePendingContributionWithoutSendingEmail(): void {
     $this->_individualId = $this->individualCreate();
     $form = new CRM_Contribute_Form_Task_Status();
 

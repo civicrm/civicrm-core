@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+{ # https://stackoverflow.com/a/21100710
+  set -e
+
+  function fatal() {
+    echo >&2 "$@"
+    exit 1
+  }
+
+  CORE="$PWD"
+  SRV="$CORE/srv"
+  ADDR_PORT="localhost:8000"
+  export PHP_CLI_SERVER_WORKERS=5
+
+  if [ ! -d "$CORE/packages" ]; then
+    fatal "Missing: \"$CORE/packages\""
+  fi
+  if [ ! -e "$CORE/vendor/autoload.php" ]; then
+    fatal "Missing: \"$CORE/vendor/autoload.php\""
+  fi
+
+  php -r 'if (version_compare(PHP_VERSION, "8", "<")) echo "\n\n===========\nWARNING: In PHP 7.x, the built-in HTTP server may handle multiprocessing poorly!!\n===========\n";'
+  ## Specifically, the security-checks require auxiliary HTTP requests.
+
+  echo "Update scaffolding ($SRV)"
+  php "$CORE/tools/standalone/bin/scaffold" $SRV --auto
+
+  echo "Launch PHP web server"
+  php -S "$ADDR_PORT" -t "$SRV/web" "$CORE/tools/standalone/router.php"
+
+  exit
+}

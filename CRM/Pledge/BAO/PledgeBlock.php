@@ -17,17 +17,10 @@
 class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
@@ -123,18 +116,23 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * Build Pledge Block in Contribution Pages.
    *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 5.68 will be removed around 5.74
    */
   public static function buildPledgeBlock($form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     //build pledge payment fields.
     if (!empty($form->_values['pledge_id'])) {
       //get all payments required details.
       $allPayments = [];
-      $returnProperties = array(
+      $returnProperties = [
         'status_id',
         'scheduled_date',
         'scheduled_amount',
         'currency',
-      );
+      ];
       CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'pledge_id',
         $form->_values['pledge_id'], $allPayments, $returnProperties
       );
@@ -146,27 +144,27 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       $overduePayments = [];
       foreach ($allPayments as $payID => $value) {
         if ($allStatus[$value['status_id']] == 'Overdue') {
-          $overduePayments[$payID] = array(
+          $overduePayments[$payID] = [
             'id' => $payID,
             'scheduled_amount' => CRM_Utils_Rule::cleanMoney($value['scheduled_amount']),
             'scheduled_amount_currency' => $value['currency'],
             'scheduled_date' => CRM_Utils_Date::customFormat($value['scheduled_date'],
               '%B %d'
             ),
-          );
+          ];
         }
         elseif (!$isNextPayment &&
           $allStatus[$value['status_id']] == 'Pending'
         ) {
           // get the next payment.
-          $nextPayment = array(
+          $nextPayment = [
             'id' => $payID,
             'scheduled_amount' => CRM_Utils_Rule::cleanMoney($value['scheduled_amount']),
             'scheduled_amount_currency' => $value['currency'],
             'scheduled_date' => CRM_Utils_Date::customFormat($value['scheduled_date'],
               '%B %d'
             ),
-          );
+          ];
           $isNextPayment = TRUE;
         }
       }
@@ -175,48 +173,44 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       $payments = [];
       if (!empty($overduePayments)) {
         foreach ($overduePayments as $id => $payment) {
-          $label = ts("%1 - due on %2 (overdue)", array(
+          $label = ts("%1 - due on %2 (overdue)", [
             1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $payment), CRM_Utils_Array::value('scheduled_amount_currency', $payment)),
             2 => $payment['scheduled_date'] ?? NULL,
-          ));
+          ]);
           $paymentID = $payment['id'] ?? NULL;
-          $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, array('amount' => CRM_Utils_Array::value('scheduled_amount', $payment)));
+          $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, ['amount' => CRM_Utils_Array::value('scheduled_amount', $payment)]);
         }
       }
 
       if (!empty($nextPayment)) {
-        $label = ts("%1 - due on %2", array(
+        $label = ts("%1 - due on %2", [
           1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $nextPayment), CRM_Utils_Array::value('scheduled_amount_currency', $nextPayment)),
           2 => $nextPayment['scheduled_date'] ?? NULL,
-        ));
+        ]);
         $paymentID = $nextPayment['id'] ?? NULL;
-        $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, array('amount' => CRM_Utils_Array::value('scheduled_amount', $nextPayment)));
+        $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, ['amount' => CRM_Utils_Array::value('scheduled_amount', $nextPayment)]);
       }
       // give error if empty or build form for payment.
       if (empty($payments)) {
         throw new CRM_Core_Exception(ts('Oops. It looks like there is no valid payment status for online payment.'));
       }
-      else {
-        $form->assign('is_pledge_payment', TRUE);
-        $form->addGroup($payments, 'pledge_amount', ts('Make Pledge Payment(s):'), '<br />');
-      }
+      $form->addGroup($payments, 'pledge_amount', ts('Make Pledge Payment(s):'), '<br />');
     }
     else {
 
       $pledgeBlock = self::getPledgeBlock($form->_id);
 
       // build form for pledge creation.
-      $pledgeOptions = array(
+      $pledgeOptions = [
         '0' => ts('I want to make a one-time contribution'),
         '1' => ts('I pledge to contribute this amount every'),
-      );
+      ];
       $form->addRadio('is_pledge', ts('Pledge Frequency Interval'), $pledgeOptions,
-        NULL, array('<br/>')
+        NULL, ['<br/>']
       );
       $form->addElement('text', 'pledge_installments', ts('Installments'), ['size' => 3, 'aria-label' => ts('Installments')]);
 
       if (!empty($pledgeBlock['is_pledge_interval'])) {
-        $form->assign('is_pledge_interval', CRM_Utils_Array::value('is_pledge_interval', $pledgeBlock));
         $form->addElement('text', 'pledge_frequency_interval', NULL, ['size' => 3, 'aria-label' => ts('Frequency Intervals')]);
       }
       else {
@@ -271,7 +265,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
               $form->assign('start_date_editable', TRUE);
               if ($field == 'calendar_month') {
                 $form->assign('is_date', FALSE);
-                $form->setDefaults(array('start_date' => $value));
+                $form->setDefaults(['start_date' => $value]);
               }
             }
           }

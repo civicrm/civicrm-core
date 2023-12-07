@@ -12,11 +12,11 @@ namespace Civi\Shimmy\Mixins;
  */
 class SettingsTest extends \PHPUnit\Framework\Assert {
 
-  public function testPreConditions($cv) {
+  public function testPreConditions($cv): void {
     $this->assertFileExists(static::getPath('/settings/Shimmy.setting.php'), 'The shimmy extension must have a Menu XML file.');
   }
 
-  public function testInstalled($cv) {
+  public function testInstalled($cv): void {
     // The menu item is registered...
     $items = $cv->api4('Setting', 'getFields', ['where' => [['name', '=', 'shimmy_example']], 'loadOptions' => TRUE]);
     $this->assertEquals('shimmy_example', $items[0]['name']);
@@ -34,7 +34,7 @@ class SettingsTest extends \PHPUnit\Framework\Assert {
     $this->assertEquals('second', $value);
   }
 
-  public function testDisabled($cv) {
+  public function testDisabled($cv): void {
     $items = $cv->api4('Setting', 'getFields', ['where' => [['name', '=', 'shimmy_example']], 'loadOptions' => TRUE]);
     $this->assertEmpty($items);
 
@@ -42,7 +42,7 @@ class SettingsTest extends \PHPUnit\Framework\Assert {
     $this->assertEquals('second', $value);
   }
 
-  public function testUninstalled($cv) {
+  public function testUninstalled($cv): void {
     $items = $cv->api4('Setting', 'getFields', ['where' => [['name', '=', 'shimmy_example']], 'loadOptions' => TRUE]);
     $this->assertEmpty($items);
 

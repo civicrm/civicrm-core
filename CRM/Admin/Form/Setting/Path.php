@@ -27,6 +27,7 @@ class CRM_Admin_Form_Setting_Path extends CRM_Admin_Form_Setting {
     'customTemplateDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
     'customPHPPathDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
     'extensionsDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
+    'ext_max_depth' => CRM_Core_BAO_Setting::EXT,
   ];
 
   /**

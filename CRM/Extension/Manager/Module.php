@@ -18,6 +18,11 @@
 class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
 
   /**
+   * @var \CRM_Extension_Mapper
+   */
+  protected $mapper;
+
+  /**
    * @param CRM_Extension_Mapper $mapper
    */
   public function __construct(CRM_Extension_Mapper $mapper) {
@@ -32,6 +37,10 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
     $this->registerClassloader($info);
     $this->callHook($info, 'install');
     $this->callHook($info, 'enable');
+  }
+
+  public function onPostInstall(CRM_Extension_Info $info) {
+    \Civi\Core\ClassScanner::cache('index')->flush();
   }
 
   /**
@@ -80,6 +89,7 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
    * @param CRM_Extension_Info $info
    */
   public function onPostUninstall(CRM_Extension_Info $info) {
+    \Civi\Core\ClassScanner::cache('index')->flush();
   }
 
   /**
@@ -89,12 +99,20 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
     $this->callHook($info, 'disable');
   }
 
+  public function onPostDisable(CRM_Extension_Info $info) {
+    \Civi\Core\ClassScanner::cache('index')->flush();
+  }
+
   /**
    * @param CRM_Extension_Info $info
    */
   public function onPreEnable(CRM_Extension_Info $info) {
     $this->registerClassloader($info);
     $this->callHook($info, 'enable');
+  }
+
+  public function onPostEnable(CRM_Extension_Info $info) {
+    \Civi\Core\ClassScanner::cache('index')->flush();
   }
 
   public function onPostReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo) {

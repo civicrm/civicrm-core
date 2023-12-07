@@ -64,7 +64,7 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
       $this->_pages['CRM_Contact_Form_Task_Result'] = NULL;
     }
 
-    $this->addSequentialPages($this->_pages, $action);
+    $this->addSequentialPages($this->_pages);
   }
 
   /**

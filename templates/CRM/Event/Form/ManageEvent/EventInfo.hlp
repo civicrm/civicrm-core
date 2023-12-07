@@ -48,7 +48,7 @@
           {ts}After adding your event, create links to the listing page by copying the URL provided in the 'Participant Listing' section of the Configure Event page.{/ts}
         {/if}
       {elseif $config->userFramework EQ 'Joomla'}
-          {ts 1=$params.entityId}Then create front-end links to the Participant Listing page using the Menu Manager. Select <strong>Participant Listing Page</strong> and enter <strong>%1</strong> for the Event ID.{/ts}
+          {ts 1=$params.entityId|smarty:nodefaults|escape}Then create front-end links to the Participant Listing page using the Menu Manager. Select <strong>Participant Listing Page</strong> and enter <strong>%1</strong> for the Event ID.{/ts}
       {/if}
     {/if}
 {/htxt}

@@ -28,6 +28,11 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
    */
   private $tx;
 
+  /**
+   * @var \CRM_Core_TemporaryErrorScope|null
+   */
+  public $errorScope;
+
   public function startTestSuite(\PHPUnit_Framework_TestSuite $suite) {
     $byInterface = $this->indexTestsByInterface($suite->tests());
     $this->validateGroups($byInterface);
@@ -111,6 +116,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     \CRM_Core_Session::singleton()->set('userID', NULL);
     // ugh, performance
     $config = \CRM_Core_Config::singleton(TRUE, TRUE);
+    $config->userSystem->setMySQLTimeZone();
 
     if (property_exists($config->userPermissionClass, 'permissions')) {
       $config->userPermissionClass->permissions = NULL;

@@ -39,6 +39,9 @@
         <td class="label">{$form.group_type.label}</td>
         <td>{$form.group_type.html}</td>
       </tr>
+      <tr>
+        <td colspan=2>{include file="CRM/Custom/Form/CustomData.tpl"}</td>
+      </tr>
     {/if}
   </table>
 

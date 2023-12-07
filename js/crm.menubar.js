@@ -8,7 +8,7 @@
     data: null,
     settings: {collapsibleBehavior: 'accordion'},
     position: 'over-cms-menu',
-    toggleButton: true,
+    toggleButton: (CRM.config.userFramework != 'Standalone'),
     attachTo: (CRM.menubar && CRM.menubar.position === 'above-crm-container') ? '#crm-container' : 'body',
     initialize: function() {
       var cache = CRM.cache.get('menubar');
@@ -28,18 +28,14 @@
 
       // Wait for crm-container present on the page as it's faster than document.ready
       function insert(markup) {
-        if ($('#crm-container').length) {
+        if (document.getElementById('crm-container')) {
           render(markup);
         } else {
           new MutationObserver(function(mutations, observer) {
-            _.each(mutations, function(mutant) {
-              _.each(mutant.addedNodes, function(node) {
-                if ($(node).is('#crm-container')) {
-                  render(markup);
-                  observer.disconnect();
-                }
-              });
-            });
+            if (document.getElementById('crm-container')) {
+              observer.disconnect();
+              render(markup);
+            }
           }).observe(document, {childList: true, subtree: true});
         }
       }
@@ -105,11 +101,13 @@
       if (typeof speed === 'number') {
         $('#civicrm-menu').slideDown(speed, function() {
           $(this).css('display', '');
+          handleResize();
         });
       }
       $('body')
         .removeClass('crm-menubar-hidden')
         .addClass('crm-menubar-visible');
+      handleResize();
     },
     hide: function(speed, showMessage) {
       if (typeof speed === 'number') {
@@ -120,6 +118,7 @@
       $('body')
         .addClass('crm-menubar-hidden')
         .removeClass('crm-menubar-visible');
+      document.documentElement.style.setProperty('--crm-menubar-bottom', '0px');
       if (showMessage === true && $('#crm-notification-container').length && initialized) {
         var alert = CRM.alert('<a href="#" id="crm-restore-menu" >' + _.escape(ts('Restore CiviCRM Menu')) + '</a>', ts('Menu hidden'), 'none', {expires: 10000});
         $('#crm-restore-menu')
@@ -289,22 +288,32 @@
             var
               option = $('input[name=quickSearchField]:checked'),
               params = {
-                name: request.term,
-                field_name: option.val()
+                formName: 'crmMenubar',
+                fieldName: 'crm-qsearch-input',
+                filters: {},
               };
-            CRM.api3('contact', 'getquick', params).done(function(result) {
+            if (option.val() === 'sort_name') {
+              params.input = request.term;
+            } else {
+              params.filters[option.val()] = request.term;
+            }
+            // Specialized Autocomplete SearchDisplay: @see ContactAutocompleteProvider
+            CRM.api4('Contact', 'autocomplete', params).then(function(result) {
               var ret = [];
-              if (result.values.length > 0) {
+              if (result.length > 0) {
                 $('#crm-qsearch-input').autocomplete('widget').menu('option', 'disabled', false);
-                $.each(result.values, function(k, v) {
-                  ret.push({value: v.id, label: v.data});
+                $.each(result, function(key, item) {
+                  // Add extra items from the description (see contact_autocomplete_options setting)
+                  let description = (item.description || []).filter((v) => v);
+                  let extra = description.length ? ' :: ' + description.join(' :: ') : '';
+                  ret.push({value: item.id, label: item.label + extra});
                 });
               } else {
                 $('#crm-qsearch-input').autocomplete('widget').menu('option', 'disabled', true);
                 var label = option.closest('label').text();
                 var msg = ts('%1 not found.', {1: label});
                 // Remind user they are not searching by contact name (unless they enter a number)
-                if (params.field_name !== 'sort_name' && !(/[\d].*/.test(params.name))) {
+                if (option.val() !== 'sort_name' && !(/[\d].*/.test(params.name))) {
                   msg += ' ' + ts('Did you mean to search by Name/Email instead?');
                 }
                 ret.push({value: '0', label: msg});
@@ -383,6 +392,7 @@
           return false;
         }
         var $menu = $('#crm-qsearch-input').autocomplete('widget');
+        // If only one contact was returned, go directly to that contact page
         if ($('li.ui-menu-item', $menu).length === 1) {
           var cid = $('li.ui-menu-item', $menu).data('ui-autocomplete-item').value;
           if (cid > 0) {
@@ -399,7 +409,8 @@
       function setQuickSearchValue() {
         var $selection = $('.crm-quickSearchField input:checked'),
           label = $selection.parent().text(),
-          value = $selection.val();
+          // Set name because the mini-form submits directly to adv search
+          value = $selection.data('advSearchLegacy') || $selection.val();
         $('#crm-qsearch-input').attr({name: value, placeholder: '\uf002 ' + label});
       }
       $('.crm-quickSearchField').click(function() {
@@ -459,7 +470,7 @@
         '</a>' +
         '<ul>' +
           '<% _.forEach(items, function(item) { %>' +
-            '<li><a href="#" class="crm-quickSearchField"><label><input type="radio" value="<%= item.key %>" name="quickSearchField"> <%- item.value %></label></a></li>' +
+            '<li><a href="#" class="crm-quickSearchField"><label><input type="radio" value="<%= item.key %>" name="quickSearchField" data-adv-search-legacy="<%= item.adv_search_legacy %>"> <%- item.value %></label></a></li>' +
           '<% }) %>' +
         '</ul>' +
       '</li>',
@@ -507,6 +518,7 @@
     } else {
       $('body').removeClass('crm-menubar-wrapped');
     }
+    document.documentElement.style.setProperty('--crm-menubar-bottom', ($('#civicrm-menu').height() + $('#civicrm-menu').position().top) + 'px');
   }
 
   // Figure out if we've hit the mobile breakpoint, based on the rule in crm-menubar.css

@@ -42,7 +42,8 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
    */
   protected function getRuleGroupNames() {
     $rules = [];
-    foreach (\CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
+    $contactTypes = $this->getEntityName() === 'Contact' ? \CRM_Contact_BAO_ContactType::basicTypes() : [$this->getEntityName()];
+    foreach ($contactTypes as $contactType) {
       $rules[] = $contactType . '.Unsupervised';
       $rules[] = $contactType . '.Supervised';
     }
@@ -142,13 +143,14 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
   public static function fields(BasicGetFieldsAction $action) {
     $fields = [];
     $ignore = ['id', 'contact_id', 'is_primary', 'on_hold', 'location_type_id', 'phone_type_id'];
-    foreach (['Contact', 'Email', 'Phone', 'Address', 'IM'] as $entity) {
+    foreach ([$action->getEntityName(), 'Email', 'Phone', 'Address', 'IM'] as $entity) {
       $entityFields = (array) civicrm_api4($entity, 'getFields', [
+        'checkPermissions' => FALSE,
         'action' => 'create',
         'loadOptions' => $action->getLoadOptions(),
         'where' => [['name', 'NOT IN', $ignore], ['type', 'IN', ['Field', 'Custom']]],
       ]);
-      if ($entity !== 'Contact') {
+      if ($entity !== $action->getEntityName()) {
         $prefix = strtolower($entity) . '_primary.';
         foreach ($entityFields as &$field) {
           $field['name'] = $prefix . $field['name'];

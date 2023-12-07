@@ -42,31 +42,6 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   */
-  public function getAngularModules() {
-    global $civicrm_root;
-
-    $result = [];
-    $result['crmCaseType'] = include "$civicrm_root/ang/crmCaseType.ang.php";
-    return $result;
-  }
-
-  /**
-   * @inheritDoc
-   * @return array
-   * @throws CRM_Core_Exception
-   */
-  public function getManagedEntities() {
-    $entities = array_merge(
-      CRM_Case_ManagedEntities::createManagedCaseTypes(),
-      CRM_Case_ManagedEntities::createManagedActivityTypes(CRM_Case_XMLRepository::singleton(), CRM_Core_ManagedEntities::singleton()),
-      CRM_Case_ManagedEntities::createManagedRelationshipTypes(CRM_Case_XMLRepository::singleton(), CRM_Core_ManagedEntities::singleton())
-    );
-    return $entities;
-  }
-
-  /**
-   * @inheritDoc
    * @param bool $getAllUnconditionally
    * @param bool $descriptions
    *   Whether to return permission descriptions
@@ -112,7 +87,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   public function getReferenceCounts($dao) {
     $result = [];
     if ($dao instanceof CRM_Core_DAO_OptionValue) {
-      /** @var $dao CRM_Core_DAO_OptionValue */
+      /** @var CRM_Core_DAO_OptionValue $dao */
       $activity_type_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'activity_type', 'id', 'name');
       if ($activity_type_gid == $dao->option_group_id) {
         $count = CRM_Case_XMLRepository::singleton()
@@ -127,7 +102,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       }
     }
     elseif ($dao instanceof CRM_Contact_DAO_RelationshipType) {
-      /** @var $dao CRM_Contact_DAO_RelationshipType */
+      /** @var CRM_Contact_DAO_RelationshipType $dao  */
 
       // Need to look both directions, but no need to translate case role
       // direction from XML perspective to client-based perspective

@@ -7,6 +7,11 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  */
 class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
 
+  /**
+   * @var CRM_Case_XMLProcessor_Report
+   */
+  private $report;
+
   public function setUp(): void {
     parent::setUp();
 
@@ -35,7 +40,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
       'prefix_id' => NULL,
       'suffix_id' => NULL,
     ]);
-    $caseObj = $this->createCase($client_id, $this->_loggedInUser, ['start_date' => '2019-11-14', 'start_date_time' => '20191114000000']);
+    $caseObj = $this->createCase($client_id, $this->getLoggedInUser(), ['start_date' => '2019-11-14', 'start_date_time' => '20191114000000']);
     $case_id = $caseObj->id;
 
     // Add an additional meeting activity not in the timeline to the case.
@@ -49,7 +54,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
       'activity_type_id' => $meetingTypeId['value'],
       'activity_date_time' => '20191114123456',
       'subject' => 'Test Meeting',
-      'source_contact_id' => $this->_loggedInUser,
+      'source_contact_id' => $this->getLoggedInUser(),
       'target_contact_id' => $client_id,
     ]);
 
@@ -75,7 +80,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
    * This is similar to testGetCaseReport but test with a timeline that
    * does have Meeting in it.
    */
-  public function testGetCaseReportWithMeetingInTimeline() {
+  public function testGetCaseReportWithMeetingInTimeline(): void {
     $client_id = $this->individualCreate([
       'first_name' => 'Casey',
       'middle_name' => '',
@@ -83,7 +88,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
       'prefix_id' => NULL,
       'suffix_id' => NULL,
     ]);
-    $caseObj = $this->createCase($client_id, $this->_loggedInUser, ['start_date' => '2019-11-14', 'start_date_time' => '20191114000000']);
+    $caseObj = $this->createCase($client_id, $this->getLoggedInUser(), ['start_date' => '2019-11-14', 'start_date_time' => '20191114000000']);
     $case_id = $caseObj->id;
 
     // Now update the timeline so it has Meeting in it.
@@ -100,7 +105,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
       'activity_type_id' => $meetingTypeId['value'],
       'activity_date_time' => '20191114123456',
       'subject' => 'Test Meeting',
-      'source_contact_id' => $this->_loggedInUser,
+      'source_contact_id' => $this->getLoggedInUser(),
       'target_contact_id' => $client_id,
     ]);
 
@@ -538,7 +543,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
   private function updateExpectedBecauseDataProviderEvaluatesBeforeEverything(&$expected, $client_id, $case_id) {
     $display_name = $this->callAPISuccess('Contact', 'getsingle', [
       'return' => ["display_name"],
-      'id' => $this->_loggedInUser,
+      'id' => $this->getLoggedInUser(),
     ]);
 
     foreach ($expected['activities'] as $idx => $activity) {

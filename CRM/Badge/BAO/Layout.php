@@ -30,17 +30,13 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_PrintLabel', $id, 'is_active', $is_active);
   }
 
@@ -54,9 +50,9 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @return object
    */
   public static function create(&$params) {
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-    $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
+    $params['is_active'] = $params['is_active'] ?? FALSE;
+    $params['is_default'] = $params['is_default'] ?? FALSE;
+    $params['is_reserved'] = $params['is_reserved'] ?? FALSE;
 
     $params['label_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_PrintLabel', 'label_type_id', 'Event Badge');
 
@@ -92,6 +88,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @deprecated
    */
   public static function del($printLabelId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     self::deleteRecord(['id' => $printLabelId]);
   }
 

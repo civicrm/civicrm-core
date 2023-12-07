@@ -129,7 +129,7 @@ class CRM_Core_Resources_Common {
       if (is_array($item)) {
         $bundle->addSetting($item);
       }
-      elseif (strpos($item, '.css')) {
+      elseif (preg_match('/(\.css$)|(\.css[?&])/', $item)) {
         Civi::resources()->isFullyFormedUrl($item) ? $bundle->addStyleUrl($item, -100) : $bundle->addStyleFile('civicrm', $item, -100);
       }
       elseif (Civi::resources()->isFullyFormedUrl($item)) {
@@ -206,18 +206,7 @@ class CRM_Core_Resources_Common {
 
     // Dynamic localization script
     if (!CRM_Core_Config::isUpgradeMode()) {
-      $items[] = Civi::service('asset_builder')->getUrl('crm-l10n.js', [
-        'cid' => $contactID,
-        'includeEmailInName' => (bool) $settings->get('includeEmailInName'),
-        'ajaxPopupsEnabled' => (bool) $settings->get('ajaxPopupsEnabled'),
-        'allowAlertAutodismissal' => (bool) $settings->get('allow_alert_autodismissal'),
-        'resourceCacheCode' => Civi::resources()->getCacheCode(),
-        'locale' => CRM_Core_I18n::getLocale(),
-        'lcMessages' => $settings->get('lcMessages'),
-        'dateInputFormat' => $settings->get('dateInputFormat'),
-        'timeInputFormat' => $settings->get('timeInputFormat'),
-        'moneyFormat' => CRM_Utils_Money::format(1234.56),
-      ]);
+      $items[] = Civi::service('asset_builder')->getUrl('crm-l10n.js', CRM_Core_Resources::getL10nJsParams());
     }
 
     // These scripts are only needed by back-office users

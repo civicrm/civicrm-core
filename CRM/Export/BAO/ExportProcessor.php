@@ -1010,7 +1010,7 @@ class CRM_Export_BAO_ExportProcessor {
         if ($field == 'provider_id' || $field == 'im_provider') {
           $fieldValue = $imProviders[$fieldValue] ?? NULL;
         }
-        elseif (strstr($field, 'master_id')) {
+        elseif (str_contains($field, 'master_id')) {
           // @todo - why not just $field === 'master_id'  - what else would it be?
           $masterAddressId = $iterationDAO->$field ?? NULL;
           // get display name of contact that address is shared.
@@ -1126,11 +1126,7 @@ class CRM_Export_BAO_ExportProcessor {
 
         return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
       }
-      elseif (in_array($field, [
-        'email_greeting',
-        'postal_greeting',
-        'addressee',
-      ])) {
+      elseif (in_array($field, ['email_greeting', 'postal_greeting', 'addressee'])) {
         //special case for greeting replacement
         $fldValue = "{$field}_display";
         return $iterationDAO->$fldValue;
@@ -1147,7 +1143,6 @@ class CRM_Export_BAO_ExportProcessor {
 
           case 'gender':
           case 'preferred_communication_method':
-          case 'preferred_mail_format':
           case 'communication_style':
             return $i18n->crm_translate($fieldValue);
 
@@ -1305,7 +1300,7 @@ class CRM_Export_BAO_ExportProcessor {
     return [
       'componentPaymentField_total_amount' => ['title' => ts('Total Amount'), 'type' => CRM_Utils_Type::T_MONEY],
       'componentPaymentField_contribution_status' => ['title' => ts('Contribution Status'), 'type' => CRM_Utils_Type::T_STRING],
-      'componentPaymentField_received_date' => ['title' => ts('Date Received'), 'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME],
+      'componentPaymentField_received_date' => ['title' => ts('Contribution Date'), 'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME],
       'componentPaymentField_payment_instrument' => ['title' => ts('Payment Method'), 'type' => CRM_Utils_Type::T_STRING],
       'componentPaymentField_transaction_id' => ['title' => ts('Transaction ID'), 'type' => CRM_Utils_Type::T_STRING],
     ];
@@ -1463,16 +1458,7 @@ class CRM_Export_BAO_ExportProcessor {
 
         case CRM_Utils_Type::T_STRING:
           if (isset($fieldSpec['maxlength'])) {
-            // A localized string for the preferred_mail_format does not fit
-            // into the varchar(8) field.
-            // @see https://lab.civicrm.org/dev/core/-/issues/2645
-            switch ($fieldName) {
-              case 'preferred_mail_format':
-                return "`$fieldName` text(16)";
-
-              default:
-                return "`$fieldName` varchar({$fieldSpec['maxlength']})";
-            }
+            return "`$fieldName` varchar({$fieldSpec['maxlength']})";
           }
           $dataType = $fieldSpec['data_type'] ?? '';
           // set the sql columns for custom data
@@ -2148,11 +2134,9 @@ WHERE  id IN ( $deleteIDString )
           $fieldValue = $imProviders[$relationValue] ?? NULL;
         }
         // CRM-13995
-        elseif (is_object($relDAO) && in_array($relationField, [
-          'email_greeting',
-          'postal_greeting',
-          'addressee',
-        ])) {
+        elseif (is_object($relDAO) &&
+          in_array($relationField, ['email_greeting', 'postal_greeting', 'addressee'])
+        ) {
           //special case for greeting replacement
           $fldValue = "{$relationField}_display";
           $fieldValue = $relDAO->$fldValue;

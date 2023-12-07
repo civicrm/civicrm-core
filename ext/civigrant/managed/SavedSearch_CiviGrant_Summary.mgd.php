@@ -36,6 +36,9 @@ return [
         'description' => NULL,
         'mapping_id' => NULL,
       ],
+      'match' => [
+        'name',
+      ],
     ],
   ],
   [
@@ -60,6 +63,16 @@ return [
           'pager' => [
             'show_count' => TRUE,
             'expose_limit' => TRUE,
+          ],
+          'toolbar' => [
+            [
+              'entity' => 'Grant',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'icon' => 'fa-plus',
+              'text' => E::ts('Add Grant'),
+              'style' => 'primary',
+            ],
           ],
           'sort' => [],
           'columns' => [
@@ -149,6 +162,10 @@ return [
           ],
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ],

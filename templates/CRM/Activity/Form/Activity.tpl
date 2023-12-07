@@ -11,15 +11,11 @@
   {if $action eq 4}
     <div class="crm-block crm-content-block crm-activity-view-block">
   {else}
-    {if $activityTypeDescription }
-      <div class="help">{$activityTypeDescription}</div>
+    {if $activityTypeDescription}
+      <div class="help">{$activityTypeDescription|purify}</div>
     {/if}
     <div class="crm-block crm-form-block crm-activity-form-block">
   {/if}
-  {if !$action or ( $action eq 1 ) or ( $action eq 2 ) }
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-  {/if}
-
   {if $action eq 8} {* Delete action. *}
   <table class="form-layout">
   <tr>
@@ -32,8 +28,8 @@
   <table class="{if $action eq 4}crm-info-panel{else}form-layout{/if}">
 
   {if $action eq 4}
-    {if $activityTypeDescription }
-    <div class="help">{$activityTypeDescription}</div>
+    {if $activityTypeDescription}
+    <div class="help">{$activityTypeDescription|purify}</div>
     {/if}
   {else}
     {if $context eq 'standalone' or $context eq 'search' or $context eq 'smog'}
@@ -138,7 +134,7 @@
       <td class="view-value">
       {$form.details.html}
       </td>
-    {elseif $activityTypeNameAndLabel.machineName eq "Inbound Email"}
+    {elseif $activityTypeNameAndLabel.machineName eq "Inbound Email" && $form.details.value|crmStripAlternatives|strip_tags eq $form.details.value|crmStripAlternatives}
       <td class="view-value">
        {$form.details.html|crmStripAlternatives|nl2br}
       </td>
@@ -151,7 +147,7 @@
   <tr class="crm-activity-form-block-priority_id">
     <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
   </tr>
-  {if !empty($surveyActivity) }
+  {if !empty($surveyActivity)}
   <tr class="crm-activity-form-block-result">
     <td class="label">{$form.result.label}</td><td class="view-value">{$form.result.html}</td>
   </tr>
@@ -236,7 +232,7 @@
   </table>
   <div class="crm-submit-buttons">
   {if $action eq 4 && ($activityTypeNameAndLabel.machineName neq 'Inbound Email' || $allow_edit_inbound_emails == 1)}
-    {if !$context }
+    {if !$context}
       {assign var="context" value='activity'}
     {/if}
     {if $permission EQ 'edit'}

@@ -2,6 +2,7 @@
 
 use Civi\Api4\Event;
 use Civi\Api4\Email;
+use Civi\Api4\Generic\Result;
 
 /**
  *  Test CRM_Event_Form_Registration functions.
@@ -11,14 +12,19 @@ use Civi\Api4\Email;
  */
 class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
+
   /**
    * Test the right emails exist after submitting the location form twice.
    *
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testSubmit() {
-    $eventID = (int) $this->eventCreate()['id'];
+  public function testSubmit(): void {
+    $eventID = (int) $this->eventCreateUnpaid()['id'];
     $this->submitForm([], $eventID);
     $this->assertCorrectEmails($eventID);
 
@@ -31,9 +37,11 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
    * Create() method
    * create various elements of location block
    * with civicrm_loc_block
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testCreateWithLocBlock() {
-    $eventID = (int) $this->eventCreate()['id'];
+  public function testCreateWithLocBlock(): void {
+    $eventID = (int) $this->eventCreateUnpaid()['id'];
     $this->submitForm([
       'address' => [
         '1' => [
@@ -95,8 +103,6 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
       'postal_code' => '01903',
       'country_id' => 1228,
       'state_province_id' => 1029,
-      'geo_code_1' => '18.219023',
-      'geo_code_2' => '-105.00973',
       'manual_geo_code' => '0',
     ], $address);
 
@@ -115,8 +121,8 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testUpdateLocationBlock() {
-    $eventID = (int) $this->eventCreate()['id'];
+  public function testUpdateLocationBlock(): void {
+    $eventID = (int) $this->eventCreateUnpaid()['id'];
     $this->submitForm([
       'address' => [
         '1' => [
@@ -183,7 +189,7 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getFormValues() {
+  protected function getFormValues(): array {
     return [
       'address' =>
         [
@@ -241,9 +247,8 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
    *
    * @return \Civi\Api4\Generic\Result
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function assertCorrectEmails($eventID) {
+  protected function assertCorrectEmails(int $eventID): Result {
     $emails = Email::get()
       ->addWhere('email', 'IN', ['bigger_party@example.org', 'celebration@example.org'])
       ->addOrderBy('email', 'DESC')

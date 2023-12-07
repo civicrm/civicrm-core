@@ -6,6 +6,7 @@ namespace Civi\Api4;
  *
  * Provided by the Search Kit extension.
  *
+ * @since 5.32
  * @searchable none
  * @package Civi\Api4
  */

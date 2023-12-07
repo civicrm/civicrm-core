@@ -26,7 +26,7 @@ return function ($mixInfo, $bootCache) {
     }
 
     foreach ((array) glob($mixInfo->getPath('xml/case/*.xml')) as $file) {
-      $name = preg_replace('/\.xml$/', '', basename($file));
+      $name = basename($file, '.xml');
       if ($name != CRM_Case_XMLProcessor::mungeCaseType($name)) {
         $errorMessage = sprintf("Case-type file name is malformed (%s vs %s)", $name, CRM_Case_XMLProcessor::mungeCaseType($name));
         throw new CRM_Core_Exception($errorMessage);

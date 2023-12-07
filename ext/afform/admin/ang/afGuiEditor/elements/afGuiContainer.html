@@ -34,6 +34,7 @@
       <af-gui-button ng-switch-when="button" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-button" ></af-gui-button>
       <af-gui-container ng-switch-when="searchFieldset" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] + ' ' + item['class'] }}" ng-class="{'af-entity-selected': isSelectedSearchFieldset(item)}" data-entity="{{ getSearchKey(item) }}" ></af-gui-container>
       <af-gui-search-display ng-switch-when="searchDisplay" node="item" class="af-gui-element"></af-gui-search-display>
+      <af-gui-generic-element ng-switch-when="generic" node="item" delete-this="$ctrl.removeElement(item)" class="af-gui-element af-gui-generic" ></af-gui-generic-element>
     </div>
   </div>
 </div>
@@ -43,5 +44,13 @@
       <i class="crm-i {{ $ctrl.node['add-icon'] || 'fa-plus' }}"></i>
     </span>
     <span crm-ui-editable ng-model="$ctrl.node['af-repeat']">{{ $ctrl.node['af-repeat'] }}</span>
+  </button>
+</div>
+<div ng-if="$ctrl.node['af-copy'] || $ctrl.node['af-copy'] === ''" class="af-gui-button">
+  <button type="button" class="btn btn-xs btn-primary disabled">
+    <span class="crm-editable-enabled" ng-click="pickCopyIcon()" >
+      <i class="crm-i {{ $ctrl.node['copy-icon'] || 'fa-copy' }}"></i>
+    </span>
+    <span crm-ui-editable ng-model="$ctrl.node['af-copy']">{{ $ctrl.node['af-copy'] }}</span>
   </button>
 </div>

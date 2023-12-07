@@ -33,6 +33,11 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   protected $groupFilterNotOptimised = FALSE;
 
   /**
+   * @var string
+   */
+  protected $statusClause = '';
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -334,7 +339,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   public function where() {
-    $this->_statusClause = "";
+    $this->statusClause = "";
     $clauses = [
       $this->_aliases['civicrm_contribution'] . '.is_test = 0',
       $this->_aliases['civicrm_contribution'] . '.is_template = 0',
@@ -350,7 +355,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
               self::fiscalYearOffset('contri.receive_date') .
               " = {$this->_params['yid_value']} AND contri.is_test = 0 AND contri.is_template = 0 )";
           }
-          elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE
+          elseif (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE
           ) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
@@ -365,14 +370,14 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
               if (($fieldName == 'contribution_status_id' ||
                   $fieldName == 'financial_type_id') && !empty($clause)
               ) {
-                $this->_statusClause .= " AND " . $clause;
+                $this->statusClause .= " AND " . $clause;
               }
             }
           }
@@ -452,7 +457,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         $sql = "" .
           "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
           implode(',', $contactIds) .
-          ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0 {$this->_statusClause} {$this->_groupBy} ";
+          ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0 {$this->statusClause} {$this->_groupBy} ";
       }
 
       $current_year = $this->_params['yid_value'];
@@ -507,7 +512,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
    */
   public function buildChart(&$rows) {
     $graphRows = [];
-    $count = 0;
+    $display = [];
     $current_year = $this->_params['yid_value'];
     $previous_year = $current_year - 1;
     $previous_two_year = $current_year - 2;
@@ -521,13 +526,13 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
     foreach ($rows as $key => $row) {
       $display["upto_{$upto}"]
-        = CRM_Utils_Array::value("upto_{$upto}", $display) + CRM_Utils_Array::value("civicrm_upto_{$upto}", $row);
+        = ($display["upto_{$upto}"] ?? 0) + ($row["civicrm_upto_{$upto}"] ?? 0);
       $display[$previous_year]
-        = CRM_Utils_Array::value($previous_year, $display) + CRM_Utils_Array::value($previous_year, $row);
+        = ($display[$previous_year] ?? 0) + ($row[$previous_year] ?? 0);
       $display[$previous_two_year]
-        = CRM_Utils_Array::value($previous_two_year, $display) + CRM_Utils_Array::value($previous_two_year, $row);
+        = ($display[$previous_two_year] ?? 0) + ($row[$previous_two_year] ?? 0);
       $display[$previous_three_year]
-        = CRM_Utils_Array::value($previous_three_year, $display) + CRM_Utils_Array::value($previous_three_year, $row);
+        = ($display[$previous_three_year] ?? 0) + ($row[$previous_three_year] ?? 0);
     }
 
     $graphRows['value'] = $display;

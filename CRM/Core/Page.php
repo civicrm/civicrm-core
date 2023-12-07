@@ -132,7 +132,26 @@ class CRM_Core_Page {
     // in 'body.tpl
     'suppressForm',
     'beginHookFormElements',
+    // This is checked in validate.tpl
+    'snippet_type',
   ];
+
+  /**
+   * The permission we have on this contact
+   *
+   * @var string
+   */
+  public $_permission;
+
+  /**
+   * @var int
+   */
+  protected $_action;
+
+  /**
+   * @var int
+   */
+  protected $_id;
 
   /**
    * Class constructor.
@@ -458,7 +477,7 @@ class CRM_Core_Page {
     $fields = civicrm_api3($entity, 'getfields', ['action' => 'get']);
     $dateFields = [];
     foreach ($fields['values'] as $fieldName => $fieldMetaData) {
-      if (isset($fieldMetaData['html']) && CRM_Utils_Array::value('type', $fieldMetaData['html']) == 'Select Date') {
+      if (isset($fieldMetaData['html']) && ($fieldMetaData['html']['type'] ?? NULL) == 'Select Date') {
         $dateFields[$fieldName] = CRM_Utils_Date::addDateMetadataToField($fieldMetaData, $fieldMetaData);
       }
     }
@@ -498,7 +517,7 @@ class CRM_Core_Page {
 
     $standardAttribs = ['aria-hidden' => 'true'];
     if ($text === NULL || $text === '') {
-      $title = $sr = '';
+      $sr = '';
     }
     else {
       $standardAttribs['title'] = $text;

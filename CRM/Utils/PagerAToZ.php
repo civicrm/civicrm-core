@@ -97,7 +97,7 @@ class CRM_Utils_PagerAToZ {
 
     $dynamicAlphabets = [];
     while ($result->fetch()) {
-      $dynamicAlphabets[] = strtoupper($result->sort_name);
+      $dynamicAlphabets[] = strtoupper($result->sort_name ?? '');
     }
     return $dynamicAlphabets;
   }

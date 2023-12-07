@@ -11,14 +11,16 @@
     controller: function($scope, $element, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
-        ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplaySortableTrait),
+        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplaySortableTrait)),
         afformLoad;
 
+      $scope.crmUrl = CRM.url;
       this.searchDisplayPath = CRM.url('civicrm/search');
       this.afformPath = CRM.url('civicrm/admin/afform');
       this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
       this.afformAdminEnabled = (CRM.checkPerm('administer CiviCRM') || CRM.checkPerm('administer afform')) &&
         'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
+      const scheduledCommunicationsEnabled = 'scheduled_communications' in CRM.crmSearchAdmin.modules;
 
       this.apiEntity = 'SavedSearch';
       this.search = {
@@ -29,6 +31,7 @@
             'id',
             'name',
             'label',
+            'description',
             'api_entity',
             'api_entity:label',
             'api_params',
@@ -37,28 +40,40 @@
             'modified_id.display_name',
             'created_date',
             'modified_date',
+            'expires_date',
             'has_base',
             'base_module:label',
             'local_modified_date',
             'DATE(created_date) AS date_created',
             'DATE(modified_date) AS date_modified',
-            'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
-            'GROUP_CONCAT(display.label ORDER BY display.id) AS display_label',
-            'GROUP_CONCAT(display.type:icon ORDER BY display.id) AS display_icon',
-            'GROUP_CONCAT(display.acl_bypass ORDER BY display.id) AS display_acl_bypass',
+            'DATE(expires_date) AS expires',
+            // Get all search displays
+            'GROUP_CONCAT(UNIQUE display.name ORDER BY display.label) AS display_name',
+            'GROUP_CONCAT(UNIQUE display.label ORDER BY display.label) AS display_label',
+            'GROUP_CONCAT(UNIQUE display.type:icon ORDER BY display.label) AS display_icon',
+            'GROUP_CONCAT(UNIQUE display.acl_bypass ORDER BY display.label) AS display_acl_bypass',
             'tags', // Not a selectable field but this hacks around the requirement that filters be in the select clause
-            'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id',
-            'GROUP_CONCAT(DISTINCT group.title) AS groups'
+            'GROUP_CONCAT(UNIQUE entity_tag.tag_id) AS tag_id',
+            // Really there can only be 1 smart group per saved-search; aggregation is just for the sake of the query
+            'GROUP_CONCAT(UNIQUE group.id) AS group_id',
+            'GROUP_CONCAT(UNIQUE group.title) AS groups'
           ],
           join: [
             ['SearchDisplay AS display', 'LEFT', ['id', '=', 'display.saved_search_id']],
             ['Group AS group', 'LEFT', ['id', '=', 'group.saved_search_id']],
             ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
           ],
-          where: [['api_entity', 'IS NOT NULL']],
+          where: [['api_entity', 'IS NOT NULL'], ['is_current', '=', true]],
           groupBy: ['id']
         }
       };
+
+      // Add scheduled communication to query if extension is enabled
+      if (scheduledCommunicationsEnabled) {
+        this.search.api_params.select.push('GROUP_CONCAT(UNIQUE schedule.id ORDER BY schedule.title) AS schedule_id');
+        this.search.api_params.select.push('GROUP_CONCAT(UNIQUE schedule.title ORDER BY schedule.title) AS schedule_title');
+        this.search.api_params.join.push(['ActionSchedule AS schedule', 'LEFT', ['schedule.mapping_id', '=', '"saved_search"'], ['id', '=', 'schedule.entity_value']]);
+      }
 
       this.$onInit = function() {
         buildDisplaySettings();
@@ -72,7 +87,7 @@
         // Customize the noResultsText
         $scope.$watch('$ctrl.filters', function() {
           ctrl.settings.noResultsText = (angular.equals(['has_base'], getActiveFilters())) ?
-            ts('Welcome to Search Kit. Click the New Search button above to start composing your first search.') :
+            ts('Welcome to SearchKit. Click the New Search button above to start composing your first search.') :
             ts('No Saved Searches match filter criteria.');
         }, true);
       };
@@ -84,8 +99,8 @@
         }));
       }
 
-      this.onPostRun.push(function(result) {
-        _.each(result, function(row) {
+      this.onPostRun.push(function(apiResults) {
+        _.each(apiResults.run, function(row) {
           row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
           // If main entity doesn't exist, no can edit
           if (!row.data['api_entity:label']) {
@@ -133,6 +148,9 @@
             _.each(search.groups, function (smartGroup) {
               msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Smart group "%1" will also be deleted.', {1: smartGroup})) + '</li>';
             });
+            _.each(search.schedule_title, (communication) => {
+              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Communication "%1" will also be deleted.', {1: communication})) + '</li>';
+            });
             if (row.afform_count) {
               _.each(ctrl.afforms[search.name], function (afform) {
                 msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Form "%1" will also be deleted because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
@@ -158,7 +176,7 @@
 
       this.deleteSearch = function(row) {
         ctrl.runSearch(
-          [['SavedSearch', 'delete', {where: [['id', '=', row.key]]}]],
+          {deleteSearch: ['SavedSearch', 'delete', {where: [['id', '=', row.key]]}]},
           {start: ts('Deleting...'), success: ts('Search Deleted')},
           row
         );
@@ -166,13 +184,13 @@
 
       this.revertSearch = function(row) {
         ctrl.runSearch(
-          [['SavedSearch', 'revert', {
+          {revertSearch: ['SavedSearch', 'revert', {
             where: [['id', '=', row.key]],
             chain: {
               revertDisplays: ['SearchDisplay', 'revert', {'where': [['saved_search_id', '=', '$id'], ['has_base', '=', true]]}],
               deleteDisplays: ['SearchDisplay', 'delete', {'where': [['saved_search_id', '=', '$id'], ['has_base', '=', false]]}]
             }
-          }]],
+          }]},
           {start: ts('Reverting...'), success: ts('Search Reverted')},
           row
         );
@@ -193,8 +211,13 @@
                 title: ts('Edit Label'),
                 editable: true
               }),
+              searchMeta.fieldToColumn('description', {
+                label: true,
+                title: ts('Edit Description'),
+                editable: true
+              }),
               searchMeta.fieldToColumn('api_entity:label', {
-                label: ts('For'),
+                label: true,
                 empty_value: ts('Missing'),
                 cssRules: [
                   ['font-italic', 'api_entity:label', 'IS EMPTY']
@@ -220,8 +243,16 @@
             path: '~/crmSearchAdmin/searchListing/afforms.html'
           });
         }
+        // Add scheduled communication column if extension is enabled
+        if (scheduledCommunicationsEnabled) {
+          ctrl.display.settings.columns.push({
+            type: 'include',
+            label: ts('Communications'),
+            path: '~/crmSearchAdmin/searchListing/communications.html'
+          });
+        }
         ctrl.display.settings.columns.push(
-          searchMeta.fieldToColumn('GROUP_CONCAT(DISTINCT group.title) AS groups', {
+          searchMeta.fieldToColumn('GROUP_CONCAT(UNIQUE group.title) AS groups', {
             label: ts('Smart Group')
           })
         );
@@ -265,6 +296,13 @@
             })
           );
         }
+        ctrl.display.settings.columns.push(
+          searchMeta.fieldToColumn('expires_date', {
+            label: ts('Expires'),
+            title: '[expires_date]',
+            rewrite: '[expires]'
+          })
+        );
         ctrl.display.settings.columns.push({
           type: 'include',
           alignment: 'text-right',

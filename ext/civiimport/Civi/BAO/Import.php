@@ -12,6 +12,7 @@
 namespace Civi\BAO;
 
 use Civi\Api4\UserJob;
+use Civi\Core\Exception\DBQueryException;
 use CRM_Civiimport_ExtensionUtil as E;
 use CRM_Core_BAO_CustomValueTable;
 use CRM_Core_DAO;
@@ -42,11 +43,21 @@ class Import extends CRM_Core_DAO {
   public static $_primaryKey = ['_id'];
 
   /**
+   * Get the array of import tables in the database.
+   *
+   * Caching is a challenge here as the tables are loaded by the entityTypes hook
+   * before the cache & full class loading is necessarily available. We did have
+   * caching in this function but removed it recently in favour of a static cache in
+   * the other function as that function was 'doing it's work' from the entityTypes
+   * hook anyway.
+   *
+   * In general, call this function from any code that runs late enough in the boot
+   * order that caches/ class loading is available in case it diverges once again
+   * from the lower level function.
+   *
    * @return array
    */
   public static function getImportTables(): array {
-    // This calls a function on the extension file as it is called from `entityTypes`
-    // which can be called very early, before this class is available to that hook.
     return _civiimport_civicrm_get_import_tables();
   }
 
@@ -126,7 +137,7 @@ class Import extends CRM_Core_DAO {
   public function table(): array {
     $table = [];
     foreach (self::getFieldsForTable($this->tableName()) as $value) {
-      $table[$value['name']] = $value['type'] ?? CRM_Utils_Type::T_STRING;
+      $table[$value['name']] = ($value['data_type'] === 'Integer') ? CRM_Utils_Type::T_INT : CRM_Utils_Type::T_STRING;
       if (!empty($value['required'])) {
         $table[$value['name']] += self::DB_DAO_NOTNULL;
       }
@@ -185,23 +196,46 @@ class Import extends CRM_Core_DAO {
    * @throws \CRM_Core_Exception
    */
   public static function getFieldsForTable(string $tableName): array {
+    $cacheKey = 'civiimport_table_fields' . $tableName;
+    if (\Civi::cache('metadata')->has($cacheKey)) {
+      return \Civi::cache('metadata')->get($cacheKey);
+    }
     if (!CRM_Utils_Rule::alphanumeric($tableName)) {
       // This is purely precautionary so does not need to be a translated string.
       throw new CRM_Core_Exception('Invalid import table');
     }
     $columns = [];
-    $headers = UserJob::get(FALSE)
+    $userJob = UserJob::get(FALSE)
       ->addWhere('metadata', 'LIKE', '%' . $tableName . '%')
-      ->addSelect('metadata')->execute()->first()['metadata']['DataSource']['column_headers'] ?? [];
-    $result = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $tableName");
+      ->addSelect('metadata', 'job_type')->execute()->first();
+    $headers = $userJob['metadata']['DataSource']['column_headers'] ?? [];
+    $entity = \CRM_Core_BAO_UserJob::getType($userJob['job_type'])['entity'];
+
+    try {
+      $result = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $tableName");
+    }
+    catch (DBQueryException $e) {
+      if ($e->getSQLErrorCode() === 1146) {
+        throw new CRM_Core_Exception('Import table no longer exists');
+      }
+      throw $e;
+    }
+
     $userFieldIndex = 0;
     while ($result->fetch()) {
       $columns[$result->Field] = ['name' => $result->Field, 'table_name' => $tableName];
-      if (substr($result->Field, 1) !== '_') {
-        $columns[$result->Field]['label'] = $headers[$userFieldIndex] ?? $result->Field;
+      if (strpos($result->Field, '_') !== 0) {
+        $columns[$result->Field]['label'] = ts('Import field') . ':' . ($headers[$userFieldIndex] ?? $result->Field);
+        $columns[$result->Field]['data_type'] = 'String';
         $userFieldIndex++;
       }
+      else {
+        $columns[$result->Field]['label'] = ($result->Field === '_entity_id') ? E::ts('Row Imported to %1 ID', [1 => $entity]) : $result->Field;
+        $columns[$result->Field]['fk_entity'] = ($result->Field === '_entity_id') ? $entity : NULL;
+        $columns[$result->Field]['data_type'] = strpos($result->Type, 'int') === 0 ? 'Integer' : 'String';
+      }
     }
+    \Civi::cache('metadata')->set($cacheKey, $columns);
     return $columns;
   }
 
@@ -249,6 +283,26 @@ class Import extends CRM_Core_DAO {
    */
   private static function getAllFields(string $tableName): array {
     return array_merge(self::getFieldsForTable($tableName), self::getSupportedFields());
+  }
+
+  /**
+   * Defines the default key as 'id'.
+   *
+   * @return array
+   */
+  public function keys() {
+    return ['_id'];
+  }
+
+  /**
+   * Tells DB_DataObject which keys use autoincrement.
+   * 'id' is autoincrementing by default.
+   *
+   *
+   * @return array
+   */
+  public function sequenceKey() {
+    return ['_id', TRUE];
   }
 
 }

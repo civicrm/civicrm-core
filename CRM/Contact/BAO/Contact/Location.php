@@ -29,15 +29,15 @@ class CRM_Contact_BAO_Contact_Location {
    *   Array of display_name, email, location type and location id if found, or (null,null,null, null)
    */
   public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL) {
-    $params = array(
+    $params = [
       'contact_id' => $id,
-      'return' => array('display_name', 'email.email'),
-      'api.Email.get' => array(
+      'return' => ['display_name', 'email.email'],
+      'api.Email.get' => [
         'location_type_id' => $locationTypeID,
         'sequential' => 0,
-        'return' => array('email', 'location_type_id', 'id'),
-      ),
-    );
+        'return' => ['email', 'location_type_id', 'id'],
+      ],
+    ];
     if ($isPrimary) {
       $params['api.Email.get']['is_primary'] = 1;
     }
@@ -49,52 +49,14 @@ class CRM_Contact_BAO_Contact_Location {
         $email = reset($contact['api.Email.get']['values']);
       }
     }
-    $returnParams = array(
+    $returnParams = [
       (isset($contact['display_name'])) ? $contact['display_name'] : NULL,
       (isset($email['email'])) ? $email['email'] : NULL,
       (isset($email['location_type_id'])) ? $email['location_type_id'] : NULL,
       (isset($email['id'])) ? $email['id'] : NULL,
-    );
+    ];
 
     return $returnParams;
-  }
-
-  /**
-   * @deprecated Not used anywhere, use the Phone API instead
-   * Get the sms number and display name of a contact.
-   *
-   * @param int $id
-   *   Id of the contact.
-   * @param string|null $type
-   *
-   * @return array
-   *   tuple of display_name and sms if found, or (null,null)
-   */
-  public static function getPhoneDetails($id, $type = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('Phone.get API instead');
-    if (!$id) {
-      return [NULL, NULL];
-    }
-
-    $cond = NULL;
-    if ($type) {
-      $cond = " AND civicrm_phone.phone_type_id = '$type'";
-    }
-
-    $sql = "
-   SELECT civicrm_contact.display_name, civicrm_phone.phone, civicrm_contact.do_not_sms
-     FROM civicrm_contact
-LEFT JOIN civicrm_phone ON ( civicrm_phone.contact_id = civicrm_contact.id )
-    WHERE civicrm_phone.is_primary = 1
-          $cond
-      AND civicrm_contact.id = %1";
-
-    $params = [1 => [$id, 'Integer']];
-    $dao = CRM_Core_DAO::executeQuery($sql, $params);
-    if ($dao->fetch()) {
-      return [$dao->display_name, $dao->phone, $dao->do_not_sms];
-    }
-    return [NULL, NULL, NULL];
   }
 
   /**
@@ -140,10 +102,10 @@ AND civicrm_contact.id IN $idString ";
 
     $params = [];
     if (!$locationTypeID) {
-      $sql .= " AND civicrm_address.is_primary = 1";
+      $sql .= ' AND civicrm_address.is_primary = 1';
     }
     else {
-      $sql .= " AND civicrm_address.location_type_id = %1";
+      $sql .= ' AND civicrm_address.location_type_id = %1';
       $params[1] = [$locationTypeID, 'Integer'];
     }
 

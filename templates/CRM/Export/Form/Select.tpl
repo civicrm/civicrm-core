@@ -19,7 +19,6 @@
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
  {include file="CRM/common/WizardHeader.tpl"}
 
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
  <div id="export-type">
   <div class="crm-section crm-exportOption-section">
     <h3>{ts count=$totalSelectedRecords plural='%count records selected for export.'}One record selected for export.{/ts}</h3>
@@ -68,11 +67,6 @@
       </table>
       <div class="clear">&nbsp;</div>
     </div>
-
-    <div class="content crm-content-mergeSameHousehold">
-        &nbsp;{$form.merge_same_household.html}
-    </div>
-    <br/>
     <div class="label crm-label-postalMailingExport">{$form.postal_mailing_export.label}</div>
     <div class="content crm-content-postalMailingExport">
         &nbsp;{$form.postal_mailing_export.html}

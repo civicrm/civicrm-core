@@ -18,7 +18,7 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
   /**
    *
    */
-  public function testI18nLocaleChange() {
+  public function testI18nLocaleChange(): void {
     $cleanup = $this->useMultilingual(['en_US' => 'fr_CA']);
 
     CRM_Core_I18n::singleton()->setLocale('fr_CA');
@@ -26,7 +26,7 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
     $this->assertEquals('fr_CA', $locale);
   }
 
-  public function testUiLanguages() {
+  public function testUiLanguages(): void {
     $languages = [
       'en_US' => 'English (United States)',
       'fr_CA' => 'French (Canada)',
@@ -139,7 +139,7 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
   /**
    * Quirk in strtolower does not handle "I" as expected, compared to mb_strtolower.
    */
-  public function testInsertTurkish() {
+  public function testInsertTurkish(): void {
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS foo");
     CRM_Core_DAO::executeQuery("CREATE TABLE foo ( bar varchar(32) )");
     // Change locale - assert it actually changed.
@@ -147,7 +147,7 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
     $dao = new CRM_Core_DAO();
     // When query() uses strtolower this returns NULL instead
     $this->assertEquals(1, $dao->query("INSERT INTO foo VALUES ('Turkish Delight')"));
-    setlocale(LC_ALL, 'en_US');
+    setlocale(LC_ALL, 'en_US.utf8');
     CRM_Core_DAO::executeQuery("DROP TABLE foo");
   }
 

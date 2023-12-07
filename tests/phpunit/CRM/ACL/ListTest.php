@@ -11,6 +11,11 @@
 class CRM_ACL_ListTest extends CiviUnitTestCase {
 
   /**
+   * @var array
+   */
+  protected $allowedContactsACL = [];
+
+  /**
    * Set up function.
    */
   public function setUp(): void {
@@ -23,7 +28,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * general test for the 'view all contacts' permission
    */
-  public function testViewAllPermission() {
+  public function testViewAllPermission(): void {
     // create test contacts
     $contacts = $this->createScenarioPlain();
 
@@ -56,7 +61,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * general test for the 'view all contacts' permission
    */
-  public function testEditAllPermission() {
+  public function testEditAllPermission(): void {
     // create test contacts
     $contacts = $this->createScenarioPlain();
 
@@ -178,7 +183,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * Test access based on ACL
    */
-  public function testPermissionByACL() {
+  public function testPermissionByACL(): void {
     $contacts = $this->createScenarioPlain();
 
     // set custom hook
@@ -202,7 +207,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * Test access with a mix of ACL and relationship
    */
-  public function testPermissionACLvsRelationship() {
+  public function testPermissionACLvsRelationship(): void {
     $contacts = $this->createScenarioRelations();
 
     // set custom hook
@@ -227,7 +232,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * Test access related to the 'access deleted contact' permission
    */
-  public function testPermissionCompare() {
+  public function testPermissionCompare(): void {
     $contacts = $this->createScenarioRelations();
     $contact_index = array_flip($contacts);
 

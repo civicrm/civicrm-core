@@ -40,7 +40,7 @@ trait CRMTraits_Custom_CustomDataTrait {
   public function createCustomGroup(array $params = []): int {
     $params = array_merge([
       'title' => 'Custom Group',
-      'extends' => $this->entity ?? 'Contact',
+      'extends' => $this->getEntity(),
       'weight' => 5,
       'style' => 'Inline',
       'max_multiple' => 0,
@@ -56,6 +56,18 @@ trait CRMTraits_Custom_CustomDataTrait {
       $this->fail('Could not create group ' . $e->getMessage());
     }
     return $this->ids['CustomGroup'][$identifier];
+  }
+
+  /**
+   * Get the entity being acted on.
+   *
+   * @return string
+   */
+  protected function getEntity(): string {
+    if (property_exists($this, 'entity')) {
+      return $this->entity;
+    }
+    return 'Contact';
   }
 
   /**
@@ -94,7 +106,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    */
   public function createCustomGroupWithFieldOfType(array $groupParams = [], string $customFieldType = 'text', ?string $identifier = NULL, array $fieldParams = []): void {
-    $supported = ['text', 'select', 'date', 'checkbox', 'int', 'contact_reference', 'radio', 'multi_country'];
+    $supported = ['text', 'select', 'date', 'checkbox', 'int', 'contact_reference', 'radio', 'multi_country', 'boolean'];
     if (!in_array($customFieldType, $supported, TRUE)) {
       $this->fail('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
     }
@@ -136,6 +148,9 @@ trait CRMTraits_Custom_CustomDataTrait {
         $reference = $this->createMultiCountryCustomField($fieldParams)['id'];
         return;
 
+      case 'boolean':
+        $reference = $this->createBooleanCustomField($fieldParams)['id'];
+        return;
     }
   }
 

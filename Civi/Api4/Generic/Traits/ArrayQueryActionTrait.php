@@ -107,16 +107,18 @@ trait ArrayQueryActionTrait {
   /**
    * @param array $row
    * @param array $condition
+   * @param int $index
    * @return bool
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  public static function filterCompare($row, $condition) {
-    if (!is_array($condition)) {
-      throw new NotImplementedException('Unexpected where syntax; expecting array.');
-    }
+  public static function filterCompare(array $row, array $condition, int $index = NULL): bool {
     $value = $row[$condition[0]] ?? NULL;
     $operator = $condition[1];
     $expected = $condition[2] ?? NULL;
+    // Comparison for aggregated values
+    if (isset($index) && is_array($value) && $operator !== 'IN' && $operator !== 'NOT IN') {
+      $value = $value[$index] ?? NULL;
+    }
     switch ($operator) {
       case '=':
       case '!=':
@@ -164,8 +166,12 @@ trait ArrayQueryActionTrait {
 
       case 'REGEXP':
       case 'NOT REGEXP':
-        $pattern = '/' . str_replace('/', '\\/', $expected) . '/';
-        return !preg_match($pattern, $value) == ($operator != 'REGEXP');
+      case 'REGEXP BINARY':
+      case 'NOT REGEXP BINARY':
+        // Perform case-sensitive matching for BINARY operator, otherwise insensitive
+        $i = str_ends_with($operator, 'BINARY') ? '' : 'i';
+        $pattern = '/' . str_replace('/', '\\/', $expected) . "/$i";
+        return !preg_match($pattern, $value) == str_starts_with($operator, 'NOT');
 
       case 'IN':
         return in_array($value, $expected);
@@ -174,13 +180,15 @@ trait ArrayQueryActionTrait {
         return !in_array($value, $expected);
 
       case 'CONTAINS':
+      case 'NOT CONTAINS':
         if (is_array($value)) {
-          return in_array($expected, $value);
+          return in_array($expected, $value) == ($operator == 'CONTAINS');
         }
         elseif (is_string($value) || is_numeric($value)) {
-          return strpos((string) $value, (string) $expected) !== FALSE;
+          // Lowercase check if string contains string
+          return (str_contains(strtolower((string) $value), strtolower((string) $expected))) == ($operator == 'CONTAINS');
         }
-        return $value == $expected;
+        return ($value == $expected) == ($operator == 'CONTAINS');
 
       default:
         throw new NotImplementedException("Unsupported operator: '$operator' cannot be used with array data");

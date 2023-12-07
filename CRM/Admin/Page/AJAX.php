@@ -36,7 +36,7 @@ class CRM_Admin_Page_AJAX {
 
       $output = [
         'menu' => $menu,
-        'search' => CRM_Utils_Array::makeNonAssociative(self::getSearchOptions()),
+        'search' => self::getSearchOptions(),
       ];
       // Encourage browsers to cache for a long time - 1 year
       $ttl = 60 * 60 * 24 * 364;
@@ -68,9 +68,9 @@ class CRM_Admin_Page_AJAX {
         $item['url'] = CRM_Utils_System::evalUrl(CRM_Core_BAO_Navigation::makeFullyFormedUrl($props['url']));
       }
       if (!empty($props['label'])) {
-        $item['label'] = ts($props['label'], ['context' => 'menu']);
+        $item['label'] = _ts($props['label'], ['context' => 'menu']);
       }
-      $item['name'] = !empty($props['name']) ? $props['name'] : CRM_Utils_String::munge(CRM_Utils_Array::value('label', $props));
+      $item['name'] = !empty($props['name']) ? $props['name'] : CRM_Utils_String::munge($props['label'] ?? '');
       if (!empty($item['child'])) {
         self::formatMenuItems($item['child']);
       }
@@ -80,15 +80,14 @@ class CRM_Admin_Page_AJAX {
 
   public static function getSearchOptions() {
     $searchOptions = Civi::settings()->get('quicksearch_options');
-    $labels = CRM_Core_SelectValues::quicksearchOptions();
+    $allOptions = array_column(CRM_Core_SelectValues::getQuicksearchOptions(), NULL, 'key');
     $result = [];
     foreach ($searchOptions as $key) {
-      $label = $labels[$key];
-      if (strpos($key, 'custom_') === 0) {
-        $key = 'custom_' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', substr($key, 7), 'id', 'name');
-        $label = array_slice(explode(': ', $label, 2), -1);
-      }
-      $result[$key] = $label;
+      $result[] = [
+        'key' => $key,
+        'value' => $allOptions[$key]['label'],
+        'adv_search_legacy' => $allOptions[$key]['adv_search_legacy'] ?? '',
+      ];
     }
     return $result;
   }
@@ -280,62 +279,6 @@ class CRM_Admin_Page_AJAX {
   }
 
   /**
-   * Get a list of mappings.
-   *
-   * This appears to be only used by scheduled reminders.
-   */
-  public static function mappingList() {
-    if (empty($_GET['mappingID'])) {
-      CRM_Utils_JSON::output(['status' => 'error', 'error_msg' => 'required params missing.']);
-    }
-
-    $mapping = CRM_Core_BAO_ActionSchedule::getMapping($_GET['mappingID']);
-    $dateFieldLabels = $mapping ? $mapping->getDateFields() : [];
-
-    // The UX here is quirky -- for "Activity" types, there's a simple drop "Recipients"
-    // dropdown which is always displayed. For other types, the "Recipients" drop down is
-    // conditional upon the weird isLimit ('Limit To / Also Include / Neither') dropdown.
-    $noThanksJustKidding = !$_GET['isLimit'];
-    if ($mapping instanceof CRM_Activity_ActionMapping || !$noThanksJustKidding) {
-      $entityRecipientLabels = $mapping ? ($mapping->getRecipientTypes() + CRM_Core_BAO_ActionSchedule::getAdditionalRecipients()) : [];
-    }
-    else {
-      $entityRecipientLabels = CRM_Core_BAO_ActionSchedule::getAdditionalRecipients();
-    }
-    $recipientMapping = array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels));
-
-    $output = [
-      'sel4' => CRM_Utils_Array::makeNonAssociative($dateFieldLabels),
-      'sel5' => CRM_Utils_Array::makeNonAssociative($entityRecipientLabels),
-      'recipientMapping' => $recipientMapping,
-    ];
-
-    CRM_Utils_JSON::output($output);
-  }
-
-  /**
-   * (Scheduled Reminders) Get the list of possible recipient filters.
-   *
-   * Ex: GET /civicrm/ajax/recipientListing?mappingID=contribpage&recipientType=
-   */
-  public static function recipientListing() {
-    $mappingID = filter_input(INPUT_GET, 'mappingID', FILTER_VALIDATE_REGEXP, [
-      'options' => [
-        'regexp' => '/^[a-zA-Z0-9_\-]+$/',
-      ],
-    ]);
-    $recipientType = filter_input(INPUT_GET, 'recipientType', FILTER_VALIDATE_REGEXP, [
-      'options' => [
-        'regexp' => '/^[a-zA-Z0-9_\-]+$/',
-      ],
-    ]);
-
-    CRM_Utils_JSON::output([
-      'recipients' => CRM_Utils_Array::makeNonAssociative(CRM_Core_BAO_ActionSchedule::getRecipientListing($mappingID, $recipientType)),
-    ]);
-  }
-
-  /**
    * Outputs one branch in the tag tree
    *
    * Used by jstree to incrementally load tags
@@ -346,7 +289,7 @@ class CRM_Admin_Page_AJAX {
     $result = [];
 
     $whereClauses = ['is_tagset <> 1'];
-    $orderColumn = 'name';
+    $orderColumn = 'label';
 
     // fetch all child tags in Array('parent_tag' => array('child_tag_1', 'child_tag_2', ...)) format
     $childTagIDs = CRM_Core_BAO_Tag::getChildTags($substring);
@@ -356,7 +299,7 @@ class CRM_Admin_Page_AJAX {
       $whereClauses[] = "parent_id = $parent";
     }
     elseif ($substring) {
-      $whereClauses['substring'] = " name LIKE '%$substring%' ";
+      $whereClauses['substring'] = " label LIKE '%$substring%' ";
       if (!empty($parentIDs)) {
         $whereClauses['substring'] = sprintf(" %s OR id IN (%s) ", $whereClauses['substring'], implode(',', $parentIDs));
       }
@@ -384,7 +327,7 @@ class CRM_Admin_Page_AJAX {
         $usedFor = (array) explode(',', $dao->used_for);
         $tag = [
           'id' => $dao->id,
-          'text' => $dao->name,
+          'text' => $dao->label,
           'a_attr' => [
             'class' => 'crm-tag-item',
           ],

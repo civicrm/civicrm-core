@@ -1,0 +1,3 @@
+<!-- Default template for behaviors that do not provide their own template -->
+<input title="{{:: behavior.title }}" crm-ui-select="{data: behavior.options, placeholder: ts('None')}" class="form-control" ng-model="$ctrl.entity[behavior.key]">
+<p class="help-block" ng-show=":: behavior.description">{{:: behavior.description }}</p>

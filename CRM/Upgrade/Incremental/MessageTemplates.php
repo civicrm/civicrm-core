@@ -350,6 +350,33 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'contribution_offline_receipt', 'type' => 'html'],
         ],
       ],
+      [
+        'version' => '5.65.alpha1',
+        'upgrade_descriptor' => ts('Update to use tokens'),
+        'templates' => [
+          ['name' => 'petition_sign', 'type' => 'text'],
+          ['name' => 'petition_sign', 'type' => 'html'],
+          ['name' => 'petition_sign', 'type' => 'subject'],
+        ],
+      ],
+      [
+        'version' => '5.68.alpha1',
+        'upgrade_descriptor' => ts('Significant changes to the template and available variables. Text version is discontinued'),
+        'templates' => [
+          ['name' => 'event_offline_receipt', 'type' => 'text'],
+          ['name' => 'event_offline_receipt', 'type' => 'html'],
+          ['name' => 'event_offline_receipt', 'type' => 'subject'],
+        ],
+      ],
+      [
+        'version' => '5.69.alpha1',
+        'upgrade_descriptor' => ts('Significant changes to the template and available variables. Text version is discontinued'),
+        'templates' => [
+          ['name' => 'membership_online_receipt', 'type' => 'text'],
+          ['name' => 'membership_online_receipt', 'type' => 'html'],
+          ['name' => 'membership_online_receipt', 'type' => 'subject'],
+        ],
+      ],
     ];
   }
 
@@ -467,6 +494,15 @@ class CRM_Upgrade_Incremental_MessageTemplates {
    */
   public function getUpgradeMessages() {
     $updates = $this->getTemplatesToUpdate();
+
+    // workflow_name is not available pre-5.26, so we won't check if templates are changed or not pre-5.26
+    try {
+      $uneditedTemplates = $this->getUneditedTemplates();
+    }
+    catch (Exception $e) {
+      $uneditedTemplates = [];
+    }
+
     $messages = [];
     $templateLabel = '';
     foreach ($updates as $key => $value) {
@@ -482,7 +518,9 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           $templateLabel = $value['label'];
         }
       }
-      $messages[$templateLabel] = $value['upgrade_descriptor'];
+      if (!(array_key_exists($key, $uneditedTemplates))) {
+        $messages[$templateLabel] = $value['upgrade_descriptor'];
+      }
     }
     return $messages;
   }
@@ -490,10 +528,10 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   /**
    * Update message templates.
    */
-  public function updateTemplates() {
+  public function updateTemplates(): void {
     $templates = $this->getTemplatesToUpdate();
     foreach ($templates as $template) {
-      $workFlowID = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) as id FROM civicrm_option_value WHERE name = %1", [
+      $workFlowID = CRM_Core_DAO::singleValueQuery('SELECT MAX(id) as id FROM civicrm_option_value WHERE name = %1', [
         1 => [$template['name'], 'String'],
       ]);
       $content = file_get_contents(\Civi::paths()->getPath('[civicrm.root]/xml/templates/message_templates/' . $template['name'] . '_' . $template['type'] . '.tpl'));
@@ -552,7 +590,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           continue;
         }
         $content = file_get_contents($filePath);
-        if ($content) {
+        if ($content !== FALSE) {
           CRM_Core_DAO::executeQuery(
             "UPDATE civicrm_msg_template SET msg_{$type} = %1 WHERE id = %2", [
               1 => [$content, 'String'],
@@ -583,8 +621,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
    * Get all the is_default templates that are the unchanged from their is_reserved counterpart, which
    * at the time this runs was the version shipped with core when it was last changed.
    *
-   * @todo have pulled this out since want to re-use it to get the preUpgrade message right. Currently
-   * it always tells you all the ones in the hardcoded per-version list have been customized.
+   * This cannot be used before 5.26, as workflow_name was only added in 5.26.
    *
    * @return array
    */
@@ -592,7 +629,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
     $templates = [];
     foreach (['html', 'text', 'subject'] as $type) {
       $dao = CRM_Core_DAO::executeQuery("
-        SELECT default_template.id, default_template.workflow_id FROM civicrm_msg_template reserved
+        SELECT default_template.id, default_template.workflow_id, default_template.workflow_name FROM civicrm_msg_template reserved
         LEFT JOIN civicrm_msg_template default_template
           ON reserved.workflow_id = default_template.workflow_id
         WHERE reserved.is_reserved = 1 AND default_template.is_default = 1 AND reserved.id <> default_template.id
@@ -600,10 +637,11 @@ class CRM_Upgrade_Incremental_MessageTemplates {
       ");
       while ($dao->fetch()) {
         // Note the same id can appear multiple times, e.g. you might change the html but not the subject.
-        $templates[] = [
+        $templates[$dao->workflow_name . '_' . $type] = [
           'id' => $dao->id,
           'type' => $type,
           'workflow_id' => $dao->workflow_id,
+          'workflow_name' => $dao->workflow_name,
         ];
       }
     }

@@ -1,6 +1,8 @@
 # Helper to run bin/regen.sh to regenerate civicrm_generated.mysql
 # 1. In your civicrm-core fork on github.com, click on the Actions tab.
+#   * If you don't see an Actions tab, you may need to enable Github Actions in your fork, under Settings - Actions - General.
 # 2. Click on Regen on the left.
+#   * If you don't see Regen on the left, the master branch of your fork may be outdated. In a recent git checkout of master run `git push my-fork master`, where "my-fork" is the remote alias of your fork (see output of `git remote -v`).
 # 3. On the right you'll see a dropdown "Run workflow".
 # 4. From the Branch field in the dropdown pick your branch.
 # 5. Optionally choose to have it add a commit with the new file to your branch at the end, otherwise it will give you the file to download.
@@ -115,7 +117,7 @@ jobs:
           git commit -m "regenerate civicrm_generated" sql/civicrm_generated.mysql
           git remote add mine https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git
           git push mine
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: ${{ success() }}
         with:
           name: the_file_you_requested

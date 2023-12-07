@@ -32,15 +32,15 @@
                     <td class="label report-contents">{if !empty($field.title)}{$field.title}{/if}</td>
                       {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName=$fieldName hideRelativeLabel=1 from='_from' to='_to' class='' colspan=''}
                   </tr>
-                {elseif $form.$fieldOp.html}
-                  <tr class="report-contents crm-report crm-report-criteria-filter crm-report-criteria-filter-{$tableName}" {if !empty($field.no_display)} style="display: none;"{/if}>
+                {elseif array_key_exists($fieldOp, $form) && $form.$fieldOp.html}
+                  <tr class="report-contents crm-report crm-report-criteria-filter crm-report-criteria-filter-{$tableName}" {if array_key_exists('no_display', $field) && $field.no_display} style="display: none;"{/if}>
                     <td class="label report-contents">{if !empty($field.title)}{$field.title}{/if}</td>
                     <td class="report-contents">{$form.$fieldOp.html}</td>
                     <td>
                       <span id="{$filterVal}_cell">{$form.$filterVal.label}&nbsp;{$form.$filterVal.html}</span>
                       <span id="{$filterMin}_max_cell">
-                        {if !empty($form.$filterMin)}{$form.$filterMin.label}&nbsp;{$form.$filterMin.html}&nbsp;&nbsp;{/if}
-                        {if !empty($form.$filterMax)}{$form.$filterMax.label}&nbsp;{$form.$filterMax.html}{/if}
+                        {if array_key_exists($filterMin, $form) && $form.$filterMin}{$form.$filterMin.label}&nbsp;{$form.$filterMin.html}&nbsp;&nbsp;{/if}
+                        {if array_key_exists($filterMax, $form) && $form.$filterMax}{$form.$filterMax.label}&nbsp;{$form.$filterMax.html}{/if}
                       </span>
                     </td>
                   </tr>

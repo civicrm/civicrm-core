@@ -76,7 +76,7 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
     CRM_Core_Session::setStatus($status, ts("Removed Contact From Group", [
       'plural' => "Removed Contacts From Group",
       'count' => $removed,
-    ]), 'success', ['expires' => 0]);
+    ]), 'success');
   }
 
 }

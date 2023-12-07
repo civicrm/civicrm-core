@@ -23,13 +23,6 @@ use Civi\Api4\PaymentProcessor;
 class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
    * Get BAO Name.
    *
    * @return string
@@ -37,42 +30,6 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
    */
   public function getBAOName() {
     return 'CRM_Financial_BAO_PaymentProcessor';
-  }
-
-  /**
-   * Get action Links.
-   *
-   * @return array
-   *   (reference) of action links
-   */
-  public function &links() {
-    if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
-          'name' => ts('Edit'),
-          'url' => 'civicrm/admin/paymentProcessor',
-          'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit Payment Processor'),
-        ),
-        CRM_Core_Action::DISABLE => array(
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable Payment Processor'),
-        ),
-        CRM_Core_Action::ENABLE => array(
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable Payment Processor'),
-        ),
-        CRM_Core_Action::DELETE => array(
-          'name' => ts('Delete'),
-          'url' => 'civicrm/admin/paymentProcessor',
-          'qs' => 'action=delete&id=%%id%%',
-          'title' => ts('Delete Payment Processor'),
-        ),
-      );
-    }
-    return self::$_links;
   }
 
   /**
@@ -85,20 +42,14 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
   public function run() {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - Payment Processor'));
-    //CRM-15546
-    $paymentProcessorTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', array(
-      'labelColumn' => 'name',
-      'flip' => 1,
-    ));
-    $this->assign('defaultPaymentProcessorType', $paymentProcessorTypes['PayPal']);
-    $breadCrumb = array(
-      array(
-        'title' => ts('Administration'),
+    $breadCrumb = [
+      [
+        'title' => ts('Administer'),
         'url' => CRM_Utils_System::url('civicrm/admin',
           'reset=1'
         ),
-      ),
-    );
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     return parent::run();
   }

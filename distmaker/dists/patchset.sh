@@ -30,7 +30,11 @@ dm_export_patches "$SRC/drupal-8"   "$TRG/civicrm-drupal-8"   $REFTAG..$DM_REF_D
 dm_export_patches "$SRC/backdrop"   "$TRG/civicrm-backdrop"   1.x-$REFTAG..$DM_REF_BACKDROP
 dm_export_patches "$SRC/packages"   "$TRG/civicrm-packages"   $REFTAG..$DM_REF_PACKAGES
 dm_export_patches "$SRC/joomla"     "$TRG/civicrm-joomla"     $REFTAG..$DM_REF_JOOMLA
-dm_export_patches "$SRC/wordpress"  "$TRG/civicrm-wordpress"  $REFTAG..$DM_REF_WORDPRESS
+if [ -d "$SRC/WordPress" ]; then
+  dm_export_patches "$SRC/WordPress"  "$TRG/civicrm-wordpress"  $REFTAG..$DM_REF_WORDPRESS
+else
+  dm_export_patches "$SRC/wordpress"  "$TRG/civicrm-wordpress"  $REFTAG..$DM_REF_WORDPRESS
+fi
 
 
 # gen tarball

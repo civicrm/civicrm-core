@@ -55,7 +55,7 @@ class CRM_Core_Invoke {
       return NULL;
     }
     // CRM-15901: Turn off PHP errors display for all ajax calls
-    if (CRM_Utils_Array::value(1, $args) == 'ajax' || !empty($_REQUEST['snippet'])) {
+    if (($args[1] ?? NULL) == 'ajax' || !empty($_REQUEST['snippet'])) {
       ini_set('display_errors', 0);
     }
 
@@ -207,6 +207,9 @@ class CRM_Core_Invoke {
     self::registerPharHandler();
 
     $config = CRM_Core_Config::singleton();
+
+    // WISHLIST: if $item is a web-service route, swap prepend to $civicrm_url_defaults
+
     if ($config->userFramework == 'Joomla' && $item) {
       $config->userFrameworkURLVar = 'task';
 
@@ -249,7 +252,7 @@ class CRM_Core_Invoke {
         CRM_Utils_System::setTitle($item['title']);
       }
 
-      if (isset($item['breadcrumb']) && !isset($item['is_public'])) {
+      if (!CRM_Core_Config::isUpgradeMode() && isset($item['breadcrumb']) && empty($item['is_public'])) {
         CRM_Utils_System::appendBreadCrumb($item['breadcrumb']);
       }
 
@@ -300,11 +303,11 @@ class CRM_Core_Invoke {
           unset($pageArgs['mode']);
         }
         $title = $item['title'] ?? NULL;
-        if (strstr($item['page_callback'], '_Page') || strstr($item['page_callback'], '\\Page\\')) {
+        if (str_contains($item['page_callback'], '_Page') || str_contains($item['page_callback'], '\\Page\\')) {
           $object = new $item['page_callback']($title, $mode);
           $object->urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
         }
-        elseif (strstr($item['page_callback'], '_Controller') || strstr($item['page_callback'], '\\Controller\\')) {
+        elseif (str_contains($item['page_callback'], '_Controller') || str_contains($item['page_callback'], '\\Controller\\')) {
           $addSequence = 'false';
           if (isset($pageArgs['addSequence'])) {
             $addSequence = $pageArgs['addSequence'];

@@ -79,11 +79,11 @@
           {if $recur}
             <div class="crm-block crm-contact-contribute-recur crm-contact-contribute-recur-active">
               <h3>{ts}Active Recurring Contributions{/ts}</h3>
-              {include file="CRM/Contribute/Page/ContributionRecurSelector.tpl" recurRows=$activeRecurRows}
+              {include file="CRM/Contribute/Page/ContributionRecurSelector.tpl" recurRows=$activeRecurRows recurType='active'}
             </div>
             <div class="crm-block crm-contact-contribute-recur crm-contact-contribute-recur-inactive">
               <h3>{ts}Inactive Recurring Contributions{/ts}</h3>
-              {include file="CRM/Contribute/Page/ContributionRecurSelector.tpl" recurRows=$inactiveRecurRows}
+              {include file="CRM/Contribute/Page/ContributionRecurSelector.tpl" recurRows=$inactiveRecurRows recurType='inactive'}
             </div>
           {/if}
         </div>

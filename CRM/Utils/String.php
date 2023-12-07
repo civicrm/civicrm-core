@@ -73,8 +73,8 @@ class CRM_Utils_String {
     // CRM-11744
     $name = preg_replace('/[^a-zA-Z0-9]+/', $char, trim($name));
 
-    //If there are no ascii characters present.
-    if ($name == $char) {
+    // If there are no ascii characters present.
+    if (!strlen(trim($name, $char))) {
       $name = self::createRandom($len, self::ALPHANUMERIC);
     }
 
@@ -355,14 +355,11 @@ class CRM_Utils_String {
    *   true if the urls match, else false
    */
   public static function match($url1, $url2) {
-    $url1 = strtolower($url1);
-    $url2 = strtolower($url2);
+    $component1 = parse_url(strtolower($url1));
+    $component2 = parse_url(strtolower($url2));
 
-    $url1Str = parse_url($url1);
-    $url2Str = parse_url($url2);
-
-    if ($url1Str['path'] == $url2Str['path'] &&
-      self::extractURLVarValue(CRM_Utils_Array::value('query', $url1Str)) == self::extractURLVarValue(CRM_Utils_Array::value('query', $url2Str))
+    if ($component1['path'] == $component2['path'] &&
+      self::extractURLVarValue($component1['query'] ?? '') == self::extractURLVarValue($component2['query'] ?? '')
     ) {
       return TRUE;
     }
@@ -448,8 +445,7 @@ class CRM_Utils_String {
    */
   public static function htmlToText($html) {
     $token_html = preg_replace('!\{([a-z_.]+)\}!i', 'token:{$1}', $html);
-    $converter = new \Html2Text\Html2Text($token_html, ['do_links' => 'table', 'width' => 75]);
-    $token_text = $converter->getText();
+    $token_text = \Soundasleep\Html2Text::convert($token_html, ['ignore_errors' => TRUE]);
     $text = preg_replace('!token\:\{([a-z_.]+)\}!i', '{$1}', $token_text);
     return $text;
   }
@@ -670,8 +666,8 @@ class CRM_Utils_String {
   /**
    * Generate a random string.
    *
-   * @param $len
-   * @param $alphabet
+   * @param int $len
+   * @param string $alphabet
    * @return string
    */
   public static function createRandom($len, $alphabet) {
@@ -692,18 +688,22 @@ class CRM_Utils_String {
    * @param string $string
    *   E.g. "view all contacts". Syntax: "[prefix:]name".
    * @param string|null $defaultPrefix
+   * @param string $validPrefixPattern
+   *   A regular expression used to determine if a prefix is valid.
+   *   To wit: Prefixes MUST be strictly alphanumeric.
    *
    * @return array
    *   (0 => string|NULL $prefix, 1 => string $value)
    */
-  public static function parsePrefix($delim, $string, $defaultPrefix = NULL) {
+  public static function parsePrefix($delim, $string, $defaultPrefix = NULL, $validPrefixPattern = '/^[A-Za-z0-9]+$/') {
     $pos = strpos($string, $delim);
     if ($pos === FALSE) {
       return [$defaultPrefix, $string];
     }
-    else {
-      return [substr($string, 0, $pos), substr($string, 1 + $pos)];
-    }
+
+    $lhs = substr($string, 0, $pos);
+    $rhs = substr($string, 1 + $pos);
+    return preg_match($validPrefixPattern, $lhs) ? [$lhs, $rhs] : [$defaultPrefix, $string];
   }
 
   /**
@@ -875,7 +875,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Determine if $string starts with $fragment.
+   * @deprecated
    *
    * @param string $string
    *   The long string.
@@ -884,15 +884,12 @@ class CRM_Utils_String {
    * @return bool
    */
   public static function startsWith($string, $fragment) {
-    if ($fragment === '') {
-      return TRUE;
-    }
-    $len = strlen($fragment ?? '');
-    return substr(($string ?? ''), 0, $len) === $fragment;
+    CRM_Core_Error::deprecatedFunctionWarning('str_starts_with');
+    return str_starts_with((string) $string, (string) $fragment);
   }
 
   /**
-   * Determine if $string ends with $fragment.
+   * @deprecated
    *
    * @param string $string
    *   The long string.
@@ -901,11 +898,8 @@ class CRM_Utils_String {
    * @return bool
    */
   public static function endsWith($string, $fragment) {
-    if ($fragment === '') {
-      return TRUE;
-    }
-    $len = strlen($fragment ?? '');
-    return substr(($string ?? ''), -1 * $len) === $fragment;
+    CRM_Core_Error::deprecatedFunctionWarning('str_ends_with');
+    return str_ends_with((string) $string, (string) $fragment);
   }
 
   /**
@@ -919,7 +913,7 @@ class CRM_Utils_String {
     $patterns = (array) $patterns;
     $result = [];
     foreach ($patterns as $pattern) {
-      if (!\CRM_Utils_String::endsWith($pattern, '*')) {
+      if (!str_ends_with($pattern, '*')) {
         if ($allowNew || in_array($pattern, $allStrings)) {
           $result[] = $pattern;
         }
@@ -927,7 +921,7 @@ class CRM_Utils_String {
       else {
         $prefix = rtrim($pattern, '*');
         foreach ($allStrings as $key) {
-          if (\CRM_Utils_String::startsWith($key, $prefix)) {
+          if (str_starts_with($key, $prefix)) {
             $result[] = $key;
           }
         }
@@ -1026,6 +1020,10 @@ class CRM_Utils_String {
    * @param string $templateString
    *
    * @return string
+   *
+   * @noinspection PhpDocRedundantThrowsInspection
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function parseOneOffStringThroughSmarty($templateString) {
     if (!CRM_Utils_String::stringContainsTokens($templateString)) {
@@ -1034,13 +1032,15 @@ class CRM_Utils_String {
     }
     $smarty = CRM_Core_Smarty::singleton();
     $cachingValue = $smarty->caching;
+    set_error_handler([$smarty, 'handleSmartyError'], E_USER_ERROR);
     $smarty->caching = 0;
     $smarty->assign('smartySingleUseString', $templateString);
     // Do not escape the smartySingleUseString as that is our smarty template
     // and is likely to contain html.
     $templateString = (string) $smarty->fetch('string:{eval var=$smartySingleUseString|smarty:nodefaults}');
     $smarty->caching = $cachingValue;
-    $smarty->assign('smartySingleUseString', NULL);
+    $smarty->assign('smartySingleUseString');
+    restore_error_handler();
     return $templateString;
   }
 

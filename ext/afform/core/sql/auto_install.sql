@@ -39,6 +39,7 @@ CREATE TABLE `civicrm_afform_submission` (
   `afform_name` varchar(255) COMMENT 'Name of submitted afform',
   `data` text COMMENT 'IDs of saved entities',
   `submission_date` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `status_id` int unsigned NOT NULL DEFAULT 1 COMMENT 'fk to Afform Submission Status options in civicrm_option_values',
   PRIMARY KEY (`id`),
   CONSTRAINT FK_civicrm_afform_submission_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL
 )

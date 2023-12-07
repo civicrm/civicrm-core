@@ -47,6 +47,12 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
     $params = ['id' => $this->_id];
     CRM_Core_BAO_CustomField::retrieve($params, $defaults);
 
+    if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $defaults['custom_group_id'], 'is_reserved')) {
+      // I think this does not have ts() because the only time you would see
+      // this is if you manually made a url you weren't supposed to.
+      CRM_Core_Error::statusBounce("You cannot delete fields in a reserved custom field-set.");
+    }
+
     $this->_title = $defaults['label'] ?? NULL;
     $this->assign('title', $this->_title);
     $this->setTitle(ts('Delete %1', [1 => $this->_title]));

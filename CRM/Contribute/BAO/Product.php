@@ -23,37 +23,27 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
   public static $_defaultContributionType = NULL;
 
   /**
-   * Fetch object based on array of properties.
-   *
+   * @deprecated
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
-   *   (reference ) an assoc array to hold the flattened values.
-   *
-   * @return CRM_Contribute_BAO_Product
+   * @return self|null
    */
   public static function retrieve(&$params, &$defaults) {
-    $premium = new CRM_Contribute_DAO_Product();
-    $premium->copyValues($params);
-    if ($premium->find(TRUE)) {
+    $premium = self::commonRetrieve(self::class, $params, $defaults);
+    if ($premium) {
       $premium->product_name = $premium->name;
-      CRM_Core_DAO::storeValues($premium, $defaults);
-      return $premium;
     }
-    return NULL;
+    return $premium;
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if (!$is_active) {
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->product_id = $id;
@@ -110,6 +100,7 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
    * @throws \CRM_Core_Exception
    */
   public static function del($productID) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     static::deleteRecord(['id' => $productID]);
   }
 

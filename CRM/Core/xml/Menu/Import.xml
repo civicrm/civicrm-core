@@ -40,6 +40,14 @@
      <weight>420</weight>
   </item>
   <item>
+    <path>civicrm/import/contribution</path>
+    <title>Import Contributions</title>
+    <page_callback>CRM_Contribute_Import_Controller</page_callback>
+    <access_arguments>access CiviContribute,edit contributions</access_arguments>
+    <page_type>1</page_type>
+    <weight>520</weight>
+  </item>
+  <item>
      <path>civicrm/import/custom</path>
      <path_arguments>id=%%id%%</path_arguments>
      <title>Import Multi-value Custom Data</title>

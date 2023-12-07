@@ -46,21 +46,6 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   }
 
   /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * Fields may have keys
-   *  - name (required to show in tpl from the array)
-   *  - description (optional, will appear below the field)
-   *  - not-auto-addable - this class will not attempt to add the field using addField.
-   *    (this will be automatically set if the field does not have html in it's metadata
-   *    or is not a core field on the form's entity).
-   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
-   *  - template - use a field specific template to render this field
-   * @var array
-   */
-  protected $entityFields = [];
-
-  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {
@@ -75,13 +60,6 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
       'is_active' => ['name' => 'is_active'],
     ];
   }
-
-  /**
-   * Deletion message to be assigned to the form.
-   *
-   * @var string
-   */
-  protected $deleteMessage;
 
   /**
    * Set the delete message.
@@ -265,8 +243,8 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     // get the submitted form values.
     $params = $this->controller->exportValues('Set');
     $nameLength = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceSet', 'name');
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params, FALSE);
+    $params['is_active'] = $params['is_active'] ?? FALSE;
+    $params['financial_type_id'] = $params['financial_type_id'] ?? FALSE;
 
     $compIds = [];
     $extends = $params['extends'] ?? NULL;
@@ -294,7 +272,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     else {
       // Jump directly to adding a field if popups are disabled
       $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? 'browse' : 'add';
-      $url = CRM_Utils_System::url('civicrm/admin/price/field', [
+      $url = CRM_Utils_System::url('civicrm/admin/price/field/edit', [
         'reset' => 1,
         'action' => $action,
         'sid' => $set->id,

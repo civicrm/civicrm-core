@@ -20,6 +20,16 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
 
   use \Civi\Test\QueueTestTrait;
 
+  /**
+   * @var CRM_Queue_Service
+   */
+  private $queueService;
+
+  /**
+   * @var CRM_Queue_Queue
+   */
+  private $queue;
+
   /* ----------------------- Queue providers ----------------------- */
 
   /* Define a list of queue providers which should be tested */

@@ -44,9 +44,6 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
 
     // CRM-19135: where CRM_Core_BAO_Contact::getValues() set label as a default value instead of reserved 'value',
     // the code is to ensure we always set default to value instead of label
-    if (!empty($defaults['preferred_mail_format'])) {
-      $defaults['preferred_mail_format'] = array_search($defaults['preferred_mail_format'], CRM_Core_SelectValues::pmf());
-    }
 
     if (empty($defaults['communication_style_id'])) {
       $defaults['communication_style_id'] = array_pop(CRM_Core_OptionGroup::values('communication_style', TRUE, NULL, NULL, 'AND is_default = 1'));
@@ -68,7 +65,7 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
     // Process / save communication preferences
 
     // this is a chekbox, so mark false if we dont get a POST value
-    $params['is_opt_out'] = CRM_Utils_Array::value('is_opt_out', $params, FALSE);
+    $params['is_opt_out'] = $params['is_opt_out'] ?? FALSE;
     $params['contact_type'] = $this->_contactType;
     $params['contact_id'] = $this->_contactId;
 

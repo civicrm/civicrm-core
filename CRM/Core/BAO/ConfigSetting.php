@@ -207,14 +207,14 @@ class CRM_Core_BAO_ConfigSetting {
 
     }
     else {
-
       // CRM-11993 - Use default when it's a single-language install.
       $chosenLocale = $defaultLocale;
-
     }
 
-    if (!$session->isEmpty()) {
-      // Always assign the chosen locale to the session.
+    if ($chosenLocale && ($requestLocale ?? NULL) === $chosenLocale) {
+      // If the locale is passed in via lcMessages key on GET or POST data,
+      // and it's valid against our configured locales, we require the session
+      // to store this, even if that means starting an anonymous session.
       $session->set('lcMessages', $chosenLocale);
     }
 
@@ -310,8 +310,8 @@ class CRM_Core_BAO_ConfigSetting {
    */
   public static function enableComponent($componentName) {
     $enabledComponents = Civi::settings()->get('enable_components');
-    if (in_array($componentName, $enabledComponents)) {
-      // component is already enabled
+    if (in_array($componentName, $enabledComponents, TRUE)) {
+      // Component is already enabled
       return TRUE;
     }
 
@@ -346,20 +346,13 @@ class CRM_Core_BAO_ConfigSetting {
    * @return bool
    */
   public static function disableComponent($componentName) {
-    $config = CRM_Core_Config::singleton();
-    if (!in_array($componentName, $config->enableComponents) ||
-      !array_key_exists($componentName, CRM_Core_Component::getComponents())
-    ) {
-      // Post-condition is satisfied.
+    $enabledComponents = Civi::settings()->get('enable_components');
+    if (!in_array($componentName, $enabledComponents, TRUE)) {
+      // Component is already disabled.
       return TRUE;
     }
 
-    // get enabled-components from DB and add to the list
-    $enabledComponents = Civi::settings()->get('enable_components');
-    $enabledComponents = array_diff($enabledComponents, [$componentName]);
-
-    self::setEnabledComponents($enabledComponents);
-
+    self::setEnabledComponents(array_diff($enabledComponents, [$componentName]));
     return TRUE;
   }
 
@@ -369,8 +362,8 @@ class CRM_Core_BAO_ConfigSetting {
    * @param array $enabledComponents
    */
   public static function setEnabledComponents($enabledComponents) {
-    // The on_change trigger on this setting will trigger a cache flush
-    Civi::settings()->set('enable_components', $enabledComponents);
+    // The post_change trigger on this setting will sync component extensions, which will also flush caches
+    Civi::settings()->set('enable_components', array_values($enabledComponents));
   }
 
   /**
