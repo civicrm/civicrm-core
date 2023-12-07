@@ -39,7 +39,7 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    *
    * @return CRM_Import_DataSource
    */
-  public function setLimit(int $limit): CRM_Import_DataSource {
+  public function setLimit(int $limit): DataSourceInterface {
     $this->limit = $limit;
     $this->queryResultObject = NULL;
     return $this;
@@ -135,7 +135,7 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    *
    * @return self
    */
-  public function setStatuses(array $statuses): self {
+  public function setStatuses(array $statuses): DataSourceInterface {
     $this->statuses = $statuses;
     $this->queryResultObject = NULL;
     return $this;
