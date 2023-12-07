@@ -2,7 +2,7 @@
 (function (angular, $, _) {
 
   var uidCount = 0,
-    pageTitle = 'CiviCRM',
+    pageTitleHTML = 'CiviCRM',
     documentTitle = 'CiviCRM';
 
   angular.module('crmUi', CRM.angRequires('crmUi'))
@@ -1186,7 +1186,7 @@
     // WARNING: Use only once per route!
     // WARNING: This directive works only if your AngularJS base page does not
     // set a custom title (i.e., it has an initial title of "CiviCRM"). See the
-    // global variables pageTitle and documentTitle.
+    // global variables pageTitleHTML and documentTitle.
     // Example (same title for both): <h1 crm-page-title>{{ts('Hello')}}</h1>
     // Example (separate document title): <h1 crm-document-title="ts('Hello')" crm-page-title><i class="crm-i fa-flag" aria-hidden="true"></i>{{ts('Hello')}}</h1>
     .directive('crmPageTitle', function($timeout) {
@@ -1197,27 +1197,22 @@
         link: function(scope, $el, attrs) {
           function update() {
             $timeout(function() {
-              var newPageTitle = _.trim($el.html()),
+              var newPageTitleHTML = $el.html().trim(),
                 newDocumentTitle = scope.crmDocumentTitle || $el.text(),
-                h1Count = 0,
                 dialog = $el.closest('.ui-dialog-content');
               if (dialog.length) {
                 dialog.dialog('option', 'title', newDocumentTitle);
                 $el.hide();
               } else {
                 document.title = $('title').text().replace(documentTitle, newDocumentTitle);
-                // If the CMS has already added title markup to the page, use it
-                $('h1').not('.crm-container h1').each(function () {
-                  if ($(this).hasClass('crm-page-title') || _.trim($(this).html()) === pageTitle) {
-                    $(this).addClass('crm-page-title').html(newPageTitle);
+                [].forEach.call(document.querySelectorAll('h1:not(.crm-container h1), .crm-page-title-wrapper>h1'), h1 => {
+                  if (h1.classList.contains('crm-page-title') || h1.innerHTML.trim() === pageTitleHTML) {
+                    h1.classList.add('crm-page-title');
+                    h1.innerHTML = newPageTitleHTML;
                     $el.hide();
-                    ++h1Count;
                   }
                 });
-                if (!h1Count) {
-                  $el.show();
-                }
-                pageTitle = newPageTitle;
+                pageTitleHTML = newPageTitleHTML;
                 documentTitle = newDocumentTitle;
               }
             });
