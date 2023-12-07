@@ -31,7 +31,7 @@ class SessionHandlerTest extends TestCase implements EndToEndInterface {
     $session_handler = new SessionHandler();
 
     // Open a session
-    $session_handler->open('/path', 'CIVISOSESSID');
+    $session_handler->open('/path', 'SESSCIVISO');
 
     // Create a unique session ID
     $session_id = $session_handler->create_sid();
@@ -58,7 +58,7 @@ class SessionHandlerTest extends TestCase implements EndToEndInterface {
     sleep(1);
 
     // Re-open the session
-    $session_handler->open('/path', 'CIVISOSESSID');
+    $session_handler->open('/path', 'SESSCIVISO');
 
     // Validate the session
     $this->assertTrue($session_handler->validateId($session_id));
@@ -89,7 +89,7 @@ class SessionHandlerTest extends TestCase implements EndToEndInterface {
     sleep(1);
 
     // Re-open the session
-    $session_handler->open('/path', 'CIVISOSESSID');
+    $session_handler->open('/path', 'SESSCIVISO');
 
     // Validate the session
     $this->assertTrue($session_handler->validateId($session_id));
@@ -121,7 +121,7 @@ class SessionHandlerTest extends TestCase implements EndToEndInterface {
       ->execute();
 
     // Open a new session to trigger garbage collection
-    $session_handler->open('/path', 'CIVISOSESSID');
+    $session_handler->open('/path', 'SESSCIVISO');
     $new_sid = $session_handler->create_sid();
     $session_handler->read($new_sid);
 
@@ -148,14 +148,14 @@ class SessionHandlerTest extends TestCase implements EndToEndInterface {
     $tx = new \CRM_Core_Transaction();
 
     // Create a new session
-    $session_handler->open('/path', 'CIVISOSESSID');
+    $session_handler->open('/path', 'SESSCIVISO');
     $session_id = $session_handler->create_sid();
     $session_handler->read($session_id);
     $session_handler->write($session_id, 'CiviCRM|a:0:{}');
     $session_handler->close();
 
     // Re-open the session
-    $session_handler->open('/path', 'CIVISOSESSID');
+    $session_handler->open('/path', 'SESSCIVISO');
     $session_handler->validateId($session_id);
     $session_handler->read($session_id);
     $session_handler->write($session_id, 'CiviCRM|a:1:{s:4:"ufID";i:1}');
