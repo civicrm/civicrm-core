@@ -310,7 +310,36 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
    * @throws \CRM_Core_Exception
    */
   protected function getContributionID(): int {
-    return (int) $this->retrieve('x_invoice_num', 'Integer');
+    $id = $this->retrieve('x_invoice_num', 'String');
+
+    /* Fix for https://lab.civicrm.org/dev/core/-/issues/4833 :
+     * There's a potential conflict in the way x_invoice_num is used currently,
+     * vs the way it was used in the past. This problem will affect long-running
+     * ARB (recurring) subscriptions, if they're old enough (e.g. created before Nov 2021,
+     * though admittedly I'm not sure of that cutoff date).
+     *
+     * Summary:
+     * - Currently: x_invoice_num is an integer equal to civicrm_contribution.id;
+     * - Previously, x_invoice_num was a 20-character alphanumeric string,
+     * stored in the comma-delimited value of civicrm_contribution.trxn_id.
+     *
+     * Therefore: If x_invoice_num is not an integer, AND it's 20 characters long,
+     * we'll assume we might be processing a payment on a long-running "old-style"
+     * ARB subscription and attempt to match on (civicrm_contribution.trxn_id contains
+     * x_invoice_num).
+     */
+    if (
+      ($id !== (int) $id)
+      && (strlen($id) == 20)
+    ) {
+      $contribution = Contribution::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('trxn_id', 'LIKE', "$id,%")
+        ->execute()
+        ->first();
+      $id = $contribution['id'];
+    }
+    return (int) $id;
   }
 
   /**
