@@ -52,7 +52,7 @@ class CRM_Utils_Address {
       $format = Civi::settings()->get('address_format');
     }
     $formatted = $format;
-
+    CRM_Core_Error::deprecatedFunctionWarning('tests speak to me');
     $fullPostalCode = $fields['postal_code'] ?? NULL;
     if (!empty($fields['postal_code_suffix'])) {
       $fullPostalCode .= '-' . $fields['postal_code_suffix'];
