@@ -32,23 +32,25 @@ class SpecGatherer extends AutoService {
   /**
    * Returns a RequestSpec with all the fields available. Uses spec providers
    * to add or modify field specifications.
-   * @see \Civi\Api4\Service\Spec\Provider\CustomFieldCreationSpecProvider
    *
    * @param string $entity
    * @param string $action
    * @param bool $includeCustom
    * @param array $values
+   * @param bool $checkPermissions
    *
    * @return \Civi\Api4\Service\Spec\RequestSpec
+   * @throws \CRM_Core_Exception
+   * @see \Civi\Api4\Service\Spec\Provider\CustomFieldCreationSpecProvider
    */
-  public function getSpec($entity, $action, $includeCustom, $values = []) {
+  public function getSpec(string $entity, string $action, bool $includeCustom, array $values = [], bool $checkPermissions = FALSE): RequestSpec {
     $specification = new RequestSpec($entity, $action, $values);
 
     // Real entities
-    if (strpos($entity, 'Custom_') !== 0) {
+    if (!str_starts_with($entity, 'Custom_')) {
       $this->addDAOFields($entity, $action, $specification, $values);
       if ($includeCustom) {
-        $this->addCustomFields($entity, $specification);
+        $this->addCustomFields($entity, $specification, $checkPermissions);
       }
     }
     // Custom pseudo-entities
@@ -64,7 +66,7 @@ class SpecGatherer extends AutoService {
     }
 
     foreach ($this->specProviders as $provider) {
-      if ($provider->applies($entity, $action)) {
+      if ($provider->applies($entity, $action, $specification->getValues())) {
         $provider->modifySpec($specification);
       }
     }
@@ -75,58 +77,56 @@ class SpecGatherer extends AutoService {
   /**
    * @param \Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface $provider
    */
-  public function addSpecProvider(SpecProviderInterface $provider) {
+  public function addSpecProvider(SpecProviderInterface $provider): void {
     $this->specProviders[] = $provider;
   }
 
   /**
-   * @param string $entity
+   * @param string $entityName
    * @param string $action
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    * @param array $values
    */
-  private function addDAOFields($entity, $action, RequestSpec $spec, array $values) {
-    $DAOFields = $this->getDAOFields($entity);
+  private function addDAOFields(string $entityName, string $action, RequestSpec $spec, array $values) {
+    $DAOFields = $this->getDAOFields($entityName);
 
     foreach ($DAOFields as $DAOField) {
-      if ($DAOField['name'] == 'id' && $action == 'create') {
-        $DAOField['required'] = FALSE;
-      }
-      if (array_key_exists('contactType', $DAOField) && $spec->getValue('contact_type') && $DAOField['contactType'] != $spec->getValue('contact_type')) {
+      if (isset($DAOField['contactType']) && $spec->getValue('contact_type') && $DAOField['contactType'] !== $spec->getValue('contact_type')) {
         continue;
       }
       if (!empty($DAOField['component']) && !\CRM_Core_Component::isEnabled($DAOField['component'])) {
         continue;
       }
-      if ($DAOField['name'] == 'is_active' && empty($DAOField['default'])) {
-        $DAOField['default'] = '1';
-      }
-      $this->setDynamicFk($DAOField, $entity, $values);
-      $field = SpecFormatter::arrayToField($DAOField, $entity);
+      $this->setDynamicFk($DAOField, $values);
+      $field = SpecFormatter::arrayToField($DAOField, $entityName);
       $spec->addFieldSpec($field);
     }
   }
 
   /**
-   * Cleverly enables getFields to report dynamic FKs if a value is supplied for the entity type.
+   * Adds metadata about dynamic foreign key fields.
    *
-   * E.g. many tables have a DFK with a pair of `entity_table` and `entity_id` columns.
-   * If you supply a value for `entity_table`, then getFields will output the correct `fk_entity` for the `entity_id` field.
+   * E.g. some tables have a DFK with a pair of columns named `entity_table` and `entity_id`.
+   * This will gather the list of 'dfk_entities' to add as metadata to the e.g. `entity_id` column.
+   *
+   * Additionally, if $values contains a value for e.g. `entity_table`,
+   * then getFields will also output the corresponding `fk_entity` for the `entity_id` field.
    *
    * @param array $DAOField
-   * @param string $entityName
    * @param array $values
    */
-  private function setDynamicFk(array &$DAOField, string $entityName, array $values): void {
-    if (empty($field['FKClassName']) && $values) {
-      $bao = CoreUtil::getBAOFromApiName($entityName);
-      // Check all dynamic FKs for entity for a match with this field and a supplied value
-      foreach ($bao::getReferenceColumns() ?? [] as $reference) {
-        if ($reference instanceof \CRM_Core_Reference_Dynamic
-          && $reference->getReferenceKey() === $DAOField['name']
-          && array_key_exists($reference->getTypeColumn(), $values)
-        ) {
-          $DAOField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getClassForTable($values[$reference->getTypeColumn()]);
+  private function setDynamicFk(array &$DAOField, array $values): void {
+    if (empty($DAOField['FKClassName']) && !empty($DAOField['bao']) && $DAOField['type'] == \CRM_Utils_Type::T_INT) {
+      // Check if this field is a key for a dynamic FK
+      foreach ($DAOField['bao']::getReferenceColumns() ?? [] as $reference) {
+        if ($reference instanceof \CRM_Core_Reference_Dynamic && $reference->getReferenceKey() === $DAOField['name']) {
+          $entityTableColumn = $reference->getTypeColumn();
+          $DAOField['DFKEntities'] = $reference->getTargetEntities();
+          $DAOField['html']['controlField'] = $entityTableColumn;
+          // If we have a value for entity_table then this field can pretend to be a single FK too.
+          if (array_key_exists($entityTableColumn, $values)) {
+            $DAOField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getClassForTable($values[$entityTableColumn]);
+          }
           break;
         }
       }
@@ -138,17 +138,29 @@ class SpecGatherer extends AutoService {
    *
    * @param string $entity
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
+   * @param bool $checkPermissions
    * @throws \CRM_Core_Exception
    * @see \CRM_Core_SelectValues::customGroupExtends
    */
-  private function addCustomFields($entity, RequestSpec $spec) {
+  private function addCustomFields(string $entity, RequestSpec $spec, bool $checkPermissions) {
+    $values = $spec->getValues();
+
+    // Handle contact type pseudo-entities
+    $contactTypes = \CRM_Contact_BAO_ContactType::basicTypes();
+    // If contact type is given
+    if ($entity === 'Contact' && !empty($values['contact_type'])) {
+      $entity = $values['contact_type'];
+    }
+
     $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entity);
     if (!$customInfo) {
       return;
     }
-    $values = $spec->getValues();
     $extends = $customInfo['extends'];
     $grouping = $customInfo['grouping'];
+    if ($entity === 'Contact' || in_array($entity, $contactTypes, TRUE)) {
+      $grouping = 'contact_sub_type';
+    }
 
     $query = CustomField::get(FALSE)
       ->setSelect(['custom_group_id.name', 'custom_group_id.title', '*'])
@@ -156,17 +168,15 @@ class SpecGatherer extends AutoService {
       ->addWhere('custom_group_id.is_active', '=', TRUE)
       ->addWhere('custom_group_id.is_multiple', '=', FALSE);
 
-    // Contact custom groups are extra complicated because contact_type can be a value for extends
-    if ($entity === 'Contact') {
-      if (array_key_exists('contact_type', $values)) {
-        $extends = ['Contact'];
-        if ($values['contact_type']) {
-          $extends[] = $values['contact_type'];
-        }
+    // Enforce permissions
+    if ($checkPermissions && !\CRM_Core_Permission::customGroupAdmin()) {
+      $allowedGroups = \CRM_Core_Permission::customGroup();
+      if (!$allowedGroups) {
+        return;
       }
-      // Now grouping can be treated normally
-      $grouping = 'contact_sub_type';
+      $query->addWhere('custom_group_id', 'IN', $allowedGroups);
     }
+
     if (is_string($grouping) && array_key_exists($grouping, $values)) {
       if (empty($values[$grouping])) {
         $query->addWhere('custom_group_id.extends_entity_column_value', 'IS EMPTY');

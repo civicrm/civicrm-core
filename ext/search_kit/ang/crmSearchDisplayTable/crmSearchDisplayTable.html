@@ -2,18 +2,18 @@
   <div class="alert alert-info crm-search-display-description" ng-if="$ctrl.settings.description">{{:: $ctrl.settings.description }}</div>
   <div class="form-inline">
     <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'" ng-if="$ctrl.settings.button"></div>
-    <crm-search-tasks ng-if="$ctrl.settings.actions" entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" search="$ctrl.search" display="$ctrl.display" display-controller="$ctrl" refresh="$ctrl.refreshAfterTask()"></crm-search-tasks>
+    <crm-search-tasks-menu ng-if="$ctrl.settings.actions && $ctrl.taskManager" ids="$ctrl.selectedRows" task-manager="$ctrl.taskManager"></crm-search-tasks-menu>
     <span ng-if="$ctrl.settings.headerCount" ng-include="'~/crmSearchDisplay/ResultCount.html'"></span>
-    <div class="btn-group pull-right" ng-include="'~/crmSearchDisplay/AddButton.html'" ng-if="$ctrl.settings.addButton.path"></div>
+    <div class="btn-group pull-right" ng-include="'~/crmSearchDisplay/toolbar.html'" ng-if="$ctrl.toolbar"></div>
   </div>
   <table class="{{:: $ctrl.settings.classes.join(' ') }}">
     <thead>
       <tr>
         <th ng-class="{'crm-search-result-select': $ctrl.settings.actions}" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTaskHeader.html'" ng-if=":: $ctrl.hasExtraFirstColumn()">
         </th>
-        <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" class="{{:: $ctrl.isSortable(col) ? 'crm-sortable-col' : ''}}" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
-          <i ng-if=":: $ctrl.isSortable(col)" class="crm-i {{ $ctrl.getSort(col) }}"></i>
-          <span>{{:: col.label }}</span>
+        <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" class="{{:: $ctrl.isSortable(col) ? 'crm-sortable-col' : ''}} {{:: col.alignment }}" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
+          <i ng-if=":: $ctrl.isSortable(col)" class="crm-i crm-search-table-column-sort-icon {{ $ctrl.getSort(col) }}"></i>
+          <span class="crm-search-display-table-column-label">{{:: col.label }}</span>
         </th>
       </tr>
     </thead>

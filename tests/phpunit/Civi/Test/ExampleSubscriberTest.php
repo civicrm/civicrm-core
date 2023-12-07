@@ -69,16 +69,16 @@ class ExampleSubscriberTest extends \PHPUnit\Framework\TestCase implements Headl
     $content .= ' ' . __FUNCTION__;
   }
 
-  public function testPageOutput() {
+  public function testPageOutput(): void {
     ob_start();
     $p = new Main();
     $p->run();
     $content = ob_get_contents();
     ob_end_clean();
-    $this->assertRegExp(';myAlterContentObject myAlterContentParams;', $content);
+    $this->assertMatchesRegularExpression(';myAlterContentObject myAlterContentParams;', $content);
   }
 
-  public function testGetFields() {
+  public function testGetFields(): void {
     $this->assertEquals([], $this->tracker['civi.api.resolve']);
     $this->assertEquals([], $this->tracker['civi.api.prepare']);
     \civicrm_api3('Contact', 'getfields', []);

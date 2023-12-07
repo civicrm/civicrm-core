@@ -41,7 +41,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $this->_docTypes = CRM_Core_SelectValues::documentApplicationType();
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
-      array($this, 'hook_alterMailParams'));
+      [$this, 'hook_alterMailParams']);
   }
 
   /**
@@ -159,7 +159,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     ];
 
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter');
-    [$contributions, $contacts] = $form->buildContributionArray('contact_id', $contributionIDs, $returnProperties, TRUE, TRUE, $messageToken, 'test', '**', FALSE);
+    [$contributions, $contacts] = $form->buildContributionArray('contact_id', $contributionIDs, $returnProperties, $messageToken, '**', FALSE);
 
     $this->assertEquals('Anthony', $contacts[$this->_individualId]['first_name']);
     $this->assertEquals('Donation', $contributions[$result['id']]['financial_type']);

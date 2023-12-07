@@ -195,6 +195,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=view&context=%%cxt%%&selectedChild=member' . $extraParams,
           'title' => ts('View Membership'),
+          'weight' => -20,
         ],
       ];
     }
@@ -205,24 +206,28 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Edit Membership'),
+          'weight' => -10,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Delete Membership'),
+          'weight' => 100,
         ],
         CRM_Core_Action::RENEW => [
           'name' => ts('Renew'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&action=renew&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Renew Membership'),
+          'weight' => 40,
         ],
         CRM_Core_Action::FOLLOWUP => [
           'name' => ts('Renew-Credit Card'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=renew&reset=1&cid=%%cid%%&id=%%id%%&context=%%cxt%%&mode=live' . $extraParams,
           'title' => ts('Renew Membership Using Credit Card'),
+          'weight' => 50,
         ],
       ];
       if (!$isPaymentProcessor || !$accessContribution) {
@@ -240,6 +245,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         'url' => 'civicrm/contribute/unsubscribe',
         'qs' => 'reset=1&mid=%%id%%&context=%%cxt%%' . $extraParams,
         'title' => ts('Cancel Auto Renew Subscription'),
+        'weight' => 40,
       ];
     }
     elseif (isset(self::$_links['all'][CRM_Core_Action::DISABLE])) {
@@ -477,17 +483,17 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'direction' => CRM_Utils_Sort::DESCENDING,
         ],
         [
-          'name' => ts('Start Date'),
+          'name' => ts('Membership Start Date'),
           'sort' => 'membership_start_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         [
-          'name' => ts('End Date'),
+          'name' => ts('Membership Expiration Date'),
           'sort' => 'membership_end_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         [
-          'name' => ts('Source'),
+          'name' => ts('Membership Source'),
           'sort' => 'membership_source',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],

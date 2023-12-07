@@ -21,7 +21,7 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
    * Test that the list of the contact's joined groups, on the Contact Dashboard,
    * contains the correct groups.
    */
-  public function testBrowseDisplaysCorrectListOfAddedGroups() {
+  public function testBrowseDisplaysCorrectListOfAddedGroups(): void {
     // create admin-only non-smart group
     $adminStdGroupTitle = 'The Admin-only Std Group';
     $adminStdGroup = $this->callAPISuccess('Group', 'create', [
@@ -96,7 +96,7 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
    * Test that the select list of available groups, on the Contact Dashboard,
    * contains the correct groups.
    */
-  public function testBrowseDisplaysCorrectListOfAVailableGroups() {
+  public function testBrowseDisplaysCorrectListOfAVailableGroups(): void {
 
     // create admin-only non-smart group
     $adminStdGroupTitle = 'The Admin-only Std Group' . uniqid();

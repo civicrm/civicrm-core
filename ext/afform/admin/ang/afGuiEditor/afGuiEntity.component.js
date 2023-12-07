@@ -103,6 +103,7 @@
               item['af-join'] = block.join_entity;
               item['#children'] = [{"#tag": directive}];
               item['af-repeat'] = ts('Add');
+              item['af-copy'] = ts('Copy');
               item.min = '1';
               if (typeof joinEntity.repeat_max === 'number') {
                 item.max = '' + joinEntity.repeat_max;

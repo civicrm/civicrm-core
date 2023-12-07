@@ -48,7 +48,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testDefaultValues() {
+  public function testDefaultValues(): void {
     $this->createCustomGroupWithFieldOfType([], 'int');
     $sg = new CRM_Contact_Form_Search_Advanced();
     $sg->controller = new CRM_Core_Controller();
@@ -83,7 +83,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testGetFormValuesWithCustomFields() {
+  public function testGetFormValuesWithCustomFields(): void {
     $this->createCustomGroupWithFieldsOfAllTypes();
     $sg = new CRM_Contact_Form_Search_Advanced();
     $sg->controller = new CRM_Core_Controller();
@@ -127,7 +127,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    * Test if skipped elements are correctly
    * stored and retrieved as formvalues.
    */
-  public function testSkippedElements() {
+  public function testSkippedElements(): void {
     $relTypeID = $this->relationshipTypeCreate();
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $formValues = [

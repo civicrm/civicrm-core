@@ -31,6 +31,7 @@
     <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
     <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
   </div>
+  <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
   <div class="form-inline">
     <div class="checkbox-inline form-control" title="{{:: ts('Shows grand totals or other statistics, configured per-column.') }}">
       <label>

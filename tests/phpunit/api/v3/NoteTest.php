@@ -27,7 +27,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction(TRUE);
 
-    $this->_contactID = $this->organizationCreate(NULL);
+    $this->_contactID = $this->organizationCreate();
     $this->_createdDate = date('Y-m-d H:i:s', strtotime('-10 years'));
 
     $this->_params = [
@@ -42,6 +42,26 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     ];
     $this->_note = $this->noteCreate($this->_contactID);
     $this->_noteID = $this->_note['id'];
+  }
+
+  /**
+   * Create note.
+   *
+   * @param int $contactID
+   *
+   * @return array
+   */
+  public function noteCreate(int $contactID): array {
+    $params = [
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $contactID,
+      'note' => 'hello I am testing Note',
+      'contact_id' => $contactID,
+      'modified_date' => date('Ymd'),
+      'subject' => 'Test Note',
+    ];
+
+    return $this->callAPISuccess('Note', 'create', $params);
   }
 
   ///////////////// civicrm_note_get methods
@@ -85,7 +105,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_contact',
       'entity_id' => $entityId,
     ];
-    $this->callAPIAndDocument('note', 'get', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('note', 'get', $params);
   }
 
   /**
@@ -139,7 +159,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   public function testCreate($version) {
     $this->_apiversion = $version;
 
-    $result = $this->callAPIAndDocument('note', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('note', 'create', $this->_params);
     $this->assertEquals($result['values'][$result['id']]['note'], 'Hello!!! m testing Note');
     $this->assertEquals(date('Y-m-d', strtotime($this->_createdDate)), date('Y-m-d', strtotime($result['values'][$result['id']]['created_date'])));
     $this->assertEquals(date('Y-m-d', strtotime($this->_createdDate)), date('Y-m-d', strtotime($result['values'][$result['id']]['note_date'])));
@@ -249,7 +269,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
    *
    * Error expected.
    */
-  public function testDeleteWithEmptyParams() {
+  public function testDeleteWithEmptyParams(): void {
     $this->callAPIFailure('note', 'delete', [], 'Mandatory key(s) missing from params array: id');
   }
 
@@ -281,10 +301,10 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'id' => $additionalNote['id'],
     ];
 
-    $this->callAPIAndDocument('note', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('note', 'delete', $params);
   }
 
-  public function testNoteJoin() {
+  public function testNoteJoin(): void {
     $org = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Organization',
       'organization_name' => 'Org123',
@@ -302,22 +322,12 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->assertEquals('Hello join', $result['note']);
     // This should return no results by restricting contact_type
     $result = $this->callAPISuccess('Note', 'get', [
-      'return' => ["entity_id.organization_name"],
+      'return' => ['entity_id.organization_name'],
       'entity_id' => $org['id'],
-      'entity_table' => "civicrm_contact",
-      'entity_id.contact_type' => "Individual",
+      'entity_table' => 'civicrm_contact',
+      'entity_id.contact_type' => 'Individual',
     ]);
     $this->assertEquals(0, $result['count']);
   }
 
-}
-
-/**
- * Test civicrm note create() using example code.
- */
-function testNoteCreateExample() {
-  require_once 'api/v3/examples/Note/Create.ex.php';
-  $result = Note_get_example();
-  $expectedResult = Note_get_expectedresult();
-  $this->assertEquals($result, $expectedResult);
 }

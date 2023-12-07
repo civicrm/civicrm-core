@@ -59,15 +59,15 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       $importKeys[] = $mapperPart;
     }
     // FIXME: should use the schema titles, not redeclare them
-    $requiredFields = array(
+    $requiredFields = [
       'membership_contact_id' => ts('Contact ID'),
       'membership_type_id' => ts('Membership Type'),
       'membership_start_date' => ts('Membership Start Date'),
-    );
-    $params = array(
+    ];
+    $params = [
       'used' => 'Unsupervised',
       'contact_type' => $self->getContactType(),
-    );
+    ];
     [$ruleFields, $threshold] = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
     $weightSum = 0;
     foreach ($importKeys as $key => $val) {
@@ -93,17 +93,17 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
           if (!isset($errors['_qf_default'])) {
             $errors['_qf_default'] = '';
           }
-          $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
+          $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [
             1 => $threshold,
-          )) . ' ' . ts('(OR Membership ID if update mode.)') . '<br />';
+          ]) . ' ' . ts('(OR Membership ID if update mode.)') . '<br />';
         }
         else {
           if (!isset($errors['_qf_default'])) {
             $errors['_qf_default'] = '';
           }
-          $errors['_qf_default'] .= ts('Missing required field: %1', array(
+          $errors['_qf_default'] .= ts('Missing required field: %1', [
             1 => $title,
-          )) . '<br />';
+          ]) . '<br />';
         }
       }
     }

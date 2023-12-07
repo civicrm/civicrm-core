@@ -53,7 +53,7 @@ return [
     'table' => 'civicrm_translation',
   ],
   'CRM_Core_DAO_Worldregion' => [
-    'name' => 'Worldregion',
+    'name' => 'WorldRegion',
     'class' => 'CRM_Core_DAO_Worldregion',
     'table' => 'civicrm_worldregion',
   ],
@@ -66,11 +66,6 @@ return [
     'name' => 'PrevNextCache',
     'class' => 'CRM_Core_DAO_PrevNextCache',
     'table' => 'civicrm_prevnext_cache',
-  ],
-  'CRM_Core_DAO_ActionMapping' => [
-    'name' => 'ActionMapping',
-    'class' => 'CRM_Core_DAO_ActionMapping',
-    'table' => 'civicrm_action_mapping',
   ],
   'CRM_Core_DAO_RecurringEntity' => [
     'name' => 'RecurringEntity',
@@ -592,9 +587,9 @@ return [
     'class' => 'CRM_Mailing_DAO_MailingGroup',
     'table' => 'civicrm_mailing_group',
   ],
-  'CRM_Mailing_DAO_TrackableURL' => [
-    'name' => 'TrackableURL',
-    'class' => 'CRM_Mailing_DAO_TrackableURL',
+  'CRM_Mailing_DAO_MailingTrackableURL' => [
+    'name' => 'MailingTrackableURL',
+    'class' => 'CRM_Mailing_DAO_MailingTrackableURL',
     'table' => 'civicrm_mailing_trackable_url',
   ],
   'CRM_Mailing_DAO_MailingJob' => [
@@ -642,9 +637,9 @@ return [
     'class' => 'CRM_Mailing_Event_DAO_MailingEventReply',
     'table' => 'civicrm_mailing_event_reply',
   ],
-  'CRM_Mailing_Event_DAO_MailingEventClickThrough' => [
-    'name' => 'MailingEventClickThrough',
-    'class' => 'CRM_Mailing_Event_DAO_MailingEventClickThrough',
+  'CRM_Mailing_Event_DAO_MailingEventTrackableURLOpen' => [
+    'name' => 'MailingEventTrackableURLOpen',
+    'class' => 'CRM_Mailing_Event_DAO_MailingEventTrackableURLOpen',
     'table' => 'civicrm_mailing_event_trackable_url_open',
   ],
   'CRM_Mailing_Event_DAO_MailingEventUnsubscribe' => [

@@ -3,18 +3,20 @@
 /**
  * Class CRM_Afform_AfformScanner
  *
- * The AfformScanner searches the extensions and `civicrm.files` for subfolders
- * named `afform`. Each item in there is interpreted as a form instance.
+ * The AfformScanner searches the `ang` directory of extensions and `civicrm.files` for files
+ * named `*.aff.*`. Each item is interpreted as a form instance.
  *
  * To reduce file-scanning, we keep a cache of file paths.
  */
 class CRM_Afform_AfformScanner {
 
-  const METADATA_FILE = 'aff.json';
+  const METADATA_JSON = 'aff.json';
+
+  const METADATA_PHP = 'aff.php';
 
   const LAYOUT_FILE = 'aff.html';
 
-  const FILE_REGEXP = '/\.aff\.(json|html)$/';
+  const FILE_REGEXP = '/\.aff\.(json|html|php)$/';
 
   const DEFAULT_REQUIRES = 'afCore';
 
@@ -34,7 +36,7 @@ class CRM_Afform_AfformScanner {
    * Get a list of all forms and their file paths.
    *
    * @return array
-   *   Ex: ['view-individual' => ['/var/www/foo/afform/view-individual']]
+   *   Ex: ['afformViewIndividual' => ['/var/www/foo/ang/afformViewIndividual']]
    */
   public function findFilePaths(): array {
     if ($this->isUseCachedPaths()) {
@@ -58,6 +60,9 @@ class CRM_Afform_AfformScanner {
       }
     }
 
+    // Scan core ang/afform directory
+    $this->appendFilePaths($paths, Civi::paths()->getPath('[civicrm.root]/ang/afform'), 'civicrm');
+    // Scan uploads/files directory
     $this->appendFilePaths($paths, $this->getSiteLocalPath(), '');
 
     if ($this->isUseCachedPaths()) {
@@ -81,16 +86,16 @@ class CRM_Afform_AfformScanner {
   }
 
   /**
-   * Get the full path to the given file.
+   * Get the absolute path to the given file.
    *
    * @param string $formName
-   *   Ex: 'view-individual'
+   *   Ex: 'afformViewIndividual'
    * @param string $suffix
    *   Ex: 'aff.json'
    * @return string|NULL
-   *   Ex: '/var/www/sites/default/files/civicrm/afform/view-individual.aff.json'
+   *   Ex: '/var/www/sites/default/files/civicrm/ang/afform/afformViewIndividual.aff.json'
    */
-  public function findFilePath($formName, $suffix) {
+  public function findFilePath(string $formName, string $suffix): ?string {
     $paths = $this->findFilePaths();
 
     if (isset($paths[$formName])) {
@@ -105,69 +110,70 @@ class CRM_Afform_AfformScanner {
   }
 
   /**
-   * Determine the path where we can write our own customized/overriden
+   * Determine the path where we can write our own customized/overridden
    * version of a file.
    *
    * @param string $formName
-   *   Ex: 'view-individual'
-   * @param string $file
+   *   Ex: 'afformViewIndividual'
+   * @param string $fileType
    *   Ex: 'aff.json'
-   * @return string|NULL
-   *   Ex: '/var/www/sites/default/files/civicrm/afform/view-individual.aff.json'
+   * @return string
+   *   Ex: '/var/www/sites/default/files/civicrm/afform/afformViewIndividual.aff.json'
    */
-  public function createSiteLocalPath($formName, $file) {
-    return $this->getSiteLocalPath() . DIRECTORY_SEPARATOR . $formName . '.' . $file;
+  public function createSiteLocalPath(string $formName, string $fileType): string {
+    return $this->getSiteLocalPath() . DIRECTORY_SEPARATOR . $formName . '.' . $fileType;
   }
 
-  public function clear() {
+  public function clear(): void {
     $this->cache->delete('afformAllPaths');
   }
 
   /**
-   * Get the effective metadata for a form.
+   * Get metadata and optionally the layout for a file-based Afform.
    *
    * @param string $name
-   *   Ex: 'view-individual'
-   * @return array
-   *   An array with some mix of the following keys: name, title, description, server_route, requires, is_public.
-   *   NOTE: This is only data available in *.aff.json. It does *NOT* include layout.
-   *   Ex: [
-   *     'name' => 'view-individual',
-   *     'title' => 'View an individual contact',
-   *     'server_route' => 'civicrm/view-individual',
-   *     'requires' => ['afform'],
-   *   ]
+   *   Ex: 'afformViewIndividual'
+   * @param bool $getLayout
+   *   Whether to fetch 'layout' from the related html file.
+   * @return array|null
+   *   An array with some mix of the keys supported by getFields
+   * @see \Civi\Api4\Afform::getFields
    */
-  public function getMeta($name) {
-    // FIXME error checking
+  public function getMeta(string $name, bool $getLayout = FALSE): ?array {
+    $defn = [];
+    $mtime = NULL;
 
-    $defaults = [
-      'name' => $name,
-      'requires' => [],
-      'title' => '',
-      'description' => '',
-      'is_dashlet' => FALSE,
-      'is_public' => FALSE,
-      'is_token' => FALSE,
-      'permission' => 'access CiviCRM',
-      'type' => 'system',
-    ];
+    $jsonFile = $this->findFilePath($name, self::METADATA_JSON);
+    $htmlFile = $this->findFilePath($name, self::LAYOUT_FILE);
 
-    $metaFile = $this->findFilePath($name, self::METADATA_FILE);
-    if ($metaFile !== NULL) {
-      $r = array_merge($defaults, json_decode(file_get_contents($metaFile), 1));
-      // Previous revisions of GUI allowed permission==''. array_merge() doesn't catch all forms of missing-ness.
-      if ($r['permission'] === '') {
-        $r['permission'] = $defaults['permission'];
-      }
-      return $r;
+    // Meta file can be either php or json format.
+    // Json takes priority because local overrides are always saved in that format.
+    if ($jsonFile !== NULL) {
+      $defn = json_decode(file_get_contents($jsonFile), 1);
+      $mtime = filemtime($jsonFile);
     }
-    elseif ($this->findFilePath($name, self::LAYOUT_FILE)) {
-      return $defaults;
-    }
+    // Extensions may provide afform definitions in php files
     else {
+      $phpFile = $this->findFilePath($name, self::METADATA_PHP);
+      if ($phpFile !== NULL) {
+        $defn = include $phpFile;
+        $mtime = filemtime($phpFile);
+      }
+    }
+    if ($htmlFile !== NULL) {
+      $mtime = max($mtime, filemtime($htmlFile));
+      if ($getLayout) {
+        // If the defn file included a layout, the html file overrides
+        $defn['layout'] = file_get_contents($htmlFile);
+      }
+    }
+    // All 3 files don't exist!
+    elseif (!$defn) {
       return NULL;
     }
+    $defn['name'] = $name;
+    $defn['modified_date'] = date('Y-m-d H:i:s', $mtime);
+    return $defn;
   }
 
   /**
@@ -175,9 +181,9 @@ class CRM_Afform_AfformScanner {
    *
    * @param array $record
    */
-  public function addComputedFields(&$record) {
+  public function addComputedFields(array &$record) {
     $name = $record['name'];
-    // Ex: $allPaths['viewIndividual']['org.civicrm.foo'] == '/var/www/foo/afform/view-individual'].
+    // Ex: $allPaths['viewIndividual']['org.civicrm.foo'] == '/var/www/foo/ang/afformViewIndividual'].
     $allPaths = $this->findFilePaths()[$name] ?? [];
     // Empty string key refers to the site local path
     $record['has_local'] = isset($allPaths['']);
@@ -188,26 +194,23 @@ class CRM_Afform_AfformScanner {
   }
 
   /**
-   * @param string $formName
-   *   Ex: 'view-individual'
-   * @return string|NULL
-   *   Ex: '<em>Hello world!</em>'
-   *   NULL if no layout exists
+   * @deprecated unused function
    */
   public function getLayout($formName) {
+    CRM_Core_Error::deprecatedFunctionWarning('APIv4');
     $filePath = $this->findFilePath($formName, self::LAYOUT_FILE);
     return $filePath === NULL ? NULL : file_get_contents($filePath);
   }
 
   /**
-   * Get the effective metadata for all forms.
+   * Get the effective metadata for all file-based forms.
    *
    * @return array
    *   A list of all forms, keyed by form name.
-   *   NOTE: This is only data available in *.aff.json. It does *NOT* include layout.
-   *   Ex: ['view-individual' => ['title' => 'View an individual contact', ...]]
+   *   NOTE: This is only data available in *.aff.(json|php) files. It does *NOT* include layout.
+   *   Ex: ['afformViewIndividual' => ['title' => 'View an individual contact', ...]]
    */
-  public function getMetas() {
+  public function getMetas(): array {
     $result = [];
     foreach (array_keys($this->findFilePaths()) as $name) {
       $result[$name] = $this->getMeta($name);
@@ -216,7 +219,7 @@ class CRM_Afform_AfformScanner {
   }
 
   /**
-   * @param array $formPaths
+   * @param array[] $formPaths
    *   List of all form paths.
    *   Ex: ['foo' => [0 => '/var/www/org.example.foobar/ang']]
    * @param string $parent
@@ -224,7 +227,7 @@ class CRM_Afform_AfformScanner {
    * @param string $module
    *   Name of module or '' empty string for local files.
    */
-  private function appendFilePaths(&$formPaths, $parent, $module) {
+  private function appendFilePaths(array &$formPaths, string $parent, string $module) {
     $files = preg_grep(self::FILE_REGEXP, (array) glob("$parent/*"));
 
     foreach ($files as $file) {
@@ -239,24 +242,13 @@ class CRM_Afform_AfformScanner {
   /**
    * Get the path where site-local form customizations are stored.
    *
-   * @return mixed|string
+   * @return string
    *   Ex: '/var/www/sites/default/files/civicrm/afform'.
    */
-  public function getSiteLocalPath() {
+  public function getSiteLocalPath(): string {
     // TODO Allow a setting override.
     // return Civi::paths()->getPath(Civi::settings()->get('afformPath'));
     return Civi::paths()->getPath('[civicrm.files]/ang');
-  }
-
-  /**
-   * @return string
-   */
-  private function getMarkerRegexp() {
-    static $v;
-    if ($v === NULL) {
-      $v = '/\.(' . preg_quote(self::LAYOUT_FILE, '/') . '|' . preg_quote(self::METADATA_FILE, '/') . ')$/';
-    }
-    return $v;
   }
 
 }

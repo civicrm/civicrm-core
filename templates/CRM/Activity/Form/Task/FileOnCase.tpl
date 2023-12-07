@@ -8,22 +8,14 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-form crm-form-block crm-file-on-case-form-block">
-<div class="help">
-   {ts}File on Case{/ts}
-</div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-   <table class="form-layout-compressed">
-      <tr class="crm-file-on-case-form-block-unclosed_cases">
-         <td class="label">
-           {$form.unclosed_case_id.label}
-         </td>
-         <td>
-           {$form.unclosed_case_id.html}<br />
-         </td>
-      </tr>
-     <tr>
-        {include file="CRM/Activity/Form/Task.tpl"}
-     </tr>
-</table>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  <table class="form-layout-compressed">
+    <tr class="crm-file-on-case-form-block-unclosed_cases">
+      <td class="label">{$form.unclosed_case_id.label}</td>
+      <td>{$form.unclosed_case_id.html}</td>
+    </tr>
+    <tr>
+      {include file="CRM/Activity/Form/Task.tpl"}
+    </tr>
+  </table>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

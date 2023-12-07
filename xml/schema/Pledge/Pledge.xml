@@ -310,6 +310,7 @@
     <type>int unsigned</type>
     <html>
       <type>Select</type>
+      <label>Status</label>
     </html>
     <pseudoconstant>
       <optionGroupName>pledge_status</optionGroupName>
@@ -351,7 +352,7 @@
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
-      <prefetch>FALSE</prefetch>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
   </field>
   <foreignKey>

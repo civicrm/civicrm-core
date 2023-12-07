@@ -56,17 +56,13 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_Navigation', $id, 'is_active', $is_active);
   }
 
@@ -78,36 +74,30 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @return CRM_Core_DAO_Navigation
    */
   public static function add(&$params) {
-    $navigation = new CRM_Core_DAO_Navigation();
     if (empty($params['id'])) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['has_separator'] = CRM_Utils_Array::value('has_separator', $params, FALSE);
+      $params['is_active'] = $params['is_active'] ?? FALSE;
+      $params['has_separator'] = $params['has_separator'] ?? FALSE;
       $params['domain_id'] = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
     }
 
     if (!isset($params['id']) ||
-      (CRM_Utils_Array::value('parent_id', $params) != CRM_Utils_Array::value('current_parent_id', $params))
+      (($params['parent_id'] ?? NULL) != ($params['current_parent_id'] ?? NULL))
     ) {
       /* re/calculate the weight, if the Parent ID changed OR create new menu */
 
-      if ($navName = CRM_Utils_Array::value('name', $params)) {
+      $navName = $params['name'] ?? NULL;
+      $navLabel = $params['label'] ?? NULL;
+      if ($navName) {
         $params['name'] = $navName;
       }
-      elseif ($navLabel = CRM_Utils_Array::value('label', $params)) {
+      elseif ($navLabel) {
         $params['name'] = $navLabel;
       }
 
       $params['weight'] = self::calculateWeight(CRM_Utils_Array::value('parent_id', $params));
     }
 
-    if (array_key_exists('permission', $params) && is_array($params['permission'])) {
-      $params['permission'] = implode(',', $params['permission']);
-    }
-
-    $navigation->copyValues($params);
-
-    $navigation->save();
-    return $navigation;
+    return self::writeRecord($params);
   }
 
   /**
@@ -177,7 +167,8 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
       $domainID = CRM_Core_Config::domainID();
       $query = "
 SELECT id, label, parent_id, weight, is_active, name
-FROM civicrm_navigation WHERE domain_id = $domainID";
+FROM civicrm_navigation WHERE domain_id = $domainID
+ORDER BY weight";
       $result = CRM_Core_DAO::executeQuery($query);
 
       $pidGroups = [];
@@ -514,11 +505,11 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
         break;
 
       case "rename":
-        self::processRename($nodeID, $label);
+        self::writeRecord(['id' => $nodeID, 'label' => $label]);
         break;
 
       case "delete":
-        self::processDelete($nodeID);
+        self::deleteRecord(['id' => $nodeID]);
         break;
     }
 
@@ -579,8 +570,6 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       $incrementOtherNodes = FALSE;
     }
 
-    $transaction = new CRM_Core_Transaction();
-
     // now update the existing nodes to weight + 1, if required.
     if ($incrementOtherNodes) {
       $query = "UPDATE civicrm_navigation SET weight = weight + 1
@@ -589,11 +578,8 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       CRM_Core_DAO::executeQuery($query);
     }
 
-    // finally set the weight of current node
-    $query = "UPDATE civicrm_navigation SET weight = {$newWeight}, parent_id = {$newParentID} WHERE id = {$nodeID}";
-    CRM_Core_DAO::executeQuery($query);
-
-    $transaction->commit();
+    // finally set the weight and parent of current node
+    self::writeRecord(['id' => $nodeID, 'weight' => $newWeight, 'parent_id' => $newParentID]);
   }
 
   /**
@@ -601,19 +587,22 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    *
    * @param int $nodeID
    * @param $label
+   * @deprecated  - use API
    */
   public static function processRename($nodeID, $label) {
-    CRM_Core_DAO::setFieldValue('CRM_Core_DAO_Navigation', $nodeID, 'label', $label);
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    self::writeRecord(['id' => $nodeID, 'label' => $label]);
   }
 
   /**
    * Process delete action for tree.
    *
    * @param int $nodeID
+   * @deprecated - use API
    */
   public static function processDelete($nodeID) {
-    $query = "DELETE FROM civicrm_navigation WHERE id = {$nodeID}";
-    CRM_Core_DAO::executeQuery($query);
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    self::deleteRecord(['id' => $nodeID]);
   }
 
   /**
@@ -834,7 +823,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     }
     $params = [
       'name' => $name,
-      'label' => ts($name),
+      'label' => _ts($name),
       'url' => $url,
       'parent_id' => $parent_id,
       'is_active' => TRUE,
@@ -891,34 +880,35 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    */
   public static function buildHomeMenu(&$menu) {
     foreach ($menu as &$item) {
-      if (CRM_Utils_Array::value('name', $item['attributes']) === 'Home') {
+      if (($item['attributes']['name'] ?? NULL) === 'Home') {
         unset($item['attributes']['label'], $item['attributes']['url']);
         $item['attributes']['icon'] = 'crm-logo-sm';
         $item['attributes']['attr']['accesskey'] = 'm';
-        $item['child'] = [
-          [
-            'attributes' => [
-              'label' => ts('CiviCRM Home'),
-              'name' => 'CiviCRM Home',
-              'url' => 'civicrm/dashboard?reset=1',
-              'weight' => 1,
-            ],
+        $item['child'] = [];
+        $item['child'][] = [
+          'attributes' => [
+            'label' => ts('CiviCRM Home'),
+            'name' => 'CiviCRM Home',
+            'url' => 'civicrm/dashboard?reset=1',
+            'weight' => 1,
           ],
-          [
+        ];
+        if (CIVICRM_UF !== 'Standalone') {
+          $item['child'][] = [
             'attributes' => [
               'label' => ts('Hide Menu'),
               'name' => 'Hide Menu',
               'url' => '#hidemenu',
               'weight' => 2,
             ],
-          ],
-          [
-            'attributes' => [
-              'label' => ts('Log out'),
-              'name' => 'Log out',
-              'url' => 'civicrm/logout?reset=1',
-              'weight' => 3,
-            ],
+          ];
+        }
+        $item['child'][] = [
+          'attributes' => [
+            'label' => ts('Log out'),
+            'name' => 'Log out',
+            'url' => 'civicrm/logout?reset=1',
+            'weight' => 3,
           ],
         ];
         return;

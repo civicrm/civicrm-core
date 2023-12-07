@@ -102,6 +102,12 @@
      <weight>25</weight>
   </item>
   <item>
+     <path>civicrm/admin/uf/group/copy</path>
+     <title>Profile Copy</title>
+     <page_callback>CRM_UF_Page_Group</page_callback>
+     <weight>26</weight>
+  </item>
+  <item>
      <path>civicrm/admin/uf/group/setting</path>
      <title>AdditionalInfo Form</title>
      <page_callback>CRM_UF_Form_AdvanceSetting</page_callback>
@@ -225,7 +231,7 @@
      <weight>95</weight>
   </item>
   <item>
-     <path>civicrm/admin/setting/preferences/date</path>
+     <path>civicrm/admin/setting/preferences/date/edit</path>
      <title>Date Preferences</title>
      <page_callback>CRM_Admin_Form_PreferencesDate</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
@@ -295,9 +301,16 @@
      <desc>Schedule Reminders.</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
      <access_callback>1</access_callback>
-     <access_arguments>administer CiviCRM data;edit all events</access_arguments>
+     <access_arguments>administer CiviCRM data</access_arguments>
      <adminGroup>Communications</adminGroup>
      <weight>40</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/scheduleReminders/edit</path>
+     <title>Schedule Reminders</title>
+     <page_callback>CRM_Admin_Form_ScheduleReminders</page_callback>
+     <access_callback>1</access_callback>
+     <access_arguments>administer CiviCRM data;edit all events</access_arguments>
   </item>
   <item>
      <path>civicrm/admin/weight</path>
@@ -313,11 +326,16 @@
   </item>
   <item>
      <path>civicrm/admin/labelFormats</path>
-     <title>Label Formats</title>
-     <desc>Configure Label Formats that are used when creating mailing labels.</desc>
+     <title>Label Page Formats</title>
+     <desc>Configure label sizes and page layouts that are used when printing mailing labels.</desc>
      <page_callback>CRM_Admin_Page_LabelFormats</page_callback>
      <adminGroup>Communications</adminGroup>
      <weight>60</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/labelFormats/edit</path>
+     <title>Label Page Formats</title>
+     <page_callback>CRM_Admin_Page_LabelFormats</page_callback>
   </item>
   <item>
      <path>civicrm/admin/pdfFormats</path>
@@ -588,6 +606,22 @@
      <weight>1370</weight>
   </item>
   <item>
+     <path>civicrm/admin/job/add</path>
+     <title>Add Scheduled Job</title>
+     <desc>Add a periodially running task.</desc>
+     <page_callback>CRM_Admin_Form_Job</page_callback>
+     <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/admin/job/edit</path>
+     <title>Edit Scheduled Job</title>
+     <desc>Edit a periodially running task.</desc>
+     <page_callback>CRM_Admin_Page_Job</page_callback>
+     <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
+     <adminGroup>System Settings</adminGroup>
+     <weight>1372</weight>
+  </item>
+  <item>
      <path>civicrm/admin/joblog</path>
      <title>Scheduled Jobs Log</title>
      <desc>Browsing the log of periodially running tasks.</desc>
@@ -613,7 +647,7 @@
   </item>
   <item>
      <path>civicrm/admin</path>
-     <title>Administer CiviCRM</title>
+     <title>Administer</title>
      <access_arguments>administer CiviCRM system,administer CiviCRM data,access CiviCRM</access_arguments>
      <page_type>1</page_type>
      <page_callback>CRM_Admin_Page_Admin</page_callback>
@@ -654,10 +688,21 @@
      <path_arguments>action=add</path_arguments>
   </item>
   <item>
+     <path>civicrm/admin/price/edit</path>
+     <title>Price Sets</title>
+     <page_callback>CRM_Price_Page_Set</page_callback>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+  </item>
+  <item>
      <path>civicrm/admin/price/field</path>
      <title>Price Fields</title>
      <page_callback>CRM_Price_Page_Field</page_callback>
      <skipBreadcrumb>true</skipBreadcrumb>
+  </item>
+  <item>
+     <path>civicrm/admin/price/field/edit</path>
+     <title>Price Fields</title>
+     <page_callback>CRM_Price_Page_Field</page_callback>
   </item>
   <item>
      <path>civicrm/admin/price/field/option</path>
@@ -665,14 +710,9 @@
      <page_callback>CRM_Price_Page_Option</page_callback>
   </item>
   <item>
-     <path>civicrm/ajax/mapping</path>
-     <page_callback>CRM_Admin_Page_AJAX::mappingList</page_callback>
-     <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/ajax/recipientListing</path>
-     <page_callback>CRM_Admin_Page_AJAX::recipientListing</page_callback>
-     <access_arguments>access CiviEvent,access CiviCRM</access_arguments>
+     <path>civicrm/admin/price/field/option/edit</path>
+     <title>Price Field Options</title>
+     <page_callback>CRM_Price_Page_Option</page_callback>
   </item>
   <item>
      <path>civicrm/admin/sms/provider</path>

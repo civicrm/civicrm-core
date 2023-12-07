@@ -40,7 +40,7 @@
  */
 function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
   static $results = [];
-  if ((CRM_Utils_Array::value('cache_clear', $apiRequest['params']))) {
+  if (!empty($apiRequest['params']['cache_clear'])) {
     $results = [];
     // we will also clear pseudoconstants here - should potentially be moved to relevant BAO classes
     CRM_Core_PseudoConstant::flush();
@@ -60,11 +60,11 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
   }
   $entity = $apiRequest['entity'];
   $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
-  $subentity    = $apiRequest['params']['contact_type'] ?? NULL;
+  $subentity = $apiRequest['params']['contact_type'] ?? NULL;
   $action = $apiRequest['params']['action'] ?? NULL;
   $sequential = empty($apiRequest['params']['sequential']) ? 0 : 1;
-  $apiRequest['params']['options'] = CRM_Utils_Array::value('options', $apiRequest['params'], []);
-  $optionsToResolve = (array) CRM_Utils_Array::value('get_options', $apiRequest['params']['options'], []);
+  $apiRequest['params']['options'] = $apiRequest['params']['options'] ?? [];
+  $optionsToResolve = (array) ($apiRequest['params']['options']['get_options'] ?? []);
 
   if (!$action || $action == 'getvalue' || $action == 'getcount') {
     $action = 'get';
@@ -279,7 +279,7 @@ function _civicrm_api3_generic_getfield_spec(&$params, $apiRequest) {
 function civicrm_api3_generic_getcount($apiRequest) {
   $apiRequest['params']['options']['is_count'] = TRUE;
   $result = civicrm_api($apiRequest['entity'], 'get', $apiRequest['params']);
-  if (is_numeric(CRM_Utils_Array::value('values', $result))) {
+  if (is_numeric($result['values'] ?? '')) {
     return (int) $result['values'];
   }
   if (!isset($result['count'])) {
@@ -477,7 +477,7 @@ function _civicrm_api3_generic_getoptions_spec(&$params, $apiRequest) {
     $params['field']['options'] = [];
     foreach ($fields['values'] as $name => $field) {
       if (isset($field['pseudoconstant']) || CRM_Utils_Array::value('type', $field) == CRM_Utils_Type::T_BOOLEAN) {
-        $params['field']['options'][$name] = CRM_Utils_Array::value('title', $field, $name);
+        $params['field']['options'][$name] = $field['title'] ?? $name;
       }
     }
   }

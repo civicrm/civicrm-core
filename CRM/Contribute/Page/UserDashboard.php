@@ -32,7 +32,9 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       // which the tpl can iterate through - this should allow us to cope with competing attempts to add new buttons
       // and allow extensions to assign new ones through the pageRun hook
       // We could check for balance_amount > 0 here? It feels more correct but this seems to be working.
-      if (in_array($row['contribution_status_id:name'], ['Pending', 'Partially paid'], TRUE)) {
+      if (in_array($row['contribution_status_id:name'], ['Pending', 'Partially paid'], TRUE)
+        && Civi::settings()->get('default_invoice_page')
+      ) {
         $row['buttons']['pay'] = [
           'class' => 'button',
           'label' => ts('Pay Now'),

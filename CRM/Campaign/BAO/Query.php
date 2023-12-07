@@ -176,7 +176,7 @@ class CRM_Campaign_BAO_Query {
 
       case 'campaign_search_voter_for':
         if (in_array($value, ['release', 'interview'])) {
-          $query->_where[$grouping][] = '(civicrm_activity.is_deleted = 0 OR civicrm_activity.is_deleted IS NULL)';
+          $query->_where[$grouping][] = 'civicrm_activity.is_deleted = 0';
         }
         return;
 
@@ -468,13 +468,21 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
       if ($searchVoterFor == 'reserve') {
         $operator = 'NOT IN';
         //filter out recontact survey contacts.
-        $recontactInterval = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey',
-          $surveyId, 'recontact_interval'
+        $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey',
+          $surveyId, 'result_id'
         );
-        $recontactInterval = CRM_Utils_String::unserialize($recontactInterval);
+        if ($optionGroupId) {
+          // Lookup intervals which are stored in option_value.filter column.
+          // FIXME: Keyed by label because civicrm_activity.result unfortunately stores the option_value.label!
+          $recontactInterval = \Civi\Api4\OptionValue::get(FALSE)
+            ->addSelect('label', 'filter')
+            ->addWhere('option_group_id', '=', $optionGroupId)
+            ->execute()
+            ->indexBy('label')->column('filter');
+        }
         if ($surveyId &&
-          is_array($recontactInterval) &&
-          !empty($recontactInterval)
+          !empty($recontactInterval) &&
+          is_array($recontactInterval)
         ) {
           $voterIds = [];
           foreach ($voterActValues as $values) {

@@ -37,6 +37,9 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
+      'match' => [
+        'name',
+      ],
     ],
   ],
   [
@@ -52,7 +55,7 @@ return [
         'saved_search_id.name' => 'Profile_Fields',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -61,6 +64,7 @@ return [
           'pager' => [
             'show_count' => TRUE,
             'expose_limit' => TRUE,
+            'hide_single' => TRUE,
           ],
           'placeholder' => 5,
           'sort' => [],
@@ -152,6 +156,24 @@ return [
                   'condition' => ['is_active', '=', TRUE],
                 ],
                 [
+                  'task' => 'enable',
+                  'entity' => 'UFField',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-on',
+                  'text' => E::ts('Enable'),
+                  'style' => 'default',
+                  'condition' => ['is_active', '=', FALSE],
+                ],
+                [
+                  'task' => 'disable',
+                  'entity' => 'UFField',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-off',
+                  'text' => E::ts('Disable'),
+                  'style' => 'default',
+                  'condition' => ['is_active', '=', TRUE],
+                ],
+                [
                   'entity' => 'UFField',
                   'action' => 'delete',
                   'join' => '',
@@ -163,16 +185,23 @@ return [
                   'condition' => [],
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
+              'icon' => 'fa-bars',
               'alignment' => 'text-right',
             ],
           ],
           'draggable' => 'weight',
           'button' => NULL,
-          'addButton' => [
-            'path' => 'civicrm/admin/uf/group/field/add?reset=1&action=add&gid=[uf_group_id]',
-            'text' => E::ts('Add Field'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'UFField',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Field'),
+              'icon' => 'fa-plus',
+              'autoOpen' => TRUE,
+            ],
           ],
           'cssRules' => [
             [
@@ -184,6 +213,10 @@ return [
           ],
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ],

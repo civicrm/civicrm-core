@@ -27,22 +27,22 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
   /**
    * @var int
    */
-  private $_job_id;
+  protected $_job_id;
 
   /**
    * @var int
    */
-  private $_queue_id;
+  protected $_queue_id;
 
   /**
    * @var string
    */
-  private $_hash;
+  protected $_hash;
 
   /**
    * @var string
    */
-  private $_email;
+  protected $_email;
 
   public function preProcess() {
     $this->_job_id = $job_id = CRM_Utils_Request::retrieve('jid', 'Integer', $this);
@@ -51,26 +51,37 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $isConfirm = CRM_Utils_Request::retrieveValue('confirm', 'Boolean', FALSE, FALSE, 'GET');
 
     if (!$job_id || !$queue_id || !$hash) {
-      throw new CRM_Core_Exception(ts('Missing Parameters'));
+      CRM_Utils_System::sendResponse(
+        new \GuzzleHttp\Psr7\Response(400, [], ts("Invalid request: missing parameters"))
+      );
     }
 
     // verify that the three numbers above match
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
     if (!$q) {
-      throw new CRM_Core_Exception(ts("There was an error in your request"));
+      CRM_Utils_System::sendResponse(
+        new \GuzzleHttp\Psr7\Response(400, [], ts("Invalid request: bad parameters"))
+      );
     }
 
     list($displayName, $email) = CRM_Mailing_Event_BAO_MailingEventQueue::getContactInfo($queue_id);
     $this->assign('display_name', $displayName);
+    $nameMasked = '';
+    $names = explode(' ', $displayName);
+    foreach ($names as $name) {
+      $nameMasked .= substr($name, 0, 2) . '***** ';
+    }
+    $this->assign('name_masked', $nameMasked);
     $emailMasked = CRM_Utils_String::maskEmail($email);
     $this->assign('email_masked', $emailMasked);
     $this->assign('email', $email);
     $this->_email = $email;
 
     $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($job_id, $queue_id, $hash, TRUE);
-    $this->assign('groups', $groups);
+    $this->assign('groups', $groups ?? []);
     $groupExist = NULL;
     foreach ($groups as $value) {
+      // How about we just array_filter - only question is before or after the assign?
       if ($value) {
         $groupExist = TRUE;
       }
@@ -79,6 +90,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
       $statusMsg = ts('%1 has already been unsubscribed.', [1 => $email]);
       CRM_Core_Session::setStatus($statusMsg, '', 'error');
     }
+    // @todo - can we just check if groups is empty here & in the template?
     $this->assign('groupExist', $groupExist);
   }
 
@@ -109,7 +121,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     // Email address verified
     $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($this->_job_id, $this->_queue_id, $this->_hash);
 
-    if (count($groups)) {
+    if (!empty($groups)) {
       CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($this->_queue_id, $groups, FALSE, $this->_job_id);
     }
 

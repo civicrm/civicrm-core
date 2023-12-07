@@ -26,6 +26,7 @@ use Civi\Api4\MessageTemplate;
 
 /**
  * @group headless
+ * @group msgtpl
  */
 class MessageTemplateTest extends Api4TestBase implements TransactionalInterface {
 
@@ -44,7 +45,7 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
   /**
    * Create/update a MessageTemplate with workflow_name and no corresponding workflow_id.
    */
-  public function testWorkflowName_clean() {
+  public function testWorkflowName_clean(): void {
     $create = civicrm_api4('MessageTemplate', 'create', [
       'values' => $this->baseTpl + ['workflow_name' => 'first', 'workflow_id' => NULL],
     ])->single();
@@ -62,7 +63,7 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
   /**
    * Create/update a MessageTemplate with workflow_name - a name which happens to have an older/corresponding workflow_id.
    */
-  public function testWorkflowName_legacyMatch() {
+  public function testWorkflowName_legacyMatch(): void {
     [$firstId, $secondId] = $this->createFirstSecond();
 
     $create = civicrm_api4('MessageTemplate', 'create', [
@@ -82,7 +83,7 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
   /**
    * Create/update a MessageTempalte with workflow_id. Ensure the newer workflow_name is set.
    */
-  public function testWorkflowId_legacyMatch() {
+  public function testWorkflowId_legacyMatch(): void {
     [$firstId, $secondId] = $this->createFirstSecond();
 
     $create = civicrm_api4('MessageTemplate', 'create', [
@@ -120,7 +121,7 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
   /**
    * Test save with no id
    */
-  public function testSaveNoId() {
+  public function testSaveNoId(): void {
     $saved = civicrm_api4('MessageTemplate', 'save', ['records' => [array_merge(['is_reserved' => 0], $this->baseTpl)]])->first();
     $this->assertDBQuery('My Template', 'SELECT msg_title FROM civicrm_msg_template WHERE id = %1', [1 => [$saved['id'], 'Int']]);
     $this->assertDBQuery('<p>My body as HTML</p>', 'SELECT msg_html FROM civicrm_msg_template WHERE id = %1', [1 => [$saved['id'], 'Int']]);
@@ -129,7 +130,7 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
   /**
    * Test save with an explicit null id
    */
-  public function testSaveNullId() {
+  public function testSaveNullId(): void {
     $saved = civicrm_api4('MessageTemplate', 'save', ['records' => [array_merge(['id' => NULL, 'is_reserved' => 0], $this->baseTpl)]])->first();
     $this->assertDBQuery('My Template', 'SELECT msg_title FROM civicrm_msg_template WHERE id = %1', [1 => [$saved['id'], 'Int']]);
     $this->assertDBQuery('<p>My body as HTML</p>', 'SELECT msg_html FROM civicrm_msg_template WHERE id = %1', [1 => [$saved['id'], 'Int']]);
@@ -138,7 +139,7 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
   /**
    * Test APIv4 calculated field master_id
    */
-  public function testMessageTemplateMasterID() {
+  public function testMessageTemplateMasterID(): void {
     \CRM_Core_Transaction::create(TRUE)->run(function(\CRM_Core_Transaction $tx) {
       $tx->rollback();
 

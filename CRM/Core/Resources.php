@@ -381,6 +381,9 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     if (!self::isAjaxMode()) {
       $this->addBundle('coreResources');
       $this->addCoreStyles($region);
+      // This ensures that if a popup link requires AngularJS, it will always be available.
+      // Additional Ang modules required by popups will be loaded on-the-fly by Civi\Angular\AngularLoader
+      Civi::service('angularjs.loader')->addModules(['crmResource']);
     }
     return $this;
   }
@@ -420,7 +423,30 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
   }
 
   /**
+   * Get the params used to render crm-l10n.js
+   * Gets called above the caching layer and then used
+   * in the render function below
+   */
+  public static function getL10nJsParams(): array {
+    $settings = Civi::settings();
+    return [
+      'cid' => CRM_Core_Session::getLoggedInContactID() ?: 0,
+      'includeEmailInName' => (bool) $settings->get('includeEmailInName'),
+      'ajaxPopupsEnabled' => (bool) $settings->get('ajaxPopupsEnabled'),
+      'allowAlertAutodismissal' => (bool) $settings->get('allow_alert_autodismissal'),
+      'resourceCacheCode' => Civi::resources()->getCacheCode(),
+      'locale' => CRM_Core_I18n::getLocale(),
+      'lcMessages' => $settings->get('lcMessages'),
+      'dateInputFormat' => $settings->get('dateInputFormat'),
+      'timeInputFormat' => $settings->get('timeInputFormat'),
+      'moneyFormat' => CRM_Utils_Money::format(1234.56),
+    ];
+  }
+
+  /**
    * Create dynamic script for localizing js widgets.
+   * Params come from the function above
+   * @see getL10nJsParams
    */
   public static function renderL10nJs(GenericHookEvent $e) {
     if ($e->asset !== 'crm-l10n.js') {
@@ -429,11 +455,48 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     $e->mimeType = 'application/javascript';
     $params = $e->params;
     $params += [
-      'contactSearch' => json_encode($params['includeEmailInName'] ? ts('Search by name/email or id...') : ts('Search by name or id...')),
+      'contactSearch' => json_encode(!empty($params['includeEmailInName']) ? ts('Search by name/email or id...') : ts('Search by name or id...')),
       'otherSearch' => json_encode(ts('Enter search term or id...')),
       'entityRef' => self::getEntityRefMetadata(),
+      'quickAdd' => self::getQuickAddForms($e->params['cid']),
     ];
     $e->content = CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $params);
+  }
+
+  /**
+   * Gets links to "Quick Add" forms, for use in Autocomplete widgets
+   *
+   * @param int|null $cid
+   * @return array
+   */
+  private static function getQuickAddForms(?int $cid): array {
+    $forms = [];
+    try {
+      $contactTypes = CRM_Contact_BAO_ContactType::getAllContactTypes();
+      $routes = \Civi\Api4\Route::get(FALSE)
+        ->addSelect('path', 'title', 'access_arguments')
+        ->addWhere('path', 'LIKE', 'civicrm/quick-add/%')
+        ->execute();
+      foreach ($routes as $route) {
+        // Ensure user has permission to use the form
+        if (!empty($route['access_arguments'][0]) && !CRM_Core_Permission::check($route['access_arguments'][0], $cid)) {
+          continue;
+        }
+        // Ensure API entity exists
+        [, , $entityType] = array_pad(explode('/', $route['path']), 3, '*');
+        if (\Civi\Api4\Utils\CoreUtil::entityExists($entityType)) {
+          $forms[] = [
+            'entity' => $entityType,
+            'path' => $route['path'],
+            'title' => $route['title'],
+            'icon' => \Civi\Api4\Utils\CoreUtil::getInfoItem($entityType, 'icon'),
+          ];
+        }
+      }
+    }
+    catch (CRM_Core_Exception $e) {
+    }
+    return $forms;
   }
 
   /**

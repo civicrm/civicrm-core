@@ -112,6 +112,11 @@
     <weight>365</weight>
   </item>
   <item>
+    <path>civicrm/admin/contribute/managePremiums/edit</path>
+    <title>Manage Premiums</title>
+    <page_callback>CRM_Contribute_Form_ManagePremiums</page_callback>
+  </item>
+  <item>
     <path>civicrm/admin/financial/financialType</path>
     <title>Financial Types</title>
     <page_callback>CRM_Financial_Page_FinancialType</page_callback>
@@ -201,15 +206,7 @@
     <weight>588</weight>
   </item>
   <item>
-    <path>civicrm/contribute/import</path>
-    <title>Import Contributions</title>
-    <page_callback>CRM_Contribute_Import_Controller</page_callback>
-    <access_arguments>access CiviContribute,edit contributions</access_arguments>
-    <page_type>1</page_type>
-    <weight>520</weight>
-  </item>
-  <item>
-    <path>civicrm/contribute/manage</path>
+    <path>civicrm/admin/contribute/manage</path>
     <title>Manage Contribution Pages</title>
     <page_callback>CRM_Contribute_Page_ContributionPage</page_callback>
     <access_arguments>administer CiviCRM,access CiviContribute</access_arguments>

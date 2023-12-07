@@ -78,6 +78,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     $cacheKey = $this->getCacheKey();
     if (!Civi::cache('metadata')->has($cacheKey)) {
       $tokensMetadata = $this->getBespokeTokens();
+      $tokensMetadata = array_merge($tokensMetadata, $this->getRelatedTokens());
       foreach ($this->getFieldMetadata() as $field) {
         $this->addFieldToTokenMetadata($tokensMetadata, $field, $this->getExposedFields());
       }
@@ -98,7 +99,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     $fieldValue = $this->getFieldValue($row, $field);
     if (is_array($fieldValue)) {
       // eg. role_id for participant would be an array here.
-      $fieldValue = implode(',', $fieldValue);
+      $fieldValue = implode(', ', $fieldValue);
     }
 
     if ($this->isPseudoField($field)) {
@@ -119,15 +120,11 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       return $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $this->getFieldValue($row, 'id'));
     }
     if ($this->isMoneyField($field)) {
-      $currency = $this->getCurrency($row);
+      $currency = $this->getCurrency($row) ?: \Civi::settings()->get('defaultCurrency');
       if (empty($fieldValue) && !is_numeric($fieldValue)) {
         $fieldValue = 0;
       }
-      if (!$currency) {
-        // too hard basket for now - just do what we always did.
-        return $row->format('text/plain')->tokens($entity, $field,
-          \CRM_Utils_Money::format($fieldValue, $currency));
-      }
+
       return $row->format('text/plain')->tokens($entity, $field,
         Money::of($fieldValue, $currency));
 
@@ -141,7 +138,21 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         Civi::log()->info('invalid date token');
       }
     }
+    if ($this->isHTMLTextField($field)) {
+      return $row->format('text/html')->tokens($entity, $field, (string) $fieldValue);
+    }
     $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
+  }
+
+  /**
+   * Is the text stored in html format.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isHTMLTextField(string $fieldName): bool {
+    return ($this->getMetadataForField($fieldName)['input_type'] ?? NULL) === 'RichTextEditor';
   }
 
   /**
@@ -276,6 +287,13 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   /**
+   * Get related entity tokens.
+   */
+  protected function getRelatedTokens(): array {
+    return [];
+  }
+
+  /**
    * Get the value for the relevant pseudo field.
    *
    * @param string $realField e.g contribution_status_id
@@ -290,10 +308,19 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   protected function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
     $bao = CRM_Core_DAO_AllCoreTables::getFullName($this->getMetadataForField($realField)['entity']);
     if ($pseudoKey === 'name') {
+      // There is a theoretical possibility fieldValue could be an array but
+      // specifically for preferred communication type - but real world usage
+      // hitting this is unlikely & the unexpectation is unclear so commenting,
+      // rather than adding handling.
       $fieldValue = (string) CRM_Core_PseudoConstant::getName($bao, $realField, $fieldValue);
     }
     if ($pseudoKey === 'label') {
-      $fieldValue = (string) CRM_Core_PseudoConstant::getLabel($bao, $realField, $fieldValue);
+      $newValue = [];
+      // Preferred communication method is an array that would resolve to (e.g) 'Phone, Email'
+      foreach ((array) $fieldValue as $individualValue) {
+        $newValue[] = CRM_Core_PseudoConstant::getLabel($bao, $realField, $individualValue);
+      }
+      $fieldValue = implode(', ', $newValue);
     }
     if ($pseudoKey === 'abbr' && $realField === 'state_province_id') {
       // hack alert - currently only supported for state.
@@ -335,10 +362,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function checkActive(TokenProcessor $processor) {
-    return (!empty($processor->context['actionMapping'])
+    return ((!empty($processor->context['actionMapping'])
         // This makes the 'schema context compulsory - which feels accidental
-        // since recent discu
-      && $processor->context['actionMapping']->getEntity()) || in_array($this->getEntityIDField(), $processor->context['schema']);
+      && $processor->context['actionMapping']->getEntityName()) || in_array($this->getEntityIDField(), $processor->context['schema'])) && in_array($this->getApiEntityName(), array_keys(\Civi::service('action_object_provider')->getEntities()));
   }
 
   /**
@@ -347,7 +373,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
    */
   public function alterActionScheduleQuery(MailingQueryEvent $e): void {
-    if ($e->mapping->getEntity() !== $this->getExtendableTableName()) {
+    if ($e->mapping->getEntityTable($e->actionSchedule) !== $this->getExtendableTableName()) {
       return;
     }
     $e->query->select('e.id AS tokenContext_' . $this->getEntityIDField());
@@ -611,7 +637,8 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param string $prefix
    */
   protected function addFieldToTokenMetadata(array &$tokensMetadata, array $field, array $exposedFields, string $prefix = ''): void {
-    if ($field['type'] !== 'Custom' && !in_array($field['name'], $exposedFields, TRUE)) {
+    $isExposed = in_array(str_replace($prefix . '.', '', $field['name']), $exposedFields, TRUE);
+    if ($field['type'] !== 'Custom' && !$isExposed) {
       return;
     }
     $field['audience'] = $field['audience'] ?? 'user';
@@ -635,8 +662,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       $tokensMetadata[$tokenName] = $field;
       return;
     }
-    $tokenName = $prefix ? ($prefix . '.' . $field['name']) : $field['name'];
-    if (in_array($field['name'], $exposedFields, TRUE)) {
+    $tokenName = $field['name'];
+    // Presumably this line can not be reached unless isExposed = TRUE.
+    if ($isExposed) {
       if (
         ($field['options'] || !empty($field['suffixes']))
         // At the time of writing currency didn't have a label option - this may have changed.
@@ -671,6 +699,37 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       $cacheKey .= '__' . CRM_Core_Session::getLoggedInContactID();
     }
     return $cacheKey;
+  }
+
+  /**
+   * Get metadata for tokens for a related entity joined by a field on the main entity.
+   *
+   * @param string $entity
+   * @param string $joinField
+   * @param array $tokenList
+   * @param array $hiddenTokens
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRelatedTokensForEntity(string $entity, string $joinField, array $tokenList, $hiddenTokens = []): array {
+    $apiParams = ['checkPermissions' => FALSE];
+    if ($tokenList !== ['*']) {
+      $apiParams['where'] = [['name', 'IN', $tokenList]];
+    }
+    $relatedTokens = civicrm_api4($entity, 'getFields', $apiParams);
+    $tokens = [];
+    foreach ($relatedTokens as $relatedToken) {
+      $tokens[$joinField . '.' . $relatedToken['name']] = [
+        'title' => $relatedToken['title'],
+        'name' => $joinField . '.' . $relatedToken['name'],
+        'type' => 'mapped',
+        'data_type' => $relatedToken['data_type'],
+        'input_type' => $relatedToken['input_type'],
+        'audience' => in_array($relatedToken['name'], $hiddenTokens, TRUE) ? 'hidden' : 'user',
+      ];
+    }
+    return $tokens;
   }
 
 }

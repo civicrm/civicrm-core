@@ -78,45 +78,6 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method retrieve()
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testRetrieve(): void {
-    $price = 100.00;
-
-    $contribution = $this->callAPISuccess('Contribution', 'create', [
-      'contact_id' => $this->individualCreate(),
-      'total_amount' => $price,
-      'financial_type_id' => 1,
-      'is_active' => 1,
-      'skipLineItem' => 1,
-    ]);
-    $lParams = [
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'price_field_id' => 1,
-      'qty' => 1,
-      'label' => 'Contribution Amount',
-      'unit_price' => $price,
-      'line_total' => $price,
-      'price_field_value_id' => 1,
-      'financial_type_id' => 1,
-    ];
-
-    $contributionObj = $this->getContributionObject($contribution['id']);
-    $lineItem = CRM_Price_BAO_LineItem::create($lParams);
-    CRM_Financial_BAO_FinancialItem::add($lineItem, $contributionObj);
-    $values = [];
-    $fParams = [
-      'entity_id' => $lineItem->id,
-      'entity_table' => 'civicrm_line_item',
-    ];
-    $financialItem = CRM_Financial_BAO_FinancialItem::retrieve($fParams, $values);
-    $this->assertEquals($financialItem->amount, $price, 'Verify financial item amount.');
-  }
-
-  /**
    * Check method create()
    *
    * @throws \CRM_Core_Exception
@@ -185,7 +146,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     ];
 
     $amount = 200;
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($fParams);
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($fParams);
     $financialTrxn = new CRM_Financial_DAO_FinancialTrxn();
     $financialTrxn->to_financial_account_id = $financialAccount->id;
     $financialTrxn->total_amount = $amount;

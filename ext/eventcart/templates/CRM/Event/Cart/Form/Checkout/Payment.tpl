@@ -1,5 +1,3 @@
-{include file="CRM/common/TrackingFields.tpl"}
-
 <table>
   <thead>
     <tr>

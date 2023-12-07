@@ -95,6 +95,9 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    * @param array|null $params
    */
   public function postProcess($params = NULL) {
+    if (!empty($params)) {
+      CRM_Core_Error::deprecatedWarning('params parameter is deprecated');
+    }
     $fv = $params ?: $this->controller->exportValues($this->_name);
     $locName = NULL;
 
@@ -246,8 +249,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         $valuesothers = CRM_Core_BAO_Location::getValues($paramsothers, $valuesothers);
         if (!empty($fv['location_type_id'])) {
           foreach ($valuesothers as $vals) {
-            if (CRM_Utils_Array::value('location_type_id', $vals) ==
-              CRM_Utils_Array::value('location_type_id', $fv)
+            if (($vals['location_type_id'] ?? NULL) ==
+              ($fv['location_type_id'] ?? NULL)
             ) {
               foreach ($vals as $k => $v) {
                 if (in_array($k, [
@@ -294,7 +297,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
     // format the addresses according to CIVICRM_ADDRESS_FORMAT (CRM-1327)
     foreach ($rows as $id => $row) {
-      if ($commMethods = CRM_Utils_Array::value('preferred_communication_method', $row)) {
+      $commMethods = $row['preferred_communication_method'] ?? NULL;
+      if ($commMethods) {
         $val = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
         $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
         $temp = [];

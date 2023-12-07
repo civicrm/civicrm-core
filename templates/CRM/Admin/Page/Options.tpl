@@ -58,13 +58,8 @@
 
 <div class="crm-content-block crm-block">
 {if $rows}
-  {if $isLocked ne 1}
-    <div class="action-link">
-      {crmButton p="civicrm/admin/options/$gName" q='action=add&reset=1' class="new-option" icon="plus-circle"}{if !$gLabel}{ts}Add Option{/ts}{else}{ts 1=$gLabel}Add %1{/ts}{/if}{/crmButton}
-    </div>
-  {/if}
 {foreach from=$rows item=row}
-  {if !empty($row.icon)}{assign var='hasIcons' value=TRUE}{/if}
+  {if !empty($row.icon)}{assign var='hasIcons' value=true}{/if}
 {/foreach}
 <div id={$gName}>
         {strip}
@@ -149,7 +144,7 @@
 </div>
 {else}
     <div class="messages status no-popup">
-      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+      {icon icon="fa-info-circle"}{/icon}
       {ts}None found.{/ts}
     </div>
 {/if}

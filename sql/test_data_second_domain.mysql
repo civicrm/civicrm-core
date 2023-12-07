@@ -29,6 +29,11 @@ SELECT @locBlockId := id from civicrm_loc_block where phone_id = @phoneId AND em
   INSERT INTO civicrm_domain
   (name, version,contact_id) VALUES (@domainName, '4.2', @contactID);
   SELECT @domainID := id FROM civicrm_domain where name = 'Second Domain';
+
+  SELECT @option_group_id_mail_approval_status := max(id) from civicrm_option_group where name = 'mail_approval_status';
+  SELECT @option_group_id_fma            := max(id) from civicrm_option_group where name = 'from_email_address';
+  SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMail';
+
   INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`)
 VALUES
@@ -132,7 +137,7 @@ VALUES
     ( @domainID, 'civicrm/contribute/add&reset=1&action=add&context=standalone', 'New Contribution',  'New Contribution',       'access CiviContribute,edit contributions', 'AND', @contributionlastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/contribute/search&reset=1',                       'Find Contributions',     'Find Contributions',     'access CiviContribute', '', @contributionlastID, '1', NULL, 3 ),
     ( @domainID, 'civicrm/batch&reset=1',                       'Batches',     'Batches',             'access CiviContribute,access CiviMember', '', @contributionlastID, '1', NULL, 4 ),
-    ( @domainID, 'civicrm/contribute/import&reset=1',                       'Import Contributions',   'Import Contributions',   'access CiviContribute,edit contributions', 'AND', @contributionlastID, '1', '1',  5 );
+    ( @domainID, 'civicrm/import/contribution&reset=1',                       'Import Contributions',   'Import Contributions',   'access CiviContribute,edit contributions', 'AND', @contributionlastID, '1', '1',  5 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
@@ -902,4 +907,4 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, CONCAT('civicrm/report/instance/', @instanceID,'&reset=1'), 'Mailing Detail Report', 'Mailing Detail Report', 'administer CiviMail', 'OR', @reportlastID, '1', NULL, @instanceID+2 );
 UPDATE civicrm_report_instance SET navigation_id = LAST_INSERT_ID() WHERE id = @instanceID;
-UPDATE civicrm_domain SET version = '5.60.alpha1';
+UPDATE civicrm_domain SET version = '5.69.alpha1';

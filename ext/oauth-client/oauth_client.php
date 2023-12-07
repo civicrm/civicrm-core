@@ -45,17 +45,6 @@ function oauth_client_civicrm_permission(&$permissions) {
 }
 
 /**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function oauth_client_civicrm_entityTypes(&$entityTypes) {
-  _oauth_client_civix_civicrm_entityTypes($entityTypes);
-}
-
-/**
  * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
  */
 function oauth_client_civicrm_container($container) {

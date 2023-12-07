@@ -7,10 +7,10 @@
 <body>
 
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
-{capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
-{capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
-{capture assign=emptyBlockStyle }style="padding: 10px; border-bottom: 1px solid #999;background-color: #f7f7f7;"{/capture}
-{capture assign=emptyBlockValueStyle }style="padding: 10px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=labelStyle}style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
+{capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=emptyBlockStyle}style="padding: 10px; border-bottom: 1px solid #999;background-color: #f7f7f7;"{/capture}
+{capture assign=emptyBlockValueStyle}style="padding: 10px; border-bottom: 1px solid #999;"{/capture}
 
  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
@@ -22,11 +22,11 @@
   <tr>
     <td>
       {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
-      {if $isRefund}
+      {if {financial_trxn.total_amount|raw} < 0}
         <p>{ts}A refund has been issued based on changes in your registration selections.{/ts}</p>
       {else}
         <p>{ts}Below you will find a receipt for this payment.{/ts}</p>
-        {if $paymentsComplete}
+        {if !{contribution.balance_amount|boolean}}
           <p>{ts}Thank you for completing this contribution.{/ts}</p>
         {/if}
       {/if}
@@ -35,7 +35,7 @@
   <tr>
    <td>
     <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
-    {if $isRefund}
+      {if {financial_trxn.total_amount|raw} < 0}
       <tr>
         <th {$headerStyle}>{ts}Refund Details{/ts}</th>
       </tr>
@@ -44,7 +44,7 @@
         {ts}This Refund Amount{/ts}
         </td>
         <td {$valueStyle}>
-        {$refundAmount|crmMoney:$currency}
+          {financial_trxn.total_amount}
         </td>
       </tr>
     {else}
@@ -56,47 +56,47 @@
         {ts}This Payment Amount{/ts}
         </td>
         <td {$valueStyle}>
-        {$paymentAmount|crmMoney:$currency}
+        {financial_trxn.total_amount}
         </td>
       </tr>
     {/if}
-    {if $receive_date}
+    {if {financial_trxn.trxn_date|boolean}}
       <tr>
         <td {$labelStyle}>
         {ts}Transaction Date{/ts}
         </td>
         <td {$valueStyle}>
-        {$receive_date|crmDate}
+         {financial_trxn.trxn_date}
         </td>
       </tr>
     {/if}
-    {if !empty($trxn_id)}
+    {if {financial_trxn.trxn_id|boolean}}
       <tr>
         <td {$labelStyle}>
         {ts}Transaction #{/ts}
         </td>
         <td {$valueStyle}>
-        {$trxn_id}
+          {financial_trxn.trxn_id}
         </td>
       </tr>
     {/if}
-    {if !empty($paidBy)}
+    {if {financial_trxn.payment_instrument_id|boolean}}
       <tr>
         <td {$labelStyle}>
         {ts}Paid By{/ts}
         </td>
         <td {$valueStyle}>
-        {$paidBy}
+          {financial_trxn.payment_instrument_id:label}
         </td>
       </tr>
     {/if}
-    {if !empty($checkNumber)}
+    {if {financial_trxn.check_number|boolean}}
       <tr>
         <td {$labelStyle}>
         {ts}Check Number{/ts}
         </td>
         <td {$valueStyle}>
-        {$checkNumber}
+          {financial_trxn.check_number}
         </td>
       </tr>
     {/if}
@@ -104,34 +104,34 @@
   <tr>
     <th {$headerStyle}>{ts}Contribution Details{/ts}</th>
   </tr>
-  {if $totalAmount}
+  {if {contribution.total_amount|boolean}}
   <tr>
     <td {$labelStyle}>
       {ts}Total Fee{/ts}
     </td>
     <td {$valueStyle}>
-      {$totalAmount|crmMoney:$currency}
+      {contribution.total_amount}
     </td>
   </tr>
   {/if}
-  {if $totalPaid}
+  {if {contribution.paid_amount|boolean}}
   <tr>
     <td {$labelStyle}>
       {ts}Total Paid{/ts}
     </td>
     <td {$valueStyle}>
-      {$totalPaid|crmMoney:$currency}
+      {contribution.paid_amount}
     </td>
   </tr>
   {/if}
-  {if $amountOwed}
+  {if {contribution.balance_amount|boolean}}
   <tr>
     <td {$labelStyle}>
       {ts}Balance Owed{/ts}
     </td>
     <td {$valueStyle}>
-      {$amountOwed|crmMoney:$currency}
-    </td> {* This will be zero after final payment. *}
+      {contribution.balance_amount}
+    </td>
   </tr>
   {/if}
   </table>
@@ -142,105 +142,125 @@
       <td>
   <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
     {if !empty($billingName) || !empty($address)}
-          <tr>
-            <th {$headerStyle}>
-        {ts}Billing Name and Address{/ts}
-            </th>
-          </tr>
-          <tr>
-            <td colspan="2" {$valueStyle}>
+        <tr>
+          <th {$headerStyle}>
+              {ts}Billing Name and Address{/ts}
+          </th>
+        </tr>
+        <tr>
+          <td colspan="2" {$valueStyle}>
         {if !empty($billingName)}{$billingName}{/if}<br />
         {if !empty($address)}{$address|nl2br}{/if}
-            </td>
-          </tr>
+          </td>
+        </tr>
+      {/if}
+    {if {financial_trxn.pan_truncation|boolean}}
+      <tr>
+        <th {$headerStyle}>
+          {ts}Credit Card Information{/ts}
+        </th>
+      </tr>
+      <tr>
+        <td colspan="2" {$valueStyle}>
+          {financial_trxn.card_type_id:label}<br />
+          ************{financial_trxn.pan_truncation}<br />
+        </td>
+      </tr>
     {/if}
-    {if !empty($credit_card_number)}
-          <tr>
-            <th {$headerStyle}>
-        {ts}Credit Card Information{/ts}
-            </th>
-          </tr>
-          <tr>
-            <td colspan="2" {$valueStyle}>
-        {$credit_card_type}<br />
-        {$credit_card_number}<br />
-        {ts}Expires:{/ts} {$credit_card_exp_date|truncate:7:''|crmDate}
-            </td>
-          </tr>
-    {/if}
-    {if $component eq 'event'}
-    <tr>
-      <th {$headerStyle}>
-        {ts}Event Information and Location{/ts}
-      </th>
-    </tr>
-    <tr>
-      <td colspan="2" {$valueStyle}>
-         {$event.event_title}<br />
-        {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
-      </td>
-    </tr>
+    {if {event.id|boolean}}
+      <tr>
+        <th {$headerStyle}>
+          {ts}Event Information and Location{/ts}
+        </th>
+      </tr>
+      <tr>
+        <td colspan="2" {$valueStyle}>
+          {event.event_title}<br />
+          {event.start_date|crmDate}{if {event.end_date|boolean}}-{if '{event.end_date|crmDate:"%Y%m%d"}' === '{event.start_date|crmDate:"%Y%m%d"}'}{event.end_date|crmDate:"Time"}{else}{event.end_date}{/if}{/if}
+        </td>
+      </tr>
 
-    {if !empty($event.participant_role)}
-    <tr>
-      <td {$labelStyle}>
-        {ts}Participant Role{/ts}
-      </td>
-      <td {$valueStyle}>
-        {$event.participant_role}
-      </td>
-    </tr>
-    {/if}
+      {if {participant.role_id|boolean}}
+      <tr>
+        <td {$labelStyle}>
+          {ts}Participant Role{/ts}
+        </td>
+        <td {$valueStyle}>
+         {participant.role_id:label}
+        </td>
+      </tr>
+      {/if}
 
-    {if !empty($isShowLocation)}
-    <tr>
-      <td colspan="2" {$valueStyle}>
-        {$location.address.1.display|nl2br}
-      </td>
-    </tr>
-    {/if}
+      {if {event.is_show_location|boolean}}
+            <tr>
+              <td colspan="2" {$valueStyle}>
+                  {event.location}
+              </td>
+            </tr>
+          {/if}
+          {if {event.loc_block_id.phone_id.phone|boolean} || {event.loc_block_id.email_id.email|boolean}}
+            <tr>
+              <td colspan="2" {$labelStyle}>
+                  {ts}Event Contacts:{/ts}
+              </td>
+            </tr>
 
-    {if !empty($location.phone.1.phone) || !empty($location.email.1.email)}
-    <tr>
-      <td colspan="2" {$labelStyle}>
-        {ts}Event Contacts:{/ts}
+             {if {event.loc_block_id.phone_id.phone|boolean}}
+            <tr>
+              <td {$labelStyle}>
+                  {if {event.loc_block_id.phone_id.phone_type_id|boolean}}
+                      {event.loc_block_id.phone_id.phone_type_id:label}
+                  {else}
+                      {ts}Phone{/ts}
+                  {/if}
+              </td>
+              <td {$valueStyle}>
+                  {event.loc_block_id.phone_id.phone} {if {event.loc_block_id.phone_id.phone_ext|boolean}}&nbsp;{ts}ext.{/ts} {event.loc_block_id.phone_id.phone_ext}{/if}
+              </td>
+            </tr>
+          {/if}
+             {if {event.loc_block_id.phone_2_id.phone|boolean}}
+            <tr>
+              <td {$labelStyle}>
+                  {if {event.loc_block_id.phone_2_id.phone_type_id|boolean}}
+                      {event.loc_block_id.phone_2_id.phone_type_id:label}
+                  {else}
+                      {ts}Phone{/ts}
+                  {/if}
+              </td>
+              <td {$valueStyle}>
+                  {event.loc_block_id.phone_2_id.phone} {if {event.loc_block_id.phone_2_id.phone_ext|boolean}}&nbsp;{ts}ext.{/ts} {event.loc_block_id.phone_2_id.phone_ext}{/if}
+              </td>
+            </tr>
+          {/if}
+
+              {if {event.loc_block_id.email_id.email|boolean}}
+            <tr>
+              <td {$labelStyle}>
+                  {ts}Email{/ts}
+              </td>
+              <td {$valueStyle}>
+                  {event.loc_block_id.email_id.email}
+              </td>
+            </tr>
+          {/if}
+
+              {if {event.loc_block_id.email_2_id.email|boolean}}
+                <tr>
+                  <td {$labelStyle}>
+                      {ts}Email{/ts}
+                  </td>
+                  <td {$valueStyle}>
+                      {event.loc_block_id.email_2_id.email}
+                  </td>
+                </tr>
+              {/if}
+            {/if}
+
+          {/if}
+        </table>
       </td>
     </tr>
-    {foreach from=$location.phone item=phone}
-    {if $phone.phone}
-          <tr>
-            <td {$labelStyle}>
-        {if $phone.phone_type}
-        {$phone.phone_type_display}
-        {else}
-        {ts}Phone{/ts}
-        {/if}
-            </td>
-            <td {$valueStyle}>
-        {$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if}
-            </td>
-          </tr>
-    {/if}
-    {/foreach}
-    {foreach from=$location.email item=eventEmail}
-    {if $eventEmail.email}
-          <tr>
-            <td {$labelStyle}>
-        {ts}Email{/ts}
-            </td>
-            <td {$valueStyle}>
-        {$eventEmail.email}
-            </td>
-          </tr>
-    {/if}
-    {/foreach}
-    {/if} {*phone block close*}
-    {/if}
   </table>
-      </td>
-    </tr>
-
-    </table>
-
  </body>
 </html>

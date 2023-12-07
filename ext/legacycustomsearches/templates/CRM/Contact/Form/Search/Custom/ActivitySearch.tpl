@@ -60,8 +60,8 @@
               <thead class="sticky">
                 <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>
                 {foreach from=$columnHeaders item=header}
-                  {if ($header.sort eq 'activity_id') or ($header.sort eq 'case_id') }
-                  {elseif ($header.sort eq 'sort_name') or ($header.sort eq 'activity_status_id') or ($header.sort eq 'activity_type_id') or ($header.sort eq 'activity_subject') or ($header.sort eq 'source_contact') or ($header.SORT eq 'activity_date') or ($header.name eq null) }
+                  {if ($header.sort eq 'activity_id') or ($header.sort eq 'case_id')}
+                  {elseif ($header.sort eq 'sort_name') or ($header.sort eq 'activity_status_id') or ($header.sort eq 'activity_type_id') or ($header.sort eq 'activity_subject') or ($header.sort eq 'source_contact') or ($header.SORT eq 'activity_date') or ($header.name eq null)}
                     <th scope="col">
                       {if $header.sort}
                         {assign var='key' value=$header.sort}
@@ -81,13 +81,13 @@
                   {assign var=cbName value=$row.checkbox}
                   <td>{$form.$cbName.html}</td>
                   {foreach from=$columnHeaders item=header}
-                    {if ($header.sort eq 'sort_name') or ($header.sort eq 'activity_status_id') or ($header.sort eq 'activity_type_id') or ($header.sort eq 'activity_subject') or ($header.sort eq 'source_contact') or ($header.SORT eq 'activity_date') or ($header.name eq null) }
+                    {if ($header.sort eq 'sort_name') or ($header.sort eq 'activity_status_id') or ($header.sort eq 'activity_type_id') or ($header.sort eq 'activity_subject') or ($header.sort eq 'source_contact') or ($header.SORT eq 'activity_date') or ($header.name eq null)}
                       {assign var=fName value=$header.sort}
                       {if $fName eq 'sort_name'}
                          <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`"}">{$row.sort_name}</a></td>
                       {elseif $fName eq 'activity_subject'}
                          <td>
-                           {if $row.case_id }
+                           {if $row.case_id}
                               <a href="{crmURL p='civicrm/case/activity/view' q="reset=1&aid=`$row.activity_id`&cid=`$row.contact_id`&caseID=`$row.case_id`"}" title="{ts}View activity details{/ts}">
                            {else}
                               <a href="{crmURL p='civicrm/contact/view/activity' q="atype=`$row.activity_type_id`&action=view&reset=1&id=`$row.activity_id`&cid=`$row.contact_id`"}" title="{ts}View activity details{/ts}">

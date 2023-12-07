@@ -62,7 +62,7 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
     $contents = ob_get_clean();
 
     unset($_GET['reset']);
-    $this->assertRegExp('/form.+id="Builder" class="CRM_Contact_Form_Search_Builder/', $contents);
+    $this->assertMatchesRegularExpression('/form.+id="Builder" class="CRM_Contact_Form_Search_Builder/', $contents);
   }
 
   public function testContactSummary(): void {

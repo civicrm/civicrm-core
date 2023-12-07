@@ -18,8 +18,8 @@
         <tr class="columnheader">
             <th>{ts}Membership{/ts}</th>
             <th>{ts}Member Since{/ts}</th>
-            <th>{ts}Start Date{/ts}</th>
-            <th>{ts}End Date{/ts}</th>
+            <th>{ts}Membership Start Date{/ts}</th>
+            <th>{ts}Membership Expiration Date{/ts}</th>
             <th>{ts}Status{/ts}</th>
             <th></th>
         </tr>
@@ -49,8 +49,8 @@
         <table>
         <tr class="columnheader">
             <th>{ts}Membership{/ts}</th>
-            <th>{ts}Start Date{/ts}</th>
-            <th>{ts}End Date{/ts}</th>
+            <th>{ts}Membership Start Date{/ts}</th>
+            <th>{ts}Membership Expiration Date{/ts}</th>
             <th>{ts}Status{/ts}</th>
             <th></th>
         </tr>

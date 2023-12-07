@@ -70,6 +70,11 @@
     <required>true</required>
     <default>CURRENT_TIMESTAMP</default>
     <comment>Date of the (un)subscription</comment>
+    <html>
+      <label>Group Membership Action Date</label>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
     <add>1.1</add>
   </field>
   <field>

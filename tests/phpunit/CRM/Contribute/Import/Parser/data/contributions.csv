@@ -1,2 +1,2 @@
-External Identifier,Total Amount,Receive Date,Financial Type,Soft Credit to,Source,Note,Transaction ID,Campaign ID
-bob,65,2008-09-20,Donation,mum@example.com,Word of mouth,Call him back,999,1
+External Identifier,Total Amount,Receive Date,Financial Type,Soft Credit to,Source,Note,Transaction ID,Campaign ID,Blank column
+bob,65,2008-09-20,Donation,mum@example.com,Word of mouth,Call him back,999,1,

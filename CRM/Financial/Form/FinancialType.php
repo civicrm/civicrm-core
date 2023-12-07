@@ -25,20 +25,6 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
   protected $_BAOName = 'CRM_Financial_BAO_FinancialType';
 
   /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * @var array
-   */
-  protected $entityFields = [];
-
-  /**
-   * Deletion message to be assigned to the form.
-   *
-   * @var string
-   */
-  protected $deleteMessage;
-
-  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Core_Exception
@@ -117,9 +103,11 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $errors = CRM_Financial_BAO_FinancialType::del($this->_id);
-      if (is_array($errors) && !empty($errors)) {
-        CRM_Core_Error::statusBounce($errors['error_message'], CRM_Utils_System::url('civicrm/admin/financial/financialType', "reset=1&action=browse"), ts('Cannot Delete'));
+      try {
+        CRM_Financial_BAO_FinancialType::deleteRecord(['id' => $this->_id]);
+      }
+      catch (CRM_Core_Exception $e) {
+        CRM_Core_Error::statusBounce($e->getMessage(), CRM_Utils_System::url('civicrm/admin/financial/financialType', "reset=1&action=browse"), ts('Cannot Delete'));
       }
       CRM_Core_Session::setStatus(ts('Selected financial type has been deleted.'), ts('Record Deleted'), 'success');
     }
@@ -129,12 +117,8 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
       if ($this->_id) {
         $params['id'] = $this->_id;
       }
-      foreach ([
-        'is_active',
-        'is_reserved',
-        'is_deductible',
-      ] as $field) {
-        $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
+      foreach (['is_active', 'is_reserved', 'is_deductible'] as $field) {
+        $params[$field] = $params[$field] ?? FALSE;
       }
       $financialType = civicrm_api3('FinancialType', 'create', $params);
       if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -163,7 +147,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
         else {
           $text = ts('Your Financial "%1" Type has been created and assigned to an existing financial account with the same title. You should review the assigned account and determine whether additional account relationships are needed.', $statusArray);
         }
-        CRM_Core_Session::setStatus($text, ts('Saved'), 'success', ['expires' => 0]);
+        CRM_Core_Session::setStatus($text, ts('Saved'), 'success', ['expires' => 30000]);
       }
 
       $session = CRM_Core_Session::singleton();

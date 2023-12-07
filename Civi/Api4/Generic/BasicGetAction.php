@@ -47,7 +47,6 @@ class BasicGetAction extends AbstractGetAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
-    $this->setDefaultWhereClause();
     $this->expandSelectClauseWildcards();
     $values = $this->getRecords();
     $this->formatRawValues($values);
@@ -106,9 +105,9 @@ class BasicGetAction extends AbstractGetAction {
     $fields = $this->entityFields();
     foreach ($records as &$values) {
       foreach ($this->entityFields() as $field) {
-        $values += [$field['name'] => NULL];
+        $values += [$field['name'] => $field['default_value'] ?? NULL];
         if (!empty($field['options'])) {
-          foreach (FormattingUtil::$pseudoConstantSuffixes as $suffix) {
+          foreach ($field['suffixes'] ?? FormattingUtil::$pseudoConstantSuffixes as $suffix) {
             $pseudofield = $field['name'] . ':' . $suffix;
             if (!isset($values[$pseudofield]) && isset($values[$field['name']]) && $this->_isFieldSelected($pseudofield)) {
               $values[$pseudofield] = $values[$field['name']];
@@ -116,9 +115,9 @@ class BasicGetAction extends AbstractGetAction {
           }
         }
       }
+      // Swap raw values with pseudoconstants
+      FormattingUtil::formatOutputValues($values, $fields, $this->getActionName());
     }
-    // Swap raw values with pseudoconstants
-    FormattingUtil::formatOutputValues($records, $fields, $this->getActionName());
   }
 
 }

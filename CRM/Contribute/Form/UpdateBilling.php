@@ -21,8 +21,6 @@
 class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_ContributionRecur {
   protected $_mode = NULL;
 
-  protected $_subscriptionDetails = NULL;
-
   public $_bltID = NULL;
 
   /**
@@ -87,7 +85,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
 
     if ($this->getSubscriptionDetails()->contact_id) {
       $fields = [];
-      $names = array(
+      $names = [
         'first_name',
         'middle_name',
         'last_name',
@@ -96,7 +94,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
         "postal_code-{$this->_bltID}",
         "country_id-{$this->_bltID}",
         "state_province_id-{$this->_bltID}",
-      );
+      ];
       foreach ($names as $name) {
         $fields[$name] = 1;
       }
@@ -139,20 +137,20 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $type = 'submit';
     }
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => $type,
         'name' => ts('Save'),
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    ));
+      ],
+    ]);
 
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, TRUE, TRUE);
-    $this->addFormRule(array('CRM_Contribute_Form_UpdateBilling', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contribute_Form_UpdateBilling', 'formRule'], $this);
   }
 
   /**
@@ -221,7 +219,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
 
       // build tpl params
       if ($this->getSubscriptionDetails()->membership_id) {
-        $inputParams = array('id' => $this->getSubscriptionDetails()->membership_id);
+        $inputParams = ['id' => $this->getSubscriptionDetails()->membership_id];
         CRM_Member_BAO_Membership::getValues($inputParams, $tplParams);
         $tplParams = $tplParams[$this->getSubscriptionDetails()->membership_id];
         $tplParams['membership_status'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $tplParams['status_id']);
@@ -234,24 +232,24 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       }
       else {
         $status = ts('Billing details for the recurring contribution of %1, every %2 %3 have been updated.',
-          array(
+          [
             1 => $this->getSubscriptionDetails()->amount,
             2 => $this->getSubscriptionDetails()->frequency_interval,
             3 => $this->getSubscriptionDetails()->frequency_unit,
-          )
+          ]
         );
         $msgTitle = ts('Details Updated');
         $msgType = 'success';
 
-        $tplParams = array(
+        $tplParams = [
           'recur_frequency_interval' => $this->getSubscriptionDetails()->frequency_interval,
           'recur_frequency_unit' => $this->getSubscriptionDetails()->frequency_unit,
           'amount' => $this->getSubscriptionDetails()->amount,
-        );
+        ];
       }
 
       // format new address for display
-      $addressParts = array("street_address", "city", "postal_code", "state_province", "country");
+      $addressParts = ["street_address", "city", "postal_code", "state_province", "country"];
       foreach ($addressParts as $part) {
         $addressParts[$part] = $processorParams[$part] ?? NULL;
       }
@@ -260,7 +258,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       // format old address to store in activity details
       $this->_defaults["state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvince($this->_defaults["state_province-{$this->_bltID}"], FALSE);
       $this->_defaults["country-{$this->_bltID}"] = CRM_Core_PseudoConstant::country($this->_defaults["country-{$this->_bltID}"], FALSE);
-      $addressParts = array("street_address", "city", "postal_code", "state_province", "country");
+      $addressParts = ["street_address", "city", "postal_code", "state_province", "country"];
       foreach ($addressParts as $part) {
         $key = "{$part}-{$this->_bltID}";
         $addressParts[$part] = $this->_defaults[$key] ?? NULL;
@@ -296,7 +294,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
 <br/>{$this->_defaults['billingName']}
 <br/>{$this->_defaults['address']}";
 
-      $activityParams = array(
+      $activityParams = [
         'source_contact_id' => $this->getSubscriptionDetails()->contact_id,
         'activity_type_id' => CRM_Core_PseudoConstant::getKey(
           'CRM_Activity_BAO_Activity',
@@ -307,7 +305,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
         'details' => $message,
         'activity_date_time' => date('YmdHis'),
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
-      );
+      ];
       $session = CRM_Core_Session::singleton();
       $cid = $session->get('userID');
       if ($cid) {
@@ -317,11 +315,11 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       CRM_Activity_BAO_Activity::create($activityParams);
 
       list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->getSubscriptionDetails()->contact_id);
-      $tplParams['contact'] = array('display_name' => $donorDisplayName);
+      $tplParams['contact'] = ['display_name' => $donorDisplayName];
 
       $tplParams = array_merge($tplParams, CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($processorParams));
 
-      $sendTemplateParams = array(
+      $sendTemplateParams = [
         'groupName' => $this->getSubscriptionDetails()->membership_id ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
         'workflow' => $this->getSubscriptionDetails()->membership_id ? 'membership_autorenew_billing' : 'contribution_recurring_billing',
         'contactId' => $this->getSubscriptionDetails()->contact_id,
@@ -331,7 +329,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
         'from' => CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID()),
         'toName' => $donorDisplayName,
         'toEmail' => $donorEmail,
-      );
+      ];
       list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     }
     else {

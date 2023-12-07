@@ -113,8 +113,9 @@ class CRM_Mailing_Event_BAO_MailingEventConfirm extends CRM_Mailing_Event_DAO_Ma
     $bao->body_html = $html;
     $templates = $bao->getTemplates();
 
-    $html = CRM_Utils_Token::replaceWelcomeTokens($templates['html'], $group->title, TRUE);
-    $text = CRM_Utils_Token::replaceWelcomeTokens($templates['text'], $group->title, FALSE);
+    // We can stop doing this here once it has been done in an upgrade script.
+    $html = str_replace('{welcome.group}', '{group.frontend_title}', $templates['html']);
+    $text = str_replace('{welcome.group}', '{group.frontend_title}', $templates['text']);
 
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,

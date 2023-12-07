@@ -6,6 +6,12 @@
   <name>civicrm_acl</name>
   <comment>Access Control List</comment>
   <add>1.6</add>
+  <paths>
+    <add>civicrm/acl/edit?reset=1&amp;action=add</add>
+    <delete>civicrm/acl/delete?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <update>civicrm/acl/edit?reset=1&amp;action=edit&amp;id=[id]</update>
+    <browse>civicrm/acl</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>ACL ID</title>
@@ -58,6 +64,9 @@
     <type>int unsigned</type>
     <title>Entity ID</title>
     <comment>ID of the object possessing this ACL</comment>
+    <pseudoconstant>
+      <optionGroupName>acl_role</optionGroupName>
+    </pseudoconstant>
     <add>1.6</add>
   </field>
   <dynamicForeignKey>
@@ -86,6 +95,13 @@
     <type>varchar</type>
     <length>64</length>
     <comment>The table of the object controlled by this ACL entry</comment>
+    <html>
+      <label>Type of Data</label>
+      <type>Select</type>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_ACL_BAO_ACL::getObjectTableOptions</callback>
+    </pseudoconstant>
     <add>1.6</add>
   </field>
   <field>
@@ -94,6 +110,15 @@
     <type>int unsigned</type>
     <comment>The ID of the object controlled by this ACL entry</comment>
     <add>1.6</add>
+    <html>
+      <label>Which Data</label>
+      <type>Select</type>
+      <controlField>object_table</controlField>
+    </html>
+    <pseudoconstant>
+      <callback>CRM_ACL_BAO_ACL::getObjectIdOptions</callback>
+      <prefetch>disabled</prefetch>
+    </pseudoconstant>
   </field>
   <field>
     <name>acl_table</name>
@@ -119,11 +144,23 @@
     <name>is_active</name>
     <title>ACL Is Active?</title>
     <type>boolean</type>
+    <required>true</required>
+    <default>1</default>
     <comment>Is this property active?</comment>
     <add>1.6</add>
     <html>
       <type>CheckBox</type>
       <label>Enabled</label>
+    </html>
+  </field>
+  <field>
+    <name>priority</name>
+    <type>int</type>
+    <default>0</default>
+    <required>true</required>
+    <add>5.64</add>
+    <html>
+      <type>Number</type>
     </html>
   </field>
 </table>

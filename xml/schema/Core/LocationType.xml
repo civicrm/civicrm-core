@@ -10,7 +10,9 @@
     <add>civicrm/admin/locationType/edit?action=add&amp;reset=1</add>
     <update>civicrm/admin/locationType/edit?action=update&amp;id=[id]&amp;reset=1</update>
     <delete>civicrm/admin/locationType/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+    <browse>civicrm/admin/locationType</browse>
   </paths>
+  <labelField>display_name</labelField>
   <field>
     <name>id</name>
     <title>Location Type ID</title>
@@ -31,6 +33,10 @@
     <title>Location Type</title>
     <type>varchar</type>
     <length>64</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <required>true</required>
     <comment>Location Type Name.</comment>
     <add>1.1</add>
   </field>
@@ -39,6 +45,10 @@
     <title>Display Name</title>
     <type>varchar</type>
     <length>64</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <required>true</required>
     <comment>Location Type Display Name.</comment>
     <localizable>true</localizable>
     <add>4.1</add>
@@ -47,6 +57,9 @@
     <name>vcard_name</name>
     <title>vCard Location Type</title>
     <type>varchar</type>
+    <html>
+      <type>Text</type>
+    </html>
     <length>64</length>
     <comment>vCard Location Type Name.</comment>
     <add>1.1</add>
@@ -55,6 +68,9 @@
     <name>description</name>
     <type>varchar</type>
     <length>255</length>
+    <html>
+      <type>Text</type>
+    </html>
     <comment>Location Type Description.</comment>
     <html>
       <label>Description</label>
@@ -65,6 +81,12 @@
     <name>is_reserved</name>
     <title>Location Type is Reserved?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
+    <html>
+      <type>CheckBox</type>
+      <label>Reserved</label>
+    </html>
     <comment>Is this location type a predefined system location?</comment>
     <add>1.1</add>
   </field>
@@ -72,6 +94,8 @@
     <name>is_active</name>
     <title>Location Type is Active?</title>
     <type>boolean</type>
+    <default>1</default>
+    <required>true</required>
     <comment>Is this property active?</comment>
     <html>
       <type>CheckBox</type>
@@ -83,6 +107,8 @@
     <name>is_default</name>
     <title>Default Location Type?</title>
     <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
     <html>
       <type>CheckBox</type>
       <label>Default</label>

@@ -583,11 +583,6 @@ class CRM_Import_ImportProcessor {
   public function getSavedQuickformDefaultsForColumn($column) {
     $fieldMapping = [];
 
-    // $sel1 is either unmapped, a relationship or a target field.
-    if ($this->getFieldName($column) === 'do_not_import') {
-      return $fieldMapping;
-    }
-
     if ($this->getValidRelationshipKey($column)) {
       $fieldMapping[] = $this->getValidRelationshipKey($column);
     }
@@ -625,7 +620,7 @@ class CRM_Import_ImportProcessor {
       $processor = new CRM_Import_ImportProcessor();
       $processor->setMappingID($mapping['id']);
       $processor->setMetadata(CRM_Contact_BAO_Contact::importableFields('All'));
-      $processor->legacyLoadSavedMapping();;
+      $processor->legacyLoadSavedMapping();
       foreach ($processor->getMappingFields() as $field) {
         // The if is mostly precautionary against running this more than once
         // - which is common in dev if not live...

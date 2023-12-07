@@ -19,7 +19,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:['msg_title','_is_translation','tx_language_label']">
+    <tr ng-repeat="record in $ctrl.records | filter:filters.text | filter:{_is_visible: true} | orderBy:['msg_title','!_is_primary','tx_language_label']">
       <td>{{record.msg_title}}</td>
       <td>{{record.tx_language_label || ts('Standard')}}</td>
       <td>
@@ -39,7 +39,7 @@
         </span>
       </td>
       <td>
-        <span ng-if="!record.tx_language">
+        <span ng-if="record._is_primary">
           <a href crm-icon="fa-plus" ng-click="$ctrl.addTranslation(record)" title="{{ts('Add translation, &quot;%1&quot;', {1: record.msg_title})}}">{{:: ts('Translate') }}</a>
         </span>
       </td>

@@ -25,7 +25,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Minimum previous CiviCRM version we can directly upgrade from
    */
-  const MINIMUM_UPGRADABLE_VERSION = '4.6.12';
+  const MINIMUM_UPGRADABLE_VERSION = '4.7.31';
 
   /**
    * @var \CRM_Core_Config
@@ -139,34 +139,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   public function checkVersionRelease($version, $release) {
     $versionParts = explode('.', $version);
     return ($versionParts[2] == $release);
-  }
-
-  /**
-   * @param $constraints
-   *
-   * @return array
-   */
-  public function checkSQLConstraints(&$constraints) {
-    $pass = $fail = 0;
-    foreach ($constraints as $constraint) {
-      if ($this->checkSQLConstraint($constraint)) {
-        $pass++;
-      }
-      else {
-        $fail++;
-      }
-      return [$pass, $fail];
-    }
-  }
-
-  /**
-   * @param $constraint
-   *
-   * @return bool
-   */
-  public function checkSQLConstraint($constraint) {
-    // check constraint here
-    return TRUE;
   }
 
   /**
@@ -289,8 +261,11 @@ SET    version = '$version'
   public function processLocales($tplFile, $rev) {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('domainID', CRM_Core_Config::domainID());
+    $tempVars = [
+      'upgradeRev' => $rev,
+    ];
 
-    $this->source($smarty->fetch($tplFile), TRUE);
+    $this->source($smarty->fetchWith($tplFile, $tempVars), TRUE);
 
     if ($this->multilingual) {
       CRM_Core_I18n_Schema::rebuildMultilingualSchema($this->locales, $rev);

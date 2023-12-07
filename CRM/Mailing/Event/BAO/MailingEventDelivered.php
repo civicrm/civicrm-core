@@ -17,15 +17,15 @@
 class CRM_Mailing_Event_BAO_MailingEventDelivered extends CRM_Mailing_Event_DAO_MailingEventDelivered {
 
   /**
-   * Create a new delivery event.
+   * Record a new delivery event.
    *
    * @param array $params
    *   Associative array of delivery event values.
    *
    * @return \CRM_Mailing_Event_BAO_MailingEventDelivered
    */
-  public static function &create(&$params) {
-    $q = &CRM_Mailing_Event_BAO_MailingEventQueue::verify($params['job_id'],
+  public static function recordDelivery(&$params) {
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL,
       $params['event_queue_id'],
       $params['hash']
     );
@@ -52,6 +52,19 @@ class CRM_Mailing_Event_BAO_MailingEventDelivered extends CRM_Mailing_Event_DAO_
     }
 
     return $delivered;
+  }
+
+  /**
+   * Create function was renamed `recordDelivery` because it's not a standard CRUD create function
+   *
+   * @param array $params
+   * @deprecated
+   *
+   * @return \CRM_Mailing_Event_BAO_MailingEventDelivered
+   */
+  public static function create(&$params) {
+    CRM_Core_Error::deprecatedFunctionWarning('recordDelivery');
+    return self::recordDelivery($params);
   }
 
   /**

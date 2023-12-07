@@ -23,16 +23,4 @@ class CRM_Contribute_WorkflowMessage_ContributionInvoiceReceipt extends GenericW
 
   public const WORKFLOW = 'contribution_invoice_receipt';
 
-  /**
-   * Specify any tokens that should be exported as smarty variables.
-   *
-   * @todo it might be that this should be moved to the trait as we
-   * we work through these.
-   *
-   * @param array $export
-   */
-  protected function exportExtraTokenContext(array &$export): void {
-    $export['smartyTokenAlias']['currency'] = 'contribution.currency';
-  }
-
 }

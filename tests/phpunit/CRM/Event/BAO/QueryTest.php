@@ -14,8 +14,8 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testParticipantNote() {
-    $event = $this->eventCreate();
+  public function testParticipantNote(): void {
+    $event = $this->eventCreateUnpaid();
     $this->individualCreate([
       'api.participant.create' => [
         'event_id' => $event['id'],
@@ -49,8 +49,8 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testEventType() {
-    $event = $this->eventCreate();
+  public function testEventType(): void {
+    $event = $this->eventCreateUnpaid();
     $contactId = $this->individualCreate([
       'api.participant.create' => [
         'event_id' => $event['id'],

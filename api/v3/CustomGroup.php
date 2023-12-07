@@ -16,19 +16,17 @@
  */
 
 /**
- * Create or modify a custom field group.
+ * This entire function consists of legacy handling, probably for a form that no longer exists.
+ * APIv3 is where code like this goes to die...
  *
  * @param array $params
  *   For legacy reasons, 'extends' can be passed as an array (for setting Participant column_value)
  *
  * @return array
- * @todo $params['extends'] is array format - is that std compatible
  */
 function civicrm_api3_custom_group_create($params) {
   if (isset($params['extends']) && is_string($params['extends'])) {
-    $extends = explode(",", $params['extends']);
-    unset($params['extends']);
-    $params['extends'] = $extends;
+    $params['extends'] = explode(',', $params['extends']);
   }
   if (!isset($params['id']) && (!isset($params['extends'][0]) || !trim($params['extends'][0]))) {
 
@@ -88,8 +86,9 @@ function _civicrm_api3_custom_group_create_spec(&$params) {
 function civicrm_api3_custom_group_delete($params) {
   $values = new CRM_Core_DAO_CustomGroup();
   $values->id = $params['id'];
-  $values->find(TRUE);
-
+  if (!$values->find(TRUE)) {
+    return civicrm_api3_create_error('Error while deleting custom group');
+  }
   $result = CRM_Core_BAO_CustomGroup::deleteGroup($values, TRUE);
   return $result ? civicrm_api3_create_success() : civicrm_api3_create_error('Error while deleting custom group');
 }

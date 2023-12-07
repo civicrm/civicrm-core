@@ -7,8 +7,8 @@
 <body>
 
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
-{capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
-{capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=labelStyle}style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
+{capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
   <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
   <!-- BEGIN HEADER -->
@@ -36,7 +36,7 @@
     </td>
    </tr>
   {/if}
-  {if $event.allow_selfcancelxfer }
+  {if $event.allow_selfcancelxfer}
   {ts}This event allows for{/ts}
   {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participant.id`&{contact.checksum}" h=0 a=1 fe=1}{/capture}
        <a href="{$selfService}"> {ts}self service cancel or transfer{/ts}</a>
@@ -56,26 +56,6 @@
        {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
       </td>
      </tr>
-     {if $conference_sessions}
-      <tr>
-       <td colspan="2" {$labelStyle}>
-  {ts}Your schedule:{/ts}
-       </td>
-      </tr>
-      <tr>
-       <td colspan="2" {$valueStyle}>
-  {assign var='group_by_day' value='NA'}
-  {foreach from=$conference_sessions item=session}
-   {if $session.start_date|crmDate:"%Y/%m/%d" != $group_by_day|crmDate:"%Y/%m/%d"}
-    {assign var='group_by_day' value=$session.start_date}
-          <em>{$group_by_day|crmDate:"%m/%d/%Y"}</em><br />
-   {/if}
-   {$session.start_date|crmDate:0:1}{if $session.end_date}-{$session.end_date|crmDate:0:1}{/if} {$session.title}<br />
-   {if $session.location}&nbsp;&nbsp;&nbsp;&nbsp;{$session.location}<br />{/if}
-  {/foreach}
-       </td>
-      </tr>
-     {/if}
      <tr>
       <td {$labelStyle}>
        {ts}Participant Role{/ts}:
@@ -167,7 +147,7 @@
     </table>
    </td>
   </tr>
-  {if $event.allow_selfcancelxfer }
+  {if $event.allow_selfcancelxfer}
    <tr>
      <td colspan="2" {$valueStyle}>
        {ts 1=$selfcancelxfer_time 2=$selfservice_preposition}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts} {if $totalAmount}{ts}Cancellations are not refundable.{/ts}{/if}<br />

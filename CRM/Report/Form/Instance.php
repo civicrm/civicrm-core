@@ -134,7 +134,7 @@ class CRM_Report_Form_Instance {
     // navigation field
     $parentMenu = CRM_Core_BAO_Navigation::getNavigationList();
 
-    $form->add('select', 'parent_id', ts('Parent Menu'), ['' => ts('- select -')] + $parentMenu);
+    $form->add('select', 'parent_id', ts('Parent Menu'), ['' => ts('- select -')] + $parentMenu, FALSE, ['class' => 'crm-select2 huge']);
 
     // For now we only providing drilldown for one primary detail report only. In future this could be multiple reports
     foreach ($form->_drilldownReport as $reportUrl => $drillLabel) {
@@ -256,7 +256,7 @@ class CRM_Report_Form_Instance {
 
       // CRM-17310 private reports option.
       $defaults['add_to_my_reports'] = 0;
-      if (CRM_Utils_Array::value('owner_id', $defaults) != NULL) {
+      if (($defaults['owner_id'] ?? NULL) != NULL) {
         $defaults['add_to_my_reports'] = 1;
       }
 
@@ -318,7 +318,7 @@ class CRM_Report_Form_Instance {
       // Delete navigation if exists.
       $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instanceID, 'navigation_id', 'id');
       if ($navId) {
-        CRM_Core_BAO_Navigation::processDelete($navId);
+        CRM_Core_BAO_Navigation::deleteRecord(['id' => $navId]);
         CRM_Core_BAO_Navigation::resetNavigation();
       }
     }

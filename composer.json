@@ -53,7 +53,7 @@
     "php": "~7.3 || ~8",
     "composer-runtime-api": "~2.0",
     "dompdf/dompdf" : "~2.0.2",
-    "firebase/php-jwt": ">=3 <6",
+    "firebase/php-jwt": ">=3 <7",
     "rubobaquero/phpquery": "^0.9.15",
     "symfony/config": "~4.4 || ~6.0",
     "symfony/polyfill-iconv": "~1.0",
@@ -61,12 +61,12 @@
     "symfony/event-dispatcher": "~4.4 || ~6.0",
     "symfony/filesystem": "~4.4 || ~6.0",
     "symfony/process": "~4.4 || ~6.0",
-    "symfony/var-dumper": "~3.0 || ~4.4 || ~5.1 || ~6.0",
+    "symfony/var-dumper": "~4.4 || ~5.1 || ~6.0",
     "symfony/service-contracts": "~2.2 || ~3.1",
     "psr/log": "~1.0 || ~2.0 || ~3.0",
     "symfony/finder": "~4.4 || ~6.0",
     "tecnickcom/tcpdf" : "6.4.*",
-    "totten/ca-config": "~22.11",
+    "totten/ca-config": "~23.07",
     "zetacomponents/base": "1.9.*",
     "zetacomponents/mail": "~1.9.4",
     "marcj/topsort": "~1.1",
@@ -83,7 +83,7 @@
     "pear/log": "1.13.3",
     "adrienrn/php-mimetyper": "0.2.2",
     "civicrm/composer-downloads-plugin": "^3.0",
-    "league/csv": "~9.6.2",
+    "league/csv": "~9.7.4",
     "league/oauth2-client": "^2.4",
     "league/oauth2-google": "^3.0",
     "tplaner/when": "~3.1",
@@ -102,12 +102,9 @@
     "symfony/polyfill-php80": "^1.0",
     "symfony/polyfill-php81": "^1.0",
     "symfony/polyfill-php82": "^1.0",
-    "html2text/html2text": "^4.3.1",
+    "soundasleep/html2text": "^2.1",
     "psr/container": "~1.0 || ~2.0",
     "ext-fileinfo": "*"
-  },
-  "require-dev": {
-    "cache/integration-tests": "~0.17.0"
   },
   "scripts": {
     "post-install-cmd": [
@@ -200,8 +197,10 @@
         "url": "https://github.com/NickQiZhu/dc.js/archive/2.1.10.zip",
         "ignore": [".*", "style", "web", "*.json", "regression", "scripts", "spec", "src", "docs", "grunt", "Gruntfile.js", "Changelog.md", "welcome.md", "class-hierarchy.dot", "index.js", "CONTRIBUTING.md", "LICENSE_BANNER", "AUTHORS"]
       },
-      "es6-promise": {
-        "url": "https://github.com/components/es6-promise/archive/v4.2.4.zip"
+      "es-module-shims": {
+        "url": "https://ga.jspm.io/npm:es-module-shims@1.7.2/dist/es-module-shims.js",
+        "path": "bower_components/es-module-shims/dist/es-module-shims.js",
+        "_comment": "See also https://github.com/guybedford/es-module-shims/. MIT license."
       },
       "ext-greenwich-bootstrap3": {
         "url": "https://github.com/twbs/bootstrap-sass/archive/v{$version}.zip",
@@ -233,7 +232,7 @@
         "url": "https://github.com/civicrm/jqueryui/archive/1.13.2-civicrm.zip"
       },
       "jquery-validation": {
-        "url": "https://github.com/jquery-validation/jquery-validation/archive/1.19.3.zip",
+        "url": "https://github.com/jquery-validation/jquery-validation/archive/1.19.5.zip",
         "ignore": [".*", "node_modules", "bower_components", "test", "demo", "lib"]
       },
       "json-formatter": {
@@ -270,20 +269,8 @@
     },
     "patches": {
       "adrienrn/php-mimetyper": {
-        "Update gitignore to ensure that sites that manage via git don't miss out on the important db.json file": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/15.patch"
-      },
-      "league/csv": {
-        "Adding in eol support to fputcsv for php8.1": "https://raw.githubusercontent.com/civicrm/civicrm-core/cacdbfaeaed8e04d504bf2fc604536137c03abeb/tools/scripts/composer/leage_csv_fputcsv.patch",
-        "Remove deprecated flag from php8.1": "https://github.com/thephpleague/csv/commit/380f884922a6cdaaaaab3ad4bfc7d1d710af736e.patch",
-        "Fix php8.1 deprecation errors part 1": "https://github.com/thephpleague/csv/commit/613db0b20157a1114cb1f9a801bd4c9c1f609cdf.patch",
-        "Fix php8.1 deprecation errors part 2": "https://github.com/thephpleague/csv/commit/49e2b08ca025ebaf87a904b5645f535c807b6f10.patch",
-        "Fix php8.1 notice issues part 3": "https://github.com/thephpleague/csv/commit/b83e972caea3cd22e7aaf65c5cffff1d49b46b69.patch"
-      },
-      "html2text/html2text": {
-        "Fix deprecation warning in php8.1 on html_entity_decode": "https://raw.githubusercontent.com/civicrm/civicrm-core/e758d20e9f613ca6c4cf652c23d2cd7e5d3af3ce/tools/scripts/composer/html2text_html2_text_php81_deprecation.patch"
-      },
-      "pear/pear-core-minimal": {
-        "Apply patch to fix creation of dynamic properties in PEAR_Error class": "https://patch-diff.githubusercontent.com/raw/pear/pear-core-minimal/pull/11.patch"
+        "Update gitignore to ensure that sites that manage via git don't miss out on the important db.json file": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/15.patch",
+        "Apply patch to fix php8.2 deprecation notice on dynamic property $filename": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/17.patch"
       },
       "pear/db": {
         "Apply patch to ensure that MySQLI reporting remains the same in php8.1": "https://patch-diff.githubusercontent.com/raw/pear/DB/pull/13.patch",
@@ -291,7 +278,7 @@
         "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/2ad420c394/tools/scripts/composer/pear_db_civicrm_changes.patch"
       },
       "pear/log": {
-        "Apply patch for php8.1": "https://patch-diff.githubusercontent.com/raw/pear/Log/pull/23.patch"
+        "Apply patch for php8.1": "https://gist.githubusercontent.com/totten/d99d47dd9d19a5cb02858954a5577609/raw/0e5e4628a475219c2aec6af76e69894cdec42a55/pear-log-locale.patch"
       },
       "pear/mail": {
         "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://raw.githubusercontent.com/civicrm/civicrm-core/36319938a5bf26c1e7e2110a26a65db6a5979268/tools/scripts/composer/patches/pear-mail.patch"

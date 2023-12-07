@@ -67,7 +67,7 @@
     <type>varchar</type>
     <length>254</length>
     <html>
-      <type>Text</type>
+      <type>Email</type>
       <size>30</size>
     </html>
     <import>true</import>

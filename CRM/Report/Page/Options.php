@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of Gender
+ * Page for displaying list of report options
  */
 class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
 
@@ -94,22 +94,26 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/report/register/' . self::$_gName,
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit %1', [1 => self::$_gLabel]),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable %1', [1 => self::$_gLabel]),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable %1', [1 => self::$_gLabel]),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/report/register/' . self::$_gName,
           'qs' => 'action=delete&id=%%id%%&reset=1',
           'title' => ts('Delete %1 Type', [1 => self::$_gLabel]),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }

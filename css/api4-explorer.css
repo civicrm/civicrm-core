@@ -133,10 +133,13 @@
 }
 
 #bootstrap-theme.api4-explorer-page .api4-operator,
+#bootstrap-theme.api4-explorer-page .api4-sets-action,
+#bootstrap-theme.api4-explorer-page .api4-sets-type,
 #bootstrap-theme.api4-explorer-page .api4-chain-index,
 #bootstrap-theme.api4-explorer-page .api4-chain-action {
   width: 90px;
 }
+#bootstrap-theme.api4-explorer-page .api4-sets-params,
 #bootstrap-theme.api4-explorer-page .api4-chain-params {
   width: calc(100% - 390px);
 }

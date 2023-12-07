@@ -32,33 +32,24 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
   public static $_statusACLFt = [];
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialType', $id, 'is_active', $is_active);
   }
 
@@ -71,6 +62,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @deprecated
    */
   public static function create(array $params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -88,6 +80,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @deprecated
    */
   public static function add(array $params, $ids = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return self::writeRecord($params);
   }
 
@@ -99,6 +92,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @return array|bool
    */
   public static function del($financialTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     try {
       static::deleteRecord(['id' => $financialTypeId]);
       return TRUE;
@@ -352,6 +346,8 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
 
   /**
    * Function to check if lineitems present in a contribution have permissioned FTs.
+   *
+   * @deprecated since 5.68 not part of core - to be handled within financialacls extension
    *
    * @param int $id
    *   contribution id

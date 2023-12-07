@@ -11,13 +11,8 @@
   <h3>{ts}Data Entry Batches{/ts}</h3>
   <table class="form-layout-compressed">
     <tr>
-      <td>
-      {$form.title.html}<br />
-        <span class="description font-italic">
-        {ts}Complete OR partial batch name.{/ts}
-        </span>
-      </td>
-      <td>{include file="CRM/common/formButtons.tpl"}</td>
+      <td>{$form.title.html}</td>
+      <td>{include file="CRM/common/formButtons.tpl" location=''}</td>
     </tr>
   </table>
 </div>

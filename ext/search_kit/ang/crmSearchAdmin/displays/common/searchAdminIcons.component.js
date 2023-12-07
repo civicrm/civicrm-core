@@ -16,9 +16,12 @@
       this.getField = searchMeta.getField;
 
       this.fields = function() {
-        var allFields = ctrl.crmSearchAdmin.getAllFields(':name', ['Field', 'Custom', 'Extra', 'Pseudo']);
+        let allFields = ctrl.crmSearchAdmin.getAllFields(':name', ['Field', 'Custom', 'Extra', 'Pseudo']);
+        let selectFields = ctrl.crmSearchAdmin.getSelectFields();
+        // Use machine names not labels for option matching
+        selectFields.forEach((field) => field.id = field.id.replace(':label', ':name'));
         return {
-          results: ctrl.crmSearchAdmin.getSelectFields().concat(allFields)
+          results: selectFields.concat(allFields)
         };
       };
 

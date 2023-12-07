@@ -46,7 +46,7 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $this->add('text', 'title', ts('Event Name'),
-      [CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'title')]
+      CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'title')
     );
 
     $this->addSelect('event_type_id', ['multiple' => TRUE, 'context' => 'search']);

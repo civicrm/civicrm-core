@@ -88,7 +88,7 @@ trait CRM_Core_Payment_AuthorizeNetTrait {
    *
    * @param array $expected
    */
-  protected function assertRequestValid($expected = []) {
+  protected function assertRequestValid(array $expected = []): void {
     $expected = array_merge([
       'x_card_num' => '4111111111111111',
       'x_card_code' => 123,

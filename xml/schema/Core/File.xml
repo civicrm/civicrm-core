@@ -27,6 +27,12 @@
     <type>int unsigned</type>
     <title>File Type</title>
     <comment>Type of file (e.g. Transcript, Income Tax Return, etc). FK to civicrm_option_value.</comment>
+    <pseudoconstant>
+      <optionGroupName>file_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>1.5</add>
   </field>
   <field>

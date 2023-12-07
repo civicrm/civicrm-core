@@ -20,12 +20,11 @@
 class CRM_Core_Action {
 
   /**
-   * Different possible actions are defined here. Keep in sync with the
-   * constant from CRM_Core_Form for various modes.
+   * Different possible actions are defined here.
    *
    * @var int
    */
-  const
+  public const
     NONE = 0,
     ADD = 1,
     UPDATE = 2,
@@ -79,12 +78,113 @@ class CRM_Core_Action {
     'reopen' => self::REOPEN,
   ];
 
-  /**
-   * The flipped version of the names array, initialized when used
-   *
-   * @var array
-   */
-  public static $_description;
+  private static function getInfo(): array {
+    Civi::$statics[__CLASS__ . 'Info'] = Civi::$statics[__CLASS__ . 'Info'] ?? [
+      self::ADD => [
+        'name' => 'add',
+        'label' => ts('Add'),
+        'weight' => 0,
+        'icon' => 'fa-plus',
+      ],
+      self::UPDATE => [
+        'name' => 'update',
+        'label' => ts('Edit'),
+        'weight' => -10,
+        'icon' => 'fa-pencil',
+      ],
+      self::VIEW => [
+        'name' => 'view',
+        'label' => ts('View'),
+        'weight' => -20,
+        'icon' => 'fa-external-link',
+      ],
+      self::DELETE => [
+        'name' => 'delete',
+        'label' => ts('Delete'),
+        'weight' => 100,
+        'icon' => 'fa-trash',
+      ],
+      self::BROWSE => [
+        'name' => 'browse',
+        'label' => ts('Browse'),
+        'weight' => 0,
+        'icon' => 'fa-list',
+      ],
+      self::ENABLE => [
+        'name' => 'enable',
+        'label' => ts('Enable'),
+        'weight' => 40,
+        'icon' => 'fa-repeat',
+      ],
+      self::DISABLE => [
+        'name' => 'disable',
+        'label' => ts('Disable'),
+        'weight' => 40,
+        'icon' => 'fa-ban',
+      ],
+      self::EXPORT => [
+        'name' => 'export',
+        'label' => ts('Export'),
+        'weight' => 0,
+        'icon' => 'fa-download',
+      ],
+      self::PREVIEW => [
+        'name' => 'preview',
+        'label' => ts('Preview'),
+        'weight' => 0,
+        'icon' => 'fa-eye',
+      ],
+      self::MAP => [
+        'name' => 'map',
+        'label' => ts('Map'),
+        'weight' => 10,
+        'icon' => 'fa-cog',
+      ],
+      self::COPY => [
+        'name' => 'copy',
+        'label' => ts('Copy'),
+        'weight' => 20,
+        'icon' => 'fa-clone',
+      ],
+      self::PROFILE => [
+        'name' => 'profile',
+        'label' => ts('Profile'),
+        'weight' => 0,
+        'icon' => 'fa-files-o',
+      ],
+      self::RENEW => [
+        'name' => 'renew',
+        'label' => ts('Renew'),
+        'weight' => 10,
+        'icon' => 'fa-undo',
+      ],
+      self::DETACH => [
+        'name' => 'detach',
+        'label' => ts('Move'),
+        'weight' => 0,
+        'icon' => 'fa-random',
+      ],
+      self::REVERT => [
+        'name' => 'revert',
+        'label' => ts('Revert'),
+        'weight' => 0,
+        'icon' => 'fa-refresh',
+      ],
+      self::CLOSE => [
+        'name' => 'close',
+        'label' => ts('Close'),
+        'weight' => 0,
+        'icon' => 'fa-folder',
+      ],
+      self::REOPEN => [
+        'name' => 'reopen',
+        'label' => ts('Reopen'),
+        'weight' => 0,
+        'icon' => 'fa-folder-open-o',
+      ],
+    ];
+    return Civi::$statics[__CLASS__ . 'Info'];
+  }
 
   /**
    * Called by the request object to translate a string into a mask.
@@ -129,35 +229,31 @@ class CRM_Core_Action {
   }
 
   /**
-   * Given a string determine the bitmask for this specific string.
+   * Given a string lookup the bitmask for the action name.
+   * e.g. "add" returns self::ADD.
    *
-   * @param string $item
-   *   The input action to process.
+   * @param string $name
    *
    * @return int
-   *   the action mask corresponding to the input string
    */
-  public static function mapItem($item) {
-    $mask = self::$_names[trim($item)] ?? NULL;
-    return $mask ? $mask : 0;
+  public static function mapItem($name) {
+    foreach (self::getInfo() as $mask => $info) {
+      if ($info['name'] === $name) {
+        return $mask;
+      }
+    }
+    return self::NONE;
   }
 
   /**
-   *
-   * Given an action mask, find the corresponding description
+   * Given an action mask, get the name which describes it,
+   * e.g. self::ADD returns 'add'.
    *
    * @param int $mask
-   *   The action mask.
-   *
    * @return string
-   *   the corresponding action description
    */
   public static function description($mask) {
-    if (!isset(self::$_description)) {
-      self::$_description = array_flip(self::$_names);
-    }
-
-    return CRM_Utils_Array::value($mask, self::$_description, 'NO DESCRIPTION SET');
+    return self::getInfo()[$mask]['name'] ?? 'NO DESCRIPTION SET';
   }
 
   /**
@@ -217,8 +313,13 @@ class CRM_Core_Action {
 
     $url = [];
 
+    usort($seqLinks, static function ($a, $b) {
+      return (int) ((int) ($a['weight']) > (int) ($b['weight']));
+    });
+
     foreach ($seqLinks as $i => $link) {
-      if (!$mask || !array_key_exists('bit', $link) || ($mask & $link['bit'])) {
+      $isActive = $link['is_active'] ?? TRUE;
+      if ($isActive && (!$mask || !array_key_exists('bit', $link) || ($mask & $link['bit']))) {
         $extra = isset($link['extra']) ? self::replace($link['extra'], $values) : NULL;
 
         $frontend = isset($link['fe']);
@@ -253,10 +354,10 @@ class CRM_Core_Action {
 
         $linkContent = $link['name'];
         if (!empty($link['icon'])) {
-          if ($iconMode == 'icon') {
+          if ($iconMode === 'icon') {
             $linkContent = CRM_Core_Page::crmIcon($link['icon'], $link['name'], TRUE, ['title' => '']);
           }
-          elseif ($iconMode == 'both') {
+          elseif ($iconMode === 'both') {
             $linkContent = CRM_Core_Page::crmIcon($link['icon']) . ' ' . $linkContent;
           }
         }
@@ -279,7 +380,7 @@ class CRM_Core_Action {
     }
     else {
       $extra = '';
-      if ($iconMode != 'icon') {
+      if ($iconMode !== 'icon') {
         $extraLinks = array_splice($url, 2);
         if (count($extraLinks) > 1) {
           $mainLinks = array_slice($url, 0, 2);
@@ -405,6 +506,93 @@ class CRM_Core_Action {
     }
 
     return $mask;
+  }
+
+  /**
+   * @param int $mask
+   * @return string|null
+   */
+  public static function getLabel(int $mask): ?string {
+    return self::getInfo()[$mask]['label'] ?? NULL;
+  }
+
+  /**
+   * @param int $mask
+   * @return int|null
+   */
+  public static function getWeight(int $mask): ?string {
+    return self::getInfo()[$mask]['weight'] ?? NULL;
+  }
+
+  /**
+   * @param int $mask
+   * @return int|null
+   */
+  public static function getIcon(int $mask): ?string {
+    return self::getInfo()[$mask]['icon'] ?? NULL;
+  }
+
+  /**
+   * Builds a title based on action and entity title, e.g. "Update Contact"
+   *
+   * @param int $action
+   * @param string $entityTitle
+   * @return string|null
+   */
+  public static function getTitle(int $action, string $entityTitle): ?string {
+    switch ($action) {
+      case self::ADD:
+        return ts('Add %1', [1 => $entityTitle]);
+
+      case self::UPDATE:
+        return ts('Update %1', [1 => $entityTitle]);
+
+      case self::VIEW:
+        return ts('View %1', [1 => $entityTitle]);
+
+      case self::DELETE:
+        return ts('Delete %1', [1 => $entityTitle]);
+
+      case self::BROWSE:
+        return ts('Browse %1', [1 => $entityTitle]);
+
+      case self::ENABLE:
+        return ts('Enable %1', [1 => $entityTitle]);
+
+      case self::DISABLE:
+        return ts('Disable %1', [1 => $entityTitle]);
+
+      case self::EXPORT:
+        return ts('Export %1', [1 => $entityTitle]);
+
+      case self::PREVIEW:
+        return ts('Preview %1', [1 => $entityTitle]);
+
+      case self::MAP:
+        return ts('Map %1', [1 => $entityTitle]);
+
+      case self::COPY:
+        return ts('Copy %1', [1 => $entityTitle]);
+
+      case self::PROFILE:
+        return ts('Profile %1', [1 => $entityTitle]);
+
+      case self::RENEW:
+        return ts('Renew %1', [1 => $entityTitle]);
+
+      case self::DETACH:
+        return ts('Move %1', [1 => $entityTitle]);
+
+      case self::REVERT:
+        return ts('Revert %1', [1 => $entityTitle]);
+
+      case self::CLOSE:
+        return ts('Close %1', [1 => $entityTitle]);
+
+      case self::REOPEN:
+        return ts('Reopen %1', [1 => $entityTitle]);
+    }
+    return NULL;
   }
 
 }

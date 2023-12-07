@@ -59,21 +59,26 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
       throw new \CRM_Core_Exception("Entity name is required to get autocomplete default display.");
     }
     $idField = CoreUtil::getIdFieldName($entityName);
-    $labelField = CoreUtil::getInfoItem($entityName, 'label_field');
-    if (!$labelField) {
-      throw new \CRM_Core_Exception("Entity $entityName has no default label field.");
-    }
+
+    // If there's no label field, fall back on id. That's a pretty lame autocomplete but better than nothing.
+    $searchFields = CoreUtil::getSearchFields($entityName) ?: [$idField];
 
     // Default sort order
     $e->display['settings']['sort'] = self::getDefaultSort($entityName);
 
     $apiGet = Request::create($entityName, 'get', ['version' => 4]);
     $fields = $apiGet->entityFields();
-    $columns = [$labelField];
+    $columns = array_slice($searchFields, 0, 1);
     // Add grouping fields like "event_type_id" in the description
-    $grouping = (array) (CoreUtil::getCustomGroupExtends($entityName)['grouping'] ?? []);
+    $grouping = (array) (CoreUtil::getCustomGroupExtends($entityName)['grouping'] ?? ['financial_type_id']);
     foreach ($grouping as $fieldName) {
-      $columns[] = "$fieldName:label";
+      if (!empty($fields[$fieldName]['options']) && !in_array("$fieldName:label", $searchFields)) {
+        $columns[] = "$fieldName:label";
+      }
+    }
+    $statusField = $fields['status_id'] ?? $fields[strtolower($entityName) . '_status_id'] ?? NULL;
+    if (!empty($statusField['options']) && !in_array("{$statusField['name']}:label", $searchFields)) {
+      $columns[] = "{$statusField['name']}:label";
     }
     if (isset($fields['description'])) {
       $columns[] = 'description';
@@ -86,11 +91,15 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
         'key' => $columnField,
       ];
     }
+    if (count($searchFields) > 1) {
+      $e->display['settings']['columns'][0]['rewrite'] = '[' . implode('] - [', $searchFields) . ']';
+    }
     // Include entity id on the second line
     $e->display['settings']['columns'][1] = [
       'type' => 'field',
-      'key' => $idField,
+      'key' => $columns[1] ?? $idField,
       'rewrite' => "#[$idField]" . (isset($columns[1]) ? " [$columns[1]]" : ''),
+      'empty_value' => "#[$idField]",
     ];
 
     // Default icons
@@ -101,7 +110,7 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
 
     // Color field
     if (isset($fields['color'])) {
-      $e->display['settings']['color'] = 'color';
+      $e->display['settings']['extra']['color'] = 'color';
     }
   }
 
@@ -152,8 +161,12 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
    * @return array
    */
   protected static function getDefaultSort($entityName) {
-    $sortField = CoreUtil::getInfoItem($entityName, 'order_by') ?: CoreUtil::getInfoItem($entityName, 'label_field');
-    return $sortField ? [[$sortField, 'ASC']] : [];
+    $result = [];
+    $sortFields = (array) (CoreUtil::getInfoItem($entityName, 'order_by') ?: CoreUtil::getSearchFields($entityName));
+    foreach ($sortFields as $sortField) {
+      $result[] = [$sortField, 'ASC'];
+    }
+    return $result;
   }
 
 }

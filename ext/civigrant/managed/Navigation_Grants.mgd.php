@@ -55,7 +55,7 @@ return [
       'values' => [
         'label' => E::ts('New Grant'),
         'name' => 'New Grant',
-        'url' => 'civicrm/grant/add?reset=1&action=add&context=standalone',
+        'url' => 'civicrm/grant/add?reset=1&action=add',
         'icon' => NULL,
         'permission' => 'access CiviGrant,edit grants',
         'permission_operator' => 'AND',

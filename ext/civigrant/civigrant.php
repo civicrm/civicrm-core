@@ -13,17 +13,6 @@ function civigrant_civicrm_config(&$config) {
 }
 
 /**
- * Implements hook_civicrm_entityTypes().
- *
- * Declare entity types provided by this module.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function civigrant_civicrm_entityTypes(&$entityTypes) {
-  _civigrant_civix_civicrm_entityTypes($entityTypes);
-}
-
-/**
  * Implements hook_civicrm_links().
  *
  * Add shortcut link to create new grant.
@@ -34,7 +23,7 @@ function civigrant_civicrm_links($context, $name, $id, &$links) {
       'ref' => 'new-grant',
       'name' => 'Grant',
       'title' => ts('Grant'),
-      'url' => CRM_Utils_System::url('civicrm/grant/add', 'reset=1&action=add&context=standalone'),
+      'url' => CRM_Utils_System::url('civicrm/grant/add', 'reset=1&action=add'),
     ];
   }
 }
@@ -50,9 +39,9 @@ function civigrant_civicrm_summaryActions(&$menu, $cid) {
     'weight' => 26,
     'ref' => 'new-grant',
     'key' => 'grant',
-    'tab' => 'afsearchGrants',
-    'href' => CRM_Utils_System::url('civicrm/contact/view/grant',
-      'reset=1&action=add&context=grant'
+    'tab' => 'grant',
+    'href' => CRM_Utils_System::url('civicrm/grant/add',
+      'reset=1&action=add'
     ),
     'permissions' => ['edit grants'],
   ];

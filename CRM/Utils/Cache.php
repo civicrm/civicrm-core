@@ -124,6 +124,7 @@ class CRM_Utils_Cache {
         break;
 
       case 'APCcache':
+      case 'APCucache':
         $defaults = [];
         if (defined('CIVICRM_DB_CACHE_TIMEOUT')) {
           $defaults['timeout'] = CIVICRM_DB_CACHE_TIMEOUT;
@@ -167,6 +168,7 @@ class CRM_Utils_Cache {
   public static function create($params = []) {
     $types = (array) $params['type'];
 
+    // FIXME: When would name ever be empty?
     if (!empty($params['name'])) {
       $params['name'] = self::cleanKey($params['name']);
     }
@@ -182,26 +184,30 @@ class CRM_Utils_Cache {
             if (!empty($params['withArray'])) {
               $cache = $params['withArray'] === 'fast' ? new CRM_Utils_Cache_FastArrayDecorator($cache) : new CRM_Utils_Cache_ArrayDecorator($cache);
             }
-            return $cache;
+            break 2;
           }
           break;
 
         case 'SqlGroup':
           if (defined('CIVICRM_DSN') && CIVICRM_DSN) {
-            return new CRM_Utils_Cache_SqlGroup([
+            $cache = new CRM_Utils_Cache_SqlGroup([
               'group' => $params['name'],
               'prefetch' => $params['prefetch'] ?? FALSE,
             ]);
+            break 2;
           }
           break;
 
         case 'Arraycache':
         case 'ArrayCache':
-          return new CRM_Utils_Cache_ArrayCache([]);
+          $cache = new CRM_Utils_Cache_ArrayCache([]);
+          break 2;
 
       }
     }
-
+    if (isset($cache)) {
+      return new CRM_Utils_Cache_CacheWrapper($cache, $params['name'] ?? NULL);
+    }
     throw new CRM_Core_Exception("Failed to instantiate cache. No supported cache type found. " . print_r($params, 1));
   }
 

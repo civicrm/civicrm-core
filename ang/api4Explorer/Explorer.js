@@ -36,7 +36,7 @@
     $scope.selectedTab = {result: 'result'};
     $scope.crmUrl = CRM.url;
     $scope.perm = {
-      accessDebugOutput: CRM.checkPerm('access debug output'),
+      viewDebugOutput: CRM.checkPerm('view debug output'),
     };
     marked.setOptions({highlight: prettyPrintOne});
     var getMetaParams = {},
@@ -352,7 +352,7 @@
       if (_.isEmpty($scope.availableParams)) {
         return;
       }
-      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy', 'having', 'join'];
+      var specialParams = ['select', 'fields', 'action', 'where', 'values', 'defaults', 'orderBy', 'chain', 'groupBy', 'having', 'join', 'sets'];
       if ($scope.availableParams.limit && $scope.availableParams.offset) {
         specialParams.push('limit', 'offset');
       }
@@ -560,7 +560,7 @@
                 false,
                 true,
                 ['id', 'name', 'label'],
-                ['id', 'name', 'label', 'abbr', 'description', 'color', 'icon']
+                CRM.vars.api4.suffixes
               ];
               format = 'json';
               defaultVal = false;
@@ -611,7 +611,7 @@
               });
             });
           }
-          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy' || name === 'select' || name === 'join') {
+          if (typeof objectParams[name] !== 'undefined' || name === 'groupBy' || name === 'select' || name === 'join' || name === 'sets') {
             $scope.$watch('controls.' + name, function(value) {
               var field = value;
               $timeout(function() {
@@ -619,6 +619,10 @@
                   if (name === 'join') {
                     $scope.params[name].push([field + ' AS ' + _.snakeCase(field), 'LEFT']);
                     ctrl.buildFieldList();
+                  }
+                  else if (name === 'sets') {
+                    var select = $scope.params.select && $scope.params.select.length ? $scope.params.select : ['id'];
+                    $scope.params[name].push(['UNION ALL', field, 'get', '{select: [' + select.join(', ') + '], where: []}']);
                   }
                   else if (typeof objectParams[name] === 'undefined') {
                     $scope.params[name].push(field);
@@ -734,6 +738,8 @@
             break;
 
           case 'php':
+            // Always shows implicit true permissions check for PHP
+            params.checkPermissions = (params.checkPermissions === false) ? false : true;
             // Write php code
             code.php = '$' + results + " = civicrm_api4('" + entity + "', '" + action + "', [";
             _.each(params, function(param, key) {
@@ -797,6 +803,9 @@
                     limitSet = true;
                     code.short += ' +l ' + (params.limit || '0') + (params.offset ? ('@' + params.offset) : '');
                   }
+                  break;
+                case (typeof param === 'boolean'):
+                  code.short += ' ' + key + '=' + (param ? 1 : 0);
                   break;
                 default:
                   code.short += ' ' + key + '=' + (typeof param === 'string' ? cliFormat(param) : cliFormat(JSON.stringify(param)));
@@ -873,9 +882,8 @@
         newLine = "\n" + _.repeat(' ', indent),
         code = '\\' + info.class + '::' + action + '(',
         args = _.cloneDeep(info.class_args || []);
-      if (params.checkPermissions === false) {
-        args.push(false);
-      }
+      // Always shows implicit true permissions check for PHP
+      args.push((params.checkPermissions === false) ? false : true);
       code += _.map(args, phpFormat).join(', ') + ')';
       _.each(params, function(param, key) {
         var val = '';
@@ -910,6 +918,11 @@
           _.each(param, function(chain, name) {
             code += newLine + "->addChain('" + name + "', " + formatOOP(chain[0], chain[1], chain[2], 2 + indent);
             code += (chain.length > 3 ? ',' : '') + (!_.isEmpty(chain[2]) ? newLine : ' ') + (chain.length > 3 ? phpFormat(chain[3]) : '') + ')';
+          });
+        } else if (key === 'sets') {
+          _.each(param, function(set) {
+            code += newLine + "->addSet(" + phpFormat(set[0]) + ', ' + formatOOP(set[1], set[2], set[3], 2 + indent);
+            code += newLine + ')';
           });
         } else if (key === 'join') {
           _.each(param, function(join) {
@@ -985,7 +998,11 @@
           break;
 
         case 'php':
-          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2)) + ';', 'php', 1));
+          // Fields marked 'localizable' in the schema should get wrapped in ts() for the php format
+          var localizable = _.pluck(_.filter(_.findWhere(getEntity().actions, {name: $scope.action}).fields, {localizable: true}), 'name') || [];
+          // More field names that probably should be translated
+          localizable = _.union(localizable, ['label', 'title', 'description', 'text']);
+          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2, localizable)) + ';', 'php', 1));
           break;
       }
     };
@@ -999,7 +1016,7 @@
     /**
      * Format value to look like php code
      */
-    function phpFormat(val, indent, indentChildren) {
+    function phpFormat(val, indent, indentChildren, localizable) {
       if (typeof val === 'undefined') {
         return '';
       }
@@ -1017,7 +1034,9 @@
           return '[]';
         }
         $.each(val, function(k, v) {
-          ret += (ret ? ', ' : '') + newLine + indent + "'" + k + "' => " + phpFormat(v, indentChild, indentChildren);
+          var ts = localizable && localizable.includes(k) && _.isString(v)  && v.length ? 'E::ts(' : '';
+          var leadingComma = !ret ? '' : (newLine ? ',' : ', ');
+          ret += leadingComma + newLine + indent + "'" + k + "' => " + ts + phpFormat(v, indentChild, indentChildren, localizable) + (ts ? ')' : '');
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
@@ -1026,7 +1045,8 @@
           return '[]';
         }
         $.each(val, function(k, v) {
-          ret += (ret ? ', ' : '') + newLine + indent + phpFormat(v, indentChild, indentChildren);
+          var leadingComma = !ret ? '' : (newLine ? ',' : ', ');
+          ret += leadingComma + newLine + indent + phpFormat(v, indentChild, indentChildren, localizable);
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
@@ -1225,10 +1245,14 @@
           if ($el.is('.crm-form-date-wrapper .crm-hidden-date')) {
             $el.crmDatepicker('destroy');
           }
-          if ($el.is('.select2-container + input')) {
+          if (isSelect2()) {
             $el.crmAutocomplete('destroy');
           }
           $(element).removeData().removeAttr('type').removeAttr('placeholder').show();
+        }
+
+        function isSelect2() {
+          return $(element).is('.select2-container + input');
         }
 
         function makeWidget(field, op) {
@@ -1292,7 +1316,7 @@
           // If the viewValue is invalid (say required but empty) it will be `undefined`
           if (_.isUndefined(viewValue)) return;
 
-          if (!multi) {
+          if (!multi || !isSelect2()) {
             return viewValue;
           }
 
@@ -1409,6 +1433,24 @@
         scope.$watch("chain[1][1]", changeAction);
       }
     };
+  });
+
+  angular.module('api4Explorer').component('api4ExpSet', {
+    bindings: {
+      set: '<',
+      deleteRow: '&',
+      entities: '<'
+    },
+    templateUrl: '~/api4Explorer/Set.html',
+    controller: function($scope) {
+      var ctrl = this;
+
+      $scope.$watch('$ctrl.set[1]', function(entity) {
+        if (!entity) {
+          ctrl.deleteRow();
+        }
+      });
+    }
   });
 
   function getEntity(entityName) {

@@ -75,12 +75,12 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           $log_url = implode($filePathMarker, $url);
           if ($this->fileExists($log_url)) {
             $docs_url = $this->createDocUrl('the-log-file-should-not-be-accessible');
-            $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
-              . '<br />' .
-              '<a href="%2">Read more about this warning</a>';
+            $msg = ts('The <a %1>CiviCRM debug log</a> should not be downloadable.', [1 => "href='$log_url'"])
+              . '<br />'
+              . '<a href="' . $docs_url . '">' . ts('Read more about this warning') . '</a>';
             $messages[] = new CRM_Utils_Check_Message(
               __FUNCTION__,
-              ts($msg, [1 => $log_url, 2 => $docs_url]),
+              $msg,
               ts('Security Warning'),
               \Psr\Log\LogLevel::WARNING,
               'fa-lock'
@@ -109,6 +109,10 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * @todo Test with WordPress, Joomla.
    */
   public function checkUploadsAreNotAccessible() {
+    if ($this->isLimitedDevelopmentServer()) {
+      return [];
+    }
+
     $messages = [];
 
     $config = CRM_Core_Config::singleton();
@@ -141,6 +145,29 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Some security checks require sending a real HTTP request. This breaks the single-threading
+   * model historically used by the PHP built-in webserver (for local development). There is some
+   * experimental support for multi-threading in PHP 7.4+. Anecdotally, this is still insufficient
+   * on PHP 7.4 -- but it works well enough on PHP 8.1.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkHttpAuditable() {
+    $messages = [];
+    if ($this->isLimitedDevelopmentServer()) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        // No ts since end users should never see this
+        'The built-in php HTTP server has no configuration options to secure folders, and so there is no point testing if they are secure. This problem only affects local development and E2E testing.',
+        'Incomplete Security Checks',
+        \Psr\Log\LogLevel::WARNING,
+        'fa-lock'
+      );
+    }
+    return $messages;
+  }
+
+  /**
    * Check if our uploads or ConfigAndLog directories have browseable
    * listings.
    *
@@ -156,6 +183,10 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * @todo Test with WordPress, Joomla.
    */
   public function checkDirectoriesAreNotBrowseable() {
+    if ($this->isLimitedDevelopmentServer()) {
+      return [];
+    }
+
     $messages = [];
     $config = CRM_Core_Config::singleton();
     $publicDirs = [
@@ -256,10 +287,6 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
         "{$packages_path}/OpenFlashChart/php-ofc-library/ofc_upload_image.php",
         \Psr\Log\LogLevel::CRITICAL,
       ],
-      [
-        "{$packages_path}/html2text/class.html2text.inc",
-        \Psr\Log\LogLevel::CRITICAL,
-      ],
     ];
     foreach ($files as $file) {
       if (file_exists($file[0])) {
@@ -356,6 +383,10 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  public function isLimitedDevelopmentServer(): bool {
+    return PHP_SAPI === 'cli-server';
+  }
+
   /**
    * Determine whether $url is a public, browsable listing for $dir
    *
@@ -380,7 +411,21 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       return FALSE;
     }
 
-    $content = @file_get_contents("$url");
+    // Since this can be confusing as to how this works:
+    // $url corresponds to $dir not $file, but we're not checking if we can
+    // retrieve $file, we're checking if retrieving $url gives us a LISTING of
+    // the files in $dir. So $content is that listing, and then the stristr
+    // is checking if $file, which is the bare filename (e.g. "delete-this-123")
+    // is contained in that listing (which would be undesirable).
+    $content = '';
+    try {
+      $response = (new \GuzzleHttp\Client())->request('GET', $url, [
+        'timeout' => \Civi::settings()->get('http_timeout'),
+      ]);
+      $content = $response->getBody()->getContents();
+    }
+    catch (\GuzzleHttp\Exception\GuzzleException $e) {
+    }
     if (stristr($content, $file)) {
       $result = TRUE;
     }
@@ -413,8 +458,17 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       return FALSE;
     }
 
+    // @todo why call fileExists before doing almost the same thing. It's slightly different than reading the file's content, but is it necessary?
     if ($this->fileExists("$url/$file")) {
-      $content = @file_get_contents("$url/$file");
+      $content = '';
+      try {
+        $response = (new \GuzzleHttp\Client())->request('GET', "$url/$file", [
+          'timeout' => \Civi::settings()->get('http_timeout'),
+        ]);
+        $content = $response->getBody()->getContents();
+      }
+      catch (\GuzzleHttp\Exception\GuzzleException $e) {
+      }
       if (preg_match('/delete me/', $content)) {
         $result = TRUE;
       }

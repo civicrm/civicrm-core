@@ -33,7 +33,7 @@ class api_v3_NavigationTest extends CiviUnitTestCase {
    * Test get specifying parent
    * FIXME: Api4
    */
-  public function testGetByParent() {
+  public function testGetByParent(): void {
     // get by name
     $this->callAPISuccess($this->_entity, 'get', ['parentID' => 'Administer', 'domain_id' => 1]);
 

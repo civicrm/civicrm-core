@@ -71,7 +71,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->setPageTitle(ts('Financial Account'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -146,7 +145,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
         $errorMsg['tax_rate'] = ts('Please enter value for tax rate');
       }
     }
-    if ((CRM_Utils_Array::value('tax_rate', $values) != NULL)) {
+    if ((($values['tax_rate'] ?? NULL) != NULL)) {
       if ($values['tax_rate'] < 0 || $values['tax_rate'] >= 100) {
         $errorMsg['tax_rate'] = ts('Tax Rate Should be between 0 - 100');
       }
@@ -201,15 +200,10 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->_id;
       }
-      foreach ([
-        'is_active',
-        'is_deductible',
-        'is_tax',
-        'is_default',
-      ] as $field) {
-        $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
+      foreach (['is_active', 'is_deductible', 'is_tax', 'is_default'] as $field) {
+        $params[$field] = $params[$field] ?? FALSE;
       }
-      $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
+      $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($params);
       CRM_Core_Session::setStatus(ts('The Financial Account \'%1\' has been saved.', [1 => $financialAccount->name]), ts('Saved'), 'success');
     }
   }

@@ -13,7 +13,7 @@
     <add>civicrm/participant/add?action=add&amp;context=standalone&amp;reset=1</add>
     <view>civicrm/contact/view/participant?id=[id]&amp;cid=[contact_id]&amp;action=view&amp;reset=1</view>
     <update>civicrm/contact/view/participant?id=[id]&amp;cid=[contact_id]&amp;action=update&amp;reset=1</update>
-    <delete>civicrm/contact/view/participant?id=[id]&amp;cid=[contact_id]&amp;action=delete&amp;reset=1</delete>
+    <delete>civicrm/participant/delete?id=[id]&amp;reset=1</delete>
   </paths>
   <field>
     <name>id</name>
@@ -287,7 +287,7 @@
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
-      <prefetch>FALSE</prefetch>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
   </field>
   <foreignKey>

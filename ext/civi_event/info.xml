@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<extension key="civi_event" type="module">
+  <file>civi_event</file>
+  <name>CiviEvent</name>
+  <description>Event management functionality for CiviCRM</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>CiviCRM</author>
+    <email>info@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Documentation">https://docs.civicrm.org/user/en/latest/events/what-is-civievent</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2023-11-02</releaseDate>
+  <version>5.69.alpha1</version>
+  <develStage>stable</develStage>
+  <tags>
+    <tag>component</tag>
+  </tags>
+  <compatibility>
+    <ver>5.69</ver>
+  </compatibility>
+  <comments>Core Component</comments>
+  <upgrader>CRM_Extension_Upgrader_Component</upgrader>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <mixins>
+    <mixin>scan-classes@1.0.0</mixin>
+  </mixins>
+  <civix>
+    <namespace>CRM/Event</namespace>
+    <format>23.02.1</format>
+    <angularModule>civiEvent</angularModule>
+  </civix>
+</extension>

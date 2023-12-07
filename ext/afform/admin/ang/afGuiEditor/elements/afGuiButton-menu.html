@@ -6,5 +6,7 @@
     </select>
   </div>
 </li>
+<li af-gui-conditional-menu="$ctrl.node" ng-if="$ctrl.editor.getEntities().length"></li>
+
 <li role="separator" class="divider"></li>
 <li><a href ng-click="$ctrl.deleteThis()"><span class="text-danger"><i class="crm-i fa-trash"></i> {{:: ts('Delete this button') }}</span></a></li>

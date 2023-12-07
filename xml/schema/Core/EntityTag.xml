@@ -56,12 +56,14 @@
     <pseudoconstant>
       <table>civicrm_tag</table>
       <keyColumn>id</keyColumn>
-      <labelColumn>name</labelColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>label</labelColumn>
       <condition>is_tagset != 1</condition>
     </pseudoconstant>
     <html>
       <type>Select</type>
       <label>Tag</label>
+      <controlField>entity_table</controlField>
     </html>
   </field>
   <foreignKey>

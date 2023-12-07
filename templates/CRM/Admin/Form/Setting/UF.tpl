@@ -11,7 +11,6 @@
     {ts}These settings define the CMS variables that are used with CiviCRM.{/ts}
 </div>
 <div class="crm-block crm-form-block crm-uf-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
       <table class="form-layout-compressed">
         {if $userFrameworkUsersTableNameEnabled}
         <tr class="crm-uf-form-block-userFrameworkUsersTableName">

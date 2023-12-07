@@ -9,7 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceField;
 use Civi\Api4\PriceSet;
+use Civi\Api4\PriceSetEntity;
 
 /**
  * Trait PriceSetTrait
@@ -26,7 +28,34 @@ trait CRMTraits_Financial_PriceSetTrait {
    * @return int
    */
   protected function getPriceSetID(string $key = 'membership'):int {
-    return $this->ids['PriceSet'][$key];
+    if (isset($this->ids['PriceSet'][$key])) {
+      return $this->ids['PriceSet'][$key];
+    }
+    if (count($this->ids['PriceSet']) === 1) {
+      return reset($this->ids['PriceSet']);
+    }
+  }
+
+  /**
+   * Get the appropriate price field label for the given contribution page.
+   *
+   * This works for quick config pages with only one option.
+   *
+   * @param int $contributionPageID
+   *
+   * @return string
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  protected function getPriceFieldLabelForContributionPage(int $contributionPageID): string {
+    $this->ids['PriceSet']['contribution_page' . $contributionPageID] = (int) PriceSetEntity::get(FALSE)
+      ->addWhere('entity_id', '=', $contributionPageID)
+      ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+      ->addSelect('price_set_id')->execute()->first()['price_set_id'];
+    $priceFieldID = PriceField::get(FALSE)->addWhere('price_set_id', '=', $this->ids['PriceSet']['contribution_page' . $contributionPageID])
+      ->addSelect('id')->execute()->first()['id'];
+    return 'price_' . $priceFieldID;
   }
 
   /**
@@ -48,14 +77,16 @@ trait CRMTraits_Financial_PriceSetTrait {
    * @param $params
    * @param array $lineItemFinancialTypes
    *   Financial Types, if an override is intended.
+   * @param string $identifier
+   *   Name to to identify price set.
    */
-  protected function createContributionWithTwoLineItemsAgainstPriceSet($params, array $lineItemFinancialTypes = []): void {
+  protected function createContributionWithTwoLineItemsAgainstPriceSet($params, array $lineItemFinancialTypes = [], string $identifier = 'Donation'): void {
     $params = (array) array_merge([
       'total_amount' => 300,
       'financial_type_id' => 'Donation',
       'contribution_status_id' => 'Pending',
     ], $params);
-    $priceFields = $this->createPriceSet('contribution');
+    $priceFields = $this->createPriceSet('contribution', NULL, [], $identifier);
     foreach ($priceFields['values'] as $key => $priceField) {
       $financialTypeID = (!empty($lineItemFinancialTypes) ? array_shift($lineItemFinancialTypes) : $priceField['financial_type_id']);
       $params['line_items'][]['line_item'][$key] = [
@@ -123,7 +154,8 @@ trait CRMTraits_Financial_PriceSetTrait {
    *
    * @param array $membershipTypeParams
    *
-   * @throws \CRM_Core_Exception
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
   protected function setUpMembershipBlockPriceSet(array $membershipTypeParams = []): void {
     $this->ids['PriceSet']['membership_block'] = PriceSet::create(FALSE)
@@ -141,7 +173,7 @@ trait CRMTraits_Financial_PriceSetTrait {
       ], $membershipTypeParams);
       $this->ids['MembershipType'] = [$this->membershipTypeCreate($membershipTypeParams)];
     }
-    $priceField = $this->callAPISuccess('price_field', 'create', [
+    $priceField = $this->callAPISuccess('PriceField', 'create', [
       'price_set_id' => $this->ids['PriceSet']['membership_block'],
       'name' => 'membership_amount',
       'label' => 'Membership Amount',
@@ -202,6 +234,16 @@ trait CRMTraits_Financial_PriceSetTrait {
       'price_field_id' => $priceField['id'],
     ]);
     $this->ids['PriceFieldValue']['contribution'] = $priceFieldValue;
+  }
+
+  /**
+   * Get the label for the form price field - eg price_6
+   * @param string $key
+   *
+   * @return string
+   */
+  protected function getPriceFieldFormLabel(string $key): string {
+    return 'price_' . $this->ids['PriceField'][$key];
   }
 
 }

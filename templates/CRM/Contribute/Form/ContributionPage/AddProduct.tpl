@@ -9,7 +9,7 @@
 *}
 {crmRegion name="contribute-form-contributionpage-addproduct-main"}
 {capture assign=managePremiumsURL}{crmURL p='civicrm/admin/contribute/managePremiums' q="reset=1"}{/capture}
-<h3>{if $action eq 2 }{ts}Add Products to This Page{/ts} {elseif $action eq 1024}{ts}Preview{/ts}{else} {ts}Remove Products from this Page{/ts}{/if}</h3>
+<h3>{if $action eq 2}{ts}Add Products to This Page{/ts} {elseif $action eq 1024}{ts}Preview{/ts}{else} {ts}Remove Products from this Page{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-contribution-add_product-form-block">
   <div class="help">
     {if $action eq 1024}
@@ -33,7 +33,7 @@
     <tr class="crm-contribution-form-block-financial_type">
       <td class="label">{$form.financial_type_id.label}</td>
       <td>
-      {if !$financialType }
+      {if !$financialType}
         {capture assign=ftUrl}{crmURL p='civicrm/admin/financial/financialType' q="reset=1"}{/capture}
         {ts 1=$ftUrl}There are no financial types configured with linked 'Cost of Sales Premiums' and 'Premiums Inventory Account' accounts. If you want to generate accounting transactions which track the cost of premiums used <a href='%1'>click here</a> to configure financial types and accounts.{/ts}
       {else}
@@ -52,7 +52,7 @@
   </div>
 {else}
   <div class="crm-done-button">
-      {include file="CRM/common/formButtons.tpl"}
+      {include file="CRM/common/formButtons.tpl" location=''}
   </div>
 {/if} {* $action ne view *}
 </div>

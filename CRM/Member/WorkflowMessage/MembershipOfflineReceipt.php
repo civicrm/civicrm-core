@@ -22,15 +22,7 @@ use Civi\WorkflowMessage\GenericWorkflowMessage;
  */
 class CRM_Member_WorkflowMessage_MembershipOfflineReceipt extends GenericWorkflowMessage {
   use CRM_Member_WorkflowMessage_MembershipTrait;
+  use CRM_Contribute_WorkflowMessage_ContributionTrait;
   public const WORKFLOW = 'membership_offline_receipt';
-
-  /**
-   * Additional text to include in the receipt.
-   *
-   * @var string
-   *
-   * @scope tplParams as receipt_text
-   */
-  protected $receiptText;
 
 }

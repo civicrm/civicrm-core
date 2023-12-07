@@ -6,41 +6,31 @@
 class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
 
   /**
-   * @var int
-   */
-  private $individualID;
-
-  /**
    * @var array
    */
   private $participantPrice;
 
   public function setUp(): void {
     parent::setUp();
-    $this->individualID = $this->individualCreate();
-    $event = $this->eventCreate();
-    $priceFieldValues = $this->createPriceSet('event', $event, [
+    $individualID = $this->individualCreate();
+    $event = $this->eventCreatePaid();
+    $priceFieldValues = $this->createPriceSet('event', $event['id'], [
       'html_type'    => 'Radio',
       'option_label' => ['1' => 'Radio Label A (inc. GST)', '2' => 'Radio Label B (inc. GST)'],
       'option_name'  => ['1' => 'Radio Label A', '2' => 'Radio Label B'],
     ]);
 
     $priceFieldValues = $priceFieldValues['values'];
-    $this->participantPrice = NULL;
-    foreach ($priceFieldValues as $priceFieldValue) {
-      $this->participantPrice = $priceFieldValue;
-      break;
-    }
+    $this->participantPrice = reset($priceFieldValues);
 
-    $today = new DateTime();
     $this->participantCreate([
       'event_id'  => $event['id'],
-      'contact_id' => $this->individualID,
+      'contact_id' => $individualID,
       'status_id' => 1,
       'fee_level' => $this->participantPrice['label'],
       'fee_amount' => $this->participantPrice['amount'],
       'fee_currency' => 'USD',
-      'register_date' => $today->format('YmdHis'),
+      'register_date' => 'now',
     ]);
   }
 
@@ -50,9 +40,12 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test that search form returns correct number of rows for complex regex filters.
+   * Test that search form returns correct number of rows for complex regex
+   * filters.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testSearch() {
+  public function testSearch(): void {
     $form = new CRM_Event_Form_Search();
     $form->controller = new CRM_Event_Controller_Search();
     $form->preProcess();
@@ -64,10 +57,13 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
       'radio_ts'         => 'ts_all',
     ]);
     $rows = $form->controller->get('rows');
-    $this->assertEquals(1, count($rows), 'Exactly one row should be returned for given price field value.');
+    $this->assertCount(1, $rows, 'Exactly one row should be returned for given price field value.');
   }
 
-  public function testSearchWithPricelabelChange() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testSearchWithPriceLabelChange(): void {
     $this->callAPISuccess('PriceFieldValue', 'create', [
       'label' => 'Radio Label C',
       'id' => $this->participantPrice['id'],
@@ -84,7 +80,7 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
     ]);
     // Confirm that even tho we have changed the label for the price field value the query still works
     $rows = $form->controller->get('rows');
-    $this->assertEquals(1, count($rows), 'Exactly one row should be returned for given price field value.');
+    $this->assertCount(1, $rows, 'Exactly one row should be returned for given price field value.');
   }
 
 }

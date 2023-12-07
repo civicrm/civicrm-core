@@ -156,7 +156,6 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       'image_URL',
       'preferred_communication_method',
       'preferred_language',
-      'preferred_mail_format',
       'hash',
       'source',
       'first_name',
@@ -169,6 +168,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       'job_title',
       'gender_id',
       'birth_date',
+      'deceased_date',
       'employer_id',
       'is_deleted',
       'created_date',
@@ -397,14 +397,17 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       foreach ($metadata as $field) {
         if ($entity === 'website') {
           // It's not the primary - it's 'just one of them' - so the name is _first not _primary
+          $field['name'] = 'website_first.' . $field['name'];
           $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, 'website_first');
         }
         else {
+          $field['name'] = $entity . '_primary.' . $field['name'];
           $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, $entity . '_primary');
           $field['label'] .= ' (' . ts('Billing') . ')';
           // Set audience to sysadmin in case adding them to UI annoys people. If people ask to see this
           // in the UI we could set to 'user'.
           $field['audience'] = 'sysadmin';
+          $field['name'] = $entity . '_billing.' . $field['name'];
           $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, $entity . '_billing');
         }
       }
@@ -412,7 +415,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     // Manually add in the abbreviated state province as that maps to
     // what has traditionally been delivered.
     $tokensMetadata['address_primary.state_province_id:abbr'] = $tokensMetadata['address_primary.state_province_id:label'];
-    $tokensMetadata['address_primary.state_province_id:abbr']['name'] = 'state_province_id:abbr';
+    $tokensMetadata['address_primary.state_province_id:abbr']['name'] = 'address_primary.state_province_id:abbr';
     $tokensMetadata['address_primary.state_province_id:abbr']['audience'] = 'user';
     // Hide the label for now because we are not sure if there are paths
     // where legacy token resolution is in play where this could not be resolved.
@@ -453,13 +456,11 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         if ($fieldSpec['table_name'] === 'civicrm_website') {
           $tableAlias = 'website_first';
           $joins[$tableAlias] = $fieldSpec['entity'];
-          $prefix = $tableAlias . '.';
         }
         if ($fieldSpec['table_name'] === 'civicrm_openid') {
           // We could start to deprecate this one maybe..... I've made it un-advertised.
           $tableAlias = 'openid_primary';
           $joins[$tableAlias] = $fieldSpec['entity'];
-          $prefix = $tableAlias . '.';
         }
         if ($fieldSpec['type'] === 'Custom') {
           $customFields['custom_' . $fieldSpec['custom_field_id']] = $fieldSpec['name'];
@@ -640,6 +641,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         'type' => 'calculated',
         'options' => NULL,
         'data_type' => 'String',
+        'input_type' => NULL,
         'audience' => 'user',
       ],
       'employer_id.display_name' => [
@@ -653,11 +655,12 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       ],
       'address_primary.country_id.region_id:name' => [
         'title' => ts('World Region'),
-        'name' => 'country_id.region_id.name',
+        'name' => 'address_primary.country_id.region_id:name',
         'type' => 'mapped',
         'api_v3' => 'world_region',
         'options' => NULL,
         'data_type' => 'String',
+        'input_type' => 'Text',
         'advertised_name' => 'world_region',
         'audience' => 'user',
       ],
@@ -668,6 +671,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         'type' => 'Field',
         'options' => NULL,
         'data_type' => 'String',
+        'input_type' => 'Text',
         'audience' => 'sysadmin',
       ],
       // this gets forced out if we specify individual fields
@@ -677,6 +681,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         'type' => 'Field',
         'options' => NULL,
         'data_type' => 'String',
+        'input_type' => 'Text',
         'audience' => 'sysadmin',
       ],
     ];

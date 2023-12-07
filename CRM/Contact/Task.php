@@ -301,11 +301,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
         self::LABEL_CONTACTS => self::$_tasks[self::LABEL_CONTACTS]['title'],
       ];
 
-      foreach ([
-        self::MAP_CONTACTS,
-        self::CREATE_MAILING,
-        self::TASK_SMS,
-      ] as $task) {
+      foreach ([self::MAP_CONTACTS, self::CREATE_MAILING, self::TASK_SMS] as $task) {
         if (isset(self::$_tasks[$task]) &&
           !empty(self::$_tasks[$task]['title'])
         ) {

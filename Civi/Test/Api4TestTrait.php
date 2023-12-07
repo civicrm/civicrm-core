@@ -2,8 +2,8 @@
 
 namespace Civi\Test;
 
+use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
-use Civi\Api4\Service\Spec\Provider\FinancialItemCreationSpecProvider;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -25,7 +25,7 @@ trait Api4TestTrait {
    *
    * @var array
    */
-  private $testRecords = [];
+  protected $testRecords = [];
 
   /**
    * Inserts a test record, supplying all required values if not provided.
@@ -66,6 +66,10 @@ trait Api4TestTrait {
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function saveTestRecords(string $entityName, array $saveParams): Result {
+    // Shortcut for creating a bunch of records
+    if (is_int($saveParams['records'])) {
+      $saveParams['records'] = array_fill(0, $saveParams['records'], []);
+    }
     $saveParams += [
       'checkPermissions' => FALSE,
       'defaults' => [],
@@ -119,12 +123,16 @@ trait Api4TestTrait {
         ['default_value', 'IS EMPTY'],
         ['readonly', 'IS EMPTY'],
       ],
+      'orderBy' => ['required' => 'DESC'],
     ], 'name');
 
     $extraValues = [];
-    foreach ($requiredFields as $fieldName => $requiredField) {
-      if (!isset($values[$fieldName])) {
-        $extraValues[$fieldName] = $this->getRequiredValue($requiredField);
+    foreach ($requiredFields as $fieldName => $field) {
+      if (
+        !isset($values[$fieldName]) &&
+        ($field['required'] || AbstractAction::evaluateCondition($field['required_if'], ['values' => $values + $extraValues]))
+      ) {
+        $extraValues[$fieldName] = $this->getRequiredValue($field);
       }
     }
 
@@ -218,26 +226,44 @@ trait Api4TestTrait {
    * @throws \CRM_Core_Exception
    */
   private function getRequiredValue(array $field) {
+    // Hack that shouldn't exist except that these entities were added with bad fk metadata
+    // and existing tests at the time didn't catch it.
+    // TODO: Fix these entities and delete this list
+    // NOT TODO: Add to this list!
+    $fixmeDfkMissing = [
+      'EntityBatch' => 'Contact',
+      'FinancialTrxn' => 'Contact',
+      'Log' => 'Contact',
+      'Managed' => 'Contact',
+      'PCPBlock' => 'Contact',
+      'PriceSetEntity' => 'Contact',
+      'RecentItem' => 'Contact',
+    ];
     if (!empty($field['options'])) {
       return key($field['options']);
     }
     if (!empty($field['fk_entity'])) {
       return $this->getFkID($field['fk_entity']);
     }
+    if (!empty($field['dfk_entities'])) {
+      return $this->getFkID($field['dfk_entities'][0]);
+    }
     if (isset($field['default_value'])) {
       return $field['default_value'];
     }
-    if ($field['name'] === 'contact_id') {
-      return $this->getFkID('Contact');
+    // Obviously an FK field, but if we get here it's missing FK metadata :(
+    if ($field['name'] === 'contact_id' || $field['name'] === 'entity_id') {
+      if (isset($fixmeDfkMissing[$field['entity']])) {
+        return $this->getFkID($fixmeDfkMissing[$field['entity']]);
+      }
+      throw new \CRM_Core_Exception($field['name'] . ' should have foreign key information defined.');
     }
-    if ($field['name'] === 'entity_id') {
-      // What could possibly go wrong with this?
-      switch ($field['table_name'] ?? NULL) {
-        case 'civicrm_financial_item':
-          return $this->getFkID(FinancialItemCreationSpecProvider::DEFAULT_ENTITY);
-
-        default:
-          return $this->getFkID('Contact');
+    // If there are no options but the field is supposed to have them, we may need to
+    // create a new option
+    if (!empty($field['suffixes']) && !empty($field['table_name'])) {
+      $optionValue = $this->createOptionValue($field['table_name'], $field['name']);
+      if ($optionValue) {
+        return $optionValue;
       }
     }
 
@@ -248,6 +274,26 @@ trait Api4TestTrait {
     }
 
     throw new \CRM_Core_Exception('Could not provide default value');
+  }
+
+  /**
+   * Creates a dummy option value when one is required but the option list is empty
+   *
+   * @param string $tableName
+   * @param string $fieldName
+   * @return mixed|null
+   */
+  private function createOptionValue(string $tableName, string $fieldName) {
+    $daoName = \CRM_Core_DAO_AllCoreTables::getClassForTable($tableName);
+    $pseudoconstant = $daoName::getSupportedFields()[$fieldName]['pseudoconstant'] ?? NULL;
+    if (!empty($pseudoconstant['optionGroupName'])) {
+      $newOption = $this->createTestRecord('OptionValue', [
+        'option_group_id:name' => $pseudoconstant['optionGroupName'],
+      ]);
+      return $newOption['value'];
+    }
+    // Other types of
+    return NULL;
   }
 
   /**

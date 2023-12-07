@@ -33,7 +33,6 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->setPageTitle(ts('Mail Account'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -77,7 +76,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
 
     $this->add('password', 'password', ts('Password'), ['autocomplete' => 'off']);
 
-    $this->add('text', 'source', ts('Source'), $attributes['source']);
+    $this->add('text', 'source', ts('Mail Folder'), $attributes['source']);
 
     $this->add('checkbox', 'is_ssl', ts('Use SSL?'));
 
@@ -86,10 +85,28 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       0 => ts('Email-to-Activity Processing'),
     ];
     $this->add('select', 'is_default', ts('Used For?'), $usedfor);
+
+    $activityTypes =
+      [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email') => 'Inbound Email']
+      + [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email') => 'Email']
+      + CRM_Core_PseudoConstant::ActivityType(FALSE);
+    $this->add('select', 'activity_type_id', ts('Activity Type'),
+      $activityTypes,
+      TRUE,
+      ['class' => 'crm-select2 required']
+    );
     $this->addField('activity_status', ['placeholder' => FALSE]);
+    CRM_Campaign_BAO_Campaign::addCampaign($this);
 
     $this->add('checkbox', 'is_non_case_email_skipped', ts('Skip emails which do not have a Case ID or Case hash'));
     $this->add('checkbox', 'is_contact_creation_disabled_if_no_match', ts('Do not create new contacts when filing emails'));
+
+    $emailRecipients = ['from' => 'From', 'to' => 'To', 'cc' => 'CC', 'bcc' => 'BCC'];
+    $this->add('select', 'activity_source', ts('Activity Source'), $emailRecipients, TRUE, ['class' => 'crm-select2 required']);
+    $this->add('select', 'activity_targets', ts('Activity Targets'), $emailRecipients, FALSE, ['class' => 'crm-select2', 'multiple' => TRUE]);
+    $this->add('select', 'activity_assignees', ts('Activity Assignees'), $emailRecipients, FALSE, ['class' => 'crm-select2', 'multiple' => TRUE]);
+
+    $this->add('checkbox', 'is_active', ts('Enabled'));
   }
 
   /**
@@ -109,12 +126,15 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
-    // Set activity status to "Completed" by default.
-    if ($this->_action != CRM_Core_Action::DELETE &&
-      (!$this->_id || !CRM_Core_DAO::getFieldValue('CRM_Core_BAO_MailSettings', $this->_id, 'activity_status'))
-    ) {
-      $defaults['activity_status'] = 'Completed';
-    }
+    $defaults['is_ssl'] = $defaults['is_ssl'] ?? TRUE;
+    $defaults['is_default'] = $defaults['is_default'] ?? 0;
+    $defaults['activity_type_id'] = $defaults['activity_type_id'] ??
+      CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email');
+    $defaults['activity_status'] = $defaults['activity_status'] ?? 'Completed';
+    $defaults['activity_source'] = $defaults['activity_source'] ?? 'from';
+    $defaults['activity_targets'] = $defaults['activity_targets'] ?? 'to,cc,bcc';
+    $defaults['activity_assignees'] = $defaults['activity_assignees'] ?? 'from';
+    $defaults['is_active'] = $defaults['is_active'] ?? TRUE;
 
     return $defaults;
   }
@@ -174,6 +194,12 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       'activity_status',
       'is_non_case_email_skipped',
       'is_contact_creation_disabled_if_no_match',
+      'activity_type_id',
+      'campaign_id',
+      'activity_source',
+      'activity_targets',
+      'activity_assignees',
+      'is_active',
     ];
 
     $params = [];
@@ -183,8 +209,9 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
         'is_ssl',
         'is_non_case_email_skipped',
         'is_contact_creation_disabled_if_no_match',
+        'is_active',
       ])) {
-        $params[$f] = CRM_Utils_Array::value($f, $formValues, FALSE);
+        $params[$f] = $formValues[$f] ?? FALSE;
       }
       else {
         $params[$f] = $formValues[$f] ?? NULL;

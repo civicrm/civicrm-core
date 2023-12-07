@@ -46,13 +46,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Takes an associative array and creates a entityTag object.
    *
-   * the function extract all the params it needs to initialize the create a
-   * group object. the params array could contain additional unused name/value
-   * pairs
-   *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
+   * @deprecated
    * @return CRM_Core_BAO_EntityTag
    */
   public static function add(&$params) {
@@ -89,7 +85,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @return bool
    */
   public static function dataExists($params) {
-    return !($params['tag_id'] == 0);
+    return !empty($params['tag_id']);
   }
 
   /**
@@ -252,8 +248,10 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Takes an associative array and creates tag entity record for all tag entities.
    *
+   * Nonstandard function
+   * @deprecated
+   *
    * @param array $params
-   *   (reference) an assoc array of name/value pairs.
    * @param string $entityTable
    * @param int $entityID
    */
@@ -303,7 +301,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   public static function getContactTags($contactID, $count = FALSE) {
     $contactTags = [];
     if (!$count) {
-      $select = "SELECT ct.id, ct.name ";
+      $select = "SELECT ct.id, ct.label ";
     }
     else {
       $select = "SELECT count(*) as cnt";
@@ -324,7 +322,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     }
 
     while ($dao->fetch()) {
-      $contactTags[$dao->id] = $dao->name;
+      $contactTags[$dao->id] = $dao->label;
     }
 
     return $contactTags;

@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Service\Autocomplete;
 
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\HookInterface;
 
@@ -36,7 +37,7 @@ class ActivityAutocompleteProvider extends \Civi\Core\Service\AutoService implem
         'id',
         'subject',
         'activity_date_time',
-        'Activity_ActivityContact_Contact_01.display_name',
+        'Activity_ActivityContact_Contact_01.sort_name',
         'activity_type_id:label',
       ],
       'orderBy' => [],
@@ -95,10 +96,10 @@ class ActivityAutocompleteProvider extends \Civi\Core\Service\AutoService implem
     // If the savedSearch includes a contact join, add it to the output and the sort.
     foreach ($e->savedSearch['api_params']['join'] ?? [] as $join) {
       [$entity, $contactAlias] = explode(' AS ', $join[0]);
-      if ($entity === 'Contact') {
+      if (CoreUtil::isContact($entity)) {
         array_unshift($e->display['settings']['sort'], ["$contactAlias.sort_name", 'ASC']);
-        $e->display['settings']['columns'][0]['rewrite'] = "[$contactAlias.display_name] - [subject]";
-        $e->display['settings']['columns'][0]['empty_value'] = "[$contactAlias.display_name] (" . ts('no subject') . ')';
+        $e->display['settings']['columns'][0]['rewrite'] = "[$contactAlias.sort_name] - [subject]";
+        $e->display['settings']['columns'][0]['empty_value'] = "[$contactAlias.sort_name] (" . ts('no subject') . ')';
         break;
       }
     }

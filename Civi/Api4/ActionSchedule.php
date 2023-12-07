@@ -11,15 +11,13 @@
 namespace Civi\Api4;
 
 /**
- * ActionSchedule Entity.
+ * Scheduled Reminders.
  *
- * This entity exposes CiviCRM schedule reminders, which allows us to send messages (through email or SMS)
- * to contacts when certain criteria are met. Using this API you can create schedule reminder for
+ * Scheduled reminders send messages (through email or SMS) to contacts when
+ * certain criteria are met. Using this API you can create schedule reminders for
  * supported entities like Contact, Activity, Event, Membership or Contribution.
  *
- * Creating a new ActionSchedule requires at minimum a title, mapping_id and entity_value.
- *
- * @searchable none
+ * @searchable secondary
  * @see https://docs.civicrm.org/user/en/latest/email/scheduled-reminders/
  * @since 5.19
  * @package Civi\Api4

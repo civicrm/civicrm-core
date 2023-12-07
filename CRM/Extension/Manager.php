@@ -455,6 +455,12 @@ class CRM_Extension_Manager {
     // TODO: to mitigate the risk of crashing during installation, scan
     // keys/statuses/types before doing anything
 
+    // Component data still lives inside of core-core. Uninstalling is nonsensical.
+    $notUninstallable = array_intersect($keys, $this->mapper->getKeysByTag('component'));
+    if (count($notUninstallable)) {
+      throw new CRM_Extension_Exception("Cannot uninstall extensions which are tagged as components: " . implode(', ', $notUninstallable));
+    }
+
     $this->addProcess($keys, 'uninstall');
 
     foreach ($keys as $key) {
@@ -700,11 +706,12 @@ class CRM_Extension_Manager {
     $dao = new CRM_Core_DAO_Extension();
     $dao->full_name = $info->key;
     if ($dao->find(TRUE)) {
-      if (CRM_Core_BAO_Extension::del($dao->id)) {
+      try {
+        CRM_Core_BAO_Extension::deleteRecord(['id' => $dao->id]);
         CRM_Core_Session::setStatus(ts('Selected option value has been deleted.'), ts('Deleted'), 'success');
       }
-      else {
-        throw new CRM_Extension_Exception("Failed to remove extension entry");
+      catch (CRM_Core_Exception $e) {
+        throw new CRM_Extension_Exception("Failed to remove extension entry $dao->id");
       }
     } // else: post-condition already satisified
   }

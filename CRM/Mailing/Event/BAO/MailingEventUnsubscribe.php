@@ -38,7 +38,7 @@ class CRM_Mailing_Event_BAO_MailingEventUnsubscribe extends CRM_Mailing_Event_DA
    *   Was the contact successfully unsubscribed?
    */
   public static function unsub_from_domain($job_id, $queue_id, $hash) {
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
     if (!$q) {
       return FALSE;
     }
@@ -110,7 +110,7 @@ WHERE  email = %2
   public static function unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE): ?array {
     // First make sure there's a matching queue event.
 
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
     if (!$q) {
       return NULL;
     }
@@ -278,18 +278,18 @@ WHERE  email = %2
       }
       while ($doAdded->fetch()) {
         $returnGroups[$doAdded->group_id] = [
-          'title' => !empty($doAdded->frontend_title) ? $doAdded->frontend_title : $doAdded->title,
-          'description' => !empty($doAdded->frontend_description) ? $doAdded->frontend_description : $doAdded->description,
+          'title' => $doAdded->frontend_title,
+          'description' => $doAdded->frontend_description,
         ];
       }
       return $returnGroups;
     }
     else {
       while ($doCached->fetch()) {
-        $groups[$doCached->group_id] = !empty($doCached->frontend_title) ? $doCached->frontend_title : $doCached->title;
+        $groups[$doCached->group_id] = $doCached->frontend_title;
       }
       while ($doAdded->fetch()) {
-        $groups[$doAdded->group_id] = !empty($doAdded->frontend_title) ? $doAdded->frontend_title : $doAdded->title;
+        $groups[$doAdded->group_id] = $doAdded->frontend_title;
       }
     }
     $transaction = new CRM_Core_Transaction();

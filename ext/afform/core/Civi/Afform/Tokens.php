@@ -12,8 +12,10 @@
 namespace Civi\Afform;
 
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
 use CRM_Afform_ExtensionUtil as E;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Every afform with the property `is_token=true` should have a corresponding
@@ -21,8 +23,23 @@ use CRM_Afform_ExtensionUtil as E;
  *
  * @see MockPublicFormTest
  * @package Civi\Afform
+ * @service civi.afform.tokens
  */
-class Tokens {
+class Tokens extends AutoService implements EventSubscriberInterface {
+
+  public static function getSubscribedEvents(): array {
+    if (!\CRM_Extension_System::singleton()->getMapper()->isActiveModule('authx')) {
+      return [];
+    }
+
+    return [
+      'hook_civicrm_alterMailContent' => 'applyCkeditorWorkaround',
+      'hook_civicrm_tokens' => 'hook_civicrm_tokens',
+      'hook_civicrm_tokenValues' => 'hook_civicrm_tokenValues',
+      'civi.token.list' => 'listTokens',
+      'civi.token.eval' => 'evaluateTokens',
+    ];
+  }
 
   /**
    * CKEditor makes it hard to set an `href` to a token, so we often get
@@ -88,70 +105,72 @@ class Tokens {
       }
     }
     catch (CryptoException $ex) {
-      \Civi::log()->warning('Civi\Afform\LegacyTokens cannot generate tokens due to crypto exception.', ['exception' => $ex]);
+      \Civi::log()->warning(__CLASS__ . ' cannot generate tokens due to a crypto exception.',
+        ['exception' => $ex]);
     }
   }
 
-  ///**
-  // * Expose tokens for use in UI.
-  // *
-  // * @param \Civi\Token\Event\TokenRegisterEvent $e
-  // */
-  //public static function onRegister(\Civi\Token\Event\TokenRegisterEvent $e) {
-  //  $tokenForms = static::getTokenForms();
-  //  foreach ($tokenForms as $tokenName => $afform) {
-  //    $e->register([
-  //      'entity' => 'afform',
-  //      'field' => $tokenName . 'Url',
-  //      'label' => E::ts('View Form: %1 (URL)', [1 => $afform['title'] ?? $afform['name']]),
-  //    ]);
-  //    $e->register([
-  //      'entity' => 'afform',
-  //      'field' => $tokenName . 'Link',
-  //      'label' => E::ts('View Form: %1 (Full Hyperlink)', [1 => $afform['title'] ?? $afform['name']]),
-  //    ]);
-  //  }
-  //}
+  public static function listTokens(\Civi\Token\Event\TokenRegisterEvent $e) {
+    // this tokens should be available only in contact context i.e. in Message Templates (add/edit)
+    if (!in_array('contactId', $e->getTokenProcessor()->getContextValues('schema')[0])) {
+      return;
+    }
 
-  ///**
-  // * Substitute any tokens of the form `{afform.myFormUrl}` or `{afform.myFormLink}` with actual values.
-  // *
-  // * @param \Civi\Token\Event\TokenValueEvent $e
-  // */
-  //public static function onEvaluate(\Civi\Token\Event\TokenValueEvent $e) {
-  //  $activeTokens = $e->getTokenProcessor()->getMessageTokens();
-  //  if (empty($activeTokens['afform'])) {
-  //    return;
-  //  }
-  //
-  //  $tokenForms = static::getTokenForms();
-  //  foreach ($tokenForms as $formName => $afform) {
-  //    if (!array_intersect($activeTokens['afform'], ["{$formName}Url", "{$formName}Link"])) {
-  //      continue;
-  //    }
-  //
-  //    if (empty($afform['server_route'])) {
-  //      \Civi::log()
-  //        ->warning('Civi\Afform\Tokens: Cannot generate link for {formName} -- missing server_route', [
-  //          'formName' => $formName,
-  //        ]);
-  //      continue;
-  //    }
-  //
-  //    foreach ($e->getRows() as $row) {
-  //      /** @var \Civi\Token\TokenRow $row */
-  //      try {
-  //        $url = self::createUrl($afform, $row->context['contactId']);
-  //        $row->format('text/plain')->tokens('afform', "{$formName}Url", $url);
-  //        $row->format('text/html')->tokens('afform', "{$formName}Link",
-  //          sprintf('<a href="%s">%s</a>', htmlentities($url), htmlentities($afform['title'] ?? $afform['name'])));
-  //      }
-  //      catch (CryptoException $e) {
-  //        \Civi::log()->warning('Civi\Afform\Tokens cannot generate tokens due to crypto exception.', ['exception' => $e]);
-  //      }
-  //    }
-  //  }
-  //}
+    $e->entity('afformSubmission')
+      ->register('validateSubmissionUrl', E::ts('Validate Submission URL'))
+      ->register('validateSubmissionLink', E::ts('Validate Submission (Full Hyperlink)'));
+  }
+
+  public static function evaluateTokens(\Civi\Token\Event\TokenValueEvent $e) {
+    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
+    if (empty($messageTokens['afformSubmission'])) {
+      return;
+    }
+
+    // If these tokens are being used, there will only be a single "row".
+    // The relevant context is on the TokenProcessor itself, not the row.
+    $context = $e->getTokenProcessor()->context;
+    $sid = $context['validateAfformSubmission']['submissionId'] ?? NULL;
+    if (empty($sid)) {
+      return;
+    }
+
+    /** @var \Civi\Token\TokenRow $row */
+    $url = self::generateEmailVerificationUrl($sid);
+    $link = sprintf(
+      '<a href="%s">%s</a>', htmlentities($url),
+      htmlentities(ts('verify your email address')));
+
+    foreach ($e->getRows() as $row) {
+      $row->format('text/plain')->tokens('afformSubmission', 'validateSubmissionUrl', $url);
+      $row->format('text/html')->tokens('afformSubmission', 'validateSubmissionLink', $link);
+    }
+  }
+
+  private static function generateEmailVerificationUrl(int $submissionId): string {
+    // 10 minutes
+    $expires = \CRM_Utils_Time::time() + (10 * 60);
+
+    try {
+      /** @var \Civi\Crypto\CryptoJwt $jwt */
+      $jwt = \Civi::service('crypto.jwt');
+
+      $token = $jwt->encode([
+        'exp' => $expires,
+        // Note: Scope is not the same as "authx" scope. "Authx" tokens are user-login tokens. This one is a more limited access token.
+        'scope' => 'afformVerifyEmail',
+        'submissionId' => $submissionId,
+      ]);
+    }
+    catch (CryptoException $exception) {
+      \Civi::log()->warning(
+        'Civi\Afform\LegacyTokens cannot generate tokens due to crypto exception.',
+        ['exception' => $exception]);
+    }
+
+    return \CRM_Utils_System::url('civicrm/afform/submission/verify',
+      ['token' => $token], TRUE, NULL, FALSE, TRUE);
+  }
 
   /**
    * Get a list of forms that have token support enabled.
@@ -161,8 +180,8 @@ class Tokens {
    */
   public static function getTokenForms() {
     if (!isset(\Civi::$statics[__CLASS__]['tokenForms'])) {
-      $tokenForms = (array) \Civi\Api4\Afform::get(0)
-        ->addWhere('is_token', '=', TRUE)
+      $tokenForms = (array) \Civi\Api4\Afform::get(FALSE)
+        ->addWhere('placement', 'CONTAINS', 'msg_token')
         ->addSelect('name', 'title', 'server_route', 'is_public')
         ->execute()
         ->indexBy('name');

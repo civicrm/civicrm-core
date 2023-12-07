@@ -9,7 +9,7 @@
 *}
 {ts 1=$totalSelectedContributions}Number of selected contributions: %1{/ts}
 
-{if $rows }
+{if $rows}
 <div class="crm-block crm-form-block crm-contribution-task-form-block">
 <table width="30%">
   <tr class="columnheader">

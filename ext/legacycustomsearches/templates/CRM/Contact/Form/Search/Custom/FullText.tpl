@@ -37,7 +37,7 @@
 {* @TODO: This is confusing - the variable `table` is already set and used above, and now we set it again to something that is technically different but has the same value, except on a blank form where it doesn't exist, but effectively then is the same value that it already has which is ''. So do we need this line even? *}
 {if $form.table.value && (array_key_exists(0, $form.table.value))}{assign var=table value=$form.table.value.0}{/if}
 {assign var=text  value=$form.text.value}
-{if !empty($summary.Contact) }
+{if !empty($summary.Contact)}
   <div class="section">
     {* Search request has returned 1 or more matching rows. Display results. *}
     <h3>{ts}Contacts{/ts}
@@ -75,7 +75,7 @@
   </div>
 {/if}
 
-{if !empty($summary.Activity) }
+{if !empty($summary.Activity)}
   <div class="section">
     {* Search request has returned 1 or more matching rows. Display results. *}
 
@@ -115,7 +115,7 @@
             </td>
             {if $allowFileSearch}<td>{$row.fileHtml}</td>{/if}
             <td>
-              {if $row.case_id }
+              {if $row.case_id}
                 <a href="{crmURL p='civicrm/case/activity/view'
                 q="reset=1&aid=`$row.activity_id`&cid=`$row.client_id`&caseID=`$row.case_id`&context=fulltext&key=`$qfKey`"}">
               {else}
@@ -138,7 +138,7 @@
   </div>
 {/if}
 
-{if !empty($summary.Case) }
+{if !empty($summary.Case)}
   <div class="section">
     {* Search request has returned 1 or more matching rows. Display results. *}
     <h3>{ts}Cases{/ts}
@@ -195,7 +195,7 @@
   </div>
 {/if}
 
-{if !empty($summary.Contribution) }
+{if !empty($summary.Contribution)}
   <div class="section">
     {* Search request has returned 1 or more matching rows. Display results. *}
 
@@ -209,8 +209,8 @@
           <th class='link'>{ts}Contributor's Name{/ts}</th>
           <th class="currency">{ts}Amount{/ts}</th>
           <th>{ts}Financial Type{/ts}</th>
-          <th>{ts}Source{/ts}</th>
-          <th class="received_date">{ts}Received{/ts}</th>
+          <th>{ts}Contribution Source{/ts}</th>
+          <th class="received_date">{ts}Contribution Date{/ts}</th>
           <th>{ts}Status{/ts}</th>
           {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
           <th></th>
@@ -249,7 +249,7 @@
   </div>
 {/if}
 
-{if !empty($summary.Participant) }
+{if !empty($summary.Participant)}
   <div class="section">
     {* Search request has returned 1 or more matching rows. *}
 
@@ -265,7 +265,7 @@
           <th>{ts}Fee Level{/ts}</th>
           <th class="currency">{ts}Fee Amount{/ts}</th>
           <th class="register_date">{ts}Register Date{/ts}</th>
-          <th>{ts}Source{/ts}</th>
+          <th>{ts}Participant Source{/ts}</th>
           <th>{ts}Status{/ts}</th>
           <th>{ts}Role{/ts}</th>
           {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
@@ -305,7 +305,7 @@
   </div>
 {/if}
 
-{if !empty($summary.Membership) }
+{if !empty($summary.Membership)}
   <div class="section">
     {* Search request has returned 1 or more matching rows. *}
 
@@ -320,8 +320,8 @@
           <th>{ts}Membership Type{/ts}</th>
           <th class="currency">{ts}Membership Fee{/ts}</th>
           <th class="start_date">{ts}Membership Start Date{/ts}</th>
-          <th class="end_date">{ts}Membership End Date{/ts}</th>
-          <th>{ts}Source{/ts}</th>
+          <th class="end_date">{ts}Membership Expiration Date{/ts}</th>
+          <th>{ts}Membership Source{/ts}</th>
           <th>{ts}Status{/ts}</th>
           {if $allowFileSearch}<th>{ts}File{/ts}</th>{/if}
           <th></th>
@@ -362,7 +362,7 @@
   </div>
 {/if}
 
-{if !empty($summary.File) }
+{if !empty($summary.File)}
 <div class="section">
 {* Search request has returned 1 or more matching rows. *}
 

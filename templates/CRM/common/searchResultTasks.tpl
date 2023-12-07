@@ -14,8 +14,8 @@
   <tr>
     <td style="width: 40%;">
     {if !empty($savedSearch.name)}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
-    {ts count=$pager->_totalItems plural='%count Results'}%count Result{/ts}{if $selectorLabel}&nbsp;-&nbsp;{$selectorLabel}{/if}
-    {if $context == 'Event' && $participantCount && ( $pager->_totalItems ne $participantCount ) }
+    {ts count=$pager->_totalItems plural="%count Results"}%count Result{/ts}{if $selectorLabel}&nbsp;-&nbsp;{$selectorLabel}{/if}
+    {if $context == 'Event' && $participantCount && ($pager->_totalItems ne $participantCount)}
         <br />{ts}Actual participant count{/ts} : {$participantCount} {help id="id-actual_participant_count" file="CRM/Event/Form/Search/Results.hlp"} &nbsp;
     {/if}
     </td>
@@ -36,18 +36,11 @@
   <tr>
     <td>{ts}Select Records{/ts}:</td>
     <td class="nowrap">
-      {$form.radio_ts.ts_all.html} <label for="{$ts_all_id}">{ts count=$pager->_totalItems plural='All %count records'}The found record{/ts}</label> &nbsp; {if $pager->_totalItems > 1} {$form.radio_ts.ts_sel.html} <label for="{$ts_sel_id}">{ts 1="<span></span>"}%1 Selected records only{/ts}</label>{/if}
+      {$form.radio_ts.ts_all.html} <label for="{$ts_all_id}">{ts count=$pager->_totalItems plural="All %count records"}The found record{/ts}</label> &nbsp; {if $pager->_totalItems > 1} {$form.radio_ts.ts_sel.html} <label for="{$ts_sel_id}">{ts 1="<span></span>"}%1 Selected records only{/ts}</label>{/if}
     </td>
   </tr>
   <tr>
     <td colspan="2">
-    {* Note print buttons were mostly removed except for Campaign search - the following lines can be removed soon CRM-12872 *}
-    {if !empty($printButtonName)}
-       {$form.$printButtonName.html} &nbsp; &nbsp;
-    {elseif !empty($form._qf_Search_next_print)}
-       {$form._qf_Search_next_print.html} &nbsp; &nbsp;
-     {/if}
-
       <span id='task-section'>
         {$form.task.html}
         {if $actionButtonName}

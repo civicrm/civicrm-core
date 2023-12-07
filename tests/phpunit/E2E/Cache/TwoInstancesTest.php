@@ -176,7 +176,7 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
 
     $a = $this->a = CRM_Utils_Cache::create($cacheA);
     $b = $this->b = CRM_Utils_Cache::create($cacheB);
-    return array($a, $b);
+    return [$a, $b];
   }
 
 }

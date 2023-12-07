@@ -298,7 +298,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
           'now', $excludeIsAdmin, $params['membership_type_id'] ?? NULL, $params
         );
         if (empty($calcStatus)) {
-          throw new CRM_Core_Exception(ts("The membership cannot be saved because the status cannot be calculated for start_date: {$params['start_date']} end_date {$params['end_date']} join_date {$params['join_date']} as at " . CRM_Utils_Time::date('Y-m-d H:i:s')));
+          throw new CRM_Core_Exception(ts("The membership cannot be saved because the status cannot be calculated for start_date: %1, end_date: %2, join_date: %3. Current time is: %4.", [1 => $params['start_date'], 2 => $params['end_date'], 3 => $params['join_date'], 4 => CRM_Utils_Time::date('Y-m-d H:i:s')]));
         }
         $params['status_id'] = $calcStatus['id'];
       }
@@ -819,7 +819,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       $dao->is_test = $isTest;
     }
     else {
-      $dao->whereAdd('is_test IS NULL OR is_test = 0');
+      $dao->whereAdd('is_test = 0');
     }
 
     //avoid pending membership as current membership: CRM-3027
@@ -1027,7 +1027,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
 
     $testClause = 'membership.is_test = 1';
     if (!$isTest) {
-      $testClause = '( membership.is_test IS NULL OR membership.is_test = 0 )';
+      $testClause = '( membership.is_test = 0 )';
     }
 
     if (!self::$_signupActType || !self::$_renewalActType) {
@@ -1686,7 +1686,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
   public static function getMembershipJoins($membershipTypeId, $startDate, $endDate, $isTest = 0) {
     $testClause = 'membership.is_test = 1';
     if (!$isTest) {
-      $testClause = '( membership.is_test IS NULL OR membership.is_test = 0 )';
+      $testClause = '( membership.is_test = 0 )';
     }
     if (!self::$_signupActType) {
       self::_getActTypes();
@@ -1739,7 +1739,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   public static function getMembershipRenewals($membershipTypeId, $startDate, $endDate, $isTest = 0) {
     $testClause = 'membership.is_test = 1';
     if (!$isTest) {
-      $testClause = '( membership.is_test IS NULL OR membership.is_test = 0 )';
+      $testClause = '( membership.is_test = 0 )';
     }
     if (!self::$_renewalActType) {
       self::_getActTypes();
@@ -1769,7 +1769,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   * @deprecated
+   * @deprecated in CiviCRM 5.39, will be removed around CiviCRM 5.66.
+   *
+   * Deprecation issue in https://lab.civicrm.org/extensions/civimobileapi/-/issues/86
    *
    * @param int $contactID
    * @param int $membershipTypeID
@@ -2280,7 +2282,7 @@ WHERE {$whereClause}";
       self::processOverriddenUntilDateMembership($dao1);
     }
 
-    $query = $baseQuery . " AND (civicrm_membership.is_override = 0 OR civicrm_membership.is_override IS NULL)
+    $query = $baseQuery . " AND civicrm_membership.is_override = 0
      AND {$membershipStatusClause}
      AND civicrm_membership.owner_membership_id IS NULL ";
 
@@ -2366,6 +2368,9 @@ WHERE {$whereClause}";
    * @return array
    */
   public static function getAllContactMembership($contactID, $isTest = FALSE, $onlyLifeTime = FALSE) : array {
+    if (!\CRM_Core_Component::isEnabled('CiviMember')) {
+      return [];
+    }
     $contactMembershipType = [];
     if (!$contactID) {
       return $contactMembershipType;

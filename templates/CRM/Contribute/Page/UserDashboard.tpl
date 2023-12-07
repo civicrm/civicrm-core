@@ -16,7 +16,7 @@
                 <tr class="columnheader">
                     <th>{ts}Total Amount{/ts}</th>
                     <th>{ts}Financial Type{/ts}</th>
-                    <th>{ts}Received date{/ts}</th>
+                    <th>{ts}Contribution Date{/ts}</th>
                     <th>{ts}Receipt Sent{/ts}</th>
                     <th>{ts}Balance{/ts}</th>
                     <th>{ts}Status{/ts}</th>
@@ -50,7 +50,7 @@
                                 <a class="button no-popup nowrap"
                                    href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
                                     <i class="crm-i fa-download" aria-hidden="true"></i>
-                                    {if empty($row.contribution_status_name) || (!empty($row.contribution_status_name) && $row.contribution_status_name != 'Refunded' && $row.contribution_status_name != 'Cancelled') }
+                                    {if empty($row.contribution_status_name) || (!empty($row.contribution_status_name) && $row.contribution_status_name != 'Refunded' && $row.contribution_status_name != 'Cancelled')}
                                         <span>{ts}Download Invoice{/ts}</span>
                                     {else}
                                         <span>{ts}Download Invoice and Credit Note{/ts}</span>
@@ -91,7 +91,7 @@
                     <th>{ts}Amount{/ts}</th>
                     <th>{ts}Type{/ts}</th>
                     <th>{ts}Financial Type{/ts}</th>
-                    <th>{ts}Received date{/ts}</th>
+                    <th>{ts}Contribution Date{/ts}</th>
                     <th>{ts}Receipt Sent{/ts}</th>
                     <th>{ts}Status{/ts}</th>
                 </tr>

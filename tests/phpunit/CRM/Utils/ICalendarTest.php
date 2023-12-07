@@ -16,8 +16,8 @@
 class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
 
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
   }
 
   /**
@@ -105,7 +105,7 @@ class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
   /**
    * Test Send with attachment.
    */
-  public function testSendWithAttachment() {
+  public function testSendWithAttachment(): void {
     $parameters = [
       'calendar_data', 'text/calendar', 'utf-8', 'civicrm_ical.ics', 'attachment',
     ];

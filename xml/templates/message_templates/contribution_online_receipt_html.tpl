@@ -7,8 +7,8 @@
 <body>
 
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
-{capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
-{capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=labelStyle}style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
+{capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
 <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
@@ -33,7 +33,7 @@
   </tr>
 </table>
 <table style="width:100%; max-width:500px; border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
-  {if '{contribution.total_amount|raw}' !== '0.00'}
+  {if {contribution.total_amount|boolean}}
     <tr>
       <th {$headerStyle}>
         {ts}Contribution Information{/ts}
@@ -48,7 +48,7 @@
               <th>{ts}Item{/ts}</th>
               <th>{ts}Qty{/ts}</th>
               <th>{ts}Each{/ts}</th>
-              {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+              {if $isShowTax && {contribution.tax_amount|boolean}}
                 <th>{ts}Subtotal{/ts}</th>
                 <th>{ts}Tax Rate{/ts}</th>
                 <th>{ts}Tax Amount{/ts}</th>
@@ -60,8 +60,8 @@
                 <td>{$line.title}</td>
                 <td>{$line.qty}</td>
                 <td>{$line.unit_price|crmMoney:$currency}</td>
-                {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
-                  <td>{$line.unit_price*$line.qty|crmMoney:$currency}</td>
+                {if $isShowTax && {contribution.tax_amount|boolean}}
+                  <td>{$line.line_total|crmMoney:$currency}</td>
                   {if $line.tax_rate || $line.tax_amount != ""}
                     <td>{$line.tax_rate|string_format:"%.2f"}%</td>
                     <td>{$line.tax_amount|crmMoney:$currency}</td>
@@ -71,7 +71,7 @@
                   {/if}
                 {/if}
                 <td>
-                  {$line.line_total+$line.tax_amount|crmMoney:$currency}
+                  {$line.line_total_inclusive|crmMoney:$currency}
                 </td>
               </tr>
             {/foreach}
@@ -79,13 +79,13 @@
         </td>
       </tr>
 
-      {if $isShowTax && '{contribution.tax_amount|raw}' !== '0.00'}
+      {if $isShowTax && {contribution.tax_amount|boolean}}
         <tr>
           <td {$labelStyle}>
             {ts} Amount before Tax : {/ts}
           </td>
           <td {$valueStyle}>
-            {$amount-$totalTaxAmount|crmMoney:$currency}
+            {contribution.tax_exclusive_amount}
           </td>
         </tr>
 
@@ -116,7 +116,7 @@
         </td>
       </tr>
     {else}
-      {if '{contribution.tax_amount|raw}' !== '0.00'}
+      {if {contribution.tax_amount|boolean}}
         <tr>
           <td {$labelStyle}>
             {ts}Total Tax Amount{/ts}
@@ -151,13 +151,13 @@
       </tr>
      {/if}
 
-     {if !empty($is_monetary) and !empty($trxn_id)}
+     {if {contribution.trxn_id|boolean}}
       <tr>
        <td {$labelStyle}>
         {ts}Transaction #{/ts}
        </td>
        <td {$valueStyle}>
-        {$trxn_id}
+         {contribution.trxn_id}
        </td>
       </tr>
      {/if}
@@ -277,10 +277,10 @@
       {/foreach}
      {/if}
 
-     {if !empty($isShare)}
+     {if {contribution.contribution_page_id.is_share|boolean}}
       <tr>
         <td colspan="2" {$valueStyle}>
-            {capture assign=contributionUrl}{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$contributionPageId`" a=true fe=1 h=1}{/capture}
+            {capture assign=contributionUrl}{crmURL p='civicrm/contribute/transact' q="reset=1&id={contribution.contribution_page_id}" a=true fe=1 h=1}{/capture}
             {include file="CRM/common/SocialNetwork.tpl" emailMode=true url=$contributionUrl title=$title pageURL=$contributionUrl}
         </td>
       </tr>
@@ -391,7 +391,7 @@
         </td>
        </tr>
       {/if}
-      {if !empty($is_deductible) AND !empty($price)}
+      {if $is_deductible AND !empty($price)}
         <tr>
          <td colspan="2" {$valueStyle}>
           <p>{ts 1=$price|crmMoney:$currency}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>
@@ -407,7 +407,6 @@
        </th>
       </tr>
       {foreach from=$customPre item=customValue key=customName}
-       {if (!empty($trackingFields) and ! in_array($customName, $trackingFields)) or empty($trackingFields)}
         <tr>
          <td {$labelStyle}>
           {$customName}
@@ -416,7 +415,6 @@
           {$customValue}
          </td>
         </tr>
-       {/if}
       {/foreach}
      {/if}
 
@@ -427,7 +425,6 @@
        </th>
       </tr>
       {foreach from=$customPost item=customValue key=customName}
-       {if (!empty($trackingFields) and ! in_array($customName, $trackingFields)) or empty($trackingFields)}
         <tr>
          <td {$labelStyle}>
           {$customName}
@@ -436,7 +433,6 @@
           {$customValue}
          </td>
         </tr>
-       {/if}
       {/foreach}
      {/if}
 

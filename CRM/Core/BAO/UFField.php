@@ -40,7 +40,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     $id = $params['id'] ?? NULL;
 
     $op = empty($id) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre('UFField', $op, $id, $params);
+    CRM_Utils_Hook::pre($op, 'UFField', $id, $params);
     // Merge in data from existing field
     if (!empty($id)) {
       $UFField = new CRM_Core_BAO_UFField();
@@ -107,39 +107,28 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($ufField->uf_group_id, TRUE);
     CRM_Core_BAO_UFGroup::updateGroupTypes($ufField->uf_group_id, $fieldsType);
 
-    CRM_Utils_Hook::post('UFField', $op, $ufField->id, $ufField);
+    CRM_Utils_Hook::post($op, 'UFField', $ufField->id, $ufField);
 
     civicrm_api3('profile', 'getfields', ['cache_clear' => TRUE]);
     return $ufField;
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     //check if custom data profile field is disabled
@@ -164,6 +153,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 
@@ -258,7 +248,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', !empty($params['id']) ? $params['id'] : $params['field_id'], 'weight', 'id');
     }
     $fieldValues = ['uf_group_id' => !empty($params['uf_group_id']) ? $params['uf_group_id'] : $params['group_id']];
-    return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, CRM_Utils_Array::value('weight', $params, 0), $fieldValues);
+    return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, $params['weight'] ?? 0, $fieldValues);
   }
 
   /**
@@ -285,12 +275,15 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * Copy existing profile fields to
    * new profile from the already built profile
    *
+   * @deprecated
+   *
    * @param int $old_id
    *   From which we need to copy.
    * @param bool $new_id
    *   In which to copy.
    */
   public static function copy($old_id, $new_id) {
+    CRM_Core_Error::deprecatedFunctionWarning('');
     $ufField = new CRM_Core_DAO_UFField();
     $ufField->uf_group_id = $old_id;
     $ufField->find();
@@ -316,7 +309,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     $ufField->find();
     while ($ufField->fetch()) {
       //enable/ disable profile
-      CRM_Core_BAO_UFField::del($ufField->id);
+      CRM_Core_BAO_UFField::deleteRecord(['id' => $ufField->id]);
     }
   }
 
@@ -794,7 +787,7 @@ SELECT  id
 
     if (!empty($index) && (
         // it's empty so we set it OR
-        !CRM_Utils_Array::value($prefixName, $profileAddressFields)
+        empty($profileAddressFields[$prefixName])
         //we are dealing with billing id (precedence)
         || $index == $billing_id
         // we are dealing with primary & billing not set
@@ -1141,7 +1134,7 @@ SELECT  id
         ],
         'receive_date' => [
           'name' => 'receive_date',
-          'title' => ts('Date Received'),
+          'title' => ts('Contribution Date'),
         ],
         'payment_instrument' => [
           'name' => 'payment_instrument',

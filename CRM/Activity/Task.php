@@ -19,6 +19,9 @@
  */
 class CRM_Activity_Task extends CRM_Core_Task {
 
+  /**
+   * @var string
+   */
   public static $objectType = 'activity';
 
   /**

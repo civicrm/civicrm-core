@@ -35,7 +35,7 @@ class IsPrimaryTest extends Api4TestBase implements TransactionalInterface {
   /**
    * Test that creating a location entity or deleting one re-assigns is_primary correctly.
    */
-  public function testPrimaryHandling() {
+  public function testPrimaryHandling(): void {
     $contactID = $this->createTestRecord('Contact')['id'];
     // Create an entity of each type.
     Email::create()->setValues(['email' => 'b@example.com', 'contact_id' => $contactID])->execute();

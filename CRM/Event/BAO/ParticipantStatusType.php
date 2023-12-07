@@ -17,33 +17,23 @@
 class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatusType {
 
   /**
+   * @deprecated
    * @param array $params
    *
    * @return self|null
    */
   public static function add(&$params) {
-    if (empty($params)) {
-      return NULL;
-    }
-    $dao = new CRM_Event_DAO_ParticipantStatusType();
-    $dao->copyValues($params);
-    return $dao->save();
+    return self::writeRecord($params);
   }
 
   /**
+   * @deprecated
    * @param array $params
    *
    * @return self|null
    */
-  public static function &create(&$params) {
-    $transaction = new CRM_Core_Transaction();
-    $statusType = self::add($params);
-    if (is_a($statusType, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $statusType;
-    }
-    $transaction->commit();
-    return $statusType;
+  public static function create(&$params) {
+    return self::writeRecord($params);
   }
 
   /**
@@ -71,29 +61,23 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   * @param $isActive
-   *
+   * @param bool $isActive
    * @return bool
    */
   public static function setIsActive($id, $isActive) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Event_BAO_ParticipantStatusType', $id, 'is_active', $isActive);
   }
 

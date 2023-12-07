@@ -67,7 +67,9 @@ class CRM_Custom_Form_CustomData {
 
   /**
    * @param CRM_Core_Form $form
-   * @param null|string $subName
+   * @param null|string $extendsEntityColumn
+   *   Additional filter on the type of custom data to retrieve - e.g for
+   *   participant data this could be a value representing role.
    * @param null|string $subType
    * @param null|int $groupCount
    * @param string $type
@@ -77,36 +79,25 @@ class CRM_Custom_Form_CustomData {
    * @throws \CRM_Core_Exception
    */
   public static function preProcess(
-    &$form, $subName = NULL, $subType = NULL,
+    &$form, $extendsEntityColumn = NULL, $subType = NULL,
     $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL
   ) {
-    if ($type) {
-      $form->_type = $type;
-    }
-    else {
-      $form->_type = CRM_Utils_Request::retrieve('type', 'String', $form);
+    if (!$type) {
+      CRM_Core_Error::deprecatedWarning('type should be passed in');
+      $type = CRM_Utils_Request::retrieve('type', 'String', $form);
     }
 
-    if (isset($subType)) {
-      $form->_subType = $subType;
+    if (!isset($subType)) {
+      $subType = CRM_Utils_Request::retrieve('subType', 'String', $form);
     }
-    else {
-      $form->_subType = CRM_Utils_Request::retrieve('subType', 'String', $form);
+    if ($subType === 'null') {
+      // Is this reachable?
+      $subType = NULL;
     }
-
-    if ($form->_subType == 'null') {
-      $form->_subType = NULL;
-    }
-
-    if (isset($subName)) {
-      $form->_subName = $subName;
-    }
-    else {
-      $form->_subName = CRM_Utils_Request::retrieve('subName', 'String', $form);
-    }
-
-    if ($form->_subName == 'null') {
-      $form->_subName = NULL;
+    $extendsEntityColumn = $extendsEntityColumn ?: CRM_Utils_Request::retrieve('subName', 'String', $form);
+    if ($extendsEntityColumn === 'null') {
+      // Is this reachable?
+      $extendsEntityColumn = NULL;
     }
 
     if ($groupCount) {
@@ -141,13 +132,50 @@ class CRM_Custom_Form_CustomData {
 
     $gid = (isset($form->_groupID)) ? $form->_groupID : NULL;
     $getCachedTree = $form->_getCachedTree ?? TRUE;
-
-    $subType = $form->_subType;
-    if (!is_array($subType) && strstr(($subType ?? ''), CRM_Core_DAO::VALUE_SEPARATOR)) {
+    if (!is_array($subType) && str_contains(($subType ?? ''), CRM_Core_DAO::VALUE_SEPARATOR)) {
+      CRM_Core_Error::deprecatedWarning('Using a CRM_Core_DAO::VALUE_SEPARATOR separated subType deprecated, use a comma-separated string instead.');
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
 
-    self::setGroupTree($form, $subType, $gid, $onlySubType, $getCachedTree);
+    $singleRecord = NULL;
+    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
+      $singleRecord = $form->_groupCount;
+    }
+    $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
+    // when a new record is being added for multivalued custom fields.
+    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
+      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
+      $singleRecord = 'new';
+    }
+
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
+      NULL,
+      $form->_entityId,
+      $gid,
+      $subType,
+      $extendsEntityColumn,
+      $getCachedTree,
+      $onlySubType,
+      FALSE,
+      CRM_Core_Permission::EDIT,
+      $singleRecord
+    );
+
+    if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
+      $form->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, TRUE, NULL, NULL, NULL, $form->_entityId);
+    }
+    // we should use simplified formatted groupTree
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $form->_groupCount, $form);
+
+    if (isset($form->_groupTree) && is_array($form->_groupTree)) {
+      $keys = array_keys($groupTree);
+      foreach ($keys as $key) {
+        $form->_groupTree[$key] = $groupTree[$key];
+      }
+    }
+    else {
+      $form->_groupTree = $groupTree;
+    }
   }
 
   /**
@@ -173,6 +201,14 @@ class CRM_Custom_Form_CustomData {
   /**
    * Add the group data as a formatted array to the form.
    *
+   * Note this is only called from this class in core but it is called
+   * from the gdpr extension so rather than clean it up we will deprecate in place
+   * and stop calling from core. (Calling functions like this from extensions)
+   * is not supported but since we are aware of it we can deprecate rather than
+   * remove it).
+   *
+   * @deprecated since 5.65 will be removed around 5.80.
+   *
    * @param CRM_Core_Form $form
    * @param string $subType
    * @param int $gid
@@ -183,6 +219,7 @@ class CRM_Custom_Form_CustomData {
    * @throws \CRM_Core_Exception
    */
   public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative - maybe copy & paste to your extension');
     $singleRecord = NULL;
     if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
       $singleRecord = $form->_groupCount;

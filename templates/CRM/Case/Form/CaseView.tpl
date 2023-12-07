@@ -24,7 +24,7 @@
         <td colspan="5" class="label">
           {ts}Clients:{/ts}
           {foreach from=$caseRoles.client item=client name=clients}
-            <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if not $smarty.foreach.clients.last}, &nbsp; {/if}
+            <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if count($caseRoles.client) gt 1}<a class="crm-popup crm-hover-button" href="{crmURL p='civicrm/contact/view/case/deleteClient' q="action=delete&reset=1&cid=`$client.contact_id`&id=`$caseId`&rcid=`$contactID`"}" title="{ts}Remove Client{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>{/if}{if not $smarty.foreach.clients.last}, &nbsp; {/if}
           {/foreach}
           <a href="#addClientDialog" class="crm-hover-button case-miniform" title="{ts}Add Client{/ts}" data-key="{crmKey name='civicrm/case/ajax/addclient'}">
             <i class="crm-i fa-user-plus" aria-hidden="true"></i>
@@ -147,30 +147,14 @@
       {/if}
 
       <div id="editCaseRoleDialog" class="hiddenElement">
-        <div><label for="edit_role_contact_id">{ts}Change To{/ts}:</label></div>
+        <div><label for="edit_role_contact_id">{ts}Change To{/ts} <span class="crm-marker">*</span></label></div>
         <div><input name="edit_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
       </div>
       <div id="caseRoles-selector-show-active">
         {* Add checkbox to show inactive roles. For open cases, default value is unchecked, i.e. show active roles. For closed cases default is checked. *}
         <label><input type="checkbox" id="role_inactive" name="role_inactive[]"{if $caseDetails.status_class neq 'Opened'} checked="checked"{/if}>{ts}Show Inactive relationships{/ts}</label>
       </div>
-      {literal}
-        <script type="text/javascript">
-            (function($) {
-                // hide the inactive role when checkbox is checked
-                $('input[type=checkbox][id=role_inactive]').change(function() {
-                  if (this.checked == true) {
-                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').hide();
-                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').show();
-                  } else if (this.checked == false) {
-                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').show();
-                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').hide();
-                  }
-                });
-            })(CRM.$);
-        </script>
-      {/literal}
-      <table id="caseRoles-selector-{$caseID}"  class="report-layout crm-ajax-table" data-page-length="10">
+      <table id="caseRoles-selector-{$caseID}" class="report-layout crm-ajax-table" data-page-length="10">
         <thead>
           <tr>
             <th data-data="relation">{ts}Case Role{/ts}</th>
@@ -188,19 +172,9 @@
         <script type="text/javascript">
           (function($) {
             var caseId = {/literal}{$caseID}{literal};
-            CRM.$('table#caseRoles-selector-' + caseId).data({
+            $('table#caseRoles-selector-' + caseId).data({
               "ajax": {
                 "url": {/literal}'{crmURL p="civicrm/ajax/caseroles" h=0 q="snippet=4&caseID=$caseId&cid=$contactID&userID=$userID"}'{literal},
-                "complete" : function(){
-                  if (CRM.$('input[type=checkbox][id=role_inactive]').prop('checked')) {
-                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').hide();
-                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').show();
-                  }
-                  else {
-                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').show();
-                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').hide();
-                  }
-                }
               }
             });
           })(CRM.$);
@@ -304,12 +278,12 @@
 
    {foreach from=$tagSetTags item=displayTagset}
      <p class="crm-block crm-content-block crm-case-caseview-display-tagset">
-       &nbsp;&nbsp;<strong>{$displayTagset.name}:</strong>
-       {', '|implode:$displayTagset.items}
+       &nbsp;&nbsp;<strong>{$displayTagset.label}:</strong>
+       {', '|implode:$displayTagset.items|escape}
      </p>
    {/foreach}
 
-   {if !$tags && !$tagSetTags }
+   {if !$tags && !$tagSetTags}
      <div class="status">
        {ts}There are no tags currently assigned to this case.{/ts}
      </div>

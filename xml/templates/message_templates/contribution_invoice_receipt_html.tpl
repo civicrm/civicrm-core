@@ -14,6 +14,11 @@
       </table>
     {/if}
     <table style="font-family: Arial, Verdana, sans-serif;" width="100%" height="100" border="0" cellpadding="5" cellspacing="0">
+      {if $userText}
+        <tr>
+          <td><font size="1" colspan="3">{$userText}</font></td>
+        </tr>
+      {/if}
       <tr>
         <td width="30%"><b><font size="4" align="center">{ts}INVOICE{/ts}</font></b></td>
         <td width="50%" valign="bottom"><b><font size="1" align="center">{ts}Invoice Date:{/ts}</font></b></td>

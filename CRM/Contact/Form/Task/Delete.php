@@ -32,9 +32,25 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
   /**
    * Cache shared address message so we don't query twice
-   * @var string
+   *
+   * @var array
    */
   protected $_sharedAddressMessage = NULL;
+
+  /**
+   * @var string
+   */
+  protected $_searchKey;
+
+  /**
+   * @var bool
+   */
+  protected $_skipUndelete;
+
+  /**
+   * @var bool
+   */
+  protected $_restore;
 
   /**
    * Build all the data structures needed to build the form.
@@ -49,8 +65,8 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
     // sort out whether it’s a delete-to-trash, delete-into-oblivion or restore (and let the template know)
     $values = $this->controller->exportValues();
-    $this->_skipUndelete = (CRM_Core_Permission::check('access deleted contacts') and (CRM_Utils_Request::retrieve('skip_undelete', 'Boolean', $this) or CRM_Utils_Array::value('task', $values) == CRM_Contact_Task::DELETE_PERMANENTLY));
-    $this->_restore = (CRM_Utils_Request::retrieve('restore', 'Boolean', $this) or CRM_Utils_Array::value('task', $values) == CRM_Contact_Task::RESTORE);
+    $this->_skipUndelete = (CRM_Core_Permission::check('access deleted contacts') and (CRM_Utils_Request::retrieve('skip_undelete', 'Boolean', $this) or ($values['task'] ?? NULL) == CRM_Contact_Task::DELETE_PERMANENTLY));
+    $this->_restore = (CRM_Utils_Request::retrieve('restore', 'Boolean', $this) or ($values['task'] ?? NULL) == CRM_Contact_Task::RESTORE);
 
     if ($this->_restore && !CRM_Core_Permission::check('access deleted contacts')) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this contact.'));
@@ -244,7 +260,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       }
       $message .= '<ul><li>' . implode('</li><li>', $this->_sharedAddressMessage['contactList']) . '</li></ul>';
 
-      $session->setStatus($message, ts('Shared Addresses Owner Deleted'), 'info', ['expires' => 0]);
+      $session->setStatus($message, ts('Shared Addresses Owner Deleted'), 'info', ['expires' => 30000]);
 
       $this->set('sharedAddressMessage', NULL);
     }

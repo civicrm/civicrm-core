@@ -4,6 +4,7 @@ use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
 use Civi\Api4\WorkflowMessage;
+use Civi\Test;
 use Civi\WorkflowMessage\GenericWorkflowMessage;
 use Civi\WorkflowMessage\WorkflowMessageExample;
 
@@ -19,20 +20,25 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
    * Get the examples this class is able to deliver.
    */
   public function getExamples(): iterable {
-    $workflows = ['contribution_online_receipt', 'contribution_offline_receipt', 'contribution_invoice_receipt'];
+    $workflows = ['contribution_online_receipt', 'contribution_offline_receipt', 'contribution_invoice_receipt', 'payment_or_refund_notification'];
+    $defaultCurrency = \Civi::settings()->get('defaultCurrency');
+    $currencies = [$defaultCurrency => $defaultCurrency, 'EUR' => 'EUR', 'CAD' => 'CAD'];
     foreach ($workflows as $workflow) {
+      foreach ($currencies as $currency) {
+        yield [
+          'name' => 'workflow/' . $workflow . '/basic_' . $currency,
+          'title' => ts('Completed Contribution') . ' : ' . $currency,
+          'tags' => $workflow === 'contribution_offline_receipt' ? ['phpunit', 'preview'] : ['preview'],
+          'workflow' => $workflow,
+        ];
+      }
       yield [
-        'name' => 'workflow/' . $workflow . '/basic_eur',
-        'title' => ts('Completed Contribution') . ' : ' . 'EUR',
-        'tags' => $workflow === 'contribution_offline_receipt' ? ['phpunit', 'preview'] : ['preview'],
-        'workflow' => $workflow,
-      ];
-      yield [
-        'name' => 'workflow/' . $workflow . '/' . 'basic_cad',
-        'title' => ts('Completed Contribution') . ' : ' . 'CAD',
+        'name' => 'workflow/' . $workflow . '/' . 'partially paid' . $currency,
+        'title' => ts('Partially Paid Contribution') . ' : ' . $currency,
         'tags' => ['preview'],
         'workflow' => $workflow,
-        'contribution_params' => ['currency' => 'CAD'],
+        'is_show_line_items' => TRUE,
+        'contribution_params' => ['contribution_status_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid')],
       ];
       $priceSet = $this->getNonQuickConfigPriceSet();
       if ($priceSet) {
@@ -111,14 +117,28 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function addExampleData(GenericWorkflowMessage $messageTemplate, $example): void {
-    $messageTemplate->setContact(\Civi\Test::example('entity/Contact/Barb'));
-    $contribution = \Civi\Test::example('entity/Contribution/Euro5990/completed');
+    $messageTemplate->setContact(Test::example('entity/Contact/Barb'));
+    $contribution = Test::example('entity/Contribution/Euro5990/completed');
+    $example['currency'] = $example['currency'] ?? \Civi::settings()->get('defaultCurrency');
     if (isset($example['contribution_params'])) {
       $contribution = array_merge($contribution, $example['contribution_params']);
     }
     $contribution['contribution_status_id:name'] = \CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']);
     $contribution['contribution_status_id:label'] = \CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']);
-
+    if ($contribution['contribution_status_id:name'] === 'Partially paid') {
+      $contribution['paid_amount'] = round($contribution['total_amount'] / 2, 2);
+    }
+    elseif ($contribution['contribution_status_id:name'] === 'Pending' || $contribution['contribution_status_id:name'] === 'Refunded') {
+      $contribution['paid_amount'] = 0;
+    }
+    else {
+      $contribution['paid_amount'] = $contribution['total_amount'];
+    }
+    $contribution['balance_amount'] = $contribution['total_amount'] - $contribution['paid_amount'];
+    if ($contribution['contribution_status_id:name'] === 'Refunded') {
+      $contribution['balance_amount'] = 0;
+    }
+    $contribution['net_amount'] = $contribution['total_amount'] - $contribution['fee_amount'];
     $mockOrder = new CRM_Financial_BAO_Order();
     $mockOrder->setTemplateContributionID(50);
 
@@ -134,7 +154,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
         $mockOrder->setDefaultFinancialTypeID($priceSet['financial_type_id']);
       }
     }
-    foreach (PriceField::get()->addWhere('price_set_id', '=', $mockOrder->getPriceSetID())->execute() as $index => $priceField) {
+    foreach (PriceField::get(FALSE)->addWhere('price_set_id', '=', $mockOrder->getPriceSetID())->execute() as $index => $priceField) {
       $priceFieldValue = PriceFieldValue::get()->addWhere('price_field_id', '=', $priceField['id'])->execute()->first();
       if (empty($example['is_show_line_items'])) {
         $priceFieldValue['amount'] = $contribution['total_amount'];
@@ -143,11 +163,28 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
       $this->setLineItem($mockOrder, $priceField, $priceFieldValue, $index);
     }
 
+    $contribution['address_id.name'] = 'Barbara Johnson';
+    $contribution['address_id.display'] = '790L Lincoln St S
+Baltimore, New York 10545
+United States';
     $contribution['total_amount'] = $mockOrder->getTotalAmount();
     $contribution['tax_amount'] = $mockOrder->getTotalTaxAmount() ? round($mockOrder->getTotalTaxAmount(), 2) : 0;
     $messageTemplate->setContribution($contribution);
     $messageTemplate->setOrder($mockOrder);
     $messageTemplate->setContribution($contribution);
+    $financialTrxn = [
+      'trxn_date' => date('Y-m-d H:i:s'),
+      'total_amount' => $contribution['contribution_status_id:name'] === 'Refunded' ? -$contribution['total_amount'] : $contribution['paid_amount'],
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', 'Credit Card'),
+      'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'card_type_id', 'Visa'),
+      'pan_truncation' => 5679,
+    ];
+    $financialTrxn['payment_instrument_id:label'] = \CRM_Core_PseudoConstant::getLabel('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', $financialTrxn['payment_instrument_id']);
+    $financialTrxn['payment_instrument_id:name'] = \CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', $financialTrxn['payment_instrument_id']);
+    $financialTrxn['card_type_id:label'] = \CRM_Core_PseudoConstant::getLabel('CRM_Financial_BAO_FinancialTrxn', 'card_type_id', $financialTrxn['card_type_id']);
+    $financialTrxn['card_type_id:name'] = \CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialTrxn', 'card_type_id', $financialTrxn['card_type_id']);
+
+    $messageTemplate->setFinancialTrxn($financialTrxn);
   }
 
   /**
@@ -157,8 +194,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
    * @throws \CRM_Core_Exception
    */
   private function getNonQuickConfigPriceSet(): ?array {
-    // Permission check defaults to true - likely implicitly OK but may need to be false.
-    return PriceSet::get()
+    return PriceSet::get(FALSE)
       ->addWhere('is_quick_config', '=', FALSE)
       ->execute()
       ->first();

@@ -336,14 +336,13 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
     $updateResultSet = FALSE;
     $resultSetOptGrpId = NULL;
-    if ((CRM_Utils_Array::value('option_type', $params) == 2) &&
+    if ((($params['option_type'] ?? NULL) == 2) &&
       !empty($params['option_group_id'])
     ) {
       $updateResultSet = TRUE;
       $resultSetOptGrpId = $params['option_group_id'];
     }
 
-    $recontactInterval = [];
     if ($updateResultSet) {
       $optionValue = new CRM_Core_DAO_OptionValue();
       $optionValue->option_group_id = $resultSetOptGrpId;
@@ -372,6 +371,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         $optionValue->value = trim($v);
         $optionValue->weight = $params['option_weight'][$k];
         $optionValue->is_active = 1;
+        $optionValue->filter = $params['option_interval'][$k];
 
         if (!empty($params['default_option']) &&
           $params['default_option'] == $k
@@ -381,14 +381,9 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
         $optionValue->save();
 
-        // using is_numeric since 0 is a valid value for option_interval
-        if (is_numeric($params['option_interval'][$k])) {
-          $recontactInterval[$optionValue->label] = $params['option_interval'][$k];
-        }
       }
     }
 
-    $params['recontact_interval'] = serialize($recontactInterval);
     $survey = CRM_Campaign_BAO_Survey::create($params);
 
     // create report if required.
@@ -397,7 +392,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       $activityStatus = array_flip($activityStatus);
       $this->_params = [
         'name' => "survey_{$survey->id}",
-        'title' => $params['report_title'] ? $params['report_title'] : $this->_values['title'],
+        'title' => $params['report_title'] ?: $this->_values['title'],
         'status_id_op' => 'eq',
         // reserved status
         'status_id_value' => $activityStatus['Scheduled'],

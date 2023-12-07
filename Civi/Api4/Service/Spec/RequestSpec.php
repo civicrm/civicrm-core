@@ -53,7 +53,7 @@ class RequestSpec implements \Iterator {
    * @param string $action
    * @param array $values
    */
-  public function __construct($entity, $action, $values = []) {
+  public function __construct(string $entity, string $action, array $values = []) {
     $this->entity = $entity;
     $this->action = $action;
     $this->entityTableName = CoreUtil::getTableName($entity);

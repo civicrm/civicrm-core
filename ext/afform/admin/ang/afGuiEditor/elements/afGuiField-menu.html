@@ -1,8 +1,25 @@
-<li ng-if="!$ctrl.fieldDefn.is_id">
+<li ng-if="!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill">
   <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Type:') }}</label>
     <select class="form-control" ng-model="getSet('input_type')" ng-model-options="{getterSetter: true}" title="{{:: ts('Field type') }}">
       <option ng-repeat="type in $ctrl.inputTypes" value="{{ type.name }}">{{ type.label }}</option>
+    </select>
+  </div>
+</li>
+<li ng-if="$ctrl.fieldDefn.input_type === 'Number' && $ctrl.fieldDefn.data_type === 'Float'">
+  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <label>{{:: ts('Decimal places:') }}</label>
+    <select class="form-control" ng-model="getSet('input_attrs.step')" ng-model-options="{getterSetter: true}" title="{{:: ts('Decimal places') }}">
+      <option ng-value="1">0</option>
+      <option ng-value=".1">1</option>
+      <option ng-value=".01">2</option>
+      <option ng-value=".001">3</option>
+      <option ng-value=".0001">4</option>
+      <option ng-value=".00001">5</option>
+      <option ng-value=".000001">6</option>
+      <option ng-value=".0000001">7</option>
+      <option ng-value=".00000001">8</option>
+      <option ng-value=".000000001">9</option>
     </select>
   </div>
 </li>
@@ -21,6 +38,11 @@
     <input crm-ui-select="{data: $ctrl.editor.securityModes}" ng-model="getSet('security')" ng-model-options="{getterSetter: true}" class="form-control">
   </div>
 </li>
+<li ng-if="$ctrl.fieldDefn.input_type === 'EntityRef'" title="{{:: ts('Allow a new entity to be created via quick-add popup') }}">
+  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <input crm-ui-select="{data: $ctrl.quickAddLinks, multiple: true, placeholder: ts('Quick Add')}" ng-model="getSet('input_attrs.quickAdd')" ng-model-options="{getterSetter: true}" ng-list class="form-control">
+  </div>
+</li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'EntityRef'">
   <a href ng-click="toggleAttr('input_attrs.autoOpen'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show autocomplete results without typing') }}">
     <i class="crm-i fa-{{ getProp('input_attrs.autoOpen') ? 'check-' : '' }}square-o"></i>
@@ -33,13 +55,21 @@
     {{:: ts('Required') }}
   </a>
 </li>
-<li ng-if="!$ctrl.fieldDefn.is_id">
+<li ng-if="!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill">
   <a href ng-click="toggleDefaultValue(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Pre-fill this field with a value') }}">
     <i class="crm-i fa-{{ $ctrl.hasDefaultValue ? 'check-' : '' }}square-o"></i>
     {{:: ts('Default value') }}
   </a>
 </li>
-<li ng-if="$ctrl.hasDefaultValue">
+<li ng-if="$ctrl.fieldDefn.input_type === 'Date' && $ctrl.hasDefaultValue">
+  <div ng-click="setDefaultDateType(); $event.stopPropagation(); $event.target.blur();" class="af-gui-field-select-in-dropdown form-inline">
+    <select class="form-control" ng-model="getSet('default_date_type')" ng-model-options="{getterSetter: true}">
+      <option value="fixed">{{:: ts('Pick Date') }}</option>
+      <option value="now">{{:: ts('Now') }}</option>
+    </select>
+  </div>
+</li>
+<li ng-if="$ctrl.hasDefaultValue && $ctrl.defaultDateType !== 'now'">
   <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
     <input class="form-control" af-gui-field-value="$ctrl.fieldDefn" ng-model="getSet('afform_default')" ng-model-options="{getterSetter: true}" >
   </form>
@@ -62,6 +92,7 @@
     {{:: ts('Post help text') }}
   </a>
 </li>
+
 <li role="separator" class="divider" ng-if="$ctrl.canBeRange() || $ctrl.canBeMultiple()"></li>
 <li ng-if="$ctrl.canBeMultiple()" ng-click="$event.stopPropagation()">
   <a href ng-click="toggleMultiple()" title="{{:: ts('Search multiple values') }}">
@@ -75,6 +106,25 @@
     {{:: ts('Search by range') }}
   </a>
 </li>
+<li ng-if="$ctrl.isSearch()" ng-click="$event.stopPropagation()">
+  <div href class="af-gui-field-select-in-dropdown">
+    <label>{{:: ts('Operator:') }}</label>
+    <select class="form-control" ng-model="getSetOperator" ng-model-options="{getterSetter: true}" title="{{:: ts('Set the search operator for this field or allow the user to select it on the form') }}">
+      <option value="">{{:: ts('Auto') }}</option>
+      <option value="_EXPOSE_">{{:: ts('User Select') }}</option>
+      <option ng-repeat="(name, label) in $ctrl.searchOperators" value="{{ name }}">{{ label }}</option>
+    </select>
+  </div>
+  <div href class="af-gui-field-select-in-dropdown" ng-if="$ctrl.getSet('expose_operator')">
+    <label>{{:: ts('Default:') }}</label>
+    <select class="form-control" ng-model="getSet('search_operator')" ng-model-options="{getterSetter: true}" title="{{:: ts('Default search operator for the user to select') }}">
+      <option ng-repeat="(name, label) in $ctrl.searchOperators" value="{{ name }}">{{ label }}</option>
+    </select>
+  </div>
+</li>
+
+<li af-gui-conditional-menu="$ctrl.node" ng-if="$ctrl.editor.getEntities().length"></li>
+
 <li role="separator" class="divider" ng-if="hasOptions()"></li>
 <li ng-if="hasOptions()" ng-click="$event.stopPropagation()">
   <a href ng-click="resetOptions()" title="{{:: ts('Reset the option list for this field') }}">
@@ -88,6 +138,7 @@
     {{:: ts('Customize options') }}
   </a>
 </li>
+
 <li role="separator" class="divider"></li>
 <li>
   <a href ng-click="$ctrl.deleteThis()" title="{{:: ts('Remove field from form') }}">

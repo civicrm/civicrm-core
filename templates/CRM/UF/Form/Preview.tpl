@@ -19,18 +19,8 @@
   {if $viewOnly}
   {* wrap in crm-container div so crm styles are used *}
     <div id="crm-container-inner" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
-    {include file="CRM/common/CMSUser.tpl"}
       {strip}
-        {if $help_pre && $action neq 4}<div class="messages help">{$help_pre}</div>{/if}
-        {assign var=zeroField value="Initial Non Existent Fieldset"}
-        {assign var=fieldset  value=$zeroField}
-        {include file="CRM/UF/Form/Fields.tpl"}
-        {if $addCAPTCHA }
-          {include file='CRM/common/ReCAPTCHA.tpl'}
-        {/if}
-        {if $field.groupHelpPost}
-          <div class="messages help">{$field.groupHelpPost}</div>
-        {/if}
+        {include file="CRM/UF/Form/Block.tpl" prefix=false mode=false hideFieldset=false}
       {/strip}
     </div> {* end crm-container div *}
   {else}
@@ -40,6 +30,6 @@
 {/if} {* fields array is not empty *}
 
   <div class="crm-submit-buttons">
-  {include file="CRM/common/formButtons.tpl"}
+  {include file="CRM/common/formButtons.tpl" location=''}
   </div>
 </div>

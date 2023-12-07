@@ -94,7 +94,7 @@
       {if $totalTaxAmount}
         {ts}Event SubTotal: {$totalAmount-$totalTaxAmount|crmMoney:$currency}{/ts}<br />
       {/if}
-      {ts}Event Total{/ts}:
+      {ts}Total Amount{/ts}:
     {elseif $context EQ "Membership"}
       {ts}Membership Fee Total{/ts}:
     {else}
@@ -114,7 +114,7 @@
           {assign var="intPCount" value=$p_count.participant_count|intval}
           {assign var="lineItemCount" value=$lineItemCount+$intPCount}
         {/foreach}
-        {if $lineItemCount < 1 }
+        {if $lineItemCount < 1}
           {assign var="lineItemCount" value=1}
         {/if}
         {assign var="totalcount" value=$totalcount+$lineItemCount}

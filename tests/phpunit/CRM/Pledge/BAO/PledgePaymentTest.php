@@ -20,7 +20,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Test for Add/Update Pledge Payment.
    */
-  public function testAdd() {
+  public function testAdd(): void {
     $pledge = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_Pledge');
     $params = [
       'pledge_id' => $pledge->id,
@@ -60,7 +60,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Retrieve a payment based on a pledge id = 0
    */
-  public function testRetrieveZeroPledeID() {
+  public function testRetrieveZeroPledeID(): void {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $params = ['pledge_id' => 0];
     $defaults = [];
@@ -73,7 +73,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Retrieve a payment based on a Null pledge id.
    */
-  public function testRetrieveStringPledgeID() {
+  public function testRetrieveStringPledgeID(): void {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $params = ['pledge_id' => 'Test'];
     $defaults = [];
@@ -86,7 +86,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Test that payment retrieve wrks based on known pledge id.
    */
-  public function testRetrieveKnownPledgeID() {
+  public function testRetrieveKnownPledgeID(): void {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $pledgeId = $payment->pledge_id;
     $params = ['pledge_id' => $pledgeId];
@@ -100,7 +100,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Delete Payments payments for one pledge.
    */
-  public function testDeletePledgePaymentsNormal() {
+  public function testDeletePledgePaymentsNormal(): void {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $paymentid = CRM_Pledge_BAO_PledgePayment::deletePayments($payment->pledge_id);
 
@@ -111,7 +111,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Delete Multiple payments for one pledge.
    */
-  public function testDeletePledgePayments() {
+  public function testDeletePledgePayments(): void {
     $contactId = $this->individualCreate();
     $pledgeId = $this->pledgeCreate(['contact_id' => $contactId]);
     CRM_Pledge_BAO_PledgePayment::deletePayments($pledgeId);
@@ -124,7 +124,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Pass Null Id for a payment deletion for one pledge.
    */
-  public function testDeletePledgePaymentsNullId() {
+  public function testDeletePledgePaymentsNullId(): void {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $paymentid = CRM_Pledge_BAO_PledgePayment::deletePayments(NULL);
     $this->assertFalse($paymentid, "No payments deleted");
@@ -134,7 +134,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Pass Zero Id for a payment deletion for one pledge.
    */
-  public function testDeletePaymentsZeroId() {
+  public function testDeletePaymentsZeroId(): void {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $paymentid = CRM_Pledge_BAO_PledgePayment::deletePayments(0);
     $result = CRM_Pledge_BAO_Pledge::deletePledge($payment->pledge_id);
@@ -143,7 +143,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Test calculateBaseScheduleDate - should give 15th day of month
    */
-  public function testcalculateBaseScheduleDateMonth() {
+  public function testcalculateBaseScheduleDateMonth(): void {
     $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'month',
@@ -158,7 +158,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Test calculateBaseScheduleDate - should give original date
    */
-  public function testcalculateBaseScheduleDateDay() {
+  public function testcalculateBaseScheduleDateDay(): void {
     $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'day',
@@ -174,7 +174,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    * Test calculateBaseScheduleDateWeek - should give the day in the week as indicated
    * testing each day as this is really the only unit that does anything
    */
-  public function testcalculateBaseScheduleDateWeek() {
+  public function testcalculateBaseScheduleDateWeek(): void {
     $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'week',
@@ -207,7 +207,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Test calculateBaseScheduleDate - should give original date
    */
-  public function testcalculateBaseScheduleDateYear() {
+  public function testcalculateBaseScheduleDateYear(): void {
     $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'year',
@@ -222,7 +222,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Test calculateNextScheduledDate - no date provided
    */
-  public function testcalculateNextScheduledDateYear() {
+  public function testcalculateNextScheduledDateYear(): void {
     $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'year',
@@ -238,7 +238,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    *  CRM-18316: To calculate pledge scheduled dates with end of a month.
    *  Test culateNextScheduledDateMonth for months.
    */
-  public function testcalculateNextScheduledDateMonth() {
+  public function testcalculateNextScheduledDateMonth(): void {
     $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'month',
@@ -302,7 +302,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   /**
    *  Test calculateNextScheduledDate - no date provided
    */
-  public function testcalculateNextScheduledDateYearDateProvided() {
+  public function testcalculateNextScheduledDateYearDateProvided(): void {
     $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'year',
@@ -319,7 +319,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    * Check for rounding bugs. NB: this cannot be done in the API, because the
    * API does not call CRM_Contribute_BAO_Contribution::updateRelatedPledge().
    */
-  public function testCreatePledgePaymentForMultipleInstallments() {
+  public function testCreatePledgePaymentForMultipleInstallments(): void {
     $scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
     $contact_id = 2;
 

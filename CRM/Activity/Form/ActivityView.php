@@ -26,6 +26,15 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
   public $submitOnce = TRUE;
 
   /**
+   * Used by CRM_Mailing_BAO_Mailing::getMailingContent(), so cannot be removed
+   * (even though at first glance it may look safe)
+   *
+   * @var bool
+   * @internal
+   */
+  public $_mailing_id;
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -42,12 +51,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     }
 
     $session = CRM_Core_Session::singleton();
-    if (!in_array($context, [
-      'home',
-      'dashlet',
-      'dashletFullscreen',
-    ])
-    ) {
+    if (!in_array($context, ['home', 'dashlet', 'dashletFullscreen'])) {
       $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=activity");
     }
     else {
@@ -60,7 +64,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     CRM_Activity_BAO_Activity::retrieve($params, $defaults);
 
     // Send activity type description to template.
-    list(, $activityTypeDescription) = CRM_Core_BAO_OptionValue::getActivityTypeDetails($defaults['activity_type_id']);
+    [, $activityTypeDescription] = CRM_Core_BAO_OptionValue::getActivityTypeDetails($defaults['activity_type_id']);
     $this->assign('activityTypeDescription', $activityTypeDescription);
 
     if (!empty($defaults['mailingId'])) {
@@ -73,7 +77,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
         $this->_mailing_id, NULL, FALSE, NULL, NULL, NULL, $cid);
       $this->assign('openreport', $full_open_report);
 
-      $click_thru_report = CRM_Mailing_Event_BAO_MailingEventClickThrough::getRows($this->_mailing_id, NULL, FALSE, NULL, NULL, NULL, NULL, $cid);
+      $click_thru_report = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getRows($this->_mailing_id, NULL, FALSE, NULL, NULL, NULL, NULL, $cid);
       $this->assign('clickreport', $click_thru_report);
     }
 
@@ -91,11 +95,13 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     $values['target_contact_value'] = $values['target_contact_value'] ?? NULL;
 
     // Get the campaign.
-    if ($campaignId = CRM_Utils_Array::value('campaign_id', $defaults)) {
+    $campaignId = $defaults['campaign_id'] ?? NULL;
+    if ($campaignId) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
     }
-    if ($engagementLevel = CRM_Utils_Array::value('engagement_level', $defaults)) {
+    $engagementLevel = $defaults['engagement_level'] ?? NULL;
+    if ($engagementLevel) {
       $engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
       $values['engagement_level'] = CRM_Utils_Array::value($engagementLevel, $engagementLevels, $engagementLevel);
     }

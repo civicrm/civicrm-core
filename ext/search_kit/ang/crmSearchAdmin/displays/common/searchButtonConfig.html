@@ -19,12 +19,3 @@
     </label>
   </div>
 </div>
-<div class="input-group">
-  <div class="checkbox-inline form-control" title="{{:: ts('Display a button for creating a new record') }}">
-    <label>
-      <input type="checkbox" ng-checked="$ctrl.display.settings.addButton.path" ng-click="$ctrl.parent.toggleAddButton()">
-      <span>{{:: ts('"Add New" Button') }}</span>
-    </label>
-  </div>
-</div>
-<input class="form-control" ng-if="$ctrl.display.settings.addButton.path" ng-model="$ctrl.display.settings.addButton.path" ng-change="$ctrl.onChangeAddButtonPath()" ng-model-options="{updateOn: 'blur'}" title="{{:: ts('Path') }}" placeholder="{{:: ts('Path') }}">

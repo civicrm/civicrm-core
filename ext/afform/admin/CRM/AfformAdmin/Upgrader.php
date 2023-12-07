@@ -4,7 +4,7 @@ use CRM_AfformAdmin_ExtensionUtil as E;
 /**
  * Collection of upgrade steps.
  */
-class CRM_AfformAdmin_Upgrader extends CRM_AfformAdmin_Upgrader_Base {
+class CRM_AfformAdmin_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * Obsolete upgrade step, no longer does anything

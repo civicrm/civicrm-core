@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!--  $Id: mailing_delivered.xml 30511 2013-04-30 11:36:36Z shot $  -->
 <dataset>
   <table name="civicrm_mailing">
   <column>id</column>

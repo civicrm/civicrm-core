@@ -91,7 +91,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->student = $params['name'];
 
     $parents = 'indivi_parent' . substr(sha1(rand()), 0, 7);
@@ -102,7 +102,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->parent = $params['name'];
 
     $organizations = 'org_sponsor' . substr(sha1(rand()), 0, 7);
@@ -113,7 +113,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
       'parent_id' => 3,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->sponsor = $params['name'];
 
     $this->individualParams = [
@@ -164,7 +164,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
    *
    * Success expected.
    */
-  public function testSearchWithType() {
+  public function testSearchWithType(): void {
 
     // for type:Individual
     $params = ['contact_type' => 'Individual', 'version' => 3];
@@ -229,7 +229,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
    *
    * Success expected.
    */
-  public function testSearchWithSubype() {
+  public function testSearchWithSubype(): void {
 
     // for subtype:Student
     $params = ['contact_sub_type' => $this->student, 'version' => 3];
@@ -277,7 +277,7 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
    *
    * Success expected.
    */
-  public function testSearchWithTypeSubype() {
+  public function testSearchWithTypeSubype(): void {
 
     // for type:individual subtype:Student
     $params = ['contact_sub_type' => $this->student, 'version' => 3];

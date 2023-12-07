@@ -28,7 +28,7 @@ use Civi\Api4\Utils\ReflectionUtils;
  *  - Require a value for the param if you add the "@required" annotation.
  *
  * @method bool getCheckPermissions()
- * @method $this setDebug(bool $value) Enable/disable debug output
+ * @method $this setDebug(bool $debug) Enable/disable debug output
  * @method bool getDebug()
  * @method $this setChain(array $chain)
  * @method array getChain()
@@ -151,15 +151,21 @@ abstract class AbstractAction implements \ArrayAccess {
    *
    * @param string $entityName
    * @param string $actionName
-   * @throws \CRM_Core_Exception
    */
   public function __construct($entityName, $actionName) {
-    // If a namespaced class name is passed in
-    if (strpos($entityName, '\\') !== FALSE) {
-      $entityName = substr($entityName, strrpos($entityName, '\\') + 1);
+    // If a namespaced class name is passed in, convert to entityName
+    $this->_entityName = CoreUtil::stripNamespace($entityName);
+    // Normalize action name case (because PHP is case-insensitive, we have to do an extra check)
+    $thisClassName = CoreUtil::stripNamespace(get_class($this));
+    // If this was called via magic method, $actionName won't necessarily have the
+    // correct case because PHP doesn't care about case when calling methods.
+    if (strtolower($thisClassName) === strtolower($actionName)) {
+      $this->_actionName = lcfirst($thisClassName);
     }
-    $this->_entityName = $entityName;
-    $this->_actionName = $actionName;
+    // If called via static method, case should already be correct.
+    else {
+      $this->_actionName = $actionName;
+    }
     $this->_id = \Civi\API\Request::getNextId();
   }
 
@@ -227,7 +233,7 @@ abstract class AbstractAction implements \ArrayAccess {
           return $this->$param;
 
         case 'set':
-          $this->$param = $arguments[0];
+          $this->$param = ReflectionUtils::castTypeSoftly($arguments[0], $this->getParamInfo()[$param] ?? []);
           return $this;
       }
     }
@@ -486,7 +492,7 @@ abstract class AbstractAction implements \ArrayAccess {
           $unmatched[] = $fieldName;
         }
         elseif (!empty($fieldInfo['required_if'])) {
-          if ($this->evaluateCondition($fieldInfo['required_if'], ['values' => $values])) {
+          if (self::evaluateCondition($fieldInfo['required_if'], ['values' => $values])) {
             $unmatched[] = $fieldName;
           }
         }
@@ -512,23 +518,22 @@ abstract class AbstractAction implements \ArrayAccess {
         if ($field) {
           $optionFields[$fieldName] = [
             'val' => $record[$expr],
+            'name' => $fieldName,
             'expr' => $expr,
             'field' => $field,
             'suffix' => substr($expr, $suffix + 1),
-            'depends' => $field['input_attrs']['control_field'] ?? NULL,
+            'input_attrs' => $field['input_attrs'] ?? [],
           ];
           unset($record[$expr]);
         }
       }
     }
-    // Sort option lookups by dependency, so e.g. country_id is processed first, then state_province_id, then county_id
-    uasort($optionFields, function ($a, $b) {
-      return $a['field']['name'] === $b['depends'] ? -1 : 1;
-    });
+    // Sort lookups by `input_attrs.control_field`, so e.g. country_id is processed first, then state_province_id, then county_id
+    CoreUtil::topSortFields($optionFields);
     // Replace pseudoconstants. Note this is a reverse lookup as we are evaluating input not output.
-    foreach ($optionFields as $fieldName => $info) {
+    foreach ($optionFields as $info) {
       $options = FormattingUtil::getPseudoconstantList($info['field'], $info['expr'], $record, 'create');
-      $record[$fieldName] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
+      $record[$info['name']] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
     }
     // The DAO works better with ints than booleans. See https://github.com/civicrm/civicrm-core/pull/23970
     foreach ($record as $key => $value) {
@@ -551,7 +556,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
-  protected function evaluateCondition($expr, $vars) {
+  public static function evaluateCondition($expr, $vars) {
     if (strpos($expr, '}') !== FALSE || strpos($expr, '{') !== FALSE) {
       throw new \CRM_Core_Exception('Illegal character in expression');
     }

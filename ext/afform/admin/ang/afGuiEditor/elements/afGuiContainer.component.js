@@ -78,9 +78,10 @@
         }
       };
 
-      this.getSearchDisplay = function(node) {
-        var searchKey = $scope.getSearchKey(node);
-        if (searchKey) {
+      // Finds a SearchDisplay within this container or within the fieldset containing this container
+      this.getSearchDisplay = function() {
+        var searchKey = ctrl.getDataEntity();
+        if (searchKey && !ctrl.entityName) {
           return afGui.getSearchDisplay.apply(null, searchKey.split('.'));
         }
       };
@@ -98,7 +99,8 @@
 
       $scope.tags = {
         div: ts('Container'),
-        fieldset: ts('Fieldset')
+        fieldset: ts('Fieldset'),
+        details: ts('Collapsible')
       };
 
       // Block settings
@@ -126,17 +128,22 @@
           delete ctrl.node.min;
           delete ctrl.node['af-repeat'];
           delete ctrl.node['add-icon'];
+          delete ctrl.node['af-copy'];
+          delete ctrl.node['copy-icon'];
+
         } else {
           ctrl.node.min = '1';
           ctrl.node['af-repeat'] = ts('Add');
+          ctrl.node['af-copy'] = ts('Copy');
           delete ctrl.node.data;
         }
       };
 
       this.getCollapsibleIcon = function() {
-        if (afGui.hasClass(ctrl.node, 'af-collapsible')) {
-          return afGui.hasClass(ctrl.node, 'af-collapsed') ? 'fa-caret-right' : 'fa-caret-down';
+        if (ctrl.node['#tag'] === 'details') {
+          return 'open' in ctrl.node ? 'fa-caret-down' : 'fa-caret-right';
         }
+        return '';
       };
 
       // Sets min value for af-repeat as a string, returns it as an int
@@ -184,6 +191,12 @@
       $scope.pickAddIcon = function() {
         afGui.pickIcon().then(function(val) {
           ctrl.node['add-icon'] = val;
+        });
+      };
+
+      $scope.pickCopyIcon = function() {
+        afGui.pickIcon().then(function(val) {
+          ctrl.node['copy-icon'] = val;
         });
       };
 
@@ -358,8 +371,6 @@
             ctrl.node['af-title'] = value;
           } else {
             delete ctrl.node['af-title'];
-            // With no title, cannot be collapsible
-            afGui.modifyClasses(ctrl.node, 'af-collapsible af-collapsed');
           }
         }
         return ctrl.node['af-title'];
@@ -416,8 +427,7 @@
           var joinType = ctrl.entityName.split('-join-');
           entityType = joinType[1] || (ctrl.editor && ctrl.editor.getEntity(joinType[0]).type);
         } else {
-          var searchKey = ctrl.getDataEntity(),
-            searchDisplay = afGui.getSearchDisplay.apply(null, searchKey.split('.')),
+          var searchDisplay = ctrl.getSearchDisplay(),
             fieldName = fieldKey.substr(fieldKey.indexOf('.') + 1),
             prefix = _.includes(fieldKey, '.') ? fieldKey.split('.')[0] : null;
           if (prefix) {

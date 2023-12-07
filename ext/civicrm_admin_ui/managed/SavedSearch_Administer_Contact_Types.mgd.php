@@ -32,6 +32,9 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
+      'match' => [
+        'name',
+      ],
     ],
   ],
   [
@@ -47,7 +50,7 @@ return [
         'saved_search_id.name' => 'Administer_Contact_Types',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -56,6 +59,7 @@ return [
           'pager' => [
             'show_count' => TRUE,
             'expose_limit' => TRUE,
+            'hide_single' => TRUE,
           ],
           'placeholder' => 5,
           'sort' => [
@@ -109,7 +113,10 @@ return [
               'editable' => TRUE,
             ],
             [
+              'text' => '',
+              'style' => 'default',
               'size' => 'btn-xs',
+              'icon' => 'fa-bars',
               'links' => [
                 [
                   'entity' => 'ContactType',
@@ -137,17 +144,26 @@ return [
                   ],
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/options/subtype/edit?action=add&reset=1',
-            'text' => E::ts('Add Contact Type'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'ContactType',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Contact Type'),
+              'icon' => 'fa-plus',
+            ],
           ],
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ],

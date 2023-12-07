@@ -6,6 +6,10 @@
   <name>civicrm_msg_template</name>
   <comment>Users will need a way to save and retrieve templates with tokens for use in recurring email communication tasks</comment>
   <add>1.6</add>
+  <title>Message Template</title>
+  <titlePlural>Message Templates</titlePlural>
+  <icon>fa-newspaper-o</icon>
+  <labelField>msg_title</labelField>
   <paths>
     <add>civicrm/admin/messageTemplates/add?action=add&amp;reset=1</add>
     <view>civicrm/admin/messageTemplates/add?action=view&amp;id=[id]&amp;reset=1</view>
@@ -141,6 +145,9 @@
       <optionGroupName>pdf_format</optionGroupName>
       <keyColumn>id</keyColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>3.4</add>
   </field>
 </table>

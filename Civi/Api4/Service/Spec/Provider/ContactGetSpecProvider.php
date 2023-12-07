@@ -15,6 +15,7 @@ namespace Civi\Api4\Service\Spec\Provider;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * @service
@@ -27,7 +28,7 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    */
   public function modifySpec(RequestSpec $spec) {
     // Groups field
-    $field = new FieldSpec('groups', 'Contact', 'Array');
+    $field = new FieldSpec('groups', $spec->getEntity(), 'Array');
     $field->setLabel(ts('In Groups'))
       ->setTitle(ts('Groups'))
       ->setColumnName('id')
@@ -40,9 +41,10 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
       ->setOptionsCallback([__CLASS__, 'getGroupList']);
     $spec->addFieldSpec($field);
 
-    // Age field
+    // The following fields are specific to Individuals
     if (!$spec->getValue('contact_type') || $spec->getValue('contact_type') === 'Individual') {
-      $field = new FieldSpec('age_years', 'Contact', 'Integer');
+      // Age field
+      $field = new FieldSpec('age_years', $spec->getEntity(), 'Integer');
       $field->setLabel(ts('Age (years)'))
         ->setTitle(ts('Age (years)'))
         ->setColumnName('birth_date')
@@ -51,6 +53,18 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
         ->setType('Extra')
         ->setReadonly(TRUE)
         ->setSqlRenderer([__CLASS__, 'calculateAge']);
+      $spec->addFieldSpec($field);
+
+      // Birthday field
+      $field = new FieldSpec('next_birthday', $spec->getEntity(), 'Integer');
+      $field->setLabel(ts('Next Birthday in (days)'))
+        ->setTitle(ts('Next Birthday in (days)'))
+        ->setColumnName('birth_date')
+        ->setInputType('Number')
+        ->setDescription(ts('Number of days until next birthday'))
+        ->setType('Extra')
+        ->setReadonly(TRUE)
+        ->setSqlRenderer([__CLASS__, 'calculateBirthday']);
       $spec->addFieldSpec($field);
     }
 
@@ -102,7 +116,7 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
     foreach ($entities as $entity => $types) {
       foreach ($types as $type => $info) {
         $name = strtolower($entity) . '_' . $type;
-        $field = new FieldSpec($name, 'Contact', 'Integer');
+        $field = new FieldSpec($name, $spec->getEntity(), 'Integer');
         $field->setLabel($info['label'])
           ->setTitle($info['title'])
           ->setColumnName('id')
@@ -122,7 +136,8 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    * @return bool
    */
   public function applies($entity, $action) {
-    return $entity === 'Contact' && $action === 'get';
+    // Applies to 'Contact' plus pseudo-entities 'Individual', 'Organization', 'Household'
+    return CoreUtil::isContact($entity) && $action === 'get';
   }
 
   /**
@@ -181,6 +196,25 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    */
   public static function calculateAge(array $field): string {
     return "TIMESTAMPDIFF(YEAR, {$field['sql_name']}, CURDATE())";
+  }
+
+  /**
+   * Generate SQL for upcoming birthday field
+   *
+   * Calculates the number of days until the next birthday
+   *
+   * @param array $field
+   * @return string
+   */
+  public static function calculateBirthday(array $field): string {
+    return "DATEDIFF(
+        IF(
+            DATE(CONCAT(YEAR(CURDATE()), '-', MONTH({$field['sql_name']}), '-', DAY({$field['sql_name']}))) < CURDATE(),
+            CONCAT(YEAR(CURDATE()) + 1, '-', MONTH({$field['sql_name']}), '-', DAY({$field['sql_name']})),
+            CONCAT(YEAR(CURDATE()), '-', MONTH({$field['sql_name']}), '-', DAY({$field['sql_name']}))
+        ),
+        CURDATE()
+    )";
   }
 
 }

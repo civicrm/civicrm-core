@@ -18,11 +18,8 @@
     <p>{ts}Review the values shown below from the first 2 rows of your import file and select the matching CiviCRM database fields from the drop-down lists in the right-hand column. Select '- do not import -' for any columns in the import file that you want ignored.{/ts}</p>
     <p>{ts}If you think you may be importing additional data from the same data source, check 'Save this field mapping' at the bottom of the page before continuing. The saved mapping can then be easily reused the next time data is imported.{/ts}</p>
   </div>
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-    {* Table for mapping data to CRM fields *}
-    {include file="CRM/Import/Form/MapTableCommon.tpl" mapper=$form.mapper}
-  <br />
-
+  {* Table for mapping data to CRM fields *}
+  {include file="CRM/Import/Form/MapTableCommon.tpl" mapper=$form.mapper}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
     {$initHideBoxes|smarty:nodefaults}
     {literal}

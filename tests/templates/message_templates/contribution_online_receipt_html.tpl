@@ -34,8 +34,7 @@
   {if !empty($is_quick_config)}
   is_quick_config:::{$is_quick_config}
   {/if}
-  {if !empty($getTaxDetails)}
-  getTaxDetails:::{$getTaxDetails}
+  {if !empty($totalTaxAmount)}
   totalTaxAmount:::{$totalTaxAmount}
   {/if}
   {if !empty($is_monetary)}
@@ -97,7 +96,7 @@
   start_date:::{$start_date}
   end_date:::{$end_date}
   {/if}
-  {if !empty($is_deductible)}
+  {if $is_deductible}
   is_deductible:::{$is_deductible}
   {/if}
   {if !empty($contact_email)}
@@ -133,12 +132,7 @@
   {/foreach}
  {/foreach}
  {/if}
- {if !empty($dataArray)}
- {foreach from=$dataArray item=value key=priceset}
-    dataArray: priceset:::$priceset
-    dataArray: value:::$value
- {/foreach}
- {/if}
+
  {if !empty($honoreeProfile)}
  {foreach from=$honoreeProfile item=value key=label}
     honoreeProfile: label:::$label
@@ -170,12 +164,6 @@
  {foreach from=$customPost item=customValue key=customName}
     customPost: customName:::$customName
     customPost: customValue:::$customValue
- {/foreach}
- {/if}
- {if !empty($trackingFields)}
- {foreach from=$trackingFields item=trackingValue key=trackingName}
-   trackingName:::$trackingName
-   trackingValue:::$trackingValue
  {/foreach}
  {/if}
 

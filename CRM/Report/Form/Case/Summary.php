@@ -16,23 +16,20 @@
  */
 class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
 
-  protected $_summary = NULL;
   protected $_relField = FALSE;
   protected $_exposeContactID = FALSE;
-
   protected $_customGroupExtends = ['Case'];
 
   /**
    * Class constructor.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct() {
-    $this->case_types = CRM_Case_PseudoConstant::caseType();
-    $this->case_statuses = CRM_Core_OptionGroup::values('case_status');
-    $rels = CRM_Core_PseudoConstant::relationshipType();
-    foreach ($rels as $relid => $v) {
-      $this->rel_types[$relid] = $v['label_b_a'];
+    $relationshipTypes = [];
+    foreach (CRM_Core_PseudoConstant::relationshipType() as $relationshipTypeID => $values) {
+      $relationshipTypes[$relationshipTypeID] = $values['label_b_a'];
     }
-
     $this->_columns = [
       'civicrm_c2' => [
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -157,7 +154,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
             'title' => ts('Staff Relationship'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $this->rel_types,
+            'options' => $relationshipTypes,
           ],
           'is_active' => [
             'title' => ts('Active Relationship?'),
@@ -182,11 +179,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     parent::__construct();
   }
 
-  public function preProcess() {
-    parent::preProcess();
-  }
-
-  public function select() {
+  public function select(): void {
     $select = [];
     $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
@@ -196,15 +189,15 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
             !empty($this->_params['fields'][$fieldName])
           ) {
 
-            if ($tableName == 'civicrm_relationship_type') {
+            if ($tableName === 'civicrm_relationship_type') {
               $this->_relField = TRUE;
             }
 
-            if ($fieldName == 'duration') {
+            if ($fieldName === 'duration') {
               $select[] = "IF({$table['fields']['end_date']['dbAlias']} Is Null, '', DATEDIFF({$table['fields']['end_date']['dbAlias']}, {$table['fields']['start_date']['dbAlias']})) as {$tableName}_{$fieldName}";
             }
-            elseif ($tableName == 'civicrm_relationship_type') {
-              $select[] = "  IF(contact_civireport.id = relationship_civireport.contact_id_a, relationship_type_civireport.label_b_a, relationship_type_civireport.label_a_b) as civicrm_relationship_type_label_b_a";
+            elseif ($tableName === 'civicrm_relationship_type') {
+              $select[] = '  IF(contact_civireport.id = relationship_civireport.contact_id_a, relationship_type_civireport.label_b_a, relationship_type_civireport.label_a_b) as civicrm_relationship_type_label_b_a';
             }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
@@ -217,18 +210,16 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     }
     $this->_selectClauses = $select;
 
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
+    $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
   }
 
   /**
-   * @param $fields
-   * @param $files
-   * @param self $self
+   * @param array $fields
    *
    * @return array
    */
-  public static function formRule($fields, $files, $self) {
-    $errors = $grouping = [];
+  public static function formRule(array $fields): array {
+    $errors = [];
     if (empty($fields['relationship_type_id_value']) &&
       (array_key_exists('sort_name', $fields['fields']) ||
         array_key_exists('label_b_a', $fields['fields']))
@@ -245,7 +236,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     return $errors;
   }
 
-  public function from() {
+  public function from(): void {
 
     $cc = $this->_aliases['civicrm_case'];
     $c = $this->_aliases['civicrm_contact'];
@@ -283,29 +274,15 @@ inner join civicrm_contact $c2 on {$c2}.id={$ccc}.contact_id
     }
   }
 
-  public function storeWhereHavingClauseArray() {
-    if (!empty($this->_params['fields']['label_b_a']) && $this->_params['fields']['label_b_a'] == 1) {
+  public function storeWhereHavingClauseArray(): void {
+    if (!empty($this->_params['fields']['label_b_a']) && (int) $this->_params['fields']['label_b_a'] === 1) {
       $this->_whereClauses[] = '(contact_civireport.sort_name != c2_civireport.sort_name)';
     }
     parent::storeWhereHavingClauseArray();
   }
 
-  public function groupBy() {
-    $this->_groupBy = "";
-  }
-
-  public function postProcess() {
-
-    $this->beginPostProcess();
-
-    $sql = $this->buildQuery(TRUE);
-
-    $rows = $graphRows = [];
-    $this->buildRows($sql, $rows);
-
-    $this->formatDisplay($rows);
-    $this->doTemplateAssignment($rows);
-    $this->endPostProcess($rows);
+  public function groupBy(): void {
+    $this->_groupBy = '';
   }
 
   /**
@@ -317,25 +294,25 @@ inner join civicrm_contact $c2 on {$c2}.id={$ccc}.contact_id
    * @param array $rows
    *   Rows generated by SQL, with an array for each row.
    */
-  public function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows): void {
     $entryFound = FALSE;
+    $caseTypes = CRM_Case_PseudoConstant::caseType();
+    $caseStatuses = CRM_Core_OptionGroup::values('case_status');
     foreach ($rows as $rowNum => $row) {
-      if (array_key_exists('civicrm_case_status_id', $row)) {
-        if ($value = $row['civicrm_case_status_id']) {
-          $rows[$rowNum]['civicrm_case_status_id'] = $this->case_statuses[$value];
-          $entryFound = TRUE;
-        }
+      if (array_key_exists('civicrm_case_status_id', $row) && $value = $row['civicrm_case_status_id']) {
+        $rows[$rowNum]['civicrm_case_status_id'] = $caseStatuses[$value];
+        $entryFound = TRUE;
       }
 
       if (array_key_exists('civicrm_case_case_type_id', $row) &&
         !empty($rows[$rowNum]['civicrm_case_case_type_id'])
       ) {
         $value = $row['civicrm_case_case_type_id'];
-        $typeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+        $caseTypeIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
         $value = [];
-        foreach ($typeIds as $typeId) {
-          if ($typeId) {
-            $value[$typeId] = $this->case_types[$typeId];
+        foreach ($caseTypeIDs as $caseTypeID) {
+          if ($caseTypeID) {
+            $value[$caseTypeID] = $caseTypes[$caseTypeID];
           }
         }
         $rows[$rowNum]['civicrm_case_case_type_id'] = implode(', ', $value);
@@ -346,25 +323,25 @@ inner join civicrm_contact $c2 on {$c2}.id={$ccc}.contact_id
       if (array_key_exists('civicrm_case_id', $row) &&
         !empty($rows[$rowNum]['civicrm_c2_id'])
       ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view/case",
+        $url = CRM_Utils_System::url('civicrm/contact/view/case',
           'reset=1&action=view&cid=' . $row['civicrm_c2_id'] . '&id=' .
           $row['civicrm_case_id'],
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_case_id_link'] = $url;
-        $rows[$rowNum]['civicrm_case_id_hover'] = ts("Manage Case");
+        $rows[$rowNum]['civicrm_case_id_hover'] = ts('Manage Case');
         $entryFound = TRUE;
       }
       if (array_key_exists('civicrm_case_subject', $row) &&
         !empty($rows[$rowNum]['civicrm_c2_id'])
       ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view/case",
+        $url = CRM_Utils_System::url('civicrm/contact/view/case',
           'reset=1&action=view&cid=' . $row['civicrm_c2_id'] . '&id=' .
           $row['civicrm_case_id'],
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_case_subject_link'] = $url;
-        $rows[$rowNum]['civicrm_case_subject_hover'] = ts("Manage Case");
+        $rows[$rowNum]['civicrm_case_subject_hover'] = ts('Manage Case');
         $entryFound = TRUE;
       }
 

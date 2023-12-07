@@ -10,6 +10,7 @@
     <add>civicrm/admin/paymentProcessor/edit?action=add&amp;reset=1</add>
     <update>civicrm/admin/paymentProcessor/edit?action=update&amp;id=[id]&amp;reset=1</update>
     <delete>civicrm/admin/paymentProcessor/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+    <browse>civicrm/admin/paymentProcessor</browse>
   </paths>
   <field>
     <name>id</name>
@@ -50,26 +51,44 @@
   </foreignKey>
   <field>
     <name>name</name>
-    <title>Payment Processor</title>
+    <title>Payment Processor Name</title>
+    <required>true</required>
     <type>varchar</type>
     <length>64</length>
     <comment>Payment Processor Name.</comment>
     <add>1.8</add>
     <html>
+      <label>Machine Name</label>
       <type>Text</type>
     </html>
   </field>
   <field>
     <name>title</name>
     <title>Payment Processor Title</title>
+    <required>true</required>
     <type>varchar</type>
-    <length>127</length>
+    <length>255</length>
     <localizable>true</localizable>
     <html>
+      <label>Backend Title</label>
       <type>Text</type>
     </html>
-    <comment>Payment Processor Descriptive Name.</comment>
+    <comment>Name of processor when shown to CiviCRM administrators.</comment>
     <add>5.13</add>
+  </field>
+  <field>
+    <name>frontend_title</name>
+    <title>Payment Processor Frontend Title</title>
+    <required>true</required>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <html>
+      <label>Frontend Title</label>
+      <type>Text</type>
+    </html>
+    <comment>Name of processor when shown to users making a payment.</comment>
+    <add>5.61</add>
   </field>
   <field>
     <name>description</name>
@@ -77,9 +96,10 @@
     <type>varchar</type>
     <length>255</length>
     <html>
+      <label>Description</label>
       <type>Text</type>
     </html>
-    <comment>Payment Processor Description.</comment>
+    <comment>Additional processor information shown to administrators.</comment>
     <add>1.8</add>
   </field>
   <field>

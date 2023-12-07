@@ -24,6 +24,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
+use Civi\Api4\Individual;
 
 /**
  * @group headless
@@ -38,7 +39,7 @@ class CustomGroupACLTest extends CustomTestBase {
     \CRM_Core_DAO::executeQuery('TRUNCATE civicrm_acl_contact_cache');
   }
 
-  public function testViewEditCustomGroupACLs() {
+  public function testViewEditCustomGroupACLs(): void {
     $groups = ['readWrite' => 'Edit', 'readOnly' => 'View', 'superSecret' => NULL];
     $v3 = [];
 
@@ -95,8 +96,17 @@ class CustomGroupACLTest extends CustomTestBase {
 
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts', 'edit all contacts'];
 
-    // Ensure ACLs apply to APIv4 get
+    // Ensure ACLs apply to APIv4 Contact.get
     $result = Contact::get()
+      ->addWhere('id', '=', $cid)
+      ->addSelect('custom.*')
+      ->execute()->single();
+    $this->assertEquals('123', $result['MyReadWriteSingle.MyField']);
+    $this->assertEquals('456', $result['MyReadOnlySingle.MyField']);
+    $this->assertArrayNotHasKey('MySuperSecretSingle.MyField', $result);
+
+    // Ensure ACLs apply to APIv4 Individual.get
+    $result = Individual::get()
       ->addWhere('id', '=', $cid)
       ->addSelect('custom.*')
       ->execute()->single();
@@ -115,7 +125,7 @@ class CustomGroupACLTest extends CustomTestBase {
     $this->assertEquals('456', $result[$v3['single']['readOnly']]);
 
     // Try to update all fields - ACLs will restrict based on write access
-    Contact::update()->setValues([
+    Individual::update()->setValues([
       'id' => $cid,
       'first_name' => 'test1234',
       'MyReadWriteSingle.MyField' => '1234',
@@ -190,6 +200,20 @@ class CustomGroupACLTest extends CustomTestBase {
       }
       // Check that it works via join also
       $result = Contact::get()
+        ->addWhere('id', '=', $cid)
+        ->addJoin("Custom_$groupName AS customGroup")
+        ->addSelect("customGroup.MyField")
+        ->execute();
+      if ($groupName !== 'MySuperSecretMulti') {
+        $this->assertEquals($values, $result->column("customGroup.MyField"));
+      }
+      else {
+        foreach ($result as $row) {
+          $this->assertArrayNotHasKey("customGroup.MyField", $row);
+        }
+      }
+      // Same check but for Individual entity
+      $result = Individual::get()
         ->addWhere('id', '=', $cid)
         ->addJoin("Custom_$groupName AS customGroup")
         ->addSelect("customGroup.MyField")

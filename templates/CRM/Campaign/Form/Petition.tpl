@@ -9,22 +9,14 @@
 *}
 
 <div class="crm-block crm-form-block crm-campaign-survey-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}
-    <table class="form-layout">
-      <tr>
-        <td colspan="2">
-          <div class="status">
-            {icon icon="fa-info-circle"}{/icon}
-            &nbsp;{ts}Are you sure you want to delete this Petition?{/ts}</div>
-        </td>
-      </tr>
-    </table>
+    <div class="messages status no-popup">
+      {icon icon="fa-info-circle"}{/icon}
+      {ts}Are you sure you want to delete this Petition?{/ts}
+    </div>
   {else}
     {if $action  eq 1}
-      <div class="help">
-        {ts}Use this form to Add new Survey. You can create a new Activity type, specific to this Survey or select an existing activity type for this Survey.{/ts}
-      </div>
+      <div class="help">{ts}Use this form to Add new Survey. You can create a new Activity type, specific to this Survey or select an existing activity type for this Survey.{/ts}</div>
     {/if}
     <table class="form-layout">
       <tr class="crm-campaign-survey-form-block-title">
@@ -32,28 +24,28 @@
         <td>{$form.title.html}
       </tr>
       <tr class="crm-campaign-survey-form-block-instructions">
-        <td class="label">{$form.instructions.label}</td>
+        <td class="label">{$form.instructions.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_survey' field='instructions' id=$surveyId}{/if}</td>
         <td class="view-value">{$form.instructions.html}
       </tr>
       <tr class="crm-campaign-survey-form-block-campaign_id">
         <td class="label">{$form.campaign_id.label}</td>
         <td>{$form.campaign_id.html}
       </tr>
+      {if array_key_exists('activity_type_id', $form)}
       <tr class="crm-campaign-survey-form-block-activity_type_id">
         <td class="label">{$form.activity_type_id.label}</td>
         <td>{$form.activity_type_id.html}
       </tr>
+      {/if}
       <tr class="crm-campaign-survey-form-block-profile_id">
         <td class="label">{$form.contact_profile_id.label}</td>
         <td>{$form.contact_profile_id.html}&nbsp;<span class="profile-links"></span>
-
           <div class="description">{ts}Fields about the contact you want to collect.{/ts}</div>
         </td>
       </tr>
       <tr class="crm-campaign-survey-form-block-profile_id">
         <td class="label">{$form.profile_id.label}</td>
         <td>{$form.profile_id.html}&nbsp;<span class="profile-links"></span>
-
           <div class="description">{ts}Fields about the petition.{/ts}</div>
           <div class="profile-create">
             <a href="{crmURL p='civicrm/admin/uf/group/add' q='reset=1&action=add'}"
@@ -64,19 +56,12 @@
       <tr class="crm-campaign-survey-form-block-thankyou_title">
         <td
           class="label">{$form.thankyou_title.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_survey' field='thankyou_title' id=$surveyId}{/if}</td>
-        <td>{$form.thankyou_title.html}<br/>
-
-          <div class="description">{ts}This title will be displayed at the top of the thank-you page.{/ts}</div>
-        </td>
+        <td>{$form.thankyou_title.html}</td>
       </tr>
       <tr class="crm-campaign-survey-form-block-thankyou_text">
         <td
           class="label">{$form.thankyou_text.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_survey' field='thankyou_text' id=$surveyId}{/if}</td>
-        <td>{$form.thankyou_text.html}<br/>
-
-          <div
-            class="description">{ts}Enter text (and optional HTML layout tags) for the thank-you message that will appear at the top of the thank-you page.{/ts}</div>
-        </td>
+        <td>{$form.thankyou_text.html}</td>
       </tr>
       <tr class="crm-campaign-survey-form-block-bypass_confirm">
         <td class="label">{$form.bypass_confirm.label}</td>
@@ -90,15 +75,11 @@
       </tr>
       <tr class="crm-campaign-survey-form-block-is_active">
         <td class="label">{$form.is_active.label}</td>
-        <td>{$form.is_active.html}
-          <div class="description">{ts}Is this petition active?{/ts}</div>
-        </td>
+        <td>{$form.is_active.html}</td>
       </tr>
       <tr class="crm-campaign-survey-form-block-is_default">
         <td class="label">{$form.is_default.label}</td>
-        <td>{$form.is_default.html}
-          <div class="description">{ts}Is this the default petition?{/ts}</div>
-        </td>
+        <td>{$form.is_default.html}</td>
       </tr>
       <tr class="crm-campaign-survey-form-block-links">
         <td class="label"><label>{ts}Links to sign this petition{/ts}</label></td>

@@ -163,7 +163,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
     $xmlProcessor->run($caseType, $xmlProcessorParams);
 
     // 2.5 Update open case activity date
-    // Multiple steps since revisioned
+    // @todo Since revisioning code has been removed this can be refactored more
     if ($form->openCaseActivityId) {
 
       $abao = new CRM_Activity_BAO_Activity();
@@ -177,44 +177,20 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
       //@todo calling api functions directly is not supported
       _civicrm_api3_object_to_array($oldActivity, $openCaseParams);
 
-      // update existing revision
-      $oldParams = [
-        'id' => $form->openCaseActivityId,
-        'is_current_revision' => 0,
-      ];
-      $oldActivity = new CRM_Activity_DAO_Activity();
-      $oldActivity->copyValues($oldParams);
-      $oldActivity->save();
-
-      // change some params for the new one
-      unset($openCaseParams['id']);
+      // change some params for the activity update
       $openCaseParams['activity_date_time'] = $params['start_date'];
       $openCaseParams['target_contact_id'] = $oldActivityDefaults['target_contact'];
       $openCaseParams['assignee_contact_id'] = $oldActivityDefaults['assignee_contact'];
       $session = CRM_Core_Session::singleton();
       $openCaseParams['source_contact_id'] = $session->get('userID');
 
-      // original_id always refers to the first activity, so only update if null (i.e. this is the second revision)
-      $openCaseParams['original_id'] = $openCaseParams['original_id'] ? $openCaseParams['original_id'] : $form->openCaseActivityId;
+      // @todo This can go eventually but is still needed to keep them linked together if there is an existing revision. Just focusing right now on not creating new revisions.
+      // original_id always refers to the first activity, so if it's null or missing, then it means no previous revisions and we can keep it null.
+      $openCaseParams['original_id'] = $openCaseParams['original_id'] ?? NULL;
 
       $newActivity = CRM_Activity_BAO_Activity::create($openCaseParams);
       if (is_a($newActivity, 'CRM_Core_Error')) {
         CRM_Core_Error::statusBounce(ts('Unable to update Open Case activity'));
-      }
-      else {
-        // Create linkage to case
-        $caseActivityParams = [
-          'activity_id' => $newActivity->id,
-          'case_id' => $caseId,
-        ];
-
-        CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
-
-        $caseActivityParams = [
-          'activityID' => $form->openCaseActivityId,
-          'mainActivityId' => $newActivity->id,
-        ];
-        CRM_Activity_BAO_Activity::copyExtendedActivityData($caseActivityParams);
       }
     }
 

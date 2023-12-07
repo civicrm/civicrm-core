@@ -18,7 +18,7 @@ if (!$url_id) {
 }
 
 require_once 'CRM/Mailing/Event/BAO/TrackableURLOpen.php';
-$url = CRM_Mailing_Event_BAO_MailingEventClickThrough::track($queue_id, $url_id);
+$url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($queue_id, $url_id);
 
 // CRM-7103
 // Looking for additional query variables and append them when redirecting.
@@ -54,5 +54,6 @@ if (strlen($query_string) > 0) {
 $url = str_replace('&amp;', '&', $url);
 
 // CRM-17953 - The CMS is not bootstrapped so cannot use CRM_Utils_System::redirect
+header('X-Robots-Tag: noindex');
 header('Location: ' . $url);
 CRM_Utils_System::civiExit();

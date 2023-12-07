@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-custom-field-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout">
     <tr class="crm-custom-field-form-block-label">
       <td class="label">{$form.label.label}
@@ -26,11 +25,15 @@
       <td class="label">{$form.html_type.label}</td>
       <td class="html-adjust">{$form.html_type.html}</td>
     </tr>
+    <tr class="crm-custom-field-form-block-fk_entity">
+      <td class="label">{$form.fk_entity.label} <span class="crm-marker">*</span></td>
+      <td class="html-adjust">{$form.fk_entity.html}</td>
+    </tr>
     <tr class="crm-custom-field-form-block-serialize">
       <td class="label">{$form.serialize.label}</td>
       <td class="html-adjust">{$form.serialize.html}</td>
     </tr>
-    {if !empty($form.in_selector)}
+    {if array_key_exists('in_selector', $form)}
       <tr class='crm-custom-field-form-block-in_selector'>
         <td class='label'>{$form.in_selector.label}</td>
         <td class='html-adjust'>{$form.in_selector.html} {help id="id-in_selector"}</td>
@@ -41,7 +44,7 @@
       <td class="html-adjust">{$form.text_length.html}</td>
     </tr>
 
-    <tr id='showoption' {if $action eq 1 or $action eq 2 }class="hiddenElement"{/if}>
+    <tr id='showoption' {if $action eq 1 or $action eq 2}class="hiddenElement"{/if}>
       <td colspan="2">
         <table class="form-layout-compressed">
           {* Conditionally show table for setting up selection options - for field types = radio, checkbox or select *}
@@ -62,9 +65,20 @@
       <td class="label">{$form.filter.label}</td>
       <td class="html-adjust">
         {$form.filter.html}
-        &nbsp;&nbsp;<span><a class="crm-hover-button toggle-contact-ref-mode" href="#Group">{ts}Filter by Group{/ts}</a></span>
+        <span class="api3-filter-info"><a class="crm-hover-button toggle-contact-ref-mode" href="#Group">{ts}Filter by Group{/ts}</a></span>
         <br />
-        <span class="description">{ts}Filter contact search results for this field using Contact get API parameters. EXAMPLE: To list Students in group 3:{/ts} "action=get&group=3&contact_sub_type=Student" {docURL page="dev/api"}</span>
+        <span class="description api3-filter-info">
+          {ts}Filter contact search results for this field using Contact get API parameters. EXAMPLE: To list Students in group 3:{/ts}
+          <code>action=get&group=3&contact_sub_type=Student</code>
+          {docURL page="dev/api"}
+        </span>
+        <span class="description api4-filter-info">
+          {ts}Filter search results for this field using API-style parameters{/ts}
+          (<code>field=value&another_field=val1,val2</code>).<br>
+          {ts}EXAMPLE (Contact entity): To list Students in "Volunteers" or "Supporters" groups:{/ts}
+          <code>contact_sub_type=Student&groups:name=Volunteers,Supporters</code>
+          {docURL page="dev/api"}
+        </span>
       </td>
     </tr>
     <tr class="crm-custom-field-form-block-options_per_line" id="optionsPerLine">
@@ -159,11 +173,7 @@
       </td>
     </tr>
   </table>
-  {if $action ne 4}
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-  {else}
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-  {/if}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 {literal}
 <script type="text/javascript">
@@ -185,8 +195,13 @@
       if (!$('#html_type', $form).val()) {
         $('#html_type', $form).val(dataToHTML[dataType][0]).change();
       }
+      // Hide html_type if there is only one option
+      $('.crm-custom-field-form-block-html_type').toggle(allowedHtmlTypes.length > 1);
       customOptionHtmlType(dataType);
       makeDefaultValueField(dataType);
+
+      // Show/hide entityReference selector
+      $('.crm-custom-field-form-block-fk_entity').toggle(dataType === 'EntityReference');
     }
 
     function onChangeHtmlType() {
@@ -195,6 +210,9 @@
 
       if (htmlType === 'CheckBox' || htmlType === 'Radio') {
         $('#serialize', $form).prop('checked', htmlType === 'CheckBox');
+      }
+      else {
+        $("#options_per_line", $form).val('');
       }
 
       showSearchRange(dataType);
@@ -220,8 +238,8 @@
         $('#filter_selected').val(setSelected.slice(1));
       }
       if (setSelected == '#Advance') {
-        $('#contact_reference_group').hide( );
-        $('#field_advance_filter').show( );
+        $('#contact_reference_group, .api4-filter-info').hide();
+        $('#field_advance_filter, .api3-filter-info').show();
       } else {
         $('#field_advance_filter').hide( );
         $('#contact_reference_group').show( );
@@ -240,12 +258,15 @@
 
       if (dataType === 'ContactReference') {
         toggleContactRefFilter();
+      } else if (dataType === 'EntityReference') {
+        $('#field_advance_filter, .api4-filter-info').show();
+        $('#contact_reference_group, .api3-filter-info').hide();
       } else {
         $('#field_advance_filter, #contact_reference_group', $form).hide();
       }
 
       if (_.includes(['String', 'Int', 'Float', 'Money'], dataType)) {
-        if (htmlType !== "Text") {
+        if (!['Text', 'Hidden'].includes(htmlType)) {
           $("#showoption, #searchable", $form).show();
           $("#hideDefault, #hideDesc, #searchByRange", $form).hide();
         } else {
@@ -264,7 +285,7 @@
         $("#showoption").hide();
       }
 
-      if (_.includes(['String', 'Int', 'Float', 'Money'], dataType) && htmlType !== 'Text') {
+      if (_.includes(['String', 'Int', 'Float', 'Money'], dataType) && !['Text', 'Hidden'].includes(htmlType)) {
         if (serialize) {
           $('div[id^=checkbox]', '#optionField').show();
           $('div[id^=radio]', '#optionField').hide();
@@ -282,7 +303,7 @@
 
       $("#noteColumns, #noteRows, #noteLength", $form).toggle(dataType === 'Memo');
 
-      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlType === 'Select' || htmlType === 'Autocomplete-Select');
+      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlType === 'Select' || htmlType === 'Autocomplete-Select' && dataType !== 'EntityReference');
     }
 
     function makeDefaultValueField(dataType) {
@@ -329,7 +350,7 @@
 </script>
 {/literal}
 {* Give link to view/edit option group *}
-{if $action eq 2 && !empty($hasOptionGroup) }
+{if $action eq 2 && !empty($hasOptionGroup)}
   <div class="action-link">
     {crmButton p="civicrm/admin/custom/group/field/option" q="reset=1&action=browse&fid=`$id`&gid=`$gid`" icon="pencil"}{ts}View / Edit Multiple Choice Options{/ts}{/crmButton}
   </div>

@@ -54,7 +54,7 @@ trait Api3TestTrait {
         unset($expected[$value]);
       }
     }
-    $this->assertEquals($result, $expected, "api result array comparison failed " . $prefix . print_r($result, TRUE) . ' was compared to ' . print_r($expected, TRUE));
+    $this->assertEquals($result, $expected, 'api result array comparison failed ' . $prefix . print_r($result, TRUE) . ' was compared to ' . print_r($expected, TRUE));
   }
 
   /**
@@ -74,16 +74,20 @@ trait Api3TestTrait {
    *   Api result.
    * @param string $prefix
    *   Extra test to add to message.
-   * @param null $expectedError
+   * @param string|null $expectedError
    */
-  public function assertAPIFailure($apiResult, $prefix = '', $expectedError = NULL) {
+  public function assertAPIFailure(array $apiResult, string $prefix = '', ?string $expectedError = NULL): void {
     if (!empty($prefix)) {
       $prefix .= ': ';
     }
     if ($expectedError && !empty($apiResult['is_error'])) {
       $this->assertStringContainsString($expectedError, $apiResult['error_message'], 'api error message not as expected' . $prefix);
     }
-    $this->assertEquals(1, $apiResult['is_error'], "api call should have failed but it succeeded " . $prefix . (print_r($apiResult, TRUE)));
+    if (!$apiResult['is_error']) {
+      // This section only called when it is going to fail - that means we don't have to parse the print_r in the message
+      // if it is not going to be used anyway. It's really helpful for debugging when needed, but potentially expensive otherwise.
+      $this->fail('api call should have failed but it succeeded ' . $prefix . (print_r($apiResult, TRUE)));
+    }
     $this->assertNotEmpty($apiResult['error_message']);
   }
 
@@ -121,7 +125,7 @@ trait Api3TestTrait {
    * @param null $extraOutput
    * @return array|int
    */
-  public function callAPIFailure($entity, $action, $params, $expectedErrorMessage = NULL, $extraOutput = NULL) {
+  public function callAPIFailure($entity, $action, $params = [], $expectedErrorMessage = NULL, $extraOutput = NULL) {
     if (is_array($params)) {
       $params += [
         'version' => $this->_apiversion,
@@ -136,6 +140,17 @@ trait Api3TestTrait {
     }
     $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success", $expectedErrorMessage);
     return $result;
+  }
+
+  /**
+   * @deprecated
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   * @return array|int
+   */
+  public function callAPIAndDocument($entity, $action, $params) {
+    return $this->callAPISuccess($entity, $action, $params);
   }
 
   /**
@@ -423,6 +438,11 @@ trait Api3TestTrait {
           // Ensure id field is returned as v3 always expects it
           if ($v4Entity != 'Setting' && !in_array('id', $v4Params['select'])) {
             $v4Params['select'][] = 'id';
+          }
+          // Convert 'custom' to 'custom.*'
+          $selectCustom = array_search('custom', $v4Params['select']);
+          if ($selectCustom !== FALSE) {
+            $v4Params['select'][$selectCustom] = 'custom.*';
           }
         }
         if ($options['limit'] && $v4Entity != 'Setting') {

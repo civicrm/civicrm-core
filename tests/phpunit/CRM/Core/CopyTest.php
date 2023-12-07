@@ -22,7 +22,7 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
   public function testEventCopy(): void {
 
     $this->createCustomGroupWithFieldOfType(['extends' => 'Event']);
-    $event = $this->eventCreate([$this->getCustomFieldName('text', 4) => 'blah']);
+    $event = $this->eventCreateUnpaid([$this->getCustomFieldName('text', 4) => 'blah']);
     $eventId = $event['id'];
     $eventRes = $event;
     $params[$this->getCustomFieldName('text') . '_1'] = 'blah';
@@ -66,14 +66,14 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
   /**
    * @group locale
    */
-  public function testI18nEventCopy() {
+  public function testI18nEventCopy(): void {
 
     $locales = ['en_US', 'fr_CA', 'nl_NL'];
 
     $cleanup = $this->useMultilingual(['en_US' => ['fr_CA', 'nl_NL']]);
     CRM_Core_I18n::singleton()->setLocale('en_US');
 
-    $event = $this->eventCreate();
+    $event = $this->eventCreatePaid();
     $eventId = $event['id'];
     $eventData = civicrm_api3('Event', 'getsingle', ['id' => $eventId]);
 

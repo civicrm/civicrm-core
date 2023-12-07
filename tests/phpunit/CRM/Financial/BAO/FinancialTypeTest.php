@@ -28,29 +28,6 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method setIsActive().
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testSetIsActive(): void {
-    $financialTypeID = FinancialType::create()->setValues([
-      'name' => 'Donations',
-      'is_deductible' => 0,
-      'is_active' => 1,
-    ])->execute()->first()['id'];
-    $result = CRM_Financial_BAO_FinancialType::setIsActive($financialTypeID, 0);
-    $this->assertEquals(TRUE, $result, 'Verify financial type record updated for is_active.');
-    $isActive = $this->assertDBNotNull(
-      'CRM_Financial_DAO_FinancialType',
-      $financialTypeID,
-      'is_active',
-      'id',
-      'Database check on updated for financial type is_active.'
-    );
-    $this->assertEquals(0, $isActive, 'Verify financial types is_active.');
-  }
-
-  /**
    * Delete test for testGitLabIssue1108.
    *
    * @dataProvider getBooleanDataProvider
@@ -157,90 +134,6 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     unset($expectedResult[2]);
     CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($types);
     $this->assertEquals($expectedResult, $types, 'Verify that removing permission for a financial type restricts the available membership types');
-  }
-
-  /**
-   * Check method testCheckPermissionedLineItems()
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testCheckPermissionedLineItems(): void {
-    $contactId = $this->individualCreate();
-    $paramsSet['title'] = 'Price Set_test';
-    $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
-    $paramsSet['is_active'] = TRUE;
-    $paramsSet['financial_type_id'] = 1;
-    $paramsSet['extends'] = 1;
-
-    $priceSet = CRM_Price_BAO_PriceSet::create($paramsSet);
-    $priceSetId = $priceSet->id;
-
-    //Checking for price set added in the table.
-    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
-      'id', $paramsSet['title'], 'Check DB for created price set'
-    );
-    $paramsField = [
-      'label' => 'Price Field',
-      'name' => CRM_Utils_String::titleToVar('Price Field'),
-      'html_type' => 'CheckBox',
-      'option_label' => ['1' => 'Price Field 1', '2' => 'Price Field 2'],
-      'option_value' => ['1' => 100, '2' => 200],
-      'option_name' => ['1' => 'Price Field 1', '2' => 'Price Field 2'],
-      'option_weight' => ['1' => 1, '2' => 2],
-      'option_amount' => ['1' => 100, '2' => 200],
-      'is_display_amounts' => 1,
-      'weight' => 1,
-      'options_per_line' => 1,
-      'is_active' => ['1' => 1, '2' => 1],
-      'price_set_id' => $priceSet->id,
-      'is_enter_qty' => 1,
-      'financial_type_id' => 1,
-    ];
-    $priceField = CRM_Price_BAO_PriceField::create($paramsField);
-    $priceFields = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField->id]);
-    $contributionParams = [
-      'total_amount' => 300,
-      'currency' => 'USD',
-      'contact_id' => $contactId,
-      'financial_type_id' => 1,
-      'contribution_status_id' => 1,
-      'skipCleanMoney' => TRUE,
-    ];
-
-    foreach ($priceFields['values'] as $key => $priceField) {
-      $lineItems[1][$key] = [
-        'price_field_id' => $priceField['price_field_id'],
-        'price_field_value_id' => $priceField['id'],
-        'label' => $priceField['label'],
-        'field_title' => $priceField['label'],
-        'qty' => 1,
-        'unit_price' => $priceField['amount'],
-        'line_total' => $priceField['amount'],
-        'financial_type_id' => $priceField['financial_type_id'],
-      ];
-    }
-    $contributionParams['line_item'] = $lineItems;
-    $contributions = CRM_Contribute_BAO_Contribution::create($contributionParams);
-    CRM_Financial_BAO_FinancialType::$_statusACLFt = [];
-    $this->setACL();
-
-    $this->setPermissions([
-      'view contributions of type Member Dues',
-    ]);
-
-    try {
-      CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributions->id, 'view');
-      $this->fail('Missed expected exception');
-    }
-    catch (CRM_Core_Exception $e) {
-      $this->assertEquals('You do not have permission to access this page.', $e->getMessage());
-    }
-
-    $this->setPermissions([
-      'view contributions of type Donation',
-    ]);
-    $perm = CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributions->id, 'view');
-    $this->assertEquals(TRUE, $perm, 'Verify that line items now have permission.');
   }
 
 }

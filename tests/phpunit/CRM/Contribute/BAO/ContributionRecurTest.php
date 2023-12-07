@@ -117,23 +117,40 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test we don't change unintended fields on API edit
+   * Test we don't change unintended fields on the recurring contribution.
+   *
+   * This tests two scenarios
+   *  - editing a contribution_recur and changing unrelated fields should leave the
+   *    currency unchanged
+   *  - Adding (or editing) contributions on the recurring should only alter
+   *    it if the contribution is a template contribution.
    *
    * @throws \CRM_Core_Exception
    */
   public function testUpdateRecur(): void {
     $createParams = $this->_params;
     $createParams['currency'] = 'XAU';
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $createParams);
-    $editParams = [
-      'id' => $contributionRecur['id'],
+    $contributionRecurID = $this->callAPISuccess('ContributionRecur', 'create', $createParams)['id'];
+    $contributionID = Contribution::create()->setValues([
+      'contribution_recur_id' => $contributionRecurID,
+      'total_amount' => 5,
+      'currency' => 'USD',
+      'contact_id' => $this->_params['contact_id'],
+      'financial_type_id:name' => 'Donation',
+    ])->execute()->first()['id'];
+    $this->assertContributionRecurValues($contributionRecurID, 3, 'XAU', 'a non template contribution should not change the recurring amount details');
+
+    Contribution::update()->setValues(['receive_date' => 'yesterday'])->addWhere('id', '=', $contributionID)->execute();
+    $this->assertContributionRecurValues($contributionRecurID, 3, 'XAU', 'a non template contribution should not change the recurring amount details');
+
+    $contributionRecurID = $this->callAPISuccess('ContributionRecur', 'create', [
+      'id' => $contributionRecurID,
       'end_date' => '+ 4 weeks',
-    ];
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $editParams);
-    $dao = new CRM_Contribute_BAO_ContributionRecur();
-    $dao->id = $contributionRecur['id'];
-    $dao->find(TRUE);
-    $this->assertEquals('XAU', $dao->currency, 'Edit clobbered recur currency');
+    ])['id'];
+    $this->assertContributionRecurValues($contributionRecurID, 3, 'XAU', 'an unrelated contribution recur update should not change the amount details');
+
+    Contribution::update()->setValues(['is_template' => TRUE])->addWhere('id', '=', $contributionID)->execute();
+    $this->assertContributionRecurValues($contributionRecurID, 5, 'USD', 'a change to a template contribution should change the recurring amount details');
   }
 
   /**
@@ -272,7 +289,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     ]);
 
     // Register "contribution create" hook
-    $this->hookClass->setHook('civicrm_post', array($this, 'implementHookPost'));
+    $this->hookClass->setHook('civicrm_post', [$this, 'implementHookPost']);
     \Civi::$statics['testCreateTemplateContributionFromFirstContributionTest']['custom_field_id'] = $custom_field['id'];
 
     // Make sure a template contribution exists.
@@ -737,6 +754,25 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $recurring3 = $this->callAPISuccess('ContributionRecur', 'create', $createParams);
     $recurring3Get = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $recurring3['id']]);
     $this->assertEquals('0', $recurring3Get['is_email_receipt']);
+  }
+
+  /**
+   * Assert the contribution recur values match.
+   *
+   * @param int $contributionRecurID
+   * @param int $amount
+   * @param string $currency
+   * @param string $message
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertContributionRecurValues(int $contributionRecurID, int $amount, string $currency, string $message = ''): void {
+    $contributionRecur = ContributionRecur::get()->setSelect([
+      'amount',
+      'currency',
+    ])->addWhere('id', '=', $contributionRecurID)->execute()->first();
+    $this->assertEquals($currency, $contributionRecur['currency'], $message);
+    $this->assertEquals($amount, $contributionRecur['amount'], $message);
   }
 
 }

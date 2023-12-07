@@ -20,6 +20,7 @@
  */
 
 return [
+  // FIXME: This is arguably the worst name for a setting ever
   'is_enabled' => [
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',

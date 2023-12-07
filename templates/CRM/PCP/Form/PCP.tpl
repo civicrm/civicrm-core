@@ -7,11 +7,10 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 <table class="form-layout">
-  <tr  class="crm-contribution-contributionpage-pcp-form-block-pcp_active">
-      <td class="label">&nbsp;</td>
-      <td>{$form.pcp_active.html} {$form.pcp_active.label}</td>
+  <tr class="crm-contribution-contributionpage-pcp-form-block-pcp_active">
+    <td class="label">&nbsp;</td>
+    <td>{$form.pcp_active.html} {$form.pcp_active.label}</td>
   </tr>
 </table>
 
@@ -46,7 +45,7 @@
         <td>{$form.notify_email.html} {help id="id-notify"}</td>
      </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-supporter_profile_id">
-        <td class="label">{$form.supporter_profile_id.label}</td>
+        <td class="label">{$form.supporter_profile_id.label} <span class="crm-marker"> *</span></td>
         <td>{$form.supporter_profile_id.html} {help id="id-supporter_profile"}</td>
      </tr>
      <tr class="crm-contribution-contributionpage-pcp-form-block-owner_notify_id">

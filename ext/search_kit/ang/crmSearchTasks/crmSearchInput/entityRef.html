@@ -2,7 +2,7 @@
   class="form-control"
   ng-model="$ctrl.value"
   crm-autocomplete="$ctrl.getFkEntity()"
-  crm-autocomplete-params="{fieldName: $ctrl.field.entity + '.' + $ctrl.field.name}"
+  crm-autocomplete-params="{fieldName: $ctrl.field.entity + '.' + $ctrl.field.name, key: $ctrl.optionKey || null}"
   auto-open="true"
   multi="$ctrl.isMulti()"
   static-options="$ctrl.getAutocompleteStaticOptions()"

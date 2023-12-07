@@ -278,8 +278,8 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
   public function formRule($fields, $files, $self) {
     $this->addGeocodingData($fields);
 
-    if (!is_numeric(CRM_Utils_Array::value('geo_code_1', $fields)) ||
-      !is_numeric(CRM_Utils_Array::value('geo_code_2', $fields)) ||
+    if (!is_numeric($fields['geo_code_1'] ?? '') ||
+      !is_numeric($fields['geo_code_2'] ?? '') ||
       !isset($fields['distance'])
     ) {
       $errorMessage = ts('Could not determine co-ordinates for provided data');

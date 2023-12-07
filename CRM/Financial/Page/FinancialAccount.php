@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of financial types
+ * Page for displaying list of financial accounts
  */
 class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
 
@@ -52,22 +52,26 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/financial/financialAccount/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Financial Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Financial Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Financial Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/financial/financialAccount/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Financial Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }

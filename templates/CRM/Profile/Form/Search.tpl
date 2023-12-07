@@ -7,8 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if ! empty( $fields )}
-  {if $groupId }
+{if ! empty($fields)}
+  {if $groupId}
   <div class="crm-accordion-wrapper crm-group-{$groupId}-accordion {if $rows}collapsed{/if}">
     <div class="crm-accordion-header crm-master-accordion-header">
       {ts}Edit Search Criteria{/ts}
@@ -75,7 +75,7 @@
       <tr><td colspan="2">{include file="CRM/Contact/Form/Task/ProximityCommon.tpl"}</td></tr>
     {/if}
 
-    <tr><td></td><td>{include file="CRM/common/formButtons.tpl"}</td></tr>
+    <tr><td></td><td>{include file="CRM/common/formButtons.tpl" location=''}</td></tr>
   </table>
 
   {if $groupId}

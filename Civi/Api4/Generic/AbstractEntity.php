@@ -12,6 +12,7 @@
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
 
 /**
@@ -74,8 +75,8 @@ abstract class AbstractEntity {
    *
    * @return string
    */
-  protected static function getEntityName() {
-    return self::stripNamespace(static::class);
+  public static function getEntityName(): string {
+    return CoreUtil::stripNamespace(static::class);
   }
 
   /**
@@ -85,19 +86,10 @@ abstract class AbstractEntity {
    *   Whether to return a plural title.
    * @return string
    */
-  protected static function getEntityTitle($plural = FALSE) {
+  protected static function getEntityTitle(bool $plural = FALSE): string {
     $name = static::getEntityName();
-    $dao = \CRM_Core_DAO_AllCoreTables::getFullName($name);
+    $dao = self::getDaoName();
     return $dao ? $dao::getEntityTitle($plural) : ($plural ? \CRM_Utils_String::pluralize($name) : $name);
-  }
-
-  /**
-   * Overridable function to return menu paths related to this entity.
-   *
-   * @return array
-   */
-  protected static function getEntityPaths() {
-    return [];
   }
 
   /**
@@ -126,6 +118,13 @@ abstract class AbstractEntity {
   }
 
   /**
+   * @return \CRM_Core_DAO|string|null
+   */
+  protected static function getDaoName(): ?string {
+    return \CRM_Core_DAO_AllCoreTables::getFullName(static::getEntityName());
+  }
+
+  /**
    * Reflection function called by Entity::get()
    *
    * @see \Civi\Api4\Action\Entity\Get
@@ -137,8 +136,8 @@ abstract class AbstractEntity {
       'name' => $entityName,
       'title' => static::getEntityTitle(),
       'title_plural' => static::getEntityTitle(TRUE),
-      'type' => [self::stripNamespace(get_parent_class(static::class))],
-      'paths' => static::getEntityPaths(),
+      'type' => [CoreUtil::stripNamespace(get_parent_class(static::class))],
+      'paths' => [],
       'class' => static::class,
       'primary_key' => ['id'],
       // Entities without a @searchable annotation will default to secondary,
@@ -146,7 +145,7 @@ abstract class AbstractEntity {
       'searchable' => 'secondary',
     ];
     // Add info for entities with a corresponding DAO
-    $dao = \CRM_Core_DAO_AllCoreTables::getFullName($info['name']);
+    $dao = static::getDaoName();
     if ($dao) {
       $info['paths'] = $dao::getEntityPaths();
       $info['primary_key'] = $dao::$_primaryKey;
@@ -155,9 +154,18 @@ abstract class AbstractEntity {
       $info['dao'] = $dao;
       $info['table_name'] = $dao::$_tableName;
       $info['icon_field'] = (array) ($dao::fields()['icon']['name'] ?? NULL);
+      if (method_exists($dao, 'indices')) {
+        foreach (\CRM_Utils_Array::findAll($dao::indices(FALSE), ['unique' => TRUE, 'localizable' => FALSE]) as $index) {
+          foreach ($index['field'] as $field) {
+            // Trim `field(length)` to just `field`
+            [$field] = explode('(', $field);
+            $info['match_fields'][] = $field;
+          }
+        }
+      }
     }
     foreach (ReflectionUtils::getTraits(static::class) as $trait) {
-      $info['type'][] = self::stripNamespace($trait);
+      $info['type'][] = CoreUtil::stripNamespace($trait);
     }
     // Get DocBlock from APIv4 Entity class
     $reflection = new \ReflectionClass(static::class);
@@ -177,22 +185,15 @@ abstract class AbstractEntity {
         $info[$field['name']] = $val;
       }
     }
-
+    // search_fields defaults to label_field
+    if (empty($info['search_fields']) && !empty($info['label_field'])) {
+      $info['search_fields'] = [$info['label_field']];
+    }
     if ($dao) {
       $info['description'] = $dao::getEntityDescription() ?? $info['description'] ?? NULL;
     }
 
     return $info;
-  }
-
-  /**
-   * Remove namespace prefix from a class name
-   *
-   * @param string $className
-   * @return string
-   */
-  private static function stripNamespace($className) {
-    return substr($className, strrpos($className, '\\') + 1);
   }
 
 }

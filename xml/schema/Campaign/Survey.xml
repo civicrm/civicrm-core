@@ -8,6 +8,11 @@
   <icon>fa-clipboard</icon>
   <labelField>title</labelField>
   <component>CiviCampaign</component>
+  <paths>
+    <add>civicrm/survey/add?reset=1</add>
+    <update>civicrm/survey/configure/main?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/survey/delete?reset=1&amp;id=[id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Survey ID</title>
@@ -54,7 +59,7 @@
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
-      <prefetch>FALSE</prefetch>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
   </field>
   <foreignKey>
@@ -91,12 +96,8 @@
     <title>Follow up Interval</title>
     <type>text</type>
     <comment>Recontact intervals for each status.</comment>
-    <html>
-      <type>TextArea</type>
-      <rows>20</rows>
-      <cols>80</cols>
-    </html>
     <add>3.3</add>
+    <drop>5.66</drop>
   </field>
 
   <field>
@@ -106,7 +107,7 @@
     <localizable>true</localizable>
     <comment>Script instructions for volunteers to use for the survey.</comment>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>20</rows>
       <cols>80</cols>
     </html>

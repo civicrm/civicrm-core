@@ -3,8 +3,7 @@
 
   // Shared between router and searchMeta service
   var searchEntity,
-    joinIndex,
-    undefined;
+    searchTasks = {};
 
   // Declare module and route/controller/services
   angular.module('crmSearchAdmin', CRM.angRequires('crmSearchAdmin'))
@@ -28,7 +27,7 @@
           savedSearch: function($route, crmApi4) {
             var params = $route.current.params;
             return crmApi4('SavedSearch', 'get', {
-              select: ['*', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
+              select: ['id', 'name', 'label', 'description', 'api_entity', 'api_params', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
               where: [['id', '=', params.id]],
               join: [
                 ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
@@ -56,7 +55,7 @@
         modules.push({text: label, id: key});
       }, []), 'text');
       this.getTags = function() {
-        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
+        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'label', ['color', 'description'])};
       };
 
       this.getPrimaryEntities = function() {
@@ -181,15 +180,17 @@
         return {field: field, join: join};
       }
       function parseFnArgs(info, expr) {
-        var fnName = expr.split('(')[0],
-          argString = expr.substr(fnName.length + 1, expr.length - fnName.length - 2);
+        var matches = /([_A-Z]*)\((.*)\)(:[a-z]+)?$/.exec(expr),
+          fnName = matches[1],
+          argString = matches[2];
         info.fn = _.find(CRM.crmSearchAdmin.functions, {name: fnName || 'e'});
         info.data_type = (info.fn && info.fn.data_type) || null;
+        info.suffix = matches[3];
 
         function getKeyword(whitelist) {
           var keyword;
           _.each(_.filter(whitelist), function(flag) {
-            if (argString.indexOf(flag + ' ') === 0) {
+            if (argString.indexOf(flag + ' ') === 0 || argString === flag) {
               keyword = flag;
               argString = _.trim(argString.substr(flag.length));
               return false;
@@ -240,7 +241,7 @@
               }
               getKeyword([',']);
             }
-            if (expr && !_.isEmpty(expr.flag_after)) {
+            if (info.args.length && !_.isEmpty(param.flag_after)) {
               _.last(info.args).flag_after = getKeyword(_.keys(param.flag_after));
             }
           } else if (param.flag_before && !param.optional) {
@@ -353,6 +354,14 @@
         parseExpr: parseExpr,
         getDefaultLabel: getDefaultLabel,
         fieldToColumn: fieldToColumn,
+        getSearchTasks: function(entityName) {
+          if (!(entityName in searchTasks)) {
+            searchTasks[entityName] = crmApi4('SearchDisplay', 'getSearchTasks', {
+              savedSearch: {api_entity: entityName}
+            });
+          }
+          return searchTasks[entityName];
+        },
         // Supply default aggregate function appropriate to the data_type
         getDefaultAggregateFn: function(info) {
           var arg = info.args[0] || {};

@@ -29,37 +29,21 @@ class Submit extends AbstractProcessor {
   protected $values;
 
   protected function processForm() {
-    // Preprocess submitted values
-    $entityValues = [];
-    foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
-      $entityValues[$entityName] = [];
-      // Gather submitted field values from $values['fields'] and sub-entities from $values['joins']
-      foreach ($this->values[$entityName] ?? [] as $values) {
-        // Only accept values from fields on the form
-        $values['fields'] = array_intersect_key($values['fields'] ?? [], $entity['fields']);
-        // Only accept joins set on the form
-        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
-        foreach ($values['joins'] as $joinEntity => &$joinValues) {
-          // Enforce the limit set by join[max]
-          $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
-          foreach ($joinValues as $index => $vals) {
-            // Only accept values from join fields on the form
-            $joinValues[$index] = array_intersect_key($vals, $entity['joins'][$joinEntity]['fields'] ?? []);
-            // Merge in pre-set data
-            $joinValues[$index] = array_merge($joinValues[$index], $entity['joins'][$joinEntity]['data'] ?? []);
-          }
-        }
-        $entityValues[$entityName][] = $values;
-      }
-      if (!empty($entity['data'])) {
-        // If no submitted values but data exists, fill the minimum number of records
-        for ($index = 0; $index < $entity['min']; $index++) {
-          $entityValues[$entityName][$index] = $entityValues[$entityName][$index] ?? ['fields' => []];
-        }
-        // Predetermined values override submitted values
-        foreach ($entityValues[$entityName] as $index => $vals) {
-          $entityValues[$entityName][$index]['fields'] = $entity['data'] + $vals['fields'];
-        }
+    // preprocess submitted values
+    $entityValues = $this->preprocessSubmittedValues($this->values);
+
+    // get the submission information if we have submission id.
+    // currently we don't support processing of already processed forms
+    // return validation error in those cases
+    if (!empty($this->args['sid'])) {
+      $afformSubmissionData = \Civi\Api4\AfformSubmission::get(FALSE)
+        ->addWhere('id', '=', $this->args['sid'])
+        ->addWhere('afform_name', '=', $this->name)
+        ->addWhere('status_id:name', '=', 'Processed')
+        ->execute()->count();
+
+      if ($afformSubmissionData > 0) {
+        throw new \CRM_Core_Exception(ts('Submission is already processed.'));
       }
     }
 
@@ -68,34 +52,47 @@ class Submit extends AbstractProcessor {
     \Civi::dispatcher()->dispatch('civi.afform.validate', $event);
     $errors = $event->getErrors();
     if ($errors) {
+      \Civi::log('afform')->error('Afform Validation errors: ' . print_r($errors, TRUE));
       throw new \CRM_Core_Exception(ts('Validation Error', ['plural' => '%1 Validation Errors', 'count' => count($errors)]), 0, ['validation' => $errors]);
     }
 
     // Save submission record
-    if (!empty($this->_afform['create_submission'])) {
+    $status = 'Processed';
+    if (!empty($this->_afform['create_submission']) && empty($this->args['sid'])) {
+      if (!empty($this->_afform['manual_processing'])) {
+        $status = 'Pending';
+      }
+
       $submission = AfformSubmission::create(FALSE)
         ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
         ->addValue('afform_name', $this->name)
         ->addValue('data', $this->getValues())
+        ->addValue('status_id:name', $status)
         ->execute()->first();
     }
 
-    // Call submit handlers
-    $entityWeights = \Civi\Afform\Utils::getEntityWeights($this->_formDataModel->getEntities(), $entityValues);
-    foreach ($entityWeights as $entityName) {
-      $entityType = $this->_formDataModel->getEntity($entityName)['type'];
-      $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
-      $this->fillIdFields($records, $entityName);
-      $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
-      \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
+    // let's not save the data in other CiviCRM table if manual verification is needed.
+    if (!empty($this->_afform['manual_processing']) && empty($this->args['sid'])) {
+      // check for verification email
+      $this->processVerficationEmail($submission['id']);
+      return [];
     }
+
+    // process and save various enities
+    $this->processFormData($entityValues);
 
     $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
     // Update submission record with entity IDs.
     if (!empty($this->_afform['create_submission'])) {
+      $submissionId = $submission['id'];
+      if (!empty($this->args['sid'])) {
+        $submissionId = $this->args['sid'];
+      }
+
       AfformSubmission::update(FALSE)
-        ->addWhere('id', '=', $submission['id'])
+        ->addWhere('id', '=', $submissionId)
         ->addValue('data', $submissionData)
+        ->addValue('status_id:name', $status)
         ->execute();
     }
 
@@ -103,25 +100,6 @@ class Submit extends AbstractProcessor {
     return [
       ['token' => $this->generatePostSubmitToken()] + $this->_entityIds,
     ];
-  }
-
-  /**
-   * Recursively add entity IDs to the values.
-   */
-  protected function combineValuesAndIds($values, $ids, $isJoin = FALSE) {
-    $combined = [];
-    $values += array_fill_keys(array_keys($ids), []);
-    foreach ($values as $name => $value) {
-      foreach ($value as $idx => $val) {
-        $idData = $ids[$name][$idx] ?? [];
-        if (!$isJoin) {
-          $idData['_joins'] = $this->combineValuesAndIds($val['joins'] ?? [], $idData['_joins'] ?? [], TRUE);
-        }
-        $item = array_merge($isJoin ? $val : ($val['fields'] ?? []), $idData);
-        $combined[$name][$idx] = $item;
-      }
-    }
-    return $combined;
   }
 
   /**
@@ -202,9 +180,15 @@ class Submit extends AbstractProcessor {
       return NULL;
     }
     $fullDefn = FormDataModel::getField($apiEntity, $fieldName, 'create');
+
+    // we don't need to validate the file fields as it's handled separately
+    if ($fullDefn['input_type'] === 'File') {
+      return NULL;
+    }
+
     $isRequired = $attributes['defn']['required'] ?? $fullDefn['required'] ?? FALSE;
     if ($isRequired) {
-      $label = $attributes['defn']['label'] ?? $fullDefn['label'];
+      $label = $attributes['defn']['label'] ?? $fullDefn['label'] ?? $fieldName;
       return E::ts('%1 is a required field.', [1 => $label]);
     }
     return NULL;
@@ -242,34 +226,6 @@ class Submit extends AbstractProcessor {
       }
     }
     return NULL;
-  }
-
-  /**
-   * Replace Entity reference fields with the id of the referenced entity.
-   * @param string $entityName
-   * @param $records
-   */
-  private function replaceReferences($entityName, $records) {
-    $entityNames = array_diff(array_keys($this->_entityIds), [$entityName]);
-    $entityType = $this->_formDataModel->getEntity($entityName)['type'];
-    foreach ($records as $key => $record) {
-      foreach ($record['fields'] as $field => $value) {
-        if (array_intersect($entityNames, (array) $value) && $this->getEntityField($entityType, $field)['input_type'] === 'EntityRef') {
-          if (is_array($value)) {
-            foreach ($value as $i => $val) {
-              if (in_array($val, $entityNames, TRUE)) {
-                $refIds = array_filter(array_column($this->_entityIds[$val], 'id'));
-                array_splice($records[$key]['fields'][$field], $i, 1, $refIds);
-              }
-            }
-          }
-          else {
-            $records[$key]['fields'][$field] = $this->_entityIds[$value][0]['id'] ?? NULL;
-          }
-        }
-      }
-    }
-    return $records;
   }
 
   /**
@@ -324,6 +280,7 @@ class Submit extends AbstractProcessor {
       catch (\CRM_Core_Exception $e) {
         // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity
         // intentionally left blank. Other times it's a real error the user should know about.
+        \Civi::log('afform')->debug("Silently ignoring exception in Afform processGenericEntity call: " . $e->getMessage());
       }
     }
   }
@@ -338,50 +295,55 @@ class Submit extends AbstractProcessor {
     // Prevent processGenericEntity
     $event->stopPropagation();
     $api4 = $event->getSecureApi4();
-    $relationship = $event->records[0]['fields'] ?? [];
-    if (empty($relationship['contact_id_a']) || empty($relationship['contact_id_b']) || empty($relationship['relationship_type_id'])) {
-      return;
-    }
-    $relationshipType = RelationshipType::get(FALSE)
-      ->addWhere('id', '=', $relationship['relationship_type_id'])
-      ->execute()->single();
-    $isReciprocal = $relationshipType['label_a_b'] == $relationshipType['label_b_a'];
-    $isActive = !isset($relationship['is_active']) || !empty($relationship['is_active']);
-    // Each contact id could be multivalued (e.g. using `af-repeat`)
-    foreach ((array) $relationship['contact_id_a'] as $contact_id_a) {
-      foreach ((array) $relationship['contact_id_b'] as $contact_id_b) {
-        $params = $relationship;
-        $params['contact_id_a'] = $contact_id_a;
-        $params['contact_id_b'] = $contact_id_b;
-        // Check for existing relationships (if allowed)
-        if (!empty($event->getEntity()['actions']['update'])) {
-          $where = [
-            ['is_active', '=', $isActive],
-            ['relationship_type_id', '=', $relationship['relationship_type_id']],
-          ];
-          // Reciprocal relationship types need an extra check
-          if ($isReciprocal) {
-            $where[] = ['OR',
-              ['AND', ['contact_id_a', '=', $contact_id_a], ['contact_id_b', '=', $contact_id_b]],
-              ['AND', ['contact_id_a', '=', $contact_id_b], ['contact_id_b', '=', $contact_id_a]],
+    // Iterate through multiple relationships (if using af-repeat)
+    foreach ($event->records as $relationship) {
+      $relationship = $relationship['fields'] ?? [];
+      if (empty($relationship['contact_id_a']) || empty($relationship['contact_id_b']) || empty($relationship['relationship_type_id'])) {
+        return;
+      }
+      $relationshipType = RelationshipType::get(FALSE)
+        ->addWhere('id', '=', $relationship['relationship_type_id'])
+        ->execute()->single();
+      $isReciprocal = $relationshipType['label_a_b'] == $relationshipType['label_b_a'];
+      $isActive = !isset($relationship['is_active']) || !empty($relationship['is_active']);
+      // Each contact id could be multivalued (e.g. using `af-repeat`)
+      foreach ((array) $relationship['contact_id_a'] as $contact_id_a) {
+        foreach ((array) $relationship['contact_id_b'] as $contact_id_b) {
+          $params = $relationship;
+          $params['contact_id_a'] = $contact_id_a;
+          $params['contact_id_b'] = $contact_id_b;
+          // Check for existing relationships (if allowed)
+          if (!empty($event->getEntity()['actions']['update'])) {
+            $where = [
+              ['is_active', '=', $isActive],
+              ['relationship_type_id', '=', $relationship['relationship_type_id']],
             ];
+            // Reciprocal relationship types need an extra check
+            if ($isReciprocal) {
+              $where[] = [
+                'OR', [
+                  ['AND', [['contact_id_a', '=', $contact_id_a], ['contact_id_b', '=', $contact_id_b]]],
+                  ['AND', [['contact_id_a', '=', $contact_id_b], ['contact_id_b', '=', $contact_id_a]]],
+                ],
+              ];
+            }
+            else {
+              $where[] = ['contact_id_a', '=', $contact_id_a];
+              $where[] = ['contact_id_b', '=', $contact_id_b];
+            }
+            $existing = $api4('Relationship', 'get', ['where' => $where])->first();
+            if ($existing) {
+              $params['id'] = $existing['id'];
+              unset($params['contact_id_a'], $params['contact_id_b']);
+              // If this is a flipped reciprocal relationship, also flip the permissions
+              $params['is_permission_a_b'] = $relationship['is_permission_b_a'] ?? NULL;
+              $params['is_permission_b_a'] = $relationship['is_permission_a_b'] ?? NULL;
+            }
           }
-          else {
-            $where[] = ['contact_id_a', '=', $contact_id_a];
-            $where[] = ['contact_id_b', '=', $contact_id_b];
-          }
-          $existing = $api4('Relationship', 'get', ['where' => $where])->first();
-          if ($existing) {
-            $params['id'] = $existing['id'];
-            unset($params['contact_id_a'], $params['contact_id_b']);
-            // If this is a flipped reciprocal relationship, also flip the permissions
-            $params['is_permission_a_b'] = $relationship['is_permission_b_a'] ?? NULL;
-            $params['is_permission_b_a'] = $relationship['is_permission_a_b'] ?? NULL;
-          }
+          $api4('Relationship', 'save', [
+            'records' => [$params],
+          ]);
         }
-        $api4('Relationship', 'save', [
-          'records' => [$params],
-        ]);
       }
     }
   }
@@ -489,18 +451,6 @@ class Submit extends AbstractProcessor {
   }
 
   /**
-   * @param array $records
-   * @param string $entityName
-   */
-  private function fillIdFields(array &$records, string $entityName): void {
-    foreach ($records as $index => &$record) {
-      if (empty($record['fields']['id']) && !empty($this->_entityIds[$entityName][$index]['id'])) {
-        $record['fields']['id'] = $this->_entityIds[$entityName][$index]['id'];
-      }
-    }
-  }
-
-  /**
    * Generates token returned from submit action
    *
    * @return string
@@ -519,6 +469,72 @@ class Submit extends AbstractProcessor {
       'scope' => 'afformPostSubmit',
       'civiAfformSubmission' => ['name' => $this->name, 'data' => $this->_entityIds],
     ]);
+  }
+
+  /**
+   * Function to send the verification email if configured
+   *
+   * @param int $submissionId
+   *
+   * @return void
+   */
+  private function processVerficationEmail(int $submissionId):void {
+    // check if email verification configured and message template is set
+    if (empty($this->_afform['allow_verification_by_email']) || empty($this->_afform['email_confirmation_template_id'])) {
+      return;
+    }
+
+    $emailValue = '';
+    $submittedValues = $this->getValues();
+    foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
+      foreach ($submittedValues[$entityName] ?? [] as $values) {
+        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
+        foreach ($values['joins'] as $joinEntity => &$joinValues) {
+          if ($joinEntity === 'Email') {
+            foreach ($joinValues as $fld => $val) {
+              if (!empty($val['email'])) {
+                $emailValue = $val['email'];
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // processing sending of email only if email field exists in the form
+    if (!empty($emailValue)) {
+      $this->sendEmail($emailValue, $submissionId);
+    }
+  }
+
+  /**
+   * Function to send email
+   *
+   * @param string $emailAddress
+   * @param int $submissionId
+   *
+   * @return void
+   */
+  private function sendEmail(string $emailAddress, int $submissionId) {
+    // get domain email address
+    [$domainEmailName, $domainEmailAddress] = \CRM_Core_BAO_Domain::getNameAndEmail();
+
+    $tokenContext = [
+      'validateAfformSubmission' => [
+        'submissionId' => $submissionId,
+      ],
+    ];
+
+    // send email
+    $emailParams = [
+      'messageTemplateID' => $this->_afform['email_confirmation_template_id'],
+      'from' => "$domainEmailName <" . $domainEmailAddress . ">",
+      'toEmail' => $emailAddress,
+      'tokenContext' => $tokenContext,
+    ];
+
+    \CRM_Core_BAO_MessageTemplate::sendTemplate($emailParams);
   }
 
 }

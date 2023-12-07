@@ -95,7 +95,7 @@ AND    {$this->_componentClause}";
     $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
     $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do not email / Do not mail)'), FALSE);
 
-    $this->add('select', 'from_email_address', ts('From Email'), $this->_fromEmails, FALSE);
+    $this->add('select', 'from_email_address', ts('From Email'), $this->getFromEmails(), FALSE);
 
     $this->addButtons([
       [
@@ -108,6 +108,15 @@ AND    {$this->_componentClause}";
         'name' => ts('Cancel'),
       ],
     ]);
+  }
+
+  /**
+   * Get an array of email IDS from which the back-office user may select the from field.
+   *
+   * @return array
+   */
+  public function getFromEmails(): array {
+    return CRM_Core_BAO_Email::getFromEmail();
   }
 
   /**
@@ -244,14 +253,13 @@ AND    {$this->_componentClause}";
     $pdfElements = [];
     $pdfElements['details'] = self::getDetails(implode(',', $contribIds));
     $excludeContactIds = [];
+    $suppressedEmails = 0;
     if (!$isCreatePDF) {
       $contactDetails = civicrm_api3('Contact', 'get', [
         'return' => ['email', 'do_not_email', 'is_deceased', 'on_hold'],
         'id' => ['IN' => $contactIds],
         'options' => ['limit' => 0],
       ])['values'];
-      $pdfElements['suppressedEmails'] = 0;
-      $suppressedEmails = 0;
       foreach ($contactDetails as $id => $values) {
         if (empty($values['email']) ||
           (empty($params['override_privacy']) && !empty($values['do_not_email']))
@@ -259,11 +267,11 @@ AND    {$this->_componentClause}";
           || !empty($values['on_hold'])
         ) {
           $suppressedEmails++;
-          $pdfElements['suppressedEmails'] = $suppressedEmails;
           $excludeContactIds[] = $values['contact_id'];
         }
       }
     }
+    $pdfElements['suppressedEmails'] = $suppressedEmails;
     $pdfElements['excludeContactIds'] = $excludeContactIds;
 
     return $pdfElements;

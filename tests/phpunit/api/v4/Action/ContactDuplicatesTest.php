@@ -27,7 +27,7 @@ use Civi\Api4\Contact;
  */
 class ContactDuplicatesTest extends CustomTestBase {
 
-  public function testGetDuplicatesUnsupervised() {
+  public function testGetDuplicatesUnsupervised(): void {
     $email = uniqid('test@');
 
     $testContacts = $this->saveTestRecords('Contact', [
@@ -44,7 +44,7 @@ class ContactDuplicatesTest extends CustomTestBase {
     $this->assertNotContains($testContacts[3], $found);
   }
 
-  public function testGetFieldsForContactGetDuplicatesAction() {
+  public function testGetFieldsForContactGetDuplicatesAction(): void {
     $fields = Contact::getFields(FALSE)
       ->setAction('getDuplicates')
       ->execute()
@@ -54,7 +54,7 @@ class ContactDuplicatesTest extends CustomTestBase {
     $this->assertEquals('Email', $fields['email_primary.email']['entity']);
   }
 
-  public function testGetRuleGroupNames() {
+  public function testGetRuleGroupNames(): void {
     $this->createTestRecord('DedupeRuleGroup', [
       'contact_type' => 'Individual',
       'name' => 'houseRule',
@@ -77,7 +77,7 @@ class ContactDuplicatesTest extends CustomTestBase {
     $this->assertContains('houseRule', $meta['params']['dedupeRule']['options']);
   }
 
-  public function testDedupeWithCustomFields() {
+  public function testDedupeWithCustomFields(): void {
     $customGroup = $this->createTestRecord('CustomGroup', ['name' => 'test1']);
 
     $customFieldText = $this->createTestRecord('CustomField', [
@@ -124,9 +124,9 @@ class ContactDuplicatesTest extends CustomTestBase {
       ->execute()->column('id');
 
     $this->assertCount(3, $found);
-    $this->assertContains($testContacts[0], $found);
-    $this->assertContains($testContacts[1], $found);
-    $this->assertContains($testContacts[3], $found);
+    $this->assertContainsEquals($testContacts[0], $found);
+    $this->assertContainsEquals($testContacts[1], $found);
+    $this->assertContainsEquals($testContacts[3], $found);
 
     $found = Contact::getDuplicates(FALSE)
       ->setDedupeRule('customRule')
@@ -136,8 +136,8 @@ class ContactDuplicatesTest extends CustomTestBase {
       ->execute()->column('id');
 
     $this->assertCount(2, $found);
-    $this->assertContains($testContacts[2], $found);
-    $this->assertContains($testContacts[4], $found);
+    $this->assertContainsEquals($testContacts[2], $found);
+    $this->assertContainsEquals($testContacts[4], $found);
   }
 
   public function testMergeDuplicates():void {

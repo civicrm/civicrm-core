@@ -52,7 +52,7 @@ class CRM_Dedupe_Finder {
     while ($dao->fetch()) {
       $dupes[] = [$dao->id1, $dao->id2, $dao->weight];
     }
-    CRM_Core_DAO::executeQuery(($rgBao->tableDropQuery()));
+    CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
 
     return $dupes;
   }
@@ -122,15 +122,15 @@ class CRM_Dedupe_Finder {
     }
     $rgBao->params = $params;
     $rgBao->fillTable();
-    $dao = new CRM_Core_DAO();
-    $dao->query($rgBao->thresholdQuery($checkPermission));
+
+    $dao = CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($checkPermission));
     $dupes = [];
     while ($dao->fetch()) {
       if (isset($dao->id) && $dao->id) {
         $dupes[] = $dao->id;
       }
     }
-    $dao->query($rgBao->tableDropQuery());
+    CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
     return array_diff($dupes, $except);
   }
 
@@ -191,10 +191,7 @@ class CRM_Dedupe_Finder {
     }
 
     // handle {birth,deceased}_date
-    foreach ([
-      'birth_date',
-      'deceased_date',
-    ] as $date) {
+    foreach (['birth_date', 'deceased_date'] as $date) {
       if (!empty($fields[$date])) {
         $flat[$date] = $fields[$date];
         if (is_array($flat[$date])) {

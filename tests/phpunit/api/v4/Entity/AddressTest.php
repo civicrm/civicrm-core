@@ -40,7 +40,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
   /**
    * Check that 2 addresses for the same contact can't both be primary
    */
-  public function testPrimary() {
+  public function testPrimary(): void {
     $cid = Contact::create(FALSE)->addValue('first_name', uniqid())->execute()->single()['id'];
 
     $a1 = Address::create(FALSE)
@@ -66,7 +66,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($addresses[1]['is_primary']);
   }
 
-  public function testSearchProximity() {
+  public function testSearchProximity(): void {
     $cid = $this->createTestRecord('Contact')['id'];
     $sampleData = [
       ['geo_code_1' => 20, 'geo_code_2' => 20],
@@ -89,6 +89,24 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains($addreses[1], $result);
     $this->assertContains($addreses[2], $result);
     $this->assertNotContains($addreses[3], $result);
+  }
+
+  public function testMasterAddressJoin(): void {
+    $contact = $this->createTestRecord('Contact');
+    $master = $this->createTestRecord('Address', [
+      'contact_id' => $contact['id'],
+    ]);
+    $address = $this->createTestRecord('Address', [
+      'master_id' => $master['id'],
+      'contact_id' => $this->createTestRecord('Contact')['id'],
+    ]);
+    $result = Address::get(FALSE)
+      ->addJoin('Contact AS master_contact', 'LEFT', ['master_id.contact_id', '=', 'master_contact.id'])
+      ->addSelect('master_contact.id')
+      // Ensure the query can handle the ambiguity of two joined entities with a `location_type_id` field
+      ->addOrderBy('location_type_id:label', 'ASC')
+      ->execute()->indexBy('id');
+    $this->assertEquals($contact['id'], $result[$address['id']]['master_contact.id']);
   }
 
 }

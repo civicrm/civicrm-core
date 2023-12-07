@@ -9,6 +9,5 @@ return [
   'css' => ['ang/afCore.css'],
   'requires' => ['crmUi', 'crmUtil', 'api4', 'checklist-model', 'angularFileUpload'],
   'partials' => ['ang/afCore'],
-  'settings' => [],
   'basePages' => [],
 ];

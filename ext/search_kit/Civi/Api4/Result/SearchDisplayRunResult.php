@@ -13,14 +13,21 @@
 namespace Civi\Api4\Result;
 
 /**
- * Class ReplaceResult
+ * Specialized APIv4 Result object for SearchDisplay::run
  *
  * @package Civi\Api4\Result
  */
 class SearchDisplayRunResult extends \Civi\Api4\Generic\Result {
   /**
+   * Contextual labels for use in page title
    * @var array
    */
   public $labels = [];
+
+  /**
+   * Rendered toolbar buttons
+   * @var array|null
+   */
+  public $toolbar = NULL;
 
 }

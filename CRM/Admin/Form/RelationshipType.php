@@ -25,25 +25,6 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
   protected $_BAOName = 'CRM_Contact_BAO_RelationshipType';
 
   /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * Fields may have keys
-   *  - name (required to show in tpl from the array)
-   *  - description (optional, will appear below the field)
-   *     Auto-added by setEntityFieldsMetadata unless specified here (use description => '' to hide)
-   *  - not-auto-addable - this class will not attempt to add the field using addField.
-   *    (this will be automatically set if the field does not have html in it's metadata
-   *    or is not a core field on the form's entity).
-   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
-   *  - template - use a field specific template to render this field
-   *  - required
-   *  - is_freeze (field should be frozen).
-   *
-   * @var array
-   */
-  protected $entityFields = [];
-
-  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {
@@ -68,13 +49,6 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
     self::setEntityFieldsMetadata();
   }
-
-  /**
-   * Deletion message to be assigned to the form.
-   *
-   * @var string
-   */
-  protected $deleteMessage;
 
   /**
    * Explicitly declare the entity api name.
@@ -161,13 +135,13 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Contact_BAO_RelationshipType::del($this->_id);
+      CRM_Contact_BAO_RelationshipType::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts('Selected Relationship type has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
       // store the submitted values in an array
       $params = $this->exportValues();
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+      $params['is_active'] = $params['is_active'] ?? FALSE;
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->_id;
@@ -185,10 +159,10 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       $params['contact_type_a'] = $cTypeA[0];
       $params['contact_type_b'] = $cTypeB[0];
 
-      $params['contact_sub_type_a'] = $cTypeA[1] ? $cTypeA[1] : 'null';
-      $params['contact_sub_type_b'] = $cTypeB[1] ? $cTypeB[1] : 'null';
+      $params['contact_sub_type_a'] = $cTypeA[1] ?: 'null';
+      $params['contact_sub_type_b'] = $cTypeB[1] ?: 'null';
 
-      if (!strlen(trim(CRM_Utils_Array::value('label_b_a', $params)))) {
+      if (!strlen(trim($params['label_b_a'] ?? ''))) {
         $params['label_b_a'] = $params['label_a_b'] ?? NULL;
       }
 

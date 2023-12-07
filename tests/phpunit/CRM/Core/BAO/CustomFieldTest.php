@@ -53,7 +53,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test changing a data type from multiple-choice to Text.
    */
-  public function testChangeDataType() {
+  public function testChangeDataType(): void {
     $customGroup = $this->createCustomField();
     $fields = [
       'label' => 'Radio to Text',
@@ -81,7 +81,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test custom field create accepts passed column name.
    */
-  public function testCreateCustomFieldColumnName() {
+  public function testCreateCustomFieldColumnName(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
     $fields = [
       'label' => 'testFld 2',
@@ -104,7 +104,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test that name is used for the column.
    */
-  public function testCreateCustomFieldName() {
+  public function testCreateCustomFieldName(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
     $fields = [
       'label' => 'testFld 2',
@@ -127,7 +127,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test get fields function.
    */
-  public function testGetFields() {
+  public function testGetFields(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
     $fields = [
       'label' => 'testFld1',
@@ -158,7 +158,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   /**
    * @throws \Exception
    */
-  public function testGetDisplayedValues() {
+  public function testGetDisplayedValues(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
     $fieldsToCreate = [
       [
@@ -249,7 +249,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
-  public function testGetDisplayedValuesContactRef() {
+  public function testGetDisplayedValuesContactRef(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
     $params = [
       'data_type' => 'ContactReference',
@@ -269,7 +269,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->customGroupDelete($customGroup['id']);
   }
 
-  public function testDeleteCustomField() {
+  public function testDeleteCustomField(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
     $fields = [
       'custom_group_id' => $customGroup['id'],
@@ -296,7 +296,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testMoveField() {
+  public function testMoveField(): void {
     $countriesByName = array_flip(CRM_Core_PseudoConstant::country(FALSE, FALSE));
     $this->assertTrue($countriesByName['Andorra'] > 0);
     $groups = [
@@ -427,7 +427,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetCustomFieldID() {
+  public function testGetCustomFieldID(): void {
     $this->createCustomField();
     $fieldID = CRM_Core_BAO_CustomField::getCustomFieldID('testFld');
     $this->assertEquals($this->customFieldID, $fieldID);
@@ -473,8 +473,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testGetFieldsForImport() {
-    $this->entity = 'Contact';
+  public function testGetFieldsForImport(): void {
     $this->createCustomGroupWithFieldsOfAllTypes();
     $customGroupID = $this->ids['CustomGroup']['Custom Group'];
     $expected = [
@@ -976,13 +975,14 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $dao = CRM_Core_DAO::executeQuery(('SHOW CREATE TABLE ' . $customGroup['values'][$customGroup['id']]['table_name']));
     $dao->fetch();
     $this->assertStringContainsString('`test_link_2` varchar(255) COLLATE ' . CRM_Core_BAO_SchemaHandler::getInUseCollation() . ' DEFAULT NULL', $dao->Create_Table);
-    $this->assertStringContainsString('KEY `INDEX_my_text` (`my_text`)', $dao->Create_Table);
+    $this->assertStringContainsString('KEY `index_my_text` (`my_text`)', $dao->Create_Table);
   }
 
   /**
    * Check that outputting the display value for a file field with No description doesn't generate error
    */
   public function testFileDisplayValueNoDescription(): void {
+    $this->useFrozenTime();
     $customGroup = $this->customGroupCreate([
       'extends' => 'Individual',
       'title' => 'Test Contact File Custom Group',
@@ -997,7 +997,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $file = $this->callAPISuccess('File', 'create', [
       'uri' => $filePath,
     ]);
-    $individual = $this->individualCreate(['custom_' . $fileField['id'] => $file['id']]);
+    $this->individualCreate(['custom_' . $fileField['id'] => $file['id']]);
     $expectedDisplayValue = CRM_Core_BAO_File::paperIconAttachment('*', $file['id'])[$file['id']];
     $this->assertEquals($expectedDisplayValue, CRM_Core_BAO_CustomField::displayValue($file['id'], $fileField['id']));
   }
@@ -1005,7 +1005,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test for hook_civicrm_alterCustomFieldDisplayValue().
    */
-  public function testAlterCustomFieldDisplayValueHook() {
+  public function testAlterCustomFieldDisplayValueHook(): void {
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_alterCustomFieldDisplayValue', [$this, 'alterCustomFieldDisplayValue']);
     $customGroupId = $this->customGroupCreate([
       'extends' => 'Individual',
@@ -1052,7 +1052,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    * Test for single select Autocomplete custom field.
    *
    */
-  public function testSingleSelectAutoComplete() {
+  public function testSingleSelectAutoComplete(): void {
     $customGroupId = $this->customGroupCreate([
       'extends' => 'Individual',
     ])['id'];
@@ -1073,7 +1073,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    * Test for multi select Autocomplete custom field.
    *
    */
-  public function testMultiSelectAutoComplete() {
+  public function testMultiSelectAutoComplete(): void {
     $customGroupId = $this->customGroupCreate([
       'extends' => 'Individual',
     ])['id'];

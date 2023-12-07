@@ -10,6 +10,9 @@
   <icon>fa-folder-open</icon>
   <labelField>subject</labelField>
   <component>CiviCase</component>
+  <paths>
+    <view>civicrm/contact/view/case?action=view&amp;reset=1&amp;id=[id]</view>
+  </paths>
   <field>
     <name>id</name>
     <type>int unsigned</type>
@@ -79,7 +82,7 @@
     <comment>Date on which given case starts.</comment>
     <html>
       <type>Select Date</type>
-      <formatType>activityDateTime</formatType>
+      <formatType>activityDate</formatType>
     </html>
     <add>1.8</add>
   </field>
@@ -92,7 +95,7 @@
     <comment>Date on which given case ends.</comment>
     <html>
       <type>Select Date</type>
-      <formatType>activityDateTime</formatType>
+      <formatType>activityDate</formatType>
     </html>
     <add>1.8</add>
   </field>
@@ -122,6 +125,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <controlField>case_type_id</controlField>
     </html>
     <add>1.8</add>
   </field>

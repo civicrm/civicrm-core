@@ -184,17 +184,19 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if isset($field.cols)}
                       'cols'      => {$field.cols},
 {/if} {* field.cols *}
-
-{if $field.import}
-                      'import'    => {$field.import|strtoupper},
+                      'usage'     => array(
+                                       {foreach from=$field.usage key=usage item=isUsed}'{$usage}' => {$isUsed},
+                                       {/foreach}),
+{if $field.import === 'TRUE'}
+                      'import'    => TRUE,
 
 {/if} {* field.import *}
   'where'     => '{$table.name}.{$field.name}',
   {if $field.headerPattern}'headerPattern' => '{$field.headerPattern}',{/if}
   {if $field.dataPattern}'dataPattern' => '{$field.dataPattern}',{/if}
-{if $field.export}
-                      'export'    => {$field.export|strtoupper},
-{/if} {* field.export *}
+{if $field.export === 'TRUE' || ($field.export === 'FALSE' && $field.import === 'TRUE')}
+                      'export'    => {$field.export},
+{/if} {* field.export - only show if meaningful, deprecated for usage *}
 {if $field.contactType}
                       'contactType' => {if $field.contactType == 'null'}NULL{else}'{$field.contactType}'{/if},
 {/if}

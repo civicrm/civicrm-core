@@ -114,9 +114,9 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testDel() {
+  public function testDel(): void {
     list($contactID, $membershipID) = $this->setupMembership();
-    CRM_Member_BAO_MembershipLog::del($membershipID);
+    CRM_Member_BAO_MembershipLog::deleteRecord(['id' => $membershipID]);
     $this->assertDBNull('CRM_Member_BAO_MembershipLog', $membershipID, 'membership_id',
       'id', 'Database check for deleted membership log.'
     );
@@ -130,7 +130,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testResetModifiedID() {
+  public function testResetModifiedID(): void {
     list($contactID, $membershipID) = $this->setupMembership();
     CRM_Member_BAO_MembershipLog::resetModifiedID($contactID);
     $this->assertDBNull('CRM_Member_BAO_MembershipLog', $contactID, 'modified_id',

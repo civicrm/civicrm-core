@@ -17,34 +17,23 @@
 class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi\Core\HookInterface {
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_OptionGroup', $id, 'is_active', $is_active);
   }
 
@@ -52,18 +41,14 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi
    * Add the Option Group.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   * @param array $ids
-   *   Reference array contains the id.
    *
    * @deprecated
    * @return CRM_Core_DAO_OptionGroup
    */
-  public static function add(&$params, $ids = []) {
-    if (empty($params['id']) && !empty($ids['optionGroup'])) {
-      CRM_Core_Error::deprecatedFunctionWarning('no $ids array');
-      $params['id'] = $ids['optionGroup'];
-    }
+  public static function add($params) {
+    // This is very similar to CRM_Core_DAO::makeNameFromLabel which would be
+    // called automatically via `self::writeRecord()`
+    // TODO: Check if the differences matter, then deprecate this function and switch to writeRecord.
     if (empty($params['name']) && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar(strtolower($params['title']));
     }
@@ -86,6 +71,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi
    * @param int $optionGroupId
    */
   public static function del($optionGroupId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     static::deleteRecord(['id' => $optionGroupId]);
   }
 

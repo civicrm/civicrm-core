@@ -34,7 +34,7 @@ use Civi\Api4\Participant;
  */
 class PseudoconstantTest extends CustomTestBase {
 
-  public function testOptionValue() {
+  public function testOptionValue(): void {
     $cid = $this->createTestRecord('Contact', ['first_name', 'bill'])['id'];
     $subject = uniqid('subject');
     $this->createTestRecord('OptionValue', [
@@ -97,7 +97,7 @@ class PseudoconstantTest extends CustomTestBase {
     $this->assertTrue(is_numeric($act[0]['activity_type_id']));
   }
 
-  public function testAddressOptions() {
+  public function testAddressOptions(): void {
     $cid = $this->createTestRecord('Contact', ['first_name', 'addr'])['id'];
     $addressData = [
       [
@@ -146,7 +146,7 @@ class PseudoconstantTest extends CustomTestBase {
     $this->assertEquals('Spain', $addr[2]['country_id:label']);
   }
 
-  public function testCustomOptions() {
+  public function testCustomOptions(): void {
     $technicolor = [
       ['id' => 'r', 'name' => 'red', 'label' => 'RED', 'color' => '#ff0000', 'description' => 'Red color', 'icon' => 'fa-red'],
       ['id' => 'g', 'name' => 'green', 'label' => 'GREEN', 'color' => '#00ff00', 'description' => 'Green color', 'icon' => 'fa-green'],
@@ -217,7 +217,7 @@ class PseudoconstantTest extends CustomTestBase {
     $this->assertEquals($cid1, $result);
   }
 
-  public function testJoinOptions() {
+  public function testJoinOptions(): void {
     $cid1 = $this->createTestRecord('Contact', [
       'first_name' => 'Tom',
       'gender_id:label' => 'Male',
@@ -258,7 +258,7 @@ class PseudoconstantTest extends CustomTestBase {
     $this->assertNull($emails[$cid3]['contact_id.gender_id:label']);
   }
 
-  public function testTagOptions() {
+  public function testTagOptions(): void {
     $tag = uniqid('tag');
     $this->createTestRecord('Tag', [
       'name' => $tag,
@@ -272,10 +272,11 @@ class PseudoconstantTest extends CustomTestBase {
     $options = array_column($options, NULL, 'name');
     $this->assertEquals('colorful', $options[$tag]['description']);
     $this->assertEquals('#aabbcc', $options[$tag]['color']);
+    $this->assertEquals($tag, $options[$tag]['name']);
     $this->assertEquals($tag, $options[$tag]['label']);
   }
 
-  public function testParticipantRole() {
+  public function testParticipantRole(): void {
     $event = $this->createTestRecord('Event');
     $contact = $this->createTestRecord('Contact');
     $participant = $this->createTestRecord('Participant', [
@@ -300,7 +301,7 @@ class PseudoconstantTest extends CustomTestBase {
     $this->assertArrayNotHasKey($participant['id'], (array) $search2);
   }
 
-  public function testPreloadFalse() {
+  public function testPreloadFalse(): void {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
 

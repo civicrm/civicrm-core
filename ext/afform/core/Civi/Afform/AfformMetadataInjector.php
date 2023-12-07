@@ -14,7 +14,6 @@ namespace Civi\Afform;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
- * Class AfformMetadataInjector
  * @package Civi\Afform
  */
 class AfformMetadataInjector {
@@ -30,8 +29,8 @@ class AfformMetadataInjector {
           $module = \Civi::service('angular')->getModule(basename($path, '.aff.html'));
           $meta = \Civi\Api4\Afform::get(FALSE)->addWhere('name', '=', $module['_afform'])->setSelect(['join_entity', 'entity_type'])->execute()->first();
 
-          // Add ngForm directive to afForm controllers
-          foreach (pq('af-form[ctrl]') as $afForm) {
+          // Add ngForm directive to afForm controller (using loop but there should be only one)
+          foreach (pq('af-form[ctrl]', $doc) as $afForm) {
             pq($afForm)->attr('ng-form', $module['_afform']);
           }
         }
@@ -121,11 +120,24 @@ class AfformMetadataInjector {
     // On a search form, search_range will present a pair of fields (or possibly 3 fields for date select + range)
     $isSearchRange = !empty($fieldDefn['search_range']) && \CRM_Utils_JS::decode($fieldDefn['search_range']);
 
+    // On a search form, the exposed operator requires a list of options.
+    if (!empty($fieldDefn['expose_operator'])) {
+      $operators = Utils::getSearchOperators();
+      // If 'operators' is present in the field definition, use it as a limiter
+      // Afform expects 'operators' in the fieldDefn to be associative key/label, not just a flat array
+      // like it is in the schema.
+      if (!empty($fieldInfo['operators'])) {
+        $operators = array_intersect_key($operators, array_flip($fieldInfo['operators']));
+      }
+      $fieldDefn['operators'] = \CRM_Utils_JS::encode($operators);
+    }
+    unset($fieldInfo['operators']);
+
     // Default placeholder for select inputs
     if ($inputType === 'Select' || $inputType === 'ChainSelect') {
       $fieldInfo['input_attrs']['placeholder'] = E::ts('Select');
     }
-    elseif ($inputType === 'EntityRef' && empty($field['is_id'])) {
+    elseif ($inputType === 'EntityRef' && empty($field['input_attrs']['placeholder'])) {
       $info = civicrm_api4('Entity', 'get', [
         'where' => [['name', '=', $fieldInfo['fk_entity']]],
         'checkPermissions' => FALSE,
@@ -146,6 +158,11 @@ class AfformMetadataInjector {
         }
         $fieldInfo['options'] = $dateOptions;
       }
+    }
+
+    // Boolean checkbox has no options
+    if ($fieldInfo['data_type'] === 'Boolean' && $inputType === 'CheckBox') {
+      unset($fieldInfo['options'], $fieldDefn['options']);
     }
 
     foreach ($fieldInfo as $name => $prop) {

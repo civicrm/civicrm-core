@@ -15,7 +15,7 @@
 <table class="selector row-highlight">
   <thead class="sticky">
   <tr>
-  {if ! $single and $context eq 'Search' }
+  {if ! $single and $context eq 'Search'}
      <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
   {/if}
   {foreach from=$columnHeaders item=header}
@@ -35,8 +35,8 @@
   {foreach from=$rows item=row}
   <tr id='crm-grant_{$row.grant_id}' class="{cycle values="odd-row,even-row"} crm-grant crm-grant_status-{$row.grant_status_id}">
 
-  {if !$single }
-     {if $context eq 'Search' }
+  {if !$single}
+     {if $context eq 'Search'}
         {assign var=cbName value=$row.checkbox}
         <td>{$form.$cbName.html}</td>
      {/if}

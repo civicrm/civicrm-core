@@ -47,7 +47,7 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
       [
         'contact_id' => '3',
         'contact_type' => '<a href="/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3" data-tooltip-url="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4&amp;is_show_email_task=1" class="crm-summary-link"><i class="crm-i fa-fw fa-user" title=""></i></a>',
-        'sort_name' => 'Anderson, Anthony',
+        'sort_name' => 'Anderson, Anthony II',
         'display_name' => 'Mr. Anthony Anderson II',
         'activity_id' => '1',
         'activity_date_time' => '2017-01-30 00:00:00',
@@ -61,7 +61,7 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
         'target_contact_name' => [],
         'assignee_contact_name' => [],
         'source_contact_id' => '3',
-        'source_contact_name' => 'Anderson, Anthony',
+        'source_contact_name' => 'Anderson, Anthony II',
         'checkbox' => 'mark_x_1',
         'mailingId' => '',
         'action' => '<span><a href="/index.php?q=civicrm/contact/view/contribution&amp;action=view&amp;reset=1&amp;id=1&amp;cid=3&amp;context=search&amp;searchContext=activity&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=\'View Activity\' >View</a></span>',
@@ -79,7 +79,7 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
   /**
    * Test the Qill for activity Date time.
    */
-  public function testQill() {
+  public function testQill(): void {
     foreach ($this->getSearchCriteria() as $test_name => $data) {
       $selector = new CRM_Activity_Selector_Search($data['search_criteria']);
       $this->assertEquals($data['expected_qill'], $selector->getQILL(), "Failed for data set: $test_name");

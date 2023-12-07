@@ -349,6 +349,36 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the full form-flow import and make sure we can map source/target external identifier correctly.
+   */
+  public function testImportCSVExternalIdentifier() :void {
+    $contactID1 = $this->individualCreate(['email' => 'mum@example.com', 'external_identifier' => 'individual1']);
+    $contactID2 = $this->individualCreate(['email' => 'mum@example.com', 'external_identifier' => 'individual2'], 'individual_2');
+    $this->importCSV('activityexternalidentifier.csv', [
+      ['name' => 'activity_date_time'],
+      ['name' => 'activity_status_id'],
+      ['name' => 'email'],
+      ['name' => 'activity_type_id'],
+      ['name' => 'activity_details'],
+      ['name' => 'activity_duration'],
+      ['name' => 'priority_id'],
+      ['name' => 'activity_location'],
+      ['name' => 'activity_subject'],
+      ['name' => 'do_not_import'],
+      ['name' => 'source_contact_external_identifier'],
+      ['name' => 'external_identifier'],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $activity = $this->callAPISuccessGetSingle('Activity', ['priority_id' => 'Urgent']);
+    $activityContacts = $this->callAPISuccess('ActivityContact', 'get', ['activity_id' => $activity['id'], 'sequential' => TRUE]);
+    $this->assertCount(2, $activityContacts['values']);
+    $this->assertEquals($activityContacts['values'][0]['contact_id'], $contactID1);
+    $this->assertEquals($activityContacts['values'][1]['contact_id'], $contactID2);
+  }
+
+  /**
    * @param array $submittedValues
    *
    * @return int

@@ -37,9 +37,15 @@ class CRM_Admin_Form extends CRM_Core_Form {
   /**
    * The name of the BAO object for this form.
    *
-   * @var string
+   * @var CRM_Core_DAO|string
    */
   protected $_BAOName;
+
+  /**
+   * Whether to use the legacy `retrieve` method or APIv4 to load values.
+   * @var string
+   */
+  protected $retrieveMethod = 'retrieve';
 
   /**
    * Explicitly declare the form context.
@@ -51,8 +57,8 @@ class CRM_Admin_Form extends CRM_Core_Form {
   /**
    * Note: This type of form was traditionally embedded in a page, with values like _id and _action
    * being `set()` by the page controller.
-   * Nowadays the preferred approach is to place these forms at their own url, so this function
-   * handles both scenarios. It will retrieve id either from a value stored by the page controller
+   * Nowadays the preferred approach is to place these forms at their own url.
+   * This function can handle either scenario. It will retrieve `id` either from a value stored by the page controller
    * if embedded, or from the url if standalone.
    */
   public function preProcess() {
@@ -62,17 +68,17 @@ class CRM_Admin_Form extends CRM_Core_Form {
     // Lookup id from URL or stored value in controller
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
+    // If embedded in a page, this will have been assigned
     $this->_BAOName = $this->get('BAOName');
-    // If BAOName not explicitly set, look it up from the api entity name
+    // Otherwise, look it up from the api entity name
     if (!$this->_BAOName) {
       $this->_BAOName = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getFullName($this->getDefaultEntity()));
     }
-    $this->_values = [];
-    if (isset($this->_id)) {
-      $params = ['id' => $this->_id];
-      // this is needed if the form is outside the CRM name space
-      $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $this->_values);
+    $this->retrieveValues();
+    $this->setPageTitle($this->_BAOName::getEntityTitle());
+    // Once form is submitted, user should be redirected back to the "browse" page.
+    if (isset($this->_BAOName::getEntityPaths()['browse'])) {
+      $this->pushUrlToUserContext($this->_BAOName::getEntityPaths()['browse']);
     }
   }
 
@@ -80,16 +86,12 @@ class CRM_Admin_Form extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   *
    * @return array
    */
   public function setDefaultValues() {
-    // Fetch defaults from the db
-    if (!empty($this->_id) && empty($this->_values) && CRM_Utils_Rule::positiveInteger($this->_id)) {
-      $this->_values = [];
-      $params = ['id' => $this->_id];
-      $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $this->_values);
+    // Fetch defaults from the db if not already retrieved
+    if (empty($this->_values)) {
+      $this->retrieveValues();
     }
     $defaults = $this->_values;
 
@@ -102,14 +104,12 @@ class CRM_Admin_Form extends CRM_Core_Form {
       }
     }
 
-    if ($this->_action == CRM_Core_Action::DELETE &&
-      isset($defaults['name'])
-    ) {
+    if ($this->_action == CRM_Core_Action::DELETE && isset($defaults['name'])) {
       $this->assign('delName', $defaults['name']);
     }
 
-    // its ok if there is no element called is_active
-    $defaults['is_active'] = ($this->_id) ? CRM_Utils_Array::value('is_active', $defaults) : 1;
+    // Field is_active should default to TRUE (if there is no such field, this value will be ignored)
+    $defaults['is_active'] = ($this->_id) ? $defaults['is_active'] ?? 1 : 1;
     if (!empty($defaults['parent_id'])) {
       $this->assign('is_parent', TRUE);
     }
@@ -142,6 +142,30 @@ class CRM_Admin_Form extends CRM_Core_Form {
         ],
       ]);
     }
+  }
+
+  /**
+   * Retrieve entity from the database using legacy retrieve method (default) or APIv4.
+   *
+   * @return array
+   */
+  protected function retrieveValues(): array {
+    $this->_values = [];
+    if (isset($this->_id) && CRM_Utils_Rule::positiveInteger($this->_id)) {
+      if ($this->retrieveMethod === 'retrieve') {
+        $params = ['id' => $this->_id];
+        $this->_BAOName::retrieve($params, $this->_values);
+      }
+      elseif ($this->retrieveMethod === 'api4') {
+        $this->_values = civicrm_api4($this->getDefaultEntity(), 'get', [
+          'where' => [['id', '=', $this->_id]],
+        ])->single();
+      }
+      else {
+        throw new CRM_Core_Exception("Unknown retrieve method '$this->retrieveMethod' in " . get_class($this));
+      }
+    }
+    return $this->_values;
   }
 
 }

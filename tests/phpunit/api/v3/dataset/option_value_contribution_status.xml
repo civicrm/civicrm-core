@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!--  $Id: option_value_activity_status.xml 23668 2009-09-17 11:16:05Z shot $  -->
 <dataset>
   <table name="civicrm_option_value">
     <column>id</column>

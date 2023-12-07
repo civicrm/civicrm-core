@@ -24,7 +24,7 @@ class CRM_Mailing_Event_BAO_MailingEventBounce extends CRM_Mailing_Event_DAO_Mai
    * @return bool|null
    */
   public static function recordBounce(&$params) {
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($params['job_id'] ?? NULL,
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL,
       $params['event_queue_id'] ?? NULL,
       $params['hash'] ?? NULL
     );
@@ -224,7 +224,7 @@ class CRM_Mailing_Event_BAO_MailingEventBounce extends CRM_Mailing_Event_DAO_Mai
       $url = CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$dao->contact_id}"
       );
-      $results[] = array(
+      $results[] = [
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
         // FIXME: translate this
@@ -232,7 +232,7 @@ class CRM_Mailing_Event_BAO_MailingEventBounce extends CRM_Mailing_Event_DAO_Mai
         ),
         'reason' => $dao->reason,
         'date' => CRM_Utils_Date::customFormat($dao->date),
-      );
+      ];
     }
     return $results;
   }

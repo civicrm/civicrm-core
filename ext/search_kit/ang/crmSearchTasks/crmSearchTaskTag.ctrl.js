@@ -14,16 +14,16 @@
 
     crmApi4({
       tags: ['Tag', 'get', {
-        select: ['id', 'name', 'color', 'description', 'is_selectable', 'parent_id'],
+        select: ['id', 'label', 'color', 'description', 'is_selectable', 'parent_id'],
         where: [
           ['is_tagset', '=', false],
           ['used_for:name', 'CONTAINS', this.entity],
           ['OR', [['parent_id', 'IS NULL'], ['parent_id.is_tagset', '=', false]]]
         ],
-        orderBy: {name: 'ASC'}
+        orderBy: {label: 'ASC'}
       }],
       tagsets: ['Tag', 'get', {
-        select: ['id', 'name'],
+        select: ['id', 'name', 'label'],
         where: [['is_tagset', '=', true], ['used_for:name', 'CONTAINS', this.entity]]
       }],
     }).then(function(result) {
@@ -36,7 +36,7 @@
       var sorted = _.transform(rawTags, function(sorted, tag) {
         sorted[tag.id] = {
           id: tag.id,
-          text: tag.name,
+          text: tag.label,
           description: tag.description,
           color: tag.color,
           disabled: !tag.is_selectable,

@@ -90,10 +90,8 @@
             {$row.title|escape}
           </td>
         {/if}
-
-          {assign var=position  value=$field|strrpos:'_'}
-          {assign var=blockId   value=$field|substr:$position+1}
-          {assign var=blockName value=$field|substr:14:$position-14}
+          {assign var=blockId  value=$row.location_block_index}
+          {assign var=blockName value=$row.location_entity}
 
           <td>
             {* @TODO check if this is ever an array or a fileName? *}
@@ -114,7 +112,7 @@
           </td>
 
           <td style='white-space: nowrap'>
-             {if $form.$field}=={$form.$field.html|crmAddClass:"select-row"}==&gt;{/if}
+             {if array_key_exists($field, $form) && $form.$field}=={$form.$field.html|crmAddClass:"select-row"}==&gt;{/if}
           </td>
 
           {* For location blocks *}
@@ -142,12 +140,12 @@
 
             <td>
               {* Display location for fields with locations *}
-              {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im' }
+              {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im'}
                 {$form.location_blocks.$blockName.$blockId.locTypeId.html}&nbsp;
               {/if}
 
               {* Display other_type_id for websites, ims and phones *}
-              {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone' }
+              {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone'}
                 {$form.location_blocks.$blockName.$blockId.typeTypeId.html}&nbsp;
               {/if}
 
@@ -219,7 +217,7 @@
       </tr>
       {else}
       <tr class="{cycle values="even-row,odd-row"}">
-        <td><strong>{ts}Move related...{/ts}</strong></td><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $form.operation.$paramName.add.html}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
+        <td><strong>{ts}Move related...{/ts}</strong></td><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $params.has_operation}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
          <td>({ts}migrate{/ts})</td>
       </tr>
       {/if}

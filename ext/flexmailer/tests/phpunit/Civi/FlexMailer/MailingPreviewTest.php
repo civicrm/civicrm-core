@@ -10,8 +10,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
 
   protected $_groupID;
   protected $_email;
-  protected $_apiversion = 3;
-  protected $_params = array();
+  protected $_params = [];
   protected $_entity = 'Mailing';
   protected $_contactID;
 
@@ -25,7 +24,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
-      $manager->install(array('org.civicrm.flexmailer'));
+      $manager->install(['org.civicrm.flexmailer']);
     }
 
     parent::setUp();
@@ -36,7 +35,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     $this->_contactID = $this->individualCreate();
     $this->_groupID = $this->groupCreate();
     $this->_email = 'test@test.test';
-    $this->_params = array(
+    $this->_params = [
       'subject' => 'Hello {contact.display_name}',
       'body_text' => "This is {contact.display_name}.\nhttps://civicrm.org\nda=({domain.address}) optout=({action.optOutUrl}) subj=({mailing.subject})",
       'body_html' => "<p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>da=({domain.address}) optout=({action.optOutUrl}) subj=({mailing.subject})</p>",
@@ -44,14 +43,14 @@ class MailingPreviewTest extends \CiviUnitTestCase {
       'created_id' => $this->_contactID,
       'header_id' => '',
       'footer_id' => '',
-    );
+    ];
 
-    $this->footer = civicrm_api3('MailingComponent', 'create', array(
+    $this->footer = civicrm_api3('MailingComponent', 'create', [
       'name' => 'test domain footer',
       'component_type' => 'footer',
       'body_html' => '<p>From {domain.address}. To opt out, go to {action.optOutUrl}.</p>',
       'body_text' => 'From {domain.address}. To opt out, go to {action.optOutUrl}.',
-    ));
+    ]);
   }
 
   public function tearDown(): void {
@@ -64,15 +63,15 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     // BEGIN SAMPLE DATA
     $contactID = $this->individualCreate();
     $displayName = $this->callAPISuccess('contact', 'get',
-      array('id' => $contactID));
+      ['id' => $contactID]);
     $displayName = $displayName['values'][$contactID]['display_name'];
     $this->assertTrue(!empty($displayName));
 
     $params = $this->_params;
-    $params['api.Mailing.preview'] = array(
+    $params['api.Mailing.preview'] = [
       'id' => '$value.id',
       'contact_id' => $contactID,
-    );
+    ];
     $params['options']['force_rollback'] = 1;
     // END SAMPLE DATA
 
@@ -131,12 +130,12 @@ class MailingPreviewTest extends \CiviUnitTestCase {
    *   Array(string $table => int $maxID).
    */
   protected function getMaxIds() {
-    return array(
+    return [
       'civicrm_mailing' => \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing'),
       'civicrm_mailing_job' => \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_job'),
       'civicrm_mailing_group' => \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_group'),
       'civicrm_mailing_recipients' => \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_recipients'),
-    );
+    ];
   }
 
   /**

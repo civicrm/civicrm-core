@@ -54,6 +54,9 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
+      'match' => [
+        'name',
+      ],
     ],
   ],
   [
@@ -69,7 +72,7 @@ return [
         'saved_search_id.name' => 'Administer_Financial_Types',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -78,6 +81,7 @@ return [
           'pager' => [
             'show_count' => TRUE,
             'expose_limit' => TRUE,
+            'hide_single' => TRUE,
           ],
           'placeholder' => 5,
           'sort' => [
@@ -147,6 +151,13 @@ return [
                   'join' => '',
                   'target' => '',
                 ],
+              ],
+              'type' => 'buttons',
+              'alignment' => 'text-right',
+            ],
+            [
+              'size' => 'btn-xs',
+              'links' => [
                 [
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
@@ -156,6 +167,24 @@ return [
                   'action' => 'update',
                   'join' => '',
                   'target' => 'crm-popup',
+                ],
+                [
+                  'task' => 'enable',
+                  'entity' => 'FinancialType',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-on',
+                  'text' => E::ts('Enable'),
+                  'style' => 'default',
+                  'condition' => ['is_active', '=', FALSE],
+                ],
+                [
+                  'task' => 'disable',
+                  'entity' => 'FinancialType',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-off',
+                  'text' => E::ts('Disable'),
+                  'style' => 'default',
+                  'condition' => ['is_active', '=', TRUE],
                 ],
                 [
                   'icon' => 'fa-trash',
@@ -168,14 +197,20 @@ return [
                   'target' => 'crm-popup',
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
+              'icon' => 'fa-bars',
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/financial/financialType/edit?reset=1&action=add',
-            'text' => E::ts('Add Financial Type'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'FinancialType',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Financial Type'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [
@@ -187,6 +222,10 @@ return [
           ],
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ],

@@ -377,10 +377,10 @@ class TokenProcessor {
     $useSmarty = !empty($row->context['smarty']);
 
     $tokens = $this->rowValues[$row->tokenRow][$message['format']];
-    $getToken = function(?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use ($tokens, $useSmarty, $row) {
+    $getToken = function(?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use ($tokens, $useSmarty, $row, $message) {
       if (isset($tokens[$entity][$field])) {
         $v = $tokens[$entity][$field];
-        $v = $this->filterTokenValue($v, $modifier, $row);
+        $v = $this->filterTokenValue($v, $modifier, $row, $message['format']);
         if ($useSmarty) {
           $v = \CRM_Utils_Token::tokenEscapeSmarty($v);
         }
@@ -456,10 +456,12 @@ class TokenProcessor {
    * @param array|null $filter
    * @param TokenRow $row
    *   The current target/row.
+   * @param string $messageFormat
+   *   Ex: 'text/plain' or 'text/html'
    * @return string
    * @throws \CRM_Core_Exception
    */
-  private function filterTokenValue($value, ?array $filter, TokenRow $row) {
+  private function filterTokenValue($value, ?array $filter, TokenRow $row, string $messageFormat) {
     // KISS demonstration. This should change... e.g. provide a filter-registry or reuse Smarty's registry...
 
     if ($value instanceof \DateTime && $filter === NULL) {
@@ -470,54 +472,33 @@ class TokenProcessor {
       }
     }
 
+    // TODO: Move this to StandardFilters
     if ($value instanceof Money) {
       switch ($filter[0] ?? NULL) {
         case NULL:
         case 'crmMoney':
-          return \Civi::format()->money($value->getAmount(), $value->getCurrency());
+          return \Civi::format()->money($value->getAmount(), $value->getCurrency(), $filter[1] ?? NULL);
+
+        case 'boolean':
+          // We resolve boolean to 0 or 1 or smarty chokes on FALSE.
+          return (int) $value->getAmount()->isGreaterThan(0);
 
         case 'raw':
           return $value->getAmount();
 
         default:
-          throw new \CRM_Core_Exception("Invalid token filter: " . json_encode($filter, JSON_UNESCAPED_SLASHES));
+          throw new \CRM_Core_Exception('Invalid token filter: ' . json_encode($filter, JSON_UNESCAPED_SLASHES));
       }
     }
 
-    switch ($filter[0] ?? NULL) {
-      case NULL:
-        return $value;
-
-      case 'upper':
-        return mb_strtoupper($value);
-
-      case 'lower':
-        return mb_strtolower($value);
-
-      case 'boolean':
-        // Cast to 0 or 1 for use in text.
-        return (int) ((bool) $value);
-
-      case 'crmDate':
-        if ($value instanceof \DateTime) {
-          // @todo cludgey.
-          require_once 'CRM/Core/Smarty/plugins/modifier.crmDate.php';
-          return \smarty_modifier_crmDate($value->format('Y-m-d H:i:s'), $filter[1] ?? NULL);
-        }
-        if ($value === '') {
-          return $value;
-        }
-
-      case 'default':
-        if (!$value) {
-          return $filter[1];
-        }
-        else {
-          return $value;
-        }
-
-      default:
-        throw new \CRM_Core_Exception('Invalid token filter: ' . json_encode($filter, JSON_UNESCAPED_SLASHES));
+    if (!isset($filter[0])) {
+      return $value;
+    }
+    elseif (is_callable([StandardFilters::class, $filter[0]])) {
+      return call_user_func([StandardFilters::class, $filter[0]], $value, $filter, $messageFormat);
+    }
+    else {
+      throw new \CRM_Core_Exception('Invalid token filter: ' . json_encode($filter, JSON_UNESCAPED_SLASHES));
     }
   }
 

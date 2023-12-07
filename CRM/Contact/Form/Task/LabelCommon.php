@@ -182,7 +182,7 @@ class CRM_Contact_Form_Task_LabelCommon {
         $valuesothers = CRM_Core_BAO_Location::getValues($paramsothers, $valuesothers);
         if ($locationTypeID) {
           foreach ($valuesothers as $vals) {
-            if (CRM_Utils_Array::value('location_type_id', $vals) ==
+            if (($vals['location_type_id'] ?? NULL) ==
               $locationTypeID
             ) {
               foreach ($vals as $k => $v) {

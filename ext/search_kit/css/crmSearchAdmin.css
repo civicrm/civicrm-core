@@ -11,6 +11,10 @@
   top: 0;
 }
 
+#bootstrap-theme .crm-search-admin-search-listing-buttons {
+  min-width: 66px;
+}
+
 #bootstrap-theme.crm-search .nav-stacked {
   margin-left: 0;
   margin-right: 20px;
@@ -26,6 +30,16 @@
 
 #bootstrap-theme.crm-search .form-control.huge {
   width: 275px;
+}
+
+/* Style expires_date date/time width */
+#bootstrap-theme.crm-search #expires_date + input,
+#bootstrap-theme.crm-search #expires_date + input + input {
+  width: calc(100% - 30px);
+}
+/* Hide time field if date & time are both empty */
+#bootstrap-theme.crm-search #expires_date + input:placeholder-shown + input:placeholder-shown {
+  display: none;
 }
 
 #bootstrap-theme.crm-search div.form-control.disabled,
@@ -142,7 +156,7 @@
 }
 
 #bootstrap-theme.crm-search .api4-operator {
-  width: 110px;
+  width: 235px;
 }
 
 #bootstrap-theme.crm-search input[type=number] {

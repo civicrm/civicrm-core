@@ -206,10 +206,10 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     $this->addElement('checkbox', 'is_share', ts('Add footer region with Twitter, Facebook and LinkedIn share buttons and scripts?'));
 
     // is active ?
-    $this->add('checkbox', 'is_active', ts('Is Active?'));
+    $this->add('checkbox', 'is_active', ts('Active?'));
 
     // is default ?
-    $this->add('checkbox', 'is_default', ts('Is Default?'));
+    $this->add('checkbox', 'is_default', ts('Default?'));
 
     // add buttons
     $this->addButtons(
@@ -291,12 +291,12 @@ WHERE  $whereClause
 
     $params['last_modified_id'] = $session->get('userID');
     $params['last_modified_date'] = date('YmdHis');
-    $params['is_share'] = CRM_Utils_Array::value('is_share', $params, FALSE);
+    $params['is_share'] = $params['is_share'] ?? FALSE;
 
     if ($this->_surveyId) {
 
       if ($this->_action & CRM_Core_Action::DELETE) {
-        CRM_Campaign_BAO_Survey::del($this->_surveyId);
+        CRM_Campaign_BAO_Survey::deleteRecord(['id' => $this->_surveyId]);
         CRM_Core_Session::setStatus(ts(' Petition has been deleted.'), ts('Record Deleted'), 'success');
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=petition'));
         return;
@@ -309,9 +309,9 @@ WHERE  $whereClause
       $params['created_date'] = date('YmdHis');
     }
 
-    $params['bypass_confirm'] = CRM_Utils_Array::value('bypass_confirm', $params, 0);
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, 0);
-    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
+    $params['bypass_confirm'] = $params['bypass_confirm'] ?? 0;
+    $params['is_active'] = $params['is_active'] ?? 0;
+    $params['is_default'] = $params['is_default'] ?? 0;
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->getEntityId(), $this->getDefaultEntity());
 

@@ -21,6 +21,7 @@ use Civi\Api4\Contribution;
  * This class generates form components for Payment-Instrument.
  */
 class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
+  use CRM_Contribute_Form_ContributeFormTrait;
 
   /**
    * Set variables up before form is built.
@@ -28,7 +29,9 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $id = $this->getID();
+    $id = $this->getContributionID();
+    $this->assign('taxTerm', Civi::settings()->get('tax_term'));
+    $this->assign('getTaxDetails', \Civi::settings()->get('invoicing'));
 
     // Check permission for action.
     $actionMapping = [
@@ -82,11 +85,11 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $values['contribution_page_title'] = '';
     if (!empty($values['contribution_page_id'])) {
       $contribPages = CRM_Contribute_PseudoConstant::contributionPage(NULL, TRUE);
-      $values['contribution_page_title'] = CRM_Utils_Array::value(CRM_Utils_Array::value('contribution_page_id', $values), $contribPages);
+      $values['contribution_page_title'] = $contribPages[$values['contribution_page_id']] ?? '';
     }
 
     // get received into i.e to_financial_account_id from last trxn
-    $financialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getID(), 'DESC');
+    $financialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getContributionID(), 'DESC');
     $values['to_financial_account'] = '';
     $values['payment_processor_name'] = '';
     if (!empty($financialTrxnId['financialTrxnId'])) {
@@ -176,7 +179,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     //assign soft credit record if exists.
-    $SCRecords = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->getID(), TRUE);
+    $SCRecords = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->getContributionID(), TRUE);
     $this->assign('softContributions', empty($SCRecords['soft_credit']) ? NULL : $SCRecords['soft_credit']);
     // unset doesn't complain if array member missing
     unset($SCRecords['soft_credit']);
@@ -191,7 +194,8 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     //do check for campaigns
     $values['campaign'] = '';
-    if ($campaignId = CRM_Utils_Array::value('campaign_id', $values)) {
+    $campaignId = $values['campaign_id'] ?? NULL;
+    if ($campaignId) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
     }
@@ -265,7 +269,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=update&context={$context}&key={$searchKey}";
       }
       if (!$contribution['is_template']) {
-        foreach (CRM_Contribute_BAO_Contribution::getContributionPaymentLinks($this->getID(), $contributionStatus) as $paymentButton) {
+        foreach (CRM_Contribute_BAO_Contribution::getContributionPaymentLinks($this->getContributionID(), $contributionStatus) as $paymentButton) {
           $paymentButton['icon'] = 'fa-plus-circle';
           $linkButtons[] = $paymentButton;
         }
@@ -377,7 +381,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     try {
       return Contribution::checkAccess()
         ->setAction($action)
-        ->addValue('id', $this->getID())
+        ->addValue('id', $this->getContributionID())
         ->execute()->first()['access'];
     }
     catch (CRM_Core_Exception $e) {
@@ -386,16 +390,33 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
   }
 
   /**
-   * Get the contribution ID.
+   * Get the selected Contribution ID.
    *
-   * @return int
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
    */
-  private function getID(): int {
+  public function getContributionID(): ?int {
     $id = $this->get('id');
-    if (empty($id)) {
-      CRM_Core_Error::statusBounce('Contribution ID is required');
+    if (!$id) {
+      $id = CRM_Utils_Request::retrieve('id', 'Positive');
     }
-    return $id;
+    return (int) $id;
+  }
+
+  /**
+   * Get id of contribution page being acted on.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getContributionPageID(): ?int {
+    return $this->getContributionID() ? $this->getContributionValue('contribution_page_id') : NULL;
   }
 
 }

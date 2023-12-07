@@ -68,7 +68,7 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
 
       // Form an expected array replacing tokens for each contact.
       foreach ($tokens as $key => $val) {
-        if (CRM_Utils_String::endsWith($val, '_date')) {
+        if (str_ends_with($val, '_date')) {
           $formattedDate = CRM_Utils_Date::customFormat($params[$val]);
           $expected[$contactId][$val] = "{$key} - {$formattedDate}";
         }
@@ -79,7 +79,7 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
     }
 
     /** @var CRM_Member_Form_Task_PDFLetter $form */
-    $form = $this->getFormObject('CRM_Member_Form_Task_PDFLetter', [
+    $form = $this->getSearchFormObject('CRM_Member_Form_Task_PDFLetter', [
       'subject' => '{contact.first_name} {membership.source}',
       'html_message' => $htmlMessage,
     ], NULL, $searchFormValues);
@@ -109,9 +109,9 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
       'Test Fee' => 'fee',
       'Test Type' => 'membership_type_id:label',
       'Test Status' => 'status_id:label',
-      'Test Join Date' => 'join_date',
-      'Test Start Date' => 'start_date',
-      'Test End Date' => 'end_date',
+      'Test Member Since' => 'join_date',
+      'Test Membership Start Date' => 'start_date',
+      'Test Membership Expiration Date' => 'end_date',
     ];
 
     $html = '';

@@ -14,7 +14,7 @@
     <div class="messages status no-popup">
         <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
     {ts 1=$title}Are you sure you want to delete the group %1?{/ts}<br /><br />
-    {if $count}
+    {if $count !== NULL}
         {ts count=$count plural='This group currently has %count members in it.'}This group currently has one member in it.{/ts}
     {/if}
     {ts}Deleting this group will NOT delete the member contact records. However, all contact subscription information and history for this group will be deleted.{/ts} {ts}If this group is used in CiviCRM profiles, those fields will be reset.{/ts} {ts}This action cannot be undone.{/ts}

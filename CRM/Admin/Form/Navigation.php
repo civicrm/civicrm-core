@@ -37,8 +37,6 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $this->setPageTitle(ts('Menu Item'));
-
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -77,11 +75,11 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
     //make separator location configurable
     $separator = CRM_Core_SelectValues::navigationMenuSeparator();
-    $this->add('select', 'has_separator', ts('Separator'), $separator);
+    $this->add('select', 'has_separator', ts('Separator'), $separator, FALSE, ['class' => 'crm-select2']);
 
     $active = $this->add('advcheckbox', 'is_active', ts('Enabled'));
 
-    if (CRM_Utils_Array::value('name', $this->_defaults) == 'Home') {
+    if (($this->_defaults['name'] ?? NULL) == 'Home') {
       $active->freeze();
     }
     else {
@@ -95,7 +93,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
       $homeMenuId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Home', 'id', 'name');
       unset($parentMenu[$homeMenuId]);
 
-      $this->add('select', 'parent_id', ts('Parent'), ['' => ts('Top level')] + $parentMenu, FALSE, ['class' => 'crm-select2']);
+      $this->add('select', 'parent_id', ts('Parent'), ['' => ts('Top level')] + $parentMenu, FALSE, ['class' => 'crm-select2 huge']);
     }
   }
 

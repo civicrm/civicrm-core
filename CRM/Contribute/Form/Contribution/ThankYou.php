@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Membership;
+
 /**
  * Form for thank-you / success page - 3rd step of online contribution process.
  */
@@ -34,20 +36,28 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    */
-  public function preProcess() {
+  public function preProcess(): void {
     parent::preProcess();
 
     $this->_params = $this->get('params');
-    $this->_lineItem = $this->get('lineItem');
     $this->_useForMember = $this->get('useForMember');
-    $is_deductible = $this->get('is_deductible');
-    $this->assign('is_deductible', $is_deductible);
     $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->_values));
     $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $this->_values));
     $this->assign('thankyou_footer', CRM_Utils_Array::value('thankyou_footer', $this->_values));
     $this->assign('max_reminders', CRM_Utils_Array::value('max_reminders', $this->_values));
     $this->assign('initial_reminder_day', CRM_Utils_Array::value('initial_reminder_day', $this->_values));
+    // Link (button) for users to create their own Personal Campaign page
+    if ($linkText = CRM_PCP_BAO_PCP::getPcpBlockStatus($this->getContributionPageID(), 'contribute')) {
+      $linkTextUrl = CRM_Utils_System::url('civicrm/contribute/campaign',
+        'action=add&reset=1&pageId=' . $this->getContributionPageID() . '&component=contribute',
+        FALSE, NULL, TRUE
+      );
+    }
+    $this->assign('linkTextUrl', $linkTextUrl ?? NULL);
+    $this->assign('linkText', $linkText);
     $this->setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values));
     // Make the contributionPageID available to the template
     $this->assign('contributionPageID', $this->_id);
@@ -58,7 +68,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     if ($this->_params['is_pay_later']) {
       $this->assign('pay_later_receipt', $this->_values['pay_later_receipt']);
     }
-    $this->assign('is_for_organization', CRM_Utils_Array::value('is_for_organization', $this->_params));
+    $this->assign('is_for_organization', $this->_params['is_for_organization'] ?? NULL);
   }
 
   /**
@@ -78,57 +88,38 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     // FIXME: Some of this code is identical to Confirm.php and should be broken out into a shared function
     $this->assignToTemplate();
     $this->_ccid = $this->get('ccid');
-    $productID = $this->get('productID');
     $option = $this->get('option');
     $membershipTypeID = $this->get('membershipTypeID');
     $this->assign('receiptFromEmail', CRM_Utils_Array::value('receipt_from_email', $this->_values));
 
-    if ($productID) {
-      CRM_Contribute_BAO_Premium::buildPremiumBlock($this, $this->_id, FALSE, $productID, $option);
+    if ($this->getProductID()) {
+      $this->buildPremiumsBlock(FALSE, $option);
     }
 
     $params = $this->_params;
-    $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
-    // Make a copy of line items array to use for display only
-    $tplLineItems = $this->_lineItem;
-    if ($invoicing) {
-      $getTaxDetails = FALSE;
-      foreach ($this->_lineItem as $key => $value) {
-        foreach ($value as $k => $v) {
-          if (isset($v['tax_rate'])) {
-            if ($v['tax_rate'] != '') {
-              $getTaxDetails = TRUE;
-              // Cast to float to display without trailing zero decimals
-              $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
-            }
-          }
-        }
-      }
-      $this->assign('getTaxDetails', $getTaxDetails);
-      $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
-      $this->assign('totalTaxAmount', $params['tax_amount']);
-    }
-
-    if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-      $this->assign('lineItem', $tplLineItems);
-    }
-    else {
+    $this->assign('getTaxDetails', (bool) $this->order->getTotalTaxAmount());
+    $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
+    $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
+    $this->assign('lineItem', $this->isQuickConfig() ? NULL : [$this->getPriceSetID() => $this->order->getLineItems()]);
+    if (!$this->isQuickConfig()) {
       if (is_array($membershipTypeID)) {
         $membershipTypeID = current($membershipTypeID);
       }
-      $this->assign('is_quick_config', 1);
       $this->_params['is_quick_config'] = 1;
     }
-    $this->assign('priceSetID', $this->_priceSetId);
+    $this->assign('is_quick_config', $this->isQuickConfig());
+    $this->assign('priceSetID', $this->getPriceSetID());
     $this->assign('useForMember', $this->get('useForMember'));
 
     if (!empty($this->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
-      $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
+      $softCreditTypes = CRM_Core_OptionGroup::values('soft_credit_type', FALSE);
 
       $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
       CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor']);
@@ -140,9 +131,9 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $qParams = "reset=1&amp;id={$this->_id}";
     //pcp elements
+    $this->assign('pcpBlock', FALSE);
     if ($this->_pcpId) {
       $qParams .= "&amp;pcpId={$this->_pcpId}";
-      $this->assign('pcpBlock', FALSE);
 
       // display honor roll data only if it's enabled for the PCP page
       if (!empty($this->_pcpInfo['is_honor_roll'])) {
@@ -161,19 +152,17 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     }
 
     $this->assign('qParams', $qParams);
-
+    $this->assign('membershipBlock', $this->_membershipBlock);
+    $this->assign('membership_trx_id', $this->get('membership_trx_id'));
     if ($membershipTypeID) {
-      $transactionID = $this->get('membership_trx_id');
       $membershipAmount = $this->get('membership_amount');
       $renewalMode = $this->get('renewal_mode');
-      $this->assign('membership_trx_id', $transactionID);
       $this->assign('membership_amount', $membershipAmount);
       $this->assign('renewal_mode', $renewalMode);
 
       $this->buildMembershipBlock(
         $this->_membershipContactID,
-        $membershipTypeID,
-        NULL
+        $membershipTypeID
       );
 
       if (!empty($params['auto_renew'])) {
@@ -182,7 +171,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     }
 
     $this->_separateMembershipPayment = $this->get('separateMembershipPayment');
-    $this->assign("is_separate_payment", $this->_separateMembershipPayment);
+    $this->assign('is_separate_payment', $this->_separateMembershipPayment);
 
     if (empty($this->_ccid)) {
       $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
@@ -206,6 +195,9 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
       $this->buildCustom($this->_values['onbehalf_profile_id'], 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
     }
+    else {
+      $this->assign('onbehalfProfile');
+    }
 
     $this->_trxnId = $this->_params['trxn_id'] ?? NULL;
 
@@ -218,7 +210,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $defaults = [];
     $fields = [];
     foreach ($this->_fields as $name => $dontCare) {
-      if ($name != 'onbehalf' || $name != 'honor') {
+      if ($name !== 'onbehalf' || $name !== 'honor') {
         $fields[$name] = 1;
       }
     }
@@ -267,15 +259,18 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $subUrl = "eid={$this->_id}&pcomponent=contribute";
       $tellAFriend = TRUE;
     }
+    else {
+      $this->assign('friendText');
+    }
 
     if ($tellAFriend) {
       if ($this->_action & CRM_Core_Action::PREVIEW) {
-        $url = CRM_Utils_System::url("civicrm/friend",
+        $url = CRM_Utils_System::url('civicrm/friend',
           "reset=1&action=preview&{$subUrl}"
         );
       }
       else {
-        $url = CRM_Utils_System::url("civicrm/friend",
+        $url = CRM_Utils_System::url('civicrm/friend',
           "reset=1&{$subUrl}"
         );
       }
@@ -299,19 +294,17 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
    *   Contact checked for having a current membership for a particular membership.
    * @param int|array $selectedMembershipTypeID
    *   Selected membership id.
-   * @param null $isTest
    *
    * @return bool
    *   Is this a separate membership payment
    *
    * @throws \CRM_Core_Exception
    */
-  private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL, $isTest = NULL) {
+  private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL) {
     $separateMembershipPayment = FALSE;
     if ($this->_membershipBlock) {
-      $this->_currentMemberships = [];
 
-      $membershipTypeIds = $membershipTypes = $radio = $radioOptAttrs = [];
+      $membershipTypeIds = $membershipTypes = [];
       $membershipPriceset = (!empty($this->_priceSetId) && $this->_useForMember);
 
       $autoRenewMembershipTypeOptions = [];
@@ -336,19 +329,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       }
 
       if (!empty($membershipTypeIds)) {
-        //set status message if wrong membershipType is included in membershipBlock
-        if (isset($this->_mid) && !$membershipPriceset) {
-          $membershipTypeID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-            $this->_mid,
-            'membership_type_id'
-          );
-          if (!in_array($membershipTypeID, $membershipTypeIds)) {
-            CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Invalid Membership'), 'error');
-          }
-        }
-
         $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIds);
-        $this->_membershipTypeValues = $membershipTypeValues;
         $endDate = NULL;
 
         // Check if we support auto-renew on this contribution page
@@ -374,52 +355,38 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
           elseif ($memType['is_active']) {
 
             if ($allowAutoRenewOpt) {
-              $javascriptMethod = ['onclick' => "return showHideAutoRenew( this.value );"];
               $isAvailableAutoRenew = $this->_membershipBlock['auto_renew'][$value] ?? 1;
               $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = (int) $memType['auto_renew'] * $isAvailableAutoRenew;
-              $allowAutoRenewMembership = TRUE;
             }
             else {
-              $javascriptMethod = NULL;
               $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = 0;
             }
 
             //add membership type.
-            $radio[$memType['id']] = NULL;
-            $radioOptAttrs[$memType['id']] = $javascriptMethod;
             if ($cid) {
-              $membership = new CRM_Member_DAO_Membership();
-              $membership->contact_id = $cid;
-              $membership->membership_type_id = $memType['id'];
-
               //show current membership, skip pending and cancelled membership records,
               //because we take first membership record id for renewal
-              $membership->whereAdd('status_id != 5 AND status_id !=6');
+              $membership = Membership::get(FALSE)
+                ->addSelect('end_date', 'membership_type_id', 'membership_type_id.duration_unit:name')
+                ->addWhere('contact_id', '=', $cid)
+                ->addWhere('membership_type_id', '=', $memType['id'])
+                ->addWhere('status_id:name', 'NOT IN', ['Cancelled', 'Pending'])
+                // @todo - this FALSE is dubious but respects the previous code behaviour.
+                // This code is from a previously shared function & likely not relevant on the
+                // thank you form anyway....
+                ->addWhere('is_test', '=', FALSE)
+                ->addOrderBy('end_date', 'DESC')
+                ->execute()
+                ->first();
 
-              if (!is_null($isTest)) {
-                $membership->is_test = $isTest;
-              }
-
-              //CRM-4297
-              $membership->orderBy('end_date DESC');
-
-              if ($membership->find(TRUE)) {
-                if (!$membership->end_date) {
-                  unset($radio[$memType['id']]);
-                  unset($radioOptAttrs[$memType['id']]);
-                  $this->assign('islifetime', TRUE);
-                  continue;
-                }
+              if ($membership && $membership['membership_type_id.duration_unit:name'] !== 'lifetime') {
                 $this->assign('renewal_mode', TRUE);
-                $this->_currentMemberships[$membership->membership_type_id] = $membership->membership_type_id;
-                $memType['current_membership'] = $membership->end_date;
+                $memType['current_membership'] = $membership['end_date'];
                 if (!$endDate) {
                   $endDate = $memType['current_membership'];
-                  $this->_defaultMemTypeId = $memType['id'];
                 }
                 if ($memType['current_membership'] < $endDate) {
                   $endDate = $memType['current_membership'];
-                  $this->_defaultMemTypeId = $memType['id'];
                 }
               }
             }
@@ -428,7 +395,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
         }
       }
 
-      $this->assign('membershipBlock', $this->_membershipBlock);
       $this->assign('showRadio', FALSE);
       $this->assign('membershipTypes', $membershipTypes);
       $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));

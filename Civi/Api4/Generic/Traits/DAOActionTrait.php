@@ -13,7 +13,6 @@
 namespace Civi\Api4\Generic\Traits;
 
 use Civi\Api4\CustomField;
-use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
@@ -103,7 +102,7 @@ trait DAOActionTrait {
   protected function writeObjects($items) {
     $updateWeights = FALSE;
     // Adjust weights for sortable entities
-    if (in_array('SortableEntity', CoreUtil::getInfoItem($this->getEntityName(), 'type'))) {
+    if (CoreUtil::isType($this->getEntityName(), 'SortableEntity')) {
       $weightField = CoreUtil::getInfoItem($this->getEntityName(), 'order_by');
       // Only take action if updating a single record, or if no weights are specified in any record
       // This avoids messing up a bulk update with multiple recalculations
@@ -112,6 +111,9 @@ trait DAOActionTrait {
       }
     }
 
+    // Values specified by entity definition (e.g. 'Individual', 'Organization', 'Household' pseudo-entities specify `contact_type`)
+    $presetValues = CoreUtil::getInfoItem($this->getEntityName(), 'where') ?? [];
+
     $result = [];
     $idField = CoreUtil::getIdFieldName($this->getEntityName());
 
@@ -119,6 +121,10 @@ trait DAOActionTrait {
       $entityId = $item[$idField] ?? NULL;
       FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);
+
+      if (!$entityId) {
+        $item = $presetValues + $item;
+      }
 
       // Adjust weights for sortable entities
       if ($updateWeights) {
@@ -140,7 +146,9 @@ trait DAOActionTrait {
     }
 
     \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
-    FormattingUtil::formatOutputValues($result, $this->entityFields());
+    foreach ($result as &$row) {
+      FormattingUtil::formatOutputValues($row, $this->entityFields());
+    }
     return $result;
   }
 
@@ -240,14 +248,14 @@ trait DAOActionTrait {
         continue;
       }
 
-      // Null and empty string are interchangeable as far as the custom bao understands
-      if (NULL === $value) {
-        $value = '';
-      }
-
       if ($field['suffix']) {
         $options = FormattingUtil::getPseudoconstantList($field, $name, $params, $this->getActionName());
         $value = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
+      }
+
+      // Null and empty string are interchangeable as far as the custom bao understands
+      if (NULL === $value) {
+        $value = '';
       }
 
       if ($field['html_type'] === 'CheckBox') {
@@ -309,7 +317,7 @@ trait DAOActionTrait {
         $field['table_name'] = $field['custom_group_id.table_name'];
         unset($field['custom_group_id.table_name']);
         $field['name'] = $groupName . '.' . $name;
-        $field['entity'] = CustomGroupJoinable::getEntityFromExtends($field['custom_group_id.extends']);
+        $field['entity'] = \CRM_Core_BAO_CustomGroup::getEntityFromExtends($field['custom_group_id.extends']);
         $info[$name] = $field;
       }
       \Civi::cache('metadata')->set($cacheKey, $info);

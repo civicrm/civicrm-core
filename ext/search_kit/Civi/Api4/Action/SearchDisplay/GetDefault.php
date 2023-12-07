@@ -8,18 +8,19 @@ use Civi\Api4\Utils\FormattingUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Search\Display;
 use CRM_Search_ExtensionUtil as E;
-use Civi\Api4\Query\SqlEquation;
-use Civi\Api4\Query\SqlExpression;
 use Civi\Api4\Query\SqlField;
-use Civi\Api4\Query\SqlFunction;
 use Civi\Api4\Query\SqlFunctionGROUP_CONCAT;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
- * Return the default results table for a saved search.
+ * Generate the default display for a saved search.
+ *
+ * Dispatches `civi.search.defaultDisplay` event to allow subscribers to provide a display based on context.
  *
  * @method $this setType(string $type)
  * @method string getType()
+ * @method $this setContext(array $context)
+ * @method array getContext()
  * @package Civi\Api4\Action\SearchDisplay
  */
 class GetDefault extends \Civi\Api4\Generic\AbstractAction {
@@ -41,9 +42,10 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
   protected $type = 'table';
 
   /**
+   * Provide context information; passed through to `civi.search.defaultDisplay` subscribers
    * @var array
    */
-  private $_joinMap;
+  protected $context = [];
 
   /**
    * @param \Civi\Api4\Generic\Result $result
@@ -60,6 +62,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
     if (!strlen($label) && !empty($this->savedSearch['api_entity'])) {
       $label = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'title_plural');
     }
+    // Initialize empty display
     $display = [
       'id' => NULL,
       'name' => NULL,
@@ -76,6 +79,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
       'savedSearch' => $this->savedSearch,
       'display' => &$display,
       'apiAction' => $this,
+      'context' => $this->context,
     ]));
 
     $fields = $this->entityFields();
@@ -91,14 +95,13 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
         $display[$fieldExpr] = $display[$fieldName];
       }
     }
-    $results = [$display];
     // Replace pseudoconstants e.g. type:icon
-    FormattingUtil::formatOutputValues($results, $fields);
-    $result->exchangeArray($this->selectArray($results));
+    FormattingUtil::formatOutputValues($display, $fields);
+    $result->exchangeArray($this->selectArray([$display]));
   }
 
   /**
-   * @param array{fields: array, expr: SqlExpression, dataType: string} $clause
+   * @param array{fields: array, expr: \Civi\Api4\Query\SqlExpression, dataType: string} $clause
    * @param string $key
    * @return array
    */
@@ -114,77 +117,14 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * @param \Civi\Api4\Query\SqlExpression $expr
-   * @return string
-   */
-  private function getColumnLabel(SqlExpression $expr) {
-    if ($expr instanceof SqlFunction) {
-      $args = [];
-      foreach ($expr->getArgs() as $arg) {
-        foreach ($arg['expr'] ?? [] as $ex) {
-          $args[] = $this->getColumnLabel($ex);
-        }
-      }
-      return '(' . $expr->getTitle() . ')' . ($args ? ' ' . implode(',', array_filter($args)) : '');
-    }
-    if ($expr instanceof SqlEquation) {
-      $args = [];
-      foreach ($expr->getArgs() as $arg) {
-        if (is_array($arg) && !empty($arg['expr'])) {
-          $args[] = $this->getColumnLabel(SqlExpression::convert($arg['expr']));
-        }
-      }
-      return '(' . implode(',', array_filter($args)) . ')';
-    }
-    elseif ($expr instanceof SqlField) {
-      $field = $this->getField($expr->getExpr());
-      $label = '';
-      if (!empty($field['explicit_join'])) {
-        $label = $this->getJoinLabel($field['explicit_join']) . ': ';
-      }
-      if (!empty($field['implicit_join']) && empty($field['custom_field_id'])) {
-        $field = $this->getField(substr($expr->getAlias(), 0, -1 - strlen($field['name'])));
-      }
-      return $label . $field['label'];
-    }
-    else {
-      return NULL;
-    }
-  }
-
-  /**
-   * @param string $joinAlias
-   * @return string
-   */
-  private function getJoinLabel($joinAlias) {
-    if (!isset($this->_joinMap)) {
-      $this->_joinMap = [];
-      $joinCount = [$this->savedSearch['api_entity'] => 1];
-      foreach ($this->savedSearch['api_params']['join'] ?? [] as $join) {
-        [$entityName, $alias] = explode(' AS ', $join[0]);
-        $num = '';
-        if (!empty($joinCount[$entityName])) {
-          $num = ' ' . (++$joinCount[$entityName]);
-        }
-        else {
-          $joinCount[$entityName] = 1;
-        }
-        $label = CoreUtil::getInfoItem($entityName, 'title');
-        $this->_joinMap[$alias] = $label . $num;
-      }
-    }
-    return $this->_joinMap[$joinAlias];
-  }
-
-  /**
    * @param array $col
-   * @param array{fields: array, expr: SqlExpression, dataType: string} $clause
+   * @param array{fields: array, expr: \Civi\Api4\Query\SqlExpression, dataType: string} $clause
    */
   private function getColumnLink(&$col, $clause) {
     if ($clause['expr'] instanceof SqlField || $clause['expr'] instanceof SqlFunctionGROUP_CONCAT) {
       $field = \CRM_Utils_Array::first($clause['fields'] ?? []);
       if ($field &&
-        CoreUtil::getInfoItem($field['entity'], 'label_field') === $field['name'] &&
+        in_array($field['name'], array_merge(CoreUtil::getSearchFields($field['entity']), [CoreUtil::getInfoItem($field['entity'], 'label_field')]), TRUE) &&
         !empty(CoreUtil::getInfoItem($field['entity'], 'paths')['view'])
       ) {
         $col['link'] = [
@@ -206,46 +146,27 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
    */
   public function getLinksMenu() {
     $menu = [];
+    $discard = array_flip(['add', 'browse']);
     $mainEntity = $this->savedSearch['api_entity'] ?? NULL;
     if ($mainEntity && !$this->canAggregate(CoreUtil::getIdFieldName($mainEntity))) {
-      foreach (CoreUtil::getInfoItem($mainEntity, 'paths') as $action => $path) {
-        $link = $this->formatMenuLink($mainEntity, $action);
-        if ($link) {
-          $menu[] = $link;
-        }
+      foreach (array_diff_key(Display::getEntityLinks($mainEntity, TRUE), $discard) as $link) {
+        $link['join'] = NULL;
+        $menu[] = $link;
       }
     }
     $keys = ['entity' => TRUE, 'bridge' => TRUE];
     foreach ($this->getJoins() as $join) {
       if (!$this->canAggregate($join['alias'] . '.' . CoreUtil::getIdFieldName($join['entity']))) {
         foreach (array_filter(array_intersect_key($join, $keys)) as $joinEntity) {
-          foreach (CoreUtil::getInfoItem($joinEntity, 'paths') as $action => $path) {
-            $link = $this->formatMenuLink($joinEntity, $action, $join['alias']);
-            if ($link) {
-              $menu[] = $link;
-            }
+          $joinLabel = $this->getJoinLabel($join['alias']);
+          foreach (array_diff_key(Display::getEntityLinks($joinEntity, $joinLabel), $discard) as $link) {
+            $link['join'] = $join['alias'];
+            $menu[] = $link;
           }
         }
       }
     }
     return $menu;
-  }
-
-  /**
-   * @param string $entity
-   * @param string $action
-   * @param string $joinAlias
-   * @return array|NULL
-   */
-  private function formatMenuLink(string $entity, string $action, string $joinAlias = NULL) {
-    if ($joinAlias && $entity === $this->getJoin($joinAlias)['entity']) {
-      $entityLabel = $this->getJoinLabel($joinAlias);
-    }
-    else {
-      $entityLabel = TRUE;
-    }
-    $link = Display::getEntityLinks($entity, $entityLabel)[$action] ?? NULL;
-    return $link ? $link + ['join' => $joinAlias] : NULL;
   }
 
   /**

@@ -127,11 +127,10 @@ class CRM_Contribute_Form_AdditionalInfo {
     }
 
     $form->add('select', 'contribution_page_id',
-      ts('Online Contribution Page'),
-      [
-        '' => ts('- select -'),
-      ] +
-      CRM_Contribute_PseudoConstant::contributionPage()
+      ts('Contribution Page'),
+      ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::contributionPage(),
+      FALSE,
+      ['class' => 'crm-select2']
     );
 
     $form->add('textarea', 'note', ts('Notes'), ["rows" => 4, "cols" => 60]);
@@ -148,9 +147,11 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * Build the form object for PaymentReminders Information.
    *
+   * @deprecated since 5.68 will be removed around 5.78.
    * @param CRM_Core_Form $form
    */
   public static function buildPaymentReminders(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative, will be removed around 5.78');
     //PaymentReminders section
     $form->add('hidden', 'hidden_PaymentReminders', 1);
     $form->add('text', 'initial_reminder_day', ts('Send Initial Reminder'), ['size' => 3]);
@@ -256,7 +257,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $noteID = [];
     if ($contributionNoteID) {
       $noteID = ["id" => $contributionNoteID];
-      $noteParams['note'] = $noteParams['note'] ? $noteParams['note'] : "null";
+      $noteParams['note'] = $noteParams['note'] ?: "null";
     }
     CRM_Core_BAO_Note::add($noteParams, $noteID);
   }
@@ -366,10 +367,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $form->assign('ccContribution', $ccContribution);
     if ($ccContribution) {
       $form->assignBillingName($params);
-      $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-        $params,
-        $form->_bltID
-      ));
+      $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params));
 
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
       $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);

@@ -18,7 +18,7 @@
       mode: '@'
     },
     controllerAs: 'editor',
-    controller: function($scope, crmApi4, afGui, $parse, $timeout, $location) {
+    controller: function($scope, crmApi4, afGui, $parse, $timeout) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
 
       this.afform = null;
@@ -44,8 +44,8 @@
       };
 
       this.securityModes = [
-        {id: 'RBAC', icon: 'fa-lock', text: ts('Enforce Permissions')},
-        {id: 'FBAC', icon: 'fa-unlock', text: ts('Open Access')},
+        {id: 'RBAC', icon: 'fa-user', text: ts('User-Based'), description: ts('Inherit permissions based on the current user or role')},
+        {id: 'FBAC', icon: 'fa-file-text', text: ts('Form-Based'), description: ts('Allow access to any fields listed on the form')},
       ];
 
       // Above mode for use with getterSetter
@@ -98,10 +98,11 @@
         if (editor.mode === 'clone') {
           delete editor.afform.name;
           delete editor.afform.server_route;
-          editor.afform.is_dashlet = false;
+          delete editor.afform.navigation;
           editor.afform.title += ' ' + ts('(copy)');
         }
         editor.afform.icon = editor.afform.icon || 'fa-list-alt';
+        editor.afform.placement = editor.afform.placement || [];
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
         $scope.entities = {};
@@ -118,6 +119,7 @@
 
           if (editor.mode === 'create') {
             editor.addEntity(editor.entity);
+            editor.afform.submit_enabled = true;
             editor.afform.create_submission = true;
             editor.layout['#children'].push(afGui.meta.elements.submit.element);
           }
@@ -135,6 +137,8 @@
         else if (editor.getFormType() === 'search') {
           editor.searchDisplays = getSearchDisplaysOnForm();
         }
+
+        editor.afform.permission_operator = editor.afform.permission_operator || 'AND';
 
         // Initialize undo history
         undoAction = 'initialLoad';
@@ -324,18 +328,21 @@
         return editor.afform;
       };
 
+      // Get all entities or a filtered list
       this.getEntities = function(filter) {
         return filter ? _.filter($scope.entities, filter) : _.toArray($scope.entities);
       };
 
-      this.toggleContactSummary = function() {
-        if (editor.afform.contact_summary) {
-          editor.afform.contact_summary = false;
+      this.isContactSummary = function() {
+        return editor.afform.placement.includes('contact_summary_block') || editor.afform.placement.includes('contact_summary_tab');
+      };
+
+      this.onChangePlacement = function() {
+        if (!editor.isContactSummary()) {
           _.each(editor.searchDisplays, function(searchDisplay) {
             delete searchDisplay.element.filters;
           });
         } else {
-          editor.afform.contact_summary = 'block';
           _.each(editor.searchDisplays, function(searchDisplay) {
             var filterOptions = getSearchFilterOptions(searchDisplay.settings);
             if (filterOptions.length) {
@@ -343,6 +350,44 @@
             }
           });
         }
+      };
+
+      // Gets complete field defn, merging values from the field with default values
+      function fillFieldDefn(entityType, field) {
+        var spec = _.cloneDeep(afGui.getField(entityType, field.name));
+        return _.merge(spec, field.defn || {});
+      }
+
+      // Get all fields on the form for a particular entity
+      this.getEntityFields = function(entityName) {
+        var fieldsets = afGui.findRecursive(editor.layout['#children'], {'af-fieldset': entityName}),
+          entityType = editor.getEntity(entityName).type,
+          entityFields = {fields: [], joins: []},
+          isJoin = function(item) {
+            return _.isPlainObject(item) && ('af-join' in item);
+          };
+        _.each(fieldsets, function(fieldset) {
+          _.each(afGui.getFormElements(fieldset['#children'], {'#tag': 'af-field'}, isJoin), function(field) {
+            if (field.name) {
+              entityFields.fields.push(fillFieldDefn(entityType, field));
+            }
+          });
+          _.each(afGui.getFormElements(fieldset['#children'], isJoin), function(join) {
+            var joinFields = [];
+            _.each(afGui.getFormElements(join['#children'], {'#tag': 'af-field'}), function(field) {
+              if (field.name) {
+                joinFields.push(fillFieldDefn(join['af-join'], field));
+              }
+            });
+            if (joinFields.length) {
+              entityFields.joins.push({
+                entity: join['af-join'],
+                fields: joinFields
+              });
+            }
+          });
+        });
+        return entityFields;
       };
 
       this.toggleNavigation = function() {
@@ -355,6 +400,23 @@
             label: editor.afform.title,
             weight: 0
           };
+        }
+      };
+
+      this.toggleManualProcessing = function() {
+        if (editor.afform.manual_processing) {
+          editor.afform.manual_processing = null;
+        } else {
+          editor.afform.create_submission = true;
+        }
+      };
+
+      this.toggleEmailVerification = function() {
+        if (editor.afform.allow_verification_by_email) {
+          editor.afform.allow_verification_by_email = null;
+        } else {
+          editor.afform.create_submission = true;
+          editor.afform.manual_processing = true;
         }
       };
 
@@ -570,6 +632,10 @@
         var afform = JSON.parse(angular.toJson(editor.afform));
         // This might be set to undefined by validation
         afform.server_route = afform.server_route || '';
+        // create submission is required if email confirmation is selected.
+        if (afform.manual_processing || afform.allow_verification_by_email) {
+          afform.create_submission = true;
+        }
         $scope.saving = true;
         crmApi4('Afform', 'save', {formatWhitespace: true, records: [afform]})
           .then(function (data) {

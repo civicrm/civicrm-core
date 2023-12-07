@@ -18,39 +18,39 @@
 /**
  * Class contains functions for phone.
  */
-class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
+class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone implements Civi\Core\HookInterface {
   use CRM_Contact_AccessTrait;
 
   /**
-   * Create phone object - note that the create function calls 'add' but
-   * has more business logic
+   * @deprecated
    *
    * @param array $params
-   *
-   * @return \CRM_Core_DAO_Phone
-   *
-   * @throws \CRM_Core_Exception
+   * @return CRM_Core_DAO_Phone
+   * @throws CRM_Core_Exception
    */
   public static function create($params) {
-    CRM_Core_BAO_Block::handlePrimary($params, get_class());
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
   /**
-   * Takes an associative array and adds phone.
-   *
-   * @deprecated use create.
+   * Event fired before modifying a Phone.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (in_array($event->action, ['create', 'edit'])) {
+      CRM_Core_BAO_Block::handlePrimary($event->params, __CLASS__);
+    }
+  }
+
+  /**
+   * @deprecated
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return object
-   *   CRM_Core_BAO_Phone object on success, null otherwise
-   *
+   * @return CRM_Core_DAO_Phone
    * @throws \CRM_Core_Exception
    */
   public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use the v4 api');
     return self::create($params);
   }
 
@@ -236,6 +236,7 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 

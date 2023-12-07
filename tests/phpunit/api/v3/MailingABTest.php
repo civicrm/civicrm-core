@@ -70,8 +70,8 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   /**
    * Test civicrm_mailing_create.
    */
-  public function testMailingABCreateSuccess() {
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
+  public function testMailingABCreateSuccess(): void {
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $this->assertTrue(is_numeric($result['id']), "In line " . __LINE__);
     $this->assertEquals($this->_params['group_percentage'], $result['values'][$result['id']]['group_percentage']);
   }
@@ -79,7 +79,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   /**
    * Test civicrm_mailing_delete.
    */
-  public function testMailerDeleteSuccess() {
+  public function testMailerDeleteSuccess(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
 
     $this->assertDBQuery(1, "SELECT count(*) FROM civicrm_mailing_abtest WHERE id = %1", [
@@ -167,7 +167,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
    * Create a test. Declare the second mailing a winner. Ensure that key
    * fields propagate to the final mailing.
    */
-  public function testSubmitWinnderId() {
+  public function testSubmitWinnderId(): void {
     $checkSyncFields = ['subject', 'body_text'];
 
     $result = $this->groupContactCreate($this->_groupID, 20, TRUE);

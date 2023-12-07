@@ -27,7 +27,8 @@ class SmartyUtil {
     require_once implode(DIRECTORY_SEPARATOR, [$srcPath, 'CRM', 'Core', 'Smarty', 'plugins', 'block.localize.php']);
     $smarty->register_block('localize', 'smarty_block_localize');
     $smarty->assign('gencodeXmlDir', "$srcPath/xml");
-
+    require_once implode(DIRECTORY_SEPARATOR, [$srcPath, 'CRM', 'Core', 'CodeGen', 'Util', 'MessageTemplates.php']);
+    \CRM_Core_CodeGen_Util_MessageTemplates::assignSmartyVariables($smarty);
     return $smarty;
   }
 

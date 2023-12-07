@@ -16,6 +16,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+namespace api\v4\Action;
+
 use api\v4\Api4TestBase;
 use Civi\Api4\Event;
 use Civi\Test\TransactionalInterface;
@@ -30,7 +32,7 @@ class EventTest extends Api4TestBase implements TransactionalInterface {
    *
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testTemplateFilterByDefault() {
+  public function testTemplateFilterByDefault(): void {
     $t = Event::create()->setValues(['template_title' => 'Big Event', 'is_template' => 1, 'start_date' => 'now', 'event_type_id:name' => 'Meeting'])->execute()->first();
     $e = Event::create()->setValues(['title' => 'Bigger Event', 'start_date' => 'now', 'event_type_id:name' => 'Meeting'])->execute()->first();
     $result = (array) Event::get()->execute()->column('id');

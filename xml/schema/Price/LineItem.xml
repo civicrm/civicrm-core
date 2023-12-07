@@ -54,6 +54,7 @@
     <comment>FK to civicrm_contribution</comment>
     <html>
       <label>Contribution</label>
+      <type>EntityRef</type>
     </html>
     <add>4.5</add>
   </field>
@@ -77,6 +78,7 @@
     <!-- changed to not required in 4.3 in order to change ON DELETE CASCADE FK constraint to SET NULL -->
     <html>
       <label>Price Field</label>
+      <type>Select</type>
     </html>
     <add>1.7</add>
   </field>
@@ -222,6 +224,8 @@
     <headerPattern>/tax(.?am(ou)?nt)?/i</headerPattern>
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <comment>tax of each item</comment>
+    <default>0</default>
+    <required>true</required>
     <add>4.6</add>
     <html>
      <type>Text</type>

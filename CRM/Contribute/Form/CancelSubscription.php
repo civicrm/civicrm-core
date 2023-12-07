@@ -29,6 +29,13 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
   protected $_donorEmail = '';
 
   /**
+   * The contributor display name (for emails)
+   *
+   * @var string
+   */
+  protected $_donorDisplayName = '';
+
+  /**
    * Should custom data be suppressed on this form.
    *
    * We override to suppress custom data because historically it has not been
@@ -257,7 +264,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         $msgType = 'success';
       }
 
-      if (CRM_Utils_Array::value('is_notify', $params) == 1) {
+      if (($params['is_notify'] ?? NULL) == 1) {
         // send notification
         $sendTemplateParams
           = [

@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  * Class contains functions for individual contact type.
  */
@@ -31,12 +33,12 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param CRM_Contact_BAO_Contact $contact
+   * @param CRM_Contact_DAO_Contact $contact
    *   Contact object.
    *
-   * @return CRM_Contact_BAO_Contact
+   * @return CRM_Contact_DAO_Contact
    */
-  public static function format(&$params, &$contact) {
+  public static function format(&$params, $contact) {
     if (!self::dataExists($params)) {
       return NULL;
     }
@@ -44,7 +46,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     // "null" value for example is passed by dedupe merge in order to empty.
     // Display name computation shouldn't consider such values.
     foreach (['first_name', 'middle_name', 'last_name', 'nick_name', 'formal_title', 'birth_date', 'deceased_date'] as $displayField) {
-      if (CRM_Utils_Array::value($displayField, $params) == "null") {
+      if (($params[$displayField] ?? NULL) == "null") {
         $params[$displayField] = '';
       }
     }
@@ -59,13 +61,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     $formalTitle = CRM_Utils_Array::value('formal_title', $params, '');
 
     // get prefix and suffix names
-    $prefix = $suffix = NULL;
-    if ($prefix_id) {
-      $params['individual_prefix'] = $prefix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'prefix_id', $prefix_id);
-    }
-    if ($suffix_id) {
-      $params['individual_suffix'] = $suffix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'suffix_id', $suffix_id);
-    }
+    $params['prefix_id:label'] = $prefix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'prefix_id', $prefix_id);
+    $params['suffix_id:label'] = $suffix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'suffix_id', $suffix_id);
 
     $individual = NULL;
     if ($contact->id) {
@@ -87,12 +84,12 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
           }
         }
 
-        foreach (['prefix', 'suffix'] as $name) {
-          $dbName = "{$name}_id";
-          $value = $individual->$dbName;
-          if ($value && !empty($params['preserveDBName'])) {
-            $useDBNames[] = $name;
-          }
+        if ($individual->suffix_id && !empty($params['preserveDBName'])) {
+          $useDBNames[] = 'suffix_id';
+        }
+
+        if ($individual->prefix_id && !empty($params['preserveDBName'])) {
+          $useDBNames[] = 'prefix_id';
         }
 
         if ($individual->formal_title && !empty($params['preserveDBName'])) {
@@ -168,8 +165,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         'middle_name' => $middleName,
         'last_name' => $lastName,
         'nick_name' => $nickName,
-        'individual_suffix' => $suffix,
-        'individual_prefix' => $prefix,
+        'suffix_id:label' => $suffix,
+        'prefix_id:label' => $prefix,
         'prefix_id' => $prefix_id,
         'suffix_id' => $suffix_id,
         'formal_title' => $formalTitle,
@@ -190,19 +187,18 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         }
       }
 
-      //build the sort name.
-      $format = Civi::settings()->get('sort_name_format');
-      $sortName = CRM_Utils_Address::format($formatted, $format,
-        FALSE, FALSE, $tokenFields
-      );
-      $sortName = trim($sortName);
-
-      //build the display name.
-      $format = Civi::settings()->get('display_name_format');
-      $displayName = CRM_Utils_Address::format($formatted, $format,
-        FALSE, FALSE, $tokenFields
-      );
-      $displayName = trim($displayName);
+      $formatted['id'] = $contact->id ?? $params['id'] ?? 0;
+      $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+        'class' => __CLASS__,
+        'schema' => ['contactId'],
+      ]);
+      $tokenProcessor->addRow(['contactId' => $contactFields['id'] ?? 0, 'contact' => $formatted]);
+      $tokenProcessor->addMessage('sort_name', Civi::settings()->get('sort_name_format'), 'text/plain');
+      $tokenProcessor->addMessage('display_name', Civi::settings()->get('display_name_format'), 'text/plain');
+      $tokenProcessor->evaluate();
+      $row = $tokenProcessor->getRow(0);
+      $sortName = trim($row->render('sort_name'));
+      $displayName = trim($row->render('display_name'));
     }
 
     //start further check for email.
@@ -248,98 +244,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       }
     }
 
-    $format = CRM_Utils_Date::getDateFormat('birth');
-    if ($date = CRM_Utils_Array::value('birth_date', $params)) {
-      if (in_array($format, [
-        'dd-mm',
-        'mm/dd',
-      ])) {
-        $separator = '/';
-        if ($format == 'dd-mm') {
-          $separator = '-';
-        }
-        $date = $date . $separator . '1902';
-      }
-      elseif (in_array($format, [
-        'yy-mm',
-      ])) {
-        $date = $date . '-01';
-      }
-      elseif (in_array($format, [
-        'M yy',
-      ])) {
-        $date = $date . '-01';
-      }
-      elseif (in_array($format, [
-        'yy',
-      ])) {
-        $date = $date . '-01-01';
-      }
-      $processedDate = CRM_Utils_Date::processDate($date);
-      $existing = substr(str_replace('-', '', $contact->birth_date), 0, 8) . '000000';
-      // By adding this check here we can rip out this whole routine in a few
-      // months after confirming it actually does nothing, ever.
-      if ($existing !== $processedDate) {
-        CRM_Core_Error::deprecatedWarning('birth_date formatting should happen before BAO is hit');
-        $contact->birth_date = $processedDate;
-      }
-    }
-    elseif ($contact->birth_date) {
-      if ($contact->birth_date !== CRM_Utils_Date::isoToMysql($contact->birth_date)) {
-        CRM_Core_Error::deprecatedWarning('birth date formatting should happen before BAO is hit');
-      }
-      $contact->birth_date = CRM_Utils_Date::isoToMysql($contact->birth_date);
-    }
-
-    if ($date = CRM_Utils_Array::value('deceased_date', $params)) {
-      if (in_array($format, [
-        'dd-mm',
-        'mm/dd',
-      ])) {
-        $separator = '/';
-        if ($format == 'dd-mm') {
-          $separator = '-';
-        }
-        $date = $date . $separator . '1902';
-      }
-      elseif (in_array($format, [
-        'yy-mm',
-      ])) {
-        $date = $date . '-01';
-      }
-      elseif (in_array($format, [
-        'M yy',
-      ])) {
-        $date = $date . '-01';
-      }
-      elseif (in_array($format, [
-        'yy',
-      ])) {
-        $date = $date . '-01-01';
-      }
-      $processedDate = CRM_Utils_Date::processDate($date);
-      $existing = substr(str_replace('-', '', $contact->deceased_date), 0, 8) . '000000';
-      // By adding this check here we can rip out this whole routine in a few
-      // months after confirming it actually does nothing, ever.
-      if ($existing !== $processedDate) {
-        CRM_Core_Error::deprecatedWarning('deceased formatting should happen before BAO is hit');
-      }
-      $contact->deceased_date = CRM_Utils_Date::processDate($date);
-    }
-    elseif ($contact->deceased_date) {
-      if ($contact->deceased_date !== CRM_Utils_Date::isoToMysql($contact->deceased_date)) {
-        CRM_Core_Error::deprecatedWarning('deceased date formatting should happen before BAO is hit');
-      }
-      $contact->deceased_date = CRM_Utils_Date::isoToMysql($contact->deceased_date);
-    }
-
-    if ($middle_name = CRM_Utils_Array::value('middle_name', $params)) {
-      if ($middle_name !== $contact->middle_name) {
-        CRM_Core_Error::deprecatedWarning('random magic is deprecated - how could this be true');
-      }
-      $contact->middle_name = $middle_name;
-    }
-
     return $contact;
   }
 
@@ -363,11 +267,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * @return bool
    */
   public static function dataExists($params) {
-    if ($params['contact_type'] == 'Individual') {
-      return TRUE;
-    }
-
-    return FALSE;
+    return $params['contact_type'] == 'Individual';
   }
 
 }

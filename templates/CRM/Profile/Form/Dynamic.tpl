@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-profile-name-{$ufGroupName}">
-{crmRegion name=profile-form-`$ufGroupName`}
+{crmRegion name="profile-form-`$ufGroupName`"}
 
 {* Profile forms when embedded in CMS account create (mode=1) or
     cms account edit (mode=8) or civicrm/profile (mode=4) pages *}
@@ -29,13 +29,13 @@
 {* Wrap in crm-container div so crm styles are used.*}
 {* Replace div id "crm-container" only when profile is not loaded in civicrm container, i.e for profile shown in my account and in profile standalone mode otherwise id should be "crm-profile-block" *}
 
-  {if $action eq 1 or $action eq 2 or $action eq 4 }
+  {if $action eq 1 or $action eq 2 or $action eq 4}
   <div id="crm-profile-block" class="crm-container crm-public">
     {else}
   <div id="crm-container" class="crm-container crm-public" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
   {/if}
 
-  {if $isDuplicate and ( ($action eq 1 and $mode eq 4 ) or ($action eq 2) or ($action eq 8192) ) }
+  {if $showSaveDuplicateButton}
     <div class="crm-submit-buttons">
       {$form._qf_Edit_upload_duplicate.html}
     </div>
@@ -50,7 +50,7 @@
     {if $action eq 2 and $multiRecordFieldListing}
       <h1>{ts}Edit Details{/ts}</h1>
       <div class="crm-submit-buttons" style='float:right'>
-      {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}{$form._qf_Edit_upload_duplicate.html}{/if}
+      {include file="CRM/common/formButtons.tpl" location=''}{if $showSaveDuplicateButton}{$form._qf_Edit_upload_duplicate.html}{/if}
       </div>
     {/if}
 
@@ -67,8 +67,8 @@
           <div {if $context neq 'dialog'}id="profilewrap{$field.group_id}"{/if}>
           <fieldset><legend>{$field.groupTitle}</legend>
         {/if}
-        {assign var=fieldset  value=`$field.groupTitle`}
-        {assign var=groupHelpPost  value=`$field.groupHelpPost`}
+        {assign var=fieldset  value=$field.groupTitle}
+        {assign var=groupHelpPost  value=$field.groupHelpPost}
         {if $field.groupHelpPre}
           <div class="messages help">{$field.groupHelpPre}</div>
         {/if}
@@ -94,27 +94,25 @@
             <div class="content description">{$field.help_pre}</div>
           </div>
         {/if}
-        {if $field.options_per_line}
+        {if array_key_exists('options_per_line', $field) && $field.options_per_line}
           <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
             <div class="label">{$form.$n.label}</div>
             <div class="content edit-value">
-              {assign var="count" value="1"}
+              {assign var="count" value=1}
               {strip}
                 <table class="form-layout-compressed">
                 <tr>
                 {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                  {assign var="index" value="1"}
                   {foreach name=outer key=key item=item from=$form.$n}
-                    {if $index < 10}
-                      {assign var="index" value=`$index+1`}
-                    {else}
+                    {* There are both numeric and non-numeric keys mixed in here, where the non-numeric are metadata that aren't arrays with html members. *}
+                    {if is_array($item) && array_key_exists('html', $item)}
                       <td class="labels font-light">{$form.$n.$key.html}</td>
                       {if $count == $field.options_per_line}
                       </tr>
                       <tr>
-                        {assign var="count" value="1"}
+                        {assign var="count" value=1}
                         {else}
-                        {assign var="count" value=`$count+1`}
+                        {assign var="count" value=$count+1}
                       {/if}
                     {/if}
                   {/foreach}
@@ -131,7 +129,7 @@
             </div>
             <div class="edit-value content">
               {if $n|substr:0:3 eq 'im-'}
-                {assign var="provider" value=$n|cat:"-provider_id"}
+                {assign var="provider" value="$n-provider_id"}
                 {$form.$provider.html}&nbsp;
               {/if}
               {if $n eq 'email_greeting' or  $n eq 'postal_greeting' or $n eq 'addressee'}
@@ -194,6 +192,7 @@
     {/if}
 
     {if ($action eq 1 and $mode eq 4 ) or ($action eq 2) or ($action eq 8192)}
+      {assign var=floatStyle value=''}
       {if $action eq 2 and $multiRecordFieldListing}
         <div class="crm-multi-record-custom-field-listing">
           {include file="CRM/Profile/Page/MultipleRecordFieldsListing.tpl" showListing=true}
@@ -201,7 +200,7 @@
         </div>
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
-        {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}{$form._qf_Edit_upload_duplicate.html}{/if}
+        {include file="CRM/common/formButtons.tpl" location=''}{if $showSaveDuplicateButton}{$form._qf_Edit_upload_duplicate.html}{/if}
         {if $includeCancelButton}
           <a class="button cancel" href="{$cancelURL}">
             <span>

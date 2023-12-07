@@ -191,7 +191,7 @@ class CRM_Contact_Form_Task_SMSCommon {
           unset($form->_contactDetails[$contactId]);
           continue;
         }
-        elseif ($contactDetails['phone_type_id'] != CRM_Utils_Array::value('Mobile', $phoneTypes)) {
+        elseif ($contactDetails['phone_type_id'] != ($phoneTypes['Mobile'] ?? NULL)) {
           //if phone is not primary check if non-primary phone is "Mobile"
           $filter = ['do_not_sms' => 0];
           $contactPhones = CRM_Core_BAO_Phone::allPhones($contactId, FALSE, 'Mobile', $filter);
@@ -314,7 +314,6 @@ class CRM_Contact_Form_Task_SMSCommon {
    */
   public static function postProcess(&$form) {
 
-    // check and ensure that
     $thisValues = $form->controller->exportValues($form->getName());
 
     $fromSmsProviderId = $thisValues['sms_provider_id'];

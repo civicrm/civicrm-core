@@ -9,74 +9,6 @@
 -- Generated from {$smarty.template}
 -- {$generated}
 --
-{* not sure how to define the below in Smarty, so doing it in PHP instead *}
-{php}
-  $ogNames = array(
-    'case'         => ts('Message Template Workflow for Cases',          array('escape' => 'sql')),
-    'contribution' => ts('Message Template Workflow for Contributions',  array('escape' => 'sql')),
-    'event'        => ts('Message Template Workflow for Events',         array('escape' => 'sql')),
-    'friend'       => ts('Message Template Workflow for Tell-a-Friend',  array('escape' => 'sql')),
-    'membership'   => ts('Message Template Workflow for Memberships',    array('escape' => 'sql')),
-    'meta'         => ts('Message Template Workflow for Meta Templates', array('escape' => 'sql')),
-    'pledge'       => ts('Message Template Workflow for Pledges',        array('escape' => 'sql')),
-    'uf'           => ts('Message Template Workflow for Profiles',       array('escape' => 'sql')),
-    'petition'     => ts('Message Template Workflow for Petition',       array('escape' => 'sql')),
-  );
-  $ovNames = array(
-    'case' => array(
-      'case_activity' => ts('Cases - Send Copy of an Activity', array('escape' => 'sql')),
-    ),
-    'contribution' => array(
-      'contribution_dupalert'         => ts('Contributions - Duplicate Organization Alert',                   array('escape' => 'sql')),
-      'contribution_offline_receipt'  => ts('Contributions - Receipt (off-line)',                             array('escape' => 'sql')),
-      'contribution_online_receipt'   => ts('Contributions - Receipt (on-line)',                              array('escape' => 'sql')),
-      'contribution_invoice_receipt'   => ts('Contributions - Invoice',                                       array('escape' => 'sql')),
-      'contribution_recurring_notify' => ts('Contributions - Recurring Start and End Notification',           array('escape' => 'sql')),
-      'contribution_recurring_cancelled' => ts('Contributions - Recurring Cancellation Notification',         array('escape' => 'sql')),
-      'contribution_recurring_billing' => ts('Contributions - Recurring Billing Updates',                     array('escape' => 'sql')),
-      'contribution_recurring_edit'    => ts('Contributions - Recurring Updates',                             array('escape' => 'sql')),
-      'pcp_notify'                    => ts('Personal Campaign Pages - Admin Notification',                   array('escape' => 'sql')),
-      'pcp_status_change'             => ts('Personal Campaign Pages - Supporter Status Change Notification', array('escape' => 'sql')),
-      'pcp_supporter_notify'          => ts('Personal Campaign Pages - Supporter Welcome',                    array('escape' => 'sql')),
-      'pcp_owner_notify'              => ts('Personal Campaign Pages - Owner Notification',                   array('escape' => 'sql')),
-      'payment_or_refund_notification' => ts('Additional Payment Receipt or Refund Notification',             array('escape' => 'sql')),
-    ),
-    'event' => array(
-      'event_offline_receipt' => ts('Events - Registration Confirmation and Receipt (off-line)', array('escape' => 'sql')),
-      'event_online_receipt'  => ts('Events - Registration Confirmation and Receipt (on-line)',  array('escape' => 'sql')),
-      'event_registration_receipt'  => ts('Events - Receipt only',                               array('escape' => 'sql')),
-      'participant_cancelled' => ts('Events - Registration Cancellation Notice',                 array('escape' => 'sql')),
-      'participant_confirm'   => ts('Events - Registration Confirmation Invite',                 array('escape' => 'sql')),
-      'participant_expired'   => ts('Events - Pending Registration Expiration Notice',           array('escape' => 'sql')),
-      'participant_transferred'   => ts('Events - Registration Transferred Notice',           array('escape' => 'sql')),
-    ),
-    'friend' => array(
-      'friend' => ts('Tell-a-Friend Email', array('escape' => 'sql')),
-    ),
-    'membership' => array(
-      'membership_offline_receipt' => ts('Memberships - Signup and Renewal Receipts (off-line)', array('escape' => 'sql')),
-      'membership_online_receipt'  => ts('Memberships - Receipt (on-line)',                      array('escape' => 'sql')),
-      'membership_autorenew_cancelled' => ts('Memberships - Auto-renew Cancellation Notification', array('escape' => 'sql')),
-      'membership_autorenew_billing' => ts('Memberships - Auto-renew Billing Updates',           array('escape' => 'sql')),
-    ),
-    'meta' => array(
-      'test_preview' => ts('Test-drive - Receipt Header', array('escape' => 'sql')),
-    ),
-    'pledge' => array(
-      'pledge_acknowledge' => ts('Pledges - Acknowledgement',  array('escape' => 'sql')),
-      'pledge_reminder'    => ts('Pledges - Payment Reminder', array('escape' => 'sql')),
-    ),
-    'uf' => array(
-      'uf_notify' => ts('Profiles - Admin Notification', array('escape' => 'sql')),
-    ),
-    'petition' => array(
-      'petition_sign' => ts('Petition - signature added', array('escape' => 'sql')),
-      'petition_confirmation_needed' => ts('Petition - need verification', array('escape' => 'sql')),
-    ),
-  );
-  $this->assign('ogNames',  $ogNames);
-  $this->assign('ovNames',  $ovNames);
-{/php}
 
 INSERT INTO civicrm_option_group
   (name,                         {localize field='title'}title{/localize},            {localize field='description'}description{/localize},      is_reserved, is_active) VALUES
@@ -106,22 +38,16 @@ INSERT INTO civicrm_msg_template
   (msg_title,      msg_subject,                  msg_text,                  msg_html,    workflow_name,              workflow_id,        is_default, is_reserved) VALUES
 {foreach from=$ovNames key=gName item=ovs name=for_groups}
 {foreach from=$ovs key=vName item=title name=for_values}
-      {fetch assign=subject file="`$gencodeXmlDir`/templates/message_templates/`$vName`_subject.tpl"}
-      {fetch assign=text    file="`$gencodeXmlDir`/templates/message_templates/`$vName`_text.tpl"}
-      {fetch assign=html    file="`$gencodeXmlDir`/templates/message_templates/`$vName`_html.tpl"}
+      {assign var="subject_file_name" value=$vName|cat:'_subject'}
+      {assign var="html_file_name" value=$vName|cat:'_html'}
+      {assign var="text_file_name" value=$vName|cat:'_text'}
+      {fetch assign=subject file="$gencodeXmlDir/templates/message_templates/$subject_file_name.tpl"}
+      {fetch assign=text    file="$gencodeXmlDir/templates/message_templates/$text_file_name.tpl"}
+      {fetch assign=html    file="$gencodeXmlDir/templates/message_templates/$html_file_name.tpl"}
       ('{$title}', '{$subject|escape:"quotes"}', '{$text|escape:"quotes"}', '{$html|escape:"quotes"}', '{$vName}', @tpl_ovid_{$vName}, 1,          0),
       ('{$title}', '{$subject|escape:"quotes"}', '{$text|escape:"quotes"}', '{$html|escape:"quotes"}', '{$vName}', @tpl_ovid_{$vName}, 0,          1) {if $smarty.foreach.for_groups.last and $smarty.foreach.for_values.last};{else},{/if}
 {/foreach}
 {/foreach}
-
-{php}
-  $dir = $this->_tpl_vars['gencodeXmlDir'] . '/templates/message_templates/sample';
-  $templates = array();
-  foreach (preg_grep('/\.tpl$/', scandir($dir)) as $filename) {
-    $templates[] = array('name' => basename($filename, '.tpl'), 'filename' => "$dir/$filename");
-  }
-  $this->assign('templates', $templates);
-{/php}
 
 {foreach from=$templates item=tpl}
   {fetch assign=content file=$tpl.filename}

@@ -11,109 +11,117 @@
 
 namespace Civi\ActionSchedule;
 
+use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
+
 /**
  * Interface MappingInterface
  * @package Civi\ActionSchedule
  */
-interface MappingInterface {
+interface MappingInterface extends SpecProviderInterface {
 
   /**
-   * @return mixed
+   * Unique identifier of this mapping type.
+   *
+   * Should return a "machine_name" style string (same output as `getName()`)
+   * Note: Some legacy implementations return an int. Don't follow those examples.
+   * @return string|int
    */
   public function getId();
 
   /**
+   * Unique name of this mapping type.
+   *
+   * Should return a "machine_name" style string (should be the same as `getId()`).
    * @return string
    */
-  public function getEntity();
+  public function getName(): string;
 
   /**
-   * Get a printable label for this mapping type.
-   *
+   * Name of the table belonging to the main entity e.g. `civicrm_activity`
+   * @param \CRM_Core_DAO_ActionSchedule $actionSchedule
+   * @return string
+   */
+  public function getEntityTable(\CRM_Core_DAO_ActionSchedule $actionSchedule): string;
+
+  /**
+   * Main entity name e.g. `Activity`
+   * @return string
+   */
+  public function getEntityName(): string;
+
+  /**
+   * Label of this mapping type as shown in the "Entity" dropdown-select on the form.
    * @return string
    */
   public function getLabel();
 
   /**
-   * Get a printable label to use as the header on the 'value' filter.
-   *
-   * @return string
+   * Get option list for the `entity_value` field.
    */
-  public function getValueHeader();
+  public function getValueLabels(): array;
 
   /**
-   * Get a printable label to use as the header on the 'status' filter.
+   * Get option list for the `entity_status` field.
    *
-   * @return string
+   * @param array|null $entityValue
+   *   Selected value(s) of the `entity_value` field.
    */
-  public function getStatusHeader();
+  public function getStatusLabels(?array $entityValue): array;
 
   /**
-   * Get a list of value options.
+   * Get option list for `start_action_date` & `end_date` fields.
+   *
+   * @param array|null $entityValue
+   *   Selected value(s) of the `entity_value` field.
+   * @return array
+   */
+  public function getDateFields(?array $entityValue = NULL): array;
+
+  /**
+   * Get the option list for `limit_to` (non-associative format)
    *
    * @return array
-   *   Array(string $value => string $label).
-   *   Ex: array(123 => 'Phone Call', 456 => 'Meeting').
    */
-  public function getValueLabels();
+  public static function getLimitToOptions(): array;
 
   /**
-   * Get a list of status options.
-   *
-   * @param string|int $value
-   *   The list of status options may be contingent upon the selected filter value.
-   *   This is the selected filter value.
-   * @return array
-   *   Array(string $value => string $label).
-   *   Ex: Array(123 => 'Completed', 456 => 'Scheduled').
-   */
-  public function getStatusLabels($value);
-
-  /**
-   * Get a list of available date fields.
-   *
-   * @return array
-   *   Array(string $fieldName => string $fieldLabel).
-   */
-  public function getDateFields();
-
-  /**
-   * Get a list of recipient types.
+   * Get option list for `recipient` field.
    *
    * Note: A single schedule may filter on *zero* or *one* recipient types.
    * When an admin chooses a value, it's stored in $schedule->recipient.
    *
    * @return array
-   *   array(string $value => string $label).
-   *   Ex: array('assignee' => 'Activity Assignee').
+   *   Ex: ['assignee' => 'Activity Assignee', ...].
    */
-  public function getRecipientTypes();
+  public static function getRecipientTypes(): array;
 
   /**
-   * Get a list of recipients which match the given type.
-   *
-   * Note: A single schedule may filter on *multiple* recipients.
-   * When an admin chooses value(s), it's stored in $schedule->recipient_listing.
+   * Get option list for `recipient_listing` field.
    *
    * @param string $recipientType
-   *   Ex: 'participant_role'.
+   *   Value of `recipient` field
    * @return array
-   *   Array(mixed $name => string $label).
-   *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
+   *   Ex: [1 => 'Attendee', 2 => 'Volunteer', ...].
    * @see getRecipientTypes
    */
-  public function getRecipientListing($recipientType);
+  public function getRecipientListing($recipientType): array;
 
   /**
-   * Determine whether a schedule based on this mapping is sufficiently
-   * complete.
+   * Check if the user has permission to create a reminder for given `entity_value`.
    *
-   * @param \CRM_Core_DAO_ActionSchedule $schedule
-   * @return array
-   *   Array (string $code => string $message).
-   *   List of error messages.
+   * This function is called by the form to escalate permissions so that less-privileged users can
+   * create a reminder for a particular entity even if they do not have 'administer CiviCRM data'.
+   *
+   * Return FALSE and the default permission of 'administer CiviCRM data' will be enforced.
+   *
+   * Note that `entity_value` is a serialized field, so will be passed as an array, even though
+   * more than one value doesn't make sense in the context of embedding the ScheduledReminder form
+   * on a page belonging to a single entity.
+   *
+   * @param array $entityValue
+   * @return bool
    */
-  public function validateSchedule($schedule);
+  public function checkAccess(array $entityValue): bool;
 
   /**
    * Generate a query to locate contacts who match the given
@@ -127,7 +135,7 @@ interface MappingInterface {
    * @return \CRM_Utils_SQL_Select
    * @see RecipientBuilder
    */
-  public function createQuery($schedule, $phase, $defaultParams);
+  public function createQuery($schedule, $phase, $defaultParams): \CRM_Utils_SQL_Select;
 
   /**
    * Determine whether a schedule based on this mapping should
@@ -137,7 +145,7 @@ interface MappingInterface {
    *
    * @param \CRM_Core_DAO_ActionSchedule $schedule
    */
-  public function resetOnTriggerDateChange($schedule);
+  public function resetOnTriggerDateChange($schedule): bool;
 
   /**
    * Determine whether a schedule based on this mapping should

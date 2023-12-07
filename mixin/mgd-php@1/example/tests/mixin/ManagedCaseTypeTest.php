@@ -24,13 +24,11 @@ class ManagedCaseTypeTest extends \PHPUnit\Framework\Assert {
     $this->assertEquals(TRUE, $items[0]['is_active']);
     $this->assertEquals(1, count($items));
 
-    // FIXME: The example is partially disabled - because the full example causes a crash.
-    // Hence, these assertions don't yet pass.
-    // $actTypes = $cv->api4('OptionValue', 'get', [
-    //   'where' => [['option_group_id:name', '=', 'activity_type'], ['name', '=', 'Nibble']],
-    // ]);
-    // $this->assertEquals('Nibble', $actTypes[0]['name'], 'ActivityType "Nibble" should be auto enabled. It\'s missing.');
-    // $this->assertEquals(TRUE, $actTypes[0]['is_active'], 'ActivityType "Nibble" should be auto enabled. It\'s inactive.');
+    $actTypes = $cv->api4('OptionValue', 'get', [
+      'where' => [['option_group_id:name', '=', 'activity_type'], ['name', '=', 'Nibble']],
+    ]);
+    $this->assertEquals('Nibble', $actTypes[0]['name'], 'ActivityType "Nibble" should be auto enabled. It\'s missing.');
+    $this->assertEquals(TRUE, $actTypes[0]['is_active'], 'ActivityType "Nibble" should be auto enabled. It\'s inactive.');
   }
 
   public function testDisabled($cv): void {

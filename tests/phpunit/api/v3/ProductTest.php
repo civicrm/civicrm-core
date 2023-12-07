@@ -27,12 +27,12 @@ class api_v3_ProductTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testGetFields() {
+  public function testGetFields(): void {
     $fields = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
     $this->assertArrayHasKey('period_type', $fields['values']);
   }
 
-  public function testGetOptions() {
+  public function testGetOptions(): void {
     $options = $this->callAPISuccess($this->_entity, 'getoptions', ['field' => 'period_type']);
     $this->assertArrayHasKey('rolling', $options['values']);
   }

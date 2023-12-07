@@ -165,9 +165,12 @@ function _civicrm_api3_event_get_legacy_support_42(&$event, $event_id) {
  * @param array $params
  *
  * @return array
+ * @throws \CRM_Core_Exception
+ * @noinspection PhpUnused
  */
-function civicrm_api3_event_delete($params) {
-  return CRM_Event_BAO_Event::del($params['id']) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while deleting event'));
+function civicrm_api3_event_delete(array $params): array {
+  CRM_Event_BAO_Event::deleteRecord($params);
+  return civicrm_api3_create_success();
 }
 
 /**

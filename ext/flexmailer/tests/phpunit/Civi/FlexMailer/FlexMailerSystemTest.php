@@ -43,20 +43,20 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
-      $manager->install(array('org.civicrm.flexmailer'));
+      $manager->install(['org.civicrm.flexmailer']);
     }
 
     parent::setUp();
 
     $dispatcher = \Civi::service('dispatcher');
     foreach (FlexMailer::getEventTypes() as $event => $class) {
-      $dispatcher->addListener($event, array($this, 'handleEvent'));
+      $dispatcher->addListener($event, [$this, 'handleEvent']);
     }
 
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
-      array($this, 'hook_alterMailParams'));
-    $this->counts = array();
+      [$this, 'hook_alterMailParams']);
+    $this->counts = [];
   }
 
   public function handleEvent(GenericHookEvent $e) {

@@ -14,7 +14,7 @@
   <form>
     <div class="crm-flex-box">
       <div class="nav-stacked">
-        <input id="crm-saved-search-label" class="form-control" ng-model="$ctrl.savedSearch.label" type="text" required placeholder="{{:: ts('Untitled Search') }}">
+        <input id="crm-saved-search-label" class="form-control" ng-model="$ctrl.savedSearch.label" type="text" required placeholder="{{:: ts('Untitled Search') }}" ng-model-options="$ctrl.debounceMode">
       </div>
       <div class="crm-flex-4 form-inline">
         <label for="crm-search-main-entity">{{:: ts('Search for') }}</label>

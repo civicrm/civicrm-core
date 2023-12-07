@@ -70,7 +70,7 @@ class CRM_Utils_Type {
    * @return string
    *   String identifying the data type, e.g. 'Int' or 'String'.
    */
-  public static function typeToString($type) {
+  public static function typeToString($type): string {
     // @todo Use constants in the case statements, e.g. "case T_INT:".
     // @todo return directly, instead of assigning a value.
     // @todo Use a lookup array, as a property or as a local variable.
@@ -134,7 +134,7 @@ class CRM_Utils_Type {
         break;
     }
 
-    return (isset($string)) ? $string : "";
+    return $string ?? '';
   }
 
   /**
@@ -236,6 +236,7 @@ class CRM_Utils_Type {
       case 'Date':
       case 'Timestamp':
       case 'ContactReference':
+      case 'EntityReference':
       case 'MysqlOrderByDirection':
         $validatedData = self::validate($data, $type, $abort);
         if (isset($validatedData)) {
@@ -380,6 +381,7 @@ class CRM_Utils_Type {
       'Date',
       'Timestamp',
       'ContactReference',
+      'EntityReference',
       'MysqlColumnNameOrAlias',
       'MysqlOrderByDirection',
       'MysqlOrderBy',
@@ -389,7 +391,7 @@ class CRM_Utils_Type {
       'Color',
     ];
     if (!in_array($type, $possibleTypes)) {
-      throw new CRM_Core_Exception(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
+      throw new CRM_Core_Exception('Invalid type, must be one of : ' . implode($possibleTypes));
     }
     switch ($type) {
       case 'Integer':
@@ -435,12 +437,13 @@ class CRM_Utils_Type {
         break;
 
       case 'ContactReference':
+      case 'EntityReference':
         // null is valid
         if (strlen(trim($data)) == 0) {
           return trim($data);
         }
 
-        if (CRM_Utils_Rule::validContact($data)) {
+        if (CRM_Utils_Rule::positiveInteger($data)) {
           return (int) $data;
         }
         break;

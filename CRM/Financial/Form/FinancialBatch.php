@@ -59,7 +59,6 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->setPageTitle(ts('Financial Batch'));
     if (!empty($this->_id)) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'title');
       $this->setTitle($this->_title . ' - ' . ts('Accounting Batch'));
@@ -77,11 +76,6 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
           'type' => 'next',
           'name' => ts('Save'),
           'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'next',
-          'name' => ts('Save and New'),
-          'subName' => 'new',
         ],
         [
           'type' => 'cancel',
@@ -194,38 +188,12 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       if (empty($params['created_id'])) {
         $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
       }
-      $details = "{$params['title']} batch has been created by this contact.";
-      $activityTypeName = 'Create Batch';
-    }
-    elseif ($this->_action & CRM_Core_Action::UPDATE && $this->_id) {
-      $details = "{$params['title']} batch has been edited by this contact.";
-      if ($params['status_id'] === $closedStatusId) {
-        $details = "{$params['title']} batch has been closed by this contact.";
-      }
-      $activityTypeName = 'Edit Batch';
     }
 
-    // FIXME: What happens if we get to here and no activityType is defined?
+    $batch = CRM_Batch_BAO_Batch::writeRecord($params);
 
-    $batch = CRM_Batch_BAO_Batch::create($params);
-
-    //set batch id
+    // Required for postProcess hooks
     $this->_id = $batch->id;
-
-    // create activity.
-    $activityParams = [
-      // activityTypeName - dev/core#1116-unknown-if-ok
-      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_type_id', $activityTypeName),
-      'subject' => $batch->title . "- Batch",
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_status_id', 'Completed'),
-      'priority_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'priority_id', 'Normal'),
-      'activity_date_time' => date('YmdHis'),
-      'source_contact_id' => CRM_Core_Session::getLoggedInContactID(),
-      'source_contact_qid' => CRM_Core_Session::getLoggedInContactID(),
-      'details' => $details,
-    ];
-
-    CRM_Activity_BAO_Activity::create($activityParams);
 
     $buttonName = $this->controller->getButtonName();
 

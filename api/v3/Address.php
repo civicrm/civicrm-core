@@ -60,22 +60,11 @@ function civicrm_api3_address_create($params) {
     $params['check_permissions'] = 0;
   }
 
-  if (!isset($params['fix_address'])) {
-    $params['fix_address'] = TRUE;
+  if (!isset($params['fix_address']) || $params['fix_address']) {
+    CRM_Core_BAO_Address::fixAddress($params);
   }
 
-  /**
-   * Create array for BAO (expects address params in as an
-   * element in array 'address'
-   */
-  $addressBAO = CRM_Core_BAO_Address::create($params, $params['fix_address']);
-  if (empty($addressBAO)) {
-    return civicrm_api3_create_error("Address is not created or updated ");
-  }
-  else {
-    $values = _civicrm_api3_dao_to_array($addressBAO, $params);
-    return civicrm_api3_create_success($values, $params, 'Address', $addressBAO);
-  }
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Address');
 }
 
 /**

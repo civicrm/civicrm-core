@@ -28,25 +28,29 @@ class CRM_Core_BAO_CMSUser {
    * Create CMS user using Profile.
    *
    * @param array $params
-   * @param string $mail
-   *   Email id for cms user.
+   * @param string $mailParam
+   *   Name of the param which contains the email address.
+   *   Because. Right. OK. That's what it is.
    *
    * @return int
    *   contact id that has been created
    */
-  public static function create(&$params, $mail) {
+  public static function create(&$params, $mailParam) {
     $config = CRM_Core_Config::singleton();
 
-    $ufID = $config->userSystem->createUser($params, $mail);
+    $ufID = $config->userSystem->createUser($params, $mailParam);
 
-    //if contact doesn't already exist create UF Match
-    if ($ufID !== FALSE &&
-      isset($params['contactID'])
+    // Create UF Match if we have contactID unless we're Standalone
+    // since in Standalone uf_match is the same table as User.
+    if (
+      CIVICRM_UF !== 'Standalone'
+      && $ufID !== FALSE
+      && isset($params['contactID'])
     ) {
       // create the UF Match record
       $ufmatch['uf_id'] = $ufID;
       $ufmatch['contact_id'] = $params['contactID'];
-      $ufmatch['uf_name'] = $params[$mail];
+      $ufmatch['uf_name'] = $params[$mailParam];
       CRM_Core_BAO_UFMatch::create($ufmatch);
     }
 

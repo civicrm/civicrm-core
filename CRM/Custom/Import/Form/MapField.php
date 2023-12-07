@@ -6,6 +6,15 @@
 class CRM_Custom_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    return 'custom_field_import';
+  }
+
+  /**
    * Build the form object.
    *
    * @throws \CRM_Core_Exception

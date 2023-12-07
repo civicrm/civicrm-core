@@ -35,7 +35,7 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
 
     // Create three sample contacts.
     foreach ([0, 1, 2] as $seq) {
-      $this->individualCreate([], $seq);
+      $this->individualCreate([], 'individual_' . $seq);
     }
   }
 

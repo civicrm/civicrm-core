@@ -139,8 +139,11 @@ class CRM_Utils_VersionCheck {
     // Non-alpha versions get the full treatment
     if ($this->localVersion && !strpos($this->localVersion, 'alpha')) {
       $this->stats += [
+        // Remove the hash after 2024-09-01 to allow the transition to sid
         'hash' => md5($siteKey . $config->userFrameworkBaseURL),
+        'sid' => Civi::settings()->get('site_id'),
         'uf' => $config->userFramework,
+        'environment' => CRM_Core_Config::environment(),
         'lang' => $config->lcMessages,
         'co' => $config->defaultContactCountry,
         'ufv' => $config->userSystem->getVersion(),
@@ -227,8 +230,7 @@ class CRM_Utils_VersionCheck {
    */
   private function getExtensionStats() {
     // Core components
-    $config = CRM_Core_Config::singleton();
-    foreach ($config->enableComponents as $comp) {
+    foreach (Civi::settings()->get('enable_components') as $comp) {
       $this->stats['extensions'][] = [
         'name' => 'org.civicrm.component.' . strtolower($comp),
         'enabled' => 1,

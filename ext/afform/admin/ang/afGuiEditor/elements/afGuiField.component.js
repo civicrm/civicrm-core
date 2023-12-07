@@ -47,7 +47,33 @@
             inputTypes.push(type);
           }
         });
+        // Quick-add links for autocompletes
+        this.quickAddLinks = [];
+        let allowedEntity = (ctrl.getFkEntity() || {}).entity;
+        let allowedEntities = (allowedEntity === 'Contact') ? ['Individual', 'Household', 'Organization'] : [allowedEntity];
+        (CRM.config.quickAdd || []).forEach((link) => {
+          if (allowedEntities.includes(link.entity)) {
+            this.quickAddLinks.push({
+              id: link.path,
+              icon: link.icon,
+              text: link.title,
+            });
+          }
+        });
+        this.searchOperators = CRM.afAdmin.search_operators;
+        // If field has limited operators, set appropriately
+        if (ctrl.fieldDefn.operators && ctrl.fieldDefn.operators.length) {
+          this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
+        }
         setDateOptions();
+
+        if (ctrl.getDefn().input_type == 'Date') {
+          if (!getSet('default_date_type')) {
+            ctrl.defaultDateType = getSet('default_date_type', 'fixed');
+          } else {
+            ctrl.defaultDateType = getSet("default_date_type");
+          }
+        }
       };
 
       this.getFkEntity = function() {
@@ -89,8 +115,8 @@
       this.getDefn = function() {
         var defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.node.name), ctrl.node.name);
         // Calc fields are specific to a search display, not part of the schema
-        if (!defn && ctrl.container.getSearchDisplay(ctrl.container.node)) {
-          var searchDisplay = ctrl.container.getSearchDisplay(ctrl.container.node);
+        if (!defn && ctrl.container.getSearchDisplay()) {
+          var searchDisplay = ctrl.container.getSearchDisplay();
           defn = _.findWhere(searchDisplay.calc_fields, {name: ctrl.node.name});
         }
         defn = defn || {
@@ -119,7 +145,7 @@
 
       $scope.hasOptions = function() {
         var inputType = $scope.getProp('input_type');
-        return _.contains(['CheckBox', 'Radio', 'Select'], inputType) && !(inputType === 'CheckBox' && !ctrl.getDefn().options);
+        return _.contains(['CheckBox', 'Radio', 'Select'], inputType) && !(inputType === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean');
       };
 
       this.getOptions = function() {
@@ -137,7 +163,7 @@
           }
           return entityRefOptions;
         }
-        return ctrl.getDefn().options || ($scope.getProp('input_type') === 'CheckBox' ? null : yesNo);
+        return ctrl.getDefn().options || (ctrl.getDefn().data_type === 'Boolean' ? yesNo : null);
       };
 
       $scope.resetOptions = function() {
@@ -176,6 +202,7 @@
             return !(defn.options || defn.data_type === 'Boolean');
 
           case 'DisplayOnly':
+          case 'Hidden':
             return true;
 
           default:
@@ -261,6 +288,10 @@
         }
       };
 
+      $scope.setDefaultDateType = function() {
+        ctrl.defaultDateType = getSet('default_date_type');
+      };
+
       $scope.defaultValueContains = function(val) {
         val = '' + val;
         var defaultVal = getSet('afform_default');
@@ -271,6 +302,7 @@
         val = '' + val;
         if (defaultValueShouldBeArray()) {
           if (!_.isArray(getSet('afform_default'))) {
+            ctrl.node.defn = ctrl.node.defn || {};
             ctrl.node.defn.afform_default = [];
           }
           if (_.includes(ctrl.node.defn.afform_default, val)) {
@@ -290,7 +322,24 @@
         }
       };
 
-      // Getter/setter for definition props
+      // Getter/setter for search_operator and expose_operator combo-field
+      // The expose_operator flag changes the behavior of the search_operator field
+      // to either set the value on the backend, or set the default value for the user-select list on the form
+      $scope.getSetOperator = function(val) {
+        if (arguments.length) {
+          // _EXPOSE_ is not a real option for search_operator, instead it sets the expose_operator boolean
+          getSet('expose_operator', val === '_EXPOSE_');
+          if (val === '_EXPOSE_') {
+            getSet('search_operator', _.keys(ctrl.searchOperators)[0]);
+          } else {
+            getSet('search_operator', val);
+          }
+          return val;
+        }
+        return getSet('expose_operator') ? '_EXPOSE_' : getSet('search_operator');
+      };
+
+      // Generic getter/setter for definition props
       $scope.getSet = function(propName) {
         return _.wrap(propName, getSet);
       };
@@ -318,6 +367,10 @@
             if (ctrl.node.defn && ctrl.node.defn.input_attrs && 'multiple' in ctrl.node.defn.input_attrs && !ctrl.canBeMultiple()) {
               delete ctrl.node.defn.input_attrs.multiple;
               clearOut(ctrl.node, ['defn', 'input_attrs']);
+            }
+            // Boolean checkbox has no options
+            if (val === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean' && ctrl.node.defn) {
+              delete ctrl.node.defn.options;
             }
           }
           setFieldDefn();

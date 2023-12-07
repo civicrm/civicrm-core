@@ -56,7 +56,7 @@
         <div ng-if="entity.entity_data && entity.selected.action !== 'ignore'">
           <div ng-repeat="(fieldName, entityField) in entity.entity_data">
             <label>
-              {{ entityField.title }}  <input  class="big" crm-ui-select='{data: entityField.options, required : entityField.is_required}' ng-model="entity.selected.entity.entity_data[fieldName]"/>
+              {{ entityField.title }}  <input  class="big" crm-ui-select='{data: entityField.options, required : entityField.is_required}' ng-model="entity.selected[fieldName]"/>
             </label>
           </div>
         </div>
@@ -142,8 +142,8 @@
 </div>
 
 <div class="crm-submit-buttons">
-  <button class="crm-form-submit cancel crm-button crm-button-type-back crm-button_qf_MapField_back" value="1" type="submit" name="_qf_MapField_back" id="_qf_MapField_back-bottom"><i aria-hidden="true" class="crm-i fa-chevron-left"></i> Previous</button>
-  <button ng-click="save($event)" class="crm-form-submit default validate crm-button crm-button-type-next crm-button_qf_MapField_next" value="1" type="submit" name="_qf_MapField_next" id="_qf_MapField_next-bottom"><i aria-hidden="true" class="crm-i fa-check"></i> Continue</button>
-  <button class="crm-form-submit cancel crm-button crm-button-type-cancel crm-button_qf_MapField_cancel" value="1" type="submit" name="_qf_MapField_cancel" id="_qf_MapField_cancel-bottom"><i aria-hidden="true" class="crm-i fa-times"></i> Cancel</button>
+  <button class="crm-form-submit cancel crm-button crm-button-type-back crm-button_qf_MapField_back" value="1" type="submit" name="_qf_MapField_back" id="_qf_MapField_back-bottom"><i aria-hidden="true" class="crm-i fa-chevron-left"></i>{{:: ts('Previous') }}</button>
+  <button ng-click="save($event)" class="crm-form-submit default validate crm-button crm-button-type-next crm-button_qf_MapField_next" value="1" type="submit" name="_qf_MapField_next" id="_qf_MapField_next-bottom"><i aria-hidden="true" class="crm-i fa-check"></i>{{:: ts('Continue') }}</button>
+  <button class="crm-form-submit cancel crm-button crm-button-type-cancel crm-button_qf_MapField_cancel" value="1" type="submit" name="_qf_MapField_cancel" id="_qf_MapField_cancel-bottom"><i aria-hidden="true" class="crm-i fa-times"></i>{{:: ts('Cancel') }}</button>
 </div>
 

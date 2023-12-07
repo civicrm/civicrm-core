@@ -60,6 +60,9 @@ if ($doSql === TRUE || ($doSql === 'auto' && preg_match(';alpha;', $newVersion))
     return "{* file to handle db changes in $newVersion during upgrade *}\n";
   });
 }
+else {
+  $sqlFile = NULL;
+}
 
 updateFile("xml/version.xml", function ($content) use ($newVersion, $oldVersion) {
   return str_replace($oldVersion, $newVersion, $content);
@@ -79,14 +82,22 @@ updateFile("sql/test_data_second_domain.mysql", function ($content) use ($newVer
   return str_replace($oldVersion, $newVersion, $content);
 });
 
-// Update core extension info
-$infoXmls = findCoreInfoXml();
+updateFile("js/version.json", function () use ($newVersion) {
+  return json_encode($newVersion) . '\n';
+});
+
+// Update core extensions if this is a stable release
+$infoXmls = isPreReleaseIncrement($newVersion) ? [] : findCoreInfoXml();
 foreach ($infoXmls as $infoXml) {
   updateXmlFile($infoXml, function (DOMDocument $dom) use ($newVersion) {
     // Update extension version
     /** @var \DOMNode $tag */
     foreach ($dom->getElementsByTagName('version') as $tag) {
       $tag->textContent = $newVersion;
+    }
+    // Update release date
+    foreach ($dom->getElementsByTagName('releaseDate') as $tag) {
+      $tag->textContent = date('Y-m-d');
     }
     // Update compatability - set to major version of core
     /** @var \DOMNode $compat */
@@ -101,8 +112,10 @@ foreach ($infoXmls as $infoXml) {
 
 if ($doCommit) {
   $files = array_filter(
-    array_merge(['xml/version.xml', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, @$sqlFile], $infoXmls),
-    'file_exists'
+    array_merge(['xml/version.xml', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, $sqlFile], $infoXmls),
+    function($file) {
+      return $file && file_exists($file);
+    }
   );
   $filesEsc = implode(' ', array_map('escapeshellarg', $files));
   passthru("git add $filesEsc");
@@ -181,6 +194,10 @@ function makeVerName($version) {
 
 function isVersionValid($v) {
   return $v && preg_match('/^[0-9a-z\.\-]+$/', $v);
+}
+
+function isPreReleaseIncrement(string $v): bool {
+  return (bool) preg_match('/(alpha|beta)/', $v) && !preg_match('/(beta1|alpha1)$/', $v);
 }
 
 /**

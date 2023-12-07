@@ -22,16 +22,15 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
   protected $_groupFilter = TRUE;
   protected $_tagFilter = TRUE;
   protected $_balance = FALSE;
-  protected $campaigns;
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Participant',
     'Contact',
     'Individual',
     'Event',
-  );
+  ];
 
-  public $_drilldownReport = array('event/income' => 'Link to Detail Report');
+  public $_drilldownReport = ['event/income' => 'Link to Detail Report'];
 
   /**
    * Class constructor.
@@ -39,353 +38,353 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
 
-    $this->_columns = array(
-      'civicrm_contact' => array(
+    $this->_columns = [
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array_merge(array(
+        'fields' => array_merge([
           // CRM-17115 - to avoid changing report output at this stage re-instate
           // old field name for sort name
-          'sort_name_linked' => array(
+          'sort_name_linked' => [
             'title' => ts('Participant Name'),
             'required' => TRUE,
             'no_repeat' => TRUE,
             'dbAlias' => 'contact_civireport.sort_name',
-          ),
-        ),
+          ],
+        ],
           $this->getBasicContactFields(),
-          array(
-            'age_at_event' => array(
+          [
+            'age_at_event' => [
               'title' => ts('Age at Event'),
               'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, event_civireport.start_date)',
-            ),
-          )
+            ],
+          ]
         ),
         'grouping' => 'contact-fields',
-        'order_bys' => array(
-          'sort_name' => array(
+        'order_bys' => [
+          'sort_name' => [
             'title' => ts('Last Name, First Name'),
             'default' => '1',
             'default_weight' => '0',
             'default_order' => 'ASC',
-          ),
-          'first_name' => array(
+          ],
+          'first_name' => [
             'name' => 'first_name',
             'title' => ts('First Name'),
-          ),
-          'gender_id' => array(
+          ],
+          'gender_id' => [
             'name' => 'gender_id',
             'title' => ts('Gender'),
-          ),
-          'birth_date' => array(
+          ],
+          'birth_date' => [
             'name' => 'birth_date',
             'title' => ts('Birth Date'),
-          ),
-          'age_at_event' => array(
+          ],
+          'age_at_event' => [
             'name' => 'age_at_event',
             'title' => ts('Age at Event'),
-          ),
-          'contact_type' => array(
+          ],
+          'contact_type' => [
             'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
+          ],
+          'contact_sub_type' => [
             'title' => ts('Contact Subtype'),
-          ),
-        ),
+          ],
+        ],
         'filters' => CRM_Report_Form::getBasicContactFilters(),
-      ),
-      'civicrm_email' => array(
+      ],
+      'civicrm_email' => [
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array(
-          'email' => array(
+        'fields' => [
+          'email' => [
             'title' => ts('Email'),
             'no_repeat' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-        'filters' => array(
-          'email' => array(
+        'filters' => [
+          'email' => [
             'title' => ts('Participant E-mail'),
             'operator' => 'like',
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
     $this->_columns += $this->getAddressColumns();
-    $this->_columns += array(
-      'civicrm_participant' => array(
+    $this->_columns += [
+      'civicrm_participant' => [
         'dao' => 'CRM_Event_DAO_Participant',
-        'fields' => array(
-          'participant_id' => array('title' => ts('Participant ID')),
-          'participant_record' => array(
+        'fields' => [
+          'participant_id' => ['title' => ts('Participant ID')],
+          'participant_record' => [
             'name' => 'id',
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'event_id' => array(
+          ],
+          'event_id' => [
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Status'),
             'default' => TRUE,
-          ),
-          'role_id' => array(
+          ],
+          'role_id' => [
             'title' => ts('Role'),
             'default' => TRUE,
-          ),
-          'fee_currency' => array(
+          ],
+          'fee_currency' => [
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
-          'registered_by_id' => array(
+          ],
+          'registered_by_id' => [
             'title' => ts('Registered by Participant ID'),
-          ),
-          'registered_by_name' => array(
+          ],
+          'registered_by_name' => [
             'title' => ts('Registered by Participant Name'),
             'name' => 'registered_by_id',
-          ),
-          'created_id' => array(
+          ],
+          'created_id' => [
             'title' => ts('Registered by Contact ID'),
-          ),
-          'registered_by_contact_name' => array(
+          ],
+          'registered_by_contact_name' => [
             'title' => ts('Registered by Contact Name'),
             'name' => 'created_id',
-          ),
-          'source' => array(
-            'title' => ts('Source'),
-          ),
+          ],
+          'source' => [
+            'title' => ts('Participant Source'),
+          ],
           'participant_fee_level' => NULL,
-          'participant_fee_amount' => array('title' => ts('Participant Fee')),
-          'participant_register_date' => array('title' => ts('Registration Date')),
-          'total_paid' => array(
+          'participant_fee_amount' => ['title' => ts('Participant Fee')],
+          'participant_register_date' => ['title' => ts('Registration Date')],
+          'total_paid' => [
             'title' => ts('Total Paid'),
             'dbAlias' => 'IFNULL(SUM(ft.total_amount), 0)',
             'type' => 1024,
-          ),
-          'balance' => array(
+          ],
+          'balance' => [
             'title' => ts('Balance'),
             'dbAlias' => 'participant_civireport.fee_amount - IFNULL(SUM(ft.total_amount), 0)',
             'type' => 1024,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'event-fields',
-        'filters' => array(
-          'event_id' => array(
+        'filters' => [
+          'event_id' => [
             'name' => 'event_id',
             'title' => ts('Event'),
             'operatorType' => CRM_Report_Form::OP_ENTITYREF,
             'type' => CRM_Utils_Type::T_INT,
-            'attributes' => array(
+            'attributes' => [
               'entity' => 'Event',
-              'select' => array('minimumInputLength' => 0),
-            ),
-          ),
-          'sid' => array(
+              'select' => ['minimumInputLength' => 0],
+            ],
+          ],
+          'sid' => [
             'name' => 'status_id',
             'title' => ts('Participant Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label'),
-          ),
-          'rid' => array(
+          ],
+          'rid' => [
             'name' => 'role_id',
             'title' => ts('Participant Role'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Event_PseudoConstant::participantRole(),
-          ),
-          'participant_register_date' => array(
+          ],
+          'participant_register_date' => [
             'title' => ts('Registration Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'fee_currency' => array(
+          ],
+          'fee_currency' => [
             'title' => ts('Fee Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'registered_by_id' => array(
+          ],
+          'registered_by_id' => [
             'title' => ts('Registered by Participant ID'),
             'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
-          ),
-          'source' => array(
-            'title' => ts('Source'),
+          ],
+          'source' => [
+            'title' => ts('Participant Source'),
             'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
-          ),
+          ],
           'is_test' => [
             'title' => ts('Is Test'),
             'type' => CRM_Utils_Type::T_BOOLEAN,
             'default' => 0,
           ],
-        ),
-        'order_bys' => array(
-          'participant_register_date' => array(
+        ],
+        'order_bys' => [
+          'participant_register_date' => [
             'title' => ts('Registration Date'),
             'default_weight' => '1',
             'default_order' => 'ASC',
-          ),
-          'event_id' => array(
+          ],
+          'event_id' => [
             'title' => ts('Event'),
             'default_weight' => '1',
             'default_order' => 'ASC',
-          ),
-        ),
-      ),
-      'civicrm_phone' => array(
+          ],
+        ],
+      ],
+      'civicrm_phone' => [
         'dao' => 'CRM_Core_DAO_Phone',
-        'fields' => array(
-          'phone' => array(
+        'fields' => [
+          'phone' => [
             'title' => ts('Phone'),
             'default' => TRUE,
             'no_repeat' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_event' => array(
+      ],
+      'civicrm_event' => [
         'dao' => 'CRM_Event_DAO_Event',
-        'fields' => array(
-          'event_type_id' => array(
+        'fields' => [
+          'event_type_id' => [
             'title' => ts('Event Type'),
-          ),
-          'event_start_date' => array(
+          ],
+          'event_start_date' => [
             'title' => ts('Event Start Date'),
-          ),
-          'event_end_date' => array(
+          ],
+          'event_end_date' => [
             'title' => ts('Event End Date'),
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'event-fields',
-        'filters' => array(
-          'eid' => array(
+        'filters' => [
+          'eid' => [
             'name' => 'event_type_id',
             'title' => ts('Event Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('event_type'),
-          ),
-          'event_start_date' => array(
+          ],
+          'event_start_date' => [
             'title' => ts('Event Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'event_end_date' => array(
+          ],
+          'event_end_date' => [
             'title' => ts('Event End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-        ),
-        'order_bys' => array(
-          'event_type_id' => array(
+          ],
+        ],
+        'order_bys' => [
+          'event_type_id' => [
             'title' => ts('Event Type'),
             'default_weight' => '2',
             'default_order' => 'ASC',
-          ),
-          'event_start_date' => array(
+          ],
+          'event_start_date' => [
             'title' => ts('Event Start Date'),
-          ),
-        ),
-      ),
-      'civicrm_note' => array(
+          ],
+        ],
+      ],
+      'civicrm_note' => [
         'dao' => 'CRM_Core_DAO_Note',
-        'fields' => array(
-          'participant_note' => array(
+        'fields' => [
+          'participant_note' => [
             'name' => 'note',
             'title' => ts('Participant Note'),
-          ),
-        ),
-      ),
-      'civicrm_contribution' => array(
+          ],
+        ],
+      ],
+      'civicrm_contribution' => [
         'dao' => 'CRM_Contribute_DAO_Contribution',
-        'fields' => array(
-          'contribution_id' => array(
+        'fields' => [
+          'contribution_id' => [
             'name' => 'id',
             'no_display' => TRUE,
             'required' => TRUE,
             'csv_display' => TRUE,
             'title' => ts('Contribution ID'),
-          ),
-          'financial_type_id' => array('title' => ts('Financial Type')),
-          'receive_date' => array('title' => ts('Payment Date')),
-          'contribution_status_id' => array('title' => ts('Contribution Status')),
-          'payment_instrument_id' => array('title' => ts('Payment Type')),
-          'contribution_source' => array(
+          ],
+          'financial_type_id' => ['title' => ts('Financial Type')],
+          'receive_date' => ['title' => ts('Payment Date')],
+          'contribution_status_id' => ['title' => ts('Contribution Status')],
+          'payment_instrument_id' => ['title' => ts('Payment Type')],
+          'contribution_source' => [
             'name' => 'source',
             'title' => ts('Contribution Source'),
-          ),
-          'currency' => array(
+          ],
+          'currency' => [
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
+          ],
           'trxn_id' => NULL,
-          'fee_amount' => array('title' => ts('Transaction Fee')),
+          'fee_amount' => ['title' => ts('Transaction Fee')],
           'net_amount' => NULL,
-        ),
+        ],
         'grouping' => 'contrib-fields',
-        'filters' => array(
-          'receive_date' => array(
+        'filters' => [
+          'receive_date' => [
             'title' => ts('Payment Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'financial_type_id' => array(
+          ],
+          'financial_type_id' => [
             'title' => ts('Financial Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
-          ),
-          'currency' => array(
+          ],
+          'currency' => [
             'title' => ts('Contribution Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'payment_instrument_id' => array(
+          ],
+          'payment_instrument_id' => [
             'title' => ts('Payment Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
-          ),
-          'contribution_status_id' => array(
+          ],
+          'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
             'default' => NULL,
-          ),
-        ),
-      ),
-      'civicrm_line_item' => array(
+          ],
+        ],
+      ],
+      'civicrm_line_item' => [
         'dao' => 'CRM_Price_DAO_LineItem',
         'grouping' => 'priceset-fields',
-        'filters' => array(
-          'price_field_value_id' => array(
+        'filters' => [
+          'price_field_value_id' => [
             'name' => 'price_field_value_id',
             'title' => ts('Fee Level'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->getPriceLevels(),
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
 
-    $this->_options = array(
-      'blank_column_begin' => array(
+    $this->_options = [
+      'blank_column_begin' => [
         'title' => ts('Blank column at the Begining'),
         'type' => 'checkbox',
-      ),
-      'blank_column_end' => array(
+      ],
+      'blank_column_end' => [
         'title' => ts('Blank column at the End'),
         'type' => 'select',
-        'options' => array(
+        'options' => [
           '' => ts('-select-'),
           1 => ts('One'),
           2 => ts('Two'),
           3 => ts('Three'),
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
     // CRM-17115 avoid duplication of sort_name - would be better to standardise name
     // & behaviour across reports but trying for no change at this point.

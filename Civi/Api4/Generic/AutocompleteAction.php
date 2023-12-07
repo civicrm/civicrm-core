@@ -29,11 +29,14 @@ use Civi\Core\Event\GenericHookEvent;
  * @method string getFormName()
  * @method $this setFieldName(string $fieldName) Set fieldName.
  * @method string getFieldName()
+ * @method $this setKey(string $key) Set keyField used as unique identifier.
+ * @method string getKey()
  * @method $this setFilters(array $filters)
  * @method array getFilters()
  */
 class AutocompleteAction extends AbstractAction {
   use Traits\SavedSearchInspectorTrait;
+  use Traits\GetSetValueTrait;
 
   /**
    * Autocomplete search input for search mode
@@ -87,6 +90,17 @@ class AutocompleteAction extends AbstractAction {
   protected $key;
 
   /**
+   * Known entity values.
+   *
+   * Value will be populated by the form based on data entered at the time.
+   * They can be used by hooks for contextual filtering.
+   *
+   * Format: [fieldName => value][]
+   * @var array
+   */
+  protected $values = [];
+
+  /**
    * Search conditions that will be automatically added to the WHERE or HAVING clauses
    *
    * Format: [fieldName => value][]
@@ -123,6 +137,8 @@ class AutocompleteAction extends AbstractAction {
       // Allow the default search to be modified
       \Civi::dispatcher()->dispatch('civi.search.autocompleteDefault', GenericHookEvent::create([
         'savedSearch' => &$this->savedSearch,
+        'formName' => $this->formName,
+        'fieldName' => $this->fieldName,
       ]));
     }
     $this->loadSavedSearch();
@@ -137,7 +153,7 @@ class AutocompleteAction extends AbstractAction {
 
     // Render mode: fetch by id
     if ($this->ids) {
-      $this->savedSearch['api_params']['where'][] = [$keyField, 'IN', $this->ids];
+      $this->addFilter($keyField, ['IN' => $this->ids]);
       unset($this->display['settings']['pager']);
       $return = NULL;
     }
@@ -145,26 +161,34 @@ class AutocompleteAction extends AbstractAction {
     else {
       // Default search and sort field
       $labelField = $this->display['settings']['columns'][0]['key'];
-      $idField = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
+      $primaryKeys = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'primary_key');
       $this->display['settings'] += [
         'sort' => [$labelField, 'ASC'],
       ];
       // Always search on the first line of the display
       $searchFields = [$labelField];
-      // If input is an integer, search by id
-      if (\CRM_Utils_Rule::positiveInteger($this->input)) {
-        $searchFields[] = $idField;
-        // Add a sort clause to place exact ID match at the top
-        array_unshift($this->display['settings']['sort'], [
-          "($idField = $this->input)",
-          'DESC',
-        ]);
+      // If input is an integer...
+      $searchById = \CRM_Utils_Rule::positiveInteger($this->input) &&
+        // ...and there is exactly one primary key (e.g. EntitySet has zero, others might have compound keys)
+        count($primaryKeys) === 1 &&
+        // ...and the primary key field is type Integer (e.g. Afform.name is a String)
+        ($this->getField($primaryKeys[0])['data_type'] ?? NULL) === 'Integer';
+      // ...then search by primary key on first page
+      $initialSearchById = $searchById && $this->page == 1;
+      if ($initialSearchById) {
+        $searchFields = $primaryKeys;
+      }
+      // For subsequent pages when searching by id, subtract the "extra" first page
+      elseif ($searchById && $this->page > 1) {
+        $this->page -= 1;
+        // Record with that id was already returned on page one so exclude it from subsequent pages
+        $this->savedSearch['api_params']['where'][] = [$primaryKeys[0], '!=', $this->input];
       }
       // If first line uses a rewrite, search on those fields too
-      if (!empty($this->display['settings']['columns'][0]['rewrite'])) {
+      if (!$initialSearchById && !empty($this->display['settings']['columns'][0]['rewrite'])) {
         $searchFields = array_merge($searchFields, $this->getTokens($this->display['settings']['columns'][0]['rewrite']));
       }
-      $this->display['settings']['limit'] = $this->display['settings']['limit'] ?? \Civi::settings()->get('search_autocomplete_count') ?: 10;
+      $this->display['settings']['limit'] = $this->display['settings']['limit'] ?? \Civi::settings()->get('search_autocomplete_count');
       $this->display['settings']['pager'] = [];
       $return = 'scroll:' . $this->page;
       // SearchKit treats comma-separated fieldnames as OR clauses
@@ -182,18 +206,22 @@ class AutocompleteAction extends AbstractAction {
       $item = [
         'id' => $row['data'][$keyField],
         'label' => $row['columns'][0]['val'],
-        'icon' => $row['columns'][0]['icons'][0]['class'] ?? NULL,
+        'icon' => $row['columns'][0]['icons']['left'][0] ?? NULL,
         'description' => [],
       ];
       foreach (array_slice($row['columns'], 1) as $col) {
         $item['description'][] = $col['val'];
       }
-      if (!empty($this->display['settings']['color'])) {
-        $item['color'] = $row['data'][$this->display['settings']['color']] ?? NULL;
+      foreach ($this->display['settings']['extra'] ?? [] as $name => $key) {
+        $item[$key] = $row['data'][$name] ?? $item[$key] ?? NULL;
       }
       $result[] = $item;
     }
     $result->setCountMatched($apiResult->count());
+    if (!empty($initialSearchById)) {
+      // Trigger "more results" after searching by exact id
+      $result->setCountMatched($apiResult->count() + 1);
+    }
   }
 
   /**
@@ -232,16 +260,33 @@ class AutocompleteAction extends AbstractAction {
    * @param array $displayFields
    */
   private function augmentSelectClause(string $idField, array $displayFields) {
-    $select = array_merge([$idField], $displayFields);
+    // Don't mess with aggregated queries
+    if ($this->savedSearch['api_entity'] === 'EntitySet' || !empty($this->savedSearch['api_params']['groupBy'])) {
+      return;
+    }
+    // Original select params. Key by alias to avoid duplication.
+    $originalSelect = [];
+    foreach ($this->savedSearch['api_params']['select'] ?? [] as $item) {
+      $alias = explode(' AS ', $item)[1] ?? $item;
+      $originalSelect[$alias] = $item;
+    }
+    // Add any missing fields which should be selected
+    $additions = array_merge([$idField], $displayFields);
     // Add trustedFilters to the SELECT clause so that SearchDisplay::run will trust them
     foreach ($this->trustedFilters as $fields => $val) {
-      $select = array_merge($select, explode(',', $fields));
+      $additions = array_merge($additions, explode(',', $fields));
     }
-    if (!empty($this->display['settings']['color'])) {
-      $select[] = $this->display['settings']['color'];
-    }
-    $select = array_merge($select, array_column($this->display['settings']['sort'] ?? [], 0));
-    $this->savedSearch['api_params']['select'] = array_unique(array_merge($this->savedSearch['api_params']['select'], $select));
+    // Add 'extra' fields defined by the display
+    $additions = array_merge($additions, array_keys($this->display['settings']['extra'] ?? []));
+    // Add 'sort' fields
+    $additions = array_merge($additions, array_column($this->display['settings']['sort'] ?? [], 0));
+
+    // Key by field name and combine with original SELECT
+    $additions = array_unique($additions);
+    $additions = array_combine($additions, $additions);
+
+    // Maintain original order (important when using UNIONs in the query)
+    $this->savedSearch['api_params']['select'] = array_values($originalSelect + $additions);
   }
 
   /**
@@ -254,18 +299,10 @@ class AutocompleteAction extends AbstractAction {
    */
   private function getKeyField() {
     $entityName = $this->savedSearch['api_entity'];
-    if ($this->key) {
-      /** @var \CRM_Core_DAO $dao */
-      $dao = CoreUtil::getInfoItem($entityName, 'dao');
-      if ($dao && method_exists($dao, 'indices')) {
-        foreach ($dao::indices(FALSE) as $index) {
-          if (!empty($index['unique']) && in_array($this->key, $index['field'], TRUE)) {
-            return $this->key;
-          }
-        }
-      }
+    if ($this->key && in_array($this->key, CoreUtil::getInfoItem($entityName, 'match_fields') ?? [], TRUE)) {
+      return $this->key;
     }
-    return CoreUtil::getIdFieldName($entityName);
+    return $this->display['settings']['keyField'] ?? CoreUtil::getIdFieldName($entityName);
   }
 
   /**

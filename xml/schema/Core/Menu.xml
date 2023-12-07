@@ -33,6 +33,7 @@
     <comment>Which Domain is this menu item for</comment>
     <html>
       <label>Domain</label>
+      <type>Select</type>
     </html>
     <add>3.0</add>
   </field>

@@ -125,6 +125,7 @@ class Test {
       ->callback(function ($ctx) {
         \Civi\Test::data()->populate();
       }, 'populate');
+    $builder->install(['org.civicrm.search_kit', 'org.civicrm.afform', 'authx']);
     return $builder;
   }
 

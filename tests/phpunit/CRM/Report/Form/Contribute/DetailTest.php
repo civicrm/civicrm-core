@@ -69,14 +69,14 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
    * @param $expectedOutputCsvFile
    * @throws \Exception
    */
-  public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
+  public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile): void {
     $config = CRM_Core_Config::singleton();
-    CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
+    CRM_Utils_File::sourceSQLFile($config->dsn, __DIR__ . "/{$dataSet}");
 
     $reportCsvFile = $this->getReportOutputAsCsv($reportClass, $inputParams);
     $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
 
-    $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
+    $expectedOutputCsvArray = $this->getArrayFromCsv(__DIR__ . "/{$expectedOutputCsvFile}");
     $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
   }
 
@@ -88,20 +88,20 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
    * @param $inputParams
    * @throws \Exception
    */
-  public function testPager($reportClass, $inputParams) {
+  public function testPager($reportClass, $inputParams): void {
     $contactID = $this->individualCreate();
     for ($i = 1; $i <= 51; $i++) {
       $this->contributionCreate(['contact_id' => $contactID, 'total_amount' => 50 + $i]);
     }
     $reportObj = $this->getReportObject($reportClass, $inputParams);
-    $pager = $reportObj->getTemplate()->_tpl_vars['pager'];
-    $this->assertEquals($pager->_response['numPages'], 2, "Pages in Pager");
+    $pager = $reportObj::getTemplate()->getTemplateVars('pager');
+    $this->assertEquals(2, $pager->_response['numPages'], 'Pages in Pager');
   }
 
   /**
    * @return array
    */
-  public function postalCodeDataProvider() {
+  public function postalCodeDataProvider(): array {
     return [
       [
         'CRM_Report_Form_Contribute_Detail',
@@ -126,20 +126,22 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
 
   /**
    * @dataProvider postalCodeDataProvider
-   * @param $reportClass
-   * @param $inputParams
-   * @param $dataSet
-   * @param $expectedOutputCsvFile
-   * @throws \Exception
+   *
+   * @param string $reportClass
+   * @param array $inputParams
+   * @param string $dataSet
+   * @param string $expectedOutputCsvFile
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testPostalCodeSearchReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
+  public function testPostalCodeSearchReportOutput(string $reportClass, array $inputParams, string $dataSet, string $expectedOutputCsvFile): void {
     $config = CRM_Core_Config::singleton();
-    CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
+    CRM_Utils_File::sourceSQLFile($config->dsn, __DIR__ . "/{$dataSet}");
 
     $reportCsvFile = $this->getReportOutputAsCsv($reportClass, $inputParams);
     $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
 
-    $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
+    $expectedOutputCsvArray = $this->getArrayFromCsv(__DIR__ . "/{$expectedOutputCsvFile}");
     $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
   }
 
@@ -262,9 +264,12 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
   }
 
   /**
-   * Make sure the civicrm_alterReportVar hook for contribute detail report work well.
+   * Make sure the civicrm_alterReportVar hook for contribute detail report
+   * work well.
+   *
+   * @throws \Civi\Core\Exception\DBQueryException|\CRM_Core_Exception
    */
-  public function testContributeDetailReportWithNewColumnFromCustomTable() {
+  public function testContributeDetailReportWithNewColumnFromCustomTable(): void {
     $this->quickCleanup($this->_tablesToTruncate);
 
     $solParams = [
@@ -272,9 +277,9 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
       'last_name' => 'User ' . rand(),
       'contact_type' => 'Individual',
     ];
-    $solicitor1Id = $this->individualCreate($solParams);
+    $this->individualCreate($solParams);
     $solParams['first_name'] = 'Solicitor 2';
-    $solicitor2Id = $this->individualCreate($solParams);
+    $this->individualCreate($solParams);
     $solParams['first_name'] = 'Donor';
     $donorId = $this->individualCreate($solParams);
 
@@ -288,22 +293,22 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     $contribId = $this->contributionCreate($contribParams);
 
     $config = CRM_Core_Config::singleton();
-    CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/fixtures/value_extension_tng55_table.sql");
+    CRM_Utils_File::sourceSQLFile($config->dsn, __DIR__ . '/fixtures/value_extension_tng55_table.sql');
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_value_extension_tng55 (`entity_id`, `title`) VALUES (%1, 'some_title')", [1 => [$contribId, 'Positive']]);
 
-    CRM_Utils_Hook::singleton()->setHook('civicrm_alterReportVar', function ($varType, &$var, &$reportForm) {
+    CRM_Utils_Hook::singleton()->setHook('civicrm_alterReportVar', function ($varType, &$var) {
       if ($varType === 'columns') {
         $var['civicrm_value_extension_tng55'] = [
           'fields' => [
             'extension_tng55_title' => [
               'title' => ts('Extension Title'),
-              'dbAlias' => "civicrm_value_extension_tng55.title",
+              'dbAlias' => 'civicrm_value_extension_tng55.title',
             ],
           ],
           'filters' => [
             'extension_tng55_title' => [
               'title' => ts('Extension Title'),
-              'dbAlias' => "civicrm_value_extension_tng55.title",
+              'dbAlias' => 'civicrm_value_extension_tng55.title',
               'type' => CRM_Utils_Type::T_INT,
               'operatorType' => CRM_Report_Form::OP_MULTISELECT,
               'options' => [],
@@ -313,10 +318,10 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
       }
       if ($varType === 'sql') {
         $from = $var->getVar('_from');
-        $from .= "
+        $from .= '
             LEFT JOIN civicrm_value_extension_tng55
             ON (civicrm_value_extension_tng55.entity_id = contribution_civireport.id)
-        ";
+        ';
         $var->setVar('_from', $from);
       }
     });

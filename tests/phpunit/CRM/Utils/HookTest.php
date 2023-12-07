@@ -27,8 +27,8 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
   public $hook;
 
   public function setUp(): void {
-    $this->useTransaction();
     parent::setUp();
+    $this->useTransaction();
     $this->fakeModules = [
       'hooktesta',
       'hooktestb',
@@ -50,9 +50,10 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
   /**
    * Verify that runHooks() is reentrant by invoking one hook which calls another hooks
    */
-  public function testRunHooks_reentrancy() {
+  public function testRunHooks_reentrancy(): void {
     $arg1 = 'whatever';
-    $this->hook->runHooks($this->fakeModules, 'civicrm_testRunHooks_outer', 1, $arg1, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject);
+    $null = NULL;
+    $this->hook->runHooks($this->fakeModules, 'civicrm_testRunHooks_outer', 1, $arg1, $null, $null, $null, $null, $null);
     $this->assertEquals(
       [
         'a-outer',
@@ -69,8 +70,9 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
   /**
    * Verify that the results of runHooks() are correctly merged
    */
-  public function testRunHooks_merge() {
-    $result = $this->hook->runHooks($this->fakeModules, 'civicrm_testRunHooks_merge', 0, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject);
+  public function testRunHooks_merge(): void {
+    $null = NULL;
+    $result = $this->hook->runHooks($this->fakeModules, 'civicrm_testRunHooks_merge', 0, $null, $null, $null, $null, $null, $null);
     $this->assertEquals(
       [
         'from-module-a1',
@@ -96,7 +98,8 @@ function hooktesta_civicrm_testRunHooks_outer() {
 function hooktestb_civicrm_testRunHooks_outer() {
   $test = CRM_Utils_HookTest::$activeTest;
   $test->log[] = 'b-outer-1';
-  $test->hook->runHooks($test->fakeModules, 'civicrm_testRunHooks_inner', 0, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject);
+  $null = NULL;
+  $test->hook->runHooks($test->fakeModules, 'civicrm_testRunHooks_inner', 0, $null, $null, $null, $null, $null, $null);
   $test->log[] = 'b-outer-2';
 }
 

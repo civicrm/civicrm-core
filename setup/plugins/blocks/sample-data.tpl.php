@@ -4,7 +4,7 @@ endif; ?>
 
 <p>
   <label for="loadGenerated"><span>Load sample data:</span><input id="loadGenerated" type="checkbox" name="civisetup[loadGenerated]" value=1 <?php echo $model->loadGenerated ? "checked='checked'" : ""; ?> /></label> <br />
-  <span class="advancedTip"><?php echo ts("Check this box to pre-populate CiviCRM with sample English contact records, online contribution pages, profile forms, etc. These examples can help you learn about CiviCRM features."); ?></span><br />
+  <span class="advancedTip"><?php echo ts("Fill the database with randomly-generated individuals, organizations, households, contributions, activities, etc. (English only). Sample data is mainly used for demo and testing sites, not for real installs."); ?></span><br />
 </p>
 
 <script type="text/javascript">

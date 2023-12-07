@@ -98,8 +98,8 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('text', 'job_title', ts('Job Title'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'job_title'));
 
     //added internal ID
-    $form->add('number', 'contact_id', ts('Contact ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'id') + ['min' => 1]);
-    $form->addRule('contact_id', ts('Please enter valid Contact ID'), 'positiveInteger');
+    $form->add('number', 'id', ts('Contact ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'id') + ['min' => 1]);
+    $form->addRule('id', ts('Please enter valid Contact ID'), 'positiveInteger');
 
     //added external ID
     $form->addElement('text', 'external_identifier', ts('External ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'external_identifier'));
@@ -374,7 +374,7 @@ class CRM_Contact_Form_Search_Criteria {
       'job_title' => ['name' => 'job_title'],
       'preferred_language' => ['name' => 'preferred_language'],
       'contact_id' => [
-        'name' => 'contact_id',
+        'name' => 'id',
         'help' => ['id' => 'id-contact-id', 'file' => 'CRM/Contact/Form/Contact'],
       ],
       'external_identifier' => [
@@ -427,7 +427,7 @@ class CRM_Contact_Form_Search_Criteria {
     $parseStreetAddress = $addressOptions['street_address_parsing'] ?? 0;
     $form->assign('parseStreetAddress', $parseStreetAddress);
     foreach ($elements as $name => $v) {
-      list($title, $attributes, $select, $multiSelect) = $v;
+      [$title, $attributes, $select, $multiSelect] = $v;
 
       if (in_array($name,
         ['street_number', 'street_name', 'street_unit']
@@ -461,7 +461,7 @@ class CRM_Contact_Form_Search_Criteria {
       }
 
       if ($addressOptions['postal_code']) {
-        $attr = ['class' => 'six'] + (array) CRM_Utils_Array::value('postal_code', $attributes);
+        $attr = ['class' => 'six'] + ($attributes['postal_code'] ?? []);
         $form->addElement('text', 'postal_code_low', NULL, $attr + ['placeholder' => ts('From')]);
         $form->addElement('text', 'postal_code_high', NULL, $attr + ['placeholder' => ts('To')]);
       }

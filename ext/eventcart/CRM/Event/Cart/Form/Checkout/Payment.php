@@ -154,7 +154,19 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
     else {
       $this->_paymentProcessorIDs = [$payment_processor_id];
-      $this->assignPaymentProcessor(FALSE);
+      $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors([ucfirst($this->_mode) . 'Mode'], $this->_paymentProcessorIDs);
+
+      if (!empty($this->_paymentProcessors)) {
+        foreach ($this->_paymentProcessors as $paymentProcessorID => $paymentProcessorDetail) {
+          if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count($this->_paymentProcessors) == 1)
+          ) {
+            $this->_paymentProcessor = $paymentProcessorDetail;
+            $this->assign('paymentProcessor', $this->_paymentProcessor);
+          }
+        }
+        // It's not clear why we set this on the form.
+        $this->set('paymentProcessors', $this->_paymentProcessors);
+      }
       CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, FALSE);
     }
     $this->assign('currency', $this->getCurrency());
@@ -236,10 +248,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       else {
         $cost = $event_price_values['amount'];
       }
-      // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
-      // function to get correct amount level consistently. Remove setting of the amount level in
-      // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
-      // to cover all variants.
+      // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
       $amount_level = $event_price_values['amount_level'];
       $price_details[$price_set_id] = $price_set_amount;
     }
@@ -487,7 +496,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $params['is_pay_later'] = 0;
     }
     if ($trxnDetails == NULL) {
-      $params['trxn_id'] = $trxn_prefix . strftime("%Y%m%d%H%M%S");
+      $params['trxn_id'] = $trxn_prefix . date('YmdHMS');
       $params['trxn_date'] = $params['now'];
     }
 

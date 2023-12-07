@@ -21,13 +21,12 @@
   <tr><td>{ts}When{/ts}</td>
       <td width="90%">
         {$event.event_start_date|crmDate}
-        {if $event.event_end_date}
-            &nbsp; {ts}through{/ts} &nbsp;
+        {if $event.event_end_date}{ts}through{/ts}
             {* Only show end time if end date = start date *}
             {if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}
-                {$event.event_end_date|crmDate:0:1}
+              {$event.event_end_date|crmDate:0:1}
             {else}
-                {$event.event_end_date|crmDate}
+              {$event.event_end_date|crmDate}
             {/if}
         {/if}
       </td>
@@ -38,10 +37,10 @@
       <tr><td>{ts}Location{/ts}</td>
           <td>
             {$location.address.1.display|nl2br}
-            {if ( $event.is_map &&
+            {if ($event.is_map &&
             $config->mapProvider &&
-      ( ( !empty($location.address.1.geo_code_1) && is_numeric($location.address.1.geo_code_1) )  ||
-        ( !empty($location.address.1.city) AND !empty($location.address.1.state_province) ) ) ) }
+      ((!empty($location.address.1.geo_code_1) && is_numeric($location.address.1.geo_code_1)) ||
+        (!empty($location.address.1.city) AND !empty($location.address.1.state_province))))}
               <br/><a href="{crmURL p='civicrm/contact/map/event' q="reset=1&eid=`$event.id`"}" title="{ts}Map this Address{/ts}" target="_blank">{ts}Map this Location{/ts}</a>
             {/if}
           </td>

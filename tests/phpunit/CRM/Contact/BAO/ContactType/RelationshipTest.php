@@ -35,7 +35,7 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->student = $params['name'];
 
     $params = [
@@ -45,7 +45,7 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->parent = $params['name'];
 
     $params = [
@@ -55,7 +55,7 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
       'parent_id' => 3,
       'is_active' => 1,
     ];
-    CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->sponsor = $params['name'];
 
     //create contacts
@@ -111,7 +111,7 @@ DELETE FROM civicrm_contact_type
    * Methods create relationshipType with valid data.
    * success expected
    */
-  public function testRelationshipTypeAddIndiviParent() {
+  public function testRelationshipTypeAddIndiviParent(): void {
     //check Individual to Parent RelationshipType
     $params = [
       'name_a_b' => 'indivToparent',
@@ -120,7 +120,7 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Individual',
       'contact_sub_type_b' => $this->parent,
     ];
-    $result = CRM_Contact_BAO_RelationshipType::add($params);
+    $result = CRM_Contact_BAO_RelationshipType::writeRecord($params);
     $this->assertEquals($result->name_a_b, 'indivToparent');
     $this->assertEquals($result->contact_type_a, 'Individual');
     $this->assertEquals($result->contact_type_b, 'Individual');
@@ -128,7 +128,7 @@ DELETE FROM civicrm_contact_type
     $this->relationshipTypeDelete($result->id);
   }
 
-  public function testRelationshipTypeAddSponcorIndivi() {
+  public function testRelationshipTypeAddSponcorIndivi(): void {
     //check Sponcor to Individual RelationshipType
     $params = [
       'name_a_b' => 'SponsorToIndiv',
@@ -137,7 +137,7 @@ DELETE FROM civicrm_contact_type
       'contact_sub_type_a' => $this->sponsor,
       'contact_type_b' => 'Individual',
     ];
-    $result = CRM_Contact_BAO_RelationshipType::add($params);
+    $result = CRM_Contact_BAO_RelationshipType::writeRecord($params);
     $this->assertEquals($result->name_a_b, 'SponsorToIndiv');
     $this->assertEquals($result->contact_type_a, 'Organization');
     $this->assertEquals($result->contact_sub_type_a, $this->sponsor);
@@ -145,7 +145,7 @@ DELETE FROM civicrm_contact_type
     $this->relationshipTypeDelete($result->id);
   }
 
-  public function testRelationshipTypeAddStudentSponcor() {
+  public function testRelationshipTypeAddStudentSponcor(): void {
     //check Student to Sponcer RelationshipType
     $params = [
       'name_a_b' => 'StudentToSponser',
@@ -155,7 +155,7 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Organization',
       'contact_sub_type_b' => $this->sponsor,
     ];
-    $result = CRM_Contact_BAO_RelationshipType::add($params);
+    $result = CRM_Contact_BAO_RelationshipType::writeRecord($params);
     $this->assertEquals($result->name_a_b, 'StudentToSponser');
     $this->assertEquals($result->contact_type_a, 'Individual');
     $this->assertEquals($result->contact_sub_type_a, $this->student);
@@ -164,7 +164,7 @@ DELETE FROM civicrm_contact_type
     $this->relationshipTypeDelete($result->id);
   }
 
-  public function testGetAnyToAnyRelTypes() {
+  public function testGetAnyToAnyRelTypes(): void {
     // Create an any to any relationship.
     $relTypeParams = [
       'name_a_b' => 'MookieIs',
@@ -172,7 +172,7 @@ DELETE FROM civicrm_contact_type
       'contact_type_a' => '',
       'contact_type_b' => '',
     ];
-    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams);
+    $relType = CRM_Contact_BAO_RelationshipType::writeRecord($relTypeParams);
     $indTypes = CRM_Contact_BAO_Relationship::getRelationType('Individual');
     $orgTypes = CRM_Contact_BAO_Relationship::getRelationType('Organization');
 

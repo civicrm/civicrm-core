@@ -12,7 +12,7 @@
 Click this link to go to a web page where you can confirm your registration online:
 {$confirmUrl}
 {/if}
-{if $event.allow_selfcancelxfer }
+{if $event.allow_selfcancelxfer}
 {ts 1=$selfcancelxfer_time 2=$selfservice_preposition}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts} {if $totalAmount}{ts}Cancellations are not refundable.{/ts}{/if}
    {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participant.id`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
 {ts}Transfer or cancel your registration:{/ts} {$selfService}
@@ -23,24 +23,6 @@ Click this link to go to a web page where you can confirm your registration onli
 ===========================================================
 {$event.event_title}
 {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
-{if $conference_sessions}
-
-
-{ts}Your schedule:{/ts}
-{assign var='group_by_day' value='NA'}
-{foreach from=$conference_sessions item=session}
-{if $session.start_date|crmDate:"%Y/%m/%d" != $group_by_day|crmDate:"%Y/%m/%d"}
-{assign var='group_by_day' value=$session.start_date}
-
-{$group_by_day|crmDate:"%m/%d/%Y"}
-
-
-{/if}
-{$session.start_date|crmDate:0:1}{if $session.end_date}-{$session.end_date|crmDate:0:1}{/if} {$session.title}
-{if $session.location}    {$session.location}{/if}
-{/foreach}
-{/if}
-
 
 {ts}Participant Role{/ts}: {$participant.role}
 

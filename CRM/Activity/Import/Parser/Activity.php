@@ -40,6 +40,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         'name' => 'activity_import',
         'label' => ts('Activity Import'),
         'entity' => 'Activity',
+        'url' => 'civicrm/import/activity',
       ],
     ];
   }
@@ -62,6 +63,10 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
     // First make sure this is a valid line
     try {
       $params = $this->getMappedRow($values);
+
+      if (!empty($params['source_contact_external_identifier'])) {
+        $params['source_contact_id'] = $this->lookupExternalIdentifier($params['source_contact_external_identifier'], $this->getContactType(), $params['contact_id'] ?? NULL);
+      }
 
       if (empty($params['external_identifier']) && empty($params['target_contact_id'])) {
 
@@ -168,7 +173,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
       }
       if ($mappedField['name']) {
         $fieldName = $this->getFieldMetadata($mappedField['name'])['name'];
-        if (in_array($mappedField['name'], ['target_contact_id', 'source_contact_id'])) {
+        if (in_array($mappedField['name'], ['target_contact_id', 'source_contact_id', 'source_contact_external_identifier'])) {
           $fieldName = $mappedField['name'];
         }
         $params[$fieldName] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
@@ -216,7 +221,10 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
         }
       }
       $tmpContactField['external_identifier'] = $contactFields['external_identifier'];
-      $tmpContactField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' (match to contact)';
+      $tmpContactField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' (target contact)' . ' (match to contact)';
+      $tmpContactField['source_contact_external_identifier'] = $contactFields['external_identifier'];
+      $tmpContactField['source_contact_external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' (source contact)' . ' (match to contact)';
+
       $fields = array_merge($fields, $tmpContactField);
       $fields = array_merge($fields, $tmpFields);
       $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Activity'));

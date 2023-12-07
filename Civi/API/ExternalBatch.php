@@ -217,7 +217,7 @@ class ExternalBatch {
     $env = array_merge($this->env, [
       'CIVICRM_SETTINGS' => $this->settingsPath,
     ]);
-    return new Process($command, $this->root, $env);
+    return Process::fromShellCommandline($command, $this->root, $env);
   }
 
   /**

@@ -9,10 +9,10 @@
   <log>true</log>
   <icon>fa-money</icon>
   <paths>
-    <add>civicrm/grant/add?reset=1&amp;action=add&amp;context=standalone</add>
-    <view>civicrm/contact/view/grant?reset=1&amp;action=view&amp;id=[id]&amp;cid=[contact_id]</view>
-    <update>civicrm/contact/view/grant?reset=1&amp;action=update&amp;id=[id]&amp;cid=[contact_id]</update>
-    <delete>civicrm/contact/view/grant?reset=1&amp;action=delete&amp;id=[id]&amp;cid=[contact_id]</delete>
+    <add>civicrm/grant/add?reset=1&amp;action=add&amp;cid=[contact_id]</add>
+    <view>civicrm/grant/view?reset=1&amp;action=view&amp;id=[id]</view>
+    <update>civicrm/grant/add?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/grant/add?reset=1&amp;action=delete&amp;id=[id]</delete>
   </paths>
   <field>
     <name>id</name>
@@ -238,6 +238,7 @@
     <comment>FK to Financial Type.</comment>
     <html>
       <label>Financial Type</label>
+      <type>Select</type>
     </html>
     <add>4.3</add>
   </field>

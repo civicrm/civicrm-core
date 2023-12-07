@@ -30,14 +30,11 @@ class CRM_Core_Component {
    * @return CRM_Core_Component_Info[]
    */
   private static function &_info($force = FALSE) {
-    if (!isset(Civi::$statics[__CLASS__]['info'])|| $force) {
+    if (!isset(Civi::$statics[__CLASS__]['info']) || $force) {
       Civi::$statics[__CLASS__]['info'] = [];
 
-      $config = CRM_Core_Config::singleton();
-      $c = self::getComponents();
-
-      foreach ($c as $name => $comp) {
-        if (in_array($name, $config->enableComponents)) {
+      foreach (self::getComponents() as $name => $comp) {
+        if (self::isEnabled($name)) {
           Civi::$statics[__CLASS__]['info'][$name] = $comp;
         }
       }
@@ -53,7 +50,7 @@ class CRM_Core_Component {
    * @return mixed
    */
   public static function get($name, $attribute = NULL) {
-    $comp = CRM_Utils_Array::value($name, self::_info());
+    $comp = self::_info()[$name] ?? NULL;
     if ($attribute) {
       return $comp->info[$attribute] ?? NULL;
     }
@@ -92,10 +89,12 @@ class CRM_Core_Component {
   }
 
   /**
+   * @deprecated
    * @return array
    *   Array(string $name => int $id).
    */
   public static function &getComponentIDs() {
+    CRM_Core_Error::deprecatedFunctionWarning('getComponents');
     $componentIDs = [];
 
     $cr = new CRM_Core_DAO_Component();
@@ -114,15 +113,6 @@ class CRM_Core_Component {
    */
   public static function &getEnabledComponents($force = FALSE) {
     return self::_info($force);
-  }
-
-  /**
-   * Triggered by on_change callback of the 'enable_components' setting.
-   */
-  public static function flushEnabledComponents() {
-    unset(Civi::$statics[__CLASS__]);
-    CRM_Core_BAO_Navigation::resetNavigation();
-    Civi::cache('metadata')->clear();
   }
 
   /**
@@ -153,12 +143,11 @@ class CRM_Core_Component {
    */
   public static function invoke(&$args, $type) {
     $info = self::_info();
-    $config = CRM_Core_Config::singleton();
 
-    $firstArg = CRM_Utils_Array::value(1, $args, '');
-    $secondArg = CRM_Utils_Array::value(2, $args, '');
+    $firstArg = $args[1] ?? '';
+    $secondArg = $args[2] ?? '';
     foreach ($info as $name => $comp) {
-      if (in_array($name, $config->enableComponents) &&
+      if (self::isEnabled($name) &&
         (($comp->info['url'] === $firstArg && $type == 'main') ||
           ($comp->info['url'] === $secondArg && $type == 'admin')
         )
@@ -170,10 +159,6 @@ class CRM_Core_Component {
           if (!empty($comp->info[$name]['formTpl'])) {
             $template->assign('formTpl', $comp->info[$name]['formTpl']);
           }
-          if (!empty($comp->info[$name]['css'])) {
-            $styleSheets = '<style type="text/css">@import url(' . "{$config->resourceBase}css/{$comp->info[$name]['css']});</style>";
-            CRM_Utils_System::addHTMLHead($styleSheet);
-          }
         }
         $inv = $comp->getInvokeObject();
         $inv->$type($args);
@@ -184,18 +169,15 @@ class CRM_Core_Component {
   }
 
   /**
+   * Get menu files from all components
    * @return array
    */
   public static function xmlMenu() {
-
-    // lets build the menu for all components
     $info = self::getComponents(TRUE);
 
     $files = [];
-    foreach ($info as $name => $comp) {
-      $files = array_merge($files,
-        $comp->menuFiles()
-      );
+    foreach ($info as $comp) {
+      $files = array_merge($files, $comp->menuFiles());
     }
 
     return $files;
@@ -204,32 +186,28 @@ class CRM_Core_Component {
   /**
    * @param string $componentName
    *
-   * @return mixed
+   * @return int|null
    */
   public static function getComponentID($componentName) {
-    $info = self::_info();
+    $info = self::getComponents();
     if (!empty($info[$componentName])) {
       return $info[$componentName]->componentID;
     }
+    return NULL;
   }
 
   /**
    * @param int $componentID
    *
-   * @return int|null|string
+   * @return string|null
    */
   public static function getComponentName($componentID) {
-    $info = self::_info();
-
-    $componentName = NULL;
-    foreach ($info as $compName => $component) {
+    foreach (self::getComponents() as $compName => $component) {
       if ($component->componentID == $componentID) {
-        $componentName = $compName;
-        break;
+        return $compName;
       }
     }
-
-    return $componentName;
+    return NULL;
   }
 
   /**
@@ -238,7 +216,7 @@ class CRM_Core_Component {
   public static function &getQueryFields($checkPermission = TRUE) {
     $info = self::_info();
     $fields = [];
-    foreach ($info as $name => $comp) {
+    foreach ($info as $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $flds = $bqr->getFields($checkPermission);
@@ -255,7 +233,7 @@ class CRM_Core_Component {
   public static function alterQuery(&$query, $fnName) {
     $info = self::_info();
 
-    foreach ($info as $name => $comp) {
+    foreach ($info as $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $bqr->$fnName($query);
@@ -274,7 +252,7 @@ class CRM_Core_Component {
     $info = self::_info();
 
     $from = NULL;
-    foreach ($info as $name => $comp) {
+    foreach ($info as $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $from = $bqr->from($fieldName, $mode, $side);
@@ -320,7 +298,7 @@ class CRM_Core_Component {
   public static function &buildSearchForm(&$form) {
     $info = self::_info();
 
-    foreach ($info as $name => $comp) {
+    foreach ($info as $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $bqr->buildSearchForm($form);
@@ -335,7 +313,7 @@ class CRM_Core_Component {
   public static function searchAction(&$row, $id) {
     $info = self::_info();
 
-    foreach ($info as $name => $comp) {
+    foreach ($info as $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $bqr->searchAction($row, $id);
@@ -386,7 +364,7 @@ class CRM_Core_Component {
   public static function tableNames(&$tables) {
     $info = self::_info();
 
-    foreach ($info as $name => $comp) {
+    foreach ($info as $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $bqr->tableNames($tables);
@@ -434,7 +412,81 @@ class CRM_Core_Component {
    *   Is the component enabled.
    */
   public static function isEnabled(string $component): bool {
-    return in_array($component, CRM_Core_Config::singleton()->enableComponents, TRUE);
+    return in_array($component, Civi::settings()->get('enable_components'), TRUE);
+  }
+
+  /**
+   * Callback for the "enable_components" setting (pre change)
+   *
+   * Before a component is disabled, disable reverse-dependencies (all extensions dependent on it).
+   *
+   * This is imperfect because it only goes one-level deep:
+   * it doesn't deal with any extensions that depend on the ones being disabled.
+   * The proper fix for that would probably be something like a CASCADE mode for
+   * disabling an extension with all its reverse dependencies (which would render this function moot).
+   *
+   * @param array $oldValue
+   *   List of component names.
+   * @param array $newValue
+   *   List of component names.
+   *
+   * @throws \CRM_Core_Exception.
+   */
+  public static function preToggleComponents($oldValue, $newValue): void {
+    if (is_array($oldValue) && is_array($newValue)) {
+      $disabledComponents = array_diff($oldValue, $newValue);
+    }
+    if (empty($disabledComponents)) {
+      return;
+    }
+    $disabledExtensions = array_map(['CRM_Utils_String', 'convertStringToSnakeCase'], $disabledComponents);
+    $manager = CRM_Extension_System::singleton()->getManager();
+    $extensions = $manager->getStatuses();
+    foreach ($extensions as $extension => $status) {
+      if ($status === CRM_Extension_Manager::STATUS_INSTALLED) {
+        $info = $manager->mapper->keyToInfo($extension);
+        if (array_intersect($info->requires, $disabledExtensions)) {
+          $manager->disable($extension);
+        }
+      }
+    }
+  }
+
+  /**
+   * Callback for the "enable_components" setting (post change)
+   *
+   * When a component is enabled or disabled, ensure the corresponding module-extension is also enabled/disabled.
+   *
+   * @param array $oldValue
+   *   List of component names.
+   * @param array $newValue
+   *   List of component names.
+   *
+   * @throws \CRM_Core_Exception.
+   */
+  public static function postToggleComponents($oldValue, $newValue): void {
+    if (CRM_Core_Config::isUpgradeMode()) {
+      return;
+    }
+    $manager = CRM_Extension_System::singleton()->getManager();
+    $toEnable = $toDisable = [];
+    foreach (self::getComponents() as $component) {
+      $componentEnabled = in_array($component->name, $newValue);
+      $extName = $component->getExtensionName();
+      $extensionEnabled = $manager->getStatus($extName) === $manager::STATUS_INSTALLED;
+      if ($componentEnabled && !$extensionEnabled) {
+        $toEnable[] = $extName;
+      }
+      elseif (!$componentEnabled && $extensionEnabled) {
+        $toDisable[] = $extName;
+      }
+    }
+    if ($toEnable) {
+      CRM_Extension_System::singleton()->getManager()->install($toEnable);
+    }
+    if ($toDisable) {
+      CRM_Extension_System::singleton()->getManager()->disable($toDisable);
+    }
   }
 
 }

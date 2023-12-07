@@ -26,16 +26,16 @@
  *   {ts} block contents from the template.
  * @param CRM_Core_Smarty $smarty
  *   The Smarty object.
+ * @param bool $repeat
+ *   Repeat is true for the opening tag, false for the closing tag
  *
- * @return string
+ * @return string|null
  *   the string, translated by gettext
  */
-function smarty_block_htxt($params, $text, &$smarty) {
-  if ($params['id'] == $smarty->_tpl_vars['id']) {
+function smarty_block_htxt($params, $text, $smarty, &$repeat) {
+  if (!$repeat && $params['id'] == $smarty->getTemplateVars('id')) {
     $smarty->assign('override_help_text', !empty($params['override']));
     return $text;
   }
-  else {
-    return NULL;
-  }
+  return NULL;
 }

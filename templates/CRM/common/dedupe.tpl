@@ -62,7 +62,7 @@ function saveProcessDupes( cid, oid, oper, context ) {
        var statusMsg = {/literal}'{ts escape="js"}Marked as duplicates.{/ts}'{literal};
     }
 
-    var url = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=processDupes' h=0 }"{literal};
+    var url = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=processDupes' h=0}"{literal};
     //post the data to process dupes.
     cj.post( url,
             {cid: cid, oid: oid, op: oper},

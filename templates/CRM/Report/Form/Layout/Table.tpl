@@ -28,14 +28,14 @@
                    {if $header.colspan}
                        <th colspan={$header.colspan}>{$header.title|escape}</th>
                       {assign var=skip value=true}
-                      {assign var=skipCount value=`$header.colspan`}
+                      {assign var=skipCount value=$header.colspan}
                       {assign var=skipMade  value=1}
                    {else}
                        <th {$class}>{$header.title|escape}</th>
                    {assign var=skip value=false}
                    {/if}
                 {else} {* for skip case *}
-                   {assign var=skipMade value=`$skipMade+1`}
+                   {assign var=skipMade value=$skipMade+1}
                    {if $skipMade >= $skipCount}{assign var=skip value=false}{/if}
                 {/if}
             {/foreach}
@@ -44,96 +44,97 @@
         {if !$sections} {* section headers and sticky headers aren't playing nice yet *}
             <thead class="sticky">
             <tr>
-                {$tableHeader}
-        </tr>
+              {$tableHeader|smarty:nodefaults}
+            </tr>
         </thead>
         {/if}
 
         {* pre-compile section header here, rather than doing it every time under foreach *}
         {capture assign=sectionHeaderTemplate}
             {assign var=columnCount value=$columnHeaders|@count}
-            {assign var=l value=$smarty.ldelim}
-            {assign var=r value=$smarty.rdelim}
             {assign var=pageBroke value=0}
-            {foreach from=$sections item=section key=column name=sections}
-                {counter assign="h"}
-                {$l}isValueChange value=$row.{$column} key="{$column}" assign=isValueChanged{$r}
-                {$l}if $isValueChanged{$r}
-
-                    {$l}if $sections.{$column}.type & 4{$r}
-                        {$l}assign var=printValue value=$row.{$column}|crmDate{$r}
-                    {$l}elseif $sections.{$column}.type eq 1024{$r}
-                        {$l}assign var=printValue value=$row.{$column}|crmMoney{$r}
-                    {$l}else{$r}
-                        {$l}assign var=printValue value=$row.{$column}{$r}
-                    {$l}/if{$r}
-                    {$l}if $rowid neq 0{$r}
-                      {if $section.pageBreak}
-                        {$l}if $pageBroke >= {$h} or $pageBroke == 0{$r}
-                          </table>
-                          <div class="page-break"></div>
-                          <table class="report-layout display">
-                        {$l}/if{$r}
-                        {$l}assign var=pageBroke value={$h}{$r}
-                      {/if}
-                    {$l}/if{$r}
-                    <tr class="crm-report-sectionHeader crm-report-sectionHeader-{$h}"><th colspan="{$columnCount}">
-
-                        <h{$h}>{$section.title|escape}: {$l}$printValue|default:"<em>none</em>"{$r}
-                            ({$l}sectionTotal key=$row.{$column} depth={$smarty.foreach.sections.index}{$r})
-                        </h{$h}>
-                    </th></tr>
-                    {if $smarty.foreach.sections.last}
-                        <tr class="crm-report-sectionCols">{$l}$tableHeader{$r}</tr>
-                    {/if}
-                {$l}/if{$r}
-            {/foreach}
         {/capture}
 
         {foreach from=$rows item=row key=rowid}
-           {eval var=$sectionHeaderTemplate}
-            <tr  class="{cycle values="odd-row,even-row"} {if $row.class}{$row.class}{/if} crm-report" id="crm-report_{$rowid}">
-                {foreach from=$columnHeaders item=header key=field}
-                    {assign var=fieldLink value=$field|cat:"_link"}
-                    {assign var=fieldHover value=$field|cat:"_hover"}
-                    {assign var=fieldClass value=$field|cat:"_class"}
-                    <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
-                        {if !empty($row.$fieldLink)}
-                            <a title="{$row.$fieldHover|escape}" href="{$row.$fieldLink}"  {if array_key_exists($fieldClass, $row)} class="{$row.$fieldClass}"{/if}>
-                        {/if}
+          {foreach from=$sections item=section key=column name=sections}
+            {counter start=1 assign="h"}
+            {assign var=sectionColumn value=$sections.$column}
+            {isValueChange value=$row.$column key=$column assign=isValueChanged}
+              {if $isValueChanged}
 
-                        {if is_array($row.$field)}
-                            {foreach from=$row.$field item=fieldrow key=fieldid}
-                                <div class="crm-report-{$field}-row-{$fieldid}">{$fieldrow}</div>
-                            {/foreach}
-                        {elseif $row.$field eq 'Subtotal'}
-                            {$row.$field}
-                        {elseif $header.type & 4 OR $header.type & 256}
-                            {if $header.group_by eq 'MONTH' or $header.group_by eq 'QUARTER'}
-                                {$row.$field|crmDate:$config->dateformatPartial}
-                            {elseif $header.group_by eq 'YEAR'}
-                                {$row.$field|crmDate:$config->dateformatYear}
-                            {else}
-                                {if $header.type == 4}
-                                   {$row.$field|truncate:10:''|crmDate}
-                                {else}
-                                   {$row.$field|crmDate}
-                                {/if}
-                            {/if}
-                        {elseif $header.type eq 1024}
-                            {if $currencyColumn}
-                                <span class="nowrap">{$row.$field|crmMoney:$row.$currencyColumn}</span>
-                            {else}
-                                <span class="nowrap">{$row.$field|crmMoney}</span>
-                           {/if}
-                        {else}
-                            {$row.$field}
-                        {/if}
+              {if $sectionColumn.type & 4}
+              {assign var=printValue value=$row.$column|crmDate}
+              {elseif $sectionColumn.type eq 1024}
+              {assign var=printValue value=$row.$column|crmMoney}
+              {else}
+              {assign var=printValue value=$row.$column}
+              {/if}
+              {if $rowid neq 0}
+              {if $section.pageBreak}
+                  {if $pageBroke >= $h or $pageBroke == 0}
+                </table>
+                <div class="page-break"></div>
+                <table class="report-layout display">
+                  {/if}
+                  {assign var=pageBroke value=$h}
+              {/if}
+              {/if}
+            <tr class="crm-report-sectionHeader crm-report-sectionHeader-{$h}"><th colspan="{$columnCount}">
 
-                        {if !empty($row.$fieldLink)}</a>{/if}
-                    </td>
-                {/foreach}
-            </tr>
+                <h{$h}>{$section.title|escape}: {$printValue|default:"<em>none</em>"}
+                  ({sectionTotal key=$row.$column depth=$smarty.foreach.sections.index totals=$sectionTotals})
+                </h{$h}>
+              </th></tr>
+              {if $smarty.foreach.sections.last}
+                <tr class="crm-report-sectionCols">{$tableHeader}</tr>
+              {/if}
+              {/if}
+          {/foreach}
+          <tr  class="{cycle values="odd-row,even-row"} {if $row.class}{$row.class}{/if} crm-report" id="crm-report_{$rowid}">
+              {foreach from=$columnHeaders item=header key=field}
+                  {assign var=fieldLink value=$field|cat:"_link"}
+                  {assign var=fieldHover value=$field|cat:"_hover"}
+                  {assign var=fieldClass value=$field|cat:"_class"}
+                  <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif array_key_exists($field, $row) && $row.$field eq 'Subtotal'} report-label{/if}">
+                      {if array_key_exists($fieldLink, $row) && $row.$fieldLink}
+                          <a href="{$row.$fieldLink}"
+                             {if array_key_exists($fieldHover, $row)}title="{$row.$fieldHover|escape}"{/if}
+                             {if array_key_exists($fieldClass, $row)}class="{$row.$fieldClass}"{/if}
+                          >
+                      {/if}
+
+                      {if array_key_exists($field, $row) && is_array($row.$field)}
+                          {foreach from=$row.$field item=fieldrow key=fieldid}
+                              <div class="crm-report-{$field}-row-{$fieldid}">{$fieldrow}</div>
+                          {/foreach}
+                      {elseif array_key_exists($field, $row) && $row.$field eq 'Subtotal'}
+                          {$row.$field}
+                      {elseif $header.type & 4 OR $header.type & 256}
+                          {if $header.group_by eq 'MONTH' or $header.group_by eq 'QUARTER'}
+                              {$row.$field|crmDate:$config->dateformatPartial}
+                          {elseif $header.group_by eq 'YEAR'}
+                              {$row.$field|crmDate:$config->dateformatYear}
+                          {else}
+                              {if $header.type == 4}
+                                 {$row.$field|truncate:10:''|crmDate}
+                              {else}
+                                 {$row.$field|crmDate}
+                              {/if}
+                          {/if}
+                      {elseif $header.type eq 1024}
+                          {if $currencyColumn}
+                              <span class="nowrap">{$row.$field|crmMoney:$row.$currencyColumn}</span>
+                          {else}
+                              <span class="nowrap">{$row.$field|crmMoney}</span>
+                         {/if}
+                      {elseif array_key_exists($field, $row)}
+                          {$row.$field|smarty:nodefaults|purify}
+                      {/if}
+
+                      {if array_key_exists($fieldLink, $row) && $row.$fieldLink}</a>{/if}
+                  </td>
+              {/foreach}
+          </tr>
         {/foreach}
 
         {if $grandStat}
@@ -147,7 +148,7 @@
                             {else}
                                 {$grandStat.$field|crmMoney}
                             {/if}
-                        {else}
+                        {elseif array_key_exists($field, $grandStat)}
                             {$grandStat.$field}
                         {/if}
                     </td>

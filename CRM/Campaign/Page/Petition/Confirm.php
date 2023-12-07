@@ -58,10 +58,12 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
     $pparams['id'] = $petition_id;
     $this->petition = [];
     CRM_Campaign_BAO_Survey::retrieve($pparams, $this->petition);
-    $this->assign('is_share', CRM_Utils_Array::value('is_share', $this->petition));
-    $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->petition));
-    $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $this->petition));
-    CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->petition));
+    $this->assign('is_share', $this->petition['is_share'] ?? FALSE);
+    $this->assign('thankyou_title', $this->petition['thankyou_title'] ?? '');
+    $this->assign('thankyou_text', $this->petition['thankyou_text'] ?? '');
+    if (!empty($this->petition['thankyou_title'])) {
+      CRM_Utils_System::setTitle($this->petition['thankyou_title']);
+    }
 
     // send thank you email
     $params['contactId'] = $contact_id;

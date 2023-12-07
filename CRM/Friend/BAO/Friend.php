@@ -45,17 +45,10 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
@@ -327,7 +320,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   public static function addTellAFriend(&$params) {
     $friendDAO = new CRM_Friend_DAO_Friend();
     $friendDAO->copyValues($params);
-    $friendDAO->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $friendDAO->is_active = $params['is_active'] ?? FALSE;
     $friendDAO->save();
 
     return $friendDAO;

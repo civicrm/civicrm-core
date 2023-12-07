@@ -39,7 +39,6 @@ class CRM_Core_Payment_Form {
    *   ID of the payment processor.
    */
   public static function setPaymentFieldsByProcessor(&$form, $processor, $billing_profile_id = NULL, $isBackOffice = FALSE, $paymentInstrumentID = NULL) {
-    $form->billingFieldSets = [];
     // Load the pay-later processor
     // @todo load this right up where the other processors are loaded initially.
     if (empty($processor)) {
@@ -55,12 +54,10 @@ class CRM_Core_Payment_Form {
     $form->assign('paymentTypeName', $paymentTypeName);
     $form->assign('paymentTypeLabel', self::getPaymentLabel($processor['object']));
     $form->assign('isBackOffice', $isBackOffice);
-    $form->_paymentFields = $form->billingFieldSets[$paymentTypeName]['fields'] = self::getPaymentFieldMetadata($processor);
+    $form->_paymentFields = self::getPaymentFieldMetadata($processor);
     $form->_paymentFields = array_merge($form->_paymentFields, self::getBillingAddressMetadata($processor, $form->_bltID));
     $form->assign('paymentFields', self::getPaymentFields($processor));
     self::setBillingAddressFields($form, $processor);
-    // @todo - this may be obsolete - although potentially it could be used to re-order things in the form.
-    $form->billingFieldSets['billing_name_address-group']['fields'] = [];
   }
 
   /**
@@ -318,12 +315,13 @@ class CRM_Core_Payment_Form {
   /**
    * Map address fields.
    *
-   * @param int $id
+   * @param int $id unused
    * @param array $src
    * @param array $dst
    * @param bool $reverse
    */
   public static function mapParams($id, $src, &$dst, $reverse = FALSE) {
+    $id = CRM_Core_BAO_LocationType::getBilling();
     $map = [
       'first_name' => 'billing_first_name',
       'middle_name' => 'billing_middle_name',
@@ -365,7 +363,8 @@ class CRM_Core_Payment_Form {
    * @return int
    */
   public static function getCreditCardExpirationMonth($src) {
-    if ($month = CRM_Utils_Array::value('M', $src['credit_card_exp_date'])) {
+    $month = $src['credit_card_exp_date']['M'] ?? NULL;
+    if ($month) {
       return $month;
     }
 

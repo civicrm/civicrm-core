@@ -28,9 +28,9 @@ class CRM_Member_Form_Task_LabelTest extends CiviUnitTestCase {
     $this->assertArrayHasKey(201, $tasks, print_r($tasks, TRUE));
     $tasks = CRM_Member_Task::permissionedTaskTitles(CRM_Core_Permission::EDIT);
     $this->assertArrayHasKey(201, $tasks);
-    $membershipID = $this->contactMembershipCreate(['contact_id' => $this->individualCreate()]);
+    $this->contactMembershipCreate(['contact_id' => $this->individualCreate()]);
     /** @var CRM_Member_Form_Task_Label $form */
-    $form = $this->getFormObject('CRM_Member_Form_Task_Label', [
+    $form = $this->getSearchFormObject('CRM_Member_Form_Task_Label', [
       'task' => 201,
       'radio_ts' => 'ts_sel',
     ], 'Search');
@@ -40,7 +40,6 @@ class CRM_Member_Form_Task_LabelTest extends CiviUnitTestCase {
       'label_name' => 3475,
     ];
     $form->preProcess();
-    $form->ids = [$membershipID => $membershipID];
     $form->buildForm();
     try {
       $form->postProcess();

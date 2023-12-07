@@ -23,16 +23,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_TaxTrait;
 
-  /**
-   * Should financials be checked after the test but before tear down.
-   *
-   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
-   * are some test data issues and some real bugs currently blocking.
-   *
-   * @var bool
-   */
-  protected $isValidateFinancialsOnPostAssert = TRUE;
-
   protected $_individualId;
 
   protected $_financialTypeId = 1;
@@ -44,8 +34,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   /**
    * Setup function.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -56,12 +44,11 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_uf_match']);
+    parent::tearDown();
   }
 
   /**
@@ -74,7 +61,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
     $params = ['contribution_id' => $contribution['id']];
 
-    $order = $this->callAPIAndDocument('Order', 'get', $params, __FUNCTION__, __FILE__);
+    $order = $this->callAPISuccess('Order', 'get', $params);
 
     $this->assertEquals(1, $order['count']);
     $expectedResult = [
@@ -145,7 +132,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * @param array $extraParams
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
   public function addOrder(bool $isPriceSet, float $amount = 300.00, array $extraParams = []): array {
     $p = [
@@ -251,7 +237,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         'is_override' => 1,
       ],
     ];
-    $order = $this->callAPIAndDocument('Order', 'create', $p, __FUNCTION__, __FILE__);
+    $order = $this->callAPISuccess('Order', 'create', $p);
     $params = [
       'contribution_id' => $order['id'],
     ];
@@ -323,7 +309,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * Test create order api for membership.
    *
    * @dataProvider dataForTestAddOrderForMembershipWithDates
-   * @throws \CRM_Core_Exception
    *
    * @param array $membershipExtraParams Optional additional params for the membership,
    *    e.g. skipStatusCal or start_date. This can also have a 'renewalOf' key, in which
@@ -333,13 +318,13 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    */
   public function testAddOrderForMembershipWithDates(array $membershipExtraParams, ?string $paymentDate, array $expectations): void {
     if (date('Y-m-d') > static::$phpunitStartedDate) {
-      $this->markTestSkipped("Test run spanned 2 days so skipping test as results would be affected");
+      $this->markTestSkipped('Test run spanned 2 days so skipping test as results would be affected');
     }
     if (date('Hi') > '2357') {
-      $this->markTestSkipped("It‘s less than 2 mins to midnight, test skipped as 'today' may change during test.");
+      $this->markTestSkipped("It‘s less than 2 minutes to midnight, test skipped as 'today' may change during test.");
     }
     if (isset($membershipExtraParams['skipStatusCal']) && !$this->skipStatusCalStillExists()) {
-      $this->markTestSkipped("The test was skipped as skipStatusCal seems to have been removed, so this test is useless and should be removed.");
+      $this->markTestSkipped('The test was skipped as skipStatusCal seems to have been removed, so this test is useless and should be removed.');
     }
 
     $membershipType = $this->membershipTypeCreate();
@@ -386,7 +371,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ],
       ],
     ];
-    $order = $this->callAPISuccess('Order', 'create', $orderCreateParams, __FUNCTION__, __FILE__);
+    $order = $this->callAPISuccess('Order', 'create', $orderCreateParams);
 
     // Create expected dates immediately before order creation to minimise chance of day changing over.
     //$expectedStart = date('Y-m-d'); $expectedEnd = date('Y-m-d', strtotime('+ 1 year - 1 day'));
@@ -512,8 +497,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testAddOrderForParticipant(): void {
-    $event = $this->eventCreate();
-    $this->_eventId = $event['id'];
+    $this->eventCreatePaid();
     $p = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
@@ -538,14 +522,14 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'line_item' => $lineItems,
       'params' => [
         'contact_id' => $this->_individualId,
-        'event_id' => $this->_eventId,
+        'event_id' => $this->getEventID(),
         'role_id' => 1,
         'register_date' => '2007-07-21 00:00:00',
         'source' => 'Online Event Registration: API Testing',
       ],
     ];
 
-    $order = $this->callAPIAndDocument('order', 'create', $p, __FUNCTION__, __FILE__, 'Create order for participant', 'CreateOrderParticipant');
+    $order = $this->callAPISuccess('order', 'create', $p);
     $params = ['contribution_id' => $order['id']];
     $order = $this->callAPISuccess('order', 'get', $params);
     $expectedResult = [
@@ -566,11 +550,11 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
     // Enable the "Pending from approval" status which is not enabled by default
     $pendingFromApprovalParticipantStatus = civicrm_api3('ParticipantStatusType', 'getsingle', [
-      'name' => "Pending from approval",
+      'name' => 'Pending from approval',
     ]);
     civicrm_api3('ParticipantStatusType', 'create', [
       'id' => $pendingFromApprovalParticipantStatus['id'],
-      'name' => "Pending from approval",
+      'name' => 'Pending from approval',
       'is_active' => 1,
     ]);
 
@@ -578,7 +562,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'line_item' => $lineItems,
       'params' => [
         'contact_id' => $this->individualCreate(),
-        'event_id' => $this->_eventId,
+        'event_id' => $this->getEventID(),
         'role_id' => 1,
         'register_date' => '2007-07-21 00:00:00',
         'source' => 'Online Event Registration: API Testing',
@@ -681,7 +665,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         'contribution_id' => $order['id'],
         'is_test' => TRUE,
       ]);
-      $this->callAPIAndDocument('order', 'delete', $params, __FUNCTION__, __FILE__);
+      $this->callAPISuccess('order', 'delete', $params);
       $order = $this->callAPISuccess('order', 'get', $params);
       $this->assertEquals(0, $order['count']);
     }
@@ -754,7 +738,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $params = [
       'contribution_id' => $contribution['id'],
     ];
-    $this->callAPIAndDocument('order', 'cancel', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('order', 'cancel', $params);
     $order = $this->callAPISuccess('Order', 'get', $params);
     $expectedResult = [
       $contribution['id'] => [

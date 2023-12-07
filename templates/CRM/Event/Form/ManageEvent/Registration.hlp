@@ -1,4 +1,4 @@
-﻿{*
+{*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
@@ -93,4 +93,25 @@
 {/htxt}
 {htxt id="id-selfcancelxfer_time"}
   {ts}Number of hours prior to event start date to allow self-service cancellation or transfer. Enter a negative number of hours to allow cancellation after the event starts. Enter 0 (or leave empty) to allow cancellation or transfer up until the event has started.{/ts}
+{/htxt}
+
+{htxt id="id-is_email_confirm-title"}
+  {ts}Send Confirmation Email?{/ts}
+{/htxt}
+{htxt id="id-is_email_confirm"}
+  {ts}Do you want a registration confirmation email sent automatically to the user? This email includes event date(s), location and contact information. For paid events, this email is also a receipt for their payment.{/ts}
+{/htxt}
+
+{htxt id="id-cc_confirm-title"}
+  {ts}CC Confirmation To{/ts}
+{/htxt}
+{htxt id="id-cc_confirm"}
+  {ts}You can notify event organizers of each online registration by specifying one or more email addresses to receive a carbon copy (cc). Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org).{/ts}
+{/htxt}
+
+{htxt id="id-bcc_confirm-title"}
+  {ts}BCC Confirmation To{/ts}
+{/htxt}
+{htxt id="id-bcc_confirm"}
+  {ts}You may specify one or more email addresses to receive a blind carbon copy (bcc) of the confirmation email. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org).{/ts}
 {/htxt}

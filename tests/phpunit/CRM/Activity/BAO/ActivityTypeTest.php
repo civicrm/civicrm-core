@@ -8,7 +8,7 @@ class CRM_Activity_BAO_ActivityTypeTest extends CiviUnitTestCase {
   /**
    * Test ActivityType
    */
-  public function testActivityType() {
+  public function testActivityType(): void {
     $actParams = [
       'option_group_id' => 'activity_type',
       'name' => 'abc123',

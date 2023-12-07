@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of Gender.
+ * Page for displaying list of survey types.
  */
 class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
 
@@ -92,22 +92,26 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/campaign/surveyType',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit %1', [1 => $this->_gName]),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable %1', [1 => $this->_gName]),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable %1', [1 => $this->_gName]),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/campaign/surveyType',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete %1 Type', [1 => $this->_gName]),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -131,7 +135,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
     $optionValues = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');
 
     foreach ($optionValues as $key => $optionValue) {
-      if (CRM_Utils_Array::value('component_id', $optionValue) != $campaingCompId) {
+      if (($optionValue['component_id'] ?? NULL) != $campaingCompId) {
         unset($optionValues[$key]);
       }
     }

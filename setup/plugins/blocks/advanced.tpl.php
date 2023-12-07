@@ -9,6 +9,7 @@ endif; ?>
 <div style="">
   <table class="settingsTable">
     <tbody>
+    <?php if ($model->cms !== 'Standalone'): ?>
     <tr>
       <th><?php echo ts('CMS Database'); ?></th>
       <td>
@@ -44,6 +45,7 @@ endif; ?>
         </div>
       </td>
     </tr>
+    <?php endif; ?>
     <tr>
       <th><?php echo ts('CiviCRM Settings File'); ?></th>
       <td><code><?php echo htmlentities($model->settingsPath); ?></code></td>

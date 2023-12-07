@@ -2,7 +2,7 @@
 namespace Civi\Afform\Event;
 
 use Civi\Afform\FormDataModel;
-use Civi\Api4\Action\Afform\Submit;
+use Civi\Api4\Action\Afform\AbstractProcessor;
 
 /**
  * Handle submission of an "<af-form>" entity (or set of entities in the case of `<af-repeat>`).
@@ -34,13 +34,13 @@ class AfformSubmitEvent extends AfformBaseEvent {
    *
    * @param array $afform
    * @param \Civi\Afform\FormDataModel $formDataModel
-   * @param \Civi\Api4\Action\Afform\Submit $apiRequest
+   * @param \Civi\Api4\Action\Afform\AbstractProcessor $apiRequest
    * @param array $records
    * @param string $entityType
    * @param string $entityName
    * @param array $entityIds
    */
-  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, &$records, string $entityType, string $entityName, array &$entityIds) {
+  public function __construct(array $afform, FormDataModel $formDataModel, AbstractProcessor $apiRequest, &$records, string $entityType, string $entityName, array &$entityIds) {
     parent::__construct($afform, $formDataModel, $apiRequest);
     $this->records =& $records;
     $this->entityType = $entityType;

@@ -105,45 +105,36 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     if (CRM_Core_Permission::check('access CiviMail')) {
       $archiveLinks = TRUE;
     }
-    if ($archiveLinks == TRUE) {
-      $this->assign('archiveLinks', $archiveLinks);
-    }
+    $this->assign('archiveLinks', $archiveLinks ?? FALSE);
   }
 
   /**
    * Run this page (figure out the action needed and perform it).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function run() {
     $this->preProcess();
 
-    $newArgs = func_get_args();
-    // since we want only first function argument
-    $newArgs = $newArgs[0];
-    $this->_isArchived = $this->isArchived($newArgs);
-    if (isset($_GET['runJobs']) || CRM_Utils_Array::value('2', $newArgs) == 'queue') {
-      $mailerJobSize = Civi::settings()->get('mailerJobSize');
-      CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize);
-      CRM_Mailing_BAO_MailingJob::runJobs();
-      CRM_Mailing_BAO_MailingJob::runJobs_post();
-    }
+    $newArgs = func_get_args()[0];
 
     $this->_sortByCharacter
       = CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
 
-    // CRM-11920 all should set sortByCharacter to null, not empty string
-    if (strtolower($this->_sortByCharacter) == 'all' || !empty($_POST)) {
+    // CRM-11920 "all" should set sortByCharacter to null, not empty string
+    if (strtolower($this->_sortByCharacter ?: '') === 'all' || !empty($_POST)) {
       $this->_sortByCharacter = NULL;
       $this->set('sortByCharacter', NULL);
     }
 
-    if (CRM_Utils_Array::value(3, $newArgs) == 'unscheduled') {
+    if (($newArgs[3] ?? NULL) === 'unscheduled') {
       $this->_unscheduled = TRUE;
     }
     $this->set('unscheduled', $this->_unscheduled);
 
     $this->set('archived', $this->isArchived($newArgs));
 
-    if (CRM_Utils_Array::value(3, $newArgs) == 'scheduled') {
+    if (($newArgs[3] ?? NULL) === 'scheduled') {
       $this->_scheduled = TRUE;
     }
     $this->set('scheduled', $this->_scheduled);
@@ -199,7 +190,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
           CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
         }
 
-        CRM_Mailing_BAO_Mailing::del($this->_mailingId);
+        CRM_Mailing_BAO_Mailing::deleteRecord(['id' => $this->_mailingId]);
         CRM_Core_Session::setStatus(ts('Selected mailing has been deleted.'), ts('Deleted'), 'success');
         CRM_Utils_System::redirect($context);
       }
@@ -252,7 +243,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     if ($this->get('sms')) {
       $urlParams .= '&sms=1';
     }
-    if (CRM_Utils_Array::value(3, $newArgs) == 'unscheduled') {
+    if (($newArgs[3] ?? NULL) === 'unscheduled') {
       $urlString .= '/unscheduled';
       $urlParams .= '&scheduled=false';
       $this->assign('unscheduled', TRUE);
@@ -262,7 +253,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       $urlString .= '/archived';
       $this->assign('archived', TRUE);
     }
-    elseif (CRM_Utils_Array::value(3, $newArgs) == 'scheduled') {
+    elseif (($newArgs[3] ?? NULL) == 'scheduled') {
       $urlString .= '/scheduled';
       $urlParams .= '&scheduled=true';
     }

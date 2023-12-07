@@ -30,7 +30,7 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
    */
   public static function getSubscribedEvents() {
     return [
-      'civi.api.prepare' => ['onApiPrepare', -20],
+      'civi.api.prepare' => ['onApiPrepare', 200],
     ];
   }
 
@@ -78,8 +78,15 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
     [$entityName, $joinEntity] = array_pad(explode('+', $entityName), 2, NULL);
     $entity = $formDataModel->getEntity($entityName);
 
+    // If no model entity, it's a search display
+    if (!$entity) {
+      $searchDisplay = $formDataModel->getSearchDisplay($entityName);
+      $apiEntity = civicrm_api4('SavedSearch', 'get', ['where' => [['name', '=', $searchDisplay['searchName']]]])
+        ->first()['api_entity'] ?? NULL;
+      $formField = $searchDisplay['fields'][$fieldName]['defn'] ?? [];
+    }
     // If using a join (e.g. Contact -> Email)
-    if ($joinEntity) {
+    elseif ($joinEntity) {
       $apiEntity = $joinEntity;
       $isId = FALSE;
       $formField = $entity['joins'][$joinEntity]['fields'][$fieldName]['defn'] ?? [];
@@ -97,7 +104,7 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
     // For the "Existing Entity" selector,
     // Look up the "type" fields (e.g. contact_type, activity_type_id, case_type_id, etc)
     // And apply it as a filter if specified on the form.
-    if ($isId) {
+    if ($isId && $entity) {
       if ($entity['type'] === 'Contact') {
         $typeFields = ['contact_type', 'contact_sub_type'];
       }

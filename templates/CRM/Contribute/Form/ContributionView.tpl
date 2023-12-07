@@ -28,12 +28,12 @@
     <td>{$financial_type}{if $is_test} {ts}(test){/ts} {/if}</td>
   </tr>
   <tr class="crm-contribution-form-block-source">
-    <td class="label">{ts}Source{/ts}</td>
+    <td class="label">{ts}Contribution Source{/ts}</td>
     <td>{$source}</td>
   </tr>
   {if empty($is_template)}
   <tr class="crm-contribution-form-block-receive_date">
-    <td class="label">{ts}Received{/ts}</td>
+    <td class="label">{ts}Contribution Date{/ts}</td>
     <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
   </tr>
   {/if}
@@ -87,7 +87,7 @@
       <td>{$revenue_recognition_date|crmDate:"%B, %Y"}</td>
     </tr>
   {/if}
-  {if $to_financial_account }
+  {if $to_financial_account}
     <tr class="crm-contribution-form-block-to_financial_account">
       <td class="label">{ts}Received Into{/ts}</td>
       <td>{$to_financial_account}</td>
@@ -151,7 +151,7 @@
     </tr>
   {/if}
   {foreach from=$note item="rec"}
-    {if $rec }
+    {if $rec}
       <tr class="crm-contribution-form-block-note">
         <td class="label">{ts}Note{/ts}</td>
         <td>{$rec}</td>

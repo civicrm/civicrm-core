@@ -84,27 +84,17 @@ use CRM_Sequentialcreditnotes_ExtensionUtil as E;
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config
  */
-function _sequentialcreditnotes_civix_civicrm_config(&$config = NULL) {
+function _sequentialcreditnotes_civix_civicrm_config($config = NULL) {
   static $configured = FALSE;
   if ($configured) {
     return;
   }
   $configured = TRUE;
 
-  $template = CRM_Core_Smarty::singleton();
-
   $extRoot = __DIR__ . DIRECTORY_SEPARATOR;
-  $extDir = $extRoot . 'templates';
-
-  if (is_array($template->template_dir)) {
-    array_unshift($template->template_dir, $extDir);
-  }
-  else {
-    $template->template_dir = [$extDir, $template->template_dir];
-  }
-
   $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
   set_include_path($include_path);
+  // Based on <compatibility>, this does not currently require mixin/polyfill.php.
 }
 
 /**
@@ -114,35 +104,7 @@ function _sequentialcreditnotes_civix_civicrm_config(&$config = NULL) {
  */
 function _sequentialcreditnotes_civix_civicrm_install() {
   _sequentialcreditnotes_civix_civicrm_config();
-  if ($upgrader = _sequentialcreditnotes_civix_upgrader()) {
-    $upgrader->onInstall();
-  }
-}
-
-/**
- * Implements hook_civicrm_postInstall().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
- */
-function _sequentialcreditnotes_civix_civicrm_postInstall() {
-  _sequentialcreditnotes_civix_civicrm_config();
-  if ($upgrader = _sequentialcreditnotes_civix_upgrader()) {
-    if (is_callable([$upgrader, 'onPostInstall'])) {
-      $upgrader->onPostInstall();
-    }
-  }
-}
-
-/**
- * Implements hook_civicrm_uninstall().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_uninstall
- */
-function _sequentialcreditnotes_civix_civicrm_uninstall(): void {
-  _sequentialcreditnotes_civix_civicrm_config();
-  if ($upgrader = _sequentialcreditnotes_civix_upgrader()) {
-    $upgrader->onUninstall();
-  }
+  // Based on <compatibility>, this does not currently require mixin/polyfill.php.
 }
 
 /**
@@ -152,56 +114,7 @@ function _sequentialcreditnotes_civix_civicrm_uninstall(): void {
  */
 function _sequentialcreditnotes_civix_civicrm_enable(): void {
   _sequentialcreditnotes_civix_civicrm_config();
-  if ($upgrader = _sequentialcreditnotes_civix_upgrader()) {
-    if (is_callable([$upgrader, 'onEnable'])) {
-      $upgrader->onEnable();
-    }
-  }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_disable().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_disable
- * @return mixed
- */
-function _sequentialcreditnotes_civix_civicrm_disable(): void {
-  _sequentialcreditnotes_civix_civicrm_config();
-  if ($upgrader = _sequentialcreditnotes_civix_upgrader()) {
-    if (is_callable([$upgrader, 'onDisable'])) {
-      $upgrader->onDisable();
-    }
-  }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_upgrade().
- *
- * @param $op string, the type of operation being performed; 'check' or 'enqueue'
- * @param $queue CRM_Queue_Queue, (for 'enqueue') the modifiable list of pending up upgrade tasks
- *
- * @return mixed
- *   based on op. for 'check', returns array(boolean) (TRUE if upgrades are pending)
- *   for 'enqueue', returns void
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
- */
-function _sequentialcreditnotes_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  if ($upgrader = _sequentialcreditnotes_civix_upgrader()) {
-    return $upgrader->onUpgrade($op, $queue);
-  }
-}
-
-/**
- * @return CRM_Sequentialcreditnotes_Upgrader
- */
-function _sequentialcreditnotes_civix_upgrader() {
-  if (!file_exists(__DIR__ . '/CRM/Sequentialcreditnotes/Upgrader.php')) {
-    return NULL;
-  }
-  else {
-    return CRM_Sequentialcreditnotes_Upgrader_Base::instance();
-  }
+  // Based on <compatibility>, this does not currently require mixin/polyfill.php.
 }
 
 /**
@@ -220,8 +133,8 @@ function _sequentialcreditnotes_civix_insert_navigation_menu(&$menu, $path, $ite
   if (empty($path)) {
     $menu[] = [
       'attributes' => array_merge([
-        'label'      => CRM_Utils_Array::value('name', $item),
-        'active'     => 1,
+        'label' => $item['name'] ?? NULL,
+        'active' => 1,
       ], $item),
     ];
     return TRUE;
@@ -284,15 +197,4 @@ function _sequentialcreditnotes_civix_fixNavigationMenuItems(&$nodes, &$maxNavID
       _sequentialcreditnotes_civix_fixNavigationMenuItems($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
     }
   }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_entityTypes().
- *
- * Find any *.entityType.php files, merge their content, and return.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
- */
-function _sequentialcreditnotes_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, []);
 }

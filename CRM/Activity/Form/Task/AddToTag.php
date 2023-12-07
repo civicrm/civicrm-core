@@ -123,7 +123,7 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
     foreach ($allTags as $key => $dnc) {
       $this->_name[] = $this->_tags[$key];
 
-      list($total, $added, $notAdded) = CRM_Core_BAO_EntityTag::addEntitiesToTag($this->_activityHolderIds, $key,
+      [, $added, $notAdded] = CRM_Core_BAO_EntityTag::addEntitiesToTag($this->_activityHolderIds, $key,
         'civicrm_activity', FALSE);
 
       $status = [ts('Activity tagged', ['count' => $added, 'plural' => '%count activities tagged'])];
@@ -134,7 +134,7 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
         ]);
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-      CRM_Core_Session::setStatus($status, ts("Added Tag <em>%1</em>", [1 => $this->_tags[$key]]), 'success', ['expires' => 0]);
+      CRM_Core_Session::setStatus($status, ts("Added Tag <em>%1</em>", [1 => $this->_tags[$key]]), 'success');
     }
 
   }

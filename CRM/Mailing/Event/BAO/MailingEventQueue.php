@@ -29,34 +29,49 @@ class CRM_Mailing_Event_BAO_MailingEventQueue extends CRM_Mailing_Event_DAO_Mail
     $eq = new CRM_Mailing_Event_BAO_MailingEventQueue();
     $eq->copyValues($params);
     if (empty($params['id']) && empty($params['hash'])) {
-      $eq->hash = self::hash($params);
+      $eq->hash = self::hash();
+    }
+    if (empty($params['id']) && !empty($params['job_id']) && empty($params['mailing_id'])) {
+      // mailing_id is a new field in 5.67. Calling code should pass it in going forwards
+      // but temporary handling will set it. (We should make the field required
+      // when we remove this in future)
+      CRM_Core_Error::deprecatedWarning('mailing_id should be passed into EventQueue create calls. Temporary handling has set it for now');
+      $query = CRM_Core_DAO::executeQuery('SELECT mailing_id, is_test
+        FROM civicrm_mailing_job job LEFT JOIN civicrm_mailing m ON m.id = mailing_id WHERE job.id = %1', [1 => [$params['job_id'], 'Integer']]);
+      $eq->mailing_id = $query->mailing_id;
+      $eq->is_test = $query->is_test;
     }
     $eq->save();
     return $eq;
   }
 
   /**
-   * Create a security hash from the job, email and contact ids.
+   * Create a unique-ish string to stare in the hash table.
    *
-   * @param array $params
+   * This is included in verp emails such that bounces go to a unique
+   * address (e.g. b.123456.456ABC456ABC.my-email-address@example.com). In this case
+   * b is the action (bounce), 123456 is the queue_id and the last part is the
+   * random string from this function. Note that the local part of the email
+   * can have a max of 64 characters
+   *
+   * https://issues.civicrm.org/jira/browse/CRM-2574
+   *
+   * The hash combined with the queue id provides a fairly unguessable combo for the emails
+   * (enough that a sysadmin should notice if someone tried to brute force it!)
    *
    * @return string
    *   The hash
    */
-  public static function hash($params) {
-    $jobId = $params['job_id'];
-    $emailId = CRM_Utils_Array::value('email_id', $params, '');
-    $contactId = $params['contact_id'];
-
-    return substr(sha1("{$jobId}:{$emailId}:{$contactId}:" . time()),
-      0, 16
-    );
+  public static function hash() {
+    // Case-insensitive. Some b64 chars are awkward in VERP+URL contexts. Over-generate (24 bytes) and then cut-back (16 alphanums).
+    $random = random_bytes(24);
+    return strtolower(substr(str_replace(['+', '/', '='], ['', '', ''], base64_encode($random)), 0, 16));
   }
 
   /**
    * Verify that a queue event exists with the specified id/job id/hash.
    *
-   * @param int $job_id
+   * @param int|int $job_id
    *   The job ID of the event to find.
    * @param int $queue_id
    *   The Queue Event ID to find.
@@ -66,45 +81,17 @@ class CRM_Mailing_Event_BAO_MailingEventQueue extends CRM_Mailing_Event_DAO_Mail
    * @return object|null
    *   The queue event if verified, or null
    */
-  public static function &verify($job_id, $queue_id, $hash) {
+  public static function verify($job_id, $queue_id, $hash) {
     $success = NULL;
     $q = new CRM_Mailing_Event_BAO_MailingEventQueue();
-    if (!empty($job_id) && !empty($queue_id) && !empty($hash)) {
+    if ($queue_id && $hash) {
       $q->id = $queue_id;
-      $q->job_id = $job_id;
       $q->hash = $hash;
       if ($q->find(TRUE)) {
         $success = $q;
       }
     }
     return $success;
-  }
-
-  /**
-   * Given a queue event ID, find the corresponding email address.
-   *
-   * @param int $queue_id
-   *   The queue event ID.
-   *
-   * @return string
-   *   The email address
-   */
-  public static function getEmailAddress($queue_id) {
-    $email = CRM_Core_BAO_Email::getTableName();
-    $eq = self::getTableName();
-    $query = "  SELECT      $email.email as email
-                    FROM        $email
-                    INNER JOIN  $eq
-                    ON          $eq.email_id = $email.id
-                    WHERE       $eq.id = " . CRM_Utils_Type::rule($queue_id, 'Integer');
-
-    $q = new CRM_Mailing_Event_BAO_MailingEventQueue();
-    $q->query($query);
-    if (!$q->fetch()) {
-      return NULL;
-    }
-
-    return $q->email;
   }
 
   /**
@@ -283,10 +270,39 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
   }
 
   /**
+   * Bulk save multiple records.
+   *
+   * For performance reasons hooks are not called here.
+   *
+   * @param array[] $records
+   *
+   * @return array
+   */
+  public static function writeRecords(array $records): array {
+    $rows = [];
+    foreach ($records as $record) {
+      $record['hash'] = self::hash();
+      $rows[] = $record;
+      if (count($rows) >= CRM_Core_DAO::BULK_INSERT_COUNT) {
+        CRM_Utils_SQL_Insert::into('civicrm_mailing_event_queue')->rows($rows)->execute();
+        $rows = [];
+      }
+    }
+    if ($rows) {
+      CRM_Utils_SQL_Insert::into('civicrm_mailing_event_queue')->rows($rows)->execute();
+    }
+    // No point returning a big array but the standard function signature is to return an array
+    // records
+    return [];
+  }
+
+  /**
+   * @deprecated
    * @param array $params
    * @param null $now
    */
   public static function bulkCreate($params, $now = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecords');
     if (!$now) {
       $now = time();
     }
@@ -294,9 +310,9 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
     // construct a bulk insert statement
     $values = [];
     foreach ($params as $param) {
-      $values[] = "( {$param[0]}, {$param[1]}, {$param[2]}, {$param[3]}, '" . substr(sha1("{$param[0]}:{$param[1]}:{$param[2]}:{$param[3]}:{$now}"),
-          0, 16
-        ) . "' )";
+      $hash = static::hash();
+      $values[] = "( {$param[0]}, {$param[1]}, {$param[2]}, {$param[3]}, '" . $hash . "' )";
+      // FIXME: This (non)escaping is valid as currently used but is not robust to change. This should use CRM_Utils_SQL_Insert...
     }
 
     while (!empty($values)) {

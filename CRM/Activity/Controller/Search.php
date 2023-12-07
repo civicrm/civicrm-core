@@ -28,6 +28,9 @@
  */
 class CRM_Activity_Controller_Search extends CRM_Core_Controller {
 
+  /**
+   * @var string
+   */
   protected $entity = 'Activity';
 
   /**

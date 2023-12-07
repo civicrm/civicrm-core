@@ -9,12 +9,21 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Group;
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
+
+  /**
+   * Length of the cookie's created by this class
+   *
+   * @var int
+   */
+  protected $cookieExpire;
 
   /**
    * Class constructor.
@@ -26,145 +35,15 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   }
 
   /**
-   * Get Petition Details for dashboard.
-   *
-   * @param array $params
-   * @param bool $onlyCount
-   *
-   * @return array|int
-   */
-  public static function getPetitionSummary($params = [], $onlyCount = FALSE) {
-    //build the limit and order clause.
-    $limitClause = $orderByClause = $lookupTableJoins = NULL;
-    if (!$onlyCount) {
-      $sortParams = [
-        'sort' => 'created_date',
-        'offset' => 0,
-        'rowCount' => 10,
-        'sortOrder' => 'desc',
-      ];
-      foreach ($sortParams as $name => $default) {
-        if (!empty($params[$name])) {
-          $sortParams[$name] = $params[$name];
-        }
-      }
-
-      //need to lookup tables.
-      $orderOnPetitionTable = TRUE;
-      if ($sortParams['sort'] == 'campaign') {
-        $orderOnPetitionTable = FALSE;
-        $lookupTableJoins = '
- LEFT JOIN civicrm_campaign campaign ON ( campaign.id = petition.campaign_id )';
-        $orderByClause = "ORDER BY campaign.title {$sortParams['sortOrder']}";
-      }
-      elseif ($sortParams['sort'] == 'activity_type') {
-        $orderOnPetitionTable = FALSE;
-        $lookupTableJoins = "
- LEFT JOIN civicrm_option_value activity_type ON ( activity_type.value = petition.activity_type_id
-                                                   OR petition.activity_type_id IS NULL )
-INNER JOIN civicrm_option_group grp ON ( activity_type.option_group_id = grp.id AND grp.name = 'activity_type' )";
-        $orderByClause = "ORDER BY activity_type.label {$sortParams['sortOrder']}";
-      }
-      elseif ($sortParams['sort'] == 'isActive') {
-        $sortParams['sort'] = 'is_active';
-      }
-      if ($orderOnPetitionTable) {
-        $orderByClause = "ORDER BY petition.{$sortParams['sort']} {$sortParams['sortOrder']}";
-      }
-      $limitClause = "LIMIT {$sortParams['offset']}, {$sortParams['rowCount']}";
-    }
-
-    //build the where clause.
-    $queryParams = $where = [];
-
-    //we only have activity type as a
-    //difference between survey and petition.
-    $petitionTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Petition');
-    if ($petitionTypeID) {
-      $where[] = "( petition.activity_type_id = %1 )";
-      $queryParams[1] = [$petitionTypeID, 'Positive'];
-    }
-    if (!empty($params['title'])) {
-      $where[] = "( petition.title LIKE %2 )";
-      $queryParams[2] = ['%' . trim($params['title']) . '%', 'String'];
-    }
-    if (!empty($params['campaign_id'])) {
-      $where[] = '( petition.campaign_id = %3 )';
-      $queryParams[3] = [$params['campaign_id'], 'Positive'];
-    }
-    $whereClause = NULL;
-    if (!empty($where)) {
-      $whereClause = ' WHERE ' . implode(" \nAND ", $where);
-    }
-
-    $selectClause = '
-SELECT  petition.id                         as id,
-        petition.title                      as title,
-        petition.is_active                  as is_active,
-        petition.result_id                  as result_id,
-        petition.is_default                 as is_default,
-        petition.campaign_id                as campaign_id,
-        petition.activity_type_id           as activity_type_id';
-
-    if ($onlyCount) {
-      $selectClause = 'SELECT COUNT(*)';
-    }
-    $fromClause = 'FROM  civicrm_survey petition';
-
-    $query = "{$selectClause} {$fromClause} {$whereClause} {$orderByClause} {$limitClause}";
-
-    if ($onlyCount) {
-      return (int) CRM_Core_DAO::singleValueQuery($query, $queryParams);
-    }
-
-    $petitions = [];
-    $properties = [
-      'id',
-      'title',
-      'campaign_id',
-      'is_active',
-      'is_default',
-      'result_id',
-      'activity_type_id',
-    ];
-
-    $petition = CRM_Core_DAO::executeQuery($query, $queryParams);
-    while ($petition->fetch()) {
-      foreach ($properties as $property) {
-        $petitions[$petition->id][$property] = $petition->$property;
-      }
-    }
-
-    return $petitions;
-  }
-
-  /**
-   * Get the petition count.
-   *
-   */
-  public static function getPetitionCount() {
-    $whereClause = 'WHERE ( 1 )';
-    $queryParams = [];
-    $petitionTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Petition');
-    if ($petitionTypeID) {
-      $whereClause = "WHERE ( petition.activity_type_id = %1 )";
-      $queryParams[1] = [$petitionTypeID, 'Positive'];
-    }
-    $query = "SELECT COUNT(*) FROM civicrm_survey petition {$whereClause}";
-
-    return (int) CRM_Core_DAO::singleValueQuery($query, $queryParams);
-  }
-
-  /**
    * Takes an associative array and creates a petition signature activity.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   an assoc array of name/value pairs.
    *
    * @return mixed
    *   CRM_Campaign_BAO_Petition or NULl or void
    */
-  public function createSignature(&$params) {
+  public function createSignature($params) {
     if (empty($params)) {
       return NULL;
     }
@@ -223,33 +102,24 @@ SELECT  petition.id                         as id,
    * @return bool
    */
   public function confirmSignature($activity_id, $contact_id, $petition_id) {
-    // change activity status to completed (status_id = 2)
-    // I wonder why do we need contact_id when we have activity_id anyway? [chastell]
-    $sql = 'UPDATE civicrm_activity SET status_id = 2 WHERE id = %1';
-    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
-    $params = [
-      1 => [$activity_id, 'Integer'],
-      2 => [$contact_id, 'Integer'],
-      3 => [$sourceID, 'Integer'],
-    ];
-    CRM_Core_DAO::executeQuery($sql, $params);
+    // change activity status to completed
+    \Civi\Api4\Activity::update(FALSE)
+      ->addValue('status_id:name', 'Completed')
+      ->addWhere('id', '=', $activity_id)
+      ->execute();
+    \Civi\Api4\ActivityContact::update(FALSE)
+      ->addValue('contact_id', $contact_id)
+      ->addWhere('activity_id', '=', $activity_id)
+      ->addWhere('record_type_id:name', '=', 'Activity Source')
+      ->execute();
 
-    $sql = 'UPDATE civicrm_activity_contact SET contact_id = %2 WHERE activity_id = %1 AND record_type_id = %3';
-    CRM_Core_DAO::executeQuery($sql, $params);
     // remove 'Unconfirmed' tag for this contact
-    $tag_name = Civi::settings()->get('tag_unconfirmed');
+    \Civi\Api4\EntityTag::delete(FALSE)
+      ->addWhere('tag_id:name', '=', Civi::settings()->get('tag_unconfirmed'))
+      ->addWhere('entity_table', '=', 'civicrm_contact')
+      ->addWhere('entity_id', '=', $contact_id)
+      ->execute();
 
-    $sql = "
-DELETE FROM civicrm_entity_tag
-WHERE       entity_table = 'civicrm_contact'
-AND         entity_id = %1
-AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
-    $params = [
-      1 => [$contact_id, 'Integer'],
-      2 => [$tag_name, 'String'],
-    ];
-    CRM_Core_DAO::executeQuery($sql, $params);
     // validate arguments to setcookie are numeric to prevent header manipulation
     if (isset($petition_id) && is_numeric($petition_id)
       && isset($activity_id) && is_numeric($activity_id)) {
@@ -507,32 +377,21 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    *   (reference ) an assoc array of name/value pairs.
    *
    * @param int $sendEmailMode
+   *   CRM_Campaign_Form_Petition_Signature::EMAIL_THANK or CRM_Campaign_Form_Petition_Signature::EMAIL_CONFIRM
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
-  public static function sendEmail($params, $sendEmailMode) {
-
-    /* sendEmailMode
-     * CRM_Campaign_Form_Petition_Signature::EMAIL_THANK
-     *   connected user via login/pwd - thank you
-     *    or dedupe contact matched who doesn't have a tag CIVICRM_TAG_UNCONFIRMED - thank you
-     *   or login using fb connect - thank you + click to add msg to fb wall
-     *
-     * CRM_Campaign_Form_Petition_Signature::EMAIL_CONFIRM
-     *  send a confirmation request email
-     */
-
-    // check if the group defined by CIVICRM_PETITION_CONTACTS exists, else create it
-    $petitionGroupName = Civi::settings()->get('petition_contacts');
-
-    $dao = new CRM_Contact_DAO_Group();
-    $dao->title = $petitionGroupName;
-    if (!$dao->find(TRUE)) {
-      $dao->is_active = 1;
-      $dao->visibility = 'User and User Admin Only';
-      $dao->save();
+  public static function sendEmail(array $params, int $sendEmailMode): void {
+    $surveyID = $params['sid'];
+    $contactID = $params['contactId'];
+    $activityID = $params['activityId'] ?? NULL;
+    $group_id = Group::get(FALSE)->addWhere('title', '=', Civi::settings()->get('petition_contacts'))->addSelect('id')->execute()->first()['id'] ?? NULL;
+    if (!$group_id) {
+      $group_id = Group::create(FALSE)->setValues([
+        'title' => Civi::settings()->get('petition_contacts'),
+        'visibility' => 'User and User Admin Only',
+      ])->execute()->first()['id'];
     }
-    $group_id = $dao->id;
 
     // get petition info
     $petitionParams['id'] = $params['sid'];
@@ -543,7 +402,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     }
 
     //get the default domain email address.
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
 
@@ -561,25 +420,17 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
 
     switch ($sendEmailMode) {
       case CRM_Campaign_Form_Petition_Signature::EMAIL_THANK:
-
-        // add this contact to the CIVICRM_PETITION_CONTACTS group
-        // Cannot pass parameter 1 by reference
-        $p = [$params['contactId']];
-        CRM_Contact_BAO_GroupContact::addContactsToGroup($p, $group_id, 'API');
+        CRM_Contact_BAO_GroupContact::addContactsToGroup([$contactID], $group_id, 'API');
 
         if ($params['email-Primary']) {
           CRM_Core_BAO_MessageTemplate::sendTemplate(
             [
-              'groupName' => 'msg_tpl_workflow_petition',
               'workflow' => 'petition_sign',
-              'contactId' => $params['contactId'],
-              'tplParams' => $tplParams,
+              'modelProps' => ['surveyID' => $surveyID, 'contactID' => $contactID],
               'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
               'toName' => $toName,
               'toEmail' => $params['email-Primary'],
               'replyTo' => $replyTo,
-              'petitionId' => $params['sid'],
-              'petitionTitle' => $petitionInfo['title'],
             ]
           );
         }

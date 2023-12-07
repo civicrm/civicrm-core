@@ -11,7 +11,6 @@
     templateUrl: '~/crmSearchAdmin/displays/searchDisplayAutocomplete.html',
     controller: function($scope, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        // Mix in properties of searchDisplayBaseTrait
         ctrl = this;
 
       this.$onInit = function() {

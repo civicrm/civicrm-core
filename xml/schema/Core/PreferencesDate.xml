@@ -7,6 +7,12 @@
   <comment>Define date preferences for the site</comment>
   <add>2.0</add>
   <log>true</log>
+  <title>Date Preference</title>
+  <paths>
+    <add>civicrm/admin/setting/preferences/date/edit?reset=1&amp;action=add</add>
+    <browse>civicrm/admin/setting/preferences/date?reset=1</browse>
+    <update>civicrm/admin/setting/preferences/date/edit?reset=1&amp;action=update&amp;id=[id]</update>
+  </paths>
   <field>
     <name>id</name>
     <title>Date Preference ID</title>

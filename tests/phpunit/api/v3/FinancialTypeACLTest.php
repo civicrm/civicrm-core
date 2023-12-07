@@ -27,7 +27,6 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   public $debug = 0;
   protected $_params;
   protected $_ids = [];
-  protected $_pageParams = [];
 
   /**
    * Parameters to create payment processor.
@@ -73,17 +72,6 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'url_recur' => 'http://dummy.com',
       'billing_mode' => 1,
     ];
-    $this->_pageParams = [
-      'title' => 'Test Contribution Page',
-      'financial_type_id' => 1,
-      'currency' => 'USD',
-      'financial_account_id' => 1,
-      'payment_processor' => $this->processorCreate(),
-      'is_active' => 1,
-      'is_allow_other_amount' => 1,
-      'min_amount' => 10,
-      'max_amount' => 1000,
-    ];
   }
 
   /**
@@ -101,7 +89,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   /**
    * Test Get.
    */
-  public function testCreateACLContribution() {
+  public function testCreateACLContribution(): void {
     $this->enableFinancialACLs();
     $p = [
       'contact_id' => $this->_individualId,
@@ -162,7 +150,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   /**
    * Test that acl contributions can be retrieved.
    */
-  public function testGetACLContribution() {
+  public function testGetACLContribution(): void {
     $this->enableFinancialACLs();
 
     $this->setPermissions([
@@ -190,7 +178,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   /**
    * Test checks that passing in line items suppresses the create mechanism.
    */
-  public function testCreateACLContributionChainedLineItems() {
+  public function testCreateACLContributionChainedLineItems(): void {
     $this->enableFinancialACLs();
     $params = [
       'contact_id' => $this->_individualId,
@@ -265,7 +253,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   /**
    * Test that acl contributions can be edited.
    */
-  public function testEditACLContribution() {
+  public function testEditACLContribution(): void {
     $this->enableFinancialACLs();
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
 
@@ -318,7 +306,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contribution['count']);
   }
 
-  public function testMembershipTypeACLFinancialTypeACL() {
+  public function testMembershipTypeACLFinancialTypeACL(): void {
     $contactID = $this->individualCreate();
     $this->contactMembershipCreate(['contact_id' => $contactID]);
     $this->enableFinancialACLs();

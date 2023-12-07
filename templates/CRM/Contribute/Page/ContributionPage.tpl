@@ -13,7 +13,7 @@
     </div>
 
     {include file="CRM/Contribute/Form/SearchContribution.tpl"}
-    {if NOT ($action eq 1 or $action eq 2) }
+    {if NOT ($action eq 1 or $action eq 2)}
       <table class="form-layout-compressed">
       <tr>
       <td><a href="{$newPageURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Contribution Page{/ts}</span></a></td>
@@ -88,7 +88,7 @@
   {if $isSearch eq 1}
       <div class="status messages">
                 <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
-                {capture assign=browseURL}{crmURL p='civicrm/contribute/manage' q="reset=1"}{/capture}
+                {capture assign=browseURL}{crmURL p='civicrm/admin/contribute/manage' q="reset=1"}{/capture}
                     {ts}No available Contribution Pages match your search criteria. Suggestions:{/ts}
                     <div class="spacer"></div>
                     <ul>

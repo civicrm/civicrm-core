@@ -13,7 +13,6 @@ use Civi\Api4\Event;
 use Civi\Api4\LocBlock;
 use Civi\Api4\Email;
 use Civi\Api4\Phone;
-use Civi\Api4\Address;
 
 /**
  *
@@ -32,14 +31,6 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    * @var \Civi\Api4\Generic\Result
    */
   protected $locationBlock;
-
-  /**
-   * How many locationBlocks should we display?
-   *
-   * @var int
-   * @const
-   */
-  const LOCATION_BLOCKS = 1;
 
   /**
    * The variable, for storing the location array
@@ -84,7 +75,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     }
 
     //location blocks.
-    CRM_Contact_Form_Location::preProcess($this);
+    $this->assign('addressSequence', CRM_Core_BAO_Address::addressSequence());
   }
 
   /**
@@ -204,7 +195,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $deleteOldBlock = FALSE;
 
     // If 'Use existing location' is selected.
-    if (CRM_Utils_Array::value('location_option', $params) == 2) {
+    if (($params['location_option'] ?? NULL) == 2) {
 
       /*
        * If there is an existing LocBlock and the selected LocBlock is different,
@@ -232,7 +223,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
      * set the loc_block_id for this Event to null so that an update results in
      * creating a new LocBlock.
      */
-    if ($this->_oldLocBlockId && (CRM_Utils_Array::value('location_option', $params) == 1)) {
+    if ($this->_oldLocBlockId && (($params['location_option'] ?? NULL) == 1)) {
       $deleteOldBlock = TRUE;
       CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $this->_id,
         'loc_block_id', 'null'
@@ -267,7 +258,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
      * In order to do so, the IDs of the Address, Phone and Email "Blocks" have
      * to be retrieved and added in to the elements in the $params array.
      */
-    if (CRM_Utils_Array::value('location_option', $params) == 2) {
+    if (($params['location_option'] ?? NULL) == 2) {
       if (empty($this->locationBlock['loc_block_id']) && !empty($params['loc_event_id'])) {
         $isUpdateToExistingLocationBlock = TRUE;
         $existingLocBlock = LocBlock::get()
@@ -331,8 +322,15 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
     }
 
-    // Update the Blocks.
-    $addresses = empty($params['address']) ? [] : Address::save(FALSE)->setRecords($params['address'])->execute();
+    // Update location Blocks.
+    $addresses = [];
+    // Don't use APIv4 for address because it doesn't handle custom fields in the format used by this form (custom_xx)
+    foreach ($params['address'] ?? [] as $address) {
+      CRM_Core_BAO_Address::fixAddress($address);
+      $address['custom'] = CRM_Core_BAO_CustomField::postProcess($address, $address['id'] ?? NULL, 'Address');
+      $addresses[] = (array) CRM_Core_BAO_Address::writeRecord($address);
+    }
+    // Using APIv4 for email & phone, the form doesn't support custom data for them anyway
     $emails = empty($params['email']) ? [] : Email::save(FALSE)->setRecords($params['email'])->execute();
     $phones = empty($params['phone']) ? [] : Phone::save(FALSE)->setRecords($params['phone'])->execute();
 

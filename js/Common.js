@@ -351,7 +351,7 @@ if (!CRM.vars) CRM.vars = {};
    * @returns {*}
    */
   CRM.utils.adjustDialogDefaults = function(settings) {
-    settings = $.extend({width: '65%', height: '65%', modal: true}, settings || {});
+    settings = $.extend({width: '65%', height: '40%', modal: true}, settings || {});
     // Support relative height
     if (typeof settings.height === 'string' && settings.height.indexOf('%') > 0) {
       settings.height = parseInt($(window).height() * (parseFloat(settings.height)/100), 10);
@@ -538,14 +538,30 @@ if (!CRM.vars) CRM.vars = {};
     });
   }
 
-  function getStaticOptionMarkup(staticItems) {
+  function renderQuickAddMarkup(quickAddLinks) {
+    if (!quickAddLinks || !quickAddLinks.length) {
+      return '';
+    }
+    let markup = '<div class="crm-entityref-links crm-entityref-quick-add">';
+    CRM.config.quickAdd.forEach((link) => {
+      if (quickAddLinks.includes(link.path)) {
+        markup += ' <a class="crm-hover-button" href="' + _.escape(CRM.url(link.path)) + '">' +
+          '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
+          _.escape(link.title) + '</a>';
+      }
+    });
+    markup += '</div>';
+    return markup;
+  }
+
+  function renderStaticOptionMarkup(staticItems) {
     if (!staticItems.length) {
       return '';
     }
     var markup = '<div class="crm-entityref-links crm-entityref-links-static">';
     _.each(staticItems, function(link) {
-      markup += ' <a class="crm-hover-button" href="#' + link.id + '">' +
-        '<i class="crm-i ' + link.icon + '" aria-hidden="true"></i> ' +
+      markup += ' <a class="crm-hover-button" href="#' + _.escape(link.id) + '">' +
+        '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
         _.escape(link.label) + '</a>';
     });
     markup += '</div>';
@@ -559,9 +575,11 @@ if (!CRM.vars) CRM.vars = {};
     }
     select2Options = select2Options || {};
     return $(this).each(function() {
-      var $el = $(this).off('.crmEntity'),
-        staticItems = getStaticOptions(select2Options.static),
-        multiple = !!select2Options.multiple;
+      const $el = $(this).off('.crmEntity');
+      let staticItems = getStaticOptions(select2Options.static),
+        quickAddLinks = select2Options.quickAdd,
+        multiple = !!select2Options.multiple,
+        key = apiParams.key || 'id';
 
       $el.crmSelect2(_.extend({
         ajax: {
@@ -604,18 +622,25 @@ if (!CRM.vars) CRM.vars = {};
           }
         },
         formatInputTooShort: function() {
-          var txt = $.fn.select2.defaults.formatInputTooShort.call(this);
-          txt += getStaticOptionMarkup(staticItems);
-          return txt;
+          let html = _.escape($.fn.select2.defaults.formatInputTooShort.call(this));
+          html += renderStaticOptionMarkup(staticItems);
+          html += renderQuickAddMarkup(quickAddLinks);
+          return html;
+        },
+        formatNoMatches: function() {
+          let html = _.escape($.fn.select2.defaults.formatNoMatches);
+          html += renderQuickAddMarkup(quickAddLinks);
+          return html;
         }
       }, select2Options));
 
-      $el.on('select2-open.crmEntity', function() {
+      $el.on('select2-open.crmEntity', function(){
         var $el = $(this);
         $('#select2-drop')
           .off('.crmEntity')
-          .on('click.crmEntity', '.crm-entityref-links-static a', function(e) {
-            var id = $(this).attr('href').substr(1),
+          // Add static item to selection when clicking static links
+          .on('click.crmEntity', '.crm-entityref-links-static a', function() {
+            let id = $(this).attr('href').substring(1),
               item = _.findWhere(staticItems, {id: id});
             $el.select2('close');
             if (multiple) {
@@ -627,6 +652,34 @@ if (!CRM.vars) CRM.vars = {};
             } else {
               $el.select2('data', item, true);
             }
+            return false;
+          })
+          // Pop-up Afform when clicking quick-add links
+          .on('click.crmEntity', '.crm-entityref-quick-add a', function() {
+            let url = $(this).attr('href');
+            $el.select2('close');
+            CRM.loadForm(url).on('crmFormSuccess', (e, data) => {
+              // Quick-add Afform has been submitted, parse submission data for id of created entity
+              const response = data.submissionResponse && data.submissionResponse[0];
+              let createdId;
+              if (typeof response === 'object') {
+                // Loop through entities created by the afform (there should be only one)
+                Object.keys(response).forEach((entity) => {
+                  if (Array.isArray(response[entity]) && response[entity][0] && response[entity][0][key]) {
+                    createdId = response[entity][0][key];
+                  }
+                });
+              }
+              // Update field value with new id and the widget will automatically fetch the label
+              if (createdId) {
+                if (multiple && $el.val()) {
+                  // Select2 v3 uses a string instead of array for multiple values
+                  $el.val($el.val() + ',' + createdId).change();
+                } else {
+                  $el.val('' + createdId).change();
+                }
+              }
+            });
             return false;
           });
       });
@@ -745,12 +798,12 @@ if (!CRM.vars) CRM.vars = {};
       }
       else {
         selectParams.formatInputTooShort = function() {
-          var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
+          var txt = _.escape($el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this));
           txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
         selectParams.formatNoMatches = function() {
-          var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
+          var txt = _.escape($el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches);
           txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
@@ -844,14 +897,14 @@ if (!CRM.vars) CRM.vars = {};
   CRM.utils.formatSelect2Result = function (row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
-      markup += '<div class="crm-select2-image"><img src="' + row.image + '"/></div>';
+      markup += '<div class="crm-select2-image"><img src="' + _.escape(row.image) + '"/></div>';
     }
     else if (row.icon_class) {
-      markup += '<div class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></div>';
+      markup += '<div class="crm-select2-icon"><div class="crm-icon ' + _.escape(row.icon_class) + '-icon"></div></div>';
     }
-    markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' +
-      (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
-      (row.icon ? '<i class="crm-i ' + row.icon + '" aria-hidden="true"></i> ' : '') +
+    markup += '<div><div class="crm-select2-row-label ' + _.escape(row.label_class || '') + '">' +
+      (row.color ? '<span class="crm-select-item-color" style="background-color: ' + _.escape(row.color) + '"></span> ' : '') +
+      (row.icon ? '<i class="crm-i ' + _.escape(row.icon) + '" aria-hidden="true"></i> ' : '') +
       _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '')) +
       '</div>' +
       '<div class="crm-select2-row-description">';
@@ -863,7 +916,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   function formatEntityRefSelection(row) {
-    return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
+    return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + _.escape(row.color) + '"></span> ' : '') +
       _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : ''));
   }
 
@@ -893,8 +946,8 @@ if (!CRM.vars) CRM.vars = {};
       }
     }
     _.each(createLinks, function(link) {
-      markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">' +
-        '<i class="crm-i ' + (link.icon || 'fa-plus-circle') + '" aria-hidden="true"></i> ' +
+      markup += ' <a class="crm-add-entity crm-hover-button" href="' + _.escape(link.url) + '">' +
+        '<i class="crm-i ' + _.escape(link.icon || 'fa-plus-circle') + '" aria-hidden="true"></i> ' +
         _.escape(link.label) + '</a>';
     });
     markup += '</div>';
@@ -1133,6 +1186,9 @@ if (!CRM.vars) CRM.vars = {};
       }
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
+      $('.crm-form-autocomplete:not(.select2-offscreen, .select2-container)[data-api-entity]', e.target).each(function() {
+        $(this).crmAutocomplete($(this).data('apiEntity'), $(this).data('apiParams'), $(this).data('selectParams'));
+      });
       $('select.crm-chain-select-control', e.target).off('.chainSelect').on('change.chainSelect', chainSelect);
       $('.crm-form-text[data-crm-datepicker]', e.target).each(function() {
         $(this).crmDatepicker($(this).data('crmDatepicker'));
@@ -1650,7 +1706,7 @@ if (!CRM.vars) CRM.vars = {};
         e.stopPropagation();
       })
       // Handle accordions
-      .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
+      .on('click.crmAccordions', 'div.crm-accordion-header, fieldset.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
         var action = 'open';
         if ($(this).parent().hasClass('collapsed')) {
           $(this).next().css('display', 'none').slideDown(200);

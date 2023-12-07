@@ -1,7 +1,7 @@
-<ul class="crm-checkbox-list" ng-if="$ctrl.getOptions()" title="{{:: ts('Set default value') }}">
+<ul class="crm-checkbox-list" ng-if="$ctrl.getDefn().data_type !== 'Boolean'" title="{{:: ts('Set default value') }}">
   <li ng-repeat="opt in $ctrl.getOptions()" >
     <input type="checkbox" ng-checked="defaultValueContains(opt.id)" ng-click="toggleDefaultValueItem(opt.id)" >
     <label>{{ opt.label }}</label>
   </li>
 </ul>
-<input type="checkbox" disabled ng-if="!$ctrl.getOptions()" >
+<input type="checkbox" ng-if="$ctrl.getDefn().data_type === 'Boolean'" ng-checked="defaultValueContains('1')" ng-click="toggleDefaultValueItem('1') ">

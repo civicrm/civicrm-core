@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Exception\DBQueryException;
 use Civi\Core\SettingsBag;
 
 /**
@@ -50,7 +51,7 @@ class CRM_Upgrade_Incremental_Base {
     $revList = [];
 
     $sqlGlob = implode(DIRECTORY_SEPARATOR, [dirname(__FILE__), 'sql', $this->getMajorMinor() . '.*.mysql.tpl']);
-    $sqlFiles = glob($sqlGlob);;
+    $sqlFiles = glob($sqlGlob);
     foreach ($sqlFiles as $file) {
       $revList[] = basename($file, '.mysql.tpl');
     }
@@ -76,7 +77,6 @@ class CRM_Upgrade_Incremental_Base {
    * This method will be invoked multiple times. Implementations MUST consult the `$rev`
    * before deciding what messages to add. See the examples linked below.
    *
-   * @see \CRM_Upgrade_Incremental_php_FourSeven::setPreUpgradeMessage()
    * @see \CRM_Upgrade_Incremental_php_FiveTwenty::setPreUpgradeMessage()
    *
    * @param string $preUpgradeMessage
@@ -101,7 +101,6 @@ class CRM_Upgrade_Incremental_Base {
    * This method will be invoked multiple times. Implementations MUST consult the `$rev`
    * before deciding what messages to add. See the examples linked below.
    *
-   * @see \CRM_Upgrade_Incremental_php_FourSeven::setPostUpgradeMessage()
    * @see \CRM_Upgrade_Incremental_php_FiveTwentyOne::setPostUpgradeMessage()
    *
    * @param string $postUpgradeMessage
@@ -189,8 +188,13 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
-   * Add a task to activate an extension. This task will run post-upgrade (after all
-   * changes to core DB are settled).
+   * Add a task to activate an extension. It will use the full, normal installation process
+   * (invoking `hook_install`, `hook_enable`, and so on). To ensure that the installation process
+   * can rely on regular core services and APIs, it will run after the core-upgrade-steps.
+   *
+   * This is more suited to green-field extensions (which started life as an extension).
+   * If you have a brown-field extension which doesn't have install-logic (i.e. it arises from
+   * rearranging pre-existing core-core functionality), then consider `addSimpleExtensionTask()`.
    *
    * @param string $title
    * @param string[] $keys
@@ -205,6 +209,90 @@ class CRM_Upgrade_Incremental_Base {
       new CRM_Queue_Task([static::CLASS, 'enableExtension'], [$keys], $title),
       ['weight' => $weight]
     );
+  }
+
+  /**
+   * Add a task to activate an extension. It will use a simple (low-tech) installation process
+   * (skipping events like `hook_install`; instead, it merely updates `civicrm_extension` and
+   * `CRM_Extension_ClassLoader`). The extension should not now (or in the future) use
+   * `hook_install`. Simple installations can run at any point during the upgrade process.
+   *
+   * This is more suited to brown-field extensions (which arise from rearranging pre-existing
+   * core-core functionality). If you have a green-field extension (which has always been an
+   * extension), then consider `addExtensionTask()` instead.
+   *
+   * @param string $title
+   * @param string|string[] $keys
+   *   List of extensions to enable.
+   */
+  protected function addSimpleExtensionTask(string $title, $keys): void {
+    $this->addTask($title, 'enableSimpleExtension', $keys);
+  }
+
+  /**
+   * This callback is used to enable one or more extensions which have no install or upgrade code,
+   * and whose autoloaders are needed right away.
+   *
+   * It was written to facilitate migrating core code into extensions.
+   * Moving a class into an extension means it is no longer loaded by the core autoloader.
+   * Upgrade code that relies on it could crash if classes disappear during the upgrade,
+   * so this function sets the extension status to enabled and installs its autoloader;
+   * both of which are important depending on the upgrade interface:
+   * - The web UI does each step as a separate ajax request, so inserting/enabling the extension in the db
+   * ensures it is loaded on subsequent requests.
+   * - The CLI upgrader does everything in a single request so its autoloader should be installed right away.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string|array $keys
+   * @return bool
+   * @throws CRM_Extension_Exception
+   * @throws DBQueryException
+   */
+  public static function enableSimpleExtension(CRM_Queue_TaskContext $ctx, $keys): bool {
+    $keys = (array) $keys;
+
+    // Find out current situation
+    $system = CRM_Extension_System::singleton();
+    $statuses = CRM_Utils_SQL_Select::from('civicrm_extension')
+      ->select(['full_name, is_active'])
+      ->execute(NULL, FALSE)
+      ->fetchAll();
+    $byStatus = CRM_Utils_Array::index(['is_active', 'full_name'], $statuses);
+    $disabled = array_intersect($keys, array_keys($byStatus[0] ?? []));
+    $uninstalled = array_diff($keys, array_keys($byStatus[0] ?? []), array_keys($byStatus[1] ?? []));
+
+    // Make a plan
+    $toUpdate = $disabled;
+    $toInsert = [];
+    foreach ($uninstalled as $key) {
+      $info = $system->getMapper()->keyToInfo($key);
+      $toInsert[] = [
+        'full_name' => $info->key,
+        'type' => $info->type,
+        'name' => $info->name,
+        'label' => $info->label,
+        'file' => $info->file,
+        'is_active' => 1,
+      ];
+    }
+
+    // Execute the plan
+    if ($toUpdate) {
+      $updateSql = 'UPDATE civicrm_extension SET is_active = 1 WHERE full_name IN ("' . implode('", "', array_keys($toUpdate)) . '")';
+      CRM_Core_DAO::executeQuery($updateSql, [], TRUE, NULL, FALSE, FALSE);
+    }
+    if ($toInsert) {
+      $insertSql = CRM_Utils_SQL_Insert::into('civicrm_extension')
+        ->rows($toInsert)
+        ->toSQL();
+      CRM_Core_DAO::executeQuery($insertSql, [], TRUE, NULL, FALSE, FALSE);
+    }
+    foreach (array_merge($disabled, $uninstalled) as $key) {
+      $info = $system->getMapper()->keyToInfo($key);
+      $path = $system->getMapper()->keyToPath($key);
+      $system->getClassLoader()->installExtension($info, dirname($path));
+    }
+    return TRUE;
   }
 
   /**
@@ -225,7 +313,9 @@ class CRM_Upgrade_Incremental_Base {
     // Hrm, `enable()` normally does these things... but not during upgrade...
     // Note: A good test-scenario is to install 5.45; enable logging and CiviGrant; disable searchkit+afform; then upgrade to 5.47.
     $schema = new CRM_Logging_Schema();
-    $schema->fixSchemaDifferences();
+    if ($schema->isEnabled()) {
+      $schema->fixSchemaDifferences();
+    }
 
     CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
@@ -298,6 +388,10 @@ class CRM_Upgrade_Incremental_Base {
       }
       foreach ($queries as $query) {
         CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+      }
+      $schema = new CRM_Logging_Schema();
+      if ($schema->isEnabled()) {
+        $schema->fixSchemaDifferencesFor($table);
       }
     }
     if ($locales && $triggerRebuild) {
@@ -517,6 +611,14 @@ class CRM_Upgrade_Incremental_Base {
       CRM_Core_DAO::executeQuery("ALTER TABLE `$table` DROP COLUMN `$column`",
         [], TRUE, NULL, FALSE, FALSE);
     }
+    $schema = new CRM_Logging_Schema();
+    if ($schema->isEnabled()) {
+      $schema->fixSchemaDifferencesFor($table);
+    }
+    $locales = CRM_Core_I18n::getMultilingual();
+    if ($locales) {
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
+    }
     return TRUE;
   }
 
@@ -547,6 +649,18 @@ class CRM_Upgrade_Incremental_Base {
   public static function dropIndex($ctx, $table, $indexName) {
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists($table, $indexName);
 
+    return TRUE;
+  }
+
+  /**
+   * Drop a table if it exists.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $tableName
+   * @return bool
+   */
+  public static function dropTable($ctx, $tableName) {
+    CRM_Core_BAO_SchemaHandler::dropTable($tableName);
     return TRUE;
   }
 
@@ -597,7 +711,19 @@ class CRM_Upgrade_Incremental_Base {
       $queries[] = "ALTER TABLE `$table` CHANGE `$column` `$column` $properties";
     }
     foreach ($queries as $query) {
-      CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+      try {
+        CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+      }
+      catch (DBQueryException $e) {
+        throw new CRM_Core_Exception($e->getSQLErrorCode() . "\n" . $e->getDebugInfo());
+      }
+    }
+    $schema = new CRM_Logging_Schema();
+    if ($schema->isEnabled()) {
+      $schema->fixSchemaDifferencesFor($table);
+    }
+    if ($locales) {
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
     }
     return TRUE;
   }

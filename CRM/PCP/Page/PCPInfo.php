@@ -164,7 +164,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
         'pageComponent' => $this->_component,
       ];
 
-      if (!$pcpBlock->is_tellfriend_enabled || CRM_Utils_Array::value('status_id', $pcpInfo) != $approvedId) {
+      if (!$pcpBlock->is_tellfriend_enabled || ($pcpInfo['status_id'] ?? NULL) != $approvedId) {
         unset($link['all'][CRM_Core_Action::DETACH]);
       }
 
@@ -206,12 +206,12 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
         TRUE, NULL, TRUE,
         TRUE
       );
-      $this->assign('linkTextUrl', $linkTextUrl);
-      $this->assign('linkText', $pcpBlock->link_text);
     }
+    $this->assign('linkTextUrl', $linkTextUrl ?? NULL);
+    $this->assign('linkText', $pcpBlock->link_text ?? NULL);
 
     $this->assign('honor', $honor);
-    $this->assign('total', $totalAmount ? $totalAmount : '0.0');
+    $this->assign('total', $totalAmount ?: '0.0');
     $this->assign('achieved', $achieved <= 100 ? $achieved : 100);
 
     if ($achieved <= 100) {
@@ -219,12 +219,12 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     }
     // make sure that we are between contribution page start and end dates OR registration start date and end dates if they are set
     if ($pcpBlock->entity_table == 'civicrm_event') {
-      $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_start_date', $pageInfo));
-      $endDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('registration_end_date', $pageInfo));
+      $startDate = CRM_Utils_Date::unixTime($pageInfo['registration_start_date'] ?? '');
+      $endDate = CRM_Utils_Date::unixTime($pageInfo['registration_end_date'] ?? '');
     }
     else {
-      $startDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('start_date', $pageInfo));
-      $endDate = CRM_Utils_Date::unixTime(CRM_Utils_Array::value('end_date', $pageInfo));
+      $startDate = CRM_Utils_Date::unixTime($pageInfo['start_date'] ?? '');
+      $endDate = CRM_Utils_Date::unixTime($pageInfo['end_date'] ?? '');
     }
 
     $now = time();

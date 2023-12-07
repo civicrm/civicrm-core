@@ -36,11 +36,7 @@ class CRM_Utils_Rule {
     }
 
     // Make sure it include valid characters, alpha numeric and underscores
-    if (!preg_match('/^\w[\w\s\'\&\,\$\#\-\.\"\?\!]+$/i', $str)) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (bool) preg_match('/^\w[\w\s\'\&\,\$\#\-\.\"\?\!]+$/i', $str);
   }
 
   /**
@@ -64,11 +60,7 @@ class CRM_Utils_Rule {
     }
 
     // make sure it includes valid characters, alpha numeric and underscores
-    if (!preg_match('/^[\w]+$/i', $str)) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (bool) preg_match('/^[\w]+$/i', $str);
   }
 
   /**
@@ -92,11 +84,8 @@ class CRM_Utils_Rule {
     //   * Composed of alphanumeric chars, underscore and hyphens.
     //   * Maximum length of 64 chars.
     //   * Optionally surrounded by backticks, in which case spaces also OK.
-    if (!preg_match('/^((`[-\w ]{1,64}`|[-\w]{1,64})\.)?(`[-\w ]{1,64}`|[-\w]{1,64})$/i', $str)) {
-      return FALSE;
-    }
+    return (bool) preg_match('/^((`[-\w ]{1,64}`|[-\w]{1,64})\.)?(`[-\w ]{1,64}`|[-\w]{1,64})$/i', $str);
 
-    return TRUE;
   }
 
   /**
@@ -108,11 +97,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function mysqlOrderByDirection($str) {
-    if (!preg_match('/^(asc|desc)$/i', $str)) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (bool) preg_match('/^(asc|desc)$/i', $str);
   }
 
   /**
@@ -163,11 +148,7 @@ class CRM_Utils_Rule {
 
     // make sure it includes valid characters, alpha numeric and underscores
     // added (. and ,) option (CRM-1336)
-    if (!preg_match('/^[\w\s\.\,]+$/i', $str)) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (bool) preg_match('/^[\w\s\.\,]+$/i', $str);
   }
 
   /**
@@ -200,11 +181,7 @@ class CRM_Utils_Rule {
     }
 
     // make sure it includes valid characters, alpha numeric and underscores
-    if (!preg_match('/^[\w\s\%\'\&\,\$\#]+$/i', $query)) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (bool) preg_match('/^[\w\s\%\'\&\,\$\#]+$/i', $query);
   }
 
   /**
@@ -658,6 +635,10 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function email($value): bool {
+    if ($value === '' || is_null($value)) {
+      // Nothing to check
+      return TRUE;
+    }
     if (function_exists('idn_to_ascii')) {
       $parts = explode('@', $value);
       foreach ($parts as &$part) {
@@ -878,12 +859,15 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * @deprecated
    * @param mixed $value
    * @param mixed $actualElementValue
    *
    * @return bool
    */
   public static function validContact($value, $actualElementValue = NULL) {
+    // @todo When this function is removed (deprecated April 2023), it should also be removed from CRM_Core_Form: https://github.com/civicrm/civicrm-core/blob/0148b09115eeb941cde8e9f6f9484d205750f144/CRM/Core/Form.php#L429
+    CRM_Core_Error::deprecatedFunctionWarning('positiveInteger');
     if ($actualElementValue) {
       $value = $actualElementValue;
     }

@@ -45,6 +45,52 @@ interface CRM_Core_Resources_CollectionAdderInterface {
   public function addMarkup(string $markup, ...$options);
 
   /**
+   * Add an ECMAScript Module (ESM) to the current page (<SCRIPT TYPE=MODULE>).
+   *
+   * Ex: addScript('alert("Hello world");', ['weight' => 123]);
+   *
+   * @param string $code
+   *   JavaScript source code.
+   * @param array $options
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addScript(string $code, int $weight, string $region).
+   * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   */
+  public function addModule(string $code, ...$options);
+
+  /**
+   * Add an ECMAScript Module (ESM) from file to the current page (<SCRIPT TYPE=MODULE SRC=...>).
+   *
+   * Ex: addScriptFile('myextension', 'myscript.js', ['weight' => 123]);
+   *
+   * @param string $ext
+   *   Extension name; use 'civicrm' for core.
+   * @param string $file
+   *   File path -- relative to the extension base dir.
+   * @param array $options
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addScriptFile(string $code, int $weight, string $region, mixed $translate).
+   * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   */
+  public function addModuleFile(string $ext, string $file, ...$options);
+
+  /**
+   * Add an ECMAScript Module (ESM) by URL to the current page (<SCRIPT TYPE=MODULE SRC=...>).
+   *
+   * Ex: addScriptUrl('http://example.com/foo.js', ['weight' => 123])
+   *
+   * @param string $url
+   * @param array $options
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addScriptUrl(string $url, int $weight, string $region).
+   * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   */
+  public function addModuleUrl(string $url, ...$options);
+
+  /**
    * Export permission data to the client to enable smarter GUIs.
    *
    * Note: Application security stems from the server's enforcement

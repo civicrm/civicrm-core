@@ -403,10 +403,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Refresh contact tabs which might have been affected
     $this->ajaxResponse = [
       'reloadBlocks' => ['#crm-contactinfo-content'],
-      'updateTabs' => [
-        '#tab_member' => CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId),
-        '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
-      ],
     ];
   }
 
@@ -493,7 +489,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         $jsData[$id] = array_filter(array_intersect_key($allRelationshipNames[$id], $whatWeWant));
         // Add user-friendly placeholder
         foreach (['a', 'b'] as $x) {
-          $type = !empty($jsData[$id]["contact_sub_type_$x"]) ? $jsData[$id]["contact_sub_type_$x"] : CRM_Utils_Array::value("contact_type_$x", $jsData[$id]);
+          $type = !empty($jsData[$id]["contact_sub_type_$x"]) ? $jsData[$id]["contact_sub_type_$x"] : (CRM_Utils_Array::value("contact_type_$x", $jsData[$id]));
           $jsData[$id]["placeholder_$x"] = $type ? ts('- select %1 -', [strtolower($contactTypes[$type]['label'])]) : ts('- select contact -');
         }
       }
@@ -508,7 +504,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    *   Relationship ID
    */
   private function deleteAction($id) {
-    CRM_Contact_BAO_Relationship::del($id);
+    CRM_Contact_BAO_Relationship::deleteRecord(['id' => $id]);
     CRM_Core_Session::setStatus(ts('Selected relationship has been deleted successfully.'), ts('Record Deleted'), 'success');
 
     // reload all blocks to reflect this change on the user interface.
@@ -579,8 +575,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
 
     // If this is a b_a relationship these form elements are flipped
-    $params['is_permission_a_b'] = CRM_Utils_Array::value("is_permission_{$a}_{$b}", $values, 0);
-    $params['is_permission_b_a'] = CRM_Utils_Array::value("is_permission_{$b}_{$a}", $values, 0);
+    $params['is_permission_a_b'] = $values["is_permission_{$a}_{$b}"] ?? 0;
+    $params['is_permission_b_a'] = $values["is_permission_{$b}_{$a}"] ?? 0;
 
     return [$params, $a];
   }

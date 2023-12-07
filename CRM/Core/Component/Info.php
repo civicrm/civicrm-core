@@ -63,7 +63,7 @@ abstract class CRM_Core_Component_Info {
   /**
    * Component settings as key/value pairs.
    *
-   * @var array
+   * @var array{name: string, translatedName: string, title: string, search: bool, showActivitiesInCore: bool, url: string}
    */
   public $info;
 
@@ -111,14 +111,11 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
-   * EXPERIMENTAL: Get a list of AngularJS modules
-   *
-   * @return array
-   *   list of modules; same format as CRM_Utils_Hook::angularModules(&$angularModules)
-   * @see CRM_Utils_Hook::angularModules
+   * Name of the module-extension coupled with this component
+   * @return string
    */
-  public function getAngularModules() {
-    return [];
+  public function getExtensionName(): string {
+    return CRM_Utils_String::convertStringToSnakeCase($this->name);
   }
 
   /**
@@ -130,17 +127,6 @@ abstract class CRM_Core_Component_Info {
    *   collection of required component settings
    */
   abstract public function getInfo();
-
-  /**
-   * Get a list of entities to register via API.
-   *
-   * @return array
-   *   list of entities; same format as CRM_Utils_Hook::managedEntities(&$entities)
-   * @see CRM_Utils_Hook::managedEntities
-   */
-  public function getManagedEntities() {
-    return [];
-  }
 
   /**
    * Provides permissions that are unwise for Anonymous Roles to have.

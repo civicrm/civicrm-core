@@ -26,7 +26,6 @@ use Civi\Api4\UserJob;
  */
 class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
 
-  use CRM_Contact_Import_MetadataTrait;
   use CRMTraits_Custom_CustomDataTrait;
 
   /**
@@ -40,7 +39,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * Delete any saved mapping config.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field'], TRUE);
+    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field', 'civicrm_user_job', 'civicrm_queue'], TRUE);
     parent::tearDown();
   }
 
@@ -208,9 +207,11 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   public function testLoadSavedMappingDirect(): void {
     $mapping = $this->storeComplexMapping();
     $this->setUpMapFieldForm();
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($this->form->getUserJobID());
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mapping['id']);
-    $processor->setMetadata($this->getContactImportMetadata());
+    $processor->setMetadata($parser->getFieldsMetadata());
     $this->assertEquals(3, $processor->getPhoneOrIMTypeID(10));
     $this->assertEquals(3, $processor->getPhoneTypeID(10));
     $this->assertEquals(1, $processor->getLocationTypeID(10));
@@ -261,7 +262,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
       [
         ['name' => 'do_not_import', 'contact_type' => 'Individual', 'column_number' => 0],
         "swapOptions(document.forms.MapField, 'mapper[0]', 0, 4, 'hs_mapper_0_');\n",
-        ['mapper[0]' => []],
+        ['mapper[0]' => ['do_not_import']],
       ],
     ];
   }
@@ -335,7 +336,9 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mappingID);
     $processor->setFormName('document.forms.MapField');
-    $processor->setMetadata($this->getContactImportMetadata());
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($this->form->getUserJobID());
+    $processor->setMetadata($parser->getFieldsMetadata());
     $processor->setContactType('Individual');
 
     $defaults = [];

@@ -30,8 +30,8 @@ use Civi\Core\Event\GenericHookEvent;
  * - 'retry': Task encountered an error. Will try again later.
  * - 'fail': Task encountered an error. Will not try again later. Removed from queue.
  *
- * @method $this setItem(?array $item)
- * @method ?array getItem()
+ * @method $this setItems(?array $items)
+ * @method ?array getItems()
  * @method ?string setQueue
  * @method $this setQueue(?string $queue)
  */

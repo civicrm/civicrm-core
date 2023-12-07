@@ -22,6 +22,7 @@ namespace api\v4\Action;
 use Civi\Api4\Relationship;
 use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
+use Civi\Api4\SavedSearch;
 use Civi\Api4\UserJob;
 use Civi\Test\TransactionalInterface;
 
@@ -125,7 +126,37 @@ class CurrentFilterTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertTrue($getAll[$current['id']]['is_current']);
     $this->assertTrue($getAll[$indefinite['id']]['is_current']);
-    $this->assertFALSE($getAll[$expired['id']]['is_current']);
+    $this->assertFalse($getAll[$expired['id']]['is_current']);
+
+    $this->assertEquals([$current['id'], $indefinite['id']], array_keys($getCurrent));
+    $this->assertEquals([$expired['id']], array_keys($notCurrent));
+  }
+
+  /**
+   * Test saved search api checks expires_date.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCurrentSavedSearch(): void {
+    $current = SavedSearch::create()->setValues([
+      'expires_date' => '+ 1 week',
+      'name' => 'current',
+    ])->execute()->first();
+    $indefinite = SavedSearch::create()->setValues([
+      'name' => 'never expires',
+    ])->execute()->first();
+    $expired = SavedSearch::create()->setValues([
+      'expires_date' => '-1 week',
+      'name' => 'expired',
+    ])->execute()->first();
+
+    $getCurrent = (array) SavedSearch::get()->addWhere('is_current', '=', TRUE)->addWhere('has_base', '=', FALSE)->execute()->indexBy('id');
+    $notCurrent = (array) SavedSearch::get()->addWhere('is_current', '=', FALSE)->addWhere('has_base', '=', FALSE)->execute()->indexBy('id');
+    $getAll = (array) SavedSearch::get()->addSelect('is_current')->addWhere('has_base', '=', FALSE)->execute()->indexBy('id');
+
+    $this->assertTrue($getAll[$current['id']]['is_current']);
+    $this->assertTrue($getAll[$indefinite['id']]['is_current']);
+    $this->assertFalse($getAll[$expired['id']]['is_current']);
 
     $this->assertEquals([$current['id'], $indefinite['id']], array_keys($getCurrent));
     $this->assertEquals([$expired['id']], array_keys($notCurrent));

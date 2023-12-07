@@ -8,11 +8,10 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm--block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {include file="CRM/Form/basicFormFields.tpl"}
 
   <table class="form-layout" id="invoicing_blocks">
-    {foreach from=$htmlFields item=fieldSpec key=htmlField}
+    {foreach from=$invoiceDependentFields item=fieldSpec key=htmlField}
       {if $form.$htmlField}
         {assign var=n value=$htmlField|cat:'_description'}
         <tr class="crm-preferences-form-block-{$htmlField}">

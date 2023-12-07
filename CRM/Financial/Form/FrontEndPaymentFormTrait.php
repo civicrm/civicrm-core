@@ -174,7 +174,7 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
    * @return string
    */
   protected function getPaymentProcessorTitle($processor) {
-    return $processor['title'] ?? $processor['name'];
+    return $processor['frontend_title'];
   }
 
   /**

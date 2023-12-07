@@ -11,7 +11,7 @@ class OutputHandlerFactoryTest extends \CiviUnitTestCase {
   /**
    * Test builtin outputhandler creation
    */
-  public function testCreateBuiltin() {
+  public function testCreateBuiltin(): void {
     $form = new \CRM_Report_Form_SampleForm();
     $form->setOutputModeForTesting('csv');
     $outputHandler = OutputHandlerFactory::singleton()->create($form);
@@ -29,7 +29,7 @@ class OutputHandlerFactoryTest extends \CiviUnitTestCase {
   /**
    * Test when no suitable handler available for given report parameters.
    */
-  public function testCreateNoMatch() {
+  public function testCreateNoMatch(): void {
     $form = new \CRM_Report_Form_SampleForm();
     $form->setOutputModeForTesting('something_nonexistent');
     $outputHandler = OutputHandlerFactory::singleton()->create($form);
@@ -39,7 +39,7 @@ class OutputHandlerFactoryTest extends \CiviUnitTestCase {
   /**
    * Test handler made available via hook.
    */
-  public function testCreateWithHook() {
+  public function testCreateWithHook(): void {
     \Civi::dispatcher()->addListener('hook_civicrm_alterReportVar', [$this, 'hookForAlterReportVar']);
     $form = new \CRM_Report_Form_SampleForm();
     $form->setOutputModeForTesting('sample');
@@ -50,7 +50,7 @@ class OutputHandlerFactoryTest extends \CiviUnitTestCase {
   /**
    * Test actions modified by hook.
    */
-  public function testAlterReportVarHookWithActions() {
+  public function testAlterReportVarHookWithActions(): void {
     \Civi::dispatcher()->addListener('hook_civicrm_alterReportVar', [$this, 'hookForAlterReportVar']);
     $form = new \CRM_Report_Form_SampleForm();
     // NULL means no particular instance - running new report from template

@@ -294,6 +294,7 @@
     <title>Is Active</title>
     <type>boolean</type>
     <required>true</required>
+    <!-- FIXME - nonstandard default for is_active -->
     <default>0</default>
     <comment>Is this Event enabled or disabled/cancelled?</comment>
     <add>1.7</add>
@@ -580,7 +581,7 @@
     <comment>The receipt sent to the user instead of the normal receipt text</comment>
     <add>2.0</add>
     <html>
-      <type>Text</type>
+      <type>RichTextEditor</type>
     </html>
   </field>
   <field>
@@ -831,7 +832,7 @@
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
-      <prefetch>FALSE</prefetch>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
   </field>
   <foreignKey>
@@ -884,12 +885,13 @@
     <name>slot_label_id</name>
     <type>int unsigned</type>
     <title>Subevent Slot Label ID</title>
+    <deprecated>true</deprecated>
     <default>NULL</default>
-    <comment>Subevent slot label. Implicit FK to civicrm_option_value where option_group = conference_slot.</comment>
+    <comment>Needs to be moved to Event cart extension. Subevent slot label. Implicit FK to civicrm_option_value where option_group = conference_slot.</comment>
     <add>4.1</add>
     <html>
-          <type>Select</type>
-        </html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>dedupe_rule_group_id</name>
@@ -923,6 +925,18 @@
     <default>0</default>
     <comment>if true than billing block is required this event</comment>
     <add>4.6</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>is_show_calendar_links</name>
+    <title>Are calendar links shown?</title>
+    <type>boolean</type>
+    <required>true</required>
+    <default>1</default>
+    <comment>If true then calendar links are shown for this event.</comment>
+    <add>5.68</add>
     <html>
       <type>CheckBox</type>
     </html>

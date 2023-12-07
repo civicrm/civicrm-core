@@ -25,6 +25,15 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   use CRM_Contact_Import_MetadataTrait;
 
   /**
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
+   */
+  public function getUserJobType(): string {
+    return 'contact_import';
+  }
+
+  /**
    * An array of all contact fields with
    * formatted custom field names.
    *
@@ -73,7 +82,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function preProcess(): void {
-    $this->_mapperFields = $this->getAvailableFields();
+    // Don't mess up the fields for related contacts
+    $this->shouldSortMapperFields = FALSE;
+
+    parent::preProcess();
     //format custom field names, CRM-2676
     $contactType = $this->getContactType();
 
@@ -90,7 +102,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       //Modify mapper fields title if fields are present in dedupe rule
       if (is_array($this->_dedupeFields[$contactType])) {
         foreach ($this->_dedupeFields[$contactType] as $val) {
-          if ($valTitle = CRM_Utils_Array::value($val, $this->_mapperFields)) {
+          $valTitle = $this->_mapperFields[$val] ?? NULL;
+          if ($valTitle) {
             $this->_mapperFields[$val] = $valTitle . ' (match to contact)';
           }
         }
@@ -100,7 +113,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $formattedFieldNames = $this->formatCustomFieldName($this->_mapperFields);
 
     $this->_formattedFieldNames[$contactType] = $this->_mapperFields = array_merge($this->_mapperFields, $formattedFieldNames);
-    $this->assignMapFieldVariables();
   }
 
   /**
@@ -110,8 +122,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function buildQuickForm(): void {
     $this->addSavedMappingFields();
-
-    $this->addFormRule(['CRM_Contact_Import_Form_MapField', 'formRule']);
 
     //-------- end of saved mapping stuff ---------
 
@@ -197,7 +207,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           static $cTypeArray = [];
           if ($relatedContactType !== $this->getContactType() && !in_array($relatedContactType, $cTypeArray)) {
             foreach ($this->_dedupeFields[$relatedContactType] as $val) {
-              if ($valTitle = CRM_Utils_Array::value($val, $this->_formattedFieldNames[$relatedContactType])) {
+              $valTitle = $this->_formattedFieldNames[$relatedContactType][$val] ?? NULL;
+              if ($valTitle) {
                 $this->_formattedFieldNames[$relatedContactType][$val] = $valTitle . ' (match to contact)';
               }
             }
@@ -267,7 +278,12 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         $last_key = array_key_last($mapper[$i]);
       }
       elseif ($this->getSubmittedValue('savedMapping') && $processor->getFieldName($i)) {
-        $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
+        $defaultField = $processor->getSavedQuickformDefaultsForColumn($i);
+        if (!array_key_exists($defaultField[0], $this->_mapperFields)) {
+          $defaultField = ['do_not_import'];
+          CRM_Core_Session::setStatus(ts('Data was configured to be imported to column %1 but it is not available. The field has been set to "%2"', [1 => $columnHeader, 2 => $this->_mapperFields['do_not_import']]));
+        }
+        $defaults["mapper[$i]"] = $defaultField;
         $last_key = array_key_last($defaults["mapper[$i]"]) ?? 0;
       }
       else {
@@ -301,24 +317,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->setDefaults($defaults);
 
     $this->addFormButtons();
-  }
-
-  /**
-   * Global validation rules for the form.
-   *
-   * @param array $fields
-   *   Posted values of the form.
-   *
-   * @return bool
-   *   list of errors to be posted back to the form
-   */
-  public static function formRule(array $fields): bool {
-    if (!empty($fields['saveMapping'])) {
-      // todo - this is nonsensical - sane js is better. PR to fix got stale but
-      // is here https://github.com/civicrm/civicrm-core/pull/23950
-      CRM_Core_Smarty::singleton()->assign('isCheked', TRUE);
-    }
-    return TRUE;
   }
 
   /**
@@ -381,7 +379,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     //Updating Mapping Records
     if (!empty($params['updateMapping'])) {
       foreach (array_keys($this->getColumnHeaders()) as $i) {
-        $this->saveMappingField($params['mappingId'], $i, TRUE);
+        $this->saveMappingField($this->getSavedMappingID(), $i, TRUE);
       }
     }
 
@@ -394,6 +392,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       ];
 
       $saveMapping = civicrm_api3('Mapping', 'create', $mappingParams);
+      $this->updateUserJobMetadata('MapField', ['mapping_id' => $saveMapping['id']]);
 
       foreach (array_keys($this->getColumnHeaders()) as $i) {
         $this->saveMappingField($saveMapping['id'], $i);

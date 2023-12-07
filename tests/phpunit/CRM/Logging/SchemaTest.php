@@ -59,7 +59,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     Civi::settings()->set('logging', TRUE);
     $log_table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE log_civicrm_acl');
     while ($log_table->fetch()) {
-      $this->assertRegexp('/ENGINE=InnoDB/', $log_table->Create_Table);
+      $this->assertMatchesRegularExpression('/ENGINE=InnoDB/', $log_table->Create_Table);
     }
   }
 
@@ -71,7 +71,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     Civi::settings()->set('logging', TRUE);
     $log_table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE log_civicrm_acl');
     while ($log_table->fetch()) {
-      $this->assertRegexp('/ENGINE=MyISAM/', $log_table->Create_Table);
+      $this->assertMatchesRegularExpression('/ENGINE=MyISAM/', $log_table->Create_Table);
     }
   }
 
@@ -110,19 +110,19 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery('ALTER TABLE log_civicrm_acl ENGINE ARCHIVE');
     $log_table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE log_civicrm_acl');
     while ($log_table->fetch()) {
-      $this->assertRegexp('/ENGINE=ARCHIVE/', $log_table->Create_Table);
+      $this->assertMatchesRegularExpression('/ENGINE=ARCHIVE/', $log_table->Create_Table);
     }
     // engine should not change by default
     $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => FALSE]);
     $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
     while ($log_table->fetch()) {
-      $this->assertRegExp('/ENGINE=ARCHIVE/', $log_table->Create_Table);
+      $this->assertMatchesRegularExpression('/ENGINE=ARCHIVE/', $log_table->Create_Table);
     }
     // update with forceEngineMigration should convert to InnoDB
     $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => TRUE]);
     $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
     while ($log_table->fetch()) {
-      $this->assertRegExp('/ENGINE=InnoDB/', $log_table->Create_Table);
+      $this->assertMatchesRegularExpression('/ENGINE=InnoDB/', $log_table->Create_Table);
     }
   }
 
@@ -145,7 +145,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
    *
    * (At point of writing this the modification was leaking to the mailing table).
    */
-  public function testTriggers() {
+  public function testTriggers(): void {
     $customGroup = $this->entityCustomGroupWithSingleFieldCreate('Contact', 'ContactTest....');
     Civi::service('sql_triggers')->rebuild();
     $log_table = CRM_Core_DAO::executeQuery("SHOW TRIGGERS WHERE `Trigger` LIKE 'civicrm_value_contact_{$customGroup['custom_group_id']}_after_insert%'");
@@ -160,7 +160,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   /**
    * Test that autoincrement keys are handled sensibly in logging table reconciliation.
    */
-  public function testAutoIncrementNonIdColumn() {
+  public function testAutoIncrementNonIdColumn(): void {
     CRM_Core_DAO::executeQuery("CREATE TABLE `civicrm_test_table` (
       test_id  int(10) unsigned NOT NULL AUTO_INCREMENT,
       PRIMARY KEY (`test_id`)
@@ -212,7 +212,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   /**
    * Test logging trigger definition
    */
-  public function testTriggerInfo() {
+  public function testTriggerInfo(): void {
     $info = [];
     $schema = new CRM_Logging_Schema();
     Civi::settings()->set('logging', TRUE);
@@ -281,7 +281,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertEquals('date', $ci['test_date']['DATA_TYPE']);
   }
 
-  public function testIndexes() {
+  public function testIndexes(): void {
     $schema = new CRM_Logging_Schema();
     $indexes = $schema->getIndexesForTable('civicrm_contact');
     $this->assertContains('PRIMARY', $indexes);
@@ -290,7 +290,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertContains('index_sort_name', $indexes);
   }
 
-  public function testLengthChange() {
+  public function testLengthChange(): void {
     CRM_Core_DAO::executeQuery("CREATE TABLE `civicrm_test_length_change` (
       test_id int(10) unsigned NOT NULL AUTO_INCREMENT,
       test_integer int(4) NULL,
@@ -423,8 +423,8 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE civicrm_test_table");
     $dao->fetch();
     // using regex since not sure it's always int(10), so accept int(10), int(11), integer, etc...
-    $this->assertRegExp('/`id` int(.*) unsigned NOT NULL AUTO_INCREMENT/', $dao->Create_Table);
-    $this->assertRegExp('/`activity_id` int(.*) unsigned NOT NULL/', $dao->Create_Table);
+    $this->assertMatchesRegularExpression('/`id` int(.*) unsigned NOT NULL AUTO_INCREMENT/', $dao->Create_Table);
+    $this->assertMatchesRegularExpression('/`activity_id` int(.*) unsigned NOT NULL/', $dao->Create_Table);
     $this->assertStringContainsString('`texty` varchar(255)', $dao->Create_Table);
     $this->assertStringContainsString('ENGINE=InnoDB', $dao->Create_Table);
     $this->assertStringContainsString('FOREIGN KEY (`activity_id`) REFERENCES `civicrm_activity` (`id`) ON DELETE CASCADE', $dao->Create_Table);
@@ -434,8 +434,8 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $dao->fetch();
     $this->assertStringNotContainsString('AUTO_INCREMENT', $dao->Create_Table);
     // This seems debatable whether `id` should lose its NOT NULL status
-    $this->assertRegExp('/`id` int(.*) unsigned DEFAULT NULL/', $dao->Create_Table);
-    $this->assertRegExp('/`activity_id` int(.*) unsigned DEFAULT NULL/', $dao->Create_Table);
+    $this->assertMatchesRegularExpression('/`id` int(.*) unsigned DEFAULT NULL/', $dao->Create_Table);
+    $this->assertMatchesRegularExpression('/`activity_id` int(.*) unsigned DEFAULT NULL/', $dao->Create_Table);
     $this->assertStringContainsString('`texty` varchar(255)', $dao->Create_Table);
     $this->assertStringContainsString('ENGINE=InnoDB', $dao->Create_Table);
     $this->assertStringNotContainsString('FOREIGN KEY', $dao->Create_Table);

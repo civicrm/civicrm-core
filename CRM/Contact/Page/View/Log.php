@@ -41,7 +41,7 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
 
     $logEntries = [];
     while ($log->fetch()) {
-      list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($log->modified_id);
+      [$displayName, $contactImage] = CRM_Contact_BAO_Contact::getDisplayAndImage($log->modified_id);
       $logEntries[] = [
         'id' => $log->modified_id,
         'name' => $displayName,

@@ -22,13 +22,15 @@
  *   The monetary amount up for display.
  * @param string|null $currency
  *   The (optional) currency.
+ * @param string|null $locale
+ *   The (optional) locale.
  *
  * @return string
  *   formatted monetary amount
  */
-function smarty_modifier_crmMoney($amount, ?string $currency = NULL): string {
+function smarty_modifier_crmMoney($amount, ?string $currency = NULL, ?string $locale = NULL): string {
   try {
-    return Civi::format()->money($amount, $currency);
+    return Civi::format()->money($amount, $currency, $locale);
   }
   catch (CRM_Core_Exception $e) {
     // @todo escalate this to a deprecation notice. It turns out to be depressingly

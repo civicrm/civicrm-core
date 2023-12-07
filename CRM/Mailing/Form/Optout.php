@@ -27,22 +27,22 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
   /**
    * @var int
    */
-  private $_job_id;
+  protected $_job_id;
 
   /**
    * @var int
    */
-  private $_queue_id;
+  protected $_queue_id;
 
   /**
    * @var string
    */
-  private $_hash;
+  protected $_hash;
 
   /**
    * @var string
    */
-  private $_email;
+  protected $_email;
 
   public function preProcess() {
     $this->_job_id = $job_id = CRM_Utils_Request::retrieve('jid', 'Integer', $this);
@@ -50,13 +50,17 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
     $this->_hash = $hash = CRM_Utils_Request::retrieve('h', 'String', $this);
 
     if (!$job_id || !$queue_id || !$hash) {
-      throw new CRM_Core_Exception(ts("Missing input parameters"));
+      CRM_Utils_System::sendResponse(
+        new \GuzzleHttp\Psr7\Response(400, [], ts("Invalid request: missing parameters"))
+      );
     }
 
     // verify that the three numbers above match
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
     if (!$q) {
-      throw new CRM_Core_Exception(ts("There was an error in your request"));
+      CRM_Utils_System::sendResponse(
+        new \GuzzleHttp\Psr7\Response(400, [], ts("Invalid request: bad parameters"))
+      );
     }
 
     list($displayName, $email) = CRM_Mailing_Event_BAO_MailingEventQueue::getContactInfo($queue_id);

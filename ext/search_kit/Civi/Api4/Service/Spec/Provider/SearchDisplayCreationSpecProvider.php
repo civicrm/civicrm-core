@@ -24,8 +24,7 @@ class SearchDisplayCreationSpecProvider extends \Civi\Core\Service\AutoService i
    * @inheritDoc
    */
   public function modifySpec(RequestSpec $spec) {
-    $spec->getFieldByName('name')->setRequired(FALSE)->setRequiredIf('empty($values.label)');
-    $spec->getFieldByName('label')->setRequired(FALSE)->setRequiredIf('empty($values.name)');
+    $spec->getFieldByName('name')->setRequired(FALSE);
   }
 
   /**

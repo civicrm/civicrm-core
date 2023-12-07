@@ -4,7 +4,7 @@ use CRM_Search_ExtensionUtil as E;
 /**
  * Collection of upgrade steps.
  */
-class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
+class CRM_Search_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * Upgrade 1000 - install schema
@@ -40,7 +40,7 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
     foreach ($savedSearches as $savedSearch) {
       $newAliases = [];
       foreach ($savedSearch['api_params']['select'] ?? [] as $i => $select) {
-        if (strstr($select, '(') && !strstr($select, ' AS ')) {
+        if (str_contains($select, '(') && !str_contains($select, ' AS ')) {
           $alias = CRM_Utils_String::munge(str_replace(')', '', $select), '_', 256);
           $newAliases[$select] = $alias;
           $savedSearch['api_params']['select'][$i] = $select . ' AS ' . $alias;
@@ -121,8 +121,7 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
    */
   public function upgrade_1005(): bool {
     $this->ctx->log->info('Applying update 1005 - add acl_bypass column.');
-    $this->addTask('Add Cancel Button Setting to the Profile', 'addColumn',
-      'civicrm_search_display', 'acl_bypass', "tinyint DEFAULT 0 COMMENT 'Skip permission checks and ACLs when running this display.'");
+    $this->addColumn('civicrm_search_display', 'acl_bypass', "tinyint DEFAULT 0 COMMENT 'Skip permission checks and ACLs when running this display.'");
     return TRUE;
   }
 
@@ -158,7 +157,7 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
    */
   public function upgrade_1007(): bool {
     $this->ctx->log->info('Applying update 1007 - add SearchSegment table.');
-    if (!CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE 'civicrm_search_segment'")) {
+    if (!CRM_Core_DAO::checkTableExists('civicrm_search_segment')) {
       $createTable = "
 CREATE TABLE `civicrm_search_segment` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique SearchSegment ID',

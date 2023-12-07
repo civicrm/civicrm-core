@@ -70,21 +70,6 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   public $_paymentProcessor = [];
 
   /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * Fields may have keys
-   *  - name (required to show in tpl from the array)
-   *  - description (optional, will appear below the field)
-   *  - not-auto-addable - this class will not attempt to add the field using addField.
-   *    (this will be automatically set if the field does not have html in it's metadata
-   *    or is not a core field on the form's entity).
-   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
-   *  - template - use a field specific template to render this field
-   * @var array
-   */
-  protected $entityFields = [];
-
-  /**
    * Details of the subscription (recurring contribution) to be altered.
    *
    * @var \CRM_Core_DAO
@@ -97,6 +82,14 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    * @var bool
    */
   protected $selfService;
+
+  /**
+   * Used by `CRM_Contribute_Form_UpdateSubscription`
+   *
+   * @var CRM_Core_DAO
+   * @deprecated This is being set temporarily - we should eventually just use the getter fn.
+   */
+  protected $_subscriptionDetails = NULL;
 
   /**
    * Explicitly declare the entity api name.

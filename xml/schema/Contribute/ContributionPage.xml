@@ -9,6 +9,12 @@
   <log>true</log>
   <component>CiviContribute</component>
   <labelField>title</labelField>
+  <paths>
+    <add>civicrm/admin/contribute/add?reset=1&amp;action=add</add>
+    <update>civicrm/admin/contribute/settings?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/admin/contribute/manage?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <browse>civicrm/admin/contribute</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>Contribution Page ID</title>
@@ -26,12 +32,41 @@
   </primaryKey>
   <field>
     <name>title</name>
-    <title>Contribution Page Title</title>
+    <title>Page Name</title>
     <type>varchar</type>
     <length>255</length>
     <localizable>true</localizable>
+    <required>true</required>
     <comment>Contribution Page title. For top of page display</comment>
     <add>1.3</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>frontend_title</name>
+    <title>Public Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <required>true</required>
+    <comment>Contribution Page Public title</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.20</add>
+  </field>
+  <field>
+    <name>name</name>
+    <title>Unique Name</title>
+    <comment>Unique name for identifying contribution page</comment>
+    <required>true</required>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.63</add>
   </field>
   <field>
     <name>intro_text</name>
@@ -187,6 +222,11 @@
     <title>Pay Later Receipt</title>
     <type>text</type>
     <localizable>true</localizable>
+    <html>
+      <type>RichTextEditor</type>
+      <rows>8</rows>
+      <cols>60</cols>
+    </html>
     <comment>The receipt sent to the user instead of the normal receipt text</comment>
     <add>2.0</add>
   </field>
@@ -466,7 +506,7 @@
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
-      <prefetch>FALSE</prefetch>
+      <prefetch>disabled</prefetch>
     </pseudoconstant>
   </field>
   <foreignKey>
@@ -493,18 +533,10 @@
     <comment>if true - billing block is required for online contribution page</comment>
     <add>4.6</add>
   </field>
-  <field>
-    <name>frontend_title</name>
-    <title>Public Title</title>
-    <type>varchar</type>
-    <length>255</length>
-    <localizable>true</localizable>
-    <default>NULL</default>
-    <comment>Contribution Page Public title</comment>
-    <html>
-      <type>Text</type>
-    </html>
-    <add>5.20</add>
-    <uniqueName>contribution_page_frontend_title</uniqueName>
-  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>2.1</add>
+  </index>
 </table>
