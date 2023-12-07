@@ -58,7 +58,12 @@
       }
       else {
         // OK response (it includes contact_id and user_id in JSON, but we don't need those)
-        window.location = '/civicrm/';
+
+        // reload the page
+        // if we were trying to access a specific url, we will be taken to it
+        // if we reload the /civicrm/login we will be redirected to the home page
+        // (or an alternative url if we make that configurable)
+        location.reload();
       }
     });
   });
