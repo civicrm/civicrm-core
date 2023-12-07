@@ -26,7 +26,6 @@ use Civi\Api4\UserJob;
  */
 class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
 
-  use CRM_Contact_Import_MetadataTrait;
   use CRMTraits_Custom_CustomDataTrait;
 
   /**
@@ -208,9 +207,11 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   public function testLoadSavedMappingDirect(): void {
     $mapping = $this->storeComplexMapping();
     $this->setUpMapFieldForm();
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($this->form->getUserJobID());
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mapping['id']);
-    $processor->setMetadata($this->getContactImportMetadata());
+    $processor->setMetadata($parser->getFieldsMetadata());
     $this->assertEquals(3, $processor->getPhoneOrIMTypeID(10));
     $this->assertEquals(3, $processor->getPhoneTypeID(10));
     $this->assertEquals(1, $processor->getLocationTypeID(10));
@@ -335,7 +336,9 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mappingID);
     $processor->setFormName('document.forms.MapField');
-    $processor->setMetadata($this->getContactImportMetadata());
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($this->form->getUserJobID());
+    $processor->setMetadata($parser->getFieldsMetadata());
     $processor->setContactType('Individual');
 
     $defaults = [];
