@@ -2203,6 +2203,10 @@ div.crm-master-accordion-header a.helpicon {
   font-weight: bold;
 }
 
+.crm-container table summary { /* Makes summary match the size of the rest of the table it's in */
+  font-size: inherit;
+}
+
 .crm-container summary::-webkit-details-marker { /* Safari fix to remove summary icon */
   display: none;
 }
