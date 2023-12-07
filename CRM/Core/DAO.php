@@ -2667,8 +2667,9 @@ SELECT contact_id
         $contactReferences[$coreReference->getReferenceTable()][] = $coreReference->getReferenceKey();
       }
     }
-    self::appendCustomTablesExtendingContacts($contactReferences);
-    self::appendCustomContactReferenceFields($contactReferences);
+    CRM_Core_DAO_Helper_ContactReferenceField::appendCustomTablesExtendingContacts($contactReferences);
+    CRM_Core_DAO_Helper_ContactReferenceField::appendCustomContactReferenceFields($contactReferences);
+    CRM_Core_DAO_Helper_ContactReferenceField::appendCustomContactEntityReferenceFields($contactReferences);
     \Civi::$statics[__CLASS__]['contact_references'] = $contactReferences;
     return \Civi::$statics[__CLASS__]['contact_references'];
   }
@@ -2691,46 +2692,6 @@ SELECT contact_id
       }
     }
     return \Civi::$statics[__CLASS__]['contact_references_dynamic'][$tableName];
-  }
-
-  /**
-   * Add custom tables that extend contacts to the list of contact references.
-   *
-   * CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity seems like a safe-ish
-   * function to be sure all are retrieved & we don't miss subtypes or inactive or multiples
-   * - the down side is it is not cached.
-   *
-   * Further changes should be include tests in the CRM_Core_MergerTest class
-   * to ensure that disabled, subtype, multiple etc groups are still captured.
-   *
-   * @param array $cidRefs
-   */
-  public static function appendCustomTablesExtendingContacts(&$cidRefs) {
-    $customValueTables = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity('Contact');
-    $customValueTables->find();
-    while ($customValueTables->fetch()) {
-      $cidRefs[$customValueTables->table_name][] = 'entity_id';
-    }
-  }
-
-  /**
-   * Add custom ContactReference fields to the list of contact references
-   *
-   * This includes active and inactive fields/groups
-   *
-   * @param array $cidRefs
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public static function appendCustomContactReferenceFields(&$cidRefs) {
-    $fields = civicrm_api3('CustomField', 'get', [
-      'return'    => ['column_name', 'custom_group_id.table_name'],
-      'data_type' => 'ContactReference',
-      'options' => ['limit' => 0],
-    ])['values'];
-    foreach ($fields as $field) {
-      $cidRefs[$field['custom_group_id.table_name']][] = $field['column_name'];
-    }
   }
 
   /**

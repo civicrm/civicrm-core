@@ -1047,6 +1047,79 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that EntityReference fields referencing a contact are updated to point
+   * to the main contact after a merge is performed and the duplicate contact is
+   * deleted.
+   *
+   * @dataProvider contactEntityNameProvider
+   */
+  public function testMigrationOfContactEntityReferenceCustomField(string $fkEntity): void {
+    // Create Custom Fields
+    $contactGroup = $this->setupCustomGroupForIndividual();
+    $activityGroup = $this->customGroupCreate([
+      'name' => 'test_group_activity',
+      'extends' => 'Activity',
+    ]);
+    $refFieldContact = $this->customFieldCreate([
+      'custom_group_id' => $contactGroup['id'],
+      'label' => 'field_1' . $contactGroup['id'],
+      'data_type' => 'EntityReference',
+      'fk_entity' => $fkEntity,
+      'default_value' => NULL,
+    ]);
+    $refFieldActivity = $this->customFieldCreate([
+      'custom_group_id' => $activityGroup['id'],
+      'label' => 'field_1' . $activityGroup['id'],
+      'data_type' => 'EntityReference',
+      'fk_entity' => $fkEntity,
+      'default_value' => NULL,
+    ]);
+
+    // Contacts setup
+    $this->setupMatchData();
+    $originalContactID = $this->contacts[0]['id'];
+    $duplicateContactID = $this->contacts[1]['id'];
+
+    // create a contact that won't be merged but has a EntityReference field
+    // pointing to the duplicate (to be deleted) contact
+    $unrelatedContact = $this->individualCreate([
+      'first_name' => 'Unrelated',
+      'last_name' => 'Contact',
+      'email' => 'unrelated@example.com',
+      "custom_{$refFieldContact['id']}" => $duplicateContactID,
+    ]);
+    // also create an activity with a EntityReference custom field
+    $activity = $this->activityCreate([
+      'target_contact_id' => $unrelatedContact,
+      "custom_{$refFieldActivity['id']}" => $duplicateContactID,
+    ]);
+
+    // verify that the fields were set
+    $this->assertCustomFieldValue($unrelatedContact, $duplicateContactID, "custom_{$refFieldContact['id']}");
+    $this->assertEntityCustomFieldValue('Activity', $activity['id'], $duplicateContactID, "custom_{$refFieldActivity['id']}");
+
+    // Perform merge
+    $this->mergeContacts($originalContactID, $duplicateContactID, []);
+
+    // verify that the ContactReference fields were updated to point to the surviving contact post-merge
+    $this->assertCustomFieldValue($unrelatedContact, $originalContactID, "custom_{$refFieldContact['id']}");
+    $this->assertEntityCustomFieldValue('Activity', $activity['id'], $originalContactID, "custom_{$refFieldActivity['id']}");
+
+    // cleanup created custom set
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $refFieldContact['id']]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $contactGroup['id']]);
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $refFieldActivity['id']]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $activityGroup['id']]);
+  }
+
+  public function contactEntityNameProvider(): iterable {
+    yield ['Contact'];
+    yield ['Household'];
+    yield ['Individual'];
+    yield ['Organization'];
+  }
+
+  /**
    * Verifies that when two contacts with view only custom fields are merged,
    * the view only field of the record being deleted is merged.
    */
