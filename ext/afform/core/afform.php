@@ -645,3 +645,16 @@ function afform_shortcode_content($content, $atts, $args, $context) {
   }
   return $content;
 }
+
+/**
+ * Implements hook_civicrm_searchKitTasks().
+ *
+ */
+function afform_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userID) {
+  $tasks['AfformSubmission']['process'] = [
+    'module' => 'afSearchTasks',
+    'title' => E::ts('Process Submissions'),
+    'icon' => 'fa-check-square-o',
+    'uiDialog' => ['templateUrl' => '~/afSearchTasks/afformSubmissionProcessTask.html'],
+  ];
+}

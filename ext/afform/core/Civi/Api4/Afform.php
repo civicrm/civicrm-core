@@ -100,6 +100,15 @@ class Afform extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Afform\Process
+   */
+  public static function process($checkPermissions = TRUE) {
+    return (new Action\Afform\Process('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\Afform\SubmitFile
    */
   public static function submitFile($checkPermissions = TRUE) {
@@ -230,6 +239,18 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'create_submission',
           'title' => E::ts('Log Submissions'),
           'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'manual_processing',
+          'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'allow_verification_by_email',
+          'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'email_confirmation_template_id',
+          'data_type' => 'Integer',
         ],
         [
           'name' => 'navigation',

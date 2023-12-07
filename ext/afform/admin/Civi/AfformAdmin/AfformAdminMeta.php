@@ -239,6 +239,7 @@ class AfformAdminMeta {
             'class' => 'af-button btn btn-primary',
             'crm-icon' => 'fa-check',
             'ng-click' => 'afform.submit()',
+            'ng-if' => 'afform.showSubmitButton',
             '#children' => [
               ['#text' => E::ts('Submit')],
             ],

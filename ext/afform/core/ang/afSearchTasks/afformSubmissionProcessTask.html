@@ -1,0 +1,7 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form name="afformSubmissionProcessTaskForm" ng-controller="afformSubmissionProcessTask as $ctrl">
+    <p><strong>{{:: ts('Process the %1 selected %2 submission(s):', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" ></crm-dialog-button>
+    <crm-dialog-button text="ts('Process submission(s)')" icons="{primary: $ctrl.run ? 'fa-spin fa-spinner' : 'fa-check'}" on-click="$ctrl.save()" disabled="$ctrl.run || !afformSubmissionProcessTaskForm.$valid" ></crm-dialog-button>
+  </form>
+</div>

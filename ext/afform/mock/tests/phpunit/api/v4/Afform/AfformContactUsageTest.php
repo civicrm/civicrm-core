@@ -179,11 +179,11 @@ EOHTML;
 
     $this->assertEquals($this->formName, $submission['afform_name']);
     $this->assertIsInt($submission['data']['Activity1'][0]['id']);
-    $this->assertEquals('Individual1', $submission['data']['Activity1'][0]['subject']);
+    $this->assertEquals('Individual1', $submission['data']['Activity1'][0]['fields']['subject']);
     $this->assertIsInt($submission['data']['Individual1'][0]['id']);
-    $this->assertEquals($firstName, $submission['data']['Individual1'][0]['first_name']);
-    $this->assertEquals('site', $submission['data']['Individual1'][0]['last_name']);
-    $this->assertEquals('This field is set in the data array', $submission['data']['Individual1'][0]['source']);
+    $this->assertEquals($firstName, $submission['data']['Individual1'][0]['fields']['first_name']);
+    $this->assertEquals('site', $submission['data']['Individual1'][0]['fields']['last_name']);
+    $this->assertEquals('This field is set in the data array', $submission['data']['Individual1'][0]['fields']['source']);
 
     // Check that Activity was submitted correctly.
     $activity = \Civi\Api4\Activity::get(FALSE)
@@ -392,12 +392,12 @@ EOHTML;
       ->execute()->single();
     $this->assertEquals($contact['id'], $submission['data']['Individual1'][0]['id']);
     $this->assertEquals($contact['org.id'], $submission['data']['Organization1'][0]['id']);
-    $this->assertEquals('Organization1', $submission['data']['Individual1'][0]['employer_id']);
-    $this->assertEquals($contact['email_primary'], $submission['data']['Individual1'][0]['_joins']['Email'][0]['id']);
-    $this->assertEquals($individualEmail, $submission['data']['Individual1'][0]['_joins']['Email'][0]['email']);
-    $this->assertEquals($locationType, $submission['data']['Individual1'][0]['_joins']['Email'][0]['location_type_id']);
-    $this->assertEquals($orgEmail, $submission['data']['Organization1'][0]['_joins']['Email'][0]['email']);
-    $this->assertEquals($locationType, $submission['data']['Organization1'][0]['_joins']['Email'][0]['location_type_id']);
+    $this->assertEquals('Organization1', $submission['data']['Individual1'][0]['fields']['employer_id']);
+    $this->assertEquals($contact['email_primary'], $submission['data']['Individual1'][0]['joins']['Email'][0]['id']);
+    $this->assertEquals($individualEmail, $submission['data']['Individual1'][0]['joins']['Email'][0]['email']);
+    $this->assertEquals($locationType, $submission['data']['Individual1'][0]['joins']['Email'][0]['location_type_id']);
+    $this->assertEquals($orgEmail, $submission['data']['Organization1'][0]['joins']['Email'][0]['email']);
+    $this->assertEquals($locationType, $submission['data']['Organization1'][0]['joins']['Email'][0]['location_type_id']);
   }
 
   public function testDedupeIndividual(): void {

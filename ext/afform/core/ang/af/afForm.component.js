@@ -93,7 +93,16 @@
           angular.merge(data[selectedEntity][selectedIndex].fields, _.cloneDeep(schema[selectedEntity].data || {}));
           data[selectedEntity][selectedIndex].joins = {};
         }
+
+        ctrl.showSubmitButton = displaySubmitButton(args);
       };
+
+      function displaySubmitButton(args) {
+        if (args.sid && args.sid.length > 0) {
+          return false;
+        }
+        return true;
+      }
 
       // Used when submitting file fields
       this.fileUploader = new FileUploader({

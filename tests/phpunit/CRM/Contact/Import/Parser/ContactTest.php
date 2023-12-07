@@ -310,6 +310,22 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportMasterAddress(): void {
+    $this->individualCreate(['external_identifier' => 'billy', 'first_name' => 'William'], 'billy-the-kid');
+    $address = $this->callAPISuccess('Address', 'create', ['street_address' => 'out yonder', 'contact_id' => $this->ids['Contact']['billy-the-kid']]);
+    $this->individualCreate(['external_identifier' => '', 'first_name' => 'Daddy Bill'], 'billy-the-dad');
+    $this->runImport([
+      'id' => $this->ids['Contact']['billy-the-dad'],
+      'master_id' => $address['id'],
+    ], CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $newAddress = $this->callAPISuccessGetSingle('Address', ['contact_id' => $this->ids['Contact']['billy-the-dad']]);
+    $this->assertEquals($address['id'], $newAddress['master_id']);
+    $this->assertEquals('out yonder', $newAddress['street_address']);
+  }
+
+  /**
    * Test updating an existing contact with external_identifier match but
    * subtype mismatch.
    *
@@ -772,6 +788,10 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
     $address = $this->callAPISuccessGetSingle('Address', ['street_address' => 'Big Mansion', 'return' => 'custom_' . $ids['custom_field_id']]);
     $this->assertEquals('Update', $address['custom_' . $ids['custom_field_id']]);
+  }
+
+  public function testAddressWithID() {
+    [$contactValues] = $this->setUpBaseContact();
   }
 
   /**

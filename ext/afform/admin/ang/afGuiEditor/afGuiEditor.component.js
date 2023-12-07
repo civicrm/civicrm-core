@@ -403,6 +403,23 @@
         }
       };
 
+      this.toggleManualProcessing = function() {
+        if (editor.afform.manual_processing) {
+          editor.afform.manual_processing = null;
+        } else {
+          editor.afform.create_submission = true;
+        }
+      };
+
+      this.toggleEmailVerification = function() {
+        if (editor.afform.allow_verification_by_email) {
+          editor.afform.allow_verification_by_email = null;
+        } else {
+          editor.afform.create_submission = true;
+          editor.afform.manual_processing = true;
+        }
+      };
+
       function loadNavigationMenu() {
         if ('navigationMenu' in editor) {
           return;
@@ -615,6 +632,10 @@
         var afform = JSON.parse(angular.toJson(editor.afform));
         // This might be set to undefined by validation
         afform.server_route = afform.server_route || '';
+        // create submission is required if email confirmation is selected.
+        if (afform.manual_processing || afform.allow_verification_by_email) {
+          afform.create_submission = true;
+        }
         $scope.saving = true;
         crmApi4('Afform', 'save', {formatWhitespace: true, records: [afform]})
           .then(function (data) {

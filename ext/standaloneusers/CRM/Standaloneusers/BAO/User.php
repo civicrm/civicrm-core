@@ -33,4 +33,34 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
     return CRM_Core_I18n::uiLanguages(FALSE);
   }
 
+  public static function getTimeZones(): array {
+    $timeZones = [];
+    foreach (\DateTimeZone::listIdentifiers() as $timezoneId) {
+      $timeZones[$timezoneId] = $timezoneId;
+    }
+    return $timeZones;
+  }
+
+  /**
+   * Check access permission
+   *
+   * @param string $entityName
+   * @param string $action
+   * @param array $record
+   * @param integer|null $userID
+   * @return boolean
+   * @see CRM_Core_DAO::checkAccess
+   */
+  public static function _checkAccess(string $entityName, string $action, array $record, ?int $userID): bool {
+    // Prevent users from deleting their own user account
+    if (in_array($action, ['delete'], TRUE)) {
+      $sess = CRM_Core_Session::singleton();
+      $ufID = (int) $sess->get('ufID');
+      if ($record['id'] == $ufID) {
+        return FALSE;
+      };
+    }
+    return TRUE;
+  }
+
 }

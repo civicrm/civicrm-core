@@ -10,6 +10,16 @@ require_once 'standaloneusers.civix.php';
 use CRM_Standaloneusers_ExtensionUtil as E;
 // phpcs:enable
 
+
+function standaloneusers_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
+  if ($bundle->name !== 'coreResources') {
+    return;
+  }
+  // This adds a few styles that only need apply to standalone, mainly
+  // providing a default style for login/password reset type pages.
+  $bundle->addStyleFile('standaloneusers', 'css/standalone.css');
+}
+
 /**
  * Hide the inherit CMS language on the Settings - Localization form.
  *

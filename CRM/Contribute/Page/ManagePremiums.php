@@ -52,14 +52,14 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
       self::$_links = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/contribute/managePremiums',
+          'url' => 'civicrm/admin/contribute/managePremiums/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Premium'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
-          'url' => 'civicrm/admin/contribute/managePremiums',
+          'url' => 'civicrm/admin/contribute/managePremiums/edit',
           'qs' => 'action=preview&id=%%id%%',
           'title' => ts('Preview Premium'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::PREVIEW),
@@ -78,7 +78,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/contribute/managePremiums',
+          'url' => 'civicrm/admin/contribute/managePremiums/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Premium'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),

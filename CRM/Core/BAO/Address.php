@@ -301,7 +301,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
         'contact_id',
         'is_billing',
         'display',
-        'master_id',
       ])) {
         continue;
       }
@@ -899,6 +898,8 @@ SELECT is_primary,
    * Fix the shared address if address is already shared
    * or if address will be shared with itself.
    *
+   * Add in the details from the master address.
+   *
    * @param array $params
    *   Associated array of address params.
    */
@@ -913,6 +914,12 @@ SELECT is_primary,
     if (($params['id'] ?? NULL) == $params['master_id']) {
       $params['master_id'] = NULL;
       CRM_Core_Session::setStatus(ts("You can't connect an address to itself"), '', 'warning');
+    }
+    if ($params['master_id']) {
+      $masterAddressParams = Address::get(FALSE)
+        ->addWhere('id', '=', $params['master_id'])->execute()->first();
+      unset($masterAddressParams['id'], $masterAddressParams['is_primary'], $masterAddressParams['is_billing'], $masterAddressParams['contact_id']);
+      $params += $masterAddressParams;
     }
   }
 
