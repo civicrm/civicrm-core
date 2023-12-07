@@ -99,7 +99,8 @@ class MembershipTest extends Api4TestBase implements TransactionalInterface {
       'financial_type_id' => 2,
       'is_active' => 1,
       'sequential' => 1,
-      'visibility' => 'Public']);
+      'visibility' => 'Public',
+    ]);
     $this->createTestEntity('Contact', ['first_name', 'Bob', 'contact_type' => 'Individual'], 1);
     $this->createTestEntity('Contact', ['first_name', 'Bob too', 'contact_type' => 'Individual'], 2);
     $this->createTestEntity('Membership', [
@@ -115,9 +116,8 @@ class MembershipTest extends Api4TestBase implements TransactionalInterface {
       'status_id:name' => 'Current',
     ], 2);
     $memberships = Membership::get()->addSelect('status_id.is_new')->execute();
-    $this->assertTrue($memberships[0]['is_new']);
-    $this->assertFalse($memberships[1]['is_new']);
+    $this->assertTrue($memberships[0]['status_id.is_new']);
+    $this->assertFalse($memberships[1]['status_id.is_new']);
   }
-
 
 }

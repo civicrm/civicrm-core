@@ -53,13 +53,20 @@ class MembershipStatusGetSpecProvider extends AutoService implements Generic\Spe
   /**
    * Determine if the membership status is the status used for new memberships.
    *
-   * @param array $id
+   * @param array $fieldSpec
    * @param \Civi\Api4\Query\Api4SelectQuery $query
    * return string
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnusedParameterInspection
    */
   public static function isNewMembership(array $fieldSpec, Api4SelectQuery $query): string {
     $newID = \CRM_Member_BAO_MembershipStatus::getNewMembershipTypeID();
-    return "IF ({id} = $newID, 1, 0)";
+    if ($newID) {
+      return "IF ({$fieldSpec['sql_name']} = $newID, 1, 0)";
+    }
+    return '0';
   }
 
 }
