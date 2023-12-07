@@ -27,8 +27,24 @@ class CRM_Upgrade_Incremental_php_FiveSeventy extends CRM_Upgrade_Incremental_Ba
    * @param string $rev
    *   The version number matching this function name
    */
-  public function upgrade_5_70_alpha1($rev): void {
+  public function upgrade_5_70_alpha1(string $rev): void {
+    $this->addTask('Add MembershipType.title', 'addColumn', 'civicrm_membership_type', 'title',
+      "varchar(255) COLLATE utf8mb4_unicode_ci NULL COMMENT 'Membership Type title. For top of page display"
+    );
+    $this->addTask('Add MembershipType.frontend_title', 'addColumn', 'civicrm_membership_type', 'frontend_title',
+      "varchar(255) COLLATE utf8mb4_unicode_ci NULL COMMENT 'Membership Type Public title'"
+    );
+    // It is important the 2 lines above run before the sql, which will populate the fields
+    // before they are made required.
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+
+    $this->addTask('Make civicrm_membership.title required', 'alterColumn', 'civicrm_membership_type', 'title',
+      "varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Membership Type title. For top of page display"
+    );
+    $this->addTask('Make civicrm_membership.frontend_title required', 'alterColumn', 'civicrm_membership_type', 'frontend_title',
+      "varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Membership Type Public title'"
+    );
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_membership_type.UI_name']), 'addIndex', 'civicrm_membership_type', [['name']], 'UI');
   }
 
 }
