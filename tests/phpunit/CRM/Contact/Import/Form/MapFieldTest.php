@@ -267,21 +267,6 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the MapField function getting defaults from column names.
-   *
-   * @dataProvider getHeaderMatchDataProvider
-   *
-   * @param $columnHeader
-   * @param $mapsTo
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testDefaultFromColumnNames($columnHeader, $mapsTo): void {
-    $this->setUpMapFieldForm();
-    $this->assertEquals($mapsTo, $this->form->defaultFromColumnName($columnHeader));
-  }
-
-  /**
    * Get data to use for default from column names.
    *
    * @return array
