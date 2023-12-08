@@ -41,7 +41,7 @@
   "include-path": ["vendor/tecnickcom"],
   "config": {
     "platform": {
-      "php": "7.3.0"
+      "php": "7.4.0"
     },
     "allow-plugins": {
       "civicrm/composer-compile-plugin": true,
@@ -50,7 +50,7 @@
     }
   },
   "require": {
-    "php": "~7.3 || ~8",
+    "php": "~7.4 || ~8",
     "composer-runtime-api": "~2.0",
     "dompdf/dompdf" : "~2.0.2",
     "firebase/php-jwt": ">=3 <7",
