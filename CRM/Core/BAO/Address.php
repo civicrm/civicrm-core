@@ -471,9 +471,13 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
     else {
       $fields['county'] = NULL;
     }
-
-    $this->display = CRM_Utils_Address::format($fields, NULL, $microformat);
-    $this->display_text = CRM_Utils_Address::format($fields);
+    if ($microformat) {
+      $this->display = CRM_Utils_Address::formatVCard($fields);
+      $this->display_text = CRM_Utils_Address::format($fields);
+    }
+    else {
+      $this->display = $this->display_text = CRM_Utils_Address::format($fields);
+    }
   }
 
   /**
