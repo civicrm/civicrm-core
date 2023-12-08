@@ -5,7 +5,7 @@ return [
   [
     'name' => 'SavedSearch_Label_Formats',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -46,7 +46,7 @@ return [
   [
     'name' => 'SavedSearch_Label_Formats_SearchDisplay_Label_Formats_Table_1',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -101,7 +101,7 @@ return [
               'type' => 'field',
               'key' => 'is_reserved',
               'dataType' => 'Boolean',
-              'label' => E::ts('Reserved?'),
+              'label' => E::ts('Reserved'),
               'sortable' => TRUE,
             ],
             [
@@ -163,7 +163,7 @@ return [
           'draggable' => 'weight',
           'toolbar' => [
             [
-              'path' => 'civicrm/admin/labelFormats/edit?action=add&id=[id]&group=[option_group_id:name]&reset=1',
+              'path' => 'civicrm/admin/labelFormats/edit?action=add&group=[option_group_id:name]&reset=1',
               'icon' => 'fa-plus',
               'text' => E::ts('Add'),
               'style' => 'default',

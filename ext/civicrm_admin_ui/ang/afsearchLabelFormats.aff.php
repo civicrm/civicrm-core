@@ -9,5 +9,4 @@ return [
   'permission' => [
     'administer CiviCRM',
   ],
-  'modified_date' => '2023-12-07 22:54:39',
 ];
