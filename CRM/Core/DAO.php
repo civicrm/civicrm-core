@@ -958,7 +958,11 @@ class CRM_Core_DAO extends DB_DataObject {
     if (empty($values[$idField]) && array_key_exists('frontend_title', $fields) && empty($values['frontend_title'])) {
       $instance->frontend_title = $instance->title;
     }
-    if (empty($values[$idField]) && array_key_exists('title', $fields) && empty($values['title']) && !empty($values['frontend_title'])) {
+    if (empty($values[$idField]) && array_key_exists('frontend_title', $fields) && !$instance->frontend_title) {
+      // Still empty? Fall back to name.
+      $instance->frontend_title = $instance->name;
+    }
+    if (empty($values[$idField]) && array_key_exists('title', $fields) && empty($values['title']) && array_key_exists('frontend_title', $fields) && $instance->frontend_title) {
       $instance->title = $instance->frontend_title;
     }
     $instance->save();
