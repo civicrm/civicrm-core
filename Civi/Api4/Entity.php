@@ -174,16 +174,6 @@ class Entity extends Generic\AbstractEntity {
   }
 
   /**
-   * @param bool $checkPermissions
-   * @deprecated
-   * @return Action\Entity\GetLinks
-   */
-  public static function getLinks($checkPermissions = TRUE) {
-    return (new Action\Entity\GetLinks('Entity', __FUNCTION__))
-      ->setCheckPermissions($checkPermissions);
-  }
-
-  /**
    * @return array
    */
   public static function permissions() {
