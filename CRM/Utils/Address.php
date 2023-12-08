@@ -51,6 +51,9 @@ class CRM_Utils_Address {
     if (!$format) {
       $format = Civi::settings()->get('address_format');
     }
+    else {
+      CRM_Core_Error::deprecatedWarning('do not pass format');
+    }
     $formatted = $format;
 
     $fullPostalCode = $fields['postal_code'] ?? NULL;
