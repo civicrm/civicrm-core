@@ -65,25 +65,6 @@
         {include file="CRM/Admin/Page/Extensions/Refresh.tpl"}
     {/if}
   </div>
-    {* Expand/Collapse *}
-    {literal}
-    <script type="text/javascript">
-      CRM.$(function($) {
-          $('.collapsed').click( function( ) {
-              var currentObj = $( this );
-              if ( currentObj.hasClass( 'expanded') ) {
-                  currentObj.removeClass( 'expanded' );
-                  currentObj.parent( ).parent( ).next( ).hide( );
-              } else {
-                  currentObj.addClass( 'expanded' );
-                  currentObj.parent( ).parent( ).next( ).show( );
-              }
-
-              return false;
-          });
-      });
-    </script>
-    {/literal}
 
     {include file="CRM/common/TabHeader.tpl" defaultTab="summary"}
 
