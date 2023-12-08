@@ -28,8 +28,6 @@ require_once 'api/v3/utils.php';
  */
 class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
-  use CRM_Contact_Import_MetadataTrait;
-
   private $externalIdentifiers = [];
 
   /**
@@ -309,7 +307,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         !array_key_exists($customFieldID, $addressCustomFields)
       ) {
         // @todo - this can probably go....
-        if ($customFields[$customFieldID]['data_type'] == 'Boolean') {
+        if ($customFields[$customFieldID]['data_type'] === 'Boolean') {
           if (empty($val) && !is_numeric($val) && $this->isFillDuplicates()) {
             //retain earlier value when Import mode is `Fill`
             unset($params[$key]);
@@ -465,6 +463,26 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     else {
       $errorMessage = $errorName;
     }
+  }
+
+  /**
+   * Get sorted available relationships.
+   *
+   * @return array
+   */
+  protected function getRelationships(): array {
+    $cacheKey = 'importable_contact_relationship_field_metadata' . $this->getContactType() . $this->getContactSubType();
+    if (Civi::cache('fields')->has($cacheKey)) {
+      return Civi::cache('fields')->get($cacheKey);
+    }
+    //Relationship importables
+    $relations = CRM_Contact_BAO_Relationship::getContactRelationshipType(
+      NULL, NULL, NULL, $this->getContactType(),
+      FALSE, 'label', TRUE, $this->getContactSubType()
+    );
+    asort($relations);
+    Civi::cache('fields')->set($cacheKey, $relations);
+    return $relations;
   }
 
   /**
@@ -748,7 +766,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
 
       if (is_numeric($locTypeId) &&
         !in_array($fieldName, $multiplFields) &&
-        substr($fieldName, 0, 7) != 'custom_'
+        substr($fieldName, 0, 7) !== 'custom_'
       ) {
         $index = $locTypeId;
 
@@ -1033,6 +1051,58 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return TRUE;
     }
     return TRUE;
+  }
+
+  /**
+   * Get metadata for contact importable fields.
+   *
+   * @internal this function will be made private in the near future. It is
+   * currently used by a core form but should not be called directly & once fixed
+   * will be private.
+   *
+   * @return array
+   */
+  public function getContactImportMetadata(): array {
+    $cacheKey = 'importable_contact_field_metadata' . $this->getContactType() . $this->getContactSubType();
+    if (Civi::cache('fields')->has($cacheKey)) {
+      return Civi::cache('fields')->get($cacheKey);
+    }
+    $contactFields = CRM_Contact_BAO_Contact::importableFields($this->getContactType());
+    // exclude the address options disabled in the Address Settings
+    $fields = CRM_Core_BAO_Address::validateAddressOptions($contactFields);
+
+    //CRM-5125
+    //supporting import for contact subtypes
+    $csType = NULL;
+    if ($this->getContactSubType()) {
+      //custom fields for sub type
+      $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($this->getContactSubType());
+
+      if (!empty($subTypeFields)) {
+        foreach ($subTypeFields as $customSubTypeField => $details) {
+          $fields[$customSubTypeField] = $details;
+        }
+      }
+    }
+
+    foreach ($this->getRelationships() as $key => $var) {
+      [$type] = explode('_', $key);
+      $relationshipType[$key]['title'] = $var;
+      $relationshipType[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
+      $relationshipType[$key]['import'] = TRUE;
+      $relationshipType[$key]['relationship_type_id'] = $type;
+      $relationshipType[$key]['related'] = TRUE;
+    }
+
+    if (!empty($relationshipType)) {
+      $fields = array_merge($fields, [
+        'related' => [
+          'title' => ts('- related contact info -'),
+        ],
+      ], $relationshipType);
+    }
+    Civi::cache('fields')->set($cacheKey, $fields);
+    return $fields;
   }
 
   /**
