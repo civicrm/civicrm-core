@@ -2265,7 +2265,10 @@ div.crm-master-accordion-header a.helpicon {
   background-color: transparent;
   font-weight: normal;
   color: #3e3e3e;
-  font-size: 1rem;
+}
+
+.crm-container .crm-accordion-wrapper .crm-master-accordion-header {
+  font-size: 16px;
 }
 
 .crm-container .crm-master-accordion-header.crm-accordion-header:hover,
