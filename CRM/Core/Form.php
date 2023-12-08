@@ -186,6 +186,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   private $authenticatedContactID;
 
   /**
+   * @var array
+   * @internal
+   * This gets used in CRM_Core_Form_Tag via multiple routes
+   */
+  public $_entityTagValues;
+
+  /**
+   * @var array
+   * @internal
+   * This gets used in CRM_Core_Form_Tag via multiple routes
+   */
+  public $_tagsetInfo;
+
+  /**
    * @return string
    */
   public function getContext() {
