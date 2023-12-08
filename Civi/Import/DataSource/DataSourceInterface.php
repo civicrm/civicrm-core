@@ -98,4 +98,34 @@ interface DataSourceInterface {
    */
   public function getColumnHeaders(): array;
 
+  /**
+   * @param int $limit
+   *
+   * @return self
+   */
+  public function setLimit(int $limit): self;
+
+  /**
+   * Set the statuses to be retrieved.
+   *
+   * @param array $statuses
+   *
+   * @return self
+   */
+  public function setStatuses(array $statuses): self;
+
+  /**
+   * Get rows as an array.
+   *
+   * The array has all values.
+   *
+   * @param bool $nonAssociative
+   *   Return as a non-associative array?
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getRows(bool $nonAssociative = TRUE): array;
+
 }

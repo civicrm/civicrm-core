@@ -17,8 +17,9 @@ use PhpOffice\PhpSpreadsheet\Reader\Exception as ReaderException;
 /**
  * Objects that implement the DataSource interface can be used in CiviCRM imports.
  */
-class Spreadsheet implements DataSourceInterface {
+class Spreadsheet extends \CRM_Import_DataSource implements DataSourceInterface {
   use DataSourceTrait;
+  protected const NUM_ROWS_TO_INSERT = 100;
 
   /**
    * Provides information about the data source.
@@ -28,8 +29,8 @@ class Spreadsheet implements DataSourceInterface {
    */
   public function getInfo(): array {
     return [
-      'title' => ts('Spreadsheet'),
-      'template' => 'CRM/Import/Form/DataSource/Spreadsheet.tpl',
+      'title' => ts('Spreadsheet (xlsx, odt)'),
+      'template' => 'CRM/Import/DataSource/Spreadsheet.tpl',
     ];
   }
 
@@ -40,7 +41,7 @@ class Spreadsheet implements DataSourceInterface {
    * It should add all fields necessary to get the data
    * uploaded to the temporary table in the DB.
    *
-   * @param \CRM_Import_Forms $form
+   * @param \CRM_Contact_Import_Form_DataSource|\CRM_Import_Form_DataSourceConfig $form
    *
    * @throws \CRM_Core_Exception
    */
@@ -50,14 +51,19 @@ class Spreadsheet implements DataSourceInterface {
     }
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_Spreadsheet');
     $form->addElement('checkbox', 'isFirstRowHeader', ts('First row contains column headers'));
+
+    $maxFileSizeMegaBytes = \CRM_Utils_File::getMaxFileSize();
+    $maxFileSizeBytes = $maxFileSizeMegaBytes * 1024 * 1024;
+    $form->assign('uploadSize', $maxFileSizeMegaBytes);
     $form->add('File', 'uploadFile', ts('Import Data File'), NULL, TRUE);
-    $maxFileSize = (int) \Civi::settings()->get('maxFileSize');
-    $form->setMaxFileSize($maxFileSize * 1024 * 1024);
+    $form->setMaxFileSize($maxFileSizeBytes);
     $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
-      1 => \Civi::settings()->get('maxFileSize'),
-    ]), 'maxfilesize', $maxFileSize * 1024 * 1024);
+      1 => $maxFileSizeMegaBytes,
+      2 => $maxFileSizeBytes,
+    ]), 'maxfilesize', $maxFileSizeBytes);
     $form->registerRule('spreadsheet', 'callback', 'isValidSpreadsheet', __CLASS__);
     $form->addRule('uploadFile', ts('The file must be of type ODS (LibreOffice), XLSX (Excel).'), 'spreadsheet');
+
     $form->setDataSourceDefaults($this->getDefaultValues());
   }
 
@@ -107,21 +113,70 @@ class Spreadsheet implements DataSourceInterface {
    * @throws \CRM_Core_Exception
    */
   public function initialize(): void {
-    $file = $this->getSubmittedValue('uploadFile')['name'];
-    $file_type = IOFactory::identify($file);
     try {
-      $objReader = IOFactory::createReader($file_type);
-      $objReader->setReadDataOnly(TRUE);
-      $objPHPExcel = $objReader->load($file);
-      $dataRows = $objPHPExcel->getActiveSheet()->toArray(NULL, TRUE, TRUE, TRUE);
-      $columnNames = $this->getSubmittedValue('isFirstRowHeader') ? $this->getColumnNamesFromHeaders($dataRows[0]) : $this->getColumnNamesForUnnamedColumns($dataRows[0]);
-      $this->createTempTableFromColumns($columnNames);
-      $this->updateUserJobDataSource(['']);
+      $result = $this->uploadToTable();
+      $this->updateUserJobDataSource([
+        'table_name' => $result['import_table_name'],
+        'column_headers' => $result['column_headers'],
+        'number_of_columns' => $result['number_of_columns'],
+      ]);
     }
     catch (ReaderException $e) {
       throw new \CRM_Core_Exception(ts('Spreadsheet not loaded.') . '' . $e->getMessage());
     }
+  }
 
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+   */
+  private function uploadToTable(): array {
+
+    $file_type = IOFactory::identify($this->getSubmittedValue('uploadFile')['name']);
+    $objReader = IOFactory::createReader($file_type);
+    $objReader->setReadDataOnly(TRUE);
+
+    $objPHPExcel = $objReader->load($this->getSubmittedValue('uploadFile')['name']);
+    $dataRows = $objPHPExcel->getActiveSheet()->toArray(NULL, TRUE, TRUE, TRUE);
+
+    // Remove the header
+    if ($this->getSubmittedValue('isFirstRowHeader')) {
+      $headers = array_values(array_shift($dataRows));
+      $columnHeaders = $headers;
+      $columns = $this->getColumnNamesFromHeaders($headers);
+    }
+    else {
+      $columns = $this->getColumnNamesForUnnamedColumns(array_values($dataRows[1]));
+      $columnHeaders = $columns;
+    }
+
+    $tableName = $this->createTempTableFromColumns($columns);
+    $numColumns = count($columns);
+    // Re-key data using the headers
+    $sql = [];
+    foreach ($dataRows as $row) {
+      // CRM-17859 Trim non-breaking spaces from columns.
+      $row = array_map([__CLASS__, 'trimNonBreakingSpaces'], $row);
+      $row = array_map(['CRM_Core_DAO', 'escapeString'], $row);
+      $sql[] = "('" . implode("', '", $row) . "')";
+
+      if (count($sql) >= self::NUM_ROWS_TO_INSERT) {
+        \CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tableName VALUES " . implode(', ', $sql));
+        $sql = [];
+      }
+    }
+
+    if (!empty($sql)) {
+      \CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tableName VALUES " . implode(', ', $sql));
+    }
+    $this->addTrackingFieldsToTable($tableName);
+
+    return [
+      'import_table_name' => $tableName,
+      'number_of_columns' => $numColumns,
+      'column_headers' => $columnHeaders,
+    ];
   }
 
 }
