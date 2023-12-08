@@ -145,4 +145,18 @@ class StandardFilters {
     return $value;
   }
 
+  /**
+   * Return value, falling back to default.
+   *
+   * @param $value
+   * @param array $filter
+   * @param string $format
+   *
+   * @return mixed
+   * @noinspection PhpUnusedParameterInspection
+   */
+  public static function strtotime($value, array $filter, string $format) {
+    return strtotime($value);
+  }
+
 }
