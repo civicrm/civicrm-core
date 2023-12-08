@@ -165,6 +165,14 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $contributionID;
 
   /**
+   * The params submitted by the form
+   *
+   * @var array
+   * @internal
+   */
+  public $_params = [];
+
+  /**
    * Get the contribution id that has been created or is being edited.
    *
    * @internal - not supported for outside core.
