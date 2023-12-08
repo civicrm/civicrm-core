@@ -2082,7 +2082,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return mixed
    */
   public function getVar($name) {
-    return $this->$name ?? NULL;
+    return $this->$name;
   }
 
   /**
