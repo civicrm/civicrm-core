@@ -81,10 +81,6 @@ class CRM_Logging_Schema {
     if (!(CRM_Core_DAO::checkTriggerViewPermission(FALSE)) && $value) {
       throw new CRM_Core_Exception(ts("In order to use this functionality, the installation's database user must have privileges to create triggers and views (if binary logging is enabled – this means the SUPER privilege). This install does not have the required privilege(s) enabled."));
     }
-    // dev/core#1812 Disable logging in a multilingual environment.
-    if (CRM_Core_I18n::isMultilingual() && $value) {
-      throw new CRM_Core_Exception(ts("Logging is not supported in a multilingual environment!"));
-    }
     return TRUE;
   }
 
