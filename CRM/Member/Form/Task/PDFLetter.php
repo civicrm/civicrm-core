@@ -87,13 +87,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
     $form = $this;
     $formValues = $form->controller->exportValues($form->getName());
     [$formValues, $html_message] = $this->processMessageTemplate($formValues);
-    $messageToken = CRM_Utils_Token::getTokens($html_message);
-    $html
-      = $this->generateHTML(
-      $membershipIDs,
-      $messageToken,
-      $html_message
-    );
+    $html = $this->generateHTML($membershipIDs, $html_message);
     $form->createActivities($html_message, $contactIDs, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
     CRM_Utils_PDF_Utils::html2pdf($html, $this->getFileName() . '.pdf', FALSE, $formValues);
 
@@ -106,7 +100,6 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    * Generate html for pdf letters.
    *
    * @param array $membershipIDs
-   * @param array $messageToken
    * @param $html_message
    *
    * @return array
@@ -114,7 +107,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    * @internal
    *
    */
-  public function generateHTML($membershipIDs, $messageToken, $html_message): array {
+  public function generateHTML($membershipIDs, $html_message): array {
     $memberships = Membership::get(FALSE)
       ->addWhere('id', 'IN', $membershipIDs)
       ->addSelect('contact_id')->execute();
