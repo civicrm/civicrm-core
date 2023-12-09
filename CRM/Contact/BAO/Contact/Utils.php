@@ -1111,35 +1111,6 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
   }
 
   /**
-   * Process a greeting template string to produce the individualised greeting text.
-   *
-   * This works just like message templates for mailings:
-   * the template is processed with the token substitution mechanism,
-   * to supply the individual contact data;
-   * and it is also processed with Smarty,
-   * to allow for conditionals etc. based on the contact data.
-   *
-   * Note: We don't pass any variables to Smarty --
-   * all variable data is inserted into the input string
-   * by the token substitution mechanism,
-   * before Smarty is invoked.
-   *
-   * @param string $templateString
-   *   The greeting template string with contact tokens + Smarty syntax.
-   *
-   * @deprecated
-   *
-   * @param array $contactDetails
-   * @param int $contactID
-   * @param string $className
-   */
-  public static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
-    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
-    CRM_Utils_Token::replaceGreetingTokens($templateString, $contactDetails, $contactID, $className, TRUE);
-    $templateString = CRM_Utils_String::parseOneOffStringThroughSmarty($templateString);
-  }
-
-  /**
    * Determine if a contact ID is real/valid.
    *
    * @param int $contactId
