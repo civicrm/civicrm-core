@@ -346,6 +346,11 @@
      <weight>70</weight>
   </item>
   <item>
+     <path>civicrm/admin/pdfFormats/edit</path>
+     <title>Print Page (PDF) Formats</title>
+     <page_callback>CRM_Admin_Page_PdfFormats</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/options/communication_style</path>
      <title>Communication Style Options</title>
      <desc>Options for Communication Style selection.</desc>
