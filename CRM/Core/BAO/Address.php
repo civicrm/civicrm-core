@@ -394,7 +394,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
           }
         }
       }
-      $stree = $address->street_address;
+
       $values = [];
       CRM_Core_DAO::storeValues($address, $values);
 
