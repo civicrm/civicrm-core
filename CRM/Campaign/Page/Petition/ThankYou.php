@@ -25,15 +25,15 @@ class CRM_Campaign_Page_Petition_ThankYou extends CRM_Core_Page {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $petition_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this);
     $params['id'] = $petition_id;
-    $this->petition = [];
-    CRM_Campaign_BAO_Survey::retrieve($params, $this->petition);
-    $this->assign('petitionTitle', $this->petition['title']);
-    $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->petition));
-    $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $this->petition));
+    $petition = [];
+    CRM_Campaign_BAO_Survey::retrieve($params, $petition);
+    $this->assign('petitionTitle', $petition['title']);
+    $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $petition));
+    $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $petition));
     $this->assign('survey_id', $petition_id);
     $this->assign('status_id', $id);
-    $this->assign('is_share', CRM_Utils_Array::value('is_share', $this->petition));
-    CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->petition));
+    $this->assign('is_share', CRM_Utils_Array::value('is_share', $petition));
+    CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $petition));
 
     // send thank you or email verification emails
     /*
