@@ -120,25 +120,6 @@
   </field>
 
   <field>
-    <name>roles</name>
-    <type>varchar</type>
-    <title>Roles</title>
-    <length>128</length>
-    <comment>FK to Role</comment>
-    <pseudoconstant>
-      <table>civicrm_role</table>
-      <keyColumn>id</keyColumn>
-      <labelColumn>label</labelColumn>
-      <nameColumn>name</nameColumn>
-      <condition>name != "everyone"</condition>
-    </pseudoconstant>
-    <html>
-      <type>Select</type>
-    </html>
-    <serialize>SEPARATOR_BOOKEND</serialize>
-  </field>
-
-  <field>
     <name>when_created</name>
     <type>timestamp</type>
     <default>CURRENT_TIMESTAMP</default>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Standaloneusers</base>
+  <class>UserRole</class>
+  <name>civicrm_user_role</name>
+  <comment>Bridge between users and roles</comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique UserRole ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>user_id</name>
+    <type>int unsigned</type>
+    <comment>FK to User</comment>
+    <html>
+      <label>User</label>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>user_id</name>
+    <table>civicrm_uf_match</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>role_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Role</comment>
+    <html>
+      <label>Role</label>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>role_id</name>
+    <table>civicrm_role</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+</table>

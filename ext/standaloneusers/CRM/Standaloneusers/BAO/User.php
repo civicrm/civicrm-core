@@ -1,9 +1,11 @@
 <?php
-
 /**
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+
+use Civi\Api4\UserRole;
+use CRM_Standaloneusers_ExtensionUtil as E;
 
 /**
  * Business access object for the User entity.
@@ -11,14 +13,44 @@
 class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implements \Civi\Core\HookInterface {
 
   /**
-   * Event fired after an action is taken on a User record.
+   * Event fired before an action is taken on a User record.
    * @param \Civi\Core\Event\PreEvent $event
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
-    if (in_array($event->action, ['create', 'edit'])
-        && empty($event->params['when_updated'])) {
+    if (
+      in_array($event->action, ['create', 'edit'], TRUE) &&
+      empty($event->params['when_updated'])
+    ) {
       // Track when_updated.
       $event->params['when_updated'] = date('YmdHis');
+    }
+  }
+
+  /**
+   * Event fired after an action is taken on a User record.
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    // Handle virtual "roles" field (defined in UserSpecProvider)
+    // @see \Civi\Api4\Service\Spec\Provider\UserSpecProvider
+    if (
+      in_array($event->action, ['create', 'edit'], TRUE) &&
+      isset($event->params['roles']) && $event->id
+    ) {
+      if ($event->params['roles']) {
+        $newRoles = array_map(function($role_id) {
+          return ['role_id' => $role_id];
+        }, $event->params['roles']);
+        UserRole::replace(FALSE)
+          ->addWhere('user_id', '=', $event->id)
+          ->setRecords($newRoles)
+          ->execute();
+      }
+      else {
+        UserRole::delete(FALSE)
+          ->addWhere('user_id', '=', $event->id)
+          ->execute();
+      }
     }
   }
 

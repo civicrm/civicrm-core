@@ -17,6 +17,7 @@
 
 SET FOREIGN_KEY_CHECKS=0;
 
+DROP TABLE IF EXISTS `civicrm_user_role`;
 DROP TABLE IF EXISTS `civicrm_uf_match`;
 DROP TABLE IF EXISTS `civicrm_role`;
 
@@ -59,7 +60,6 @@ CREATE TABLE `civicrm_uf_match` (
   `contact_id` int unsigned COMMENT 'FK to Contact ID',
   `username` varchar(60) NOT NULL,
   `hashed_password` varchar(128) NOT NULL DEFAULT "" COMMENT 'Hashed, not plaintext password',
-  `roles` varchar(128) COMMENT 'FK to Role',
   `when_created` timestamp DEFAULT CURRENT_TIMESTAMP,
   `when_last_accessed` timestamp NULL,
   `when_updated` timestamp NULL,
@@ -74,5 +74,22 @@ CREATE TABLE `civicrm_uf_match` (
   UNIQUE INDEX `UI_contact_domain_id`(contact_id, domain_id),
   CONSTRAINT FK_civicrm_uf_match_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`),
   CONSTRAINT FK_civicrm_uf_match_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL
+)
+ENGINE=InnoDB;
+
+-- /*******************************************************
+-- *
+-- * civicrm_user_role
+-- *
+-- * Bridge between users and roles
+-- *
+-- *******************************************************/
+CREATE TABLE `civicrm_user_role` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique UserRole ID',
+  `user_id` int unsigned COMMENT 'FK to User',
+  `role_id` int unsigned COMMENT 'FK to Role',
+  PRIMARY KEY (`id`),
+  CONSTRAINT FK_civicrm_user_role_user_id FOREIGN KEY (`user_id`) REFERENCES `civicrm_uf_match`(`id`) ON DELETE CASCADE,
+  CONSTRAINT FK_civicrm_user_role_role_id FOREIGN KEY (`role_id`) REFERENCES `civicrm_role`(`id`) ON DELETE CASCADE
 )
 ENGINE=InnoDB;
