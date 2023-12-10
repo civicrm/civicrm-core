@@ -15,11 +15,6 @@
   {crmRegion name='html-header'}
   {/crmRegion}
 
-{* @todo This is probably not required? *}
-{if isset($buildNavigation) and !$urlIsPublic}
-    {include file="CRM/common/Navigation.tpl"}
-{/if}
-
   <title>{if isset($docTitle)}{$docTitle}{else}CiviCRM{/if}</title>
 </head>
 <body>
