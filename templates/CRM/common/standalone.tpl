@@ -3,7 +3,7 @@
  <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="Shortcut Icon" type="image/x-icon" href="{$config->resourceBase}i/widget/favicon.png" />
+  <link rel="icon" type="image/png" href="{$config->resourceBase}i/logo_lg.png" >
 
   {* @todo crmRegion below should replace this, but not working? *}
   {if isset($pageHTMLHead)}
