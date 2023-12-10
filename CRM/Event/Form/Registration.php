@@ -1489,7 +1489,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function processRegistration($params, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
-    $this->_participantInfo = [];
+    $participantInfo = [];
 
     // CRM-4320, lets build array of cancelled additional participant ids
     // those are drop or skip by primary at the time of confirmation.
@@ -1526,10 +1526,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             }
           }
           if ($participantEmail) {
-            $this->_participantInfo[] = $participantEmail;
+            $participantInfo[] = $participantEmail;
           }
           else {
-            $this->_participantInfo[] = $value['first_name'] . ' ' . $value['last_name'];
+            $participantInfo[] = $value['first_name'] . ' ' . $value['last_name'];
           }
         }
         elseif (!empty($value['contact_id'])) {
@@ -1587,8 +1587,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     //set information about additional participants if exists
-    if (count($this->_participantInfo)) {
-      $this->set('participantInfo', $this->_participantInfo);
+    if (count($participantInfo)) {
+      $this->set('participantInfo', $participantInfo);
     }
 
     if ($this->getPaymentProcessorObject()->supports('noReturn')
