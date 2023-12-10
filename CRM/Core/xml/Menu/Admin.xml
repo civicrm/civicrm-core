@@ -346,6 +346,11 @@
      <weight>70</weight>
   </item>
   <item>
+     <path>civicrm/admin/pdfFormats/edit</path>
+     <title>Print Page (PDF) Formats</title>
+     <page_callback>CRM_Admin_Page_PdfFormats</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/options/communication_style</path>
      <title>Communication Style Options</title>
      <desc>Options for Communication Style selection.</desc>
@@ -723,7 +728,16 @@
      <adminGroup>System Settings</adminGroup>
      <weight>500</weight>
   </item>
-    <item>
+  <item>
+     <path>civicrm/admin/sms/provider/edit</path>
+     <title>Sms Providers</title>
+     <desc>To configure a sms provider</desc>
+     <page_callback>CRM_SMS_Form_Provider</page_callback>
+     <access_arguments>administer CiviCRM</access_arguments>
+     <adminGroup>System Settings</adminGroup>
+     <weight>501</weight>
+  </item>
+  <item>
      <path>civicrm/sms/send</path>
      <title>New Mass SMS</title>
      <page_callback>CRM_SMS_Controller_Send</page_callback>

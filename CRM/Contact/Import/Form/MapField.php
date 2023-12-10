@@ -22,8 +22,6 @@ use Civi\Api4\RelationshipType;
  */
 class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
-  use CRM_Contact_Import_MetadataTrait;
-
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
    *
@@ -42,38 +40,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   protected $_formattedFieldNames;
 
   protected $_dedupeFields;
-
-  /**
-   * Attempt to match header labels with our mapper fields.
-   *
-   * FIXME: This is essentially the same function as parent::defaultFromHeader
-   *
-   * @param string $columnName name of column header
-   *
-   * @return string
-   */
-  public function defaultFromColumnName(string $columnName): string {
-
-    if (!preg_match('/^[a-z0-9 ]$/i', $columnName)) {
-      if ($columnKey = array_search($columnName, $this->getFieldTitles())) {
-        $this->_fieldUsed[$columnKey] = TRUE;
-        return $columnKey;
-      }
-    }
-
-    foreach ($this->getHeaderPatterns() as $key => $re) {
-      // Skip empty key/patterns
-      if (!$key || !$re || strlen("$re") < 5) {
-        continue;
-      }
-
-      if (preg_match($re, $columnName)) {
-        $this->_fieldUsed[$key] = TRUE;
-        return $key;
-      }
-    }
-    return '';
-  }
 
   /**
    * Set variables up before form is built.
@@ -127,8 +93,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
-    $hasColumnNames = !empty($this->getDataSourceObject()->getColumnHeaders());
-
     $this->getLocationTypes();
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     $this->assign('defaultLocationType', $defaultLocationType->id);
@@ -167,13 +131,13 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     foreach ($mapperKeys as $key) {
       // check if there is a _a_b or _b_a in the key
       if (strpos($key, '_a_b') || strpos($key, '_b_a')) {
-        [$id, $first, $second] = explode('_', $key);
+        [, $first, $second] = explode('_', $key);
         $relatedContactType = $this->getRelatedContactType($key);
         //CRM-5125 for contact subtype specific RelationshipTypes
         $relatedContactSubType = $this->getRelatedContactSubType($key);
       }
       else {
-        $id = $first = $second = NULL;
+        $first = $second = NULL;
       }
       if (($first === 'a' && $second === 'b') || ($first === 'b' && $second === 'a')) {
         $relatedFields = CRM_Contact_BAO_Contact::importableFields($relatedContactType);
@@ -263,7 +227,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID((int) $this->getSubmittedValue('savedMapping'));
     $processor->setFormName($formName);
-    $processor->setMetadata($this->getContactImportMetadata());
+    $processor->setMetadata($this->getParser()->getFieldsMetadata());
     $processor->setContactType($this->getSubmittedValue('contactType'));
     $processor->setContactSubType($this->getSubmittedValue('contactSubType'));
     $mapper = $this->getSubmittedValue('mapper');
@@ -287,19 +251,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         $last_key = array_key_last($defaults["mapper[$i]"]) ?? 0;
       }
       else {
-        if ($hasColumnNames) {
-          // do array search first to see if has mapped key
-          $columnKey = array_search($columnHeader, $this->getFieldTitles(), TRUE);
-          if (isset($this->_fieldUsed[$columnKey])) {
-            $defaults["mapper[$i]"] = [$columnKey];
-            $this->_fieldUsed[$key] = TRUE;
-          }
-          else {
-            // Infer the default from the column names if we have them
-            $defaults["mapper[$i]"] = [
-              $this->defaultFromColumnName($columnHeader),
-            ];
-          }
+        if ($this->getSubmittedValue('skipColumnHeader')) {
+          $defaults["mapper[$i]"][0] = $this->guessMappingBasedOnColumns($columnHeader);
+        }
+        else {
+          $defaults["mapper[$i]"][0] = 'do_not_import';
         }
         $last_key = array_key_last($defaults["mapper[$i]"]) ?? 0;
       }

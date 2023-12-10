@@ -953,7 +953,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
       ->addWhere('name', '=', 'import_' . $mappingName)
       ->addWhere('is_template', '=', TRUE)
       ->execute()->first();
-    $this->templateID = $templateJob['id'];
+    $this->templateID = $templateJob['id'] ?? NULL;
     return $templateJob ?? NULL;
   }
 

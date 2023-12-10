@@ -67,11 +67,10 @@ return [
               'label' => E::ts('Username'),
               'sortable' => TRUE,
               'link' => [
-                'path' => '/civicrm/admin/user#?User1=[id]',
-                'entity' => '',
-                'action' => '',
+                'entity' => 'User',
+                'action' => 'update',
                 'join' => '',
-                'target' => '',
+                'target' => 'crm-popup',
               ],
             ],
             [
