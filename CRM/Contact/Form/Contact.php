@@ -359,7 +359,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         CRM_Contact_Form_Edit_CustomData::preProcess($this);
       }
       else {
-        $contactSubType = $this->_contactSubType;
+        $contactSubType = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, (string) $this->_contactSubType));
         // need contact sub type to build related grouptree array during post process
         if (!empty($_POST['qfKey'])) {
           $contactSubType = $_POST['contact_sub_type'] ?? NULL;
