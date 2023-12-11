@@ -17,7 +17,6 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
     // Remove breadcrumb for login page.
     $this->assign('breadcrumb', NULL);
 
-    $this->assign('anonAccessDenied', isset($_GET['anonAccessDenied']));
     $this->assign('justLoggedOut', isset($_GET['justLoggedOut']));
 
     parent::run();
