@@ -25,6 +25,8 @@
  */
 class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
+  use CRM_Contact_Form_ContactFormTrait;
+
   /**
    * The contact type of the form.
    *
@@ -128,6 +130,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
@@ -183,14 +187,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $this->_contactId = NULL;
     }
     else {
-      //update mode
-      if (!$this->_contactId) {
-        $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-      }
-
-      if ($this->_contactId) {
+      if ($this->getContactID()) {
         $defaults = [];
-        $params = ['id' => $this->_contactId];
+        $params = ['id' => $this->getContactID()];
         $returnProperities = ['id', 'contact_type', 'contact_sub_type', 'modified_date', 'is_deceased'];
         CRM_Core_DAO::commonRetrieve('CRM_Contact_DAO_Contact', $params, $defaults, $returnProperities);
 
@@ -359,14 +358,15 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         CRM_Contact_Form_Edit_CustomData::preProcess($this);
       }
       else {
-        $contactSubType = $this->_contactSubType;
-        // need contact sub type to build related grouptree array during post process
-        if (!empty($_POST['qfKey'])) {
-          $contactSubType = $_POST['contact_sub_type'] ?? NULL;
-        }
-        //only custom data has preprocess hence directly call it
-        CRM_Custom_Form_CustomData::preProcess($this, NULL, $contactSubType,
-          1, $this->_contactType, $this->_contactId
+        // The reason we call this here is that it sets the _groupTree property which is later used
+        // in setDefaultValues and buildForm. (Ideally instead we would have a trait with getCustomGroup & getCustomFields
+        // that can be called at appropriate times). In order for buildForm to add the right fields it needs
+        // to know any contact sub types that are being added in the submission. Since this runs before
+        // the buildForm adds the contact_sub_type to the form we need to look in _submitValues for it - submitValues
+        // is a un-sanitised version of what is in the form submission (_POST) whereas `getSubmittedValues()` retrieves
+        // 'allowed' POSTED values - ie values which match available fields, with some localization handling.
+        CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type'),
+          1, $this->_contactType, $this->getContactID()
         );
         $this->assign('customValueCount', $this->_customValueCount);
       }
@@ -1503,6 +1503,20 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     return "$number$str";
+  }
+
+  /**
+   * Get the contact ID being edited.
+   *
+   * @return int||null
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getContactID(): ?int {
+    if (!$this->_contactId) {
+      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    }
+    return $this->_contactId ? (int) $this->_contactId : NULL;
   }
 
 }
