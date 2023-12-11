@@ -46,23 +46,6 @@ af-form {
   right: 0;
 }
 
-/* Collapsible containers */
-.af-collapsible > .af-title {
-  cursor: pointer;
-}
-.af-collapsible > .af-title:before {
-  font-family: "FontAwesome";
-  display: inline-block;
-  width: 1em;
-  content: "\f0d7";
-}
-.af-collapsible.af-collapsed > .af-title:before {
-  content: "\f0da";
-}
-.af-collapsible.af-collapsed > .af-title ~ * {
-  display: none !important;
-}
-
 /* Card style */
 #bootstrap-theme .af-container-style-pane {
   background-color: white;
@@ -82,9 +65,6 @@ af-form {
   width: calc(100% + 10px);
   margin-top: 0;
   margin-bottom: 10px;
-}
-#bootstrap-theme .af-container-style-pane.af-collapsed > .af-title {
-  margin-bottom: 0;
 }
 
 /* Admin edit links */
