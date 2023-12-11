@@ -3850,10 +3850,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
-      self::updateMembershipBasedOnCompletionOfContribution(
-        $contributionID,
-        $input['trxn_date'] ?? date('YmdHis')
-      );
+      $dateTodayForDatesCalculations = $input['trxn_date'] ?? date('YmdHis');
+      \Civi::dispatcher()->dispatch('civi.order.complete', new \Civi\Order\Event\OrderCompleteEvent($contributionID, $dateTodayForDatesCalculations));
     }
 
     $participantPayments = civicrm_api3('ParticipantPayment', 'get', ['contribution_id' => $contributionID, 'return' => 'participant_id', 'sequential' => 1])['values'];
