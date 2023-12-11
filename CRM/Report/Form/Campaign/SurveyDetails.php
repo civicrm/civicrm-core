@@ -16,9 +16,10 @@
  */
 class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
 
-  protected $_emailField = FALSE;
-
-  protected $_phoneField = FALSE;
+  /**
+   * @var array
+   */
+  protected $surveyResponseFields = [];
 
   protected $_locationBasedPhoneField = FALSE;
 
@@ -236,7 +237,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         ) {
 
           $fieldsName = CRM_Utils_Array::value(1, explode('_', $tableName));
-          if ($fieldsName) {
+          if ($fieldsName && property_exists($this, "_$fieldsName" . 'Field')) {
             $this->{"_$fieldsName" . 'Field'} = TRUE;
           }
 
@@ -282,7 +283,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     $this->joinEmailFromContact();
 
     if ($this->_locationBasedPhoneField) {
-      foreach ($this->_surveyResponseFields as $key => $value) {
+      foreach ($this->surveyResponseFields as $key => $value) {
         if (substr($key, 0, 5) == 'phone' && !empty($value['location_type_id'])
         ) {
           $fName = str_replace('-', '_', $key);
@@ -676,7 +677,7 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
     $responseFields = [];
     foreach ($surveyIds as $surveyId) {
       $responseFields += CRM_Campaign_BAO_Survey::getSurveyResponseFields($surveyId);
-      $this->_surveyResponseFields = $responseFields;
+      $this->surveyResponseFields = $responseFields;
     }
     foreach ($responseFields as $key => $value) {
       if (substr($key, 0, 5) == 'phone' && !empty($value['location_type_id'])) {
