@@ -89,4 +89,8 @@ class ServiceListener {
     return $this;
   }
 
+  public function getInertCb() {
+    return implode('::', $this->inertCb);
+  }
+
 }
