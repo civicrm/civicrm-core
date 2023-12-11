@@ -352,7 +352,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     $statusMsg = ts('The payment record has been processed.');
     // send email
-    if (!empty($paymentID) && !empty($this->_params['is_email_receipt'])) {
+    if (!empty($paymentID) && $this->getSubmittedValue('is_email_receipt')) {
       $sendResult = civicrm_api3('Payment', 'sendconfirmation', ['id' => $paymentID, 'from' => $submittedValues['from_email_address']])['values'][$paymentID];
       if ($sendResult['is_sent']) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
@@ -364,7 +364,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   public function processCreditCard(): ?array {
     // we need to retrieve email address
-    if ($this->_context === 'standalone' && !empty($this->_params['is_email_receipt'])) {
+    if ($this->_context === 'standalone' && $this->getSubmittedValue('is_email_receipt')) {
       [$displayName] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
       $this->assign('displayName', $displayName);
     }
@@ -381,13 +381,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     CRM_Core_Payment_Form::mapParams($this->_bltID, $this->getSubmittedValues(), $paymentParams, TRUE);
 
     $paymentParams['contributionPageID'] = NULL;
-    if (!empty($this->_params['is_email_receipt'])) {
-      $paymentParams['email'] = $this->_contributorEmail;
-      $paymentParams['is_email_receipt'] = TRUE;
-    }
-    else {
-      $paymentParams['is_email_receipt'] = $this->_params['is_email_receipt'] = FALSE;
-    }
+    $paymentParams['email'] = $this->_contributorEmail;
+    $paymentParams['is_email_receipt'] = (bool) $this->getSubmittedValue('is_email_receipt');
 
     $result = NULL;
 
