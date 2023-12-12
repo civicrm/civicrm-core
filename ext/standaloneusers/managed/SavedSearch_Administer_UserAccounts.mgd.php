@@ -11,7 +11,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Users',
-        'label' => E::ts('Administer Users'),
+        'label' => E::ts('Administer User accounts'),
         'api_entity' => 'User',
         'api_params' => [
           'version' => 4,
@@ -45,7 +45,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Users',
-        'label' => E::ts('Users'),
+        'label' => E::ts('Administer User accounts'),
         'saved_search_id.name' => 'Users',
         'type' => 'table',
         'settings' => [
