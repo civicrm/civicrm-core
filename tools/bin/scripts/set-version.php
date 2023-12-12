@@ -108,7 +108,7 @@ foreach ($infoXmls as $infoXml) {
 
 if ($doCommit) {
   $files = array_filter(
-    array_merge(['xml/version.xml', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, $sqlFile], $infoXmls),
+    array_merge(['xml/version.xml', 'js/version.json', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, $sqlFile], $infoXmls),
     function($file) {
       return $file && file_exists($file);
     }
