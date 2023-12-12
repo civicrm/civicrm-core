@@ -713,6 +713,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @throws \CRM_Core_Exception
    */
   protected function getRelatedTokensForEntity(string $entity, string $joinField, array $tokenList, $hiddenTokens = []): array {
+    if (!array_key_exists($entity, \Civi::service('action_object_provider')->getEntities())) {
+      return [];
+    }
     $apiParams = ['checkPermissions' => FALSE];
     if ($tokenList !== ['*']) {
       $apiParams['where'] = [['name', 'IN', $tokenList]];

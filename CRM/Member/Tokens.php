@@ -10,8 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\ContributionRecur;
-
 /**
  * Class CRM_Member_Tokens
  *
@@ -63,8 +61,8 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     if ($field === 'fee') {
-      $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($this->getFieldValue($row, 'membership_type_id'));
-      $row->tokens($entity, $field, \CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($membershipType['minimum_fee'] ?? 0));
+      parent::evaluateToken($row, $entity, 'membership_type_id.minimum_fee', $prefetch);
+      $row->format('text/plain')->tokens($entity, $field, $row->tokens['membership']['membership_type_id.minimum_fee']);
     }
     else {
       parent::evaluateToken($row, $entity, $field, $prefetch);
@@ -96,12 +94,29 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
+   * These tokens still work but we don't advertise them.
+   *
+   * We will actively remove from the following places
+   * - scheduled reminders
+   * - add to 'blocked' on pdf letter & email
+   *
+   * & then at some point start issuing warnings for them.
+   *
+   * @return string[]
+   */
+  protected function getDeprecatedTokens(): array {
+    return [
+      'fee' => 'membership_type_id.minimum_fee',
+    ];
+  }
+
+  /**
    * Get fields which need to be returned to render another token.
    *
    * @return array
    */
   public function getDependencies(): array {
-    return ['fee' => 'membership_type_id'];
+    return ['fee' => 'membership_type_id.minimum_fee'];
   }
 
   /**
@@ -119,7 +134,7 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
         'type' => 'calculated',
         'options' => NULL,
         'data_type' => 'integer',
-        'audience' => 'user',
+        'audience' => 'hidden',
       ],
     ];
   }
@@ -129,21 +144,10 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
    */
   protected function getRelatedTokens(): array {
     $tokens = [];
-    if (!in_array('ContributionRecur', array_keys(\Civi::service('action_object_provider')->getEntities()))) {
-      return $tokens;
-    }
     $hiddenTokens = ['modified_date', 'create_date', 'trxn_id', 'invoice_id', 'is_test', 'payment_token_id', 'payment_processor_id', 'payment_instrument_id', 'cycle_day', 'installments', 'processor_id', 'next_sched_contribution_date', 'failure_count', 'failure_retry_date', 'auto_renew', 'is_email_receipt', 'contribution_status_id'];
-    $contributionRecurFields = ContributionRecur::getFields(FALSE)->setLoadOptions(TRUE)->execute();
-    foreach ($contributionRecurFields as $contributionRecurField) {
-      $tokens['contribution_recur_id.' . $contributionRecurField['name']] = [
-        'title' => $contributionRecurField['title'],
-        'name' => 'contribution_recur_id.' . $contributionRecurField['name'],
-        'type' => 'mapped',
-        'options' => $contributionRecurField['options'] ?? NULL,
-        'data_type' => $contributionRecurField['data_type'],
-        'audience' => in_array($contributionRecurField['name'], $hiddenTokens) ? 'hidden' : 'user',
-      ];
-    }
+    $tokens += $this->getRelatedTokensForEntity('ContributionRecur', 'contribution_recur_id', ['*'], $hiddenTokens);
+    $tokens += $this->getRelatedTokensForEntity('MembershipType', 'membership_type_id', ['minimum_fee']);
+    $tokens += $this->getRelatedTokensForEntity('MembershipStatus', 'status_id', ['is_new']);
     return $tokens;
   }
 
