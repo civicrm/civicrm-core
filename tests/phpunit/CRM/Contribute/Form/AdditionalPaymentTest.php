@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Country;
+use Civi\Api4\StateProvince;
+
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
@@ -137,7 +140,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'This Payment Amount',
       '$70.00',
       'Billing Name and Address',
-      'Vancouver, BC 1321312',
+      'Vancouver, British Columbia 1321312',
       'Visa',
       '***********1111',
     ]);
@@ -258,7 +261,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'Credit Card',
       '***********1111',
       'Billing Name and Address',
-      'Vancouver, BC 1321312',
+      'Vancouver, British Columbia 1321312',
     ]);
     $mut->stop();
     $mut->clearMessages();
@@ -371,9 +374,9 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     ];
     if ($mode) {
       $_REQUEST['mode'] = $mode;
-      $stateProvinceBC = \Civi\Api4\StateProvince::get()
+      $stateProvinceID = StateProvince::get()
         ->addWhere('abbreviation', '=', 'BC')
-        ->addWhere('country_id', '=', 1039)
+        ->addWhere('country_id.name', '=', 'Canada')
         ->execute()
         ->single();
       $submitParams += [
@@ -384,9 +387,9 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
         'cvv2' => 234,
         'credit_card_type' => 'Visa',
         'billing_city-5' => 'Vancouver',
-        'billing_state_province_id-5' => $stateProvinceBC['id'],
+        'billing_state_province_id-5' => $stateProvinceID['id'],
         'billing_postal_code-5' => 1321312,
-        'billing_country_id-5' => 1228,
+        'billing_country_id-5' => Country::get()->addWhere('name', '=', 'Canada')->execute()->first()['id'],
       ];
     }
     else {
