@@ -82,6 +82,13 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     // If it is repeated it will be replaced by the first input -
     // ie { }{ } will be replaced by the content of the latter token.
     // Check testGenerateDisplayNameCustomFormats for test cover.
+    // and testMailingLabel
+    // This first regex targets anything like {, }{ } - where the presence of the space
+    // one tells us we could be in a situation like
+    // {contact.address_primary.city}{, }{contact.address_primary.state_province_id:label}{ }{contact.address_primary.postal_code}
+    // Where state_province is not present. No perfect solution here but we
+    // do want to keep the comma in this case.
+    $e->string = preg_replace('/\\\\|{(\s*([,`~()\-*|])*\s*)?}}*({\s})/', '$1', $e->string);
     $e->string = preg_replace('/\\\\|{(\s*(\s|,|`|~|\(|\)|-|\*|\|)*\s*)?\}}*(?=[^{\s])/', '$1', $e->string);
     // Now do a another pass, removing any remaining instances (which will get rid of any that were not
     // followed by something).
