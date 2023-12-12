@@ -34,15 +34,21 @@ class Security {
    * @param string $permissionName
    *   The permission to check.
    *
-   * @param int $userID
-   *   It is unclear if this typehint is true: The Drupal version has a default NULL!
+   * @param ?int $userID
+   *   The User ID (not ContactID) to check. If NULL, current logged in user.
    *
    * @return bool
    *   true if yes, else false
    */
-  public function checkPermission(\CRM_Core_Permission_Standalone $permissionObject, string $permissionName, $userID) {
+  public function checkPermission(\CRM_Core_Permission_Standalone $permissionObject, string $permissionName, ?int $userID = NULL) {
+    if ($permissionName == \CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
+      return FALSE;
+    }
+    if ($permissionName == \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
+      return TRUE;
+    }
 
-    // I think null means the current logged-in user
+    // NULL means the current logged-in user
     $userID = $userID ?? $this->getLoggedInUfID() ?? 0;
 
     if (!isset(\Civi::$statics[__METHOD__][$userID])) {
@@ -67,6 +73,8 @@ class Security {
       else {
         $permissionsPerRoleApiCall->addWhere('name', '=', 'everyone');
       }
+
+      // Get and cache an array of permission names for this user.
       $permissions = array_unique(array_merge(...$permissionsPerRoleApiCall->execute()->column('permissions')));
       \Civi::$statics[__METHOD__][$userID] = $permissions;
     }

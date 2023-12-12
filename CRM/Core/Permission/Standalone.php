@@ -16,6 +16,11 @@
  */
 
 /**
+ * Permissions class for Standalone.
+ *
+ * Note that CRM_Core_Permission_Base is unrelated to CRM_Core_Permission
+ * This class, and the _Base class, is to do with CMS permissions, whereas
+ * the CRM_Core_Permission class deals with Civi-specific permissioning.
  *
  */
 class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
@@ -27,7 +32,13 @@ class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
   public $permissions = NULL;
 
   /**
-   * Given a permission string, check for access requirements
+   * Given a permission string, check for access requirements.
+   *
+   * Note this differs from CRM_Core_Permission::check() which handles
+   * composite permissions (ORs etc) and Contacts.
+   *
+   * Some codepaths assume to be able to check a permission through this class;
+   * others through CRM_Core_Permission::check().
    *
    * @param string $str
    *   The permission to check.
@@ -37,19 +48,7 @@ class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
    *   true if yes, else false
    */
   public function check($str, $userId = NULL) {
-    if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
-      return FALSE;
-    }
-    if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
-      return TRUE;
-    }
-
-    if (class_exists(\Civi\Standalone\Security::class)) {
-      return \Civi\Standalone\Security::singleton()->checkPermission($this, $str, $userId);
-    }
-
-    // return the stubbed permission (defaulting to true if the array is missing)
-    return isset($this->permissions) && is_array($this->permissions) ? in_array($str, $this->permissions) : TRUE;
+    return \Civi\Standalone\Security::singleton()->checkPermission($this, $str, $userId);
   }
 
 }
