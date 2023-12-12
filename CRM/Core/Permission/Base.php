@@ -154,7 +154,7 @@ class CRM_Core_Permission_Base {
 
       $groups = CRM_Core_PseudoConstant::allGroup($groupType, $excludeHidden);
 
-      if ($this->check('edit all contacts')) {
+      if (CRM_Core_Permission::check('edit all contacts')) {
         // this is the most powerful permission, so we return
         // immediately rather than dilute it further
         $this->_editAdminUser = $this->_viewAdminUser = TRUE;
@@ -163,7 +163,7 @@ class CRM_Core_Permission_Base {
         Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = $groups;
         return Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey];
       }
-      elseif ($this->check('view all contacts')) {
+      elseif (CRM_Core_Permission::check('view all contacts')) {
         $this->_viewAdminUser = TRUE;
         $this->_viewPermission = TRUE;
         Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = $groups;
