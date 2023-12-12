@@ -875,15 +875,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->_id) {
       $params['id'] = $this->_id;
     }
-
-    $config = CRM_Core_Config::singleton();
-    if (isset($params['total_amount'])) {
-      $params['total_amount'] = CRM_Utils_Rule::cleanMoney($params['total_amount']);
-    }
     if ($this->_isPaidEvent) {
-      [$lineItem, $params] = $this->preparePaidEventProcessing($params);
+      $params = $this->preparePaidEventProcessing($params);
     }
-
+    $lineItem = $this->_lineItem = [$this->getPriceSetID() => $this->getLineItems()];
     $this->_params = $params;
     parent::beginPostProcess();
     $amountOwed = NULL;
@@ -1014,9 +1009,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $contributions = [];
       if (!empty($params['record_contribution'])) {
         $contributionParams = [
-          'skipLineItem' => 1,
           'skipCleanMoney' => TRUE,
-          'total_amount' => $this->getSubmittedValue('total_amount'),
+          'total_amount' => $this->getOrder()->getTotalAmount(),
           'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
           'source' => $this->getSourceText(),
           'non_deductible_amount' => 'null',
@@ -1029,6 +1023,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           'pan_truncation' => $this->getSubmittedValue('pan_truncation'),
           'card_type_id' => $this->getSubmittedValue('card_type_id'),
           'receive_date' => $this->getSubmittedValue('receive_date') ?: $now,
+          'line_item' => [$this->getPriceSetID() => $this->getLineItems()],
+          'is_pay_later' => ('Pending' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'))),
         ];
         if (!empty($params['id'])) {
           if ($this->_onlinePendingContributionId) {
@@ -1049,13 +1045,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         if ($this->_id) {
           $contributionParams['contribution_mode'] = 'participant';
           $contributionParams['participant_id'] = $this->_id;
-        }
-        // Set is_pay_later flag for back-office offline Pending status contributions
-        if ($contributionParams['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Pending')) {
-          $contributionParams['is_pay_later'] = 1;
-        }
-        elseif ($contributionParams['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Completed')) {
-          $contributionParams['is_pay_later'] = 0;
         }
 
         if ($params['status_id'] == array_search('Partially paid', $participantStatus)) {
@@ -1080,9 +1069,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           }
         }
 
-        if (!empty($this->_params['tax_amount'])) {
-          $contributionParams['tax_amount'] = $this->_params['tax_amount'];
-        }
+        $contributionParams['tax_amount'] = $this->getOrder()->getTotalTaxAmount();
 
         if ($this->_single) {
           $contributions[] = CRM_Contribute_BAO_Contribution::create($contributionParams);
@@ -1428,54 +1415,22 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @throws \CRM_Core_Exception
    */
   protected function preparePaidEventProcessing($params): array {
-    $participantStatus = CRM_Event_PseudoConstant::participantStatus();
-    $lineItem = [];
-
     if ($this->isPaymentOnExistingContribution()) {
       //re-enter the values for UPDATE mode
       $params['fee_level'] = $params['amount_level'] = $this->getParticipantValue('fee_level');
       $params['fee_amount'] = $this->getParticipantValue('fee_amount');
     }
     else {
-      //lets carry currency, CRM-4453
-      $params['fee_currency'] = $this->getCurrency();
-      if (!isset($lineItem[0])) {
-        $lineItem[0] = [];
-      }
-      CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'],
-        $params, $lineItem[0]
-      );
-      //CRM-11529 for quick config backoffice transactions
-      //when financial_type_id is passed in form, update the
-      //lineitems with the financial type selected in form
-      $submittedFinancialType = $params['financial_type_id'] ?? NULL;
-      $isPaymentRecorded = $this->getSubmittedValue('record_contribution');
-      if ($isPaymentRecorded && $this->isQuickConfig() && $submittedFinancialType) {
-        foreach ($lineItem[0] as &$values) {
-          $values['financial_type_id'] = $submittedFinancialType;
-        }
-      }
 
-      $params['fee_level'] = $params['amount_level'];
-      if ($this->isQuickConfig() && !empty($params['total_amount']) &&
-        $params['status_id'] != array_search('Partially paid', $participantStatus)
-      ) {
-        $params['fee_amount'] = $params['total_amount'];
+      // check that discount_id is set
+      if (empty($params['discount_id'])) {
+        $params['discount_id'] = 'null';
       }
-      else {
-        //fix for CRM-3086
-        $params['fee_amount'] = $params['amount'];
-      }
+      $params['fee_level'] = $this->getOrder()->getAmountLevel();
+      $params['fee_amount'] = $this->getOrder()->getTotalAmount();
     }
 
-    if (isset($params['priceSetId'])) {
-      if (!empty($lineItem[0])) {
-        $this->set('lineItem', $lineItem);
-        $this->_lineItem = $lineItem;
-      }
-    }
-
-    return [$lineItem, $params];
+    return $params;
   }
 
   /**
