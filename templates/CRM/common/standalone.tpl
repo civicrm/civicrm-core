@@ -22,7 +22,7 @@
   {include file="CRM/common/debug.tpl"}
   {/if}
 
-  <div id="crm-container" class="crm-container" lang="{$config->lcMessages|substr:0:2}" xml:lang="{$config->lcMessages|substr:0:2}">
+  <div id="crm-container" class="crm-container standalone-page-padding" lang="{$config->lcMessages|substr:0:2}" xml:lang="{$config->lcMessages|substr:0:2}">
     {if $breadcrumb}
       <nav aria-label="{ts}Breadcrumb{/ts}" class="breadcrumb"><ol>
         <li><a href="/civicrm/dashboard?reset=1" >{ts}Home{/ts}</a></li>
@@ -39,8 +39,8 @@
     {/if}
 
     {if $pageTitle}
-      <div class="crm-title">
-        <h1 class="title">{if $isDeleted}<del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
+      <div class="crm-page-title-wrapper">
+        <h1 class="crm-page-title">{$pageTitle}</h1>
       </div>
     {/if}
 
