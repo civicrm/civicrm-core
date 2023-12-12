@@ -837,6 +837,8 @@ WHERE ($subtypeClause)";
     $contactTypes = $cache->get($cacheKey);
     if ($contactTypes === NULL) {
       $query = CRM_Utils_SQL_Select::from('civicrm_contact_type');
+      // Ensure stable order
+      $query->orderBy('id');
       $dao = CRM_Core_DAO::executeQuery($query->toSQL());
       $contactTypes = array_column($dao->fetchAll(), NULL, 'name');
       $parents = array_column($contactTypes, NULL, 'id');
