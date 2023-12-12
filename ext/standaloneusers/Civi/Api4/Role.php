@@ -10,4 +10,13 @@ namespace Civi\Api4;
  */
 class Role extends Generic\DAOEntity {
 
+  /**
+   * Declare permissions needed to access this entity.
+   */
+  public static function permissions() {
+    return [
+      'default' => ['cms:administer users'],
+    ];
+  }
+
 }
