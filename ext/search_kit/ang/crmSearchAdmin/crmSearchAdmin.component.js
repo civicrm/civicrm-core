@@ -70,10 +70,6 @@
             defaults[param] = [];
           }
         });
-        // Default to Individuals
-        if (this.savedSearch.api_entity === 'Contact' && CRM.crmSearchAdmin.defaultContactType) {
-          defaults.where.push(['contact_type:name', '=', CRM.crmSearchAdmin.defaultContactType]);
-        }
 
         $scope.$bindToRoute({
           param: 'params',
@@ -82,11 +78,16 @@
           default: defaults
         });
 
+        // Set default label
+        ctrl.savedSearch.label = ts('%1 Search by %2', {
+          1: searchMeta.getEntity(ctrl.savedSearch.api_entity).title,
+          2: CRM.crmSearchAdmin.myName
+        });
         $scope.$bindToRoute({
           param: 'label',
           expr: '$ctrl.savedSearch.label',
           format: 'raw',
-          default: ''
+          default: ctrl.savedSearch.label
         });
       }
 
