@@ -25,6 +25,8 @@ use Civi\Payment\Exception\PaymentProcessorException;
  */
 class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_ContributionRecur {
 
+  use CRM_Financial_Form_PaymentProcessorFormTrait;
+
   public $_paymentProcessor = NULL;
 
   public $_paymentProcessorObj = NULL;
@@ -51,6 +53,13 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
   protected $_donorEmail = '';
 
   /**
+   * The ContributionRecur as returned by API4
+   *
+   * @var array
+   */
+  protected array $contributionRecur;
+
+  /**
    * Pre-processing for the form.
    *
    * @throws \Exception
@@ -74,39 +83,36 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       CRM_Core_Error::statusBounce(ts('Required information missing.'));
     }
 
-    if ($this->_subscriptionDetails->membership_id && $this->_subscriptionDetails->auto_renew) {
-      // Add Membership details to form
-      $membership = civicrm_api3('Membership', 'get', [
-        'contribution_recur_id' => $this->contributionRecurID,
-      ]);
-      if (!empty($membership['count'])) {
-        $membershipDetails = reset($membership['values']);
-        $values['membership_id'] = $membershipDetails['id'];
-        $values['membership_name'] = $membershipDetails['membership_name'];
-      }
-      $this->assign('recurMembership', $values);
-      $this->assign('contactId', $this->_subscriptionDetails->contact_id);
+    $this->contributionRecur = \Civi\Api4\ContributionRecur::get(FALSE)
+      ->addWhere('id', '=', $this->contributionRecurID)
+      ->execute()
+      ->first();
+
+    $membership = \Civi\Api4\Membership::get(FALSE)
+      ->addSelect('id', 'membership_type_id:name')
+      ->addWhere('contribution_recur_id', '=', $this->contributionRecurID)
+      ->execute()
+      ->first();
+    if (!empty($membership)) {
+      $membershipValues['membership_id'] = $membership['id'];
+      $membershipValues['membership_name'] = $membership['membership_type_id:name'];
     }
+    $this->assign('recurMembership', $membershipValues ?? []);
+    $this->assign('contactId', $this->contributionRecur['contact_id']);
 
     $this->assign('self_service', $this->isSelfService());
-    $this->assign('recur_frequency_interval', $this->_subscriptionDetails->frequency_interval);
-    $this->assign('recur_frequency_unit', $this->_subscriptionDetails->frequency_unit);
+    $this->assign('recur_frequency_interval', $this->contributionRecur['frequency_interval']);
+    $this->assign('recur_frequency_unit', $this->contributionRecur['frequency_unit']);
 
-    $this->editableScheduleFields = $this->_paymentProcessorObj->getEditableRecurringScheduleFields();
+    $this->editableScheduleFields = $this->getPaymentProcessorObject()->getEditableRecurringScheduleFields();
 
-    $changeHelpText = $this->_paymentProcessorObj->getRecurringScheduleUpdateHelpText();
+    $changeHelpText = $this->getPaymentProcessorObject()->getRecurringScheduleUpdateHelpText();
     if (!in_array('amount', $this->editableScheduleFields)) {
       // Not sure if this is good behaviour - maintaining this existing behaviour for now.
       CRM_Core_Session::setStatus($changeHelpText, ts('Warning'), 'alert');
     }
     else {
       $this->assign('changeHelpText', $changeHelpText);
-    }
-    $alreadyHardCodedFields = ['amount', 'installments'];
-    foreach ($this->editableScheduleFields as $editableScheduleField) {
-      if (!in_array($editableScheduleField, $alreadyHardCodedFields)) {
-        $this->addField($editableScheduleField, ['entity' => 'ContributionRecur'], FALSE, FALSE);
-      }
     }
 
     // when custom data is included in this page
@@ -116,12 +122,23 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
-    $this->assign('editableScheduleFields', array_diff($this->editableScheduleFields, $alreadyHardCodedFields));
-
-    if ($this->_subscriptionDetails->contact_id) {
-      $contactDetails = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
-      $this->_donorEmail = $contactDetails[1];
+    // amount, installments are added to the form as separate elements
+    // everything that is in the smarty variable editableScheduleFields will be added (again)
+    $editableScheduleFieldsToBeAddedToForm = [];
+    foreach ($this->editableScheduleFields as $field) {
+      if (in_array($field, ['amount', 'installments'])) {
+        continue;
+      }
+      $editableScheduleFieldsToBeAddedToForm[] = $field;
     }
+    $this->assign('editableScheduleFields', $editableScheduleFieldsToBeAddedToForm);
+
+    $email = \Civi\Api4\Email::get(FALSE)
+      ->addWhere('contact_id', '=', $this->contributionRecur['contact_id'])
+      ->addOrderBy('is_primary', 'DESC')
+      ->execute()
+      ->first();
+    $this->_donorEmail = $email['email'] ?? '';
 
     $this->setTitle(ts('Update Recurring Contribution'));
 
@@ -136,12 +153,12 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
    */
   public function setDefaultValues() {
     $this->_defaults = [];
-    $this->_defaults['amount'] = $this->_subscriptionDetails->amount;
-    $this->_defaults['installments'] = $this->_subscriptionDetails->installments;
+    $this->_defaults['amount'] = $this->contributionRecur['amount'];
+    $this->_defaults['installments'] = $this->contributionRecur['installments'];
     $this->_defaults['campaign_id'] = $this->_subscriptionDetails->campaign_id;
     $this->_defaults['financial_type_id'] = $this->_subscriptionDetails->financial_type_id;
     foreach ($this->editableScheduleFields as $field) {
-      $this->_defaults[$field] = $this->_subscriptionDetails->$field ?? NULL;
+      $this->_defaults[$field] = $this->contributionRecur[$field] ?? NULL;
     }
 
     return $this->_defaults;
@@ -157,8 +174,9 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     if (count($lineItems) > 1) {
       $amtAttr += ['readonly' => TRUE];
     }
-    $amountField = $this->addMoney('amount', ts('Recurring Contribution Amount'), TRUE, $amtAttr,
-      TRUE, 'currency', $this->_subscriptionDetails->currency, TRUE
+
+    $this->addMoney('amount', ts('Recurring Contribution Amount'), TRUE, $amtAttr,
+      TRUE, 'currency', $this->contributionRecur['currency'], TRUE
     );
 
     // https://lab.civicrm.org/dev/financial/-/issues/197 https://github.com/civicrm/civicrm-core/pull/23796
@@ -173,7 +191,9 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     //   $amountField->freeze();
     // }
 
-    $this->add('text', 'installments', ts('Number of Installments'), ['size' => 20], FALSE);
+    if (in_array('installments', $this->editableScheduleFields)) {
+      $this->add('text', 'installments', ts('Number of Installments'), ['size' => 20], FALSE);
+    }
 
     if ($this->_donorEmail) {
       $this->add('checkbox', 'is_notify', ts('Notify Contributor?'));
@@ -217,23 +237,35 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
    */
   public function postProcess() {
     // store the submitted values in an array
+    // @todo Stop using $params/exportValues()
     $params = $this->exportValues();
+
+    $isNotify = (bool) $this->getSubmittedValue('is_notify');
 
     if ($this->isSelfService() && $this->_donorEmail) {
       // for self service force notify
-      $params['is_notify'] = 1;
+      $isNotify = TRUE;
     }
 
-    // if this is an update of an existing recurring contribution, pass the ID
-    $params['contributionRecurID'] = $params['id'] = $this->getContributionRecurID();
     $message = '';
 
-    $params['recurProcessorID'] = $params['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
-
     $updateSubscription = TRUE;
-    if ($this->_paymentProcessorObj->supports('changeSubscriptionAmount')) {
+    if ($this->getPaymentProcessorObject()->supports('changeSubscriptionAmount')) {
       try {
-        $updateSubscription = $this->_paymentProcessorObj->changeSubscriptionAmount($message, $params);
+        $changeSubscriptionAmountParams['contributionRecurID'] = $this->contributionRecur['id'];
+        $changeSubscriptionAmountParams['recurProcessorID'] = $this->contributionRecur['processor_id'];
+        foreach ($this->editableScheduleFields as $field) {
+          if ($this->getSubmittedValue($field)) {
+            $changeSubscriptionAmountParams[$field] = $this->getSubmittedValue($field);
+          }
+          if ((int) $this->getsubmittedValue('financial_type_id') !== $this->contributionRecur['financial_type_id']) {
+            $recurParams['financial_type_id'] = $this->getSubmittedValue('financial_type_id');
+          }
+        }
+        // @todo Legacy parameters that we want to remove!
+        $changeSubscriptionAmountParams['subscriptionId'] = $changeSubscriptionAmountParams['recurProcessorID'];
+
+        $updateSubscription = $this->getPaymentProcessorObject()->changeSubscriptionAmount($message, $changeSubscriptionAmountParams);
         if ($updateSubscription instanceof CRM_Core_Error) {
           CRM_Core_Error::deprecatedWarning('An exception should be thrown');
           throw new PaymentProcessorException(ts('Could not update the Recurring contribution details'));
@@ -244,31 +276,45 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       }
     }
     if ($updateSubscription) {
+      // @todo convert to API4 ContributionRecur::Update (need to handle custom fields)
+      $recurParams = [
+        'id' => $this->contributionRecur['id'],
+        'custom' => CRM_Core_BAO_CustomField::postProcess($params, $this->contributionRecurID, 'ContributionRecur'),
+      ];
+      foreach ($this->editableScheduleFields as $field) {
+        if ($this->getSubmittedValue($field)) {
+          $recurParams[$field] = $this->getSubmittedValue($field);
+        }
+      }
+      if ($this->getsubmittedValue('financial_type_id')) {
+        $recurParams['financial_type_id'] = $this->getSubmittedValue('financial_type_id');
+      }
       // Handle custom data
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->contributionRecurID, 'ContributionRecur');
       // save the changes
-      CRM_Contribute_BAO_ContributionRecur::add($params);
-      $status = ts('Recurring contribution has been updated to: %1, every %2 %3(s) for %4 installments.',
+      CRM_Contribute_BAO_ContributionRecur::add($recurParams);
+      $status = ts('Recurring contribution has been updated to: %1 every %2 %3(s)',
         [
-          1 => CRM_Utils_Money::format($params['amount'], $this->_subscriptionDetails->currency),
-          2 => $this->_subscriptionDetails->frequency_interval,
-          3 => $this->_subscriptionDetails->frequency_unit,
-          4 => $params['installments'],
+          1 => CRM_Utils_Money::format($this->getSubmittedValue('amount'), $this->contributionRecur['currency']),
+          2 => $this->contributionRecur['frequency_interval'],
+          3 => $this->contributionRecur['frequency_unit'],
         ]
       );
+      if ($this->getSubmittedValue('installments')) {
+        $status .= ts(' for %1 installments.', [4 => $this->getSubmittedValue('installments')]);
+      }
 
       $msgTitle = ts('Update Success');
       $msgType = 'success';
       $msg = ts('Recurring Contribution Updated');
-      $contactID = $this->_subscriptionDetails->contact_id;
+      $contactID = $this->contributionRecur['contact_id'];
 
-      if ($this->_subscriptionDetails->amount != $params['amount']) {
+      if ($this->contributionRecur['amount'] != $this->getSubmittedValue('amount')) {
         $message .= "<br /> " . ts("Recurring contribution amount has been updated from %1 to %2 for this subscription.",
             [
-              1 => CRM_Utils_Money::format($this->_subscriptionDetails->amount, $this->_subscriptionDetails->currency),
-              2 => CRM_Utils_Money::format($params['amount'], $this->_subscriptionDetails->currency),
+              1 => CRM_Utils_Money::format($this->getSubmittedValue('amount'), $this->contributionRecur['currency']),
+              2 => CRM_Utils_Money::format($this->getSubmittedValue('amount'), $this->contributionRecur['currency']),
             ]) . ' ';
-        if ($this->_subscriptionDetails->amount < $params['amount']) {
+        if ($this->contributionRecur['amount'] < $this->getSubmittedValue('amount')) {
           $msg = ts('Recurring Contribution Updated - increased installment amount');
         }
         else {
@@ -276,10 +322,10 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
         }
       }
 
-      if ($this->_subscriptionDetails->installments != $params['installments']) {
+      if ($this->contributionRecur['installments'] !== $this->getSubmittedValue('installments')) {
         $message .= "<br /> " . ts("Recurring contribution installments have been updated from %1 to %2 for this subscription.", [
-          1 => $this->_subscriptionDetails->installments,
-          2 => $params['installments'],
+          1 => $this->contributionRecur['installments'],
+          2 => $this->getSubmittedValue('installments'),
         ]) . ' ';
       }
 
@@ -301,8 +347,8 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       }
       CRM_Activity_BAO_Activity::create($activityParams);
 
-      if (!empty($params['is_notify'])) {
-        $receiptFrom = CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID());
+      if ($isNotify) {
+        $receiptFrom = CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->contributionRecur['id']);
 
         [$donorDisplayName, $donorEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
 
@@ -311,12 +357,12 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
           'workflow' => 'contribution_recurring_edit',
           'contactId' => $contactID,
           'tplParams' => ['receipt_from_email' => $receiptFrom],
-          'isTest' => $this->_subscriptionDetails->is_test,
+          'isTest' => $this->contributionRecur['is_test'],
           'PDFFilename' => 'receipt.pdf',
           'from' => $receiptFrom,
           'toName' => $donorDisplayName,
           'toEmail' => $donorEmail,
-          'tokenContext' => ['contribution_recurId' => $this->getContributionRecurID()],
+          'tokenContext' => ['contribution_recurId' => $this->contributionRecur['id']],
         ];
         CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
