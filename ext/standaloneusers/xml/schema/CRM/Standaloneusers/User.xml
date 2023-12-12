@@ -82,6 +82,8 @@
     <comment>FK to Contact ID</comment>
     <html>
       <label>Contact</label>
+      <type>EntityRef</type>
+      <filter>contact_type=Individual</filter>
     </html>
     <add>1.1</add>
   </field>
