@@ -98,6 +98,10 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
+    if ($this->_action & CRM_Core_Action::VIEW) {
+      $this->view();
+      return;
+    }
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons([
           [
@@ -175,6 +179,26 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $this->setEntityId($note->id);
 
     CRM_Core_Session::setStatus(ts('Your Note has been saved.'), ts('Saved'), 'success');
+  }
+
+  /**
+   * View details of a note.
+   */
+  private function view() {
+    $note = \Civi\Api4\Note::get()
+      ->addSelect('*', 'privacy:label')
+      ->addWhere('id', '=', $this->_id)
+      ->execute()
+      ->single();
+    $note['privacy'] = $note['privacy:label'];
+    $this->assign('note', $note);
+
+    $comments = CRM_Core_BAO_Note::getNoteTree($this->_id, 1);
+    $this->assign('comments', $comments);
+
+    // add attachments part
+    $currentAttachmentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_note', $this->_id);
+    $this->assign('currentAttachmentInfo', $currentAttachmentInfo);
   }
 
 }
