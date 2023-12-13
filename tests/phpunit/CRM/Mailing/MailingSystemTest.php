@@ -170,7 +170,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
     $replyComponent = $this->callAPISuccess('MailingComponent', 'get', ['id' => CRM_Mailing_PseudoConstant::defaultComponent('Reply', ''), 'sequential' => 1])['values'][0];
     $replyComponent['body_html'] .= ' {domain.address} ';
-    $replyComponent['body_txt'] = $replyComponent['body_txt'] ?? '' . ' {domain.address} ';
+    $replyComponent['body_txt'] = ($replyComponent['body_txt'] ?? '') . ' {domain.address} ';
     $this->callAPISuccess('MailingComponent', 'create', $replyComponent);
 
     // Create initial mailing to the group.
