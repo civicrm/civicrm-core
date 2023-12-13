@@ -136,7 +136,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       ], $fieldDefaults);
       $field += $defaults + $fieldDefaults;
       if (array_key_exists('label', $fieldDefaults)) {
-        $field['label'] = $field['label'] ?? $field['title'] ?? $field['name'];
+        $field['label'] ??= $field['title'] ?? $field['name'];
       }
       if (isset($field['options']) && is_array($field['options']) && empty($field['suffixes']) && array_key_exists('suffixes', $field)) {
         $this->setFieldSuffixes($field);

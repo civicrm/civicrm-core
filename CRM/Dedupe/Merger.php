@@ -1651,7 +1651,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $mainContactValue = $mainTree[$gid]['fields'][$fid]['customValue'] ?? NULL;
         $otherContactValue = $otherTree[$gid]['fields'][$fid]['customValue'] ?? NULL;
         if (in_array($fid, $compareFields['custom'])) {
-          $rows["custom_group_$gid"]['title'] = $rows["custom_group_$gid"]['title'] ?? $group['title'];
+          $rows["custom_group_$gid"]['title'] ??= $group['title'];
 
           if ($mainContactValue) {
             foreach ($mainContactValue as $valueId => $values) {

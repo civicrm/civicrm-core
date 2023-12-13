@@ -43,9 +43,9 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP implements \Civi\Core\HookInterfac
     if ($event->action === 'create') {
       // For some reason `status_id` is allowed to be empty
       // FIXME: Why?
-      $event->params['status_id'] = $event->params['status_id'] ?? 0;
+      $event->params['status_id'] ??= 0;
       // Supply default for `currency`
-      $event->params['currency'] = $event->params['currency'] ?? Civi::settings()->get('defaultCurrency');
+      $event->params['currency'] ??= Civi::settings()->get('defaultCurrency');
     }
   }
 

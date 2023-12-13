@@ -947,7 +947,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
     $validPriceFieldIds = array_keys($form->_priceSet['fields']);
 
-    $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetId;
+    $form->_priceSet['id'] ??= $priceSetId;
     $form->assign('priceSet', $form->_priceSet);
 
     $feeBlock = &$form->_priceSet['fields'];

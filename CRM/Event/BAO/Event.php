@@ -102,7 +102,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
         // unless we are explicitly trying to create a new template
         // we want to set the `is_template` flag on the clone to false
         // so that the copy is a new event rather than a new template
-        $params['is_template'] = $params['is_template'] ?? 0;
+        $params['is_template'] ??= 0;
 
         //fix for api from template creation bug
         civicrm_api4('ActionSchedule', 'update', [
@@ -2043,7 +2043,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @throws \CRM_Core_Exception
    */
   public static function checkPermission(int $eventId, $permissionType = CRM_Core_Permission::VIEW, $userId = NULL) {
-    $userId = $userId ?? CRM_Core_Session::getLoggedInContactID();
+    $userId ??= CRM_Core_Session::getLoggedInContactID();
     switch ($permissionType) {
       case CRM_Core_Permission::EDIT:
         // We also set the cached "view" permission to TRUE if "edit" is TRUE

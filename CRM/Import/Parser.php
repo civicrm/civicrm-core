@@ -848,7 +848,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   protected function checkContactDuplicate(&$formatValues) {
     //retrieve contact id using contact dedupe rule
-    $formatValues['contact_type'] = $formatValues['contact_type'] ?? $this->getContactType();
+    $formatValues['contact_type'] ??= $this->getContactType();
     $formatValues['version'] = 3;
     $params = $formatValues;
     static $cIndieFields = NULL;

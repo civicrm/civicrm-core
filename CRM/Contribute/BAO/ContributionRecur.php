@@ -504,7 +504,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       $templateContributionParams['on_behalf'] = TRUE;
       $templateContributionParams['source_contact_id'] = $relatedContact['individual_id'];
     }
-    $templateContributionParams['source'] = $templateContributionParams['source'] ?? ts('Recurring contribution');
+    $templateContributionParams['source'] ??= ts('Recurring contribution');
     $templateContribution = Contribution::create(FALSE)
       ->setValues($templateContributionParams)
       ->execute()

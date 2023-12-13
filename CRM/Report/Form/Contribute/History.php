@@ -494,7 +494,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
    * @return array
    */
   public function limit($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     return parent::limit($rowCount);
   }
 
@@ -504,7 +504,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
    * @param int|null $rowCount
    */
   public function setPager($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     parent::setPager($rowCount);
   }
 

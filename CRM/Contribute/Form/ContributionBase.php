@@ -1162,8 +1162,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         ->addWhere('id', '=', $selectedMembershipTypeID)
         ->execute()
         ->first();
-      $this->_params['frequency_interval'] = $this->_params['frequency_interval'] ?? $this->_values['fee'][$priceFieldId]['options'][$priceFieldValue]['membership_num_terms'];
-      $this->_params['frequency_unit'] = $this->_params['frequency_unit'] ?? $membershipTypeDetails['duration_unit'];
+      $this->_params['frequency_interval'] ??= $this->_values['fee'][$priceFieldId]['options'][$priceFieldValue]['membership_num_terms'];
+      $this->_params['frequency_unit'] ??= $membershipTypeDetails['duration_unit'];
     }
     elseif (!$this->_separateMembershipPayment && (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_required'])
       || in_array($selectedMembershipTypeID, $membershipTypes['autorenew_optional']))) {

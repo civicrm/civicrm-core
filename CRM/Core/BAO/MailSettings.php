@@ -136,8 +136,8 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     }
 
     if (empty($params['id'])) {
-      $params['is_ssl'] = $params['is_ssl'] ?? FALSE;
-      $params['is_default'] = $params['is_default'] ?? FALSE;
+      $params['is_ssl'] ??= FALSE;
+      $params['is_default'] ??= FALSE;
     }
 
     //handle is_default.

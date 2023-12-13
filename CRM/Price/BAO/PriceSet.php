@@ -836,7 +836,7 @@ WHERE  id = %1";
         }
       }
     }
-    $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetId;
+    $form->_priceSet['id'] ??= $priceSetId;
     $form->assign('priceSet', $form->_priceSet);
 
     if ($className == 'CRM_Contribute_Form_Contribution_Main') {

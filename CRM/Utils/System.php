@@ -254,8 +254,8 @@ class CRM_Utils_System {
     $forceBackend = FALSE
   ) {
     // handle legacy null params
-    $path = $path ?? '';
-    $query = $query ?? '';
+    $path ??= '';
+    $query ??= '';
 
     $query = self::makeQueryString($query);
 

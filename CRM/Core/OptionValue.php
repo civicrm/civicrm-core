@@ -181,7 +181,7 @@ class CRM_Core_OptionValue {
    *
    */
   public static function addOptionValue(&$params, $optionGroupName, $action, $optionValueID) {
-    $params['is_active'] = $params['is_active'] ?? FALSE;
+    $params['is_active'] ??= FALSE;
     // checking if the group name with the given id or name (in $groupParams) exists
     $groupParams = ['name' => $optionGroupName, 'is_active' => 1];
     $optionGroup = CRM_Core_BAO_OptionGroup::retrieve($groupParams, $defaults);

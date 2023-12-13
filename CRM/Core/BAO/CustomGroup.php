@@ -2558,7 +2558,7 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
       ];
     }
     foreach ($options as &$option) {
-      $option['icon'] = $option['icon'] ?? \Civi\Api4\Utils\CoreUtil::getInfoItem($option['id'], 'icon');
+      $option['icon'] ??= \Civi\Api4\Utils\CoreUtil::getInfoItem($option['id'], 'icon');
     }
     return $options;
   }

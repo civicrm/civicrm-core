@@ -151,7 +151,7 @@ WHERE contact_id IN ({$contact_id_list})
    */
   public static function allow($id, $type = CRM_Core_Permission::VIEW, $userID = NULL) {
     // Default to logged in user if not supplied
-    $userID = $userID ?? CRM_Core_Session::getLoggedInContactID();
+    $userID ??= CRM_Core_Session::getLoggedInContactID();
 
     // first: check if contact is trying to view own contact
     if ($userID == $id && ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')
@@ -389,7 +389,7 @@ AND    $operationClause
     }
 
     // Default to currently logged in user
-    $userID = $userID ?? CRM_Core_Session::getLoggedInContactID();
+    $userID ??= CRM_Core_Session::getLoggedInContactID();
     if (empty($userID)) {
       return [];
     }

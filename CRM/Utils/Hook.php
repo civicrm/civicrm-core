@@ -651,7 +651,7 @@ abstract class CRM_Utils_Hook {
   public static function selectWhereClause($entity, array &$clauses, int $userId = NULL, array $conditions = []): void {
     $entityName = is_object($entity) ? CRM_Core_DAO_AllCoreTables::getBriefName(get_class($entity)) : $entity;
     $null = NULL;
-    $userId = $userId ?? (int) CRM_Core_Session::getLoggedInContactID();
+    $userId ??= (int) CRM_Core_Session::getLoggedInContactID();
     self::singleton()->invoke(['entity', 'clauses', 'userId', 'conditions'],
       $entityName, $clauses, $userId, $conditions,
       $null, $null,

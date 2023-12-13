@@ -267,7 +267,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
       $params['id'] = $this->_widget->id;
     }
     $params['contribution_page_id'] = $this->_id;
-    $params['is_active'] = $params['is_active'] ?? FALSE;
+    $params['is_active'] ??= FALSE;
     $params['url_homepage'] = 'null';
 
     $widget = new CRM_Contribute_DAO_Widget();

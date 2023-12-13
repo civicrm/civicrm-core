@@ -239,7 +239,7 @@ class CoreUtil {
    * @throws \CRM_Core_Exception
    */
   public static function checkAccessRecord(AbstractAction $apiRequest, array $record, int $userID = NULL): ?bool {
-    $userID = $userID ?? \CRM_Core_Session::getLoggedInContactID() ?? 0;
+    $userID ??= \CRM_Core_Session::getLoggedInContactID() ?? 0;
     $idField = self::getIdFieldName($apiRequest->getEntityName());
 
     // Super-admins always have access to everything

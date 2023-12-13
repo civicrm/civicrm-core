@@ -328,9 +328,9 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         $params[$field] = CRM_Utils_Rule::cleanMoney(trim($params[$field]));
       }
       $params['price_field_id'] = $this->_fid;
-      $params['is_default'] = $params['is_default'] ?? FALSE;
-      $params['is_active'] = $params['is_active'] ?? FALSE;
-      $params['visibility_id'] = $params['visibility_id'] ?? FALSE;
+      $params['is_default'] ??= FALSE;
+      $params['is_active'] ??= FALSE;
+      $params['visibility_id'] ??= FALSE;
       $ids = [];
       if ($this->_oid) {
         $params['id'] = $this->_oid;

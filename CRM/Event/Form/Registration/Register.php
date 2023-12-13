@@ -669,7 +669,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           }
         }
       }
-      $form->_priceSet['id'] = $form->_priceSet['id'] ?? $priceSetID;
+      $form->_priceSet['id'] ??= $priceSetID;
       $form->assign('priceSet', $form->_priceSet);
     }
     else {

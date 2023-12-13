@@ -162,10 +162,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     }
 
     // provide defaults for required fields if empty (and as a 'hint' for approval message field)
-    $defaults['registration_link_text'] = $defaults['registration_link_text'] ?? ts('Register Now');
-    $defaults['confirm_title'] = $defaults['confirm_title'] ?? ts('Confirm Your Registration Information');
-    $defaults['thankyou_title'] = $defaults['thankyou_title'] ?? ts('Thank You for Registering');
-    $defaults['approval_req_text'] = $defaults['approval_req_text'] ?? ts('Participation in this event requires approval. Submit your registration request here. Once approved, you will receive an email with a link to a web page where you can complete the registration process.');
+    $defaults['registration_link_text'] ??= ts('Register Now');
+    $defaults['confirm_title'] ??= ts('Confirm Your Registration Information');
+    $defaults['thankyou_title'] ??= ts('Thank You for Registering');
+    $defaults['approval_req_text'] ??= ts('Participation in this event requires approval. Submit your registration request here. Once approved, you will receive an email with a link to a web page where you can complete the registration process.');
 
     return $defaults;
   }
@@ -783,12 +783,12 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $params['id'] = $this->_id;
 
     // format params
-    $params['is_online_registration'] = $params['is_online_registration'] ?? FALSE;
+    $params['is_online_registration'] ??= FALSE;
     // CRM-11182
-    $params['is_confirm_enabled'] = $params['is_confirm_enabled'] ?? FALSE;
-    $params['is_multiple_registrations'] = $params['is_multiple_registrations'] ?? FALSE;
-    $params['allow_same_participant_emails'] = $params['allow_same_participant_emails'] ?? FALSE;
-    $params['requires_approval'] = $params['requires_approval'] ?? FALSE;
+    $params['is_confirm_enabled'] ??= FALSE;
+    $params['is_multiple_registrations'] ??= FALSE;
+    $params['allow_same_participant_emails'] ??= FALSE;
+    $params['requires_approval'] ??= FALSE;
 
     // reset is_email confirm if not online reg
     if (!$params['is_online_registration']) {

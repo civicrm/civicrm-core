@@ -188,7 +188,7 @@ class AutocompleteAction extends AbstractAction {
       if (!$initialSearchById && !empty($this->display['settings']['columns'][0]['rewrite'])) {
         $searchFields = array_merge($searchFields, $this->getTokens($this->display['settings']['columns'][0]['rewrite']));
       }
-      $this->display['settings']['limit'] = $this->display['settings']['limit'] ?? \Civi::settings()->get('search_autocomplete_count');
+      $this->display['settings']['limit'] ??= \Civi::settings()->get('search_autocomplete_count');
       $this->display['settings']['pager'] = [];
       $return = 'scroll:' . $this->page;
       // SearchKit treats comma-separated fieldnames as OR clauses

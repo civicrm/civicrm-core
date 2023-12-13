@@ -49,7 +49,7 @@ class Security {
     }
 
     // NULL means the current logged-in user
-    $userID = $userID ?? $this->getLoggedInUfID() ?? 0;
+    $userID ??= $this->getLoggedInUfID() ?? 0;
 
     if (!isset(\Civi::$statics[__METHOD__][$userID])) {
 

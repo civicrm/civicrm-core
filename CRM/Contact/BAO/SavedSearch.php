@@ -250,9 +250,9 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
       $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
       if ($loggedInContactID) {
         if ($event->action === 'create') {
-          $event->params['created_id'] = $event->params['created_id'] ?? $loggedInContactID;
+          $event->params['created_id'] ??= $loggedInContactID;
         }
-        $event->params['modified_id'] = $event->params['modified_id'] ?? $loggedInContactID;
+        $event->params['modified_id'] ??= $loggedInContactID;
       }
       // Set by mysql
       unset($event->params['modified_date']);

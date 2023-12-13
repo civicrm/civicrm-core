@@ -1162,7 +1162,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
 
     // The latter format would be normal here - it's unclear if it is sometimes in the former format.
-    $row['membership_type_id'] = $row['membership_type_id'] ?? $row['membership_type'][1];
+    $row['membership_type_id'] ??= $row['membership_type'][1];
     unset($row['membership_type']);
     // total_amount is required.
     $row['total_amount'] = (float) $row['total_amount'];

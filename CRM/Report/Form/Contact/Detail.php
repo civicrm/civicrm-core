@@ -797,7 +797,7 @@ HERESQL;
    * @param int|null $rowCount
    */
   public function limit($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     parent::limit($rowCount);
   }
 
@@ -806,7 +806,7 @@ HERESQL;
    * @param int|null $rowCount
    */
   public function setPager($rowCount = NULL): void {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     parent::setPager($rowCount);
   }
 

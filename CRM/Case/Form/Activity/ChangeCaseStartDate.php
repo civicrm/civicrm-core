@@ -186,7 +186,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
 
       // @todo This can go eventually but is still needed to keep them linked together if there is an existing revision. Just focusing right now on not creating new revisions.
       // original_id always refers to the first activity, so if it's null or missing, then it means no previous revisions and we can keep it null.
-      $openCaseParams['original_id'] = $openCaseParams['original_id'] ?? NULL;
+      $openCaseParams['original_id'] ??= NULL;
 
       $newActivity = CRM_Activity_BAO_Activity::create($openCaseParams);
       if (is_a($newActivity, 'CRM_Core_Error')) {
