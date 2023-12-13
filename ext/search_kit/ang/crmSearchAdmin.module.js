@@ -88,7 +88,7 @@
       // Changing entity will refresh the angular page
       $scope.$watch('$ctrl.savedSearch.api_entity', function(newEntity, oldEntity) {
         if (newEntity && oldEntity && newEntity !== oldEntity) {
-          $location.url('/create/' + newEntity + (ctrl.savedSearch.label ? '?label=' + ctrl.savedSearch.label : ''));
+          $location.url('/create/' + newEntity + ($routeParams.label ? '?label=' + $routeParams.label : ''));
         }
       });
     })
