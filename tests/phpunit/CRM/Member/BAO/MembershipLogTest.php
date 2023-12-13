@@ -163,7 +163,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    */
   private function setupMembership($modifiedID = NULL): array {
     $contactID = $this->individualCreate();
-    $modifiedID = $modifiedID ?? $contactID;
+    $modifiedID ??= $contactID;
 
     $params = [
       'contact_id' => $contactID,

@@ -79,7 +79,7 @@ class CRM_Core_Action {
   ];
 
   private static function getInfo(): array {
-    Civi::$statics[__CLASS__ . 'Info'] = Civi::$statics[__CLASS__ . 'Info'] ?? [
+    Civi::$statics[__CLASS__ . 'Info'] ??= [
       self::ADD => [
         'name' => 'add',
         'label' => ts('Add'),

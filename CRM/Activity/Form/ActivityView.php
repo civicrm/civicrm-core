@@ -88,11 +88,11 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     }
 
     // ensure these are set so that they get assigned to the template
-    $values['mailingId'] = $values['mailingId'] ?? NULL;
-    $values['campaign'] = $values['campaign'] ?? NULL;
-    $values['engagement_level'] = $values['engagement_level'] ?? NULL;
+    $values['mailingId'] ??= NULL;
+    $values['campaign'] ??= NULL;
+    $values['engagement_level'] ??= NULL;
     // also this which doesn't get set for bulk emails
-    $values['target_contact_value'] = $values['target_contact_value'] ?? NULL;
+    $values['target_contact_value'] ??= NULL;
 
     // Get the campaign.
     $campaignId = $defaults['campaign_id'] ?? NULL;

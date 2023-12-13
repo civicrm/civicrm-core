@@ -73,7 +73,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
    * @deprecated
    */
   public static function retrieve(array $params, ?array &$defaults = NULL) {
-    $defaults = $defaults ?? [];
+    $defaults ??= [];
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 

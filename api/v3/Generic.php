@@ -63,7 +63,7 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
   $subentity = $apiRequest['params']['contact_type'] ?? NULL;
   $action = $apiRequest['params']['action'] ?? NULL;
   $sequential = empty($apiRequest['params']['sequential']) ? 0 : 1;
-  $apiRequest['params']['options'] = $apiRequest['params']['options'] ?? [];
+  $apiRequest['params']['options'] ??= [];
   $optionsToResolve = (array) ($apiRequest['params']['options']['get_options'] ?? []);
 
   if (!$action || $action == 'getvalue' || $action == 'getcount') {

@@ -256,7 +256,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     }
     else {
       $params = $this->controller->exportValues($this->_name);
-      $params['is_active'] = $params['is_active'] ?? FALSE;
+      $params['is_active'] ??= FALSE;
       $params['entity_table'] = 'civicrm_acl_role';
 
       // Figure out which type of object we're permissioning on and set object_table and object_id.

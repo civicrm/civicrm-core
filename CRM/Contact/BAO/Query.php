@@ -5344,7 +5344,7 @@ civicrm_relationship.start_date > {$today}
       }
 
       if ($secondDate) {
-        $highDBFieldName = $highDBFieldName ?? $dbFieldName;
+        $highDBFieldName ??= $dbFieldName;
         $this->_where[$grouping][] = "
 ( {$tableName}.{$dbFieldName} $firstOP '$firstDate' ) AND
 ( {$tableName}.{$highDBFieldName} $secondOP '$secondDate' )
@@ -5398,8 +5398,8 @@ civicrm_relationship.start_date > {$today}
     }
 
     // Ensure the tables are set, but don't whomp anything.
-    $this->_tables[$tableName] = $this->_tables[$tableName] ?? 1;
-    $this->_whereTables[$tableName] = $this->_whereTables[$tableName] ?? 1;
+    $this->_tables[$tableName] ??= 1;
+    $this->_whereTables[$tableName] ??= 1;
   }
 
   /**
@@ -7056,8 +7056,8 @@ AND   displayRelType.is_active = 1
     $filters = CRM_Core_OptionGroup::values('relative_date_filters');
     $grouping = $values[3] ?? NULL;
     // If the table value is already set for a custom field it will be more nuanced than just '1'.
-    $this->_tables[$tableName] = $this->_tables[$tableName] ?? 1;
-    $this->_whereTables[$tableName] = $this->_whereTables[$tableName] ?? 1;
+    $this->_tables[$tableName] ??= 1;
+    $this->_whereTables[$tableName] ??= 1;
 
     $dates = CRM_Utils_Date::getFromTo($value, NULL, NULL);
     // Where end would be populated only if we are handling one of the weird ones with different from & to fields.

@@ -1197,7 +1197,7 @@ Attendees will need to install the [TeleFoo](http://telefoo.example.com) app.';
    * @return string
    */
   protected function renderText(array $rowContext, string $text, array $context = [], $isHtml = TRUE): string {
-    $context['schema'] = $context['schema'] ?? [];
+    $context['schema'] ??= [];
     foreach (array_keys($rowContext) as $key) {
       $context['schema'][] = $key;
     }

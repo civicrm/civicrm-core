@@ -39,7 +39,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
       'httpx' => $_SERVER['HTTP_X_REQUESTED_WITH'] ?? NULL,
     ];
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
-    $_SERVER['HTTP_REFERER'] = $_SERVER['HTTP_REFERER'] ?? NULL;
+    $_SERVER['HTTP_REFERER'] ??= NULL;
     http_response_code(200);
   }
 

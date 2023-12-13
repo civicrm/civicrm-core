@@ -331,8 +331,8 @@ WHERE  title = %1
         $params['group_type'] = [];
       }
 
-      $params['is_reserved'] = $params['is_reserved'] ?? FALSE;
-      $params['is_active'] = $params['is_active'] ?? FALSE;
+      $params['is_reserved'] ??= FALSE;
+      $params['is_active'] ??= FALSE;
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
         $this->_id,
         'Group'

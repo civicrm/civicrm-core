@@ -50,9 +50,9 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @return object
    */
   public static function create(&$params) {
-    $params['is_active'] = $params['is_active'] ?? FALSE;
-    $params['is_default'] = $params['is_default'] ?? FALSE;
-    $params['is_reserved'] = $params['is_reserved'] ?? FALSE;
+    $params['is_active'] ??= FALSE;
+    $params['is_default'] ??= FALSE;
+    $params['is_reserved'] ??= FALSE;
 
     $params['label_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_PrintLabel', 'label_type_id', 'Event Badge');
 

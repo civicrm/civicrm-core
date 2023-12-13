@@ -391,7 +391,7 @@ class CRM_Core_CodeGen_Specification {
     $field['usage'] = array_merge(array_fill_keys(['import', 'export', 'duplicate_matching'], $import), $usage);
     // Usage for tokens has not historically been in the metadata so we can default to FALSE.
     // historically hard-coded lists have been used.
-    $field['usage']['token'] = $field['usage']['token'] ?? 'FALSE';
+    $field['usage']['token'] ??= 'FALSE';
     $field['import'] = $field['usage']['import'];
     $field['export'] = $export ?? $import;
     $field['rule'] = $this->value('rule', $fieldXML);

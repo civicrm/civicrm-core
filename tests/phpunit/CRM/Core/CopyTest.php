@@ -102,7 +102,7 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
 
     // init in case it's not defined
     foreach ($locParams as $field) {
-      $eventData[$field] = $eventData[$field] ?? '';
+      $eventData[$field] ??= '';
     }
 
     // differencing the data in original content for each locales

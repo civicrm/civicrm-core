@@ -425,7 +425,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       if (!empty($entity['data'])) {
         // If no submitted values but data exists, fill the minimum number of records
         for ($index = 0; $index < $entity['min']; $index++) {
-          $entityValues[$entityName][$index] = $entityValues[$entityName][$index] ?? ['fields' => []];
+          $entityValues[$entityName][$index] ??= ['fields' => []];
         }
         // Predetermined values override submitted values
         foreach ($entityValues[$entityName] as $index => $vals) {

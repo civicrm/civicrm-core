@@ -535,7 +535,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       $attributes['data-crm-datepicker'] = json_encode((array) $extra);
       if (!empty($attributes['aria-label']) || $label) {
-        $attributes['aria-label'] = $attributes['aria-label'] ?? $label;
+        $attributes['aria-label'] ??= $label;
       }
       $type = 'text';
     }
@@ -1114,7 +1114,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected function handlePreApproval(&$params) {
     try {
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-      $params['component'] = $params['component'] ?? 'contribute';
+      $params['component'] ??= 'contribute';
       $result = $payment->doPreApproval($params);
       if (empty($result)) {
         // This could happen, for example, when paypal looks at the button value & decides it is not paypal express.
@@ -1426,7 +1426,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
       }
       // We use a class here to avoid html5 issues with collapsed cutsomfield sets.
-      $optAttributes['class'] = $optAttributes['class'] ?? '';
+      $optAttributes['class'] ??= '';
       if ($required) {
         $optAttributes['class'] .= ' required';
       }
@@ -1856,7 +1856,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
       if ($context == 'search') {
         $widget = $widget == 'Select2' ? $widget : 'Select';
-        $props['multiple'] = $props['multiple'] ?? TRUE;
+        $props['multiple'] ??= TRUE;
       }
       elseif (!empty($fieldSpec['serialize'])) {
         $props['multiple'] = TRUE;
@@ -1894,7 +1894,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Number':
       case 'Email':
         //TODO: Autodetect ranges
-        $props['size'] = $props['size'] ?? 60;
+        $props['size'] ??= 60;
         return $this->add(strtolower($widget), $name, $label, $props, $required);
 
       case 'hidden':
@@ -1902,8 +1902,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'TextArea':
         //Set default columns and rows for textarea.
-        $props['rows'] = $props['rows'] ?? 4;
-        $props['cols'] = $props['cols'] ?? 60;
+        $props['rows'] ??= 4;
+        $props['cols'] ??= 60;
         if (empty($props['maxlength']) && isset($fieldSpec['length'])) {
           $props['maxlength'] = $fieldSpec['length'];
         }
@@ -1988,7 +1988,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->addEntityRef($name, $label, $props, $required);
 
       case 'Password':
-        $props['size'] = $props['size'] ?? 60;
+        $props['size'] ??= 60;
         return $this->add('password', $name, $label, $props, $required);
 
       // Check datatypes of fields
@@ -2332,7 +2332,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $props['api']['fieldName'] = $this->getDefaultEntity() . '.' . $name;
     }
     $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-autocomplete');
-    $props['placeholder'] = $props['placeholder'] ?? self::selectOrAnyPlaceholder($props, $required);
+    $props['placeholder'] ??= self::selectOrAnyPlaceholder($props, $required);
     $props['data-select-params'] = json_encode($props['select']);
     $props['data-api-params'] = json_encode($props['api']);
     $props['data-api-entity'] = $props['entity'];
@@ -2372,7 +2372,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       unset($props['create']);
     }
 
-    $props['placeholder'] = $props['placeholder'] ?? self::selectOrAnyPlaceholder($props, $required);
+    $props['placeholder'] ??= self::selectOrAnyPlaceholder($props, $required);
 
     $defaults = [];
     if (!empty($props['multiple'])) {

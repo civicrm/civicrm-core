@@ -163,8 +163,8 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         }
       }
       $customOption[$id]['order'] = $customOption[$id]['weight'];
-      $customOption[$id]['help_pre'] = $customOption[$id]['help_pre'] ?? NULL;
-      $customOption[$id]['help_post'] = $customOption[$id]['help_post'] ?? NULL;
+      $customOption[$id]['help_pre'] ??= NULL;
+      $customOption[$id]['help_post'] ??= NULL;
       $customOption[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
         [
           'oid' => $id,

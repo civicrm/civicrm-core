@@ -413,7 +413,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
     // save creator id and time
     if (!$id) {
-      $params['created_id'] = $params['created_id'] ?? CRM_Core_Session::getLoggedInContactID();
+      $params['created_id'] ??= CRM_Core_Session::getLoggedInContactID();
     }
 
     $tag = self::writeRecord($params);

@@ -291,7 +291,7 @@ WHERE  $whereClause
 
     $params['last_modified_id'] = $session->get('userID');
     $params['last_modified_date'] = date('YmdHis');
-    $params['is_share'] = $params['is_share'] ?? FALSE;
+    $params['is_share'] ??= FALSE;
 
     if ($this->_surveyId) {
 
@@ -309,9 +309,9 @@ WHERE  $whereClause
       $params['created_date'] = date('YmdHis');
     }
 
-    $params['bypass_confirm'] = $params['bypass_confirm'] ?? 0;
-    $params['is_active'] = $params['is_active'] ?? 0;
-    $params['is_default'] = $params['is_default'] ?? 0;
+    $params['bypass_confirm'] ??= 0;
+    $params['is_active'] ??= 0;
+    $params['is_default'] ??= 0;
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->getEntityId(), $this->getDefaultEntity());
 

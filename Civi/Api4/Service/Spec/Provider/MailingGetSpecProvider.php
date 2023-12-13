@@ -195,7 +195,7 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
 
     }
 
-    $count = $count ?? "$tableName.event_queue_id";
+    $count ??= "$tableName.event_queue_id";
     $query = "(
       SELECT      COUNT($count)
       FROM        $tableName

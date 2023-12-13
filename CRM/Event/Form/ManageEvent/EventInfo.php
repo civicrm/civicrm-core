@@ -91,9 +91,9 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->assign('description', $defaults['description'] ?? '');
 
     // Provide suggested text for event full and waitlist messages if they're empty
-    $defaults['event_full_text'] = $defaults['event_full_text'] ?? ts('This event is currently full.');
+    $defaults['event_full_text'] ??= ts('This event is currently full.');
 
-    $defaults['waitlist_text'] = $defaults['waitlist_text'] ?? ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.');
+    $defaults['waitlist_text'] ??= ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.');
     $defaults['template_id'] = $this->_templateId;
 
     return $defaults;
@@ -216,15 +216,15 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $params = array_merge($this->controller->exportValues($this->_name), $this->_submitValues);
 
     //format params
-    $params['start_date'] = $params['start_date'] ?? NULL;
-    $params['end_date'] = $params['end_date'] ?? NULL;
-    $params['has_waitlist'] = $params['has_waitlist'] ?? FALSE;
-    $params['is_map'] = $params['is_map'] ?? FALSE;
-    $params['is_active'] = $params['is_active'] ?? FALSE;
-    $params['is_public'] = $params['is_public'] ?? FALSE;
-    $params['is_share'] = $params['is_share'] ?? FALSE;
-    $params['is_show_calendar_links'] = $params['is_show_calendar_links'] ?? FALSE;
-    $params['default_role_id'] = $params['default_role_id'] ?? FALSE;
+    $params['start_date'] ??= NULL;
+    $params['end_date'] ??= NULL;
+    $params['has_waitlist'] ??= FALSE;
+    $params['is_map'] ??= FALSE;
+    $params['is_active'] ??= FALSE;
+    $params['is_public'] ??= FALSE;
+    $params['is_share'] ??= FALSE;
+    $params['is_show_calendar_links'] ??= FALSE;
+    $params['default_role_id'] ??= FALSE;
     $params['id'] = $this->_id;
     //merge params with defaults from templates
     if (!empty($params['template_id'])) {

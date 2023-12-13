@@ -953,7 +953,7 @@ class CRM_Financial_BAO_Order {
       elseif ($taxRate) {
         $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
       }
-      $lineItem['membership_type_id'] = $lineItem['membership_type_id'] ?? NULL;
+      $lineItem['membership_type_id'] ??= NULL;
       if ($lineItem['membership_type_id']) {
         $lineItem['entity_table'] = 'civicrm_membership';
       }
@@ -1219,8 +1219,8 @@ class CRM_Financial_BAO_Order {
       }
     }
     $lineItem['unit_price'] = $lineItem['line_total'] ?? $option['amount'];
-    $lineItem['label'] = $lineItem['label'] ?? $option['label'];
-    $lineItem['field_title'] = $lineItem['field_title'] ?? $option['label'];
+    $lineItem['label'] ??= $option['label'];
+    $lineItem['field_title'] ??= $option['label'];
     $lineItem['financial_type_id'] = $lineItem['financial_type_id'] ?: ($this->getDefaultFinancialTypeID() ?? $option['financial_type_id']);
     return $lineItem;
   }

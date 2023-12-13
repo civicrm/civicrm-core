@@ -2244,7 +2244,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       }
     }
 
-    $contributionParams['source'] = $contributionParams['source'] ?? ts('Recurring contribution');
+    $contributionParams['source'] ??= ts('Recurring contribution');
 
     $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
     $temporaryObject = new CRM_Contribute_BAO_Contribution();

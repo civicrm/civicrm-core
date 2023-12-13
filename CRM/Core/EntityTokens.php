@@ -641,7 +641,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if ($field['type'] !== 'Custom' && !$isExposed) {
       return;
     }
-    $field['audience'] = $field['audience'] ?? 'user';
+    $field['audience'] ??= 'user';
     if ($field['name'] === 'contact_id') {
       // Since {contact.id} is almost always present don't confuse users
       // by also adding (e.g {participant.contact_id)

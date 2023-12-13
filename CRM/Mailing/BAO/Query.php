@@ -450,8 +450,8 @@ class CRM_Mailing_BAO_Query {
    */
   public static function tableNames(&$tables) {
     if (isset($tables['civicrm_mailing_job'])) {
-      $tables['civicrm_mailing'] = $tables['civicrm_mailing'] ?? 1;
-      $tables['civicrm_mailing_recipients'] = $tables['civicrm_mailing_recipients'] ?? 1;
+      $tables['civicrm_mailing'] ??= 1;
+      $tables['civicrm_mailing_recipients'] ??= 1;
     }
   }
 

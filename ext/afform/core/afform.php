@@ -221,7 +221,7 @@ function afform_civicrm_pageRun(&$page) {
     // If Afform specifies a contact type, lookup the contact and compare
     if (!empty($afform['summary_contact_type'])) {
       // Contact.get only needs to happen once
-      $contact = $contact ?? civicrm_api4('Contact', 'get', [
+      $contact ??= civicrm_api4('Contact', 'get', [
         'select' => ['contact_type', 'contact_sub_type'],
         'where' => [['id', '=', $cid]],
       ])->first();

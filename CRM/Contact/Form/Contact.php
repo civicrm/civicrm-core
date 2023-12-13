@@ -1055,7 +1055,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     if (array_key_exists('CommunicationPreferences', $this->_editOptions)) {
       // this is a chekbox, so mark false if we dont get a POST value
-      $params['is_opt_out'] = $params['is_opt_out'] ?? FALSE;
+      $params['is_opt_out'] ??= FALSE;
 
       CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
     }

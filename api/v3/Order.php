@@ -131,7 +131,7 @@ function civicrm_api3_order_create(array $params): array {
         && (!CRM_Event_BAO_ParticipantStatusType::getIsValidStatusForClass($entityParams['participant_status_id'], 'Pending'))) {
         throw new CRM_Core_Exception('Creating a participant via the Order API with a non "pending" status is not supported');
       }
-      $entityParams['participant_status_id'] = $entityParams['participant_status_id'] ?? 'Pending from incomplete transaction';
+      $entityParams['participant_status_id'] ??= 'Pending from incomplete transaction';
       $entityParams['status_id'] = $entityParams['participant_status_id'];
       $entityParams['skipLineItem'] = TRUE;
       $entityResult = civicrm_api3('Participant', 'create', $entityParams);

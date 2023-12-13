@@ -490,7 +490,7 @@ function civicrm_api3_contribution_completetransaction($params): array {
     throw new CRM_Core_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
 
-  $params['trxn_id'] = $params['trxn_id'] ?? $contribution->trxn_id;
+  $params['trxn_id'] ??= $contribution->trxn_id;
 
   $passThroughParams = [
     'fee_amount',

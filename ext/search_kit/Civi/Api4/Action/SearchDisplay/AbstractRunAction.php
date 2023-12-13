@@ -118,7 +118,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
 
     $this->_apiParams['checkPermissions'] = $this->savedSearch['api_params']['checkPermissions'] = empty($this->display['acl_bypass']);
-    $this->display['settings']['columns'] = $this->display['settings']['columns'] ?? [];
+    $this->display['settings']['columns'] ??= [];
 
     $this->processResult($result);
   }
@@ -388,7 +388,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $iconClass = \CRM_Utils_Array::first(array_filter((array) $data[$iconField]));
         }
       }
-      $iconClass = $iconClass ?? $icon['icon'];
+      $iconClass ??= $icon['icon'];
       if ($iconClass && !empty($icon['if'])) {
         $condition = $this->getRuleCondition($icon['if'], $isMulti);
         if (!is_null($condition[0]) && !(self::filterCompare($data, $condition, $isMulti ? $index : NULL))) {

@@ -93,10 +93,10 @@ class CRM_Utils_Recent {
         return [];
       }
     }
-    $params['title'] = $params['title'] ?? self::getTitle($params['entity_type'], $params['entity_id']);
-    $params['view_url'] = $params['view_url'] ?? self::getUrl($params['entity_type'], $params['entity_id'], 'view');
-    $params['edit_url'] = $params['edit_url'] ?? self::getUrl($params['entity_type'], $params['entity_id'], 'update');
-    $params['delete_url'] = $params['delete_url'] ?? (empty($params['is_deleted']) ? self::getUrl($params['entity_type'], $params['entity_id'], 'delete') : NULL);
+    $params['title'] ??= self::getTitle($params['entity_type'], $params['entity_id']);
+    $params['view_url'] ??= self::getUrl($params['entity_type'], $params['entity_id'], 'view');
+    $params['edit_url'] ??= self::getUrl($params['entity_type'], $params['entity_id'], 'update');
+    $params['delete_url'] ??= (empty($params['is_deleted']) ? self::getUrl($params['entity_type'], $params['entity_id'], 'delete') : NULL);
     self::add($params['title'], $params['view_url'], $params['entity_id'], $params['entity_type'], $params['contact_id'] ?? NULL, NULL, $params);
     return $params;
   }
