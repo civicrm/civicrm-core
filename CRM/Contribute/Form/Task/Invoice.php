@@ -373,6 +373,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'amount' => $contribution->total_amount,
         'amountDue' => $amountDue,
         'amountPaid' => $amountPaid,
+        // @todo nused in shipped template from 5.69
         'invoice_date' => $invoiceDate,
         'dueDate' => $dueDate,
         'notes' => $invoiceNotes,
