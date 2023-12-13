@@ -980,7 +980,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       //add contribution record
       $contributions[] = $contribution = $this->processContribution(
-        $this->_params,
         $result, $contactID,
         FALSE,
         $this->_paymentProcessor
@@ -1501,7 +1500,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Process the contribution.
    *
-   * @param array $params
    * @param array $result
    * @param int $contactID
    * @param bool $pending
@@ -1511,7 +1509,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @throws \CRM_Core_Exception
    */
-  protected function processContribution($params, $result, $contactID,
+  protected function processContribution($result, $contactID,
     $pending = FALSE,
     $paymentProcessor = NULL
   ) {
