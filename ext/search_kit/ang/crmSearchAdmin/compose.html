@@ -1,7 +1,7 @@
 <div class="crm-flex-box">
   <div class="crm-search-criteria-column">
-    <div ng-if=":: $ctrl.paramExists('join')">
-      <fieldset ng-repeat="join in $ctrl.savedSearch.api_params.join">
+    <div ng-if=":: $ctrl.paramExists('join')" class="crm-search-joins">
+      <fieldset ng-repeat="join in $ctrl.savedSearch.api_params.join" class="crm-search-join">
         <div class="form-inline">
           <select class="form-control" ng-model="join[1]" ng-change="$ctrl.changeJoinType(join)" ng-options="o.k as o.v for o in ::joinTypes" ></select>
           <input id="crm-search-join-{{ $index }}" class="form-control huge" ng-model="join[0]" crm-ui-select="{placeholder: ' ', data: getJoinEntities}" disabled >
@@ -13,7 +13,7 @@
           <crm-search-clause clauses="join" format="json" skip="2 + getJoin(join[0]).conditions.length" op="AND" label="{{:: ts('If') }}" hide-label="true" placeholder="ts('Add Condition')" fields="fieldsForJoin(join[0])" ></crm-search-clause>
         </div>
       </fieldset>
-      <fieldset>
+      <fieldset class="crm-search-join-add">
         <div class="form-inline">
           <select class="form-control" ng-model="controls.joinType" ng-options="o.k as o.v for o in ::joinTypes" ></select>
           <input id="crm-search-add-join"
@@ -23,8 +23,8 @@
         </div>
       </fieldset>
     </div>
-    <fieldset ng-if=":: $ctrl.paramExists('groupBy')">
-      <div class="form-inline" ng-repeat="groupBy in $ctrl.savedSearch.api_params.groupBy">
+    <fieldset ng-if=":: $ctrl.paramExists('groupBy')" class="crm-search-groupbys">
+      <div class="form-inline" ng-repeat="groupBy in $ctrl.savedSearch.api_params.groupBy" class="crm-search-groupby">
         <label for="crm-search-groupBy-{{ $index }}">{{:: ts('Group By') }}</label>
         <crm-search-function class="form-group" expr="$ctrl.savedSearch.api_params.groupBy[$index]" mode="groupBy"></crm-search-function>
         <span ng-if="!$ctrl.hasFunction($ctrl.savedSearch.api_params.groupBy[$index])">
@@ -32,7 +32,7 @@
         </span>
         <hr>
       </div>
-      <div class="form-inline">
+      <div class="form-inline crm-search-groupby-add">
         <input id="crm-search-add-groupBy"
                class="form-control crm-action-menu fa-plus"
                crm-ui-select="{placeholder: ts('Group By'), data: fieldsForGroupBy, dropdownCss: {width: '300px'}}"
@@ -41,15 +41,15 @@
     </fieldset>
   </div>
   <div class="crm-search-criteria-column">
-    <fieldset class="api4-clause-fieldset">
+    <fieldset class="api4-clause-fieldset crm-search-wheres">
       <crm-search-clause clauses="$ctrl.savedSearch.api_params.where" format="string" op="AND" label="{{:: ts('Where') }}" fields="fieldsForWhere" allow-functions="true" ></crm-search-clause>
     </fieldset>
-    <fieldset ng-if="$ctrl.paramExists('having') && $ctrl.savedSearch.api_params.groupBy.length" class="api4-clause-fieldset">
+    <fieldset ng-if="$ctrl.paramExists('having') && $ctrl.savedSearch.api_params.groupBy.length" class="api4-clause-fieldset crm-search-havings">
       <crm-search-clause clauses="$ctrl.savedSearch.api_params.having" format="string" op="AND" label="{{:: ts('Having') }}" help="having" fields="fieldsForHaving" ></crm-search-clause>
     </fieldset>
   </div>
 </div>
-<div class="form-group crm-search-admin-right">
+<div class="form-group crm-search-admin-right crm-search-admin-links">
   <div class="btn-group" ng-if="$ctrl.savedSearch.id">
     <a ng-href="{{ $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name }}" target="_blank" class="btn btn-primary-outline" title="{{:: ts('View search results table') }}">
       <i class="crm-i fa-external-link"></i>
@@ -74,7 +74,7 @@
     </ul>
   </div>
 </div>
-<details id="crm-search-build-functions">
+<details id="crm-search-build-functions" class="crm-search-select-fields">
   <summary ng-click="controls.showFunctions = !controls.showFunctions">
     {{:: ts('Field Transformations') }}
   </summary>
