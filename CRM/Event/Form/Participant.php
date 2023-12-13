@@ -940,6 +940,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     if ($this->_mode) {
+
+      //add contribution record
+      $contributions[] = $contribution = $this->processContribution(
+        $this->_params,
+        NULL, $contactID,
+        TRUE,
+        $this->_paymentProcessor
+      );
       // add all the additional payment params we need
       $paymentParams = $this->prepareParamsForPaymentProcessor($this->getSubmittedValues());
 
@@ -966,7 +974,24 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $paymentParams['amount'] = $this->order->getTotalAmount();
       try {
         $paymentParams['invoiceID'] = $this->getInvoiceID();
-        $result = $payment->doPayment($paymentParams);
+        $paymentResult = $payment->doPayment($paymentParams);
+        if ($paymentResult['payment_status'] === 'Completed') {
+          civicrm_api3('Payment', 'create', [
+            'trxn_id' => $paymentResult['trxn_id'],
+            'total_amount' => $this->order->getTotalAmount(),
+            'check_number' => $this->getSubmittedValue('check_number'),
+            'fee_amount' => $paymentResult['fee_amount'] ?? 0,
+            'contribution_id' => $contribution->id,
+            'payment_processor_id' => $this->getPaymentProcessorID(),
+            'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type')),
+            'pan_truncation' => substr((string) $this->getSubmittedValue('credit_card_number'), -4),
+            'trxn_result_code' => $paymentResult['trxn_result_code'] ?? NULL,
+            'payment_instrument_id' => $this->_paymentProcessor['payment_instrument_id'],
+            'trxn_date' => 'now',
+            // This form sends payment notification only, for historical reasons.
+            'is_send_contribution_notification' => FALSE,
+          ]);
+        }
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
         // @todo un comment the following line out when we are creating a contribution before we get to this point
@@ -977,14 +1002,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           "reset=1&action=add&cid={$this->_contactId}&context=participant&mode={$this->_mode}"
         ));
       }
-
-      //add contribution record
-      $contributions[] = $contribution = $this->processContribution(
-        $this->_params,
-        $result, $contactID,
-        FALSE,
-        $this->_paymentProcessor
-      );
 
       // add participant record
       $participants = [];
@@ -1533,6 +1550,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'card_type_id' => $this->getSubmittedValue('card_type_id'),
       'pan_truncation' => substr($this->getSubmittedValue('credit_card_number'), -4),
+      'line_item' => [$this->getPriceSetID() => $this->getLineItems()],
     ];
 
     if ($paymentProcessor) {
@@ -1540,36 +1558,16 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $contribParams['payment_processor'] = $paymentProcessor['id'];
     }
 
-    if (!$pending && $result) {
-      $contribParams += [
-        'fee_amount' => $result['fee_amount'] ?? NULL,
-        'trxn_id' => $result['trxn_id'],
-      ];
-    }
-
-    $allStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $contribParams['contribution_status_id'] = array_search('Completed', $allStatuses);
-    if ($pending) {
-      $contribParams['contribution_status_id'] = array_search('Pending', $allStatuses);
-    }
+    $contribParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
 
     $contribParams['is_test'] = 0;
     if ($this->getAction() & CRM_Core_Action::PREVIEW || ($this->_mode ?? NULL) === 'test') {
       $contribParams['is_test'] = 1;
     }
-
-    if (!empty($contribParams['invoice_id'])) {
-      $contribParams['id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
-        $contribParams['invoice_id'],
-        'id',
-        'invoice_id'
-      );
-    }
     $contribParams['revenue_recognition_date'] = $this->getRevenueRecognitionDate();
 
     $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
 
-    $contribParams['skipLineItem'] = 1;
     $contribParams['skipCleanMoney'] = 1;
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
