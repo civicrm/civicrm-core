@@ -78,7 +78,7 @@ class FinancialTypeTest extends BaseTestClass {
   }
 
   /**
-   * Check method testCheckPermissionedLineItems()
+   * Check method test_civicrm_financial_acls_check_permissioned_line_items()
    *
    * @throws \CRM_Core_Exception
    */
@@ -139,7 +139,7 @@ class FinancialTypeTest extends BaseTestClass {
     ]);
 
     try {
-      \CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contribution['id'], 'view');
+      _civicrm_financial_acls_check_permissioned_line_items($contribution['id'], 'view');
       $this->fail('Missed expected exception');
     }
     catch (\CRM_Core_Exception $e) {
@@ -150,7 +150,7 @@ class FinancialTypeTest extends BaseTestClass {
       'view contributions of type Donation',
     ]);
     try {
-      \CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contribution['id'], 'view');
+      _civicrm_financial_acls_check_permissioned_line_items($contribution['id'], 'view');
     }
     catch (\CRM_Core_Exception $e) {
       $this->fail('permissions should be established');

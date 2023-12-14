@@ -285,12 +285,44 @@ function _financialacls_civi_api4_authorizeContribution(\Civi\Api4\Event\Authori
     if ($e->getActionName() === 'delete') {
       // First check contribution financial type
       // Now check permissioned line items & permissioned contribution
-      if (!CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributionID, 'delete', FALSE, $e->getUserID())
-      ) {
+      if (!_civicrm_financial_acls_check_permissioned_line_items($contributionID, 'delete', FALSE, $e->getUserID())) {
         $e->setAuthorized(FALSE);
       }
     }
   }
+}
+
+/**
+ * Function to check if lineitems present in a contribution have permissioned FTs.
+ *
+ * @param int $id
+ *   contribution id
+ * @param string $op
+ *   the mode of operation, can be add, view, edit, delete
+ * @param bool $force
+ * @param int $contactID
+ *
+ * @return bool
+ */
+function _civicrm_financial_acls_check_permissioned_line_items($id, $op, $force = TRUE, $contactID = NULL) {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return TRUE;
+  }
+  $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id);
+  $flag = FALSE;
+  foreach ($lineItems as $items) {
+    if (!CRM_Core_Permission::check($op . ' contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']), $contactID)) {
+      if ($force) {
+        throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
+      }
+      $flag = FALSE;
+      break;
+    }
+    else {
+      $flag = TRUE;
+    }
+  }
+  return $flag;
 }
 
 /**
