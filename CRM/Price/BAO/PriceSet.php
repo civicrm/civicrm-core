@@ -678,7 +678,7 @@ WHERE  id = %1";
       [$params, $lineItem] = self::getLine($params, $lineItem, $priceSetID, $field, $id);
     }
     $order = new CRM_Financial_BAO_Order();
-    $order->setLineItems($lineItem);
+    $order->setLineItems((array) $lineItem);
     $params['amount_level'] = $order->getAmountLevel();
     $params['amount'] = $order->getTotalAmount();
     $params['tax_amount'] = $order->getTotalTaxAmount();
