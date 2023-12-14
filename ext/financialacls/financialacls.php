@@ -311,7 +311,7 @@ function _civicrm_financial_acls_check_permissioned_line_items($id, $op, $force 
   $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id);
   $flag = FALSE;
   foreach ($lineItems as $items) {
-    if (!CRM_Core_Permission::check($op . ' contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']), $contactID)) {
+    if (!CRM_Core_Permission::check($op . ' contributions of type ' . CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $items['financial_type_id']), $contactID)) {
       if ($force) {
         throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
       }
@@ -420,7 +420,7 @@ function financialacls_civicrm_alterMenu(array &$menu): void {
 
 /**
  * @param string $formName
- * @param \CRM_Core_Form $form
+ * @param \CRM_Event_Form_Registration|\CRM_Contribute_Form_Contribution $form
  */
 function financialacls_civicrm_preProcess(string $formName, \CRM_Core_Form $form): void {
   if (!financialacls_is_acl_limiting_enabled()) {
@@ -431,6 +431,14 @@ function financialacls_civicrm_preProcess(string $formName, \CRM_Core_Form $form
     if (!CRM_Core_Permission::check('add contributions of type ' . $form->getContributionPageValue('financial_type_id:name'))) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
+  }
+
+  // check for ability to add contributions of type
+  if (str_starts_with($formName, 'CRM_Event_Form_Registration_') && $form->getEventValue('is_monetary')
+    && !CRM_Core_Permission::check(
+      'add contributions of type ' . CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $form->getEventValue('financial_type_id')))
+  ) {
+    CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
   }
 
 }
