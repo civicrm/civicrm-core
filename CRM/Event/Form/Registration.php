@@ -662,17 +662,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if (!is_array($eventFee) || empty($eventFee)) {
       $form->_values['fee'] = [];
     }
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-      && !empty($form->_values['fee'])
-    ) {
-      foreach ($form->_values['fee'] as $k => $fees) {
-        foreach ($fees['options'] as $options) {
-          if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
-            unset($form->_values['fee'][$k]);
-          }
-        }
-      }
-    }
   }
 
   /**
