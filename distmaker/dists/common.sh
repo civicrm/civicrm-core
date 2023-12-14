@@ -87,7 +87,7 @@ function dm_install_core() {
   done
 
   dm_install_files "$repo" "$to" {agpl-3.0,agpl-3.0.exception,gpl}.txt
-  dm_install_files "$repo" "$to" composer.json composer.lock package.json Civi.php README.md release-notes.md extension-compatibility.json guzzle_php81_shim.php
+  dm_install_files "$repo" "$to" composer.json composer.lock package.json Civi.php README.md release-notes.md extension-compatibility.json deleted-files-list.json guzzle_php81_shim.php
 
   mkdir -p "$to/sql"
   pushd "$repo" >> /dev/null
