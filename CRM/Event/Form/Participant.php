@@ -820,10 +820,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Process the form submission.
    */
   public function postProcess() {
-    // get the submitted form values.
-    $params = $this->controller->exportValues($this->_name);
-
-    $statusMsg = $this->submit($params);
+    $statusMsg = $this->submit($this->getSubmittedValues());
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
     $session = CRM_Core_Session::singleton();
     $buttonName = $this->controller->getButtonName();
@@ -862,7 +859,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return string
    * @throws \CRM_Core_Exception
    */
-  public function submit($params) {
+  public function submit(array $params) {
     if ($this->_mode && !$this->_isPaidEvent) {
       CRM_Core_Error::statusBounce(ts('Selected Event is not Paid Event '));
     }
@@ -876,16 +873,16 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $params['id'] = $this->_id;
     }
 
-    $config = CRM_Core_Config::singleton();
-    if (isset($params['total_amount'])) {
-      $params['total_amount'] = CRM_Utils_Rule::cleanMoney($params['total_amount']);
-    }
     if ($this->_isPaidEvent) {
       [$lineItem, $params] = $this->preparePaidEventProcessing($params);
     }
-
+    // @todo - params is unused - remove in favour of __get
+    // but there is another parameter we need to fix first.
     $this->_params = $params;
-    parent::beginPostProcess();
+    // @todo - stop assigning these - pass financial_trxnId in token context
+    // and swap template to use tokens.
+    $this->assign('credit_card_type', $this->getSubmittedValue('credit_card_type'));
+    $this->assign('credit_card_number', CRM_Utils_System::mungeCreditCard($this->getSubmittedValue('credit_card_number')));
     $amountOwed = NULL;
     if (isset($params['amount'])) {
       $amountOwed = $params['amount'];
@@ -1079,8 +1076,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           }
         }
 
-        if (!empty($this->_params['tax_amount'])) {
-          $contributionParams['tax_amount'] = $this->_params['tax_amount'];
+        if (!empty($params['tax_amount'])) {
+          $contributionParams['tax_amount'] = $params['tax_amount'];
         }
 
         if ($this->_single) {
