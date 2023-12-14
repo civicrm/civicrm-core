@@ -404,7 +404,6 @@
               <td colspan="2" {$valueStyle}>
                 {$credit_card_type}<br/>
                 {$credit_card_number}<br/>
-                {ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}
               </td>
             </tr>
           {/if}
