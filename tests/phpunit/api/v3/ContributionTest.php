@@ -2083,7 +2083,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'pay_later_receipt:::This is a pay later receipt',
       'contributionPageId:::' . $contributionPageID,
       'title:::Test Contribution Page',
-      'amount:::100',
+      'amount:::$100.00',
     ]);
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
