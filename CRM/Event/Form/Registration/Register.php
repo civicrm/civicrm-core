@@ -618,8 +618,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         // public AND admin visibility fields are included for back-office registration and back-office change selections
         if (($field['visibility'] ?? NULL) == 'public' ||
           (($field['visibility'] ?? NULL) == 'admin' && $adminFieldVisible == TRUE) ||
-          $className == 'CRM_Event_Form_Participant' ||
-          $className === 'CRM_Event_Form_Task_Register' ||
           $className == 'CRM_Event_Form_ParticipantFeeSelection'
         ) {
           $fieldId = $field['id'];
@@ -632,7 +630,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
           //user might modified w/ hook.
           $options = $field['options'] ?? NULL;
-          $formClasses = ['CRM_Event_Form_Participant', 'CRM_Event_Form_Task_Register', 'CRM_Event_Form_ParticipantFeeSelection'];
+          $formClasses = ['CRM_Event_Form_ParticipantFeeSelection'];
 
           if (!is_array($options)) {
             continue;
@@ -681,10 +679,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
           //CRM-7632, CRM-6201
           $totalAmountJs = NULL;
-          if ($className == 'CRM_Event_Form_Participant' || $className === 'CRM_Event_Form_Task_Register') {
-            $totalAmountJs = ['onClick' => "fillTotalAmount(" . $fee['value'] . ")"];
-          }
-
           $eventFeeBlockValues['amount_id_' . $fee['amount_id']] = $fee['value'];
           $elements[$fee['amount_id']] = CRM_Utils_Money::format($fee['value']) . ' ' . $fee['label'];
           $elementJS[$fee['amount_id']] = $totalAmountJs;
@@ -793,11 +787,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $option['is_full'] = $isFull;
         $option['db_total_count'] = $dbTotalCount;
         $option['total_option_count'] = $dbTotalCount + $currentTotalCount;
-      }
-
-      //ignore option full for offline registration.
-      if ($className == 'CRM_Event_Form_Participant' || $className === 'CRM_Event_Form_Task_Register') {
-        $optionFullIds = [];
       }
 
       //finally get option ids in.
