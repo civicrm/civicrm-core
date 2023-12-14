@@ -458,7 +458,7 @@ function financialacls_civicrm_links(string $op, ?string $objectName, $objectID,
   }
   if ($objectName === 'Contribution') {
     // Now check for lineItems
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+    if (Civi::settings()->get('acl_financial_type')) {
       $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID((int) $objectID);
       foreach ($lineItems as $item) {
         $financialType = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $item['financial_type_id']);
