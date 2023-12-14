@@ -239,6 +239,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
+    if ($this->_action & CRM_Core_Action::UPDATE && !Contribution::checkAccess()
+      ->setAction('update')
+      ->addValue('id', $this->getContributionID())
+      ->execute()->first()['access']) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+    }
+
     parent::preProcess();
 
     $this->_formType = $_GET['formType'] ?? NULL;
@@ -579,18 +586,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         ],
       ]);
       return;
-    }
-
-    // FIXME: This probably needs to be done in preprocess
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-      && $this->_action & CRM_Core_Action::UPDATE
-      && !empty($this->_values['financial_type_id'])
-    ) {
-      $financialTypeID = CRM_Contribute_PseudoConstant::financialType($this->_values['financial_type_id']);
-      CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($this->_id, 'edit');
-      if (!CRM_Core_Permission::check('edit contributions of type ' . $financialTypeID)) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-      }
     }
     $allPanes = [];
 
