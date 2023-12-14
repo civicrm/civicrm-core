@@ -447,6 +447,31 @@ function financialacls_civicrm_links(string $op, ?string $objectName, $objectID,
   }
   if ($objectName === 'MembershipType') {
     $financialType = CRM_Core_PseudoConstant::getName('CRM_Member_BAO_MembershipType', 'financial_type_id', CRM_Member_BAO_MembershipType::getMembershipType($objectID)['financial_type_id']);
+  }
+  if ($objectName === 'Contribution') {
+    // Now check for lineItems
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID((int) $objectID);
+      foreach ($lineItems as $item) {
+        $financialType = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $item['financial_type_id']);
+        if (!CRM_Core_Permission::check('view contributions of type ' . $financialType)) {
+          // Remove all links & early return for this contribution if there is an un-viewable financial type.
+          $links = [];
+          return;
+        }
+        if (!CRM_Core_Permission::check('edit contributions of type ' . $financialType)) {
+          unset($links[CRM_Core_Action::UPDATE]);
+        }
+        if (!CRM_Core_Permission::check('delete contributions of type ' . $financialType)) {
+          unset($links[CRM_Core_Action::DELETE]);
+        }
+      }
+      $financialTypeID = $values['financial_type_id'] ?? CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $objectID, 'financial_type_id');
+      $financialType = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $financialTypeID);
+    }
+  }
+
+  if (!empty($financialType)) {
     $hasEditPermission = CRM_Core_Permission::check('edit contributions of type ' . $financialType);
     $hasDeletePermission = CRM_Core_Permission::check('delete contributions of type ' . $financialType);
     if (!$hasDeletePermission || !$hasEditPermission) {
