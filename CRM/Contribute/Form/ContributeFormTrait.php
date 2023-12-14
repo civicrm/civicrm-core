@@ -89,7 +89,7 @@ trait CRM_Contribute_Form_ContributeFormTrait {
   }
 
   /**
-   * Get the value for a field relating to the contribution.
+   * Get the value for a field relating to the contribution recur record.
    *
    * All values returned in apiv4 format. Escaping may be required.
    *
