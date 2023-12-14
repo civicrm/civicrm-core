@@ -726,6 +726,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * buildQuickForm.
    */
   public function buildForm() {
+    // @todo - move this to the end of the function - then it can be checked
+    // ie $this->isBuilt() to determine whether variables are not yet in getSubmittedValues()
     $this->_formBuilt = TRUE;
 
     $this->preProcess();
