@@ -21,6 +21,9 @@
 class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
 
   use CRM_Core_Form_EntityFormTrait;
+  use CRM_Contribute_Form_ContributeFormTrait;
+  use CRM_Member_Form_MembershipFormTrait;
+  use CRM_Financial_Form_PaymentProcessorFormTrait;
 
   /**
    * Contribution ID.
@@ -33,6 +36,8 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    * Contribution Recur ID.
    *
    * @var int
+   *
+   * @internal
    */
   protected $_crid = NULL;
 
@@ -43,6 +48,8 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    * we should probably deprecate $_crid.
    *
    * @var int
+   *
+   * @internal
    */
   protected $contributionRecurID = NULL;
 
@@ -50,8 +57,10 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    * Membership ID.
    *
    * @var int
+   *
+   * @internal
    */
-  protected $_mid = NULL;
+  protected $_mid;
 
   /**
    * Payment processor object.
@@ -121,10 +130,11 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    */
   public function preProcess() {
     $this->setAction(CRM_Core_Action::UPDATE);
-    $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
-    $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
-    $this->contributionRecurID = $this->_crid;
-    $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this, FALSE);
+    // These 2 gets shouldn't be needed long term but for now they ensure the
+    // properties are set - but we should deprecate the properties in favour of the
+    // standardised get methods.
+    $this->getMembershipID();
+    $this->getContributionID();
     $this->setSubscriptionDetails();
     $this->setPaymentProcessor();
     if ($this->getSubscriptionContactID()) {
@@ -139,16 +149,12 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    * but this is good choice of function to call.
    */
   protected function setPaymentProcessor() {
-    if ($this->_crid) {
-      $this->_paymentProcessor = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessor($this->contributionRecurID);
+    if ($this->getContributionRecurID()) {
+      $this->_paymentProcessor = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessor($this->getContributionRecurID());
       if (!$this->_paymentProcessor) {
         CRM_Core_Error::statusBounce(ts('There is no valid processor for this subscription so it cannot be updated'));
       }
       $this->_paymentProcessorObj = $this->_paymentProcessor['object'];
-    }
-    elseif ($this->_mid) {
-      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'obj');
-      $this->_paymentProcessor = $this->_paymentProcessorObj->getPaymentProcessor();
     }
   }
 
@@ -156,17 +162,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    * Set the subscription details on the form.
    */
   protected function setSubscriptionDetails() {
-    if ($this->contributionRecurID) {
-      $this->subscriptionDetails = $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
-    }
-    elseif ($this->_coid) {
-      $this->subscriptionDetails = $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
-    }
-    elseif ($this->_mid) {
-      $this->subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_mid, 'membership');
-    }
-    // This is being set temporarily - we should eventually just use the getter fn.
-    $this->_subscriptionDetails = $this->subscriptionDetails;
+    $this->subscriptionDetails = $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->getContributionRecurID());
   }
 
   /**
@@ -191,10 +187,50 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   /**
    * Get the recurring contribution ID.
    *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
    * @return int
    */
-  protected function getContributionRecurID(): int {
-    return $this->getSubscriptionDetails()->recur_id;
+  public function getContributionRecurID(): int {
+    $id = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
+    if (!$id && $this->getContributionID()) {
+      $id = $this->getContributionValue('contribution_recur_id');
+    }
+    if (!$id) {
+      $id = $this->getMembershipValue('contribution_recur_id');
+    }
+    $this->contributionRecurID = $this->_crid = $id;
+    return (int) $id;
+  }
+
+  /**
+   * Get the selected Contribution ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getContributionID(): ?int {
+    $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this);
+    return $this->_coid ? (int) $this->_coid : NULL;
+  }
+
+  /**
+   * Get the membership ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int
+   */
+  protected function getMembershipID(): ?int {
+    $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
+    return $this->_mid ? (int) $this->_mid : NULL;
   }
 
   /**

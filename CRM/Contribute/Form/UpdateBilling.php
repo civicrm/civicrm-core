@@ -30,7 +30,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
    */
   public function preProcess() {
     parent::preProcess();
-    if ($this->_crid) {
+    if ($this->getContributionRecurID()) {
       // Are we cancelling a recurring contribution that is linked to an auto-renew membership?
       if ($this->getSubscriptionDetails()->membership_id) {
         $this->_mid = $this->getSubscriptionDetails()->membership_id;
