@@ -2181,7 +2181,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     $optionFullTotalAmount = 0;
     $currentParticipantNo = (int) substr($form->_name, 12);
     foreach ($form->_feeBlock as & $field) {
-      $optionFullIds = [];
       $fieldId = $field['id'];
       if (!is_array($field['options'])) {
         continue;
@@ -2200,15 +2199,9 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
             (empty($form->_lineItem[$currentParticipantNo][$optId]['price_field_id']) || $dbTotalCount >= $maxValue))
         ) {
           $isFull = TRUE;
-          $optionFullIds[$optId] = $optId;
-          if ($field['html_type'] != 'Select') {
+          if ($field['html_type'] !== 'Select') {
             if (in_array($optId, $defaultPricefieldIds)) {
               $optionFullTotalAmount += $option['amount'] ?? 0;
-            }
-          }
-          else {
-            if (!empty($defaultPricefieldIds) && in_array($optId, $defaultPricefieldIds)) {
-              unset($optionFullIds[$optId]);
             }
           }
         }
