@@ -1687,7 +1687,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @param array $params
    *   Params as submitted.
    */
-  protected function storePaymentCreateParams($params) {
+  protected function storePaymentCreateParams(array $params): void {
     if ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id'])) {
       $this->setCreatePaymentParams([
         'total_amount' => $params['total_amount'],
@@ -2079,7 +2079,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * 'universe' and is not supported for such use. Signature has changed & will
    * change again.
    *
-   * @param CRM_Event_Form_Registration_Register $form
+   * @param self $form
    *   Form object.
    * @param bool $required
    *   True if you want to add formRule.
@@ -2089,7 +2089,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    *
    * @throws \CRM_Core_Exception
    */
-  public function buildAmount($form, $required, $discountId, $priceSetID) {
+  private function buildAmount($form, $required, $discountId, $priceSetID) {
     $feeFields = $form->_values['fee'] ?? NULL;
 
     if (is_array($feeFields)) {
@@ -2175,20 +2175,9 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       return;
     }
 
-    $skipParticipants = $formattedPriceSetDefaults = [];
-    if (!empty($form->_allowConfirmation) && (isset($form->_pId) || isset($form->_additionalParticipantId))) {
-      $participantId = $form->_pId ?? $form->_additionalParticipantId;
-      $pricesetDefaults = CRM_Event_Form_EventFees::setDefaultPriceSet($participantId,
-        $form->_eventId
-      );
-      // modify options full to respect the selected fields
-      // options on confirmation.
-      $formattedPriceSetDefaults = self::formatPriceSetParams($form, $pricesetDefaults);
-    }
-
     //get the current price event price set options count.
     $currentOptionsCount = self::getPriceSetOptionCount($form);
-    $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($form->_eventId, $skipParticipants);
+    $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($form->_eventId, []);
     $optionFullTotalAmount = 0;
     $currentParticipantNo = (int) substr($form->_name, 12);
     foreach ($form->_feeBlock as & $field) {
@@ -2226,15 +2215,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         //here option is not full,
         //but we don't want to allow participant to increase
         //seats at the time of re-walking registration.
-        if ($count &&
-          !empty($form->_allowConfirmation) &&
-          !empty($formattedPriceSetDefaults)
-        ) {
-          if (empty($formattedPriceSetDefaults["price_{$field}"]) || empty($formattedPriceSetDefaults["price_{$fieldId}"][$optId])) {
-            $optionFullIds[$optId] = $optId;
-            $isFull = TRUE;
-          }
-        }
         $option['is_full'] = $isFull;
         $option['db_total_count'] = $dbTotalCount;
         $option['total_option_count'] = $dbTotalCount + $currentTotalCount;
@@ -2246,53 +2226,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       $field['option_full_ids'] = $optionFullIds;
     }
     $form->assign('optionFullTotalAmount', $optionFullTotalAmount);
-  }
-
-  /**
-   * Format user submitted price set params.
-   *
-   * Convert price set each param as an array.
-   *
-   * @param CRM_Core_Form $form
-   * @param array $params
-   *   An array of user submitted params.
-   *
-   * @return array
-   *   Formatted price set params.
-   */
-  private static function formatPriceSetParams(&$form, $params) {
-    if (!is_array($params) || empty($params)) {
-      return $params;
-    }
-
-    $priceSetId = $form->get('priceSetId');
-    if (!$priceSetId) {
-      return $params;
-    }
-    $priceSetDetails = $form->get('priceSet');
-
-    foreach ($params as $key => & $value) {
-      $vals = [];
-      if (strpos($key, 'price_') !== FALSE) {
-        $fieldId = substr($key, 6);
-        if (!array_key_exists($fieldId, $priceSetDetails['fields']) ||
-          is_array($value) ||
-          !$value
-        ) {
-          continue;
-        }
-        $field = $priceSetDetails['fields'][$fieldId];
-        if ($field['html_type'] == 'Text') {
-          $fieldOption = current($field['options']);
-          $value = [$fieldOption['id'] => $value];
-        }
-        else {
-          $value = [$value => TRUE];
-        }
-      }
-    }
-
-    return $params;
   }
 
   /**
