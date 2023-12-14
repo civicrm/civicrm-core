@@ -88,4 +88,43 @@ trait CRM_Contribute_Form_ContributeFormTrait {
     return NULL;
   }
 
+  /**
+   * Get the value for a field relating to the contribution recur record.
+   *
+   * All values returned in apiv4 format. Escaping may be required.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @param string $fieldName
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  public function getContributionRecurValue(string $fieldName) {
+    if ($this->isDefined('ContributionRecur')) {
+      return $this->lookup('ContributionRecur', $fieldName);
+    }
+    $id = $this->getContributionRecurID();
+    if ($id) {
+      $this->define('ContributionRecur', 'ContributionRecur', ['id' => $id]);
+      return $this->lookup('ContributionRecur', $fieldName);
+    }
+    return NULL;
+  }
+
+  /**
+   * Get the selected Contribution ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getContributionRecurID(): ?int {
+    throw new CRM_Core_Exception('`getContributionID` must be implemented');
+  }
+
 }
