@@ -13,7 +13,7 @@
 
   {include file="CRM/Contact/Form/Search/Intro.tpl"}
 
-  <details class="crm-advanced_search_form-accordion" open>
+  <details class="crm-advanced_search_form-accordion" {if !$rows}open{/if} >
     <summary class="crm-master-accordion-header">
       {if !empty($savedSearch)}
         {ts 1=$savedSearch.name}Edit %1 Smart Group Criteria{/ts}
