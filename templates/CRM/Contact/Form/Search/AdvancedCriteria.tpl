@@ -69,6 +69,13 @@ CRM.$(function($) {
       body.html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Loading{/ts}{literal}...</span></div>');
       header.append('{/literal}<a href="#" class="crm-close-accordion crm-hover-button css_right" title="{ts escape='js'}Remove from search criteria{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>{literal}');
       header.addClass('active');
+      const summaries = document.querySelectorAll('summary.active');
+      summaries.forEach(function (summary) {
+            const details = summary.parentNode;
+            if (details && details.tagName === 'DETAILS') {
+                details.setAttribute('open', 'open');
+            }
+        });
       CRM.loadPage(url, {target: body, block: false});
     }
   }
