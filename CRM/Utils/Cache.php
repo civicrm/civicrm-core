@@ -206,7 +206,7 @@ class CRM_Utils_Cache {
       }
     }
     if (isset($cache)) {
-      return new CRM_Utils_Cache_CacheWrapper($cache, $params['name'] ?? NULL);
+      return new CRM_Utils_Cache_CacheWrapper($cache, $params['service'] ?? $params['name'] ?? NULL);
     }
     throw new CRM_Core_Exception("Failed to instantiate cache. No supported cache type found. " . print_r($params, 1));
   }
