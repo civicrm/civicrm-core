@@ -68,9 +68,8 @@ class CRM_Campaign_BAO_PetitionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       '1600 Pennsylvania Avenue',
       'Washington',
-      'Dear Anthony,
-Thank you for signing Test Petition.
-',
+      'Dear Anthony,',
+      'Thank you for signing Test Petition.',
     ]);
     $mut->stop();
   }
