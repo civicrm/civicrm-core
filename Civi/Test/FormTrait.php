@@ -103,6 +103,18 @@ trait FormTrait {
   }
 
   /**
+   * Assert that the sent mail included the supplied strings.
+   *
+   * @param array $strings
+   * @param int $mailIndex
+   */
+  protected function assertMailSentContainingHeaderStrings(array $strings, int $mailIndex = 0): void {
+    foreach ($strings as $string) {
+      $this->assertMailSentContainingHeaderString($string, $mailIndex);
+    }
+  }
+
+  /**
    * Assert the right number of mails were sent.
    *
    * @param int $count
@@ -134,6 +146,10 @@ trait FormTrait {
    */
   protected function getDeprecatedProperty(string $property) {
     return $this->form->getDeprecatedProperty($property);
+  }
+
+  protected function assertPrematureExit(): void {
+    $this->assertInstanceOf(\CRM_Core_Exception_PrematureExitException::class, $this->form->getException());
   }
 
 }

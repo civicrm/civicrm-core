@@ -422,37 +422,32 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function testSubmitCreditCardInvalid(): void {
     $this->paymentProcessor->setDoDirectPaymentResult(['is_error' => 1]);
-    try {
-      $this->submitContributionForm([
-        'total_amount' => 50,
-        'financial_type_id' => 1,
-        'contact_id' => $this->_individualId,
-        'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
-        'payment_processor_id' => $this->paymentProcessorID,
-        'credit_card_exp_date' => ['M' => 5, 'Y' => 2012],
-        'credit_card_number' => '411111111111111',
-        'credit_card_type' => 'Visa',
-      ], NULL, 'live');
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->callAPISuccessGetCount('Contribution', [
-        'contact_id' => $this->_individualId,
-        'contribution_status_id' => 'Failed',
-      ], 1);
-      $lineItem = $this->callAPISuccessGetSingle('line_item', []);
-      $this->assertEquals('50.00', $lineItem['unit_price']);
-      $this->assertEquals('50.00', $lineItem['line_total']);
-      $this->assertEquals(1, $lineItem['qty']);
-      $this->assertEquals(1, $lineItem['financial_type_id']);
-      $financialItem = $this->callAPISuccessGetSingle('financial_item', [
-        'civicrm_line_item' => $lineItem['id'],
-        'entity_id' => $lineItem['id'],
-      ]);
-      $this->assertEquals('50.00', $financialItem['amount']);
-      $this->assertEquals(3, $financialItem['status_id']);
-      return;
-    }
-    $this->fail('An expected exception has not been raised.');
+    $this->submitContributionForm([
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
+      'payment_processor_id' => $this->paymentProcessorID,
+      'credit_card_exp_date' => ['M' => 5, 'Y' => 2012],
+      'credit_card_number' => '411111111111111',
+      'credit_card_type' => 'Visa',
+    ], NULL, 'live');
+    $this->callAPISuccessGetCount('Contribution', [
+      'contact_id' => $this->_individualId,
+      'contribution_status_id' => 'Failed',
+    ], 1);
+    $lineItem = $this->callAPISuccessGetSingle('line_item', []);
+    $this->assertEquals('50.00', $lineItem['unit_price']);
+    $this->assertEquals('50.00', $lineItem['line_total']);
+    $this->assertEquals(1, $lineItem['qty']);
+    $this->assertEquals(1, $lineItem['financial_type_id']);
+    $financialItem = $this->callAPISuccessGetSingle('financial_item', [
+      'civicrm_line_item' => $lineItem['id'],
+      'entity_id' => $lineItem['id'],
+    ]);
+    $this->assertEquals('50.00', $financialItem['amount']);
+    $this->assertEquals(3, $financialItem['status_id']);
+    $this->assertPrematureExit();
   }
 
   /**
