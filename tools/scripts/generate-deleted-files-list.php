@@ -45,6 +45,13 @@ $prefix = 'packages/';
 $logString = `(cd $prefix && git log $minVer...HEAD --diff-filter=D --summary | grep delete)`;
 parseLog($logString, $deletedFiles, $prefix);
 
+// Vendor: these files are managed by composer not git.
+// for lack of anything more clever here's a hand-curated list.
+$deletedFiles[] = 'vendor/pear/net_smtp/examples/*';
+$deletedFiles[] = 'vendor/pear/net_smtp/tests/*';
+$deletedFiles[] = 'vendor/pear/net_smtp/phpdoc.sh';
+$deletedFiles[] = 'vendor/phpoffice/phpword/samples/*';
+
 $deletedFiles = array_unique($deletedFiles);
 sort($deletedFiles);
 $fileName = 'deleted-files-list.json';
