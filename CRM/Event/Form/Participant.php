@@ -2174,8 +2174,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     CRM_Utils_Hook::buildAmount('event', $form, $form->_feeBlock);
 
     //build the priceset fields.
-    //format price set fields across option full.
-    self::formatFieldsForOptionFull($form);
     // This is probably not required now - normally loaded from event ....
     $form->add('hidden', 'priceSetId', $priceSetID);
 
@@ -2193,12 +2191,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         continue;
       }
 
-      $optionFullIds = CRM_Utils_Array::value('option_full_ids', $field, []);
-
       //soft suppress required rule when option is full.
-      if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {
-        $isRequire = FALSE;
-      }
       if (!empty($options)) {
         //build the element.
         CRM_Price_BAO_PriceField::addQuickFormElement($form,
@@ -2207,154 +2200,12 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
           FALSE,
           $isRequire,
           NULL,
-          $options,
-          $optionFullIds
+          $options
         );
       }
     }
     $form->_priceSet['id'] ??= $priceSetID;
     $form->assign('priceSet', $form->_priceSet);
-  }
-
-  /**
-   * @param self $form
-   */
-  private static function formatFieldsForOptionFull(&$form) {
-    $priceSet = $form->get('priceSet');
-    $priceSetId = $form->get('priceSetId');
-    $defaultPricefieldIds = [];
-    if (!empty($form->_values['line_items'])) {
-      foreach ($form->_values['line_items'] as $lineItem) {
-        $defaultPricefieldIds[] = $lineItem['price_field_value_id'];
-      }
-    }
-    if (!$priceSetId ||
-      !is_array($priceSet) ||
-      empty($priceSet) || empty($priceSet['optionsMaxValueTotal'])
-    ) {
-      return;
-    }
-
-    //get the current price event price set options count.
-    $currentOptionsCount = self::getPriceSetOptionCount($form);
-    $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($form->_eventId, []);
-    $optionFullTotalAmount = 0;
-    $currentParticipantNo = (int) substr($form->_name, 12);
-    foreach ($form->_feeBlock as & $field) {
-      $fieldId = $field['id'];
-      if (!is_array($field['options'])) {
-        continue;
-      }
-      foreach ($field['options'] as & $option) {
-        $optId = $option['id'];
-        $count = $option['count'] ?? 0;
-        $maxValue = $option['max_value'] ?? 0;
-        $dbTotalCount = $recordedOptionsCount[$optId] ?? 0;
-        $currentTotalCount = $currentOptionsCount[$optId] ?? 0;
-
-        $totalCount = $currentTotalCount + $dbTotalCount;
-        $isFull = FALSE;
-        if ($maxValue &&
-          (($totalCount >= $maxValue) &&
-            (empty($form->_lineItem[$currentParticipantNo][$optId]['price_field_id']) || $dbTotalCount >= $maxValue))
-        ) {
-          $isFull = TRUE;
-          if ($field['html_type'] !== 'Select') {
-            if (in_array($optId, $defaultPricefieldIds)) {
-              $optionFullTotalAmount += $option['amount'] ?? 0;
-            }
-          }
-        }
-        //here option is not full,
-        //but we don't want to allow participant to increase
-        //seats at the time of re-walking registration.
-        $option['is_full'] = $isFull;
-        $option['db_total_count'] = $dbTotalCount;
-        $option['total_option_count'] = $dbTotalCount + $currentTotalCount;
-      }
-
-      $optionFullIds = [];
-
-      //finally get option ids in.
-      $field['option_full_ids'] = $optionFullIds;
-    }
-    $form->assign('optionFullTotalAmount', $optionFullTotalAmount);
-  }
-
-  /**
-   * Calculate total count for each price set options.
-   *
-   * - currently selected by user.
-   *
-   * @param CRM_Core_Form $form
-   *   Form object.
-   *
-   * @return array
-   *   array of each option w/ count total.
-   */
-  private static function getPriceSetOptionCount(&$form) {
-    $params = $form->get('params');
-    $priceSet = $form->get('priceSet');
-    $priceSetId = $form->get('priceSetId');
-
-    $optionsCount = [];
-    if (!$priceSetId ||
-      !is_array($priceSet) ||
-      empty($priceSet) ||
-      !is_array($params) ||
-      empty($params)
-    ) {
-      return $optionsCount;
-    }
-
-    $priceSetFields = $priceMaxFieldDetails = [];
-    if (!empty($priceSet['optionsCountTotal'])) {
-      $priceSetFields = $priceSet['optionsCountDetails']['fields'];
-    }
-
-    if (!empty($priceSet['optionsMaxValueTotal'])) {
-      $priceMaxFieldDetails = $priceSet['optionsMaxValueDetails']['fields'];
-    }
-
-    $addParticipantNum = substr($form->_name, 12);
-    foreach ($params as $pCnt => $values) {
-      if ($values == 'skip' ||
-        $pCnt === $addParticipantNum
-      ) {
-        continue;
-      }
-
-      foreach ($values as $valKey => $value) {
-        if (strpos($valKey, 'price_') === FALSE) {
-          continue;
-        }
-
-        $priceFieldId = substr($valKey, 6);
-        if (!$priceFieldId ||
-          !is_array($value) ||
-          !(array_key_exists($priceFieldId, $priceSetFields) || array_key_exists($priceFieldId, $priceMaxFieldDetails))
-        ) {
-          continue;
-        }
-
-        foreach ($value as $optId => $optVal) {
-          if (($priceSet['fields'][$priceFieldId]['html_type'] ?? NULL) === 'Text') {
-            $currentCount = $optVal;
-          }
-          else {
-            $currentCount = 1;
-          }
-
-          if (isset($priceSetFields[$priceFieldId]) && isset($priceSetFields[$priceFieldId]['options'][$optId])) {
-            $currentCount = $priceSetFields[$priceFieldId]['options'][$optId] * $optVal;
-          }
-
-          $optionsCount[$optId] = $currentCount + ($optionsCount[$optId] ?? 0);
-        }
-      }
-    }
-
-    return $optionsCount;
   }
 
 }
