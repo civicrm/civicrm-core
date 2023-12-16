@@ -24,7 +24,6 @@ CRM.$(function($) {
     var header = $(this).parent();
     header.next().html('');
     header.removeClass('active');
-    header.parent('.crm-ajax-accordion:not(.collapsed)').crmAccordionToggle();
     // Reset results-display mode if it depends on this pane
     var mode = modes[$('#component_mode').val()] || null;
     if (mode && header.attr('id') == mode) {
@@ -72,6 +71,8 @@ CRM.$(function($) {
       CRM.loadPage(url, {target: body, block: false});
     }
   }
+  // Keeps the detail/accordion of 'active' fieldsets open after a search
+  $('summary.active').parent('details').attr('open', '');
 });
 </script>
 {/literal}
