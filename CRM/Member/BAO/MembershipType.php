@@ -72,8 +72,11 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
     if ($membershipTypeID) {
       // on update we may need to retrieve some details for the price field function - otherwise we get e-notices on attempts to retrieve
       // name etc - the presence of previous id tells us this is an update
-      $params = array_merge(civicrm_api3('membership_type', 'getsingle', ['id' => $membershipType->id]), $params);
+      $params = array_merge(civicrm_api3('membership_type', 'getsingle', ['id' => $membershipTypeID]), $params);
     }
+
+    $membershipType = self::writeRecord($params);
+
     self::createMembershipPriceField($params, $previousID, $membershipType->id);
     // update all price field value for quick config when membership type is set CRM-11718
     if ($membershipTypeID) {
