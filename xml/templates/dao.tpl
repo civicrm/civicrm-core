@@ -254,41 +254,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       {rdelim}
 
       /**
-       * Return a mapping from field-name to the corresponding key (as used in fields()).
-       *
-       * @return array
-       *   Array(string $name => string $uniqueName).
-       */
-      public static function &fieldKeys( ) {ldelim}
-        if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {ldelim}
-          Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
-        {rdelim}
-        return Civi::$statics[__CLASS__]['fieldKeys'];
-      {rdelim}
-
-      /**
-       * Returns the names of this table
-       *
-       * @return string
-       */
-      public static function getTableName( ) {ldelim}
-        {if $table.localizable}
-          return CRM_Core_DAO::getLocaleTableName( self::$_tableName );
-        {else}
-          return self::$_tableName;
-        {/if}
-      {rdelim}
-
-      /**
-       * Returns if this table needs to be logged
-       *
-       * @return bool
-       */
-      public function getLog( ) {ldelim}
-          return self::$_log;
-      {rdelim}
-
-      /**
        * Returns the list of fields that can be imported
        *
        * @param bool $prefix
