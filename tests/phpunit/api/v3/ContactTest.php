@@ -101,6 +101,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ];
     $this->quickCleanUpFinancialEntities();
     $this->deleteNonDefaultRelationshipTypes();
+    $this->restoreMembershipTypes();
     $this->quickCleanup($tablesToTruncate, TRUE);
     parent::tearDown();
   }
