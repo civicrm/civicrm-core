@@ -1289,7 +1289,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $form->assign('priceSet', $form->_priceSet ?? NULL);
       }
       else {
-        $this->buildAmount($form, TRUE, $form->getDiscountID(), $this->getPriceSetID());
+        $this->buildAmount($form, $form->getDiscountID(), $this->getPriceSetID());
       }
       $lineItem = [];
       $totalTaxAmount = 0;
@@ -1552,6 +1552,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Get the currency for the event.
    *
    * @return string
+   * @noinspection PhpDocMissingThrowsInspection
    */
   public function getCurrency() {
     return $this->getEventValue('currency') ?: \Civi::settings()->get('defaultCurrency');
@@ -2070,6 +2071,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * Get the order object, if the event is paid.
    *
    * @return \CRM_Financial_BAO_Order|null
+   * @throws \CRM_Core_Exception
    */
   protected function getOrder(): ?CRM_Financial_BAO_Order {
     if (!$this->order && $this->getPriceSetID()) {
@@ -2141,20 +2143,14 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    *
    * @param self $form
    *   Form object.
-   * @param bool $required
-   *   True if you want to add formRule.
    * @param int|null $discountId
    *   Discount id for the event.
    * @param int|null $priceSetID
    *
    * @throws \CRM_Core_Exception
    */
-  private function buildAmount($form, $required, $discountId, $priceSetID) {
+  private function buildAmount($form, $discountId, $priceSetID): void {
     $feeFields = $form->_values['fee'] ?? NULL;
-
-    if (is_array($feeFields)) {
-      $form->_feeBlock = &$form->_values['fee'];
-    }
 
     //check for discount.
     $discountedFee = $form->_values['discount'] ?? NULL;
@@ -2163,21 +2159,18 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         $form->_discountId = $discountId = CRM_Core_BAO_Discount::findSet($form->_eventId, 'civicrm_event');
       }
       if ($discountId) {
-        $form->_feeBlock = &$form->_values['discount'][$discountId];
+        $feeFields = &$form->_values['discount'][$discountId];
       }
-    }
-    if (!is_array($form->_feeBlock)) {
-      $form->_feeBlock = [];
     }
 
     //its time to call the hook.
-    CRM_Utils_Hook::buildAmount('event', $form, $form->_feeBlock);
+    CRM_Utils_Hook::buildAmount('event', $form, $feeFields);
 
     //build the priceset fields.
     // This is probably not required now - normally loaded from event ....
     $form->add('hidden', 'priceSetId', $priceSetID);
 
-    foreach ($form->_feeBlock as $field) {
+    foreach ($feeFields as $field) {
       // public AND admin visibility fields are included for back-office registration and back-office change selections
       $fieldId = $field['id'];
       $elementName = 'price_' . $fieldId;
