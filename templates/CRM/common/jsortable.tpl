@@ -91,11 +91,10 @@
         }
         count++;
       });
-      // Fixme: this could be done without eval
       columns = columns.substring(0, columns.length - 1);
       sortColumn = sortColumn.substring(0, sortColumn.length - 1);
-      eval('sortColumn =[' + sortColumn + ']');
-      eval('columns =[' + columns + ']');
+      columns = JSON.parse('[' + columns + ']');
+      sortColumn = JSON.parse('[' + sortColumn + ']');
 
       var noRecordFoundMsg = {/literal}'{ts escape="js"}None found.{/ts}'{literal};
 
