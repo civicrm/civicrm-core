@@ -132,6 +132,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       }
     }
     $this->restoreUFGroupOne();
+    $this->revertTemplateToReservedTemplate();
     parent::tearDown();
   }
 
@@ -2002,7 +2003,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'email:::anthony_anderson@civicrm.org',
       'is_monetary:::1',
-      'amount:::100.00',
+      'amount:::$100.00',
       'currency:::USD',
       'receive_date:::' . date('Ymd', strtotime($contribution['receive_date'])),
       "receipt_date:::\n",
@@ -2042,7 +2043,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'email:::anthony_anderson@civicrm.org',
       'is_monetary:::1',
-      'amount:::100.00',
+      'amount:::€100.00',
       'currency:::EUR',
       'receive_date:::' . date('Ymd', strtotime($contribution['receive_date'])),
       "receipt_date:::\n",
@@ -2083,7 +2084,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'pay_later_receipt:::This is a pay later receipt',
       'contributionPageId:::' . $contributionPageID,
       'title:::Test Contribution Page',
-      'amount:::100',
+      'amount:::$100.00',
     ]);
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
@@ -3150,7 +3151,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->mut->checkMailLog([
       'email:::anthony_anderson@civicrm.org',
       'is_monetary:::1',
-      'amount:::100.00',
+      'amount:::$100.00',
       'currency:::USD',
       'receive_date:::' . date('Ymd', strtotime($receive_date)),
       'receipt_date:::' . date('Ymd'),
@@ -3320,7 +3321,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $status);
     $mut->checkMailLog([
-      'amount:::500.00',
+      'amount:::$500.00',
       // The `receive_date` should remain as it was created.
       // TODO: the latest payment transaction date (and maybe other details,
       // such as amount and payment instrument) would be a useful token to make
