@@ -154,7 +154,6 @@ class CRM_Utils_PDF_Utils {
    * @param string $fileName
    */
   public static function _html2pdf_weasyprint($paper_size, $orientation, $margins, $html, $output, $fileName) {
-    require_once 'php-weasyprint/src/autoload.php';
     $weasyprint = new Pontedilana\PhpWeasyPrint\Pdf(\Civi::settings()->get('weasyprint_path'));
     $weasyprint->setOption("page-width", $paper_size[2] . "pt");
     $weasyprint->setOption("page-height", $paper_size[3] . "pt");
