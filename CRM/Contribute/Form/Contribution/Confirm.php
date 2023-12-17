@@ -1553,6 +1553,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // If this is a single membership-related contribution, it won't have
       // be performed yet, so do it now.
       if ($isPaidMembership && !$this->isSeparatePaymentSelected()) {
+        $paymentParams['amount'] = $this->getMainContributionAmount();
         $paymentActionResult = $payment->doPayment($paymentParams);
         $paymentResults[] = ['contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult];
       }
@@ -1863,7 +1864,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if ($form->isSeparateMembershipPayment()) {
       $amount -= $form->order->getMembershipTotalAmount();
     }
-    $form->_amount = $params['amount'] = $form->_params['amount'] = $amount;
     // hack these in for test support.
     $form->_fields['billing_first_name'] = 1;
     $form->_fields['billing_last_name'] = 1;
@@ -2215,7 +2215,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           }
         }
       }
-
+      $paymentParams['amount'] = $this->getMainContributionAmount();
+      $paymentParams['line_item'] = [$this->getPriceSetID() => $this->getMainContributionLineItems()];
       $result = $this->processConfirm($paymentParams,
         $contactID,
         $this->wrangleFinancialTypeID($this->_values['financial_type_id']),
@@ -2511,11 +2512,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form->assign('receive_date',
       CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
     );
-
-    if (empty($form->_values['amount'])) {
-      // If the amount is not in _values[], set it
-      $form->_values['amount'] = $form->_params['amount'];
-    }
 
     if (isset($paymentParams['contribution_source'])) {
       $paymentParams['source'] = $paymentParams['contribution_source'];
