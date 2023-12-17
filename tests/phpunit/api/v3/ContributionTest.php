@@ -118,6 +118,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    $this->restoreMembershipTypes();
     $this->quickCleanup(['civicrm_uf_match'], TRUE);
     $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', ['return' => 'name']);
     foreach ($financialAccounts['values'] as $financialAccount) {
