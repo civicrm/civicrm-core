@@ -1,9 +1,10 @@
-<li role="presentation" ng-class="{active: controls.tab === tab.key}" ng-repeat="tab in $ctrl.tabs">
+<li role="presentation" ng-class="{active: controls.tab === tab.key}" ng-repeat="tab in $ctrl.mainTabs">
   <a href ng-click="selectTab(tab.key)">
     <i class="crm-i {{:: tab.icon }}"></i>
     {{:: tab.title }}
   </a>
 </li>
+<li role="separator" class="disabled"></li>
 <li role="presentation" ng-class="{active: controls.tab === 'group'}" ng-if="$ctrl.savedSearch.groups.length" title="{{ !$ctrl.groupExists ? ts('Group will be deleted.') : '' }}">
   <a href ng-click="selectTab('group')" ng-disabled="!$ctrl.groupExists">
     <i class="crm-i fa-users"></i>

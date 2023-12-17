@@ -11,13 +11,8 @@
   min-width: 66px;
 }
 
-#bootstrap-theme.crm-search .nav-stacked {
-  margin-left: 0;
-  margin-right: 20px;
-}
-
-#bootstrap-theme.crm-search ul.nav-stacked {
-  margin-top: 20px;
+#bootstrap-theme.crm-search .crm-search-admin-main-tabs {
+  margin: 10px 20px 20px 0;
 }
 
 #bootstrap-theme.crm-search .help-block.bg-warning {
@@ -49,6 +44,12 @@
 
 #bootstrap-theme.crm-search ul.nav-stacked li {
   cursor: default;
+}
+
+#bootstrap-theme.crm-search ul.nav-stacked li[role=separator] {
+  height: 8px;
+  border-top: 1px solid lightgrey;
+  margin-top: 8px;
 }
 
 #bootstrap-theme.crm-search ul.nav-stacked li a[disabled] {

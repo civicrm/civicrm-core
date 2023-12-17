@@ -4,7 +4,8 @@
   // Specialized searchDisplay, only used by Admins
   angular.module('crmSearchAdmin').component('crmSearchAdminResultsTable', {
     bindings: {
-      search: '<'
+      search: '<',
+      debug: '<'
     },
     require: {
       crmSearchAdmin: '^crmSearchAdmin'
@@ -23,12 +24,9 @@
         ctrl.settings.columns = _.transform(ctrl.search.api_params.select, function(columns, fieldExpr) {
           columns.push(searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}));
         }).concat(ctrl.settings.columns);
-        ctrl.debug = {
-          apiParams: JSON.stringify(ctrl.search.api_params, null, 2)
-        };
-        ctrl.perm = {
-          viewDebugOutput: CRM.checkPerm('view debug output'),
-        };
+        ctrl.debug.apiParams = JSON.stringify(ctrl.search.api_params, null, 2);
+        delete ctrl.debug.sql;
+        delete ctrl.debug.timeIndex;
         ctrl.results = null;
         ctrl.rowCount = null;
         ctrl.page = 1;
@@ -49,7 +47,8 @@
 
       this.onPostRun.push(function(apiResults) {
         // Add debug output (e.g. raw SQL) to the "Query Info" tab
-        ctrl.debug = _.extend(_.pick(ctrl.debug, 'apiParams'), apiResults.run.debug);
+        ctrl.debug.sql = apiResults.run.debug.sql;
+        ctrl.debug.timeIndex = apiResults.run.debug.timeIndex;
       });
 
       $scope.sortableColumnOptions = {

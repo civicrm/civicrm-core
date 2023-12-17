@@ -91,18 +91,23 @@
     </div>
 
     <div class="crm-flex-box">
-      <ul class="nav nav-pills nav-stacked" ng-include="'~/crmSearchAdmin/tabs.html'"></ul>
-      <div class="crm-flex-4" ng-switch="controls.tab">
-        <div ng-switch-when="for|fields|conditions|settings|group" ng-switch-when-separator="|">
+      <nav class="crm-search-admin-main-tabs">
+        <ul class="nav nav-pills nav-stacked" ng-include="'~/crmSearchAdmin/tabs.html'"></ul>
+      </nav>
+      <div class="crm-flex-4">
+        <div ng-if="!$ctrl.selectedDisplay()">
           <div ng-include="'~/crmSearchAdmin/crmSearch-' + controls.tab + '.html'" class="crm-search-admin-relative"></div>
-          <crm-search-admin-results-table search="$ctrl.savedSearch"></crm-search-admin-results-table>
         </div>
-        <div ng-switch-default>
+        <div ng-if="$ctrl.selectedDisplay()">
           <div ng-repeat="display in $ctrl.savedSearch.displays" ng-if="controls.tab === ('display_' + $index)">
             <crm-search-admin-display class="crm-search-admin-relative" display="display" saved-search="$ctrl.savedSearch"></crm-search-admin-display>
           </div>
         </div>
       </div>
+    </div>
+
+    <div ng-if="!$ctrl.selectedDisplay()">
+      <crm-search-admin-results-table search="$ctrl.savedSearch" debug="$ctrl.debug"></crm-search-admin-results-table>
     </div>
 
   </form>

@@ -28,8 +28,9 @@
     this.displayTypes = _.indexBy(CRM.crmSearchAdmin.displayTypes, 'id');
     this.searchDisplayPath = CRM.url('civicrm/search');
     this.afformPath = CRM.url('civicrm/admin/afform');
+    this.debug = {};
 
-    this.tabs = [
+    this.mainTabs = [
       {
         key: 'for',
         title: ts('Search For'),
@@ -37,7 +38,7 @@
       },
       {
         key: 'conditions',
-        title: ts('Conditions'),
+        title: ts('Filter Conditions'),
         icon: 'fa-filter',
       },
       {
@@ -50,9 +51,20 @@
         title: ts('Configure Settings'),
         icon: 'fa-gears',
       },
+      {
+        key: 'query',
+        title: ts('Query Info'),
+        icon: 'fa-info-circle',
+      },
     ];
 
-    $scope.controls = {tab: this.tabs[0].key, joinType: 'LEFT'};
+    $scope.controls = {tab: this.mainTabs[0].key, joinType: 'LEFT'};
+
+    this.selectedDisplay = function() {
+      // Could return the display but for now we don't need it
+      return $scope.controls.tab.startsWith('display_');
+    };
+
     $scope.joinTypes = [
       {k: 'LEFT', v: ts('With (optional)')},
       {k: 'INNER', v: ts('With (required)')},
@@ -61,6 +73,7 @@
     $scope.getEntity = searchMeta.getEntity;
     $scope.getField = searchMeta.getField;
     this.perm = {
+      viewDebugOutput: CRM.checkPerm('view debug output'),
       editGroups: CRM.checkPerm('edit groups')
     };
 
