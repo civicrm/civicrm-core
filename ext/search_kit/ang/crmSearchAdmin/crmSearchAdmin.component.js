@@ -29,7 +29,30 @@
     this.searchDisplayPath = CRM.url('civicrm/search');
     this.afformPath = CRM.url('civicrm/admin/afform');
 
-    $scope.controls = {tab: 'compose', joinType: 'LEFT'};
+    this.tabs = [
+      {
+        key: 'for',
+        title: ts('Search For'),
+        icon: 'fa-search',
+      },
+      {
+        key: 'conditions',
+        title: ts('Conditions'),
+        icon: 'fa-filter',
+      },
+      {
+        key: 'fields',
+        title: ts('Select Fields'),
+        icon: 'fa-columns',
+      },
+      {
+        key: 'settings',
+        title: ts('Configure Settings'),
+        icon: 'fa-gears',
+      },
+    ];
+
+    $scope.controls = {tab: this.tabs[0].key, joinType: 'LEFT'};
     $scope.joinTypes = [
       {k: 'LEFT', v: ts('With (optional)')},
       {k: 'INNER', v: ts('With (required)')},
