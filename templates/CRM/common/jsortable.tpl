@@ -60,14 +60,14 @@
         var stype   = 'numeric';
         switch( option ) {
           case 'sortable':
-            sortColumn += '[' + count + ', "asc" ],';
+            sortColumn += '[' + count + ', "{/literal}{$defaultOrderByDirection}{literal}" ],';
             columns += '{"sClass": "'+ getElementClass( this ) +'"},';
             break;
           case 'date':
             stype = 'date';
           case 'order':
             if ( $(this).attr('class') == 'sortable' ){
-              sortColumn += '[' + count + ', "asc" ],';
+              sortColumn += '[' + count + ', "{/literal}{$defaultOrderByDirection}{literal}" ],';
             }
             var sortId   = getRowId(tdObject, $(this).attr('id') +' hiddenElement' );
             columns += '{ "render": function ( data, type, row ) { return "<div style=\'display:none\'>"+ data +"</div>" + row[sortId] ; }, "targets": sortColumn,"bUseRendered": false},';
