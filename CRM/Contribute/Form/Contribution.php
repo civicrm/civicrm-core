@@ -2401,10 +2401,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public function getPriceSetID(): ?int {
     $priceSetID = $this->getSubmittedValue('price_set_id') ?: CRM_Utils_Request::retrieve('priceSetId', 'Integer');
-    // Ideally we would use $this->isFormBuilt() here to know when to access the _POST
-    // array directly. However, the parent sets isBuilt before, building the form,
-    // rather than after.
-    if (!$priceSetID && !empty($this->getSubmitValue('price_set_id'))) {
+    if (!$this->isFormBuilt() && !empty($this->getSubmitValue('price_set_id'))) {
       return (int) $this->getSubmitValue('price_set_id');
     }
     return $priceSetID ?? NULL;
