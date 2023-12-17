@@ -367,6 +367,7 @@ trait Api4TestTrait {
         return $this->randomLetters(100);
 
       case 'Money':
+      case 'Float':
         return sprintf('%d.%2d', random_int(0, 2000), random_int(10, 99));
 
       case 'Date':
