@@ -378,7 +378,12 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'is_test' => FALSE,
     ]);
     $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID], FALSE);
-    $this->setUpMembershipBlockPriceSet(['minimum_fee' => 1000]);
+
+    if (empty($this->ids['MembershipType'])) {
+      $membershipTypeParams = ['minimum_fee' => 1000];
+      $this->ids['MembershipType'] = [$this->membershipTypeCreate($membershipTypeParams)];
+    }
+    $this->setUpMembershipBlockPriceSet();
     $this->createTestEntity('PriceSetEntity', [
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $contributionPageID,

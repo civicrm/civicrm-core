@@ -992,7 +992,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    *   MembershipType.create API
    */
   public function setUpMembershipContributionPage(bool $isSeparatePayment = FALSE, bool $isRecur = FALSE, array $membershipTypeParams = []): void {
-    $this->setUpMembershipBlockPriceSet($membershipTypeParams);
+    if (empty($this->ids['MembershipType'])) {
+      $membershipTypeParams = array_merge([
+        'minimum_fee' => 2,
+      ], $membershipTypeParams);
+      $this->ids['MembershipType'] = [$this->membershipTypeCreate($membershipTypeParams)];
+    }
+    $this->setUpMembershipBlockPriceSet();
     $this->setupPaymentProcessor();
     $contributionPageParameters = !$isRecur ? [] : [
       'is_recur' => TRUE,
