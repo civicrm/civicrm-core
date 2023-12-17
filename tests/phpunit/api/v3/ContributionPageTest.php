@@ -300,8 +300,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $this->setUpMembershipContributionPage(TRUE);
     $submitParams = [
-      $this->getPriceFieldLabel('contribution') => 1,
-      $this->getPriceFieldLabel('membership') => $this->getPriceFieldValue('general'),
+      'price_' . $this->ids['PriceField']['other_amount'] => 1,
+      $this->getPriceFieldLabel('membership_amount') => $this->getPriceFieldValue('general'),
       'id' => $this->getContributionPageID(),
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
@@ -340,8 +340,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->ids['MembershipType'] = [$this->membershipTypeCreate(['minimum_fee' => 2])];
     //Pay later
     $submitParams = [
-      $this->getPriceFieldLabel('contribution') => 1,
-      $this->getPriceFieldLabel('membership') => $this->getPriceFieldValue('general'),
+      $this->getPriceFieldLabel('other_amount') => 1,
+      $this->getPriceFieldLabel('membership_amount') => $this->getPriceFieldValue('general'),
       'id' => $this->getContributionPageID(),
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
@@ -998,22 +998,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       ], $membershipTypeParams);
       $this->ids['MembershipType'] = [$this->membershipTypeCreate($membershipTypeParams)];
     }
-    $this->setUpMembershipBlockPriceSet();
-    $this->setupPaymentProcessor();
     $contributionPageParameters = !$isRecur ? [] : [
       'is_recur' => TRUE,
       'recur_frequency_unit' => 'month',
     ];
-    $this->setUpContributionPage($contributionPageParameters, ['id' => $this->getPriceSetID('membership_block')]);
-
-    $this->callAPISuccess('MembershipBlock', 'create', [
-      'entity_id' => $this->getContributionPageID(),
-      'entity_table' => 'civicrm_contribution_page',
-      'is_required' => TRUE,
-      'is_active' => TRUE,
-      'is_separate_payment' => $isSeparatePayment,
-      'membership_type_default' => $this->ids['MembershipType'],
-    ]);
+    $this->contributionPageQuickConfigCreate($contributionPageParameters, [], $isSeparatePayment, TRUE, TRUE, TRUE);
   }
 
   /**
@@ -1520,7 +1509,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   private function getSubmitParamsContributionPlusMembership(bool $isCardPayment = FALSE, string $membershipType = 'general'): array {
     $params = $this->getSubmitParamsMembership($isCardPayment, $membershipType);
-    $params[$this->getPriceFieldLabel('contribution')] = 1;
+    $params['price_' . $this->ids['PriceField']['other_amount']] = 88;
     return $params;
   }
 
@@ -1534,7 +1523,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   protected function getSubmitParamsMembership(bool $isCardPayment = FALSE, string $membershipType = 'general'): array {
     $params = [
-      $this->getPriceFieldLabel('membership') => $this->getPriceFieldValue($membershipType),
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_' . $membershipType],
       'id' => $this->getContributionPageID(),
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
