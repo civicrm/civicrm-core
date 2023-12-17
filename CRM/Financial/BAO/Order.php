@@ -958,7 +958,24 @@ class CRM_Financial_BAO_Order {
         $lineItem['entity_table'] = 'civicrm_membership';
       }
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
-      $lineItem['line_total_inclusive'] = $lineItem['line_total'] + $lineItem['tax_amount'];
+      $lineItem['tax_rate'] = $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
+      if ($this->getOverrideTotalAmount() !== FALSE) {
+        $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
+      }
+      elseif ($this->getPriceFieldMetadata($lineItem['price_field_id'])['name'] === 'other_amount') {
+        // Other amount is a front end user entered form. It is reasonable to think it would be tax inclusive.
+        $lineItem['line_total_inclusive'] = $lineItem['line_total'];
+        $lineItem['line_total'] = $lineItem['line_total_inclusive'] / (1 + ($lineItem['tax_rate'] / 100));
+        $lineItem['tax_amount'] = round($lineItem['line_total_inclusive'] - $lineItem['line_total'], 2);
+        // Make sure they still add up to each other afer the rounding.
+        $lineItem['line_total'] = $lineItem['line_total_inclusive'] - $lineItem['tax_amount'];
+        $lineItem['unit_price'] = $lineItem['line_total'] / $lineItem['qty'];
+
+      }
+      elseif ($taxRate) {
+        $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
+      }
+      $lineItem['line_total_inclusive'] = $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
     }
     return $lineItems;
   }
