@@ -10,4 +10,10 @@ namespace Civi\Api4;
  */
 class Session extends Generic\DAOEntity {
 
+  public static function permissions() {
+    return [
+      'default' => ['cms:administer users'],
+    ];
+  }
+
 }
