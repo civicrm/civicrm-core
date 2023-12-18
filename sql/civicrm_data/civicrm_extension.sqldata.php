@@ -37,8 +37,14 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_extension', 'INSERT IGNORE INTO
       'name' => 'FlexMailer',
       'file' => 'flexmailer',
     ],
-
-    // The following should be kept in sync with the *default* list of components (`enable_components`).
+    [
+      'full_name' => 'civi_campaign',
+      'name' => 'CiviCampaign',
+    ],
+    [
+      'full_name' => 'civi_case',
+      'name' => 'CiviCase',
+    ],
     [
       'full_name' => 'civi_contribute',
       'name' => 'CiviContribute',
