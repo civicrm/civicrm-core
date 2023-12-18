@@ -11,6 +11,7 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
+use Civi\Api4\PriceSet;
 use Civi\Api4\PriceSetEntity;
 use Civi\Test\ContributionPageTestTrait;
 use Civi\Test\FormTrait;
@@ -814,6 +815,96 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
     $this->assertEquals($processor['payment_instrument_id'], $recurringContribution['payment_instrument_id']);
     $this->assertEquals(5, $recurringContribution['contribution_status_id']);
+  }
+
+  /**
+   * Helper function to set up contribution page which can be used to purchase a
+   * membership type for different intervals.
+   */
+  public function setUpMultiIntervalMembershipContributionPage(): void {
+    $this->membershipTypeCreate([
+      // force auto-renew
+      'name' => 'monthly',
+      'auto_renew' => 2,
+      'duration_unit' => 'month',
+      'minimum_fee' => 10,
+    ], 'monthly');
+
+    $this->membershipTypeCreate([
+      // force auto-renew
+      'auto_renew' => 2,
+      'name' => 'yearly',
+      'duration_unit' => 'year',
+      'minimum_fee' => 100,
+    ], 'yearly');
+    $this->contributionPageQuickConfigCreate([], [], FALSE);
+  }
+
+  /**
+   * Test submit with a membership block in place.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isQuickConfig
+   */
+  public function testSubmitMultiIntervalMembershipContributionPage(bool $isQuickConfig): void {
+    $this->setUpMultiIntervalMembershipContributionPage();
+    PriceSet::update()->setValues(['is_quick_config' => $isQuickConfig])->addWhere('id', '=', $this->ids['PriceSet']['QuickConfig'])->execute();
+    if (!$isQuickConfig) {
+      $this->createTestEntity('PriceFieldValue', [
+        'name' => 'CRM-21177_12_Months',
+        'label' => 'CRM-21177 - 12 Months',
+        'amount' => 200,
+        'membership_num_terms' => 12,
+        'membership_type_id' => $this->ids['MembershipType']['monthly'],
+        'price_field_id' => $this->ids['PriceField']['membership_amount'],
+        'financial_type_id:name' => 'Member Dues',
+      ], 'membership_12_months');
+    }
+    $submitParams = [
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_monthly'],
+      'first_name' => 'Billy',
+      'last_name' => 'Gruff',
+      'email' => 'billy@goat.gruff',
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
+      'cvv2' => 123,
+    ];
+    $this->submitOnlineContributionForm($submitParams,
+      $this->getContributionPageID());
+    $membership = $this->callAPISuccessGetSingle('Membership', []);
+    $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['id' => $membership['contribution_recur_id']]);
+    $this->assertEquals('month', $contributionRecur['frequency_unit']);
+    $this->assertEquals(1, $contributionRecur['frequency_interval']);
+
+    $submitParams['price_' . $this->ids['PriceField']['membership_amount']] = $this->ids['PriceFieldValue']['membership_yearly'];
+    $this->submitOnlineContributionForm($submitParams,
+      $this->getContributionPageID());
+    $membership = $this->callAPISuccessGetSingle('Membership', ['membership_type_id' => $this->ids['MembershipType']['yearly']]);
+    $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['id' => $membership['contribution_recur_id']]);
+    $this->assertEquals('year', $contributionRecur['frequency_unit']);
+    $this->assertEquals(1, $contributionRecur['frequency_interval']);
+
+    if (!$isQuickConfig) {
+      $submitParams['price_' . $this->ids['PriceField']['membership_amount']] = $this->ids['PriceFieldValue']['membership_12_months'];
+      $this->submitOnlineContributionForm($submitParams,
+        $this->getContributionPageID());
+      $contribution = $this->callAPISuccess('Contribution', 'get', [
+        'contribution_page_id' => $this->getContributionPageID(),
+        'sequential' => 1,
+        'api.ContributionRecur.getsingle' => [],
+        'version' => 3,
+      ]);
+      $this->assertEquals(1, $contribution['values'][0]['api.ContributionRecur.getsingle']['frequency_interval']);
+      $this->assertEquals(1, $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_interval']);
+      $this->assertEquals(12, $contribution['values'][2]['api.ContributionRecur.getsingle']['frequency_interval']);
+
+      $this->assertEquals('month', $contribution['values'][0]['api.ContributionRecur.getsingle']['frequency_unit']);
+      $this->assertEquals('year', $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_unit']);
+      $this->assertEquals('month', $contribution['values'][2]['api.ContributionRecur.getsingle']['frequency_unit']);
+    }
   }
 
 }

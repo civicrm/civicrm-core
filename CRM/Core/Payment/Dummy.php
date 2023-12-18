@@ -222,8 +222,10 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     // the back-end's canonical set of parameters.  But if a processor
     // does this, it needs to invoke this hook after it has done translation,
     // but before it actually starts talking to its proprietary back-end.
-    if ($propertyBag->getIsRecur()) {
-      $throwAnENoticeIfNotSetAsTheseAreRequired = $propertyBag->getRecurFrequencyInterval() . $propertyBag->getRecurFrequencyUnit();
+    if ($propertyBag->getIsRecur() || !empty($params['contributionRecurID'])) {
+      if (empty($params['frequency_interval']) || empty($params['frequency_unit'])) {
+        CRM_Core_Error::deprecatedWarning('contracted frequency params not passed');
+      }
     }
     // no translation in Dummy processor
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $propertyBag);

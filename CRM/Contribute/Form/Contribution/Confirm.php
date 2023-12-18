@@ -1321,7 +1321,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   protected function processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams,
                                 $membershipLineItems): void {
 
-    $membershipTypeIDs = (array) $membershipParams['selectMembership'];
+    $membershipTypeIDs = array_keys($this->order->getMembershipTypes());
     $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIDs);
     $membershipType = empty($membershipTypes) ? [] : reset($membershipTypes);
 
