@@ -591,8 +591,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function doSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPayment(array $params = []): void {
-    $this->params['is_recur'] = 1;
-    $this->params['recur_frequency_unit'] = $params['recur_frequency_unit'];
+    $params['is_recur'] = 1;
     $membershipTypeParams['duration_unit'] = $params['duration_unit'];
     if ($params['recur_frequency_unit'] === $params['duration_unit']) {
       $durationUnit = $params['duration_unit'];
@@ -617,7 +616,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = array_merge($this->getSubmitParamsMembership(TRUE), [
       'is_recur' => 1,
       'frequency_interval' => 1,
-      'frequency_unit' => $this->params['recur_frequency_unit'],
+      'frequency_unit' => $params['recur_frequency_unit'],
     ]);
 
     $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
