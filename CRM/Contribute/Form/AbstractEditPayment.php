@@ -235,6 +235,24 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $invoiceID;
 
   /**
+   * Provide support for extensions that are used to being able to retrieve _lineItem
+   *
+   * Note extension should call getPriceSetID() and getLineItems() directly.
+   * They are supported for external use per the api annotation.
+   *
+   * @param string $name
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function __get($name) {
+    if ($name === '_params') {
+      CRM_Core_Error::deprecatedWarning('attempt to access undefined property _params - use externally supported function getSubmittedValues()');
+      return $this->getSubmittedValues();
+    }
+    CRM_Core_Error::deprecatedWarning('attempt to access invalid property :' . $name);
+  }
+
+  /**
    * Get the unique invoice ID.
    *
    * This is generated if one has not already been generated.
