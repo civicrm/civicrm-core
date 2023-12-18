@@ -33,7 +33,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
    * @throws \CRM_Core_Exception
    */
   public function getExamples(): iterable {
-    $workflows = ['event_online_receipt', 'event_offline_receipt'];
+    $workflows = ['event_online_receipt', 'event_offline_receipt', 'participant_cancelled', 'participant_confirm', 'participant_expired', 'participant_transferred', 'event_registration_receipt'];
     foreach ($workflows as $workflow) {
       $priceSets = $this->getPriceSets();
       foreach ($priceSets as $priceSet) {
@@ -141,7 +141,7 @@ United States';
     $messageTemplate->setOrder($mockOrder);
     $messageTemplate->setParticipantContacts($participantContacts);
     $roleID = Event::get(FALSE)->addWhere('id', '=', $example['event_id'])->addSelect('default_role_id')->execute()->first()['default_role_id'];
-    $messageTemplate->setParticipant(['id' => $isPrimary ? $primaryParticipantID : $otherParticipantID, 'registered_by_id' => $isPrimary ? NULL : $primaryParticipantID, 'register_date' => date('Y-m-d'), 'role_id' => $roleID]);
+    $messageTemplate->setParticipant(['id' => $isPrimary ? $primaryParticipantID : $otherParticipantID, 'registered_by_id' => $isPrimary ? NULL : $primaryParticipantID, 'register_date' => date('Y-m-d'), 'role_id' => $roleID, 'event_id' => $example['event_id']]);
   }
 
   /**
