@@ -37,7 +37,16 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   public $_action;
 
+  public $_bltID;
+
   public $_fields = [];
+
+  /**
+   * Current payment processor including a copy of the object in 'object' key.
+   *
+   * @var array
+   */
+  public $_paymentProcessor;
 
   /**
    * Available recurring processors.
