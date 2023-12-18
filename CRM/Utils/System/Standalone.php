@@ -16,6 +16,7 @@
  */
 
 use Civi\Standalone\Security;
+use Civi\Standalone\SessionHandler;
 
 /**
  * Standalone specific stuff goes here.
@@ -33,18 +34,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function missingStandaloneExtension() {
     // error_log("sessionStart, " . (class_exists(\Civi\Standalone\Security::class) ? 'exists' : 'no ext'));
     return !class_exists(\Civi\Standalone\Security::class);
-  }
-
-  public function initialize() {
-    parent::initialize();
-    // Initialize the session if it looks like there might be one.
-    // Case 1: user sends no session cookie: do NOT start the session. May be anon access that does not require session data. Good for caching.
-    // Case 2: user sends a session cookie: start the session, so we can access data like lcMessages for localization (which occurs early in the boot process).
-    // Case 3: user sends a session cookie but it's invalid: start the session, it will be empty and a new cookie will be sent.
-    if (isset($_COOKIE['PHPSESSID'])) {
-      // Note: passing $isRead = FALSE in the arguments will cause the session to be started.
-      CRM_Core_Session::singleton()->initialize(FALSE);
-    }
   }
 
   /**
@@ -595,6 +584,26 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
       throw new CRM_Core_Exception('Access denied. Standaloneusers extension not found');
     }
+  }
+
+  /**
+   * Start a new session.
+   */
+  public function sessionStart() {
+    $session_handler = new SessionHandler();
+    session_set_save_handler($session_handler);
+
+    $session_max_lifetime = Civi::settings()->get('standaloneusers_session_max_lifetime') ?? 1440;
+
+    session_start([
+      'cookie_httponly'  => 1,
+      'cookie_secure'    => !empty($_SERVER['HTTPS']),
+      'gc_maxlifetime'   => $session_max_lifetime,
+      'name'             => 'SESSCIVISO',
+      'use_cookies'      => 1,
+      'use_only_cookies' => 1,
+      'use_strict_mode'  => 1,
+    ]);
   }
 
 }
