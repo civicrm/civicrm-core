@@ -515,8 +515,6 @@ trait Api3TestTrait {
       $actionInfo = \civicrm_api4($v4Entity, 'getActions', ['checkPermissions' => FALSE, 'where' => [['name', '=', $v4Action]]]);
     }
     catch (NotImplementedException $e) {
-      // For now we'll mark the test incomplete if a v4 entity doesn't exit yet
-      $this->markTestIncomplete($e->getMessage());
     }
     if (!isset($actionInfo[0])) {
       throw new \Exception("Api4 $v4Entity $v4Action does not exist.");
