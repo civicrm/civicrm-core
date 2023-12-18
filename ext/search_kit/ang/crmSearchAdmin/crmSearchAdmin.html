@@ -92,13 +92,13 @@
 
     <div class="crm-flex-box">
       <nav class="crm-search-admin-main-tabs">
-        <ul class="nav nav-pills nav-stacked" ng-include="'~/crmSearchAdmin/tabs.html'"></ul>
+        <ul class="nav nav-pills nav-stacked" role="tablist" aria-orientation="vertical" ng-include="'~/crmSearchAdmin/tabs.html'"></ul>
       </nav>
       <div class="crm-flex-4">
-        <div ng-if="!$ctrl.selectedDisplay()">
+        <div ng-if="!$ctrl.selectedDisplay()" role="tabpanel">
           <div ng-include="'~/crmSearchAdmin/crmSearch-' + controls.tab + '.html'" class="crm-search-admin-relative"></div>
         </div>
-        <div ng-if="$ctrl.selectedDisplay()">
+        <div ng-if="$ctrl.selectedDisplay()" role="tabpanel">
           <div ng-repeat="display in $ctrl.savedSearch.displays" ng-if="controls.tab === ('display_' + $index)">
             <crm-search-admin-display class="crm-search-admin-relative" display="display" saved-search="$ctrl.savedSearch"></crm-search-admin-display>
           </div>
