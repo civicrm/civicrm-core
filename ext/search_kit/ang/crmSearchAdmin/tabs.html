@@ -10,7 +10,7 @@
     <i class="crm-i fa-users"></i>
     {{:: ts('Smart Group') }} {{ $ctrl.savedSearch.groups[0].title }}
   </a>
-  <button type="button" class="btn-xs btn-danger-outline crm-search-display-control" ng-click="$ctrl.removeGroup()" title="{{ $ctrl.groupExists ? ts('Delete') : ts('Undelete') }}">
+  <button type="button" class="btn btn-xs btn-danger-outline crm-search-display-control" ng-click="$ctrl.removeGroup()" title="{{ $ctrl.groupExists ? ts('Delete') : ts('Undelete') }}">
     <i class="crm-i fa-{{ $ctrl.groupExists ? 'trash' : 'undo' }}"></i>
   </button>
 </li>
