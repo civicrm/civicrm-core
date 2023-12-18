@@ -102,6 +102,9 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     if ($this->getProductID()) {
       $this->buildPremiumsBlock(FALSE, $option);
     }
+    else {
+      $this->assign('products');
+    }
 
     $params = $this->_params;
     $this->assign('getTaxDetails', (bool) $this->order->getTotalTaxAmount());
@@ -127,6 +130,9 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $fieldTypes = ['Contact'];
       $fieldTypes[] = CRM_Core_BAO_UFGroup::getContactType($this->_values['honoree_profile_id']);
       $this->buildCustom($this->_values['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
+    }
+    else {
+      $this->assign('honoreeProfileFields');
     }
 
     $qParams = "reset=1&amp;id={$this->_id}";
