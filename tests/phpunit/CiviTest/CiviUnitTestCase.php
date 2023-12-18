@@ -973,13 +973,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   public function pledgeCreate(array $params): int {
     $params = array_merge([
-      'pledge_create_date' => date('Ymd'),
+      'create_date' => date('Ymd'),
       'start_date' => date('Ymd'),
       'scheduled_date' => date('Ymd'),
       'amount' => 100.00,
-      'pledge_status_id' => '2',
+      'status_id' => '2',
       'financial_type_id' => '1',
-      'pledge_original_installment_amount' => 20,
+      'original_installment_amount' => 20,
       'frequency_interval' => 5,
       'frequency_unit' => 'year',
       'frequency_day' => 15,
@@ -987,7 +987,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ],
       $params);
 
-    $result = $this->callAPISuccess('Pledge', 'create', $params);
+    $result = $this->createTestEntity('Pledge', $params);
     return $result['id'];
   }
 

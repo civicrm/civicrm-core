@@ -2389,8 +2389,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test repeat contribution accepts recur_id instead of
    * original_contribution_id.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionAcceptRecurID(): void {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
@@ -3311,12 +3309,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'trxn_date' => '1 Feb 2013',
     ]);
     $pledge = $this->callAPISuccessGetSingle('Pledge', [
-      'id' => $this->_ids['pledge'],
+      'id' => $this->ids['Pledge']['default'],
     ]);
     $this->assertEquals('Completed', $pledge['pledge_status']);
 
     $status = $this->callAPISuccessGetValue('PledgePayment', [
-      'pledge_id' => $this->_ids['pledge'],
+      'pledge_id' => $this->ids['Pledge']['default'],
       'return' => 'status_id',
     ]);
     $this->assertEquals(1, $status);
@@ -3354,7 +3352,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'trxn_date' => '1 Feb 2013',
     ]);
     $this->assertEquals('In Progress', Pledge::get()
-      ->addWhere('id', '=', $this->_ids['pledge'])
+      ->addWhere('id', '=', $this->ids['Pledge']['default'])
       ->addSelect('status_id:name')->execute()->first()['status_id:name']
     );
     $this->callAPISuccess('contribution', 'repeattransaction', [
@@ -3363,7 +3361,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 'Completed',
     ]);
     $this->assertEquals('Completed', Pledge::get()
-      ->addWhere('id', '=', $this->_ids['pledge'])
+      ->addWhere('id', '=', $this->ids['Pledge']['default'])
       ->addSelect('status_id:name')->execute()->first()['status_id:name']
     );
   }
@@ -3873,7 +3871,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function createPendingPledgeContribution(int $installments = 1): int {
     $pledgeID = $this->pledgeCreate(['contact_id' => $this->individualID, 'installments' => $installments, 'amount' => 500]);
-    $this->_ids['pledge'] = $pledgeID;
     $contribution = $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, [
       'contribution_status_id' => 'Pending',
       'total_amount' => (500 / $installments),
@@ -4246,9 +4243,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *   Parameters to merge into the recur only.
    *
    * @return array|int
-   * @throws \CRM_Core_Exception
    */
-  protected function setUpAutoRenewMembership($generalParams = [], $recurParams = []) {
+  protected function setUpAutoRenewMembership(array $generalParams = [], array $recurParams = []) {
     $newContact = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Individual',
       'sort_name' => 'McTesterson, Testy',
@@ -4514,9 +4510,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test sending a mail via the API.
    *
-   * @throws \CRM_Core_Exception
    */
-  public function testSendMailWithRepeatTransactionAPIFalltoContributionPage(): void {
+  public function testSendMailWithRepeatTransactionAPIFallToContributionPage(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $contributionPage = $this->contributionPageCreate(['receipt_from_name' => 'CiviCRM LLC', 'receipt_from_email' => 'contributionpage@civicrm.org', 'is_email_receipt' => 1]);
     $paymentProcessorID = $this->paymentProcessorCreate();
