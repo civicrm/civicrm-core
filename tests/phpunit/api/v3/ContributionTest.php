@@ -2532,9 +2532,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * This is one of those tests that locks in existing behaviour.
    *
-   * I feel like correct behaviour is arguable & has been discussed in the past. However, if the membership has
-   * a date which says it should be expired then the result of repeattransaction is to push that date
-   * to be one membership term from 'now' with status 'new'.
+   * I feel like correct behaviour is arguable & has been discussed in the
+   * past. However, if the membership has a date which says it should be
+   * expired then the result of repeattransaction is to push that date to be
+   * one membership term from 'now'.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testRepeattransactionRenewMembershipOldMembership(): void {
     $entities = $this->setUpAutoRenewMembership();
@@ -2552,11 +2555,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     // So it seems renewing this expired membership results in it's new status being current and it being pushed to a future date
     $this->callAPISuccess('Contribution', 'repeattransaction', ['original_contribution_id' => $entities[0]['id'], 'contribution_status_id' => 'Completed']);
-    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membership['id']]);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membership['id'], 'version' => 4, 'return' => ['end_date', 'status_id.name']]);
     // If this date calculation winds up being flakey the spirit of the test would be maintained by just checking
     // date is greater than today.
     $this->assertEquals(date('Y-m-d', strtotime('+ 1 month -1 day')), $membership['end_date']);
-    $this->assertEquals($newStatusID, $membership['membership_type_id']);
+    $this->assertEquals('Current', $membership['status_id.name']);
   }
 
   /**
