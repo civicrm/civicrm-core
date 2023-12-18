@@ -259,7 +259,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
   }
 
   /**
-   * Check the function to populate phone_numeric exists.
+   * Check the SQL trigger to populate `civicrm_relationship_cache` exists.
    *
    * @return array|\CRM_Utils_Check_Message[]
    */
@@ -275,13 +275,45 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         ts("Your database is missing functionality to populate the relationship cache."),
         ts('Missing Relationship Cache Trigger'),
         \Psr\Log\LogLevel::WARNING,
-        'fa-server'
+        'fa-database'
       );
       $msg->addAction(
         ts('Rebuild triggers'),
         ts('Create missing triggers now? This may take a few minutes.'),
         'api3',
         ['System', 'flush', ['triggers' => TRUE]]
+      );
+      return [$msg];
+    }
+    return [];
+  }
+
+  /**
+   * Verify `civicrm_relationship_cache` table contains the right amount of data.
+   *
+   * @return array|\CRM_Utils_Check_Message[]
+   */
+  public function checkRelationshipCacheData(): array {
+    $relationshipCount = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(`id`) FROM `civicrm_relationship`");
+    $cacheCount = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(`id`) FROM `civicrm_relationship_cache`");
+    $expectedCount = 2 * $relationshipCount;
+    if ($cacheCount !== $expectedCount) {
+      $msg = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts("Your database is missing relationship cache data; this can cause related contact information to not show when it should.") .
+          '<ul><li>' . ts('Expected %1 records.', [1 => $expectedCount]) . '</li>' .
+          '<li>' . ts('Found %1 in cache.', [1 => $cacheCount]) . '</li></ul>',
+        ts('Missing Relationship Cache Data'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-database'
+      );
+      $msg->addAction(
+        ts('Rebuild cache'),
+        '<p>' . ts('Rebuild relationship cache now? This may take a few minutes.') . '</p>' .
+        '<p>' . ts('Note: on very large databases it may be necessary to run this via cli instead to avoid timeouts:') . '</p>' .
+        '<pre>cv api4 RelationshipCache.rebuild</pre>',
+        'api4',
+        ['RelationshipCache', 'rebuild']
       );
       return [$msg];
     }

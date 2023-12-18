@@ -268,14 +268,9 @@ United States<br />',
     $this->setCurrencySeparators($thousandSeparator);
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
     $_REQUEST['mode'] = 'live';
-    Civi\Payment\System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['payment_status_id' => 'failed']);
-    try {
-      $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      return;
-    }
-    $this->fail('should have hit premature exit');
+    \Civi\Payment\System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['payment_status_id' => 'failed']);
+    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
+    $this->assertPrematureExit();
   }
 
   /**

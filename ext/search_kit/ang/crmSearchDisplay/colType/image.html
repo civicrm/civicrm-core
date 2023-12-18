@@ -1,6 +1,6 @@
 <span ng-if="::colData.links && colData.img">
   <span ng-repeat="link in colData.links">
-    <a target="{{:: link.target }}" ng-href="{{:: link.url }}">
+    <a target="{{:: link.target }}" ng-attr-href="{{ link.url || '' }}">
       <img ng-src="{{:: colData.img.src }}" alt="{{:: colData.val }}" height="{{:: colData.img.height }}" width="{{:: colData.img.width }}"/>
     </a>
   </span>

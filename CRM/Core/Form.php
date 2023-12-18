@@ -726,8 +726,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * buildQuickForm.
    */
   public function buildForm() {
-    $this->_formBuilt = TRUE;
-
     $this->preProcess();
 
     CRM_Utils_Hook::preProcess(get_class($this), $this);
@@ -785,6 +783,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // it's already been initialized.
     self::$_template->ensureVariablesAreAssigned($this->expectedSmartyVariables);
     self::$_template->addExpectedTabHeaderKeys();
+    $this->_formBuilt = TRUE;
   }
 
   /**

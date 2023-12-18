@@ -611,16 +611,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ($this->_priceSetId || !empty($_POST['price_set_id']))
     ) {
       $buildPriceSet = TRUE;
-      $getOnlyPriceSetElements = TRUE;
-      if (!$this->_priceSetId) {
-        $this->_priceSetId = $_POST['price_set_id'];
-        $getOnlyPriceSetElements = FALSE;
-      }
-
       $this->buildPriceSet();
-
-      // get only price set form elements.
-      if ($getOnlyPriceSetElements) {
+      if (!$this->isSubmitted()) {
+        // This is being called in overload mode to render the price set.
         return;
       }
     }
@@ -2402,13 +2395,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * Get the price set ID.
    *
-   * Note that the function currently returns NULL if not submitted
-   * but will over time be fixed to always return an ID.
+   * @api Supported for external use.
    *
    * @return int|null
    */
-  protected function getPriceSetID() {
-    return $this->getSubmittedValue('price_set_id') ?: CRM_Utils_Request::retrieve('priceSetId', 'Integer');
+  public function getPriceSetID(): ?int {
+    $priceSetID = $this->getSubmittedValue('price_set_id') ?: CRM_Utils_Request::retrieve('priceSetId', 'Integer');
+    if (!$this->isFormBuilt() && !empty($this->getSubmitValue('price_set_id'))) {
+      return (int) $this->getSubmitValue('price_set_id');
+    }
+    return $priceSetID ?? NULL;
   }
 
   /**

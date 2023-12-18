@@ -111,6 +111,7 @@
     <html>
       <type>Text</type>
     </html>
+    <crmType>CRM_Utils_Type::T_FLOAT</crmType>
   </field>
   <field>
     <name>unit_price</name>

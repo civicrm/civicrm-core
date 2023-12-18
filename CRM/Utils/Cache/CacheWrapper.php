@@ -22,7 +22,7 @@ class CRM_Utils_Cache_CacheWrapper implements CRM_Utils_Cache_Interface {
   /**
    * @var string
    */
-  private $cacheName;
+  private $serviceName;
 
   /**
    * @var CRM_Utils_Cache_Interface
@@ -31,11 +31,11 @@ class CRM_Utils_Cache_CacheWrapper implements CRM_Utils_Cache_Interface {
 
   /**
    * @param \CRM_Utils_Cache_Interface $delegate
-   * @param string $cacheName
+   * @param string $serviceName
    */
-  public function __construct(\CRM_Utils_Cache_Interface $delegate, $cacheName) {
+  public function __construct(\CRM_Utils_Cache_Interface $delegate, $serviceName) {
     $this->delegate = $delegate;
-    $this->cacheName = $cacheName;
+    $this->serviceName = $serviceName;
   }
 
   public function getMultiple($keys, $default = NULL) {
@@ -93,13 +93,12 @@ class CRM_Utils_Cache_CacheWrapper implements CRM_Utils_Cache_Interface {
 
   private function dispatchClearEvent($keys = NULL) {
     // FIXME: When would name ever be empty?
-    if ($this->cacheName) {
+    if ($this->serviceName) {
       $hookParams = [
-        'cacheName' => $this->cacheName,
         'items' => $keys,
       ];
       $event = \Civi\Core\Event\GenericHookEvent::create($hookParams);
-      Civi::dispatcher()->dispatch('civi.cache.clear', $event);
+      Civi::dispatcher()->dispatch("civi.cache.$this->serviceName.clear", $event);
     }
   }
 

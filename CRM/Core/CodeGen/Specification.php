@@ -344,7 +344,7 @@ class CRM_Core_CodeGen_Specification {
       case 'decimal':
         $length = $fieldXML->length ? $fieldXML->length : '20,2';
         $field['sqlType'] = 'decimal(' . $length . ')';
-        $field['crmType'] = 'CRM_Utils_Type::T_MONEY';
+        $field['crmType'] = $this->value('crmType', $fieldXML, 'CRM_Utils_Type::T_MONEY');
         $field['precision'] = $length . ',';
         break;
 

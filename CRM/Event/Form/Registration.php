@@ -604,7 +604,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Initiate event fee.
    *
-   * @param \CRM_Event_Form_Participant|\CRM_Event_Form_Registration|\CRM_Event_Form_ParticipantFeeSelection|\CRM_Event_Form_Task_Register $form
+   * @param \CRM_Event_Form_Registration|\CRM_Event_Form_ParticipantFeeSelection $form
    * @param bool $doNotIncludeExpiredFields
    *   See CRM-16456.
    * @param int|null $priceSetId
@@ -661,17 +661,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $eventFee = $form->_values['fee'] ?? NULL;
     if (!is_array($eventFee) || empty($eventFee)) {
       $form->_values['fee'] = [];
-    }
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-      && !empty($form->_values['fee'])
-    ) {
-      foreach ($form->_values['fee'] as $k => $fees) {
-        foreach ($fees['options'] as $options) {
-          if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
-            unset($form->_values['fee'][$k]);
-          }
-        }
-      }
     }
   }
 
