@@ -1860,10 +1860,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // @todo deprecate receiving amount, calculate on the form.
       $form->order->setOverrideTotalAmount((float) $params['amount']);
     }
-    $amount = $form->order->getTotalAmount();
-    if ($form->isSeparateMembershipPayment()) {
-      $amount -= $form->order->getMembershipTotalAmount();
-    }
     // hack these in for test support.
     $form->_fields['billing_first_name'] = 1;
     $form->_fields['billing_last_name'] = 1;
