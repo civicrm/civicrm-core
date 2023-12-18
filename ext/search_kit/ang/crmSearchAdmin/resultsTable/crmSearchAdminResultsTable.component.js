@@ -59,16 +59,11 @@
           if (!ui.item.sortable.dropindex && ctrl.crmSearchAdmin.groupExists) {
             ui.item.sortable.cancel();
           }
-          // Function selectors use `ng-repeat` with `track by $index` so must be refreshed when rearranging the array
-          ctrl.crmSearchAdmin.hideFuncitons();
         }
       };
 
       $scope.fieldsForSelect = function() {
-        return {results: ctrl.crmSearchAdmin.getAllFields(':label', ['Field', 'Custom', 'Extra', 'Pseudo'], function(key) {
-            return _.contains(ctrl.search.api_params.select, key);
-          })
-        };
+        return ctrl.crmSearchAdmin.fieldsForSelect();
       };
 
       $scope.addColumn = function(col) {
