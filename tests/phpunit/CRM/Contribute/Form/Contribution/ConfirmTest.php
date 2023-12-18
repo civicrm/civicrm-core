@@ -670,7 +670,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->getContributionPageID());
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID()]);
-    $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $contribution['id'], 'version' => 3]);
+    $this->callAPISuccessGetSingle('MembershipPayment', ['version' => 3, 'contribution_id' => $contribution['id']]);
     //Assert only one mail is being sent.
     $this->assertMailSentCount(1);
     $this->assertMailSentContainingStrings([
