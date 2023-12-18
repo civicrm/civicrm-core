@@ -384,6 +384,7 @@ SELECT rec.id                   as recur_id,
        mp.membership_id";
 
     if ($entity == 'recur') {
+      // This should be always true now.
       $sql .= "
       FROM civicrm_contribution_recur rec
 LEFT JOIN civicrm_contribution       con ON ( con.contribution_recur_id = rec.id )
@@ -391,6 +392,7 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
      WHERE rec.id = %1";
     }
     elseif ($entity == 'contribution') {
+      CRM_Core_Error::deprecatedWarning('no longer used');
       $sql .= "
       FROM civicrm_contribution       con
 INNER JOIN civicrm_contribution_recur rec ON ( con.contribution_recur_id = rec.id )
@@ -398,6 +400,7 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
      WHERE con.id = %1";
     }
     elseif ($entity == 'membership') {
+      CRM_Core_Error::deprecatedWarning('no longer used');
       $sql .= "
       FROM civicrm_membership_payment mp
 INNER JOIN civicrm_membership         mem ON ( mp.membership_id = mem.id )
