@@ -278,6 +278,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     }
 
     $this->assign('isPendingOutcome', $this->isPendingOutcome($params));
+    $this->assign('paymentProcessorName', $this->getPaymentProcessorValue('frontend_title'));
     $this->freeze();
 
     // can we blow away the session now to prevent hackery
