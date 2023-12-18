@@ -152,12 +152,10 @@ trait CRMTraits_Financial_PriceSetTrait {
    * page with non-quick config membership and an optional
    * additional contribution non-membership amount.
    *
-   * @param array $membershipTypeParams
-   *
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function setUpMembershipBlockPriceSet(array $membershipTypeParams = []): void {
+  protected function setUpMembershipBlockPriceSet(): void {
     $this->ids['PriceSet']['membership_block'] = PriceSet::create(FALSE)
       ->setValues([
         'is_quick_config' => TRUE,
@@ -167,12 +165,6 @@ trait CRMTraits_Financial_PriceSetTrait {
       ])
       ->execute()->first()['id'];
 
-    if (empty($this->ids['MembershipType'])) {
-      $membershipTypeParams = array_merge([
-        'minimum_fee' => 2,
-      ], $membershipTypeParams);
-      $this->ids['MembershipType'] = [$this->membershipTypeCreate($membershipTypeParams)];
-    }
     $priceField = $this->callAPISuccess('PriceField', 'create', [
       'price_set_id' => $this->ids['PriceSet']['membership_block'],
       'name' => 'membership_amount',

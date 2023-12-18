@@ -45,7 +45,7 @@
         </div>
       {/if}
     {elseif $isPendingOutcome}
-      <div>{ts 1=$paymentProcessor.name}Your contribution has been submitted to %1 for processing.{/ts}</div>
+      <div>{ts 1=$paymentProcessorName|escape}Your contribution has been submitted to %1 for processing.{/ts}</div>
         {if $is_email_receipt}
       <div>
         {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
