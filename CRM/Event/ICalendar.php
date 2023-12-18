@@ -54,10 +54,7 @@ class CRM_Event_ICalendar {
     $config = CRM_Core_Config::singleton();
 
     $template->assign('events', $info);
-
-    $timezones = [@date_default_timezone_get()];
-
-    $template->assign('timezone', $timezones[0]);
+    $template->assign('timezone', date_default_timezone_get());
 
     // Send data to the correct template for formatting (iCal vs. gData)
     if ($rss) {
