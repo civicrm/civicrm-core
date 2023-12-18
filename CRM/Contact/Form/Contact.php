@@ -322,7 +322,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $paramSubType = implode(',', $contactSubType);
       }
 
-      $this->_getCachedTree = FALSE;
       unset($customGroupCount[0]);
       foreach ($customGroupCount as $groupID => $groupCount) {
         if ($groupCount > 1) {
@@ -330,7 +329,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           //loop the group
           for ($i = 1; $i <= $groupCount; $i++) {
             CRM_Custom_Form_CustomData::preProcess($this, NULL, $contactSubType,
-              $i, $this->_contactType, $this->_contactId
+              $i, $this->_contactType, $this->_contactId, NULL, FALSE
             );
             CRM_Contact_Form_Edit_CustomData::buildQuickForm($this);
           }

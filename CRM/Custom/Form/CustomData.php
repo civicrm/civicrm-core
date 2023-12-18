@@ -72,15 +72,16 @@ class CRM_Custom_Form_CustomData {
    *   participant data this could be a value representing role.
    * @param null|string $subType
    * @param null|int $groupCount
-   * @param string $type
+   * @param null $type
    * @param null|int $entityID
    * @param null $onlySubType
+   * @param bool $isLoadFromCache
    *
    * @throws \CRM_Core_Exception
    */
   public static function preProcess(
     &$form, $extendsEntityColumn = NULL, $subType = NULL,
-    $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL
+    $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL, $isLoadFromCache = TRUE
   ) {
     if (!$type) {
       CRM_Core_Error::deprecatedWarning('type should be passed in');
@@ -131,7 +132,6 @@ class CRM_Custom_Form_CustomData {
     }
 
     $gid = (isset($form->_groupID)) ? $form->_groupID : NULL;
-    $getCachedTree = $form->_getCachedTree ?? TRUE;
     if (!is_array($subType) && str_contains(($subType ?? ''), CRM_Core_DAO::VALUE_SEPARATOR)) {
       CRM_Core_Error::deprecatedWarning('Using a CRM_Core_DAO::VALUE_SEPARATOR separated subType deprecated, use a comma-separated string instead.');
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
@@ -154,7 +154,7 @@ class CRM_Custom_Form_CustomData {
       $gid,
       $subType,
       $extendsEntityColumn,
-      $getCachedTree,
+      $isLoadFromCache,
       $onlySubType,
       FALSE,
       CRM_Core_Permission::EDIT,
