@@ -106,7 +106,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     //set defaults in create mode
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
-      if (empty($params['invoice_number']) && CRM_Invoicing_Utils::isInvoicingEnabled()) {
+      if (empty($params['invoice_number']) && \Civi::settings()->get('invoicing')) {
         $nextContributionID = CRM_Core_DAO::singleValueQuery("SELECT COALESCE(MAX(id) + 1, 1) FROM civicrm_contribution");
         $params['invoice_number'] = self::getInvoiceNumber($nextContributionID);
       }
