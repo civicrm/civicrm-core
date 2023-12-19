@@ -20,11 +20,6 @@ use PHPUnit\Framework\Assert;
 class EventCheck extends Assert {
 
   /**
-   * @var \PHPUnit\Framework\Test
-   */
-  private $test;
-
-  /**
    * Determine whether this check should be used during the current test.
    *
    * @param \PHPUnit\Framework\Test|null $test
@@ -36,20 +31,6 @@ class EventCheck extends Assert {
    */
   public function isSupported($test) {
     return TRUE;
-  }
-
-  /**
-   * @return \PHPUnit\Framework\Test|NULL
-   */
-  public function getTest() {
-    return $this->test;
-  }
-
-  /**
-   * @param \PHPUnit\Framework\Test|null $test
-   */
-  public function setTest($test): void {
-    $this->test = $test;
   }
 
   /**

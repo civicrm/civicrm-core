@@ -37,7 +37,6 @@ class EventChecker {
         /** @var EventCheck $template */
         if ($template->isSupported($test)) {
           $checker = clone $template;
-          $checker->setTest($test);
           $this->activeChecks[] = $checker;
           $checker->setUp();
         }
@@ -79,7 +78,6 @@ class EventChecker {
     foreach ($this->activeChecks ?? [] as $checker) {
       /** @var \Civi\Test\EventCheck $checker */
       Invasive::call([$checker, 'tearDown']);
-      $checker->setTest(NULL);
     }
     $this->activeChecks = NULL;
     return $this;
