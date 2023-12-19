@@ -133,7 +133,7 @@ class CRM_Contribute_Task extends CRM_Core_Task {
       }
 
       // remove action "Invoices - print or email"
-      $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
+      $invoicing = \Civi::settings()->get('invoicing');
       if (!$invoicing) {
         unset(self::$_tasks[self::PDF_INVOICE]);
       }

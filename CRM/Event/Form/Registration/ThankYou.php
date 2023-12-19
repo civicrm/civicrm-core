@@ -85,7 +85,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
     $this->assignToTemplate();
 
-    $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
+    $invoicing = \Civi::settings()->get('invoicing');
     $taxAmount = 0;
 
     $lineItemForTemplate = [];

@@ -108,7 +108,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         }
         if ($taxAmount != 0) {
           $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($params['contribution']->contribution_status_id, $context) * $taxAmount;
-          $itemParams['description'] = CRM_Invoicing_Utils::getTaxTerm();
+          $itemParams['description'] = \Civi::settings()->get('tax_term');
           if ($lineItemDetails['financial_type_id']) {
             $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
           }

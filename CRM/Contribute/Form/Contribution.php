@@ -600,8 +600,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // build price set form.
     $buildPriceSet = FALSE;
-    $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
-    $this->assign('invoicing', CRM_Invoicing_Utils::isInvoicingEnabled());
+    $this->assign('invoicing', \Civi::settings()->get('invoicing'));
     // This is a probably-deprecated approach to partial payments - assign here
     // & if true it will be overwritten.
     $this->assign('payNow', FALSE);
@@ -1706,7 +1705,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ]);
       $this->_id = $params['id'];
       $this->_values = $existingContribution;
-      if (CRM_Invoicing_Utils::isInvoicingEnabled()) {
+      if (\Civi::settings()->get('invoicing')) {
         $this->_values['tax_amount'] = civicrm_api3('contribution', 'getvalue', [
           'id' => $params['id'],
           'return' => 'tax_amount',
