@@ -1158,6 +1158,12 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function testActivityDetails(): void {
     $this->createContactsWithActivities();
+    // Add employers for created contacts.
+    foreach ($this->contactIDs as $i => $contactID) {
+      $organizationIDs[] = $organizationID = $this->organizationCreate(['organization_name' => 'Test Organization ' . $i]);
+      $this->callAPISuccess('Contact', 'create', ['id' => $contactID, 'employer_id' => $organizationID]);
+    }
+
     $fields = [
       'contact_source' => '1',
       'contact_assignee' => '1',
@@ -1210,8 +1216,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $rows = $this->callAPISuccess('report_template', 'getrows', $params)['values'];
     $expected = [
       'civicrm_contact_contact_source' => 'Łąchowski-Roberts, Anthony II',
-      'civicrm_contact_contact_assignee' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony II</a>',
-      'civicrm_contact_contact_target' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3\'>Brzęczysław, Anthony II</a>; <a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony II</a>',
+      'civicrm_contact_contact_assignee' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->contactIDs[1] . '\'>Łąchowski-Roberts, Anthony II</a>',
+      'civicrm_contact_contact_target' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->contactIDs[0] . '\'>Brzęczysław, Anthony II</a>; <a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->contactIDs[1] . '\'>Łąchowski-Roberts, Anthony II</a>',
       'civicrm_contact_contact_source_id' => $this->contactIDs[2],
       'civicrm_contact_contact_assignee_id' => $this->contactIDs[1],
       'civicrm_contact_contact_target_id' => $this->contactIDs[0] . ';' . $this->contactIDs[1],
@@ -1249,6 +1255,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'civicrm_contact_contact_source_hover' => 'View Contact Summary for this Contact',
       'civicrm_activity_activity_type_id_hover' => 'View Activity Record',
       'class' => NULL,
+      'civicrm_contact_contact_source_employer_id' => $organizationIDs[2],
+      'civicrm_contact_contact_assignee_employer_id' => $organizationIDs[1],
+      'civicrm_contact_contact_target_employer_id' => $organizationIDs[0] . ';' . $organizationIDs[1],
     ];
     $row = $rows[0];
     // This link is not relative - skip for now
