@@ -1,36 +1,20 @@
-<li>
-  <textarea class="form-control" placeholder="{{:: ts('Description (shown above default display)') }}" ng-model="$ctrl.savedSearch.description"></textarea>
-</li>
-<li>
-  <div class="form-inline" title="{{:: ts('Search Expiry Date') }}">
-    <div class="form-group">
-      <label class="sr-only" for="expires_date">{{:: ts('Search Expiry Date') }}</label>
-      <div class="input-group">
-        <div class="input-group-addon"><i class="crm-i fa-calendar-times-o"></i></div>
-        <input id="expires_date" class="form-control" crm-ui-datepicker="{time: true}" ng-model="$ctrl.savedSearch.expires_date" placeholder="Expires">
-      </div>
-    </div>
-  </div>
-</li>
-<li>
-  <crm-search-admin-tags tag-ids="$ctrl.savedSearch.tag_id" class="btn-group btn-group-sm"></crm-search-admin-tags>
-</li>
-<li role="presentation" ng-class="{active: controls.tab === 'compose'}">
-  <a href ng-click="selectTab('compose')">
-    <i class="crm-i fa-gears"></i>
-    {{:: ts('Compose Search') }}
+<li role="tab" ng-class="{active: controls.tab === tab.key}" ng-repeat="tab in $ctrl.mainTabs">
+  <a href ng-click="selectTab(tab.key)">
+    <i class="crm-i {{:: tab.icon }}"></i>
+    {{:: tab.title }}
   </a>
 </li>
-<li role="presentation" ng-class="{active: controls.tab === 'group'}" ng-if="$ctrl.savedSearch.groups.length" title="{{ !$ctrl.groupExists ? ts('Group will be deleted.') : '' }}">
+<li role="separator" class="disabled"></li>
+<li role="tab" ng-class="{active: controls.tab === 'group'}" ng-if="$ctrl.savedSearch.groups.length" title="{{ !$ctrl.groupExists ? ts('Group will be deleted.') : '' }}">
   <a href ng-click="selectTab('group')" ng-disabled="!$ctrl.groupExists">
     <i class="crm-i fa-users"></i>
     {{:: ts('Smart Group') }} {{ $ctrl.savedSearch.groups[0].title }}
   </a>
-  <button type="button" class="btn-xs btn-danger-outline crm-search-display-control" ng-click="$ctrl.removeGroup()" title="{{ $ctrl.groupExists ? ts('Delete') : ts('Undelete') }}">
+  <button type="button" class="btn btn-xs btn-danger-outline crm-search-display-control" ng-click="$ctrl.removeGroup()" title="{{ $ctrl.groupExists ? ts('Delete') : ts('Undelete') }}">
     <i class="crm-i fa-{{ $ctrl.groupExists ? 'trash' : 'undo' }}"></i>
   </button>
 </li>
-<li role="presentation" ng-repeat="display in $ctrl.savedSearch.displays" ng-class="{active: controls.tab === ('display_' + $index)}" title="{{ display.trashed ? ts('Display will be deleted.') : '' }}">
+<li role="tab" ng-repeat="display in $ctrl.savedSearch.displays" ng-class="{active: controls.tab === ('display_' + $index)}" title="{{ display.trashed ? ts('Display will be deleted.') : '' }}">
   <a href ng-click="selectTab('display_' + $index)" ng-disabled="display.trashed">
     <i class="crm-i {{ $ctrl.displayTypes[display.type].icon }}"></i>
     {{ display.label || ts('Untitled') }}
@@ -42,7 +26,7 @@
     <i class="crm-i fa-copy"></i>
   </button>
 </li>
-<li role="presentation">
+<li role="tab">
   <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     <i class="crm-i fa-plus"></i> {{:: ts('Add...') }} <span class="caret"></span>
   </button>

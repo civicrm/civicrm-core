@@ -1,5 +1,4 @@
 <div class="crm-search-display crm-search-display-table">
-  <div ng-include="'~/crmSearchAdmin/resultsTable/debug.html'"></div>
   <div class="form-inline">
     <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'"></div>
     <crm-search-tasks-menu ids="$ctrl.selectedRows" task-manager="$ctrl.taskManager"></crm-search-tasks-menu>
@@ -20,7 +19,7 @@
         </th>
         <th class="form-inline text-right">
           <input class="form-control crm-action-menu fa-plus collapsible-optgroups"
-                 crm-ui-select="::{data: fieldsForSelect, placeholder: ts('Add'), width: '80px', containerCss: {minWidth: '80px'}, dropdownCss: {width: '300px'}}"
+                 crm-ui-select="::{data: fieldsForSelect, placeholder: ' ', width: '48px', containerCss: {minWidth: '48px'}, dropdownCss: {width: '300px'}}"
                  on-crm-ui-select="addColumn(selection)" >
         </th>
       </tr>

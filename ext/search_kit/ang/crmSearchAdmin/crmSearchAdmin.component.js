@@ -28,8 +28,43 @@
     this.displayTypes = _.indexBy(CRM.crmSearchAdmin.displayTypes, 'id');
     this.searchDisplayPath = CRM.url('civicrm/search');
     this.afformPath = CRM.url('civicrm/admin/afform');
+    this.debug = {};
 
-    $scope.controls = {tab: 'compose', joinType: 'LEFT'};
+    this.mainTabs = [
+      {
+        key: 'for',
+        title: ts('Search For'),
+        icon: 'fa-search',
+      },
+      {
+        key: 'conditions',
+        title: ts('Filter Conditions'),
+        icon: 'fa-filter',
+      },
+      {
+        key: 'fields',
+        title: ts('Select Fields'),
+        icon: 'fa-columns',
+      },
+      {
+        key: 'settings',
+        title: ts('Configure Settings'),
+        icon: 'fa-gears',
+      },
+      {
+        key: 'query',
+        title: ts('Query Info'),
+        icon: 'fa-info-circle',
+      },
+    ];
+
+    $scope.controls = {tab: this.mainTabs[0].key, joinType: 'LEFT'};
+
+    this.selectedDisplay = function() {
+      // Could return the display but for now we don't need it
+      return $scope.controls.tab.startsWith('display_');
+    };
+
     $scope.joinTypes = [
       {k: 'LEFT', v: ts('With (optional)')},
       {k: 'INNER', v: ts('With (required)')},
@@ -38,6 +73,7 @@
     $scope.getEntity = searchMeta.getEntity;
     $scope.getField = searchMeta.getField;
     this.perm = {
+      viewDebugOutput: CRM.checkPerm('view debug output'),
       editGroups: CRM.checkPerm('edit groups')
     };
 
@@ -472,15 +508,7 @@
 
     // Deletes an item from an array param
     this.clearParam = function(name, idx) {
-      if (name === 'select') {
-        // Function selectors use `ng-repeat` with `track by $index` so must be refreshed when splicing the array
-        ctrl.hideFuncitons();
-      }
       ctrl.savedSearch.api_params[name].splice(idx, 1);
-    };
-
-    this.hideFuncitons = function() {
-      $scope.controls.showFunctions = false;
     };
 
     function onChangeSelect(newSelect, oldSelect) {
@@ -541,6 +569,14 @@
 
     $scope.fieldsForHaving = function() {
       return {results: ctrl.getSelectFields()};
+    };
+
+    this.fieldsForSelect = function() {
+      return {
+        results: ctrl.getAllFields(':label', ['Field', 'Custom', 'Extra', 'Pseudo'], (key) => {
+          ctrl.savedSearch.api_params.select.includes(key);
+        })
+      };
     };
 
     this.getAllFields = function(suffix, allowedTypes, disabledIf, topJoin) {
