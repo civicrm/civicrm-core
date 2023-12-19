@@ -53,10 +53,4 @@ class EventCheck extends Assert {
     }
   }
 
-  public function setUp() {
-  }
-
-  public function tearDown() {
-  }
-
 }
