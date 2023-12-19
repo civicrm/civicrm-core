@@ -26,7 +26,7 @@ class EventChecker {
   private $activeChecks = NULL;
 
   /**
-   * @param \PHPUnit\Framework\Test $test
+   * @param \PHPUnit\Framework\Test|NULL $test
    *
    * @return $this
    */
