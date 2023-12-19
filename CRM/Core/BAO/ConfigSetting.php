@@ -216,9 +216,6 @@ class CRM_Core_BAO_ConfigSetting {
       // and it's valid against our configured locales, we require the session
       // to store this, even if that means starting an anonymous session.
       $session->set('lcMessages', $chosenLocale);
-
-      // Clear menu cache if we've changed locale.
-      CRM_Core_BAO_Navigation::resetNavigation();
     }
 
     /*
