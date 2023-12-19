@@ -957,6 +957,7 @@ class CRM_Financial_BAO_Order {
       $lineItem['membership_type_id'] ??= NULL;
       if ($lineItem['membership_type_id']) {
         $lineItem['entity_table'] = 'civicrm_membership';
+        $lineItem['membership_num_terms'] = $lineItem['membership_num_terms'] ?:1;
       }
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
       $lineItem['tax_rate'] = $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);

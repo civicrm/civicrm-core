@@ -1143,30 +1143,31 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $priceFieldValue = $this->_params["price_{$priceFieldId}"];
     }
     $selectedMembershipTypeID = $this->_values['fee'][$priceFieldId]['options'][$priceFieldValue]['membership_type_id'] ?? NULL;
-    if (!$selectedMembershipTypeID) {
+    if (!$selectedMembershipTypeID || !$this->getPaymentProcessorValue('is_recur')) {
       return;
     }
 
     // Check if membership the selected membership is automatically opted into auto renew or give user the option.
     // In the 2nd case we check that the user has in deed opted in (auto renew as at June 22 is the field name for the membership auto renew checkbox)
     // Also check that the payment Processor used can support recurring contributions.
-    $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($this->getPriceSetID());
-    if (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_required'])
-      || (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_optional']) &&
-        !empty($this->_params['auto_renew']))
-        && !empty($this->_paymentProcessor['is_recur'])
+    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($selectedMembershipTypeID);
+    if (
+      // 2 means required
+      $membershipTypeDetails['auto_renew'] === 2
+      // 1 means optional - so they must also select the check box on the form
+      || ($membershipTypeDetails['auto_renew'] === 1 && !empty($this->_params['auto_renew']))
     ) {
       $this->_params['auto_renew'] = TRUE;
       $this->_params['is_recur'] = $this->_values['is_recur'] = 1;
-      $membershipTypeDetails = \Civi\Api4\MembershipType::get(FALSE)
-        ->addWhere('id', '=', $selectedMembershipTypeID)
-        ->execute()
-        ->first();
-      $this->_params['frequency_interval'] ??= $this->_values['fee'][$priceFieldId]['options'][$priceFieldValue]['membership_num_terms'];
-      $this->_params['frequency_unit'] ??= $membershipTypeDetails['duration_unit'];
+      // If membership_num_terms is not specified on the the price field value (which seems not uncommon
+      // in default config) then the membership type provides the values.
+      // @todo - access the line item value from $this->getLineItems() rather than _values['fee']
+      $this->_params['frequency_interval'] = $this->getSubmittedValue('frequency_interval') ?? ($this->_values['fee'][$priceFieldId]['options'][$priceFieldValue]['membership_num_terms'] ?? ($membershipTypeDetails['duration_interval'] ?? 1));
+      $this->_params['frequency_unit'] = $this->_params['frequency_unit'] ?? $membershipTypeDetails['duration_unit'];
     }
-    elseif (!$this->_separateMembershipPayment && (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_required'])
-      || in_array($selectedMembershipTypeID, $membershipTypes['autorenew_optional']))) {
+    // This seems like it repeats the above with less care...
+    elseif (!$this->_separateMembershipPayment && ($membershipTypeDetails['auto_renew'] === 2
+      || $membershipTypeDetails['auto_renew'] === 1)) {
       // otherwise check if we have a separate membership payment setting as that will allow people to independently opt into recurring contributions and memberships
       // If we don't have that and the membership type is auto recur or opt into recur set is_recur to 0.
       $this->_params['is_recur'] = $this->_values['is_recur'] = 0;

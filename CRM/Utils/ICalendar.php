@@ -245,7 +245,7 @@ class CRM_Utils_ICalendar {
           return strtotime($event['end_date'] ?? $event['start_date']);
         }, $info)
       );
-      $template->assign('timezones', CRM_Utils_ICalendar::generate_timezones($timezones, $date_min, $date_max));
+      $template->assign('timezones', CRM_Utils_ICalendar::generate_timezones([date_default_timezone_get()], $date_min, $date_max));
     }
     else {
       $template->assign('timezones', NULL);
