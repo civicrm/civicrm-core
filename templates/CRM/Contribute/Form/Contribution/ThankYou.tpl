@@ -116,7 +116,7 @@
           {if !empty($auto_renew)} {* Auto-renew membership confirmation *}
             {crmRegion name="contribution-thankyou-recur-membership"}
               <br />
-              {if $installments > 1}
+              {if !$installments || $installments > 1}
                 {if $frequency_interval > 1}
                   <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
                 {else}
