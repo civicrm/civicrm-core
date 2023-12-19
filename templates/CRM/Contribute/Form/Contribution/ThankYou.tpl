@@ -315,6 +315,6 @@
   </div>
   {if $isShare}
     {capture assign=contributionUrl}{crmURL p='civicrm/contribute/transact' q="$qParams" a=1 fe=1 h=1}{/capture}
-    {include file="CRM/common/SocialNetwork.tpl" url=$contributionUrl title=$title pageURL=$contributionUrl emailMode=false}
+    {include file="CRM/common/SocialNetwork.tpl" url=$contributionUrl title=false pageURL=$contributionUrl emailMode=false}
   {/if}
 </div>
