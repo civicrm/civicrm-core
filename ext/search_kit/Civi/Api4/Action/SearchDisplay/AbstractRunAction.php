@@ -508,7 +508,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   protected function formatLink(array $link, array $data, string $text = NULL, $index = 0): ?array {
-    $link = $this->getLinkInfo($link);
     if (!$this->checkLinkAccess($link, $data, $index)) {
       return NULL;
     }
@@ -663,10 +662,30 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * @param array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, title: string, text: string} $link
-   * @return array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, title: string, text: string, prefix: string}
+   * Fills in info about each link in the search display.
    */
-  private function getLinkInfo(array $link): array {
+  protected function preprocessLinks(): void {
+    foreach ($this->display['settings']['columns'] as &$column) {
+      if (!empty($column['link'])) {
+        $this->preprocessLink($column['link']);
+      }
+      if (!empty($column['links'])) {
+        foreach ($column['links'] as &$link) {
+          $this->preprocessLink($link);
+        }
+      }
+    }
+    if (!empty($this->display['settings']['toolbar'])) {
+      foreach ($this->display['settings']['toolbar'] as &$button) {
+        $this->preprocessLink($button);
+      }
+    }
+  }
+
+  /**
+   * @param array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, title: string, text: string, prefix: string} $link
+   */
+  private function preprocessLink(array &$link): void {
     $link += [
       'path' => '',
       'target' => '',
@@ -687,8 +706,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $link['prefix'] = $link['join'] . '.';
       }
       // Get path from action
-      if (!$link['path'] && !empty($link['action'])) {
-        $link['path'] = CoreUtil::getInfoItem($entity, 'paths')[$link['action']] ?? NULL;
+      if (!empty($link['action'])) {
+        $getLinks = civicrm_api4($entity, 'getLinks', [
+          'checkPermissions' => FALSE,
+          'where' => [
+            ['ui_action', '=', $link['action']],
+          ],
+        ]);
+        $link['path'] = $getLinks[0]['path'] ?? NULL;
+        $link['entity'] = $getLinks[0]['entity'] ?? NULL;
         // This is a bit clunky, the function_join_field gets un-munged later by $this->getJoinFromAlias()
         if ($this->canAggregate($link['prefix'] . $idKey)) {
           $link['prefix'] = 'GROUP_CONCAT_' . str_replace('.', '_', $link['prefix']);
@@ -724,7 +750,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       $link['key'] = $link['prefix'] . $idKey;
     }
-    return $link;
   }
 
   /**
@@ -734,7 +759,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return array
    */
   private function getLinkTokens(array $link): array {
-    $link = $this->getLinkInfo($link);
     $tokens = [];
     if (!$link['path'] && !empty($link['task'])) {
       $tokens[] = $link['prefix'] . $this->getIdKeyName($link['entity']);

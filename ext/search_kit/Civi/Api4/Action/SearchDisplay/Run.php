@@ -44,6 +44,7 @@ class Run extends AbstractRunAction {
     // Pager can operate in "page" mode for traditional pager, or "scroll" mode for infinite scrolling
     $pagerMode = NULL;
 
+    $this->preprocessLinks();
     $this->augmentSelectClause($apiParams);
     $this->applyFilters();
 
