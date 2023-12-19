@@ -88,7 +88,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         'currency' => $currency,
         'amount' => self::getFinancialItemAmountFromParams($inputParams, $context, $lineItemDetails, $isARefund, $previousLineItemTotal),
         'description' => $prevFinancialItem['description'] ?? NULL,
-        'status_id' => $prevFinancialItem['status_id'],
+        'status_id' => $prevFinancialItem['status_id'] ?? NULL,
         'financial_account_id' => $financialAccount,
         'entity_table' => 'civicrm_line_item',
         'entity_id' => $lineItemDetails['id'],
