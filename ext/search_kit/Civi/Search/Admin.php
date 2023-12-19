@@ -282,10 +282,11 @@ class Admin {
   public static function getJoins(array $allowedEntities):array {
     $joins = [];
     foreach ($allowedEntities as $entity) {
-      // Multi-record custom field groups (to-date only the contact entity supports these)
+      // Multi-record custom field groups
       if (in_array('CustomValue', $entity['type'])) {
-        // TODO: Lookup target entity from custom group if someday other entities support multi-record custom data
-        $targetEntity = $allowedEntities['Contact'];
+        // Get `extends` entity of custom group
+        $entityIdField = \CRM_Utils_Array::findAll($entity['fields'], ['name' => 'entity_id'])[0];
+        $targetEntity = $allowedEntities[$entityIdField['fk_entity']];
         // Join from Custom group to Contact (n-1)
         $alias = "{$entity['name']}_{$targetEntity['name']}_entity_id";
         $joins[$entity['name']][] = [
