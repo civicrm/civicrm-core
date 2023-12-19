@@ -41,7 +41,7 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
 
     foreach ($workflows as $workflow) {
       foreach ($priceSets as $priceSet) {
-        if (!$priceSet['contribution_page_id'] && $workflow === 'membership_online_receipt' & count($priceSets) > 1) {
+        if (empty($priceSet['contribution_page_id']) && $workflow === 'membership_online_receipt' & count($priceSets) > 1) {
           // Generally the online receipt is used with a contribution page so lets' focus
           // on those examples for it - unless none exist. It could also be used
           // on other contributions via the send receipt method so we do want to show it if
