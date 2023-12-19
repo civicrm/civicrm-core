@@ -37,6 +37,7 @@ class Standalone implements AuthxInterface {
    */
   public function logoutSession() {
     \CRM_Core_Session::singleton()->reset();
+    session_destroy();
   }
 
   /**

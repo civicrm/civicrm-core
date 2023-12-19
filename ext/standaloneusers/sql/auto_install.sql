@@ -19,6 +19,7 @@ SET FOREIGN_KEY_CHECKS=0;
 
 DROP TABLE IF EXISTS `civicrm_user_role`;
 DROP TABLE IF EXISTS `civicrm_uf_match`;
+DROP TABLE IF EXISTS `civicrm_session`;
 DROP TABLE IF EXISTS `civicrm_role`;
 
 SET FOREIGN_KEY_CHECKS=1;
@@ -42,6 +43,23 @@ CREATE TABLE `civicrm_role` (
   `permissions` text NOT NULL COMMENT 'List of permissions granted by this role',
   `is_active` tinyint NOT NULL DEFAULT 1 COMMENT 'Only active roles grant permissions',
   PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB;
+
+-- /*******************************************************
+-- *
+-- * civicrm_session
+-- *
+-- * Standalone User Sessions
+-- *
+-- *******************************************************/
+CREATE TABLE `civicrm_session` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Unique Session ID',
+  `session_id` char(64) NOT NULL COMMENT 'Hexadecimal Session Identifier',
+  `data` longtext COMMENT 'Session Data',
+  `last_accessed` datetime COMMENT 'Timestamp of the last session access',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `index_session_id`(session_id)
 )
 ENGINE=InnoDB;
 
