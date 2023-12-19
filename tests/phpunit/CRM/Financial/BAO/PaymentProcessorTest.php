@@ -10,18 +10,12 @@
  */
 
 use Civi\Api4\PaymentProcessor;
-use Civi\Payment\PropertyBag;
 
 /**
  * Class CRM_Financial_BAO_PaymentProcessorTypeTest
  * @group headless
  */
 class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
-
-  public function tearDown(): void {
-    $this->quickCleanup(['civicrm_payment_processor']);
-    parent::tearDown();
-  }
 
   /**
    * Check method create()
@@ -95,8 +89,6 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
 
   /**
    * Test the Manual processor supports 'NoEmailProvided'
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testManualProcessorSupportsNoEmailProvided(): void {
     $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(['NoEmailProvided']);
@@ -108,71 +100,6 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
       }
     }
     $this->assertTrue($found, 'The Manual payment processor should support "NoEmailProvided"');
-  }
-
-  /**
-   * Test that deprecation warnings are emitted when required recur params not present
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\Payment\Exception\PaymentProcessorException
-   */
-  public function testDummyCheckArrayAccess(): void {
-    $this->dummyProcessorCreate();
-    $processor = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
-    $parameters = ['amount' => 100, 'is_recur' => TRUE];
-    try {
-      $processor->doPayment($parameters);
-    }
-    catch (Exception $e) {
-      $this->assertEquals('contracted frequency params not passed Caller: CRM_Financial_BAO_PaymentProcessorTest::testDummyCheckArrayAccess', $e->getMessage());
-    }
-  }
-
-  /**
-   * Test that deprecation warnings are emitted when required recur params not present
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\Payment\Exception\PaymentProcessorException
-   */
-  public function testDummyCheckPropertyBag(): void {
-    $this->dummyProcessorCreate();
-    $processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
-    $parameters = ['amount' => 100, 'is_recur' => TRUE];
-    $parameters = PropertyBag::cast($parameters);
-    try {
-      $processor->doPayment($parameters);
-    }
-    catch (Exception $e) {
-      $this->assertEquals('contracted frequency params not passed Caller: CRM_Financial_BAO_PaymentProcessorTest::testDummyCheckPropertyBag', $e->getMessage());
-    }
-  }
-
-  /**
-   * Test that deprecation warnings are emitted when required recur params are present
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\Payment\Exception\PaymentProcessorException
-   */
-  public function testDummyCheckArrayAccessWithParams(): void {
-    $this->dummyProcessorCreate();
-    $processor = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
-    $parameters = ['amount' => 100, 'is_recur' => TRUE, 'frequency_unit' => 'month', 'frequency_interval' => 1];
-    $parameters = PropertyBag::cast($parameters);
-    $processor->doPayment($parameters);
-  }
-
-  /**
-   * Test that deprecation warnings are emitted when required recur params are present
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\Payment\Exception\PaymentProcessorException
-   */
-  public function testDummyCheckPropertyBagWithParams(): void {
-    $this->dummyProcessorCreate();
-    $processor = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
-    $parameters = ['amount' => 100, 'is_recur' => TRUE, 'frequency_unit' => 'month', 'frequency_interval' => 1];
-    $parameters = PropertyBag::cast($parameters);
-    $processor->doPayment($parameters);
   }
 
 }

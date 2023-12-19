@@ -216,18 +216,16 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
       $result['payment_status'] = 'Completed';
       return $result;
     }
-    // Warn it the contracted variables are not provided
-    // The list is at https://docs.civicrm.org/dev/en/latest/extensions/payment-processors/paymentclass/#recurring-contribution-parameters
-    if ($propertyBag->getIsRecur()) {
-      if (empty($params['frequency_interval']) || empty($params['frequency_unit']) || empty($params['is_recur'])) {
-        CRM_Core_Error::deprecatedWarning('contracted frequency params not passed');
-      }
-    }
+
     // Invoke hook_civicrm_paymentProcessor
     // In Dummy's case, there is no translation of parameters into
     // the back-end's canonical set of parameters.  But if a processor
     // does this, it needs to invoke this hook after it has done translation,
     // but before it actually starts talking to its proprietary back-end.
+    if ($propertyBag->getIsRecur()) {
+      $throwAnENoticeIfNotSetAsTheseAreRequired = $propertyBag->getRecurFrequencyInterval() . $propertyBag->getRecurFrequencyUnit();
+    }
+    // no translation in Dummy processor
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $propertyBag);
     // This means we can test failing transactions by setting a past year in expiry. A full expiry check would
     // be more complete.
