@@ -160,41 +160,49 @@ class CRM_Utils_ICalendar {
   }
 
   /**
+   * @param array $timezones - Timezone strings
    * @param $date_min
    * @param $date_max
    *
    * @return array
    */
-  public static function generate_timezones($date_min, $date_max) {
-    $tzstr = date_default_timezone_get();
-    $timezone = new DateTimeZone($tzstr);
-
-    $transitions = $timezone->getTransitions($date_min, $date_max);
-
-    if (count($transitions) === 1) {
-      $transitions[] = array_values($transitions)[0];
+  public static function generate_timezones(array $timezones, $date_min, $date_max) {
+    if (empty($timezones)) {
+      return [];
     }
 
-    $item = [
-      'id' => $timezone->getName(),
-      'transitions' => [],
-    ];
+    $tz_items = [];
 
-    $last_transition = array_shift($transitions);
+    foreach ($timezones as $tzstr) {
+      $timezone = new DateTimeZone($tzstr);
 
-    foreach ($transitions as $transition) {
-      $item['transitions'][] = [
-        'type' => $transition['isdst'] ? 'DAYLIGHT' : 'STANDARD',
-        'offset_from' => self::format_tz_offset($last_transition['offset']),
-        'offset_to' => self::format_tz_offset($transition['offset']),
-        'abbr' => $transition['abbr'],
-        'dtstart' => date_create($transition['time'], $timezone)->format("Ymd\THis"),
+      $transitions = $timezone->getTransitions($date_min, $date_max);
+
+      if (count($transitions) === 1) {
+        $transitions[] = array_values($transitions)[0];
+      }
+
+      $item = [
+        'id' => $timezone->getName(),
+        'transitions' => [],
       ];
 
-      $last_transition = $transition;
-    }
+      $last_transition = array_shift($transitions);
 
-    $tz_items[] = $item;
+      foreach ($transitions as $transition) {
+        $item['transitions'][] = [
+          'type' => $transition['isdst'] ? 'DAYLIGHT' : 'STANDARD',
+          'offset_from' => self::format_tz_offset($last_transition['offset']),
+          'offset_to' => self::format_tz_offset($transition['offset']),
+          'abbr' => $transition['abbr'],
+          'dtstart' => date_create($transition['time'], $timezone)->format("Ymd\THis"),
+        ];
+
+        $last_transition = $transition;
+      }
+
+      $tz_items[] = $item;
+    }
 
     return $tz_items;
   }
@@ -237,7 +245,7 @@ class CRM_Utils_ICalendar {
           return strtotime($event['end_date'] ?? $event['start_date']);
         }, $info)
       );
-      $template->assign('timezones', CRM_Utils_ICalendar::generate_timezones($date_min, $date_max));
+      $template->assign('timezones', CRM_Utils_ICalendar::generate_timezones([date_default_timezone_get()], $date_min, $date_max));
     }
     else {
       $template->assign('timezones', NULL);
