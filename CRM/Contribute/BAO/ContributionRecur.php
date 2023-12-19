@@ -296,6 +296,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     $recur->whereAdd("contribution_status_id != $cancelledId");
 
     if ($recur->find(TRUE)) {
+      throw new CRM_Core_Exception('found it');
       $transaction = new CRM_Core_Transaction();
       $recur->contribution_status_id = $cancelledId;
       $recur->cancel_reason = $params['cancel_reason'] ?? NULL;
