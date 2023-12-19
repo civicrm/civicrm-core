@@ -308,6 +308,27 @@ class Admin {
           'alias' => $alias,
           'multi' => TRUE,
         ];
+
+        // Allow joins via EntityRef fields in multi-value custom data
+        foreach ($entity['fields'] as $field) {
+          // Note: we skip entity_id field since it is handled below.
+          if ($field['input_type'] === 'EntityRef' && $field['name'] !== 'entity_id') {
+
+            // Join from the custom data entity to the referenced entity
+            $joins[$entity['name']][] = self::getEntityRefJoins($entity, $field);
+
+            // Join from referenced entity to the custom data entity
+            $joins[$field['fk_entity']][] = [
+              'label' => $entity["title_plural"],
+              'description' => $entity["description"],
+              'entity' => $entity["name"],
+              'conditions' => [],
+              'defaults' => [],
+              'alias' => $entity['name'],
+              'multi' => TRUE,
+            ];
+          }
+        }
       }
       // Non-custom DAO entities
       elseif (!empty($entity['dao'])) {
@@ -425,24 +446,33 @@ class Admin {
         // Custom EntityRef joins
         foreach ($fields as $field) {
           if ($field['type'] === 'Custom' && $field['input_type'] === 'EntityRef') {
-            $targetEntity = $allowedEntities[$field['fk_entity']];
-            // Add the EntityRef join
-            [, $bareFieldName] = explode('.', $field['name']);
-            $alias = $entity['name'] . '_' . $field['fk_entity'] . '_' . $bareFieldName;
-            $joins[$entity['name']][] = [
-              'label' => $entity['title'] . ' ' . $field['title'],
-              'description' => $field['description'],
-              'entity' => $field['fk_entity'],
-              'conditions' => self::getJoinConditions($field['name'], $alias . '.id'),
-              'defaults' => [],
-              'alias' => $alias,
-              'multi' => FALSE,
-            ];
+            $joins[$entity['name']][] = self::getEntityRefJoins($entity, $field);
           }
         }
       }
     }
     return $joins;
+  }
+
+  /**
+   * Get a join for an entity reference
+   *
+   * @return void
+   */
+  public static function getEntityRefJoins($entity, $field) {
+    $exploded = explode('.', $field['name']);
+    $bareFieldName = array_reverse($exploded)[0];
+    $alias = $entity['name'] . '_' . $field['fk_entity'] . '_' . $bareFieldName;
+    $join = [
+      'label' => $entity['title'] . ' ' . $field['title'],
+      'description' => $field['description'],
+      'entity' => $field['fk_entity'],
+      'conditions' => self::getJoinConditions($field['name'], $alias . '.id'),
+      'defaults' => [],
+      'alias' => $alias,
+      'multi' => FALSE,
+    ];
+    return $join;
   }
 
   /**
