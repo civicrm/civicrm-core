@@ -275,14 +275,12 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *   Recur contribution params
    *
    * @return bool
+   * @throws \CRM_Core_Exception
+   * @internal
+   *
    */
-  public static function cancelRecurContribution($params) {
-    if (is_numeric($params)) {
-      CRM_Core_Error::deprecatedFunctionWarning('You are using a BAO function whose signature has changed. Please use the ContributionRecur.cancel api');
-      $params = ['id' => $params];
-    }
-    $recurId = $params['id'];
-    if (!$recurId) {
+  public static function cancelRecurContribution(array $params): bool {
+    if (!$params['id']) {
       return FALSE;
     }
     $activityParams = [
@@ -292,7 +290,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
 
     $cancelledId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Cancelled');
     $recur = new CRM_Contribute_DAO_ContributionRecur();
-    $recur->id = $recurId;
+    $recur->id = $params['id'];
     $recur->whereAdd("contribution_status_id != $cancelledId");
 
     if ($recur->find(TRUE)) {
@@ -303,7 +301,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       $recur->save();
 
       // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
-      $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurId);
+      $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($params['id']);
       if ($dao && $dao->recur_id) {
         $details = $activityParams['details'] ?? NULL;
         if ($dao->auto_renew && $dao->membership_id) {

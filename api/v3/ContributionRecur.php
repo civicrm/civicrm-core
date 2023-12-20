@@ -64,10 +64,11 @@ function civicrm_api3_contribution_recur_get($params) {
  * @param array $params
  *   Array containing id of the recurring contribution.
  *
- * @return bool
+ * @return array
  *   returns true is successfully cancelled
+ * @throws \CRM_Core_Exception
  */
-function civicrm_api3_contribution_recur_cancel($params) {
+function civicrm_api3_contribution_recur_cancel(array $params): array {
   return CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($params) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while cancelling recurring contribution'));
 }
 
