@@ -74,6 +74,7 @@ class CRM_Core_Session {
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {
+      defined('DBG') && $cleanup = dbg_scope('Session::__construct');
       self::$_singleton = new CRM_Core_Session();
     }
     return self::$_singleton;
@@ -83,6 +84,7 @@ class CRM_Core_Session {
    * Replace the session object with a fake session.
    */
   public static function useFakeSession() {
+    defined('DBG') && $cleanup = dbg_scope('Session::useFakeSession');
     self::$_singleton = new class() extends CRM_Core_Session {
 
       public function initialize($isRead = FALSE) {
@@ -121,8 +123,10 @@ class CRM_Core_Session {
    *   Is this a read operation, in this case, the session will not be touched.
    */
   public function initialize($isRead = FALSE) {
+    // defined('DBG') && $cleanup = dbg_scope('Session::initialize');
     // reset $this->_session in case if it is no longer a reference to $_SESSION;
     if (isset($_SESSION) && isset($this->_session) && $_SESSION !== $this->_session) {
+      defined('DBG') && dbg_note('+', 'initialize > unset _session');
       unset($this->_session);
     }
     // lets initialize the _session variable just before we need it
@@ -133,8 +137,10 @@ class CRM_Core_Session {
         if ($isRead) {
           return;
         }
+        defined('DBG') && dbg_note('+', 'initialize > sessionStart()');
         CRM_Core_Config::singleton()->userSystem->sessionStart();
       }
+      defined('DBG') && dbg_note('+', 'initialize > assign _SESSION');
       $this->_session =& $_SESSION;
     }
 
@@ -145,6 +151,7 @@ class CRM_Core_Session {
     if (!isset($this->_session[$this->_key]) ||
       !is_array($this->_session[$this->_key])
     ) {
+      defined('DBG') && dbg_note('+', 'initialize > set _session[' . $this->_key . '] to []]');
       $this->_session[$this->_key] = [];
     }
   }
@@ -155,6 +162,7 @@ class CRM_Core_Session {
    * @param int $all
    */
   public function reset($all = 1) {
+    defined('DBG') && $cleanup = dbg_scope('Session::reset');
     if ($all != 1) {
       $this->initialize();
 

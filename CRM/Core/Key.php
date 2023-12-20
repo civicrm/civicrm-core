@@ -49,12 +49,16 @@ class CRM_Core_Key {
    */
   public static function privateKey() {
     if (!self::$_key) {
+      defined('DBG') && $cleanup = dbg_scope('Key::privateKey() - build');
       $session = CRM_Core_Session::singleton();
       self::$_key = $session->get('qfPrivateKey');
       if (!self::$_key) {
         self::$_key = base64_encode(random_bytes(self::PRIVATE_KEY_LENGTH));
         $session->set('qfPrivateKey', self::$_key);
       }
+    }
+    else {
+      defined('DBG') && dbg_note('+', 'Key::privateKey() - read', self::$_key);
     }
     return self::$_key;
   }
@@ -64,12 +68,16 @@ class CRM_Core_Key {
    */
   public static function sessionID() {
     if (!self::$_sessionID) {
+      defined('DBG') && $cleanup = dbg_scope('Key::sessionID() - build');
       $session = CRM_Core_Session::singleton();
       self::$_sessionID = $session->get('qfSessionID');
       if (!self::$_sessionID) {
         self::$_sessionID = CRM_Core_Config::singleton()->userSystem->getSessionId();
         $session->set('qfSessionID', self::$_sessionID);
       }
+    }
+    else {
+      defined('DBG') && dbg_note('+', 'Key::sessionID() - read', self::$_sessionID);
     }
     return self::$_sessionID;
   }
@@ -152,6 +160,7 @@ class CRM_Core_Key {
   private static function sign($name) {
     $privateKey = self::privateKey();
     $sessionID = self::sessionID();
+    defined('DBG') && dbg_note('+', "Key::sign($name)", $privateKey, $sessionID);
     $delim = chr(0);
     if (strpos($sessionID, $delim) !== FALSE || strpos($name, $delim) !== FALSE) {
       throw new \RuntimeException("Failed to generate signature. Malformed session-id or form-name.");

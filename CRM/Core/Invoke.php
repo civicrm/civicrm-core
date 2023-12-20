@@ -32,6 +32,7 @@ class CRM_Core_Invoke {
    *
    */
   public static function invoke($args) {
+    defined('DBG') && $cleanup = dbg_scope('CRM_Core_Invoke::invoke');
     try {
       return self::_invoke($args);
     }

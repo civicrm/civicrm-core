@@ -538,6 +538,7 @@ class CRM_Utils_System {
    *   Optional additional information for the hook.
    */
   public static function redirect($url = NULL, $context = []) {
+    defined('DBG') && $cleanup = dbg_scope('System::redirect');
     if (!$url) {
       $url = self::url('civicrm/dashboard', 'reset=1');
     }

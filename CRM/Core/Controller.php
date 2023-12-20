@@ -300,6 +300,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     // https://github.com/civicrm/civicrm-core/pull/17324
     // and/or related get merged, then we should remove the REQUEST reference here.
     $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+    defined('DBG') && $cleanup = dbg_scope('Controller::key()', $name);
     if (!$key && in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'])) {
       // Generate a key if this is an initial request without one.
       // We allow HEAD here because it is used by bots to validate URLs, so if
@@ -877,6 +878,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * to the entryURL if present
    */
   public function invalidKeyRedirect() {
+    defined('DBG') && $cleanup = dbg_scope('invalidKeyRedirect');
     if ($this->_entryURL && $url_parts = parse_url($this->_entryURL)) {
       // CRM-16832: Ensure local redirects only.
       if (!empty($url_parts['path'])) {
