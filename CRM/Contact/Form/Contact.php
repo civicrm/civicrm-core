@@ -987,13 +987,15 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $params['preferred_communication_method'] = 'null';
     }
 
-    $group = $params['group'] ?? NULL;
-    $params['group'] = ($params['group'] == '') ? [] : $params['group'];
-    if (!empty($group)) {
-      $group = is_array($group) ? $group : explode(',', $group);
-      $params['group'] = [];
-      foreach ($group as $key => $value) {
-        $params['group'][$value] = 1;
+    if (array_key_exists('group', $params)) {
+      $group = $params['group'] ?? NULL;
+      $params['group'] = ($params['group'] == '') ? [] : $params['group'];
+      if (!empty($group)) {
+        $group = is_array($group) ? $group : explode(',', $group);
+        $params['group'] = [];
+        foreach ($group as $value) {
+          $params['group'][$value] = 1;
+        }
       }
     }
 
