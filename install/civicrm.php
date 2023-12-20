@@ -210,8 +210,9 @@ function civicrm_config(&$config) {
     'dbSSL' => '',
     'CMSdbSSL' => '',
   ];
-
+  global $pkgPath;
   $params['baseURL'] = $config['base_url'] ?? civicrm_cms_base();
+  $params['packagesPath'] = $pkgPath;
   if ($installType == 'drupal' && defined('VERSION')) {
     if (version_compare(VERSION, '8.0') >= 0) {
       $params['cms'] = 'Drupal';
