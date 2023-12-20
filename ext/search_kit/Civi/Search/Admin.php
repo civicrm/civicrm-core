@@ -282,10 +282,10 @@ class Admin {
   public static function getJoins(array $allowedEntities):array {
     $joins = [];
     foreach ($allowedEntities as $entity) {
-      $isCustomEntity = in_array('CustomValue', $entity['type'], TRUE);
+      $isMultiValueCustomEntity = in_array('CustomValue', $entity['type'], TRUE);
 
-      // Non-custom DAO entities
-      if (!$isCustomEntity && !empty($entity['dao'])) {
+      // Normal DAO entities (excludes multi-value custom field entities)
+      if (!empty($entity['dao']) && !$isMultiValueCustomEntity) {
         /** @var \CRM_Core_DAO $daoClass */
         $daoClass = $entity['dao'];
         $references = $daoClass::getReferenceColumns();
@@ -401,7 +401,7 @@ class Admin {
 
       // Custom EntityRef joins
       foreach ($entity['fields'] as $field) {
-        if (($field['type'] === 'Custom' || $isCustomEntity) && $field['fk_entity'] && $field['input_type'] === 'EntityRef') {
+        if (($field['type'] === 'Custom' || $isMultiValueCustomEntity) && $field['fk_entity'] && $field['input_type'] === 'EntityRef') {
           $entityRefJoins = self::getEntityRefJoins($entity, $field);
           foreach ($entityRefJoins as $joinEntity => $joinInfo) {
             $joins[$joinEntity][] = $joinInfo;
@@ -413,7 +413,8 @@ class Admin {
   }
 
   /**
-   * Get joins for entity reference custom fields, and the entity_id fields in multi-record custom groups.
+   * Get joins for entity reference custom fields, and the entity_id field in
+   * multi-record custom groups.
    *
    * @return array[]
    */
