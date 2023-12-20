@@ -1,24 +1,27 @@
 <div ng-include="'~/crmSearchAdmin/crmSearchAdminDisplayHeader.html'"></div>
-<fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
-<fieldset>
-  <div class="form-inline">
-    <label for="crm-search-admin-display-style">{{:: ts('Style') }}</label>
-    <select id="crm-search-admin-display-style" class="form-control" ng-model="$ctrl.display.settings.style" ng-change="$ctrl.display.settings.symbol = ''">
-      <option value="ul">{{:: ts('Bullets') }}</option>
-      <option value="ol">{{:: ts('Numbers') }}</option>
-    </select>
-    <label for="crm-search-admin-display-symbol">{{:: ts('Symbol') }}</label>
-    <select id="crm-search-admin-display-symbol" class="form-control" ng-model="$ctrl.display.settings.symbol">
-      <option ng-repeat="symbol in $ctrl.symbols[$ctrl.display.settings.style]" value="{{ symbol.char }}">
-        {{ symbol.label }}
-      </option>
-    </select>
-    <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
-  </div>
-  <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
-  <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
-  <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
-</fieldset>
+<details>
+  <summary>{{:: ts('Settings') }}</summary>
+  <fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
+  <fieldset>
+    <div class="form-inline">
+      <label for="crm-search-admin-display-style">{{:: ts('Style') }}</label>
+      <select id="crm-search-admin-display-style" class="form-control" ng-model="$ctrl.display.settings.style" ng-change="$ctrl.display.settings.symbol = ''">
+        <option value="ul">{{:: ts('Bullets') }}</option>
+        <option value="ol">{{:: ts('Numbers') }}</option>
+      </select>
+      <label for="crm-search-admin-display-symbol">{{:: ts('Symbol') }}</label>
+      <select id="crm-search-admin-display-symbol" class="form-control" ng-model="$ctrl.display.settings.symbol">
+        <option ng-repeat="symbol in $ctrl.symbols[$ctrl.display.settings.style]" value="{{ symbol.char }}">
+          {{ symbol.label }}
+        </option>
+      </select>
+      <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
+    </div>
+    <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
+    <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
+    <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
+  </fieldset>
+</details>
 <fieldset class="crm-search-admin-edit-columns-wrapper">
   <legend>
     {{:: ts('Fields') }}

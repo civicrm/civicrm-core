@@ -1,20 +1,23 @@
 <div ng-include="'~/crmSearchAdmin/crmSearchAdminDisplayHeader.html'"></div>
-<fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
-<fieldset>
-  <div class="form-inline">
-    <label for="crm-search-admin-display-colno">{{:: ts('Layout') }}</label>
-    <select id="crm-search-admin-display-colno" class="form-control" ng-model="$ctrl.display.settings.colno">
-      <option value="2">{{:: ts('2 x 2') }}</option>
-      <option value="3">{{:: ts('3 x 3') }}</option>
-      <option value="4">{{:: ts('4 x 4') }}</option>
-      <option value="5">{{:: ts('5 x 5') }}</option>
-    </select>
-    <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
-  </div>
-  <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
-  <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
-  <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
-</fieldset>
+<details>
+  <summary>{{:: ts('Settings') }}</summary>
+  <fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
+  <fieldset>
+    <div class="form-inline">
+      <label for="crm-search-admin-display-colno">{{:: ts('Layout') }}</label>
+      <select id="crm-search-admin-display-colno" class="form-control" ng-model="$ctrl.display.settings.colno">
+        <option value="2">{{:: ts('2 x 2') }}</option>
+        <option value="3">{{:: ts('3 x 3') }}</option>
+        <option value="4">{{:: ts('4 x 4') }}</option>
+        <option value="5">{{:: ts('5 x 5') }}</option>
+      </select>
+      <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
+    </div>
+    <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
+    <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
+    <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
+  </fieldset>
+</details>
 <fieldset class="crm-search-admin-edit-columns-wrapper">
   <legend>
     {{:: ts('Fields') }}
