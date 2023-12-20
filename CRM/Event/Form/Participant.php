@@ -1276,13 +1276,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       else {
         $this->buildAmount($form, $form->getDiscountID(), $this->getPriceSetID());
       }
-      $lineItem = [];
-      $totalTaxAmount = 0;
-      if (!CRM_Utils_System::isNull($form->_values['line_items'] ?? NULL)) {
-        foreach ($form->_values['line_items'] as $key => $value) {
-          $totalTaxAmount = $value['tax_amount'] + $totalTaxAmount;
-        }
-      }
       $discounts = [];
       if (!empty($form->_values['discount'])) {
         foreach ($form->_values['discount'] as $key => $value) {
