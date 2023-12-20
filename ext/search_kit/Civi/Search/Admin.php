@@ -282,35 +282,10 @@ class Admin {
   public static function getJoins(array $allowedEntities):array {
     $joins = [];
     foreach ($allowedEntities as $entity) {
-      // Multi-record custom field groups (to-date only the contact entity supports these)
-      if (in_array('CustomValue', $entity['type'])) {
-        // TODO: Lookup target entity from custom group if someday other entities support multi-record custom data
-        $targetEntity = $allowedEntities['Contact'];
-        // Join from Custom group to Contact (n-1)
-        $alias = "{$entity['name']}_{$targetEntity['name']}_entity_id";
-        $joins[$entity['name']][] = [
-          'label' => $entity['title'] . ' ' . $targetEntity['title'],
-          'description' => '',
-          'entity' => $targetEntity['name'],
-          'conditions' => self::getJoinConditions('entity_id', $alias . '.id'),
-          'defaults' => self::getJoinDefaults($alias, $targetEntity),
-          'alias' => $alias,
-          'multi' => FALSE,
-        ];
-        // Join from Contact to Custom group (n-n)
-        $alias = "{$targetEntity['name']}_{$entity['name']}_entity_id";
-        $joins[$targetEntity['name']][] = [
-          'label' => $entity['title_plural'],
-          'description' => '',
-          'entity' => $entity['name'],
-          'conditions' => self::getJoinConditions('id', $alias . '.entity_id'),
-          'defaults' => self::getJoinDefaults($alias, $entity),
-          'alias' => $alias,
-          'multi' => TRUE,
-        ];
-      }
-      // Non-custom DAO entities
-      elseif (!empty($entity['dao'])) {
+      $isMultiValueCustomEntity = in_array('CustomValue', $entity['type'], TRUE);
+
+      // Normal DAO entities (excludes multi-value custom field entities)
+      if (!empty($entity['dao']) && !$isMultiValueCustomEntity) {
         /** @var \CRM_Core_DAO $daoClass */
         $daoClass = $entity['dao'];
         $references = $daoClass::getReferenceColumns();
@@ -422,25 +397,52 @@ class Admin {
             }
           }
         }
-        // Custom EntityRef joins
-        foreach ($fields as $field) {
-          if ($field['type'] === 'Custom' && $field['input_type'] === 'EntityRef') {
-            $targetEntity = $allowedEntities[$field['fk_entity']];
-            // Add the EntityRef join
-            [, $bareFieldName] = explode('.', $field['name']);
-            $alias = $entity['name'] . '_' . $field['fk_entity'] . '_' . $bareFieldName;
-            $joins[$entity['name']][] = [
-              'label' => $entity['title'] . ' ' . $field['title'],
-              'description' => $field['description'],
-              'entity' => $field['fk_entity'],
-              'conditions' => self::getJoinConditions($field['name'], $alias . '.id'),
-              'defaults' => [],
-              'alias' => $alias,
-              'multi' => FALSE,
-            ];
+      }
+
+      // Custom EntityRef joins
+      foreach ($entity['fields'] as $field) {
+        if (($field['type'] === 'Custom' || $isMultiValueCustomEntity) && $field['fk_entity'] && $field['input_type'] === 'EntityRef') {
+          $entityRefJoins = self::getEntityRefJoins($entity, $field);
+          foreach ($entityRefJoins as $joinEntity => $joinInfo) {
+            $joins[$joinEntity][] = $joinInfo;
           }
         }
       }
+    }
+    return $joins;
+  }
+
+  /**
+   * Get joins for entity reference custom fields, and the entity_id field in
+   * multi-record custom groups.
+   *
+   * @return array[]
+   */
+  public static function getEntityRefJoins(array $entity, array $field): array {
+    $exploded = explode('.', $field['name']);
+    $bareFieldName = array_reverse($exploded)[0];
+    $alias = "{$entity['name']}_{$field['fk_entity']}_$bareFieldName";
+    $joins[$entity['name']] = [
+      'label' => $entity['title'] . ' ' . $field['label'],
+      'description' => $field['description'],
+      'entity' => $field['fk_entity'],
+      'conditions' => self::getJoinConditions($field['name'], $alias . '.id'),
+      'defaults' => [],
+      'alias' => $alias,
+      'multi' => FALSE,
+    ];
+    // Do reverse join if not the same entity
+    if ($entity['name'] !== $field['fk_entity']) {
+      $alias = "{$field['fk_entity']}_{$entity['name']}_$bareFieldName";
+      $joins[$field['fk_entity']] = [
+        'label' => $entity['title_plural'],
+        'description' => $entity['description'],
+        'entity' => $entity['name'],
+        'conditions' => self::getJoinConditions('id', "$alias.{$field['name']}"),
+        'defaults' => [],
+        'alias' => $alias,
+        'multi' => TRUE,
+      ];
     }
     return $joins;
   }
