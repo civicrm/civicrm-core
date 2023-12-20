@@ -425,7 +425,10 @@ class FormattingUtil {
    *   Path at which these fields are found, e.g. "address.contact."
    * @return array
    */
-  public static function contactFieldsToRemove($contactType, $prefix) {
+  public static function contactFieldsToRemove($contactType, $prefix): array {
+    if (!$contactType || !is_string($contactType)) {
+      return [];
+    }
     if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__][$contactType])) {
       \Civi::$statics[__CLASS__][__FUNCTION__][$contactType] = [];
       foreach (\CRM_Contact_DAO_Contact::fields() as $field) {
