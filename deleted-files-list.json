@@ -620,7 +620,6 @@
     "ext/standaloneusers/CRM/Standaloneusers/BAO/UserRole.php",
     "ext/standaloneusers/CRM/Standaloneusers/DAO/RolePermission.php",
     "ext/standaloneusers/CRM/Standaloneusers/Upgrader/*",
-    "ext/standaloneusers/Civi/Api4/RolePermission.php",
     "ext/standaloneusers/ang/afformEditUserAccount.aff.json",
     "ext/standaloneusers/ang/afformX.aff.json",
     "ext/standaloneusers/ang/afsearchAdministerUserAccounts.aff.json",
