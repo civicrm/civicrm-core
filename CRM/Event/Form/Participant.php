@@ -149,15 +149,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   public $_eID = NULL;
 
-  /**
-   * Line Item for Price Set.
-   *
-   * @var array
-   *
-   * @deprecated
-   */
-  public $_lineItem;
-
   public $_online;
 
   /**
@@ -874,8 +865,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     if ($this->_isPaidEvent) {
-      [$lineItem, $params] = $this->preparePaidEventProcessing($params);
+      $params = $this->preparePaidEventProcessing($params);
     }
+    $lineItem = [$this->getPriceSetID() => $this->getLineItems()];
     // @todo - stop assigning these - pass financial_trxnId in token context
     // and swap template to use tokens.
     $this->assign('credit_card_type', $this->getSubmittedValue('credit_card_type'));
@@ -1104,28 +1096,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     // also store lineitem stuff here
-    if ((($this->_lineItem && $this->_action & CRM_Core_Action::ADD) ||
-      ($this->_lineItem && CRM_Core_Action::UPDATE && !$this->_paymentId))
+    if ((($this->getLineItems() && $this->_action & CRM_Core_Action::ADD) ||
+      ($this->getLineItems() && CRM_Core_Action::UPDATE && !$this->_paymentId))
     ) {
       foreach ($this->_contactIds as $num => $contactID) {
-        foreach ($this->_lineItem as $key => $value) {
-          if (is_array($value) && $value !== 'skip') {
-            foreach ($value as $lineKey => $line) {
-              //10117 update the line items for participants if contribution amount is recorded
-              if ($this->isQuickConfig() && !empty($params['total_amount']) &&
-                ($params['status_id'] != array_search('Partially paid', $participantStatus))
-              ) {
-                $line['unit_price'] = $line['line_total'] = $params['total_amount'];
-                if (!empty($params['tax_amount'])) {
-                  $line['unit_price'] = $line['unit_price'] - $params['tax_amount'];
-                  $line['line_total'] = $line['line_total'] - $params['tax_amount'];
-                }
-              }
-              $lineItem[$this->_priceSetId][$lineKey] = $line;
-            }
-            CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, $contributions[$num] ?? NULL, 'civicrm_participant');
-          }
-        }
+        $lineItem = [$this->getPriceSetID() => $this->getLineItems()];
+        CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, $contributions[$num] ?? NULL, 'civicrm_participant');
       }
       foreach ($contributions as $contribution) {
         if (!empty($this->getCreatePaymentParams())) {
@@ -1468,14 +1444,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
 
-    if (isset($params['priceSetId'])) {
-      if (!empty($lineItem[0])) {
-        $this->set('lineItem', $lineItem);
-        $this->_lineItem = $lineItem;
-      }
-    }
-
-    return [$lineItem, $params];
+    return $params;
   }
 
   /**

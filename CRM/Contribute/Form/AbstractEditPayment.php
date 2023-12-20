@@ -254,6 +254,10 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
       CRM_Core_Error::deprecatedWarning('attempt to access undefined property _params - use externally supported function getSubmittedValues()');
       return $this->getSubmittedValues();
     }
+    if ($name === '_lineItem') {
+      CRM_Core_Error::deprecatedWarning('attempt to access undefined property _params - use externally supported function getSubmittedValues()');
+      return [0 => $this->getLineItems()];
+    }
     CRM_Core_Error::deprecatedWarning('attempt to access invalid property :' . $name);
   }
 
