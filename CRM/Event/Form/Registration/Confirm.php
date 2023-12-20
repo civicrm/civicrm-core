@@ -203,59 +203,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       ($this->_params[0]['amount'] || $this->_params[0]['amount'] == 0) &&
       !$this->_requireApproval
     ) {
-      $this->_amount = [];
 
-      $taxAmount = 0;
-      foreach ($this->_params as $k => $v) {
-        if ($v === 'skip') {
-          continue;
-        }
-        $individualTaxAmount = 0;
-        $append = '';
-        //display tax amount on confirmation page
-        $taxAmount += $v['tax_amount'];
-        if (is_array($v)) {
-          $this->cleanMoneyFields($v);
-          foreach (['first_name', 'last_name'] as $name) {
-            if (isset($v['billing_' . $name]) &&
-              !isset($v[$name])
-            ) {
-              $v[$name] = $v['billing_' . $name];
-            }
-          }
+      [$taxAmount, $participantDetails, $individual, $amountArray] = $this->calculateAmounts();
 
-          if (!empty($v['first_name']) && !empty($v['last_name'])) {
-            $append = $v['first_name'] . ' ' . $v['last_name'];
-          }
-          else {
-            //use an email if we have one
-            foreach ($v as $v_key => $v_val) {
-              if (str_starts_with($v_key, 'email-')) {
-                $append = $v[$v_key];
-              }
-            }
-          }
-
-          $this->_amount[$k]['amount'] = $v['amount'];
-          if (!empty($v['discountAmount'])) {
-            $this->_amount[$k]['amount'] -= $v['discountAmount'];
-          }
-
-          $this->_amount[$k]['label'] = preg_replace('//', '', $v['amount_level']) . '  -  ' . $append;
-          $participantDetails[$k]['info'] = ($v['first_name'] ?? '') . ' ' . ($v['last_name'] ?? '');
-          if (empty($v['first_name'])) {
-            $participantDetails[$k]['info'] = $append;
-          }
-
-          /*CRM-16320 */
-          $individual[$k]['totalAmtWithTax'] = $this->_amount[$k]['amount'];
-          $individual[$k]['totalTaxAmt'] = $individualTaxAmount + $v['tax_amount'];
-          $this->_totalAmount = $this->_totalAmount + $this->_amount[$k]['amount'];
-          if (!empty($v['is_primary'])) {
-            $this->set('primaryParticipantAmount', $this->_amount[$k]['amount']);
-          }
-        }
-      }
+      $this->_amount = $amountArray;
 
       if (\Civi::settings()->get('invoicing')) {
         $this->assign('totalTaxAmount', $taxAmount);
@@ -266,7 +217,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       $this->assign('part', $participantDetails);
       $this->set('part', $participantDetails);
-      $this->assign('amounts', $this->_amount);
+      $this->assign('amounts', $amountArray);
       $this->assign('totalAmount', $this->_totalAmount);
       $this->set('totalAmount', $this->_totalAmount);
       // This use of the ts function uses the legacy interpolation of the button name to avoid translations having to be re-done.
@@ -1311,6 +1262,67 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
     }
+  }
+
+  /**
+   * Interim refactoring extraction.
+   *
+   * @return array
+   */
+  private function calculateAmounts(): array {
+    $taxAmount = 0;
+    $amountArray = [];
+    foreach ($this->_params as $k => $v) {
+      if ($v === 'skip') {
+        continue;
+      }
+      $individualTaxAmount = 0;
+      $append = '';
+      //display tax amount on confirmation page
+      $taxAmount += $v['tax_amount'];
+      if (is_array($v)) {
+        $this->cleanMoneyFields($v);
+        foreach (['first_name', 'last_name'] as $name) {
+          if (isset($v['billing_' . $name]) &&
+            !isset($v[$name])
+          ) {
+            $v[$name] = $v['billing_' . $name];
+          }
+        }
+
+        if (!empty($v['first_name']) && !empty($v['last_name'])) {
+          $append = $v['first_name'] . ' ' . $v['last_name'];
+        }
+        else {
+          //use an email if we have one
+          foreach ($v as $v_key => $v_val) {
+            if (str_starts_with($v_key, 'email-')) {
+              $append = $v[$v_key];
+            }
+          }
+        }
+
+        $amountArray[$k]['amount'] = $v['amount'];
+        if (!empty($v['discountAmount'])) {
+          $amountArray[$k]['amount'] -= $v['discountAmount'];
+        }
+
+        $amountArray[$k]['label'] = preg_replace('//', '', $v['amount_level']) . '  -  ' . $append;
+        $participantDetails[$k]['info'] = ($v['first_name'] ?? '') . ' ' . ($v['last_name'] ?? '');
+        if (empty($v['first_name'])) {
+          $participantDetails[$k]['info'] = $append;
+        }
+
+        /*CRM-16320 */
+        $individual[$k]['totalAmtWithTax'] = $amountArray[$k]['amount'];
+        $individual[$k]['totalTaxAmt'] = $individualTaxAmount + $v['tax_amount'];
+        $this->_totalAmount = $this->_totalAmount + $amountArray[$k]['amount'];
+        if (!empty($v['is_primary'])) {
+          $this->set('primaryParticipantAmount', $amountArray[$k]['amount']);
+        }
+      }
+    }
+    return [$taxAmount, $participantDetails, $individual, $amountArray];
   }
 
 }
