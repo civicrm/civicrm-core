@@ -283,62 +283,53 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     if (!$params['id']) {
       return FALSE;
     }
-    $activityParams = [
-      'subject' => !empty($params['membership_id']) ? ts('Auto-renewal membership cancelled') : ts('Recurring contribution cancelled'),
-      'details' => $params['processor_message'] ?? NULL,
-    ];
+    $transaction = new CRM_Core_Transaction();
+    ContributionRecur::update(FALSE)
+      ->addWhere('id', '=', $params['id'])
+      ->setValues([
+        'contribution_status_id:name' => 'Cancelled',
+        'cancel_reason' => $params['cancel_reason'] ?? NULL,
+        'cancel_date' => $params['cancel_date'] ?? 'now',
+      ])->execute();
 
-    $cancelledId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Cancelled');
-    $recur = new CRM_Contribute_DAO_ContributionRecur();
-    $recur->id = $params['id'];
-    $recur->whereAdd("contribution_status_id != $cancelledId");
-
-    if ($recur->find(TRUE)) {
-      $transaction = new CRM_Core_Transaction();
-      $recur->contribution_status_id = $cancelledId;
-      $recur->cancel_reason = $params['cancel_reason'] ?? NULL;
-      $recur->cancel_date = date('YmdHis');
-      $recur->save();
-
-      // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
-      $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($params['id']);
-      if ($dao && $dao->recur_id) {
-        $details = $activityParams['details'] ?? NULL;
-        if ($dao->auto_renew && $dao->membership_id) {
-          // its auto-renewal membership mode
-          $membershipTypes = CRM_Member_PseudoConstant::membershipType();
-          $membershipType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $dao->membership_id, 'membership_type_id');
-          $membershipType = $membershipTypes[$membershipType] ?? NULL;
-          $details .= '
+    // @todo - all of this should be moved to the post hook.
+    // It seems to just create activities.
+    $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($params['id']);
+    if ($dao && $dao->recur_id) {
+      $details = $params['processor_message'] ?? NULL;
+      if ($dao->auto_renew && $dao->membership_id) {
+        // its auto-renewal membership mode
+        $membershipTypes = CRM_Member_PseudoConstant::membershipType();
+        $membershipType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $dao->membership_id, 'membership_type_id');
+        $membershipType = $membershipTypes[$membershipType] ?? NULL;
+        $details .= '
 <br/>' . ts('Automatic renewal of %1 membership cancelled.', [1 => $membershipType]);
-        }
-        else {
-          $details .= '<br/>' . ts('The recurring contribution of %1, every %2 %3 has been cancelled.', [
-            1 => $dao->amount,
-            2 => $dao->frequency_interval,
-            3 => $dao->frequency_unit,
-          ]);
-        }
-        $activityParams = [
-          'source_contact_id' => $dao->contact_id,
-          'source_record_id' => $dao->recur_id,
-          'activity_type_id' => 'Cancel Recurring Contribution',
-          'subject' => CRM_Utils_Array::value('subject', $activityParams, ts('Recurring contribution cancelled')),
-          'details' => $details,
-          'status_id' => 'Completed',
-        ];
-
-        $cid = CRM_Core_Session::singleton()->get('userID');
-        if ($cid) {
-          $activityParams['target_contact_id'][] = $activityParams['source_contact_id'];
-          $activityParams['source_contact_id'] = $cid;
-        }
-        civicrm_api3('Activity', 'create', $activityParams);
       }
+      else {
+        $details .= '<br/>' . ts('The recurring contribution of %1, every %2 %3 has been cancelled.', [
+          1 => $dao->amount,
+          2 => $dao->frequency_interval,
+          3 => $dao->frequency_unit,
+        ]);
+      }
+      $activityParams = [
+        'source_contact_id' => $dao->contact_id,
+        'source_record_id' => $dao->recur_id,
+        'activity_type_id' => 'Cancel Recurring Contribution',
+        'subject' => !empty($params['membership_id']) ? ts('Auto-renewal membership cancelled') : ts('Recurring contribution cancelled'),
+        'details' => $details,
+        'status_id' => 'Completed',
+      ];
 
-      $transaction->commit();
-      return TRUE;
+      $cid = CRM_Core_Session::singleton()->get('userID');
+      if ($cid) {
+        $activityParams['target_contact_id'][] = $activityParams['source_contact_id'];
+        $activityParams['source_contact_id'] = $cid;
+      }
+      civicrm_api3('Activity', 'create', $activityParams);
     }
+    $transaction->commit();
+    return TRUE;
   }
 
   /**

@@ -71,7 +71,8 @@ function civicrm_api3_contribution_recur_get($params) {
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contribution_recur_cancel(array $params): array {
-  $existing = ContributionRecur::get(TRUE)
+  $params['check_permissions'] = $params['check_permissions'] ?? FALSE;
+  $existing = ContributionRecur::get($params['check_permissions'])
     ->addWhere('id', '=', $params['id'])
     ->addSelect('contribution_status_id:name')
     ->execute()->first();
