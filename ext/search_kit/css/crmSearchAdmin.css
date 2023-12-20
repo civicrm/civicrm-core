@@ -314,3 +314,7 @@ crm-search-admin-import {
   right: 0;
   background-color: white;
 }
+
+#bootstrap-theme .crm-search-admin-edit-columns details summary {
+  font-size: inherit;
+}

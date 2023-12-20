@@ -33,9 +33,9 @@
 <fieldset class="crm-search-admin-edit-columns-wrapper">
   <legend>
     {{:: ts('Columns') }}
-    <div ng-if="$ctrl.parent.hiddenColumns.length" ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'" class="btn-group btn-group-xs"></div>
   </legend>
-  <div class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
+  <div ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'"></div>
+  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend>
         <i class="crm-i fa-arrows crm-search-move-icon"></i>
@@ -49,5 +49,5 @@
         </button>
       </div>
     </fieldset>
-  </div>
+  </fieldset>
 </fieldset>

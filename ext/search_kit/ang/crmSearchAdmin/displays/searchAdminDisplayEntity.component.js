@@ -13,12 +13,7 @@
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayEntity.html',
     controller: function($scope, crmApi4) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this,
-        colTypes = [];
-
-      this.getColTypes = function() {
-        return colTypes;
-      };
+        ctrl = this;
 
       this.$onInit = function () {
         ctrl.jobFrequency = CRM.crmSearchAdmin.jobFrequency;
