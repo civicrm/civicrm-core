@@ -82,6 +82,16 @@ return new class() extends EventCheck implements HookInterface {
   ];
 
   /**
+   * The $objectId is usually numeric. Some links are based on non-numeric IDs.
+   *
+   * @var array
+   */
+  protected $objectIdTypes = [
+    'extension.local.action' => 'string',
+    'extension.remote.action' => 'string',
+  ];
+
+  /**
    * List of events with multiple problems. These are completely ignored.
    *
    * @var string[]
@@ -109,9 +119,14 @@ return new class() extends EventCheck implements HookInterface {
     $this->assertTrue((bool) preg_match(';^[A-Z][a-zA-Z0-9]+$;', $objectName) || !empty($matchGrandfatheredObjectNames),
       "$msg: Object name ($objectName) should be a CamelCase name or a grandfathered name");
 
-    // $this->assertType('integer|null', $objectId, "$msg: Object ID ($objectId) should be int|null");
-    $this->assertTrue($objectId === NULL || is_numeric($objectId), "$msg: Object ID ($objectId) should be int|null");
-    // Sometimes it's a string-style int. Patch-welcome if someone wants to clean that up. But this is what it currently does.
+    if (isset($this->objectIdTypes[$op])) {
+      $this->assertType($this->objectIdTypes[$op], $objectId, "$msg: Object ID ($objectId) should be " . $this->objectIdTypes[$op]);
+    }
+    else {
+      // $this->assertType('integer|null', $objectId, "$msg: Object ID ($objectId) should be int|null");
+      $this->assertTrue($objectId === NULL || is_numeric($objectId), "$msg: Object ID ($objectId) should be int|null");
+      // Sometimes it's a string-style int. Patch-welcome if someone wants to clean that up. But this is what it currently does.
+    }
 
     $this->assertType('array', $links, "$msg: Links should be an array");
     $this->assertType('integer|null', $mask, "$msg: Mask ($mask) should be int}null");
