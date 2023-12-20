@@ -7,6 +7,7 @@ require_once __DIR__ . '/../../../../../../../tests/phpunit/api/v4/Api4TestBase.
 use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Activity;
+use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
 use Civi\Api4\Email;
@@ -1433,6 +1434,66 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(3, $data['Individual']);
     $this->assertEquals(2, $data['Organization']);
     $this->assertEquals(1, $data['Household']);
+  }
+
+  public function testGroupByAddress(): void {
+    $source = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['contact_type' => 'Individual'],
+      ['contact_type' => 'Individual'],
+      ['contact_type' => 'Individual'],
+      ['contact_type' => 'Organization'],
+      ['contact_type' => 'Organization'],
+      ['contact_type' => 'Household'],
+    ];
+    Contact::save(FALSE)
+      ->addDefault('source', $source)
+      ->setRecords($sampleData)
+      ->addChain('address', Address::create()
+        ->addValue('contact_id', '$id')
+        ->addValue('street_address', '123')
+      )
+      ->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'COUNT(id) AS COUNT_id',
+            'Contact_Address_contact_id_01.street_address',
+            'GROUP_CONCAT(DISTINCT sort_name) AS GROUP_CONCAT_sort_name',
+            'GROUP_CONCAT(DISTINCT contact_type:label) AS GROUP_CONCAT_contact_type_label',
+            'GROUP_CONCAT(DISTINCT contact_sub_type:label) AS GROUP_CONCAT_contact_sub_type_label',
+          ],
+          'where' => [
+            ['source', '=', $source],
+          ],
+          'groupBy' => [
+            'Contact_Address_contact_id_01.street_address',
+          ],
+          'join' => [
+            [
+              'Address AS Contact_Address_contact_id_01',
+              'LEFT',
+              ['id', '=', 'Contact_Address_contact_id_01.contact_id'],
+              ['Contact_Address_contact_id_01.is_primary', '=', TRUE],
+            ],
+          ],
+        ],
+      ],
+      'display' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+    $this->assertEquals(6, $result[0]['data']['COUNT_id']);
+    $this->assertEquals('123', $result[0]['data']['Contact_Address_contact_id_01.street_address']);
+    sort($result[0]['data']['GROUP_CONCAT_contact_type_label']);
+    $this->assertEquals(['Household', 'Individual', 'Organization'], $result[0]['data']['GROUP_CONCAT_contact_type_label']);
   }
 
   public function testGroupByFunction(): void {
