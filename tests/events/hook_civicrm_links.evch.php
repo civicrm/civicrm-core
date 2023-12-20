@@ -20,6 +20,7 @@ return new class() extends EventCheck implements HookInterface {
   protected $grandfatheredObjectNames = [
     'CRM_Core_BAO_LocationType',
     'CRM_Core_BAO_MessageTemplate',
+    'CRM_Report_Form_*',
   ];
 
   /**
@@ -56,6 +57,7 @@ return new class() extends EventCheck implements HookInterface {
    */
   protected $grandfatheredInvalidKeys = [
     'pledge.selector.row' => ['is_active'],
+    'view.report.links' => ['confirm_message'],
   ];
 
   /**
@@ -67,6 +69,15 @@ return new class() extends EventCheck implements HookInterface {
    */
   protected $grandfatheredInvalidLinks = [
     'pcp.user.actions::Pcp',
+  ];
+
+  /**
+   * The specification says that `name` property stores the printable label.
+   * But in some lists, this has been changed to a different property.
+   * @var string[]
+   */
+  protected $grandfatheredNameFields = [
+    'view.report.links' => 'label',
   ];
 
   /**
@@ -92,8 +103,9 @@ return new class() extends EventCheck implements HookInterface {
       return;
     }
 
+    $matchGrandfatheredObjectNames = CRM_Utils_String::filterByWildcards($this->grandfatheredObjectNames, [$objectName]);
     $this->assertTrue((bool) preg_match(';^\w+(\.\w+)+$;', $op), "$msg: Operation ($op) should be dotted expression");
-    $this->assertTrue((bool) preg_match(';^[A-Z][a-zA-Z0-9]+$;', $objectName) || in_array($objectName, $this->grandfatheredObjectNames),
+    $this->assertTrue((bool) preg_match(';^[A-Z][a-zA-Z0-9]+$;', $objectName) || !empty($matchGrandfatheredObjectNames),
       "$msg: Object name ($objectName) should be a CamelCase name or a grandfathered name");
 
     // $this->assertType('integer|null', $objectId, "$msg: Object ID ($objectId) should be int|null");
@@ -107,9 +119,10 @@ return new class() extends EventCheck implements HookInterface {
     if (in_array("$op::$objectName", $this->grandfatheredInvalidLinks)) {
       return;
     }
+    $nameField = $this->grandfatheredNameFields[$op] ?? 'name';
     foreach ($links as $link) {
-      if (isset($link['name'])) {
-        $this->assertType('string', $link['name'], "$msg: name should be a string");
+      if (isset($link[$nameField])) {
+        $this->assertType('string', $link[$nameField], "$msg: $nameField should be a string");
       }
       else {
         $this->fail("$msg: name is missing");
@@ -157,7 +170,7 @@ return new class() extends EventCheck implements HookInterface {
       }
 
       $expectKeys = array_merge(
-        ['name', 'url', 'qs', 'title', 'extra', 'bit', 'ref', 'class', 'weight', 'accessKey', 'icon'],
+        [$nameField, 'url', 'qs', 'title', 'extra', 'bit', 'ref', 'class', 'weight', 'accessKey', 'icon'],
         $this->grandfatheredInvalidKeys[$op] ?? []
       );
       $extraKeys = array_diff(array_keys($link), $expectKeys);
