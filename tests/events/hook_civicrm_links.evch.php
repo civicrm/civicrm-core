@@ -58,6 +58,7 @@ return new class() extends EventCheck implements HookInterface {
   protected $grandfatheredInvalidKeys = [
     'pledge.selector.row' => ['is_active'],
     'view.report.links' => ['confirm_message'],
+    'contribution.selector.row' => ['result', 'key', 'is_single_mode', 'title_single_mode', 'filters'],
   ];
 
   /**
