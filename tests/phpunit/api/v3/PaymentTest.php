@@ -185,7 +185,9 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertNotEmpty($contribution['receipt_date']);
     $mut->checkMailLog([
-      'Fundraising Dinner -...            1    $100.00     $100.00',
+      'Fundraising Dinner',
+      '$100.00',
+      '$200.00',
       'event place',
       'streety street',
     ]);
