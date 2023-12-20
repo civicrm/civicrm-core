@@ -38,6 +38,16 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
   }
 
   /**
+   * This holds the value taken from the url for the A-Z pager.
+   *
+   * It seems like the A-Z pager is a bit broken & could be removed
+   * from this page.
+   *
+   * @var string|null
+   */
+  protected $_sortByCharacter;
+
+  /**
    * Get action Links.
    *
    * @return array
