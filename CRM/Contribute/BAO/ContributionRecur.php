@@ -339,16 +339,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       $transaction->commit();
       return TRUE;
     }
-    else {
-      // if already cancelled, return true
-      $recur->whereAdd();
-      $recur->whereAdd("contribution_status_id = $cancelledId");
-      if ($recur->find(TRUE)) {
-        return TRUE;
-      }
-    }
-
-    return FALSE;
   }
 
   /**
