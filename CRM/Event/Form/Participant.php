@@ -27,6 +27,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   use EntityLookupTrait;
   use CRM_Contact_Form_ContactFormTrait;
   use CRM_Event_Form_EventFormTrait;
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * Participant ID - use getParticipantID.
@@ -211,7 +212,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return int|null
    */
   public function getEventID(): ?int {
-    return $this->_eventId ?: ($this->getSubmittedValue('event_id') ? (int) $this->getSubmittedValue('event_id') : NULL);
+    if (!$this->_eventId) {
+      if ($this->isFormBuilt()) {
+        $this->_eventId = $this->getSubmittedValue('event_id');
+      }
+      else {
+        $this->_eventId = $this->getSubmitValue('event_id');
+      }
+    }
+    return $this->_eventId ? (int) $this->_eventId : NULL;
   }
 
   /**
@@ -337,42 +346,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       $this->buildEventFeeForm($this);
       CRM_Event_Form_EventFees::setDefaultValues($this);
-    }
-
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      $eventId = (int) ($_POST['event_id'] ?? 0);
-      // Custom data of type participant role
-      // Note: Some earlier commits imply $_POST['role_id'] could be a comma separated string,
-      //       not sure if that ever really happens
-      if (!empty($_POST['role_id'])) {
-        foreach ($_POST['role_id'] as $roleID) {
-          CRM_Custom_Form_CustomData::preProcess($this, $this->getExtendsEntityColumnID('ParticipantRole'), $roleID, 1, 'Participant', $this->_id);
-          CRM_Custom_Form_CustomData::buildQuickForm($this);
-          CRM_Custom_Form_CustomData::setDefaultValues($this);
-        }
-      }
-
-      //custom data of type participant event
-      CRM_Custom_Form_CustomData::preProcess($this, $this->getExtendsEntityColumnID('ParticipantEventType'), $eventId, 1, 'Participant', $this->_id);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
-
-      // custom data of type participant event type
-      $eventTypeId = NULL;
-      if ($eventId) {
-        $eventTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventId, 'event_type_id', 'id');
-      }
-      CRM_Custom_Form_CustomData::preProcess($this, $this->getExtendsEntityColumnID('ParticipantEventType'), $eventTypeId,
-        1, 'Participant', $this->_id
-      );
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
-
-      //custom data of type participant, ( we 'null' to reset subType and subName)
-      CRM_Custom_Form_CustomData::preProcess($this, 'null', 'null', 1, 'Participant', $this->_id);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
     // CRM-4395, get the online pending contribution id.
@@ -578,6 +551,18 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     if ($this->isOverloadFeesMode()) {
       return $this->buildEventFeeForm($this);
+    }
+
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Participant', array_filter([
+        'event_id' => $this->getEventID(),
+        'role_id' => $_POST['role_id'] ?? NULL,
+        'id' => $this->getParticipantID(),
+      ]));
     }
 
     //need to assign custom data type to the template

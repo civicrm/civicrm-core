@@ -665,6 +665,23 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Register a field with quick form as supporting a file upload.
+   *
+   * @param array $fieldNames
+   *
+   * @return void
+   */
+  public function registerFileField(array $fieldNames): void {
+    // hack for field type File
+    $formUploadNames = $this->get('uploadNames');
+    if (is_array($formUploadNames)) {
+      $fieldNames = array_unique(array_merge($formUploadNames, $fieldNames));
+    }
+
+    $this->set('uploadNames', $fieldNames);
+  }
+
+  /**
    * This virtual function is used to build the form.
    *
    * It replaces the buildForm associated with QuickForm_Page. This allows us to put
