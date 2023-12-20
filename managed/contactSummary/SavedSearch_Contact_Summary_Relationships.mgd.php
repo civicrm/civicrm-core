@@ -45,7 +45,9 @@ return [
             'is_active',
           ],
           'orderBy' => [],
-          'where' => [],
+          'where' => [
+            ['RelationshipCache_Contact_far_contact_id_01.is_deleted', '=', FALSE],
+          ],
           'groupBy' => [],
           'join' => $joins,
           'having' => [],
