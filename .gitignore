@@ -22,6 +22,7 @@
 !/ext/financialacls
 !/ext/contributioncancelactions
 !/ext/recaptcha
+!/ext/oembed
 !/ext/payflowpro
 !/ext/ckeditor4
 !/ext/legacycustomsearches
