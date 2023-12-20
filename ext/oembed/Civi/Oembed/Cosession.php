@@ -1,0 +1,195 @@
+<?php
+namespace Civi\Oembed;
+
+use CRM_Oembed_ExtensionUtil as E;
+use Civi\Core\Service\AutoService;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+/**
+ * The co-session provides a long (real) session built on top of short (fake) sessions.
+ *
+ * Within an oembed IFRAME context, cookies are unreliable. The CMS creates cookies and sessions,
+ * but they only work for 1 page-load. On the next page-load, you're in a new session. These
+ * short sessions are kind of pointless - but they're baked into each CMS (*cumbersome to fine-tune*).
+ * To achieve session-like behavior, we need to propagate request-parameters instead.
+ *
+ * For the "oEmbed co-session", we sync the short-lived CMS sessions with a long-lived co-session.
+ *
+ * - The co-session is stored separately (via `Civi::cache('session')`)
+ * - The co-session is activated by a request-parameter (`?_oembedSes={JWT}`) instead of a cookie.
+ * - The request-parameter is outputted at key moments (e.g. `hook_buildForm`) so that it propagates
+ *   to subsequent requests.
+ * - As the request begins (*as the CMS session starts*), we import data from the co-session.
+ * - As the request finishes (*as the CMS session ends*), we export data back to the co-session.
+ *
+ * @service oembed.cosession
+ */
+class Cosession extends AutoService implements EventSubscriberInterface {
+
+  protected $ttl = '+3 hour';
+
+  public static function getSubscribedEvents(): array {
+    return [
+      '&civi.invoke.auth' => ['onInvoke', 100],
+      '&civi.session.storeObjects' => ['export', 0],
+      '&hook_civicrm_buildForm' => ['onBuildForm', 0],
+      '&hook_civicrm_alterRedirect' => ['onRedirect', 0],
+    ];
+  }
+
+  /**
+   * @var \Civi\Crypto\CryptoJwt
+   * @inject crypto.jwt
+   */
+  protected $jwt;
+
+  protected ?string $sessionId = NULL;
+
+  public function onInvoke(array $path) {
+    if (!defined('CIVICRM_OEMBED') || !$this->isEmbeddable(implode('/', $path))) {
+      return;
+    }
+
+    defined('DBG') && $cleanup = dbg_scope('onInvoke');
+
+    // TODO: Accept _oembedSes if one of these criteria are met:
+    //   - POST to quickform (non-conflicted referer)
+    //   - POST to AJAX (non-conflicted referer)
+    //   - GET for an approved landing-page
+    //     ("Approved" ==> Per-route? Or is distinct to th page-flow/step/JWT?)
+    //   - What about GET for AJAX?
+    // OR: If it's a GET for approved landing-page, then force-change the underlying sessionId?
+    //     In effect, that invalidates all existing tokens. Mitigates known-session-id attacks?
+    // MAYBE: Store the entry-point where we started the session. If session ever fails, give link back.
+    if (isset($_REQUEST['_oembedSes'])) {
+      $this->sessionId = $this->parseToken($_REQUEST['_oembedSes']);
+      // TODO: In non-debug mode, perhaps we catch JWT exceptions, log them, and redirect/restart - like when you have invalid qfKey.
+    }
+    else {
+      $this->sessionId = $this->createSessionId();
+    }
+
+    $session = \CRM_Core_Session::singleton();
+    if ($session->isEmpty()) {
+      $session->initialize();
+    }
+    $this->import();
+
+    // In principle, this will propagate to AJAX subrequests...
+    // ...but currently all our JS broken due to CIVICRM_UF_BASEURL override...
+
+    // Defer resolution of sessionId as long as possible
+    \CRM_Core_Region::instance('page-header')->add([
+      'callback' => function() {
+        $token = $this->createToken($this->sessionId);
+        $script = sprintf('CRM.$.ajaxSetup({data: {_oembedSes: %s}});', json_encode($token));
+        return "<script type='text/javascript'>\n$script\n</script>";
+      },
+    ]);
+  }
+
+  /**
+   * Determine whether the request is allowed within an oembed iframe.
+   *
+   * @param string $path
+   *  Ex: 'civicrm/foo/bar'
+   * @return bool
+   *   TRUE if this path is embeddable
+   */
+  public function isEmbeddable(string $path): bool {
+    if (preg_match(';^civicrm/ajax/;', $path)) {
+      return TRUE;
+    }
+
+    $route = \CRM_Core_Invoke::getItem($path);
+    return !empty($route['is_public']) && !empty($route['is_active']);
+  }
+
+  /**
+   * @see \CRM_Utils_Hook::buildForm()
+   */
+  public function onBuildForm($formName, $form) {
+    if (!$this->sessionId) {
+      return;
+    }
+    defined('DBG') && $cleanup = dbg_scope('onBuildForm');
+    $form->addElement('hidden', '_oembedSes', $this->createToken($this->sessionId));
+  }
+
+  public function onRedirect(\Psr\Http\Message\UriInterface &$url, &$context) {
+    if (!$this->sessionId) {
+      return;
+    }
+
+    defined('DBG') && $cleanup = dbg_scope('onRedirect');
+    $action = $context['qfAction'] ?? NULL;
+    if ($action === 'jump' || $action === 'bounceOnError') {
+      $token = $this->createToken($this->sessionId);
+      $url = $url->withQuery($url->getQuery() . '&_oembedSes=' . urlencode($token));
+    }
+  }
+
+  /**
+   * Get the long-lived co-session. Import data into the short-lived CMS session.
+   */
+  public function import() {
+    if (!$this->sessionId) {
+      return;
+    }
+    defined('DBG') && $cleanup = dbg_scope('import');
+    $sessionData = \Civi::cache('session')->get('co_' . $this->sessionId);
+    foreach ($sessionData ?: [] as $key => $value) {
+      $_SESSION[$key] = $value;
+    }
+  }
+
+  /**
+   * Export data from the short-lived CMS session. Save it to the co-session.
+   */
+  public function export() {
+    if (!$this->sessionId) {
+      return;
+    }
+    defined('DBG') && $cleanup = dbg_scope('export');
+    \Civi::cache('session')->set('co_' . $this->sessionId, $_SESSION);
+    // TODO: we should probably clean-up the CMS session to avoid leaks.
+    // But need to explore/experiment to find the best moment.
+  }
+
+  protected function createToken($sessionId): string {
+    return $this->jwt->encode([
+      'scope' => 'session',
+      'sessionId' => $sessionId,
+      'sessionIp' => \CRM_Utils_System::ipAddress(),
+      'exp' => \CRM_Utils_Time::strtotime($this->ttl),
+    ]);
+  }
+
+  protected function parseToken(string $token): string {
+    $claims = $this->jwt->decode($token);
+    if ($claims['scope'] !== 'session') {
+      throw new \CRM_Core_Exception("Invalid session token. Missing scope=session");
+    }
+    if ($claims['sessionIp'] !== \CRM_Utils_System::ipAddress()) {
+      throw new \CRM_Core_Exception("Invalid session token. IP address changed");
+    }
+    return $claims['sessionId'];
+  }
+
+  /**
+   * @return string
+   */
+  protected function createSessionId(): string {
+    return \CRM_Utils_String::createRandom(32, \CRM_Utils_String::ALPHANUMERIC);
+  }
+
+  protected function rotateSessionId(): void {
+    $oldId = $this->sessionId;
+    $newId = $this->createSessionId();
+    $storage = \Civi::cache('session');
+    $storage->set($newId, $storage->get($oldId));
+    $storage->delete($oldId);
+    $this->sessionId = $newId;
+  }
+
+}
