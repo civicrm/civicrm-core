@@ -59,6 +59,7 @@ return new class() extends EventCheck implements HookInterface {
     'pledge.selector.row' => ['is_active'],
     'view.report.links' => ['confirm_message'],
     'contribution.selector.row' => ['result', 'key', 'is_single_mode', 'title_single_mode', 'filters'],
+    'create.new.shortcuts' => ['shortCuts'],
   ];
 
   /**
@@ -72,6 +73,17 @@ return new class() extends EventCheck implements HookInterface {
     'pcp.user.actions::Pcp',
   ];
 
+  protected $grandfatheredInvalidWeights = [
+    'create.new.shortcuts', /* These weights don't match the EDIT/VIEW/DELETE constructs... */
+  ];
+
+  /**
+   * @var string[]
+   */
+  protected $grandfatheredInvalidObjectNames = [
+    'create.new.shortcuts', /* Documented as passing NULL */
+  ];
+
   /**
    * The specification says that `name` property stores the printable label.
    * But in some lists, this has been changed to a different property.
@@ -79,6 +91,7 @@ return new class() extends EventCheck implements HookInterface {
    */
   protected $grandfatheredNameFields = [
     'view.report.links' => 'label',
+    'create.new.shortcuts' => 'title',
   ];
 
   /**
@@ -97,7 +110,6 @@ return new class() extends EventCheck implements HookInterface {
    * @var string[]
    */
   protected $unrepentantMiscreants = [
-    'create.new.shortcuts', /* FIXME */
     'create.new.shorcuts', /* Deprecated */
   ];
 
@@ -114,10 +126,12 @@ return new class() extends EventCheck implements HookInterface {
       return;
     }
 
-    $matchGrandfatheredObjectNames = CRM_Utils_String::filterByWildcards($this->grandfatheredObjectNames, [$objectName]);
-    $this->assertTrue((bool) preg_match(';^\w+(\.\w+)+$;', $op), "$msg: Operation ($op) should be dotted expression");
-    $this->assertTrue((bool) preg_match(';^[A-Z][a-zA-Z0-9]+$;', $objectName) || !empty($matchGrandfatheredObjectNames),
-      "$msg: Object name ($objectName) should be a CamelCase name or a grandfathered name");
+    if (!in_array($op, $this->grandfatheredInvalidObjectNames)) {
+      $matchGrandfatheredObjectNames = CRM_Utils_String::filterByWildcards($this->grandfatheredObjectNames, [$objectName]);
+      $this->assertTrue((bool) preg_match(';^\w+(\.\w+)+$;', $op), "$msg: Operation ($op) should be dotted expression");
+      $this->assertTrue((bool) preg_match(';^[A-Z][a-zA-Z0-9]+$;', $objectName) || !empty($matchGrandfatheredObjectNames),
+        "$msg: Object name ($objectName) should be a CamelCase name or a grandfathered name");
+    }
 
     if (isset($this->objectIdTypes[$op])) {
       $this->assertType($this->objectIdTypes[$op], $objectId, "$msg: Object ID ($objectId) should be " . $this->objectIdTypes[$op]);
@@ -177,7 +191,9 @@ return new class() extends EventCheck implements HookInterface {
       if (isset($link['class'])) {
         $this->assertType('string', $link['class'], "$msg: class should be a string");
       }
-      $this->assertTrue(isset($link['weight']) && is_numeric($link['weight']), "$msg: weight should be numerical");
+      if (!in_array($op, $this->grandfatheredInvalidWeights)) {
+        $this->assertTrue(isset($link['weight']) && is_numeric($link['weight']), "$msg: weight should be numerical");
+      }
       if (isset($link['accessKey'])) {
         $this->assertTrue(is_string($link['accessKey']) && mb_strlen($link['accessKey']) <= 1, "$msg: accessKey should be a letter");
       }
