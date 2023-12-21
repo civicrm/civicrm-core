@@ -139,9 +139,9 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     }
     $this->set('scheduled', $this->_scheduled);
 
-    $this->_createdId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, 0);
-    if ($this->_createdId) {
-      $this->set('createdId', $this->_createdId);
+    $createdId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, 0);
+    if ($createdId) {
+      $this->set('createdId', $createdId);
     }
 
     if ($this->_sms) {
