@@ -85,7 +85,7 @@
     "civicrm/composer-downloads-plugin": "^3.0",
     "league/csv": "~9.7.4",
     "league/oauth2-client": "^2.4",
-    "league/oauth2-google": "^3.0",
+    "league/oauth2-google": "^3.0 || ^4.0",
     "tplaner/when": "~3.1",
     "xkerman/restricted-unserialize": "~1.1",
     "typo3/phar-stream-wrapper": "^2 || ^3.0",
