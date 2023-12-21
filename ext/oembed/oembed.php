@@ -30,3 +30,7 @@ function oembed_civicrm_install(): void {
 function oembed_civicrm_enable(): void {
   _oembed_civix_civicrm_enable();
 }
+
+function oembed_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions) {
+  $permissions['oembed']['installscript'] = ['administer oembed'];
+}

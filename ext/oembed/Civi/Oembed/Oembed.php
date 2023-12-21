@@ -25,7 +25,7 @@ class Oembed extends AutoService {
    * @return \Civi\Core\Url
    */
   public function getUrl(): Url {
-    return \Civi::url('[cms.root]/oembed.php');
+    return \Civi::url('[cms.root]/oembed.php', 'a');
   }
 
   /**
