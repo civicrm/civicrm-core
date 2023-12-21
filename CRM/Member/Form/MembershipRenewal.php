@@ -539,7 +539,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $paymentParams['contactID'] = $this->_contributorContactID;
 
-      CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
+      CRM_Core_Payment_Form::mapParams(NULL, $this->_params, $paymentParams, TRUE);
 
       if (!empty($this->_params['auto_renew'])) {
 

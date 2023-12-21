@@ -138,7 +138,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
         $params = array_merge($this->_params, $preApprovalParams);
       }
-      CRM_Core_Payment_Form::mapParams($this->_bltID, $params, $params, FALSE);
+      CRM_Core_Payment_Form::mapParams(NULL, $params, $params, FALSE);
 
       // set a few other parameters that are not really specific to this method because we don't know what
       // will break if we change this.
@@ -500,7 +500,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
         }
         elseif (!empty($participantRecord['is_primary'])) {
-          CRM_Core_Payment_Form::mapParams($this->_bltID, $participantRecord, $participantRecord, TRUE);
+          CRM_Core_Payment_Form::mapParams(NULL, $participantRecord, $participantRecord, TRUE);
           // payment email param can be empty for _bltID mapping
           // thus provide mapping for it with a different email value
           if (empty($participantRecord['email'])) {

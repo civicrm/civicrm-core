@@ -627,8 +627,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   protected function getForm($formValues = [], $mode = 'test'): CRM_Member_Form_MembershipRenewal {
     /** @var CRM_Member_Form_MembershipRenewal $form */
     $form = $this->getFormObject('CRM_Member_Form_MembershipRenewal', $formValues);
-
-    $form->_bltID = 5;
     $form->_mode = $mode;
     $form->setEntityId($this->_membershipID);
     $form->preProcess();
