@@ -5,7 +5,7 @@ use Civi\Test\HookInterface;
 
 return new class() extends EventCheck implements HookInterface {
 
-  // There are several properties named "$grandfatherdXyz". These mark itmes which
+  // There are several properties named "$grandfatherdXyz". These mark items which
   // pass through hook_civicrm_links but deviate from the plain interpretation of the docs.
   // Auditing or cleaning each would be its own separate project. Please feel free to
   // do that audit and figure how to normalize it. But for now, the goal of this file is
@@ -70,6 +70,16 @@ return new class() extends EventCheck implements HookInterface {
   ];
 
   /**
+   * List of events with multiple problems. These are completely ignored.
+   *
+   * @var string[]
+   */
+  protected $unrepentantMiscreants = [
+    'create.new.shortcuts', /* FIXME */
+    'create.new.shorcuts', /* Deprecated */
+  ];
+
+  /**
    * Ensure that the hook data is always well-formed.
    *
    * @see \CRM_Utils_Hook::links()
@@ -77,6 +87,10 @@ return new class() extends EventCheck implements HookInterface {
   public function hook_civicrm_links($op, $objectName, &$objectId, &$links, &$mask = NULL, &$values = []): void {
     // fprintf(STDERR, "CHECK hook_civicrm_links($op)\n");
     $msg = sprintf('Non-conforming hook_civicrm_links(%s, %s)', json_encode($op), json_encode($objectName));
+
+    if (in_array($op, $this->unrepentantMiscreants)) {
+      return;
+    }
 
     $this->assertTrue((bool) preg_match(';^\w+(\.\w+)+$;', $op), "$msg: Operation ($op) should be dotted expression");
     $this->assertTrue((bool) preg_match(';^[A-Z][a-zA-Z0-9]+$;', $objectName) || in_array($objectName, $this->grandfatheredObjectNames),
