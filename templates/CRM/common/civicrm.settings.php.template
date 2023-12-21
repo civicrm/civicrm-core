@@ -187,21 +187,6 @@ if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
 }
 
 /**
- * SMARTY Compile Check:
- *
- * This tells Smarty whether to check for recompiling or not. Recompiling
- * does not need to happen unless a template or config file is changed.
- * Typically you enable this during development, and disable for production.
- *
- * Related issue:
- * https://lab.civicrm.org/dev/core/issues/1073
- *
- */
-//if (!defined('CIVICRM_TEMPLATE_COMPILE_CHECK')) {
-//  define('CIVICRM_TEMPLATE_COMPILE_CHECK', FALSE);
-//}
-
-/**
  * Smarty escape on output.
  *
  * This does not currently work if you have a Smarty 3 path defined
@@ -252,6 +237,21 @@ if (!defined('CIVICRM_UF_BASEURL')) {
   define( 'CIVICRM_UF_BASEURL'      , '%%baseURL%%');
 }
 
+/**
+ * SMARTY Compile Check:
+ *
+ * This tells Smarty whether to check for recompiling or not. Recompiling
+ * does not need to happen unless a template or config file is changed.
+ * Typically you enable this during development, and disable for production.
+ *
+ * Related issue:
+ * https://lab.civicrm.org/dev/core/issues/1073
+ *
+ */
+if (!defined('CIVICRM_TEMPLATE_COMPILE_CHECK')) {
+  $isProbablyDevelopmentSite = str_contains(CIVICRM_UF_BASEURL, 'localhost') || str_contains(CIVICRM_UF_BASEURL, 'staging') || str_contains(CIVICRM_UF_BASEURL, 'dev');
+  define('CIVICRM_TEMPLATE_COMPILE_CHECK',  $isProbablyDevelopmentSite);
+}
 
 /**
  * Specify a Smarty 3 autoload file.
