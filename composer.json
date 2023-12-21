@@ -102,7 +102,8 @@
     "symfony/polyfill-php82": "^1.0",
     "soundasleep/html2text": "^2.1",
     "psr/container": "~1.0 || ~2.0",
-    "ext-fileinfo": "*"
+    "ext-fileinfo": "*",
+    "pontedilana/php-weasyprint": "^0.13.0"
   },
   "scripts": {
     "post-install-cmd": [
