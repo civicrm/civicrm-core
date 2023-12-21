@@ -962,8 +962,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   - thankyou_date (not all forms will set this)
    *
    * @param CRM_Financial_DAO_FinancialType $financialType
-   * @param int $billingLocationID
-   *   ID of billing location type.
    * @param bool $isRecur
    *   Is this recurring?
    *
@@ -979,7 +977,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $result,
     $contributionParams,
     $financialType,
-    $billingLocationID,
     $isRecur
   ) {
     $form = $this;
@@ -1704,14 +1701,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     // CRM-19792 : set necessary fields for payment processor
-    CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $tempParams, TRUE);
+    CRM_Core_Payment_Form::mapParams(NULL, $this->_params, $tempParams, TRUE);
 
     $membershipContribution = $this->processFormContribution(
       $tempParams,
       $tempParams,
       $contributionParams,
       $financialType,
-      $this->_bltID,
       $isRecur
     );
 
@@ -2550,7 +2546,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         NULL,
         $contributionParams,
         $financialType,
-        $form->_bltID,
         $isRecur
       );
       // CRM-13074 - create the CMSUser after the transaction is completed as it
