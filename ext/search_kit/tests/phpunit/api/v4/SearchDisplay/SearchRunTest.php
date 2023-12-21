@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../../../../../../tests/phpunit/api/v4/Api4TestBase.
 
 use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Action\GetLinks;
 use Civi\Api4\Activity;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
@@ -2049,6 +2050,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(0, $result->toolbar);
     // With 'add contacts' permission the button will be shown
     \CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'add contacts';
+    // Clear getLinks cache after changing permissions
+    \Civi::$statics[GetLinks::class] = [];
+
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result->toolbar);
     $button = $result->toolbar[0];
