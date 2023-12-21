@@ -115,7 +115,7 @@ return [
     'title' => ts('Smart group cache timeout'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('The number of minutes to cache smart group contacts. We strongly recommend that this value be greater than zero, since a value of zero means no caching at all. If your contact data changes frequently, you should set this value to at least 5 minutes.'),
+    'description' => ts('The number of minutes to cache smart group contacts. The best value will depend on your site and the complexity of the groups and acls you use. A value of zero means no caching at all. You may need to experiment with this.'),
     'help_text' => NULL,
   ],
   'defaultSearchProfileID' => [
