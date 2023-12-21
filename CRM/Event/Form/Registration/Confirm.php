@@ -1193,41 +1193,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Submit in test mode.
-   *
-   * Do not use this - we have figured out how to emulate form in tests now.
-   *
-   * See ConfirmTest.
-   *
-   * @deprecated
-   *
-   * @param $params
-   */
-  public static function testSubmit($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('use the Civi\Test\FormTrait');
-    $form = new CRM_Event_Form_Registration_Confirm();
-    // This way the mocked up controller ignores the session stuff.
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $_REQUEST['id'] = $form->_eventId = $params['id'];
-    $form->controller = new CRM_Event_Controller_Registration();
-    $form->_params = $params['params'];
-    // This happens in buildQuickForm so emulate here.
-    $form->_amount = $form->_totalAmount = $params['totalAmount'] ?? 0;
-    $form->set('params', $params['params']);
-    $form->_values['custom_pre_id'] = $params['custom_pre_id'] ?? NULL;
-    $form->_values['custom_post_id'] = $params['custom_post_id'] ?? NULL;
-    $form->_values['event'] = $params['event'] ?? NULL;
-    $eventParams = ['id' => $params['id']];
-    CRM_Event_BAO_Event::retrieve($eventParams, $form->_values['event']);
-    $form->set('registerByID', $params['registerByID']);
-    if (!empty($params['paymentProcessorObj'])) {
-      $form->_paymentProcessor = $params['paymentProcessorObj'];
-    }
-    $form->postProcess();
-    return $form;
-  }
-
-  /**
    * Process the payment, redirecting back to the page on error.
    *
    * @param \CRM_Core_Payment $payment
