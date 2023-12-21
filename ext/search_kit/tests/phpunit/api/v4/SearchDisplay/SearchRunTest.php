@@ -428,7 +428,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString('Enable', $result[3]['columns'][1]['links'][2]['title']);
     // 4th link is to the case, and only for the relevant entity
     $this->assertEquals('Manage Case', $result[2]['columns'][1]['links'][3]['text']);
-    $this->assertStringContainsString('civicrm', $result[3]['columns'][1]['links'][3]['url']);
+    $this->assertStringContainsString("id={$case['id']}", $result[3]['columns'][1]['links'][3]['url']);
   }
 
   /**

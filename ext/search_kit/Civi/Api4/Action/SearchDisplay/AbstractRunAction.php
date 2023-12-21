@@ -507,13 +507,51 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     return $out;
   }
 
+  /**
+   * Format a link to resolve tokens and form the url.
+   *
+   * There are 3 ways a link can be declared:
+   *  1. entity+action
+   *  2. entity+task
+   *  3. path
+   *
+   * @param array $link
+   * @param array $data
+   * @param string|NULL $text
+   * @param $index
+   * @return array|null
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
   protected function formatLink(array $link, array $data, string $text = NULL, $index = 0): ?array {
-    if (!$this->checkLinkAccess($link, $data, $index)) {
+    $useApi = (!empty($link['entity']) && !empty($link['action']));
+    if (isset($index)) {
+      foreach ($data as $key => $value) {
+        if (is_array($value)) {
+          $data[$key] = $value[$index] ?? NULL;
+        }
+      }
+    }
+    if ($useApi) {
+      $checkPermissions = !in_array($link['action'], ['view', 'preview'], TRUE);
+      if (!empty($link['prefix'])) {
+        $data = \CRM_Utils_Array::filterByPrefix($data, $link['prefix']);
+      }
+      // Hack to support links to relationships
+      $linkEntity = ($link['entity'] === 'Relationship') ? 'RelationshipCache' : $link['entity'];
+      $apiInfo = civicrm_api4($linkEntity, 'getLinks', [
+        'checkPermissions' => $checkPermissions,
+        'values' => $data,
+        'where' => [['ui_action', '=', $link['action']]],
+      ]);
+      $link['path'] = $apiInfo[0]['path'] ?? '';
+    }
+    elseif (!$this->checkLinkAccess($link, $data)) {
       return NULL;
     }
     $link['text'] = $text ?? $this->replaceTokens($link['text'], $data, 'view');
     // Will return null if `$link[path]` is empty or if any tokens do not resolve
-    $path = $this->replaceTokens($link['path'], $data, 'url', $index);
+    $path = $this->replaceTokens($link['path'], $data, 'url');
     if ($path) {
       $link['url'] = $this->getUrl($path);
       $keys = ['url', 'text', 'title', 'target', 'icon', 'style', 'autoOpen'];
@@ -539,12 +577,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param array $link
    * @param array $data
-   * @param int $index
    * @return bool
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  private function checkLinkAccess(array $link, array $data, int $index = 0): bool {
+  private function checkLinkAccess(array $link, array $data): bool {
     if (empty($link['path']) && empty($link['task'])) {
       return FALSE;
     }
@@ -560,7 +597,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $idField = CoreUtil::getIdFieldName($link['entity']);
       $idKey = $this->getIdKeyName($link['entity']);
       $id = $data[$link['prefix'] . $idKey] ?? NULL;
-      $id = is_array($id) ? $id[$index] ?? NULL : $id;
       if ($id) {
         $values = [$idField => $id];
         // If not aggregated, add other values to help checkAccess be efficient
@@ -714,7 +750,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           ],
         ]);
         $link['path'] = $getLinks[0]['path'] ?? NULL;
-        $link['entity'] = $getLinks[0]['entity'] ?? NULL;
         // This is a bit clunky, the function_join_field gets un-munged later by $this->getJoinFromAlias()
         if ($this->canAggregate($link['prefix'] . $idKey)) {
           $link['prefix'] = 'GROUP_CONCAT_' . str_replace('.', '_', $link['prefix']);
@@ -1002,7 +1037,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param string $tokenExpr
    * @param array $data
    * @param string $format view|raw|url
-   * @param int $index
    * @return string
    */
   private function replaceTokens($tokenExpr, $data, $format, $index = NULL) {
@@ -1012,12 +1046,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $dataType = $this->getSelectExpression($token)['dataType'] ?? NULL;
         $val = $this->formatViewValue($token, $val, $data, $dataType);
       }
-      if (!(is_null($index))) {
-        $replacement = is_array($val) ? $val[$index] ?? '' : $val;
-      }
-      else {
-        $replacement = implode(', ', (array) $val);
-      }
+      $replacement = implode(', ', (array) $val);
       // A missing token value in a url invalidates it
       if ($format === 'url' && (!isset($replacement) || $replacement === '')) {
         return NULL;
