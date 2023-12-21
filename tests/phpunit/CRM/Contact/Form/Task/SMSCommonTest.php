@@ -97,7 +97,8 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
    * Test to ensure SMS Activity QuickForm displays the right phone numbers.
    */
   public function testQuickFormMobileNumbersDisplay(): void {
-    $form = $this->getFormObject('CRM_Core_Form');
+    /** @var CRM_Activity_Form_Task_SMS $form */
+    $form = $this->getFormObject('CRM_Contact_Form_Task_SMS');
     $form->_contactIds = array_values($this->ids['Contact']);
     $form->_single = FALSE;
     CRM_Contact_Form_Task_SMSCommon::buildQuickForm($form);
