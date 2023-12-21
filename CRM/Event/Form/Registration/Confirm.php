@@ -45,6 +45,27 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   protected $submittableMoneyFields = ['total_amount', 'net_amount', 'non_deductible_amount', 'fee_amount', 'tax_amount', 'amount'];
 
+  private $_amount;
+
+  /**
+   * Provide support for extensions that are used to being able to retrieve _amount
+   *
+   * This property was never declared & is hard to support & a good thing to keep.
+   * However, it makes sense to provide a transitional magic method to get what
+   * it used to provide.
+   *
+   * @param string $name
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function __get($name) {
+    if ($name === '_amount') {
+      CRM_Core_Error::deprecatedWarning('attempt to access undefined deprecated property _amount');
+      return $this->calculateLegacyAmountArray();
+    }
+    CRM_Core_Error::deprecatedWarning('attempt to access invalid property :' . $name);
+  }
+
   /**
    * Set variables up before form is built.
    */
@@ -1323,6 +1344,52 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
     return [$taxAmount, $participantDetails, $individual, $amountArray];
+  }
+
+  /**
+   * Interim refactoring extraction.
+   *
+   * @internal
+   * @return array
+   */
+  private function calculateLegacyAmountArray(): array {
+    $amountArray = [];
+    foreach ($this->_params as $k => $v) {
+      if ($v === 'skip') {
+        continue;
+      }
+      $append = '';
+      if (is_array($v)) {
+        $this->cleanMoneyFields($v);
+        foreach (['first_name', 'last_name'] as $name) {
+          if (isset($v['billing_' . $name]) &&
+            !isset($v[$name])
+          ) {
+            $v[$name] = $v['billing_' . $name];
+          }
+        }
+
+        if (!empty($v['first_name']) && !empty($v['last_name'])) {
+          $append = $v['first_name'] . ' ' . $v['last_name'];
+        }
+        else {
+          //use an email if we have one
+          foreach ($v as $v_key => $v_val) {
+            if (str_starts_with($v_key, 'email-')) {
+              $append = $v[$v_key];
+            }
+          }
+        }
+
+        $amountArray[$k]['amount'] = $v['amount'];
+        if (!empty($v['discountAmount'])) {
+          $amountArray[$k]['amount'] -= $v['discountAmount'];
+        }
+
+        $amountArray[$k]['label'] = preg_replace('//', '', $v['amount_level']) . '  -  ' . $append;
+      }
+    }
+    return $amountArray;
   }
 
 }
