@@ -65,7 +65,7 @@ class ScriptManager extends AutoService implements HookInterface {
     if ($this->isInstallable()) {
       $message->addAction(ts('Deploy now'), FALSE, 'api3', ['Oembed', 'installscript']);
     }
-    // $message->addAction(ts('Deploy instructions'), FALSE, 'href', ['path' => 'civicrm/admin/oembed/install', 'query' => 'reset=1']);
+    $message->addAction(ts('Deploy instructions'), FALSE, 'href', ['path' => 'civicrm/admin/oembed/install', 'query' => 'reset=1']);
     $messages[] = $message;
   }
 
@@ -120,6 +120,11 @@ class ScriptManager extends AutoService implements HookInterface {
       '//TEMPLATE:START' => $metaCode,
       '//TEMPLATE:END' => sprintf("%s::main();\n", $class->getShortName()),
     ]);
+  }
+
+  public function getCurrent(): ?string {
+    $path = $this->oembed->getPath();
+    return file_exists($path) ? file_get_contents($path) : NULL;
   }
 
   /**
