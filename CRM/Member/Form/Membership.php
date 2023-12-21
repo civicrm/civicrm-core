@@ -1051,7 +1051,7 @@ DESC limit 1");
 
       // This is a candidate for shared beginPostProcess function.
       // @todo Do we need this now we have $this->formatParamsForPaymentProcessor() ?
-      CRM_Core_Payment_Form::mapParams($this->_bltID, $formValues, $paymentParams, TRUE);
+      CRM_Core_Payment_Form::mapParams(NULL, $formValues, $paymentParams, TRUE);
       // CRM-7137 -for recurring membership,
       // we do need contribution and recurring records.
       $result = NULL;
