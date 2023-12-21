@@ -1,86 +1,92 @@
 <div ng-include="'~/crmSearchAdmin/crmSearchAdminDisplayHeader.html'"></div>
-<fieldset ng-if="!$ctrl.display.settings.draggable" ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
-<fieldset>
-  <div ng-if="$ctrl.canBeDraggable" class="form-inline">
-    <div class="checkbox-inline form-control">
-      <label>
-        <input type="checkbox" ng-checked="!!$ctrl.display.settings.draggable" ng-click="$ctrl.toggleDraggable()">
-        <span>{{:: ts('Drag and drop sorting') }}</span>
-      </label>
+<details>
+  <summary>{{:: ts('Settings') }}</summary>
+  <fieldset ng-if="!$ctrl.display.settings.draggable" ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
+  <fieldset>
+    <div ng-if="$ctrl.canBeDraggable" class="form-inline">
+      <div class="checkbox-inline form-control">
+        <label>
+          <input type="checkbox" ng-checked="!!$ctrl.display.settings.draggable" ng-click="$ctrl.toggleDraggable()">
+          <span>{{:: ts('Drag and drop sorting') }}</span>
+        </label>
+      </div>
     </div>
-  </div>
-  <div class="form-inline">
-    <search-admin-tasks-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-tasks-config>
-  </div>
-  <div class="form-inline">
-    <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
-  </div>
-  <div class="form-inline">
-    <label>{{:: ts('Table Style') }}</label>
-    <div class="checkbox-inline form-control" ng-repeat="style in $ctrl.tableClasses">
-      <label>
-        <input type="checkbox" ng-checked="$ctrl.includes($ctrl.display.settings.classes, style.name)" ng-click="$ctrl.toggle($ctrl.display.settings.classes, style.name)">
-        <span>{{:: style.label }}</span>
-      </label>
+    <div class="form-inline">
+      <search-admin-tasks-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-tasks-config>
     </div>
-  </div>
-  <search-admin-css-rules label="{{:: ts('Row Style') }}" item="$ctrl.display.settings"></search-admin-css-rules>
-  <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
-  <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
-  <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Text to display if the table is empty.') }}">
-    <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
-    <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
-  </div>
-  <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
-  <div class="form-inline">
-    <div class="checkbox-inline form-control" title="{{:: ts('Shows grand totals or other statistics, configured per-column.') }}">
-      <label>
-        <input type="checkbox" ng-click="$ctrl.toggleTally()" ng-checked="!!$ctrl.display.settings.tally">
-        <span>{{:: ts('Show Totals in Footer') }}</span>
-      </label>
+    <div class="form-inline">
+      <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
     </div>
-    <div class="form-group" ng-if="$ctrl.display.settings.tally">
-      <label for="crm-search-admin-table-tally-title">{{:: ts('Label') }}</label>
-      <input id="crm-search-admin-table-tally-title" ng-model="$ctrl.display.settings.tally.label" class="form-control">
+    <div class="form-inline">
+      <label>{{:: ts('Table Style') }}</label>
+      <div class="checkbox-inline form-control" ng-repeat="style in $ctrl.tableClasses">
+        <label>
+          <input type="checkbox" ng-checked="$ctrl.includes($ctrl.display.settings.classes, style.name)" ng-click="$ctrl.toggle($ctrl.display.settings.classes, style.name)">
+          <span>{{:: style.label }}</span>
+        </label>
+      </div>
     </div>
-  </div>
-</fieldset>
+    <search-admin-css-rules label="{{:: ts('Row Style') }}" item="$ctrl.display.settings"></search-admin-css-rules>
+    <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
+    <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
+    <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Text to display if the table is empty.') }}">
+      <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
+      <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
+    </div>
+    <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
+    <div class="form-inline">
+      <div class="checkbox-inline form-control" title="{{:: ts('Shows grand totals or other statistics, configured per-column.') }}">
+        <label>
+          <input type="checkbox" ng-click="$ctrl.toggleTally()" ng-checked="!!$ctrl.display.settings.tally">
+          <span>{{:: ts('Show Totals in Footer') }}</span>
+        </label>
+      </div>
+      <div class="form-group" ng-if="$ctrl.display.settings.tally">
+        <label for="crm-search-admin-table-tally-title">{{:: ts('Label') }}</label>
+        <input id="crm-search-admin-table-tally-title" ng-model="$ctrl.display.settings.tally.label" class="form-control">
+      </div>
+    </div>
+  </fieldset>
+</details>
 <fieldset class="crm-search-admin-edit-columns-wrapper">
   <legend>
     {{:: ts('Columns') }}
-    <div ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'" class="btn-group btn-group-xs"></div>
   </legend>
-  <div class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
+  <div ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'"></div>
+  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
-      <legend><i class="crm-i fa-arrows crm-search-move-icon"></i> {{ $ctrl.parent.getColLabel(col) }}</legend>
-      <div class="form-inline crm-search-admin-flex-row">
-        <label for="crm-search-admin-edit-col-{{ $index }}">{{:: ts('Header') }}</label>
-        <input id="crm-search-admin-edit-col-{{ $index }}" class="form-control crm-flex-1" type="text" ng-model="col.label" >
-        <button type="button" class="btn-xs" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
-          <i class="crm-i fa-ban"></i>
-        </button>
-      </div>
-      <div class="form-inline">
-        <label>{{:: ts('Alignment') }}</label>
-        <select ng-model="col.alignment" class="form-control">
-          <option value="">{{:: ts('Left') }}</option>
-          <option value="text-center">{{:: ts('Center') }}</option>
-          <option value="text-right">{{:: ts('Right') }}</option>
-        </select>
-      </div>
-      <div class="form-inline" ng-if="$ctrl.parent.canBeSortable(col)">
-        <label title="{{:: ts('Allow user to click on header to sort table by this column') }}">
-          <input type="checkbox" ng-checked="col.sortable !== false" ng-click="col.sortable = col.sortable === false" >
-          {{:: ts('Sortable Header') }}
-        </label>
-      </div>
-      <div ng-include="'~/crmSearchAdmin/displays/colType/' + col.type + '.html'"></div>
-      <div class="form-inline" ng-if="col.type === 'field' && $ctrl.display.settings.tally">
-        <label>{{:: ts('Footer Label') }}</label>
-        <input class="form-control" ng-model="col.tally.label" placeholder="{{:: ts('None') }}">
-        <label>{{:: ts('Footer Aggregate') }}</label>
-        <input class="form-control" ng-model="col.tally.fn" crm-ui-select="{data: $ctrl.getTallyFunctions, placeholder: ts('None'), allowClear: true}">
-      </div>
+      <i class="crm-i fa-arrows crm-search-move-icon"></i>
+      <button type="button" class="btn btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
+        <i class="crm-i fa-ban"></i>
+      </button>
+      <details>
+        <summary>{{ $ctrl.parent.getColLabel(col) }}</summary>
+        <div class="form-inline crm-search-admin-flex-row">
+          <label for="crm-search-admin-edit-col-{{ $index }}">{{:: ts('Header') }}</label>
+          <input id="crm-search-admin-edit-col-{{ $index }}" class="form-control crm-flex-1" type="text" ng-model="col.label" >
+        </div>
+        <div class="form-inline">
+          <label>{{:: ts('Alignment') }}</label>
+          <select ng-model="col.alignment" class="form-control">
+            <option value="">{{:: ts('Left') }}</option>
+            <option value="text-center">{{:: ts('Center') }}</option>
+            <option value="text-right">{{:: ts('Right') }}</option>
+          </select>
+        </div>
+        <div class="form-inline" ng-if="$ctrl.parent.canBeSortable(col)">
+          <label title="{{:: ts('Allow user to click on header to sort table by this column') }}">
+            <input type="checkbox" ng-checked="col.sortable !== false" ng-click="col.sortable = col.sortable === false" >
+            {{:: ts('Sortable Header') }}
+          </label>
+        </div>
+        <div ng-include="'~/crmSearchAdmin/displays/colType/' + col.type + '.html'"></div>
+        <div class="form-inline" ng-if="col.type === 'field' && $ctrl.display.settings.tally">
+          <label>{{:: ts('Footer Label') }}</label>
+          <input class="form-control" ng-model="col.tally.label" placeholder="{{:: ts('None') }}">
+          <label>{{:: ts('Footer Aggregate') }}</label>
+          <input class="form-control" ng-model="col.tally.fn" crm-ui-select="{data: $ctrl.getTallyFunctions, placeholder: ts('None'), allowClear: true}">
+        </div>
+      </details>
     </fieldset>
-  </div>
+  </fieldset>
 </fieldset>
