@@ -131,14 +131,14 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     $this->applyFilter('__ALL__', 'trim');
 
     $session = CRM_Core_Session::singleton();
-    $this->_cancelURL = $_POST['cancelURL'] ?? NULL;
+    $cancelURL = $_POST['cancelURL'] ?? NULL;
 
-    if (!$this->_cancelURL) {
-      $this->_cancelURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
+    if (!$cancelURL) {
+      $cancelURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
     }
 
-    if ($this->_cancelURL) {
-      $this->addElement('hidden', 'cancelURL', $this->_cancelURL);
+    if ($cancelURL) {
+      $this->addElement('hidden', 'cancelURL', $cancelURL);
     }
 
     $buttons = [
@@ -154,7 +154,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     ];
     $this->addButtons($buttons);
 
-    $session->replaceUserContext($this->_cancelURL);
+    $session->replaceUserContext($cancelURL);
 
     // don't show option for contribution amounts section if membership price set
     // this flag is sent to template

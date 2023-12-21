@@ -55,8 +55,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    */
   protected $_templateId;
 
-  protected $_cancelURL = NULL;
-
   /**
    * The campaign id of the existing event, we use this to know if we need to update
    * the participant records
@@ -246,23 +244,23 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
 
-    $this->_cancelURL = $_POST['cancelURL'] ?? NULL;
+    $cancelURL = $_POST['cancelURL'] ?? NULL;
 
-    if (!$this->_cancelURL) {
+    if (!$cancelURL) {
       if ($this->_isTemplate) {
-        $this->_cancelURL = CRM_Utils_System::url('civicrm/admin/eventTemplate',
+        $cancelURL = CRM_Utils_System::url('civicrm/admin/eventTemplate',
           'reset=1'
         );
       }
       else {
-        $this->_cancelURL = CRM_Utils_System::url('civicrm/event/manage',
+        $cancelURL = CRM_Utils_System::url('civicrm/event/manage',
           'reset=1'
         );
       }
     }
 
-    if ($this->_cancelURL) {
-      $this->addElement('hidden', 'cancelURL', $this->_cancelURL);
+    if ($cancelURL) {
+      $this->addElement('hidden', 'cancelURL', $cancelURL);
     }
 
     if ($this->_single) {
@@ -301,7 +299,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
       $this->addButtons($buttons);
     }
-    $session->replaceUserContext($this->_cancelURL);
+    $session->replaceUserContext($cancelURL);
     $this->add('hidden', 'is_template', $this->_isTemplate);
   }
 
