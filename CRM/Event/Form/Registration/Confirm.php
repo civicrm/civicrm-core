@@ -835,6 +835,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $this->assign('lineItem', $lineItem);
           }
           $this->_values['params']['additionalParticipant'] = TRUE;
+          // Removed from tpl in 5.67
           $this->assign('isAdditionalParticipant', $this->_values['params']['additionalParticipant']);
         }
 
