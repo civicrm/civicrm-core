@@ -33,6 +33,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   use CRMTraits_Financial_TaxTrait;
   use CRMTraits_Financial_PriceSetTrait;
   use FormTrait;
+  use CRM_Core_Payment_AuthorizeNetTrait;
 
   protected $individualID;
   protected $financialTypeID = 1;
