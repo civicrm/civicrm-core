@@ -429,11 +429,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
    * To create an address we need state_province_id.
    *
    * @param array $params
-   * @param int $billingLocationTypeID
    *
    * @return array
    */
-  public static function getPaymentProcessorReadyAddressParams($params, $billingLocationTypeID) {
+  public static function getPaymentProcessorReadyAddressParams($params) {
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
     [$hasBillingField, $addressParams] = self::getBillingAddressParams($params, $billingLocationTypeID);
     foreach ($addressParams as $name => $field) {
       if (substr($name, 0, 8) == 'billing_') {

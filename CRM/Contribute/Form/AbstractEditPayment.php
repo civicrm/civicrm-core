@@ -554,15 +554,15 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     foreach (array_keys($this->_fields) as $name) {
       $fields[$name] = 1;
     }
-
-    $fields["address_name-{$this->_bltID}"] = 1;
+    $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
+    $fields["address_name-{$billingLocationID}"] = 1;
 
     //ensure we don't over-write the payer's email with the member's email
     if ($contactID == $this->_contactID) {
-      $fields["email-{$this->_bltID}"] = 1;
+      $fields["email-{$billingLocationID}"] = 1;
     }
 
-    [$hasBillingField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params, $this->_bltID);
+    [$hasBillingField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params);
     $fields = $this->formatParamsForPaymentProcessor($fields);
 
     if ($hasBillingField) {
