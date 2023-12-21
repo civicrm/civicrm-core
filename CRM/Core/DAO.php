@@ -1520,6 +1520,8 @@ LIKE %1
   /**
    * Fetch object based on array of properties.
    *
+   * @internal - extensions should always use the api
+   *
    * @param string $daoName
    *   Name of the dao class.
    * @param array $params
