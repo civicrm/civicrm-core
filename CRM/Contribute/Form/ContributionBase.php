@@ -1404,10 +1404,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * form (Contribution_Main) available from the others in the same flow
    * (Contribution_Confirm, Contribution_ThankYou).
    *
-   * @api This function will not change in a minor release and is supported for
-   * use outside of core. This annotation / external support for properties
-   * is only given where there is specific test cover.
-   *
    * @return string[]
    */
   protected function getSubmittableFields(): array {
