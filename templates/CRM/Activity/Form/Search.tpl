@@ -9,7 +9,7 @@
 *}
 {* Search form and results for Activities *}
 <div class="crm-form-block crm-search-form-block">
-  <details class="crm-accordion-wrapper crm-advanced_search_form-accordion" open="">
+  <details class="crm-accordion-wrapper crm-advanced_search_form-accordion" {if !$rows}open=""{/if}">
     <summary class="crm-accordion-header crm-master-accordion-header">
       {ts}Edit Search Criteria{/ts}
     </summary>
