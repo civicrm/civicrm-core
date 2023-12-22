@@ -37,6 +37,11 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   public $_action;
 
+  /**
+   * @var int
+   *
+   * @deprecated
+   */
   public $_bltID;
 
   public $_fields = [];
@@ -429,19 +434,20 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    */
   public function unsetCreditCardFields($submittedValues) {
     //Offline Contribution.
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
     $unsetParams = [
       'payment_processor_id',
-      "email-{$this->_bltID}",
+      "email-{$billingLocationTypeID}",
       'hidden_buildCreditCard',
       'hidden_buildDirectDebit',
       'billing_first_name',
       'billing_middle_name',
       'billing_last_name',
       'street_address-5',
-      "city-{$this->_bltID}",
-      "state_province_id-{$this->_bltID}",
-      "postal_code-{$this->_bltID}",
-      "country_id-{$this->_bltID}",
+      "city-{$billingLocationTypeID}",
+      "state_province_id-{$billingLocationTypeID}",
+      "postal_code-{$billingLocationTypeID}",
+      "country_id-{$billingLocationTypeID}",
       'credit_card_number',
       'cvv2',
       'credit_card_exp_date',
@@ -599,12 +605,13 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected function getBillingDefaults($defaults) {
     // set default country from config if no country set
     $config = CRM_Core_Config::singleton();
-    if (empty($defaults["billing_country_id-{$this->_bltID}"])) {
-      $defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
+    if (empty($defaults["billing_country_id-{$billingLocationTypeID}"])) {
+      $defaults["billing_country_id-{$billingLocationTypeID}"] = \Civi::settings()->get('defaultContactCountry');
     }
 
-    if (empty($defaults["billing_state_province_id-{$this->_bltID}"])) {
-      $defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
+    if (empty($defaults["billing_state_province_id-{$billingLocationTypeID}"])) {
+      $defaults["billing_state_province_id-{$billingLocationTypeID}"] = \Civi::settings()->get('defaultContactStateProvince');
     }
 
     $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
