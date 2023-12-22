@@ -2,7 +2,7 @@
 
 namespace Civi\Oembed\EntryPoint;
 
-use Drupal\Core\DrupalKernel;
+use Civi\Oembed\OembedDrupalKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
@@ -25,9 +25,12 @@ class Drupal8 {
       unset($_COOKIE[$cookie]);
     }
 
+    /** @var \Composer\Autoload\ClassLoader $autoloader */
     $autoloader = require_once 'autoload.php';
+    $autoloader->addPsr4('Civi\\Oembed\\', realpath($GLOBALS['CIVICRM_OEMBED_META']['extPath']) . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR);
+
     $request = Request::createFromGlobals();
-    $kernel = DrupalKernel::createFromRequest($request, $autoloader, 'prod');
+    $kernel = OembedDrupalKernel::createFromRequest($request, $autoloader, 'prod');
     $kernel->boot();
     \Drupal::service('civicrm')->initialize();
     \Drupal::service('event_dispatcher')->addListener('kernel.response', function(ResponseEvent $event) {
