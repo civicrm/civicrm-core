@@ -805,7 +805,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     // @todo - on the fence about caching these in the cache for all custom fields. The down side is the
     // cache array could get really big & serializing & un-serializing big arrays is expensive.
     $entity = in_array($field['custom_group_id.extends'], CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE) ? 'Contact' : $field['custom_group_id.extends'];
-    $field['options'] = self::getFieldOptions($field['id'], $field['option_group_id'], $field['data_type'], $entity);
+    if ($field['id'] && $field['data_type'] && $entity) {
+      $field['options'] = self::getFieldOptions($field['id'], $field['option_group_id'], $field['data_type'], $entity);
+    }
     return $field;
   }
 
