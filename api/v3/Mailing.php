@@ -117,24 +117,6 @@ function _civicrm_api3_mailing_gettokens_spec(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_create_spec(&$params) {
-  $params['created_id']['api.default'] = 'user_contact_id';
-
-  $params['override_verp']['api.default'] = !CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'track_civimail_replies');
-  $params['visibility']['api.default'] = 'Public Pages';
-  $params['dedupe_email']['api.default'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'dedupe_email_default');
-
-  $params['forward_replies']['api.default'] = FALSE;
-  $params['auto_responder']['api.default'] = FALSE;
-  $params['open_tracking']['api.default'] = Civi::settings()->get('open_tracking_default');
-  $params['url_tracking']['api.default'] = Civi::settings()->get('url_tracking_default');
-
-  $params['header_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
-  $params['footer_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
-  $params['optout_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('OptOut', '');
-  $params['reply_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Reply', '');
-  $params['resubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Resubscribe', '');
-  $params['unsubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Unsubscribe', '');
-  $params['mailing_type']['api.default'] = 'standalone';
   $defaultAddress = CRM_Core_BAO_Domain::getNameAndEmail(TRUE, TRUE);
   foreach ($defaultAddress as $value) {
     if (preg_match('/"(.*)" <(.*)>/', $value, $match)) {
