@@ -387,9 +387,9 @@ emo
     $this->createLoggedInUser();
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hook_aggregateTokenValues']);
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
-    $this->mut = new CiviMailUtils($this, TRUE);
-    $this->_individualId = $this->individualCreate();
-    $this->_individualId2 = $this->individualCreate();
+    $mailUtil = new CiviMailUtils($this, TRUE);
+    $contact1ID = $this->individualCreate();
+    $contact2ID = $this->individualCreate();
     $htmlMessage = '{aggregate.rendered_token}';
     $formValues = [
       'group_by' => 'contact_id',
@@ -401,14 +401,14 @@ emo
 
     $contributionIDs = [];
     $contribution = $this->callAPISuccess('Contribution', 'create', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $contact1ID,
       'total_amount' => 100,
       'financial_type_id' => 'Donation',
       'receive_date' => '2016-12-25',
     ]);
     $contributionIDs[] = $contribution['id'];
     $contribution = $this->callAPISuccess('Contribution', 'create', [
-      'contact_id' => $this->_individualId2,
+      'contact_id' => $contact2ID,
       'total_amount' => 10,
       'financial_type_id' => 'Donation',
       'receive_date' => '2016-12-25',
@@ -416,7 +416,7 @@ emo
     $contributionIDs[] = $contribution['id'];
 
     $contribution = $this->callAPISuccess('Contribution', 'create', [
-      'contact_id' => $this->_individualId2,
+      'contact_id' => $contact2ID,
       'total_amount' => 1,
       'financial_type_id' => 'Donation',
       'receive_date' => '2016-12-25',
@@ -503,7 +503,7 @@ emo
     // once for each contact create + once for the activities.
     // By calling the cached function we can get this down to 1
     $this->assertEquals(3, $this->hookTokensCalled);
-    $this->mut->checkAllMailLog($html);
+    $mailUtil->checkAllMailLog($html);
 
   }
 
