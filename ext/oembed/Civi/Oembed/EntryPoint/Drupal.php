@@ -25,6 +25,7 @@ class Drupal {
 
     require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
     \drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+    $GLOBALS['conf']['x_frame_options'] = '';
     \civicrm_initialize();
 
     \Civi::service('oembed.router')->invoke([
