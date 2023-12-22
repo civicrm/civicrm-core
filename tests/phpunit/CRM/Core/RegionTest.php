@@ -7,16 +7,6 @@
  */
 class CRM_Core_RegionTest extends CiviUnitTestCase {
 
-  public function setUp(): void {
-    parent::setUp();
-
-    // Templates injected into regions should normally be file names, but for unit-testing it's handy to use "string:" notation
-    require_once 'CRM/Core/Smarty/resources/String.php';
-    civicrm_smarty_register_string_resource();
-
-    $this->useTransaction();
-  }
-
   use CRM_Core_Resources_CollectionTestTrait;
 
   /**
@@ -39,10 +29,11 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * When a {crmRegion} is blank and when there are no extra snippets, the
    * output is blank.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testBlank(): void {
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testBlank}{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testBlank"}{/crmRegion}');
     $expected = '';
     $this->assertEquals($expected, $actual);
   }
@@ -50,10 +41,11 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * When a {crmRegion} is not blank and when there are no extra snippets,
    * the output is only determined by the {crmRegion} block.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testDefault(): void {
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testDefault}default<br/>{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testDefault"}default<br/>{/crmRegion}');
     $expected = 'default<br/>';
     $this->assertEquals($expected, $actual);
   }
@@ -69,8 +61,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       'markup' => 'override<br/>',
     ]);
 
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testOverride}default<br/>{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name=testOverride}default<br/>{/crmRegion}');
     $expected = 'override<br/>';
     $this->assertEquals($expected, $actual);
   }
@@ -84,7 +75,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
     ]);
     CRM_Core_Region::instance('testAllTypes')->add([
       // note: 'template' would normally be a file name
-      'template' => 'string:smarty-is-{$snippet.extrainfo}<br/>',
+      'template' => 'eval:smarty-is-{$snippet.extrainfo}<br/>',
       'extrainfo' => 'dynamic',
     ]);
     CRM_Core_Region::instance('testAllTypes')->add([
@@ -120,8 +111,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       'style' => 'body { background: black; }',
     ]);
 
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testAllTypes}default<br/>{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testAllTypes"}default<br/>{/crmRegion}');
     $expected = "callback-ref<br/>"
       . "default<br/>"
       . "some-markup<br/>"
@@ -169,8 +159,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       'esm' => TRUE,
     ]);
 
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testEsm}default<br/>{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testEsm"}default<br/>{/crmRegion}');
     $this->assertEquals($expected[$loader], $actual);
 
     $header = CRM_Core_Region::instance('html-header')->render('');
@@ -191,25 +180,24 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    */
   public function testDirectNest(): void {
     CRM_Core_Region::instance('testDirectNestOuter')->add([
-      'template' => 'string:O={$snippet.weight} ',
+      'template' => 'eval:O={$snippet.weight} ',
       'weight' => -5,
     ]);
     CRM_Core_Region::instance('testDirectNestOuter')->add([
-      'template' => 'string:O={$snippet.weight} ',
+      'template' => 'eval:O={$snippet.weight} ',
       'weight' => 5,
     ]);
 
     CRM_Core_Region::instance('testDirectNestInner')->add([
-      'template' => 'string:I={$snippet.weight} ',
+      'template' => 'eval:I={$snippet.weight} ',
       'weight' => -5,
     ]);
     CRM_Core_Region::instance('testDirectNestInner')->add([
-      'template' => 'string:I={$snippet.weight} ',
+      'template' => 'eval:I={$snippet.weight} ',
       'weight' => 5,
     ]);
 
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testDirectNestOuter}left {crmRegion name=testDirectNestInner}middle {/crmRegion}right {/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testDirectNestOuter"}left {crmRegion name="testDirectNestInner"}middle {/crmRegion}right {/crmRegion}');
     $expected = 'O=-5 left I=-5 middle I=5 right O=5 ';
     $this->assertEquals($expected, $actual);
   }
@@ -228,8 +216,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       'template' => 'string: I={$snippet.region}',
     ]);
 
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testIndirectNestOuter}default{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name=testIndirectNestOuter}default{/crmRegion}');
     $expected = 'default O=testIndirectNestOuter O=testIndirectNestOuter I=testIndirectNestInner O=testIndirectNestOuter';
     $this->assertEquals($expected, $actual);
   }
@@ -239,19 +226,20 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    */
   public function testNoInjection(): void {
     CRM_Core_Region::instance('testNoInjectionOuter')->add([
-      'template' => 'string:{$snippet.scarystuff} ',
+      'template' => 'eval:{$snippet.scarystuff} ',
       'scarystuff' => '{$is_outer_scary}',
     ]);
     CRM_Core_Region::instance('testNoInjectionInner')->add([
-      'template' => 'string:{$snippet.scarystuff} ',
+      'template' => 'eval:{$snippet.scarystuff} ',
       'scarystuff' => '{$is_inner_scary}',
     ]);
-
+    error_reporting(E_ALL & ~E_NOTICE);
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('is_outer_scary', 'egad');
     $smarty->assign('is_inner_scary', 'egad');
     $smarty->assign('also_scary', 'egad');
-    $actual = $smarty->fetch('string:{crmRegion name=testNoInjectionOuter}left {crmRegion name=testNoInjectionInner}middle {literal}{$also_scary}{/literal} {/crmRegion}right {/crmRegion}');
+
+    $actual = $smarty->fetch('eval:{crmRegion name="testNoInjectionOuter"}left {crmRegion name="testNoInjectionInner"}middle {literal}{$also_scary}{/literal} {/crmRegion}right {/crmRegion}');
     $expected = 'left middle {$also_scary} {$is_inner_scary} right {$is_outer_scary} ';
     $this->assertEquals($expected, $actual);
   }
@@ -259,20 +247,22 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   /**
    * Make sure that standard Smarty variables ($smarty->assign(...)) as well
    * as the magical $snippet variable both evaluate correctly.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSmartyVars(): void {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('extrainfo', 'one');
     CRM_Core_Region::instance('testSmartyVars')->add([
-      'template' => 'string:var-style-{$extrainfo}<br/>',
+      'template' => 'eval:var-style-{$extrainfo}<br/>',
     ]);
 
     CRM_Core_Region::instance('testSmartyVars')->add([
-      'template' => 'string:var-style-{$snippet.extrainfo}<br/>',
+      'template' => 'eval:var-style-{$snippet.extrainfo}<br/>',
       'extrainfo' => 'two',
     ]);
 
-    $actual = $smarty->fetch('string:{crmRegion name=testSmartyVars}default<br/>{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name=testSmartyVars}default<br/>{/crmRegion}');
     $expected = 'default<br/>var-style-one<br/>var-style-two<br/>';
     $this->assertEquals($expected, $actual);
   }
@@ -295,8 +285,7 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       'weight' => 5,
     ]);
 
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testWeight}default<br/>{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name=testWeight}default<br/>{/crmRegion}');
     $expected = 'prepend-5<br/>prepend-3<br/>default<br/>append+3<br/>append+5<br/>';
     $this->assertEquals($expected, $actual);
   }

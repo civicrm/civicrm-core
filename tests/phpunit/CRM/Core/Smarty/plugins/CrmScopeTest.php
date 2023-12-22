@@ -6,21 +6,10 @@
  */
 class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
 
-  public function setUp(): void {
-    parent::setUp();
-    require_once 'CRM/Core/Smarty.php';
-
-    // Templates should normally be file names, but for unit-testing it's handy to use "string:" notation
-    require_once 'CRM/Core/Smarty/resources/String.php';
-    civicrm_smarty_register_string_resource();
-
-    $this->useTransaction();
-  }
-
   /**
    * @return array
    */
-  public function scopeCases() {
+  public function scopeCases(): array {
     $cases = [];
     $cases[] = ['', '{crmScope}{/crmScope}'];
     $cases[] = ['', '{crmScope x=1}{/crmScope}'];
@@ -49,7 +38,7 @@ class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
   public function testBlank($expected, $input) {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('x', 0);
-    $actual = $smarty->fetch('string:' . $input);
+    $actual = $smarty->fetch('eval:' . $input);
     $this->assertEquals($expected, $actual, "Process input=[$input]");
   }
 
