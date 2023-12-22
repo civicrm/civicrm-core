@@ -22,6 +22,10 @@ use Civi\Core\Event\GenericHookEvent;
  * Get action links for the $ENTITY entity.
  *
  * Action links are paths to forms for e.g. view, edit, or delete actions.
+ * @method string getEntityTitle()
+ * @method $this setEntityTitle(string $entityTitle)
+ * @method bool getExpandMultiple()
+ * @method $this setExpandMultiple(bool $expandMultiple)
  */
 class GetLinks extends BasicGetAction {
   use \Civi\Api4\Generic\Traits\GetSetValueTrait;
@@ -37,6 +41,12 @@ class GetLinks extends BasicGetAction {
    * @var bool|string
    */
   protected $entityTitle = TRUE;
+
+  /**
+   * Should multiple links e.g. to create different subtypes all be returned?
+   * @var bool
+   */
+  protected bool $expandMultiple = FALSE;
 
   public function _run(Result $result) {
     parent::_run($result);

@@ -4,7 +4,7 @@
     <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'" ng-if="$ctrl.settings.button"></div>
     <crm-search-tasks-menu ng-if="$ctrl.settings.actions && $ctrl.taskManager" ids="$ctrl.selectedRows" task-manager="$ctrl.taskManager"></crm-search-tasks-menu>
     <span ng-if="$ctrl.settings.headerCount" ng-include="'~/crmSearchDisplay/ResultCount.html'"></span>
-    <div class="btn-group pull-right" ng-include="'~/crmSearchDisplay/toolbar.html'" ng-if="$ctrl.toolbar"></div>
+    <div class="form-group pull-right" ng-include="'~/crmSearchDisplay/toolbar.html'" ng-if="$ctrl.toolbar"></div>
   </div>
   <table class="{{:: $ctrl.settings.classes.join(' ') }}">
     <thead>

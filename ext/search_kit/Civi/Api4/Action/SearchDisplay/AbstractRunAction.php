@@ -470,7 +470,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function formatFieldLinks($column, $data, $value): array {
     $links = [];
     foreach ((array) $value as $index => $val) {
-      $link = $this->formatLink($column['link'], $data, $val, $index);
+      $link = $this->formatLink($column['link'], $data, FALSE, $val, $index);
       if ($link) {
         // Style rules get appled to each link
         if (!empty($column['cssRules'])) {
@@ -517,13 +517,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param array $link
    * @param array $data
+   * @param bool $allowMultiple
    * @param string|NULL $text
-   * @param $index
+   * @param int $index
    * @return array|null
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\NotImplementedException
    */
-  protected function formatLink(array $link, array $data, string $text = NULL, $index = 0): ?array {
+  protected function formatLink(array $link, array $data, bool $allowMultiple = FALSE, string $text = NULL, $index = 0): ?array {
     $useApi = (!empty($link['entity']) && !empty($link['action']));
     if (isset($index)) {
       foreach ($data as $key => $value) {
@@ -539,11 +539,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       // Hack to support links to relationships
       $linkEntity = ($link['entity'] === 'Relationship') ? 'RelationshipCache' : $link['entity'];
-      $apiInfo = civicrm_api4($linkEntity, 'getLinks', [
+      $apiInfo = (array) civicrm_api4($linkEntity, 'getLinks', [
         'checkPermissions' => $checkPermissions,
         'values' => $data,
+        'expandMultiple' => $allowMultiple,
         'where' => [['ui_action', '=', $link['action']]],
       ]);
+      if ($allowMultiple && count($apiInfo) > 1) {
+        return $this->formatMultiLink($link, $apiInfo, $data);
+      }
       $link['path'] = $apiInfo[0]['path'] ?? '';
     }
     elseif (!$this->checkLinkAccess($link, $data)) {
@@ -570,6 +574,28 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Returns an array of multiple links for use as a dropdown-select when API::getLinks returns > 1 record
+   */
+  private function formatMultiLink(array $link, array $apiInfo, array $data): array {
+    $dropdown = [
+      'text' => $this->replaceTokens($link['text'], $data, 'view') ?: $apiInfo[0]['text'],
+      'icon' => $link['icon'] ?: $link[0]['icon'],
+      'title' => $link['title'],
+      'style' => $link['style'],
+      'children' => [],
+    ];
+    foreach ($apiInfo as $child) {
+      $dropdown['children'][] = [
+        'text' => $child['text'],
+        'target' => $child['target'],
+        'icon' => $child['icon'],
+        'url' => $this->getUrl($child['path']),
+      ];
+    }
+    return $dropdown;
+  }
+
+  /**
    * Check if a link should be visible to the user based on their permissions
    *
    * Checks ACLs for all links other than VIEW (presumably if a record is shown in
@@ -585,7 +611,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (empty($link['path']) && empty($link['task'])) {
       return FALSE;
     }
-    if ($link['entity'] && !empty($link['action']) && !in_array($link['action'], ['view', 'preview'], TRUE) && $this->getCheckPermissions()) {
+    if (!empty($link['entity']) && !empty($link['action']) && !in_array($link['action'], ['view', 'preview'], TRUE) && $this->getCheckPermissions()) {
       $actionName = $this->getPermittedLinkAction($link['entity'], $link['action']);
       if (!$actionName) {
         return FALSE;
@@ -1039,7 +1065,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param string $format view|raw|url
    * @return string
    */
-  private function replaceTokens($tokenExpr, $data, $format, $index = NULL) {
+  private function replaceTokens($tokenExpr, $data, $format) {
     foreach ($this->getTokens($tokenExpr ?? '') as $token) {
       $val = $data[$token] ?? NULL;
       if (isset($val) && $format === 'view') {

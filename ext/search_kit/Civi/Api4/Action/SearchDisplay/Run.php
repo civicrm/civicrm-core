@@ -162,7 +162,7 @@ class Run extends AbstractRunAction {
       if (!$this->checkLinkCondition($button, $data)) {
         continue;
       }
-      $button = $this->formatLink($button, $data);
+      $button = $this->formatLink($button, $data, TRUE);
       if ($button) {
         $toolbar[] = $button;
       }

@@ -34,6 +34,7 @@ class GetLinksTest extends Api4TestBase implements TransactionalInterface {
   public function testContactLinks(): void {
     $links = Contact::getLinks(FALSE)
       ->addWhere('api_action', '=', 'create')
+      ->setExpandMultiple(TRUE)
       ->execute()->indexBy('path');
     $this->assertEquals('Add Individual', $links['civicrm/contact/add?reset=1&ct=Individual']['text']);
     $this->assertEquals('fa-user', $links['civicrm/contact/add?reset=1&ct=Individual']['icon']);
@@ -68,6 +69,7 @@ class GetLinksTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
     $links = Individual::getLinks(FALSE)
       ->addWhere('api_action', '=', 'create')
+      ->setExpandMultiple(TRUE)
       ->execute();
     $this->assertStringContainsString('ct=Individual', $links[0]['path']);
     $this->assertEquals('Add Individual', $links[0]['text']);

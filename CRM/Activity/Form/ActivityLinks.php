@@ -35,6 +35,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
     $activityLinks = \Civi\Api4\Activity::getLinks()
       ->addValue('target_contact_id', $contactId)
       ->addWhere('ui_action', '=', 'add')
+      ->setExpandMultiple(TRUE)
       ->execute();
     foreach ($activityLinks as $activityLink) {
       $activityTypes[] = [

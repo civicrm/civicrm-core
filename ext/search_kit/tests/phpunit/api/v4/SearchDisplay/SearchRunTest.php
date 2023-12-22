@@ -2055,11 +2055,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result->toolbar);
-    $button = $result->toolbar[0];
-    $this->assertEquals('crm-popup', $button['target']);
-    $this->assertEquals('fa-plus', $button['icon']);
-    $this->assertEquals('primary', $button['style']);
-    $this->assertEquals('Add Contact', $button['text']);
+    $menu = $result->toolbar[0];
+    $this->assertEquals('Add Contact', $menu['text']);
+    $this->assertEquals('fa-plus', $menu['icon']);
+    $button = $menu['children'][0];
+    $this->assertEquals('fa-user', $button['icon']);
+    $this->assertEquals('Add Individual', $button['text']);
     $this->assertStringContainsString('=Individual', $button['url']);
 
     // Try with pseudoconstant (for proper test the label needs to be different from the name)
@@ -2068,9 +2069,14 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('name', '=', 'Organization')
       ->execute();
     $params['filters'] = ['contact_type:label' => 'Disorganization'];
+    // Use default label this time
+    unset($params['display']['settings']['toolbar'][0]['text']);
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $button = $result->toolbar[0];
+    $menu = $result->toolbar[0];
+    $this->assertEquals('Add Disorganization', $menu['text']);
+    $button = $menu['children'][0];
     $this->assertStringContainsString('=Organization', $button['url']);
+    $this->assertEquals('Add Disorganization', $button['text']);
 
     // Test legacy 'addButton' setting
     $params['display']['settings']['toolbar'] = NULL;
