@@ -48,7 +48,20 @@ class CRM_Core_CodeGen_Util_Smarty {
     $base = dirname(dirname(dirname(dirname(__DIR__))));
     $pkgs = file_exists(dirname($base) . "/civicrm-packages") ? dirname($base) . "/civicrm-packages" : "$base/packages";
 
-    require_once 'Smarty/Smarty.class.php';
+    if (!class_exists('Smarty')) {
+      if (defined('CIVICRM_SMARTY3_AUTOLOAD_PATH')) {
+        throw new \Exception('hello');
+        // @todo - this is experimental but it allows someone to
+        // get Smarty3 to load instead of Smarty2 if set.
+        // It is likely the final Smarty3 solution will look
+        // different but this makes testing possible without re-inventing
+        // it each time we try...
+        require_once CIVICRM_SMARTY3_AUTOLOAD_PATH;
+      }
+      else {
+        require_once 'Smarty/Smarty.class.php';
+      }
+    }
     $smarty = new Smarty();
     $smarty->template_dir = "$base/xml/templates";
     $smarty->plugins_dir = ["$pkgs/Smarty/plugins", "$base/CRM/Core/Smarty/plugins"];
