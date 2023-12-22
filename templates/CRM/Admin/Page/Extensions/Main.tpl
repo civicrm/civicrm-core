@@ -1,6 +1,5 @@
 {*
 Display a table of locally-available extensions.
-
 Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
 *}
 {if $localExtensionRows}
@@ -13,7 +12,6 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
           <th>{ts}Name{/ts}</th>
           <th>{ts}Status{/ts}</th>
           <th>{ts}Version{/ts}</th>
-          <th>{ts}Type{/ts}</th>
           <th></th>
         </tr>
       </thead>
@@ -39,11 +37,8 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
               {icon icon="fa-check-circle crm-extensions-stage"}{ts}This is a stable release version.{/ts}{/icon}
             {/if}
           </td>
-          <td class="crm-extensions-description">{$row.type|escape|capitalize}</td>
           <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
-                
-            
         {/foreach}
       </tbody>
     </table>
@@ -51,7 +46,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
   </div>
 {else}
   <div class="messages status no-popup">
-       {icon icon="fa-info-circle"}{/icon}
-      {ts 1="https://civicrm.org/extensions"}There are no extensions to display. Click the "Add New" tab to browse and install extensions posted on the <a href="%1">public CiviCRM Extensions Directory</a>. If you have downloaded extensions manually and don't see them here, try clicking the "Refresh" button.{/ts}
+    {icon icon="fa-info-circle"}{/icon}
+    {ts 1="https://civicrm.org/extensions"}There are no extensions to display. Click the "Add New" tab to browse and install extensions posted on the <a href="%1">public CiviCRM Extensions Directory</a>. If you have downloaded extensions manually and don't see them here, try clicking the "Refresh" button.{/ts}
   </div>
 {/if}
