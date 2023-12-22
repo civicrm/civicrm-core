@@ -4,6 +4,7 @@ namespace Civi\Oembed\EntryPoint;
 
 use Drupal\Core\DrupalKernel;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 //TEMPLATE:START
 
@@ -29,6 +30,9 @@ class Drupal8 {
     $kernel = DrupalKernel::createFromRequest($request, $autoloader, 'prod');
     $kernel->boot();
     \Drupal::service('civicrm')->initialize();
+    \Drupal::service('event_dispatcher')->addListener('kernel.response', function(ResponseEvent $event) {
+      $event->getResponse()->headers->remove('X-Frame-Options');
+    });
 
     \Civi::service('oembed.router')->invoke([
       'route' => trim($_SERVER['PATH_INFO'], '/'),
