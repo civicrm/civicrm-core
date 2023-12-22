@@ -28,6 +28,14 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   public $additionalParticipantId = NULL;
 
   /**
+   * Tracks whether we are at the last participant.
+   *
+   * @var bool
+   * @internal
+   */
+  public $_lastParticipant = FALSE;
+
+  /**
    * Get the active UFGroups (profiles) on this form
    * Many forms load one or more UFGroups (profiles).
    * This provides a standard function to retrieve the IDs of those profiles from the form
