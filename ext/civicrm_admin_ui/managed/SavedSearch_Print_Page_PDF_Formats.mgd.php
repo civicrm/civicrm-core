@@ -137,7 +137,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-off',
-                  'text' => E::ts('Disable Option Values'),
+                  'text' => E::ts('Disable'),
                   'style' => 'warning',
                   'path' => '',
                   'action' => '',
