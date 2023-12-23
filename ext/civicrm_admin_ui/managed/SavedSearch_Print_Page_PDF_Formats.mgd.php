@@ -141,7 +141,7 @@ return [
                   'style' => 'warning',
                   'path' => '',
                   'action' => '',
-                  'condition' => [],
+                  'condition' => ['is_active', '=', TRUE],
                 ],
               ],
               'type' => 'menu',
