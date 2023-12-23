@@ -9,8 +9,16 @@ use CRM_Oembed_ExtensionUtil as E;
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
  */
-function oembed_civicrm_config(&$config): void {
+function oembed_civicrm_config(&$config, ?array $flags = NULL): void {
   _oembed_civix_civicrm_config($config);
+  if ($flags['civicrm']) {
+    \Civi::paths()->register('civicrm.oembed', function() {
+      return [
+        'path' => \Civi::paths()->getPath('[cms.root]/oembed.php'),
+        'url' => \Civi::paths()->getUrl('[cms.root]/oembed.php', 'absolute'),
+      ];
+    });
+  }
 }
 
 /**
