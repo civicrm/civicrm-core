@@ -125,7 +125,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-on',
-                  'text' => E::ts('Enable Option Values'),
+                  'text' => E::ts('Enable'),
                   'style' => 'default',
                   'path' => '',
                   'task' => 'enable',
