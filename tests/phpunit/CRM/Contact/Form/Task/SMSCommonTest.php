@@ -102,7 +102,7 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
     $form->_contactIds = array_values($this->ids['Contact']);
     $form->_single = FALSE;
     CRM_Contact_Form_Task_SMSCommon::buildQuickForm($form);
-    $contacts = json_decode($form->get_template_vars('toContact'));
+    $contacts = json_decode($form->getTemplateVars('toContact'));
     $smsRecipientsActual = [];
 
     $phoneNumbers = [

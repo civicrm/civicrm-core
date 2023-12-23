@@ -303,7 +303,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
     $form->assignActivityType();
 
     // Check the smarty template has the correct values assigned.
-    $keyValuePair = $form->getTemplate()->get_template_vars('activityTypeNameAndLabel');
+    $keyValuePair = $form->getTemplate()->getTemplateVars('activityTypeNameAndLabel');
     $this->assertEquals('47395hc', $keyValuePair['machineName']);
     $this->assertEquals('Hide Cookies', $keyValuePair['displayLabel']);
 

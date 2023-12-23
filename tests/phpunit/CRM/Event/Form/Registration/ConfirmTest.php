@@ -370,7 +370,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     CRM_Event_Form_Registration_Confirm::assignProfiles($form);
 
     $smarty = CRM_Core_Smarty::singleton();
-    $tplVar = $smarty->get_template_vars();
+    $tplVar = $smarty->getTemplateVars();
     $this->assertEquals([
       'CustomPre' => ['First Name' => NULL],
       'CustomPreGroupTitle' => 'Public title',
@@ -424,7 +424,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     CRM_Event_Form_Registration_Confirm::assignProfiles($form);
 
     $smarty = CRM_Core_Smarty::singleton();
-    $tplVar = $smarty->get_template_vars();
+    $tplVar = $smarty->getTemplateVars();
     $this->assertEquals([
       'CustomPre' => ['First Name' => NULL, 'Comment' => NULL],
       'CustomPreGroupTitle' => 'Public title',

@@ -26,14 +26,14 @@ class CRM_Core_SmartyTest extends CiviUnitTestCase {
    */
   public function testFetchWith_CleanNonExistent(): void {
     $smarty = CRM_Core_Smarty::singleton();
-    $this->assertFalse(array_key_exists('my_variable', $smarty->get_template_vars()));
+    $this->assertFalse(array_key_exists('my_variable', $smarty->getTemplateVars()));
 
     $rendered = $smarty->fetchWith('string:({$my_variable})', [
       'my_variable' => 'temporary value',
     ]);
     $this->assertEquals('(temporary value)', $rendered);
 
-    $this->assertFalse(array_key_exists('my_variable', $smarty->get_template_vars()));
+    $this->assertFalse(array_key_exists('my_variable', $smarty->getTemplateVars()));
   }
 
   /**
@@ -47,7 +47,7 @@ class CRM_Core_SmartyTest extends CiviUnitTestCase {
   public function testFetchWith_CleanNull(): void {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('my_variable', NULL);
-    $this->assertEquals(NULL, $smarty->get_template_vars()['my_variable']);
+    $this->assertEquals(NULL, $smarty->getTemplateVars()['my_variable']);
 
     $tpl = 'string:({$my_variable})';
     $this->assertEquals('()', $smarty->fetchWith($tpl, []));
@@ -56,7 +56,7 @@ class CRM_Core_SmartyTest extends CiviUnitTestCase {
     ]));
 
     // Assert global state
-    $this->assertEquals(NULL, $smarty->get_template_vars()['my_variable']);
+    $this->assertEquals(NULL, $smarty->getTemplateVars()['my_variable']);
   }
 
 }

@@ -76,7 +76,7 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
           break;
 
         case 'template':
-          $tmp = $smarty->get_template_vars('snippet');
+          $tmp = $smarty->getTemplateVars('snippet');
           $smarty->assign('snippet', $snippet);
           $html .= $smarty->fetch($snippet['template']);
           $smarty->assign('snippet', $tmp);

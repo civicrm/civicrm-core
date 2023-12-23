@@ -1738,7 +1738,7 @@ Expires: ',
     $membershipViewForm->preProcess();
 
     // Get contribution rows related to membership payments.
-    $templateVar = $membershipViewForm::getTemplate()->get_template_vars('rows');
+    $templateVar = $membershipViewForm::getTemplate()->getTemplateVars('rows');
 
     $this->assertEquals($templateVar[0]['contribution_id'], $contribution1->id);
     $this->assertEquals($templateVar[0]['contact_id'], $contactId2);

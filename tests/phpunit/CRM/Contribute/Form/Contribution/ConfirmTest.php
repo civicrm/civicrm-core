@@ -197,7 +197,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals([$organizationID], $activity['target_contact_id']);
     $this->assertEquals($individualID, $activity['source_contact_id']);
-    $assignedVariables = $form->get_template_vars();
+    $assignedVariables = $form->getTemplateVars();
     $this->assertFalse($assignedVariables['is_separate_payment']);
   }
 
