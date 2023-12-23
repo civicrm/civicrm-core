@@ -87,14 +87,13 @@ return [
               'size' => 'btn-xs',
               'links' => [
                 [
-                  'entity' => '',
-                  'action' => '',
+                  'entity' => 'OptionValue',
+                  'action' => 'update',
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-external-link',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
-                  'path' => 'civicrm/admin/pdfFormats?action=update&id=[id]&reset=1',
                   'task' => '',
                   'condition' => [],
                 ],
