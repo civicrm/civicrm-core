@@ -129,7 +129,7 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'task' => 'enable',
-                  'condition' => [],
+                  'condition' => ['is_active', '=', FALSE],
                 ],
                 [
                   'task' => 'disable',
