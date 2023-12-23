@@ -32,7 +32,7 @@ class ScriptManager extends AutoService implements HookInterface {
       return;
     }
 
-    $path = $this->oembed->getPath();
+    $path = $this->getPath();
     $template = $this->oembed->getTemplate();
 
     if (!class_exists($template)) {
@@ -51,7 +51,7 @@ class ScriptManager extends AutoService implements HookInterface {
     }
 
     $tsVars = [
-      1 => htmlentities(basename($this->oembed->getPath())),
+      1 => htmlentities(basename($this->getPath())),
     ];
     $message = new \CRM_Utils_Check_Message(
       static::CHECK_NAME,
@@ -70,7 +70,7 @@ class ScriptManager extends AutoService implements HookInterface {
   }
 
   public function isInstallable(): bool {
-    $path = $this->oembed->getPath();
+    $path = $this->getPath();
     $parent = dirname($path);
     if (file_exists($path) && is_writable($path)) {
       return TRUE;
@@ -83,7 +83,7 @@ class ScriptManager extends AutoService implements HookInterface {
 
   public function install(): void {
     $content = $this->render($this->oembed->getTemplate());
-    $path = $this->oembed->getPath();
+    $path = $this->getPath();
     if (!file_put_contents($path, $content)) {
       throw new \CRM_Core_Exception("Failed to install $path");
     }
@@ -100,8 +100,8 @@ class ScriptManager extends AutoService implements HookInterface {
     $meta = [
       'uf' => CIVICRM_UF,
       'sourceClass' => $sourceClass,
-      'extPath' => static::relativize(E::path(), dirname($this->oembed->getPath())),
-      'scriptUrl' => (string) $this->oembed->getUrl(),
+      'extPath' => static::relativize(E::path(), dirname($this->getPath())),
+      'scriptUrl' => (string) \Civi::url('oembed://'),
     ];
 
     $metaCode =
@@ -123,7 +123,7 @@ class ScriptManager extends AutoService implements HookInterface {
   }
 
   public function getCurrent(): ?string {
-    $path = $this->oembed->getPath();
+    $path = $this->getPath();
     return file_exists($path) ? file_get_contents($path) : NULL;
   }
 
@@ -133,14 +133,14 @@ class ScriptManager extends AutoService implements HookInterface {
    * @return array|null
    */
   public function getMeta(): ?array {
-    $path = $this->oembed->getPath();
+    $path = $this->getPath();
     if (!file_exists($path)) {
       return NULL;
     }
 
     try {
       $GLOBALS['CIVICRM_OEMBED_READ'] = TRUE;
-      return (include $this->oembed->getPath());
+      return (include $this->getPath());
     }
     finally {
       unset($GLOBALS['CIVICRM_OEMBED_READ']);
@@ -162,6 +162,15 @@ class ScriptManager extends AutoService implements HookInterface {
     }
     $relPath = \CRM_Utils_File::relativize($target, $base . DIRECTORY_SEPARATOR);
     return $prefix . $relPath;
+  }
+
+  /**
+   * Get the local path to the oEmbed entry-point.
+   *
+   * @return string
+   */
+  public function getPath(): string {
+    return \Civi::paths()->getVariable('civicrm.oembed', 'path');
   }
 
 }
