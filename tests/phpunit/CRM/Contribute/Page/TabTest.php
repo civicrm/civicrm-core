@@ -34,7 +34,7 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
   public function testLinksManual(): void {
     [$contactID, $recurID] = $this->setupTemplate();
 
-    $templateVariable = CRM_Core_Smarty::singleton()->get_template_vars();
+    $templateVariable = CRM_Core_Smarty::singleton()->getTemplateVars();
     $this->assertEquals('Mr. Anthony Anderson II', $templateVariable['displayName']);
     $this->assertEquals("<span><a href=\"/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=" . $recurID . '&amp;cid=' . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='View Recurring Payment' >View</a><a href=\"/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=1&amp;cid=3&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Edit Recurring Payment' >Edit</a><a href=\"/index.php?q=civicrm/contribute/unsubscribe&amp;reset=1&amp;crid=" . $recurID . '&amp;cid=' . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Cancel' >Cancel</a></span>",
       $this->getActionHtml()
@@ -110,7 +110,7 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
    */
   protected function getActionHtml(): string {
     return CRM_Core_Smarty::singleton()
-      ->get_template_vars()['activeRecurRows'][1]['action'];
+      ->getTemplateVars()['activeRecurRows'][1]['action'];
   }
 
   /**
@@ -120,7 +120,7 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
    */
   protected function getDashboardActionHtml(): string {
     return CRM_Core_Smarty::singleton()
-      ->get_template_vars()['recurRows'][1]['action'];
+      ->getTemplateVars()['recurRows'][1]['action'];
   }
 
 }

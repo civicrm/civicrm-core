@@ -201,7 +201,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function appendBreadCrumb($breadCrumbs) {
     $template = CRM_Core_Smarty::singleton();
-    $bc = $template->get_template_vars('breadcrumb');
+    $bc = $template->getTemplateVars('breadcrumb');
 
     if (is_array($breadCrumbs)) {
       foreach ($breadCrumbs as $crumbs) {

@@ -3661,7 +3661,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $this->checkCreditCardDetails($mut, $order['id']);
     $mut->stop();
-    $tplVars = CRM_Core_Smarty::singleton()->get_template_vars();
+    $tplVars = CRM_Core_Smarty::singleton()->getTemplateVars();
     $this->assertEquals('bob', $tplVars['billingName']);
   }
 

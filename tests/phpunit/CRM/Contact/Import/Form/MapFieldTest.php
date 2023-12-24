@@ -192,7 +192,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $expectedJS = "<script type='text/javascript'>
 " . $expectedJS . '</script>';
 
-    $this->assertEquals($expectedJS, trim((string) CRM_Core_Smarty::singleton()->get_template_vars('initHideBoxes')));
+    $this->assertEquals($expectedJS, trim((string) CRM_Core_Smarty::singleton()->getTemplateVars('initHideBoxes')));
     $this->assertEquals($expectedDefaults, $this->form->_defaultValues);
   }
 

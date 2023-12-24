@@ -129,7 +129,7 @@ class FormWrapper {
     if ($state > self::VALIDATED) {
       $this->postProcess();
     }
-    $this->templateVariables = \CRM_Core_Smarty::singleton()->get_template_vars();
+    $this->templateVariables = \CRM_Core_Smarty::singleton()->getTemplateVars();
     \CRM_Core_Smarty::singleton()->popScope([]);
     return $this;
   }

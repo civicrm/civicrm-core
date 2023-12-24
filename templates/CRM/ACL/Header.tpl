@@ -15,7 +15,7 @@
 </div>
 
 {php}
-  $currentStep = $this->get_template_vars('step');
+  $currentStep = $this->getTemplateVars('step');
   $wizard = [
     'style' => ['barClass' => '', 'showTitle' => FALSE],
     'currentStepNumber' => $currentStep,
