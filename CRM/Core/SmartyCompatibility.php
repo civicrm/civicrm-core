@@ -166,7 +166,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    */
   public function getTemplateVars($varName = NULL, Smarty_Internal_Data $_ptr = NULL, $searchParents = TRUE) {
     if (method_exists(get_parent_class(), 'getTemplateVars')) {
-      return parent::getTemplateVars($varName . $_ptr, $searchParents);
+      return parent::getTemplateVars($varName, $_ptr, $searchParents);
     }
     return parent::get_template_vars($varName);
   }
