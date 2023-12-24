@@ -17,7 +17,7 @@ class UrlTest extends \CiviUnitTestCase {
 
   public function setUp(): void {
     $parts = explode('/', CIVICRM_UF_BASEURL);
-    $this->assertRegexp(';^[a-z0-9\.\-]+(:\d+)?$;', $parts[2], 'CIVICRM_UF_BASEURL should have domain name and/or port');
+    $this->assertMatchesRegularExpression(';^[a-z0-9\.\-]+(:\d+)?$;', $parts[2], 'CIVICRM_UF_BASEURL should have domain name and/or port');
     $tmpVars['_SERVER']['HTTP_HOST'] = $parts[2];
     \CRM_Utils_GlobalStack::singleton()->push($tmpVars);
 
