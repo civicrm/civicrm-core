@@ -17,7 +17,7 @@ class UrlTest extends \CiviUnitTestCase {
 
   public function setUp(): void {
     $parts = explode('/', CIVICRM_UF_BASEURL);
-    $this->assertRegexp(';^[a-z0-9\.\-]+(:\d+)?$;', $parts[2], 'CIVICRM_UF_BASEURL should have domain name and/or port');
+    $this->assertMatchesRegularExpression(';^[a-z0-9\.\-]+(:\d+)?$;', $parts[2], 'CIVICRM_UF_BASEURL should have domain name and/or port');
     $tmpVars['_SERVER']['HTTP_HOST'] = $parts[2];
     \CRM_Utils_GlobalStack::singleton()->push($tmpVars);
 
@@ -45,10 +45,10 @@ class UrlTest extends \CiviUnitTestCase {
     $relatives['asset'] = Civi::url('asset://[civicrm.packages]/js/foobar.js', 'r');
 
     foreach ($absolutes as $key => $url) {
-      $this->assertRegExp(';^https?://;', (string) $url, "absolutes[$key] should be absolute URL");
+      $this->assertMatchesRegularExpression(';^https?://;', (string) $url, "absolutes[$key] should be absolute URL");
     }
     foreach ($relatives as $key => $url) {
-      $this->assertNotRegExp(';^https?://;', (string) $url, "relatives[$key] should be relative URL");
+      $this->assertDoesNotMatchRegularExpression(';^https?://;', (string) $url, "relatives[$key] should be relative URL");
     }
   }
 
