@@ -12,7 +12,6 @@ class Drupal {
   public static function main(): void {
 
     define('CIVICRM_OEMBED', 1);
-    define('CIVICRM_UF_BASEURL', $GLOBALS['CIVICRM_OEMBED_META']['scriptUrl']); /* FIXME */
     define('DRUPAL_ROOT', getcwd());
 
     // Do not accept cookies.
@@ -22,6 +21,8 @@ class Drupal {
     foreach (array_keys($_COOKIE) as $cookie) {
       unset($_COOKIE[$cookie]);
     }
+
+    $GLOBALS['civicrm_url_defaults'][]['scheme'] = 'oembed';
 
     require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
     \drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
