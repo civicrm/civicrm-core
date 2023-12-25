@@ -15,7 +15,6 @@ class Drupal8 {
 
   public static function main(): void {
     define('CIVICRM_OEMBED', 1);
-    define('CIVICRM_UF_BASEURL', $GLOBALS['CIVICRM_OEMBED_META']['scriptUrl']); /* FIXME */
 
     // Do not accept cookies.
     // The whole issue is that browsers disagree on cookie-handling for embedded iframe content.
@@ -24,6 +23,8 @@ class Drupal8 {
     foreach (array_keys($_COOKIE) as $cookie) {
       unset($_COOKIE[$cookie]);
     }
+
+    $GLOBALS['civicrm_url_defaults'][]['scheme'] = 'oembed';
 
     /** @var \Composer\Autoload\ClassLoader $autoloader */
     $autoloader = require_once 'autoload.php';
