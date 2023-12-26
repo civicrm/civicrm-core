@@ -2274,6 +2274,7 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 .crm-container div.collapsed .crm-accordion-body,
+.crm-container fieldset.collapsed .crm-accordion-body,
 .crm-container .crm-collapsible.collapsed .collapsible-title + * {
   display: none;
 }
