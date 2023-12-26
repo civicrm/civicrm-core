@@ -63,7 +63,7 @@ return [
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     // default to TRUE for demo or localhost sites.
-    'default' => str_contains(CIVICRM_UF_BASEURL, 'localhost') || str_contains(CIVICRM_UF_BASEURL, 'demo.civicrm.org'),
+    'default' => str_contains(CIVICRM_UF_BASEURL, 'localhost') || str_contains(CIVICRM_UF_BASEURL, 'demo.civicrm.org') || (defined('CIVICRM_TEST') && CIVICRM_TEST),
     'add' => '4.3',
     'title' => ts('Enable Debugging'),
     'is_domain' => 1,
