@@ -188,7 +188,6 @@ class CRM_Utils_PDF_Utils {
    * @param string $fileName
    */
   public static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
-    require_once 'snappy/src/autoload.php';
     $snappy = new Knp\Snappy\Pdf(\Civi::settings()->get('wkhtmltopdfPath'));
     $snappy->setOption("page-width", $paper_size[2] . "pt");
     $snappy->setOption("page-height", $paper_size[3] . "pt");
