@@ -145,6 +145,12 @@
     },
     spin: function(spin) {
       $('.crm-logo-sm', '#civicrm-menu').toggleClass('fa-spin', spin);
+      // Sometimes the logo does not stop spinning (ex: file downloads)
+      if (spin) {
+        window.setTimeout(function() {
+          CRM.menubar.spin(false);
+        }, 10000);
+      }
     },
     getItem: function(itemName) {
       return traverse(CRM.menubar.data.menu, itemName, 'get');
