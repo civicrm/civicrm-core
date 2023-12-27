@@ -51,6 +51,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    * Set variables up before form is built.
    *
    * @return void
+   * @throws CRM_Core_Exception
    */
   public function preProcess() {
     parent::preProcess();
@@ -110,7 +111,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         $optionsFull = CRM_Utils_Array::value('option_full_ids', $val, []);
         foreach ($val['options'] as $keys => $values) {
           if ($values['is_default'] && !in_array($keys, $optionsFull)) {
-            if ($val['html_type'] == 'CheckBox') {
+            if ($val['html_type'] === 'CheckBox') {
               $defaults["price_{$key}"][$keys] = 1;
             }
             else {
@@ -395,7 +396,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       $realPayLater = $self->_params[0]['is_pay_later'] ?? NULL;
     }
 
-    if ($button != 'skip') {
+    if ($button !== 'skip') {
       //Check that either an email or firstname+lastname is included in the form(CRM-9587)
       CRM_Event_Form_Registration_Register::checkProfileComplete($fields, $errors, $self->_eventId);
 
@@ -721,7 +722,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
 
     $participantNo = count($this->_params);
-    if ($button != 'skip') {
+    if ($button !== 'skip') {
       $statusMsg = ts('Registration information for participant %1 has been saved.', [1 => $participantNo]);
       CRM_Core_Session::setStatus($statusMsg, ts('Registration Saved'), 'success');
     }
