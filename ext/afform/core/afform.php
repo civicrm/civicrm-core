@@ -168,7 +168,8 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
     return;
   }
   $contactTypes = array_merge((array) ($context['contact_type'] ?? []), $context['contact_sub_type'] ?? []);
-  $afforms = Civi\Api4\Afform::get(FALSE)
+  // Afform permissions control visibility
+  $afforms = Civi\Api4\Afform::get(TRUE)
     ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type', 'summary_weight')
     ->addWhere('placement', 'CONTAINS', 'contact_summary_tab')
     ->addOrderBy('title')
@@ -207,7 +208,8 @@ function afform_civicrm_pageRun(&$page) {
   if (!in_array(get_class($page), ['CRM_Contact_Page_View_Summary', 'CRM_Contact_Page_View_Print'])) {
     return;
   }
-  $afforms = Civi\Api4\Afform::get(FALSE)
+  // Afform permissions control visibility
+  $afforms = Civi\Api4\Afform::get(TRUE)
     ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type')
     ->addWhere('placement', 'CONTAINS', 'contact_summary_block')
     ->addOrderBy('summary_weight')
@@ -251,7 +253,7 @@ function afform_civicrm_pageRun(&$page) {
  * @link https://github.com/civicrm/org.civicrm.contactlayout
  */
 function afform_civicrm_contactSummaryBlocks(&$blocks) {
-  $afforms = \Civi\Api4\Afform::get(FALSE)
+  $afforms = \Civi\Api4\Afform::get(TRUE)
     ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'type:icon', 'type:label', 'summary_contact_type'])
     ->addWhere('placement', 'CONTAINS', 'contact_summary_block')
     ->addOrderBy('title')
