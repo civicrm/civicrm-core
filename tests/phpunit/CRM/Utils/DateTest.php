@@ -2672,9 +2672,9 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    */
   public function dateDataProvider(): array {
     return [
-      ['date' => '2022-10-01', 'format' => CRM_Core_Form_Date::DATE_yyyy_mm_dd, 'expected' => '20221001'],
-      ['date' => '2022-10-01 15:54', 'format' => CRM_Core_Form_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155400'],
-      ['date' => '2022-10-01 15:54:56', 'format' => CRM_Core_Form_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155456'],
+      ['date' => '2022-10-01', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001'],
+      ['date' => '2022-10-01 15:54', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155400'],
+      ['date' => '2022-10-01 15:54:56', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155456'],
     ];
   }
 

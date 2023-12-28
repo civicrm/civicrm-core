@@ -21,6 +21,14 @@
 class CRM_Utils_Date {
 
   /**
+   * Date input formats.
+   *
+   * For example a user selecting `DATE_dd_mm_yyyy` in the context of an import is
+   * saying that they want the dates they are importing to be converted from dd_mm_yyy format.
+   */
+  public const DATE_yyyy_mm_dd = 1, DATE_mm_dd_yy = 2, DATE_mm_dd_yyyy = 4, DATE_Month_dd_yyyy = 8, DATE_dd_mon_yy = 16, DATE_dd_mm_yyyy = 32;
+
+  /**
    * Format a date by padding it with leading '0'.
    *
    * @param array $date
@@ -218,6 +226,33 @@ class CRM_Utils_Date {
       }
     }
     return \Civi::$statics[__CLASS__][$key];
+  }
+
+  /**
+   * Get the available input formats.
+   *
+   * These are the formats that this class is able to convert into a standard format
+   * provided it knows the input format. These are used when doing an import.
+   *
+   * @param bool $isShowTime
+   *
+   * @return array
+   */
+  public static function getAvailableInputFormats(bool $isShowTime): array {
+    if ($isShowTime) {
+      $dateText = ts('yyyy-mm-dd OR yyyy-mm-dd HH:mm OR yyyymmdd OR yyyymmdd HH:mm (1998-12-25 OR 1998-12-25 15:33 OR 19981225 OR 19981225 10:30 OR ( 2008-9-1 OR 2008-9-1 15:33 OR 20080901 15:33)');
+    }
+    else {
+      $dateText = ts('yyyy-mm-dd OR yyyymmdd (1998-12-25 OR 19981225) OR (2008-9-1 OR 20080901)');
+    }
+    return [
+      CRM_Utils_Date::DATE_yyyy_mm_dd => $dateText,
+      CRM_Utils_Date::DATE_mm_dd_yy => ts('mm/dd/yy OR mm-dd-yy (12/25/98 OR 12-25-98) OR (9/1/08 OR 9-1-08)'),
+      CRM_Utils_Date::DATE_mm_dd_yyyy => ts('mm/dd/yyyy OR mm-dd-yyyy (12/25/1998 OR 12-25-1998) OR (9/1/2008 OR 9-1-2008)'),
+      CRM_Utils_Date::DATE_Month_dd_yyyy => ts('Month dd, yyyy (December 12, 1998)'),
+      CRM_Utils_Date::DATE_dd_mon_yy => ts('dd-mon-yy OR dd/mm/yy (25-Dec-98 OR 25/12/98 OR 1-09-98)'),
+      CRM_Utils_Date::DATE_dd_mm_yyyy => ts('dd/mm/yyyy (25/12/1998 OR 1/9/2008 OR 1-Sep-2008)'),
+    ];
   }
 
   /**
@@ -2134,7 +2169,7 @@ class CRM_Utils_Date {
    * @param $date
    *   Date string as entered.
    * @param $dateType
-   *   One of the constants like CRM_Core_Form_Date::DATE_yyyy_mm_dd.
+   *   One of the constants like CRM_Utils_Date::DATE_yyyy_mm_dd.
    *
    * @return null|string
    */
