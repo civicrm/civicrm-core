@@ -50,7 +50,7 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
         }
         yield [
           'name' => 'workflow/' . $workflow . '/' . strtolower($membershipType['name']) . '_' . strtolower($priceSet['name']) . '_' . strtolower($defaultCurrency),
-          'title' => ($priceSet['contribution_page_id'] ? $this->getContributionPage($priceSet['contribution_page_id'])['title'] : $priceSet['title']) . ' - ' . $membershipType['name'] . ' : ' . $defaultCurrency,
+          'title' => (!empty($priceSet['contribution_page_id']) ? $this->getContributionPage($priceSet['contribution_page_id'])['title'] : $priceSet['title']) . ' - ' . $membershipType['name'] . ' : ' . $defaultCurrency,
           'tags' => ['preview'],
           'workflow' => $workflow,
           'membership_type' => $membershipType,
