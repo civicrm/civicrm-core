@@ -37,8 +37,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   /**
    * Used by testGetFromTo
    */
-  private function fromToData() {
-    $cases = [];
+  private function fromToData(): array {
     // Absolute dates
     $cases['absolute'] = [
       'expectedFrom' => '20170901000000',
@@ -75,8 +74,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   public function testGetFromTo(): void {
     $cases = $this->fromToData();
     foreach ($cases as $caseDescription => $case) {
-      $obj = new CRM_Utils_Date();
-      [$calculatedFrom, $calculatedTo] = $obj->getFromTo($case['relative'], $case['from'], $case['to']);
+      [$calculatedFrom, $calculatedTo] = CRM_Utils_Date::getFromTo($case['relative'], $case['from'], $case['to']);
       $this->assertEquals($case['expectedFrom'], $calculatedFrom, "Expected From failed for case $caseDescription");
       $this->assertEquals($case['expectedTo'], $calculatedTo, "Expected To failed for case $caseDescription");
     }
@@ -90,7 +88,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   public function testRelativeToAbsoluteFiscalYear(): void {
     $sequence = ['this', 'previous', 'previous_before'];
     Civi::settings()->set('fiscalYearStart', ['M' => 7, 'd' => 1]);
-    $fiscalYearStartYear = (strtotime('now') > strtotime((date('Y-07-01')))) ? date('Y') : (date('Y') - 1);
+    $fiscalYearStartYear = (time() > strtotime((date('Y-07-01')))) ? date('Y') : (date('Y') - 1);
 
     //  this_2 = 'These  2 Fiscal  years'
     $date = CRM_Utils_Date::relativeToAbsolute('this_2', 'fiscal_year');
@@ -243,7 +241,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   public function testRelativeToAbsoluteFiscalYearRange(): void {
     $sequence = ['previous_2', 'previous_3', 'previous_4'];
     Civi::settings()->set('fiscalYearStart', ['M' => 7, 'd' => 1]);
-    $lastFiscalYearEnd = (strtotime('now') > strtotime((date('Y-07-01')))) ? (date('Y')) : (date('Y') - 1);
+    $lastFiscalYearEnd = (time() > strtotime((date('Y-07-01')))) ? (date('Y')) : (date('Y') - 1);
 
     foreach ($sequence as $relativeString) {
       $date = CRM_Utils_Date::relativeToAbsolute($relativeString, 'fiscal_year');
@@ -260,13 +258,15 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
 
   /**
    * Extendable test of relative dates.
+   *
    * This is similar to the existing tests but can quickly add a variation
-   * by adding an array to the dataprovider.
+   * by adding an array to the dataProvider.
+   *
    * @dataProvider relativeDateProvider
    * @param array $input
    * @param array $expected
    */
-  public function testRelativeToAbsoluteGeneral(array $input, array $expected) {
+  public function testRelativeToAbsoluteGeneral(array $input, array $expected): void {
     if (isset($input['fiscalYearStart'])) {
       Civi::settings()->set('fiscalYearStart', $input['fiscalYearStart']);
     }
@@ -2549,25 +2549,25 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $currentTimezone = date_default_timezone_get();
     date_default_timezone_set('America/Los_Angeles');
     $dateTime = "2018-11-08 21:46:44";
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%b"), "Nov");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%B"), "November");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%d"), "08");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%e"), " 8");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%E"), "8");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%f"), "th");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%H"), "21");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%I"), "09");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%k"), "21");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%l"), " 9");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%m"), "11");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%M"), "46");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%p"), "pm");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%P"), "PM");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%Y"), "2018");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%s"), "44");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%A"), "Thursday");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%a"), "Thu");
-    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%Z"), "PST");
+    $this->assertEquals("Nov", CRM_Utils_Date::customFormat($dateTime, "%b"));
+    $this->assertEquals("November", CRM_Utils_Date::customFormat($dateTime, "%B"));
+    $this->assertEquals("08", CRM_Utils_Date::customFormat($dateTime, "%d"));
+    $this->assertEquals(" 8", CRM_Utils_Date::customFormat($dateTime, "%e"));
+    $this->assertEquals("8", CRM_Utils_Date::customFormat($dateTime, "%E"));
+    $this->assertEquals("th", CRM_Utils_Date::customFormat($dateTime, "%f"));
+    $this->assertEquals("21", CRM_Utils_Date::customFormat($dateTime, "%H"));
+    $this->assertEquals("09", CRM_Utils_Date::customFormat($dateTime, "%I"));
+    $this->assertEquals("21", CRM_Utils_Date::customFormat($dateTime, "%k"));
+    $this->assertEquals(" 9", CRM_Utils_Date::customFormat($dateTime, "%l"));
+    $this->assertEquals("11", CRM_Utils_Date::customFormat($dateTime, "%m"));
+    $this->assertEquals("46", CRM_Utils_Date::customFormat($dateTime, "%M"));
+    $this->assertEquals("pm", CRM_Utils_Date::customFormat($dateTime, "%p"));
+    $this->assertEquals("PM", CRM_Utils_Date::customFormat($dateTime, "%P"));
+    $this->assertEquals("2018", CRM_Utils_Date::customFormat($dateTime, "%Y"));
+    $this->assertEquals("44", CRM_Utils_Date::customFormat($dateTime, "%s"));
+    $this->assertEquals("Thursday", CRM_Utils_Date::customFormat($dateTime, "%A"));
+    $this->assertEquals("Thu", CRM_Utils_Date::customFormat($dateTime, "%a"));
+    $this->assertEquals("PST", CRM_Utils_Date::customFormat($dateTime, "%Z"));
     date_default_timezone_set($currentTimezone);
   }
 
@@ -2578,24 +2578,24 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $currentTimezone = date_default_timezone_get();
     date_default_timezone_set('America/Los_Angeles');
     $ts = mktime(21, 46, 44, 11, 8, 2018);
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%b"), "Nov");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%B"), "November");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%d"), "08");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%e"), " 8");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%E"), "8");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%f"), "th");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%H"), "21");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%I"), "09");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%k"), "21");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%l"), " 9");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%m"), "11");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%M"), "46");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%p"), "pm");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%P"), "PM");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%Y"), "2018");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%A"), "Thursday");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%a"), "Thu");
-    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%Z"), "PST");
+    $this->assertEquals("Nov", CRM_Utils_Date::customFormatTs($ts, "%b"));
+    $this->assertEquals("November", CRM_Utils_Date::customFormatTs($ts, "%B"));
+    $this->assertEquals("08", CRM_Utils_Date::customFormatTs($ts, "%d"));
+    $this->assertEquals(" 8", CRM_Utils_Date::customFormatTs($ts, "%e"));
+    $this->assertEquals("8", CRM_Utils_Date::customFormatTs($ts, "%E"));
+    $this->assertEquals("th", CRM_Utils_Date::customFormatTs($ts, "%f"));
+    $this->assertEquals("21", CRM_Utils_Date::customFormatTs($ts, "%H"));
+    $this->assertEquals("09", CRM_Utils_Date::customFormatTs($ts, "%I"));
+    $this->assertEquals("21", CRM_Utils_Date::customFormatTs($ts, "%k"));
+    $this->assertEquals(" 9", CRM_Utils_Date::customFormatTs($ts, "%l"));
+    $this->assertEquals("11", CRM_Utils_Date::customFormatTs($ts, "%m"));
+    $this->assertEquals("46", CRM_Utils_Date::customFormatTs($ts, "%M"));
+    $this->assertEquals("pm", CRM_Utils_Date::customFormatTs($ts, "%p"));
+    $this->assertEquals("PM", CRM_Utils_Date::customFormatTs($ts, "%P"));
+    $this->assertEquals("2018", CRM_Utils_Date::customFormatTs($ts, "%Y"));
+    $this->assertEquals("Thursday", CRM_Utils_Date::customFormatTs($ts, "%A"));
+    $this->assertEquals("Thu", CRM_Utils_Date::customFormatTs($ts, "%a"));
+    $this->assertEquals("PST", CRM_Utils_Date::customFormatTs($ts, "%Z"));
     date_default_timezone_set($currentTimezone);
   }
 
@@ -2606,7 +2606,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $currentTimezone = date_default_timezone_get();
     date_default_timezone_set('Australia/Sydney');
     $dateTime = '2018-11-08 21:46:44';
-    $this->assertEquals("AEDT", CRM_Utils_Date::customFormat($dateTime, "%Z"));
+    $this->assertEquals('AEDT', CRM_Utils_Date::customFormat($dateTime, "%Z"));
     date_default_timezone_set($currentTimezone);
   }
 
@@ -2622,7 +2622,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     ], $date);
   }
 
-  public function testLocalizeConsts(): void {
+  public function testLocalizeConstants(): void {
     $expect['en_US'] = ['Jan', 'Tue', 'March', 'Thursday'];
     $expect['fr_FR'] = ['janv.', 'mar.', 'mars', 'jeudi'];
     $expect['es_MX'] = ['ene.', 'mar.', 'marzo', 'jueves'];
