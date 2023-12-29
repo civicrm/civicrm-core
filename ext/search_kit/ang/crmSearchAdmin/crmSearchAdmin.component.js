@@ -421,7 +421,7 @@
       _.each(ctrl.savedSearch.api_params.select, function(col, pos) {
         var info = searchMeta.parseExpr(col),
           fieldExpr = (_.findWhere(info.args, {type: 'field'}) || {}).value;
-        if (ctrl.canAggregate(col)) {
+        if (ctrl.mustAggregate(col)) {
           // Ensure all non-grouped columns are aggregated if using GROUP BY
           if (!info.fn || info.fn.category !== 'aggregate') {
             var dflFn = searchMeta.getDefaultAggregateFn(info) || 'GROUP_CONCAT',
@@ -526,7 +526,16 @@
 
     // Is a column eligible to use an aggregate function?
     this.canAggregate = function(col) {
-      // If the query does not use grouping, never
+      // If the query does not use grouping, it's always allowed
+      if (!ctrl.savedSearch.api_params.groupBy || !ctrl.savedSearch.api_params.groupBy.length) {
+        return true;
+      }
+      return this.mustAggregate(col);
+    };
+
+    // Is a column required to use an aggregate function?
+    this.mustAggregate = function(col) {
+      // If the query does not use grouping, it's never required
       if (!ctrl.savedSearch.api_params.groupBy || !ctrl.savedSearch.api_params.groupBy.length) {
         return false;
       }
@@ -737,7 +746,7 @@
           if (info.field && !info.suffix && !info.fn && info.field.type === 'Field' && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
             var idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')),
               idField = searchMeta.parseExpr(idFieldName).args[0].field;
-            if (!ctrl.canAggregate(idFieldName)) {
+            if (!ctrl.mustAggregate(idFieldName)) {
               var joinEntity = searchMeta.getEntity(idField.fk_entity),
                 label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs && idField.input_attrs.label || idField.label);
               _.each(_.cloneDeep(joinEntity && joinEntity.links), function(link) {
