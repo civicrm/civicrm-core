@@ -36,6 +36,22 @@ return [
     'description' => E::ts('List of other pages that may be embedded. One line per item. May use wildcards. Example: "<code>civicrm/ajax/*</code>"'),
     'help_text' => NULL,
   ],
+  'oembed_theme' => $basic + [
+    'name' => 'oembed_theme',
+    'type' => 'String',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => [
+      'class' => 'crm-select2',
+    ],
+    'pseudoconstant' => [
+      'callback' => 'call://themes/getAvailable',
+    ],
+    'default' => 'default',
+    'title' => E::ts('Theme'),
+    'description' => E::ts('Apply styling to elements inside the IFRAME. In "Automatic" mode, inherit styling from the CiviCRM frontend.'),
+    'help_text' => NULL,
+  ],
   'oembed_layout' => $basic + [
     'name' => 'oembed_layout',
     'type' => 'String',

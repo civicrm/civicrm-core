@@ -34,6 +34,7 @@ class Cosession extends AutoService implements EventSubscriberInterface {
       '&civi.session.storeObjects' => ['export', 0],
       '&hook_civicrm_buildForm' => ['onBuildForm', 0],
       '&hook_civicrm_alterRedirect' => ['onRedirect', 0],
+      '&hook_civicrm_activeTheme' => ['pickTheme', 0],
     ];
   }
 
@@ -103,6 +104,23 @@ class Cosession extends AutoService implements EventSubscriberInterface {
         return "<script type='text/javascript'>\n$script\n</script>";
       },
     ]);
+  }
+
+  /**
+   * @param $themeKey
+   * @param $context
+   * @return void
+   * @see \CRM_Utils_Hook::activeTheme()
+   */
+  public function pickTheme(&$themeKey, $context): void {
+    if (!defined('CIVICRM_OEMBED')) {
+      return;
+    }
+
+    $setting = \Civi::settings()->get('oembed_theme');
+    if ($setting && $setting !== 'default') {
+      $themeKey = $setting;
+    }
   }
 
   /**
