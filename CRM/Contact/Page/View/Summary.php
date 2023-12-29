@@ -375,6 +375,9 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         CRM_Core_Permission::access($component->name)
       ) {
         $elem = $component->registerTab();
+        if (empty($elem)) {
+          continue;
+        }
 
         // FIXME: not very elegant, probably needs better approach
         // allow explicit id, if not defined, use keyword instead
