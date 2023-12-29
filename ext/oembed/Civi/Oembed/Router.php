@@ -70,6 +70,9 @@ class Router extends AutoService {
   protected function invokeCms(array $params):void {
     switch (CIVICRM_UF) {
       case 'Drupal':
+        \CRM_Core_Resources::singleton()->addCoreResources();
+        // FIXME: ^^^ should be handled by civicrm_html_head(), but the arg(0) guard misfires.
+
         \menu_execute_active_handler();
         break;
 
