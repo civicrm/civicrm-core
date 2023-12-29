@@ -248,9 +248,6 @@
         "url": "https://github.com/lodash/lodash-compat/archive/3.0.1.zip",
         "ignore": [".*", "*.log", "*.md", "component.json", "package.json", "node_modules"]
       },
-      "phantomjs-polyfill": {
-        "url": "https://github.com/conversocial/phantomjs-polyfill/archive/v0.0.2.zip"
-      },
       "select2": {
         "url": "https://github.com/colemanw/select2/archive/v3.5-civicrm-1.0.zip"
       },
