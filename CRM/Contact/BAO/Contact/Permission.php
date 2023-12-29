@@ -294,8 +294,8 @@ AND    $operationClause
 
     // Add in a row for the logged in contact. Do not try to combine with the above query or an ugly OR will appear in
     // the permission clause.
-    if (CRM_Core_Permission::check('edit my contact') ||
-      ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact'))) {
+    if ($userID && (CRM_Core_Permission::check('edit my contact') ||
+      ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')))) {
       if (!CRM_Core_DAO::singleValueQuery("
         SELECT count(*) FROM civicrm_acl_contact_cache WHERE user_id = %1 AND contact_id = %1 AND operation = '{$operation}' LIMIT 1", $queryParams)) {
         CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation ) VALUES(%1, %1, '{$operation}')", $queryParams);
