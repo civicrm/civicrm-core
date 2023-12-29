@@ -49,7 +49,7 @@ class Router extends AutoService {
   protected function getHandler(): callable {
     $setting = \Civi::settings()->get('oembed_layout');
     if ($setting === 'auto') {
-      $setting = 'cms';
+      $setting = 'basic';
     }
     return [$this, 'invoke' . ucfirst($setting)];
   }
@@ -65,6 +65,37 @@ class Router extends AutoService {
       $pageContent = $printedContent;
     }
     echo $pageContent;
+  }
+
+  /**
+   * Execute and display the requested route. Apply basic formatting.
+   *
+   * This means that CMS navigation and theming are disabled. However,
+   * HTML <HEAD> and Civi theming are enabled.
+   *
+   * @param array $params
+   *   Open-ended parameters provided by the entry-script (`oembed.php`).
+   * @throws \CRM_Core_Exception
+   */
+  protected function invokeBasic(array $params): void {
+    \CRM_Core_Resources::singleton()->addCoreResources('html-header');
+
+    ob_start();
+    $pageContent = \CRM_Core_Invoke::invoke(explode('/', $params['route']));
+    $printedContent = ob_get_clean();
+    if (empty($pageContent) && !empty($printedContent)) {
+      $pageContent = $printedContent;
+    }
+
+    $htmlHeader = \CRM_Core_Region::instance('html-header')->render('');
+    $locale = \CRM_Core_I18n::getLocale();
+
+    echo \CRM_Core_Smarty::singleton()->fetchWith('oembed-basic-page.tpl', [
+      'lang' => substr($locale, 0, 2),
+      'dir' => \CRM_Core_I18n::isLanguageRTL($locale) ? 'rtl' : 'ltr',
+      'head' => $htmlHeader,
+      'body' => $pageContent,
+    ]);
   }
 
   protected function invokeCms(array $params):void {
