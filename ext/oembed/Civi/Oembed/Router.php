@@ -17,17 +17,41 @@ class Router extends AutoService {
     $config = \CRM_Core_Config::singleton();
     $_GET[$config->userFrameworkURLVar] = $params['route'];
 
-    $handler = [$this, 'invoke' . ucfirst($this->getChrome())];
+    $handler = $this->getHandler();
     $handler($params);
   }
 
   public function isAllowedRoute(string $route): bool {
-    return preg_match(';^civicrm/;', $route);
+    if (!preg_match(';^civicrm/;', $route)) {
+      return FALSE;
+    }
+
+    $flags = \Civi::settings()->get('oembed_allow');
+    if (in_array('ajax', $flags) && preg_match(';^civicrm/ajax/;', $route)) {
+      return TRUE;
+    }
+    if (in_array('public', $flags) && \CRM_Core_Menu::isPublicRoute($route)) {
+      return TRUE;
+    }
+
+    $list = explode("\n", \Civi::settings()->get('oembed_allow_other'));
+    \Civi::dispatcher()->dispatch('civi.oembed.allowRoutes', [
+      'routes' => &$list,
+    ]);
+    $matches = \CRM_Utils_String::filterByWildcards($list, [$route]);
+    if (!empty($matches)) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
-  public function getChrome(): string {
-    // return 'raw';
-    return 'full';
+  protected function getHandler(): callable {
+    $setting = \Civi::settings()->get('oembed_layout');
+    if ($setting === 'auto') {
+      $setting = 'cms';
+    }
+    return [$this, 'invoke' . ucfirst($setting)];
   }
 
   protected function invokeRaw(array $params): void {
@@ -43,7 +67,7 @@ class Router extends AutoService {
     echo $pageContent;
   }
 
-  protected function invokeFull(array $params):void {
+  protected function invokeCms(array $params):void {
     switch (CIVICRM_UF) {
       case 'Drupal':
         \menu_execute_active_handler();
