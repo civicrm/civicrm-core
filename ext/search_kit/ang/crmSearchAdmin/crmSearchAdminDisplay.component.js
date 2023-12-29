@@ -319,8 +319,8 @@
           let selectAliases = ctrl.savedSearch.api_params.select.map(selectExpr => selectToKey(selectExpr));
           // Delete any column that is no longer in the
           activeColumns.reverse().forEach((key, index) => {
-            if (key && !_.includes(selectAliases, key)) {
-              ctrl.display.settings.columns.splice(index, 1);
+            if (key && !selectAliases.includes(key)) {
+              ctrl.removeCol(activeColumns.length - 1 - index);
             }
           });
         }
