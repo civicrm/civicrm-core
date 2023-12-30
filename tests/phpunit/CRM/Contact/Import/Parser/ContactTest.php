@@ -1564,12 +1564,12 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    */
   public function dateDataProvider(): array {
     return [
-      'type_1' => ['csv' => 'individual_dates_type1.csv', 'dateType' => CRM_Core_Form_Date::DATE_yyyy_mm_dd],
-      'type_2' => ['csv' => 'individual_dates_type2.csv', 'dateType' => CRM_Core_Form_Date::DATE_mm_dd_yy],
-      'type_4' => ['csv' => 'individual_dates_type4.csv', 'dateType' => CRM_Core_Form_Date::DATE_mm_dd_yyyy],
-      'type_8' => ['csv' => 'individual_dates_type8.csv', 'dateType' => CRM_Core_Form_Date::DATE_Month_dd_yyyy],
-      'type_16' => ['csv' => 'individual_dates_type16.csv', 'dateType' => CRM_Core_Form_Date::DATE_dd_mon_yy],
-      'type_32' => ['csv' => 'individual_dates_type32.csv', 'dateType' => CRM_Core_Form_Date::DATE_dd_mm_yyyy],
+      'type_1' => ['csv' => 'individual_dates_type1.csv', 'dateType' => CRM_Utils_Date::DATE_yyyy_mm_dd],
+      'type_2' => ['csv' => 'individual_dates_type2.csv', 'dateType' => CRM_Utils_Date::DATE_mm_dd_yy],
+      'type_4' => ['csv' => 'individual_dates_type4.csv', 'dateType' => CRM_Utils_Date::DATE_mm_dd_yyyy],
+      'type_8' => ['csv' => 'individual_dates_type8.csv', 'dateType' => CRM_Utils_Date::DATE_Month_dd_yyyy],
+      'type_16' => ['csv' => 'individual_dates_type16.csv', 'dateType' => CRM_Utils_Date::DATE_dd_mon_yy],
+      'type_32' => ['csv' => 'individual_dates_type32.csv', 'dateType' => CRM_Utils_Date::DATE_dd_mm_yyyy],
     ];
   }
 
@@ -2204,7 +2204,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
           'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
           'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
           'dedupe_rule_id' => NULL,
-          'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+          'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',
@@ -2275,7 +2275,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'mapper' => $mapper,
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
-      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
       'groups' => [],
     ], $submittedValues);
