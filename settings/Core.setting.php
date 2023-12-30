@@ -321,7 +321,7 @@ return [
     'help_text' => NULL,
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
     'validate_callback' => 'CRM_Admin_Form_Setting_Search::enableOptionOne',
-    'settings_pages' => ['search' => ['weight' => 80]],
+    'settings_pages' => ['search' => ['weight' => 120]],
   ],
   'contact_reference_options' => [
     'group_name' => 'CiviCRM Preferences',
@@ -341,7 +341,7 @@ return [
     'help_text' => NULL,
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
     'validate_callback' => 'CRM_Admin_Form_Setting_Search::enableOptionOne',
-    'settings_pages' => ['search' => ['weight' => 90]],
+    'settings_pages' => ['search' => ['weight' => 130]],
   ],
   'contact_smart_group_display' => [
     'group_name' => 'CiviCRM Preferences',

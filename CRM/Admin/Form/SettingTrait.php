@@ -70,6 +70,9 @@ trait CRM_Admin_Form_SettingTrait {
       // This array_merge re-orders to the key order of $this->_settings.
       $this->settingsMetadata = array_merge($this->_settings, $this->settingsMetadata);
     }
+    uasort($this->settingsMetadata, function ($a, $b) {
+      return $this->isWeightHigher($a, $b);
+    });
     return $this->settingsMetadata;
   }
 
@@ -150,6 +153,7 @@ trait CRM_Admin_Form_SettingTrait {
    */
   protected function getSettingsOrderedByWeight() {
     $settingMetaData = $this->getSettingsMetaData();
+    // Probably unnessary to do this again.
     $settingMetaData = $this->filterMetadataByWeight($settingMetaData);
 
     return $settingMetaData;
@@ -404,22 +408,33 @@ trait CRM_Admin_Form_SettingTrait {
    * @return array
    */
   protected function filterMetadataByWeight(array $settingMetaData): array {
-    $filter = $this->getSettingPageFilter();
-
-    usort($settingMetaData, function ($a, $b) use ($filter) {
-      // Handle cases in which a comparison is impossible. Such will be considered ties.
-      if (
-        // A comparison can't be made unless both setting weights are declared.
-        !isset($a['settings_pages'][$filter]['weight'], $b['settings_pages'][$filter]['weight'])
-        // A pair of settings might actually have the same weight.
-        || $a['settings_pages'][$filter]['weight'] === $b['settings_pages'][$filter]['weight']
-      ) {
-        return 0;
-      }
-
-      return $a['settings_pages'][$filter]['weight'] > $b['settings_pages'][$filter]['weight'] ? 1 : -1;
+    usort($settingMetaData, function ($a, $b) {
+      return $this->isWeightHigher($a, $b);
     });
     return $settingMetaData;
+  }
+
+  /**
+   * Is the relevant weight of b higher than a.
+   *
+   * @param array $a
+   * @param array $b
+   *
+   * @return int
+   */
+  protected function isWeightHigher(array $a, array $b): int {
+    $filter = $this->getSettingPageFilter();
+    // Handle cases in which a comparison is impossible. Such will be considered ties.
+    if (
+      // A comparison can't be made unless both setting weights are declared.
+      !isset($a['settings_pages'][$filter]['weight'], $b['settings_pages'][$filter]['weight'])
+      // A pair of settings might actually have the same weight.
+      || $a['settings_pages'][$filter]['weight'] === $b['settings_pages'][$filter]['weight']
+    ) {
+      return 0;
+    }
+
+    return $a['settings_pages'][$filter]['weight'] > $b['settings_pages'][$filter]['weight'] ? 1 : -1;
   }
 
 }
