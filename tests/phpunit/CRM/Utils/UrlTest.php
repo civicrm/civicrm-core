@@ -69,4 +69,73 @@ class CRM_Utils_UrlTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, $actual, "Within \"$currentHost\", \"$absoluteUrl\" should render as \"$expectedResult\"");
   }
 
+  public function getChildOfExamples(): array {
+    $es = [];
+
+    $es[] = ['http://example.com/child', 'http://example.com/', TRUE];
+    $es[] = ['http://example.com:8888/child', 'http://example.com:8888/', TRUE];
+    $es[] = ['http://example.com/page.php?foo=bar', 'http://example.com/page.php', TRUE];
+
+    $es[] = ['http://example.com/', 'http://example.com/nope', FALSE];
+    $es[] = ['http://example.com/child', 'http://example.com:8888/', FALSE];
+    $es[] = ['http://example.com:8888/', 'http://example.com:8888/nope', FALSE];
+    $es[] = ['http://example.com/page.php?foo=bar', 'http://example.com/page.php?x=y', FALSE];
+
+    // These rely on implicit HTTP_HOST.
+
+    $es[] = ['/router.php', '/', TRUE];
+    $es[] = ['/router.php/foo', '/router.php', TRUE];
+    $es[] = ['/router.php', 'http://childof.example.com/router.php/page', TRUE];
+    $es[] = ['http://childof.example.com/page.php', '/', TRUE];
+    $es[] = ['http://childof.example.com/page.php', 'http://childof.example.com/', TRUE];
+
+    $es[] = ['/page.php', 'http://other.example.com/', FALSE];
+    $es[] = ['/', 'http://other.example.com/', FALSE];
+
+    return $es;
+  }
+
+  /**
+   * @param string $childStr
+   * @param string $parentStr
+   * @param bool $expected
+   * @return void
+   * @dataProvider getChildOfExamples
+   */
+  public function testIsChildOf(string $childStr, string $parentStr, bool $expected): void {
+    $oldHost = $_SERVER['HTTP_HOST'] ?? NULL;
+    $_SERVER['HTTP_HOST'] = 'childof.example.com';
+    $autoclean = CRM_Utils_AutoClean::with(fn() => $_SERVER['HTTP_HOST'] = $oldHost);
+
+    $allFormats = [
+      'string' => fn($url) => $url,
+      'psr7' => ['CRM_Utils_Url', 'parseUrl'],
+      'civi' => ['Civi', 'url'],
+    ];
+    $childFormats = $parentFormats = $allFormats;
+    // $childFormats = CRM_Utils_Array::subset($allFormats, ['string']);
+    // $parentFormats = CRM_Utils_Array::subset($allFormats, ['string']);
+
+    $count = 0;
+    foreach ($childFormats as $childFmtName => $childFmt) {
+      foreach ($parentFormats as $parentFmtName => $parentFmt) {
+        if ($childFmtName === 'civi' && $childStr[0] === '/') {
+          continue; /* In Civi::url(), URLs are relative to the router -- not the domain. */
+        }
+        if ($parentFmtName === 'civi' && $parentStr[0] === '/') {
+          continue; /* In Civi::url(), URLs are relative to the router -- not the domain. */
+        }
+
+        $childValue = $childFmt($childStr);
+        $parentValue = $parentFmt($parentStr);
+        $message = sprintf('Check isChildOf(%s(%s), %s(%s))', $childFmtName, $childStr, $parentFmtName, $parentStr);
+        $actual = CRM_Utils_Url::isChildOf($childValue, $parentValue);
+        $this->assertEquals($expected, $actual, $message);
+        $count++;
+      }
+    }
+
+    $this->assertTrue($count > 0, "Should have at least 1 check");
+  }
+
 }
