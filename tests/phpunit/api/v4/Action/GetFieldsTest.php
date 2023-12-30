@@ -66,7 +66,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->indexBy('name');
     // Ensure table & column are returned
-    $this->assertEquals('civicrm_contact', $fields['display_name']['table_name']);
+    $this->assertEquals('civicrm_contact', $fields['contact_type']['table_name']);
     $this->assertEquals('display_name', $fields['display_name']['column_name']);
 
     // Check suffixes

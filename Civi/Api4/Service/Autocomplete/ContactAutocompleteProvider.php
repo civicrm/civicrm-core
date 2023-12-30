@@ -54,6 +54,12 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
     if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || !CoreUtil::isContact($e->savedSearch['api_entity'])) {
       return;
     }
+    if ($e->savedSearch['api_entity'] === 'Contact') {
+      $contactTypeIcon = ['field' => 'contact_type:icon'];
+    }
+    else {
+      $contactTypeIcon = ['icon' => CoreUtil::getInfoItem($e->savedSearch['api_entity'], 'icon')];
+    }
     $e->display['settings'] = [
       'sort' => [
         ['sort_name', 'ASC'],
@@ -64,7 +70,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
           'key' => 'sort_name',
           'icons' => [
             ['field' => 'contact_sub_type:icon'],
-            ['field' => 'contact_type:icon'],
+            $contactTypeIcon,
           ],
         ],
         [
