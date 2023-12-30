@@ -133,16 +133,16 @@ class Cosession extends AutoService implements EventSubscriberInterface {
     $form->addElement('hidden', '_oembedSes', $this->createToken($this->sessionId));
   }
 
-  public function onRedirect(\Psr\Http\Message\UriInterface &$url, &$context) {
+  public function onRedirect(\Psr\Http\Message\UriInterface &$redirectUrl, &$context) {
     if (!$this->findCreateSessionId()) {
       return;
     }
 
     defined('DBG') && $cleanup = dbg_scope('onRedirect');
-    $action = $context['qfAction'] ?? NULL;
-    if ($action === 'jump' || $action === 'bounceOnError') {
+    $embedUrl = \Civi::url('oembed://');
+    if (\CRM_Utils_Url::isChildOf($redirectUrl, $embedUrl)) {
       $token = $this->createToken($this->sessionId);
-      $url = $url->withQuery($url->getQuery() . '&_oembedSes=' . urlencode($token));
+      $redirectUrl = $redirectUrl->withQuery($redirectUrl->getQuery() . '&_oembedSes=' . urlencode($token));
     }
   }
 
