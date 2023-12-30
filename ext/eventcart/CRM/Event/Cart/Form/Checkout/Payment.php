@@ -340,7 +340,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         'credit_card_exp_date' => $params['credit_card_exp_date'],
         'credit_card_type' => $params['credit_card_type'],
         'credit_card_number' => "************" . substr($params['credit_card_number'], -4, 4),
-        // XXX cart->get_discounts
         'discounts' => $this->discounts,
         'email' => $contact_details[1],
         'events_in_cart' => $events_in_cart,
