@@ -45,6 +45,38 @@ class Cosession extends AutoService implements EventSubscriberInterface {
 
   protected ?string $sessionId = NULL;
 
+  public function findCreateSessionId(): ?string {
+    if (!defined('CIVICRM_OEMBED')) {
+      return NULL;
+    }
+
+    // We store a copy of sessionId on $this. However, there are some unclear situations
+    // where $this is recreated in the middle of a request (e.g. toward the end
+    // of "civicrm/contribution/transact" flow). This helper allows rereading multiple times.
+
+    if ($this->sessionId === NULL) {
+      defined('DBG') && $cleanup = dbg_scope('getSessionId');
+      // TODO: Accept _oembedSes if one of these criteria are met:
+      //   - POST to quickform (non-conflicted referer)
+      //   - POST to AJAX (non-conflicted referer)
+      //   - GET for an approved landing-page
+      //     ("Approved" ==> Per-route? Or is distinct to th page-flow/step/JWT?)
+      //   - What about GET for AJAX?
+      // OR: If it's a GET for approved landing-page, then force-change the underlying sessionId?
+      //     In effect, that invalidates all existing tokens. Mitigates known-session-id attacks?
+      // MAYBE: Store the entry-point where we started the session. If session ever fails, give link back.
+      if (isset($_REQUEST['_oembedSes'])) {
+        $this->sessionId = $this->parseToken($_REQUEST['_oembedSes']);
+        // TODO: In non-debug mode, perhaps we catch JWT exceptions, log them, and redirect/restart - like when you have invalid qfKey.
+      }
+      else {
+        $this->sessionId = $this->createSessionId();
+        $_REQUEST['_oembedSes'] = $this->createToken($this->sessionId);
+      }
+    }
+    return $this->sessionId;
+  }
+
   public function onInvoke(array $path) {
     if (!defined('CIVICRM_OEMBED') || !$this->isEmbeddable(implode('/', $path))) {
       return;
@@ -52,22 +84,7 @@ class Cosession extends AutoService implements EventSubscriberInterface {
 
     defined('DBG') && $cleanup = dbg_scope('onInvoke');
 
-    // TODO: Accept _oembedSes if one of these criteria are met:
-    //   - POST to quickform (non-conflicted referer)
-    //   - POST to AJAX (non-conflicted referer)
-    //   - GET for an approved landing-page
-    //     ("Approved" ==> Per-route? Or is distinct to th page-flow/step/JWT?)
-    //   - What about GET for AJAX?
-    // OR: If it's a GET for approved landing-page, then force-change the underlying sessionId?
-    //     In effect, that invalidates all existing tokens. Mitigates known-session-id attacks?
-    // MAYBE: Store the entry-point where we started the session. If session ever fails, give link back.
-    if (isset($_REQUEST['_oembedSes'])) {
-      $this->sessionId = $this->parseToken($_REQUEST['_oembedSes']);
-      // TODO: In non-debug mode, perhaps we catch JWT exceptions, log them, and redirect/restart - like when you have invalid qfKey.
-    }
-    else {
-      $this->sessionId = $this->createSessionId();
-    }
+    $this->findCreateSessionId();
 
     $session = \CRM_Core_Session::singleton();
     if ($session->isEmpty()) {
@@ -109,7 +126,7 @@ class Cosession extends AutoService implements EventSubscriberInterface {
    * @see \CRM_Utils_Hook::buildForm()
    */
   public function onBuildForm($formName, $form) {
-    if (!$this->sessionId) {
+    if (!$this->findCreateSessionId()) {
       return;
     }
     defined('DBG') && $cleanup = dbg_scope('onBuildForm');
@@ -117,7 +134,7 @@ class Cosession extends AutoService implements EventSubscriberInterface {
   }
 
   public function onRedirect(\Psr\Http\Message\UriInterface &$url, &$context) {
-    if (!$this->sessionId) {
+    if (!$this->findCreateSessionId()) {
       return;
     }
 
@@ -133,7 +150,7 @@ class Cosession extends AutoService implements EventSubscriberInterface {
    * Get the long-lived co-session. Import data into the short-lived CMS session.
    */
   public function import() {
-    if (!$this->sessionId) {
+    if (!$this->findCreateSessionId()) {
       return;
     }
     defined('DBG') && $cleanup = dbg_scope('import');
@@ -147,7 +164,7 @@ class Cosession extends AutoService implements EventSubscriberInterface {
    * Export data from the short-lived CMS session. Save it to the co-session.
    */
   public function export() {
-    if (!$this->sessionId) {
+    if (!$this->findCreateSessionId()) {
       return;
     }
     defined('DBG') && $cleanup = dbg_scope('export');
