@@ -18,6 +18,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Utils\ReflectionUtils;
+
 require_once 'HTML/QuickForm/Page.php';
 
 /**
@@ -2106,6 +2108,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return mixed
    */
   public function getVar($name) {
+    if (!empty(ReflectionUtils::getCodeDocs((new ReflectionProperty($this, $name)), 'Property')['deprecated'])) {
+      CRM_Core_Error::deprecatedWarning('deprecated property accessed :' . $name);
+    }
+    // @todo - add warnings for internal properties & protected properties.
     return $this->$name;
   }
 
