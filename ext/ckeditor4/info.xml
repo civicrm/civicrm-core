@@ -14,8 +14,8 @@
     <url desc="Support">https://github.com/civicrm/civicrm-core/</url>
     <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2023-12-07</releaseDate>
-  <version>5.68.0</version>
+  <releaseDate>2023-12-30</releaseDate>
+  <version>5.68.1</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>5.68</ver>
