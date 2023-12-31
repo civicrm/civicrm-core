@@ -14,8 +14,8 @@
     <url desc="Issues">https://lab.civicrm.org/dev/report/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2023-12-07</releaseDate>
-  <version>5.68.0</version>
+  <releaseDate>2023-12-30</releaseDate>
+  <version>5.68.1</version>
   <develStage>stable</develStage>
   <tags>
     <tag>mgmt:required</tag>
