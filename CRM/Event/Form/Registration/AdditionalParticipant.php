@@ -22,10 +22,49 @@
 class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_Registration {
 
   /**
-   * Pre-registered additional participant id.
+   * Additional participant id.
+   *
    * @var int
+   * @internal
    */
-  public $additionalParticipantId = NULL;
+  public $_additionalParticipantId = NULL;
+
+  /**
+   * Tracks whether we are at the last participant.
+   *
+   * @var bool
+   * @internal
+   */
+  public $_lastParticipant = FALSE;
+
+  /**
+   * @var bool
+   * @internal
+   */
+  public $_resetAllowWaitlist = FALSE;
+
+  /**
+   * @var int
+   * @internal
+   */
+  public $_contactId;
+
+  /**
+   * Used within CRM_Event_Form_EventFees
+   *
+   * @var int
+   * @internal
+   */
+  public $_discountId;
+
+  /**
+   * Alias of $this->_additionalParticipantId,
+   * Used within CRM_Event_Form_EventFees
+   *
+   * @var int
+   * @internal
+   */
+  public $_pId;
 
   /**
    * Get the active UFGroups (profiles) on this form
