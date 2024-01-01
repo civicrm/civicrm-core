@@ -191,10 +191,19 @@ trait DAOActionTrait {
    * @param array $record
    */
   private function resolveFKValues(array &$record): void {
-    // Resolve domain id first
     uksort($record, function($a, $b) {
-      return substr($a, 0, 9) == 'domain_id' ? -1 : 1;
+      // Resolve domain id first
+      if (str_starts_with($a, 'domain_id')) {
+        return -1;
+      }
+      // Resolve previous & next sortable columns last
+      if (str_starts_with($a, 'previous.') || str_starts_with($a, 'next.')) {
+        return 1;
+      }
+      return 0;
     });
+    // Sortable entities
+    $isSortable = CoreUtil::isType($this->getEntityName(), 'SortableEntity');
     foreach ($record as $key => $value) {
       if (!$value || substr_count($key, '.') !== 1) {
         continue;
@@ -204,25 +213,35 @@ trait DAOActionTrait {
       if (!$field || empty($field['fk_entity'])) {
         continue;
       }
+      $filters = [$fkField => $value];
+      $constraints = [];
       $fkDao = CoreUtil::getBAOFromApiName($field['fk_entity']);
       // Constrain search to the domain of the current entity
-      $domainConstraint = NULL;
-      if (isset($fkDao::getSupportedFields()['domain_id'])) {
-        if (!empty($record['domain_id'])) {
-          $domainConstraint = $record['domain_id'] === 'current_domain' ? \CRM_Core_Config::domainID() : $record['domain_id'];
+      if (isset($fkDao::getSupportedFields()['domain_id']) && isset($this->entityFields()['domain_id'])) {
+        $constraints[] = 'domain_id';
+      }
+      // Handle the SortableEntity's `previous` and `next` fields
+      if ($isSortable && in_array($fieldName, ['previous', 'next'], TRUE)) {
+        $constraints = array_unique(array_merge($constraints, (array) CoreUtil::getInfoItem($field['fk_entity'], 'group_weights_by')));
+      }
+      foreach ($constraints as $constraint) {
+        if (array_key_exists($constraint, $record)) {
+          $filters[$constraint] = ($constraint === 'domain_id' && $record['domain_id'] === 'current_domain') ? \CRM_Core_Config::domainID() : $record[$constraint];
         }
-        elseif (!empty($record['id']) && isset($this->entityFields()['domain_id'])) {
-          $domainConstraint = \CRM_Core_DAO::getFieldValue($this->getBaoName(), $record['id'], 'domain_id');
+        elseif (!empty($record['id'])) {
+          $filters[$constraint] = \CRM_Core_DAO::getFieldValue($this->getBaoName(), $record['id'], $constraint);
         }
       }
-      if ($domainConstraint) {
+      // Use filters in lookup
+      if (count($filters) > 1) {
         $fkSearch = new $fkDao();
-        $fkSearch->domain_id = $domainConstraint;
-        $fkSearch->$fkField = $value;
+        foreach ($filters as $filterName => $filterValue) {
+          $fkSearch->$filterName = $filterValue;
+        }
         $fkSearch->find(TRUE);
         $record[$fieldName] = $fkSearch->id;
       }
-      // Simple lookup without all the fuss about domains
+      // Simple lookup without any constraints
       else {
         $record[$fieldName] = \CRM_Core_DAO::getFieldValue($fkDao, $value, 'id', $fkField);
       }
@@ -343,12 +362,22 @@ trait DAOActionTrait {
     $newWeight = $record[$weightField] ?? NULL;
     $oldWeight = empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $weightField);
 
+    // Handle the SortableEntity's `previous` and `next` fields
+    foreach (['previous' => 1, 'next' => 0] as $sibling => $offset) {
+      if (!empty($record[$sibling])) {
+        $siblingWeight = \CRM_Core_DAO::getFieldValue($daoName, $record[$sibling], $weightField);
+        if (isset($siblingWeight)) {
+          $newWeight = $siblingWeight + $offset;
+        }
+      }
+    }
+
     $filters = [];
     foreach ($grouping ?? [] as $filter) {
       $filters[$filter] = $record[$filter] ?? (empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $filter));
     }
     // Supply default weight for new record
-    if (!isset($record[$weightField]) && empty($record[$idField])) {
+    if (!isset($newWeight) && empty($record[$idField])) {
       $record[$weightField] = $this->getMaxWeight($daoName, $filters, $weightField);
     }
     else {
