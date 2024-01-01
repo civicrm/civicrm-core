@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\MembershipBlock;
 
 /**
  * Contribution Page form.
@@ -411,6 +412,18 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     }
     return $this->_id ? (int) $this->_id : NULL;
+  }
+
+  /**
+   * Get the membership Block ID, if any, attached to the contribution page.
+   *
+   * @return int|null
+   */
+  public function getMembershipBlockID(): ?int {
+    return MembershipBlock::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+      ->addWhere('entity_id', '=', $this->getContributionPageID())
+      ->addWhere('is_active', '=', TRUE)->execute()->first()['id'] ?? NULL;
   }
 
   /**
