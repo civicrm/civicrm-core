@@ -1162,8 +1162,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       // If membership_num_terms is not specified on the the price field value (which seems not uncommon
       // in default config) then the membership type provides the values.
       // @todo - access the line item value from $this->getLineItems() rather than _values['fee']
-      $this->_params['frequency_interval'] = $this->getSubmittedValue('frequency_interval') ?? ($this->_values['fee'][$priceFieldId]['options'][$priceFieldValue]['membership_num_terms'] ?? ($membershipTypeDetails['duration_interval'] ?? 1));
-      $this->_params['frequency_unit'] = $this->_params['frequency_unit'] ?? $membershipTypeDetails['duration_unit'];
+      $membershipNumTerms = $this->_values['fee'][$priceFieldId]['options'][$priceFieldValue]['membership_num_terms'] ?? 1;
+      $membershipDurationInterval = $membershipTypeDetails['duration_interval'] ?? 1;
+      $this->_params['frequency_interval'] = $this->getSubmittedValue('frequency_interval') ?? ($membershipNumTerms * $membershipDurationInterval);
+      $this->_params['frequency_unit'] = $this->getSubmittedValue('frequency_unit') ?? $membershipTypeDetails['duration_unit'];
     }
     // This seems like it repeats the above with less care...
     elseif (!$this->_separateMembershipPayment && ($membershipTypeDetails['auto_renew'] === 2
