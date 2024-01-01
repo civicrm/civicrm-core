@@ -128,7 +128,11 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * @return array|null
    */
   public function registerTab() {
-    return NULL;
+    return [
+      'title' => ts('Memberships'),
+      'url' => 'membership',
+      'weight' => 30,
+    ];
   }
 
   /**
