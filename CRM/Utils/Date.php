@@ -604,44 +604,44 @@ class CRM_Utils_Date {
     }
 
     switch ($dateType) {
-      case 1:
+      case self::DATE_yyyy_mm_dd:
         if (!preg_match('/^\d\d\d\d-?(\d|\d\d)-?(\d|\d\d)$/', $value)) {
           return FALSE;
         }
         break;
 
-      case 2:
+      case self::DATE_mm_dd_yy:
         if (!preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d$/', $value)) {
           return FALSE;
         }
         break;
 
-      case 4:
+      case self::DATE_mm_dd_yyyy:
         if (!preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d$/', $value)) {
           return FALSE;
         }
         break;
 
-      case 8:
+      case self::DATE_Month_dd_yyyy:
         if (!preg_match('/^[A-Za-z]*.[ \t]?\d\d\,[ \t]?\d\d\d\d$/', $value)) {
           return FALSE;
         }
         break;
 
-      case 16:
+      case self::DATE_dd_mon_yy:
         if (!preg_match('/^\d\d-[A-Za-z]{3}.*-\d\d$/', $value) && !preg_match('/^\d\d[-\/]\d\d[-\/]\d\d$/', $value)) {
           return FALSE;
         }
         break;
 
-      case 32:
+      case self::DATE_dd_mm_yyyy:
         if (!preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d/', $value)) {
           return FALSE;
         }
         break;
     }
 
-    if ($dateType == 1) {
+    if ($dateType === self::DATE_yyyy_mm_dd) {
       $formattedDate = explode("-", $value);
       if (count($formattedDate) == 3) {
         $year = (int) $formattedDate[0];
@@ -656,7 +656,7 @@ class CRM_Utils_Date {
       }
     }
 
-    if ($dateType == 2 || $dateType == 4) {
+    if ($dateType === self::DATE_mm_dd_yy || $dateType === self::DATE_mm_dd_yyyy) {
       $formattedDate = explode("/", $value);
       if (count($formattedDate) != 3) {
         $formattedDate = explode("-", $value);
@@ -670,7 +670,7 @@ class CRM_Utils_Date {
         return FALSE;
       }
     }
-    if ($dateType == 8) {
+    if ($dateType === self::DATE_Month_dd_yyyy) {
       $dateArray = explode(' ', $value);
       // ignore comma(,)
       $dateArray[1] = (int) substr($dateArray[1], 0, 2);
@@ -696,7 +696,7 @@ class CRM_Utils_Date {
       $day = (int) $dateArray[1];
       $month = (int) $monthInt;
     }
-    if ($dateType == 16) {
+    if ($dateType === self::DATE_dd_mon_yy) {
       $dateArray = explode('-', $value);
       if (count($dateArray) != 3) {
         $dateArray = explode('/', $value);
@@ -732,7 +732,7 @@ class CRM_Utils_Date {
         return FALSE;
       }
     }
-    if ($dateType == 32) {
+    if ($dateType === self::DATE_dd_mm_yyyy) {
       $formattedDate = explode("/", $value);
       if (count($formattedDate) == 3) {
         $year = (int) $formattedDate[2];
@@ -2168,12 +2168,12 @@ class CRM_Utils_Date {
    *
    * @param $date
    *   Date string as entered.
-   * @param $dateType
+   * @param int $dateType
    *   One of the constants like CRM_Utils_Date::DATE_yyyy_mm_dd.
    *
    * @return null|string
    */
-  public static function formatDate($date, $dateType) {
+  public static function formatDate($date, int $dateType = self::DATE_yyyy_mm_dd) {
     if (empty($date)) {
       return NULL;
     }
@@ -2188,7 +2188,7 @@ class CRM_Utils_Date {
 
     if (CRM_Utils_Date::convertToDefaultDate($dateParams, $dateType, $dateKey)) {
       $dateVal = $dateParams[$dateKey];
-      if ($dateType == 1) {
+      if ($dateType === self::DATE_yyyy_mm_dd) {
         $matches = [];
         // The seconds part of this regex is not quite right - but it does succeed
         // in clarifying whether there is a time component or not - which is all it is meant
