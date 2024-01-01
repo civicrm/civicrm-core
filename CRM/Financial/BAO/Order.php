@@ -823,6 +823,17 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Recalculate the line items.
+   *
+   * @return void
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function recalculateLineItems(): void {
+    $this->lineItems = $this->calculateLineItems();
+  }
+
+  /**
    * Get line items in a 'traditional' indexing format.
    *
    * This ensures the line items are indexed by
