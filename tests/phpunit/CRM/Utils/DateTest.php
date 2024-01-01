@@ -2661,20 +2661,74 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    * Test the format function used in imports. Note most forms
    * are able to format pre-submit but the import needs to parse the date.
    */
-  public function testFormatDate($date, $format, $expected): void {
+  public function testFormatDate($date, $format, $expected, $ignoreReason = NULL): void {
+    if ($ignoreReason) {
+      $this->markTestSkipped($ignoreReason);
+    }
     $this->assertEquals($expected, CRM_Utils_Date::formatDate($date, $format));
   }
 
   /**
    * Data provider for date formats.
    *
+   * Supported variants are
+   * DATE_yyyy_mm_dd = 1,
+   * DATE_mm_dd_yy = 2,
+   * DATE_mm_dd_yyyy = 4,
+   * DATE_Month_dd_yyyy = 8,
+   * DATE_dd_mon_yy = 16,
+   * DATE_dd_mm_yyyy = 32;
+   *
    * @return array[]
    */
   public function dateDataProvider(): array {
     return [
-      ['date' => '2022-10-01', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001'],
-      ['date' => '2022-10-01 15:54', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155400'],
-      ['date' => '2022-10-01 15:54:56', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155456'],
+      // YYYY-mm-dd format - eg. 2022-10-01.
+      '2022-10-01' => ['date' => '2022-10-01', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001'],
+      '2022-10-01 15:54' => ['date' => '2022-10-01 15:54', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155400'],
+      '2022-10-01 3:54' => ['date' => '2022-10-01 3:54', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155400', 'ignore_reason' => 'Truncated hour does not pass, yet.'],
+      '2022-10-01 15:54:56' => ['date' => '2022-10-01 15:54:56', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155456'],
+      '2022-10-01 3:54:56' => ['date' => '2022-10-01 3:54:56', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155456', 'ignore_reason' => 'Truncated hour does not pass, yet.'],
+
+      // mm_dd_yy format - eg. US Style 10-01-22 OR 10/01/22 where 10 is the month. 2 digit year.
+      '10-01-22' => ['date' => '10-01-22', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '20221001'],
+      '10-1-22' => ['date' => '10-1-22', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '20221001'],
+      '10-01-22 15:54:56' => ['date' => '10-01-22 15:54:56', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '10-1-22 3:54:56' => ['date' => '10-1-22 3:54:56', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '20221001035456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '10/01/22' => ['date' => '10/01/22', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '20221001'],
+      '10/1/22' => ['date' => '10/1/22', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '20221001'],
+      '10/01/22 15:54:56' => ['date' => '10/01/22 15:54:56', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '10/01/22 3:54:56' => ['date' => '10/01/22 3:54:56', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '20221001035456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+
+      // mm_dd_yyyy format - eg. US Style 10-01-2022 OR 10/01/2022 where 10 is the month. 4 digit year.
+      '10-01-2022' => ['date' => '10-01-2022', 'format' => CRM_Utils_Date::DATE_mm_dd_yyyy, 'expected' => '20221001'],
+      '10-1-2022' => ['date' => '10-1-2022', 'format' => CRM_Utils_Date::DATE_mm_dd_yyyy, 'expected' => '20221001'],
+      '10-01-2022 15:54:56' => ['date' => '10-01-2022 15:54:56', 'format' => CRM_Utils_Date::DATE_mm_dd_yyyy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '10-01-2022 3:54:56' => ['date' => '10-01-2022 3:54:56', 'format' => CRM_Utils_Date::DATE_mm_dd_yyyy, 'expected' => '20221001035456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '10/01/2022' => ['date' => '10/01/2022', 'format' => CRM_Utils_Date::DATE_mm_dd_yyyy, 'expected' => '20221001'],
+      '10/1/2022' => ['date' => '10/1/2022', 'format' => CRM_Utils_Date::DATE_mm_dd_yyyy, 'expected' => '20221001'],
+      '10/1/2022 15:54:56' => ['date' => '10/1/2022 15:54:56', 'format' => CRM_Utils_Date::DATE_mm_dd_yyyy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+
+      // DATE_Month_dd_yyyy ie December, 12 2023
+      'December, 12 2023' => ['date' => 'December, 12 2023', 'format' => CRM_Utils_Date::DATE_Month_dd_yyyy, 'expected' => '20221001035456', 'ignore_reason' => 'Example syntax is broken. Investigate'],
+
+      // dd_mon_yy format (NZ, Australia) - eg. 01-10-22 or 01/10/22 WHERE 01 is the DAY. 2 digit year.
+      '01/10/22' => ['date' => '01/10/22', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001'],
+      '1/10/22' => ['date' => '1/10/22', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001', 'ignore_reason' => 'Truncated month not handled correctly.'],
+      '1-Oct-22 15:54:56' => ['date' => '1-Oct-22 15:54:56', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '1-Oct-22 3:54:56' => ['date' => '1-Oct-22 3:54:56', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '1-10-22 15:54:56' => ['date' => '1-10-22 15:54:56', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '1-10-22 3:54:56' => ['date' => '1-10-22 3:54:56', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+
+      // dd_mon_yyyy format (NZ, Australia) - eg. 01-10-2022 or 01/10/2022 WHERE 01 is the DAY. 4 digit year.
+      '01/10/2022' => ['date' => '01/10/2022', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001'],
+      '1/10/2022' => ['date' => '1/10/2022', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001'],
+      '1/10/2022 15:54:56' => ['date' => '1/10/2022 15:54:56', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '1/10/2022 3:54:56' => ['date' => '1/10/2022 3:54:56', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '1-Oct-2022 15:54:56' => ['date' => '1-Oct-2022 15:54:56', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '1-Oct-2022 3:54:56' => ['date' => '1-Oct-2022 3:54:56', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '1-10-2022 15:54:56' => ['date' => '1-10-2022 15:54:56', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
+      '1-10-2022 3:54:56' => ['date' => '1-10-2022 3:54:56', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
     ];
   }
 
