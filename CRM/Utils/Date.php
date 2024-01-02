@@ -167,7 +167,7 @@ class CRM_Utils_Date {
    *   0-based array with abbreviated weekday names
    *
    */
-  public static function getAbbrWeekdayNames() {
+  public static function getAbbrWeekdayNames(): array {
     $key = 'abbrDays_' . \CRM_Core_I18n::getLocale();
     if (empty(\Civi::$statics[__CLASS__][$key])) {
       $intl_formatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, NULL, IntlDateFormatter::GREGORIAN, 'E');
@@ -204,7 +204,7 @@ class CRM_Utils_Date {
    *   0-based array with full weekday names
    *
    */
-  public static function getFullWeekdayNames() {
+  public static function getFullWeekdayNames(): array {
     $key = 'fullDays_' . \CRM_Core_I18n::getLocale();
     if (empty(\Civi::$statics[__CLASS__][$key])) {
       $intl_formatter = IntlDateFormatter::create(CRM_Core_I18n::getLocale(), IntlDateFormatter::MEDIUM, IntlDateFormatter::MEDIUM, NULL, IntlDateFormatter::GREGORIAN, 'EEEE');
@@ -258,13 +258,12 @@ class CRM_Utils_Date {
   /**
    * Return abbreviated month names according to the locale.
    *
-   * @param bool $month
+   * @param bool|string $month (deprecated)
    *
-   * @return array
+   * @return array|string
    *   1-based array with abbreviated month names
-   *
    */
-  public static function &getAbbrMonthNames($month = FALSE) {
+  public static function getAbbrMonthNames($month = FALSE) {
     $key = 'abbrMonthNames_' . \CRM_Core_I18n::getLocale();
     if (empty(\Civi::$statics[__CLASS__][$key])) {
       // Note: IntlDateFormatter provides even more strings than `strftime()` or `l10n/*/civicrm.mo`.
@@ -279,6 +278,7 @@ class CRM_Utils_Date {
       ));
     }
     if ($month) {
+      CRM_Core_Error::deprecatedWarning('passing in month is deprecated');
       return \Civi::$statics[__CLASS__][$key][$month];
     }
     return \Civi::$statics[__CLASS__][$key];
@@ -291,7 +291,7 @@ class CRM_Utils_Date {
    *   1-based array with full month names
    *
    */
-  public static function &getFullMonthNames() {
+  public static function getFullMonthNames(): array {
     $key = 'fullMonthNames_' . \CRM_Core_I18n::getLocale();
     if (empty(\Civi::$statics[__CLASS__][$key])) {
       // Note: IntlDateFormatter provides even more strings than `strftime()` or `l10n/*/civicrm.mo`.
