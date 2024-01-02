@@ -1,5 +1,5 @@
 <?php
-class CRM_Case_WorkflowMessage_CaseActivity_CaseModelExample extends \Civi\WorkflowMessage\WorkflowMessageExample {
+class CRM_Case_WorkflowMessage_CaseActivityTestWorkflow_CaseModelExample extends \Civi\WorkflowMessage\WorkflowMessageExample {
 
   /**
    * @inheritDoc
@@ -9,7 +9,7 @@ class CRM_Case_WorkflowMessage_CaseActivity_CaseModelExample extends \Civi\Workf
       return []; /* CaseActivity WfMsg is temporarily in tests/phpunit, so it's not reliably loadable.  Temp work-around. */
     }
     yield [
-      'name' => "workflow/{$this->wfName}/{$this->exName}",
+      'name' => 'workflow/case_activity_test/CaseModelExample',
       'title' => ts('Case Activity (Class-style example)'),
       'tags' => ['phpunit', 'preview'],
     ];

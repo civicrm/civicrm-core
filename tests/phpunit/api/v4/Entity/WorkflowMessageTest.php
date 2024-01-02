@@ -40,15 +40,25 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
       ->addWhere('name', 'LIKE', 'case%')
       ->execute()
       ->indexBy('name');
-    $this->assertTrue(isset($result['case_activity']));
+    // Temporarily make this false - we are going to put the real slim shady
+    // in place soon - at which point we can re-enable but turn off for
+    // the bait & switch.
+    $this->assertFalse(isset($result['case_activity']));
   }
 
   /**
    * @throws \CRM_Core_Exception
    */
   public function testRenderDefaultTemplate(): void {
+    \CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_msg_template (msg_text, workflow_name, is_active, is_default)
+      VALUES('" . '{foreach from=$activity.fields item=field}
+{$field.label} : {$field.value}
+{/foreach}' . "', 'case_activity_test', 1, 1)
+    ");
+
     $ex = ExampleData::get(FALSE)
-      ->addWhere('name', '=', 'workflow/case_activity/CaseModelExample')
+      ->addWhere('name', '=', 'workflow/case_activity_test/CaseModelExample')
       ->addSelect('data')
       ->addChain('render', WorkflowMessage::render()
         ->setWorkflow('$data.workflow')
@@ -64,12 +74,12 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
    */
   public function testRenderCustomTemplate(): void {
     $ex = ExampleData::get(0)
-      ->addWhere('name', '=', 'workflow/case_activity/CaseModelExample')
+      ->addWhere('name', '=', 'workflow/case_activity_test/CaseModelExample')
       ->addSelect('data')
       ->execute()
       ->single();
     $result = WorkflowMessage::render(0)
-      ->setWorkflow('case_activity')
+      ->setWorkflow('case_activity_test')
       ->setValues($ex['data']['modelProps'])
       ->setMessageTemplate([
         'msg_text' => 'The role is {$contact.role}.',

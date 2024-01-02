@@ -9,18 +9,17 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\WorkflowMessage\GenericWorkflowMessage;
+
 /**
- * When an activity is created in a case, the "case_activity" email is sent.
- * Generally, the email is sent to the assignee, although (depending on
- * the configuration/add-ons) additional copies may be sent.
+ * Sample to test test model architecture.
  *
  * @see CRM_Case_BAO_Case::sendActivityCopy
  * @support template-only
  */
-class CRM_Case_WorkflowMessage_CaseActivity extends Civi\WorkflowMessage\GenericWorkflowMessage {
+class CRM_Case_WorkflowMessage_CaseActivityTestWorkflow extends GenericWorkflowMessage {
 
-  const GROUP = 'msg_tpl_workflow_case';
-  const WORKFLOW = 'case_activity';
+  const WORKFLOW = 'case_activity_test';
 
   /**
    * The recipient of the notification. The `{contact.*}` tokens will reference this person.
