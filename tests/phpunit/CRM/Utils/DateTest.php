@@ -2716,7 +2716,8 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
 
       // dd_mon_yy format (NZ, Australia) - eg. 01-10-22 or 01/10/22 WHERE 01 is the DAY. 2 digit year.
       '01/10/22' => ['date' => '01/10/22', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001'],
-      '1/10/22' => ['date' => '1/10/22', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001', 'ignore_reason' => 'Truncated month not handled correctly.'],
+      '1/10/22' => ['date' => '1/10/22', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001'],
+      '1-Oct-22' => ['date' => '1-Oct-22', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001'],
       '1-Oct-22 15:54:56' => ['date' => '1-Oct-22 15:54:56', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
       '1-Oct-22 3:54:56' => ['date' => '1-Oct-22 3:54:56', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],
       '1-10-22 15:54:56' => ['date' => '1-10-22 15:54:56', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001155456', 'ignore_reason' => 'Time not handled correctly in this instance.'],

@@ -768,7 +768,7 @@ class CRM_Utils_Date {
         return preg_match('/^[A-Za-z]*.[ \t]?\d\d\,[ \t]?\d\d\d\d$/', $inputValue);
 
       case self::DATE_dd_mon_yy:
-        return preg_match('/^\d\d-[A-Za-z]{3}.*-\d\d$/', $inputValue) || preg_match('/^\d\d[-\/]\d\d[-\/]\d\d$/', $inputValue);
+        return preg_match('/^(\d|\d\d)-[A-Za-z]{3}.*-\d\d$/', $inputValue) || preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d$/', $inputValue);
 
       case self::DATE_dd_mm_yyyy:
         return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d/', $inputValue);
