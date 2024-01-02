@@ -1,4 +1,5 @@
 <?php
+
 namespace Civi\Api4\Action\User;
 
 use Civi\API\Exception\UnauthorizedException;
@@ -20,9 +21,7 @@ trait WriteTrait {
    *
    * We can do some basic checks.
    *
-   * Do all most of our complex permissions checks here.
-   *
-   * Convert plaintext passwords into hashed ones for storage.
+   * Do most of our complex permissions checks here.
    *
    * @param array $record
    * @throws \CRM_Core_Exception
@@ -54,10 +53,10 @@ trait WriteTrait {
     }
     if (array_key_exists('password', $record)) {
       if (!empty($record['hashed_password'])) {
-        throw new API_Exception("Ambiguous password parameters: Cannot pass password AND hashed_password.");
+        throw new \API_Exception("Ambiguous password parameters: Cannot pass password AND hashed_password.");
       }
       if (empty($record['password'])) {
-        throw new API_Exception("Disallowing empty password.");
+        throw new \API_Exception("Disallowing empty password.");
       }
     }
     parent::formatWriteValues($record);
