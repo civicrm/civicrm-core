@@ -396,8 +396,11 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   public function testCaseActivityCopyTemplate():void {
     $client_id = $this->individualCreate();
     $contact_id = $this->individualCreate();
-
-    $msg = WorkflowMessage::create('case_activity', [
+    \CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_msg_template (msg_text, msg_subject, workflow_name, is_active, is_default)
+      VALUES('" . $this->getActivityCaseText() . "', '" . $this->getActivityCaseSubject() . "', 'case_activity_test', 1, 1)
+    ");
+    $msg = WorkflowMessage::create('case_activity_test', [
       'modelProps' => [
         'contactID' => $contact_id,
         'contact' => ['role' => 'Sand grain counter'],
@@ -420,7 +423,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertEquals([], Invasive::get([$msg, '_extras']));
 
     [, $subject, $message] = $msg->sendTemplate([
-      'workflow' => 'case_activity',
+      'workflow' => 'case_activity_test',
       'from' => 'admin@example.com',
       'toName' => 'Demo',
       'toEmail' => 'admin@example.com',
@@ -434,9 +437,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
   public function testSendToEmail_variantA(): void {
     $mut = new CiviMailUtils($this, TRUE);
-    $cid = $this->individualCreate();
+    $this->individualCreate();
 
-    $msg = \Civi\WorkflowMessage\WorkflowMessage::create('petition_sign', [
+    $msg = WorkflowMessage::create('petition_sign', [
       'from' => '"The Sender" <sender-a@example.com>',
       'toEmail' => 'demo-a@example.com',
       'contactId' => 204,
@@ -456,11 +459,67 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $mut->stop();
   }
 
+  /**
+   * Get the contents of the case activity text template, from when the test was written.
+   * @return string
+   */
+  public function getActivityCaseSubject(): string {
+    return '{if !empty($idHash)}[case #{$idHash}]{/if} {$activitySubject}';
+  }
+
+  /**
+   * Get the contents of the case activity text template, from when the test was written.
+   * @return string
+   */
+  public function getActivityCaseText(): string {
+    return '===========================================================
+{ts}Activity Summary{/ts} - {$activityTypeName}
+===========================================================
+{if !empty($isCaseActivity)}
+{ts}Your Case Role(s){/ts} : {$contact.role|default:""}
+{if !empty($manageCaseURL)}
+{ts}Manage Case{/ts} : {$manageCaseURL}
+{/if}
+{/if}
+
+{if !empty($editActURL)}
+{ts}Edit activity{/ts} : {$editActURL}
+{/if}
+{if !empty($viewActURL)}
+{ts}View activity{/ts} : {$viewActURL}
+{/if}
+
+{foreach from=$activity.fields item=field}
+{if $field.type eq "Date"}
+{$field.label} : {$field.value|crmDate:$config->dateformatDatetime}
+{else}
+{$field.label} : {$field.value}
+{/if}
+{/foreach}
+
+{if !empty($activity.customGroups)}
+{foreach from=$activity.customGroups key=customGroupName item=customGroup}
+==========================================================
+{$customGroupName}
+==========================================================
+{foreach from=$customGroup item=field}
+{if $field.type eq "Date"}
+{$field.label} : {$field.value|crmDate:$config->dateformatDatetime}
+{else}
+{$field.label} : {$field.value}
+{/if}
+{/foreach}
+
+{/foreach}
+{/if}
+';
+  }
+
   public function testSendToEmail_variantB(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $cid = $this->individualCreate();
 
-    \Civi\WorkflowMessage\WorkflowMessage::create('petition_sign')
+    WorkflowMessage::create('petition_sign')
       ->setFrom(['name' => 'The Sender', 'email' => 'sender-b@example.com'])
       ->setTo(['name' => 'The Recipient', 'email' => 'demo-b@example.com'])
       ->setContactID($cid)
