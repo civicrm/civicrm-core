@@ -233,7 +233,7 @@ class CRM_Mailing_Event_BAO_MailingEventForward extends CRM_Mailing_Event_DAO_Ma
 
     // get the formatted location blocks into params - w/ 3.0 format, CRM-4605
     if (!empty($values['location_type_id'])) {
-      static $fields = NULL;
+      $fields = NULL;
       if ($fields == NULL) {
         $fields = [];
       }
