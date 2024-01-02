@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Contribution;
+
 /**
  * This class provides the functionality to delete a group of contributions.
  *
@@ -28,13 +30,12 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
    *
    * @var bool
    */
-  protected $_single = FALSE;
+  protected bool $_single = FALSE;
 
   /**
    * Build all the data structures needed to build the form.
    */
-  public function preProcess() {
-    //check for delete
+  public function preProcess(): void {
     if (!CRM_Core_Permission::checkActionPermission('CiviContribute', CRM_Core_Action::DELETE)) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
@@ -43,26 +44,19 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $count = 0;
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-      foreach ($this->_contributionIds as $key => $id) {
-        $finTypeID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $id, 'financial_type_id');
-        if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($finTypeID))) {
-          unset($this->_contributionIds[$key]);
-          $count++;
-        }
-        // Now check for lineItems
-        if ($lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id)) {
-          foreach ($lineItems as $items) {
-            if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
-              unset($this->_contributionIds[$key]);
-              $count++;
-              break;
-            }
-          }
-        }
+    $this->assign('rows');
+    foreach ($this->_contributionIds as $key => $id) {
+      if (!Contribution::checkAccess()
+        ->setAction('delete')
+        ->addValue('id', $id)
+        ->execute()->first()['access']) {
+        unset($this->_contributionIds[$key]);
+        $count++;
       }
     }
     if ($count && empty($this->_contributionIds)) {
@@ -86,7 +80,7 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
   /**
    * Process the form after the input has been submitted and validated.
    */
-  public function postProcess() {
+  public function postProcess(): void {
     $deleted = $failed = 0;
     foreach ($this->_contributionIds as $contributionId) {
       if (CRM_Contribute_BAO_Contribution::deleteContribution($contributionId)) {

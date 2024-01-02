@@ -347,7 +347,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
   /**
    * Function to check if lineitems present in a contribution have permissioned FTs.
    *
-   * @deprecated since 5.68 not part of core - to be handled within financialacls extension
+   * @deprecated since 5.68 not part of core - to be removed 5.74
    *
    * @param int $id
    *   contribution id
@@ -359,6 +359,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @return bool
    */
   public static function checkPermissionedLineItems($id, $op, $force = TRUE, $contactID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('use financial acls extension');
     if (!self::isACLFinancialTypeStatus()) {
       return TRUE;
     }

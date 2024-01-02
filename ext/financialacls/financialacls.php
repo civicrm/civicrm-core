@@ -285,12 +285,44 @@ function _financialacls_civi_api4_authorizeContribution(\Civi\Api4\Event\Authori
     if ($e->getActionName() === 'delete') {
       // First check contribution financial type
       // Now check permissioned line items & permissioned contribution
-      if (!CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributionID, 'delete', FALSE, $e->getUserID())
-      ) {
+      if (!_civicrm_financial_acls_check_permissioned_line_items($contributionID, 'delete', FALSE, $e->getUserID())) {
         $e->setAuthorized(FALSE);
       }
     }
   }
+}
+
+/**
+ * Function to check if lineitems present in a contribution have permissioned FTs.
+ *
+ * @param int $id
+ *   contribution id
+ * @param string $op
+ *   the mode of operation, can be add, view, edit, delete
+ * @param bool $force
+ * @param int $contactID
+ *
+ * @return bool
+ */
+function _civicrm_financial_acls_check_permissioned_line_items($id, $op, $force = TRUE, $contactID = NULL) {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return TRUE;
+  }
+  $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id);
+  $flag = FALSE;
+  foreach ($lineItems as $items) {
+    if (!CRM_Core_Permission::check($op . ' contributions of type ' . CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $items['financial_type_id']), $contactID)) {
+      if ($force) {
+        throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
+      }
+      $flag = FALSE;
+      break;
+    }
+    else {
+      $flag = TRUE;
+    }
+  }
+  return $flag;
 }
 
 /**
@@ -388,7 +420,7 @@ function financialacls_civicrm_alterMenu(array &$menu): void {
 
 /**
  * @param string $formName
- * @param \CRM_Core_Form $form
+ * @param \CRM_Event_Form_Registration|\CRM_Contribute_Form_Contribution $form
  */
 function financialacls_civicrm_preProcess(string $formName, \CRM_Core_Form $form): void {
   if (!financialacls_is_acl_limiting_enabled()) {
@@ -399,6 +431,14 @@ function financialacls_civicrm_preProcess(string $formName, \CRM_Core_Form $form
     if (!CRM_Core_Permission::check('add contributions of type ' . $form->getContributionPageValue('financial_type_id:name'))) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
+  }
+
+  // check for ability to add contributions of type
+  if (str_starts_with($formName, 'CRM_Event_Form_Registration_') && $form->getEventValue('is_monetary')
+    && !CRM_Core_Permission::check(
+      'add contributions of type ' . CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $form->getEventValue('financial_type_id')))
+  ) {
+    CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
   }
 
 }
@@ -415,6 +455,29 @@ function financialacls_civicrm_links(string $op, ?string $objectName, $objectID,
   }
   if ($objectName === 'MembershipType') {
     $financialType = CRM_Core_PseudoConstant::getName('CRM_Member_BAO_MembershipType', 'financial_type_id', CRM_Member_BAO_MembershipType::getMembershipType($objectID)['financial_type_id']);
+  }
+  if ($objectName === 'Contribution') {
+    // Now check for lineItems
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID((int) $objectID);
+    foreach ($lineItems as $item) {
+      $financialType = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $item['financial_type_id']);
+      if (!CRM_Core_Permission::check('view contributions of type ' . $financialType)) {
+        // Remove all links & early return for this contribution if there is an un-viewable financial type.
+        $links = [];
+        return;
+      }
+      if (!CRM_Core_Permission::check('edit contributions of type ' . $financialType)) {
+        unset($links[CRM_Core_Action::UPDATE]);
+      }
+      if (!CRM_Core_Permission::check('delete contributions of type ' . $financialType)) {
+        unset($links[CRM_Core_Action::DELETE]);
+      }
+    }
+    $financialTypeID = $values['financial_type_id'] ?? CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $objectID, 'financial_type_id');
+    $financialType = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $financialTypeID);
+  }
+
+  if (!empty($financialType)) {
     $hasEditPermission = CRM_Core_Permission::check('edit contributions of type ' . $financialType);
     $hasDeletePermission = CRM_Core_Permission::check('delete contributions of type ' . $financialType);
     if (!$hasDeletePermission || !$hasEditPermission) {
