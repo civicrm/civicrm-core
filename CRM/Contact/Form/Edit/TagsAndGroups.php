@@ -169,7 +169,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       $contactGroup = CRM_Contact_BAO_GroupContact::getContactGroup($id, 'Added', NULL, FALSE, TRUE, FALSE, TRUE, NULL, TRUE);
       if ($contactGroup) {
         if ($groupElementType == 'select') {
-          $defaults[$fName] = implode(',', CRM_Utils_Array::collect('group_id', $contactGroup));
+          $defaults[$fName] = implode(',', array_column($contactGroup, 'group_id'));
         }
         else {
           foreach ($contactGroup as $group) {
