@@ -258,7 +258,7 @@ class CRM_Utils_Date {
   /**
    * Return abbreviated month names according to the locale.
    *
-   * @param bool|string $month
+   * @param bool|string $month (deprecated)
    *
    * @return array|string
    *   1-based array with abbreviated month names
@@ -278,6 +278,7 @@ class CRM_Utils_Date {
       ));
     }
     if ($month) {
+      CRM_Core_Error::deprecatedWarning('passing in month is deprecated');
       return \Civi::$statics[__CLASS__][$key][$month];
     }
     return \Civi::$statics[__CLASS__][$key];
