@@ -40,7 +40,10 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
       ->addWhere('name', 'LIKE', 'case%')
       ->execute()
       ->indexBy('name');
-    $this->assertTrue(isset($result['case_activity']));
+    // Temporarily make this false - we are going to put the real slim shady
+    // in place soon - at which point we can re-enable but turn off for
+    // the bait & switch.
+    $this->assertFalse(isset($result['case_activity']));
   }
 
   /**
