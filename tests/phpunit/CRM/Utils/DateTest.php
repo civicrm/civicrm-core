@@ -2684,11 +2684,12 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   public function dateDataProvider(): array {
     return [
       // YYYY-mm-dd format - eg. 2022-10-01.
-      '2022-10-01' => ['date' => '2022-10-01', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001'],
+      '2022-10-01' => ['date' => '2022-10-01', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001000000'],
+      'invalid_date_2022-25-01' => ['date' => '2022-25-01', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => NULL],
       '2022-10-01 15:54' => ['date' => '2022-10-01 15:54', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155400'],
-      '2022-10-01 3:54' => ['date' => '2022-10-01 3:54', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155400', 'ignore_reason' => 'Truncated hour does not pass, yet.'],
+      '2022-10-01 3:54' => ['date' => '2022-10-01 3:54', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001035400'],
       '2022-10-01 15:54:56' => ['date' => '2022-10-01 15:54:56', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155456'],
-      '2022-10-01 3:54:56' => ['date' => '2022-10-01 3:54:56', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155456', 'ignore_reason' => 'Truncated hour does not pass, yet.'],
+      '2022-10-01 3:54:56' => ['date' => '2022-10-01 3:54:56', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001035456'],
 
       // mm_dd_yy format - eg. US Style 10-01-22 OR 10/01/22 where 10 is the month. 2 digit year.
       '10-01-22' => ['date' => '10-01-22', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '20221001'],

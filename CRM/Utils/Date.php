@@ -599,7 +599,7 @@ class CRM_Utils_Date {
     $value = '';
     if (!empty($params[$dateParam])) {
       // suppress hh:mm or hh:mm:ss if it exists CRM-7957
-      $value = preg_replace("/(\s(([01]\d)|[2][0-3])(:([0-5]\d)){1,2})$/", "", $params[$dateParam]);
+      $value = preg_replace(self::getTimeRegex(), "", $params[$dateParam]);
     }
     if (!self::validateDateInput($params[$dateParam] ?? '', $dateType)) {
       return FALSE;
@@ -745,9 +745,11 @@ class CRM_Utils_Date {
   protected static function validateDateInput(string $inputValue, int $dateType = self::DATE_yyyy_mm_dd): bool {
     // suppress hh:mm or hh:mm:ss if it exists CRM-7957
     // @todo - fix regex instead.
-    $inputValue = preg_replace("/(\s(([01]\d)|[2][0-3])(:([0-5]\d)){1,2})$/", "", $inputValue);
+    $inputValue = preg_replace(self::getTimeRegex(), "", $inputValue);
     switch ($dateType) {
       case self::DATE_yyyy_mm_dd:
+        // 4 numbers separated by - followed by 1-2 numbers, separated by -
+        // followed by 1-2 numbers with optional time string.
         return preg_match('/^\d\d\d\d-?(\d|\d\d)-?(\d|\d\d)$/', $inputValue);
 
       case self::DATE_mm_dd_yy:
@@ -766,6 +768,17 @@ class CRM_Utils_Date {
         return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d/', $inputValue);
     }
     return FALSE;
+  }
+
+  /**
+   * Get the regex to extract the time portion.
+   *
+   * @internal
+   *
+   * @return string
+   */
+  protected static function getTimeRegex(): string {
+    return "/(\s(([01]*\d)|[2][0-3])(:([0-5]\d)){1,2})$/";
   }
 
   /**
@@ -2173,38 +2186,21 @@ class CRM_Utils_Date {
    *
    * @return null|string
    */
-  public static function formatDate($date, int $dateType = self::DATE_yyyy_mm_dd) {
-    if (empty($date)) {
+  public static function formatDate($date, int $dateType = self::DATE_yyyy_mm_dd): ?string {
+    // This empty check is never hit in practice - hence it is ok to treat it the same as bad data.
+    if (empty($date) || !self::validateDateInput($date, $dateType)) {
       return NULL;
     }
-
-    // 1. first convert date to default format.
-    // 2. append time to default formatted date (might be removed during format)
-    // 3. validate date / date time.
-    // 4. If date and time then convert to default date time format.
+    if ($dateType === self::DATE_yyyy_mm_dd) {
+      $timestamp = strtotime($date);
+      return $timestamp ? date('YmdHis', $timestamp) : NULL;
+    }
 
     $dateKey = 'date';
     $dateParams = [$dateKey => $date];
 
     if (CRM_Utils_Date::convertToDefaultDate($dateParams, $dateType, $dateKey)) {
       $dateVal = $dateParams[$dateKey];
-      if ($dateType === self::DATE_yyyy_mm_dd) {
-        $matches = [];
-        // The seconds part of this regex is not quite right - but it does succeed
-        // in clarifying whether there is a time component or not - which is all it is meant
-        // to do.
-        if (preg_match('/(\s(([01]\d)|[2][0-3]):([0-5]\d):?[0-5]?\d?)$/', $date, $matches)) {
-          if (strpos($date, '-') !== FALSE) {
-            $dateVal .= array_shift($matches);
-          }
-          if (!CRM_Utils_Rule::dateTime($dateVal)) {
-            return NULL;
-          }
-          $dateVal = CRM_Utils_Date::customFormat(preg_replace("/(:|\s)?/", '', $dateVal), '%Y%m%d%H%i%s');
-          return $dateVal;
-        }
-      }
-
       // validate date.
       return CRM_Utils_Rule::date($dateVal) ? $dateVal : NULL;
     }
