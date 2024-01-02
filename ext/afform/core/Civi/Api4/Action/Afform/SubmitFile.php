@@ -104,11 +104,12 @@ class SubmitFile extends AbstractProcessor {
     if ($attachmentParams['entity_table'] == 'civicrm_contact' && isset($attachmentParams['entity_id'])) {
       $fileId = $file['id'];
       $filepath = pathinfo($file['values'][$fileId]['path']);
-      $imageParams = [
-        'id' => $attachmentParams['entity_id'],
-        'image_URL' => sprintf('/civicrm/contact/imagefile?photo=%s',$filepath['basename']),
-      ];
-      civicrm_api3('Contact', 'update', $imageParams);
+      $result = civicrm_api4('Contact', 'update', [
+        'values' => [
+          'id' => $attachmentParams['entity_id'],
+          'image_URL' => sprintf('/civicrm/contact/imagefile?photo=%s',$filepath['basename']),
+        ]
+      ]);
     }
 
     // Update multi-record custom field with value
