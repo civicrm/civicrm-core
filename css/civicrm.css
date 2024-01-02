@@ -1863,8 +1863,10 @@ input.crm-form-entityref {
 
 .crm-container .crm-submit-buttons,
 .crm-container .action-link {
-  height: 27px;
   margin: 4px 0 4px 2px;
+}
+.crm-container .action-link {
+  height: 27px;
 }
 
 .crm-container .register_link-top {
@@ -1902,8 +1904,7 @@ input.crm-form-entityref {
   text-decoration: none;
   cursor: pointer;
   border: 1px solid #3e3e3e;
-  display: block;
-  float: left;
+  display: inline-block;
   overflow: hidden;
   line-height: 135%;
   border-radius: 3px;
