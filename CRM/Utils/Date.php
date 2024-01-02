@@ -2204,7 +2204,13 @@ class CRM_Utils_Date {
       $date = str_replace('-', '/', $date);
       $date = self::replaceShortYear($date, '/', 3);
     }
-    if (in_array($dateType, [self::DATE_yyyy_mm_dd, self::DATE_mm_dd_yy, self::DATE_mm_dd_yyyy], TRUE)) {
+    if ($dateType === self::DATE_dd_mon_yy || $dateType === self::DATE_dd_mm_yyyy) {
+      // PHP interprets slashes as American and dashes as European/other
+      // We swap any slashes to dashes so strtotime will handle.
+      $date = str_replace('/', '-', $date);
+      $date = self::replaceShortYear($date, '-', 3);
+    }
+    if (in_array($dateType, [self::DATE_yyyy_mm_dd, self::DATE_mm_dd_yy, self::DATE_mm_dd_yyyy, self::DATE_dd_mm_yyyy], TRUE)) {
       $timestamp = strtotime($date);
       return $timestamp ? date('YmdHis', $timestamp) : NULL;
     }
@@ -2269,17 +2275,6 @@ class CRM_Utils_Date {
         $year = (int) $dateArray[2];
         $day = (int) $dateArray[0];
         $month = (int) $monthInt;
-      }
-      else {
-        return NULL;
-      }
-    }
-    if ($dateType === self::DATE_dd_mm_yyyy) {
-      $formattedDate = explode("/", $value);
-      if (count($formattedDate) == 3) {
-        $year = (int) $formattedDate[2];
-        $month = (int) $formattedDate[1];
-        $day = (int) $formattedDate[0];
       }
       else {
         return NULL;
