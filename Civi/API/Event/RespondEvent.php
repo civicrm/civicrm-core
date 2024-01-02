@@ -21,7 +21,7 @@ namespace Civi\API\Event;
  */
 class RespondEvent extends Event {
   /**
-   * @var mixed
+   * @var \Civi\Api4\Generic\Result|mixed
    */
   private $response;
 
@@ -30,7 +30,7 @@ class RespondEvent extends Event {
    *   The API provider responsible for executing the request.
    * @param array $apiRequest
    *   The full description of the API request.
-   * @param mixed $response
+   * @param \Civi\Api4\Generic\Result|mixed $response
    *   The response to return to the client.
    * @param \Civi\API\Kernel $apiKernel
    *   The kernel which fired the event.
@@ -41,7 +41,7 @@ class RespondEvent extends Event {
   }
 
   /**
-   * @return mixed
+   * @return \Civi\Api4\Generic\Result|mixed
    */
   public function getResponse() {
     return $this->response;

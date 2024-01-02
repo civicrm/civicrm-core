@@ -62,6 +62,16 @@ class CustomValue {
   /**
    * @param string $customGroup
    * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\GetLinks
+   */
+  public static function getLinks($customGroup = NULL, $checkPermissions = TRUE) {
+    return (new \Civi\Api4\Action\GetLinks("Custom_$customGroup", __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Save
    * @throws \CRM_Core_Exception
    */

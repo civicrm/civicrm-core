@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../../../../../../tests/phpunit/api/v4/Api4TestBase.
 
 use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Action\GetLinks;
 use Civi\Api4\Activity;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
@@ -428,7 +429,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString('Enable', $result[3]['columns'][1]['links'][2]['title']);
     // 4th link is to the case, and only for the relevant entity
     $this->assertEquals('Manage Case', $result[2]['columns'][1]['links'][3]['text']);
-    $this->assertStringContainsString('civicrm', $result[3]['columns'][1]['links'][3]['url']);
+    $this->assertStringContainsString("id={$case['id']}", $result[3]['columns'][1]['links'][3]['url']);
   }
 
   /**
@@ -2049,13 +2050,17 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(0, $result->toolbar);
     // With 'add contacts' permission the button will be shown
     \CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'add contacts';
+    // Clear getLinks cache after changing permissions
+    \Civi::$statics[GetLinks::class] = [];
+
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result->toolbar);
-    $button = $result->toolbar[0];
-    $this->assertEquals('crm-popup', $button['target']);
-    $this->assertEquals('fa-plus', $button['icon']);
-    $this->assertEquals('primary', $button['style']);
-    $this->assertEquals('Add Contact', $button['text']);
+    $menu = $result->toolbar[0];
+    $this->assertEquals('Add Contact', $menu['text']);
+    $this->assertEquals('fa-plus', $menu['icon']);
+    $button = $menu['children'][0];
+    $this->assertEquals('fa-user', $button['icon']);
+    $this->assertEquals('Add Individual', $button['text']);
     $this->assertStringContainsString('=Individual', $button['url']);
 
     // Try with pseudoconstant (for proper test the label needs to be different from the name)
@@ -2064,9 +2069,14 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('name', '=', 'Organization')
       ->execute();
     $params['filters'] = ['contact_type:label' => 'Disorganization'];
+    // Use default label this time
+    unset($params['display']['settings']['toolbar'][0]['text']);
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $button = $result->toolbar[0];
+    $menu = $result->toolbar[0];
+    $this->assertEquals('Add Disorganization', $menu['text']);
+    $button = $menu['children'][0];
     $this->assertStringContainsString('=Organization', $button['url']);
+    $this->assertEquals('Add Disorganization', $button['text']);
 
     // Test legacy 'addButton' setting
     $params['display']['settings']['toolbar'] = NULL;

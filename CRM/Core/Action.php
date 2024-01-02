@@ -76,6 +76,7 @@ class CRM_Core_Action {
     'revert' => self::REVERT,
     'close' => self::CLOSE,
     'reopen' => self::REOPEN,
+    'advanced' => self::ADVANCED,
   ];
 
   private static function getInfo(): array {

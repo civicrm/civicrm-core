@@ -1044,4 +1044,26 @@ class CRM_Utils_String {
     return $templateString;
   }
 
+  /**
+   * Parse a string for SearchKit-style [square_bracket] tokens.
+   * @internal
+   * @param string $raw
+   * @return array
+   */
+  public static function getSquareTokens(string $raw): array {
+    $matches = $tokens = [];
+    if (str_contains($raw, '[')) {
+      preg_match_all('/\\[([^]]+)\\]/', $raw, $matches);
+      foreach (array_unique($matches[1]) as $match) {
+        [$field, $suffix] = array_pad(explode(':', $match), 2, NULL);
+        $tokens[$match] = [
+          'token' => "[$match]",
+          'field' => $field,
+          'suffix' => $suffix,
+        ];
+      }
+    }
+    return $tokens;
+  }
+
 }
