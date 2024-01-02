@@ -596,49 +596,13 @@ class CRM_Utils_Date {
    */
   public static function convertToDefaultDate(&$params, $dateType, $dateParam) {
     $now = getdate();
-
     $value = '';
     if (!empty($params[$dateParam])) {
       // suppress hh:mm or hh:mm:ss if it exists CRM-7957
       $value = preg_replace("/(\s(([01]\d)|[2][0-3])(:([0-5]\d)){1,2})$/", "", $params[$dateParam]);
     }
-
-    switch ($dateType) {
-      case self::DATE_yyyy_mm_dd:
-        if (!preg_match('/^\d\d\d\d-?(\d|\d\d)-?(\d|\d\d)$/', $value)) {
-          return FALSE;
-        }
-        break;
-
-      case self::DATE_mm_dd_yy:
-        if (!preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d$/', $value)) {
-          return FALSE;
-        }
-        break;
-
-      case self::DATE_mm_dd_yyyy:
-        if (!preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d$/', $value)) {
-          return FALSE;
-        }
-        break;
-
-      case self::DATE_Month_dd_yyyy:
-        if (!preg_match('/^[A-Za-z]*.[ \t]?\d\d\,[ \t]?\d\d\d\d$/', $value)) {
-          return FALSE;
-        }
-        break;
-
-      case self::DATE_dd_mon_yy:
-        if (!preg_match('/^\d\d-[A-Za-z]{3}.*-\d\d$/', $value) && !preg_match('/^\d\d[-\/]\d\d[-\/]\d\d$/', $value)) {
-          return FALSE;
-        }
-        break;
-
-      case self::DATE_dd_mm_yyyy:
-        if (!preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d/', $value)) {
-          return FALSE;
-        }
-        break;
+    if (!self::validateDateInput($params[$dateParam] ?? '', $dateType)) {
+      return FALSE;
     }
 
     if ($dateType === self::DATE_yyyy_mm_dd) {
@@ -764,6 +728,42 @@ class CRM_Utils_Date {
     // if month is invalid return as error
     if ($month !== '00' && $month <= 12) {
       return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Validate input date against the input type.
+   *
+   * @param string $inputValue
+   * @param int $dateType
+   *
+   * @internal Function signature subject to change without notice.
+   *
+   * @return bool
+   */
+  protected static function validateDateInput(string $inputValue, int $dateType = self::DATE_yyyy_mm_dd): bool {
+    // suppress hh:mm or hh:mm:ss if it exists CRM-7957
+    // @todo - fix regex instead.
+    $inputValue = preg_replace("/(\s(([01]\d)|[2][0-3])(:([0-5]\d)){1,2})$/", "", $inputValue);
+    switch ($dateType) {
+      case self::DATE_yyyy_mm_dd:
+        return preg_match('/^\d\d\d\d-?(\d|\d\d)-?(\d|\d\d)$/', $inputValue);
+
+      case self::DATE_mm_dd_yy:
+        return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d$/', $inputValue);
+
+      case self::DATE_mm_dd_yyyy:
+        return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d$/', $inputValue);
+
+      case self::DATE_Month_dd_yyyy:
+        return preg_match('/^[A-Za-z]*.[ \t]?\d\d\,[ \t]?\d\d\d\d$/', $inputValue);
+
+      case self::DATE_dd_mon_yy:
+        return preg_match('/^\d\d-[A-Za-z]{3}.*-\d\d$/', $inputValue) || preg_match('/^\d\d[-\/]\d\d[-\/]\d\d$/', $inputValue);
+
+      case self::DATE_dd_mm_yyyy:
+        return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d/', $inputValue);
     }
     return FALSE;
   }
@@ -928,7 +928,7 @@ class CRM_Utils_Date {
    */
   public static function getFromTo($relative, $from = NULL, $to = NULL, $fromTime = NULL, $toTime = '235959') {
     if ($relative) {
-      list($term, $unit) = explode('.', $relative, 2);
+      [$term, $unit] = explode('.', $relative, 2);
       $dateRange = self::relativeToAbsolute($term, $unit);
       $from = substr(($dateRange['from'] ?? ''), 0, 8);
       $to = substr(($dateRange['to'] ?? ''), 0, 8);
@@ -1076,17 +1076,17 @@ class CRM_Utils_Date {
   /**
    * Get the smarty view presentation mapping for the given format.
    *
-   * Historically it was decided that where the view format is 'dd/mm/yy' or 'mm/dd/yy'
-   * they should be rendered using a longer date format. This is likely as much to
-   * do with the earlier date widget being unable to handle some formats as usablity.
-   * However, we continue to respect this.
+   * Historically it was decided that where the view format is 'dd/mm/yy' or
+   * 'mm/dd/yy' they should be rendered using a longer date format. This is
+   * likely as much to do with the earlier date widget being unable to handle
+   * some formats as usablity. However, we continue to respect this.
    *
    * @param $format
    *   Given format ( eg 'M Y', 'Y M' ).
    *
    * @return string|null
-   *   Smarty translation of the date format. Null is also valid and is translated
-   *   according to the available parts at the smarty layer.
+   *   Smarty translation of the date format. Null is also valid and is
+   *   translated according to the available parts at the smarty layer.
    */
   public static function getDateFieldViewFormat($format) {
     $supportableFormats = [
