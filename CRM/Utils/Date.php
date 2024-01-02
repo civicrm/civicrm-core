@@ -2197,7 +2197,14 @@ class CRM_Utils_Date {
     if (empty($date) || !self::validateDateInput($date, $dateType)) {
       return NULL;
     }
-    if ($dateType === self::DATE_yyyy_mm_dd) {
+    if ($dateType === self::DATE_mm_dd_yy || $dateType === self::DATE_mm_dd_yyyy) {
+      // PHP interprets slashes as American and dots/dashes as European/other.
+      // The only thing we support for mm_dd_yy that differs from strtotime is
+      // the use of dashes - so here we replace then we can use strtotime.
+      $date = str_replace('-', '/', $date);
+      $date = self::replaceShortYear($date, '/', 3);
+    }
+    if (in_array($dateType, [self::DATE_yyyy_mm_dd, self::DATE_mm_dd_yy, self::DATE_mm_dd_yyyy], TRUE)) {
       $timestamp = strtotime($date);
       return $timestamp ? date('YmdHis', $timestamp) : NULL;
     }
@@ -2205,21 +2212,6 @@ class CRM_Utils_Date {
     $now = getdate();
     // suppress hh:mm or hh:mm:ss if it exists CRM-7957
     $value = preg_replace(self::getTimeRegex(), "", $date);
-
-    if ($dateType === self::DATE_mm_dd_yy || $dateType === self::DATE_mm_dd_yyyy) {
-      $formattedDate = explode("/", $value);
-      if (count($formattedDate) != 3) {
-        $formattedDate = explode("-", $value);
-      }
-      if (count($formattedDate) == 3) {
-        $year = (int) $formattedDate[2];
-        $month = (int) $formattedDate[0];
-        $day = (int) $formattedDate[1];
-      }
-      else {
-        return NULL;
-      }
-    }
     if ($dateType === self::DATE_Month_dd_yyyy) {
       $dateArray = explode(' ', $value);
       // ignore comma(,)
@@ -2297,16 +2289,7 @@ class CRM_Utils_Date {
     $month = ($month < 10) ? "0" . "$month" : $month;
     $day = ($day < 10) ? "0" . "$day" : $day;
 
-    $year = (int) $year;
-    if ($year < 100) {
-      $year = substr($now['year'], 0, 2) * 100 + $year;
-      if ($year > ($now['year'] + 5)) {
-        $year = $year - 100;
-      }
-      elseif ($year <= ($now['year'] - 95)) {
-        $year = $year + 100;
-      }
-    }
+    $year = self::getYear($year, $now['year']);
 
     $newDate = "$year$month$day";
     // if month is invalid return as error
@@ -2433,6 +2416,73 @@ class CRM_Utils_Date {
     }
 
     return TRUE;
+  }
+
+  /**
+   * Get the date element from the passed date string.
+   *
+   * @param string $date e.g. '20-Oct-2022'
+   * @param string $separator e.g '-'
+   * @param int $monthPlacement eg. 2 for the second section of the string
+   *
+   * @return string
+   */
+  protected static function getDateElement(string $date, string $separator, int $monthPlacement): string {
+    $element = explode($separator, $date)[$monthPlacement - 1];
+    // This second explosion drops any trailing time string.
+    return explode(' ', $element)[0];
+  }
+
+  /**
+   * Replace a year in the short year format e.g 22.
+   *
+   * Note this differs from standard php strotime as we treat anything less
+   * than 5 years in the future as being in the past.
+   *
+   * The reasons for this are not documented but it is likely that our use cases
+   * dictated it - eg. importing birth dates would more sanely default to handling 68
+   * as 1968. By contrast importing future data is likely rare.
+   *
+   * @param string $date
+   * @param string $separator
+   * @param int $yearPlacement
+   *
+   * @return string
+   */
+  public static function replaceShortYear($date, string $separator, int $yearPlacement): string {
+    $year = self::getDateElement($date, $separator, $yearPlacement);
+    if (strlen($year) === 4) {
+      return $date;
+    }
+    $parts = explode($separator, $date);
+    // Replace the year with the 4-digit-year, re-appending any trailing time string.
+    $parts[$yearPlacement - 1] = self::getYear($year) . substr($parts[$yearPlacement - 1], 2);
+    return implode($separator, $parts);
+  }
+
+  /**
+   * Get a 4 digit year from a 2 or 4 digit year.
+   *
+   * The handling differs from strtotime as a year more than 5 years in the future
+   * is deemed to be in the past whereas strtotime uses a 1970 cutoff
+   * https://www.w3schools.com/php/func_date_strtotime.asp
+   *
+   * @param int $year
+   *
+   * @return int
+   */
+  public static function getYear(int $year) {
+    $currentYear = date('Y');
+    if ($year < 100) {
+      $year = ((int) substr($currentYear, 0, 2)) * 100 + $year;
+      if ($year > ($currentYear + 5)) {
+        $year -= 100;
+      }
+      elseif ($year <= ($currentYear - 95)) {
+        $year += 100;
+      }
+    }
+    return $year;
   }
 
 }
