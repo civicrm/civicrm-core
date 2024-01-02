@@ -215,7 +215,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
    */
   public function ensureVariablesAreAssigned(array $variables): void {
     foreach ($variables as $variable) {
-      if (!isset($this->get_template_vars()[$variable])) {
+      if (!isset($this->getTemplateVars()[$variable])) {
         $this->assign($variable);
       }
     }
