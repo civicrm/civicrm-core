@@ -140,6 +140,7 @@ class CRM_Core_CodeGen_Specification {
       $tables[$name]['foreignKey'][$fkey]['className'] = $classNames[$ftable];
       $tables[$name]['foreignKey'][$fkey]['fileName'] = str_replace('_', '/', $classNames[$ftable]) . '.php';
       $tables[$name]['fields'][$fkey]['FKClassName'] = $classNames[$ftable];
+      $tables[$name]['fields'][$fkey]['FKColumnName'] = $tables[$name]['foreignKey'][$fkey]['key'];
     }
   }
 
@@ -296,8 +297,10 @@ class CRM_Core_CodeGen_Specification {
           $this->getDynamicForeignKey($foreignXML, $dynamicForeign, $name);
         }
       }
-      if (!empty($dynamicForeign)) {
-        $table['dynamicForeignKey'] = $dynamicForeign;
+      $table['dynamicForeignKey'] = $dynamicForeign;
+      foreach ($dynamicForeign as $dfk) {
+        $fields[$dfk['idColumn']]['FKColumnName'] = $dfk['key'];
+        $fields[$dfk['idColumn']]['DFKEntityColumn'] = $dfk['typeColumn'];
       }
     }
 
@@ -737,7 +740,7 @@ class CRM_Core_CodeGen_Specification {
     $foreignKey = [
       'idColumn' => trim($foreignXML->idColumn),
       'typeColumn' => trim($foreignXML->typeColumn),
-      'key' => trim($this->value('key', $foreignXML) ?? ''),
+      'key' => trim($this->value('key', $foreignXML) ?? 'id'),
     ];
     $dynamicForeignKeys[] = $foreignKey;
   }

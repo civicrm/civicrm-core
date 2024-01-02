@@ -539,8 +539,29 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[static::class]['links'])) {
-      Civi::$statics[static::class]['links'] = static::createReferenceColumns(static::class);
-      CRM_Core_DAO_AllCoreTables::invoke(static::class, 'links_callback', Civi::$statics[static::class]['links']);
+      $links = static::createReferenceColumns(static::class);
+      // Add references based on field metadata
+      foreach (static::fields() as $field) {
+        if (!empty($field['FKClassName'])) {
+          $links[] = new CRM_Core_Reference_Basic(
+            static::getTableName(),
+            $field['name'],
+            CRM_Core_DAO_AllCoreTables::getTableForClass($field['FKClassName']),
+            $field['FKColumnName'] ?? 'id'
+          );
+        }
+        if (!empty($field['DFKEntityColumn'])) {
+          $links[] = new CRM_Core_Reference_Dynamic(
+            static::getTableName(),
+            $field['name'],
+            NULL,
+            $field['FKColumnName'] ?? 'id',
+            $field['DFKEntityColumn']
+          );
+        }
+      }
+      CRM_Core_DAO_AllCoreTables::invoke(static::class, 'links_callback', $links);
+      Civi::$statics[static::class]['links'] = $links;
     }
     return Civi::$statics[static::class]['links'];
   }
@@ -2528,7 +2549,7 @@ SELECT contact_id
           $className::getTableName(),
           $field['name'],
           'civicrm_option_value',
-          CRM_Utils_Array::value('keyColumn', $field['pseudoconstant'], 'value'),
+          $field['pseudoconstant']['keyColumn'] ?? 'value',
           $field['pseudoconstant']['optionGroupName']
         );
       }
