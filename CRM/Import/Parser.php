@@ -1128,11 +1128,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
     // get the formatted location blocks into params - w/ 3.0 format, CRM-4605
     if (!empty($values['location_type_id'])) {
-      $fields = NULL;
-      if ($fields == NULL) {
-        $fields = [];
-      }
-
       foreach (['Phone', 'Email', 'IM', 'OpenID', 'Phone_Ext'] as $block) {
         $name = strtolower($block);
         if (!array_key_exists($name, $values)) {
