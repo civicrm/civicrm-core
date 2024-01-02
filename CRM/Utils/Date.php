@@ -596,49 +596,13 @@ class CRM_Utils_Date {
    */
   public static function convertToDefaultDate(&$params, $dateType, $dateParam) {
     $now = getdate();
-
     $value = '';
     if (!empty($params[$dateParam])) {
       // suppress hh:mm or hh:mm:ss if it exists CRM-7957
-      $value = preg_replace("/(\s(([01]\d)|[2][0-3])(:([0-5]\d)){1,2})$/", "", $params[$dateParam]);
+      $value = preg_replace(self::getTimeRegex(), "", $params[$dateParam]);
     }
-
-    switch ($dateType) {
-      case self::DATE_yyyy_mm_dd:
-        if (!preg_match('/^\d\d\d\d-?(\d|\d\d)-?(\d|\d\d)$/', $value)) {
-          return FALSE;
-        }
-        break;
-
-      case self::DATE_mm_dd_yy:
-        if (!preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d$/', $value)) {
-          return FALSE;
-        }
-        break;
-
-      case self::DATE_mm_dd_yyyy:
-        if (!preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d$/', $value)) {
-          return FALSE;
-        }
-        break;
-
-      case self::DATE_Month_dd_yyyy:
-        if (!preg_match('/^[A-Za-z]*.[ \t]?\d\d\,[ \t]?\d\d\d\d$/', $value)) {
-          return FALSE;
-        }
-        break;
-
-      case self::DATE_dd_mon_yy:
-        if (!preg_match('/^\d\d-[A-Za-z]{3}.*-\d\d$/', $value) && !preg_match('/^\d\d[-\/]\d\d[-\/]\d\d$/', $value)) {
-          return FALSE;
-        }
-        break;
-
-      case self::DATE_dd_mm_yyyy:
-        if (!preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d/', $value)) {
-          return FALSE;
-        }
-        break;
+    if (!self::validateDateInput($params[$dateParam] ?? '', $dateType)) {
+      return FALSE;
     }
 
     if ($dateType === self::DATE_yyyy_mm_dd) {
@@ -766,6 +730,55 @@ class CRM_Utils_Date {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Validate input date against the input type.
+   *
+   * @param string $inputValue
+   * @param int $dateType
+   *
+   * @internal Function signature subject to change without notice.
+   *
+   * @return bool
+   */
+  protected static function validateDateInput(string $inputValue, int $dateType = self::DATE_yyyy_mm_dd): bool {
+    // suppress hh:mm or hh:mm:ss if it exists CRM-7957
+    // @todo - fix regex instead.
+    $inputValue = preg_replace(self::getTimeRegex(), "", $inputValue);
+    switch ($dateType) {
+      case self::DATE_yyyy_mm_dd:
+        // 4 numbers separated by - followed by 1-2 numbers, separated by -
+        // followed by 1-2 numbers with optional time string.
+        return preg_match('/^\d\d\d\d-?(\d|\d\d)-?(\d|\d\d)$/', $inputValue);
+
+      case self::DATE_mm_dd_yy:
+        return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d$/', $inputValue);
+
+      case self::DATE_mm_dd_yyyy:
+        return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d$/', $inputValue);
+
+      case self::DATE_Month_dd_yyyy:
+        return preg_match('/^[A-Za-z]*.[ \t]?\d\d\,[ \t]?\d\d\d\d$/', $inputValue);
+
+      case self::DATE_dd_mon_yy:
+        return preg_match('/^\d\d-[A-Za-z]{3}.*-\d\d$/', $inputValue) || preg_match('/^\d\d[-\/]\d\d[-\/]\d\d$/', $inputValue);
+
+      case self::DATE_dd_mm_yyyy:
+        return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d/', $inputValue);
+    }
+    return FALSE;
+  }
+
+  /**
+   * Get the regex to extract the time portion.
+   *
+   * @internal
+   *
+   * @return string
+   */
+  protected static function getTimeRegex(): string {
+    return "/(\s(([01]*\d)|[2][0-3])(:([0-5]\d)){1,2})$/";
   }
 
   /**
@@ -928,7 +941,7 @@ class CRM_Utils_Date {
    */
   public static function getFromTo($relative, $from = NULL, $to = NULL, $fromTime = NULL, $toTime = '235959') {
     if ($relative) {
-      list($term, $unit) = explode('.', $relative, 2);
+      [$term, $unit] = explode('.', $relative, 2);
       $dateRange = self::relativeToAbsolute($term, $unit);
       $from = substr(($dateRange['from'] ?? ''), 0, 8);
       $to = substr(($dateRange['to'] ?? ''), 0, 8);
@@ -1076,17 +1089,17 @@ class CRM_Utils_Date {
   /**
    * Get the smarty view presentation mapping for the given format.
    *
-   * Historically it was decided that where the view format is 'dd/mm/yy' or 'mm/dd/yy'
-   * they should be rendered using a longer date format. This is likely as much to
-   * do with the earlier date widget being unable to handle some formats as usablity.
-   * However, we continue to respect this.
+   * Historically it was decided that where the view format is 'dd/mm/yy' or
+   * 'mm/dd/yy' they should be rendered using a longer date format. This is
+   * likely as much to do with the earlier date widget being unable to handle
+   * some formats as usablity. However, we continue to respect this.
    *
    * @param $format
    *   Given format ( eg 'M Y', 'Y M' ).
    *
    * @return string|null
-   *   Smarty translation of the date format. Null is also valid and is translated
-   *   according to the available parts at the smarty layer.
+   *   Smarty translation of the date format. Null is also valid and is
+   *   translated according to the available parts at the smarty layer.
    */
   public static function getDateFieldViewFormat($format) {
     $supportableFormats = [
@@ -2173,38 +2186,21 @@ class CRM_Utils_Date {
    *
    * @return null|string
    */
-  public static function formatDate($date, int $dateType = self::DATE_yyyy_mm_dd) {
-    if (empty($date)) {
+  public static function formatDate($date, int $dateType = self::DATE_yyyy_mm_dd): ?string {
+    // This empty check is never hit in practice - hence it is ok to treat it the same as bad data.
+    if (empty($date) || !self::validateDateInput($date, $dateType)) {
       return NULL;
     }
-
-    // 1. first convert date to default format.
-    // 2. append time to default formatted date (might be removed during format)
-    // 3. validate date / date time.
-    // 4. If date and time then convert to default date time format.
+    if ($dateType === self::DATE_yyyy_mm_dd) {
+      $timestamp = strtotime($date);
+      return $timestamp ? date('YmdHis', $timestamp) : NULL;
+    }
 
     $dateKey = 'date';
     $dateParams = [$dateKey => $date];
 
     if (CRM_Utils_Date::convertToDefaultDate($dateParams, $dateType, $dateKey)) {
       $dateVal = $dateParams[$dateKey];
-      if ($dateType === self::DATE_yyyy_mm_dd) {
-        $matches = [];
-        // The seconds part of this regex is not quite right - but it does succeed
-        // in clarifying whether there is a time component or not - which is all it is meant
-        // to do.
-        if (preg_match('/(\s(([01]\d)|[2][0-3]):([0-5]\d):?[0-5]?\d?)$/', $date, $matches)) {
-          if (strpos($date, '-') !== FALSE) {
-            $dateVal .= array_shift($matches);
-          }
-          if (!CRM_Utils_Rule::dateTime($dateVal)) {
-            return NULL;
-          }
-          $dateVal = CRM_Utils_Date::customFormat(preg_replace("/(:|\s)?/", '', $dateVal), '%Y%m%d%H%i%s');
-          return $dateVal;
-        }
-      }
-
       // validate date.
       return CRM_Utils_Rule::date($dateVal) ? $dateVal : NULL;
     }
