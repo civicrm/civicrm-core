@@ -81,7 +81,7 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
    * @param array $record
    * @param integer|null $userID
    * @return boolean
-   * @see CRM_Core_DAO::checkAccess
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
   public static function _checkAccess(string $entityName, string $action, array $record, ?int $userID): bool {
     // Prevent users from deleting their own user account

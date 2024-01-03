@@ -31,7 +31,7 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken {
    * @param array $record
    * @param $userId
    * @return bool
-   * @see CRM_Core_DAO::checkAccess
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
   public static function _checkAccess(string $entityName, string $action, array $record, $userId): bool {
     try {

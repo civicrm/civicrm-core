@@ -2194,7 +2194,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @param array $record
    * @param int $userID
    * @return bool
-   * @see CRM_Core_DAO::checkAccess
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
   public static function _checkAccess(string $entityName, string $action, array $record, $userID): bool {
     switch ($action) {
