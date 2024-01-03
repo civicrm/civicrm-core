@@ -767,10 +767,12 @@ class CRM_Utils_Date {
         return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d$/', $inputValue);
 
       case self::DATE_Month_dd_yyyy:
-        return preg_match('/^[A-Za-z]*.[ \t]?\d\d\,[ \t]?\d\d\d\d$/', $inputValue);
+        $monthRegex = self::getMonthRegex();
+        $regex = '/^' . $monthRegex . ',?\s?(\d|\d\d),?\s]?(\d\d|\d\d\d\d)$/i';
+        return preg_match($regex, $inputValue);
 
       case self::DATE_dd_mon_yy:
-        return preg_match('/^(\d|\d\d)-[A-Za-z]{3}.*-\d\d$/', $inputValue) || preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d$/', $inputValue);
+        return preg_match('/^(\d|\d\d)-' . self::getMonthRegex() . '-\d\d$/i', $inputValue) || preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d$/', $inputValue);
 
       case self::DATE_dd_mm_yyyy:
         return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d/', $inputValue);
@@ -2224,35 +2226,21 @@ class CRM_Utils_Date {
       $date = self::replaceShortYear($date, '-', 3);
     }
 
-    if (in_array($dateType, [self::DATE_yyyy_mm_dd, self::DATE_mm_dd_yy, self::DATE_mm_dd_yyyy, self::DATE_dd_mm_yyyy, self::DATE_dd_mon_yy], TRUE)) {
-      $timestamp = strtotime($date);
-      return $timestamp ? date('YmdHis', $timestamp) : NULL;
-    }
-
-    $now = getdate();
-    // suppress hh:mm or hh:mm:ss if it exists CRM-7957
-    $value = preg_replace(self::getTimeRegex(), "", $date);
     if ($dateType === self::DATE_Month_dd_yyyy) {
-      $dateArray = explode(' ', $value);
-      // ignore comma(,)
-      $dateArray[1] = (int) substr($dateArray[1], 0, 2);
-
-      $month = self::getNumericMonth($dateArray[0]);
-      $year = (int) $dateArray[2];
-      $day = (int) $dateArray[1];
+      $timeMatches = [];
+      preg_match(self::getTimeRegex(), $date, $timeMatches);
+      $timePortion = $timeMatches[0] ?? '';
+      $datePortion = str_replace($timePortion, '', $date);
+      // Replace whitespace in the date portion of the string with '/' for strtotime to handle
+      // as US-ordered values. We strip off & re-add the time portion
+      // so that part is not changed (ie a space continues to separate the date & time).
+      $date = preg_replace('/(,|\s)+/', '/', $datePortion) . $timePortion;
+      $date = self::replaceTextMonth($date, '/', 1);
+      $date = self::replaceShortYear($date, '/', 3);
     }
 
-    $day = ($day < 10) ? "0" . "$day" : $day;
-
-    $year = self::getYear($year, $now['year']);
-
-    $newDate = "$year$month$day";
-    // if month is invalid return as error
-    if ($month !== '00' && $month <= 12) {
-      // validate date.
-      return CRM_Utils_Rule::date($newDate) ? $newDate : NULL;
-    }
-    return NULL;
+    $timestamp = strtotime($date);
+    return $timestamp ? date('YmdHis', $timestamp) : NULL;
   }
 
   /**
@@ -2388,7 +2376,7 @@ class CRM_Utils_Date {
     if (is_numeric($string)) {
       return $string;
     }
-    $string = strtolower(trim($string, '.'));
+    $string = strtolower(trim($string, "., \n\r\t\v\0"));
     foreach (self::getFullMonthNames() as $monthNumeric => $monthName) {
       if ($string === mb_strtolower($monthName)) {
         return str_pad($monthNumeric, 2, 0, STR_PAD_LEFT);
@@ -2490,6 +2478,22 @@ class CRM_Utils_Date {
       }
     }
     return $year;
+  }
+
+  /**
+   * Get the regex to find a locale-relevant date in the string.
+   *
+   * Resulting regex looks like this, in English locale
+   * /^(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec),?\s?\d\d,?\s]?\d\d\d\d$/
+   *
+   *
+   * @return string
+   * @internal
+   *
+   */
+  protected static function getMonthRegex(): string {
+    $months = array_merge(self::getFullMonthNames(), self::getAbbrMonthNames());
+    return '(' . implode('|', $months) . ')';
   }
 
 }
