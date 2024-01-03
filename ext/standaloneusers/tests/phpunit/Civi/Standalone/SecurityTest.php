@@ -168,6 +168,20 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     }
   }
 
+  public static function storeFakePasswordResetToken(int $userID, int $expires): string {
+    $token = \Civi::service('crypto.jwt')->encode([
+      'exp' => $expires,
+      'sub' => "uid:$userID",
+      'scope' => Security::PASSWORD_RESET_SCOPE,
+    ]);
+    User::update(FALSE)
+      ->addValue('password_reset_token', $token)
+      ->addWhere('id', '=', $userID)
+      ->execute();
+
+    return $token;
+  }
+
   public function testForgottenPassword() {
 
     /** @var Security $security */
@@ -175,14 +189,9 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     // Create token.
     $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
-    $this->assertMatchesRegularExpression('/^([0-9a-f]{8}[a-zA-Z0-9]{32})([0-9a-f]+)$/', $token);
-
-    // Fake an expired token
-    $old = dechex(time() - 1);
-    $this->assertNull($security->checkPasswordResetToken($old . substr($token, 9)));
-
-    // Check token fails if contact ID is different.
-    $this->assertNull($security->checkPasswordResetToken($token . '0'));
+    $decodedToken = \Civi::service('crypto.jwt')->decode($token);
+    $this->assertEquals('uid:' . $userID, $decodedToken['sub']);
+    $this->assertEquals(Security::PASSWORD_RESET_SCOPE, $decodedToken['scope']);
 
     // Check it works, but only once.
     $extractedUserID = $security->checkPasswordResetToken($token);
@@ -223,6 +232,10 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['text']);
     $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['html']);
     $this->assertEquals('Password reset link for Demonstrators Anonymous', $result['subject']);
+
+    // Fake an expired token
+    $token = $this->storeFakePasswordResetToken($userID, time() - 1);
+    $this->assertNull($security->checkPasswordResetToken($token));
   }
 
   public function testGetUserIDFromUsername() {
