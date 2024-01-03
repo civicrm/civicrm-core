@@ -56,7 +56,7 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
           'membership_type' => $membershipType,
           'currency' => $defaultCurrency,
           'price_set_id' => $priceSet['id'],
-          'contribution_page_id' => $priceSet['contribution_page_id'],
+          'contribution_page_id' => $priceSet['contribution_page_id'] ?? NULL,
           'is_show_line_items' => !$priceSet['is_quick_config'],
         ];
       }
