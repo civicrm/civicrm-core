@@ -749,6 +749,8 @@ class CRM_Utils_Date {
    * @return bool
    */
   protected static function validateDateInput(string $inputValue, int $dateType = self::DATE_yyyy_mm_dd): bool {
+    // @todo - return these regex from the same function that returns the values in getAvailableInputFormats()
+    // so they are defined together.
     // suppress hh:mm or hh:mm:ss if it exists CRM-7957
     // @todo - fix regex instead.
     $inputValue = preg_replace(self::getTimeRegex(), "", $inputValue);
@@ -2197,6 +2199,16 @@ class CRM_Utils_Date {
     if (empty($date) || !self::validateDateInput($date, $dateType)) {
       return NULL;
     }
+    // Test cover for this function is in CRM_Utils_DateTest::testFormatDate().
+    // This function does some special handling for month translations and
+    // for 2 digit years outside normal strtotime. It might be possible to migrate
+    // to other multilingual php date handling - which is why the recent focus has been on adding
+    // tests.
+    // Note that the replaceShortYear & replaceTextMonth functions would work
+    // on other date formats - eg. self::DATE_mm_dd_yy - it is only the
+    // validation function that is block ing. There is some question as to how
+    // useful it is to require the user to specify the date format to the extent we
+    // do - as 2 digit year vs 4 digit can be figured out...
     if ($dateType === self::DATE_mm_dd_yy || $dateType === self::DATE_mm_dd_yyyy) {
       // PHP interprets slashes as American and dots/dashes as European/other.
       // The only thing we support for mm_dd_yy that differs from strtotime is
@@ -2208,9 +2220,11 @@ class CRM_Utils_Date {
       // PHP interprets slashes as American and dashes as European/other
       // We swap any slashes to dashes so strtotime will handle.
       $date = str_replace('/', '-', $date);
+      $date = self::replaceTextMonth($date, '-', 2);
       $date = self::replaceShortYear($date, '-', 3);
     }
-    if (in_array($dateType, [self::DATE_yyyy_mm_dd, self::DATE_mm_dd_yy, self::DATE_mm_dd_yyyy, self::DATE_dd_mm_yyyy], TRUE)) {
+
+    if (in_array($dateType, [self::DATE_yyyy_mm_dd, self::DATE_mm_dd_yy, self::DATE_mm_dd_yyyy, self::DATE_dd_mm_yyyy, self::DATE_dd_mon_yy], TRUE)) {
       $timestamp = strtotime($date);
       return $timestamp ? date('YmdHis', $timestamp) : NULL;
     }
@@ -2223,65 +2237,11 @@ class CRM_Utils_Date {
       // ignore comma(,)
       $dateArray[1] = (int) substr($dateArray[1], 0, 2);
 
-      $monthInt = 0;
-      $fullMonths = self::getFullMonthNames();
-      foreach ($fullMonths as $key => $val) {
-        if (strtolower($dateArray[0]) == strtolower($val)) {
-          $monthInt = $key;
-          break;
-        }
-      }
-      if (!$monthInt) {
-        $abbrMonths = self::getAbbrMonthNames();
-        foreach ($abbrMonths as $key => $val) {
-          if (strtolower(trim($dateArray[0], ".")) == strtolower($val)) {
-            $monthInt = $key;
-            break;
-          }
-        }
-      }
+      $month = self::getNumericMonth($dateArray[0]);
       $year = (int) $dateArray[2];
       $day = (int) $dateArray[1];
-      $month = (int) $monthInt;
-    }
-    if ($dateType === self::DATE_dd_mon_yy) {
-      $dateArray = explode('-', $value);
-      if (count($dateArray) != 3) {
-        $dateArray = explode('/', $value);
-      }
-
-      if (count($dateArray) == 3) {
-        $monthInt = 0;
-        $fullMonths = self::getFullMonthNames();
-        foreach ($fullMonths as $key => $val) {
-          if (strtolower($dateArray[1]) == strtolower($val)) {
-            $monthInt = $key;
-            break;
-          }
-        }
-        if (!$monthInt) {
-          $abbrMonths = self::getAbbrMonthNames();
-          foreach ($abbrMonths as $key => $val) {
-            if (strtolower(trim($dateArray[1], ".")) == strtolower($val)) {
-              $monthInt = $key;
-              break;
-            }
-          }
-        }
-        if (!$monthInt) {
-          $monthInt = $dateArray[1];
-        }
-
-        $year = (int) $dateArray[2];
-        $day = (int) $dateArray[0];
-        $month = (int) $monthInt;
-      }
-      else {
-        return NULL;
-      }
     }
 
-    $month = ($month < 10) ? "0" . "$month" : $month;
     $day = ($day < 10) ? "0" . "$day" : $day;
 
     $year = self::getYear($year, $now['year']);
@@ -2414,11 +2374,42 @@ class CRM_Utils_Date {
   }
 
   /**
+   * Get the 2-digit numeric month from the input variable.
+   *
+   * Month names & abbreviations are checked in a translation-sensitive manner.
+   *
+   * @param string $string
+   *
+   * @return string|bool
+   *
+   * @internal
+   */
+  protected static function getNumericMonth(string $string) {
+    if (is_numeric($string)) {
+      return $string;
+    }
+    $string = strtolower(trim($string, '.'));
+    foreach (self::getFullMonthNames() as $monthNumeric => $monthName) {
+      if ($string === mb_strtolower($monthName)) {
+        return str_pad($monthNumeric, 2, 0, STR_PAD_LEFT);
+      }
+    }
+    foreach (self::getAbbrMonthNames() as $monthNumeric => $monthAbbreviation) {
+      if ($string === mb_strtolower($monthAbbreviation)) {
+        return str_pad($monthNumeric, 2, 0, STR_PAD_LEFT);
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Get the date element from the passed date string.
    *
    * @param string $date e.g. '20-Oct-2022'
    * @param string $separator e.g '-'
    * @param int $monthPlacement eg. 2 for the second section of the string
+   *
+   * @internal
    *
    * @return string
    */
@@ -2426,6 +2417,23 @@ class CRM_Utils_Date {
     $element = explode($separator, $date)[$monthPlacement - 1];
     // This second explosion drops any trailing time string.
     return explode(' ', $element)[0];
+  }
+
+  /**
+   * @param $date
+   * @param string $separator
+   * @param int $monthPlacement
+   *
+   * @internal
+   *
+   * @return float|int|mixed|string
+   */
+  protected static function replaceTextMonth($date, string $separator, int $monthPlacement) {
+    $month = self::getDateElement($date, $separator, $monthPlacement);
+    if (!is_numeric($month)) {
+      return str_replace($month, self::getNumericMonth($month), $date);
+    }
+    return $date;
   }
 
   /**
@@ -2442,9 +2450,11 @@ class CRM_Utils_Date {
    * @param string $separator
    * @param int $yearPlacement
    *
+   * @internal
+   *
    * @return string
    */
-  public static function replaceShortYear($date, string $separator, int $yearPlacement): string {
+  protected static function replaceShortYear($date, string $separator, int $yearPlacement): string {
     $year = self::getDateElement($date, $separator, $yearPlacement);
     if (strlen($year) === 4) {
       return $date;
@@ -2464,9 +2474,11 @@ class CRM_Utils_Date {
    *
    * @param int $year
    *
+   * @internal
+   *
    * @return int
    */
-  public static function getYear(int $year) {
+  protected static function getYear(int $year) {
     $currentYear = date('Y');
     if ($year < 100) {
       $year = ((int) substr($currentYear, 0, 2)) * 100 + $year;
