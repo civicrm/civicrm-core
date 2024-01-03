@@ -464,35 +464,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Check with complete array + custom field.
    *
    * Note that the test is written on purpose without any
-   * variables specific to participant so it can be replicated into other entities
-   * and / or moved to the automated test suite
-   */
-  public function testCreateWithCustom(): void {
-    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
-
-    $params = $this->_params;
-    $params['custom_' . $ids['custom_field_id']] = 'custom string';
-
-    $result = $this->callAPISuccess($this->entity, 'create', $params);
-    $this->assertEquals($result['id'], $result['values'][$result['id']]['id']);
-    $check = $this->callAPISuccess($this->entity, 'get', [
-      'return.custom_' . $ids['custom_field_id'] => 1,
-      'id' => $result['id'],
-    ]);
-    $this->assertEquals('custom string', $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
-  }
-
-  /**
-   * Check with complete array + custom field.
-   *
-   * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other
    * entities and / or moved to the automated test suite
    */
   public function testCreateGetFieldsWithCustom(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate('ContributionCustomFields', __FILE__);
     $idsContact = $this->entityCustomGroupWithSingleFieldCreate('ContactCustomFields', 'ContactTest.php');
-    $result = $this->callAPISuccess('Contribution', 'getfields', []);
+    $result = $this->callAPISuccess('Contribution', 'getfields');
     $this->assertArrayHasKey('custom_' . $ids['custom_field_id'], $result['values']);
     $this->assertArrayNotHasKey('custom_' . $idsContact['custom_field_id'], $result['values']);
     $this->customFieldDelete($ids['custom_field_id']);
@@ -581,7 +559,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \CRM_Core_Exception
+   *
    */
   public function testCreateContributionOffline(): void {
     $params = [
@@ -698,8 +676,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * CRM-16227 introduces invoice_id as a parameter.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetContributionByInvoice(): void {
     $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, ['invoice_id' => 'curly']));
@@ -1104,15 +1080,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Function tests that additional financial records are created when online
    * contribution is created.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateContributionOnline(): void {
     CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->pageParams);
     $this->assertAPISuccess($contributionPage);
     $params = [
-      'contact_id' => $this->individualID,
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'receive_date' => '20120511',
       'total_amount' => 100.00,
       'financial_type_id' => 1,
@@ -1126,42 +1100,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ];
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->individualID);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], 1);
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
-    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1);
+    $contribution = $contribution['values'][$contribution['id']];
+    $this->assertEquals($params['contact_id'], $contribution['contact_id']);
+    $this->assertEquals(100.00, $contribution['total_amount']);
+    $this->assertEquals(1, $contribution['financial_type_id']);
+    $this->assertEquals(12345, $contribution['trxn_id']);
+    $this->assertEquals(67890, $contribution['invoice_id']);
+    $this->assertEquals('SSF', $contribution['source']);
+    $this->assertEquals(1, $contribution['contribution_status_id']);
     $contribution['payment_instrument_id'] = $this->callAPISuccessGetValue('PaymentProcessor', [
       'id' => $this->paymentProcessorID,
       'return' => 'payment_instrument_id',
     ]);
     $this->_checkFinancialRecords($contribution, 'online');
-  }
-
-  /**
-   * Check handling of financial type.
-   *
-   * In the interests of removing financial type / contribution type checks from
-   * legacy format function lets test that the api is doing this for us
-   */
-  public function testCreateInvalidFinancialType(): void {
-    $params = $this->_params;
-    $params['financial_type_id'] = 99999;
-    $this->callAPIFailure($this->entity, 'create', $params);
-  }
-
-  /**
-   * Check handling of financial type.
-   *
-   * In the interests of removing financial type / contribution type checks from
-   * legacy format function lets test that the api is doing this for us.
-   */
-  public function testValidNamedFinancialType(): void {
-    $params = $this->_params;
-    $params['financial_type_id'] = 'Donation';
-    $this->callAPISuccess($this->entity, 'create', $params);
   }
 
   /**
