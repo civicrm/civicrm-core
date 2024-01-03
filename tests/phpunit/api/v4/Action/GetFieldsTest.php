@@ -253,6 +253,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     // fk_entity should be specific to specified entity_table, but dfk_entities should still contain all values
     $this->assertEquals('Activity', $tagFields['entity_id']['fk_entity']);
     $this->assertContains('Contact', $tagFields['entity_id']['dfk_entities']);
+    $this->assertEquals('id', $tagFields['entity_id']['fk_column']);
 
     $tagFields = EntityTag::getFields(FALSE)
       ->addValue('entity_table:name', 'Contact')

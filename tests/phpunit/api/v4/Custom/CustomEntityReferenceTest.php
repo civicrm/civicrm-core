@@ -58,6 +58,7 @@ class CustomEntityReferenceTest extends CustomTestBase {
     $this->assertNull($spec['suffixes']);
     $this->assertEquals('EntityRef', $spec['input_type']);
     $this->assertEquals('Activity', $spec['fk_entity']);
+    $this->assertEquals('id', $spec['fk_column']);
     $this->assertEquals($subject, $spec['input_attrs']['filter']['subject']);
     // Check results
     $activities = $this->saveTestRecords('Activity', [
