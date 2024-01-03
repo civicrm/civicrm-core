@@ -25,7 +25,7 @@ class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implemen
    * @param array $record
    * @param integer|null $userID
    * @return boolean
-   * @see CRM_Core_DAO::checkAccess
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
   public static function _checkAccess(string $entityName, string $action, array $record, ?int $userID): bool {
     // Prevent users from updating or deleting the admin and everyone roles

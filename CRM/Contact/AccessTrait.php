@@ -26,7 +26,7 @@ trait CRM_Contact_AccessTrait {
    * @param array $record
    * @param int $userID
    * @return bool
-   * @see CRM_Core_DAO::checkAccess
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
   public static function _checkAccess(string $entityName, string $action, array $record, int $userID) {
     $cid = $record['contact_id'] ?? NULL;
