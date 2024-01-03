@@ -47,6 +47,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
     'add' => 'civicrm/admin/contribute/managePremiums/edit?action=add&reset=1',
     'update' => 'civicrm/admin/contribute/managePremiums/edit?action=update&id=[id]&reset=1',
     'delete' => 'civicrm/admin/contribute/managePremiums/edit?action=delete&id=[id]&reset=1',
+    'preview' => 'civicrm/admin/contribute/managePremiums/edit?action=preview&reset=1&id=[id]',
     'browse' => 'civicrm/admin/contribute/managePremiums/',
   ];
 
