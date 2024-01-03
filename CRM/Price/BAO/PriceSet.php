@@ -668,6 +668,7 @@ WHERE  id = %1";
       $data['fields'] = (array) PriceField::get(FALSE)
         ->addWhere('price_set_id', '=', $priceSetID)
         ->addSelect('*', 'visibility_id:name')
+        ->addOrderBy('weight', 'ASC')
         ->execute()->indexBy('id');
       foreach ($data['fields'] as &$field) {
         $field['options'] = [];
@@ -681,6 +682,7 @@ WHERE  id = %1";
       $options = PriceFieldValue::get(FALSE)
         ->addWhere('price_field_id', 'IN', array_keys($data['fields']))
         ->setSelect($select)
+        ->addOrderBy('weight', 'ASC')
         ->execute();
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
       foreach ($options as $option) {
