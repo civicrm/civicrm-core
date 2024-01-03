@@ -148,4 +148,42 @@ class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
     $this->assertEquals($expected['Cache-Control'], $headers['Cache-Control']);
   }
 
+  public function testIcalTimezones() {
+    // The default timezone is UTC which makes it hard to test timezone
+    // accuracy, so we set to an arbitrary different timezone.
+    $oldTimeZone = date_default_timezone_get();
+    date_default_timezone_set('America/Los_Angeles');
+
+    // When using eventCreateUnpaid(), the default date start is back in 2008
+    // and the default date end is in one month, which creates an unnecessarily
+    // huge ics file. So, override start and end date for easier readability.
+    // It's from 7:00 pm - 8:00 pm tomorrow (LA time). Note: it has to be in
+    // the future because ics files are only generated for future events.
+    $eventParameters = [
+      'start_date' => 'tomorrow 19:00',
+      'end_date' => 'tomorrow 20:00',
+    ];
+    $this->eventCreateUnpaid($eventParameters);
+
+    $info = CRM_Event_BAO_Event::getCompleteInfo(NULL, NULL, $this->getEventId());
+    $calendar = explode("\n", CRM_Utils_ICalendar::createCalendarFile($info));
+    $expectedLines = [
+      "TZID:America/Los_Angeles" => FALSE,
+      "DTSTART:20240104T190000" => FALSE,
+      "DTSTAMP;TZID=America/Los_Angeles:20240104T190000" => FALSE,
+      "DTSTART;TZID=America/Los_Angeles:20240104T190000" => FALSE,
+      "DTEND;TZID=America/Los_Angeles:20240104T200000" => FALSE,
+    ];
+    foreach ($calendar as $line) {
+      $line = trim($line);
+      if (array_key_exists($line, $expectedLines)) {
+        $expectedLines[$line] = TRUE;
+      }
+    }
+    foreach ($expectedLines as $line => $status) {
+      $this->assertTrue($status, "Missing {$line} from ics file output.");
+    }
+    date_default_timezone_set($oldTimeZone);
+  }
+
 }
