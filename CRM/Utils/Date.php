@@ -592,9 +592,15 @@ class CRM_Utils_Date {
    * @param string $dateParam
    *   Index of params.
    *
+   * @deprecated since 5.70 will be removed around 5.80.
+   *
+   * At time of deprecation only usages were in CiviHR & CiviProspect in classes that
+   * appeared to be otherwise unmaintained & broken.
+   *
    * @return bool
    */
   public static function convertToDefaultDate(&$params, $dateType, $dateParam) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $now = getdate();
     $value = '';
     if (!empty($params[$dateParam])) {
@@ -762,7 +768,7 @@ class CRM_Utils_Date {
         return preg_match('/^[A-Za-z]*.[ \t]?\d\d\,[ \t]?\d\d\d\d$/', $inputValue);
 
       case self::DATE_dd_mon_yy:
-        return preg_match('/^\d\d-[A-Za-z]{3}.*-\d\d$/', $inputValue) || preg_match('/^\d\d[-\/]\d\d[-\/]\d\d$/', $inputValue);
+        return preg_match('/^(\d|\d\d)-[A-Za-z]{3}.*-\d\d$/', $inputValue) || preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d$/', $inputValue);
 
       case self::DATE_dd_mm_yyyy:
         return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d/', $inputValue);
@@ -2191,20 +2197,106 @@ class CRM_Utils_Date {
     if (empty($date) || !self::validateDateInput($date, $dateType)) {
       return NULL;
     }
-    if ($dateType === self::DATE_yyyy_mm_dd) {
+    if ($dateType === self::DATE_mm_dd_yy || $dateType === self::DATE_mm_dd_yyyy) {
+      // PHP interprets slashes as American and dots/dashes as European/other.
+      // The only thing we support for mm_dd_yy that differs from strtotime is
+      // the use of dashes - so here we replace then we can use strtotime.
+      $date = str_replace('-', '/', $date);
+      $date = self::replaceShortYear($date, '/', 3);
+    }
+    if (in_array($dateType, [self::DATE_yyyy_mm_dd, self::DATE_mm_dd_yy, self::DATE_mm_dd_yyyy], TRUE)) {
       $timestamp = strtotime($date);
       return $timestamp ? date('YmdHis', $timestamp) : NULL;
     }
 
-    $dateKey = 'date';
-    $dateParams = [$dateKey => $date];
+    $now = getdate();
+    // suppress hh:mm or hh:mm:ss if it exists CRM-7957
+    $value = preg_replace(self::getTimeRegex(), "", $date);
+    if ($dateType === self::DATE_Month_dd_yyyy) {
+      $dateArray = explode(' ', $value);
+      // ignore comma(,)
+      $dateArray[1] = (int) substr($dateArray[1], 0, 2);
 
-    if (CRM_Utils_Date::convertToDefaultDate($dateParams, $dateType, $dateKey)) {
-      $dateVal = $dateParams[$dateKey];
-      // validate date.
-      return CRM_Utils_Rule::date($dateVal) ? $dateVal : NULL;
+      $monthInt = 0;
+      $fullMonths = self::getFullMonthNames();
+      foreach ($fullMonths as $key => $val) {
+        if (strtolower($dateArray[0]) == strtolower($val)) {
+          $monthInt = $key;
+          break;
+        }
+      }
+      if (!$monthInt) {
+        $abbrMonths = self::getAbbrMonthNames();
+        foreach ($abbrMonths as $key => $val) {
+          if (strtolower(trim($dateArray[0], ".")) == strtolower($val)) {
+            $monthInt = $key;
+            break;
+          }
+        }
+      }
+      $year = (int) $dateArray[2];
+      $day = (int) $dateArray[1];
+      $month = (int) $monthInt;
+    }
+    if ($dateType === self::DATE_dd_mon_yy) {
+      $dateArray = explode('-', $value);
+      if (count($dateArray) != 3) {
+        $dateArray = explode('/', $value);
+      }
+
+      if (count($dateArray) == 3) {
+        $monthInt = 0;
+        $fullMonths = self::getFullMonthNames();
+        foreach ($fullMonths as $key => $val) {
+          if (strtolower($dateArray[1]) == strtolower($val)) {
+            $monthInt = $key;
+            break;
+          }
+        }
+        if (!$monthInt) {
+          $abbrMonths = self::getAbbrMonthNames();
+          foreach ($abbrMonths as $key => $val) {
+            if (strtolower(trim($dateArray[1], ".")) == strtolower($val)) {
+              $monthInt = $key;
+              break;
+            }
+          }
+        }
+        if (!$monthInt) {
+          $monthInt = $dateArray[1];
+        }
+
+        $year = (int) $dateArray[2];
+        $day = (int) $dateArray[0];
+        $month = (int) $monthInt;
+      }
+      else {
+        return NULL;
+      }
+    }
+    if ($dateType === self::DATE_dd_mm_yyyy) {
+      $formattedDate = explode("/", $value);
+      if (count($formattedDate) == 3) {
+        $year = (int) $formattedDate[2];
+        $month = (int) $formattedDate[1];
+        $day = (int) $formattedDate[0];
+      }
+      else {
+        return NULL;
+      }
     }
 
+    $month = ($month < 10) ? "0" . "$month" : $month;
+    $day = ($day < 10) ? "0" . "$day" : $day;
+
+    $year = self::getYear($year, $now['year']);
+
+    $newDate = "$year$month$day";
+    // if month is invalid return as error
+    if ($month !== '00' && $month <= 12) {
+      // validate date.
+      return CRM_Utils_Rule::date($newDate) ? $newDate : NULL;
+    }
     return NULL;
   }
 
@@ -2324,6 +2416,73 @@ class CRM_Utils_Date {
     }
 
     return TRUE;
+  }
+
+  /**
+   * Get the date element from the passed date string.
+   *
+   * @param string $date e.g. '20-Oct-2022'
+   * @param string $separator e.g '-'
+   * @param int $monthPlacement eg. 2 for the second section of the string
+   *
+   * @return string
+   */
+  protected static function getDateElement(string $date, string $separator, int $monthPlacement): string {
+    $element = explode($separator, $date)[$monthPlacement - 1];
+    // This second explosion drops any trailing time string.
+    return explode(' ', $element)[0];
+  }
+
+  /**
+   * Replace a year in the short year format e.g 22.
+   *
+   * Note this differs from standard php strotime as we treat anything less
+   * than 5 years in the future as being in the past.
+   *
+   * The reasons for this are not documented but it is likely that our use cases
+   * dictated it - eg. importing birth dates would more sanely default to handling 68
+   * as 1968. By contrast importing future data is likely rare.
+   *
+   * @param string $date
+   * @param string $separator
+   * @param int $yearPlacement
+   *
+   * @return string
+   */
+  public static function replaceShortYear($date, string $separator, int $yearPlacement): string {
+    $year = self::getDateElement($date, $separator, $yearPlacement);
+    if (strlen($year) === 4) {
+      return $date;
+    }
+    $parts = explode($separator, $date);
+    // Replace the year with the 4-digit-year, re-appending any trailing time string.
+    $parts[$yearPlacement - 1] = self::getYear($year) . substr($parts[$yearPlacement - 1], 2);
+    return implode($separator, $parts);
+  }
+
+  /**
+   * Get a 4 digit year from a 2 or 4 digit year.
+   *
+   * The handling differs from strtotime as a year more than 5 years in the future
+   * is deemed to be in the past whereas strtotime uses a 1970 cutoff
+   * https://www.w3schools.com/php/func_date_strtotime.asp
+   *
+   * @param int $year
+   *
+   * @return int
+   */
+  public static function getYear(int $year) {
+    $currentYear = date('Y');
+    if ($year < 100) {
+      $year = ((int) substr($currentYear, 0, 2)) * 100 + $year;
+      if ($year > ($currentYear + 5)) {
+        $year -= 100;
+      }
+      elseif ($year <= ($currentYear - 95)) {
+        $year += 100;
+      }
+    }
+    return $year;
   }
 
 }
