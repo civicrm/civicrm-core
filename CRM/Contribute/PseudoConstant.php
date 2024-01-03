@@ -307,34 +307,19 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the Personal campaign pages.
-   *
-   *
-   * @param string|null $pageType
-   * @param int $id
-   *
-   * @return array
-   *   array reference of all pcp if any
+   * Get all the active Personal Campaign Pages.
    */
-  public static function &pcPage($pageType = NULL, $id = NULL) {
-    if (!isset(self::$pcPage[$pageType])) {
-      if ($pageType) {
-        $params = "page_type='{$pageType}'";
-      }
-      else {
-        $params = '';
-      }
-      CRM_Core_PseudoConstant::populate(self::$pcPage[$pageType],
-        'CRM_PCP_DAO_PCP',
-        FALSE, 'title', 'is_active', $params
-      );
+  public static function &pcPage(): array {
+    if (!isset(self::$pcPage)) {
+      $result = (array) \Civi\Api4\PCP::get(FALSE)
+        ->addSelect('id', 'title')
+        ->addWhere('is_active', '=', TRUE)
+        ->execute()
+        ->indexBy('id');
+      $returnValue = \CRM_Utils_Type::escapeAll(array_column($result, 'title', 'id'), 'String');
+      self::$pcPage = $returnValue;
     }
-    $result = self::$pcPage[$pageType];
-    if ($id) {
-      return $result = $result[$id] ?? NULL;
-    }
-
-    return $result;
+    return self::$pcPage;
   }
 
   /**
