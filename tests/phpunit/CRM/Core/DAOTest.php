@@ -22,6 +22,33 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertInstanceOf(\CRM_Core_Reference_Basic::class, $contactRef);
   }
 
+  public function testGetDynamicReferenceColumns(): void {
+    // CRM_Core_DAO_EntityTag has an example of all 3 types of references
+    $referenceColumns = [];
+    foreach (CRM_Core_DAO_EntityTag::getReferenceColumns() as $reference) {
+      $this->assertEquals('civicrm_entity_tag', $reference->getReferenceTable());
+      $referenceColumns[$reference->getReferenceKey()] = $reference;
+    }
+
+    $reference = $referenceColumns['entity_table'];
+    $this->assertInstanceOf(\CRM_Core_Reference_OptionValue::class, $reference);
+    $this->assertNull($reference->getTypeColumn());
+    $this->assertEquals('civicrm_option_value', $reference->getTargetTable());
+    $this->assertEquals('value', $reference->getTargetKey());
+
+    $reference = $referenceColumns['tag_id'];
+    $this->assertInstanceOf(\CRM_Core_Reference_Basic::class, $reference);
+    $this->assertNull($reference->getTypeColumn());
+    $this->assertEquals('civicrm_tag', $reference->getTargetTable());
+    $this->assertEquals('id', $reference->getTargetKey());
+
+    $reference = $referenceColumns['entity_id'];
+    $this->assertInstanceOf(\CRM_Core_Reference_Dynamic::class, $reference);
+    $this->assertEquals('entity_table', $reference->getTypeColumn());
+    $this->assertNull($reference->getTargetTable());
+    $this->assertEquals('id', $reference->getTargetKey());
+  }
+
   public function testGetReferencesToTable(): void {
     $refs = CRM_Core_DAO::getReferencesToTable(CRM_Financial_DAO_FinancialType::getTableName());
     $refsBySource = [];
