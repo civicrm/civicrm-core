@@ -84,7 +84,7 @@ CREATE TABLE `civicrm_uf_match` (
   `is_active` tinyint NOT NULL DEFAULT 1,
   `timezone` varchar(32) NULL COMMENT 'User\'s timezone',
   `language` varchar(5) COMMENT 'UI language preferred by the given user/contact',
-  `password_reset_token` varchar(40) COMMENT 'The unspent token',
+  `password_reset_token` varchar(255) COMMENT 'The unspent token',
   PRIMARY KEY (`id`),
   INDEX `I_civicrm_uf_match_uf_id`(uf_id),
   UNIQUE INDEX `UI_username`(username),

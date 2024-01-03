@@ -102,20 +102,20 @@ class SendPasswordReset extends AbstractAction {
    *   The token
    */
   public static function updateToken(int $userID): string {
-    // Generate a once-use token that expires in 1 hour.
+    // Generate a JWT that expires in 1 hour.
     // We'll store this on the User record, that way invalidating any previous token that may have been generated.
-    // The format is <expiry><random><userID>
-    // The UserID shouldn't need to be secret.
-    // We only store <expiry><random> on the User record.
     $expires = time() + 60 * 60;
-    $token = dechex($expires) . substr(preg_replace('@[/+=]+@', '', base64_encode(random_bytes(64))), 0, 32);
-
+    $token = \Civi::service('crypto.jwt')->encode([
+      'exp' => $expires,
+      'sub' => "uid:$userID",
+      'scope' => Security::PASSWORD_RESET_SCOPE,
+    ]);
     User::update(FALSE)
       ->addValue('password_reset_token', $token)
       ->addWhere('id', '=', $userID)
       ->execute();
 
-    return $token . dechex($userID);
+    return $token;
   }
 
 }
