@@ -498,6 +498,10 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         }
       }
     }
+    if (!is_array($params)) {
+      CRM_Core_Error::deprecatedWarning('this could indicate a bug - see https://lab.civicrm.org/dev/core/-/issues/4881');
+      $params = [];
+    }
 
     //remove name related fields and construct name string with prefix/suffix
     //which will be later assigned to template
