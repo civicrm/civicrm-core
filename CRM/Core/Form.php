@@ -1580,6 +1580,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * @deprecated
+   * Use $this->addDatePickerRange() instead.
+   *
    * @param string $name
    * @param string $from
    * @param string $to
@@ -1589,7 +1592,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $displayTime
    */
   public function addDateRange($name, $from = '_from', $to = '_to', $label = 'From:', $dateFormat = 'searchDate', $required = FALSE, $displayTime = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use CRM_Core_Form::addDatePickerRange insted');
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_Form::addDatePickerRange');
     if ($displayTime) {
       $this->addDateTime($name . $from, $label, $required, ['formatType' => $dateFormat]);
       $this->addDateTime($name . $to, ts('To:'), $required, ['formatType' => $dateFormat]);
@@ -2147,6 +2150,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Key / value pair.
    */
   public function addDate($name, $label, $required = FALSE, $attributes = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_Form::add("datepicker")');
     if (!empty($attributes['formatType'])) {
       // get actual format
       $params = ['name' => $attributes['formatType']];
@@ -2236,6 +2240,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $attributes
    */
   public function addDateTime($name, $label, $required = FALSE, $attributes = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_Form::add("datepicker")');
     $addTime = ['addTime' => TRUE];
     if (is_array($attributes)) {
       $attributes = array_merge($attributes, $addTime);
