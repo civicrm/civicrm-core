@@ -110,6 +110,8 @@
     <type>boolean</type>
     <comment>Yes/No field stating whether grant report was received by donor.</comment>
     <import>true</import>
+    <required>true</required>
+    <default>0</default>
     <add>1.8</add>
     <html>
       <type>CheckBox</type>
