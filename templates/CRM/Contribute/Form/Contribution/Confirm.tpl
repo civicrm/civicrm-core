@@ -40,15 +40,15 @@
         {elseif $is_separate_payment}
           {if $amount AND $minimum_fee}
             {$membership_name} {ts}Membership{/ts}:
-            <strong>{$minimum_fee|crmMoney}</strong>
+            <strong>{$membershipTotalAmount|crmMoney}</strong>
             <br/>
             {ts}Additional Contribution{/ts}:
-            <strong>{$amount|crmMoney}</strong>
+            <strong>{$nonMembershipTotalAmount|crmMoney}</strong>
             <br/>
             <strong> -------------------------------------------</strong>
             <br/>
             {ts}Total{/ts}:
-            <strong>{$amount+$minimum_fee|crmMoney}</strong>
+            <strong>{$orderTotal|crmMoney}</strong>
             <br/>
           {elseif $amount}
             {ts}Amount{/ts}:

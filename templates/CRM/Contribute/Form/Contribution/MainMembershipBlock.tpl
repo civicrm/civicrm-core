@@ -20,10 +20,10 @@
           </div>
         {/if}
       {else}
-        {if $membershipBlock.new_title}
+        {if array_key_exists('new_title', $membershipBlock) && $membershipBlock.new_title}
           <legend>{$membershipBlock.new_title}</legend>
         {/if}
-        {if $membershipBlock.new_text}
+        {if array_key_exists('new_text', $membershipBlock) && $membershipBlock.new_text}
           <div id="membership-intro" class="crm-section membership_new_intro-section">
             {$membershipBlock.new_text}
           </div>
@@ -52,23 +52,7 @@
   </div>
   {literal}
   <script type="text/javascript">
-    CRM.$(function($) {
-      //if price set is set we use below below code to show for showing auto renew
-      var autoRenewOption =  {/literal}'{$autoRenewOption}'{literal};
-      var autoRenew = $("#auto_renew_section");
-      var autoRenewCheckbox = $("#auto_renew");
-      var forceRenew = $("#force_renew");
-      autoRenew.hide();
-      forceRenew.hide();
-      if ( autoRenewOption == 1 ) {
-        autoRenew.show();
-      } else if ( autoRenewOption == 2 ) {
-        autoRenewCheckbox.prop('checked',  true );
-        autoRenewCheckbox.attr( 'readonly', true );
-        autoRenew.hide();
-        forceRenew.show();
-      }
-    });
+
   </script>
 {/literal}
 </div>
@@ -155,13 +139,16 @@
       //does this page has only one membership type.
       var renewOptions  = {/literal}{$autoRenewMembershipTypeOptions}{literal};
       var currentOption = eval( "renewOptions." + 'autoRenewMembershipType_' + memTypeId );
+      if (memTypeId === undefined) {
+        currentOption = 0;
+      }
       var autoRenew = cj('#auto_renew_section');
       var autoRenewC = cj('input[name="auto_renew"]');
       var forceRenew = cj("#force_renew");
 
       var readOnly = false;
       var isChecked  = false;
-      if ( currentOption == 0 ) {
+      if (currentOption == 0 ) {
         isChecked = false;
         forceRenew.hide();
         autoRenew.hide();
