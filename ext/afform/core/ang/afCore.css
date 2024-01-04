@@ -36,6 +36,10 @@ af-form {
   display: inline-block;
 }
 
+#bootstrap-theme .input-group .afform-search-operator {
+  width: 6rem;
+}
+
 [af-repeat-item] {
   position: relative;
 }

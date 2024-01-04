@@ -137,8 +137,8 @@ class Run extends AbstractRunAction {
       return [];
     }
     // There is no row data, but some values can be inferred from query filters
-    // First pass: gather raw data from the where clause
-    foreach ($this->_apiParams['where'] as $clause) {
+    // First pass: gather raw data from the where & having clauses
+    foreach (array_merge($this->_apiParams['where'], $this->_apiParams['having'] ?? []) as $clause) {
       if ($clause[1] === '=' || $clause[1] === 'IN') {
         $data[$clause[0]] = $clause[2];
       }

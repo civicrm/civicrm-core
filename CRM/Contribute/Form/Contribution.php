@@ -1101,6 +1101,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (empty($this->_id) && !empty($contribution->id)) {
       $this->_id = $contribution->id;
     }
+    $this->ajaxResponse['updateTabs']['#tab_activity'] = TRUE;
     if (!empty($this->_id) && CRM_Core_Permission::access('CiviMember')) {
       $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', ['contribution_id' => $this->_id]);
       if ($membershipPaymentCount) {
