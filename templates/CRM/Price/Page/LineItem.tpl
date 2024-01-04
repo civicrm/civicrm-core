@@ -131,22 +131,4 @@
     <em>({$hookDiscount.message})</em>
   </div>
 {/if}
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-  {/literal}
-    var comma = '{$config->monetaryThousandSeparator}';
-    var dot = '{$config->monetaryDecimalPoint}';
-    var format = '{$config->moneyformat}';
-    var currency = '{$currency}';
-    var currencySymbol = '{$currencySymbol}';
-  {literal}
-  // Todo: This function should be a utility
-  function moneyFormat(amount) {
-    amount = parseFloat(amount).toFixed(2);
-    amount = amount.replace(',', 'comma').replace('.', 'dot');
-    amount = amount.replace('comma', comma).replace('dot', dot);
-    return format.replace('%C', currency).replace('%c', currencySymbol).replace('%a', amount);
-  }});
-</script>
-{/literal}
+
