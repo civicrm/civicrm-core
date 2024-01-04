@@ -1170,10 +1170,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   /**
    * Process the form submission.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     // we first reset the confirm page so it accepts new values
     $this->controller->resetPage('Confirm');
+    // Update order to the submitted values (in case the back button has been used
+    // and the submitted values have changed.
+    $this->set('lineItem', NULL);
+    $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
+    $this->order->recalculateLineItems();
 
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
