@@ -617,17 +617,18 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @throws \CRM_Core_Exception
    */
-  private function buildMembershipBlock() {
+  private function buildMembershipBlock(): ?bool {
     $cid = $this->_membershipContactID;
     $separateMembershipPayment = FALSE;
     $this->addOptionalQuickFormElement('auto_renew');
+    $this->addExpectedSmartyVariable('renewal_mode');
     if ($this->_membershipBlock) {
 
       $membershipTypeIds = $membershipTypes = $radio = $radioOptAttrs = [];
       // This is always true if this line is reachable - remove along with the upcoming if.
       $membershipPriceset = TRUE;
 
-      $allowAutoRenewMembership = $autoRenewOption = FALSE;
+      $allowAutoRenewMembership = FALSE;
       $autoRenewMembershipTypeOptions = [];
 
       $separateMembershipPayment = $this->_membershipBlock['is_separate_payment'] ?? NULL;
@@ -651,30 +652,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $this->_membershipTypeValues = $membershipTypeValues;
         $endDate = NULL;
 
-        // Check if we support auto-renew on this contribution page
-        // FIXME: If any of the payment processors do NOT support recurring you cannot setup an
-        //   auto-renew payment even if that processor is not selected.
-        $allowAutoRenewOpt = TRUE;
-        if (is_array($this->_paymentProcessors)) {
-          foreach ($this->_paymentProcessors as $id => $val) {
-            if ($id && !$val['is_recur']) {
-              $allowAutoRenewOpt = FALSE;
-            }
-          }
-        }
+        $allowAutoRenewOpt = $this->isPageHasPaymentProcessorSupportForRecurring();
         foreach ($membershipTypeIds as $value) {
           $memType = $membershipTypeValues[$value];
           if ($memType['is_active']) {
-
+            $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = $this->getConfiguredAutoRenewOptionForMembershipType($value);
             if ($allowAutoRenewOpt) {
               $javascriptMethod = ['onclick' => "return showHideAutoRenew( this.value );"];
-              $isAvailableAutoRenew = $this->_membershipBlock['auto_renew'][$value] ?? 1;
-              $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = (int) $memType['auto_renew'] * $isAvailableAutoRenew;
               $allowAutoRenewMembership = TRUE;
             }
             else {
               $javascriptMethod = NULL;
-              $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = 0;
             }
 
             //add membership type.
@@ -717,9 +705,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       //give preference to user submitted auto_renew value.
       $takeUserSubmittedAutoRenew = (!empty($_POST) || $this->isSubmitted());
       $this->assign('takeUserSubmittedAutoRenew', $takeUserSubmittedAutoRenew);
-
+      $autoRenewOption = $this->getAutoRenewOption();
       // Assign autorenew option (0:hide,1:optional,2:required) so we can use it in confirmation etc.
-      $autoRenewOption = CRM_Price_BAO_PriceSet::checkAutoRenewForPriceSet($this->_priceSetId);
       $this->assign('autoRenewOption', $autoRenewOption);
 
       if ((!$this->_values['is_pay_later'] || is_array($this->_paymentProcessors)) && ($allowAutoRenewMembership || $autoRenewOption)) {
@@ -1817,6 +1804,75 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $membershipTypeIDs[$lineItem['membership_type_id']] = $lineItem['membership_type_id'];
     }
     return $membershipTypeIDs;
+  }
+
+  /**
+   * @return int
+   */
+  private function getAutoRenewOption(): int {
+    $autoRenewOption = 0;
+    foreach ($this->getPriceFieldMetaData() as $field) {
+      foreach ($field['options'] as $option) {
+        if ($option['membership_type_id.auto_renew'] === 1) {
+          $autoRenewOption = 1;
+          break 2;
+        }
+        if ($option['membership_type_id.auto_renew'] === 2) {
+          $autoRenewOption = 2;
+        }
+      }
+    }
+    return $autoRenewOption;
+  }
+
+  /**
+   * Get configured auto renew option.
+   *
+   * One of
+   * 0 = never
+   * 1 = optional
+   * 2 - always
+   *
+   * This is based on the membership type but 1 can be moved up or down by membership block configuration.
+   *
+   * @param int $membershipTypeID
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  private function getConfiguredAutoRenewOptionForMembershipType($membershipTypeID): int {
+    if (!$this->isPageHasPaymentProcessorSupportForRecurring()) {
+      return 0;
+    }
+    if (!$this->isQuickConfig()) {
+      return CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID)['auto_renew'];
+    }
+    $membershipTypeAutoRenewOption = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID)['auto_renew'];
+    if ($membershipTypeAutoRenewOption === 2 || $membershipTypeAutoRenewOption === 0) {
+      // It is not possible to override never or always at the membership block leve.
+      return $membershipTypeAutoRenewOption;
+    }
+    // For quick config it is possible to override the give option membership type setting in the membership block.
+    return $this->_membershipBlock['auto_renew'][$membershipTypeID] ?? $membershipTypeAutoRenewOption;
+  }
+
+  /**
+   * Is there payment processor support for recurring contributions on the the contribution page.
+   *
+   * As our front end js is not clever enough to deal with switching this returns FALSE
+   * if any configured processor will not do recurring.
+   *
+   * @return bool
+   */
+  private function isPageHasPaymentProcessorSupportForRecurring(): bool {
+    if (is_array($this->_paymentProcessors)) {
+      foreach ($this->_paymentProcessors as $id => $val) {
+        if ($id && !$val['is_recur']) {
+          return FALSE;
+        }
+      }
+    }
+    return TRUE;
   }
 
 }

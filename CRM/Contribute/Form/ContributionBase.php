@@ -1523,6 +1523,23 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Assign the total amounts for display on Confirm and ThankYou pages.
+   *
+   * These values are used in the separate payments section.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  protected function assignTotalAmounts(): void {
+    // orderTotal includes both payments, if separate.
+    $orderTotal = $this->getOrder() ? $this->order->getTotalAmount() : 0;
+    $membershipTotalAmount = $this->getOrder() ? $this->order->getMembershipTotalAmount() : 0;
+    $this->assign('orderTotal', $orderTotal);
+    $this->assign('membershipTotalAmount', $membershipTotalAmount);
+    $this->assign('nonMembershipTotalAmount', $orderTotal - $membershipTotalAmount);
+  }
+
+  /**
    * Get the currency for the form.
    *
    * Rather historic - might have unneeded stuff

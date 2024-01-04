@@ -93,7 +93,7 @@
             {/if}
           {/if}
           <strong> -------------------------------------------</strong><br />
-          {ts}Total{/ts}: <strong>{$amount+$membership_amount|crmMoney}</strong><br />
+          {ts}Total{/ts}: <strong>{$orderTotal|crmMoney}</strong><br />
         {else}
           {if $totalTaxAmount}
             {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
