@@ -51,6 +51,17 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
   public $isShowParticipantCount;
 
   /**
+   * What is the participant count, if 'specifically configured'.
+   *
+   * See getter notes.
+   *
+   * @var bool
+   *
+   * @scope tplParams as participantCount
+   */
+  public $participantCount;
+
+  /**
    * @var int
    *
    * @scope tokenContext as eventId, tplParams as eventID
@@ -175,12 +186,28 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    * @throws \CRM_Core_Exception
    */
   public function getIsShowParticipantCount(): bool {
+    return (bool) $this->getParticipantCount();
+  }
+
+  /**
+   * Get the count of participants, where count is used in the line items.
+   *
+   * This might be the case where a line item represents a table of 6 people.
+   *
+   * Where the price field value does not record the participant count we ignore.
+   *
+   * This lack of specifying it is a bit unclear but seems to be 'presumed 1'.
+   * From the templates point of view it is not information to present if not
+   * configured.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getParticipantCount() {
+    $count = 0;
     foreach ($this->getLineItems() as $lineItem) {
-      if ((int) $lineItem['participant_count'] > 1) {
-        return TRUE;
-      }
+      $count += $lineItem['participant_count'];
     }
-    return FALSE;
+    return $count;
   }
 
   /**
