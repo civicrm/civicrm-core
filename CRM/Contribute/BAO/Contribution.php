@@ -3506,6 +3506,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         if ($context !== 'validate') {
           $params['condition'] = "v.name <> 'Template'";
         }
+        break;
+
+      case 'payment_instrument_id':
+        if (isset($props['filter'])) {
+          $params['condition'] = "v.filter = " . $props['filter'];
+        }
+        break;
     }
     return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
   }

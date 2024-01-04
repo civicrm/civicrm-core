@@ -235,7 +235,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
       $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
-        ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument(),
+        ['' => ts('- select -')] + CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'create', ['filter' => 0]),
         TRUE,
         ['onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);", 'class' => 'crm-select2']
       );
