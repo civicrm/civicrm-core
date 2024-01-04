@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Extension;
+use Psr\Log\LogLevel;
+
 /**
  *
  * @package CRM
@@ -200,7 +203,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       return $messages;
     }
 
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     $domain        = CRM_Core_BAO_Domain::getDomain();
     $domainName    = $domain->name;
     $fixEmailUrl   = CRM_Utils_System::url("civicrm/admin/options/from_email_address", "&reset=1");
@@ -766,7 +769,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $messages = [];
 
     $setting = Civi::settings()->get('enable_components');
-    $exts = \Civi\Api4\Extension::get(FALSE)
+    $exts = Extension::get(FALSE)
       ->addWhere('key', 'LIKE', 'civi_%')
       ->addWhere('status', '=', 'installed')
       ->execute()
@@ -855,6 +858,31 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ['path' => 'civicrm/admin/extensions/upgrade', 'query' => ['reset' => 1, 'destination' => CRM_Utils_System::url('civicrm/a/#/status')]]
       );
       return [$message];
+    }
+    return [];
+  }
+
+  /**
+   * Checks if logging is enabled but Civi-report is not.
+   *
+   * @return CRM_Utils_Check_Message[]
+   * @throws \CRM_Core_Exception
+   */
+  public function checkLoggingHasCiviReport(): array {
+    if (Civi::settings()->get('logging')) {
+      $isEnabledCiviReport = (bool) Extension::get(FALSE)
+        ->addWhere('key', '=', 'civi_report')
+        ->addWhere('status', '=', 'installed')
+        ->execute()->countFetched();
+      return $isEnabledCiviReport ? [] : [
+        new CRM_Utils_Check_Message(
+          __FUNCTION__,
+          ts('You have enabled detailed logging but to display this in the change log tab CiviReport must be enabled'),
+          ts('CiviReport required to display detailed logging.'),
+          LogLevel::WARNING,
+          'fa-plug'
+        ),
+      ];
     }
     return [];
   }
