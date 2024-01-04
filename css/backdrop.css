@@ -62,6 +62,7 @@
 
 .crm-container details {
   border: 0 solid transparent;
+  background-color: inherit;
   padding: 0;
   margin: inherit;
 }
