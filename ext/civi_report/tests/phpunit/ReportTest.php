@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;

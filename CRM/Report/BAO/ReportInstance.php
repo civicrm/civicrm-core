@@ -258,7 +258,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
    *   Url to redirect the browser to on fail.
    * @param string $successRedirect
    */
-  public static function doFormDelete($instanceId, $bounceTo = 'civicrm/report/list?reset=1', $successRedirect = NULL) {
+  public static function doFormDelete($instanceId, $bounceTo = 'civicrm/report/list?reset=1', $successRedirect = NULL): void {
     if (!CRM_Core_Permission::check('administer Reports')) {
       $statusMessage = ts('You do not have permission to Delete Report.');
       CRM_Core_Error::statusBounce($statusMessage, $bounceTo);
@@ -270,6 +270,34 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
     if ($successRedirect) {
       CRM_Utils_System::redirect(CRM_Utils_System::url($successRedirect));
     }
+  }
+
+  /**
+   * Apply permission field check to ReportInstance.
+   *
+   * Note that we just check all the individual found permissions & then use the
+   * 'OK' ones as a filter. The volume should be low enough for this to be OK
+   * and the table holds exactly one permission for each instance.
+   *
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
+   *
+   * @inheritDoc
+   */
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+    $permissions = CRM_Core_DAO::executeQuery('SELECT DISTINCT permission FROM civicrm_report_instance');
+    $validPermissions = [];
+    while ($permissions->fetch()) {
+      $permission = $permissions->permission;
+      if ($permission && CRM_Core_Permission::check($permission)) {
+        $validPermissions[] = $permission;
+      }
+    }
+    if (!$validPermissions) {
+      return ['permission' => ['IS NULL']];
+    }
+    return ['permission' => ['IN ("' . implode('", "', $validPermissions) . '")']];
   }
 
   /**
@@ -287,7 +315,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
    *    wrong, but at the php level it worked https://github.com/civicrm/civicrm-core/pull/8529#issuecomment-227639091
    *  - general script-add.
    */
-  public static function getActionMetadata() {
+  public static function getActionMetadata(): array {
     $actions = [];
     if (CRM_Core_Permission::check('save Report Criteria')) {
       $actions['report_instance.save'] = ['title' => ts('Save')];
