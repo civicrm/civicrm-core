@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Event\PreEvent;
+
 /**
  *
  * @package CRM
@@ -44,18 +46,15 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
   }
 
   /**
-   * Create instance.
+   * Create report instance.
    *
-   * takes an associative array and creates a instance object and does any related work like permissioning, adding to dashboard etc.
-   *
-   * This function is invoked from within the web form layer and also from the api layer
+   * Does any related work like creating navigation, adding to dashboard etc.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Report_DAO_ReportInstance
    */
-  public static function &create(&$params) {
+  public static function create(array $params) {
     // Transform nonstandard field names used by quickform
     $params['id'] ??= ($params['instance_id'] ?? NULL);
     if (isset($params['report_header'])) {
@@ -112,10 +111,6 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
     $transaction = new CRM_Core_Transaction();
 
     $instance = self::add($params);
-    if (is_a($instance, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $instance;
-    }
 
     // add / update navigation as required
     if (!empty($navigationParams)) {
@@ -177,9 +172,12 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
 
   /**
    * Event fired prior to modifying a ReportInstance.
+   *
    * @param \Civi\Core\Event\PreEvent $event
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+  public static function self_hook_civicrm_pre(PreEvent $event): void {
     if ($event->action === 'delete' && $event->id) {
       // When deleting a report, also delete from navigation menu
       $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $event->id, 'navigation_id');
