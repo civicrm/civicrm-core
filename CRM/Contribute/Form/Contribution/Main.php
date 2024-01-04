@@ -551,6 +551,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             ];
           }
 
+          if (!empty($field['options'])) {
+            foreach ($field['options'] as $option) {
+              if (!empty($option['membership_type_id.auto_renew'])) {
+                $extra += [
+                  'onclick' => "return showHideAutoRenew(CRM.$(this).data('membershipTypeId'));",
+                ];
+                $this->assign('membershipFieldID', $fieldID);
+              }
+            }
+          }
+
           CRM_Price_BAO_PriceField::addQuickFormElement($form,
             'price_' . $fieldID,
             $field['id'],
@@ -623,8 +634,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->addOptionalQuickFormElement('auto_renew');
     $this->addExpectedSmartyVariable('renewal_mode');
     if ($this->_membershipBlock) {
-
-      $membershipTypeIds = $membershipTypes = $radio = $radioOptAttrs = [];
+      $membershipTypeIds = $membershipTypes = $radio = [];
       // This is always true if this line is reachable - remove along with the upcoming if.
       $membershipPriceset = TRUE;
 
@@ -658,7 +668,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           if ($memType['is_active']) {
             $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = $this->getConfiguredAutoRenewOptionForMembershipType($value);
             if ($allowAutoRenewOpt) {
-              $javascriptMethod = ['onclick' => "return showHideAutoRenew( this.value );"];
               $allowAutoRenewMembership = TRUE;
             }
             else {
@@ -667,14 +676,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
             //add membership type.
             $radio[$memType['id']] = NULL;
-            $radioOptAttrs[$memType['id']] = $javascriptMethod;
             if ($cid) {
               //show current membership, skip pending and cancelled membership records,
               $membership = $memberships[$memType['id']] ?? NULL;
               if ($membership) {
                 if ($membership["membership_type_id.duration_unit:name"] === 'lifetime') {
                   unset($radio[$memType['id']]);
-                  unset($radioOptAttrs[$memType['id']]);
                   $this->assign('hasExistingLifetimeMembership', TRUE);
                   unset($memberships[$memType['id']]);
                   continue;
