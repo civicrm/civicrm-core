@@ -40,7 +40,7 @@ CREATE TABLE `civicrm_grant` (
   `decision_date` date COMMENT 'Date on which grant decision was made.',
   `money_transfer_date` date COMMENT 'Date on which grant money transfer was made.',
   `grant_due_date` date COMMENT 'Date on which grant report is due.',
-  `grant_report_received` tinyint COMMENT 'Yes/No field stating whether grant report was received by donor.',
+  `grant_report_received` tinyint NOT NULL DEFAULT 0 COMMENT 'Yes/No field stating whether grant report was received by donor.',
   `grant_type_id` int unsigned NOT NULL COMMENT 'Type of grant. Implicit FK to civicrm_option_value in grant_type option_group.',
   `amount_total` decimal(20,2) NOT NULL COMMENT 'Requested grant amount, in default currency.',
   `amount_requested` decimal(20,2) COMMENT 'Requested grant amount, in original currency (optional).',
