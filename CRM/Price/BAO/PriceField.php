@@ -372,16 +372,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             'data-amount' => $opt[$valueFieldName],
             'data-currency' => $currencyName,
             'data-price-field-values' => json_encode($customOption),
+            'data-membership-type-id' => $opt['membership_type_id'] ?? NULL,
             'visibility' => $visibility_id,
           ] + $incomingExtra;
-          // @todo - move this back to the only calling function on Contribution_Form_Main.php
-          if ($field->name == 'membership_amount') {
-            $extra += [
-              'onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
-              'membership-type' => $opt['membership_type_id'],
-            ];
-            $qf->assign('membershipFieldID', $field->id);
-          }
 
           $choice[$opt['id']] = CRM_Utils_String::purifyHTML($priceOptionText['label']);
           $choiceAttrs[$opt['id']] = $extra;
@@ -412,7 +405,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
 
           $choice['0'] = '<span class="crm-price-amount-label">' . $none . '</span>';
-          $choiceAttrs['0'] = ['price' => json_encode([$elementName, '0'])];
+          $choiceAttrs['0'] = [
+            'price' => json_encode([$elementName, '0']),
+            'data-membership-type-id' => NULL,
+          ] + $incomingExtra;
         }
 
         $element = &$qf->addRadio($elementName, $label, $choice, [], NULL, FALSE, $choiceAttrs);
