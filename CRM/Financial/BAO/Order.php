@@ -690,7 +690,7 @@ class CRM_Financial_BAO_Order {
           elseif (!empty($option['membership_type_id'])) {
             $membershipType = CRM_Member_BAO_MembershipType::getMembershipType((int) $option['membership_type_id']);
             $metadata[$index]['options'][$optionID]['membership_type_id.auto_renew'] = (int) $membershipType['auto_renew'];
-            $metadata[$index]['supports_auto_renew'] = $membershipType['auto_renew'] ?: (bool) $membershipType['auto_renew'];
+            $metadata[$index]['supports_auto_renew'] = $metadata[$index]['supports_auto_renew'] ?? $membershipType['auto_renew'] ?: (bool) $membershipType['auto_renew'];
           }
           else {
             $metadata[$index]['options'][$optionID]['membership_type_id.auto_renew'] = NULL;
