@@ -560,7 +560,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $this->assign('eventTypeID', $this->_eventTypeId);
 
-    $this->assign('event_is_test', CRM_Utils_Array::value('event_is_test', $defaults));
+    $this->assign('event_is_test', $this->isTest());
     return $defaults;
   }
 
@@ -926,13 +926,16 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $fields, $this->_contactId, NULL, NULL, $ctype);
     }
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, $this->getDefaultEntity());
 
     //do cleanup line  items if participant edit the Event Fee.
     if (($this->getLineItems() || !isset($params['proceSetId'])) && !$this->_paymentId && $this->_id) {
       CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_participant');
     }
-
+    $participants = [];
+    $contactIDS = $this->_contactIds ?: [$this->getContactID()];
+    foreach ($contactIDS as $contactID) {
+      $participants[] = $this->addParticipant($contactID);
+    }
     if ($this->_mode) {
       // add all the additional payment params we need
       $paymentParams = $this->prepareParamsForPaymentProcessor($this->getSubmittedValues());
@@ -979,10 +982,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->_paymentProcessor
       );
 
-      // add participant record
-      $participants = [];
-      $participants[] = $this->addParticipant($contactID);
-
       // Add participant payment
       $participantPaymentParams = [
         'participant_id' => $participants[0]->id,
@@ -994,14 +993,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     else {
       if ($this->_single) {
+        // Still needed?
         $this->_contactIds[] = $this->_contactId;
-      }
-      $participants = [];
-      foreach ($this->_contactIds as $contactID) {
-        $commonParams = $params;
-        $commonParams['source'] = $this->getSourceText();
-        $commonParams['contact_id'] = $contactID;
-        $participants[] = CRM_Event_BAO_Participant::create($commonParams);
       }
 
       $contributions = [];
@@ -1155,11 +1148,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     if (!empty($params['send_receipt'])) {
       $result = $this->sendReceipts($params, $participants);
-    }
-
-    // set the participant id if it is not set
-    if (!$this->_id) {
-      $this->_id = $participants[0]->id;
     }
 
     return $this->getStatusMsg($params, $result['sent'] ?? 0, $result['not_sent'] ?? 0, (string) $updateStatusMsg);
@@ -1572,10 +1560,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $contribParams['contribution_status_id'] = array_search('Pending', $allStatuses);
     }
 
-    $contribParams['is_test'] = 0;
-    if ($this->getAction() & CRM_Core_Action::PREVIEW || ($this->_mode ?? NULL) === 'test') {
-      $contribParams['is_test'] = 1;
-    }
+    $contribParams['is_test'] = $this->isTest();
 
     if (!empty($contribParams['invoice_id'])) {
       $contribParams['id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
@@ -1618,14 +1603,17 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'role_id' => $this->getSubmittedValue('role_id'),
       'register_date' => $this->getSubmittedValue('register_date'),
       'source' => $this->getSourceText(),
-      'fee_level' => $this->order->getAmountLevel(),
       'is_pay_later' => FALSE,
-      'fee_amount' => $this->order->getTotalAmount(),
       'fee_currency' => $this->getCurrency(),
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'note' => $this->getSubmittedValue('note'),
-      'is_test' => ($this->_mode === 'test)'),
+      'is_test' => $this->isTest(),
     ];
+    $order = $this->getOrder();
+    if ($order) {
+      $participantParams['fee_level'] = $order->getAmountLevel();
+      $participantParams['fee_amount'] = $order->getTotalAmount();
+    }
     $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
     $participant = CRM_Event_BAO_Participant::create($participantParams);
 
@@ -1637,7 +1625,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'Participant'
     );
     $transaction->commit();
-
+    $this->_id = $participant->id;
     return $participant;
   }
 
@@ -1867,7 +1855,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       $sendTemplateParams = [
         'workflow' => 'event_offline_receipt',
         'contactId' => $contactID,
-        'isTest' => !empty($this->_defaultValues['is_test']),
+        'isTest' => $this->isTest(),
         'PDFFilename' => ts('confirmation') . '.pdf',
         'modelProps' => [
           'participantID' => $participantID,
@@ -1985,6 +1973,17 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    */
   protected function isOverloadFeesMode(): bool {
     return (bool) ($_GET['eventId'] ?? NULL);
+  }
+
+  /**
+   * Is the form being submitted in test mode.
+   *
+   * @api this function is supported for external use.
+   *
+   * @return bool
+   */
+  public function isTest(): bool {
+    return $this->_mode === 'test';
   }
 
   /**
