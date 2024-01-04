@@ -131,6 +131,11 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
   public function fields() {
     $fields = parent::fields();
     $fields[] = [
+      'name' => 'fk_column',
+      'data_type' => 'String',
+      'description' => 'Name of fk_entity column this field references.',
+    ];
+    $fields[] = [
       'name' => 'dfk_entities',
       'description' => 'List of possible entity types this field could be referencing.',
       'data_type' => 'Array',

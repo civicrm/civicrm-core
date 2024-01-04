@@ -117,6 +117,9 @@ class SpecFormatter {
     elseif (($data['html']['type'] ?? NULL) === 'EntityRef' && !empty($data['pseudoconstant']['table'])) {
       $field->setFkEntity(CoreUtil::getApiNameFromTableName($data['pseudoconstant']['table']));
     }
+    if (!empty($data['FKColumnName'])) {
+      $field->setFkColumn($data['FKColumnName']);
+    }
 
     return $field;
   }
