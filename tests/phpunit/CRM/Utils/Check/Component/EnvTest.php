@@ -18,7 +18,7 @@ class CRM_Utils_Check_Component_EnvTest extends CiviUnitTestCase {
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
   public function testResourceUrlCheck(): void {
-    $check = new \CRM_Utils_Check_Component_Env();
+    $check = new CRM_Utils_Check_Component_Env();
     $failRequest = $check->fileExists('https://civicrm.org', 0.001);
     $successRequest = $check->fileExists('https://civicrm.org', 0);
 
