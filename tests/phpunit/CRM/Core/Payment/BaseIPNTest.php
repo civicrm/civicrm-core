@@ -184,7 +184,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $contribution->loadRelatedObjects($this->_processorId, $this->ids);
     $msg = $contribution->composeMessageArray($this->input, $this->ids);
-    $this->assertStringContainsString('registration has been received and your status has been updated to Attended.', $msg['body']);
+    $this->assertStringContainsString('registration has been received and your status has been updated to<strong> Attended</strong>.', $msg['html']);
     $this->assertStringContainsString('Annual CiviCRM meet', $msg['html']);
   }
 
@@ -197,7 +197,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input, $this->ids);
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertStringContainsString('Thank you for your registration', $msg['body']);
+    $this->assertStringContainsString('Thank you for your registration', $msg['html']);
   }
 
   /**
