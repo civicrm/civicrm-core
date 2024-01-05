@@ -206,7 +206,7 @@
                               <th>{ts}Tax Amount{/ts}</th>
                             {/if}
                           <th>{ts}Total{/ts}</th>
-                          {if !empty($pricesetFieldsCount)}
+                          {if $isShowParticipantCount}
                             <th>{ts}Total Participants{/ts}</th>
                           {/if}
                         </tr>
@@ -228,7 +228,7 @@
                             <td {$tdStyle}>
                               {$line.line_total_inclusive|crmMoney:$currency}
                             </td>
-                            {if !empty($pricesetFieldsCount)}
+                            {if $isShowParticipantCount}
                               <td {$tdStyle}>{$line.participant_count}</td>
                             {/if}
                           </tr>
@@ -300,25 +300,12 @@
                   {contribution.total_amount} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
                 </td>
               </tr>
-              {if !empty($pricesetFieldsCount)}
+              {if $isShowParticipantCount}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Total Participants{/ts}</td>
                   <td {$valueStyle}>
-                    {assign var="count" value= 0}
-                    {foreach from=$lineItem item=pcount}
-                      {assign var="lineItemCount" value=0}
-                      {if $pcount neq 'skip'}
-                        {foreach from=$pcount item=p_count}
-                          {assign var="lineItemCount" value=$lineItemCount+$p_count.participant_count}
-                        {/foreach}
-                        {if $lineItemCount < 1}
-                          {assign var="lineItemCount" value=1}
-                        {/if}
-                        {assign var="count" value=$count+$lineItemCount}
-                      {/if}
-                    {/foreach}
-                    {$count}
+                    {$participantCount}
                   </td>
                 </tr>
               {/if}
