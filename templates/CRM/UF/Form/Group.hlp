@@ -125,7 +125,7 @@
   {ts}Account Creation{/ts}
 {/htxt}
 {htxt id='id-is_cms_user'}
-{ts 1=`$config->userFramework`}If you are using this profile as a contact signup form, using it in an online contribution page OR an event registration page, anonymous users will be given the option to create a %1 User Account as part of completing the form.{/ts}
+{ts 1=$config->userFramework}If you are using this profile as a contact signup form, using it in an online contribution page OR an event registration page, anonymous users will be given the option to create a %1 User Account as part of completing the form.{/ts}
 {if $config->userSystem->is_drupal EQ '1'}
     {ts}This feature requires your Drupal User Settings to allow 'visitors to create accounts' (with or without administrator approval). The 'Email Verification' option may be enabled or disabled.{/ts}
     {ts}If the 'Email Verification' option is enabled, users will receive a welcome email from Drupal with login information. Otherwise they will select a Password inline, and if administrator approval is not required they will be automatically logged in as soon as the transaction is completed.{/ts}
@@ -163,7 +163,7 @@
   {ts}User Link{/ts}
 {/htxt}
 {htxt id='id-is_uf_link'}
-  {ts 1=`$config->userFramework`}Check this box if you want to include a link in the listings to view contacts' %1 user account information (e.g. their 'My Account' page). This link will only be included for contacts who have a user account on your website.{/ts}
+  {ts 1=$config->userFramework}Check this box if you want to include a link in the listings to view contacts' %1 user account information (e.g. their 'My Account' page). This link will only be included for contacts who have a user account on your website.{/ts}
 {/htxt}
 
 {htxt id='id-is_proximity_search-title'}
