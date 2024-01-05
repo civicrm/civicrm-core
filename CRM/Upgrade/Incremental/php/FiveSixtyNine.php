@@ -39,4 +39,10 @@ class CRM_Upgrade_Incremental_php_FiveSixtyNine extends CRM_Upgrade_Incremental_
     );
   }
 
+  public function upgrade_5_69_1($rev): void {
+    $this->addTask('Replace incorrect pay later token',
+      'updateMessageToken', 'membership_online_receipt', 'contribution.pay_later_receipt', 'contribution.contribution_page_id.pay_later_receipt', $rev
+    );
+  }
+
 }
