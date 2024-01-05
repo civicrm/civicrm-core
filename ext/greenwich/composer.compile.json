@@ -8,7 +8,10 @@
       ],
       "watch-files": ["scss", "../../bower_components/select2/select2-bootstrap.css"],
       "scss-files": {"dist/bootstrap3.css": "scss/main.scss"},
-      "scss-imports": ["scss", "extern/bootstrap3/assets/stylesheets", "extern/select2"]
+      "scss-imports": ["scss", "extern/bootstrap3/assets/stylesheets", "extern/select2"],
+      "scss-import-prefixes": {
+        "bootstrap": "scss/bootstrap-override"
+      }
     }
   ]
 }
