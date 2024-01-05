@@ -9,11 +9,11 @@ ADD `fk_entity_on_delete` VARCHAR(255) NOT NULL DEFAULT 'set_null' COMMENT 'Beha
 {if $multilingual}
   {foreach from=$locales item=locale}
     UPDATE `civicrm_uf_group`
-    SET `frontend_title_{$locale}` = `title_{$locale}`, `name` = CONCAT(`title_{$locale}`, `id`);
+    SET `frontend_title_{$locale}` = `title_{$locale}`, `name` = CONCAT(`title_{$locale}`, `id`)
     WHERE `frontend_title_{$locale}` IS NULL OR `frontend_title_{$locale}` = '';
 
     UPDATE `civicrm_uf_group`
-    SET `name` = CONCAT(`title_{$locale}`, `id`);
+    SET `name` = CONCAT(`title_{$locale}`, `id`)
     WHERE `name` IS NULL OR `name` = '';
   {/foreach}
 {else}
