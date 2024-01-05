@@ -296,7 +296,11 @@ function _civicrm_api3_setting_create_spec(&$params) {
  */
 function civicrm_api3_setting_get($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
-  $result = CRM_Core_BAO_Setting::getItems($params, $domains, $params['return'] ?? []);
+  $returnSettings = (array) ($params['return'] ?? []);
+  if (in_array('contribution_invoice_settings', $returnSettings)) {
+    CRM_Core_Error::deprecatedWarning('contribution_invoice_settings is not a valid setting. Request the actual setting');
+  }
+  $result = CRM_Core_BAO_Setting::getItems($params, $domains, $returnSettings);
   return civicrm_api3_create_success($result, $params, 'Setting', 'get');
 }
 

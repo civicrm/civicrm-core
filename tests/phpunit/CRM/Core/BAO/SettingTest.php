@@ -70,50 +70,6 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test temporary retrieval & setting of converted settings.
-   *
-   * As a transitional measure we allow the settings that were munged into
-   * contribution_invoice_setting. This tests that the current method of getting via the 'old' key
-   * works. This will be deprecated & removed over the next few versions but
-   * 1) some extensions use these settings &
-   * 2) there is a lot of work to fix this mess in core so a transitional method makes sense.
-   *
-   * https://lab.civicrm.org/dev/core/issues/1558
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testHandlingOfContributionInvoiceSetting(): void {
-    $contributionSettings = [
-      'invoice_prefix' => 'G_',
-      'credit_notes_prefix' => 'XX_',
-      'due_date' => '20',
-      'due_date_period' => 'weeks',
-      'notes' => '<p>Give me money</p>',
-      'tax_term' => 'Extortion',
-      'tax_display_settings' => 'Exclusive',
-      // NOTE: This form of `invoicing` is accepted, but it may be normalized to the idiomatic form with a nested array.
-      'invoicing' => 1,
-      'is_email_pdf' => '1',
-    ];
-    Civi::settings()->set('contribution_invoice_settings', $contributionSettings);
-    $settingsFromGet = Civi::settings()->get('contribution_invoice_settings');
-    $settingsFromAPI = $this->callAPISuccess('Setting', 'get', ['return' => 'contribution_invoice_settings'])['values'][CRM_Core_Config::domainID()]['contribution_invoice_settings'];
-    $getVersion = $this->callAPISuccessGetValue('Setting', ['name' => 'contribution_invoice_settings']);
-    $this->assertEquals($settingsFromAPI, $settingsFromGet);
-    $this->assertAPIArrayComparison($getVersion, $settingsFromGet);
-    $this->assertEquals(['invoicing' => ['invoicing' => 1]] + $contributionSettings, $settingsFromGet);
-
-    // These are the preferred retrieval methods.
-    $this->assertEquals('G_', Civi::settings()->get('invoice_prefix'));
-    $this->assertEquals('XX_', Civi::settings()->get('credit_notes_prefix'));
-    $this->assertEquals('20', Civi::settings()->get('invoice_due_date'));
-    $this->assertEquals('weeks', Civi::settings()->get('invoice_due_date_period'));
-    $this->assertEquals('<p>Give me money</p>', Civi::settings()->get('invoice_notes'));
-    $this->assertEquals('Extortion', Civi::settings()->get('tax_term'));
-    $this->assertEquals('Exclusive', Civi::settings()->get('tax_display_settings'));
-  }
-
-  /**
    * Ensure that overrides in $civicrm_setting apply when
    * using getItem($group,$name).
    */

@@ -270,6 +270,7 @@ class SettingsBag {
    */
   public function updateVirtual($key, $value) {
     if ($key === 'contribution_invoice_settings') {
+      \CRM_Core_Error::deprecatedWarning('Invoicing settings should be directly accessed - eg Civi::setting()->set("invoicing")');
       foreach (SettingsBag::getContributionInvoiceSettingKeys() as $possibleKeyName => $settingName) {
         $keyValue = $value[$possibleKeyName] ?? '';
         if ($possibleKeyName === 'invoicing' && is_array($keyValue)) {
