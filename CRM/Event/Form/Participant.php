@@ -1995,13 +1995,13 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
    * @noinspection PhpDocSignatureIsNotCompleteInspection
    */
   public function getContactID():?int {
+    // Always set it back to the submitted value if there is one - this is to prevent it being set in
+    // proProcess & then ignoring the actual submitted value in post-process.
+    if ($this->getSubmittedValue('contact_id')) {
+      $this->_contactID = $this->getSubmittedValue('contact_id');
+    }
     if ($this->_contactID === NULL) {
-      if ($this->getSubmittedValue('contact_id')) {
-        $contactID = $this->getSubmittedValue('contact_id');
-      }
-      else {
-        $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-      }
+      $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
       if (!$contactID && $this->getParticipantID()) {
         $contactID = $this->getParticipantValue('contact_id');
       }
