@@ -235,6 +235,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     // Adding this is preparatory to smarty 3....
     if (!function_exists('smarty_function_eval') && !file_exists(SMARTY_DIR . '/plugins/function.eval.php')) {
       $smarty = $this->_tpl;
+      $tplSource = trim($tplSource);
       $smarty->assign('var', $tplSource);
       return $smarty->fetch("string:$tplSource");
     }
