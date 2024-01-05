@@ -326,6 +326,21 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportNonDefaultCountryState(): void {
+    \Civi::settings()->set('defaultContactCountry', 1228);
+    $this->validateCSV('individual_country_state.csv', [
+      ['first_name'],
+      ['last_name'],
+      ['state_province', 'Primary'],
+      ['country', 'Primary'],
+    ]);
+    $dataSource = $this->getDataSource();
+    $row = $dataSource->getRow();
+  }
+
+    /**
    * Test updating an existing contact with external_identifier match but
    * subtype mismatch.
    *
