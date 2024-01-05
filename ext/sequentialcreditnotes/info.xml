@@ -14,8 +14,8 @@
     <url desc="Support">https://lab.civicrm.org/extensions/sequentialcreditnotes</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2023-12-08</releaseDate>
-  <version>5.70.alpha1</version>
+  <releaseDate>2024-01-05</releaseDate>
+  <version>5.70.beta1</version>
   <tags>
     <tag>mgmt:hidden</tag>
   </tags>
