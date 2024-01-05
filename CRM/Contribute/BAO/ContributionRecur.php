@@ -290,6 +290,9 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
         'contribution_status_id:name' => 'Cancelled',
         'cancel_reason' => $params['cancel_reason'] ?? NULL,
         'cancel_date' => $params['cancel_date'] ?? 'now',
+        // reset the next_sched_contribution_date and failure_retry_date to null if cancel recur
+        'next_sched_contribution_date' => NULL,
+        'failure_retry_date' => NULL,
       ])->execute();
 
     // @todo - all of this should be moved to the post hook.
