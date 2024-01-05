@@ -3539,8 +3539,8 @@ SELECT  group_id
    * @throws \CRM_Core_Exception
    */
   public static function getFrontEndTitle(int $profileID) {
-    $profile = civicrm_api3('UFGroup', 'getsingle', ['id' => $profileID, 'return' => ['title', 'frontend_title']]);
-    return $profile['frontend_title'] ?? $profile['title'];
+    $profile = civicrm_api3('UFGroup', 'getsingle', ['id' => $profileID, 'return' => ['frontend_title']]);
+    return $profile['frontend_title'];
   }
 
   /**
