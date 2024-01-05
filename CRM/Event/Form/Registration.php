@@ -1602,6 +1602,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $primaryContactId = $this->get('primaryContactId');
 
     //build an array of custom profile and assigning it to template.
+    // @todo - don't call buildCustomProfile to get additionalParticipants.
+    // CRM_Event_BAO_Participant::getAdditionalParticipantIds is a better fit.
     $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID, NULL,
       $primaryContactId, $isTest, TRUE
     );

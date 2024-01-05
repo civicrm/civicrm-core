@@ -779,6 +779,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     else {
 
       //build an array of cId/pId of participants
+      // @todo - don't call buildCustomProfile to get additionalParticipants.
+      // CRM_Event_BAO_Participant::getAdditionalParticipantIds is a better fit.
       $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID,
         NULL, $primaryContactId, $isTest,
         TRUE

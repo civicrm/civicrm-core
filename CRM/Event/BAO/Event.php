@@ -1187,13 +1187,13 @@ WHERE civicrm_event.is_active = 1
 
         $sendTemplateParams = [
           'workflow' => 'event_online_receipt',
-          'contactId' => $contactID,
           'isTest' => $isTest,
           'tplParams' => $tplParams,
           'PDFFilename' => ts('confirmation') . '.pdf',
           'modelProps' => [
             'participantID' => (int) $participantId,
             'eventID' => (int) $values['event']['id'],
+            'contactID' => (int) $contactID,
           ],
         ];
 
