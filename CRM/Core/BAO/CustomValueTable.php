@@ -630,6 +630,14 @@ AND    cf.id IN ( $fieldIDList )
         if (is_array($fieldValue['value']) && CRM_Core_BAO_CustomField::isSerialized($dao)) {
           $fieldValue['value'] = CRM_Utils_Array::implodePadded($fieldValue['value']);
         }
+
+        if ($dataType == 'Timestamp') {
+          // Replace format YYYY-MM-DD HH:MM:SS with YYYYMMDDHHMMSS
+          if (preg_match('/^\d{4}\-\d{2}\-\d{2}\s\d{2}\:\d{2}\:\d{2}$/', $fieldValue['value'])) {
+            $fieldValue['value'] = str_replace(['-', ' ', ':'], "", $fieldValue['value']);
+          }
+        }
+
         // Format null values correctly
         if ($fieldValue['value'] === NULL || $fieldValue['value'] === '') {
           switch ($dataType) {
