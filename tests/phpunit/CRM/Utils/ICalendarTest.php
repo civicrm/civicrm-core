@@ -165,14 +165,15 @@ class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
     ];
     $this->eventCreateUnpaid($eventParameters);
 
+    $expectedDate = date('Ymd', strtotime('tomorrow'));
     $info = CRM_Event_BAO_Event::getCompleteInfo(NULL, NULL, $this->getEventId());
     $calendar = explode("\n", CRM_Utils_ICalendar::createCalendarFile($info));
     $expectedLines = [
       "TZID:America/Los_Angeles" => FALSE,
-      "DTSTART:20240104T190000" => FALSE,
-      "DTSTAMP;TZID=America/Los_Angeles:20240104T190000" => FALSE,
-      "DTSTART;TZID=America/Los_Angeles:20240104T190000" => FALSE,
-      "DTEND;TZID=America/Los_Angeles:20240104T200000" => FALSE,
+      "DTSTART:{$expectedDate}T190000" => FALSE,
+      "DTSTAMP;TZID=America/Los_Angeles:{$expectedDate}T190000" => FALSE,
+      "DTSTART;TZID=America/Los_Angeles:{$expectedDate}T190000" => FALSE,
+      "DTEND;TZID=America/Los_Angeles:{$expectedDate}T200000" => FALSE,
     ];
     foreach ($calendar as $line) {
       $line = trim($line);
