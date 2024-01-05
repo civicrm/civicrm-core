@@ -182,6 +182,9 @@
     <default>0</default>
     <required>true</required>
     <import>true</import>
+    <html>
+      <type>Radio</type>
+    </html>
     <add>1.7</add>
   </field>
   <field>
@@ -193,6 +196,9 @@
     <required>true</required>
     <import>true</import>
     <headerPattern>/(is.)?(pay(.)?later)$/i</headerPattern>
+    <html>
+      <type>Radio</type>
+    </html>
     <add>2.1</add>
   </field>
 
@@ -205,6 +211,9 @@
     <headerPattern>/fee(.?am(ou)?nt)?/i</headerPattern>
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <comment>actual processor fee if known - may be 0.</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>2.1</add>
   </field>
   <field>
