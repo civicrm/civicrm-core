@@ -230,7 +230,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testTaxMultipleParticipant(): void {
-    $this->swapMessageTemplateForTestTemplate('event_online_receipt', 'text');
     $this->createLoggedInUser();
     $this->createScenarioMultipleParticipantPendingWithTax();
 
@@ -247,8 +246,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(660, $contribution['total_amount'], 'Invalid Tax amount.');
     $mailSent = $this->sentMail;
     $this->assertCount(3, $mailSent, 'Three mails should have been sent to the 3 participants.');
-    $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[0]['body']);
-    $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[1]['body']);
+    $this->assertStringContainsString('Dear Participant1', $mailSent[0]['body']);
+    $this->assertStringContainsString('Dear Participant2', $mailSent[1]['body']);
     $mut = new CiviMailUtils($this);
     $this->validateAllContributions();
     $this->validateAllPayments();
@@ -256,12 +255,11 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $mailSent = $mut->getAllMessages();
     $this->assertCount(3, $mailSent);
 
-    $this->assertStringContainsString('participant_status:::Registered', $mailSent[0]);
-    $this->assertStringContainsString('Dear Participant2', $mailSent[0]);
+    $this->assertStringContainsString('Registered', $mailSent[0]);
 
-    $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[0]);
-    $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 2), $mailSent[1]);
-    $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[2]);
+    $this->assertStringContainsString('Dear Participant1', $mailSent[2]);
+    $this->assertStringContainsString('Dear Participant2', $mailSent[0]);
+    $this->assertStringContainsString('Dear Participant3', $mailSent[1]);
   }
 
   /**
