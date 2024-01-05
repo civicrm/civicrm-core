@@ -292,6 +292,7 @@ trait EventTestTrait {
     try {
       $this->setTestEntity('UFJoin', UFJoin::create(FALSE)->setValues([
         'module' => $additionalSuffix ? 'CiviEvent_Additional' : 'CiviEvent',
+        'entity_table' => 'civicrm_event',
         'uf_group_id:name' => $profileName,
         'entity_table' => 'civicrm_event',
         'entity_id' => $this->getEventID($identifier),

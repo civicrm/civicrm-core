@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+use Civi\Api4\Participant;
 use Civi\Test\FormTrait;
 
 /**
@@ -232,8 +234,9 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   public function testTaxMultipleParticipant(): void {
     $this->createLoggedInUser();
     $this->createScenarioMultipleParticipantPendingWithTax();
-
-    $participants = $this->callAPISuccess('Participant', 'get', [])['values'];
+    $participants = Participant::get()
+      ->addWhere('event_id', '=', $this->getEventID())
+      ->addSelect('contact_id', 'contact_id.job_title')->execute();
     $this->assertCount(3, $participants);
     $contribution = $this->callAPISuccessGetSingle(
       'Contribution',
@@ -246,8 +249,25 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(660, $contribution['total_amount'], 'Invalid Tax amount.');
     $mailSent = $this->sentMail;
     $this->assertCount(3, $mailSent, 'Three mails should have been sent to the 3 participants.');
+
+    // The first one is the primary & has the job titles for all 3.
     $this->assertStringContainsString('Dear Participant1', $mailSent[0]['body']);
+    $this->assertStringContainsString('job_title	oracle', $mailSent[0]['body']);
+    $this->assertStringContainsString('job_title	wizard', $mailSent[0]['body']);
+    $this->assertStringContainsString('job_title	seer', $mailSent[0]['body']);
+
+    // The second has only it's own job title.
     $this->assertStringContainsString('Dear Participant2', $mailSent[1]['body']);
+    $this->assertStringNotContainsString('job_title	oracle', $mailSent[1]['body']);
+    $this->assertStringContainsString('job_title	wizard', $mailSent[1]['body']);
+    $this->assertStringNotContainsString('job_title	seer', $mailSent[1]['body']);
+
+    // The third has only it's own job title.
+    $this->assertStringContainsString('Dear Participant3', $mailSent[2]['body']);
+    $this->assertStringNotContainsString('job_title	oracle', $mailSent[2]['body']);
+    $this->assertStringNotContainsString('job_title	wizard', $mailSent[2]['body']);
+    $this->assertStringContainsString('job_title	seer', $mailSent[2]['body']);
+
     $mut = new CiviMailUtils($this);
     $this->validateAllContributions();
     $this->validateAllPayments();
@@ -258,8 +278,19 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertStringContainsString('Registered', $mailSent[0]);
 
     $this->assertStringContainsString('Dear Participant1', $mailSent[2]);
+    $this->assertStringContainsString('job_title	oracle', $mailSent[2]);
+    // Note the delayed version does not add the additional participant profiles
+    // This could be fixed at some point so no assertions added.
+
     $this->assertStringContainsString('Dear Participant2', $mailSent[0]);
+    $this->assertStringNotContainsString('job_title	oracle', $mailSent[0]);
+    $this->assertStringContainsString('job_title	wizard', $mailSent[0]);
+    $this->assertStringNotContainsString('job_title	seer', $mailSent[0]);
+
     $this->assertStringContainsString('Dear Participant3', $mailSent[1]);
+    $this->assertStringNotContainsString('job_title	oracle', $mailSent[1]);
+    $this->assertStringNotContainsString('job_title	wizard', $mailSent[1]);
+    $this->assertStringContainsString('job_title	seer', $mailSent[1]);
   }
 
   /**
