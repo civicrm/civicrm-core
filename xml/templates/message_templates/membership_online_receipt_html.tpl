@@ -25,7 +25,7 @@
      <p>{$userText}</p>
     {/if}
     {if {contribution.balance_amount|boolean} && {contribution.is_pay_later|boolean}}
-      <p>{contribution.pay_later_receipt}</p>
+      <p>{contribution.contribution_page_id.pay_later_receipt}</p>
     {/if}
 
    </td>

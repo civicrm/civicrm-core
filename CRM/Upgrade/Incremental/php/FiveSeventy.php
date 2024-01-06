@@ -31,4 +31,10 @@ class CRM_Upgrade_Incremental_php_FiveSeventy extends CRM_Upgrade_Incremental_Ba
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
+  public function upgrade_5_70_beta1($rev): void {
+    $this->addTask('Replace incorrect pay later token',
+      'updateMessageToken', 'membership_online_receipt', 'contribution.pay_later_receipt', 'contribution.contribution_page_id.pay_later_receipt', $rev
+    );
+  }
+
 }
