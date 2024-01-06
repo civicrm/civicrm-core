@@ -380,58 +380,26 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
-   * Submit (unpaid) event registration with a note field
-   *
-   * @param array $event
-   * @param int|null $contact_id
-   *
-   * @return array
-   */
-  private function submitWithNote(array $event, ?int $contact_id): array {
-    if ($contact_id === NULL) {
-      $contact_id = $this->createLoggedInUser();
-    }
-    $mut = new CiviMailUtils($this, TRUE);
-    $this->submitForm($event['id'], [
-      [
-        'email-Primary' => 'demo@example.com',
-        'note' => $event['note'],
-      ],
-    ]);
-    $participant = $this->callAPISuccessGetSingle('Participant', []);
-    $mut->checkMailLog(['Comment', $event['note'] . chr(0x0A)]);
-    $mut->stop();
-    $mut->clearMessages();
-    //return ['contact_id' => $contact_id, 'participant_id' => $participant['id']];
-    return [$contact_id, $participant['id']];
-  }
-
-  /**
    * Create an event with a "pre" profile
    *
    * @throws \CRM_Core_Exception
    */
-  private function creatEventWithProfile($event): array {
-    if (empty($event)) {
-      $event = $this->eventCreateUnpaid();
-      $this->createJoinedProfile(['entity_table' => 'civicrm_event', 'entity_id' => $event['id']]);
-      $this->addUFField($this->ids['UFGroup']['our profile'], 'note', 'Contact', 'Comment');
+  private function submitEventWithNoteInProfile($note): void {
+    if (empty($this->ids['Event'])) {
+      $this->eventCreateUnpaid();
+      $this->addUFField($this->ids['UFGroup']['event_post_post_event'], 'note', 'Contact', 'Comment');
     }
 
-    $_REQUEST['id'] = $event['id'];
-    /** @var \CRM_Event_Form_Registration_Confirm $form */
-    $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm');
-    $form->preProcess();
-
-    CRM_Event_Form_Registration_Confirm::assignProfiles($form);
-
-    $smarty = CRM_Core_Smarty::singleton();
-    $tplVar = $smarty->getTemplateVars();
-    $this->assertEquals([
-      'CustomPre' => ['First Name' => NULL, 'Comment' => NULL],
-      'CustomPreGroupTitle' => 'Public title',
-    ], $tplVar['primaryParticipantProfile']);
-    return $event;
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'email-Primary' => 'demo@example.com',
+      'note' => $note,
+      'job_title' => 'Magician',
+    ], ['id' => $this->getEventID()])->addSubsequentForm('CRM_Event_Form_Registration_Confirm');
+    $form->processForm();
+    $form->checkTemplateVariable('primaryParticipantProfile', [
+      'CustomPre' => ['Comment' => $note, 'job_title' => 'Magician'],
+      'CustomPreGroupTitle' => 'Public Event Post Post Profile',
+    ]);
   }
 
   /**
@@ -469,26 +437,24 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   public function testNoteSubmission(): void {
     // Create an event with an attached profile containing a note
-    $event = $this->creatEventWithProfile(NULL);
-    $event['custom_pre_id'] = $this->ids['UFGroup']['our profile'];
-    $event['note'] = 'This is note 1';
-    [$contact_id, $participant_id] = $this->submitWithNote($event, NULL);
-
-    civicrm_api3('Participant', 'delete', ['id' => $participant_id]);
+    $this->submitEventWithNoteInProfile('This is note 1');
+    $participant = $this->callAPISuccessGetSingle('Participant', []);
+    $this->assertMailSentContainingStrings(['Comment', 'This is note 1']);
+    $this->callAPISuccess('Participant', 'delete', ['id' => $participant['id']]);
 
     //now that the contact has one note, register this contact again with a different note
     //and confirm that the note shown in the email is the current one
-    $event = $this->creatEventWithProfile($event);
-    $event['custom_pre_id'] = $this->ids['UFGroup']['our profile'];
-    $event['note'] = 'This is note 2';
-    [$contact_id, $participant_id] = $this->submitWithNote($event, $contact_id);
-    civicrm_api3('Participant', 'delete', ['id' => $participant_id]);
+    // Create an event with an attached profile containing a note
+    $this->submitEventWithNoteInProfile('This is note 2');
+    $participant = $this->callAPISuccessGetSingle('Participant', []);
+    $this->assertMailSentContainingStrings(['Comment', 'This is note 2']);
+    $this->callAPISuccess('Participant', 'delete', ['id' => $participant['id']]);
 
     //finally, submit a blank note and confirm that the note shown in the email is blank
-    $event = $this->creatEventWithProfile($event);
-    $event['custom_pre_id'] = $this->ids['UFGroup']['our profile'];
-    $event['note'] = '';
-    $this->submitWithNote($event, $contact_id);
+    $this->submitEventWithNoteInProfile('');
+    $participant = $this->callAPISuccessGetSingle('Participant', []);
+    $this->assertMailSentNotContainingString('This is note');
+    $this->callAPISuccess('Participant', 'delete', ['id' => $participant['id']]);
   }
 
   /**

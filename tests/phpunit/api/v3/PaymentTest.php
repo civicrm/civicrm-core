@@ -287,7 +287,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentEmailReceiptFullyPaid(): void {
     $mut = new CiviMailUtils($this);
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviContribute', 'edit contributions', 'access CiviCRM'];
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviContribute', 'edit contributions', 'access CiviCRM', 'profile listings and forms'];
     $contribution = $this->createPartiallyPaidParticipantOrder();
 
     $params = [
