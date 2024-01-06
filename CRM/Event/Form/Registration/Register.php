@@ -600,8 +600,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $required = FALSE;
     }
 
-    $className = CRM_Utils_System::getClassName($form);
-
     //build the priceset fields.
     if ($priceSetID) {
 
@@ -616,26 +614,24 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
       foreach ($form->_feeBlock as $field) {
         // public AND admin visibility fields are included for back-office registration and back-office change selections
-        if (($field['visibility'] ?? NULL) == 'public' ||
-          (($field['visibility'] ?? NULL) == 'admin' && $adminFieldVisible == TRUE) ||
-          $className == 'CRM_Event_Form_ParticipantFeeSelection'
+        if (($field['visibility'] ?? NULL) === 'public' ||
+          (($field['visibility'] ?? NULL) === 'admin' && $adminFieldVisible == TRUE)
         ) {
           $fieldId = $field['id'];
           $elementName = 'price_' . $fieldId;
 
           $isRequire = $field['is_required'] ?? NULL;
-          if ($button == 'skip') {
+          if ($button === 'skip') {
             $isRequire = FALSE;
           }
 
           //user might modified w/ hook.
           $options = $field['options'] ?? NULL;
-          $formClasses = ['CRM_Event_Form_ParticipantFeeSelection'];
 
           if (!is_array($options)) {
             continue;
           }
-          elseif ($hideAdminValues && !in_array($className, $formClasses)) {
+          if ($hideAdminValues) {
             $publicVisibilityID = CRM_Price_BAO_PriceField::getVisibilityOptionID('public');
             $adminVisibilityID = CRM_Price_BAO_PriceField::getVisibilityOptionID('admin');
 
