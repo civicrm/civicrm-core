@@ -178,7 +178,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     CRM_Event_Form_Registration::initEventFee($this, $this->_action !== CRM_Core_Action::UPDATE, $this->getPriceSetID());
-    CRM_Event_Form_Registration_Register::buildAmount($this, TRUE, NULL, $this->getPriceSetID());
+    $this->buildAmount($this, TRUE, NULL, $this->getPriceSetID());
 
     if (!CRM_Utils_System::isNull($this->_values['line_items'] ?? NULL)) {
       $lineItem[] = $this->_values['line_items'];
@@ -228,6 +228,86 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     $this->addButtons($buttons);
     $this->addFormRule(['CRM_Event_Form_ParticipantFeeSelection', 'formRule'], $this);
+  }
+
+  /**
+   * Build the radio/text form elements for the amount field
+   *
+   * @internal function is not currently called by any extentions in our civi
+   * 'universe' and is not supported for such use. Signature has changed & will
+   * change again.
+   *
+   * @param CRM_Event_Form_Registration_Register $form
+   *   Form object.
+   * @param int|null $discountId
+   *   Discount id for the event.
+   * @param int|null $priceSetID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function buildAmount($form, $discountId, $priceSetID) {
+    $feeFields = $form->_values['fee'] ?? NULL;
+
+    if (is_array($feeFields)) {
+      $form->_feeBlock = &$form->_values['fee'];
+    }
+
+    //check for discount.
+    $discountedFee = $form->_values['discount'] ?? NULL;
+    if (is_array($discountedFee) && !empty($discountedFee)) {
+      if (!$discountId) {
+        $form->_discountId = $discountId = CRM_Core_BAO_Discount::findSet($form->_eventId, 'civicrm_event');
+      }
+      if ($discountId) {
+        $form->_feeBlock = &$form->_values['discount'][$discountId];
+      }
+    }
+    if (!is_array($form->_feeBlock)) {
+      $form->_feeBlock = [];
+    }
+
+    //its time to call the hook.
+    CRM_Utils_Hook::buildAmount('event', $form, $form->_feeBlock);
+
+    //format price set fields across option full.
+    CRM_Event_Form_Registration_Register::formatFieldsForOptionFull($form);
+    // This is probably not required now - normally loaded from event ....
+    $form->add('hidden', 'priceSetId', $priceSetID);
+
+    foreach ($form->_feeBlock as $field) {
+      $fieldId = $field['id'];
+      $elementName = 'price_' . $fieldId;
+
+      $isRequire = $field['is_required'] ?? NULL;
+
+      //user might modified w/ hook.
+      $options = $field['options'] ?? NULL;
+
+      if (!is_array($options)) {
+        continue;
+      }
+
+      $optionFullIds = CRM_Utils_Array::value('option_full_ids', $field, []);
+
+      //soft suppress required rule when option is full.
+      if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {
+        $isRequire = FALSE;
+      }
+      if (!empty($options)) {
+        //build the element.
+        CRM_Price_BAO_PriceField::addQuickFormElement($form,
+          $elementName,
+          $fieldId,
+          FALSE,
+          $isRequire,
+          NULL,
+          $options,
+          $optionFullIds
+        );
+      }
+    }
+    $form->_priceSet['id'] ??= $priceSetID;
+    $form->assign('priceSet', $form->_priceSet);
   }
 
   /**
