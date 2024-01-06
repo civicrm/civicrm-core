@@ -83,7 +83,7 @@ updateFile("sql/test_data_second_domain.mysql", function ($content) use ($newVer
 });
 
 updateFile("js/version.json", function () use ($newVersion) {
-  return json_encode($newVersion) . '\n';
+  return json_encode($newVersion) . "\n";
 });
 
 // Update core extensions if this is a stable release
