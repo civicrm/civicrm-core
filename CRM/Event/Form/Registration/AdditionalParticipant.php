@@ -501,7 +501,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         $totalParticipants = self::getParticipantCount($self, $allParticipantParams);
 
         //validate price field params.
-        $priceSetErrors = self::validatePriceSet($self, $allParticipantParams);
+        $priceSetErrors = $self->validatePriceSet($allParticipantParams);
         $errors = array_merge($errors, CRM_Utils_Array::value($addParticipantNum, $priceSetErrors, []));
 
         if (!$self->_allowConfirmation &&
