@@ -5,13 +5,32 @@ $deletedFiles = [];
 // CRM_Upgrade_Form::MINIMUM_UPGRADABLE_VERSION
 $minVer = '4.6.0';
 
+// Ignore deleted files in these directories.
+// Because this list is primarily for consumption by sites that install
+// from a zip file, tests and tools should not be there anyway.
+$excludeDirectories = [
+  'tests',
+  'tools',
+];
+
 function parseLog($logString, &$deletedFiles, $prefix = '') {
+  global $excludeDirectories;
   $log = preg_split("/\r\n|\n|\r/", $logString);
   foreach ($log as $line) {
     $matches = [];
     preg_match('#delete[ ]+mode[ ]+[0-9]+[ ]+([^ ]+)#', $line, $matches);
     $fileName = $matches[1] ?? NULL;
-    if ($fileName && $fileName !== '1' && !file_exists($prefix . $fileName)) {
+    // No filename or name doesn't make sense
+    if (!$fileName || $fileName === '1') {
+      continue;
+    }
+    // Exclude files from $excludeDirectories
+    foreach ($excludeDirectories as $excludeDirectory) {
+      if (!$prefix && (str_starts_with($fileName, "$excludeDirectory/"))) {
+        continue 2;
+      }
+    }
+    if (!file_exists($prefix . $fileName)) {
       // Was the file deleted or was the entire directory deleted?
       $path = explode('/', $prefix . $fileName);
       array_pop($path);

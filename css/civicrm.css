@@ -1905,7 +1905,6 @@ input.crm-form-entityref {
   cursor: pointer;
   border: 1px solid #3e3e3e;
   display: inline-block;
-  overflow: hidden;
   line-height: 135%;
   border-radius: 3px;
 }
