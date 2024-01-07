@@ -851,7 +851,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       //format params.
       $formatted = self::formatPriceSetParams($form, $fields);
       $ppParams = [$formatted];
-      $priceSetErrors = self::validatePriceSet($form, $ppParams);
+      $priceSetErrors = $form->validatePriceSet($ppParams);
       $primaryParticipantCount = self::getParticipantCount($form, $ppParams);
 
       //get price set fields errors in.

@@ -1232,18 +1232,17 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * User should select at least one price field option.
    *
-   * @param CRM_Core_Form $form
    * @param array $params
    *
    * @return array
    */
-  public static function validatePriceSet(&$form, $params) {
+  protected function validatePriceSet($params) {
     $errors = [];
     $hasOptMaxValue = FALSE;
     if (!is_array($params) || empty($params)) {
       return $errors;
     }
-
+    $form = $this;
     $currentParticipantNum = substr($form->_name, 12);
     if (!$currentParticipantNum) {
       $currentParticipantNum = 0;
