@@ -346,13 +346,6 @@
     <add>5.60</add>
   </field>
   <index>
-    <name>UI_label_custom_group_id</name>
-    <fieldName>label</fieldName>
-    <fieldName>custom_group_id</fieldName>
-    <unique>true</unique>
-    <add>1.1</add>
-  </index>
-  <index>
     <name>UI_name_custom_group_id</name>
     <fieldName>name</fieldName>
     <fieldName>custom_group_id</fieldName>
