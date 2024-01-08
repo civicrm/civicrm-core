@@ -14,6 +14,7 @@
  * @group headless
  */
 class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
+  use CRM_Core_Payment_AuthorizeNetTrait;
 
   protected $_financialTypeId;
   protected $_contributionParams;
