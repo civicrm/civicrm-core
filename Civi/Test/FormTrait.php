@@ -63,7 +63,7 @@ trait FormTrait {
    * @param array $strings
    * @param int $mailIndex
    */
-  protected function assertMailSentNotContainStrings(array $strings, int $mailIndex = 0): void {
+  protected function assertMailSentNotContainingStrings(array $strings, int $mailIndex = 0): void {
     foreach ($strings as $string) {
       $this->assertMailSentNotContainingString($string, $mailIndex);
     }
