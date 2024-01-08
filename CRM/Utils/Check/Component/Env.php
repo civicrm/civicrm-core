@@ -246,11 +246,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    * @param bool $force
    * @return CRM_Utils_Check_Message[]
    */
-  public function checkDefaultMailbox($force = FALSE) {
+  public function checkDefaultMailbox($force = FALSE): array {
     $messages = [];
 
     // CiviMail doesn't work in non-production environments; skip.
-    if (!$force && CRM_Core_Config::environment() != 'Production') {
+    if (!$force && CRM_Core_Config::environment() !== 'Production') {
       return $messages;
     }
 
@@ -1120,21 +1120,60 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
-  public function checkPHPIntlExists() {
+  public function checkPHPIntlExists(): array {
     $messages = [];
     if (!extension_loaded('intl')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('This system currently does not have the PHP-Intl extension enabled.  Please contact your system administrator about getting the extension enabled.'),
         ts('Missing PHP Extension: INTL'),
-        \Psr\Log\LogLevel::WARNING,
+        LogLevel::WARNING,
         'fa-server'
       );
     }
     return $messages;
   }
 
-  public function checkAngularModuleSettings() {
+  /**
+   * Let people know if they could improve performance by defining the exclude directory.
+   *
+   * @return array
+   */
+  public function checkExcludeDirectories(): array {
+    $messages = [];
+    if (!defined('CIVICRM_EXCLUDE_DIRS_PATTERN')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('You can improve performance by defining the CIVICRM_EXCLUDE_DIRS_PATTERN in your civicrm.settings.php file. See <a href="https://docs.civicrm.org/sysadmin/en/latest/setup/optimizations/#exclude-dirs-that-do-not-need-to-be-scanned" target="_blank">documentation</a>.'),
+        ts('Performance can be improved by configuring the exclude directories path'),
+        LogLevel::NOTICE,
+        'fa-flag'
+      );
+    }
+    return $messages;
+  }
+
+  /**
+   * Let people know if they could improve performance by defining the template compile check.
+   *
+   * @return array
+   */
+  public function checkTemplateCompileCheck(): array {
+    $messages = [];
+    $isProbablyDevelopmentSite = str_contains(CIVICRM_UF_BASEURL, 'localhost') || str_contains(CIVICRM_UF_BASEURL, 'staging') || str_contains(CIVICRM_UF_BASEURL, 'dev');
+    if (!defined('CIVICRM_TEMPLATE_COMPILE_CHECK') && !$isProbablyDevelopmentSite && !\Civi::settings()->get('debug_enabled')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('You can improve performance on production sites by specifying the CIVICRM_TEMPLATE_COMPILE_CHECK in the civicrm.settings.php file. See <a href="https://docs.civicrm.org/sysadmin/en/latest/setup/optimizations/#disable-compile-check" target="_blank">documentation</a>'),
+        ts('Performance can be improved on live sites by defining the template compile check'),
+        LogLevel::NOTICE,
+        'fa-flag'
+      );
+    }
+    return $messages;
+  }
+
+  public function checkAngularModuleSettings(): array {
     $messages = [];
     $modules = Civi::container()->get('angular')->getModules();
     foreach ($modules as $name => $module) {
@@ -1147,7 +1186,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
             3 => 'target="_blank" href="https://github.com/civicrm/civicrm-core/pull/19052"',
           ]),
           ts('Unsupported Angular Setting'),
-          \Psr\Log\LogLevel::WARNING,
+          LogLevel::WARNING,
           'fa-code'
         );
       }
@@ -1155,7 +1194,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
-  public function checkForMultipleL10NDirs() {
+  public function checkForMultipleL10NDirs(): array {
     $messages = [];
     $dirs = [];
 
@@ -1191,7 +1230,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ts('There are multiple l10n directories, listed below. The one that appears to be in use is %1. You may wish to remove the others to avoid confusion when updating translation files.', [1 => $current_l10n])
           . '<p><ul>' . $dirlist . '</ul></p>',
         ts('Multiple l10n Directories'),
-        \Psr\Log\LogLevel::WARNING,
+        LogLevel::WARNING,
         'fa-files-o'
       );
     }
@@ -1200,8 +1239,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Avoid issues with trailing slashes and mixed separators on windows.
+   *
+   * @param string $path
+   *
+   * @return string
    */
-  private static function normalizePath($path) {
+  private static function normalizePath($path): string {
     return rtrim(str_replace(DIRECTORY_SEPARATOR, '/', $path), '/');
   }
 
