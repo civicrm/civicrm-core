@@ -1243,10 +1243,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       return $errors;
     }
     $form = $this;
-    $currentParticipantNum = substr($form->_name, 12);
-    if (!$currentParticipantNum) {
-      $currentParticipantNum = 0;
-    }
 
     $priceSetId = $form->get('priceSetId');
     $priceSetDetails = $form->get('priceSet');
