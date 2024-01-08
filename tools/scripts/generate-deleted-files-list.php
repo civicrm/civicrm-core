@@ -17,9 +17,26 @@ function parseLog($logString, &$deletedFiles, $prefix = '') {
   global $excludeDirectories;
   $log = preg_split("/\r\n|\n|\r/", $logString);
   foreach ($log as $line) {
-    $matches = [];
-    preg_match('#delete[ ]+mode[ ]+[0-9]+[ ]+([^ ]+)#', $line, $matches);
-    $fileName = $matches[1] ?? NULL;
+    $fileName = NULL;
+    $deleted = $renamed = [];
+    preg_match('#^[ ]*delete[ ]+mode[ ]+[0-9]+[ ]+([^ ]+)#', $line, $deleted);
+    if (isset($deleted[1])) {
+      $fileName = $deleted[1];
+    }
+    else {
+      preg_match('#^[ ]*rename[ ]+(.+)[ ]+\(\d+%\)#', $line, $renamed);
+    }
+    // Renamed files will look something like `rename CRM/Foo/{OldName.php => NewName.php}`
+    // Moved files will look something like `rename CRM/Foo/{OldDir => NewDir}/File.php
+    if (isset($renamed[1]) && str_contains($renamed[1], '{')) {
+      $fileName = preg_replace('#{(.*) =>[^}]+}#', '$1', $renamed[1]);
+      // If the file was moved up a directory, get rid of the extra slash
+      $fileName = str_replace('//', '/', $fileName);
+    }
+    // Root-level renamed files won't have any curly-brace stuff so just capture the old name
+    elseif (isset($renamed[1])) {
+      $fileName = explode(' ', $renamed[1])[0];
+    }
     // No filename or name doesn't make sense
     if (!$fileName || $fileName === '1') {
       continue;
@@ -56,12 +73,12 @@ function parseLog($logString, &$deletedFiles, $prefix = '') {
 }
 
 // Core files
-$logString = `git log $minVer...HEAD --diff-filter=D --summary | grep delete`;
+$logString = `git log $minVer...HEAD --diff-filter=DR --summary | grep '\(delete\|rename\)'`;
 parseLog($logString, $deletedFiles);
 
 // Packages
 $prefix = 'packages/';
-$logString = `(cd $prefix && git log $minVer...HEAD --diff-filter=D --summary | grep delete)`;
+$logString = `(cd $prefix && git log $minVer...HEAD --diff-filter=DR --summary | grep '\(delete\|rename\)')`;
 parseLog($logString, $deletedFiles, $prefix);
 
 // Vendor: these files are managed by composer not git.
