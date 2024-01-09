@@ -1591,7 +1591,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->set('participantInfo', $this->_participantInfo);
     }
 
-    if ($this->getPaymentProcessorObject()->supports('noReturn')
+    if (!$this->getEventValue('is_monetary') || $this->getPaymentProcessorObject()->supports('noReturn')
     ) {
       // Send mail Confirmation/Receipt.
       $this->sendMails($params, $registerByID, $participantCount);
