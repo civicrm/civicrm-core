@@ -18,6 +18,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use GuzzleHttp\Psr7\Request;
+
 /**
  * Class CRM_Mailing_MailingSystemTest
  * @group headless
@@ -52,11 +54,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     $this->_mut = new CiviMailUtils($this, TRUE);
     $this->callAPISuccess('mail_settings', 'get',
       ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
+    Civi::settings()->set('civimail_unsubscribe_methods', ['mailto', 'http', 'oneclick']);
   }
 
   /**
    */
   public function tearDown(): void {
+    $this->revertSetting('civimail_unsubscribe_methods');
     $this->_mut->stop();
     CRM_Utils_Hook::singleton()->reset();
     // DGW
@@ -87,9 +91,54 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertMatchesRegularExpression('#^text/plain; charset=utf-8#', $message->headers['Content-Type']);
       $this->assertMatchesRegularExpression(';^b\.[\d\.a-z]+@chaos.org$;', $message->headers['Return-Path']);
       $this->assertMatchesRegularExpression(';^b\.[\d\.a-z]+@chaos.org$;', $message->headers['X-CiviMail-Bounce'][0]);
-      $this->assertMatchesRegularExpression(';^\<mailto:u\.[\d\.a-z]+@chaos.org\>$;', $message->headers['List-Unsubscribe'][0]);
+      $this->assertMatchesRegularExpression(';^\<mailto:u\.[\d\.a-z]+@chaos.org\>, \<http.*unsubscribe.*\>$;', $message->headers['List-Unsubscribe'][0]);
       $this->assertEquals('bulk', $message->headers['Precedence'][0]);
     }
+  }
+
+  public function testHttpUnsubscribe(): void {
+    $client = new Civi\Test\LocalHttpClient(['reboot' => TRUE, 'htmlHeader' => FALSE]);
+
+    $allMessages = $this->runMailingSuccess([
+      'subject' => 'Yellow Unsubmarine',
+      'body_text' => 'In the {domain.address} where I was born, lived a man who sailed to sea',
+    ]);
+
+    $getMembers = fn($status) => Civi\Api4\GroupContact::get(FALSE)
+      ->addWhere('group_id', '=', $this->_groupID)
+      ->addWhere('status', '=', $status)
+      ->execute();
+
+    $this->assertEquals(2, $getMembers('Added')->count());
+    $this->assertEquals(0, $getMembers('Removed')->count());
+
+    foreach ($allMessages as $k => $message) {
+      $this->assertNotEmpty($message->headers['List-Unsubscribe'][0]);
+      $this->assertEquals('List-Unsubscribe=One-Click', $message->headers['List-Unsubscribe-Post'][0]);
+
+      $urls = array_map(
+        fn($s) => trim($s, '<>'),
+        preg_split('/[,\s]+/', $message->headers['List-Unsubscribe'][0])
+
+      );
+      $url = CRM_Utils_Array::first(preg_grep('/^http/', $urls));
+      $this->assertMatchesRegularExpression(';civicrm/mailing/unsubscribe;', $url);
+
+      // Older clients (RFC 2369 only): Open a browser for the unsubscribe page
+      // FIXME: This works locally, but in CI complains about ckeditor4. Smells like compatibility issue between LocalHttpClient and $unclear.
+      $get = $client->sendRequest(new Request('GET', $url));
+      $this->assertEquals(200, $get->getStatusCode());
+      $this->assertMatchesRegularExpression(';You are requesting to unsubscribe;', (string) $get->getBody());
+
+      // Newer clients (RFC 8058): Send headless HTTP POST
+      $post = $client->sendRequest(new Request('POST', $url, [], $message->headers['List-Unsubscribe-Post'][0]));
+      $this->assertEquals(200, $post->getStatusCode());
+      $this->assertEquals('OK', trim((string) $post->getBody()));
+    }
+
+    // The HTTP POSTs removed the members.
+    $this->assertEquals(0, $getMembers('Added')->count());
+    $this->assertEquals(2, $getMembers('Removed')->count());
   }
 
   /**
