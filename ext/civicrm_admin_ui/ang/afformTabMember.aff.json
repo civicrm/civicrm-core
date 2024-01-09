@@ -9,8 +9,7 @@
         "contact_summary_tab"
     ],
     "summary_contact_type": [
-        "Individual",
-        "Household"
+        "Organization"
     ],
     "summary_weight": 30,
     "icon": "fa-id-badge",
@@ -29,5 +28,5 @@
     "allow_verification_by_email": false,
     "email_confirmation_template_id": null,
     "navigation": null,
-    "modified_date": "2024-01-05 05:42:48"
+    "modified_date": "2024-01-09 13:48:38"
 }
