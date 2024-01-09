@@ -29,6 +29,7 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
     // dev/core#1768 Make this interval configurable.
     'civimail_sync_interval' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'replyTo' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'civimail_unsubscribe_methods' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
   ];
 
   /**
