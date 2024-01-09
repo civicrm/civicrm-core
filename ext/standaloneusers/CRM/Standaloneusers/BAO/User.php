@@ -74,25 +74,19 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
   }
 
   /**
-   * Check access permission
-   *
-   * @param string $entityName
-   * @param string $action
-   * @param array $record
-   * @param integer|null $userID
-   * @return boolean
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, ?int $userID): bool {
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $action = $e->getActionName();
     // Prevent users from deleting their own user account
     if (in_array($action, ['delete'], TRUE)) {
       $sess = CRM_Core_Session::singleton();
       $ufID = (int) $sess->get('ufID');
       if ($record['id'] == $ufID) {
-        return FALSE;
+        $e->setAuthorized(FALSE);
       };
     }
-    return TRUE;
   }
 
 }
