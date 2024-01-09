@@ -328,6 +328,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             [
               'price' => json_encode([$optionKey, $priceVal]),
               'size' => '4',
+              'pattern' => '[\d\.]*',
             ]
           ),
           $useRequired && $field->is_required
