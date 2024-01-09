@@ -1144,7 +1144,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if (!defined('CIVICRM_EXCLUDE_DIRS_PATTERN')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('You can improve performance by defining the CIVICRM_EXCLUDE_DIRS_PATTERN in your civicrm.settings.php file. See <a href="https://docs.civicrm.org/sysadmin/en/latest/setup/optimizations/#exclude-dirs-that-do-not-need-to-be-scanned" target="_blank">documentation</a>.'),
+        ts('You can improve performance by defining the CIVICRM_EXCLUDE_DIRS_PATTERN in your civicrm.settings.php file. See <a %1>documentation</a>.', [1 => 'href="https://docs.civicrm.org/sysadmin/en/latest/setup/optimizations/#exclude-dirs-that-do-not-need-to-be-scanned" target="_blank"']),
         ts('Performance can be improved by configuring the exclude directories path'),
         LogLevel::NOTICE,
         'fa-flag'
