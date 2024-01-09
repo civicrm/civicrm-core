@@ -1,16 +1,17 @@
 <?php
+use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
   [
     'name' => 'SavedSearch_Contact_Summary_Membership_Type',
     'entity' => 'SavedSearch',
-    'cleanup' => 'always',
+    'cleanup' => 'unused',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
         'name' => 'Contact_Summary_Membership_Type',
-        'label' => ts('Contact Summary Membership Type'),
+        'label' => E::ts('Contact Summary Membership Type'),
         'api_entity' => 'MembershipType',
         'api_params' => [
           'version' => 4,
@@ -44,17 +45,17 @@ return [
   [
     'name' => 'SavedSearch_Contact_Summary_Membership_Type_SearchDisplay_Contact_Summary_Membership_Type',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'always',
+    'cleanup' => 'unused',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
         'name' => 'Contact_Summary_Membership_Type',
-        'label' => ts('Contact Summary Membership Type'),
+        'label' => E::ts('Contact Summary Membership Type'),
         'saved_search_id.name' => 'Contact_Summary_Membership_Type',
         'type' => 'table',
         'settings' => [
-          'description' => ts('The following Membership Types are associated with this organization. Click Members for a listing of all contacts who have memberships of that type. Click Edit to modify the settings for that type.'),
+          'description' => E::ts('The following Membership Types are associated with this organization. Click Members for a listing of all contacts who have memberships of that type. Click Edit to modify the settings for that type.'),
           'sort' => [],
           'limit' => 50,
           'pager' => [
@@ -66,35 +67,35 @@ return [
               'type' => 'field',
               'key' => 'name',
               'dataType' => 'String',
-              'label' => ts('Name'),
+              'label' => E::ts('Name'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'period_type:label',
               'dataType' => 'String',
-              'label' => ts('Period'),
+              'label' => E::ts('Period'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'fixed_period_start_day',
               'dataType' => 'Integer',
-              'label' => ts('Fixed Start'),
+              'label' => E::ts('Fixed Start'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'minimum_fee',
               'dataType' => 'Money',
-              'label' => ts('Minimum Fee'),
+              'label' => E::ts('Minimum Fee'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'duration_interval',
               'dataType' => 'Integer',
-              'label' => ts('Duration'),
+              'label' => E::ts('Duration'),
               'sortable' => TRUE,
               'rewrite' => '[duration_interval] [duration_unit:label]',
             ],
@@ -102,7 +103,7 @@ return [
               'type' => 'field',
               'key' => 'visibility:label',
               'dataType' => 'String',
-              'label' => ts('Visibility'),
+              'label' => E::ts('Visibility'),
               'sortable' => TRUE,
             ],
             [
@@ -111,7 +112,7 @@ return [
                 [
                   'path' => 'civicrm/member/search?reset=1&force=1&type=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => ts('Members'),
+                  'text' => E::ts('Members'),
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -126,7 +127,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-external-link',
-                  'text' => ts('Edit'),
+                  'text' => E::ts('Edit'),
                   'style' => 'default',
                   'path' => 'civicrm/admin/member/membershipType/add?action=update&id=[id]&reset=1',
                   'action' => '',
