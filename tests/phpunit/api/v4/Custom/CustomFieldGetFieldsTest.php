@@ -221,7 +221,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       ->setRecords($sampleData)
       ->execute();
 
-    // CustomGroup based on Event Type
+    // CustomGroup based on Event Type = Meeting|Conference
     CustomGroup::create(FALSE)
       ->addValue('extends', 'Participant')
       ->addValue('extends_entity_column_id:name', 'ParticipantEventType')
@@ -234,7 +234,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       )
       ->execute();
 
-    // CustomGroup based on Participant Status
+    // CustomGroup based on Participant Role
     CustomGroup::create(FALSE)
       ->addValue('extends', 'Participant')
       ->addValue('extends_entity_column_id:name', 'ParticipantRole')
@@ -307,6 +307,20 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $this->assertArrayHasKey('volunteer_host.sub_field', $participant3Fields);
     $this->assertArrayNotHasKey('event_3_and_3.sub_field', $participant3Fields);
     $this->assertArrayHasKey('always.on', $participant3Fields);
+
+    $event1Fields = Participant::getFields(FALSE)
+      ->addValue('event_id', $event1['id'])
+      ->execute()->indexBy('name');
+    $this->assertArrayHasKey('meeting_conference.sub_field', $event1Fields);
+    $this->assertArrayNotHasKey('event_2_and_3.sub_field', $event1Fields);
+    $this->assertArrayHasKey('always.on', $event1Fields);
+
+    $event4Fields = Participant::getFields(FALSE)
+      ->addValue('event_id', $event4['id'])
+      ->execute()->indexBy('name');
+    $this->assertArrayNotHasKey('meeting_conference.sub_field', $event4Fields);
+    $this->assertArrayNotHasKey('event_3_and_3.sub_field', $event4Fields);
+    $this->assertArrayHasKey('always.on', $event4Fields);
   }
 
   public function testFiltersAreReturnedForContactRefFields(): void {

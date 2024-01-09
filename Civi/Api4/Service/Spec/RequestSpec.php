@@ -57,25 +57,51 @@ class RequestSpec implements \Iterator {
     $this->entity = $entity;
     $this->action = $action;
     $this->entityTableName = CoreUtil::getTableName($entity);
+    $this->values = $this->resolveValues($values);
+  }
 
-    // If `id` given, lookup other values needed to filter custom fields
-    $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entity);
+  /**
+   * Resolve as many values as possible based on available data
+   */
+  private function resolveValues(array $values) {
+    if (!$values) {
+      return $values;
+    }
+    $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($this->entity);
     $idCol = $customInfo['column'] ?? NULL;
-    if ($idCol && !empty($values[$idCol])) {
-      $grouping = (array) $customInfo['grouping'];
-      $lookupNeeded = array_diff($grouping, array_keys($values));
-      if ($lookupNeeded) {
-        $record = \civicrm_api4($entity, 'get', [
+    $grouping = (array) ($customInfo['grouping'] ?? []);
+    $lookupNeeded = array_diff($grouping, array_keys($values));
+    // If `id` given, use that first
+    if ($lookupNeeded && $idCol && !empty($values[$idCol])) {
+      $record = \civicrm_api4($this->entity, 'get', [
+        'checkPermissions' => FALSE,
+        'where' => [[$idCol, '=', $values[$idCol]]],
+        'select' => $lookupNeeded,
+      ])->first();
+      if ($record) {
+        $values += $record;
+      }
+    }
+    $lookupNeeded = array_diff($grouping, array_keys($values));
+    foreach ($lookupNeeded as $fieldName) {
+      // If we need a value like `event_id.event_type_id` and we only have `event_id`,
+      // use the FK to lookup the value from the event.
+      if (str_contains($fieldName, '.')) {
+        [$fkFrom, $fkTo] = explode('.', $fieldName);
+        $fkEntity = \civicrm_api4($this->entity, 'getFields', [
           'checkPermissions' => FALSE,
-          'where' => [[$idCol, '=', $values[$idCol]]],
-          'select' => $lookupNeeded,
-        ])->first();
-        if ($record) {
-          $values += $record;
+          'where' => [['name', '=', $fkFrom]],
+        ])->first()['fk_entity'] ?? NULL;
+        if (!empty($values[$fkFrom]) && $fkEntity) {
+          $values[$fieldName] = \civicrm_api4($fkEntity, 'get', [
+            'checkPermissions' => FALSE,
+            'where' => [['id', '=', $values[$fkFrom]]],
+            'select' => [$fkTo],
+          ])->first()[$fkTo] ?? NULL;
         }
       }
     }
-    $this->values = $values;
+    return $values;
   }
 
   /**
