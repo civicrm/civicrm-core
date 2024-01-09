@@ -244,7 +244,7 @@ class CoreUtil {
 
     // For get actions, just run a get and ACLs will be applied to the query.
     // It's a cheap trick and not as efficient as not running the query at all,
-    // but BAO::checkAccess doesn't consistently check permissions for the "get" action.
+    // but authorizeRecord doesn't consistently check permissions for the "get" action.
     if (is_a($apiRequest, '\Civi\Api4\Generic\AbstractGetAction')) {
       return (bool) $apiRequest->addSelect($idField)->addWhere($idField, '=', $record[$idField])->execute()->count();
     }
@@ -252,18 +252,16 @@ class CoreUtil {
     $event = new \Civi\Api4\Event\AuthorizeRecordEvent($apiRequest, $record, $userID);
     \Civi::dispatcher()->dispatch('civi.api4.authorizeRecord', $event);
 
-    // Note: $bao::_checkAccess() is a quasi-listener. TODO: Convert to straight-up listener.
+    // $bao::_checkAccess() is deprecated in favor of `civi.api4.authorizeRecord` event.
     if ($event->isAuthorized() === NULL) {
       $baoName = self::getBAOFromApiName($apiRequest->getEntityName());
       if ($baoName && method_exists($baoName, '_checkAccess')) {
+        \CRM_Core_Error::deprecatedWarning("$baoName::_checkAccess is deprecated and should be replaced with 'civi.api4.authorizeRecord' event listener.");
         $authorized = $baoName::_checkAccess($event->getEntityName(), $event->getActionName(), $event->getRecord(), $event->getUserID());
         $event->setAuthorized($authorized);
       }
-      else {
-        $event->setAuthorized(TRUE);
-      }
     }
-    return $event->isAuthorized();
+    return $event->isAuthorized() ?? TRUE;
   }
 
   /**
