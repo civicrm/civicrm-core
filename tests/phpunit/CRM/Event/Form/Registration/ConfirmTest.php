@@ -590,6 +590,18 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ], $submitValues));
   }
 
+  /**
+   * Ensure an email is sent when confirm is disabled for unpaid events.
+   */
+  public function testSubmitUnpaidEventNoConfirm(): void {
+    $this->eventCreateUnpaid(['is_confirm_enabled' => FALSE]);
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'email-Primary' => 'demo@example.com',
+    ], ['id' => $this->getEventID()]);
+    $form->processForm();
+    $this->assertMailSentContainingStrings(['Event']);
+  }
+
   public function testRegistrationWithoutCiviContributeEnabled(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $event = $this->eventCreateUnpaid([
