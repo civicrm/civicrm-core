@@ -2990,7 +2990,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
       // Filter status id by case type id
       case 'status_id':
-        if (!empty($props['case_type_id'])) {
+        if (!empty($props['case_type_id']) && is_scalar($props['case_type_id'])) {
           $idField = is_numeric($props['case_type_id']) ? 'id' : 'name';
           $caseType = civicrm_api3('CaseType', 'getsingle', [$idField => $props['case_type_id'], 'return' => 'definition']);
           if (!empty($caseType['definition']['statuses'])) {
