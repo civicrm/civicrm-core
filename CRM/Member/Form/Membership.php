@@ -427,7 +427,7 @@ DESC limit 1");
           $selOrgMemType[$memberOfContactId][$key] = $values['name'] ?? NULL;
         }
       }
-      $totalAmount = $values['minimum_fee'] ?? NULL;
+      $totalAmount = $values['minimum_fee'] ?? 0;
       // build membership info array, which is used when membership type is selected to:
       // - set the payment information block
       // - set the max related block
