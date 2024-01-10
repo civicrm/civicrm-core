@@ -10,6 +10,7 @@
  */
 namespace Civi\Api4;
 
+use Civi\Api4\Action\GetLinks;
 use Civi\Api4\Import\CheckAccessAction;
 use Civi\Api4\Generic\DAOGetAction;
 use Civi\Api4\Generic\DAOGetFieldsAction;
@@ -101,6 +102,17 @@ class Import {
    */
   public static function getActions(int $userJobID, bool $checkPermissions = TRUE): GetActions {
     return (new GetActions('Import_' . $userJobID, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param int $userJobID
+   * @param bool $checkPermissions
+   *
+   * @return \Civi\Api4\Action\GetLinks
+   */
+  public static function getLinks(int $userJobID, bool $checkPermissions = TRUE): GetLinks {
+    return (new GetLinks('Import_' . $userJobID, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
