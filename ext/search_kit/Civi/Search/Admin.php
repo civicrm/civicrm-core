@@ -144,10 +144,6 @@ class Admin {
         if ($links) {
           $entity['links'] = array_values($links);
         }
-        $paths = CoreUtil::getInfoItem($entity['name'], 'paths');
-        if (!empty($paths['add'])) {
-          $entity['addPath'] = $paths['add'];
-        }
         try {
           $getFields = civicrm_api4($entity['name'], 'getFields', [
             'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'],
