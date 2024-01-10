@@ -643,12 +643,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
     $params['id'] = $this->getEntityId();
-    $priceField = $this->submit($params);
-    if (!is_a($priceField, 'CRM_Core_Error')) {
-      // Required by extensions implementing the postProcess hook (to get the ID of new entities)
-      $this->setEntityId($priceField->id);
-      CRM_Core_Session::setStatus(ts('Price Field \'%1\' has been saved.', [1 => $priceField->label]), ts('Saved'), 'success');
-    }
+    $this->submit($params);
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
@@ -708,8 +703,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
     $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? CRM_Utils_Array::value('membership_num_terms', $params, 1) : NULL;
 
-    $priceField = CRM_Price_BAO_PriceField::create($params);
-    return $priceField;
+    return CRM_Price_BAO_PriceField::create($params);
   }
 
 }
