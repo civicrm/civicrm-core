@@ -455,7 +455,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       //@todo we are blocking for multiple registrations because we haven't tested
       $this->addCIDZeroOptions();
     }
-
+    $this->assign('priceSet', $this->_priceSet);
     $this->addElement('hidden', 'bypass_payment', NULL, ['id' => 'bypass_payment']);
     $this->assign('bypassPayment', $bypassPayment);
 
@@ -664,7 +664,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
       }
       $form->_priceSet['id'] ??= $priceSetID;
-      $form->assign('priceSet', $form->_priceSet);
     }
     else {
       // Is this reachable?
