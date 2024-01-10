@@ -42,7 +42,7 @@ trait DataTypeSpecTrait {
   public $fkEntity;
 
   /**
-   * @var string
+   * @var array
    */
   public $fkColumn;
 
@@ -128,18 +128,18 @@ trait DataTypeSpecTrait {
   }
 
   /**
-   * @return string
+   * @return array|null
    */
-  public function getDfkEntities() {
+  public function getDfkEntities(): ?array {
     return $this->dfkEntities;
   }
 
   /**
-   * @param string $dfkEntities
+   * @param array|null $dfkEntities
    *
    * @return $this
    */
-  public function setDfkEntities($dfkEntities) {
+  public function setDfkEntities(?array $dfkEntities) {
     $this->dfkEntities = $dfkEntities;
     return $this;
   }

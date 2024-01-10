@@ -118,8 +118,16 @@
     <html>
       <type>Select</type>
     </html>
+    <pseudoconstant>
+      <callback>CRM_PCP_BAO_PCP::pageTypeOptions</callback>
+    </pseudoconstant>
     <add>2.2</add>
   </field>
+  <dynamicForeignKey>
+    <idColumn>page_id</idColumn>
+    <typeColumn>page_type</typeColumn>
+    <add>2.1</add>
+  </dynamicForeignKey>
   <field>
     <name>pcp_block_id</name>
     <title>PCP Block</title>

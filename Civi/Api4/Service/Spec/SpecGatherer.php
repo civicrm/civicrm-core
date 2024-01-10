@@ -124,8 +124,8 @@ class SpecGatherer extends AutoService {
           $DAOField['DFKEntities'] = $reference->getTargetEntities();
           $DAOField['html']['controlField'] = $entityTableColumn;
           // If we have a value for entity_table then this field can pretend to be a single FK too.
-          if (array_key_exists($entityTableColumn, $values)) {
-            $DAOField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getClassForTable($values[$entityTableColumn]);
+          if (array_key_exists($entityTableColumn, $values) && $DAOField['DFKEntities']) {
+            $DAOField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getFullName($DAOField['DFKEntities'][$values[$entityTableColumn]]);
           }
           break;
         }
