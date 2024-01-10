@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Mailing_Page_Unsubscribe extends CRM_Mailing_Page_Common {
+class CRM_Mailing_Page_Unsubscribe extends CRM_Core_Page {
 
   /**
    * Run page.
@@ -25,8 +25,8 @@ class CRM_Mailing_Page_Unsubscribe extends CRM_Mailing_Page_Common {
    * @throws Exception
    */
   public function run() {
-    $this->_type = 'unsubscribe';
-    return parent::run();
+    $wrapper = new CRM_Utils_Wrapper();
+    return $wrapper->run('CRM_Mailing_Form_Unsubscribe', $this->_title);
   }
 
 }
