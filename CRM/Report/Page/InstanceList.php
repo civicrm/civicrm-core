@@ -241,16 +241,19 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&output=copy'),
         'label' => ts('Save a Copy'),
         'confirm_message' => NULL,
+        'weight' => CRM_Core_Action::getWeight(\CRM_Core_Action::COPY),
       ],
       'pdf' => [
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&force=1&output=pdf'),
         'label' => ts('View as pdf'),
         'confirm_message' => NULL,
+        'weight' => CRM_Core_Action::getWeight(\CRM_Core_Action::EXPORT),
       ],
       'print' => [
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&force=1&output=print'),
         'label' => ts('Print report'),
         'confirm_message' => NULL,
+        'weight' => CRM_Core_Action::getWeight(\CRM_Core_Action::EXPORT),
       ],
     ];
     // Hackery, Hackera, Hacker ahahahahahaha a super nasty hack.
@@ -266,6 +269,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&force=1&output=csv'),
         'label' => ts('Export to csv'),
         'confirm_message' => NULL,
+        'weight' => CRM_Core_Action::getWeight(\CRM_Core_Action::EXPORT),
       ];
     }
     if (CRM_Core_Permission::check('administer Reports')) {
@@ -273,6 +277,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&action=delete'),
         'label' => ts('Delete report'),
         'confirm_message' => ts('Are you sure you want delete this report? This action cannot be undone.'),
+        'weight' => CRM_Core_Action::getWeight(\CRM_Core_Action::DELETE),
       ];
     }
     CRM_Utils_Hook::links('view.report.links',
