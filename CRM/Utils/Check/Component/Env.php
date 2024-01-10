@@ -1141,10 +1141,10 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    */
   public function checkExcludeDirectories(): array {
     $messages = [];
-    if (!defined('CIVICRM_EXCLUDE_DIRS_PATTERN')) {
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && !defined('CIVICRM_EXCLUDE_DIRS_PATTERN')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('You can improve performance by defining the CIVICRM_EXCLUDE_DIRS_PATTERN in your civicrm.settings.php file. See <a %1>documentation</a>.', [1 => 'href="https://docs.civicrm.org/sysadmin/en/latest/setup/optimizations/#exclude-dirs-that-do-not-need-to-be-scanned" target="_blank"']),
+        ts('You can improve performance by defining the CIVICRM_EXCLUDE_DIRS_PATTERN in your civicrm.settings.php file.') . '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/optimizations/#exclude-dirs-that-do-not-need-to-be-scanned'),
         ts('Performance can be improved by configuring the exclude directories path'),
         LogLevel::NOTICE,
         'fa-flag'
@@ -1164,7 +1164,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if (!defined('CIVICRM_TEMPLATE_COMPILE_CHECK') && !$isProbablyDevelopmentSite && !\Civi::settings()->get('debug_enabled')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('You can improve performance on production sites by specifying the CIVICRM_TEMPLATE_COMPILE_CHECK in the civicrm.settings.php file. See <a href="https://docs.civicrm.org/sysadmin/en/latest/setup/optimizations/#disable-compile-check" target="_blank">documentation</a>'),
+        ts('You can improve performance on production sites by specifying the CIVICRM_TEMPLATE_COMPILE_CHECK in the civicrm.settings.php file.') . '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/optimizations/#disable-compile-check'),
         ts('Performance can be improved on live sites by defining the template compile check'),
         LogLevel::NOTICE,
         'fa-flag'
