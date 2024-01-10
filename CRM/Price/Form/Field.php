@@ -122,7 +122,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $this->_sid = $defaults['price_set_id'];
 
       // if text, retrieve price
-      if ($defaults['html_type'] == 'Text') {
+      if ($defaults['html_type'] === 'Text') {
         $isActive = $defaults['is_active'];
         $valueParams = ['price_field_id' => $this->getEntityId()];
 
@@ -430,7 +430,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     if ((is_numeric($fields['count'] ?? '') &&
         empty($fields['count'])
       ) &&
-      (($fields['html_type'] ?? NULL) == 'Text')
+      (($fields['html_type'] ?? NULL) === 'Text')
     ) {
       $errors['count'] = ts('Participant Count must be greater than zero.');
     }
@@ -442,7 +442,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     }
 
     if ($form->_action & CRM_Core_Action::ADD) {
-      if ($fields['html_type'] != 'Text') {
+      if ($fields['html_type'] !== 'Text') {
         $countemptyrows = 0;
         $publicOptionCount = $_flagOption = $_rowError = 0;
 
@@ -491,7 +491,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
               $_flagOption = 1;
             }
           }
-          if (!$noLabel && !$noAmount && !empty($fields['option_financial_type_id']) && $fields['option_financial_type_id'][$index] == '' && $fields['html_type'] != 'Text') {
+          if (!$noLabel && !$noAmount && !empty($fields['option_financial_type_id']) && $fields['option_financial_type_id'][$index] == '' && $fields['html_type'] !== 'Text') {
             $errors["option_financial_type_id[{$index}]"] = ts('Financial Type is a Required field.');
           }
           if ($noLabel && !$noAmount) {
@@ -534,7 +534,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
           }
 
           if (!empty($fields['option_visibility_id'][$index]) && (!$noLabel || !$noAmount)) {
-            if ($visibilityOptions[$fields['option_visibility_id'][$index]] == 'public') {
+            if ($visibilityOptions[$fields['option_visibility_id'][$index]] === 'public') {
               $publicOptionCount++;
             }
           }
@@ -544,7 +544,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
         if (!empty($memTypesIDS)) {
           // check for checkboxes allowing user to select multiple memberships from same membership organization
-          if ($fields['html_type'] == 'CheckBox') {
+          if ($fields['html_type'] === 'CheckBox') {
             $foundDuplicate = FALSE;
             $orgIds = [];
             foreach ($memTypesIDS as $key => $val) {
@@ -587,7 +587,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
           $_flagOption = 1;
         }
 
-        if ($visibilityOptions[$fields['visibility_id']] == 'public' && $publicOptionCount == 0) {
+        if ($visibilityOptions[$fields['visibility_id']] === 'public' && $publicOptionCount == 0) {
           $errors['visibility_id'] = ts('You have selected to make this field public but have not enabled any public price options. Please update your selections to include a public price option, or make this field admin visibility only.');
           for ($index = 1; $index <= self::NUM_OPTION; $index++) {
             if (!empty($fields['option_label'][$index]) || !empty($fields['option_amount'][$index])) {
@@ -596,7 +596,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
           }
         }
 
-        if ($visibilityOptions[$fields['visibility_id']] == 'admin' && $publicOptionCount > 0) {
+        if ($visibilityOptions[$fields['visibility_id']] === 'admin' && $publicOptionCount > 0) {
           $errors['visibility_id'] = ts('Field with \'Admin\' visibility should only contain \'Admin\' options.');
 
           for ($index = 1; $index <= self::NUM_OPTION; $index++) {
@@ -604,7 +604,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
             $isOptionSet = !empty($fields['option_label'][$index]) || !empty($fields['option_amount'][$index]);
             $currentOptionVisibility = $visibilityOptions[$fields['option_visibility_id'][$index]] ?? NULL;
 
-            if ($isOptionSet && $currentOptionVisibility == 'public') {
+            if ($isOptionSet && $currentOptionVisibility === 'public') {
               $errors["option_visibility_id[{$index}]"] = ts('\'Admin\' field should only have \'Admin\' visibility options.');
             }
           }
