@@ -732,7 +732,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     //get the current price event price set options count.
     $currentOptionsCount = self::getPriceSetOptionCount($form);
     $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($form->_eventId, $skipParticipants);
-    $optionFullTotalAmount = 0;
+
     $currentParticipantNo = (int) substr($form->_name, 12);
     foreach ($form->_feeBlock as & $field) {
       $optionFullIds = [];
@@ -755,12 +755,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         ) {
           $isFull = TRUE;
           $optionFullIds[$optId] = $optId;
-          if ($field['html_type'] !== 'Select') {
-            if (in_array($optId, $defaultPricefieldIds)) {
-              $optionFullTotalAmount += $option['amount'] ?? 0;
-            }
-          }
-          else {
+          if ($field['html_type'] === 'Select') {
             if (!empty($defaultPricefieldIds) && in_array($optId, $defaultPricefieldIds)) {
               unset($optionFullIds[$optId]);
             }
@@ -785,7 +780,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       //finally get option ids in.
       $field['option_full_ids'] = $optionFullIds;
     }
-    $form->assign('optionFullTotalAmount', $optionFullTotalAmount);
   }
 
   /**
