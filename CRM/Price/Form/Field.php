@@ -403,7 +403,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * @param array $files
    * @param self $form
    *
-   * @return array
+   * @return array|bool
    *   if errors then list of errors to be posted back to the form,
    *                  true otherwise
    */
