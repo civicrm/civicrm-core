@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
+
 /**
  *
  * @package CRM
@@ -2189,17 +2191,17 @@ WHERE  ce.loc_block_id = $locBlockId";
   }
 
   /**
-   * @param string $entityName
-   * @param string $action
-   * @param array $record
-   * @param int $userID
-   * @return bool
+   * Check event access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, $userID): bool {
-    switch ($action) {
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $userID = $e->getUserID();
+
+    switch ($e->getActionName()) {
       case 'create':
-        return CRM_Core_Permission::check('access CiviEvent', $userID);
+        $e->setAuthorized(CRM_Core_Permission::check('access CiviEvent', $userID));
+        return;
 
       case 'get':
         $actionType = CRM_Core_Permission::VIEW;
@@ -2214,7 +2216,7 @@ WHERE  ce.loc_block_id = $locBlockId";
         break;
     }
 
-    return self::checkPermission($record['id'], $actionType, $userID);
+    $e->setAuthorized(self::checkPermission($record['id'], $actionType, $userID));
   }
 
   /**

@@ -14,17 +14,6 @@ function search_kit_civicrm_config(&$config) {
 }
 
 /**
- * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
- */
-function search_kit_civicrm_container($container) {
-  $container->getDefinition('dispatcher')
-    ->addMethodCall('addListener', [
-      'civi.api4.authorizeRecord::SavedSearch',
-      ['CRM_Search_BAO_SearchDisplay', 'savedSearchCheckAccessByDisplay'],
-    ]);
-}
-
-/**
  * Implements hook_civicrm_permission().
  *
  * Define SearchKit permissions.

@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\MembershipType;
 use Civi\Api4\Relationship;
 
@@ -2266,24 +2267,24 @@ SELECT count(*)
   }
 
   /**
-   * @param string $entityName
-   * @param string $action
-   * @param array $record
-   * @param int $userID
-   * @return bool
+   * Check related contact access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, int $userID): bool {
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $userID = $e->getUserID();
+    $delegateAction = $e->getActionName() === 'get' ? 'get' : 'update';
+
     // Delegate relationship permissions to contacts a & b
     foreach (['a', 'b'] as $ab) {
       if (empty($record["contact_id_$ab"]) && !empty($record['id'])) {
         $record["contact_id_$ab"] = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], "contact_id_$ab");
       }
-      if (!\Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', 'update', ['id' => $record["contact_id_$ab"]], $userID)) {
-        return FALSE;
+      if (!\Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', $delegateAction, ['id' => $record["contact_id_$ab"]], $userID)) {
+        $e->setAuthorized(FALSE);
+        break;
       }
     }
-    return TRUE;
   }
 
 }

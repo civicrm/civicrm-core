@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
+
 /**
  *
  * @package CRM
@@ -868,23 +870,18 @@ WHERE ($subtypeClause)";
   }
 
   /**
-   * @param string $entityName
-   * @param string $action
-   * @param array $record
-   * @param $userID
-   * @return bool
+   * Check write access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, $userID): bool {
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     // Only records with a parent may be deleted
-    if ($action === 'delete') {
+    if ($e->getActionName() === 'delete') {
+      $record = $e->getRecord();
       if (!array_key_exists('parent_id', $record)) {
         $record['parent_id'] = CRM_Core_DAO::getFieldValue(parent::class, $record['id'], 'parent_id');
       }
-      return (bool) $record['parent_id'];
+      $e->setAuthorized((bool) $record['parent_id']);
     }
-    // Gatekeeper permissions suffice for everything else
-    return TRUE;
   }
 
 }

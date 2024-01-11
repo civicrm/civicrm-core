@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Token\TokenProcessor;
 
 /**
@@ -3587,17 +3588,17 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   }
 
   /**
-   * @param string $entityName
-   * @param string $action
-   * @param array $record
-   * @param $userID
-   * @return bool
+   * Check contact access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, $userID): bool {
-    switch ($action) {
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $userID = $e->getUserID();
+
+    switch ($e->getActionName()) {
       case 'create':
-        return CRM_Core_Permission::check('add contacts', $userID);
+        $e->setAuthorized(CRM_Core_Permission::check('add contacts', $userID));
+        return;
 
       case 'get':
         $actionType = CRM_Core_Permission::VIEW;
@@ -3612,7 +3613,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
         break;
     }
 
-    return CRM_Contact_BAO_Contact_Permission::allow($record['id'], $actionType, $userID);
+    $e->setAuthorized(CRM_Contact_BAO_Contact_Permission::allow($record['id'], $actionType, $userID));
   }
 
   /**
