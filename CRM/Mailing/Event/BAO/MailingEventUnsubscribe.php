@@ -93,8 +93,7 @@ WHERE  email = %2
   /**
    * Unsubscribe a contact from all groups that received this mailing.
    *
-   * @param int $job_id
-   *   The job ID.
+   * @param null $unused
    * @param int $queue_id
    *   The Queue Event ID of the recipient.
    * @param string $hash
@@ -107,7 +106,7 @@ WHERE  email = %2
    *
    * @throws \CRM_Core_Exception
    */
-  public static function unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE): ?array {
+  public static function unsub_from_mailing($unused, $queue_id, $hash, $return = FALSE): ?array {
     // First make sure there's a matching queue event.
 
     $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
@@ -117,7 +116,7 @@ WHERE  email = %2
 
     $contact_id = $q->contact_id;
 
-    $mailing_id = (int) civicrm_api3('MailingJob', 'getvalue', ['id' => $job_id, 'return' => 'mailing_id']);
+    $mailing_id = (int) civicrm_api3('MailingJobQueue', 'getvalue', ['id' => $queue_id, 'return' => 'mailing_id']);
     $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
 
     // We need a mailing id that points to the mailing that defined the recipients.
