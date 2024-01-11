@@ -167,7 +167,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
 
-    if ($config->debug || str_contains(CIVICRM_UF_BASEURL, 'localhost')) {
+    if ($config->debug || str_contains(CIVICRM_UF_BASEURL, 'localhost') || CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests') {
       $this->error_reporting = E_ALL;
     }
   }

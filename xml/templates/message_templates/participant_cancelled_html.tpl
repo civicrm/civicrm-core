@@ -46,71 +46,72 @@
        {participant.role_id:label}
       </td>
      </tr>
-
-    {if !empty($isShowLocation)}
-          <tr>
-            <td colspan="2" {$valueStyle}>
-                {event.location}
-            </td>
-          </tr>
-        {/if}
+    {if {event.is_show_location|boolean}}
+        <tr>
+          <td colspan="2" {$valueStyle}>
+            {event.location}
+          </td>
+        </tr>
+      {/if}
 
     {if {event.loc_block_id.phone_id.phone|boolean} || {event.loc_block_id.email_id.email|boolean}}
+        <tr>
+          <td colspan="2" {$labelStyle}>
+            {ts}Event Contacts:{/ts}
+          </td>
+        </tr>
+
+        {if {event.loc_block_id.phone_id.phone|boolean}}
           <tr>
-            <td colspan="2" {$labelStyle}>
-                {ts}Event Contacts:{/ts}
+            <td {$labelStyle}>
+              {if {event.loc_block_id.phone_id.phone_type_id|boolean}}
+                {event.loc_block_id.phone_id.phone_type_id:label}
+              {else}
+                {ts}Phone{/ts}
+              {/if}
+            </td>
+            <td {$valueStyle}>
+              {event.loc_block_id.phone_id.phone} {if {event.loc_block_id.phone_id.phone_ext|boolean}}&nbsp;{ts}ext.{/ts} {event.loc_block_id.phone_id.phone_ext}{/if}
             </td>
           </tr>
-
-            {if {event.loc_block_id.phone_id.phone|boolean}}
-              <tr>
-                <td {$labelStyle}>
-                    {if {event.loc_block_id.phone_id.phone_type_id|boolean}}
-                        {event.loc_block_id.phone_id.phone_type_id:label}
-                    {else}
-                        {ts}Phone{/ts}
-                    {/if}
-                </td>
-                <td {$valueStyle}>
-                    {event.loc_block_id.phone_id.phone} {if {event.loc_block_id.phone_id.phone_ext|boolean}}&nbsp;{ts}ext.{/ts} {event.loc_block_id.phone_id.phone_ext}{/if}
-                </td>
-              </tr>
-            {/if}
-            {if {event.loc_block_id.phone_2_id.phone|boolean}}
-              <tr>
-                <td {$labelStyle}>
-                    {if {event.loc_block_id.phone_2_id.phone_type_id|boolean}}
-                        {event.loc_block_id.phone_2_id.phone_type_id:label}
-                    {else}
-                        {ts}Phone{/ts}
-                    {/if}
-                </td>
-                <td {$valueStyle}>
-                    {event.loc_block_id.phone_2_id.phone} {if {event.loc_block_id.phone_2_id.phone_ext|boolean}}&nbsp;{ts}ext.{/ts} {event.loc_block_id.phone_2_id.phone_ext}{/if}
-                </td>
-              </tr>
-            {/if}
-            {if {event.loc_block_id.email_id.email|boolean}}
-              <tr>
-                <td {$labelStyle}>
-                    {ts}Email{/ts}
-                </td>
-                <td {$valueStyle}>
-                    {event.loc_block_id.email_id.email}
-                </td>
-              </tr>
-            {/if}
-            {if {event.loc_block_id.email_2_id.email|boolean}}
-              <tr>
-                <td {$labelStyle}>
-                    {ts}Email{/ts}
-                </td>
-                <td {$valueStyle}>
-                    {event.loc_block_id.email_2_id.email}
-                </td>
-              </tr>
-            {/if}
         {/if}
+        {if {event.loc_block_id.phone_2_id.phone|boolean}}
+          <tr>
+            <td {$labelStyle}>
+              {if {event.loc_block_id.phone_2_id.phone_type_id|boolean}}
+                {event.loc_block_id.phone_2_id.phone_type_id:label}
+              {else}
+                {ts}Phone{/ts}
+              {/if}
+            </td>
+            <td {$valueStyle}>
+              {event.loc_block_id.phone_2_id.phone} {if {event.loc_block_id.phone_2_id.phone_ext|boolean}}&nbsp;{ts}ext.{/ts} {event.loc_block_id.phone_2_id.phone_ext}{/if}
+            </td>
+          </tr>
+        {/if}
+
+        {if {event.loc_block_id.email_id.email|boolean}}
+          <tr>
+            <td {$labelStyle}>
+              {ts}Email{/ts}
+            </td>
+            <td {$valueStyle}>
+              {event.loc_block_id.email_id.email}
+            </td>
+          </tr>
+        {/if}
+
+        {if {event.loc_block_id.email_2_id.email|boolean}}
+          <tr>
+            <td {$labelStyle}>
+              {ts}Email{/ts}
+            </td>
+            <td {$valueStyle}>
+              {event.loc_block_id.email_2_id.email}
+            </td>
+          </tr>
+        {/if}
+      {/if}
 
     {if '{contact.email}'}
       <tr>

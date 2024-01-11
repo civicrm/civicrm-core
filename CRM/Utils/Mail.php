@@ -199,6 +199,16 @@ class CRM_Utils_Mail {
       // This is copied from the Action Schedule send code.
       $textMessage = str_replace('&amp;', '&', $textMessage);
     }
+    if (str_contains($textMessage, 'Undefined array key') || str_contains($htmlMessage, 'Undefined array key') || str_contains($htmlMessage, 'Undefined index')) {
+      $logCount = \Civi::$statics[__CLASS__][__FUNCTION__]['count'] ?? 0;
+      if ($logCount < 3) {
+        // Only record the first 3 times since there might be different messages but after 3 chances are
+        // it's just bulk run of the same..
+        CRM_Core_Error::deprecatedWarning('email output affected by undefined php properties:' . (CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests' ? CRM_Utils_String::purifyHTML($htmlMessage) : ''));
+        $logCount++;
+        \Civi::$statics[__CLASS__][__FUNCTION__]['count'] = $logCount;
+      }
+    }
 
     $headers = [];
     // CRM-10699 support custom email headers

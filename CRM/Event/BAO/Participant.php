@@ -1408,7 +1408,6 @@ UPDATE  civicrm_participant
         [
           'workflow' => 'participant_' . strtolower($mailType),
           'contactId' => $contactId,
-          'tokenContext' => ['participantId' => $participantId],
           'tplParams' => [
             'participant' => $participantValues,
             'event' => $eventDetails,
@@ -1418,6 +1417,11 @@ UPDATE  civicrm_participant
             'isExpired' => $mailType === 'Expired',
             'isConfirm' => $mailType === 'Confirm',
             'checksumValue' => $checksumValue,
+          ],
+          'modelProps' => [
+            'participantID' => (int) $participantId,
+            'eventID' => (int) $eventDetails['id'],
+            'contactID' => (int) $contactId,
           ],
           'from' => $receiptFrom,
           'toName' => $participantName,

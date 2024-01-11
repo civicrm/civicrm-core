@@ -2433,12 +2433,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param string $message
    */
-  protected function bounceOnError($message) {
+  protected function bounceOnError($message): void {
     CRM_Core_Session::singleton()
-      ->setStatus(ts("Payment Processor Error message :") .
+      ->setStatus(ts('Payment Processor Error message :') .
         $message);
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
-      "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"
+      '_qf_Main_display=true&qfKey=' . ($this->_params['qfKey'] ?? NULL)
     ));
   }
 
