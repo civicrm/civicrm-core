@@ -511,4 +511,51 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     return $this->defaultFromHeader($columnHeader, $headerPatterns);
   }
 
+  /**
+   * Get default values for the mapping.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDefaults(): array {
+    $defaults = $mappingFailures = [];
+    $headerPatterns = $this->getHeaderPatterns();
+    $fieldMappings = $this->getFieldMappings();
+    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
+      if ($this->getSubmittedValue('savedMapping')) {
+        $fieldMapping = $fieldMappings[$i] ?? NULL;
+        if (isset($fieldMappings[$i])) {
+          if (($fieldMapping['name'] === 'do_not_import')) {
+            $defaults["mapper[$i]"] = NULL;
+          }
+          elseif (array_key_exists($fieldMapping['name'], $this->getAvailableFields())) {
+            $defaults["mapper[$i]"] = $fieldMapping['name'];
+          }
+          else {
+            // The field from the saved mapping does not map to an available field.
+            // This could be because of an old, not-upgraded mapping or
+            // something we have failed to anticipate.
+            // In this case we should let the user know, but not
+            // set the default to the invalid field.
+            // See https://lab.civicrm.org/dev/core/-/issues/4781
+            // Note that we have made attempts (e.g 5.51) to upgrade mappings and
+            // there is code to remove a mapping if a custom field is deleted
+            // (but perhaps not disabled or acl-restricted) but we should also
+            // handle it here rather than rely on our other efforts.
+            $mappingFailures[] = $columnHeader;
+            $defaults["mapper[$i]"] = NULL;
+          }
+        }
+      }
+      if (!isset($defaults["mapper[$i]"]) && $this->getSubmittedValue('skipColumnHeader')) {
+        $defaults["mapper[$i]"] = $this->defaultFromHeader($columnHeader, $headerPatterns);
+      }
+    }
+    if (!$this->isSubmitted() && $mappingFailures) {
+      CRM_Core_Session::setStatus(ts('Unable to load saved mapping. Please ensure all fields are correctly mapped'));
+    }
+    return $defaults;
+  }
+
 }
