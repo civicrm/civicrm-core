@@ -27,6 +27,26 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  public function testLoadAll(): void {
+    $this->quickCleanup([], TRUE);
+
+    $activeGroup = $this->CustomGroupCreate(['title' => 'ActiveGroup', 'weight' => 1]);
+    $this->customFieldCreate(['label' => 'Active', 'custom_group_id' => $activeGroup['id']]);
+    $this->customFieldCreate(['label' => 'Disabled', 'is_active' => 0, 'custom_group_id' => $activeGroup['id']]);
+
+    $inactiveGroup = $this->CustomGroupCreate(['title' => 'InactiveGroup', 'weight' => 2, 'is_active' => 0]);
+    $this->customFieldCreate(['label' => 'Inactive', 'custom_group_id' => $inactiveGroup['id']]);
+
+    $allGroups = CRM_Core_BAO_CustomGroup::getAll();
+    $activeGroups = CRM_Core_BAO_CustomGroup::getActive();
+
+    $this->assertCount(2, $allGroups);
+    $this->assertCount(2, $allGroups[0]['fields']);
+    $this->assertCount(1, $allGroups[1]['fields']);
+    $this->assertCount(1, $activeGroups);
+    $this->assertCount(1, $activeGroups[0]['fields']);
+  }
+
   /**
    * Test getTree().
    */
