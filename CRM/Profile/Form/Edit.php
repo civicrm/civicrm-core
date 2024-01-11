@@ -145,6 +145,7 @@ SELECT module,is_reserved
 
     $this->assign('recentlyViewed', FALSE);
 
+    $cancelURL = '';
     if ($this->_context !== 'dialog') {
       $this->_postURL = $this->_ufGroup['post_url'];
       $cancelURL = $this->_ufGroup['cancel_url'];
