@@ -13,6 +13,7 @@
 namespace Civi\Api4\Service\Links;
 
 use Civi\API\Event\RespondEvent;
+use Civi\Core\Event\GenericHookEvent;
 
 /**
  * @service
@@ -23,8 +24,22 @@ class MembershipLinksProvider extends \Civi\Core\Service\AutoSubscriber {
 
   public static function getSubscribedEvents(): array {
     return [
+      'civi.api4.getLinks' => 'alterMembershipLinks',
       'civi.api.respond' => 'alterMembershipLinksResult',
     ];
+  }
+
+  public static function alterMembershipLinks(GenericHookEvent $e): void {
+    $addTemplate = [
+      'api_action' => 'update',
+      'ui_action' => '',
+      'entity' => 'Membership',
+      'path' => '',
+      'text' => '',
+      'icon' => 'fa-external-link',
+      'target' => 'crm-popup',
+    ];
+    self::addLinks($e->links, $addTemplate);
   }
 
   public static function alterMembershipLinksResult(RespondEvent $e): void {
@@ -32,15 +47,6 @@ class MembershipLinksProvider extends \Civi\Core\Service\AutoSubscriber {
     if ($request['version'] == 4 && $request->getEntityName() === 'Membership' && is_a($request, '\Civi\Api4\Action\GetLinks')) {
       $links = (array) $e->getResponse();
       $isUpdateBilling = $isCancelSupported = FALSE;
-      $addTemplate = [
-        'ui_action' => '',
-        'entity' => 'Membership',
-        'path' => '',
-        'text' => '',
-        'icon' => 'fa-external-link',
-        'target' => 'crm-popup',
-      ];
-      self::addLinks($links, $addTemplate);
 
       if (!\CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
         self::unsetLinks($links, ['followup']);
@@ -84,13 +90,6 @@ class MembershipLinksProvider extends \Civi\Core\Service\AutoSubscriber {
         if ($finType && !\CRM_Core_Permission::check('delete contributions of type ' . $finType)) {
           self::unsetLinks($links, ['delete']);
         }
-      }
-
-      $params = $request->getParams();
-      if (!empty($params['where'][0][0]) && $params['where'][0][0] == 'ui_action') {
-        $action = $params['where'][0][2];
-        $actionLinkIndex = self::getActionIndex($links, $action);
-        $links = [$links[$actionLinkIndex]];
       }
 
       $e->getResponse()->exchangeArray(array_values($links));
