@@ -241,19 +241,23 @@ class SpecGatherer extends AutoService {
   }
 
   /**
-   * @param string $customGroup
+   * @param string $customGroupName
    * @param \Civi\Api4\Service\Spec\RequestSpec $specification
    */
-  private function getCustomGroupFields($customGroup, RequestSpec $specification) {
-    $customFields = CustomField::get(FALSE)
-      ->addWhere('custom_group_id.name', '=', $customGroup)
-      ->addWhere('is_active', '=', TRUE)
-      ->setSelect(['custom_group_id.name', 'custom_group_id.table_name', 'custom_group_id.title', '*'])
-      ->execute();
-
-    foreach ($customFields as $fieldArray) {
-      $field = SpecFormatter::arrayToField($fieldArray, 'Custom_' . $customGroup);
-      $specification->addFieldSpec($field);
+  private function getCustomGroupFields($customGroupName, RequestSpec $specification): void {
+    foreach (\CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+      if ($customGroup['name'] === $customGroupName) {
+        foreach ($customGroup['fields'] as $fieldArray) {
+          if ($fieldArray['is_active']) {
+            $fieldArray['custom_group_id.name'] = $customGroup['name'];
+            $fieldArray['custom_group_id.table_name'] = $customGroup['table_name'];
+            $fieldArray['custom_group_id.title'] = $customGroup['title'];
+            $field = SpecFormatter::arrayToField($fieldArray, 'Custom_' . $customGroupName);
+            $specification->addFieldSpec($field);
+          }
+        }
+        return;
+      }
     }
   }
 
