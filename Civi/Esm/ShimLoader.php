@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * ShimLoader works by:
  *
  * 1. Adding the extra `es-module-shims.js` file.
- *     +<script async src="...../es-module-shims/dist/es-module-shims.js">
+ *     +<script async src="...../es-module-shims/src/es-module-shims.js">
  * 2. Swapping HTML tags to prefer shim-loading.
  *     -<script type='importmap'>
  *     +<script type='importmap-shim'>
@@ -78,7 +78,7 @@ class ShimLoader extends \Civi\Core\Service\AutoService implements EventSubscrib
    * @inheritDoc
    */
   protected function renderImportMap(array $importMap): string {
-    $shimUrl = Civi::paths()->getUrl('[civicrm.bower]/es-module-shims/dist/es-module-shims.js');
+    $shimUrl = Civi::paths()->getUrl('[civicrm.bower]/es-module-shims/src/es-module-shims.js');
     $shimHtml = sprintf("<script async src='%s'></script>\n", htmlentities($shimUrl));
 
     $flags = JSON_UNESCAPED_SLASHES;

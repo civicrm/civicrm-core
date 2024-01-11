@@ -198,8 +198,8 @@
         "ignore": [".*", "style", "web", "*.json", "regression", "scripts", "spec", "src", "docs", "grunt", "Gruntfile.js", "Changelog.md", "welcome.md", "class-hierarchy.dot", "index.js", "CONTRIBUTING.md", "LICENSE_BANNER", "AUTHORS"]
       },
       "es-module-shims": {
-        "url": "https://ga.jspm.io/npm:es-module-shims@1.7.2/dist/es-module-shims.js",
-        "path": "bower_components/es-module-shims/dist/es-module-shims.js",
+        "url": "https://github.com/guybedford/es-module-shims/blob/1.7.2/src/es-module-shims.js",
+        "path": "bower_components/es-module-shims/src/es-module-shims.js",
         "_comment": "See also https://github.com/guybedford/es-module-shims/. MIT license."
       },
       "ext-greenwich-bootstrap3": {
