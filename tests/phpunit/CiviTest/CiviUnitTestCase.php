@@ -781,7 +781,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'status_id' => 2,
       'role_id' => 1,
       'register_date' => 20070219,
-      'source' => 'Wimbeldon',
+      'source' => 'Wimbledon',
       'event_level' => 'Payment',
       'debug' => 1,
     ];

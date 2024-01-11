@@ -709,7 +709,7 @@ contribution_recur.payment_instrument_id:name :Check
     return "participant.status_id :2
 participant.role_id :1
 participant.register_date :February 19th, 2007
-participant.source :Wimbeldon
+participant.source :Wimbledon
 participant.fee_level :steep
 participant.fee_amount :$50.00
 participant.registered_by_id :
