@@ -51,7 +51,7 @@
         function run() {
           switch (action.type) {
             case 'href':
-              window.location = CRM.url(action.params.path, action.params.query, action.params.mode);
+              window.location = action.params.url ? action.params.url : CRM.url(action.params.path, action.params.query, action.params.mode);
               break;
 
             case 'api3':
