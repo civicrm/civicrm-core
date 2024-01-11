@@ -188,18 +188,8 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     // Text box for Participant Count for a field
 
     // Financial Type
-    $financialType = CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
-    foreach ($financialType as $finTypeId => $type) {
-      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-        && !CRM_Core_Permission::check('add contributions of type ' . $type)
-      ) {
-        unset($financialType[$finTypeId]);
-      }
-    }
-    if (count($financialType)) {
-      $this->assign('financialType', $financialType);
-    }
-
+    $financialTypes = CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
+    $this->assign('financialType', $financialTypes);
     //Visibility Type Options
     $visibilityType = CRM_Core_PseudoConstant::visibility();
     $this->assign('visibilityType', $visibilityType);
@@ -217,7 +207,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
     $this->add('select', 'financial_type_id',
       ts('Financial Type'),
-      [' ' => ts('- select -')] + $financialType
+      [' ' => ts('- select -')] + $financialTypes
     );
 
     $this->assign('useForMember', FALSE);
@@ -285,7 +275,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         'select',
         'option_financial_type_id[' . $i . ']',
         ts('Financial Type'),
-        ['' => ts('- select -')] + $financialType
+        ['' => ts('- select -')] + $financialTypes
       );
       if (in_array($eventComponentId, $this->_extendComponentId)) {
         // count
