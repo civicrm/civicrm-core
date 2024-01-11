@@ -126,6 +126,9 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'icon' => 'fa-random',
     ];
     $this->assertEquals($expected, $allTypes);
+    // Verify function returns field values formatted correctly by type
+    $this->assertTrue(is_int($allTypes['blah']['id']));
+    $this->assertFalse($allTypes['blah']['is_active']);
   }
 
   /**
