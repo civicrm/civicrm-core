@@ -29,6 +29,80 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
+   * Retrieve all enabled custom groups and fields in a nested array.
+   *
+   * @return array[]
+   */
+  public static function getActive(): array {
+    $allGroups = self::getAll();
+    $allGroups = array_values(array_filter($allGroups, fn($group) => $group['is_active']));
+    foreach ($allGroups as $groupIndex => $group) {
+      $allGroups[$groupIndex]['fields'] = array_values(array_filter($group['fields'], fn($field) => $field['is_active']));
+    }
+    return $allGroups;
+  }
+
+  /**
+   * Same as self::getActive() but returns only active groups and
+   * fields which the given user is allowed to see.
+   *
+   * @param int $permissionType (CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT)
+   * @param int|null $userId
+   * @return array[]
+   */
+  public static function getPermitted(int $permissionType, ?int $userId = NULL) {
+    if (!in_array($permissionType, [CRM_Core_Permission::EDIT, CRM_Core_Permission::VIEW], TRUE)) {
+      throw new CRM_Core_Exception('permissionType must be CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT');
+    }
+    $allGroups = self::getActive();
+    $allowedGroupIds = CRM_Core_Permission::customGroup($permissionType, FALSE, $userId);
+    $allGroups = array_filter($allGroups, function($group) use ($allowedGroupIds) {
+      return in_array($group['id'], $allowedGroupIds);
+    });
+    return array_values($allGroups);
+  }
+
+  /**
+   * Fetch all custom groups and fields in a nested array.
+   *
+   * Avoids calling the API to prevent recursion or early-bootstrap issues.
+   *
+   * @return array[]
+   */
+  public static function getAll(): array {
+    $cacheString = __CLASS__ . __FUNCTION__ . '_' . CRM_Core_I18n::getLocale();
+    $custom = Civi::cache('metadata')->get($cacheString);
+    if (!isset($custom)) {
+      $custom = [];
+      $select = ['g.*'];
+      foreach (array_keys(CRM_Core_BAO_CustomField::getSupportedFields()) as $fieldKey) {
+        if ($fieldKey !== 'custom_group_id') {
+          $select[] = "f.`$fieldKey` AS `field__$fieldKey`";
+        }
+      }
+      $data = \CRM_Utils_SQL_Select::from('civicrm_custom_group g')
+        ->join('f', 'LEFT JOIN civicrm_custom_field f ON g.id = f.custom_group_id')
+        ->select($select)
+        ->orderBy(['g.weight', 'g.name', 'f.weight', 'f.name'])
+        ->execute()->fetchAll();
+      foreach ($data as $groupData) {
+        $groupName = $groupData['name'];
+        $fieldData = CRM_Utils_Array::filterByPrefix($groupData, 'field__');
+        if (!isset($custom[$groupName])) {
+          self::formatFieldValues($groupData);
+          $groupData['fields'] = [];
+          $custom[$groupName] = $groupData;
+        }
+        CRM_Core_BAO_CustomField::formatFieldValues($fieldData);
+        $custom[$groupName]['fields'][] = $fieldData;
+      }
+      $custom = array_values($custom);
+      Civi::cache('metadata')->set($cacheString, $custom);
+    }
+    return $custom;
+  }
+
+  /**
    * FIXME: This function is too complex because it's trying to handle both api-style inputs and
    * quickform inputs. Needs to be deprecated and broken up.
    *

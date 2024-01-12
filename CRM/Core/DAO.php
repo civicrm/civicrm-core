@@ -616,6 +616,47 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Format field values according to fields() metadata.
+   *
+   * When fetching results from a query, every field is returned as a string.
+   * This function automatically converts them to the correct data type.
+   *
+   * @param array $fieldValues
+   * @return void
+   */
+  public static function formatFieldValues(array &$fieldValues) {
+    $fields = array_column((array) static::fields(), NULL, 'name');
+    foreach ($fieldValues as $fieldName => $fieldValue) {
+      $fieldSpec = $fields[$fieldName] ?? NULL;
+      $fieldValues[$fieldName] = self::formatFieldValue($fieldValue, $fieldSpec);
+    }
+  }
+
+  /**
+   * Format a value according to field metadata.
+   *
+   * @param string|null $value
+   * @param array|null $fieldSpec
+   * @return mixed
+   */
+  protected static function formatFieldValue($value, ?array $fieldSpec) {
+    if (!isset($value) || !isset($fieldSpec)) {
+      return $value;
+    }
+    $dataType = $fieldSpec['type'] ?? NULL;
+    if ($dataType === CRM_Utils_Type::T_INT) {
+      return (int) $value;
+    }
+    if ($dataType === CRM_Utils_Type::T_BOOLEAN) {
+      return (bool) $value;
+    }
+    if (!empty($fieldSpec['serialize'])) {
+      return self::unSerializeField($value, $fieldSpec['serialize']);
+    }
+    return $value;
+  }
+
+  /**
    * Get/set an associative array of table columns
    *
    * @return array

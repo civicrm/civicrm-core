@@ -844,15 +844,13 @@ WHERE ($subtypeClause)";
       $dao = CRM_Core_DAO::executeQuery($query->toSQL());
       $contactTypes = array_column($dao->fetchAll(), NULL, 'name');
       $parents = array_column($contactTypes, NULL, 'id');
-      foreach ($contactTypes as $name => $contactType) {
-        $contactTypes[$name]['parent'] = $contactType['parent_id'] ? $parents[$contactType['parent_id']]['name'] : NULL;
-        $contactTypes[$name]['parent_label'] = $contactType['parent_id'] ? $parents[$contactType['parent_id']]['label'] : NULL;
+      foreach ($contactTypes as $name => &$contactType) {
         // Cast int/bool types.
-        $contactTypes[$name]['id'] = (int) $contactType['id'];
-        $contactTypes[$name]['parent_id'] = ((int) $contactType['parent_id']) ?: NULL;
-        $contactTypes[$name]['is_active'] = (bool) $contactType['is_active'];
-        $contactTypes[$name]['is_reserved'] = (bool) $contactType['is_reserved'];
-        $contactTypes[$name]['icon'] = $contactType['icon'] ?? $parents[$contactType['parent_id']]['icon'] ?? NULL;
+        self::formatFieldValues($contactType);
+        // Fill data from parents
+        $contactType['parent'] = $parents[$contactType['parent_id']]['name'] ?? NULL;
+        $contactType['parent_label'] = $parents[$contactType['parent_id']]['label'] ?? NULL;
+        $contactType['icon'] ??= $parents[$contactType['parent_id']]['icon'] ?? NULL;
       }
       $cache->set($cacheKey, $contactTypes);
     }

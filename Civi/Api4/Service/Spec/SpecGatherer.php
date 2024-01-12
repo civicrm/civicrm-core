@@ -12,7 +12,6 @@
 
 namespace Civi\Api4\Service\Spec;
 
-use Civi\Api4\CustomField;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Service\AutoService;
@@ -145,8 +144,6 @@ class SpecGatherer extends AutoService {
   private function addCustomFields(string $entity, RequestSpec $spec, bool $checkPermissions) {
     $values = $spec->getValues();
 
-    // Handle contact type pseudo-entities
-    $contactTypes = \CRM_Contact_BAO_ContactType::basicTypes();
     // If contact type is given
     if ($entity === 'Contact' && !empty($values['contact_type'])) {
       $entity = $values['contact_type'];
@@ -156,104 +153,92 @@ class SpecGatherer extends AutoService {
     if (!$customInfo) {
       return;
     }
-    $extends = $customInfo['extends'];
     $grouping = $customInfo['grouping'];
-    if ($entity === 'Contact' || in_array($entity, $contactTypes, TRUE)) {
+    if (CoreUtil::isContact($entity)) {
       $grouping = 'contact_sub_type';
     }
 
-    $query = CustomField::get(FALSE)
-      ->setSelect(['custom_group_id.name', 'custom_group_id.title', '*'])
-      ->addWhere('is_active', '=', TRUE)
-      ->addWhere('custom_group_id.is_active', '=', TRUE)
-      ->addWhere('custom_group_id.is_multiple', '=', FALSE);
-
-    // Enforce permissions
-    if ($checkPermissions && !\CRM_Core_Permission::customGroupAdmin()) {
-      $allowedGroups = \CRM_Core_Permission::customGroup();
-      if (!$allowedGroups) {
-        return;
-      }
-      $query->addWhere('custom_group_id', 'IN', $allowedGroups);
+    if ($checkPermissions) {
+      $permissionType = in_array($spec->getAction(), ['create', 'update', 'save', 'delete', 'replace']) ?
+        \CRM_Core_Permission::EDIT :
+        \CRM_Core_Permission::VIEW;
+      $customGroups = \CRM_Core_BAO_CustomGroup::getPermitted($permissionType);
+    }
+    else {
+      $customGroups = \CRM_Core_BAO_CustomGroup::getActive();
     }
 
-    if (is_string($grouping) && array_key_exists($grouping, $values)) {
-      if (empty($values[$grouping])) {
-        $query->addWhere('custom_group_id.extends_entity_column_value', 'IS EMPTY');
-      }
-      else {
-        $clause = [
-          ['custom_group_id.extends_entity_column_value', 'IS EMPTY'],
-        ];
-        foreach ((array) $values[$grouping] as $value) {
-          $clause[] = ['custom_group_id.extends_entity_column_value', 'CONTAINS', $value];
-        }
-        $query->addClause('OR', $clause);
-      }
-    }
-    // Handle multiple groupings
-    // (In core, only Participant custom fields have multiple groupings)
-    elseif (is_array($grouping)) {
-      $clauses = [];
-      foreach ($grouping as $columnId => $group) {
-        if (array_key_exists($group, $values)) {
-          if (empty($values[$group])) {
-            $clauses[] = [
-              'AND',
-              [
-                ['custom_group_id.extends_entity_column_id', '=', $columnId],
-                ['custom_group_id.extends_entity_column_value', 'IS EMPTY'],
-              ],
-            ];
-          }
-          else {
-            $clause = [];
-            foreach ((array) $values[$group] as $value) {
-              $clause[] = ['custom_group_id.extends_entity_column_value', 'CONTAINS', $value];
-            }
-            $clauses[] = [
-              'AND',
-              [
-                ['custom_group_id.extends_entity_column_id', '=', $columnId],
-                ['OR', $clause],
-              ],
-            ];
-          }
+    foreach ($customGroups as $customGroup) {
+      if ($this->customGroupBelongsTo($customGroup, $customInfo['extends'], $values, $grouping)) {
+        foreach ($customGroup['fields'] as $fieldArray) {
+          $field = SpecFormatter::arrayToField($fieldArray, $entity, $customGroup);
+          $spec->addFieldSpec($field);
         }
       }
-      if ($clauses) {
-        $clauses[] = [
-          'AND',
-          [
-            ['custom_group_id.extends_entity_column_id', 'IS EMPTY'],
-            ['custom_group_id.extends_entity_column_value', 'IS EMPTY'],
-          ],
-        ];
-        $query->addClause('OR', $clauses);
-      }
-    }
-    $query->addWhere('custom_group_id.extends', 'IN', $extends);
-
-    foreach ($query->execute() as $fieldArray) {
-      $field = SpecFormatter::arrayToField($fieldArray, $entity);
-      $spec->addFieldSpec($field);
     }
   }
 
   /**
-   * @param string $customGroup
+   * Check if custom group belongs to $extends entity and meets criteria from $values
+   */
+  private function customGroupBelongsTo(array $customGroup, array $extends, array $values, $grouping): bool {
+    if ($customGroup['is_multiple'] || !in_array($customGroup['extends'], $extends)) {
+      return FALSE;
+    }
+    // No values or grouping = no filtering needed
+    if (empty($values) ||
+      (empty($customGroup['extends_entity_column_value']) && empty($customGroup['extends_entity_column_id']))
+    ) {
+      return TRUE;
+    }
+    if (is_string($grouping) && array_key_exists($grouping, $values)) {
+      foreach ((array) $values[$grouping] as $value) {
+        if (in_array($value, $customGroup['extends_entity_column_value'])) {
+          return TRUE;
+        }
+      }
+      return empty($customGroup['extends_entity_column_value']);
+    }
+    // Handle multiple groupings
+    // (in core, only Participant custom fields have multiple groupings)
+    elseif (is_array($grouping)) {
+      foreach ($grouping as $columnId => $group) {
+        if (array_key_exists($group, $values)) {
+          if (empty($values[$group])) {
+            if (
+              !$customGroup['extends_entity_column_value'] &&
+              $customGroup['extends_entity_column_id'] == $columnId
+            ) {
+              return TRUE;
+            }
+          }
+          elseif (
+            array_intersect((array) $values[$group], (array) $customGroup['extends_entity_column_value']) &&
+            $customGroup['extends_entity_column_id'] == $columnId
+          ) {
+            return TRUE;
+          }
+        }
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * @param string $customGroupName
    * @param \Civi\Api4\Service\Spec\RequestSpec $specification
    */
-  private function getCustomGroupFields($customGroup, RequestSpec $specification) {
-    $customFields = CustomField::get(FALSE)
-      ->addWhere('custom_group_id.name', '=', $customGroup)
-      ->addWhere('is_active', '=', TRUE)
-      ->setSelect(['custom_group_id.name', 'custom_group_id.table_name', 'custom_group_id.title', '*'])
-      ->execute();
-
-    foreach ($customFields as $fieldArray) {
-      $field = SpecFormatter::arrayToField($fieldArray, 'Custom_' . $customGroup);
-      $specification->addFieldSpec($field);
+  private function getCustomGroupFields($customGroupName, RequestSpec $specification): void {
+    foreach (\CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+      if ($customGroup['name'] === $customGroupName) {
+        foreach ($customGroup['fields'] as $fieldArray) {
+          if ($fieldArray['is_active']) {
+            $field = SpecFormatter::arrayToField($fieldArray, 'Custom_' . $customGroupName, $customGroup);
+            $specification->addFieldSpec($field);
+          }
+        }
+        return;
+      }
     }
   }
 
