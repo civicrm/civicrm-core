@@ -2697,9 +2697,6 @@ SELECT contact_id
    * @throws \CRM_Core_Exception
    */
   public static function getReferencesToContactTable() {
-    if (isset(\Civi::$statics[__CLASS__]) && isset(\Civi::$statics[__CLASS__]['contact_references'])) {
-      return \Civi::$statics[__CLASS__]['contact_references'];
-    }
     $contactReferences = [];
     $coreReferences = CRM_Core_DAO::getReferencesToTable('civicrm_contact');
     foreach ($coreReferences as $coreReference) {
@@ -2714,8 +2711,7 @@ SELECT contact_id
     }
     self::appendCustomTablesExtendingContacts($contactReferences);
     self::appendCustomContactReferenceFields($contactReferences);
-    \Civi::$statics[__CLASS__]['contact_references'] = $contactReferences;
-    return \Civi::$statics[__CLASS__]['contact_references'];
+    return $contactReferences;
   }
 
   /**
@@ -2741,6 +2737,7 @@ SELECT contact_id
   /**
    * Add custom tables that extend contacts to the list of contact references.
    *
+   * @internal
    * Includes all contact custom groups including inactive, multiple & subtypes.
    *
    * @param array $cidRefs
@@ -2755,6 +2752,7 @@ SELECT contact_id
   /**
    * Add custom ContactReference fields to the list of contact references.
    *
+   * @internal
    * Includes both ContactReference and EntityReference type fields.
    * Includes active and inactive fields/groups
    *
