@@ -30,7 +30,7 @@ class SpecFormatter {
     // Custom field
     if (!empty($data['custom_group_id.name'])) {
       $field = new CustomFieldSpec($data['name'], $entityName, $dataTypeName);
-      if (strpos($entityName, 'Custom_') !== 0) {
+      if (!str_starts_with($entityName, 'Custom_')) {
         $field->setName($data['custom_group_id.name'] . '.' . $data['name']);
       }
       else {
