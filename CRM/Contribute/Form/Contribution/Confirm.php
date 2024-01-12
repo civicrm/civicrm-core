@@ -2189,6 +2189,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // store the fact that this is a membership and membership type is selected
     if ($this->isMembershipSelected()) {
+      $result = [];
       $this->doMembershipProcessing($contactID, $membershipParams, $premiumParams);
     }
     else {
@@ -2248,8 +2249,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           }
         }
       }
-      return $result;
     }
+    if (empty($result['is_payment_failure'])) {
+      $this->createCMSUser($contactID);
+    }
+    return $result;
   }
 
   /**
@@ -2377,14 +2381,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       catch (CRM_Core_Exception $e) {
         CRM_Core_Session::singleton()->setStatus($e->getMessage());
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
-      }
-      if (!$this->_amount > 0.0 || !$membershipParams['amount']) {
-        // we need to explicitly create a CMS user in case of free memberships
-        // since it is done under processConfirm for paid memberships
-        CRM_Contribute_BAO_Contribution_Utils::createCMSUser($membershipParams,
-          $membershipParams['cms_contactID'],
-          'email-' . $this->_bltID
-        );
       }
     }
   }
@@ -2554,18 +2550,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $form->_bltID,
         $isRecur
       );
-      // CRM-13074 - create the CMSUser after the transaction is completed as it
-      // is not appropriate to delete a valid contribution if a user create problem occurs
-      if (isset($this->_params['related_contact'])) {
-        $contactID = $this->_params['related_contact'];
-      }
-      elseif (isset($this->_params['cms_contactID'])) {
-        $contactID = $this->_params['cms_contactID'];
-      }
-      CRM_Contribute_BAO_Contribution_Utils::createCMSUser($this->_params,
-        $contactID,
-        'email-' . $form->_bltID
-      );
 
       $paymentParams['item_name'] = $form->_params['description'];
 
@@ -2644,6 +2628,21 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       ];
     }
     throw new CRM_Core_Exception('code is unreachable, exception is for clarity for refactoring');
+  }
+
+  private function createCMSUser($contactID) : void {
+    // CRM-13074 - create the CMSUser after the transaction is completed as it
+    // is not appropriate to delete a valid contribution if a user create problem occurs
+    if (isset($this->_params['related_contact'])) {
+      $contactID = $this->_params['related_contact'];
+    }
+    elseif (isset($this->_params['cms_contactID'])) {
+      $contactID = $this->_params['cms_contactID'];
+    }
+    CRM_Contribute_BAO_Contribution_Utils::createCMSUser($this->_params,
+      $contactID,
+      'email-' . $this->_bltID
+    );
   }
 
   /**
