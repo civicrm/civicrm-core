@@ -22,24 +22,15 @@ namespace api\v4\Entity;
 use Civi\Api4\Event;
 use Civi\Api4\Participant;
 use api\v4\Api4TestBase;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ParticipantTest extends Api4TestBase implements TransactionalInterface {
+class ParticipantTest extends Api4TestBase {
 
-  public function setUp(): void {
-    parent::setUp();
-    $cleanup_params = [
-      'tablesToTruncate' => [
-        'civicrm_event',
-        'civicrm_participant',
-      ],
-    ];
-    $this->cleanup($cleanup_params);
-  }
-
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function testGetActions(): void {
     $result = Participant::getActions(FALSE)
       ->execute()
@@ -52,6 +43,9 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString($whereDescription, $getParams['where']['description']);
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function testGet(): void {
     $rows = $this->getRowCount('civicrm_participant');
     if ($rows > 0) {
@@ -116,8 +110,7 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
       ->addClause('AND', ['event_id', '=', $firstEventId])
       ->execute();
 
-    $this->assertEquals($expectedFirstEventCount, count($firstOnlyResult),
-      "count of first event is not $expectedFirstEventCount");
+    $this->assertCount($expectedFirstEventCount, $firstOnlyResult, "count of first event is not $expectedFirstEventCount");
 
     // get first two events using different methods
     $firstTwo = Participant::get(FALSE)
@@ -145,7 +138,7 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('contact_id', '=', $firstContactId)
       ->execute();
 
-    $this->assertEquals(1, count($firstParticipantResult), "more than one registration");
+    $this->assertCount(1, $firstParticipantResult, 'more than one registration');
 
     $firstParticipantId = $firstParticipantResult->first()['id'];
 
@@ -171,9 +164,9 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertEquals($otherParticipantResult, $otherParticipantResult2);
 
-    $this->assertEquals($participantCount - 1,
-      count($otherParticipantResult),
-      "failed to exclude a single record on complex criteria");
+    $this->assertCount($participantCount - 1,
+      $otherParticipantResult,
+      'failed to exclude a single record on complex criteria');
     // check the record we have excluded is the right one:
 
     $this->assertFalse(
@@ -252,6 +245,9 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(1, Participant::get()->selectRowCount()->addWhere('id', '=', $testParticipants->first()['id'])->execute());
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function testGetRemainingParticipants(): void {
     $eventWithMax = $this->createTestRecord('Event', ['max_participants' => 3])['id'];
     $eventUnlimited = $this->createTestRecord('Event', ['max_participants' => 0])['id'];
@@ -266,6 +262,12 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNull($events[1]['remaining_participants']);
 
     $deleted = $this->createTestRecord('Contact', ['is_deleted' => TRUE])['id'];
+    $this->createTestRecord('OptionValue', [
+      'option_group_id:name' => 'participant_role',
+      'filter' => 0,
+      'label' => 'invisible man',
+      'name' => 'spy',
+    ]);
 
     $this->saveTestRecords('Participant', [
       'records' => [
@@ -274,6 +276,7 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
         ['event_id' => $eventWithMax, 'status_id:name' => 'Attended'],
         // None of these should count toward $eventWithMax participant limit
         ['event_id' => $eventWithMax, 'status_id:name' => 'Registered', 'contact_id' => $deleted],
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Registered', 'role_id:name' => 'spy'],
         ['event_id' => $eventWithMax, 'status_id:name' => 'Cancelled'],
         ['event_id' => $eventUnlimited, 'status_id:name' => 'Registered'],
       ],
