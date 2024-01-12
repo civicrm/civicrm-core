@@ -52,7 +52,7 @@ class EventGetSpecProvider extends \Civi\Core\Service\AutoService implements Gen
    * @throws \CRM_Core_Exception
    */
   public static function getRemainingParticipants(array $maxField, Api4SelectQuery $query): string {
-    $statuses = \CRM_Event_BAO_Participant::buildOptions('status_id', NULL, ['is_counted' => 1]);
+    $statuses = \CRM_Event_BAO_Participant::buildOptions('status_id', NULL, ['is_counted' => 1]) ?: [0];
     $statusIds = implode(',', array_keys($statuses));
     $idField = $query->getFieldSibling($maxField, 'id');
     $whereClauses = [
