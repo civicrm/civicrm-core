@@ -9,6 +9,11 @@
   <log>true</log>
   <component>CiviMember</component>
   <labelField>name</labelField>
+  <paths>
+    <add>civicrm/admin/member/membershipType/add?action=add&amp;reset=1</add>
+    <update>civicrm/admin/member/membershipType/add?action=update&amp;id=[id]&amp;reset=1</update>
+    <delete>civicrm/admin/member/membershipType/add?action=delete&amp;id=[id]&amp;reset=1</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Membership Type ID</title>
