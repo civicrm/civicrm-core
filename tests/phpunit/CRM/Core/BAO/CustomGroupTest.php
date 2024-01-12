@@ -435,44 +435,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getActiveGroups() with Invalid Params()
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testGetActiveGroupsWithInvalidParams(): void {
-    $contactId = $this->individualCreate();
-    $activeGroups = CRM_Core_BAO_CustomGroup::getActiveGroups('ABC', 'civicrm/contact/view/cd', $contactId);
-    $this->assertEquals(empty($activeGroups), TRUE, 'Check that Emprt params are retreived');
-  }
-
-  public function testGetActiveGroups(): void {
-    $contactId = $this->individualCreate();
-    $customGroupTitle = 'Custom Group';
-    $groupParams = [
-      'title' => $customGroupTitle,
-      'name' => 'test_custom_group',
-      'style' => 'Tab',
-      'extends' => 'Individual',
-      'weight' => 10,
-      'is_active' => 1,
-    ];
-
-    $customGroup = $this->customGroupCreate($groupParams);
-    $activeGroup = CRM_Core_BAO_CustomGroup::getActiveGroups('Individual', 'civicrm/contact/view/cd', $contactId);
-    foreach ($activeGroup as $key => $value) {
-      if ($value['id'] == $customGroup['id']) {
-        $this->assertEquals('civicrm/contact/view/cd', $value['path']);
-        $this->assertEquals($value['title'], $customGroupTitle);
-        $query = 'reset=1&gid=' . $customGroup['id'] . '&cid=' . $contactId;
-        $this->assertEquals($value['query'], $query);
-      }
-    }
-
-    $this->customGroupDelete($customGroup['id']);
-    $this->contactDelete($contactId);
-  }
-
-  /**
    * Test create()
    *
    * @throws \CRM_Core_Exception

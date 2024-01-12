@@ -417,18 +417,18 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
 
     // now add all the custom tabs
-    $entityType = $this->get('contactType');
-    $activeGroups = CRM_Core_BAO_CustomGroup::getActiveGroups(
-      $entityType,
-      'civicrm/contact/view/cd',
-      $this->_contactId
-    );
+    $extends = ['Contact', $this->get('contactType')];
+    $style = ['Tab', 'Tab with table'];
+    $activeGroups = CRM_Core_BAO_CustomGroup::getPermitted(CRM_Core_Permission::VIEW);
 
     foreach ($activeGroups as $group) {
+      if (!in_array($group['extends'], $extends) || !in_array($group['style'], $style)) {
+        continue;
+      }
       $id = "custom_{$group['id']}";
       $allTabs[] = [
         'id' => $id,
-        'url' => CRM_Utils_System::url($group['path'], $group['query'] . "&selectedChild=$id"),
+        'url' => CRM_Utils_System::url('civicrm/contact/view/cd', "reset=1&gid={$group['id']}&cid={$this->_contactId}&selectedChild=$id"),
         'title' => $group['title'],
         'weight' => $weight,
         'count' => NULL,
