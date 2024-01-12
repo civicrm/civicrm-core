@@ -76,6 +76,40 @@ class Extension extends Generic\AbstractEntity {
           'description' => "Tags which characterize the extension's purpose or functionality",
         ],
         [
+          'name' => 'path',
+          'description' => 'Absolute file path',
+        ],
+        [
+          'name' => 'releaseDate',
+          'description' => 'Release date',
+        ],
+        [
+          'name' => 'compatibility',
+          'description' => 'CiviCRM compatibility',
+        ],
+        [
+          'name' => 'develStage',
+          'description' => 'Development stage',
+        ],
+        [
+          'name' => 'urls',
+          'data_type' => 'Array',
+          'description' => 'URLs for extension page, documentation, licensing and support',
+        ],
+        [
+          'name' => 'authors',
+          'data_type' => 'Array',
+          'description' => 'Authors',
+        ],
+        [
+          'name' => 'license',
+          'description' => 'License',
+        ],
+        [
+          'name' => 'comments',
+          'description' => 'Comments',
+        ],
+        [
           'name' => 'status',
           'description' => 'Extension enabled/disabled/uninstalled status',
           'options' => [
