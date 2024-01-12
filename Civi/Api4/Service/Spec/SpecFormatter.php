@@ -28,7 +28,7 @@ class SpecFormatter {
 
     $hasDefault = isset($data['default']) && $data['default'] !== '';
     // Custom field
-    if (!empty($data['custom_group_id'])) {
+    if (!empty($data['custom_group_id.name'])) {
       $field = new CustomFieldSpec($data['name'], $entityName, $dataTypeName);
       if (strpos($entityName, 'Custom_') !== 0) {
         $field->setName($data['custom_group_id.name'] . '.' . $data['name']);
@@ -313,7 +313,7 @@ class SpecFormatter {
       $inputAttrs['step'] = $dataTypeName === 'Integer' ? 1 : .01;
     }
     // Date/time settings from custom fields
-    if ($inputType == 'Date' && !empty($data['custom_group_id'])) {
+    if ($inputType == 'Date' && !empty($data['custom_group_id.name'])) {
       $inputAttrs['time'] = empty($data['time_format']) ? FALSE : ($data['time_format'] == 1 ? 12 : 24);
       $inputAttrs['date'] = $data['date_format'];
       $inputAttrs['start_date_years'] = isset($data['start_date_years']) ? (int) $data['start_date_years'] : NULL;
