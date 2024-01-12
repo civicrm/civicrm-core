@@ -174,6 +174,7 @@ class CRM_Event_Form_EventFees {
     //CRM-4453
     if (!empty($defaults['participant_fee_currency'])) {
       $form->assign('fee_currency', $defaults['participant_fee_currency']);
+      $form->assign('currency', $defaults['participant_fee_currency']);
     }
 
     // CRM-4395

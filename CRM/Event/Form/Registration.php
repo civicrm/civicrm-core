@@ -226,7 +226,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     //check if participant allow to walk registration wizard.
     $this->_allowConfirmation = $this->get('allowConfirmation');
-
+    $this->assign('currency', $this->getCurrency());
     // check for Approval
     $this->_requireApproval = $this->get('requireApproval');
 
@@ -1713,14 +1713,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Rather historic - might have unneeded stuff
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
   public function getCurrency() {
-    $currency = $this->_values['currency'] ?? NULL;
-    // For event forms, currency is in a different spot
+    $currency = $this->getEventValue('currency');
     if (empty($currency)) {
-      $currency = CRM_Utils_Array::value('currency', CRM_Utils_Array::value('event', $this->_values));
-    }
-    if (empty($currency)) {
+      // Is this valid? It comes from previously shared code.
       $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
     }
     // @todo If empty there is a problem - we should probably put in a deprecation notice

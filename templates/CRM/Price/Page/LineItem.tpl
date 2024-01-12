@@ -8,10 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 
-{* Displays contribution/event fees when price set is used. *}
-{if !$currency && $fee_currency}
-  {assign var=currency value="$fee_currency"}
-{/if}
+{* Displays contribution/event fees. *}
 
 {foreach from=$lineItem item=value key=priceset}
   {if $value neq 'skip'}

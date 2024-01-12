@@ -45,7 +45,7 @@
                 {$event.fee_label}
             </div>
             {if $lineItem}
-                {include file="CRM/Price/Page/LineItem.tpl" context="Event"}
+                {include file="CRM/Price/Page/LineItem.tpl" context="Event" displayLineItemFinancialType=false getTaxDetails=$totalTaxAmount}
             {elseif $amounts || $amount == 0}
           <div class="crm-section no-label amount-item-section">
                     {foreach from=$amounts item=amount key=level}

@@ -86,9 +86,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     if (!empty($this->_params[0]['discount']) && !empty($this->_params[0]['discount']['applied'])) {
       $this->set('hookDiscount', $this->_params[0]['discount']);
-      $this->assign('hookDiscount', $this->_params[0]['discount']);
     }
-
+    $this->assign('hookDiscount', $this->_params[0]['discount'] ?? '');
     $this->preProcessExpress();
 
     if ($this->_values['event']['is_monetary']) {
@@ -226,11 +225,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     ) {
 
       [$taxAmount, $participantDetails, $individual, $amountArray] = $this->calculateAmounts();
-
+      $this->assign('totalTaxAmount', $taxAmount);
       $this->_amount = $amountArray;
 
       if (\Civi::settings()->get('invoicing')) {
-        $this->assign('totalTaxAmount', $taxAmount);
         $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
         $this->assign('individual', $individual);
         $this->set('individual', $individual);
