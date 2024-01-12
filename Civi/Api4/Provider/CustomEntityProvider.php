@@ -37,37 +37,35 @@ class CustomEntityProvider extends AutoService implements EventSubscriberInterfa
    */
   public static function addCustomEntities(GenericHookEvent $e) {
     $baseInfo = CustomValue::getInfo();
-    $select = \CRM_Utils_SQL_Select::from('civicrm_custom_group')
-      ->where('is_multiple = 1')
-      ->where('is_active = 1')
-      ->toSQL();
-    $group = \CRM_Core_DAO::executeQuery($select);
-    while ($group->fetch()) {
-      $entityName = 'Custom_' . $group->name;
-      $baseEntity = CRM_Core_BAO_CustomGroup::getEntityFromExtends($group->extends);
+    foreach (\CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+      if (empty($customGroup['is_multiple']) || empty($customGroup['is_active'])) {
+        continue;
+      }
+      $entityName = 'Custom_' . $customGroup['name'];
+      $baseEntity = CRM_Core_BAO_CustomGroup::getEntityFromExtends($customGroup['extends']);
       // Lookup base entity info using DAO methods not CoreUtil to avoid early-bootstrap issues
       $baseEntityDao = \CRM_Core_DAO_AllCoreTables::getFullName($baseEntity);
       $baseEntityTitle = $baseEntityDao ? $baseEntityDao::getEntityTitle(TRUE) : $baseEntity;
       $e->entities[$entityName] = [
         'name' => $entityName,
-        'title' => $group->title,
-        'title_plural' => $group->title,
-        'table_name' => $group->table_name,
-        'class_args' => [$group->name],
+        'title' => $customGroup['title'],
+        'title_plural' => $customGroup['title'],
+        'table_name' => $customGroup['table_name'],
+        'class_args' => [$customGroup['name']],
         'description' => ts('Custom group for %1', [1 => $baseEntityTitle]),
         'paths' => [
-          'view' => "civicrm/contact/view/cd?reset=1&gid={$group->id}&recId=[id]&multiRecordDisplay=single",
+          'view' => "civicrm/contact/view/cd?reset=1&gid={$customGroup['id']}&recId=[id]&multiRecordDisplay=single",
         ],
       ] + $baseInfo;
-      if (!empty($group->icon)) {
-        $e->entities[$entityName]['icon'] = $group->icon;
+      if (!empty($customGroup['icon'])) {
+        $e->entities[$entityName]['icon'] = $customGroup['icon'];
       }
-      if (!empty($group->help_pre)) {
-        $e->entities[$entityName]['comment'] = self::plainTextify($group->help_pre);
+      if (!empty($customGroup['help_pre'])) {
+        $e->entities[$entityName]['comment'] = self::plainTextify($customGroup['help_pre']);
       }
-      if (!empty($group->help_post)) {
+      if (!empty($customGroup['help_post'])) {
         $pre = empty($e->entities[$entityName]['comment']) ? '' : $e->entities[$entityName]['comment'] . "\n\n";
-        $e->entities[$entityName]['comment'] = $pre . self::plainTextify($group->help_post);
+        $e->entities[$entityName]['comment'] = $pre . self::plainTextify($customGroup['help_post']);
       }
     }
   }
