@@ -1154,13 +1154,10 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * @param $entityType
-   * @param $path
-   * @param string $cidToken
-   *
-   * @return array
+   * @deprecated since 5.71, will be removed around 5.85
    */
   public static function &getActiveGroups($entityType, $path, $cidToken = '%%cid%%') {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getPermitted');
     // for Group's
     $customGroupDAO = new CRM_Core_DAO_CustomGroup();
 
