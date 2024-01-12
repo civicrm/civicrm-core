@@ -20,6 +20,8 @@
  */
 class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
+  use CRM_Event_Form_EventFormTrait;
+
   /**
    * Run the page.
    *
@@ -79,15 +81,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     // show event fees.
     if ($this->_id && !empty($values['event']['is_monetary'])) {
-
-      //CRM-10434
-      $discountId = CRM_Core_BAO_Discount::findSet($this->_id, 'civicrm_event');
-      if ($discountId) {
-        $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Discount', $discountId, 'price_set_id');
-      }
-      else {
-        $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->_id);
-      }
+      $priceSetId = $this->getPriceSetID();
 
       // get price set options, - CRM-5209
       if ($priceSetId) {
@@ -246,10 +240,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
 
     $hasWaitingList = $values['event']['has_waitlist'] ?? NULL;
-    $eventFullMessage = CRM_Event_BAO_Participant::eventFull($this->_id,
-      FALSE,
-      $hasWaitingList
-    );
+    $availableSpaces = $this->getEventValue('available_spaces');
 
     $allowRegistration = FALSE;
     $isEventOpenForRegistration = CRM_Event_BAO_Event::validRegistrationRequest($values['event'], $this->_id);
@@ -262,7 +253,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
           FALSE, NULL, TRUE,
           TRUE
         );
-        if (!$eventFullMessage || $hasWaitingList) {
+        if ($availableSpaces || $hasWaitingList) {
           $registerText = ts('Register Now');
           if (!empty($values['event']['registration_link_text'])) {
             $registerText = $values['event']['registration_link_text'];
@@ -287,8 +278,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       'role_id' => $values['event']['default_role_id'] ?? NULL,
     ];
 
-    if ($eventFullMessage && ($noFullMsg == 'false') || CRM_Event_BAO_Event::checkRegistration($params)) {
-      $statusMessage = $eventFullMessage;
+    if (($availableSpaces < 1 && ($noFullMsg === 'false')) || CRM_Event_BAO_Event::checkRegistration($params)) {
+      $statusMessage = $this->getEventValue('event_full_text');
       if (CRM_Event_BAO_Event::checkRegistration($params)) {
         if ($noFullMsg == 'false') {
           if ($values['event']['allow_same_participant_emails']) {
@@ -359,6 +350,31 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       }
     }
     return parent::getTemplateFileName();
+  }
+
+  /**
+   * Get the price set ID for the event.
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  public function getPriceSetID(): ?int {
+    if ($this->getEventValue('is_monetary')) {
+      //CRM-10434
+      $discountID = CRM_Core_BAO_Discount::findSet($this->getEventID(), 'civicrm_event');
+      if ($discountID) {
+        return (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Discount', $discountID, 'price_set_id');
+      }
+
+      return (int) CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->getEventID());
+    }
+    return NULL;
   }
 
 }
