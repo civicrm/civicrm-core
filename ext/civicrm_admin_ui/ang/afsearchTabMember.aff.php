@@ -17,8 +17,4 @@ return [
     'access CiviCRM',
     'access CiviMember',
   ],
-  'search_displays' => [
-    'Contact_Summary_Memberships.Contact_Summary_Memberships_Active',
-    'Contact_Summary_Memberships.Contact_Summary_Memberships_Inactive',
-  ],
 ];

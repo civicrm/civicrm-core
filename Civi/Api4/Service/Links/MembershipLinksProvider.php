@@ -30,16 +30,18 @@ class MembershipLinksProvider extends \Civi\Core\Service\AutoSubscriber {
   }
 
   public static function alterMembershipLinks(GenericHookEvent $e): void {
-    $addTemplate = [
-      'api_action' => 'update',
-      'ui_action' => '',
-      'entity' => 'Membership',
-      'path' => '',
-      'text' => '',
-      'icon' => 'fa-external-link',
-      'target' => 'crm-popup',
-    ];
-    self::addLinks($e->links, $addTemplate);
+    if ($e->entity == 'Membership') {
+      $addTemplate = [
+        'api_action' => 'update',
+        'ui_action' => '',
+        'entity' => 'Membership',
+        'path' => '',
+        'text' => '',
+        'icon' => 'fa-external-link',
+        'target' => 'crm-popup',
+      ];
+      self::addLinks($e->links, $addTemplate);
+    }
   }
 
   public static function alterMembershipLinksResult(RespondEvent $e): void {
@@ -126,7 +128,9 @@ class MembershipLinksProvider extends \Civi\Core\Service\AutoSubscriber {
   private static function unsetLinks(array &$links, array $actions) {
     foreach ($actions as $action) {
       $actionLinkIndex = self::getActionIndex($links, $action);
-      unset($links[$actionLinkIndex]);
+      if (isset($actionLinkIndex)) {
+        unset($links[$actionLinkIndex]);
+      }
     }
   }
 

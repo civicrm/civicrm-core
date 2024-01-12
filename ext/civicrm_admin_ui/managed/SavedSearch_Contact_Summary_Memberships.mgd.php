@@ -177,7 +177,7 @@ return [
                   'condition' => [],
                 ],
                 [
-                  'path' => 'civicrm/contact/view/membership?action=renew&reset=1&cid=[contact_id]&id=[id]&context=membership&selectedChild=member',
+                  'path' => '',
                   'icon' => 'fa-external-link',
                   'text' => E::ts('Renew Membership'),
                   'style' => 'default',
@@ -189,7 +189,7 @@ return [
                   'target' => 'crm-popup',
                 ],
                 [
-                  'path' => 'civicrm/contact/view/membership?action=renew&reset=1&cid=[contact_id]&id=[id]&context=membership&selectedChild=member&mode=live',
+                  'path' => '',
                   'icon' => 'fa-external-link',
                   'text' => E::ts('Renew-Credit Card Membership'),
                   'style' => 'default',
@@ -213,7 +213,7 @@ return [
                   'condition' => [],
                 ],
                 [
-                  'path' => 'civicrm/contribute/unsubscribe?reset=1&cid=[contact_id]&mid=[id]&context=membership&selectedChild=member',
+                  'path' => '',
                   'icon' => 'fa-external-link',
                   'text' => E::ts('Cancel Auto-renewal'),
                   'style' => 'default',
@@ -225,7 +225,7 @@ return [
                   'target' => 'crm-popup',
                 ],
                 [
-                  'path' => 'civicrm/contribute/updatebilling?reset=1&cid=[contact_id]&mid=[id]&context=membership&selectedChild=member',
+                  'path' => '',
                   'icon' => 'fa-external-link',
                   'text' => E::ts('Change Billing Details'),
                   'style' => 'default',
@@ -411,7 +411,7 @@ return [
                   'condition' => [],
                 ],
                 [
-                  'path' => 'civicrm/contact/view/membership?action=renew&reset=1&cid=[contact_id]&id=[id]&context=membership&selectedChild=member',
+                  'path' => '',
                   'icon' => 'fa-external-link',
                   'text' => E::ts('Renew Membership'),
                   'style' => 'default',
@@ -423,7 +423,7 @@ return [
                   'target' => 'crm-popup',
                 ],
                 [
-                  'path' => 'civicrm/contact/view/membership?action=renew&reset=1&cid=[contact_id]&id=[id]&context=membership&selectedChild=member&mode=live',
+                  'path' => '',
                   'icon' => 'fa-external-link',
                   'text' => E::ts('Renew-Credit Card Membership'),
                   'style' => 'default',
@@ -447,7 +447,7 @@ return [
                   'condition' => [],
                 ],
                 [
-                  'path' => 'civicrm/contribute/unsubscribe?reset=1&cid=[contact_id]&mid=[id]&context=membership&selectedChild=member',
+                  'path' => '',
                   'entity' => 'Membership',
                   'action' => 'cancelrecur',
                   'join' => '',
@@ -459,7 +459,7 @@ return [
                   'condition' => [],
                 ],
                 [
-                  'path' => 'civicrm/contribute/updatebilling?reset=1&cid=[contact_id]&mid=[id]&context=membership&selectedChild=member',
+                  'path' => '',
                   'entity' => 'Membership',
                   'action' => 'changebilling',
                   'join' => '',
