@@ -60,14 +60,12 @@ class CRM_Core_Permission_Base {
     [$civiPrefix, $name] = CRM_Utils_String::parsePrefix(':', $perm, NULL);
     switch ($civiPrefix) {
       case $nativePrefix:
+      case NULL:
         return $name;
 
       // pass through
       case 'cms':
-        return CRM_Utils_Array::value($name, $map, CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
-
-      case NULL:
-        return $name;
+        return $map[$name] ?? CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
 
       default:
         return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
