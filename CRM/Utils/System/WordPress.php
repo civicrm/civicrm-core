@@ -901,8 +901,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
      * Broadcast that CiviCRM is about to create a WordPress User.
      *
      * @since 5.37
+     * @since 5.71 Added $params, $mailParam and $user_data.
+     *
+     * @param array $params The array of source Contact data.
+     * @param string $mailParam The name of the param which contains the email address.
+     * @param array $user_data The array of data to create the WordPress User with.
      */
-    do_action('civicrm_pre_create_user');
+    do_action('civicrm_pre_create_user', $params, $mailParam, $user_data);
 
     // Remove the CiviCRM-WordPress listeners.
     $this->hooks_core_remove();
@@ -936,8 +941,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
      * Broadcast that CiviCRM has creates a WordPress User.
      *
      * @since 5.37
+     * @since 5.71 Added $uid and $params.
+     *
+     * @param integer $uid The ID of the new WordPress User.
+     * @param array $params The array of source Contact data.
      */
-    do_action('civicrm_post_create_user');
+    do_action('civicrm_post_create_user', $uid, $params);
 
     return $uid;
   }
