@@ -49,12 +49,14 @@ class CustomGroupJoinable extends Joinable {
   /**
    * @inheritDoc
    */
-  public function getEntityFields() {
+  public function getEntityFields(): array {
+    $entityFields = [];
     $baseEntity = CoreUtil::getApiNameFromTableName($this->getBaseTable());
-    foreach (\CRM_Core_BAO_CustomGroup::getActive() as $customGroup) {
-      if ($customGroup['table_name'] !== $this->getTargetTable()) {
-        continue;
-      }
+    $filters = [
+      'is_active' => TRUE,
+      'table_name' => $this->getTargetTable(),
+    ];
+    foreach (\CRM_Core_BAO_CustomGroup::getFiltered($filters) as $customGroup) {
       foreach ($customGroup['fields'] as $fieldArray) {
         $entityFields[] = SpecFormatter::arrayToField($fieldArray, $baseEntity, $customGroup);
       }

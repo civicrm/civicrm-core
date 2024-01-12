@@ -105,11 +105,12 @@ class SchemaMapBuilder extends AutoService {
     if (!$customInfo) {
       return;
     }
-
-    foreach (\CRM_Core_BAO_CustomGroup::getActive() as $customGroup) {
-      if (!$customGroup['fields'] || !in_array($customGroup['extends'], $customInfo['extends'])) {
-        continue;
-      }
+    $filters = [
+      'extends' => $customInfo['extends'],
+      'is_active' => TRUE,
+      'fields' => TRUE,
+    ];
+    foreach (\CRM_Core_BAO_CustomGroup::getFiltered($filters) as $customGroup) {
       $customTable = new Table($customGroup['table_name']);
 
       // Add entity_id join from multi-record custom group to the base entity

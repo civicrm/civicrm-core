@@ -27,24 +27,33 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testLoadAll(): void {
+  public function testGetFiltered(): void {
     $this->quickCleanup([], TRUE);
 
-    $activeGroup = $this->CustomGroupCreate(['title' => 'ActiveGroup', 'weight' => 1]);
+    $activeGroup = $this->CustomGroupCreate(['title' => 'ActiveGroup', 'weight' => 1, 'extends' => 'Household']);
     $this->customFieldCreate(['label' => 'Active', 'custom_group_id' => $activeGroup['id']]);
     $this->customFieldCreate(['label' => 'Disabled', 'is_active' => 0, 'custom_group_id' => $activeGroup['id']]);
 
-    $inactiveGroup = $this->CustomGroupCreate(['title' => 'InactiveGroup', 'weight' => 2, 'is_active' => 0]);
+    $inactiveGroup = $this->CustomGroupCreate(['title' => 'InactiveGroup', 'weight' => 2, 'is_active' => 0, 'extends' => 'Activity']);
     $this->customFieldCreate(['label' => 'Inactive', 'custom_group_id' => $inactiveGroup['id']]);
 
     $allGroups = CRM_Core_BAO_CustomGroup::getAll();
-    $activeGroups = CRM_Core_BAO_CustomGroup::getActive();
+    $activeGroups = CRM_Core_BAO_CustomGroup::getFiltered(['is_active' => TRUE]);
 
     $this->assertCount(2, $allGroups);
     $this->assertCount(2, $allGroups[0]['fields']);
     $this->assertCount(1, $allGroups[1]['fields']);
     $this->assertCount(1, $activeGroups);
+    $this->assertEquals($activeGroup['id'], $activeGroups[0]['id']);
     $this->assertCount(1, $activeGroups[0]['fields']);
+
+    $activityGroups = CRM_Core_BAO_CustomGroup::getFiltered(['extends' => 'Activity']);
+    $this->assertCount(1, $activityGroups);
+    $this->assertEquals($inactiveGroup['id'], $activityGroups[0]['id']);
+
+    $contactGroups = CRM_Core_BAO_CustomGroup::getFiltered(['extends' => 'Contact']);
+    $this->assertEquals($activeGroup['id'], $contactGroups[0]['id']);
+    $this->assertCount(2, $contactGroups[0]['fields']);
   }
 
   /**

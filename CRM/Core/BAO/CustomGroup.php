@@ -29,43 +29,62 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
-   * Retrieve all enabled custom groups and fields in a nested array.
+   * Retrieve custom groups and fields in a nested array, with optional filters and permissions applied.
    *
-   * @return array[]
-   */
-  public static function getActive(): array {
-    $allGroups = self::getAll();
-    $allGroups = array_values(array_filter($allGroups, fn($group) => $group['is_active']));
-    foreach ($allGroups as $groupIndex => $group) {
-      $allGroups[$groupIndex]['fields'] = array_values(array_filter($group['fields'], fn($field) => $field['is_active']));
-    }
-    return $allGroups;
-  }
-
-  /**
-   * Same as self::getActive() but returns only active groups and
-   * fields which the given user is allowed to see.
+   * With no params, this returns the same output as self::getAll().
    *
-   * @param int $permissionType (CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT)
+   * @param array $filters
+   *   [key => value] pairs to filter each custom group.
+   *   - $filters[extends] will auto-expand Contact types
+   *   - $filters[is_active] will also filter the fields
+   * @param int|null $permissionType
+   *   Check permission: (CRM_Core_Permission::VIEW | CRM_Core_Permission::EDIT)
    * @param int|null $userId
+   *   User contact id for permission check (defaults to current user)
    * @return array[]
    */
-  public static function getPermitted(int $permissionType, ?int $userId = NULL) {
-    if (!in_array($permissionType, [CRM_Core_Permission::EDIT, CRM_Core_Permission::VIEW], TRUE)) {
-      throw new CRM_Core_Exception('permissionType must be CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT');
+  public static function getFiltered(array $filters = [], int $permissionType = NULL, int $userId = NULL): array {
+    if (isset($permissionType)) {
+      if (!in_array($permissionType, [CRM_Core_Permission::EDIT, CRM_Core_Permission::VIEW], TRUE)) {
+        throw new CRM_Core_Exception('permissionType must be CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT');
+      }
+      $filters['id'] = CRM_Core_Permission::customGroup($permissionType, FALSE, $userId);
     }
-    $allGroups = self::getActive();
-    $allowedGroupIds = CRM_Core_Permission::customGroup($permissionType, FALSE, $userId);
-    $allGroups = array_filter($allGroups, function($group) use ($allowedGroupIds) {
-      return in_array($group['id'], $allowedGroupIds);
+    if (!empty($filters['extends']) && is_string($filters['extends'])) {
+      $contactTypes = CRM_Contact_BAO_ContactType::basicTypes(TRUE);
+      if ($filters['extends'] === 'Contact') {
+        $filters['extends'] = array_merge(['Contact'], $contactTypes);
+      }
+      elseif (in_array($filters['extends'], $contactTypes, TRUE)) {
+        $filters['extends'] = ['Contact', $filters['extends']];
+      }
+    }
+    $allGroups = array_filter(self::getAll(), function($group) use ($filters) {
+      foreach ($filters as $key => $value) {
+        if (is_array($value)) {
+          if (!in_array($group[$key], $value)) {
+            return FALSE;
+          }
+        }
+        elseif ($group[$key] != $value) {
+          return FALSE;
+        }
+      }
+      return TRUE;
     });
+    // The `is_active` filter applies to fields as well as groups.
+    if (!empty($filters['is_active'])) {
+      foreach ($allGroups as $groupIndex => $group) {
+        $allGroups[$groupIndex]['fields'] = array_values(array_filter($group['fields'], fn($field) => $field['is_active']));
+      }
+    }
     return array_values($allGroups);
   }
 
   /**
    * Fetch all custom groups and fields in a nested array.
    *
-   * Avoids calling the API to prevent recursion or early-bootstrap issues.
+   * Output includes all custom group data + fields.
    *
    * @return array[]
    */
@@ -80,6 +99,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
           $select[] = "f.`$fieldKey` AS `field__$fieldKey`";
         }
       }
+      // Avoid calling the API to prevent recursion or early-bootstrap issues.
       $data = \CRM_Utils_SQL_Select::from('civicrm_custom_group g')
         ->join('f', 'LEFT JOIN civicrm_custom_field f ON g.id = f.custom_group_id')
         ->select($select)

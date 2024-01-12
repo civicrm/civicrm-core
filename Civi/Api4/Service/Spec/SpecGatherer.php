@@ -158,18 +158,21 @@ class SpecGatherer extends AutoService {
       $grouping = 'contact_sub_type';
     }
 
+    $filters = [
+      'is_active' => TRUE,
+      'extends' => $customInfo['extends'],
+      'is_multiple' => FALSE,
+    ];
+    $permissionType = NULL;
     if ($checkPermissions) {
       $permissionType = in_array($spec->getAction(), ['create', 'update', 'save', 'delete', 'replace']) ?
         \CRM_Core_Permission::EDIT :
         \CRM_Core_Permission::VIEW;
-      $customGroups = \CRM_Core_BAO_CustomGroup::getPermitted($permissionType);
     }
-    else {
-      $customGroups = \CRM_Core_BAO_CustomGroup::getActive();
-    }
+    $customGroups = \CRM_Core_BAO_CustomGroup::getFiltered($filters, $permissionType);
 
     foreach ($customGroups as $customGroup) {
-      if ($this->customGroupBelongsTo($customGroup, $customInfo['extends'], $values, $grouping)) {
+      if ($this->customGroupBelongsTo($customGroup, $values, $grouping)) {
         foreach ($customGroup['fields'] as $fieldArray) {
           $field = SpecFormatter::arrayToField($fieldArray, $entity, $customGroup);
           $spec->addFieldSpec($field);
@@ -179,12 +182,9 @@ class SpecGatherer extends AutoService {
   }
 
   /**
-   * Check if custom group belongs to $extends entity and meets criteria from $values
+   * Check if custom group meets criteria from $values
    */
-  private function customGroupBelongsTo(array $customGroup, array $extends, array $values, $grouping): bool {
-    if ($customGroup['is_multiple'] || !in_array($customGroup['extends'], $extends)) {
-      return FALSE;
-    }
+  private function customGroupBelongsTo(array $customGroup, array $values, $grouping): bool {
     // No values or grouping = no filtering needed
     if (empty($values) ||
       (empty($customGroup['extends_entity_column_value']) && empty($customGroup['extends_entity_column_id']))
