@@ -1195,19 +1195,11 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * Get the table name for the entity type
-   * currently if entity type is 'Contact', 'Individual', 'Household', 'Organization'
-   * tableName is 'civicrm_contact'
-   *
-   * @param string $entityType
-   *   What entity are we extending here ?.
-   *
-   * @return string
-   *
-   *
-   * @see _apachesolr_civiAttachments_dereference_file_parent
+   * Unused function.
+   * @deprecated since 5.71 will be removed around 5.85
    */
   public static function getTableNameByEntityName($entityType) {
+    CRM_Core_Error::deprecatedFunctionWarning('CoreUtil::getTableName');
     switch ($entityType) {
       case 'Contact':
       case 'Individual':

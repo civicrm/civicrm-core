@@ -14,8 +14,13 @@ namespace Civi\API\Subscriber;
 use Civi\API\Events;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
+ * This is only used by the APIv3 "Attachment" entity.
+ *
+ * @deprecated APIv3 only.
+ *
  * Given an entity which dynamically attaches itself to another entity,
  * determine if one has permission to the other entity.
  *
@@ -362,7 +367,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
         'field_name' => $query->field_name,
         'table_name' => $query->table_name,
         'extends' => $query->extends,
-        'entity_table' => \CRM_Core_BAO_CustomGroup::getTableNameByEntityName($query->extends),
+        'entity_table' => CoreUtil::getTableName($query->extends),
       ];
     }
     return $rows;
