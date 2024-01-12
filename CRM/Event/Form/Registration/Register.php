@@ -803,12 +803,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!$form->_skipDupeRegistrationCheck) {
       self::checkRegistration($fields, $form);
     }
+    $spacesAvailable = $form->getEventValue('available_spaces');
     //check for availability of registrations.
     if (!$form->_allowConfirmation && empty($fields['bypass_payment']) &&
-      is_numeric($form->_availableRegistrations) &&
-      CRM_Utils_Array::value('additional_participants', $fields) >= $form->_availableRegistrations
+      ($fields['additional_participants'] ?? 0) >= $spacesAvailable
     ) {
-      $errors['additional_participants'] = ts("There is only enough space left on this event for %1 participant(s).", [1 => $form->_availableRegistrations]);
+      $errors['additional_participants'] = ts("There is only enough space left on this event for %1 participant(s).", [1 => $spacesAvailable]);
     }
 
     $numberAdditionalParticipants = $fields['additional_participants'] ?? 0;
@@ -827,8 +827,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     //don't allow to register w/ waiting if enough spaces available.
     if (!empty($fields['bypass_payment']) && $form->_allowConfirmation) {
-      if (!is_numeric($form->_availableRegistrations) ||
-        (empty($fields['priceSetId']) && CRM_Utils_Array::value('additional_participants', $fields) < $form->_availableRegistrations)
+      if ($spacesAvailable === 0 ||
+        (empty($fields['priceSetId']) && CRM_Utils_Array::value('additional_participants', $fields) < $spacesAvailable)
       ) {
         $errors['bypass_payment'] = ts("You have not been added to the waiting list because there are spaces available for this event. We recommend registering yourself for an available space instead.");
       }
@@ -854,10 +854,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
       if (empty($fields['bypass_payment']) &&
         !$form->_allowConfirmation &&
-        is_numeric($form->_availableRegistrations) &&
-        $form->_availableRegistrations < $totalParticipants
+        $spacesAvailable < $totalParticipants
       ) {
-        $errors['_qf_default'] = ts("Only %1 Registrations available.", [1 => $form->_availableRegistrations]);
+        $errors['_qf_default'] = ts("Only %1 Registrations available.", [1 => $spacesAvailable]);
       }
 
       $lineItem = [];
