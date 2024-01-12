@@ -860,8 +860,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       'role' => get_option('default_role'),
     ];
 
-    // The notify parameter was ignored on WordPress and default behaviour was to always notify.
-    // Preserve that behaviour but allow the "notify" parameter to be used.
+    /*
+     * The notify parameter was ignored on WordPress and default behaviour
+     * was to always notify. Preserve that behaviour but allow the "notify"
+     * parameter to be used.
+     */
     if (!isset($params['notify'])) {
       $params['notify'] = TRUE;
     }
@@ -898,7 +901,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
 
     /**
-     * Broadcast that CiviCRM is about to create a WordPress User.
+     * Fires when CiviCRM is about to create a WordPress User.
      *
      * @since 5.37
      * @since 5.71 Added $params, $mailParam and $user_data.
@@ -912,41 +915,57 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     // Remove the CiviCRM-WordPress listeners.
     $this->hooks_core_remove();
 
+    // User is not logged in by default.
+    $logged_in = FALSE;
+
     // Now go ahead and create a WordPress User.
     $uid = wp_insert_user($user_data);
-
-    /*
-     * Call wp_signon if we aren't already logged in.
-     * For example, we might be creating a new user from the Contact record.
-     */
-    if (!current_user_can('create_users')) {
-      $creds = [];
-      $creds['user_login'] = $params['cms_name'];
-      $creds['user_password'] = $user_data['user_pass'];
-      $creds['remember'] = TRUE;
-
-      // @todo handle a wp_signon failure
-      wp_signon($creds, FALSE);
+    if (is_wp_error($uid)) {
+      Civi::log()->error("Could not create the user. WordPress returned: " . $uid->get_error_message());
     }
+    else {
 
-    if ($params['notify']) {
-      // Fire the new user action. Sends notification email by default.
-      do_action('register_new_user', $uid);
+      /*
+       * Call wp_signon if we aren't already logged in.
+       * For example, we might be creating a new user from the Contact record.
+       */
+      if (!current_user_can('create_users')) {
+        $creds = [];
+        $creds['user_login'] = $params['cms_name'];
+        $creds['user_password'] = $user_data['user_pass'];
+        $creds['remember'] = TRUE;
+
+        // Authenticate and log the user in.
+        $user = wp_signon($creds, FALSE);
+        if (is_wp_error($user)) {
+          Civi::log()->error("Could not log the user in. WordPress returned: " . $user->get_error_message());
+        }
+        else {
+          $logged_in = TRUE;
+        }
+      }
+
+      if ($params['notify']) {
+        // Fire the new user action. Sends notification email by default.
+        do_action('register_new_user', $uid);
+      }
+
     }
 
     // Restore the CiviCRM-WordPress listeners.
     $this->hooks_core_add();
 
     /**
-     * Broadcast that CiviCRM has creates a WordPress User.
+     * Fires after CiviCRM has tried to create a WordPress User.
      *
      * @since 5.37
      * @since 5.71 Added $uid and $params.
      *
-     * @param integer $uid The ID of the new WordPress User.
+     * @param int|WP_Error $uid The ID of the new WordPress User, or WP_Error on failure.
      * @param array $params The array of source Contact data.
+     * @param bool $logged_in TRUE when the User has been auto-logged-in, FALSE otherwise.
      */
-    do_action('civicrm_post_create_user', $uid, $params);
+    do_action('civicrm_post_create_user', $uid, $params, $logged_in);
 
     return $uid;
   }
