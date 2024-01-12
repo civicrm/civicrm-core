@@ -56,9 +56,7 @@ class CustomGroupJoinable extends Joinable {
         continue;
       }
       foreach ($customGroup['fields'] as $fieldArray) {
-        $fieldArray['custom_group_id.name'] = $customGroup['name'];
-        $fieldArray['custom_group_id.title'] = $customGroup['title'];
-        $entityFields[] = SpecFormatter::arrayToField($fieldArray, $baseEntity);
+        $entityFields[] = SpecFormatter::arrayToField($fieldArray, $baseEntity, $customGroup);
       }
     }
     return $entityFields;

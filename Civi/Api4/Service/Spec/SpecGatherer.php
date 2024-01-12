@@ -171,9 +171,7 @@ class SpecGatherer extends AutoService {
     foreach ($customGroups as $customGroup) {
       if ($this->customGroupBelongsTo($customGroup, $customInfo['extends'], $values, $grouping)) {
         foreach ($customGroup['fields'] as $fieldArray) {
-          $fieldArray['custom_group_id.name'] = $customGroup['name'];
-          $fieldArray['custom_group_id.title'] = $customGroup['title'];
-          $field = SpecFormatter::arrayToField($fieldArray, $entity);
+          $field = SpecFormatter::arrayToField($fieldArray, $entity, $customGroup);
           $spec->addFieldSpec($field);
         }
       }
@@ -235,10 +233,7 @@ class SpecGatherer extends AutoService {
       if ($customGroup['name'] === $customGroupName) {
         foreach ($customGroup['fields'] as $fieldArray) {
           if ($fieldArray['is_active']) {
-            $fieldArray['custom_group_id.name'] = $customGroup['name'];
-            $fieldArray['custom_group_id.table_name'] = $customGroup['table_name'];
-            $fieldArray['custom_group_id.title'] = $customGroup['title'];
-            $field = SpecFormatter::arrayToField($fieldArray, 'Custom_' . $customGroupName);
+            $field = SpecFormatter::arrayToField($fieldArray, 'Custom_' . $customGroupName, $customGroup);
             $specification->addFieldSpec($field);
           }
         }

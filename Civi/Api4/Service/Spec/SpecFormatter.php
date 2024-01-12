@@ -18,25 +18,22 @@ use Civi\Api4\Utils\FormattingUtil;
 class SpecFormatter {
 
   /**
-   * @param array $data
-   * @param string $entityName
-   *
-   * @return FieldSpec
+   * Convert array from BAO::fields() or CustomGroup::getAll() into a FieldSpec object
    */
-  public static function arrayToField(array $data, string $entityName): FieldSpec {
+  public static function arrayToField(array $data, string $entityName, array $customGroup = NULL): FieldSpec {
     $dataTypeName = self::getDataType($data);
 
     $hasDefault = isset($data['default']) && $data['default'] !== '';
     // Custom field
-    if (!empty($data['custom_group_id.name'])) {
+    if ($customGroup) {
       $field = new CustomFieldSpec($data['name'], $entityName, $dataTypeName);
       if (!str_starts_with($entityName, 'Custom_')) {
-        $field->setName($data['custom_group_id.name'] . '.' . $data['name']);
+        $field->setName($customGroup['name'] . '.' . $data['name']);
       }
       else {
         // Fields belonging to custom entities are treated as normal; type = Field instead of Custom
         $field->setType('Field');
-        $field->setTableName($data['custom_group_id.table_name']);
+        $field->setTableName($customGroup['table_name']);
       }
       if ($dataTypeName === 'EntityReference') {
         $field->setFkEntity($data['fk_entity']);
@@ -44,9 +41,9 @@ class SpecFormatter {
       $field->setColumnName($data['column_name']);
       $field->setNullable(empty($data['is_required']));
       $field->setCustomFieldId($data['id'] ?? NULL);
-      $field->setCustomGroupName($data['custom_group_id.name']);
+      $field->setCustomGroupName($customGroup['name']);
       $field->setTitle($data['label']);
-      $field->setLabel($data['custom_group_id.title'] . ': ' . $data['label']);
+      $field->setLabel($customGroup['title'] . ': ' . $data['label']);
       $field->setHelpPre($data['help_pre'] ?? NULL);
       $field->setHelpPost($data['help_post'] ?? NULL);
       if (\CRM_Core_BAO_CustomField::hasOptions($data)) {
@@ -281,7 +278,7 @@ class SpecFormatter {
    * @param array $data
    * @param string $dataTypeName
    */
-  public static function setInputTypeAndAttrs(FieldSpec &$fieldSpec, $data, $dataTypeName) {
+  public static function setInputTypeAndAttrs(FieldSpec $fieldSpec, $data, $dataTypeName) {
     $inputType = $data['html']['type'] ?? $data['html_type'] ?? NULL;
     $inputAttrs = $data['html'] ?? [];
     unset($inputAttrs['type']);
@@ -313,7 +310,7 @@ class SpecFormatter {
       $inputAttrs['step'] = $dataTypeName === 'Integer' ? 1 : .01;
     }
     // Date/time settings from custom fields
-    if ($inputType == 'Date' && !empty($data['custom_group_id.name'])) {
+    if ($inputType == 'Date' && is_a($fieldSpec, CustomFieldSpec::class)) {
       $inputAttrs['time'] = empty($data['time_format']) ? FALSE : ($data['time_format'] == 1 ? 12 : 24);
       $inputAttrs['date'] = $data['date_format'];
       $inputAttrs['start_date_years'] = isset($data['start_date_years']) ? (int) $data['start_date_years'] : NULL;
