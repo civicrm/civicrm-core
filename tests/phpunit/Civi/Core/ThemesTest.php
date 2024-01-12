@@ -195,19 +195,19 @@ class ThemesTest extends \CiviUnitTestCase {
     return $map[$themeKey][$cssExt][$cssFile] ?? Themes::PASSTHRU;
   }
 
-  public function testGetAll() {
+  public function testGetAll(): void {
     $all = \Civi::service('themes')->getAll();
     $this->assertTrue(isset($all['greenwich']));
     $this->assertTrue(isset($all['_fallback_']));
   }
 
-  public function testGetAvailable() {
+  public function testGetAvailable(): void {
     $all = \Civi::service('themes')->getAvailable();
     $this->assertTrue(isset($all['greenwich']));
     $this->assertFalse(isset($all['_fallback_']));
   }
 
-  public function testApiOptions() {
+  public function testApiOptions(): void {
     $result = $this->callAPISuccess('Setting', 'getoptions', [
       'field' => 'theme_backend',
     ]);

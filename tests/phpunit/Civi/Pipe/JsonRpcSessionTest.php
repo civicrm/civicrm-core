@@ -36,7 +36,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testInvalid_BadMethod() {
+  public function testInvalid_BadMethod(): void {
     $responseLines = $this->runLines([
       '{"jsonrpc":"2.0","method":"wiggum"}',
     ]);
@@ -46,7 +46,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertEquals(-32601, $decode['error']['code']);
   }
 
-  public function testInvalid_MalformedParams() {
+  public function testInvalid_MalformedParams(): void {
     $responseLines = $this->runLines([
       '{"jsonrpc":"2.0","id":"a","method":"echo","params":123}',
     ]);
@@ -56,7 +56,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertEquals(-32602, $decode['error']['code']);
   }
 
-  public function testEcho() {
+  public function testEcho(): void {
     $this->assertRequestResponse([
       '{"jsonrpc":"2.0","id":null,"method":"echo"}' => '{"jsonrpc":"2.0","result":[],"id":null}',
       '{"jsonrpc":"2.0","id":"a","method":"echo","params":{"color":"blue"}}' => '{"jsonrpc":"2.0","result":{"color":"blue"},"id":"a"}',
@@ -65,7 +65,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     ]);
   }
 
-  public function testBatch() {
+  public function testBatch(): void {
     $batchLine = '[' .
       '{"jsonrpc":"2.0","id":"a","method":"wiggum"},' .
       '{"jsonrpc":"2.0","id":"b","method": "echo","params":[123]}' .
@@ -83,14 +83,14 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertEquals([123], $decode[1]['result']);
   }
 
-  public function testInvalidControl() {
+  public function testInvalidControl(): void {
     $responses = $this->runLines(['{"jsonrpc":"2.0","id":"b","method":"session.nope","params":[]}']);
     $decode = json_decode($responses[1], 1);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('Method not found', $decode['error']['message']);
   }
 
-  public function testControl() {
+  public function testControl(): void {
     $this->assertRequestResponse([
       '{"jsonrpc":"2.0","id":"c","method":"options"}' => '{"jsonrpc":"2.0","result":{"apiCheckPermissions":true,"apiError":"exception","bufferSize":524288,"responsePrefix":null},"id":"c"}',
       '{"jsonrpc":"2.0","id":"c","method":"options","params":{"responsePrefix":"ZZ"}}' => 'ZZ{"jsonrpc":"2.0","result":{"responsePrefix":"ZZ"},"id":"c"}',
@@ -98,7 +98,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     ]);
   }
 
-  public function testApi3() {
+  public function testApi3(): void {
     $responses = $this->runLines(['{"jsonrpc":"2.0","id":"a3","method":"api3","params":["System","get"]}']);
 
     $this->assertEquals($this->standardHeader, $responses[0]);
@@ -109,7 +109,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertEquals(\CRM_Utils_System::version(), $decode['result']['values'][0]['version']);
   }
 
-  public function testApi3ErrorModes() {
+  public function testApi3ErrorModes(): void {
     $responses = $this->runLines([
       // First call: By default, use JSON-RPC errors.
       '{"jsonrpc":"2.0","id":"bad1","method":"api3","params":["System","zznnzznnzz"]}',
@@ -123,7 +123,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $decode = json_decode($responses[1], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('bad1', $decode['id']);
-    $this->assertRegexp(';API.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
+    $this->assertMatchesRegularExpression(';API.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
 
     $decode = json_decode($responses[2], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
@@ -134,10 +134,10 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('bad2', $decode['id']);
     $this->assertEquals(1, $decode['result']['is_error']);
-    $this->assertRegexp(';API.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
+    $this->assertMatchesRegularExpression(';API.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
   }
 
-  public function testApi4() {
+  public function testApi4(): void {
     $responses = $this->runLines(['{"jsonrpc":"2.0","id":"a4","method":"api4","params":["Contact","getFields"]}']);
 
     $this->assertEquals($this->standardHeader, $responses[0]);
@@ -150,7 +150,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertEquals('Number', $fields['id']['input_type']);
   }
 
-  public function testApi4Authz() {
+  public function testApi4Authz(): void {
     // We try 'Route.get' action with different access levels.
     $useException = '{"jsonrpc":"2.0","id":"o","method":"options","params":{"apiError":"exception"}}';
     $checkPermTrue = '{"jsonrpc":"2.0","id":"m","method":"api4","params":["Route","get",{"checkPermissions":true}]}';
@@ -168,7 +168,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     };
     $apiFail = function($line, $caseId) {
       $decode = json_decode($line, TRUE);
-      $this->assertRegExp(';Authorization failed;', $decode['error']['message'], "($caseId) Should have authorization error. Got: $line");
+      $this->assertMatchesRegularExpression(';Authorization failed;', $decode['error']['message'], "($caseId) Should have authorization error. Got: $line");
     };
 
     $cases = []; /* [ ActivePerms?, Trusted?, CheckPerms?, ExpectResult */
@@ -193,12 +193,12 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
       [$inActivePerms, $inTrusted, $inApiCall, $expect] = $case;
       $this->setPermissions($inActivePerms);
       $responses = $this->runLines([$useException, $inApiCall], $inTrusted);
-      $this->assertRegExp($inTrusted === 'u' ? ';"untrusted";' : ';"trusted";', $responses[0], "($caseId) Header should indicate trust level");
+      $this->assertMatchesRegularExpression($inTrusted === 'u' ? ';"untrusted";' : ';"trusted";', $responses[0], "($caseId) Header should indicate trust level");
       $expect($responses[2], $caseId);
     }
   }
 
-  public function testApi4ErrorModes() {
+  public function testApi4ErrorModes(): void {
     $responses = $this->runLines([
       // First call: By default, use JSON-RPC errors.
       '{"jsonrpc":"2.0","id":"bad1","method":"api4","params":["System","zznnzznnzz"]}',
@@ -212,7 +212,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $decode = json_decode($responses[1], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('bad1', $decode['id']);
-    $this->assertRegexp(';Api.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
+    $this->assertMatchesRegularExpression(';Api.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
 
     $decode = json_decode($responses[2], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
@@ -223,7 +223,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertEquals('bad2', $decode['id']);
     $this->assertEquals(1, $decode['result']['is_error']);
-    $this->assertRegexp(';Api.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
+    $this->assertMatchesRegularExpression(';Api.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
   }
 
   /**

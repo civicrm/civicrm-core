@@ -1,5 +1,3 @@
-{include file="CRM/common/TrackingFields.tpl"}
-
 <div class="crm-block crm-form-block crm-eventcart-participantsandprices">
 
   {if $contact}

@@ -272,13 +272,16 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    *
    * @return string
    */
-  public function getText($context, $params) {
+  public function getText($context, $params): string {
     switch ($context) {
       case 'contributionPageContinueText':
-        if ($params['amount'] <= 0) {
-          return ts('To complete this transaction, click the <strong>Continue</strong> button below.');
-        }
-        return ts('To complete your contribution, click the <strong>Continue</strong> button below.');
+        return '';
+
+      case 'contributionPageButtonText':
+        return ts('Continue');
+
+      case 'contributionPageConfirmText':
+        return '';
 
       default:
         return parent::getText($context, $params);

@@ -43,7 +43,7 @@ class CRM_Contribute_Form_ContributionViewTest extends CiviUnitTestCase {
   /**
    * Test that can still view a contribution without full permissions.
    */
-  public function testContributionViewLimitedPermissions() {
+  public function testContributionViewLimitedPermissions(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'access CiviCRM',
       'access all custom data',
@@ -71,11 +71,11 @@ class CRM_Contribute_Form_ContributionViewTest extends CiviUnitTestCase {
     unset($_GET['id'], $_REQUEST['id']);
     unset($_GET['cid'], $_REQUEST['cid']);
 
-    $this->assertRegExp('/Contribution Total:\s+\$10\.00/', $contents);
+    $this->assertMatchesRegularExpression('/Contribution Total:\s+\$10\.00/', $contents);
     $this->assertStringContainsString('Mr. Anthony Anderson II', $contents);
   }
 
-  public function testInvoiceDownload() {
+  public function testInvoiceDownload(): void {
     Civi::settings()->set('invoicing', 1);
 
     $_SERVER['REQUEST_URI'] = "civicrm/contribute/invoice?reset=1&id={$this->contribution['id']}&cid={$this->contact_id}";

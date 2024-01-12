@@ -56,10 +56,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
 
     $pcomponent = CRM_Utils_Request::retrieve('pcomponent', 'String', $this, TRUE);
 
-    if (in_array($pcomponent, [
-      'contribute',
-      'event',
-    ])) {
+    if (in_array($pcomponent, ['contribute', 'event'])) {
       $values = [];
       $params = ['id' => $this->_entityId];
       CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_ContributionPage',
@@ -285,8 +282,6 @@ class CRM_Friend_Form extends CRM_Core_Form {
           FALSE, NULL, TRUE,
           TRUE
         );
-        $this->assign('linkTextUrl', $linkTextUrl);
-        $this->assign('linkText', $linkText);
       }
     }
     elseif ($this->_entityTable === 'civicrm_event') {
@@ -297,11 +292,10 @@ class CRM_Friend_Form extends CRM_Core_Form {
           "action=add&reset=1&pageId={$defaults['entity_id']}&component=event",
           FALSE, NULL, TRUE,
           TRUE);
-        $this->assign('linkTextUrl', $linkTextUrl);
-        $this->assign('linkText', $linkText);
       }
     }
-
+    $this->assign('linkTextUrl', $linkTextUrl ?? NULL);
+    $this->assign('linkText', $linkText ?? NULL);
     $this->setTitle($defaults['thankyou_title']);
     $this->assign('thankYouText', $defaults['thankyou_text']);
   }

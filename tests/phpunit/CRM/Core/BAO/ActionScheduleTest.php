@@ -1053,7 +1053,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       }
 
       foreach ($patterns as $field => $pattern) {
-        $this->assertRegExp($pattern, $messageArray[$field],
+        $this->assertMatchesRegularExpression($pattern, $messageArray[$field],
           "Check that '$field'' matches regex. " . print_r(['expected' => $patterns, 'actual' => $messageArray], 1));
       }
     }
@@ -1756,7 +1756,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testContactBirthDateNoAnniversary(): void {
     $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
-    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $this->createScheduleFromFixtures('sched_contact_birth_day_yesterday');
     $this->assertCronRuns([
       [
@@ -1777,7 +1776,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testContactBirthDateAnniversary(): void {
     $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
-    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $this->createScheduleFromFixtures('sched_contact_birth_day_anniversary');
     $this->assertCronRuns([
       [
@@ -1815,8 +1813,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $createField = $this->callAPISuccess('custom_field', 'create', $field);
     $contactParams = $this->fixtures['contact'];
     $contactParams["custom_{$createField['id']}"] = '2013-12-16';
-    $contact = $this->callAPISuccess('Contact', 'create', $contactParams);
-    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
+    $this->callAPISuccess('Contact', 'create', $contactParams);
     $this->createScheduleFromFixtures('sched_contact_grad_tomorrow', ['entity_value' => "custom_{$createField['id']}"]);
     $this->assertCronRuns([
       [
@@ -1860,7 +1857,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testContactModifiedAnniversary(): void {
     $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
-    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $modifiedDate = $this->callAPISuccess('Contact', 'getvalue', ['id' => $contact['id'], 'return' => 'modified_date']);
     $this->createScheduleFromFixtures('sched_contact_mod_anniversary');
     $actionSchedule = [
@@ -2106,8 +2102,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->createCustomGroupWithFieldOfType([], 'date');
     $contactParams = $this->fixtures['contact'];
     $contactParams[$this->getCustomFieldName('date')] = '2013-12-16';
-    $contact = $this->callAPISuccess('Contact', 'create', $contactParams);
-    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
+    $this->callAPISuccess('Contact', 'create', $contactParams);
     $this->fixtures['sched_contact_grad_anniversary']['entity_value'] = $this->getCustomFieldName('date');
     $this->createScheduleFromFixtures('sched_contact_grad_anniversary');
 
@@ -2408,20 +2403,15 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
-   * @var array
+   * This is a wrapper for CRM_Core_DAO::createTestObject.
    *
-   * (DAO_Name => array(int)) List of items to garbage-collect during tearDown
-   */
-  private $_testObjects = [];
-
-  /**
-   * This is a wrapper for CRM_Core_DAO::createTestObject which tracks
-   * created entities and provides for brainless cleanup.
+   * It was thought to be 'brainless' but we don't use it for cleanup anymore.
    *
-   * However, it is only really brainless when initially writing the code.
+   * However, was only really brainless when initially writing the code.
    * It 'steals and deletes entities that are part of the 'stock build'.
    *
-   * In general this causes weird stuff.
+   * In general this causes weird stuff and is worse that competing functions
+   * like individualCreate() eventCreateUnpaid() or createTestEntity().
    *
    * @param $daoName
    * @param array $params
@@ -2433,41 +2423,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function createTestObject($daoName, array $params = [], int $numObjects = 1, bool $createOnly = FALSE) {
     $objects = CRM_Core_DAO::createTestObject($daoName, $params, $numObjects, $createOnly);
-    if (is_array($objects)) {
-      $this->registerTestObjects($objects);
-    }
-    else {
-      $this->registerTestObjects([$objects]);
-    }
     return $objects;
-  }
-
-  /**
-   * @param array $objects
-   *   DAO or BAO objects.
-   */
-  public function registerTestObjects(array $objects): void {
-    //if (is_object($objects)) {
-    //  $objects = array($objects);
-    //}
-    foreach ($objects as $object) {
-      $daoName = str_replace('_BAO_', '_DAO_', get_class($object));
-      $this->_testObjects[$daoName][] = $object->id;
-    }
-  }
-
-  public function deleteTestObjects(): void {
-    // Note: You might argue that the FK relations between test
-    // objects could make this problematic; however, it should
-    // behave intuitively as long as we mentally split our
-    // test-objects between the "manual/primary records"
-    // and the "automatic/secondary records"
-    foreach ($this->_testObjects as $daoName => $daoIds) {
-      foreach ($daoIds as $daoId) {
-        CRM_Core_DAO::deleteTestObjects($daoName, ['id' => $daoId]);
-      }
-    }
-    $this->_testObjects = [];
   }
 
   /**

@@ -29,6 +29,14 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
   protected function getRecords() {
     $fieldsToGet = $this->_itemsToGet('name');
     $typesToGet = $this->_itemsToGet('type');
+    // Force-set values supplied by entity definition
+    // e.g. if this is a ContactType pseudo-entity, set `contact_type` value which is used by the following:
+    // @see \Civi\Api4\Service\Spec\Provider\ContactGetSpecProvider
+    // @see \Civi\Api4\Service\Spec\SpecGatherer::addDAOFields
+    $presetValues = CoreUtil::getInfoItem($this->getEntityName(), 'where') ?? [];
+    foreach ($presetValues as $presetField => $presetValue) {
+      $this->addValue($presetField, $presetValue);
+    }
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
     $includeCustom = TRUE;
@@ -122,6 +130,16 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
 
   public function fields() {
     $fields = parent::fields();
+    $fields[] = [
+      'name' => 'fk_column',
+      'data_type' => 'String',
+      'description' => 'Name of fk_entity column this field references.',
+    ];
+    $fields[] = [
+      'name' => 'dfk_entities',
+      'description' => 'List of possible entity types this field could be referencing.',
+      'data_type' => 'Array',
+    ];
     $fields[] = [
       'name' => 'help_pre',
       'data_type' => 'String',

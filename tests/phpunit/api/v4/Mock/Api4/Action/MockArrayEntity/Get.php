@@ -64,6 +64,14 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'field5' => 'apple',
         'field6' => 0,
       ],
+      [
+        'field1' => 6,
+        'field2' => 'Yack',
+        'field3' => 1,
+        'field4' => [4, 5, 6],
+        'field5' => 'Apple',
+        'field6' => 0,
+      ],
     ];
   }
 

@@ -151,7 +151,7 @@ WHERE contact_id IN ({$contact_id_list})
    */
   public static function allow($id, $type = CRM_Core_Permission::VIEW, $userID = NULL) {
     // Default to logged in user if not supplied
-    $userID = $userID ?? CRM_Core_Session::getLoggedInContactID();
+    $userID ??= CRM_Core_Session::getLoggedInContactID();
 
     // first: check if contact is trying to view own contact
     if ($userID == $id && ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')
@@ -294,8 +294,8 @@ AND    $operationClause
 
     // Add in a row for the logged in contact. Do not try to combine with the above query or an ugly OR will appear in
     // the permission clause.
-    if (CRM_Core_Permission::check('edit my contact') ||
-      ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact'))) {
+    if ($userID && (CRM_Core_Permission::check('edit my contact') ||
+      ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')))) {
       if (!CRM_Core_DAO::singleValueQuery("
         SELECT count(*) FROM civicrm_acl_contact_cache WHERE user_id = %1 AND contact_id = %1 AND operation = '{$operation}' LIMIT 1", $queryParams)) {
         CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation ) VALUES(%1, %1, '{$operation}')", $queryParams);
@@ -389,7 +389,7 @@ AND    $operationClause
     }
 
     // Default to currently logged in user
-    $userID = $userID ?? CRM_Core_Session::getLoggedInContactID();
+    $userID ??= CRM_Core_Session::getLoggedInContactID();
     if (empty($userID)) {
       return [];
     }

@@ -1,5 +1,6 @@
 <?php
 use CRM_Standaloneusers_ExtensionUtil as E;
+use Civi\Api4\MessageTemplate;
 
 /**
  * Collection of upgrade steps.
@@ -44,19 +45,50 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
    */
   public function postInstall() {
 
+    // Ensure users can login with username/password via authx.
     Civi::settings()->set('authx_login_cred', array_unique(array_merge(
       Civi::settings()->get('authx_login_cred'),
       ['pass']
     )));
 
-    $users = \Civi\Api4\User::get(FALSE)->selectRowCount()->execute()->countMatched();
-    if ($users == 0) {
-      CRM_Core_DAO::executeQuery('DELETE FROM civicrm_uf_match');
-    }
+    $this->createPasswordResetMessageTemplate();
 
     // `standaloneusers` is installed as part of the overall install process for `Standalone`.
     // A subsequent step will configure some default users (*depending on local options*).
     // See also: `StandaloneUsers.civi-setup.php`
+  }
+
+  protected function createPasswordResetMessageTemplate() {
+
+    $baseTpl = [
+      'workflow_name' => 'password_reset',
+      'msg_title' => 'Password reset',
+      'msg_subject' => '{ts}Password reset link for{/ts} {domain.name}',
+      'msg_text' => <<<TXT
+        {ts}A password reset link was requested for this account.  If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.{/ts}
+
+        {\$resetUrlPlaintext}
+
+        {domain.name}
+        TXT,
+      'msg_html' => <<<HTML
+        <p>{ts}A password reset link was requested for this account.&nbsp; If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.{/ts}</p>
+
+        <p><a href="{\$resetUrlHtml}">{\$resetUrlHtml}</a></p>
+
+        <p>{domain.name}</p>
+        HTML,
+    ];
+
+    // Create a "reserved" template. This is a pristine copy provided for reference.
+    MessageTemplate::save(FALSE)
+      ->setDefaults($baseTpl)
+      ->setRecords([
+        ['is_reserved' => TRUE, 'is_default' => FALSE],
+        ['is_reserved' => FALSE, 'is_default' => TRUE],
+      ])
+      ->execute();
+
   }
 
   /**
@@ -156,5 +188,17 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
   //   }
   //   return TRUE;
   // }
+
+  /**
+   * Create table civicrm_session
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_5691(): bool {
+    $this->ctx->log->info('Applying update 5691');
+    $this->executeSqlFile('sql/upgrade_5691.sql');
+    return TRUE;
+  }
 
 }

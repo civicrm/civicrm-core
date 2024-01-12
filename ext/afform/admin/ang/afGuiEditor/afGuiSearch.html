@@ -77,4 +77,12 @@
       </div>
     </div>
   </fieldset>
+
+  <fieldset>
+    <legend>{{:: ts('Options') }}</legend>
+    <label>{{:: ts('Remember Filters') }} <input type="checkbox" ng-model="$ctrl.display.fieldset['store-values']"></label>
+    <p class="help-block">
+      {{:: ts('Filter fields will retain their value when the same user revisits the form.') }}
+    </p>
+  </fieldset>
 </div>

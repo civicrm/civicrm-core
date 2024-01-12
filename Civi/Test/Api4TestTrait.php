@@ -4,7 +4,6 @@ namespace Civi\Test;
 
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
-use Civi\Api4\Service\Spec\Provider\FinancialItemCreationSpecProvider;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -131,7 +130,7 @@ trait Api4TestTrait {
     foreach ($requiredFields as $fieldName => $field) {
       if (
         !isset($values[$fieldName]) &&
-        ($field['required'] || AbstractAction::evaluateCondition($field['required_if'], $values + $extraValues))
+        ($field['required'] || AbstractAction::evaluateCondition($field['required_if'], ['values' => $values + $extraValues]))
       ) {
         $extraValues[$fieldName] = $this->getRequiredValue($field);
       }
@@ -227,27 +226,37 @@ trait Api4TestTrait {
    * @throws \CRM_Core_Exception
    */
   private function getRequiredValue(array $field) {
+    // Hack that shouldn't exist except that these entities were added with bad fk metadata
+    // and existing tests at the time didn't catch it.
+    // TODO: Fix these entities and delete this list
+    // NOT TODO: Add to this list!
+    $fixmeDfkMissing = [
+      'EntityBatch' => 'Contact',
+      'FinancialTrxn' => 'Contact',
+      'Log' => 'Contact',
+      'Managed' => 'Contact',
+      'PCPBlock' => 'Contact',
+      'PriceSetEntity' => 'Contact',
+      'RecentItem' => 'Contact',
+    ];
     if (!empty($field['options'])) {
       return key($field['options']);
     }
     if (!empty($field['fk_entity'])) {
       return $this->getFkID($field['fk_entity']);
     }
+    if (!empty($field['dfk_entities'])) {
+      return $this->getFkID(reset($field['dfk_entities']));
+    }
     if (isset($field['default_value'])) {
       return $field['default_value'];
     }
-    if ($field['name'] === 'contact_id') {
-      return $this->getFkID('Contact');
-    }
-    if ($field['name'] === 'entity_id') {
-      // What could possibly go wrong with this?
-      switch ($field['table_name'] ?? NULL) {
-        case 'civicrm_financial_item':
-          return $this->getFkID(FinancialItemCreationSpecProvider::DEFAULT_ENTITY);
-
-        default:
-          return $this->getFkID('Contact');
+    // Obviously an FK field, but if we get here it's missing FK metadata :(
+    if ($field['name'] === 'contact_id' || $field['name'] === 'entity_id') {
+      if (isset($fixmeDfkMissing[$field['entity']])) {
+        return $this->getFkID($fixmeDfkMissing[$field['entity']]);
       }
+      throw new \CRM_Core_Exception($field['name'] . ' should have foreign key information defined.');
     }
     // If there are no options but the field is supposed to have them, we may need to
     // create a new option
@@ -358,6 +367,7 @@ trait Api4TestTrait {
         return $this->randomLetters(100);
 
       case 'Money':
+      case 'Float':
         return sprintf('%d.%2d', random_int(0, 2000), random_int(10, 99));
 
       case 'Date':

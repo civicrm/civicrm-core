@@ -14,19 +14,24 @@
     <td class="html-adjust description">{$element.help_pre}</td>
   </tr>
 {/if}
-{if $element.options_per_line}
+{if $element.html_type === 'Hidden'}
+  {* Hidden field - render in hidden row *}
+  <tr class="custom_field-row {$element.element_name}-row hiddenElement">
+    <td>{$formElement.html}</td>
+  </tr>
+{elseif $element.options_per_line}
   <tr class="custom_field-row {$element.element_name}-row">
     <td class="label">{$formElement.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
     <td class="html-adjust">
-      {assign var="count" value="1"}
+      {assign var="count" value=1}
       {foreach name=outer key=key item=item from=$formElement}
         {if is_array($item) && array_key_exists('html', $item)}
           {$item.html}
           {if $count == $element.options_per_line}
             <br />
-            {assign var="count" value="1"}
+            {assign var="count" value=1}
           {else}
-            {assign var="count" value=`$count+1`}
+            {assign var="count" value=$count+1}
           {/if}
         {else}
           {* Skip because this isn't one of the numeric keyed elements that are the options to display, it's non-numeric keys like the field label and metadata. *}
@@ -34,7 +39,7 @@
       {/foreach}
 
       {if $element.html_type == 'Radio' and $element.is_required == 0}
-        <br /><a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+        <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
       {/if}
     </td>
   </tr>

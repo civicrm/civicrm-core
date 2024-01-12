@@ -110,7 +110,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     }
   }
 
-  public function testCronFallback() {
+  public function testCronFallback(): void {
     // Fake "remote" source data
     $tmpSrc = $this->tempDir . '/versionCheckTestFile.json';
     file_put_contents($tmpSrc, json_encode($this->sampleVersionInfo));
@@ -147,7 +147,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     $this->assertEquals($remoteData, $vc->versionInfo);
   }
 
-  public function testGetSiteStats() {
+  public function testGetSiteStats(): void {
     // Create domain address so the domain country will come up in the stats.
     $country_params = [
       'sequential' => 1,

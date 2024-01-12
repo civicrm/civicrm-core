@@ -151,13 +151,13 @@ class CRM_Event_Task extends CRM_Core_Task {
     }
     else {
       $tasks = [
-        self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
-        self::TASK_EMAIL => self::$_tasks[self::TASK_EMAIL]['title'],
+        self::TASK_EXPORT => self::tasks()[self::TASK_EXPORT]['title'],
+        self::TASK_EMAIL => self::tasks()[self::TASK_EMAIL]['title'],
       ];
 
       //CRM-4418,
       if (CRM_Core_Permission::check('delete in CiviEvent')) {
-        $tasks[self::TASK_DELETE] = self::$_tasks[self::TASK_DELETE]['title'];
+        $tasks[self::TASK_DELETE] = self::tasks()[self::TASK_DELETE]['title'];
       }
     }
 

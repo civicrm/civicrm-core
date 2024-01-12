@@ -95,14 +95,14 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
-    // FIXME: This assumes that $values only has one field, but UI shows multiselect.
-    // Properly supporting multiselect would require total rewrite of this function.
+    // Only one value is allowed for this mapping type.
+    // The form and API both enforce this, so this error should never happen.
     if (count($selectedValues) != 1 || !isset($selectedValues[0])) {
       throw new \CRM_Core_Exception("Error: Scheduled reminders may only have one contact field.");
     }
     elseif (in_array($selectedValues[0], $this->contactDateFields)) {
       $dateDBField = $selectedValues[0];
-      $query = \CRM_Utils_SQL_Select::from("{$this->getEntityTable()} e")->param($defaultParams);
+      $query = \CRM_Utils_SQL_Select::from('civicrm_contact e')->param($defaultParams);
       $query->param([
         'casAddlCheckFrom' => 'civicrm_contact e',
         'casContactIdField' => 'e.id',

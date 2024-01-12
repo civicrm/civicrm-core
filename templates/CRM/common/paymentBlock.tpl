@@ -52,8 +52,7 @@
    */
   function skipPaymentMethod() {
     var isHide = false;
-    var isMultiple = {/literal}{$event.is_multiple_registrations|@json_encode}{literal};
-    var alwaysShowFlag = (isMultiple && cj("#additional_participants").val());
+    var alwaysShowFlag = (cj("#additional_participants").val());
     var alwaysHideFlag = (cj("#bypass_payment").val() == 1);
     var total_amount_tmp =  cj('#pricevalue').data('raw-total');
     // Hide billing questions if this is free
@@ -75,20 +74,10 @@
     function buildPaymentBlock(type) {
       var $form = $('#billing-payment-block').closest('form');
       {/literal}
-      {if !$isBackOffice && $contributionPageID}
-        {capture assign='contributionPageID'}&id={$contributionPageID}{/capture}
-      {else}
-        {capture assign='contributionPageID'}{/capture}
-      {/if}
       {if !$isBackOffice && $custom_pre_id}
         {capture assign='preProfileID'}&pre_profile_id={$custom_pre_id}{/capture}
       {else}
         {capture assign='preProfileID'}{/capture}
-      {/if}
-      {if $urlPathVar}
-        {capture assign='urlPathVar'}&{$urlPathVar}{/capture}
-      {else}
-        {capture assign='urlPathVar'}{/capture}
       {/if}
       {* Billing profile ID is only ever set on front end forms, to force entering address for pay later. *}
       {if !$isBackOffice && $billing_profile_id}
@@ -104,7 +93,7 @@
       var currency = '{$currency}';
       currency = currency == '' ? $('#currency').val() : currency;
 
-      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="formName=`$form.formName``$urlPathVar``$isBackOfficePathVar``$profilePathVar``$contributionPageID``$preProfileID`"}";
+      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="formName=`$form.formName``$isBackOfficePathVar``$profilePathVar``$preProfileID`"}";
       {literal}
       if (typeof(CRM.vars) != "undefined") {
         if (typeof(CRM.vars.coreForm) != "undefined") {
@@ -134,6 +123,10 @@
     $('#payment_instrument_id').on('change.paymentBlock', function() {
       buildPaymentBlock(0);
     });
+
+    if ($('#payment_instrument_id').val()) {
+      buildPaymentBlock(0);
+    }
 
     $('#billing-payment-block').on('crmLoad', function() {
       $('.crm-submit-buttons input').prop('disabled', false);

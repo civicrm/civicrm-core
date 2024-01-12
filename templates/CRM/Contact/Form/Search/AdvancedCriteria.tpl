@@ -24,7 +24,6 @@ CRM.$(function($) {
     var header = $(this).parent();
     header.next().html('');
     header.removeClass('active');
-    header.parent('.crm-ajax-accordion:not(.collapsed)').crmAccordionToggle();
     // Reset results-display mode if it depends on this pane
     var mode = modes[$('#component_mode').val()] || null;
     if (mode && header.attr('id') == mode) {
@@ -72,6 +71,8 @@ CRM.$(function($) {
       CRM.loadPage(url, {target: body, block: false});
     }
   }
+  // Keeps the detail/accordion of 'active' fieldsets open after a search
+  $('summary.active').parent('details').attr('open', '');
 });
 </script>
 {/literal}
@@ -86,37 +87,37 @@ CRM.$(function($) {
 {/if}
 
 {strip}
-  <div class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion" open>
+    <summary class="crm-accordion-header">
       {ts}Display Settings For Results{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       {include file="CRM/Contact/Form/Search/Criteria/DisplaySettings.tpl"}
     </div>
-  </div>
-  <div class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
-    <div class="crm-accordion-header">
+  </details>
+  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion" open>
+    <summary class="crm-accordion-header">
       {ts}Search Settings{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       {include file="CRM/Contact/Form/Search/Criteria/SearchSettings.tpl"}
     </div>
-  </div>
-  <div class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
-    <div class="crm-accordion-header">
+  </details>
+  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion" open>
+    <summary class="crm-accordion-header">
       {ts}Basic Criteria{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       {include file="CRM/Contact/Form/Search/Criteria/Basic.tpl"}
     </div>
-  </div>
+  </details>
   {foreach from=$allPanes key=paneName item=paneValue}
-    <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || array_key_exists($paneName, $openedPanes)} {else}collapsed{/if}">
-      <div class="crm-accordion-header" id="{$paneValue.id}">
+    <details class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || array_key_exists($paneName, $openedPanes)} {else}collapsed{/if}">
+      <summary class="crm-accordion-header" id="{$paneValue.id}">
         {$paneName}
-      </div>
+      </summary>
     <div class="crm-accordion-body {$paneValue.id}"></div>
-    </div><!-- Surplus /div is required (not sure why but breakage is obvious when you remove it) -->
+    </details>
   {/foreach}
   <div class="spacer"></div>
 

@@ -200,6 +200,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
           'main' => NULL,
           'other' => NULL,
           'location_entity' => NULL,
+          'location_block_index' => NULL,
         ];
       }
       $this->assign('rows', $assignedRows);

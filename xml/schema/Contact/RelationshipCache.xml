@@ -10,6 +10,7 @@
   <icon>fa-handshake-o</icon>
   <title>Related Contact</title>
   <paths>
+    <add>civicrm/contact/view/rel?cid=[near_contact_id]&amp;action=add&amp;reset=1</add>
     <view>civicrm/contact/view/rel?action=view&amp;reset=1&amp;cid=[near_contact_id]&amp;id=[relationship_id]</view>
     <update>civicrm/contact/view/rel?action=update&amp;reset=1&amp;cid=[near_contact_id]&amp;id=[relationship_id]&amp;rtype=[orientation]</update>
     <delete>civicrm/contact/view/rel?action=delete&amp;reset=1&amp;cid=[near_contact_id]&amp;id=[relationship_id]</delete>

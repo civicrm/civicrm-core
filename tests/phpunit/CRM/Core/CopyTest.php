@@ -66,7 +66,7 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
   /**
    * @group locale
    */
-  public function testI18nEventCopy() {
+  public function testI18nEventCopy(): void {
 
     $locales = ['en_US', 'fr_CA', 'nl_NL'];
 
@@ -102,7 +102,7 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
 
     // init in case it's not defined
     foreach ($locParams as $field) {
-      $eventData[$field] = $eventData[$field] ?? '';
+      $eventData[$field] ??= '';
     }
 
     // differencing the data in original content for each locales

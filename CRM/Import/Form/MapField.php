@@ -32,6 +32,11 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
   protected $_mapperFields;
 
   /**
+   * @var bool
+   */
+  protected $shouldSortMapperFields = TRUE;
+
+  /**
    * Column headers, if we have them
    *
    * @var array
@@ -72,7 +77,9 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     if (empty($_POST) && count($fieldMappings) > 0 && count($this->getColumnHeaders()) !== count($fieldMappings)) {
       CRM_Core_Session::singleton()->setStatus(ts('The data columns in this import file appear to be different from the saved mapping. Please verify that you have selected the correct saved mapping before continuing.'));
     }
-    asort($this->_mapperFields);
+    if ($this->shouldSortMapperFields) {
+      asort($this->_mapperFields);
+    }
     parent::preProcess();
   }
 

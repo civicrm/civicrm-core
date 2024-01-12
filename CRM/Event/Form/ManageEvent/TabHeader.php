@@ -76,7 +76,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     if (CRM_Core_Permission::check('administer CiviCRM data') || !empty($permissions[CRM_Core_Permission::EDIT])) {
       $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage'] + $default;
     }
-    $tabs['conference'] = ['title' => ts('Conference Slots')] + $default;
+
     $tabs['friend'] = ['title' => ts('Tell a Friend')] + $default;
     $tabs['pcp'] = ['title' => ts('Personal Campaigns')] + $default;
     $tabs['repeat'] = ['title' => ts('Repeat')] + $default;
@@ -84,12 +84,6 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     // Repeat tab must refresh page when switching repeat mode so js & vars will get set-up
     if (!$form->_isRepeatingEvent) {
       unset($tabs['repeat']['class']);
-    }
-
-    // @todo Move to eventcart extension
-    // check if we're in shopping cart mode for events
-    if (!(bool) Civi::settings()->get('enable_cart')) {
-      unset($tabs['conference']);
     }
 
     $eventID = $form->getVar('_id');
@@ -227,7 +221,7 @@ WHERE      e.id = %1
       }
     }
 
-    $current = $current ? $current : 'settings';
+    $current = $current ?: 'settings';
     return $current;
   }
 

@@ -102,11 +102,7 @@ class CRM_Case_Audit_Audit {
 
               //CRM-4570
               if ($printReport) {
-                if (!in_array($label, [
-                  'Activity Type',
-                  'Status',
-                ])
-                ) {
+                if (!in_array($label, ['Activity Type', 'Status'])) {
                   $caseActivities[$activityindex][$fieldindex] = [];
                   $caseActivities[$activityindex][$fieldindex]['name'] = $name;
                   $caseActivities[$activityindex][$fieldindex]['label'] = $label;

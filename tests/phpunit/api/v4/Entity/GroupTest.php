@@ -87,7 +87,7 @@ class GroupTest extends Api4TestBase {
     $this->assertTrue($get[$smartGroup['id']]['cache_expired']);
   }
 
-  public function testCreate() {
+  public function testCreate(): void {
     $this->createLoggedInUser();
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'access CiviCRM',
@@ -143,7 +143,7 @@ class GroupTest extends Api4TestBase {
       ->execute();
   }
 
-  public function testParentsInWhereClause() {
+  public function testParentsInWhereClause(): void {
     // Create 10 groups - at least 1 id will be 2-digit and contain the number 1
     $groups = $this->saveTestRecords('Group', [
       'records' => array_fill(0, 10, []),
@@ -180,7 +180,7 @@ class GroupTest extends Api4TestBase {
     $this->assertEquals($child3['id'], $found[0]['id']);
   }
 
-  public function testGetParents() {
+  public function testGetParents(): void {
     $parent1 = Group::create(FALSE)
       ->addValue('title', uniqid())
       ->execute()->single();
@@ -237,7 +237,7 @@ class GroupTest extends Api4TestBase {
     $this->assertEquals($child2['title'], $joined[2]['child_group.title']);
   }
 
-  public function testAddRemoveParents() {
+  public function testAddRemoveParents(): void {
     $group1 = Group::create(FALSE)
       ->addValue('title', uniqid())
       ->execute()->single();

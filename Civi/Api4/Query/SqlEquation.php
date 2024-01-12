@@ -77,9 +77,10 @@ class SqlEquation extends SqlExpression {
    * Render the expression for insertion into the sql query
    *
    * @param \Civi\Api4\Query\Api4Query $query
+   * @param bool $includeAlias
    * @return string
    */
-  public function render(Api4Query $query): string {
+  public function render(Api4Query $query, bool $includeAlias = FALSE): string {
     $output = [];
     foreach ($this->args as $i => $arg) {
       // Just an operator
@@ -98,7 +99,7 @@ class SqlEquation extends SqlExpression {
         $output[] = $arg->render($query);
       }
     }
-    return '(' . implode(' ', $output) . ')';
+    return '(' . implode(' ', $output) . ')' . ($includeAlias ? " AS `{$this->getAlias()}`" : '');
   }
 
   /**
@@ -133,11 +134,10 @@ class SqlEquation extends SqlExpression {
    * Change $dataType according to operator used in equation
    *
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
-   * @param string $value
-   * @param string $dataType
-   * @return string
+   * @param string|null $dataType
+   * @param array $values
    */
-  public function formatOutputValue($value, &$dataType) {
+  public function formatOutputValue(?string &$dataType, array &$values) {
     foreach (self::$comparisonOperators as $op) {
       if (strpos($this->expr, " $op ")) {
         $dataType = 'Boolean';
@@ -148,7 +148,6 @@ class SqlEquation extends SqlExpression {
         $dataType = 'Float';
       }
     }
-    return $value;
   }
 
   public static function getTitle(): string {

@@ -20,6 +20,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   protected $_customGroupExtends = [
     'Activity',
     'Individual',
+    'Organization',
+    'Contact',
   ];
 
   protected $_nonDisplayFields = [];
@@ -37,16 +39,22 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   protected $groupFilterNotOptimised = TRUE;
 
   /**
+   * @var array|int
+   */
+  private $engagementLevels;
+
+  /**
+   * @var array
+   */
+  private $activityTypes;
+
+  /**
    * Class constructor.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function __construct() {
     // There could be multiple contacts. We not clear on which contact id to display.
     // Lets hide it for now.
     $this->_exposeContactID = FALSE;
-    // if navigated from count link of activity summary reports.
-    $this->_resetDateFilter = CRM_Utils_Request::retrieve('resetDateFilter', 'Boolean');
 
     $components = CRM_Core_Component::getEnabledComponents();
     $campaignEnabled = !empty($components['CiviCampaign']);
@@ -87,21 +95,21 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'name' => 'sort_name',
             'title' => ts('Assignee Name'),
             'alias' => 'civicrm_contact_assignee',
-            'dbAlias' => "civicrm_contact_assignee.sort_name",
+            'dbAlias' => 'civicrm_contact_assignee.sort_name',
             'default' => TRUE,
           ],
           'contact_target' => [
             'name' => 'sort_name',
             'title' => ts('Target Name'),
             'alias' => 'civicrm_contact_target',
-            'dbAlias' => "civicrm_contact_target.sort_name",
+            'dbAlias' => 'civicrm_contact_target.sort_name',
             'default' => TRUE,
           ],
           'contact_target_birth' => [
             'name' => 'birth_date',
             'title' => ts('Target Birth Date'),
             'alias' => 'civicrm_contact_target',
-            'dbAlias' => "civicrm_contact_target.birth_date",
+            'dbAlias' => 'civicrm_contact_target.birth_date',
           ],
           'contact_target_gender' => [
             'name' => 'gender_id',
@@ -130,6 +138,30 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'name' => 'id',
             'alias' => 'civicrm_contact_target',
             'dbAlias' => "civicrm_contact_target.id",
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
+          ],
+          'contact_source_employer_id' => [
+            'name' => 'employer_id',
+            'alias' => 'civicrm_contact_source',
+            'dbAlias' => "civicrm_contact_source.employer_id",
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
+          ],
+          'contact_assignee_employer_id' => [
+            'name' => 'employer_id',
+            'alias' => 'civicrm_contact_assignee',
+            'dbAlias' => "civicrm_contact_assignee.employer_id",
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
+          ],
+          'contact_target_employer_id' => [
+            'name' => 'employer_id',
+            'alias' => 'civicrm_contact_target',
+            'dbAlias' => "civicrm_contact_target.employer_id",
             'no_display' => TRUE,
             'default' => TRUE,
             'required' => TRUE,
@@ -211,6 +243,26 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'name' => 'phone',
             'title' => ts('Target Phone'),
             'alias' => 'civicrm_phone_target',
+          ],
+        ],
+      ],
+      'civicrm_employer' => [
+        'dao' => 'CRM_Contact_DAO_Contact',
+        'fields' => [
+          'contact_source_employer' => [
+            'name' => 'display_name',
+            'title' => ts('Source Employer'),
+            'alias' => 'civicrm_employer_source',
+          ],
+          'contact_assignee_employer' => [
+            'name' => 'display_name',
+            'title' => ts('Assignee Employer'),
+            'alias' => 'civicrm_employer_assignee',
+          ],
+          'contact_target_employer' => [
+            'name' => 'display_name',
+            'title' => ts('Target Employer'),
+            'alias' => 'civicrm_employer_target',
           ],
         ],
       ],
@@ -426,12 +478,14 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     if ($recordType == 'target') {
       // @todo - fix up the way the tables are declared in construct & remove this.
       foreach ($this->_selectClauses as $key => $clause) {
-        if (strstr($clause, 'civicrm_contact_assignee.') ||
-          strstr($clause, 'civicrm_contact_source.') ||
-          strstr($clause, 'civicrm_email_assignee.') ||
-          strstr($clause, 'civicrm_email_source.') ||
-          strstr($clause, 'civicrm_phone_assignee.') ||
-          strstr($clause, 'civicrm_phone_source.')
+        if (str_contains($clause, 'civicrm_contact_assignee.') ||
+          str_contains($clause, 'civicrm_contact_source.') ||
+          str_contains($clause, 'civicrm_email_assignee.') ||
+          str_contains($clause, 'civicrm_email_source.') ||
+          str_contains($clause, 'civicrm_phone_assignee.') ||
+          str_contains($clause, 'civicrm_phone_source.') ||
+          str_contains($clause, 'civicrm_employer_assignee.') ||
+          str_contains($clause, 'civicrm_employer_source.')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -441,13 +495,15 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     elseif ($recordType == 'assignee') {
       // @todo - fix up the way the tables are declared in construct & remove this.
       foreach ($this->_selectClauses as $key => $clause) {
-        if (strstr($clause, 'civicrm_contact_target.') ||
-          strstr($clause, 'civicrm_contact_source.') ||
-          strstr($clause, 'civicrm_email_target.') ||
-          strstr($clause, 'civicrm_email_source.') ||
-          strstr($clause, 'civicrm_phone_target.') ||
-          strstr($clause, 'civicrm_phone_source.') ||
-          strstr($clause, 'civicrm_address_')
+        if (str_contains($clause, 'civicrm_contact_target.') ||
+          str_contains($clause, 'civicrm_contact_source.') ||
+          str_contains($clause, 'civicrm_email_target.') ||
+          str_contains($clause, 'civicrm_email_source.') ||
+          str_contains($clause, 'civicrm_phone_target.') ||
+          str_contains($clause, 'civicrm_phone_source.') ||
+          str_contains($clause, 'civicrm_employer_target.') ||
+          str_contains($clause, 'civicrm_employer_source.') ||
+          str_contains($clause, 'civicrm_address_')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -457,33 +513,38 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     elseif ($recordType == 'source') {
       // @todo - fix up the way the tables are declared in construct & remove this.
       foreach ($this->_selectClauses as $key => $clause) {
-        if (strstr($clause, 'civicrm_contact_target.') ||
-          strstr($clause, 'civicrm_contact_assignee.') ||
-          strstr($clause, 'civicrm_email_target.') ||
-          strstr($clause, 'civicrm_email_assignee.') ||
-          strstr($clause, 'civicrm_phone_target.') ||
-          strstr($clause, 'civicrm_phone_assignee.') ||
-          strstr($clause, 'civicrm_address_')
+        if (str_contains($clause, 'civicrm_contact_target.') ||
+          str_contains($clause, 'civicrm_contact_assignee.') ||
+          str_contains($clause, 'civicrm_email_target.') ||
+          str_contains($clause, 'civicrm_email_assignee.') ||
+          str_contains($clause, 'civicrm_phone_target.') ||
+          str_contains($clause, 'civicrm_phone_assignee.') ||
+          str_contains($clause, 'civicrm_employer_target.') ||
+          str_contains($clause, 'civicrm_employer_assignee.') ||
+          str_contains($clause, 'civicrm_address_')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
         }
       }
     }
-    elseif ($recordType == 'final') {
+    elseif ($recordType === 'final') {
       $this->_selectClauses = $this->_selectAliasesTotal;
       foreach ($this->_selectClauses as $key => $clause) {
         // @todo - fix up the way the tables are declared in construct & remove this.
-        if (strstr($clause, 'civicrm_contact_contact_target') ||
-          strstr($clause, 'civicrm_contact_contact_assignee') ||
-          strstr($clause, 'civicrm_contact_contact_source') ||
-          strstr($clause, 'civicrm_phone_contact_source_phone') ||
-          strstr($clause, 'civicrm_phone_contact_assignee_phone') ||
-          strstr($clause, 'civicrm_email_contact_source_email') ||
-          strstr($clause, 'civicrm_email_contact_assignee_email') ||
-          strstr($clause, 'civicrm_email_contact_target_email') ||
-          strstr($clause, 'civicrm_phone_contact_target_phone') ||
-          strstr($clause, 'civicrm_address_')
+        if (str_contains($clause, 'civicrm_contact_contact_target') ||
+          str_contains($clause, 'civicrm_contact_contact_assignee') ||
+          str_contains($clause, 'civicrm_contact_contact_source') ||
+          str_contains($clause, 'civicrm_phone_contact_source_phone') ||
+          str_contains($clause, 'civicrm_phone_contact_assignee_phone') ||
+          str_contains($clause, 'civicrm_email_contact_source_email') ||
+          str_contains($clause, 'civicrm_email_contact_assignee_email') ||
+          str_contains($clause, 'civicrm_email_contact_target_email') ||
+          str_contains($clause, 'civicrm_phone_contact_target_phone') ||
+          str_contains($clause, 'civicrm_employer_contact_source_employer') ||
+          str_contains($clause, 'civicrm_employer_contact_assignee_employer') ||
+          str_contains($clause, 'civicrm_employer_contact_target_employer') ||
+          str_contains($clause, 'civicrm_address_')
         ) {
           $this->_selectClauses[$key] = "GROUP_CONCAT(DISTINCT $clause SEPARATOR ';') as $clause";
         }
@@ -495,7 +556,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         unset($this->_selectAliases[$key]);
       }
 
-      if ($recordType == 'target') {
+      if ($recordType === 'target') {
         foreach ($this->_columns['civicrm_address']['order_bys'] as $fieldName => $field) {
           $orderByFld = $this->_columns['civicrm_address']['order_bys'][$fieldName];
           $fldInfo = $this->_columns['civicrm_address']['fields'][$fieldName];
@@ -544,7 +605,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           ) {
             continue;
           }
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+          if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
@@ -722,7 +783,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
    *
    * @return string
    */
-  public function buildQuery($applyLimit = TRUE) {
+  public function buildQuery($applyLimit = TRUE): string {
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
@@ -765,10 +826,14 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
   ADD COLUMN civicrm_contact_contact_source VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_assignee_id VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_source_id VARCHAR(128),
+  ADD COLUMN civicrm_contact_contact_assignee_employer_id VARCHAR(128),
+  ADD COLUMN civicrm_contact_contact_source_employer_id VARCHAR(128),
   ADD COLUMN civicrm_phone_contact_assignee_phone VARCHAR(128),
   ADD COLUMN civicrm_phone_contact_source_phone VARCHAR(128),
   ADD COLUMN civicrm_email_contact_assignee_email VARCHAR(128),
-  ADD COLUMN civicrm_email_contact_source_email VARCHAR(128)";
+  ADD COLUMN civicrm_email_contact_source_email VARCHAR(128),
+  ADD COLUMN civicrm_employer_contact_assignee_employer VARCHAR(128),
+  ADD COLUMN civicrm_employer_contact_source_employer VARCHAR(128)";
     $this->executeReportQuery($tempQuery);
 
     // 3. fill temp table with assignee results
@@ -816,7 +881,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
 
     $groupByFromSelect = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, 'civicrm_activity_id');
 
-    $this->_where = " WHERE (1)";
+    $this->_where = ' WHERE (1)';
     $this->buildPermissionClause();
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
@@ -846,7 +911,8 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
    * Override parent to reset value of activity_date.
    */
   public function beginPostProcessCommon() {
-    if (!empty($this->_resetDateFilter)) {
+    if (CRM_Utils_Request::retrieve('resetDateFilter', 'Boolean')) {
+      // if navigated from count link of activity summary reports.
       $this->_formValues['activity_date_time_relative'] = NULL;
     }
   }
@@ -930,7 +996,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       if (array_key_exists('civicrm_contact_contact_source', $row)) {
         if ($value = $row['civicrm_contact_contact_source_id']) {
           if ($viewLinks) {
-            $url = CRM_Utils_System::url("civicrm/contact/view",
+            $url = CRM_Utils_System::url('civicrm/contact/view',
               'reset=1&cid=' . $value,
               $this->_absoluteUrl
             );
@@ -949,7 +1015,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
           if ($viewLinks) {
             foreach ($assigneeContactIds as $id => $value) {
               if (isset($value) && isset($assigneeNames[$id])) {
-                $url = CRM_Utils_System::url("civicrm/contact/view",
+                $url = CRM_Utils_System::url('civicrm/contact/view',
                   'reset=1&cid=' . $value,
                   $this->_absoluteUrl
                 );
@@ -980,6 +1046,64 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
               }
             }
             $rows[$rowNum]['civicrm_contact_contact_target'] = implode('; ', $link);
+          }
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_employer_contact_source_employer', $row)) {
+        if ($value = $row['civicrm_contact_contact_source_employer_id']) {
+          if ($viewLinks) {
+            $url = CRM_Utils_System::url('civicrm/contact/view',
+              'reset=1&cid=' . $value,
+              $this->_absoluteUrl
+            );
+            $rows[$rowNum]['civicrm_employer_contact_source_employer_link'] = $url;
+            $rows[$rowNum]['civicrm_employer_contact_source_employer_hover'] = $onHover;
+          }
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_employer_contact_assignee_employer', $row)) {
+        $assigneeNames = explode(';', $row['civicrm_employer_contact_assignee_employer']);
+        if ($value = $row['civicrm_contact_contact_assignee_employer_id']) {
+          $assigneeContactIds = explode(';', $value);
+          $link = [];
+          if ($viewLinks) {
+            foreach ($assigneeContactIds as $id => $value) {
+              if (isset($value) && isset($assigneeNames[$id])) {
+                $url = CRM_Utils_System::url('civicrm/contact/view',
+                  'reset=1&cid=' . $value,
+                  $this->_absoluteUrl
+                );
+                $link[] = "<a title='" . $onHover . "' href='" . $url .
+                  "'>{$assigneeNames[$id]}</a>";
+              }
+            }
+            $rows[$rowNum]['civicrm_employer_contact_assignee_employer'] = implode('; ', $link);
+          }
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_employer_contact_target_employer', $row)) {
+        $targetNames = explode(';', $row['civicrm_employer_contact_target_employer']);
+        if ($value = $row['civicrm_contact_contact_target_employer_id']) {
+          $targetContactIds = explode(';', $value);
+          $link = [];
+          if ($viewLinks) {
+            foreach ($targetContactIds as $id => $value) {
+              if (isset($value) && isset($targetNames[$id])) {
+                $url = CRM_Utils_System::url("civicrm/contact/view",
+                  'reset=1&cid=' . $value,
+                  $this->_absoluteUrl
+                );
+                $link[] = "<a title='" . $onHover . "' href='" . $url .
+                  "'>{$targetNames[$id]}</a>";
+              }
+            }
+            $rows[$rowNum]['civicrm_employer_contact_target_employer'] = implode('; ', $link);
           }
           $entryFound = TRUE;
         }
@@ -1039,9 +1163,9 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
         array_key_exists('civicrm_activity_status_id', $row)
       ) {
         if (CRM_Utils_Date::overdue($rows[$rowNum]['civicrm_activity_activity_date_time']) &&
-          $activityStatus[$row['civicrm_activity_status_id']] != 'Completed'
+          $activityStatus[$row['civicrm_activity_status_id']] !== 'Completed'
         ) {
-          $rows[$rowNum]['class'] = "status-overdue";
+          $rows[$rowNum]['class'] = 'status-overdue';
           $entryFound = TRUE;
         }
       }
@@ -1075,7 +1199,6 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       foreach (array_merge($sectionAliases, $this->_selectAliases) as $alias) {
         $ifnulls[] = "ifnull($alias, '') as $alias";
       }
-      $this->_select = "SELECT " . implode(", ", $ifnulls);
       $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($ifnulls, $sectionAliases);
 
       $query = $this->_select .
@@ -1180,6 +1303,12 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
           LEFT JOIN civicrm_phone civicrm_phone_{$recordType}
                  ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_phone_{$recordType}.contact_id AND
                     civicrm_phone_{$recordType}.is_primary = 1 ";
+    }
+
+    if ($this->isTableSelected('civicrm_employer')) {
+      $this->_from .= "
+          LEFT JOIN civicrm_contact civicrm_employer_{$recordType}
+                 ON civicrm_contact_{$recordType}.employer_id = civicrm_employer_{$recordType}.id";
     }
     $this->_aliases['civicrm_contact'] = "civicrm_contact_{$recordType}";
 

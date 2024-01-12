@@ -1,6 +1,8 @@
 <?php
 
-class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken {
+use Civi\Api4\Event\AuthorizeRecordEvent;
+
+class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken implements \Civi\Core\HookInterface {
 
   /**
    * Create or update OAuthContactToken based on array-data
@@ -26,21 +28,18 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken {
   }
 
   /**
-   * @param string $entityName
-   * @param string $action
-   * @param array $record
-   * @param $userId
-   * @return bool
-   * @see CRM_Core_DAO::checkAccess
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, $userId): bool {
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $userId = $e->getUserID();
     try {
       $record['check_permissions'] = TRUE;
       self::fillAndValidate($record, $userId);
-      return TRUE;
+      $e->setAuthorized(TRUE);
     }
-    catch (\Civi\API\Exception\UnauthorizedException $e) {
-      return FALSE;
+    catch (\Civi\API\Exception\UnauthorizedException $exception) {
+      $e->setAuthorized(FALSE);
     }
   }
 
@@ -97,9 +96,12 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken {
   }
 
   /**
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
 
@@ -109,13 +111,13 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken {
     }
     // With 'manage my' permission, limit to just the current user
     elseif ($loggedInContactID && CRM_Core_Permission::check(['manage my OAuth contact tokens'])) {
-      $clauses['contact_id'] = "= $loggedInContactID";
+      $clauses['contact_id'][] = "= $loggedInContactID";
     }
     // No permission, return nothing
     else {
-      $clauses['contact_id'] = "= -1";
+      $clauses['contact_id'][] = "= -1";
     }
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
   }
 

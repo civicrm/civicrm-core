@@ -36,6 +36,7 @@ use Civi\Core\Event\GenericHookEvent;
  */
 class AutocompleteAction extends AbstractAction {
   use Traits\SavedSearchInspectorTrait;
+  use Traits\GetSetValueTrait;
 
   /**
    * Autocomplete search input for search mode
@@ -87,6 +88,17 @@ class AutocompleteAction extends AbstractAction {
    * @var string
    */
   protected $key;
+
+  /**
+   * Known entity values.
+   *
+   * Value will be populated by the form based on data entered at the time.
+   * They can be used by hooks for contextual filtering.
+   *
+   * Format: [fieldName => value][]
+   * @var array
+   */
+  protected $values = [];
 
   /**
    * Search conditions that will be automatically added to the WHERE or HAVING clauses
@@ -149,26 +161,34 @@ class AutocompleteAction extends AbstractAction {
     else {
       // Default search and sort field
       $labelField = $this->display['settings']['columns'][0]['key'];
-      $idField = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
+      $primaryKeys = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'primary_key');
       $this->display['settings'] += [
         'sort' => [$labelField, 'ASC'],
       ];
       // Always search on the first line of the display
       $searchFields = [$labelField];
-      // If input is an integer, search by id
-      $numericInput = $this->page == 1 && \CRM_Utils_Rule::positiveInteger($this->input);
-      if ($numericInput) {
-        $searchFields = [$idField];
+      // If input is an integer...
+      $searchById = \CRM_Utils_Rule::positiveInteger($this->input) &&
+        // ...and there is exactly one primary key (e.g. EntitySet has zero, others might have compound keys)
+        count($primaryKeys) === 1 &&
+        // ...and the primary key field is type Integer (e.g. Afform.name is a String)
+        ($this->getField($primaryKeys[0])['data_type'] ?? NULL) === 'Integer';
+      // ...then search by primary key on first page
+      $initialSearchById = $searchById && $this->page == 1;
+      if ($initialSearchById) {
+        $searchFields = $primaryKeys;
       }
-      // For subsequent pages when searching numeric input
-      elseif ($this->page > 1 && \CRM_Utils_Rule::positiveInteger($this->input)) {
+      // For subsequent pages when searching by id, subtract the "extra" first page
+      elseif ($searchById && $this->page > 1) {
         $this->page -= 1;
+        // Record with that id was already returned on page one so exclude it from subsequent pages
+        $this->savedSearch['api_params']['where'][] = [$primaryKeys[0], '!=', $this->input];
       }
       // If first line uses a rewrite, search on those fields too
-      if (!empty($this->display['settings']['columns'][0]['rewrite'])) {
+      if (!$initialSearchById && !empty($this->display['settings']['columns'][0]['rewrite'])) {
         $searchFields = array_merge($searchFields, $this->getTokens($this->display['settings']['columns'][0]['rewrite']));
       }
-      $this->display['settings']['limit'] = $this->display['settings']['limit'] ?? \Civi::settings()->get('search_autocomplete_count');
+      $this->display['settings']['limit'] ??= \Civi::settings()->get('search_autocomplete_count');
       $this->display['settings']['pager'] = [];
       $return = 'scroll:' . $this->page;
       // SearchKit treats comma-separated fieldnames as OR clauses
@@ -186,7 +206,7 @@ class AutocompleteAction extends AbstractAction {
       $item = [
         'id' => $row['data'][$keyField],
         'label' => $row['columns'][0]['val'],
-        'icon' => $row['columns'][0]['icons'][0]['class'] ?? NULL,
+        'icon' => $row['columns'][0]['icons']['left'][0] ?? NULL,
         'description' => [],
       ];
       foreach (array_slice($row['columns'], 1) as $col) {
@@ -198,7 +218,7 @@ class AutocompleteAction extends AbstractAction {
       $result[] = $item;
     }
     $result->setCountMatched($apiResult->count());
-    if (!empty($numericInput)) {
+    if (!empty($initialSearchById)) {
       // Trigger "more results" after searching by exact id
       $result->setCountMatched($apiResult->count() + 1);
     }
@@ -279,16 +299,8 @@ class AutocompleteAction extends AbstractAction {
    */
   private function getKeyField() {
     $entityName = $this->savedSearch['api_entity'];
-    if ($this->key) {
-      /** @var \CRM_Core_DAO $dao */
-      $dao = CoreUtil::getInfoItem($entityName, 'dao');
-      if ($dao && method_exists($dao, 'indices')) {
-        foreach ($dao::indices(FALSE) as $index) {
-          if (!empty($index['unique']) && in_array($this->key, $index['field'], TRUE)) {
-            return $this->key;
-          }
-        }
-      }
+    if ($this->key && in_array($this->key, CoreUtil::getInfoItem($entityName, 'match_fields') ?? [], TRUE)) {
+      return $this->key;
     }
     return $this->display['settings']['keyField'] ?? CoreUtil::getIdFieldName($entityName);
   }

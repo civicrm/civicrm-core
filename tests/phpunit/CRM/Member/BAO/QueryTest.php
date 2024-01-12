@@ -22,7 +22,7 @@ class CRM_Member_BAO_QueryTest extends CiviUnitTestCase {
    * We want to see the following syntaxes for membership_type_id field handled:
    *   1) membership_type_id => 1
    */
-  public function testConvertEntityFieldSingleValue() {
+  public function testConvertEntityFieldSingleValue(): void {
     $formValues = ['membership_type_id' => 2];
     $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, ['membership_type_id']);
     $this->assertEquals(['membership_type_id', '=', 2, 0, 0], $params[0]);
@@ -38,7 +38,7 @@ class CRM_Member_BAO_QueryTest extends CiviUnitTestCase {
    *
    * The last of these is the format used prior to converting membership_type_id to an entity reference field.
    */
-  public function testConvertEntityFieldMultipleValueEntityRef() {
+  public function testConvertEntityFieldMultipleValueEntityRef(): void {
     $formValues = ['membership_type_id' => '1,2'];
     $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, ['membership_type_id']);
     $this->assertEquals(['membership_type_id', 'IN', [1, 2], 0, 0], $params[0]);
@@ -55,7 +55,7 @@ class CRM_Member_BAO_QueryTest extends CiviUnitTestCase {
    * The last of these is the format used prior to converting membership_type_id to an entity reference field. It will
    * be used by pre-existing smart groups.
    */
-  public function testConvertEntityFieldMultipleValueLegacy() {
+  public function testConvertEntityFieldMultipleValueLegacy(): void {
     $formValues = ['membership_type_id' => [1, 2]];
     $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, ['membership_type_id']);
     $this->assertEquals(['membership_type_id', 'IN', [1, 2], 0, 0], $params[0]);
@@ -70,7 +70,7 @@ class CRM_Member_BAO_QueryTest extends CiviUnitTestCase {
    *
    * The convertFormValues function should cope with this until such time as we can rationalise that.
    */
-  public function testConvertEntityFieldMultipleValueEntityRefDoubleRun() {
+  public function testConvertEntityFieldMultipleValueEntityRefDoubleRun(): void {
     $formValues = ['membership_type_id' => '1,2'];
     $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, ['membership_type_id']);
     $this->assertEquals(['membership_type_id', 'IN', [1, 2], 0, 0], $params[0]);

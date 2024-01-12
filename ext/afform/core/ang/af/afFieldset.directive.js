@@ -5,7 +5,8 @@
       restrict: 'A',
       require: ['afFieldset', '?^^afForm'],
       bindToController: {
-        modelName: '@afFieldset'
+        modelName: '@afFieldset',
+        storeValues: '<'
       },
       link: function($scope, $el, $attr, ctrls) {
         var self = ctrls[0];
@@ -39,6 +40,26 @@
         };
         this.getFormName = function() {
           return ctrl.afFormCtrl ? ctrl.afFormCtrl.getFormMeta().name : $scope.meta.name;
+        };
+
+        // If `storeValue` setting is enabled, field values are cached in localStorage
+        function getCacheKey() {
+          return 'afform:' + ctrl.getFormName() + ctrl.getName();
+        }
+        this.getStoredValue = function(fieldName) {
+          if (!this.storeValues) {
+            return;
+          }
+          return CRM.cache.get(getCacheKey(), {})[fieldName];
+        };
+        this.$onInit = function() {
+          if (this.storeValues) {
+            $scope.$watch(ctrl.getFieldData, function(newVal, oldVal) {
+              if (typeof newVal === 'object' && typeof oldVal === 'object' && Object.keys(newVal).length) {
+                CRM.cache.set(getCacheKey(), newVal);
+              }
+            }, true);
+          }
         };
       }
     };

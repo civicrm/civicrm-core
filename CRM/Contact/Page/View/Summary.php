@@ -21,6 +21,42 @@
 class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
   /**
+   * Contents of contact_view_options setting.
+   *
+   * @var array
+   * @internal
+   */
+  public $_viewOptions;
+
+  /**
+   * Provide support for extensions that are using the _show{Block} properties
+   * (e.g. `_showCustomData`, `_showAddress`, `_showPhone` etc)
+   *
+   * These properties were dynamically defined,
+   * based on the available `contact_edit_options`,
+   * and so have been deprecated for PHP 8.2 support.
+   *
+   * Extension authors can read contact_edit_options directly.
+   * The show{Block} values are also still assigned to the template layer.
+   *
+   * @param string $name
+   * @return bool|null
+   */
+  public function __get($name) {
+    if (str_starts_with($name, '_show')) {
+      $blockName = substr($name, strlen('_show'));
+      $editOptions = CRM_Core_BAO_Setting::valueOptions(
+        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'contact_edit_options'
+      );
+
+      CRM_Core_Error::deprecatedWarning('_show{Block} properties are deprecated in CRM_Contact_Page_View_Summary. Read contact_edit_options directly instead.');
+      return $editOptions[$blockName] ?? FALSE;
+    }
+    return NULL;
+  }
+
+  /**
    * Heart of the viewing process.
    *
    * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
@@ -140,6 +176,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       'email_greeting_custom' => '',
       'addressee_custom' => '',
       'communication_style_display' => '',
+      'email_greeting_display' => '',
+      'postal_greeting_display' => '',
       // for Demographics.tpl
       'age' => ['y' => '', 'm' => ''],
       'birth_date' => '',
@@ -214,9 +252,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     );
 
     foreach ($editOptions as $blockName => $value) {
-      $varName = '_show' . $blockName;
-      $this->$varName = $value;
-      $this->assign(substr($varName, 1), $this->$varName);
+      $varName = 'show' . $blockName;
+      $this->assign($varName, $value);
     }
 
     // get contact name of shared contact names
@@ -303,25 +340,11 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'icon' => 'crm-i fa-tasks',
       ],
       [
-        'id' => 'rel',
-        'title' => ts('Relationships'),
-        'class' => 'livePage',
-        'weight' => 80,
-        'icon' => 'crm-i fa-handshake-o',
-      ],
-      [
         'id' => 'group',
         'title' => ts('Groups'),
         'class' => 'ajaxForm',
         'weight' => 90,
         'icon' => 'crm-i fa-users',
-      ],
-      [
-        'id' => 'note',
-        'title' => ts('Notes'),
-        'class' => 'livePage',
-        'weight' => 100,
-        'icon' => 'crm-i fa-sticky-note-o',
       ],
       [
         'id' => 'tag',

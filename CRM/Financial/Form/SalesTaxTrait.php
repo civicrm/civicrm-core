@@ -18,8 +18,11 @@ trait CRM_Financial_Form_SalesTaxTrait {
 
   /**
    * Assign the sales tax term to the template.
+   *
+   * @deprecated since 5.69 will be removed around 5.80
    */
   public function assignSalesTaxTermToTemplate() {
+    CRM_Core_Error::deprecatedFunctionWarning('assign the setting');
     $this->assign('taxTerm', $this->getSalesTaxTerm());
   }
 
@@ -47,7 +50,7 @@ trait CRM_Financial_Form_SalesTaxTrait {
    */
   public function assignSalesTaxMetadataToTemplate() {
     $this->assignSalesTaxRates();
-    $this->assignSalesTaxTermToTemplate();
+    $this->assign('taxTerm', $this->getSalesTaxTerm());
   }
 
   /**

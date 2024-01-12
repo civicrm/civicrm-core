@@ -53,7 +53,7 @@
       <td colspan="2"><label>{ts}Active Period{/ts}</label> {help id="id-relationship-active-period" file="CRM/Contact/Form/Search/Advanced.hlp"}<br /></td>
     </tr>
     <tr>
-      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="relation_active_period_date" to='' from='' colspan='' class ='' hideRelativeLabel=1 }
+      {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="relation_active_period_date" to='' from='' colspan='' class ='' hideRelativeLabel=1}
     </tr>
     {if !empty($relationshipGroupTree)}
       <tr>

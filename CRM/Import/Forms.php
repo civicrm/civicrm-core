@@ -17,6 +17,8 @@
 
 use Civi\Api4\Mapping;
 use Civi\Api4\UserJob;
+use Civi\Core\ClassScanner;
+use Civi\Import\DataSource\DataSourceInterface;
 use League\Csv\Writer;
 
 /**
@@ -269,7 +271,8 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getDataSources(): array {
     $dataSources = [];
-    foreach (['CRM_Import_DataSource_SQL', 'CRM_Import_DataSource_CSV'] as $dataSourceClass) {
+    $classes = ClassScanner::get(['interface' => DataSourceInterface::class]);
+    foreach ($classes as $dataSourceClass) {
       $object = new $dataSourceClass();
       if ($object->checkPermission()) {
         $dataSources[$dataSourceClass] = $object->getInfo()['title'];
@@ -388,11 +391,10 @@ class CRM_Import_Forms extends CRM_Core_Form {
   /**
    * Get the relevant datasource object.
    *
-   * @return \CRM_Import_DataSource|null
-   *
+   * @return \Civi\Import\DataSource\DataSourceInterface|null
    * @throws \CRM_Core_Exception
    */
-  protected function getDataSourceObject(): ?CRM_Import_DataSource {
+  protected function getDataSourceObject(): ?DataSourceInterface {
     $className = $this->getDataSourceClassName();
     if ($className) {
       return new $className($this->getUserJobID());
@@ -638,6 +640,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
 
   /**
    * Outputs and downloads the csv of outcomes from an import job.
+   * Function is accessed from civicrm/import/outcome path.
    *
    * This gets the rows from the temp table that match the relevant status
    * and output them as a csv.
@@ -950,7 +953,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
       ->addWhere('name', '=', 'import_' . $mappingName)
       ->addWhere('is_template', '=', TRUE)
       ->execute()->first();
-    $this->templateID = $templateJob['id'];
+    $this->templateID = $templateJob['id'] ?? NULL;
     return $templateJob ?? NULL;
   }
 

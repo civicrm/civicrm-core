@@ -34,7 +34,7 @@ class ContributionAutocompleteProvider extends \Civi\Core\Service\AutoService im
       'version' => 4,
       'select' => [
         'id',
-        'contact_id.display_name',
+        'contact_id.sort_name',
         'total_amount',
         'receive_date',
         'financial_type_id:label',
@@ -66,8 +66,8 @@ class ContributionAutocompleteProvider extends \Civi\Core\Service\AutoService im
       'columns' => [
         [
           'type' => 'field',
-          'key' => 'contact_id.display_name',
-          'rewrite' => '[contact_id.display_name] - [total_amount]',
+          'key' => 'contact_id.sort_name',
+          'rewrite' => '[contact_id.sort_name] - [total_amount]',
         ],
         [
           'type' => 'field',

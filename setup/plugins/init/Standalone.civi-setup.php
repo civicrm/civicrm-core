@@ -75,7 +75,7 @@ function _standalone_setup_scheme(): string {
     if (empty($projectRootPath)) {
       throw new \RuntimeException("Failed to identify standalone root. (TIP: Set extras.standaloneRoot)");
     }
-
+    $model->paths['civicrm.private']['path'] = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data']);
     $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'civicrm.settings.php']);
     $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'templates_c']);
     // print "\n-------------------------\nSet model values:\n" . json_encode($model->getValues(), JSON_PRETTY_PRINT) . "\n-----------------------------\n";

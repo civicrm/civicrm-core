@@ -38,10 +38,10 @@ class Validator {
     }
     $mailing->copyValues($params);
 
-    return (new Validator())->run(array(
+    return (new Validator())->run([
       'mailing' => $mailing,
       'attachments' => \CRM_Core_BAO_File::getEntityFile('civicrm_mailing', $mailing->id),
-    ));
+    ]);
   }
 
   /**
@@ -54,7 +54,7 @@ class Validator {
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
    */
   public function __construct(EventDispatcherInterface $dispatcher = NULL) {
-    $this->dispatcher = $dispatcher ? $dispatcher : \Civi::service('dispatcher');
+    $this->dispatcher = $dispatcher ?: \Civi::service('dispatcher');
   }
 
   /**

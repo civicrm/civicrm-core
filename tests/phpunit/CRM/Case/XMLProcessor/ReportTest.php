@@ -65,7 +65,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
 
     // run the thing we're testing and get the output vars
     $template = CRM_Case_XMLProcessor_Report::populateCaseReportTemplate($client_id, $case_id, $activitySetName, $caseReportParams, $this->report);
-    $assigned_vars = $template->get_template_vars();
+    $assigned_vars = $template->getTemplateVars();
 
     // Update $expected now since dataprovider doesn't have access to the variables from setup() because it runs before setup.
     $this->updateExpectedBecauseDataProviderEvaluatesBeforeEverything($expected, $client_id, $case_id);
@@ -80,7 +80,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
    * This is similar to testGetCaseReport but test with a timeline that
    * does have Meeting in it.
    */
-  public function testGetCaseReportWithMeetingInTimeline() {
+  public function testGetCaseReportWithMeetingInTimeline(): void {
     $client_id = $this->individualCreate([
       'first_name' => 'Casey',
       'middle_name' => '',
@@ -116,7 +116,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
 
     // run the thing we're testing and get the output vars
     $template = CRM_Case_XMLProcessor_Report::populateCaseReportTemplate($client_id, $case_id, 'standard_timeline', $caseReportParams, $this->report);
-    $assigned_vars = $template->get_template_vars();
+    $assigned_vars = $template->getTemplateVars();
 
     // We don't want to run all the data in the dataprovider but we know
     // in this case it should be the same as the second one in the

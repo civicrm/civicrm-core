@@ -341,12 +341,12 @@ class CRM_Financial_Page_AJAX {
     while ($financialItem->fetch()) {
       $row[$financialItem->id] = [];
       foreach ($columnHeader as $columnKey => $columnValue) {
-        if ($financialItem->contact_sub_type && $columnKey == 'contact_type') {
+        if ($financialItem->contact_sub_type && $columnKey === 'contact_type') {
           $row[$financialItem->id][$columnKey] = $financialItem->contact_sub_type;
           continue;
         }
         $row[$financialItem->id][$columnKey] = $financialItem->$columnKey;
-        if ($columnKey == 'sort_name' && $financialItem->$columnKey && $financialItem->contact_id) {
+        if ($columnKey === 'sort_name' && $financialItem->$columnKey && $financialItem->contact_id) {
           $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=" . $financialItem->contact_id);
           $row[$financialItem->id][$columnKey] = '<a href=' . $url . '>' . $financialItem->$columnKey . '</a>';
         }

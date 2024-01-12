@@ -95,7 +95,7 @@ AND    {$this->_componentClause}";
     $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
     $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do not email / Do not mail)'), FALSE);
 
-    $this->add('select', 'from_email_address', ts('From Email'), $this->_fromEmails, FALSE);
+    $this->add('select', 'from_email_address', ts('From Email'), $this->getFromEmails(), FALSE);
 
     $this->addButtons([
       [
@@ -108,6 +108,15 @@ AND    {$this->_componentClause}";
         'name' => ts('Cancel'),
       ],
     ]);
+  }
+
+  /**
+   * Get an array of email IDS from which the back-office user may select the from field.
+   *
+   * @return array
+   */
+  public function getFromEmails(): array {
+    return CRM_Core_BAO_Email::getFromEmail();
   }
 
   /**

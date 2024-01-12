@@ -22,17 +22,15 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
         {/if}
         <tr id="addnew-row_{$row.file}" class="crm-extensions crm-extensions_{$row.file}">
           <td class="crm-extensions-label">
-            <a class="collapsed" href="#"></a>&nbsp;<strong>{$row.label|escape}</strong><br/>{$row.description|escape}
+            <details class="crm-accordion-light">
+              <summary><strong>{$row.label|escape}</strong>
+              <br/>{$row.description|escape}</summary>
+                {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row}
+            </details>
           </td>
           <td class="crm-extensions-version">{$row.version|escape}</td>
           <td class="crm-extensions-description">{$row.type|capitalize}</td>
           <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
-        </tr>
-        <tr class="hiddenElement" id="crm-extensions-details-addnew-{$row.file}">
-            <td>
-                {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row}
-            </td>
-            <td></td><td></td><td></td>
         </tr>
         {/foreach}
       </tbody>

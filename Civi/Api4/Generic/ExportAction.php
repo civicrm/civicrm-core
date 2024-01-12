@@ -24,7 +24,7 @@ use Civi\Api4\Utils\CoreUtil;
  * @method $this setId(int $id)
  * @method int getId()
  * @method $this setMatch(array $match) Specify fields to match for update.
- * @method bool getMatch()
+ * @method array getMatch()
  * @method $this setCleanup(string $cleanup)
  * @method string getCleanup()
  * @method $this setUpdate(string $update)
@@ -40,17 +40,14 @@ class ExportAction extends AbstractAction {
   protected $id;
 
   /**
-   * Specify fields to match when managed records are being reconciled.
+   * Fields to match when managed records are being reconciled.
    *
-   * To prevent "DB Error: Already Exists" errors, it's generally a good idea to set this
-   * value to whatever unique fields this entity has (for most entities it's "name").
-   * The managed system will then check if a record with that name already exists before
-   * trying to create a new one.
+   * By default this will be set automatically based on the entity's unique fields.
    *
    * @var array
    * @optionsCallback getMatchFields
    */
-  protected $match = ['name'];
+  protected $match;
 
   /**
    * Specify rule for auto-updating managed entity
@@ -76,18 +73,17 @@ class ExportAction extends AbstractAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
-    $this->exportRecord($this->getEntityName(), $this->id, $result, $this->match);
+    $this->exportRecord($this->getEntityName(), $this->id, $result);
   }
 
   /**
    * @param string $entityType
    * @param int $entityId
    * @param \Civi\Api4\Generic\Result $result
-   * @param array $matchFields
    * @param string $parentName
    * @param array $excludeFields
    */
-  private function exportRecord(string $entityType, int $entityId, Result $result, array $matchFields, $parentName = NULL, $excludeFields = []) {
+  private function exportRecord(string $entityType, int $entityId, Result $result, $parentName = NULL, $excludeFields = []) {
     if (isset($this->exportedEntities[$entityType][$entityId])) {
       throw new \CRM_Core_Exception("Circular reference detected: attempted to export $entityType id $entityId multiple times.");
     }
@@ -121,27 +117,12 @@ class ExportAction extends AbstractAction {
     }
     // The get api always returns ID, but it should not be included in an export
     unset($record['id']);
-    // Should references be limited to the current domain?
-    $limitRefsByDomain = $entityType === 'OptionGroup' && \CRM_Core_OptionGroup::isDomainOptionGroup($record['name']) ? \CRM_Core_BAO_Domain::getDomain()->id : FALSE;
-    foreach ($allFields as $fieldName => $field) {
-      if (($field['fk_entity'] ?? NULL) === 'Domain') {
-        $alias = $fieldName . '.name';
-        if (isset($record[$alias])) {
-          // If this entity is for a specific domain, limit references to that same domain
-          if ($fieldName === 'domain_id') {
-            $limitRefsByDomain = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $record[$alias], 'id', 'name');
-          }
-          // Swap current domain for special API keyword
-          if ($record[$alias] === \CRM_Core_BAO_Domain::getDomain()->name) {
-            unset($record[$alias]);
-            $record[$fieldName] = 'current_domain';
-          }
-        }
-      }
-    }
     $name = ($parentName ?? '') . $entityType . '_' . ($record['name'] ?? count($this->exportedEntities[$entityType]));
-    // Ensure safe characters, max length
-    $name = \CRM_Utils_String::munge($name, '_', 127);
+    // Ensure safe characters, max length.
+    // This is used for the value of `civicrm_managed.name` which has a maxlength of 255, but is also used
+    // to generate a file by civix, and many filesystems have a maxlength of 255 including the suffix, so
+    // 255 - strlen('.mgd.php') = 247
+    $name = \CRM_Utils_String::munge($name, '_', 247);
     // Include option group with custom field
     if ($entityType === 'CustomField') {
       if (
@@ -149,7 +130,7 @@ class ExportAction extends AbstractAction {
         // Sometimes fields share an option group; only export it once.
         empty($this->exportedEntities['OptionGroup'][$record['option_group_id']])
       ) {
-        $this->exportRecord('OptionGroup', $record['option_group_id'], $result, $matchFields);
+        $this->exportRecord('OptionGroup', $record['option_group_id'], $result);
       }
     }
     // Don't use joins/pseudoconstants if null or if it has the same value as the original
@@ -158,6 +139,12 @@ class ExportAction extends AbstractAction {
         unset($record[$alias]);
       }
       else {
+        unset($record[$fieldName]);
+      }
+    }
+    // Unset values that match the default
+    foreach ($allFields as $fieldName => $field) {
+      if (($record[$fieldName] ?? NULL) === $field['default_value']) {
         unset($record[$fieldName]);
       }
     }
@@ -171,8 +158,13 @@ class ExportAction extends AbstractAction {
         'values' => $record,
       ],
     ];
-    foreach (array_unique(array_intersect($matchFields, array_keys($allFields))) as $match) {
-      $export['params']['match'][] = $match;
+    $matchFields = $this->match;
+    // Calculate $match param if not passed explicitly
+    if (!isset($matchFields)) {
+      $matchFields = (array) CoreUtil::getInfoItem($entityType, 'match_fields');
+    }
+    if ($matchFields) {
+      $export['params']['match'] = $matchFields;
     }
     $result[] = $export;
     // Export entities that reference this one
@@ -187,15 +179,6 @@ class ExportAction extends AbstractAction {
         // Custom fields don't really "belong" to option groups despite the reference
         if ($refEntity === 'CustomField' && $entityType === 'OptionGroup') {
           continue;
-        }
-        // Limit references by domain
-        if (property_exists($reference, 'domain_id')) {
-          if (!isset($reference->domain_id)) {
-            $reference->find(TRUE);
-          }
-          if (isset($reference->domain_id) && $reference->domain_id != $limitRefsByDomain) {
-            continue;
-          }
         }
         $references[$refEntity][] = $reference;
       }
@@ -219,18 +202,8 @@ class ExportAction extends AbstractAction {
             return $a->$weightCol < $b->$weightCol ? -1 : 1;
           });
         }
-        $referenceMatchFields = $matchFields;
-        // Add back-reference to "match" fields to enforce uniqueness
-        // See https://lab.civicrm.org/dev/core/-/issues/4286
-        if ($referenceMatchFields) {
-          foreach ($reference::fields() as $field) {
-            if (($field['FKClassName'] ?? '') === $daoName) {
-              $referenceMatchFields[] = $field['name'];
-            }
-          }
-        }
         foreach ($records as $record) {
-          $this->exportRecord($refEntity, $record->id, $result, $referenceMatchFields, $name . '_', $exclude);
+          $this->exportRecord($refEntity, $record->id, $result, $name . '_', $exclude);
         }
       }
     }
@@ -275,6 +248,8 @@ class ExportAction extends AbstractAction {
       ['type', 'IN', ['Field', 'Custom']],
       ['readonly', '!=', TRUE],
     ];
+    // Domains are handled automatically
+    $excludeFields[] = 'domain_id';
     if ($excludeFields) {
       $conditions[] = ['name', 'NOT IN', $excludeFields];
     }

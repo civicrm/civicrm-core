@@ -45,7 +45,7 @@ class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
       'join' => 'join_entity',
       'block' => 'entity_type',
     ];
-    foreach (glob("$localDir/*." . $scanner::METADATA_FILE) as $fileName) {
+    foreach (glob("$localDir/*." . $scanner::METADATA_JSON) as $fileName) {
       $meta = json_decode(file_get_contents($fileName), TRUE);
       foreach ($replacements as $oldKey => $newKey) {
         if (isset($meta[$oldKey])) {

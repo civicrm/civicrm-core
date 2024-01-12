@@ -539,8 +539,29 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[static::class]['links'])) {
-      Civi::$statics[static::class]['links'] = static::createReferenceColumns(static::class);
-      CRM_Core_DAO_AllCoreTables::invoke(static::class, 'links_callback', Civi::$statics[static::class]['links']);
+      $links = static::createReferenceColumns(static::class);
+      // Add references based on field metadata
+      foreach (static::fields() as $field) {
+        if (!empty($field['FKClassName'])) {
+          $links[] = new CRM_Core_Reference_Basic(
+            static::getTableName(),
+            $field['name'],
+            CRM_Core_DAO_AllCoreTables::getTableForClass($field['FKClassName']),
+            $field['FKColumnName'] ?? 'id'
+          );
+        }
+        if (!empty($field['DFKEntityColumn'])) {
+          $links[] = new CRM_Core_Reference_Dynamic(
+            static::getTableName(),
+            $field['name'],
+            NULL,
+            $field['FKColumnName'] ?? 'id',
+            $field['DFKEntityColumn']
+          );
+        }
+      }
+      CRM_Core_DAO_AllCoreTables::invoke(static::class, 'links_callback', $links);
+      Civi::$statics[static::class]['links'] = $links;
     }
     return Civi::$statics[static::class]['links'];
   }
@@ -592,6 +613,47 @@ class CRM_Core_DAO extends DB_DataObject {
     }
 
     return $fields;
+  }
+
+  /**
+   * Format field values according to fields() metadata.
+   *
+   * When fetching results from a query, every field is returned as a string.
+   * This function automatically converts them to the correct data type.
+   *
+   * @param array $fieldValues
+   * @return void
+   */
+  public static function formatFieldValues(array &$fieldValues) {
+    $fields = array_column((array) static::fields(), NULL, 'name');
+    foreach ($fieldValues as $fieldName => $fieldValue) {
+      $fieldSpec = $fields[$fieldName] ?? NULL;
+      $fieldValues[$fieldName] = self::formatFieldValue($fieldValue, $fieldSpec);
+    }
+  }
+
+  /**
+   * Format a value according to field metadata.
+   *
+   * @param string|null $value
+   * @param array|null $fieldSpec
+   * @return mixed
+   */
+  protected static function formatFieldValue($value, ?array $fieldSpec) {
+    if (!isset($value) || !isset($fieldSpec)) {
+      return $value;
+    }
+    $dataType = $fieldSpec['type'] ?? NULL;
+    if ($dataType === CRM_Utils_Type::T_INT) {
+      return (int) $value;
+    }
+    if ($dataType === CRM_Utils_Type::T_BOOLEAN) {
+      return (bool) $value;
+    }
+    if (!empty($fieldSpec['serialize'])) {
+      return self::unSerializeField($value, $fieldSpec['serialize']);
+    }
+    return $value;
   }
 
   /**
@@ -780,6 +842,10 @@ class CRM_Core_DAO extends DB_DataObject {
           }
         }
         elseif (is_array($value) && !empty($field['serialize'])) {
+          if (!empty($field['pseudoconstant'])) {
+            // Pseudoconstant implies 1-1 option matching; duplicates would not make sense
+            $value = array_unique($value);
+          }
           $this->$dbName = CRM_Core_DAO::serializeField($value, $field['serialize']);
           $allNull = FALSE;
         }
@@ -954,7 +1020,11 @@ class CRM_Core_DAO extends DB_DataObject {
     if (empty($values[$idField]) && array_key_exists('frontend_title', $fields) && empty($values['frontend_title'])) {
       $instance->frontend_title = $instance->title;
     }
-    if (empty($values[$idField]) && array_key_exists('title', $fields) && empty($values['title']) && !empty($values['frontend_title'])) {
+    if (empty($values[$idField]) && array_key_exists('frontend_title', $fields) && !$instance->frontend_title) {
+      // Still empty? Fall back to name.
+      $instance->frontend_title = $instance->name;
+    }
+    if (empty($values[$idField]) && array_key_exists('title', $fields) && empty($values['title']) && array_key_exists('frontend_title', $fields) && $instance->frontend_title) {
       $instance->title = $instance->frontend_title;
     }
     $instance->save();
@@ -1424,7 +1494,7 @@ LIKE %1
       throw new CRM_Core_Exception('getFieldValue failed');
     }
 
-    self::$_dbColumnValueCache = self::$_dbColumnValueCache ?? [];
+    self::$_dbColumnValueCache ??= [];
 
     while (strpos($daoName, '_BAO_') !== FALSE) {
       $daoName = get_parent_class($daoName);
@@ -1511,6 +1581,8 @@ LIKE %1
 
   /**
    * Fetch object based on array of properties.
+   *
+   * @internal - extensions should always use the api
    *
    * @param string $daoName
    *   Name of the dao class.
@@ -2518,7 +2590,7 @@ SELECT contact_id
           $className::getTableName(),
           $field['name'],
           'civicrm_option_value',
-          CRM_Utils_Array::value('keyColumn', $field['pseudoconstant'], 'value'),
+          $field['pseudoconstant']['keyColumn'] ?? 'value',
           $field['pseudoconstant']['optionGroupName']
         );
       }
@@ -3059,51 +3131,106 @@ SELECT contact_id
    *
    * Return format is in the form of fieldname => clauses starting with an operator. e.g.:
    * ```
-   *   array(
-   *     'location_type_id' => array('IS NOT NULL', 'IN (1,2,3)')
-   *   )
+   *   [
+   *     // Each string in the array will get joined with AND
+   *     'location_type_id' => ['IS NOT NULL', 'IN (1,2,3)'],
+   *     // Each sub-array in the array will get joined with OR, field names must be enclosed in curly braces
+   *     'privacy' => [
+   *                    ['= 0', '= 1 AND {contact_id} = 456'],
+   *                  ],
+   *   ]
    * ```
    *
    * Note that all array keys must be actual field names in this entity. Use subqueries to filter on other tables e.g. custom values.
+   * The query strings MAY reference other fields in this entity; they must be enclosed in {curly_braces}.
    *
+   * @param string|null $entityName
+   *   Name of the entity being queried (for normal BAO files implementing this method, this variable is redundant
+   *   as there is a 1-1 relationship between most entities and most BAOs. However the variable is passed in to support
+   *   dynamic entities such as ECK).
+   * @param int|null $userId
+   *   Contact id of the current user.
+   *   This param is more aspirational than functional for now. Someday the API may support checking permissions
+   *   for contacts other than the current user, but at present this is always NULL which defaults to the current user.
+   * @param array $conditions
+   *   Contains field/value pairs gleaned from the WHERE clause or ON clause
+   *   (depending on how the entity was added to the query).
+   *   Can be used for optimization/deduping of clauses.
    * @return array
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses = [];
-    $fields = $this->fields();
-    // Notes should check permissions on the entity_id field, not the contact_id field
-    $skipContactCheckFor = ['Note'];
+    $fields = $this::getSupportedFields();
     foreach ($fields as $fieldName => $field) {
       // Clause for contact-related entities like Email, Relationship, etc.
-      if (strpos($field['name'], 'contact_id') === 0 && !in_array($field['entity'], $skipContactCheckFor) && ($field['FKClassName'] ?? NULL) == 'CRM_Contact_DAO_Contact') {
+      if (str_starts_with($fieldName, 'contact_id') && ($field['FKClassName'] ?? NULL) === 'CRM_Contact_DAO_Contact') {
         $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
         if (!empty($contactClause)) {
-          $clauses[$field['name']] = $contactClause;
+          $clauses[$fieldName] = $contactClause;
         }
       }
       // Clause for an entity_table/entity_id combo
-      if ($field['name'] === 'entity_id' && isset($fields['entity_table'])) {
-        $relatedClauses = [];
-        $relatedEntities = $this->buildOptions('entity_table', 'get');
-        foreach ((array) $relatedEntities as $table => $ent) {
-          if (!empty($ent)) {
-            $ent = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table);
-            $subquery = CRM_Utils_SQL::mergeSubquery($ent);
-            if ($subquery) {
-              $relatedClauses[] = "(entity_table = '$table' AND entity_id " . implode(' AND entity_id ', $subquery) . ")";
-            }
-            else {
-              $relatedClauses[] = "(entity_table = '$table')";
-            }
-          }
-        }
+      if ($fieldName === 'entity_id' && isset($fields['entity_table'])) {
+        $relatedClauses = self::getDynamicFkAclClauses('entity_table', 'entity_id', $conditions['entity_table'] ?? NULL);
         if ($relatedClauses) {
-          $clauses['id'] = 'IN (SELECT id FROM `' . $this->tableName() . '` WHERE (' . implode(') OR (', $relatedClauses) . '))';
+          // Nested array will be joined with OR
+          $clauses['entity_table'] = [$relatedClauses];
         }
       }
     }
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($entityName ?? $this, $clauses);
     return $clauses;
+  }
+
+  /**
+   * Get an array of ACL clauses for a dynamic FK (entity_id/entity_table combo)
+   *
+   * @param string $entityTableField
+   * @param string $entityIdField
+   * @param mixed|NULL $entityTableValues
+   * @return array
+   */
+  protected static function getDynamicFkAclClauses(string $entityTableField, string $entityIdField, $entityTableValues = NULL): array {
+    // If entity_table is specified in the WHERE clause, use that instead of the entity_table pseudoconstant
+    if ($entityTableValues && is_string($entityTableValues) || is_array($entityTableValues)) {
+      // Ideally we would validate table names against the entity_table pseudoconstant,
+      // but some entities have missing/incomplete metadata and it's better to generate an ACL
+      // clause for what we have than no ACL clause at all, so validate against all known tables.
+      $allTableNames = CRM_Core_DAO_AllCoreTables::tables();
+      $relatedEntities = array_intersect_key(array_flip((array) $entityTableValues), $allTableNames);
+    }
+    // No valid entity_table in WHERE clause so build an ACL case for every possible entity type
+    if (empty($relatedEntities)) {
+      $relatedEntities = static::buildOptions($entityTableField, 'get');
+    }
+    // Hmm, this entity is missing entity_table pseudoconstant. We really should fix that.
+    if (!$relatedEntities) {
+      return [];
+    }
+    $relatedClauses = [];
+    foreach ($relatedEntities as $table => $ent) {
+      // Ensure $ent is the machine name of the entity not a translated title
+      $ent = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table);
+      // Prevent infinite recursion
+      $subquery = $table === static::getTableName() ? NULL : CRM_Utils_SQL::mergeSubquery($ent);
+      if ($subquery) {
+        foreach ($subquery as $index => $condition) {
+          // Join OR clauses
+          if (is_array($condition)) {
+            $subquery[$index] = "(({{$entityIdField}} " . implode(") OR ({{$entityIdField}} ", $condition) . '))';
+          }
+          else {
+            $subquery[$index] = "{{$entityIdField}} $condition";
+          }
+        }
+        $relatedClauses[] = "= '$table' AND " . implode(" AND ", $subquery);
+      }
+      // If it's the only value with no conditions, don't need to add it
+      elseif (!$entityTableValues || count($relatedEntities) > 1) {
+        $relatedClauses[] = "= '$table'";
+      }
+    }
+    return $relatedClauses;
   }
 
   /**
@@ -3111,22 +3238,47 @@ SELECT contact_id
    *
    * With acls from related entities + additional clauses from hook_civicrm_selectWhereClause
    *
-   * @param string $tableAlias
+   * DO NOT OVERRIDE THIS FUNCTION
+   *
+   * @TODO: ADD `final` keyword to function signature
+   *
+   * @param string|null $tableAlias
+   * @param string|null $entityName
+   * @param array $conditions
+   *   Values from WHERE or ON clause
    * @return array
    */
-  public static function getSelectWhereClause($tableAlias = NULL) {
+  public static function getSelectWhereClause($tableAlias = NULL, $entityName = NULL, $conditions = []) {
     $bao = new static();
-    if ($tableAlias === NULL) {
-      $tableAlias = $bao->tableName();
-    }
-    $clauses = [];
-    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
-      $clauses[$field] = NULL;
-      if ($vals) {
-        $clauses[$field] = "(`$tableAlias`.`$field` IS NULL OR (`$tableAlias`.`$field` " . implode(" AND `$tableAlias`.`$field` ", (array) $vals) . '))';
+    $tableAlias ??= $bao->tableName();
+    $entityName ??= CRM_Core_DAO_AllCoreTables::getBriefName(get_class($bao));
+    $finalClauses = [];
+    $fields = static::getSupportedFields();
+    $selectWhereClauses = $bao->addSelectWhereClause($entityName, NULL, $conditions);
+    foreach ($selectWhereClauses as $fieldName => $fieldClauses) {
+      $finalClauses[$fieldName] = NULL;
+      if ($fieldClauses) {
+        if (!is_array($fieldClauses)) {
+          CRM_Core_Error::deprecatedWarning('Expected array of selectWhereClauses for ' . $bao->tableName() . '.' . $fieldName . ', instead got ' . json_encode($fieldClauses));
+          $fieldClauses = (array) $fieldClauses;
+        }
+        $formattedClauses = [];
+        foreach (CRM_Utils_SQL::prefixFieldNames($fieldClauses, array_keys($fields), $tableAlias) as $subClause) {
+          // Arrays of arrays get joined with OR (similar to CRM_Core_Permission::check)
+          if (is_array($subClause)) {
+            $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . implode(" OR `$tableAlias`.`$fieldName` ", $subClause) . ')';
+          }
+          else {
+            $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . $subClause . ')';
+          }
+        }
+        $finalClauses[$fieldName] = '(' . implode(' AND ', $formattedClauses) . ')';
+        if (empty($fields[$fieldName]['required'])) {
+          $finalClauses[$fieldName] = "(`$tableAlias`.`$fieldName` IS NULL OR {$finalClauses[$fieldName]})";
+        }
       }
     }
-    return $clauses;
+    return $finalClauses;
   }
 
   /**
@@ -3266,10 +3418,11 @@ SELECT contact_id
    * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
    * @return array
-   *   Array(string $name => string $uniqueName).
+   *   [string $name => string $uniqueName]
    */
   public static function fieldKeys() {
-    return array_flip(CRM_Utils_Array::collect('name', static::fields()));
+    $fields = static::fields();
+    return array_combine(array_column($fields, 'name'), array_keys($fields));
   }
 
   /**
@@ -3328,27 +3481,76 @@ SELECT contact_id
       // No label supplied, do nothing
       return;
     }
-    $maxLen = static::getSupportedFields()['name']['maxlength'] ?? 255;
-    // Strip unsafe characters and trim to max length (-3 characters leaves room for a unique suffix)
-    $name = CRM_Utils_String::munge($label, '_', $maxLen - 3);
 
-    // Find existing records with the same name
-    $sql = new CRM_Utils_SQL_Select($this::getTableName());
-    $sql->select(['id', 'name']);
-    $sql->where('name LIKE @name', ['@name' => $name . '%']);
-    // Include all fields that are part of the index
-    foreach (array_diff($indexNameWith, ['name']) as $field) {
-      $sql->where("`$field` = @val", ['@val' => $this->$field]);
-    }
-    $query = $sql->toSQL();
-    $existing = self::executeQuery($query)->fetchMap('id', 'name');
-    $dupes = 0;
-    $suffix = '';
-    // Add unique suffix if existing records have the same name
-    while (in_array($name . $suffix, $existing)) {
-      $suffix = '_' . ++$dupes;
-    }
-    $this->name = $name . $suffix;
+    // Strip unsafe characters and trim to max length, allowing room for a
+    // unique suffix composed of an underscore + 4 alphanumeric chars,
+    // supporting up to 36^4=1,679,616 unique names for any given value of
+    // $label. Half that amount could be considered the working limit, as
+    // much above that the time to find a non-existent suffix becomes
+    // unacceptable.
+    $maxSuffixLen = 5;
+    $maxLen = static::getSupportedFields()['name']['maxlength'] ?? 255;
+    $name = CRM_Utils_String::munge($label, '_', $maxLen - $maxSuffixLen);
+
+    // Define an arbitrary limit on how many guesses we will perform before
+    // throwing an exception. This would occur only in some unanticipated use
+    // case.
+    $max_guesses = 36 ^ ($maxSuffixLen - 1);
+
+    $guesses_per_loop = 5;
+    $guess_count = 0;
+
+    do {
+      // Make an initial attempt to guess a unique name by searching for
+      // 5 candidates (the original $name plus $name with 4 random suffixes).
+      // If all of these happen to exist in the table, we'll keep trying,
+      // doubling the number of guesses each time through the loop.
+      for ($i = 0; $i < $guesses_per_loop; $i++, $guess_count++) {
+        $suffix = $guess_count == 0 ? '' :
+          '_' . CRM_Utils_String::createRandom($maxSuffixLen - 1, 'abcdefghijklmnopqrstuvwxyz0123456789');
+        $candidates[$i] = $name . $suffix;
+      }
+
+      $sql = new CRM_Utils_SQL_Select($this::getTableName());
+      $sql->select(['id', 'LOWER(name) name_lc']);
+      $sql->where('name IN (@candidates)', ['@candidates' => $candidates]);
+
+      // Narrow the search by specifying the value of any additional fields
+      // that may be part of the index.
+      foreach (array_diff($indexNameWith, ['name']) as $field) {
+        $sql->where("`$field` = @val", ['@val' => $this->$field]);
+      }
+      $query = $sql->toSQL();
+
+      // Search the table for our candidates using case-sensitivity determined
+      // by the collation of the name column -- case-insensitive by default.
+      // Array $existing_lc will contains all the candidates found in the table,
+      // converted to lower-case.
+      $existing_lc = self::executeQuery($query)->fetchMap('id', 'name_lc');
+
+      if (count($existing_lc) < $guesses_per_loop) {
+        // Not all of our candidates were found in the table, so we'll search
+        // for the first element of $candidates that wasn't found. This search
+        // is performed case-insensitive to ensure that the selected candidate
+        // is unique with both ci and cs collation of the name column. If the
+        // original (unsuffixed) value of $name doesn't exist in the table, then
+        // that value will be our selected candidate.
+        foreach ($candidates as $c) {
+          if (!in_array(strtolower($c), $existing_lc)) {
+            $this->name = $c;
+            return;
+          }
+        }
+      }
+      else {
+        // All candidates were found in the table. Try harder next time.
+        $guesses_per_loop = min(1000, $guesses_per_loop * 2);
+
+        if ($guess_count > $max_guesses) {
+          throw new CRM_Core_Exception("CRM_Core_DAO::makeNameFromLabel failed to generate a unique name for label $label.");
+        }
+      }
+    } while (1);
   }
 
   /**

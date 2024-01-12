@@ -196,12 +196,12 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   public function getPaypalRecurTransaction(): array {
     return [
       'contactID' => $this->_contactID,
-      'contributionID' => $this->_contributionID,
+      'contributionID' => $this->ids['Contribution']['default'],
       'invoice' => 'xyz',
-      'contributionRecurID' => $this->_contributionRecurID,
+      'contributionRecurID' => $this->ids['ContributionRecur']['default'],
       'mc_gross' => '15.00',
       'module' => 'contribute',
-      'payer_id' => '4NHUTA7ZUE92C',
+      'payer_id' => '4NHU7ZUE92C',
       'payment_status' => 'Completed',
       'receiver_email' => 'sunil._1183377782_biz_api1.webaccess.co.in',
       'txn_type' => 'subscr_payment',
@@ -225,7 +225,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'mc_fee' => '5.00',
       'settle_amount' => '95.00',
       'module' => 'contribute',
-      'payer_id' => 'FV5ZW7TLMQ874',
+      'payer_id' => 'FV5ZW7TL874',
       'payment_status' => 'Completed',
       'receiver_email' => 'sunil._1183377782_biz_api1.webaccess.co.in',
       'txn_type' => 'web_accept',
@@ -304,7 +304,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
       'trxn_id' => NULL,
       'invoice_id' => 'xyz',
-      'contribution_status_id' => $pendingStatusID,
+      'contribution_status_id' => 'Pending',
       'is_email_receipt' => TRUE,
     ];
     $this->_contributionID = $this->contributionCreate($params);

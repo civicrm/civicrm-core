@@ -13,7 +13,7 @@ namespace Civi\Api4;
 /**
  * File entity.
  *
- * @searchable none
+ * @searchable secondary
  * @since 5.41
  * @package Civi\Api4
  */

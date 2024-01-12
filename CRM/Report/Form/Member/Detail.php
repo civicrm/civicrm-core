@@ -16,7 +16,7 @@
  */
 class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
 
-  protected $_summary = NULL;
+  protected $_summary;
 
   protected $_customGroupExtends = [
     'Membership',
@@ -27,7 +27,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     'Organization',
   ];
 
-  protected $_customGroupGroupBy = FALSE;
+  protected $_customGroupGroupBy;
 
   /**
    * This report has not been optimised for group filtering.
@@ -90,7 +90,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'title' => ts('Primary/Inherited?'),
             'default' => TRUE,
           ],
-          'join_date' => [
+          'membership_join_date' => [
             'title' => ts('Member Since'),
             'default' => TRUE,
           ],
@@ -118,6 +118,18 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'default' => '0',
             'default_weight' => '1',
             'default_order' => 'ASC',
+          ],
+          'status_id' => [
+            'title' => ts('Membership Status'),
+          ],
+          'membership_start_date' => [
+            'title' => ts('Membership Start Date'),
+          ],
+          'membership_end_date' => [
+            'title' => ts('Membership End Date'),
+          ],
+          'contribution_recur_id' => [
+            'title' => ts('Auto-renew'),
           ],
         ],
         'grouping' => 'member-fields',
@@ -185,13 +197,13 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           'financial_type_id' => [
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search'),
             'type' => CRM_Utils_Type::T_INT,
           ],
           'payment_instrument_id' => [
             'title' => ts('Payment Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'search'),
             'type' => CRM_Utils_Type::T_INT,
           ],
           'currency' => [
@@ -235,6 +247,12 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
           ],
         ],
+        'order_bys' => [
+          'autorenew_status_id' => [
+            'name' => 'contribution_status_id',
+            'title' => ts('Auto-Renew Subscription Status'),
+          ],
+        ],
         'grouping' => 'member-fields',
       ],
     ] + $this->getAddressColumns([
@@ -252,7 +270,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     parent::__construct();
   }
 
-  public function preProcess() {
+  public function preProcess(): void {
     $this->assign('reportTitle', ts('Membership Detail Report'));
     parent::preProcess();
   }
@@ -298,7 +316,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
                  ON ({$this->_aliases['civicrm_membership']}.id = cmp.membership_id";
       $this->_from .= $groupedBy ? "
                  AND cmp.id = (SELECT MAX(id) FROM civicrm_membership_payment WHERE civicrm_membership_payment.membership_id = {$this->_aliases['civicrm_membership']}.id))"
-                 : ")";
+                 : ')';
       $this->_from .= "
              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                  ON cmp.contribution_id={$this->_aliases['civicrm_contribution']}.id\n";
@@ -379,18 +397,13 @@ HERESQL;
     }
   }
 
-  public function getOperationPair($type = "string", $fieldName = NULL) {
+  public function getOperationPair($type = 'string', $fieldName = NULL): array {
     //re-name IS NULL/IS NOT NULL for clarity
     if ($fieldName === 'owner_membership_id') {
       $result = [];
+      $result[''] = ts('Any');
       $result['nll'] = ts('Primary members only');
       $result['nnll'] = ts('Non-primary members only');
-      $options = parent::getOperationPair($type, $fieldName);
-      foreach ($options as $key => $label) {
-        if (!array_key_exists($key, $result)) {
-          $result[$key] = $label;
-        }
-      }
     }
     else {
       $result = parent::getOperationPair($type, $fieldName);
@@ -455,12 +468,12 @@ HERESQL;
         $rows[$rowNum]['civicrm_contact_sort_name'] &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view",
+        $url = CRM_Utils_System::url('civicrm/contact/view',
           'reset=1&cid=' . $row['civicrm_contact_id'],
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.");
+        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts('View Contact Summary for this Contact.');
         $entryFound = TRUE;
       }
 

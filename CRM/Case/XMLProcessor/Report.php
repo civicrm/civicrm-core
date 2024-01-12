@@ -31,6 +31,11 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   protected $_redactionStringRules = [];
 
   /**
+   * @var array
+   */
+  public $_redactionRegexRules;
+
+  /**
    */
   public function __construct() {
   }
@@ -529,7 +534,7 @@ WHERE      a.id = %1
           if ($value) {
             // Note: this is already taken care in getDisplayValue above, but sometimes
             // strings like '^A^A' creates problem. So to fix this special case -
-            if (strstr($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
+            if (str_contains($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
               $value = trim($value, CRM_Core_DAO::VALUE_SEPARATOR);
             }
             if (($typeValue['type'] ?? NULL) == 'String' ||
@@ -725,7 +730,7 @@ LIMIT  1
    * @param int $caseID
    * @param string $activitySetName
    * @param array $params
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_XMLProcessor_Report $form
    *
    * @return CRM_Core_Smarty
    */

@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{* This template is used for adding/editing/deleting offline Event Registrations *}
+{* This template is used for adding/editing offline Event Registrations *}
 
 {* Ajax callback for showing event fee snippet  - to be moved to separate form *}
 {if $showFeeBlock}
@@ -33,22 +33,7 @@
       {/if}
       <div id="eventFullMsg" class="messages status no-popup" style="display:none;"></div>
 
-      {if $action eq 8} {* If action is Delete *}
-        <div class="crm-participant-form-block-delete messages status no-popup">
-          <div class="crm-content">
-            {icon icon="fa-info-circle"}{/icon}
-            {ts}WARNING: Deleting this registration will result in the loss of related payment records (if any).{/ts} {ts}Do you want to continue?{/ts}
-          </div>
-          {if $additionalParticipant}
-            <div class="crm-content">
-              {ts 1=$additionalParticipant} There are %1 more Participant(s) registered by this participant.{/ts}
-            </div>
-          {/if}
-        </div>
-        {if $additionalParticipant}
-          {$form.delete_participant.html}
-        {/if}
-        {else} {* If action is other than Delete *}
+      {if 1} {* If action is other than Delete *}
         <table class="form-layout-compressed">
           {if $context EQ 'standalone' OR $context EQ 'participant' OR $action EQ 2}
             <tr class="crm-participant-form-contact-id">

@@ -67,16 +67,19 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'qs' => 'action=copy&gid=%%id%%',
           'title' => ts('Make a Copy of CiviCRM Contribution Page'),
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'title' => ts('Disable'),
           'ref' => 'crm-enable-disable',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
@@ -84,6 +87,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'qs' => 'action=delete&reset=1&id=%%id%%',
           'title' => ts('Delete Custom Field'),
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -108,6 +112,8 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString . 'settings',
           'qs' => $urlParams,
           'uniqueName' => 'settings',
+          // This needs to be lower than Membership Settings since otherwise the order doesn't make sense.
+          'weight' => -20,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Contribution Amounts'),
@@ -115,6 +121,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString . 'amount',
           'qs' => $urlParams,
           'uniqueName' => 'amount',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('Membership Settings'),
@@ -122,6 +129,8 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString . 'membership',
           'qs' => $urlParams,
           'uniqueName' => 'membership',
+          // This should come after Title
+          'weight' => 0,
         ],
         CRM_Core_Action::EXPORT => [
           'name' => ts('Thank-you and Receipting'),
@@ -129,6 +138,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString . 'thankyou',
           'qs' => $urlParams,
           'uniqueName' => 'thankyou',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::EXPORT),
         ],
         CRM_Core_Action::BASIC => [
           'name' => ts('Tell a Friend'),
@@ -136,6 +146,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString . 'friend',
           'qs' => $urlParams,
           'uniqueName' => 'friend',
+          'weight' => 10,
         ],
         CRM_Core_Action::PROFILE => [
           'name' => ts('Include Profiles'),
@@ -143,6 +154,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString . 'custom',
           'qs' => $urlParams,
           'uniqueName' => 'custom',
+          'weight' => 20,
         ],
         CRM_Core_Action::MAP => [
           'name' => ts('Contribution Widget'),
@@ -150,6 +162,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString . 'widget',
           'qs' => $urlParams,
           'uniqueName' => 'widget',
+          'weight' => 30,
         ],
         CRM_Core_Action::FOLLOWUP => [
           'name' => ts('Premiums'),
@@ -157,6 +170,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString . 'premium',
           'qs' => $urlParams,
           'uniqueName' => 'premium',
+          'weight' => 40,
         ],
         CRM_Core_Action::ADVANCED => [
           'name' => ts('Personal Campaign Pages'),
@@ -164,6 +178,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString . 'pcp',
           'qs' => $urlParams,
           'uniqueName' => 'pcp',
+          'weight' => 50,
         ],
       ];
       $context = [
@@ -193,6 +208,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'qs' => $urlParams,
           'fe' => TRUE,
           'uniqueName' => 'live_page',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::RENEW),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Test-drive'),
@@ -202,6 +218,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           // Addresses https://lab.civicrm.org/dev/core/issues/658
           'fe' => TRUE,
           'uniqueName' => 'test_drive',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::PREVIEW),
         ],
       ];
     }
@@ -233,6 +250,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString,
           'qs' => "{$urlParams}&receive_date_low={$monthDate}&receive_date_high={$now}",
           'uniqueName' => 'current_month_to_date',
+          'weight' => 10,
         ],
         CRM_Core_Action::REVERT => [
           'name' => ts('Fiscal Year-To-Date'),
@@ -240,6 +258,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString,
           'qs' => "{$urlParams}&receive_date_low={$yearDate}&receive_date_high={$yearNow}",
           'uniqueName' => 'fiscal_year_to_date',
+          'weight' => 20,
         ],
         CRM_Core_Action::BROWSE => [
           'name' => ts('Cumulative'),
@@ -247,6 +266,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'url' => $urlString,
           'qs' => "{$urlParams}",
           'uniqueName' => 'cumulative',
+          'weight' => 30,
         ],
       ];
     }

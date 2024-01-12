@@ -191,24 +191,31 @@ class CRM_Extension_Downloader {
     if ($res === TRUE) {
       $zipSubDir = CRM_Utils_Zip::guessBasedir($zip, $key);
       if ($zipSubDir === FALSE) {
+        \Civi::log()->error('Unable to extract the extension: bad directory structure');
         CRM_Core_Session::setStatus(ts('Unable to extract the extension: bad directory structure'), '', 'error');
         return FALSE;
       }
       $extractedZipPath = $this->tmpDir . DIRECTORY_SEPARATOR . $zipSubDir;
       if (is_dir($extractedZipPath)) {
         if (!CRM_Utils_File::cleanDir($extractedZipPath, TRUE, FALSE)) {
+          \Civi::log()->error('Unable to extract the extension {extension}: {path} cannot be cleared', [
+            'extension' => $key,
+            'path' => $extractedZipPath,
+          ]);
           CRM_Core_Session::setStatus(ts('Unable to extract the extension: %1 cannot be cleared', [1 => $extractedZipPath]), ts('Installation Error'), 'error');
           return FALSE;
         }
       }
       if (!$zip->extractTo($this->tmpDir)) {
+        \Civi::log()->error('Unable to extract the extension to {path}.', ['path' => $this->tmpDir]);
         CRM_Core_Session::setStatus(ts('Unable to extract the extension to %1.', [1 => $this->tmpDir]), ts('Installation Error'), 'error');
         return FALSE;
       }
       $zip->close();
     }
     else {
-      CRM_Core_Session::setStatus(ts('Unable to extract the extension.'), '', 'error');
+      \Civi::log()->error('Unable to extract the extension');
+      CRM_Core_Session::setStatus(ts('Unable to extract the extension'), '', 'error');
       return FALSE;
     }
 
@@ -227,6 +234,7 @@ class CRM_Extension_Downloader {
   public function validateFiles($key, $extractedZipPath) {
     $filename = $extractedZipPath . DIRECTORY_SEPARATOR . CRM_Extension_Info::FILENAME;
     if (!is_readable($filename)) {
+      \Civi::log()->error('Failed reading data from {filename} during installation', ['filename' => $filename]);
       CRM_Core_Session::setStatus(ts('Failed reading data from %1 during installation', [1 => $filename]), ts('Installation Error'), 'error');
       return FALSE;
     }
@@ -235,6 +243,7 @@ class CRM_Extension_Downloader {
       $newInfo = CRM_Extension_Info::loadFromFile($filename);
     }
     catch (Exception $e) {
+      \Civi::log()->error('Failed reading data from {filename} during installation', ['filename' => $filename]);
       CRM_Core_Session::setStatus(ts('Failed reading data from %1 during installation', [1 => $filename]), ts('Installation Error'), 'error');
       return FALSE;
     }

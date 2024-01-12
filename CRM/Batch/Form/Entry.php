@@ -108,6 +108,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected $currentRowExistingMembership;
 
   /**
+   * @var array
+   */
+  protected $_priceSet;
+
+  /**
    * Get the contribution id for the current row.
    *
    * @return int
@@ -650,10 +655,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $lineItem = [];
         CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'], $value, $lineItem[$priceSetId]);
 
-        // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
-        // function to get correct amount level consistently. Remove setting of the amount level in
-        // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
-        // to cover all variants.
+        // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
         unset($value['amount_level']);
 
         //CRM-11529 for back office transactions
@@ -915,7 +917,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * Send email receipt.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Batch_Form_Entry $form
    *   Form object.
    * @param array $formValues
    *
@@ -952,22 +954,22 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
     $form->assign('membership_name', CRM_Member_PseudoConstant::membershipType($membership->membership_type_id));
 
-    [$form->_contributorDisplayName, $form->_contributorEmail]
+    [$contributorDisplayName, $contributorEmail]
       = CRM_Contact_BAO_Contact_Location::getEmailDetails($formValues['contact_id']);
-    $form->_receiptContactId = $formValues['contact_id'];
+    $receiptContactId = $formValues['contact_id'];
 
     CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'workflow' => 'membership_offline_receipt',
         'from' => $this->getFromEmailAddress(),
-        'toName' => $form->_contributorDisplayName,
-        'toEmail' => $form->_contributorEmail,
+        'toName' => $contributorDisplayName,
+        'toEmail' => $contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
         'modelProps' => [
           'contributionID' => $this->getCurrentRowContributionID(),
-          'contactID' => $form->_receiptContactId,
+          'contactID' => $receiptContactId,
           'membershipID' => $this->getCurrentRowMembershipID(),
         ],
       ]
@@ -1160,7 +1162,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
 
     // The latter format would be normal here - it's unclear if it is sometimes in the former format.
-    $row['membership_type_id'] = $row['membership_type_id'] ?? $row['membership_type'][1];
+    $row['membership_type_id'] ??= $row['membership_type'][1];
     unset($row['membership_type']);
     // total_amount is required.
     $row['total_amount'] = (float) $row['total_amount'];

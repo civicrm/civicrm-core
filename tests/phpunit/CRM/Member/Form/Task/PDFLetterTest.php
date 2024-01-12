@@ -27,6 +27,8 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
 
   /**
    * Test token replacement for Print/Merge Task
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMembershipTokenReplacementInPDF(): void {
     $this->createLoggedInUser();
@@ -35,7 +37,7 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
 
     $searchFormValues = [
       'radio_ts' => 'ts_sel',
-      'task' => CRM_Member_Task::PDF_LETTER,
+      'task' => CRM_Core_Task::PDF_LETTER,
     ];
 
     $membershipDates = [
@@ -56,7 +58,7 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
         'start_date' => $date,
         'end_date' => date('Y-m-d', strtotime("{$date} +1 year")),
       ];
-      $result = $this->callAPISuccess('membership', 'create', $params);
+      $result = $this->callAPISuccess('Membership', 'create', $params);
       $searchFormValues['mark_x_' . $result['id']] = 1;
       $params = array_merge($params,
         [
@@ -68,7 +70,7 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
 
       // Form an expected array replacing tokens for each contact.
       foreach ($tokens as $key => $val) {
-        if (CRM_Utils_String::endsWith($val, '_date')) {
+        if (str_ends_with($val, '_date')) {
           $formattedDate = CRM_Utils_Date::customFormat($params[$val]);
           $expected[$contactId][$val] = "{$key} - {$formattedDate}";
         }
@@ -79,12 +81,13 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
     }
 
     /** @var CRM_Member_Form_Task_PDFLetter $form */
-    $form = $this->getFormObject('CRM_Member_Form_Task_PDFLetter', [
+    $form = $this->getSearchFormObject('CRM_Member_Form_Task_PDFLetter', [
       'subject' => '{contact.first_name} {membership.source}',
       'html_message' => $htmlMessage,
     ], NULL, $searchFormValues);
     $form->buildForm();
     try {
+      $testHTML = '';
       $form->postProcess();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
@@ -93,7 +96,7 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
 
     // Assert all membership tokens are replaced correctly.
     $expected = array_values($expected);
-    foreach ($expected as $key => $dateVal) {
+    foreach ($expected as $dateVal) {
       $this->assertStringContainsString('Anthony', $testHTML);
       foreach ($tokens as $token) {
         $this->assertStringContainsString($dateVal[$token], $testHTML);
@@ -104,7 +107,7 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
   /**
    * Generate sample HTML for testing.
    */
-  public static function getSampleHTML() {
+  public static function getSampleHTML(): array {
     $tokens = [
       'Test Fee' => 'fee',
       'Test Type' => 'membership_type_id:label',

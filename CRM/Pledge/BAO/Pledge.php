@@ -922,7 +922,7 @@ SELECT  pledge.contact_id              as contact_id,
           // 2. send acknowledgement mail
           if ($toEmail && !($doNotEmail || $onHold)) {
             // assign value to template
-            $template->assign('amount_paid', $details['amount_paid'] ? $details['amount_paid'] : 0);
+            $template->assign('amount_paid', $details['amount_paid'] ?: 0);
             $template->assign('next_payment', $details['scheduled_date']);
             $template->assign('amount_due', $details['amount_due']);
             $template->assign('checksumValue', $details['checksumValue']);

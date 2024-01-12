@@ -61,7 +61,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(0, $get['count'], 'Contact not successfully deleted.');
 
-    $result = $this->callAPIAndDocument('email', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('email', 'create', $params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['id']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
@@ -81,7 +81,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = $this->_params;
     unset($params['location_type_id']);
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $this->assertEquals(CRM_Core_BAO_LocationType::getDefault()->id, $result['values'][$result['id']]['location_type_id']);
     $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
   }
@@ -182,7 +182,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('email', 'create', $params);
 
-    $result = $this->callAPIAndDocument('email', 'delete', ['id' => $create['id']], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('email', 'delete', ['id' => $create['id']]);
     $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('email', 'get', [
       'location_type_id' => $this->_locationTypeID,
@@ -235,7 +235,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
         ],
       ],
     ];
-    $replace1 = $this->callAPIAndDocument('email', 'replace', $replace1Params, __FUNCTION__, __FILE__);
+    $replace1 = $this->callAPISuccess('email', 'replace', $replace1Params);
     $this->assertEquals(5, $replace1['count']);
 
     // check emails at location #1 or #2
@@ -305,8 +305,6 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     ]);
     $this->assertAPISuccess($get);
     $this->assertEquals(0, $get['count'], 'email already exists');
-    $description = 'Demonstrates use of Replace in a nested API call.';
-    $subfile = 'NestedReplaceEmail';
     // initialize email list with three emails at loc #1 and two emails at loc #2
     $getReplace1Params = [
 
@@ -341,7 +339,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
         ],
       ],
     ];
-    $getReplace1 = $this->callAPIAndDocument('contact', 'get', $getReplace1Params, __FUNCTION__, __FILE__, $description, $subfile);
+    $getReplace1 = $this->callAPISuccess('contact', 'get', $getReplace1Params);
     $this->assertEquals(5, $getReplace1['values'][$this->_contactID]['api.email.replace']['count']);
 
     // check emails at location #1 or #2
@@ -445,13 +443,13 @@ class api_v3_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testEmailOnHold() {
+  public function testEmailOnHold(): void {
     $params = [
       'contact_id' => $this->_contactID,
       'email' => 'api@a-team.com',
       'on_hold' => '2',
     ];
-    $result = $this->callAPIAndDocument('email', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('email', 'create', $params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['id']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
@@ -482,7 +480,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSetBulkEmail() {
+  public function testSetBulkEmail(): void {
     $individualID = $this->individualCreate([]);
     $email = $this->callAPISuccessGetSingle('Email', ['contact_id' => $individualID]);
     $this->assertEquals(0, $email['is_bulkmail']);
@@ -500,7 +498,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetlist() {
+  public function testGetlist(): void {
     $name = 'Scarabée';
     $emailMatchContactID = $this->individualCreate(['last_name' => $name, 'email' => 'bob@bob.com']);
     $emailMatchEmailID = $this->callAPISuccessGetValue('Email', ['return' => 'id', 'contact_id' => $emailMatchContactID]);

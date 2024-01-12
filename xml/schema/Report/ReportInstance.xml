@@ -109,7 +109,8 @@
     <length>255</length>
     <comment>permission required to be able to run this instance</comment>
     <html>
-      <type>Text</type>
+      <label>Permission</label>
+      <type>Select</type>
     </html>
     <add>2.2</add>
   </field>
@@ -121,8 +122,14 @@
     <comment>role required to be able to run this instance</comment>
     <add>4.1</add>
     <html>
-      <type>Text</type>
+      <title>ACL Group/Role</title>
+      <type>Select</type>
+      <multiple>1</multiple>
     </html>
+    <serialize>SEPARATOR_TRIMMED</serialize>
+    <pseudoconstant>
+      <callback>CRM_Report_BAO_ReportInstance::getGrouproleOptions</callback>
+    </pseudoconstant>
   </field>
   <field>
     <name>form_values</name>

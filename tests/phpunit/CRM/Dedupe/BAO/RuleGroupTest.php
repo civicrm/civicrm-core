@@ -2,18 +2,7 @@
 
 class CRM_Dedupe_DAO_TestEntity extends CRM_Core_DAO {
 
-  /**
-   * Returns foreign keys and entity references.
-   *
-   * @return array
-   *   [CRM_Core_Reference_Interface]
-   */
-  public static function getReferenceColumns() {
-    if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic('civicrm_dedupe_test_table', 'contact_id', 'civicrm_contact', 'id');
-    }
-    return Civi::$statics[__CLASS__]['links'];
-  }
+  public static $_tableName = 'civicrm_dedupe_test_table';
 
   /**
    * Returns all the column names of this table
@@ -38,6 +27,7 @@ class CRM_Dedupe_DAO_TestEntity extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_test_table',
           'entity' => 'TestEntity',
           'FKClassName' => 'CRM_Contact_DAO_Contact',
+          'FKColumnName' => 'id',
         ],
         'dedupe_test_field' => [
           'name' => 'dedupe_test_field',
@@ -205,7 +195,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
    * In general we do have a bit of a problem with having overloaded the meaning of
    * importable & exportable fields.
    */
-  public function testSupportedFields() {
+  public function testSupportedFields(): void {
     $fields = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization');
 
     $this->assertEquals($this->getSupportedFields(), $fields);
@@ -215,7 +205,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
    * Test that custom_fields are included in supported fields.
    *
    */
-  public function testSupportedCustomFields() {
+  public function testSupportedCustomFields(): void {
     //Create custom group with fields of all types to test.
     $customGroup = $this->createCustomGroup(['extends' => 'Organization']);
 
@@ -235,7 +225,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
    * dedupe rule.
    *
    */
-  public function testSupportedCustomFieldsSubtype() {
+  public function testSupportedCustomFieldsSubtype(): void {
 
     //Create custom group with fields of all types to test.
     $contactType = $this->callAPISuccess('ContactType', 'create', ['name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization']);
@@ -321,7 +311,6 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
     ];
 
     $count = 1;
-    $contact_id;
     foreach ($params as $param) {
       $contact = $this->callAPISuccess('contact', 'create', $param);
       $this->contactIDs[$count++] = $contact['id'];

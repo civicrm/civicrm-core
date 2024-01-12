@@ -283,10 +283,7 @@ class CRM_Contact_Form_Edit_Address {
             'street_name',
             'street_unit',
           ] as $fld) {
-            if (in_array($fld, [
-              'street_name',
-              'street_unit',
-            ])) {
+            if (in_array($fld, ['street_name', 'street_unit'])) {
               $streetAddress .= ' ';
             }
             // CRM-17619 - if the street number suffix begins with a number, add a space
@@ -296,7 +293,7 @@ class CRM_Contact_Form_Edit_Address {
                 $streetAddress .= ' ';
               }
             }
-            $streetAddress .= CRM_Utils_Array::value($fld, $address);
+            $streetAddress .= $address[$fld] ?? '';
           }
           $streetAddress = trim($streetAddress);
           if (!empty($streetAddress)) {
@@ -429,7 +426,7 @@ class CRM_Contact_Form_Edit_Address {
       CRM_Contact_Form_Edit_Address::storeRequiredCustomDataInfo($form, $groupTree);
 
       $tplGroupTree = CRM_Core_Smarty::singleton()
-        ->get_template_vars('address_groupTree');
+        ->getTemplateVars('address_groupTree');
       $tplGroupTree = empty($tplGroupTree) ? [] : $tplGroupTree;
 
       $form->assign('address_groupTree', $tplGroupTree + [$blockId => $groupTree]);

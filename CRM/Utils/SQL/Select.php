@@ -581,13 +581,13 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
       $sql .= $join . "\n";
     }
     if ($this->wheres) {
-      $sql .= 'WHERE (' . implode(') AND (', $this->wheres) . ")\n";
+      $sql .= 'WHERE (' . implode(")\n  AND (", $this->wheres) . ")\n";
     }
     if ($this->groupBys) {
       $sql .= 'GROUP BY ' . implode(', ', $this->groupBys) . "\n";
     }
     if ($this->havings) {
-      $sql .= 'HAVING (' . implode(') AND (', $this->havings) . ")\n";
+      $sql .= 'HAVING (' . implode(")\n  AND (", $this->havings) . ")\n";
     }
     if ($this->orderBys) {
       $orderBys = CRM_Utils_Array::crmArraySortByField($this->orderBys,
@@ -645,6 +645,13 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
 
     return CRM_Core_DAO::executeQuery($this->toSQL(), $params, $abort, $daoName,
       $freeDAO, $i18nRewrite, $trapException);
+  }
+
+  /**
+   * @return string
+   */
+  public function getFrom(): string {
+    return $this->from;
   }
 
 }

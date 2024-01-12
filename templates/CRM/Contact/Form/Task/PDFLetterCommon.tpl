@@ -233,7 +233,7 @@ function selectFormat( val, bind ) {
     bind = false;
   }
 
-  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/pdfFormat' h=0 }"{literal};
+  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/pdfFormat' h=0}"{literal};
   cj.post( dataUrl, {formatId: val}, function( data ) {
     fillFormatInfo(data, bind);
   }, 'json');
@@ -241,7 +241,7 @@ function selectFormat( val, bind ) {
 
 function selectPaper( val )
 {
-    dataUrl = {/literal}"{crmURL p='civicrm/ajax/paperSize' h=0 }"{literal};
+    dataUrl = {/literal}"{crmURL p='civicrm/ajax/paperSize' h=0}"{literal};
     cj.post( dataUrl, {paperSizeName: val}, function( data ) {
         cj("#paper_size").val( data.name );
         metric = document.getElementById('metric').value;

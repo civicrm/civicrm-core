@@ -116,8 +116,13 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * Build Pledge Block in Contribution Pages.
    *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 5.68 will be removed around 5.74
    */
   public static function buildPledgeBlock($form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     //build pledge payment fields.
     if (!empty($form->_values['pledge_id'])) {
       //get all payments required details.
@@ -189,10 +194,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       if (empty($payments)) {
         throw new CRM_Core_Exception(ts('Oops. It looks like there is no valid payment status for online payment.'));
       }
-      else {
-        $form->assign('is_pledge_payment', TRUE);
-        $form->addGroup($payments, 'pledge_amount', ts('Make Pledge Payment(s):'), '<br />');
-      }
+      $form->addGroup($payments, 'pledge_amount', ts('Make Pledge Payment(s):'), '<br />');
     }
     else {
 
@@ -209,7 +211,6 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       $form->addElement('text', 'pledge_installments', ts('Installments'), ['size' => 3, 'aria-label' => ts('Installments')]);
 
       if (!empty($pledgeBlock['is_pledge_interval'])) {
-        $form->assign('is_pledge_interval', CRM_Utils_Array::value('is_pledge_interval', $pledgeBlock));
         $form->addElement('text', 'pledge_frequency_interval', NULL, ['size' => 3, 'aria-label' => ts('Frequency Intervals')]);
       }
       else {

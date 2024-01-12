@@ -27,7 +27,7 @@ use Civi\Api4\UFGroup;
  */
 class CustomProfileFieldTest extends CustomTestBase {
 
-  public function testExportProfileWithCustomFields() {
+  public function testExportProfileWithCustomFields(): void {
     $customGroup = CustomGroup::create(FALSE)
       ->addValue('title', 'ProfileGroup')
       ->addValue('extends', 'Individual')

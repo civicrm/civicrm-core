@@ -20,12 +20,11 @@ var angularTempFile = cv(['php:eval', '-U', _CV.ADMIN_USER, cmd]);
 module.exports = function(config) {
   config.set({
     autoWatch: true,
-    browsers: ['PhantomJS'],
+    browsers: ['ChromeHeadless'],
     exclude: [
       'ang/api4Explorer/Explorer.js'
     ],
     files: [
-      'bower_components/phantomjs-polyfill/bind-polyfill.js',
       'bower_components/jquery/dist/jquery.min.js',
       'bower_components/jquery-ui/jquery-ui.min.js',
       'bower_components/lodash-compat/lodash.min.js',
@@ -48,15 +47,23 @@ module.exports = function(config) {
       'ang/**/*.js',
       'tests/karma/lib/*.js',
       'tests/karma/**/*.js',
-      'ang/**/*.html'
+      'ang/**/*.html',
+      'ext/civi_mail/ang/*.js',
+      'ext/civi_mail/ang/**/*.js',
+      'ext/civi_mail/ang/**/*.html',
+      'ext/civi_case/ang/*.js',
+      'ext/civi_case/ang/**/*.js',
+      'ext/civi_case/ang/**/*.html'
     ],
     preprocessors : {
-      'ang/**/*.html' : ['ng-html2js']
+      'ang/**/*.html': ['ng-html2js'],
+      'ext/*/ang/**/*.html': ['ng-html2js'],
     },
 
     ngHtml2JsPreprocessor: {
-      stripPrefix: 'ang/',
-      prependPrefix: '~/',
+      cacheIdFromPath: function(filepath) {
+        return filepath.replace(/.*ang\//, '~/');
+      },
       moduleName: 'crmResource'
     },
     frameworks: ['jasmine'],

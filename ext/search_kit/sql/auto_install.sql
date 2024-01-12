@@ -31,7 +31,7 @@ SET FOREIGN_KEY_CHECKS=1;
 -- *
 -- * civicrm_search_display
 -- *
--- * Search Kit - saved search displays
+-- * SearchKit - saved search displays
 -- *
 -- *******************************************************/
 CREATE TABLE `civicrm_search_display` (

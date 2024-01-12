@@ -57,6 +57,8 @@ if (!defined('CIVI_SETUP')) {
     // $model->paths['civicrm.files']['url'] = $filePublicPath;
     $model->paths['civicrm.files']['path'] = implode(DIRECTORY_SEPARATOR,
       [_backdrop_civisetup_getPublicFiles(), 'civicrm']);
+    $model->paths['civicrm.private']['path'] = implode(DIRECTORY_SEPARATOR,
+      [_backdrop_civisetup_getPrivateFiles(), 'civicrm']);
 
     // Compute templateCompileDir.
     $model->templateCompilePath = implode(DIRECTORY_SEPARATOR,

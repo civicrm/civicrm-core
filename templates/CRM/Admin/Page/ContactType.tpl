@@ -32,7 +32,7 @@
     </tr>
     </thead>
     {foreach from=$rows item=row}
-      <tr id="contact_type-{$row.id}" data-action="create" class="{cycle values="odd-row,even-row"} {if !empty($row.class)}{$row.class}{/if} crm-contactType crm-entity {if NOT $row.is_active} disabled{/if}">
+      <tr id="contact_type-{$row.id}" data-action="create" class="{cycle values="odd-row,even-row"} {$row.class} crm-contactType crm-entity {if NOT $row.is_active} disabled{/if}">
         <td class="crm-contactType-label crm-editable" data-field="label">{ts}{$row.label}{/ts}</td>
         <td class="crm-contactType-parent">{if $row.parent}{ts}{$row.parent_label}{/ts}{else}{ts}(built-in){/ts}{/if}</td>
         <td class="crm-contactType-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>

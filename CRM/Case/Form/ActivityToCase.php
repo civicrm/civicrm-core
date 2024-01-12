@@ -21,6 +21,19 @@
 class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
 
   /**
+   * Case Activity being copied or moved
+   * @var int
+   */
+  public $_activityId;
+
+
+  /**
+   * Current CiviCase ID associated with the activity
+   * @var int
+   */
+  public $_currentCaseId;
+
+  /**
    * Build all the data structures needed to build the form.
    *
    * @throws \CRM_Core_Exception

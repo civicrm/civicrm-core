@@ -220,12 +220,14 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&action=renew&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Renew Membership'),
+          'weight' => 40,
         ],
         CRM_Core_Action::FOLLOWUP => [
           'name' => ts('Renew-Credit Card'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=renew&reset=1&cid=%%cid%%&id=%%id%%&context=%%cxt%%&mode=live' . $extraParams,
           'title' => ts('Renew Membership Using Credit Card'),
+          'weight' => 50,
         ],
       ];
       if (!$isPaymentProcessor || !$accessContribution) {

@@ -35,7 +35,7 @@ class GetActions extends BasicGetAction {
     $entityReflection = new \ReflectionClass($className);
     foreach ($entityReflection->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC) as $method) {
       $actionName = $method->getName();
-      if ($actionName != 'permissions' && $actionName != 'getInfo' && $actionName[0] != '_') {
+      if (!in_array($actionName, ['permissions', 'getInfo', 'getEntityName'], TRUE) && !str_starts_with($actionName, '_')) {
         $this->loadAction($actionName, $method);
       }
     }

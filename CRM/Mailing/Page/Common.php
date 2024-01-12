@@ -38,13 +38,13 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
     }
 
     // verify that the three numbers above match
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
     if (!$q) {
       throw new CRM_Core_Exception(ts("There was an error in your request"));
     }
 
     $cancel = CRM_Utils_Request::retrieve("_qf_{$this->_type}_cancel", 'String');
-    if ($cancel) {
+    if (isset($cancel)) {
       $config = CRM_Core_Config::singleton();
       CRM_Utils_System::redirect($config->userFrameworkBaseURL);
     }
@@ -57,28 +57,30 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
     $this->assign('confirm', $confirm);
 
     $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($job_id, $queue_id, $hash, TRUE);
-    $this->assign('groups', $groups);
+    $this->assign('groups', $groups ?? []);
     $groupExist = NULL;
-    foreach ($groups as $key => $value) {
+    foreach ($groups as $value) {
+      // How about we just array_filter - only question is before or after the assign?
       if ($value) {
         $groupExist = TRUE;
       }
     }
+    // @todo - can we just check if groups is empty here & in the template?
     $this->assign('groupExist', $groupExist);
 
     if ($confirm) {
-      if ($this->_type == 'unsubscribe') {
+      if ($this->_type === 'unsubscribe') {
         $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($job_id, $queue_id, $hash);
-        if (count($groups)) {
+        if (!empty($groups)) {
           CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($queue_id, $groups, FALSE, $job_id);
         }
         else {
           // should we indicate an error, or just ignore?
         }
       }
-      elseif ($this->_type == 'resubscribe') {
+      elseif ($this->_type === 'resubscribe') {
         $groups = CRM_Mailing_Event_BAO_MailingEventResubscribe::resub_to_mailing($job_id, $queue_id, $hash);
-        if (count($groups)) {
+        if (!empty($groups)) {
           CRM_Mailing_Event_BAO_MailingEventResubscribe::send_resub_response($queue_id, $groups, $job_id);
         }
         else {

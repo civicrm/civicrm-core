@@ -31,7 +31,7 @@ use Civi\Test\TransactionalInterface;
  */
 class DateTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testRelationshipDate() {
+  public function testRelationshipDate(): void {
     $c1 = Contact::create()
       ->addValue('first_name', 'c')
       ->addValue('last_name', 'one')
@@ -63,7 +63,7 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayNotHasKey($r, $result);
   }
 
-  public function testRelativeDateRanges() {
+  public function testRelativeDateRanges(): void {
     $c1 = Contact::create()
       ->addValue('first_name', 'c')
       ->addValue('last_name', 'one')
@@ -146,7 +146,7 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotContains($act[6], $result);
   }
 
-  public function testJoinOnRelativeDate() {
+  public function testJoinOnRelativeDate(): void {
     $c1 = Contact::create(FALSE)
       ->addValue('first_name', 'Contributor')
       ->addValue('last_name', 'One')

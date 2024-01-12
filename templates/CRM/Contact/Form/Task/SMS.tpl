@@ -10,7 +10,7 @@
 <div class="crm-block crm-form-block crm-contactSMS-form-block">
 {if $suppressedSms > 0}
     <div class="status">
-        <p>{ts count=$suppressedSms plural='SMS will NOT be sent to %count contacts - (no phone number on file, or communication preferences specify DO NOT SMS, or contact is deceased).'}SMS will NOT be sent to %count contact - (no phone number on file, or communication preferences specify DO NOT SMS, or contact is deceased).{/ts}</p>
+        <p>{ts count=$suppressedSms plural='SMS will NOT be sent to %count contacts who have no mobile phone number, who are set to Do not SMS, or who are deceased.'}SMS will NOT be sent to %count contact who has no mobile phone number, who is set to Do not SMS, or who is deceased.{/ts}</p>
     </div>
 {/if}
 {if $extendTargetContacts > 0}
@@ -77,7 +77,7 @@
 
 {literal}
 CRM.$(function($){
-  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkphone' h=0 }{literal}";
+  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkphone' h=0}{literal}";
   function phoneSelect(el){
     $(el).data('api-entity', 'contact').crmSelect2({
       minimumInputLength: 1,

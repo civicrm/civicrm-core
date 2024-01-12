@@ -39,23 +39,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
   protected $recursion = NULL;
   protected $recursion_start_date = NULL;
 
-  public static $_entitiesToBeDeleted = [];
-
   public static $status = NULL;
-
-  public static $_recurringEntityHelper
-    = [
-      'civicrm_event' => [
-        'helper_class' => 'CRM_Event_DAO_Event',
-        'delete_func' => 'delete',
-        'pre_delete_func' => 'CRM_Event_Form_ManageEvent_Repeat::checkRegistrationForEvents',
-      ],
-      'civicrm_activity' => [
-        'helper_class' => 'CRM_Activity_DAO_Activity',
-        'delete_func' => 'delete',
-        'pre_delete_func' => '',
-      ],
-    ];
 
   public static $_dateColumns
     = [

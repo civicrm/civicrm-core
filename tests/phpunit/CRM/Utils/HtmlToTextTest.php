@@ -25,27 +25,18 @@ class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
 
     $cases[] = [
       "\n<p>\n" .
-      "This is a paragraph with <b>Bold</b> and <i>italics</i>\n" .
+      "This is a paragraph with <b>Bold</b> and <i>italics</i>.\n" .
       "Also some <a href=\"http://www.example.com\">hrefs</a> and a\n" .
       "few <mailto:\"info@example.org\">mailto</mailto> tags.\n" .
       "This is also a really long long line\n" .
       "\n",
-      "This is a paragraph with BOLD and _italics_ Also some hrefs [1] and a few\n" .
-      "mailto tags. This is also a really long long line\n" .
-      "\n" .
-      "Links:\n" .
-      "------\n" .
-      "[1] http://www.example.com\n" .
-      "",
+      "This is a paragraph with Bold and italics. Also some [hrefs](http://www.example.com)" .
+      " and a few mailto tags. This is also a really long long line",
     ];
 
     $cases[] = [
       "<p>\nA <a href=\"{action.do_something}\">token</a>\nis not treated as a relative URL",
-      "A token [1] is not treated as a relative URL\n" .
-      "\n" .
-      "Links:\n" .
-      "------\n" .
-      "[1] {action.do_something}\n",
+      "A [token]({action.do_something}) is not treated as a relative URL",
     ];
 
     return $cases;

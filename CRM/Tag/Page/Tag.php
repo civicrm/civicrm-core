@@ -40,7 +40,7 @@ class CRM_Tag_Page_Tag extends CRM_Core_Page {
     }
 
     $result = civicrm_api3('Tag', 'get', [
-      'return' => ["name", "used_for", "description", "created_id.display_name", "created_date", "is_reserved"],
+      'return' => ["name", "label", "used_for", "description", "created_id.display_name", "created_date", "is_reserved"],
       'is_tagset' => 1,
       'options' => ['limit' => 0],
     ]);

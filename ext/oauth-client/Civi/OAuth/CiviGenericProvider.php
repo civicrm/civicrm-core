@@ -14,9 +14,8 @@ use League\OAuth2\Client\Token\AccessToken;
  *   may prefer "prompt" nowadays.
  * - Allow one to fetch claims about the resource-owner from the `id_token`
  *   supported by OpenID Connect. This reduces the need for extra round-trips
- *   and proprietary scopes+URLs. To use this, set the the option:
- *
- *    "urlResourceOwnerDetails": "{{use_id_token}}",
+ *   and proprietary scopes+URLs. To use this, set the option:
+ *     "urlResourceOwnerDetails": "{{use_id_token}}",
  * - Allow support for {{tenant}} token in provider URLs, if the provider has
  *   the 'tenancy' option set to TRUE (eg: ms-exchange).
  */

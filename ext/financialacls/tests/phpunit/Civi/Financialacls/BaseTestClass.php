@@ -7,6 +7,7 @@ use Civi\Api4\FinancialType;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
+use Civi\Api4\Product;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
@@ -49,6 +50,7 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
   public function tearDown(): void {
     Contribution::delete(FALSE)->addWhere('id', '>', 0)->execute();
     FinancialType::delete(FALSE)->addWhere('name', 'LIKE', '%test%')->execute();
+    Product::delete(FALSE)->addWhere('name', '=', '10_dollars')->execute();
     $this->cleanupPriceSets();
   }
 

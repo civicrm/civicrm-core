@@ -52,7 +52,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
    * Test create function succeeds.
    */
   public function testCreateSurvey(): void {
-    $result = $this->callAPIAndDocument('Survey', 'create', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Survey', 'create', $this->params);
     $this->getAndCheck($this->params, $result['id'], $this->entity);
   }
 
@@ -65,7 +65,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
    */
   public function testGetSurvey(): void {
     $this->createTestEntity('Survey', $this->params);
-    $result = $this->callAPIAndDocument('Survey', 'get', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Survey', 'get', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
@@ -75,26 +75,21 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
    */
   public function testDeleteSurvey(): void {
     $entity = $this->createTestEntity('Survey', $this->params);
-    $this->callAPIAndDocument('survey', 'delete', ['id' => $entity['id']], __FUNCTION__, __FILE__);
+    $this->callAPISuccess('survey', 'delete', ['id' => $entity['id']]);
     $checkDeleted = $this->callAPISuccess($this->entity, 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
   /**
-   * Test & document chained delete pattern.
-   *
-   * Note that explanation of the pattern
-   * is best put in the $description variable as it will then be displayed in the
-   * test generated examples. (these are to be found in the api/examples folder).
+   * Test chained delete pattern.
    */
   public function testGetSurveyChainDelete(): void {
-    $description = 'Demonstrates get + delete in the same call.';
     $params = [
       'title' => 'survey title',
       'api.survey.delete' => 1,
     ];
     $this->callAPISuccess('Survey', 'create', $this->params);
-    $this->callAPIAndDocument('Survey', 'get', $params, __FUNCTION__, __FILE__, $description, 'ChainedGetDelete');
+    $this->callAPISuccess('Survey', 'get', $params);
     $this->assertEquals(0, $this->callAPISuccess('survey', 'getcount', []));
   }
 

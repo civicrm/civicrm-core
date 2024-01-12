@@ -19,7 +19,7 @@ class Backdrop implements AuthxInterface {
   public function checkPassword(string $username, string $password) {
     $uid = user_authenticate($username, $password);
     // Ensure strict nullness.
-    return $uid ? $uid : NULL;
+    return $uid ?: NULL;
   }
 
   /**

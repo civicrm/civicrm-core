@@ -25,6 +25,8 @@ use Civi\Api4\ContactType;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Event;
+use Civi\Api4\Individual;
+use Civi\Api4\Organization;
 use Civi\Api4\Participant;
 
 /**
@@ -50,7 +52,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       ->execute();
   }
 
-  public function testDisabledFields() {
+  public function testDisabledAndHiddenFields(): void {
     // Create a custom group with one enabled and one disabled field
     CustomGroup::create(FALSE)
       ->addValue('extends', 'Activity')
@@ -60,14 +62,20 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       'records' => [
         ['label' => 'enabled_field'],
         ['label' => 'disabled_field', 'is_active' => FALSE],
+        ['label' => 'hidden_field', 'html_type' => 'Hidden'],
       ],
       'defaults' => ['custom_group_id.name' => 'act_test_grp'],
     ]);
 
-    // Only the enabled field shows up
-    $getFields = Activity::getFields(FALSE)->execute()->column('name');
-    $this->assertContains('act_test_grp.enabled_field', $getFields);
-    $this->assertNotContains('act_test_grp.disabled_field', $getFields);
+    // Only the enabled fields show up
+    $getFields = Activity::getFields(FALSE)->execute()->indexBy('name');
+    $this->assertArrayHasKey('act_test_grp.enabled_field', $getFields);
+    $this->assertArrayHasKey('act_test_grp.hidden_field', $getFields);
+    $this->assertArrayNotHasKey('act_test_grp.disabled_field', $getFields);
+
+    // Hidden field does not have option lists
+    $this->assertFalse($getFields['act_test_grp.hidden_field']['options']);
+    $this->assertNull($getFields['act_test_grp.hidden_field']['suffixes']);
 
     // Disable the entire custom group
     CustomGroup::update(FALSE)
@@ -81,18 +89,18 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $this->assertNotContains('act_test_grp.disabled_field', $getFields);
   }
 
-  public function testCustomGetFieldsWithContactSubType() {
+  public function testCustomGetFieldsWithContactSubType(): void {
     ContactType::create(FALSE)
       ->addValue('name', $this->subTypeName)
       ->addValue('label', $this->subTypeName)
       ->addValue('parent_id:name', 'Individual')
       ->execute();
 
-    $contact1 = Contact::create(FALSE)
+    $contact1 = Individual::create(FALSE)
       ->execute()->first();
-    $contact2 = Contact::create(FALSE)->addValue('contact_sub_type', [$this->subTypeName])
+    $contact2 = Individual::create(FALSE)->addValue('contact_sub_type', [$this->subTypeName])
       ->execute()->first();
-    $org = Contact::create(FALSE)->addValue('contact_type', 'Organization')
+    $org = Organization::create(FALSE)
       ->execute()->first();
 
     // Individual sub-type custom group
@@ -141,12 +149,33 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $this->assertArrayNotHasKey('org_group.sub_field', $fieldsWithSubtype);
     $this->assertArrayHasKey('always.on', $fieldsWithSubtype);
 
+    $fieldsWithSubtype = Individual::getFields(FALSE)
+      ->addValue('id', $contact2['id'])
+      ->execute()->indexBy('name');
+    $this->assertArrayHasKey('contact_sub.sub_field', $fieldsWithSubtype);
+    $this->assertArrayNotHasKey('org_group.sub_field', $fieldsWithSubtype);
+    $this->assertArrayHasKey('always.on', $fieldsWithSubtype);
+
+    $fieldsWithSubtype = Contact::getFields(FALSE)
+      ->addValue('id', $contact2['id'])
+      ->execute()->indexBy('name');
+    $this->assertArrayHasKey('contact_sub.sub_field', $fieldsWithSubtype);
+    $this->assertArrayNotHasKey('org_group.sub_field', $fieldsWithSubtype);
+    $this->assertArrayHasKey('always.on', $fieldsWithSubtype);
+
     $fieldsNoSubtype = Contact::getFields(FALSE)
       ->addValue('id', $contact1['id'])
       ->execute()->indexBy('name');
     $this->assertArrayNotHasKey('contact_sub.sub_field', $fieldsNoSubtype);
     $this->assertArrayNotHasKey('org_group.sub_field', $fieldsNoSubtype);
     $this->assertArrayHasKey('always.on', $fieldsNoSubtype);
+
+    $groupFields = Organization::getFields(FALSE)
+      ->addValue('id', $org['id'])
+      ->execute()->indexBy('name');
+    $this->assertArrayNotHasKey('contact_sub.sub_field', $groupFields);
+    $this->assertArrayHasKey('org_group.sub_field', $groupFields);
+    $this->assertArrayHasKey('always.on', $groupFields);
 
     $groupFields = Contact::getFields(FALSE)
       ->addValue('id', $org['id'])
@@ -156,7 +185,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $this->assertArrayHasKey('always.on', $groupFields);
   }
 
-  public function testCustomGetFieldsForParticipantSubTypes() {
+  public function testCustomGetFieldsForParticipantSubTypes(): void {
     $event1 = Event::create(FALSE)
       ->addValue('title', 'Test1')
       ->addValue('event_type_id:name', 'Meeting')
@@ -192,7 +221,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       ->setRecords($sampleData)
       ->execute();
 
-    // CustomGroup based on Event Type
+    // CustomGroup based on Event Type = Meeting|Conference
     CustomGroup::create(FALSE)
       ->addValue('extends', 'Participant')
       ->addValue('extends_entity_column_id:name', 'ParticipantEventType')
@@ -205,7 +234,7 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       )
       ->execute();
 
-    // CustomGroup based on Participant Status
+    // CustomGroup based on Participant Role
     CustomGroup::create(FALSE)
       ->addValue('extends', 'Participant')
       ->addValue('extends_entity_column_id:name', 'ParticipantRole')
@@ -278,6 +307,20 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $this->assertArrayHasKey('volunteer_host.sub_field', $participant3Fields);
     $this->assertArrayNotHasKey('event_3_and_3.sub_field', $participant3Fields);
     $this->assertArrayHasKey('always.on', $participant3Fields);
+
+    $event1Fields = Participant::getFields(FALSE)
+      ->addValue('event_id', $event1['id'])
+      ->execute()->indexBy('name');
+    $this->assertArrayHasKey('meeting_conference.sub_field', $event1Fields);
+    $this->assertArrayNotHasKey('event_2_and_3.sub_field', $event1Fields);
+    $this->assertArrayHasKey('always.on', $event1Fields);
+
+    $event4Fields = Participant::getFields(FALSE)
+      ->addValue('event_id', $event4['id'])
+      ->execute()->indexBy('name');
+    $this->assertArrayNotHasKey('meeting_conference.sub_field', $event4Fields);
+    $this->assertArrayNotHasKey('event_3_and_3.sub_field', $event4Fields);
+    $this->assertArrayHasKey('always.on', $event4Fields);
   }
 
   public function testFiltersAreReturnedForContactRefFields(): void {

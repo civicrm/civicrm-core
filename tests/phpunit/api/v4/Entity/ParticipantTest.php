@@ -19,6 +19,7 @@
 
 namespace api\v4\Entity;
 
+use Civi\Api4\Event;
 use Civi\Api4\Participant;
 use api\v4\Api4TestBase;
 use Civi\Test\TransactionalInterface;
@@ -39,7 +40,7 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
     $this->cleanup($cleanup_params);
   }
 
-  public function testGetActions() {
+  public function testGetActions(): void {
     $result = Participant::getActions(FALSE)
       ->execute()
       ->indexBy('name');
@@ -51,7 +52,7 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString($whereDescription, $getParams['where']['description']);
   }
 
-  public function testGet() {
+  public function testGet(): void {
     $rows = $this->getRowCount('civicrm_participant');
     if ($rows > 0) {
       $this->fail('Participant table must be empty');
@@ -249,6 +250,65 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
 
     // Or if you search by id
     $this->assertCount(1, Participant::get()->selectRowCount()->addWhere('id', '=', $testParticipants->first()['id'])->execute());
+  }
+
+  public function testGetRemainingParticipants(): void {
+    $eventWithMax = $this->createTestRecord('Event', ['max_participants' => 3])['id'];
+    $eventUnlimited = $this->createTestRecord('Event', ['max_participants' => 0])['id'];
+
+    $events = Event::get(FALSE)
+      ->addSelect('remaining_participants')
+      ->addWhere('id', 'IN', [$eventWithMax, $eventUnlimited])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(3, $events[0]['remaining_participants']);
+    // `remaining_participants` is always NULL for unlimited events
+    $this->assertNull($events[1]['remaining_participants']);
+
+    $deleted = $this->createTestRecord('Contact', ['is_deleted' => TRUE])['id'];
+
+    $this->saveTestRecords('Participant', [
+      'records' => [
+        // 2 legit registrations for $eventWithMax
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Registered'],
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Attended'],
+        // None of these should count toward $eventWithMax participant limit
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Registered', 'contact_id' => $deleted],
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Cancelled'],
+        ['event_id' => $eventUnlimited, 'status_id:name' => 'Registered'],
+      ],
+    ]);
+
+    $events = Event::get(FALSE)
+      ->addSelect('remaining_participants')
+      ->addWhere('id', 'IN', [$eventWithMax, $eventUnlimited])
+      ->addOrderBy('id')
+      ->execute();
+    // 1 Spot remaining
+    $this->assertEquals(1, $events[0]['remaining_participants']);
+    // `remaining_participants` is always NULL for unlimited events
+    $this->assertNull($events[1]['remaining_participants']);
+
+    $this->saveTestRecords('Participant', [
+      'records' => [
+        // 2 legit registrations for $eventWithMax
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Registered'],
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Attended'],
+        // None of these should count toward $eventWithMax participant limit
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Registered', 'contact_id' => $deleted],
+        ['event_id' => $eventUnlimited, 'status_id:name' => 'Registered'],
+      ],
+    ]);
+
+    $events = Event::get(FALSE)
+      ->addSelect('remaining_participants')
+      ->addWhere('id', 'IN', [$eventWithMax, $eventUnlimited])
+      ->addOrderBy('id')
+      ->execute();
+    // -1 spot remaining
+    $this->assertEquals(-1, $events[0]['remaining_participants']);
+    // `remaining_participants` is always NULL for unlimited events
+    $this->assertNull($events[1]['remaining_participants']);
   }
 
   /**

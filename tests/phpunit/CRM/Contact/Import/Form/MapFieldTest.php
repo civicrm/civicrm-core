@@ -26,7 +26,6 @@ use Civi\Api4\UserJob;
  */
 class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
 
-  use CRM_Contact_Import_MetadataTrait;
   use CRMTraits_Custom_CustomDataTrait;
 
   /**
@@ -193,7 +192,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $expectedJS = "<script type='text/javascript'>
 " . $expectedJS . '</script>';
 
-    $this->assertEquals($expectedJS, trim((string) CRM_Core_Smarty::singleton()->get_template_vars('initHideBoxes')));
+    $this->assertEquals($expectedJS, trim((string) CRM_Core_Smarty::singleton()->getTemplateVars('initHideBoxes')));
     $this->assertEquals($expectedDefaults, $this->form->_defaultValues);
   }
 
@@ -208,9 +207,11 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   public function testLoadSavedMappingDirect(): void {
     $mapping = $this->storeComplexMapping();
     $this->setUpMapFieldForm();
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($this->form->getUserJobID());
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mapping['id']);
-    $processor->setMetadata($this->getContactImportMetadata());
+    $processor->setMetadata($parser->getFieldsMetadata());
     $this->assertEquals(3, $processor->getPhoneOrIMTypeID(10));
     $this->assertEquals(3, $processor->getPhoneTypeID(10));
     $this->assertEquals(1, $processor->getLocationTypeID(10));
@@ -261,24 +262,9 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
       [
         ['name' => 'do_not_import', 'contact_type' => 'Individual', 'column_number' => 0],
         "swapOptions(document.forms.MapField, 'mapper[0]', 0, 4, 'hs_mapper_0_');\n",
-        ['mapper[0]' => []],
+        ['mapper[0]' => ['do_not_import']],
       ],
     ];
-  }
-
-  /**
-   * Test the MapField function getting defaults from column names.
-   *
-   * @dataProvider getHeaderMatchDataProvider
-   *
-   * @param $columnHeader
-   * @param $mapsTo
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testDefaultFromColumnNames($columnHeader, $mapsTo): void {
-    $this->setUpMapFieldForm();
-    $this->assertEquals($mapsTo, $this->form->defaultFromColumnName($columnHeader));
   }
 
   /**
@@ -335,7 +321,9 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mappingID);
     $processor->setFormName('document.forms.MapField');
-    $processor->setMetadata($this->getContactImportMetadata());
+    $parser = new CRM_Contact_Import_Parser_Contact();
+    $parser->setUserJobID($this->form->getUserJobID());
+    $processor->setMetadata($parser->getFieldsMetadata());
     $processor->setContactType('Individual');
 
     $defaults = [];

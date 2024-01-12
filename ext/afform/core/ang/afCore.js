@@ -17,6 +17,8 @@
           $scope.crmUiAlert = crmUiAlert;
           $scope.crmUrl = CRM.url;
 
+          $el.addClass('afform-directive');
+
           // Afforms do not use routing, but some forms get input from search params
           var dialog = $el.closest('.ui-dialog-content');
           if (!dialog.length) {

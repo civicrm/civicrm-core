@@ -60,9 +60,9 @@ class RequiredFields extends BaseListener {
       }
 
       if (!$found) {
-        $e->setError($field, E::ts('Field %1 is required.', array(
+        $e->setError($field, E::ts('Field %1 is required.', [
           1 => $fieldTitle,
-        )));
+        ]));
       }
       unset($found);
     }

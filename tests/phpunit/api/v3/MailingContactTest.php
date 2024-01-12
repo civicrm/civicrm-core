@@ -41,7 +41,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testMailingContactGetFields() {
+  public function testMailingContactGetFields(): void {
     $result = $this->callAPISuccess('MailingContact', 'getfields', [
       'action' => 'get',
     ]);
@@ -56,7 +56,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    * Test is of marginal if any value & testing of wrapper level functionality
    * belongs in the SyntaxConformance class
    */
-  public function testMailingNoContactID() {
+  public function testMailingNoContactID(): void {
     $this->callAPIFailure('MailingContact', 'get', ['something' => 'This is not a real field']);
   }
 
@@ -68,14 +68,14 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    * Test is of marginal if any value & testing of wrapper level functionality
    * belongs in the SyntaxConformance class
    */
-  public function testMailingContactInvalidContactID() {
+  public function testMailingContactInvalidContactID(): void {
     $this->callAPIFailure('MailingContact', 'get', ['contact_id' => 'This is not a number']);
   }
 
   /**
    * Test that invalid types are returned with appropriate errors.
    */
-  public function testMailingContactInvalidType() {
+  public function testMailingContactInvalidType(): void {
     $params = [
       'contact_id' => 23,
       'type' => 'invalid',
@@ -86,7 +86,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
   /**
    * Test for success result when there are no mailings for a the given contact.
    */
-  public function testMailingContactNoMailings() {
+  public function testMailingContactNoMailings(): void {
     $params = [
       'contact_id' => $this->contact['id'],
     ];
@@ -98,7 +98,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
   /**
    * Test that the API returns a mailing properly when there is only one.
    */
-  public function testMailingContactDelivered() {
+  public function testMailingContactDelivered(): void {
     list($contactID, $mailingID, $eventQueueID) = $this->setupEventQueue();
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_mailing_event_delivered (event_queue_id) VALUES(%1)", [1 => [$eventQueueID, 'Integer']]);
 
@@ -123,7 +123,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testMailingContactBounced() {
+  public function testMailingContactBounced(): void {
     list($contactID, $mailingID, $eventQueueID) = $this->setupEventQueue();
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_mailing_event_bounce (event_queue_id, bounce_type_id) VALUES(%1, 6)", [1 => [$eventQueueID, 'Integer']]);
 

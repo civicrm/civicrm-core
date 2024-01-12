@@ -4,57 +4,38 @@ contactID:::{$contactID}
 {if !empty($event.confirm_email_text)}
 event.confirm_email_text:::{$event.confirm_email_text}
 {/if}
-{if isset($isOnWaitlist)}
+{if !empty($isOnWaitlist)}
 isOnWaitlist:::{$isOnWaitlist}
 {/if}
-{if isset($isRequireApproval)}
+{if !empty($isRequireApproval)}
 isRequireApproval:::{$isRequireApproval}
 {/if}
 participant_status:::{$participant_status}
-{if isset($pricesetFieldsCount)}
-pricesetFieldsCount:::{$pricesetFieldsCount}
-{/if}
 {if !empty($isPrimary)}
 isPrimary:::{$isPrimary}
 {/if}
-{if isset($conference_sessions)}
-conference_sessions:::{$conference_sessions}
-{/if}
-{if isset($is_pay_later)}
+{if !empty($is_pay_later)}
 is_pay_later:::{$is_pay_later}
 {/if}
-{if isset($isAmountzero)}
+{if !empty($isAmountzero)}
 isAmountzero:::{$isAmountzero}
 {/if}
-{if isset($isAdditionalParticipant)}
-isAdditionalParticipant:::{$isAdditionalParticipant}
-{/if}
-{if isset($pay_later_receipt)}
+{if !empty($pay_later_receipt)}
 pay_later_receipt:::{$pay_later_receipt}
 {/if}
 event.event_title:::{$event.event_title}
 event.event_start_date:::{$event.event_start_date|crmDate:"%A"}
 event.event_end_date:::{event.end_date|crmDate:"%Y%m%d"}
-{if isset($event.is_monetary)}
-event.is_monetary:::{$event.is_monetary}
-{/if}
-{if !empty($event.fee_label)}
-event.fee_label:::{$event.fee_label}
-{/if}
-{if !empty($conference_sessions)}
-conference_sessions:::{$conference_sessions}
-{/if}
-{if !empty($event.participant_role)}
-  event.participant_role::{$event.participant_role}
-  defaultRole:::{$defaultRole}
-{/if}
+event.is_monetary:::{event.is_monetary|boolean}
+event.fee_label:::{event.fee_label}
+event.participant_role:::{event.participant_role_id:label}
 {if !empty($isShowLocation)}
 isShowLocation:::{$isShowLocation}
 location.address.1.display:::{$location.address.1.display}
-location.phone.1.phone:::{$location.phone.1.phone}
-location.phone.1.phone_type_display:::{$location.phone.1.phone_type_display}
-location.phone.1.phone_ext:::{$location.phone.1.phone_ext}
-location.email.1.email:::{$location.email.1.email}
+location.phone.1.phone:::{event.loc_block_id.phone_id.phone}
+location.phone.1.phone_type_display:::{event.loc_block_id.phone_id.phone_type_id:label}
+location.phone.1.phone_ext:::{event.loc_block_id.phone_id.phone_ext}
+location.email.1.email:::{event.loc_block_id.email_id.email}
 {/if}
 {if {event.is_public|boolean}}
 event.is_public:::{$event.is_public}
@@ -86,10 +67,6 @@ part:::{foreach from=$part item=value key=key}
 {/foreach}
 {/if}
 
-{if !empty($dataArray)}
-dataArray:::{$dataArray}
-{/if}
-
 {if isset($totalTaxAmount)}
 totalTaxAmount:::{$totalTaxAmount}
 {/if}
@@ -114,9 +91,7 @@ paidBy:::{$paidBy}
 {if isset($checkNumber)}
 checkNumber:::{$checkNumber}
 {/if}
-{if isset($billingName)}
-billingName:::{$billingName}
-{/if}
+billingName:::{contribution.address_id.name}
 {if isset($credit_card_type)}
 credit_card_type:::{$credit_card_type}
 credit_card_number:::{$credit_card_number}

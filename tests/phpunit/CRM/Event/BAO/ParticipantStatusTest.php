@@ -20,7 +20,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   /**
    *  create() and deleteParticipantStatusType() method
    */
-  public function testCreateAndDelete() {
+  public function testCreateAndDelete(): void {
 
     // create using required params
     $params = [
@@ -31,7 +31,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'visibility_id' => 1,
     ];
 
-    $statusType = CRM_Event_BAO_ParticipantStatusType::create($params);
+    $statusType = CRM_Event_BAO_ParticipantStatusType::writeRecord($params);
     // Checking for participant status type id in db.
     $statusTypeId = $this->assertDBNotNull('CRM_Event_DAO_ParticipantStatusType', $statusType->id, 'id',
       'id', 'Check DB for status type id'
@@ -47,7 +47,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   /**
    *  add() method (add and edit modes of participant status type)
    */
-  public function testAddStatusType() {
+  public function testAddStatusType(): void {
 
     $params = [
       'name' => 'testStatus',
@@ -60,7 +60,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
     ];
 
     // check for add participant status type
-    $statusType = CRM_Event_BAO_ParticipantStatusType::add($params);
+    $statusType = CRM_Event_BAO_ParticipantStatusType::writeRecord($params);
     foreach ($params as $param => $value) {
       $this->assertEquals($value, $statusType->$param);
     }
@@ -77,7 +77,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
     ];
 
     // check for add participant status type
-    $statusType = CRM_Event_BAO_ParticipantStatusType::add($params);
+    $statusType = CRM_Event_BAO_ParticipantStatusType::writeRecord($params);
     foreach ($params as $param => $value) {
       $this->assertEquals($value, $statusType->$param);
     }
@@ -86,7 +86,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   /**
    * Retrieve() method of participant status type
    */
-  public function testRetrieveStatusType() {
+  public function testRetrieveStatusType(): void {
 
     $params = [
       'name' => 'testStatus',
@@ -98,7 +98,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'visibility_id' => 1,
     ];
 
-    $statusType = CRM_Event_BAO_ParticipantStatusType::create($params);
+    $statusType = CRM_Event_BAO_ParticipantStatusType::writeRecord($params);
 
     // retrieve status type
     $retrieveParams = ['id' => $statusType->id];

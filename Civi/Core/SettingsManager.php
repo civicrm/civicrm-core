@@ -239,7 +239,7 @@ class SettingsManager {
    */
   protected function getMandatory($entity) {
     if ($this->mandatory === NULL) {
-      $this->mandatory = self::parseMandatorySettings(\CRM_Utils_Array::value('civicrm_setting', $GLOBALS));
+      $this->mandatory = self::parseMandatorySettings($GLOBALS['civicrm_setting'] ?? NULL);
     }
     return $this->mandatory[$entity];
   }

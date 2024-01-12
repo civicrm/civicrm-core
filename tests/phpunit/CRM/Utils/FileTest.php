@@ -13,7 +13,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   /**
    * Test is child path.
    */
-  public function testIsChildPath() {
+  public function testIsChildPath(): void {
     $testCases = [];
     $testCases[] = ['/ab/cd/ef', '/ab/cd', FALSE];
     $testCases[] = ['/ab/cd', '/ab/cd/ef', TRUE];
@@ -43,7 +43,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
   }
 
-  public function testStripComment() {
+  public function testStripComment(): void {
     $strings = [
       "\nab\n-- cd\nef" => "\nab\nef",
       "ab\n-- cd\nef" => "ab\nef",
@@ -152,7 +152,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   /**
    * Check a few variations of isIncludable
    */
-  public function testIsIncludable() {
+  public function testIsIncludable(): void {
     $path = \Civi::paths()->getPath('[civicrm.private]/');
     $bare_filename = 'afile' . time() . '.php';
     $file = "$path/$bare_filename";
@@ -213,7 +213,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * Just trying to include some of the same tests as php itself and
    * this doesn't fit in well to a dataprovider so is separate.
    */
-  public function testIsDirMkdir() {
+  public function testIsDirMkdir(): void {
     $a_dir = sys_get_temp_dir() . '/testIsDir';
     // I think temp is global to the test node, so if any test failed on this
     // in the past it doesn't get cleaned up and so already exists.
@@ -231,7 +231,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   /**
    * testIsDirSlashVariations
    */
-  public function testIsDirSlashVariations() {
+  public function testIsDirSlashVariations(): void {
     $a_dir = sys_get_temp_dir() . '/testIsDir';
     // I think temp is global to the test node, so if any test failed on this
     // in the past it doesn't get cleaned up and so already exists.
@@ -276,7 +276,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * Test hard and soft links with isDir
    * Note hard links to directories aren't allowed so can only test with file.
    */
-  public function testIsDirLinks() {
+  public function testIsDirLinks(): void {
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
       $this->markTestSkipped('Windows has links but not the same.');
     }
@@ -429,7 +429,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
     try {
       $cmd = 'cv ev -v ' . escapeshellarg("return require \"$outFile\";");
-      $descriptorSpec = array(0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']);
+      $descriptorSpec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
       $oldOutput = getenv('CV_OUTPUT');
       putenv("CV_OUTPUT=json");
       $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__);

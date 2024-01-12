@@ -39,7 +39,7 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
    */
   public static function &reply($job_id, $queue_id, $hash, $replyto = NULL) {
     // First make sure there's a matching queue event.
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
 
     $success = NULL;
 

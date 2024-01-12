@@ -225,7 +225,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
    * @inheritDoc
    */
   public function limit($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     parent::limit($rowCount);
 
     // Modify limit.
@@ -243,7 +243,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
    * @param int|null $rowCount
    */
   public function setPager($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     $params = [
       'total' => $this->_rowsFound,
       'rowCount' => $rowCount,

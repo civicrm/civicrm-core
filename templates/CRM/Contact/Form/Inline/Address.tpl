@@ -43,9 +43,9 @@
         <table id="address_table_{$blockId}" class="form-layout-compressed">
            {* build address block w/ address sequence. *}
            {foreach item=addressElement from=$addressSequence}
-            {include file=CRM/Contact/Form/Edit/Address/$addressElement.tpl}
+            {include file="CRM/Contact/Form/Edit/Address/`$addressElement`.tpl"}
            {/foreach}
-           {include file=CRM/Contact/Form/Edit/Address/geo_code.tpl}
+           {include file="CRM/Contact/Form/Edit/Address/geo_code.tpl"}
        </table>
       </td>
      </tr>

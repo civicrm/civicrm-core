@@ -58,10 +58,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    * @var array[]
    */
   public static $_dataToHTML = [
-    'String' => ['Text', 'Select', 'Radio', 'CheckBox', 'Autocomplete-Select'],
-    'Int' => ['Text', 'Select', 'Radio'],
-    'Float' => ['Text', 'Select', 'Radio'],
-    'Money' => ['Text', 'Select', 'Radio'],
+    'String' => ['Text', 'Select', 'Radio', 'CheckBox', 'Autocomplete-Select', 'Hidden'],
+    'Int' => ['Text', 'Select', 'Radio', 'Hidden'],
+    'Float' => ['Text', 'Select', 'Radio', 'Hidden'],
+    'Money' => ['Text', 'Select', 'Radio', 'Hidden'],
     'Memo' => ['TextArea', 'RichTextEditor'],
     'Date' => ['Select Date'],
     'Boolean' => ['Radio'],
@@ -238,7 +238,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       'select' => ['minimumInputLength' => 0],
     ]);
 
-    if ($this->_action == CRM_Core_Action::UPDATE) {
+    $isUpdateAction = $this->_action == CRM_Core_Action::UPDATE;
+    if ($isUpdateAction) {
       $this->freeze('data_type');
       if (!empty($this->_values['option_group_id'])) {
         $this->assign('hasOptionGroup', in_array($this->_values['html_type'], self::$htmlTypesWithOptions));
@@ -247,12 +248,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         $optionGroupParams['id'] = $this->_values['option_group_id'];
         $optionGroupParams['options']['or'] = [["is_reserved", "id"]];
       }
-      $this->assign('originalHtmlType', $this->_values['html_type']);
-      $this->assign('originalSerialize', $this->_values['serialize']);
-      if (!empty($this->_values['serialize'])) {
-        $this->assign('existingMultiValueCount', $this->getMultiValueCount());
-      }
     }
+    $this->assign('existingMultiValueCount', ($isUpdateAction && !empty($this->_values['serialize'])) ? $this->getMultiValueCount() : NULL);
+    $this->assign('originalSerialize', $isUpdateAction ? $this->_values['serialize'] : NULL);
+    $this->assign('originalHtmlType', $isUpdateAction ? $this->_values['html_type'] : NULL);
 
     // Retrieve optiongroups for selection list
     $optionGroupMetadata = civicrm_api3('OptionGroup', 'get', $optionGroupParams);

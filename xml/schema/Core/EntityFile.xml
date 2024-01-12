@@ -26,8 +26,12 @@
     <name>entity_table</name>
     <title>Entity Table</title>
     <type>varchar</type>
+    <required>true</required>
     <length>64</length>
     <comment>physical tablename for entity being joined to file, e.g. civicrm_contact</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_File::getEntityTables</callback>
+    </pseudoconstant>
     <add>1.5</add>
   </field>
   <field>

@@ -72,7 +72,7 @@ return [
         'saved_search_id.name' => 'Administer_Financial_Types',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -151,6 +151,13 @@ return [
                   'join' => '',
                   'target' => '',
                 ],
+              ],
+              'type' => 'buttons',
+              'alignment' => 'text-right',
+            ],
+            [
+              'size' => 'btn-xs',
+              'links' => [
                 [
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
@@ -190,14 +197,20 @@ return [
                   'target' => 'crm-popup',
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
+              'icon' => 'fa-bars',
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/financial/financialType/edit?reset=1&action=add',
-            'text' => E::ts('Add Financial Type'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'FinancialType',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Financial Type'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [

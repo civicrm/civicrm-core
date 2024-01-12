@@ -253,7 +253,7 @@ WHERE  inst.report_id = %1";
           // Remove HTML, unencode entities, and escape quotation marks.
           $value = str_replace('"', '""', html_entity_decode(strip_tags($value), ENT_QUOTES | ENT_HTML401));
 
-          if (CRM_Utils_Array::value('type', $form->_columnHeaders[$v]) & 4) {
+          if (($form->_columnHeaders[$v]['type'] ?? 0) & 4) {
             if (($form->_columnHeaders[$v]['group_by'] ?? NULL) == 'MONTH' ||
               ($form->_columnHeaders[$v]['group_by'] ?? NULL) == 'QUARTER'
             ) {
@@ -395,45 +395,49 @@ WHERE  inst.report_id = %1";
 
     $optionVal = self::getValueFromUrl($instanceId);
     $messages = ['Report Mail Triggered...'];
-
-    $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', $optionVal, 'value');
-    $obj = new CRM_Report_Page_Instance();
-    $is_error = 0;
-    if (strstr(CRM_Utils_Array::value('name', $templateInfo), '_Form')) {
-      $instanceInfo = [];
-      CRM_Report_BAO_ReportInstance::retrieve(['id' => $instanceId], $instanceInfo);
-
-      if (!empty($instanceInfo['title'])) {
-        $obj->assign('reportTitle', $instanceInfo['title']);
-      }
-      else {
-        $obj->assign('reportTitle', $templateInfo['label']);
-      }
-
-      $wrapper = new CRM_Utils_Wrapper();
-      $arguments = [
-        'urlToSession' => [
-          [
-            'urlVar' => 'instanceId',
-            'type' => 'Positive',
-            'sessionVar' => 'instanceId',
-            'default' => 'null',
-          ],
-        ],
-        'ignoreKey' => TRUE,
-      ];
-      $messages[] = $wrapper->run($templateInfo['name'], NULL, $arguments);
+    if (empty($optionVal)) {
+      $is_error = 1;
+      $messages[] = 'Did not find a valid instance to execute';
     }
     else {
-      $is_error = 1;
-      if (!$instanceId) {
-        $messages[] = 'Required parameter missing: instanceId';
+      $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', $optionVal, 'value');
+      $obj = new CRM_Report_Page_Instance();
+      $is_error = 0;
+      if (str_contains($templateInfo['name'] ?? '', '_Form')) {
+        $instanceInfo = [];
+        CRM_Report_BAO_ReportInstance::retrieve(['id' => $instanceId], $instanceInfo);
+
+        if (!empty($instanceInfo['title'])) {
+          $obj->assign('reportTitle', $instanceInfo['title']);
+        }
+        else {
+          $obj->assign('reportTitle', $templateInfo['label']);
+        }
+
+        $wrapper = new CRM_Utils_Wrapper();
+        $arguments = [
+          'urlToSession' => [
+            [
+              'urlVar' => 'instanceId',
+              'type' => 'Positive',
+              'sessionVar' => 'instanceId',
+              'default' => 'null',
+            ],
+          ],
+          'ignoreKey' => TRUE,
+        ];
+        $messages[] = $wrapper->run($templateInfo['name'], NULL, $arguments);
       }
       else {
-        $messages[] = 'Did not find valid instance to execute';
+        $is_error = 1;
+        if (!$instanceId) {
+          $messages[] = 'Required parameter missing: instanceId';
+        }
+        else {
+          $messages[] = 'Did not find valid instance to execute';
+        }
       }
     }
-
     $result = [
       'is_error' => $is_error,
       'messages' => implode("\n", $messages),

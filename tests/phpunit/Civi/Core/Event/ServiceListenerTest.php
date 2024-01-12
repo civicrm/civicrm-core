@@ -12,7 +12,7 @@ class ServiceListenerTest extends \CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testDispatch() {
+  public function testDispatch(): void {
     $changeMe = $rand = rand(0, 16384);
 
     $container = new ContainerBuilder();

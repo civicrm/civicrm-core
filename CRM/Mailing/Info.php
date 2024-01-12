@@ -130,31 +130,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * Get AngularJS modules and their dependencies.
-   *
-   * @return array
-   *   list of modules; same format as CRM_Utils_Hook::angularModules(&$angularModules)
-   * @see CRM_Utils_Hook::angularModules
-   */
-  public function getAngularModules() {
-    // load angular files only if valid permissions are granted to the user
-    if (!CRM_Core_Permission::check('access CiviMail')
-      && !CRM_Core_Permission::check('create mailings')
-      && !CRM_Core_Permission::check('schedule mailings')
-      && !CRM_Core_Permission::check('approve mailings')
-    ) {
-      return [];
-    }
-    global $civicrm_root;
-
-    $result = [];
-    $result['crmMailing'] = include "$civicrm_root/ang/crmMailing.ang.php";
-    $result['crmMailingAB'] = include "$civicrm_root/ang/crmMailingAB.ang.php";
-
-    return $result;
-  }
-
-  /**
    * @return bool
    */
   public static function workflowEnabled() {

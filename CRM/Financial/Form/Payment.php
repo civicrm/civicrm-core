@@ -69,13 +69,10 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   /**
    * Get currency
    *
-   * @param array $submittedValues
-   *   Required for consistency with other form methods.
-   *
    * @return string
    */
-  public function getCurrency($submittedValues = []) {
-    return $this->currency;
+  public function getCurrency(): string {
+    return (string) $this->currency;
   }
 
   /**

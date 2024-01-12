@@ -19,7 +19,7 @@ class CRM_Core_SessionTest extends CiviUnitTestCase {
    * Test that the template setStatus uses gives reasonable output.
    * Test with text only.
    */
-  public function testSetStatusWithTextOnly() {
+  public function testSetStatusWithTextOnly(): void {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('infoMessage', 'Your refridgerator door is open.');
     $output = $smarty->fetch('CRM/common/info.tpl');
@@ -30,7 +30,7 @@ class CRM_Core_SessionTest extends CiviUnitTestCase {
    * Test that the template setStatus uses gives reasonable output.
    * Test with title only.
    */
-  public function testSetStatusWithTitleOnly() {
+  public function testSetStatusWithTitleOnly(): void {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('infoTitle', 'Error Error Error.');
     $output = $smarty->fetch('CRM/common/info.tpl');
@@ -41,7 +41,7 @@ class CRM_Core_SessionTest extends CiviUnitTestCase {
    * Test that the template setStatus uses gives reasonable output.
    * Test with both text and title.
    */
-  public function testSetStatusWithBoth() {
+  public function testSetStatusWithBoth(): void {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('infoTitle', 'Spoiler alert!');
     $smarty->assign('infoMessage', 'Your refridgerator door is open.');

@@ -455,7 +455,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
         unset($_POST['crmPID_B'], $_POST['crmPID']);
       }
 
-      $pageId = $pageId ? $pageId : 1;
+      $pageId = $pageId ?: 1;
       $offset = ($pageId - 1) * $rowCount;
 
       $offset = CRM_Utils_Type::escape($offset, 'Int');

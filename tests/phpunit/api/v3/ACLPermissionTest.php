@@ -1154,10 +1154,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereOnlyOne']);
     $this->cleanupCachedPermissions();
 
-    $customValues = CustomValue::get($group)->addSelect('*', 'contact.first_name')->execute();
+    $customValues = CustomValue::get($group)->addSelect('*', 'entity_id.first_name')->execute();
     $this->assertCount(1, $customValues);
     $this->assertEquals($c2, $customValues[0]['entity_id']);
-    $this->assertEquals('C2', $customValues[0]['contact.first_name']);
+    $this->assertEquals('C2', $customValues[0]['entity_id.first_name']);
 
     $customValues = Contact::get()
       ->addJoin('Custom_' . $group . ' AS cf')
@@ -1456,6 +1456,85 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->assertCount(2, $contacts);
     $this->assertEquals($contact2, $contacts[0]['id']);
     $this->assertEquals($contact3, $contacts[1]['id']);
+    $groups = CRM_ACL_API::group(CRM_ACL_API::EDIT);
+    $this->assertFalse(in_array($excludeGroup, $groups));
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testContactACLWithAllAllowedWithSpecificAllowedAlso(): void {
+    $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => 'acl_role',
+      'label' => 'Test Multiple allow Specific Groups ACL Role',
+      'value' => 7,
+      'is_active' => 1,
+    ]);
+    $contact1 = $this->individualCreate();
+    $contact2 = $this->individualCreate();
+    $contact3 = $this->individualCreate();
+    $excludeGroup = $this->groupCreate(['title' => 'exclude group also allow', 'name' => 'exclude group also allow']);
+    $otherGroup = $this->groupCreate(['title' => 'Other group also allow', 'name' => 'other group also allow']);
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $contact1,
+      'group_id' => $excludeGroup,
+      'status' => 'Added',
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $contact2,
+      'group_id' => $otherGroup,
+      'status' => 'Added',
+    ]);
+    $aclGroup = $this->groupCreate();
+    ACLEntityRole::create(FALSE)->setValues([
+      'acl_role_id' => 7,
+      'entity_table' => 'civicrm_group',
+      'entity_id' => $aclGroup,
+      'is_active' => 1,
+    ])->execute();
+    $this->callAPISuccess('Acl', 'create', [
+      'name' => 'Test Postive All Groups ACL',
+      'priority' => 6,
+      'entity_table' => 'civicrm_acl_role',
+      'entity_id' => 7,
+      'operation' => 'Edit',
+      'object_table' => 'civicrm_group',
+      'object_id' => 0,
+    ]);
+    $this->callAPISuccess('Acl', 'create', [
+      'name' => 'Test Negative Specific Group ACL',
+      'priority' => 7,
+      'entity_table' => 'civicrm_acl_role',
+      'entity_id' => 7,
+      'operation' => 'Edit',
+      'object_table' => 'civicrm_group',
+      'object_id' => $excludeGroup,
+      'deny' => 0,
+    ]);
+    $userID = $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view my contact',
+    ];
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $userID,
+      'group_id' => $aclGroup,
+      'status' => 'Added',
+    ]);
+    $this->cleanupCachedPermissions();
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+    $contacts = Contact::get()->addWhere('id', 'IN', [$contact1, $contact2, $contact3])->execute();
+    $this->assertCount(3, $contacts);
+    $this->assertEquals($contact1, $contacts[0]['id']);
+    $this->assertEquals($contact2, $contacts[1]['id']);
+    $this->assertEquals($contact3, $contacts[2]['id']);
+    $groups = CRM_ACL_API::group(CRM_ACL_API::EDIT);
+    $this->assertTrue(in_array($excludeGroup, $groups));
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
   }
 
   /**

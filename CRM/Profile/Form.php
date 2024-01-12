@@ -473,11 +473,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
           }
 
         }
-        elseif (!empty($this->_multiRecordFields)
-          && (!$this->_multiRecord || !in_array($this->_multiRecord, [
-            CRM_Core_Action::DELETE,
-            CRM_Core_Action::UPDATE,
-          ]))
+        elseif (!empty($this->_multiRecordFields) &&
+          (!$this->_multiRecord || !in_array($this->_multiRecord, [CRM_Core_Action::DELETE, CRM_Core_Action::UPDATE]))
         ) {
           CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
           //multi-record listing page
@@ -492,7 +489,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
           $page->run();
         }
       }
-      $this->assign('multiRecordFieldListing', $multiRecordFieldListing);
 
       // is profile double-opt in?
       if (!empty($this->_fields['group']) &&
@@ -521,7 +517,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
       }
     }
-
+    $this->assign('multiRecordFieldListing', $multiRecordFieldListing ?? NULL);
     if (!is_array($this->_fields)) {
       CRM_Core_Session::setStatus(ts('This feature is not currently available.'), ts('Sorry'), 'error');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm', 'reset=1'));
@@ -770,7 +766,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
           $return = TRUE;
           if (!$statusMessage) {
             $statusMessage = ts("This profile is configured for contact type '%1'. It cannot be used to edit contacts of other types.",
-                [1 => $profileSubType ? $profileSubType : $profileType]);
+                [1 => $profileSubType ?: $profileType]);
           }
         }
       }
@@ -796,6 +792,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     $this->assign('id', $this->_id);
     $this->assign('mode', $this->_mode);
+    $this->assign('isHideFieldSet', ($this->_mode === self::MODE_CREATE || $this->_mode === self::MODE_EDIT));
     $this->assign('action', $this->_action);
     $this->assign('fields', $this->_fields);
     $this->assign('fieldset', (isset($this->_fieldset)) ? $this->_fieldset : "");
@@ -889,12 +886,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $this->setDefaultsValues();
 
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, NULL);
-
+    $this->assign('showCMS', FALSE);
     if ($this->_mode == self::MODE_CREATE || $this->_mode == self::MODE_EDIT) {
       CRM_Core_BAO_CMSUser::buildForm($this, $this->_gid, $emailPresent, $action);
-    }
-    else {
-      $this->assign('showCMS', FALSE);
     }
 
     $this->assign('groupId', $this->_gid);
@@ -1367,7 +1361,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
-    return $fileName ? $fileName : parent::getTemplateFileName();
+    return $fileName ?: parent::getTemplateFileName();
   }
 
   /**
@@ -1378,7 +1372,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
-    return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
+    return $fileName ?: parent::overrideExtraTemplateFileName();
   }
 
   /**

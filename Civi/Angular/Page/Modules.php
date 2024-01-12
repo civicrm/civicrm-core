@@ -2,6 +2,8 @@
 
 namespace Civi\Angular\Page;
 
+use Civi\Angular\Manager;
+
 /**
  * This page aggregates data from Angular modules.
  *
@@ -148,18 +150,17 @@ class Modules extends \CRM_Core_Page {
    * @param \Civi\Angular\Manager $angular
    * @return array
    */
-  public function getMetadata($moduleNames, $angular) {
-    $modules = $angular->getModules();
+  public function getMetadata(array $moduleNames, Manager $angular): array {
     $result = [];
     foreach ($moduleNames as $moduleName) {
-      if (isset($modules[$moduleName])) {
-        $result[$moduleName] = [];
-        $result[$moduleName]['domain'] = $modules[$moduleName]['ext'];
-        $result[$moduleName]['js'] = $angular->getResources($moduleName, 'js', 'rawUrl');
-        $result[$moduleName]['css'] = $angular->getResources($moduleName, 'css', 'rawUrl');
-        $result[$moduleName]['partials'] = $angular->getPartials($moduleName);
-        $result[$moduleName]['strings'] = $angular->getTranslatedStrings($moduleName);
-      }
+      $module = $angular->getModule($moduleName);
+      $result[$moduleName] = [
+        'domain' => $module['ext'],
+        'js' => $angular->getResources($moduleName, 'js', 'rawUrl'),
+        'css' => $angular->getResources($moduleName, 'css', 'rawUrl'),
+        'partials' => $angular->getPartials($moduleName),
+        'strings' => $angular->getTranslatedStrings($moduleName),
+      ];
     }
     return $result;
   }

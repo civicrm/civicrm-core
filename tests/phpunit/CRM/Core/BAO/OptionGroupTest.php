@@ -29,7 +29,7 @@ class CRM_Core_BAO_OptionGroupTest extends CiviUnitTestCase {
   /**
    * Ensure only one option value exists after calling ensureOptionValueExists.
    */
-  public function testEnsureOptionGroupExistsExistingValue() {
+  public function testEnsureOptionGroupExistsExistingValue(): void {
     CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(['name' => 'contribution_status']);
     $this->callAPISuccessGetSingle('OptionGroup', ['name' => 'contribution_status']);
   }
@@ -37,7 +37,7 @@ class CRM_Core_BAO_OptionGroupTest extends CiviUnitTestCase {
   /**
    * Ensure only one option value exists adds a new value.
    */
-  public function testEnsureOptionGroupExistsNewValue() {
+  public function testEnsureOptionGroupExistsNewValue(): void {
     CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(['name' => 'Bombed']);
     $optionGroups = $this->callAPISuccess('OptionValue', 'getoptions', ['context' => 'validate', 'field' => 'option_group_id'])['values'];
     $this->assertTrue(in_array('bombed', $optionGroups));

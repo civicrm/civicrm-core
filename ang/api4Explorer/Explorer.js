@@ -1245,10 +1245,14 @@
           if ($el.is('.crm-form-date-wrapper .crm-hidden-date')) {
             $el.crmDatepicker('destroy');
           }
-          if ($el.is('.select2-container + input')) {
+          if (isSelect2()) {
             $el.crmAutocomplete('destroy');
           }
           $(element).removeData().removeAttr('type').removeAttr('placeholder').show();
+        }
+
+        function isSelect2() {
+          return $(element).is('.select2-container + input');
         }
 
         function makeWidget(field, op) {
@@ -1312,7 +1316,7 @@
           // If the viewValue is invalid (say required but empty) it will be `undefined`
           if (_.isUndefined(viewValue)) return;
 
-          if (!multi) {
+          if (!multi || !isSelect2()) {
             return viewValue;
           }
 

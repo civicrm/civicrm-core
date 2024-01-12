@@ -273,6 +273,8 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
       <abbrColumn>abbreviation</abbrColumn>
+      <!-- No 'name' suffix tells SearchKit to use Autocomplete. See #25053 -->
+      <suffixes>label,abbr</suffixes>
     </pseudoconstant>
     <html>
       <type>ChainSelect</type>
@@ -301,6 +303,8 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
       <abbrColumn>abbreviation</abbrColumn>
+      <!-- No 'name' suffix tells SearchKit to use Autocomplete. See #25053 -->
+      <suffixes>label,abbr</suffixes>
     </pseudoconstant>
     <localize_context>province</localize_context>
     <html>
@@ -372,6 +376,8 @@
       <labelColumn>name</labelColumn>
       <nameColumn>iso_code</nameColumn>
       <abbrColumn>iso_code</abbrColumn>
+      <!-- No 'name' suffix tells SearchKit to use Autocomplete. See #25053 -->
+      <suffixes>label,abbr</suffixes>
     </pseudoconstant>
     <localize_context>country</localize_context>
     <html>

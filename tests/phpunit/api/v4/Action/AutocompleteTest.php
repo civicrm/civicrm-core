@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Contact;
 use Civi\Api4\MockBasicEntity;
+use Civi\Api4\EntitySet;
 use Civi\Api4\SavedSearch;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\HookInterface;
@@ -135,15 +136,15 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->execute();
 
     // Contacts will be returned in order by sort_name
-    $this->assertStringStartsWith('Both', $result[0]['label']);
+    $this->assertStringEndsWith('Both', $result[0]['label']);
     $this->assertEquals('fa-star', $result[0]['icon']);
-    $this->assertStringStartsWith('No icon', $result[1]['label']);
+    $this->assertStringEndsWith('No icon', $result[1]['label']);
     $this->assertEquals('fa-user', $result[1]['icon']);
-    $this->assertStringStartsWith('Starry', $result[2]['label']);
+    $this->assertStringEndsWith('Starry', $result[2]['label']);
     $this->assertEquals('fa-star', $result[2]['icon']);
   }
 
-  public function testAutocompleteValidation() {
+  public function testAutocompleteValidation(): void {
     $lastName = uniqid(__FUNCTION__);
     $sampleData = [
       [
@@ -199,7 +200,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertCount(1, $result);
   }
 
-  public function testAutocompletePager() {
+  public function testAutocompletePager(): void {
     \Civi::settings()->set('search_autocomplete_count', 10);
     MockBasicEntity::delete()->addWhere('identifier', '>', 0)->execute();
     $sampleData = [];
@@ -234,7 +235,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals(1, $result3->countMatched());
   }
 
-  public function testAutocompleteWithDifferentKey() {
+  public function testAutocompleteWithDifferentKey(): void {
     $label = \CRM_Utils_String::createRandom(10, implode('', range('a', 'z')));
     $sample = $this->saveTestRecords('SavedSearch', [
       'records' => [
@@ -284,6 +285,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $cid = $contacts[11]['id'];
 
     Contact::save(FALSE)
+      ->addRecord(['id' => $contacts[11]['id'], 'last_name' => "Aaaac$cid"])
       ->addRecord(['id' => $contacts[0]['id'], 'last_name' => "Aaaac$cid"])
       ->addRecord(['id' => $contacts[14]['id'], 'last_name' => "Aaaab$cid"])
       ->addRecord(['id' => $contacts[6]['id'], 'last_name' => "Aaaaa$cid"])
@@ -329,6 +331,30 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->setInput(substr((string) $cid, 0, 1))
       ->execute();
     $this->assertNotContains($cid, $result->column('id'));
+  }
+
+  public function testMailingAutocompleteNoDisabledGroups(): void {
+    $this->createTestRecord('Group', [
+      'title' => 'Second Star',
+      'frontend_title' => 'Second Star',
+      'name' => 'Second_Star',
+      'group_type:name' => 'Mailing List',
+    ]);
+    $this->createTestRecord('Group', [
+      'title' => 'Second',
+      'frontend_title' => 'Second',
+      'name' => 'Second',
+      'group_type:name' => 'Mailing List',
+      'is_active' => 0,
+    ]);
+
+    $result = EntitySet::autocomplete()
+      ->setInput('')
+      ->setFieldName('Mailing.recipients_include')
+      ->setFormName('crmMailing.1')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('Second Star', $result[0]['label']);
   }
 
 }

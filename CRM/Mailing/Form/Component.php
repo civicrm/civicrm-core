@@ -35,8 +35,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   protected $_BAOName;
 
   public function preProcess() {
-    $this->_id = $this->get('id');
-    $this->_BAOName = $this->get('BAOName');
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
   }
 
   /**
@@ -94,8 +93,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
 
     if (isset($this->_id)) {
       $params = ['id' => $this->_id];
-      $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $defaults);
+      CRM_Mailing_BAO_MailingComponent::retrieve($params, $defaults);
     }
     else {
       $defaults['is_active'] = 1;
@@ -146,10 +144,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
       $InvalidTokens = ['action.forward' => ts("This token can only be used in send mailing context (body, header, footer)..")];
     }
     $errors = [];
-    foreach ([
-      'text',
-      'html',
-    ] as $type) {
+    foreach (['text', 'html'] as $type) {
       $dataErrors = [];
       foreach ($InvalidTokens as $token => $desc) {
         if ($params['body_' . $type]) {

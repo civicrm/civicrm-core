@@ -1,7 +1,7 @@
 {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
 
-{if $receipt_text}
-{$receipt_text}
+{if $userTextPlain}
+{$userTextPlain}
 {else}{ts}Thank you for this contribution.{/ts}{/if}
 
 {if !$isShowLineItems}
@@ -40,7 +40,7 @@
 --------------------------------------------------------------------------------------------------
 
 {foreach from=$lineItems item=line}
-{line.title} {$line.line_total|crmMoney|string_format:"%10s"}  {if $isShowTax && {contribution.tax_amount|boolean}} {$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"}  {else}                  {/if}   {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {/if} {$line.membership.start_date|string_format:"%20s"} {$line.membership.end_date|string_format:"%20s"}
+{line.title} {$line.line_total|crmMoney|string_format:"%10s"}  {if $isShowTax && {contribution.tax_amount|boolean}} {$line.line_total|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"}  {else}                  {/if}   {$line.line_total_inclusive|crmMoney|string_format:"%10s"} {/if} {$line.membership.start_date|string_format:"%20s"} {$line.membership.end_date|string_format:"%20s"}
 {/foreach}
 
 {if $isShowTax && {contribution.tax_amount|boolean}}
@@ -70,7 +70,7 @@
 {/if}
 {/if}
 
-{if !empty($isPrimary) }
+{if !empty($isPrimary)}
 {if !empty($billingName)}
 
 ===========================================================

@@ -24,7 +24,7 @@
       </li>
       {foreach from=$tagsets item=set}
         <li class="ui-corner-all crm-tab-button {if ($set.is_reserved)}is-reserved{/if}" title="{ts 1=', '|implode:$set.used_for_label}Tag Set for %1{/ts}">
-          <a href="#tagset-{$set.id}">{$set.name}</a>
+          <a href="#tagset-{$set.id}">{$set.label}</a>
         </li>
       {/foreach}
       {if call_user_func(array('CRM_Core_Permission','check'), 'administer Tagsets')}
@@ -164,7 +164,7 @@
 
         function updateTagset(info) {
           tagSets[tagset].description = info.description;
-          tagSets[tagset].name = info.name;
+          tagSets[tagset].label = info.label;
           tagSets[tagset].used_for = info.used_for;
           tagSets[tagset].is_reserved = info.is_reserved;
           formatTagSet(tagSets[tagset]);
@@ -175,7 +175,7 @@
         function addTagsetHeader() {
           $('.tagset-header', $panel).remove();
           $panel.prepend(tagsetHeaderTpl(tagSets[tagset]));
-          $("a[href='#tagset-" + tagset + "']").text(tagSets[tagset].name)
+          $("a[href='#tagset-" + tagset + "']").text(tagSets[tagset].label)
             .parent().toggleClass('is-reserved', tagSets[tagset].is_reserved == 1)
             .attr('title', ts('{/literal}{ts escape='js' 1='%1'}Tag Set for %1{/ts}{literal}', {'1': tagSets[tagset].used_for_label.join(', ')}));
         }
@@ -188,7 +188,7 @@
           e.preventDefault();
           var sets = [{key: '0', value: '{/literal}{ts escape='js'}Main Tag Tree{/ts}{literal}'}];
           _.each(tagSets, function(tagSet) {
-            sets.push({key: tagSet.id, value: tagSet.name});
+            sets.push({key: tagSet.id, value: tagSet.label});
           });
           CRM.confirm({
             title: '{/literal}{ts escape='js'}Move to Tagset{/ts}{literal}',
@@ -321,7 +321,7 @@
             tagSets[data.tag.id].display_name = user.display_name;
             formatTagSet(tagSets[data.tag.id]);
             $("#new-tagset").before('<div id="tagset-' + data.tag.id + '">');
-            $("a[href='#new-tagset']").parent().before('<li class="ui-corner-all crm-tab-button"><a href="#tagset-' + data.tag.id + '">' + data.tag.name + '</a></li>');
+            $("a[href='#new-tagset']").parent().before('<li class="ui-corner-all crm-tab-button"><a href="#tagset-' + data.tag.id + '">' + data.tag.label + '</a></li>');
             $('#mainTabContainer').tabs('refresh');
             $('#mainTabContainer').tabs('option', 'active', -2);
           });
@@ -482,7 +482,7 @@
   <div class="crm-entity" data-entity="Tag" data-id="<%= id %>">
     <h4>
       <input type="color" value="<%= data.color %>" <% if (!data.is_reserved || adminReserved) {ldelim} %>title="{ts}Select color{/ts}" <% {rdelim} else {ldelim} %>disabled<% {rdelim} %> />
-      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="name"><%- text %></span>
+      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="label"><%- text %></span>
     </h4>
     <hr />
     <div><span class="tdl">{ts}Description:{/ts}</span>

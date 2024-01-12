@@ -211,10 +211,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
     }
     $noteValue = NULL;
     $hasNoteField = FALSE;
-    foreach ([
-      'note',
-      'participant_note',
-    ] as $noteFld) {
+    foreach (['note', 'participant_note'] as $noteFld) {
       if (array_key_exists($noteFld, $params)) {
         $noteValue = $params[$noteFld];
         $hasNoteField = TRUE;
@@ -269,8 +266,8 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
         );
       }
       if (CRM_Core_Permission::check('delete in CiviEvent')) {
-        $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/participant',
-          "action=delete&reset=1&id={$participant->id}&cid={$participant->contact_id}&context=home"
+        $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/participant/delete',
+          "reset=1&id={$participant->id}"
         );
       }
 
@@ -546,7 +543,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
       if ($lineItem->html_type == 'Text') {
         $count *= $lineItem->qty;
       }
-      $optionsCount[$lineItem->valueId] = $count + CRM_Utils_Array::value($lineItem->valueId, $optionsCount, 0);
+      $optionsCount[$lineItem->valueId] = $count + ($optionsCount[$lineItem->valueId] ?? 0);
     }
 
     return $optionsCount;
@@ -1411,7 +1408,6 @@ UPDATE  civicrm_participant
         [
           'workflow' => 'participant_' . strtolower($mailType),
           'contactId' => $contactId,
-          'tokenContext' => ['participantId' => $participantId],
           'tplParams' => [
             'participant' => $participantValues,
             'event' => $eventDetails,
@@ -1421,6 +1417,11 @@ UPDATE  civicrm_participant
             'isExpired' => $mailType === 'Expired',
             'isConfirm' => $mailType === 'Confirm',
             'checksumValue' => $checksumValue,
+          ],
+          'modelProps' => [
+            'participantID' => (int) $participantId,
+            'eventID' => (int) $eventDetails['id'],
+            'contactID' => (int) $contactId,
           ],
           'from' => $receiptFrom,
           'toName' => $participantName,
@@ -1744,8 +1745,8 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     $contactId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantId, 'contact_id');
 
     $date = CRM_Utils_Date::currentDBDate();
-    $event = CRM_Event_BAO_Event::getEvents(0, $eventId);
-    $subject = sprintf("Registration selections changed for %s", CRM_Utils_Array::value($eventId, $event));
+    $title = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventId, 'title');
+    $subject = ts('Registration selections changed for %1', [1 => $title]);
 
     // activity params
     $activityParams = [
@@ -1858,7 +1859,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
         return $details;
       }
       // Verify participant status is one that can be self-cancelled
-      if (!in_array($details['status'], ['Registered', 'Pending from pay later', 'On waitlist'])) {
+      if (!in_array($details['status'], ['Registered', 'Pending from pay later', 'On waitlist', 'Pending from incomplete transaction'])) {
         $details['eligible'] = FALSE;
         $details['ineligible_message'] = ts('You cannot transfer or cancel your registration for %1 as you are not currently registered for this event.', [1 => $eventTitle]);
         return $details;

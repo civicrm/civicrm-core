@@ -45,7 +45,7 @@ class PermissionCheckTest extends Api4TestBase implements TransactionalInterface
 
   /**
    */
-  public function testGatekeeperPermissions() {
+  public function testGatekeeperPermissions(): void {
     $config = \CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = [
       'access CiviCRM',
@@ -69,7 +69,7 @@ class PermissionCheckTest extends Api4TestBase implements TransactionalInterface
   /**
    * Tests that gatekeeper permissions are enforced for implicit joins
    */
-  public function testImplicitJoinPermissions() {
+  public function testImplicitJoinPermissions(): void {
     $config = \CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = [
       'access CiviCRM',
@@ -122,7 +122,7 @@ class PermissionCheckTest extends Api4TestBase implements TransactionalInterface
   /**
    * Tests that gatekeeper permissions are enforced for explicit joins
    */
-  public function testExplicitJoinPermissions() {
+  public function testExplicitJoinPermissions(): void {
     $config = \CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = [
       'access CiviCRM',

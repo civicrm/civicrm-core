@@ -14,7 +14,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
   /**
    * Test store function for country.
    */
-  public function testStoreCountry() {
+  public function testStoreCountry(): void {
     $params = [];
     $contactID = $this->individualCreate();
     $customGroup = $this->customGroupCreate();
@@ -45,7 +45,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
   /**
    * Test store function for file.
    */
-  public function testStoreFile() {
+  public function testStoreFile(): void {
     $contactID = $this->individualCreate();
     $file = $this->callAPISuccess('File', 'create', ['uri' => 'dummy_data']);
     $customGroup = $this->customGroupCreate();

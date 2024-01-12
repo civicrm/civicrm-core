@@ -17,17 +17,12 @@
 class CRM_PCP_BAO_PCPBlock extends CRM_PCP_DAO_PCPBlock {
 
   /**
-   * Create or update either a Personal Campaign Page OR a PCP Block.
-   *
-   * @param array $params
-   *
+   * @deprecated
    * @return CRM_PCP_DAO_PCPBlock
    */
   public static function create($params) {
-    $dao = new CRM_PCP_DAO_PCPBlock();
-    $dao->copyValues($params);
-    $dao->save();
-    return $dao;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
 }

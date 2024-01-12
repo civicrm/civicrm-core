@@ -409,12 +409,28 @@ abstract class CRM_Utils_Hook {
    * @param string $op
    *   The type of operation being performed.
    * @param string $objectName
-   *   The name of the object.
+   *   The name of the object. This is generally a CamelCase entity (eg `Contact` or `Activity`).
+   *   Historical exceptions: 'CRM_Core_BAO_LocationType', 'CRM_Core_BAO_MessageTemplate'
    * @param int $objectId
    *   The unique identifier for the object.
    * @param array $links
    *   (optional) the links array (introduced in v3.2).
-   * @param int $mask
+   *   Each of the links may have properties:
+   *   - 'name' (string): the link text
+   *   - 'url' (string): the link URL base path (like civicrm/contact/view, and fillable from $values)
+   *   - 'qs' (string|array): the link URL query parameters to be used by sprintf() with $values (like reset=1&cid=%%id%% when $values['id'] is the contact ID)
+   *   - 'title' (string) (optional): the text that appears when hovering over the link
+   *   - 'extra' (optional): additional attributes for the <a> tag (fillable from $values)
+   *   - 'bit' (optional): a binary number that will be filtered by $mask (sending nothing as $links['bit'] means the link will always display)
+   *   - 'ref' (optional, recommended): a CSS class to apply to the <a> tag.
+   *   - 'class' (string): Optional list of CSS classes
+   *   - 'weight' (int): Weight is used to order the links. If not set 0 will be used but e-notices could occur. This was introduced in CiviCRM 5.63 so it will not have any impact on earlier versions of CiviCRM.
+   *   - 'accessKey' (string) (optional): HTML access key. Single letter or empty string.
+   *   - 'icon' (string) (optional): FontAwesome class name
+   *
+   *   Depending on the specific screen, some fields (e.g. `icon`) may be ignored.
+   *   If you have any idea of a clearer rule, then please update the docs.
+   * @param int|null $mask
    *   (optional) the bitmask to show/hide links.
    * @param array $values
    *   (optional) the values to fill the links.
@@ -627,13 +643,18 @@ abstract class CRM_Utils_Hook {
   /**
    * @param string|CRM_Core_DAO $entity
    * @param array $clauses
-   * @return mixed
+   * @param int|null $userId
+   *   User contact id. NULL == current user.
+   * @param array $conditions
+   *   Values from WHERE or ON clause
    */
-  public static function selectWhereClause($entity, &$clauses) {
-    $entityName = is_object($entity) ? _civicrm_api_get_entity_name_from_dao($entity) : $entity;
+  public static function selectWhereClause($entity, array &$clauses, int $userId = NULL, array $conditions = []): void {
+    $entityName = is_object($entity) ? CRM_Core_DAO_AllCoreTables::getBriefName(get_class($entity)) : $entity;
     $null = NULL;
-    return self::singleton()->invoke(['entity', 'clauses'], $entityName, $clauses,
-      $null, $null, $null, $null,
+    $userId ??= (int) CRM_Core_Session::getLoggedInContactID();
+    self::singleton()->invoke(['entity', 'clauses', 'userId', 'conditions'],
+      $entityName, $clauses, $userId, $conditions,
+      $null, $null,
       'civicrm_selectWhereClause'
     );
   }
@@ -656,7 +677,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * (Experimental) This hook is called when build the menu table.
+   * This hook is called when building the menu table.
    *
    * @param array $items
    *   List of records to include in menu table.
@@ -771,7 +792,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    *   the return value is ignored
    */
-  public static function managed(&$entities, ?array $modules = NULL) {
+  public static function managed(array &$entities, ?array $modules = NULL) {
     $null = NULL;
     self::singleton()->invoke(['entities', 'modules'], $entities, $modules,
       $null, $null, $null, $null,
@@ -1124,6 +1145,9 @@ abstract class CRM_Utils_Hook {
    *     - title: string
    *     - callback: string|array, the function which starts the setup process.
    *        The function is expected to return a 'url' for the config screen.
+   *     - url: string (optional), a URL which starts the setup process.
+   *        If omitted, then a default URL is generated. The effect of opening the URL is
+   *        to invoke the `callback`.
    * @return mixed
    */
   public static function mailSetupActions(&$setupActions) {
@@ -1155,7 +1179,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * (Experimental) Modify the list of template-types used for CiviMail composition.
+   * Modify the list of template-types used for CiviMail composition.
    *
    * @param array $types
    *   Sequentially indexed list of template types. Each type specifies:
@@ -1425,18 +1449,48 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called soon after the CRM_Core_Config object has ben initialized.
    * You can use this hook to modify the config object and hence behavior of CiviCRM dynamically.
    *
-   * @param CRM_Core_Config|array $config
+   * In *typical* page-loads, this hook fires one time. However, the hook may fire multiple times if...
+   *
+   * - the process is executing test-suites, or
+   * - the process involves some special configuration-changes, or
+   * - the process begins with the "extern" bootstrap process (aka `loadBootStrap()`)
+   *       N.B. For "extern", CiviCRM initially boots without having access to the UF APIs.
+   *       When the UF eventually boots, it may re-fire the event (for the benefit UF add-ons).
+   *
+   * The possibility of multiple invocations means that most consumers should be guarded.
+   * When registering resources, consult the `$flags`.
+   *
+   *   function hook_civicrm_config($config, $flags = NULL) {
+   *     if ($flags['...']) {
+   *       Civi::dispatcher()->addListener(...);
+   *       CRM_Core_Smarty::singleton()->addTemplateDir(...);
+   *     }
+   *   }
+   *
+   * @param CRM_Core_Config $config
    *   The config object
+   * @param array|NULL $flags
+   *   Mix of flags:
+   *     - civicrm: TRUE if this invocation is intended for CiviCRM extensions
+   *     - uf: TRUE if this invocation is intended for UF modules (Drupal/Joomla/etc)
+   *     - instances: The number of distinct copies of `CRM_Core_Config` which have been initialized.
+   *
+   *   The value of `$flags` is NULL when executing on an older CiviCRM environments (<=5.65).
    *
    * @return mixed
    */
-  public static function config(&$config) {
+  public static function config(&$config, ?array $flags = NULL) {
+    static $count = 0;
+    if (!empty($flags['civicrm'])) {
+      $count++;
+    }
+    $defaultFlags = ['civicrm' => FALSE, 'uf' => FALSE, 'instances' => $count];
+    $flags = !empty($flags) ? array_merge($defaultFlags, $flags) : $defaultFlags;
     $null = NULL;
-    return self::singleton()->invoke(['config'], $config,
-      $null, $null, $null, $null, $null,
+    return self::singleton()->invoke(['config', 'flags'], $config,
+      $flags, $null, $null, $null, $null,
       'civicrm_config'
     );
   }
@@ -1518,19 +1572,20 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook provides a way to override the default privacy behavior for notes.
-   *
+   * Deprecated: use hook_civicrm_selectWhereClause instead.
+   * @deprecated since 5.67 will be removed around 5.85
+   * .
    * @param array &$noteValues
-   *   Associative array of values for this note
-   *
-   * @return mixed
    */
   public static function notePrivacy(&$noteValues) {
     $null = NULL;
-    return self::singleton()->invoke(['noteValues'], $noteValues,
+    self::singleton()->invoke(['noteValues'], $noteValues,
       $null, $null, $null, $null, $null,
       'civicrm_notePrivacy'
     );
+    if (isset($noteValues['notePrivacy_hidden'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('hook_civicrm_selectWhereClause', 'hook_civicrm_notePrivacy');
+    }
   }
 
   /**
@@ -1812,10 +1867,9 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * (EXPERIMENTAL) Scan extensions for a list of auto-registered interfaces.
+   * Scan extensions for a list of auto-registered interfaces.
    *
-   * This hook is currently experimental. It is a means to implementing `mixin/scan-classes@1`.
-   * If there are no major difficulties circa 5.55, then it can be marked stable.
+   * @see mixin/scan-classes@1
    *
    * @param string[] $classes
    *   List of classes which may be of interest to the class-scanner.
@@ -2618,7 +2672,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * EXPERIMENTAL: This hook allows one to register additional Angular modules
+   * Register Angular modules
    *
    * @param array $angularModules
    *   List of modules. Each module defines:
@@ -2965,6 +3019,33 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Should queue processing proceed.
+   *
+   * This hook is called when a background process attempts to claim an item from
+   * the queue to process. A hook could alter the status from 'active' to denote
+   * that the server is busy & hence no item should be claimed and processed at
+   * this time.
+   *
+   * @param string $status
+   *   This will be set to active. It is recommended hooks change it to 'paused'
+   *   to prevent queue processing (although currently any value other than active
+   *   is treated as inactive 'paused')
+   * @param string $queueName
+   *   The name of the queue. Equivalent to civicrm_queue.name
+   * @param array $queueSpecification
+   *   Array of information about the queue loaded from civicrm_queue.
+   *
+   * @see https://docs.civicrm.org/dev/en/latest/framework/queues/
+   */
+  public static function queueActive(string &$status, string $queueName, array $queueSpecification): void {
+    $null = NULL;
+    self::singleton()->invoke(['status', 'queueName', 'queueSpecification'], $status,
+      $queueName, $queueSpecification, $null, $null, $null,
+      'civicrm_queueActive'
+    );
+  }
+
+  /**
    * Fire `hook_civicrm_queueRun_{$runner}`.
    *
    * This event only fires if these conditions are met:
@@ -3035,7 +3116,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function queueTaskError(CRM_Queue_Queue $queue, $item, &$outcome, ?Throwable $exception) {
     $null = NULL;
-    return self::singleton()->invoke(['job', 'params'], $queue, $item,
+    return self::singleton()->invoke(['queue', 'item', 'outcome', 'exception'], $queue, $item,
       $outcome, $exception, $null, $null,
       'civicrm_queueTaskError'
     );

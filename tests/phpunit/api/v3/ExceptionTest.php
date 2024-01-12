@@ -30,7 +30,7 @@ class api_v3_ExceptionTest extends CiviUnitTestCase {
   /**
    * Test that when a dedupe exception is created the pair are saved from the merge cache.
    */
-  public function testCreatingAnExceptionRemovesFromCachedMergePairs() {
+  public function testCreatingAnExceptionRemovesFromCachedMergePairs(): void {
     $contact1 = $this->individualCreate();
     $contact2 = $this->individualCreate();
     $defaultRuleGroupID = $this->callAPISuccess('RuleGroup', 'getvalue', [
@@ -56,7 +56,7 @@ class api_v3_ExceptionTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testExceptionSavesLowerIDFirst() {
+  public function testExceptionSavesLowerIDFirst(): void {
     $contact1 = $this->individualCreate();
     $contact2 = $this->individualCreate();
     $this->callAPISuccess('Exception', 'create', ['contact_id1' => $contact2, 'contact_id2' => $contact1]);

@@ -6,7 +6,7 @@
  */
 class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
 
-  public function testCheckAuthz() {
+  public function testCheckAuthz(): void {
     $cases = [];
 
     $cases[] = ['method', 'CRM_Foo', FALSE, 'method'];

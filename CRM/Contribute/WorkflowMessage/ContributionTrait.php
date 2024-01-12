@@ -3,9 +3,10 @@
 use Civi\Api4\Membership;
 
 /**
- * @method array getContribution()
  * @method int|null getContributionID()
- * @method $this setContributionID(?int $contributionId)
+ * @method $this setContributionID(?int $contributionID)
+ * @method int|null getFinancialTrxnID()
+ * @method $this setFinancialTrxnID(?int $financialTrxnID)
  */
 trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   /**
@@ -18,10 +19,32 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   public $contribution;
 
   /**
+   * @return array|null
+   */
+  public function getContribution(): ?array {
+    return $this->contribution;
+  }
+
+  /**
+   * Optional financial transaction (payment).
+   *
+   * @var array|null
+   *
+   * @scope tokenContext as financial_trxn
+   */
+  public $financialTrxn;
+
+  /**
    * @var int
    * @scope tokenContext as contributionId, tplParams as contributionID
    */
   public $contributionID;
+
+  /**
+   * @var int
+   * @scope tokenContext as financial_trxnId
+   */
+  public $financialTrxnID;
 
   /**
    * Is the site configured such that tax should be displayed.
@@ -29,6 +52,18 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * @var bool
    */
   public $isShowTax;
+
+  /**
+   * Is it a good idea to show the line item subtotal.
+   *
+   * This would be true if at least one line has a quantity > 1.
+   * Otherwise it is very repetitive.
+   *
+   * @var bool
+   *
+   * @scope tplParams
+   */
+  public $isShowLineSubtotal;
 
   /**
    * Line items associated with the contribution.
@@ -109,6 +144,25 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
       return FALSE;
     }
     return !$this->order->getPriceSetMetadata()['is_quick_config'];
+    return $this->isShowLineItems;
+  }
+
+  /**
+   * Is it a good idea to show the line item subtotal.
+   *
+   * This would be true if at least one line has a quantity > 1.
+   * Otherwise it is very repetitive.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public function getIsShowLineSubtotal(): bool {
+    foreach ($this->getLineItems() as $lineItem) {
+      if ((int) $lineItem['qty'] > 1) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -185,6 +239,21 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
     $this->contribution = $contribution;
     if (!empty($contribution['id'])) {
       $this->contributionID = $contribution['id'];
+    }
+    return $this;
+  }
+
+  /**
+   * Set contribution object.
+   *
+   * @param array $financialTrxn
+   *
+   * @return $this
+   */
+  public function setFinancialTrxn(array $financialTrxn): self {
+    $this->financialTrxn = $financialTrxn;
+    if (!empty($financialTrxn['id'])) {
+      $this->financialTrxnID = $financialTrxn['id'];
     }
     return $this;
   }

@@ -1458,28 +1458,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       $params['group_type'] = implode(',', $params['group_type']);
     }
 
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'UFGroup', ($params['id'] ?? NULL), $params);
-
-    $ufGroup = new CRM_Core_DAO_UFGroup();
-    $ufGroup->copyValues($params);
-
-    $ufGroupID = CRM_Utils_Array::value('ufgroup', $ids, CRM_Utils_Array::value('id', $params));
-    if (!$ufGroupID && empty($params['name'])) {
-      $ufGroup->name = CRM_Utils_String::munge($ufGroup->title, '_', 56);
-    }
-    $ufGroup->id = $ufGroupID;
-
-    $ufGroup->save();
-
-    if (!$ufGroupID && empty($params['name'])) {
-      $ufGroup->name = $ufGroup->name . "_{$ufGroup->id}";
-      $ufGroup->save();
-    }
-
-    CRM_Utils_Hook::post($hook, 'UFGroup', $ufGroup->id, $ufGroup);
-
-    return $ufGroup;
+    return self::writeRecord($params);
   }
 
   /**
@@ -1808,7 +1787,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $view = $field['is_view'];
     $required = ($mode == CRM_Profile_Form::MODE_SEARCH) ? FALSE : $field['is_required'];
     $search = $mode == CRM_Profile_Form::MODE_SEARCH;
-    $isShared = CRM_Utils_Array::value('is_shared', $field, 0);
+    $isShared = $field['is_shared'] ?? 0;
 
     // do not display view fields in drupal registration form
     // CRM-4632
@@ -1843,7 +1822,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete Contact Image'),
           'url' => 'civicrm/contact/image',
-          'qs' => 'reset=1&id=%%id%%&gid=%%gid%%&action=delete',
+          'qs' => 'reset=1&id=%%id%%&gid=%%gid%%&action=delete&qfKey=%%key%%',
           'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
         ],
       ];
@@ -1852,6 +1831,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         [
           'id' => $form->get('id'),
           'gid' => $form->get('gid'),
+          'key' => $form->controller->_key,
         ],
         ts('more'),
         FALSE,
@@ -1957,7 +1937,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       ], $required);
     }
     elseif ($fieldName === 'contact_sub_type') {
-      $gId = $form->get('gid') ? $form->get('gid') : CRM_Utils_Array::value('group_id', $field);
+      $gId = $form->get('gid') ?:  $field['group_id'] ?? NULL;
       if ($usedFor == 'onbehalf') {
         $profileType = 'Organization';
       }
@@ -1991,7 +1971,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif (in_array($fieldName, CRM_Contact_BAO_Contact::$_greetingTypes)) {
       // Get contact type for greeting selector
-      $gId = $form->get('gid') ?: CRM_Utils_Array::value('group_id', $field);
+      $gId = $form->get('gid') ?:  $field['group_id'] ?? NULL;
       $profileType = CRM_Core_BAO_UFField::getProfileType($gId, TRUE, FALSE, TRUE);
 
       if (!$profileType || in_array($profileType, ['Contact', 'Contribution', 'Participant', 'Membership'])) {

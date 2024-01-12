@@ -308,7 +308,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     ];
     foreach ($lookup as $name => $paypalName) {
       $value = $this->retrieve($paypalName, 'String', FALSE);
-      $input[$name] = $value ? $value : NULL;
+      $input[$name] = $value ?: NULL;
     }
 
     $input['is_test'] = $this->retrieve('test_ipn', 'Integer', FALSE);
@@ -430,7 +430,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       $this->contribution = new CRM_Contribute_BAO_Contribution();
       $this->contribution->id = $this->getContributionID();
       if (!$this->contribution->find(TRUE)) {
-        throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: "]);
+        throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $this->contribution->id, NULL, ['context' => "Could not find contribution record: {$this->contribution->id} in IPN request: "]);
       }
       if ((int) $this->contribution->contact_id !== $this->getContactID()) {
         CRM_Core_Error::debug_log_message("Contact ID in IPN not found but contact_id found in contribution.");

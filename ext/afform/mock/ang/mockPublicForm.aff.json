@@ -1,7 +1,0 @@
-{
-  "type": "form",
-  "title": "My public form",
-  "server_route": "civicrm/mock-public-form",
-  "permission": "*always allow*",
-  "is_token": true
-}

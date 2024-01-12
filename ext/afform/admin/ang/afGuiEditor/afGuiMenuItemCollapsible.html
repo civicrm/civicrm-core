@@ -1,8 +1,4 @@
-<label ng-class="{disabled: !$ctrl.node['af-title']}" ng-click="$ctrl.toggleCollapsible(); $event.stopPropagation();" title="{{ $ctrl.node['af-title'] ? ts('Allow user to collapse this to only show title') : ts('Must have a title to be collapsible') }}">
-  <i class="crm-i fa-{{ $ctrl.isCollapsible() ? 'check-' : '' }}square-o"></i>
-  {{:: ts('Collapsible') }}
+<label ng-click="$ctrl.toggleCollapsed(); $event.stopPropagation();">
+  <i class="crm-i fa{{ $ctrl.isCollapsed() ? '-check' : '' }}-square-o"></i>
+  {{:: ts('Collapsed') }}
 </label>
-<a href ng-click="$ctrl.toggleCollapsed(); $event.stopPropagation();" class="btn btn-sm btn-default" ng-class="{invisible: !$ctrl.isCollapsible()}">
-  <i class="crm-i fa-caret-{{ $ctrl.isCollapsed() ? 'right' : 'down' }}"></i>
-  {{ $ctrl.isCollapsed() ? ts('Closed') : ts('Open') }}
-</a>

@@ -57,6 +57,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @return array
    */
   public function buildTaskList(CRM_Core_Form_Search $form) {
+    CRM_Core_Error::deprecatedFunctionWarning('this does not seem reachable');
     return $form->getVar('_taskList');
   }
 

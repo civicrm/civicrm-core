@@ -59,9 +59,9 @@ class CRM_Core_CodeGen_Util_Smarty {
 
     require_once 'CRM/Core/Smarty/plugins/block.localize.php';
     $smarty->register_block('localize', 'smarty_block_localize');
-
     $smarty->assign('gencodeXmlDir', dirname(dirname(dirname(dirname(__DIR__)))) . '/xml');
-
+    require_once 'CRM/Core/CodeGen/Util/MessageTemplates.php';
+    CRM_Core_CodeGen_Util_MessageTemplates::assignSmartyVariables($smarty);
     return $smarty;
   }
 

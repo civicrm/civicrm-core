@@ -28,13 +28,14 @@
  *
  * @param array $params
  *   Template call's parameters.
- * @param CRM_Core_Smarty $smarty
- *   The Smarty object.
  *
  * @return string
  *   the string, translated by gettext
+ *
+ * @deprecated This is called from table.tpl but we aim to remove
+ * from there.
  */
-function smarty_function_sectionTotal($params, &$smarty) {
+function smarty_function_sectionTotal(array $params) {
   /* section totals are stored in template variable 'sectionTotals',
    * which is a two-dimensional array keyed to a string which is a delimited
    * concatenation (using CRM_Core_DAO::VALUE_SEPARATOR) of ordered permutations
@@ -59,5 +60,5 @@ function smarty_function_sectionTotal($params, &$smarty) {
   $totalsKey = implode(CRM_Core_DAO::VALUE_SEPARATOR, $sectionValues);
 
   // return the corresponding total
-  return $smarty->_tpl_vars['sectionTotals'][$totalsKey];
+  return $params['totals'][$totalsKey];
 }

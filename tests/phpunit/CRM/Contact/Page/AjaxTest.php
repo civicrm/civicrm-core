@@ -28,7 +28,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
   /**
    * Minimal test on the testGetDupes function to make sure it completes without error.
    */
-  public function testGetDedupes() {
+  public function testGetDedupes(): void {
     $_REQUEST['gid'] = 1;
     $_REQUEST['rgid'] = 1;
     $_REQUEST['columns'] = [
@@ -50,7 +50,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testProcessDupes() {
+  public function testProcessDupes(): void {
     $contact1 = $this->individualCreate();
     $contact2 = $this->individualCreate();
     $contact3 = $this->individualCreate();
@@ -61,7 +61,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('Exception', ['contact_id1' => $contact1, 'contact_id2' => $contact3]);
   }
 
-  public function testGetDedupesPostCode() {
+  public function testGetDedupesPostCode(): void {
     $_REQUEST['gid'] = 1;
     $_REQUEST['rgid'] = 1;
     $_REQUEST['snippet'] = 4;
@@ -242,7 +242,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
   /**
    * CRM-20621 : Test to check usage count of Tag tree
    */
-  public function testGetTagTree() {
+  public function testGetTagTree(): void {
     $contacts = [];
     // create three contacts
     for ($i = 0; $i < 3; $i++) {
@@ -340,7 +340,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
   /**
    * Test to check contact reference field
    */
-  public function testContactReference() {
+  public function testContactReference(): void {
     //create group
     $groupId1 = $this->groupCreate();
     $groupId2 = $this->groupCreate([

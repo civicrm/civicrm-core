@@ -7,6 +7,7 @@ namespace Civi\Api4;
  * Provided by the Afform: Core Runtime extension.
  *
  * @searchable secondary
+ * @since 5.42
  * @package Civi\Api4
  */
 class AfformSubmission extends Generic\DAOEntity {

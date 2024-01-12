@@ -9,7 +9,7 @@
 *}
 {ts 1=$totalSelectedMailingRecipients}Number of selected Mailing Recipients: %1{/ts}
 
-{if $rows }
+{if $rows}
 <div class="crm-block crm-form-block crm-mailing-task-form-block">
 <table width="30%">
   <tr class="columnheader">

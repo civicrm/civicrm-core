@@ -80,7 +80,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $this->assign('suppressForm', FALSE);
 
     // Contribute PDF tasks allow you to email as well, so we need to add email address to those forms
-    $this->add('select', 'from_email_address', ts('From Email Address'), $this->_fromEmails, TRUE);
+    $this->add('select', 'from_email_address', ts('From Email Address'), $this->getFromEmails(), TRUE);
     $this->addPDFElementsToForm();
 
     // specific need for contributions
@@ -241,7 +241,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $contactIds = array_keys($contacts);
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
     if ($this->isLiveMode()) {
-      $this->createActivities($html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), CRM_Utils_Array::value('campaign_id', $formValues), $contactHtml);
+      $this->createActivities($html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), $formValues['campaign_id'] ?? NULL, $contactHtml);
     }
     $html = array_diff_key($html, $emailedHtml);
 

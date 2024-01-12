@@ -9,7 +9,7 @@
 *}
 {ts 1=$totalSelectedCases}Number of selected cases: %1{/ts}
 
-{if $rows }
+{if $rows}
 <div class="crm-block-crm-form-block crm-case-task-form-block">
 <table width="30%">
   <tr class="columnheader">

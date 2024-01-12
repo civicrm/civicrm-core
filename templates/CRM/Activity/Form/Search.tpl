@@ -9,10 +9,10 @@
 *}
 {* Search form and results for Activities *}
 <div class="crm-form-block crm-search-form-block">
-  <div class="crm-accordion-wrapper crm-advanced_search_form-accordion {if $rows}collapsed{/if}">
-    <div class="crm-accordion-header crm-master-accordion-header">
+  <details class="crm-accordion-wrapper crm-advanced_search_form-accordion" {if !$rows}open=""{/if}">
+    <summary class="crm-accordion-header crm-master-accordion-header">
       {ts}Edit Search Criteria{/ts}
-    </div>
+    </summary>
     <!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
       <div id="searchForm" class="form-item">
@@ -41,10 +41,10 @@
         {/strip}
       </div>
     </div>
-  </div>
+  </details>
 </div>
 
-{if $rowsEmpty || $rows }
+{if $rowsEmpty || $rows}
   <div class="crm-content-block">
     {if $rowsEmpty}
       <div class="crm-results-block crm-results-block-empty">

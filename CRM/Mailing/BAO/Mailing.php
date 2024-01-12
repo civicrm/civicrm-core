@@ -616,11 +616,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
 
       $this->preparedTemplates = [];
 
-      foreach ([
-        'html',
-        'text',
-        'subject',
-      ] as $key) {
+      foreach (['html', 'text', 'subject'] as $key) {
         if (!isset($templates[$key])) {
           continue;
         }
@@ -816,10 +812,11 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
    *
    * @param array $testParams
    *   Contains form values.
+   * @param int $mailingID
    *
-   * @return void
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function getTestRecipients($testParams) {
+  public static function getTestRecipients(array $testParams, int $mailingID): void {
     if (!empty($testParams['test_group']) && array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
       $contacts = civicrm_api('contact', 'get', [
         'version' => 3,
@@ -852,6 +849,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
             'job_id' => $testParams['job_id'],
             'email_id' => $dao->email_id,
             'contact_id' => $groupContact,
+            'mailing_id' => $mailingID,
+            'is_test' => TRUE,
           ];
           CRM_Mailing_Event_BAO_MailingEventQueue::create($params);
         }
@@ -908,7 +907,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $fields = [];
     $fields[] = 'Message-ID';
     // CRM-17754 check if Resent-Message-id is set also if not add it in when re-laying reply email
-    if ($prefix == 'r') {
+    if ($prefix === 'r') {
       $fields[] = 'Resent-Message-ID';
     }
     foreach ($fields as $field) {
@@ -916,7 +915,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $headers[$field] = '<' . implode($config->verpSeparator,
             [
               $localpart . $prefix,
-              $job_id,
               $event_queue_id,
               $hash,
             ]
@@ -1017,12 +1015,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $verp['reply'] = "\"{$this->from_name}\" <{$this->from_email}>";
     }
 
+    // Generating URLs is expensive, so we only call it once for each of these 5 URLs.
+    $genericURL = CRM_Utils_System::url('civicrm/mailing/genericUrlPath', "reset=1&jid={$job_id}&qid={$event_queue_id}&h={$hash}", TRUE, NULL, TRUE, TRUE);
     $urls = [
-      'forward' => CRM_Utils_System::url('civicrm/mailing/forward', "reset=1&jid={$job_id}&qid={$event_queue_id}&h={$hash}", TRUE, NULL, TRUE, TRUE),
-      'unsubscribeUrl' => CRM_Utils_System::url('civicrm/mailing/unsubscribe', "reset=1&jid={$job_id}&qid={$event_queue_id}&h={$hash}", TRUE, NULL, TRUE, TRUE),
-      'resubscribeUrl' => CRM_Utils_System::url('civicrm/mailing/resubscribe', "reset=1&jid={$job_id}&qid={$event_queue_id}&h={$hash}", TRUE, NULL, TRUE, TRUE),
-      'optOutUrl' => CRM_Utils_System::url('civicrm/mailing/optout', "reset=1&jid={$job_id}&qid={$event_queue_id}&h={$hash}", TRUE, NULL, TRUE, TRUE),
-      'subscribeUrl' => CRM_Utils_System::url('civicrm/mailing/subscribe', 'reset=1', TRUE, NULL, TRUE, TRUE),
+      'forward' => str_replace('genericUrlPath', 'forward', $genericURL),
+      'unsubscribeUrl' => str_replace('genericUrlPath', 'unsubscribe', $genericURL),
+      'resubscribeUrl' => str_replace('genericUrlPath', 'resubscribe', $genericURL),
+      'optOutUrl' => str_replace('genericUrlPath', 'optout', $genericURL),
+      'subscribeUrl' => str_replace('genericUrlPath', 'subscribe', $genericURL),
     ];
 
     $headers = [
@@ -1472,7 +1472,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $params = self::processWorkflowPermissions($params);
     }
     if (!$id) {
-      $params['domain_id'] = $params['domain_id'] ?? CRM_Core_Config::domainID();
+      $params['domain_id'] ??= CRM_Core_Config::domainID();
     }
     if (
       ((!$id && empty($params['replyto_email'])) || !isset($params['replyto_email'])) &&
@@ -1561,8 +1561,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'url_tracking' => Civi::settings()->get('url_tracking_default'),
         'visibility' => 'Public Pages',
         'replyto_email' => $domain_email,
-        'header_id' => CRM_Mailing_PseudoConstant::defaultComponent('header_id', ''),
-        'footer_id' => CRM_Mailing_PseudoConstant::defaultComponent('footer_id', ''),
+        'header_id' => CRM_Mailing_PseudoConstant::defaultComponent('Header', ''),
+        'footer_id' => CRM_Mailing_PseudoConstant::defaultComponent('Footer', ''),
         'from_email' => $domain_email,
         'from_name' => $domain_name,
         'msg_template_id' => NULL,
@@ -2437,6 +2437,22 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @throws CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'create') {
+      $params = &$event->params;
+      $params['created_id'] ??= CRM_Core_Session::singleton()->getLoggedInContactID();
+      $params['override_verp'] ??= !Civi::settings()->get('track_civimail_replies');
+      $params['visibility'] ??= 'Public Pages';
+      $params['dedupe_email'] ??= Civi::settings()->get('dedupe_email_default');
+      $params['open_tracking'] ??= Civi::settings()->get('open_tracking_default');
+      $params['url_tracking'] ??= Civi::settings()->get('url_tracking_default');
+      $params['header_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
+      $params['footer_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
+      $params['optout_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('OptOut', '');
+      $params['reply_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Reply', '');
+      $params['resubscribe_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Resubscribe', '');
+      $params['unsubscribe_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Unsubscribe', '');
+      $params['mailing_type'] ??= 'standalone';
+    }
     if ($event->action === 'delete' && $event->id) {
       // Delete all file attachments
       CRM_Core_BAO_File::deleteEntityFile('civicrm_mailing', $event->id);
@@ -2580,10 +2596,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
         );
       }
       $form->add('checkbox', "{$prefix}updateTemplate", ts('Update Template'), NULL);
-
-      $form->add('checkbox', "{$prefix}saveTemplate", ts('Save As New Template'), NULL, FALSE,
-        ['onclick' => "showSaveDetails(this, '{$prefix}');"]
-      );
+      $form->add('checkbox', "{$prefix}saveTemplate", ts('Save As New Template'), ['onclick' => "showSaveDetails(this, '{$prefix}');"]);
       $form->add('text', "{$prefix}saveTemplateName", ts('Template Title'));
     }
 
@@ -2755,7 +2768,7 @@ WHERE  civicrm_mailing_job.id = %1
     }
 
     // Split up the parent jobs into multiple child jobs
-    $mailerJobSize = Civi::settings()->get('mailerJobSize');
+    $mailerJobSize = (int) Civi::settings()->get('mailerJobSize');
     CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs(NULL, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs_post($mode);
@@ -2862,7 +2875,7 @@ ORDER BY civicrm_mailing.id DESC";
       $mailing['openstats'] = "Opens: " .
         CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0) .
         "<br />Clicks: " .
-        CRM_Utils_Array::value($values['mailing_id'], $clickCounts, 0);
+        $clickCounts[$values['mailing_id']] ?? 0;
 
       $actionLinks = [
         CRM_Core_Action::VIEW => [
@@ -2871,12 +2884,14 @@ ORDER BY civicrm_mailing.id DESC";
           'qs' => "reset=1&id=%%mkey%%&cid=%%cid%%&cs=%%cs%%",
           'title' => ts('View Mailing'),
           'class' => 'crm-popup',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::BROWSE => [
           'name' => ts('Mailing Report'),
           'url' => 'civicrm/mailing/report',
           'qs' => "mid=%%mid%%&reset=1&cid=%%cid%%&context=mailing",
           'title' => ts('View Mailing Report'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::BROWSE),
         ],
       ];
 

@@ -29,7 +29,7 @@ use Civi\Test\TransactionalInterface;
  */
 class EvaluateConditionTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testEvaluateCondition() {
+  public function testEvaluateCondition(): void {
     $method = [MockBasicEntity::get(), 'evaluateCondition'];
 
     $data = [

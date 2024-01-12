@@ -55,7 +55,7 @@
         {/foreach}
         </table>
 
-        {if NOT ($action eq 1 or $action eq 2) }
+        {if NOT ($action eq 1 or $action eq 2)}
         <div class="action-link">
             {crmButton p='civicrm/admin/price/edit' q="action=add&reset=1" id="newPriceSet"  icon="plus-circle"}{ts}Add Set of Price Fields{/ts}{/crmButton}
         </div>

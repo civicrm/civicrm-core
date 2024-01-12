@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 <p>
-{if $rows }
+{if $rows}
 <div class="form-item">
      <span class="element-right">{include file="CRM/common/formButtons.tpl" location="top"}</span>
 </div>

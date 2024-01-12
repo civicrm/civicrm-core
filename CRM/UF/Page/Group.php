@@ -48,18 +48,21 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'url' => 'civicrm/admin/uf/group/field',
           'qs' => 'reset=1&action=browse&gid=%%id%%',
           'title' => ts('View and Edit Fields'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::BROWSE),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Settings'),
           'url' => 'civicrm/admin/uf/group/update',
           'qs' => 'action=update&id=%%id%%&context=group',
           'title' => ts('Edit CiviCRM Profile Group'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
           'url' => 'civicrm/admin/uf/group/preview',
           'qs' => 'action=preview&gid=%%id%%&context=group',
           'title' => ts('Edit CiviCRM Profile Group'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::PREVIEW),
         ],
         CRM_Core_Action::ADD => [
           'name' => ts('Use - Create Mode'),
@@ -67,6 +70,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'qs' => 'gid=%%id%%&reset=1',
           'title' => ts('Use - Create Mode'),
           'fe' => TRUE,
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
         ],
         CRM_Core_Action::ADVANCED => [
           'name' => ts('Use - Edit Mode'),
@@ -74,6 +78,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'qs' => 'gid=%%id%%&reset=1',
           'title' => ts('Use - Edit Mode'),
           'fe' => TRUE,
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADVANCED),
         ],
         CRM_Core_Action::BASIC => [
           'name' => ts('Use - Listings Mode'),
@@ -81,22 +86,26 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'qs' => 'gid=%%id%%&reset=1',
           'title' => ts('Use - Listings Mode'),
           'fe' => TRUE,
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::BASIC),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable CiviCRM Profile Group'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable CiviCRM Profile Group'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/uf/group',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete CiviCRM Profile Group'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
@@ -104,6 +113,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'qs' => 'action=copy&gid=%%id%%',
           'title' => ts('Make a Copy of CiviCRM Profile Group'),
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
         ],
       ];
       $allowRemoteSubmit = Civi::settings()->get('remote_profile_submissions');
@@ -113,6 +123,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'url' => 'civicrm/admin/uf/group',
           'qs' => 'action=profile&gid=%%id%%',
           'title' => ts('HTML Form Snippet for this Profile'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::PROFILE),
         ];
       }
     }

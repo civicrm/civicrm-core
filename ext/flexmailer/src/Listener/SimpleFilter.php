@@ -65,7 +65,7 @@ class SimpleFilter {
    */
   public static function byColumn(ComposeBatchEvent $e, $field, $filter) {
     $tasks = $e->getTasks();
-    $values = array();
+    $values = [];
 
     foreach ($tasks as $k => $task) {
       /** @var \Civi\FlexMailer\FlexMailerTask $task */
@@ -75,7 +75,7 @@ class SimpleFilter {
       }
     }
 
-    $values = call_user_func_array($filter, array($values, $e));
+    $values = call_user_func_array($filter, [$values, $e]);
 
     foreach ($values as $k => $value) {
       $tasks[$k]->setMailParam($field, $value);

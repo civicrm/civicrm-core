@@ -59,17 +59,20 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Event'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Event'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => CRM_Utils_System::currentPath(),
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Event'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
@@ -77,6 +80,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'qs' => 'reset=1&action=copy&id=%%id%%',
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'title' => ts('Copy Event'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
         ],
       ];
     }
@@ -91,6 +95,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'title' => ts('Register Participant'),
           'url' => 'civicrm/participant/add',
           'qs' => 'reset=1&action=add&context=standalone&eid=%%id%%',
+          'weight' => -30,
         ],
         'event_info' => [
           'name' => ts('Event Info'),
@@ -98,6 +103,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'url' => 'civicrm/event/info',
           'qs' => 'reset=1&id=%%id%%',
           'fe' => TRUE,
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         'online_registration_test' => [
           'name' => ts('Registration (Test-drive)'),
@@ -105,6 +111,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'url' => 'civicrm/event/register',
           'qs' => 'reset=1&action=preview&id=%%id%%',
           'fe' => TRUE,
+          'weight' => 30,
         ],
         'online_registration_live' => [
           'name' => ts('Registration (Live)'),
@@ -112,6 +119,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'url' => 'civicrm/event/register',
           'qs' => 'reset=1&id=%%id%%',
           'fe' => TRUE,
+          'weight' => 40,
         ],
       ];
     }
@@ -126,11 +134,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * @throws \CRM_Core_Exception
    */
   public static function &tabs() {
-    // @todo Move to eventcart extension
-    // check if we're in shopping cart mode for events
-    $enableCart = (bool) Civi::settings()->get('enable_cart');
-
-    $cacheKey = $enableCart ? 1 : 0;
+    $cacheKey = 0;
     if (!(self::$_tabLinks)) {
       self::$_tabLinks = [];
     }
@@ -174,12 +178,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
             'field' => 'reminder',
           ];
       }
-      self::$_tabLinks[$cacheKey]['conference']
-        = [
-          'title' => ts('Conference Slots'),
-          'url' => 'civicrm/event/manage/conference',
-          'field' => 'slot_label_id',
-        ];
       self::$_tabLinks[$cacheKey]['friend']
         = [
           'title' => ts('Tell a Friend'),
@@ -198,10 +196,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'url' => 'civicrm/event/manage/repeat',
           'field' => 'is_repeating_event',
         ];
-    }
-
-    if (!$enableCart) {
-      unset(self::$_tabLinks[$cacheKey]['conference']);
     }
 
     CRM_Utils_Hook::tabset('civicrm/event/manage', self::$_tabLinks[$cacheKey], []);

@@ -16,9 +16,10 @@
  */
 class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
 
-  protected $_emailField = FALSE;
-
-  protected $_phoneField = FALSE;
+  /**
+   * @var array
+   */
+  protected $surveyResponseFields = [];
 
   protected $_locationBasedPhoneField = FALSE;
 
@@ -236,7 +237,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         ) {
 
           $fieldsName = CRM_Utils_Array::value(1, explode('_', $tableName));
-          if ($fieldsName) {
+          if ($fieldsName && property_exists($this, "_$fieldsName" . 'Field')) {
             $this->{"_$fieldsName" . 'Field'} = TRUE;
           }
 
@@ -282,7 +283,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     $this->joinEmailFromContact();
 
     if ($this->_locationBasedPhoneField) {
-      foreach ($this->_surveyResponseFields as $key => $value) {
+      foreach ($this->surveyResponseFields as $key => $value) {
         if (substr($key, 0, 5) == 'phone' && !empty($value['location_type_id'])
         ) {
           $fName = str_replace('-', '_', $key);
@@ -306,7 +307,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
 
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+          if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
@@ -318,9 +319,9 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
             }
           }
@@ -357,11 +358,11 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
 
   public function compileContent() {
     $coverSheet = $this->_surveyCoverSheet() .
-        "<div style=\"page-break-after: always\"></div>";
+      "<div style=\"page-break-after: always\"></div>";
     $templateFile = $this->getHookedTemplateFileName();
     return $coverSheet .
       CRM_Core_Form::$_template->fetch($templateFile) .
-      CRM_Utils_Array::value('report_footer', $this->_formValues);
+      ($this->_formValues['report_footer'] ?? '');
   }
 
   /**
@@ -628,10 +629,7 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
       if ($responseField->option_group_id) {
         //show value for print and pdf.
         $value = $responseField->label;
-        if (in_array($this->_outputMode, [
-          'print',
-          'pdf',
-        ])) {
+        if (in_array($this->_outputMode, ['print', 'pdf'])) {
           $value = $responseField->value;
         }
         $fieldValueMap[$responseField->option_group_id][$responseField->value] = $value;
@@ -679,7 +677,7 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
     $responseFields = [];
     foreach ($surveyIds as $surveyId) {
       $responseFields += CRM_Campaign_BAO_Survey::getSurveyResponseFields($surveyId);
-      $this->_surveyResponseFields = $responseFields;
+      $this->surveyResponseFields = $responseFields;
     }
     foreach ($responseFields as $key => $value) {
       if (substr($key, 0, 5) == 'phone' && !empty($value['location_type_id'])) {

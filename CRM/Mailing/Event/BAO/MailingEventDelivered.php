@@ -25,7 +25,7 @@ class CRM_Mailing_Event_BAO_MailingEventDelivered extends CRM_Mailing_Event_DAO_
    * @return \CRM_Mailing_Event_BAO_MailingEventDelivered
    */
   public static function recordDelivery(&$params) {
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($params['job_id'],
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL,
       $params['event_queue_id'],
       $params['hash']
     );

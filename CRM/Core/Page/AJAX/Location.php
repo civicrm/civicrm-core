@@ -155,7 +155,7 @@ class CRM_Core_Page_AJAX_Location {
               $elements["onbehalf_{$key}"]['value'][$k] = $v;
             }
           }
-          elseif (strstr($htmlType, 'Multi-Select')) {
+          elseif (str_contains($htmlType, 'Multi-Select')) {
             $elements["onbehalf_{$key}"]['type'] = 'Multi-Select';
             $elements["onbehalf_{$key}"]['value'] = array_values($defaults[$key]);
           }
@@ -210,15 +210,8 @@ class CRM_Core_Page_AJAX_Location {
     );
     // lets output only required fields.
     foreach ($addressOptions as $element => $isSet) {
-      if ($isSet && (!in_array($element, [
-        'im',
-        'openid',
-      ]))) {
-        if (in_array($element, [
-          'country',
-          'state_province',
-          'county',
-        ])) {
+      if ($isSet && (!in_array($element, ['im', 'openid']))) {
+        if (in_array($element, ['country', 'state_province', 'county'])) {
           $element .= '_id';
         }
         elseif ($element == 'address_name') {
@@ -226,30 +219,18 @@ class CRM_Core_Page_AJAX_Location {
         }
         $fld = "address[1][{$element}]";
         $value = $location['address'][1][$element] ?? NULL;
-        $value = $value ? $value : "";
-        $result[str_replace([
-          '][',
-          '[',
-          "]",
-        ], ['_', '_', ''], $fld)] = $value;
+        $value = $value ?: "";
+        $result[str_replace(['][', '[', ']'], ['_', '_', ''], $fld)] = $value;
       }
     }
 
-    foreach ([
-      'email',
-      'phone_type_id',
-      'phone',
-    ] as $element) {
+    foreach (['email', 'phone_type_id', 'phone'] as $element) {
       $block = ($element == 'phone_type_id') ? 'phone' : $element;
       for ($i = 1; $i < 3; $i++) {
         $fld = "{$block}[{$i}][{$element}]";
         $value = $location[$block][$i][$element] ?? NULL;
-        $value = $value ? $value : "";
-        $result[str_replace([
-          '][',
-          '[',
-          "]",
-        ], ['_', '_', ''], $fld)] = $value;
+        $value = $value ?: "";
+        $result[str_replace(['][', '[', ']'], ['_', '_', ''], $fld)] = $value;
       }
     }
 

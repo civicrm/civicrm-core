@@ -57,3 +57,16 @@
 .crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-compress::before {
   content: "\f066";
 }
+
+/* Resets details/summary appearance for accordions */
+
+.crm-container details {
+  border: 0 solid transparent;
+  background-color: inherit;
+  padding: 0;
+  margin: inherit;
+}
+.crm-container details summary span {
+  color: inherit;
+  font-size: inherit;
+}

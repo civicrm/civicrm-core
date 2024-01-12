@@ -31,7 +31,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
   /**
    * Test creating location block.
    */
-  public function testCreateLocBlock() {
+  public function testCreateLocBlock(): void {
     $email = $this->callAPISuccess('email', 'create', [
       'contact_id' => 'null',
       'email' => 'test@loc.block',
@@ -51,8 +51,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
       'phone_id' => $phone['id'],
       'email_id' => $email['id'],
     ];
-    $description = 'Create locBlock with existing entities';
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $id = $result['id'];
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$id]['id']);
@@ -62,7 +61,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
   /**
    * Test creating location block entities.
    */
-  public function testCreateLocBlockEntities() {
+  public function testCreateLocBlockEntities(): void {
     $params = [
       'email' => [
         'location_type_id' => 1,
@@ -81,8 +80,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
         'street_address' => '987654321',
       ],
     ];
-    $description = "Create entities and locBlock in 1 api call.";
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, 'CreateEntities');
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $id = $result['id'];
     $this->assertEquals(1, $result['count']);
 
@@ -92,7 +90,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
       'return' => 'all',
     ];
     // Can't use callAPISuccess with getsingle.
-    $result = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__, 'Get entities and location block in 1 api call');
+    $result = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $result = array_pop($result['values']);
     $this->assertNotNull($result['email_id']);
     $this->assertNotNull($result['phone_id']);

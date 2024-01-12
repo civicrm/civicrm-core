@@ -65,7 +65,7 @@ class SavedSearchTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayNotHasKey($in['id'], (array) $outs);
   }
 
-  public function testEmailSmartGroup() {
+  public function testEmailSmartGroup(): void {
     $in = Contact::create(FALSE)->addValue('first_name', 'yep')->execute()->first();
     $out = Contact::create(FALSE)->addValue('first_name', 'nope')->execute()->first();
     $email = uniqid() . '@' . uniqid();
@@ -100,7 +100,7 @@ class SavedSearchTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayNotHasKey($in['id'], (array) $outs);
   }
 
-  public function testSmartGroupWithHaving() {
+  public function testSmartGroupWithHaving(): void {
     $in = Contact::create(FALSE)->addValue('first_name', 'yes')->addValue('last_name', 'siree')->execute()->first();
     $in2 = Contact::create(FALSE)->addValue('first_name', 'yessir')->addValue('last_name', 'ee')->execute()->first();
     $out = Contact::create(FALSE)->addValue('first_name', 'yess')->execute()->first();
@@ -139,7 +139,7 @@ class SavedSearchTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayNotHasKey($in2['id'], (array) $outs);
   }
 
-  public function testMultipleSmartGroups() {
+  public function testMultipleSmartGroups(): void {
     $inGroup = $outGroup = [];
     $inName = uniqid('inGroup');
     $outName = uniqid('outGroup');

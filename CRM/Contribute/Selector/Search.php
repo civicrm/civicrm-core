@@ -357,35 +357,8 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           $qfKey,
           $componentContext
       );
-
-      $checkLineItem = FALSE;
       // Set defaults to empty to prevent e-notices.
       $row = ['amount_level' => ''];
-      // Now check for lineItems
-      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-        $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($result->id);
-        foreach ($lineItems as $items) {
-          if (!CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
-            $checkLineItem = TRUE;
-            break;
-          }
-          if (!CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
-            unset($links[CRM_Core_Action::UPDATE]);
-          }
-          if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
-            unset($links[CRM_Core_Action::DELETE]);
-          }
-        }
-        if ($checkLineItem) {
-          continue;
-        }
-        if (!CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($result->financial_type_id))) {
-          unset($links[CRM_Core_Action::UPDATE]);
-        }
-        if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($result->financial_type_id))) {
-          unset($links[CRM_Core_Action::DELETE]);
-        }
-      }
       // the columns we are interested in
       foreach (self::$_properties as $property) {
         if (property_exists($result, $property)) {
@@ -405,7 +378,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       );
 
       $isPayLater = FALSE;
-      if ($result->is_pay_later && ($row['contribution_status_name'] ?? NULL) == 'Pending') {
+      if ($result->is_pay_later && ($row['contribution_status_name'] ?? NULL) === 'Pending') {
         $isPayLater = TRUE;
         $row['contribution_status'] .= ' (' . ts('Pay Later') . ')';
         $links[CRM_Core_Action::ADD] = [
@@ -413,9 +386,10 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           'url' => 'civicrm/contact/view/contribution',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%&mode=live',
           'title' => ts('Pay with Credit Card'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
         ];
       }
-      elseif (($row['contribution_status_name'] ?? NULL) == 'Pending') {
+      elseif (($row['contribution_status_name'] ?? NULL) === 'Pending') {
         $row['contribution_status'] .= ' (' . ts('Incomplete Transaction') . ')';
       }
 
@@ -426,14 +400,15 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->contribution_id;
 
       $actions = [
-        'id' => $result->contribution_id,
-        'cid' => $result->contact_id,
+        'id' => (int) $result->contribution_id,
+        'cid' => (int) $result->contact_id,
         'cxt' => $this->_context,
+        'financial_type_id' => $result->financial_type_id ? (int) $result->financial_type_id : NULL,
       ];
 
       if (in_array($row['contribution_status_name'], ['Partially paid', 'Pending refund']) || $isPayLater) {
         $buttonName = ts('Record Payment');
-        if ($row['contribution_status_name'] == 'Pending refund') {
+        if ($row['contribution_status_name'] === 'Pending refund') {
           $buttonName = ts('Record Refund');
         }
         elseif (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
@@ -442,6 +417,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
             'url' => 'civicrm/payment/add',
             'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution&mode=live',
             'title' => ts('Submit Credit Card payment'),
+            'weight' => 30,
           ];
         }
         $links[CRM_Core_Action::ADD] = [
@@ -449,6 +425,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           'url' => 'civicrm/payment',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution',
           'title' => $buttonName,
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
         ];
       }
       $links = $links + CRM_Contribute_Task::getContextualLinks($row);
@@ -460,7 +437,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         FALSE,
         'contribution.selector.row',
         'Contribution',
-        $result->contribution_id
+        (int) $result->contribution_id
       );
 
       $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id

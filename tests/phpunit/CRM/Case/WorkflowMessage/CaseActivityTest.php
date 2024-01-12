@@ -10,6 +10,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\WorkflowMessage\WorkflowMessage;
+
 /**
  * Class CRM_Case_WorkflowMessage_CaseActivityTest
  * @group msgtpl
@@ -18,18 +20,18 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
   use \Civi\Test\WorkflowMessageTestTrait;
 
   public function getWorkflowClass(): string {
-    return CRM_Case_WorkflowMessage_CaseActivity::class;
+    return CRM_Case_WorkflowMessage_CaseActivityTestWorkflow::class;
   }
 
-  public function testAdhocClassEquiv() {
+  public function testAdhocClassEquiv(): void {
     $examples = \Civi\Api4\ExampleData::get(0)
       ->setSelect(['name', 'data'])
-      ->addWhere('name', 'IN', ['workflow/case_activity/CaseAdhocExample', 'workflow/case_activity/CaseModelExample'])
+      ->addWhere('name', 'IN', ['workflow/case_activity_test/CaseAdhocExample', 'workflow/case_activity_test/CaseModelExample'])
       ->execute()
       ->indexBy('name')
       ->column('data');
-    $byAdhoc = Civi\WorkflowMessage\WorkflowMessage::create('case_activity', $examples['workflow/case_activity/CaseAdhocExample']);
-    $byClass = new CRM_Case_WorkflowMessage_CaseActivity($examples['workflow/case_activity/CaseModelExample']);
+    $byAdhoc = WorkflowMessage::create('case_activity_test', $examples['workflow/case_activity_test/CaseAdhocExample']);
+    $byClass = new CRM_Case_WorkflowMessage_CaseActivityTestWorkflow($examples['workflow/case_activity_test/CaseModelExample']);
     $this->assertSameWorkflowMessage($byClass, $byAdhoc, 'Compare byClass and byAdhoc: ');
   }
 
@@ -38,7 +40,7 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
    *
    * To see this, we take all the example data and use it with diff constructors.
    */
-  public function testConstructorEquivalence() {
+  public function testConstructorEquivalence(): void {
     $examples = $this->findExamples()->execute()->indexBy('name')->column('data');
     $this->assertTrue(count($examples) >= 1, 'Must have at least one example data-set');
     foreach ($examples as $example) {
@@ -52,9 +54,9 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testExampleGet() {
-    $file = \Civi::paths()->getPath('[civicrm.root]/tests/phpunit/CRM/Case/WorkflowMessage/CaseActivity/CaseModelExample.php');
-    $name = 'workflow/case_activity/CaseModelExample';
+  public function testExampleGet(): void {
+    $file = \Civi::paths()->getPath('[civicrm.root]/tests/phpunit/CRM/Case/WorkflowMessage/CaseActivityTestWorkflow/CaseModelExample.php');
+    $name = 'workflow/case_activity_test/CaseModelExample';
 
     $this->assertTrue(file_exists($file), "Expect find canary file ($file)");
 

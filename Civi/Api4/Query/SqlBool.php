@@ -21,8 +21,8 @@ class SqlBool extends SqlExpression {
   protected function initialize() {
   }
 
-  public function render(Api4Query $query): string {
-    return $this->expr === 'TRUE' ? '1' : '0';
+  public function render(Api4Query $query, bool $includeAlias = FALSE): string {
+    return ($this->expr === 'TRUE' ? '1' : '0') . ($includeAlias ? " AS `{$this->getAlias()}`" : '');
   }
 
   public static function getTitle(): string {

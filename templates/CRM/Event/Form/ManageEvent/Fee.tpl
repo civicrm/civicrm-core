@@ -17,15 +17,7 @@
         </div>
     {/if}
 <div class="crm-block crm-form-block crm-event-manage-fee-form-block">
-  <div class="crm-submit-buttons">
-   {include file="CRM/common/formButtons.tpl" location="top"}
-  </div>
-
     <table class="form-layout">
-       <tr class="crm-event-manage-fee-form-block-title">
-    <td class="label">{$form.title.label}</td>
-    <td>{$form.title.html}</td>
-       </tr>
        <tr class="crm-event-manage-fee-form-block-is_monetary">
           <td class="label">{$form.is_monetary.label}</td>
           <td>{$form.is_monetary.html}</td>
@@ -140,7 +132,7 @@
 
   {section name=rowLoop start=1 loop=6}
      {assign var=index value=$smarty.section.rowLoop.index}
-     <tr id="discount_{$index}" class=" crm-event-manage-fee-form-block-discount_{$index} {if $index GT 1 AND empty( $form.discount_name[$index].value) } hiddenElement {/if} form-item {cycle values="odd-row,even-row"}">
+     <tr id="discount_{$index}" class=" crm-event-manage-fee-form-block-discount_{$index} {if $index GT 1 AND empty( $form.discount_name[$index].value)} hiddenElement {/if} form-item {cycle values="odd-row,even-row"}">
            <td>{if $index GT 1} <a onclick="showHideDiscountRow('discount_{$index}', false, {$index}); return false;" name="discount_{$index}" href="#" class="form-link">{icon icon="fa-trash"}{ts}remove discount set{/ts}{/icon}</span></a>{/if}
            </td>
            <td class="crm-event-manage-fee-form-block-discount_name"> {$form.discount_name.$index.html}</td>
@@ -220,7 +212,7 @@
 
     function warnDiscountDel( ) {
         if ( ! document.getElementsByName('is_discount')[0].checked ) {
-            CRM.alert('{/literal}{ts escape="js"}If you uncheck "Discounts by Signup Date" and Save this form, any existing discount sets will be deleted.{/ts} {ts escape="js"}This action cannot be undone.{/ts} {ts escape="js"}If this is NOT what you want to do, you can check "Discounts by Signup Date" again.{/ts}', '{ts escape="js}Warning{/ts}{literal}', 'alert', {expires: 0});
+            CRM.alert('{/literal}{ts escape="js"}If you uncheck "Discounts by Signup Date" and Save this form, any existing discount sets will be deleted.{/ts} {ts escape="js"}This action cannot be undone.{/ts} {ts escape="js"}If this is NOT what you want to do, you can check "Discounts by Signup Date" again.{/ts}', '{ts escape="js"}Warning{/ts}{literal}', 'alert', {expires: 0});
         }
     }
 
@@ -309,7 +301,7 @@
         message: {/literal}"{ts escape='js'}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}"{literal}
       }).on('crmConfirm:yes', function() {
           {/literal}
-          var dataUrl  = '{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_event&id=$eventId" }';
+          var dataUrl  = '{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_event&id=$eventId"}';
           {literal}
         $.getJSON(dataUrl).done(function(result) {window.location = CRM.url("civicrm/admin/price/field", {reset: 1, action: 'browse', sid: result});});
         });

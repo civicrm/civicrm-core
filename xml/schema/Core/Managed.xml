@@ -27,16 +27,20 @@
     <name>module</name>
     <title>Module</title>
     <type>varchar</type>
-    <length>127</length>
+    <length>255</length>
     <required>true</required>
-    <comment>Name of the module which declared this object</comment>
+    <comment>Name of the module which declared this object (soft FK to civicrm_extension.full_name)</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_Managed::getBaseModules</callback>
+    </pseudoconstant>
     <add>4.2</add>
   </field>
   <field>
     <name>name</name>
     <title>Name</title>
     <type>varchar</type>
-    <length>127</length>
+    <length>255</length>
+    <required>true</required>
     <comment>Symbolic name used by the module to identify the object</comment>
     <add>4.2</add>
   </field>
@@ -59,15 +63,16 @@
     <name>entity_id</name>
     <title>Entity ID</title>
     <type>int unsigned</type>
-    <required>true</required>
-    <comment>Foreign key to the referenced item.</comment>
+    <comment>Soft foreign key to the referenced item.</comment>
     <add>4.2</add>
   </field>
   <field>
     <name>cleanup</name>
     <title>Cleanup Setting</title>
     <type>varchar</type>
-    <length>32</length>
+    <length>16</length>
+    <required>true</required>
+    <default>'always'</default>
     <comment>Policy on when to cleanup entity (always, never, unused)</comment>
     <pseudoconstant>
       <callback>CRM_Core_ManagedEntities::getCleanupOptions</callback>

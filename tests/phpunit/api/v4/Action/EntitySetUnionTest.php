@@ -151,7 +151,7 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->assertEquals($contacts[0], $result[2]['contact_id_b']);
   }
 
-  public function testUnionWithSelectStar() {
+  public function testUnionWithSelectStar(): void {
     $subType = $this->createTestRecord('ContactType', [
       'parent_id:name' => 'Household',
       'name' => uniqid('HH1'),

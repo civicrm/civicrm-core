@@ -59,7 +59,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     $p->evaluate();
     $count = 0;
     foreach ($p->getRows() as $row) {
-      $this->assertRegExp($expectRegex, $row->render('example'));
+      $this->assertMatchesRegularExpression($expectRegex, $row->render('example'));
       $count++;
     }
     $this->assertEquals(1, $count);
@@ -68,7 +68,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
   /**
    * Check that mailing-tokens are generated (given a mailing DAO as input).
    */
-  public function testTokensWithMailingObject() {
+  public function testTokensWithMailingObject(): void {
     // We only need one case to see that the mailing-object works as
     // an alternative to the mailing-id.
     $inputTemplateFormat = 'text/plain';
@@ -96,7 +96,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     $p->evaluate();
     $count = 0;
     foreach ($p->getRows() as $row) {
-      $this->assertRegExp($expectRegex, $row->render('example'));
+      $this->assertMatchesRegularExpression($expectRegex, $row->render('example'));
       $count++;
     }
     $this->assertEquals(1, $count);
@@ -138,14 +138,14 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     //      $this->fail('TokenProcessor::evaluate() should have thrown an exception');
     //    }
     //    catch (CRM_Core_Exception $e) {
-    //      $this->assertRegExp(';Cannot use action tokens unless context defines mailingJobId and mailingActionTarget;', $e->getMessage());
+    //      $this->assertMatchesRegularExpression(';Cannot use action tokens unless context defines mailingJobId and mailingActionTarget;', $e->getMessage());
     //    }
 
     $p->evaluate();
 
     // FIXME: For compatibility with
     $actual = $p->getRow(0)->render('example');
-    $this->assertRegExp($expectRegex, $actual);
+    $this->assertMatchesRegularExpression($expectRegex, $actual);
   }
 
 }

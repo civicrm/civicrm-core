@@ -30,14 +30,19 @@
  *
  * @param $smarty
  *
- * @return string
+ * @param bool $repeat
+ *   Repeat is true for the opening tag, false for the closing tag
+ *
+ * @return string|null
  */
-function smarty_block_icon($params, $text, &$smarty) {
-  $condition = array_key_exists('condition', $params) ? $params['condition'] : 1;
-  $icon = $params['icon'] ?? 'fa-check';
-  $dontPass = [
-    'condition' => 1,
-    'icon' => 1,
-  ];
-  return CRM_Core_Page::crmIcon($icon, $text, $condition, array_diff_key($params, $dontPass));
+function smarty_block_icon($params, $text, &$smarty, &$repeat) {
+  if (!$repeat) {
+    $condition = array_key_exists('condition', $params) ? $params['condition'] : 1;
+    $icon = $params['icon'] ?? 'fa-check';
+    $dontPass = [
+      'condition' => 1,
+      'icon' => 1,
+    ];
+    return CRM_Core_Page::crmIcon($icon, $text, $condition, array_diff_key($params, $dontPass));
+  }
 }

@@ -304,7 +304,7 @@
     },
     refresh: function() {
       var that = this,
-        hash = this.options.url.split('#')[1];
+        hash = this.options.url.split('#')[1],
         url = this._formatUrl(this.options.url, 'json');
       $(this.element).data('urlHash', hash);
       if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();

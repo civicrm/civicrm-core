@@ -21,10 +21,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_extension', 'INSERT IGNORE INTO
       'name' => 'Theme: Greenwich',
     ],
     [
-      'full_name' => 'eventcart',
-      'name' => 'Event cart',
-    ],
-    [
       'full_name' => 'financialacls',
       'name' => 'Financial ACLs',
     ],
@@ -37,16 +33,18 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_extension', 'INSERT IGNORE INTO
       'name' => 'CKEditor4',
     ],
     [
-      'full_name' => 'legacycustomsearches',
-      'name' => 'Custom search framework',
-    ],
-    [
       'full_name' => 'org.civicrm.flexmailer',
       'name' => 'FlexMailer',
       'file' => 'flexmailer',
     ],
-
-    // The following should be kept in sync with the *default* list of components (`enable_components`).
+    [
+      'full_name' => 'civi_campaign',
+      'name' => 'CiviCampaign',
+    ],
+    [
+      'full_name' => 'civi_case',
+      'name' => 'CiviCase',
+    ],
     [
       'full_name' => 'civi_contribute',
       'name' => 'CiviContribute',

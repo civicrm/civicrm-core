@@ -136,14 +136,14 @@ class CRM_Utils_EnglishNumber {
     $strBuf = strtolower(str_replace('-', '', $english));
 
     foreach (self::$intervalsOfTen as $num => $name) {
-      if (CRM_Utils_String::startsWith($strBuf, strtolower($name))) {
+      if (str_starts_with($strBuf, strtolower($name))) {
         $intBuf += 10 * $num;
         $strBuf = substr($strBuf, strlen($name));
         break;
       }
     }
     foreach (array_reverse(self::$lowNumbers, TRUE) as $num => $name) {
-      if (CRM_Utils_String::startsWith($strBuf, strtolower($name))) {
+      if (str_starts_with($strBuf, strtolower($name))) {
         $intBuf += $num;
         $strBuf = substr($strBuf, strlen($name));
         break;

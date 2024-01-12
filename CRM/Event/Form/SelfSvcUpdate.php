@@ -27,6 +27,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    *
    */
   protected $_participant_id;
+
   /**
    * contact id
    *
@@ -34,6 +35,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    *
    */
   protected $_contact_id;
+
   /**
    * name of the participant
    *
@@ -41,60 +43,79 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    *
    */
   protected $_contact_name;
+
   /**
    * email of participant
    *
    * @var string
    */
   protected $_contact_email;
+
   /**
    * event to be cancelled/transferred
    *
    * @var string
    */
   protected $_event_id;
+
   /**
    * event title
    *
    * @var string
    */
   protected $_event_title;
+
   /**
    * event title
    *
    * @var string
    */
   protected $_event_start_date;
+
   /**
    * action
    *
    * @var string
    */
   public $_action;
+
   /**
    * participant object
    *
    * @var string
    */
   protected $_participant = [];
+
   /**
    * participant values
    *
    * @var string
    */
   protected $_part_values;
+
   /**
    * details of event registration values
    *
    * @var array
    */
   protected $_details = [];
+
   /**
    * Is backoffice form?
    *
    * @var bool
    */
   protected $isBackoffice = FALSE;
+
+  /**
+   * @var string
+   */
+  protected $_userContext;
+
+  /**
+   * @var string
+   */
+  protected $_userChecksum;
 
   /**
    * Set variables up before form is built based on participant ID from URL
@@ -145,19 +166,13 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     }
     $details = array_merge($details, $selfServiceDetails);
     $this->assign('details', $details);
-    $this->selfsvcupdateUrl = CRM_Utils_System::url('civicrm/event/selfsvcupdate', "reset=1&id={$this->_participant_id}&id=0");
-    $this->selfsvcupdateText = ts('Update');
-    $this->selfsvcupdateButtonText = ts('Update');
-    // Based on those ids retrieve event and verify it is eligible
-    // for self update (event.start_date > today, event can be 'self_updated'
-    // retrieve contact name and email, and let user verify his/her identity
   }
 
   /**
    * buildQuickForm -populate input variables for source Event
    * to cancel or transfer to another person
    *
-   * return @void
+   * @return void
    */
   public function buildQuickForm() {
     $this->add('select', 'action', ts('Transfer or Cancel Registration'), [ts('-select-'), ts('Transfer'), ts('Cancel Registration')], TRUE);
@@ -178,7 +193,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
   /**
    * Set default values for contact
    *
-   * return @void
+   * @return void
    */
   public function setDefaultValues() {
     $this->_defaults = [];
@@ -208,15 +223,15 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    * Process submit form - based on user selection of action
    * transfer or cancel the event
    *
-   * return @void
+   * @return void
    */
   public function postProcess() {
     //if selection is cancel, cancel this participant' registration, process refund
-    //if transfer, process form to allow selection of transferree
+    //if transfer, process form to allow selection of transferee
     $params = $this->controller->exportValues($this->_name);
     $action = $params['action'];
     if ($action == "1") {
-      $this->transferParticipant($params);
+      $this->transferParticipant();
     }
     elseif ($action == "2") {
       $this->cancelParticipant($params);
@@ -227,9 +242,9 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    * Transfer to a new form, allowing selection of a new contact
    * based on email and name. The Event will be transferred to this new participant
    *
-   * return @void
+   * @return void
    */
-  public function transferParticipant($params) {
+  public function transferParticipant() {
     CRM_Utils_System::redirect(CRM_Utils_System::url(
       'civicrm/event/selfsvctransfer',
       [
@@ -246,12 +261,10 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    * Cancel this participant and finish, send cancellation email. At this point no
    * auto-cancellation of payment is handled, so payment needs to be manually cancelled
    *
-   * return @void
-   *
    * @throws \CRM_Core_Exception
    */
   public function cancelParticipant($params) {
-    //set participant record status to Cancelled, refund payment if possible
+    // Set participant record status to Cancelled, refund payment if possible
     // send email to participant and admin, and log Activity
     $value = [];
     $value['id'] = $this->_participant_id;

@@ -24,6 +24,17 @@ use Civi\Api4\UserJob;
 abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
 
   /**
+   * Should the text describing date formats include the time.
+   *
+   * This is used to alter the displayed text to that perceived to be more useful.
+   * e.g. for contacts it might be birthdate so including time is confusing
+   * but activities would more likely use them.
+   *
+   * @var bool
+   */
+  protected $isDisplayTimeInDateFormats = FALSE;
+
+  /**
    * Values loaded from a saved UserJob template.
    *
    * Within Civi-Import it is possible to save a UserJob with is_template = 1.
@@ -37,8 +48,6 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    */
   public function preProcess(): void {
     $this->pushUrlToUserContext();
-    // check for post max size
-    CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
     $this->assign('importEntity', $this->getTranslatedEntity());
     $this->assign('importEntities', $this->getTranslatedEntities());
   }
@@ -86,7 +95,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
     $this->assign('urlPath', 'civicrm/import/datasource');
     $this->assign('urlPathVar', 'snippet=4&user_job_id=' . $this->get('user_job_id'));
     if ($this->isImportDataUploaded()) {
-      $this->add('checkbox', 'use_existing_upload', ts('Use data already uploaded'), NULL, FALSE, [
+      $this->add('checkbox', 'use_existing_upload', ts('Use data already uploaded'), [
         'onChange' => "
           CRM.$('.crm-import-datasource-form-block-dataSource').toggle();
           CRM.$('#data-source-form-block').toggle()",
@@ -108,7 +117,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
     }
 
     //build date formats
-    CRM_Core_Form_Date::buildAllowedDateFormats($this);
+    $this->buildAllowedDateFormats();
     // When we call buildDataSourceFields we add them to the form both for purposes of
     // initial display, but also so they are available during `postProcess`. Hence
     // we need to add them to the form when first displaying it, or when a csv has been
@@ -131,6 +140,15 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
           'name' => ts('Cancel'),
         ],
     ]);
+  }
+
+  /**
+   * Build the date-format form.
+   */
+  protected function buildAllowedDateFormats(): void {
+    $formats = CRM_Utils_Date::getAvailableInputFormats($this->isDisplayTimeInDateFormats);
+    $this->addRadio('dateFormats', ts('Date Format'), $formats, [], '<br/>');
+    $this->setDefaults(['dateFormats' => array_key_first($formats)]);
   }
 
   public function setDefaultValues() {

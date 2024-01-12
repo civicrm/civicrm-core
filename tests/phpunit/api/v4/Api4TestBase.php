@@ -89,7 +89,7 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
    * @throws \CRM_Core_Exception
    */
   public function createLoggedInUser(): int {
-    $contactID = $this->createTestRecord('Contact')['id'];
+    $contactID = $this->createTestRecord('Individual')['id'];
     UFMatch::delete(FALSE)->addWhere('uf_id', '=', 6)->execute();
     $this->createTestRecord('UFMatch', [
       'contact_id' => $contactID,

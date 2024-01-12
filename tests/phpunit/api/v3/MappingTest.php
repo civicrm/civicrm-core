@@ -34,7 +34,7 @@ class api_v3_MappingTest extends CiviUnitTestCase {
   }
 
   public function testCreateMapping(): void {
-    $result = $this->callAPIAndDocument('Mapping', 'create', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Mapping', 'create', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->getAndCheck($this->params, $result['id'], 'Mapping');
     $this->assertNotNull($result['values'][$result['id']]['id']);
@@ -42,7 +42,7 @@ class api_v3_MappingTest extends CiviUnitTestCase {
 
   public function testGetMapping(): void {
     $this->callAPISuccess('Mapping', 'create', $this->params);
-    $result = $this->callAPIAndDocument('Mapping', 'get', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Mapping', 'get', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('Mapping', 'delete', ['id' => $result['id']]);
@@ -51,7 +51,7 @@ class api_v3_MappingTest extends CiviUnitTestCase {
   public function testDeleteMapping(): void {
     $result = $this->callAPISuccess('Mapping', 'create', $this->params);
     $deleteParams = ['id' => $result['id']];
-    $this->callAPIAndDocument('Mapping', 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('Mapping', 'delete', $deleteParams);
     $checkDeleted = $this->callAPISuccess('Mapping', 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);
   }

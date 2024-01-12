@@ -42,6 +42,16 @@ trait DataTypeSpecTrait {
   public $fkEntity;
 
   /**
+   * @var array
+   */
+  public $fkColumn;
+
+  /**
+   * @var string
+   */
+  public $dfkEntities;
+
+  /**
    * Aliases for the valid data types
    *
    * @var array
@@ -93,7 +103,44 @@ trait DataTypeSpecTrait {
    */
   public function setFkEntity($fkEntity) {
     $this->fkEntity = $fkEntity;
+    // If the field has a FK Entity, then FK Column also must be set.
+    if ($fkEntity) {
+      // Ensure a sensible default if not already set.
+      $this->fkColumn ??= 'id';
+    }
+    return $this;
+  }
 
+  /**
+   * @return string|null
+   */
+  public function getFkColumn(): ?string {
+    return $this->fkColumn;
+  }
+
+  /**
+   * @param string $fkColumn
+   * @return $this
+   */
+  public function setFkColumn($fkColumn) {
+    $this->fkColumn = $fkColumn;
+    return $this;
+  }
+
+  /**
+   * @return array|null
+   */
+  public function getDfkEntities(): ?array {
+    return $this->dfkEntities;
+  }
+
+  /**
+   * @param array|null $dfkEntities
+   *
+   * @return $this
+   */
+  public function setDfkEntities(?array $dfkEntities) {
+    $this->dfkEntities = $dfkEntities;
     return $this;
   }
 

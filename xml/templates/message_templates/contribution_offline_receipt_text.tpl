@@ -1,6 +1,9 @@
 {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
 
-{ts}Below you will find a receipt for this contribution.{/ts}
+{if {contribution.contribution_page_id.receipt_text|boolean}}
+{contribution.contribution_page_id.receipt_text}
+{elseif {contribution.paid_amount|boolean}} {ts}Below you will find a receipt for this contribution.{/ts}
+{/if}
 
 ===========================================================
 {ts}Contribution Information{/ts}
@@ -24,7 +27,7 @@
 {$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if $isShowTax && {contribution.tax_amount|boolean}} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"}
 ----------------------------------------------------------
 {foreach from=$lineItems item=line}
-{capture assign=ts_item}{$line.title}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $isShowTax && {contribution.tax_amount|boolean}}{$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""} {$line.tax_rate|string_format:"%.2f"} %   {$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"} {else}                  {/if} {/if}   {$line.line_total+$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"}
+{capture assign=ts_item}{$line.title}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $isShowTax && {contribution.tax_amount|boolean}}{$line.line_total|crmMoney:'{contribution.currency}'|string_format:"%10s"} {if $line.tax_rate || $line.tax_amount != ""} {$line.tax_rate|string_format:"%.2f"} %   {$line.tax_amount|crmMoney:'{contribution.currency}'|string_format:"%10s"} {else}                  {/if} {/if}   {$line.line_total_inclusive|crmMoney:'{contribution.currency}'|string_format:"%10s"}
 {/foreach}
 {/if}
 
@@ -46,7 +49,7 @@
 {if '{contribution.receipt_date}'}
 {ts}Receipt Date{/ts}: {contribution.receipt_date|crmDate:"shortdate"}
 {/if}
-{if '{contribution.payment_instrument_id}' and empty($formValues.hidden_CreditCard)}
+{if {contribution.payment_instrument_id|boolean} && {contribution.paid_amount|boolean}}
 {ts}Paid By{/ts}: {contribution.payment_instrument_id:label}
 {if '{contribution.check_number}'}
 {ts}Check Number{/ts}: {contribution.check_number}

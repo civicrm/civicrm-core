@@ -144,6 +144,8 @@
     <name>is_active</name>
     <title>ACL Is Active?</title>
     <type>boolean</type>
+    <required>true</required>
+    <default>1</default>
     <comment>Is this property active?</comment>
     <add>1.6</add>
     <html>

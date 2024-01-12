@@ -14,9 +14,9 @@
       </table>
     {/if}
     <table style="font-family: Arial, Verdana, sans-serif;" width="100%" height="100" border="0" cellpadding="5" cellspacing="0">
-      {if $email_comment}
+      {if $userText}
         <tr>
-          <td><font size="1" colspan="3">{$email_comment}</font></td>
+          <td><font size="1" colspan="3">{$userText}</font></td>
         </tr>
       {/if}
       <tr>

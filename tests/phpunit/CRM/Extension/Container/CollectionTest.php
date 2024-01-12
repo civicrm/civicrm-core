@@ -15,12 +15,12 @@
  */
 class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
 
-  public function testGetKeysEmpty() {
+  public function testGetKeysEmpty(): void {
     $c = new CRM_Extension_Container_Collection([]);
     $this->assertEquals($c->getKeys(), []);
   }
 
-  public function testGetKeys() {
+  public function testGetKeys(): void {
     $c = $this->_createContainer();
     $this->assertEquals([
       'test.conflict',
@@ -31,7 +31,7 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
     ], $c->getKeys());
   }
 
-  public function testGetPath() {
+  public function testGetPath(): void {
     $c = $this->_createContainer();
     try {
       $c->getPath('un.kno.wn');
@@ -48,7 +48,7 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
     $this->assertEquals("/path/to/conflict-b", $c->getPath('test.conflict'));
   }
 
-  public function testGetResUrl() {
+  public function testGetResUrl(): void {
     $c = $this->_createContainer();
     try {
       $c->getResUrl('un.kno.wn');
@@ -65,7 +65,7 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
     $this->assertEquals('http://conflict-b', $c->getResUrl('test.conflict'));
   }
 
-  public function testCaching() {
+  public function testCaching(): void {
     $cache = new CRM_Utils_Cache_ArrayCache([]);
     $this->assertTrue(!is_array($cache->get('ext-collection')));
     $c = $this->_createContainer($cache, 'ext-collection');

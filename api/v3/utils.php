@@ -497,12 +497,12 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
   $options = _civicrm_api3_get_options_from_params($params, TRUE);
 
   $inputParams = array_merge(
-    CRM_Utils_Array::value('input_params', $options, []),
-    CRM_Utils_Array::value('input_params', $additional_options, [])
+    $options['input_params'] ?? [],
+    $additional_options['input_params'] ?? []
   );
   $returnProperties = array_merge(
-    CRM_Utils_Array::value('return', $options, []),
-    CRM_Utils_Array::value('return', $additional_options, [])
+    $options['return'] ?? [],
+    $additional_options['return'] ?? []
   );
   if (empty($returnProperties)) {
     $returnProperties = $defaultReturnProperties;
@@ -579,7 +579,7 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
   $sort = $options['sort'] ?? NULL;
   $offset = $options['offset'] ?? NULL;
   $rowCount = $options['limit'] ?? NULL;
-  $inputParams = CRM_Utils_Array::value('input_params', $options, []);
+  $inputParams = $options['input_params'] ?? [];
   $returnProperties = $options['return'] ?? NULL;
   if (empty($returnProperties)) {
     $returnProperties = CRM_Contribute_BAO_Query::defaultReturnProperties($mode);
@@ -637,7 +637,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $extraSql 
 
   //accept filters like filter.activity_date_time_high
   // std is now 'filters' => ..
-  if (strstr(implode(',', array_keys($params)), 'filter')) {
+  if (str_contains(implode(',', array_keys($params)), 'filter')) {
     if (isset($params['filters']) && is_array($params['filters'])) {
       foreach ($params['filters'] as $paramkey => $paramvalue) {
         _civicrm_api3_apply_filters_to_dao($paramkey, $paramvalue, $dao);
@@ -645,7 +645,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $extraSql 
     }
     else {
       foreach ($params as $paramkey => $paramvalue) {
-        if (strstr($paramkey, 'filter')) {
+        if (str_contains($paramkey, 'filter')) {
           _civicrm_api3_apply_filters_to_dao(substr($paramkey, 7), $paramvalue, $dao);
         }
       }
@@ -723,11 +723,11 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $extraSql 
  *   DAO object.
  */
 function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
-  if (strstr($filterField, 'high')) {
+  if (str_contains($filterField, 'high')) {
     $fieldName = substr($filterField, 0, -5);
     $dao->whereAdd("($fieldName <= $filterValue )");
   }
-  if (strstr($filterField, 'low')) {
+  if (str_contains($filterField, 'low')) {
     $fieldName = substr($filterField, 0, -4);
     $dao->whereAdd("($fieldName >= $filterValue )");
   }
@@ -767,15 +767,15 @@ function _civicrm_api3_get_options_from_params($params, $queryObject = FALSE, $e
   $sort = $params['option_sort'] ?? $params['option.sort'] ?? $params['sort'] ?? 0;
   $offset = $params['option_offset'] ?? $params['option.offset'] ?? $params['offset'] ?? 0;
 
-  $limit = CRM_Utils_Array::value('rowCount', $params, 25);
-  $limit = CRM_Utils_Array::value('option.limit', $params, $limit);
-  $limit = CRM_Utils_Array::value('option_limit', $params, $limit);
+  $limit = $params['rowCount'] ?? 25;
+  $limit = $params['option.limit'] ?? $limit;
+  $limit = $params['option_limit'] ?? $limit;
 
   if (isset($params['options']) && is_array($params['options'])) {
     // is count is set by generic getcount not user
     $is_count = $params['options']['is_count'] ?? FALSE;
     $offset = $params['options']['offset'] ?? $offset;
-    $limit = CRM_Utils_Array::value('limit', $params['options'], $limit);
+    $limit = $params['options']['limit'] ?? $limit;
     $sort = $params['options']['sort'] ?? $sort;
   }
 
@@ -931,7 +931,7 @@ function _civicrm_api3_build_fields_array(&$bao, $unique = TRUE) {
 function _civicrm_api3_get_unique_name_array(&$bao) {
   $fields = $bao->fields();
   foreach ($fields as $field => $values) {
-    $uniqueFields[$field] = CRM_Utils_Array::value('name', $values, $field);
+    $uniqueFields[$field] = $values['name'] ?? $field;
   }
   return $uniqueFields;
 }
@@ -1694,7 +1694,7 @@ function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
   if (!empty($params[$fieldInfo['name']])) {
     $fieldValue = _civicrm_api3_getValidDate($fieldValue, $fieldInfo['name'], $fieldInfo['type']);
   }
-  if ((CRM_Utils_Array::value('name', $fieldInfo) != $fieldName) && !empty($fieldValue)) {
+  if (($fieldInfo['name'] ?? NULL) !== $fieldName && !empty($fieldValue)) {
     $fieldValue = _civicrm_api3_getValidDate($fieldValue, $fieldName, $fieldInfo['type']);
   }
 
@@ -1975,7 +1975,7 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
     FALSE,
     FALSE,
     // we could / should probably test for other subtypes here - e.g. activity_type_id
-    CRM_Utils_Array::value('contact_sub_type', $params),
+    $params['contact_sub_type'] ?? NULL,
     NULL,
     FALSE,
     FALSE,
@@ -1988,7 +1988,7 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
     // Regular fields have a 'name' property
     $value['name'] = 'custom_' . $key;
     $value['title'] = $value['label'];
-    if ($value['data_type'] == 'Date' && CRM_Utils_Array::value('time_format', $value, 0) > 0) {
+    if ($value['data_type'] == 'Date' && ($value['time_format'] ?? 0) > 0) {
       $value['data_type'] = 'DateTime';
     }
     $value['type'] = CRM_Utils_Array::value($value['data_type'], CRM_Core_BAO_CustomField::dataToType());
@@ -2317,7 +2317,7 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
     }
     $options = civicrm_api($entity, 'getoptions', $options_lookup_params);
 
-    $options = CRM_Utils_Array::value('values', $options, []);
+    $options = $options['values'] ?? [];
   }
 
   if (is_string($fieldValue) && strpos($fieldValue, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
@@ -2327,12 +2327,12 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
   if (is_array($fieldValue)) {
     foreach ($fieldValue as &$value) {
       if (!is_array($value)) {
-        _civicrm_api3_api_match_pseudoconstant_value($value, $options, $fieldName, CRM_Utils_Array::value('api.required', $fieldInfo));
+        _civicrm_api3_api_match_pseudoconstant_value($value, $options, $fieldName, $fieldInfo['api.required'] ?? FALSE);
       }
     }
   }
   else {
-    _civicrm_api3_api_match_pseudoconstant_value($fieldValue, $options, $fieldName, CRM_Utils_Array::value('api.required', $fieldInfo));
+    _civicrm_api3_api_match_pseudoconstant_value($fieldValue, $options, $fieldName, $fieldInfo['api.required'] ?? FALSE);
   }
 }
 
@@ -2439,10 +2439,10 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create'
     return $meta[$fieldName]['name'];
   }
   foreach ($meta as $info) {
-    if ($fieldName == $info['name'] || $fieldName == CRM_Utils_Array::value('uniqueName', $info)) {
+    if ($fieldName == $info['name'] || $fieldName == ($info['uniqueName'] ?? NULL)) {
       return $info['name'];
     }
-    if (array_search($fieldName, CRM_Utils_Array::value('api.aliases', $info, [])) !== FALSE) {
+    if (array_search($fieldName, $info['api.aliases'] ?? []) !== FALSE) {
       return $info['name'];
     }
   }
@@ -2489,7 +2489,7 @@ function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
 
   if (!empty($fieldValue) && is_array($fieldValue) &&
     (array_search(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators()) ||
-      $type == 'String' && strstr(key($fieldValue), 'EMPTY'))
+      $type == 'String' && str_contains(key($fieldValue), 'EMPTY'))
   ) {
     $op = key($fieldValue);
     $fieldValue = $fieldValue[$op] ?? NULL;
@@ -2615,7 +2615,7 @@ function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $filt
     }
   }
 
-  $return = CRM_Utils_Array::value('return', $options, []);
+  $return = $options['return'] ?? [];
   if (!empty($return)) {
     $return['id'] = 1;
     $matches = CRM_Utils_Array::filterColumns($matches, array_keys($return));

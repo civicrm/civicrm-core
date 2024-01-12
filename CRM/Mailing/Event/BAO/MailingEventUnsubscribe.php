@@ -38,7 +38,7 @@ class CRM_Mailing_Event_BAO_MailingEventUnsubscribe extends CRM_Mailing_Event_DA
    *   Was the contact successfully unsubscribed?
    */
   public static function unsub_from_domain($job_id, $queue_id, $hash) {
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
     if (!$q) {
       return FALSE;
     }
@@ -110,7 +110,7 @@ WHERE  email = %2
   public static function unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE): ?array {
     // First make sure there's a matching queue event.
 
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
     if (!$q) {
       return NULL;
     }

@@ -13,6 +13,12 @@ class AfformAdminMeta {
    * @return array
    */
   public static function getAdminSettings() {
+    $afformPlacement = \CRM_Utils_Array::formatForSelect2((array) \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('value', 'label', 'icon', 'description')
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('option_group_id:name', '=', 'afform_placement')
+      ->addOrderBy('weight')
+      ->execute(), 'label', 'value');
     $afformTypes = (array) \Civi\Api4\OptionValue::get(FALSE)
       ->addSelect('name', 'label', 'icon')
       ->addWhere('is_active', '=', TRUE)
@@ -31,6 +37,7 @@ class AfformAdminMeta {
     }
     return [
       'afform_type' => $afformTypes,
+      'afform_placement' => $afformPlacement,
       'search_operators' => \Civi\Afform\Utils::getSearchOperators(),
     ];
   }
@@ -232,6 +239,7 @@ class AfformAdminMeta {
             'class' => 'af-button btn btn-primary',
             'crm-icon' => 'fa-check',
             'ng-click' => 'afform.submit()',
+            'ng-if' => 'afform.showSubmitButton',
             '#children' => [
               ['#text' => E::ts('Submit')],
             ],

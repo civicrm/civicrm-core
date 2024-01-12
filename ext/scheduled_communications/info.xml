@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<extension key="scheduled_communications" type="module">
+  <file>scheduled_communications</file>
+  <name>Scheduled Communications</name>
+  <description>Schedule communications using SearchKit</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>CiviCRM</author>
+    <email>info@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/search-improvements</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2024-01-05</releaseDate>
+  <version>5.71.alpha1</version>
+  <develStage>beta</develStage>
+  <compatibility>
+    <ver>5.71</ver>
+  </compatibility>
+  <comments>Click on the chat link above to discuss development, report problems or ask questions.</comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/ScheduledCommunications</namespace>
+    <format>23.02.1</format>
+    <angularModule>crmScheduledCommunications</angularModule>
+  </civix>
+  <mixins>
+    <mixin>scan-classes@1.0.0</mixin>
+  </mixins>
+</extension>

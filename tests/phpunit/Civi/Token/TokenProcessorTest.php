@@ -1,6 +1,8 @@
 <?php
 namespace Civi\Token;
 
+use Brick\Money\Context\DefaultContext;
+use Brick\Money\Money;
 use Civi\Api4\Website;
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenValueEvent;
@@ -462,7 +464,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $this->counts['onEvalTokens']);
   }
 
-  public function getFilterExamples() {
+  public function getFilterExamples(): array {
     $exampleTokens = [
       // All the "{my_text.*}" tokens will be treated as plain-text ("text/plain").
       'my_text' => [
@@ -477,7 +479,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
         'and_such' => '<strong>testing &amp; such</strong>',
       ],
       'my_currencies' => [
-        'amount' => \Brick\Money\Money::of(123, 'USD', new \Brick\Money\Context\DefaultContext()),
+        'amount' => Money::of(123, 'USD', new DefaultContext()),
         'currency' => 'EUR',
         'locale' => 'fr_FR',
       ],
@@ -856,7 +858,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   // *
   // * Ex: $tokenContext['oldSmartyVar'] = 'new_entity.new_field';
   // */
-  //  public function testSmartyTokenAlias_Contact() {
+  //  public function testSmartyTokenAlias_Contact(): void {
   //    $alice = $this->individualCreate(['first_name' => 'Alice']);
   //    $bob = $this->individualCreate(['first_name' => 'Bob']);
   //    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());

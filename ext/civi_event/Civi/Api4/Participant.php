@@ -14,6 +14,7 @@ namespace Civi\Api4;
  * Participant entity, stores the participation record of a contact in an event.
  *
  * @searchable primary
+ * @searchFields contact_id.sort_name,event_id.title
  * @since 5.19
  * @package Civi\Api4
  */

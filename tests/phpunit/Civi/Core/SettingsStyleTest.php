@@ -11,7 +11,7 @@ class SettingsStyleTest extends \CiviUnitTestCase {
   /**
    * Scan all known settings
    */
-  public function testConformance() {
+  public function testConformance(): void {
     $errors = [];
     $assert = function (string $setting, bool $condition, string $message) use (&$errors) {
       if (!$condition) {

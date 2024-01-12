@@ -22,7 +22,7 @@ class CRM_Case_XMLProcessorTest extends CiviCaseTestCase {
    * Test that allRelationshipTypes() doesn't have name and label mixed up
    * and that is has the right directions.
    */
-  public function testAllRelationshipTypes() {
+  public function testAllRelationshipTypes(): void {
 
     // Add a relationship type to test against.
     $params = [

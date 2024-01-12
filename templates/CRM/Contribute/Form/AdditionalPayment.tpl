@@ -43,11 +43,11 @@
   </div>
   <table class="form-layout-compressed">
     <tr>
-      <td class="label"><strong>{if $component eq 'event'}{ts}Participant{/ts}{else}{ts}Contact{/ts}{/if}</strong></td><td><strong>{$displayName}</strong></td>
+      <td class="label"><strong>{if $component eq 'event'}{ts}Participant{/ts}{else}{ts}Contact{/ts}{/if}</strong></td><td><strong>{$displayName|escape}</strong></td>
     </tr>
     {if $eventName}
       <tr>
-        <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>
+        <td class='label'>{ts}Event{/ts}</td><td>{$eventName|escape}</td>
       </tr>
     {/if}
     <tr class="crm-payment-form-block-total_amount">
@@ -61,7 +61,7 @@
             {$form.is_email_receipt.label}
           </td>
           <td>{$form.is_email_receipt.html}
-              <span class="description">{ts 1=$email}Automatically email a receipt to %1?{/ts}</span>
+              <span class="description">{ts 1=$email|escape}Automatically email a receipt to %1?{/ts}</span>
           </td>
         </tr>
         <tr id="fromEmail" class="crm-payment-form-block-from_email_address" style="display:none;">
@@ -107,9 +107,6 @@
 
     {literal}
     <script type="text/javascript">
-
-    var url = {/literal}{$dataUrl|@json_encode}{literal};
-
       CRM.$(function($) {
         showHideByValue( 'is_email_receipt', '', 'notice', 'table-row', 'radio', false );
         showHideByValue( 'is_email_receipt', '', 'fromEmail', 'table-row', 'radio', false );

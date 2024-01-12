@@ -48,7 +48,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         case 'form':
           $info['definition'] = $this->definition + [
             'title' => '',
-            'permission' => 'access CiviCRM',
+            'permission' => ['access CiviCRM'],
             'layout' => [
               [
                 '#tag' => 'af-form',
@@ -70,7 +70,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         case 'search':
           $info['definition'] = $this->definition + [
             'title' => '',
-            'permission' => 'access CiviCRM',
+            'permission' => ['access CiviCRM'],
             'layout' => [
               [
                 '#tag' => 'div',

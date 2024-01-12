@@ -666,12 +666,12 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $params['option_amount'][$key] = CRM_Utils_Rule::cleanMoney($amount);
     }
 
-    $params['is_display_amounts'] = CRM_Utils_Array::value('is_display_amounts', $params, FALSE);
-    $params['is_required'] = CRM_Utils_Array::value('is_required', $params, FALSE);
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params, FALSE);
-    $params['visibility_id'] = CRM_Utils_Array::value('visibility_id', $params, FALSE);
-    $params['count'] = CRM_Utils_Array::value('count', $params, FALSE);
+    $params['is_display_amounts'] ??= FALSE;
+    $params['is_required'] ??= FALSE;
+    $params['is_active'] ??= FALSE;
+    $params['financial_type_id'] ??= FALSE;
+    $params['visibility_id'] ??= FALSE;
+    $params['count'] ??= FALSE;
 
     // need the FKEY - price set id
     $params['price_set_id'] = $this->_sid;
@@ -689,7 +689,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     if (isset($params['option_name'])) {
       $params['option_value'] = $params['option_name'];
     }
-    $params['is_enter_qty'] = CRM_Utils_Array::value('is_enter_qty', $params, FALSE);
+    $params['is_enter_qty'] ??= FALSE;
 
     if ($params['html_type'] === 'Text') {
       // if html type is Text, force is_enter_qty on

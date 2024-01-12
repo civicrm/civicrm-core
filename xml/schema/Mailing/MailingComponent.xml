@@ -7,8 +7,9 @@
   <comment>Stores information about the mailing components (header/footer).</comment>
   <component>CiviMail</component>
   <paths>
-    <add>civicrm/admin/component?action=add&amp;reset=1</add>
-    <update>civicrm/admin/component?action=update&amp;id=[id]&amp;reset=1</update>
+    <add>civicrm/admin/component/edit?action=add&amp;reset=1</add>
+    <update>civicrm/admin/component/edit?action=update&amp;id=[id]&amp;reset=1</update>
+    <browse>civicrm/admin/component?action=browse&amp;id=[id]&amp;reset=1</browse>
   </paths>
   <field>
     <name>id</name>

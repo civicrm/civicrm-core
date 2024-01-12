@@ -18,8 +18,6 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
 
   /**
    * Test create a document with basic tokens.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateDocumentBasicTokens(): void {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
@@ -53,7 +51,7 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['activityId']]);
 
     $this->assertEquals(array_merge($this->getActivityTokens(), CRM_Core_SelectValues::domainTokens()), $tokenProcessor->listTokens());
-    $html_message = "\n" . implode("\n", CRM_Utils_Array::collect('0', $data)) . "\n";
+    $html_message = "\n" . implode("\n", array_column($data, '0')) . "\n";
     $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
     try {
       $output = $form->createDocument([$activity['id']], $html_message, []);
@@ -92,7 +90,7 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testCreateDocumentCustomFieldTokens() {
+  public function testCreateDocumentCustomFieldTokens(): void {
     // Set up custom group, and field
     // returns custom_group_id, custom_field_id, custom_field_option_group_id, custom_field_group_options
     $cg = $this->entityCustomGroupWithSingleStringMultiSelectFieldCreate("MyCustomField", "ActivityTest.php");

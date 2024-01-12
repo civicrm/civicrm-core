@@ -28,7 +28,7 @@ use Civi\Api4\CustomGroup;
  */
 class ExtendFromIndividualTest extends CustomTestBase {
 
-  public function testGetWithNonStandardExtends() {
+  public function testGetWithNonStandardExtends(): void {
 
     $customGroup = CustomGroup::create(FALSE)
       ->addValue('title', 'MyContactFields')

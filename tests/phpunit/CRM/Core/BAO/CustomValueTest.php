@@ -21,7 +21,7 @@
  */
 class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
 
-  public function testTypeCheckWithValidInput() {
+  public function testTypeCheckWithValidInput(): void {
 
     $values = [
       'Memo' => 'Test1',
@@ -45,7 +45,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function testTypeCheckWithInvalidInput() {
+  public function testTypeCheckWithInvalidInput(): void {
     $values = ['check1' => 'chk'];
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typecheck($type, $value);
@@ -53,7 +53,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function testTypeCheckWithWrongInput() {
+  public function testTypeCheckWithWrongInput(): void {
     $values = [
       'String' => 1,
       'Boolean' => 'US',
@@ -64,7 +64,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function testTypeToFieldWithValidInput() {
+  public function testTypeToFieldWithValidInput(): void {
     $values = [
       'String' => 'char_data',
       'File' => 'char_data',
@@ -85,7 +85,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function testTypeToFieldWithWrongInput() {
+  public function testTypeToFieldWithWrongInput(): void {
     $values = [
       'String' => 'memo_data',
       'File' => 'date_data',
@@ -97,7 +97,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function testFixCustomFieldValue() {
+  public function testFixCustomFieldValue(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
     $params = [
       'email' => 'abc@example.com',
@@ -154,7 +154,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     $this->customGroupDelete($customGroup['id']);
   }
 
-  public function testFixCustomFieldValueWithEmptyParams() {
+  public function testFixCustomFieldValueWithEmptyParams(): void {
     $params = [];
     $result = CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
     $this->assertEquals($result, NULL, 'Checking the returned value of type Memo.');

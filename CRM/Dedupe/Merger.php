@@ -48,7 +48,7 @@ class CRM_Dedupe_Merger {
         ]);
       }
       elseif ($config->userFramework === 'Joomla') {
-        $userRecordUrl = $config->userSystem->getVersion() > 1.5 ? $config->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . '%ufid' : $config->userFrameworkBaseURL . "index2.php?option=com_users&view=user&task=edit&id[]=" . '%ufid';
+        $userRecordUrl = $config->userFrameworkBaseURL . 'index.php?option=com_users&view=user&task=user.edit&id=%ufid';
         $title = ts('%1 User: %2; user id: %3', [
           1 => $config->userFramework,
           2 => '$ufname',
@@ -1561,8 +1561,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $value[1] = NULL;
       }
 
-      // Display a checkbox to migrate, only if the values are different
-      if ($value != $main[$field]) {
+      // Display a checkbox to migrate, only if the values are different, should check type also for true value
+      if ($value !== $main[$field]) {
         // Don't check source if main is empty, because the source of the other contact is not the source of the merged contact
         $isChecked = ($field === 'source') ? FALSE : (!isset($main[$field]) || $main[$field] === '');
         $elements[] = [
@@ -1651,7 +1651,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $mainContactValue = $mainTree[$gid]['fields'][$fid]['customValue'] ?? NULL;
         $otherContactValue = $otherTree[$gid]['fields'][$fid]['customValue'] ?? NULL;
         if (in_array($fid, $compareFields['custom'])) {
-          $rows["custom_group_$gid"]['title'] = $rows["custom_group_$gid"]['title'] ?? $group['title'];
+          $rows["custom_group_$gid"]['title'] ??= $group['title'];
 
           if ($mainContactValue) {
             foreach ($mainContactValue as $valueId => $values) {
@@ -2945,6 +2945,7 @@ ORDER BY civicrm_custom_group.weight,
         // Add this value to the table rows
         $rows["move_location_{$blockName}_{$count}"]['other'] = $displayValue;
         $rows["move_location_{$blockName}_{$count}"]['location_entity'] = $blockName;
+        $rows["move_location_{$blockName}_{$count}"]['location_block_index'] = $count;
 
         // CRM-17556 Only display 'main' contact value if it's the same location + type
         // Look it up from main values...

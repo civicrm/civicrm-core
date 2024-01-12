@@ -87,7 +87,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   public function testMailerCreateSuccess(int $version): void {
     $this->_apiversion = $version;
     $this->callAPISuccess('Campaign', 'create', ['name' => 'big campaign', 'title' => 'abc']);
-    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign'], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign']);
     $jobs = $this->callAPISuccess('MailingJob', 'get', ['mailing_id' => $result['id']]);
     $this->assertEquals(1, $jobs['count']);
     // return isn't working on this in getAndCheck so lets not check it for now
@@ -98,7 +98,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * Tes that the parameter _skip_evil_bao_auto_schedule_ is respected & prevents jobs being created.
    */
-  public function testSkipAutoSchedule() {
+  public function testSkipAutoSchedule(): void {
     $this->callAPISuccess('Mailing', 'create', array_merge($this->_params, [
       '_skip_evil_bao_auto_schedule_' => TRUE,
       'scheduled_date' => 'now',
@@ -118,7 +118,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $this->_params['body_html'] = 'I am completed so it does not matter if there is an opt out link since I have already been sent by another system';
     $this->_params['is_completed'] = 1;
-    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now']);
     $jobs = $this->callAPISuccess('mailing_job', 'get', ['mailing_id' => $result['id']]);
     $this->assertEquals(1, $jobs['count']);
     $this->assertEquals('Complete', $jobs['values'][$jobs['id']]['status']);
@@ -132,14 +132,14 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    */
   public function testMailerCreateSuccessNoCreatedID(): void {
     unset($this->_params['created_id']);
-    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now']);
     $this->getAndCheck($this->_params, $result['id'], 'mailing');
   }
 
   /**
    *
    */
-  public function testTemplateTypeOptions() {
+  public function testTemplateTypeOptions(): void {
     $types = $this->callAPISuccess('Mailing', 'getoptions', ['field' => 'template_type']);
     $this->assertTrue(isset($types['values']['traditional']));
   }
@@ -147,7 +147,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * Check that default header+footer are available.
    */
-  public function testHeaderFooterOptions() {
+  public function testHeaderFooterOptions(): void {
     $headers = $this->callAPISuccess('Mailing', 'getoptions', ['field' => 'header']);
     $this->assertTrue(in_array('Mailing Header', $headers['values']));
     $footers = $this->callAPISuccess('Mailing', 'getoptions', ['field' => 'footer']);
@@ -161,7 +161,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testMailerCreateTemplateOptions() {
+  public function testMailerCreateTemplateOptions(): void {
     // 1. Create mailing with template_options.
     $params = $this->_params;
     $params['template_options'] = json_encode(['foo' => 'bar_1']);
@@ -200,7 +200,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testMagicGroups_create_update() {
+  public function testMagicGroups_create_update(): void {
     // BEGIN SAMPLE DATA
     $groupIDs['a'] = $this->groupCreate(['name' => 'Example include group', 'title' => 'Example include group']);
     $groupIDs['b'] = $this->groupCreate(['name' => 'Example exclude group', 'title' => 'Example exclude group']);
@@ -302,8 +302,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
     $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
     $this->assertStringContainsString("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
-    $this->assertRegexp('!>Forward this email</a>!', $previewResult['values']['body_html']);
-    $this->assertRegexp('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!>Forward this email</a>!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
@@ -371,7 +371,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'mailing' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing'),
       'group' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_group'),
     ];
-    $create = $this->callAPIAndDocument('Mailing', 'create', $params, __FUNCTION__, __FILE__);
+    $create = $this->callAPISuccess('Mailing', 'create', $params);
     // 'Preview should not create any mailing records'
     $this->assertDBQuery($maxIDs['mailing'], 'SELECT MAX(id) FROM civicrm_mailing');
     // 'Preview should not create any mailing_group records'
@@ -391,7 +391,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testMailerPreviewRecipientsDeduplicateAndOnholdEmails() {
+  public function testMailerPreviewRecipientsDeduplicateAndOnholdEmails(): void {
     // BEGIN SAMPLE DATA
     $groupIDs['grp'] = $this->groupCreate(['name' => 'Example group', 'title' => 'Example group']);
     $contactIDs['include_me'] = $this->individualCreate([
@@ -460,7 +460,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * Test sending a test mailing.
    */
-  public function testMailerSendTest_email() {
+  public function testMailerSendTest_email(): void {
     $contactIDs['alice'] = $this->individualCreate([
       'email' => 'alice@example.org',
       'first_name' => 'Alice',
@@ -487,7 +487,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    *
    */
-  public function testMailerSendTest_group() {
+  public function testMailerSendTest_group(): void {
     // BEGIN SAMPLE DATA
     $groupIDs['inc'] = $this->groupCreate(['name' => 'Example include group', 'title' => 'Example include group']);
     $contactIDs['alice'] = $this->individualCreate([
@@ -518,7 +518,6 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'contact_id' => $contactIDs['carol'],
     ]);
     // END SAMPLE DATA
-    unset(Civi::$statics['CRM_Core_Permission_Base']);
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
     $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', [
       'mailing_id' => $mail['id'],
@@ -678,10 +677,10 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $submitParams['id'] = $id;
     if ($expectedFailure) {
       $submitResult = $this->callAPIFailure('mailing', 'submit', $submitParams);
-      $this->assertRegExp($expectedFailure, $submitResult['error_message']);
+      $this->assertMatchesRegularExpression($expectedFailure, $submitResult['error_message']);
     }
     else {
-      $submitResult = $this->callAPIAndDocument('Mailing', 'submit', $submitParams, __FUNCTION__, __FILE__);
+      $submitResult = $this->callAPISuccess('Mailing', 'submit', $submitParams);
       $this->assertIsNumeric($submitResult['id']);
       $this->assertIsNumeric($submitResult['values'][$id]['scheduled_id']);
       $this->assertEquals($submitParams['scheduled_date'], $submitResult['values'][$id]['scheduled_date']);
@@ -697,7 +696,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testUnsubscribeGroupList() {
+  public function testUnsubscribeGroupList(): void {
     // Create set of groups and add a contact to both of them.
     $groupID2 = $this->groupCreate(['name' => 'Test group 2', 'title' => 'group title 2']);
     $groupID3 = $this->groupCreate(['name' => 'Test group 3', 'title' => 'group title 3']);
@@ -733,7 +732,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'group_type' => 'Include',
     ];
     $this->callAPISuccess('MailingGroup', 'create', $mgParams);
-    unset(Civi::$statics['CRM_Core_Permission_Base']);
+    unset(Civi::$statics['CRM_ACL_API']);
 
     //Include previous mail in the mailing group.
     $mail2 = $this->callAPISuccess('mailing', 'create', $this->_params);
@@ -768,7 +767,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    *
    */
-  public function testMailerStats() {
+  public function testMailerStats(): void {
     $result = $this->groupContactCreate($this->_groupID, 100);
     //verify if 100 contacts are added for group
     $this->assertEquals(100, $result['added']);
@@ -822,19 +821,17 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
   /**
    * Test civicrm_mailing_delete.
    */
-  public function testMailerDeleteSuccess() {
+  public function testMailerDeleteSuccess(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $this->callAPIAndDocument($this->_entity, 'delete', ['id' => $result['id']], __FUNCTION__, __FILE__);
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
     $this->assertAPIDeleted($this->_entity, $result['id']);
   }
 
   /**
    * Test Mailing.gettokens.
    */
-  public function testMailGetTokens() {
-    $description = 'Demonstrates fetching tokens for one or more entities (in this case "Contact" and "Mailing").
-      Optionally pass sequential=1 to have output ready-formatted for the select2 widget.';
-    $result = $this->callAPIAndDocument($this->_entity, 'gettokens', ['entity' => ['Contact', 'Mailing']], __FUNCTION__, __FILE__, $description);
+  public function testMailGetTokens(): void {
+    $result = $this->callAPISuccess($this->_entity, 'gettokens', ['entity' => ['Contact', 'Mailing']]);
     $this->assertContains('Contact Type', $result['values']);
 
     // Check that passing "sequential" correctly outputs a hierarchical array
@@ -848,7 +845,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
    *
    * @throws \CRM_Core_Exception
    */
-  public function testClone() {
+  public function testClone(): void {
     // BEGIN SAMPLE DATA
     $groupIDs['inc'] = $this->groupCreate(['name' => 'Example include group', 'title' => 'Example include group']);
     $contactIDs['include_me'] = $this->individualCreate([
@@ -872,7 +869,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $this->callAPISuccess('Mailing', 'get');
     $createId = $create['id'];
     $this->createLoggedInUser();
-    $clone = $this->callAPIAndDocument('Mailing', 'clone', ['id' => $create['id']], __FUNCTION__, __FILE__);
+    $clone = $this->callAPISuccess('Mailing', 'clone', ['id' => $create['id']]);
     $cloneId = $clone['id'];
 
     $this->assertNotEquals($createId, $cloneId, 'Create and clone should return different records');
@@ -903,7 +900,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
    * api function cannot be considered supported  / 'part of the api' without a
    * success test
    */
-  public function testMailerBounceWrongParams() {
+  public function testMailerBounceWrongParams(): void {
     $params = [
       'job_id' => 'Wrong ID',
       'event_queue_id' => 'Wrong ID',
@@ -924,7 +921,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
    * api function cannot be considered supported  / 'part of the api' without a
    * success test
    */
-  public function testMailerConfirmWrongParams() {
+  public function testMailerConfirmWrongParams(): void {
     $params = [
       'contact_id' => 'Wrong ID',
       'subscribe_id' => 'Wrong ID',
@@ -946,7 +943,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
    * api function cannot be considered supported  / 'part of the api' without a
    * success test
    */
-  public function testMailerReplyWrongParams() {
+  public function testMailerReplyWrongParams(): void {
     $params = [
       'job_id' => 'Wrong ID',
       'event_queue_id' => 'Wrong ID',
@@ -968,7 +965,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
    * api function cannot be considered supported  / 'part of the api' without a
    * success test
    */
-  public function testMailerForwardWrongParams() {
+  public function testMailerForwardWrongParams(): void {
     $params = [
       'job_id' => 'Wrong ID',
       'event_queue_id' => 'Wrong ID',
@@ -1004,7 +1001,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
    *
    * @throws \CRM_Core_Exception
    */
-  public function testUrlWithMissingTrackingHash() {
+  public function testUrlWithMissingTrackingHash(): void {
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
     $jobs = $this->callAPISuccess('mailing_job', 'get', ['mailing_id' => $mail['id']]);
     $this->assertEquals(1, $jobs['count']);
@@ -1038,7 +1035,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
   /**
    * Test Trackable URL with unicode character
    */
-  public function testTrackableURLWithUnicodeSign() {
+  public function testTrackableURLWithUnicodeSign(): void {
     $unicodeURL = "https://civińcrm.org";
     $this->_params['body_text'] = str_replace("https://civicrm.org", $unicodeURL, $this->_params['body_text']);
     $this->_params['body_html'] = str_replace("https://civicrm.org", $unicodeURL, $this->_params['body_html']);
@@ -1071,13 +1068,13 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
    * CRM-20892 : Test if Mail.create API throws error on update,
    *  if modified_date less then the date when the mail was last updated/created
    */
-  public function testModifiedDateMismatchOnMailingUpdate() {
+  public function testModifiedDateMismatchOnMailingUpdate(): void {
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params + ['modified_date' => 'now']);
     try {
       $this->callAPISuccess('mailing', 'create', $this->_params + ['id' => $mail['id'], 'modified_date' => '2 seconds ago']);
     }
     catch (Exception $e) {
-      $this->assertRegExp("/Failure in api call for mailing create:  Mailing has not been saved, Content maybe out of date, please refresh the page and try again/", $e->getMessage());
+      $this->assertMatchesRegularExpression("/Failure in api call for mailing create:  Mailing has not been saved, Content maybe out of date, please refresh the page and try again/", $e->getMessage());
     }
   }
 
@@ -1086,7 +1083,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
    *
    * @throws \CRM_Core_Exception
    */
-  public function testUpdateEmailResetdate() {
+  public function testUpdateEmailResetdate(): void {
     $this->callAPISuccess('Mailing', 'update_email_resetdate', []);
   }
 

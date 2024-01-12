@@ -30,7 +30,7 @@ class EmailCreationSpecProvider extends \Civi\Core\Service\AutoService implement
     $spec->getFieldByName('is_primary')->setRequired(FALSE);
 
     $defaultLocationType = \CRM_Core_BAO_LocationType::getDefault()->id ?? NULL;
-    $spec->getFieldByName('location_type_id')->setDefaultValue($defaultLocationType);
+    $spec->getFieldByName('location_type_id')->setDefaultValue($defaultLocationType ? (int) $defaultLocationType : NULL);
   }
 
   /**

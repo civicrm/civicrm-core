@@ -53,7 +53,6 @@
     <readonly>true</readonly>
     <add>1.1</add>
     <change>3.1</change>
-    <contactType>null</contactType>
   </field>
   <index>
     <name>index_contact_type</name>

@@ -18,7 +18,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
   /**
    * Check method add()
    */
-  public function testAdd() {
+  public function testAdd(): void {
     $params = [
       'name' => 'Test Product',
       'sku' => 'TP-10',
@@ -41,7 +41,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
   /**
    * Check method retrieve( )
    */
-  public function testRetrieve() {
+  public function testRetrieve(): void {
     $params = [
       'name' => 'Test Product',
       'sku' => 'TP-10',
@@ -62,7 +62,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
   /**
    * Check method del( )
    */
-  public function testDel() {
+  public function testDel(): void {
     $params = [
       'name' => 'Test Product',
       'sku' => 'TP-10',

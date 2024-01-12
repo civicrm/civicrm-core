@@ -174,7 +174,7 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
   public static function defaultCurrencySymbol($defaultCurrency = NULL) {
     static $cachedSymbol = NULL;
     if (!$cachedSymbol || $defaultCurrency) {
-      $currency = $defaultCurrency ? $defaultCurrency : Civi::settings()->get('defaultCurrency');
+      $currency = $defaultCurrency ?: Civi::settings()->get('defaultCurrency');
       if ($currency) {
         $currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', [
           'labelColumn' => 'symbol',

@@ -52,27 +52,62 @@ class CRM_Utils_SQL {
   /**
    * Helper function for adding the permissioned subquery from one entity onto another
    *
-   * @param string $entity
+   * @param string $entityName
    * @param string $joinColumn
    * @return array
    */
-  public static function mergeSubquery($entity, $joinColumn = 'id') {
-    require_once 'api/v3/utils.php';
-    $baoName = _civicrm_api3_get_BAO($entity);
+  public static function mergeSubquery($entityName, $joinColumn = 'id') {
+    $baoName = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getFullName($entityName));
     $bao = new $baoName();
-    $clauses = $subclauses = [];
-    foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
-      if ($vals && $field == $joinColumn) {
-        $clauses = array_merge($clauses, (array) $vals);
-      }
-      elseif ($vals) {
-        $subclauses[] = "$field " . implode(" AND $field ", (array) $vals);
+    $fields = $bao::getSupportedFields();
+    $mergeClauses = $subClauses = [];
+    foreach ((array) $bao->addSelectWhereClause($entityName) as $fieldName => $fieldClauses) {
+      if ($fieldClauses) {
+        foreach ((array) $fieldClauses as $fieldClause) {
+          $formattedClause = CRM_Utils_SQL::prefixFieldNames($fieldClause, array_keys($fields), $bao->tableName());
+          // Same as join column with no additional fields - can be added directly
+          if ($fieldName === $joinColumn && $fieldClause === $formattedClause) {
+            $mergeClauses[] = $formattedClause;
+          }
+          // Arrays of arrays get joined with OR (similar to CRM_Core_Permission::check)
+          elseif (is_array($formattedClause)) {
+            $subClauses[] = "(($fieldName " . implode(") OR ($fieldName ", $formattedClause) . '))';
+          }
+          else {
+            $subClauses[] = "$fieldName $formattedClause";
+          }
+        }
       }
     }
-    if ($subclauses) {
-      $clauses[] = "IN (SELECT `$joinColumn` FROM `" . $bao->tableName() . "` WHERE " . implode(' AND ', $subclauses) . ")";
+    if ($subClauses) {
+      $mergeClauses[] = "IN (SELECT `$joinColumn` FROM `" . $bao->tableName() . "` WHERE " . implode(' AND ', $subClauses) . ")";
     }
-    return $clauses;
+    return $mergeClauses;
+  }
+
+  /**
+   * Walk a nested array and replace "{field_name}" with "`tableAlias`.`field_name`"
+   *
+   * @param string|array $clause
+   * @param array $fieldNames
+   * @param string $tableAlias
+   * @return string|array
+   */
+  public static function prefixFieldNames(&$clause, array $fieldNames, string $tableAlias) {
+    if (is_array($clause)) {
+      foreach ($clause as $index => $subclause) {
+        $clause[$index] = self::prefixFieldNames($subclause, $fieldNames, $tableAlias);
+      }
+    }
+    if (is_string($clause) && str_contains($clause, '{')) {
+      $find = $replace = [];
+      foreach ($fieldNames as $fieldName) {
+        $find[] = '{' . $fieldName . '}';
+        $replace[] = '`' . $tableAlias . '`.`' . $fieldName . '`';
+      }
+      $clause = str_replace($find, $replace, $clause);
+    }
+    return $clause;
   }
 
   /**

@@ -11,8 +11,6 @@
   {include file="CRM/Contribute/Form/Contribution/PreviewHeader.tpl"}
 {/if}
 
-{include file="CRM/common/TrackingFields.tpl"}
-
 <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-thankyou-form-block" data-page-id="{$contributionPageID}" data-page-template="thankyou">
   {if $thankyou_text}
     <div id="thankyou_text" class="crm-section thankyou_text-section">
@@ -47,7 +45,7 @@
         </div>
       {/if}
     {elseif $isPendingOutcome}
-      <div>{ts 1=$paymentProcessor.name}Your contribution has been submitted to %1 for processing.{/ts}</div>
+      <div>{ts 1=$paymentProcessorName|escape}Your contribution has been submitted to %1 for processing.{/ts}</div>
         {if $is_email_receipt}
       <div>
         {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
@@ -74,41 +72,39 @@
 
   {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl"}
 
-  {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $priceSetID and $lineItem ) }
+  {if $amount GTE 0 OR $minimum_fee GTE 0 OR ($priceSetID and $lineItem)}
     <div class="crm-group amount_display-group">
-      {if !$useForMember}
-        <div class="header-dark">
-          {if !$membershipBlock AND $amount OR ( $priceSetID and $lineItem )}{ts}Contribution Information{/ts}{else}{ts}Membership Fee{/ts}{/if}
-        </div>
-      {/if}
+      <div class="header-dark">
+        {if !$membershipBlock AND $amount OR ($priceSetID and $lineItem)}{ts}Contribution Information{/ts}{else}{ts}Membership Fee{/ts}{/if}
+      </div>
+
       <div class="display-block">
-        {if !$useForMember}
-          {if $lineItem and $priceSetID}
-            {if !$amount}{assign var="amount" value=0}{/if}
-            {assign var="totalAmount" value=$amount}
-            {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
-          {elseif $membership_amount}
-            {$membership_name} {ts}Membership{/ts}: <strong>{$membership_amount|crmMoney}</strong><br />
-            {if $amount}
-              {if !$is_separate_payment}
-                {ts}Contribution Amount{/ts}: <strong>{$amount|crmMoney}</strong><br />
-              {else}
-                {ts}Additional Contribution{/ts}: <strong>{$amount|crmMoney}</strong><br />
-              {/if}
+        {if $lineItem and $priceSetID}
+          {if !$amount}{assign var="amount" value=0}{/if}
+          {assign var="totalAmount" value=$amount}
+          {include file="CRM/Price/Page/LineItem.tpl" context="Contribution" displayLineItemFinancialType=false pricesetFieldsCount=false currencySymbol='' hookDiscount=''}
+        {elseif $membership_amount}
+          {$membership_name} {ts}Membership{/ts}: <strong>{$membership_amount|crmMoney}</strong><br />
+          {if $amount}
+            {if !$is_separate_payment}
+              {ts}Contribution Amount{/ts}: <strong>{$amount|crmMoney}</strong><br />
+            {else}
+              {ts}Additional Contribution{/ts}: <strong>{$amount|crmMoney}</strong><br />
             {/if}
-            <strong> -------------------------------------------</strong><br />
-            {ts}Total{/ts}: <strong>{$amount+$membership_amount|crmMoney}</strong><br />
-          {else}
-            {if $totalTaxAmount}
-              {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
-            {/if}
-            {if $installments}{ts}Installment Amount{/ts}{else}{ts}Amount{/ts}{/if}: <strong>{$amount|crmMoney:$currency}{if $amount_level } &ndash; {$amount_level}{/if}</strong>
           {/if}
+          <strong> -------------------------------------------</strong><br />
+          {ts}Total{/ts}: <strong>{$orderTotal|crmMoney}</strong><br />
+        {else}
+          {if $totalTaxAmount}
+            {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
+          {/if}
+          {if $installments}{ts}Installment Amount{/ts}{else}{ts}Amount{/ts}{/if}: <strong>{$amount|crmMoney:$currency}{if $amount_level} &ndash; {$amount_level}{/if}</strong>
         {/if}
+
         {if $receive_date}
           {ts}Date{/ts}: <strong>{$receive_date|crmDate}</strong><br />
         {/if}
-        {if $contributeMode ne 'notify' and $is_monetary and ! $is_pay_later and $trxn_id}
+        {if $trxn_id}
           {ts}Transaction #{/ts}: {$trxn_id}<br />
         {/if}
         {if $membership_trx_id}
@@ -120,7 +116,7 @@
           {if !empty($auto_renew)} {* Auto-renew membership confirmation *}
             {crmRegion name="contribution-thankyou-recur-membership"}
               <br />
-              {if $installments > 1}
+              {if !$installments || $installments > 1}
                 {if $frequency_interval > 1}
                   <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
                 {else}
@@ -204,7 +200,7 @@
 
   {if $onbehalfProfile && $onbehalfProfile|@count}
     <div class="crm-group onBehalf_display-group label-left crm-profile-view">
-      {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
+      {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf' hideFieldset=false}
      </div>
   {/if}
 
@@ -216,7 +212,7 @@
       <div class="display-block">
        <div class="label-left crm-section honoree_profile-section">
           <strong>{$honorName}</strong><br/>
-          {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor'}
+          {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor' hideFieldset=false}
         </div>
       </div>
    </div>
@@ -224,7 +220,7 @@
 
   {if $customPre}
     <fieldset class="label-left crm-profile-view">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false hideFieldset=false}
     </fieldset>
   {/if}
 
@@ -250,38 +246,34 @@
     </div>
   {/if}
 
-  {if ( $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }
-    {if $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) }
-      {if $billingName or $address}
-        <div class="crm-group billing_name_address-group">
-          <div class="header-dark">
-            {ts}Billing Name and Address{/ts}
-          </div>
-          <div class="crm-section no-label billing_name-section">
-            <div class="content">{$billingName}</div>
-            <div class="clear"></div>
-          </div>
-          <div class="crm-section no-label billing_address-section">
-            <div class="content">{$address|nl2br}</div>
-            <div class="clear"></div>
-          </div>
-        </div>
-      {/if}
-    {/if}
-    {if !$emailExists}
-      <div class="crm-group contributor_email-group">
+  {if $billingName or $address}
+      <div class="crm-group billing_name_address-group">
         <div class="header-dark">
-          {ts}Your Email{/ts}
+            {ts}Billing Name and Address{/ts}
         </div>
-        <div class="crm-section no-label contributor_email-section">
-          <div class="content">{$email}</div>
+        <div class="crm-section no-label billing_name-section">
+          <div class="content">{$billingName}</div>
+          <div class="clear"></div>
+        </div>
+        <div class="crm-section no-label billing_address-section">
+          <div class="content">{$address|nl2br}</div>
           <div class="clear"></div>
         </div>
       </div>
     {/if}
+  {if !$emailExists && $email}
+    <div class="crm-group contributor_email-group">
+      <div class="header-dark">
+          {ts}Your Email{/ts}
+      </div>
+      <div class="crm-section no-label contributor_email-section">
+        <div class="content">{$email}</div>
+        <div class="clear"></div>
+      </div>
+    </div>
   {/if}
 
-  {if in_array('credit_card_number', $form) || in_array('bank_account_number', $form) && ($amount GT 0 OR $minimum_fee GT 0)}
+  {if in_array('credit_card_number', $paymentFields) || in_array('bank_account_number', $paymentFields) && ($amount GT 0 OR $minimum_fee GT 0)}
     {crmRegion name="contribution-thankyou-billing-block"}
       <div class="crm-group credit_card-group">
         {if $paymentFieldsetLabel}
@@ -289,7 +281,7 @@
             {$paymentFieldsetLabel}
           </div>
         {/if}
-          {if in_array('bank_account_number', $form) && $bank_account_number}
+          {if in_array('bank_account_number', $paymentFields) && $bank_account_number}
           <div class="display-block">
             {ts}Account Holder{/ts}: {$account_holder}<br />
             {ts}Bank Identification Number{/ts}: {$bank_identification_number}<br />
@@ -308,11 +300,11 @@
     {/crmRegion}
   {/if}
 
-  {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="thankContribution"}
+  {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="thankContribution" showPremiumSelectionFields=false preview=false}
 
   {if $customPost}
     <fieldset class="label-left crm-profile-view">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}
     </fieldset>
   {/if}
 
@@ -323,6 +315,6 @@
   </div>
   {if $isShare}
     {capture assign=contributionUrl}{crmURL p='civicrm/contribute/transact' q="$qParams" a=1 fe=1 h=1}{/capture}
-    {include file="CRM/common/SocialNetwork.tpl" url=$contributionUrl title=$title pageURL=$contributionUrl}
+    {include file="CRM/common/SocialNetwork.tpl" url=$contributionUrl title=false pageURL=$contributionUrl emailMode=false}
   {/if}
 </div>

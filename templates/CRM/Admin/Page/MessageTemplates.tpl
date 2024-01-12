@@ -86,9 +86,9 @@
     {include file="CRM/common/jsortable.tpl"}
     {foreach from=$rows item=template_row key=type}
       {if (
-        $type ne 'userTemplates' and ($canEditSystemTemplates or $canEditMessageTemplates)
+        $type ne 'userTemplates' && ($canEditSystemTemplates or $canEditMessageTemplates)
       ) or (
-        $type eq 'userTemplates'and ($canEditUserDrivenMessageTemplates or $canEditMessageTemplates)
+        $type eq 'userTemplates' && ($canEditUserDrivenMessageTemplates or $canEditMessageTemplates)
       )}
       <div id="{if $type eq 'userTemplates'}user{else}workflow{/if}" class='ui-tabs-panel ui-widget-content ui-corner-bottom'>
           <div class="help">
@@ -111,7 +111,7 @@
             </div>
             <div class="spacer"></div>
           {/if}
-            {if !empty( $template_row) }
+            {if !empty( $template_row)}
               <table class="display">
                 <thead>
                   <tr>
@@ -145,7 +145,7 @@
               <div class="spacer"></div>
             {/if}
 
-            {if empty( $template_row) }
+            {if empty( $template_row)}
                 <div class="messages status no-popup">
                     {icon icon="fa-info-circle"}{/icon}
                     {ts 1=$crmURL}There are no User-driven Message Templates entered. You can <a href='%1'>add one</a>.{/ts}

@@ -25,7 +25,7 @@ namespace Civi\Core {
     /**
      * Test callback with a constant value.
      */
-    public function testConstant() {
+    public function testConstant(): void {
       $cb = $this->resolver->get('0');
       $actual = call_user_func($cb, 'foo');
       $this->assertTrue(0 === $actual);
@@ -38,7 +38,7 @@ namespace Civi\Core {
     /**
      * Test callback for a global function.
      */
-    public function testGlobalFunc() {
+    public function testGlobalFunc(): void {
       // Note: civi_core_callback_dummy is implemented at the bottom of this file.
       $cb = $this->resolver->get('civi_core_callback_dummy');
       $this->assertEquals('civi_core_callback_dummy', $cb);
@@ -51,7 +51,7 @@ namespace Civi\Core {
     /**
      * Test callback for a static function.
      */
-    public function testStatic() {
+    public function testStatic(): void {
       $cb = $this->resolver->get('Civi\Core\ResolverTest::dummy');
       $this->assertEquals(['Civi\Core\ResolverTest', 'dummy'], $cb);
 
@@ -63,7 +63,7 @@ namespace Civi\Core {
     /**
      * Test callback for an API.
      */
-    public function testApi3() {
+    public function testApi3(): void {
       // Note: The Resolvertest.Ping API is implemented at the bottom of this file.
       $cb = $this->resolver->get('api3://Resolvertest/ping?first=@1');
       $expected = 'api dummy received foo';
@@ -74,7 +74,7 @@ namespace Civi\Core {
     /**
      * Test callback for an object in the container.
      */
-    public function testCall() {
+    public function testCall(): void {
       // Note: ResolverTestExampleService is implemented at the bottom of this file.
       \Civi::container()->set('callbackTestService', new ResolverTestExampleService());
       $cb = $this->resolver->get('call://callbackTestService/ping');
@@ -86,7 +86,7 @@ namespace Civi\Core {
     /**
      * Test callback for an invalid object in the container.
      */
-    public function testCallWithInvalidService() {
+    public function testCallWithInvalidService(): void {
       $this->expectException(\Symfony\Component\DependencyInjection\Exception\ExceptionInterface::class);
       $this->resolver->get('call://totallyNonexistentService/ping');
     }
@@ -94,7 +94,7 @@ namespace Civi\Core {
     /**
      * Test callback which returns a global variable.
      */
-    public function testGlobalGetter() {
+    public function testGlobalGetter(): void {
       $_GET['resolverTest'] = 123;
       $cb = $this->resolver->get('global://_GET/resolverTest?getter');
       $_GET['resolverTest'] = 456;
@@ -103,7 +103,7 @@ namespace Civi\Core {
       unset($_GET['resolverTest']);
     }
 
-    public function testGlobalSetter() {
+    public function testGlobalSetter(): void {
       $GLOBALS['resolverTest2'] = 78;
       $cb = $this->resolver->get('global://resolverTest2?setter');
       call_user_func($cb, 90);
@@ -113,7 +113,7 @@ namespace Civi\Core {
     /**
      * Test object-lookup in the container.
      */
-    public function testObj() {
+    public function testObj(): void {
       // Note: ResolverTestExampleService is implemented at the bottom of this file.
       \Civi::container()->set('callbackTestService', new ResolverTestExampleService());
       $obj = $this->resolver->get('obj://callbackTestService');
@@ -123,7 +123,7 @@ namespace Civi\Core {
     /**
      * Test object-lookup in the container (invalid name).
      */
-    public function testObjWithInvalidService() {
+    public function testObjWithInvalidService(): void {
       $this->expectException(\Symfony\Component\DependencyInjection\Exception\ExceptionInterface::class);
       $this->resolver->get('obj://totallyNonexistentService');
     }
@@ -131,7 +131,7 @@ namespace Civi\Core {
     /**
      * Test default object creation.
      */
-    public function testClass() {
+    public function testClass(): void {
       // Note: ResolverTestExampleService is implemented at the bottom of this file.
       $obj = $this->resolver->get('Civi\Core\ResolverTestExampleService');
       $this->assertTrue($obj instanceof ResolverTestExampleService);

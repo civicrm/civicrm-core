@@ -244,6 +244,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
           'url' => '#',
           'extra' => 'onclick="javascript:fileOnCase( \'file\', \'%%id%%\', null, this ); return false;"',
           'title' => ts('File on Case'),
+          'weight' => 50,
         ],
       ];
     }
@@ -416,11 +417,11 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
         $row['engagement_level'] = CRM_Utils_Array::value($engagementLevel, $engagementLevels, $engagementLevel);
       }
 
-      $actionLinks = $this->actionLinks(CRM_Utils_Array::value('activity_type_id', $row),
-        CRM_Utils_Array::value('source_record_id', $row),
+      $actionLinks = $this->actionLinks($row['activity_type_id'],
+        $row['source_record_id'] ?? NULL,
         // CRM-3553
         !empty($row['mailingId']),
-        CRM_Utils_Array::value('activity_id', $row),
+        $row['activity_id'] ?? NULL,
         $this->_key
       );
 

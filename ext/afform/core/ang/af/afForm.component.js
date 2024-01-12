@@ -1,4 +1,5 @@
 (function(angular, $, _) {
+  "use strict";
   // Example usage: <af-form ctrl="afform">
   angular.module('af').component('afForm', {
     bindings: {
@@ -13,6 +14,7 @@
         status,
         args,
         submissionResponse,
+        ts = CRM.ts('org.civicrm.afform'),
         ctrl = this;
 
       this.$onInit = function() {
@@ -41,13 +43,14 @@
         return $scope.$parent.meta;
       };
       // With no arguments this will prefill the entire form based on url args
+      // and also check if the form is open for submissions.
       // With selectedEntity, selectedIndex & selectedId provided this will prefill a single entity
       this.loadData = function(selectedEntity, selectedIndex, selectedId, selectedField) {
-        var toLoad = 0,
-          params = {name: ctrl.getFormMeta().name, args: {}};
+        let toLoad = true;
+        const params = {name: ctrl.getFormMeta().name, args: {}};
         // Load single entity
         if (selectedEntity) {
-          toLoad = 1;
+          toLoad = !!selectedId;
           params.matchField = selectedField;
           params.args[selectedEntity] = {};
           params.args[selectedEntity][selectedIndex] = selectedId;
@@ -56,9 +59,6 @@
         else {
           args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
           _.each(schema, function (entity, entityName) {
-            if (args[entityName] || entity.actions.update) {
-              toLoad++;
-            }
             if (args[entityName] && typeof args[entityName] === 'string') {
               args[entityName] = args[entityName].split(',');
             }
@@ -67,21 +67,42 @@
         }
         if (toLoad) {
           crmApi4('Afform', 'prefill', params)
-            .then(function(result) {
-              _.each(result, function(item) {
-                data[item.name] = data[item.name] || {};
-                _.extend(data[item.name], item.values, schema[item.name].data || {});
+            .then((result) => {
+              // In some cases (noticed on Wordpress) the response header incorrectly outputs success when there's an error.
+              if (result.error_message) {
+                disableForm(result.error_message);
+                return;
+              }
+              result.forEach((item) => {
+                // Use _.each() because item.values could be cast as an object if array keys are not sequential
+                _.each(item.values, (values, index) => {
+                  data[item.name][index] = data[item.name][index] || {};
+                  data[item.name][index].joins = {};
+                  angular.merge(data[item.name][index], values, {fields: _.cloneDeep(schema[item.name].data || {})});
+                });
               });
+            }, (error) => {
+              disableForm(error.error_message);
             });
         }
         // Clear existing contact selection
         else if (selectedEntity) {
-          data[selectedEntity][selectedIndex].fields = {};
-          if (data[selectedEntity][selectedIndex].joins) {
-            data[selectedEntity][selectedIndex].joins = {};
-          }
+          // Delete object keys without breaking object references
+          Object.keys(data[selectedEntity][selectedIndex].fields).forEach(key => delete data[selectedEntity][selectedIndex].fields[key]);
+          // Fill pre-set values
+          angular.merge(data[selectedEntity][selectedIndex].fields, _.cloneDeep(schema[selectedEntity].data || {}));
+          data[selectedEntity][selectedIndex].joins = {};
         }
+
+        ctrl.showSubmitButton = displaySubmitButton(args);
       };
+
+      function displaySubmitButton(args) {
+        if (args.sid && args.sid.length > 0) {
+          return false;
+        }
+        return true;
+      }
 
       // Used when submitting file fields
       this.fileUploader = new FileUploader({
@@ -94,6 +115,36 @@
         }
       });
 
+      // Handle the logic for conditional fields
+      this.checkConditions = function(conditions, op) {
+        op = op || 'AND';
+        // OR and AND have the opposite behavior so the logic is inverted
+        // NOT works identically to OR but gets flipped at the end
+        var ret = op === 'AND',
+          flip = !ret;
+        _.each(conditions, function(clause) {
+          // Recurse into nested group
+          if (_.isArray(clause[1])) {
+            if (ctrl.checkConditions(clause[1], clause[0]) === flip) {
+              ret = flip;
+            }
+          } else {
+            // Angular can't handle expressions with quotes inside brackets, so they are omitted
+            // Here we add them back to make valid js
+            _.each(clause, function(expr, idx) {
+              if (_.isString(expr) && expr.charAt(0) !== '"') {
+                clause[idx] = expr.replace(/\[/g, "['").replace(/]/g, "']");
+              }
+            });
+            var parser = $parse(clause.join(' '));
+            if (parser(data) === flip) {
+              ret = flip;
+            }
+          }
+        });
+        return op === 'NOT' ? !ret : ret;
+      };
+
       // Called after form is submitted and files are uploaded
       function postProcess() {
         var metaData = ctrl.getFormMeta(),
@@ -101,7 +152,8 @@
 
         $element.trigger('crmFormSuccess', {
           afform: metaData,
-          data: data
+          data: data,
+          submissionResponse: submissionResponse,
         });
 
         status.resolve();
@@ -149,6 +201,13 @@
         return valid;
       }
 
+      function disableForm(errorMsg) {
+        $('af-form[ng-form="' + ctrl.getFormMeta().name + '"]')
+          .addClass('disabled')
+          .find('button[ng-click="afform.submit()"]').prop('disabled', true);
+        CRM.alert(errorMsg, ts('Sorry'), 'error');
+      }
+
       this.submit = function() {
         // validate required fields on the form
         if (!ctrl.ngForm.$valid || !validateFileFields()) {
@@ -179,10 +238,9 @@
           }
         })
         .catch(function(error) {
-          status.resolve();
-          status = CRM.status(error.error_message, 'error');
+          status.reject();
           $element.unblock();
-          CRM.alert(error.error_message, ts('Form Error'));
+          CRM.alert(error.error_message || '', ts('Form Error'));
         });
       };
     }

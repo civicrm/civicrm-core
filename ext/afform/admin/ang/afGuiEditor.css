@@ -346,6 +346,17 @@ body.af-gui-dragging {
   color: #0071bd;
 }
 
+#afGuiEditor #af_config_form_permission {
+  width: calc(100% - 55px);
+}
+#afGuiEditor #af_config_form_permission_operator {
+  width: 45px;
+}
+
+#afGuiEditor #afGuiEditor-palette input[type=number] {
+  width: 6em;
+}
+
 #afGuiEditor .af-gui-layout-icon {
   width: 12px;
   height: 11px;
@@ -598,4 +609,102 @@ body.af-gui-dragging {
   background-color: #e9eeff;
   border: 2px solid #0071bd;
   min-height: 30px;
+}
+
+/* Rules for Conditional dialog */
+#bootstrap-theme.af-gui-conditional-dialog fieldset {
+  padding: 6px;
+  border-top: 1px solid lightgrey;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+#bootstrap-theme.af-gui-conditional-dialog fieldset fieldset {
+  padding-top: 0;
+  border-left: 1px solid lightgrey;
+  border-right: 1px solid lightgrey;
+  border-bottom: 1px solid lightgrey;
+}
+
+#bootstrap-theme.af-gui-conditional-dialog fieldset legend {
+  background-color: white;
+  font-size: 13px;
+  margin: 0;
+  width: auto;
+  border: 0 none;
+  padding: 2px 5px;
+  text-transform: none;
+}
+
+#bootstrap-theme.af-gui-conditional-dialog af-gui-clause > .btn-group {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+#bootstrap-theme.af-gui-conditional-dialog fieldset div.api4-input {
+  margin-bottom: 10px;
+}
+
+#bootstrap-theme.af-gui-conditional-dialog fieldset div.api4-input.ui-sortable-helper {
+  background-color: rgba(255, 255, 255, .9);
+}
+
+#bootstrap-theme.af-gui-conditional-dialog fieldset div.api4-input.ui-sortable-helper {
+  background-color: rgba(255, 255, 255, .9);
+}
+
+#bootstrap-theme.af-gui-conditional-dialog .api4-clause-fieldset fieldset {
+  float: right;
+  width: calc(100% - 58px);
+  margin-top: -8px;
+}
+
+#bootstrap-theme.af-gui-conditional-dialog .api4-clause-fieldset.api4-sorting fieldset .api4-clause-group-sortable {
+  min-height: 3.5em;
+}
+
+#bootstrap-theme.af-gui-conditional-dialog legend[ng-click] {
+  cursor: pointer;
+}
+
+#bootstrap-theme.af-gui-conditional-dialog .api4-input-group {
+  display: inline-block;
+}
+
+#bootstrap-theme i.crm-i.af-gui-conditional-dialog-move-icon {
+  opacity: .5;
+}
+#bootstrap-theme .crm-draggable:hover > i.crm-i.af-gui-conditional-dialog-move-icon,
+#bootstrap-theme .crm-draggable:hover > * > i.crm-i.af-gui-conditional-dialog-move-icon {
+  opacity: 1;
+}
+
+#bootstrap-theme.af-gui-conditional-dialog .api4-clause-badge {
+  width: 55px;
+  display: inline-block;
+  cursor: move;
+}
+#bootstrap-theme.af-gui-conditional-dialog .api4-clause-badge .badge {
+  opacity: .5;
+  position: relative;
+}
+#bootstrap-theme.af-gui-conditional-dialog .api4-clause-badge .caret {
+  margin: 0;
+}
+/* Icon only shown while dragging */
+#bootstrap-theme.af-gui-conditional-dialog .api4-clause-badge .crm-i {
+  display: none;
+  padding: 0 6px;
+}
+#bootstrap-theme.af-gui-conditional-dialog .ui-sortable-helper .api4-clause-badge .badge span {
+  display: none;
+}
+#bootstrap-theme.af-gui-conditional-dialog .ui-sortable-helper .api4-clause-badge .crm-i {
+  display: inline-block;
+}
+
+#bootstrap-theme.af-gui-conditional-dialog .api4-operator {
+  width: 110px;
 }

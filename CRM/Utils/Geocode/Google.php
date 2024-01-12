@@ -66,7 +66,7 @@ class CRM_Utils_Geocode_Google {
 
     if (!empty($values['state_province']) || (!empty($values['state_province_id']) && $values['state_province_id'] != 'null')) {
       if (!empty($values['state_province_id'])) {
-        $stateProvince = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $values['state_province_id']);
+        $stateProvince = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $values['state_province_id']) ?? '';
       }
       else {
         if (!$stateName) {
@@ -74,10 +74,10 @@ class CRM_Utils_Geocode_Google {
             $values['state_province'],
             'name',
             'abbreviation'
-          );
+          ) ?? '';
         }
         else {
-          $stateProvince = $values['state_province'];
+          $stateProvince = $values['state_province'] ?? '';
         }
       }
 

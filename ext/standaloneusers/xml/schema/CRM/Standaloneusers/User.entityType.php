@@ -5,6 +5,6 @@ return [
   [
     'name' => 'User',
     'class' => 'CRM_Standaloneusers_DAO_User',
-    'table' => 'civicrm_user',
+    'table' => 'civicrm_uf_match',
   ],
 ];

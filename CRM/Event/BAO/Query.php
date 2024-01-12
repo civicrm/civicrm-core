@@ -270,13 +270,13 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         $exEventId = '';
         if ($query->_where[$grouping]) {
           foreach ($query->_where[$grouping] as $key => $val) {
-            if (strstr($val, 'civicrm_event.id =')) {
+            if (str_contains($val, 'civicrm_event.id =')) {
               $exEventId = $val;
               $extractEventId = explode(" ", $val);
               $value = $extractEventId[2];
               $where = $query->_where[$grouping][$key];
             }
-            elseif (strstr($val, 'civicrm_event.id IN')) {
+            elseif (str_contains($val, 'civicrm_event.id IN')) {
               //extract the first event id if multiple events are selected
               preg_match('/civicrm_event.id IN \(\"(\d+)/', $val, $matches);
               $value = $matches[1];
@@ -405,8 +405,8 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
           $op = key($value);
           $value = $value[$op];
         }
-        if (!strstr($op, 'NULL') && !strstr($op, 'EMPTY') && !strstr($op, 'LIKE')) {
-          $regexOp = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT REGEXP' : 'REGEXP';
+        if (!str_contains($op, 'NULL') && !str_contains($op, 'EMPTY') && !str_contains($op, 'LIKE')) {
+          $regexOp = (str_contains($op, '!') || str_contains($op, 'NOT')) ? 'NOT REGEXP' : 'REGEXP';
           $regexp = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', (array) $value) . "([[:cntrl:]]|$)";
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_participant.$name", $regexOp, $regexp, 'String');
         }
@@ -434,11 +434,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
       case 'event_type_id':
       case 'event_title':
         $qillName = $name;
-        if (in_array($name, [
-          'event_id',
-          'event_title',
-          'event_is_public',
-        ])) {
+        if (in_array($name, ['event_id', 'event_title', 'event_is_public'])) {
           $name = str_replace('event_', '', $name);
         }
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';

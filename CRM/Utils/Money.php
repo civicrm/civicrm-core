@@ -202,7 +202,7 @@ class CRM_Utils_Money {
    * @throws \Brick\Money\Exception\UnknownCurrencyException
    */
   protected static function formatLocaleNumeric(string $amount, $locale = NULL, $currency = NULL, $numberOfPlaces = 2): string {
-    $currency = $currency ?? CRM_Core_Config::singleton()->defaultCurrency;
+    $currency ??= CRM_Core_Config::singleton()->defaultCurrency;
     $currencyObject = self::getCurrencyObject($currency);
     $money = Money::of($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
     $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);

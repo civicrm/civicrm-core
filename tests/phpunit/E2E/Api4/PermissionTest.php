@@ -16,7 +16,7 @@ class PermissionTest extends \CiviEndToEndTestCase {
    *
    * This is a general sanity-check/well-formed-ness
    */
-  public function testGet() {
+  public function testGet(): void {
     // If the CMS integration is working,t hen you should expect one of these "smoke-test" permissions to be present.
     $smokeTest = [
       'Backdrop' => 'Drupal:post comments',

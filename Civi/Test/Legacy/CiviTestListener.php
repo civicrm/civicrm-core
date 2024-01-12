@@ -28,6 +28,11 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
    */
   private $tx;
 
+  /**
+   * @var \CRM_Core_TemporaryErrorScope|null
+   */
+  public $errorScope;
+
   public function startTestSuite(\PHPUnit_Framework_TestSuite $suite) {
     $byInterface = $this->indexTestsByInterface($suite->tests());
     $this->validateGroups($byInterface);

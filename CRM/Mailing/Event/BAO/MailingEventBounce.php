@@ -24,7 +24,7 @@ class CRM_Mailing_Event_BAO_MailingEventBounce extends CRM_Mailing_Event_DAO_Mai
    * @return bool|null
    */
   public static function recordBounce(&$params) {
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($params['job_id'] ?? NULL,
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL,
       $params['event_queue_id'] ?? NULL,
       $params['hash'] ?? NULL
     );

@@ -21,11 +21,7 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
     ]);
 
     $priceFieldValues = $priceFieldValues['values'];
-    $this->participantPrice = NULL;
-    foreach ($priceFieldValues as $priceFieldValue) {
-      $this->participantPrice = $priceFieldValue;
-      break;
-    }
+    $this->participantPrice = reset($priceFieldValues);
 
     $this->participantCreate([
       'event_id'  => $event['id'],
@@ -61,10 +57,13 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
       'radio_ts'         => 'ts_all',
     ]);
     $rows = $form->controller->get('rows');
-    $this->assertEquals(1, count($rows), 'Exactly one row should be returned for given price field value.');
+    $this->assertCount(1, $rows, 'Exactly one row should be returned for given price field value.');
   }
 
-  public function testSearchWithPricelabelChange() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testSearchWithPriceLabelChange(): void {
     $this->callAPISuccess('PriceFieldValue', 'create', [
       'label' => 'Radio Label C',
       'id' => $this->participantPrice['id'],
@@ -81,7 +80,7 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
     ]);
     // Confirm that even tho we have changed the label for the price field value the query still works
     $rows = $form->controller->get('rows');
-    $this->assertEquals(1, count($rows), 'Exactly one row should be returned for given price field value.');
+    $this->assertCount(1, $rows, 'Exactly one row should be returned for given price field value.');
   }
 
 }

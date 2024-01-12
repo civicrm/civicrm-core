@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for renewing memberships for a contact  *}
-  {if $membershipMode == 'test' }
+  {if $membershipMode == 'test'}
     {assign var=registerMode value="TEST"}
   {elseif $membershipMode == 'live'}
     {assign var=registerMode value="LIVE"}

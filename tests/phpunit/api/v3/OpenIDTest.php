@@ -50,7 +50,7 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
    */
   public function testCreateOpenID($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__)['values'];
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->_params)['values'];
     $this->assertCount(1, $result);
     unset($this->_params['sequential']);
     $this->getAndCheck($this->_params, $result[0]['id'], $this->_entity);
@@ -69,7 +69,7 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = $this->_params;
     unset($params['location_type_id']);
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__)['values'];
+    $result = $this->callAPISuccess($this->_entity, 'create', $params)['values'];
     $this->assertEquals(CRM_Core_BAO_LocationType::getDefault()->id, $result[0]['location_type_id']);
     $this->callAPISuccess($this->_entity, 'delete', ['id' => $result[0]['id']]);
   }
@@ -83,7 +83,7 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
   public function testGetOpenID($version) {
     $this->_apiversion = $version;
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $result = $this->callAPIAndDocument($this->_entity, 'get', $this->_params, __FUNCTION__, __FILE__)['values'];
+    $result = $this->callAPISuccess($this->_entity, 'get', $this->_params)['values'];
     $this->assertCount(1, $result);
     $this->assertNotNull($result[0]['id']);
     $this->callAPISuccess($this->_entity, 'delete', ['id' => $result[0]['id']]);
@@ -99,7 +99,7 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $deleteParams = ['id' => $result['id']];
-    $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $this->callAPISuccess($this->_entity, 'delete', $deleteParams);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get');
     $this->assertEquals(0, $checkDeleted['count']);
   }

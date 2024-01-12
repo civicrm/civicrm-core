@@ -37,45 +37,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
   }
 
   /**
-   * Build all the data structures needed to build the form.
-   *
-   * @deprecated
-   *
-   * @param CRM_Core_Form $form
-   */
-  public static function preProcess(&$form) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
-    $defaults = [];
-    $form->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
-    if (is_numeric(key($form->_fromEmails))) {
-      $emailID = (int) key($form->_fromEmails);
-      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
-    }
-    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
-      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
-    }
-    $form->setDefaults($defaults);
-    $form->setTitle(ts('Print/Merge Document'));
-  }
-
-  /**
-   * @deprecated
-   * @param CRM_Core_Form $form
-   * @param int $cid
-   */
-  public static function preProcessSingle(&$form, $cid) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
-    $form->_contactIds = explode(',', $cid);
-    // put contact display name in title for single contact mode
-    if (count($form->_contactIds) === 1) {
-      $form->setTitle(
-        ts('Print/Merge Document for %1',
-        [1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name')])
-      );
-    }
-  }
-
-  /**
    * Get the categories required for rendering tokens.
    *
    * @deprecated

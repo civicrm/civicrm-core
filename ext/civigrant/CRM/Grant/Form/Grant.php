@@ -45,16 +45,19 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    */
   public function preProcess() {
 
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_grantType = NULL;
     if ($this->_id) {
       $this->_grantType = CRM_Core_DAO::getFieldValue('CRM_Grant_DAO_Grant', $this->_id, 'grant_type_id');
+      $this->_contactID = CRM_Core_DAO::getFieldValue('CRM_Grant_DAO_Grant', $this->_id, 'contact_id');
     }
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
+    else {
+      $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    }
+    // Almost-useless _context variable just tells if we have a contact id
+    $this->_context = $this->_contactID ? 'contact' : 'standalone';
 
     $this->assign('action', $this->_action);
-    $this->assign('context', $this->_context);
 
     // check permission for action.
     $perm = $this->_action & CRM_Core_Action::DELETE ? 'delete in CiviGrant' : 'edit grants';
@@ -62,7 +65,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
-    $this->setPageTitle(ts('Grant'));
+    $this->setPageTitle();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -187,22 +190,24 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc $uploadNames = $this->get( 'uploadNames' );
-    $this->addButtons([
-      [
-        'type' => 'upload',
-        'name' => ts('Save'),
-        'isDefault' => TRUE,
-      ],
-      [
-        'type' => 'upload',
-        'name' => ts('Save and New'),
-        'subName' => 'new',
-      ],
-      [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ],
-    ]);
+    if ($this->_action !== CRM_Core_Action::VIEW) {
+      $this->addButtons([
+        [
+          'type' => 'upload',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'upload',
+          'name' => ts('Save and New'),
+          'subName' => 'new',
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
+    }
 
     $contactField = $this->addEntityRef('contact_id', ts('Applicant'), ['create' => TRUE], TRUE);
     if ($this->_context != 'standalone') {
@@ -227,7 +232,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     $params['id'] = $this->_id;
 
     if (empty($params['grant_report_received'])) {
-      $params['grant_report_received'] = "null";
+      $params['grant_report_received'] = 0;
     }
 
     // set the contact, when contact is selected
@@ -285,7 +290,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     if ($this->_context == 'standalone') {
       if ($buttonName == $this->getButtonName('upload', 'new')) {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/grant/add',
-          'reset=1&action=add&context=standalone'
+          'reset=1&action=add'
         ));
       }
       else {
@@ -295,8 +300,8 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       }
     }
     elseif ($buttonName == $this->getButtonName('upload', 'new')) {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/grant',
-        "reset=1&action=add&context=grant&cid={$this->_contactID}"
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/grant/add',
+        "reset=1&action=add&cid={$this->_contactID}"
       ));
     }
   }

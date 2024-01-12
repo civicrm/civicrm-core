@@ -358,7 +358,7 @@ class CRM_Core_DAO_AllCoreTables {
    *
    * @param string $briefName
    *
-   * @return FALSE|string
+   * @return string
    */
   public static function getTableForEntityName($briefName): string {
     self::init();

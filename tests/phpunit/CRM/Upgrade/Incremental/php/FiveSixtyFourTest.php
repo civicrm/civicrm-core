@@ -13,7 +13,7 @@ class CRM_Upgrade_Incremental_php_FiveSixtyFourTest extends CiviUnitTestCase {
   /**
    * Test that fixing the double json encode works as expected
    */
-  public function testFixDobuleJsonEncode() {
+  public function testFixDobuleJsonEncode(): void {
     $this->createAuthorizeNetProcessor();
     $this->paymentProcessorAuthorizeNetCreate();
     $creditCards = [

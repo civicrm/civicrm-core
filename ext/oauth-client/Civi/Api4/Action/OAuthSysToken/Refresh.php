@@ -41,10 +41,6 @@ class Refresh extends BasicBatchAction {
   private $selectFields = ['id', 'client_id', 'access_token', 'refresh_token', 'expires', 'token_type', 'raw'];
   private $providers = [];
 
-  public function __construct($entityName, $actionName) {
-    parent::__construct($entityName, $actionName);
-  }
-
   protected function getSelect() {
     return $this->selectFields;
   }

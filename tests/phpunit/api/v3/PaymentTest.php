@@ -52,7 +52,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access CiviContribute';
     $this->callAPISuccess('payment', 'get', $params);
 
-    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'get', $params);
     $this->assertEquals(1, $payment['count']);
 
     $expectedResult = [
@@ -185,7 +185,9 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertNotEmpty($contribution['receipt_date']);
     $mut->checkMailLog([
-      'Fundraising Dinner -...            1    $100.00     $100.00',
+      'Fundraising Dinner',
+      '$100.00',
+      '$200.00',
       'event place',
       'streety street',
     ]);
@@ -258,14 +260,20 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: "FIXME" <info@EXAMPLE.ORG>',
       'Dear Anthony,',
-      'Total Fee: $300.00',
-      'This Payment Amount: $50.00',
+      'Total Fee',
+      '$300.00',
+      'This Payment Amount',
+      '$50.00',
       //150 was paid in the 1st payment.
-      'Balance Owed: $100.00',
+      'Balance Owed',
+      '$100.00',
       'Event Information and Location',
-      'Paid By: Check',
-      'Check Number: 345',
-      'Transaction Date: August 13th, 2018  5:57 PM',
+      'Paid By',
+      'Check',
+      'Check Number',
+      '345',
+      'Transaction Date',
+      'August 13th, 2018  5:57 PM',
       'event place',
       'streety street',
     ]);
@@ -279,7 +287,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentEmailReceiptFullyPaid(): void {
     $mut = new CiviMailUtils($this);
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviContribute', 'edit contributions', 'access CiviCRM'];
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviContribute', 'edit contributions', 'access CiviCRM', 'profile listings and forms'];
     $contribution = $this->createPartiallyPaidParticipantOrder();
 
     $params = [
@@ -296,10 +304,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'From: "FIXME" <info@EXAMPLE.ORG>',
       'Dear Anthony,',
       'Below you will find a receipt for this payment.',
-      'Total Fee: $300.00',
-      'Total Paid: $300.00',
-      'This Payment Amount: $150.00',
-      'Thank you for completing this payment.',
+      'Total Fee',
+      '$300.00',
+      'Total Paid', '
+      $300.00',
+      'This Payment Amount',
+      '$150.00',
+      'Thank you for completing this contribution.',
     ]);
   }
 
@@ -347,12 +358,17 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'Dear Anthony,',
       'A refund has been issued based on changes in your registration selections.',
-      'Total Fee: $300' . $decimalSeparator . '00',
-      'Refund Amount: -$30' . $decimalSeparator . '00',
+      'Total Fee',
+      '$300' . $decimalSeparator . '00',
+      'Refund Amount',
+      '-$30' . $decimalSeparator . '00',
       'Event Information and Location',
-      'Paid By: Check',
-      'Transaction Date: November 13th, 2018 12:01 PM',
-      'Total Paid: $170' . $decimalSeparator . '00',
+      'Paid By',
+      'Check',
+      'Transaction Date',
+      'November 13th, 2018 12:01 PM',
+      'Total Paid',
+      '$170' . $decimalSeparator . '00',
     ]);
   }
 
@@ -411,7 +427,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'total_amount' => 50,
     ];
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPISuccess('payment', 'create', $params);
     $this->checkPaymentIsValid($payment['id'], $contribution['id']);
 
     $params = [
@@ -492,7 +508,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     foreach ($lineItems as $id => $ignore) {
       $params['line_item'][] = [$id => array_pop($amounts)];
     }
-    $payment = $this->callAPIAndDocument('Payment', 'create', $params, __FUNCTION__, __FILE__, 'Payment with line item', 'CreatePaymentWithLineItems');
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
     $this->checkPaymentIsValid($payment['id'], $contribution['id']);
 
     $params = [
@@ -635,7 +651,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'edit contributions');
 
-    $this->callAPIAndDocument('payment', 'cancel', $cancelParams, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('payment', 'cancel', $cancelParams);
 
     $payment = $this->callAPISuccess('payment', 'get', $params);
     $this->assertEquals(2, $payment['count']);
@@ -667,7 +683,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPIFailure('payment', 'delete', $deleteParams, 'API permission check failed for Payment/delete call; insufficient permission: require access CiviCRM and access CiviContribute and delete in CiviContribute');
 
     array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'delete in CiviContribute');
-    $this->callAPIAndDocument('payment', 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('payment', 'delete', $deleteParams);
     $this->callAPISuccessGetCount('payment', $params, 0);
 
     $this->callAPISuccess('Contribution', 'Delete', ['id' => $contribution['id']]);
@@ -743,7 +759,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPIFailure('payment', 'create', $params, 'API permission check failed for Payment/create call; insufficient permission: require access CiviCRM and access CiviContribute and edit contributions');
 
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute', 'access CiviCRM', 'edit contributions'];
-    $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__, 'Update Payment', 'UpdatePayment');
+    $payment = $this->callAPISuccess('payment', 'create', $params);
 
     $this->validateAllPayments();
     // Check for proportional cancelled payment against line items.
@@ -1185,8 +1201,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test that Payment.create uses the to_account of the payment processor.
    */
   public function testPaymentWithProcessorWithOddFinancialAccount(): void {
-    $processor = $this->dummyProcessorCreate(['financial_account_id' => 'Deposit Bank Account', 'payment_instrument_id' => 'Cash']);
-    $processor2 = $this->dummyProcessorCreate(['financial_account_id' => 'Payment Processor Account', 'name' => 'p2', 'payment_instrument_id' => 'EFT']);
+    $processor = $this->dummyProcessorCreate(['financial_account_id:name' => 'Deposit Bank Account', 'payment_instrument_id:name' => 'Cash']);
+    $processor2 = $this->dummyProcessorCreate(['financial_account_id:name' => 'Payment Processor Account', 'name' => 'p2', 'payment_instrument_id:name' => 'EFT']);
     $contributionParams = [
       'total_amount' => 100,
       'currency' => 'USD',

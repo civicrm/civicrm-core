@@ -13,7 +13,7 @@
   financialTypeName:::{$financialTypeName}
   contactID:::{$contactID}
   contributionID:::{$contributionID}
-  amount:::{$amount}
+  amount:::{contribution.total_amount}
   {if !empty($amount_level)}
   amount_level:::{$amount_level}
   {/if}
@@ -34,8 +34,7 @@
   {if !empty($is_quick_config)}
   is_quick_config:::{$is_quick_config}
   {/if}
-  {if !empty($getTaxDetails)}
-  getTaxDetails:::{$getTaxDetails}
+  {if !empty($totalTaxAmount)}
   totalTaxAmount:::{$totalTaxAmount}
   {/if}
   {if !empty($is_monetary)}
@@ -133,12 +132,7 @@
   {/foreach}
  {/foreach}
  {/if}
- {if !empty($dataArray)}
- {foreach from=$dataArray item=value key=priceset}
-    dataArray: priceset:::$priceset
-    dataArray: value:::$value
- {/foreach}
- {/if}
+
  {if !empty($honoreeProfile)}
  {foreach from=$honoreeProfile item=value key=label}
     honoreeProfile: label:::$label
@@ -170,12 +164,6 @@
  {foreach from=$customPost item=customValue key=customName}
     customPost: customName:::$customName
     customPost: customValue:::$customValue
- {/foreach}
- {/if}
- {if !empty($trackingFields)}
- {foreach from=$trackingFields item=trackingValue key=trackingName}
-   trackingName:::$trackingName
-   trackingValue:::$trackingValue
  {/foreach}
  {/if}
 

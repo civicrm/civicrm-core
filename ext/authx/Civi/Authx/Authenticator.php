@@ -421,7 +421,7 @@ class AuthenticatorTarget {
    */
   public function setPrincipal($args) {
     if (!empty($args['user'])) {
-      $args['userId'] = $args['userId'] ?? \CRM_Core_Config::singleton()->userSystem->getUfId($args['user']);
+      $args['userId'] ??= \CRM_Core_Config::singleton()->userSystem->getUfId($args['user']);
       if ($args['userId']) {
         unset($args['user']);
       }

@@ -43,30 +43,6 @@ class api_v3_GroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test missing required title parameter results in an error.
-   *
-   * @param int $version
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGroupCreateNoTitle($version) {
-    $this->_apiversion = $version;
-    $params = [
-      'name' => 'Test Group No title ',
-      'domain_id' => 1,
-      'description' => 'New Test Group Created',
-      'is_active' => 1,
-      'visibility' => 'Public Pages',
-      'group_type' => [
-        '1' => 1,
-        '2' => 1,
-      ],
-    ];
-
-    $this->callAPIFailure('group', 'create', $params, 'title');
-  }
-
-  /**
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
@@ -127,7 +103,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $params = [
       'name' => "Test Group 1",
     ];
-    $group = $this->callAPIAndDocument('group', 'get', $params, __FUNCTION__, __FILE__);
+    $group = $this->callAPISuccess('group', 'get', $params);
     $group = $group['values'];
 
     foreach ($group as $v) {
@@ -179,7 +155,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
    * Test Group create with Group Type and Parent
    * FIXME: Api4
    */
-  public function testGroupCreateWithTypeAndParent() {
+  public function testGroupCreateWithTypeAndParent(): void {
     $params = [
       'name' => 'Test Group type',
       'title' => 'Test Group Type',
@@ -308,13 +284,12 @@ class api_v3_GroupTest extends CiviUnitTestCase {
    */
   public function testgetfields($version) {
     $this->_apiversion = $version;
-    $description = "Demonstrate use of getfields to interrogate api.";
     $params = ['action' => 'create'];
-    $result = $this->callAPIAndDocument('group', 'getfields', $params, __FUNCTION__, __FILE__, $description);
+    $result = $this->callAPISuccess('group', 'getfields', $params);
     $this->assertEquals('is_active', $result['values']['is_active']['name']);
   }
 
-  public function testIllegalParentsParams() {
+  public function testIllegalParentsParams(): void {
     $params = [
       'title' => 'Test illegal Group',
       'domain_id' => 1,
@@ -350,7 +325,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $this->callAPISuccessGetCount('Group', ['check_permissions' => 1], 0);
     $this->hookClass->setHook('civicrm_aclGroup', [$this, 'aclGroupAllGroups']);
-    unset(Civi::$statics['CRM_ACL_API']['group_permission']);
+    unset(Civi::$statics['CRM_ACL_API']);
     $this->callAPISuccessGetCount('Group', ['check_permissions' => 1], 1);
   }
 

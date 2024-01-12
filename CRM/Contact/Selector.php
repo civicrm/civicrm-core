@@ -82,6 +82,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   protected $_contextMenu;
 
   /**
+   * The search context
+   *
+   * @var string
+   */
+  public $_context;
+
+  /**
    * Params is the array in a value used by the search query creator
    *
    * @var array
@@ -190,8 +197,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         FALSE, $this->_ufGroupID
       );
       self::$_columnHeaders = NULL;
-
-      $this->_customFields = CRM_Core_BAO_CustomField::getFieldsForImport('Individual');
 
       $this->_returnProperties = CRM_Contact_BAO_Contact::makeHierReturnProperties($this->_fields);
       $this->_returnProperties['contact_type'] = 1;
@@ -964,6 +969,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             'url' => 'civicrm/contact/view/delete',
             'qs' => 'reset=1&cid=%%id%%&restore=1',
             'title' => ts('Restore Contact'),
+            'weight' => 80,
           ],
         ];
         if (CRM_Core_Permission::check('delete contacts')) {

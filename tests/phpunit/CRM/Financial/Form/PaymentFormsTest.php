@@ -33,12 +33,19 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
 
   use CRM_Core_Payment_AuthorizeNetTrait;
 
+  public function tearDown(): void {
+    $this->callAPISuccess('Extension', 'disable', ['keys' => ['eventcart']]);
+    $this->callAPISuccess('Extension', 'uninstall', ['keys' => ['eventcart']]);
+    parent::tearDown();
+  }
+
   /**
    * Generic test on event payment forms to make sure they submit without error with payment processing.
    *
    * @throws \CRM_Core_Exception
    */
   public function testEventPaymentForms(): void {
+    $this->callAPISuccess('Extension', 'install', ['keys' => ['eventcart']]);
     $this->createAuthorizeNetProcessor();
     $processors = [$this->ids['PaymentProcessor']['anet']];
     $eventID = $this->eventCreatePaid([

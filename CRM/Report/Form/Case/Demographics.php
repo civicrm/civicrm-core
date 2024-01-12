@@ -329,9 +329,9 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
               else {
                 $clause = $this->whereClause($field,
                   $op,
-                  CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                  $this->_params["{$fieldName}_value"] ?? NULL,
+                  $this->_params["{$fieldName}_min"] ?? NULL,
+                  $this->_params["{$fieldName}_max"] ?? NULL
                 );
               }
             }

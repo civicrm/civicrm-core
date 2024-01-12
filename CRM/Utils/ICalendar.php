@@ -215,4 +215,59 @@ class CRM_Utils_ICalendar {
     return sprintf('%+03d%02d', $hours, $minutes);
   }
 
+  /**
+   * @param array|NULL $info
+   *   Information of the events to create an iCal file for, as returned by
+   *   CRM_Event_BAO_Event::getCompleteInfo().
+   *
+   * @return string
+   *   The rendered contents of the iCal file.
+   */
+  public static function createCalendarFile($info) {
+    $template = \CRM_Core_Smarty::singleton();
+
+    // Decode HTML entities in relevant fields.
+    foreach (['title', 'description', 'event_type', 'location', 'contact_email'] as $field) {
+      if (isset($info[0][$field])) {
+        $info[0][$field] = html_entity_decode($info[0][$field], ENT_QUOTES | ENT_HTML401, 'UTF-8');
+      }
+    }
+
+    // Calculate timezones.
+    if (count($info) > 0) {
+      $date_min = min(
+        array_map(function ($event) {
+          return strtotime($event['start_date']);
+        }, $info)
+      );
+      $date_max = max(
+        array_map(function ($event) {
+          return strtotime($event['end_date'] ?? $event['start_date']);
+        }, $info)
+      );
+      $template->assign('timezones', CRM_Utils_ICalendar::generate_timezones([date_default_timezone_get()], $date_min, $date_max));
+    }
+    else {
+      $template->assign('timezones', NULL);
+    }
+    $template->assign('timezone', @date_default_timezone_get());
+
+    $template->assign('events', $info);
+    $ical_data = $template->fetch('CRM/Core/Calendar/ICal.tpl');
+    $ical_data = preg_replace('/(?<!\r)\n/', "\r\n", $ical_data);
+
+    return $ical_data;
+  }
+
+  /**
+   * @param int|NULL $event_id
+   *   The CiviCRM Event ID of the event to render an iCal file for.
+   *
+   * @return string
+   */
+  public static function createCalendarFileForEvent($event_id) {
+    $info = \CRM_Event_BAO_Event::getCompleteInfo(NULL, NULL, $event_id, NULL, FALSE);
+    return self::createCalendarFile($info);
+  }
+
 }

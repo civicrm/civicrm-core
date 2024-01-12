@@ -70,7 +70,7 @@ class CRM_Utils_Type {
    * @return string
    *   String identifying the data type, e.g. 'Int' or 'String'.
    */
-  public static function typeToString($type) {
+  public static function typeToString($type): string {
     // @todo Use constants in the case statements, e.g. "case T_INT:".
     // @todo return directly, instead of assigning a value.
     // @todo Use a lookup array, as a property or as a local variable.
@@ -134,7 +134,7 @@ class CRM_Utils_Type {
         break;
     }
 
-    return (isset($string)) ? $string : "";
+    return $string ?? '';
   }
 
   /**

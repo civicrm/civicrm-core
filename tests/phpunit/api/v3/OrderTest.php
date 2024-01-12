@@ -61,7 +61,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
     $params = ['contribution_id' => $contribution['id']];
 
-    $order = $this->callAPIAndDocument('Order', 'get', $params, __FUNCTION__, __FILE__);
+    $order = $this->callAPISuccess('Order', 'get', $params);
 
     $this->assertEquals(1, $order['count']);
     $expectedResult = [
@@ -237,7 +237,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         'is_override' => 1,
       ],
     ];
-    $order = $this->callAPIAndDocument('Order', 'create', $p, __FUNCTION__, __FILE__);
+    $order = $this->callAPISuccess('Order', 'create', $p);
     $params = [
       'contribution_id' => $order['id'],
     ];
@@ -529,7 +529,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ],
     ];
 
-    $order = $this->callAPIAndDocument('order', 'create', $p, __FUNCTION__, __FILE__, 'Create order for participant', 'CreateOrderParticipant');
+    $order = $this->callAPISuccess('order', 'create', $p);
     $params = ['contribution_id' => $order['id']];
     $order = $this->callAPISuccess('order', 'get', $params);
     $expectedResult = [
@@ -665,7 +665,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         'contribution_id' => $order['id'],
         'is_test' => TRUE,
       ]);
-      $this->callAPIAndDocument('order', 'delete', $params, __FUNCTION__, __FILE__);
+      $this->callAPISuccess('order', 'delete', $params);
       $order = $this->callAPISuccess('order', 'get', $params);
       $this->assertEquals(0, $order['count']);
     }
@@ -738,7 +738,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $params = [
       'contribution_id' => $contribution['id'],
     ];
-    $this->callAPIAndDocument('order', 'cancel', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('order', 'cancel', $params);
     $order = $this->callAPISuccess('Order', 'get', $params);
     $expectedResult = [
       $contribution['id'] => [

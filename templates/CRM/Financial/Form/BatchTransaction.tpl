@@ -319,7 +319,7 @@ function selectAction( id, toggleSelectId, checkId ) {
 }
 
 function bulkAssignRemove( action ) {
-  var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q="className=CRM_Financial_Page_AJAX&fnName=bulkAssignRemove&entityID=$entityID" }"{literal};
+  var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q="className=CRM_Financial_Page_AJAX&fnName=bulkAssignRemove&entityID=$entityID"}"{literal};
   var fids = [];
   if (action == 'Assign') {
     CRM.$("input[id^='mark_x_']:checked").each( function () {

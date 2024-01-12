@@ -6,23 +6,33 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_tag')
   ])
   ->addValues([
     [
-      'name' => ts('Non-profit'),
+      'label' => ts('Non-profit'),
+      'name' => 'Non_profit',
       'description' => ts('Any not-for-profit organization.'),
+      'color' => '#0bcb21',
     ],
     [
-      'name' => ts('Company'),
+      'label' => ts('Company'),
+      'name' => 'Company',
       'description' => ts('For-profit organization.'),
+      'color' => '#2260c3',
     ],
     [
-      'name' => ts('Government Entity'),
+      'label' => ts('Government Entity'),
+      'name' => 'Government_Entity',
       'description' => ts('Any governmental entity.'),
+      'color' => '#cd4b13',
     ],
     [
-      'name' => ts('Major Donor'),
+      'label' => ts('Major Donor'),
+      'name' => 'Major_Donor',
       'description' => ts('High-value supporter of our organization.'),
+      'color' => '#0cdae9',
     ],
     [
-      'name' => ts('Volunteer'),
+      'label' => ts('Volunteer'),
+      'name' => 'Volunteer',
       'description' => ts('Active volunteers.'),
+      'color' => '#f0dc00',
     ],
   ]);

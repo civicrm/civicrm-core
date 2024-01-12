@@ -8,7 +8,7 @@
       display: '<',
       settings: '<',
       filters: '<',
-      totalCount: '<'
+      totalCount: '=?'
     },
     require: {
       afFieldset: '?^^afFieldset'
@@ -22,10 +22,11 @@
       this.$onInit = function() {
         var tallyParams;
 
+        // Copy API params from the run and adapt them in a secondary `tally` call for the "Totals" row
         if (ctrl.settings.tally) {
           ctrl.onPreRun.push(function (apiCalls) {
             ctrl.tally = null;
-            tallyParams = _.cloneDeep(apiCalls.run);
+            tallyParams = _.cloneDeep(apiCalls.run[2]);
           });
 
           ctrl.onPostRun.push(function (apiResults, status) {

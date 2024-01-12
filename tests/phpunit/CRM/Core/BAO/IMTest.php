@@ -11,7 +11,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
   /**
    * Create() method (create and update modes)
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $contactId = $this->individualCreate();
 
     $params = [
@@ -50,7 +50,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
   /**
    * AllIMs() method - get all IMs for our contact, with primary IM first
    */
-  public function testAllIMs() {
+  public function testAllIMs(): void {
     $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/im_test.xml');
 
     $contactId = 69;

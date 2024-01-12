@@ -15,6 +15,8 @@
  */
 class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
 
+  use CRMTraits_PCP_PCPTestTrait;
+
   /**
    * Clean up after tests.
    */
@@ -30,7 +32,7 @@ class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
    *
    * Future is CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship
    */
-  public function testGetRelationalFinancialAccount() {
+  public function testGetRelationalFinancialAccount(): void {
     $financialTypes = $this->callAPISuccess('FinancialType', 'get', [])['values'];
     $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', [])['values'];
     foreach ($financialTypes as $financialType) {
@@ -59,7 +61,7 @@ class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
    *
    * Future is CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship
    */
-  public function testGetRelationalFinancialAccountForPaymentInstrument() {
+  public function testGetRelationalFinancialAccountForPaymentInstrument(): void {
     $paymentInstruments = $this->callAPISuccess('Contribution', 'getoptions', ['field' => 'payment_instrument_id'])['values'];
     $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', [])['values'];
     foreach ($paymentInstruments as $paymentInstrumentID => $paymentInstrumentName) {
@@ -71,6 +73,17 @@ class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
         $this->assertEquals('Deposit Bank Account', $financialAccounts[$financialAccountID]['name']);
       }
     }
+  }
+
+  public function testPcPages(): void {
+    $blockParams = $this->pcpBlockParams();
+    $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord($blockParams);
+
+    $params = $this->pcpParams();
+    $params['pcp_block_id'] = $pcpBlock->id;
+    CRM_PCP_BAO_PCP::writeRecord($params);
+    $result = \CRM_Contribute_PseudoConstant::pcPage();
+    $this->assertCount(1, $result);
   }
 
 }

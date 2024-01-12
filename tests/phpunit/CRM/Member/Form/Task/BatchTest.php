@@ -35,7 +35,7 @@ class CRM_Member_Form_Task_BatchTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testBatchSubmit() {
+  public function testBatchSubmit(): void {
     $form = $this->getFormObject('CRM_Member_Form_Task_Batch');
     $membership1 = $this->contactMembershipCreate(['contact_id' => $this->individualCreate()]);
     $membership2 = $this->contactMembershipCreate(['contact_id' => $this->individualCreate()]);

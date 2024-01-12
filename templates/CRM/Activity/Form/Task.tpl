@@ -9,7 +9,7 @@
 *}
 {ts 1=$totalSelectedActivities}Number of selected Activities: %1{/ts}
 
-{if $rows }
+{if $rows}
 <div class="form-item">
 <table width="30%">
   <tr class="columnheader">

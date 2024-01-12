@@ -126,10 +126,10 @@ class CiviReportTestCase extends CiviUnitTestCase {
     );
 
     foreach ($actualCsvArray as $intKey => $strVal) {
-      $rowData = var_export(array(
+      $rowData = var_export([
         'expected' => $expectedCsvArray[$intKey],
         'actual' => $actualCsvArray[$intKey],
-      ), TRUE);
+      ], TRUE);
       $this->assertNotNull($expectedCsvArray[$intKey]);
       $this->assertEquals(
         count($actualCsvArray[$intKey]),

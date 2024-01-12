@@ -82,12 +82,12 @@ function dm_install_core() {
   local repo="$1"
   local to="$2"
 
-  for dir in ang css i js PEAR templates bin CRM api extern Reports install mixin settings Civi partials release-notes xml setup sql/civicrm_data ; do
+  for dir in ang css i js PEAR templates bin CRM api extern Reports install managed mixin settings Civi partials release-notes xml setup sql/civicrm_data ; do
     [ -d "$repo/$dir" ] && dm_install_dir "$repo/$dir" "$to/$dir"
   done
 
   dm_install_files "$repo" "$to" {agpl-3.0,agpl-3.0.exception,gpl}.txt
-  dm_install_files "$repo" "$to" composer.json composer.lock package.json Civi.php README.md release-notes.md extension-compatibility.json guzzle_php81_shim.php
+  dm_install_files "$repo" "$to" composer.json composer.lock package.json Civi.php README.md release-notes.md extension-compatibility.json deleted-files-list.json guzzle_php81_shim.php
 
   mkdir -p "$to/sql"
   pushd "$repo" >> /dev/null

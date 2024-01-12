@@ -30,7 +30,7 @@ use Civi\Test\TransactionalInterface;
  */
 class SystemTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testSystemCheck() {
+  public function testSystemCheck(): void {
     $origEnv = \CRM_Core_Config::environment();
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_check', [$this, 'hook_civicrm_check']);

@@ -28,7 +28,7 @@
         </div>
 
         <div class="action-link">
-          {include file="CRM/common/formButtons.tpl" location="top"}
+          {include file="CRM/common/formButtons.tpl" location="top" form=false}
         </div>
     {/if}
     {if NOT ($activeMembers or $inActiveMembers) and $action ne 2 and $action ne 1 and $action ne 8 and $action ne 4 and $action ne 32768}

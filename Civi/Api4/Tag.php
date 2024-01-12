@@ -22,5 +22,6 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class Tag extends Generic\DAOEntity {
+  use Generic\Traits\ManagedEntity;
 
 }

@@ -27,21 +27,49 @@ use api\v4\Api4TestBase;
  */
 class EntityTest extends Api4TestBase {
 
-  public function testEntityGet() {
+  public function testEntityGet(): void {
+    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $result = Entity::get(FALSE)
       ->execute()
       ->indexBy('name');
-    $this->assertArrayHasKey('Entity', $result,
-      "Entity::get missing itself");
+    $this->assertArrayHasKey('Entity', $result, "Entity::get missing itself");
 
-    $this->assertEquals('CRM_Contact_DAO_Contact', $result['Contact']['dao']);
-    $this->assertEquals(['DAOEntity'], $result['Contact']['type']);
-    $this->assertEquals(['id'], $result['Contact']['primary_key']);
-    // Contact icon fields
-    $this->assertEquals(['contact_sub_type:icon', 'contact_type:icon'], $result['Contact']['icon_field']);
+    // Label fields
+    $this->assertEquals('title', $result['Event']['label_field']);
+    // Search fields
+    $this->assertEquals(['sort_name'], $result['Contact']['search_fields']);
+    $this->assertEquals(['title'], $result['Event']['search_fields']);
+    $this->assertEquals(['contact_id.sort_name', 'event_id.title'], $result['Participant']['search_fields']);
   }
 
-  public function testEntity() {
+  public function testContactPseudoEntityGet(): void {
+    $result = Entity::get(FALSE)
+      ->execute()
+      ->indexBy('name');
+
+    foreach (['Contact', 'Individual', 'Organization', 'Household'] as $contactType) {
+      $this->assertEquals('CRM_Contact_DAO_Contact', $result[$contactType]['dao']);
+      $this->assertContains('DAOEntity', $result[$contactType]['type']);
+      $this->assertEquals('display_name', $result[$contactType]['label_field']);
+      $this->assertEquals(['id'], $result[$contactType]['primary_key']);
+      // Contact icon fields
+      $this->assertEquals(['contact_sub_type:icon', 'contact_type:icon'], $result[$contactType]['icon_field']);
+    }
+
+    foreach (['Individual', 'Organization', 'Household'] as $contactType) {
+      $this->assertContains('ContactType', $result[$contactType]['type']);
+      $this->assertEquals($contactType, $result[$contactType]['where']['contact_type']);
+    }
+
+    $this->assertEquals('Individual', $result['Individual']['title']);
+    $this->assertEquals('Individuals', $result['Individual']['title_plural']);
+    $this->assertEquals('Household', $result['Household']['title']);
+    $this->assertEquals('Households', $result['Household']['title_plural']);
+    $this->assertEquals('Organization', $result['Organization']['title']);
+    $this->assertEquals('Organizations', $result['Organization']['title_plural']);
+  }
+
+  public function testEntity(): void {
     $result = Entity::getActions(FALSE)
       ->execute()
       ->indexBy('name');
@@ -51,7 +79,7 @@ class EntityTest extends Api4TestBase {
       "Entity entity has more than basic actions");
   }
 
-  public function testEntityComponent() {
+  public function testEntityComponent(): void {
     \CRM_Core_BAO_ConfigSetting::disableComponent('CiviEvent');
     $result = Entity::get(FALSE)
       ->execute()

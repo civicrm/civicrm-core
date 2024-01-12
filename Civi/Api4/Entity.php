@@ -75,6 +75,11 @@ class Entity extends Generic\AbstractEntity {
       'description' => 'Field to show when displaying a record',
     ],
     [
+      'name' => 'search_fields',
+      'data_type' => 'Array',
+      'description' => 'Fields to show in search context',
+    ],
+    [
       'name' => 'icon_field',
       'data_type' => 'Array',
       'description' => 'Field(s) which contain the icon for a record, listed in order of precedence',
@@ -114,6 +119,11 @@ class Entity extends Generic\AbstractEntity {
       'description' => 'Arguments needed by php action factory functions (used when multiple entities share a class, e.g. CustomValue).',
     ],
     [
+      'name' => 'where',
+      'data_type' => 'Array',
+      'description' => 'Constant values which will be force-set when reading/writing this entity (e.g. [contact_type => Individual])',
+    ],
+    [
       'name' => 'bridge',
       'data_type' => 'Array',
       'description' => 'Connecting fields for EntityBridge types',
@@ -122,6 +132,11 @@ class Entity extends Generic\AbstractEntity {
       'name' => 'ui_join_filters',
       'data_type' => 'Array',
       'description' => 'When joining entities in the UI, which fields should be presented by default in the ON clause',
+    ],
+    [
+      'name' => 'match_fields',
+      'data_type' => 'Array',
+      'description' => 'Combination of fields used for unique matching',
     ],
     [
       'name' => 'group_weights_by',
@@ -155,16 +170,6 @@ class Entity extends Generic\AbstractEntity {
    */
   public static function autocomplete($checkPermissions = TRUE) {
     return (new Generic\AutocompleteAction('Entity', __FUNCTION__))
-      ->setCheckPermissions($checkPermissions);
-  }
-
-  /**
-   * @param bool $checkPermissions
-   * @deprecated
-   * @return Action\Entity\GetLinks
-   */
-  public static function getLinks($checkPermissions = TRUE) {
-    return (new Action\Entity\GetLinks('Entity', __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

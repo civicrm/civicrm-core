@@ -92,8 +92,8 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
     $result = $this->callAPISuccess('mailing', 'create', $params);
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
-    $this->assertRegexp('!>Forward this email written in ckeditor</a>!', $previewResult['values']['body_html']);
-    $this->assertRegexp('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!>Forward this email written in ckeditor</a>!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!<a href="([^"]+)civicrm/mailing/forward&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
@@ -118,19 +118,19 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     parent::testUrlTracking($inputHtml, $htmlUrlRegex, $textUrlRegex, $params);
   }
 
-  public function testBasicHeaders() {
+  public function testBasicHeaders(): void {
     parent::testBasicHeaders();
   }
 
-  public function testText() {
+  public function testText(): void {
     parent::testText();
   }
 
-  public function testHtmlWithOpenTracking() {
+  public function testHtmlWithOpenTracking(): void {
     parent::testHtmlWithOpenTracking();
   }
 
-  public function testHtmlWithOpenAndUrlTracking() {
+  public function testHtmlWithOpenAndUrlTracking(): void {
     parent::testHtmlWithOpenAndUrlTracking();
   }
 
@@ -138,7 +138,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
    * Test to check Activity being created on mailing Job.
    *
    */
-  public function testMailingActivityCreate() {
+  public function testMailingActivityCreate(): void {
     $subject = uniqid('testMailingActivityCreate');
     $this->runMailingSuccess([
       'subject' => $subject,
@@ -170,7 +170,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
     $replyComponent = $this->callAPISuccess('MailingComponent', 'get', ['id' => CRM_Mailing_PseudoConstant::defaultComponent('Reply', ''), 'sequential' => 1])['values'][0];
     $replyComponent['body_html'] .= ' {domain.address} ';
-    $replyComponent['body_txt'] = $replyComponent['body_txt'] ?? '' . ' {domain.address} ';
+    $replyComponent['body_txt'] = ($replyComponent['body_txt'] ?? '') . ' {domain.address} ';
     $this->callAPISuccess('MailingComponent', 'create', $replyComponent);
 
     // Create initial mailing to the group.
@@ -187,8 +187,8 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
     // The following code is exactly the same as runMailingSuccess() except that we store the ID of the mailing.
     $mailing_1 = $this->callAPISuccess('Mailing', 'create', $mailingParams);
-    $mut->assertRecipients(array());
-    $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
+    $mut->assertRecipients([]);
+    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $mut->getAllMessages('ezc');
     $this->assertCount(1, $allMessages);
@@ -300,8 +300,8 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
     // The following code is exactly the same as runMailingSuccess() except that we store the ID of the mailing.
     $mailing_1 = $this->callAPISuccess('mailing', 'create', $mailingParams);
-    $mut->assertRecipients(array());
-    $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
+    $mut->assertRecipients([]);
+    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $mut->getAllMessages('ezc');
     // There are exactly two contacts produced by setUp().
@@ -325,7 +325,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
       'body_text'      => 'Please just {action.unsubscribeUrl}',
     ];
     $this->callAPISuccess('mailing', 'create', $mailingParams);
-    $_ = $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
+    $_ = $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $mut->getAllMessages('ezc');
     // We should have 2+2 messages sent by the mail system now.

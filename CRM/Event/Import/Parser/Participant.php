@@ -21,14 +21,6 @@
 class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   protected $_mapperKeys;
 
-  /**
-   * Array of successfully imported participants id's
-   *
-   * @var array
-   */
-  protected $_newParticipants;
-
-
   protected $_fileName;
 
   /**
@@ -147,8 +139,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
               ];
               CRM_Price_BAO_LineItem::syncLineItems($newParticipant->id, 'civicrm_participant', $newParticipant->fee_amount, $otherParams);
             }
-
-            $this->_newParticipant[] = $newParticipant->id;
             $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant->id);
             return;
           }
@@ -225,25 +215,12 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
           throw new CRM_Core_Exception(ts('Unknown error'));
         }
       }
-
-      if (!(is_array($newParticipant) && civicrm_error($newParticipant))) {
-        $this->_newParticipants[] = $newParticipant['id'] ?? NULL;
-      }
     }
     catch (CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
       return;
     }
     $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant['id']);
-  }
-
-  /**
-   * Get the array of successfully imported Participation ids.
-   *
-   * @return array
-   */
-  public function &getImportedParticipations() {
-    return $this->_newParticipants;
   }
 
   /**

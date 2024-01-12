@@ -42,7 +42,7 @@ class CRM_Report_Form_Contact_LoggingDetailTest extends CiviReportTestCase {
   /**
    * Ensure a missing label name on a DAO won't crash the Logging Detail Report.
    */
-  public function testLabelFieldIsntRequired() {
+  public function testLabelFieldIsntRequired(): void {
     // Create an individual and a contribution in the same database connection (as if a new contact submitted a contribution online).
     $cid = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $cid]);

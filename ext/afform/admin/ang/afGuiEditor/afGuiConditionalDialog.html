@@ -1,0 +1,7 @@
+<div id="bootstrap-theme" class="af-gui-conditional-dialog" crm-dialog="afformGuiConditionalDialog" ng-controller="AfGuiConditionalDialog">
+  <form class="api4-clause-fieldset" ng-if="$ctrl.fieldSelector.length">
+    <label>{{:: ts('Element will be shown if') }}</label>
+    <af-gui-clause clauses="$ctrl.conditions" fields="$ctrl.fieldSelector" field-defns="$ctrl.fieldDefns" op="AND" label="{{:: ts('If') }}" hide-label="true"></af-gui-clause>
+  </form>
+  <crm-dialog-button text="ts('Apply Changes')" icons="{primary: 'fa-check'}" on-click="$ctrl.save()" />
+</div>

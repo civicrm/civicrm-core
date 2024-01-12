@@ -21,15 +21,18 @@ namespace api\v4\Entity;
 use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\Domain;
+use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
+use Civi\Test\EntityTrait;
 use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
 class MembershipTest extends Api4TestBase implements TransactionalInterface {
+  use EntityTrait;
 
-  public function testUpdateWeights() {
+  public function testUpdateWeights(): void {
     $getValues = function($domain) {
       return MembershipType::get(FALSE)
         ->addWhere('domain_id.name', '=', $domain)
@@ -83,6 +86,38 @@ class MembershipTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('rolling', $fields['period_type']['options'][0]['name']);
     $this->assertEquals('rolling', $fields['period_type']['options'][0]['id']);
     $this->assertEquals('Rolling', $fields['period_type']['options'][0]['label']);
+  }
+
+  public function testGetIsMembershipNew() : void {
+    $this->createTestEntity('MembershipType', [
+      'name' => 'General',
+      'duration_unit' => 'year',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'member_of_contact_id' => 1,
+      'domain_id' => 1,
+      'financial_type_id' => 2,
+      'is_active' => 1,
+      'sequential' => 1,
+      'visibility' => 'Public',
+    ]);
+    $this->createTestEntity('Contact', ['first_name', 'Bob', 'contact_type' => 'Individual'], 1);
+    $this->createTestEntity('Contact', ['first_name', 'Bob too', 'contact_type' => 'Individual'], 2);
+    $this->createTestEntity('Membership', [
+      'contact_id' => $this->ids['Contact'][1],
+      'start_date' => 'now',
+      'membership_type_id:name' => 'General',
+      'status_id:name' => 'New',
+    ], 1);
+    $this->createTestEntity('Membership', [
+      'contact_id' => $this->ids['Contact'][2],
+      'start_date' => '4 months ago',
+      'membership_type_id.name' => 'General',
+      'status_id:name' => 'Current',
+    ], 2);
+    $memberships = Membership::get()->addSelect('status_id.is_new')->execute();
+    $this->assertTrue($memberships[0]['status_id.is_new']);
+    $this->assertFalse($memberships[1]['status_id.is_new']);
   }
 
 }

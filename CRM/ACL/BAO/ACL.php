@@ -222,31 +222,13 @@ SELECT count( a.id )
    * @return null|string
    */
   public static function whereClause($type, &$tables, &$whereTables, $contactID = NULL) {
-    $acls = CRM_ACL_BAO_Cache::build($contactID);
 
     $whereClause = NULL;
     $allInclude = $allExclude = FALSE;
     $clauses = [];
 
-    if (!empty($acls)) {
-      $aclKeys = array_keys($acls);
-      $aclKeys = implode(',', $aclKeys);
-      $orderBy = 'a.object_id';
-      if (array_key_exists('priority', CRM_ACL_BAO_ACL::getSupportedFields())) {
-        $orderBy .= ',a.priority';
-      }
-      $query = "
-SELECT   a.operation, a.object_id,a.deny
-  FROM   civicrm_acl_cache c, civicrm_acl a
- WHERE   c.acl_id       =  a.id
-   AND   a.is_active    =  1
-   AND   a.object_table = 'civicrm_group'
-   AND   a.id        IN ( $aclKeys )
-ORDER BY {$orderBy}
-";
-
-      $dao = CRM_Core_DAO::executeQuery($query);
-
+    $dao = self::getOrderedActiveACLs($contactID, 'civicrm_group');
+    if ($dao !== NULL) {
       // do an or of all the where clauses u see
       $ids = $excludeIds = [];
       while ($dao->fetch()) {
@@ -277,8 +259,11 @@ ORDER BY {$orderBy}
         $ids = [];
         $clauses[] = self::getGroupClause($excludeIds, 'NOT IN');
       }
-      if (!empty($ids)) {
+      if (!empty($ids) && !$allInclude) {
         $clauses[] = self::getGroupClause($ids, 'IN');
+      }
+      elseif ($allInclude && empty($excludeIds)) {
+        $clauses[] = ' ( 1 ) ';
       }
     }
 
@@ -451,52 +436,71 @@ ORDER BY {$orderBy}
    */
   protected static function loadPermittedIDs(int $contactID, string $tableName, int $type, $allGroups): array {
     $ids = [];
-    $acls = CRM_ACL_BAO_Cache::build($contactID);
-    $aclKeys = array_keys($acls);
-    $aclKeys = implode(',', $aclKeys);
-    $orderBy = 'a.object_id';
-    if (array_key_exists('priority', CRM_ACL_BAO_ACL::getSupportedFields())) {
-      $orderBy .= ',a.priority';
+    $dao = self::getOrderedActiveACLs($contactID, $tableName);
+    if ($dao !== NULL) {
+      while ($dao->fetch()) {
+        if ($dao->object_id) {
+          if (self::matchType($type, $dao->operation)) {
+            if (!$dao->deny) {
+              $ids[] = $dao->object_id;
+            }
+            else {
+              $ids = array_diff($ids, [$dao->object_id]);
+            }
+          }
+        }
+        else {
+          // this user has got the permission for all objects of this type
+          // check if the type matches
+          if (self::matchType($type, $dao->operation)) {
+            if (!$dao->deny) {
+              foreach ($allGroups as $id => $dontCare) {
+                $ids[] = $id;
+              }
+            }
+            else {
+              $ids = array_diff($ids, array_keys($allGroups));
+            }
+          }
+        }
+      }
     }
-    $query = "
-SELECT   a.operation,a.object_id,a.deny
+    return $ids;
+  }
+
+  /**
+   * Execute a query to find active ACLs for a contact, ordered by priority (if supported) and object ID.
+   * The query returns the 'operation', 'object_id' and 'deny' properties.
+   * Returns NULL if CRM_ACL_BAO_Cache::build (effectively, CRM_ACL_BAO_ACL::getAllByContact)
+   * returns no ACLs (active or not) for the contact.
+   *
+   * @param string $contactID
+   * @param string $tableName
+   * @return NULL|CRM_Core_DAO|object
+   */
+  private static function getOrderedActiveACLs(string $contactID, string $tableName) {
+    $dao = NULL;
+    $acls = CRM_ACL_BAO_Cache::build($contactID);
+    if (!empty($acls)) {
+      $aclKeys = array_keys($acls);
+      $aclKeys = implode(',', $aclKeys);
+      $orderBy = 'a.object_id';
+      if (array_key_exists('priority', CRM_ACL_BAO_ACL::getSupportedFields())) {
+        $orderBy = "a.priority, $orderBy";
+      }
+      $query = "
+SELECT   a.operation, a.object_id, a.deny
   FROM   civicrm_acl_cache c, civicrm_acl a
  WHERE   c.acl_id       =  a.id
    AND   a.is_active    =  1
    AND   a.object_table = %1
-   AND   a.id        IN ( $aclKeys )
+   AND   a.id        IN ({$aclKeys})
 ORDER BY {$orderBy}
 ";
-    $params = [1 => [$tableName, 'String']];
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    while ($dao->fetch()) {
-      if ($dao->object_id) {
-        if (self::matchType($type, $dao->operation)) {
-          if (!$dao->deny) {
-            $ids[] = $dao->object_id;
-          }
-          else {
-            $ids = array_diff($ids, [$dao->object_id]);
-          }
-        }
-      }
-      else {
-        // this user has got the permission for all objects of this type
-        // check if the type matches
-        if (self::matchType($type, $dao->operation)) {
-          if (!$dao->deny) {
-            foreach ($allGroups as $id => $dontCare) {
-              $ids[] = $id;
-            }
-          }
-          else {
-            $ids = array_diff($ids, array_keys($allGroups));
-          }
-        }
-        break;
-      }
+      $params = [1 => [$tableName, 'String']];
+      $dao = CRM_Core_DAO::executeQuery($query, $params);
     }
-    return $ids;
+    return $dao;
   }
 
   private static function getGroupClause(array $groupIDs, string $operation): string {
@@ -509,7 +513,7 @@ SELECT g.*
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
     $foundGroupIDs = [];
-    $groupContactCacheClause = FALSE;
+    $groupContactCacheClause = '';
     while ($dao->fetch()) {
       $foundGroupIDs[] = $dao->id;
       if (($dao->saved_search_id || $dao->children || $dao->parents)) {
@@ -520,7 +524,7 @@ SELECT g.*
       }
     }
 
-    if ($groupIDs) {
+    if ($foundGroupIDs) {
       return "(
         `contact_a`.id $operation (
          SELECT contact_id FROM civicrm_group_contact WHERE group_id IN (" . implode(', ', $foundGroupIDs) . ") AND status = 'Added'
@@ -528,7 +532,12 @@ SELECT g.*
          )
       )";
     }
-    return '';
+    else {
+      // Edge case avoiding SQL syntax error if no $foundGroupIDs
+      return "(
+        `contact_a`.id $operation (0)
+      )";
+    }
   }
 
   public static function getObjectTableOptions(): array {

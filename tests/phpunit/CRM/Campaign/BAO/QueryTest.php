@@ -18,7 +18,7 @@
  */
 class CRM_Campaign_BAO_QueryTest extends CiviUnitTestCase {
 
-  public function testCampaignVoterClause() {
+  public function testCampaignVoterClause(): void {
     $loggedInContact = $this->createLoggedInUser();
     $contact = $this->individualCreate();
     $activityType = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'survey');

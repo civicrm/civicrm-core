@@ -42,9 +42,7 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreatePaymentToken(): void {
-    $description = 'Create a payment token - Note use of relative dates here:
-      @link http://www.php.net/manual/en/datetime.formats.relative.php.';
-    $result = $this->callAPIAndDocument('payment_token', 'create', $this->params, __FUNCTION__, __FILE__, $description);
+    $result = $this->callAPISuccess('payment_token', 'create', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->params, $result['id'], 'payment_token', TRUE);
@@ -59,7 +57,7 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
    */
   public function testGetPaymentToken(): void {
     $this->callAPISuccess('payment_token', 'create', $this->params);
-    $result = $this->callAPIAndDocument('payment_token', 'get', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('payment_token', 'get', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
@@ -75,7 +73,7 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
     $this->callAPISuccess('payment_token', 'create', $this->params);
     $entity = $this->callAPISuccess('payment_token', 'get', ($this->params));
     $delete = ['id' => $entity['id']];
-    $this->callAPIAndDocument('payment_token', 'delete', $delete, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('payment_token', 'delete', $delete);
 
     $checkDeleted = $this->callAPISuccess('payment_token', 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);

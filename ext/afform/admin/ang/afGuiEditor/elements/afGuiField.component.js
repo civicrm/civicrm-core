@@ -47,12 +47,33 @@
             inputTypes.push(type);
           }
         });
+        // Quick-add links for autocompletes
+        this.quickAddLinks = [];
+        let allowedEntity = (ctrl.getFkEntity() || {}).entity;
+        let allowedEntities = (allowedEntity === 'Contact') ? ['Individual', 'Household', 'Organization'] : [allowedEntity];
+        (CRM.config.quickAdd || []).forEach((link) => {
+          if (allowedEntities.includes(link.entity)) {
+            this.quickAddLinks.push({
+              id: link.path,
+              icon: link.icon,
+              text: link.title,
+            });
+          }
+        });
         this.searchOperators = CRM.afAdmin.search_operators;
         // If field has limited operators, set appropriately
         if (ctrl.fieldDefn.operators && ctrl.fieldDefn.operators.length) {
           this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
         }
         setDateOptions();
+
+        if (ctrl.getDefn().input_type == 'Date') {
+          if (!getSet('default_date_type')) {
+            ctrl.defaultDateType = getSet('default_date_type', 'fixed');
+          } else {
+            ctrl.defaultDateType = getSet("default_date_type");
+          }
+        }
       };
 
       this.getFkEntity = function() {
@@ -124,7 +145,7 @@
 
       $scope.hasOptions = function() {
         var inputType = $scope.getProp('input_type');
-        return _.contains(['CheckBox', 'Radio', 'Select'], inputType) && !(inputType === 'CheckBox' && !ctrl.getDefn().options);
+        return _.contains(['CheckBox', 'Radio', 'Select'], inputType) && !(inputType === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean');
       };
 
       this.getOptions = function() {
@@ -142,7 +163,7 @@
           }
           return entityRefOptions;
         }
-        return ctrl.getDefn().options || ($scope.getProp('input_type') === 'CheckBox' ? null : yesNo);
+        return ctrl.getDefn().options || (ctrl.getDefn().data_type === 'Boolean' ? yesNo : null);
       };
 
       $scope.resetOptions = function() {
@@ -181,6 +202,7 @@
             return !(defn.options || defn.data_type === 'Boolean');
 
           case 'DisplayOnly':
+          case 'Hidden':
             return true;
 
           default:
@@ -266,6 +288,10 @@
         }
       };
 
+      $scope.setDefaultDateType = function() {
+        ctrl.defaultDateType = getSet('default_date_type');
+      };
+
       $scope.defaultValueContains = function(val) {
         val = '' + val;
         var defaultVal = getSet('afform_default');
@@ -276,6 +302,7 @@
         val = '' + val;
         if (defaultValueShouldBeArray()) {
           if (!_.isArray(getSet('afform_default'))) {
+            ctrl.node.defn = ctrl.node.defn || {};
             ctrl.node.defn.afform_default = [];
           }
           if (_.includes(ctrl.node.defn.afform_default, val)) {
@@ -340,6 +367,10 @@
             if (ctrl.node.defn && ctrl.node.defn.input_attrs && 'multiple' in ctrl.node.defn.input_attrs && !ctrl.canBeMultiple()) {
               delete ctrl.node.defn.input_attrs.multiple;
               clearOut(ctrl.node, ['defn', 'input_attrs']);
+            }
+            // Boolean checkbox has no options
+            if (val === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean' && ctrl.node.defn) {
+              delete ctrl.node.defn.options;
             }
           }
           setFieldDefn();

@@ -48,7 +48,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
       }
       $name = $fieldDAO->field_name;
 
-      if ($fieldDAO->field_name == 'phone_and_ext') {
+      if ($fieldDAO->field_name === 'phone_and_ext') {
         $name = 'phone';
       }
 
@@ -85,7 +85,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
 
       $fieldArray[$name] = $fields[$name];
 
-      if ($fieldDAO->field_name == 'phone_and_ext') {
+      if ($fieldDAO->field_name === 'phone_and_ext') {
         $phoneExtField = str_replace('phone', 'phone_ext', $name);
         $fieldArray[$phoneExtField] = $fields[$phoneExtField];
       }

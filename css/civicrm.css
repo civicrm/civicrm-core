@@ -1863,8 +1863,10 @@ input.crm-form-entityref {
 
 .crm-container .crm-submit-buttons,
 .crm-container .action-link {
-  height: 27px;
   margin: 4px 0 4px 2px;
+}
+.crm-container .action-link {
+  height: 27px;
 }
 
 .crm-container .register_link-top {
@@ -1902,9 +1904,7 @@ input.crm-form-entityref {
   text-decoration: none;
   cursor: pointer;
   border: 1px solid #3e3e3e;
-  display: block;
-  float: left;
-  overflow: hidden;
+  display: inline-block;
   line-height: 135%;
   border-radius: 3px;
 }
@@ -2194,6 +2194,23 @@ div.crm-master-accordion-header a.helpicon {
 
 /* Specific types of headers */
 
+.crm-container summary { /* default summary setting*/
+  display: list-item;
+  list-style: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.5rem;
+  font-weight: bold;
+}
+
+.crm-container table summary { /* Makes summary match the size of the rest of the table it's in */
+  font-size: inherit;
+}
+
+.crm-container summary::-webkit-details-marker { /* Safari fix to remove summary icon */
+  display: none;
+}
+
 #crm-container .widget-content .crm-accordion-header {
   background-color: #efefe5;
   color: #080808;
@@ -2205,24 +2222,37 @@ div.crm-master-accordion-header a.helpicon {
   color: #3e3e3e;
 }
 
-.crm-container .crm-accordion-header {
+.crm-container details .crm-accordion-body {
+  display: block; /* Fix for old JS trying to hide crm-accordion-body */
+}
+
+.crm-container .crm-accordion-header,
+.crm-container .collapsed .crm-accordion-header,
+.crm-container .crm-accordion-bold > summary,
+.crm-container details > .crm-accordion-header { /* applies civi's default accordion header to summary & .crm-accrdion-bold */
   color: #f5f6f1;
   font-weight: normal;
   padding: 4px 8px;
   background-color: #5d677b;
-  border-radius: 4px 4px 0 0;
-}
-
-.crm-container .collapsed .crm-accordion-header {
   border-radius: 4px;
 }
 
-.crm-container .crm-accordion-header.active {
+.crm-container div.crm-accordion-header,
+.crm-container details[open] > .crm-accordion-header,
+.crm-container .crm-accordion-bold[open] > summary { /* open version of that */
+  border-radius: 4px 4px 0 0;
+}
+
+.crm-container .crm-accordion-header.active,
+.crm-container .crm-accordion-bold > summary.active { /* active version of that */
   font-weight: bold;
   background-color: #3e3e3e;
 }
 
-.crm-container .crm-accordion-header:hover {
+.crm-container .crm-accordion-header:hover,
+.crm-container .crm-accordion-header:focus,
+.crm-container .crm-accordion-bold > summary:hover,
+.crm-container .crm-accordion-bold > summary:focus { /* hover version of that */
   background-color: #2f2f2e;
 }
 
@@ -2230,8 +2260,10 @@ div.crm-master-accordion-header a.helpicon {
   background-color: #e8e8de;
 }
 
-.crm-container .crm-accordion-wrapper .crm-master-accordion-header {
+.crm-container .crm-accordion-wrapper .crm-master-accordion-header,
+.crm-container .crm-accordion-light > summary { /* adds a utility class to match civi's transparent accordion header style */
   background-color: transparent;
+  font-weight: normal;
   color: #3e3e3e;
 }
 
@@ -2240,23 +2272,34 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 .crm-container .crm-master-accordion-header.crm-accordion-header:hover,
-.crm-container .crm-collapsible .collapsible-title:hover {
+.crm-container .crm-accordion-light > summary:hover,
+.crm-container .crm-collapsible .collapsible-title:hover,
+.crm-container .crm-master-accordion-header.crm-accordion-header:focus,
+.crm-container .crm-accordion-light > summary:focus,
+.crm-container .crm-collapsible .collapsible-title:focus { /* hover state for this */
   color: #121a2d;
 }
 
-.crm-container .collapsed .crm-accordion-body,
+.crm-container div.collapsed .crm-accordion-body,
+.crm-container fieldset.collapsed .crm-accordion-body,
 .crm-container .crm-collapsible.collapsed .collapsible-title + * {
   display: none;
+}
+
+.crm-container details details {
+  padding: 0 0.25rem; /* adds padding for nested accordions */
 }
 
 /* Collapse icon */
 
 /* General icon settings for all collapsible things */
-.crm-container .crm-accordion-header:before,
+.crm-container div.crm-accordion-header:before,
+.crm-container .collapsed div.crm-accordion-header:before,
 .crm-container .crm-collapsible .collapsible-title:before,
 .crm-container span.collapsed:before,
 .crm-container a.collapsed:before,
-.crm-container .crm-expand-row:before {
+.crm-container .crm-expand-row:before,
+.crm-container details > summary:before {
   font-family: "FontAwesome";
   display: inline-block;
   width: 1em;
@@ -2264,28 +2307,21 @@ div.crm-master-accordion-header a.helpicon {
   font-size: 13px;
 }
 
-/* Collapsed icon */
-.crm-container .collapsed .crm-accordion-header:before,
-.crm-container .crm-collapsible.collapsed .collapsible-title:before,
-.crm-container span.collapsed:before,
-.crm-container a.collapsed:before,
-.crm-container .crm-expand-row:before {
-  content: "\f0da";
-}
-
 /* Expanded icon */
-.crm-container .crm-accordion-header:before,
+.crm-container div.crm-accordion-header:before,
 .crm-container .crm-collapsible .collapsible-title:before,
 .crm-container span.expanded:before,
 .crm-container a.expanded:before,
-.crm-container .crm-expand-row.expanded:before {
+.crm-container .crm-expand-row.expanded:before,
+.crm-container details[open] > summary:before {
   font-family: "FontAwesome";
   content: "\f0d7";
 }
 
 /* Accordion bodies */
 
-.crm-container .crm-accordion-body {
+.crm-container .crm-accordion-wrapper .crm-accordion-body,
+.crm-container details.crm-accordion-bold .crm-accordion-body {
   border-radius: 0 0 4px 4px;
   border: 1px solid #70716b;
   border-top: 0;
@@ -2296,13 +2332,15 @@ div.crm-master-accordion-header a.helpicon {
   border-color: #e8e8de;
 }
 
-.crm-container .crm-master-accordion-header+.crm-accordion-body {
+.crm-container .crm-master-accordion-header+.crm-accordion-body,
+.crm-accordion-wrapper.crm-accordion-light {
   border: none;
   padding: 0;
 }
 
 #crm-container .widget-content .crm-accordion-body,
-.crm-container .crm-accordion-body.padded {
+.crm-container .crm-accordion-body.padded,
+.crm-container details.padded {
   padding-left: .5em;
   padding-right: .5em;
 }
@@ -3931,4 +3969,21 @@ span.crm-status-icon {
 }
 .dedupe-rules-dialog label > * {
   margin-left: 30px;
+}
+
+/* Standalone-only styles. A minimal set to make it usable out-of-the-box. */
+html.crm-standalone body {
+  --sa-font-family: sans-serif;
+  --roundness: 3px;
+  --error-colour: #a00;
+  --warning-colour: #fbb862;
+  --success-colour: #86c66c;
+  --label-colour: #464354;
+  --background-colour: rgb(242,242,237);
+  --box-padding: 1.6rem;
+  --box-background: #fff;
+  margin: 0;
+  padding: 0;
+  font-family: var(--sa-font-family);
+  background-color: var(--background-colour);
 }

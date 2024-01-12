@@ -41,6 +41,19 @@ abstract class CRM_Financial_BAO_ExportFormat {
   public $_isDownloadFile;
 
   /**
+   * BatchIds to be exported
+   * @var string
+   */
+  public $_batchIds;
+
+
+  /**
+   * Files to be downloaded
+   * @var array
+   */
+  public $_downloadFile;
+
+  /**
    * Class constructor.
    */
   public function __construct() {

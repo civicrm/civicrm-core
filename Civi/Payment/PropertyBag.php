@@ -162,7 +162,7 @@ class PropertyBag implements \ArrayAccess {
   public function offsetExists ($offset): bool {
     $prop = $this->handleLegacyPropNames($offset, TRUE);
     // If there's no prop, assume it's a custom property.
-    $prop = $prop ?? $offset;
+    $prop ??= $offset;
     return array_key_exists($prop, $this->props['default']);
   }
 

@@ -121,6 +121,21 @@ trait ACLPermissionTrait {
   }
 
   /**
+   * Only specified contact returned.
+   *
+   * @implements CRM_Utils_Hook::aclWhereClause
+   *
+   * @param $type
+   * @param $tables
+   * @param $whereTables
+   * @param $contactID
+   * @param $where
+   */
+  public function aclWhereMultipleContacts($type, &$tables, &$whereTables, &$contactID, &$where) {
+    $where = " contact_a.id IN (" . implode(', ', $this->allowedContacts) . ")";
+  }
+
+  /**
    * Set up a core ACL.
    *
    * It is recommended that this helper function is accessed through a scenario function.

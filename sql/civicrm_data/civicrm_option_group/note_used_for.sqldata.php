@@ -9,4 +9,6 @@ return CRM_Core_CodeGen_OptionGroup::create('note_used_for', 'a/0047')
     [ts('Relationships'), 'Relationship', 'civicrm_relationship'],
     [ts('Participants'), 'Participant', 'civicrm_participant'],
     [ts('Contributions'), 'Contribution', 'civicrm_contribution'],
+    // Notes can be attached to notes as comments
+    [ts('Notes'), 'Note', 'civicrm_note'],
   ]);

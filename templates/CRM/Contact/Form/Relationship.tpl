@@ -60,7 +60,7 @@
       <div class="spacer"></div>
     </div>
   {/if}
-  {if ($action EQ 1) OR ($action EQ 2) }
+  {if ($action EQ 1) OR ($action EQ 2)}
     {*include custom data js file *}
     {include file="CRM/common/customData.tpl"}
     <script type="text/javascript">

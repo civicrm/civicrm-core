@@ -46,7 +46,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    * @throws \CRM_Core_Exception
    */
-  public function testSinglePayment() {
+  public function testSinglePayment(): void {
     $this->setupMockHandler();
     $params = $this->getBillingParams();
     $params['amount'] = 5.24;
@@ -59,7 +59,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    *
    * Test works but not both due to some form of caching going on in the SmartySingleton
    */
-  public function testCreateSingleNowDated() {
+  public function testCreateSingleNowDated(): void {
     $this->isRecur = TRUE;
     $this->setupMockHandler();
     $firstName = 'John';
@@ -101,7 +101,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     $params = array_merge($billingParams, [
       'qfKey' => '08ed21c7ca00a1f7d32fff2488596ef7_4454',
-      'hidden_CreditCard' => 1,
       'is_recur' => 1,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
@@ -181,7 +180,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   /**
    * Create a single post dated payment as a recurring transaction.
    */
-  public function testCreateSinglePostDated() {
+  public function testCreateSinglePostDated(): void {
     $this->isRecur = TRUE;
     $this->setupMockHandler();
     $start_date = date('Ymd', strtotime('+ 1 week'));
@@ -226,7 +225,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     $params = [
       'qfKey' => '00ed21c7ca00a1f7d555555596ef7_4454',
-      'hidden_CreditCard' => 1,
       'billing_first_name' => $firstName,
       'billing_middle_name' => '',
       'billing_last_name' => $lastName,
@@ -400,7 +398,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   /**
    * Test the update billing function.
    */
-  public function testUpdateBilling() {
+  public function testUpdateBilling(): void {
     $this->setUpClient($this->getExpectedUpdateResponse());
     $params = [
       'qfKey' => '52e3078a34158a80b18d0e3c690c5b9f_2369',
@@ -437,7 +435,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function testChangeSubscription() {
+  public function testChangeSubscription(): void {
     $this->setUpClient($this->getExpectedUpdateResponse());
     $params = [
       'hidden_custom' => '1',
@@ -579,7 +577,7 @@ Content-Length: 492
   /**
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function testCancelRecurring() {
+  public function testCancelRecurring(): void {
     $this->setUpClient($this->getExpectedCancelResponse());
     $propertyBag = new PropertyBag();
     $propertyBag->setContributionRecurID(9);

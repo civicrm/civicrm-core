@@ -33,7 +33,7 @@ class SimpleFilterTest extends \CiviUnitTestCase {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
-      $manager->install(array('org.civicrm.flexmailer'));
+      $manager->install(['org.civicrm.flexmailer']);
     }
 
     parent::setUp();
@@ -49,10 +49,7 @@ class SimpleFilterTest extends \CiviUnitTestCase {
     SimpleFilter::byValue($e, 'text', function ($value, $t, $e) use ($test) {
       $test->assertInstanceOf('Civi\FlexMailer\FlexMailerTask', $t);
       $test->assertInstanceOf('Civi\FlexMailer\Event\ComposeBatchEvent', $e);
-      $test->assertTrue(in_array($value, array(
-        'eat more cheese',
-        'eat more ice cream',
-      )));
+      $test->assertTrue(in_array($value, ['eat more cheese', 'eat more ice cream']));
       return preg_replace('/more/', 'thoughtfully considered quantities of', $value);
     });
 
@@ -83,15 +80,15 @@ class SimpleFilterTest extends \CiviUnitTestCase {
    * @return array
    */
   protected function createExampleBatch() {
-    $tasks = array();
+    $tasks = [];
     $tasks[0] = new FlexMailerTask(1000, 2000, 'asdf', 'foo@example.org');
     $tasks[1] = new FlexMailerTask(1001, 2001, 'fdsa', 'bar@example.org');
 
-    $e = new ComposeBatchEvent(array(), $tasks);
+    $e = new ComposeBatchEvent([], $tasks);
 
     $tasks[0]->setMailParam('text', 'eat more cheese');
     $tasks[1]->setMailParam('text', 'eat more ice cream');
-    return array($tasks, $e);
+    return [$tasks, $e];
   }
 
 }

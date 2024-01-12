@@ -21,6 +21,7 @@ use Civi\Api4\FinancialType;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
 use Civi\Api4\PriceFieldValue;
+use Civi\Test\FormTrait;
 
 /**
  *  Test CRM_Member_Form_Membership functions.
@@ -32,6 +33,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_OrderTrait;
   use CRMTraits_Financial_PriceSetTrait;
+  use FormTrait;
 
   /**
    * @var int
@@ -295,7 +297,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testFormRulePermanentOverrideWithNoStatus() {
+  public function testFormRulePermanentOverrideWithNoStatus(): void {
     $params = [
       'join_date' => date('Y-m-d'),
       'membership_type_id' => [$this->ids['contact']['organization'], $this->ids['membership_type']['AnnualFixed']],
@@ -308,7 +310,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->assertTrue(array_key_exists('status_id', $rc));
   }
 
-  public function testFormRuleUntilDateOverrideWithValidOverrideEndDate() {
+  public function testFormRuleUntilDateOverrideWithValidOverrideEndDate(): void {
     $params = [
       'join_date' => date('Y-m-d'),
       'membership_type_id' => [$this->ids['contact']['organization'], $this->ids['membership_type']['AnnualFixed']],
@@ -364,7 +366,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    * Test CRM_Member_Form_Membership::formRule() with a join date of today and a rolling membership type.
    */
-  public function testFormRuleRollingJoinToday() {
+  public function testFormRuleRollingJoinToday(): void {
     $params = [
       'join_date' => date('Y-m-d'),
       'start_date' => '',
@@ -383,7 +385,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of one month ago and a rolling membership type
    */
-  public function testFormRuleRollingJoin1MonthAgo() {
+  public function testFormRuleRollingJoin1MonthAgo(): void {
     $unixNow = time();
     $unix1MAgo = $unixNow - (31 * 24 * 60 * 60);
     $params = [
@@ -403,7 +405,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    *  Test CRM_Member_Form_Membership::formRule() with a join date of six months ago and a rolling membership type.
    */
-  public function testFormRuleRollingJoin6MonthsAgo() {
+  public function testFormRuleRollingJoin6MonthsAgo(): void {
     $unixNow = time();
     $unix6MAgo = $unixNow - (180 * 24 * 60 * 60);
     $params = [
@@ -424,7 +426,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of one year+ ago and a rolling membership type
    */
-  public function testFormRuleRollingJoin1YearAgo() {
+  public function testFormRuleRollingJoin1YearAgo(): void {
     $unixNow = time();
     $unix1YAgo = $unixNow - (370 * 24 * 60 * 60);
     $params = [
@@ -445,7 +447,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Test CRM_Member_Form_Membership::formRule() with a join date
    *  of two years ago and a rolling membership type
    */
-  public function testFormRuleRollingJoin2YearsAgo() {
+  public function testFormRuleRollingJoin2YearsAgo(): void {
     $unixNow = time();
     $unix2YAgo = $unixNow - (2 * 365 * 24 * 60 * 60);
     $params = [
@@ -467,7 +469,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * The setup is a join date of six months ago and a fixed membership type.
    */
-  public function testFormRuleFixedJoin6MonthsAgo() {
+  public function testFormRuleFixedJoin6MonthsAgo(): void {
     $unixNow = time();
     $unix6MAgo = $unixNow - (180 * 24 * 60 * 60);
     $params = [
@@ -536,6 +538,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $form->buildForm();
     $form->postProcess();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $this->assertEquals($form->getMembershipID(), $membership['id']);
     $membershipEndYear = date('Y') + 1;
     if (date('m-d') === '12-31') {
       // If you join on Dec 31, then the first term would end right away, so
@@ -798,21 +801,18 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // Step 2: submit the other half of the partial payment
     //  via AdditionalPayment form to complete the related contribution
-    $form = new CRM_Contribute_Form_AdditionalPayment();
-    $submitParams = [
-      'contribution_id' => $contribution['contribution_id'],
-      'contact_id' => $this->_individualId,
-      'total_amount' => $this->formatMoneyInput(25),
-      'currency' => 'USD',
-      'financial_type_id' => 2,
-      'receive_date' => '2015-04-21 23:27:00',
+    $this->getTestForm('CRM_Contribute_Form_AdditionalPayment', [
+      'total_amount' => 150.00,
       'trxn_date' => '2017-04-11 13:05:11',
-      'payment_processor_id' => 0,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments, TRUE),
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', 'Check'),
       'check_number' => 'check-12345',
-    ];
-    $form->cid = $this->_individualId;
-    $form->testSubmit($submitParams);
+      'trxn_id' => '',
+      'currency' => 'USD',
+      'fee_amount' => '',
+      'net_amount' => '',
+      'payment_processor_id' => 0,
+      'contact_id' => $this->_individualId,
+    ], ['id' => $contribution['id']])->processForm();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     // check the membership status after additional payment, if its changed to 'New'
     $this->assertEquals(array_search('New', CRM_Member_PseudoConstant::membershipStatus(), TRUE), $membership['status_id']);
@@ -1109,7 +1109,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // Check if Membership is updated to New.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
-    $this->assertEquals($membership['status_id'], array_search('New', $memStatus));
+    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
   }
 
   /**
@@ -1318,7 +1318,7 @@ Expires: ',
     $discountedItems = 0;
     foreach ($lineItemResult['values'] as $lineItem) {
       $this->assertEquals(round($lineItem['line_total'] * .1, 2), $lineItem['tax_amount']);
-      if (CRM_Utils_String::startsWith($lineItem['label'], 'Long Haired Goat')) {
+      if (str_starts_with($lineItem['label'], 'Long Haired Goat')) {
         $this->assertEquals(15.0, $lineItem['line_total']);
         $this->assertEquals('Long Haired Goat - one leg free!', $lineItem['label']);
         $discountedItems++;
@@ -1511,7 +1511,7 @@ Expires: ',
       'price_' . $fieldOption['price_field_id'] => $fieldOption['id'],
       'total_amount' => 55,
       'receive_date' => date('Y-m-d') . ' 20:36:00',
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments, TRUE),
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       //Member dues, see data.xml
       'financial_type_id' => 2,
@@ -1648,16 +1648,15 @@ Expires: ',
       'contact_id' => $this->_individualId,
     ]);
     $endDate = (new DateTime(date('Y-m-d')))->modify('+3 years')->modify('-1 day');
-    $endDate = $endDate->format("Y-m-d");
+    $endDate = $endDate->format('Y-m-d');
 
     $this->assertEquals($endDate, $membership['end_date'], 'Membership Expiration Date should be ' . $endDate);
-    $this->assertEquals(1, count($contribution['values']), 'Pending contribution should be created.');
+    $this->assertCount(1, $contribution['values'], 'Pending contribution should be created.');
     $contribution = $contribution['values'][$contribution['id']];
-    $additionalPaymentForm = new CRM_Contribute_Form_AdditionalPayment();
-    $additionalPaymentForm->testSubmit([
+    $this->getTestForm('CRM_Contribute_Form_AdditionalPayment', [
       'total_amount' => 150.00,
-      'trxn_date' => date("Y-m-d H:i:s"),
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'trxn_date' => date('Y-m-d H:i:s'),
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialTrxn', 'payment_instrument_id', 'Check'),
       'check_number' => 'check-12345',
       'trxn_id' => '',
       'currency' => 'USD',
@@ -1666,8 +1665,7 @@ Expires: ',
       'net_amount' => '',
       'payment_processor_id' => 0,
       'contact_id' => $this->_individualId,
-      'contribution_id' => $contribution['id'],
-    ]);
+    ], ['id' => $contribution['id']])->processForm();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'contact_id' => $this->_individualId,
@@ -1740,7 +1738,7 @@ Expires: ',
     $membershipViewForm->preProcess();
 
     // Get contribution rows related to membership payments.
-    $templateVar = $membershipViewForm::getTemplate()->get_template_vars('rows');
+    $templateVar = $membershipViewForm::getTemplate()->getTemplateVars('rows');
 
     $this->assertEquals($templateVar[0]['contribution_id'], $contribution1->id);
     $this->assertEquals($templateVar[0]['contact_id'], $contactId2);

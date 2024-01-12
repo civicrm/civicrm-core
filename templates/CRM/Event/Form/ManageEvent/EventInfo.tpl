@@ -10,10 +10,6 @@
 {* Step 1 of New Event Wizard, and Edit Event Info form. *}
 
 <div class="crm-block crm-form-block crm-event-manage-eventinfo-form-block">
-  {assign var=eventID value=$id}
-  <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl" location="top"}
-  </div>
   <table class="form-layout-compressed">
     {if !empty($form.template_id)}
       <tr class="crm-event-manage-eventinfo-form-block-template_id">
@@ -42,7 +38,7 @@
       </td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-participant_listing_id">
-      <td class="label">{$form.participant_listing_id.label} {help id="id-listing" isTemplate=$isTemplate action=$action entityId=$entityId}</td>
+      <td class="label">{$form.participant_listing_id.label} {help id="id-listing" isTemplate=$isTemplate action=$action entityId=$eventID}</td>
       <td>{$form.participant_listing_id.html}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-title">
@@ -71,7 +67,7 @@
       <td class="label">{$form.max_participants.label} {help id="id-max_participants" waitlist=$waitlist}</td>
       <td>
         {$form.max_participants.html|crmAddClass:four}
-        {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+        {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
           <a class="crm-popup crm-hover-button" target="_blank" title="{ts}Edit Participant Status Options{/ts}" href="{crmURL p='civicrm/admin/participant_status' q='reset=1'}"><i class="crm-i fa-wrench" aria-hidden="true"></i></a>
         {/if}
       </td>
@@ -109,6 +105,10 @@
       <td>&nbsp;</td>
       <td>{$form.is_active.html} {$form.is_active.label}</td>
     </tr>
+    <tr class="crm-event-manage-eventinfo-form-block-is_show_calendar_links">
+      <td>&nbsp;</td>
+      <td>{$form.is_show_calendar_links.html} {$form.is_show_calendar_links.label}</td>
+    </tr>
 
     {if $eventID AND !$isTemplate}
       <tr class="crm-event-manage-eventinfo-form-block-info_link">
@@ -124,7 +124,7 @@
       </tr>
     {/if}
   </table>
-  {include file="CRM/common/customDataBlock.tpl"}
+  {include file="CRM/common/customDataBlock.tpl" entityID=$eventID}
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>

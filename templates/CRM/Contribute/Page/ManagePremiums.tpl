@@ -43,13 +43,13 @@
            </tr>
           </thead>
         {foreach from=$rows item=row}
-        <tr id="product-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
-          <td class="crm-contribution-form-block-name crm-editable" data-field="name">{$row.name}</td>
-          <td class="crm-contribution-form-block-sku crm-editable" data-field="sku">{$row.sku}</td>
+        <tr id="product-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+          <td class="crm-contribution-form-block-name crm-editable" data-field="name">{$row.name|escape}</td>
+          <td class="crm-contribution-form-block-sku crm-editable" data-field="sku">{$row.sku|escape}</td>
           <td class="crm-contribution-form-block-price">{$row.price|crmMoney}</td>
           <td class="crm-contribution-form-block-min_contribution">{$row.min_contribution|crmMoney}</td>
           <td class="crm-contribution-form-block-cost">{$row.cost|crmMoney}</td>
-          <td class="crm-contribution-form-block-financial_type">{$row.financial_type}</td>
+          <td class="crm-contribution-form-block-financial_type">{$row.financial_type|escape}</td>
           <td id="row_{$row.id}_status" >{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td id={$row.id}>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
@@ -66,7 +66,7 @@
     {if $action ne 1 and $action ne 2}
     <div class="messages status no-popup">
         <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
-        {capture assign=crmURL}{crmURL p='civicrm/admin/contribute/managePremiums' q="action=add&reset=1"}{/capture}
+        {capture assign=crmURL}{crmURL p='civicrm/admin/contribute/managePremiums/edit' q="action=add&reset=1"}{/capture}
         {ts 1=$crmURL}No premium products have been created for your site. You can <a href='%1'>add one</a>.{/ts}
     </div>
     {/if}

@@ -21,7 +21,7 @@ class Standalone implements AuthxInterface {
   public function checkPassword(string $username, string $password) {
     $security = Security::singleton();
     $user = $security->loadUserByName($username);
-    return $security->checkPassword($password, $user['password'] ?? '') ? $user['id'] : NULL;
+    return $security->checkPassword($password, $user['hashed_password'] ?? '') ? $user['id'] : NULL;
   }
 
   /**
@@ -37,6 +37,7 @@ class Standalone implements AuthxInterface {
    */
   public function logoutSession() {
     \CRM_Core_Session::singleton()->reset();
+    session_destroy();
   }
 
   /**

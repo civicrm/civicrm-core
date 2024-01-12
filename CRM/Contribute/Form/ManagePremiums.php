@@ -264,7 +264,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       catch (CRM_Core_Exception $e) {
         $message = ts("This Premium is linked to an <a href='%1'>Online Contribution page</a>. Please remove it before deleting this Premium.", [1 => CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1')]);
         CRM_Core_Session::setStatus($message, ts('Cannot delete Premium'), 'error');
-        CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/contribute/managePremiums', 'reset=1&action=browse'));
+        CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/contribute/managePremiums', 'reset=1'));
         return;
       }
       CRM_Core_Session::setStatus(

@@ -234,11 +234,7 @@ class CRM_Core_Permission {
       return TRUE;
     }
 
-    if (self::check('administer CiviCRM data', $userId)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return self::check('administer CiviCRM data', $userId);
   }
 
   /**
@@ -996,9 +992,6 @@ class CRM_Core_Permission {
       'get' => [],
       // managed by _civicrm_api3_check_edit_permissions
       'update' => [],
-      'getquick' => [
-        ['access CiviCRM', 'access AJAX API'],
-      ],
       'duplicatecheck' => [
         'access CiviCRM',
       ],
@@ -1155,7 +1148,11 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['line_item'] = $permissions['contribution'];
-    $permissions['product'] = $permissions['contribution'];
+    $permissions['product'] = $permissions['premiums'] = $permissions['premiums_product'] = $permissions['contribution'];
+    // Add 'make online contributions' permissions to allow anon users to access these entities
+    // (permissions are controlled by financial ACLs)
+    $permissions['product']['get'] = $permissions['premium']['get'] = $permissions['premiums_product']['get'] = [['access CiviCRM', 'access CiviContribute', 'make online contributions']];
+    $permissions['product']['meta'] = $permissions['premium']['meta'] = $permissions['premiums_product']['meta'] = [['access CiviCRM', 'access CiviContribute', 'make online contributions']];
 
     $permissions['financial_item'] = $permissions['contribution'];
     $permissions['financial_type']['get'] = $permissions['contribution']['get'];
@@ -1262,6 +1259,7 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['files_by_entity'] = $permissions['file'];
+    $permissions['entity_file'] = $permissions['file'];
 
     // Group permissions
     $permissions['group'] = [
@@ -1577,6 +1575,12 @@ class CRM_Core_Permission {
 
     $permissions['custom_value'] = [
       'gettree' => ['access CiviCRM'],
+    ];
+
+    $permissions['location_type'] = [
+      'get' => ['access CiviCRM'],
+      'update' => ['administer CiviCRM data'],
+      'delete' => ['administer CiviCRM data'],
     ];
 
     $permissions['message_template'] = [

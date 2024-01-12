@@ -482,12 +482,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    */
   public static function getProcessorForEntity($entityID, $component = 'contribute', $type = 'id') {
     $result = NULL;
-    if (!in_array($component, [
-      'membership',
-      'contribute',
-      'recur',
-    ])
-    ) {
+    if (!in_array($component, ['membership', 'contribute', 'recur'])) {
       return $result;
     }
 

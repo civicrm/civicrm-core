@@ -23,7 +23,7 @@ namespace Civi\Api4;
  * EntityBatch entity.
  *
  * @since 5.41
- * @searchable none
+ * @searchable secondary
  * @package Civi\Api4
  */
 class EntityBatch extends Generic\DAOEntity {

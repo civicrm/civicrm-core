@@ -16,11 +16,11 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
   use Api4TestTrait;
 
   private $formNames = [
-    'contact_summary_test1',
-    'contact_summary_test2',
-    'contact_summary_test3',
-    'contact_summary_test4',
-    'contact_summary_test5',
+    'afFormTest0',
+    'afFormTabTest1',
+    'afSearchTabTest2',
+    'afSearchtest3',
+    'afFormTabTest4',
   ];
 
   public function setUpHeadless(): CiviEnvBuilder {
@@ -43,26 +43,27 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
     Afform::create()
       ->addValue('name', $this->formNames[0])
       ->addValue('title', 'Test B')
-      ->addValue('contact_summary', 'tab')
+      ->addValue('placement', ['contact_summary_tab'])
       ->addValue('summary_contact_type', ['Organization'])
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[1])
       ->addValue('title', 'Test C')
-      ->addValue('contact_summary', 'tab')
+      ->addValue('placement', ['contact_summary_tab'])
       ->addValue('summary_contact_type', ['FooBar'])
       ->addValue('icon', 'smiley-face')
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[2])
       ->addValue('title', 'Test A')
-      ->addValue('contact_summary', 'tab')
+      ->addValue('placement', ['contact_summary_tab'])
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[3])
       ->addValue('title', 'Test D')
-      ->addValue('contact_summary', 'tab')
+      ->addValue('placement', ['contact_summary_tab'])
       ->addValue('summary_contact_type', ['Individual'])
+      ->addValue('summary_weight', 99)
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[4])
@@ -80,20 +81,22 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
 
     $tabs = array_column($tabs, NULL, 'id');
 
-    $this->assertArrayHasKey($this->formNames[1], $tabs);
-    $this->assertArrayHasKey($this->formNames[2], $tabs);
-    $this->assertArrayNotHasKey($this->formNames[0], $tabs);
-    $this->assertArrayHasKey($this->formNames[3], $tabs);
-    $this->assertArrayNotHasKey($this->formNames[4], $tabs);
-    $this->assertEquals('Test C', $tabs[$this->formNames[1]]['title']);
-    $this->assertEquals(['Individual'], $tabs[$this->formNames[1]]['contact_type']);
-    $this->assertEquals(['Individual'], $tabs[$this->formNames[3]]['contact_type']);
-    $this->assertEquals('Test A', $tabs[$this->formNames[2]]['title']);
-    $this->assertEquals('crm-i smiley-face', $tabs[$this->formNames[1]]['icon']);
+    $this->assertArrayHasKey('test1', $tabs);
+    $this->assertArrayHasKey('test2', $tabs);
+    $this->assertArrayNotHasKey('test0', $tabs);
+    $this->assertArrayHasKey('test3', $tabs);
+    $this->assertArrayNotHasKey('test4', $tabs);
+    $this->assertEquals('Test C', $tabs['test1']['title']);
+    $this->assertEquals(['Individual'], $tabs['test1']['contact_type']);
+    $this->assertEquals(['Individual'], $tabs['test3']['contact_type']);
+    $this->assertEquals('Test A', $tabs['test2']['title']);
+    $this->assertEquals('crm-i smiley-face', $tabs['test1']['icon']);
     // Fallback icon
-    $this->assertEquals('crm-i fa-list-alt', $tabs[$this->formNames[2]]['icon']);
+    $this->assertEquals('crm-i fa-list-alt', $tabs['test2']['icon']);
     // Forms should be sorted by title alphabetically
-    $this->assertGreaterThan($tabs[$this->formNames[2]]['weight'], $tabs[$this->formNames[1]]['weight']);
+    $this->assertGreaterThan($tabs['test2']['weight'], $tabs['test1']['weight']);
+    // Should respect explicit weight
+    $this->assertEquals(99, $tabs['test3']['weight']);
   }
 
   public function testAfformContactSummaryBlock(): void {
@@ -113,14 +116,14 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
       ->addValue('name', $this->formNames[0])
       ->addValue('title', 'Test B')
       ->addValue('type', 'search')
-      ->addValue('contact_summary', 'block')
+      ->addValue('placement', ['contact_summary_block'])
       ->addValue('summary_contact_type', ['Individual', 'Household'])
       ->execute();
     Afform::create()
       ->addValue('name', $this->formNames[1])
       ->addValue('title', 'Test C')
       ->addValue('type', 'form')
-      ->addValue('contact_summary', 'block')
+      ->addValue('placement', ['contact_summary_block'])
       ->addValue('summary_contact_type', ['Farm'])
       ->addValue('icon', 'smiley-face')
       ->execute();
@@ -128,7 +131,14 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
       ->addValue('name', $this->formNames[2])
       ->addValue('type', 'form')
       ->addValue('title', 'Test A')
-      ->addValue('contact_summary', 'block')
+      ->addValue('placement', ['contact_summary_block'])
+      ->execute();
+    Afform::create()
+      ->addValue('name', $this->formNames[3])
+      ->addValue('type', 'form')
+      ->addValue('title', 'A Weight Test')
+      ->addValue('placement', ['contact_summary_block'])
+      ->addValue('summary_weight', 99)
       ->execute();
 
     // Call pageRun hook and then assert afforms have been added to the appropriate region
@@ -139,10 +149,10 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
     // TODO: Be more flexible
     // The presence of any other afform blocks in the system might alter the left-right assumptions here
     $blockA = \CRM_Core_Region::instance('contact-basic-info-left')->get('afform:' . $this->formNames[2]);
-    $this->assertStringContainsString("<contact-summary-test3 options=\"{contact_id: $cid}\"></contact-summary-test3>", $blockA['markup']);
+    $this->assertStringContainsString("<af-search-tab-test2 options=\"{contact_id: $cid}\"></af-search-tab-test2>", $blockA['markup']);
 
     $blockB = \CRM_Core_Region::instance('contact-basic-info-right')->get('afform:' . $this->formNames[1]);
-    $this->assertStringContainsString("<contact-summary-test2 options=\"{contact_id: $cid}\"></contact-summary-test2>", $blockB['markup']);
+    $this->assertStringContainsString("<af-form-tab-test1 options=\"{contact_id: $cid}\"></af-form-tab-test1>", $blockB['markup']);
 
     // Block for wrong contact type should not appear
     $this->assertNull(\CRM_Core_Region::instance('contact-basic-info-left')->get('afform:' . $this->formNames[0]));
@@ -159,6 +169,8 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
     // Forms should be sorted by title
     $order = array_flip(array_keys($blocks['afform_form']['blocks']));
     $this->assertGreaterThan($order[$this->formNames[2]], $order[$this->formNames[1]]);
+    // Unless explicit weight is given
+    $this->assertGreaterThan($order[$this->formNames[3]], $order[$this->formNames[2]]);
   }
 
 }

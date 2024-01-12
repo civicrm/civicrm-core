@@ -21,6 +21,13 @@
 class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
 
   /**
+   * @return string
+   */
+  public function getDefaultEntity(): string {
+    return 'PreferencesDate';
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {

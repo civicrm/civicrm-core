@@ -27,7 +27,7 @@ use Civi\Api4\Group;
  */
 class GroupContactTest extends Api4TestBase {
 
-  public function testCount() {
+  public function testCount(): void {
     $contact = $this->createTestRecord('Contact');
     $group = $this->createTestRecord('Group');
 

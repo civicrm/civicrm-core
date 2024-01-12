@@ -1,9 +1,0 @@
-<div class="btn-group">
-  <a class="btn btn-primary crm-popup" ng-href="{{ crmUrl('civicrm/grant/add', {reset: 1, action: 'add', context: 'grant', cid: options.contact_id}) }}">
-    <i class="crm-i fa-plus-circle"></i>
-    {{:: ts('Add Grant') }}
-  </a>
-</div>
-<div af-fieldset="">
-  <crm-search-display-table search-name="CiviGrant_Summary" display-name="Grant_Tab" filters="{'contact_id': options.contact_id}"></crm-search-display-table>
-</div>

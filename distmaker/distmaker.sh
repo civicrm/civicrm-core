@@ -42,6 +42,7 @@ J5PACK=0
 WP5PACK=0
 PATCHPACK=0
 SK5PACK=0
+STANDALONEPACK=0
 L10NPACK=0
 REPOREPORT=0
 
@@ -62,6 +63,7 @@ display_usage()
   echo "  WordPress|wp5  - generate Wordpress PHP5 module"
   echo "  patchset       - generate a tarball with patch files"
   echo "  sk             - generate Drupal StarterKit module"
+  echo "  standalone     - generate CiviCRM Standalone"
   echo
   echo "You also need to have distmaker.conf file in place."
   echo "See distmaker.conf.dist for example contents."
@@ -123,7 +125,7 @@ check_conf()
     echo "Current directory is : $THIS_DIR";
     exit 1
   else
-    export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL8 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_PACKAGES
+    export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL8 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_STANDALONE DM_REF_PACKAGES
     if [ ! -d "$DM_SOURCEDIR" ]; then
       echo; echo "ERROR! " DM_SOURCEDIR "directory not found!"; echo "(if you get empty directory name, it might mean that one of necessary variables is not set)"; echo;
     fi
@@ -187,6 +189,12 @@ case $1 in
   WP5PACK=1
   ;;
 
+  # STANDALONE
+  standalone|Standalone)
+  echo; echo "Generating CiviCRM Standalone"; echo;
+  STANDALONEPACK=1
+  ;;
+
   ## PATCHSET export
   patchset)
   echo; echo "Generating patchset"; echo;
@@ -208,6 +216,7 @@ case $1 in
   WP5PACK=1
   PATCHPACK=1
   SKPACK=1
+  STANDALONEPACK=1
   L10NPACK=1
   REPOREPORT=1
   ;;
@@ -293,6 +302,11 @@ if [ "$WP5PACK" = 1 ]; then
   bash $P/dists/wordpress_php5.sh
 fi
 
+if [ "$STANDALONEPACK" = 1 ]; then
+  echo; echo "Packaging for CiviCRM Standalone"; echo;
+  bash $P/dists/standalone.sh
+fi
+
 if [ "$PATCHPACK" = 1 ]; then
   echo; echo "Packaging for patchset tarball"; echo;
   bash $P/dists/patchset.sh
@@ -308,6 +322,7 @@ if [ "$REPOREPORT" = 1 ]; then
     SKPACK="$SKPACK" \
     J5PACK="$J5PACK" \
     WP5PACK="$WP5PACK" \
+    STANDALONEPACK="$STANDALONEPACK" \
     bash $P/dists/repo-report.sh
 fi
 

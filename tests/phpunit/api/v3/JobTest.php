@@ -101,7 +101,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Create job.
    */
   public function testCreate(): void {
-    $result = $this->callAPIAndDocument('Job', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Job', 'create', $this->_params);
     $this->getAndCheck($this->_params, $result['id'], 'Job');
   }
 
@@ -111,7 +111,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testClone(): void {
     $createResult = $this->callAPISuccess('Job', 'create', $this->_params);
     $params = ['id' => $createResult['id']];
-    $cloneResult = $this->callAPIAndDocument('Job', 'clone', $params, __FUNCTION__, __FILE__);
+    $cloneResult = $this->callAPISuccess('Job', 'clone', $params);
     $clonedJob = $cloneResult['values'][$cloneResult['id']];
     $this->assertEquals($this->_params['name'] . ' - Copy', $clonedJob['name']);
     $this->assertEquals($this->_params['description'], $clonedJob['description']);
@@ -127,7 +127,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testDelete(): void {
     $createResult = $this->callAPISuccess('Job', 'create', $this->_params);
     $params = ['id' => $createResult['id']];
-    $this->callAPIAndDocument('Job', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('Job', 'delete', $params);
     $this->assertAPIDeleted('Job', $createResult['id']);
   }
 

@@ -79,7 +79,7 @@ return [
         'saved_search_id.name' => 'Administer_Payment_Processors',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -208,14 +208,20 @@ return [
                   'condition' => [],
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
+              'icon' => 'fa-bars',
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/paymentProcessor/edit?action=add&reset=1',
-            'text' => E::ts('Add Payment Processor'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'PaymentProcessor',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Payment Processor'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [

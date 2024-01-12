@@ -10,22 +10,20 @@
 
 {* this template is used for adding/editing activities for a case. *}
 <div class="crm-block crm-form-block crm-case-activity-form-block">
-  {if $action eq 8 or $action eq 32768 }
+  {if $action eq 8 or $action eq 32768}
   <div class="messages status no-popup">
     <i class="crm-i fa-info-circle" aria-hidden="true"></i> &nbsp;
     {if $action eq 8}
-      {* activityTypeName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label) *}
-      {ts 1=$activityTypeName}Click Delete to move this &quot;%1&quot; activity to the Trash.{/ts}
+      {ts 1=$activityTypeNameAndLabel.displayLabel|escape}Click Delete to move this &quot;%1&quot; activity to the Trash.{/ts}
     {else}
-      {* activityTypeName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label) *}
-      {ts 1=$activityTypeName}Click Restore to retrieve this &quot;%1&quot; activity from the Trash.{/ts}
+      {ts 1=$activityTypeNameAndLabel.displayLabel|escape}Click Restore to retrieve this &quot;%1&quot; activity from the Trash.{/ts}
     {/if}
   </div><br />
   {else}
   <table class="form-layout">
-    {if $activityTypeDescription }
+    {if $activityTypeDescription}
       <tr>
-        <div class="help">{$activityTypeDescription}</div>
+        <div class="help">{$activityTypeDescription|purify}</div>
       </tr>
     {/if}
     {* Block for change status, case type and start date. *}
@@ -89,8 +87,7 @@
 
                 <tr class="crm-case-activity-form-block-activityTypeName">
                   <td class="label">{ts}Activity Type{/ts}</td>
-                  {* activityTypeName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label) *}
-                  <td class="view-value bold">{$activityTypeName|escape}</td>
+                  <td class="view-value bold">{$activityTypeNameAndLabel.displayLabel|escape}</td>
                 </tr>
                 <tr class="crm-case-activity-form-block-source_contact_id">
                   <td class="label">{$form.source_contact_id.label}</td>
@@ -118,7 +115,11 @@
               {/if}
               <tr class="crm-case-activity-form-block-medium_id">
                 <td class="label">{$form.medium_id.label}</td>
-                <td class="view-value">{$form.medium_id.html}&nbsp;&nbsp;&nbsp;{$form.location.label} &nbsp;{$form.location.html|crmAddClass:huge}</td>
+                <td class="view-value">{$form.medium_id.html}</td>
+              </tr>
+              <tr class="crm-case-activity-form-block-location">
+                <td class="label">{$form.location.label}</td>
+                <td class="view-value">{$form.location.html|crmAddClass:huge}</td>
               </tr>
               <tr class="crm-case-activity-form-block-activity_date_time">
                 <td class="label">{$form.activity_date_time.label}</td>

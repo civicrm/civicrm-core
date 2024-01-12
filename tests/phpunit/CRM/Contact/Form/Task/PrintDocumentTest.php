@@ -47,19 +47,21 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
    *  Assert the content of document
    *
    * @param array $formValues
-   * @param array $type
+   * @param string $type
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function _testDocumentContent($formValues, $type) {
+  public function _testDocumentContent(array $formValues, $type): void {
     $html = [];
     /** @var CRM_Contact_Form_Task_PDF $form */
-    $form = $this->getFormObject('CRM_Contact_Form_Task_PDF', [], NULL, [
+    $form = $this->getSearchFormObject('CRM_Contact_Form_Task_PDF', [], NULL, [
       'radio_ts' => 'ts_sel',
       'task' => CRM_Member_Task::PDF_LETTER,
     ]);
-    list($formValues) = $form->processMessageTemplate($formValues);
-    list($html_message, $zip) = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
+    [$formValues] = $form->processMessageTemplate($formValues);
+    [$html_message, $zip] = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
 
-    foreach ($this->_contactIds as $item => $contactId) {
+    foreach ($this->_contactIds as $contactId) {
       $html[] = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_html' => $html_message], 'contactId' => $contactId, 'disableSmarty' => TRUE])['html'];
     }
 

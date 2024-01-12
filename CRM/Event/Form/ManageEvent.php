@@ -55,8 +55,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    */
   protected $_templateId;
 
-  protected $_cancelURL = NULL;
-
   /**
    * The campaign id of the existing event, we use this to know if we need to update
    * the participant records
@@ -95,13 +93,9 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     $this->assign('action', $this->_action);
 
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
-    if ($this->_id) {
+    if ($this->getEventID()) {
       $this->_isRepeatingEvent = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
       $this->assign('eventId', $this->_id);
-      if (!empty($this->_addBlockName) && empty($this->_addProfileBottom) && empty($this->_addProfileBottomAdd)) {
-        $this->add('hidden', 'id', $this->_id);
-      }
       $this->_single = TRUE;
 
       $eventInfo = \Civi\Api4\Event::get(FALSE)
@@ -166,11 +160,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     $this->_templateId = (int) CRM_Utils_Request::retrieve('template_id', 'Integer', $this);
 
-    //Is a repeating event
-    if ($this->_isRepeatingEvent) {
-      $isRepeatingEntity = TRUE;
-      $this->assign('isRepeatingEntity', $isRepeatingEntity);
-    }
+    $this->assign('isRepeatingEntity', $this->_isRepeatingEvent);
 
     // CRM-16776 - show edit/copy/create buttons for Profiles if user has required permission.
     $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
@@ -184,6 +174,9 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     ];
     if (CRM_Core_Permission::check($checkPermission) || !empty($ufCreate) || !empty($ufEdit)) {
       $this->assign('perm', TRUE);
+    }
+    else {
+      $this->assign('perm', FALSE);
     }
 
     // also set up tabs
@@ -251,23 +244,23 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
 
-    $this->_cancelURL = $_POST['cancelURL'] ?? NULL;
+    $cancelURL = $_POST['cancelURL'] ?? NULL;
 
-    if (!$this->_cancelURL) {
+    if (!$cancelURL) {
       if ($this->_isTemplate) {
-        $this->_cancelURL = CRM_Utils_System::url('civicrm/admin/eventTemplate',
+        $cancelURL = CRM_Utils_System::url('civicrm/admin/eventTemplate',
           'reset=1'
         );
       }
       else {
-        $this->_cancelURL = CRM_Utils_System::url('civicrm/event/manage',
+        $cancelURL = CRM_Utils_System::url('civicrm/event/manage',
           'reset=1'
         );
       }
     }
 
-    if ($this->_cancelURL) {
-      $this->addElement('hidden', 'cancelURL', $this->_cancelURL);
+    if ($cancelURL) {
+      $this->addElement('hidden', 'cancelURL', $cancelURL);
     }
 
     if ($this->_single) {
@@ -276,12 +269,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
           'type' => 'upload',
           'name' => ts('Save'),
           'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'upload',
-          'name' => ts('Save and Done'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'subName' => 'done',
         ],
         [
           'type' => 'cancel',
@@ -312,7 +299,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
       $this->addButtons($buttons);
     }
-    $session->replaceUserContext($this->_cancelURL);
+    $session->replaceUserContext($cancelURL);
     $this->add('hidden', 'is_template', $this->_isTemplate);
   }
 
@@ -391,6 +378,17 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public static function addProfileEditScripts() {
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
     CRM_UF_Page_ProfileEditor::registerSchemas(['IndividualModel', 'ParticipantModel']);
+  }
+
+  /**
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getEventID() {
+    if (!$this->_id) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
+    }
+    return $this->_id ? (int) $this->_id : NULL;
   }
 
 }

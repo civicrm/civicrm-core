@@ -151,7 +151,6 @@ trait CRM_Contact_Form_Task_PDFTrait {
     $form->assign('totalSelectedContacts', !is_null($form->_contactIds) ? count($form->_contactIds) : 0);
 
     $form->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
-
     $documentTypes = implode(',', CRM_Core_SelectValues::documentApplicationType());
     $form->addElement('file', "document_file", 'Upload Document', 'size=30 maxlength=255 accept="' . $documentTypes . '"');
     $form->addUploadElement("document_file");
@@ -170,9 +169,9 @@ trait CRM_Contact_Form_Task_PDFTrait {
   public function preProcessPDF(): void {
     $form = $this;
     $defaults = [];
-    $form->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
-    if (is_numeric(key($form->_fromEmails))) {
-      $emailID = (int) key($form->_fromEmails);
+    $fromEmails = $this->getFromEmails();
+    if (is_numeric(key($fromEmails))) {
+      $emailID = (int) key($fromEmails);
       $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
     }
     if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
@@ -180,6 +179,15 @@ trait CRM_Contact_Form_Task_PDFTrait {
     }
     $form->setDefaults($defaults);
     $form->setTitle(ts('Print/Merge Document'));
+  }
+
+  /**
+   * Get an array of email IDS from which the back-office user may select the from field.
+   *
+   * @return array
+   */
+  protected function getFromEmails(): array {
+    return CRM_Core_BAO_Email::getFromEmail();
   }
 
   /**
@@ -273,7 +281,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
 
     if ($tee) {
       $tee->stop();
-      $content = file_get_contents($tee->getFileName(), NULL, NULL, NULL, 5);
+      $content = file_get_contents($tee->getFileName(), FALSE, NULL, 0, 5);
       if (empty($content)) {
         throw new \CRM_Core_Exception("Failed to capture document content (type=$type)!");
       }

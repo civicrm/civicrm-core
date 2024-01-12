@@ -34,27 +34,27 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
   }
 
-  public function testCreateParticipantStatusType() {
-    $result = $this->callAPIAndDocument('participant_status_type', 'create', $this->params, __FUNCTION__, __FILE__);
+  public function testCreateParticipantStatusType(): void {
+    $result = $this->callAPISuccess('participant_status_type', 'create', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
-  public function testGetParticipantStatusType() {
-    $result = $this->callAPIAndDocument('participant_status_type', 'create', $this->params, __FUNCTION__, __FILE__);
+  public function testGetParticipantStatusType(): void {
+    $result = $this->callAPISuccess('participant_status_type', 'create', $this->params);
     $this->assertEquals(1, $result['count']);
 
-    $result = $this->callAPIAndDocument('participant_status_type', 'get', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('participant_status_type', 'get', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->id = $result['id'];
   }
 
-  public function testDeleteParticipantStatusType() {
+  public function testDeleteParticipantStatusType(): void {
 
     $ParticipantStatusType = $this->callAPISuccess('ParticipantStatusType', 'Create', $this->params);
     $entity = $this->callAPISuccess('participant_status_type', 'get', []);
-    $result = $this->callAPIAndDocument('participant_status_type', 'delete', ['id' => $ParticipantStatusType['id']], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('participant_status_type', 'delete', ['id' => $ParticipantStatusType['id']]);
     $getCheck = $this->callAPISuccess('ParticipantStatusType', 'GET', ['id' => $ParticipantStatusType['id']]);
     $checkDeleted = $this->callAPISuccess('ParticipantStatusType', 'Get', []);
     $this->assertEquals($entity['count'] - 1, $checkDeleted['count']);

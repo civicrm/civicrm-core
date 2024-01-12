@@ -32,7 +32,7 @@ class CustomValueTest extends CustomTestBase {
   /**
    * Test CustomValue::GetFields/Get/Create/Update/Replace/Delete
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $optionValues = ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'];
 
     $group = uniqid('groupc');
@@ -138,6 +138,7 @@ class CustomValueTest extends CustomTestBase {
         'entity' => "Custom_$group",
         'table_name' => $customGroup['table_name'],
         'column_name' => 'id',
+        'nullable' => FALSE,
         'data_type' => 'Integer',
         'fk_entity' => NULL,
       ],
@@ -148,6 +149,7 @@ class CustomValueTest extends CustomTestBase {
         'table_name' => $customGroup['table_name'],
         'column_name' => 'entity_id',
         'entity' => "Custom_$group",
+        'nullable' => FALSE,
         'data_type' => 'Integer',
         'fk_entity' => 'Contact',
       ],
@@ -282,16 +284,16 @@ class CustomValueTest extends CustomTestBase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testEntityRefresh() {
+  public function testEntityRefresh(): void {
     $groupName = uniqid('groupc');
 
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
 
-    CustomGroup::create(FALSE)
+    $customGroup = CustomGroup::create(FALSE)
       ->addValue('title', $groupName)
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', FALSE)
-      ->execute();
+      ->execute()->single();
 
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
 
@@ -300,6 +302,12 @@ class CustomValueTest extends CustomTestBase {
       ->addValue('is_multiple', TRUE)
       ->execute();
     $this->assertContains("Custom_$groupName", Entity::get()->execute()->column('name'));
+
+    $links = CustomValue::getLinks($groupName, FALSE)
+      ->addValue('id', 3)
+      ->execute()->indexBy('ui_action');
+    $this->assertStringContainsString('gid=' . $customGroup['id'], $links['view']['path']);
+    $this->assertStringContainsString('recId=3', $links['view']['path']);
 
     CustomGroup::update(FALSE)
       ->addWhere('name', '=', $groupName)

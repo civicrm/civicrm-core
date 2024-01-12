@@ -448,7 +448,14 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
           $params['attachments'] = [];
         }
         $params['attachments'][] = CRM_Utils_Mail::appendPDF($params['PDFFilename'], $params['html'], $mailContent['format']);
+        // This specifically allows the invoice code to attach an invoice & have
+        // a different message body. It will be removed & replaced with something
+        // saner so avoid trying to leverage this. There are no universe usages outside
+        // the core invoice task as of Dec 2023
         if (isset($params['tplParams']['email_comment'])) {
+          if ($params['workflow'] !== 'contribution_invoice_receipt') {
+            CRM_Core_Error::deprecatedWarning('unsupported parameter email_comment used');
+          }
           $params['html'] = $params['tplParams']['email_comment'];
           $params['text'] = strip_tags($params['tplParams']['email_comment']);
         }

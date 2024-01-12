@@ -322,7 +322,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     $transaction = new CRM_Core_Transaction();
 
-    $params['id'] = $params['id'] ?? $ids['membership'] ?? NULL;
+    $params['id'] ??= $ids['membership'] ?? NULL;
     $membership = self::add($params);
 
     if (is_a($membership, 'CRM_Core_Error')) {

@@ -12,14 +12,14 @@
 </div>
 {if $membershipBlock AND $is_quick_config}
     <div class="header-dark">
-      {if $renewal_mode }
-        {if $membershipBlock.renewal_title}
+      {if $renewal_mode}
+        {if array_key_exists('renewal_title', $membershipBlock) && $membershipBlock.renewal_title}
           {$membershipBlock.renewal_title}
         {else}
           {ts}Select a Membership Renewal Level{/ts}
         {/if}
       {else}
-        {if $membershipBlock.new_title}
+        {if array_key_exists('new_title', $membershipBlock) && $membershipBlock.new_title}
           {$membershipBlock.new_title}
         {else}
           {ts}Select a Membership Level{/ts}
@@ -42,7 +42,7 @@
         </tr>
 
       {/foreach}
-      {if $form.auto_renew}
+      {if array_key_exists('auto_renew', $form)}
         <tr id="allow_auto_renew">
           <td style="width: auto;">{$form.auto_renew.html}</td>
           <td style="width: auto;">

@@ -87,11 +87,20 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       \Civi\Core\Container::boot($loadFromDB);
       if ($loadFromDB && self::$_singleton->dsn) {
         $domain = \CRM_Core_BAO_Domain::getDomain();
+        if (CIVICRM_UF === 'Standalone') {
+          // Standalone's session cannot be initialized until CiviCRM is booted,
+          // since it is defined in an extension, and we need the session
+          // initialized before calling applyLocale.
+          \CRM_Core_Session::singleton()->initialize();
+        }
         \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
 
         unset($errorScope);
 
-        CRM_Utils_Hook::config(self::$_singleton);
+        CRM_Utils_Hook::config(self::$_singleton, [
+          'civicrm' => TRUE,
+          'uf' => self::$_singleton->userSystem->isLoaded(),
+        ]);
         self::$_singleton->authenticate();
 
         // Extreme backward compat: $config binds to active domain at moment of setup.
@@ -345,6 +354,11 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       CRM_Core_DAO::executeQuery($query);
     }
 
+    // Clear the Redis prev-next cache, if there is one.
+    // Since we truncated the civicrm_cache table it is logical to also remove
+    // the same from the Redis cache here.
+    \Civi::service('prevnext')->deleteItem();
+
     // also delete all the import and export temp tables
     self::clearTempTables();
   }
@@ -423,11 +437,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $path = $_GET[$urlVar] ?? NULL;
     }
 
-    if ($path && preg_match('/^civicrm\/upgrade(\/.*)?$/', $path)) {
-      return TRUE;
-    }
-
-    return FALSE;
+    return ($path && preg_match('/^civicrm\/upgrade(\/.*)?$/', $path));
   }
 
   /**

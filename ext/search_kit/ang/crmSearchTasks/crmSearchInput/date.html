@@ -10,7 +10,7 @@
   <div class="form-group" ng-switch="$ctrl.dateType">
 
     <div class="form-group" ng-switch-when="fixed">
-      <input class="form-control" crm-ui-datepicker="{time: $ctrl.field.data_type === 'Timestamp'}" ng-model="$ctrl.value" ng-required="!$ctrl.field.nullable" ng-if="!$ctrl.isMulti()">
+      <input class="form-control" crm-ui-datepicker="{time: $ctrl.field.data_type === 'Timestamp', start_date_years: 100, end_date_years: 100}" ng-model="$ctrl.value" ng-required="!$ctrl.field.nullable" ng-if="!$ctrl.isMulti()">
       <input class="form-control" crm-multi-select-date ng-model="$ctrl.value" ng-required="!$ctrl.field.nullable" ng-if="$ctrl.isMulti()">
     </div>
 

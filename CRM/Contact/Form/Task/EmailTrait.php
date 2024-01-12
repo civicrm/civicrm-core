@@ -384,7 +384,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $cc,
       $bcc,
       $additionalDetails,
-      CRM_Utils_Array::value('campaign_id', $formValues),
+      $formValues['campaign_id'] ?? NULL,
       $this->getCaseID()
     );
 
@@ -838,7 +838,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $details = "-ALTERNATIVE ITEM 0-\n{$html}{$additionalDetails}\n-ALTERNATIVE ITEM 1-\n{$text}{$additionalDetails}\n-ALTERNATIVE END-\n";
     }
     else {
-      $details = $html ? $html : $text;
+      $details = $html ?: $text;
       $details .= $additionalDetails;
     }
 

@@ -29,7 +29,7 @@ class CRM_Mailing_Event_BAO_MailingEventForward extends CRM_Mailing_Event_DAO_Ma
    * @return bool
    */
   public static function &forward($job_id, $queue_id, $hash, $forward_email, $fromEmail = NULL, $comment = NULL) {
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
 
     $successfulForward = FALSE;
     $contact_id = NULL;
@@ -233,11 +233,6 @@ class CRM_Mailing_Event_BAO_MailingEventForward extends CRM_Mailing_Event_DAO_Ma
 
     // get the formatted location blocks into params - w/ 3.0 format, CRM-4605
     if (!empty($values['location_type_id'])) {
-      static $fields = NULL;
-      if ($fields == NULL) {
-        $fields = [];
-      }
-
       foreach (['Phone', 'Email', 'IM', 'OpenID', 'Phone_Ext'] as $block) {
         $name = strtolower($block);
         if (!array_key_exists($name, $values)) {

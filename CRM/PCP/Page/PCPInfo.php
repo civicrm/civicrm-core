@@ -206,12 +206,12 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
         TRUE, NULL, TRUE,
         TRUE
       );
-      $this->assign('linkTextUrl', $linkTextUrl);
-      $this->assign('linkText', $pcpBlock->link_text);
     }
+    $this->assign('linkTextUrl', $linkTextUrl ?? NULL);
+    $this->assign('linkText', $pcpBlock->link_text ?? NULL);
 
     $this->assign('honor', $honor);
-    $this->assign('total', $totalAmount ? $totalAmount : '0.0');
+    $this->assign('total', $totalAmount ?: '0.0');
     $this->assign('achieved', $achieved <= 100 ? $achieved : 100);
 
     if ($achieved <= 100) {

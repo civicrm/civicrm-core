@@ -117,12 +117,8 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
       if ($this->_id) {
         $params['id'] = $this->_id;
       }
-      foreach ([
-        'is_active',
-        'is_reserved',
-        'is_deductible',
-      ] as $field) {
-        $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
+      foreach (['is_active', 'is_reserved', 'is_deductible'] as $field) {
+        $params[$field] ??= FALSE;
       }
       $financialType = civicrm_api3('FinancialType', 'create', $params);
       if ($this->_action & CRM_Core_Action::UPDATE) {

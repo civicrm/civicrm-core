@@ -103,12 +103,23 @@ function civicrm_api3_contribution_page_validate($params) {
   // one being generated so we generate one first.
   $originalRequest = $_REQUEST;
   $qfKey = $_REQUEST['qfKey'] ?? NULL;
-  if (!$qfKey) {
-    $_REQUEST['qfKey'] = CRM_Core_Key::get('CRM_Core_Controller', TRUE);
-  }
+  $_REQUEST['id'] = $params['id'];
+  $requestMethod = $_SERVER['REQUEST_METHOD'] ?? NULL;
+  // This is set to POST in a test - (probably cos we didn't have full form
+  // testing when it was written). It needs to be get for long enough to
+  // get past the constructor.
+  $_SERVER['REQUEST_METHOD'] = 'GET';
   $form = new CRM_Contribute_Form_Contribution_Main();
-  $form->controller = new CRM_Core_Controller();
-  $form->set('id', $params['id']);
+  $form->controller = new CRM_Contribute_Controller_Contribution();
+  if ($requestMethod) {
+    $_SERVER['REQUEST_METHOD'] = $requestMethod;
+  }
+  $form->controller->setStateMachine(new CRM_Contribute_StateMachine_Contribution($form->controller));
+  // The submitted values are on the Main form.
+  $_SESSION['_' . $form->controller->_name . '_container']['values']['Main'] = $params;
+  if (!$qfKey) {
+    $_REQUEST['qfKey'] = CRM_Core_Key::get('CRM_Contribute_Controller_Contribution', TRUE);
+  }
   $form->preProcess();
   $errors = CRM_Contribute_Form_Contribution_Main::formRule($params, [], $form);
   if ($errors === TRUE) {
@@ -148,5 +159,12 @@ function _civicrm_api3_contribution_page_getlist_defaults(&$request) {
     'params' => [
       'is_active' => 1,
     ],
+  ];
+}
+
+function _civicrm_api3_contribution_page_deprecation(): array {
+  return [
+    'submit' => 'Not recommended as reliable enough for production use. See methods in CRM_Contribute_Form_Contribution_ConfirmTest for better methods in tests.',
+    'validate' => 'Not recommended as reliable enough for production use. See methods in CRM_Contribute_Form_Contribution_ConfirmTest for better methods in tests.',
   ];
 }

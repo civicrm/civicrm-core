@@ -11,7 +11,7 @@ class SettingsStackTest extends \CiviUnitTestCase {
   /**
    * Temporarily modify -- then restore -- settings.
    */
-  public function testStack() {
+  public function testStack(): void {
     $origVal = \Civi::settings()->get('show_events');
 
     $settingsStack = new \Civi\Core\SettingsStack();

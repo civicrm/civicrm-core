@@ -29,7 +29,7 @@ class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
     );
   }
 
-  public function testMultiVersionDecode() {
+  public function testMultiVersionDecode(): void {
     $encoders = ['serialize', ['CRM_Core_BAO_Cache', 'encode']];
     $values = [NULL, 0, 1, TRUE, FALSE, [], ['abcd'], 'ab;cd', new stdClass()];
     foreach ($encoders as $encoder) {

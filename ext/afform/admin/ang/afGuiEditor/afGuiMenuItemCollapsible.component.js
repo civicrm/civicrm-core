@@ -12,28 +12,15 @@
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
-      this.isCollapsible = function() {
-        return afGui.hasClass(ctrl.node, 'af-collapsible');
-      };
-
       this.isCollapsed = function() {
-        return afGui.hasClass(ctrl.node, 'af-collapsible af-collapsed');
-      };
-
-      this.toggleCollapsible = function() {
-        // Node must have a title to be collapsible
-        if (ctrl.isCollapsible() || !ctrl.node['af-title']) {
-          afGui.modifyClasses(ctrl.node, 'af-collapsible af-collapsed');
-        } else {
-          afGui.modifyClasses(ctrl.node, null, 'af-collapsible');
-        }
+        return !('open' in ctrl.node);
       };
 
       this.toggleCollapsed = function() {
         if (ctrl.isCollapsed()) {
-          afGui.modifyClasses(ctrl.node, 'af-collapsed');
+          ctrl.node.open = '';
         } else {
-          afGui.modifyClasses(ctrl.node, null, 'af-collapsed');
+          delete ctrl.node.open;
         }
       };
 

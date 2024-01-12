@@ -227,6 +227,21 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $suppressedEmails = $isCreatePDF ? NULL : $invoiceElements['suppressedEmails'];
     unset($invoiceElements);
 
+    // @todo - almost all the code from here down should be removed. The expectation
+    // is that the template should not rely on the form layer to assign variables
+    // but rather the templates should be migrated over time to use tokens
+    // and the variables assigned from the WorkFlow message class
+    // ie $lineItems and $taxBreakdown and a small number of other complex variables
+    // that are not suited to tokens.
+    // The expectation is that the invoice should be renderable from other places,
+    // including our form builder/ search kit layer based on being provided the
+    // contribution ID & contact ID.
+    // Note that current gaps are in 2 groups
+    // 1) tpl file could be updated as of now - this is almost all the tokens
+    // 2) no suitable token available. This is probably only the case with
+    // the title token and the due_date token. We will incrementally update the template
+    // but we don't do 'push notifications' (put out a message to tell users to
+    // update their customised tokens) every update.
     // gives the status id when contribution status is 'Refunded'
     $contributionStatusID = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $refundedStatusId = CRM_Utils_Array::key('Refunded', $contributionStatusID);
@@ -261,6 +276,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       ]);
 
       if (!empty($addressDetails)) {
+        // @todo - use {contribution.address_id.display} token in the template}
+        // stop calculating this.
         $billingAddress = array_shift($addressDetails);
       }
 
@@ -268,31 +285,31 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $creditNoteId = $contribution->creditnote_id;
       }
       if (!$contribution->invoice_number) {
+        // @todo - use {contribution.invoice_number token in the template}. remove this code.
         $contribution->invoice_number = CRM_Contribute_BAO_Contribution::getInvoiceNumber($contribution->id);
       }
 
       //to obtain due date for PDF invoice
       $contributionReceiveDate = date('F j,Y', strtotime(date($input['receive_date'])));
+      // @todo - stop assigning invoiceDate to the template - use
+      // {contribution.total_amount} or {domain.now} instead - both of which support
+      // formatting via |crmDate
       $invoiceDate = date("F j, Y");
       $dueDateSetting = Civi::settings()->get('invoice_due_date');
       $dueDatePeriodSetting = Civi::settings()->get('invoice_due_date_period');
       $dueDate = date('F j, Y', strtotime($contributionReceiveDate . "+" . $dueDateSetting . "" . $dueDatePeriodSetting));
-
+      // @todo - use {contribution.balance_amount} & {contribution.amount_paid} in the template
+      // - remove these 2
       $amountPaid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionID, TRUE);
       $amountDue = ($input['amount'] - $amountPaid);
 
       // retrieving the subtotal and sum of same tax_rate
-      $dataArray = [];
       $subTotal = 0;
+      // @todo - this lineItem variable is no longer used in the shipped template - stop
+      // calculating & remove.
       $lineItem = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionID);
       foreach ($lineItem as $taxRate) {
-        if (isset($dataArray[(string) $taxRate['tax_rate']])) {
-          $dataArray[(string) $taxRate['tax_rate']] = $dataArray[(string) $taxRate['tax_rate']] + CRM_Utils_Array::value('tax_amount', $taxRate);
-        }
-        else {
-          $dataArray[(string) $taxRate['tax_rate']] = $taxRate['tax_amount'] ?? NULL;
-        }
-        $subTotal += CRM_Utils_Array::value('subTotal', $taxRate);
+        $subTotal += $taxRate['subTotal'] ?? 0;
       }
 
       // to email the invoice
@@ -333,6 +350,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
         $title = CRM_Utils_Array::value('title', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
       }
+      // @todo - use token in template, stop assigning.
       $source = $contribution->source;
 
       $config = CRM_Core_Config::singleton();
@@ -341,6 +359,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       }
 
       // get organization address
+      // @todo - this should all be replaced by using tokens in the template.
       $domain = CRM_Core_BAO_Domain::getDomain();
       $locParams = ['contact_id' => $domain->contact_id];
       $locationDefaults = CRM_Core_BAO_Location::getValues($locParams);
@@ -377,16 +396,24 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'resourceBase' => $config->userFrameworkResourceURL,
         // @todo not used in shipped template for a long time
         'defaultCurrency' => $config->defaultCurrency,
+        // @todo - stop assigning this to the template
+        // ensure the template uses {contribution.total_amount}
         'amount' => $contribution->total_amount,
+        // @todo - stop assigning this to the template
+        // ensure the template uses {contribution.balance_amount}
         'amountDue' => $amountDue,
+        // @todo - stop assigning this to the template
+        // ensure the template uses {contribution.amount_paid}
         'amountPaid' => $amountPaid,
+        // @todo - stop assigning this to the template - ensure the
+        // template uses {contribution.receive_date} or {domain.now}
+        // both of which support crmDate formatting.
         'invoice_date' => $invoiceDate,
+        // @todo add this to apiv4 & add a token so we can replace it here.
         'dueDate' => $dueDate,
         'notes' => $invoiceNotes,
         // @todo not used in shipped template from 5.53
         'lineItem' => $lineItem,
-        // @todo not used in shipped template from 5.53
-        'dataArray' => $dataArray,
         // @todo not used in shipped template from 5.52
         'refundedStatusId' => $refundedStatusId,
         // @todo not used in shipped template from 5.52
@@ -397,8 +424,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'contribution_status_id' => $contribution->contribution_status_id,
         // @todo not used in shipped template for a long time
         'contributionStatusName' => CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id),
-        //  @todo appears to be the same as {contribution.tax_amount}
+        //  @todo appears to be the same as {contribution.tax_amount}. Stop assigning
         'subTotal' => $subTotal,
+        // @todo - stop assigning this to the template - ensure the
+        // template uses {contribution.address_id.street_address} (etc)
         'street_address' => $billingAddress['street_address'] ?? NULL,
         'supplemental_address_1' => $billingAddress['supplemental_address_1'] ?? NULL,
         'supplemental_address_2' => $billingAddress['supplemental_address_2'] ?? NULL,
@@ -436,6 +465,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'tplParams' => $tplParams,
         'PDFFilename' => $pdfFileName,
         'tokenContext' => ['contributionId' => $contribution->id, 'contactId' => $contribution->contact_id],
+        'modelProps' => [
+          'userEnteredText' => $params['email_comment'] ?? NULL,
+        ],
       ];
 
       // from email address
@@ -504,10 +536,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $fileName = self::putFile($html, $pdfFileName, $pdfFormat);
         self::addActivities($subject, $contribution->contact_id, $fileName, $params, $contribution->id);
       }
-      elseif ($component == 'event') {
+      elseif ($component === 'event') {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contribution->contact_id);
 
-        $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => $params['email_comment']]);
+        $sendTemplateParams['tplParams'] = $tplParams;
         $sendTemplateParams['from'] = $fromEmailAddress;
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = $values['cc_confirm'] ?? NULL;

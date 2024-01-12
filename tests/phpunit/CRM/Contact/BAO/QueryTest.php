@@ -433,7 +433,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSearchPrimaryLocTypes() {
+  public function testSearchPrimaryLocTypes(): void {
     $contactID = $this->individualCreate();
     $params = [
       'contact_id' => $contactID,
@@ -489,7 +489,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSearchOtherLocationUpperLower() {
+  public function testSearchOtherLocationUpperLower(): void {
 
     $params = [
       0 => [
@@ -561,7 +561,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       [$select, $from, $where, $having] = $queryObj->query();
       $dao = CRM_Core_DAO::executeQuery("$select $from $where $having");
       $dao->fetch();
-      $this->assertEquals('Anderson, Anthony', $dao->sort_name);
+      $this->assertEquals('Anderson, Anthony II', $dao->sort_name);
     }
     catch (PEAR_Exception $e) {
       $err = $e->getCause();
@@ -596,7 +596,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSearchBuilderActivityType() {
+  public function testSearchBuilderActivityType(): void {
     $queryObj = new CRM_Contact_BAO_Query([['activity_type', '=', '3', 1, 0]]);
     $this->assertStringContainsString('WHERE  (  ( civicrm_activity.activity_type_id = 3 )', $queryObj->getSearchSQL());
     $this->assertEquals('Activity Type = Email', $queryObj->_qill[1][0]);
@@ -642,7 +642,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGroupContactCacheAddSearch() {
+  public function testGroupContactCacheAddSearch(): void {
     $returnProperties = ['contact_id'];
     $params = [['group', 'IN', [1], 0, 0]];
 
@@ -664,7 +664,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testNumericPostal() {
+  public function testNumericPostal(): void {
     // Precaution as hitting some inconsistent set up running in isolation vs in the suite.
     CRM_Core_DAO::executeQuery('UPDATE civicrm_address SET postal_code = NULL');
 
@@ -704,7 +704,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCaseInsensitive() {
+  public function testCaseInsensitive(): void {
     $orgID = $this->organizationCreate(['organization_name' => 'BOb']);
     $params = [
       'display_name' => 'Minnie Mouse',
@@ -739,7 +739,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testNonNumericEqualsPostal() {
+  public function testNonNumericEqualsPostal(): void {
     $this->individualCreate(['api.address.create' => ['postal_code' => 5, 'location_type_id' => 'Main']]);
     $this->individualCreate(['api.address.create' => ['postal_code' => 'EH10 4RB-889', 'location_type_id' => 'Main']]);
     $this->individualCreate(['api.address.create' => ['postal_code' => '4', 'location_type_id' => 'Main']]);
@@ -767,7 +767,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testRelationshipDescription() {
+  public function testRelationshipDescription(): void {
     $relType = $this->callAPISuccess('RelationshipType', 'create', [
       'name_a_b' => 'blah',
       'name_b_a' => 'other blah',
@@ -810,7 +810,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testNonReciprocalRelationshipTargetGroupIsCorrectResults() {
+  public function testNonReciprocalRelationshipTargetGroupIsCorrectResults(): void {
     $contactID_a = $this->individualCreate();
     $contactID_b = $this->individualCreate();
     $this->callAPISuccess('Relationship', 'create', [
@@ -862,7 +862,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testReciprocalRelationshipWithCustomFields() {
+  public function testReciprocalRelationshipWithCustomFields(): void {
     $params = [
       'extends' => 'Relationship',
     ];
@@ -910,7 +910,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testReciprocalRelationshipTargetGroupIsCorrectResults() {
+  public function testReciprocalRelationshipTargetGroupIsCorrectResults(): void {
     $contactID_a = $this->individualCreate();
     $contactID_b = $this->individualCreate();
     $this->callAPISuccess('Relationship', 'create', [
@@ -962,7 +962,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testReciprocalRelationshipTargetGroupUsesTempTable() {
+  public function testReciprocalRelationshipTargetGroupUsesTempTable(): void {
     $groupID = $this->groupCreate();
     $params = [
       [
@@ -995,7 +995,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testRelationshipPermissionClause() {
+  public function testRelationshipPermissionClause(): void {
     $params = [['relation_type_id', 'IN', ['1_b_a'], 0, 0], ['relation_permission', 'IN', [2], 0, 0]];
     $sql = CRM_Contact_BAO_Query::getQuery($params);
     $this->assertStringContainsString('(civicrm_relationship.is_permission_a_b IN (2))', $sql);
@@ -1006,7 +1006,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testRelationshipClause() {
+  public function testRelationshipClause(): void {
     $today = date('Ymd');
     $from1 = ' FROM civicrm_contact contact_a LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_a = contact_a.id ) LEFT JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_b = contact_b.id )';
     $from2 = ' FROM civicrm_contact contact_a LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = contact_a.id ) LEFT JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_a = contact_b.id )';
@@ -1083,7 +1083,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetByGroupWithStatus() {
+  public function testGetByGroupWithStatus(): void {
     $groupID = $this->groupCreate();
     $this->groupContactCreate($groupID, 3);
     $groupContactID = $this->callAPISuccessGetSingle('GroupContact', ['group_id' => $groupID, 'options' => ['limit' => 1]])['id'];
@@ -1106,7 +1106,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @throws \Exception
    */
-  public function testGetByGroupWithStatusSmartGroup() {
+  public function testGetByGroupWithStatusSmartGroup(): void {
     $groupID = $this->smartGroupCreate();
     // This means they are actually all hard-added, which is fine for this purpose.
     $this->groupContactCreate($groupID, 3);
@@ -1131,7 +1131,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @throws \Exception
    */
-  public function testGroupClause() {
+  public function testGroupClause(): void {
     $this->householdCreate();
     $householdID = $this->householdCreate();
     $individualID = $this->individualCreate();
@@ -1421,7 +1421,7 @@ civicrm_relationship.is_active = 1 AND
   /**
    * Test the options are handled for the qill.
    */
-  public function testQillOptions() {
+  public function testQillOptions(): void {
     $qill = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Activity_BAO_Activity', 'activity_type_id', 2, '=');
     $this->assertEquals(['=', 'Phone Call'], $qill);
 

@@ -1,7 +1,0 @@
-{
-    "type": "search",
-    "title": "Administer Payment Processors",
-    "icon": "fa-list-alt",
-    "server_route": "civicrm/admin/paymentProcessor",
-    "permission": "administer payment processors"
-}

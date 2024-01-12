@@ -105,7 +105,7 @@ trait AfformEventEntityTrait {
    */
   public function setJoinIds($index, $joinEntity, $joinIds) {
     $idField = CoreUtil::getIdFieldName($joinEntity);
-    $this->entityIds[$this->entityName][$index]['_joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinIds, [$idField]);
+    $this->entityIds[$this->entityName][$index]['joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinIds, [$idField]);
     return $this;
   }
 

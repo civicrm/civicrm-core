@@ -115,7 +115,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
         $el['html'] = $date . '<input type="hidden" value="' . $element->getValue() . '" name="' . $element->getAttribute('name') . '">';
       }
       // Render html for wysiwyg textareas
-      if ($el['type'] == 'textarea' && isset($element->_attributes['class']) && strstr($element->_attributes['class'], 'wysiwyg')) {
+      if ($el['type'] == 'textarea' && isset($element->_attributes['class']) && str_contains($element->_attributes['class'], 'wysiwyg')) {
         $el['html'] = '<span class="crm-frozen-field">' . $el['value'] . '</span>';
       }
       else {
@@ -215,6 +215,34 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
 
     $attributes['class'] = $class;
     $element->updateAttributes($attributes);
+  }
+
+  /**
+   * Process an template sourced in a string with Smarty
+   *
+   * This overrides the quick form function which has not been updated in a while.
+   *
+   * The function is called when render the code to mark a field as 'required'
+   *
+   * The notes on the quick form function seem to refer to older smarty - ie:
+   * Smarty has no core function to render a template given as a string.
+   * So we use the smarty eval plugin function to do this.
+   *
+   * @param string $tplSource The template source
+   */
+  public function _tplFetch($tplSource) {
+    // Smarty3 does not have this function defined so the parent fails.
+    // Adding this is preparatory to smarty 3....
+    if (!function_exists('smarty_function_eval') && !file_exists(SMARTY_DIR . '/plugins/function.eval.php')) {
+      $smarty = $this->_tpl;
+      $smarty->assign('var', $tplSource);
+      return $smarty->fetch("eval:$tplSource");
+    }
+    // This part is what the parent does & is suitable to Smarty 2.
+    if (!function_exists('smarty_function_eval')) {
+      require SMARTY_DIR . '/plugins/function.eval.php';
+    }
+    return smarty_function_eval(['var' => $tplSource], $this->_tpl);
   }
 
   /**

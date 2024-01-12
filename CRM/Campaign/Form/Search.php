@@ -65,12 +65,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     //operation for state machine.
     $this->_operation = CRM_Utils_Request::retrieve('op', 'String', $this, FALSE, 'reserve');
     //validate operation.
-    if (!in_array($this->_operation, [
-      'reserve',
-      'release',
-      'interview',
-    ])
-    ) {
+    if (!in_array($this->_operation, ['reserve', 'release', 'interview'])) {
       $this->_operation = 'reserve';
       $this->set('op', $this->_operation);
     }

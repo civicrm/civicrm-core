@@ -219,32 +219,31 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Test getrows on Mailing Opened report.
    */
   public function testReportTemplateGetRowsMailingUniqueOpened(): void {
-    $description = 'Retrieve rows from a mailing opened report template.';
     $this->loadXMLDataSet(__DIR__ . '/../../CRM/Mailing/BAO/queryDataset.xml');
 
     // Check total rows without distinct
     global $_REQUEST;
     $_REQUEST['distinct'] = 0;
-    $result = $this->callAPIAndDocument('report_template', 'getrows', [
+    $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
-    ], __FUNCTION__, __FILE__, $description, 'Getrows');
+    ]);
     $this->assertEquals(14, $result['count']);
 
     // Check total rows with distinct
     $_REQUEST['distinct'] = 1;
-    $result = $this->callAPIAndDocument('report_template', 'getrows', [
+    $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
-    ], __FUNCTION__, __FILE__, $description, 'Getrows');
+    ]);
     $this->assertEquals(5, $result['count']);
 
     // Check total rows with distinct by passing NULL value to distinct parameter
     $_REQUEST['distinct'] = NULL;
-    $result = $this->callAPIAndDocument('report_template', 'getrows', [
+    $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
-    ], __FUNCTION__, __FILE__, $description, 'Getrows');
+    ]);
     $this->assertEquals(5, $result['count']);
   }
 
@@ -326,13 +325,12 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     if (strpos($reportID, 'logging') === 0) {
       Civi::settings()->set('logging', 1);
     }
-    $description = "Get Statistics from a report (note there isn't much data to get in the test DB).";
     if ($reportID === 'contribute/summary') {
       $this->hookClass->setHook('civicrm_alterReportVar', [$this, 'alterReportVarHook']);
     }
-    $this->callAPIAndDocument('report_template', 'getstatistics', [
+    $this->callAPISuccess('report_template', 'getstatistics', [
       'report_id' => $reportID,
-    ], __FUNCTION__, __FILE__, $description, 'Getstatistics');
+    ]);
   }
 
   /**
@@ -573,7 +571,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCaseDetailsCaseTypeHeader() {
+  public function testCaseDetailsCaseTypeHeader(): void {
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'case/detail',
       'fields' => ['subject' => 1, 'client_sort_name' => 1],
@@ -592,7 +590,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionDetailSoftCredits() {
+  public function testContributionDetailSoftCredits(): void {
     $contactID = $this->individualCreate();
     $contactID2 = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
@@ -604,7 +602,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => ['metadata' => ['sql']],
     ]);
     $this->assertEquals(
-      "<a href='/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=" . $contactID2 . "'>Anderson, Anthony</a> $ 5.00",
+      "<a href='/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=" . $contactID2 . "'>Anderson, Anthony II</a> $ 5.00",
       $rows['values'][0]['civicrm_contribution_soft_credits']
     );
   }
@@ -614,7 +612,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionDetailSoftCreditsOnly() {
+  public function testContributionDetailSoftCreditsOnly(): void {
     $contactID = $this->individualCreate();
     $contactID2 = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
@@ -672,7 +670,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Group', ['check_permissions' => 1], 0);
     $this->hookClass->setHook('civicrm_aclGroup', [$this, 'aclGroupOnly']);
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclGroupContactsOnly']);
-    unset(Civi::$statics['CRM_ACL_API']['group_permission']);
+    unset(Civi::$statics['CRM_ACL_API']);
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
       'gid_value' => [$this->aclGroupID],
@@ -706,7 +704,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryWithTwoGroups() {
+  public function testContributionSummaryWithTwoGroups(): void {
     $groupID = $this->setUpPopulatedGroup();
     $groupID2 = $this->setUpPopulatedSmartGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', [
@@ -723,7 +721,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryGroupByContributionStatus() {
+  public function testContributionSummaryGroupByContributionStatus(): void {
     $params = [
       'report_id' => 'contribute/summary',
       'fields' => ['total_amount' => 1, 'country_id' => 1],
@@ -741,7 +739,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryGroupByYearFrequency() {
+  public function testContributionSummaryGroupByYearFrequency(): void {
     $params = [
       'report_id' => 'contribute/summary',
       'fields' => ['total_amount' => 1, 'country_id' => 1],
@@ -1160,6 +1158,12 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function testActivityDetails(): void {
     $this->createContactsWithActivities();
+    // Add employers for created contacts.
+    foreach ($this->contactIDs as $i => $contactID) {
+      $organizationIDs[] = $organizationID = $this->organizationCreate(['organization_name' => 'Test Organization ' . $i]);
+      $this->callAPISuccess('Contact', 'create', ['id' => $contactID, 'employer_id' => $organizationID]);
+    }
+
     $fields = [
       'contact_source' => '1',
       'contact_assignee' => '1',
@@ -1211,9 +1215,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     $rows = $this->callAPISuccess('report_template', 'getrows', $params)['values'];
     $expected = [
-      'civicrm_contact_contact_source' => 'Łąchowski-Roberts, Anthony',
-      'civicrm_contact_contact_assignee' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony</a>',
-      'civicrm_contact_contact_target' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3\'>Brzęczysław, Anthony</a>; <a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony</a>',
+      'civicrm_contact_contact_source' => 'Łąchowski-Roberts, Anthony II',
+      'civicrm_contact_contact_assignee' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->contactIDs[1] . '\'>Łąchowski-Roberts, Anthony II</a>',
+      'civicrm_contact_contact_target' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->contactIDs[0] . '\'>Brzęczysław, Anthony II</a>; <a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->contactIDs[1] . '\'>Łąchowski-Roberts, Anthony II</a>',
       'civicrm_contact_contact_source_id' => $this->contactIDs[2],
       'civicrm_contact_contact_assignee_id' => $this->contactIDs[1],
       'civicrm_contact_contact_target_id' => $this->contactIDs[0] . ';' . $this->contactIDs[1],
@@ -1251,6 +1255,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'civicrm_contact_contact_source_hover' => 'View Contact Summary for this Contact',
       'civicrm_activity_activity_type_id_hover' => 'View Activity Record',
       'class' => NULL,
+      'civicrm_contact_contact_source_employer_id' => $organizationIDs[2],
+      'civicrm_contact_contact_assignee_employer_id' => $organizationIDs[1],
+      'civicrm_contact_contact_target_employer_id' => $organizationIDs[0] . ';' . $organizationIDs[1],
     ];
     $row = $rows[0];
     // This link is not relative - skip for now
@@ -1444,7 +1451,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     // pcpBLockParams creates a contribution page and returns the parameters
     // necessary to create a PBP Block.
     $blockParams = $this->pcpBlockParams();
-    $pcpBlock = CRM_PCP_BAO_PCPBlock::create($blockParams);
+    $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord($blockParams);
 
     // Keep track of the contribution page id created. We will use this
     // contribution page id for all the PCP pages.
@@ -1458,7 +1465,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $pcpParams['pcp_block_id'] = $pcpBlock->id;
     $pcpParams['page_id'] = $contribution_page_id;
     $pcpParams['page_type'] = 'contribute';
-    $pcp1 = CRM_PCP_BAO_PCP::create($pcpParams);
+    $pcp1 = CRM_PCP_BAO_PCP::writeRecord($pcpParams);
 
     // Nice work. Now, let's create a second PCP page.
     $pcpParams = $this->pcpParams();
@@ -1469,7 +1476,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $pcpParams['pcp_block_id'] = $pcpBlock->id;
     $pcpParams['page_id'] = $contribution_page_id;
     $pcpParams['page_type'] = 'contribute';
-    $pcp2 = CRM_PCP_BAO_PCP::create($pcpParams);
+    $pcp2 = CRM_PCP_BAO_PCP::writeRecord($pcpParams);
 
     // Get soft credit types, with the name column as the key.
     $soft_credit_types = CRM_Core_PseudoConstant::get('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', ['flip' => TRUE, 'labelColumn' => 'name']);

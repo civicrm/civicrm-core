@@ -41,7 +41,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testRelationshipTypeOptionsWillReturnSpecifiedType() {
+  public function testRelationshipTypeOptionsWillReturnSpecifiedType(): void {
     $orgToOrgType = 'A_B_relationship';
     $orgToOrgReverseType = 'B_A_relationship';
     $this->callAPISuccess('RelationshipType', 'create', [
@@ -69,7 +69,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->assertNotContains($orgToOrgReverseType, $result['values']);
   }
 
-  public function testContactIdAndRelationshipIdWillBeUsedInFilter() {
+  public function testContactIdAndRelationshipIdWillBeUsedInFilter(): void {
     $individual = civicrm_api3('Contact', 'create', [
       'display_name' => 'Individual A',
       'contact_type' => 'Individual',
@@ -203,7 +203,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSingleMembershipForTwoRelationships() {
+  public function testSingleMembershipForTwoRelationships(): void {
     $individualID = $this->individualCreate(['display_name' => 'Individual A']);
     $organisationID = $this->organizationCreate(['organization_name' => 'Organization B']);
     $membershipOrganisationID = $this->organizationCreate(['organization_name' => 'Membership Organization']);
@@ -283,7 +283,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
    * for the api, but since it does some more business logic after too the
    * tests might not be checking exactly the same thing.
    */
-  public function testBAOAdd() {
+  public function testBAOAdd(): void {
     // add a new type
     $relationship_type_id_1 = $this->relationshipTypeCreate([
       'name_a_b' => 'Food poison tester is',
@@ -329,7 +329,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
    * @return void
    * @throws \CRM_Core_Exception
    */
-  public function testDisableInvalidRelationship() {
+  public function testDisableInvalidRelationship(): void {
     $individualStaff = civicrm_api3('Contact', 'create', [
       'display_name' => 'Individual A',
       'contact_type' => 'Individual',

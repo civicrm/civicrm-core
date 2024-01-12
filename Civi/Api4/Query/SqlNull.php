@@ -19,10 +19,6 @@ class SqlNull extends SqlExpression {
   protected function initialize() {
   }
 
-  public function render(Api4Query $query): string {
-    return 'NULL';
-  }
-
   public static function getTitle(): string {
     return ts('Null');
   }

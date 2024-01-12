@@ -140,19 +140,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   }
 
   /**
-   * called when action is browse.
-   *
-   */
-  public function browse() {
-    // do nothing :) we are using datatable for rendering relationship selectors
-    $columnHeaders = CRM_Contact_BAO_Relationship::getColumnHeaders();
-    $selector = NULL;
-    $contactRelationships = [];
-    CRM_Utils_Hook::searchColumns('relationship.columns', $columnHeaders, $contactRelationships, $selector);
-    $this->assign('columnHeaders', $columnHeaders);
-  }
-
-  /**
    * called when action is update or new.
    *
    */
@@ -215,11 +202,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
       $this->edit();
     }
 
-    // if this is called from case view, suppress browse relationships form
-    else {
-      $this->browse();
-    }
-
     return parent::run();
   }
 
@@ -245,7 +227,9 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   }
 
   /**
-   * Get action links.
+   * @deprecated since 5.68. Will be removed around 5.74.
+   *
+   * Only-used-by-user-dashboard.
    *
    * @return array
    *   (reference) of action links

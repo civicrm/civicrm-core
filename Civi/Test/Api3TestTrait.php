@@ -54,7 +54,7 @@ trait Api3TestTrait {
         unset($expected[$value]);
       }
     }
-    $this->assertEquals($result, $expected, "api result array comparison failed " . $prefix . print_r($result, TRUE) . ' was compared to ' . print_r($expected, TRUE));
+    $this->assertEquals($result, $expected, 'api result array comparison failed ' . $prefix . print_r($result, TRUE) . ' was compared to ' . print_r($expected, TRUE));
   }
 
   /**
@@ -125,7 +125,7 @@ trait Api3TestTrait {
    * @param null $extraOutput
    * @return array|int
    */
-  public function callAPIFailure($entity, $action, $params, $expectedErrorMessage = NULL, $extraOutput = NULL) {
+  public function callAPIFailure($entity, $action, $params = [], $expectedErrorMessage = NULL, $extraOutput = NULL) {
     if (is_array($params)) {
       $params += [
         'version' => $this->_apiversion,
@@ -140,6 +140,17 @@ trait Api3TestTrait {
     }
     $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success", $expectedErrorMessage);
     return $result;
+  }
+
+  /**
+   * @deprecated
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   * @return array|int
+   */
+  public function callAPIAndDocument($entity, $action, $params) {
+    return $this->callAPISuccess($entity, $action, $params);
   }
 
   /**
@@ -504,8 +515,6 @@ trait Api3TestTrait {
       $actionInfo = \civicrm_api4($v4Entity, 'getActions', ['checkPermissions' => FALSE, 'where' => [['name', '=', $v4Action]]]);
     }
     catch (NotImplementedException $e) {
-      // For now we'll mark the test incomplete if a v4 entity doesn't exit yet
-      $this->markTestIncomplete($e->getMessage());
     }
     if (!isset($actionInfo[0])) {
       throw new \Exception("Api4 $v4Entity $v4Action does not exist.");

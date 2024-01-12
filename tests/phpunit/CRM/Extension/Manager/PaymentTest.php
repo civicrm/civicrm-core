@@ -42,7 +42,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   /**
    * Install an extension with a valid type name.
    */
-  public function testInstallDisableUninstall() {
+  public function testInstallDisableUninstall(): void {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
     $manager->install(['test.extension.manager.paymenttest']);
@@ -62,7 +62,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
   /**
    * Install an extension with a valid type name.
    */
-  public function testInstallDisableEnable() {
+  public function testInstallDisableEnable(): void {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
 
@@ -85,7 +85,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
    * Install an extension and create a payment processor which uses it.
    * Attempts to uninstall fail
    */
-  public function testInstall_Add_FailUninstall() {
+  public function testInstall_Add_FailUninstall(): void {
     $manager = $this->system->getManager();
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
 

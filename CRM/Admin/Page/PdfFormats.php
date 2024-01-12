@@ -51,13 +51,13 @@ class CRM_Admin_Page_PdfFormats extends CRM_Core_Page_Basic {
       self::$_links = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/pdfFormats',
+          'url' => 'civicrm/admin/pdfFormats/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit PDF Page Format'),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/pdfFormats',
+          'url' => 'civicrm/admin/pdfFormats/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete PDF Page Format'),
         ],

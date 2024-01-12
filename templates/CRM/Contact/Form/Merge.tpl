@@ -90,10 +90,8 @@
             {$row.title|escape}
           </td>
         {/if}
-
-          {assign var=position  value=$field|strrpos:'_'}
-          {assign var=blockId   value=$field|substr:$position+1}
-          {assign var=blockName value=$field|substr:14:$position-14}
+          {assign var=blockId  value=$row.location_block_index}
+          {assign var=blockName value=$row.location_entity}
 
           <td>
             {* @TODO check if this is ever an array or a fileName? *}
@@ -142,12 +140,12 @@
 
             <td>
               {* Display location for fields with locations *}
-              {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im' }
+              {if $blockName eq 'email' || $blockName eq 'phone' || $blockName eq 'address' || $blockName eq 'im'}
                 {$form.location_blocks.$blockName.$blockId.locTypeId.html}&nbsp;
               {/if}
 
               {* Display other_type_id for websites, ims and phones *}
-              {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone' }
+              {if $blockName eq 'website' || $blockName eq 'im' || $blockName eq 'phone'}
                 {$form.location_blocks.$blockName.$blockId.typeTypeId.html}&nbsp;
               {/if}
 

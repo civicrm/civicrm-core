@@ -1,0 +1,11 @@
+<fieldset>
+  <div class="form-inline">
+    <div class="checkbox-inline form-control">
+      <label>
+        <input type="checkbox" ng-checked="!!$ctrl.display.settings.toolbar" ng-click="$ctrl.toggleToolbar()">
+        <span>{{:: ts('Toolbar') }}</span>
+      </label>
+    </div>
+  </div>
+  <crm-search-admin-link-group ng-if="$ctrl.display.settings.toolbar" links="$ctrl.links" group="$ctrl.display.settings.toolbar" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></crm-search-admin-link-group>
+</fieldset>

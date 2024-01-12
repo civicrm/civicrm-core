@@ -8,7 +8,7 @@
   <add>1.1</add>
   <log>true</log>
   <icon>fa-tag</icon>
-  <labelField>name</labelField>
+  <labelField>label</labelField>
   <field>
     <name>id</name>
     <title>Tag ID</title>
@@ -30,9 +30,23 @@
     <type>varchar</type>
     <required>true</required>
     <length>64</length>
-    <comment>Name of Tag.</comment>
+    <comment>Unique machine name</comment>
     <add>1.1</add>
   </field>
+  <!-- TODO: Localizable -->
+  <field>
+    <name>label</name>
+    <title>Tag Label</title>
+    <comment>User-facing tag name</comment>
+    <required>true</required>
+    <type>varchar</type>
+    <length>64</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.68</add>
+  </field>
+  <!-- TODO: Localizable -->
   <field>
     <name>description</name>
     <title>Description</title>
@@ -50,7 +64,8 @@
     <pseudoconstant>
       <table>civicrm_tag</table>
       <keyColumn>id</keyColumn>
-      <labelColumn>name</labelColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>label</labelColumn>
     </pseudoconstant>
     <html>
       <label>Parent Tag</label>
@@ -116,6 +131,7 @@
     <comment>FK to civicrm_contact, who created this tag</comment>
     <html>
       <label>Created By</label>
+      <type>EntityRef</type>
     </html>
     <add>3.4</add>
   </field>
@@ -140,6 +156,13 @@
     <type>datetime</type>
     <title>Tag Created Date</title>
     <comment>Date and time that tag was created.</comment>
+    <default>CURRENT_TIMESTAMP</default>
+    <readonly>true</readonly>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+      <label>Created Date</label>
+    </html>
     <add>3.4</add>
   </field>
 </table>

@@ -99,7 +99,7 @@
                         new OpenLayers.Projection("EPSG:4326"),
                         map.getProjectionObject()
                 );
-                {if $location.image && ( $location.marker_class neq 'Event' ) }
+                {if $location.image && ($location.marker_class neq 'Event')}
                     var image = '{$location.image}';
                 {else}
                     {if $location.marker_class eq 'Individual'}
@@ -121,7 +121,7 @@
         map.setCenter(bounds.getCenterLonLat());
         {if count($locations) gt 1}
             map.zoomToExtent(bounds);
-        {elseif $location.marker_class eq 'Event' || $location.marker_class eq 'Individual'|| $location.marker_class eq 'Household' || $location.marker_class eq 'Organization' }
+        {elseif $location.marker_class eq 'Event' || $location.marker_class eq 'Individual'|| $location.marker_class eq 'Household' || $location.marker_class eq 'Organization'}
             map.zoomTo({$defaultZoom});
         {else}
             map.zoomTo({$defaultZoom});

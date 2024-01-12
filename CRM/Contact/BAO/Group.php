@@ -9,14 +9,16 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\Group;
+use Civi\Core\HookInterface;
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
+class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterface {
 
   /**
    * @deprecated
@@ -310,17 +312,19 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     if (!CRM_Core_Permission::check([['edit all contacts', 'view all contacts']])) {
-      $allGroups = CRM_Core_PseudoConstant::allGroup(NULL, FALSE);
-      $allowedGroups = \CRM_ACL_API::group(CRM_ACL_API::VIEW, NULL, 'civicrm_group', $allGroups);
-      $groupsIn = $allowedGroups ? implode(',', $allowedGroups) : '0';
+      $allowedGroups = CRM_Core_Permission::group(NULL, FALSE);
+      $groupsIn = $allowedGroups ? implode(',', array_keys($allowedGroups)) : '0';
       $clauses['id'][] = "IN ($groupsIn)";
     }
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
   }
 
@@ -342,9 +346,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       'parents' => NULL,
     ];
 
+    // Fill title and frontend_title if not supplied
+    if (empty($params['id']) && empty($params['title'])) {
+      $params['title'] = $params['frontend_title'] ?? $params['name'];
+    }
     if (empty($params['id']) && empty($params['frontend_title'])) {
-      // If we were calling writeRecord it would handle this, but we need
-      // to migrate the other bits of magic.
       $params['frontend_title'] = $params['title'];
     }
     $hook = empty($params['id']) ? 'create' : 'edit';
@@ -386,6 +392,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     // form the name only if missing: CRM-627
     $nameParam = $params['name'] ?? NULL;
+    // If we were calling writeRecord it would handle this, but we need
+    // to migrate the other bits of magic.
     if (!$nameParam && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
@@ -631,17 +639,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    */
   protected static function flushCaches() {
     CRM_Utils_System::flushCache();
-    $staticCaches = [
-      'CRM_Core_PseudoConstant' => 'groups',
-      'CRM_ACL_API' => 'group_permission',
-      'CRM_ACL_BAO_ACL' => 'permissioned_groups',
-      'CRM_Contact_BAO_Group' => 'permission_clause',
-    ];
-    foreach ($staticCaches as $class => $key) {
-      if (isset(Civi::$statics[$class][$key])) {
-        unset(Civi::$statics[$class][$key]);
-      }
-    }
+    unset(Civi::$statics['CRM_Core_PseudoConstant']['groups']);
+    unset(Civi::$statics['CRM_ACL_API']);
+    unset(Civi::$statics['CRM_ACL_BAO_ACL']['permissioned_groups']);
+    unset(Civi::$statics['CRM_Contact_BAO_Group']['permission_clause']);
   }
 
   /**
@@ -1025,6 +1026,12 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     // CRM-16905 - Sort by count cannot be done with sql
     if (!empty($params['sort']) && strpos($params['sort'], 'count') === 0) {
       usort($values, function($a, $b) {
+        if ($a['count'] === 'unknown') {
+          return -1;
+        }
+        if ($b['count'] === 'unknown') {
+          return 1;
+        }
         return $a['count'] - $b['count'];
       });
       if (strpos($params['sort'], 'desc')) {
@@ -1436,32 +1443,26 @@ WHERE {$whereClause}";
   }
 
   /**
-   * @param string $entityName
-   * @param string $action
-   * @param array $record
-   * @param $userID
-   * @return bool
-   * @see CRM_Core_DAO::checkAccess
+   * Check write access.
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, $userID): bool {
-    switch ($action) {
-      case 'create':
-        $groupType = (array) ($record['group_type:name'] ?? []);
-        // If not already in :name format, transform to name
-        foreach ((array) ($record['group_type'] ?? []) as $typeId) {
-          $groupType[] = CRM_Core_PseudoConstant::getName(self::class, 'group_type', $typeId);
-        }
-        if ($groupType === ['Mailing List']) {
-          // If it's only a Mailing List, edit groups OR create mailings will work
-          return CRM_Core_Permission::check(['access CiviCRM', ['edit groups', 'access CiviMail', 'create mailings']], $userID);
-        }
-        else {
-          return CRM_Core_Permission::check(['access CiviCRM', 'edit groups'], $userID);
-        }
-
-      default:
-        // All other actions just rely on gatekeeper permissions
-        return TRUE;
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $userID = $e->getUserID();
+    // Check create permission (all other actions just rely on gatekeeper permissions)
+    if ($e->getActionName() === 'create') {
+      $groupType = (array) ($record['group_type:name'] ?? []);
+      // If not already in :name format, transform to name
+      foreach ((array) ($record['group_type'] ?? []) as $typeId) {
+        $groupType[] = CRM_Core_PseudoConstant::getName(self::class, 'group_type', $typeId);
+      }
+      if ($groupType === ['Mailing List']) {
+        // If it's only a Mailing List, edit groups OR create mailings will work
+        $e->setAuthorized(CRM_Core_Permission::check(['access CiviCRM', ['edit groups', 'access CiviMail', 'create mailings']], $userID));
+      }
+      else {
+        $e->setAuthorized(CRM_Core_Permission::check(['access CiviCRM', 'edit groups'], $userID));
+      }
     }
   }
 

@@ -13,8 +13,8 @@
 
   {include file="CRM/Contact/Form/Search/Intro.tpl"}
 
-  <div class="crm-accordion-wrapper crm-advanced_search_form-accordion {if !empty($ssID) or $rows}collapsed{/if}">
-    <div class="crm-accordion-header crm-master-accordion-header">
+  <details class="crm-advanced_search_form-accordion" {if !$rows}open{/if} >
+    <summary class="crm-master-accordion-header">
       {if !empty($savedSearch)}
         {ts 1=$savedSearch.name}Edit %1 Smart Group Criteria{/ts}
       {elseif !empty($ssID) or $rows}
@@ -23,11 +23,11 @@
         {ts}Search Criteria{/ts}
       {/if}
       {help id='id-advanced-intro'}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       {include file="CRM/Contact/Form/Search/AdvancedCriteria.tpl"}
     </div>
-  </div>
+  </details>
 </div>
 
 {if $rowsEmpty}

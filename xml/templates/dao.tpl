@@ -115,33 +115,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
   {rdelim}
 {/if}
 
-
-{if !empty($table.foreignKey) || !empty($table.dynamicForeignKey)}
-    /**
-     * Returns foreign keys and entity references.
-     *
-     * @return array
-     *   [CRM_Core_Reference_Interface]
-     */
-    public static function getReferenceColumns() {ldelim}
-      if (!isset(Civi::$statics[__CLASS__]['links'])) {ldelim}
-        Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
-{if isset($table.foreignKey)}
-{foreach from=$table.foreignKey item=foreign}
-        Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}');
-{/foreach}
-{/if}
-{if isset($table.dynamicForeignKey)}
-{foreach from=$table.dynamicForeignKey item=foreign}
-        Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}');
-{/foreach}
-{/if}
-        CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
-      {rdelim}
-      return Civi::$statics[__CLASS__]['links'];
-    {rdelim}
-{/if} {* table.foreignKey *}
-
       /**
        * Returns all the column names of this table
        *
@@ -219,6 +192,12 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if isset($field.FKClassName)}
                       'FKClassName' => '{$field.FKClassName}',
 {/if}
+{if isset($field.DFKEntityColumn)}
+                      'DFKEntityColumn' => '{$field.DFKEntityColumn}',
+{/if}
+{if isset($field.FKColumnName)}
+                      'FKColumnName' => '{$field.FKColumnName}',
+{/if}
 {if !empty($field.component)}
                       'component' => '{$field.component}',
 {/if}
@@ -251,41 +230,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
             CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
           {rdelim}
           return Civi::$statics[__CLASS__]['fields'];
-      {rdelim}
-
-      /**
-       * Return a mapping from field-name to the corresponding key (as used in fields()).
-       *
-       * @return array
-       *   Array(string $name => string $uniqueName).
-       */
-      public static function &fieldKeys( ) {ldelim}
-        if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {ldelim}
-          Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
-        {rdelim}
-        return Civi::$statics[__CLASS__]['fieldKeys'];
-      {rdelim}
-
-      /**
-       * Returns the names of this table
-       *
-       * @return string
-       */
-      public static function getTableName( ) {ldelim}
-        {if $table.localizable}
-          return CRM_Core_DAO::getLocaleTableName( self::$_tableName );
-        {else}
-          return self::$_tableName;
-        {/if}
-      {rdelim}
-
-      /**
-       * Returns if this table needs to be logged
-       *
-       * @return bool
-       */
-      public function getLog( ) {ldelim}
-          return self::$_log;
       {rdelim}
 
       /**

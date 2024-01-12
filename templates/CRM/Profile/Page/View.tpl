@@ -10,7 +10,7 @@
 {* If you want a custom profile view, you can access field labels and values in $profileFields_N array - where N is profile ID. *}
 {* EXAMPLES *}{* $profileFields_1.last_name.label *}{* $profileFields_1.last_name.value *}
 
-{if $overlayProfile }
+{if $overlayProfile}
     {foreach from=$profileGroups item=group}
         <div class="crm-summary-group">
            {$group.content}

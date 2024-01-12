@@ -125,7 +125,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
           CRM_Core_Action::DELETE => [
             'name' => ts('Delete Contact Image'),
             'url' => 'civicrm/contact/image',
-            'qs' => 'reset=1&cid=' . $this->_contactID . '&action=delete',
+            'qs' => 'reset=1&cid=%%id%%&action=delete&qfKey=%%key%%&pcp=1',
             'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
           ],
         ];
@@ -133,6 +133,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
           CRM_Core_Action::DELETE,
           [
             'id' => $this->_contactID,
+            'key' => $this->controller->_key,
           ],
           ts('more'),
           FALSE,

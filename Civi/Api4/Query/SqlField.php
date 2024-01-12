@@ -25,13 +25,13 @@ class SqlField extends SqlExpression {
     $this->fields[] = $this->expr;
   }
 
-  public function render(Api4Query $query): string {
+  public function render(Api4Query $query, bool $includeAlias = FALSE): string {
     $field = $query->getField($this->expr, TRUE);
+    $rendered = $field['sql_name'];
     if (!empty($field['sql_renderer'])) {
-      $renderer = $field['sql_renderer'];
-      return $renderer($field, $query);
+      $rendered = $field['sql_renderer']($field, $query);
     }
-    return $field['sql_name'];
+    return $rendered . ($includeAlias ? " AS `{$this->getAlias()}`" : '');
   }
 
   public static function getTitle(): string {

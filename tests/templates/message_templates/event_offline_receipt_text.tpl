@@ -1,6 +1,6 @@
-contactID:::{$contactID}
-eventID:::{$eventID}
-participantID:::{$participantID}
+contactID:::{contact.id}
+eventID:::{event.id}
+participantID:::{participant.id}
 contact.id:::{contact.id}
 event.id:::{event.id}
 participant.id:::{participant.id}
@@ -17,7 +17,7 @@ event.is_show_location|boolean::{event.is_show_location|boolean}
 event.is_public|boolean::{event.is_public|boolean}
 participant.participant_role_id:name::{participant.participant_role_id:name}
 participant.status_id:name:::{participant.status_id:name}
-email:::{$email}
+email:::{contact.email_primary.email}
 event.pay_later_receipt:::{event.pay_later_receipt}
 contribution.total_amount:::{contribution.total_amount|crmMoney}
 contribution.total_amount|raw:::{contribution.total_amount|raw}

@@ -16,7 +16,15 @@
  */
 class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
 
-  protected $_summary = NULL;
+  protected $_summary;
+
+  private $_columnHeadersComponent;
+
+  private $_selectComponent;
+
+  private $_formComponent;
+
+  private $_contactSelected;
 
   protected $_customGroupExtends = [
     'Contact',
@@ -423,27 +431,15 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
 
     foreach ($this->getAvailableComponents() as $val) {
       if (!empty($select[$val])) {
-        $this->_selectComponent[$val] = "SELECT " . implode(', ', $select[$val]) . " ";
+        $this->_selectComponent[$val] = 'SELECT ' . implode(', ', $select[$val]) . ' ';
         unset($select[$val]);
       }
     }
 
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
+    $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
   }
 
-  /**
-   * @param $fields
-   * @param $files
-   * @param self $self
-   *
-   * @return array
-   */
-  public static function formRule($fields, $files, $self) {
-    $errors = [];
-    return $errors;
-  }
-
-  public function from() {
+  public function from(): void {
     $this->_from = "
       FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
     ";
@@ -557,7 +553,7 @@ HERESQL;
           $componentsList[] = $compObj->componentID;
         }
       }
-      $componentClause = "civicrm_option_value.component_id IS NULL";
+      $componentClause = 'civicrm_option_value.component_id IS NULL';
       if (!empty($componentsList)) {
         $componentsIn = implode(', ', $componentsList);
         $componentClause = <<<HERESQL
@@ -592,14 +588,13 @@ HERESQL;
     }
   }
 
-  public function where() {
+  public function where(): void {
     $clauses = [];
 
-    foreach ($this->_columns as $tableName => $table) {
+    foreach ($this->_columns as $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
-          $clause = NULL;
-          if (CRM_Utils_Array::value('operatorType', $field) & CRM_Report_Form::OP_DATE
+          if (($field['operatorType'] ?? 0) & CRM_Report_Form::OP_DATE
           ) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
@@ -611,9 +606,9 @@ HERESQL;
             $op = $this->_params["{$fieldName}_op"] ?? NULL;
             $clause = $this->whereClause($field,
               $op,
-              CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-              CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-              CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+              $this->_params["{$fieldName}_value"] ?? NULL,
+              $this->_params["{$fieldName}_min"] ?? NULL,
+              $this->_params["{$fieldName}_max"] ?? NULL
             );
           }
           if (!empty($clause)) {
@@ -624,10 +619,10 @@ HERESQL;
     }
 
     if (empty($clauses)) {
-      $this->_where = "WHERE ( 1 ) ";
+      $this->_where = 'WHERE ( 1 ) ';
     }
     else {
-      $this->_where = "WHERE " . implode(' AND ', $clauses);
+      $this->_where = 'WHERE ' . implode(' AND ', $clauses);
     }
 
     if ($this->_aclWhere) {
@@ -637,8 +632,9 @@ HERESQL;
 
   /**
    * @return array
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function clauseComponent() {
+  public function clauseComponent(): array {
     $selectedContacts = implode(',', $this->_contactSelected);
     $eligibleResult = $rows = $tempArray = [];
     foreach ($this->getAvailableComponents() as $val) {
@@ -698,7 +694,7 @@ HERESQL;
           $row[$key] = $dao->$key;
         }
 
-        $relTitle = "" . $dao->civicrm_relationship_relationship_type_id .
+        $relTitle = '' . $dao->civicrm_relationship_relationship_type_id .
           '_a_b';
         $row['civicrm_relationship_relationship_type_id'] = $relTypes[$relTitle];
 
@@ -747,7 +743,7 @@ HERESQL;
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
         foreach ($this->_columnHeadersComponent[$val] as $key => $value) {
-          if ($key == 'civicrm_activity_source_contact_id') {
+          if ($key === 'civicrm_activity_source_contact_id') {
             $row[$key] = $dao->added_by;
             continue;
           }
@@ -782,7 +778,7 @@ HERESQL;
    *
    * @return array
    */
-  public function statistics(&$rows) {
+  public function statistics(&$rows): array {
     $statistics = [];
 
     $count = count($rows);
@@ -801,7 +797,7 @@ HERESQL;
    * @param int|null $rowCount
    */
   public function limit($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     parent::limit($rowCount);
   }
 
@@ -809,12 +805,15 @@ HERESQL;
    * Override to set pager with limit is 10
    * @param int|null $rowCount
    */
-  public function setPager($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+  public function setPager($rowCount = NULL): void {
+    $rowCount ??= $this->getRowCount();
     parent::setPager($rowCount);
   }
 
-  public function postProcess() {
+  /**
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public function postProcess(): void {
     $this->beginPostProcess();
     $sql = $this->buildQuery(TRUE);
 
@@ -861,7 +860,7 @@ HERESQL;
    * @param array $rows
    *   Rows generated by SQL, with an array for each row.
    */
-  public function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows): void {
 
     $entryFound = FALSE;
 
@@ -898,25 +897,21 @@ HERESQL;
   /**
    * @param array $componentRows
    */
-  public function alterComponentDisplay(&$componentRows) {
-    // custom code to alter rows
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
-    $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-
+  public function alterComponentDisplay(array &$componentRows): void {
     $entryFound = FALSE;
     foreach ($componentRows as $contactID => $components) {
       foreach ($components as $component => $rows) {
         foreach ($rows as $rowNum => $row) {
           // handle contribution
-          if ($component == 'contribution_civireport') {
+          if ($component === 'contribution_civireport') {
             $val = $row['civicrm_contribution_financial_type_id'] ?? NULL;
             if ($val) {
-              $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_financial_type_id'] = CRM_Contribute_PseudoConstant::financialType($val, FALSE);
+              $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_financial_type_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'financial_type_id', $val);
             }
 
             $val = $row['civicrm_contribution_contribution_status_id'] ?? NULL;
             if ($val) {
-              $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_contribution_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($val, 'label');
+              $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_contribution_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $val);
             }
             $entryFound = TRUE;
           }
@@ -924,27 +919,26 @@ HERESQL;
           if ($component === 'membership_civireport') {
             $val = $row['civicrm_membership_membership_type_id'] ?? NULL;
             if ($val) {
-              $componentRows[$contactID][$component][$rowNum]['civicrm_membership_membership_type_id'] = CRM_Member_PseudoConstant::membershipType($val, FALSE);
+              $componentRows[$contactID][$component][$rowNum]['civicrm_membership_membership_type_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'membership_type_id', $val);
             }
 
             $val = $row['civicrm_membership_status_id'] ?? NULL;
             if ($val) {
-              $componentRows[$contactID][$component][$rowNum]['civicrm_membership_status_id'] = CRM_Member_PseudoConstant::membershipStatus($val, FALSE);
+              $componentRows[$contactID][$component][$rowNum]['civicrm_membership_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'membership_status_id', $val);
             }
             $entryFound = TRUE;
           }
 
-          if ($component == 'participant_civireport') {
+          if ($component === 'participant_civireport') {
             $val = $row['civicrm_participant_event_id'] ?? NULL;
             if ($val) {
-              $componentRows[$contactID][$component][$rowNum]['civicrm_participant_event_id'] = CRM_Event_PseudoConstant::event($val, FALSE);
+              $componentRows[$contactID][$component][$rowNum]['civicrm_participant_event_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'event_id', $val);
               $url = CRM_Report_Utils_Report::getNextUrl('event/income',
                 'reset=1&force=1&id_op=in&id_value=' . $val,
                 $this->_absoluteUrl, $this->_id
               );
               $componentRows[$contactID][$component][$rowNum]['civicrm_participant_event_id_link'] = $url;
               $componentRows[$contactID][$component][$rowNum]['civicrm_participant_event_id_hover'] = ts('View Event Income details for this Event.');
-              $entryFound = TRUE;
             }
 
             $val = $row['civicrm_participant_participant_status_id'] ?? NULL;
@@ -964,19 +958,19 @@ HERESQL;
             $entryFound = TRUE;
           }
 
-          if ($component == 'activity_civireport') {
+          if ($component === 'activity_civireport') {
             $val = $row['civicrm_activity_activity_type_id'] ?? NULL;
             if ($val) {
-              $componentRows[$contactID][$component][$rowNum]['civicrm_activity_activity_type_id'] = $activityTypes[$val];
+              $componentRows[$contactID][$component][$rowNum]['civicrm_activity_activity_type_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $val);
             }
             $val = $row['civicrm_activity_activity_status_id'] ?? NULL;
             if ($val) {
-              $componentRows[$contactID][$component][$rowNum]['civicrm_activity_activity_status_id'] = $activityStatus[$val];
+              $componentRows[$contactID][$component][$rowNum]['civicrm_activity_activity_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_status_id', $val);
             }
 
             $entryFound = TRUE;
           }
-          if ($component == 'membership_civireport') {
+          if ($component === 'membership_civireport') {
             $val = $row['civicrm_membership_membership_status_id'] ?? NULL;
             if ($val) {
               $componentRows[$contactID][$component][$rowNum]['civicrm_membership_membership_status_id'] = CRM_Member_PseudoConstant::membershipStatus($val);

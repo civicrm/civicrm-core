@@ -11,23 +11,18 @@
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
 {/if}
 
-{include file="CRM/common/TrackingFields.tpl"}
-
 <div class="crm-event-id-{$event.id} crm-block crm-event-confirm-form-block">
     <div class="messages status section continue_message-section"><p>
+    {capture assign=register}{ts}Register{/ts}{/capture}
     {if $isOnWaitlist}
         {ts}Please verify your information.{/ts} <strong>{ts}If space becomes available you will receive an email with a link to complete your registration.{/ts}</strong>
-        {ts 1=$form.buttons._qf_Confirm_next.html|strip_tags}Click <strong>%1</strong> to be added to the WAIT LIST for this event.{/ts}
+        {ts 1=$register}Click <strong>%1</strong> to be added to the WAIT LIST for this event.{/ts}
     {elseif $isRequireApproval}
         {ts}Please verify your information.{/ts} <strong>{ts}Once approved, you will receive an email with a link to complete the registration process.{/ts}</strong>
-        {ts 1=$form.buttons._qf_Confirm_next.html|strip_tags}Click <strong>%1</strong> to submit your registration for approval.{/ts}
+        {ts 1=$register}Click <strong>%1</strong> to submit your registration for approval.{/ts}
     {else}
         {ts}Please verify your information.{/ts}
-        {if $contributeMode EQ 'notify' and !$is_pay_later and !$isAmountzero}
-            {ts 1=$form.buttons._qf_Confirm_next.html|strip_tags 2=$paymentProcessor.frontend_title}Click <strong>%1</strong> to checkout with %2.{/ts}
-        {else}
-            {ts 1=$form.buttons._qf_Confirm_next.html|strip_tags}Click <strong>%1</strong> to complete your registration.{/ts}
-        {/if}
+        {$verifyText}
     {/if}
     </p></div>
     {if $is_pay_later and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
@@ -53,7 +48,7 @@
                 {include file="CRM/Price/Page/LineItem.tpl" context="Event"}
             {elseif $amounts || $amount == 0}
           <div class="crm-section no-label amount-item-section">
-                    {foreach from= $amounts item=amount key=level}
+                    {foreach from=$amounts item=amount key=level}
               <div class="content">
                   {$amount.amount|crmMoney}&nbsp;&nbsp;{$amount.label}
               </div>

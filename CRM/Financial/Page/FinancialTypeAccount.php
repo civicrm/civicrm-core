@@ -57,12 +57,14 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
           'url' => 'civicrm/admin/financial/financialType/accounts',
           'qs' => 'action=update&id=%%id%%&aid=%%aid%%&reset=1',
           'title' => ts('Edit Financial Type Account'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/financial/financialType/accounts',
           'qs' => 'action=delete&id=%%id%%&aid=%%aid%%',
           'title' => ts('Delete Financial Type Account'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }

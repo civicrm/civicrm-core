@@ -41,6 +41,14 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
+   * @internal
+   * @return bool
+   */
+  public function isLoaded(): bool {
+    return function_exists('t');
+  }
+
+  /**
    * @inheritdoc
    */
   public function getDefaultFileStorage() {
@@ -293,9 +301,11 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function getModules() {
     $result = [];
-    $q = db_query('SELECT name, status FROM {system} WHERE type = \'module\' AND schema_version <> -1');
+    $q = db_query('SELECT name, status, info FROM {system} WHERE type = \'module\' AND schema_version <> -1');
     foreach ($q as $row) {
-      $result[] = new CRM_Core_Module('drupal.' . $row->name, $row->status == 1);
+      $info = $row->info ? \CRM_Utils_String::unserialize($row->info) : [];
+      $label = _ts('%1 (%2)', [1 => $info['name'] ?? $row->name, 2 => _ts(CIVICRM_UF)]);
+      $result[] = new CRM_Core_Module('drupal.' . $row->name, $row->status == 1, $label);
     }
     return $result;
   }
@@ -782,15 +792,15 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function getEmailFieldName(CRM_Core_Form $form, array $fields):string {
     $emailName = '';
-
-    if (!empty($form->_bltID) && array_key_exists("email-{$form->_bltID}", $fields)) {
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
+    if (array_key_exists("email-{$billingLocationTypeID}", $fields)) {
       // this is a transaction related page
-      $emailName = 'email-' . $form->_bltID;
+      $emailName = 'email-' . $billingLocationTypeID;
     }
     else {
       // find the email field in a profile page
       foreach ($fields as $name => $dontCare) {
-        if (substr($name, 0, 5) == 'email') {
+        if (str_starts_with($name, 'email')) {
           $emailName = $name;
           break;
         }

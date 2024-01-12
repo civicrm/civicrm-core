@@ -32,11 +32,13 @@
  * @param string|null $text
  *   The SELECT query which supplies the interesting data to be stored in the snapshot.
  * @param CRM_Core_Smarty $smarty
+ * @param bool $repeat
+ *   Repeat is true for the opening tag, false for the closing tag
  * @return string|null
  * @throws \CRM_Core_Exception
  */
-function smarty_block_crmUpgradeSnapshot($params, $text, &$smarty) {
-  if ($text === NULL) {
+function smarty_block_crmUpgradeSnapshot($params, $text, &$smarty, &$repeat) {
+  if ($repeat || $text === NULL) {
     return NULL;
   }
 

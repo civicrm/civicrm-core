@@ -73,13 +73,13 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGet() {
+  public function testGet(): void {
     $params = [
       'parent_group_id' => $this->ids['Group']['parent'],
       'child_group_id' => $this->ids['Group']['child'],
     ];
 
-    $result = $this->callAPIAndDocument('group_nesting', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_nesting', 'get', $params);
     $expected = [
       1 => [
         'id' => 1,
@@ -96,7 +96,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGetWithChildGroupId() {
+  public function testGetWithChildGroupId(): void {
     $params = [
       'child_group_id' => $this->ids['Group']['child3'],
     ];
@@ -125,7 +125,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGetWithParentGroupId() {
+  public function testGetWithParentGroupId(): void {
     $params = [
       'parent_group_id' => $this->ids['Group']['parent'],
     ];
@@ -162,7 +162,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGetEmptyResults() {
+  public function testGetEmptyResults(): void {
     $params = [
       'parent_group_id' => $this->ids['Group']['parent'],
       'child_group_id' => 700,
@@ -177,13 +177,13 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $params = [
       'parent_group_id' => $this->ids['Group']['parent'],
       'child_group_id' => $this->ids['Group']['child2'],
     ];
 
-    $this->callAPIAndDocument('group_nesting', 'create', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('group_nesting', 'create', $params);
     $this->callAPISuccessGetCount('GroupNesting', $params, 1);
   }
 
@@ -192,7 +192,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testDelete() {
+  public function testDelete(): void {
     $params = [
       'parent_group_id' => $this->ids['Group']['parent'],
       'child_group_id' => $this->ids['Group']['child'],
@@ -200,7 +200,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('group_nesting', 'get', $params);
     $params = ['id' => $result['id']];
-    $this->callAPIAndDocument('group_nesting', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('group_nesting', 'delete', $params);
     $this->assertEquals(0, $this->callAPISuccess('group_nesting', 'getcount', $params));
   }
 
@@ -211,7 +211,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testDeleteWithEmptyParams() {
+  public function testDeleteWithEmptyParams(): void {
     $this->callAPIFailure('group_nesting', 'delete', []);
   }
 

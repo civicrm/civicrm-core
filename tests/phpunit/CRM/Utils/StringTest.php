@@ -88,8 +88,8 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
       $actual = [];
       CRM_Utils_String::extractName($case['full_name'], $actual);
       $this->assertEquals($actual['first_name'], $case['first_name']);
-      $this->assertEquals(CRM_Utils_Array::value('last_name', $actual), CRM_Utils_Array::value('last_name', $case));
-      $this->assertEquals(CRM_Utils_Array::value('middle_name', $actual), CRM_Utils_Array::value('middle_name', $case));
+      $this->assertEquals($actual['last_name'] ?? NULL, $case['last_name'] ?? NULL);
+      $this->assertEquals($actual['middle_name'] ?? NULL, $case['middle_name'] ?? NULL);
     }
   }
 
@@ -118,11 +118,11 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     for ($i = 0; $i < 4; $i++) {
       $actual = CRM_Utils_String::createRandom(4, 'abc');
       $this->assertEquals(4, strlen($actual));
-      $this->assertRegExp('/^[abc]+$/', $actual);
+      $this->assertMatchesRegularExpression('/^[abc]+$/', $actual);
 
       $actual = CRM_Utils_String::createRandom(6, '12345678');
       $this->assertEquals(6, strlen($actual));
-      $this->assertRegExp('/^[12345678]+$/', $actual);
+      $this->assertMatchesRegularExpression('/^[12345678]+$/', $actual);
     }
   }
 
@@ -189,43 +189,6 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   public function testStrToBool($input, bool $expected): void {
     $actual = CRM_Utils_String::strtobool($input);
     $this->assertSame($expected, $actual);
-  }
-
-  /**
-   * Data provider for checking how strings start and end.
-   *
-   * @noinspection SpellCheckingInspection
-   */
-  public function startEndCases(): array {
-    $cases = [];
-    $cases[] = ['startsWith', 'foo', '', TRUE];
-    $cases[] = ['startsWith', 'foo', 'f', TRUE];
-    $cases[] = ['startsWith', 'foo', 'fo', TRUE];
-    $cases[] = ['startsWith', 'foo', 'foo', TRUE];
-    $cases[] = ['startsWith', 'foo', 'fooo', FALSE];
-    $cases[] = ['startsWith', 'foo', 'o', FALSE];
-    $cases[] = ['endsWith', 'foo', 'f', FALSE];
-    $cases[] = ['endsWith', 'foo', '', TRUE];
-    $cases[] = ['endsWith', 'foo', 'o', TRUE];
-    $cases[] = ['endsWith', 'foo', 'oo', TRUE];
-    $cases[] = ['endsWith', 'foo', 'foo', TRUE];
-    $cases[] = ['endsWith', 'foo', 'fooo', FALSE];
-    $cases[] = ['endsWith', 'foo*', '*', TRUE];
-    return $cases;
-  }
-
-  /**
-   * @param string $function
-   *   One of: 'startsWith' or 'endsWith'.
-   * @param $string
-   * @param $fragment
-   * @param $expectedResult
-   *
-   * @dataProvider startEndCases
-   */
-  public function testStartEndWith(string $function, $string, $fragment, $expectedResult): void {
-    $actualResult = CRM_Utils_String::$function($string, $fragment);
-    $this->assertEquals($expectedResult, $actualResult, "Checking $function($string,$fragment)");
   }
 
   public function wildcardCases(): array {

@@ -32,9 +32,25 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
   /**
    * Cache shared address message so we don't query twice
-   * @var string
+   *
+   * @var array
    */
   protected $_sharedAddressMessage = NULL;
+
+  /**
+   * @var string
+   */
+  protected $_searchKey;
+
+  /**
+   * @var bool
+   */
+  protected $_skipUndelete;
+
+  /**
+   * @var bool
+   */
+  protected $_restore;
 
   /**
    * Build all the data structures needed to build the form.

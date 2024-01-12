@@ -19,7 +19,7 @@ class ChangeSetTest extends \CiviUnitTestCase {
   /**
    * Insert content using after().
    */
-  public function testInsertAfter() {
+  public function testInsertAfter(): void {
     $changeSet = ChangeSet::create(__FUNCTION__);
     $counts = ['~/foo.html' => 0];
 
@@ -49,7 +49,7 @@ class ChangeSetTest extends \CiviUnitTestCase {
   /**
    * Insert content using append() and prepend().
    */
-  public function testAppendPrepend() {
+  public function testAppendPrepend(): void {
     $changeSet = ChangeSet::create(__FUNCTION__);
     $counts = ['~/foo.html' => 0];
 
@@ -80,7 +80,7 @@ class ChangeSetTest extends \CiviUnitTestCase {
   /**
    * Test that href expressions don't get mangled.
    */
-  public function testHrefExpressions() {
+  public function testHrefExpressions(): void {
     $changeSet = ChangeSet::create(__FUNCTION__);
     $counts = ['~/foo.html' => 0];
 

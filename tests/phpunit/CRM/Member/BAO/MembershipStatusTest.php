@@ -27,7 +27,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
   /**
    * Check function add()
    */
-  public function testAdd() {
+  public function testAdd(): void {
     $params = [
       'name' => 'added',
       'is_active' => 1,
@@ -45,7 +45,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testExpiredDisabled() {
+  public function testExpiredDisabled(): void {
     $this->callAPISuccess('MembershipStatus', 'get', [
       'name' => 'Expired',
       'api.MembershipStatus.create' => ['label' => 'Expiiiired'],
@@ -88,7 +88,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
 
   }
 
-  public function testGetMembershipStatusByDate() {
+  public function testGetMembershipStatusByDate(): void {
     $params = [
       'name' => 'Current',
       'is_active' => 1,
@@ -341,7 +341,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testgetMembershipStatusCurrent() {
+  public function testgetMembershipStatusCurrent(): void {
     $params = [
       'name' => 'Current',
       'is_active' => 1,

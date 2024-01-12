@@ -27,9 +27,17 @@
     {{:: ts('Without Role-Based access, users of the form will be able to view and update any %1 by changing the id in the URL.', {1: getMeta().label}) }}
   </div>
   <div class="description" ng-if="$ctrl.entity['url-autofill'] === '1'">
-    {{:: ts('Update %1 by including the id in the link to this form:', {1: getMeta().label}) }}
-    <code>
-      {{ ($ctrl.editor.getLink() || '') + '#?' + $ctrl.entity.name + '=123' }}
-    </code>
+    <p>
+      {{:: ts('Update %1 by including the id in the link to this form:', {1: $ctrl.entity.name}) }}
+      <code>
+        {{ ($ctrl.editor.getLink() || '') + '#?' + $ctrl.entity.name + '=123' }}
+      </code>
+    </p>
+    <p>
+      {{:: ts('If you have made a repeating container for %1, you may update multiple %2s using comma-separated ids:', {1: $ctrl.entity.name, 2: getMeta().label}) }}
+      <code>
+        {{ ($ctrl.editor.getLink() || '') + '#?' + $ctrl.entity.name + '=123,456' }}
+      </code>
+    </p>
   </div>
 </div>

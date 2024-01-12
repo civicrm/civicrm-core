@@ -14,10 +14,6 @@
   position: relative;
 }
 
-.crm-search-display crm-search-display-editable + span.crm-editable-disabled {
-  display: none !important;
-}
-
 .crm-search-display .crm-search-display-editable-buttons {
   position: absolute;
   bottom: -24px;

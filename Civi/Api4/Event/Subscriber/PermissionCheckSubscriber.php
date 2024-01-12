@@ -42,7 +42,12 @@ class PermissionCheckSubscriber extends \Civi\Core\Service\AutoService implement
     /** @var \Civi\Api4\Generic\AbstractAction $apiRequest */
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['version'] == 4) {
-      if (!$apiRequest->getCheckPermissions() || $apiRequest->isAuthorized(\CRM_Core_Session::singleton()->getLoggedInContactID())) {
+      if (
+        !$apiRequest->getCheckPermissions() ||
+        // This action checks permissions internally
+        $apiRequest->getActionName() === 'getLinks' ||
+        $apiRequest->isAuthorized(\CRM_Core_Session::singleton()->getLoggedInContactID())
+      ) {
         $event->authorize();
         $event->stopPropagation();
       }

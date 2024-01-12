@@ -28,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  */
 class ActivityTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testActivityContactVirtualFields() {
+  public function testActivityContactVirtualFields(): void {
     $c = $this->saveTestRecords('Contact', ['records' => 5])->column('id');
 
     $sourceContactId = $c[2];
@@ -86,7 +86,22 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($sourceContactId, $contactGet['activity.source_contact_id']);
     $this->assertEquals($targetContactIds, $contactGet['activity.target_contact_id']);
     $this->assertEquals($assigneeContactIds, $contactGet['activity.assignee_contact_id']);
+  }
 
+  public function testAllowedActivityTypes(): void {
+    // No access to CiviCase, etc will result in a limited number of activity types
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts', 'view debug output'];
+    $result = Activity::get()
+      ->setDebug(TRUE)
+      ->execute();
+    // SQL includes a constraint listing some activity type ids
+    $this->assertMatchesRegularExpression('/activity_type_id[` ]*IN[ ]*\([ \d,]{9}/', $result->debug['sql'][0]);
+    $result = Activity::get()
+      ->addWhere('activity_type_id:name', '=', 'Meeting')
+      ->setDebug(TRUE)
+      ->execute();
+    // Constraint is redundant with WHERE clause so should not have been included
+    $this->assertDoesNotMatchRegularExpression('/activity_type_id[` ]*IN[ ]*\([ \d,]{9}/', $result->debug['sql'][0]);
   }
 
 }

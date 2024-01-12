@@ -66,14 +66,14 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   /**
    * Test civicrm_membership_payment_create with empty params.
    */
-  public function testCreateEmptyParams() {
+  public function testCreateEmptyParams(): void {
     $this->callAPIFailure('membership_payment', 'create', [], 'Mandatory key(s) missing from params array: membership_id, contribution_id');
   }
 
   /**
    * Test civicrm_membership_payment_create - success expected.
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $contactId = $this->individualCreate();
 
     $params = [
@@ -93,7 +93,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
       'contribution_id' => $this->_contribution['id'],
       'membership_id' => $membership['id'],
     ];
-    $result = $this->callAPIAndDocument('membership_payment', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('membership_payment', 'create', $params);
     $this->assertEquals($result['values'][$result['id']]['membership_id'], $membership['id'], 'Check Membership Id in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['contribution_id'], $this->_contribution['id'], 'Check Contribution Id in line ' . __LINE__);
 
@@ -104,7 +104,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   /**
    * Test civicrm_membershipPayment_get - success expected.
    */
-  public function testGet() {
+  public function testGet(): void {
     $contactId = $this->individualCreate();
     $params = [
       'contact_id' => $contactId,
@@ -122,7 +122,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccess('membership_payment', 'create', $params);
 
-    $result = $this->callAPIAndDocument('membership_payment', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('membership_payment', 'get', $params);
     $this->assertEquals($result['values'][$result['id']]['membership_id'], $params['membership_id'], 'Check Membership Id');
     $this->assertEquals($result['values'][$result['id']]['contribution_id'], $params['contribution_id'], 'Check Contribution Id');
   }

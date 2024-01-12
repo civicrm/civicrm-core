@@ -1,0 +1,52 @@
+.standalone-page-padding {
+  padding: 1px 3vw 1rem;
+}
+
+html.crm-standalone  nav.breadcrumb>ol {
+  padding-inline-start: 0;
+}
+
+.standalone-auth-form {
+  display: grid;
+  place-content: center;
+  width: 100%;
+  height: 100vh;
+}
+.standalone-auth-box {
+  box-sizing: border-box;
+  width: clamp(280px, 68vw, 45rem);
+  margin: 0;
+  background-color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 1rem 3vw;;
+}
+.standalone-auth-form img.crm-logo {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 2rem;
+  display: block;
+}
+.standalone-auth-form .input-wrapper {
+  margin-bottom: 1rem;
+}
+.standalone-auth-form label {
+  display: block;
+}
+.standalone-auth-form input {
+  box-sizing: border-box;
+  width: 100%;
+}
+.standalone-auth-form .login-or-forgot {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+}
+.standalone-auth-form .login-or-forgot>a {
+  grid-column: 1;
+}
+.standalone-auth-form .login-or-forgot>button {
+  grid-column: 2;
+  place-self: end;
+  margin-right: 0; /* override civicrm.css's 6px */
+}

@@ -19,7 +19,7 @@
     </div>
   {/if}
   <div class="help">
-    {ts 1=$importEntity 2= $importEntities}The %1 Import Wizard allows you to easily upload %2 from other applications into CiviCRM.{/ts}
+    {ts 1=$importEntity 2=$importEntities}The %1 Import Wizard allows you to easily upload %2 from other applications into CiviCRM.{/ts}
   </div>
   <div id="choose-data-source" class="form-item">
     <h3>{ts}Choose Data Source{/ts}</h3>
@@ -146,7 +146,7 @@
     function buildSubTypes( )
     {
       element = cj('input[name="contactType"]:checked').val( );
-      var postUrl = {/literal}"{crmURL p='civicrm/ajax/subtype' h=0 }"{literal};
+      var postUrl = {/literal}"{crmURL p='civicrm/ajax/subtype' h=0}"{literal};
       var param = 'parentId='+ element;
       cj.ajax({ type: "POST", url: postUrl, data: param, async: false, dataType: 'json',
         success: function(subtype)
@@ -171,7 +171,7 @@
     function buildDedupeRules( )
     {
       element = cj("input[name=contactType]:checked").val();
-      var postUrl = {/literal}"{crmURL p='civicrm/ajax/dedupeRules' h=0 }"{literal};
+      var postUrl = {/literal}"{crmURL p='civicrm/ajax/dedupeRules' h=0}"{literal};
       var param = 'parentId='+ element;
       cj.ajax({ type: "POST", url: postUrl, data: param, async: false, dataType: 'json',
         success: function(dedupe){

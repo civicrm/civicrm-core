@@ -34,7 +34,7 @@ class ContributionRecurAutocompleteProvider extends \Civi\Core\Service\AutoServi
       'version' => 4,
       'select' => [
         'id',
-        'contact_id.display_name',
+        'contact_id.sort_name',
         'frequency_unit:label',
         'frequency_interval',
         'amount',
@@ -68,8 +68,8 @@ class ContributionRecurAutocompleteProvider extends \Civi\Core\Service\AutoServi
       'columns' => [
         [
           'type' => 'field',
-          'key' => 'contact_id.display_name',
-          'rewrite' => '[contact_id.display_name] - [amount]',
+          'key' => 'contact_id.sort_name',
+          'rewrite' => '[contact_id.sort_name] - [amount]',
         ],
         [
           'type' => 'field',

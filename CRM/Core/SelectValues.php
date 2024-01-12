@@ -219,6 +219,11 @@ class CRM_Core_SelectValues {
         'name' => 'Link',
         'label' => ts('Link'),
       ],
+      [
+        'id' => 'Hidden',
+        'name' => 'Hidden',
+        'label' => ts('Hidden'),
+      ],
     ];
   }
 
@@ -634,6 +639,7 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function participantTokens(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('user TokenProcessor');
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['participantId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {
@@ -1079,16 +1085,19 @@ class CRM_Core_SelectValues {
         'id' => CRM_Contact_BAO_Relationship::NONE,
         'name' => 'None',
         'label' => ts('None'),
+        'icon' => NULL,
       ],
       [
         'id' => CRM_Contact_BAO_Relationship::VIEW,
         'name' => 'View only',
         'label' => ts('View only'),
+        'icon' => 'fa-eye',
       ],
       [
         'id' => CRM_Contact_BAO_Relationship::EDIT,
         'name' => 'View and update',
         'label' => ts('View and update'),
+        'icon' => 'fa-pencil-square',
       ],
     ];
   }
@@ -1108,6 +1117,88 @@ class CRM_Core_SelectValues {
     return $optionValues;
   }
 
+  public static function getQuicksearchOptions(): array {
+    $includeEmail = civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']);
+    $options = [
+      [
+        'key' => 'sort_name',
+        'label' => $includeEmail ? ts('Name/Email') : ts('Name'),
+      ],
+      [
+        'key' => 'id',
+        'label' => ts('Contact ID'),
+      ],
+      [
+        'key' => 'external_identifier',
+        'label' => ts('External ID'),
+      ],
+      [
+        'key' => 'first_name',
+        'label' => ts('First Name'),
+      ],
+      [
+        'key' => 'last_name',
+        'label' => ts('Last Name'),
+      ],
+      [
+        'key' => 'email_primary.email',
+        'label' => ts('Email'),
+        'adv_search_legacy' => 'email',
+      ],
+      [
+        'key' => 'phone_primary.phone_numeric',
+        'label' => ts('Phone'),
+        'adv_search_legacy' => 'phone_numeric',
+      ],
+      [
+        'key' => 'address_primary.street_address',
+        'label' => ts('Street Address'),
+        'adv_search_legacy' => 'street_address',
+      ],
+      [
+        'key' => 'address_primary.city',
+        'label' => ts('City'),
+        'adv_search_legacy' => 'city',
+      ],
+      [
+        'key' => 'address_primary.postal_code',
+        'label' => ts('Postal Code'),
+        'adv_search_legacy' => 'postal_code',
+      ],
+      [
+        'key' => 'employer_id.sort_name',
+        'label' => ts('Current Employer'),
+      ],
+      [
+        'key' => 'job_title',
+        'label' => ts('Job Title'),
+      ],
+    ];
+    $custom = civicrm_api4('CustomField', 'get', [
+      'checkPermissions' => FALSE,
+      'select' => ['id', 'name', 'label', 'custom_group_id.name', 'custom_group_id.title', 'option_group_id'],
+      'where' => [
+        ['custom_group_id.extends', 'IN', array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes())],
+        ['data_type', 'NOT IN', ['ContactReference', 'Date', 'File']],
+        ['custom_group_id.is_active', '=', TRUE],
+        ['is_active', '=', TRUE],
+        ['is_searchable', '=', TRUE],
+      ],
+      'orderBy' => [
+        'custom_group_id.weight' => 'ASC',
+        'weight' => 'ASC',
+      ],
+    ]);
+    foreach ($custom as $field) {
+      $options[] = [
+        'key' => $field['custom_group_id.name'] . '.' . $field['name'] . ($field['option_group_id'] ? ':label' : ''),
+        'label' => $field['custom_group_id.title'] . ': ' . $field['label'],
+        'adv_search_legacy' => 'custom_' . $field['id'],
+      ];
+    }
+    return $options;
+  }
+
   /**
    * Dropdown options for quicksearch in the menu
    *
@@ -1115,33 +1206,7 @@ class CRM_Core_SelectValues {
    * @throws \CRM_Core_Exception
    */
   public static function quicksearchOptions() {
-    $includeEmail = civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']);
-    $options = [
-      'sort_name' => $includeEmail ? ts('Name/Email') : ts('Name'),
-      'contact_id' => ts('Contact ID'),
-      'external_identifier' => ts('External ID'),
-      'first_name' => ts('First Name'),
-      'last_name' => ts('Last Name'),
-      'email' => ts('Email'),
-      'phone_numeric' => ts('Phone'),
-      'street_address' => ts('Street Address'),
-      'city' => ts('City'),
-      'postal_code' => ts('Postal Code'),
-      'job_title' => ts('Job Title'),
-    ];
-    $custom = civicrm_api3('CustomField', 'get', [
-      'return' => ['name', 'label', 'custom_group_id.title'],
-      'custom_group_id.extends' => ['IN' => array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes())],
-      'data_type' => ['NOT IN' => ['ContactReference', 'Date', 'File']],
-      'custom_group_id.is_active' => 1,
-      'is_active' => 1,
-      'is_searchable' => 1,
-      'options' => ['sort' => ['custom_group_id.weight', 'weight'], 'limit' => 0],
-    ]);
-    foreach ($custom['values'] as $field) {
-      $options['custom_' . $field['name']] = $field['custom_group_id.title'] . ': ' . $field['label'];
-    }
-    return $options;
+    return array_column(self::getQuicksearchOptions(), 'label', 'key');
   }
 
   /**

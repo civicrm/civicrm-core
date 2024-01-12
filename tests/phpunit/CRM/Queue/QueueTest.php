@@ -78,7 +78,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * If the queue has an automatic background runner (`runner`), then it
    * must also have an `error` policy.
    */
-  public function testRunnerRequiresErrorPolicy() {
+  public function testRunnerRequiresErrorPolicy(): void {
     try {
       $q1 = Civi::queue('test/incomplete/1', [
         'type' => 'Sql',
@@ -87,7 +87,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
       $this->fail('Should fail without error policy');
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertRegExp('/Invalid error mode/', $e->getMessage());
+      $this->assertMatchesRegularExpression('/Invalid error mode/', $e->getMessage());
     }
 
     $q2 = Civi::queue('test/complete/2', [
@@ -98,7 +98,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertTrue($q2 instanceof CRM_Queue_Queue_Sql);
   }
 
-  public function testStatuses() {
+  public function testStatuses(): void {
     $q1 = Civi::queue('test/valid/default', [
       'type' => 'Sql',
       'runner' => 'task',
@@ -119,7 +119,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     }
   }
 
-  public function testTemplating() {
+  public function testTemplating(): void {
     \Civi\Api4\Queue::create()->setValues([
       'is_template' => TRUE,
       'name' => 'test/template',
@@ -364,7 +364,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     }
   }
 
-  public function testFacadeAutoCreate() {
+  public function testFacadeAutoCreate(): void {
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_queue');
     $q1 = Civi::queue('testFacadeAutoCreate_q1', [
       'type' => 'Sql',
@@ -386,7 +386,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
       $this->fail('Queue lookup should fail. There is neither pre-existing registration nor new details.');
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertRegExp(';Missing field "type";', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Missing field "type";', $e->getMessage());
     }
   }
 
@@ -513,7 +513,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertQueueStats(0, 0, 0, $this->queue);
   }
 
-  public function testSetStatus() {
+  public function testSetStatus(): void {
     $fired = ['status-changes' => []];
     \Civi::dispatcher()->addListener('hook_civicrm_queueStatus', function ($e) use (&$fired) {
       $fired[$e->queue->getName()][] = $e->status;

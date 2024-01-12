@@ -29,6 +29,15 @@
     <weight>410</weight>
   </item>
   <item>
+    <path>civicrm/admin/component/edit</path>
+    <title>Headers, Footers, and Automated Messages</title>
+    <page_callback>CRM_Mailing_Form_Component</page_callback>
+    <desc>Configure the header and footer used for mailings. Customize the content of automated Subscribe, Unsubscribe, Resubscribe and Opt-out messages.</desc>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
+    <adminGroup>CiviMail</adminGroup>
+    <weight>411</weight>
+  </item>
+  <item>
     <path>civicrm/admin/options/from_email_address/civimail</path>
     <title>From Email Addresses</title>
     <desc>List of Email Addresses which can be used when sending emails to contacts.</desc>
@@ -142,13 +151,6 @@
     <access_arguments>access CiviMail subscribe/unsubscribe pages</access_arguments>
     <is_public>true</is_public>
     <weight>660</weight>
-  </item>
-  <item>
-    <path>civicrm/mailing/preview</path>
-    <title>Preview Mailing</title>
-    <page_callback>CRM_Mailing_Page_Preview</page_callback>
-    <access_arguments>access CiviMail;approve mailings;create mailings;schedule mailings</access_arguments>
-    <weight>670</weight>
   </item>
   <item>
     <path>civicrm/mailing/report</path>

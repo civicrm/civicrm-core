@@ -142,9 +142,9 @@ class ReflectionUtils {
    * List all traits used by a class and its parents.
    *
    * @param object|string $class
-   * @return array
+   * @return string[]
    */
-  public static function getTraits($class) {
+  public static function getTraits($class): array {
     $traits = [];
     // Get traits of this class + parent classes
     do {
@@ -206,7 +206,7 @@ class ReflectionUtils {
 
       yield from [];
       foreach ($clazz->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $m) {
-        if (\CRM_Utils_String::startsWith($m->getName(), $prefix)) {
+        if (str_starts_with($m->getName(), $prefix)) {
           yield $m;
         }
       }

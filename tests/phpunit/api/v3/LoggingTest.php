@@ -72,7 +72,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test that logging is successfully enabled and disabled.
    */
-  public function testEnableDisableLoggingWithTriggerHook() {
+  public function testEnableDisableLoggingWithTriggerHook(): void {
     $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'innodbLogTableSpec']);
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->checkINNODBLogTableCreated();
@@ -92,7 +92,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    *
    * The settings for unique id will not be set.
    */
-  public function testEnableLoggingLegacyLogTableExists() {
+  public function testEnableLoggingLegacyLogTableExists(): void {
     $this->createLegacyStyleContactLogTable();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->checkTriggersCreated(FALSE);
@@ -103,7 +103,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Check we can update legacy log tables using the api function.
    */
-  public function testUpdateLegacyLogTable() {
+  public function testUpdateLegacyLogTable(): void {
     $this->createLegacyStyleContactLogTable();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->callAPISuccess('System', 'updatelogtables', []);
@@ -119,7 +119,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Check if we can create missing log tables using api.
    */
-  public function testCreateMissingLogTables() {
+  public function testCreateMissingLogTables(): void {
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     CRM_Core_DAO::executeQuery("DROP TABLE log_civicrm_contact");
     $this->callAPISuccess('System', 'createmissinglogtables', []);
@@ -131,7 +131,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Check we can update legacy log tables using the api function.
    */
-  public function testUpdateLogTableHookINNODB() {
+  public function testUpdateLogTableHookINNODB(): void {
     $this->createLegacyStyleContactLogTable();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'innodbLogTableSpec']);
@@ -287,7 +287,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test changes can be reverted.
    */
-  public function testRevert() {
+  public function testRevert(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     // Pause for one second here to ensure the timestamps between the first create action
@@ -302,15 +302,14 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     ]
     );
     $email = $this->callAPISuccessGetSingle('email', ['email' => 'dopey@mail.com']);
-    $this->callAPIAndDocument('Logging', 'revert', ['log_conn_id' => 'woot', 'log_date' => $timeStamp], __FILE__, 'Revert');
-    $this->assertEquals('Anthony', $this->callAPISuccessGetValue('contact', ['id' => $contactId, 'return' => 'first_name']));
+    $this->callAPISuccess('Logging', 'revert', ['log_conn_id' => 'woot', 'log_date' => $timeStamp]);
     $this->callAPISuccessGetCount('Email', ['id' => $email['id']], 0);
   }
 
   /**
    * Test changes can be reverted.
    */
-  public function testRevertNoDate() {
+  public function testRevertNoDate(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     // Pause for one second here to ensure the timestamps between the first create action
@@ -336,7 +335,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testRevertRestrictedTables() {
+  public function testRevertRestrictedTables(): void {
 
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'temp name'");
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
@@ -381,7 +380,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Test changes can be reverted.
    */
-  public function testRevertNoDateNotUnique() {
+  public function testRevertNoDateNotUnique(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'Wopity woot'");
@@ -402,8 +401,10 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
 
   /**
    * Test changes can be retrieved.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testGet() {
+  public function testGet(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty woot'");
@@ -418,15 +419,17 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccessGetSingle('email', ['email' => 'dopey@mail.com']);
     $diffs = $this->callAPISuccess('Logging', 'get', ['log_conn_id' => 'wooty woot', 'log_date' => $timeStamp], __FUNCTION__, __FILE__);
-    $this->assertLoggingIncludes($diffs['values'], ['to' => 'Dwarf, Dopey']);
+    $this->assertLoggingIncludes($diffs['values'], ['to' => 'Dwarf, Dopey II']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'Mr. Dopey Dwarf II', 'table' => 'civicrm_contact', 'action' => 'Update', 'field' => 'display_name']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'dopey@mail.com', 'table' => 'civicrm_email', 'action' => 'Insert', 'field' => 'email']);
   }
 
   /**
    * Test changes can be retrieved without log_date being required.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testGetNoDate() {
+  public function testGetNoDate(): void {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty wop wop'");
@@ -440,8 +443,8 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
       'api.email.create' => ['email' => 'dopey@mail.com'],
     ]);
     $this->callAPISuccessGetSingle('email', ['email' => 'dopey@mail.com']);
-    $diffs = $this->callAPIAndDocument('Logging', 'get', ['log_conn_id' => 'wooty wop wop'], __FUNCTION__, __FILE__);
-    $this->assertLoggingIncludes($diffs['values'], ['to' => 'Dwarf, Dopey']);
+    $diffs = $this->callAPISuccess('Logging', 'get', ['log_conn_id' => 'wooty wop wop']);
+    $this->assertLoggingIncludes($diffs['values'], ['to' => 'Dwarf, Dopey II']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'Mr. Dopey Dwarf II', 'table' => 'civicrm_contact', 'action' => 'Update', 'field' => 'display_name']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'dopey@mail.com', 'table' => 'civicrm_email', 'action' => 'Insert', 'field' => 'email']);
   }

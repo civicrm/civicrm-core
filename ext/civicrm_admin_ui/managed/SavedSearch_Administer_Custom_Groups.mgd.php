@@ -68,7 +68,7 @@ return [
         'saved_search_id.name' => 'Administer_Custom_Groups',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -124,7 +124,7 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Fields'),
               'sortable' => TRUE,
-              'rewrite' => "{capture assign=fields}[GROUP_CONCAT_CustomGroup_CustomField_custom_group_id_01_label]{/capture}{ \$fields|replace:',':'<br>'}",
+              'rewrite' => "{capture assign=fields}[GROUP_CONCAT_CustomGroup_CustomField_custom_group_id_01_label]{/capture}{\$fields|replace:',':'<br>'}",
             ],
             [
               'size' => 'btn-xs',
@@ -167,7 +167,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-eye',
-                  'text' => E::ts('Preview Group'),
+                  'text' => E::ts('Preview'),
                   'style' => 'default',
                   'path' => '',
                   'condition' => [],
@@ -196,7 +196,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete Group'),
+                  'text' => E::ts('Delete'),
                   'style' => 'danger',
                   'path' => '',
                   'condition' => [],
@@ -216,11 +216,16 @@ return [
             ],
           ],
           'placeholder' => 5,
-          'addButton' => [
-            'path' => 'civicrm/admin/custom/group/edit?reset=1',
-            'text' => E::ts('Add Set of Custom Fields'),
-            'icon' => 'fa-plus',
-            'autoOpen' => TRUE,
+          'toolbar' => [
+            [
+              'entity' => 'CustomGroup',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Set of Custom Fields'),
+              'icon' => 'fa-plus',
+              'autoOpen' => TRUE,
+            ],
           ],
         ],
         'acl_bypass' => FALSE,

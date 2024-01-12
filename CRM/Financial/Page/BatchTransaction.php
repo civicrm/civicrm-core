@@ -63,11 +63,13 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
           'url' => 'civicrm/contact/view/contribution',
           'qs' => 'reset=1&id=%%contid%%&cid=%%cid%%&action=view&context=contribution&selectedChild=contribute',
           'title' => ts('View Contribution'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         'remove' => [
           'name' => ts('Remove'),
           'title' => ts('Remove Transaction'),
           'extra' => 'onclick = "removeFromBatch(%%id%%);"',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }

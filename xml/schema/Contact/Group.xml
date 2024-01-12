@@ -177,6 +177,15 @@
     <add>5.34</add>
   </index>
   <field>
+    <name>cache_fill_took</name>
+    <type>float</type>
+    <title>Seconds taken by last cache fill</title>
+    <comment>Seconds taken to fill smart group cache</comment>
+    <required>false</required>
+    <readonly>true</readonly>
+    <add>5.67</add>
+  </field>
+  <field>
     <name>refresh_date</name>
     <type>timestamp</type>
     <title>Next Group Refresh Time</title>

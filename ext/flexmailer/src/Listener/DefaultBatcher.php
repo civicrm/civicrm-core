@@ -39,7 +39,7 @@ class DefaultBatcher extends BaseListener {
     $mailerBatchLimit = \CRM_Core_Config::singleton()->mailerBatchLimit;
 
     $eq = \CRM_Mailing_BAO_MailingJob::findPendingTasks($job->id, 'email');
-    $tasks = array();
+    $tasks = [];
     while ($eq->fetch()) {
       if ($mailerBatchLimit > 0 && \CRM_Mailing_BAO_MailingJob::$mailsProcessed >= $mailerBatchLimit) {
         if (!empty($tasks)) {
@@ -61,7 +61,7 @@ class DefaultBatcher extends BaseListener {
           $e->setCompleted($isDelivered);
           return;
         }
-        $tasks = array();
+        $tasks = [];
       }
     }
 

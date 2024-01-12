@@ -37,10 +37,10 @@
       <tr><td>{ts}Location{/ts}</td>
           <td>
             {$location.address.1.display|nl2br}
-            {if ( $event.is_map &&
+            {if ($event.is_map &&
             $config->mapProvider &&
-      ( ( !empty($location.address.1.geo_code_1) && is_numeric($location.address.1.geo_code_1) )  ||
-        ( !empty($location.address.1.city) AND !empty($location.address.1.state_province) ) ) ) }
+      ((!empty($location.address.1.geo_code_1) && is_numeric($location.address.1.geo_code_1)) ||
+        (!empty($location.address.1.city) AND !empty($location.address.1.state_province))))}
               <br/><a href="{crmURL p='civicrm/contact/map/event' q="reset=1&eid=`$event.id`"}" title="{ts}Map this Address{/ts}" target="_blank">{ts}Map this Location{/ts}</a>
             {/if}
           </td>

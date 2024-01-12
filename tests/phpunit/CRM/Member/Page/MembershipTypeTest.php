@@ -24,7 +24,7 @@ class CRM_Member_Page_MembershipTypeTest extends CiviUnitTestCase {
     $page = new CRM_Member_Page_MembershipType();
     $id = $this->membershipTypeCreate(['weight' => 1]);
     $page->browse();
-    $assigned = CRM_Core_Smarty::singleton()->get_template_vars();
+    $assigned = CRM_Core_Smarty::singleton()->getTemplateVars();
     $this->assertEquals([
       $id => [
         'id' => '1',

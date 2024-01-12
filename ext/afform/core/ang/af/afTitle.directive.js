@@ -10,15 +10,16 @@
         var ctrl = this;
 
         $scope.$watch(function() {return ctrl.title;}, function(text) {
-          var tag = $element.is('fieldset') ? 'legend' : 'h4',
-            $title = $element.children(tag + '.af-title');
+          let tag = 'h4';
+          if ($element.is('fieldset')) {
+            tag = 'legend';
+          }
+          if ($element.is('details')) {
+            tag = 'summary';
+          }
+          let $title = $element.children(tag + '.af-title');
           if (!$title.length) {
             $title = $('<' + tag + ' class="af-title" />').prependTo($element);
-            if ($element.hasClass('af-collapsible')) {
-              $title.click(function() {
-                $element.toggleClass('af-collapsed');
-              });
-            }
           }
           $title.text(text);
         });

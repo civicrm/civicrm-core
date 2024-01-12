@@ -23,7 +23,7 @@ class CRM_Event_Form_ManageEvent_RegistrationTest extends CiviUnitTestCase {
   /**
    * Test end date not allowed with only 'time' part.
    */
-  public function testEndDateWithoutDateNotAllowed() {
+  public function testEndDateWithoutDateNotAllowed(): void {
     $values = $this->getCorrectFormFields();
     $values['registration_end_date'] = '00:01';
     $form = new CRM_Event_Form_ManageEvent_Registration();
@@ -34,7 +34,7 @@ class CRM_Event_Form_ManageEvent_RegistrationTest extends CiviUnitTestCase {
   /**
    * Test end date must be after start date.
    */
-  public function testEndDateBeforeStartDateNotAllowed() {
+  public function testEndDateBeforeStartDateNotAllowed(): void {
     $values = $this->getCorrectFormFields();
     $values['registration_end_date'] = '1900-01-01 00:00';
     $form = new CRM_Event_Form_ManageEvent_Registration();

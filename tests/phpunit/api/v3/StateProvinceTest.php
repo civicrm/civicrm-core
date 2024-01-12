@@ -32,8 +32,8 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
   /**
    * @dataProvider versionThreeAndFour
    */
-  public function testCreateStateProvince() {
-    $result = $this->callAPIAndDocument('StateProvince', 'create', $this->_params, __FUNCTION__, __FILE__);
+  public function testCreateStateProvince(): void {
+    $result = $this->callAPISuccess('StateProvince', 'create', $this->_params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('StateProvince', 'delete', ['id' => $result['id']]);
@@ -42,12 +42,12 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
   /**
    * @dataProvider versionThreeAndFour
    */
-  public function testDeleteStateProvince() {
+  public function testDeleteStateProvince(): void {
     // Create
     $create = $this->callAPISuccess('StateProvince', 'create', $this->_params);
 
     // Delete
-    $result = $this->callAPIAndDocument('StateProvince', 'delete', ['id' => $create['id']], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('StateProvince', 'delete', ['id' => $create['id']]);
     $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('StateProvince', 'get', [
       'id' => $create['id'],
@@ -59,7 +59,7 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
    * Test with empty params
    * @dataProvider versionThreeAndFour
    */
-  public function testGetEmptyParams() {
+  public function testGetEmptyParams(): void {
     $result = $this->callAPISuccess('StateProvince', 'Get', []);
   }
 
@@ -67,7 +67,7 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
    * Test with wrong params
    * @dataProvider versionThreeAndFour
    */
-  public function testGetWrongParams() {
+  public function testGetWrongParams(): void {
     $this->callAPIFailure('StateProvince', 'Get', ['id' => 'abc']);
   }
 
@@ -75,12 +75,12 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
    * Test get
    * @dataProvider versionThreeAndFour
    */
-  public function testGet() {
+  public function testGet(): void {
     $province = $this->callAPISuccess('StateProvince', 'create', $this->_params);
     $params = [
       'name' => $this->_params['name'],
     ];
-    $result = $this->callAPIAndDocument('StateProvince', 'Get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('StateProvince', 'Get', $params);
     $this->assertEquals($province['values'][$province['id']]['name'], $result['values'][$province['id']]['name']);
     $this->assertEquals($province['values'][$province['id']]['abbreviation'], $result['values'][$province['id']]['abbreviation']);
   }
@@ -89,7 +89,7 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
    * There cannot be two state/provinces with the same name in the same country.
    * @dataProvider versionThreeAndFour
    */
-  public function testCreateDuplicateFail() {
+  public function testCreateDuplicateFail(): void {
     $params = $this->_params;
     unset($params['id']);
     $this->callAPISuccess('StateProvince', 'create', $params);

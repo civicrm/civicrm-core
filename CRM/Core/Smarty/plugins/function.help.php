@@ -27,12 +27,12 @@
  *   the help html to be inserted
  */
 function smarty_function_help($params, &$smarty) {
-  if (!isset($params['id']) || !isset($smarty->_tpl_vars['config'])) {
+  if (!isset($params['id']) || !isset($smarty->getTemplateVars()['config'])) {
     return NULL;
   }
 
-  if (empty($params['file']) && isset($smarty->_tpl_vars['tplFile'])) {
-    $params['file'] = $smarty->_tpl_vars['tplFile'];
+  if (empty($params['file']) && isset($smarty->getTemplateVars()['tplFile'])) {
+    $params['file'] = $smarty->getTemplateVars()['tplFile'];
   }
   elseif (empty($params['file'])) {
     return NULL;
@@ -42,8 +42,7 @@ function smarty_function_help($params, &$smarty) {
   $fieldID = str_replace('-', '_', preg_replace('/^id-/', '', $params['id']));
 
   if (empty($params['title'])) {
-    $vars = $smarty->get_template_vars();
-    $smarty->assign('id', $params['id'] . '-title');
+    $vars = $smarty->getTemplateVars();
 
     // The way this works is a bit bonkers. All the .hlp files are expecting an
     // assign called $params (which is different from our php var here called
@@ -52,14 +51,16 @@ function smarty_function_help($params, &$smarty) {
     // that we return at the bottom below). But right now when we fetch the
     // file on the next line, there is no params. So it gives a notice. So
     // let's assign something.
+    // We also need to assign the id for the title we are looking for, which
+    // will not be present in Smarty 3 otherwise.
     // It's also awkward since the ONLY reason we're fetching the file
     // now is to get the help section's title and we don't care about the rest
     // of the file, but that is a bit of a separate issue.
-    $temporary_vars = [];
+    $temporary_vars = ['id' => $params['id'] . '-title'];
     if (!array_key_exists('params', $vars)) {
       // In the unlikely event that params already exists, we don't want to
       // overwrite it, so only do this if not already set.
-      $temporary_vars = ['params' => []];
+      $temporary_vars += ['params' => []];
     }
     // Note fetchWith adds the temporary ones to the existing scope but then
     // will reset, unsetting them if not already present before, which is what
@@ -70,13 +71,13 @@ function smarty_function_help($params, &$smarty) {
       $extraoutput = trim($smarty->fetch($additionalTPLFile));
       if ($extraoutput) {
         // Allow override param to replace default text e.g. {hlp id='foo' override=1}
-        $name = ($smarty->get_template_vars('override_help_text') || empty($name)) ? $extraoutput : $name . ' ' . $extraoutput;
+        $name = ($smarty->getTemplateVars('override_help_text') || empty($name)) ? $extraoutput : $name . ' ' . $extraoutput;
       }
     }
 
     // Ensure we didn't change any existing vars CRM-11900
     foreach ($vars as $key => $value) {
-      if ($smarty->get_template_vars($key) !== $value) {
+      if ($smarty->getTemplateVars($key) !== $value) {
         $smarty->assign($key, $value);
       }
     }

@@ -45,9 +45,7 @@ class CRM_Import_Form_DataSourceConfig extends CRM_Import_Forms {
    * @throws \CRM_Core_Exception
    */
   public function preProcess(): void {
-    $dataSourcePath = explode('_', $this->getDataSourceClassName());
-    $templateFile = 'CRM/Contact/Import/Form/' . $dataSourcePath[3] . '.tpl';
-    $this->assign('dataSourceFormTemplateFile', $templateFile ?? NULL);
+    $this->assign('dataSourceFormTemplateFile', $this->getDataSourceObject()->getInfo()['template']);
     if (CRM_Utils_Request::retrieveValue('user_job_id', 'Integer')) {
       $this->setUserJobID(CRM_Utils_Request::retrieveValue('user_job_id', 'Integer'));
     }

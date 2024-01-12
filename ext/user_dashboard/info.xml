@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<extension key="user_dashboard" type="module">
+  <file>user_dashboard</file>
+  <name>User Dashboard</name>
+  <description>Adds a page for users to see their contributions, memberships, etc.</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>CiviCRM</author>
+    <email>info@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">http://FIXME</url>
+    <url desc="Documentation">http://FIXME</url>
+    <url desc="Support">http://FIXME</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2024-01-05</releaseDate>
+  <version>5.71.alpha1</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>5.71</ver>
+  </compatibility>
+  <comments>This extension is still experimental</comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/UserDashboard</namespace>
+    <format>23.02.1</format>
+    <angularModule>crmUserDashboard</angularModule>
+  </civix>
+  <mixins>
+    <mixin>mgd-php@1.0.0</mixin>
+  </mixins>
+</extension>

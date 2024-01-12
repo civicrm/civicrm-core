@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\MembershipType;
 use Civi\Api4\Relationship;
 
@@ -1590,13 +1591,7 @@ contact_id_a IN ( %1 ) OR contact_id_b IN ( %1 ) AND id IN (" . implode(',', $re
       return TRUE;
     }
 
-    $recordsFound = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_relationship WHERE relationship_type_id IN ( " . implode(',', $membershipTypeRelationshipTypeIDs) . " ) AND contact_id_a IN ( %1, %2 ) AND contact_id_b IN ( %1, %2 ) AND id NOT IN (" . implode(',', $relIds) . ")", $relParamas);
-
-    if ($recordsFound) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return !CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_relationship WHERE relationship_type_id IN ( " . implode(',', $membershipTypeRelationshipTypeIDs) . " ) AND contact_id_a IN ( %1, %2 ) AND contact_id_b IN ( %1, %2 ) AND id NOT IN (" . implode(',', $relIds) . ")", $relParamas);
   }
 
   /**
@@ -1807,14 +1802,9 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
-   * Wrapper for contact relationship selector.
+   * @deprecated since 5.68. Will be removed around 5.74.
    *
-   * @param array $params
-   *   Associated array for params record id.
-   *
-   * @return array
-   *   associated array of contact relationships
-   * @throws \Exception
+   * Only-used-by-user-dashboard.
    */
   public static function getContactRelationshipSelector(&$params) {
     // format the params
@@ -1957,7 +1947,9 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
-   * @return array
+   * @deprecated since 5.68. Will be removed around 5.74.
+   *
+   * Only-used-by-user-dashboard.
    */
   public static function getColumnHeaders() {
     return [
@@ -2040,7 +2032,7 @@ AND cc.sort_name LIKE '%$name%'";
    */
   public static function isCurrentEmployerNeedingToBeCleared($params, $relationshipId, $updatedRelTypeID = NULL) {
     $existingTypeID = (int) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Relationship', $relationshipId, 'relationship_type_id');
-    $updatedRelTypeID = $updatedRelTypeID ? $updatedRelTypeID : $existingTypeID;
+    $updatedRelTypeID = $updatedRelTypeID ?: $existingTypeID;
     $currentEmployerID = (int) civicrm_api3('Contact', 'getvalue', ['return' => 'current_employer_id', 'id' => $params['contact_id_a']]);
 
     if ($currentEmployerID !== (int) $params['contact_id_b'] || !self::isRelationshipTypeCurrentEmployer($existingTypeID)) {
@@ -2271,6 +2263,27 @@ SELECT count(*)
         empty($params['id']) ? CRM_Core_Action::ADD : CRM_Core_Action::UPDATE,
         $active
       );
+    }
+  }
+
+  /**
+   * Check related contact access.
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
+   */
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $userID = $e->getUserID();
+    $delegateAction = $e->getActionName() === 'get' ? 'get' : 'update';
+
+    // Delegate relationship permissions to contacts a & b
+    foreach (['a', 'b'] as $ab) {
+      if (empty($record["contact_id_$ab"]) && !empty($record['id'])) {
+        $record["contact_id_$ab"] = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], "contact_id_$ab");
+      }
+      if (!\Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', $delegateAction, ['id' => $record["contact_id_$ab"]], $userID)) {
+        $e->setAuthorized(FALSE);
+        break;
+      }
     }
   }
 

@@ -145,7 +145,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Test civicrm_activity_create() with mismatched activity_type_id
    * and activity_name.
    */
-  public function testActivityCreateMismatchNameType() {
+  public function testActivityCreateMismatchNameType(): void {
     $params = [
       'source_contact_id' => $this->_contactID,
       'subject' => 'Test activity',
@@ -165,7 +165,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_id() with missing source_contact_id is put with the current user.
    */
-  public function testActivityCreateWithMissingContactId() {
+  public function testActivityCreateWithMissingContactId(): void {
     $params = [
       'subject' => 'Make-it-Happen Meeting',
       'activity_date_time' => date('Ymd'),
@@ -184,7 +184,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    *
    * Since the field is required the validation should reject the default.
    */
-  public function testActivityCreateWithMissingContactIdNoLoggedInUser() {
+  public function testActivityCreateWithMissingContactIdNoLoggedInUser(): void {
     CRM_Core_Session::singleton()->set('userID', NULL);
     $params = [
       'subject' => 'Make-it-Happen Meeting',
@@ -226,7 +226,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Oddly enough this test was failing because the creation of the invalid type
    * got added to the set up routine. Probably a mis-fix on a test
    */
-  public function testActivityCreateWithNonNumericActivityTypeId() {
+  public function testActivityCreateWithNonNumericActivityTypeId(): void {
     $params = [
       'source_contact_id' => $this->_contactID,
       'subject' => 'Make-it-Happen Meeting',
@@ -244,7 +244,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Check with incorrect required fields.
    */
-  public function testActivityCreateWithUnknownActivityTypeId() {
+  public function testActivityCreateWithUnknownActivityTypeId(): void {
     $this->callAPIFailure('activity', 'create', [
       'source_contact_id' => $this->_contactID,
       'subject' => 'Make-it-Happen Meeting',
@@ -257,7 +257,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     ]);
   }
 
-  public function testActivityCreateWithInvalidPriority() {
+  public function testActivityCreateWithInvalidPriority(): void {
     $params = [
       'source_contact_id' => $this->_contactID,
       'subject' => 'Make-it-Happen Meeting',
@@ -278,7 +278,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test create succeeds with valid string for priority.
    */
-  public function testActivityCreateWithValidStringPriority() {
+  public function testActivityCreateWithValidStringPriority(): void {
     $params = [
       'source_contact_id' => $this->_contactID,
       'subject' => 'Make-it-Happen Meeting',
@@ -298,7 +298,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test create fails with invalid priority string.
    */
-  public function testActivityCreateWithInValidStringPriority() {
+  public function testActivityCreateWithInValidStringPriority(): void {
     $params = [
       'source_contact_id' => $this->_contactID,
       'subject' => 'Make-it-Happen Meeting',
@@ -377,8 +377,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    */
   public function testActivityReturnTargetAssignee(int $version): void {
     $this->_apiversion = $version;
-    $description = 'Demonstrates setting & retrieving activity target & source.';
-    $subfile = 'GetTargetAndAssignee';
     $params = [
       'source_contact_id' => $this->_contactID,
       'subject' => 'Make-it-Happen Meeting',
@@ -393,7 +391,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'assignee_contact_id' => $this->_contactID,
     ];
 
-    $result = $this->callAPIAndDocument('activity', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('activity', 'create', $params);
 
     $actContacts = $this->callAPISuccess('ActivityContact', 'get', [
       'activity_id' => $result['id'],
@@ -417,10 +415,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test get returns target and assignee contact names.
    */
-  public function testActivityReturnTargetAssigneeName() {
+  public function testActivityReturnTargetAssigneeName(): void {
 
-    $description = "Demonstrates retrieving activity target & source contact names.";
-    $subfile = "GetTargetandAssigneeName";
     $target1 = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'first_name' => 'A', 'last_name' => 'Cat']);
     $target2 = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'first_name' => 'B', 'last_name' => 'Good']);
     $assignee = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'first_name' => 'C', 'last_name' => 'Shore']);
@@ -437,10 +433,10 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('activity', 'create', $params);
-    $result = $this->callAPIAndDocument('activity', 'getsingle', [
+    $result = $this->callAPISuccess('activity', 'getsingle', [
       'id' => $result['id'],
       'return' => ['source_contact_name', 'target_contact_name', 'assignee_contact_name', 'subject'],
-    ], __FUNCTION__, __FILE__, $description, $subfile);
+    ]);
 
     $this->assertEquals($params['subject'], $result['subject']);
     $this->assertEquals($source['id'], $result['source_contact_id']);
@@ -454,11 +450,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_create() with valid parameters and custom data.
    */
-  public function testActivityCreateCustom() {
+  public function testActivityCreateCustom(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $result = $this->callAPISuccess($this->_entity, 'get', [
       'return.custom_' . $ids['custom_field_id'] => 1,
       'id' => $result['id'],
@@ -470,24 +466,9 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_activity_create() using example code.
-   */
-  public function testActivityCreateExample() {
-    require_once 'api/v3/examples/Activity/Create.ex.php';
-    $result = activity_create_example();
-    $expectedResult = activity_create_expectedresult();
-    // Compare everything *except* timestamps.
-    unset($result['values'][1]['created_date']);
-    unset($result['values'][1]['modified_date']);
-    unset($expectedResult['values'][1]['created_date']);
-    unset($expectedResult['values'][1]['modified_date']);
-    $this->assertEquals($result, $expectedResult);
-  }
-
-  /**
    * Test civicrm_activity_create() with valid parameters and custom data.
    */
-  public function testActivityCreateCustomSubType() {
+  public function testActivityCreateCustomSubType(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $this->callAPISuccess('CustomGroup', 'create', [
       'extends_entity_column_value' => $this->test_activity_type_value,
@@ -497,7 +478,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     ]);
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $result = $this->callAPISuccess($this->_entity, 'get', [
       'return.custom_' . $ids['custom_field_id'] => 1,
       'id' => $result['id'],
@@ -511,11 +492,9 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_create() with valid parameters and custom data.
    */
-  public function testActivityCreateCustomContactRefField() {
+  public function testActivityCreateCustomContactRefField(): void {
 
     $this->callAPISuccess('contact', 'create', ['id' => $this->_contactID, 'sort_name' => 'Contact, Test']);
-    $subfile = 'ContactRefCustomField';
-    $description = "Demonstrates create with Contact Reference Custom Field.";
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params = [
       'custom_group_id' => $ids['custom_group_id'],
@@ -532,16 +511,16 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $params = $this->_params;
     $params['custom_' . $customField['id']] = "$this->_contactID";
 
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $result = $this->callAPIAndDocument($this->_entity, 'get', [
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+    $result = $this->callAPISuccess($this->_entity, 'get', [
       'return.custom_' . $customField['id'] => 1,
       'id' => $result['id'],
-    ], __FUNCTION__, __FILE__, 'Get with Contact Ref Custom Field', 'ContactRefCustomFieldGet');
+    ]);
 
-    $this->assertEquals('Anderson, Anthony', $result['values'][$result['id']]['custom_' . $customField['id']]);
-    $this->assertEquals($this->_contactID, $result['values'][$result['id']]['custom_' . $customField['id'] . "_id"], ' in line ' . __LINE__);
-    $this->assertEquals('Anderson, Anthony', $result['values'][$result['id']]['custom_' . $customField['id'] . '_1'], ' in line ' . __LINE__);
-    $this->assertEquals($this->_contactID, $result['values'][$result['id']]['custom_' . $customField['id'] . "_1_id"], ' in line ' . __LINE__);
+    $this->assertEquals('Anderson, Anthony II', $result['values'][$result['id']]['custom_' . $customField['id']]);
+    $this->assertEquals($this->_contactID, $result['values'][$result['id']]['custom_' . $customField['id'] . '_id']);
+    $this->assertEquals('Anderson, Anthony II', $result['values'][$result['id']]['custom_' . $customField['id'] . '_1']);
+    $this->assertEquals($this->_contactID, $result['values'][$result['id']]['custom_' . $customField['id'] . '_1_id']);
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
   }
@@ -549,7 +528,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_create() with an invalid text status_id.
    */
-  public function testActivityCreateBadTextStatus() {
+  public function testActivityCreateBadTextStatus(): void {
 
     $params = [
       'source_contact_id' => $this->_contactID,
@@ -568,7 +547,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_create() with an invalid text status_id.
    */
-  public function testActivityCreateSupportActivityStatus() {
+  public function testActivityCreateSupportActivityStatus(): void {
 
     $params = [
       'source_contact_id' => $this->_contactID,
@@ -588,7 +567,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_create() with using a text status_id.
    */
-  public function testActivityCreateTextStatus() {
+  public function testActivityCreateTextStatus(): void {
 
     $params = [
       'source_contact_id' => $this->_contactID,
@@ -612,17 +591,15 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_get() with no params
    */
-  public function testActivityGetEmpty() {
+  public function testActivityGetEmpty(): void {
     $this->callAPISuccess('activity', 'get', []);
   }
 
   /**
    * Test civicrm_activity_get() with a good activity ID
    */
-  public function testActivityGetGoodID1() {
+  public function testActivityGetGoodID1(): void {
     // Insert rows in civicrm_activity creating activities 4 and 13
-    $description = 'Demonstrates getting assignee_contact_id & using it to get the contact.';
-    $subfile = 'ReturnAssigneeContact';
     $activity = $this->callAPISuccess('activity', 'create', $this->_params);
 
     $contact = $this->callAPISuccess('Contact', 'Create', [
@@ -647,7 +624,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'return' => ['activity_type_id', 'subject'],
     ];
 
-    $result = $this->callAPIAndDocument('Activity', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('Activity', 'Get', $params);
 
     $this->assertEquals($activity['id'], $result['id']);
 
@@ -661,7 +638,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * test that get functioning does filtering.
    */
-  public function testGetFilter() {
+  public function testGetFilter(): void {
     $params = [
       'source_contact_id' => $this->_contactID,
       'subject' => 'Make-it-Happen Meeting',
@@ -683,7 +660,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_get() with filter target_contact_id
    */
-  public function testActivityGetTargetFilter() {
+  public function testActivityGetTargetFilter(): void {
     $params = $this->_params;
     $contact1Params = [
       'first_name' => 'John',
@@ -735,7 +712,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test that activity.get api works when filtering on subject.
    */
-  public function testActivityGetSubjectFilter() {
+  public function testActivityGetSubjectFilter(): void {
     $subject = 'test activity ' . __FUNCTION__ . mt_rand();
     $params = $this->_params;
     $params['subject'] = $subject;
@@ -748,7 +725,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test that activity.get api works when filtering on details.
    */
-  public function testActivityGetDetailsFilter() {
+  public function testActivityGetDetailsFilter(): void {
     $details = 'test activity ' . __FUNCTION__ . mt_rand();
     $params = $this->_params;
     $params['details'] = $details;
@@ -761,7 +738,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test that activity.get api works when filtering on tag.
    */
-  public function testActivityGetTagFilter() {
+  public function testActivityGetTagFilter(): void {
     $tag = $this->callAPISuccess('Tag', 'create', ['name' => mt_rand(), 'used_for' => 'Activities']);
     $activity = $this->callAPISuccess('Activity', 'Create', $this->_params);
     $this->callAPISuccess('EntityTag', 'create', ['entity_table' => 'civicrm_activity', 'tag_id' => $tag['id'], 'entity_id' => $activity['id']]);
@@ -774,7 +751,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Return tag info
    */
-  public function testJoinOnTags() {
+  public function testJoinOnTags(): void {
     $tagName = 'act_tag_nm_' . mt_rand();
     $tagDescription = 'act_tag_ds_' . mt_rand();
     $tagColor = '#' . substr(md5(mt_rand()), 0, 6);
@@ -793,7 +770,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test that activity.get api works to filter on and return files.
    */
-  public function testActivityGetFile() {
+  public function testActivityGetFile(): void {
     $activity = $this->callAPISuccess('Activity', 'create', $this->_params);
     $activity2 = $this->callAPISuccess('Activity', 'create', $this->_params2);
     $file = $this->callAPISuccess('Attachment', 'create', [
@@ -815,7 +792,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * test that get functioning does filtering.
    */
-  public function testGetStatusID() {
+  public function testGetStatusID(): void {
     $params = [
       'source_contact_id' => $this->_contactID,
       'subject' => 'Make-it-Happen Meeting',
@@ -866,8 +843,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Activity', 'Get', [
       'version' => 3,
     ]);
-    $description = "Demonstrates _low filter (at time of writing doesn't work if contact_id is set.";
-    $subFile = "DateTimeLow";
     $this->assertEquals(2, $result['count']);
     $params = [
       'version' => 3,
@@ -875,10 +850,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'sequential' => 1,
       'return' => 'activity_date_time',
     ];
-    $result = $this->callAPIAndDocument('Activity', 'Get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Activity', 'Get', $params);
     $this->assertEquals(1, $result['count']);
-    $description = "Demonstrates _high filter (at time of writing doesn't work if contact_id is set.";
-    $subFile = 'DateTimeHigh';
     $this->assertEquals('2012-02-16 00:00:00', $result['values'][0]['activity_date_time']);
     $params = [
       'source_contact_id' => $this->_contactID,
@@ -887,7 +860,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'sequential' => 1,
       'return' => 'activity_date_time',
     ];
-    $result = $this->callAPIAndDocument('Activity', 'Get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $result = $this->callAPISuccess('Activity', 'Get', $params);
 
     $this->assertEquals(1, $result['count']);
     $this->assertEquals('2011-01-01 00:00:00', $result['values'][0]['activity_date_time']);
@@ -900,7 +873,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Test civicrm_activity_get() with a good activity ID which
    * has associated custom data
    */
-  public function testActivityGetGoodIDCustom() {
+  public function testActivityGetGoodIDCustom(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
     $params = $this->_params;
@@ -914,7 +887,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'sequential' => 1,
       'return.custom_' . $ids['custom_field_id'] => 1,
     ];
-    $result = $this->callAPIAndDocument('activity', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('activity', 'get', $params);
     $this->assertEquals('custom string', $result['values'][0]['custom_' . $ids['custom_field_id']]);
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
@@ -962,7 +935,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   public function testDeleteActivity(): void {
     $result = $this->callAPISuccess('Activity', 'create', $this->_params);
     $params = ['id' => $result['id']];
-    $this->callAPIAndDocument('Activity', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('Activity', 'delete', $params);
   }
 
   /**
@@ -978,7 +951,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_update() with non-numeric id
    */
-  public function testActivityUpdateWithNonNumericId() {
+  public function testActivityUpdateWithNonNumericId(): void {
     $params = [
       'id' => 'lets break it',
       'activity_name' => 'Meeting',
@@ -992,7 +965,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Check with incorrect required fields.
    */
-  public function testActivityUpdateWithIncorrectContactActivityType() {
+  public function testActivityUpdateWithIncorrectContactActivityType(): void {
     $params = [
       'id' => 1,
       'activity_name' => 'Test Activity',
@@ -1132,7 +1105,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Test civicrm_activity_update() for core activity fields
    * and some custom data
    */
-  public function testActivityUpdateCheckCoreFields() {
+  public function testActivityUpdateCheckCoreFields(): void {
     $params = $this->_params;
     $contact1Params = [
       'first_name' => 'John',
@@ -1235,7 +1208,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Test civicrm_activity_update() where the DB has a date_time
    * value and there is none in the update params.
    */
-  public function testActivityUpdateNotDate() {
+  public function testActivityUpdateNotDate(): void {
     $result = $this->callAPISuccess('activity', 'create', $this->_params);
 
     $params = [
@@ -1260,7 +1233,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Check activity update with status.
    */
-  public function testActivityUpdateWithStatus() {
+  public function testActivityUpdateWithStatus(): void {
     $activity = $this->callAPISuccess('activity', 'create', $this->_params);
     $params = [
       'id' => $activity['id'],
@@ -1330,7 +1303,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_contact_get() with invalid Contact ID.
    */
-  public function testActivitiesContactGetWithInvalidContactId() {
+  public function testActivitiesContactGetWithInvalidContactId(): void {
     $params = ['contact_id' => 'contact'];
     $this->callAPIFailure('activity', 'get', $params);
   }
@@ -1338,7 +1311,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_contact_get() with contact having no Activity.
    */
-  public function testActivitiesContactGetHavingNoActivity() {
+  public function testActivitiesContactGetHavingNoActivity(): void {
     $params = [
       'first_name' => 'dan',
       'last_name' => 'conberg',
@@ -1357,9 +1330,9 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getfields function.
    */
-  public function testGetFields() {
+  public function testGetFields(): void {
     $params = ['action' => 'create'];
-    $result = $this->callAPIAndDocument('activity', 'getfields', $params, __FUNCTION__, __FILE__, NULL, NULL);
+    $result = $this->callAPISuccess('activity', 'getfields', $params);
     $this->assertTrue(is_array($result['values']), 'get fields doesn\'t return values array');
     foreach ($result['values'] as $key => $value) {
       $this->assertTrue(is_array($value), $key . " is not an array");
@@ -1369,7 +1342,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test or operator in api params
    */
-  public function testGetWithOr() {
+  public function testGetWithOr(): void {
     $acts = [
       'test or 1' => 'orOperator',
       'test or 2' => 'orOperator',
@@ -1401,7 +1374,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test handling of is_overdue calculated field
    */
-  public function testGetOverdue() {
+  public function testGetOverdue(): void {
     $overdueAct = $this->callAPISuccess('Activity', 'create', [
       'activity_date_time' => 'now - 1 week',
       'status_id' => 'Scheduled',

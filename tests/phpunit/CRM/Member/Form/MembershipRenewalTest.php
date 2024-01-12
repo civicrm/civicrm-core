@@ -95,7 +95,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'fixed_period_start_day' => '101',
       'fixed_period_rollover_day' => '1231',
       'relationship_type_id' => 20,
-      'min_fee' => 100,
+      'minimum_fee' => 100,
       'financial_type_id' => $this->financialTypeID,
       'max_related' => 10,
     ])['id'];
@@ -298,7 +298,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $form->_mode = 'test';
     $form->_contactID = $this->_individualId;
 
-    $form->testSubmit();
+    $form->postProcess();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['contact_id' => $this->_individualId]);
     $this->assertEquals(1, $contributionRecur['is_email_receipt']);
@@ -357,6 +357,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'duration_unit' => 'month',
       'duration_interval' => 1,
       'auto_renew' => 1,
+      'minimum_fee' => 10,
     ]);
     $this->createLoggedInUser();
     $form = $this->getForm(array_merge($this->getBaseSubmitParams(), ['is_recur' => 1, 'auto_renew' => '1']));
@@ -626,11 +627,10 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   protected function getForm($formValues = [], $mode = 'test'): CRM_Member_Form_MembershipRenewal {
     /** @var CRM_Member_Form_MembershipRenewal $form */
     $form = $this->getFormObject('CRM_Member_Form_MembershipRenewal', $formValues);
-
-    $form->_bltID = 5;
     $form->_mode = $mode;
     $form->setEntityId($this->_membershipID);
     $form->preProcess();
+    $form->buildForm();
     return $form;
   }
 

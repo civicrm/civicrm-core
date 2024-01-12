@@ -12,7 +12,7 @@ class CRM_Utils_EnglishNumberTest extends CiviUnitTestCase {
     $this->useTransaction();
   }
 
-  public function testRoundTrip() {
+  public function testRoundTrip(): void {
     for ($i = 0; $i < 100; $i++) {
       $camel = CRM_Utils_EnglishNumber::toCamelCase($i);
       $camelToInt = CRM_Utils_EnglishNumber::toInt($camel);
@@ -24,7 +24,7 @@ class CRM_Utils_EnglishNumberTest extends CiviUnitTestCase {
     }
   }
 
-  public function testCamel() {
+  public function testCamel(): void {
     $this->assertEquals('Seven', CRM_Utils_EnglishNumber::toCamelCase(7));
     $this->assertEquals('Nineteen', CRM_Utils_EnglishNumber::toCamelCase(19));
     $this->assertEquals('Thirty', CRM_Utils_EnglishNumber::toCamelCase(30));
@@ -32,7 +32,7 @@ class CRM_Utils_EnglishNumberTest extends CiviUnitTestCase {
     $this->assertEquals('NinetyNine', CRM_Utils_EnglishNumber::toCamelCase(99));
   }
 
-  public function testHyphen() {
+  public function testHyphen(): void {
     $this->assertEquals('seven', CRM_Utils_EnglishNumber::toHyphen(7));
     $this->assertEquals('nineteen', CRM_Utils_EnglishNumber::toHyphen(19));
     $this->assertEquals('thirty', CRM_Utils_EnglishNumber::toHyphen(30));
@@ -40,7 +40,7 @@ class CRM_Utils_EnglishNumberTest extends CiviUnitTestCase {
     $this->assertEquals('ninety-nine', CRM_Utils_EnglishNumber::toHyphen(99));
   }
 
-  public function testIsNumeric() {
+  public function testIsNumeric(): void {
     $assertNumeric = function($expectBool, $string) {
       $this->assertEquals($expectBool, CRM_Utils_EnglishNumber::isNumeric($string), "isNumeric($string) should return " . (int) $expectBool);
     };

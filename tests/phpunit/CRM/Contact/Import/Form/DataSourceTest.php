@@ -56,6 +56,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
    */
   public function testDataSources(): void {
     $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'import SQL datasource']);
     $this->callAPISuccess('Mapping', 'create', ['name' => 'Well dressed ducks', 'mapping_type_id' => 'Import Contact']);
 
     $sqlFormValues = [

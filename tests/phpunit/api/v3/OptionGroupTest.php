@@ -33,41 +33,41 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   /**
    * Good to test option group as a representative on the Camel Case.
    */
-  public function testGetOptionGroupGetFields() {
+  public function testGetOptionGroupGetFields(): void {
     $result = $this->callAPISuccess('option_group', 'getfields', []);
     $this->assertFalse(empty($result['values']));
   }
 
-  public function testGetOptionGroupGetFieldsCreateAction() {
+  public function testGetOptionGroupGetFieldsCreateAction(): void {
     $result = $this->callAPISuccess('option_group', 'getfields', ['action' => 'create']);
     $this->assertFalse(empty($result['values']));
     $this->assertEquals($result['values']['name']['api.unique'], 1);
   }
 
-  public function testGetOptionGroupByID() {
+  public function testGetOptionGroupByID(): void {
     $result = $this->callAPISuccess('option_group', 'get', ['id' => 1]);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(1, $result['id']);
   }
 
-  public function testGetOptionGroupByName() {
+  public function testGetOptionGroupByName(): void {
     $params = ['name' => 'preferred_communication_method'];
-    $result = $this->callAPIAndDocument('option_group', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('option_group', 'get', $params);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(1, $result['id']);
   }
 
-  public function testGetOptionGroup() {
+  public function testGetOptionGroup(): void {
     $result = $this->callAPISuccess('option_group', 'get', []);
     $this->assertGreaterThan(1, $result['count']);
   }
 
-  public function testGetOptionDoesNotExist() {
+  public function testGetOptionDoesNotExist(): void {
     $result = $this->callAPISuccess('option_group', 'get', ['name' => 'FSIGUBSFGOMUUBSFGMOOUUBSFGMOOBUFSGMOOIIB']);
     $this->assertEquals(0, $result['count']);
   }
 
-  public function testGetOptionCreateSuccess() {
+  public function testGetOptionCreateSuccess(): void {
     $params = [
       'sequential' => 1,
       'name' => 'civicrm_event.amount.560',
@@ -81,7 +81,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
         'format.only_id' => 1,
       ],
     ];
-    $result = $this->callAPIAndDocument('OptionGroup', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('OptionGroup', 'create', $params);
     $this->assertEquals('civicrm_event.amount.560', $result['values'][0]['name']);
     $this->assertTrue(is_int($result['values'][0]['api.OptionValue.create']));
     $this->assertGreaterThan(0, $result['values'][0]['api.OptionValue.create']);
@@ -91,7 +91,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   /**
    * Test the error message when a failure is due to a key duplication issue.
    */
-  public function testGetOptionCreateFailOnDuplicate() {
+  public function testGetOptionCreateFailOnDuplicate(): void {
     $params = [
       'sequential' => 1,
       'name' => 'civicrm_dup_entry',
@@ -108,7 +108,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
    *
    * Check error returned.
    */
-  public function testGetOptionCreateFailRollback() {
+  public function testGetOptionCreateFailRollback(): void {
     $countFirst = $this->callAPISuccess('OptionGroup', 'getcount', ['options' => ['limit' => 5000]]);
     $params = [
       'sequential' => 1,
@@ -137,7 +137,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   /**
    * Success test for updating an existing Option Group.
    */
-  public function testCreateUpdateOptionGroup() {
+  public function testCreateUpdateOptionGroup(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $params = array_merge($this->_params, ['id' => $result['id'], 'is_active' => 0]);
     $this->callAPISuccess($this->_entity, 'create', $params);
@@ -147,9 +147,9 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   /**
    * Success test for deleting an existing Option Group.
    */
-  public function testDeleteOptionGroup() {
+  public function testDeleteOptionGroup(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $this->callAPIAndDocument('OptionGroup', 'delete', ['id' => $result['id']], __FUNCTION__, __FILE__);
+    $this->callAPISuccess('OptionGroup', 'delete', ['id' => $result['id']]);
   }
 
   /**
@@ -157,7 +157,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testEnsureOptionGroupExistsExistingValue() {
+  public function testEnsureOptionGroupExistsExistingValue(): void {
     CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(['name' => 'participant_role']);
     $this->callAPISuccessGetSingle('OptionGroup', ['name' => 'participant_role']);
   }
@@ -165,7 +165,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   /**
    * Ensure only one option value exists adds a new value.
    */
-  public function testEnsureOptionGroupExistsNewValue() {
+  public function testEnsureOptionGroupExistsNewValue(): void {
     $optionGroupID = CRM_Core_BAO_OptionGroup::ensureOptionGroupExists([
       'name' => 'Bombed',
       'title' => ts('Catastrophy'),

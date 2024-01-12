@@ -61,6 +61,7 @@ class RelationshipCacheSpecProvider extends \Civi\Core\Service\AutoService imple
         // Fetches the value from the relationship
         ->setColumnName('relationship_id')
         ->setDescription($fieldInfo['description'])
+        ->setSuffixes(['name', 'label', 'icon'])
         ->setOptionsCallback(['CRM_Core_SelectValues', 'getPermissionedRelationshipOptions'])
         ->setSqlRenderer([__CLASS__, 'directionalRelationshipField']);
       $spec->addFieldSpec($field);

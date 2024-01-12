@@ -64,7 +64,7 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * CRM-20412: Test accurate count for unique open details
    */
-  public function testOpenedMailingQuery() {
+  public function testOpenedMailingQuery(): void {
 
     $this->loadXMLDataSet(dirname(__FILE__) . '/queryDataset.xml');
     // ensure that total unique opened mail count is same while
@@ -79,7 +79,7 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * CRM-21194: Test accurate count for unique trackable URLs
    */
-  public function testTrackableUrlMailingQuery() {
+  public function testTrackableUrlMailingQuery(): void {
     $this->loadXMLDataSet(dirname(__FILE__) . '/queryDataset.xml');
 
     // ensure that total unique clicked mail count is same while

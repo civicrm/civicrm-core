@@ -80,12 +80,12 @@ class DebugSubscriber implements EventSubscriberInterface {
       && (empty($apiRequest['params']['check_permissions']) || \CRM_Core_Permission::check('view debug output'))
     ) {
       if (is_a($result, '\Civi\Api4\Generic\Result')) {
-        $result->debug = $result->debug ?? [];
+        $result->debug ??= [];
         $debug =& $result->debug;
       }
       // result would not be an array for api3 getvalue
       elseif (is_array($result)) {
-        $result['xdebug'] = $result['xdebug'] ?? [];
+        $result['xdebug'] ??= [];
         $debug =& $result['xdebug'];
       }
       else {

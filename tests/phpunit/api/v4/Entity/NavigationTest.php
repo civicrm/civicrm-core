@@ -27,7 +27,7 @@ use Civi\Test\TransactionalInterface;
  */
 class NavigationTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testCreate() {
+  public function testCreate(): void {
     $created = Navigation::create(FALSE)
       ->addValue('permission', ['administer CiviCRM', 'access CiviCRM'])
       ->addValue('name', 'Test menu item')

@@ -25,8 +25,6 @@ use Civi\Payment\Exception\PaymentProcessorException;
  */
 class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_ContributionRecur {
 
-  protected $_subscriptionDetails = NULL;
-
   public $_paymentProcessor = NULL;
 
   public $_paymentProcessorObj = NULL;
@@ -44,6 +42,13 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
    * @var int
    */
   public $_contactID;
+
+  /**
+   * The contributor email
+   *
+   * @var string
+   */
+  protected $_donorEmail = '';
 
   /**
    * Pre-processing for the form.
@@ -114,7 +119,8 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $this->assign('editableScheduleFields', array_diff($this->editableScheduleFields, $alreadyHardCodedFields));
 
     if ($this->_subscriptionDetails->contact_id) {
-      [$this->_donorDisplayName, $this->_donorEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
+      $contactDetails = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
+      $this->_donorEmail = $contactDetails[1];
     }
 
     $this->setTitle(ts('Update Recurring Contribution'));

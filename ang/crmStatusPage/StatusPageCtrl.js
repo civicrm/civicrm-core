@@ -57,6 +57,11 @@
             case 'api3':
               refresh([action.params], action.title);
               break;
+
+            case 'api4':
+              $('#crm-status-list').block();
+              CRM.api4([action.params]).then(() => refresh());
+              break;
           }
         }
 

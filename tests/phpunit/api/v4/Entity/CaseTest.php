@@ -20,8 +20,10 @@
 namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Activity;
 use Civi\Api4\CaseActivity;
+use Civi\Api4\CiviCase;
 use Civi\Api4\Relationship;
 
 /**
@@ -34,7 +36,7 @@ class CaseTest extends Api4TestBase {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
   }
 
-  public function testCreateUsingLoggedInUser() {
+  public function testCreateUsingLoggedInUser(): void {
     $uid = $this->createLoggedInUser();
 
     $contactID = $this->createTestRecord('Contact')['id'];
@@ -53,7 +55,7 @@ class CaseTest extends Api4TestBase {
     $this->assertEquals($contactID, $relationships[0]['contact_id_a']);
   }
 
-  public function testCgExtendsObjects() {
+  public function testCgExtendsObjects(): void {
     $this->createTestRecord('CaseType', [
       'title' => 'Test Case Type',
       'name' => 'test_case_type1',
@@ -162,6 +164,123 @@ class CaseTest extends Api4TestBase {
       ->addWhere('activity_id', '=', $activity['id'])
       ->execute();
     $this->assertCount(0, $get1);
+  }
+
+  public function testCaseActivityPermission(): void {
+    $case1 = $this->createTestRecord('Case')['id'];
+    $userId = $this->createLoggedInUser();
+    $case2 = $this->createTestRecord('Case', [
+      'creator_id' => $userId,
+    ])['id'];
+
+    $act1 = $this->createTestRecord('Activity', [
+      'case_id' => $case1,
+    ])['id'];
+    $act2 = $this->createTestRecord('Activity', [
+      'case_id' => $case2,
+    ])['id'];
+    $act3 = $this->createTestRecord('Activity')['id'];
+
+    // No CiviCase permission
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+    ];
+
+    $result = Activity::get()
+      ->addWhere('id', 'IN', [$act1, $act2, $act3])
+      ->execute()->column('id');
+    $this->assertCount(1, $result);
+    $this->assertEquals($act3, $result[0]);
+    try {
+      CiviCase::get()->execute();
+      $this->fail('Expected UnauthorizedException');
+    }
+    catch (UnauthorizedException $e) {
+    }
+
+    // Without any CiviCase permission, ensure `case_id` in the where clause doesn't cause errors
+    $result = Activity::get()
+      ->addWhere('id', 'IN', [$act1, $act2, $act3])
+      ->addWhere('case_id', 'IS EMPTY')
+      ->execute()->column('id');
+    $this->assertCount(1, $result);
+    $this->assertEquals($act3, $result[0]);
+
+    // CiviCase permission limited to "my cases"
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+      'access my cases and activities',
+    ];
+
+    $result = Activity::get()
+      ->addWhere('id', 'IN', [$act1, $act2])
+      ->execute()->column('id');
+    $this->assertCount(1, $result);
+    $this->assertEquals($act2, $result[0]);
+    $result = CiviCase::get()
+      ->addWhere('id', 'IN', [$case1, $case2])
+      ->execute()->column('id');
+    $this->assertCount(1, $result);
+    $this->assertEquals($case2, $result[0]);
+
+    // CiviCase permission for all non-deleted cases
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+      'access all cases and activities',
+    ];
+
+    $result = Activity::get()
+      ->addWhere('id', 'IN', [$act1, $act2])
+      ->execute()->column('id');
+    $this->assertCount(2, $result);
+    $result = CiviCase::get()
+      ->addWhere('id', 'IN', [$case1, $case2])
+      ->execute()->column('id');
+    $this->assertCount(2, $result);
+
+    CiviCase::update(FALSE)
+      ->addWhere('id', '=', $case2)
+      ->addValue('is_deleted', TRUE)
+      ->execute();
+
+    $result = Activity::get()
+      ->addWhere('id', 'IN', [$act1, $act2])
+      ->execute()->column('id');
+    $this->assertCount(1, $result);
+    $this->assertEquals($act1, $result[0]);
+    $result = CiviCase::get()
+      ->addWhere('id', 'IN', [$case1, $case2])
+      ->execute()->column('id');
+    $this->assertCount(1, $result);
+    $this->assertEquals($case1, $result[0]);
+
+    // CiviCase permission for all contacts and cases
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+      'access deleted contacts',
+      'access all cases and activities',
+      'administer CiviCase',
+    ];
+
+    $result = Activity::get()
+      ->addWhere('id', 'IN', [$act1, $act2])
+      ->execute()->column('id');
+    $this->assertCount(2, $result);
+    $result = CiviCase::get()
+      ->addWhere('id', 'IN', [$case1, $case2])
+      ->execute()->column('id');
+    $this->assertCount(2, $result);
+
+    $result = Activity::get()
+      ->addWhere('id', 'IN', [$act1, $act2, $act3])
+      ->addWhere('case_id', 'IS EMPTY')
+      ->execute()->column('id');
+    $this->assertCount(1, $result);
+    $this->assertEquals($act3, $result[0]);
   }
 
 }

@@ -36,11 +36,7 @@ class CRM_Utils_Rule {
     }
 
     // Make sure it include valid characters, alpha numeric and underscores
-    if (!preg_match('/^\w[\w\s\'\&\,\$\#\-\.\"\?\!]+$/i', $str)) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (bool) preg_match('/^\w[\w\s\'\&\,\$\#\-\.\"\?\!]+$/i', $str);
   }
 
   /**
@@ -64,11 +60,7 @@ class CRM_Utils_Rule {
     }
 
     // make sure it includes valid characters, alpha numeric and underscores
-    if (!preg_match('/^[\w]+$/i', $str)) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (bool) preg_match('/^[\w]+$/i', $str);
   }
 
   /**
@@ -92,11 +84,8 @@ class CRM_Utils_Rule {
     //   * Composed of alphanumeric chars, underscore and hyphens.
     //   * Maximum length of 64 chars.
     //   * Optionally surrounded by backticks, in which case spaces also OK.
-    if (!preg_match('/^((`[-\w ]{1,64}`|[-\w]{1,64})\.)?(`[-\w ]{1,64}`|[-\w]{1,64})$/i', $str)) {
-      return FALSE;
-    }
+    return (bool) preg_match('/^((`[-\w ]{1,64}`|[-\w]{1,64})\.)?(`[-\w ]{1,64}`|[-\w]{1,64})$/i', $str);
 
-    return TRUE;
   }
 
   /**
@@ -108,11 +97,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function mysqlOrderByDirection($str) {
-    if (!preg_match('/^(asc|desc)$/i', $str)) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (bool) preg_match('/^(asc|desc)$/i', $str);
   }
 
   /**
@@ -163,11 +148,7 @@ class CRM_Utils_Rule {
 
     // make sure it includes valid characters, alpha numeric and underscores
     // added (. and ,) option (CRM-1336)
-    if (!preg_match('/^[\w\s\.\,]+$/i', $str)) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (bool) preg_match('/^[\w\s\.\,]+$/i', $str);
   }
 
   /**
@@ -200,11 +181,7 @@ class CRM_Utils_Rule {
     }
 
     // make sure it includes valid characters, alpha numeric and underscores
-    if (!preg_match('/^[\w\s\%\'\&\,\$\#]+$/i', $query)) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (bool) preg_match('/^[\w\s\%\'\&\,\$\#]+$/i', $query);
   }
 
   /**

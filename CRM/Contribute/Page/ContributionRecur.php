@@ -51,7 +51,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
     }
 
     $contributionRecur['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName(
-      CRM_Utils_Array::value('payment_processor_id', $contributionRecur)
+      $contributionRecur['payment_processor_id'] ?? NULL
     );
     $idFields = ['contribution_status_id', 'campaign_id', 'financial_type_id'];
     foreach ($idFields as $idField) {

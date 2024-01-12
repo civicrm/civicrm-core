@@ -15,11 +15,10 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  * @param $tpl_name
  * @param $tpl_source
- * @param $smarty_obj
  *
  * @return bool
  */
-function civicrm_smarty_resource_string_get_template($tpl_name, &$tpl_source, &$smarty_obj) {
+function civicrm_smarty_resource_string_get_template($tpl_name, &$tpl_source) {
   $tpl_source = $tpl_name;
   return TRUE;
 }
@@ -27,30 +26,24 @@ function civicrm_smarty_resource_string_get_template($tpl_name, &$tpl_source, &$
 /**
  * @param string $tpl_name
  * @param $tpl_timestamp
- * @param CRM_Core_Smarty $smarty_obj
  *
  * @return bool
  */
-function civicrm_smarty_resource_string_get_timestamp($tpl_name, &$tpl_timestamp, &$smarty_obj) {
+function civicrm_smarty_resource_string_get_timestamp($tpl_name, &$tpl_timestamp) {
   $tpl_timestamp = time();
   return TRUE;
 }
 
 /**
- * @param string $tpl_name
- * @param CRM_Core_Smarty $smarty_obj
- *
  * @return bool
  */
-function civicrm_smarty_resource_string_get_secure($tpl_name, &$smarty_obj) {
+function civicrm_smarty_resource_string_get_secure() {
   return TRUE;
 }
 
 /**
- * @param string $tpl_name
- * @param CRM_Core_Smarty $smarty_obj
  */
-function civicrm_smarty_resource_string_get_trusted($tpl_name, &$smarty_obj) {
+function civicrm_smarty_resource_string_get_trusted() {
 
 }
 

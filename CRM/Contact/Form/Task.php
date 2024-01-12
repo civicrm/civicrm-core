@@ -262,7 +262,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       $queryOperator = 'AND';
     }
     $dao = $selector->contactIDQuery($params, $sortID,
-      CRM_Utils_Array::value('display_relationship_type', $fv),
+      $fv['display_relationship_type'] ?? NULL,
       $queryOperator
     );
 

@@ -38,7 +38,7 @@ class RelationshipAutocompleteProvider extends \Civi\Core\Service\AutoService im
         [
           'type' => 'field',
           'key' => 'relationship_type_id.label_a_b',
-          'rewrite' => '[contact_id_a.display_name] [relationship_type_id.label_a_b] [contact_id_b.display_name]',
+          'rewrite' => '[contact_id_a.sort_name] [relationship_type_id.label_a_b] [contact_id_b.sort_name]',
         ],
         [
           'type' => 'field',

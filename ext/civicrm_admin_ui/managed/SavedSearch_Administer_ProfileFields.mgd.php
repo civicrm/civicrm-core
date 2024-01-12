@@ -55,7 +55,7 @@ return [
         'saved_search_id.name' => 'Profile_Fields',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -185,17 +185,23 @@ return [
                   'condition' => [],
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
+              'icon' => 'fa-bars',
               'alignment' => 'text-right',
             ],
           ],
           'draggable' => 'weight',
           'button' => NULL,
-          'addButton' => [
-            'path' => 'civicrm/admin/uf/group/field/add?reset=1&action=add&gid=[uf_group_id]',
-            'text' => E::ts('Add Field'),
-            'icon' => 'fa-plus',
-            'autoOpen' => TRUE,
+          'toolbar' => [
+            [
+              'entity' => 'UFField',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Field'),
+              'icon' => 'fa-plus',
+              'autoOpen' => TRUE,
+            ],
           ],
           'cssRules' => [
             [

@@ -209,14 +209,14 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       '$params' => $params,
       '$result' => $result,
     ], TRUE));
-    $this->assertRegExp($expectedError, $result['error_message']);
+    $this->assertMatchesRegularExpression($expectedError, $result['error_message']);
   }
 
   /**
    * Test whether trusted API calls bypass the permission check
    *
    */
-  public function testNotDelegated() {
+  public function testNotDelegated(): void {
     $entity = 'FakeFile';
     $action = 'create';
     $params = [
@@ -229,7 +229,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     // run with permission check
     $result = $this->kernel->runSafe('FakeFile', 'create', $params);
     $this->assertTrue((bool) $result['is_error'], 'Undelegated entity with check_permissions = 1 should fail');
-    $this->assertRegExp('/Unrecognized target entity table \(civicrm_membership\)/', $result['error_message']);
+    $this->assertMatchesRegularExpression('/Unrecognized target entity table \(civicrm_membership\)/', $result['error_message']);
     // repeat without permission check
     $params['check_permissions'] = 0;
     $result = $this->kernel->runSafe('FakeFile', 'create', $params);

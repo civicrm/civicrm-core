@@ -199,12 +199,7 @@
 {literal}
 <script type="text/javascript">
 
-   var futurePaymentProcessorMapper = [];
-   {/literal}{if $futurePaymentProcessor}
-   {foreach from=$futurePaymentProcessor item="futurePaymentProcessor" key="index"}{literal}
-     futurePaymentProcessorMapper[{/literal}{$index}{literal}] = '{/literal}{$futurePaymentProcessor}{literal}';
-   {/literal}{/foreach}
-   {literal}
+   {/literal}{if $futurePaymentProcessor}{literal}
    CRM.$(function($) {
      var defId = $('input[name="pledge_default_toggle"][value="contribution_date"]').attr('id');
      var calId = $('input[name="pledge_default_toggle"][value="calendar_date"]').attr('id');
@@ -382,13 +377,13 @@
     function showAdjustRecurring( paymentProcessorIds ) {
         var display = true;
         cj.each(paymentProcessorIds, function(k, id){
-            if( cj.inArray(id, futurePaymentProcessorMapper) == -1 ) {
-                display = false;
-            }
+           if( cj.inArray(parseInt(id), {/literal}{$futurePaymentProcessor}{literal}) == -1 ) {
+              display = false;
+          }
         });
 
         if(display) {
-            cj( '#adjustRecurringFields' ).show( );
+            cj('#adjustRecurringFields').show();
         } else {
             if ( cj( '#adjust_recur_start_date' ).prop('checked' ) ) {
                 cj( '#adjust_recur_start_date' ).prop('checked', false);
@@ -455,7 +450,7 @@
         message: {/literal}"{ts escape='js'}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}"{literal}
       }).on('crmConfirm:yes', function() {
         {/literal}
-        var dataUrl = '{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_contribution_page&id=$contributionPageID" }';
+        var dataUrl = '{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_contribution_page&id=$contributionPageID"}';
         {literal}
         $.getJSON(dataUrl).done(function(result) {window.location = CRM.url("civicrm/admin/price/field", {reset: 1, action: 'browse', sid: result});});
       });

@@ -34,9 +34,7 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
    */
   public function testCreateCampaign($version) {
     $this->_apiversion = $version;
-    $description = "Create a campaign - Note use of relative dates here:
-      @link http://www.php.net/manual/en/datetime.formats.relative.php.";
-    $result = $this->callAPIAndDocument('campaign', 'create', $this->params, __FUNCTION__, __FILE__, $description);
+    $result = $this->callAPISuccess('campaign', 'create', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck(array_merge($this->params, ['created_date' => '2008-07-05 00:00:00']), $result['id'], 'campaign', TRUE);
@@ -49,7 +47,7 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
   public function testGetCampaign($version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess('campaign', 'create', $this->params);
-    $result = $this->callAPIAndDocument('campaign', 'get', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('campaign', 'get', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
@@ -63,7 +61,7 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
     $this->callAPISuccess('campaign', 'create', $this->params);
     $entity = $this->callAPISuccess('campaign', 'get', ($this->params));
     $delete = ['id' => $entity['id']];
-    $result = $this->callAPIAndDocument('campaign', 'delete', $delete, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('campaign', 'delete', $delete);
 
     $checkDeleted = $this->callAPISuccess('campaign', 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);

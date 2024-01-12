@@ -20,10 +20,10 @@
           </div>
         {/if}
       {else}
-        {if $membershipBlock.new_title}
+        {if array_key_exists('new_title', $membershipBlock) && $membershipBlock.new_title}
           <legend>{$membershipBlock.new_title}</legend>
         {/if}
-        {if $membershipBlock.new_text}
+        {if array_key_exists('new_text', $membershipBlock) && $membershipBlock.new_text}
           <div id="membership-intro" class="crm-section membership_new_intro-section">
             {$membershipBlock.new_text}
           </div>
@@ -47,38 +47,24 @@
           {/if}
         {/foreach}
       {/if}
-      {include file="CRM/Price/Form/PriceSet.tpl" extends="Membership"}
+      {include file="CRM/Price/Form/PriceSet.tpl" extends="Membership" hideTotal=$quickConfig}
     </fieldset>
   </div>
   {literal}
   <script type="text/javascript">
-    CRM.$(function($) {
-      //if price set is set we use below below code to show for showing auto renew
-      var autoRenewOption =  {/literal}'{$autoRenewOption}'{literal};
-      var autoRenew = $("#auto_renew_section");
-      var autoRenewCheckbox = $("#auto_renew");
-      var forceRenew = $("#force_renew");
-      autoRenew.hide();
-      forceRenew.hide();
-      if ( autoRenewOption == 1 ) {
-        autoRenew.show();
-      } else if ( autoRenewOption == 2 ) {
-        autoRenewCheckbox.prop('checked',  true );
-        autoRenewCheckbox.attr( 'readonly', true );
-        autoRenew.hide();
-        forceRenew.show();
-      }
-    });
+
   </script>
 {/literal}
 </div>
 
-{if $membershipBlock AND $is_quick_config}
+{if $isPaymentOnExistingContribution && $membershipBlock && $is_quick_config}
+    {* This code is hit only when ccid is in the url to pay on an existing contribution and it is quick config *}
+    {* Removing the contents of this if does not result in any apparent change & it may be removable *}
     {strip}
       <table id="membership-listings">
           {foreach from=$membershipTypes item=row}
             <tr class="odd-row" valign="top">
-                {if $showRadio }
+                {if $showRadio}
                     {* unreachable - show radio is never true *}
                     {assign var="pid" value=$row.id}
                   <td style="width: 1em;">{$form.selectMembership.$pid.html}</td>
@@ -87,7 +73,7 @@
                 {/if}
               <td style="width: auto;">
                 <span class="bold">{$row.name} &nbsp;
-                {if ($membershipBlock.display_min_fee) AND $row.minimum_fee GT 0 }
+                {if ($membershipBlock.display_min_fee) AND $row.minimum_fee GT 0}
                     {if $is_separate_payment OR ! $form.amount.label}
                       &ndash; {$row.minimum_fee|crmMoney}
                     {else}
@@ -126,7 +112,7 @@
             </tr>
           {/if}
           {if $showRadio}{* unreachable *}
-              {if $showRadioNoThanks } {* Provide no-thanks option when Membership signup is not required - per membership block configuration. *}
+              {if $showRadioNoThanks} {* Provide no-thanks option when Membership signup is not required - per membership block configuration. *}
                 <tr class="odd-row">
                   <td>{$form.selectMembership.no_thanks.html}</td>
                   <td colspan="2"><strong>{ts}No thank you{/ts}</strong></td>
@@ -151,17 +137,18 @@
       if ( !memTypeId ) memTypeId = cj('input:radio[name='+priceSetName+']:checked').attr('membership-type');
 
       //does this page has only one membership type.
-      var singleMembership = {/literal}'{$singleMembership}'{literal};
-      if ( !memTypeId && singleMembership ) memTypeId = cj("input:radio[name="+priceSetName+"]").attr('membership-type');
       var renewOptions  = {/literal}{$autoRenewMembershipTypeOptions}{literal};
       var currentOption = eval( "renewOptions." + 'autoRenewMembershipType_' + memTypeId );
+      if (memTypeId === undefined) {
+        currentOption = 0;
+      }
       var autoRenew = cj('#auto_renew_section');
       var autoRenewC = cj('input[name="auto_renew"]');
       var forceRenew = cj("#force_renew");
 
       var readOnly = false;
       var isChecked  = false;
-      if ( currentOption == 0 ) {
+      if (currentOption == 0 ) {
         isChecked = false;
         forceRenew.hide();
         autoRenew.hide();

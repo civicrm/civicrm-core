@@ -33,7 +33,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Test case for add( ).
    */
-  public function testAddSimple() {
+  public function testAddSimple(): void {
 
     $checkParams = $params = [
       'title' => 'Group Uno',
@@ -247,7 +247,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    *  Copy the output to a single sql file and place in the SavedSearchDataSets folder - use the group number as the prefix.
    *  Try to keep as much of the real world irregular glory as you can! Don't change the table ids to be number 1 as this can hide errors
    */
-  public function testGroupData() {
+  public function testGroupData(): void {
     $groups = $this->dataProviderSavedSearch();
     foreach ($groups[0] as $groupID) {
       $group = new CRM_Contact_BAO_Group();
@@ -261,7 +261,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Ensure that when updating a group with a linked organisation record even tho that record's id doesn't match the group id no db error is produced
    */
-  public function testGroupUpdateWithOrganization() {
+  public function testGroupUpdateWithOrganization(): void {
     $params = [
       'name' => uniqid(),
       'title' => 'Group A',
@@ -299,7 +299,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Ensure that when hidden smart group is created, wildcard string value is not ignored
    */
-  public function testHiddenSmartGroup() {
+  public function testHiddenSmartGroup(): void {
     $customGroup = $this->customGroupCreate();
     $fields = [
       'label' => 'testFld',
@@ -337,7 +337,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    * Test updating a group with just description and check the recent items
    * list has the right title.
    */
-  public function testGroupUpdateDescription() {
+  public function testGroupUpdateDescription(): void {
     // Create a group. Copied from $this->testAddSimple().
     // Note we need $checkParams because the function call changes $params.
     $checkParams = $params = [

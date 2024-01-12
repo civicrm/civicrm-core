@@ -77,7 +77,7 @@ class Setup {
       '/^civi\.setupui\./' => 'run',
       '/./' => 'fail',
     ]);
-    self::$instance->log = $log ? $log : new NullLogger();
+    self::$instance->log = $log ?: new NullLogger();
 
     $pluginDir = dirname(__DIR__) . '/plugins';
     $pluginFiles = array();

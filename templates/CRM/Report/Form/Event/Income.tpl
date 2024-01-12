@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this div is being used to apply special css *}
-    {if !$section }
+    {if !$section}
     <div class="crm-block crm-form-block crm-report-field-form-block">
     {include file="CRM/Report/Form/Fields.tpl"}
        </div>
@@ -17,7 +17,7 @@
 <div class="crm-block crm-content-block crm-report-form-block">
 {include file="CRM/Report/Form/Actions.tpl"}
 {*Statistics at the Top of the page*}
-    {if !$section }
+    {if !$section}
         {include file="CRM/Report/Form/Statistics.tpl" top=true bottom=false}
     {/if}
 
@@ -31,7 +31,7 @@
                           {if $keys == 'Title'}
                               <tr>
                                         <th>{$keys}</th>
-                                        <th colspan="3">{$values}</th>
+                                        <th colspan="3">{$values|smarty:nodefaults|purify}</th>
                                     </tr>
                                 {else}
                                     <tr class="{cycle values="odd-row,even-row"} crm-report crm-report_event_summary" id="crm-report_{$eventID}_summary_{$keys}">
@@ -68,7 +68,7 @@
     <div class="report-pager">
             {include file="CRM/common/pager.tpl"}
         </div>
-        {if !$section }
+        {if !$section}
             {*Statistics at the bottom of the page*}
             {include file="CRM/Report/Form/Statistics.tpl" top=false bottom=true}
         {/if}

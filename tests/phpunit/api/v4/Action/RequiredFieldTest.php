@@ -28,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  */
 class RequiredFieldTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testRequired() {
+  public function testRequired(): void {
     $msg = '';
     try {
       Event::create()->execute();

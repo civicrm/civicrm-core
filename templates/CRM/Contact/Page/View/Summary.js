@@ -403,6 +403,12 @@
       }
     }
 
+    // Changing relationships may affect related members and contributions. Ensure they are refreshed.
+    $('#contact-rel').on('crmPopupFormSuccess', function() {
+      CRM.tabHeader.resetTab('#tab_contribute');
+      CRM.tabHeader.resetTab('#tab_member');
+    });
+
     onResize();
     $(window).resize(onResize);
   });

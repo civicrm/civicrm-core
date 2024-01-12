@@ -109,43 +109,49 @@ abstract class SqlFunction extends SqlExpression {
   /**
    * Set $dataType and convert value by suffix
    *
+   * @param string|null $dataType
+   * @param array $values
+   * @param string $key
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
-   * @param string $value
-   * @param string $dataType
-   * @return string
    */
-  public function formatOutputValue($value, &$dataType) {
+  public function formatOutputValue(?string &$dataType, array &$values, string $key): void {
     if (static::$dataType) {
       $dataType = static::$dataType;
     }
-    if (isset($value) && $this->suffix && $this->suffix !== 'id') {
+    elseif (static::$category === self::CATEGORY_AGGREGATE) {
+      $exprArgs = $this->getArgs();
+      // If the first expression is a SqlFunction/SqlEquation, allow it to control the aggregate dataType
+      if (method_exists($exprArgs[0]['expr'][0], 'formatOutputValue')) {
+        $exprArgs[0]['expr'][0]->formatOutputValue($dataType, $values, $key);
+      }
+    }
+    if (isset($values[$key]) && $this->suffix && $this->suffix !== 'id') {
       $dataType = 'String';
+      $value =& $values[$key];
       $option = $this->getOptions()[$value] ?? NULL;
       // Option contains an array of suffix keys
       if (is_array($option)) {
-        return $option[$this->suffix] ?? NULL;
+        $value = $option[$this->suffix] ?? NULL;
       }
       // Flat arrays are name/value pairs
       elseif ($this->suffix === 'label') {
-        return $option;
+        $value = $option;
       }
-      elseif ($this->suffix === 'name') {
-        return $value;
-      }
-      else {
-        return NULL;
+      // Name needs no transformation, and any other suffix is invalid
+      elseif ($this->suffix !== 'name') {
+        $value = NULL;
       }
     }
-    return $value;
   }
 
   /**
    * Render the expression for insertion into the sql query
    *
    * @param \Civi\Api4\Query\Api4Query $query
+   * @param bool $includeAlias
    * @return string
    */
-  public function render(Api4Query $query): string {
+  public function render(Api4Query $query, bool $includeAlias = FALSE): string {
     $output = '';
     foreach ($this->args as $arg) {
       $rendered = $this->renderArg($arg, $query);
@@ -153,7 +159,7 @@ abstract class SqlFunction extends SqlExpression {
         $output .= (strlen($output) ? ' ' : '') . $rendered;
       }
     }
-    return $this->renderExpression($output);
+    return $this->renderExpression($output) . ($includeAlias ? " AS `{$this->getAlias()}`" : '');
   }
 
   /**
@@ -162,8 +168,8 @@ abstract class SqlFunction extends SqlExpression {
    * @param string $output
    * @return string
    */
-  protected function renderExpression($output): string {
-    return $this->getName() . '(' . $output . ')';
+  protected function renderExpression(string $output): string {
+    return $this->getName() . "($output)";
   }
 
   /**

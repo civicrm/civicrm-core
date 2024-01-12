@@ -7,8 +7,8 @@
 <body>
 
   {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
-  {capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
-  {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
+  {capture assign=labelStyle}style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
+  {capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
     <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
@@ -23,7 +23,7 @@
           <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
             <tr>
               <th {$headerStyle}>
-                {ts}Activity Summary{/ts} - {$activityTypeName}
+                {ts}Activity Summary{/ts} - {activity.activity_type_id:label}
               </th>
             </tr>
             {if !empty($isCaseActivity)}

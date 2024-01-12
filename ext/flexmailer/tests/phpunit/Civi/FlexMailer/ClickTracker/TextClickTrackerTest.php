@@ -23,7 +23,7 @@ class TextClickTrackerTest extends \CiviUnitTestCase {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
-      $manager->install(array('org.civicrm.flexmailer'));
+      $manager->install(['org.civicrm.flexmailer']);
     }
 
     parent::setUp();
@@ -45,19 +45,14 @@ class TextClickTrackerTest extends \CiviUnitTestCase {
       '<p><a href=\'tracking(https://sub.example.com/foo.php?whiz=%2Fbang%2F&pie[fruit]=apple)\' rel=\'nofollow\'>Foo</a></p>',
     ];
     $exs[] = [
-      // Messy looking URL, designed to trip-up quote handling
+      // Messy looking URL, designed to trip-up quote handling, no tracking as no http
       '<p><a href="javascript:alert(\'Cheese\')">Foo</a></p>',
-      '<p><a href="tracking(javascript:alert(\'Cheese\'))" rel=\'nofollow\'>Foo</a></p>',
+      '<p><a href="javascript:alert(\'Cheese\')" rel=\'nofollow\'>Foo</a></p>',
     ];
     $exs[] = [
-      // Messy looking URL, designed to trip-up quote handling
+      // Messy looking URL, designed to trip-up quote handling, no tracking as no http
       '<p><a href=\'javascript:alert("Cheese")\'>Foo</a></p>',
-      '<p><a href=\'tracking(javascript:alert("Cheese"))\' rel=\'nofollow\'>Foo</a></p>',
-    ];
-    $exs[] = [
-      // Messy looking URL, funny whitespace
-      '<p><a href="http://example.com/' . "\n" . 'weird">Foo</a></p>',
-      '<p><a href="tracking(http://example.com/' . "\n" . 'weird)" rel=\'nofollow\'>Foo</a></p>',
+      '<p><a href=\'javascript:alert("Cheese")\' rel=\'nofollow\'>Foo</a></p>',
     ];
     $exs[] = [
       // Messy looking URL, funny whitespace

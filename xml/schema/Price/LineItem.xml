@@ -111,6 +111,7 @@
     <html>
       <type>Text</type>
     </html>
+    <crmType>CRM_Utils_Type::T_FLOAT</crmType>
   </field>
   <field>
     <name>unit_price</name>
@@ -224,6 +225,8 @@
     <headerPattern>/tax(.?am(ou)?nt)?/i</headerPattern>
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
     <comment>tax of each item</comment>
+    <default>0</default>
+    <required>true</required>
     <add>4.6</add>
     <html>
      <type>Text</type>

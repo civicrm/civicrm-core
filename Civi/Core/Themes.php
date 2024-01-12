@@ -57,7 +57,7 @@ class Themes extends \Civi\Core\Service\AutoService {
    * @param \CRM_Utils_Cache_Interface $cache
    */
   public function __construct($cache = NULL) {
-    $this->cache = $cache ? $cache : Civi::cache('long');
+    $this->cache = $cache ?: Civi::cache('long');
   }
 
   /**

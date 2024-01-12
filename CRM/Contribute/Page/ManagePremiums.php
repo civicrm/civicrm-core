@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Product;
+
 /**
  * Page for displaying list of Premiums.
  */
@@ -27,7 +29,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  public static $_links = NULL;
+  public static $_links;
 
   /**
    * Get BAO Name.
@@ -35,7 +37,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * @return string
    *   Classname of BAO.
    */
-  public function getBAOName() {
+  public function getBAOName(): string {
     return 'CRM_Contribute_BAO_Product';
   }
 
@@ -45,36 +47,41 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * @return array
    *   (reference) of action links
    */
-  public function &links() {
+  public function &links(): array {
     if (!(self::$_links)) {
       self::$_links = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
-          'url' => 'civicrm/admin/contribute/managePremiums',
+          'url' => 'civicrm/admin/contribute/managePremiums/edit',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
-          'url' => 'civicrm/admin/contribute/managePremiums',
+          'url' => 'civicrm/admin/contribute/managePremiums/edit',
           'qs' => 'action=preview&id=%%id%%',
           'title' => ts('Preview Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::PREVIEW),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/contribute/managePremiums',
+          'url' => 'civicrm/admin/contribute/managePremiums/edit',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -87,8 +94,10 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    * Finally it calls the parent's run method.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function run() {
+  public function run(): void {
     $id = $this->getIdAndAction();
 
     // what action to take ?
@@ -99,45 +108,42 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
     $this->browse();
 
     // parent run
-    return CRM_Core_Page::run();
+    CRM_Core_Page::run();
   }
 
   /**
    * Browse all custom data groups.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function browse() {
-    // get all custom groups sorted by weight
-    $premiums = [];
-    $dao = new CRM_Contribute_DAO_Product();
-    $dao->orderBy('name');
-    $dao->find();
+  public function browse(): void {
+    // We could probably use checkPermissions here but historically didn't
+    // so have set it to FALSE to be safe while converting to api use.
+    $premiums = Product::get(FALSE)->addOrderBy('name')
+      ->addSelect('*', 'financial_type_id:name')
+      ->execute();
 
-    while ($dao->fetch()) {
-      $premiums[$dao->id] = [];
-      CRM_Core_DAO::storeValues($dao, $premiums[$dao->id]);
-      // form all action links
+    foreach ($premiums as $index => $premium) {
       $action = array_sum(array_keys($this->links()));
 
-      if ($dao->is_active) {
+      if ($premium['is_active']) {
         $action -= CRM_Core_Action::ENABLE;
       }
       else {
         $action -= CRM_Core_Action::DISABLE;
       }
 
-      $premiums[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(),
+      $premiums[$index]['action'] = CRM_Core_Action::formLink($this->links(),
         $action,
-        ['id' => $dao->id],
+        ['id' => $premium['id']],
         ts('more'),
         FALSE,
         'premium.manage.row',
         'Premium',
-        $dao->id
+        $premium['id']
       );
-      // Financial Type
-      if (!empty($dao->financial_type_id)) {
-        $premiums[$dao->id]['financial_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Product', 'financial_type_id', $dao->financial_type_id);
-      }
+      $premiums[$index]['financial_type'] = $premium['financial_type_id:name'];
+      $premiums[$index]['class'] = '';
     }
     $this->assign('rows', $premiums);
   }
@@ -148,7 +154,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * @return string
    *   Classname of edit form.
    */
-  public function editForm() {
+  public function editForm(): string {
     return 'CRM_Contribute_Form_ManagePremiums';
   }
 
@@ -158,7 +164,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * @return string
    *   name of this page.
    */
-  public function editName() {
+  public function editName(): string {
     return 'Manage Premiums';
   }
 
@@ -170,7 +176,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * @return string
    *   user context.
    */
-  public function userContext($mode = NULL) {
+  public function userContext($mode = NULL): string {
     return 'civicrm/admin/contribute/managePremiums';
   }
 

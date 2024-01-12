@@ -14,8 +14,8 @@
     <url desc="Support">http://civicrm.stackexchange.com/</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2020-08-05</releaseDate>
-  <version>5.66.alpha1</version>
+  <releaseDate>2024-01-05</releaseDate>
+  <version>5.71.alpha1</version>
   <develStage>stable</develStage>
   <comments>
     FlexMailer is an email delivery engine which replaces the internal guts
@@ -23,13 +23,14 @@
     to provide richer email features.
   </comments>
   <compatibility>
-    <ver>5.66</ver>
+    <ver>5.71</ver>
   </compatibility>
   <tags>
     <tag>mgmt:required</tag>
   </tags>
   <classloader>
     <psr4 prefix="Civi\FlexMailer\" path="src"/>
+    <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
@@ -37,6 +38,6 @@
   </mixins>
   <civix>
     <namespace>CRM/Flexmailer</namespace>
-    <format>23.02.0</format>
+    <format>23.02.1</format>
   </civix>
 </extension>

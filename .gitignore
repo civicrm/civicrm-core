@@ -34,6 +34,8 @@
 !/ext/civi_member
 !/ext/civi_pledge
 !/ext/civi_report
+!/ext/scheduled_communications
+!/ext/user_dashboard
 backdrop/
 bower_components
 CRM/Case/xml/configuration
@@ -70,6 +72,7 @@ tools/tests/reports/logfile.tap
 tools/tests/reports/testdox.html
 tools/tests/reports/testdox.txt
 tools/extensions/org.civicrm.contactlayout
+tools/extensions/phpstorm/.phpstorm.meta.php
 l10n
 vendor
 civicrm.settings.php

@@ -848,7 +848,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   protected function checkContactDuplicate(&$formatValues) {
     //retrieve contact id using contact dedupe rule
-    $formatValues['contact_type'] = $formatValues['contact_type'] ?? $this->getContactType();
+    $formatValues['contact_type'] ??= $this->getContactType();
     $formatValues['version'] = 3;
     $params = $formatValues;
     static $cIndieFields = NULL;
@@ -1128,11 +1128,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
     // get the formatted location blocks into params - w/ 3.0 format, CRM-4605
     if (!empty($values['location_type_id'])) {
-      static $fields = NULL;
-      if ($fields == NULL) {
-        $fields = [];
-      }
-
       foreach (['Phone', 'Email', 'IM', 'OpenID', 'Phone_Ext'] as $block) {
         $name = strtolower($block);
         if (!array_key_exists($name, $values)) {

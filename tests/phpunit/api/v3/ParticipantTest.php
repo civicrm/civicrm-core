@@ -139,7 +139,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = 'custom string';
 
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
     $this->assertEquals($result['id'], $result['values'][$result['id']]['id']);
 
@@ -166,7 +166,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('participant', 'get', $params);
     $this->assertEquals($result['values'][$this->ids['Participant']['primary']]['event_id'], $this->getEventID());
     $this->assertEquals('2007-02-19 00:00:00', $result['values'][$this->ids['Participant']['primary']]['participant_register_date']);
-    $this->assertEquals('Wimbeldon', $result['values'][$this->ids['Participant']['primary']]['participant_source']);
+    $this->assertEquals('Wimbledon', $result['values'][$this->ids['Participant']['primary']]['participant_source']);
     $params = [
       'id' => $this->ids['Participant']['primary'],
       'return' => 'id,participant_register_date,event_id',
@@ -207,10 +207,10 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $params = [
       'id' => $this->ids['Participant']['primary'],
     ];
-    $result = $this->callAPIAndDocument('participant', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('participant', 'get', $params);
     $this->assertEquals($result['values'][$this->ids['Participant']['primary']]['event_id'], $this->getEventID());
     $this->assertEquals('2007-02-19 00:00:00', $result['values'][$this->ids['Participant']['primary']]['participant_register_date']);
-    $this->assertEquals('Wimbeldon', $result['values'][$this->ids['Participant']['primary']]['participant_source']);
+    $this->assertEquals('Wimbledon', $result['values'][$this->ids['Participant']['primary']]['participant_source']);
     $this->assertEquals($result['id'], $result['values'][$this->ids['Participant']['primary']]['id']);
   }
 
@@ -232,7 +232,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Participant', 'get', $params)['values'];
     $this->assertEquals($this->getEventID(), $result[$this->ids['Participant']['primary']]['event_id']);
     $this->assertEquals('2007-02-19 00:00:00', $result[$this->ids['Participant']['primary']]['participant_register_date']);
-    $this->assertEquals('Wimbeldon', $result[$this->ids['Participant']['primary']]['participant_source']);
+    $this->assertEquals('Wimbledon', $result[$this->ids['Participant']['primary']]['participant_source']);
     $this->assertEquals($this->getEventID(), $result[$this->ids['Participant']['primary']]['api.event.get']['id']);
   }
 
@@ -262,7 +262,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals($this->ids['Participant']['primary'], $participant['id']);
     $this->assertEquals($this->getEventID(), $participant['values'][$participant['id']]['event_id']);
     $this->assertEquals('2007-02-19 00:00:00', $participant['values'][$participant['id']]['participant_register_date']);
-    $this->assertEquals('Wimbeldon', $participant['values'][$participant['id']]['participant_source']);
+    $this->assertEquals('Wimbledon', $participant['values'][$participant['id']]['participant_source']);
     $this->assertEquals($participant['id'], $participant['values'][$participant['id']]['id']);
   }
 
@@ -312,7 +312,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $participant = $this->callAPISuccess('Participant', 'get', $params);
     $this->assertEquals($participant['values'][$this->ids['Participant']['primary']]['event_id'], $this->getEventID());
     $this->assertEquals('2007-02-19 00:00:00', $participant['values'][$this->ids['Participant']['primary']]['participant_register_date']);
-    $this->assertEquals('Wimbeldon', $participant['values'][$this->ids['Participant']['primary']]['participant_source']);
+    $this->assertEquals('Wimbledon', $participant['values'][$this->ids['Participant']['primary']]['participant_source']);
   }
 
   /**
@@ -643,11 +643,10 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    * Delete with a get - a 'criteria delete'
    */
   public function testNestedDelete(): void {
-    $description = 'Criteria delete by nesting a GET & a DELETE.';
     $participants = $this->callAPISuccess('Participant', 'Get', []);
     $this->assertEquals(3, $participants['count']);
     $params = ['contact_id' => $this->_contactID2, 'api.participant.delete' => 1];
-    $this->callAPIAndDocument('Participant', 'Get', $params, __FUNCTION__, __FILE__, $description, 'NestedDelete');
+    $this->callAPISuccess('Participant', 'Get', $params);
     $check = $this->callAPISuccess('participant', 'getcount', []);
     $this->assertEquals(1, $check, 'only one participant should be left');
   }
@@ -656,8 +655,6 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    * Test creation of a participant with an associated contribution.
    */
   public function testCreateParticipantWithPayment(): void {
-    $description = "Single function to create contact with participation & contribution.
-      Note that in the case of 'contribution' the 'create' is implied (api.contribution.create)";
     $params = [
       'contact_type' => 'Individual',
       'display_name' => 'Guru',
@@ -678,7 +675,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       ],
     ];
 
-    $result = $this->callAPIAndDocument('contact', 'create', $params, __FUNCTION__, __FILE__, $description, 'CreateParticipantPayment');
+    $result = $this->callAPISuccess('contact', 'create', $params);
     $this->assertEquals(1, $result['values'][$result['id']]['api.participant_payment.create']['count']);
     $this->callAPISuccess('contact', 'delete', ['id' => $result['id']]);
   }

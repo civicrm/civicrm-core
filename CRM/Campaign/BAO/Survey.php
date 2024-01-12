@@ -64,141 +64,6 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Co
   }
 
   /**
-   * Retrieve surveys for dashboard.
-   *
-   * @param array $params
-   * @param bool $onlyCount
-   *
-   * @return array|int
-   */
-  public static function getSurveySummary($params = [], $onlyCount = FALSE) {
-    //build the limit and order clause.
-    $limitClause = $orderByClause = $lookupTableJoins = NULL;
-    if (!$onlyCount) {
-      $sortParams = [
-        'sort' => 'created_date',
-        'offset' => 0,
-        'rowCount' => 10,
-        'sortOrder' => 'desc',
-      ];
-      foreach ($sortParams as $name => $default) {
-        if (!empty($params[$name])) {
-          $sortParams[$name] = $params[$name];
-        }
-      }
-
-      //need to lookup tables.
-      $orderOnSurveyTable = TRUE;
-      if ($sortParams['sort'] == 'campaign') {
-        $orderOnSurveyTable = FALSE;
-        $lookupTableJoins = '
- LEFT JOIN civicrm_campaign campaign ON ( campaign.id = survey.campaign_id )';
-        $orderByClause = "ORDER BY campaign.title {$sortParams['sortOrder']}";
-      }
-      elseif ($sortParams['sort'] == 'activity_type') {
-        $orderOnSurveyTable = FALSE;
-        $lookupTableJoins = "
- LEFT JOIN civicrm_option_value activity_type ON ( activity_type.value = survey.activity_type_id
-                                                   OR survey.activity_type_id IS NULL )
-INNER JOIN civicrm_option_group grp ON ( activity_type.option_group_id = grp.id AND grp.name = 'activity_type' )";
-        $orderByClause = "ORDER BY activity_type.label {$sortParams['sortOrder']}";
-      }
-      elseif ($sortParams['sort'] == 'isActive') {
-        $sortParams['sort'] = 'is_active';
-      }
-      if ($orderOnSurveyTable) {
-        $orderByClause = "ORDER BY survey.{$sortParams['sort']} {$sortParams['sortOrder']}";
-      }
-      $limitClause = "LIMIT {$sortParams['offset']}, {$sortParams['rowCount']}";
-    }
-
-    //build the where clause.
-    $queryParams = $where = [];
-
-    //we only have activity type as a
-    //difference between survey and petition.
-    $petitionTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Petition');
-    if ($petitionTypeID) {
-      $where[] = "( survey.activity_type_id != %1 )";
-      $queryParams[1] = [$petitionTypeID, 'Positive'];
-    }
-
-    if (!empty($params['title'])) {
-      $where[] = "( survey.title LIKE %2 )";
-      $queryParams[2] = ['%' . trim($params['title']) . '%', 'String'];
-    }
-    if (!empty($params['campaign_id'])) {
-      $where[] = '( survey.campaign_id = %3 )';
-      $queryParams[3] = [$params['campaign_id'], 'Positive'];
-    }
-    if (!empty($params['activity_type_id'])) {
-      $typeId = $params['activity_type_id'];
-      if (is_array($params['activity_type_id'])) {
-        $typeId = implode(' , ', $params['activity_type_id']);
-      }
-      $where[] = "( survey.activity_type_id IN ( {$typeId} ) )";
-    }
-    $whereClause = NULL;
-    if (!empty($where)) {
-      $whereClause = ' WHERE ' . implode(" \nAND ", $where);
-    }
-
-    $selectClause = '
-SELECT  survey.id                         as id,
-        survey.title                      as title,
-        survey.is_active                  as is_active,
-        survey.result_id                  as result_id,
-        survey.is_default                 as is_default,
-        survey.campaign_id                as campaign_id,
-        survey.activity_type_id           as activity_type_id,
-        survey.release_frequency          as release_frequency,
-        survey.max_number_of_contacts     as max_number_of_contacts,
-        survey.default_number_of_contacts as default_number_of_contacts';
-    if ($onlyCount) {
-      $selectClause = 'SELECT COUNT(*)';
-    }
-    $fromClause = 'FROM  civicrm_survey survey';
-
-    $query = "{$selectClause} {$fromClause} {$lookupTableJoins} {$whereClause} {$orderByClause} {$limitClause}";
-
-    //return only count.
-    if ($onlyCount) {
-      return (int) CRM_Core_DAO::singleValueQuery($query, $queryParams);
-    }
-
-    $surveys = [];
-    $properties = [
-      'id',
-      'title',
-      'campaign_id',
-      'is_active',
-      'is_default',
-      'result_id',
-      'activity_type_id',
-      'release_frequency',
-      'max_number_of_contacts',
-      'default_number_of_contacts',
-    ];
-
-    $survey = CRM_Core_DAO::executeQuery($query, $queryParams);
-    while ($survey->fetch()) {
-      foreach ($properties as $property) {
-        $surveys[$survey->id][$property] = $survey->$property;
-      }
-    }
-
-    return $surveys;
-  }
-
-  /**
-   * Get the survey count.
-   *
-   */
-  public static function getSurveyCount() {
-    return (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_survey');
-  }
-
-  /**
    * Get Surveys.
    *
    * @param bool $onlyActive
@@ -401,10 +266,7 @@ SELECT  survey.id    as id,
 
     $select = $from = [];
     foreach ($returnProperties as $property => $ignore) {
-      $value = (in_array($property, [
-        'city',
-        'street_address',
-      ])) ? 'address' : $property;
+      $value = (in_array($property, ['city', 'street_address'])) ? 'address' : $property;
       switch ($property) {
         case 'sort_name':
         case 'contact_type':
@@ -809,7 +671,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
         );
         $menuLinks[] = sprintf('<a href="%s" class="action-item crm-hover-button" title="%s">%s</a>',
           $urlPath,
-          CRM_Utils_Array::value('title', $link),
+          $link['title'] ?? NULL,
           $link['title']
         );
       }

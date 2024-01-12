@@ -14,6 +14,7 @@
  * @group headless
  */
 class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
+  use CRM_Core_Payment_AuthorizeNetTrait;
 
   protected $_financialTypeId;
   protected $_contributionParams;
@@ -122,11 +123,10 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpMembershipObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $values = [];
-    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
+    $msg = $contribution->composeMessageArray($this->input, $this->ids);
     $this->assertIsArray($msg, 'Message returned as an array in line');
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertStringContainsString('Membership Type: General', $msg['body']);
+    $this->assertStringContainsString('General', $msg['html']);
   }
 
   /**
@@ -139,11 +139,10 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   public function testSendMailMembershipObjectsNoLeakage(): void {
     $this->_setUpMembershipObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
-    $values = [];
     $contribution->id = $this->_contributionId;
-    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
+    $msg = $contribution->composeMessageArray($this->input, $this->ids);
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertStringContainsString('Membership Type: General', $msg['body']);
+    $this->assertStringContainsString('General', $msg['html']);
 
     $this->ids['contact'] = $this->_contactId = $this->individualCreate(['prefix_id' => 'Dr.', 'first_name' => 'Donald', 'last_name' => 'Duck', 'email' => 'the-don@duckville.com']);
     $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_contributionParams, ['invoice_id' => 'abc']));
@@ -154,9 +153,9 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->input['invoiceID'] = 'abc';
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
+    $msg = $contribution->composeMessageArray($this->input, $this->ids);
     $this->assertEquals('Dr. Donald Duck II', $msg['to']);
-    $this->assertStringContainsString('Membership Type: Fowl', $msg['body']);
+    $this->assertStringContainsString('Fowl', $msg['html']);
   }
 
   /**
@@ -168,10 +167,10 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpMembershipObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
+    $msg = $contribution->composeMessageArray($this->input, $this->ids);
     $this->assertIsArray($msg, 'Message not returned as an array');
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertStringContainsString('Membership Type: General', $msg['body']);
+    $this->assertStringContainsString('General', $msg['html']);
   }
 
   /**
@@ -185,8 +184,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $contribution->loadRelatedObjects($this->_processorId, $this->ids);
-    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
-    $this->assertStringContainsString('registration has been received and your status has been updated to Attended.', $msg['body']);
+    $msg = $contribution->composeMessageArray($this->input, $this->ids);
+    $this->assertStringContainsString('registration has been received and your status has been updated to<strong> Attended</strong>.', $msg['html']);
     $this->assertStringContainsString('Annual CiviCRM meet', $msg['html']);
   }
 
@@ -197,9 +196,9 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpParticipantObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
+    $msg = $contribution->composeMessageArray($this->input, $this->ids);
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertStringContainsString('Thank you for your registration', $msg['body']);
+    $this->assertStringContainsString('Thank you for your registration', $msg['html']);
   }
 
   /**
@@ -230,7 +229,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $event->id = $this->_eventId;
     $event->is_email_confirm = FALSE;
     $event->save();
-    $values = [];
     $tablesToTruncate = [
       'civicrm_mailing_spool',
     ];
@@ -238,7 +236,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $contribution->composeMessageArray($this->input, $this->ids, $values);
+    $contribution->composeMessageArray($this->input, $this->ids);
     $mut->assertMailLogEmpty('no mail should have been send as event set to no confirm');
     $mut->stop();
   }
@@ -252,7 +250,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpPledgeObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
+    $msg = $contribution->composeMessageArray($this->input, $this->ids);
     $this->assertStringContainsString('Contribution Information', $msg['html']);
   }
 

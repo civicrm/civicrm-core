@@ -48,10 +48,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
    * @param array $params
    */
   public static function setDefaults(&$params) {
-    $params['label'] = $params['label'] ?? $params['name'];
-    $params['name'] = $params['name'] ?? CRM_Utils_String::titleToVar($params['label']);
-    $params['weight'] = $params['weight'] ?? self::getDefaultWeight($params);
-    $params['value'] = $params['value'] ?? self::getDefaultValue($params);
+    $params['label'] ??= $params['name'];
+    $params['name'] ??= CRM_Utils_String::titleToVar($params['label']);
+    $params['weight'] ??= self::getDefaultWeight($params);
+    $params['value'] ??= self::getDefaultValue($params);
   }
 
   /**

@@ -8,13 +8,13 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting pledge *}
-{if $showAdditionalInfo and $formType }
+{if $showAdditionalInfo and $formType}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 {if !$email and $action neq 8 and $context neq 'standalone'}
 <div class="messages status no-popup">
   {icon icon="fa-info-circle"}{/icon}
-  <p>{ts}You will not be able to send an acknowledgment for this pledge because there is no email address recorded for this contact. If you want a acknowledgment to be sent when this pledge is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the pledge.{/ts}</p>
+  {ts}You will not be able to send an acknowledgment for this pledge because there is no email address recorded for this contact. If you want a acknowledgment to be sent when this pledge is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the pledge.{/ts}
 </div>
 {/if}
 {if $action EQ 2}
@@ -22,7 +22,7 @@
     {math equation="x / y" x=$amount y=$installments format="%.2f" assign="currentInstallment"}
     {* Check if current Total Pledge Amount is different from original pledge amount. *}
     {if $currentInstallment NEQ $eachPaymentAmount}
-      {assign var=originalPledgeAmount value=`$installments*$eachPaymentAmount`}
+      {assign var=originalPledgeAmount value=$installments*$eachPaymentAmount}
     {/if}
 {/if}
 <div class="crm-block crm-form-block crm-pledge-form-block">
@@ -42,7 +42,7 @@
             <td class="label">{$form.amount.label}</td>
             <td>
               <span>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.amount.html|crmAddClass:eight}</span>
-              {if $originalPledgeAmount}<div class="messages status no-popup">{icon icon="fa-info-circle"}{/icon}{ts 1=$originalPledgeAmount|crmMoney:$currency} Pledge total has changed due to payment adjustments. Original pledge amount was %1.{/ts}</div>{/if}
+              {if $action EQ 2 && $originalPledgeAmount}<div class="messages status no-popup">{icon icon="fa-info-circle"}{/icon}{ts 1=$originalPledgeAmount|crmMoney:$currency} Pledge total has changed due to payment adjustments. Original pledge amount was %1.{/ts}</div>{/if}
             </td>
           </tr>
           <tr class="crm-pledge-form-block-installments">
@@ -85,7 +85,7 @@
             </td>
           </tr>
             {/if}
-        {elseif $context eq 'standalone' and $outBound_option != 2 }
+        {elseif $context eq 'standalone' and $outBound_option != 2}
           <tr id="acknowledgment-receipt" style="display:none;">
             <td class="label">{$form.is_acknowledge.label}</td>
             <td>
@@ -105,7 +105,7 @@
             </td>
           </tr>
           <tr class="crm-pledge-form-block-financial_type_id">
-            <td class="label">{$form.financial_type_id.label} {help id='id-financial_type_id'}
+            <td class="label">{$form.financial_type_id.label} {help id='id-financial_type_id' file="CRM/Pledge/Form/Pledge.hlp"}
 </td>
             <td>{$form.financial_type_id.html}</td>
           </tr>
@@ -115,7 +115,7 @@
       campaignTrClass="crm-pledge-form-block-campaign_id"}
 
           <tr class="crm-pledge-form-block-contribution_page_id">
-            <td class="label">{$form.contribution_page_id.label} {help id='id-contribution_page_id'}</td>
+            <td class="label">{$form.contribution_page_id.label} {help id='id-contribution_page_id' file="CRM/Pledge/Form/Pledge.hlp"}</td>
             <td>{$form.contribution_page_id.html}</td>
           </tr>
 
@@ -157,11 +157,6 @@
     // load panes function calls for snippet based on id of crm-accordion-header
     function loadPanes( id ) {
       var url = "{/literal}{crmURL p='civicrm/contact/view/pledge' q='snippet=4&formType=' h=0}{literal}" + id;
-      {/literal}
-        {if $contributionMode}
-          url = url + "&mode={$contributionMode}";
-        {/if}
-      {literal}
       if ( ! $('div.'+id).html() ) {
         var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
         $('div.'+id).html(loading);
@@ -233,7 +228,7 @@
      };
 
     {/literal}
-    {if $context eq 'standalone' and $outBound_option != 2 }
+    {if $context eq 'standalone' and $outBound_option != 2}
     {literal}
     CRM.$(function($) {
       var $form = $("form.{/literal}{$form.formClass}{literal}");

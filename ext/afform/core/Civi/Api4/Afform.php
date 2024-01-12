@@ -4,6 +4,7 @@ namespace Civi\Api4;
 
 use Civi\Api4\Generic\AutocompleteAction;
 use Civi\Api4\Generic\BasicGetFieldsAction;
+use CRM_Afform_ExtensionUtil as E;
 
 /**
  * User-configurable forms.
@@ -20,6 +21,7 @@ use Civi\Api4\Generic\BasicGetFieldsAction;
  * @labelField title
  * @iconField type:icon
  * @searchable none
+ * @since 5.31
  * @package Civi\Api4
  */
 class Afform extends Generic\AbstractEntity {
@@ -98,6 +100,15 @@ class Afform extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Afform\Process
+   */
+  public static function process($checkPermissions = TRUE) {
+    return (new Action\Afform\Process('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\Afform\SubmitFile
    */
   public static function submitFile($checkPermissions = TRUE) {
@@ -132,81 +143,132 @@ class Afform extends Generic\AbstractEntity {
       $fields = [
         [
           'name' => 'name',
+          'title' => E::ts('Name'),
         ],
         [
           'name' => 'type',
+          'title' => E::ts('Type'),
           'pseudoconstant' => ['optionGroupName' => 'afform_type'],
+          'default_value' => 'form',
         ],
         [
           'name' => 'requires',
+          'title' => E::ts('Requires'),
           'data_type' => 'Array',
         ],
         [
           'name' => 'entity_type',
+          'title' => E::ts('Block Entity'),
           'description' => 'Block used for this entity type',
         ],
         [
           'name' => 'join_entity',
+          'title' => E::ts('Join Entity'),
           'description' => 'Used for blocks that join a sub-entity (e.g. Emails for a Contact)',
         ],
         [
           'name' => 'title',
+          'title' => E::ts('Title'),
           'required' => $self->getAction() === 'create',
         ],
         [
           'name' => 'description',
+          'title' => E::ts('Description'),
         ],
         [
-          'name' => 'is_dashlet',
-          'data_type' => 'Boolean',
-        ],
-        [
-          'name' => 'is_public',
-          'data_type' => 'Boolean',
-        ],
-        [
-          'name' => 'is_token',
-          'data_type' => 'Boolean',
-        ],
-        [
-          'name' => 'contact_summary',
-          'data_type' => 'String',
-          'options' => [
-            'block' => ts('Contact Summary Block'),
-            'tab' => ts('Contact Summary Tab'),
-          ],
+          'name' => 'placement',
+          'title' => E::ts('Placement'),
+          'pseudoconstant' => ['optionGroupName' => 'afform_placement'],
+          'data_type' => 'Array',
         ],
         [
           'name' => 'summary_contact_type',
+          'title' => E::ts('Summary Contact Type'),
           'data_type' => 'Array',
           'options' => \CRM_Contact_BAO_ContactType::contactTypePairs(),
         ],
         [
+          'name' => 'summary_weight',
+          'title' => E::ts('Order'),
+          'data_type' => 'Integer',
+        ],
+        [
           'name' => 'icon',
+          'title' => E::ts('Icon'),
           'description' => 'Icon shown in the contact summary tab',
         ],
         [
           'name' => 'server_route',
+          'title' => E::ts('Page Route'),
+        ],
+        [
+          'name' => 'is_public',
+          'title' => E::ts('Is Public'),
+          'data_type' => 'Boolean',
+          'default_value' => FALSE,
         ],
         [
           'name' => 'permission',
+          'title' => E::ts('Permission'),
+          'data_type' => 'Array',
+          'default_value' => ['access CiviCRM'],
+        ],
+        [
+          'name' => 'permission_operator',
+          'title' => E::ts('Permission Operator'),
+          'data_type' => 'String',
+          'default_value' => 'AND',
+          'options' => \CRM_Core_SelectValues::andOr(),
         ],
         [
           'name' => 'redirect',
+          'title' => E::ts('Post-Submit Page'),
+        ],
+        [
+          'name' => 'submit_enabled',
+          'title' => E::ts('Allow Submissions'),
+          'data_type' => 'Boolean',
+          'default_value' => TRUE,
+        ],
+        [
+          'name' => 'submit_limit',
+          'title' => E::ts('Maximum Submissions'),
+          'data_type' => 'Integer',
         ],
         [
           'name' => 'create_submission',
+          'title' => E::ts('Log Submissions'),
           'data_type' => 'Boolean',
         ],
         [
+          'name' => 'manual_processing',
+          'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'allow_verification_by_email',
+          'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'email_confirmation_template_id',
+          'data_type' => 'Integer',
+        ],
+        [
           'name' => 'navigation',
+          'title' => E::ts('Navigation Menu'),
           'data_type' => 'Array',
           'description' => 'Insert into navigation menu {parent: string, label: string, weight: int}',
         ],
         [
           'name' => 'layout',
+          'title' => E::ts('Layout'),
           'data_type' => 'Array',
           'description' => 'HTML form layout; format is controlled by layoutFormat param',
+        ],
+        [
+          'name' => 'modified_date',
+          'title' => E::ts('Date Modified'),
+          'data_type' => 'Timestamp',
+          'readonly' => TRUE,
         ],
       ];
       // Calculated fields returned by get action
@@ -214,11 +276,37 @@ class Afform extends Generic\AbstractEntity {
         $fields[] = [
           'name' => 'module_name',
           'type' => 'Extra',
+          'description' => 'Name of generated Angular module (CamelCase)',
           'readonly' => TRUE,
         ];
         $fields[] = [
           'name' => 'directive_name',
           'type' => 'Extra',
+          'description' => 'Html tag name to invoke this form (dash-case)',
+          'readonly' => TRUE,
+        ];
+        $fields[] = [
+          'name' => 'submission_count',
+          'type' => 'Extra',
+          'data_type' => 'Integer',
+          'input_type' => 'Number',
+          'description' => 'Number of submission records for this form',
+          'readonly' => TRUE,
+        ];
+        $fields[] = [
+          'name' => 'submission_date',
+          'type' => 'Extra',
+          'data_type' => 'Timestamp',
+          'input_type' => 'Date',
+          'description' => 'Date & time of last form submission',
+          'readonly' => TRUE,
+        ];
+        $fields[] = [
+          'name' => 'submit_currently_open',
+          'type' => 'Extra',
+          'data_type' => 'Boolean',
+          'input_type' => 'Select',
+          'description' => 'Based on settings and current submission count, is the form open for submissions',
           'readonly' => TRUE,
         ];
         $fields[] = [
@@ -241,7 +329,7 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'String',
           'description' => 'Name of extension which provides this form',
           'readonly' => TRUE,
-          'pseudoconstant' => ['callback' => ['CRM_Core_PseudoConstant', 'getExtensions']],
+          'pseudoconstant' => ['callback' => ['CRM_Core_BAO_Managed', 'getBaseModules']],
         ];
         $fields[] = [
           'name' => 'search_displays',

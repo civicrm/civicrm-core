@@ -27,7 +27,7 @@ use api\v4\Api4TestBase;
  */
 class ArrayInsertionServiceTest extends Api4TestBase {
 
-  public function testInsertWillWork() {
+  public function testInsertWillWork(): void {
     $arr = [];
     $path = ['foo' => FALSE, 'bar' => FALSE];
     $inserter = new ArrayInsertionUtil();
@@ -42,7 +42,7 @@ class ArrayInsertionServiceTest extends Api4TestBase {
     $this->assertEquals($expected, $arr);
   }
 
-  public function testInsertionOfContactEmailLocation() {
+  public function testInsertionOfContactEmailLocation(): void {
     $contacts = [
       [
         'id' => 1,

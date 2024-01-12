@@ -41,7 +41,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
     $params = [
       'id' => $this->batchCreate(),
     ];
-    $result = $this->callAPIAndDocument('Batch', 'get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Batch', 'get', $params);
     $this->assertEquals($params['id'], $result['id']);
   }
 
@@ -65,7 +65,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
       'status_id' => 1,
     ];
 
-    $result = $this->callAPIAndDocument('batch', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('batch', 'create', $params);
     $this->assertNotNull($result['id']);
     $this->getAndCheck($params, $result['id'], 'Batch');
   }
@@ -90,7 +90,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
       'id' => $this->batchCreate(),
     ];
 
-    $result = $this->callAPIAndDocument('batch', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('batch', 'create', $params);
     $this->assertNotNull($result['id']);
     $this->getAndCheck($params, $result['id'], $this->_entity);
   }
@@ -121,7 +121,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
     $params = [
       'id' => $batchID,
     ];
-    $this->callAPIAndDocument('Batch', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('Batch', 'delete', $params);
   }
 
 }

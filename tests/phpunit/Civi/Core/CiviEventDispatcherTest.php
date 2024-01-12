@@ -11,7 +11,7 @@ use Civi\Core\Event\GenericHookEvent;
  */
 class CiviEventDispatcherTest extends \CiviUnitTestCase {
 
-  public function testDispatchPolicy_run() {
+  public function testDispatchPolicy_run(): void {
     $d = new CiviEventDispatcher(\Civi::container());
     $d->setDispatchPolicy([
       'hook_civicrm_fakeRunnable' => 'run',
@@ -24,7 +24,7 @@ class CiviEventDispatcherTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $calls['hook_civicrm_fakeRunnable']);
   }
 
-  public function testDispatchPolicy_drop() {
+  public function testDispatchPolicy_drop(): void {
     $d = new CiviEventDispatcher(\Civi::container());
     $d->setDispatchPolicy([
       '/^hook_civicrm_fakeDr/' => 'drop',
@@ -37,7 +37,7 @@ class CiviEventDispatcherTest extends \CiviUnitTestCase {
     $this->assertTrue(!isset($calls['hook_civicrm_fakeDroppable']));
   }
 
-  public function testDispatchPolicy_fail() {
+  public function testDispatchPolicy_fail(): void {
     $d = new CiviEventDispatcher(\Civi::container());
     $d->setDispatchPolicy([
       '/^hook_civicrm_fakeFa/' => 'fail',
@@ -47,7 +47,7 @@ class CiviEventDispatcherTest extends \CiviUnitTestCase {
       $this->fail('Expected exception');
     }
     catch (\Exception $e) {
-      $this->assertRegExp(';The dispatch policy prohibits event;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';The dispatch policy prohibits event;', $e->getMessage());
     }
   }
 

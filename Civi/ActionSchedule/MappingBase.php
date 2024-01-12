@@ -41,7 +41,7 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
     $registrations->register(new static());
   }
 
-  public function getEntityTable(): string {
+  public function getEntityTable(\CRM_Core_DAO_ActionSchedule $actionSchedule): string {
     return \CRM_Core_DAO_AllCoreTables::getTableForEntityName($this->getEntityName());
   }
 
@@ -52,7 +52,7 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
    */
   public function getEntity(): string {
     \CRM_Core_Error::deprecatedFunctionWarning('getEntityTable');
-    return $this->getEntityTable();
+    return \CRM_Core_DAO_AllCoreTables::getTableForEntityName($this->getEntityName());
   }
 
   public function getLabel(): string {

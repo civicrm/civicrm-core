@@ -34,7 +34,7 @@ class PledgeAutocompleteProvider extends \Civi\Core\Service\AutoService implemen
       'version' => 4,
       'select' => [
         'id',
-        'contact_id.display_name',
+        'contact_id.sort_name',
         'amount',
         'start_date',
         'end_date',
@@ -66,8 +66,8 @@ class PledgeAutocompleteProvider extends \Civi\Core\Service\AutoService implemen
       'columns' => [
         [
           'type' => 'field',
-          'key' => 'contact_id.display_name',
-          'rewrite' => '[contact_id.display_name] - [amount]',
+          'key' => 'contact_id.sort_name',
+          'rewrite' => '[contact_id.sort_name] - [amount]',
         ],
         [
           'type' => 'field',

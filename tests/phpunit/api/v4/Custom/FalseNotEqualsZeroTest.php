@@ -28,7 +28,7 @@ use Civi\Api4\CustomGroup;
  */
 class FalseNotEqualsZeroTest extends CustomTestBase {
 
-  public function testFalseNotEqualsZero() {
+  public function testFalseNotEqualsZero(): void {
 
     $customGroup = CustomGroup::create(FALSE)
       ->addValue('title', 'MyContactFields')

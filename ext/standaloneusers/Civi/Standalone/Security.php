@@ -2,6 +2,10 @@
 namespace Civi\Standalone;
 
 use CRM_Core_Session;
+use Civi;
+use Civi\Api4\User;
+use Civi\Api4\MessageTemplate;
+use CRM_Standaloneusers_WorkflowMessage_PasswordReset;
 
 /**
  * This is a single home for security related functions for Civi Standalone.
@@ -11,13 +15,6 @@ use CRM_Core_Session;
  *
  */
 class Security {
-
-  public const ITOA64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-
-  public static $minHashCount = 7;
-  public static $maxHashCount = 30;
-  public static $hashLength = 55;
-  public static $hashMethod = 'sha512';
 
   /**
    * @return static
@@ -30,41 +27,27 @@ class Security {
   }
 
   /**
-   * Check whether a password matches a hashed version.
-   */
-  public function checkPassword(string $plaintextPassword, string $storedHashedPassword): bool {
-    $type = substr($storedHashedPassword, 0, 3);
-    switch ($type) {
-      case '$S$':
-        // A normal Drupal 7 password.
-        $hash = $this->_password_crypt(static::$hashMethod, $plaintextPassword, $storedHashedPassword);
-        break;
-
-      default:
-        // Invalid password
-        return FALSE;
-    }
-    return hash_equals($storedHashedPassword, $hash);
-  }
-
-  /**
    * CRM_Core_Permission_Standalone::check() delegates here.
-   *
-   * @param \CRM_Core_Permission_Standalone $permissionObject
    *
    * @param string $permissionName
    *   The permission to check.
    *
-   * @param int $userID
-   *   It is unclear if this typehint is true: The Drupal version has a default NULL!
+   * @param ?int $userID
+   *   The User ID (not ContactID) to check. If NULL, current logged in user.
    *
    * @return bool
    *   true if yes, else false
    */
-  public function checkPermission(\CRM_Core_Permission_Standalone $permissionObject, string $permissionName, $userID) {
+  public function checkPermission(string $permissionName, ?int $userID = NULL) {
+    if ($permissionName == \CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
+      return FALSE;
+    }
+    if ($permissionName == \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
+      return TRUE;
+    }
 
-    // I think null means the current logged-in user
-    $userID = $userID ?? $this->getLoggedInUfID() ?? 0;
+    // NULL means the current logged-in user
+    $userID ??= $this->getLoggedInUfID() ?? 0;
 
     if (!isset(\Civi::$statics[__METHOD__][$userID])) {
 
@@ -88,6 +71,8 @@ class Security {
       else {
         $permissionsPerRoleApiCall->addWhere('name', '=', 'everyone');
       }
+
+      // Get and cache an array of permission names for this user.
       $permissions = array_unique(array_merge(...$permissionsPerRoleApiCall->execute()->column('permissions')));
       \Civi::$statics[__METHOD__][$userID] = $permissions;
     }
@@ -102,7 +87,7 @@ class Security {
     return \Civi\Api4\User::get(FALSE)
       ->addWhere('username', '=', $username)
       ->execute()
-      ->single()['id'] ?? NULL;
+      ->first()['id'] ?? NULL;
   }
 
   /**
@@ -154,30 +139,29 @@ class Security {
    *    - 'cms_name'
    *    - 'cms_pass' plaintext password
    *    - 'notify' boolean
-   * @param string $mailParam
+   * @param string $emailParam
    *   Name of the $param which contains the email address.
    *
    * @return int|bool
    *   uid if user was created, false otherwise
    */
-  public function createUser(&$params, $mailParam) {
+  public function createUser(&$params, $emailParam) {
     try {
-      // Q. should this be in the api for User.create?
-      $hashedPassword = $this->_password_crypt(static::$hashMethod, $params['cms_pass'], $this->_password_generate_salt());
-      $mail = $params[$mailParam];
-
-      $userID = \Civi\Api4\User::create(FALSE)
+      $email = $params[$emailParam];
+      $userID = User::create(FALSE)
         ->addValue('username', $params['cms_name'])
-        ->addValue('email', $mail)
-        ->addValue('password', $hashedPassword)
+        ->addValue('uf_name', $email)
+        ->addValue('password', $params['cms_pass'])
+        ->addValue('contact_id', $params['contact_id'] ?? NULL)
+        // ->addValue('uf_id', 0) // does not work without this.
         ->execute()->single()['id'];
     }
     catch (\Exception $e) {
-      \Civi::log()->warning("Failed to create user '$mail': " . $e->getMessage());
+      \Civi::log()->warning("Failed to create user '$email': " . $e->getMessage());
       return FALSE;
     }
 
-    // @todo This is what Drupal does, but it's unclear why.
+    // @todo This next line is what Drupal does, but it's unclear why.
     // I think it assumes we want to be logged in as this contact, and as there's no uf match, it's not in civi.
     // But I'm not sure if we are always becomming this user; I'm not sure waht calls this function.
     // CRM_Core_Config::singleton()->inCiviCRM = FALSE;
@@ -193,7 +177,7 @@ class Security {
   public function updateCMSName($ufID, $email) {
     \Civi\Api4\User::update(FALSE)
       ->addWhere('id', '=', $ufID)
-      ->addValue('email', $email)
+      ->addValue('uf_name', $email)
       ->execute();
   }
 
@@ -232,6 +216,8 @@ class Security {
       return FALSE;
     }
 
+    $this->applyLocaleFromUser($user);
+
     // Note: random_int is more appropriate for cryptographical use than mt_rand
     // The long number is the max 32 bit value.
     return [$user['contact_id'], $user['id'], random_int(0, 2147483647)];
@@ -257,6 +243,7 @@ class Security {
       ])['values'][0]['contact_id'] ?? NULL;
       // Confusingly, Civi stores it's *Contact* ID as *userID* on the session.
       $session->set('userID', $contactID);
+      $this->applyLocaleFromUser($user);
     }
   }
 
@@ -265,12 +252,6 @@ class Security {
    */
   public function isUserLoggedIn(): bool {
     return !empty($this->getLoggedInUfID());
-  }
-
-  public function getCurrentLanguage() {
-    // @todo
-    \Civi::log()->debug('CRM_Utils_System_Standalone::getCurrentLanguage: not implemented');
-    return NULL;
   }
 
   /**
@@ -295,7 +276,7 @@ class Security {
    * @return array
    */
   public function getCMSPermissionsUrlParams() {
-    return ['ufAccessURL' => '/fixme/standalone/permissions/url/params'];
+    return ['ufAccessURL' => '/civicrm/admin/roles'];
   }
 
   /**
@@ -314,140 +295,177 @@ class Security {
   }
 
   /**
-   * This is taken from Drupal 7.91
-   *
-   * Hash a password using a secure stretched hash.
-   *
-   * By using a salt and repeated hashing the password is "stretched". Its
-   * security is increased because it becomes much more computationally costly
-   * for an attacker to try to break the hash by brute-force computation of the
-   * hashes of a large number of plain-text words or strings to find a match.
-   *
-   * @param $algo
-   *   The string name of a hashing algorithm usable by hash(), like 'sha256'.
-   * @param $password
-   *   Plain-text password up to 512 bytes (128 to 512 UTF-8 characters) to hash.
-   * @param $setting
-   *   An existing hash or the output of _password_generate_salt().  Must be
-   *   at least 12 characters (the settings and salt).
-   *
-   * @return string|bool
-   *   A string containing the hashed password (and salt) or FALSE on failure.
-   *   The return string will be truncated at DRUPAL_HASH_LENGTH characters max.
+   * High level function to encrypt password using the site-default mechanism.
    */
-  public function _password_crypt($algo, $password, $setting) {
-    // Prevent DoS attacks by refusing to hash large passwords.
-    if (strlen($password) > 512) {
-      return FALSE;
-    }
-    // The first 12 characters of an existing hash are its setting string.
-    $setting = substr($setting, 0, 12);
-
-    if ($setting[0] != '$' || $setting[2] != '$') {
-      return FALSE;
-    }
-
-    $count_log2 = strpos(self::ITOA64, $setting[3]);
-
-    // Hashes may be imported from elsewhere, so we allow != DRUPAL_HASH_COUNT
-    if ($count_log2 < self::$minHashCount || $count_log2 > self::$maxHashCount) {
-      return FALSE;
-    }
-    $salt = substr($setting, 4, 8);
-    // Hashes must have an 8 character salt.
-    if (strlen($salt) != 8) {
-      return FALSE;
-    }
-
-    // Convert the base 2 logarithm into an integer.
-    $count = 1 << $count_log2;
-    $hash = hash($algo, $password, TRUE);
-    do {
-      $hash = hash($algo, $hash . $password, TRUE);
-    } while (--$count);
-
-    $len = strlen($hash);
-    $output = $setting . $this->_password_base64_encode($hash, $len);
-    // _password_base64_encode() of a 16 byte MD5 will always be 22 characters.
-    // _password_base64_encode() of a 64 byte sha512 will always be 86 characters.
-    $expected = 12 + ceil((8 * $len) / 6);
-    return (strlen($output) == $expected) ? substr($output, 0, self::$hashLength) : FALSE;
+  public function hashPassword(string $plaintext): string {
+    // For now, we just implement D7's but this should be configurable.
+    // Sites should be able to move from one password hashing algo to another
+    // e.g. if a vulnerability is discovered.
+    $algo = new \Civi\Standalone\PasswordAlgorithms\Drupal7();
+    return $algo->hashPassword($plaintext);
   }
 
   /**
-   * This is taken from Drupal 7.91
-   *
-   * Generates a random base 64-encoded salt prefixed with settings for the hash.
-   *
-   * Proper use of salts may defeat a number of attacks, including:
-   *  - The ability to try candidate passwords against multiple hashes at once.
-   *  - The ability to use pre-hashed lists of candidate passwords.
-   *  - The ability to determine whether two users have the same (or different)
-   *    password without actually having to guess one of the passwords.
-   *
-   * @param $count_log2
-   *   Integer that determines the number of iterations used in the hashing
-   *   process. A larger value is more secure, but takes more time to complete.
-   *
-   * @return string
-   *   A 12 character string containing the iteration count and a random salt.
+   * Check whether a password matches a hashed version.
    */
-  public function _password_generate_salt($count_log2 = NULL): string {
+  public function checkPassword(string $plaintextPassword, string $storedHashedPassword): bool {
 
-    // Standalone: D7 has this stored as a CMS variable setting.
-    // @todo use global setting that can be changed in civicrm.settings.php
-    // For now, we just pick a value half way between our hard-coded min and max.
-    if ($count_log2 === NULL) {
-      $count_log2 = (int) ((static::$maxHashCount + static::$minHashCount) / 2);
+    if (preg_match('@^\$S\$[A-Za-z./0-9]{52}$@', $storedHashedPassword)) {
+      // Looks like a default D7 password.
+      $algo = new \Civi\Standalone\PasswordAlgorithms\Drupal7();
+      return $algo->checkPassword($plaintextPassword, $storedHashedPassword);
     }
-    $output = '$S$';
-    // Ensure that $count_log2 is within set bounds.
-    $count_log2 = max(static::$minHashCount, min(static::$maxHashCount, $count_log2));
-    // We encode the final log2 iteration count in base 64.
-    $output .= self::ITOA64[$count_log2];
-    // 6 bytes is the standard salt for a portable phpass hash.
-    $output .= $this->_password_base64_encode(random_bytes(6), 6);
-    return $output;
+
+    if (preg_match('@^\$P\$B[a-zA-Z0-9./]{30}$@', $storedHashedPassword)) {
+      Civi::log()->warning("Denying access to user whose password looks like a WordPress one because we haven't coded support for that.");
+      return FALSE;
+    }
+
+    // See if we can parse it against this spec...
+    // One day we might like to support this format because it allows all sorts of hashing algorithms.
+    // https://github.com/P-H-C/phc-string-format/blob/master/phc-sf-spec.md
+    // $<id>[$v=<version>][$<param>=<value>(,<param>=<value>)*][$<salt>[$<hash>]]
+    if (!preg_match('/
+      ^
+      \$([a-z0-9-]{1,32})  # Match 1 algorithm identifier
+      (\$v=[0-9+])?        # Match 2 optional version
+      (\$[a-z0-9-]{1,32}=[a-zA-Z0-9/+.-]*(?:,[a-z0-9-]{1,32}=[a-zA-Z0-9/+.-]*)*)? # 3: optional parameters
+      \$([a-zA-Z0-9/+.-]+) # Match 4 salt
+      \$([a-zA-Z0-9/+]+)   # Match 5 B64 encoded hash
+      $/x', $storedHashedPassword, $matches)) {
+
+      Civi::log()->warning("Denying access to user whose stored password is not in a format we can parse.");
+      return FALSE;
+    }
+    [, $identifier, $version, $params, $salt, $hash] = $matches;
+
+    // Map type to algorithm name. Some common ones here, but we don't implement them all.
+    $algo = [
+      '1'  => 'md5',
+      '5'  => 'sha256_crypt',
+      '6'  => 'sha512_crypt',
+      '2'  => 'bcrypt',
+      '2b' => 'bcrypt',
+      '2x' => 'bcrypt',
+      '2y' => 'bcrypt',
+    ][$identifier] ?? '';
+
+    $version = ltrim($version, '$');
+    $parsedParams = [];
+    if (!empty($params)) {
+      $parsedParams = [];
+      foreach (explode(',', (ltrim($params, '$'))) as $kv) {
+        [$k, $v] = explode('=', $kv);
+        $parsedParams[$k] = $v;
+      }
+    }
+    $params = $parsedParams;
+
+    // salt and hash should be base64 encoded.
+    $salt = base64_decode(ltrim($salt, '$'), TRUE);
+    $hash = base64_decode(ltrim($hash, '$'), TRUE);
+
+    // @todo
+    // Implement a pluggable interface here to handle some of these password types or more.
+    Civi::log()->warning("Denying access to user whose stored password relies on '$algo' which we have not implemented yet.");
+    return FALSE;
   }
 
   /**
-   * This is taken from Drupal 7.91
+   * Check a password reset token matches for a User.
    *
-   * Encodes bytes into printable base 64 using the *nix standard from crypt().
+   * @param string $token
+   * @param bool $spend
+   *   If TRUE, and the token matches, the token is then reset; so it can only be used once.
+   *   If FALSE no changes are made.
    *
-   * @param $input
-   *   The string containing bytes to encode.
-   * @param $count
-   *   The number of characters (bytes) to encode.
+   * @return NULL|int
+   *   If int, it's the UserID
    *
-   * @return string
-   *   Encoded string
    */
-  public function _password_base64_encode($input, $count): string {
-    $output = '';
-    $i = 0;
-    $itoa64 = self::ITOA64;
-    do {
-      $value = ord($input[$i++]);
-      $output .= $itoa64[$value & 0x3f];
-      if ($i < $count) {
-        $value |= ord($input[$i]) << 8;
-      }
-      $output .= $itoa64[($value >> 6) & 0x3f];
-      if ($i++ >= $count) {
-        break;
-      }
-      if ($i < $count) {
-        $value |= ord($input[$i]) << 16;
-      }
-      $output .= $itoa64[($value >> 12) & 0x3f];
-      if ($i++ >= $count) {
-        break;
-      }
-      $output .= $itoa64[($value >> 18) & 0x3f];
-    } while ($i < $count);
+  public function checkPasswordResetToken(string $token, bool $spend = TRUE): ?int {
+    if (!preg_match('/^([0-9a-f]{8})([a-zA-Z0-9]{32})([0-9a-f]+)$/', $token, $matches)) {
+      // Hacker
+      Civi::log()->warning("Rejected passwordResetToken with invalid syntax.", compact('token'));
+      return NULL;
+    }
 
-    return $output;
+    $userID = hexdec($matches[3]);
+    if (!$userID > 0) {
+      // Hacker
+      Civi::log()->warning("Rejected passwordResetToken with invalid userID.", compact('token', 'userID'));
+      return NULL;
+    }
+
+    $expiry = hexdec($matches[1]);
+    if (time() > $expiry) {
+      // Less serious
+      Civi::log()->info("Rejected expired passwordResetToken for user $userID");
+      return NULL;
+    }
+
+    $storedToken = $matches[1] . $matches[2];
+    $matched = User::get(FALSE)
+      ->addWhere('id', '=', $userID)
+      ->addWhere('password_reset_token', '=', $storedToken)
+      ->addWhere('is_active', '=', 1)
+      ->selectRowCount()
+      ->execute()->countMatched() === 1;
+
+    if ($matched && $spend) {
+      $matched = User::update(FALSE)
+        ->addWhere('id', '=', $userID)
+        ->addValue('password_reset_token', NULL)
+        ->execute();
+    }
+    Civi::log()->info(($matched ? 'Accepted' : 'Rejected') . " passwordResetToken for user $userID");
+    return $matched ? $userID : NULL;
+  }
+
+  /**
+   * Prepare a password reset workflow email, if configured.
+   *
+   * @return \CRM_Standaloneusers_WorkflowMessage_PasswordReset|null
+   */
+  public function preparePasswordResetWorkflow(array $user, string $token): ?CRM_Standaloneusers_WorkflowMessage_PasswordReset {
+    // Find the message template
+    $tplID = MessageTemplate::get(FALSE)
+      ->setSelect(['id'])
+      ->addWhere('workflow_name', '=', 'password_reset')
+      ->addWhere('is_default', '=', TRUE)
+      ->addWhere('is_reserved', '=', FALSE)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->first()['id'];
+    if (!$tplID) {
+      // Some sites may deliberately disable this, but it's unusual, so leave a notice in the log.
+      Civi::log()->notice("There is no active, default password_reset message template, which has prevented emailing a reset to {username}", ['username' => $user['username']]);
+      return NULL;
+    }
+    if (!filter_var($user['uf_name'] ?? '', \FILTER_VALIDATE_EMAIL)) {
+      Civi::log()->warning("User $user[id] has an invalid email. Failed to send password reset.");
+      return NULL;
+    }
+
+    // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml} {$usernamePlaintext} {$usernameHtml}
+    list($domainFromName, $domainFromEmail) = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+    $workflowMessage = (new \CRM_Standaloneusers_WorkflowMessage_PasswordReset())
+      ->setDataFromUser($user, $token)
+      ->setFrom("\"$domainFromName\" <$domainFromEmail>");
+
+    return $workflowMessage;
+  }
+
+  /**
+   * Applies the locale from the user record.
+   *
+   * @param array $user
+   * @return void
+   */
+  private function applyLocaleFromUser(array $user) {
+    $session = CRM_Core_Session::singleton();
+    if (!empty($user['language'])) {
+      $session->set('lcMessages', $user['language']);
+    }
   }
 
 }

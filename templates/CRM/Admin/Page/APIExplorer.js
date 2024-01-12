@@ -11,7 +11,6 @@
     getFieldsCache = {},
     getActionsCache = {},
     params = {},
-    smartyPhp,
     entityDoc,
     fieldTpl = _.template($('#api-param-tpl').html()),
     optionsTpl = _.template($('#api-options-tpl').html()),
@@ -597,21 +596,6 @@
   }
 
   /**
-   * @param value string
-   * @param js string
-   * @param key string
-   */
-  function smartyFormat(value, js, key) {
-    var varName = 'param_' + key.replace(/[. -]/g, '_').toLowerCase();
-    // Can't pass array literals directly into smarty so we add a php snippet
-    if (_.includes(js, '[') || _.includes(js, '{')) {
-      smartyPhp.push('$this->assign("'+ varName + '", '+ phpFormat(value) +');');
-      return '$' + varName;
-    }
-    return js;
-  }
-
-  /**
    * Create the params array from user input
    * @param e
    */
@@ -716,7 +700,6 @@
         "curl '" + http.url + "?" + $.param(http.query) + "'"
         : "curl -X " + http.method + " -d '" + $.param(http.query) +"' \\\n  '" + http.url + "'"
     };
-    smartyPhp = [];
     $.each(params, function(key, value) {
       var json = JSON.stringify(value),
         // Encourage 'return' to be an array - at least in php & js
@@ -732,7 +715,7 @@
       q.json += "  \"" + key + '": ' + js;
       // smarty already defaults to sequential
       if (key !== 'sequential') {
-        q.smarty += ' ' + key + '=' + smartyFormat(value, json, key);
+        q.smarty += ' ' + key + '=' + phpFormat(value);
       }
       // FIXME: This is not totally correct cli syntax
       q.cv += key + '=' + json + ' ';
@@ -748,8 +731,6 @@
     q.smarty += "}\n{foreach from=$result.values item=" + entity.toLowerCase() + "}\n  {$" + entity.toLowerCase() + ".some_field}\n{/foreach}";
     if (!_.includes(action, 'get')) {
       q.smarty = '{* Smarty API only works with get actions *}';
-    } else if (smartyPhp.length) {
-      q.smarty = "{php}\n  " + smartyPhp.join("\n  ") + "\n{/php}\n" + q.smarty;
     }
     $('#api-rest').html(restTpl(http));
     $.each(q, function(type, val) {
@@ -806,36 +787,6 @@
         $('#api-result').append(footer);
       }
     });
-  }
-
-  /**
-   * Fetch list of example files for a given entity
-   */
-  function getExamples() {
-    CRM.utils.setOptions($('#example-action').prop('disabled', true).addClass('loading'), []);
-    $.getJSON(CRM.url('civicrm/ajax/apiexample', {entity: $(this).val()}))
-      .then(function(result) {
-        CRM.utils.setOptions($('#example-action').prop('disabled', false).removeClass('loading'), result);
-      });
-  }
-
-  /**
-   * Fetch and display an example file
-   */
-  function getExample() {
-    var
-      entity = $('#example-entity').val(),
-      action = $('#example-action').val();
-    if (entity && action) {
-      $('#example-result').block();
-      $.get(CRM.url('civicrm/ajax/apiexample', {file: entity + '/' + action}))
-        .then(function(result) {
-          $('#example-result').unblock().text(result);
-          prettyPrint('#example-result');
-        });
-    } else {
-      $('#example-result').text($('#example-result').attr('placeholder'));
-    }
   }
 
   /**
@@ -1002,7 +953,7 @@
     });
 
     // Initialize widgets
-    $('#api-entity, #example-entity, #doc-entity').crmSelect2({
+    $('#api-entity, #doc-entity').crmSelect2({
       // Add strikethough class to selection to indicate deprecated apis
       formatSelection: function(option) {
         return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + option.text + '</span>' : option.text;
@@ -1051,8 +1002,6 @@
         items: '.api-chain-row, .api-param-row'
       });
     $('#api-join').on('change', 'input', onSelectJoin);
-    $('#example-entity').on('change', getExamples);
-    $('#example-action').on('change', getExample);
     $('#doc-entity').on('change', getDocEntity);
     $('#doc-action').on('change', getDocAction);
     $('#api-params-add').on('click', function(e) {

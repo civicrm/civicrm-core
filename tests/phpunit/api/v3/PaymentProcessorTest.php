@@ -65,7 +65,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   public function testPaymentProcessorCreate($version) {
     $this->_apiversion = $version;
     $params = $this->_params;
-    $result = $this->callAPIAndDocument('payment_processor', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('payment_processor', 'create', $params);
     $this->callAPISuccessGetSingle('EntityFinancialAccount', ['entity_table' => 'civicrm_payment_processor', 'entity_id' => $result['id']]);
 
     // Test that the option values are flushed so ths can be used straight away.
@@ -129,16 +129,6 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test  using example code.
-   */
-  public function testPaymentProcessorCreateExample() {
-    require_once 'api/v3/examples/PaymentProcessor/Create.ex.php';
-    $result = payment_processor_create_example();
-    $expectedResult = payment_processor_create_expectedresult();
-    $this->assertAPISuccess($result);
-  }
-
-  /**
    * Check payment processor delete.
    * @dataProvider versionThreeAndFour
    *
@@ -151,7 +141,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
       'id' => $result['id'],
     ];
 
-    $this->callAPIAndDocument('payment_processor', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('payment_processor', 'delete', $params);
   }
 
   /**

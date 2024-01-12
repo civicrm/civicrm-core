@@ -26,7 +26,7 @@ class api_v3_SelectQueryTest extends CiviUnitTestCase {
     CRM_Utils_Hook::singleton()->setHook('civicrm_selectWhereClause', [$this, 'hook_civicrm_selectWhereClause']);
   }
 
-  public function testHookPhoneClause() {
+  public function testHookPhoneClause(): void {
     $person1 = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'first_name' => 'Bob', 'last_name' => 'Tester']);
     $cid = $person1['id'];
     for ($number = 1; $number < 6; ++$number) {
@@ -43,7 +43,7 @@ class api_v3_SelectQueryTest extends CiviUnitTestCase {
     $this->assertEquals(3, $phone['phone']);
   }
 
-  public function testHookContactClause() {
+  public function testHookContactClause(): void {
     $person1 = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'first_name' => 'Bob', 'last_name' => 'Tester', 'email' => 'bob@test.er']);
     $person2 = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'first_name' => 'Tom', 'last_name' => 'Tester', 'email' => 'tom@test.er']);
     $person3 = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'first_name' => 'Tim', 'last_name' => 'Tester', 'email' => 'tim@test.er']);
@@ -59,7 +59,7 @@ class api_v3_SelectQueryTest extends CiviUnitTestCase {
   public function hook_civicrm_selectWhereClause($entity, &$clauses) {
     if ($entity == $this->hookEntity) {
       foreach ($this->hookCondition as $field => $clause) {
-        $clauses[$field] = array_merge(CRM_Utils_Array::value($field, $clauses, []), $clause);
+        $clauses[$field] = array_merge(($clauses[$field] ?? []), $clause);
       }
     }
   }

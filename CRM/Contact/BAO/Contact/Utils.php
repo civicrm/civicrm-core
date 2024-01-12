@@ -584,10 +584,7 @@ UPDATE civicrm_contact
       }
 
       // check permission on acl basis.
-      if (in_array($task, [
-        'view',
-        'edit',
-      ])) {
+      if (in_array($task, ['view', 'edit'])) {
         $aclPermission = CRM_Core_Permission::VIEW;
         if ($task == 'edit') {
           $aclPermission = CRM_Core_Permission::EDIT;
@@ -946,14 +943,6 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
       throw new CRM_Core_Exception(ts('Incorrect greeting value id %1, or no default greeting for this contact type and greeting type.', [1 => $valueID]));
     }
 
-    // build return properties based on tokens
-    $greetingTokens = CRM_Utils_Token::getTokens($greetingString);
-    $tokens = $greetingTokens['contact'] ?? NULL;
-    $greetingsReturnProperties = [];
-    if (is_array($tokens)) {
-      $greetingsReturnProperties = array_fill_keys(array_values($tokens), 1);
-    }
-
     // Process ALL contacts only when force=1 or force=2 is passed. Else only contacts with NULL greeting or addressee value are updated.
     $processAll = $processOnlyIdSet = FALSE;
     if ($force == 1) {
@@ -1119,35 +1108,6 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
     $allTokens = array_merge_recursive($tokens['addressee'], $tokens['email_greeting'], $tokens['postal_greeting']);
     $tokens['all'] = $allTokens;
     return $tokens;
-  }
-
-  /**
-   * Process a greeting template string to produce the individualised greeting text.
-   *
-   * This works just like message templates for mailings:
-   * the template is processed with the token substitution mechanism,
-   * to supply the individual contact data;
-   * and it is also processed with Smarty,
-   * to allow for conditionals etc. based on the contact data.
-   *
-   * Note: We don't pass any variables to Smarty --
-   * all variable data is inserted into the input string
-   * by the token substitution mechanism,
-   * before Smarty is invoked.
-   *
-   * @param string $templateString
-   *   The greeting template string with contact tokens + Smarty syntax.
-   *
-   * @deprecated
-   *
-   * @param array $contactDetails
-   * @param int $contactID
-   * @param string $className
-   */
-  public static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
-    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
-    CRM_Utils_Token::replaceGreetingTokens($templateString, $contactDetails, $contactID, $className, TRUE);
-    $templateString = CRM_Utils_String::parseOneOffStringThroughSmarty($templateString);
   }
 
   /**

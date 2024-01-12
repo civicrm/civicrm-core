@@ -35,9 +35,9 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   /**
    * Test getremote.
    */
-  public function testGetremote() {
+  public function testGetremote(): void {
     $testsDir = dirname(dirname(dirname(dirname(__FILE__))));
-    $this->createMockHandler([file_get_contents($testsDir . '/mock/extension_browser_results/single')]);
+    $this->createMockHandler([file_get_contents($testsDir . '/mock/extension_browser_results/single.json')]);
     $this->setUpClientWithHistoryContainer();
     CRM_Extension_System::singleton()->getBrowser()->setGuzzleClient($this->getGuzzleClient());
     CRM_Extension_System::singleton()->getBrowser()->refresh();
@@ -54,7 +54,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * Test getting a single extension
    * @see https://issues.civicrm.org/jira/browse/CRM-20532
    */
-  public function testExtensionGetSingleExtension() {
+  public function testExtensionGetSingleExtension(): void {
     $result = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.moduletest']);
     $this->assertEquals('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
     $this->assertEquals('module', $result['values'][$result['id']]['type']);
@@ -65,7 +65,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * Test single Extension get with specific fields in return
    * @see https://issues.civicrm.org/jira/browse/CRM-20532
    */
-  public function testSingleExtensionGetWithReturnFields() {
+  public function testSingleExtensionGetWithReturnFields(): void {
     $result = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.moduletest', 'return' => ['name', 'status', 'key']]);
     $this->assertEquals('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
     $this->assertFalse(isset($result['values'][$result['id']]['type']));
@@ -78,7 +78,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * Note that this is likely to fail locally but will work on Jenkins due to the result count check
    * @see https://issues.civicrm.org/jira/browse/CRM-20532
    */
-  public function testExtensionGet() {
+  public function testExtensionGet(): void {
     $result = $this->callAPISuccess('extension', 'get', ['options' => ['limit' => 0]]);
     $testExtensionResult = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.paymenttest']);
     $ext = $result['values'][$testExtensionResult['id']];
@@ -90,7 +90,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   /**
    * Filtering by status=installed or status=uninstalled should produce different results.
    */
-  public function testExtensionGetByStatus() {
+  public function testExtensionGetByStatus(): void {
     $installed = $this->callAPISuccess('extension', 'get', ['status' => 'installed', 'options' => ['limit' => 0]]);
     $uninstalled = $this->callAPISuccess('extension', 'get', ['status' => 'uninstalled', 'options' => ['limit' => 0]]);
     $disabled = $this->callAPISuccess('extension', 'get', ['status' => 'disabled', 'options' => ['limit' => 0]]);
@@ -109,7 +109,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
     $this->assertEquals($all['count'], $installed['count'] + $uninstalled['count'] + $disabled['count']);
   }
 
-  public function testGetMultipleExtensions() {
+  public function testGetMultipleExtensions(): void {
     $result = $this->callAPISuccess('extension', 'get', ['key' => ['test.extension.manager.paymenttest', 'test.extension.manager.moduletest']]);
     $this->assertEquals(2, $result['count']);
   }
@@ -117,7 +117,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   /**
    * Test that extension get works with api request with parameter full_name as build by api explorer.
    */
-  public function testGetMultipleExtensionsApiExplorer() {
+  public function testGetMultipleExtensionsApiExplorer(): void {
     $result = $this->callAPISuccess('extension', 'get', ['full_name' => ['test.extension.manager.paymenttest', 'test.extension.manager.moduletest']]);
     $this->assertEquals(2, $result['count']);
   }
@@ -125,7 +125,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   /**
    * Test that extension get can be filtered by id.
    */
-  public function testGetExtensionByID() {
+  public function testGetExtensionByID(): void {
     $result = $this->callAPISuccess('extension', 'get', ['id' => 2, 'return' => ['label']]);
     $this->assertEquals(1, $result['count']);
   }

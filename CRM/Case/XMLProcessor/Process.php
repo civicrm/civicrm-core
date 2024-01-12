@@ -263,7 +263,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
         $maxInstances = (string) $recordXML->max_instances;
         $activityTypeInfo = $activityTypes[$activityTypeName] ?? NULL;
 
-        if ($activityTypeInfo['id']) {
+        if ($activityTypeInfo) {
           if ($maskAction) {
             if ($maskAction == 'edit' && '0' === (string) $recordXML->editable) {
               $result[$maskAction][] = $activityTypeInfo['id'];

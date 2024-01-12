@@ -26,7 +26,7 @@ class EventChecker {
   private $activeChecks = NULL;
 
   /**
-   * @param \PHPUnit\Framework\Test $test
+   * @param \PHPUnit\Framework\Test|NULL $test
    *
    * @return $this
    */
@@ -37,9 +37,7 @@ class EventChecker {
         /** @var EventCheck $template */
         if ($template->isSupported($test)) {
           $checker = clone $template;
-          $checker->setTest($test);
           $this->activeChecks[] = $checker;
-          $checker->setUp();
         }
       }
     }
@@ -76,11 +74,6 @@ class EventChecker {
    */
   public function stop() {
     // NOTE: In test environment, dispatcher will be removed regardless.
-    foreach ($this->activeChecks ?? [] as $checker) {
-      /** @var \Civi\Test\EventCheck $checker */
-      Invasive::call([$checker, 'tearDown']);
-      $checker->setTest(NULL);
-    }
     $this->activeChecks = NULL;
     return $this;
   }

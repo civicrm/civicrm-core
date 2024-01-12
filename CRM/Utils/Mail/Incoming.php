@@ -287,49 +287,38 @@ class CRM_Utils_Mail_Incoming {
 
   /**
    * @param $mail
-   * @param $createContact
-   * @param $requireContact
+   * @param $attachments
+   * @param bool $createContact
    * @param array $emailFields
-   *   Which fields to process and create contacts for of from, to, cc, bcc
+   *   Which fields to process and create contacts for - subset of [from, to, cc, bcc],
+   * @param array $from
    *
    * @return array
    */
-  public static function parseMailingObject(&$mail, $createContact = TRUE, $requireContact = TRUE, $emailFields = ['from', 'to', 'cc', 'bcc']) {
-
-    $config = CRM_Core_Config::singleton();
-
-    // get ready for collecting data about this email
-    // and put it in a standardized format
-    $params = ['is_error' => 0];
-
-    // Sometimes $mail->from is unset because ezcMail didn't handle format
-    // of From header. CRM-19215.
-    if (!isset($mail->from)) {
-      if (preg_match('/^([^ ]*)( (.*))?$/', $mail->getHeader('from'), $matches)) {
-        $mail->from = new ezcMailAddress($matches[1], trim($matches[2]));
-      }
-    }
-
+  public static function parseMailingObject(&$mail, $attachments, $createContact, $emailFields, $from) {
+    $params = [];
     foreach ($emailFields as $field) {
       // to, bcc, cc are arrays of objects, but from is an object, so make it an array of one object so we can handle it the same
       if ($field === 'from') {
-        $value = [$mail->$field];
+        $value = $from;
       }
       else {
         $value = $mail->$field;
       }
-      self::parseAddresses($value, $field, $params, $mail, $createContact);
+      $params[$field] = [];
+      foreach ($value as $address) {
+        $subParam = [];
+        // @todo - stop creating a complex array here - $params[$field][] is
+        // an array with name, email & id. The calling function only wants the
+        // id & does quite a bit of work to extract it....
+        self::parseAddress($address, $subParam, $mail, $createContact);
+        $params[$field][] = $subParam;
+      }
     }
-
-    // define other parameters
-    $params['subject'] = $mail->subject;
-    $params['date'] = date("YmdHi00",
-      strtotime($mail->getHeader("Date"))
-    );
-    $attachments = [];
-    $params['body'] = self::formatMailPart($mail->body, $attachments);
-
-    // format and move attachments to the civicrm area
+    // @todo mode this code to be a `getAttachments` function on the IncomingMail class
+    // which would get attachments & move the files to the civicrm area.
+    // The formatting to api array should go back to the calling function on
+    // EmailProcessor.
     if (!empty($attachments)) {
       $date = date('YmdHis');
       $config = CRM_Core_Config::singleton();
@@ -358,12 +347,11 @@ class CRM_Utils_Mail_Incoming {
 
   /**
    * @param ezcMailAddress $address
-   * @param array $params
    * @param $subParam
    * @param $mail
    * @param $createContact
    */
-  private static function parseAddress(&$address, &$params, &$subParam, &$mail, $createContact = TRUE) {
+  private static function parseAddress($address, &$subParam, &$mail, $createContact = TRUE) {
     // CRM-9484
     if (empty($address->email)) {
       return;
@@ -374,26 +362,9 @@ class CRM_Utils_Mail_Incoming {
 
     $contactID = self::getContactID($subParam['email'],
       $subParam['name'],
-      $createContact,
-      $mail
+      $createContact
     );
-    $subParam['id'] = $contactID ? $contactID : NULL;
-  }
-
-  /**
-   * @param ezcMailAddress[] $addresses
-   * @param $token
-   * @param array $params
-   * @param $mail
-   * @param $createContact
-   */
-  public static function parseAddresses(&$addresses, $token, &$params, &$mail, $createContact = TRUE) {
-    $params[$token] = [];
-    foreach ($addresses as $address) {
-      $subParam = [];
-      self::parseAddress($address, $params, $subParam, $mail, $createContact);
-      $params[$token][] = $subParam;
-    }
+    $subParam['id'] = $contactID ?: NULL;
   }
 
   /**
@@ -404,11 +375,12 @@ class CRM_Utils_Mail_Incoming {
    * @param string $email
    * @param string $name
    * @param bool $create
-   * @param string $mail
+   *
+   * @internal core use only (only use outside this class is in core unit tests).
    *
    * @return int|null
    */
-  public static function getContactID($email, $name, $create, &$mail) {
+  public static function getContactID($email, $name, $create) {
     $dao = CRM_Contact_BAO_Contact::matchContactOnEmail($email, 'Individual');
 
     $contactID = NULL;

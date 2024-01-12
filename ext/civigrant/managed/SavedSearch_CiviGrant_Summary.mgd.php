@@ -64,6 +64,16 @@ return [
             'show_count' => TRUE,
             'expose_limit' => TRUE,
           ],
+          'toolbar' => [
+            [
+              'entity' => 'Grant',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'icon' => 'fa-plus',
+              'text' => E::ts('Add Grant'),
+              'style' => 'primary',
+            ],
+          ],
           'sort' => [],
           'columns' => [
             [

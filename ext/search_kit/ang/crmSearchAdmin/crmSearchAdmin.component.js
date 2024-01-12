@@ -28,8 +28,43 @@
     this.displayTypes = _.indexBy(CRM.crmSearchAdmin.displayTypes, 'id');
     this.searchDisplayPath = CRM.url('civicrm/search');
     this.afformPath = CRM.url('civicrm/admin/afform');
+    this.debug = {};
 
-    $scope.controls = {tab: 'compose', joinType: 'LEFT'};
+    this.mainTabs = [
+      {
+        key: 'for',
+        title: ts('Search For'),
+        icon: 'fa-search',
+      },
+      {
+        key: 'conditions',
+        title: ts('Filter Conditions'),
+        icon: 'fa-filter',
+      },
+      {
+        key: 'fields',
+        title: ts('Select Fields'),
+        icon: 'fa-columns',
+      },
+      {
+        key: 'settings',
+        title: ts('Configure Settings'),
+        icon: 'fa-gears',
+      },
+      {
+        key: 'query',
+        title: ts('Query Info'),
+        icon: 'fa-info-circle',
+      },
+    ];
+
+    $scope.controls = {tab: this.mainTabs[0].key, joinType: 'LEFT'};
+
+    this.selectedDisplay = function() {
+      // Could return the display but for now we don't need it
+      return $scope.controls.tab.startsWith('display_');
+    };
+
     $scope.joinTypes = [
       {k: 'LEFT', v: ts('With (optional)')},
       {k: 'INNER', v: ts('With (required)')},
@@ -38,6 +73,7 @@
     $scope.getEntity = searchMeta.getEntity;
     $scope.getField = searchMeta.getField;
     this.perm = {
+      viewDebugOutput: CRM.checkPerm('view debug output'),
       editGroups: CRM.checkPerm('edit groups')
     };
 
@@ -61,7 +97,7 @@
       if (!this.savedSearch.id) {
         var defaults = {
           version: 4,
-          select: getDefaultSelect(),
+          select: searchMeta.getEntity(ctrl.savedSearch.api_entity).default_columns,
           orderBy: {},
           where: [],
         };
@@ -70,10 +106,6 @@
             defaults[param] = [];
           }
         });
-        // Default to Individuals
-        if (this.savedSearch.api_entity === 'Contact' && CRM.crmSearchAdmin.defaultContactType) {
-          defaults.where.push(['contact_type:name', '=', CRM.crmSearchAdmin.defaultContactType]);
-        }
 
         $scope.$bindToRoute({
           param: 'params',
@@ -82,11 +114,16 @@
           default: defaults
         });
 
+        // Set default label
+        ctrl.savedSearch.label = ts('%1 Search by %2', {
+          1: searchMeta.getEntity(ctrl.savedSearch.api_entity).title,
+          2: CRM.crmSearchAdmin.myName
+        });
         $scope.$bindToRoute({
           param: 'label',
           expr: '$ctrl.savedSearch.label',
           format: 'raw',
-          default: ''
+          default: ctrl.savedSearch.label
         });
       }
 
@@ -329,8 +366,15 @@
           params.push(condition);
         });
         ctrl.savedSearch.api_params.join.push(params);
-        if (entity.label_field && $scope.controls.joinType !== 'EXCLUDE') {
-          ctrl.savedSearch.api_params.select.push(join.alias + '.' + entity.label_field);
+        if (entity.search_fields && $scope.controls.joinType !== 'EXCLUDE') {
+          // Add columns for newly-joined entity
+          entity.search_fields.forEach((fieldName) => {
+            // Try to avoid adding duplicate columns
+            const simpleName = _.last(fieldName.split('.'));
+            if (!ctrl.savedSearch.api_params.select.join(',').includes(simpleName)) {
+              ctrl.savedSearch.api_params.select.push(join.alias + '.' + fieldName);
+            }
+          });
         }
         loadFieldOptions();
       }
@@ -377,7 +421,7 @@
       _.each(ctrl.savedSearch.api_params.select, function(col, pos) {
         var info = searchMeta.parseExpr(col),
           fieldExpr = (_.findWhere(info.args, {type: 'field'}) || {}).value;
-        if (ctrl.canAggregate(col)) {
+        if (ctrl.mustAggregate(col)) {
           // Ensure all non-grouped columns are aggregated if using GROUP BY
           if (!info.fn || info.fn.category !== 'aggregate') {
             var dflFn = searchMeta.getDefaultAggregateFn(info) || 'GROUP_CONCAT',
@@ -464,15 +508,7 @@
 
     // Deletes an item from an array param
     this.clearParam = function(name, idx) {
-      if (name === 'select') {
-        // Function selectors use `ng-repeat` with `track by $index` so must be refreshed when splicing the array
-        ctrl.hideFuncitons();
-      }
       ctrl.savedSearch.api_params[name].splice(idx, 1);
-    };
-
-    this.hideFuncitons = function() {
-      $scope.controls.showFunctions = false;
     };
 
     function onChangeSelect(newSelect, oldSelect) {
@@ -490,7 +526,16 @@
 
     // Is a column eligible to use an aggregate function?
     this.canAggregate = function(col) {
-      // If the query does not use grouping, never
+      // If the query does not use grouping, it's always allowed
+      if (!ctrl.savedSearch.api_params.groupBy || !ctrl.savedSearch.api_params.groupBy.length) {
+        return true;
+      }
+      return this.mustAggregate(col);
+    };
+
+    // Is a column required to use an aggregate function?
+    this.mustAggregate = function(col) {
+      // If the query does not use grouping, it's never required
       if (!ctrl.savedSearch.api_params.groupBy || !ctrl.savedSearch.api_params.groupBy.length) {
         return false;
       }
@@ -535,15 +580,13 @@
       return {results: ctrl.getSelectFields()};
     };
 
-    // Sets the default select clause based on commonly-named fields
-    function getDefaultSelect() {
-      var entity = searchMeta.getEntity(ctrl.savedSearch.api_entity);
-      return _.transform(entity.fields, function(defaultSelect, field) {
-        if (field.name === 'id' || field.name === entity.label_field) {
-          defaultSelect.push(field.name);
-        }
-      });
-    }
+    this.fieldsForSelect = function() {
+      return {
+        results: ctrl.getAllFields(':label', ['Field', 'Custom', 'Extra', 'Pseudo'], (key) => {
+          ctrl.savedSearch.api_params.select.includes(key);
+        })
+      };
+    };
 
     this.getAllFields = function(suffix, allowedTypes, disabledIf, topJoin) {
       disabledIf = disabledIf || _.noop;
@@ -668,7 +711,7 @@
 
     // Build a list of all possible links to main entity & join entities
     // @return {Array}
-    this.buildLinks = function() {
+    this.buildLinks = function(isRow) {
       function addTitle(link, entityName) {
         link.text = link.text.replace('%1', entityName);
       }
@@ -703,7 +746,7 @@
           if (info.field && !info.suffix && !info.fn && info.field.type === 'Field' && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
             var idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')),
               idField = searchMeta.parseExpr(idFieldName).args[0].field;
-            if (!ctrl.canAggregate(idFieldName)) {
+            if (!ctrl.mustAggregate(idFieldName)) {
               var joinEntity = searchMeta.getEntity(idField.fk_entity),
                 label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs && idField.input_attrs.label || idField.label);
               _.each(_.cloneDeep(joinEntity && joinEntity.links), function(link) {
@@ -715,7 +758,8 @@
           }
         }
       });
-      return links;
+      // Filter links according to usage - add & browse only make sense outside of a row
+      return _.filter(links, (link) => ['add', 'browse'].includes(link.action) !== isRow);
     };
 
     function loadAfforms() {

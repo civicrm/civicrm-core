@@ -19,16 +19,7 @@ if (!defined('CIVI_SETUP')) {
     $m = $e->getModel();
 
     $langs = NULL;
-    require implode(DIRECTORY_SEPARATOR, [$m->srcPath, 'install', 'langs.php']);
-    foreach ($langs as $locale => $_) {
-      if ($locale == 'en_US') {
-        continue;
-      }
-      if (!file_exists(implode(DIRECTORY_SEPARATOR, array($m->srcPath, 'sql', "civicrm_data.$locale.mysql")))) {
-        unset($langs[$locale]);
-      }
-    }
-
+    require implode(DIRECTORY_SEPARATOR, [$m->srcPath, 'setup', 'res', 'languages.php']);
     $m->setField('lang', 'options', $langs);
 
   }, \Civi\Setup::PRIORITY_PREPARE);

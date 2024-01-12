@@ -325,10 +325,7 @@ class CRM_Activity_Page_AJAX {
 
     // Mark previous activity as deleted. If it was a non-case activity
     // then just change the subject.
-    if (in_array($params['mode'], [
-      'move',
-      'file',
-    ])) {
+    if (in_array($params['mode'], ['move', 'file'])) {
       $caseActivity = new CRM_Case_DAO_CaseActivity();
       $caseActivity->case_id = $params['caseID'];
       $caseActivity->activity_id = $otherActivity->id;

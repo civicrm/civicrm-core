@@ -65,7 +65,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $this->callAPISuccess($this->_entity, 'create', $this->params);
     $getParams = ['amount' => '500'];
-    $result = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $this->assertEquals(1, $result['count']);
   }
 
@@ -74,7 +74,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreateContributionRecurWithToken() {
+  public function testCreateContributionRecurWithToken(): void {
     // create token
     $this->createLoggedInUser();
     $token = $this->callAPISuccess('PaymentToken', 'create', [
@@ -105,7 +105,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetFieldsContributionRecur() {
+  public function testGetFieldsContributionRecur(): void {
     $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
     $this->assertEquals(12, $result['values']['start_date']['type']);
   }
@@ -115,7 +115,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionRecurCancel() {
+  public function testContributionRecurCancel(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->callAPISuccess('ContributionRecur', 'cancel', ['id' => $result['id'], 'cancel_reason' => 'just cos', 'processor_message' => 'big fail']);
     $cancelled = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $result['id']]);

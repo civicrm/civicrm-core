@@ -55,7 +55,7 @@
           <tr id="event-{$row.id}" class="crm-entity {if NOT $row.is_active} disabled{/if}">
           <td class="crm-event_{$row.id}">
             <a href="{crmURL p='civicrm/event/info' q="id=`$row.id`&reset=1"}"
-               title="{ts}View event info page{/ts}" class="bold">{$row.title}</a>&nbsp;&nbsp;({ts}ID:{/ts} {$row.id})<br/>
+               title="{ts}View event info page{/ts}" class="bold">{$row.title|smarty:nodefaults|purify}</a>&nbsp;&nbsp;({ts}ID:{/ts} {$row.id})<br/>
                <span><b>{$row.repeat}</b></span>
           </td>
           <td class="crm-event-city">{$row.city}</td>

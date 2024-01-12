@@ -433,7 +433,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     // We need to call the config hook again, since we now know
     // all the modules that are listening on it (CRM-8655).
     $config = CRM_Core_Config::singleton();
-    CRM_Utils_Hook::config($config);
+    CRM_Utils_Hook::config($config, ['uf' => TRUE]);
 
     if ($loadUser) {
       if (!empty($params['uid']) && $username = \Drupal\user\Entity\User::load($params['uid'])->getAccountName()) {
@@ -571,7 +571,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $module_data = \Drupal::service('extension.list.module')->reset()->getList();
     foreach ($module_data as $module_name => $extension) {
       if (!isset($extension->info['hidden']) && $extension->origin != 'core' && $extension->status == 1) {
-        $modules[] = new CRM_Core_Module('drupal.' . $module_name, TRUE);
+        $modules[] = new CRM_Core_Module('drupal.' . $module_name, TRUE,
+          _ts('%1 (%2)', [1 => $extension->info['name'] ?? $module_name, _ts('Drupal')])
+        );
       }
     }
     return $modules;
@@ -942,7 +944,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritdoc
    */
   public function ipAddress():?string {
-    return class_exists('Drupal') ? \Drupal::request()->getClientIp() : ($_SERVER['REMOTE_ADDR'] ?? NULL);
+    // dev/core#4756 fallback if checking before CMS bootstrap
+    if (!class_exists('Drupal') || !\Drupal::hasContainer()) {
+      return ($_SERVER['REMOTE_ADDR'] ?? NULL);
+    }
+    return \Drupal::request()->getClientIp();
   }
 
   /**

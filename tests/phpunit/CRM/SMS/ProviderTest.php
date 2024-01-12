@@ -47,7 +47,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
   /**
    * CRM-20238 Add test of the processInbound function for SMSs
    */
-  public function testProcessInbound() {
+  public function testProcessInbound(): void {
     $this->individualCreate(['phone' => [1 => ['phone_type_id' => 'Phone', 'location_type_id' => 'Home', 'phone' => '+61487654321']]]);
     $provider = new CiviTestSMSProvider('CiviTestSMSProvider');
     $result = $provider->processInbound('+61412345678', 'This is a test message', '+61487654321');
@@ -58,7 +58,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
   /**
    * CRM-20238 Add test of processInbound function where no To is passed into the function
    */
-  public function testProcessInboundNoTo() {
+  public function testProcessInboundNoTo(): void {
     $provider = new CiviTestSMSProvider('CiviTestSMSProvider');
     $result = $provider->processInbound('+61412345678', 'This is a test message', NULL, '12345');
     $this->assertEquals('This is a test message', $result->details);
@@ -74,7 +74,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
   /**
    * CRM-20238 Add test of ProcessInbound function where no To number is passed into the function but the toContactId gets set in a hook
    */
-  public function testProcessInboundSetToContactIDUsingHook() {
+  public function testProcessInboundSetToContactIDUsingHook(): void {
     $provider = new CiviTestSMSProvider('CiviTestSMSProvider');
     $this->hookClass->setHook('civicrm_inboundSMS', [$this, 'smsHookTest']);
     $result = $provider->processInbound('+61412345678', 'This is a test message', NULL, '12345');
@@ -96,7 +96,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
    * or the dummy SMS provider extension, might not provide a default url,
    * but the form shouldn't fail because of that.
    */
-  public function testMissingUrl() {
+  public function testMissingUrl(): void {
     $form = $this->getFormObject('CRM_SMS_Form_Provider');
     $_REQUEST['key'] = 'CiviTestSMSProvider';
 

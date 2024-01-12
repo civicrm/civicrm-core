@@ -15,9 +15,35 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_ContributionPage {
-  protected $_colors;
 
+  /**
+   * Configuration for each form field
+   *
+   * @var array
+   * @internal
+   */
+  public $_fields = [];
+
+  /**
+   * Configuration for each color field
+   *
+   * @var array
+   * @internal
+   */
+  public $_colorFields = [];
+
+  /**
+   * @var CRM_Contribute_DAO_Widget
+   */
   protected $_widget;
+
+  /**
+   * Name of the refresh button,
+   * used to display the widget preview
+   *
+   * @var string
+   */
+  protected $_refreshButtonName;
 
   public function preProcess() {
     parent::preProcess();
@@ -241,7 +267,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
       $params['id'] = $this->_widget->id;
     }
     $params['contribution_page_id'] = $this->_id;
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $params['is_active'] ??= FALSE;
     $params['url_homepage'] = 'null';
 
     $widget = new CRM_Contribute_DAO_Widget();

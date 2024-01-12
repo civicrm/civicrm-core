@@ -59,13 +59,13 @@
         subject = $("#file_on_case_activity_subject").val(),
         targetContactId = $("#file_on_case_target_contact_id").val();
 
-      var postUrl = {/literal}"{crmURL p='civicrm/ajax/activity/convert' h=0 }"{literal};
+      var postUrl = {/literal}"{crmURL p='civicrm/ajax/activity/convert' h=0}"{literal};
       $.post( postUrl, { activityID: activityID, caseID: selectedCaseId, contactID: contactId, newSubject: subject, targetContactIds: targetContactId, mode: action, key: {/literal}"{crmKey name='civicrm/ajax/activity/convert'}"{literal} },
         function( values ) {
           if ( values.error_msg ) {
             $().crmError(values.error_msg, "{/literal}{ts escape='js'}Unable to file on case.{/ts}{literal}");
           } else {
-            var destUrl = {/literal}"{crmURL p='civicrm/contact/view/case' q='reset=1&action=view&id=' h=0 }"{literal};
+            var destUrl = {/literal}"{crmURL p='civicrm/contact/view/case' q='reset=1&action=view&id=' h=0}"{literal};
             var context = '';
             {/literal}{if !empty($fulltext)}{literal}
             context = '&context={/literal}{$fulltext}{literal}';

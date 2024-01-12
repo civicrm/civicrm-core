@@ -22,8 +22,17 @@
     <label for="af_config_form_permission">
       {{:: ts('Permission') }}
     </label>
-    <input ng-model="editor.afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions}" >
-    <p class="help-block">{{:: ts('What permission is required to use this form?') }}</p>
+    <div class="form-inline" >
+      <input ng-model="editor.afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions, multiple: true}" ng-list >
+      <select ng-model="editor.afform.permission_operator" class="form-control" id="af_config_form_permission_operator" >
+        <option value="AND">{{:: ts('And') }}</option>
+        <option value="OR">{{:: ts('Or') }}</option>
+      </select>
+    </div>
+    <p class="help-block">
+      {{:: ts('What permission is required to use this form?') }}
+      {{:: ts('Join multiple permissions with "And" to require all, or "Or" to require at least one.') }}
+    </p>
   </div>
 
   <!-- Placement options do not apply to blocks -->
@@ -34,7 +43,7 @@
       <label for="af_config_form_server_route">
         {{:: ts('Page Route') }}
       </label>
-      <input ng-model="editor.afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}" ng-model-options="editor.debounceMode">
+      <input ng-model="editor.afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}" placeholder="{{:: ts('None') }}" ng-model-options="editor.debounceMode">
       <p class="help-block">{{:: ts('Expose the form as a standalone webpage. (Example: "civicrm/my-form")') }}</p>
     </div>
 
@@ -43,14 +52,6 @@
         <input type="checkbox" ng-model="editor.afform.is_public">
         {{:: ts('Accessible on front-end of website') }}
       </label>
-    </div>
-
-    <div class="form-group" ng-if="!!editor.afform.server_route">
-      <label>
-        <input type="checkbox" ng-model="editor.afform.is_token">
-        {{:: ts('Provide Email Token') }}
-      </label>
-      <p class="help-block">{{:: ts('Allows CiviMail authors to easily link to this page') }}</p>
     </div>
 
     <div class="form-group">
@@ -83,56 +84,87 @@
     </div>
 
     <div class="form-group">
-      <div class="form-inline">
-        <label>
-          <input type="checkbox" ng-checked="editor.afform.contact_summary" ng-click="editor.toggleContactSummary()">
-          {{:: ts('Add to Contact Summary Page') }}
-        </label>
-        <select class="form-control" ng-model="editor.afform.contact_summary" ng-if="editor.afform.contact_summary">
-          <option value="block">{{:: ts('As Block') }}</option>
-          <option value="tab">{{:: ts('As Tab') }}</option>
-        </select>
-      </div>
-      <div class="form-inline" ng-if="editor.afform.contact_summary">
-        <label>{{:: ts('For') }}</label>
-        <input class="form-control" crm-autocomplete="'ContactType'" ng-model="editor.afform.summary_contact_type" auto-open="true" multi="true" crm-autocomplete-params="{key: 'name'}" placeholder="{{:: ts('Any contact type') }}">
-      </div>
-      <p class="help-block" ng-show="editor.afform.contact_summary">
-        {{:: ts('Placement can be configured using the Contact Layout Editor.') }}
-      </p>
+      <label for="afform_placement">
+        {{:: ts('Expose To') }}
+      </label>
+      <input ng-list crm-ui-select="{multiple: true, data: editor.meta.afform_placement, placeholder: ts('None')}" class="form-control" id="afform_placement" ng-model="editor.afform.placement" ng-change="editor.onChangePlacement()">
+      <p class="help-block">{{:: ts('Additional contexts in which the form can be embedded') }}</p>
     </div>
 
-    <div class="form-group">
-      <label>
-        <input type="checkbox" ng-model="editor.afform.is_dashlet">
-        {{:: ts('Add to Dashboard') }}
-      </label>
-      <p class="help-block">{{:: ts('Allow CiviCRM users to add the form to their home dashboard.') }}</p>
+    <div class="form-group" ng-if="editor.afform.placement.includes('contact_summary_block') || editor.afform.placement.includes('contact_summary_tab')">
+      <div class="form-inline">
+        <label for="afform_summary_contact_type">{{:: ts('For') }}</label>
+        <input class="form-control" crm-autocomplete="'ContactType'" id="afform_summary_contact_type" ng-model="editor.afform.summary_contact_type" auto-open="true" multi="true" crm-autocomplete-params="{key: 'name'}" placeholder="{{:: ts('Any contact type') }}">
+      </div>
+      <div class="form-inline">
+        <label for="afform_summary_weight">{{:: ts('Position') }}</label>
+        <input class="form-control" type="number" id="afform_summary_weight" ng-model="editor.afform.summary_weight" placeholder="{{:: ts('Auto') }}">
+      </div>
     </div>
 
   </fieldset>
 
   <!--  Submit actions are only applicable to form types with a submit button (exclude blocks and search forms) -->
   <fieldset ng-if=":: editor.afform.type === 'form'">
-    <legend>{{:: ts('Submit Actions') }}</legend>
+    <legend class="form-inline">
+      {{:: ts('Submissions') }}
+    </legend>
 
-    <div class="form-group" >
-      <label>
-        <input type="checkbox" ng-model="editor.afform.create_submission" >
-        {{:: ts('Log Submissions') }}
+    <p class="form-inline">
+      <label class="radio">
+        <input class="crm-form-radio" type="radio" name="submit_enabled" ng-model="editor.afform.submit_enabled" ng-value="true">
+        {{:: ts('Open') }}
       </label>
-      <p class="help-block">{{:: ts('Keep a log of the date, time, user, and items saved by each form submission.') }}</p>
-    </div>
+      <label class="radio">
+        <input class="crm-form-radio" type="radio" name="submit_enabled" ng-model="editor.afform.submit_enabled" ng-value="false">
+        {{:: ts('Closed') }}
+      </label>
+    </p>
 
-    <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}">
-      <label for="af_config_redirect">
-        {{:: ts('Post-Submit Page') }}
-      </label>
-      <div class="input-group">
-        <input ng-model="editor.afform.redirect" name="redirect" class="form-control" id="af_config_redirect" title="{{:: ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
-        <af-gui-token-select class="input-group-addon" model="editor.afform" field="redirect"></af-gui-token-select>
+    <div ng-if="editor.afform.submit_enabled">
+      <div class="form-group">
+        <label>
+          <input type="checkbox" ng-model="editor.afform.create_submission" ng-class="{'disabled': !!editor.afform.require_email_confirmation}">
+          {{:: ts('Log Submissions') }}
+        </label>
+        <p class="help-block">{{:: ts('Keep a log of the date, time, user, and items saved by each form submission.') }}</p>
       </div>
-      <p class="help-block">{{:: ts('Enter a URL or path that the form should redirect to following a successful submission.') }}</p>
+
+      <div class="form-group" ng-if="editor.afform.create_submission">
+        <label for="submit_limit">{{:: ts('Maximum Submissions') }}</label>
+        <input type="number" min="1" step="1" id="submit_limit" ng-model="editor.afform.submit_limit" placeholder="{{:: ts('Unlimited') }}">
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" ng-model="editor.afform.manual_processing" ng-click="editor.toggleManualProcessing()" ng-class="{'disabled': !!editor.afform.allow_verification_by_email}">
+          {{:: ts('Verify submission before processing') }}
+        </label>
+        <p class="help-block">{{:: ts('The data will need to be processed manually using Form Submission action.') }}</p>
+      </div>
+
+      <div class="form-group" ng-if="!!editor.afform.manual_processing">
+        <label>
+          <input type="checkbox" ng-model="editor.afform.allow_verification_by_email" ng-click="editor.toggleEmailVerification()">
+          {{:: ts('Allow verification by email') }}
+        </label>
+        <p class="help-block">{{:: ts('The data can be processed via email verification. Email field should be included in the form for this functionality.') }}</p>
+        <div class="form-inline" ng-if="editor.afform.allow_verification_by_email">
+          <label>{{:: ts('Email template') }}</label>
+          <input class="form-control" crm-autocomplete="'MessageTemplate'" id="afform_email_confirmation_template_id" ng-model="editor.afform.email_confirmation_template_id" auto-open="true" placeholder="{{:: ts('- select -') }}">
+        </div>
+      </div>
+
+      <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}">
+        <label for="af_config_redirect">
+          {{:: ts('Post-Submit Page') }}
+        </label>
+        <div class="input-group">
+          <input ng-model="editor.afform.redirect" name="redirect" class="form-control" id="af_config_redirect" title="{{:: ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
+          <af-gui-token-select class="input-group-addon" model="editor.afform" field="redirect"></af-gui-token-select>
+        </div>
+        <p class="help-block">{{:: ts('Enter a URL or path that the form should redirect to following a successful submission.') }}</p>
+      </div>
     </div>
   </fieldset>
 </ng-form>

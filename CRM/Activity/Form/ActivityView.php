@@ -26,6 +26,15 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
   public $submitOnce = TRUE;
 
   /**
+   * Used by CRM_Mailing_BAO_Mailing::getMailingContent(), so cannot be removed
+   * (even though at first glance it may look safe)
+   *
+   * @var bool
+   * @internal
+   */
+  public $_mailing_id;
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -42,12 +51,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     }
 
     $session = CRM_Core_Session::singleton();
-    if (!in_array($context, [
-      'home',
-      'dashlet',
-      'dashletFullscreen',
-    ])
-    ) {
+    if (!in_array($context, ['home', 'dashlet', 'dashletFullscreen'])) {
       $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=activity");
     }
     else {
@@ -84,11 +88,11 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     }
 
     // ensure these are set so that they get assigned to the template
-    $values['mailingId'] = $values['mailingId'] ?? NULL;
-    $values['campaign'] = $values['campaign'] ?? NULL;
-    $values['engagement_level'] = $values['engagement_level'] ?? NULL;
+    $values['mailingId'] ??= NULL;
+    $values['campaign'] ??= NULL;
+    $values['engagement_level'] ??= NULL;
     // also this which doesn't get set for bulk emails
-    $values['target_contact_value'] = $values['target_contact_value'] ?? NULL;
+    $values['target_contact_value'] ??= NULL;
 
     // Get the campaign.
     $campaignId = $defaults['campaign_id'] ?? NULL;

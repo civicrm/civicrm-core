@@ -4,13 +4,13 @@
 <fieldset class="crm-search-admin-edit-columns-wrapper">
   <legend>
     {{:: ts('Fields') }}
-    <div ng-if="$ctrl.parent.hiddenColumns.length" ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'" class="btn-group btn-group-xs"></div>
   </legend>
+  <div ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'"></div>
   <p class="help-block">
     {{:: ts("The top-most line will be shown as the searchable title (combine multiple fields using rewrite + tokens).") }}
     {{:: ts("Other lines will be shown below in smaller text, and will not be searchable (except for ID which is always searchable).") }}
   </p>
-  <div class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
+  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend>
         <i class="crm-i fa-arrows crm-search-move-icon"></i>
@@ -37,5 +37,5 @@
       </div>
       <search-admin-icons item="col" ng-if="!$index"></search-admin-icons>
     </fieldset>
-  </div>
+  </fieldset>
 </fieldset>

@@ -23,7 +23,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   /**
    * Testing Activity Generation through Entity Recursion.
    */
-  public function testActivityGeneration() {
+  public function testActivityGeneration(): void {
     //Activity set initial params
     $daoActivity = new CRM_Activity_DAO_Activity();
     $daoActivity->activity_type_id = 1;
@@ -84,7 +84,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
    */
   private function createActionSchedule($entity_id, $entity_table) {
     $params = [
-      'title' => 'My Reminder',
+      'name' => 'repeat_' . $entity_table . '_' . $entity_id,
       "used_for" => $entity_table,
       "entity_value" => $entity_id,
       "start_action_date" => date("YmdHis"),
@@ -144,7 +144,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   /**
    * Testing Event Generation through Entity Recursion.
    */
-  public function testEventGeneration() {
+  public function testEventGeneration(): void {
     //Event set initial params
     $daoEvent = new CRM_Event_DAO_Event();
     $daoEvent->title = 'Test event for Recurring Entity';
@@ -294,7 +294,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   /**
    * Testing Activity Generation through Entity Recursion with Custom Data and Tags.
    */
-  public function testRecurringEntityGenerationWithCustomDataAndTags() {
+  public function testRecurringEntityGenerationWithCustomDataAndTags(): void {
 
     // Create custom group and field
     $customGroup = $this->customGroupCreate([
@@ -373,7 +373,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   /**
    * Testing Activity Generation through Entity Recursion with minute units.
    */
-  public function testRecurringEntityGenerationWithMinuteUnit() {
+  public function testRecurringEntityGenerationWithMinuteUnit(): void {
     // Create original activity
     $activityDateTime = '2021-11-11 15:00:00';
     $activityId = $this->activityCreate([

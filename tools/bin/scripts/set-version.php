@@ -82,14 +82,22 @@ updateFile("sql/test_data_second_domain.mysql", function ($content) use ($newVer
   return str_replace($oldVersion, $newVersion, $content);
 });
 
-// Update core extension info
-$infoXmls = findCoreInfoXml();
+updateFile("js/version.json", function () use ($newVersion) {
+  return json_encode($newVersion) . "\n";
+});
+
+// Update core extensions if this is a stable release
+$infoXmls = isPreReleaseIncrement($newVersion) ? [] : findCoreInfoXml();
 foreach ($infoXmls as $infoXml) {
   updateXmlFile($infoXml, function (DOMDocument $dom) use ($newVersion) {
     // Update extension version
     /** @var \DOMNode $tag */
     foreach ($dom->getElementsByTagName('version') as $tag) {
       $tag->textContent = $newVersion;
+    }
+    // Update release date
+    foreach ($dom->getElementsByTagName('releaseDate') as $tag) {
+      $tag->textContent = date('Y-m-d');
     }
     // Update compatability - set to major version of core
     /** @var \DOMNode $compat */
@@ -102,9 +110,12 @@ foreach ($infoXmls as $infoXml) {
   });
 }
 
+// Update deleted-files-list.json
+`php tools/scripts/generate-deleted-files-list.php`;
+
 if ($doCommit) {
   $files = array_filter(
-    array_merge(['xml/version.xml', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, $sqlFile], $infoXmls),
+    array_merge(['xml/version.xml', 'js/version.json', 'deleted-files-list.json', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, $sqlFile], $infoXmls),
     function($file) {
       return $file && file_exists($file);
     }
@@ -186,6 +197,10 @@ function makeVerName($version) {
 
 function isVersionValid($v) {
   return $v && preg_match('/^[0-9a-z\.\-]+$/', $v);
+}
+
+function isPreReleaseIncrement(string $v): bool {
+  return (bool) preg_match('/(alpha|beta)/', $v) && !preg_match('/(beta1|alpha1)$/', $v);
 }
 
 /**

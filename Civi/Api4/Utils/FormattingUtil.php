@@ -80,16 +80,16 @@ class FormattingUtil {
    * This is used by read AND write actions (Get, Create, Update, Replace)
    *
    * @param $value
-   * @param string|null $fieldName
+   * @param string|null $fieldPath
    * @param array $fieldSpec
    * @param array $params
    * @param string|null $operator (only for 'get' actions)
    * @param null $index (for recursive loops)
    * @throws \CRM_Core_Exception
    */
-  public static function formatInputValue(&$value, ?string $fieldName, array $fieldSpec, array $params = [], &$operator = NULL, $index = NULL) {
+  public static function formatInputValue(&$value, ?string $fieldPath, array $fieldSpec, array $params = [], &$operator = NULL, $index = NULL) {
     // Evaluate pseudoconstant suffix
-    $suffix = str_replace(':', '', strstr(($fieldName ?? ''), ':'));
+    $suffix = str_replace(':', '', strstr(($fieldPath ?? ''), ':'));
     $fk = $fieldSpec['name'] == 'id' ? $fieldSpec['entity'] : $fieldSpec['fk_entity'] ?? NULL;
 
     // Handle special 'current_domain' option. See SpecFormatter::getOptions
@@ -113,14 +113,14 @@ class FormattingUtil {
 
     // Convert option list suffix to value
     if ($suffix) {
-      $options = self::getPseudoconstantList($fieldSpec, $fieldName, $params, $operator ? 'get' : 'create');
+      $options = self::getPseudoconstantList($fieldSpec, $fieldPath, $params, $operator ? 'get' : 'create');
       $value = self::replacePseudoconstant($options, $value, TRUE);
       return;
     }
     elseif (is_array($value)) {
       $i = 0;
       foreach ($value as &$val) {
-        self::formatInputValue($val, $fieldName, $fieldSpec, $params, $operator, $i++);
+        self::formatInputValue($val, $fieldPath, $fieldSpec, $params, $operator, $i++);
       }
       return;
     }
@@ -144,7 +144,7 @@ class FormattingUtil {
     }
 
     $hic = \CRM_Utils_API_HTMLInputCoder::singleton();
-    if (is_string($value) && $fieldName && !$hic->isSkippedField($fieldSpec['name'])) {
+    if (is_string($value) && $fieldPath && !$hic->isSkippedField($fieldSpec['name'])) {
       $value = $hic->encodeValue($value);
     }
   }
@@ -232,17 +232,22 @@ class FormattingUtil {
       }
     }
     foreach ($result as $key => $value) {
+      // Skip null values or values that have already been unset by `formatOutputValue` functions
+      if (!isset($result[$key])) {
+        continue;
+      }
       $fieldExpr = SqlExpression::convert($selectAliases[$key] ?? $key);
-      $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields() ?? '');
+      $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields());
       $baseName = $fieldName ? \CRM_Utils_Array::first(explode(':', $fieldName)) : NULL;
       $field = $fields[$fieldName] ?? $fields[$baseName] ?? NULL;
       $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
-      // Allow Sql Functions to do special formatting and/or alter the $dataType
+      // Allow Sql Functions to alter the value and/or $dataType
       if (method_exists($fieldExpr, 'formatOutputValue') && is_string($value)) {
-        $result[$key] = $value = $fieldExpr->formatOutputValue($value, $dataType);
+        $fieldExpr->formatOutputValue($dataType, $result, $key);
+        $value = $result[$key];
       }
       if (!empty($field['output_formatters'])) {
-        self::applyFormatters($result, $fieldName, $field, $value);
+        self::applyFormatters($result, $fieldExpr, $field, $value);
         $dataType = NULL;
       }
       // Evaluate pseudoconstant suffixes
@@ -340,15 +345,34 @@ class FormattingUtil {
    * Apply a field's output_formatters callback functions
    *
    * @param array $result
-   * @param string $fieldPath
-   * @param array $field
+   * @param \Civi\Api4\Query\SqlExpression $fieldExpr
+   * @param array $fieldDefn
    * @param mixed $value
    */
-  private static function applyFormatters(array $result, string $fieldPath, array $field, &$value) {
-    $row = self::filterByPath($result, $fieldPath, $field['name']);
+  private static function applyFormatters(array $result, SqlExpression $fieldExpr, array $fieldDefn, &$value): void {
+    $fieldPath = \CRM_Utils_Array::first($fieldExpr->getFields());
+    $row = self::filterByPath($result, $fieldPath, $fieldDefn['name']);
 
-    foreach ($field['output_formatters'] as $formatter) {
-      $formatter($value, $row, $field);
+    // For aggregated array data, apply the formatter to each item
+    if (is_array($value) && $fieldExpr->getType() === 'SqlFunction' && $fieldExpr::getCategory() === 'aggregate') {
+      foreach ($value as $index => &$val) {
+        $subRow = $row;
+        foreach ($row as $rowKey => $rowValue) {
+          if (is_array($rowValue) && array_key_exists($index, $rowValue)) {
+            $subRow[$rowKey] = $rowValue[$index];
+          }
+        }
+        self::applyFormatter($fieldDefn, $subRow, $val);
+      }
+    }
+    else {
+      self::applyFormatter($fieldDefn, $row, $value);
+    }
+  }
+
+  private static function applyFormatter(array $fieldDefn, array $row, &$value): void {
+    foreach ($fieldDefn['output_formatters'] as $formatter) {
+      $formatter($value, $row, $fieldDefn);
     }
   }
 
@@ -377,9 +401,16 @@ class FormattingUtil {
         case 'Float':
           return (float) $value;
 
+        case 'Timestamp':
         case 'Date':
+          // Convert mysql-style default to api-style default
+          if (str_contains($value, 'CURRENT_TIMESTAMP')) {
+            return 'now';
+          }
           // Strip time from date-only fields
-          return substr($value, 0, 10);
+          if ($dataType === 'Date' && $value) {
+            return substr($value, 0, 10);
+          }
       }
     }
     return $value;
@@ -394,7 +425,10 @@ class FormattingUtil {
    *   Path at which these fields are found, e.g. "address.contact."
    * @return array
    */
-  public static function contactFieldsToRemove($contactType, $prefix) {
+  public static function contactFieldsToRemove($contactType, $prefix): array {
+    if (!$contactType || !is_string($contactType)) {
+      return [];
+    }
     if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__][$contactType])) {
       \Civi::$statics[__CLASS__][__FUNCTION__][$contactType] = [];
       foreach (\CRM_Contact_DAO_Contact::fields() as $field) {

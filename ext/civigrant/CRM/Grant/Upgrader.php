@@ -35,4 +35,11 @@ class CRM_Grant_Upgrader extends CRM_Extension_Upgrader_Base {
       ->execute();
   }
 
+  public function upgrade_1001(): bool {
+    $this->ctx->log->info('Applying Update 1001 - fixing database column for grant_report_received to default to 0 and be required');
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_grant SET grant_report_received = 0 WHERE grant_report_received IS NULL");
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_grant CHANGE `grant_report_received` `grant_report_received` tinyint NOT NULL DEFAULT 0 COMMENT 'Yes/No field stating whether grant report was received by donor.'");
+    return TRUE;
+  }
+
 }

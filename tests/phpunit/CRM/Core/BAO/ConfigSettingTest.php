@@ -15,7 +15,7 @@
  */
 class CRM_Core_BAO_ConfigSettingTest extends CiviUnitTestCase {
 
-  public function testToggleComponent() {
+  public function testToggleComponent(): void {
     $origNames = [];
     foreach (CRM_Core_Component::getEnabledComponents() as $c) {
       $origNames[] = $c->name;

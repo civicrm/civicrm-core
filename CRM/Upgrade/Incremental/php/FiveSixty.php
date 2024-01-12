@@ -56,7 +56,7 @@ class CRM_Upgrade_Incremental_php_FiveSixty extends CRM_Upgrade_Incremental_Base
     CRM_Core_DAO::executeQuery($commentQuery);
 
     // Set job_id = NULL for any that don't have matching jobs (ie. job was deleted).
-    $updateQuery = 'UPDATE civicrm_job_log job_log LEFT JOIN civicrm_job job ON job.id = job_log.id SET job_id = NULL WHERE job.id IS NULL';
+    $updateQuery = 'UPDATE civicrm_job_log job_log LEFT JOIN civicrm_job job ON job.id = job_log.job_id SET job_id = NULL WHERE job.id IS NULL';
     CRM_Core_DAO::executeQuery($updateQuery);
 
     // Add the foreign key

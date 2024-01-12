@@ -45,6 +45,7 @@
 
 - github      : AHowiller
   name        : Andreas Howiller
+  organization: civiservice.de
 
 - github      : ajdavis
   name        : A. Jesse Jiryu Davis
@@ -197,6 +198,10 @@
   name        : Bastien Ho
   organization: N.O.U.S. Open Usefull and Simple
 
+- github      : bb
+  name        : Benjamin Bock
+  organization: European Centre for Press and Media Freedom (ECPMF)
+
 - github      : bdpfreizeiten
   name        : David Geisel
   organization: Bund Deutscher PfadfinderInnen BaWue
@@ -255,6 +260,8 @@
   name        : Joan Cervan Andreu
   organization: calbasi.net
 
+- github      : cdhassell
+
 - name        : Cath O'Connell
 
 - github      : chagrawil
@@ -275,6 +282,10 @@
 
 - name        : Cheryl Chase
   organization: Mathias Consulting
+
+- github      : chriscant
+  organization: PHD Computer Consultants Ltd
+  name        : Chris Cant
 
 - github      : chrisgaraffa
   name        : Chris Garaffa
@@ -378,7 +389,10 @@
 
 - github      : detsieber
   name        : Detlev Sieber
-  organization: Digitalcourage
+  organization: civiservice.de
+
+- github      : devappsoftware
+  organization: DevApp
 
 - github      : devarun
   name        : Arun Singh
@@ -976,7 +990,8 @@
 - name        : Manish Zope
 
 - github      : mariav0
-  name        : Maria
+  name        : Maria Vogel
+  organization: civiservice.de
 
 - github      : marcusjwilson
   name        : Marcus J Wilson
@@ -1066,6 +1081,9 @@
 
 - name        : Mick Collopy
 
+- github      : midtsveen
+  name        : Erik Midtsveen
+
 - github      : mihaelmladenov
   name        : Mihael Mladenov
 
@@ -1092,6 +1110,10 @@
 - github      : mlutfy
   name        : Mathieu Lutfy
   organization: Coop SymbioTIC
+
+  github      : 19ATf72
+  name        : Micah Hobby
+  organization: Circle Interactive
 
 - github      : michau
   name        : Michal Mach
@@ -1211,6 +1233,9 @@
 - github      : prondubuisi
   name        : Onyemenam Ndubuisi
 
+- github      : PrzemyslawTabor
+  name        : Przemysław Tabor
+
 - name        : Richard Edgar
 
 - github      : ogomez78
@@ -1280,6 +1305,8 @@
 
 - github      : quimgil
   name        : Quim Gil
+
+- github      : ranjit-git
 
 - name        : Rareș Pamfil
 
@@ -1414,10 +1441,6 @@
   name        : Sean Madsen
   organization: Left Join Labs
 
-- github      : sebalis
-  name        : Sebastian Lisken
-  organization: civiservice.de
-
 - github      : semseysandor
   name        : Sandor Semsey
   organization: Reflexive Communications
@@ -1505,6 +1528,12 @@
 
 - name        : Bashar Makhay
 
+- github      : technomaz
+  name        : Mark 
+
+- github      : TomRosenbloom
+  name        : Tom Rosenbloom
+
 - github      : trakos
   name        : Piotr Stankowski
 
@@ -1527,6 +1556,7 @@
 
 - github      : TobiasVoigt
   name        : Tobias Voigt
+  organization: civiservice.de
 
 - name        : Thomas Mannell
   organization: Registered Nurses' Association of Ontario
@@ -1607,6 +1637,10 @@
   name        : Vinu Varshith Sekar
   organization: CompuCorp
 
+- github      : vinay-osseed
+  name        : Vinay Gawade
+  organization: OSSeed Technologies LLP
+
 - github      : vinuvarshith
   name        : Vinu Varshith Sekar
   organization: CompuCorp
@@ -1672,6 +1706,8 @@
 - name        : Philipp Michael
   organization: XIMA
 
+- github      : xavi-xaloc
+
 - github      : xurizaemon
   name        : Chris Burgess
 
@@ -1700,6 +1736,8 @@
 
 - github      : YesusHDS
 
+- github      : yurg
+
 - github      : Toby-fz
   name        : Toby Messerli
   organization: Fuzion
@@ -1717,3 +1755,5 @@
   organization: Fuzion
 
 - github      : ziljah
+
+- github      : 19ATF72

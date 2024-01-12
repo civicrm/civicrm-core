@@ -591,6 +591,40 @@ abstract class CRM_Core_Payment {
       case 'contributionPageContinueText':
         return ts('Click the <strong>Continue</strong> button to proceed with the payment.');
 
+      case 'contributionPageConfirmText':
+        if ($params['amount'] <= 0.0) {
+          return '';
+        }
+        if ((int) $this->_paymentProcessor['billing_mode'] !== 4) {
+          return ts('Your contribution will not be completed until you click the <strong>%1</strong> button. Please click the button one time only.', [1 => ts('Make Contribution')]);
+        }
+        return '';
+
+      case 'contributionPageButtonText':
+        if ($params['amount'] <= 0.0 || (int) $this->_paymentProcessor['billing_mode'] === 4) {
+          return ts('Continue');
+        }
+        if ($params['is_payment_to_existing']) {
+          return ts('Make Payment');
+        }
+        return ts('Make Contribution');
+
+      case 'eventContinueText':
+        // This use of the ts function uses the legacy interpolation of the button name to avoid translations having to be re-done.
+        if ((int) $this->_paymentProcessor['billing_mode'] === self::BILLING_MODE_NOTIFY) {
+          return ts('Click <strong>%1</strong> to checkout with %2.', [1 => ts('Register'), 2 => $this->_paymentProcessor['frontend_title']]);
+        }
+        return ts('Click <strong>%1</strong> to complete your registration.', [1 => ts('Register')]);
+
+      case 'eventConfirmText':
+        if ((int) $this->_paymentProcessor['billing_mode'] === self::BILLING_MODE_NOTIFY) {
+          return ts('Your registration payment has been submitted to %1 for processing', [1 => $this->_paymentProcessor['frontend_title']]);
+        }
+        return '';
+
+      case 'eventConfirmEmailText':
+        return ts('A registration confirmation email will be sent to %1 once the transaction is processed successfully.', [1 => $params['email']]);
+
       case 'cancelRecurDetailText':
         if ($params['mode'] === 'auto_renew') {
           return ts('Click the button below if you want to cancel the auto-renewal option for your %1 membership. This will not cancel your membership. However you will need to arrange payment for renewal when your membership expires.',
@@ -1478,13 +1512,14 @@ abstract class CRM_Core_Payment {
   /**
    * Refunds payment
    *
-   * Payment processors should set payment_status_id if it set the status to Refunded in case the transaction is successful
-   *
    * @param array $params
    *
-   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   * @return array
+   *   Result array (containing at least the key refund_status)
    */
-  public function doRefund(&$params) {}
+  public function doRefund(&$params) {
+    return ['refund_status' => 'Completed'];
+  }
 
   /**
    * Query payment processor for details about a transaction.
@@ -1526,15 +1561,11 @@ abstract class CRM_Core_Payment {
       return FALSE;
     }
 
-    if (isset($_GET['payment_date']) &&
+    return (isset($_GET['payment_date']) &&
       isset($_GET['merchant_return_link']) &&
       ($_GET['payment_status'] ?? NULL) == 'Completed' &&
       $paymentProcessor['payment_processor_type'] == "PayPal_Standard"
-    ) {
-      return TRUE;
-    }
-
-    return FALSE;
+    );
   }
 
   /**
@@ -1851,6 +1882,20 @@ abstract class CRM_Core_Payment {
    */
   protected function supportsChangeSubscriptionAmount() {
     return method_exists(CRM_Utils_System::getClassName($this), 'changeSubscriptionAmount');
+  }
+
+  /**
+   * Checks if payment processor supports not returning to the form processing.
+   *
+   * The exists to support historical event form logic where emails are sent
+   * & the form postProcess hook is called before redirecting the browser where
+   * the user is redirected.
+   *
+   * @return bool
+   */
+  public function supportsNoReturn(): bool {
+    $billingMode = (int) $this->_paymentProcessor['billing_mode'];
+    return $billingMode === self::BILLING_MODE_NOTIFY || $billingMode === self::BILLING_MODE_BUTTON;
   }
 
   /**

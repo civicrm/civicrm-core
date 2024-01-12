@@ -1,7 +1,0 @@
-{
-    "type": "search",
-    "title": "Manage Scheduled Jobs",
-    "icon": "fa-list-alt",
-    "server_route": "civicrm/admin/job",
-    "permission": "access CiviCRM"
-}

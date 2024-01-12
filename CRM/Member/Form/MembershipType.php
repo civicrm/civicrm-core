@@ -23,6 +23,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
   use CRM_Core_Form_EntityFormTrait;
 
+  protected $submittableMoneyFields = ['minimum_fee'];
+
   /**
    * Set entity fields to be assigned to the form.
    */
@@ -53,7 +55,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       'auto_renew' => [
         'name' => 'auto_renew',
         'options' => CRM_Core_SelectValues::memberAutoRenew(),
-        'place_holder' => ts('You will need to select and configure a supported payment processor (currently Authorize.Net, PayPal Pro, or PayPal Website Standard) in order to offer automatically renewing memberships.'),
+        // Note this doesn't get used currently because the template has its own code for this field. Note also the documentation link that you see in the template is added later here down below.
+        'description' => ts('You will need to select and configure a supported payment processor (currently Authorize.Net, PayPal Pro, or PayPal Website Standard) in order to offer automatically renewing memberships.'),
       ],
       'duration_interval' => [
         'name' => 'duration_interval',
@@ -99,7 +102,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
     if (!CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(['Recurring'])) {
       $this->entityFields['auto_renew']['not-auto-addable'] = TRUE;
-      $this->entityFields['auto_renew']['documentation_link'] = ['page' => 'user/contributions/payment-processors'];
+      $this->entityFields['auto_renew']['documentation_link'] = ['page' => 'user/contributions/payment-processors', 'resource' => ''];
     }
   }
 
@@ -286,7 +289,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       $errors['financial_type_id'] = ts('Please enter the financial Type.');
     }
 
-    if (empty($params['duration_interval']) and $params['duration_unit'] != 'lifetime') {
+    if (empty($params['duration_interval']) and $params['duration_unit'] !== 'lifetime') {
       $errors['duration_interval'] = ts('Please enter a duration interval.');
     }
 
@@ -294,15 +297,15 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       1,
       2,
     ])) {
-      if (($params['duration_interval'] > 1 && $params['duration_unit'] == 'year') ||
-        ($params['duration_interval'] > 12 && $params['duration_unit'] == 'month')
+      if (($params['duration_interval'] > 1 && $params['duration_unit'] === 'year') ||
+        ($params['duration_interval'] > 12 && $params['duration_unit'] === 'month')
       ) {
         $errors['duration_unit'] = ts('Automatic renewals are not supported by the currently available payment processors when the membership duration is greater than 1 year / 12 months.');
       }
     }
 
-    if ($params['period_type'] == 'fixed' &&
-      $params['duration_unit'] == 'day'
+    if ($params['period_type'] === 'fixed' &&
+      $params['duration_unit'] === 'day'
     ) {
       $errors['period_type'] = ts('Period type should be Rolling when duration unit is Day');
     }
@@ -361,11 +364,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       CRM_Core_Session::setStatus(ts('Selected membership type has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
-      $params = $this->exportValues();
-
-      if ($params['minimum_fee']) {
-        $params['minimum_fee'] = CRM_Utils_Rule::cleanMoney($params['minimum_fee']);
-      }
+      $params = $this->getSubmittedValues();
 
       $hasRelTypeVal = FALSE;
       if (!CRM_Utils_System::isNull($params['relationship_type_id'])) {

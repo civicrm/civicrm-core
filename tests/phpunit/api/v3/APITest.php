@@ -19,7 +19,7 @@ class api_v3_APITest extends CiviUnitTestCase {
 
   protected $_apiversion = 3;
 
-  public function testAPIReplaceVariables() {
+  public function testAPIReplaceVariables(): void {
     $result = [];
     $result['testfield'] = 6;
     $result['api.tag.get'] = 999;
@@ -52,7 +52,7 @@ class api_v3_APITest extends CiviUnitTestCase {
   /**
    * Test that error doesn't occur for non-existent file.
    */
-  public function testAPIWrapperIncludeNoFile() {
+  public function testAPIWrapperIncludeNoFile(): void {
     $this->callAPIFailure(
       'RandomFile',
       'get',
@@ -61,18 +61,18 @@ class api_v3_APITest extends CiviUnitTestCase {
     );
   }
 
-  public function testAPIWrapperCamelCaseFunction() {
+  public function testAPIWrapperCamelCaseFunction(): void {
     $this->callAPISuccess('OptionGroup', 'Get', []);
   }
 
-  public function testAPIWrapperLcaseFunction() {
+  public function testAPIWrapperLcaseFunction(): void {
     $this->callAPISuccess('OptionGroup', 'get', []);
   }
 
   /**
    * Test resolver.
    */
-  public function testAPIResolver() {
+  public function testAPIResolver(): void {
     $oldPath = get_include_path();
     set_include_path($oldPath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
 
@@ -86,7 +86,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     set_include_path($oldPath);
   }
 
-  public function testFromCamel() {
+  public function testFromCamel(): void {
     $cases = [
       'Contribution' => 'contribution',
       'contribution' => 'contribution',
@@ -103,7 +103,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     }
   }
 
-  public function testToCamel() {
+  public function testToCamel(): void {
     $cases = [
       'Contribution' => 'Contribution',
       'contribution' => 'Contribution',
@@ -122,7 +122,7 @@ class api_v3_APITest extends CiviUnitTestCase {
   /**
    * Test that calling via wrapper works.
    */
-  public function testv3Wrapper() {
+  public function testv3Wrapper(): void {
     try {
       $result = civicrm_api3('contact', 'get', []);
     }
@@ -136,7 +136,7 @@ class api_v3_APITest extends CiviUnitTestCase {
   /**
    * Test exception is thrown.
    */
-  public function testV3WrapperException() {
+  public function testV3WrapperException(): void {
     try {
       civicrm_api3('contact', 'create', ['debug' => 1]);
     }
@@ -153,7 +153,7 @@ class api_v3_APITest extends CiviUnitTestCase {
   /**
    * Test result parsing for null.
    */
-  public function testCreateNoStringNullResult() {
+  public function testCreateNoStringNullResult(): void {
     // create an example contact
     // $contact = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage')->toArray();
     $result = $this->callAPISuccess('ContributionPage', 'create', [

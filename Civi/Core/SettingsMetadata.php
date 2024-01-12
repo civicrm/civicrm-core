@@ -155,7 +155,7 @@ class SettingsMetadata {
       // but it's tightly coupled to DAO/field. However, if you really need to support
       // more pseudoconstant types, then probably best to refactor it. For now, KISS.
       if (!empty($pseudoconstant['optionGroupName'])) {
-        $keyColumn = \CRM_Utils_Array::value('keyColumn', $pseudoconstant, 'value');
+        $keyColumn = $pseudoconstant['keyColumn'] ?? 'value';
         if (is_array($optionsFormat)) {
           $optionValues = \CRM_Core_OptionValue::getValues(['name' => $pseudoconstant['optionGroupName']]);
           foreach ($optionValues as $option) {

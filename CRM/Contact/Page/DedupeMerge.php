@@ -42,7 +42,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     $limit = CRM_Utils_Request::retrieveValue('limit', 'Positive');
     $action = CRM_Utils_Request::retrieveValue('action', 'String');
     $mode = CRM_Utils_Request::retrieveValue('mode', 'String', 'safe');
-    $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $null, FALSE, '{}');
+    $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', NULL, FALSE, '{}');
 
     $urlQry = [
       'reset' => 1,

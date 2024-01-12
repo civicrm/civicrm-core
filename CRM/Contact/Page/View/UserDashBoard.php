@@ -19,7 +19,7 @@
  * This class is used to build User Dashboard
  */
 class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
-  public $_contactId = NULL;
+  public $_contactId;
 
   /**
    * Always show public groups.
@@ -34,7 +34,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
    *
    * @var array
    */
-  public static $_links = NULL;
+  public static $_links;
 
   /**
    * @throws Exception
@@ -126,7 +126,10 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       }
     }
 
-    // CRM-16512 - Hide related contact table if user lacks permission to view self
+    // Relationship section
+    // FIXME - this used to share code with the contact summary "Relationships" tab
+    // now that tab has been switched to use SearchKit, and this ought to be switched as well;
+    // then remove all code commented with "only-used-by-user-dashboard"
     if (!empty($dashboardOptions['Permissioned Orgs']) && CRM_Core_Permission::check('view my contact')) {
       $columnHeaders = CRM_Contact_BAO_Relationship::getColumnHeaders();
       $contactRelationships = $selector = NULL;
@@ -149,7 +152,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
         'sectionTitle' => ts('Personal Campaign Pages'),
         'weight' => 40,
       ];
-      list($pcpBlock, $pcpInfo) = CRM_PCP_BAO_PCP::getPcpDashboardInfo($this->_contactId);
+      [$pcpBlock, $pcpInfo] = CRM_PCP_BAO_PCP::getPcpDashboardInfo((int) $this->_contactId);
       $this->assign('pcpBlock', $pcpBlock);
       $this->assign('pcpInfo', $pcpInfo);
     }

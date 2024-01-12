@@ -42,6 +42,8 @@ class ActionScheduleTest extends Api4TestBase {
     $this->assertEquals('limit', $fields['limit_to']['options'][0]['name']);
     $this->assertEquals('2', $fields['limit_to']['options'][1]['id']);
     $this->assertEquals('add', $fields['limit_to']['options'][1]['name']);
+
+    $this->assertEquals(['name', 'label', 'icon'], $fields['mapping_id']['suffixes']);
   }
 
   public function testGetFieldsForActivity(): void {

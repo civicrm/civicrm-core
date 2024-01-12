@@ -141,7 +141,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
     else {
       // store the submitted values in an array
       $params = $this->exportValues();
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+      $params['is_active'] ??= FALSE;
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->_id;
@@ -159,8 +159,8 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       $params['contact_type_a'] = $cTypeA[0];
       $params['contact_type_b'] = $cTypeB[0];
 
-      $params['contact_sub_type_a'] = $cTypeA[1] ? $cTypeA[1] : 'null';
-      $params['contact_sub_type_b'] = $cTypeB[1] ? $cTypeB[1] : 'null';
+      $params['contact_sub_type_a'] = $cTypeA[1] ?: 'null';
+      $params['contact_sub_type_b'] = $cTypeB[1] ?: 'null';
 
       if (!strlen(trim($params['label_b_a'] ?? ''))) {
         $params['label_b_a'] = $params['label_a_b'] ?? NULL;

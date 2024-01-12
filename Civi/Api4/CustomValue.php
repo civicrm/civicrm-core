@@ -29,6 +29,17 @@ class CustomValue {
   /**
    * @param string $customGroup
    * @param bool $checkPermissions
+   * @return \Civi\Api4\Generic\AutocompleteAction
+   * @throws \API_Exception
+   */
+  public static function autocomplete(string $customGroup, $checkPermissions = TRUE) {
+    return (new \Civi\Api4\Generic\AutocompleteAction("Custom_$customGroup", __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Get
    * @throws \CRM_Core_Exception
    */
@@ -45,6 +56,16 @@ class CustomValue {
    */
   public static function getFields($customGroup = NULL, $checkPermissions = TRUE) {
     return (new Action\CustomValue\GetFields($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param string $customGroup
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\GetLinks
+   */
+  public static function getLinks($customGroup = NULL, $checkPermissions = TRUE) {
+    return (new \Civi\Api4\Action\GetLinks("Custom_$customGroup", __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -136,6 +157,13 @@ class CustomValue {
   }
 
   /**
+   * @return \CRM_Core_DAO|string|null
+   */
+  protected static function getDaoName(): ?string {
+    return 'CRM_Core_BAO_CustomValue';
+  }
+
+  /**
    * @see \Civi\Api4\Generic\AbstractEntity::getInfo()
    * @return array
    */
@@ -145,7 +173,7 @@ class CustomValue {
       'type' => ['CustomValue', 'DAOEntity'],
       'searchable' => 'secondary',
       'primary_key' => ['id'],
-      'dao' => 'CRM_Core_BAO_CustomValue',
+      'dao' => self::getDaoName(),
       'see' => [
         'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
         '\Civi\Api4\CustomGroup',

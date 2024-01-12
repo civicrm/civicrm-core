@@ -140,6 +140,7 @@ class CRM_Core_CodeGen_Specification {
       $tables[$name]['foreignKey'][$fkey]['className'] = $classNames[$ftable];
       $tables[$name]['foreignKey'][$fkey]['fileName'] = str_replace('_', '/', $classNames[$ftable]) . '.php';
       $tables[$name]['fields'][$fkey]['FKClassName'] = $classNames[$ftable];
+      $tables[$name]['fields'][$fkey]['FKColumnName'] = $tables[$name]['foreignKey'][$fkey]['key'];
     }
   }
 
@@ -296,8 +297,10 @@ class CRM_Core_CodeGen_Specification {
           $this->getDynamicForeignKey($foreignXML, $dynamicForeign, $name);
         }
       }
-      if (!empty($dynamicForeign)) {
-        $table['dynamicForeignKey'] = $dynamicForeign;
+      $table['dynamicForeignKey'] = $dynamicForeign;
+      foreach ($dynamicForeign as $dfk) {
+        $fields[$dfk['idColumn']]['FKColumnName'] = $dfk['key'];
+        $fields[$dfk['idColumn']]['DFKEntityColumn'] = $dfk['typeColumn'];
       }
     }
 
@@ -344,7 +347,7 @@ class CRM_Core_CodeGen_Specification {
       case 'decimal':
         $length = $fieldXML->length ? $fieldXML->length : '20,2';
         $field['sqlType'] = 'decimal(' . $length . ')';
-        $field['crmType'] = 'CRM_Utils_Type::T_MONEY';
+        $field['crmType'] = $this->value('crmType', $fieldXML, 'CRM_Utils_Type::T_MONEY');
         $field['precision'] = $length . ',';
         break;
 
@@ -391,7 +394,7 @@ class CRM_Core_CodeGen_Specification {
     $field['usage'] = array_merge(array_fill_keys(['import', 'export', 'duplicate_matching'], $import), $usage);
     // Usage for tokens has not historically been in the metadata so we can default to FALSE.
     // historically hard-coded lists have been used.
-    $field['usage']['token'] = $field['usage']['token'] ?? 'FALSE';
+    $field['usage']['token'] ??= 'FALSE';
     $field['import'] = $field['usage']['import'];
     $field['export'] = $export ?? $import;
     $field['rule'] = $this->value('rule', $fieldXML);
@@ -497,6 +500,10 @@ class CRM_Core_CodeGen_Specification {
       if (!isset($field['pseudoconstant']['optionEditPath']) && !empty($field['pseudoconstant']['optionGroupName'])) {
         $field['pseudoconstant']['optionEditPath'] = 'civicrm/admin/options/' . $field['pseudoconstant']['optionGroupName'];
       }
+      // Set suffixes if explicitly declared
+      if (!empty($fieldXML->pseudoconstant->suffixes)) {
+        $field['pseudoconstant']['suffixes'] = explode(',', $this->value('suffixes', $fieldXML->pseudoconstant));
+      }
       // For now, fields that have option lists that are not in the db can simply
       // declare an empty pseudoconstant tag and we'll add this placeholder.
       // That field's BAO::buildOptions fn will need to be responsible for generating the option list
@@ -548,11 +555,7 @@ class CRM_Core_CodeGen_Specification {
    */
   private function getPhpNullable($fieldXML) {
     $required = $this->value('required', $fieldXML);
-    if ($required) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return !$required;
   }
 
   /**
@@ -737,7 +740,7 @@ class CRM_Core_CodeGen_Specification {
     $foreignKey = [
       'idColumn' => trim($foreignXML->idColumn),
       'typeColumn' => trim($foreignXML->typeColumn),
-      'key' => trim($this->value('key', $foreignXML) ?? ''),
+      'key' => trim($this->value('key', $foreignXML) ?? 'id'),
     ];
     $dynamicForeignKeys[] = $foreignKey;
   }

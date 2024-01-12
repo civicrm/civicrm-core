@@ -49,7 +49,7 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
     parent::setUp();
   }
 
-  public function testEmailReplace() {
+  public function testEmailReplace(): void {
     $cid1 = Contact::create()
       ->addValue('first_name', 'Lotsa')
       ->addValue('last_name', 'Emails')
@@ -105,7 +105,7 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('nosomany@example.com', $c2email['email']);
   }
 
-  public function testCustomValueReplace() {
+  public function testCustomValueReplace(): void {
     $customGroup = CustomGroup::create(FALSE)
       ->addValue('title', 'replaceTest')
       ->addValue('extends', 'Contact')

@@ -249,7 +249,7 @@ trait AddressingTrait {
    * @see \Civi\WorkflowMessage\Traits\ReflectiveWorkflowTrait::import
    */
   protected function importExtraEnvelope_toAddress(array &$values): void {
-    if (array_key_exists('toEmail', $values) || array_key_exists('toName', $values)) {
+    if (isset($values['toEmail']) || isset($values['toName'])) {
       $this->setTo(['name' => $values['toName'] ?? NULL, 'email' => $values['toEmail'] ?? NULL]);
       unset($values['toName']);
       unset($values['toEmail']);

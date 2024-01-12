@@ -52,7 +52,7 @@ class ManagedEntitySpecProvider extends \Civi\Core\Service\AutoService implement
       ->setDescription(ts('Name of extension which provides this package'))
       ->setType('Extra')
       ->setReadonly(TRUE)
-      ->setOptionsCallback(['CRM_Core_PseudoConstant', 'getExtensions'])
+      ->setOptionsCallback(['CRM_Core_BAO_Managed', 'getBaseModules'])
       ->setSqlRenderer([__CLASS__, 'renderBaseModule']);
     $spec->addFieldSpec($field);
 

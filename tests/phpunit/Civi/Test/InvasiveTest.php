@@ -13,7 +13,7 @@ namespace Civi\Test;
 
 class InvasiveTest extends \CiviUnitTestCase {
 
-  public function testPrivate() {
+  public function testPrivate(): void {
     $tgt = new InvasiveExample();
     $this->assertEquals(10, Invasive::get([$tgt, 'privateField']));
     $this->assertEquals(10, Invasive::call([$tgt, 'getPrivateField']));
@@ -25,7 +25,7 @@ class InvasiveTest extends \CiviUnitTestCase {
     $this->assertEquals(1100, $theRef);
   }
 
-  public function testProtectedStatic() {
+  public function testProtectedStatic(): void {
     $tgt = InvasiveExample::class;
     $this->assertEquals(20, Invasive::get([$tgt, 'protectedStaticField']));
     $this->assertEquals(20, Invasive::call([$tgt, 'getProtectedStaticField']));

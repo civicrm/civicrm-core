@@ -28,7 +28,7 @@ use Civi\Api4\Utils\ReflectionUtils;
  *  - Require a value for the param if you add the "@required" annotation.
  *
  * @method bool getCheckPermissions()
- * @method $this setDebug(bool $value) Enable/disable debug output
+ * @method $this setDebug(bool $debug) Enable/disable debug output
  * @method bool getDebug()
  * @method $this setChain(array $chain)
  * @method array getChain()
@@ -153,12 +153,19 @@ abstract class AbstractAction implements \ArrayAccess {
    * @param string $actionName
    */
   public function __construct($entityName, $actionName) {
-    // If a namespaced class name is passed in
-    if (strpos($entityName, '\\') !== FALSE) {
-      $entityName = substr($entityName, strrpos($entityName, '\\') + 1);
+    // If a namespaced class name is passed in, convert to entityName
+    $this->_entityName = CoreUtil::stripNamespace($entityName);
+    // Normalize action name case (because PHP is case-insensitive, we have to do an extra check)
+    $thisClassName = CoreUtil::stripNamespace(get_class($this));
+    // If this was called via magic method, $actionName won't necessarily have the
+    // correct case because PHP doesn't care about case when calling methods.
+    if (strtolower($thisClassName) === strtolower($actionName)) {
+      $this->_actionName = lcfirst($thisClassName);
     }
-    $this->_entityName = $entityName;
-    $this->_actionName = $actionName;
+    // If called via static method, case should already be correct.
+    else {
+      $this->_actionName = $actionName;
+    }
     $this->_id = \Civi\API\Request::getNextId();
   }
 

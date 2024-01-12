@@ -11,6 +11,11 @@ class CRM_Case_Form_CaseViewTest extends CiviCaseTestCase {
   public function testSearchFilterDropdown(): void {
     $client_id = $this->individualCreate([], 0, TRUE);
     $caseObj = $this->createCase($client_id, $this->getLoggedInUser());
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+      'access my cases and activities',
+    ];
 
     $form = $this->getFormObject('CRM_Case_Form_CaseView');
     $form->set('cid', $client_id);
@@ -25,12 +30,12 @@ class CRM_Case_Form_CaseViewTest extends CiviCaseTestCase {
     }, $options);
     $this->assertEquals([
       [14 => 'Follow up'],
-      [60 => 'Income and benefits stabilization'],
-      [58 => 'Long-term housing plan'],
-      [55 => 'Medical evaluation'],
-      [56 => 'Mental health evaluation'],
+      [61 => 'Income and benefits stabilization'],
+      [59 => 'Long-term housing plan'],
+      [56 => 'Medical evaluation'],
+      [57 => 'Mental health evaluation'],
       [13 => 'Open Case'],
-      [57 => 'Secure temporary housing'],
+      [58 => 'Secure temporary housing'],
     ], array_values($mappedOptions));
 
     // Now add some activities where the type might not even be in the config.
@@ -71,14 +76,14 @@ class CRM_Case_Form_CaseViewTest extends CiviCaseTestCase {
       [3 => 'Email'],
       [14 => 'Follow up'],
       [12 => 'Inbound Email'],
-      [60 => 'Income and benefits stabilization'],
-      [58 => 'Long-term housing plan'],
-      [55 => 'Medical evaluation'],
+      [61 => 'Income and benefits stabilization'],
+      [59 => 'Long-term housing plan'],
+      [56 => 'Medical evaluation'],
       [1 => 'Meeting'],
-      [56 => 'Mental health evaluation'],
+      [57 => 'Mental health evaluation'],
       [13 => 'Open Case'],
       [2 => 'Phone Call'],
-      [57 => 'Secure temporary housing'],
+      [58 => 'Secure temporary housing'],
     ], array_values($mappedOptions));
   }
 

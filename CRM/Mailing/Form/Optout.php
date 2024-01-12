@@ -56,7 +56,7 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
     }
 
     // verify that the three numbers above match
-    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify($job_id, $queue_id, $hash);
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
     if (!$q) {
       CRM_Utils_System::sendResponse(
         new \GuzzleHttp\Psr7\Response(400, [], ts("Invalid request: bad parameters"))

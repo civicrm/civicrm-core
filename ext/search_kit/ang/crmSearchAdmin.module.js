@@ -55,7 +55,7 @@
         modules.push({text: label, id: key});
       }, []), 'text');
       this.getTags = function() {
-        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
+        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'label', ['color', 'description'])};
       };
 
       this.getPrimaryEntities = function() {
@@ -88,7 +88,7 @@
       // Changing entity will refresh the angular page
       $scope.$watch('$ctrl.savedSearch.api_entity', function(newEntity, oldEntity) {
         if (newEntity && oldEntity && newEntity !== oldEntity) {
-          $location.url('/create/' + newEntity + (ctrl.savedSearch.label ? '?label=' + ctrl.savedSearch.label : ''));
+          $location.url('/create/' + newEntity + ($routeParams.label ? '?label=' + $routeParams.label : ''));
         }
       });
     })
@@ -190,7 +190,7 @@
         function getKeyword(whitelist) {
           var keyword;
           _.each(_.filter(whitelist), function(flag) {
-            if (argString.indexOf(flag + ' ') === 0) {
+            if (argString.indexOf(flag + ' ') === 0 || argString === flag) {
               keyword = flag;
               argString = _.trim(argString.substr(flag.length));
               return false;
@@ -241,7 +241,7 @@
               }
               getKeyword([',']);
             }
-            if (expr && !_.isEmpty(expr.flag_after)) {
+            if (info.args.length && !_.isEmpty(param.flag_after)) {
               _.last(info.args).flag_after = getKeyword(_.keys(param.flag_after));
             }
           } else if (param.flag_before && !param.optional) {

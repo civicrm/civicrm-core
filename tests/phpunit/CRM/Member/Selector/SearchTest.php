@@ -21,7 +21,7 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
    */
   public function testSelectorGetRows(): void {
     $contactID = $this->individualCreate();
-    $this->_paymentProcessorID = $this->paymentProcessorCreate();
+    $this->paymentProcessorCreate();
     $this->setupMembershipRecurringPaymentProcessorTransaction();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $contactID]);
     $membershipID = (int) $membership['id'];
@@ -32,7 +32,7 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
       'contact_id' => $contactID,
       'membership_id' => $membershipID,
       'contact_type' => '<a href="/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $contactID . '" data-tooltip-url="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=' . $contactID . '&amp;snippet=4&amp;is_show_email_task=1" class="crm-summary-link"><i class="crm-i fa-fw fa-user" title=""></i></a>',
-      'sort_name' => 'Anderson, Anthony',
+      'sort_name' => 'Anderson, Anthony II',
       'membership_type' => 'General',
       'membership_join_date' => date('Y-m-d'),
       'membership_start_date' => date('Y-m-d'),

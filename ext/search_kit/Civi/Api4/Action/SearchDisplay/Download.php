@@ -52,14 +52,21 @@ class Download extends AbstractRunAction {
   protected function processResult(\Civi\Api4\Result\SearchDisplayRunResult $result) {
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->_apiParams;
-    $settings = $this->display['settings'];
+    $settings =& $this->display['settings'];
 
-    // checking permissions for menu, link or button columns is costly, so remove them early
-    foreach ($this->display['settings']['columns'] as $index => $col) {
+    // Checking permissions for menu, link or button columns is costly, so remove them early
+    foreach ($settings['columns'] as $index => $col) {
+      // Remove buttons/menus and other column types that cannot be rendered in a spreadsheet
       if (empty($col['key'])) {
-        unset($this->display['settings']['columns'][$index]);
+        unset($settings['columns'][$index]);
+      }
+      // Avoid wasting time processing links, editable and other non-printable items from spreadsheet
+      else {
+        \CRM_Utils_Array::remove($settings['columns'][$index], 'link', 'editable', 'icons', 'cssClass');
       }
     }
+    // Reset indexes as some items may have been removed
+    $settings['columns'] = array_values($settings['columns']);
 
     // Displays are only exportable if they have actions enabled
     if (empty($settings['actions'])) {

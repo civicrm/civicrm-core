@@ -58,7 +58,7 @@
 {include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
 campaignTrClass='' campaignTdClass='crm-event-form-block-participant_campaign_id'}
 
-{if $participantGroupTree }
+{if $participantGroupTree}
 <tr>
   <td colspan="4">
   {include file="CRM/Custom/Form/Search.tpl" groupTree=$participantGroupTree showHideLinks=false}

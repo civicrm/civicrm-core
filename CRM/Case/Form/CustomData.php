@@ -110,7 +110,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function postProcess(): void {
-    $params = $this->controller->exportValues($this->_name);
+    $params = $this->getSubmittedValues();
 
     $transaction = new CRM_Core_Transaction();
 

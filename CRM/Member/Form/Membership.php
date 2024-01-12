@@ -29,8 +29,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public $_mode;
 
-  public $_contributeMode = 'direct';
-
   protected $_memTypeSelected;
 
   /**
@@ -377,8 +375,8 @@ DESC limit 1");
           NULL, ['onchange' => "buildAmount( this.value );"]
         );
       }
-      $this->assign('hasPriceSets', $buildPriceSet);
     }
+    $this->assign('hasPriceSets', $buildPriceSet ?? NULL);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons([
@@ -911,7 +909,7 @@ DESC limit 1");
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
         'isTest' => (bool) ($this->_action & CRM_Core_Action::PREVIEW),
         'modelProps' => [
-          'receiptText' => $this->getSubmittedValue('receipt_text'),
+          'userEnteredText' => $this->getSubmittedValue('receipt_text'),
           'contributionID' => $formValues['contribution_id'],
           'contactID' => $this->_receiptContactId,
           'membershipID' => $this->getMembershipID(),
@@ -933,7 +931,7 @@ DESC limit 1");
 
     $params = $softParams = [];
 
-    $this->processBillingAddress();
+    $this->processBillingAddress($this->getContributionContactID(), (string) $this->_contributorEmail);
     $formValues = $this->_params;
     $formValues = $this->setPriceSetParameters($formValues);
 
@@ -1053,7 +1051,7 @@ DESC limit 1");
 
       // This is a candidate for shared beginPostProcess function.
       // @todo Do we need this now we have $this->formatParamsForPaymentProcessor() ?
-      CRM_Core_Payment_Form::mapParams($this->_bltID, $formValues, $paymentParams, TRUE);
+      CRM_Core_Payment_Form::mapParams(NULL, $formValues, $paymentParams, TRUE);
       // CRM-7137 -for recurring membership,
       // we do need contribution and recurring records.
       $result = NULL;
@@ -1254,21 +1252,6 @@ DESC limit 1");
         else {
           $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
         }
-      }
-      if (Civi::settings()->get('invoicing')) {
-        $dataArray = [];
-        foreach ($lineItem[$this->_priceSetId] as $value) {
-          if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
-            if (isset($dataArray[$value['tax_rate']])) {
-              $dataArray[$value['tax_rate']] = $dataArray[$value['tax_rate']] + CRM_Utils_Array::value('tax_amount', $value);
-            }
-            else {
-              $dataArray[$value['tax_rate']] = $value['tax_amount'] ?? NULL;
-            }
-          }
-        }
-
-        $this->assign('dataArray', $dataArray);
       }
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
@@ -1510,10 +1493,7 @@ DESC limit 1");
 
     if ($this->_mode) {
       // @todo move this outside shared code as Batch entry just doesn't
-      $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-        $this->_params,
-        $this->_bltID
-      ));
+      $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
       $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
@@ -1822,10 +1802,10 @@ DESC limit 1");
   /**
    * Get the created or edited membership ID.
    *
-   * @return false|mixed
+   * @return int|null
    */
-  protected function getMembershipID() {
-    return reset($this->_membershipIDs);
+  public function getMembershipID(): ?int {
+    return $this->_membershipIDs[0] ?? NULL;
   }
 
   /**
@@ -1848,7 +1828,7 @@ DESC limit 1");
    */
   protected function setMembership(array $membership): void {
     if (!in_array($membership['id'], $this->_membershipIDs, TRUE)) {
-      $this->_membershipIDs[] = $membership['id'];
+      $this->_membershipIDs[] = (int) $membership['id'];
     }
     $this->membership = $membership;
   }
@@ -1894,7 +1874,7 @@ DESC limit 1");
     $ids = [];
     foreach ($contribution['values'][$contribution['id']]['line_item'] as $line) {
       if ($line['entity_table'] ?? '' === 'civicrm_membership') {
-        $ids[] = $line['entity_id'];
+        $ids[] = (int) $line['entity_id'];
       }
     }
     $this->setMembershipIDs($ids);

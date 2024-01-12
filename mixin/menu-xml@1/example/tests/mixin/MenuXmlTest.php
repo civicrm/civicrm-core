@@ -2,6 +2,8 @@
 
 namespace Civi\Shimmy\Mixins;
 
+use Civi\Test\HttpTestTrait;
+
 /**
  * Assert that the `xml/Menu/*.xml` mixin is working properly.
  *
@@ -12,11 +14,7 @@ namespace Civi\Shimmy\Mixins;
  */
 class MenuXmlTest extends \PHPUnit\Framework\Assert {
 
-  /**
-   * The URL of hte example route, `civicrm/shimmy/foobar`.
-   * @var string
-   */
-  protected $url;
+  use HttpTestTrait;
 
   public function testPreConditions($cv): void {
     $this->assertFileExists(static::getPath('/xml/Menu/shimmy.xml'), 'The shimmy extension must have a Menu XML file.');
@@ -27,21 +25,18 @@ class MenuXmlTest extends \PHPUnit\Framework\Assert {
     $items = $cv->api4('Route', 'get', ['where' => [['path', '=', 'civicrm/shimmy/foobar']]]);
     $this->assertEquals('CRM_Shimmy_Page_FooBar', $items[0]['page_callback']);
 
-    // And the menu item works...
-    $this->url = cv('url civicrm/shimmy/foobar');
-    $this->assertTrue(is_string($this->url));
-    $response = file_get_contents($this->url);
-    $this->assertRegExp(';hello world;', $response);
+    $response = $this->createGuzzle()->get('frontend://civicrm/shimmy/foobar');
+    $this->assertStatusCode(200, $response);
+    $this->assertBodyRegexp(';hello world;', $response);
   }
 
   public function testDisabled($cv): void {
     $items = $cv->api4('Route', 'get', ['where' => [['path', '=', 'civicrm/shimmy/foobar']]]);
     $this->assertEmpty($items);
 
-    $this->assertNotEmpty($this->url);
-    $response = file_get_contents($this->url, FALSE, stream_context_create(['http' => ['ignore_errors' => TRUE]]));
-    $this->assertNotRegExp(';hello world;', $response);
-    $this->assertNotRegExp(';HTTP.*200.*;', $http_response_header[0]);
+    $response = $this->createGuzzle(['http_errors' => FALSE])->get('frontend://civicrm/shimmy/foobar');
+    $this->assertPageNotShown($response);
+    $this->assertNotBodyRegexp(';hello world;', $response);
   }
 
   public function testUninstalled($cv): void {

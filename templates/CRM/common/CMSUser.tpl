@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $showCMS }{*true if is_cms_user field is set *}
+{if $showCMS}{*true if is_cms_user field is set *}
    <fieldset class="crm-group crm_user-group">
       <legend>{ts}Account{/ts}</legend>
       <div class="messages help cms_user_help-section">

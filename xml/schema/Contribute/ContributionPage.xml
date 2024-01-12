@@ -12,7 +12,7 @@
   <paths>
     <add>civicrm/admin/contribute/add?reset=1&amp;action=add</add>
     <update>civicrm/admin/contribute/settings?reset=1&amp;action=update&amp;id=[id]</update>
-    <delete>civicrm/admin/contribute?reset=1&amp;action=delete&amp;id=[id]</delete>
+    <delete>civicrm/admin/contribute/manage?reset=1&amp;action=delete&amp;id=[id]</delete>
     <browse>civicrm/admin/contribute</browse>
   </paths>
   <field>
@@ -222,6 +222,11 @@
     <title>Pay Later Receipt</title>
     <type>text</type>
     <localizable>true</localizable>
+    <html>
+      <type>RichTextEditor</type>
+      <rows>8</rows>
+      <cols>60</cols>
+    </html>
     <comment>The receipt sent to the user instead of the normal receipt text</comment>
     <add>2.0</add>
   </field>

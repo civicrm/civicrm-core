@@ -2,13 +2,6 @@
 
 <menu>
   <item>
-    <path>civicrm/campaign</path>
-    <title>Campaign Dashboard</title>
-    <page_callback>CRM_Campaign_Page_DashBoard</page_callback>
-    <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
-    <component>CiviCampaign</component>
-  </item>
-  <item>
     <path>civicrm/campaign/add</path>
     <title>New Campaign</title>
     <page_callback>CRM_Campaign_Form_Campaign</page_callback>

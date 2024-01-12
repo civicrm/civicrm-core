@@ -53,11 +53,11 @@
 
           <td>
             {assign var="contact1name" value="contact_id1.display_name"}
-            <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id1`"}" target="_blank">{ $exception.$contact1name }</a>
+            <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id1`"}" target="_blank">{$exception.$contact1name}</a>
           </td>
           <td>
             {assign var="contact2name" value="contact_id2.display_name"}
-            <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id2`"}" target="_blank">{ $exception.$contact2name }</a>
+            <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id2`"}" target="_blank">{$exception.$contact2name}</a>
           </td>
           <td>
             <a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.contact_id1}, {$exception.contact_id2}, 'nondupe-dupe', 'dedupe-exception' );return false;"><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Remove Exception{/ts}</a>

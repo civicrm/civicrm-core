@@ -1135,11 +1135,7 @@ class CRM_Utils_Token {
         }
 
         // special case for greeting replacement
-        foreach ([
-          'email_greeting',
-          'postal_greeting',
-          'addressee',
-        ] as $val) {
+        foreach (['email_greeting', 'postal_greeting', 'addressee'] as $val) {
           if (!empty($contactDetails[$contactID][$val])) {
             $contactDetails[$contactID][$val] = $contactDetails[$contactID]["{$val}_display"];
           }
@@ -1258,11 +1254,7 @@ class CRM_Utils_Token {
   public static function flattenTokens(&$tokens) {
     $flattenTokens = [];
 
-    foreach ([
-      'html',
-      'text',
-      'subject',
-    ] as $prop) {
+    foreach (['html', 'text', 'subject'] as $prop) {
       if (!isset($tokens[$prop])) {
         continue;
       }
@@ -1585,7 +1577,7 @@ class CRM_Utils_Token {
       default:
         if (in_array($token, $supportedTokens)) {
           $value = $membership[$token];
-          if (CRM_Utils_String::endsWith($token, '_date')) {
+          if (str_ends_with($token, '_date')) {
             $value = CRM_Utils_Date::customFormat($value);
           }
         }
@@ -1746,7 +1738,7 @@ class CRM_Utils_Token {
         $value = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $token, $value);
       }
     }
-    elseif ($value && CRM_Utils_String::endsWith($token, '_date')) {
+    elseif ($value && str_ends_with($token, '_date')) {
       $value = CRM_Utils_Date::customFormat($value);
     }
     return $value;
@@ -1762,29 +1754,62 @@ class CRM_Utils_Token {
       'WorkFlowMessageTemplates' => [
         'contribution_invoice_receipt' => [
           '$display_name' => 'contact.display_name',
+          '$dataArray' => ts('found within $taxBreakDown'),
         ],
         'contribution_online_receipt' => [
-          '$contributeMode' => 'no longer available / relevant',
+          '$contributeMode' => ts('no longer available / relevant'),
           '$first_name' => 'contact.first_name',
           '$last_name' => 'contact.last_name',
           '$displayName' => 'contact.display_name',
+          '$dataArray' => ts('found within $taxBreakDown'),
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
           'receipt_text_renewal' => 'receipt_text',
-          '$isAmountZero' => 'no longer available / relevant',
+          '$isAmountZero' => ts('no longer available / relevant'),
+          '$dataArray' => ts('found within $taxBreakDown'),
+        ],
+        'membership_online_receipt' => [
+          '$dataArray' => ts('found within $taxBreakDown'),
+          '$mem_start_date' => 'membership.start_date',
+          '$mem_end_date' => 'membership.end_date',
+          '$mem_join_date' => 'membership.join_date',
         ],
         'event_offline_receipt' => [
-          '$contributeMode' => 'no longer available / relevant',
-          '$isAmountZero' => 'no longer available / relevant',
+          '$contributeMode' => ts('no longer available / relevant'),
+          '$isAmountZero' => ts('no longer available / relevant'),
+          '$dataArray' => ts('found within $participants'),
+          '$paidBy' => 'contribution.payment_instrument_id:label',
+          '$totalTaxAmount' => 'contribution.tax_amount',
+          '$amount' => ts('found within $participants'),
+          '$checkNumber' => 'contribution.check_number',
+          '$module' => ts('no longer available / relevant'),
+          '$register_date' => 'participant.register_date',
+          '$receive_date' => 'contribution.receive_date',
+          '$is_pay_later' => 'contribution.is_pay_later',
+          '$totalAmount' => 'contribution.total_amount',
+          '$location' => 'event.location',
+          '$isShowLocation' => 'event.is_show_location|boolean',
+          '$event.participant_role' => 'participant.role_id:label',
+          '$amount_level' => ts('found within $participants'),
+          'balanceAmount' => 'contribution.balance_amount',
+          '$financialTypeName' => 'contribution.financial_type_id:label',
+          '$contributionTypeName' => 'contribution.financial_type_id:label',
+          '$trxn_id' => 'contribution.trxn_id',
+          '$participant_status_id' => 'participant.status_id',
+
+        ],
+        'event_online_receipt' => [
+          '`$participant.id`' => 'participant.id',
+          '$dataArray' => ts('found within $taxBreakDown'),
         ],
         'pledge_acknowledgement' => [
-          '$domain' => 'no longer available / relevant',
-          '$contact' => 'no longer available / relevant',
+          '$domain' => ts('no longer available / relevant'),
+          '$contact' => ts('no longer available / relevant'),
         ],
         'pledge_reminder' => [
-          '$domain' => 'no longer available / relevant',
-          '$contact' => 'no longer available / relevant',
+          '$domain' => ts('no longer available / relevant'),
+          '$contact' => ts('no longer available / relevant'),
         ],
       ],
     ];

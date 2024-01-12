@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
+use Civi\Api4\Email;
 use Civi\Api4\Relationship;
 use Civi\Test\TransactionalInterface;
 
@@ -29,7 +30,7 @@ use Civi\Test\TransactionalInterface;
  */
 class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testGetDeletedContacts() {
+  public function testGetDeletedContacts(): void {
     $last_name = uniqid('deleteContactTest');
 
     $bob = Contact::create()
@@ -59,7 +60,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains($del['id'], $contacts->column('id'));
   }
 
-  public function testGetWithLimit() {
+  public function testGetWithLimit(): void {
     $last_name = uniqid('getWithLimitTest');
 
     $bob = Contact::create()
@@ -98,7 +99,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     catch (\CRM_Core_Exception $e) {
       $msg = $e->getMessage();
     }
-    $this->assertRegExp(';Expected to find one Contact record;', $msg);
+    $this->assertMatchesRegularExpression(';Expected to find one Contact record;', $msg);
     $limit1 = Contact::get(FALSE)->addWhere('last_name', '=', $last_name)->setLimit(1)->execute();
     $this->assertCount(1, (array) $limit1);
     $this->assertCount(1, $limit1);
@@ -137,7 +138,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     }
   }
 
-  public function testEmptyAndNullOperators() {
+  public function testEmptyAndNullOperators(): void {
     $last_name = uniqid(__FUNCTION__);
 
     $bob = Contact::create()
@@ -199,7 +200,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayHasKey($jan['id'], (array) $result);
   }
 
-  public function testRegexpOperators() {
+  public function testRegexpOperators(): void {
     $last_name = uniqid(__FUNCTION__);
 
     $alice = Contact::create()
@@ -214,23 +215,81 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ->setValues(['first_name' => 'Jane', 'last_name' => $last_name])
       ->execute()->first();
 
+    $holly = Contact::create()
+      ->setValues(['first_name' => 'holly', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $meg = Contact::create()
+      ->setValues(['first_name' => 'meg', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $jess = Contact::create()
+      ->setValues(['first_name' => 'jess', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $amy = Contact::create()
+      ->setValues(['first_name' => 'amy', 'last_name' => $last_name])
+      ->execute()->first();
+
     $result = Contact::get(FALSE)
       ->addWhere('last_name', '=', $last_name)
       ->addWhere('first_name', 'REGEXP', '^A')
       ->execute()->indexBy('id');
-    $this->assertCount(2, $result);
+    $this->assertCount(3, $result);
     $this->assertArrayHasKey($alice['id'], (array) $result);
     $this->assertArrayHasKey($alex['id'], (array) $result);
+    $this->assertArrayHasKey($amy['id'], (array) $result);
 
     $result = Contact::get(FALSE)
       ->addWhere('last_name', '=', $last_name)
       ->addWhere('first_name', 'NOT REGEXP', '^A')
       ->execute()->indexBy('id');
-    $this->assertCount(1, $result);
+    $this->assertCount(4, $result);
+    $this->assertArrayHasKey($jane['id'], (array) $result);
+    $this->assertArrayHasKey($holly['id'], (array) $result);
+    $this->assertArrayHasKey($meg['id'], (array) $result);
+    $this->assertArrayHasKey($jess['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'REGEXP BINARY', '^[A-Z]')
+      ->execute()->indexBy('id');
+    $this->assertCount(3, $result);
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+    $this->assertArrayHasKey($alex['id'], (array) $result);
+    $this->assertArrayHasKey($jane['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'REGEXP BINARY', '^[a-z]')
+      ->execute()->indexBy('id');
+    $this->assertCount(4, $result);
+    $this->assertArrayHasKey($holly['id'], (array) $result);
+    $this->assertArrayHasKey($meg['id'], (array) $result);
+    $this->assertArrayHasKey($jess['id'], (array) $result);
+    $this->assertArrayHasKey($amy['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'NOT REGEXP BINARY', '^[A-Z]')
+      ->execute()->indexBy('id');
+    $this->assertCount(4, $result);
+    $this->assertArrayHasKey($holly['id'], (array) $result);
+    $this->assertArrayHasKey($meg['id'], (array) $result);
+    $this->assertArrayHasKey($jess['id'], (array) $result);
+    $this->assertArrayHasKey($amy['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'NOT REGEXP BINARY', '^[a-z]')
+      ->execute()->indexBy('id');
+    $this->assertCount(3, $result);
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+    $this->assertArrayHasKey($alex['id'], (array) $result);
     $this->assertArrayHasKey($jane['id'], (array) $result);
   }
 
-  public function testGetRelatedWithSubType() {
+  public function testGetRelatedWithSubType(): void {
     $org = Contact::create(FALSE)
       ->addValue('contact_type', 'Organization')
       ->addValue('organization_name', 'Run Amok')
@@ -294,7 +353,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['Student'], $result['Contact_RelationshipCache_Contact_01.contact_sub_type:label']);
   }
 
-  public function testGetWithWhereExpression() {
+  public function testGetWithWhereExpression(): void {
     $last_name = uniqid(__FUNCTION__);
 
     $alice = Contact::create()
@@ -354,7 +413,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
   /**
    *
    */
-  public function testGetWithCount() {
+  public function testGetWithCount(): void {
     $myName = uniqid('count');
     for ($i = 1; $i <= 20; ++$i) {
       $this->createTestRecord('Contact', [
@@ -375,7 +434,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
   }
 
-  public function testGetWithPrimaryEmailPhoneIMAddress() {
+  public function testGetWithPrimaryEmailPhoneIMAddress(): void {
     $lastName = uniqid(__FUNCTION__);
     $email = uniqid() . '@example.com';
     $phone = uniqid('phone');
@@ -408,28 +467,6 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNull($results[2]['address_primary.city']);
   }
 
-  public function testBasicContactACLs() {
-    $this->createLoggedInUser();
-    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
-      'access CiviCRM',
-      'view all contacts',
-    ];
-
-    $this->createTestRecord('Contact');
-
-    $result = Contact::get()->execute();
-    $this->assertGreaterThan(0, $result->count());
-
-    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
-      'access CiviCRM',
-    ];
-
-    $this->createTestRecord('Contact');
-
-    $result = Contact::get()->execute();
-    $this->assertCount(0, $result);
-  }
-
   public function testInvalidPseudoConstantWithIN(): void {
     $this->createTestRecord('Contact', [
       'first_name' => uniqid(),
@@ -441,6 +478,66 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('prefix_id:name', 'IN', ['Msssss.'])
       ->execute();
     $this->assertCount(0, $resultCount);
+  }
+
+  public function testContactPseudoEntityGet(): void {
+    $allCids = [];
+    $cids = [];
+    // Create a different number of contacts of each type
+    $contactTypes = [
+      'Individual' => 1,
+      'Organization' => 2,
+      'Household' => 3,
+    ];
+    foreach ($contactTypes as $contactType => $count) {
+      $saved = $this->saveTestRecords($contactType, ['records' => $count])->column('id');
+      $allCids = array_merge($allCids, $saved);
+      $cids[$contactType] = $saved;
+    }
+    $getAll = Contact::get(FALSE)
+      ->addWhere('id', 'IN', $allCids)
+      ->execute();
+    $this->assertCount(6, $getAll);
+    // Each pseudo-entity will only return contacts of that type
+    foreach ($contactTypes as $contactType => $count) {
+      $get[$contactType] = civicrm_api4($contactType, 'get', [
+        'where' => [['id', 'IN', $allCids]],
+        'debug' => TRUE,
+      ]);
+      $this->assertStringContainsString("`contact_type` = \"$contactType\"", $get[$contactType]->debug['sql'][0]);
+      $this->assertCount($count, $get[$contactType]);
+    }
+    // Ensure fields are returned appropriate to contact type: Individual
+    $this->assertArrayHasKey('first_name', $get['Individual'][0]);
+    $this->assertArrayNotHasKey('organization_name', $get['Individual'][0]);
+    $this->assertArrayNotHasKey('household_name', $get['Individual'][0]);
+    // Ensure fields are returned appropriate to contact type: Organization
+    $this->assertArrayNotHasKey('first_name', $get['Organization'][0]);
+    $this->assertArrayHasKey('organization_name', $get['Organization'][0]);
+    $this->assertArrayNotHasKey('household_name', $get['Organization'][0]);
+    // Ensure fields are returned appropriate to contact type: Household
+    $this->assertArrayNotHasKey('first_name', $get['Household'][0]);
+    $this->assertArrayNotHasKey('organization_name', $get['Household'][0]);
+    $this->assertArrayHasKey('household_name', $get['Household'][0]);
+
+    // Ensure contact type condition is added to the ON clause
+    foreach ($allCids as $cid) {
+      $emails[] = $this->createTestRecord('Email', ['contact_id' => $cid])['id'];
+    }
+    $getAll = Email::get(FALSE)
+      ->addWhere('id', 'IN', $emails)
+      ->addJoin('Contact AS contact', 'INNER', ['contact_id', '=', 'contact.id'])
+      ->execute();
+    $this->assertCount(6, $getAll);
+    foreach ($contactTypes as $contactType => $count) {
+      $get = Email::get(FALSE)
+        ->addWhere('id', 'IN', $emails)
+        ->addJoin("$contactType AS contact", 'INNER', ['contact_id', '=', 'contact.id'])
+        ->setDebug(TRUE)
+        ->execute();
+      $this->assertStringContainsString("`contact`.`contact_type` = \"$contactType\"", $get->debug['sql'][0]);
+      $this->assertCount($count, $get);
+    }
   }
 
 }

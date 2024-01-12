@@ -12,12 +12,15 @@
     <url desc="Chat">https://chat.civicrm.org/civicrm/channels/dev-afform</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2020-01-09</releaseDate>
-  <version>5.66.alpha1</version>
-  <develStage>beta</develStage>
+  <releaseDate>2024-01-05</releaseDate>
+  <version>5.71.alpha1</version>
   <compatibility>
-    <ver>5.66</ver>
+    <ver>5.71</ver>
   </compatibility>
+  <develStage>stable</develStage>
+  <tags>
+    <tag>mgmt:required</tag>
+  </tags>
   <comments>The Form Core extension is required to use any dynamic form. To administer and edit forms, also install the FormBuilder extension.</comments>
   <civix>
     <namespace>CRM/Afform</namespace>
@@ -36,6 +39,7 @@
     <mixin>scan-classes@1.0.0</mixin>
     <mixin>smarty-v2@1.0.1</mixin>
     <mixin>entity-types-php@1.0.0</mixin>
+    <mixin>menu-xml@1.0.0</mixin>
   </mixins>
   <upgrader>CRM_Afform_Upgrader</upgrader>
 </extension>

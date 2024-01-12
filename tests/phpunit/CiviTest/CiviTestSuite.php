@@ -59,7 +59,7 @@ class CiviTestSuite extends PHPUnit\Framework\TestSuite {
    *  suppress failed test error issued by phpunit when it finds.
    *  a test suite with no tests
    */
-  public function testNothing() {
+  public function testNothing(): void {
   }
 
   /**

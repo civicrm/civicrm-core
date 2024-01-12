@@ -9,7 +9,7 @@
 *}
 <p>
 
-{if $rows }
+{if $rows}
 <div class="crm-submit-buttons element-right">{$form.buttons.html}</div>
 <div class="spacer"></div>
 <br />

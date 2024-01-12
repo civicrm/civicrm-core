@@ -19,7 +19,7 @@
   </tr>
   <tr>
     <td>{ts}Email{/ts}&nbsp;
-      {if $actualBlockCount lt 5 }
+      {if $actualBlockCount lt 5}
         <span id="add-more-email" title="{ts}click to add more{/ts}">
           <a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a>
         </span>

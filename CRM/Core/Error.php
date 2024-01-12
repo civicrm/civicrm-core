@@ -468,46 +468,57 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param string $name name of debug section
    * @param mixed $variable reference to variables that we need a trace of
-   * @param bool $log should we log or return the output
-   * @param bool $html whether to generate a HTML-escaped output
+   * @param bool $log
+   *    - TRUE: log to error_log and echo one of: everything / a code / nothing, depending on permissions.
+   *    - FALSE: only return the output as a string. Nothing to error_log or echo.
+   * @param bool $html whether to HTML-escape output (typically use TRUE unless you know your $variable is safe)
    * @param bool $checkPermission should we check permissions before displaying output
-   *                useful when we die during initialization and permissioning
-   *                subsystem is not initialized - CRM-13765
+   *    useful when we die during initialization and permissioning
+   *    subsystem is not initialized - CRM-13765
    *
    * @return string
    *   the generated output
+   *
+   * @deprecated prefer Civi::log().
+   * @see https://github.com/civicrm/civicrm-core/pull/27138
    */
   public static function debug($name, $variable = NULL, $log = TRUE, $html = TRUE, $checkPermission = TRUE) {
-    $error = self::singleton();
-
     if ($variable === NULL) {
       $variable = $name;
       $name = NULL;
     }
 
     $out = print_r($variable, TRUE);
-    $prefix = NULL;
-    if ($html) {
-      $out = htmlspecialchars($out);
-      if ($name) {
-        $prefix = "<p>$name</p>";
-      }
-      $out = "{$prefix}<p><pre>$out</pre></p><p></p>";
-    }
-    else {
-      if ($name) {
-        $prefix = "$name:\n";
-      }
-      $out = "{$prefix}$out\n";
-    }
-    if (
-      $log &&
-      (!$checkPermission || CRM_Core_Permission::check('view debug output'))
-    ) {
-      echo $out;
+    $outHTML = htmlspecialchars($out);
+
+    if ($name) {
+      $outHTML = "<p>" . htmlspecialchars($name) . "</p><p><pre>$outHTML</pre></p>";
+      $out = "$name:\n$out";
     }
 
-    return $out;
+    if ($log) {
+      // Log the output to error_log with a unique reference.
+      $unique = substr(md5(random_bytes(32)), 0, 12);
+      error_log("errorID:$unique\n$out");
+
+      if (!$checkPermission) {
+        // Permission system inactive, only emit a reference to content in logfile
+        echo "Critical error. Please see server logs for errorID:$unique";
+      }
+      else {
+        if (CRM_Core_Permission::check('view debug output')) {
+          // We are outputting to the browser.
+          echo $html ? $outHTML : $out;
+        }
+        else {
+          // No permission; show nothing visible, but include the error in an HTML
+          // comment in case a dev wants to inspect.
+          echo $html ? "<!-- critical error reference $unique -->" : '';
+        }
+      }
+    }
+
+    return $html ? $outHTML : $out;
   }
 
   /**
@@ -644,7 +655,13 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function createDebugLogger($prefix = '') {
     self::generateLogFileName($prefix);
-    return Log::singleton('file', \Civi::$statics[__CLASS__]['logger_file' . $prefix], '');
+    $log = Log::singleton('file', \Civi::$statics[__CLASS__]['logger_file' . $prefix], '', [
+      'timeFormat' => '%Y-%m-%d %H:%M:%S%z',
+    ]);
+    if (is_callable([$log, 'setLocale'])) {
+      $log->setLocale(CRM_Core_I18n::getLocale());
+    }
+    return $log;
   }
 
   /**

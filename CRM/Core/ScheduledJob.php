@@ -18,12 +18,114 @@
  */
 class CRM_Core_ScheduledJob {
 
-  public $version = 3;
+  /**
+   * Job ID
+   *
+   * @var int
+   */
+  public $id;
 
-  public $name = NULL;
+  /**
+   * Which Domain is this scheduled job for
+   *
+   * @var int
+   */
+  public $domain_id;
 
+  /**
+   * Scheduled job run frequency.
+   *
+   * @var string
+   */
+  public $run_frequency;
+
+  /**
+   * When was this cron entry last run
+   *
+   * @var string
+   */
+  public $last_run;
+
+  /**
+   * When is this cron entry scheduled to run
+   *
+   * @var string
+   */
+  public $scheduled_run_date;
+
+  /**
+   * Title of the job
+   *
+   * @var string
+   */
+  public $name;
+
+  /**
+   * Description of the job
+   *
+   * @var string
+   */
+  public $description;
+
+  /**
+   * Entity of the job api call
+   *
+   * @var string
+   */
+  public $api_entity;
+
+  /**
+   * Action of the job api call
+   *
+   * @var string
+   */
+  public $api_action;
+
+  /**
+   * List of parameters to the command.
+   *
+   * @var string
+   */
+  public $parameters;
+
+  /**
+   * Is this job active?
+   *
+   * @var bool
+   */
+  public $is_active;
+
+  /**
+   * Class string
+   *
+   * Set as a URL, when the jobs template is rendered,
+   * but not set in other contexts
+   *
+   * @var string|null
+   */
+  public $action = NULL;
+
+  /**
+   * Action
+   *
+   * @var string
+   * @todo This seems to only ever be set to an empty string and passed through to job.tpl,
+   *       where it is used a HTML `class`. Can this be removed?
+   */
+  public $class;
+
+  /**
+   * Result of parsing multi-line `$parameters` string into an array
+   *
+   * @var array
+   */
   public $apiParams = [];
 
+  /**
+   * Container for error messages
+   *
+   * @var array
+   */
   public $remarks = [];
 
   /**
@@ -31,30 +133,16 @@ class CRM_Core_ScheduledJob {
    */
   public function __construct($params) {
     foreach ($params as $name => $param) {
-      $this->$name = $param;
+      if (property_exists($this, $name)) {
+        $this->$name = $param;
+      }
     }
 
-    // version is set to 3 by default - if different number
-    // defined in params, it's replaced later on, however,
-    // it's practically useles, since it seems none of api v2
-    // will work properly in cron job setup. It might become
-    // useful when/if api v4 starts to emerge and will need
-    // testing in the cron job setup. To permanenty require
-    // hardcoded api version, it's enough to move below line
-    // under following if block.
-    $this->apiParams = ['version' => $this->version];
-
-    if (!empty($this->parameters)) {
-      $lines = explode("\n", $this->parameters);
-
-      foreach ($lines as $line) {
-        $pair = explode("=", $line);
-        if ($pair === FALSE || count($pair) != 2 || trim($pair[0]) == '' || trim($pair[1]) == '') {
-          $this->remarks[] .= 'Malformed parameters!';
-          break;
-        }
-        $this->apiParams[trim($pair[0])] = trim($pair[1]);
-      }
+    try {
+      $this->apiParams = CRM_Core_BAO_Job::parseParameters($this->parameters);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->remarks[] = $e->getMessage();
     }
   }
 
@@ -135,9 +223,6 @@ class CRM_Core_ScheduledJob {
     $nextTime = strtotime($offset, $lastTime);
 
     return ($now >= $nextTime);
-  }
-
-  public function __destruct() {
   }
 
 }

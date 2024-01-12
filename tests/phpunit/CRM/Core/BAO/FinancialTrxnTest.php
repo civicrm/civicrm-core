@@ -27,7 +27,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $contactId = $this->individualCreate();
     $financialTypeId = 1;
     $contributionID = $this->contributionCreate([
@@ -170,7 +170,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       ]
     );
     $this->assertArrayNotHasKey('card_type_id', $financialTrxn);
-    $this->assertEquals(NULL, CRM_Utils_Array::value('pan_truncation', $financialTrxn));
+    $this->assertFalse(isset($financialTrxn['pan_truncation']));
     $params = [
       'card_type_id' => 2,
       'pan_truncation' => 4567,
@@ -193,7 +193,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testUpdateCreditCardDetails() {
+  public function testUpdateCreditCardDetails(): void {
     $cid = $this->individualCreate();
     $params = [
       'contact_id' => $cid,
@@ -210,8 +210,8 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
         'return' => ['card_type_id', 'pan_truncation'],
       ]
     );
-    $this->assertEquals(CRM_Utils_Array::value('card_type_id', $financialTrxn), NULL);
-    $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), NULL);
+    $this->assertFalse(isset($financialTrxn['card_type_id']));
+    $this->assertFalse(isset($financialTrxn['pan_truncation']));
     CRM_Core_BAO_FinancialTrxn::updateCreditCardDetails($contribution['id'], 4567, 2);
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
@@ -229,7 +229,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetContributionBalance() {
+  public function testGetContributionBalance(): void {
     //create the contribution that isn't paid yet
     $contactId = $this->individualCreate();
     $params = [
@@ -259,7 +259,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testFeeAmountTrxns() {
+  public function testFeeAmountTrxns(): void {
     $contactId = $this->individualCreate();
 
     // Get the expected financial account of a payment made with a credit card.

@@ -81,7 +81,7 @@ function civicrm_api3_profile_get($params) {
 
       $contactFields = $activityFields = [];
       foreach ($profileFields as $fieldName => $field) {
-        if (CRM_Utils_Array::value('field_type', $field) == 'Activity') {
+        if (($field['field_type'] ?? NULL) === 'Activity') {
           $activityFields[$fieldName] = $field;
         }
         else {
@@ -244,7 +244,7 @@ function civicrm_api3_profile_submit($params) {
     ];
   }
 
-  $contactParams['contact_id'] = empty($params['contact_id']) ? CRM_Utils_Array::value('id', $params) : $params['contact_id'];
+  $contactParams['contact_id'] = empty($params['contact_id']) ? ($params['id'] ?? NULL) : $params['contact_id'];
   $contactParams['profile_id'] = $profileID;
   $contactParams['skip_custom'] = 1;
 
@@ -298,7 +298,7 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
     // we don't resolve state, country & county for performance reasons
     $resolveOptions = ($apirequest['params']['get_options'] ?? NULL) == 'all';
     $profileID = _civicrm_api3_profile_getProfileID($apirequest['params']['profile_id']);
-    $params = _civicrm_api3_buildprofile_submitfields($profileID, $resolveOptions, CRM_Utils_Array::value('cache_clear', $params));
+    $params = _civicrm_api3_buildprofile_submitfields($profileID, $resolveOptions, $params['cache_clear'] ?? FALSE);
   }
   elseif (isset($apirequest['params']['cache_clear'])) {
     _civicrm_api3_buildprofile_submitfields(FALSE, FALSE, TRUE);
@@ -360,10 +360,10 @@ function civicrm_api3_profile_apply($params) {
 
   list($data, $contactDetails) = CRM_Contact_BAO_Contact::formatProfileContactParams($params,
     $profileFields,
-    CRM_Utils_Array::value('contact_id', $params),
+    $params['contact_id'] ?? NULL,
     $params['profile_id'],
-    CRM_Utils_Array::value('contact_type', $params),
-    CRM_Utils_Array::value('skip_custom', $params, FALSE)
+    $params['contact_type'] ?? NULL,
+    $params['skip_custom'] ?? FALSE
   );
 
   if (empty($data)) {
@@ -606,7 +606,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour, 
        */
     }
   }
-  $profileFields[$profileID] = $profileFields[$profileID] ?? [];
+  $profileFields[$profileID] ??= [];
   uasort($profileFields[$profileID], "_civicrm_api3_order_by_weight");
   return $profileFields[$profileID];
 }

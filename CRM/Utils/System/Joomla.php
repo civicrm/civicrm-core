@@ -34,6 +34,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
+   * @internal
+   * @return bool
+   */
+  public function isLoaded(): bool {
+    return class_exists('JFactory');
+  }
+
+  /**
    * @inheritDoc
    */
   public function createUser(&$params, $mailParam) {
@@ -80,6 +88,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $register = $model->register($values);
 
     $ufID = JUserHelper::getUserId($values['username']);
+    JUserHelper::addUserToGroup($ufID, $userType);
+
     return $ufID;
   }
 
@@ -104,15 +114,15 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function getEmailFieldName(CRM_Core_Form $form, array $fields):string {
     $emailName = '';
-
-    if (!empty($form->_bltID) && array_key_exists("email-{$form->_bltID}", $fields)) {
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
+    if (array_key_exists("email-{$billingLocationTypeID}", $fields)) {
       // this is a transaction related page
-      $emailName = 'email-' . $form->_bltID;
+      $emailName = 'email-' . $billingLocationTypeID;
     }
     else {
       // find the email field in a profile page
       foreach ($fields as $name => $dontCare) {
-        if (substr($name, 0, 5) == 'email') {
+        if (str_starts_with($name, 'email')) {
           $emailName = $name;
           break;
         }
@@ -128,8 +138,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
 
-    $name = CRM_Utils_Array::value('name', $params);
-    $email = CRM_Utils_Array::value('mail', $params);
+    $name = $params['name'] ?? NULL;
+    $email = $params['mail'] ?? NULL;
     //don't allow the special characters and min. username length is two
     //regex \\ to match a single backslash would become '/\\\\/'
     $isNotValid = (bool) preg_match('/[\<|\>|\"|\'|\%|\;|\(|\)|\&|\\\\|\/]/im', $name);
@@ -191,7 +201,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function appendBreadCrumb($breadCrumbs) {
     $template = CRM_Core_Smarty::singleton();
-    $bc = $template->get_template_vars('breadcrumb');
+    $bc = $template->getTemplateVars('breadcrumb');
 
     if (is_array($breadCrumbs)) {
       foreach ($breadCrumbs as $crumbs) {
@@ -672,7 +682,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     // CRM-14281 Joomla wasn't available during bootstrap, so hook_civicrm_config never executes.
     $config = CRM_Core_Config::singleton();
-    CRM_Utils_Hook::config($config);
+    CRM_Utils_Hook::config($config, ['uf' => TRUE]);
     return TRUE;
   }
 

@@ -178,11 +178,14 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
   /**
    * Override base method which assumes permissions should be based on entity_table.
    *
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
    * @return array
    */
-  public function addSelectWhereClause() {
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
     $clauses = [];
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
   }
 

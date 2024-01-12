@@ -88,7 +88,7 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
    * @return mixed
    */
   protected function prefill($params) {
-    $params['name'] = $params['name'] ?? $this->getFormName();
+    $params['name'] ??= $this->getFormName();
     return $this->callApi4AjaxSuccess('Afform', 'prefill', $params);
   }
 
@@ -100,7 +100,7 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
    * @return mixed
    */
   protected function prefillError($params) {
-    $params['name'] = $params['name'] ?? $this->getFormName();
+    $params['name'] ??= $this->getFormName();
     return $this->callApi4AjaxError('Afform', 'prefill', $params);
   }
 
@@ -112,7 +112,7 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
    * @return mixed
    */
   protected function submit($params) {
-    $params['name'] = $params['name'] ?? $this->getFormName();
+    $params['name'] ??= $this->getFormName();
     return $this->callApi4AjaxSuccess('Afform', 'submit', $params);
   }
 
@@ -124,7 +124,7 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
    * @return mixed
    */
   protected function submitError($params) {
-    $params['name'] = $params['name'] ?? $this->getFormName();
+    $params['name'] ??= $this->getFormName();
     return $this->callApi4AjaxError('Afform', 'submit', $params);
   }
 

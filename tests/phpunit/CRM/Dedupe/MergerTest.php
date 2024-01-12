@@ -234,7 +234,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * Test the batch merge.
    */
-  public function testBatchMergeAllDuplicates() {
+  public function testBatchMergeAllDuplicates(): void {
     $this->createDupeContacts();
 
     // verify that all contacts have been created separately
@@ -481,7 +481,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * Test that if criteria are passed and there are no matching contacts no matches are returned.
    */
-  public function testGetMatchesCriteriaNotMatched() {
+  public function testGetMatchesCriteriaNotMatched(): void {
     $this->setupMatchData();
     $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
       'rule_group_id' => 1,
@@ -574,7 +574,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testGetOrganizationMatchesInGroup() {
+  public function testGetOrganizationMatchesInGroup(): void {
     $this->setupMatchData();
     $ruleGroups = $this->callAPISuccessGetSingle('RuleGroup', [
       'contact_type' => 'Organization',
@@ -662,7 +662,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * It turns out there are 2 code paths retrieving this data so my initial
    * focus is on ensuring they match.
    */
-  public function testGetMatchesInGroup() {
+  public function testGetMatchesInGroup(): void {
     $this->setupMatchData();
 
     $groupID = $this->groupCreate(['title' => 'she-mice']);
@@ -749,7 +749,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * Test migration of Membership.
    */
-  public function testMergeMembership() {
+  public function testMergeMembership(): void {
     // Contacts setup
     $this->setupMatchData();
     $originalContactID = $this->contacts[0]['id'];
@@ -884,7 +884,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * of the custom fields of that custom table are selected, the value is not
    * merged in.
    */
-  public function testMigrationOfUnselectedCustomDataOnEmptyCustomRecord() {
+  public function testMigrationOfUnselectedCustomDataOnEmptyCustomRecord(): void {
     // Create Custom Fields
     $createGroup = $this->setupCustomGroupForIndividual();
     $customField1 = $this->setupCustomField('TestField', $createGroup);
@@ -934,7 +934,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testMigrationOfSomeCustomDataOnEmptyCustomRecord() {
+  public function testMigrationOfSomeCustomDataOnEmptyCustomRecord(): void {
     // Create Custom Fields
     $createGroup = $this->setupCustomGroupForIndividual();
     $customField1 = $this->setupCustomField('Test1', $createGroup);
@@ -989,7 +989,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testMigrationOfContactReferenceCustomField() {
+  public function testMigrationOfContactReferenceCustomField(): void {
     // Create Custom Fields
     $contactGroup = $this->setupCustomGroupForIndividual();
     $activityGroup = $this->customGroupCreate([
@@ -1050,7 +1050,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Verifies that when two contacts with view only custom fields are merged,
    * the view only field of the record being deleted is merged.
    */
-  public function testMigrationOfViewOnlyCustomData() {
+  public function testMigrationOfViewOnlyCustomData(): void {
     // Create Custom Fields
     $createGroup = $this->setupCustomGroupForIndividual();
     $customField = $this->setupCustomField('TestField', $createGroup);
@@ -1268,6 +1268,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         0 => 'contact_id',
       ],
       'civicrm_address' => [
+        0 => 'contact_id',
+      ],
+      'civicrm_afform_submission' => [
         0 => 'contact_id',
       ],
       'civicrm_batch' => [

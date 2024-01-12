@@ -24,7 +24,7 @@ return new class() extends \Civi\Test\EventCheck implements \Civi\Test\HookInter
     $this->assertTrue($e->region instanceof \CRM_Core_Region);
     /** @var \CRM_Core_Region $region */
     $region = $e->region;
-    $this->assertRegexp($this->validRegion, $region->_name);
+    $this->assertMatchesRegularExpression($this->validRegion, $region->_name);
     foreach ($region->getAll() as $snippet) {
       $this->assertContains($snippet['type'], $this->validSnippetTypes);
     }

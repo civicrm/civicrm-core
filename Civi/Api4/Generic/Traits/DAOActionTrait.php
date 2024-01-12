@@ -12,8 +12,6 @@
 
 namespace Civi\Api4\Generic\Traits;
 
-use Civi\Api4\CustomField;
-use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
@@ -103,7 +101,7 @@ trait DAOActionTrait {
   protected function writeObjects($items) {
     $updateWeights = FALSE;
     // Adjust weights for sortable entities
-    if (in_array('SortableEntity', CoreUtil::getInfoItem($this->getEntityName(), 'type'))) {
+    if (CoreUtil::isType($this->getEntityName(), 'SortableEntity')) {
       $weightField = CoreUtil::getInfoItem($this->getEntityName(), 'order_by');
       // Only take action if updating a single record, or if no weights are specified in any record
       // This avoids messing up a bulk update with multiple recalculations
@@ -112,6 +110,9 @@ trait DAOActionTrait {
       }
     }
 
+    // Values specified by entity definition (e.g. 'Individual', 'Organization', 'Household' pseudo-entities specify `contact_type`)
+    $presetValues = CoreUtil::getInfoItem($this->getEntityName(), 'where') ?? [];
+
     $result = [];
     $idField = CoreUtil::getIdFieldName($this->getEntityName());
 
@@ -119,6 +120,10 @@ trait DAOActionTrait {
       $entityId = $item[$idField] ?? NULL;
       FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);
+
+      if (!$entityId) {
+        $item = $presetValues + $item;
+      }
 
       // Adjust weights for sortable entities
       if ($updateWeights) {
@@ -272,7 +277,7 @@ trait DAOActionTrait {
         $field['id'],
         $customParams,
         $value,
-        $field['custom_group_id.extends'],
+        $field['extends'],
         // todo check when this is needed
         NULL,
         $entityId,
@@ -290,33 +295,30 @@ trait DAOActionTrait {
    *
    * @param string $fieldExpr
    *   Field identifier with possible suffix, e.g. MyCustomGroup.MyField1:label
-   * @return array{id: int, name: string, entity: string, suffix: string, html_type: string, data_type: string}|NULL
+   * @return array{id: int, name: string, entity: string, suffix: string, html_type: string, data_type: string, extends: string, table_name: string}|NULL
    */
-  protected function getCustomFieldInfo(string $fieldExpr) {
-    if (strpos($fieldExpr, '.') === FALSE) {
+  protected function getCustomFieldInfo(string $fieldExpr): ?array {
+    if (!str_contains($fieldExpr, '.')) {
       return NULL;
     }
     [$groupName, $fieldName] = explode('.', $fieldExpr);
     [$fieldName, $suffix] = array_pad(explode(':', $fieldName), 2, NULL);
-    $cacheKey = "APIv4_Custom_Fields-$groupName";
-    $info = \Civi::cache('metadata')->get($cacheKey);
-    if (!isset($info[$fieldName])) {
-      $info = [];
-      $fields = CustomField::get(FALSE)
-        ->addSelect('id', 'name', 'html_type', 'data_type', 'custom_group_id.extends', 'column_name', 'custom_group_id.table_name')
-        ->addWhere('custom_group_id.name', '=', $groupName)
-        ->execute()->indexBy('name');
-      foreach ($fields as $name => $field) {
-        $field['custom_field_id'] = $field['id'];
-        $field['table_name'] = $field['custom_group_id.table_name'];
-        unset($field['custom_group_id.table_name']);
-        $field['name'] = $groupName . '.' . $name;
-        $field['entity'] = CustomGroupJoinable::getEntityFromExtends($field['custom_group_id.extends']);
-        $info[$name] = $field;
+    foreach (\CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+      if ($customGroup['name'] === $groupName) {
+        foreach ($customGroup['fields'] as $field) {
+          if ($field['name'] === $fieldName) {
+            $field['custom_field_id'] = $field['id'];
+            $field['table_name'] = $customGroup['table_name'];
+            $field['extends'] = $customGroup['extends'];
+            $field['name'] = "$groupName.$fieldName";
+            $field['entity'] = \CRM_Core_BAO_CustomGroup::getEntityFromExtends($customGroup['extends']);
+            $field['suffix'] = $suffix;
+            return $field;
+          }
+        }
       }
-      \Civi::cache('metadata')->set($cacheKey, $info);
     }
-    return isset($info[$fieldName]) ? ['suffix' => $suffix] + $info[$fieldName] : NULL;
+    return NULL;
   }
 
   /**

@@ -25,6 +25,8 @@ class TagCreationSpecProvider extends \Civi\Core\Service\AutoService implements 
    */
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('used_for')->setDefaultValue('civicrm_contact');
+    $spec->getFieldByName('name')->setRequired(FALSE)->setRequiredIf('empty($values.label)');
+    $spec->getFieldByName('label')->setRequired(FALSE)->setRequiredIf('empty($values.name)');
   }
 
   /**

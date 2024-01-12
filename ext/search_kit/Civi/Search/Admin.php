@@ -13,7 +13,6 @@ namespace Civi\Search;
 
 use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
 use Civi\Api4\Entity;
-use Civi\Api4\Extension;
 use Civi\Api4\Query\SqlEquation;
 use Civi\Api4\Query\SqlFunction;
 use Civi\Api4\SearchDisplay;
@@ -35,8 +34,6 @@ class Admin {
    */
   public static function getAdminSettings():array {
     $schema = self::getSchema();
-    $extensions = Extension::get(FALSE)->addWhere('status', '=', 'installed')
-      ->execute()->indexBy('key')->column('label');
     $data = [
       'schema' => self::addImplicitFKFields($schema),
       'joins' => self::getJoins($schema),
@@ -48,17 +45,17 @@ class Admin {
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
       'defaultPagerSize' => (int) \Civi::settings()->get('default_pager_size'),
       'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),
-      'modules' => $extensions,
-      'defaultContactType' => \CRM_Contact_BAO_ContactType::basicTypeInfo()['Individual']['name'] ?? NULL,
+      'modules' => \CRM_Core_BAO_Managed::getBaseModules(),
       'defaultDistanceUnit' => \CRM_Utils_Address::getDefaultDistanceUnit(),
       'jobFrequency' => \Civi\Api4\Job::getFields()
         ->addWhere('name', '=', 'run_frequency')
         ->setLoadOptions(['id', 'label'])
         ->execute()->first()['options'],
       'tags' => Tag::get()
-        ->addSelect('id', 'name', 'color', 'is_selectable', 'description')
+        ->addSelect('id', 'label', 'color', 'is_selectable', 'description')
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
         ->execute(),
+      'myName' => \CRM_Core_Session::singleton()->getLoggedInContactDisplayName(),
     ];
     $perms = \Civi\Api4\Permission::get()
       ->addWhere('group', 'IN', ['civicrm', 'cms'])
@@ -98,6 +95,8 @@ class Admin {
       'NOT LIKE' => E::ts('Not Like'),
       'REGEXP' => E::ts('Matches Pattern'),
       'NOT REGEXP' => E::ts("Doesn't Match Pattern"),
+      'REGEXP BINARY' => E::ts('Matches Pattern (case-sensitive)'),
+      'NOT REGEXP BINARY' => E::ts("Doesn't Match Pattern (case-sensitive)"),
       'BETWEEN' => E::ts('Is Between'),
       'NOT BETWEEN' => E::ts('Not Between'),
       'IS EMPTY' => E::ts('Is Empty'),
@@ -131,7 +130,7 @@ class Admin {
   public static function getSchema(): array {
     $schema = [];
     $entities = Entity::get()
-      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable', 'order_by')
+      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'search_fields', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable', 'order_by')
       ->addWhere('searchable', '!=', 'none')
       ->addOrderBy('title_plural')
       ->setChain([
@@ -145,16 +144,12 @@ class Admin {
         if ($links) {
           $entity['links'] = array_values($links);
         }
-        $paths = CoreUtil::getInfoItem($entity['name'], 'paths');
-        if (!empty($paths['add'])) {
-          $entity['addPath'] = $paths['add'];
-        }
         try {
           $getFields = civicrm_api4($entity['name'], 'getFields', [
             'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'],
             'where' => [['deprecated', '=', FALSE], ['name', 'NOT IN', ['api_key', 'hash']]],
-            'orderBy' => ['label'],
-          ]);
+            'orderBy' => ['label' => 'ASC'],
+          ])->indexBy('name');
         }
         catch (\CRM_Core_Exception $e) {
           \Civi::log()->warning('Entity could not be loaded', ['entity' => $entity['name']]);
@@ -170,6 +165,7 @@ class Admin {
           }
           $entity['fields'][] = $field;
         }
+        $entity['default_columns'] = self::getDefaultColumns($entity, $getFields);
         $params = $entity['get'][0];
         // Entity must support at least these params or it is too weird for search kit
         if (!array_diff(['select', 'where', 'orderBy', 'limit', 'offset'], array_keys($params))) {
@@ -180,6 +176,44 @@ class Admin {
       }
     }
     return $schema;
+  }
+
+  /**
+   * Build default columns - these are used when creating a new search with this entity
+   *
+   * @param array $entity
+   * @param iterable $getFields
+   * @return array
+   */
+  private static function getDefaultColumns(array $entity, iterable $getFields): array {
+    // Start with id & label
+    $defaultColumns = array_merge(
+      $entity['primary_key'],
+      $entity['search_fields'] ?? []
+    );
+    $possibleColumns = [];
+    // Include grouping fields like "event_type_id"
+    foreach ((array) (CoreUtil::getCustomGroupExtends($entity['name'])['grouping'] ?? []) as $column) {
+      $possibleColumns[$column] = "$column:label";
+    }
+    // Other possible relevant columns... now we're just guessing
+    $possibleColumns['financial_type_id'] = 'financial_type_id:label';
+    $possibleColumns['description'] = 'description';
+    // E.g. "activity_status_id"
+    $possibleColumns[strtolower($entity['name']) . 'status_id'] = strtolower($entity['name']) . 'status_id:label';
+    $possibleColumns['start_date'] = 'start_date';
+    $possibleColumns['end_date'] = 'end_date';
+    $possibleColumns['is_active'] = 'is_active';
+    foreach ($possibleColumns as $fieldName => $columnName) {
+      if (
+        (str_contains($columnName, ':') && !empty($getFields[$fieldName]['options'])) ||
+        (!str_contains($columnName, ':') && !empty($getFields[$fieldName]))
+      ) {
+        $defaultColumns[] = $columnName;
+      }
+    }
+    // `array_unique` messes with the index so reset it with `array_values` so it cleanly encodes to a json array
+    return array_values(array_unique($defaultColumns));
   }
 
   /**
@@ -194,22 +228,27 @@ class Admin {
     foreach ($schema as &$entity) {
       if ($entity['searchable'] !== 'bridge') {
         foreach (array_reverse($entity['fields'] ?? [], TRUE) as $index => $field) {
-          if (!empty($field['fk_entity']) && !$field['options'] && !$field['suffixes'] && !empty($schema[$field['fk_entity']]['label_field'])) {
-            $isCustom = strpos($field['name'], '.');
-            // Custom fields: append "Contact ID" etc. to original field label
-            if ($isCustom) {
-              $idField = array_column($schema[$field['fk_entity']]['fields'], NULL, 'name')['id'];
-              $entity['fields'][$index]['label'] .= ' ' . $idField['title'];
+          if (!empty($field['fk_entity']) && !$field['options'] && !$field['suffixes'] && !empty($schema[$field['fk_entity']]['search_fields'])) {
+            $labelFields = array_unique(array_merge($schema[$field['fk_entity']]['search_fields'], (array) ($schema[$field['fk_entity']]['label_field'] ?? [])));
+            foreach ($labelFields as $labelField) {
+              $isCustom = strpos($field['name'], '.');
+              // Custom fields: append "Contact ID" etc. to original field label
+              if ($isCustom) {
+                $idField = array_column($schema[$field['fk_entity']]['fields'], NULL, 'name')['id'];
+                $entity['fields'][$index]['label'] .= ' ' . $idField['title'];
+              }
+              // DAO fields: use title instead of label since it represents the id (title usually ends in ID but label does not)
+              else {
+                $entity['fields'][$index]['label'] = $field['title'];
+              }
+              // Add the label field from the other entity to this entity's list of fields
+              $newField = \CRM_Utils_Array::findAll($schema[$field['fk_entity']]['fields'], ['name' => $labelField])[0] ?? NULL;
+              if ($newField) {
+                $newField['name'] = $field['name'] . '.' . $labelField;
+                $newField['label'] = $field['label'] . ' ' . $newField['label'];
+                array_splice($entity['fields'], $index + 1, 0, [$newField]);
+              }
             }
-            // DAO fields: use title instead of label since it represents the id (title usually ends in ID but label does not)
-            else {
-              $entity['fields'][$index]['label'] = $field['title'];
-            }
-            // Add the label field from the other entity to this entity's list of fields
-            $newField = \CRM_Utils_Array::findAll($schema[$field['fk_entity']]['fields'], ['name' => $schema[$field['fk_entity']]['label_field']])[0];
-            $newField['name'] = $field['name'] . '.' . $schema[$field['fk_entity']]['label_field'];
-            $newField['label'] = $field['label'] . ' ' . $newField['label'];
-            array_splice($entity['fields'], $index, 0, [$newField]);
           }
         }
         // Useful address fields (see ContactSchemaMapSubscriber)
@@ -239,35 +278,10 @@ class Admin {
   public static function getJoins(array $allowedEntities):array {
     $joins = [];
     foreach ($allowedEntities as $entity) {
-      // Multi-record custom field groups (to-date only the contact entity supports these)
-      if (in_array('CustomValue', $entity['type'])) {
-        // TODO: Lookup target entity from custom group if someday other entities support multi-record custom data
-        $targetEntity = $allowedEntities['Contact'];
-        // Join from Custom group to Contact (n-1)
-        $alias = "{$entity['name']}_{$targetEntity['name']}_entity_id";
-        $joins[$entity['name']][] = [
-          'label' => $entity['title'] . ' ' . $targetEntity['title'],
-          'description' => '',
-          'entity' => $targetEntity['name'],
-          'conditions' => self::getJoinConditions('entity_id', $alias . '.id'),
-          'defaults' => self::getJoinDefaults($alias, $targetEntity),
-          'alias' => $alias,
-          'multi' => FALSE,
-        ];
-        // Join from Contact to Custom group (n-n)
-        $alias = "{$targetEntity['name']}_{$entity['name']}_entity_id";
-        $joins[$targetEntity['name']][] = [
-          'label' => $entity['title_plural'],
-          'description' => '',
-          'entity' => $entity['name'],
-          'conditions' => self::getJoinConditions('id', $alias . '.entity_id'),
-          'defaults' => self::getJoinDefaults($alias, $entity),
-          'alias' => $alias,
-          'multi' => TRUE,
-        ];
-      }
-      // Non-custom DAO entities
-      elseif (!empty($entity['dao'])) {
+      $isMultiValueCustomEntity = in_array('CustomValue', $entity['type'], TRUE);
+
+      // Normal DAO entities (excludes multi-value custom field entities)
+      if (!empty($entity['dao']) && !$isMultiValueCustomEntity) {
         /** @var \CRM_Core_DAO $daoClass */
         $daoClass = $entity['dao'];
         $references = $daoClass::getReferenceColumns();
@@ -292,29 +306,37 @@ class Admin {
             $dynamicCol = $reference->getTypeColumn();
 
             // For dynamic references getTargetEntities will return multiple targets; for normal joins this loop will only run once
-            foreach ($reference->getTargetEntities() as $targetTable => $targetEntityName) {
-              if (!isset($allowedEntities[$targetEntityName]) || $targetEntityName === $entity['name']) {
+            foreach ($reference->getTargetEntities() as $dynamicValue => $targetEntityName) {
+              if (
+                !isset($allowedEntities[$targetEntityName]) ||
+                // What to do with self-references? They're weird but sometimes useful.
+                // For now, only allowing it for dynamic columns since they're explicitly declared
+                // (e.g. a Note can be a comment on a Note), and only the 1-n join since n-1 can be done with implicit joins.
+                ($targetEntityName === $entity['name'] && !$dynamicCol)
+              ) {
                 continue;
               }
               $targetEntity = $allowedEntities[$targetEntityName];
-              // Add the straight 1-1 join
-              $alias = $entity['name'] . '_' . $targetEntityName . '_' . $keyField['name'];
-              $joins[$entity['name']][] = [
-                'label' => $entity['title'] . ' ' . ($dynamicCol ? $targetEntity['title'] : $keyField['label']),
-                'description' => '',
-                'entity' => $targetEntityName,
-                'conditions' => self::getJoinConditions($keyField['name'], $alias . '.' . $reference->getTargetKey(), $targetTable, $dynamicCol),
-                'defaults' => self::getJoinDefaults($alias, $targetEntity),
-                'alias' => $alias,
-                'multi' => FALSE,
-              ];
+              // Add the straight 1-1 join (but only if it's not a reference to itself, see above)
+              if ($targetEntityName !== $entity['name']) {
+                $alias = $entity['name'] . '_' . $targetEntityName . '_' . $keyField['name'];
+                $joins[$entity['name']][] = [
+                  'label' => $entity['title'] . ' ' . ($dynamicCol ? $targetEntity['title'] : $keyField['label']),
+                  'description' => '',
+                  'entity' => $targetEntityName,
+                  'conditions' => self::getJoinConditions($keyField['name'], $alias . '.' . $reference->getTargetKey(), $dynamicValue, $dynamicCol),
+                  'defaults' => self::getJoinDefaults($alias, $targetEntity),
+                  'alias' => $alias,
+                  'multi' => FALSE,
+                ];
+              }
               // Flip the conditions & add the reverse (1-n) join
               $alias = $targetEntityName . '_' . $entity['name'] . '_' . $keyField['name'];
               $joins[$targetEntityName][] = [
                 'label' => $targetEntity['title'] . ' ' . $entity['title_plural'],
                 'description' => $dynamicCol ? '' : $keyField['label'],
                 'entity' => $entity['name'],
-                'conditions' => self::getJoinConditions($reference->getTargetKey(), $alias . '.' . $keyField['name'], $targetTable, $dynamicCol ? $alias . '.' . $dynamicCol : NULL),
+                'conditions' => self::getJoinConditions($reference->getTargetKey(), $alias . '.' . $keyField['name'], $dynamicValue, $dynamicCol ? $alias . '.' . $dynamicCol : NULL),
                 'defaults' => self::getJoinDefaults($alias, $entity),
                 'alias' => $alias,
                 'multi' => TRUE,
@@ -329,7 +351,7 @@ class Admin {
             $reference = self::getReference($targetKey, $references);
             $dynamicCol = $reference->getTypeColumn();
             $keyField = $fields[$reference->getReferenceKey()] ?? NULL;
-            foreach ($reference->getTargetEntities() as $targetTable => $targetEntityName) {
+            foreach ($reference->getTargetEntities() as $dynamicValue => $targetEntityName) {
               $targetEntity = $allowedEntities[$targetEntityName] ?? NULL;
               $baseEntity = $allowedEntities[$fields[$baseKey]['fk_entity']] ?? NULL;
               if (!$targetEntity || !$baseEntity) {
@@ -344,7 +366,7 @@ class Admin {
                 'entity' => $targetEntityName,
                 'conditions' => array_merge(
                   [$bridge],
-                  self::getJoinConditions('id', $alias . '.' . $baseKey, NULL, NULL)
+                  self::getJoinConditions('id', $alias . '.' . $baseKey)
                 ),
                 'defaults' => self::getJoinDefaults($alias, $targetEntity, $entity),
                 'bridge' => $bridge,
@@ -360,7 +382,7 @@ class Admin {
                   'entity' => $baseEntity['name'],
                   'conditions' => array_merge(
                     [$bridge],
-                    self::getJoinConditions($reference->getTargetKey(), $alias . '.' . $keyField['name'], $targetTable, $dynamicCol ? $alias . '.' . $dynamicCol : NULL)
+                    self::getJoinConditions($reference->getTargetKey(), $alias . '.' . $keyField['name'], $dynamicValue, $alias . '.' . $dynamicCol)
                   ),
                   'defaults' => self::getJoinDefaults($alias, $baseEntity, $entity),
                   'bridge' => $bridge,
@@ -371,25 +393,52 @@ class Admin {
             }
           }
         }
-        // Custom EntityRef joins
-        foreach ($fields as $field) {
-          if ($field['type'] === 'Custom' && $field['input_type'] === 'EntityRef') {
-            $targetEntity = $allowedEntities[$field['fk_entity']];
-            // Add the EntityRef join
-            [, $bareFieldName] = explode('.', $field['name']);
-            $alias = $entity['name'] . '_' . $field['fk_entity'] . '_' . $bareFieldName;
-            $joins[$entity['name']][] = [
-              'label' => $entity['title'] . ' ' . $field['title'],
-              'description' => $field['description'],
-              'entity' => $field['fk_entity'],
-              'conditions' => self::getJoinConditions($field['name'], $alias . '.id'),
-              'defaults' => [],
-              'alias' => $alias,
-              'multi' => FALSE,
-            ];
+      }
+
+      // Custom EntityRef joins
+      foreach ($entity['fields'] as $field) {
+        if (($field['type'] === 'Custom' || $isMultiValueCustomEntity) && $field['fk_entity'] && $field['input_type'] === 'EntityRef') {
+          $entityRefJoins = self::getEntityRefJoins($entity, $field);
+          foreach ($entityRefJoins as $joinEntity => $joinInfo) {
+            $joins[$joinEntity][] = $joinInfo;
           }
         }
       }
+    }
+    return $joins;
+  }
+
+  /**
+   * Get joins for entity reference custom fields, and the entity_id field in
+   * multi-record custom groups.
+   *
+   * @return array[]
+   */
+  public static function getEntityRefJoins(array $entity, array $field): array {
+    $exploded = explode('.', $field['name']);
+    $bareFieldName = array_reverse($exploded)[0];
+    $alias = "{$entity['name']}_{$field['fk_entity']}_$bareFieldName";
+    $joins[$entity['name']] = [
+      'label' => $entity['title'] . ' ' . $field['label'],
+      'description' => $field['description'],
+      'entity' => $field['fk_entity'],
+      'conditions' => self::getJoinConditions($field['name'], $alias . '.id'),
+      'defaults' => [],
+      'alias' => $alias,
+      'multi' => FALSE,
+    ];
+    // Do reverse join if not the same entity
+    if ($entity['name'] !== $field['fk_entity']) {
+      $alias = "{$field['fk_entity']}_{$entity['name']}_$bareFieldName";
+      $joins[$field['fk_entity']] = [
+        'label' => $entity['title_plural'],
+        'description' => $entity['description'],
+        'entity' => $entity['name'],
+        'conditions' => self::getJoinConditions('id', "$alias.{$field['name']}"),
+        'defaults' => [],
+        'alias' => $alias,
+        'multi' => TRUE,
+      ];
     }
     return $joins;
   }
@@ -414,11 +463,11 @@ class Admin {
    *
    * @param string $nearCol
    * @param string $farCol
-   * @param string|null $targetTable
+   * @param string|null $dynamicValue
    * @param string|null $dynamicCol
    * @return array[]
    */
-  private static function getJoinConditions(string $nearCol, string $farCol, string $targetTable = NULL, string $dynamicCol = NULL):array {
+  private static function getJoinConditions(string $nearCol, string $farCol, string $dynamicValue = NULL, string $dynamicCol = NULL):array {
     $conditions = [
       [
         $nearCol,
@@ -430,7 +479,7 @@ class Admin {
       $conditions[] = [
         $dynamicCol,
         '=',
-        "'$targetTable'",
+        "'$dynamicValue'",
       ];
     }
     return $conditions;

@@ -14,17 +14,17 @@
   {assign var="count" value=$customGroupCount%2}
   {if ($count eq $side) or $skipTitle}
     {foreach from=$customValues item=cd_edit key=cvID}
-      <div class="customFieldGroup crm-collapsible{if !empty($cd_edit.collapse_display)} collapsed{/if} ui-corner-all {$cd_edit.name} crm-custom-set-block-{$customGroupId}">
-        <div class="collapsible-title">
+      <details class="customFieldGroup crm-accordion-wrapper ui-corner-all {$cd_edit.name} crm-custom-set-block-{$customGroupId}" {if !empty($cd_edit.collapse_display)} open{/if}>
+        <summary class="crm-accordion-header crm-master-accordion-header">
           {$cd_edit.title}
-        </div>
+        </summary>
         {if $cvID eq 0}
           {assign var='cvID' value='-1'}
         {/if}
         <div class="crm-summary-block" id="custom-set-block-{$customGroupId}-{$cvID}">
           {include file="CRM/Contact/Page/View/CustomDataFieldView.tpl" customGroupId=$customGroupId customRecId=$cvID cgcount=$cgcount}
         </div>
-      </div>
+      </details>
       {assign var="cgcount" value=$cgcount+1}
     {/foreach}
   {/if}

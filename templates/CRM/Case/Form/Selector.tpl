@@ -12,7 +12,7 @@
 <table class="caseSelector row-highlight">
   <tr class="columnheader">
 
-  {if ! $single and $context eq 'Search' }
+  {if ! $single and $context eq 'Search'}
     <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
   {/if}
 
@@ -59,7 +59,7 @@
   {/foreach}
 
     {* Dashboard only lists 10 most recent cases. *}
-    {if $context EQ 'dashboard' and $limit and $pager->_totalItems GT $limit }
+    {if $context EQ 'dashboard' and $limit and $pager->_totalItems GT $limit}
       <tr class="even-row">
         <td colspan="10"><a href="{crmURL p='civicrm/case/search' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Find more cases{/ts}... </a></td>
       </tr>

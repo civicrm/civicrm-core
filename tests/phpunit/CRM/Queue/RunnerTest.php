@@ -93,7 +93,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    *
    * One of the tasks will insert more TODOs at the start of the list.
    */
-  public function testRunAll_AddMore() {
+  public function testRunAll_AddMore(): void {
     // Prepare a list of tasks with an error in the middle.
     $this->queue->createItem(new CRM_Queue_Task(
       ['CRM_Queue_RunnerTest', '_recordValue'],
@@ -128,7 +128,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * Run a series of tasks; when one throws an
    * exception, ignore it and continue
    */
-  public function testRunAll_Continue_Exception() {
+  public function testRunAll_Continue_Exception(): void {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
       ['CRM_Queue_RunnerTest', '_recordValue'],
@@ -165,7 +165,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * Run a series of tasks; when one throws an exception,
    * abort processing and return it to the queue.
    */
-  public function testRunAll_Abort_Exception() {
+  public function testRunAll_Abort_Exception(): void {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
       ['CRM_Queue_RunnerTest', '_recordValue'],
@@ -203,7 +203,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    * Run a series of tasks; when one returns false,
    * abort processing and return it to the queue.
    */
-  public function testRunAll_Abort_False() {
+  public function testRunAll_Abort_False(): void {
     // prepare a list of tasks with an error in the middle
     $this->queue->createItem(new CRM_Queue_Task(
       ['CRM_Queue_RunnerTest', '_recordValue'],

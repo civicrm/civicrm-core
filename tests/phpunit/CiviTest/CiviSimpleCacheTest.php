@@ -170,7 +170,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     ];
   }
 
-  public function testSet() {
+  public function testSet(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -183,7 +183,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
   /**
    * @medium
    */
-  public function testSetTtl() {
+  public function testSetTtl(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -201,7 +201,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertNull($this->cache->get('key2'), 'Value must expire after ttl.');
   }
 
-  public function testSetExpiredTtl() {
+  public function testSetExpiredTtl(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -216,7 +216,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertFalse($this->cache->has('key1'));
   }
 
-  public function testGet() {
+  public function testGet(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -228,7 +228,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertEquals('value', $this->cache->get('key', 'foo'));
   }
 
-  public function testDelete() {
+  public function testDelete(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -239,7 +239,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertNull($this->cache->get('key'), 'Values must be deleted on delete()');
   }
 
-  public function testClear() {
+  public function testClear(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -250,7 +250,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertNull($this->cache->get('key'), 'Values must be deleted on clear()');
   }
 
-  public function testSetMultiple() {
+  public function testSetMultiple(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -261,7 +261,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertEquals('value1', $this->cache->get('key1'));
   }
 
-  public function testSetMultipleWithIntegerArrayKey() {
+  public function testSetMultipleWithIntegerArrayKey(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -274,7 +274,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
   /**
    * @medium
    */
-  public function testSetMultipleTtl() {
+  public function testSetMultipleTtl(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -292,7 +292,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertNull($this->cache->get('key4'), 'Value must expire after ttl.');
   }
 
-  public function testSetMultipleExpiredTtl() {
+  public function testSetMultipleExpiredTtl(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -302,7 +302,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertNull($this->cache->get('key1'));
   }
 
-  public function testSetMultipleWithGenerator() {
+  public function testSetMultipleWithGenerator(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -317,7 +317,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertEquals('value1', $this->cache->get('key1'));
   }
 
-  public function testGetMultiple() {
+  public function testGetMultiple(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -347,7 +347,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertSame(['key2', 'key3', 'key4'], $keys);
   }
 
-  public function testGetMultipleWithGenerator() {
+  public function testGetMultipleWithGenerator(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -378,7 +378,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertNull($this->cache->get('key1'));
   }
 
-  public function testDeleteMultiple() {
+  public function testDeleteMultiple(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -393,7 +393,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertNull($this->cache->get('key1'), 'Values must be deleted on deleteMultiple()');
   }
 
-  public function testDeleteMultipleGenerator() {
+  public function testDeleteMultipleGenerator(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -409,7 +409,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertNull($this->cache->get('key1'), 'Values must be deleted on deleteMultiple()');
   }
 
-  public function testHas() {
+  public function testHas(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -419,7 +419,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertTrue($this->cache->has('key0'));
   }
 
-  public function testBasicUsageWithLongKey() {
+  public function testBasicUsageWithLongKey(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -461,7 +461,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $result = $this->cache->getMultiple(['key1', $key, 'key2']);
   }
 
-  public function testGetMultipleNoIterable() {
+  public function testGetMultipleNoIterable(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -499,7 +499,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->cache->setMultiple($values());
   }
 
-  public function testSetMultipleNoIterable() {
+  public function testSetMultipleNoIterable(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -544,7 +544,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->cache->deleteMultiple(['key1', $key, 'key2']);
   }
 
-  public function testDeleteMultipleNoIterable() {
+  public function testDeleteMultipleNoIterable(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -577,7 +577,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->cache->setMultiple(['key' => 'value'], $ttl);
   }
 
-  public function testNullOverwrite() {
+  public function testNullOverwrite(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -588,7 +588,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertNull($this->cache->get('key'), 'Setting null to a key must overwrite previous value');
   }
 
-  public function testDataTypeString() {
+  public function testDataTypeString(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -599,7 +599,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertTrue(is_string($result), 'Wrong data type. If we store a string we must get an string back.');
   }
 
-  public function testDataTypeInteger() {
+  public function testDataTypeInteger(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -610,7 +610,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertTrue(is_int($result), 'Wrong data type. If we store an int we must get an int back.');
   }
 
-  public function testDataTypeFloat() {
+  public function testDataTypeFloat(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -622,7 +622,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertEquals($float, $result);
   }
 
-  public function testDataTypeBoolean() {
+  public function testDataTypeBoolean(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -634,7 +634,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertTrue($this->cache->has('key'), 'has() should return true when true are stored. ');
   }
 
-  public function testDataTypeArray() {
+  public function testDataTypeArray(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -646,7 +646,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertEquals($array, $result);
   }
 
-  public function testDataTypeObject() {
+  public function testDataTypeObject(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -659,7 +659,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertEquals($object, $result);
   }
 
-  public function testBinaryData() {
+  public function testBinaryData(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -736,7 +736,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertSame(['key'], $keys);
   }
 
-  public function testObjectAsDefaultValue() {
+  public function testObjectAsDefaultValue(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }
@@ -746,7 +746,7 @@ abstract class CiviSimpleCacheTest extends TestCase {
     $this->assertEquals($obj, $this->cache->get('key', $obj));
   }
 
-  public function testObjectDoesNotChangeInCache() {
+  public function testObjectDoesNotChangeInCache(): void {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
     }

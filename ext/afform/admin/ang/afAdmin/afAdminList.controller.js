@@ -24,29 +24,13 @@
 
     this.afforms = _.transform(afforms, function(afforms, afform) {
       afform.type = afform.type || 'system';
-      // Aggregate a couple fields for the "Placement" column
-      afform.placement = [];
-      if (afform.is_dashlet) {
-        afform.placement.push(ts('Dashboard'));
-      }
-      if (afform['contact_summary:label']) {
-        afform.placement.push(afform['contact_summary:label']);
+      afform.placement = afform['placement:label'];
+      if (afform.submission_date) {
+        afform.submission_date = CRM.utils.formatDate(afform.submission_date);
       }
       afforms[afform.type] = afforms[afform.type] || [];
       afforms[afform.type].push(afform);
     }, {});
-
-    // Load aggregated submission stats for each form
-    crmApi4('AfformSubmission', 'get', {
-      select: ['afform_name', 'MAX(submission_date) AS last_submission', 'COUNT(id) AS submission_count'],
-      groupBy: ['afform_name']
-    }).then(function(submissions) {
-      _.each(submissions, function(submission) {
-        var afform = _.findWhere(afforms, {name: submission.afform_name}) || {};
-        afform.last_submission = CRM.utils.formatDate(submission.last_submission);
-        afform.submission_count = submission.submission_count;
-      });
-    });
 
     // Change sort field/direction when clicking a column header
     this.sortBy = function(col) {

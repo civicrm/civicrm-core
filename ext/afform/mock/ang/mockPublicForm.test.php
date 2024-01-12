@@ -76,7 +76,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
       $this->fail('Plain text message did not have URL in expected place: ' . $text);
     }
     $url = $m[1];
-    $this->assertRegExp(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
 
     // Going to this page will cause us to authenticate as the target contact
     $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => new \GuzzleHttp\Cookie\CookieJar()]);
@@ -102,7 +102,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
       $this->fail('HTML message did not have URL in expected place: ' . $html);
     }
     $url = html_entity_decode($m[1]);
-    $this->assertRegExp(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
 
     // Going to this page will cause us to authenticate as the target contact
     $http = $this->createGuzzle(['cookies' => new \GuzzleHttp\Cookie\CookieJar()]);
@@ -126,7 +126,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $this->assertEquals(1, $doc->find('a')->count(), 'Document should have hyperlink');
     foreach ($doc->find('a') as $item) {
       /** @var \DOMElement $item */
-      $this->assertRegExp(';^https?:.*civicrm/mock-public-form.*;', $item->getAttribute('href'));
+      $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $item->getAttribute('href'));
       $this->assertEquals('My public form', $item->firstChild->data);
       $url = $item->getAttribute('href');
     }

@@ -20,7 +20,7 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
   /**
    * Test the payment method is adequately logged - we don't expect the processing to succeed
    */
-  public function testHandlePaymentMethodLogging() {
+  public function testHandlePaymentMethodLogging(): void {
     $params = ['processor_name' => 'Paypal', 'data' => 'blah'];
     try {
       CRM_Core_Payment::handlePaymentMethod('method', $params);
@@ -35,7 +35,7 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
   /**
    * Test that CVV is always required for front facing pages.
    */
-  public function testCVVSettingForContributionPages() {
+  public function testCVVSettingForContributionPages(): void {
     Civi::settings()->set('cvv_backoffice_required', 0);
     $processor = NULL;
     $dummyPayment = new CRM_Core_Payment_Dummy("test", $processor);
@@ -58,7 +58,7 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals(1, $paymentMetaData["cvv2"]["is_required"], "CVV should always be required for front office.");
   }
 
-  public function testSettingUrl() {
+  public function testSettingUrl(): void {
     /** @var CRM_Core_Payment_Dummy $processor */
     $processor = \Civi\Payment\System::singleton()->getById($this->processorCreate());
     $success = 'http://success.com';

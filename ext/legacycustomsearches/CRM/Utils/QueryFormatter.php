@@ -283,7 +283,7 @@ class CRM_Utils_QueryFormatter {
     //Return if searched string ends with an unsupported operator.
     //Or if the string contains an invalid joint occurrence of operators.
     foreach ($operators as $val) {
-      if ($text == '@' || CRM_Utils_String::endsWith($text, $val) || preg_match("/[{$expression}]{2,}/", $text)) {
+      if ($text == '@' || str_ends_with($text, $val) || preg_match("/[{$expression}]{2,}/", $text)) {
         $csid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', 'CRM_Contact_Form_Search_Custom_FullText', 'value', 'name');
         $url = CRM_Utils_System::url("civicrm/contact/search/custom", "csid={$csid}&reset=1");
         $operators = implode("', '", $operators);

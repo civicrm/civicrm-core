@@ -200,7 +200,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     if ($compContext) {
       $extraParams .= "&compContext={$compContext}";
     }
-    elseif ($context == 'search') {
+    elseif ($context === 'search') {
       $extraParams .= '&compContext=participant';
     }
 
@@ -226,8 +226,8 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/contact/view/participant',
-          'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
+          'url' => 'civicrm/participant/delete',
+          'qs' => 'reset=1&id=%%id%%' . $extraParams,
           'title' => ts('Delete Participation'),
           'weight' => 100,
         ],
@@ -329,23 +329,13 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       // Skip registration if event_id is NULL
       if (empty($row['event_id'])) {
-        Civi::log()->warning('Participant record without event ID. You have invalid data in your database!');
+        Civi::log()->warning('Participant record (' . $row['participant_id'] . ') without event ID. You have invalid data in your database!');
         continue;
       }
 
       //carry campaign on selectors.
       $row['campaign'] = $allCampaigns[$result->participant_campaign_id] ?? NULL;
       $row['campaign_id'] = $result->participant_campaign_id;
-
-      // gross hack to show extra information for pending status
-      $statusClass = NULL;
-      if ((isset($row['participant_status_id'])) &&
-        ($statusId = array_search($row['participant_status_id'], $statusTypes))
-      ) {
-        $statusClass = $statusClasses[$statusId];
-      }
-
-      $row['showConfirmUrl'] = $statusClass == 'Pending';
 
       if (!empty($row['participant_is_test'])) {
         $row['participant_status'] = CRM_Core_TestEntity::appendTestText($row['participant_status']);
@@ -354,12 +344,13 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->participant_id;
       $links = self::links($this->_key, $this->_context, $this->_compContext);
 
-      if ($statusTypes[$row['participant_status_id']] == 'Partially paid') {
+      if ($statusTypes[$row['participant_status_id']] === 'Partially paid') {
         $links[CRM_Core_Action::ADD] = [
           'name' => ts('Record Payment'),
           'url' => 'civicrm/payment',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
           'title' => ts('Record Payment'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
         ];
         if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
           $links[CRM_Core_Action::BASIC] = [
@@ -367,16 +358,18 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
             'url' => 'civicrm/payment/add',
             'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event&mode=live',
             'title' => ts('Submit Credit Card payment'),
+            'weight' => 50,
           ];
         }
       }
 
-      if ($statusTypes[$row['participant_status_id']] == 'Pending refund') {
+      if ($statusTypes[$row['participant_status_id']] === 'Pending refund') {
         $links[CRM_Core_Action::ADD] = [
           'name' => ts('Record Refund'),
           'url' => 'civicrm/payment',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
           'title' => ts('Record Refund'),
+          'weight' => 60,
         ];
       }
 
@@ -391,6 +384,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
           'url' => 'civicrm/event/selfsvcupdate',
           'qs' => 'reset=1&pid=%%id%%&is_backoffice=1&cs=' . CRM_Contact_BAO_Contact_Utils::generateChecksum($result->contact_id, NULL, 'inf'),
           'title' => ts('Transfer or Cancel'),
+          'weight' => 70,
         ];
       }
 

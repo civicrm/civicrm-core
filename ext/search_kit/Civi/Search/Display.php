@@ -12,7 +12,6 @@
 namespace Civi\Search;
 
 use CRM_Search_ExtensionUtil as E;
-use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Class Display
@@ -58,36 +57,20 @@ class Display {
    * @return array[]
    */
   public static function getEntityLinks(string $entity, $addLabel = FALSE): array {
-    $paths = CoreUtil::getInfoItem($entity, 'paths') ?? [];
-    $links = [];
-    // Hack to support links to relationships
-    if ($entity === 'RelationshipCache') {
-      $entity = 'Relationship';
+    $links = (array) civicrm_api4($entity, 'getLinks', [
+      'checkPermissions' => FALSE,
+      'entityTitle' => $addLabel,
+      'select' => ['ui_action', 'entity', 'text', 'icon', 'target'],
+    ]);
+    $styles = [
+      'delete' => 'danger',
+      'add' => 'primary',
+    ];
+    foreach ($links as &$link) {
+      $link['action'] = $link['ui_action'];
+      $link['style'] = $styles[$link['ui_action']] ?? 'default';
+      unset($link['ui_action']);
     }
-    if ($addLabel === TRUE) {
-      $addLabel = CoreUtil::getInfoItem($entity, 'title');
-    }
-    // If addLabel is false the placeholder needs to be passed through to javascript
-    $label = $addLabel ?: '%1';
-    unset($paths['add'], $paths['browse']);
-    foreach (array_keys($paths) as $actionName) {
-      $actionKey = \CRM_Core_Action::mapItem($actionName);
-      $link = [
-        'action' => $actionName,
-        'entity' => $entity,
-        'text' => \CRM_Core_Action::getTitle($actionKey, $label),
-        'icon' => \CRM_Core_Action::getIcon($actionKey),
-        'weight' => \CRM_Core_Action::getWeight($actionKey),
-        'style' => $actionName === 'delete' ? 'danger' : 'default',
-        'target' => 'crm-popup',
-      ];
-      // Contacts and cases are too cumbersome to view in a popup
-      if (in_array($entity, ['Contact', 'Case']) && in_array($actionName, ['view', 'update'])) {
-        $link['target'] = '_blank';
-      }
-      $links[$actionName] = $link;
-    }
-    uasort($links, ['CRM_Utils_Sort', 'cmpFunc']);
     return $links;
   }
 

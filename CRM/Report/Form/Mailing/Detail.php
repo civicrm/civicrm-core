@@ -271,12 +271,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
           if (!empty($field['required']) ||
             !empty($this->_params['fields'][$fieldName])
           ) {
-            if (in_array($fieldName, [
-              'unsubscribe_id',
-              'optout_id',
-              'forward_id',
-              'reply_id',
-            ])) {
+            if (in_array($fieldName, ['unsubscribe_id', 'optout_id', 'forward_id', 'reply_id'])) {
               $select[] = "IF({$field['dbAlias']} IS NULL, 'No', 'Yes') as {$tableName}_{$fieldName}";
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = $field['no_display'] ?? NULL;

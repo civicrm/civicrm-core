@@ -63,7 +63,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testCreateBasicBundle() {
+  public function testCreateBasicBundle(): void {
     $hits = [];
 
     $init = function(CRM_Core_Resources_Bundle $b) use (&$hits) {
@@ -86,7 +86,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    * Make two bundles (multi-regional). Add them to CRM_Core_Resources.
    * Ensure that the resources land in the right regions.
    */
-  public function testAddBundle() {
+  public function testAddBundle(): void {
     $foo = new CRM_Core_Resources_Bundle('foo', ['scriptUrl', 'styleUrl', 'markup']);
     $bar = new CRM_Core_Resources_Bundle('bar', ['scriptUrl', 'styleUrl', 'markup']);
 
@@ -127,7 +127,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     );
   }
 
-  public function testAddScriptFile() {
+  public function testAddScriptFile(): void {
     $this->res
       ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile')
       // extra
@@ -148,7 +148,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    *
    * FIXME: This can't work because the tests run in English and CRM_Core_Resources optimizes
    * away the English data from $settings['strings']
-   * public function testAddScriptFile_strings() {
+   * public function testAddScriptFile_strings(): void {
    * file_put_contents($this->mapper->keyToBasePath('com.example.ext') . '/hello.js', 'alert(ts("Hello world"));');
    * $this->res->addScriptFile('com.example.ext', 'hello.js', 0, 'testAddScriptFile_strings');
    * $settings = $this->res->getSettings();
@@ -160,7 +160,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   /**
    * Ensure that adding a script URL creates expected markup.
    */
-  public function testAddScriptURL() {
+  public function testAddScriptURL(): void {
     $this->res
       ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL')
       // extra
@@ -176,7 +176,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function testAddScript() {
+  public function testAddScript(): void {
     $this->res
       ->addScript('alert("hi");', 0, 'testAddScript')
       ->addScript('alert("there");', 0, 'testAddScript');
@@ -189,7 +189,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function testAddVars() {
+  public function testAddVars(): void {
     $this->res
       ->addVars('food', ['fruit' => ['mine' => 'apple', 'ours' => 'banana']])
       ->addVars('food', ['fruit' => ['mine' => 'new apple', 'yours' => 'orange']]);
@@ -209,7 +209,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     );
   }
 
-  public function testAddSetting() {
+  public function testAddSetting(): void {
     $this->res
       ->addSetting(['fruit' => ['mine' => 'apple']])
       ->addSetting(['fruit' => ['yours' => 'orange']]);
@@ -222,7 +222,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertTrue(strpos($actual, $expected) !== FALSE);
   }
 
-  public function testAddSettingToBillingBlock() {
+  public function testAddSettingToBillingBlock(): void {
     $this->res
       ->addSetting(['cheese' => ['cheddar' => 'yellow']], 'billing-block')
       ->addSetting(['cheese' => ['edam' => 'red']], 'billing-block');
@@ -235,7 +235,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertTrue(strpos($actual, $expected) !== FALSE);
   }
 
-  public function testAddSettingHook() {
+  public function testAddSettingHook(): void {
     $test = $this;
     Civi::dispatcher()->addListener('hook_civicrm_alterResourceSettings', function($event) use ($test) {
       $test->assertEquals('apple', $event->data['fruit']['mine']);
@@ -246,7 +246,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertTreeEquals(['fruit' => ['mine' => 'banana']], $settings);
   }
 
-  public function testAddSettingFactory() {
+  public function testAddSettingFactory(): void {
     $this->res->addSettingsFactory(function () {
       return ['fruit' => ['yours' => 'orange']];
     });
@@ -259,7 +259,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertTreeEquals($expected, $actual);
   }
 
-  public function testAddSettingAndSettingFactory() {
+  public function testAddSettingAndSettingFactory(): void {
     $this->res->addSetting(['fruit' => ['mine' => 'apple']]);
 
     $muckableValue = ['fruit' => ['yours' => 'orange', 'theirs' => 'apricot']];
@@ -278,7 +278,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertTreeEquals($expected, $actual);
   }
 
-  public function testCrmJS() {
+  public function testCrmJS(): void {
     $smarty = CRM_Core_Smarty::singleton();
 
     $actual = $smarty->fetch('string:{crmScript ext=com.example.ext file=foo%20bar.js region=testCrmJS}');
@@ -295,7 +295,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function testAddStyleFile() {
+  public function testAddStyleFile(): void {
     $this->res
       ->addStyleFile('com.example.ext', 'foo%20bar.css', 0, 'testAddStyleFile')
       // extra
@@ -311,7 +311,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function testAddStyleURL() {
+  public function testAddStyleURL(): void {
     $this->res
       ->addStyleUrl('/whiz/foo%20bar.css', 0, 'testAddStyleURL')
       // extra
@@ -327,7 +327,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function testAddStyle() {
+  public function testAddStyle(): void {
     $this->res
       ->addStyle('body { background: black; }', 0, 'testAddStyle')
       ->addStyle('body { text-color: black; }', 0, 'testAddStyle');
@@ -340,7 +340,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function testCrmCSS() {
+  public function testCrmCSS(): void {
     $smarty = CRM_Core_Smarty::singleton();
 
     $actual = $smarty->fetch('string:{crmStyle ext=com.example.ext file=foo%20bar.css region=testCrmCSS}');
@@ -357,7 +357,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public function testGetURL() {
+  public function testGetURL(): void {
     $this->assertEquals(
       'http://core-app/dir/file%20name.txt',
       $this->res->getURL('civicrm', 'dir/file%20name.txt')
@@ -376,7 +376,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     );
   }
 
-  public function testCrmResURL() {
+  public function testCrmResURL(): void {
     $smarty = CRM_Core_Smarty::singleton();
 
     $actual = $smarty->fetch('string:{crmResURL ext=com.example.ext file=foo%20bar.png}');
@@ -392,7 +392,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals(Civi::paths()->getUrl('[civicrm.root]/foo'), $actual);
   }
 
-  public function testGlob() {
+  public function testGlob(): void {
     $this->assertEquals(
       ['info.xml'],
       $this->res->glob('com.example.ext', 'info.xml')
@@ -504,7 +504,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    * Test for hook_civicrm_entityRefFilters().
    *
    */
-  public function testEntityRefFiltersHook() {
+  public function testEntityRefFiltersHook(): void {
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_entityRefFilters', [$this, 'entityRefFilters']);
     $data = Invasive::call(['CRM_Core_Resources', 'getEntityRefMetadata']);
     $this->assertEquals(count($data['links']['Contact']), 4);

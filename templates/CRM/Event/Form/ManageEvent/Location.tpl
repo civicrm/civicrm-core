@@ -13,9 +13,6 @@
 </div>
 
 <div class="crm-block crm-form-block crm-event-manage-location-form-block">
-  <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl" location="top"}
-  </div>
   {if $locEvents}
     <table class="form-layout-compressed">
       <tr id="optionType" class="crm-event-manage-location-form-block-location_option">
@@ -71,8 +68,11 @@
     </tr>
   </table>
 
-  {if $locEvents}
+  <div class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl" location="bottom"}
+  </div>
 
+  {if $locEvents}
     <script type="text/javascript">
       {literal}
       CRM.$(function($) {

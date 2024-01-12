@@ -5,7 +5,7 @@
   angular.module('crmSearchAdmin').component('crmSearchAdminSegmentListing', {
     bindings: {
       filters: '<',
-      totalCount: '='
+      totalCount: '=?'
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
     controller: function($scope, $element, crmApi4, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {

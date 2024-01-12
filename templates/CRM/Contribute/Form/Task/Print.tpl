@@ -9,7 +9,7 @@
 *}
 <p>
 
-{if $rows }
+{if $rows}
 <div class="form-item crm-block crm-form-block crm-contribution-form-block">
      <span class="element-right">{$form.buttons.html}</span>
 </div>

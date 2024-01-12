@@ -322,7 +322,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertEquals($entity_table, $createResult['values'][$fileId]['entity_table']);
     $this->assertEquals($entity->id, $createResult['values'][$fileId]['entity_id']);
     $this->assertEquals('My test description', $createResult['values'][$fileId]['description']);
-    $this->assertRegExp('/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/', $createResult['values'][$fileId]['upload_date']);
+    $this->assertMatchesRegularExpression('/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/', $createResult['values'][$fileId]['upload_date']);
     $this->assertNotTrue(isset($createResult['values'][$fileId]['content']));
     $this->assertNotEmpty($createResult['values'][$fileId]['url']);
     $this->assertAttachmentExistence(TRUE, $createResult);
@@ -378,7 +378,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       'entity_table' => $entity_table,
       'entity_id' => $entity->id,
     ]);
-    $this->assertRegExp($expectedError, $createResult['error_message']);
+    $this->assertMatchesRegularExpression($expectedError, $createResult['error_message']);
   }
 
   /**
@@ -403,7 +403,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $updateResult = $this->callAPIFailure('Attachment', 'create', $updateParams + [
       'id' => $fileId,
     ]);
-    $this->assertRegExp($expectedError, $updateResult['error_message']);
+    $this->assertMatchesRegularExpression($expectedError, $updateResult['error_message']);
   }
 
   /**
@@ -449,7 +449,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertEquals($loggedInUser, $createResult['values'][$fileId]['created_id']);
   }
 
-  public function testCreateShouldKeepCreatedIdEmptyIfTheresNoLoggedInUser() {
+  public function testCreateShouldKeepCreatedIdEmptyIfTheresNoLoggedInUser(): void {
     $testEntityClass = 'CRM_Activity_DAO_Activity';
     $entity = CRM_Core_DAO::createTestObject($testEntityClass);
     $entity_table = CRM_Core_DAO_AllCoreTables::getTableForClass($testEntityClass);
@@ -467,7 +467,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertEmpty($createResult['values'][$fileId]['created_id']);
   }
 
-  public function testCreateShouldNotUpdateTheCreatedId() {
+  public function testCreateShouldNotUpdateTheCreatedId(): void {
     $testEntityClass = 'CRM_Activity_DAO_Activity';
     $entity = CRM_Core_DAO::createTestObject($testEntityClass);
     $entity_table = CRM_Core_DAO_AllCoreTables::getTableForClass($testEntityClass);
@@ -560,7 +560,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     }
 
     $getResult = $this->callAPIFailure('Attachment', 'get', $getParams);
-    $this->assertRegExp($expectedError, $getResult['error_message']);
+    $this->assertMatchesRegularExpression($expectedError, $getResult['error_message']);
   }
 
   /**

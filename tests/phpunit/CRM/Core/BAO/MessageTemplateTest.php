@@ -396,8 +396,11 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   public function testCaseActivityCopyTemplate():void {
     $client_id = $this->individualCreate();
     $contact_id = $this->individualCreate();
-
-    $msg = WorkflowMessage::create('case_activity', [
+    \CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_msg_template (msg_text, msg_subject, workflow_name, is_active, is_default)
+      VALUES('" . $this->getActivityCaseText() . "', '" . $this->getActivityCaseSubject() . "', 'case_activity_test', 1, 1)
+    ");
+    $msg = WorkflowMessage::create('case_activity_test', [
       'modelProps' => [
         'contactID' => $contact_id,
         'contact' => ['role' => 'Sand grain counter'],
@@ -420,7 +423,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertEquals([], Invasive::get([$msg, '_extras']));
 
     [, $subject, $message] = $msg->sendTemplate([
-      'workflow' => 'case_activity',
+      'workflow' => 'case_activity_test',
       'from' => 'admin@example.com',
       'toName' => 'Demo',
       'toEmail' => 'admin@example.com',
@@ -430,6 +433,108 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertEquals('[case #' . $msg->getIdHash() . '] Test 123', $subject);
     $this->assertStringContainsString('Your Case Role(s) : Sand grain counter', $message);
     $this->assertStringContainsString('Case ID : 1234', $message);
+  }
+
+  public function testSendToEmail_variantA(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->individualCreate();
+
+    $msg = WorkflowMessage::create('petition_sign', [
+      'from' => '"The Sender" <sender-a@example.com>',
+      'toEmail' => 'demo-a@example.com',
+      'contactId' => 204,
+    ]);
+    $msg->sendTemplate([
+      'messageTemplate' => [
+        'msg_subject' => 'Hello world',
+        'msg_text' => 'Hello',
+        'msg_html' => '<p>Hello</p>',
+      ],
+    ]);
+    $mut->checkMailLog([
+      'From: "The Sender" <sender-a@example.com>',
+      'To: <demo-a@example.com>',
+      "Subject: Hello world",
+    ]);
+    $mut->stop();
+  }
+
+  /**
+   * Get the contents of the case activity text template, from when the test was written.
+   * @return string
+   */
+  public function getActivityCaseSubject(): string {
+    return '{if !empty($idHash)}[case #{$idHash}]{/if} {$activitySubject}';
+  }
+
+  /**
+   * Get the contents of the case activity text template, from when the test was written.
+   * @return string
+   */
+  public function getActivityCaseText(): string {
+    return '===========================================================
+{ts}Activity Summary{/ts} - {$activityTypeName}
+===========================================================
+{if !empty($isCaseActivity)}
+{ts}Your Case Role(s){/ts} : {$contact.role|default:""}
+{if !empty($manageCaseURL)}
+{ts}Manage Case{/ts} : {$manageCaseURL}
+{/if}
+{/if}
+
+{if !empty($editActURL)}
+{ts}Edit activity{/ts} : {$editActURL}
+{/if}
+{if !empty($viewActURL)}
+{ts}View activity{/ts} : {$viewActURL}
+{/if}
+
+{foreach from=$activity.fields item=field}
+{if $field.type eq "Date"}
+{$field.label} : {$field.value|crmDate:$config->dateformatDatetime}
+{else}
+{$field.label} : {$field.value}
+{/if}
+{/foreach}
+
+{if !empty($activity.customGroups)}
+{foreach from=$activity.customGroups key=customGroupName item=customGroup}
+==========================================================
+{$customGroupName}
+==========================================================
+{foreach from=$customGroup item=field}
+{if $field.type eq "Date"}
+{$field.label} : {$field.value|crmDate:$config->dateformatDatetime}
+{else}
+{$field.label} : {$field.value}
+{/if}
+{/foreach}
+
+{/foreach}
+{/if}
+';
+  }
+
+  public function testSendToEmail_variantB(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    $cid = $this->individualCreate();
+
+    WorkflowMessage::create('petition_sign')
+      ->setFrom(['name' => 'The Sender', 'email' => 'sender-b@example.com'])
+      ->setTo(['name' => 'The Recipient', 'email' => 'demo-b@example.com'])
+      ->setContactID($cid)
+      ->setTemplate([
+        'msg_subject' => 'Bonjour le monde',
+        'msg_text' => 'Ça va',
+        'msg_html' => '<p>Ça va</p>',
+      ])
+      ->sendTemplate();
+    $mut->checkMailLog([
+      'From: The Sender <sender-b@example.com>',
+      'To: The Recipient <demo-b@example.com>',
+      "Subject: Bonjour le monde",
+    ]);
+    $mut->stop();
   }
 
   /**
@@ -516,7 +621,7 @@ London, 90210
    */
   public function testContactTokens(): void {
     // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
-    $restoreTime = $this->useFrozenTime();
+    $this->useFrozenTime();
 
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hookTokens']);
@@ -525,6 +630,12 @@ London, 90210
     $tokenData = $this->getOldContactTokens();
     $address = $this->setupContactFromTokeData($tokenData);
     $advertisedTokens = CRM_Core_SelectValues::contactTokens();
+
+    // let's unset specical afform submission tokens which are kind of related to contact
+    // but not exactly as contact is not yet created
+    unset($advertisedTokens['{afformSubmission.validateSubmissionUrl}']);
+    unset($advertisedTokens['{afformSubmission.validateSubmissionLink}']);
+
     $this->assertEquals($this->getAdvertisedTokens(), $advertisedTokens);
 
     CRM_Core_Smarty::singleton()->assign('pre_assigned_smarty', 'woo');
@@ -574,7 +685,6 @@ emo
     $this->assertEquals($expected_parts[0], $returned_parts[0]);
     $this->assertApproxEquals($expected_parts[1], $returned_parts[1], 2);
     $this->assertEquals($expected_parts[2], $returned_parts[2]);
-    $restoreTime->cleanup();
   }
 
   /**
@@ -585,10 +695,7 @@ emo
    */
   public function testTokensIndividually(): void {
     // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
-    // This variable releases the time on destruct so needs to be assigned for the
-    // duration of the test.
-    /** @noinspection PhpUnusedLocalVariableInspection */
-    $restoreTime = $this->useFrozenTime();
+    $this->useFrozenTime();
 
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hookTokens']);
@@ -879,7 +986,7 @@ emo
       'do_not_trade' => 1,
       'is_opt_out' => 1,
       'external_identifier' => 'blah',
-      'sort_name' => 'Smith, Robert',
+      'sort_name' => 'Smith, Robert II',
       'display_name' => 'Robert Smith',
       'nick_name' => 'Bob',
       'image_URL' => 'https://example.com',
@@ -1011,21 +1118,6 @@ primary_phone:123-456
   }
 
   /**
-   * Temporarily freeze time, as perceived through `CRM_Utils_Time`.
-   *
-   * @return \CRM_Utils_AutoClean
-   */
-  protected function useFrozenTime(): CRM_Utils_AutoClean {
-    $oldTimeFunc = getenv('TIME_FUNC');
-    putenv('TIME_FUNC=frozen');
-    CRM_Utils_Time::setTime(date('Y-m-d H:i:s'));
-    return CRM_Utils_AutoClean::with(function () use ($oldTimeFunc) {
-      putenv($oldTimeFunc === NULL ? 'TIME_FUNC' : "TIME_FUNC=$oldTimeFunc");
-      CRM_Utils_Time::resetTime();
-    });
-  }
-
-  /**
    * @param array $tokenData
    *
    * @return array|int
@@ -1071,7 +1163,7 @@ do_not_sms:1
 do_not_trade:1
 is_opt_out:1
 external_identifier:blah
-sort_name:Smith, Robert
+sort_name:Smith, Robert II
 display_name:Mr. Robert Smith II
 nick_name:Bob
 image_URL:https://example.com
@@ -1170,7 +1262,7 @@ do_not_sms:label |Yes
 do_not_trade:label |Yes
 is_opt_out:label |Yes
 external_identifier |blah
-sort_name |Smith, Robert
+sort_name |Smith, Robert II
 display_name |Mr. Robert Smith II
 nick_name |Bob
 image_URL |https://example.com

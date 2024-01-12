@@ -16,6 +16,17 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   public $_mode;
   public $participants;
 
+  /**
+   * Provides way for extensions to add discounts to the event_registration_receipt emails.
+   *
+   * Todo: Do any extensions actually use this,
+   * or can it be removed, and the email templates cleaned up?
+   *
+   * @var array
+   * @deprecated Not recommended for new extensions.
+   */
+  public $discounts = [];
+
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieveValue('action', 'String');
     $this->_mode = 'live';
@@ -23,15 +34,9 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
 
     $this->checkWaitingList();
 
-    $this->assignBillingType();
-
     $event_titles = [];
     foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
       $event_titles[] = $event_in_cart->event->title;
-    }
-    $this->description = ts("Online Registration for %1", [1 => implode(", ", $event_titles)]);
-    if (!isset($this->discounts)) {
-      $this->discounts = [];
     }
   }
 
@@ -91,9 +96,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     if (is_string($empty_seats)) {
       return 0;
     }
-    else {
-      return NULL;
-    }
+    return NULL;
   }
 
   /**
@@ -114,8 +117,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     }
 
     // check if the user is registered and we have a contact ID
-    $session = CRM_Core_Session::singleton();
-    return $session->get('userID');
+    return CRM_Core_Session::getLoggedInContactID();
   }
 
   /**

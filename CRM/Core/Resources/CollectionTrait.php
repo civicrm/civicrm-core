@@ -111,7 +111,7 @@ trait CRM_Core_Resources_CollectionTrait {
       $res = Civi::resources();
       list ($ext, $file) = $snippet['scriptFile'];
 
-      $snippet['translate'] = $snippet['translate'] ?? TRUE;
+      $snippet['translate'] ??= TRUE;
       if ($snippet['translate']) {
         $domain = ($snippet['translate'] === TRUE) ? $ext : $snippet['translate'];
         // Is this too early?

@@ -56,7 +56,7 @@ return [
         'saved_search_id.name' => 'Administer_Financial_Accounts',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -184,14 +184,20 @@ return [
                   'condition' => ['is_reserved', '=', FALSE],
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
+              'icon' => 'fa-bars',
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/financial/financialAccount/edit?action=add&reset=1',
-            'text' => E::ts('Add Financial Account'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'FinancialAccount',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Financial Account'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [

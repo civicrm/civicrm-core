@@ -12,7 +12,7 @@
 
 namespace Civi\Api4\Service\Schema\Joinable;
 
-use Civi\Api4\CustomField;
+use Civi\Api4\Service\Spec\SpecFormatter;
 use Civi\Api4\Utils\CoreUtil;
 
 class CustomGroupJoinable extends Joinable {
@@ -50,18 +50,14 @@ class CustomGroupJoinable extends Joinable {
    * @inheritDoc
    */
   public function getEntityFields() {
-    $cacheKey = 'APIv4_CustomGroupJoinable-' . $this->getTargetTable();
-    $entityFields = (array) \Civi::cache('metadata')->get($cacheKey);
-    if (!$entityFields) {
-      $baseEntity = CoreUtil::getApiNameFromTableName($this->getBaseTable());
-      $fields = CustomField::get(FALSE)
-        ->setSelect(['custom_group_id.name', 'custom_group_id.extends', 'custom_group_id.table_name', 'custom_group_id.title', '*'])
-        ->addWhere('custom_group_id.table_name', '=', $this->getTargetTable())
-        ->execute();
-      foreach ($fields as $field) {
-        $entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, $baseEntity);
+    $baseEntity = CoreUtil::getApiNameFromTableName($this->getBaseTable());
+    foreach (\CRM_Core_BAO_CustomGroup::getActive() as $customGroup) {
+      if ($customGroup['table_name'] !== $this->getTargetTable()) {
+        continue;
       }
-      \Civi::cache('metadata')->set($cacheKey, $entityFields);
+      foreach ($customGroup['fields'] as $fieldArray) {
+        $entityFields[] = SpecFormatter::arrayToField($fieldArray, $baseEntity, $customGroup);
+      }
     }
     return $entityFields;
   }
@@ -87,27 +83,6 @@ class CustomGroupJoinable extends Joinable {
       $fieldName = substr($fieldName, 1 + strrpos($fieldName, '.'));
     }
     return $this->columns[$fieldName];
-  }
-
-  /**
-   * Translate custom_group.extends to entity name.
-   *
-   * Custom_group.extends pretty much maps 1-1 with entity names, except for a couple oddballs.
-   * @see \CRM_Core_SelectValues::customGroupExtends
-   *
-   * @param $extends
-   * @return string
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   */
-  public static function getEntityFromExtends($extends) {
-    if (strpos($extends, 'Participant') === 0) {
-      return 'Participant';
-    }
-    if ($extends === 'Contact' || in_array($extends, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
-      return 'Contact';
-    }
-    return $extends;
   }
 
 }

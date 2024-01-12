@@ -44,8 +44,20 @@ class CRM_Upgrade_Snapshot {
   public static function getActivationIssues(): array {
     if (static::$activationIssues === NULL) {
       $policy = CRM_Utils_Constant::value('CIVICRM_UPGRADE_SNAPSHOT', 'auto');
+      static::$activationIssues = [];
+
+      $version = CRM_Utils_SQL::getDatabaseVersion();
+      if ((stripos($version, 'mariadb') !== FALSE) && version_compare($version, '10.6.0', '>=')) {
+        // MariaDB briefly (10.6.0-10.6.5) flirted with the idea of phasing-out `COMPRESSED`. By default, snapshots won't work on those versions.
+        // https://mariadb.com/kb/en/innodb-compressed-row-format/#read-only
+        $roCompressed = CRM_Core_DAO::singleValueQuery('SELECT @@innodb_read_only_compressed');
+        if (in_array($roCompressed, ['on', 'ON', 1, '1'])) {
+          static::$activationIssues['row_compressed'] = ts('This MariaDB instance does not allow creating compressed snapshots.');
+        }
+      }
+
       if ($policy === TRUE) {
-        return [];
+        return static::$activationIssues;
       }
 
       $limits = [
@@ -57,7 +69,6 @@ class CRM_Upgrade_Snapshot {
         'civicrm_event' => 200 * 1000,
       ];
 
-      static::$activationIssues = [];
       foreach ($limits as $table => $limit) {
         try {
           // Use select MAX(id) rather than COUNT as COUNT is slow on large databases.

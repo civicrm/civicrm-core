@@ -18,7 +18,7 @@
 {elseif $action eq 4}
   <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}
-        {ts 1=$jobName}Are you sure you would like to execute %1 job?{/ts}
+        {ts 1=$jobName|escape:html}Are you sure you would like to execute %1 job?{/ts}
   </div>
 {else}
   <div class="help">
@@ -35,57 +35,11 @@
     <tr class="crm-job-form-block-run_frequency">
         <td class="label">{$form.run_frequency.label}</td><td>{$form.run_frequency.html}</td>
     </tr>
+    <tr class="crm-job-form-block-api_entity">
+      <td class="label">{$form.api_entity.label}</td><td>{$form.api_entity.html}</td>
+    </tr>
     <tr class="crm-job-form-block-api_action">
-        <td class="label"><label>{ts}API call:{/ts}</label></td>
-        <td>
-
-        <div id="fname"><br/>
-        </div>
-        <select name="api_entity" type="text" id="api_entity" class="crm-form-select required">
-          {crmAPI entity="Entity" var="entities"}
-          {foreach from=$entities.values item=entity}
-            <option value="{$entity}"{if $entity eq $form.api_entity.value} selected="selected"{/if}>{$entity}</option>
-          {/foreach}
-        </select>
-        {$form.api_action.html}
-
-        <div class="description">{ts}Put in the API method name. You need to enter pieces of full API function name as described in the documentation.{/ts}</div>
-<script>
-{literal}
-CRM.$(function($) {
-  function assembleName( ) {
-
-    // dunno yet
-    var apiName = "";
-
-    // building prefix
-    if( $('#api_action').val() == '' ) {
-      $('#fname').html( "<em>API name will start appearing here as you type in fields below.</em>" );
-      return;
-    }
-
-    var apiPrefix = 'api'
-
-    // building entity
-    var apiEntity = $('#api_entity').val().replace( /([A-Z])/g, function($1) {
-      return $1.toLowerCase();
-    });
-    // building action
-    var apiAction = $('#api_action').val().replace(/(\_[a-z])/g, function($1) {return $1.toUpperCase().replace('_','');});
-    apiName = apiPrefix + '.' + apiEntity + '.' + apiAction;
-    $('#fname').text( apiName );
-  }
-
-  // bind to different events to build API name live
-  $('#api_entity').change(assembleName)
-  $('#api_action').change(assembleName).keyup(assembleName);
-  assembleName();
-});
-
-{/literal}
-</script>
-
-      </td>
+      <td class="label">{$form.api_action.label}</td><td>{$form.api_action.html}</td>
     </tr>
     <tr class="crm-job-form-block-parameters">
       <td class="label">{$form.parameters.label}<br />{docURL page="user/initial-set-up/scheduled-jobs/#parameters"}</td>

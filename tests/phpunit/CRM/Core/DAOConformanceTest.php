@@ -10,7 +10,7 @@ class CRM_Core_DAOConformanceTest extends CiviUnitTestCase {
   /**
    * Check all fields have defined titles.
    */
-  public function testFieldsHaveTitles() {
+  public function testFieldsHaveTitles(): void {
     foreach (CRM_Core_DAO_AllCoreTables::getClasses() as $class) {
       $dao = new $class();
       $fields = $dao->fields();

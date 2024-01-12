@@ -10,7 +10,7 @@
 {* this template is used for adding/editing/deleting contributions and pledge payments *}
 
 {if $priceSetId}
-  {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Contribution"}
+  {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Contribution" hideTotal=false}
 {elseif !empty($showAdditionalInfo) and !empty($formType)}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
@@ -143,7 +143,7 @@
           <tr class="crm-contribution-form-block-contribution_status_id">
             <td class="label">{$form.contribution_status_id.label}</td>
             <td>{$form.contribution_status_id.html}
-              {if $contribution_status_id eq 2}{if $is_pay_later }: {ts}Pay Later{/ts} {else}: {ts}Incomplete Transaction{/ts}{/if}{/if}
+              {if $contribution_status_id eq 2}{if $is_pay_later}: {ts}Pay Later{/ts} {else}: {ts}Incomplete Transaction{/ts}{/if}{/if}
             </td>
             <td>
               {if !$isUsePaymentBlock && $contactId && $contribution_status_id eq 2 && $contribID && $contributionMode EQ null}
@@ -205,7 +205,7 @@
               <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
             </td>
           </tr>
-        {elseif empty($is_template) and $context eq 'standalone' and $outBound_option != 2 }
+        {elseif empty($is_template) and $context eq 'standalone' and $outBound_option != 2}
           <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
             <td class="label">{$form.is_email_receipt.label}</td>
             <td>{$form.is_email_receipt.html}
@@ -316,7 +316,7 @@
     <!-- end of PCP -->
 
     {if !$payNow}
-      {include file="CRM/common/customDataBlock.tpl"}
+      {include file="CRM/common/customDataBlock.tpl" cid=$contactId}
     {/if}
 
     {literal}
@@ -357,8 +357,6 @@
             });
           }
         }
-
-        var url = {/literal}{$dataUrl|@json_encode}{literal};
 
         {/literal}
         {if $context eq 'standalone' and $outBound_option != 2}
@@ -591,10 +589,10 @@
         var freezeFinancialType = '{/literal}{$freezeFinancialType}{literal}';
         if (!freezeFinancialType) {
           var financialType = $('#financial_type_id').val();
-          var taxRates = '{/literal}{$taxRates}{literal}';
+          var taxRates = '{/literal}{$taxRates|smarty:nodefaults}{literal}';
           var taxTerm = '{/literal}{$taxTerm}{literal}';
           taxRates = JSON.parse(taxRates);
-          var currencies = '{/literal}{$currencies}{literal}';
+          var currencies = '{/literal}{$currencies|smarty:nodefaults}{literal}';
           currencies = JSON.parse(currencies);
           var currencySelect = $('#currency').val();
           var currencySymbol = currencies[currencySelect];

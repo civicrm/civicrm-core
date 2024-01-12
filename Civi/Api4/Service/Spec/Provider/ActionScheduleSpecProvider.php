@@ -43,7 +43,6 @@ class ActionScheduleSpecProvider extends \Civi\Core\Service\AutoService implemen
       $spec->getFieldByName('repetition_frequency_interval')->setRequiredIf('!empty($values.is_repeat)');
       $spec->getFieldByName('end_frequency_interval')->setRequiredIf('!empty($values.is_repeat)');
     }
-    $spec->getFieldByName('mapping_id')->setSuffixes(['name', 'label', 'icon']);
   }
 
   /**

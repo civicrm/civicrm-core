@@ -19,7 +19,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
   /**
    * Test that a missing report menu link is added by rebuildReportsNavigation.
    */
-  public function testCreateMissingReportMenuItemLink() {
+  public function testCreateMissingReportMenuItemLink(): void {
     $reportCount = $this->getCountReportInstances();
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_navigation WHERE url LIKE 'civicrm/report/instance/1?reset=1%'");
     $this->assertEquals($reportCount - 1, $this->getCountReportInstances());
@@ -36,7 +36,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
   /**
    * Test that a link with output=criteria at the end is not duplicated.
    */
-  public function testNoDuplicateReportMenuItemLink() {
+  public function testNoDuplicateReportMenuItemLink(): void {
     CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
     $reportCount = $this->getCountReportInstances();
     CRM_Core_DAO::executeQuery("
@@ -56,7 +56,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    * both winding up under the Reports menu - since they already exist they should be unchanged
    * by rebuilding reports.
    */
-  public function testNoDuplicateAllReportsLink() {
+  public function testNoDuplicateAllReportsLink(): void {
     $existing_links = $this->callAPISuccess('Navigation', 'get', ['label' => 'All Reports', 'sequential' => 1]);
     $this->assertNotEquals($existing_links['values'][0]['parent_id'], $existing_links['values'][1]['parent_id']);
     CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
@@ -70,7 +70,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    *
    * Function tests CRM_Core_BAO_Navigation::rebuildReportsNavigation.
    */
-  public function testUpdateExistingReportMenuLink() {
+  public function testUpdateExistingReportMenuLink(): void {
     $url = 'civicrm/report/instance/1';
     $url_params = 'reset=1';
     $existing_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params);
@@ -93,7 +93,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
   /**
    * Test that a navigation item can be retrieved by it's url.
    */
-  public function testGetNavItemByUrl() {
+  public function testGetNavItemByUrl(): void {
     $random_string = substr(sha1(rand()), 0, 7);
     $name = "Test Menu Link {$random_string}";
     $url = "civicrm/test/{$random_string}";
@@ -121,7 +121,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    * We want to be able to get a report url with OR without the output=criteria since
    * that is part of the navigation but not the instance.
    */
-  public function testGetNavItemByUrlWildcard() {
+  public function testGetNavItemByUrlWildcard(): void {
     $random_string = substr(sha1(rand()), 0, 7);
     $name = "Test Menu Link {$random_string}";
     $url = "civicrm/test/{$random_string}";
@@ -168,7 +168,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    * Run fixNavigationMenu() on a menu which already has navIDs
    * everywhere. They should be unchanged.
    */
-  public function testFixNavigationMenu_preserveIDs() {
+  public function testFixNavigationMenu_preserveIDs(): void {
     $input[10] = [
       'attributes' => [
         'label' => 'Custom Menu Entry',
@@ -201,7 +201,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    * Run fixNavigationMenu() on a menu which is missing some navIDs. They
    * should be filled in, and others should be preserved.
    */
-  public function testFixNavigationMenu_inferIDs() {
+  public function testFixNavigationMenu_inferIDs(): void {
     $input[10] = [
       'attributes' => [
         'label' => 'Custom Menu Entry',
@@ -242,7 +242,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $this->assertEquals(100, $output[10]['child'][100]['attributes']['navID']);
   }
 
-  public function testFixNavigationMenu_inferIDs_deep() {
+  public function testFixNavigationMenu_inferIDs_deep(): void {
     $input[10] = [
       'attributes' => [
         'label' => 'Custom Menu Entry',
@@ -287,7 +287,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
   /**
    * Tests that permissions and component status are checked with the correct operator.
    */
-  public function testCheckPermissions() {
+  public function testCheckPermissions(): void {
     $menuItem = [
       'permission' => 'access CiviCRM, access CiviContribute',
       'operator' => 'AND',

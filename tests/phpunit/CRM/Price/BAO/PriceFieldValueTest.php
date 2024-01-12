@@ -19,14 +19,14 @@ class CRM_Price_BAO_PriceFieldValueTest extends CiviUnitTestCase {
    * Verifies visibility field exists and is configured as a pseudoconstant
    * referencing the 'visibility' option group.
    */
-  public function testVisibilityFieldExists() {
+  public function testVisibilityFieldExists(): void {
     $fields = CRM_Price_DAO_PriceFieldValue::fields();
 
     $this->assertArrayKeyExists('visibility_id', $fields);
     $this->assertEquals('visibility', $fields['visibility_id']['pseudoconstant']['optionGroupName']);
   }
 
-  public function testEmptyStringLabel() {
+  public function testEmptyStringLabel(): void {
     // Put stuff here that should happen before all tests in this unit.
     $priceSetParams = [
       'name' => 'default_goat_priceset',

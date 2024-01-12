@@ -7,30 +7,12 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{*CRM-14190*}
-{if $parent_groups|@count > 0 || !empty($form.parents.html)}
-  <h3>{ts}Parent Groups{/ts} {help id="id-group-parent" file="CRM/Group/Page/Group.hlp"}</h3>
-  {if $parent_groups|@count > 0}
-    <table class="form-layout-compressed">
-      <tr>
-        <td><label>{ts}Remove Parent?{/ts}</label></td>
-      </tr>
-      {foreach from=$parent_groups item=cgroup key=group_id}
-        {assign var="element_name" value="remove_parent_group_"|cat:$group_id}
-        <tr>
-          <td>&nbsp;&nbsp;{$form.$element_name.html}&nbsp;{$form.$element_name.label}</td>
-        </tr>
-      {/foreach}
-    </table>
-    <br />
-  {/if}
-  <table class="form-layout-compressed">
-    <tr class="crm-group-form-block-parents">
-      <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.parents.label}</td>
-      <td>{$form.parents.html|crmAddClass:huge}</td>
-    </tr>
-  </table>
-{/if}
+<table class="form-layout-compressed">
+  <tr class="crm-group-form-block-parents">
+    <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.parents.label}</td>
+    <td>{$form.parents.html|crmAddClass:huge}</td>
+  </tr>
+</table>
 {if array_key_exists('organization_id', $form)}
   <h3>{ts}Associated Organization{/ts} {help id="id-group-organization" file="CRM/Group/Page/Group.hlp"}</h3>
   <table class="form-layout-compressed">

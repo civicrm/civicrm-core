@@ -20,20 +20,13 @@ use Civi\Api4\Service\Spec\RequestSpec;
  */
 class FinancialItemCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
-  // I'm not sure it makes sense to have a default `entity_table`... actually, I don't even know if it makes
-  // sense to expose `FinancialItem` as a public API, for what that's worth. But it's there, so clearly it does.
-  //  And the ConformanceTests require that you be able to create (and read-back) a record using metadata.
-
-  const DEFAULT_TABLE = 'civicrm_line_item';
-  const DEFAULT_ENTITY = 'LineItem';
-
   /**
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   public function modifySpec(RequestSpec $spec) {
+    // TODO: These fields ought to be required in the schema.
     $spec->getFieldByName('entity_table')->setRequired(TRUE);
     $spec->getFieldByName('entity_id')->setRequired(TRUE);
-    $spec->getFieldByName('entity_table')->setDefaultValue(self::DEFAULT_TABLE);
   }
 
   /**

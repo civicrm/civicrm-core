@@ -136,15 +136,21 @@ class BasicGetFieldsAction extends BasicGetAction {
       ], $fieldDefaults);
       $field += $defaults + $fieldDefaults;
       if (array_key_exists('label', $fieldDefaults)) {
-        $field['label'] = $field['label'] ?? $field['title'] ?? $field['name'];
+        $field['label'] ??= $field['title'] ?? $field['name'];
       }
-      if (!empty($field['options']) && is_array($field['options']) && empty($field['suffixes']) && array_key_exists('suffixes', $field)) {
+      if (isset($field['options']) && is_array($field['options']) && empty($field['suffixes']) && array_key_exists('suffixes', $field)) {
         $this->setFieldSuffixes($field);
       }
       if (isset($defaults['options'])) {
         $this->formatOptionList($field);
       }
       $field = array_diff_key($field, $internalProps);
+    }
+    // Hide the 'contact_type' field from Individual,Organization,Household pseudo-entities
+    if (!$isInternal && $this->getEntityName() !== 'Contact' && CoreUtil::isContact($this->getEntityName())) {
+      $values = array_filter($values, function($field) {
+        return $field['name'] !== 'contact_type';
+      });
     }
   }
 
@@ -156,13 +162,14 @@ class BasicGetFieldsAction extends BasicGetAction {
    * @param array $field
    */
   private function formatOptionList(&$field) {
-    if (empty($field['options'])) {
+    $optionsExist = isset($field['options']) && is_array($field['options']);
+    if (!isset($field['options'])) {
       $field['options'] = !empty($field['pseudoconstant']);
     }
     if (!empty($field['pseudoconstant']['optionGroupName'])) {
       $field['suffixes'] = CoreUtil::getOptionValueFields($field['pseudoconstant']['optionGroupName']);
     }
-    if (!$this->loadOptions || !$field['options']) {
+    if (!$this->loadOptions || (!$optionsExist && empty($field['pseudoconstant']))) {
       $field['options'] = (bool) $field['options'];
       return;
     }
@@ -324,11 +331,15 @@ class BasicGetFieldsAction extends BasicGetAction {
           'Email' => ts('Email'),
           'EntityRef' => ts('Autocomplete Entity'),
           'File' => ts('File'),
+          'Hidden' => ts('Hidden'),
           'Location' => ts('Address Location'),
           'Number' => ts('Number'),
           'Radio' => ts('Radio Buttons'),
+          'RichTextEditor' => ts('Rich Text Editor'),
           'Select' => ts('Select'),
-          'Text' => ts('Text'),
+          'Text' => ts('Single-Line Text'),
+          'TextArea' => ts('Multi-Line Text'),
+          'Url' => ts('URL'),
         ],
       ],
       [

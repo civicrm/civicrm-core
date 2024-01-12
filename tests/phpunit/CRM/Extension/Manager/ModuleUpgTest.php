@@ -38,7 +38,7 @@ class CRM_Extension_Manager_ModuleUpgTest extends CiviUnitTestCase {
   /**
    * Install an extension with a valid type name.
    */
-  public function testInstallDisableUninstall() {
+  public function testInstallDisableUninstall(): void {
     $manager = $this->system->getManager();
     $this->assertModuleActiveByName(FALSE, 'moduleupgtest');
 
@@ -79,7 +79,7 @@ class CRM_Extension_Manager_ModuleUpgTest extends CiviUnitTestCase {
   /**
    * Install an extension with a valid type name.
    */
-  public function testInstallDisableEnable() {
+  public function testInstallDisableEnable(): void {
     $manager = $this->system->getManager();
     $this->assertModuleActiveByName(FALSE, 'moduleupgtest');
     $this->assertModuleActiveByKey(FALSE, 'test.extension.manager.moduleupgtest');
@@ -118,7 +118,7 @@ class CRM_Extension_Manager_ModuleUpgTest extends CiviUnitTestCase {
   /**
    * Install an extension then forcibly remove the code and cleanup DB afterwards.
    */
-  public function testInstall_DirtyRemove_Disable_Uninstall() {
+  public function testInstall_DirtyRemove_Disable_Uninstall(): void {
     // create temporary extension (which can dirtily remove later)
     $this->_createExtension('test.extension.manager.moduleupg.auto1', 'module', 'test_extension_manager_moduleupg_auto1');
     $mainfile = $this->basedir . '/test.extension.manager.moduleupg.auto1/test_extension_manager_moduleupg_auto1.php';
@@ -174,7 +174,7 @@ class CRM_Extension_Manager_ModuleUpgTest extends CiviUnitTestCase {
   /**
    * Install an extension then forcibly remove the code and cleanup DB afterwards.
    */
-  public function testInstall_DirtyRemove_Disable_Restore() {
+  public function testInstall_DirtyRemove_Disable_Restore(): void {
     // create temporary extension (which can dirtily remove later)
     $this->_createExtension('test.extension.manager.moduleupg.auto2', 'module', 'test_extension_manager_moduleupg_auto2');
     $mainfile = $this->basedir . '/test.extension.manager.moduleupg.auto2/test_extension_manager_moduleupg_auto2.php';

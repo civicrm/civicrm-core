@@ -8,8 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 
-{assign var='hideTotal' value=$quickConfig+$noCalcValueDisplay}
-
 <div id="pricesetTotal" class="crm-section section-pricesetTotal">
   <div id="pricelabel" class="label {if $hideTotal}hiddenElement{/if}">
     {if ($extends eq 'Contribution') || ($extends eq 'Membership')}

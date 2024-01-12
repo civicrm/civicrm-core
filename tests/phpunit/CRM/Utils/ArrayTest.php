@@ -14,7 +14,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->useTransaction();
   }
 
-  public function testAsColumns() {
+  public function testAsColumns(): void {
     $rowsNum = [
       ['a' => 10, 'b' => 11],
       ['a' => 20, 'b' => 21],
@@ -45,7 +45,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     );
   }
 
-  public function testIndexArray() {
+  public function testIndexArray(): void {
     $inputs = [];
     $inputs[] = [
       'lang' => 'en',
@@ -88,7 +88,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($inputs[5], $byLangMsgid[NULL]['greeting']);
   }
 
-  public function testCollect() {
+  public function testCollect(): void {
     $arr = [
       ['catWord' => 'cat', 'dogWord' => 'dog'],
       ['catWord' => 'chat', 'dogWord' => 'chien'],
@@ -105,7 +105,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($expected, CRM_Utils_Array::collect('catWord', $arr));
   }
 
-  public function testProduct0() {
+  public function testProduct0(): void {
     $actual = CRM_Utils_Array::product(
       [],
       ['base data' => 1]
@@ -115,7 +115,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ], $actual);
   }
 
-  public function testProduct1() {
+  public function testProduct1(): void {
     $actual = CRM_Utils_Array::product(
       ['dim1' => ['a', 'b']],
       ['base data' => 1]
@@ -126,7 +126,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ], $actual);
   }
 
-  public function testProduct3() {
+  public function testProduct3(): void {
     $actual = CRM_Utils_Array::product(
       ['dim1' => ['a', 'b'], 'dim2' => ['alpha', 'beta'], 'dim3' => ['one', 'two']],
       ['base data' => 1]
@@ -143,7 +143,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ], $actual);
   }
 
-  public function testIsSubset() {
+  public function testIsSubset(): void {
     $this->assertTrue(CRM_Utils_Array::isSubset([], []));
     $this->assertTrue(CRM_Utils_Array::isSubset(['a'], ['a']));
     $this->assertTrue(CRM_Utils_Array::isSubset(['a'], ['b', 'a', 'c']));
@@ -153,7 +153,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertFalse(CRM_Utils_Array::isSubset(['a'], ['b', 'c', 'd']));
   }
 
-  public function testRemove() {
+  public function testRemove(): void {
     $data = [
       'one' => 1,
       'two' => 2,
@@ -166,7 +166,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($data, ['six' => 6]);
   }
 
-  public function testGetSetPathParts() {
+  public function testGetSetPathParts(): void {
     $arr = $arrOrig = [
       'one' => '1',
       'two' => [
@@ -215,7 +215,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
   }
 
-  public function testGetSet_EmptyPath() {
+  public function testGetSet_EmptyPath(): void {
     $emptyPath = [];
 
     $x = 'hello';
@@ -430,7 +430,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
   /**
    * Test the flatten function
    */
-  public function testFlatten() {
+  public function testFlatten(): void {
     $data = [
       'my_array' => [
         '0' => 'bar',
@@ -466,7 +466,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($flat, $expected);
   }
 
-  public function testSingle() {
+  public function testSingle(): void {
     $okExamples = [
       ['abc'],
       [123],
@@ -511,6 +511,21 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     }
 
     $this->assertEquals(0, $todoCount);
+  }
+
+  public function testValue() {
+    $list = ['a' => 'apple', 'b' => 'banana', 'c' => NULL];
+
+    // array key exists; value is not null
+    $this->assertEquals('apple', CRM_Utils_Array::value('a', $list, 'fruit'));
+
+    // array key does not exist
+    $this->assertEquals('fruit', CRM_Utils_Array::value(999, $list, 'fruit'));
+
+    // array key exists; value is null
+    // This is the one situation in which the function's behavior differs from
+    // that of PHP's null-coalescing operator (??)
+    $this->assertEquals(NULL, CRM_Utils_Array::value('c', $list, 'fruit'));
   }
 
 }

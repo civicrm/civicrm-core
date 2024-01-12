@@ -181,7 +181,7 @@ class CRM_Core_OptionValue {
    *
    */
   public static function addOptionValue(&$params, $optionGroupName, $action, $optionValueID) {
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $params['is_active'] ??= FALSE;
     // checking if the group name with the given id or name (in $groupParams) exists
     $groupParams = ['name' => $optionGroupName, 'is_active' => 1];
     $optionGroup = CRM_Core_BAO_OptionGroup::retrieve($groupParams, $defaults);
@@ -306,12 +306,7 @@ class CRM_Core_OptionValue {
       elseif ($mode == '') {
         //the fields email greeting and postal greeting are meant only for Individual and Household
         //the field addressee is meant for all contact types, CRM-4575
-        if (in_array($contactType, [
-          'Individual',
-          'Household',
-          'Organization',
-          'All',
-        ])) {
+        if (in_array($contactType, ['Individual', 'Household', 'Organization', 'All'])) {
           $nameTitle = [
             'addressee' => [
               'name' => 'addressee',

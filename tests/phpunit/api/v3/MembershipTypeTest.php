@@ -62,7 +62,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $id = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID]);
     $params = ['id' => $id];
-    $membershipType = $this->callAPIAndDocument('membership_type', 'get', $params, __FUNCTION__, __FILE__);
+    $membershipType = $this->callAPISuccess('membership_type', 'get', $params);
     $membershipType = $membershipType['values'][$id];
     $this->assertEquals('General', $membershipType['name']);
     $this->assertEquals($membershipType['member_of_contact_id'], $this->_contactID);
@@ -120,7 +120,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'public',
     ];
 
-    $membershipType = $this->callAPIAndDocument('membership_type', 'create', $params, __FUNCTION__, __FILE__);
+    $membershipType = $this->callAPISuccess('membership_type', 'create', $params);
     $this->assertNotNull($membershipType['values']);
     $this->membershipTypeDelete(['id' => $membershipType['id']]);
   }
@@ -241,7 +241,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->organizationCreate()]);
     $params = ['id' => $membershipTypeID];
-    $this->callAPIAndDocument('membership_type', 'delete', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('membership_type', 'delete', $params);
   }
 
   /**

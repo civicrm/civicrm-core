@@ -14,7 +14,7 @@
 <div class="crm-block crm-form-block crm-case-form-block">
 
 <h3>{if $action eq 8}{ts}Delete Case{/ts}{elseif $action eq 32768}{ts}Restore Case{/ts}{/if}</h3>
-{if $action eq 8 or $action eq 32768 }
+{if $action eq 8 or $action eq 32768}
       <div class="messages status no-popup">
         {icon icon="fa-info-circle"}{/icon}
           {if $action eq 8}
@@ -25,9 +25,9 @@
       </div>
 {else}
 <table class="form-layout">
-    {if $activityTypeDescription }
+    {if $activityTypeDescription}
         <tr>
-            <div class="help">{$activityTypeDescription}</div>
+            <div class="help">{$activityTypeDescription|purify}</div>
         </tr>
     {/if}
 {if $clientName}

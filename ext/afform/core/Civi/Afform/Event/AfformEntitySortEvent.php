@@ -29,7 +29,7 @@ class AfformEntitySortEvent extends AfformBaseEvent {
     $sorter = new FixedArraySort();
     $formEntities = array_keys($this->getFormDataModel()->getEntities());
     foreach ($formEntities as $entityName) {
-      // Add all dependencies that are the valid name of another entitiy
+      // Add all dependencies that are the valid name of another entity
       $dependencies = array_intersect($this->dependencies[$entityName] ?? [], $formEntities);
       $sorter->add($entityName, $dependencies);
     }

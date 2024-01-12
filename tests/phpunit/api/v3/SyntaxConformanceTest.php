@@ -102,6 +102,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Logging',
     ];
     $this->toBeImplemented['create'] = [
+      'Afform',
       'Cxn',
       'CxnApp',
       'SurveyRespondant',
@@ -791,7 +792,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $result = civicrm_api($Entity, 'Get', ['version' => 3]);
     $this->assertEquals(1, $result['is_error']);
     // $this->assertStringContainsString("API ($Entity, Get) does not exist", $result['error_message']);
-    $this->assertRegExp('/API (.*) does not exist/', $result['error_message']);
+    $this->assertMatchesRegularExpression('/API (.*) does not exist/', $result['error_message']);
   }
 
   /**
@@ -844,6 +845,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public function testCustomDataGet(string $entityName): void {
     if ($entityName === 'Note') {
       $this->markTestIncomplete('Note can not be processed here because of a vagary in the note api, it adds entity_table=contact to the get params when id is not present - which makes sense almost always but kills this test');
+    }
+    elseif ($entityName === 'Afform') {
+      $this->markTestSkipped('Not necessary.');
     }
     $this->quickCleanup(['civicrm_uf_match']);
     // so subsidiary activities are created
@@ -1096,7 +1100,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $toBeIgnored = array_merge($this->toBeImplemented['get'],
       $this->getDeprecatedAPIs(),
       $this->toBeSkipped_get(TRUE),
-      $this->toBeSkippedGetByID()
+      $this->toBeSkippedGetByID(),
+      ['Afform']
     );
     if (in_array($entityName, $toBeIgnored)) {
       return;
@@ -1370,15 +1375,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
             $entity[$fieldName] = ['sort_name' => "SortName2"];
           }
           else {
-            $entity[$fieldName] = substr('New String', 0, CRM_Utils_Array::Value('maxlength', $specs, 100));
+            $entity[$fieldName] = substr('New String', 0, $specs['maxlength'] ?? 100);
             if ($fieldName == 'email') {
               $entity[$fieldName] = strtolower($entity[$fieldName]);
             }
             // typecast with array to satisfy changes made in CRM-13160
-            if ($entityName == 'MembershipType' && in_array($fieldName, [
-              'relationship_type_id',
-              'relationship_direction',
-            ])) {
+            if ($entityName == 'MembershipType' && in_array($fieldName, ['relationship_type_id', 'relationship_direction'])) {
               $entity[$fieldName] = (array) $entity[$fieldName];
             }
           }
@@ -1424,7 +1426,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           $entity[$field] = 'warm.beer.com';
       }
       if (empty($specs['FKClassName']) && (!empty($specs['pseudoconstant']) || !empty($specs['options']))) {
-        $options = CRM_Utils_Array::value('options', $specs, []);
+        $options = $specs['options'] ?? [];
         if (!$options) {
           //eg. pdf_format id doesn't ship with any
           if (isset($specs['pseudoconstant']['optionGroupName'])) {
@@ -1434,7 +1436,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
               'sequential' => 1,
             ]);
             $optionValue = $optionValue['values'];
-            $keyColumn = CRM_Utils_Array::value('keyColumn', $specs['pseudoconstant'], 'value');
+            $keyColumn = $specs['pseudoconstant']['keyColumn'] ?? 'value';
             $options[$optionValue[0][$keyColumn]] = 'new option value';
           }
         }
@@ -1632,7 +1634,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * In this example, the event 'title' is subject to encoding, but the
    * event 'description' is not.
    */
-  public function testEncodeDecodeConsistency() {
+  public function testEncodeDecodeConsistency(): void {
     // Create example
     $createResult = civicrm_api('Event', 'Create', [
       'version' => 3,

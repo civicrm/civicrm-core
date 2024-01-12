@@ -8,6 +8,7 @@ namespace Civi\Api4;
  * Provided by the Afform: Core Runtime extension.
  *
  * @searchable secondary
+ * @since 5.56
  * @package Civi\Api4
  */
 class AfformBehavior extends Generic\AbstractEntity {

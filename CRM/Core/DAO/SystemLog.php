@@ -266,37 +266,6 @@ class CRM_Core_DAO_SystemLog extends CRM_Core_DAO {
   }
 
   /**
-   * Return a mapping from field-name to the corresponding key (as used in fields()).
-   *
-   * @return array
-   *   Array(string $name => string $uniqueName).
-   */
-  public static function &fieldKeys() {
-    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
-      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
-    }
-    return Civi::$statics[__CLASS__]['fieldKeys'];
-  }
-
-  /**
-   * Returns the names of this table
-   *
-   * @return string
-   */
-  public static function getTableName() {
-    return self::$_tableName;
-  }
-
-  /**
-   * Returns if this table needs to be logged
-   *
-   * @return bool
-   */
-  public function getLog() {
-    return self::$_log;
-  }
-
-  /**
    * Returns the list of fields that can be imported
    *
    * @param bool $prefix

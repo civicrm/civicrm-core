@@ -26,7 +26,7 @@
  * @method static mixed permissionDenied() Show access denied screen.
  * @method static mixed logout() Log out the current user.
  * @method static mixed updateCategories() Clear CMS caches related to the user registration/profile forms.
- * @method static void appendBreadCrumb(array $breadCrumbs) Append an additional breadcrumb tag to the existing breadcrumbs.
+ * @method static void appendBreadCrumb(array $breadCrumbs) Append an additional breadcrumb link to the existing breadcrumbs.
  * @method static void resetBreadCrumb() Reset an additional breadcrumb tag to the existing breadcrumb.
  * @method static void addHTMLHead(string $head) Append a string to the head of the HTML file.
  * @method static string postURL(int $action) Determine the post URL for a form.
@@ -126,7 +126,7 @@ class CRM_Utils_System {
       $qs = explode('&', str_replace('&amp;', '&', $_SERVER['QUERY_STRING']));
       for ($i = 0, $cnt = count($qs); $i < $cnt; $i++) {
         // check first if exist a pair
-        if (strstr($qs[$i], '=') !== FALSE) {
+        if (str_contains($qs[$i], '=')) {
           [$name, $value] = explode('=', $qs[$i]);
           if ($name != $urlVar) {
             $name = rawurldecode($name);
@@ -254,26 +254,26 @@ class CRM_Utils_System {
     $forceBackend = FALSE
   ) {
     // handle legacy null params
-    $path = $path ?? '';
-    $query = $query ?? '';
+    $path ??= '';
+    $query ??= '';
 
     $query = self::makeQueryString($query);
 
     // Legacy handling for when the system passes around html escaped strings
-    if (strstr($query, '&amp;')) {
+    if (str_contains($query, '&amp;')) {
       $query = html_entity_decode($query);
     }
 
     // Extract fragment from path or query if munged together
-    if ($query && strstr($query, '#')) {
+    if ($query && str_contains($query, '#')) {
       [$path, $fragment] = explode('#', $query);
     }
-    if ($path && strstr($path, '#')) {
+    if ($path && str_contains($path, '#')) {
       [$path, $fragment] = explode('#', $path);
     }
 
     // Extract query from path if munged together
-    if ($path && strstr($path, '?')) {
+    if ($path && str_contains($path, '?')) {
       [$path, $extraQuery] = explode('?', $path);
       $query = $extraQuery . ($query ? "&$query" : '');
     }
@@ -452,12 +452,12 @@ class CRM_Utils_System {
 
     return self::url(
       $p,
-      CRM_Utils_Array::value('q', $params),
-      CRM_Utils_Array::value('a', $params, FALSE),
-      CRM_Utils_Array::value('f', $params),
-      CRM_Utils_Array::value('h', $params, TRUE),
-      CRM_Utils_Array::value('fe', $params, FALSE),
-      CRM_Utils_Array::value('fb', $params, FALSE)
+      $params['q'] ?? NULL,
+      $params['a'] ?? FALSE,
+      $params['f'] ?? NULL,
+      $params['h'] ?? TRUE,
+      $params['fe'] ?? FALSE,
+      $params['fb'] ?? FALSE
     );
   }
 
@@ -472,7 +472,7 @@ class CRM_Utils_System {
   public static function setTitle($title, $pageTitle = NULL) {
     self::$title = $title;
     $config = CRM_Core_Config::singleton();
-    return $config->userSystem->setTitle($title, $pageTitle);
+    return $config->userSystem->setTitle(CRM_Utils_String::purifyHtml($title), CRM_Utils_String::purifyHtml($pageTitle));
   }
 
   /**
@@ -493,7 +493,7 @@ class CRM_Utils_System {
 
     if ($referer && !empty($names)) {
       foreach ($names as $name) {
-        if (strstr($referer, $name)) {
+        if (str_contains($referer, $name)) {
           $url = $referer;
           break;
         }
@@ -1290,7 +1290,7 @@ class CRM_Utils_System {
     // convert ipV6 to ipV4
     if ($strictIPV4) {
       // this converts 'IPV4 mapped IPV6 address' to IPV4
-      if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && strstr($address, '::ffff:')) {
+      if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && str_contains($address, '::ffff:')) {
         $address = ltrim($address, '::ffff:');
       }
     }

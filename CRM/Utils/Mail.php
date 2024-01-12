@@ -43,8 +43,8 @@ class CRM_Utils_Mail {
         throw new CRM_Core_Exception(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
       }
 
-      $params['host'] = $mailingInfo['smtpServer'] ? $mailingInfo['smtpServer'] : 'localhost';
-      $params['port'] = $mailingInfo['smtpPort'] ? $mailingInfo['smtpPort'] : 25;
+      $params['host'] = $mailingInfo['smtpServer'] ?: 'localhost';
+      $params['port'] = $mailingInfo['smtpPort'] ?: 25;
 
       if ($mailingInfo['smtpAuth']) {
         $params['username'] = $mailingInfo['smtpUsername'];
@@ -190,7 +190,7 @@ class CRM_Utils_Mail {
       $htmlMessage = FALSE;
     }
     $attachments = $params['attachments'] ?? NULL;
-    if (!empty($params['text'])) {
+    if (!empty($params['text']) && trim($params['text'])) {
       $textMessage = $params['text'];
     }
     else {
@@ -198,6 +198,16 @@ class CRM_Utils_Mail {
       // Render the &amp; entities in text mode, so that the links work.
       // This is copied from the Action Schedule send code.
       $textMessage = str_replace('&amp;', '&', $textMessage);
+    }
+    if (str_contains($textMessage, 'Undefined array key') || str_contains($htmlMessage, 'Undefined array key') || str_contains($htmlMessage, 'Undefined index')) {
+      $logCount = \Civi::$statics[__CLASS__][__FUNCTION__]['count'] ?? 0;
+      if ($logCount < 3) {
+        // Only record the first 3 times since there might be different messages but after 3 chances are
+        // it's just bulk run of the same..
+        CRM_Core_Error::deprecatedWarning('email output affected by undefined php properties:' . (CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests' ? CRM_Utils_String::purifyHTML($htmlMessage) : ''));
+        $logCount++;
+        \Civi::$statics[__CLASS__][__FUNCTION__]['count'] = $logCount;
+      }
     }
 
     $headers = [];
@@ -276,7 +286,13 @@ class CRM_Utils_Mail {
           TRUE,
           'base64',
           'attachment',
-          (isset($attach['charset']) ? $attach['charset'] : '')
+          (isset($attach['charset']) ? $attach['charset'] : ''),
+          '',
+          '',
+          NULL,
+          NULL,
+          '',
+          'utf-8'
         );
       }
     }
@@ -355,16 +371,6 @@ class CRM_Utils_Mail {
     ]) . '</p>';
 
     return $message;
-  }
-
-  /**
-   * @param $to
-   * @param $headers
-   * @param $message
-   * @deprecated
-   */
-  public static function logger(&$to, &$headers, &$message) {
-    CRM_Utils_Mail_Logger::log($to, $headers, $message);
   }
 
   /**

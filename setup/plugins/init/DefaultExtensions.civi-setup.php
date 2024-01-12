@@ -14,5 +14,7 @@ if (!defined('CIVI_SETUP')) {
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'init'));
 
     $e->getModel()->extensions[] = 'org.civicrm.search_kit';
+    $e->getModel()->extensions[] = 'org.civicrm.afform';
+    $e->getModel()->extensions[] = 'authx';
 
   });

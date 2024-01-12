@@ -37,7 +37,7 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
    * @inheritDoc
    */
   public function alterActionScheduleQuery(MailingQueryEvent $e): void {
-    if ($e->mapping->getEntityTable() !== $this->getExtendableTableName()) {
+    if ($e->mapping->getEntityTable($e->actionSchedule) !== $this->getExtendableTableName()) {
       return;
     }
 

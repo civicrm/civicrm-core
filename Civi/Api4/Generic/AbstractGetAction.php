@@ -39,7 +39,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function setDefaultWhereClause() {
+  public function setDefaultWhereClause() {
     if (!$this->_itemsToGet('id')) {
       $fields = $this->entityFields();
       foreach ($fields as $field) {

@@ -50,11 +50,13 @@ class CRM_Contribute_Task extends CRM_Core_Task {
           'title' => ts('Delete contributions'),
           'class' => 'CRM_Contribute_Form_Task_Delete',
           'result' => FALSE,
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         self::TASK_PRINT => [
           'title' => ts('Print selected rows'),
           'class' => 'CRM_Contribute_Form_Task_Print',
           'result' => FALSE,
+          'weight' => 10,
         ],
         self::TASK_EXPORT => [
           'title' => ts('Export contributions'),
@@ -63,6 +65,7 @@ class CRM_Contribute_Task extends CRM_Core_Task {
             'CRM_Contribute_Export_Form_Map',
           ],
           'result' => FALSE,
+          'weight' => 20,
         ],
         self::BATCH_UPDATE => [
           'title' => ts('Update multiple contributions'),
@@ -71,6 +74,7 @@ class CRM_Contribute_Task extends CRM_Core_Task {
             'CRM_Contribute_Form_Task_Batch',
           ],
           'result' => TRUE,
+          'weight' => 30,
         ],
         self::TASK_EMAIL => [
           'title' => ts('Email - send now (to %1 or less)', [
@@ -79,11 +83,13 @@ class CRM_Contribute_Task extends CRM_Core_Task {
           ]),
           'class' => 'CRM_Contribute_Form_Task_Email',
           'result' => TRUE,
+          'weight' => 40,
         ],
         self::UPDATE_STATUS => [
           'title' => ts('Record payments for contributions'),
           'class' => 'CRM_Contribute_Form_Task_Status',
           'result' => TRUE,
+          'weight' => 50,
         ],
         self::PDF_RECEIPT => [
           'title' => ts('Receipts - print or email'),
@@ -96,6 +102,7 @@ class CRM_Contribute_Task extends CRM_Core_Task {
           'icon' => 'fa-envelope-o',
           'filters' => ['contribution_status_id' => [CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')]],
           'is_single_mode' => TRUE,
+          'weight' => 60,
         ],
         self::PDF_THANKYOU => [
           'title' => ts('Thank-you letters - print or email'),
@@ -106,11 +113,13 @@ class CRM_Contribute_Task extends CRM_Core_Task {
           'name' => ts('Send Letter'),
           'is_single_mode' => TRUE,
           'title_single_mode' => ts('Thank-you letter - print or email'),
+          'weight' => 70,
         ],
         self::PDF_INVOICE => [
           'title' => ts('Invoices - print or email'),
           'class' => 'CRM_Contribute_Form_Task_Invoice',
           'result' => FALSE,
+          'weight' => 80,
         ],
       ];
 
@@ -124,7 +133,7 @@ class CRM_Contribute_Task extends CRM_Core_Task {
       }
 
       // remove action "Invoices - print or email"
-      $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
+      $invoicing = \Civi::settings()->get('invoicing');
       if (!$invoicing) {
         unset(self::$_tasks[self::PDF_INVOICE]);
       }

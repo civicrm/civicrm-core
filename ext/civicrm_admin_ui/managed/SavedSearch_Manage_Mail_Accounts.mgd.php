@@ -59,6 +59,7 @@ return [
         'saved_search_id.name' => 'Mail_Accounts',
         'type' => 'table',
         'settings' => [
+          'actions' => TRUE,
           'description' => NULL,
           'sort' => [],
           'limit' => 50,
@@ -173,15 +174,19 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'actions' => FALSE,
           'classes' => [
             'table',
             'table-striped',
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/mailSettings/edit?action=add&reset=1',
-            'text' => E::ts('Add Mail Account'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'MailSettings',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Mail Account'),
+              'icon' => 'fa-plus',
+            ],
           ],
         ],
         'acl_bypass' => FALSE,

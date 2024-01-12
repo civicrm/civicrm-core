@@ -103,7 +103,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     for ($index = 1; $index <= $maxIndex; $index++) {
       if (array_key_exists('option_amount', $params) &&
         array_key_exists($index, $params['option_amount']) &&
-        (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) || !empty($params['is_quick_config'])) &&
+        (!empty($params['option_label'][$index]) || !empty($params['is_quick_config'])) &&
         !CRM_Utils_System::isNull($params['option_amount'][$index])
       ) {
         $options = [
@@ -128,7 +128,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $options['is_default'] = !empty($defaultArray[$params['membership_type_id'][$index]]) ? $defaultArray[$params['membership_type_id'][$index]] : 0;
         }
 
-        if (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_financial_type_id', $params))) {
+        if (!empty($params['option_financial_type_id'][$index])) {
           $options['financial_type_id'] = $params['option_financial_type_id'][$index];
         }
         elseif (!empty($params['financial_type_id'])) {
@@ -236,6 +236,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *
    * @param null $fieldOptions
    * @param array $freezeOptions
+   * @param array $extra
+   *   Passed through to the add element function, use to add js.
    *
    * @return null
    */
@@ -247,18 +249,20 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     $useRequired = TRUE,
     $label = NULL,
     $fieldOptions = NULL,
-    $freezeOptions = []
+    $freezeOptions = [],
+    array $extra = []
   ) {
-
+    $incomingExtra = $extra;
     $field = new CRM_Price_DAO_PriceField();
     $field->id = $fieldId;
     if (!$field->find(TRUE)) {
       /* FIXME: failure! */
       return NULL;
     }
-
+    $label = $label ?: $field->label;
     $is_pay_later = 0;
     $isQuickConfig = CRM_Price_BAO_PriceSet::isQuickConfig($field->price_set_id);
+    // @todo - pass is_pay_later in rather than checking form properties
     if (isset($qf->_mode) && empty($qf->_mode)) {
       $is_pay_later = 1;
     }
@@ -274,10 +278,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     // get currency name for price field and option attributes
     $currencyName = $config->defaultCurrency;
 
-    if (!isset($label)) {
-      $label = (!empty($qf->_membershipBlock) && $field->name === 'contribution_amount') ? ts('Additional Contribution') : $field->label;
-    }
-
+    // @todo - pass useRequired in rather than checking form properties
     if (isset($qf->_online) && $qf->_online) {
       $useRequired = FALSE;
     }
@@ -310,21 +311,16 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $max_value,
         ]);
 
-        $extra = [];
-        if (!empty($qf->_membershipBlock) && $isQuickConfig && $field->name == 'other_amount') {
-          $useRequired = 0;
-        }
-        elseif (!empty($fieldOptions[$optionKey]['label'])) {
+        if (!empty($fieldOptions[$optionKey]['label'])) {
           //check for label.
-          $label = $fieldOptions[$optionKey]['label'];
-          if ($isQuickConfig && $field->name === 'contribution_amount' && strtolower($fieldOptions[$optionKey]['name']) == 'other_amount') {
-            $label .= '  ' . $currencySymbol;
-            $qf->assign('priceset', $elementName);
-            $extra = [
-              'onclick' => 'useAmountOther();',
-              'autocomplete' => 'off',
-            ];
+          $label = CRM_Utils_String::purifyHTML($fieldOptions[$optionKey]['label']);
+        }
+        // @todo - move this back to the only calling function on Contribution_Form_Main.php
+        if ($isQuickConfig && $field->name === 'other_amount') {
+          if (!empty($qf->_membershipBlock)) {
+            $useRequired = 0;
           }
+          $label .= '  ' . $currencySymbol;
         }
 
         $element = &$qf->add('text', $elementName, $label,
@@ -353,7 +349,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $type = 'money';
         }
         else {
-          $message = ts('%1 must be a number (with or without decimal point).', [1 => $label]);
+          $message = ts('%1 must be a number (with or without decimals).', [1 => $label]);
           $type = 'numeric';
         }
         // integers will have numeric rule applied to them.
@@ -362,10 +358,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
       case 'Radio':
         $choice = [];
-
-        if ($isQuickConfig && $field->name === 'contribution_amount') {
-          $qf->assign('contriPriceset', $elementName);
-        }
 
         foreach ($customOption as $opId => $opt) {
           $priceOptionText = self::buildPriceOptionText($opt, $field->is_display_amounts, $valueFieldName);
@@ -380,25 +372,17 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             'data-amount' => $opt[$valueFieldName],
             'data-currency' => $currencyName,
             'data-price-field-values' => json_encode($customOption),
+            'data-membership-type-id' => $opt['membership_type_id'] ?? NULL,
             'visibility' => $visibility_id,
-          ];
-          if ($isQuickConfig && $field->name == 'contribution_amount') {
-            $extra += ['onclick' => 'clearAmountOther();'];
-          }
-          if ($field->name == 'membership_amount') {
-            $extra += [
-              'onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
-              'membership-type' => $opt['membership_type_id'],
-            ];
-            $qf->assign('membershipFieldID', $field->id);
-          }
+          ] + $incomingExtra;
 
-          $choice[$opt['id']] = $priceOptionText['label'];
+          $choice[$opt['id']] = CRM_Utils_String::purifyHTML($priceOptionText['label']);
           $choiceAttrs[$opt['id']] = $extra;
           if ($is_pay_later) {
             $qf->add('text', 'txt-' . $elementName, $label, ['size' => '4']);
           }
         }
+        // @todo - move this back to the only calling function on Contribution_Form_Main.php
         if (!empty($qf->_membershipBlock) && $field->name == 'contribution_amount') {
           $choice['-1'] = ts('No thank you');
           $choiceAttrs['-1'] = [
@@ -421,7 +405,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
 
           $choice['0'] = '<span class="crm-price-amount-label">' . $none . '</span>';
-          $choiceAttrs['0'] = ['price' => json_encode([$elementName, '0'])];
+          $choiceAttrs['0'] = [
+            'price' => json_encode([$elementName, '0']),
+            'data-membership-type-id' => NULL,
+          ] + $incomingExtra;
         }
 
         $element = &$qf->addRadio($elementName, $label, $choice, [], NULL, FALSE, $choiceAttrs);
@@ -435,6 +422,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
 
         // make contribution field required for quick config when membership block is enabled
+        // @todo - move this back to the only calling function on Contribution_Form_Main.php
         if (($field->name == 'membership_amount' || $field->name == 'contribution_amount')
           && !empty($qf->_membershipBlock) && !$field->is_required
         ) {
@@ -528,6 +516,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
         break;
     }
+    // @todo - move this action back to the calling function
     if (isset($qf->_online) && $qf->_online) {
       $element->freeze();
     }
@@ -737,11 +726,11 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
         }
       }
 
-      list($componentName) = explode(':', $fields['_qf_default']);
+      [$componentName] = explode(':', $fields['_qf_default']);
       // now we have all selected amount in hand.
       $totalAmount = array_sum($selectedAmounts);
       // The form offers a field to enter the amount paid. This may differ from the amount that is due to complete the purchase
-      $totalPaymentAmountEnteredOnForm = CRM_Utils_Array::value('total_amount', $fields);
+      $totalPaymentAmountEnteredOnForm = $fields['total_amount'] ?? NULL;
       if ($totalAmount < 0) {
         $error['_qf_default'] = ts('%1 amount can not be less than zero. Please select the options accordingly.', [1 => $componentName]);
       }
@@ -778,12 +767,12 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
    */
   public static function buildPriceOptionText($opt, $isDisplayAmounts, $valueFieldName) {
     $preHelpText = $postHelpText = '';
-    $optionLabel = !empty($opt['label']) ? '<span class="crm-price-amount-label">' . $opt['label'] . '</span>' : '';
-    if (!empty($opt['help_pre'])) {
-      $preHelpText = '<span class="crm-price-amount-help-pre description">' . $opt['help_pre'] . '</span><span class="crm-price-amount-help-pre-separator">:&nbsp;</span>';
+    $optionLabel = !empty($opt['label']) ? '<span class="crm-price-amount-label">' . CRM_Utils_String::purifyHTML($opt['label']) . '</span>' : '';
+    if (CRM_Utils_String::purifyHTML($opt['help_pre'] ?? '')) {
+      $preHelpText = '<span class="crm-price-amount-help-pre description">' . CRM_Utils_String::purifyHTML($opt['help_pre']) . '</span><span class="crm-price-amount-help-pre-separator">:&nbsp;</span>';
     }
-    if (!empty($opt['help_post'])) {
-      $postHelpText = '<span class="crm-price-amount-help-post-separator">:&nbsp;</span><span class="crm-price-amount-help-post description">' . $opt['help_post'] . '</span>';
+    if (CRM_Utils_String::purifyHTML($opt['help_post'] ?? '')) {
+      $postHelpText = '<span class="crm-price-amount-help-post-separator">:&nbsp;</span><span class="crm-price-amount-help-post description">' . CRM_Utils_String::purifyHTML($opt['help_post']) . '</span>';
     }
 
     $invoicing = Civi::settings()->get('invoicing');

@@ -7,8 +7,8 @@
 <body>
 
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
-{capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
-{capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=labelStyle}style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
+{capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
   <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
   <!-- BEGIN HEADER -->
@@ -23,7 +23,7 @@
     <p>{ts}This is an invitation to complete your registration that was initially waitlisted.{/ts}</p>
    </td>
   </tr>
-  {if !$isAdditional and $participant.id}
+  {if !$isAdditional and {participant.id|boolean}}
    <tr>
     <th {$headerStyle}>
      {ts}Confirm Your Registration{/ts}
@@ -31,14 +31,14 @@
    </tr>
    <tr>
     <td colspan="2" {$valueStyle}>
-     {capture assign=confirmUrl}{crmURL p='civicrm/event/confirm' q="reset=1&participantId=`$participant.id`&cs=`$checksumValue`" a=true h=0 fe=1}{/capture}
+     {capture assign=confirmUrl}{crmURL p='civicrm/event/confirm' q="reset=1&participantId={participant.id}&cs=`$checksumValue`" a=true h=0 fe=1}{/capture}
      <a href="{$confirmUrl}">{ts}Click here to confirm and complete your registration{/ts}</a>
     </td>
    </tr>
   {/if}
-  {if $event.allow_selfcancelxfer }
+  {if {event.allow_selfcancelxfer|boolean}}
   {ts}This event allows for{/ts}
-  {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participant.id`&{contact.checksum}" h=0 a=1 fe=1}{/capture}
+  {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid={participant.id}&{contact.checksum}" h=0 a=1 fe=1}{/capture}
        <a href="{$selfService}"> {ts}self service cancel or transfer{/ts}</a>
   {/if}
 
@@ -52,89 +52,95 @@
      </tr>
      <tr>
       <td colspan="2" {$valueStyle}>
-       {$event.event_title}<br />
-       {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+       {event.title}<br />
+       {event.start_date|crmDate:"%A"} {event.start_date|crmDate}{if {event.end_date|boolean}}-{if '{event.end_date|crmDate:"%Y%m%d"}' === '{event.start_date|crmDate:"%Y%m%d"}'}{event.end_date|crmDate:"Time"}{else}{event.end_date|crmDate:"%A"} {event.end_date|crmDate}{/if}{/if}
       </td>
      </tr>
-     {if $conference_sessions}
-      <tr>
-       <td colspan="2" {$labelStyle}>
-  {ts}Your schedule:{/ts}
-       </td>
-      </tr>
-      <tr>
-       <td colspan="2" {$valueStyle}>
-  {assign var='group_by_day' value='NA'}
-  {foreach from=$conference_sessions item=session}
-   {if $session.start_date|crmDate:"%Y/%m/%d" != $group_by_day|crmDate:"%Y/%m/%d"}
-    {assign var='group_by_day' value=$session.start_date}
-          <em>{$group_by_day|crmDate:"%m/%d/%Y"}</em><br />
-   {/if}
-   {$session.start_date|crmDate:0:1}{if $session.end_date}-{$session.end_date|crmDate:0:1}{/if} {$session.title}<br />
-   {if $session.location}&nbsp;&nbsp;&nbsp;&nbsp;{$session.location}<br />{/if}
-  {/foreach}
-       </td>
-      </tr>
-     {/if}
      <tr>
       <td {$labelStyle}>
        {ts}Participant Role{/ts}:
       </td>
       <td {$valueStyle}>
-       {$participant.role}
+        {participant.role_id:label}
       </td>
      </tr>
-
-     {if $isShowLocation}
-      <tr>
-       <td colspan="2" {$valueStyle}>
-        {$event.location.address.1.display|nl2br}
-       </td>
-      </tr>
-     {/if}
-
-     {if $event.location.phone.1.phone || $event.location.email.1.email}
-      <tr>
-       <td colspan="2" {$labelStyle}>
-        {ts}Event Contacts:{/ts}
-       </td>
-      </tr>
-      {foreach from=$event.location.phone item=phone}
-       {if $phone.phone}
+     {if {event.is_show_location|boolean}}
         <tr>
-         <td {$labelStyle}>
-          {if $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}
-         </td>
-         <td {$valueStyle}>
-          {$phone.phone}
-         </td>
+          <td colspan="2" {$valueStyle}>
+            {event.location}
+          </td>
         </tr>
-       {/if}
-      {/foreach}
-      {foreach from=$event.location.email item=eventEmail}
-       {if $eventEmail.email}
-        <tr>
-         <td {$labelStyle}>
-          {ts}Email{/ts}
-         </td>
-         <td {$valueStyle}>
-          {$eventEmail.email}
-         </td>
-        </tr>
-       {/if}
-      {/foreach}
-     {/if}
+      {/if}
 
-     {if $event.is_public}
+     {if {event.loc_block_id.phone_id.phone|boolean} || {event.loc_block_id.email_id.email|boolean}}
+        <tr>
+          <td colspan="2" {$labelStyle}>
+            {ts}Event Contacts:{/ts}
+          </td>
+        </tr>
+
+        {if {event.loc_block_id.phone_id.phone|boolean}}
+          <tr>
+            <td {$labelStyle}>
+              {if {event.loc_block_id.phone_id.phone_type_id|boolean}}
+                {event.loc_block_id.phone_id.phone_type_id:label}
+              {else}
+                {ts}Phone{/ts}
+              {/if}
+            </td>
+            <td {$valueStyle}>
+              {event.loc_block_id.phone_id.phone} {if {event.loc_block_id.phone_id.phone_ext|boolean}}&nbsp;{ts}ext.{/ts} {event.loc_block_id.phone_id.phone_ext}{/if}
+            </td>
+          </tr>
+        {/if}
+        {if {event.loc_block_id.phone_2_id.phone|boolean}}
+          <tr>
+            <td {$labelStyle}>
+              {if {event.loc_block_id.phone_2_id.phone_type_id|boolean}}
+                {event.loc_block_id.phone_2_id.phone_type_id:label}
+              {else}
+                {ts}Phone{/ts}
+              {/if}
+            </td>
+            <td {$valueStyle}>
+              {event.loc_block_id.phone_2_id.phone} {if {event.loc_block_id.phone_2_id.phone_ext|boolean}}&nbsp;{ts}ext.{/ts} {event.loc_block_id.phone_2_id.phone_ext}{/if}
+            </td>
+          </tr>
+        {/if}
+
+        {if {event.loc_block_id.email_id.email|boolean}}
+          <tr>
+            <td {$labelStyle}>
+              {ts}Email{/ts}
+            </td>
+            <td {$valueStyle}>
+              {event.loc_block_id.email_id.email}
+            </td>
+          </tr>
+        {/if}
+
+        {if {event.loc_block_id.email_2_id.email|boolean}}
+          <tr>
+            <td {$labelStyle}>
+              {ts}Email{/ts}
+            </td>
+            <td {$valueStyle}>
+              {event.loc_block_id.email_2_id.email}
+            </td>
+          </tr>
+        {/if}
+      {/if}
+
+     {if {event.is_public|boolean}}
      <tr>
        <td colspan="2" {$valueStyle}>
-           {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+           {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
          <a href="{$icalFeed}">{ts}Download iCalendar entry for this event.{/ts}</a>
        </td>
      </tr>
      <tr>
        <td colspan="2" {$valueStyle}>
-           {capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+           {capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
          <a href="{$gCalendar}">{ts}Add event to Google Calendar{/ts}</a>
        </td>
      </tr>
@@ -153,13 +159,13 @@
       </tr>
      {/if}
 
-     {if $register_date}
+     {if {participant.register_date|boolean}}
       <tr>
        <td {$labelStyle}>
         {ts}Registration Date{/ts}
        </td>
        <td {$valueStyle}>
-        {$participant.register_date|crmDate}
+         {participant.register_date}
        </td>
       </tr>
      {/if}
@@ -167,11 +173,11 @@
     </table>
    </td>
   </tr>
-  {if $event.allow_selfcancelxfer }
+  {if {event.allow_selfcancelxfer|boolean}}
    <tr>
      <td colspan="2" {$valueStyle}>
-       {ts 1=$selfcancelxfer_time 2=$selfservice_preposition}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts} {if $totalAmount}{ts}Cancellations are not refundable.{/ts}{/if}<br />
-         {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participant.id`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
+       {ts 1=$selfcancelxfer_time 2=$selfservice_preposition}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts}<br />
+         {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid={participant.id}&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
        <a href="{$selfService}">{ts}Click here to transfer or cancel your registration.{/ts}</a>
      </td>
    </tr>

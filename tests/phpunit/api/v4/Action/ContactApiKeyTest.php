@@ -29,7 +29,7 @@ use Civi\Test\TransactionalInterface;
  */
 class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testGetApiKey() {
+  public function testGetApiKey(): void {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts', 'edit api keys', 'view all contacts', 'edit all contacts'];
     $key = \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
     $isSafe = function ($mixed) use ($key) {
@@ -102,7 +102,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($isSafe($result), "Should NOT reveal secret details ($key): " . var_export($result, 1));
   }
 
-  public function testApiKeyInWhereAndOrderBy() {
+  public function testApiKeyInWhereAndOrderBy(): void {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts', 'edit api keys', 'view all contacts', 'edit all contacts'];
     $keyA = 'a' . \CRM_Utils_String::createRandom(15, \CRM_Utils_String::ALPHANUMERIC);
     $keyB = 'b' . \CRM_Utils_String::createRandom(15, \CRM_Utils_String::ALPHANUMERIC);
@@ -180,7 +180,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
 
   }
 
-  public function testCreateWithInsufficientPermissions() {
+  public function testCreateWithInsufficientPermissions(): void {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts'];
     $key = uniqid();
 
@@ -199,7 +199,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString('key', $error);
   }
 
-  public function testGetApiKeyViaJoin() {
+  public function testGetApiKeyViaJoin(): void {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
     $key = \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
     $isSafe = function ($mixed) use ($key) {
@@ -238,7 +238,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($isSafe($result), "Should NOT reveal secret details ($key): " . var_export($result, 1));
   }
 
-  public function testUpdateApiKey() {
+  public function testUpdateApiKey(): void {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit all contacts'];
     $key = uniqid();
 
@@ -290,7 +290,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($result['api_key'], "IGotThePower!");
   }
 
-  public function testUpdateOwnApiKey() {
+  public function testUpdateOwnApiKey(): void {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit own api keys', 'edit all contacts'];
     $key = uniqid();
 
@@ -342,7 +342,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($result['api_key'], "MyId!");
   }
 
-  public function testApiKeyWithGetFields() {
+  public function testApiKeyWithGetFields(): void {
     // With sufficient permissions the field should exist
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit api keys'];
     $this->assertArrayHasKey('api_key', \civicrm_api4('Contact', 'getFields', [], 'name'));

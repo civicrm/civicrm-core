@@ -63,7 +63,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'billing_mode' => 'form',
       'is_recur' => 0,
     ];
-    $result = $this->callAPIAndDocument('PaymentProcessorType', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('PaymentProcessorType', 'create', $params);
     $this->assertNotNull($result['values'][0]['id']);
 
     // mutate $params to match expected return value
@@ -71,16 +71,6 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $params['billing_mode'] = CRM_Core_Payment::BILLING_MODE_FORM;
     //assertDBState compares expected values in $result to actual values in the DB
     $this->assertDBState('CRM_Financial_DAO_PaymentProcessorType', $result['id'], $params);
-  }
-
-  /**
-   * Test  using example code.
-   */
-  public function testPaymentProcessorTypeCreateExample() {
-    require_once 'api/v3/examples/PaymentProcessorType/Create.ex.php';
-    $result = payment_processor_type_create_example();
-    $expectedResult = payment_processor_type_create_expectedresult();
-    $this->assertAPISuccess($result);
   }
 
   ///////////////// civicrm_payment_processor_type_delete methods
@@ -139,7 +129,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
    */
   public function testPaymentProcessorTypeDelete($version) {
     $this->_apiversion = $version;
-    $this->callAPIAndDocument('PaymentProcessorType', 'delete', ['id' => $this->paymentProcessorTypeCreate()], __FUNCTION__, __FILE__);
+    $this->callAPISuccess('PaymentProcessorType', 'delete', ['id' => $this->paymentProcessorTypeCreate()]);
   }
 
   ///////////////// civicrm_payment_processor_type_update

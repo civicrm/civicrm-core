@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MembershipType;
+
 /**
  *
  * @package CRM
@@ -54,11 +56,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    * @return \CRM_Member_DAO_MembershipType
    * @throws \CRM_Core_Exception
    */
-  public static function add(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
+  public static function add($params) {
     $membershipTypeID = $params['id'] ?? NULL;
-    CRM_Utils_Hook::pre($hook, 'MembershipType', $membershipTypeID, $params);
-
     if (!$membershipTypeID && !isset($params['domain_id'])) {
       $params['domain_id'] = CRM_Core_Config::domainID();
     }
@@ -68,10 +67,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
     if ($membershipTypeID) {
       $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipTypeID, 'member_of_contact_id');
     }
-
-    $membershipType = new CRM_Member_DAO_MembershipType();
-    $membershipType->copyValues($params);
-    $membershipType->save();
+    $membershipType = self::writeRecord($params);
 
     if ($membershipTypeID) {
       // on update we may need to retrieve some details for the price field function - otherwise we get e-notices on attempts to retrieve
@@ -83,9 +79,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
     if ($membershipTypeID) {
       self::updateAllPriceFieldValue($membershipTypeID, $params);
     }
-
-    CRM_Utils_Hook::post($hook, 'MembershipType', $membershipType->id, $membershipType);
-
     self::flush();
     return $membershipType;
   }
@@ -298,11 +291,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
     $membershipTypeDetails = self::getMembershipTypeDetails($membershipTypeId);
 
     // Convert all dates to 'Y-m-d' format.
-    foreach ([
-      'joinDate',
-      'startDate',
-      'endDate',
-    ] as $dateParam) {
+    foreach (['joinDate', 'startDate', 'endDate'] as $dateParam) {
       if (!empty($$dateParam)) {
         $$dateParam = CRM_Utils_Date::processDate($$dateParam, NULL, FALSE, 'Y-m-d');
       }
@@ -521,18 +510,18 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
         $date = $membershipDetails->end_date;
       }
       $date = explode('-', $date);
-      // We have to add 1 day first in case it's the end of the month, then subtract afterwards
+      $year = $date[0];
+      $month = $date[1];
+      $day = $date[2];
+
+      // $logStartDate is used for the membership log only, except if the membership is monthly
+      // then we add 1 day first in case it's the end of the month, then subtract afterwards
       // eg. 2018-02-28 should renew to 2018-03-31, if we just added 1 month we'd get 2018-03-28
       $logStartDate = date('Y-m-d', mktime(0, 0, 0,
         (double) $date[1],
         (double) ($date[2] + 1),
         (double) $date[0]
       ));
-
-      $date = explode('-', $logStartDate);
-      $year = $date[0];
-      $month = $date[1];
-      $day = $date[2];
 
       switch ($membershipTypeDetails['duration_unit']) {
         case 'year':
@@ -548,6 +537,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
           break;
 
         case 'month':
+          $date = explode('-', $logStartDate);
+          $year = $date[0];
+          $month = $date[1];
+          $day = $date[2] - 1;
           $month = $month + ($numRenewTerms * $membershipTypeDetails['duration_interval']);
           break;
 
@@ -561,7 +554,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
       else {
         $endDate = date('Y-m-d', mktime(0, 0, 0,
           $month,
-          $day - 1,
+          $day,
           $year
         ));
       }
@@ -805,28 +798,13 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   public static function getAllMembershipTypes(): array {
     $cacheString = __CLASS__ . __FUNCTION__ . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
     if (!Civi::cache('metadata')->has($cacheString)) {
-      $types = civicrm_api3('MembershipType', 'get', ['options' => ['limit' => 0, 'sort' => 'weight']])['values'];
+      $types = (array) MembershipType::get(FALSE)->addOrderBy('weight')->execute()->indexBy('id');
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-      $keys = ['description', 'relationship_type_id', 'relationship_direction', 'max_related', 'auto_renew'];
-      // In order to avoid down-stream e-notices we undo api v3 filtering of NULL values. This is covered
-      // in Unit tests & ideally we might switch to apiv4 but I would argue we should build caching
-      // of metadata entities like this directly into apiv4.
       foreach ($types as $id => $type) {
-        foreach ($keys as $key) {
-          if (!isset($type[$key])) {
-            $types[$id][$key] = NULL;
-          }
-        }
-        if (isset($type['contribution_type_id'])) {
-          unset($types[$id]['contribution_type_id']);
-        }
         $types[$id]['tax_rate'] = (float) ($taxRates[$type['financial_type_id']] ?? 0.0);
         $multiplier = 1;
         if ($types[$id]['tax_rate'] !== 0.0) {
           $multiplier += ($types[$id]['tax_rate'] / 100);
-        }
-        if (!array_key_exists('minimum_fee', $types[$id])) {
-          $types[$id]['minimum_fee'] = 0;
         }
         $types[$id]['minimum_fee_with_tax'] = (float) $types[$id]['minimum_fee'] * $multiplier;
       }

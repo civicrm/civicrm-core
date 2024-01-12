@@ -31,7 +31,7 @@
 </div>
 </div>
 
-{if $rowsEmpty || $rows }
+{if $rowsEmpty || $rows}
 
 <div class="crm-content-block">
 

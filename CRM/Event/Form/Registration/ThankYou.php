@@ -72,16 +72,20 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   public function buildQuickForm() {
     // Assign the email address from a contact id lookup as in CRM_Event_BAO_Event->sendMail()
     $primaryContactId = $this->get('primaryContactId');
+    $email = NULL;
     if ($primaryContactId) {
       $email = CRM_Utils_Array::valueByRegexKey('/^email-/', current($this->_params));
       if (!$email) {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($primaryContactId);
       }
-      $this->assign('email', $email);
     }
+    $this->assign('email', $email ?? NULL);
+    $this->assign('eventConfirmText', $this->getEventValue('is_monetary') ? $this->getPaymentProcessorObject()->getText('eventConfirmText', []) : '');
+    $this->assign('eventConfirmEmailText', ($email && $this->getEventValue('is_monetary')) ? $this->getPaymentProcessorObject()->getText('eventConfirmEmailText', ['email' => $email]) : '');
+
     $this->assignToTemplate();
 
-    $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
+    $invoicing = \Civi::settings()->get('invoicing');
     $taxAmount = 0;
 
     $lineItemForTemplate = [];

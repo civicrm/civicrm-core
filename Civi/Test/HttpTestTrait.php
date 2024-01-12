@@ -75,7 +75,7 @@ trait HttpTestTrait {
    * @return mixed
    */
   protected function callApi4AjaxSuccess(string $entity, string $action, $params = []) {
-    $method = \CRM_Utils_String::startsWith($action, 'get') ? 'GET' : 'POST';
+    $method = str_starts_with($action, 'get') ? 'GET' : 'POST';
     $response = $this->createGuzzle()->request($method, "civicrm/ajax/api4/$entity/$action", [
       'headers' => ['X-Requested-With' => 'XMLHttpRequest'],
       // This should probably be 'form_params', but 'query' is more representative of frontend.
@@ -99,7 +99,7 @@ trait HttpTestTrait {
    * @return mixed
    */
   protected function callApi4AjaxError(string $entity, string $action, $params = []) {
-    $method = \CRM_Utils_String::startsWith($action, 'get') ? 'GET' : 'POST';
+    $method = str_starts_with($action, 'get') ? 'GET' : 'POST';
     $response = $this->createGuzzle()->request($method, "civicrm/ajax/api4/$entity/$action", [
       'headers' => ['X-Requested-With' => 'XMLHttpRequest'],
       // This should probably be 'form_params', but 'query' is more representative of frontend.
@@ -131,6 +131,37 @@ trait HttpTestTrait {
   }
 
   /**
+   * Assert that the response did NOT produce a normal page-view.
+   *
+   * This is basically `assertStatusCode(404)`, except that the local configuration
+   * (CMS/setings/exts/yaddayadda) may change how the error manifests.
+   *
+   * @param $response
+   * @return void
+   */
+  protected function assertPageNotShown($response = NULL): void {
+    $response = $this->resolveResponse($response);
+    $actualCode = $response->getStatusCode();
+    switch ($actualCode) {
+      case 404: /* Good! Right! */
+      case 403: /* Maybe request falls through to `/civicrm/dashboard` */
+      case 500: /* Maybe request falls through to `/civicrm/dashboard`, and it's weird */
+        // OK, close enough. You convinced that the page was not shown to the user.
+        // Bump the assertion-counter and carry on.
+        $this->assertTrue(TRUE);
+        return;
+
+      case 200:
+        // Hypothetically, you might do extra checks on the body to detected misreported errors.
+        // But for now, let's pretend that HTTP 200 means "OK, Page Found!"... since that is exactly what it means.
+        $this->fail("Expected HTTP response to indicate a failure (e.g. 404). Received HTTP response $actualCode.\n" . $this->formatFailure($response));
+
+      default:
+        $this->fail("Expected HTTP response, but the status code makes no sense. Received HTTP response $actualCode.\n" . $this->formatFailure($response));
+    }
+  }
+
+  /**
    * @param $expectType
    * @param \Psr\Http\Message\ResponseInterface|null $response
    *   If NULL, then it uses the last response.
@@ -146,6 +177,8 @@ trait HttpTestTrait {
   }
 
   /**
+   * Assert that the response body matches a regular-expression.
+   *
    * @param string $regexp
    * @param \Psr\Http\Message\ResponseInterface $response
    * @param string $message
@@ -156,8 +189,26 @@ trait HttpTestTrait {
     }
 
     $response = $this->resolveResponse($response);
-    $this->assertRegexp($regexp, (string) $response->getBody(),
+    $this->assertMatchesRegularExpression($regexp, (string) $response->getBody(),
       $message . 'Response body does not match pattern' . $this->formatFailure($response));
+    return $this;
+  }
+
+  /**
+   * Assert that the response body DOES NOT match a regular-expression.
+   *
+   * @param string $regexp
+   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param string $message
+   */
+  protected function assertNotBodyRegexp($regexp, $response = NULL, $message = NULL) {
+    if ($message) {
+      $message .= "\n";
+    }
+
+    $response = $this->resolveResponse($response);
+    $this->assertDoesNotMatchRegularExpression($regexp, (string) $response->getBody(),
+      $message . 'Response body should not match pattern' . $this->formatFailure($response));
     return $this;
   }
 

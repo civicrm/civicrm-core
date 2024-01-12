@@ -87,7 +87,7 @@
       <td>{$revenue_recognition_date|crmDate:"%B, %Y"}</td>
     </tr>
   {/if}
-  {if $to_financial_account }
+  {if $to_financial_account}
     <tr class="crm-contribution-form-block-to_financial_account">
       <td class="label">{ts}Received Into{/ts}</td>
       <td>{$to_financial_account}</td>
@@ -151,7 +151,7 @@
     </tr>
   {/if}
   {foreach from=$note item="rec"}
-    {if $rec }
+    {if $rec}
       <tr class="crm-contribution-form-block-note">
         <td class="label">{ts}Note{/ts}</td>
         <td>{$rec}</td>

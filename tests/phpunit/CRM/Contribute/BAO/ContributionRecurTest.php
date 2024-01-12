@@ -289,7 +289,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     ]);
 
     // Register "contribution create" hook
-    $this->hookClass->setHook('civicrm_post', array($this, 'implementHookPost'));
+    $this->hookClass->setHook('civicrm_post', [$this, 'implementHookPost']);
     \Civi::$statics['testCreateTemplateContributionFromFirstContributionTest']['custom_field_id'] = $custom_field['id'];
 
     // Make sure a template contribution exists.

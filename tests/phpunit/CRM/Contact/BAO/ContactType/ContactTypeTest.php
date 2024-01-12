@@ -59,7 +59,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   /**
    * Test contactTypes() and subTypes() methods return correct contact types.
    */
-  public function testGetMethods() {
+  public function testGetMethods(): void {
     $result = CRM_Contact_BAO_ContactType::contactTypes(TRUE);
     $this->assertEquals(array_keys($this->getExpectedContactTypes()), $result);
 
@@ -89,7 +89,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   /**
    * Test subTypes() methods with invalid data
    */
-  public function testGetMethodsInvalid() {
+  public function testGetMethodsInvalid(): void {
 
     $params = 'invalid';
     $result = CRM_Contact_BAO_ContactType::subTypes($params);
@@ -105,7 +105,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContactTypeInfo() {
+  public function testContactTypeInfo(): void {
     $blahType = ['is_active' => 0, 'name' => 'blah', 'label' => 'blah blah', 'parent_id:name' => 'Individual', 'icon' => 'fa-random'];
     $createdType = ContactType::create()->setValues($blahType)->execute()->first();
     $activeTypes = CRM_Contact_BAO_ContactType::contactTypeInfo();
@@ -126,6 +126,9 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'icon' => 'fa-random',
     ];
     $this->assertEquals($expected, $allTypes);
+    // Verify function returns field values formatted correctly by type
+    $this->assertTrue(is_int($allTypes['blah']['id']));
+    $this->assertFalse($allTypes['blah']['is_active']);
   }
 
   /**
@@ -340,7 +343,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
    * Test add() methods with valid data
    * success expected
    */
-  public function testAdd() {
+  public function testAdd(): void {
 
     $params = [
       'label' => 'indiviSubType',
@@ -372,7 +375,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   /**
    * Test del() with valid data.
    */
-  public function testDel() {
+  public function testDel(): void {
 
     $params = [
       'label' => 'indiviSubType',

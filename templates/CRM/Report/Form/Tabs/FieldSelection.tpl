@@ -10,7 +10,7 @@
 
   <div id="report-tab-col-groups" class="civireport-criteria">
     {foreach from=$colGroups item=grpFields key=dnc}
-      {assign  var="count" value="0"}
+      {assign  var="count" value=0}
       {* Wrap custom field sets in collapsed accordion pane. *}
       {if !empty($grpFields.use_accordian_for_field_selection)}
         <div class="crm-accordion-wrapper crm-accordion collapsed">
@@ -22,7 +22,7 @@
       <table class="criteria-group">
         <tr class="crm-report crm-report-criteria-field crm-report-criteria-field-{$dnc}">
           {foreach from=$grpFields.fields item=title key=field}
-          {assign var="count" value=`$count+1`}
+          {assign var="count" value=$count+1}
           <td width="25%">{$form.fields.$field.html}</td>
           {if $count is div by 4}
         </tr><tr class="crm-report crm-report-criteria-field crm-report-criteria-field_{$dnc}">

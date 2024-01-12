@@ -22,7 +22,7 @@ use Civi\Core\HookInterface;
 class EntityAutocompleteProvider extends \Civi\Core\Service\AutoService implements HookInterface {
 
   /**
-   * Provide default SearchDisplay for ContactType autocompletes
+   * Provide default SearchDisplay for autocompletes of API Entity names
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */

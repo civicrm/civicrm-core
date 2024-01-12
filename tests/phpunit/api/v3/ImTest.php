@@ -47,7 +47,7 @@ class api_v3_ImTest extends CiviUnitTestCase {
    */
   public function testCreateIm($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPIAndDocument(self::ENTITY, 'create', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess(self::ENTITY, 'create', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->getAndCheck($this->params, $result['id'], self::ENTITY);
     $this->assertNotNull($result['values'][$result['id']]['id']);
@@ -64,7 +64,7 @@ class api_v3_ImTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = $this->params;
     unset($params['location_type_id']);
-    $result = $this->callAPIAndDocument(self::ENTITY, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess(self::ENTITY, 'create', $params);
     $this->assertEquals(CRM_Core_BAO_LocationType::getDefault()->id, $result['values'][$result['id']]['location_type_id']);
     $this->callAPISuccess(self::ENTITY, 'delete', ['id' => $result['id']]);
   }
@@ -77,7 +77,7 @@ class api_v3_ImTest extends CiviUnitTestCase {
   public function testGetIm($version) {
     $this->_apiversion = $version;
     $this->callAPISuccess(self::ENTITY, 'create', $this->params);
-    $result = $this->callAPIAndDocument(self::ENTITY, 'get', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess(self::ENTITY, 'get', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess(self::ENTITY, 'delete', ['id' => $result['id']]);
@@ -92,7 +92,7 @@ class api_v3_ImTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess(self::ENTITY, 'create', $this->params);
     $deleteParams = ['id' => $result['id']];
-    $this->callAPIAndDocument(self::ENTITY, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $this->callAPISuccess(self::ENTITY, 'delete', $deleteParams);
     $checkDeleted = $this->callAPISuccess(self::ENTITY, 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);
   }
@@ -100,7 +100,7 @@ class api_v3_ImTest extends CiviUnitTestCase {
   /**
    * Skip api4 test - delete behaves differently
    */
-  public function testDeleteImInvalid() {
+  public function testDeleteImInvalid(): void {
     $this->callAPISuccess(self::ENTITY, 'create', $this->params);
     $deleteParams = ['id' => 600];
     $this->callAPIFailure(self::ENTITY, 'delete', $deleteParams);

@@ -97,7 +97,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       if (!empty($entityId)) {
         $subType = CRM_Contact_BAO_Contact::getContactSubType($entityId, ',');
       }
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, NULL, NULL, $entityId);
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, NULL, CRM_Utils_Request::retrieve('type', 'String', $this), $entityId);
       if ($this->_multiRecordDisplay) {
         $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
         $this->_tableID = $this->_entityId;
@@ -215,7 +215,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
       if ($this->_copyValueId) {
         // cached tree is fetched
-        $groupTree = CRM_Core_BAO_CustomGroup::getTree($this->_type,
+        $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contact',
           NULL,
           $this->_entityId,
           $this->_groupID,

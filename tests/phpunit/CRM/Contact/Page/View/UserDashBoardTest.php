@@ -270,7 +270,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     ];
 
     $params['contact_id'] = $this->contactID;
-    $params['event_id'] = $this->eventCreateUnpaid()['id'];;
+    $params['event_id'] = $this->eventCreateUnpaid()['id'];
     $this->participantCreate($params);
     $params['event_id'] = $this->eventCreateUnpaid(['title' => 'Social Distancing Meetup Group'], 'event_2')['id'];
     $this->participantCreate($params);

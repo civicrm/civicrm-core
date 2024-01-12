@@ -20,8 +20,6 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
 
   /**
    * Clean up after test.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -36,9 +34,9 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
   public function testLinksManual(): void {
     [$contactID, $recurID] = $this->setupTemplate();
 
-    $templateVariable = CRM_Core_Smarty::singleton()->get_template_vars();
+    $templateVariable = CRM_Core_Smarty::singleton()->getTemplateVars();
     $this->assertEquals('Mr. Anthony Anderson II', $templateVariable['displayName']);
-    $this->assertEquals("<span><a href=\"/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=" . $recurID . "&amp;cid=" . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='View Recurring Payment' >View</a><a href=\"/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=1&amp;cid=3&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Edit Recurring Payment' >Edit</a><a href=\"/index.php?q=civicrm/contribute/unsubscribe&amp;reset=1&amp;crid=" . $recurID . "&amp;cid=" . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Cancel' >Cancel</a></span>",
+    $this->assertEquals("<span><a href=\"/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=" . $recurID . '&amp;cid=' . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='View Recurring Payment' >View</a><a href=\"/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=1&amp;cid=3&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Edit Recurring Payment' >Edit</a><a href=\"/index.php?q=civicrm/contribute/unsubscribe&amp;reset=1&amp;crid=" . $recurID . '&amp;cid=' . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Cancel' >Cancel</a></span>",
       $this->getActionHtml()
     );
   }
@@ -76,10 +74,11 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
    *
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function setupTemplate($recurParams = []): array {
+  protected function setupTemplate(array $recurParams = []): array {
     $contactID = $recurParams['contact_id'] ?? $this->individualCreate();
+    $_REQUEST['action'] = CRM_Core_Action::VIEW;
+    $_REQUEST['cid'] = $contactID;
     $recurID = ContributionRecur::create()->setValues(array_merge([
       'contact_id' => $contactID,
       'amount' => 10,
@@ -99,8 +98,7 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
         ])
       )->execute()->first()['id'];
     $page = new CRM_Contribute_Page_Tab();
-    $page->_contactId = $contactID;
-    $page->_action = CRM_Core_Action::VIEW;
+    $page->preProcess();
     $page->browse();
     return [$contactID, $recurID];
   }
@@ -112,7 +110,7 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
    */
   protected function getActionHtml(): string {
     return CRM_Core_Smarty::singleton()
-      ->get_template_vars()['activeRecurRows'][1]['action'];
+      ->getTemplateVars()['activeRecurRows'][1]['action'];
   }
 
   /**
@@ -122,7 +120,7 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
    */
   protected function getDashboardActionHtml(): string {
     return CRM_Core_Smarty::singleton()
-      ->get_template_vars()['recurRows'][1]['action'];
+      ->getTemplateVars()['recurRows'][1]['action'];
   }
 
 }

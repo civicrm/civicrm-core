@@ -8,8 +8,8 @@
 <body>
 
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
-{capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
-{capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=labelStyle}style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
+{capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
   <table id="crm-membership_receipt"
          style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
@@ -23,8 +23,8 @@
     <tr>
       <td>
         {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
-        {if $receipt_text}
-          <p>{$receipt_text|htmlize}</p>
+        {if $userText}
+          <p>{$userText}</p>
         {else}
           <p>{ts}Thank you for this contribution.{/ts}</p>
         {/if}
@@ -108,7 +108,7 @@
                             </td>
                             {if $isShowTax && {contribution.tax_amount|boolean}}
                               <td>
-                                {$line.unit_price*$line.qty|crmMoney:'{contribution.currency}'}
+                                {$line.line_total|crmMoney:'{contribution.currency}'}
                               </td>
                               {if $line.tax_rate || $line.tax_amount != ""}
                                 <td>
@@ -122,7 +122,7 @@
                                 <td></td>
                               {/if}
                               <td>
-                                {$line.line_total+$line.tax_amount|crmMoney:'{contribution.currency}'}
+                                {$line.line_total_inclusive|crmMoney:'{contribution.currency}'}
                               </td>
                             {/if}
                             <td>
@@ -182,7 +182,7 @@
                   </td>
                 </tr>
               {/if}
-              {if {contribution.payment_instrument_id|boolean}}
+              {if {contribution.payment_instrument_id|boolean} && {contribution.paid_amount|boolean}}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Paid By{/ts}

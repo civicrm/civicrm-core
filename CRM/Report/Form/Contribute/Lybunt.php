@@ -644,9 +644,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     foreach ($rows as $key => $row) {
       // The final row contains the totals so we don't need to include it here.
       if (!empty($row['civicrm_contribution_contact_id'])) {
-        $display['life_time'] = CRM_Utils_Array::value('life_time', $display) +
+        $display['life_time'] = ($display['life_time'] ?? 0) +
           $row['civicrm_contribution_civicrm_life_time_total'];
-        $display[$previous_year] = CRM_Utils_Array::value($previous_year, $display) + $row['civicrm_contribution_last_year_total_amount'];
+        $display[$previous_year] = ($display[$previous_year] ?? 0) + $row['civicrm_contribution_last_year_total_amount'];
       }
     }
 

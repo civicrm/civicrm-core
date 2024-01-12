@@ -303,9 +303,15 @@ class CRM_Core_I18n_Schema {
     }
 
     // rebuild views
+    $logging_enabled = \Civi::settings()->get('logging');
+
     foreach ($locales as $locale) {
       foreach ($tables as $table) {
         $queries[] = self::createViewQuery($locale, $table, $dao, $class, $isUpgradeMode);
+
+        if ($logging_enabled) {
+          $queries[] = self::createViewQuery($locale, 'log_' . $table, $dao, $class, $isUpgradeMode);
+        }
       }
     }
 
@@ -459,9 +465,16 @@ class CRM_Core_I18n_Schema {
     $cols = [];
     $tableCols = [];
     $dao->query("DESCRIBE {$table}", FALSE);
+
+    $lookup_table = $table;
+
+    if (substr($table, 0, 4) == 'log_') {
+      $lookup_table = substr($table, 4);
+    }
+
     while ($dao->fetch()) {
       // view non-internationalized columns directly
-      if (!array_key_exists($dao->Field, $columns[$table]) &&
+      if (!in_array($dao->Field, array_keys($columns[$lookup_table])) &&
         !preg_match('/_[a-z][a-z]_[A-Z][A-Z]$/', $dao->Field)
       ) {
         $cols[] = '`' . $dao->Field . '`';
@@ -469,7 +482,7 @@ class CRM_Core_I18n_Schema {
       $tableCols[] = $dao->Field;
     }
     // view internationalized columns through an alias
-    foreach ($columns[$table] as $column => $_) {
+    foreach ($columns[$lookup_table] as $column => $_) {
       if (!$isUpgradeMode) {
         $cols[] = "`{$column}_{$locale}` `{$column}`";
       }

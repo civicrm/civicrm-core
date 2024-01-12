@@ -29,13 +29,25 @@
  *   {ts} block contents from the template.
  * @param CRM_Core_Smarty $smarty
  *   The Smarty object.
+ * @param bool $repeat
+ *   Repeat is true for the opening tag, false for the closing tag
  *
- * @return string
+ * @return string|null
  *   the string, translated by gettext
  */
-function smarty_block_ts($params, $text, &$smarty) {
-  if (!isset($params['domain']) && $extensionKey = $smarty->get_template_vars('extensionKey')) {
-    $params['domain'] = is_array($extensionKey) ? $extensionKey : [$extensionKey, NULL];
+function smarty_block_ts($params, $text, &$smarty, &$repeat) {
+  if (!$repeat) {
+    $extensionKey = '';
+    if (method_exists($smarty, 'getTemplateVars')) {
+      $extensionKey = $smarty->getTemplateVars('extensionKey');
+    }
+    else {
+      // Transitional support for Smarty2 still being used in GenCode.
+      $extensionKey = $smarty->get_template_vars('extensionKey');
+    }
+    if (!isset($params['domain']) && $extensionKey) {
+      $params['domain'] = is_array($extensionKey) ? $extensionKey : [$extensionKey, NULL];
+    }
+    return _ts($text, $params);
   }
-  return _ts($text, $params);
 }

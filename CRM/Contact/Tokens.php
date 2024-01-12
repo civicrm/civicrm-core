@@ -641,6 +641,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         'type' => 'calculated',
         'options' => NULL,
         'data_type' => 'String',
+        'input_type' => NULL,
         'audience' => 'user',
       ],
       'employer_id.display_name' => [
@@ -659,6 +660,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         'api_v3' => 'world_region',
         'options' => NULL,
         'data_type' => 'String',
+        'input_type' => 'Text',
         'advertised_name' => 'world_region',
         'audience' => 'user',
       ],
@@ -669,6 +671,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         'type' => 'Field',
         'options' => NULL,
         'data_type' => 'String',
+        'input_type' => 'Text',
         'audience' => 'sysadmin',
       ],
       // this gets forced out if we specify individual fields
@@ -678,6 +681,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         'type' => 'Field',
         'options' => NULL,
         'data_type' => 'String',
+        'input_type' => 'Text',
         'audience' => 'sysadmin',
       ],
     ];

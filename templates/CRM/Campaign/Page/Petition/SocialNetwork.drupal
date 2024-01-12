@@ -68,11 +68,11 @@ and modify to fit your specific configuration.
 
   global $base_url;
   $this->assign('base_url', $base_url);
-  $email = $this->get_template_vars('email');
-  $noscript = $this->get_template_vars('noscript');
-  $petition_id = $this->get_template_vars('petition_id');
+  $email = $this->getTemplateVars('email');
+  $noscript = $this->getTemplateVars('noscript');
+  $petition_id = $this->getTemplateVars('petition_id');
   $node = getPetitionDrupalNodeData($petition_id);
-  $this->assign_by_ref('node', $node);
+  $this->assign('node', $node);
 
 {/php}
 

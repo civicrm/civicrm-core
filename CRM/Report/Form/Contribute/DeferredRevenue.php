@@ -352,7 +352,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
    * @param int|null $rowCount
    */
   public function limit($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     $this->_limit = NULL;
   }
 
@@ -448,10 +448,10 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
         $arraykey = $dao->civicrm_financial_account_id . '_' . $dao->civicrm_financial_account_1_id;
 
         if (property_exists($dao, $key)) {
-          if (CRM_Utils_Array::value('type', $value) & CRM_Utils_Type::T_DATE) {
+          if (($value['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
             $row[$key] = CRM_Utils_Date::customFormat($dao->$key, $dateFormat);
           }
-          elseif (CRM_Utils_Array::value('type', $value) & CRM_Utils_Type::T_MONEY) {
+          elseif (($value['type'] ?? 0) & CRM_Utils_Type::T_MONEY) {
             $values = [];
             foreach (explode(',', $dao->$key) as $moneyValue) {
               $values[] = CRM_Utils_Money::format($moneyValue);

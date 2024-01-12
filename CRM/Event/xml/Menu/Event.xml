@@ -128,15 +128,6 @@
      <weight>399</weight>
   </item>
   <item>
-    <path>civicrm/admin/options/conference_slot</path>
-    <title>Conference Slot Labels</title>
-    <page_callback>CRM_Admin_Page_Options</page_callback>
-    <desc>Define conference slots and labels.</desc>
-    <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
-    <adminGroup>CiviEvent</adminGroup>
-    <weight>415</weight>
-  </item>
-  <item>
      <path>civicrm/admin/setting/preferences/event</path>
      <title>CiviEvent Component Settings</title>
      <page_callback>CRM_Admin_Form_Generic</page_callback>
@@ -225,14 +216,6 @@
      <weight>960</weight>
   </item>
   <item>
-    <path>civicrm/event/manage/conference</path>
-    <title>Conference Slots</title>
-    <page_callback>CRM_Event_Form_ManageEvent_Conference</page_callback>
-    <access_arguments>access CiviEvent</access_arguments>
-    <is_ssl>true</is_ssl>
-    <weight>950</weight>
-  </item>
-  <item>
      <path>civicrm/event/add</path>
      <path_arguments>action=add</path_arguments>
      <title>New Event</title>
@@ -286,6 +269,12 @@
      <path>civicrm/contact/view/participant</path>
      <page_callback>CRM_Event_Page_Tab</page_callback>
      <weight>4</weight>
+  </item>
+  <item>
+    <path>civicrm/participant/delete</path>
+    <page_callback>CRM_Event_Form_Participant_Delete</page_callback>
+    <access_arguments>delete in CiviEvent</access_arguments>
+    <weight>4</weight>
   </item>
   <item>
      <path>civicrm/ajax/eventFee</path>

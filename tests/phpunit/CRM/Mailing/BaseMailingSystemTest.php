@@ -66,8 +66,10 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
   /**
    * Generate a fully-formatted mailing with standard email headers.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testBasicHeaders() {
+  public function testBasicHeaders(): void {
     $allMessages = $this->runMailingSuccess([
       'subject' => 'Accidents in cars cause children for {contact.display_name}!',
       'body_text' => 'BEWARE children need regular infusions of toys. Santa knows your {domain.address}. There is no {action.optOutUrl}.',
@@ -77,15 +79,15 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
       $offset = $k + 1;
 
-      $this->assertEquals("FIXME", $message->from->name);
-      $this->assertEquals("info@EXAMPLE.ORG", $message->from->email);
+      $this->assertEquals('FIXME', $message->from->name);
+      $this->assertEquals('info@EXAMPLE.ORG', $message->from->email);
       $this->assertEquals("Mr. Foo{$offset} Anderson II", $message->to[0]->name);
       $this->assertEquals("mail{$offset}@nul.example.com", $message->to[0]->email);
 
-      $this->assertRegExp('#^text/plain; charset=utf-8#', $message->headers['Content-Type']);
-      $this->assertRegExp(';^b\.[\d\.a-f]+@chaos.org$;', $message->headers['Return-Path']);
-      $this->assertRegExp(';^b\.[\d\.a-f]+@chaos.org$;', $message->headers['X-CiviMail-Bounce'][0]);
-      $this->assertRegExp(';^\<mailto:u\.[\d\.a-f]+@chaos.org\>$;', $message->headers['List-Unsubscribe'][0]);
+      $this->assertMatchesRegularExpression('#^text/plain; charset=utf-8#', $message->headers['Content-Type']);
+      $this->assertMatchesRegularExpression(';^b\.[\d\.a-z]+@chaos.org$;', $message->headers['Return-Path']);
+      $this->assertMatchesRegularExpression(';^b\.[\d\.a-z]+@chaos.org$;', $message->headers['X-CiviMail-Bounce'][0]);
+      $this->assertMatchesRegularExpression(';^\<mailto:u\.[\d\.a-z]+@chaos.org\>$;', $message->headers['List-Unsubscribe'][0]);
       $this->assertEquals('bulk', $message->headers['Precedence'][0]);
     }
   }
@@ -93,7 +95,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
   /**
    * Generate a fully-formatted mailing (with body_text content).
    */
-  public function testText() {
+  public function testText(): void {
     $allMessages = $this->runMailingSuccess([
       'subject' => 'Accidents in cars cause children for {contact.display_name}!',
       'body_text' => 'BEWARE children need regular infusions of toys. Santa knows your {domain.address}. There is no {action.optOutUrl}.',
@@ -107,13 +109,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertTrue($message->body instanceof ezcMailText);
 
       $this->assertEquals('plain', $message->body->subType);
-      $this->assertRegExp(
+      $this->assertMatchesRegularExpression(
         ";" .
         // Default header
         "Sample Header for TEXT formatted content.\n" .
         "BEWARE children need regular infusions of toys. Santa knows your .*\\. There is no http.*civicrm/mailing/optout.*\\.\n" .
         // Default footer
-        "to unsubscribe: http.*civicrm/mailing/optout" .
+        "Opt out of any future emails: http.*civicrm/mailing/optout" .
         ";",
         $message->body->text
       );
@@ -123,7 +125,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
   /**
    * Generate a fully-formatted mailing (with body_html content).
    */
-  public function testHtmlWithOpenTracking() {
+  public function testHtmlWithOpenTracking(): void {
     $allMessages = $this->runMailingSuccess([
       'subject' => 'Example Subject',
       'body_html' => '<p>You can go to <a href="http://example.net/first?{contact.checksum}">Google</a> or <a href="{action.optOutUrl}">opt out</a>.</p>',
@@ -140,7 +142,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       [$textPart, $htmlPart] = $message->body->getParts();
 
       $this->assertEquals('html', $htmlPart->subType);
-      $this->assertRegExp(
+      $this->assertMatchesRegularExpression(
         ";" .
         // Default header
         "Sample Header for HTML formatted content.\n" .
@@ -156,21 +158,14 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       );
 
       $this->assertEquals('plain', $textPart->subType);
-      $this->assertRegExp(
+      $this->assertMatchesRegularExpression(
         ";" .
         // Default header
         "Sample Header for TEXT formatted content.\n" .
         //  body_html, filtered
-        "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
-        "\n" .
-        "\n" .
-        "Links:\n" .
-        "------\n" .
-        "\\[1\\] http://example.net/first\\?cs=[0-9a-f_]+\n" .
-        "\\[2\\] http.*civicrm/mailing/optout.*\n" .
-        "\n" .
+        "You can go to \\[Google\\]\\(http://example.net/first\?cs=[0-9a-f_]+\\) or \\[opt out\\]\\(http.*civicrm/mailing/optout.*\\)\\.\n" .
         // Default footer
-        "to unsubscribe: http.*civicrm/mailing/optout" .
+        "Opt out of any future emails: http.*civicrm/mailing/optout" .
         ";",
         $textPart->text
       );
@@ -180,7 +175,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
   /**
    * Generate a fully-formatted mailing (with body_html content).
    */
-  public function testHtmlWithOpenAndUrlTracking() {
+  public function testHtmlWithOpenAndUrlTracking(): void {
     $allMessages = $this->runMailingSuccess([
       'subject' => 'Example Subject',
       'body_html' => '<p>You can go to <a href="http://example.net">Google</a> or <a href="{action.optOutUrl}">opt out</a>.</p>',
@@ -197,7 +192,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       [$textPart, $htmlPart] = $message->body->getParts();
 
       $this->assertEquals('html', $htmlPart->subType);
-      $this->assertRegExp(
+      $this->assertMatchesRegularExpression(
         ";" .
         // body_html
         "<p>You can go to <a href=['\"].*(extern/url.php|civicrm/mailing/url)(\?|&amp\\;)u=\d+&amp\\;qid=\d+['\"] rel='nofollow'>Google</a>" .
@@ -212,19 +207,12 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       );
 
       $this->assertEquals('plain', $textPart->subType);
-      $this->assertRegExp(
+      $this->assertMatchesRegularExpression(
         ";" .
         //  body_html, filtered
-        "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
-        "\n" .
-        "\n" .
-        "Links:\n" .
-        "------\n" .
-        "\\[1\\] http.*(extern/url.php|civicrm/mailing/url)(\?|&)u=\d+&qid=\d+\n" .
-        "\\[2\\] http.*civicrm/mailing/optout.*\n" .
-        "\n" .
+        "You can go to \\[Google\\]\\(http.*(extern/url.php|civicrm/mailing/url)(\?|&)u=\d+&qid=\d+\\) or \\[opt out\\]\\(http.*civicrm/mailing/optout.*\\)\\.\n" .
         // Default footer
-        "to unsubscribe: http.*civicrm/mailing/optout" .
+        "Opt out of any future emails: http.*civicrm/mailing/optout" .
         ";",
         $textPart->text
       );
@@ -247,20 +235,20 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     $cases[0] = [
       '<p><a href="http://example.net/">Foo</a></p>',
       ';<p><a href="http://example\.net/">Foo</a></p>;',
-      ';\\[1\\] http://example\.net/;',
+      ';\\(http://example\.net/\\);',
       ['url_tracking' => 0],
     ];
     $cases[1] = [
       '<p><a href="http://example.net/?id={contact.contact_id}">Foo</a></p>',
       // FIXME: Legacy tracker adds extra quote after URL
       ';<p><a href="http://example\.net/\?id=\d+""?>Foo</a></p>;',
-      ';\\[1\\] http://example\.net/\?id=\d+;',
+      ';\\(http://example\.net/\?id=\d+\\);',
       ['url_tracking' => 0],
     ];
     $cases[2] = [
       '<p><a href="{action.optOutUrl}">Foo</a></p>',
       ';<p><a href="http.*civicrm/mailing/optout.*">Foo</a></p>;',
-      ';\\[1\\] http.*civicrm/mailing/optout.*;',
+      ';\\(http.*civicrm/mailing/optout.*\\);',
       ['url_tracking' => 0],
     ];
     $cases[3] = [
@@ -282,13 +270,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     $cases[5] = [
       '<p><a href="http://example.net/">Foo</a></p>',
       ';<p><a href=[\'"].*(extern/url.php|civicrm/mailing/url)(\?|&amp\\;)u=\d+.*[\'"]>Foo</a></p>;',
-      ';\\[1\\] .*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*;',
+      ';\\(.*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*\\);',
       ['url_tracking' => 1],
     ];
     $cases['url_trackin_enabled'] = [
       '<p><a href="http://example.net/?id={contact.contact_id}">Foo</a></p>',
       ';<p><a href=[\'"].*(extern/url.php|civicrm/mailing/url)(\?|&amp\\;)u=\d+.*&amp\\;id=\d+.*[\'"]>Foo</a></p>;',
-      ';\\[1\\] .*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*&id=\d+.*;',
+      ';\\(.*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*&id=\d+.*\\);',
       ['url_tracking' => 1],
     ];
 
@@ -296,7 +284,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       // It would be redundant/slow to track the action URLs?
       '<p><a href="{action.optOutUrl}">Foo</a></p>',
       ';<p><a href="http.*civicrm/mailing/optout.*">Foo</a></p>;',
-      ';\\[1\\] http.*civicrm/mailing/optout.*;',
+      ';\\(http.*civicrm/mailing/optout.*\\);',
       ['url_tracking' => 1],
     ];
     $cases[8] = [
@@ -342,13 +330,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       if ($htmlUrlRegex) {
         $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params, 'htmlUrlRegex' => $htmlUrlRegex, 'htmlPart' => $htmlPart->text], 1);
         $this->assertEquals('html', $htmlPart->subType, "Should have HTML part in case: $caseName");
-        $this->assertRegExp($htmlUrlRegex, $htmlPart->text, "Should have correct HTML in case: $caseName");
+        $this->assertMatchesRegularExpression($htmlUrlRegex, $htmlPart->text, "Should have correct HTML in case: $caseName");
       }
 
       if ($textUrlRegex) {
         $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params, 'textUrlRegex' => $textUrlRegex, 'textPart' => $textPart->text], 1);
         $this->assertEquals('plain', $textPart->subType, "Should have text part in case: $caseName");
-        $this->assertRegExp($textUrlRegex, $textPart->text, "Should have correct text in case: $caseName");
+        $this->assertMatchesRegularExpression($textUrlRegex, $textPart->text, "Should have correct text in case: $caseName");
       }
     }
   }

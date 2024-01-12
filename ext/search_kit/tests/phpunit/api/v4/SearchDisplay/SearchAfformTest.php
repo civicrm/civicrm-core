@@ -5,6 +5,8 @@ use Civi\Api4\Action\Afform\Save;
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
+use Civi\Api4\OptionGroup;
+use Civi\Api4\OptionValue;
 use Civi\Api4\Phone;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
@@ -33,7 +35,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
   /**
    * Test running a searchDisplay within an afform.
    */
-  public function testRunWithAfform() {
+  public function testRunWithAfform(): void {
     $search = SavedSearch::create(FALSE)
       ->setValues([
         'name' => 'TestContactEmailSearch',
@@ -180,7 +182,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $this->assertCount(1, $result);
   }
 
-  public function testRunMultipleSearchForm() {
+  public function testRunMultipleSearchForm(): void {
     $email = uniqid('tester@');
 
     Contact::create(FALSE)
@@ -230,8 +232,8 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       )
       ->execute();
 
-    $contactEmailSearch = SavedSearch::create(FALSE)
-      ->setValues([
+    $contactEmailSearch = SavedSearch::save(FALSE)
+      ->addRecord([
         'name' => 'TestContactEmailSearch',
         'label' => 'TestContactEmailSearch',
         'api_entity' => 'Contact',
@@ -257,10 +259,11 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
           'having' => [],
         ],
       ])
+      ->setMatch(['name'])
       ->execute()->first();
 
-    $contactEmailDisplay = SearchDisplay::create(FALSE)
-      ->setValues([
+    $contactEmailDisplay = SearchDisplay::save(FALSE)
+      ->addRecord([
         'name' => 'TestContactEmailDisplay',
         'label' => 'TestContactEmailDisplay',
         'saved_search_id.name' => 'TestContactEmailSearch',
@@ -291,11 +294,12 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
         ],
         'acl_bypass' => FALSE,
       ])
+      ->setMatch(['name'])
       ->execute()->first();
 
     foreach (['Email', 'Phone'] as $entity) {
-      SavedSearch::create(FALSE)
-        ->setValues([
+      SavedSearch::save(FALSE)
+        ->addRecord([
           'name' => 'TestSearchFor' . $entity,
           'label' => 'TestSearchFor' . $entity,
           'api_entity' => $entity,
@@ -312,6 +316,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
             'having' => [],
           ],
         ])
+        ->setMatch(['name'])
         ->execute();
     }
 
@@ -349,9 +354,9 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $this->assertCount(1, $result);
   }
 
-  public function testSearchReferencesToAfform() {
-    $search = SavedSearch::create(FALSE)
-      ->setValues([
+  public function testSearchReferencesToAfform(): void {
+    $search = SavedSearch::save(FALSE)
+      ->addRecord([
         'name' => 'TestSearchToDelete',
         'label' => 'TestSearchToDelete',
         'api_entity' => 'Contact',
@@ -360,10 +365,11 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
           'select' => ['id'],
         ],
       ])
+      ->setMatch(['name'])
       ->execute()->first();
 
-    $display = SearchDisplay::create(FALSE)
-      ->setValues([
+    $display = SearchDisplay::save(FALSE)
+      ->addRecord([
         'name' => 'TestDisplayToDelete',
         'label' => 'TestDisplayToDelete',
         'saved_search_id.name' => 'TestSearchToDelete',
@@ -380,6 +386,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
         ],
         'acl_bypass' => FALSE,
       ])
+      ->setMatch(['saved_search_id', 'name'])
       ->execute()->first();
 
     // The search should have one reference (its display)
@@ -441,6 +448,99 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
 
     $this->assertCount(0, Afform::get(FALSE)->addWhere('search_displays', 'CONTAINS', 'TestSearchToDelete.TestDisplayToDelete')->execute());
     $this->assertCount(0, Afform::get(FALSE)->addWhere('name', 'CONTAINS', 'TestAfformToDelete')->execute());
+  }
+
+  public function testDisplaysSharingSameFieldset(): void {
+    OptionGroup::save(FALSE)
+      ->addRecord([
+        'title' => 'search_test_options',
+      ])
+      ->setMatch(['title'])
+      ->execute();
+    OptionValue::save(FALSE)
+      ->setDefaults(['option_group_id.name' => 'search_test_options'])
+      ->addRecord([
+        'label' => 'option_a',
+        'value' => 'a',
+      ])
+      ->addRecord([
+        'label' => 'option_b',
+        'value' => 'b',
+      ])
+      ->addRecord([
+        'label' => 'option_c',
+        'value' => 'c',
+        'is_active' => FALSE,
+      ])
+      ->setMatch(['name', 'option_group_id'])
+      ->execute();
+
+    $search = SavedSearch::save(FALSE)
+      ->addRecord([
+        'name' => 'testDisplaysSharingSameFieldset',
+        'label' => 'testDisplaysSharingSameFieldset',
+        'api_entity' => 'OptionValue',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['value'],
+        ],
+      ])
+      ->setMatch(['name'])
+      ->execute()->first();
+
+    $display = SearchDisplay::save(FALSE)
+      ->addRecord([
+        'name' => 'testDisplaysSharingSameFieldset',
+        'label' => 'testDisplaysSharingSameFieldset',
+        'saved_search_id.name' => 'testDisplaysSharingSameFieldset',
+        'type' => 'table',
+        'settings' => [
+          'columns' => [
+            [
+              'key' => 'value',
+              'type' => 'field',
+            ],
+          ],
+        ],
+        'acl_bypass' => FALSE,
+      ])
+      ->setMatch(['saved_search_id', 'name'])
+      ->execute()->first();
+
+    $baseParams = [
+      'return' => 'page:1',
+      'savedSearch' => $search['name'],
+      'display' => $display['name'],
+      'afform' => 'testDisplaysSharingSameFieldset',
+      'filters' => ['option_group_id:name' => 'search_test_options'],
+    ];
+
+    // Afform has 2 copies of the same display, with different values for the filter is_active
+    // This should allow the is_active filters to be set in the params
+    $params = $baseParams;
+    $params['filters']['is_active'] = TRUE;
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+
+    $params = $baseParams;
+    $params['filters']['is_active'] = FALSE;
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+    $this->assertEquals('c', $result[0]['columns'][0]['val']);
+
+    // Because the 2 displays share a fieldset, the filter field should work on both
+    $params = $baseParams;
+    $params['filters']['is_active'] = TRUE;
+    $params['filters']['label'] = 'b';
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+    $this->assertEquals('b', $result[0]['columns'][0]['val']);
+
+    $params = $baseParams;
+    $params['filters']['is_active'] = FALSE;
+    $params['filters']['label'] = 'b';
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(0, $result);
   }
 
 }

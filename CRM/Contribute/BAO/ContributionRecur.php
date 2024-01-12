@@ -38,14 +38,16 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * Takes an associative array and creates a contribution object.
    *
    * the function extract all the params it needs to initialize the create a
-   * contribution object. the params array could contain additional unused name/value
-   * pairs
+   * contribution object. the params array could contain additional unused
+   * name/value pairs
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return \CRM_Contribute_BAO_ContributionRecur|\CRM_Core_Error
-   * @todo move hook calls / extended logic to create - requires changing calls to call create not add
+   * @return \CRM_Contribute_BAO_ContributionRecur
+   * @throws \CRM_Core_Exception
+   * @todo move hook calls / extended logic to create - requires changing calls
+   *   to call create not add
    */
   public static function add(&$params) {
     if (!empty($params['id'])) {
@@ -59,14 +61,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     // or invoice ID as an existing recurring contribution
     $duplicates = [];
     if (self::checkDuplicate($params, $duplicates)) {
-      $error = CRM_Core_Error::singleton();
-      $d = implode(', ', $duplicates);
-      $error->push(CRM_Core_Error::DUPLICATE_CONTRIBUTION,
-        'Fatal',
-        [$d],
-        "Found matching recurring contribution(s): $d"
-      );
-      return $error;
+      throw new CRM_Core_Exception('Found matching recurring contribution(s): ' . implode(', ', $duplicates));
     }
 
     $recurring = new CRM_Contribute_BAO_ContributionRecur();
@@ -280,82 +275,61 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *   Recur contribution params
    *
    * @return bool
+   * @throws \CRM_Core_Exception
+   * @internal
+   *
    */
-  public static function cancelRecurContribution($params) {
-    if (is_numeric($params)) {
-      CRM_Core_Error::deprecatedFunctionWarning('You are using a BAO function whose signature has changed. Please use the ContributionRecur.cancel api');
-      $params = ['id' => $params];
-    }
-    $recurId = $params['id'];
-    if (!$recurId) {
+  public static function cancelRecurContribution(array $params): bool {
+    if (!$params['id']) {
       return FALSE;
     }
-    $activityParams = [
-      'subject' => !empty($params['membership_id']) ? ts('Auto-renewal membership cancelled') : ts('Recurring contribution cancelled'),
-      'details' => $params['processor_message'] ?? NULL,
-    ];
+    $transaction = new CRM_Core_Transaction();
+    ContributionRecur::update(FALSE)
+      ->addWhere('id', '=', $params['id'])
+      ->setValues([
+        'contribution_status_id:name' => 'Cancelled',
+        'cancel_reason' => $params['cancel_reason'] ?? NULL,
+        'cancel_date' => $params['cancel_date'] ?? 'now',
+      ])->execute();
 
-    $cancelledId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Cancelled');
-    $recur = new CRM_Contribute_DAO_ContributionRecur();
-    $recur->id = $recurId;
-    $recur->whereAdd("contribution_status_id != $cancelledId");
-
-    if ($recur->find(TRUE)) {
-      $transaction = new CRM_Core_Transaction();
-      $recur->contribution_status_id = $cancelledId;
-      $recur->cancel_reason = $params['cancel_reason'] ?? NULL;
-      $recur->cancel_date = date('YmdHis');
-      $recur->save();
-
-      // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
-      $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurId);
-      if ($dao && $dao->recur_id) {
-        $details = $activityParams['details'] ?? NULL;
-        if ($dao->auto_renew && $dao->membership_id) {
-          // its auto-renewal membership mode
-          $membershipTypes = CRM_Member_PseudoConstant::membershipType();
-          $membershipType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $dao->membership_id, 'membership_type_id');
-          $membershipType = $membershipTypes[$membershipType] ?? NULL;
-          $details .= '
+    // @todo - all of this should be moved to the post hook.
+    // It seems to just create activities.
+    $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($params['id']);
+    if ($dao && $dao->recur_id) {
+      $details = $params['processor_message'] ?? NULL;
+      if ($dao->auto_renew && $dao->membership_id) {
+        // its auto-renewal membership mode
+        $membershipTypes = CRM_Member_PseudoConstant::membershipType();
+        $membershipType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $dao->membership_id, 'membership_type_id');
+        $membershipType = $membershipTypes[$membershipType] ?? NULL;
+        $details .= '
 <br/>' . ts('Automatic renewal of %1 membership cancelled.', [1 => $membershipType]);
-        }
-        else {
-          $details .= '<br/>' . ts('The recurring contribution of %1, every %2 %3 has been cancelled.', [
-            1 => $dao->amount,
-            2 => $dao->frequency_interval,
-            3 => $dao->frequency_unit,
-          ]);
-        }
-        $activityParams = [
-          'source_contact_id' => $dao->contact_id,
-          'source_record_id' => $dao->recur_id,
-          'activity_type_id' => 'Cancel Recurring Contribution',
-          'subject' => CRM_Utils_Array::value('subject', $activityParams, ts('Recurring contribution cancelled')),
-          'details' => $details,
-          'status_id' => 'Completed',
-        ];
-
-        $cid = CRM_Core_Session::singleton()->get('userID');
-        if ($cid) {
-          $activityParams['target_contact_id'][] = $activityParams['source_contact_id'];
-          $activityParams['source_contact_id'] = $cid;
-        }
-        civicrm_api3('Activity', 'create', $activityParams);
       }
-
-      $transaction->commit();
-      return TRUE;
-    }
-    else {
-      // if already cancelled, return true
-      $recur->whereAdd();
-      $recur->whereAdd("contribution_status_id = $cancelledId");
-      if ($recur->find(TRUE)) {
-        return TRUE;
+      else {
+        $details .= '<br/>' . ts('The recurring contribution of %1, every %2 %3 has been cancelled.', [
+          1 => $dao->amount,
+          2 => $dao->frequency_interval,
+          3 => $dao->frequency_unit,
+        ]);
       }
-    }
+      $activityParams = [
+        'source_contact_id' => $dao->contact_id,
+        'source_record_id' => $dao->recur_id,
+        'activity_type_id' => 'Cancel Recurring Contribution',
+        'subject' => !empty($params['membership_id']) ? ts('Auto-renewal membership cancelled') : ts('Recurring contribution cancelled'),
+        'details' => $details,
+        'status_id' => 'Completed',
+      ];
 
-    return FALSE;
+      $cid = CRM_Core_Session::singleton()->get('userID');
+      if ($cid) {
+        $activityParams['target_contact_id'][] = $activityParams['source_contact_id'];
+        $activityParams['source_contact_id'] = $cid;
+      }
+      civicrm_api3('Activity', 'create', $activityParams);
+    }
+    $transaction->commit();
+    return TRUE;
   }
 
   /**
@@ -389,6 +363,7 @@ SELECT rec.id                   as recur_id,
        mp.membership_id";
 
     if ($entity == 'recur') {
+      // This should be always true now.
       $sql .= "
       FROM civicrm_contribution_recur rec
 LEFT JOIN civicrm_contribution       con ON ( con.contribution_recur_id = rec.id )
@@ -396,6 +371,7 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
      WHERE rec.id = %1";
     }
     elseif ($entity == 'contribution') {
+      CRM_Core_Error::deprecatedWarning('no longer used');
       $sql .= "
       FROM civicrm_contribution       con
 INNER JOIN civicrm_contribution_recur rec ON ( con.contribution_recur_id = rec.id )
@@ -403,6 +379,7 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
      WHERE con.id = %1";
     }
     elseif ($entity == 'membership') {
+      CRM_Core_Error::deprecatedWarning('no longer used');
       $sql .= "
       FROM civicrm_membership_payment mp
 INNER JOIN civicrm_membership         mem ON ( mp.membership_id = mem.id )
@@ -509,7 +486,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       $templateContributionParams['on_behalf'] = TRUE;
       $templateContributionParams['source_contact_id'] = $relatedContact['individual_id'];
     }
-    $templateContributionParams['source'] = $templateContributionParams['source'] ?? ts('Recurring contribution');
+    $templateContributionParams['source'] ??= ts('Recurring contribution');
     $templateContribution = Contribution::create(FALSE)
       ->setValues($templateContributionParams)
       ->execute()

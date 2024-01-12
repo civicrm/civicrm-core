@@ -30,6 +30,7 @@
         _.each(ctrl.onInitialize, function(callback) {
           callback.call(ctrl, $scope, $element);
         });
+        this.isArray = angular.isArray;
 
         // _.debounce used here to trigger the initial search immediately but prevent subsequent launches within 300ms
         this.getResultsPronto = _.debounce(ctrl.runSearch, 300, {leading: true, trailing: false});
@@ -45,12 +46,13 @@
         // FIXME: Additional hack to directly update tabHeader for contact summary tab. It would be better to
         // decouple the contactTab code into a separate directive that checks totalCount.
         var contactTab = $element.closest('.crm-contact-page .ui-tabs-panel').attr('id');
-        if (contactTab || typeof ctrl.totalCount !== 'undefined') {
+        if (contactTab || ctrl.hasOwnProperty('totalCount')) {
           $scope.$watch('$ctrl.rowCount', function(rowCount) {
             // Update totalCount only if no user filters are set
             if (typeof rowCount === 'number' && angular.equals({}, ctrl.getAfformFilters())) {
               ctrl.totalCount = rowCount;
-              if (contactTab) {
+              // The first display in a tab gets to control the count
+              if (contactTab && $element.is($('#' + contactTab + ' [search][display]').first())) {
                 CRM.tabHeader.updateCount(contactTab.replace('contact-', '#tab_'), rowCount);
               }
             }
@@ -125,16 +127,6 @@
         };
       },
 
-      // Get path for the addButton
-      getButtonUrl: function() {
-        var path = this.settings.addButton.path,
-          filters = this.getFilters();
-        _.each(filters, function(value, key) {
-          path = path.replace('[' + key + ']', value);
-        });
-        return CRM.url(path);
-      },
-
       onClickSearchButton: function() {
         this.rowCount = null;
         this.page = 1;
@@ -172,14 +164,20 @@
                 ctrl.rowCount = result.count;
               });
             }
-            // If there are no results on initial load, open the "addNew" link if configured as "autoOpen"
-            if (!ctrl.results.length && requestId === 1 && ctrl.settings.addButton && ctrl.settings.addButton.autoOpen) {
-              CRM.loadForm(ctrl.getButtonUrl())
-                .on('crmFormSuccess', function() {
-                  ctrl.rowCount = null;
-                  ctrl.getResultsPronto();
-                });
-            }
+          }
+          // Process toolbar
+          if (apiResults.run.toolbar) {
+            ctrl.toolbar = apiResults.run.toolbar;
+            // If there are no results on initial load, open an "autoOpen" toolbar link
+            ctrl.toolbar.forEach((link) => {
+              if (link.autoOpen && requestId === 1 && !ctrl.results.length) {
+                CRM.loadForm(link.url)
+                  .on('crmFormSuccess', () => {
+                    ctrl.rowCount = null;
+                    ctrl.getResultsPronto();
+                  });
+              }
+            });
           }
           _.each(ctrl.onPostRun, function(callback) {
             callback.call(ctrl, apiResults, 'success', editedRow);
@@ -201,6 +199,9 @@
       },
       formatFieldValue: function(colData) {
         return angular.isArray(colData.val) ? colData.val.join(', ') : colData.val;
+      },
+      isEditing: function(rowIndex, colIndex) {
+        return this.editing && this.editing[0] === rowIndex && this.editing[1] === colIndex;
       }
     };
   });

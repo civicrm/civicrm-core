@@ -18,13 +18,17 @@ class CRM_Core_BAO_TagTest extends CiviUnitTestCase {
     // Create an example hierarchy of tags.
     // The family tree of Abraham is used as a well known example of a hierarchy (no statement intended).
     // The order of ids is important because of: https://lab.civicrm.org/dev/core/-/issues/4049, that's why we create Isaac before Abraham.
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_tag (id,name,used_for,is_tagset) VALUES(1, 'Isaac', 'civicrm_contact', 0);");
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_tag (id,name,used_for,is_tagset) VALUES(2, 'Abraham', 'civicrm_contact', 0);");
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_tag (id,name,used_for,is_tagset) VALUES(3, 'Jacob', 'civicrm_contact', 0);");
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_tag (id,name,used_for,is_tagset) VALUES(4, 'Ishmael', 'civicrm_contact', 1);");
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_tag (id,name,used_for,is_tagset) VALUES(5, 'Kedar', 'civicrm_contact', 1);");
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_tag (id,name,used_for,is_tagset) VALUES(6, 'Working', 'civicrm_activity', 1);");
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_tag (id,name,used_for,is_tagset) VALUES(7, 'Eating', 'civicrm_activity', 1);");
+    CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_tag (id, name, label, used_for, is_tagset)
+      VALUES
+        (1, 'Isaac', 'Isaac', 'civicrm_contact', 0),
+        (2, 'Abraham', 'Abraham', 'civicrm_contact', 0),
+        (3, 'Jacob', 'Jacob', 'civicrm_contact', 0),
+        (4, 'Ishmael', 'Ishmael', 'civicrm_contact', 1),
+        (5, 'Kedar', 'Kedar', 'civicrm_contact', 1),
+        (6, 'Working', 'Working', 'civicrm_activity', 1),
+        (7, 'Eating', 'Eating', 'civicrm_activity', 1);
+    ");
 
     // Isaac is the son of abraham
     CRM_Core_DAO::executeQuery("UPDATE civicrm_tag SET parent_id = 2 WHERE name = 'Isaac';");
@@ -44,7 +48,7 @@ class CRM_Core_BAO_TagTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetTreeWithoutFilters() {
+  public function testGetTreeWithoutFilters(): void {
     $bao = new CRM_Core_BAO_Tag();
 
     $tree = $bao->getTree();
@@ -112,7 +116,7 @@ class CRM_Core_BAO_TagTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetTreeWithFilters() {
+  public function testGetTreeWithFilters(): void {
     $bao = new CRM_Core_BAO_Tag();
 
     $tree = $bao->getTree('civicrm_contact', TRUE);

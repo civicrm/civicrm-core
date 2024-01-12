@@ -130,7 +130,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   /**
    * Test that custom fields is returned for correct contact type only.
    */
-  public function testGetFields() {
+  public function testGetFields(): void {
     $result = $this->callAPISuccess('Contact', 'getfields', []);
     $this->assertArrayHasKey("custom_{$this->individualFieldID}", $result['values'], 'If This fails there is probably a caching issue - failure in line' . __LINE__ . print_r(array_keys($result['values']), TRUE));
     $result = $this->callAPISuccess('Contact', 'getfields', [
@@ -150,7 +150,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   /**
    * Add  Custom data of Contact Type : Individual to a Contact type: Organization
    */
-  public function testAddIndividualCustomDataToOrganization() {
+  public function testAddIndividualCustomDataToOrganization(): void {
 
     $params = [
       'id' => $this->organizationContactID,
@@ -169,7 +169,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
    * Add valid  Empty params to a Contact Type : Individual
    * note - don't copy & paste this - is of marginal value
    */
-  public function testAddCustomDataEmptyToIndividual() {
+  public function testAddCustomDataEmptyToIndividual(): void {
     $contact = $this->callAPIFailure('contact', 'create', [],
       'Mandatory key(s) missing from params array: contact_type'
     );
@@ -178,7 +178,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   /**
    * Add valid custom data to a Contact Type : Individual
    */
-  public function testAddValidCustomDataToIndividual() {
+  public function testAddValidCustomDataToIndividual(): void {
 
     $params = [
       'contact_id' => $this->individualContactID,
@@ -198,7 +198,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   /**
    * Add  Custom data of Contact Type : Individual , SubType : Student to a Contact type: Organization  Subtype: Sponsor
    */
-  public function testAddIndividualStudentCustomDataToOrganizationSponsor() {
+  public function testAddIndividualStudentCustomDataToOrganizationSponsor(): void {
 
     $params = [
       'contact_id' => $this->organizationSponsorContactID,
@@ -216,7 +216,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   /**
    * Add valid custom data to a Contact Type : Individual Subtype: Student
    */
-  public function testCreateValidCustomDataToIndividualStudent() {
+  public function testCreateValidCustomDataToIndividualStudent(): void {
 
     $params = [
       'contact_id' => $this->individualStudentContactID,
@@ -237,7 +237,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   /**
    * Add custom data of Individual Student to a Contact Type : Individual - parent
    */
-  public function testAddIndividualStudentCustomDataToIndividualParent() {
+  public function testAddIndividualStudentCustomDataToIndividualParent(): void {
 
     $params = [
       'contact_id' => $this->individualParentContactID,
@@ -256,7 +256,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   /**
    * Retrieve Valid custom Data added to  Individual Contact Type.
    */
-  public function testRetrieveValidCustomDataToIndividual() {
+  public function testRetrieveValidCustomDataToIndividual(): void {
 
     $params = [
       'contact_id' => $this->individualContactID,
@@ -281,7 +281,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   /**
    * Retrieve Valid custom Data added to  Individual Contact Type , Subtype : Student.
    */
-  public function testRetrieveValidCustomDataToIndividualStudent() {
+  public function testRetrieveValidCustomDataToIndividualStudent(): void {
 
     $params = [
       'contact_id' => $this->individualStudentContactID,

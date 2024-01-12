@@ -131,6 +131,7 @@
     <type>boolean</type>
     <title>Is Dashlet Active?</title>
     <comment>Is this dashlet active?</comment>
+    <!-- FIXME - nonstandard default for is_active -->
     <default>0</default>
     <html>
       <type>CheckBox</type>

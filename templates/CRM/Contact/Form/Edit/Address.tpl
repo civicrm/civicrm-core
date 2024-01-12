@@ -22,7 +22,7 @@
  <div id="Address_Block_{$blockId}" {if $className eq 'CRM_Contact_Form_Contact'} class="boxBlock crm-edit-address-block crm-address_{$blockId}"{/if}>
   {if $blockId gt 1}<fieldset><legend>{ts}Supplemental Address{/ts}</legend>{/if}
   <table class="form-layout-compressed crm-edit-address-form">
-     {if $masterAddress && $masterAddress.$blockId gt 0 }
+     {if $masterAddress && $masterAddress.$blockId gt 0}
         <tr><td><div class="message status">{icon icon="fa-info-circle"}{/icon} {ts 1=$masterAddress.$blockId}This address is shared with %1 contact record(s). Modifying this address will automatically update the shared address for these contacts.{/ts}</div></td></tr>
      {/if}
 
@@ -50,9 +50,9 @@
      <table id="address_table_{$blockId}" class="form-layout-compressed">
          {* build address block w/ address sequence. *}
          {foreach item=addressElement from=$addressSequence}
-              {include file=CRM/Contact/Form/Edit/Address/$addressElement.tpl}
+              {include file="CRM/Contact/Form/Edit/Address/`$addressElement`.tpl"}
          {/foreach}
-         {include file=CRM/Contact/Form/Edit/Address/geo_code.tpl}
+         {include file="CRM/Contact/Form/Edit/Address/geo_code.tpl"}
      </table>
         </td>
         <td colspan="2">
@@ -69,7 +69,7 @@
       </div>
   {/if}
 
-{if $title and $className eq 'CRM_Contact_Form_Contact'}
+{if $className eq 'CRM_Contact_Form_Contact' && $title}
 </div>
  </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->

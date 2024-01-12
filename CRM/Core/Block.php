@@ -218,10 +218,7 @@ class CRM_Core_Block {
     $block = [];
     foreach (self::properties() as $id => $value) {
       if ($value['active']) {
-        if (in_array($id, [
-          self::ADD,
-          self::CREATE_NEW,
-        ])) {
+        if (in_array($id, [self::ADD, self::CREATE_NEW])) {
           $hasAccess = TRUE;
           if (!CRM_Core_Permission::check('add contacts') &&
             !CRM_Core_Permission::check('edit groups')

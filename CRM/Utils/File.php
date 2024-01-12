@@ -21,6 +21,11 @@
 class CRM_Utils_File {
 
   /**
+   * Used to remove md5 hash that was injected into uploaded file names.
+   */
+  const HASH_REMOVAL_PATTERN = '/_[a-f0-9]{32}\./';
+
+  /**
    * Given a file name, determine if the file contents make it an ascii file
    *
    * @param string $name
@@ -90,12 +95,12 @@ class CRM_Utils_File {
    * @param bool $rmdir
    * @param bool $verbose
    *
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
+  public static function cleanDir(string $target, bool $rmdir = TRUE, bool $verbose = TRUE) {
     static $exceptions = ['.', '..'];
-    if ($target == '' || $target == '/' || !$target) {
-      throw new Exception("Overly broad deletion");
+    if (!$target || $target === '/') {
+      throw new CRM_Core_Exception('Overly broad deletion');
     }
 
     if ($dh = @opendir($target)) {
@@ -212,11 +217,7 @@ class CRM_Utils_File {
 
     $written = fwrite($file, $contents);
     $closed = fclose($file);
-    if ($written === FALSE or !$closed) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return !($written === FALSE or !$closed);
   }
 
   /**
@@ -394,7 +395,10 @@ class CRM_Utils_File {
   }
 
   /**
-   * Remove the 32 bit md5 we add to the fileName also remove the unknown tag if we added it.
+   * Remove 32 bit md5 hash prepended to the file suffix.
+   *
+   * Note: if the filename was munged with an `.unknown` suffix, this removes
+   * the md5 but doesn't undo the munging or remove the `.unknown` suffix.
    *
    * @param $name
    *
@@ -402,7 +406,7 @@ class CRM_Utils_File {
    */
   public static function cleanFileName($name) {
     // replace the last 33 character before the '.' with null
-    $name = preg_replace('/(_[\w]{32})\./', '.', $name);
+    $name = preg_replace(self::HASH_REMOVAL_PATTERN, '.', $name);
     return $name;
   }
 
@@ -410,22 +414,29 @@ class CRM_Utils_File {
    * Make a valid file name.
    *
    * @param string $name
+   * @param bool $unicode
    *
    * @return string
    */
-  public static function makeFileName($name) {
+  public static function makeFileName($name, bool $unicode = FALSE) {
     $uniqID = md5(uniqid(rand(), TRUE));
     $info = pathinfo($name);
     $basename = substr($info['basename'],
       0, -(strlen($info['extension'] ?? '') + (($info['extension'] ?? '') == '' ? 0 : 1))
     );
     if (!self::isExtensionSafe($info['extension'] ?? '')) {
+      if ($unicode) {
+        return self::makeFilenameWithUnicode("{$basename}_" . ($info['extension'] ?? '') . "_{$uniqID}", '_', 240) . ".unknown";
+      }
       // munge extension so it cannot have an embbeded dot in it
       // The maximum length of a filename for most filesystems is 255 chars.
       // We'll truncate at 240 to give some room for the extension.
       return CRM_Utils_String::munge("{$basename}_" . ($info['extension'] ?? '') . "_{$uniqID}", '_', 240) . ".unknown";
     }
     else {
+      if ($unicode) {
+        return self::makeFilenameWithUnicode("{$basename}_{$uniqID}", '_', 240) . "." . ($info['extension'] ?? '');
+      }
       return CRM_Utils_String::munge("{$basename}_{$uniqID}", '_', 240) . "." . ($info['extension'] ?? '');
     }
   }
@@ -894,8 +905,8 @@ HTACCESS;
       case 'image/x-png':
       case 'image/png':
       case 'image/jpg':
-        list($imageWidth, $imageHeight) = getimagesize($path);
-        list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
+        [$imageWidth, $imageHeight] = getimagesize($path);
+        [$imageThumbWidth, $imageThumbHeight] = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
         $url = "<a href=\"$url\" class='crm-image-popup'>
           <img src=\"$url\" width=$imageThumbWidth height=$imageThumbHeight/>
           </a>";
@@ -1143,6 +1154,25 @@ HTACCESS;
       restore_error_handler();
     }
     return $is_dir;
+  }
+
+  /**
+   * Get the maximum file size permitted for upload.
+   *
+   * This function contains logic to check the server setting if none
+   * is configured. It is unclear if this is still relevant but perhaps it is no
+   * harm-no-foul.
+   *
+   * @return int
+   *   Size in mega-bytes.
+   */
+  public static function getMaxFileSize(): int {
+    $maxFileSizeMegaBytes = \Civi::settings()->get('maxFileSize');
+    //Fetch maxFileSizeMegaBytes from php_ini when $config->maxFileSize is set to "no limit".
+    if (empty($maxFileSizeMegaBytes)) {
+      $maxFileSizeMegaBytes = round((CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize')) / (1024 * 1024)), 2);
+    }
+    return $maxFileSizeMegaBytes;
   }
 
 }

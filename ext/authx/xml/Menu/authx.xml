@@ -21,12 +21,4 @@
     <access_arguments>*always allow*</access_arguments>
     <is_public>true</is_public>
   </item>
-  <item>
-    <path>civicrm/admin/setting/authx</path>
-    <title>Authentication</title>
-    <page_callback>CRM_Admin_Form_Generic</page_callback>
-    <adminGroup>System Settings</adminGroup>
-    <desc>Configure authentication for external systems</desc>
-    <access_arguments>administer CiviCRM</access_arguments>
-  </item>
 </menu>

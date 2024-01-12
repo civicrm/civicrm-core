@@ -7,7 +7,7 @@
 
     // TaskManager object is responsible for fetching task metadata for a SearchDispaly
     // and handles the running of tasks.
-    function TaskManager(displayCtrl) {
+    function TaskManager(displayCtrl, $element) {
       var mngr = this;
       var fetchedMetadata;
       this.tasks = null;
@@ -84,8 +84,11 @@
       this.refreshAfterTask = function() {
         displayCtrl.selectedRows = [];
         displayCtrl.allRowsSelected = false;
-        displayCtrl.rowCount = undefined;
-        displayCtrl.runSearch();
+        displayCtrl.rowCount = null;
+        displayCtrl.getResultsPronto();
+        // Trigger all other displays in the same form to update.
+        // This display won't update twice because of the debounce in getResultsPronto()
+        $element.trigger('crmPopupFormSuccess');
       };
     }
 
@@ -201,10 +204,10 @@
       },
 
       // onInitialize callback
-      onInitialize: [function() {
+      onInitialize: [function($scope, $element) {
         // Instantiate task manager object
         if (!this.taskManager) {
-          this.taskManager = new TaskManager(this);
+          this.taskManager = new TaskManager(this, $element);
         }
       }],
 

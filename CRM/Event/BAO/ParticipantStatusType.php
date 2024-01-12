@@ -17,33 +17,23 @@
 class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatusType {
 
   /**
+   * @deprecated
    * @param array $params
    *
    * @return self|null
    */
   public static function add(&$params) {
-    if (empty($params)) {
-      return NULL;
-    }
-    $dao = new CRM_Event_DAO_ParticipantStatusType();
-    $dao->copyValues($params);
-    return $dao->save();
+    return self::writeRecord($params);
   }
 
   /**
+   * @deprecated
    * @param array $params
    *
    * @return self|null
    */
-  public static function &create(&$params) {
-    $transaction = new CRM_Core_Transaction();
-    $statusType = self::add($params);
-    if (is_a($statusType, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $statusType;
-    }
-    $transaction->commit();
-    return $statusType;
+  public static function create(&$params) {
+    return self::writeRecord($params);
   }
 
   /**

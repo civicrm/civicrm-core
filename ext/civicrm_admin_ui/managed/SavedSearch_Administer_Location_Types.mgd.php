@@ -54,7 +54,7 @@ return [
         'saved_search_id.name' => 'Administer_Location_Types',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -168,14 +168,20 @@ return [
                   ],
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
+              'icon' => 'fa-bars',
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/locationType/edit?action=add&reset=1',
-            'text' => E::ts('Add Location Type'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'LocationType',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Location Type'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [

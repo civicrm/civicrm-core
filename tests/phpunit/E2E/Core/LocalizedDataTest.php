@@ -20,7 +20,7 @@ class LocalizedDataTest extends \CiviEndToEndTestCase {
    * $ env CIVICRM_LOCALES=en_US,fr_FR,de_DE ./bin/setup.sh -g \
    *   && phpunit6 tests/phpunit/E2E/Core/LocalizedDataTest.php
    */
-  public function testLocalizedData() {
+  public function testLocalizedData(): void {
     $getSql = $this->getSqlFunc();
 
     $sqls = [
@@ -57,6 +57,7 @@ class LocalizedDataTest extends \CiviEndToEndTestCase {
       'WordPress' => [$this, '_getSqlFile'],
       'Backdrop' => [$this, '_getSqlFile'],
       'Joomla' => [$this, '_getSqlFile'],
+      'Standalone' => [$this, '_getSqlFile'],
     ];
     if (isset($installerTypes[$uf])) {
       return $installerTypes[$uf];

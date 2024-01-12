@@ -20,7 +20,7 @@ class CRM_Event_Form_ManageEvent_EventInfoTest extends CiviUnitTestCase {
   /**
    * Test correct form submission.
    */
-  public function testValidFormSubmission() {
+  public function testValidFormSubmission(): void {
     $values = $this->getCorrectFormFields();
     $validationResult = \CRM_Event_Form_ManageEvent_EventInfo::formRule($values);
     $this->assertEmpty($validationResult);
@@ -29,7 +29,7 @@ class CRM_Event_Form_ManageEvent_EventInfoTest extends CiviUnitTestCase {
   /**
    * Test end date not allowed with only 'time' part.
    */
-  public function testEndDateWithoutDateNotAllowed() {
+  public function testEndDateWithoutDateNotAllowed(): void {
     $values = $this->getCorrectFormFields();
     $values['end_date'] = '00:01';
     $validationResult = \CRM_Event_Form_ManageEvent_EventInfo::formRule($values);
@@ -39,7 +39,7 @@ class CRM_Event_Form_ManageEvent_EventInfoTest extends CiviUnitTestCase {
   /**
    * Test end date must be after start date.
    */
-  public function testEndDateBeforeStartDateNotAllowed() {
+  public function testEndDateBeforeStartDateNotAllowed(): void {
     $values = $this->getCorrectFormFields();
     $values['end_date'] = '1900-01-01 00:00';
     $validationResult = \CRM_Event_Form_ManageEvent_EventInfo::formRule($values);

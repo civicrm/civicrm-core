@@ -13,6 +13,7 @@ namespace Civi\WorkflowMessage\Traits;
 
 use Civi\Api4\Contact;
 use Civi\Api4\MessageTemplate;
+use CRM_Core_Exception;
 
 /**
  * @method getTemplate(): ?array

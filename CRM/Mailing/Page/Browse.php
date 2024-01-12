@@ -105,13 +105,13 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     if (CRM_Core_Permission::check('access CiviMail')) {
       $archiveLinks = TRUE;
     }
-    if ($archiveLinks == TRUE) {
-      $this->assign('archiveLinks', $archiveLinks);
-    }
+    $this->assign('archiveLinks', $archiveLinks ?? FALSE);
   }
 
   /**
    * Run this page (figure out the action needed and perform it).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function run() {
     $this->preProcess();
@@ -122,26 +122,26 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       = CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
 
     // CRM-11920 "all" should set sortByCharacter to null, not empty string
-    if (strtolower($this->_sortByCharacter ?: '') == 'all' || !empty($_POST)) {
+    if (strtolower($this->_sortByCharacter ?: '') === 'all' || !empty($_POST)) {
       $this->_sortByCharacter = NULL;
       $this->set('sortByCharacter', NULL);
     }
 
-    if (($newArgs[3] ?? NULL) == 'unscheduled') {
+    if (($newArgs[3] ?? NULL) === 'unscheduled') {
       $this->_unscheduled = TRUE;
     }
     $this->set('unscheduled', $this->_unscheduled);
 
     $this->set('archived', $this->isArchived($newArgs));
 
-    if (($newArgs[3] ?? NULL) == 'scheduled') {
+    if (($newArgs[3] ?? NULL) === 'scheduled') {
       $this->_scheduled = TRUE;
     }
     $this->set('scheduled', $this->_scheduled);
 
-    $this->_createdId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, 0);
-    if ($this->_createdId) {
-      $this->set('createdId', $this->_createdId);
+    $createdId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, 0);
+    if ($createdId) {
+      $this->set('createdId', $createdId);
     }
 
     if ($this->_sms) {
@@ -243,7 +243,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     if ($this->get('sms')) {
       $urlParams .= '&sms=1';
     }
-    if (($newArgs[3] ?? NULL) == 'unscheduled') {
+    if (($newArgs[3] ?? NULL) === 'unscheduled') {
       $urlString .= '/unscheduled';
       $urlParams .= '&scheduled=false';
       $this->assign('unscheduled', TRUE);

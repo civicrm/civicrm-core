@@ -12,6 +12,7 @@ namespace Civi\Api4;
 
 use Civi\Api4\Action\Queue\ClaimItems;
 use Civi\Api4\Action\Queue\RunItems;
+use Civi\Api4\Action\Queue\Run;
 
 /**
  * Track a list of durable/scannable queues.
@@ -19,7 +20,7 @@ use Civi\Api4\Action\Queue\RunItems;
  * Registering a queue in this table (and setting `is_auto=1`) can
  * allow it to execute tasks automatically in the background.
  *
- * @searchable none
+ * @searchable secondary
  * @since 5.47
  * @package Civi\Api4
  */
@@ -40,9 +41,13 @@ class Queue extends \Civi\Api4\Generic\DAOEntity {
   }
 
   /**
-   * Claim an item from the queue. Returns zero or one items.
+   * Claim some items from the queue. Returns zero or more items.
    *
    * Note: This is appropriate for persistent, auto-run queues.
+   *
+   * The number of items depends on the specific queue. Most notably, batch sizes are
+   * influenced by queue-driver support (`BatchQueueInterface`) and queue-configuration
+   * (`civicrm_queue.batch_limit`).
    *
    * @param bool $checkPermissions
    * @return \Civi\Api4\Action\Queue\ClaimItems
@@ -53,15 +58,34 @@ class Queue extends \Civi\Api4\Generic\DAOEntity {
   }
 
   /**
-   * Run an item from the queue.
+   * Run some items from the queue.
    *
    * Note: This is appropriate for persistent, auto-run queues.
+   *
+   * The number of items depends on the specific queue. Most notably, batch sizes are
+   * influenced by queue-driver support (`BatchQueueInterface`) and queue-configuration
+   * (`civicrm_queue.batch_limit`).
    *
    * @param bool $checkPermissions
    * @return \Civi\Api4\Action\Queue\RunItems
    */
   public static function runItems($checkPermissions = TRUE) {
     return (new RunItems(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * Run a series of items from a queue.
+   *
+   * This is a lightweight main-loop for development/testing. It may have some limited utility for
+   * sysadmins who want to fine-tune runners on a specific queue. See the class docblock for
+   * more information.
+   *
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\Queue\Run
+   */
+  public static function run($checkPermissions = TRUE) {
+    return (new Run(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

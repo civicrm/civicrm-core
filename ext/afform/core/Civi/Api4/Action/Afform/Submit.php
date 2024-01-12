@@ -29,37 +29,21 @@ class Submit extends AbstractProcessor {
   protected $values;
 
   protected function processForm() {
-    // Preprocess submitted values
-    $entityValues = [];
-    foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
-      $entityValues[$entityName] = [];
-      // Gather submitted field values from $values['fields'] and sub-entities from $values['joins']
-      foreach ($this->values[$entityName] ?? [] as $values) {
-        // Only accept values from fields on the form
-        $values['fields'] = array_intersect_key($values['fields'] ?? [], $entity['fields']);
-        // Only accept joins set on the form
-        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
-        foreach ($values['joins'] as $joinEntity => &$joinValues) {
-          // Enforce the limit set by join[max]
-          $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
-          foreach ($joinValues as $index => $vals) {
-            // Only accept values from join fields on the form
-            $joinValues[$index] = array_intersect_key($vals, $entity['joins'][$joinEntity]['fields'] ?? []);
-            // Merge in pre-set data
-            $joinValues[$index] = array_merge($joinValues[$index], $entity['joins'][$joinEntity]['data'] ?? []);
-          }
-        }
-        $entityValues[$entityName][] = $values;
-      }
-      if (!empty($entity['data'])) {
-        // If no submitted values but data exists, fill the minimum number of records
-        for ($index = 0; $index < $entity['min']; $index++) {
-          $entityValues[$entityName][$index] = $entityValues[$entityName][$index] ?? ['fields' => []];
-        }
-        // Predetermined values override submitted values
-        foreach ($entityValues[$entityName] as $index => $vals) {
-          $entityValues[$entityName][$index]['fields'] = $entity['data'] + $vals['fields'];
-        }
+    // preprocess submitted values
+    $entityValues = $this->preprocessSubmittedValues($this->values);
+
+    // get the submission information if we have submission id.
+    // currently we don't support processing of already processed forms
+    // return validation error in those cases
+    if (!empty($this->args['sid'])) {
+      $afformSubmissionData = \Civi\Api4\AfformSubmission::get(FALSE)
+        ->addWhere('id', '=', $this->args['sid'])
+        ->addWhere('afform_name', '=', $this->name)
+        ->addWhere('status_id:name', '=', 'Processed')
+        ->execute()->count();
+
+      if ($afformSubmissionData > 0) {
+        throw new \CRM_Core_Exception(ts('Submission is already processed.'));
       }
     }
 
@@ -73,30 +57,42 @@ class Submit extends AbstractProcessor {
     }
 
     // Save submission record
-    if (!empty($this->_afform['create_submission'])) {
+    $status = 'Processed';
+    if (!empty($this->_afform['create_submission']) && empty($this->args['sid'])) {
+      if (!empty($this->_afform['manual_processing'])) {
+        $status = 'Pending';
+      }
+
       $submission = AfformSubmission::create(FALSE)
         ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
         ->addValue('afform_name', $this->name)
         ->addValue('data', $this->getValues())
+        ->addValue('status_id:name', $status)
         ->execute()->first();
     }
 
-    // Call submit handlers
-    $entityWeights = \Civi\Afform\Utils::getEntityWeights($this->_formDataModel->getEntities(), $entityValues);
-    foreach ($entityWeights as $entityName) {
-      $entityType = $this->_formDataModel->getEntity($entityName)['type'];
-      $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
-      $this->fillIdFields($records, $entityName);
-      $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
-      \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
+    // let's not save the data in other CiviCRM table if manual verification is needed.
+    if (!empty($this->_afform['manual_processing']) && empty($this->args['sid'])) {
+      // check for verification email
+      $this->processVerficationEmail($submission['id']);
+      return [];
     }
+
+    // process and save various enities
+    $this->processFormData($entityValues);
 
     $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
     // Update submission record with entity IDs.
     if (!empty($this->_afform['create_submission'])) {
+      $submissionId = $submission['id'];
+      if (!empty($this->args['sid'])) {
+        $submissionId = $this->args['sid'];
+      }
+
       AfformSubmission::update(FALSE)
-        ->addWhere('id', '=', $submission['id'])
+        ->addWhere('id', '=', $submissionId)
         ->addValue('data', $submissionData)
+        ->addValue('status_id:name', $status)
         ->execute();
     }
 
@@ -104,25 +100,6 @@ class Submit extends AbstractProcessor {
     return [
       ['token' => $this->generatePostSubmitToken()] + $this->_entityIds,
     ];
-  }
-
-  /**
-   * Recursively add entity IDs to the values.
-   */
-  protected function combineValuesAndIds($values, $ids, $isJoin = FALSE) {
-    $combined = [];
-    $values += array_fill_keys(array_keys($ids), []);
-    foreach ($values as $name => $value) {
-      foreach ($value as $idx => $val) {
-        $idData = $ids[$name][$idx] ?? [];
-        if (!$isJoin) {
-          $idData['_joins'] = $this->combineValuesAndIds($val['joins'] ?? [], $idData['_joins'] ?? [], TRUE);
-        }
-        $item = array_merge($isJoin ? $val : ($val['fields'] ?? []), $idData);
-        $combined[$name][$idx] = $item;
-      }
-    }
-    return $combined;
   }
 
   /**
@@ -249,34 +226,6 @@ class Submit extends AbstractProcessor {
       }
     }
     return NULL;
-  }
-
-  /**
-   * Replace Entity reference fields with the id of the referenced entity.
-   * @param string $entityName
-   * @param $records
-   */
-  private function replaceReferences($entityName, $records) {
-    $entityNames = array_diff(array_keys($this->_entityIds), [$entityName]);
-    $entityType = $this->_formDataModel->getEntity($entityName)['type'];
-    foreach ($records as $key => $record) {
-      foreach ($record['fields'] as $field => $value) {
-        if (array_intersect($entityNames, (array) $value) && $this->getEntityField($entityType, $field)['input_type'] === 'EntityRef') {
-          if (is_array($value)) {
-            foreach ($value as $i => $val) {
-              if (in_array($val, $entityNames, TRUE)) {
-                $refIds = array_filter(array_column($this->_entityIds[$val], 'id'));
-                array_splice($records[$key]['fields'][$field], $i, 1, $refIds);
-              }
-            }
-          }
-          else {
-            $records[$key]['fields'][$field] = $this->_entityIds[$value][0]['id'] ?? NULL;
-          }
-        }
-      }
-    }
-    return $records;
   }
 
   /**
@@ -502,18 +451,6 @@ class Submit extends AbstractProcessor {
   }
 
   /**
-   * @param array $records
-   * @param string $entityName
-   */
-  private function fillIdFields(array &$records, string $entityName): void {
-    foreach ($records as $index => &$record) {
-      if (empty($record['fields']['id']) && !empty($this->_entityIds[$entityName][$index]['id'])) {
-        $record['fields']['id'] = $this->_entityIds[$entityName][$index]['id'];
-      }
-    }
-  }
-
-  /**
    * Generates token returned from submit action
    *
    * @return string
@@ -532,6 +469,72 @@ class Submit extends AbstractProcessor {
       'scope' => 'afformPostSubmit',
       'civiAfformSubmission' => ['name' => $this->name, 'data' => $this->_entityIds],
     ]);
+  }
+
+  /**
+   * Function to send the verification email if configured
+   *
+   * @param int $submissionId
+   *
+   * @return void
+   */
+  private function processVerficationEmail(int $submissionId):void {
+    // check if email verification configured and message template is set
+    if (empty($this->_afform['allow_verification_by_email']) || empty($this->_afform['email_confirmation_template_id'])) {
+      return;
+    }
+
+    $emailValue = '';
+    $submittedValues = $this->getValues();
+    foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
+      foreach ($submittedValues[$entityName] ?? [] as $values) {
+        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
+        foreach ($values['joins'] as $joinEntity => &$joinValues) {
+          if ($joinEntity === 'Email') {
+            foreach ($joinValues as $fld => $val) {
+              if (!empty($val['email'])) {
+                $emailValue = $val['email'];
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // processing sending of email only if email field exists in the form
+    if (!empty($emailValue)) {
+      $this->sendEmail($emailValue, $submissionId);
+    }
+  }
+
+  /**
+   * Function to send email
+   *
+   * @param string $emailAddress
+   * @param int $submissionId
+   *
+   * @return void
+   */
+  private function sendEmail(string $emailAddress, int $submissionId) {
+    // get domain email address
+    [$domainEmailName, $domainEmailAddress] = \CRM_Core_BAO_Domain::getNameAndEmail();
+
+    $tokenContext = [
+      'validateAfformSubmission' => [
+        'submissionId' => $submissionId,
+      ],
+    ];
+
+    // send email
+    $emailParams = [
+      'messageTemplateID' => $this->_afform['email_confirmation_template_id'],
+      'from' => "$domainEmailName <" . $domainEmailAddress . ">",
+      'toEmail' => $emailAddress,
+      'tokenContext' => $tokenContext,
+    ];
+
+    \CRM_Core_BAO_MessageTemplate::sendTemplate($emailParams);
   }
 
 }

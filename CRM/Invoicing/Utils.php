@@ -48,11 +48,9 @@ class CRM_Invoicing_Utils {
   /**
    * Function to call to determine if invoicing is enabled.
    *
-   * Historically the invoicing was declared as a setting but actually
-   * set within contribution_invoice_settings (which stores multiple settings
-   * as an array in a non-standard way).
+   * Use Civi::settings()->get('invoicing') instead.
    *
-   * We check both here. But will deprecate the latter in time.
+   * @deprecated since 5.68 expected removal time to be added when we add noisy deprecation.
    */
   public static function isInvoicingEnabled() {
     return Civi::settings()->get('invoicing');
@@ -61,8 +59,9 @@ class CRM_Invoicing_Utils {
   /**
    * Function to get the tax term.
    *
-   * The value is nested in the contribution_invoice_settings setting - which
-   * is unsupported. Here we have a wrapper function to make later cleanup easier.
+   * Use Civi::settings()->get('tax_term') instead.
+   *
+   * @deprecated since 5.68 expected removal time to be added when we add noisy deprecation.
    */
   public static function getTaxTerm() {
     return Civi::settings()->get('tax_term');

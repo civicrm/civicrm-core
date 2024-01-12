@@ -47,7 +47,7 @@
 {/literal}</style>
 {* Force the custom config file to reload by appending a new query string *}
 <script type="text/javascript">
-  {if $configUrl}CKEDITOR.config.customConfig = '{$configUrl}?{php}print str_replace(array(' ', '.'), array('', '='), microtime());{/php}'{/if};
+  {if $configUrl}CKEDITOR.config.customConfig = '{$configUrl}?{$smarty.now}'{/if};
 </script>
 
 <div class="ui-tabs">

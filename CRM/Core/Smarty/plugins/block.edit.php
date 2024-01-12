@@ -30,11 +30,15 @@
  *   {edit} block contents from the template.
  * @param CRM_Core_Smarty $smarty
  *   The Smarty object.
+ * @param bool $repeat
+ *   Repeat is true for the opening tag, false for the closing tag
  *
- * @return string
+ * @return string|null
  *   the string, translated by gettext
  */
-function smarty_block_edit($params, $text, &$smarty) {
-  $action = $smarty->_tpl_vars['action'];
-  return ($action & 3) ? $text : NULL;
+function smarty_block_edit($params, $text, &$smarty, &$repeat) {
+  if (!$repeat) {
+    $action = $smarty->getTemplateVars()['action'];
+    return ($action & 3) ? $text : NULL;
+  }
 }

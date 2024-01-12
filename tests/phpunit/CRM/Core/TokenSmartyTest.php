@@ -25,7 +25,7 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
   /**
    * A template which uses both token-data and Smarty-data.
    */
-  public function testMixedData() {
+  public function testMixedData(): void {
     $rendered = CRM_Core_TokenSmarty::render(
       ['msg_subject' => 'First name is {contact.first_name}. ExtraFoo is {$extra.foo}.'],
       ['contactId' => $this->contactId],
@@ -57,7 +57,7 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
   /**
    * A template which uses token-data as part of a Smarty expression.
    */
-  public function testTokenInSmarty() {
+  public function testTokenInSmarty(): void {
     \CRM_Utils_Time::setTime('2022-04-08 16:32:04');
     $resetTime = \CRM_Utils_AutoClean::with(['CRM_Utils_Time', 'resetTime']);
 
@@ -132,7 +132,7 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testTokenDataEscape() {
+  public function testTokenDataEscape(): void {
     $cutesyContactId = $this->individualCreate([
       'first_name' => 'Ivan\'s "The Ter<r>ib`le"',
     ]);

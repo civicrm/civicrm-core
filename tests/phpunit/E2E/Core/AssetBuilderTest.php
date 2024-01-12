@@ -23,15 +23,15 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     \Civi::service('asset_builder')->clear();
 
     $this->fired['hook_civicrm_buildAsset'] = 0;
-    \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', array($this, 'counter'));
-    \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', array($this, 'buildSquareTxt'));
-    \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', array($this, 'buildSquareJs'));
+    \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', [$this, 'counter']);
+    \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', [$this, 'buildSquareTxt']);
+    \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', [$this, 'buildSquareJs']);
   }
 
   protected function tearDown(): void {
-    \Civi::dispatcher()->removeListener('hook_civicrm_buildAsset', array($this, 'counter'));
-    \Civi::dispatcher()->removeListener('hook_civicrm_buildAsset', array($this, 'buildSquareTxt'));
-    \Civi::dispatcher()->removeListener('hook_civicrm_buildAsset', array($this, 'buildSquareJs'));
+    \Civi::dispatcher()->removeListener('hook_civicrm_buildAsset', [$this, 'counter']);
+    \Civi::dispatcher()->removeListener('hook_civicrm_buildAsset', [$this, 'buildSquareTxt']);
+    \Civi::dispatcher()->removeListener('hook_civicrm_buildAsset', [$this, 'buildSquareJs']);
     parent::tearDown();
   }
 
@@ -51,7 +51,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     if ($e->asset !== 'square.txt') {
       return;
     }
-    $this->assertTrue(in_array($e->params['x'], array(11, 12)));
+    $this->assertTrue(in_array($e->params['x'], [11, 12]));
 
     $e->mimeType = 'text/plain';
     $e->content = "Square: " . ($e->params['x'] * $e->params['x']);
@@ -65,7 +65,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     if ($e->asset !== 'square.js') {
       return;
     }
-    $this->assertTrue(in_array($e->params['x'], array(11, 12)));
+    $this->assertTrue(in_array($e->params['x'], [11, 12]));
 
     $e->mimeType = 'application/javascript';
     $e->content = "var square=" . ($e->params['x'] * $e->params['x']) . ';';
@@ -78,24 +78,24 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
   public function getExamples() {
     $examples = [];
 
-    $examples[] = array(
+    $examples[] = [
       0 => 'square.txt',
-      1 => array('x' => 11),
+      1 => ['x' => 11],
       2 => 'text/plain',
       3 => 'Square: 121',
-    );
-    $examples[] = array(
+    ];
+    $examples[] = [
       0 => 'square.txt',
-      1 => array('x' => 12),
+      1 => ['x' => 12],
       2 => 'text/plain',
       3 => 'Square: 144',
-    );
-    $examples[] = array(
+    ];
+    $examples[] = [
       0 => 'square.js',
-      1 => array('x' => 12),
+      1 => ['x' => 12],
       2 => 'application/javascript',
       3 => 'var square=144;',
-    );
+    ];
 
     return $examples;
   }
@@ -133,7 +133,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     \Civi::service('asset_builder')->setCacheEnabled(TRUE);
     $url = \Civi::service('asset_builder')->getUrl($asset, $params);
     $this->assertEquals(1, $this->fired['hook_civicrm_buildAsset']);
-    $this->assertRegExp(';^https?:.*dyn/square.[0-9a-f]+.(txt|js)$;', $url);
+    $this->assertMatchesRegularExpression(';^https?:.*dyn/square.[0-9a-f]+.(txt|js)$;', $url);
     $this->assertEquals($expectedContent, file_get_contents($url));
     // Note: This actually relies on httpd to determine MIME type.
     // That could be ambiguous for javascript.
@@ -157,7 +157,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     $url = \Civi::service('asset_builder')->getUrl($asset, $params);
     $this->assertEquals(0, $this->fired['hook_civicrm_buildAsset']);
     // Ex: Traditional URLs on D7 have "/". Traditional URLs on WP have "%2F".
-    $this->assertRegExp(';^https?:.*civicrm(/|%2F)asset(/|%2F)builder.*square.(txt|js);', $url);
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm(/|%2F)asset(/|%2F)builder.*square.(txt|js);', $url);
 
     // Simulate a request. Our fake hook won't fire in a real request.
     parse_str(parse_url($url, PHP_URL_QUERY), $get);
@@ -166,12 +166,17 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     $this->assertEquals($expectedContent, $asset['content']);
   }
 
-  public function testInvalid() {
+  /**
+   * @group ornery
+   *
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function testInvalid(): void {
     \Civi::service('asset_builder')->setCacheEnabled(FALSE);
     $url = \Civi::service('asset_builder')->getUrl('invalid.json');
     try {
       $guzzleClient = new \GuzzleHttp\Client();
-      $guzzleResponse = $guzzleClient->request('GET', $url, array('timeout' => 2));
+      $guzzleResponse = $guzzleClient->request('GET', $url, ['timeout' => 2]);
       $this->fail('Expecting ClientException... but it was not thrown!');
     }
     catch (\GuzzleHttp\Exception\ClientException $e) {

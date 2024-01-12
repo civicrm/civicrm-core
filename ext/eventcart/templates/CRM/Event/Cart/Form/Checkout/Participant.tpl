@@ -8,7 +8,7 @@
   <div class="clearfix">
           {assign var=pre value="event[`$event_id`][participant][`$participant_id`][customPre]"}
           <div class="profile-group">
-          {include file="CRM/UF/Form/Block.tpl" fields=$custom.$pre form=$form.field.$participant_id}
+          {include file="CRM/UF/Form/Block.tpl" fields=$custom.$pre form=$form.field.$participant_id hideFieldset=false}
           </div>
 
     <div class="participant-info crm-section form-item">
@@ -23,7 +23,7 @@
           {assign var=post value="event[`$event_id`][participant][`$participant_id`][customPost]"}
           <div style="clear:left"></div>
           <div class="profile-group">
-          {include file="CRM/UF/Form/Block.tpl" fields=$custom.$post form=$form.field.$participant_id}
+          {include file="CRM/UF/Form/Block.tpl" fields=$custom.$post form=$form.field.$participant_id hideFieldset=false}
           </div>
   </div>
     <!--if $form_participant->participant_index > 0-->

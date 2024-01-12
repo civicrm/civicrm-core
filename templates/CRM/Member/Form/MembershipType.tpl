@@ -105,8 +105,7 @@
       </div>
     </fieldset>
 
-    {include file="CRM/common/customDataBlock.tpl"}
-
+    {include file="CRM/common/customDataBlock.tpl" customDataType='MembershipType' customDataSubType=false cid=false groupID=false}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {/if}
     <div class="spacer"></div>
@@ -170,27 +169,6 @@ function showHidePeriodSettings() {
     cj("#fixed_period_rollover_day_M, #fixed_period_rollover_day_d").val("");
     cj("#month_fixed_rollover_day_row").val("");
   }
-}
-
-//load the auto renew msg if recur allow.
-{/literal}{if $authorize and $allowAutoRenewMsg}{literal}
-CRM.$(function($) {
-  setReminder( null );
-});
-{/literal}{/if}{literal}
-
-function setReminder( autoRenewOpt ) {
-  //don't process.
-  var allowToProcess = {/literal}'{$allowAutoRenewMsg}'{literal};
-  if ( !allowToProcess ) {
-    return;
-  }
-  if ( !autoRenewOpt ) {
-    autoRenewOpt = cj( 'input:radio[name="auto_renew"]:checked').val();
-  }
-  funName = 'hide();';
-  if ( autoRenewOpt == 1 || autoRenewOpt == 2 ) funName = 'show();';
-  eval( "cj('#autoRenewalMsgId')." + funName );
 }
 
 function showHideMaxRelated(relTypeId) {

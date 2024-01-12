@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+{if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
   {capture assign="buttonTitle"}{ts}Configure Event{/ts}{/capture}
   {crmButton target="_blank" p="civicrm/event/manage/settings" q="reset=1&action=update&id=`$event.id`" fb=1 title="$buttonTitle" icon="fa-wrench"}{ts}Configure{/ts}{/crmButton}
   <div class='clear'></div>
@@ -16,8 +16,6 @@
   {if $action & 1024}
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
   {/if}
-
-  {include file="CRM/common/TrackingFields.tpl"}
 
   <div class="crm-event-id-{$event.id} crm-block crm-event-register-form-block">
 
@@ -75,17 +73,17 @@
 
     <div class="crm-public-form-item crm-section custom_pre-section">
       {* Display "Top of page" profile immediately after the introductory text *}
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false hideFieldset=false}
     </div>
 
     {if $priceSet}
       {if ! $quickConfig}<fieldset id="priceset" class="crm-public-form-item crm-group priceset-group">
         <legend>{$event.fee_label}</legend>{/if}
-      {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
+      {include file="CRM/Price/Form/PriceSet.tpl" extends="Event" hideTotal=$quickConfig}
       {include file="CRM/Price/Form/ParticipantCount.tpl"}
       {if ! $quickConfig}</fieldset>{/if}
     {/if}
-    {if $pcp && $is_honor_roll }
+    {if $pcp && $is_honor_roll}
       <fieldset class="crm-public-form-item crm-group pcp-group">
         <div class="crm-public-form-item crm-section pcp-section">
           <div class="crm-public-form-item crm-section display_in_roll-section">
@@ -137,7 +135,9 @@
     {/if}
 
     <div class="crm-public-form-item crm-section custom_post-section">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+      {foreach from=$postPageProfiles item=customPost}
+        {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}
+      {/foreach}
     </div>
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">
@@ -164,7 +164,7 @@
     });
 
   {/literal}
-  {if $pcp && $is_honor_roll }
+  {if $pcp && $is_honor_roll}
     pcpAnonymous();
   {/if}
   {literal}
@@ -262,7 +262,7 @@
   }
 
   {/literal}
-  {if $pcp && $is_honor_roll }{literal}
+  {if $pcp && $is_honor_roll}{literal}
   function pcpAnonymous() {
     // clear nickname field if anonymous is true
     if (document.getElementsByName("pcp_is_anonymous")[1].checked) {

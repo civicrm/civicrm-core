@@ -30,9 +30,10 @@ class CRM_Event_Form_SelfSvcUpdateTest extends CiviUnitTestCase {
     $mut->checkAllMailLog([
       'Your Event Registration has been cancelled',
       'Annual CiviCRM meet',
-      'Registration Date: February 19th, 2007',
+      'Registration Date',
+      'February 19th, 2007',
       'Please contact us at 123 or send email to fixme.domainemail@example.org',
-      'October 21st, 2008 12:00 AM-October 23rd, 2008 12:00 AM',
+      'Tuesday October 21st, 2008 12:00 AM-Thursday October 23rd, 2008 12:00 AM',
     ]);
     $emails = $mut->getAllMessages();
     $this->assertStringContainsString('', $emails[0]);

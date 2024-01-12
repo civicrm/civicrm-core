@@ -25,7 +25,7 @@
 </table>
 <div class="spacer"></div>
 {if $cd_edit.help_post}<div class="messages help">{$cd_edit.help_post}</div>{/if}
-{if !$isSingleRecordEdit && $cd_edit.is_multiple and ( ( $cd_edit.max_multiple eq '' )  or ( $cd_edit.max_multiple > 0 and $cd_edit.max_multiple > $cgCount ) ) }
+{if !$isSingleRecordEdit && $cd_edit.is_multiple and (($cd_edit.max_multiple eq '') or ($cd_edit.max_multiple > 0 and $cd_edit.max_multiple > $cgCount))}
   {if $skipTitle}
     {* We don't yet support adding new records in inline-edit forms *}
     <div class="messages help">

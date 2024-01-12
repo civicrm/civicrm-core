@@ -177,12 +177,6 @@
     <page_callback>CRM_Contact_Page_View_ContactSmartGroup</page_callback>
   </item>
   <item>
-     <path>civicrm/contact/view/note</path>
-     <path_arguments>cid=%%cid%%</path_arguments>
-     <title>Notes</title>
-     <page_callback>CRM_Contact_Page_View_Note</page_callback>
-  </item>
-  <item>
      <path>civicrm/contact/view/tag</path>
      <path_arguments>cid=%%cid%%</path_arguments>
      <title>Tags</title>
@@ -377,6 +371,7 @@
   <page_callback>CRM_Contact_Form_Task_SMS</page_callback>
   <access_arguments>send SMS</access_arguments>
 </item>
+  <!-- DELETEME only-used-by-user-dashboard -->
   <item>
     <path>civicrm/ajax/contactrelationships</path>
     <page_callback>CRM_Contact_Page_AJAX::getContactRelationships</page_callback>
