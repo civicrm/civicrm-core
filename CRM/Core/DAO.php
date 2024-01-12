@@ -2741,20 +2741,14 @@ SELECT contact_id
   /**
    * Add custom tables that extend contacts to the list of contact references.
    *
-   * CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity seems like a safe-ish
-   * function to be sure all are retrieved & we don't miss subtypes or inactive or multiples
-   * - the down side is it is not cached.
-   *
-   * Further changes should be include tests in the CRM_Core_MergerTest class
-   * to ensure that disabled, subtype, multiple etc groups are still captured.
+   * Includes all contact custom groups including inactive, multiple & subtypes.
    *
    * @param array $cidRefs
    */
   public static function appendCustomTablesExtendingContacts(&$cidRefs) {
-    $customValueTables = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity('Contact');
-    $customValueTables->find();
-    while ($customValueTables->fetch()) {
-      $cidRefs[$customValueTables->table_name][] = 'entity_id';
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Contact']);
+    foreach ($customGroups as $customGroup) {
+      $cidRefs[$customGroup['table_name']][] = 'entity_id';
     }
   }
 
