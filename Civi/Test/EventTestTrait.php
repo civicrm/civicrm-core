@@ -306,13 +306,13 @@ trait EventTestTrait {
    * @param string $identifier
    */
   private function eventCreatePriceSet(array $priceSetParameters, string $identifier): void {
-    $priceSetParameters = array_merge($priceSetParameters, [
+    $priceSetParameters = array_merge([
       'min_amount' => 0,
       'title' => 'Fundraising dinner',
       'name' => $identifier,
       'extends:name' => 'CiviEvent',
       'financial_type_id:name' => 'Event Fee',
-    ]);
+    ], $priceSetParameters);
 
     $this->createTestEntity('PriceSet', $priceSetParameters, $identifier);
     $this->createTestEntity('PriceField', [
