@@ -83,7 +83,17 @@ class FormWrapper {
 
   private $mailSpoolID;
 
+  /**
+   * @var array|bool
+   */
   private $validation;
+
+  /**
+   * @return array|bool
+   */
+  public function getValidationOutput() {
+    return $this->validation;
+  }
 
   private $originalMailSetting;
 
@@ -124,7 +134,8 @@ class FormWrapper {
       $this->form->buildForm();
     }
     if ($state > self::BUILT) {
-      $this->validation = $this->form->validate();
+      $this->form->validate();
+      $this->validation = $this->form->_errors;
     }
     if ($state > self::VALIDATED) {
       $this->postProcess();
