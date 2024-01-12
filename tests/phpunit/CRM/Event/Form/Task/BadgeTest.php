@@ -95,7 +95,7 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
       '{participant.status_id}' => 2,
       '{participant.role_id}' => 1,
       '{participant.register_date}' => 'February 19th, 2007',
-      '{participant.source}' => 'Wimbeldon',
+      '{participant.source}' => 'Wimbledon',
       '{participant.fee_level}' => 'low',
       '{participant.fee_amount}' => '$0.00',
       '{participant.registered_by_id}' => NULL,
