@@ -349,7 +349,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     /**
      * Filter the Base URL.
      *
-     * @since 5.66
+     * @since 5.67
      *
      * @param str $base The Base URL.
      * @param bool $admin_request True if building an admin URL, false otherwise.
@@ -650,7 +650,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
        *
        * The CiviCRM-WordPress plugin supports Polylang and WPML via this filter.
        *
-       * @since 5.66
+       * @since 5.67
        *
        * @param str $locale The WordPress locale.
        */
