@@ -2753,22 +2753,24 @@ SELECT contact_id
   }
 
   /**
-   * Add custom ContactReference fields to the list of contact references
+   * Add custom ContactReference fields to the list of contact references.
    *
-   * This includes active and inactive fields/groups
+   * Includes both ContactReference and EntityReference type fields.
+   * Includes active and inactive fields/groups
    *
    * @param array $cidRefs
-   *
-   * @throws \CRM_Core_Exception
    */
   public static function appendCustomContactReferenceFields(&$cidRefs) {
-    $fields = civicrm_api3('CustomField', 'get', [
-      'return'    => ['column_name', 'custom_group_id.table_name'],
-      'data_type' => 'ContactReference',
-      'options' => ['limit' => 0],
-    ])['values'];
-    foreach ($fields as $field) {
-      $cidRefs[$field['custom_group_id.table_name']][] = $field['column_name'];
+    $contactTypes = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
+    foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+      foreach ($customGroup['fields'] as $field) {
+        if (
+          $field['data_type'] === 'ContactReference' ||
+          in_array($field['fk_entity'], $contactTypes, TRUE)
+        ) {
+          $cidRefs[$customGroup['table_name']][] = $field['column_name'];
+        }
+      }
     }
   }
 
