@@ -1228,6 +1228,22 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get the number of available spaces in the given event.
+   *
+   * @internal this is a transitional function to handle this form's
+   * odd behaviour whereby sometimes the fetched value is text. We need to wean
+   * the places that access it off this...
+   *
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getAvailableSpaces(): int {
+    // non numeric would be 'event full text'....
+    return is_numeric($this->_availableRegistrations) ? (int) $this->_availableRegistrations : 0;
+  }
+
+  /**
    * Validate price set submitted params for price option limit.
    *
    * User should select at least one price field option.
