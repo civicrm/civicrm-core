@@ -203,13 +203,11 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    */
   public function entityCustomDataLogTables($extends) {
     $customGroupTables = [];
-    $customGroupDAO = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity($extends);
-    $customGroupDAO->find();
-    while ($customGroupDAO->fetch()) {
-      // logging is disabled for the table (e.g by hook) then $this->logs[$customGroupDAO->table_name]
+    foreach (CRM_Core_BAO_CustomGroup::getAll(['extends' => $extends]) as $customGroup) {
+      // logging is disabled for the table (e.g by hook) then $this->logs[$customGroup['table_name']]
       // will be empty.
-      if (!empty($this->logs[$customGroupDAO->table_name])) {
-        $customGroupTables[$customGroupDAO->table_name] = $this->logs[$customGroupDAO->table_name];
+      if (!empty($this->logs[$customGroup['table_name']])) {
+        $customGroupTables[$customGroup['table_name']] = $this->logs[$customGroup['table_name']];
       }
     }
     return $customGroupTables;
