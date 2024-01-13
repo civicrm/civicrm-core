@@ -44,35 +44,27 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
   }
 
   /**
-   * Retrieve basic contact type information.
+   * Retrieve base contact type information.
    *
    * @param bool $includeInactive
    *
-   * @return array
-   *   Array of basic contact types information.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
+   * @return array[]
+   *   Array of base contact types keyed by name.
    */
-  public static function basicTypeInfo($includeInactive = FALSE) {
+  public static function basicTypeInfo($includeInactive = FALSE): array {
     return array_filter(self::getAllContactTypes(), function($type) use ($includeInactive) {
       return empty($type['parent']) && ($includeInactive || $type['is_active']);
     });
   }
 
   /**
-   * Retrieve all basic contact types.
+   * Get names of base contact types e.g. [Individual, Household, Organization]
    *
-   * @param bool $all
-   *
-   * @return array
-   *   Array of basic contact types
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
+   * @param bool $includeInactive
+   * @return string[]
    */
-  public static function basicTypes($all = FALSE): array {
-    return array_keys(self::basicTypeInfo($all));
+  public static function basicTypes($includeInactive = FALSE): array {
+    return array_keys(self::basicTypeInfo($includeInactive));
   }
 
   /**
@@ -830,10 +822,9 @@ WHERE ($subtypeClause)";
    * Note, this function is used within APIv4 Entity.get, so must use a
    * SQL query instead of calling APIv4 to avoid an infinite loop.
    *
-   * @return array
-   * @throws \CRM_Core_Exception
+   * @return array[]
    */
-  public static function getAllContactTypes() {
+  public static function getAllContactTypes(): array {
     $cache = Civi::cache('contactTypes');
     $cacheKey = 'all_' . $GLOBALS['tsLocale'];
     $contactTypes = $cache->get($cacheKey);
@@ -844,7 +835,7 @@ WHERE ($subtypeClause)";
       $dao = CRM_Core_DAO::executeQuery($query->toSQL());
       $contactTypes = array_column($dao->fetchAll(), NULL, 'name');
       $parents = array_column($contactTypes, NULL, 'id');
-      foreach ($contactTypes as $name => &$contactType) {
+      foreach ($contactTypes as &$contactType) {
         // Cast int/bool types.
         self::formatFieldValues($contactType);
         // Fill data from parents
