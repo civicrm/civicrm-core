@@ -29,9 +29,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
-   * Retrieve custom groups and fields in a nested array, with optional filters and permissions applied.
+   * Return custom groups and fields in a nested array, with optional filters and permissions applied.
    *
-   * With no params, this returns the same output as self::getAll().
+   * With no params, this returns every custom group and field, including disabled.
    *
    * @param array $filters
    *   [key => value] pairs to filter each custom group.
@@ -43,12 +43,15 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    *   User contact id for permission check (defaults to current user)
    * @return array[]
    */
-  public static function getFiltered(array $filters = [], int $permissionType = NULL, int $userId = NULL): array {
+  public static function getAll(array $filters = [], int $permissionType = NULL, int $userId = NULL): array {
     if (isset($permissionType)) {
       if (!in_array($permissionType, [CRM_Core_Permission::EDIT, CRM_Core_Permission::VIEW], TRUE)) {
         throw new CRM_Core_Exception('permissionType must be CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT');
       }
       $filters['id'] = CRM_Core_Permission::customGroup($permissionType, FALSE, $userId);
+    }
+    if (!$filters) {
+      return self::loadAll();
     }
     if (!empty($filters['extends']) && is_string($filters['extends'])) {
       $contactTypes = CRM_Contact_BAO_ContactType::basicTypes(TRUE);
@@ -59,7 +62,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         $filters['extends'] = ['Contact', $filters['extends']];
       }
     }
-    $allGroups = array_filter(self::getAll(), function($group) use ($filters) {
+    $allGroups = array_filter(self::loadAll(), function($group) use ($filters) {
       foreach ($filters as $key => $value) {
         if (is_array($value)) {
           if (!in_array($group[$key], $value)) {
@@ -88,7 +91,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    *
    * @return array[]
    */
-  public static function getAll(): array {
+  private static function loadAll(): array {
     $cacheString = __CLASS__ . __FUNCTION__ . '_' . CRM_Core_I18n::getLocale();
     $custom = Civi::cache('metadata')->get($cacheString);
     if (!isset($custom)) {

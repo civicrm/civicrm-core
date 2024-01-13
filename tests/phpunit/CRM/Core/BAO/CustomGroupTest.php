@@ -38,7 +38,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->customFieldCreate(['label' => 'Inactive', 'custom_group_id' => $inactiveGroup['id']]);
 
     $allGroups = CRM_Core_BAO_CustomGroup::getAll();
-    $activeGroups = CRM_Core_BAO_CustomGroup::getFiltered(['is_active' => TRUE]);
+    $activeGroups = CRM_Core_BAO_CustomGroup::getAll(['is_active' => TRUE]);
 
     $this->assertCount(2, $allGroups);
     $this->assertCount(2, $allGroups[0]['fields']);
@@ -47,11 +47,11 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertEquals($activeGroup['id'], $activeGroups[0]['id']);
     $this->assertCount(1, $activeGroups[0]['fields']);
 
-    $activityGroups = CRM_Core_BAO_CustomGroup::getFiltered(['extends' => 'Activity']);
+    $activityGroups = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Activity']);
     $this->assertCount(1, $activityGroups);
     $this->assertEquals($inactiveGroup['id'], $activityGroups[0]['id']);
 
-    $contactGroups = CRM_Core_BAO_CustomGroup::getFiltered(['extends' => 'Contact']);
+    $contactGroups = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Contact']);
     $this->assertEquals($activeGroup['id'], $contactGroups[0]['id']);
     $this->assertCount(2, $contactGroups[0]['fields']);
   }

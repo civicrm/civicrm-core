@@ -169,7 +169,7 @@ class SpecGatherer extends AutoService {
         \CRM_Core_Permission::EDIT :
         \CRM_Core_Permission::VIEW;
     }
-    $customGroups = \CRM_Core_BAO_CustomGroup::getFiltered($filters, $permissionType);
+    $customGroups = \CRM_Core_BAO_CustomGroup::getAll($filters, $permissionType);
 
     foreach ($customGroups as $customGroup) {
       if ($this->customGroupBelongsTo($customGroup, $values, $grouping)) {

@@ -56,7 +56,7 @@ class CustomGroupJoinable extends Joinable {
       'is_active' => TRUE,
       'table_name' => $this->getTargetTable(),
     ];
-    foreach (\CRM_Core_BAO_CustomGroup::getFiltered($filters) as $customGroup) {
+    foreach (\CRM_Core_BAO_CustomGroup::getAll($filters) as $customGroup) {
       foreach ($customGroup['fields'] as $fieldArray) {
         $entityFields[] = SpecFormatter::arrayToField($fieldArray, $baseEntity, $customGroup);
       }

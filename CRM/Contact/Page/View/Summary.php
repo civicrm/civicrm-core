@@ -422,7 +422,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       'extends' => $this->get('contactType'),
       'style' => ['Tab', 'Tab with table'],
     ];
-    $activeGroups = CRM_Core_BAO_CustomGroup::getFiltered($filters, CRM_Core_Permission::VIEW);
+    $activeGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::VIEW);
 
     foreach ($activeGroups as $group) {
       $id = "custom_{$group['id']}";
