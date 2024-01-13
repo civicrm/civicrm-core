@@ -92,7 +92,8 @@
       {ts}Contribution Total{/ts}:
     {elseif $context EQ "Event"}
       {if $totalTaxAmount}
-        {ts}Event SubTotal: {assign var=eventSubTotal value=$totalAmount-$totalTaxAmount}{$eventSubTotal|crmMoney:$currency}{/ts}<br />
+        {assign var=eventSubTotal value=$totalAmount-$totalTaxAmount}
+        {ts 1=$eventSubTotal|crmMoney:$currency}Event SubTotal: %1{/ts}<br />
       {/if}
       {ts}Total Amount{/ts}:
     {elseif $context EQ "Membership"}
