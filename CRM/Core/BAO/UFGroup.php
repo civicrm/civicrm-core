@@ -716,30 +716,26 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
 
   /**
    * @param $ctype
-   * @param int|bool $checkPermission
-   * @return mixed
+   * @param int|null $checkPermission
+   * @return array
    */
   protected static function getCustomFields($ctype, $checkPermission = CRM_Core_Permission::VIEW) {
     // Only Edit and View is supported in ACL for custom field.
-    if ($checkPermission == CRM_Core_Permission::CREATE) {
+    if ($checkPermission && $checkPermission != CRM_Core_Permission::VIEW) {
       $checkPermission = CRM_Core_Permission::EDIT;
     }
-    // Make the cache user specific by adding the ID to the key.
-    $contactId = CRM_Core_Session::getLoggedInContactID();
-    $cacheKey = 'uf_group_custom_fields_' . $ctype . '_' . $contactId . '_' . (int) $checkPermission;
-    if (!Civi::cache('metadata')->has($cacheKey)) {
-      $customFields = CRM_Core_BAO_CustomField::getFieldsForImport($ctype, FALSE, FALSE, FALSE, $checkPermission, TRUE);
+    $customFields = CRM_Core_BAO_CustomField::getFieldsForImport($ctype, FALSE, FALSE, FALSE, $checkPermission, TRUE);
 
-      // hack to add custom data for components
-      $components = ['Contribution', 'Participant', 'Membership', 'Activity', 'Case'];
-      foreach ($components as $value) {
-        $customFields = array_merge($customFields, CRM_Core_BAO_CustomField::getFieldsForImport($value));
-      }
-      $addressCustomFields = CRM_Core_BAO_CustomField::getFieldsForImport('Address');
-      $customFields = array_merge($customFields, $addressCustomFields);
-      Civi::cache('metadata')->set($cacheKey, [$customFields, $addressCustomFields]);
+    // Fixme: why this hardcoded list? If we truly want all fields we should use CRM_Core_BAO_CustomGroup::getAll().
+    $components = ['Contribution', 'Participant', 'Membership', 'Activity', 'Case'];
+    foreach ($components as $value) {
+      $extraFields = CRM_Core_BAO_CustomField::getFieldsForImport($value, FALSE, FALSE, FALSE, $checkPermission);
+      $customFields = array_merge($customFields, $extraFields);
     }
-    return Civi::cache('metadata')->get($cacheKey);
+    $addressCustomFields = CRM_Core_BAO_CustomField::getFieldsForImport('Address', FALSE, FALSE, FALSE, $checkPermission);
+    $customFields = array_merge($customFields, $addressCustomFields);
+    // For some reason this function returns Address custom fields as a second item.
+    return [$customFields, $addressCustomFields];
   }
 
   /**
