@@ -177,29 +177,4 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     return $highlightedFields;
   }
 
-  /**
-   * Get default values for the mapping.
-   *
-   * @return array
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getDefaults(): array {
-    $defaults = [];
-    $headerPatterns = $this->getHeaderPatterns();
-    $fieldMappings = $this->getFieldMappings();
-    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
-      if ($this->getSubmittedValue('savedMapping')) {
-        $fieldMapping = $fieldMappings[$i] ?? NULL;
-        if (isset($fieldMappings[$i])) {
-          $defaults["mapper[$i]"] = ($fieldMapping['name'] !== 'do_not_import') ? $fieldMapping['name'] : NULL;
-        }
-      }
-      if (!isset($defaults["mapper[$i]"]) && $this->getSubmittedValue('skipColumnHeader')) {
-        $defaults["mapper[$i]"] = $this->defaultFromHeader($columnHeader, $headerPatterns);
-      }
-    }
-    return $defaults;
-  }
-
 }
