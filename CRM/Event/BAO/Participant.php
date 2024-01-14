@@ -1429,10 +1429,7 @@ UPDATE  civicrm_participant
           'is_test' => $participantValues['is_test'],
           'status_id' => 2,
         ];
-
-        if (is_a(CRM_Activity_BAO_Activity::create($activityParams), 'CRM_Core_Error')) {
-          throw new CRM_Core_Exception('Failed creating Activity for expiration mail');
-        }
+        CRM_Activity_BAO_Activity::create($activityParams);
       }
     }
 
