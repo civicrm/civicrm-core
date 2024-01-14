@@ -27,24 +27,52 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testLoadAll(): void {
+  public function testGetAll(): void {
     $this->quickCleanup([], TRUE);
 
-    $activeGroup = $this->CustomGroupCreate(['title' => 'ActiveGroup', 'weight' => 1]);
+    $activeGroup = $this->CustomGroupCreate(['title' => 'ActiveGroup', 'weight' => 1, 'extends' => 'Household']);
     $this->customFieldCreate(['label' => 'Active', 'custom_group_id' => $activeGroup['id']]);
     $this->customFieldCreate(['label' => 'Disabled', 'is_active' => 0, 'custom_group_id' => $activeGroup['id']]);
 
-    $inactiveGroup = $this->CustomGroupCreate(['title' => 'InactiveGroup', 'weight' => 2, 'is_active' => 0]);
+    $inactiveGroup = $this->CustomGroupCreate(['title' => 'InactiveGroup', 'weight' => 2, 'is_active' => 0, 'extends' => 'Activity']);
     $this->customFieldCreate(['label' => 'Inactive', 'custom_group_id' => $inactiveGroup['id']]);
 
-    $allGroups = CRM_Core_BAO_CustomGroup::getAll();
-    $activeGroups = CRM_Core_BAO_CustomGroup::getActive();
+    $activityTypeGroup = $this->CustomGroupCreate(['title' => 'ActivityTypeGroup', 'weight' => 3, 'extends' => 'Activity', 'extends_entity_column_value' => [1, 2]]);
 
-    $this->assertCount(2, $allGroups);
+    $allGroups = CRM_Core_BAO_CustomGroup::getAll();
+
+    $this->assertCount(3, $allGroups);
     $this->assertCount(2, $allGroups[0]['fields']);
     $this->assertCount(1, $allGroups[1]['fields']);
-    $this->assertCount(1, $activeGroups);
+    $this->assertCount(0, $allGroups[2]['fields']);
+
+    $activeGroups = CRM_Core_BAO_CustomGroup::getAll(['is_active' => TRUE]);
+    $this->assertCount(2, $activeGroups);
+    $this->assertTrue($activeGroups[0]['is_active']);
+    $this->assertSame($activeGroup['id'], $activeGroups[0]['id']);
     $this->assertCount(1, $activeGroups[0]['fields']);
+    $this->assertTrue($activeGroups[0]['fields'][0]['is_active']);
+    $this->assertNull($activeGroups[0]['fields'][0]['help_pre']);
+
+    $activityGroups = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Activity']);
+    $this->assertCount(2, $activityGroups);
+    $this->assertEquals($inactiveGroup['id'], $activityGroups[0]['id']);
+
+    // When in an array, "Contact" means "Contact only" so the household group will not be returned
+    $contactActivityGroups = CRM_Core_BAO_CustomGroup::getAll(['is_active' => TRUE, 'extends' => ['Contact', 'Activity']]);
+    $this->assertCount(1, $contactActivityGroups);
+    $this->assertEquals([$activityTypeGroup['id']], array_column($contactActivityGroups, 'id'));
+    $this->assertCount(0, $contactActivityGroups[0]['fields']);
+
+    // When passed as a string, "Contact" means ["Contact", "Individual", "Household", "Organization"]
+    $contactGroups = CRM_Core_BAO_CustomGroup::getAll(['is_active' => TRUE, 'extends' => 'Contact']);
+    $this->assertEquals([$activeGroup['id']], array_column($contactGroups, 'id'));
+    $this->assertCount(1, $contactGroups[0]['fields']);
+
+    $this->assertCount(0, CRM_Core_BAO_CustomGroup::getAll(['extends_entity_column_value' => 3]));
+    $this->assertCount(1, CRM_Core_BAO_CustomGroup::getAll(['extends_entity_column_value' => 2]));
+    $this->assertCount(1, CRM_Core_BAO_CustomGroup::getAll(['extends_entity_column_value' => [2, 4]]));
+    $this->assertCount(3, CRM_Core_BAO_CustomGroup::getAll(['extends_entity_column_value' => [1, NULL]]));
   }
 
   /**

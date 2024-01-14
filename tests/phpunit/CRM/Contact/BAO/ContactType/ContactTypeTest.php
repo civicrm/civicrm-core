@@ -45,6 +45,18 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->ids['ContactType'][] = (int) ContactType::create()->setValues($params)->execute()->first()['id'];
   }
 
+  private function strictArrayCompare($arr1, $arr2) {
+    ksort($arr1);
+    foreach ($arr1 as &$value) {
+      ksort($value);
+    }
+    ksort($arr2);
+    foreach ($arr2 as &$value) {
+      ksort($value);
+    }
+    $this->assertSame($arr1, $arr2);
+  }
+
   /**
    * Cleanup contact types.
    *
@@ -66,23 +78,23 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     // check for type:Individual
     $result = CRM_Contact_BAO_ContactType::subTypes('Individual');
     $this->assertEquals(array_keys($this->getExpectedContactSubTypes('Individual')), $result);
-    $this->assertEquals($this->getExpectedContactSubTypes('Individual'), CRM_Contact_BAO_ContactType::subTypeInfo('Individual'));
+    $this->strictArrayCompare($this->getExpectedContactSubTypes('Individual'), CRM_Contact_BAO_ContactType::subTypeInfo('Individual'));
 
     // check for type:Organization
     $result = CRM_Contact_BAO_ContactType::subTypes('Organization');
     $this->assertEquals(array_keys($this->getExpectedContactSubTypes('Organization')), $result);
-    $this->assertEquals($this->getExpectedContactSubTypes('Organization'), CRM_Contact_BAO_ContactType::subTypeInfo('Organization'));
+    $this->strictArrayCompare($this->getExpectedContactSubTypes('Organization'), CRM_Contact_BAO_ContactType::subTypeInfo('Organization'));
 
     // check for type:Household
     $result = CRM_Contact_BAO_ContactType::subTypes('Household');
     $this->assertEquals(array_keys($this->getExpectedContactSubTypes('Household')), $result);
-    $this->assertEquals($this->getExpectedContactSubTypes('Household'), CRM_Contact_BAO_ContactType::subTypeInfo('Household'));
+    $this->strictArrayCompare($this->getExpectedContactSubTypes('Household'), CRM_Contact_BAO_ContactType::subTypeInfo('Household'));
 
     // check for all contact types
     $result = CRM_Contact_BAO_ContactType::subTypes();
     $subtypes = array_keys($this->getExpectedAllSubtypes());
     $this->assertEquals(sort($subtypes), sort($result));
-    $this->assertEquals($this->getExpectedAllSubtypes(), CRM_Contact_BAO_ContactType::subTypeInfo());
+    $this->strictArrayCompare($this->getExpectedAllSubtypes(), CRM_Contact_BAO_ContactType::subTypeInfo());
 
   }
 
@@ -110,7 +122,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $createdType = ContactType::create()->setValues($blahType)->execute()->first();
     $activeTypes = CRM_Contact_BAO_ContactType::contactTypeInfo();
     $expected = $this->getExpectedContactTypes();
-    $this->assertEquals($expected, $activeTypes);
+    $this->strictArrayCompare($expected, $activeTypes);
     $allTypes = CRM_Contact_BAO_ContactType::contactTypeInfo(TRUE);
     $expected['blah'] = [
       'is_active' => FALSE,
@@ -121,14 +133,12 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'is_reserved' => FALSE,
       'parent' => 'Individual',
       'parent_label' => 'Individual',
-      'description' => '',
-      'image_URL' => '',
+      'description' => NULL,
+      'image_URL' => NULL,
       'icon' => 'fa-random',
     ];
-    $this->assertEquals($expected, $allTypes);
     // Verify function returns field values formatted correctly by type
-    $this->assertTrue(is_int($allTypes['blah']['id']));
-    $this->assertFalse($allTypes['blah']['is_active']);
+    $this->strictArrayCompare($expected, $allTypes);
   }
 
   /**
@@ -138,174 +148,162 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
    */
   public function getExpectedContactTypes() {
     return [
-      'Individual' =>
-        [
-          'id' => '1',
-          'name' => 'Individual',
-          'label' => 'Individual',
-          'is_active' => TRUE,
-          'is_reserved' => TRUE,
-          'description' => '',
-          'parent_id' => NULL,
-          'parent' => NULL,
-          'parent_label' => NULL,
-          'image_URL' => '',
-          'icon' => 'fa-user',
-        ],
-      'Household' =>
-        [
-          'id' => '2',
-          'name' => 'Household',
-          'label' => 'Household',
-          'is_active' => TRUE,
-          'is_reserved' => TRUE,
-          'description' => '',
-          'parent_id' => NULL,
-          'parent' => NULL,
-          'parent_label' => NULL,
-          'image_URL' => '',
-          'icon' => 'fa-home',
-        ],
-      'Organization' =>
-        [
-          'id' => '3',
-          'name' => 'Organization',
-          'label' => 'Organization',
-          'is_active' => TRUE,
-          'is_reserved' => TRUE,
-          'description' => '',
-          'parent_id' => NULL,
-          'parent' => NULL,
-          'parent_label' => NULL,
-          'image_URL' => '',
-          'icon' => 'fa-building',
-        ],
-      'Student' =>
-        [
-          'id' => 4,
-          'name' => 'Student',
-          'label' => 'Student',
-          'parent_id' => 1,
-          'is_active' => '1',
-          'is_reserved' => FALSE,
-          'description' => '',
-          'parent' => 'Individual',
-          'parent_label' => 'Individual',
-          'image_URL' => '',
-          'icon' => 'fa-graduation-cap',
-        ],
-      'Parent' =>
-        [
-          'id' => 5,
-          'name' => 'Parent',
-          'label' => 'Parent',
-          'parent_id' => 1,
-          'is_active' => TRUE,
-          'is_reserved' => FALSE,
-          'description' => '',
-          'parent' => 'Individual',
-          'parent_label' => 'Individual',
-          'image_URL' => '',
-          'icon' => 'fa-user-circle-o',
-        ],
-      'Staff' =>
-        [
-          'id' => 6,
-          'name' => 'Staff',
-          'label' => 'Staff',
-          'parent_id' => 1,
-          'is_active' => TRUE,
-          'is_reserved' => FALSE,
-          'description' => '',
-          'parent' => 'Individual',
-          'parent_label' => 'Individual',
-          'image_URL' => '',
-          'icon' => 'fa-id-badge',
-        ],
-      'Team' =>
-        [
-          'id' => 7,
-          'name' => 'Team',
-          'label' => 'Team',
-          'parent_id' => 3,
-          'is_active' => TRUE,
-          'is_reserved' => FALSE,
-          'description' => '',
-          'parent' => 'Organization',
-          'parent_label' => 'Organization',
-          'image_URL' => '',
-          'icon' => 'fa-users',
-        ],
-      'Sponsor' =>
-        [
-          'id' => 8,
-          'name' => 'Sponsor',
-          'label' => 'Sponsor',
-          'parent_id' => 3,
-          'is_active' => TRUE,
-          'is_reserved' => FALSE,
-          'description' => '',
-          'parent' => 'Organization',
-          'parent_label' => 'Organization',
-          'image_URL' => '',
-          'icon' => 'fa-leaf',
-        ],
-      'sub1_individual' =>
-        [
-          'id' => $this->ids['ContactType'][0],
-          'name' => 'sub1_individual',
-          'label' => 'sub1_individual',
-          'parent_id' => 1,
-          'is_active' => TRUE,
-          'is_reserved' => FALSE,
-          'description' => '',
-          'parent' => 'Individual',
-          'parent_label' => 'Individual',
-          'image_URL' => '',
-          'icon' => '',
-        ],
-      'sub2_individual' =>
-        [
-          'id' => $this->ids['ContactType'][1],
-          'name' => 'sub2_individual',
-          'label' => 'sub2_individual',
-          'parent_id' => 1,
-          'is_active' => TRUE,
-          'is_reserved' => FALSE,
-          'description' => '',
-          'parent' => 'Individual',
-          'parent_label' => 'Individual',
-          'image_URL' => '',
-          'icon' => '',
-        ],
-      'sub_organization' =>
-        [
-          'id' => $this->ids['ContactType'][2],
-          'name' => 'sub_organization',
-          'label' => 'sub_organization',
-          'parent_id' => 3,
-          'is_active' => TRUE,
-          'is_reserved' => FALSE,
-          'description' => '',
-          'parent' => 'Organization',
-          'parent_label' => 'Organization',
-          'image_URL' => '',
-          'icon' => '',
-        ],
-      'sub_household' =>
-        [
-          'id' => $this->ids['ContactType'][3],
-          'name' => 'sub_household',
-          'label' => 'sub_household',
-          'parent_id' => 2,
-          'is_active' => TRUE,
-          'is_reserved' => FALSE,
-          'description' => '',
-          'parent' => 'Household',
-          'parent_label' => 'Household',
-          'image_URL' => '',
-          'icon' => '',
-        ],
+      'Individual' => [
+        'id' => 1,
+        'name' => 'Individual',
+        'label' => 'Individual',
+        'is_active' => TRUE,
+        'is_reserved' => TRUE,
+        'description' => NULL,
+        'parent_id' => NULL,
+        'parent' => NULL,
+        'parent_label' => NULL,
+        'image_URL' => NULL,
+        'icon' => 'fa-user',
+      ],
+      'Household' => [
+        'id' => 2,
+        'name' => 'Household',
+        'label' => 'Household',
+        'is_active' => TRUE,
+        'is_reserved' => TRUE,
+        'description' => NULL,
+        'parent_id' => NULL,
+        'parent' => NULL,
+        'parent_label' => NULL,
+        'image_URL' => NULL,
+        'icon' => 'fa-home',
+      ],
+      'Organization' => [
+        'id' => 3,
+        'name' => 'Organization',
+        'label' => 'Organization',
+        'is_active' => TRUE,
+        'is_reserved' => TRUE,
+        'description' => NULL,
+        'parent_id' => NULL,
+        'parent' => NULL,
+        'parent_label' => NULL,
+        'image_URL' => NULL,
+        'icon' => 'fa-building',
+      ],
+      'Student' => [
+        'id' => 4,
+        'name' => 'Student',
+        'label' => 'Student',
+        'parent_id' => 1,
+        'is_active' => TRUE,
+        'is_reserved' => FALSE,
+        'description' => NULL,
+        'parent' => 'Individual',
+        'parent_label' => 'Individual',
+        'image_URL' => NULL,
+        'icon' => 'fa-graduation-cap',
+      ],
+      'Parent' => [
+        'id' => 5,
+        'name' => 'Parent',
+        'label' => 'Parent',
+        'parent_id' => 1,
+        'is_active' => TRUE,
+        'is_reserved' => FALSE,
+        'description' => NULL,
+        'parent' => 'Individual',
+        'parent_label' => 'Individual',
+        'image_URL' => NULL,
+        'icon' => 'fa-user-circle-o',
+      ],
+      'Staff' => [
+        'id' => 6,
+        'name' => 'Staff',
+        'label' => 'Staff',
+        'parent_id' => 1,
+        'is_active' => TRUE,
+        'is_reserved' => FALSE,
+        'description' => NULL,
+        'parent' => 'Individual',
+        'parent_label' => 'Individual',
+        'image_URL' => NULL,
+        'icon' => 'fa-id-badge',
+      ],
+      'Team' => [
+        'id' => 7,
+        'name' => 'Team',
+        'label' => 'Team',
+        'parent_id' => 3,
+        'is_active' => TRUE,
+        'is_reserved' => FALSE,
+        'description' => NULL,
+        'parent' => 'Organization',
+        'parent_label' => 'Organization',
+        'image_URL' => NULL,
+        'icon' => 'fa-users',
+      ],
+      'Sponsor' => [
+        'id' => 8,
+        'name' => 'Sponsor',
+        'label' => 'Sponsor',
+        'parent_id' => 3,
+        'is_active' => TRUE,
+        'is_reserved' => FALSE,
+        'description' => NULL,
+        'parent' => 'Organization',
+        'parent_label' => 'Organization',
+        'image_URL' => NULL,
+        'icon' => 'fa-leaf',
+      ],
+      'sub1_individual' => [
+        'id' => $this->ids['ContactType'][0],
+        'name' => 'sub1_individual',
+        'label' => 'sub1_individual',
+        'parent_id' => 1,
+        'is_active' => TRUE,
+        'is_reserved' => FALSE,
+        'description' => NULL,
+        'parent' => 'Individual',
+        'parent_label' => 'Individual',
+        'image_URL' => NULL,
+        'icon' => 'fa-user',
+      ],
+      'sub2_individual' => [
+        'id' => $this->ids['ContactType'][1],
+        'name' => 'sub2_individual',
+        'label' => 'sub2_individual',
+        'parent_id' => 1,
+        'is_active' => TRUE,
+        'is_reserved' => FALSE,
+        'description' => NULL,
+        'parent' => 'Individual',
+        'parent_label' => 'Individual',
+        'image_URL' => NULL,
+        'icon' => 'fa-user',
+      ],
+      'sub_organization' => [
+        'id' => $this->ids['ContactType'][2],
+        'name' => 'sub_organization',
+        'label' => 'sub_organization',
+        'parent_id' => 3,
+        'is_active' => TRUE,
+        'is_reserved' => FALSE,
+        'description' => NULL,
+        'parent' => 'Organization',
+        'parent_label' => 'Organization',
+        'image_URL' => NULL,
+        'icon' => 'fa-building',
+      ],
+      'sub_household' => [
+        'id' => $this->ids['ContactType'][3],
+        'name' => 'sub_household',
+        'label' => 'sub_household',
+        'parent_id' => 2,
+        'is_active' => TRUE,
+        'is_reserved' => FALSE,
+        'description' => NULL,
+        'parent' => 'Household',
+        'parent_label' => 'Household',
+        'image_URL' => NULL,
+        'icon' => 'fa-home',
+      ],
     ];
   }
 

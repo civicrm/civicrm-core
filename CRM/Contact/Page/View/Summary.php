@@ -417,14 +417,14 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
 
     // now add all the custom tabs
-    $extends = ['Contact', $this->get('contactType')];
-    $style = ['Tab', 'Tab with table'];
-    $activeGroups = CRM_Core_BAO_CustomGroup::getPermitted(CRM_Core_Permission::VIEW);
+    $filters = [
+      'is_active' => TRUE,
+      'extends' => $this->get('contactType'),
+      'style' => ['Tab', 'Tab with table'],
+    ];
+    $activeGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::VIEW);
 
     foreach ($activeGroups as $group) {
-      if (!in_array($group['extends'], $extends) || !in_array($group['style'], $style)) {
-        continue;
-      }
       $id = "custom_{$group['id']}";
       $allTabs[] = [
         'id' => $id,
