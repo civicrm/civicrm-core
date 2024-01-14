@@ -299,12 +299,10 @@ class TimestampTriggers {
     $relations = $this->getRelations();
 
     if ($this->getCustomDataEntity()) {
-      $customGroupDAO = \CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity($this->getCustomDataEntity());
-      $customGroupDAO->is_multiple = 0;
-      $customGroupDAO->find();
-      while ($customGroupDAO->fetch()) {
+      $customGroups = \CRM_Core_BAO_CustomGroup::getAll(['extends' => $this->getCustomDataEntity(), 'is_multiple' => FALSE]);
+      foreach ($customGroups as $customGroup) {
         $relations[] = [
-          'table' => $customGroupDAO->table_name,
+          'table' => $customGroup['table_name'],
           'column' => 'entity_id',
         ];
       }

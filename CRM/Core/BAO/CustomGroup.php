@@ -1198,7 +1198,6 @@ ORDER BY civicrm_custom_group.weight,
    * @deprecated since 5.71, will be removed around 5.85
    */
   public static function &getActiveGroups($entityType, $path, $cidToken = '%%cid%%') {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getPermitted');
     // for Group's
     $customGroupDAO = new CRM_Core_DAO_CustomGroup();
 
@@ -1206,7 +1205,7 @@ ORDER BY civicrm_custom_group.weight,
     $customGroupDAO->whereAdd("style IN ('Tab', 'Tab with table')");
     $customGroupDAO->whereAdd("is_active = 1");
 
-    // add whereAdd for entity type
+    // Emits a noisy deprecation notice
     self::_addWhereAdd($customGroupDAO, $entityType, $cidToken);
 
     $groups = [];
@@ -1254,9 +1253,7 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * Get a list of custom groups which extend a given entity type.
-   * If there are custom-groups which only apply to certain subtypes,
-   * those WILL be included.
+   * @deprecated since 5.71 will be removed around 5.85
    *
    * @param string $entityType
    *
@@ -1264,22 +1261,16 @@ ORDER BY civicrm_custom_group.weight,
    */
   public static function getAllCustomGroupsByBaseEntity($entityType) {
     $customGroupDAO = new CRM_Core_DAO_CustomGroup();
+    // Emits a noisy deprecation notice
     self::_addWhereAdd($customGroupDAO, $entityType, NULL, TRUE);
     return $customGroupDAO;
   }
 
   /**
-   * Add the whereAdd clause for the DAO depending on the type of entity
-   * the custom group is extending.
-   *
-   * @param object $customGroupDAO
-   * @param string $entityType
-   *   What entity are we extending here ?.
-   *
-   * @param int $entityID
-   * @param bool $allSubtypes
+   * @deprecated since 5.71 will be removed around 5.85
    */
   private static function _addWhereAdd(&$customGroupDAO, $entityType, $entityID = NULL, $allSubtypes = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getAll');
     $addSubtypeClause = FALSE;
     // This function isn't really accessible with user data but since the string
     // is not passed as a param to the query CRM_Core_DAO::escapeString seems like a harmless
@@ -1543,7 +1534,7 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * Old function only called from one place...
+   * @deprecated function only called from one place...
    * @see CRM_Dedupe_Finder::formatParams
    *
    * @param array $groupTree
