@@ -317,18 +317,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $this->set('additionalParticipantIds', $this->_additionalParticipantIds);
       }
 
-      $eventFull = CRM_Event_BAO_Participant::eventFull($this->getEventID(), FALSE,
-        $this->_values['event']['has_waitlist'] ?? NULL
-      );
-
-      $this->_allowWaitlist = $this->_isEventFull = FALSE;
-      if ($eventFull && !$this->_allowConfirmation) {
-        $this->_isEventFull = TRUE;
+      $this->_isEventFull = $this->getEventValue('available_spaces') < 1 && !$this->_allowConfirmation;
+      $this->_allowWaitlist = $this->getEventValue('has_waitlist');
+      if ($this->_isEventFull && !$this->_allowWaitlist) {
         //lets redirecting to info only when to waiting list.
-        $this->_allowWaitlist = $this->_values['event']['has_waitlist'] ?? NULL;
-        if (!$this->_allowWaitlist) {
-          CRM_Utils_System::redirect($this->getInfoPageUrl());
-        }
+        CRM_Utils_System::redirect($this->getInfoPageUrl());
       }
       $this->set('isEventFull', $this->_isEventFull);
       $this->set('allowWaitlist', $this->_allowWaitlist);
@@ -419,13 +412,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       $this->set('values', $this->_values);
       $this->set('fields', $this->_fields);
-
-      $this->_availableRegistrations
-        = CRM_Event_BAO_Participant::eventFull(
-        $this->_values['event']['id'], TRUE,
-        $this->_values['event']['has_waitlist'] ?? NULL
-      );
-      $this->set('availableRegistrations', $this->_availableRegistrations);
+      $this->set('availableRegistrations', $this->getEventValue('available_spaces'));
     }
     $this->assign_by_ref('paymentProcessor', $this->_paymentProcessor);
 
@@ -1448,6 +1435,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getAvailableSpaces(): int {
+    if (!isset($this->_availableRegistrations)) {
+      $this->_availableRegistrations
+        = CRM_Event_BAO_Participant::eventFull(
+        $this->getEventID(), TRUE,
+        $this->getEventValue('has_waitlist')
+      );
+    }
     // non numeric would be 'event full text'....
     return is_numeric($this->_availableRegistrations) ? (int) $this->_availableRegistrations : 0;
   }
