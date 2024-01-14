@@ -35,7 +35,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    *
    * @param array $filters
    *   [key => value] pairs to filter each custom group.
-   *   - $filters[extends] will auto-expand Contact types
+   *   - $filters[extends] will auto-expand Contact types (if passed as a string)
    *   - $filters[is_active] will also filter the fields
    * @param int|null $permissionType
    *   Check permission: (CRM_Core_Permission::VIEW | CRM_Core_Permission::EDIT)
@@ -55,21 +55,37 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     }
     if (!empty($filters['extends']) && is_string($filters['extends'])) {
       $contactTypes = CRM_Contact_BAO_ContactType::basicTypes(TRUE);
+      // "Contact" should include all contact types (Individual, Organization, Household)
       if ($filters['extends'] === 'Contact') {
         $filters['extends'] = array_merge(['Contact'], $contactTypes);
       }
+      // A contact type (e.g. "Individual") should include "Contact"
       elseif (in_array($filters['extends'], $contactTypes, TRUE)) {
         $filters['extends'] = ['Contact', $filters['extends']];
       }
     }
     $allGroups = array_filter(self::loadAll(), function($group) use ($filters) {
-      foreach ($filters as $key => $value) {
-        if (is_array($value)) {
-          if (!in_array($group[$key], $value)) {
+      foreach ($filters as $filterKey => $filterValue) {
+        $groupValue = $group[$filterKey] ?? NULL;
+        // Compare arrays using array_intersect
+        if (is_array($filterValue) && is_array($groupValue)) {
+          if (!array_intersect($groupValue, $filterValue)) {
             return FALSE;
           }
         }
-        elseif ($group[$key] != $value) {
+        // Compare arrays with scalar using in_array
+        elseif (is_array($filterValue)) {
+          if (!in_array($groupValue, $filterValue)) {
+            return FALSE;
+          }
+        }
+        elseif (is_array($groupValue)) {
+          if (!in_array($filterValue, $groupValue)) {
+            return FALSE;
+          }
+        }
+        // Compare scalar values with ==
+        elseif ($groupValue != $filterValue) {
           return FALSE;
         }
       }
@@ -116,8 +132,10 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
           $groupData['fields'] = [];
           $custom[$groupName] = $groupData;
         }
-        CRM_Core_BAO_CustomField::formatFieldValues($fieldData);
-        $custom[$groupName]['fields'][] = $fieldData;
+        if ($fieldData['id']) {
+          CRM_Core_BAO_CustomField::formatFieldValues($fieldData);
+          $custom[$groupName]['fields'][] = $fieldData;
+        }
       }
       $custom = array_values($custom);
       Civi::cache('metadata')->set($cacheString, $custom);
