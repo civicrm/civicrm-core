@@ -10,6 +10,8 @@
 
  */
 
+use Civi\Api4\Participant;
+
 /**
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
@@ -1481,25 +1483,19 @@ UPDATE  civicrm_participant
    *
    * @return string
    */
-  public static function eventFullMessage($eventId, $participantId = NULL) {
+  public static function eventFullMessage(int $eventId, $participantId = NULL) {
     $eventfullMsg = $dbStatusId = NULL;
-    $checkEventFull = TRUE;
     if ($participantId) {
       $dbStatusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'status_id');
       if (array_key_exists($dbStatusId, CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1'))) {
         //participant already in counted status no need to check for event full messages.
-        $checkEventFull = FALSE;
+        return FALSE;
       }
     }
 
-    //early return.
-    if (!$eventId || !$checkEventFull) {
-      return $eventfullMsg;
-    }
-
     //event is truly full.
-    $emptySeats = self::eventFull($eventId, FALSE, FALSE);
-    if (is_string($emptySeats) && $emptySeats !== NULL) {
+    $emptySeats = self::eventFull($eventId, TRUE, FALSE);
+    if ($emptySeats < 1) {
       $maxParticipants = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventId, 'max_participants');
       $eventfullMsg = ts("This event currently has the maximum number of participants registered (%1). However, you can still override this limit and register additional participants using this form.", [
         1 => $maxParticipants,

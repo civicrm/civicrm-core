@@ -1660,7 +1660,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public function getParticipantID(): ?int {
     if ($this->isOverloadFeesMode()) {
       $participantID = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
-      return $participantID ? (int)  $participantID: NULL;
+      return $participantID ? (int) $participantID : NULL;
     }
     if ($this->_id === NULL) {
       $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
