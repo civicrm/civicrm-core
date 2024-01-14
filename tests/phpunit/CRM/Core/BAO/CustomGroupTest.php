@@ -27,7 +27,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testGetFiltered(): void {
+  public function testGetAll(): void {
     $this->quickCleanup([], TRUE);
 
     $activeGroup = $this->CustomGroupCreate(['title' => 'ActiveGroup', 'weight' => 1, 'extends' => 'Household']);
@@ -44,8 +44,11 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertCount(2, $allGroups[0]['fields']);
     $this->assertCount(1, $allGroups[1]['fields']);
     $this->assertCount(1, $activeGroups);
-    $this->assertEquals($activeGroup['id'], $activeGroups[0]['id']);
+    $this->assertTrue($activeGroups[0]['is_active']);
+    $this->assertSame($activeGroup['id'], $activeGroups[0]['id']);
     $this->assertCount(1, $activeGroups[0]['fields']);
+    $this->assertTrue($activeGroups[0]['fields'][0]['is_active']);
+    $this->assertNull($activeGroups[0]['fields'][0]['help_pre']);
 
     $activityGroups = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Activity']);
     $this->assertCount(1, $activityGroups);

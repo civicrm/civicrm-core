@@ -640,6 +640,10 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return mixed
    */
   protected static function formatFieldValue($value, ?array $fieldSpec) {
+    // DAO queries return `null` db values as empty string
+    if ($value === '' && empty($fieldSpec['required'])) {
+      return NULL;
+    }
     if (!isset($value) || !isset($fieldSpec)) {
       return $value;
     }
