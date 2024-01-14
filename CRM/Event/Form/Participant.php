@@ -111,6 +111,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * If event is paid or unpaid.
    *
    * @var bool
+   *
+   * @deprecated use $this->getEventValue('is_monetary')
    */
   public $_isPaidEvent;
 
@@ -211,7 +213,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return int|null
    */
   public function getEventID(): ?int {
-    return $this->_eventId ?: ($this->getSubmittedValue('event_id') ? (int) $this->getSubmittedValue('event_id') : NULL);
+    if ($this->isOverloadFeesMode()) {
+      $this->_eventId = CRM_Utils_Request::retrieve('eventId', 'Positive', $this);
+    }
+    if ($this->_eventId) {
+      return (int) $this->_eventId;
+    }
+    return $this->getSubmittedValue('event_id') ? (int) $this->getSubmittedValue('event_id') : NULL;
   }
 
   /**
@@ -335,7 +343,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if ($this->_submitValues['event_id']) {
         $this->_eventId = (int) $this->_submitValues['event_id'];
       }
-      $this->buildEventFeeForm($this);
+      $this->buildEventFeeForm();
       CRM_Event_Form_EventFees::setDefaultValues($this);
     }
 
@@ -577,7 +585,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
 
     if ($this->isOverloadFeesMode()) {
-      return $this->buildEventFeeForm($this);
+      return $this->buildAjaxFeesForm();
     }
 
     //need to assign custom data type to the template
@@ -1219,37 +1227,21 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @internal - this will be made protected, once some notice is provided to lineItem
    * edit extension which calls it form tests.
    *
-   * @param \CRM_Event_Form_Participant $form
-   *
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
-  public function buildEventFeeForm($form) {
-    //as when call come from register.php
-    if (!$form->_eventId) {
-      $form->_eventId = CRM_Utils_Request::retrieve('eventId', 'Positive', $form);
-    }
-
+  public function buildEventFeeForm() {
+    $form = $this;
     $form->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $form);
     $form->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $form);
-
-    if ($form->_eventId) {
-      $form->_isPaidEvent = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'is_monetary');
-      if ($form->_isPaidEvent) {
-        $form->addElement('hidden', 'hidden_feeblock', 1);
-      }
-
-      $eventfullMsg = CRM_Event_BAO_Participant::eventFullMessage($form->_eventId, $this->getParticipantID());
-      $form->addElement('hidden', 'hidden_eventFullMsg', $eventfullMsg, ['id' => 'hidden_eventFullMsg']);
-    }
-
-    if ($form->_isPaidEvent) {
-      $params = ['id' => $form->_eventId];
+    $form->_isPaidEvent = $form->getEventValue('is_monetary');
+    if ($form->getEventValue('is_monetary')) {
+      $params = ['id' => $this->getEventID()];
       CRM_Event_BAO_Event::retrieve($params, $event);
 
       //retrieve custom information
       $this->_values = [];
-      $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'participant');
+      $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->getParticipantID(), 'participant');
       self::initEventFee($form, $this->getPriceSetID());
       if ($form->_context === 'standalone' || $form->_context === 'participant') {
         $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($event['id'], 'civicrm_event');
@@ -1666,6 +1658,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @noinspection PhpDocMissingThrowsInspection
    */
   public function getParticipantID(): ?int {
+    if ($this->isOverloadFeesMode()) {
+      $participantID = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
+      return $participantID ? (int)  $participantID: NULL;
+    }
     if ($this->_id === NULL) {
       $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
       $this->_id = $id ? (int) $id : FALSE;
@@ -2158,6 +2154,27 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     }
     $form->_priceSet['id'] ??= $priceSetID;
     $form->assign('priceSet', $form->_priceSet);
+  }
+
+  /**
+   * Build the form that is loaded via ajax.
+   *
+   * Note this is not really 'part' of this form - it's just using the same
+   * url / sharing some code. @todo - give this it's own url / menu item.
+   * The shared code part is only that the fields need to be added to the form
+   * so that QUickForm picks them up on submit.
+   *
+   * @return false|void
+   * @throws \CRM_Core_Exception
+   */
+  protected function buildAjaxFeesForm() {
+    if ($this->getEventValue('is_monetary')) {
+      $this->addElement('hidden', 'hidden_feeblock', 1);
+      $availableSpaces = $this->getEventValue('available_spaces');
+      $eventFullMessage = $availableSpaces ? NULL : CRM_Event_BAO_Participant::eventFullMessage($this->getEventID(), $this->getParticipantID());
+      $this->addElement('hidden', 'hidden_eventFullMsg', CRM_Utils_String::purifyHTML($eventFullMessage), ['id' => 'hidden_eventFullMsg']);
+    }
+    return $this->buildEventFeeForm();
   }
 
 }
