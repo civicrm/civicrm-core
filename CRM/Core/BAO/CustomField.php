@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\CustomField;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -459,84 +458,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Get all active custom fields (cached wrapper).
-   *
-   * @param false|int $permissionType
-   *   - Either FALSE (do not check) or CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT
-   *
-   * @return array
-   *   List of customField details keyed by customFieldID
-   * @throws \CRM_Core_Exception
-   */
-  public static function getAllCustomFields($permissionType): array {
-    if ($permissionType !== FALSE && !is_int($permissionType)) {
-      throw new CRM_Core_Exception('permissionCheck must be FALSE or CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT');
-    }
-    $cacheString = __CLASS__ . __FUNCTION__ . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
-    if ($permissionType) {
-      $cacheString .= 'check_' . $permissionType . '_user_' . CRM_Core_Session::getLoggedInContactID();
-    }
-    if (!Civi::cache('metadata')->has($cacheString)) {
-      $apiCall = CustomField::get(FALSE)
-        ->addOrderBy('custom_group_id.title')
-        ->addOrderBy('custom_group_id.weight')
-        ->addOrderBy('weight')
-        ->addOrderBy('label')
-        ->addSelect('*')
-        ->addSelect('custom_group_id.extends')
-        ->addSelect('custom_group_id.extends_entity_column_id')
-        ->addSelect('custom_group_id.extends_entity_column_value')
-        ->addSelect('custom_group_id.is_active')
-        ->addSelect('custom_group_id.name')
-        ->addSelect('custom_group_id.title')
-        ->addSelect('custom_group_id.table_name')
-        ->addSelect('custom_group_id.is_public');
-      if ($permissionType && !CRM_Core_Permission::customGroupAdmin()) {
-        $availableGroups = CRM_Core_Permission::customGroup($permissionType);
-        $apiCall->addWhere('custom_group_id', 'IN', empty($availableGroups) ? [0] : $availableGroups);
-      }
-
-      $types = (array) $apiCall->execute()->indexBy('id');
-
-      Civi::cache('metadata')->set($cacheString, $types);
-    }
-    return Civi::cache('metadata')->get($cacheString);
-  }
-
-  /**
-   * Get all active custom fields for the given contact type.
-   *
-   * This is formatted as an apiv4 Style array.
-   *
-   * @param string $contactType
-   * @param bool|int $permissionType
-   *  - Either FALSE (do not check) or CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT
-   * @param array $contactSubTypes
-   *
-   * @return array $fields
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public static function getCustomFieldsForContactType(string $contactType, $permissionType, array $contactSubTypes = []): array {
-    $fields = [];
-    foreach (self::getAllCustomFields($permissionType) as $field) {
-      if ($field['custom_group_id.extends'] === $contactType || $field['custom_group_id.extends'] === 'Contact') {
-        if (empty($contactSubTypes) || empty($field['custom_group_id.extends_entity_column_value'])) {
-          $fields[$field['id']] = $field;
-        }
-        else {
-          foreach ($contactSubTypes as $contactSubType) {
-            if (in_array($contactSubType, $field['custom_group_id.extends_entity_column_value'], TRUE)) {
-              $fields[$field['id']] = $field;
-            }
-          }
-        }
-      }
-    }
-    return $fields;
-  }
-
-  /**
    * Return field ids and names (with groups).
    *
    * NOTE: Despite this function's name, it is used both for IMPORT and EXPORT.
@@ -663,85 +584,25 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Use the cache to get all values of a specific custom field.
+   * Get all values of a specific custom field + its custom group.
    *
    * @param int $id
    *   The custom field ID.
-   * @param int|false $permissionType
    *
-   * @return array
+   * @return array|null
    *   The field object.
    * @throws CRM_Core_Exception
    */
-  public static function getField(int $id, $permissionType = FALSE): array {
-    $field = self::getAllCustomFields($permissionType)[$id];
-    // @todo - on the fence about caching these in the cache for all custom fields. The down side is the
-    // cache array could get really big & serializing & un-serializing big arrays is expensive.
-    $entity = in_array($field['custom_group_id.extends'], CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE) ? 'Contact' : $field['custom_group_id.extends'];
-    $field['options'] = self::getFieldOptions($field['id'], $field['option_group_id'], $field['data_type'], $entity);
-    return $field;
-  }
-
-  /**
-   * Gets an array of custom fields that are public.
-   *
-   * @internal do not use from untested or external code - signature may change.
-   *
-   * This takes into account
-   *  - the is_public setting on the Custom Group
-   *  - the is_view permission on the field (these are generally suppressed).
-   *
-   * @param string $extends
-   * @param array $extendsEntity
-   *   Keyed by name values from CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions()
-   *   Values can be an int or an array.
-   *   eg ['ParticipantRole' = [1], 'ParticipantEventType' => 2], ['ParticipantEventName' => 3]
-   * @param int $permissionType
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public static function getViewableCustomFields(string $extends, array $extendsEntity = [], $permissionType = CRM_Core_Permission::VIEW): array {
-    $entityFilters = [];
-    // Convert from ['ParticipantRole' = [1], 'ParticipantEventType' => 2], ['ParticipantEventName' => 3]
-    // to [1 => [1], 2 => [2], 3 = [3]
-    if (!empty($extendsEntity)) {
-      $entityColumns = CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions();
-      foreach ($entityColumns as $entityColumn) {
-        if (isset($extendsEntity[$entityColumn['name']])) {
-          $entityFilters[(int) $entityColumn['id']] = (array) $extendsEntity[$entityColumn['name']];
-          foreach ($entityFilters[$entityColumn['id']] as &$value) {
-            // Cast to string because we don't want the calling function to have to worry
-            // but also the array intersect fails otherwise.
-            $value = (string) $value;
-          }
+  public static function getField(int $id): ?array {
+    foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+      foreach ($customGroup['fields'] as $field) {
+        if ($field['id'] === $id) {
+          $field['custom_group'] = array_diff_key($customGroup, ['fields' => 1]);
+          return $field;
         }
       }
     }
-    $cacheKey = $extends . $permissionType . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale() . substr(md5(json_encode($extendsEntity)), 0, 30);
-    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey])) {
-      \Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey] = [];
-      $allFields = CRM_Core_BAO_CustomField::getAllCustomFields($permissionType);
-      foreach ($allFields as $field) {
-        $entityValueMatches = array_intersect((array) $field['custom_group_id.extends_entity_column_value'], ($entityFilters[$field['custom_group_id.extends_entity_column_id']] ?? []));
-        if (
-          !$field['is_view']
-          && $field['custom_group_id.is_public']
-          && (
-            !empty($entityValueMatches)
-            || empty($entityFilters)
-            || empty($field['custom_group_id.extends_entity_column_id'])
-          )
-          && (
-            $field['custom_group_id.extends'] === $extends
-            || ($field['custom_group_id.extends'] === 'Contact' && in_array($extends, ['Individual', 'Organization', 'Household']))
-          )
-        ) {
-          \Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey][(int) $field['id']] = $field;
-        }
-      }
-    }
-    return \Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey];
+    return NULL;
   }
 
   /**
@@ -1124,6 +985,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $fieldID = is_object($fieldID) ? $fieldID->id : (int) str_replace('custom_', '', $fieldID);
     }
     $fieldInfo = self::getField($fieldID);
+    $fieldInfo['options'] = self::getFieldOptions($fieldID, $fieldInfo['option_group_id'], $fieldInfo['data_type'], $fieldInfo['custom_group']['extends']);
     $displayValue = self::formatDisplayValue($value, $fieldInfo, $entityID);
     // Call hook to alter display value.
     CRM_Utils_Hook::alterCustomFieldDisplayValue($displayValue, $value, $entityID, $fieldInfo);
@@ -2872,6 +2734,7 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     $cache = CRM_Utils_Cache::singleton();
     $options = $cache->get($cacheKey);
     if (!isset($options)) {
+      $entity = in_array($entity, CRM_Contact_BAO_ContactType::basicTypes(TRUE)) ? 'Contact' : $entity;
       // This will hold the list of options in format key => label
       $options = [];
 
