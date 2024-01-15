@@ -431,6 +431,9 @@ class Container {
       [new Reference('service_container')]
     ))->setFactory([new Reference(self::SELF), 'createEsmLoader'])->setPublic(TRUE);
 
+    // Reset list of entities to be populated by newly registered event listeners
+    \CRM_Core_DAO_AllCoreTables::flush();
+
     \CRM_Utils_Hook::container($container);
 
     return $container;
