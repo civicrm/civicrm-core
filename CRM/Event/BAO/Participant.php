@@ -314,7 +314,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
    *   Consider waiting list in event full.
    *                 calculation or not. (it is for cron job  purpose)
    *
-   * @param bool $returnWaitingCount
+   * @param false $returnWaitingCount deprecated, always false
    * @param bool $considerTestParticipant deprecated, unused
    * @param bool $onlyPositiveStatuses
    *   When FALSE, count all participant statuses where is_counted = 1.  This includes
@@ -375,6 +375,7 @@ INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
       if ($hasWaitlistedParticipants) {
         //oops here event is full and we don't want waiting count.
         if ($returnWaitingCount) {
+          CRM_Core_Error::deprecatedWarning('never reached');
           return CRM_Event_BAO_Event::eventTotalSeats($eventId, $eventSeatsWhere);
         }
         return CRM_Core_DAO::singleValueQuery('SELECT event_full_text FROM civicrm_event WHERE id = ' . (int) $eventId) ?: ts('This event is full.');
