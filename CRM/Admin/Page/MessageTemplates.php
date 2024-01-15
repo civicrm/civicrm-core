@@ -260,6 +260,10 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     $messageTemplate->find();
     while ($messageTemplate->fetch()) {
       $values[$messageTemplate->id] = ['class' => ''];
+      // Make the subject a empty string if it isn't defined
+      if (!isset($messageTemplate->msg_subject)) {
+        $messageTemplate->msg_subject = "";
+      }
       CRM_Core_DAO::storeValues($messageTemplate, $values[$messageTemplate->id]);
       // populate action links
       $this->action($messageTemplate, $action, $values[$messageTemplate->id], $links, CRM_Core_Permission::EDIT);
