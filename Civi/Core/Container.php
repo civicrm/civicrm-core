@@ -417,7 +417,15 @@ class Container {
         $file = (new \ReflectionClass($baoClass))->getFileName();
         $container->addResource(new \Symfony\Component\Config\Resource\FileResource($file));
         $dispatcherDefn->addMethodCall('addListenerMap', [$baoClass, $listenerMap]);
+        if ([] !== array_filter($listenerMap, function($key) {
+            return strpos($key, 'hook_civicrm_entityTypes') !== FALSE;
+          }, ARRAY_FILTER_USE_KEY)) {
+          $flushEntityTypes = TRUE;
+        }
       }
+    }
+    if ($flushEntityTypes ?? FALSE) {
+      \CRM_Core_DAO_AllCoreTables::flush();
     }
 
     // FIXME: Automatically scan BasicServices for ProviderInterface.
