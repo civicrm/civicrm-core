@@ -22,7 +22,7 @@
         element = document.Main.elements[i];
         if ( element.type == 'radio' && element.name === mainPriceFieldName ) {
           if (element.value == '0' ) {
-            element.click();
+            element.checked = true;
           }
           else {
             element.checked = false;
