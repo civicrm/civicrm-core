@@ -2536,26 +2536,10 @@ WHERE      f.id IN ($ids)";
    * @return bool
    */
   public static function isMultiRecordField($customId) {
-    $isMultipleWithGid = FALSE;
     if (!is_numeric($customId)) {
       $customId = self::getKeyID($customId);
     }
-    if (is_numeric($customId)) {
-      $sql = "SELECT cg.id cgId
- FROM civicrm_custom_group cg
- INNER JOIN civicrm_custom_field cf
- ON cg.id = cf.custom_group_id
-WHERE cf.id = %1 AND cg.is_multiple = 1";
-      $params[1] = [$customId, 'Integer'];
-      $dao = CRM_Core_DAO::executeQuery($sql, $params);
-      if ($dao->fetch()) {
-        if ($dao->cgId) {
-          $isMultipleWithGid = $dao->cgId;
-        }
-      }
-    }
-
-    return $isMultipleWithGid;
+    return self::getField((int) $customId)['custom_group']['is_multiple'] ?? FALSE;
   }
 
   /**
@@ -2608,7 +2592,7 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
    * @return string
    */
   public function getEntity() {
-    $entity = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'extends');
+    $entity = self::getField($this->id)['custom_group']['extends'];
     return in_array($entity, CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE) ? 'Contact' : $entity;
   }
 
@@ -2617,12 +2601,11 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
    * @return string
    */
   public function getEntityName(): string {
-    $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'is_multiple');
-    if ($isMultiple) {
-      $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'name');
-      return "Custom_$groupName";
+    $customGroup = self::getField($this->id)['custom_group'];
+    if ($customGroup['is_multiple']) {
+      return "Custom_{$customGroup['name']}";
     }
-    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->custom_group_id, 'extends');
+    return $customGroup['extends'];
   }
 
   /**
