@@ -940,7 +940,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
 
     if ($paymentStatus == 'Completed'
       && CRM_Contribute_PseudoConstant::contributionStatus($existing['contribution_status_id'], 'name') == 'Pending') {
-      $params['contribution_status_id'] = 'In Progress';
+      $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'In Progress');
     }
     if ($paymentStatus == 'Failed') {
       $params['failure_count'] = $existing['failure_count'];
@@ -948,7 +948,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $params['modified_date'] = date('Y-m-d H:i:s');
 
     if (!empty($existing['installments']) && self::isComplete($recurringContributionID, $existing['installments'])) {
-      $params['contribution_status_id'] = 'Completed';
+      $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Completed');
       $params['next_sched_contribution_date'] = 'null';
       $params['end_date'] = 'now';
     }
