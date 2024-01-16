@@ -94,10 +94,10 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     // The `is_active` filter applies to fields as well as groups.
     if (!empty($filters['is_active'])) {
       foreach ($allGroups as $groupIndex => $group) {
-        $allGroups[$groupIndex]['fields'] = array_values(array_filter($group['fields'], fn($field) => $field['is_active']));
+        $allGroups[$groupIndex]['fields'] = array_filter($group['fields'], fn($field) => $field['is_active']);
       }
     }
-    return array_values($allGroups);
+    return $allGroups;
   }
 
   /**
@@ -125,19 +125,18 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         ->orderBy(['g.weight', 'g.name', 'f.weight', 'f.name'])
         ->execute()->fetchAll();
       foreach ($data as $groupData) {
-        $groupName = $groupData['name'];
+        $groupId = (int) $groupData['id'];
         $fieldData = CRM_Utils_Array::filterByPrefix($groupData, 'field__');
-        if (!isset($custom[$groupName])) {
+        if (!isset($custom[$groupId])) {
           self::formatFieldValues($groupData);
           $groupData['fields'] = [];
-          $custom[$groupName] = $groupData;
+          $custom[$groupId] = $groupData;
         }
         if ($fieldData['id']) {
           CRM_Core_BAO_CustomField::formatFieldValues($fieldData);
-          $custom[$groupName]['fields'][] = $fieldData;
+          $custom[$groupId]['fields'][$fieldData['id']] = $fieldData;
         }
       }
-      $custom = array_values($custom);
       Civi::cache('metadata')->set($cacheString, $custom);
     }
     return $custom;

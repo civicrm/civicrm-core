@@ -595,11 +595,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    */
   public static function getField(int $id): ?array {
     foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
-      foreach ($customGroup['fields'] as $field) {
-        if ($field['id'] === $id) {
-          $field['custom_group'] = array_diff_key($customGroup, ['fields' => 1]);
-          return $field;
-        }
+      if (isset($customGroup['fields'][$id])) {
+        $customGroup['fields'][$id]['custom_group'] = array_diff_key($customGroup, ['fields' => 1]);
+        return $customGroup['fields'][$id];
       }
     }
     return NULL;
