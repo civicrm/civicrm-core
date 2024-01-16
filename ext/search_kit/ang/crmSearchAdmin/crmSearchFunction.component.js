@@ -105,7 +105,8 @@
         if (ctrl.expr && ctrl.fieldArg) {
           if (ctrl.mode !== 'groupBy' && ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
             allowedTypes.push('aggregate');
-          } else {
+          }
+          if (ctrl.mode === 'groupBy' || !ctrl.crmSearchAdmin.mustAggregate(ctrl.expr)) {
             allowedTypes.push('comparison', 'string');
             if (_.includes(['Integer', 'Float', 'Date', 'Timestamp', 'Money'], ctrl.fieldArg.field.data_type)) {
               allowedTypes.push('math');
