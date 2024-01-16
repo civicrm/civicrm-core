@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Extension;
+
 /**
  * This class contains generic upgrade logic which runs regardless of version.
  */
@@ -134,8 +136,7 @@ class CRM_Upgrade_Incremental_General {
     }
 
     $ftAclSetting = Civi::settings()->get('acl_financial_type');
-    $financialAclExtension = civicrm_api3('extension', 'get', ['key' => 'biz.jmaconsulting.financialaclreport', 'sequential' => 1]);
-    if ($ftAclSetting && (($financialAclExtension['count'] == 1 && $financialAclExtension['values'][0]['status'] != 'Installed') || $financialAclExtension['count'] !== 1)) {
+    if ($ftAclSetting && !self::isExtensionInstalled('biz.jmaconsulting.financialaclreport')) {
       $preUpgradeMessage .= '<br />' . ts('CiviCRM will in the future require the extension %1 for CiviCRM Reports to work correctly with the Financial Type ACLs. The extension can be downloaded <a href="%2">here</a>', [
         1 => 'biz.jmaconsulting.financialaclreport',
         2 => 'https://github.com/JMAConsulting/biz.jmaconsulting.financialaclreport',
@@ -183,6 +184,16 @@ class CRM_Upgrade_Incremental_General {
     ]) . '<ul>' . implode('', $messagesHtml) . '</ul>';
 
     $messageObj->updateTemplates();
+  }
+
+  private static function isExtensionInstalled(string $key): bool {
+    $extension = Extension::get(FALSE)
+      ->addWhere('key', '=', $key)
+      ->addWhere('status', '=', 'Installed')
+      ->selectRowCount()
+      ->execute();
+
+    return $extension->countMatched() === 1;
   }
 
 }
