@@ -5,7 +5,6 @@
  */
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
-use CRM_Standaloneusers_ExtensionUtil as E;
 
 class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implements \Civi\Core\HookInterface {
 
@@ -19,6 +18,9 @@ class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implemen
   }
 
   /**
+   * Check access permission
+   *
+   * @param \Civi\Api4\Event\AuthorizeRecordEvent $e
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {

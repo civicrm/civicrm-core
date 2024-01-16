@@ -224,7 +224,7 @@ class Security {
   }
 
   /**
-   * Currently only used by CRM_Utils_System_Standalone::loadBootstrap
+   * Register the given user as the currently logged in user.
    */
   public function loginAuthenticatedUserRecord(array $user, bool $withSession) {
     global $loggedInUserId, $loggedInUser;

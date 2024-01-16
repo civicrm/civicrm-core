@@ -119,6 +119,9 @@
     <length>128</length>
     <readonly>true</readonly>
     <comment>Hashed, not plaintext password</comment>
+    <permission>
+      <or>administer CiviCRM, cms:administer users</or>
+    </permission>
   </field>
 
   <field>
@@ -199,5 +202,8 @@
     <type>varchar</type>
     <length>40</length>
     <readonly>true</readonly>
+    <permission>
+      <or>administer CiviCRM, cms:administer users</or>
+    </permission>
   </field>
 </table>
