@@ -122,7 +122,7 @@ return [
               'dataType' => 'Boolean',
               'label' => E::ts('Auto Renew'),
               'sortable' => FALSE,
-              'rewrite' => '{ts}{/ts}',
+              'rewrite' => ' ',
               'icons' => [
                 [
                   'icon' => 'fa-exclamation-triangle',
@@ -370,8 +370,8 @@ return [
               'key' => 'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
               'dataType' => 'Boolean',
               'label' => E::ts('Auto Renew'),
-              'sortable' => TRUE,
-              'rewrite' => '{ts}{/ts}',
+              'sortable' => FALSE,
+              'rewrite' => ' ',
               'icons' => [
                 [
                   'icon' => 'fa-exclamation-triangle',
