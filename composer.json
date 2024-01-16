@@ -264,6 +264,7 @@
         "ignore": ["examples"]
       }
     },
+    "patches-comments": "For information about defining patches via composer.json, see https://docs.civicrm.org/dev/en/latest/core/dependencies/",
     "patches": {
       "adrienrn/php-mimetyper": {
         "Update gitignore to ensure that sites that manage via git don't miss out on the important db.json file": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/15.patch",
