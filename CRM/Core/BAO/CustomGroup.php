@@ -424,10 +424,16 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
-   * Get custom groups/fields data for type of entity in a tree structure representing group->field hierarchy
-   * This may also include entity specific data values.
+   * @deprecated Function demonstrates just how bad code can get from 20 years of entropy.
    *
-   * An array containing all custom groups and their custom fields is returned.
+   * This function takes an overcomplicated set of params and returns an overcomplicated
+   * mix of custom groups, custom fields, custom values (if passed $entityID), and other random stuff.
+   *
+   * @see CRM_Core_BAO_CustomGroup::getAll()
+   * for a better alternative to fetching a tree of custom groups and fields.
+   *
+   * @see APIv4::get()
+   * for a better alternative to fetching entity values.
    *
    * @param string $entityType
    *   Of the contact whose contact type is needed.
@@ -449,17 +455,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    *   holds 'new' or id if view/edit/copy form for a single record is being loaded.
    * @param bool $showPublicOnly
    *
-   * @return array
-   *   Custom field 'tree'.
-   *
+   * @return array[]
    *   The returned array is keyed by group id and has the custom group table fields
    *   and a subkey 'fields' holding the specific custom fields.
    *   If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
    *   if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
-   *
-   * @todo - review this  - It also returns an array called 'info' with tables, select, from, where keys
-   *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
-   *   With caching the performance impact would be small & the function would be cleaner
    *
    * @throws \CRM_Core_Exception
    */
@@ -477,8 +477,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     $singleRecord = NULL,
     $showPublicOnly = FALSE
   ) {
-    if ($checkPermission === TRUE) {
-      CRM_Core_Error::deprecatedWarning('Unexpected TRUE passed to CustomGroup::getTree $checkPermission param.');
+    if ($checkPermission && !in_array($checkPermission, [CRM_Core_Permission::EDIT, CRM_Core_Permission::VIEW], TRUE)) {
+      CRM_Core_Error::deprecatedWarning("Unexpected value '$checkPermission' passed to CustomGroup::getTree \$checkPermission param.");
       $checkPermission = CRM_Core_Permission::EDIT;
     }
     if ($entityID) {
@@ -498,187 +498,42 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       }
     }
 
-    // create a new tree
+    if (str_contains($entityType, "'")) {
+      // Handle really weird legacy input format
+      $entityType = explode(',', str_replace([' ', "'"], '', $entityType));
+    }
 
-    // legacy hardcoded list of data to return
-    $tableData = [
-      'custom_field' => [
-        'id',
-        'name',
-        'label',
-        'column_name',
-        'data_type',
-        'html_type',
-        'default_value',
-        'attributes',
-        'is_required',
-        'is_view',
-        'help_pre',
-        'help_post',
-        'options_per_line',
-        'start_date_years',
-        'end_date_years',
-        'date_format',
-        'time_format',
-        'option_group_id',
-        'in_selector',
-      ],
-      'custom_group' => [
-        'id',
-        'name',
-        'table_name',
-        'title',
-        'help_pre',
-        'help_post',
-        'collapse_display',
-        'style',
-        'is_multiple',
-        'extends',
-        'extends_entity_column_id',
-        'extends_entity_column_value',
-        'max_multiple',
-        'is_public',
-      ],
+    $filters = [
+      'extends' => $entityType,
+      'is_active' => TRUE,
     ];
-    $current_db_version = CRM_Core_BAO_Domain::version();
-    $serialize_version = version_compare($current_db_version, '5.27.alpha1', '>=');
-    if ($serialize_version) {
-      $tableData['custom_field'][] = 'serialize';
-    }
-    if (!$toReturn || !is_array($toReturn)) {
-      $toReturn = $tableData;
-    }
-    else {
-      // Supply defaults and remove unknown array keys
-      $toReturn = array_intersect_key(array_filter($toReturn) + $tableData, $tableData);
-      // Merge in required fields that we must have
-      $toReturn['custom_field'] = array_unique(array_merge($toReturn['custom_field'], ['id', 'column_name', 'data_type']));
-      $toReturn['custom_group'] = array_unique(array_merge($toReturn['custom_group'], ['id', 'is_multiple', 'table_name', 'name']));
-      // Validate return fields
-      $toReturn['custom_field'] = array_intersect($toReturn['custom_field'], array_keys(CRM_Core_DAO_CustomField::fieldKeys()));
-      $toReturn['custom_group'] = array_intersect($toReturn['custom_group'], array_keys(CRM_Core_DAO_CustomGroup::fieldKeys()));
-    }
-
-    // create select
-    $select = [];
-    foreach ($toReturn as $tableName => $tableColumn) {
-      foreach ($tableColumn as $columnName) {
-        $select[] = "civicrm_{$tableName}.{$columnName} as civicrm_{$tableName}_{$columnName}";
+    if ($subTypes) {
+      foreach ($subTypes as $subType) {
+        $filters['extends_entity_column_value'][] = CRM_Core_BAO_CustomGroup::validateSubTypeByEntity($entityType, $subType);
       }
-    }
-    $strSelect = "SELECT " . implode(', ', $select);
-
-    // from, where, order by
-    $strFrom = "
-FROM     civicrm_custom_group
-LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicrm_custom_group.id)
-";
-
-    // if entity is either individual, organization or household pls get custom groups for 'contact' too.
-    if ($entityType == "Individual" || $entityType == 'Organization' ||
-      $entityType == 'Household'
-    ) {
-      $in = "'$entityType', 'Contact'";
-    }
-    elseif (strpos($entityType, "'") !== FALSE) {
-      // this allows the calling function to send in multiple entity types
-      $in = $entityType;
-    }
-    else {
-      // quote it
-      $in = "'$entityType'";
-    }
-
-    $params = [];
-    $sqlParamKey = 1;
-    $subType = '';
-    if (!empty($subTypes)) {
-      foreach ($subTypes as $key => $subType) {
-        $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", self::validateSubTypeByEntity($entityType, $subType));
-      }
-      $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . ')';
       if (!$onlySubType) {
-        $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
+        $filters['extends_entity_column_value'][] = NULL;
       }
-
-      $strWhere = "
-WHERE civicrm_custom_group.is_active = 1
-  AND civicrm_custom_field.is_active = 1
-  AND civicrm_custom_group.extends IN ($in)
-  AND $subTypeClause
-";
       if ($subName) {
-        $strWhere .= " AND civicrm_custom_group.extends_entity_column_id = %{$sqlParamKey}";
-        $params[$sqlParamKey] = [$subName, 'String'];
-        $sqlParamKey = $sqlParamKey + 1;
+        $filters['extends_entity_column_id'] = $subName;
       }
     }
-    else {
-      $strWhere = "
-WHERE civicrm_custom_group.is_active = 1
-  AND civicrm_custom_field.is_active = 1
-  AND civicrm_custom_group.extends IN ($in)
-";
-      if (!$returnAll) {
-        $strWhere .= "AND civicrm_custom_group.extends_entity_column_value IS NULL";
-      }
+    elseif (!$returnAll) {
+      $filters['extends_entity_column_value'] = NULL;
     }
-
     if ($groupID > 0) {
-      // since we want a specific group id we add it to the where clause
-      $strWhere .= " AND civicrm_custom_group.id = %{$sqlParamKey}";
-      $params[$sqlParamKey] = [$groupID, 'Integer'];
+      $filters['id'] = $groupID;
     }
     elseif (!$groupID) {
       // since groupID is false we need to show all Inline groups
-      $strWhere .= " AND civicrm_custom_group.style = 'Inline'";
+      $filters['style'] = 'Inline';
     }
-    if ($checkPermission) {
-      // ensure that the user has access to these custom groups
-      $strWhere .= " AND " .
-        CRM_Core_Permission::customGroupClause($checkPermission,
-          'civicrm_custom_group.'
-        );
-    }
-
     if ($showPublicOnly) {
-      $strWhere .= 'AND civicrm_custom_group.is_public = 1';
+      $filters['is_public'] = TRUE;
     }
 
-    $orderBy = '
-ORDER BY civicrm_custom_group.weight,
-         civicrm_custom_group.title,
-         civicrm_custom_field.weight,
-         civicrm_custom_field.label
-';
+    [$multipleFieldGroups, $groupTree] = self::buildLegacyGroupTree($filters, $checkPermission, $subTypes);
 
-    // final query string
-    $queryString = "$strSelect $strFrom $strWhere $orderBy";
-
-    // lets see if we can retrieve the groupTree from cache
-    $cacheString = $queryString;
-    if ($groupID > 0) {
-      $cacheString .= "_{$groupID}";
-    }
-    else {
-      $cacheString .= "_Inline";
-    }
-
-    $multipleFieldGroups = [];
-    $cacheKey = "CRM_Core_DAO_CustomGroup_Query " . md5($cacheString);
-    $multipleFieldGroupCacheKey = "CRM_Core_DAO_CustomGroup_QueryMultipleFields " . md5($cacheString);
-    $cache = CRM_Utils_Cache::singleton();
-    if ($fromCache) {
-      $groupTree = $cache->get($cacheKey);
-      $multipleFieldGroups = $cache->get($multipleFieldGroupCacheKey);
-    }
-
-    if (empty($groupTree)) {
-      [$multipleFieldGroups, $groupTree] = self::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
-
-      $cache->set($cacheKey, $groupTree);
-      $cache->set($multipleFieldGroupCacheKey, $multipleFieldGroups);
-    }
     // entitySelectClauses is an array of select clauses for custom value tables which are not multiple
     // and have data for the given entities. $entityMultipleSelectClauses is the same for ones with multiple
     $entitySingleSelectClauses = $entityMultipleSelectClauses = $groupTree['info']['select'] = [];
@@ -686,11 +541,7 @@ ORDER BY civicrm_custom_group.weight,
     // now that we have all the groups and fields, lets get the values
     // since we need to know the table and field names
     // add info to groupTree
-
-    if (isset($groupTree['info']) && !empty($groupTree['info']) &&
-      !empty($groupTree['info']['tables']) && $singleRecord != 'new'
-    ) {
-      $select = $from = $where = [];
+    if (!empty($groupTree['info']['tables']) && $singleRecord != 'new') {
       $groupTree['info']['where'] = NULL;
 
       foreach ($groupTree['info']['tables'] as $table => $fields) {
@@ -730,7 +581,62 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * Clean and validate the filter before it is used in a db query.
+   * Recreates legacy formatting for getTree but uses the new cached function to retrieve data.
+   * @deprecated only used by legacy function.
+   */
+  private static function buildLegacyGroupTree($filters, $permission, $subTypes) {
+    $multipleFieldGroups = [];
+    $customValueTables = [];
+    $customGroups = self::getAll($filters, $permission ?: NULL);
+    foreach ($customGroups as &$group) {
+      self::formatLegacyDbValues($group);
+      if ($group['is_multiple']) {
+        $multipleFieldGroups[$group['id']] = $group['table_name'];
+      }
+      // CRM-5507 - Hard to know what this was supposed to do but this faithfully recreates
+      // whatever it was doing before the refactor, which was probably broken anyway.
+      if (!empty($subTypes[0])) {
+        $group['subtype'] = self::validateSubTypeByEntity(CRM_Utils_Array::first((array) $filters['extends']), $subTypes[0]);
+      }
+      foreach ($group['fields'] as &$field) {
+        self::formatLegacyDbValues($field);
+        $customValueTables[$group['table_name']][$field['column_name']] = 1;
+      }
+    }
+    $customGroups['info'] = ['tables' => $customValueTables];
+    return [$multipleFieldGroups, $customGroups];
+  }
+
+  /**
+   * Recreates the crude string-only format originally produced by self::getTree.
+   * @deprecated only used by legacy functions.
+   */
+  private static function formatLegacyDbValues(array &$values): void {
+    foreach ($values as $key => $value) {
+      if ($key === 'fields') {
+        continue;
+      }
+      if (is_null($value)) {
+        unset($values[$key]);
+        continue;
+      }
+      if (is_bool($value)) {
+        $value = (int) $value;
+      }
+      if (is_array($value)) {
+        $value = CRM_Utils_Array::implodePadded($value);
+      }
+      $values[$key] = (string) $value;
+    }
+  }
+
+  /**
+   * Validates contact subtypes and event types.
+   *
+   * Performs case-insensitive matching of strings and outputs the correct case.
+   * e.g. an input of "meeting" would output "Meeting".
+   *
+   * For all other entities, it doesn't validate except to check the subtype is an integer.
    *
    * @internal this will be private again soon.
    *
@@ -747,24 +653,32 @@ ORDER BY civicrm_custom_group.weight,
     }
 
     $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo(TRUE);
-    $contactTypes = array_merge($contactTypes, ['Event' => 1]);
+    $contactTypes['Contact'] = 1;
 
-    if ($entityType != 'Contact' && !array_key_exists($entityType, $contactTypes)) {
+    if ($entityType === 'Event') {
+      $subTypes = CRM_Core_OptionGroup::values('event_type', TRUE, FALSE, FALSE, NULL, 'name');
+    }
+    elseif (!array_key_exists($entityType, $contactTypes)) {
       throw new CRM_Core_Exception('Invalid Entity Filter');
     }
-    $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
-    $subTypes = array_merge($subTypes, CRM_Event_PseudoConstant::eventType());
+    else {
+      $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
+      $subTypes = array_column($subTypes, 'name', 'name');
+    }
     // When you create a new contact type it gets saved in mixed case in the database.
     // Eg. "Service User" becomes "Service_User" in civicrm_contact_type.name
     // But that field does not differentiate case (eg. you can't add Service_User and service_user because mysql will report a duplicate error)
     // webform_civicrm and some other integrations pass in the name as lowercase to API3 Contact.duplicatecheck
     // Since we can't actually have two strings with different cases in the database perform a case-insensitive search here:
-    $subTypes = array_change_key_case($subTypes, CASE_LOWER);
-    if (!array_key_exists(mb_strtolower($subType), $subTypes)) {
+    $subTypesByName = array_combine($subTypes, $subTypes);
+    $subTypesByName = array_change_key_case($subTypesByName, CASE_LOWER);
+    $subTypesByKey = array_change_key_case($subTypes, CASE_LOWER);
+    $subTypeKey = mb_strtolower($subType);
+    if (!array_key_exists($subTypeKey, $subTypesByKey) && !in_array($subTypeKey, $subTypesByName)) {
       \Civi::log()->debug("entityType: {$entityType}; subType: {$subType}");
       throw new CRM_Core_Exception('Invalid Filter');
     }
-    return $subType;
+    return $subTypesByName[$subTypeKey] ?? $subTypesByKey[$subTypeKey];
   }
 
   /**
