@@ -1860,39 +1860,30 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
-   * Get the custom group titles by custom field ids.
+   * @deprecated Silly function that shouldn't exist.
+   *
+   * @see CRM_Core_BAO_CustomField::getField()
+   * for a better alternative.
    *
    * @param array $fieldIds
    *   Array of custom field ids.
    *
-   * @return array|NULL
+   * @return array
    *   array consisting of groups and fields labels with ids.
    */
-  public static function getGroupTitles($fieldIds) {
-    if (!is_array($fieldIds) && empty($fieldIds)) {
-      return NULL;
-    }
-
+  public static function getGroupTitles(array $fieldIds): array {
     $groupLabels = [];
-    $fIds = "(" . implode(',', $fieldIds) . ")";
-
-    $query = "
-SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupTitle,
-        civicrm_custom_field.label as fieldLabel, civicrm_custom_field.id as fieldID
-  FROM  civicrm_custom_group, civicrm_custom_field
- WHERE  civicrm_custom_group.id = civicrm_custom_field.custom_group_id
-   AND  civicrm_custom_field.id IN {$fIds}";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $groupLabels[$dao->fieldID] = [
-        'fieldID' => $dao->fieldID,
-        'fieldLabel' => $dao->fieldLabel,
-        'groupID' => $dao->groupID,
-        'groupTitle' => $dao->groupTitle,
-      ];
+    foreach ($fieldIds as $fieldId) {
+      $field = CRM_Core_BAO_CustomField::getField($fieldId);
+      if ($field) {
+        $groupLabels[$fieldId] = [
+          'fieldID' => (string) $fieldId,
+          'fieldLabel' => $field['label'],
+          'groupID' => (string) $field['custom_group']['id'],
+          'groupTitle' => $field['custom_group']['title'],
+        ];
+      }
     }
-
     return $groupLabels;
   }
 

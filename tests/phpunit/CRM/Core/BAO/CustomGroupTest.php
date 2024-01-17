@@ -530,48 +530,34 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getGroupTitles() with Invalid Params()
-   */
-  public function testGetGroupTitlesWithInvalidParams(): void {
-    $params = [99];
-    $groupTitles = CRM_Core_BAO_CustomGroup::getGroupTitles($params);
-    $this->assertTrue(empty($groupTitles), 'Check that no titles are received');
-  }
-
-  /**
    * Test getGroupTitles()
    */
   public function testGetGroupTitles(): void {
     $groupParams = [
       'title' => 'Test Group',
       'name' => 'test_custom_group',
-      'style' => 'Tab',
-      'extends' => 'Individual',
-      'weight' => 10,
-      'is_active' => 1,
+      'is_active' => 0,
     ];
 
     $customGroup = $this->customGroupCreate($groupParams);
 
     $fieldParams = [
       'label' => 'Custom Field',
-      'html_type' => 'Text',
-      'data_type' => 'String',
-      'is_required' => 1,
-      'is_searchable' => 0,
-      'is_active' => 1,
+      'is_active' => 0,
       'custom_group_id' => $customGroup['id'],
     ];
 
     $customField = $this->customFieldCreate($fieldParams);
     $customFieldId = $customField['id'];
 
-    $params = [$customFieldId];
+    $this->assertEmpty(CRM_Core_BAO_CustomGroup::getGroupTitles([$customFieldId + 99]));
 
-    $groupTitles = CRM_Core_BAO_CustomGroup::getGroupTitles($params);
+    $groupTitles = CRM_Core_BAO_CustomGroup::getGroupTitles([$customFieldId]);
 
-    $this->assertEquals($groupTitles[$customFieldId]['groupTitle'], 'Test Group', 'Check Group Title.');
-    $this->customGroupDelete($customGroup['id']);
+    $this->assertEquals('Test Group', $groupTitles[$customFieldId]['groupTitle']);
+    $this->assertEquals($customGroup['id'], $groupTitles[$customFieldId]['groupID']);
+    $this->assertEquals('Custom Field', $groupTitles[$customFieldId]['fieldLabel']);
+    $this->assertEquals($customField['id'], $groupTitles[$customFieldId]['fieldID']);
   }
 
   /**
