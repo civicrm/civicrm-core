@@ -2527,17 +2527,19 @@ WHERE      f.id IN ($ids)";
   }
 
   /**
-   * Is this field a multi record field.
+   * If custom field belongs to a multi-record group, return the group id.
    *
-   * @param int $customId
+   * @param string|int $customId
+   *   Either the numeric id or a string like "custom_xx"
    *
-   * @return bool
+   * @return int|false
    */
   public static function isMultiRecordField($customId) {
     if (!is_numeric($customId)) {
       $customId = self::getKeyID($customId);
     }
-    return self::getField((int) $customId)['custom_group']['is_multiple'] ?? FALSE;
+    $customGroup = self::getField((int) $customId)['custom_group'] ?? NULL;
+    return empty($customGroup['is_multiple']) ? FALSE : $customGroup['id'];
   }
 
   /**
