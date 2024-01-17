@@ -218,13 +218,14 @@ class CoreUtil {
   }
 
   /**
-   * Checks if a custom group exists and is multivalued
+   * @deprecated since 5.71 will be removed around 5.81
    *
    * @param $customGroupName
    * @return bool
    * @throws \CRM_Core_Exception
    */
   public static function isCustomEntity($customGroupName): bool {
+    \CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getAll');
     return $customGroupName && \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupName, 'is_multiple', 'name');
   }
 
