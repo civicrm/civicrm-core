@@ -240,8 +240,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       foreach ($value as $key1 => $value1) {
         //CRM-2676, replacing the conflict for same custom field name from different custom group.
         if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key1)) {
-          $customGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customFieldId, 'custom_group_id');
-          $customGroupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'title');
+          $customGroupName = CRM_Core_BAO_CustomField::getField($customFieldId)['custom_group']['title'];
           $this->_mapperFields[$key][$key1] = $value1['title'] . ' :: ' . $customGroupName;
           if (in_array($key1, $addressCustomFields)) {
             $noSearchable[] = $value1['title'] . ' :: ' . $customGroupName;
