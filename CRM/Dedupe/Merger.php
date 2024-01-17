@@ -2036,11 +2036,11 @@ ORDER BY civicrm_custom_group.weight,
     foreach ($submitted as $key => $value) {
       if (strpos($key, 'custom_') === 0) {
         $fieldID = (int) substr($key, 7);
-        $fieldMetadata = CRM_Core_BAO_CustomField::getCustomFieldsForContactType($contactType, FALSE)[$fieldID] ?? NULL;
+        $fieldMetadata = CRM_Core_BAO_CustomField::getField($fieldID);
         if ($fieldMetadata) {
           $htmlType = (string) $fieldMetadata['html_type'];
-          $isSerialized = CRM_Core_BAO_CustomField::isSerialized($fieldMetadata);
-          $isView = (bool) $fieldMetadata['is_view'];
+          $isSerialized = $fieldMetadata['serialize'];
+          $isView = $fieldMetadata['is_view'];
           $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
           if ($isView) {
             $viewOnlyCustomFields[$key] = $submitted[$key];
