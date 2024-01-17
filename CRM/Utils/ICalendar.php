@@ -174,16 +174,17 @@ class CRM_Utils_ICalendar {
     $tz_items = [];
 
     foreach ($timezones as $tzstr) {
-      $timezone = new DateTimeZone($tzstr);
+      $utcTimezone = new DateTimeZone('UTC');
+      $eventTimezone = new DateTimeZone($tzstr);
 
-      $transitions = $timezone->getTransitions($date_min, $date_max);
+      $transitions = $eventTimezone->getTransitions($date_min, $date_max);
 
       if (count($transitions) === 1) {
         $transitions[] = array_values($transitions)[0];
       }
 
       $item = [
-        'id' => $timezone->getName(),
+        'id' => $eventTimezone->getName(),
         'transitions' => [],
       ];
 
@@ -195,9 +196,8 @@ class CRM_Utils_ICalendar {
           'offset_from' => self::format_tz_offset($last_transition['offset']),
           'offset_to' => self::format_tz_offset($transition['offset']),
           'abbr' => $transition['abbr'],
-          'dtstart' => date_create($transition['time'], $timezone)->format("Ymd\THis"),
+          'dtstart' => date_create($transition['time'], $utcTimezone)->setTimezone($eventTimezone)->format("Ymd\THis"),
         ];
-
         $last_transition = $transition;
       }
 
