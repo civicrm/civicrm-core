@@ -303,16 +303,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getTitle() with Invalid Params()
-   */
-  public function testGetTitleWithInvalidParams(): void {
-    $params = 99;
-    $customGroupTitle = CRM_Core_BAO_CustomGroup::getTitle($params);
-
-    $this->assertNull($customGroupTitle, 'Check that no custom Group Title is retreived');
-  }
-
-  /**
    * Test getTitle()
    */
   public function testGetTitle(): void {
@@ -328,13 +318,14 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customGroup = $this->customGroupCreate($groupParams);
     $customGroupId = $customGroup['id'];
 
+    // Should return NULL for a group that doesn't exist
+    $this->assertNull(CRM_Core_BAO_CustomGroup::getTitle($customGroupId + 99));
+
     //get the custom group title
     $title = CRM_Core_BAO_CustomGroup::getTitle($customGroupId);
 
     //check for object update
     $this->assertEquals($customGroupTitle, $title);
-
-    $this->customGroupDelete($customGroupId);
   }
 
   /**

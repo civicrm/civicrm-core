@@ -956,7 +956,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    *   title
    */
   public static function getTitle($id) {
-    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $id, 'title');
+    return self::getAll()[$id]['title'] ?? NULL;
   }
 
   /**
