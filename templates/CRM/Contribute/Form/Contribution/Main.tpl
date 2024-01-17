@@ -23,6 +23,9 @@
         if ( element.type == 'radio' && element.name === mainPriceFieldName ) {
           if (element.value == '0' ) {
             element.checked = true;
+            // Copied from `updatePriceSetHighlight()` below which isn't available here.
+            cj('#priceset .price-set-row span').removeClass('highlight');
+            cj('#priceset .price-set-row input:checked').parent().addClass('highlight');
           }
           else {
             element.checked = false;
@@ -321,7 +324,7 @@
       var isRecur = cj('input[id="is_recur"]:checked');
 
       var quickConfig = {/literal}'{$quickConfig}'{literal};
-      if (cj("#auto_renew") && quickConfig) {
+      if (cj("#auto_renew").length && quickConfig) {
         showHideAutoRenew(null);
       }
 
