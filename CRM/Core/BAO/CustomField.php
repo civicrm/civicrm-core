@@ -561,25 +561,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    */
   public static function getFieldObject($fieldID) {
     $field = new CRM_Core_BAO_CustomField();
-
-    // check if we can get the field values from the system cache
-    $cacheKey = "CRM_Core_DAO_CustomField_{$fieldID}";
-    $cache = CRM_Utils_Cache::singleton();
-    $fieldValues = $cache->get($cacheKey);
-    if (empty($fieldValues)) {
-      $field->id = $fieldID;
-      if (!$field->find(TRUE)) {
-        throw new CRM_Core_Exception('Cannot find Custom Field ' . $fieldID);
-      }
-      $fieldValues = [];
-      CRM_Core_DAO::storeValues($field, $fieldValues);
-
-      $cache->set($cacheKey, $fieldValues);
-    }
-    else {
-      $field->copyValues($fieldValues);
-    }
-
+    $field->copyValues(self::getField($fieldID));
     return $field;
   }
 

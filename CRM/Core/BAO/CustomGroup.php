@@ -114,9 +114,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       $custom = [];
       $select = ['g.*'];
       foreach (array_keys(CRM_Core_BAO_CustomField::getSupportedFields()) as $fieldKey) {
-        if ($fieldKey !== 'custom_group_id') {
-          $select[] = "f.`$fieldKey` AS `field__$fieldKey`";
-        }
+        $select[] = "f.`$fieldKey` AS `field__$fieldKey`";
       }
       // Avoid calling the API to prevent recursion or early-bootstrap issues.
       $data = \CRM_Utils_SQL_Select::from('civicrm_custom_group g')
