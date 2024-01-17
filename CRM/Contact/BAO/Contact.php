@@ -2647,7 +2647,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       default:
         if (!$tableName) {
           $custom = explode('_', $type);
-          $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $custom[1], 'table_name');
+          $tableName = CRM_Core_BAO_CustomGroup::getGroup(['id' => $custom[1]])['table_name'];
         }
         $queryString = "SELECT count(id) FROM $tableName WHERE entity_id = $contactId";
         return (int) CRM_Core_DAO::singleValueQuery($queryString);

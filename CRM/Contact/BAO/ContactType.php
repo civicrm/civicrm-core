@@ -768,7 +768,7 @@ WHERE extends = %1 AND ' . implode(" OR ", $subTypeClause);
       return FALSE;
     }
 
-    $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $gID, 'table_name');
+    $tableName = CRM_Core_BAO_CustomGroup::getGroup(['id' => $gID])['table_name'];
 
     // drop triggers CRM-13587
     CRM_Core_DAO::dropTriggers($tableName);
