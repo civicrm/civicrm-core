@@ -188,11 +188,11 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * Does profile consists of a multi-record custom field.
+   * Returns the id of the first multi-record custom group in this profile (if any).
    *
    * @param int $gId
    *
-   * @return bool
+   * @return int|false
    */
   public static function checkMultiRecordFieldExists($gId) {
     $queryString = "SELECT f.field_name
@@ -201,36 +201,18 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
                           AND  g.id = %1 AND f.field_name LIKE 'custom%'";
     $p = [1 => [$gId, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($queryString, $p);
-    $customFieldIds = [];
-    $isMultiRecordFieldPresent = FALSE;
+
     while ($dao->fetch()) {
-      if ($customId = CRM_Core_BAO_CustomField::getKeyID($dao->field_name)) {
-        if (is_numeric($customId)) {
-          $customFieldIds[] = $customId;
+      $customId = CRM_Core_BAO_CustomField::getKeyID($dao->field_name);
+      if ($customId && is_numeric($customId)) {
+        $multiRecordGroupId = CRM_Core_BAO_CustomField::isMultiRecordField($customId);
+        if ($multiRecordGroupId) {
+          return $multiRecordGroupId;
         }
       }
     }
 
-    if (!empty($customFieldIds) && count($customFieldIds) == 1) {
-      $customFieldId = array_pop($customFieldIds);
-      $isMultiRecordFieldPresent = CRM_Core_BAO_CustomField::isMultiRecordField($customFieldId);
-    }
-    elseif (count($customFieldIds) > 1) {
-      $customFieldIds = implode(", ", $customFieldIds);
-      $queryString = "
-      SELECT cg.id as cgId
- FROM civicrm_custom_group cg
- INNER JOIN civicrm_custom_field cf
- ON cg.id = cf.custom_group_id
-WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
-
-      $dao = CRM_Core_DAO::executeQuery($queryString);
-      if ($dao->fetch()) {
-        $isMultiRecordFieldPresent = ($dao->cgId) ? $dao->cgId : FALSE;
-      }
-    }
-
-    return $isMultiRecordFieldPresent;
+    return FALSE;
   }
 
   /**
