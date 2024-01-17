@@ -74,6 +74,14 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertCount(1, CRM_Core_BAO_CustomGroup::getAll(['extends_entity_column_value' => 2]));
     $this->assertCount(1, CRM_Core_BAO_CustomGroup::getAll(['extends_entity_column_value' => [2, 4]]));
     $this->assertCount(3, CRM_Core_BAO_CustomGroup::getAll(['extends_entity_column_value' => [1, NULL]]));
+
+    // Test getGroup by id
+    $this->assertEquals('ActiveGroup', CRM_Core_BAO_CustomGroup::getGroup(['id' => $activeGroup['id']])['title']);
+    $this->assertEquals('ActivityTypeGroup', CRM_Core_BAO_CustomGroup::getGroup(['id' => $activityTypeGroup['id']])['title']);
+    // Test getGroup by other criteria
+    $this->assertFalse(CRM_Core_BAO_CustomGroup::getGroup(['name' => 'InactiveGroup'])['is_active']);
+    $this->assertEquals('InactiveGroup', CRM_Core_BAO_CustomGroup::getGroup(['name' => 'InactiveGroup', 'is_active' => FALSE])['title']);
+    $this->assertEquals('ActivityTypeGroup', CRM_Core_BAO_CustomGroup::getGroup(['name' => 'ActivityTypeGroup', 'extends' => 'Activity', 'is_active' => TRUE])['title']);
   }
 
   /**
