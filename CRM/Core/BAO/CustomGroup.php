@@ -691,23 +691,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
-   * Suppose you have a SQL column, $column, which includes a delimited list, and you want
-   * a WHERE condition for rows that include $value. Use whereListHas().
-   *
-   * @param string $column
-   * @param string $value
-   * @param string $delimiter
-   * @return string
-   *   SQL condition.
-   */
-  private static function whereListHas($column, $value, $delimiter = CRM_Core_DAO::VALUE_SEPARATOR) {
-    // ?
-    $bareValue = trim($value, $delimiter);
-    $escapedValue = CRM_Utils_Type::escape("%{$delimiter}{$bareValue}{$delimiter}%", 'String', FALSE);
-    return "($column LIKE \"$escapedValue\")";
-  }
-
-  /**
    * Check whether the custom group has any data for the given entity.
    *
    * @param int $entityID
