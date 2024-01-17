@@ -76,7 +76,7 @@
     "pear/auth_sasl": "1.1.0",
     "pear/net_smtp": "1.10.*",
     "pear/net_socket": "1.0.*",
-    "pear/mail": "^1.5",
+    "pear/mail": "^2.0",
     "guzzlehttp/guzzle": "^6.3 || ^7.3",
     "psr/simple-cache": "~1.0.1",
     "cweagans/composer-patches": "~1.0",
@@ -92,7 +92,7 @@
     "brick/money": "~0.5",
     "ext-intl": "*",
     "pear/mail_mime": "~1.10",
-    "pear/db": "1.11",
+    "pear/db": "~1.12.1",
     "civicrm/composer-compile-lib": "~0.6 || ~1.0",
     "ext-json": "*",
     "ezyang/htmlpurifier": "^4.13",
@@ -271,8 +271,6 @@
         "Apply patch to fix php8.2 deprecation notice on dynamic property $filename": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/17.patch"
       },
       "pear/db": {
-        "Apply patch to ensure that MySQLI reporting remains the same in php8.1": "https://patch-diff.githubusercontent.com/raw/pear/DB/pull/13.patch",
-        "Apply patch to fix deprecations in php8.2": "https://patch-diff.githubusercontent.com/raw/pear/DB/pull/14.patch",
         "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/2ad420c394/tools/scripts/composer/pear_db_civicrm_changes.patch"
       },
       "pear/log": {
