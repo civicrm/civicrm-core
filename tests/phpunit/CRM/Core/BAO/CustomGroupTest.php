@@ -244,24 +244,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getGroupDetail() with Empty Params
-   */
-  public function testGetGroupDetailEmptyParams(): void {
-    $customGroupId = [];
-    $customGroup = CRM_Core_BAO_CustomGroup::getGroupDetail($customGroupId);
-    $this->assertTrue(empty($customGroup), 'Check that no custom Group  details is retreived');
-  }
-
-  /**
-   * Test getGroupDetail with Invalid Params.
-   */
-  public function testGetGroupDetailInvalidParams(): void {
-    $customGroupId = 99;
-    $customGroup = CRM_Core_BAO_CustomGroup::getGroupDetail($customGroupId);
-    $this->assertTrue(empty($customGroup), 'Check that no custom Group  details is retreived');
-  }
-
-  /**
    * Test getGroupDetail().
    */
   public function testGetGroupDetail(): void {
@@ -279,37 +261,45 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customGroup = $this->customGroupCreate($groupParams);
     $customGroupId = $customGroup['id'];
 
-    $fieldParams = [
-      'custom_group_id' => $customGroupId,
-      'label' => 'Test Custom Field',
+    $field1Params = [
+      'label' => 'Test Custom Field1',
       'html_type' => 'Text',
       'data_type' => 'String',
       'is_required' => 1,
       'is_searchable' => 0,
       'is_active' => 1,
     ];
+    $customField1 = $this->customFieldCreate($field1Params + ['custom_group_id' => $customGroupId]);
+    $field1Id = $customField1['id'];
 
-    $customField = $this->customFieldCreate($fieldParams);
-    $customFieldId = $customField['id'];
+    $field2Params = [
+      'label' => 'Test Custom Field2',
+      'html_type' => 'Text',
+      'data_type' => 'String',
+      'is_required' => 0,
+      'is_searchable' => 1,
+      'is_active' => 1,
+    ];
+    $customField2 = $this->customFieldCreate($field2Params + ['custom_group_id' => $customGroupId]);
+    $field2Id = $customField2['id'];
+
+    $emptyTree = CRM_Core_BAO_CustomGroup::getGroupDetail(99);
+    $this->assertCount(0, $emptyTree, 'Check that no custom Group matches id=99');
 
     $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail($customGroupId);
-    $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroupId, 'title', 'id',
-      'Database check for custom group record.'
-    );
-    //check retieve values of custom group
-    unset($groupParams['is_active']);
-    unset($groupParams['title']);
-    unset($groupParams['version']);
+    $this->assertCount(1, $groupTree);
+    $this->assertCount(2, $groupTree[$customGroupId]['fields']);
+    //check values of custom group
     $this->assertAttributesEquals($groupParams, $groupTree[$customGroupId]);
+    //check values of custom fields
+    $this->assertAttributesEquals($field1Params, $groupTree[$customGroupId]['fields'][$field1Id]);
+    $this->assertAttributesEquals($field2Params, $groupTree[$customGroupId]['fields'][$field2Id]);
 
-    //check retieve values of custom field
-    unset($fieldParams['is_active']);
-    unset($fieldParams['custom_group_id']);
-    unset($fieldParams['version']);
-    $this->assertAttributesEquals($fieldParams, $groupTree[$customGroupId]['fields'][$customFieldId], " in line " . __LINE__);
-
-    $this->customFieldDelete($customField['id']);
-    $this->customGroupDelete($customGroup['id']);
+    $searchableTree = CRM_Core_BAO_CustomGroup::getGroupDetail($customGroupId, TRUE);
+    $this->assertCount(1, $searchableTree[$customGroupId]['fields']);
+    $this->assertAttributesEquals($groupParams, $searchableTree[$customGroupId]);
+    // only searchable field should be returned
+    $this->assertAttributesEquals($field2Params, $searchableTree[$customGroupId]['fields'][$field2Id]);
   }
 
   /**

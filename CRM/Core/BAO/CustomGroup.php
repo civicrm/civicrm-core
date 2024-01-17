@@ -48,7 +48,16 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       if (!in_array($permissionType, [CRM_Core_Permission::EDIT, CRM_Core_Permission::VIEW], TRUE)) {
         throw new CRM_Core_Exception('permissionType must be CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT');
       }
-      $filters['id'] = CRM_Core_Permission::customGroup($permissionType, FALSE, $userId);
+      $permittedIds = CRM_Core_Permission::customGroup($permissionType, FALSE, $userId);
+      if (!empty($filters['id'])) {
+        $filters['id'] = array_intersect((array) $filters['id'], $permittedIds);
+      }
+      else {
+        $filters['id'] = $permittedIds;
+      }
+      if (!$filters['id']) {
+        return [];
+      }
     }
     if (!$filters) {
       return self::loadAll();
@@ -951,9 +960,10 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
-   * Get custom group details for a group.
+   * @deprecated Legacy function
    *
-   * An array containing custom group details (including their custom field) is returned.
+   * @see CRM_Core_BAO_CustomGroup::getAll()
+   * for a better alternative.
    *
    * @param int $groupId
    *   Group id whose details are needed.
@@ -961,146 +971,48 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    *   Is this field searchable.
    * @param array $extends
    *   Which table does it extend if any.
-   *
    * @param bool $inSelector
    *
    * @return array
    *   array consisting of all group and field details
    */
   public static function &getGroupDetail($groupId = NULL, $searchable = NULL, &$extends = NULL, $inSelector = NULL) {
-    // create a new tree
-    $groupTree = [];
-
-    // using tableData to build the queryString
-    $tableData = [
-      'civicrm_custom_field' => [
-        'id',
-        'label',
-        'data_type',
-        'html_type',
-        'default_value',
-        'attributes',
-        'is_required',
-        'help_pre',
-        'help_post',
-        'options_per_line',
-        'is_searchable',
-        'start_date_years',
-        'end_date_years',
-        'is_search_range',
-        'date_format',
-        'time_format',
-        'note_columns',
-        'note_rows',
-        'column_name',
-        'is_view',
-        'option_group_id',
-        'in_selector',
-      ],
-      'civicrm_custom_group' => [
-        'id',
-        'name',
-        'title',
-        'help_pre',
-        'help_post',
-        'collapse_display',
-        'collapse_adv_display',
-        'extends',
-        'extends_entity_column_value',
-        'table_name',
-        'is_multiple',
-      ],
+    $groupFilters = [
+      'is_active' => TRUE,
     ];
-
-    // create select
-    $s = [];
-    foreach ($tableData as $tableName => $tableColumn) {
-      foreach ($tableColumn as $columnName) {
-        $s[] = "{$tableName}.{$columnName} as {$tableName}_{$columnName}";
-      }
-    }
-    $select = 'SELECT ' . implode(', ', $s);
-    $params = [];
-    // from, where, order by
-    $from = " FROM civicrm_custom_field, civicrm_custom_group";
-    $where = " WHERE civicrm_custom_field.custom_group_id = civicrm_custom_group.id
-                            AND civicrm_custom_group.is_active = 1
-                            AND civicrm_custom_field.is_active = 1 ";
+    $fieldFilters = [];
     if ($groupId) {
-      $params[1] = [$groupId, 'Integer'];
-      $where .= " AND civicrm_custom_group.id = %1";
+      $groupFilters['id'] = $groupId;
     }
-
     if ($searchable) {
-      $where .= " AND civicrm_custom_field.is_searchable = 1";
+      $fieldFilters['is_searchable'] = TRUE;
     }
-
     if ($inSelector) {
-      $where .= " AND civicrm_custom_field.in_selector = 1 AND civicrm_custom_group.is_multiple = 1 ";
+      $groupFilters['is_multiple'] = TRUE;
+      $fieldFilters['in_selector'] = TRUE;
     }
-
     if ($extends) {
-      $clause = [];
-      foreach ($extends as $e) {
-        $clause[] = "civicrm_custom_group.extends = '$e'";
-      }
-      $where .= " AND ( " . implode(' OR ', $clause) . " ) ";
+      $groupFilters['extends'] = $extends;
 
       //include case activities customdata if case is enabled
       if (in_array('Activity', $extends)) {
-        $extendValues = implode(',', array_keys(CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE)));
-        $where .= " AND ( civicrm_custom_group.extends_entity_column_value IS NULL OR REPLACE( civicrm_custom_group.extends_entity_column_value, %2, ' ') IN ($extendValues) ) ";
-        $params[2] = [CRM_Core_DAO::VALUE_SEPARATOR, 'String'];
+        $extendValues = array_keys(CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE));
+        $extendValues[] = NULL;
+        $groupFilters['extends_entity_column_value'] = $extendValues;
       }
     }
 
     // ensure that the user has access to these custom groups
-    $where .= " AND " .
-      CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW,
-        'civicrm_custom_group.'
-      );
-
-    $orderBy = " ORDER BY civicrm_custom_group.weight, civicrm_custom_field.weight";
-
-    // final query string
-    $queryString = $select . $from . $where . $orderBy;
-
-    // dummy dao needed
-    $crmDAO = CRM_Core_DAO::executeQuery($queryString, $params);
+    $groupTree = self::getAll($groupFilters, CRM_Core_Permission::VIEW);
 
     // process records
-    while ($crmDAO->fetch()) {
-      $groupId = $crmDAO->civicrm_custom_group_id;
-      $fieldId = $crmDAO->civicrm_custom_field_id;
-
-      // create an array for groups if it does not exist
-      if (!array_key_exists($groupId, $groupTree)) {
-        $groupTree[$groupId] = [];
-        $groupTree[$groupId]['id'] = $groupId;
-
-        foreach ($tableData['civicrm_custom_group'] as $v) {
-          $fullField = "civicrm_custom_group_" . $v;
-
-          if ($v == 'id' || is_null($crmDAO->$fullField)) {
-            continue;
-          }
-
-          $groupTree[$groupId][$v] = $crmDAO->$fullField;
-        }
-
-        $groupTree[$groupId]['fields'] = [];
+    foreach ($groupTree as &$group) {
+      self::formatLegacyDbValues($group);
+      foreach ($group['fields'] as &$field) {
+        self::formatLegacyDbValues($field);
       }
-
-      // add the fields now (note - the query row will always contain a field)
-      $groupTree[$groupId]['fields'][$fieldId] = [];
-      $groupTree[$groupId]['fields'][$fieldId]['id'] = $fieldId;
-
-      foreach ($tableData['civicrm_custom_field'] as $v) {
-        $fullField = "civicrm_custom_field_" . $v;
-        if ($v == 'id' || is_null($crmDAO->$fullField)) {
-          continue;
-        }
-        $groupTree[$groupId]['fields'][$fieldId][$v] = $crmDAO->$fullField;
+      if ($fieldFilters) {
+        $group['fields'] = array_column(CRM_Utils_Array::findAll($group['fields'], $fieldFilters), NULL, 'id');
       }
     }
 
