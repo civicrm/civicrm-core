@@ -401,10 +401,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
       'title' => 'My Custom Group',
       'name' => 'my_custom_group',
       'extends' => 'Individual',
-      'help_pre' => 'Custom Group Help Pre',
-      'help_post' => 'Custom Group Help Post',
-      'is_active' => 1,
-      'collapse_display' => 1,
     ];
 
     $customGroup = $this->customGroupCreate($groupParams);
@@ -415,23 +411,12 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $fieldParams = [
       'custom_group_id' => $customGroupId,
       'label' => $customFieldLabel,
-      'html_type' => 'Text',
-      'data_type' => 'String',
-      'is_required' => 1,
-      'is_searchable' => 0,
-      'is_active' => 1,
     ];
 
     $customField = $this->customFieldCreate($fieldParams);
     $customField = $customField['values'][$customField['id']];
 
     $customFieldId = $customField['id'];
-
-    //check db for custom field
-    $dbCustomFieldLabel = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customFieldId, 'label', 'id',
-      'Database check for custom field record.'
-    );
-    $this->assertEquals($customFieldLabel, $dbCustomFieldLabel);
 
     //check the custom field type.
     $usedFor = CRM_Core_BAO_CustomGroup::checkCustomField(
@@ -443,9 +428,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
       $customFieldId, ['Contribution', 'Membership', 'Participant']
     );
     $this->assertEquals(TRUE, $usedFor);
-
-    $this->customFieldDelete($customField['id']);
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**

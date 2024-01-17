@@ -1585,32 +1585,19 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
-   * Check the type of custom field type (eg: Used for Individual, Contribution, etc)
-   * this function is used to get the custom fields of a type (eg: Used for Individual, Contribution, etc )
+   * @deprecated Silly function that does almost nothing.
+   * @see CRM_Core_BAO_CustomField::getField()
+   * for a more useful alternative.
    *
    * @param int $customFieldId
-   *   Custom field id.
    * @param array $removeCustomFieldTypes
    *   Remove custom fields of a type eg: array("Individual") ;.
    *
    * @return bool
-   *   false if it matches else true
-   *
-   * @throws \CRM_Core_Exception
    */
   public static function checkCustomField($customFieldId, $removeCustomFieldTypes) {
-    $query = 'SELECT cg.extends as extends
-                  FROM civicrm_custom_group as cg, civicrm_custom_field as cf
-                  WHERE cg.id = cf.custom_group_id
-                    AND cf.id =' .
-      CRM_Utils_Type::escape($customFieldId, 'Integer');
-
-    $extends = CRM_Core_DAO::singleValueQuery($query);
-
-    if (in_array($extends, $removeCustomFieldTypes)) {
-      return FALSE;
-    }
-    return TRUE;
+    $extends = CRM_Core_BAO_CustomField::getField($customFieldId)['custom_group']['extends'];
+    return !in_array($extends, $removeCustomFieldTypes);
   }
 
   /**
