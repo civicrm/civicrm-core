@@ -41,6 +41,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+    CRM_Core_BAO_MailSettings::defaultDAO(TRUE);
 
     $this->_groupID = $this->groupCreate();
     $this->createContactsInGroup(2, $this->_groupID);
@@ -139,6 +140,19 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     // The HTTP POSTs removed the members.
     $this->assertEquals(0, $getMembers('Added')->count());
     $this->assertEquals(2, $getMembers('Removed')->count());
+  }
+
+  public function testHttpUnsubscribe_altVerp(): void {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_mail_settings SET localpart = "aeiou.aeiou-"');
+    CRM_Core_BAO_MailSettings::defaultDAO(TRUE);
+
+    try {
+      Civi::settings()->set('verpSeparator', '-');
+      $this->testHttpUnsubscribe();
+    }
+    finally {
+      $this->revertSetting('verpSeparator');
+    }
   }
 
   /**
