@@ -491,7 +491,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
     // Note: there are situations when we want getFieldsForImport() return fields related
     // ONLY to basic contact types, but NOT subtypes. And thats where $onlyParent is helpful
-    $fields = &self::getFields($contactType,
+    $fields = self::getFields($contactType,
       $showAll,
       FALSE,
       NULL,
