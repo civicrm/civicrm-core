@@ -14,6 +14,7 @@
   {include file="CRM/Contact/Form/Search/Intro.tpl"}
 
   <details class="crm-advanced_search_form-accordion" {if !$rows}open{/if} >
+    {strip}
     <summary class="crm-master-accordion-header">
       {if !empty($savedSearch)}
         {ts 1=$savedSearch.name}Edit %1 Smart Group Criteria{/ts}
@@ -24,6 +25,7 @@
       {/if}
       {help id='id-advanced-intro'}
     </summary>
+    {/strip}
     <div class="crm-accordion-body">
       {include file="CRM/Contact/Form/Search/AdvancedCriteria.tpl"}
     </div>
