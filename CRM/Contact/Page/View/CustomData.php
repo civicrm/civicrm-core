@@ -42,7 +42,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
     // If no cid supplied, look it up
     if (!$this->_contactId && $this->_recId) {
-      $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_groupId, 'table_name');
+      $tableName = CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->_groupId])['table_name'] ?? NULL;
       if ($tableName) {
         $this->_contactId = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `$tableName` WHERE id = %1", [1 => [$this->_recId, 'Integer']]);
       }

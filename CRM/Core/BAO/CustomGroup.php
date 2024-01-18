@@ -29,6 +29,26 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
+   * Retrieve a group by id, name, etc.
+   *
+   * @param array $filter
+   *   e.g. `['id' => 23]` or `['name' => 'MyGroup']`
+   * @return array|null
+   *   Result includes all custom fields in addition to group info.
+   */
+  public static function getGroup(array $filter): ?array {
+    if (isset($filter['id']) && count($filter) === 1) {
+      return self::getAll()[$filter['id']] ?? NULL;
+    }
+    foreach (self::getAll() as $group) {
+      if (array_intersect_assoc($filter, $group) === $filter) {
+        return $group;
+      }
+    }
+    return NULL;
+  }
+
+  /**
    * Return custom groups and fields in a nested array, with optional filters and permissions applied.
    *
    * With no params, this returns every custom group and field, including disabled.

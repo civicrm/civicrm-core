@@ -274,7 +274,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       $this->_tableID,
       $this->_entityType
     );
-    $table = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_groupID, 'table_name');
+    $table = CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->_groupID])['table_name'];
     $cgcount = CRM_Core_BAO_CustomGroup::customGroupDataExistsForEntity($this->_tableID, $table, TRUE);
     $cgcount += 1;
     $buttonName = $this->controller->getButtonName();
