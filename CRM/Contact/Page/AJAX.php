@@ -265,19 +265,6 @@ class CRM_Contact_Page_AJAX {
     CRM_Utils_JSON::output($ret);
   }
 
-  /**
-   * Fetch the custom field help.
-   */
-  public static function customField() {
-    $fieldId = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
-    $params = ['id' => $fieldId];
-    $returnProperties = ['help_pre', 'help_post'];
-    $values = [];
-
-    CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $values, $returnProperties);
-    CRM_Utils_JSON::output($values);
-  }
-
   public static function groupTree() {
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     $gids = CRM_Utils_Type::escape($_GET['gids'], 'String');
