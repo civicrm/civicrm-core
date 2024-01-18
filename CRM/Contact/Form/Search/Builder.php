@@ -568,9 +568,11 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
       foreach ($value as $key1 => $value1) {
         //CRM-2676, replacing the conflict for same custom field name from different custom group.
-        $customGroupName = CRM_Core_BAO_Mapping::getCustomGroupName($key1);
+        $customFieldId = CRM_Core_BAO_CustomField::getKeyID($key1);
 
-        if ($customGroupName) {
+        if ($customFieldId) {
+          $customGroupName = CRM_Core_BAO_CustomField::getField($customFieldId)['custom_group']['title'];
+          $customGroupName = CRM_Utils_String::ellipsify($customGroupName, 13);
           $relatedMapperFields[$key][$key1] = $mapperFields[$key][$key1] = $customGroupName . ': ' . $value1['title'];
         }
         else {

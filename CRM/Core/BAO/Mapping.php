@@ -532,15 +532,16 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
   }
 
   /**
-   * Function returns all  Custom group Names.
+   * Unused function.
+   * @deprecated since 5.71 will be removed around 5.85.
    *
-   * @param int $customfieldId
-   *   Related file id.
+   * @param string $customfieldId
    *
    * @return null|string
    *   $customGroupName all custom group names
    */
   public static function getCustomGroupName($customfieldId) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomField::getField');
     if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($customfieldId)) {
       $customGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customFieldId, 'custom_group_id');
       $customGroupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'title');
