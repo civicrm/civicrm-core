@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4d83914e1eba4abeb1a44bcc1512aa47",
+    "content-hash": "142449f17c1a3e6d486d398c274352f8",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -2007,16 +2007,16 @@
         },
         {
             "name": "pear/db",
-            "version": "v1.11.0",
+            "version": "v1.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/DB.git",
-                "reference": "7e4f33dcecd99595df982ef8f56c1d7c2bbeaa21"
+                "reference": "403775906ed8bb25505cefdee49885de181862da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/DB/zipball/7e4f33dcecd99595df982ef8f56c1d7c2bbeaa21",
-                "reference": "7e4f33dcecd99595df982ef8f56c1d7c2bbeaa21",
+                "url": "https://api.github.com/repos/pear/DB/zipball/403775906ed8bb25505cefdee49885de181862da",
+                "reference": "403775906ed8bb25505cefdee49885de181862da",
                 "shasum": ""
             },
             "require": {
@@ -2047,6 +2047,11 @@
                     "role": "Lead"
                 },
                 {
+                    "name": "Armin Graefe",
+                    "email": "schengawegga@gmail.com",
+                    "role": "Lead"
+                },
+                {
                     "name": "Stig Bakken",
                     "email": "stig@php.net",
                     "role": "Developer"
@@ -2062,7 +2067,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=DB",
                 "source": "https://github.com/pear/DB"
             },
-            "time": "2021-08-11T00:24:34+00:00"
+            "time": "2024-01-17T08:06:35+00:00"
         },
         {
             "name": "pear/log",
@@ -2126,16 +2131,16 @@
         },
         {
             "name": "pear/mail",
-            "version": "v1.5.0",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Mail.git",
-                "reference": "c31b7635899a630a8ce681e5ced18cededcc15f3"
+                "reference": "eb053f8b74f4f3178105fcf001626e63068c0dbc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Mail/zipball/c31b7635899a630a8ce681e5ced18cededcc15f3",
-                "reference": "c31b7635899a630a8ce681e5ced18cededcc15f3",
+                "url": "https://api.github.com/repos/pear/Mail/zipball/eb053f8b74f4f3178105fcf001626e63068c0dbc",
+                "reference": "eb053f8b74f4f3178105fcf001626e63068c0dbc",
                 "shasum": ""
             },
             "require": {
@@ -2189,7 +2194,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Mail",
                 "source": "https://github.com/pear/Mail"
             },
-            "time": "2022-11-29T22:04:18+00:00"
+            "time": "2024-01-15T21:56:23+00:00"
         },
         {
             "name": "pear/mail_mime",
@@ -5484,5 +5489,5 @@
     "platform-overrides": {
         "php": "7.4.0"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
