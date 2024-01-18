@@ -2338,7 +2338,8 @@ AND      default_value IS NOT NULL";
   }
 
   /**
-   * @deprecated old function only used by APIv3.
+   * @deprecated Old function with weirdly ambiguous logic.
+   * Only used by APIv3. Use at your peril.
    *
    * @param string $fieldName Field name or label
    * @param string|null $groupName (Optional) Group name or label
@@ -2381,7 +2382,7 @@ AND      default_value IS NOT NULL";
   }
 
   /**
-   * Given ID of a custom field, return its name as well as the name of the custom group it belongs to.
+   * @deprecated Old function only used by APIv3.
    *
    * @param array $ids
    *
