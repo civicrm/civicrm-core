@@ -2101,35 +2101,22 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
+   * Returns TRUE if this is a multivalued group which has reached the max for a given entity.
+   *
    * @param int $customGroupId
    * @param int $entityId
-   *
-   * @return bool
    */
-  public static function hasReachedMaxLimit($customGroupId, $entityId) {
-    // check whether the group is multiple
-    $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'is_multiple');
-    $isMultiple = (bool) $isMultiple;
-    $hasReachedMax = FALSE;
-    if ($isMultiple &&
-      ($maxMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'max_multiple'))
-    ) {
-      if (!$maxMultiple) {
-        $hasReachedMax = FALSE;
-      }
-      else {
-        $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'table_name');
-        // count the number of entries for a entity
-        $sql = "SELECT COUNT(id) FROM {$tableName} WHERE entity_id = %1";
-        $params = [1 => [$entityId, 'Integer']];
-        $count = CRM_Core_DAO::singleValueQuery($sql, $params);
-
-        if ($count >= $maxMultiple) {
-          $hasReachedMax = TRUE;
-        }
-      }
+  public static function hasReachedMaxLimit($customGroupId, $entityId): bool {
+    $customGroup = self::getGroup(['id' => $customGroupId]);
+    $maxMultiple = $customGroup['max_multiple'] ?? NULL;
+    if ($maxMultiple && $customGroup['is_multiple']) {
+      // count the number of entries for entity
+      $sql = "SELECT COUNT(id) FROM {$customGroup['table_name']} WHERE entity_id = %1";
+      $params = [1 => [$entityId, 'Integer']];
+      $count = CRM_Core_DAO::singleValueQuery($sql, $params);
+      return $count >= $maxMultiple;
     }
-    return $hasReachedMax;
+    return FALSE;
   }
 
   /**
