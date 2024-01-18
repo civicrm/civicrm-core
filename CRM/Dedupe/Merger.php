@@ -10,7 +10,6 @@
  */
 
 use Civi\Api4\Contact;
-use Civi\Api4\CustomGroup;
 
 /**
  *
@@ -624,15 +623,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param array $cidRefs
    *
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected static function filterRowBasedCustomDataFromCustomTables(array &$cidRefs) {
-    $customTables = (array) CustomGroup::get(FALSE)
-      ->setSelect(['table_name'])
-      ->addWhere('is_multiple', '=', 0)
-      ->addWhere('extends', 'IN', array_merge(['Contact'], CRM_Contact_BAO_ContactType::contactTypes()))
-      ->execute()
-      ->indexBy('table_name');
+    $filters = [
+      'is_multiple' => FALSE,
+      'extends' => 'Contact',
+    ];
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters);
+    $customTables = array_column($customGroups, NULL, 'table_name');
     foreach (array_intersect_key($cidRefs, $customTables) as $tableName => $cidSpec) {
       if (in_array('entity_id', $cidSpec, TRUE)) {
         unset($cidRefs[$tableName][array_search('entity_id', $cidSpec, TRUE)]);
