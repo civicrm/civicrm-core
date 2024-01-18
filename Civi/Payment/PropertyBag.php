@@ -44,6 +44,8 @@ class PropertyBag implements \ArrayAccess {
     'billing_state_province'      => 'billingStateProvince',
     'state_province'              => 'billingStateProvince',
     'billingCountry'              => TRUE,
+    'billing_country'             => 'billingCountry',
+    'country'                     => 'billingCountry',
     'contactID'                   => TRUE,
     'contact_id'                  => 'contactID',
     'contributionID'              => TRUE,
@@ -804,7 +806,7 @@ class PropertyBag implements \ArrayAccess {
    */
   public function setCurrency($value, $label = 'default') {
     if (!preg_match('/^[A-Z]{3}$/', $value)) {
-      throw new \InvalidArgumentException("Attemted to setCurrency with a value that was not an ISO 3166-1 alpha 3 currency code");
+      throw new \InvalidArgumentException("Attempted to setCurrency with a value that was not an ISO 3166-1 alpha 3 currency code");
     }
     return $this->set('currency', $label, $value);
   }
