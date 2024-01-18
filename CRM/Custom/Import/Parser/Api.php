@@ -1,7 +1,5 @@
 <?php
 
-use Civi\Api4\CustomField;
-
 /**
  * Class CRM_Custom_Import_Parser_Api
  */
@@ -181,13 +179,10 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
    */
   private function getGroupFieldsForImport(int $customGroupID): array {
     $importableFields = [];
-    $fields = (array) CustomField::get(FALSE)
-      ->addSelect('*', 'custom_group_id.is_multiple', 'custom_group_id.name', 'custom_group_id.extends')
-      ->addWhere('custom_group_id', '=', $customGroupID)->execute();
+    $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['id' => $customGroupID]);
 
-    foreach ($fields as $values) {
-      $datatype = $values['data_type'] ?? NULL;
-      if ($datatype === 'File') {
+    foreach ($customGroup['fields'] as $values) {
+      if ($values['data_type'] === 'File') {
         continue;
       }
       /* generate the key for the fields array */
@@ -206,10 +201,10 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
         'is_search_range' => $values['is_search_range'],
         'date_format' => $values['date_format'],
         'time_format' => $values['time_format'],
-        'extends' => $values['custom_group_id.extends'],
+        'extends' => $customGroup['extends'],
         'custom_group_id' => $customGroupID,
-        'custom_group_id.name' => $values['custom_group_id.name'],
-        'is_multiple' => $values['custom_group_id.is_multiple'],
+        'custom_group_id.name' => $customGroup['name'],
+        'is_multiple' => $customGroup['is_multiple'],
       ];
     }
     return $importableFields;
