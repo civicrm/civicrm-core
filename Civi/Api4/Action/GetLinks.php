@@ -151,9 +151,8 @@ class GetLinks extends BasicGetAction {
     if (!$this->getCheckPermissions()) {
       return;
     }
-    $allowedApiActions = $this->getAllowedEntityActions();
     foreach ($links as $index => $link) {
-      if (!in_array($link['api_action'], $allowedApiActions, TRUE)) {
+      if (!$this->isActionAllowed($link['entity'], $link['api_action'])) {
         unset($links[$index]);
         continue;
       }
@@ -167,9 +166,13 @@ class GetLinks extends BasicGetAction {
     }
   }
 
-  private function getAllowedEntityActions(): array {
+  private function isActionAllowed(string $entityName, string $actionName): bool {
+    $allowedApiActions = $this->getAllowedEntityActions($entityName);
+    return in_array($actionName, $allowedApiActions, TRUE);
+  }
+
+  private function getAllowedEntityActions(string $entityName): array {
     $uid = \CRM_Core_Session::getLoggedInContactID();
-    $entityName = $this->getEntityName();
     if (!isset(\Civi::$statics[__CLASS__]['actions'][$entityName][$uid])) {
       \Civi::$statics[__CLASS__]['actions'][$entityName][$uid] = civicrm_api4($entityName, 'getActions', ['checkPermissions' => TRUE])->column('name');
     }
