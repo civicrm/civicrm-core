@@ -96,20 +96,30 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals(sort($subtypes), sort($result));
     $this->strictArrayCompare($this->getExpectedAllSubtypes(), CRM_Contact_BAO_ContactType::subTypeInfo());
 
-  }
-
-  /**
-   * Test subTypes() methods with invalid data
-   */
-  public function testGetMethodsInvalid(): void {
-
+    // Invalid input yields empty result
     $params = 'invalid';
     $result = CRM_Contact_BAO_ContactType::subTypes($params);
-    $this->assertEquals(empty($result), TRUE);
+    $this->assertEmpty($result);
 
     $params = ['invalid'];
     $result = CRM_Contact_BAO_ContactType::subTypes($params);
-    $this->assertEquals(empty($result), TRUE);
+    $this->assertEmpty($result);
+
+    // Test getBasicType with string input
+    $this->assertEquals('Individual', CRM_Contact_BAO_ContactType::getBasicType('sub1_individual'));
+    $this->assertEquals('Individual', CRM_Contact_BAO_ContactType::getBasicType('sub2_individual'));
+    $this->assertEquals('Organization', CRM_Contact_BAO_ContactType::getBasicType('sub_organization'));
+    $this->assertEquals('Household', CRM_Contact_BAO_ContactType::getBasicType('sub_household'));
+    $this->assertNull(CRM_Contact_BAO_ContactType::getBasicType('invalid'));
+
+    // Test getBasicTypes with array input
+    $subTypeToType = [
+      'sub1_individual' => 'Individual',
+      'sub2_individual' => 'Individual',
+      'sub_organization' => 'Organization',
+      'sub_household' => 'Household',
+    ];
+    $this->assertEquals($subTypeToType, CRM_Contact_BAO_ContactType::getBasicType(array_keys($subTypeToType)));
   }
 
   /**

@@ -333,40 +333,15 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
    * Retrieve the basic contact type associated with given subType.
    *
    * @param array|string $subType contact subType.
-   * @return array|string
+   * @return array|string|null
+   *   Return value will be a string if input is a string, otherwise an array
    */
   public static function getBasicType($subType) {
-    // @todo - use Cache class - ie like Civi::cache('contactTypes')
-    static $_cache = NULL;
-    if ($_cache === NULL) {
-      $_cache = [];
+    $allSubTypes = array_column(self::subTypeInfo(NULL, TRUE), 'parent', 'name');
+    if (is_array($subType)) {
+      return array_intersect_key($allSubTypes, array_flip($subType));
     }
-
-    $isArray = TRUE;
-    if ($subType && !is_array($subType)) {
-      $subType = [$subType];
-      $isArray = FALSE;
-    }
-    $argString = implode('_', $subType);
-
-    if (!array_key_exists($argString, $_cache)) {
-      $_cache[$argString] = [];
-
-      $sql = "
-SELECT subtype.name as contact_subtype, type.name as contact_type
-FROM   civicrm_contact_type subtype
-INNER JOIN civicrm_contact_type type ON ( subtype.parent_id = type.id )
-WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      while ($dao->fetch()) {
-        if (!$isArray) {
-          $_cache[$argString] = $dao->contact_type;
-          break;
-        }
-        $_cache[$argString][$dao->contact_subtype] = $dao->contact_type;
-      }
-    }
-    return $_cache[$argString];
+    return $allSubTypes[$subType] ?? NULL;
   }
 
   /**
@@ -481,6 +456,7 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
         throw new CRM_Core_Exception(ts("You can not delete this contact type -- it is used by %1 custom field group(s). The custom fields must be deleted first.", [1 => $custom->N]));
       }
     }
+    Civi::cache('contactTypes')->clear();
   }
 
   /**
