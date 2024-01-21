@@ -10,7 +10,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   public function setUp(): void {
     parent::setUp();
     $params = [
-      'label' => 'sub1_individual',
+      'label' => 'Sub1 Individual',
       'name' => 'sub1_individual',
       'parent_id:name' => 'Individual',
       'is_active' => 1,
@@ -19,7 +19,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->ids['ContactType'][] = ContactType::create()->setValues($params)->execute()->first()['id'];
 
     $params = [
-      'label' => 'sub2_individual',
+      'label' => 'Sub2 Individual',
       'name' => 'sub2_individual',
       'parent_id:name' => 'Individual',
       'is_active' => 1,
@@ -28,7 +28,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->ids['ContactType'][] = ContactType::create()->setValues($params)->execute()->first()['id'];
 
     $params = [
-      'label' => 'sub_organization',
+      'label' => 'Sub Organization',
       'name' => 'sub_organization',
       'parent_id:name' => 'Organization',
       'is_active' => 1,
@@ -37,7 +37,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->ids['ContactType'][] = ContactType::create()->setValues($params)->execute()->first()['id'];
 
     $params = [
-      'label' => 'sub_household',
+      'label' => 'Sub Household',
       'name' => 'sub_household',
       'parent_id:name' => 'Household',
       'is_active' => 1,
@@ -120,6 +120,18 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'sub_household' => 'Household',
     ];
     $this->assertEquals($subTypeToType, CRM_Contact_BAO_ContactType::getBasicType(array_keys($subTypeToType)));
+
+    // Test getSelectElements
+    $selectElements = CRM_Contact_BAO_ContactType::getSelectElements();
+    $this->assertEquals('- Sub1 Individual', $selectElements['Individual__sub1_individual']);
+    $this->assertEquals('- Sub Organization', $selectElements['Organization__sub_organization']);
+    $selectOrder = array_flip(array_keys($selectElements));
+    // Individual is always first
+    $this->assertEquals(0, $selectOrder['Individual']);
+    // Sub-types should come after the primary type, but before the next primary type
+    $this->assertGreaterThan($selectOrder['Individual__sub1_individual'], $selectOrder['Individual__sub2_individual']);
+    $this->assertGreaterThan($selectOrder['Individual__sub1_individual'], $selectOrder['Organization']);
+    $this->assertGreaterThan($selectOrder['Organization'], $selectOrder['Organization__sub_organization']);
   }
 
   /**
@@ -265,7 +277,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'sub1_individual' => [
         'id' => $this->ids['ContactType'][0],
         'name' => 'sub1_individual',
-        'label' => 'sub1_individual',
+        'label' => 'Sub1 Individual',
         'parent_id' => 1,
         'is_active' => TRUE,
         'is_reserved' => FALSE,
@@ -278,7 +290,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'sub2_individual' => [
         'id' => $this->ids['ContactType'][1],
         'name' => 'sub2_individual',
-        'label' => 'sub2_individual',
+        'label' => 'Sub2 Individual',
         'parent_id' => 1,
         'is_active' => TRUE,
         'is_reserved' => FALSE,
@@ -291,7 +303,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'sub_organization' => [
         'id' => $this->ids['ContactType'][2],
         'name' => 'sub_organization',
-        'label' => 'sub_organization',
+        'label' => 'Sub Organization',
         'parent_id' => 3,
         'is_active' => TRUE,
         'is_reserved' => FALSE,
@@ -304,7 +316,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'sub_household' => [
         'id' => $this->ids['ContactType'][3],
         'name' => 'sub_household',
-        'label' => 'sub_household',
+        'label' => 'Sub Household',
         'parent_id' => 2,
         'is_active' => TRUE,
         'is_reserved' => FALSE,

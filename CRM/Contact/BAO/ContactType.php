@@ -238,81 +238,43 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    * @param bool $isSeparator
    * @param string $separator
    *
-   * @return mixed
-   * @throws \Civi\Core\Exception\DBQueryException
+   * @return array
    */
   public static function getSelectElements(
     $all = FALSE,
     $isSeparator = TRUE,
     $separator = '__'
-  ) {
-    // @todo - use Cache class - ie like Civi::cache('contactTypes')
-    static $_cache = NULL;
+  ): array {
+    $contactTypes = self::getAllContactTypes();
+    foreach ($contactTypes as $contactType) {
+      $parent = $contactType['parent'] ? $contactTypes[$contactType['parent']] : NULL;
+      if (!$all && (!$contactType['is_active'] || ($parent && !$parent['is_active']))) {
+        continue;
+      }
+      if ($parent) {
+        $key = $isSeparator ? $parent['name'] . $separator . $contactType['name'] : $contactType['name'];
+        $label = "- {$contactType['label']}";
+        $pName = $parent['name'];
+      }
+      else {
+        $key = $contactType['name'];
+        $label = $contactType['label'];
+        $pName = $contactType['name'];
+      }
 
-    if ($_cache === NULL) {
-      $_cache = [];
+      if (!isset($values[$pName])) {
+        $values[$pName] = [];
+      }
+      $values[$pName][] = ['key' => $key, 'label' => $label];
     }
 
-    // @todo - call getAllContactTypes & return filtered results.
-    $argString = $all ? 'CRM_CT_GSE_1' : 'CRM_CT_GSE_0';
-    $argString .= $isSeparator ? '_1' : '_0';
-    $argString .= $separator;
-    $argString = CRM_Utils_Cache::cleanKey($argString);
-    if (!array_key_exists($argString, $_cache)) {
-      $cache = CRM_Utils_Cache::singleton();
-      $_cache[$argString] = $cache->get($argString);
-
-      if (!$_cache[$argString]) {
-        $_cache[$argString] = [];
-
-        $sql = '
-SELECT    c.name as child_name , c.label as child_label , c.id as child_id,
-          p.name as parent_name, p.label as parent_label, p.id as parent_id
-FROM      civicrm_contact_type c
-LEFT JOIN civicrm_contact_type p ON ( c.parent_id = p.id )
-WHERE     ( c.name IS NOT NULL )
-';
-
-        if ($all === FALSE) {
-          $sql .= '
-AND   c.is_active = 1
-AND   ( p.is_active = 1 OR p.id IS NULL )
-';
-        }
-        $sql .= " ORDER BY c.id";
-
-        $values = [];
-        $dao = CRM_Core_DAO::executeQuery($sql);
-        while ($dao->fetch()) {
-          if (!empty($dao->parent_id)) {
-            $key = $isSeparator ? $dao->parent_name . $separator . $dao->child_name : $dao->child_name;
-            $label = "- {$dao->child_label}";
-            $pName = $dao->parent_name;
-          }
-          else {
-            $key = $dao->child_name;
-            $label = $dao->child_label;
-            $pName = $dao->child_name;
-          }
-
-          if (!isset($values[$pName])) {
-            $values[$pName] = [];
-          }
-          $values[$pName][] = ['key' => $key, 'label' => $label];
-        }
-
-        $selectElements = [];
-        foreach ($values as $pName => $elements) {
-          foreach ($elements as $element) {
-            $selectElements[$element['key']] = $element['label'];
-          }
-        }
-        $_cache[$argString] = $selectElements;
-
-        $cache->set($argString, $_cache[$argString]);
+    $selectElements = [];
+    foreach ($values as $elements) {
+      foreach ($elements as $element) {
+        $selectElements[$element['key']] = $element['label'];
       }
     }
-    return $_cache[$argString];
+    return $selectElements;
   }
 
   /**
