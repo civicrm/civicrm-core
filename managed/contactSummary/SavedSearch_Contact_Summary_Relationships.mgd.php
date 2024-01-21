@@ -293,7 +293,7 @@ return [
         'saved_search_id.name' => 'Contact_Summary_Relationships',
         'type' => 'table',
         'settings' => [
-          'description' => ts('These relationships are Disabled OR have a past End Date.'),
+          'description' => '',
           'sort' => [],
           'limit' => 50,
           'pager' => [
