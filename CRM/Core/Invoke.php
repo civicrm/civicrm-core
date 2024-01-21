@@ -229,6 +229,7 @@ class CRM_Core_Invoke {
     // jsortable.tpl (datatables)
     $template->assign('sourceUrl');
     $template->assign('useAjax', 0);
+    $template->assign('defaultOrderByDirection', 'asc');
 
     if ($item) {
 
