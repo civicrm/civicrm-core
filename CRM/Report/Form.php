@@ -4180,7 +4180,7 @@ ORDER BY cg.weight, cf.weight";
         if ((!$this->isFieldSelected($prop)) || ($joinsForFiltersOnly && !$this->isFieldFiltered($prop))) {
           continue;
         }
-        $baseJoin = CRM_Utils_Array::value($prop['extends'], $this->_customGroupExtendsJoin, "{$this->_aliases[$extendsTable]}.id");
+        $baseJoin = $this->_customGroupExtendsJoin[$prop['extends']] ?? "{$this->_aliases[$extendsTable]}.id";
 
         $customJoin = is_array($this->_customGroupJoin) ? $this->_customGroupJoin[$table] : $this->_customGroupJoin;
         $this->_from .= "
@@ -4188,10 +4188,8 @@ ORDER BY cg.weight, cf.weight";
         // handle for ContactReference
         if (array_key_exists('fields', $prop)) {
           foreach ($prop['fields'] as $fieldName => $field) {
-            if (($field['dataType'] ?? NULL) ==
-              'ContactReference'
-            ) {
-              $columnName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', CRM_Core_BAO_CustomField::getKeyID($fieldName), 'column_name');
+            if (($field['dataType'] ?? NULL) === 'ContactReference') {
+              $columnName = CRM_Core_BAO_CustomField::getField(CRM_Core_BAO_CustomField::getKeyID($fieldName))['column_name'];
               $this->_from .= "
 LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_aliases[$table]}.{$columnName} ";
             }
