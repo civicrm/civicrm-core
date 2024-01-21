@@ -4171,13 +4171,7 @@ ORDER BY cg.weight, cf.weight";
       return;
     }
     $mapper = CRM_Core_BAO_CustomQuery::$extendsMap;
-    //CRM-18276 GROUP_CONCAT could be used with singleValueQuery and then exploded,
-    //but by default that truncates to 1024 characters, which causes errors with installs with lots of custom field sets
-    $customTables = [];
-    $customTablesDAO = CRM_Core_DAO::executeQuery("SELECT table_name FROM civicrm_custom_group");
-    while ($customTablesDAO->fetch()) {
-      $customTables[] = $customTablesDAO->table_name;
-    }
+    $customTables = array_column(CRM_Core_BAO_CustomGroup::getAll(), 'table_name');
 
     foreach ($this->_columns as $table => $prop) {
       if (in_array($table, $customTables)) {
