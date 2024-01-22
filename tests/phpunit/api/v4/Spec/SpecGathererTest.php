@@ -51,7 +51,7 @@ class SpecGathererTest extends Api4TestBase {
     $gather = new SpecGatherer();
 
     $provider = $this->prophesize(SpecProviderInterface::class);
-    $provider->applies('Contact', 'create', [])->willReturn(TRUE);
+    $provider->applies('Contact', 'create')->willReturn(TRUE);
     $provider->modifySpec(Argument::any())->will(function ($args) {
       /** @var \Civi\Api4\Service\Spec\RequestSpec $spec */
       $spec = $args[0];

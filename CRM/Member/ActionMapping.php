@@ -35,7 +35,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return 'Membership';
   }
 
-  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+  public function modifyApiSpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
     $spec->getFieldByName('entity_value')
       ->setLabel(ts('Membership Type'));
     $spec->getFieldByName('entity_status')

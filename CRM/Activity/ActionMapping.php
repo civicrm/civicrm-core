@@ -40,7 +40,7 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return 'Activity';
   }
 
-  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+  public function modifyApiSpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
     $spec->getFieldByName('entity_value')
       ->setLabel(ts('Activity Type'));
     $spec->getFieldByName('entity_status')

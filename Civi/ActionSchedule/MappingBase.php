@@ -11,6 +11,7 @@
 
 namespace Civi\ActionSchedule;
 
+use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Service\AutoSubscriber;
 
@@ -101,10 +102,17 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
     return TRUE;
   }
 
-  final public function applies(string $entity, string $action, array $values = []) {
+  abstract public function modifyApiSpec(RequestSpec $spec);
+
+  final public function modifySpec(RequestSpec $spec) {
+    if ($this->getId() == $spec->getValue('mapping_id')) {
+      $this->modifyApiSpec($spec);
+    }
+  }
+
+  final public function applies(string $entity, string $action): bool {
     return $entity === 'ActionSchedule' &&
-      in_array($action, ['create', 'get', 'update', 'save'], TRUE) &&
-      $this->getId() == ($values['mapping_id'] ?? NULL);
+      in_array($action, ['create', 'get', 'update', 'save'], TRUE);
   }
 
 }

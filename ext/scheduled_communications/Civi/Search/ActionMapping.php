@@ -45,7 +45,7 @@ class ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return \CRM_Core_DAO_AllCoreTables::getTableForEntityName($this->savedSearch['api_entity']);
   }
 
-  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+  public function modifyApiSpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
     $spec->getFieldByName('entity_value')
       ->setLabel(ts('Saved Search'))
       ->setInputAttr('multiple', FALSE);
