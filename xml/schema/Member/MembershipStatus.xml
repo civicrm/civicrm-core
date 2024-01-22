@@ -134,6 +134,9 @@
     <required>true</required>
     <comment>Does this status aggregate to current members (e.g. New, Renewed, Grace might all be TRUE... while Unrenewed, Lapsed, Inactive would be FALSE).</comment>
     <add>1.5</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
   </field>
   <field>
     <name>is_admin</name>
