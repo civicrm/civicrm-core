@@ -142,11 +142,9 @@ class SpecGatherer extends AutoService {
    * @see \CRM_Core_SelectValues::customGroupExtends
    */
   private function addCustomFields(string $entity, RequestSpec $spec, bool $checkPermissions) {
-    $values = $spec->getValues();
-
-    // If contact type is given
-    if ($entity === 'Contact' && !empty($values['contact_type'])) {
-      $entity = $values['contact_type'];
+    // If contact type is given, treat it as the api entity
+    if ($entity === 'Contact' && $spec->getValue('contact_type')) {
+      $entity = $spec->getValue('contact_type');
     }
 
     $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entity);
@@ -163,6 +161,19 @@ class SpecGatherer extends AutoService {
       'extends' => $customInfo['extends'],
       'is_multiple' => FALSE,
     ];
+    if (is_string($grouping) && $spec->hasValue($grouping)) {
+      $filters['extends_entity_column_value'] = array_merge([NULL], (array) $spec->getValue($grouping));
+    }
+    // Gather values to filter multiple groupings (Participant entity)
+    $groupingValues = [];
+    if (is_array($grouping)) {
+      foreach ($grouping as $groupingKey) {
+        if ($spec->hasValue($groupingKey)) {
+          $groupingValues[$groupingKey] = $spec->getValue($groupingKey);
+        }
+      }
+    }
+
     $permissionType = NULL;
     if ($checkPermissions) {
       $permissionType = in_array($spec->getAction(), ['create', 'update', 'save', 'delete', 'replace']) ?
@@ -172,7 +183,7 @@ class SpecGatherer extends AutoService {
     $customGroups = \CRM_Core_BAO_CustomGroup::getAll($filters, $permissionType);
 
     foreach ($customGroups as $customGroup) {
-      if ($this->customGroupBelongsTo($customGroup, $values, $grouping)) {
+      if (!$groupingValues || $this->customGroupBelongsTo($customGroup, $groupingValues, $grouping)) {
         foreach ($customGroup['fields'] as $fieldArray) {
           $field = SpecFormatter::arrayToField($fieldArray, $entity, $customGroup);
           $spec->addFieldSpec($field);
@@ -182,42 +193,29 @@ class SpecGatherer extends AutoService {
   }
 
   /**
-   * Check if custom group meets criteria from $values
+   * Implements the logic needed by entities that use multiple groupings
+   * (in core, only Participant custom fields have multiple groupings)
    */
   private function customGroupBelongsTo(array $customGroup, array $values, $grouping): bool {
-    // No values or grouping = no filtering needed
-    if (empty($values) ||
-      (empty($customGroup['extends_entity_column_value']) && empty($customGroup['extends_entity_column_id']))
-    ) {
+    if (empty($customGroup['extends_entity_column_value']) && empty($customGroup['extends_entity_column_id'])) {
+      // Custom group has no filter
       return TRUE;
     }
-    if (is_string($grouping) && array_key_exists($grouping, $values)) {
-      foreach ((array) $values[$grouping] as $value) {
-        if (in_array($value, $customGroup['extends_entity_column_value'])) {
-          return TRUE;
-        }
-      }
-      return empty($customGroup['extends_entity_column_value']);
-    }
-    // Handle multiple groupings
-    // (in core, only Participant custom fields have multiple groupings)
-    elseif (is_array($grouping)) {
-      foreach ($grouping as $columnId => $group) {
-        if (array_key_exists($group, $values)) {
-          if (empty($values[$group])) {
-            if (
-              !$customGroup['extends_entity_column_value'] &&
-              $customGroup['extends_entity_column_id'] == $columnId
-            ) {
-              return TRUE;
-            }
-          }
-          elseif (
-            array_intersect((array) $values[$group], (array) $customGroup['extends_entity_column_value']) &&
+    foreach ($grouping as $columnId => $group) {
+      if (array_key_exists($group, $values)) {
+        if (empty($values[$group])) {
+          if (
+            !$customGroup['extends_entity_column_value'] &&
             $customGroup['extends_entity_column_id'] == $columnId
           ) {
             return TRUE;
           }
+        }
+        elseif (
+          array_intersect((array) $values[$group], (array) $customGroup['extends_entity_column_value']) &&
+          $customGroup['extends_entity_column_id'] == $columnId
+        ) {
+          return TRUE;
         }
       }
     }

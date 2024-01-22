@@ -202,6 +202,10 @@ class RequestSpec implements \Iterator {
     return $this->values[$key] ?? NULL;
   }
 
+  public function hasValue(string $key): bool {
+    return array_key_exists($key, $this->values);
+  }
+
   /**
    * @return string
    */
