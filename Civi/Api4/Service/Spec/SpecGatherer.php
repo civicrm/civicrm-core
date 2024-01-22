@@ -64,10 +64,17 @@ class SpecGatherer extends AutoService {
       }
     }
 
-    foreach ($this->specProviders as $provider) {
-      if ($provider->applies($entity, $action, $specification->getValues())) {
-        $provider->modifySpec($specification);
+    $cacheKey = $entity . $action . json_encode($specification->getValues());
+    if (isset(\Civi::$statics[$cacheKey])) {
+      $specification = \Civi::$statics[$cacheKey];
+    }
+    else {
+      foreach ($this->specProviders as $provider) {
+        if ($provider->applies($entity, $action, $specification->getValues())) {
+          $provider->modifySpec($specification);
+        }
       }
+      \Civi::$statics[$cacheKey] = $specification;
     }
 
     return $specification;
