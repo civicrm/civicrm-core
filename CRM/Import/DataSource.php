@@ -34,6 +34,18 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    */
   private $limit;
 
+  public function getLimit(): int {
+    return $this->limit;
+  }
+
+  public function getOffset(): int {
+    return $this->offset;
+  }
+
+  public function getStatuses(): array {
+    return $this->statuses;
+  }
+
   /**
    * @param int $limit
    *
@@ -41,7 +53,7 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    */
   public function setLimit(int $limit): DataSourceInterface {
     $this->limit = $limit;
-    $this->queryResultObject = NULL;
+    $this->flushQueryResults();
     return $this;
   }
 
@@ -52,7 +64,7 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    */
   public function setOffset(int $offset): CRM_Import_DataSource {
     $this->offset = $offset;
-    $this->queryResultObject = NULL;
+    $this->flushQueryResults();
     return $this;
   }
 
@@ -137,7 +149,7 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
    */
   public function setStatuses(array $statuses): DataSourceInterface {
     $this->statuses = $statuses;
-    $this->queryResultObject = NULL;
+    $this->flushQueryResults();
     return $this;
   }
 
@@ -190,6 +202,19 @@ abstract class CRM_Import_DataSource implements DataSourceInterface {
     }
     $this->row = $values;
     return $values;
+  }
+
+  /**
+   * Flush the existing query to retrieve rows.
+   *
+   * The query will be run again, potentially retrieving newly-available rows.
+   * Note the 'newly available' could mean an external process has intervened.
+   * For example the import_extensions lazy-loads into the import table.
+   *
+   * @return void
+   */
+  private function flushQueryResults() {
+    $this->queryResultObject = NULL;
   }
 
   /**
