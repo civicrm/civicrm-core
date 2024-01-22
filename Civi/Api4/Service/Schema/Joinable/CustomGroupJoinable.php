@@ -64,27 +64,4 @@ class CustomGroupJoinable extends Joinable {
     return $entityFields;
   }
 
-  /**
-   * @inheritDoc
-   */
-  public function getField($fieldName) {
-    foreach ($this->getEntityFields() as $field) {
-      $name = $field->getName();
-      if ($name === $fieldName || strrpos($name, '.' . $fieldName) === strlen($name) - strlen($fieldName) - 1) {
-        return $field;
-      }
-    }
-    return NULL;
-  }
-
-  /**
-   * @return string
-   */
-  public function getSqlColumn($fieldName) {
-    if (strpos($fieldName, '.') !== FALSE) {
-      $fieldName = substr($fieldName, 1 + strrpos($fieldName, '.'));
-    }
-    return $this->columns[$fieldName];
-  }
-
 }
