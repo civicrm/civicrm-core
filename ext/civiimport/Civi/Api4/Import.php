@@ -11,7 +11,6 @@
 namespace Civi\Api4;
 
 use Civi\Api4\Action\GetLinks;
-use Civi\Api4\Generic\ExportAction;
 use Civi\Api4\Import\CheckAccessAction;
 use Civi\Api4\Generic\DAOGetAction;
 use Civi\Api4\Generic\DAOGetFieldsAction;
@@ -148,15 +147,6 @@ class Import {
    */
   public static function validate(int $userJobID, bool $checkPermissions = TRUE): Validate {
     return (new Validate('Import_' . $userJobID, __FUNCTION__))->setCheckPermissions($checkPermissions);
-  }
-
-  /**
-   * @param bool $checkPermissions
-   * @return \Civi\Api4\Generic\ExportAction
-   */
-  public static function export($checkPermissions = TRUE) {
-    return (new ExportAction('Import', __FUNCTION__))
-      ->setCheckPermissions($checkPermissions);
   }
 
   /**
