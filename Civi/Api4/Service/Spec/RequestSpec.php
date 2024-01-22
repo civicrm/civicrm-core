@@ -49,6 +49,11 @@ class RequestSpec implements \Iterator {
   protected $values = [];
 
   /**
+   * @var array
+   */
+  protected $valuesUsed = [];
+
+  /**
    * @param string $entity
    * @param string $action
    * @param array $values
@@ -57,51 +62,34 @@ class RequestSpec implements \Iterator {
     $this->entity = $entity;
     $this->action = $action;
     $this->entityTableName = CoreUtil::getTableName($entity);
-    $this->values = $this->resolveValues($values);
+    $this->values = $values;
   }
 
   /**
-   * Resolve as many values as possible based on available data
+   * Resolve requested value based on available data in $values
+   * e.g. if `id` is available then we can use it to look up other values.
    */
-  private function resolveValues(array $values) {
-    if (!$values) {
-      return $values;
+  private function resolveValue(string $key) {
+    $this->valuesUsed[$key] = TRUE;
+    if (!$this->values || array_key_exists($key, $this->values)) {
+      return;
     }
-    $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($this->entity);
-    $idCol = $customInfo['column'] ?? NULL;
-    $grouping = (array) ($customInfo['grouping'] ?? []);
-    $lookupNeeded = array_diff($grouping, array_keys($values));
-    // If `id` given, use that first
-    if ($lookupNeeded && $idCol && !empty($values[$idCol])) {
-      $record = \civicrm_api4($this->entity, 'get', [
-        'checkPermissions' => FALSE,
-        'where' => [[$idCol, '=', $values[$idCol]]],
-        'select' => $lookupNeeded,
-      ])->first();
-      if ($record) {
-        $values += $record;
+    $baoName = CoreUtil::getBAOFromApiName($this->entity);
+    $idCol = CoreUtil::getIdFieldName($this->entity);
+    // If `id` given, use it to look up value
+    if (!array_key_exists($key, $this->values) && !empty($this->values[$idCol]) && array_key_exists($key, $baoName::getSupportedFields())) {
+      $this->values[$key] = $baoName::getDbVal($key, $this->values[$idCol], $idCol);
+    }
+    // If we need a value like `event_id.event_type_id` and we only have `event_id`,
+    // use the FK to look up the value from the event.
+    if (!array_key_exists($key, $this->values) && str_contains($key, '.')) {
+      [$fkFrom, $fkTo] = explode('.', $key);
+      $fkField = $baoName::getSupportedFields()[$fkFrom] ?? NULL;
+      $fkBAO = $fkField['FKClassName'] ?? NULL;
+      if (!empty($this->values[$fkFrom]) && $fkBAO) {
+        $this->values[$key] = $fkBAO::getDbVal($fkTo, $this->values[$fkFrom], $fkField['FKColumnName'] ?? 'id');
       }
     }
-    $lookupNeeded = array_diff($grouping, array_keys($values));
-    foreach ($lookupNeeded as $fieldName) {
-      // If we need a value like `event_id.event_type_id` and we only have `event_id`,
-      // use the FK to lookup the value from the event.
-      if (str_contains($fieldName, '.')) {
-        [$fkFrom, $fkTo] = explode('.', $fieldName);
-        $fkEntity = \civicrm_api4($this->entity, 'getFields', [
-          'checkPermissions' => FALSE,
-          'where' => [['name', '=', $fkFrom]],
-        ])->first()['fk_entity'] ?? NULL;
-        if (!empty($values[$fkFrom]) && $fkEntity) {
-          $values[$fieldName] = \civicrm_api4($fkEntity, 'get', [
-            'checkPermissions' => FALSE,
-            'where' => [['id', '=', $values[$fkFrom]]],
-            'select' => [$fkTo],
-          ])->first()[$fkTo] ?? NULL;
-        }
-      }
-    }
-    return $values;
   }
 
   /**
@@ -195,14 +183,23 @@ class RequestSpec implements \Iterator {
   }
 
   /**
+   * What values were requested by specProviders
+   */
+  public function getValuesUsed(): array {
+    return $this->valuesUsed;
+  }
+
+  /**
    * @param string $key
    * @return mixed
    */
   public function getValue(string $key) {
+    $this->resolveValue($key);
     return $this->values[$key] ?? NULL;
   }
 
   public function hasValue(string $key): bool {
+    $this->resolveValue($key);
     return array_key_exists($key, $this->values);
   }
 
