@@ -134,9 +134,8 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    *
    * @param array $dataSet
    *
-   * @throws \CRM_Core_Exception
    */
-  public function testBatchMergeCheckboxCustomFieldHandling($dataSet) {
+  public function testBatchMergeCheckboxCustomFieldHandling(array $dataSet): void {
     $customFieldLabel = 'custom_' . $this->customStringCheckboxID;
     $contact1Params = is_array($dataSet['contacts'][0]) ? [$customFieldLabel => $dataSet['contacts'][0]] : [];
     $contact2Params = is_array($dataSet['contacts'][1]) ? [$customFieldLabel => $dataSet['contacts'][1]] : [];
