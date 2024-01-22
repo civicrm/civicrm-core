@@ -42,7 +42,7 @@ class SpecGatherer extends AutoService {
    * @throws \CRM_Core_Exception
    * @see \Civi\Api4\Service\Spec\Provider\CustomFieldCreationSpecProvider
    */
-  public function getSpec(string $entity, string $action, bool $includeCustom, array $values = [], bool $checkPermissions = FALSE): RequestSpec {
+  public function getSpec(string $entity, string $action, bool $includeCustom = TRUE, array $values = [], bool $checkPermissions = FALSE): RequestSpec {
     $specification = new RequestSpec($entity, $action, $values);
 
     // Real entities

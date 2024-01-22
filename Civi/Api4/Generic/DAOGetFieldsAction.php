@@ -28,7 +28,6 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
    */
   protected function getRecords() {
     $fieldsToGet = $this->_itemsToGet('name');
-    $typesToGet = $this->_itemsToGet('type');
     // Force-set values supplied by entity definition
     // e.g. if this is a ContactType pseudo-entity, set `contact_type` value which is used by the following:
     // @see \Civi\Api4\Service\Spec\Provider\ContactGetSpecProvider
@@ -39,19 +38,11 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
     }
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
-    $includeCustom = TRUE;
-    if ($typesToGet) {
-      $includeCustom = in_array('Custom', $typesToGet, TRUE);
-    }
-    elseif ($fieldsToGet) {
-      // Any fields name with a dot in it is either custom or an implicit join
-      $includeCustom = strpos(implode('', $fieldsToGet), '.') !== FALSE;
-    }
     $this->formatValues();
-    $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $includeCustom, $this->values, $this->checkPermissions);
+    $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), TRUE, $this->values, $this->checkPermissions);
     $fields = $this->specToArray($spec->getFields($fieldsToGet));
     foreach ($fieldsToGet ?? [] as $fieldName) {
-      if (empty($fields[$fieldName]) && strpos($fieldName, '.') !== FALSE) {
+      if (empty($fields[$fieldName]) && str_contains($fieldName, '.')) {
         $fkField = $this->getFkFieldSpec($fieldName, $fields);
         if ($fkField) {
           $fkField['name'] = $fieldName;

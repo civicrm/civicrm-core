@@ -38,7 +38,7 @@ class SpecGathererTest extends Api4TestBase {
 
   public function testBasicFieldsGathering(): void {
     $gatherer = new SpecGatherer();
-    $specs = $gatherer->getSpec('Contact', 'get', FALSE);
+    $specs = $gatherer->getSpec('Contact', 'get');
     $contactDAO = CoreUtil::getBAOFromApiName('Contact');
     $contactFields = $contactDAO::fields();
     $specFieldNames = $specs->getFieldNames();
@@ -59,7 +59,7 @@ class SpecGathererTest extends Api4TestBase {
     });
     $gather->addSpecProvider($provider->reveal());
 
-    $spec = $gather->getSpec('Contact', 'create', FALSE);
+    $spec = $gather->getSpec('Contact', 'create');
     $fieldNames = $spec->getFieldNames();
 
     $this->assertContains('foo', $fieldNames);
