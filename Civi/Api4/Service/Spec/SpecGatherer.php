@@ -34,7 +34,6 @@ class SpecGatherer extends AutoService {
    *
    * @param string $entity
    * @param string $action
-   * @param bool $includeCustom
    * @param array $values
    * @param bool $checkPermissions
    *
@@ -42,15 +41,13 @@ class SpecGatherer extends AutoService {
    * @throws \CRM_Core_Exception
    * @see \Civi\Api4\Service\Spec\Provider\CustomFieldCreationSpecProvider
    */
-  public function getSpec(string $entity, string $action, bool $includeCustom = TRUE, array $values = [], bool $checkPermissions = FALSE): RequestSpec {
+  public function getSpec(string $entity, string $action, array $values = [], bool $checkPermissions = FALSE): RequestSpec {
     $specification = new RequestSpec($entity, $action, $values);
 
     // Real entities
     if (!str_starts_with($entity, 'Custom_')) {
       $this->addDAOFields($entity, $action, $specification, $values);
-      if ($includeCustom) {
-        $this->addCustomFields($entity, $specification, $checkPermissions);
-      }
+      $this->addCustomFields($entity, $specification, $checkPermissions);
     }
     // Custom pseudo-entities
     else {

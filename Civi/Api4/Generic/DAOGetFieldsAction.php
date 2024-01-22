@@ -39,7 +39,7 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
     $this->formatValues();
-    $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), TRUE, $this->values, $this->checkPermissions);
+    $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $this->values, $this->checkPermissions);
     $fields = $this->specToArray($spec->getFields($fieldsToGet));
     foreach ($fieldsToGet ?? [] as $fieldName) {
       if (empty($fields[$fieldName]) && str_contains($fieldName, '.')) {

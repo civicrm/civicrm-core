@@ -302,13 +302,23 @@ class Joinable {
     return get_object_vars($this);
   }
 
+  public function getEntityFields(): array {
+    $entityFields = [];
+    foreach ($this->getEntityFieldSpecs() as $fieldSpec) {
+      if ($fieldSpec->getTableName() === $this->getTargetTable()) {
+        $entityFields[] = $fieldSpec;
+      }
+    }
+    return $entityFields;
+  }
+
   /**
    * @return \Civi\Api4\Service\Spec\RequestSpec
    */
-  public function getEntityFields() {
+  public function getEntityFieldSpecs() {
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
-    $spec = $gatherer->getSpec($this->entity, 'get', FALSE);
+    $spec = $gatherer->getSpec($this->entity, 'get');
     // Serialized fields require a specialized join
     if ($this->serialize) {
       foreach ($spec as $field) {

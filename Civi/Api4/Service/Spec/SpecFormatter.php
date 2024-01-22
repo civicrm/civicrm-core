@@ -33,8 +33,8 @@ class SpecFormatter {
       else {
         // Fields belonging to custom entities are treated as normal; type = Field instead of Custom
         $field->setType('Field');
-        $field->setTableName($customGroup['table_name']);
       }
+      $field->setTableName($customGroup['table_name']);
       if ($dataTypeName === 'EntityReference') {
         $field->setFkEntity($data['fk_entity']);
       }

@@ -22,7 +22,7 @@ class GetFields extends \Civi\Api4\Generic\DAOGetFieldsAction {
     $fields = $this->_itemsToGet('name');
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
-    $spec = $gatherer->getSpec('Custom_' . $this->getCustomGroup(), $this->getAction(), TRUE, $this->values);
+    $spec = $gatherer->getSpec('Custom_' . $this->getCustomGroup(), $this->getAction(), $this->values);
     return $this->specToArray($spec->getFields($fields));
   }
 
