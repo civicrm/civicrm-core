@@ -188,9 +188,9 @@ class RequestSpec implements \Iterator {
   }
 
   /**
-   * @return array
+   * Private because we want everyone downstream to use getValue() and hasValue().
    */
-  public function getValues() {
+  private function getValues(): array {
     return $this->values;
   }
 
