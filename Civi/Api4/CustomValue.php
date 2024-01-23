@@ -51,11 +51,11 @@ class CustomValue {
   /**
    * @param string $customGroup
    * @param bool $checkPermissions
-   * @return Action\CustomValue\GetFields
+   * @return \Civi\Api4\Generic\DAOGetFieldsAction
    * @throws \CRM_Core_Exception
    */
   public static function getFields($customGroup = NULL, $checkPermissions = TRUE) {
-    return (new Action\CustomValue\GetFields($customGroup, __FUNCTION__))
+    return (new Generic\DAOGetFieldsAction("Custom_$customGroup", __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
