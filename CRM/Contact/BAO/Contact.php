@@ -2633,9 +2633,11 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
 
       case 'activity':
         return \Civi\Api4\Activity::get(TRUE)
+          ->selectRowCount()
           ->addJoin('ActivityContact AS activity_contact', 'INNER')
           ->addWhere('activity_contact.contact_id', '=', $contactId)
           ->addWhere('is_test', '=', FALSE)
+          ->addGroupBy('id')
           ->execute()
           ->count();
 
