@@ -1852,9 +1852,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       return 0;
     }
     if (!$this->isQuickConfig()) {
-      return CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID)['auto_renew'];
+      return CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID)['auto_renew'] ?? 0;
     }
-    $membershipTypeAutoRenewOption = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID)['auto_renew'];
+    $membershipTypeAutoRenewOption = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID)['auto_renew'] ?? 0;
     if ($membershipTypeAutoRenewOption === 2 || $membershipTypeAutoRenewOption === 0) {
       // It is not possible to override never or always at the membership block leve.
       return $membershipTypeAutoRenewOption;
