@@ -2439,19 +2439,19 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if ($event->action === 'create') {
       $params = &$event->params;
-      $params['created_id'] ??= CRM_Core_Session::singleton()->getLoggedInContactID();
-      $params['override_verp'] ??= !Civi::settings()->get('track_civimail_replies');
-      $params['visibility'] ??= 'Public Pages';
-      $params['dedupe_email'] ??= Civi::settings()->get('dedupe_email_default');
-      $params['open_tracking'] ??= Civi::settings()->get('open_tracking_default');
-      $params['url_tracking'] ??= Civi::settings()->get('url_tracking_default');
-      $params['header_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
-      $params['footer_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
-      $params['optout_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('OptOut', '');
-      $params['reply_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Reply', '');
-      $params['resubscribe_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Resubscribe', '');
-      $params['unsubscribe_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Unsubscribe', '');
-      $params['mailing_type'] ??= 'standalone';
+      $params['created_id'] = $params['created_id'] ?? CRM_Core_Session::singleton()->getLoggedInContactID();
+      $params['override_verp'] = $params['override_verp'] ?? !Civi::settings()->get('track_civimail_replies');
+      $params['visibility'] = $params['visibility'] ?? 'Public Pages';
+      $params['dedupe_email'] = $params['dedupe_email'] ?? Civi::settings()->get('dedupe_email_default');
+      $params['open_tracking'] = $params['open_tracking'] ?? Civi::settings()->get('open_tracking_default');
+      $params['url_tracking'] = $params['url_tracking'] ?? Civi::settings()->get('url_tracking_default');
+      $params['header_id'] = $params['header_id'] ?? CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
+      $params['footer_id'] = $params['footer_id'] ?? CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
+      $params['optout_id'] = $params['optout_id'] ?? CRM_Mailing_PseudoConstant::defaultComponent('OptOut', '');
+      $params['reply_id'] = $params['reply_id'] ?? CRM_Mailing_PseudoConstant::defaultComponent('Reply', '');
+      $params['resubscribe_id'] = $params['resubscribe_id'] ?? CRM_Mailing_PseudoConstant::defaultComponent('Resubscribe', '');
+      $params['unsubscribe_id'] = $params['unsubscribe_id'] ?? CRM_Mailing_PseudoConstant::defaultComponent('Unsubscribe', '');
+      $params['mailing_type'] = $params['mailing_type'] ?? 'standalone';
     }
     if ($event->action === 'delete' && $event->id) {
       // Delete all file attachments
