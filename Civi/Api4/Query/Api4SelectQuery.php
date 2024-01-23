@@ -845,8 +845,7 @@ class Api4SelectQuery extends Api4Query {
         }
 
         // Cache field info for retrieval by $this->getField()
-        foreach ($link->getEntityFields() as $fieldObject) {
-          $fieldArray = $fieldObject->toArray();
+        foreach ($link->getEntityFields() as $fieldArray) {
           // Set sql name of field, using column name for real joins
           if (!$virtualField) {
             $fieldArray['sql_name'] = '`' . $tableAlias . '`.`' . $fieldArray['column_name'] . '`';

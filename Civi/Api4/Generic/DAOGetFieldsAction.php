@@ -39,8 +39,10 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
     $this->formatValues();
-    $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $this->values, $this->checkPermissions);
-    $fields = $this->specToArray($spec->getFields($fieldsToGet));
+    $fields = $gatherer->getAllFields($this->getEntityName(), $this->getAction(), $this->values, $this->checkPermissions);
+    if ($this->loadOptions) {
+      $this->loadFieldOptions($fields, $fieldsToGet ?: array_keys($fields));
+    }
     foreach ($fieldsToGet ?? [] as $fieldName) {
       if (empty($fields[$fieldName]) && str_contains($fieldName, '.')) {
         $fkField = $this->getFkFieldSpec($fieldName, $fields);
@@ -53,22 +55,12 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
     return $fields;
   }
 
-  /**
-   * @param \Civi\Api4\Service\Spec\FieldSpec[] $fields
-   *
-   * @return array
-   */
-  protected function specToArray($fields) {
-    $fieldArray = [];
-
-    foreach ($fields as $field) {
-      if ($this->loadOptions) {
-        $field->getOptions($this->values, $this->loadOptions, $this->checkPermissions);
+  protected function loadFieldOptions(array &$fields, array $fieldsToGet) {
+    foreach ($fieldsToGet as $fieldName) {
+      if (!empty($fields[$fieldName]['options_callback'])) {
+        $fields[$fieldName]['options'] = $fields[$fieldName]['options_callback']($fields[$fieldName], $this->values, $this->loadOptions, $this->checkPermissions, $fields[$fieldName]['options_callback_params'] ?? NULL);
       }
-      $fieldArray[$field->getName()] = $field->toArray();
     }
-
-    return $fieldArray;
   }
 
   /**

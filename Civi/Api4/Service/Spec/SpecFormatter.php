@@ -144,24 +144,24 @@ class SpecFormatter {
   /**
    * Callback function to build option lists for all DAO & custom fields.
    *
-   * @param FieldSpec $spec
+   * @param array $field
    * @param array $values
    * @param bool|array $returnFormat
    * @param bool $checkPermissions
    * @return array|false
    */
-  public static function getOptions($spec, $values, $returnFormat, $checkPermissions) {
-    $fieldName = $spec->getName();
+  public static function getOptions($field, $values, $returnFormat, $checkPermissions) {
+    $fieldName = $field['name'];
 
-    if ($spec instanceof CustomFieldSpec) {
+    if (!empty($field['custom_field_id'])) {
       // buildOptions relies on the custom_* type of field names
-      $fieldName = sprintf('custom_%d', $spec->getCustomFieldId());
+      $fieldName = sprintf('custom_%d', $field['custom_field_id']);
     }
 
     // BAO::buildOptions returns a single-dimensional list, we call that first because of the hook contract,
     // @see CRM_Utils_Hook::fieldOptions
     // We then supplement the data with additional properties if requested.
-    $bao = CoreUtil::getBAOFromApiName($spec->getEntity());
+    $bao = CoreUtil::getBAOFromApiName($field['entity']);
     $optionLabels = $bao::buildOptions($fieldName, NULL, $values);
 
     if (!is_array($optionLabels)) {
@@ -170,11 +170,11 @@ class SpecFormatter {
     else {
       $options = \CRM_Utils_Array::makeNonAssociative($optionLabels, 'id', 'label');
       if (is_array($returnFormat) && $options) {
-        self::addOptionProps($options, $spec, $bao, $fieldName, $values, $returnFormat);
+        self::addOptionProps($options, $field, $bao, $fieldName, $values, $returnFormat);
       }
     }
     // Special 'current_domain' option
-    if ($spec->getFkEntity() === 'Domain') {
+    if ($field['fk_entity'] === 'Domain') {
       array_unshift($options, [
         'id' => 'current_domain',
         'name' => 'current_domain',
@@ -191,13 +191,13 @@ class SpecFormatter {
    * We start with BAO::buildOptions in order to respect hooks which may be adding/removing items, then we add the extra data.
    *
    * @param array $options
-   * @param FieldSpec $spec
+   * @param array $field
    * @param \CRM_Core_DAO $baoName
    * @param string $fieldName
    * @param array $values
    * @param array $returnFormat
    */
-  private static function addOptionProps(&$options, $spec, $baoName, $fieldName, $values, $returnFormat) {
+  private static function addOptionProps(&$options, $field, $baoName, $fieldName, $values, $returnFormat) {
     // FIXME: For now, call the buildOptions function again and then combine the arrays. Not an ideal approach.
     // TODO: Teach CRM_Core_Pseudoconstant to always load multidimensional option lists so we can get more properties like 'color' and 'icon',
     // however that might require a change to the hook_civicrm_fieldOptions signature so that's a bit tricky.
@@ -208,8 +208,8 @@ class SpecFormatter {
     // CRM_Core_Pseudoconstant doesn't know how to fetch extra stuff like icon, description, color, etc., so we have to invent that wheel here...
     if ($returnFormat) {
       $optionIndex = array_flip(array_column($options, 'id'));
-      if ($spec instanceof CustomFieldSpec) {
-        $optionGroupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $spec->getCustomFieldId(), 'option_group_id');
+      if (!empty($field['custom_field_id'])) {
+        $optionGroupId = \CRM_Core_BAO_CustomField::getField($field['custom_field_id'])['option_group_id'];
       }
       else {
         $dao = new $baoName();

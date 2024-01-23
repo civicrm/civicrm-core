@@ -140,32 +140,10 @@ class RequestSpec implements \Iterator {
   }
 
   /**
-   * @return array|FieldSpec[]
-   */
-  public function getConditionalRequiredFields() {
-    return array_filter($this->fields, function (FieldSpec $field) {
-      return $field->getRequiredIf();
-    });
-  }
-
-  /**
-   * @param array $fieldNames
-   *   Optional array of fields to return
    * @return FieldSpec[]
    */
-  public function getFields($fieldNames = NULL) {
-    if (!$fieldNames) {
-      return $this->fields;
-    }
-    // Return all exact matches plus partial matches (to support retrieving fk fields)
-    return array_filter($this->fields, function($field) use($fieldNames) {
-      foreach ($fieldNames as $fieldName) {
-        if (strpos($fieldName, $field->getName()) === 0) {
-          return TRUE;
-        }
-      }
-      return FALSE;
-    });
+  public function getFields() {
+    return $this->fields;
   }
 
   /**

@@ -74,14 +74,14 @@ class SKEntitySpecProvider extends AutoService implements SpecProviderInterface 
   /**
    * Callback function retrieve options from original field.
    *
-   * @param \Civi\Api4\Service\Spec\FieldSpec $spec
+   * @param array $field
    * @param array $values
    * @param bool|array $returnFormat
    * @param bool $checkPermissions
    * @param array $params
    * @return array|false
    */
-  public static function getOptionsForSKEntityField($spec, $values, $returnFormat, $checkPermissions, $params) {
+  public static function getOptionsForSKEntityField($field, $values, $returnFormat, $checkPermissions, $params) {
     return civicrm_api4($params['original_field_entity'], 'getFields', [
       'where' => [['name', '=', $params['original_field_name']]],
       'loadOptions' => $returnFormat,
