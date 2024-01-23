@@ -31,7 +31,13 @@ class MetadataFlush extends Service\AutoSubscriber {
    * as it's being deleted.
    */
   public static function onClearMetadata(): void {
-    \Civi::resources()->resetCacheCode();
+    // This seems to cause problems during unit test setup
+    if (CIVICRM_UF === 'UnitTests') {
+      return;
+    }
+    if (\Civi\Core\Container::singleton()->has('resources')) {
+      \Civi::resources()->resetCacheCode();
+    }
   }
 
 }
