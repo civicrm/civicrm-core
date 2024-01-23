@@ -22,7 +22,7 @@ namespace Civi\Api4;
  * @since 5.19
  * @package Civi\Api4
  */
-class Route extends \Civi\Api4\Generic\AbstractEntity {
+class Route extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions

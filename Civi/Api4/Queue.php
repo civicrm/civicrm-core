@@ -24,7 +24,7 @@ use Civi\Api4\Action\Queue\Run;
  * @since 5.47
  * @package Civi\Api4
  */
-class Queue extends \Civi\Api4\Generic\DAOEntity {
+class Queue extends Generic\DAOEntity {
 
   use Generic\Traits\ManagedEntity;
 

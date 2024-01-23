@@ -33,7 +33,7 @@ class CustomValue {
    * @throws \API_Exception
    */
   public static function autocomplete(string $customGroup, $checkPermissions = TRUE) {
-    return (new \Civi\Api4\Generic\AutocompleteAction("Custom_$customGroup", __FUNCTION__))
+    return (new Generic\AutocompleteAction("Custom_$customGroup", __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -65,7 +65,7 @@ class CustomValue {
    * @return \Civi\Api4\Action\GetLinks
    */
   public static function getLinks($customGroup = NULL, $checkPermissions = TRUE) {
-    return (new \Civi\Api4\Action\GetLinks("Custom_$customGroup", __FUNCTION__))
+    return (new Action\GetLinks("Custom_$customGroup", __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
