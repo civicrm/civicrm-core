@@ -27,11 +27,11 @@ class MembershipGetSpecProvider extends AutoService implements Generic\SpecProvi
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   public function modifySpec(RequestSpec $spec): void {
-    $spec->addFieldSpec(new FieldSpec('is_primary_member', 'Membership', 'Integer'));
+    $spec->addFieldSpec(new FieldSpec('is_primary_member', 'Membership', 'Boolean'));
     $field = (new FieldSpec('is_primary_member', 'Membership', 'Boolean'))
       ->setTitle(ts('Is Primary Member?'))
       ->setDescription(ts('Is this a primary membership?'))
-      ->setInputType('Number')
+      ->setInputType('Radio')
       ->setType('Extra')
       ->setColumnName('owner_membership_id')
       ->setSqlRenderer([__CLASS__, 'isPrimaryMembership']);
