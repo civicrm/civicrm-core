@@ -188,8 +188,7 @@ class Container {
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $definitionParams = [
         'name' => $cacheGrp . (in_array($cacheGrp, $verSuffixCaches) ? $verSuffix : ''),
-        // FIXME: Uncommenting below causes test failure
-        // 'service' => $cacheSvc,
+        'service' => $cacheSvc,
         'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
       ];
       // For Caches that we don't really care about the ttl for and/or maybe accessed
