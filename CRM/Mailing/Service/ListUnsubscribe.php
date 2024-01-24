@@ -8,6 +8,8 @@
  */
 class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
 
+  private ?string $urlFlags = NULL;
+
   public static function getMethods(): array {
     return [
       'mailto' => ts('Mailto'),
@@ -48,12 +50,21 @@ class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService
       return;
     }
 
+    if ($this->urlFlags === NULL) {
+      $this->urlFlags = 'a';
+      if (in_array('oneclick', $methods) && empty(parse_url(CIVICRM_UF_BASEURL, PHP_URL_PORT))) {
+        // Yahoo etal require HTTPS for one-click URLs. Cron-runs can be a bit inconsistent wrt HTTP(S),
+        // so we force-SSL for most production-style sites.
+        $this->urlFlags .= 's';
+      }
+    }
+
     $listUnsubscribe = [];
     if (in_array('mailto', $methods)) {
       $listUnsubscribe[] = $params['List-Unsubscribe'];
     }
     if (array_intersect(['http', 'oneclick'], $methods)) {
-      $listUnsubscribe[] = '<' . Civi::url('civicrm/mailing/unsubscribe', 'a')->addQuery([
+      $listUnsubscribe[] = '<' . Civi::url('civicrm/mailing/unsubscribe', $this->urlFlags)->addQuery([
         'reset' => 1,
         'jid' => $m[1],
         'qid' => $m[2],
