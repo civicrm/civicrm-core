@@ -79,11 +79,9 @@ class ActivityLinksProvider extends \Civi\Core\Service\AutoSubscriber {
   private static function getActivityTypeAddLinks($contactId, $checkPermissions): array {
     $addLinks = [];
     $activityTypeQuery = OptionValue::get(FALSE)
-      ->addSelect('name', 'label', 'icon', 'value')
+      ->addSelect('name', 'label', 'icon', 'value', 'filter', 'component_id')
       ->addWhere('option_group_id:name', '=', 'activity_type')
       ->addWhere('is_active', '=', TRUE)
-      ->addWhere('filter', 'IS EMPTY')
-      ->addWhere('component_id', 'IS NULL')
       ->addOrderBy('weight');
 
     // TODO: Code block was moved from CRM_Activity_Form_ActivityLinks and could use further cleanup
@@ -134,6 +132,9 @@ class ActivityLinksProvider extends \Civi\Core\Service\AutoSubscriber {
       }
       elseif ($act['name'] == 'Print PDF Letter') {
         $url = 'civicrm/activity/pdf/add';
+      }
+      elseif (!empty($act['filter']) || (!empty($act['component_id']) && $act['component_id'] != '1')) {
+        continue;
       }
 
       $act['icon'] = $act['icon'] ?? 'fa-plus-square-o';
