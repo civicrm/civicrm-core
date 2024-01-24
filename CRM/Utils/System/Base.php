@@ -977,7 +977,7 @@ abstract class CRM_Utils_System_Base {
       CRM_Utils_System::setHttpHeader($name, implode(', ', (array) $values));
     }
     echo $response->getBody();
-    CRM_Utils_System::civiExit();
+    CRM_Utils_System::civiExit(0, ['response' => $response]);
   }
 
   /**
