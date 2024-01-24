@@ -115,7 +115,7 @@ trait CRM_Event_Form_EventFormTrait {
       TRUE,
       $this->getEventValue('has_waitlist')
     );
-    return is_numeric($availableSpaces) ? (int) $availableSpaces : 0;
+    return is_null($availableSpaces) ? PHP_INT_MAX : (is_numeric($availableSpaces) ? (int) $availableSpaces : 0);
   }
 
 }
