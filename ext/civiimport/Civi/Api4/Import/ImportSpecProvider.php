@@ -70,7 +70,7 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
    * @inheritDoc
    */
   public function applies($entity, $action): bool {
-    return strpos($entity, 'Import_') === 0;
+    return str_starts_with($entity, 'Import_');
   }
 
   /**
@@ -82,18 +82,14 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
    * @throws \CRM_Core_Exception
    */
   public function getJobType(RequestSpec $spec): array {
-    if (!isset(\Civi::$statics[__CLASS__][$spec->getEntity()])) {
-      // CheckPermissions does not reach us here - so we will have to rely on earlier permission filters.
-      $userJobID = substr($spec->getEntity(), (strpos($spec->getEntity(), '_') + 1));
-      $userJob = UserJob::get(FALSE)
-        ->addWhere('id', '=', $userJobID)
-        ->addSelect('metadata', 'job_type', 'created_id')
-        ->execute()
-        ->first();
-      \Civi::$statics[__CLASS__][$spec->getEntity()] = CRM_Core_BAO_UserJob::getType($userJob['job_type']);
-    }
-
-    return \Civi::$statics[__CLASS__][$spec->getEntity()];
+    // CheckPermissions does not reach us here - so we will have to rely on earlier permission filters.
+    [, $userJobID] = explode('_', $spec->getEntity(), 2);
+    $userJob = UserJob::get(FALSE)
+      ->addWhere('id', '=', $userJobID)
+      ->addSelect('metadata', 'job_type', 'created_id')
+      ->execute()
+      ->first();
+    return CRM_Core_BAO_UserJob::getType($userJob['job_type']);
   }
 
 }

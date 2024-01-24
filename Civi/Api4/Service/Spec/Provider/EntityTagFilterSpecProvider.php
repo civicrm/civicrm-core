@@ -84,14 +84,14 @@ class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService impleme
   /**
    * Callback function to build option list for tags filters.
    *
-   * @param \Civi\Api4\Service\Spec\FieldSpec $spec
+   * @param array $field
    * @param array $values
    * @param bool|array $returnFormat
    * @param bool $checkPermissions
    * @return array
    */
-  public static function getTagList($spec, $values, $returnFormat, $checkPermissions) {
-    $table = CoreUtil::getTableName($spec->getEntity());
+  public static function getTagList($field, $values, $returnFormat, $checkPermissions) {
+    $table = CoreUtil::getTableName($field['entity']);
     $result = new Result();
     Request::create('EntityTag', 'getFields', [
       'version' => 4,

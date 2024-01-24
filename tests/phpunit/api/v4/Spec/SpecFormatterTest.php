@@ -59,6 +59,7 @@ class SpecFormatterTest extends Api4TestBase {
     $customGroup = [
       'name' => 'my_group',
       'title' => 'My Group',
+      'table_name' => 'civicrm_value_my_group',
     ];
 
     /** @var \Civi\Api4\Service\Spec\CustomFieldSpec $field */
@@ -69,6 +70,7 @@ class SpecFormatterTest extends Api4TestBase {
     $this->assertEquals($customFieldId, $field->getCustomFieldId());
     $this->assertEquals(\CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND, $field->getSerialize());
     $this->assertEquals('Select', $field->getInputType());
+    $this->assertEquals('civicrm_value_my_group', $field->getTableName());
     $this->assertTrue($field->getInputAttrs()['multiple']);
   }
 

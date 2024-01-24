@@ -1524,6 +1524,24 @@ LIKE %1
   }
 
   /**
+   * Fetch a single field value from the database.
+   *
+   * Uses static caching and applies formatting.
+   *
+   * @param string $returnColumn
+   * @param string|int $searchValue
+   * @param string $searchColumn
+   * @return array|bool|int|string|null
+   *   Returned value will be formatted according to data type.
+   * @throws CRM_Core_Exception
+   */
+  public static function getDbVal(string $returnColumn, $searchValue, string $searchColumn = 'id') {
+    $fieldSpec = static::getSupportedFields()[$returnColumn] ?? NULL;
+    $value = $fieldSpec ? self::getFieldValue(static::class, $searchValue, $returnColumn, $searchColumn) : NULL;
+    return self::formatFieldValue($value, $fieldSpec);
+  }
+
+  /**
    * Given a DAO name, a column name and a column value, find the record and SET the value of another column in that record
    *
    * @param string $daoName

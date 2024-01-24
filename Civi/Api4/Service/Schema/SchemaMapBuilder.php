@@ -142,8 +142,7 @@ class SchemaMapBuilder extends AutoService {
       $map->addTable($customTable);
 
       // Add custom join
-      $columns = array_column($customGroup['fields'], 'column_name', 'name');
-      $joinable = new CustomGroupJoinable($customGroup['table_name'], $customGroup['name'], $customGroup['is_multiple'], $columns);
+      $joinable = new CustomGroupJoinable($customGroup['table_name'], $customGroup['name'], $customGroup['is_multiple'], $entityName);
       $baseTable->addTableLink($customInfo['column'], $joinable);
     }
   }
