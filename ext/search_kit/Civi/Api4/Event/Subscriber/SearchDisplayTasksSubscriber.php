@@ -22,14 +22,20 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SearchDisplayTasksSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
   /**
-   * Filter tasks with a priority of -50, which allows W_MIDDLE & W_EARLY to go first, but W_LATE to go after.
+   * Listen for hook_civicrm_searchKitTasks with a low priority so that most other hooks have gone first.
+   * Setting the priority to -200 because:
+   *  - The default for symfony-style hooks is W_MIDDLE = 0.
+   *  - The default for CMS-style hooks is DEFAULT_HOOK_PRIORITY = -100.
+   *
+   * Generally speaking, the configuration settings enforced by `filterTasksForDisplay` should be respected,
+   * but if an extension needs to override them it can do so by listening to this event with an even lower priority.
    *
    * @return array
    */
   public static function getSubscribedEvents() {
     return [
       'hook_civicrm_searchKitTasks' => [
-        ['filterTasksForDisplay', -50],
+        ['filterTasksForDisplay', -200],
       ],
     ];
   }
