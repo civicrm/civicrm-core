@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Mailing_Page_Unsubscribe extends CRM_Mailing_Page_Common {
+class CRM_Mailing_Page_Unsubscribe extends CRM_Core_Page {
 
   /**
    * Run page.
@@ -25,8 +25,44 @@ class CRM_Mailing_Page_Unsubscribe extends CRM_Mailing_Page_Common {
    * @throws Exception
    */
   public function run() {
-    $this->_type = 'unsubscribe';
-    return parent::run();
+    $isOneClick = ($_SERVER['REQUEST_METHOD'] === 'POST' && CRM_Utils_Request::retrieve('List-Unsubscribe', 'String') === 'One-Click');
+    if ($isOneClick) {
+      $this->handleOneClick();
+      return NULL;
+    }
+
+    $wrapper = new CRM_Utils_Wrapper();
+    return $wrapper->run('CRM_Mailing_Form_Unsubscribe', $this->_title);
+  }
+
+  /**
+   *
+   * Pre-condition: Validated the _job_id, _queue_id, _hash.
+   * Post-condition: Unsubscribed
+   *
+   * @link https://datatracker.ietf.org/doc/html/rfc8058
+   * @return void
+   */
+  public function handleOneClick(): void {
+    $jobId = CRM_Utils_Request::retrieve('jid', 'Integer');
+    $queueId = CRM_Utils_Request::retrieve('qid', 'Integer');
+    $hash = CRM_Utils_Request::retrieve('h', 'String');
+
+    $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queueId, $hash);
+    if (!$q) {
+      CRM_Utils_System::sendResponse(
+        new \GuzzleHttp\Psr7\Response(400, [], ts("Invalid request: bad parameters"))
+      );
+    }
+
+    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($jobId, $queueId, $hash);
+    if (!empty($groups)) {
+      CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($queueId, $groups, FALSE, $jobId);
+    }
+
+    CRM_Utils_System::sendResponse(
+      new \GuzzleHttp\Psr7\Response(200, [], 'OK')
+    );
   }
 
 }

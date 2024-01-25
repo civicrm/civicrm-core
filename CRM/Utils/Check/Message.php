@@ -155,6 +155,9 @@ class CRM_Utils_Check_Message {
    *   Currently supports: api3 or href
    * @param array $params
    *   Params to be passed to CRM.api3 or CRM.url depending on type
+   *   Ex: ['MyApiEntity', 'MyApiAction', [...params...]]
+   *   Ex: ['path' => 'civicrm/admin/foo', 'query' => 'reset=1']
+   *   Ex: ['url' => 'https://example.com/more/info']
    * @param string $icon
    *   Fa-icon class for the button
    */
