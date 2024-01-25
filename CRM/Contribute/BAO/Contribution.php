@@ -16,6 +16,7 @@ use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
+use Civi\Api4\Membership;
 use Civi\Api4\PaymentProcessor;
 use Civi\Core\Event\PostEvent;
 
@@ -4254,12 +4255,20 @@ LIMIT 1;";
         unset($dates['end_date']);
         $membershipParams['status_id'] = CRM_Utils_Array::value('id', $calcStatus, 'New');
       }
-      //we might be renewing membership,
-      //so make status override false.
-      $membershipParams['is_override'] = FALSE;
-      $membershipParams['status_override_end_date'] = 'null';
-      $membership = civicrm_api3('Membership', 'create', $membershipParams);
-      $membership = $membership['values'][$membership['id']];
+
+      $membershipUpdate = Membership::update(FALSE)
+        ->addWhere('id', '=', $membershipParams['id'])
+        ->addValue('join_date', $dates['join_date'])
+        ->addValue('start_date', $dates['start_date'])
+        // we might be renewing membership so make status override false.
+        ->addValue('is_override', FALSE)
+        ->addValue('status_override_end_date', '');
+
+      if (isset($dates['end_date'])) {
+        $membershipUpdate->addValue('end_date', $dates['end_date']);
+      }
+      $membership = $membershipUpdate->execute()->first();
+
       // Update activity to Completed.
       // Perhaps this should be in Membership::create? Test cover in
       // api_v3_ContributionTest.testPendingToCompleteContribution.

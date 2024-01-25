@@ -492,10 +492,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
 
     // CRM-7297 Membership Upsell
     if (is_null($membershipTypeID)) {
-      $membershipTypeDetails = self::getMembershipTypeDetails($membershipDetails->membership_type_id);
+      $membershipTypeDetails = self::getMembershipType($membershipDetails->membership_type_id);
     }
     else {
-      $membershipTypeDetails = self::getMembershipTypeDetails($membershipTypeID);
+      $membershipTypeDetails = self::getMembershipType($membershipTypeID);
     }
     $statusDetails = CRM_Member_BAO_MembershipStatus::getMembershipStatus($statusID);
 
