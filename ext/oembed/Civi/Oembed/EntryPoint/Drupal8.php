@@ -30,16 +30,22 @@ class Drupal8 {
     $autoloader = require_once 'autoload.php';
     $autoloader->addPsr4('Civi\\Oembed\\', realpath($GLOBALS['CIVICRM_OEMBED_META']['extPath']) . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR);
 
+    $route = trim($_SERVER['PATH_INFO'], '/');
+
     $request = Request::createFromGlobals();
     $kernel = OembedDrupalKernel::createFromRequest($request, $autoloader, 'prod');
     $kernel->boot();
+    $kernel->preHandle($request);
+    $request->attributes->set(\Drupal\Core\Routing\RouteObjectInterface::ROUTE_OBJECT, new \Symfony\Component\Routing\Route($route));
+    $request->attributes->set(\Drupal\Core\Routing\RouteObjectInterface::ROUTE_NAME, 'civicrm.' . implode('_', explode('/', $route)));
+
     \Drupal::service('civicrm')->initialize();
     \Drupal::service('event_dispatcher')->addListener('kernel.response', function(ResponseEvent $event) {
       $event->getResponse()->headers->remove('X-Frame-Options');
     });
 
     \Civi::service('oembed.router')->invoke([
-      'route' => trim($_SERVER['PATH_INFO'], '/'),
+      'route' => $route,
       'drupalKernel' => $kernel,
       'drupalRequest' => $request,
     ]);
