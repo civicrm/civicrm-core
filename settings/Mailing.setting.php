@@ -105,7 +105,7 @@ return [
       'class' => 'crm-select2',
     ],
     'default' => version_compare(CRM_Utils_System::version(), '5.72', '<=') ? ['mailto'] : ['mailto', 'http', 'oneclick'],
-    'add' => '5.70',
+    'add' => '5.69',
     'title' => ts('Unsubscribe Methods'),
     'is_domain' => 1,
     'is_contact' => 0,

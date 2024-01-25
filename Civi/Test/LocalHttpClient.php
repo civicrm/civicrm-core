@@ -41,7 +41,7 @@ class LocalHttpClient implements ClientInterface {
    * @var array
    *   Ex: ['_GET' => new SuperGlobal('_GET')]
    */
-  protected array $scopes;
+  protected $scopes;
 
   /**
    * List of scopes which should be inherited/extended within the subrequest.
@@ -49,14 +49,14 @@ class LocalHttpClient implements ClientInterface {
    * @var array
    *   Ex: ['_COOKIE', '_SERVER']
    */
-  protected array $inherit;
+  protected $inherit;
 
   /**
    * Whether to generate the HTML <HEAD>er
    *
    * @var bool
    */
-  protected bool $htmlHeader;
+  protected $htmlHeader;
 
   /**
    * @param array $options

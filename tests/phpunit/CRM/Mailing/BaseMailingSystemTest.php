@@ -105,10 +105,12 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       'body_text' => 'In the {domain.address} where I was born, lived a man who sailed to sea',
     ]);
 
-    $getMembers = fn($status) => Civi\Api4\GroupContact::get(FALSE)
-      ->addWhere('group_id', '=', $this->_groupID)
-      ->addWhere('status', '=', $status)
-      ->execute();
+    $getMembers = function ($status) {
+      return Civi\Api4\GroupContact::get(FALSE)
+        ->addWhere('group_id', '=', $this->_groupID)
+        ->addWhere('status', '=', $status)
+        ->execute();
+    };
 
     $this->assertEquals(2, $getMembers('Added')->count());
     $this->assertEquals(0, $getMembers('Removed')->count());
@@ -118,7 +120,9 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertEquals('List-Unsubscribe=One-Click', $message->headers['List-Unsubscribe-Post'][0]);
 
       $urls = array_map(
-        fn($s) => trim($s, '<>'),
+        function($s) {
+          return trim($s, '<>');
+        },
         preg_split('/[,\s]+/', $message->headers['List-Unsubscribe'][0])
 
       );

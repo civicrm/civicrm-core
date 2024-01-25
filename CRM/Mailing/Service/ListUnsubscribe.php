@@ -8,7 +8,10 @@
  */
 class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
 
-  private ?string $urlFlags = NULL;
+  /**
+   * @var string|null
+   */
+  private $urlFlags = NULL;
 
   public static function getMethods(): array {
     return [

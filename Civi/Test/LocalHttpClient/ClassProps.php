@@ -1,12 +1,17 @@
 <?php
 namespace Civi\Test\LocalHttpClient;
 
+use Civi\Test\Invasive;
+
 /**
  * @internal
  */
 class ClassProps {
 
-  protected \ReflectionClass $class;
+  /**
+   * @var \ReflectionClass
+   */
+  protected $class;
 
   public function __construct(string $class) {
     $this->class = new \ReflectionClass($class);
@@ -18,13 +23,17 @@ class ClassProps {
 
   public function setValues(iterable $values): void {
     foreach ($values as $key => $value) {
-      $this->class->setStaticPropertyValue($key, $value);
+      // In PHP 7.3, setStaticPropertyValue() fails for private properties.
+      // $this->class->setStaticPropertyValue($key, $value);
+      Invasive::set([$this->class->getName(), $key], $value);
     }
   }
 
   public function unsetKeys(iterable $keys): void {
     foreach ($keys as $key) {
-      $this->class->setStaticPropertyValue($key, NULL);
+      // In PHP 7.3, setStaticPropertyValue() fails for private properties.
+      // $this->class->setStaticPropertyValue($key, NULL);
+      Invasive::set([$this->class->getName(), $key], NULL);
     }
   }
 
