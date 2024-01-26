@@ -550,13 +550,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Use the cache to get all values of a specific custom field.
+   * Get specific custom field as an object.
+   * @deprecated
+   * @see CRM_Core_BAO_CustomField::getField()
+   * which does the same thing but returns an array instead of an object.
    *
    * @param int $fieldID
    *   The custom field ID.
    *
    * @return CRM_Core_BAO_CustomField
-   *   The field object.
    * @throws CRM_Core_Exception
    */
   public static function getFieldObject($fieldID) {
@@ -1181,9 +1183,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $value = NULL
   ) {
     //get the type of custom field
-    $customField = new CRM_Core_BAO_CustomField();
-    $customField->id = $customFieldId;
-    $customField->find(TRUE);
+    $customField = self::getFieldObject($customFieldId);
 
     if (!$contactId) {
       if ($mode == CRM_Profile_Form::MODE_CREATE) {
