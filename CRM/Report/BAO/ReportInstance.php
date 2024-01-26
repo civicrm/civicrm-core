@@ -29,6 +29,11 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
       return NULL;
     }
 
+    if (empty($params['grouprole'])) {
+      // an empty array is getting stored as '' but it needs to be null
+      $params['grouprole'] = NULL;
+    }
+
     if (!isset($params['id'])) {
       $params['domain_id'] ??= CRM_Core_Config::domainID();
       // CRM-17256 set created_id on report creation.
