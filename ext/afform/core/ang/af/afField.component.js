@@ -256,8 +256,12 @@
         };
       };
 
-      ctrl.getAutocompleteFieldName = function() {
-        return ctrl.afFieldset.modelName + (ctrl.afJoin ? ('+' + ctrl.afJoin.entity) : '') + ':' + ctrl.fieldName;
+      ctrl.getAutocompleteParams = function() {
+        return {
+          formName: 'afform:' + ctrl.afFieldset.getFormName(),
+          fieldName: ctrl.afFieldset.getName() + ':' + ctrl.fieldName,
+          values: $scope.dataProvider.getFieldData()
+        };
       };
 
       $scope.getOptions = function () {
