@@ -625,27 +625,25 @@ WHERE contact_sub_type LIKE '%{$subType}%'";
   }
 
   /**
+   * Checks to see if a given contact has custom data specific to a particular sub-type.
+   *
    * @param string $contactType
    * @param int $contactId
    *
    * @return bool
    */
   public static function hasCustomData($contactType, $contactId = NULL) {
-    $subTypeClause = '';
-
+    $filters = [
+      'extends' => [$contactType],
+    ];
     if (self::isaSubType($contactType)) {
-      $subType = $contactType;
-      $contactType = self::getBasicType($subType);
-
-      // check for empty custom data which extends subtype
-      $subTypeValue = CRM_Core_DAO::VALUE_SEPARATOR . $subType . CRM_Core_DAO::VALUE_SEPARATOR;
-      $subTypeClause = " AND extends_entity_column_value LIKE '%{$subTypeValue}%' ";
+      $filters['extends'] = [self::getBasicType($contactType)];
+      $filters['extends_entity_column_value'] = [$contactType];
     }
-    $query = "SELECT table_name FROM civicrm_custom_group WHERE extends = '{$contactType}' {$subTypeClause}";
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters);
 
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $sql = "SELECT count(id) FROM {$dao->table_name}";
+    foreach ($customGroups as $customGroup) {
+      $sql = "SELECT count(id) FROM {$customGroup['table_name']}";
       if ($contactId) {
         $sql .= " WHERE entity_id = {$contactId}";
       }
