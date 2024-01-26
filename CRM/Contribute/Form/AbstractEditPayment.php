@@ -666,21 +666,12 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   /**
    * Assign the values to build the payment info block.
-   *
-   * @return string
-   *   Block title.
    */
   protected function assignPaymentInfoBlock() {
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, TRUE);
-    $title = ts('View Payment');
-    if (!empty($this->_component) && $this->_component == 'event') {
-      $info = CRM_Event_BAO_Participant::participantDetails($this->_id);
-      $title .= " - {$info['title']}";
-    }
     $this->assign('transaction', TRUE);
     $this->assign('payments', $paymentInfo['transaction'] ?? NULL);
     $this->assign('paymentLinks', $paymentInfo['payment_links']);
-    return $title;
   }
 
   protected function assignContactEmailDetails(): void {

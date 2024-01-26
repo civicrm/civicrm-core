@@ -85,7 +85,12 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('suppressPaymentFormButtons', $this->isBeingCalledFromSelectorContext());
 
     if ($this->_view === 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
-      $title = $this->assignPaymentInfoBlock();
+      $this->assignPaymentInfoBlock();
+      $title = ts('View Payment');
+      if (!empty($this->_component) && $this->_component == 'event') {
+        $info = CRM_Event_BAO_Participant::participantDetails($this->_id);
+        $title .= " - {$info['title']}";
+      }
       $this->setTitle($title);
       return;
     }
