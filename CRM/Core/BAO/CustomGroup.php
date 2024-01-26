@@ -536,7 +536,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     ];
     if ($subTypes) {
       foreach ($subTypes as $subType) {
-        $filters['extends_entity_column_value'][] = CRM_Core_BAO_CustomGroup::validateSubTypeByEntity($entityType, $subType);
+        $filters['extends_entity_column_value'][] = self::validateSubTypeByEntity($entityType, $subType);
       }
       if (!$onlySubType) {
         $filters['extends_entity_column_value'][] = NULL;
@@ -665,15 +665,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    *
    * For all other entities, it doesn't validate except to check the subtype is an integer.
    *
-   * @internal this will be private again soon.
-   *
    * @param string $entityType
    * @param string $subType
    *
    * @return string
    * @throws \CRM_Core_Exception
    */
-  public static function validateSubTypeByEntity($entityType, $subType) {
+  private static function validateSubTypeByEntity($entityType, $subType) {
     $subType = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
     if (is_numeric($subType)) {
       return $subType;
