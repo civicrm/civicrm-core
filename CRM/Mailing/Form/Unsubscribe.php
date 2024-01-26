@@ -64,7 +64,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
       );
     }
 
-    list($displayName, $email) = CRM_Mailing_Event_BAO_MailingEventQueue::getContactInfo($queue_id);
+    [$displayName, $email] = CRM_Mailing_Event_BAO_MailingEventQueue::getContactInfo($queue_id);
     $this->assign('display_name', $displayName);
     $nameMasked = '';
     $names = explode(' ', $displayName);
