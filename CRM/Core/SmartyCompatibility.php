@@ -116,6 +116,10 @@ class CRM_Core_SmartyCompatibility extends Smarty {
       parent::register_resource($type, $functions);
       return;
     }
+    if ($type === 'string') {
+      // Not valid / required for Smarty3+
+      return;
+    }
     parent::registerResource($type, $functions);
   }
 
