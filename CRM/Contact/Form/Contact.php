@@ -1192,12 +1192,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @return bool
    *   true if data exists, false otherwise
    */
-  public static function blockDataExists(&$fields) {
+  public static function blockDataExists($fields): bool {
     if (!is_array($fields)) {
+      CRM_Core_Error::deprecatedWarning('support for invalid values will be dropped');
       return FALSE;
     }
 
-    static $skipFields = [
+    $dataFields = array_filter(array_diff_key($fields, array_fill_keys([
       'location_type_id',
       'is_primary',
       'phone_type_id',
@@ -1205,34 +1206,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       'country_id',
       'website_type_id',
       'master_id',
-    ];
-    foreach ($fields as $name => $value) {
-      $skipField = FALSE;
-      foreach ($skipFields as $skip) {
-        if (strpos("[$skip]", $name) !== FALSE) {
-          if ($name == 'phone') {
-            continue;
-          }
-          $skipField = TRUE;
-          break;
-        }
-      }
-      if ($skipField) {
-        continue;
-      }
-      if (is_array($value)) {
-        if (self::blockDataExists($value)) {
-          return TRUE;
-        }
-      }
-      else {
-        if (!empty($value)) {
-          return TRUE;
-        }
-      }
-    }
-
-    return FALSE;
+    ], TRUE)));
+    return !empty($dataFields);
   }
 
   /**
