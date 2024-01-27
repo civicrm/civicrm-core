@@ -118,4 +118,47 @@ trait CRM_Event_Form_EventFormTrait {
     return is_numeric($availableSpaces) ? (int) $availableSpaces : 0;
   }
 
+  /**
+   * Is the event full already.
+   *
+   * This function may be calculated by v4 api in time, in which case the function
+   * will call that instead but will remain available.
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   * @api This function will not change in a minor release and is supported for
+   *  use outside of core. This annotation / external support for properties
+   *  is only given where there is specific test cover.
+   */
+  public function isEventFull(): bool {
+    $maximum = $this->getEventValue('max_participants');
+    return !($maximum === NULL) && $this->getEventValue('available_spaces') < 1;
+  }
+
+  /**
+   * Is the event ready for online registrations.
+   *
+   * @internal - the handling of waitlist in this function may change.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  protected function isAvailableForOnlineRegistration(): bool {
+    if (!$this->getEventValue('is_online_registration')) {
+      return FALSE;
+    }
+    if ($this->isEventFull() && !$this->getEventValue('has_waitlist')) {
+      return FALSE;
+    }
+    if (!CRM_Event_BAO_Event::validRegistrationRequest([
+      'registration_start_date' => $this->getEventValue('registration_start_date'),
+      'registration_end_date' => $this->getEventValue('registration_end_date'),
+      'end_date' => $this->getEventValue('end_date'),
+    ], $this->getEventID())) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
 }

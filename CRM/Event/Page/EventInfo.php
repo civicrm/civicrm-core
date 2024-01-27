@@ -240,32 +240,32 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
 
     $hasWaitingList = $values['event']['has_waitlist'] ?? NULL;
-    $availableSpaces = $this->getEventValue('available_spaces');
+    $isEventOpenForRegistration = CRM_Event_BAO_Event::validRegistrationRequest($values['event'], $this->_id);
 
     $allowRegistration = FALSE;
-    $isEventOpenForRegistration = CRM_Event_BAO_Event::validRegistrationRequest($values['event'], $this->_id);
-    if (!empty($values['event']['is_online_registration'])) {
-      if ($isEventOpenForRegistration == 1) {
-        // we always generate urls for the front end in joomla
-        $action_query = $action === CRM_Core_Action::PREVIEW ? "&action=$action" : '';
-        $url = CRM_Utils_System::url('civicrm/event/register',
-          "id={$this->_id}&reset=1{$action_query}",
-          FALSE, NULL, TRUE,
-          TRUE
-        );
-        if ($availableSpaces || $hasWaitingList) {
-          $registerText = ts('Register Now');
-          if (!empty($values['event']['registration_link_text'])) {
-            $registerText = $values['event']['registration_link_text'];
-          }
-
-          //Fixed for CRM-4855
-          $allowRegistration = CRM_Event_BAO_Event::showHideRegistrationLink($values);
-
-          $this->assign('registerText', $registerText);
-          $this->assign('registerURL', $url);
-        }
+    // check that the user has permission to register for this event
+    // Looks like the form shows either way - just not the register option.
+    $hasPermission = CRM_Core_Permission::event(CRM_Core_Permission::EDIT,
+      $this->getEventID(), 'register for events'
+    );
+    if ($hasPermission && $this->isAvailableForOnlineRegistration()) {
+      // we always generate urls for the front end in joomla
+      $action_query = $action === CRM_Core_Action::PREVIEW ? "&action=$action" : '';
+      $url = CRM_Utils_System::url('civicrm/event/register',
+        "id={$this->_id}&reset=1{$action_query}",
+        FALSE, NULL, TRUE,
+        TRUE
+      );
+      $registerText = ts('Register Now');
+      if (!empty($values['event']['registration_link_text'])) {
+        $registerText = $values['event']['registration_link_text'];
       }
+
+      //Fixed for CRM-4855
+      $allowRegistration = CRM_Event_BAO_Event::showHideRegistrationLink($values);
+
+      $this->assign('registerText', $registerText);
+      $this->assign('registerURL', $url);
     }
 
     $this->assign('registerClosed', !empty($values['event']['is_online_registration']) && !$isEventOpenForRegistration && CRM_Core_Permission::check('register for events'));
@@ -278,7 +278,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       'role_id' => $values['event']['default_role_id'] ?? NULL,
     ];
 
-    if (($availableSpaces < 1 && ($noFullMsg === 'false')) || CRM_Event_BAO_Event::checkRegistration($params)) {
+    if (($this->isEventFull() && $noFullMsg === 'false') || CRM_Event_BAO_Event::checkRegistration($params)) {
       $statusMessage = $this->getEventValue('event_full_text');
       if (CRM_Event_BAO_Event::checkRegistration($params)) {
         if ($noFullMsg == 'false') {
