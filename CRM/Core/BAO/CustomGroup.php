@@ -401,7 +401,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
-   * Determine if given entity (sub)type has any custom groups
+   * @deprecated since 5.71 will be removed around 5.85.
    *
    * @param string $extends
    *   E.g. "Individual", "Activity".
@@ -413,41 +413,23 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @return bool
    */
   public static function hasCustomGroup($extends, $columnId, $columnValue) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getAll');
     $dao = new CRM_Core_DAO_CustomGroup();
     $dao->extends = $extends;
     $dao->extends_entity_column_id = $columnId;
     $escapedValue = CRM_Core_DAO::VALUE_SEPARATOR . CRM_Core_DAO::escapeString($columnValue) . CRM_Core_DAO::VALUE_SEPARATOR;
     $dao->whereAdd("extends_entity_column_value LIKE \"%$escapedValue%\"");
-    //$dao->extends_entity_column_value = $columnValue;
     return (bool) $dao->find();
   }
 
   /**
-   * Determine if there are any CustomGroups for the given $activityTypeId.
-   * If none found, create one.
+   * @deprecated Function moved
    *
    * @param int $activityTypeId
-   *
-   * @return bool
-   *   TRUE if a group is found or created; FALSE on error
    */
   public static function autoCreateByActivityType($activityTypeId) {
-    if (self::hasCustomGroup('Activity', NULL, $activityTypeId)) {
-      return TRUE;
-    }
-    // everything
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE, FALSE);
-    $params = [
-      'version' => 3,
-      'extends' => 'Activity',
-      'extends_entity_column_id' => NULL,
-      'extends_entity_column_value' => CRM_Utils_Array::implodePadded([$activityTypeId]),
-      'title' => ts('%1 Questions', [1 => $activityTypes[$activityTypeId]]),
-      'style' => 'Inline',
-      'is_active' => 1,
-    ];
-    $result = civicrm_api('CustomGroup', 'create', $params);
-    return !$result['is_error'];
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Campaign_Form_Survey_Questions::autoCreateCustomGroup');
+    return CRM_Campaign_Form_Survey_Questions::autoCreateCustomGroup($activityTypeId);
   }
 
   /**
