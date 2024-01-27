@@ -2440,24 +2440,14 @@ WHERE      f.id IN ($ids)";
     //lets start w/ params.
     foreach ($params as $key => $value) {
       $customFieldID = self::getKeyID($key);
-      if (!$customFieldID) {
+      $field = $customFieldID ? CRM_Core_BAO_CustomField::getField($customFieldID) : NULL;
+      if (!$field) {
         continue;
       }
-
-      //load the structural info for given field.
-      $field = new CRM_Core_DAO_CustomField();
-      $field->id = $customFieldID;
-      if (!$field->find(TRUE)) {
-        continue;
-      }
-      $dataType = $field->data_type;
-
       $profileField = $profileFields[$key] ?? [];
       $fieldTitle = $profileField['title'] ?? NULL;
       $isRequired = $profileField['is_required'] ?? NULL;
-      if (!$fieldTitle) {
-        $fieldTitle = $field->label;
-      }
+      $fieldTitle = CRM_Utils_String::purifyHTML($fieldTitle ?: $field['label']);
 
       //no need to validate.
       if (CRM_Utils_System::isNull($value) && !$isRequired) {
@@ -2472,7 +2462,7 @@ WHERE      f.id IN ($ids)";
 
       //now time to take care of custom field form rules.
       $ruleName = $errorMsg = NULL;
-      switch ($dataType) {
+      switch ($field['data_type']) {
         case 'Int':
           $ruleName = 'integer';
           $errorMsg = ts('%1 must be an integer (whole number).', [1 => $fieldTitle]);
