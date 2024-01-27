@@ -97,12 +97,12 @@
           </tr>
           <tr class="crm-payment-form-block-fee_amount">
             <td class="label">{$form.fee_amount.label}</td>
-            <td{$valueStyle}>{$form.fee_amount.html}</td>
+            <td>{$form.fee_amount.html}</td>
           </tr>
         </table>
       </div>
       {/if}
-      {include file='CRM/Core/BillingBlockWrapper.tpl'}
+      {include file='CRM/Core/BillingBlockWrapper.tpl' currency=false}
     </div>
 
     {literal}
