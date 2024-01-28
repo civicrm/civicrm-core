@@ -35,9 +35,9 @@ class Router extends AutoService {
     }
 
     $list = explode("\n", \Civi::settings()->get('oembed_allow_other'));
-    \Civi::dispatcher()->dispatch('civi.oembed.allowRoutes', [
+    \Civi::dispatcher()->dispatch('civi.oembed.allowRoutes', \Civi\Core\Event\GenericHookEvent::create([
       'routes' => &$list,
-    ]);
+    ]));
     $matches = \CRM_Utils_String::filterByWildcards($list, [$route]);
     if (!empty($matches)) {
       return TRUE;
