@@ -407,7 +407,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
           // Set audience to sysadmin in case adding them to UI annoys people. If people ask to see this
           // in the UI we could set to 'user'.
           $field['audience'] = 'sysadmin';
-          $field['name'] = $entity . '_billing.' . $field['name'];
+          $field['name'] = str_replace('_primary.', '_billing.', $field['name']);
           $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, $entity . '_billing');
         }
       }
@@ -417,6 +417,9 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     $tokensMetadata['address_primary.state_province_id:abbr'] = $tokensMetadata['address_primary.state_province_id:label'];
     $tokensMetadata['address_primary.state_province_id:abbr']['name'] = 'address_primary.state_province_id:abbr';
     $tokensMetadata['address_primary.state_province_id:abbr']['audience'] = 'user';
+    $tokensMetadata['address_billing.state_province_id:abbr'] = $tokensMetadata['address_billing.state_province_id:label'];;
+    $tokensMetadata['address_billing.state_province_id:abbr']['name'] = 'address_billing.state_province_id:abbr';
+
     // Hide the label for now because we are not sure if there are paths
     // where legacy token resolution is in play where this could not be resolved.
     $tokensMetadata['address_primary.state_province_id:label']['audience'] = 'sysadmin';
