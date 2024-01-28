@@ -15,6 +15,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\PCPBlock;
 
 /**
  * This class generates form components for processing Event
@@ -142,7 +143,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     foreach ($fields as $name => $dontCare) {
       if (isset($this->_params[0][$name])) {
         $defaults[$name] = $this->_params[0][$name];
-        if (substr($name, 0, 7) == 'custom_') {
+        if (str_starts_with($name, 'custom_')) {
           $timeField = "{$name}_time";
           if (isset($this->_params[0][$timeField])) {
             $defaults[$timeField] = $this->_params[0][$timeField];
@@ -195,18 +196,8 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
     $this->assign('isOnWaitlist', $isOnWaitlist);
     $this->assign('isRequireApproval', $isRequireApproval);
-
-    // find pcp info
-    $dao = new CRM_PCP_DAO_PCPBlock();
-    $dao->entity_table = 'civicrm_event';
-    $dao->entity_id = $this->_eventId;
-    $dao->is_active = 1;
-    $dao->find(TRUE);
-
-    if ($dao->id) {
-      $this->assign('pcpLink', CRM_Utils_System::url('civicrm/contribute/campaign', 'action=add&reset=1&pageId=' . $this->_eventId . '&component=event'));
-      $this->assign('pcpLinkText', $dao->link_text);
-    }
+    $this->assign('pcpLink', $this->getPCPBlockID() ? CRM_Utils_System::url('civicrm/contribute/campaign', 'action=add&reset=1&pageId=' . $this->getEventID() . '&component=event') : NULL);
+    $this->assign('pcpLinkText', $this->getPCPBlockID() ? $this->getPCPBlockValue('link_text') : NULL);
 
     // Assign Participant Count to Lineitem Table
     $this->assign('pricesetFieldsCount', CRM_Price_BAO_PriceSet::getPricesetCount($this->_priceSetId));
@@ -231,6 +222,40 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    */
   public function getTitle() {
     return ts('Thank You Page');
+  }
+
+  /**
+   * @return int|null
+   */
+  public function getPCPBlockID(): ?int {
+    if (!$this->isDefined('PCPBlock')) {
+      $pcpBlock = PCPBlock::get(FALSE)
+        ->addWhere('entity_table', '=', 'civicrm_event')
+        ->addWhere('entity_id', '=', $this->getEventID())
+        ->addWhere('is_active', '=', TRUE)
+        ->execute()->first();
+      if (!$pcpBlock) {
+        return NULL;
+      }
+      $this->define('PCPBlock', 'PCPBlock', $pcpBlock);
+    }
+    return $this->lookup('PCPBlock', 'id');
+  }
+
+  /**
+   * Get a PCP Block value.
+   *
+   * @param string $value
+   *
+   * @return mixed|null
+   * @throws \CRM_Core_Exception
+   * @todo - this should probably be on a trait & made public like similar getValue functions.
+   */
+  protected function getPCPBlockValue(string $value) {
+    if (!$this->getPCPBlockID()) {
+      return NULL;
+    }
+    return $this->lookup('PCPBlock', $value);
   }
 
 }
