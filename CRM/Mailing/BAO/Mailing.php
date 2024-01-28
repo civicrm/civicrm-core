@@ -2649,27 +2649,6 @@ SELECT  $mailing.id as mailing_id
    *   array content/component.
    */
   public static function getMailingContent(&$report, &$form, $isSMS = FALSE) {
-    $htmlHeader = $textHeader = NULL;
-    $htmlFooter = $textFooter = NULL;
-
-    if (!$isSMS) {
-      if ($report['mailing']['header_id']) {
-        $header = new CRM_Mailing_BAO_MailingComponent();
-        $header->id = $report['mailing']['header_id'];
-        $header->find(TRUE);
-        $htmlHeader = $header->body_html;
-        $textHeader = $header->body_text;
-      }
-
-      if ($report['mailing']['footer_id']) {
-        $footer = new CRM_Mailing_BAO_MailingComponent();
-        $footer->id = $report['mailing']['footer_id'];
-        $footer->find(TRUE);
-        $htmlFooter = $footer->body_html;
-        $textFooter = $footer->body_text;
-      }
-    }
-
     $mailingKey = $form->_mailing_id;
     if (!$isSMS) {
       if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($mailingKey)) {
