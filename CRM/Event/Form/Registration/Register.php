@@ -852,7 +852,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $totalParticipants += $numberAdditionalParticipants;
       }
 
-      if (empty($fields['bypass_payment']) &&
+      if ($form->getEventValue('max_participants') !== NULL && empty($fields['bypass_payment']) &&
         !$form->_allowConfirmation &&
         $spacesAvailable < $totalParticipants
       ) {
