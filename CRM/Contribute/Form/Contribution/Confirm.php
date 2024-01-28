@@ -2376,7 +2376,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       catch (CRM_Core_Exception $e) {
         CRM_Core_Session::singleton()->setStatus($e->getMessage());
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey=" . ($this->_params['qfKey'] ?? '')));
       }
       if (!$this->_amount > 0.0 || !$membershipParams['amount']) {
         // we need to explicitly create a CMS user in case of free memberships
