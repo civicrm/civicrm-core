@@ -23,7 +23,10 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
   /**
    * Event type.
+   *
    * @var int
+   *
+   * @deprecated - never set.
    */
   protected $_eventType;
 
@@ -225,14 +228,14 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $params['is_share'] ??= FALSE;
     $params['is_show_calendar_links'] ??= FALSE;
     $params['default_role_id'] ??= FALSE;
-    $params['id'] = $this->_id;
+    $params['id'] = $this->getEventID();
     //merge params with defaults from templates
     if (!empty($params['template_id'])) {
       $params = array_merge(CRM_Event_BAO_Event::getTemplateDefaultValues($params['template_id']), $params);
     }
 
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $this->_id,
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(),
+      $this->getEventID(),
       'Event'
     );
 
