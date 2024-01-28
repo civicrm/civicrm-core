@@ -290,8 +290,10 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
   }
 
   public static function registerStringResource() {
-    require_once 'CRM/Core/Smarty/resources/String.php';
-    civicrm_smarty_register_string_resource();
+    if (method_exists('Smarty', 'register_resource')) {
+      require_once 'CRM/Core/Smarty/resources/String.php';
+      civicrm_smarty_register_string_resource();
+    }
   }
 
   /**
