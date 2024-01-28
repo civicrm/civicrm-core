@@ -33,7 +33,7 @@
         </font></td>
       </tr>
       <tr>
-        <td><font size="1" align="center">{$street_address} {$supplemental_address_1}</font></td>
+        <td><font size="1" align="center">{contact.address_billing.street_address} {contact.address_billing.supplemental_address_1}</font></td>
         <td><b><font size="1" align="right">{ts}Invoice Number:{/ts}</font></b></td>
         <td><font size="1" align="right">
           {domain.supplemental_address_2}
@@ -41,7 +41,7 @@
         </font></td>
       </tr>
       <tr>
-        <td><font size="1" align="center">{$supplemental_address_2} {$stateProvinceAbbreviation}</font></td>
+        <td><font size="1" align="center">{contact.address_billing.supplemental_address_2} {contact.address_billing.state_province_id:abbr}</font></td>
         <td><font size="1" align="right">{contribution.invoice_number}</font></td>
         <td style="white-space: nowrap"><font size="1" align="right">
           {domain.city}
@@ -49,7 +49,7 @@
         </font></td>
       </tr>
       <tr>
-        <td><font size="1" align="right">{$city}  {$postal_code}</font></td>
+        <td><font size="1" align="right">{contact.address_billing.city}  {contact.address_billing.postal_code}</font></td>
         <td height="10"><b><font size="1" align="right">{ts}Reference:{/ts}</font></b></td>
         <td><font size="1" align="right">{domain.country_id:label}</font></td>
       </tr>
@@ -218,7 +218,7 @@
          </font></td>
       </tr>
       <tr>
-        <td style="padding-left:17px;"><font size="1" align="center">{$street_address}   {$supplemental_address_1}</font></td>
+        <td style="padding-left:17px;"><font size="1" align="center">{contact.address_billing.street_address}   {contact.address_billing.supplemental_address_1}</font></td>
         <td style="padding-left:30px;"><b><font size="1" align="right">{ts}Credit Note Number:{/ts}</font></b></td>
         <td><font size="1" align="right">
           {domain.supplemental_address_2}
@@ -226,7 +226,7 @@
         </font></td>
       </tr>
       <tr>
-        <td style="padding-left:17px;"><font size="1" align="center">{$supplemental_address_2}  {$stateProvinceAbbreviation}</font></td>
+        <td style="padding-left:17px;"><font size="1" align="center">{contact.address_billing.supplemental_address_2}  {contact.address_billing.state_province_id:abbr}</font></td>
         <td style="padding-left:30px;"><font size="1" align="right">{contribution.creditnote_id}</font></td>
         <td><font size="1" align="right">
           {domain.city}
@@ -234,7 +234,7 @@
         </font></td>
       </tr>
       <tr>
-        <td style="padding-left:17px;"><font size="1" align="right">{$city}  {$postal_code}</font></td>
+        <td style="padding-left:17px;"><font size="1" align="right">{contact.address_billing.city}  {contact.address_billing.postal_code}</font></td>
         <td height="10" style="padding-left:30px;"><b><font size="1" align="right">{ts}Reference:{/ts}</font></b></td>
         <td><font size="1" align="right">
           {domain.country_id:label}
