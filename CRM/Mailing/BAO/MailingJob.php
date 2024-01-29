@@ -40,20 +40,11 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * @return \CRM_Mailing_BAO_MailingJob
    * @throws \CRM_Core_Exception
    */
-  public static function create($params) {
-    if (empty($params['id']) && empty($params['mailing_id'])) {
-      throw new CRM_Core_Exception("Failed to create job: Unknown mailing ID");
-    }
-    $op = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($op, 'MailingJob', $params['id'] ?? NULL, $params);
-
-    $jobDAO = new CRM_Mailing_BAO_MailingJob();
-    $jobDAO->copyValues($params);
-    $jobDAO->save();
+  public static function create(array $params): self {
+    $jobDAO = self::writeRecord($params);
     if (!empty($params['mailing_id']) && empty('is_calling_function_updated_to_reflect_deprecation')) {
       CRM_Mailing_BAO_Mailing::getRecipients($params['mailing_id']);
     }
-    CRM_Utils_Hook::post($op, 'MailingJob', $jobDAO->id, $jobDAO);
     return $jobDAO;
   }
 
