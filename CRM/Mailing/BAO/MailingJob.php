@@ -69,14 +69,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   public static function runJobs($testParams = NULL, $mode = NULL) {
     $job = $mode === 'sms' ? new CRM_Mailing_BAO_SMSJob() : new CRM_Mailing_BAO_MailingJob();
 
-    $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
-    $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
     $mailerBatchLimit = Civi::settings()->get('mailerBatchLimit');
 
     if (!empty($testParams)) {
       $query = "
       SELECT *
-        FROM $jobTable
+        FROM civicrm_mailing_job
        WHERE id = {$testParams['job_id']}";
       $job->query($query);
     }
@@ -85,17 +83,14 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       $mailingACL = CRM_Mailing_BAO_Mailing::mailingACL('m');
       $domainID = CRM_Core_Config::domainID();
 
-      $modeClause = 'AND m.sms_provider_id IS NULL';
-      if ($mode == 'sms') {
-        $modeClause = 'AND m.sms_provider_id IS NOT NULL';
-      }
+      $modeClause = 'AND m.sms_provider_id ' . ($mode === 'sms' ? 'IS NOT NULL' : 'IS NULL');
 
       // Select the first child job that is scheduled
       // CRM-6835
       $query = "
       SELECT   j.*
-        FROM   $jobTable     j,
-           $mailingTable m
+        FROM   civicrm_mailing_job     j,
+           civicrm_mailing m
        WHERE   m.id = j.mailing_id AND m.domain_id = {$domainID}
                      {$modeClause}
          AND   j.is_test = 0
@@ -134,8 +129,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         );
 
         if (
-          $job->status != 'Running' &&
-          $job->status != 'Scheduled'
+          $job->status !== 'Running' &&
+          $job->status !== 'Scheduled'
         ) {
           // this includes Cancelled and other statuses, CRM-4246
           $lock->release();
@@ -145,7 +140,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
       /* Queue up recipients for the child job being launched */
 
-      if ($job->status != 'Running') {
+      if ($job->status !== 'Running') {
         $transaction = new CRM_Core_Transaction();
 
         // have to queue it up based on the offset and limits
