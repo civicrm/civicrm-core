@@ -43,7 +43,7 @@ class CRM_Mailing_Event_BAO_MailingEventForward extends CRM_Mailing_Event_DAO_Ma
                             email.id as email_id,
                             contact.do_not_email as do_not_email,
                             queue.id as queue_id
-                FROM        (civicrm_email email, job as temp_job)
+                FROM        (civicrm_email email, civicrm_mailing_job as temp_job)
                 INNER JOIN  civicrm_contact contact
                         ON  email.contact_id = contact.id
                 LEFT JOIN   civicrm_mailing_event_queue queue
