@@ -165,4 +165,49 @@ EOHTML;
     $this->assertContains($cid[0], array_column($parents, 'id'));
   }
 
+  public function testPrefillWithDisplayOnlyFields(): void {
+
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC"  />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1" >
+    <af-field name="id" />
+    <afblock-name-individual />
+    <af-field name="gender_id" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $cid = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'One', 'last_name' => 'Name', 'gender_id:name' => 'Female'],
+        ['first_name' => 'Two', 'last_name' => 'Name', 'gender_id:name' => 'Male'],
+      ],
+    ])->column('id');
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setArgs(['Individual1' => [$cid[0]]])
+      ->execute()
+      ->indexBy('name');
+    $this->assertCount(1, $prefill['Individual1']['values']);
+    $this->assertEquals('One', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('Female', $prefill['Individual1']['values'][0]['fields']['gender_id:label']);
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setArgs(['Individual1' => [$cid[1]]])
+      ->execute()
+      ->indexBy('name');
+    $this->assertCount(1, $prefill['Individual1']['values']);
+    $this->assertEquals('Two', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('Male', $prefill['Individual1']['values'][0]['fields']['gender_id:label']);
+  }
+
 }

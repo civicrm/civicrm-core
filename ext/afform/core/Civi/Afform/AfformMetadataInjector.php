@@ -120,6 +120,15 @@ class AfformMetadataInjector {
     // On a search form, search_range will present a pair of fields (or possibly 3 fields for date select + range)
     $isSearchRange = !empty($fieldDefn['search_range']) && \CRM_Utils_JS::decode($fieldDefn['search_range']);
 
+    // DisplayOnly field should show label not id
+    if ($inputType === 'DisplayOnly') {
+      if (in_array('label', $fieldInfo['suffixes'] ?? [], TRUE)) {
+        pq($afField)->attr('name', pq($afField)->attr('name') . ':label');
+      }
+      unset($fieldInfo['options']);
+    }
+    unset($fieldInfo['suffixes']);
+
     // On a search form, the exposed operator requires a list of options.
     if (!empty($fieldDefn['expose_operator'])) {
       $operators = Utils::getSearchOperators();

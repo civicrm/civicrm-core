@@ -198,7 +198,23 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   private function apiGet($api4, $entityName, $entityFields, $params) {
     $idField = CoreUtil::getIdFieldName($entityName);
-    $params['select'] = array_unique(array_merge([$idField], array_keys($entityFields)));
+    $params['select'] = [$idField];
+    foreach ($entityFields as $fieldName => $entityField) {
+      if (($entityField['defn']['input_type'] ?? NULL) === 'DisplayOnly') {
+        // DisplayOnly field value not needed unless this is a prefill action
+        if (is_a($this, 'Civi\Api4\Action\Afform\Prefill')) {
+          $fieldInfo = self::getEntityField($entityName, $fieldName);
+          // DisplayOnly field should show label not id
+          if (in_array('label', $fieldInfo['suffixes'] ?? [], TRUE)) {
+            $params['select'][] = "$fieldName:label";
+          }
+        }
+      }
+      else {
+        $params['select'][] = $fieldName;
+      }
+    }
+    $params['select'] = array_unique($params['select']);
     $result = (array) $api4($entityName, 'get', $params)->indexBy($idField);
     // Check for file fields
     $fieldInfo = civicrm_api4($entityName, 'getFields', [
