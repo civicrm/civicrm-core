@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\CustomValue;
+
 /**
  * Class CRM_Custom_Import_Parser_Api
  */
@@ -37,9 +39,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
     try {
       $params = $this->getMappedRow($values);
       $params['skipRecentView'] = TRUE;
-      $params['check_permissions'] = TRUE;
       $params['entity_id'] = $params['contact_id'];
-      civicrm_api3('CustomValue', 'create', $params);
+      CustomValue::create($this->getCustomGroupID())->setValues($params)->execute();
       $this->setImportStatus($rowNumber, 'IMPORTED', '', $params['contact_id']);
     }
     catch (CRM_Core_Exception $e) {
