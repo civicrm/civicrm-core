@@ -422,7 +422,7 @@ function civicrm_api3_mailing_event_forward($params) {
     return civicrm_api3_create_success($params);
   }
 
-  return civicrm_api3_create_error('Queue event could not be found');
+  throw new CRM_Core_Exception('Queue event could not be found');
 }
 
 /**
