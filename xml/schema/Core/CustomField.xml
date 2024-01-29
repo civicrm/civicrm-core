@@ -359,6 +359,7 @@
     <html>
       <type>Select</type>
     </html>
+    <add>5.71</add>
   </field>
   <field>
     <name>is_on_delete_includes_soft_delete</name>
@@ -369,6 +370,7 @@
     <html>
       <type>CheckBox</type>
     </html>
+    <add>5.71</add>
   </field>
   <index>
     <name>index_data_type</name>
