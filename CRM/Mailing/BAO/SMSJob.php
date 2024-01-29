@@ -21,9 +21,6 @@ class CRM_Mailing_BAO_SMSJob extends CRM_Mailing_BAO_MailingJob {
     $isTest = !empty($isTest);
     $mailingID = $this->mailing_id;
     $mailer = CRM_SMS_Provider::singleton(['mailing_id' => $mailingID]);
-    if (\Civi::settings()->get('experimentalFlexMailerEngine')) {
-      throw new \RuntimeException("Cannot use legacy deliver() when experimentalFlexMailerEngine is enabled");
-    }
 
     $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->id = $this->mailing_id;
@@ -46,12 +43,12 @@ class CRM_Mailing_BAO_SMSJob extends CRM_Mailing_BAO_MailingJob {
       $mailing->subject = ts('[CiviMail Draft]') . ' ' . $mailing->subject;
     }
 
-    CRM_Mailing_BAO_Mailing::tokenReplace($mailing);
-
     // get and format attachments
     $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_mailing', $mailing->id);
 
     if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
+      // This is probably a hang over from when Civi was not probably initialised.
+      // It is not relevant once we are off Smarty 2.
       CRM_Core_Smarty::registerStringResource();
     }
 
