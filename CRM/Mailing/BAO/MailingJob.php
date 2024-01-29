@@ -744,55 +744,49 @@ AND    record_type_id = $targetRecordID
    * @return \CRM_Mailing_Event_BAO_MailingEventQueue
    *   A query object whose rows provide ('id', 'contact_id', 'hash') and ('email' or 'phone').
    */
-  public static function findPendingTasks($jobId, $medium) {
+  public static function findPendingTasks(int $jobId, string $medium): CRM_Mailing_Event_BAO_MailingEventQueue {
     $eq = new CRM_Mailing_Event_BAO_MailingEventQueue();
-    $queueTable = CRM_Mailing_Event_BAO_MailingEventQueue::getTableName();
-    $emailTable = CRM_Core_BAO_Email::getTableName();
-    $phoneTable = CRM_Core_BAO_Phone::getTableName();
-    $contactTable = CRM_Contact_BAO_Contact::getTableName();
-    $deliveredTable = CRM_Mailing_Event_BAO_MailingEventDelivered::getTableName();
-    $bounceTable = CRM_Mailing_Event_BAO_MailingEventBounce::getTableName();
 
-    $query = "  SELECT      $queueTable.id,
-                                $emailTable.email as email,
-                                $queueTable.contact_id,
-                                $queueTable.hash,
+    $query = "  SELECT      queue.id,
+                                email.email as email,
+                                queue.contact_id,
+                                queue.hash,
                                 NULL as phone
-                    FROM        $queueTable
-                    INNER JOIN  $emailTable
-                            ON  $queueTable.email_id = $emailTable.id
-                    INNER JOIN  $contactTable
-                            ON  $contactTable.id = $emailTable.contact_id
-                    LEFT JOIN   $deliveredTable
-                            ON  $queueTable.id = $deliveredTable.event_queue_id
-                    LEFT JOIN   $bounceTable
-                            ON  $queueTable.id = $bounceTable.event_queue_id
-                    WHERE       $queueTable.job_id = " . $jobId . "
-                        AND     $deliveredTable.id IS null
-                        AND     $bounceTable.id IS null
-                        AND    $contactTable.is_opt_out = 0";
+                    FROM        civicrm_mailing_event_queue queue
+                    INNER JOIN  civicrm_email email
+                            ON  queue.email_id = email.id
+                    INNER JOIN  civicrm_contact contact
+                            ON  contact.id = email.contact_id
+                    LEFT JOIN   civicrm_mailing_event_delivered delivered
+                            ON  queue.id = delivered.event_queue_id
+                    LEFT JOIN   civicrm_mailing_event_bounce bounce
+                            ON  queue.id = bounce.event_queue_id
+                    WHERE       queue.job_id = " . $jobId . "
+                        AND     delivered.id IS null
+                        AND     bounce.id IS null
+                        AND     contact.is_opt_out = 0";
 
     if ($medium === 'sms') {
       $query = "
-                    SELECT      $queueTable.id,
-                                $phoneTable.phone as phone,
-                                $queueTable.contact_id,
-                                $queueTable.hash,
+                    SELECT      queue.id,
+                                phone,
+                                queue.contact_id,
+                                queue.hash,
                                 NULL as email
-                    FROM        $queueTable
-                    INNER JOIN  $phoneTable
-                            ON  $queueTable.phone_id = $phoneTable.id
-                    INNER JOIN  $contactTable
-                            ON  $contactTable.id = $phoneTable.contact_id
-                    LEFT JOIN   $deliveredTable
-                            ON  $queueTable.id = $deliveredTable.event_queue_id
-                    LEFT JOIN   $bounceTable
-                            ON  $queueTable.id = $bounceTable.event_queue_id
-                    WHERE       $queueTable.job_id = " . $jobId . "
-                        AND     $deliveredTable.id IS null
-                        AND     $bounceTable.id IS null
-                        AND    ( $contactTable.is_opt_out = 0
-                        OR       $contactTable.do_not_sms = 0 )";
+                    FROM        civicrm_mailing_event_queue queue
+                    INNER JOIN  civicrm_phone phone
+                            ON  queue.phone_id = phone.id
+                    INNER JOIN  civicrm_contact contact
+                            ON  contact.id = phone.contact_id
+                    LEFT JOIN   civicrm_mailing_event_delivered delivered
+                            ON  queue.id = delivered.event_queue_id
+                    LEFT JOIN   civicrm_mailing_event_bounce bounce
+                            ON  queue.id = bounce.event_queue_id
+                    WHERE       queue.job_id = " . $jobId . "
+                        AND     delivered.id IS null
+                        AND     bounce.id IS null
+                        AND    ( contact.is_opt_out = 0
+                        OR       contact.do_not_sms = 0 )";
     }
     $eq->query($query);
     return $eq;
