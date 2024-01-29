@@ -16,6 +16,7 @@
  */
 
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\MailingGroup;
 
 require_once 'Mail/mime.php';
 
@@ -445,24 +446,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
     // Condition on the existence of a scheduled date.
     if (!empty($params['scheduled_date']) && $params['scheduled_date'] !== 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
 
-      if (!isset($params['is_completed']) || $params['is_completed'] !== 1) {
-        $mailingGroups = \Civi\Api4\MailingGroup::get()
-          ->addSelect('group.id')
-          ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
-          ->addWhere('mailing_id', '=', $mailing->id)
-          ->addWhere('entity_table', '=', 'civicrm_group')
-          ->addWhere('group_type', 'IN', ['Include', 'Exclude'])
-          ->addClause('OR', ['group.saved_search_id', 'IS NOT NULL'], ['group.children', 'IS NOT NULL'])
-          ->execute();
-        foreach ($mailingGroups as $mailingGroup) {
-          CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($mailingGroup['group.id']);
-          $group = new CRM_Contact_DAO_Group();
-          $group->find(TRUE);
-          $group->id = $mailingGroup['group.id'];
-          CRM_Contact_BAO_GroupContactCache::load($group);
-        }
-      }
-
       $job = new CRM_Mailing_BAO_MailingJob();
       $job->mailing_id = $mailing->id;
       // If we are creating a new Completed mailing (e.g. import from another system) set the job to completed.
@@ -482,7 +465,43 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
 
     // Populate the recipients.
     if (empty($params['_skip_evil_bao_auto_recipients_'])) {
+      if ((!isset($params['is_completed']) || $params['is_completed'] !== 1)
+        && !empty($params['scheduled_date']) && $params['scheduled_date'] !== 'null'
+        && empty($params['_skip_evil_bao_auto_schedule_'])
+      ) {
+        self::refreshMailingGroupCache($mailing->id);
+      }
       self::getRecipients($mailing->id);
+    }
+  }
+
+  /**
+   * Refresh the group cache for groups relevant to the mailing.
+   *
+   * @param int $mailingID
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   *
+   * @internal not supported for use from outside of core. Function has always
+   * been internal so may be moved / removed / alters at any time without
+   * regard for external users.
+   */
+  public static function refreshMailingGroupCache(int $mailingID): void {
+    $mailingGroups = MailingGroup::get()
+      ->addSelect('group.id')
+      ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
+      ->addWhere('mailing_id', '=', $mailingID)
+      ->addWhere('entity_table', '=', 'civicrm_group')
+      ->addWhere('group_type', 'IN', ['Include', 'Exclude'])
+      ->addClause('OR', ['group.saved_search_id', 'IS NOT NULL'], ['group.children', 'IS NOT NULL'])
+      ->execute();
+    foreach ($mailingGroups as $mailingGroup) {
+      CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($mailingGroup['group.id']);
+      $group = new CRM_Contact_DAO_Group();
+      $group->find(TRUE);
+      $group->id = $mailingGroup['group.id'];
+      CRM_Contact_BAO_GroupContactCache::load($group);
     }
   }
 
@@ -1419,7 +1438,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     permissions in the future, but it's called by some extensions during mail processing, when cron isn't necessarily
     called with a logged-in user.
      */
-    $mailingGroups = \Civi\Api4\MailingGroup::get(FALSE)
+    $mailingGroups = MailingGroup::get(FALSE)
       ->addSelect('group.title', 'group.frontend_title')
       ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
       ->addWhere('mailing_id', '=', $this->id)
