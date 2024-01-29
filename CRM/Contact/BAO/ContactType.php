@@ -411,11 +411,12 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
     // Before deleting a contactType, check references by custom groups
     if ($event->action === 'delete') {
       $name = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $event->id);
-      $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-      $custom = new CRM_Core_DAO_CustomGroup();
-      $custom->whereAdd("extends_entity_column_value LIKE '%{$sep}{$name}{$sep}%'");
-      if ($custom->find()) {
-        throw new CRM_Core_Exception(ts("You can not delete this contact type -- it is used by %1 custom field group(s). The custom fields must be deleted first.", [1 => $custom->N]));
+      $customGroups = CRM_Core_BAO_CustomGroup::getAll([
+        'extends' => 'Contact',
+        'extends_entity_column_value' => $name,
+      ]);
+      if ($customGroups) {
+        throw new CRM_Core_Exception(ts("You can not delete this contact type -- it is used by %1 custom field group(s). The custom fields must be deleted first.", [1 => count($customGroups)]));
       }
     }
     Civi::cache('contactTypes')->clear();
