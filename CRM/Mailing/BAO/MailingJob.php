@@ -109,6 +109,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     }
 
     while ($job->fetch()) {
+      $mailingID = $job->mailing_id;
       // still use job level lock for each child job
       $lock = Civi::lockManager()->acquire("data.mailing.job.{$job->id}");
       if (!$lock->isAcquired()) {
@@ -145,7 +146,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
         // have to queue it up based on the offset and limits
         // get the parent ID, and limit and offset
-        $job->queue($testParams);
+        if (!empty($testParams)) {
+          CRM_Mailing_BAO_Mailing::getTestRecipients($testParams, (int) $mailingID);
+        }
+        else {
+          $job->queue();
+        }
 
         // Update to show job has started.
         self::create([
@@ -395,62 +401,57 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
-   * @param ?array $testParams
+   *
    */
-  public function queue(?array $testParams = NULL) {
-    if (!empty($testParams)) {
-      CRM_Mailing_BAO_Mailing::getTestRecipients($testParams, (int) $this->mailing_id);
-    }
-    else {
-      // We are still getting all the recipients from the parent job
-      // so we don't mess with the include/exclude logic.
-      $recipients = CRM_Mailing_BAO_MailingRecipients::mailingQuery($this->mailing_id, $this->job_offset, $this->job_limit);
+  public function queue() {
+    // We are still getting all the recipients from the parent job
+    // so we don't mess with the include/exclude logic.
+    $recipients = CRM_Mailing_BAO_MailingRecipients::mailingQuery($this->mailing_id, $this->job_offset, $this->job_limit);
 
-      $params = [];
-      $count = 0;
-      // dev/core#1768 Get the mail sync interval.
-      $mail_sync_interval = Civi::settings()->get('civimail_sync_interval');
-      while ($recipients->fetch()) {
-        // CRM-18543: there are situations when both the email and phone are null.
-        // Skip the recipient in this case.
-        if (empty($recipients->email_id) && empty($recipients->phone_id)) {
-          continue;
-        }
-        $params[] = [
-          'job_id' => $this->id,
-          'email_id' => $recipients->email_id ? (int) $recipients->email_id : NULL,
-          'phone_id' => $recipients->phone_id ? (int) $recipients->phone_id : NULL,
-          'contact_id' => $recipients->contact_id ? (int) $recipients->contact_id : NULL,
-          'mailing_id' => (int) $this->mailing_id,
-          'is_test' => !empty($testParams),
-        ];
-        $count++;
-        /*
-        The mail sync interval is used here to determine how
-        many rows to insert in each insert statement.
-        The discussion & name of the setting implies that the intent of the
-        setting is the frequency with which the mailing tables are updated
-        with information about actions taken on the mailings (ie if you send
-        an email & quickly update the delivered table that impacts information
-        availability.
-
-        However, here it is used to manage the size of each individual
-        insert statement. It is unclear why as the trade offs are out of sync
-        ie. you want you insert statements here to be 'big, but not so big they
-        stall out' but in the delivery context it's a trade off between
-        information availability & performance.
-        https://github.com/civicrm/civicrm-core/pull/17367 */
-
-        if ($count % $mail_sync_interval === 0) {
-          CRM_Mailing_Event_BAO_MailingEventQueue::writeRecords($params);
-          $count = 0;
-          $params = [];
-        }
+    $params = [];
+    $count = 0;
+    // dev/core#1768 Get the mail sync interval.
+    $mail_sync_interval = Civi::settings()->get('civimail_sync_interval');
+    while ($recipients->fetch()) {
+      // CRM-18543: there are situations when both the email and phone are null.
+      // Skip the recipient in this case.
+      if (empty($recipients->email_id) && empty($recipients->phone_id)) {
+        continue;
       }
+      $params[] = [
+        'job_id' => $this->id,
+        'email_id' => $recipients->email_id ? (int) $recipients->email_id : NULL,
+        'phone_id' => $recipients->phone_id ? (int) $recipients->phone_id : NULL,
+        'contact_id' => $recipients->contact_id ? (int) $recipients->contact_id : NULL,
+        'mailing_id' => (int) $this->mailing_id,
+        'is_test' => FALSE,
+      ];
+      $count++;
+      /*
+      The mail sync interval is used here to determine how
+      many rows to insert in each insert statement.
+      The discussion & name of the setting implies that the intent of the
+      setting is the frequency with which the mailing tables are updated
+      with information about actions taken on the mailings (ie if you send
+      an email & quickly update the delivered table that impacts information
+      availability.
 
-      if (!empty($params)) {
+      However, here it is used to manage the size of each individual
+      insert statement. It is unclear why as the trade offs are out of sync
+      ie. you want you insert statements here to be 'big, but not so big they
+      stall out' but in the delivery context it's a trade off between
+      information availability & performance.
+      https://github.com/civicrm/civicrm-core/pull/17367 */
+
+      if ($count % $mail_sync_interval === 0) {
         CRM_Mailing_Event_BAO_MailingEventQueue::writeRecords($params);
+        $count = 0;
+        $params = [];
       }
+    }
+
+    if (!empty($params)) {
+      CRM_Mailing_Event_BAO_MailingEventQueue::writeRecords($params);
     }
   }
 
