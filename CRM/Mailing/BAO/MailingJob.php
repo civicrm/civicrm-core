@@ -37,6 +37,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    *
    * @param array $params
    *
+   * @deprecated since 5.71 will be removed around 5.85
+   *
    * @return \CRM_Mailing_BAO_MailingJob
    * @throws \CRM_Core_Exception
    */
