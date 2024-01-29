@@ -134,7 +134,7 @@
       var priceSetName = "price_"+{/literal}'{$membershipFieldID}'{literal};
       var considerUserInput = {/literal}'{$takeUserSubmittedAutoRenew}'{literal};
       if ( memTypeId ) considerUserInput = false;
-      if ( !memTypeId ) memTypeId = cj('input:radio[name='+priceSetName+']:checked').attr('membership-type');
+      if ( !memTypeId ) memTypeId = cj('input:radio[name='+priceSetName+']:checked').data('membership-type-id');
 
       //does this page has only one membership type.
       var renewOptions  = {/literal}{$autoRenewMembershipTypeOptions}{literal};
