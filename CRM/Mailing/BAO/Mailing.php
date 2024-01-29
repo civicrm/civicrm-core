@@ -65,18 +65,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
   private $footer = NULL;
 
   /**
-   * The HTML content of the message.
-   * @var string
-   */
-  private $html = NULL;
-
-  /**
-   * The text content of the message.
-   * @var string
-   */
-  private $text = NULL;
-
-  /**
    * Cached BAO for the domain.
    * @var int
    */
@@ -95,7 +83,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
     $mailingObj->id = $mailingID;
     $mailingObj->find(TRUE);
 
-    $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $contact = CRM_Contact_DAO_Contact::getTableName();
     $isSMSmode = (!CRM_Utils_System::isNull($mailingObj->sms_provider_id));
 
@@ -109,7 +96,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
       ->param('#mailing_id', $mailingID)
       ->execute();
     while ($dao->fetch()) {
-      if ($dao->entity_table == 'civicrm_mailing') {
+      if ($dao->entity_table === 'civicrm_mailing') {
         $priorMailingIDs[$dao->group_type] = explode(',', $dao->group_ids);
       }
       else {
@@ -145,10 +132,10 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
         if ($groupDAO->cache_date == NULL || $groupDAO->is_hidden) {
           CRM_Contact_BAO_GroupContactCache::load($groupDAO);
         }
-        if ($groupType == 'Include') {
+        if ($groupType === 'Include') {
           $includeSmartGroupIDs[] = $groupDAO->id;
         }
-        elseif ($groupType == 'Exclude') {
+        elseif ($groupType === 'Exclude') {
           $excludeSmartGroupIDs[] = $groupDAO->id;
         }
         //NOTE: Do nothing for base
@@ -458,7 +445,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
   protected static function doSubmitActions(array $params, CRM_Mailing_DAO_Mailing $mailing): array {
     // Create parent job if not yet created.
     // Condition on the existence of a scheduled date.
-    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
+    if (!empty($params['scheduled_date']) && $params['scheduled_date'] !== 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
 
       if (!isset($params['is_completed']) || $params['is_completed'] !== 1) {
         $mailingGroups = \Civi\Api4\MailingGroup::get()
@@ -941,7 +928,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    */
   public static function getVerpAndUrls($job_id, $event_queue_id, $hash, $email) {
     // create a skeleton object and set its properties that are required by getVerpAndUrlsAndHeaders()
-    $config = CRM_Core_Config::singleton();
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->_domain = CRM_Core_BAO_Domain::getDomain();
     $bao->from_name = $bao->from_email = $bao->subject = '';
@@ -1075,7 +1061,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $contactDetails, &$attachments, $isForward = FALSE,
     $fromEmail = NULL, $replyToEmail = NULL
   ) {
-    $config = CRM_Core_Config::singleton();
     $this->getTokens();
 
     if ($this->_domain == NULL) {
@@ -1253,7 +1238,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     if (!empty($mailParams['attachments'])) {
-      foreach ($mailParams['attachments'] as $fileID => $attach) {
+      foreach ($mailParams['attachments'] as $attach) {
         $message->addAttachment($attach['fullPath'],
           $attach['mime_type'],
           $attach['cleanName']
@@ -1319,7 +1304,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $mailing->templates[$type] = CRM_Utils_Token::replaceDomainTokens(
           $mailing->templates[$type],
           $domain,
-          $type == 'html',
+          $type === 'html',
           $tokens[$type]
         );
         $mailing->templates[$type] = CRM_Utils_Token::replaceMailingTokens($mailing->templates[$type], $mailing, NULL, $tokens[$type]);
@@ -1350,7 +1335,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY;
 
-    if ($type == 'embedded_url') {
+    if ($type === 'embedded_url') {
       $embed_data = [];
       foreach ($token as $t) {
         $embed_data[] = $this->getTokenData($t, $html, $contact, $verp, $urls, $event_queue_id);
@@ -1381,7 +1366,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $data = CRM_Utils_String::unstupifyUrl($data);
       }
     }
-    elseif ($type == 'url') {
+    elseif ($type === 'url') {
       if ($this->url_tracking && !empty($this->id)) {
         // ensure that Google CSS and any .css files are not tracked.
         if (!(strpos($token, 'css?family') || strpos($token, '.css'))) {
@@ -1395,21 +1380,21 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $data = $token;
       }
     }
-    elseif ($type == 'contact') {
+    elseif ($type === 'contact') {
       $data = CRM_Utils_Token::getContactTokenReplacement($token, $contact, FALSE, FALSE, $useSmarty);
     }
-    elseif ($type == 'action') {
+    elseif ($type === 'action') {
       $data = CRM_Utils_Token::getActionTokenReplacement($token, $verp, $urls, $html);
     }
-    elseif ($type == 'domain') {
+    elseif ($type === 'domain') {
       $domain = CRM_Core_BAO_Domain::getDomain();
       $data = CRM_Utils_Token::getDomainTokenReplacement($token, $domain, $html);
     }
-    elseif ($type == 'mailing') {
-      if ($token == 'name') {
+    elseif ($type === 'mailing') {
+      if ($token === 'name') {
         $data = $this->name;
       }
-      elseif ($token == 'group') {
+      elseif ($token === 'group') {
         $groups = $this->getGroupNames();
         $data = implode(', ', $groups);
       }
@@ -1682,8 +1667,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     if (!Civi::settings()->get('disable_mandatory_tokens_check')) {
-      $header = $mailing->header_id && $mailing->header_id != 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->header_id) : NULL;
-      $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->footer_id) : NULL;
+      $header = $mailing->header_id && $mailing->header_id !== 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->header_id) : NULL;
+      $footer = $mailing->footer_id && $mailing->footer_id !== 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->footer_id) : NULL;
       foreach (['body_html', 'body_text'] as $field) {
         if (empty($mailing->{$field})) {
           continue;
@@ -1722,7 +1707,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     civicrm_api3('mailing_group', 'replace', [
       'mailing_id' => $mailingId,
       'group_type' => $type,
-      'entity_table' => ($entity == 'groups') ? CRM_Contact_BAO_Group::getTableName() : CRM_Mailing_BAO_Mailing::getTableName(),
+      'entity_table' => ($entity === 'groups') ? CRM_Contact_BAO_Group::getTableName() : CRM_Mailing_BAO_Mailing::getTableName(),
       'values' => $values,
     ]);
   }
@@ -1898,10 +1883,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $row['name'] = "Search Results";
       }
 
-      if ($mailing->group_type == 'Include') {
+      if ($mailing->group_type === 'Include') {
         $report['group']['include'][] = $row;
       }
-      elseif ($mailing->group_type == 'Base') {
+      elseif ($mailing->group_type === 'Base') {
         $report['group']['base'][] = $row;
       }
       else {
@@ -2181,8 +2166,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   public function getCount() {
     $this->selectAdd();
     $this->selectAdd('COUNT(id) as count');
-
-    $session = CRM_Core_Session::singleton();
     $this->find(TRUE);
 
     return $this->count;
@@ -2317,9 +2300,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   public function &getRows($offset, $rowCount, $sort, $additionalClause = NULL, $additionalParams = NULL) {
     $mailing = self::getTableName();
     $job = CRM_Mailing_BAO_MailingJob::getTableName();
-    $group = CRM_Mailing_DAO_MailingGroup::getTableName();
-    $session = CRM_Core_Session::singleton();
-
     $mailingACL = self::mailingACL();
 
     //get all campaigns.
