@@ -92,7 +92,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     Civi::settings()->add([
       'mailerBatchLimit' => 2,
     ]);
-    $this->callAPISuccess('mailing', 'create', $this->_params);
+    $this->callAPISuccess('Mailing', 'create', $this->_params);
     $this->_mut->assertRecipients([]);
     $this->callAPISuccess('job', 'process_mailing', []);
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
