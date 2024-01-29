@@ -67,7 +67,7 @@
                     <div class="clear"></div>
                   </div>
                 {/if}
-                {if $hookDiscount.message}
+                {if $hookDiscount}
                     <div class="crm-section hookDiscount-section">
                         <em>({$hookDiscount.message})</em>
                     </div>
