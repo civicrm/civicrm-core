@@ -480,13 +480,13 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
               'key' => 'first_name',
               'label' => 'Name',
               'type' => 'field',
-              'rewrite' => '{if "[nick_name]"}[nick_name]{else}[first_name]{/if} [last_name]',
+              'rewrite' => '{if $nick_name}{$nick_name}{else}[first_name]{/if} [last_name]',
             ],
             [
               'key' => 'Contact_Email_contact_id_01.email',
               'label' => 'Email',
               'type' => 'field',
-              'rewrite' => '{if "[Contact_Email_contact_id_01.email]"}[Contact_Email_contact_id_01.email] ([Contact_Email_contact_id_01.location_type_id:label]){/if}',
+              'rewrite' => '{if $Contact_Email_contact_id_01.email}{$Contact_Email_contact_id_01.email} ({$Contact_Email_contact_id_01.location_type_id_label}){/if}',
             ],
           ],
           'sort' => [

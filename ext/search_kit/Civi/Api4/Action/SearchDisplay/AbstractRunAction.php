@@ -307,8 +307,21 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $hasSmarty = strpos($column['rewrite'], '{') !== FALSE;
     $output = $this->replaceTokens($column['rewrite'], $data, 'view');
     if ($hasSmarty) {
+      $vars = [];
+      // Convert dots to nested arrays which are more Smarty-friendly
+      foreach ($data as $key => $value) {
+        $parent = &$vars;
+        $keys = array_map('CRM_Utils_String::munge', explode('.', $key));
+        while (count($keys) > 1) {
+          $level = array_shift($keys);
+          $parent[$level] = $parent[$level] ?? [];
+          $parent = &$parent[$level];
+        }
+        $level = array_shift($keys);
+        $parent[$level] = $value;
+      }
       $smarty = \CRM_Core_Smarty::singleton();
-      $output = $smarty->fetchWith("string:$output", []);
+      $output = $smarty->fetchWith("string:$output", $vars);
     }
     return $output;
   }
