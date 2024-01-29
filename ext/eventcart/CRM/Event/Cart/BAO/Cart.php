@@ -67,12 +67,6 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     $transaction = new CRM_Core_Transaction();
 
     $cart = self::add($params);
-
-    if (is_a($cart, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      throw new CRM_Core_Exception(ts('There was an error creating an event cart'));
-    }
-
     $transaction->commit();
 
     return $cart;

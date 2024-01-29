@@ -56,11 +56,6 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
       'cart_id' => $params['cart_id'],
     ];
     $participant = CRM_Event_BAO_Participant::create($participantParams);
-
-    if (is_a($participant, 'CRM_Core_Error')) {
-      throw new CRM_Core_Exception(ts('There was an error creating a cart participant'));
-    }
-
     $mer_participant = new CRM_Event_Cart_BAO_MerParticipant($participant);
     return $mer_participant;
   }

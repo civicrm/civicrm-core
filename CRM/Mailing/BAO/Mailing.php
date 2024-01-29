@@ -1584,10 +1584,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $mailing = self::add($params);
 
-    if (is_a($mailing, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $mailing;
-    }
     // update mailings with hash values
     CRM_Contact_BAO_Contact_Utils::generateChecksum($mailing->id, NULL, NULL, NULL, 'mailing', 16);
 
