@@ -373,14 +373,6 @@
     <add>5.71</add>
   </field>
   <index>
-    <name>index_data_type</name>
-    <fieldName>data_type</fieldName>
-  </index>
-  <index>
-    <name>index_fk_entity</name>
-    <fieldName>fk_entity</fieldName>
-  </index>
-  <index>
     <name>UI_label_custom_group_id</name>
     <fieldName>label</fieldName>
     <fieldName>custom_group_id</fieldName>
