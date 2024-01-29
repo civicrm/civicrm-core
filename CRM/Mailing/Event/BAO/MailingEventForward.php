@@ -28,7 +28,7 @@ class CRM_Mailing_Event_BAO_MailingEventForward extends CRM_Mailing_Event_DAO_Ma
    *
    * @return bool
    */
-  public static function &forward($job_id, $queue_id, $hash, $forward_email, $fromEmail = NULL, $comment = NULL) {
+  public static function forward($job_id, $queue_id, $hash, $forward_email, $fromEmail = NULL, $comment = NULL) {
     $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
 
     $successfulForward = FALSE;
@@ -38,28 +38,21 @@ class CRM_Mailing_Event_BAO_MailingEventForward extends CRM_Mailing_Event_DAO_Ma
     }
 
     // Find the email address/contact, if it exists.
-
-    $contact = CRM_Contact_BAO_Contact::getTableName();
-    $email = CRM_Core_BAO_Email::getTableName();
-    $queueTable = CRM_Mailing_Event_BAO_MailingEventQueue::getTableName();
-    $job = CRM_Mailing_BAO_MailingJob::getTableName();
-
-    $dao = new CRM_Core_DAO();
-    $dao->query("
-                SELECT      $contact.id as contact_id,
-                            $email.id as email_id,
-                            $contact.do_not_email as do_not_email,
-                            $queueTable.id as queue_id
-                FROM        ($email, $job as temp_job)
-                INNER JOIN  $contact
-                        ON  $email.contact_id = $contact.id
-                LEFT JOIN   $queueTable
-                        ON  $email.id = $queueTable.email_id
-                LEFT JOIN   $job
-                        ON  $queueTable.job_id = $job.id
-                        AND temp_job.mailing_id = $job.mailing_id
-                WHERE       $queueTable.job_id = $job_id
-                    AND     $email.email = '" .
+    $dao = CRM_Core_DAO::executeQuery("
+                SELECT      contact.id as contact_id,
+                            email.id as email_id,
+                            contact.do_not_email as do_not_email,
+                            queue.id as queue_id
+                FROM        (civicrm_email email, job as temp_job)
+                INNER JOIN  civicrm_contact contact
+                        ON  email.contact_id = contact.id
+                LEFT JOIN   civicrm_mailing_event_queue queue
+                        ON  email.id = queue.email_id
+                LEFT JOIN   civicrm_mailing_job as job
+                        ON  queue.job_id = job.id
+                        AND temp_job.mailing_id = job.mailing_id
+                WHERE       queue.job_id = job_id
+                    AND     email.email = '" .
       CRM_Utils_Type::escape($forward_email, 'String') . "'"
     );
 
@@ -76,7 +69,6 @@ class CRM_Mailing_Event_BAO_MailingEventForward extends CRM_Mailing_Event_DAO_Ma
       return $successfulForward;
     }
 
-    require_once 'api/api.php';
     $contactParams = [
       'email' => $forward_email,
       'version' => 3,
@@ -129,11 +121,9 @@ class CRM_Mailing_Event_BAO_MailingEventForward extends CRM_Mailing_Event_DAO_Ma
     $forward->dest_queue_id = $queue->id;
     $forward->save();
 
-    $dao->reset();
-    $dao->query("   SELECT  $job.mailing_id as mailing_id
-                        FROM    $job
-                        WHERE   $job.id = " .
-      CRM_Utils_Type::escape($job_id, 'Integer')
+    $dao = CRM_Core_DAO::executeQuery("   SELECT  mailing_id
+                        FROM    civicrm_mailing_job
+                        WHERE   id = " . (int) $job_id
     );
     $dao->fetch();
     $mailing_obj = new CRM_Mailing_BAO_Mailing();
