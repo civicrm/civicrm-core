@@ -1067,15 +1067,13 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @param string $fromEmail
    *   Email address of who is forwarding it.
    *
-   * @param null $replyToEmail
-   *
    * @return Mail_mime               The mail object
    */
   public function compose(
     $job_id, $event_queue_id, $hash, $contactId,
     $email, &$recipient, $test,
     $contactDetails, &$attachments, $isForward = FALSE,
-    $fromEmail = NULL, $replyToEmail = NULL
+    $fromEmail = NULL
   ) {
     $this->getTokens();
 
@@ -1095,10 +1093,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if ($fromEmail) {
       unset($headers['From']);
       $headers['From'] = "<{$fromEmail}>";
-    }
-
-    if ($replyToEmail && ($fromEmail != $replyToEmail)) {
-      $headers['Reply-To'] = "{$replyToEmail}";
     }
 
     if ($contactDetails) {
