@@ -3169,7 +3169,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
         //FIX ME: We need to loop defaults, but once we move to custom_1_x convention this code can be simplified.
         foreach ($defaults as $customKey => $customValue) {
-          if ($customFieldDetails = CRM_Core_BAO_CustomField::getKeyID($customKey, TRUE)) {
+          $customFieldDetails = CRM_Core_BAO_CustomField::getKeyID($customKey, TRUE);
+          if ($customFieldDetails[0]) {
             if ($name == 'custom_' . $customFieldDetails[0]) {
 
               //hack to set default for checkbox
