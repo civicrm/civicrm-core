@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 use Civi\Api4\ActivityContact;
+use Civi\Api4\MailingJob;
 
 /**
  *
@@ -43,8 +44,10 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * @throws \CRM_Core_Exception
    */
   public static function create(array $params): self {
+    CRM_Core_Error::deprecatedWarning('use the api');
     $jobDAO = self::writeRecord($params);
     if (!empty($params['mailing_id']) && empty('is_calling_function_updated_to_reflect_deprecation')) {
+      CRM_Core_Error::deprecatedWarning('mail recipients should not be generated during MailingJob::create');
       CRM_Mailing_BAO_Mailing::getRecipients($params['mailing_id']);
     }
     return $jobDAO;
@@ -147,11 +150,11 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         }
 
         // Update to show job has started.
-        self::create([
+        MailingJob::update(FALSE)->setValues([
           'id' => $job->id,
           'start_date' => date('YmdHis'),
           'status' => 'Running',
-        ]);
+        ])->execute();
 
         $transaction->commit();
       }
@@ -171,9 +174,11 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       if ($isComplete) {
         // Finish the job.
 
-        $transaction = new CRM_Core_Transaction();
-        self::create(['id' => $job->id, 'end_date' => date('YmdHis'), 'status' => 'Complete']);
-        $transaction->commit();
+        MailingJob::update(FALSE)->setValues([
+          'id' => $job->id,
+          'end_date' => 'now',
+          'status' => 'Complete',
+        ])->execute();
 
         // don't mark the mailing as complete
       }
@@ -337,7 +342,11 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       self::split_job((int) $offset, (int) $job->id, (int) $job->mailing_id, $job->scheduled_date);
 
       // Update the status of the parent job
-      self::create(['id' => $job->id, 'start_date' => date('YmdHis'), 'status' => 'Running']);
+      MailingJob::update(FALSE)->setValues([
+        'id' => $job->id,
+        'start_date' => 'now',
+        'status' => 'Running',
+      ])->execute();
       $transaction->commit();
 
       // Release the job lock
