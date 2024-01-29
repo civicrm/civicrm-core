@@ -439,10 +439,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
    *
    * @param array $params
    * @param \CRM_Mailing_DAO_Mailing $mailing
-   *
-   * @return array
    */
-  protected static function doSubmitActions(array $params, CRM_Mailing_DAO_Mailing $mailing): array {
+  protected static function doSubmitActions(array $params, CRM_Mailing_DAO_Mailing $mailing): void {
     // Create parent job if not yet created.
     // Condition on the existence of a scheduled date.
     if (!empty($params['scheduled_date']) && $params['scheduled_date'] !== 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
@@ -486,7 +484,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
     if (empty($params['_skip_evil_bao_auto_recipients_'])) {
       self::getRecipients($mailing->id);
     }
-    return $params;
   }
 
   /**
@@ -1629,7 +1626,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // point we will create a 'submit' function which will do the crud+submit
     // but for now only CRUD is available via v4 api.
     if (($params['version'] ?? '') !== 4) {
-      $params = self::doSubmitActions($params, $mailing);
+      self::doSubmitActions($params, $mailing);
     }
 
     return $mailing;
