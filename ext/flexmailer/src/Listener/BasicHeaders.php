@@ -40,8 +40,7 @@ class BasicHeaders extends AutoService {
       }
 
       list($verp) = $mailing->getVerpAndUrlsAndHeaders(
-        $e->getJob()->id, $task->getEventQueueId(), $task->getHash(),
-        $task->getAddress());
+        $e->getJob()->id, $task->getEventQueueId(), $task->getHash());
 
       $mailParams = [];
       $mailParams['List-Unsubscribe'] = "<mailto:{$verp['unsubscribe']}>";

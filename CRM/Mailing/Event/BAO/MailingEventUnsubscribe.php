@@ -392,7 +392,7 @@ WHERE  email = %2
       }
     }
 
-    [$addresses, $urls] = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash, $eq->email);
+    [$addresses, $urls] = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash);
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
     $bao->body_html = $html;
