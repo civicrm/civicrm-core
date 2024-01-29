@@ -62,7 +62,7 @@ class CRM_Mailing_BAO_SMSJob extends CRM_Mailing_BAO_MailingJob {
 
     // make sure that there's no more than $mailerBatchLimit mails processed in a run
     $mailerBatchLimit = Civi::settings()->get('mailerBatchLimit');
-    $eq = self::findPendingTasks($this->id, $mailing->sms_provider_id ? 'sms' : 'email');
+    $eq = self::findPendingTasks((int) $this->id, 'sms');
     while ($eq->fetch()) {
       if ($mailerBatchLimit > 0 && self::$mailsProcessed >= $mailerBatchLimit) {
         if (!empty($fields)) {
