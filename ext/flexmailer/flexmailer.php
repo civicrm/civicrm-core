@@ -48,3 +48,17 @@ function flexmailer_civicrm_container($container) {
   $container->addResource(new \Symfony\Component\Config\Resource\FileResource(__FILE__));
   \Civi\FlexMailer\Services::registerServices($container);
 }
+
+/**
+ * @see \CRM_Utils_Hook::scanClasses()
+ */
+function flexmailer_civicrm_scanClasses(array &$classes): void {
+  $prefix = 'Civi\\FlexMailer\\';
+  $dir = __DIR__ . '/src';
+  $delim = '\\';
+
+  foreach (\CRM_Utils_File::findFiles($dir, '*.php', TRUE) as $relFile) {
+    $relFile = str_replace(DIRECTORY_SEPARATOR, '/', $relFile);
+    $classes[] = $prefix . str_replace('/', $delim, substr($relFile, 0, -4));
+  }
+}
