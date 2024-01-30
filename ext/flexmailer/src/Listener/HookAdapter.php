@@ -10,9 +10,15 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 
-class HookAdapter extends BaseListener {
+/**
+ * @service civi_flexmailer_hooks
+ */
+class HookAdapter extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * Expose to hook_civicrm_alterMailParams.

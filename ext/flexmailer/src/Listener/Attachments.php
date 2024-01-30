@@ -10,9 +10,15 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 
-class Attachments extends BaseListener {
+/**
+ * @service civi_flexmailer_attachments
+ */
+class Attachments extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * Add any attachments.

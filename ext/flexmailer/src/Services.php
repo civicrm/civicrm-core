@@ -51,12 +51,6 @@ class Services {
       ],
     ]))->setPublic(TRUE);
 
-    $container->setDefinition('civi_flexmailer_attachments', new Definition('Civi\FlexMailer\Listener\Attachments'))->setPublic(TRUE);
-    $container->setDefinition('civi_flexmailer_bounce_tracker', new Definition('Civi\FlexMailer\Listener\BounceTracker'))->setPublic(TRUE);
-    $container->setDefinition('civi_flexmailer_default_sender', new Definition('Civi\FlexMailer\Listener\DefaultSender'))->setPublic(TRUE);
-    $container->setDefinition('civi_flexmailer_hooks', new Definition('Civi\FlexMailer\Listener\HookAdapter'))->setPublic(TRUE);
-    $container->setDefinition('civi_flexmailer_test_prefix', new Definition('Civi\FlexMailer\Listener\TestPrefix'))->setPublic(TRUE);
-
     $container->setDefinition('civi_flexmailer_html_click_tracker', new Definition('Civi\FlexMailer\ClickTracker\HtmlClickTracker'))->setPublic(TRUE);
     $container->setDefinition('civi_flexmailer_text_click_tracker', new Definition('Civi\FlexMailer\ClickTracker\TextClickTracker'))->setPublic(TRUE);
 
