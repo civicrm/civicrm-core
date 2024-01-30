@@ -749,9 +749,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       //get custom field id
       $customFieldId = explode('_', $profileFieldName);
       if ($customFieldId[0] == 'custom') {
-        $customField = new CRM_Core_DAO_CustomField();
-        $customField->id = $customFieldId[1];
-        $customField->find(TRUE);
+        $customField = CRM_Core_BAO_CustomField::getFieldObject($customFieldId[1]);
         $isCustomField = TRUE;
         if (!empty($fields['field_id']) && !$customField->is_active && $is_active) {
           $errors['field_name'] = ts('Cannot set this field "Active" since the selected custom field is disabled.');
