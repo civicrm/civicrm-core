@@ -313,7 +313,7 @@ class CRM_Core_Payment_Form {
   /**
    * Map address fields.
    *
-   * @param int $id unused
+   * @param null $id unused
    * @param array $src
    * @param array $dst
    * @param bool $reverse

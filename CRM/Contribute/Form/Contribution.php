@@ -1194,7 +1194,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // so we copy stuff over to first_name etc.
     $paymentParams = $this->_params;
     $paymentParams['contactID'] = $contactID;
-    CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
+    CRM_Core_Payment_Form::mapParams(NULL, $this->_params, $paymentParams, TRUE);
 
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $params['financial_type_id'];

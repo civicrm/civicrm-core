@@ -287,7 +287,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       // We may have fetched some billing details from the getPreApprovalDetails function so we
       // want to ensure we set this after that function has been called.
-      CRM_Core_Payment_Form::mapParams($this->_bltID, $preApprovalParams, $this->_params, FALSE);
+      CRM_Core_Payment_Form::mapParams(NULL, $preApprovalParams, $this->_params, FALSE);
     }
 
     $this->_params['is_pay_later'] = $this->get('is_pay_later');
@@ -1546,7 +1546,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $paymentParams = array_merge($this->_params, ['contributionID' => $this->_values['contribution_other_id']]);
 
       // CRM-19792 : set necessary fields for payment processor
-      CRM_Core_Payment_Form::mapParams($this->_bltID, $paymentParams, $paymentParams, TRUE);
+      CRM_Core_Payment_Form::mapParams(NULL, $paymentParams, $paymentParams, TRUE);
 
       // If this is a single membership-related contribution, it won't have
       // be performed yet, so do it now.
@@ -2315,7 +2315,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $membershipParams['campaign_id'] = $this->_values['campaign_id'] ?? NULL;
     }
 
-    $this->_params = CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $membershipParams, TRUE);
+    $this->_params = CRM_Core_Payment_Form::mapParams(NULL, $this->_params, $membershipParams, TRUE);
 
     // This could be set by a hook.
     if (!empty($this->_params['installments'])) {
@@ -2477,7 +2477,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isRecur
   ): array {
     $form = $this;
-    CRM_Core_Payment_Form::mapParams($this->_bltID, $form->_params, $paymentParams, TRUE);
+    CRM_Core_Payment_Form::mapParams(NULL, $form->_params, $paymentParams, TRUE);
     $isPaymentTransaction = self::isPaymentTransaction($this);
 
     $financialType = new CRM_Financial_DAO_FinancialType();
