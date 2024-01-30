@@ -10,9 +10,15 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 
-class OpenTracker extends BaseListener {
+/**
+ * @service civi_flexmailer_open_tracker
+ */
+class OpenTracker extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * Inject open-tracking codes.

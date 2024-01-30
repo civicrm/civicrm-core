@@ -10,9 +10,15 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 
-class ToHeader extends BaseListener {
+/**
+ * @service civi_flexmailer_to_header
+ */
+class ToHeader extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * Inject the "To:" header.

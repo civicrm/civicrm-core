@@ -10,10 +10,16 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\WalkBatchesEvent;
 use Civi\FlexMailer\FlexMailerTask;
 
-class DefaultBatcher extends BaseListener {
+/**
+ * @service civi_flexmailer_default_batcher
+ */
+class DefaultBatcher extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * Given a MailingJob (`$e->getJob()`), enumerate the recipients as
