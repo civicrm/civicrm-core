@@ -570,6 +570,12 @@ if (!CRM.vars) CRM.vars = {};
 
   // Autocomplete based on APIv4 and Select2.
   $.fn.crmAutocomplete = function(entityName, apiParams, select2Options) {
+    function getApiParams() {
+      if (typeof apiParams === 'function') {
+        return apiParams();
+      }
+      return apiParams || {};
+    }
     if (entityName === 'destroy') {
       return $(this).off('.crmEntity').crmSelect2('destroy');
     }
@@ -578,8 +584,7 @@ if (!CRM.vars) CRM.vars = {};
       const $el = $(this).off('.crmEntity');
       let staticItems = getStaticOptions(select2Options.static),
         quickAddLinks = select2Options.quickAdd,
-        multiple = !!select2Options.multiple,
-        key = apiParams.key || 'id';
+        multiple = !!select2Options.multiple;
 
       $el.crmSelect2(_.extend({
         ajax: {
@@ -589,7 +594,7 @@ if (!CRM.vars) CRM.vars = {};
             return {params: JSON.stringify(_.assign({
               input: input,
               page: pageNum || 1
-            }, apiParams))};
+            }, getApiParams()))};
           },
           results: function(data) {
             return {
@@ -615,7 +620,7 @@ if (!CRM.vars) CRM.vars = {};
           if (!idsNeeded.length) {
             callback(multiple ? existing : existing[0]);
           } else {
-            var params = $.extend({}, apiParams || {}, {ids: idsNeeded});
+            var params = $.extend({}, getApiParams(), {ids: idsNeeded});
             CRM.api4(entityName, 'autocomplete', params).then(function (result) {
               callback(multiple ? result.concat(existing) : result[0]);
             });
@@ -663,6 +668,7 @@ if (!CRM.vars) CRM.vars = {};
               const response = data.submissionResponse && data.submissionResponse[0];
               let createdId;
               if (typeof response === 'object') {
+                let key = getApiParams().key || 'id';
                 // Loop through entities created by the afform (there should be only one)
                 Object.keys(response).forEach((entity) => {
                   if (Array.isArray(response[entity]) && response[entity][0] && response[entity][0][key]) {
