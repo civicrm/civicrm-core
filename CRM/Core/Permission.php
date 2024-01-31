@@ -1766,18 +1766,13 @@ class CRM_Core_Permission {
     }
 
     $permissions = [];
-    foreach ($components as $comp) {
-      $perm = $comp->getPermissions($includeDisabled, TRUE);
-      if ($perm) {
-        $info = $comp->getInfo();
-        foreach ($perm as $p => $attr) {
-
-          if (!is_array($attr)) {
-            $attr = [$attr];
-          }
-
-          $attr[0] = $info['translatedName'] . ': ' . $attr[0];
-          $permissions[$p] = $attr;
+    foreach ($components as $component) {
+      $perms = $component->getPermissions($includeDisabled, TRUE);
+      if ($perms) {
+        $info = $component->getInfo();
+        foreach ($perms as $name => $perm) {
+          $perm['label'] = $info['translatedName'] . ': ' . $perm['label'];
+          $permissions[$name] = $perm;
         }
       }
     }

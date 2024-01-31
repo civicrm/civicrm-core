@@ -67,16 +67,16 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
     $permissions = [
       'access CiviMember' => [
-        ts('access CiviMember'),
-        ts('View memberships'),
+        'label' => ts('access CiviMember'),
+        'description' => ts('View memberships'),
       ],
       'edit memberships' => [
-        ts('edit memberships'),
-        ts('Create and update memberships'),
+        'label' => ts('edit memberships'),
+        'description' => ts('Create and update memberships'),
       ],
       'delete in CiviMember' => [
-        ts('delete in CiviMember'),
-        ts('Delete memberships'),
+        'label' => ts('delete in CiviMember'),
+        'description' => ts('Delete memberships'),
       ],
     ];
 
