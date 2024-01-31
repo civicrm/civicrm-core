@@ -390,25 +390,15 @@ class CRM_Core_Permission_Base {
    * Get the permissions defined in the hook_civicrm_permission implementation
    * in all enabled CiviCRM module extensions.
    *
-   * @param bool $descriptions
-   *
    * @return array
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
-  public function getAllModulePermissions($descriptions = FALSE): array {
+  public function getAllModulePermissions(): array {
     $permissions = [];
     CRM_Utils_Hook::permission($permissions);
 
-    if ($descriptions) {
-      foreach ($permissions as $permission => $label) {
-        $permissions[$permission] = (is_array($label)) ? $label : [$label];
-      }
-    }
-    else {
-      // Passing in false here is to be deprecated.
-      foreach ($permissions as $permission => $label) {
-        $permissions[$permission] = (is_array($label)) ? array_shift($label) : $label;
-      }
+    foreach ($permissions as $permission => $label) {
+      $permissions[$permission] = (is_array($label)) ? $label : [$label];
     }
     return $permissions;
   }
