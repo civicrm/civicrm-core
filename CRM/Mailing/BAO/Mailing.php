@@ -2452,25 +2452,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
   /**
    * @deprecated
-   *  Use CRM_Mailing_BAO_MailingJob::del($id)
-   *
-   * @param int $id
-   *   Id of the Job to delete.
-   *
-   * @return void
-   */
-  public static function delJob($id) {
-    if (empty($id)) {
-      throw new CRM_Core_Exception(ts('No id passed to mailing delJob function'));
-    }
-
-    CRM_Core_Error::deprecatedWarning('This function is deprecated, use CRM_Mailing_BAO_MailingJob::del instead');
-
-    CRM_Mailing_BAO_MailingJob::deleteRecord(['id' => $id]);
-  }
-
-  /**
-   * @deprecated
    *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    * @return array
    */
