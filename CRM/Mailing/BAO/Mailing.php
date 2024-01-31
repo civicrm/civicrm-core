@@ -1305,6 +1305,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @param CRM_Mailing_BAO_Mailing $mailing
    */
   public static function tokenReplace(&$mailing) {
+    CRM_Core_Error::deprecatedWarning('function no longer called, use flexmailer');
     $domain = CRM_Core_BAO_Domain::getDomain();
 
     foreach (['text', 'html'] as $type) {
@@ -2475,7 +2476,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public function getReturnProperties() {
     $tokens = &$this->getTokens();
-
+    CRM_Core_Error::deprecatedWarning('function no longer called - use flexmailer');
     $properties = [];
     if (isset($tokens['html']) &&
       isset($tokens['html']['contact'])
