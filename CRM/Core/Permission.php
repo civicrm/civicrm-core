@@ -1795,7 +1795,6 @@ class CRM_Core_Permission {
   protected static function getCoreAndComponentPermissions(bool $all): array {
     $permissions = self::getCorePermissions();
     $permissions = array_merge($permissions, self::getComponentPermissions($all));
-    $permissions['all CiviCRM permissions and ACLs']['implied_permissions'] = array_keys($permissions);
     return $permissions;
   }
 
