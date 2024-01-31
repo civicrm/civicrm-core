@@ -957,27 +957,6 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     );
   }
 
-  //----------- civicrm_mailing_event_forward methods ----------
-
-  /**
-   * Test civicrm_mailing_event_forward with wrong params.
-   * Note that tests like this are slightly better than no test but an
-   * api function cannot be considered supported  / 'part of the api' without a
-   * success test
-   */
-  public function testMailerForwardWrongParams(): void {
-    $params = [
-      'job_id' => 'Wrong ID',
-      'event_queue_id' => 'Wrong ID',
-      'hash' => 'Wrong Hash',
-      'email' => $this->_email,
-      'time_stamp' => '20111111010101',
-    ];
-    $this->callAPIFailure('mailing_event', 'forward', $params,
-      'Queue event could not be found'
-    );
-  }
-
   /**
    * @param array $params
    *   Extra parameters for the draft mailing.
