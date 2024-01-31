@@ -41,13 +41,8 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   * @param bool $getAllUnconditionally
-   * @param bool $descriptions
-   *   Whether to return permission descriptions
-   *
-   * @return array
    */
-  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+  public function getPermissions(): array {
     $permissions = [
       'administer CiviCampaign' => [
         'label' => ts('administer CiviCampaign'),
@@ -77,13 +72,6 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
         'label' => ts('sign CiviCRM Petition'),
       ],
     ];
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
-
     return $permissions;
   }
 

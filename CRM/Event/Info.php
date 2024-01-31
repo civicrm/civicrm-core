@@ -41,13 +41,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   * @param bool $getAllUnconditionally
-   * @param bool $descriptions
-   *   Whether to return permission descriptions
-   *
-   * @return array
    */
-  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+  public function getPermissions(): array {
     $permissions = [
       'access CiviEvent' => [
         'label' => ts('access CiviEvent'),
@@ -81,13 +76,6 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
         'description' => ts('Allow users to create, edit and copy event-related profile forms used for online event registration.'),
       ],
     ];
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
-
     return $permissions;
   }
 

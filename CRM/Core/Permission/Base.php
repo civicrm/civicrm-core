@@ -397,8 +397,17 @@ class CRM_Core_Permission_Base {
     $permissions = [];
     CRM_Utils_Hook::permission($permissions);
 
-    foreach ($permissions as $permission => $label) {
-      $permissions[$permission] = (is_array($label)) ? $label : [$label];
+    // Normalize permission array format.
+    // Historically, a string was acceptable (interpreted as label), as was a non-associative array.
+    // Convert them all to associative arrays.
+    foreach ($permissions as $name => $defn) {
+      $defn = (array) $defn;
+      $permission = [
+        'label' => $defn['label'] ?? $defn[0],
+        'description' => $defn['description'] ?? $defn[1] ?? NULL,
+        'disabled' => $defn['disabled'] ?? NULL,
+      ];
+      $permissions[$name] = array_filter($permission, fn($item) => isset($item));
     }
     return $permissions;
   }
