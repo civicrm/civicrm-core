@@ -148,30 +148,30 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
     $permissions = [
       'access CiviMail' => [
-        ts('access CiviMail'),
+        'label' => ts('access CiviMail'),
       ],
       'access CiviMail subscribe/unsubscribe pages' => [
-        ts('access CiviMail subscribe/unsubscribe pages'),
-        ts('Subscribe/unsubscribe from mailing list group'),
+        'label' => ts('access CiviMail subscribe/unsubscribe pages'),
+        'description' => ts('Subscribe/unsubscribe from mailing list group'),
       ],
       'delete in CiviMail' => [
-        ts('delete in CiviMail'),
-        ts('Delete Mailing'),
+        'label' => ts('delete in CiviMail'),
+        'description' => ts('Delete Mailing'),
       ],
       'view public CiviMail content' => [
-        ts('view public CiviMail content'),
+        'label' => ts('view public CiviMail content'),
       ],
     ];
 
     if (self::workflowEnabled() || $getAllUnconditionally) {
       $permissions['create mailings'] = [
-        ts('create mailings'),
+        'label' => ts('create mailings'),
       ];
       $permissions['schedule mailings'] = [
-        ts('schedule mailings'),
+        'label' => ts('schedule mailings'),
       ];
       $permissions['approve mailings'] = [
-        ts('approve mailings'),
+        'label' => ts('approve mailings'),
       ];
     }
 

@@ -68,19 +68,19 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
     $permissions = [
       'access CiviContribute' => [
-        ts('access CiviContribute'),
-        ts('Record backend contributions (with edit contributions) and view all contributions (for visible contacts)'),
+        'label' => ts('access CiviContribute'),
+        'description' => ts('Record backend contributions (with edit contributions) and view all contributions (for visible contacts)'),
       ],
       'edit contributions' => [
-        ts('edit contributions'),
-        ts('Record and update contributions'),
+        'label' => ts('edit contributions'),
+        'description' => ts('Record and update contributions'),
       ],
       'make online contributions' => [
-        ts('make online contributions'),
+        'label' => ts('make online contributions'),
       ],
       'delete in CiviContribute' => [
-        ts('delete in CiviContribute'),
-        ts('Delete contributions'),
+        'label' => ts('delete in CiviContribute'),
+        'description' => ts('Delete contributions'),
       ],
     ];
 

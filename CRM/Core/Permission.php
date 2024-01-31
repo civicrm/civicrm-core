@@ -638,244 +638,244 @@ class CRM_Core_Permission {
     $prefix = ts('CiviCRM') . ': ';
     $permissions = [
       'add contacts' => [
-        $prefix . ts('add contacts'),
-        ts('Create a new contact record in CiviCRM'),
+        'label' => $prefix . ts('add contacts'),
+        'description' => ts('Create a new contact record in CiviCRM'),
       ],
       'view all contacts' => [
-        $prefix . ts('view all contacts'),
-        ts('View ANY CONTACT in the CiviCRM database, export contact info and perform activities such as Send Email, Phone Call, etc.'),
+        'label' => $prefix . ts('view all contacts'),
+        'description' => ts('View ANY CONTACT in the CiviCRM database, export contact info and perform activities such as Send Email, Phone Call, etc.'),
       ],
       'edit all contacts' => [
-        $prefix . ts('edit all contacts'),
-        ts('View, Edit and Delete ANY CONTACT in the CiviCRM database; Create and edit relationships, tags and other info about the contacts'),
+        'label' => $prefix . ts('edit all contacts'),
+        'description' => ts('View, Edit and Delete ANY CONTACT in the CiviCRM database; Create and edit relationships, tags and other info about the contacts'),
       ],
       'view my contact' => [
-        $prefix . ts('view my contact'),
+        'label' => $prefix . ts('view my contact'),
       ],
       'edit my contact' => [
-        $prefix . ts('edit my contact'),
+        'label' => $prefix . ts('edit my contact'),
       ],
       'delete contacts' => [
-        $prefix . ts('delete contacts'),
+        'label' => $prefix . ts('delete contacts'),
       ],
       'access deleted contacts' => [
-        $prefix . ts('access deleted contacts'),
-        ts('Access contacts in the trash'),
+        'label' => $prefix . ts('access deleted contacts'),
+        'description' => ts('Access contacts in the trash'),
       ],
       'import contacts' => [
-        $prefix . ts('import contacts'),
-        ts('Import contacts and activities'),
+        'label' => $prefix . ts('import contacts'),
+        'description' => ts('Import contacts and activities'),
       ],
       'import SQL datasource' => [
-        $prefix . ts('import SQL datasource'),
-        ts('When importing, consume data directly from a SQL datasource'),
+        'label' => $prefix . ts('import SQL datasource'),
+        'description' => ts('When importing, consume data directly from a SQL datasource'),
       ],
       'edit groups' => [
-        $prefix . ts('edit groups'),
-        ts('Create new groups, edit group settings (e.g. group name, visibility...), delete groups'),
+        'label' => $prefix . ts('edit groups'),
+        'description' => ts('Create new groups, edit group settings (e.g. group name, visibility...), delete groups'),
       ],
       'administer CiviCRM' => [
-        $prefix . ts('administer CiviCRM'),
-        ts('Perform all tasks in the Administer CiviCRM control panel and Import Contacts'),
+        'label' => $prefix . ts('administer CiviCRM'),
+        'description' => ts('Perform all tasks in the Administer CiviCRM control panel and Import Contacts'),
       ],
       'skip IDS check' => [
-        $prefix . ts('skip IDS check'),
-        ts('Warning: Give to trusted roles only; this permission has security implications. IDS system is bypassed for users with this permission. Prevents false errors for admin users.'),
+        'label' => $prefix . ts('skip IDS check'),
+        'description' => ts('Warning: Give to trusted roles only; this permission has security implications. IDS system is bypassed for users with this permission. Prevents false errors for admin users.'),
       ],
       'access uploaded files' => [
-        $prefix . ts('access uploaded files'),
-        ts('View / download files including images and photos'),
+        'label' => $prefix . ts('access uploaded files'),
+        'description' => ts('View / download files including images and photos'),
       ],
       'profile listings and forms' => [
-        $prefix . ts('profile listings and forms'),
-        ts('Warning: Give to trusted roles only; this permission has privacy implications. Add/edit data in online forms and access public searchable directories.'),
+        'label' => $prefix . ts('profile listings and forms'),
+        'description' => ts('Warning: Give to trusted roles only; this permission has privacy implications. Add/edit data in online forms and access public searchable directories.'),
       ],
       'profile listings' => [
-        $prefix . ts('profile listings'),
-        ts('Warning: Give to trusted roles only; this permission has privacy implications. Access public searchable directories.'),
+        'label' => $prefix . ts('profile listings'),
+        'description' => ts('Warning: Give to trusted roles only; this permission has privacy implications. Access public searchable directories.'),
       ],
       'profile create' => [
-        $prefix . ts('profile create'),
-        ts('Add data in a profile form.'),
+        'label' => $prefix . ts('profile create'),
+        'description' => ts('Add data in a profile form.'),
       ],
       'profile edit' => [
-        $prefix . ts('profile edit'),
-        ts('Edit data in a profile form.'),
+        'label' => $prefix . ts('profile edit'),
+        'description' => ts('Edit data in a profile form.'),
       ],
       'profile view' => [
-        $prefix . ts('profile view'),
-        ts('View data in a profile.'),
+        'label' => $prefix . ts('profile view'),
+        'description' => ts('View data in a profile.'),
       ],
       'access all custom data' => [
-        $prefix . ts('access all custom data'),
-        ts('View all custom fields regardless of ACL rules'),
+        'label' => $prefix . ts('access all custom data'),
+        'description' => ts('View all custom fields regardless of ACL rules'),
       ],
       'view all activities' => [
-        $prefix . ts('view all activities'),
-        ts('View all activities (for visible contacts)'),
+        'label' => $prefix . ts('view all activities'),
+        'description' => ts('View all activities (for visible contacts)'),
       ],
       'delete activities' => [
-        $prefix . ts('Delete activities'),
+        'label' => $prefix . ts('Delete activities'),
       ],
       'edit inbound email basic information' => [
-        $prefix . ts('edit inbound email basic information'),
-        ts('Edit all inbound email activities (for visible contacts) basic information. Content editing not allowed.'),
+        'label' => $prefix . ts('edit inbound email basic information'),
+        'description' => ts('Edit all inbound email activities (for visible contacts) basic information. Content editing not allowed.'),
       ],
       'edit inbound email basic information and content' => [
-        $prefix . ts('edit inbound email basic information and content'),
-        ts('Edit all inbound email activities (for visible contacts) basic information and content.'),
+        'label' => $prefix . ts('edit inbound email basic information and content'),
+        'description' => ts('Edit all inbound email activities (for visible contacts) basic information and content.'),
       ],
       'access CiviCRM' => [
-        $prefix . ts('access CiviCRM backend and API'),
-        ts('Master control for access to the main CiviCRM backend and API. Give to trusted roles only.'),
+        'label' => $prefix . ts('access CiviCRM backend and API'),
+        'description' => ts('Master control for access to the main CiviCRM backend and API. Give to trusted roles only.'),
       ],
       'access Contact Dashboard' => [
-        $prefix . ts('access Contact Dashboard'),
-        ts('View Contact Dashboard (for themselves and visible contacts)'),
+        'label' => $prefix . ts('access Contact Dashboard'),
+        'description' => ts('View Contact Dashboard (for themselves and visible contacts)'),
       ],
       'translate CiviCRM' => [
-        $prefix . ts('translate CiviCRM'),
-        ts('Allow User to enable multilingual'),
+        'label' => $prefix . ts('translate CiviCRM'),
+        'description' => ts('Allow User to enable multilingual'),
       ],
       'manage tags' => [
-        $prefix . ts('manage tags'),
-        ts('Create and rename tags'),
+        'label' => $prefix . ts('manage tags'),
+        'description' => ts('Create and rename tags'),
       ],
       'administer reserved groups' => [
-        $prefix . ts('administer reserved groups'),
-        ts('Edit and disable Reserved Groups (Needs Edit Groups)'),
+        'label' => $prefix . ts('administer reserved groups'),
+        'description' => ts('Edit and disable Reserved Groups (Needs Edit Groups)'),
       ],
       'administer Tagsets' => [
-        $prefix . ts('administer Tagsets'),
+        'label' => $prefix . ts('administer Tagsets'),
       ],
       'administer reserved tags' => [
-        $prefix . ts('administer reserved tags'),
+        'label' => $prefix . ts('administer reserved tags'),
       ],
       'administer queues' => [
-        $prefix . ts('administer queues'),
-        ts('Initialize, browse, and cancel background processing queues'),
+        'label' => $prefix . ts('administer queues'),
+        'description' => ts('Initialize, browse, and cancel background processing queues'),
         // At time of writing, we have specifically omitted the ability to edit fine-grained
         // data about specific queue-tasks. Tasks are usually defined as PHP callables...
         // and one should hesitate before allowing open-ended edits of PHP callables.
         // However, it seems fine for web-admins to browse and cancel these things.
       ],
       'administer dedupe rules' => [
-        $prefix . ts('administer dedupe rules'),
-        ts('Create and edit rules, change the supervised and unsupervised rules'),
+        'label' => $prefix . ts('administer dedupe rules'),
+        'description' => ts('Create and edit rules, change the supervised and unsupervised rules'),
       ],
       'merge duplicate contacts' => [
-        $prefix . ts('merge duplicate contacts'),
-        ts('Delete Contacts must also be granted in order for this to work.'),
+        'label' => $prefix . ts('merge duplicate contacts'),
+        'description' => ts('Delete Contacts must also be granted in order for this to work.'),
       ],
       'force merge duplicate contacts' => [
-        $prefix . ts('force merge duplicate contacts'),
-        ts('Delete Contacts must also be granted in order for this to work.'),
+        'label' => $prefix . ts('force merge duplicate contacts'),
+        'description' => ts('Delete Contacts must also be granted in order for this to work.'),
       ],
       'view debug output' => [
-        $prefix . ts('view debug output'),
-        ts('View results of debug and backtrace'),
+        'label' => $prefix . ts('view debug output'),
+        'description' => ts('View results of debug and backtrace'),
       ],
 
       'view all notes' => [
-        $prefix . ts('view all notes'),
-        ts("View notes (for visible contacts) even if they're marked author only"),
+        'label' => $prefix . ts('view all notes'),
+        'description' => ts("View notes (for visible contacts) even if they're marked author only"),
       ],
       'add contact notes' => [
-        $prefix . ts('add contact notes'),
-        ts("Create notes for contacts"),
+        'label' => $prefix . ts('add contact notes'),
+        'description' => ts("Create notes for contacts"),
       ],
       'access AJAX API' => [
-        $prefix . ts('access AJAX API'),
-        ts('Allow API access even if Access CiviCRM is not granted'),
+        'label' => $prefix . ts('access AJAX API'),
+        'description' => ts('Allow API access even if Access CiviCRM is not granted'),
       ],
       'access contact reference fields' => [
-        $prefix . ts('access contact reference fields'),
-        ts('Allow entering data into contact reference fields'),
+        'label' => $prefix . ts('access contact reference fields'),
+        'description' => ts('Allow entering data into contact reference fields'),
       ],
       'create manual batch' => [
-        $prefix . ts('create manual batch'),
-        ts('Create an accounting batch (with Access to CiviContribute and View Own/All Manual Batches)'),
+        'label' => $prefix . ts('create manual batch'),
+        'description' => ts('Create an accounting batch (with Access to CiviContribute and View Own/All Manual Batches)'),
       ],
       'edit own manual batches' => [
-        $prefix . ts('edit own manual batches'),
-        ts('Edit accounting batches created by user'),
+        'label' => $prefix . ts('edit own manual batches'),
+        'description' => ts('Edit accounting batches created by user'),
       ],
       'edit all manual batches' => [
-        $prefix . ts('edit all manual batches'),
-        ts('Edit all accounting batches'),
+        'label' => $prefix . ts('edit all manual batches'),
+        'description' => ts('Edit all accounting batches'),
       ],
       'close own manual batches' => [
-        $prefix . ts('close own manual batches'),
-        ts('Close accounting batches created by user (with Access to CiviContribute)'),
+        'label' => $prefix . ts('close own manual batches'),
+        'description' => ts('Close accounting batches created by user (with Access to CiviContribute)'),
       ],
       'close all manual batches' => [
-        $prefix . ts('close all manual batches'),
-        ts('Close all accounting batches (with Access to CiviContribute)'),
+        'label' => $prefix . ts('close all manual batches'),
+        'description' => ts('Close all accounting batches (with Access to CiviContribute)'),
       ],
       'reopen own manual batches' => [
-        $prefix . ts('reopen own manual batches'),
-        ts('Reopen accounting batches created by user (with Access to CiviContribute)'),
+        'label' => $prefix . ts('reopen own manual batches'),
+        'description' => ts('Reopen accounting batches created by user (with Access to CiviContribute)'),
       ],
       'reopen all manual batches' => [
-        $prefix . ts('reopen all manual batches'),
-        ts('Reopen all accounting batches (with Access to CiviContribute)'),
+        'label' => $prefix . ts('reopen all manual batches'),
+        'description' => ts('Reopen all accounting batches (with Access to CiviContribute)'),
       ],
       'view own manual batches' => [
-        $prefix . ts('view own manual batches'),
-        ts('View accounting batches created by user (with Access to CiviContribute)'),
+        'label' => $prefix . ts('view own manual batches'),
+        'description' => ts('View accounting batches created by user (with Access to CiviContribute)'),
       ],
       'view all manual batches' => [
-        $prefix . ts('view all manual batches'),
-        ts('View all accounting batches (with Access to CiviContribute)'),
+        'label' => $prefix . ts('view all manual batches'),
+        'description' => ts('View all accounting batches (with Access to CiviContribute)'),
       ],
       'delete own manual batches' => [
-        $prefix . ts('delete own manual batches'),
-        ts('Delete accounting batches created by user'),
+        'label' => $prefix . ts('delete own manual batches'),
+        'description' => ts('Delete accounting batches created by user'),
       ],
       'delete all manual batches' => [
-        $prefix . ts('delete all manual batches'),
-        ts('Delete all accounting batches'),
+        'label' => $prefix . ts('delete all manual batches'),
+        'description' => ts('Delete all accounting batches'),
       ],
       'export own manual batches' => [
-        $prefix . ts('export own manual batches'),
-        ts('Export accounting batches created by user'),
+        'label' => $prefix . ts('export own manual batches'),
+        'description' => ts('Export accounting batches created by user'),
       ],
       'export all manual batches' => [
-        $prefix . ts('export all manual batches'),
-        ts('Export all accounting batches'),
+        'label' => $prefix . ts('export all manual batches'),
+        'description' => ts('Export all accounting batches'),
       ],
       'administer payment processors' => [
-        $prefix . ts('administer payment processors'),
-        ts('Add, Update, or Disable Payment Processors'),
+        'label' => $prefix . ts('administer payment processors'),
+        'description' => ts('Add, Update, or Disable Payment Processors'),
       ],
       'render templates' => [
-        $prefix . ts('render templates'),
-        ts('Render open-ended template content. (Additional constraints may apply to autoloaded records and specific notations.)'),
+        'label' => $prefix . ts('render templates'),
+        'description' => ts('Render open-ended template content. (Additional constraints may apply to autoloaded records and specific notations.)'),
       ],
       'edit message templates' => [
-        $prefix . ts('edit message templates'),
+        'label' => $prefix . ts('edit message templates'),
       ],
       'edit system workflow message templates' => [
-        $prefix . ts('edit system workflow message templates'),
+        'label' => $prefix . ts('edit system workflow message templates'),
       ],
       'edit user-driven message templates' => [
-        $prefix . ts('edit user-driven message templates'),
+        'label' => $prefix . ts('edit user-driven message templates'),
       ],
       'view my invoices' => [
-        $prefix . ts('view my invoices'),
-        ts('Allow users to view/ download their own invoices'),
+        'label' => $prefix . ts('view my invoices'),
+        'description' => ts('Allow users to view/ download their own invoices'),
       ],
       'edit api keys' => [
-        $prefix . ts('edit api keys'),
-        ts('Edit API keys'),
+        'label' => $prefix . ts('edit api keys'),
+        'description' => ts('Edit API keys'),
       ],
       'edit own api keys' => [
-        $prefix . ts('edit own api keys'),
-        ts('Edit user\'s own API keys'),
+        'label' => $prefix . ts('edit own api keys'),
+        'description' => ts('Edit user\'s own API keys'),
       ],
       'send SMS' => [
-        $prefix . ts('send SMS'),
-        ts('Send an SMS'),
+        'label' => $prefix . ts('send SMS'),
+        'description' => ts('Send an SMS'),
       ],
       'administer CiviCRM system' => [
         'label' => $prefix . ts('administer CiviCRM System'),
@@ -1766,18 +1766,13 @@ class CRM_Core_Permission {
     }
 
     $permissions = [];
-    foreach ($components as $comp) {
-      $perm = $comp->getPermissions($includeDisabled, TRUE);
-      if ($perm) {
-        $info = $comp->getInfo();
-        foreach ($perm as $p => $attr) {
-
-          if (!is_array($attr)) {
-            $attr = [$attr];
-          }
-
-          $attr[0] = $info['translatedName'] . ': ' . $attr[0];
-          $permissions[$p] = $attr;
+    foreach ($components as $component) {
+      $perms = $component->getPermissions($includeDisabled, TRUE);
+      if ($perms) {
+        $info = $component->getInfo();
+        foreach ($perms as $name => $perm) {
+          $perm['label'] = $info['translatedName'] . ': ' . $perm['label'];
+          $permissions[$name] = $perm;
         }
       }
     }

@@ -62,16 +62,16 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
     $permissions = [
       'access CiviPledge' => [
-        ts('access CiviPledge'),
-        ts('View pledges'),
+        'label' => ts('access CiviPledge'),
+        'description' => ts('View pledges'),
       ],
       'edit pledges' => [
-        ts('edit pledges'),
-        ts('Create and update pledges'),
+        'label' => ts('edit pledges'),
+        'description' => ts('Create and update pledges'),
       ],
       'delete in CiviPledge' => [
-        ts('delete in CiviPledge'),
-        ts('Delete pledges'),
+        'label' => ts('delete in CiviPledge'),
+        'description' => ts('Delete pledges'),
       ],
     ];
 

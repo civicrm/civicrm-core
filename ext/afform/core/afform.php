@@ -432,8 +432,8 @@ function afform_civicrm_alterMenu(&$items) {
  */
 function afform_civicrm_permission(&$permissions) {
   $permissions['administer afform'] = [
-    E::ts('FormBuilder: edit and delete forms'),
-    E::ts('Allows non-admin users to create, update and delete forms'),
+    'label' => E::ts('FormBuilder: edit and delete forms'),
+    'description' => E::ts('Allows non-admin users to create, update and delete forms'),
   ];
 }
 
