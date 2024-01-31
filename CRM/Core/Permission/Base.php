@@ -402,6 +402,9 @@ class CRM_Core_Permission_Base {
     // Convert them all to associative arrays.
     foreach ($permissions as $name => $defn) {
       $defn = (array) $defn;
+      if (!isset($defn['label'])) {
+        CRM_Core_Error::deprecatedWarning("Permission '$name' should be declared with 'label' and 'description' keys. See https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_permission/");
+      }
       $permission = [
         'label' => $defn['label'] ?? $defn[0],
         'description' => $defn['description'] ?? $defn[1] ?? NULL,
