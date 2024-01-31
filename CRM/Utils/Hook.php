@@ -975,6 +975,8 @@ abstract class CRM_Utils_Hook {
    * @param string $className
    *   The top level className from where the hook is invoked.
    *
+   * @deprecated since 5.71 will be removed sometime after all core uses are fully removed.
+   *
    * @return null
    */
   public static function tokenValues(
