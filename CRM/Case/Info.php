@@ -42,13 +42,8 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   * @param bool $getAllUnconditionally
-   * @param bool $descriptions
-   *   Whether to return permission descriptions
-   *
-   * @return array
    */
-  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+  public function getPermissions(): array {
     $permissions = [
       'delete in CiviCase' => [
         'label' => ts('delete in CiviCase'),
@@ -71,13 +66,6 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
         'description' => ts('Open a new case'),
       ],
     ];
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
-
     return $permissions;
   }
 

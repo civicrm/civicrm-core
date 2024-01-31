@@ -51,21 +51,8 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   * Provides permissions that are used by component.
-   * Needs to be implemented in component's information
-   * class.
-   *
-   * NOTE: if using conditionally permission return,
-   * implementation of $getAllUnconditionally is required.
-   *
-   * @param bool $getAllUnconditionally
-   * @param bool $descriptions
-   *   Whether to return permission descriptions
-   *
-   * @return array|null
-   *   collection of permissions, null if none
    */
-  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+  public function getPermissions(): array {
     $permissions = [
       'access CiviContribute' => [
         'label' => ts('access CiviContribute'),
@@ -83,13 +70,6 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
         'description' => ts('Delete contributions'),
       ],
     ];
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
-
     return $permissions;
   }
 

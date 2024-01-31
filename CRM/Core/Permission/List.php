@@ -31,14 +31,13 @@ class CRM_Core_Permission_List {
    * @see \CRM_Utils_Hook::permissionList
    */
   public static function findCiviPermissions(GenericHookEvent $e) {
-    $activeCorePerms = \CRM_Core_Permission::basicPermissions(FALSE);
     $allCorePerms = \CRM_Core_Permission::basicPermissions(TRUE, TRUE);
     foreach ($allCorePerms as $permName => $corePerm) {
       $e->permissions[$permName] = [
         'group' => 'civicrm',
-        'title' => $corePerm['label'] ?? $corePerm[0] ?? $permName,
-        'description' => $corePerm['description'] ?? $corePerm[1] ?? NULL,
-        'is_active' => isset($activeCorePerms[$permName]),
+        'title' => $corePerm['label'],
+        'description' => $corePerm['description'] ?? NULL,
+        'is_active' => empty($corePerm['disabled']),
       ];
     }
   }

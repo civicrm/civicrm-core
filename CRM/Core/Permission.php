@@ -563,41 +563,32 @@ class CRM_Core_Permission {
   }
 
   /**
-   * @param bool $all
-   *   Include disabled components
-   * @param bool $descriptions
-   *   Whether to return descriptions
+   * @param bool $includeDisabled
+   *   Include permissions from disabled components/settings.
+   * @param bool $returnAssociative
+   *   Whether to return full info including description, or just label.
    *
    * @return array
    */
-  public static function basicPermissions($all = FALSE, $descriptions = FALSE) {
-    $cacheKey = implode('-', [$all, $descriptions]);
-    if (empty(Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey])) {
-      Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey] = self::assembleBasicPermissions($all, $descriptions);
+  public static function basicPermissions($includeDisabled = FALSE, $returnAssociative = FALSE): array {
+    $permissions = Civi::$statics[__CLASS__][__FUNCTION__] ??= self::assembleBasicPermissions();
+    if (!$includeDisabled) {
+      $permissions = array_filter($permissions, fn($permission) => empty($permission['disabled']));
     }
-    return Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey];
+    if ($returnAssociative) {
+      return $permissions;
+    }
+    return array_combine(array_keys($permissions), array_column($permissions, 'label'));
   }
 
   /**
-   * @param bool $all
-   * @param bool $descriptions
-   *   whether to return descriptions
-   *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public static function assembleBasicPermissions($all = FALSE, $descriptions = FALSE): array {
-    $permissions = self::getCoreAndComponentPermissions($all);
-
-    // Add any permissions defined in hook_civicrm_permission implementations.
+  protected static function assembleBasicPermissions(): array {
+    $permissions = self::getCoreAndComponentPermissions();
     $module_permissions = CRM_Core_Config::singleton()->userPermissionClass->getAllModulePermissions();
-    $permissions = array_merge($permissions, $module_permissions);
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
-    return $permissions;
+    return array_merge($permissions, $module_permissions);
   }
 
   /**
@@ -1752,27 +1743,21 @@ class CRM_Core_Permission {
   /**
    * Get permissions for components.
    *
-   * @param bool $includeDisabled
-   *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function getComponentPermissions(bool $includeDisabled): array {
-    if (!$includeDisabled) {
-      $components = CRM_Core_Component::getEnabledComponents();
-    }
-    else {
-      $components = CRM_Core_Component::getComponents();
-    }
-
+  protected static function getComponentPermissions(): array {
     $permissions = [];
-    foreach ($components as $component) {
-      $perms = $component->getPermissions($includeDisabled, TRUE);
+    foreach (CRM_Core_Component::getComponents() as $component) {
+      $perms = $component->getPermissions();
       if ($perms) {
         $info = $component->getInfo();
         foreach ($perms as $name => $perm) {
           $perm['label'] = $info['translatedName'] . ': ' . $perm['label'];
           $permissions[$name] = $perm;
+          if (!$component->isEnabled()) {
+            $perm['disabled'] = TRUE;
+          }
         }
       }
     }
@@ -1782,14 +1767,12 @@ class CRM_Core_Permission {
   /**
    * Get permissions for core functionality and for that of core components.
    *
-   * @param bool $all
-   *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function getCoreAndComponentPermissions(bool $all): array {
+  protected static function getCoreAndComponentPermissions(): array {
     $permissions = self::getCorePermissions();
-    $permissions = array_merge($permissions, self::getComponentPermissions($all));
+    $permissions = array_merge($permissions, self::getComponentPermissions());
     return $permissions;
   }
 
