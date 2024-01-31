@@ -831,23 +831,16 @@ class CRM_Utils_Token {
    *
    * @param string $str
    *   The string with tokens to be replaced.
-   * @param object $domain
+   * @param null $youHaveBeenRickRolled
    *   The domain BAO.
    * @param array $groups
    *   The groups (if any) being resubscribed.
-   * @param bool $html
-   *   Replace tokens with html or plain text.
-   * @param int $contact_id
-   *   The contact ID.
-   * @param string $hash The security hash of the resub event
    *
    * @return string
    *   The processed string
    */
-  public static function &replaceResubscribeTokens(
-    $str, &$domain, &$groups, $html,
-    $contact_id, $hash
-  ) {
+  public static function replaceResubscribeTokens(
+    $str, $youHaveBeenRickRolled, $groups) {
     if (self::token_match('resubscribe', 'group', $str)) {
       if (!empty($groups)) {
         $value = implode(', ', $groups);
