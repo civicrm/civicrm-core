@@ -738,64 +738,6 @@ AND    record_type_id = $targetRecordID
   }
 
   /**
-   * Search the mailing-event queue for a list of pending delivery tasks.
-   *
-   * @param int $jobId
-   * @param string $medium
-   *   Ex: 'email' or 'sms'.
-   *
-   * @return \CRM_Mailing_Event_BAO_MailingEventQueue
-   *   A query object whose rows provide ('id', 'contact_id', 'hash') and ('email' or 'phone').
-   */
-  public static function findPendingTasks(int $jobId, string $medium): CRM_Mailing_Event_BAO_MailingEventQueue {
-    $eq = new CRM_Mailing_Event_BAO_MailingEventQueue();
-
-    $query = "  SELECT      queue.id,
-                                email.email as email,
-                                queue.contact_id,
-                                queue.hash,
-                                NULL as phone
-                    FROM        civicrm_mailing_event_queue queue
-                    INNER JOIN  civicrm_email email
-                            ON  queue.email_id = email.id
-                    INNER JOIN  civicrm_contact contact
-                            ON  contact.id = email.contact_id
-                    LEFT JOIN   civicrm_mailing_event_delivered delivered
-                            ON  queue.id = delivered.event_queue_id
-                    LEFT JOIN   civicrm_mailing_event_bounce bounce
-                            ON  queue.id = bounce.event_queue_id
-                    WHERE       queue.job_id = " . $jobId . "
-                        AND     delivered.id IS null
-                        AND     bounce.id IS null
-                        AND     contact.is_opt_out = 0";
-
-    if ($medium === 'sms') {
-      $query = "
-                    SELECT      queue.id,
-                                phone,
-                                queue.contact_id,
-                                queue.hash,
-                                NULL as email
-                    FROM        civicrm_mailing_event_queue queue
-                    INNER JOIN  civicrm_phone phone
-                            ON  queue.phone_id = phone.id
-                    INNER JOIN  civicrm_contact contact
-                            ON  contact.id = phone.contact_id
-                    LEFT JOIN   civicrm_mailing_event_delivered delivered
-                            ON  queue.id = delivered.event_queue_id
-                    LEFT JOIN   civicrm_mailing_event_bounce bounce
-                            ON  queue.id = bounce.event_queue_id
-                    WHERE       queue.job_id = " . $jobId . "
-                        AND     delivered.id IS null
-                        AND     bounce.id IS null
-                        AND    ( contact.is_opt_out = 0
-                        OR       contact.do_not_sms = 0 )";
-    }
-    $eq->query($query);
-    return $eq;
-  }
-
-  /**
    * Delete the mailing job.
    *
    * @param int $id

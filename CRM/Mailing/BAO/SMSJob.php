@@ -59,7 +59,7 @@ class CRM_Mailing_BAO_SMSJob extends CRM_Mailing_BAO_MailingJob {
 
     // make sure that there's no more than $mailerBatchLimit mails processed in a run
     $mailerBatchLimit = Civi::settings()->get('mailerBatchLimit');
-    $eq = self::findPendingTasks((int) $this->id, 'sms');
+    $eq = self::findPendingSMSTasks((int) $this->id);
     while ($eq->fetch()) {
       if ($mailerBatchLimit > 0 && self::$mailsProcessed >= $mailerBatchLimit) {
         if (!empty($fields)) {
@@ -89,6 +89,41 @@ class CRM_Mailing_BAO_SMSJob extends CRM_Mailing_BAO_MailingJob {
       $isDelivered = $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
     }
     return $isDelivered;
+  }
+
+  /**
+   * Search the mailing-event queue for a list of pending delivery tasks.
+   *
+   * @param int $jobId
+   *
+   * @return \CRM_Mailing_Event_BAO_MailingEventQueue
+   *   A query object whose rows provide ('id', 'contact_id', 'hash') and ('email' or 'phone').
+   */
+  private static function findPendingSMSTasks(int $jobId): CRM_Mailing_Event_BAO_MailingEventQueue {
+    $eq = new CRM_Mailing_Event_BAO_MailingEventQueue();
+    $query = "
+                  SELECT      queue.id,
+                              phone,
+                              queue.contact_id,
+                              queue.hash,
+                              NULL as email
+                  FROM        civicrm_mailing_event_queue queue
+                  INNER JOIN  civicrm_phone phone
+                          ON  queue.phone_id = phone.id
+                  INNER JOIN  civicrm_contact contact
+                          ON  contact.id = phone.contact_id
+                  LEFT JOIN   civicrm_mailing_event_delivered delivered
+                          ON  queue.id = delivered.event_queue_id
+                  LEFT JOIN   civicrm_mailing_event_bounce bounce
+                          ON  queue.id = bounce.event_queue_id
+                  WHERE       queue.job_id = " . $jobId . "
+                      AND     delivered.id IS null
+                      AND     bounce.id IS null
+                      AND    ( contact.is_opt_out = 0
+                      OR       contact.do_not_sms = 0 )";
+    // note this `query` function leaks memory more than CRM_Core_DAO::ExecuteQuery()
+    $eq->query($query);
+    return $eq;
   }
 
   /**
