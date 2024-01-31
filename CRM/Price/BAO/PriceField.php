@@ -389,6 +389,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             'price' => json_encode([$elementName, '0|0']),
             'data-currency' => $currencyName,
             'onclick' => 'clearAmountOther();',
+            'data-amount' => 0,
+            'data-is-null-option' => TRUE,
           ];
         }
 
@@ -408,6 +410,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $choiceAttrs['0'] = [
             'price' => json_encode([$elementName, '0']),
             'data-membership-type-id' => NULL,
+            'data-amount' => 0,
+            'data-is-null-option' => TRUE,
           ] + $incomingExtra;
         }
 
