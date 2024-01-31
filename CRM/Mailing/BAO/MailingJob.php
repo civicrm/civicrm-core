@@ -146,7 +146,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
           CRM_Mailing_BAO_Mailing::getTestRecipients($testParams, (int) $mailingID);
         }
         else {
-          $job->queue();
+          self::queue((int) $job->mailing_id, (int) $job->job_offset, (int) $job->job_limit, (int) $job->id);
         }
 
         // Update to show job has started.
@@ -403,12 +403,17 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
+   * @param int $mailingID
+   * @param int $jobOffset
+   * @param int $limit
+   * @param int $jobID
    *
+   * @return void
    */
-  public function queue() {
+  private static function queue(int $mailingID, int $jobOffset, int $limit, int $jobID): void {
     // We are still getting all the recipients from the parent job
     // so we don't mess with the include/exclude logic.
-    $recipients = CRM_Mailing_BAO_MailingRecipients::mailingQuery($this->mailing_id, $this->job_offset, $this->job_limit);
+    $recipients = CRM_Mailing_BAO_MailingRecipients::mailingQuery($mailingID, $jobOffset, $limit);
 
     $params = [];
     $count = 0;
@@ -421,11 +426,11 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         continue;
       }
       $params[] = [
-        'job_id' => $this->id,
+        'job_id' => $jobID,
         'email_id' => $recipients->email_id ? (int) $recipients->email_id : NULL,
         'phone_id' => $recipients->phone_id ? (int) $recipients->phone_id : NULL,
         'contact_id' => $recipients->contact_id ? (int) $recipients->contact_id : NULL,
-        'mailing_id' => (int) $this->mailing_id,
+        'mailing_id' => (int) $mailingID,
         'is_test' => FALSE,
       ];
       $count++;
