@@ -76,8 +76,14 @@ function standaloneusers_civicrm_enable() {
  * Implements hook_civicrm_permission().
  */
 function standaloneusers_civicrm_permission(&$permissions) {
-  $permissions['access password resets'] = ts('Allow users to access the reset password system');
+  $permissions['access password resets'] = [
+    'label' => E::ts('Allow users to access the reset password system'),
+  ];
   // Concrete implementations of synthetic cms: permissions.
-  $permissions['administer users'] = ts('Administer user accounts');
-  $permissions['view user account'] = ts('View user accounts');
+  $permissions['administer users'] = [
+    'label' => E::ts('Administer user accounts'),
+  ];
+  $permissions['view user account'] = [
+    'label' => E::ts('View user accounts'),
+  ];
 }

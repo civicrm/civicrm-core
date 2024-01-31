@@ -50,19 +50,19 @@ class FinancialTypeTest extends BaseTestClass {
       foreach ($actions as $action => $action_ts) {
         $this->assertEquals(
           [
-            ts('CiviCRM: %1 contributions of type %2', [
+            'label' => ts('CiviCRM: %1 contributions of type %2', [
               1 => $action_ts,
               2 => $type,
             ]),
-            ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+            'description' => ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
           ],
           $permissions[$action . ' contributions of type ' . $type]
         );
       }
     }
     $this->assertEquals([
-      ts('CiviCRM: administer CiviCRM Financial Types'),
-      ts('Administer access to Financial Types'),
+      'label' => ts('CiviCRM: administer CiviCRM Financial Types'),
+      'description' => ts('Administer access to Financial Types'),
     ], $permissions['administer CiviCRM Financial Types']);
   }
 
