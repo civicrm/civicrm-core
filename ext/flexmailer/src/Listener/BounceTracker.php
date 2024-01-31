@@ -10,9 +10,15 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 
-class BounceTracker extends BaseListener {
+/**
+ * @service civi_flexmailer_bounce_tracker
+ */
+class BounceTracker extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * Inject bounce-tracking codes.

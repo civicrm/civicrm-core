@@ -10,9 +10,15 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 
-class TestPrefix extends BaseListener {
+/**
+ * @service civi_flexmailer_test_prefix
+ */
+class TestPrefix extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * For any test mailings, the "Subject:" should have a prefix.

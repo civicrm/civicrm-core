@@ -10,12 +10,27 @@
  */
 namespace Civi\FlexMailer\Listener;
 
-/**
- * @deprecated
- *   As of Feb 2024, still used by Mosaico releases. Need at least a year to phase-out.
- */
-class BaseListener {
+trait IsActiveTrait {
 
-  use IsActiveTrait;
+  /**
+   * @var bool
+   */
+  private $active = TRUE;
+
+  /**
+   * @return bool
+   */
+  public function isActive() {
+    return $this->active;
+  }
+
+  /**
+   * @param bool $active
+   * @return $this
+   */
+  public function setActive($active) {
+    $this->active = $active;
+    return $this;
+  }
 
 }

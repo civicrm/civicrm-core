@@ -10,6 +10,7 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\RunEvent;
 
 /**
@@ -22,8 +23,12 @@ use Civi\FlexMailer\Event\RunEvent;
  *
  * During incubation, we want to mostly step-aside -- for traditional
  * mailings, simply continue using the old system.
+ *
+ * @service civi_flexmailer_abdicator
  */
-class Abdicator {
+class Abdicator extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * @param \CRM_Mailing_BAO_Mailing $mailing
