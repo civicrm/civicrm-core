@@ -1067,6 +1067,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @param string $fromEmail
    *   Email address of who is forwarding it.
    *
+   * @deprecated since 5.17 will be removed around 5.74
+   *
+   * Note this REALLY should not be called anymore. I considered just removing
+   * but opted for noisy deprecation with short turn around.
+   *
    * @return Mail_mime               The mail object
    */
   public function compose(
@@ -1076,7 +1081,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $fromEmail = NULL
   ) {
     $this->getTokens();
-
+    CRM_Core_Error::deprecatedWarning('unused function - use flexmailer');
     if ($this->_domain == NULL) {
       $this->_domain = CRM_Core_BAO_Domain::getDomain();
     }
@@ -1300,7 +1305,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * Get mailing object and replaces subscribeInvite, domain and mailing tokens.
    *
-   * @deprecated
+   * @deprecated since 2017 will be removed around 5.74
    *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    * @param CRM_Mailing_BAO_Mailing $mailing
    */
@@ -1326,7 +1331,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Get data to resolve tokens.
    *
-   * @deprecated
+   * @deprecated since 2017 will be removed around 5.74
    *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    *
    * @param array $token_a
@@ -1343,7 +1348,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $type = $token_a['type'];
     $token = $token_a['token'];
     $data = $token;
-
+    CRM_Core_Error::deprecatedWarning('called only by deprecated function');
     $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY;
 
     if ($type === 'embedded_url') {
@@ -1420,10 +1425,13 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * Return a list of group names for this mailing.  Does not work with
    * prior-mailing targets.
    *
+   * @deprecated since 5.71 will be removed around 5.77
+   *
    * @return array
    *   Names of groups receiving this mailing
    */
   public function &getGroupNames() {
+    CRM_Core_Error::deprecatedWarning('unused function');
     if (!isset($this->id)) {
       return [];
     }

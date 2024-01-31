@@ -4580,6 +4580,8 @@ civicrm_relationship.start_date > {$today}
    *
    * @return array
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 5.71 - will be removed after all core usages are fully removed.
    */
   public static function apiQuery(
     $params = NULL,
