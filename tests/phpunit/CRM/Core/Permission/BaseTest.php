@@ -57,7 +57,16 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'administer CiviCRM',
     ];
+    $this->assertTrue(CRM_Core_Permission::check('administer CiviCRM'));
+    // administer CiviCRM implies the following two:
+    $this->assertTrue(CRM_Core_Permission::check('administer CiviCRM system'));
     $this->assertTrue(CRM_Core_Permission::check('administer CiviCRM data'));
+    // cascading implications from the previous two
+    $this->assertTrue(CRM_Core_Permission::check('edit system workflow message templates'));
+    $this->assertTrue(CRM_Core_Permission::check('edit message templates'));
+    $this->assertTrue(CRM_Core_Permission::check('administer dedupe rules'));
+    // administer CiviCRM does NOT imply edit all contacts
+    $this->assertFalse(CRM_Core_Permission::check('edit all contacts'));
   }
 
   /**
@@ -68,6 +77,7 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'all CiviCRM permissions and ACLs',
     ];
+    $this->assertTrue(CRM_Core_Permission::check('administer CiviCRM system'));
     $this->assertTrue(CRM_Core_Permission::check('view all contacts'));
   }
 
