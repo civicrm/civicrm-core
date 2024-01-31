@@ -501,60 +501,10 @@ function civicrm_api3_mailing_event_open($params) {
  * @param array $params
  *   Array per getfields metadata.
  *
- * @return array
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_mailing_preview($params) {
-  $fromEmail = NULL;
-  if (!empty($params['from_email'])) {
-    $fromEmail = $params['from_email'];
-  }
-
-  $mailing = new CRM_Mailing_BAO_Mailing();
-  $mailingID = $params['id'] ?? NULL;
-  if ($mailingID) {
-    $mailing->id = $mailingID;
-    $mailing->find(TRUE);
-  }
-  else {
-    $mailing->copyValues($params);
-  }
-
-  $session = CRM_Core_Session::singleton();
-
-  CRM_Mailing_BAO_Mailing::tokenReplace($mailing);
-
-  // get and format attachments
-  $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_mailing', $mailing->id);
-
-  $returnProperties = $mailing->getReturnProperties();
-  $contactID = $params['contact_id'] ?? NULL;
-  if (!$contactID) {
-    // If we still don't have a userID in a session because we are annon then set contactID to be 0
-    $contactID = empty($session->get('userID')) ? 0 : $session->get('userID');
-  }
-  $mailingParams = ['contact_id' => $contactID];
-
-  if (!$contactID) {
-    $details = CRM_Utils_Token::getAnonymousTokenDetails($mailingParams, $returnProperties, empty($mailing->sms_provider_id), TRUE, NULL, $mailing->getFlattenedTokens());
-    $details = $details[0][0] ?? NULL;
-  }
-  else {
-    [$details] = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, empty($mailing->sms_provider_id), TRUE, NULL, $mailing->getFlattenedTokens());
-    $details = $details[$contactID];
-  }
-
-  $mime = $mailing->compose(NULL, NULL, NULL, $contactID, $fromEmail, $fromEmail,
-    TRUE, $details, $attachments
-  );
-
-  return civicrm_api3_create_success([
-    'id' => $mailingID,
-    'contact_id' => $contactID,
-    'subject' => CRM_Utils_Array::value('Subject', $mime->headers(), ''),
-    'body_html' => $mime->getHTMLBody(),
-    'body_text' => $mime->getTXTBody(),
-  ]);
+  throw new CRM_Core_Exception('This is never called because flexmailer intercepts it');
 }
 
 /**

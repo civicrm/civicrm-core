@@ -1183,6 +1183,7 @@ class CRM_Utils_Token {
                                            $className = NULL,
                                            $jobID = NULL) {
     $details = [0 => []];
+    CRM_Core_Error::deprecatedFunctionWarning('function no longer used - see flexmailer');
     // also call a hook and get token details
     CRM_Utils_Hook::tokenValues($details[0],
       $contactIDs,
