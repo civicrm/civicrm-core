@@ -395,15 +395,16 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * (Quasi-Private) Do not call externally. For use by DAOs.
    *
-   * @param string $dao
+   * @param string|CRM_Core_DAO $dao
    *   Ex: 'CRM_Core_DAO_Address'.
    * @param string $labelName
    *   Ex: 'address'.
    * @param bool $prefix
    * @param array $foreignDAOs
+   *   Historically used for... something? Currently never set by any core BAO.
    * @return array
    */
-  public static function getExports($dao, $labelName, $prefix, $foreignDAOs) {
+  public static function getExports($dao, $labelName, $prefix, $foreignDAOs = []) {
     // Bug-level compatibility -- or sane behavior?
     $cacheKey = $dao . ':export';
     // $cacheKey = $dao . ':' . ($prefix ? 'export-prefix' : 'export');
@@ -423,6 +424,7 @@ class CRM_Core_DAO_AllCoreTables {
         }
       }
 
+      // TODO: Remove this bit; no core DAO actually uses it
       foreach ($foreignDAOs as $foreignDAO) {
         $exports = array_merge($exports, $foreignDAO::export(TRUE));
       }
@@ -435,15 +437,16 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * (Quasi-Private) Do not call externally. For use by DAOs.
    *
-   * @param string $dao
+   * @param string|CRM_Core_DAO $dao
    *   Ex: 'CRM_Core_DAO_Address'.
    * @param string $labelName
    *   Ex: 'address'.
    * @param bool $prefix
    * @param array $foreignDAOs
+   *   Historically used for... something? Currently never set by any core BAO.
    * @return array
    */
-  public static function getImports($dao, $labelName, $prefix, $foreignDAOs) {
+  public static function getImports($dao, $labelName, $prefix, $foreignDAOs = []) {
     // Bug-level compatibility -- or sane behavior?
     $cacheKey = $dao . ':import';
     // $cacheKey = $dao . ':' . ($prefix ? 'import-prefix' : 'import');
@@ -463,6 +466,7 @@ class CRM_Core_DAO_AllCoreTables {
         }
       }
 
+      // TODO: Remove this bit; no core DAO actually uses it
       foreach ($foreignDAOs as $foreignDAO) {
         $imports = array_merge($imports, $foreignDAO::import(TRUE));
       }
