@@ -207,6 +207,26 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Returns the list of fields that can be imported
+   *
+   * @param bool $prefix
+   * @return array
+   */
+  public static function import($prefix = FALSE) {
+    return CRM_Core_DAO_AllCoreTables::getImports(static::class, substr(static::$_tableName, 8), $prefix);
+  }
+
+  /**
+   * Returns the list of fields that can be exported
+   *
+   * @param bool $prefix
+   * @return array
+   */
+  public static function export($prefix = FALSE) {
+    return CRM_Core_DAO_AllCoreTables::getExports(static::class, substr(static::$_tableName, 8), $prefix);
+  }
+
+  /**
    * Initialize the DAO object.
    *
    * @param string $dsn
