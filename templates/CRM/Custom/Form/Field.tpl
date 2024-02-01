@@ -33,10 +33,6 @@
       <td class="label">{$form.fk_entity_on_delete.label} <span class="crm-marker">*</span></td>
       <td class="html-adjust">{$form.fk_entity_on_delete.html}</td>
     </tr>
-    <tr class="crm-custom-field-form-block-is_on_delete_includes_soft_delete">
-      <td class="label">{$form.is_on_delete_includes_soft_delete.label}</td>
-      <td class="html-adjust">{$form.is_on_delete_includes_soft_delete.html} {help id="id-is_on_delete_includes_soft_delete"}</td>
-    </tr>
     <tr class="crm-custom-field-form-block-serialize">
       <td class="label">{$form.serialize.label}</td>
       <td class="html-adjust">{$form.serialize.html}</td>
@@ -211,7 +207,6 @@
       // Show/hide entityReference selector
       $('.crm-custom-field-form-block-fk_entity').toggle(dataType === 'EntityReference');
       $('.crm-custom-field-form-block-fk_entity_on_delete').toggle(dataType === 'EntityReference');
-      $('.crm-custom-field-form-block-is_on_delete_includes_soft_delete').toggle(dataType === 'EntityReference');
     }
 
     function onChangeHtmlType() {

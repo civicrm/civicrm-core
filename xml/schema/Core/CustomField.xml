@@ -361,17 +361,6 @@
     </html>
     <add>5.71</add>
   </field>
-  <field>
-    <name>is_on_delete_includes_soft_delete</name>
-    <type>boolean</type>
-    <title>On Delete Includes Soft Delete?</title>
-    <default>0</default>
-    <comment>Behavior for referenced entity delete is applied on soft delete, too.</comment>
-    <html>
-      <type>CheckBox</type>
-    </html>
-    <add>5.71</add>
-  </field>
   <index>
     <name>UI_label_custom_group_id</name>
     <fieldName>label</fieldName>

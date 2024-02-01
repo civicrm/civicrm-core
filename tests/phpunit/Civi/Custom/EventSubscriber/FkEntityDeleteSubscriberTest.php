@@ -53,7 +53,7 @@ final class FkEntityDeleteSubscriberTest extends \CiviUnitTestCase {
   }
 
   public function testCascade(): void {
-    $this->updateContactEntityReferenceField('cascade', FALSE);
+    $this->updateContactEntityReferenceField('cascade');
     $contact1 = $this->createIndividual();
     $contact2 = $this->createIndividual();
     $group = $this->createGroup(['cg_group.contact' => $contact1['id']]);
@@ -92,68 +92,10 @@ final class FkEntityDeleteSubscriberTest extends \CiviUnitTestCase {
     );
   }
 
-  public function testCascadeSoftDelete(): void {
-    $this->updateContactEntityReferenceField('cascade', TRUE);
-    $contact1 = $this->createIndividual();
-    $contact2 = $this->createIndividual();
-    $group = $this->createGroup(['cg_group.contact' => $contact1['id']]);
-
-    Contact::delete()
-      ->addWhere('id', '=', $contact2['id'])
-      ->execute();
-
-    // If a not referenced entity is deleted nothing should happen.
-    static::assertCount(1, Group::get()
-      ->addWhere('id', '=', $group['id'])
-      ->addWhere('cg_group.contact', '=', $contact1['id'])
-      ->execute()
-    );
-
-    Contact::delete()
-      ->addWhere('id', '=', $contact1['id'])
-      ->execute();
-
-    // Soft delete should be cascaded.
-    static::assertCount(0, Group::get()
-      ->addWhere('id', '=', $group['id'])
-      ->execute()
-    );
-  }
-
-  public function testSetNullSoftDelete(): void {
-    $this->updateContactEntityReferenceField('set_null', TRUE);
-    $contact1 = $this->createIndividual();
-    $contact2 = $this->createIndividual();
-    $group = $this->createGroup(['cg_group.contact' => $contact1['id']]);
-
-    Contact::delete()
-      ->addWhere('id', '=', $contact2['id'])
-      ->execute();
-
-    // If a not referenced entity is deleted nothing should happen.
-    static::assertCount(1, Group::get()
-      ->addWhere('id', '=', $group['id'])
-      ->addWhere('cg_group.contact', '=', $contact1['id'])
-      ->execute()
-    );
-
-    Contact::delete()
-      ->addWhere('id', '=', $contact1['id'])
-      ->execute();
-
-    // Reference field should be set to null on soft delete.
-    static::assertCount(1, Group::get()
-      ->addWhere('id', '=', $group['id'])
-      ->addWhere('cg_group.contact', 'IS NULL')
-      ->execute()
-    );
-  }
-
-  private function updateContactEntityReferenceField(string $onDelete, bool $onDeleteIncludesSoftDelete): void {
+  private function updateContactEntityReferenceField(string $onDelete): void {
     CustomField::update()
       ->setValues([
         'fk_entity_on_delete' => $onDelete,
-        'is_on_delete_includes_soft_delete' => $onDeleteIncludesSoftDelete,
       ])->addWhere('id', '=', $this->contactEntityReferenceField['id'])
       ->execute();
   }

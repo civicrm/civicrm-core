@@ -10,6 +10,3 @@
 {htxt id="id-in_selector"}
   {ts}Display in Table controls which columns are included in the listing of custom data records. If your custom data set has a large number of fields, uncheck this box to exclude less important fields from the listing. All fields will still be included when viewing a single record. You may also want to exclude Note type fields from the table listing.{/ts}
 {/htxt}
-{htxt id="id-is_on_delete_includes_soft_delete"}
-  {ts}Shall the operation on referenced entity delete be applied on soft delete (contact moved to trash), too?{/ts}
-{/htxt}

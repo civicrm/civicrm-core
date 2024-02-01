@@ -15,28 +15,16 @@ final class FkEntityDeleteSubscriber extends AutoSubscriber {
   }
 
   public function onPre(PreEvent $event): void {
+    // Set NULL on real deletion is part of the database schema and does not
+    // need to be handled here.
     if ('delete' === $event->action) {
-      $this->performCascadeDeletions($event->entity, (int) $event->id, FALSE);
-    }
-    elseif ($event->params['is_deleted'] ?? FALSE) {
-      $this->performCascadeDeletions($event->entity, (int) $event->id, TRUE);
-      // Set NULL on real deletion is part of the database schema.
-      $this->performSetNull($event->entity, (int) $event->id);
+      $this->performCascadeDeletions($event->entity, (int) $event->id);
     }
   }
 
-  private function performCascadeDeletions(string $fkEntity, int $id, bool $softDelete): void {
-    foreach ($this->getReferenceFieldNames($fkEntity, 'cascade', $softDelete) as $entity => $referenceFieldName) {
+  private function performCascadeDeletions(string $fkEntity, int $id): void {
+    foreach ($this->getReferenceFieldNames($fkEntity, 'cascade') as $entity => $referenceFieldName) {
       civicrm_api4($entity, 'delete', [
-        'where' => [[$referenceFieldName, '=', $id]],
-      ]);
-    }
-  }
-
-  private function performSetNull(string $fkEntity, int $id): void {
-    foreach ($this->getReferenceFieldNames($fkEntity, 'set_null', TRUE) as $entity => $referenceFieldName) {
-      civicrm_api4($entity, 'update', [
-        'values' => [$referenceFieldName => NULL],
         'where' => [[$referenceFieldName, '=', $id]],
       ]);
     }
@@ -46,13 +34,12 @@ final class FkEntityDeleteSubscriber extends AutoSubscriber {
    * @phpstan-return iterable<string, string>
    *   Entity name mapped to custom entity reference field name.
    */
-  private function getReferenceFieldNames(string $fkEntity, string $onDelete, bool $onlySoftDelete): iterable {
+  private function getReferenceFieldNames(string $fkEntity, string $onDelete): iterable {
     $fkEntities = $this->getFkEntityTypes($fkEntity);
 
     foreach (\CRM_Core_BAO_CustomGroup::getAll() as $group) {
       foreach ($group['fields'] as $field) {
         if ($field['data_type'] === 'EntityReference' && $field['fk_entity_on_delete'] === $onDelete
-          && (!$onlySoftDelete || $field['is_on_delete_includes_soft_delete'])
           && in_array($field['fk_entity'], $fkEntities, TRUE)
         ) {
           yield $group['extends'] => $group['name'] . '.' . $field['name'];
