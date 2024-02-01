@@ -56,10 +56,14 @@ trait CRM_Event_Form_EventFormTrait {
    * is only given where there is specific test cover.
    *
    * @noinspection PhpUnhandledExceptionInspection
-   * @noinspection PhpDocMissingThrowsInspection
    */
   public function getEventID(): ?int {
-    throw new CRM_Core_Exception('`getEventID` must be implemented');
+    try {
+      return $this->getParticipantValue('event_id');
+    }
+    catch (CRM_Core_Exception $e) {
+      throw new CRM_Core_Exception('`getEventID` must be implemented');
+    }
   }
 
   /**
