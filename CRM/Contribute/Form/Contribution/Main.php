@@ -629,12 +629,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @throws \CRM_Core_Exception
    */
   private function buildMembershipBlock(): ?bool {
-    $cid = $this->_membershipContactID;
     $separateMembershipPayment = FALSE;
     $this->addOptionalQuickFormElement('auto_renew');
     $this->addExpectedSmartyVariable('renewal_mode');
     if ($this->_membershipBlock) {
-      $membershipTypeIds = $membershipTypes = $radio = [];
+      $membershipTypes = $radio = [];
       // This is always true if this line is reachable - remove along with the upcoming if.
       $membershipPriceset = TRUE;
 
@@ -643,69 +642,56 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       $separateMembershipPayment = $this->_membershipBlock['is_separate_payment'] ?? NULL;
 
-      foreach ($this->getPriceFieldMetaData() as $pField) {
-        if (empty($pField['options'])) {
-          continue;
-        }
-        foreach ($pField['options'] as $opId => $opValues) {
-          if (empty($opValues['membership_type_id'])) {
-            continue;
-          }
-          $membershipTypeIds[$opValues['membership_type_id']] = $opValues['membership_type_id'];
-        }
-      }
+      $membershipTypeIds = $this->getAvailableMembershipTypeIDs();
 
       //because we take first membership record id for renewal
-      $memberships = $this->getExistingMemberships();
       if (!empty($membershipTypeIds)) {
+        // @todo = this hook should be called when loading the priceFieldMetadata in preProcess & incorporated
+        // There should be function to retrieve rather than property access.
         $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIds);
         $this->_membershipTypeValues = $membershipTypeValues;
-        $endDate = NULL;
+      }
+      $endDate = NULL;
 
-        $allowAutoRenewOpt = $this->isPageHasPaymentProcessorSupportForRecurring();
-        foreach ($membershipTypeIds as $value) {
-          $memType = $membershipTypeValues[$value];
-          if ($memType['is_active']) {
-            $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = $this->getConfiguredAutoRenewOptionForMembershipType($value);
-            if ($allowAutoRenewOpt) {
-              $allowAutoRenewMembership = TRUE;
-            }
-            else {
-              $javascriptMethod = NULL;
-            }
-
-            //add membership type.
-            $radio[$memType['id']] = NULL;
-            if ($cid) {
-              //show current membership, skip pending and cancelled membership records,
-              $membership = $memberships[$memType['id']] ?? NULL;
-              if ($membership) {
-                if ($membership["membership_type_id.duration_unit:name"] === 'lifetime') {
-                  unset($radio[$memType['id']]);
-                  $this->assign('hasExistingLifetimeMembership', TRUE);
-                  unset($memberships[$memType['id']]);
-                  continue;
-                }
-                $this->define('Membership', 'CurrentMembership', $membership);
-                $memType['current_membership'] = $membership['end_date'];
-                if (!$endDate) {
-                  $endDate = $memType['current_membership'];
-                  $this->_defaultMemTypeId = $memType['id'];
-                }
-                if ($memType['current_membership'] < $endDate) {
-                  $endDate = $memType['current_membership'];
-                  $this->_defaultMemTypeId = $memType['id'];
-                }
-              }
-            }
-            $membershipTypes[] = $memType;
+      foreach ($membershipTypeIds as $membershipTypeID) {
+        $memType = $membershipTypeValues[$membershipTypeID];
+        if ($memType['is_active']) {
+          $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$membershipTypeID}"] = $this->getConfiguredAutoRenewOptionForMembershipType($membershipTypeID);
+          if ($this->isPageHasPaymentProcessorSupportForRecurring()) {
+            $allowAutoRenewMembership = TRUE;
           }
+          else {
+            $javascriptMethod = NULL;
+          }
+
+          //add membership type.
+          $radio[$memType['id']] = NULL;
+          //show current membership, skip pending and cancelled membership records,
+          $membership = $this->getExistingMembership($membershipTypeID);
+          if ($membership) {
+            if ($membership["membership_type_id.duration_unit:name"] === 'lifetime') {
+              unset($radio[$memType['id']]);
+              $this->assign('hasExistingLifetimeMembership', TRUE);
+              continue;
+            }
+            $this->define('Membership', 'CurrentMembership', $membership);
+            $memType['current_membership'] = $membership['end_date'];
+            if (!$endDate) {
+              $endDate = $memType['current_membership'];
+              $this->_defaultMemTypeId = $memType['id'];
+            }
+            if ($memType['current_membership'] < $endDate) {
+              $endDate = $memType['current_membership'];
+              $this->_defaultMemTypeId = $memType['id'];
+            }
+          }
+          $membershipTypes[] = $memType;
         }
       }
 
       $this->assign('membershipBlock', $this->_membershipBlock);
       $this->assign('showRadio', TRUE);
-      $this->assign('renewal_mode', !empty($memberships));
+      $this->assign('renewal_mode', $this->contactHasRenewableMembership());
       $this->assign('membershipTypes', $membershipTypes);
       $this->assign('allowAutoRenewMembership', $allowAutoRenewMembership);
       $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
@@ -1800,6 +1786,32 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   }
 
   /**
+   * Get the first existing membership of the given type.
+   *
+   * @param int $membershipTypeID
+   * @return array|null
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function getExistingMembership(int $membershipTypeID): ?array {
+    foreach ($this->getExistingMemberships() as $membership) {
+      if ($membership['membership_type_id'] === $membershipTypeID) {
+        return $membership;
+      }
+    }
+    return NULL;
+  }
+
+  private function contactHasRenewableMembership(): bool {
+    foreach ($this->getExistingMemberships() as $membership) {
+      if ($membership['membership_type_id.duration_unit:name'] !== 'lifetime') {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Get the membership type IDs available in the price set.
    *
    * @return array
@@ -1807,8 +1819,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   private function getAvailableMembershipTypeIDs(): array {
     $membershipTypeIDs = [];
-    foreach ($this->getMembershipLineItems() as $lineItem) {
-      $membershipTypeIDs[$lineItem['membership_type_id']] = $lineItem['membership_type_id'];
+    foreach ($this->getPriceFieldMetaData() as $priceField) {
+      foreach ($priceField['options'] ?? [] as $option) {
+        if (!empty($option['membership_type_id'])) {
+          $membershipTypeIDs[$option['membership_type_id']] = $option['membership_type_id'];
+        }
+      }
     }
     return $membershipTypeIDs;
   }

@@ -60,7 +60,12 @@ class CryptoJwt {
    * @throws CryptoException
    */
   public function decode($token, $keyTag = 'SIGN') {
-    $useKeyObj = version_compare(\Composer\InstalledVersions::getVersion('firebase/php-jwt'), '6', '>=');
+    // Version 6.x+ has 2 parameters, earlier versions had 3
+    $reflection = new \ReflectionMethod('Firebase\JWT\JWT::decode');
+    $useKeyObj = ($reflection->getNumberOfParameters() === 2) ?? FALSE;
+
+    // Composer\InstalledVersions returns 0 if the library has been replaced using "replace" in composer.json
+    // $useKeyObj = version_compare(\Composer\InstalledVersions::getVersion('firebase/php-jwt'), '6', '>=');
     if (!$useKeyObj) {
       \CRM_Core_Error::deprecatedWarning('Using deprecated version of firebase/php-jwt. Upgrade to 6.x+.');
     }
