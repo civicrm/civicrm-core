@@ -2310,6 +2310,7 @@ abstract class CRM_Utils_Hook {
    *
    * @return null
    *   The return value is ignored
+   * @throws RuntimeException
    */
   public static function permission(&$newPermissions) {
     $null = NULL;

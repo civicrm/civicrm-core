@@ -569,6 +569,7 @@ class CRM_Core_Permission {
    *   If false, returns strings (label only).
    *
    * @return array[]|string[]
+   * @throws RuntimeException
    */
   public static function basicPermissions($includeDisabled = FALSE, $returnAssociative = FALSE): array {
     $permissions = Civi::$statics[__CLASS__][__FUNCTION__] ??= self::assembleBasicPermissions();
@@ -583,7 +584,7 @@ class CRM_Core_Permission {
 
   /**
    * @return array
-   * @throws \CRM_Core_Exception
+   * @throws RuntimeException
    */
   protected static function assembleBasicPermissions(): array {
     $permissions = self::getCoreAndComponentPermissions();
@@ -950,7 +951,13 @@ class CRM_Core_Permission {
       // Also '@afform - see AfformUsageTest.
       return [$permissionName];
     }
-    $impliedPermissions = self::basicPermissions(TRUE, TRUE)[$permissionName]['implied_by'] ?? [];
+    try {
+      $impliedPermissions = self::basicPermissions(TRUE, TRUE)[$permissionName]['implied_by'] ?? [];
+    }
+    // This could happen early in the boot-cycle or during upgrade
+    catch (RuntimeException $e) {
+      $impliedPermissions = [];
+    }
     return array_merge([$permissionName, 'all CiviCRM permissions and ACLs'], $impliedPermissions);
   }
 
@@ -1766,7 +1773,6 @@ class CRM_Core_Permission {
    * Get permissions for components.
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
   protected static function getComponentPermissions(): array {
     $permissions = [];
@@ -1790,7 +1796,6 @@ class CRM_Core_Permission {
    * Get permissions for core functionality and for that of core components.
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
   protected static function getCoreAndComponentPermissions(): array {
     $permissions = self::getCorePermissions();
