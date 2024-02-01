@@ -1043,7 +1043,15 @@ class CRM_Utils_String {
     // Adding this is preparatory to smarty 3. The original PR failed some
     // tests so we check for the function.
     if (!function_exists('smarty_function_eval') && !file_exists(SMARTY_DIR . '/plugins/function.eval.php')) {
-      $templateString = (string) $smarty->fetch('eval:{eval var=$smartySingleUseString|smarty:nodefaults}');
+      try {
+        $templateString = (string) $smarty->fetch('eval:' . $templateString);
+      }
+      catch (SmartyCompilerException $e) {
+        \Civi::log('smarty')->info('parsing smarty template {template}', [
+          'template' => $templateString,
+        ]);
+        throw new \CRM_Core_Exception('Message was not parsed due to invalid smarty syntax : ' . $e->getMessage() . ((CIVICRM_UF === 'UnitTest' || CRM_Utils_Constant::value('SMARTY_DEBUG_STRINGS')) ? $templateString : ''));
+      }
     }
     else {
       $templateString = (string) $smarty->fetch('string:{eval var=$smartySingleUseString|smarty:nodefaults}');
