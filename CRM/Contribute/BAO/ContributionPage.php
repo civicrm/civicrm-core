@@ -417,6 +417,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'tokenContext' => $tokenContext,
         'isTest' => $isTest,
         'PDFFilename' => 'receipt.pdf',
+        'modelProps' => $values['modelProps'] ?? [],
       ];
 
       if ($returnMessageText) {
