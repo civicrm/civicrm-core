@@ -65,8 +65,39 @@
 
           {if $profileFieldName eq 'email_greeting' or  $profileFieldName eq 'postal_greeting' or $profileFieldName eq 'addressee'}
             {include file="CRM/Profile/Form/GreetingType.tpl"}
+          {elseif $profileFieldName eq 'tag'}
+          <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
+            <tr>
+              <td>
+            <div class="crm-section tag-section">
+              {if !empty($title)}{$form.tag.label}<br>{/if}
+              {$form.tag.html}
+            </div>
+              </td>
+            </tr>
+          </table>
           {elseif ($profileFieldName eq 'group' && $form.group) || ($profileFieldName eq 'tag' && $form.tag)}
-            {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$profileFieldName title=null context="profile"}
+            <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
+              <tr>
+                <td>
+            {if $groupElementType eq 'select'}
+              <div class="crm-section group-section">
+                {if $title}{$form.group.label}<br>{/if}
+                {$form.group.html}
+              </div>
+            {else}
+              {foreach key=key item=item from=$tagGroup.group}
+                <div class="group-wrapper">
+                  {$form.group.$key.html}
+                  {if $item.description}
+                    <div class="description">{$item.description}</div>
+                  {/if}
+                </div>
+              {/foreach}
+            {/if}
+                </td>
+              </tr>
+            </table>
           {elseif array_key_exists('is_datetime_field', $field) && $field.is_datetime_field && $action & 4}
             <span class="crm-frozen-field">
               {$formElement.value|crmDate:$field.smarty_view_format}

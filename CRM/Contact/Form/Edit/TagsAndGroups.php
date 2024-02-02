@@ -58,7 +58,6 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     $groupElementType = 'checkbox',
     $public = FALSE
   ) {
-    $tagGroup = [];
     $form->addExpectedSmartyVariable('type');
     $form->addOptionalQuickFormElement('group');
     // NYSS 5670
@@ -131,6 +130,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     $form->assign('groupElementType', $groupElementType ?? NULL);
 
     if ($type & self::TAG) {
+      $tagGroup = [];
       $tags = CRM_Core_BAO_Tag::getColorTags('civicrm_contact');
 
       if (!empty($tags)) {
@@ -141,7 +141,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
       CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', $contactId, FALSE, TRUE);
     }
-    $form->assign('tagGroup', $tagGroup);
+    $form->assign('tagGroup', $tagGroup ?? NULL);
   }
 
   /**
