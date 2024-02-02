@@ -81,7 +81,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->_params[0]['is_pay_later'] = $this->get('is_pay_later');
     $this->assign('is_pay_later', $this->_params[0]['is_pay_later']);
     $this->assign('pay_later_receipt', $this->_params[0]['is_pay_later'] ? $this->_values['event']['pay_later_receipt'] : NULL);
-
+    $this->assign('confirm_text', $this->getEventValue('confirm_text'));
     CRM_Utils_Hook::eventDiscount($this, $this->_params);
 
     if (!empty($this->_params[0]['discount']) && !empty($this->_params[0]['discount']['applied'])) {
