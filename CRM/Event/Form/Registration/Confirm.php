@@ -108,7 +108,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->setTitle($this->_values['event']['confirm_title']);
     }
 
-    // Personal campaign page
+    // Personal campaign page.
+    // Unclear if this really is possible on event pages or copy & paste.
+    $this->assign('pcpBlock', FALSE);
     if ($this->_pcpId) {
       $params = CRM_Contribute_Form_Contribution_Confirm::processPcp($this, $this->_params[0]);
       $this->_params[0] = $params;
@@ -1204,6 +1206,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
       $form->_fields = $profileFields;
     }
+    $form->assign('addParticipantProfile', []);
     if (!empty($formattedValues)) {
       $form->assign('primaryParticipantProfile', $formattedValues[1]);
       $form->set('primaryParticipantProfile', $formattedValues[1]);
