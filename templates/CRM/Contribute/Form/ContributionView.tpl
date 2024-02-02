@@ -8,11 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-content-block crm-contribution-view-form-block">
-<div class="action-link">
-  <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl" location="top"}
-  </div>
-</div>
 <table class="crm-info-panel">
   {if $is_test}
     <div class="help">
