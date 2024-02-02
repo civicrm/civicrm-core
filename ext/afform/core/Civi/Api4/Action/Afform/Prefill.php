@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\Afform;
 
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\Utils\FormattingUtil;
 
 /**
  * Class Prefill
@@ -23,6 +24,7 @@ class Prefill extends AbstractProcessor {
       if ($this->matchField) {
         $this->handleMatchField($afformEntity['type'], $valueSets);
       }
+      $this->formatViewValues($afformEntity, $valueSets);
     }
     return \CRM_Utils_Array::makeNonAssociative($entityValues, 'name', 'values');
   }
@@ -46,6 +48,50 @@ class Prefill extends AbstractProcessor {
         unset($valueSet['fields'][$idField]);
       }
     }
+  }
+
+  private function formatViewValues(array $afformEntity, array &$valueSets): void {
+    $originalValues = $valueSets;
+    foreach ($this->getDisplayOnlyFields($afformEntity['fields']) as $fieldName) {
+      foreach ($valueSets as $index => $valueSet) {
+        $this->formatViewValue($afformEntity['type'], $fieldName, $valueSets[$index]['fields'], $originalValues[$index]['fields']);
+      }
+    }
+    foreach ($afformEntity['joins'] ?? [] as $joinEntity => $join) {
+      foreach ($this->getDisplayOnlyFields($join['fields']) as $fieldName) {
+        foreach ($valueSets as $index => $valueSet) {
+          if (!empty($valueSet['joins'][$joinEntity])) {
+            foreach ($valueSet['joins'][$joinEntity] as $joinIndex => $joinValues) {
+              $this->formatViewValue($joinEntity, $fieldName, $valueSets[$index]['joins'][$joinEntity][$joinIndex], $originalValues[$index]['joins'][$joinEntity][$joinIndex]);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private function formatViewValue(string $entityType, string $fieldName, array &$values, $originalValues) {
+    if (isset($values[$fieldName])) {
+      $fieldInfo = $this->_formDataModel->getField($entityType, $fieldName, 'create', $originalValues);
+      $dataType = $fieldInfo['data_type'] ?? NULL;
+      if (!empty($fieldInfo['options'])) {
+        $values[$fieldName] = FormattingUtil::replacePseudoconstant(array_column($fieldInfo['options'], 'label', 'id'), $values[$fieldName]);
+      }
+      elseif ($dataType === 'Boolean') {
+        $values[$fieldName] = $values[$fieldName] ? ts('Yes') : ts('No');
+      }
+      elseif ($dataType === 'Date' || $dataType === 'Timestamp') {
+        $values[$fieldName] = \CRM_Utils_Date::customFormat($values[$fieldName]);
+      }
+      if (is_array($values[$fieldName])) {
+        $values[$fieldName] = implode(', ', $values[$fieldName]);
+      }
+    }
+  }
+
+  private function getDisplayOnlyFields(array $fields) {
+    $displayOnly = array_filter($fields, fn($field) => ($field['defn']['input_type'] ?? NULL) === 'DisplayOnly');
+    return array_keys($displayOnly);
   }
 
 }
