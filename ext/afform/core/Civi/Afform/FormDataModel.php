@@ -195,9 +195,10 @@ class FormDataModel {
    * @param string $entityName
    * @param string $fieldName
    * @param string $action
+   * @param array $values
    * @return array|NULL
    */
-  public static function getField(string $entityName, string $fieldName, string $action): ?array {
+  public static function getField(string $entityName, string $fieldName, string $action, array $values = []): ?array {
     // For explicit joins, strip the alias off the field name
     if (strpos($entityName, ' AS ')) {
       [$entityName, $alias] = explode(' AS ', $entityName);
@@ -219,11 +220,8 @@ class FormDataModel {
       'loadOptions' => ['id', 'label'],
       // If the admin included this field on the form, then it's OK to get metadata about the field regardless of user permissions.
       'checkPermissions' => FALSE,
+      'values' => $values,
     ];
-    if (in_array($entityName, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
-      $params['values'] = ['contact_type' => $entityName];
-      $entityName = 'Contact';
-    }
     foreach (civicrm_api4($entityName, 'getFields', $params) as $field) {
       // In the highly unlikely event of 2 fields returned, prefer the exact match
       if ($field['name'] === $fieldName) {
