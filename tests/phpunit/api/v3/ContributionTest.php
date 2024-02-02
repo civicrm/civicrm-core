@@ -2669,6 +2669,159 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test contribution_page_id with a recurring contribution.
+   *
+   * The contribution_page_id is stored at the recurring contribution
+   * at the first contribution and at the template contribution.
+   *
+   * This test checks whether the contribution_page_id is set
+   * when a repeat transaction is done
+   */
+  public function testRepeatTransactionWithContributionPageId(): void {
+    $contributionPage = $this->contributionPageCreate(['receipt_from_name' => 'CiviCRM LLC', 'receipt_from_email' => 'contributionpage@civicrm.org', 'is_email_receipt' => 1]);
+    $contributionRecurParams = [
+      'contribution_page_id' => $contributionPage['id'],
+    ];
+    $contributionParams = [
+      'contribution_page_id' => $contributionPage['id'],
+    ];
+    $originalContribution = $this->setUpRepeatTransaction($contributionRecurParams, 'single', $contributionParams);
+
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'contribution_recur_id' => $originalContribution['contribution_recur_id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'number_2',
+    ]);
+
+    $contribution = Contribution::get()
+      ->addWhere('trxn_id', '=', 'number_2')
+      ->addSelect('contribution_page_id')
+      ->addSelect('id')
+      ->execute()->single();
+    $this->assertEquals($contributionPage['id'], $contribution['contribution_page_id']);
+  }
+
+  /**
+   * Test contribution_page_id with a recurring contribution.
+   *
+   * The contribution_page_id is stored at the recurring contribution
+   * at the first contribution and at the template contribution.
+   *
+   * This test checks whether the contribution_page_id is taken from the contribution recur.
+   * We change the contribution_page_id at the second contribution and then
+   * we repeat the transaction and check the contribution_page_id again.
+   */
+  public function testRepeatTransactionWithChangedContributionPageId(): void {
+    $contributionPage = $this->contributionPageCreate(['receipt_from_name' => 'CiviCRM LLC', 'receipt_from_email' => 'contributionpage@civicrm.org', 'is_email_receipt' => 1]);
+    $contributionPage2 = $this->contributionPageCreate(['receipt_from_name' => 'CiviCRM LLC', 'receipt_from_email' => 'contributionpage@civicrm.org', 'is_email_receipt' => 1]);
+    $contributionRecurParams = [
+      'contribution_page_id' => $contributionPage['id'],
+    ];
+    $contributionParams = [
+      'contribution_page_id' => $contributionPage['id'],
+      'trxn_id' => 'number_1',
+    ];
+    $originalContribution = $this->setUpRepeatTransaction($contributionRecurParams, 'single', $contributionParams);
+
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'contribution_recur_id' => $originalContribution['contribution_recur_id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'number_2',
+    ]);
+
+    $contribution = Contribution::get()
+      ->addWhere('trxn_id', '=', 'number_2')
+      ->setSelect(['id', 'contribution_page_id'])
+      ->execute()
+      ->single();
+    $this->assertEquals($contributionPage['id'], $contribution['contribution_page_id']);
+
+    ContributionRecur::update()
+      ->setValues(['contribution_page_id' => $contributionPage2['id']])
+      ->addWhere('id', '=', $originalContribution['contribution_recur_id'])
+      ->execute();
+
+    $this->callAPISuccess('contribution', 'repeattransaction', [
+      'contribution_recur_id' => $originalContribution['contribution_recur_id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'number_3',
+    ]);
+
+    // Test whether the contribution page is taken from the contribution recur object
+    $contribution = Contribution::get()
+      ->addWhere('trxn_id', '=', 'number_3')
+      ->setSelect(['id', 'contribution_page_id'])
+      ->execute()
+      ->single();
+    $this->assertEquals($contributionPage2['id'], $contribution['contribution_page_id']);
+  }
+
+  /**
+   * Test contribution_page_id with a recurring contribution.
+   *
+   * The contribution_page_id is stored at the recurring contribution
+   * at the first contribution and at the template contribution.
+   *
+   * This test checks whether the contribution_page_id is taken from the template contribution.
+   * We change the contribution_page_id at the template contribution and then
+   * we repeat the transaction and check the contribution_page_id again.
+   */
+  public function testRepeatTransactionWithChangedContributionPageIdAtTheTemplateContribution(): void {
+    $contributionPage = $this->contributionPageCreate(['receipt_from_name' => 'CiviCRM LLC', 'receipt_from_email' => 'contributionpage@civicrm.org', 'is_email_receipt' => 1]);
+    $contributionPage2 = $this->contributionPageCreate(['receipt_from_name' => 'CiviCRM LLC', 'receipt_from_email' => 'contributionpage@civicrm.org', 'is_email_receipt' => 1]);
+    $contributionRecurParams = [
+      'contribution_page_id' => $contributionPage['id'],
+    ];
+    $contributionParams = [
+      'contribution_page_id' => $contributionPage['id'],
+      'trxn_id' => 'number_1',
+    ];
+    $originalContribution = $this->setUpRepeatTransaction($contributionRecurParams, 'single', $contributionParams);
+
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'contribution_recur_id' => $originalContribution['contribution_recur_id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'number_2',
+    ]);
+
+    $templateContributionId = CRM_Contribute_BAO_ContributionRecur::ensureTemplateContributionExists($originalContribution['contribution_recur_id']);
+    $contribution = Contribution::get()
+      ->addWhere('id', '=', $templateContributionId)
+      ->setSelect(['id', 'contribution_page_id'])
+      ->execute()
+      ->single();
+    $this->assertEquals($contributionPage['id'], $contribution['contribution_page_id']);
+
+    Contribution::update()
+      ->setValues(['contribution_page_id' => $contributionPage2['id']])
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute();
+
+    // Test whether the contribution recur record is updated after the update of the
+    // template contribution.
+    $contributionRecur = ContributionRecur::get()
+      ->setSelect(['id', 'contribution_page_id'])
+      ->addWhere('id', '=', $originalContribution['contribution_recur_id'])
+      ->execute()
+      ->single();
+    $this->assertEquals($contributionPage2['id'], $contributionRecur['contribution_page_id']);
+
+    $this->callAPISuccess('contribution', 'repeattransaction', [
+      'contribution_recur_id' => $originalContribution['contribution_recur_id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'number_3',
+    ]);
+
+    // Test whether the contribution page is taken from the contribution recur object
+    $contribution = Contribution::get()
+      ->addWhere('trxn_id', '=', 'number_3')
+      ->setSelect(['id', 'contribution_page_id'])
+      ->execute()
+      ->single();
+    $this->assertEquals($contributionRecur['contribution_page_id'], $contribution['contribution_page_id']);
+  }
+
+  /**
    * Test Contribution with Order api.
    *
    * @throws \CRM_Core_Exception

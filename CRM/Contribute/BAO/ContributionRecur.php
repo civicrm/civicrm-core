@@ -512,7 +512,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   public static function getTemplateContribution(int $id, array $inputOverrides = []): array {
     $recurringContribution = ContributionRecur::get(FALSE)
       ->addWhere('id', '=', $id)
-      ->setSelect(['is_test', 'financial_type_id', 'amount', 'campaign_id'])
+      ->setSelect(['is_test', 'financial_type_id', 'amount', 'campaign_id', 'contribution_page_id'])
       ->execute()
       ->first();
 
@@ -522,6 +522,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $overrides = array_filter([
       'is_test' => $inputOverrides['is_test'] ?? $recurringContribution['is_test'],
       'financial_type_id' => $inputOverrides['financial_type_id'] ?? ($recurringContribution['financial_type_id'] ?? ''),
+      'contribution_page_id' => $inputOverrides['contribution_page_id'] ?? ($recurringContribution['contribution_page_id'] ?? ''),
       'campaign_id' => $inputOverrides['campaign_id'] ?? ($recurringContribution['campaign_id'] ?? ''),
       'total_amount' => $inputOverrides['total_amount'] ?? $recurringContribution['amount'],
     ], 'strlen');
@@ -980,7 +981,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       return;
     }
 
-    if ($contribution->total_amount === NULL || $contribution->currency === NULL || $contribution->is_template === NULL) {
+    if ($contribution->total_amount === NULL || $contribution->currency === NULL || $contribution->is_template === NULL || $contribution->contribution_page_id) {
       // The contribution has not been fully loaded, so fetch a full copy now.
       $contribution->find(TRUE);
     }
@@ -993,10 +994,17 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       ->execute()
       ->first();
 
+    $updateValues = [];
     if ($contribution->currency !== $contributionRecur['currency'] || !CRM_Utils_Money::equals($contributionRecur['amount'], $contribution->total_amount, $contribution->currency)) {
+      $updateValues['amount'] = $contribution->total_amount;
+      $updateValues['currency'] = $contribution->currency;
+    }
+    if ($contribution->contribution_page_id != $contributionRecur['contribution_page_id']) {
+      $updateValues['contribution_page_id'] = $contribution->contribution_page_id;
+    }
+    if (count($updateValues)) {
       ContributionRecur::update(FALSE)
-        ->addValue('amount', $contribution->total_amount)
-        ->addValue('currency', $contribution->currency)
+        ->setValues($updateValues)
         ->addValue('modified_date', 'now')
         ->addWhere('id', '=', $contributionRecur['id'])
         ->execute();

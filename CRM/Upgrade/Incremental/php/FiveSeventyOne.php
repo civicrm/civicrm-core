@@ -29,6 +29,26 @@ class CRM_Upgrade_Incremental_php_FiveSeventyOne extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_71_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('dev/core#4947 - Add contribution_page_id column to civicrm_contribution_recur table', 'addColumn', 'civicrm_contribution_recur', 'contribution_page_id',
+      'int unsigned COMMENT "The Contribution Page which triggered this contribution"');
+    $this->addTask('dev/core#4947 - Add contribution_page_id foreign key to civicrm_contribution_recur', 'addContributionPageIdFKToContributionRecur');
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function addContributionPageIdFKToContributionRecur(CRM_Queue_TaskContext $ctx): bool {
+    if (!self::checkFKExists('civicrm_contribution_recur', 'FK_civicrm_contribution_recur_contribution_page_id')) {
+      CRM_Core_DAO::executeQuery("
+        ALTER TABLE `civicrm_contribution_recur`
+          ADD CONSTRAINT `FK_civicrm_contribution_recur_contribution_page_id`
+            FOREIGN KEY (`contribution_page_id`) REFERENCES `civicrm_contribution_page` (`id`)
+            ON DELETE SET NULL;
+      ", [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
   }
 
 }

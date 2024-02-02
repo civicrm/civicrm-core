@@ -1106,7 +1106,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return int|null
    */
   private function processRecurringContribution(array $params, array $recurParams) {
-
+    $recurParams['contribution_page_id'] = $this->getContributionPageID();
     $recurParams['amount'] = $params['amount'] ?? NULL;
     $recurParams['auto_renew'] = $params['auto_renew'] ?? NULL;
     $recurParams['frequency_unit'] = $params['frequency_unit'] ?? NULL;
