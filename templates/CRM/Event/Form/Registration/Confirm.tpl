@@ -33,9 +33,9 @@
       {include file="CRM/common/formButtons.tpl" location="top"}
     </div>
 
-    {if $event.confirm_text}
+    {if $confirm_text}
         <div id="intro_text" class="crm-section event_confirm_text-section">
-          <p>{$event.confirm_text}</p>
+          <p>{$confirm_text|escape}</p>
         </div>
     {/if}
 
