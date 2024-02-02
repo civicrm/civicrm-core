@@ -219,7 +219,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $button = substr($this->controller->getButtonName(), -4);
 
     if ($this->_values['event']['is_monetary']) {
-      CRM_Event_Form_Registration_Register::buildAmount($this, TRUE, NULL, $this->_priceSetId);
+      $this->buildAmount(TRUE, NULL, $this->_priceSetId);
     }
     $this->assign('priceSet', $this->_priceSet);
 
