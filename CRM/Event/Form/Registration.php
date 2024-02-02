@@ -597,7 +597,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Initiate event fee.
    *
-   * @param \CRM_Event_Form_Registration|\CRM_Event_Form_ParticipantFeeSelection $form
+   * @param \CRM_Event_Form_Registration $form
    * @param bool $doNotIncludeExpiredFields
    *   See CRM-16456.
    * @param int|null $priceSetId
@@ -605,7 +605,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @internal function has had several recent signature changes & is expected to be eventually removed.
    */
-  public static function initEventFee($form, $doNotIncludeExpiredFields, $priceSetId): void {
+  private static function initEventFee($form, $doNotIncludeExpiredFields, $priceSetId): void {
     if (!$priceSetId) {
       CRM_Core_Error::deprecatedWarning('this should not be reachable');
       return;
