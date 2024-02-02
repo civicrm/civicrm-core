@@ -1647,7 +1647,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // In v4 of the api they are not available via CRUD. At some
     // point we will create a 'submit' function which will do the crud+submit
     // but for now only CRUD is available via v4 api.
-    if (($params['version'] ?? '') !== 4) {
+    if (empty($params['skip_legacy_scheduling'])) {
       self::doSubmitActions($params, $mailing);
     }
 
