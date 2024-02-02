@@ -328,13 +328,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $config = CRM_Core_Config::singleton();
 
     $contactID = $this->getContactID();
+    $this->assign('contact_id', $contactID);
     if ($contactID) {
-      $this->assign('contact_id', $contactID);
       $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
     }
 
     $this->applyFilter('__ALL__', 'trim');
-    $this->assign('showMainEmail', !empty($this->_ccid));
+    $this->assign('showMainEmail', empty($this->_ccid));
     if (empty($this->_ccid)) {
       if ($this->_emailExists == FALSE) {
         $this->add('text', "email-{$this->_bltID}",
