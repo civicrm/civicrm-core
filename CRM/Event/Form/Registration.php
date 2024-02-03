@@ -309,7 +309,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $priceSetID = $this->getPriceSetID();
       if ($priceSetID) {
         $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
-        self::initEventFee($this, TRUE, $priceSetID);
+        $this->initEventFee();
 
         //fix for non-upgraded price sets.CRM-4256.
         if (isset($this->_isPaidEvent)) {
@@ -597,46 +597,36 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Initiate event fee.
    *
-   * @param \CRM_Event_Form_Registration $form
-   * @param bool $doNotIncludeExpiredFields
-   *   See CRM-16456.
-   * @param int|null $priceSetId
-   *   ID of the price set in use.
-   *
    * @internal function has had several recent signature changes & is expected to be eventually removed.
    */
-  private static function initEventFee($form, $doNotIncludeExpiredFields, $priceSetId): void {
-    if (!$priceSetId) {
-      CRM_Core_Error::deprecatedWarning('this should not be reachable');
-      return;
-    }
-
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, NULL, $doNotIncludeExpiredFields);
-    $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
-    $form->_values['fee'] = $form->_priceSet['fields'] ?? NULL;
+  private function initEventFee(): void {
+    $priceSetId = $this->getPriceSetID();
+    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->getPriceSetID(), NULL, TRUE);
+    $this->_priceSet = $priceSet[$this->getPriceSetID()] ?? NULL;
+    $this->_values['fee'] = $this->_priceSet['fields'] ?? [];
 
     //get the price set fields participant count.
     //get option count info.
-    $form->_priceSet['optionsCountTotal'] = CRM_Price_BAO_PriceSet::getPricesetCount($priceSetId);
-    if ($form->_priceSet['optionsCountTotal']) {
+    $this->_priceSet['optionsCountTotal'] = CRM_Price_BAO_PriceSet::getPricesetCount($priceSetId);
+    if ($this->_priceSet['optionsCountTotal']) {
       $optionsCountDetails = [];
-      if (!empty($form->_priceSet['fields'])) {
-        foreach ($form->_priceSet['fields'] as $field) {
+      if (!empty($this->_priceSet['fields'])) {
+        foreach ($this->_priceSet['fields'] as $field) {
           foreach ($field['options'] as $option) {
             $count = $option['count'] ?? 0;
             $optionsCountDetails['fields'][$field['id']]['options'][$option['id']] = $count;
           }
         }
       }
-      $form->_priceSet['optionsCountDetails'] = $optionsCountDetails;
+      $this->_priceSet['optionsCountDetails'] = $optionsCountDetails;
     }
 
     //get option max value info.
     $optionsMaxValueTotal = 0;
     $optionsMaxValueDetails = [];
 
-    if (!empty($form->_priceSet['fields'])) {
-      foreach ($form->_priceSet['fields'] as $field) {
+    if (!empty($this->_priceSet['fields'])) {
+      foreach ($this->_priceSet['fields'] as $field) {
         foreach ($field['options'] as $option) {
           $maxVal = $option['max_value'] ?? 0;
           $optionsMaxValueDetails['fields'][$field['id']]['options'][$option['id']] = $maxVal;
@@ -645,16 +635,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
 
-    $form->_priceSet['optionsMaxValueTotal'] = $optionsMaxValueTotal;
+    $this->_priceSet['optionsMaxValueTotal'] = $optionsMaxValueTotal;
     if ($optionsMaxValueTotal) {
-      $form->_priceSet['optionsMaxValueDetails'] = $optionsMaxValueDetails;
+      $this->_priceSet['optionsMaxValueDetails'] = $optionsMaxValueDetails;
     }
-    $form->set('priceSet', $form->_priceSet);
-
-    $eventFee = $form->_values['fee'] ?? NULL;
-    if (!is_array($eventFee) || empty($eventFee)) {
-      $form->_values['fee'] = [];
-    }
+    $this->set('priceSet', $this->_priceSet);
   }
 
   /**
