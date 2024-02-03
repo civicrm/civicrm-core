@@ -1787,7 +1787,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if ($priceSetID) {
 
       //format price set fields across option full.
-      $this->formatPriceFieldsForFull();
+      $this->formatPriceFieldsForFull($form->_feeBlock);
       // This is probably not required now - normally loaded from event ....
       $form->add('hidden', 'priceSetId', $priceSetID);
 
@@ -1879,7 +1879,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    *
    */
-  protected function formatPriceFieldsForFull() {
+  protected function formatPriceFieldsForFull(&$feeBlock): void {
     $form = $this;
     $priceSet = $form->get('priceSet');
     $priceSetId = $form->get('priceSetId');
@@ -1918,7 +1918,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($form->_eventId, $skipParticipants);
 
     $currentParticipantNo = (int) substr($form->_name, 12);
-    foreach ($form->_feeBlock as & $field) {
+    foreach ($feeBlock as & $field) {
       $optionFullIds = [];
       $fieldId = $field['id'];
       if (!is_array($field['options'])) {
