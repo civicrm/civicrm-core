@@ -130,7 +130,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
 
-    $priceSetValues = $this->getPriceSetDefaults($this->_participantId, $this->_eventId);
+    $priceSetValues = $this->getPriceSetDefaults();
     $priceFieldId = (array_keys($this->_values['fee']));
     if (!empty($priceSetValues)) {
       $defaults[$this->_participantId] = array_merge($defaults[$this->_participantId], $priceSetValues);
@@ -157,25 +157,11 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
   /**
    * This function sets the default values for price set.
    *
-   * @param int $participantID
-   * @param int $eventID
-   *
    * @return array
    */
-  private function getPriceSetDefaults($participantID, $eventID = NULL) {
+  private function getPriceSetDefaults() {
     $defaults = [];
-    if (!$eventID && $participantID) {
-      $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantID, 'event_id');
-    }
-    if (!$participantID || !$eventID) {
-      return $defaults;
-    }
-
-    // get price set ID.
-    $priceSetID = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID);
-    if (!$priceSetID) {
-      return $defaults;
-    }
+    $participantID = $this->getParticipantID();
 
     // use line items for setdefault price set fields, CRM-4090
     $lineItems[$participantID] = CRM_Price_BAO_LineItem::getLineItems($participantID, 'participant', FALSE, FALSE);
@@ -214,7 +200,7 @@ SELECT  id, html_type
           continue;
         }
 
-        if ($htmlType == 'Text') {
+        if ($htmlType === 'Text') {
           $defaults["price_{$fieldId}"] = $items['qty'];
         }
         else {
@@ -224,7 +210,7 @@ SELECT  id, html_type
           }
 
           foreach ($fieldOptValues as $optionId) {
-            if ($htmlType == 'CheckBox') {
+            if ($htmlType === 'CheckBox') {
               $defaults["price_{$fieldId}"][$optionId] = TRUE;
             }
             else {
