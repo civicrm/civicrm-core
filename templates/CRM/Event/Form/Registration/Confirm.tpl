@@ -186,4 +186,3 @@
         </div>
     {/if}
 </div>
-{include file="CRM/common/showHide.tpl"}
