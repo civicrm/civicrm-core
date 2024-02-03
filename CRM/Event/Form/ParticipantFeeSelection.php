@@ -126,11 +126,11 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $params = ['id' => $this->_participantId];
+    $params = ['id' => $this->getParticipantID()];
 
     CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
 
-    $priceSetValues = CRM_Event_Form_EventFees::setDefaultPriceSet($this->_participantId, $this->_eventId, FALSE);
+    $priceSetValues = $this->getPriceSetDefaults();
     $priceFieldId = (array_keys($this->_values['fee']));
     if (!empty($priceSetValues)) {
       $defaults[$this->_participantId] = array_merge($defaults[$this->_participantId], $priceSetValues);
@@ -151,6 +151,77 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       $this->assign('fee_amount', CRM_Utils_Array::value('fee_amount', $defaults[$this->_participantId]));
     }
     $defaults = $defaults[$this->_participantId];
+    return $defaults;
+  }
+
+  /**
+   * This function sets the default values for price set.
+   *
+   * @return array
+   */
+  private function getPriceSetDefaults() {
+    $defaults = [];
+    $participantID = $this->getParticipantID();
+
+    // use line items for setdefault price set fields, CRM-4090
+    $lineItems[$participantID] = CRM_Price_BAO_LineItem::getLineItems($participantID, 'participant', FALSE, FALSE);
+
+    if (is_array($lineItems[$participantID]) &&
+      !CRM_Utils_System::isNull($lineItems[$participantID])
+    ) {
+
+      $priceFields = $htmlTypes = $optionValues = [];
+      foreach ($lineItems[$participantID] as $lineId => $items) {
+        $priceFieldId = $items['price_field_id'] ?? NULL;
+        $priceOptionId = $items['price_field_value_id'] ?? NULL;
+        if ($priceFieldId && $priceOptionId) {
+          $priceFields[$priceFieldId][] = $priceOptionId;
+        }
+      }
+
+      if (empty($priceFields)) {
+        return $defaults;
+      }
+
+      // get all price set field html types.
+      $sql = '
+SELECT  id, html_type
+  FROM  civicrm_price_field
+ WHERE  id IN (' . implode(',', array_keys($priceFields)) . ')';
+      $fieldDAO = CRM_Core_DAO::executeQuery($sql);
+      while ($fieldDAO->fetch()) {
+        $htmlTypes[$fieldDAO->id] = $fieldDAO->html_type;
+      }
+
+      foreach ($lineItems[$participantID] as $lineId => $items) {
+        $fieldId = $items['price_field_id'];
+        $htmlType = $htmlTypes[$fieldId] ?? NULL;
+        if (!$htmlType) {
+          continue;
+        }
+
+        if ($htmlType === 'Text') {
+          $defaults["price_{$fieldId}"] = $items['qty'];
+        }
+        else {
+          $fieldOptValues = $priceFields[$fieldId] ?? NULL;
+          if (!is_array($fieldOptValues)) {
+            continue;
+          }
+
+          foreach ($fieldOptValues as $optionId) {
+            if ($htmlType === 'CheckBox') {
+              $defaults["price_{$fieldId}"][$optionId] = TRUE;
+            }
+            else {
+              $defaults["price_{$fieldId}"] = $optionId;
+              break;
+            }
+          }
+        }
+      }
+    }
+
     return $defaults;
   }
 
