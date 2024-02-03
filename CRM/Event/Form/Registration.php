@@ -1789,7 +1789,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if ($priceSetID) {
 
       //format price set fields across option full.
-      CRM_Event_Form_Registration_Register::formatFieldsForOptionFull($form);
+      $this->formatPriceFieldsForFull();
       // This is probably not required now - normally loaded from event ....
       $form->add('hidden', 'priceSetId', $priceSetID);
 
@@ -1875,6 +1875,96 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       if ($required) {
         $form->addRule('amount', ts('Fee Level is a required field.'), 'required');
       }
+    }
+  }
+
+  /**
+   *
+   */
+  protected function formatPriceFieldsForFull() {
+    $form = $this;
+    $priceSet = $form->get('priceSet');
+    $priceSetId = $form->get('priceSetId');
+    $defaultPricefieldIds = [];
+    if (!empty($form->_values['line_items'])) {
+      foreach ($form->_values['line_items'] as $lineItem) {
+        $defaultPricefieldIds[] = $lineItem['price_field_value_id'];
+      }
+    }
+    if (!$priceSetId ||
+      !is_array($priceSet) ||
+      empty($priceSet) || empty($priceSet['optionsMaxValueTotal'])
+    ) {
+      return;
+    }
+
+    $skipParticipants = $formattedPriceSetDefaults = [];
+    if (!empty($form->_allowConfirmation) && (isset($form->_pId) || isset($form->_additionalParticipantId))) {
+      $participantId = $form->_pId ?? $form->_additionalParticipantId;
+      $pricesetDefaults = CRM_Event_Form_EventFees::setDefaultPriceSet($participantId,
+        $form->_eventId
+      );
+      // modify options full to respect the selected fields
+      // options on confirmation.
+      $formattedPriceSetDefaults = self::formatPriceSetParams($form, $pricesetDefaults);
+
+      // to skip current registered participants fields option count on confirmation.
+      $skipParticipants[] = $form->_participantId;
+      if (!empty($form->_additionalParticipantIds)) {
+        $skipParticipants = array_merge($skipParticipants, $form->_additionalParticipantIds);
+      }
+    }
+
+    //get the current price event price set options count.
+    $currentOptionsCount = self::getPriceSetOptionCount($form);
+    $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($form->_eventId, $skipParticipants);
+
+    $currentParticipantNo = (int) substr($form->_name, 12);
+    foreach ($form->_feeBlock as & $field) {
+      $optionFullIds = [];
+      $fieldId = $field['id'];
+      if (!is_array($field['options'])) {
+        continue;
+      }
+      foreach ($field['options'] as & $option) {
+        $optId = $option['id'];
+        $count = $option['count'] ?? 0;
+        $maxValue = $option['max_value'] ?? 0;
+        $dbTotalCount = $recordedOptionsCount[$optId] ?? 0;
+        $currentTotalCount = $currentOptionsCount[$optId] ?? 0;
+
+        $totalCount = $currentTotalCount + $dbTotalCount;
+        $isFull = FALSE;
+        if ($maxValue &&
+          (($totalCount >= $maxValue) &&
+            (empty($form->_lineItem[$currentParticipantNo][$optId]['price_field_id']) || $dbTotalCount >= $maxValue))
+        ) {
+          $isFull = TRUE;
+          $optionFullIds[$optId] = $optId;
+          if ($field['html_type'] === 'Select') {
+            if (!empty($defaultPricefieldIds) && in_array($optId, $defaultPricefieldIds)) {
+              unset($optionFullIds[$optId]);
+            }
+          }
+        }
+        //here option is not full,
+        //but we don't want to allow participant to increase
+        //seats at the time of re-walking registration.
+        if ($count &&
+          !empty($form->_allowConfirmation) &&
+          !empty($formattedPriceSetDefaults)
+        ) {
+          if (empty($formattedPriceSetDefaults["price_{$field}"]) || empty($formattedPriceSetDefaults["price_{$fieldId}"][$optId])) {
+            $optionFullIds[$optId] = $optId;
+            $isFull = TRUE;
+          }
+        }
+        $option['is_full'] = $isFull;
+        $option['db_total_count'] = $dbTotalCount;
+      }
+
+      //finally get option ids in.
+      $field['option_full_ids'] = $optionFullIds;
     }
   }
 

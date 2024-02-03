@@ -348,7 +348,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
     if ($form->getEventValue('is_monetary')) {
       $form->_feeBlock = $form->_values['fee'];
-      CRM_Event_Form_Registration_Register::formatFieldsForOptionFull($form);
+      $form->formatPriceFieldsForFull();
 
       if (!empty($form->_priceSetId) &&
         !$form->_requireApproval && !$form->_allowWaitlist
