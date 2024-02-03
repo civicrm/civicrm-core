@@ -47,6 +47,7 @@ trait CRM_Custom_Form_CustomDataTrait {
       'values' => $filters,
       'where' => [
         ['type', '=', 'Custom'],
+        ['readonly', '=', FALSE],
       ],
       'checkPermissions' => TRUE,
     ])->indexBy('custom_field_id');
