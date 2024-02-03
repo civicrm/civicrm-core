@@ -54,14 +54,19 @@ class Display {
    * @param string|bool $addLabel
    *   Pass a string to supply a custom label, TRUE to use the default,
    *   or FALSE to keep the %1 placeholders in the text (used for the admin UI)
+   * @param array|null $excludeActions
    * @return array[]
    */
-  public static function getEntityLinks(string $entity, $addLabel = FALSE): array {
-    $links = (array) civicrm_api4($entity, 'getLinks', [
+  public static function getEntityLinks(string $entity, $addLabel = FALSE, array $excludeActions = NULL): array {
+    $apiParams = [
       'checkPermissions' => FALSE,
       'entityTitle' => $addLabel,
       'select' => ['ui_action', 'entity', 'text', 'icon', 'target'],
-    ]);
+    ];
+    if ($excludeActions) {
+      $apiParams['where'][] = ['ui_action', 'NOT IN', $excludeActions];
+    }
+    $links = (array) civicrm_api4($entity, 'getLinks', $apiParams);
     $styles = [
       'delete' => 'danger',
       'add' => 'primary',
