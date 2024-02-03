@@ -62,6 +62,8 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   protected $contributionAmt = NULL;
 
+  private CRM_Financial_BAO_Order $order;
+
   public function preProcess() {
     $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
 
@@ -118,6 +120,59 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       }
     }
     return $this->contributionID ?: NULL;
+  }
+
+  protected function getOrder(): CRM_Financial_BAO_Order {
+    if (!isset($this->order)) {
+      $this->initializeOrder();
+    }
+    return $this->order;
+  }
+
+  protected function initializeOrder(): void {
+    $this->order = new CRM_Financial_BAO_Order();
+    $this->order->setPriceSetID($this->getPriceSetID());
+    $this->order->setIsExcludeExpiredFields($this->_action !== CRM_Core_Action::UPDATE);
+    $this->order->setForm($this);
+    foreach ($this->getPriceFieldMetaData() as $priceField) {
+      if ($priceField['html_type'] === 'Text') {
+        $this->submittableMoneyFields[] = 'price_' . $priceField['id'];
+      }
+    }
+  }
+
+  /**
+   * Get the form context.
+   *
+   * This is important for passing to the buildAmount hook as CiviDiscount checks it.
+   *
+   * @return string
+   */
+  public function getFormContext(): string {
+    return 'event';
+  }
+
+  /**
+   * Get price field metadata.
+   *
+   * The returned value is an array of arrays where each array
+   * is an id-keyed price field and an 'options' key has been added to that
+   * arry for any options.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return array
+   */
+  public function getPriceFieldMetaData(): array {
+    if (!empty($this->_values['fee'])) {
+      return $this->_values['fee'];
+    }
+    if (!empty($this->_priceSet['fields'])) {
+      return $this->_priceSet['fields'];
+    }
+    return $this->order->getPriceFieldsMetadata();
   }
 
   /**
@@ -248,6 +303,8 @@ SELECT  id, html_type
     $this->_values = [];
 
     $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
+    $this->_priceSet = $this->getOrder()->getPriceSetMetadata();
+    $this->setPriceFieldMetaData($this->order->getPriceFieldsMetadata());
     self::initializeEventFee($this, $this->_action !== CRM_Core_Action::UPDATE, $this->getPriceSetID());
     $this->buildAmount(TRUE, NULL, $this->getPriceSetID());
 
@@ -299,6 +356,15 @@ SELECT  id, html_type
 
     $this->addButtons($buttons);
     $this->addFormRule(['CRM_Event_Form_ParticipantFeeSelection', 'formRule'], $this);
+  }
+
+  /**
+   * Set price field metadata.
+   *
+   * @param array $metadata
+   */
+  protected function setPriceFieldMetaData(array $metadata): void {
+    $this->_values['fee'] = $this->_priceSet['fields'] = $metadata;
   }
 
   /**
@@ -710,20 +776,11 @@ SELECT  id, html_type
    *
    * Formerly shared function.
    *
-   * @param \CRM_Event_Form_ParticipantFeeSelection $form
-   * @param bool $doNotIncludeExpiredFields
-   *   See CRM-16456.
-   * @param int|null $priceSetId
-   *   ID of the price set in use.
-   *
    * @internal function has had several recent signature changes & is expected to be eventually removed.
    */
-  private static function initializeEventFee($form, $doNotIncludeExpiredFields, $priceSetId): void {
-
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, NULL, $doNotIncludeExpiredFields);
-    $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
-    $form->_values['fee'] = $form->_priceSet['fields'] ?? NULL;
-
+  private function initializeEventFee(): void {
+    $priceSetId = $this->getPriceSetID();
+    $form = $this;
     //get the price set fields participant count.
     //get option count info.
     $form->_priceSet['optionsCountTotal'] = CRM_Price_BAO_PriceSet::getPricesetCount($priceSetId);
