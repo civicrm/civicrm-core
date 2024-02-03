@@ -725,39 +725,20 @@ SELECT  id, html_type
     $form->_values['fee'] = $form->_priceSet['fields'] ?? NULL;
 
     //get the price set fields participant count.
-    //get option count info.
-    $form->_priceSet['optionsCountTotal'] = CRM_Price_BAO_PriceSet::getPricesetCount($priceSetId);
-    if ($form->_priceSet['optionsCountTotal']) {
-      $optionsCountDetails = [];
-      if (!empty($form->_priceSet['fields'])) {
-        foreach ($form->_priceSet['fields'] as $field) {
-          foreach ($field['options'] as $option) {
-            $count = $option['count'] ?? 0;
-            $optionsCountDetails['fields'][$field['id']]['options'][$option['id']] = $count;
-          }
-        }
-      }
-      $form->_priceSet['optionsCountDetails'] = $optionsCountDetails;
-    }
-
     //get option max value info.
     $optionsMaxValueTotal = 0;
-    $optionsMaxValueDetails = [];
 
     if (!empty($form->_priceSet['fields'])) {
       foreach ($form->_priceSet['fields'] as $field) {
         foreach ($field['options'] as $option) {
           $maxVal = $option['max_value'] ?? 0;
-          $optionsMaxValueDetails['fields'][$field['id']]['options'][$option['id']] = $maxVal;
           $optionsMaxValueTotal += $maxVal;
         }
       }
     }
 
     $form->_priceSet['optionsMaxValueTotal'] = $optionsMaxValueTotal;
-    if ($optionsMaxValueTotal) {
-      $form->_priceSet['optionsMaxValueDetails'] = $optionsMaxValueDetails;
-    }
+
     $form->set('priceSet', $form->_priceSet);
 
     $eventFee = $form->_values['fee'] ?? NULL;
