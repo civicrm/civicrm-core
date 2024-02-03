@@ -662,10 +662,17 @@ class CRM_Core_Permission {
       'view all contacts' => [
         'label' => $prefix . ts('view all contacts'),
         'description' => ts('View ANY CONTACT in the CiviCRM database, export contact info and perform activities such as Send Email, Phone Call, etc.'),
+        'implies' => [
+          'view my contact',
+        ],
       ],
       'edit all contacts' => [
         'label' => $prefix . ts('edit all contacts'),
         'description' => ts('View, Edit and Delete ANY CONTACT in the CiviCRM database; Create and edit relationships, tags and other info about the contacts'),
+        'implies' => [
+          'view all contacts',
+          'edit my contact',
+        ],
       ],
       'view my contact' => [
         'label' => $prefix . ts('view my contact'),
@@ -711,6 +718,9 @@ class CRM_Core_Permission {
       'profile listings and forms' => [
         'label' => $prefix . ts('profile listings and forms'),
         'description' => ts('Warning: Give to trusted roles only; this permission has privacy implications. Add/edit data in online forms and access public searchable directories.'),
+        'implies' => [
+          'profile listings',
+        ],
       ],
       'profile listings' => [
         'label' => $prefix . ts('profile listings'),
@@ -825,6 +835,10 @@ class CRM_Core_Permission {
       'edit all manual batches' => [
         'label' => $prefix . ts('edit all manual batches'),
         'description' => ts('Edit all accounting batches'),
+        'implies' => [
+          'view all manual batches',
+          'edit own manual batches',
+        ],
       ],
       'close own manual batches' => [
         'label' => $prefix . ts('close own manual batches'),
@@ -833,6 +847,9 @@ class CRM_Core_Permission {
       'close all manual batches' => [
         'label' => $prefix . ts('close all manual batches'),
         'description' => ts('Close all accounting batches (with Access to CiviContribute)'),
+        'implies' => [
+          'close own manual batches',
+        ],
       ],
       'reopen own manual batches' => [
         'label' => $prefix . ts('reopen own manual batches'),
@@ -841,6 +858,9 @@ class CRM_Core_Permission {
       'reopen all manual batches' => [
         'label' => $prefix . ts('reopen all manual batches'),
         'description' => ts('Reopen all accounting batches (with Access to CiviContribute)'),
+        'implies' => [
+          'reopen own manual batches',
+        ],
       ],
       'view own manual batches' => [
         'label' => $prefix . ts('view own manual batches'),
@@ -849,6 +869,9 @@ class CRM_Core_Permission {
       'view all manual batches' => [
         'label' => $prefix . ts('view all manual batches'),
         'description' => ts('View all accounting batches (with Access to CiviContribute)'),
+        'implies' => [
+          'view own manual batches',
+        ],
       ],
       'delete own manual batches' => [
         'label' => $prefix . ts('delete own manual batches'),
@@ -857,6 +880,9 @@ class CRM_Core_Permission {
       'delete all manual batches' => [
         'label' => $prefix . ts('delete all manual batches'),
         'description' => ts('Delete all accounting batches'),
+        'implies' => [
+          'delete own manual batches',
+        ],
       ],
       'export own manual batches' => [
         'label' => $prefix . ts('export own manual batches'),
@@ -865,6 +891,9 @@ class CRM_Core_Permission {
       'export all manual batches' => [
         'label' => $prefix . ts('export all manual batches'),
         'description' => ts('Export all accounting batches'),
+        'implies' => [
+          'export own manual batches',
+        ],
       ],
       'administer payment processors' => [
         'label' => $prefix . ts('administer payment processors'),
@@ -890,10 +919,13 @@ class CRM_Core_Permission {
       'edit api keys' => [
         'label' => $prefix . ts('edit api keys'),
         'description' => ts('Edit API keys'),
+        'implies' => [
+          'edit own api keys',
+        ],
       ],
       'edit own api keys' => [
         'label' => $prefix . ts('edit own api keys'),
-        'description' => ts('Edit user\'s own API keys'),
+        'description' => ts("Edit user's own API keys"),
       ],
       'send SMS' => [
         'label' => $prefix . ts('send SMS'),
