@@ -32,6 +32,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public $_eventId;
 
+  private CRM_Financial_BAO_Order $order;
+
+  protected function getOrder(): CRM_Financial_BAO_Order {
+    if (!isset($this->order)) {
+      $this->initializeOrder();
+    }
+    return $this->order;
+  }
+
   /**
    * Get the selected Event ID.
    *
@@ -52,6 +61,38 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
     return $this->_eventId;
+  }
+
+  /**
+   * Set price field metadata.
+   *
+   * @param array $metadata
+   */
+  protected function setPriceFieldMetaData(array $metadata): void {
+    $this->_values['fee'] = $this->_priceSet['fields'] = $metadata;
+  }
+
+  /**
+   * Get price field metadata.
+   *
+   * The returned value is an array of arrays where each array
+   * is an id-keyed price field and an 'options' key has been added to that
+   * arry for any options.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return array
+   */
+  public function getPriceFieldMetaData(): array {
+    if (!empty($this->_values['fee'])) {
+      return $this->_values['fee'];
+    }
+    if (!empty($this->_priceSet['fields'])) {
+      return $this->_priceSet['fields'];
+    }
+    return $this->order->getPriceFieldsMetadata();
   }
 
   /**
@@ -309,6 +350,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $priceSetID = $this->getPriceSetID();
       if ($priceSetID) {
         $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
+        $this->_priceSet = $this->getOrder()->getPriceSetMetadata();
+        $this->setPriceFieldMetaData($this->order->getPriceFieldsMetadata());
         $this->initEventFee();
 
         //fix for non-upgraded price sets.CRM-4256.
@@ -601,9 +644,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   private function initEventFee(): void {
     $priceSetId = $this->getPriceSetID();
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->getPriceSetID(), NULL, TRUE);
-    $this->_priceSet = $priceSet[$this->getPriceSetID()] ?? NULL;
-    $this->_values['fee'] = $this->_priceSet['fields'] ?? [];
 
     //get the price set fields participant count.
     //get option count info.
@@ -625,13 +665,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $optionsMaxValueTotal = 0;
     $optionsMaxValueDetails = [];
 
-    if (!empty($this->_priceSet['fields'])) {
-      foreach ($this->_priceSet['fields'] as $field) {
-        foreach ($field['options'] as $option) {
-          $maxVal = $option['max_value'] ?? 0;
-          $optionsMaxValueDetails['fields'][$field['id']]['options'][$option['id']] = $maxVal;
-          $optionsMaxValueTotal += $maxVal;
-        }
+    foreach ($this->getPriceFieldMetaData() as $field) {
+      foreach ($field['options'] as $option) {
+        $maxVal = $option['max_value'] ?? 0;
+        $optionsMaxValueDetails['fields'][$field['id']]['options'][$option['id']] = $maxVal;
+        $optionsMaxValueTotal += $maxVal;
       }
     }
 
@@ -640,6 +678,29 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->_priceSet['optionsMaxValueDetails'] = $optionsMaxValueDetails;
     }
     $this->set('priceSet', $this->_priceSet);
+  }
+
+  protected function initializeOrder(): void {
+    $this->order = new CRM_Financial_BAO_Order();
+    $this->order->setPriceSetID($this->getPriceSetID());
+    $this->order->setIsExcludeExpiredFields(TRUE);
+    $this->order->setForm($this);
+    foreach ($this->getPriceFieldMetaData() as $priceField) {
+      if ($priceField['html_type'] === 'Text') {
+        $this->submittableMoneyFields[] = 'price_' . $priceField['id'];
+      }
+    }
+  }
+
+  /**
+   * Get the form context.
+   *
+   * This is important for passing to the buildAmount hook as CiviDiscount checks it.
+   *
+   * @return string
+   */
+  public function getFormContext(): string {
+    return 'event';
   }
 
   /**
@@ -1739,28 +1800,19 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $priceSetID = $this->_priceSetId;
     $required = TRUE;
     $discountId = NULL;
-    $feeFields = $form->_values['fee'] ?? NULL;
-
-    if (is_array($feeFields)) {
-      $form->_feeBlock = &$form->_values['fee'];
-    }
+    $feeFields = $this->getPriceFieldMetaData();
 
     //check for discount.
     $discountedFee = $form->_values['discount'] ?? NULL;
     if (is_array($discountedFee) && !empty($discountedFee)) {
+      CRM_Core_Error::deprecatedWarning('code believed to be unreachable.');
       if (!$discountId) {
         $form->_discountId = $discountId = CRM_Core_BAO_Discount::findSet($form->_eventId, 'civicrm_event');
       }
       if ($discountId) {
-        $form->_feeBlock = &$form->_values['discount'][$discountId];
+        $feeFields = &$form->_values['discount'][$discountId];
       }
     }
-    if (!is_array($form->_feeBlock)) {
-      $form->_feeBlock = [];
-    }
-
-    //its time to call the hook.
-    CRM_Utils_Hook::buildAmount('event', $form, $form->_feeBlock);
 
     //reset required if participant is skipped.
     $button = substr($form->controller->getButtonName(), -4);
@@ -1772,7 +1824,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if ($priceSetID) {
 
       //format price set fields across option full.
-      $this->formatPriceFieldsForFull($form->_feeBlock);
+      $this->formatPriceFieldsForFull($feeFields);
       // This is probably not required now - normally loaded from event ....
       $form->add('hidden', 'priceSetId', $priceSetID);
 
@@ -1780,7 +1832,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM data');
       $hideAdminValues = !CRM_Core_Permission::check('edit event participants');
 
-      foreach ($form->_feeBlock as $field) {
+      foreach ($feeFields as $field) {
         // public AND admin visibility fields are included for back-office registration and back-office change selections
         if (($field['visibility'] ?? NULL) === 'public' ||
           (($field['visibility'] ?? NULL) === 'admin' && $adminFieldVisible == TRUE)
@@ -1831,14 +1883,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           }
         }
       }
-      $form->_priceSet['id'] ??= $priceSetID;
     }
     else {
       // Is this reachable?
       // Noisy deprecation notice added in Sep 2023 (in previous code location).
       CRM_Core_Error::deprecatedWarning('code believed to be unreachable');
       $eventFeeBlockValues = $elements = $elementJS = [];
-      foreach ($form->_feeBlock as $fee) {
+      foreach ($feeFields as $fee) {
         if (is_array($fee)) {
 
           //CRM-7632, CRM-6201
@@ -1859,6 +1910,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $form->addRule('amount', ts('Fee Level is a required field.'), 'required');
       }
     }
+    // @todo this is temporary while we stop calling it from other places
+    $this->_feeBlock = $feeFields;
   }
 
   /**
