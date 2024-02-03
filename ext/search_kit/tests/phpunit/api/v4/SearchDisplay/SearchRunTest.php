@@ -227,6 +227,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(1, $result[1]['columns'][1]['links']);
     $this->assertCount(1, $result[2]['columns'][0]['links']);
     $this->assertCount(1, $result[2]['columns'][1]['links']);
+    $this->assertContains('View Group', array_column($result[0]['columns'][2]['links'], 'text'));
+    $this->assertContains('Update Group', array_column($result[0]['columns'][2]['links'], 'text'));
+    $this->assertContains('Delete Group', array_column($result[0]['columns'][2]['links'], 'text'));
+    // Add and browse links should not be shown in rows
+    $this->assertNotContains('Add Group', array_column($result[0]['columns'][2]['links'], 'text'));
+    $this->assertNotContains('Browse Group', array_column($result[0]['columns'][2]['links'], 'text'));
     // No contact links in 1st row since the group is empty
     $this->assertNotContains('View Contact', array_column($result[0]['columns'][2]['links'], 'text'));
     $this->assertNotContains('Delete Contact', array_column($result[0]['columns'][2]['links'], 'text'));
@@ -234,6 +240,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains('Delete Contact', array_column($result[1]['columns'][2]['links'], 'text'));
     $this->assertContains('View Contact', array_column($result[2]['columns'][2]['links'], 'text'));
     $this->assertContains('Delete Contact', array_column($result[2]['columns'][2]['links'], 'text'));
+    // Add and browse links should not be shown in rows
+    $this->assertNotContains('Add Contact', array_column($result[1]['columns'][2]['links'], 'text'));
+    $this->assertNotContains('Browse Contact', array_column($result[2]['columns'][2]['links'], 'text'));
   }
 
   /**

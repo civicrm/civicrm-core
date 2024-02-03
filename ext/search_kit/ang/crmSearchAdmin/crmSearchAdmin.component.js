@@ -237,7 +237,7 @@
       if (display.id) {
         display.trashed = !display.trashed;
         if ($scope.controls.tab === ('display_' + index) && display.trashed) {
-          $scope.selectTab('compose');
+          $scope.selectTab('for');
         } else if (!display.trashed) {
           $scope.selectTab('display_' + index);
         }
@@ -255,7 +255,7 @@
           });
         }
       } else {
-        $scope.selectTab('compose');
+        $scope.selectTab('for');
         ctrl.savedSearch.displays.splice(index, 1);
       }
     };
@@ -300,7 +300,7 @@
         ctrl.savedSearch.groups.length = 0;
       }
       if ($scope.controls.tab === 'group') {
-        $scope.selectTab('compose');
+        $scope.selectTab('for');
       }
     };
 
