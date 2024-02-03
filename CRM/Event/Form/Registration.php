@@ -1249,19 +1249,18 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * User should select at least one price field option.
    *
    * @param array $params
+   * @param array $feeBlock
+   * @param int $priceSetId
+   * @param array $priceSetDetails
    *
    * @return array
    */
-  protected function validatePriceSet($params) {
+  protected static function validatePriceSet(array $params, $feeBlock, $priceSetId, $priceSetDetails) {
     $errors = [];
     $hasOptMaxValue = FALSE;
     if (!is_array($params) || empty($params)) {
       return $errors;
     }
-    $form = $this;
-
-    $priceSetId = $form->get('priceSetId');
-    $priceSetDetails = $form->get('priceSet');
     if (
       !$priceSetId ||
       !is_array($priceSetDetails) ||
@@ -1285,7 +1284,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $hasOptCount = TRUE;
       $optionsCountDetails = $priceSetDetails['optionsCountDetails']['fields'];
     }
-    $feeBlock = $form->_feeBlock;
 
     if (empty($feeBlock)) {
       $feeBlock = $priceSetDetails['fields'];
