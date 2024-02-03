@@ -38,6 +38,7 @@ class CRM_Core_Permission_List {
         'title' => $corePerm['label'],
         'description' => $corePerm['description'] ?? NULL,
         'is_active' => empty($corePerm['disabled']),
+        'implies' => $corePerm['implies'] ?? NULL,
       ];
     }
   }
@@ -83,6 +84,7 @@ class CRM_Core_Permission_List {
    */
   public static function findConstPermissions(GenericHookEvent $e) {
     // There are a handful of special permissions defined in CRM/Core/Permission.
+    // Enforcement of them is handled in `CRM_Core_Permission_*::check()`
     $e->permissions[\CRM_Core_Permission::ALWAYS_DENY_PERMISSION] = [
       'group' => 'const',
       'title' => ts('Generic: Deny all users'),
@@ -92,6 +94,9 @@ class CRM_Core_Permission_List {
       'group' => 'const',
       'title' => ts('Generic: Allow all users (including anonymous)'),
       'is_synthetic' => TRUE,
+      // This line is here more as a bit of documentation (so it will show in `Civi\Api4\Permission::get()`).
+      // The functionality that actually handles this pseudo-permission is in `CRM_Core_Permission_*::check()`
+      'implies' => ['*'],
     ];
   }
 

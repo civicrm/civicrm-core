@@ -128,8 +128,7 @@ class CRM_Core_Permission {
       }
       else {
         // This is an individual permission
-        $impliedPermissions = self::getImpliedPermissionsFor($permission);
-        $impliedPermissions[] = $permission;
+        $impliedPermissions = self::getImpliedBy($permission);
         foreach ($impliedPermissions as $permissionOption) {
           $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permissionOption, $userId);
           // Call the permission_check hook to permit dynamic escalation (CRM-19256)
@@ -566,9 +565,11 @@ class CRM_Core_Permission {
    * @param bool $includeDisabled
    *   Include permissions from disabled components/settings.
    * @param bool $returnAssociative
-   *   Whether to return full info including description, or just label.
+   *   If true, returns arrays with keys: [label, description, disabled, implies, implied_by].
+   *   If false, returns strings (label only).
    *
-   * @return array
+   * @return array[]|string[]
+   * @throws RuntimeException
    */
   public static function basicPermissions($includeDisabled = FALSE, $returnAssociative = FALSE): array {
     $permissions = Civi::$statics[__CLASS__][__FUNCTION__] ??= self::assembleBasicPermissions();
@@ -583,12 +584,38 @@ class CRM_Core_Permission {
 
   /**
    * @return array
-   * @throws \CRM_Core_Exception
+   * @throws RuntimeException
    */
   protected static function assembleBasicPermissions(): array {
     $permissions = self::getCoreAndComponentPermissions();
     $module_permissions = CRM_Core_Config::singleton()->userPermissionClass->getAllModulePermissions();
-    return array_merge($permissions, $module_permissions);
+    $allPermissions = array_merge($permissions, $module_permissions);
+    // Propagate implied permissions to their children
+    foreach ($allPermissions as $name => $permission) {
+      if (!empty($permission['implies'])) {
+        self::setImpliedBy([$name], $permission['implies'], $allPermissions);
+      }
+    }
+    return $allPermissions;
+  }
+
+  /**
+   * Recursively sets the 'implied_by' value for every sub-permission,
+   * based on the 'implies' declaration in meta-permissions.
+   *
+   * @param array $metaPermissions
+   * @param array $subPermissions
+   * @param array $allPermissions
+   */
+  protected static function setImpliedBy(array $metaPermissions, array $subPermissions, array &$allPermissions): void {
+    foreach ($subPermissions as $name) {
+      if (isset($allPermissions[$name])) {
+        $allPermissions[$name]['implied_by'] = array_unique(array_merge($allPermissions[$name]['implied_by'] ?? [], $metaPermissions));
+        if (!empty($allPermissions[$name]['implies'])) {
+          self::setImpliedBy(array_merge([$name], $metaPermissions), $allPermissions[$name]['implies'], $allPermissions);
+        }
+      }
+    }
   }
 
   /**
@@ -668,6 +695,10 @@ class CRM_Core_Permission {
       'administer CiviCRM' => [
         'label' => $prefix . ts('administer CiviCRM'),
         'description' => ts('Perform all tasks in the Administer CiviCRM control panel and Import Contacts'),
+        'implies' => [
+          'administer CiviCRM system',
+          'administer CiviCRM data',
+        ],
       ],
       'skip IDS check' => [
         'label' => $prefix . ts('skip IDS check'),
@@ -871,14 +902,27 @@ class CRM_Core_Permission {
       'administer CiviCRM system' => [
         'label' => $prefix . ts('administer CiviCRM System'),
         'description' => ts('Perform all system administration tasks in CiviCRM'),
+        'implies' => [
+          'edit system workflow message templates',
+        ],
       ],
       'administer CiviCRM data' => [
         'label' => $prefix . ts('administer CiviCRM Data'),
         'description' => ts('Permit altering all restricted data options'),
+        'implies' => [
+          'edit message templates',
+          'administer dedupe rules',
+        ],
       ],
+      // This is a very special permission that supersedes all others;
+      // it's the equivalent of user 1 in Drupal.
       'all CiviCRM permissions and ACLs' => [
         'label' => $prefix . ts('all CiviCRM permissions and ACLs'),
         'description' => ts('Administer and use CiviCRM bypassing any other permission or ACL checks and enabling the creation of displays and forms that allow others to bypass checks. This permission should be given out with care'),
+        // This line is here more as a bit of documentation (so it will show in `Civi\Api4\Permission::get()`).
+        // The functionality that actually propagates this permission into all others
+        // is in `self::getImpliedBy`.
+        'implies' => ['*'],
       ],
     ];
     if (self::isMultisiteEnabled()) {
@@ -893,43 +937,28 @@ class CRM_Core_Permission {
   }
 
   /**
-   * Get permissions implied by 'superset' permissions.
+   * Get all permissions that would grant the given permission.
    *
+   * This always includes the permission itself and the super 'all CiviCRM permissions and ACLs'
+   * plus any meta-permissions that imply this one.
+   *
+   * @param string $permissionName
    * @return array
    */
-  public static function getImpliedAdminPermissions(): array {
-    return [
-      'administer CiviCRM' => ['implied_permissions' => ['administer CiviCRM system', 'administer CiviCRM data']],
-      'administer CiviCRM data' => ['implied_permissions' => ['edit message templates', 'administer dedupe rules']],
-      'administer CiviCRM system' => ['implied_permissions' => ['edit system workflow message templates']],
-    ];
-  }
-
-  /**
-   * Get any super-permissions that imply the given permission.
-   *
-   * @param string $permission
-   *
-   * @return array
-   */
-  public static function getImpliedPermissionsFor(string $permission): array {
-    if (in_array($permission[0], ['@', '*'], TRUE)) {
+  private static function getImpliedBy(string $permissionName): array {
+    if (in_array($permissionName[0], ['@', '*'], TRUE)) {
       // Special permissions like '*always deny*' - see DynamicFKAuthorizationTest.
       // Also '@afform - see AfformUsageTest.
-      return [];
+      return [$permissionName];
     }
-    $implied = Civi::cache('metadata')->get('implied_permissions', []);
-    if (isset($implied[$permission])) {
-      return $implied[$permission];
+    try {
+      $impliedPermissions = self::basicPermissions(TRUE, TRUE)[$permissionName]['implied_by'] ?? [];
     }
-    $implied[$permission] = ['all CiviCRM permissions and ACLs'];
-    foreach (self::getImpliedAdminPermissions() as $key => $details) {
-      if (in_array($permission, $details['implied_permissions'] ?? [], TRUE)) {
-        $implied[$permission][] = $key;
-      }
+    // This could happen early in the boot-cycle or during upgrade
+    catch (RuntimeException $e) {
+      $impliedPermissions = [];
     }
-    Civi::cache('metadata')->set('implied_permissions', $implied);
-    return $implied[$permission];
+    return array_merge([$permissionName, 'all CiviCRM permissions and ACLs'], $impliedPermissions);
   }
 
   /**
@@ -1744,7 +1773,6 @@ class CRM_Core_Permission {
    * Get permissions for components.
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
   protected static function getComponentPermissions(): array {
     $permissions = [];
@@ -1768,7 +1796,6 @@ class CRM_Core_Permission {
    * Get permissions for core functionality and for that of core components.
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
   protected static function getCoreAndComponentPermissions(): array {
     $permissions = self::getCorePermissions();

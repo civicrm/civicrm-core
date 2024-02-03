@@ -392,6 +392,7 @@ class CRM_Core_Permission_Base {
    *
    * @return array
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
+   * @throws RuntimeException
    */
   public function getAllModulePermissions(): array {
     $permissions = [];
