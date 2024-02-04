@@ -25,8 +25,13 @@ class CRM_Contact_Form_Task_EmailCommon {
   /**
    * Pre Process Form Addresses to be used in Quickform
    *
-   * @param CRM_Core_Form $form
+   * This doesn't really do much - use part should be transferred back to caller
+   * and noisy deprecation added.
+   *
+   * @param \CRM_Contribute_Form_Task_Invoice $form
    * @param bool $bounce determine if we want to throw a status bounce.
+   *
+   * @deprecated
    *
    * @throws \CRM_Core_Exception
    */
