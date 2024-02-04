@@ -13,7 +13,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 
 <head>
-  <title>{$pageTitle|escape}</title>
+  <title>{ts}Error{/ts}</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <base href="{$config->resourceBase}" />
   <style type="text/css" media="screen">
