@@ -269,7 +269,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   protected static function getJoinWhereClause(FormDataModel $formDataModel, string $mainEntityName, string $joinEntityType, $mainEntityId) {
     $entity = $formDataModel->getEntity($mainEntityName);
-    $mainEntityType = $entity['type'];
+    $mainEntityType = CoreUtil::isContact($entity['type']) ? 'Contact' : $entity['type'];
     $params = [];
 
     // Add data as clauses e.g. `is_primary: true`

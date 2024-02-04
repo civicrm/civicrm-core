@@ -93,9 +93,15 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       }
     }
 
-    if ($getLayout && $this->layoutFormat !== 'html') {
+    // Format layouts
+    if ($getLayout) {
       foreach ($afforms as $name => $record) {
-        $afforms[$name]['layout'] = isset($record['layout']) ? $this->convertHtmlToOutput($record['layout']) : NULL;
+        if (isset($record['layout'])) {
+          $this->convertLegacyContactTypes($afforms[$name]['layout']);
+          if ($this->layoutFormat !== 'html') {
+            $afforms[$name]['layout'] = $this->convertHtmlToOutput($afforms[$name]['layout']);
+          }
+        }
       }
     }
 
@@ -210,6 +216,33 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       }
     }
     return $searchDisplays;
+  }
+
+  /**
+   * Backward-compatability conversion of <af-entity> Contact tags
+   * to use contact-type-specific API entity names.
+   *
+   * Converts: <af-entity type="Contact" data="{contact_type: 'Individual'}">
+   * Into:     <af-entity type="Individual" data="{}">
+   *
+   * @param string $layout
+   * @return void
+   */
+  private static function convertLegacyContactTypes(&$layout): void {
+    if (!$layout || !is_string($layout)) {
+      return;
+    }
+    // It was easier to write two regexes:
+    // 1. If the `type` property precedes the `data` property
+    $regex1 = <<<'REGEX'
+      /<af-entity([^>]+)type\s*=\s*["']Contact["']([^>]*)data\s*=\s*"\{([^>]*)'?contact_type'?\s*:\s*'(Individual|Household|Organization)'\s*,?/
+      REGEX;
+    $layout = preg_replace($regex1, '<af-entity$1type="$4"$2data="{', $layout);
+    // 2. If the `data` property precedes the `type` property
+    $regex2 = <<<'REGEX'
+      /<af-entity([^>]+)data\s*=\s*"\{([^>]*)'?contact_type'?\s*:\s*'(Individual|Household|Organization)'\s*,?([^>]+)type\s*=\s*["']Contact["']/
+      REGEX;
+    $layout = preg_replace($regex2, '<af-entity$1data="{$2$4type="$3"', $layout);
   }
 
   private static function convertLegacyPlacement(array &$afform): void {

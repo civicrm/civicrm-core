@@ -4,6 +4,7 @@ namespace Civi\Afform\Behavior;
 use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
+use Civi\Api4\Utils\CoreUtil;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -96,7 +97,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
   }
 
   public static function onAfformPrefill(AfformPrefillEvent $event): void {
-    if ($event->getEntityType() === 'Contact') {
+    if (CoreUtil::isContact($event->getEntityType())) {
       $entity = $event->getEntity();
       $id = $event->getEntityId();
       $autoFillMode = $entity['autofill'] ?? '';
