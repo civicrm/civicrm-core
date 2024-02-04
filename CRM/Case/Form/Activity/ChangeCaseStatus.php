@@ -20,6 +20,12 @@
  */
 class CRM_Case_Form_Activity_ChangeCaseStatus {
 
+  public $_caseId;
+
+  public $_defaultCaseStatus;
+
+  public $_oldCaseStatus;
+
   /**
    * @param CRM_Core_Form $form
    *
@@ -58,7 +64,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
   /**
    * @param CRM_Core_Form $form
    */
-  public static function buildQuickForm(&$form) {
+  public static function buildQuickForm($form) {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
 
