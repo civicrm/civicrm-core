@@ -2132,11 +2132,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       if (!empty(ReflectionUtils::getCodeDocs((new ReflectionProperty($this, $name)), 'Property')['deprecated'])) {
         CRM_Core_Error::deprecatedWarning('deprecated property accessed :' . $name);
       }
+      if (!empty(ReflectionUtils::getCodeDocs((new ReflectionProperty($this, $name)), 'Property')['internal'])) {
+        CRM_Core_Error::deprecatedWarning('internal property accessed :' . $name);
+      }
     }
     catch (\ReflectionException $e) {
-      // If the variable isn't defined you can't access its properties to check if it's deprecated. Let php 8.2 deal with those warnings.
+      // If the variable isn't defined you can't access its properties so it throws an exceptions.
+      CRM_Core_Error::deprecatedWarning('undeclared property accessed :' . $name);
     }
-    // @todo - add warnings for internal properties & protected properties.
+    // @todo - add warnings for protected properties.
     return $this->$name;
   }
 
