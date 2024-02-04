@@ -127,15 +127,6 @@
               CRM.afGuiEditor.entities[entityName].fields = fields;
             }
           });
-          // Optimization - since contact fields are a combination of these three,
-          // the server doesn't send contact fields if sending contact-type fields
-          if ('Individual' in data.fields || 'Household' in data.fields || 'Organization' in data.fields) {
-            CRM.afGuiEditor.entities.Contact.fields = _.assign({},
-              (CRM.afGuiEditor.entities.Individual || {}).fields,
-              (CRM.afGuiEditor.entities.Household || {}).fields,
-              (CRM.afGuiEditor.entities.Organization || {}).fields
-            );
-          }
           _.each(data.search_displays, function(display) {
             CRM.afGuiEditor.searchDisplays[display['saved_search_id.name'] + (display.name ? '.' + display.name : '')] = display;
           });

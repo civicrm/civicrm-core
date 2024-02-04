@@ -303,9 +303,6 @@
       };
 
       this.getEntityDefn = function(entity) {
-        if (entity.type === 'Contact' && entity.data && entity.data.contact_type) {
-          return editor.meta.entities[entity.data.contact_type];
-        }
         return editor.meta.entities[entity.type];
       };
 

@@ -16,7 +16,7 @@ class AfformContactUsageTest extends AfformUsageTestCase {
     parent::setUpBeforeClass();
     self::$layouts['aboutMe'] = <<<EOHTML
 <af-form ctrl="modelListCtrl">
-  <af-entity type="Contact" data="{contact_type: 'Individual'}" name="me" label="Myself" url-autofill="1" autofill="user" />
+  <af-entity type="Individual" data="{}" name="me" label="Myself" url-autofill="1" autofill="user" />
   <fieldset af-fieldset="me">
       <af-field name="first_name" />
       <af-field name="last_name" />

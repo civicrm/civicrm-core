@@ -239,15 +239,18 @@ class Submit extends AbstractProcessor {
    * @see afform_civicrm_config
    */
   public static function preprocessContact(AfformSubmitEvent $event): void {
-    if ($event->getEntityType() !== 'Contact') {
+    $entityType = $event->getEntityType();
+    if (!CoreUtil::isContact($entityType)) {
       return;
     }
     // When creating a contact, verify they have a name or email address
     foreach ($event->records as $index => $contact) {
+      // This trick ensures the array is not technically empty so it can get past the empty check in `processGenericEntity()`
+      $event->records[$index]['fields'] += ['id' => NULL];
       if (!empty($contact['fields']['id'])) {
         continue;
       }
-      if (empty($contact['fields']) || \CRM_Contact_BAO_Contact::hasName($contact['fields'])) {
+      if (empty($contact['fields']) || \CRM_Contact_BAO_Contact::hasName($contact['fields'] + ['contact_type' => $entityType])) {
         continue;
       }
       foreach ($contact['joins']['Email'] ?? [] as $email) {

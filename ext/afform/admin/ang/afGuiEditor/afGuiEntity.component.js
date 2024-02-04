@@ -19,7 +19,7 @@
       $scope.elementTitles = [];
 
       this.getEntityType = function() {
-        return (ctrl.entity.type === 'Contact' && ctrl.entity.data) ? ctrl.entity.data.contact_type || 'Contact' : ctrl.entity.type;
+        return ctrl.entity.type;
       };
 
       $scope.getMeta = function() {
@@ -90,7 +90,9 @@
         $scope.blockTitles.length = 0;
         _.each(afGui.meta.blocks, function(block, directive) {
           if ((!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) &&
-            (block.entity_type === '*' || block.entity_type === ctrl.entity.type || (ctrl.entity.type === 'Contact' && block.entity_type === ctrl.entity.data.contact_type)) &&
+            // A block of type "*" applies to everything. A block of type "Contact" also applies to "Individual", "Organization" & "Household".
+            (block.entity_type === '*' || block.entity_type === ctrl.entity.type || (block.entity_type === 'Contact' && ['Individual', 'Household', 'Organization'].includes(ctrl.entity.type))) &&
+            // Prevent recursion
             block.name !== ctrl.editor.getAfform().name
           ) {
             var item = {"#tag": block.join_entity ? "div" : directive};

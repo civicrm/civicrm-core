@@ -220,10 +220,6 @@ class FormDataModel {
       // If the admin included this field on the form, then it's OK to get metadata about the field regardless of user permissions.
       'checkPermissions' => FALSE,
     ];
-    if (in_array($entityName, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
-      $params['values'] = ['contact_type' => $entityName];
-      $entityName = 'Contact';
-    }
     foreach (civicrm_api4($entityName, 'getFields', $params) as $field) {
       // In the highly unlikely event of 2 fields returned, prefer the exact match
       if ($field['name'] === $fieldName) {

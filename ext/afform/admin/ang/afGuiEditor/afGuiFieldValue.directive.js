@@ -38,7 +38,7 @@
               // Static options for choosing current user or other entities on the form
               options = [];
               filters = (field.input_attrs && field.input_attrs.filter) || {};
-              if (field.fk_entity === 'Contact' && (!filters.contact_type || filters.contact_type === 'Individual')) {
+              if (field.fk_entity === 'Individual' || (field.fk_entity === 'Contact' && (!filters.contact_type || filters.contact_type === 'Individual'))) {
                 options.push('user_contact_id');
               }
               _.each(ctrl.editor ? ctrl.editor.getEntities({type: field.fk_entity}) : [], function(entity) {
