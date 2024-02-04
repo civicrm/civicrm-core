@@ -18,6 +18,7 @@
  * This class generates form components for processing Event.
  */
 class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
+  use CRM_Event_Form_EventFormTrait;
 
   /**
    * The id of the event we are processing.
@@ -98,17 +99,12 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $this->assign('eventId', $this->_id);
       $this->_single = TRUE;
 
-      $eventInfo = \Civi\Api4\Event::get(FALSE)
-        ->addWhere('id', '=', $this->_id)
-        ->execute()
-        ->first();
-
       // its an update mode, do a permission check
       if (!CRM_Event_BAO_Event::checkPermission($this->_id, CRM_Core_Permission::EDIT)) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
 
-      $participantListingID = $eventInfo['participant_listing_id'] ?? NULL;
+      $participantListingID = $this->getEventValue('participant_listing_id');
       if ($participantListingID) {
         $participantListingURL = CRM_Utils_System::url('civicrm/event/participant',
           "reset=1&id={$this->_id}",
@@ -117,14 +113,14 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       }
       $this->assign('participantListingURL', $participantListingURL ?? NULL);
       $this->assign('participantListingID', $participantListingID);
-      $this->assign('isOnlineRegistration', CRM_Utils_Array::value('is_online_registration', $eventInfo));
+      $this->assign('isOnlineRegistration', $this->getEventValue('is_online_registration'));
 
       $this->assign('id', $this->_id);
     }
 
     // figure out whether we’re handling an event or an event template
     if ($this->_id) {
-      $this->_isTemplate = $eventInfo['is_template'] ?? NULL;
+      $this->_isTemplate = $this->getEventValue('is_template');
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
       $this->_isTemplate = CRM_Utils_Request::retrieve('is_template', 'Boolean', $this);
@@ -136,11 +132,11 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     $title = NULL;
     if ($this->_id) {
       if ($this->_isTemplate) {
-        $title = ts('Edit Event Template') . ' - ' . ($eventInfo['template_title'] ?? '');
+        $title = ts('Edit Event Template') . ' - ' . ($this->getEventValue('template_title'));
       }
       else {
         $configureText = $this->_isRepeatingEvent ? ts('Configure Repeating Event') : ts('Configure Event');
-        $title = $configureText . ' - ' . ($eventInfo['title'] ?? '');
+        $title = $configureText . ' - ' . $this->getEventValue('title');
       }
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
