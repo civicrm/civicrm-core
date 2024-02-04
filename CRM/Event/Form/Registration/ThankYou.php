@@ -19,7 +19,6 @@ use Civi\Api4\PCPBlock;
 
 /**
  * This class generates form components for processing Event
- *
  */
 class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
@@ -27,19 +26,16 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    * Set variables up before form is built.
    *
    * @return void
+   * @throws \CRM_Core_Exception
    */
-  public function preProcess() {
+  public function preProcess(): void {
     parent::preProcess();
     $this->_params = $this->get('params');
     $this->_lineItem = $this->get('lineItem');
-    $this->_part = $this->get('part');
-    $this->_totalAmount = $this->get('totalAmount');
-    $this->_receiveDate = $this->get('receiveDate');
-    $this->_trxnId = $this->get('trxnId');
     $finalAmount = $this->get('finalAmount');
     $this->assign('finalAmount', $finalAmount);
     $participantInfo = $this->get('participantInfo');
-    $this->assign('part', $this->_part);
+    $this->assign('part', $this->get('part'));
     $this->assign('participantInfo', $participantInfo);
     $customGroup = $this->get('customProfile');
     $this->assign('customProfile', $customGroup);
@@ -56,19 +52,19 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    *
    * @return int
    */
-  public function getAction() {
+  public function getAction(): int {
     if ($this->_action & CRM_Core_Action::PREVIEW) {
       return CRM_Core_Action::VIEW | CRM_Core_Action::PREVIEW;
     }
-    else {
-      return CRM_Core_Action::VIEW;
-    }
+
+    return CRM_Core_Action::VIEW;
   }
 
   /**
    * Build the form object.
    *
    * @return void
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     // Assign the email address from a contact id lookup as in CRM_Event_BAO_Event->sendMail()
@@ -92,7 +88,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $lineItemForTemplate = [];
     if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
       foreach ($this->_lineItem as $key => $value) {
-        if (!empty($value) && $value != 'skip') {
+        if (!empty($value) && $value !== 'skip') {
           $lineItemForTemplate[$key] = $value;
           if ($invoicing) {
             foreach ($value as $v) {
@@ -115,18 +111,16 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     if ($invoicing) {
       $this->assign('totalTaxAmount', $taxAmount);
     }
-    $this->assign('totalAmount', $this->_totalAmount);
+    $this->assign('totalAmount', $this->get('totalAmount'));
 
     $hookDiscount = $this->get('hookDiscount');
     if ($hookDiscount) {
       $this->assign('hookDiscount', $hookDiscount);
     }
 
-    $this->assign('receive_date', $this->_receiveDate);
-    $this->assign('trxn_id', $this->_trxnId);
-
-    //cosider total amount.
-    $this->assign('isAmountzero', $this->_totalAmount <= 0);
+    $this->assign('receive_date', $this->get('receiveDate'));
+    $this->assign('trxn_id', $this->get('trxnId'));
+    $this->assign('isAmountzero', $this->get('totalAmount') <= 0);
 
     $this->assign('defaultRole', FALSE);
     if (($this->_params[0]['defaultRole'] ?? NULL) == 1) {
@@ -212,7 +206,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    *
    * @return void
    */
-  public function postProcess() {
+  public function postProcess(): void {
   }
 
   /**
@@ -220,12 +214,13 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    *
    * @return string
    */
-  public function getTitle() {
+  public function getTitle(): string {
     return ts('Thank You Page');
   }
 
   /**
    * @return int|null
+   * @throws \CRM_Core_Exception
    */
   public function getPCPBlockID(): ?int {
     if (!$this->isDefined('PCPBlock')) {
