@@ -1700,14 +1700,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         $form->assign('qfKey', $qf);
         Civi::cache('customData')->set($qf, $formValues);
       }
-
-      // hack for field type File
-      $formUploadNames = $form->get('uploadNames');
-      if (is_array($formUploadNames)) {
-        $uploadNames = array_unique(array_merge($formUploadNames, $uploadNames));
-      }
-
-      $form->set('uploadNames', $uploadNames);
+      $form->registerFileField($uploadNames);
     }
 
     return $formattedGroupTree;
