@@ -20,6 +20,7 @@
  */
 class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   use CRM_Core_Form_EntityFormTrait;
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * Flag if its a AR account type.
@@ -43,10 +44,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   public function preProcess() {
     parent::preProcess();
 
-    // Add custom data to form
-    CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'FinancialAccount', $this->_id);
-    CRM_Custom_Form_CustomData::buildQuickForm($this);
-
     if ($this->_id) {
       $params = [
         'id' => $this->_id,
@@ -54,7 +51,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       $financialAccount = CRM_Financial_BAO_FinancialAccount::retrieve($params);
       $financialAccountTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
       if ($financialAccount->financial_account_type_id == $financialAccountTypeId
-        && strtolower($financialAccount->account_type_code) == 'ar'
+        && strtolower($financialAccount->account_type_code) === 'ar'
         && !CRM_Financial_BAO_FinancialAccount::getARAccounts($this->_id, $financialAccountTypeId)
       ) {
         $this->_isARFlag = TRUE;
@@ -64,6 +61,8 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
         }
       }
     }
+    // Assigned for the ajax call to get custom data.
+    $this->assign('entityID', $this->_id);
   }
 
   /**
@@ -74,6 +73,9 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
+    }
+    if ($this->isSubmitted()) {
+      $this->addCustomDataFieldsToForm('FinancialAccount');
     }
 
     $this->applyFilter('__ALL__', 'trim');
@@ -114,7 +116,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       }
     }
 
-    $this->addCustomDataToForm();
     if ($this->_action == CRM_Core_Action::UPDATE &&
       CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $this->_id, 'is_reserved')
     ) {
@@ -173,7 +174,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
-    $defaults = array_merge($defaults, CRM_Custom_Form_CustomData::setDefaultValues($this));
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['contact_id'] = CRM_Core_BAO_Domain::getDomain()->contact_id;
     }
@@ -195,7 +195,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     else {
       // store the submitted values in an array
       $params = $this->exportValues();
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->_submitValues, $this->_id, 'FinancialAccount');
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'FinancialAccount');
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->_id;
