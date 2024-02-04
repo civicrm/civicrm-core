@@ -40,7 +40,7 @@
         <td>{$form.group_type.html}</td>
       </tr>
       <tr>
-        <td colspan=2>{include file="CRM/Custom/Form/CustomData.tpl"}</td>
+        <td colspan=2>{include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Group' customDataSubType=false cid=false}</td>
       </tr>
     {/if}
   </table>
