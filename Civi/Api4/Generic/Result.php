@@ -156,7 +156,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
    *
    * @return int
    */
-  public function countFetched() :int {
+  public function countFetched(): int {
     return parent::count();
   }
 
@@ -165,7 +165,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
    *
    * @return int
    */
-  public function countMatched() :int {
+  public function countMatched(): int {
     if (!isset($this->matchedCount)) {
       throw new \CRM_Core_Exception("countMatched can only be used if there was no limit set or if row_count was included in the select fields.");
     }
@@ -190,15 +190,14 @@ class Result extends \ArrayObject implements \JsonSerializable {
    * @param $name
    * @return array
    */
-  public function column($name) {
+  public function column($name): array {
     return array_column($this->getArrayCopy(), $name, $this->indexedBy);
   }
 
   /**
    * @return array
    */
-  #[\ReturnTypeWillChange]
-  public function jsonSerialize() {
+  public function jsonSerialize(): array {
     return $this->getArrayCopy();
   }
 
