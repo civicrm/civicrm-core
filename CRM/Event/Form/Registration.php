@@ -1049,13 +1049,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * - currently selected by user.
    *
-   * @param CRM_Core_Form $form
-   *   Form object.
-   *
    * @return array
    *   array of each option w/ count total.
    */
-  public static function getPriceSetOptionCount(&$form) {
+  protected function getPriceSetOptionCount() {
+    $form = $this;
     $params = $form->get('params');
     $priceSet = $form->get('priceSet');
     $priceSetId = $form->get('priceSetId');
@@ -1958,7 +1956,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     //get the current price event price set options count.
-    $currentOptionsCount = self::getPriceSetOptionCount($form);
+    $currentOptionsCount = $form->getPriceSetOptionCount();
     $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($form->_eventId, $skipParticipants);
 
     $currentParticipantNo = (int) substr($form->_name, 12);

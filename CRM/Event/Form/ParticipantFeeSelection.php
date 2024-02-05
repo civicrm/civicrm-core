@@ -467,7 +467,7 @@ SELECT  id, html_type
     }
 
     //get the current price event price set options count.
-    $currentOptionsCount = CRM_Event_Form_Registration::getPriceSetOptionCount($form);
+    $currentOptionsCount = $this->getPriceOptionCount();
     $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($form->_eventId, []);
     $optionFullTotalAmount = 0;
     $currentParticipantNo = (int) substr($form->_name, 12);
@@ -802,6 +802,80 @@ SELECT  id, html_type
     if (!is_array($eventFee) || empty($eventFee)) {
       $form->_values['fee'] = [];
     }
+  }
+
+  /**
+   * Calculate total count for each price set options.
+   *
+   * - currently selected by user.
+   *
+   * @return array
+   *   array of each option w/ count total.
+   */
+  private function getPriceOptionCount() {
+    $form = $this;
+    $params = $form->get('params');
+    $priceSet = $form->get('priceSet');
+    $priceSetId = $form->get('priceSetId');
+
+    $optionsCount = [];
+    if (!$priceSetId ||
+      !is_array($priceSet) ||
+      empty($priceSet) ||
+      !is_array($params) ||
+      empty($params)
+    ) {
+      return $optionsCount;
+    }
+
+    $priceSetFields = $priceMaxFieldDetails = [];
+    if (!empty($priceSet['optionsCountTotal'])) {
+      $priceSetFields = $priceSet['optionsCountDetails']['fields'];
+    }
+
+    if (!empty($priceSet['optionsMaxValueTotal'])) {
+      $priceMaxFieldDetails = $priceSet['optionsMaxValueDetails']['fields'];
+    }
+
+    $addParticipantNum = substr($form->_name, 12);
+    foreach ($params as $pCnt => $values) {
+      if ($values == 'skip' ||
+        $pCnt === $addParticipantNum
+      ) {
+        continue;
+      }
+
+      foreach ($values as $valKey => $value) {
+        if (strpos($valKey, 'price_') === FALSE) {
+          continue;
+        }
+
+        $priceFieldId = substr($valKey, 6);
+        if (!$priceFieldId ||
+          !is_array($value) ||
+          !(array_key_exists($priceFieldId, $priceSetFields) || array_key_exists($priceFieldId, $priceMaxFieldDetails))
+        ) {
+          continue;
+        }
+
+        foreach ($value as $optId => $optVal) {
+          if (($priceSet['fields'][$priceFieldId]['html_type'] ?? NULL) === 'Text') {
+            $currentCount = $optVal;
+          }
+          else {
+            $currentCount = 1;
+          }
+
+          if (isset($priceSetFields[$priceFieldId]) && isset($priceSetFields[$priceFieldId]['options'][$optId])) {
+            $currentCount = $priceSetFields[$priceFieldId]['options'][$optId] * $optVal;
+          }
+
+          $optionsCount[$optId] = $currentCount + ($optionsCount[$optId] ?? 0);
+        }
+      }
+    }
+
+    return $optionsCount;
   }
 
 }
