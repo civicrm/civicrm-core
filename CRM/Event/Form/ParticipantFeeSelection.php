@@ -447,7 +447,10 @@ SELECT  id, html_type
   }
 
   /**
+   * This function is unshared from the front end registration form.
    *
+   * It might be that it is just calculation for the multiple participant flow
+   * and can be removed from this form.
    */
   private function formatFieldsForOptionFull(): void {
     $form = $this;
@@ -461,7 +464,7 @@ SELECT  id, html_type
     }
     if (!$priceSetId ||
       !is_array($priceSet) ||
-      empty($priceSet) || empty($priceSet['optionsMaxValueTotal'])
+      empty($priceSet) || !$this->isMaxValueValidationRequired()
     ) {
       return;
     }
@@ -509,6 +512,26 @@ SELECT  id, html_type
       $field['option_full_ids'] = $optionFullIds;
     }
     $form->assign('optionFullTotalAmount', $optionFullTotalAmount);
+  }
+
+  /**
+   * Is there a price field value configured with a maximum value.
+   *
+   * If so there mau need to be a check to ensure the number used does not
+   * exceed it. But not this might only be relevant to the front end form
+   * that used to share this.
+   *
+   * @return bool
+   */
+  protected function isMaxValueValidationRequired(): bool {
+    foreach ($this->getPriceFieldMetaData() as $field) {
+      foreach ($field['options'] as $priceValueOption) {
+        if ($priceValueOption['max_value']) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -794,8 +817,6 @@ SELECT  id, html_type
       }
     }
 
-    $form->_priceSet['optionsMaxValueTotal'] = $optionsMaxValueTotal;
-
     $form->set('priceSet', $form->_priceSet);
 
     $eventFee = $form->_values['fee'] ?? NULL;
@@ -808,6 +829,9 @@ SELECT  id, html_type
    * Calculate total count for each price set options.
    *
    * - currently selected by user.
+   *
+   * This was previously shared with the online event registration
+   * and may have no relevance to this form.
    *
    * @return array
    *   array of each option w/ count total.
@@ -835,7 +859,7 @@ SELECT  id, html_type
       $priceSetFields = $priceSet['optionsCountDetails']['fields'];
     }
 
-    if (!empty($priceSet['optionsMaxValueTotal'])) {
+    if ($this->isMaxValueValidationRequired()) {
       $priceMaxFieldDetails = $priceSet['optionsMaxValueDetails']['fields'];
     }
 
@@ -851,7 +875,8 @@ SELECT  id, html_type
         if (strpos($valKey, 'price_') === FALSE) {
           continue;
         }
-
+        // @todo - is this reachable - looks like it was probably only
+        // meaningful on the online form flow (which this form used to share)
         $priceFieldId = substr($valKey, 6);
         if (!$priceFieldId ||
           !is_array($value) ||
