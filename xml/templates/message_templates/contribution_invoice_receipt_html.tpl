@@ -26,7 +26,7 @@
       </tr>
       <tr>
         <td><font size="1" align="center">{contact.display_name}{if '{contact.current_employer}'} ({contact.current_employer}){/if}</font></td>
-        <td><font size="1" align="right">{$invoice_date}</font></td>
+        <td><font size="1" align="right">{contribution.receive_date|crmDate:"Full"}</font></td>
         <td style="white-space: nowrap"><font size="1" align="right">
           {domain.street_address}
           {domain.supplemental_address_1}
@@ -54,7 +54,7 @@
         <td><font size="1" align="right">{domain.country_id:label}</font></td>
       </tr>
       <tr>
-        <td><font size="1" align="right"> {$country}</font></td>
+        <td><font size="1" align="right"> {contact.address_billing.country_id:label}</font></td>
         <td><font size="1" align="right">{contribution.source}</font></td>
         <td valign="top" style="white-space: nowrap"><font size="1" align="right">{domain.email}</font> </td>
       </tr>
@@ -91,7 +91,7 @@
       <tr>
         <td colspan="3"></td>
         <td style="text-align:right;"><font size="1">{ts}Sub Total{/ts}</font></td>
-        <td style="text-align:right;"><font size="1">{$subTotal|crmMoney:$currency}</font></td>
+        <td style="text-align:right;"><font size="1">{contribution.tax_exclusive_amount}</font></td>
       </tr>
       {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
         {if $taxRate != 0}
@@ -211,7 +211,7 @@
       </tr>
       <tr>
         <td style="padding-left:17px;"><font size="1" align="center">{contact.display_name}{if '{contact.current_employer}'} ({contact.current_employer}){/if}</font></td>
-        <td style="padding-left:30px;"><font size="1" align="right">{$invoice_date}</font></td>
+        <td style="padding-left:30px;"><font size="1" align="right">{contribution.receive_date|crmDate:"Full"}</font></td>
         <td><font size="1" align="right">
           {domain.street_address}
           {domain.supplemental_address_1}
@@ -226,7 +226,7 @@
         </font></td>
       </tr>
       <tr>
-        <td style="padding-left:17px;"><font size="1" align="center">{contact.address_billing.supplemental_address_2}  {contact.address_billing.state_province_id:abbr}</font></td>
+        <td style="padding-left:17px;"><font size="1" align="center">{contact.address_billing.supplemental_address_2} {contact.address_billing.state_province_id:abbr}</font></td>
         <td style="padding-left:30px;"><font size="1" align="right">{contribution.creditnote_id}</font></td>
         <td><font size="1" align="right">
           {domain.city}
@@ -287,7 +287,7 @@
             <tr>
               <td colspan="3"></td>
               <td style="padding-left:28px;text-align:right;"><font size="1">{ts}Sub Total{/ts}</font></td>
-              <td style="padding-left:28px;text-align:right;"><font size="1">{$subTotal|crmMoney:$currency}</font></td>
+              <td style="padding-left:28px;text-align:right;"><font size="1">{contribution.tax_exclusive_amount}</font></td>
             </tr>
             {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
                 {if $taxRate != 0}
