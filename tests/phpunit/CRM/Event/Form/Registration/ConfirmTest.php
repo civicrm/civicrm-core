@@ -2,6 +2,7 @@
 
 declare(strict_types = 1);
 use Civi\Api4\Participant;
+use Civi\Api4\PriceFieldValue;
 use Civi\Test\FormTrait;
 
 /**
@@ -267,6 +268,57 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertStringNotContainsString('job_title	oracle', $mailSent[1]);
     $this->assertStringNotContainsString('job_title	wizard', $mailSent[1]);
     $this->assertStringContainsString('job_title	seer', $mailSent[1]);
+  }
+
+  /**
+   * Test price set level participant count with multiple participants.
+   *
+   * In this scenario each price field value has a participant count
+   * and the total (7) exceeds the available places (6).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testEventFullHandlingMultipleParticipants(): void {
+    $paymentProcessorID = $this->paymentProcessorCreate();
+    $this->eventCreatePaid(['max_participants' => 6, 'processor_id' => $paymentProcessorID]);
+    $participantCount = [
+      'standard' => 1,
+      'student' => 4,
+      'student_plus' => 2,
+    ];
+    foreach ($participantCount as $key => $count) {
+      PriceFieldValue::update(FALSE)
+        ->addWhere('id', '=', $this->ids['PriceFieldValue']['PaidEvent_' . $key])
+        ->setValues(['count' => $count])->execute();
+    }
+    $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Participant1',
+      'last_name' => 'LastName',
+      'email-Primary' => 'participant1@example.com',
+      'additional_participants' => 2,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      'payment_processor_id' => 0,
+      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
+    ], ['id' => $this->getEventID()])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant2',
+        'last_name' => 'LastName',
+        'job_title' => 'wizard',
+        'email-Primary' => 'participant2@example.com',
+        'priceSetId' => $this->getPriceSetID('PaidEvent'),
+        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant3',
+        'last_name' => 'LastName',
+        'job_title' => 'seer',
+        'email-Primary' => 'participant3@example.com',
+        'priceSetId' => $this->getPriceSetID('PaidEvent'),
+        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student_plus'],
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
+      ->processForm();
+    // nothing to see here - just a no-fail test at this stage.
   }
 
   /**
@@ -650,6 +702,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'billing_postal_code-5' => '7',
       'billing_country_id-5' => '1228',
       'payment_processor_id' => $paymentProcessorID,
+      'hidden_processor' => '1',
     ];
   }
 

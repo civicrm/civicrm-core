@@ -200,6 +200,8 @@ class FormWrapper {
       foreach ($this->subsequentForms as $form) {
         $form->preProcess();
         $form->buildForm();
+        $form->validate();
+        $this->validation[$form->getName()] = $form->_errors;
         $form->postProcess();
       }
     }
