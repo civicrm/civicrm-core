@@ -758,10 +758,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     ];
     CRM_Utils_Hook::pre('edit', $contact->contact_type, $contact->id, $updateParams);
 
-    $params = [1 => [$contact->id, 'Integer']];
-    $query = 'DELETE FROM civicrm_uf_match WHERE contact_id = %1';
-    CRM_Core_DAO::executeQuery($query, $params);
-
     $contact->copyValues($updateParams);
     $contact->save();
     CRM_Core_BAO_Log::register($contact->id, 'civicrm_contact', $contact->id);
@@ -911,6 +907,15 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $contact = new CRM_Contact_DAO_Contact();
     $contact->id = $id;
     if (!$contact->find(TRUE)) {
+      return FALSE;
+    }
+
+    // Note: we're not using CRM_Core_BAO_UFMatch::getUFId() because that's cached.
+    $ufmatch = new CRM_Core_DAO_UFMatch();
+    $ufmatch->contact_id = $id;
+    $ufmatch->domain_id = CRM_Core_Config::domainID();
+    if ($ufmatch->find(TRUE)) {
+      // Do not permit a contact to be deleted if it is linked to a site user.
       return FALSE;
     }
 
