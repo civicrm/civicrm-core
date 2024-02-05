@@ -1305,7 +1305,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @return array
    */
-  protected static function validatePriceSet(array $params, $feeBlock, $priceSetId, $priceSetDetails) {
+  protected function validatePriceSet(array $params, $feeBlock, $priceSetId, $priceSetDetails) {
     $errors = [];
     $hasOptMaxValue = FALSE;
     if (!is_array($params) || empty($params)) {

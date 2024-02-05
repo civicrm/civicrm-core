@@ -829,6 +829,8 @@ SELECT  id, html_type
     }
 
     $priceSetFields = $priceMaxFieldDetails = [];
+    // @todo - replace this line with if ($this->getOrder()->isUseParticipantCount()) {
+    // (pending https://github.com/civicrm/civicrm-core/pull/29249 being merged)
     if (!empty($priceSet['optionsCountTotal'])) {
       $priceSetFields = $priceSet['optionsCountDetails']['fields'];
     }
