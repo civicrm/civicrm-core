@@ -308,8 +308,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             break;
           }
           else {
-            if ($values['is_default'] && empty($values['is_full'])) {
-              if ($val['html_type'] == 'CheckBox') {
+            if ($values['is_default'] && !$this->getIsOptionFull($values)) {
+              if ($val['html_type'] === 'CheckBox') {
                 $this->_defaults["price_{$key}"][$keys] = 1;
               }
               else {
