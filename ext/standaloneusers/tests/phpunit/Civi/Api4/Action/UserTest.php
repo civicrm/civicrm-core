@@ -758,4 +758,51 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     }
   }
 
+  public function testEveryoneRoleProtections() {
+    $this->loginUser($this->adminUserID);
+    $this->assertRoleCannotBeDeleted('everyone');
+    $this->assertRoleUpdateFails('everyone', ['name' => 'everyone']);
+    $this->assertRoleUpdateFails('everyone', ['is_active' => FALSE]);
+    // Check we can change permissions
+    $user = Role::update(TRUE)
+      ->addWhere('name', '=', 'everyone')
+      ->setValues([
+        'permissions' => ['access CiviMail subscribe/unsubscribe pages'],
+        'label' => 'Y’all',
+      ])
+      ->execute();
+  }
+
+  public function testAdminRoleProtections() {
+    $this->loginUser($this->adminUserID);
+    $this->assertRoleCannotBeDeleted('admin');
+    $this->assertRoleUpdateFails('admin', ['name' => 'admin']);
+    $this->assertRoleUpdateFails('admin', ['is_active' => FALSE]);
+  }
+
+  protected function assertRoleCannotBeDeleted($roleName) {
+    try {
+      $user = Role::delete(TRUE)
+        ->addWhere('name', '=', $roleName)
+        ->execute();
+      $this->fail("We were able to delete the '$roleName' role and we should not be allowed to.");
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      $this->assertEquals('ACL check failed', $e->getMessage());
+    }
+  }
+
+  protected function assertRoleUpdateFails($roleName, array $updates) {
+    try {
+      $user = Role::update(TRUE)
+        ->addWhere('name', '=', $roleName)
+        ->setValues($updates)
+        ->execute();
+      $this->fail("We were able to update the '$roleName' role and we should not be allowed to.");
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      $this->assertEquals('ACL check failed', $e->getMessage());
+    }
+  }
+
 }
