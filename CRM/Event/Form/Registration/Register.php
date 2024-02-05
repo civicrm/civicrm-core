@@ -292,8 +292,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->_defaults['participant_role']
         = $this->_defaults['participant_role_id'] = $this->_values['event']['default_role_id'];
     }
-    if ($this->_priceSetId && !empty($this->_feeBlock)) {
-      foreach ($this->_feeBlock as $key => $val) {
+    if ($this->_priceSetId) {
+      foreach ($this->getPriceFieldMetaData() as $key => $val) {
         if (empty($val['options'])) {
           continue;
         }
@@ -607,7 +607,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       //format params.
       $formatted = self::formatPriceSetParams($form, $fields);
       $ppParams = [$formatted];
-      $priceSetErrors = $form->validatePriceSet($ppParams, $form->_feeBlock, $fields['priceSetId'], $form->get('priceSet'));
+      $priceSetErrors = $form->validatePriceSet($ppParams, $fields['priceSetId'], $form->get('priceSet'));
       $primaryParticipantCount = $form->getParticipantCount($ppParams);
 
       //get price set fields errors in.

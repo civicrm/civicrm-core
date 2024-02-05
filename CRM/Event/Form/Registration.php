@@ -1458,13 +1458,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * User should select at least one price field option.
    *
    * @param array $params
-   * @param array $feeBlock
    * @param int $priceSetId
    * @param array $priceSetDetails
    *
    * @return array
    */
-  protected function validatePriceSet(array $params, $feeBlock, $priceSetId, $priceSetDetails) {
+  protected function validatePriceSet(array $params, $priceSetId, $priceSetDetails) {
     $errors = [];
     $hasOptMaxValue = FALSE;
     if (!is_array($params) || empty($params)) {
@@ -1493,10 +1492,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $optionsCountDetails = $priceSetDetails['optionsCountDetails']['fields'];
     }
 
-    if (empty($feeBlock)) {
-      $feeBlock = $priceSetDetails['fields'];
-    }
-
     $optionMaxValues = $fieldSelected = [];
     foreach ($params as $pNum => $values) {
       if (!is_array($values) || $values == 'skip') {
@@ -1509,7 +1504,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         }
         $priceFieldId = substr($valKey, 6);
         $noneOptionValueSelected = FALSE;
-        if (!$feeBlock[$priceFieldId]['is_required'] && $value == 0) {
+        if (!$this->getPriceFieldMetaData()[$priceFieldId]['is_required'] && $value == 0) {
           $noneOptionValueSelected = TRUE;
         }
 
@@ -1527,7 +1522,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         }
 
         foreach ($value as $optId => $optVal) {
-          if (($feeBlock[$priceFieldId]['html_type'] ?? NULL) === 'Text') {
+          if (($this->getPriceFieldMetaData()[$priceFieldId]['html_type'] ?? NULL) === 'Text') {
             $currentMaxValue = $optVal;
           }
           else {
@@ -1555,7 +1550,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     //validate for option max value.
     foreach ($optionMaxValues as $fieldId => $values) {
-      $options = $feeBlock[$fieldId]['options'] ?? [];
       foreach ($values as $optId => $total) {
         $optMax = $optionsMaxValueDetails[$fieldId]['options'][$optId];
         $opDbCount = $this->getUsedSeatsCount($optId);
@@ -2073,8 +2067,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $form->addRule('amount', ts('Fee Level is a required field.'), 'required');
       }
     }
-    // @todo this is temporary while we stop calling it from other places
-    $this->_feeBlock = $feeFields;
   }
 
   /**
