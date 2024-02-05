@@ -77,10 +77,9 @@ class Manager {
    *     List of settings to preload.
    */
   public function getModules() {
-    $moduleNames = $this->cache->get('moduleNames');
-    $angularModules = [];
+    $angularModules = $this->cache->get('angularModules') ?? [];
     // Cache not set, fetch fresh list of modules and store in cache
-    if (!$moduleNames) {
+    if (!$angularModules) {
       // Load all modules from CiviCRM core
       $files = (array) glob(\Civi::paths()->getPath('[civicrm.root]/ang/*.ang.php'));
       foreach ($files as $file) {
@@ -113,16 +112,7 @@ class Manager {
         }
       }
       $angularModules = $this->resolvePatterns($angularModules);
-      $this->cache->set('moduleNames', array_keys($angularModules));
-      foreach ($angularModules as $moduleName => $moduleInfo) {
-        $this->cache->set("module $moduleName", $moduleInfo);
-      }
-    }
-    // Rehydrate modules from cache
-    else {
-      foreach ($moduleNames as $moduleName) {
-        $angularModules[$moduleName] = $this->cache->get("module $moduleName");
-      }
+      $this->cache->set('angularModules', $angularModules);
     }
 
     return $angularModules;
