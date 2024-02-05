@@ -758,7 +758,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $closedStatus = $closedStatusResult['values'][$closedStatusResult['id']]['value'];
 
     // Go thru the motions to change case status
-    $form = new CRM_Case_Form_Activity_ChangeCaseStatus();
+    $form = new CRM_Case_Form_Activity();
     $form->_caseId = [$case1->id];
     $form->_oldCaseStatus = [$case1->status_id];
     $params = [
