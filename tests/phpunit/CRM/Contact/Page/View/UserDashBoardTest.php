@@ -53,7 +53,6 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $this->quickCleanup(['civicrm_uf_match']);
     CRM_Utils_Hook::singleton()->reset();
     CRM_Core_Session::singleton()->reset();
-    CRM_Core_Smarty::singleton()->clearTemplateVars();
     $this->callAPISuccess('Contact', 'delete', ['id' => $this->contactID]);
     parent::tearDown();
   }
