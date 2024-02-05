@@ -248,8 +248,9 @@ class CRM_Core_Permission {
    * @return int[]
    */
   public static function customGroup($type = CRM_Core_Permission::VIEW, $reset = FALSE, $userId = NULL) {
-    $customGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id',
-      ['fresh' => $reset]);
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll();
+    // Hook expects a flat array of [id => name]
+    $customGroups = array_combine(array_keys($customGroups), array_column($customGroups, 'name'));
 
     // Administrators and users with 'access all custom data' can see all custom groups.
     if (self::customGroupAdmin($userId)) {

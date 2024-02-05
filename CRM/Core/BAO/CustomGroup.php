@@ -32,15 +32,21 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * Retrieve a group by id, name, etc.
    *
    * @param array $filter
+   *   Simplified version of $filters in self::getAll; returns first group that matches every filter.
    *   e.g. `['id' => 23]` or `['name' => 'MyGroup']`
+   * @param int|null $permissionType
+   *    Check permission: (CRM_Core_Permission::VIEW | CRM_Core_Permission::EDIT)
+   * @param int|null $userId
+   *    User contact id for permission check (defaults to current user)
    * @return array|null
    *   Result includes all custom fields in addition to group info.
    */
-  public static function getGroup(array $filter): ?array {
+  public static function getGroup(array $filter, int $permissionType = NULL, int $userId = NULL): ?array {
+    $allGroups = self::getAll([], $permissionType, $userId);
     if (isset($filter['id']) && count($filter) === 1) {
-      return self::getAll()[$filter['id']] ?? NULL;
+      return $allGroups[$filter['id']] ?? NULL;
     }
-    foreach (self::getAll() as $group) {
+    foreach ($allGroups as $group) {
       if (array_intersect_assoc($filter, $group) === $filter) {
         return $group;
       }
@@ -64,23 +70,16 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @return array[]
    */
   public static function getAll(array $filters = [], int $permissionType = NULL, int $userId = NULL): array {
+    $allGroups = self::loadAll();
     if (isset($permissionType)) {
       if (!in_array($permissionType, [CRM_Core_Permission::EDIT, CRM_Core_Permission::VIEW], TRUE)) {
         throw new CRM_Core_Exception('permissionType must be CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT');
       }
       $permittedIds = CRM_Core_Permission::customGroup($permissionType, FALSE, $userId);
-      if (!empty($filters['id'])) {
-        $filters['id'] = array_intersect((array) $filters['id'], $permittedIds);
-      }
-      else {
-        $filters['id'] = $permittedIds;
-      }
-      if (!$filters['id']) {
-        return [];
-      }
+      $allGroups = array_intersect_key($allGroups, array_flip($permittedIds));
     }
     if (!$filters) {
-      return self::loadAll();
+      return $allGroups;
     }
     if (!empty($filters['extends']) && is_string($filters['extends'])) {
       $contactTypes = CRM_Contact_BAO_ContactType::basicTypes(TRUE);
@@ -93,7 +92,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         $filters['extends'] = ['Contact', $filters['extends']];
       }
     }
-    $allGroups = array_filter(self::loadAll(), function($group) use ($filters) {
+    $allGroups = array_filter($allGroups, function($group) use ($filters) {
       foreach ($filters as $filterKey => $filterValue) {
         $groupValue = $group[$filterKey] ?? NULL;
         // Compare arrays using array_intersect

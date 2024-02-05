@@ -80,7 +80,7 @@ class AfformAdminMeta {
     // Custom entities are always type 'join'
     if (in_array('CustomValue', $info['type'], TRUE)) {
       $meta['type'] = 'join';
-      $max = (int) \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', substr($info['name'], 7), 'max_multiple', 'name');
+      $max = (int) \CRM_Core_BAO_CustomGroup::getGroup(['name' => substr($info['name'], 7)])['max_multiple'];
       $meta['repeat_max'] = $max ?: NULL;
     }
     return $meta;
