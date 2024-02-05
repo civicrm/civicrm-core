@@ -157,25 +157,6 @@ class CRM_Core_SmartyCompatibility extends Smarty {
   }
 
   /**
-   * Returns a single or all template variables
-   *
-   * @api  Smarty::getTemplateVars()
-   * @link http://www.smarty.net/docs/en/api.get.template.vars.tpl
-   *
-   * @param string $varName variable name or NULL
-   * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $_ptr optional pointer to data object
-   * @param bool $searchParents include parent templates?
-   *
-   * @return mixed variable value or or array of variables
-   */
-  public function getTemplateVars($varName = NULL, Smarty_Internal_Data $_ptr = NULL, $searchParents = TRUE) {
-    if (method_exists(get_parent_class(), 'getTemplateVars')) {
-      return parent::getTemplateVars($varName, $_ptr, $searchParents);
-    }
-    return parent::get_template_vars($varName);
-  }
-
-  /**
    * Generally Civi mis-uses this for perceived php4 conformance, avoid.
    *
    * @deprecated
