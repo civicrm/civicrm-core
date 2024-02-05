@@ -614,7 +614,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $formatted = self::formatPriceSetParams($form, $fields);
       $ppParams = [$formatted];
       $priceSetErrors = $form->validatePriceSet($ppParams, $form->_feeBlock, $fields['priceSetId'], $form->get('priceSet'));
-      $primaryParticipantCount = self::getParticipantCount($form, $ppParams);
+      $primaryParticipantCount = $form->getParticipantCount($ppParams);
 
       //get price set fields errors in.
       $errors = array_merge($errors, CRM_Utils_Array::value(0, $priceSetErrors, []));
@@ -759,7 +759,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     //hack to allow group to register w/ waiting
-    $primaryParticipantCount = self::getParticipantCount($this, $params);
+    $primaryParticipantCount = $this->getParticipantCount($params);
 
     $totalParticipants = $primaryParticipantCount;
     if (!empty($params['additional_participants'])) {

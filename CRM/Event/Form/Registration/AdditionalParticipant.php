@@ -248,7 +248,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     if ($this->_lastParticipant || $pricesetFieldsCount) {
       //get the participant total.
-      $processedCnt = self::getParticipantCount($this, $this->_params, TRUE);
+      $processedCnt = $this->getParticipantCount($this->_params, TRUE);
     }
 
     if (!$this->_allowConfirmation && !empty($this->_params[0]['bypass_payment']) &&
@@ -499,7 +499,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
         //format current participant params.
         $allParticipantParams[$addParticipantNum] = self::formatPriceSetParams($self, $fields);
-        $totalParticipants = self::getParticipantCount($self, $allParticipantParams);
+        $totalParticipants = $self->getParticipantCount($allParticipantParams);
 
         //validate price field params.
         $priceSetErrors = $self->validatePriceSet($allParticipantParams, $self->_feeBlock, $self->get('priceSetId'), $self->get('priceSet'));
@@ -659,13 +659,13 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     ) {
       $this->_allowWaitlist = FALSE;
       //get the current page count.
-      $currentCount = self::getParticipantCount($this, $params);
-      if ($button == 'skip') {
+      $currentCount = $this->getParticipantCount($params);
+      if ($button === 'skip') {
         $currentCount = 'skip';
       }
 
       //get the total count.
-      $previousCount = self::getParticipantCount($this, $this->_params, TRUE);
+      $previousCount = $this->getParticipantCount($this->_params, TRUE);
       $totalParticipants = $previousCount;
       if (is_numeric($currentCount)) {
         $totalParticipants += $currentCount;

@@ -890,15 +890,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Calculate the total participant count as per params.
    *
-   * @param CRM_Core_Form $form
    * @param array $params
    *   User params.
    * @param bool $skipCurrent
    *
    * @return int
    */
-  public static function getParticipantCount(&$form, $params, $skipCurrent = FALSE) {
+  protected function getParticipantCount($params, $skipCurrent = FALSE) {
     $totalCount = 0;
+    $form = $this;
     if (!is_array($params) || empty($params)) {
       return $totalCount;
     }
