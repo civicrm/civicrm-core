@@ -297,7 +297,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         if (empty($val['options'])) {
           continue;
         }
-        $optionFullIds = CRM_Utils_Array::value('option_full_ids', $val, []);
+        $optionFullIds = $this->getOptionFullPriceFieldValues($val);
         foreach ($val['options'] as $keys => $values) {
           $priceFieldName = 'price_' . $values['price_field_id'];
           $priceFieldValue = CRM_Price_BAO_PriceSet::getPriceFieldValueFromURL($this, $priceFieldName);

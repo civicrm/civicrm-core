@@ -144,7 +144,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           continue;
         }
 
-        $optionsFull = CRM_Utils_Array::value('option_full_ids', $val, []);
+        $optionsFull = $this->getOptionFullPriceFieldValues($val);
         foreach ($val['options'] as $keys => $values) {
           if ($values['is_default'] && !in_array($keys, $optionsFull)) {
             if ($val['html_type'] === 'CheckBox') {

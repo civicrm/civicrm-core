@@ -1053,19 +1053,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * @param array $field
-   *
-   * @return array
-   */
-  protected function addOptionFullInformation(array $field): array {
-    $optionFullIds = $this->getOptionFullPriceFieldValues($field);
-
-    //finally get option ids in.
-    $field['option_full_ids'] = $optionFullIds;
-    return $field;
-  }
-
-  /**
    * Calculate the total participant count as per params.
    *
    * @param array $params
@@ -1998,8 +1985,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     //build the priceset fields.
     if ($priceSetID) {
 
-      //format price set fields across option full.
-      $this->formatPriceFieldsForFull($feeFields);
       // This is probably not required now - normally loaded from event ....
       $form->add('hidden', 'priceSetId', $priceSetID);
 
@@ -2038,7 +2023,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             }
           }
 
-          $optionFullIds = CRM_Utils_Array::value('option_full_ids', $field, []);
+          $optionFullIds = $this->getOptionFullPriceFieldValues($field);
 
           //soft suppress required rule when option is full.
           if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {
@@ -2090,26 +2075,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
     // @todo this is temporary while we stop calling it from other places
     $this->_feeBlock = $feeFields;
-  }
-
-  /**
-   *
-   */
-  protected function formatPriceFieldsForFull(&$feeBlock): void {
-    $form = $this;
-    $priceSet = $form->get('priceSet');
-    $priceSetId = $form->get('priceSetId');
-    if (!$priceSetId ||
-      !is_array($priceSet) ||
-      empty($priceSet)
-      || !$this->isMaxValueValidationRequired()
-    ) {
-      return;
-    }
-
-    foreach ($feeBlock as &$field) {
-      $field = $this->addOptionFullInformation($field);
-    }
   }
 
   /**
