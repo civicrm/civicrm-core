@@ -828,8 +828,8 @@ class Api4SelectQuery extends Api4Query {
         }
         if ($this->getCheckPermissions() && $isCustom) {
           // Check access to custom group
-          $groupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $link->getTargetTable(), 'id', 'table_name');
-          if (!\CRM_Core_BAO_CustomGroup::checkGroupAccess($groupId, \CRM_Core_Permission::VIEW)) {
+          $allowedGroup = \CRM_Core_BAO_CustomGroup::getGroup(['table_name' => $link->getTargetTable()], \CRM_Core_Permission::VIEW);
+          if (!$allowedGroup) {
             return;
           }
         }
