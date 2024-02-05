@@ -12,12 +12,6 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
    */
   public function preProcess() {
     parent::preProcess();
-
-    $this->cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    if (!isset($this->cid) || $this->cid > 0) {
-      //TODO users with permission can default to another contact
-      $this->cid = self::getContactID();
-    }
   }
 
   /**
@@ -47,8 +41,8 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
       ]
     );
 
-    if ($this->cid) {
-      $params = ['id' => $this->cid];
+    if ($this->getContactID()) {
+      $params = ['id' => $this->getContactID()];
       $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
       $contact_values = [];
       CRM_Core_DAO::storeValues($contact, $contact_values);
@@ -95,8 +89,8 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
       $index = -1;
       foreach ($price_set['fields'] as $field) {
         $index++;
-        if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
-           (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == TRUE)) {
+        if (($field['visibility'] ?? '') === 'public' ||
+           (($field['visibility'] ?? '') === 'admin' && $adminFieldVisible == TRUE)) {
           $field_name = "event_{$event->id}_price_{$field['id']}";
           if (!empty($field['options'])) {
             CRM_Price_BAO_PriceField::addQuickFormElement($this, $field_name, $field['id'], FALSE);
@@ -187,6 +181,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
    * Set default values.
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $this->loadCart();
@@ -196,17 +191,17 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
       $form = $participant->get_form();
       if (empty($participant->email)
         && ($participant->get_participant_index() == 1)
-        && ($this->cid != 0)
+        && ($this->getContactID() != 0)
       ) {
         $defaults = [];
-        $params = ['id' => $this->cid];
+        $params = ['id' => $this->getContactID()];
         $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
-        $participant->contact_id = $this->cid;
+        $participant->contact_id = $this->getContactID();
         $participant->save();
         $participant->email = self::primary_email_from_contact($contact);
       }
-      elseif ($this->cid == 0
-        && $participant->contact_id == self::getContactID()
+      elseif ($this->getContactID() == 0
+        && $participant->contact_id == $this->getContactID()
       ) {
         $participant->email = NULL;
         $participant->contact_id = self::find_or_create_contact();
@@ -227,7 +222,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
             $field_name = "event_{$event_id}_price_{$field['id']}";
             foreach ($options as $value) {
               if ($value['is_default']) {
-                if ($field['html_type'] == 'Checkbox') {
+                if ($field['html_type'] === 'Checkbox') {
                   $defaults[$field_name] = 1;
                 }
                 else {
