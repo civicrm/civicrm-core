@@ -89,30 +89,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'first_name' => 'k',
       'last_name' => 'p',
       'email-Primary' => 'demo@example.com',
-      'hidden_processor' => '1',
-      'credit_card_number' => '4111111111111111',
-      'cvv2' => '123',
-      'credit_card_exp_date' => [
-        'M' => '1',
-        'Y' => date('Y') + 1,
-      ],
-      'credit_card_type' => 'Visa',
-      'billing_first_name' => 'p',
-      'billing_middle_name' => '',
-      'billing_last_name' => 'p',
-      'billing_street_address-5' => 'p',
-      'billing_city-5' => 'p',
-      'billing_state_province_id-5' => '1061',
-      'billing_postal_code-5' => '7',
-      'billing_country_id-5' => '1228',
-      'priceSetId' => $this->getPriceSetID('PaidEvent'),
       'price_' . $this->getPriceFieldID('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_standard'],
-      'payment_processor_id' => $paymentProcessorID,
-      'year' => '2019',
-      'month' => '1',
-      'billing_state_province-5' => 'AP',
-      'billing_country-5' => 'US',
-    ]);
+    ] + $this->getCreditCardParameters($paymentProcessorID));
     $this->callAPISuccessGetCount('Participant', [], 1);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(300, $contribution['total_amount']);
@@ -620,10 +598,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'email-Primary' => 'bruce@gotham.com',
           'is_primary' => 1,
           'is_pay_later' => 0,
-          'campaign_id' => NULL,
-          'defaultRole' => 1,
-          'participant_role_id' => '1',
-          'button' => '_qf_Register_upload',
         ],
       ]
     );
@@ -648,6 +622,35 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       $submittedValues,
       ['id' => $eventID])
       ->addSubsequentForm('CRM_Event_Form_Registration_Confirm');
+  }
+
+  /**
+   * @param int $paymentProcessorID
+   *
+   * @return array
+   */
+  public function getCreditCardParameters(int $paymentProcessorID): array {
+    return [
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '123',
+      'credit_card_exp_date' => [
+        'M' => '1',
+        'Y' => date('Y') + 1,
+      ],
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      'billing_state_province-5' => 'AP',
+      'billing_country-5' => 'US',
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'p',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'p',
+      'billing_street_address-5' => 'p',
+      'billing_city-5' => 'p',
+      'billing_state_province_id-5' => '1061',
+      'billing_postal_code-5' => '7',
+      'billing_country_id-5' => '1228',
+      'payment_processor_id' => $paymentProcessorID,
+    ];
   }
 
 }
