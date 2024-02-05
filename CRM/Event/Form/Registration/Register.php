@@ -433,12 +433,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->assign('isAdditionalParticipants', $isAdditionalParticipants);
 
     if ($this->_values['event']['is_monetary']) {
-      // Required for currency formatting in the JS layer
-      // this is a temporary fix intended to resolve a regression quickly
-      // And assigning moneyFormat for js layer formatting
-      // will only work until that is done.
-      // https://github.com/civicrm/civicrm-core/pull/19151
-      $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56));
       // build amount only when needed, skip incase of event full and waitlisting is enabled
       // and few other conditions check preProcess()
       if (!$this->_noFees) {
