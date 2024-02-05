@@ -94,8 +94,9 @@ class Manager {
       \CRM_Utils_Hook::angularModules($angularModules);
 
       foreach ($angularModules as $module => $info) {
-        // Merge in defaults
-        $angularModules[$module] += ['basePages' => ['civicrm/a']];
+        // This property must be an array. If null, set to the historical default of ['civicrm/a']
+        // (historical default preserved for backward-compat reasons, but a better default would be the more common value of []).
+        $angularModules[$module]['basePages'] ??= ['civicrm/a'];
         if (!empty($info['settings'])) {
           \CRM_Core_Error::deprecatedWarning(sprintf('The Angular file "%s" from extension "%s" must be updated to use "settingsFactory" instead of "settings". See https://github.com/civicrm/civicrm-core/pull/19052', $info['module'], $info['ext']));
         }
