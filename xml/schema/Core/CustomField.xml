@@ -345,6 +345,22 @@
     <comment>Name of entity being referenced.</comment>
     <add>5.60</add>
   </field>
+  <field>
+    <name>fk_entity_on_delete</name>
+    <type>varchar</type>
+    <title>On Referenced Entity Delete</title>
+    <length>255</length>
+    <default>'set_null'</default>
+    <required>true</required>
+    <comment>Behavior if referenced entity is deleted.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_CustomField::getFkEntityOnDeleteOptions</callback>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>5.71</add>
+  </field>
   <index>
     <name>UI_label_custom_group_id</name>
     <fieldName>label</fieldName>
