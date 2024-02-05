@@ -134,12 +134,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   /**
    * Build the form object.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->preventAjaxSubmit();
     $this->assign('isAdmin', CRM_Core_Permission::check('administer CiviCRM'));
 
     $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE, ['class' => 'crm-select2 huge']);
-    if ($this->_selectedOutput != 'email') {
+    if ($this->_selectedOutput !== 'email') {
       $this->addElement('radio', 'output', NULL, ts('Email Invoice'), 'email_invoice');
       $this->addElement('radio', 'output', NULL, ts('PDF Invoice'), 'pdf_invoice');
       $this->addRule('output', ts('Selection required'), 'required');
@@ -162,7 +162,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $this->addButtons([
       [
         'type' => 'upload',
-        'name' => $this->_selectedOutput == 'email' ? ts('Send Email') : ts('Process Invoice(s)'),
+        'name' => $this->_selectedOutput === 'email' ? ts('Send Email') : ts('Process Invoice(s)'),
         'isDefault' => TRUE,
       ],
       [
