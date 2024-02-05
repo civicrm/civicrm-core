@@ -1748,23 +1748,23 @@ class CRM_Utils_Token {
       'WorkFlowMessageTemplates' => [
         'contribution_invoice_receipt' => [
           '$display_name' => 'contact.display_name',
-          '$dataArray' => ts('found within $taxBreakDown'),
+          '$dataArray' => ts('see default template for how to show this'),
         ],
         'contribution_online_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
           '$first_name' => 'contact.first_name',
           '$last_name' => 'contact.last_name',
           '$displayName' => 'contact.display_name',
-          '$dataArray' => ts('found within $taxBreakDown'),
+          '$dataArray' => ts('see default template for how to show this'),
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
           'receipt_text_renewal' => 'receipt_text',
           '$isAmountZero' => ts('no longer available / relevant'),
-          '$dataArray' => ts('found within $taxBreakDown'),
+          '$dataArray' => ts('see default template for how to show this'),
         ],
         'membership_online_receipt' => [
-          '$dataArray' => ts('found within $taxBreakDown'),
+          '$dataArray' => ts('see default template for how to show this'),
           '$mem_start_date' => 'membership.start_date',
           '$mem_end_date' => 'membership.end_date',
           '$mem_join_date' => 'membership.join_date',
@@ -1772,10 +1772,10 @@ class CRM_Utils_Token {
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
           '$isAmountZero' => ts('no longer available / relevant'),
-          '$dataArray' => ts('found within $participants'),
+          '$dataArray' => ts('see default template for how to show this'),
           '$paidBy' => 'contribution.payment_instrument_id:label',
           '$totalTaxAmount' => 'contribution.tax_amount',
-          '$amount' => ts('found within $participants'),
+          '$amount' => ts('see default template for how to show this'),
           '$checkNumber' => 'contribution.check_number',
           '$module' => ts('no longer available / relevant'),
           '$register_date' => 'participant.register_date',
@@ -1785,7 +1785,7 @@ class CRM_Utils_Token {
           '$location' => 'event.location',
           '$isShowLocation' => 'event.is_show_location|boolean',
           '$event.participant_role' => 'participant.role_id:label',
-          '$amount_level' => ts('found within $participants'),
+          '$amount_level' => ts('see default template for how to show this'),
           'balanceAmount' => 'contribution.balance_amount',
           '$financialTypeName' => 'contribution.financial_type_id:label',
           '$contributionTypeName' => 'contribution.financial_type_id:label',
@@ -1795,7 +1795,8 @@ class CRM_Utils_Token {
         ],
         'event_online_receipt' => [
           '`$participant.id`' => 'participant.id',
-          '$dataArray' => ts('found within $taxBreakDown'),
+          '$dataArray' => ts('see default template for how to show this'),
+          '$individual' => ts('see default template for how to show this'),
         ],
         'pledge_acknowledgement' => [
           '$domain' => ts('no longer available / relevant'),

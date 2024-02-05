@@ -227,9 +227,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       [$taxAmount, $participantDetails, $individual, $amountArray] = $this->calculateAmounts();
       $this->assign('totalTaxAmount', $taxAmount);
       $this->_amount = $amountArray;
-
+      $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
       if (\Civi::settings()->get('invoicing')) {
-        $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
+        // @todo - remove this - used to be for online event template but no longer used.
         $this->assign('individual', $individual);
         $this->set('individual', $individual);
       }
