@@ -34,6 +34,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   private CRM_Financial_BAO_Order $order;
 
+  private array $optionsCount;
+
   protected function getOrder(): CRM_Financial_BAO_Order {
     if (!isset($this->order)) {
       $this->initializeOrder();
@@ -892,6 +894,25 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get the used seat count for the price value option
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  protected function getUsedSeatsCount(int $priceFieldValueID) : int {
+    $skipParticipants = [];
+    if (!empty($this->_allowConfirmation) && (isset($this->_pId) || isset($this->_additionalParticipantId))) {
+      // to skip current registered participants fields option count on confirmation.
+      $skipParticipants[] = $this->_participantId;
+      if (!empty($this->_additionalParticipantIds)) {
+        $skipParticipants = array_merge($skipParticipants, $this->_additionalParticipantIds);
+      }
+    }
+    $this->optionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($this->getEventID(), $skipParticipants);
+    return $this->optionsCount[$priceFieldValueID] ?? 0;
+  }
+
+  /**
    * @param array $field
    *
    * @return array
@@ -911,7 +932,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $defaultPricefieldIds[] = $lineItem['price_field_value_id'];
       }
     }
-    $skipParticipants = $formattedPriceSetDefaults = [];
+    $formattedPriceSetDefaults = [];
     if (!empty($form->_allowConfirmation) && (isset($form->_pId) || isset($form->_additionalParticipantId))) {
       $participantId = $form->_pId ?? $form->_additionalParticipantId;
       $pricesetDefaults = CRM_Event_Form_EventFees::setDefaultPriceSet($participantId,
@@ -920,29 +941,22 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       // modify options full to respect the selected fields
       // options on confirmation.
       $formattedPriceSetDefaults = self::formatPriceSetParams($form, $pricesetDefaults);
-
-      // to skip current registered participants fields option count on confirmation.
-      $skipParticipants[] = $form->_participantId;
-      if (!empty($form->_additionalParticipantIds)) {
-        $skipParticipants = array_merge($skipParticipants, $form->_additionalParticipantIds);
-      }
     }
+
     //get the current price event price set options count.
     $currentOptionsCount = $this->getPriceSetOptionCount();
-    $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($this->getEventID(), $skipParticipants);
 
     foreach ($field['options'] as &$option) {
       $optId = $option['id'];
       $count = $option['count'] ?? 0;
       $maxValue = $option['max_value'] ?? 0;
-      $dbTotalCount = $recordedOptionsCount[$optId] ?? 0;
       $currentTotalCount = $currentOptionsCount[$optId] ?? 0;
 
-      $totalCount = $currentTotalCount + $dbTotalCount;
+      $totalCount = $currentTotalCount + $this->getUsedSeatsCount($optId);
       $isFull = FALSE;
       if ($maxValue &&
         (($totalCount >= $maxValue) &&
-          (empty($this->_lineItem[$currentParticipantNo][$optId]['price_field_id']) || $dbTotalCount >= $maxValue))
+          (empty($this->_lineItem[$currentParticipantNo][$optId]['price_field_id']) || $this->getUsedSeatsCount($optId) >= $maxValue))
       ) {
         $isFull = TRUE;
         $optionFullIds[$optId] = $optId;
@@ -965,7 +979,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         }
       }
       $option['is_full'] = $isFull;
-      $option['db_total_count'] = $dbTotalCount;
     }
 
     //finally get option ids in.
@@ -1479,7 +1492,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $options = $feeBlock[$fieldId]['options'] ?? [];
       foreach ($values as $optId => $total) {
         $optMax = $optionsMaxValueDetails[$fieldId]['options'][$optId];
-        $opDbCount = $options[$optId]['db_total_count'] ?? 0;
+        $opDbCount = $this->getUsedSeatsCount($optId);
         $total += $opDbCount;
         if ($optMax && ($total > $optMax)) {
           if ($opDbCount && ($opDbCount >= $optMax)) {
