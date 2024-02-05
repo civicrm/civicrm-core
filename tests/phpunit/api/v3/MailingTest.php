@@ -460,10 +460,16 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'first_name' => 'Alice',
       'last_name' => 'Person',
     ]);
+    $contactIDs['bob'] = $this->individualCreate([
+      'email' => 'bob@example.org',
+      'first_name' => 'Bob',
+      'last_name' => 'Person',
+      'do_not_email' => 1,
+    ]);
 
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
 
-    $params = ['mailing_id' => $mail['id'], 'test_email' => 'ALicE@example.org', 'test_group' => NULL];
+    $params = ['mailing_id' => $mail['id'], 'test_email' => 'ALicE@example.org,bob@example.org', 'test_group' => NULL];
     // Per https://lab.civicrm.org/dev/core/issues/229 ensure this is not passed through!
     // Per https://lab.civicrm.org/dev/mail/issues/32 test non-lowercase email
     $params['id'] = $mail['id'];

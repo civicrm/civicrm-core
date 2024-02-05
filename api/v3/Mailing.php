@@ -671,13 +671,9 @@ function civicrm_api3_mailing_send_test($params) {
   $testEmailParams['emails'] = array_key_exists('test_email', $testEmailParams) ? explode(',', strtolower($testEmailParams['test_email'] ?? '')) : NULL;
   if (!empty($params['test_email'])) {
     $query = CRM_Utils_SQL_Select::from('civicrm_email e')
-      ->select(['e.id', 'e.contact_id', 'e.email'])
+      ->select(['e.id', 'e.contact_id', 'e.email', 'e.on_hold', 'c.is_opt_out', 'c.do_not_email', 'c.is_deceased'])
       ->join('c', 'INNER JOIN civicrm_contact c ON e.contact_id = c.id')
       ->where('e.email IN (@emails)', ['@emails' => $testEmailParams['emails']])
-      ->where('e.on_hold = 0')
-      ->where('c.is_opt_out = 0')
-      ->where('c.do_not_email = 0')
-      ->where('c.is_deceased = 0')
       ->where('c.is_deleted = 0')
       ->groupBy('e.id')
       ->orderBy(['e.is_bulkmail DESC', 'e.is_primary DESC'])
@@ -689,16 +685,22 @@ function civicrm_api3_mailing_send_test($params) {
       $emailDetail[strtolower($dao->email)] = [
         'contact_id' => $dao->contact_id,
         'email_id' => $dao->id,
+        'is_opt_out' => $dao->is_opt_out,
+        'do_not_email' => $dao->do_not_email,
+        'is_deceased' => $dao->is_deceased,
       ];
     }
-    foreach ($testEmailParams['emails'] as $key => $email) {
+    foreach ($testEmailParams['emails'] as $email) {
       $email = trim($email);
       $contactId = $emailId = NULL;
       if (array_key_exists($email, $emailDetail)) {
+        if ($emailDetail[$email]['is_opt_out'] || $emailDetail[$email]['do_not_email'] || $emailDetail[$email]['is_deceased']) {
+          continue;
+        }
         $emailId = $emailDetail[$email]['email_id'];
         $contactId = $emailDetail[$email]['contact_id'];
       }
-      if (!$contactId && CRM_Core_Permission::check('add contacts')) {
+      elseif (!$contactId && CRM_Core_Permission::check('add contacts')) {
         //create new contact.
         $contact   = civicrm_api3('Contact', 'create',
           [
