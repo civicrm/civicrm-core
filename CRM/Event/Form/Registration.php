@@ -894,6 +894,28 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get the array of price field value IDs on the form that 'count' as
+   * full.
+   *
+   * The criteria for full is slightly confusing as it has an exclusion around
+   * select fields if they are the default - or something...
+   *
+   * @param array $field
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getOptionFullPriceFieldValues(array $field): array {
+    $optionFullIds = [];
+    foreach ($field['options'] ?? [] as &$option) {
+      if ($this->isOptionFullID($option, $field)) {
+        $optionFullIds[$option['id']] = $option['id'];
+      }
+    }
+    return $optionFullIds;
+  }
+
+  /**
    * Is the option a 'full ID'.
    *
    * It is not clear why this is different to the is_full calculation
@@ -1036,17 +1058,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return array
    */
   protected function addOptionFullInformation(array $field): array {
-
-    if (!is_array($field['options'])) {
-      // Is this reachable
-      return $field;
-    }
-    $optionFullIds = [];
-    foreach ($field['options'] as &$option) {
-      if ($this->isOptionFullID($option, $field)) {
-        $optionFullIds[$option['id']] = $option['id'];
-      }
-    }
+    $optionFullIds = $this->getOptionFullPriceFieldValues($field);
 
     //finally get option ids in.
     $field['option_full_ids'] = $optionFullIds;
