@@ -18,15 +18,14 @@
 /**
  * Smarty Compatibility class.
  *
- * This class implements but Smarty v2 & Smarty v3 functions so that
+ * This class implements both Smarty v2 & Smarty v3+ functions so that
  *
  * 1) we can start to transition functions like `$smarty->assign_var` to
  * `$smarty->assignVar()`
- * 2) if someone adds the Smarty3 package onto their site and
- * defines CIVICRM_SMARTY3_AUTOLOAD_PATH then Smarty3 will load from that
+ * 2) if someone defines CIVICRM_SMARTY_AUTOLOAD_PATH then Smarty will load from that
  * location.
  *
- * Note that experimenting with `CIVICRM_SMARTY3_AUTOLOAD_PATH` will not
+ * Note that experimenting with `CIVICRM_SMARTY_AUTOLOAD_PATH` will not
  * go well if extensions are installed that have not run civix upgrade
  * somewhat recently (ie have the old version of the hook_civicrm_config
  * with reference to `$template =& CRM_Core_Smarty::singleton();`
@@ -37,12 +36,12 @@
  * other similar PEAR packages. doubt it
  */
 if (!class_exists('Smarty')) {
-  if (defined('CIVICRM_SMARTY3_AUTOLOAD_PATH')) {
-    // @todo - this is experimental but it allows someone to
-    // get Smarty3 to load instead of Smarty2 if set.
-    // It is likely the final Smarty3 solution will look
-    // different but this makes testing possible without re-inventing
-    // it each time we try...
+  if (defined('CIVICRM_SMARTY_AUTOLOAD_PATH')) {
+    // Specify the smarty version to load.
+    require_once CIVICRM_SMARTY_AUTOLOAD_PATH;
+  }
+  elseif (defined('CIVICRM_SMARTY3_AUTOLOAD_PATH')) {
+    // older version of the above constant.
     require_once CIVICRM_SMARTY3_AUTOLOAD_PATH;
   }
   else {

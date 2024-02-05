@@ -147,7 +147,9 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     }
 
     if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')
-      && !CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH')) {
+      && !CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH')
+      && !CRM_Utils_Constant::value('CIVICRM_SMARTY_AUTOLOAD_PATH')
+    ) {
       // Currently DEFAULT escape does not work with Smarty3
       // dunno why - thought it would be the default with Smarty3 - but
       // getting onto Smarty 3 is higher priority.
