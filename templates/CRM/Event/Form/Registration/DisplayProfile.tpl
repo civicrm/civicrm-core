@@ -22,7 +22,7 @@
                    {/foreach}
                </fieldset>
             {/if}
-         {if $primaryParticipantProfile.CustomPost}
+         {if array_key_exists('CustomPost', $primaryParticipantProfile) && $primaryParticipantProfile.CustomPost}
                {foreach from=$primaryParticipantProfile.CustomPost item=value key=field}
                   <fieldset class="label-left no-border"><div class="bold crm-profile-view-title">{$primaryParticipantProfile.CustomPostGroupTitle.$field.groupTitle}</div>
                     <div class="crm-profile-view">

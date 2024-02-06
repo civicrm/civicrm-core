@@ -50,6 +50,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * Show fee block or not.
    *
    * @var bool
+   *
+   * @deprecated
    */
   public $_noFees;
 
@@ -164,10 +166,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId, FALSE, CRM_Utils_Array::value('has_waitlist', $this->_values['event']));
 
     // Get payment processors if appropriate for this event
-    // We hide the payment fields if the event is full or requires approval,
-    // and the current user has not yet been approved CRM-12279
-    $this->_noFees = (($eventFull || $this->_requireApproval) && !$this->_allowConfirmation);
-    $this->_paymentProcessors = $this->_noFees ? [] : $this->get('paymentProcessors');
+    $this->_noFees = $suppressPayment = $this->isSuppressPayment();
+    $this->_paymentProcessors = $suppressPayment ? [] : $this->get('paymentProcessors');
+    $this->assign('suppressPaymentBlock', $suppressPayment);
     $this->preProcessPaymentOptions();
 
     $this->_allowWaitlist = FALSE;
@@ -221,7 +222,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    */
   public function setDefaultValues() {
     $this->_defaults = [];
-    if (!$this->_allowConfirmation && $this->_requireApproval) {
+    if ($this->isSuppressPayment()) {
       $this->_defaults['bypass_payment'] = 1;
     }
     $contactID = $this->getContactID();
@@ -435,8 +436,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($this->_values['event']['is_monetary']) {
       // build amount only when needed, skip incase of event full and waitlisting is enabled
       // and few other conditions check preProcess()
-      if (!$this->_noFees) {
-        $this->buildAmount(TRUE, NULL, $this->_priceSetId);
+      if (!$this->isSuppressPayment()) {
+        $this->buildAmount();
       }
       if (!$this->showPaymentOnConfirm) {
         CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
@@ -571,8 +572,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
     $spacesAvailable = $form->getEventValue('available_spaces');
     //check for availability of registrations.
-    if ($form->getEventValue('max_participants') !== NULL  && !$form->_allowConfirmation && empty($fields['bypass_payment']) &&
-      ($fields['additional_participants'] ?? 0) >= $spacesAvailable
+    if ($form->getEventValue('max_participants') !== NULL
+      && !$form->_allowConfirmation
+      && !empty($fields['additional_participants'])
+      && empty($fields['bypass_payment']) &&
+      ((int) $fields['additional_participants']) >= $spacesAvailable
     ) {
       $errors['additional_participants'] = ts("There is only enough space left on this event for %1 participant(s).", [1 => $spacesAvailable]);
     }
@@ -801,12 +805,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
       }
       elseif (empty($params['priceSetId'])) {
-        CRM_Core_Error::deprecatedWarning('unreachable code price set is always set here - passed as a hidden field although we could just load...');
+        // We would wind up here if waitlisting - in which case there should be no amount set.
         if (!empty($params['amount'])) {
+          CRM_Core_Error::deprecatedWarning('unreachable code price set is always set here - passed as a hidden field although we could just load...');
           $params['amount'] = $this->_values['fee'][$params['amount']]['value'];
-        }
-        else {
-          $params['amount'] = '';
         }
       }
       else {
@@ -827,7 +829,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $this->set('lineItemParticipantsCount', [$primaryParticipantCount]);
       }
 
-      $this->set('amount', $params['amount']);
+      $this->set('amount', $params['amount'] ?? 0);
       $this->set('amount_level', $params['amount_level']);
 
       // generate and set an invoiceID for this transaction
@@ -1002,6 +1004,27 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
       }
     }
+  }
+
+  /**
+   * Is it appropriate to suppress the payment elements on the form.
+   *
+   * We hide the price and payment fields if the event is full or requires approval,
+   * and the current user has not yet been approved CRM-12279
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  private function isSuppressPayment(): bool {
+    if ($this->_allowConfirmation) {
+      // They might be paying for a now-confirmed registration.
+      return FALSE;
+    }
+    if ($this->getSubmittedValue('bypass_payment')) {
+      // Value set by javascript on the form.
+      return TRUE;
+    }
+    return $this->isEventFull() || $this->_requireApproval;
   }
 
 }

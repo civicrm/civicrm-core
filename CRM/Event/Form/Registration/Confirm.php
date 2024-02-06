@@ -81,7 +81,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->_params[0]['is_pay_later'] = $this->get('is_pay_later');
     $this->assign('is_pay_later', $this->_params[0]['is_pay_later']);
     $this->assign('pay_later_receipt', $this->_params[0]['is_pay_later'] ? $this->_values['event']['pay_later_receipt'] : NULL);
-
+    $this->assign('confirm_text', $this->getEventValue('confirm_text'));
     CRM_Utils_Hook::eventDiscount($this, $this->_params);
 
     if (!empty($this->_params[0]['discount']) && !empty($this->_params[0]['discount']['applied'])) {
@@ -108,7 +108,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->setTitle($this->_values['event']['confirm_title']);
     }
 
-    // Personal campaign page
+    // Personal campaign page.
+    // Unclear if this really is possible on event pages or copy & paste.
+    $this->assign('pcpBlock', FALSE);
     if ($this->_pcpId) {
       $params = CRM_Contribute_Form_Contribution_Confirm::processPcp($this, $this->_params[0]);
       $this->_params[0] = $params;
@@ -220,7 +222,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->assignToTemplate();
 
     if ($this->_values['event']['is_monetary'] &&
-      ($this->_params[0]['amount'] || $this->_params[0]['amount'] == 0) &&
+      (isset($this->_params[0]['amount']) && is_numeric($this->_params[0]['amount'])) &&
       !$this->_requireApproval
     ) {
 
@@ -1203,6 +1205,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
       $form->_fields = $profileFields;
     }
+    $form->assign('addParticipantProfile', []);
     if (!empty($formattedValues)) {
       $form->assign('primaryParticipantProfile', $formattedValues[1]);
       $form->set('primaryParticipantProfile', $formattedValues[1]);

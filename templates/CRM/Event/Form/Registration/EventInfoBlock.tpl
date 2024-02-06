@@ -54,7 +54,7 @@
         {* loop on any phones and emails for this event *}
            {foreach from=$location.phone item=phone}
              {if $phone.phone}
-                {if $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}: {$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if}
+                {if array_key_exists('phone_type', $phone) && $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}: {$phone.phone} {if array_key_exists('phone_ext', $phone) && $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if}
                 <br />
             {/if}
            {/foreach}
