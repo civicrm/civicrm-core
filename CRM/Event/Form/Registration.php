@@ -671,16 +671,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $optionsMaxValueTotal = 0;
     $optionsMaxValueDetails = [];
 
-    foreach ($this->getPriceFieldMetaData() as $field) {
-      foreach ($field['options'] as $option) {
-        $maxVal = $option['max_value'] ?? 0;
-        $optionsMaxValueDetails['fields'][$field['id']]['options'][$option['id']] = $maxVal;
-        $optionsMaxValueTotal += $maxVal;
+    if ($this->isMaxValueValidationRequired()) {
+      foreach ($this->getPriceFieldMetaData() as $field) {
+        foreach ($field['options'] as $option) {
+          $maxVal = $option['max_value'] ?? 0;
+          $optionsMaxValueDetails['fields'][$field['id']]['options'][$option['id']] = $maxVal;
+          $optionsMaxValueTotal += $maxVal;
+        }
       }
-    }
-
-    $this->_priceSet['optionsMaxValueTotal'] = $optionsMaxValueTotal;
-    if ($optionsMaxValueTotal) {
       $this->_priceSet['optionsMaxValueDetails'] = $optionsMaxValueDetails;
     }
     $this->set('priceSet', $this->_priceSet);
@@ -1073,7 +1071,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $priceSetFields = $priceSet['optionsCountDetails']['fields'];
     }
 
-    if (!empty($priceSet['optionsMaxValueTotal'])) {
+    if ($this->isMaxValueValidationRequired()) {
       $priceMaxFieldDetails = $priceSet['optionsMaxValueDetails']['fields'];
     }
 
@@ -1321,8 +1319,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $optionsCountDetails = $optionsMaxValueDetails = [];
     if (
-      isset($priceSetDetails['optionsMaxValueTotal'])
-      && $priceSetDetails['optionsMaxValueTotal']
+      $this->isMaxValueValidationRequired()
     ) {
       $hasOptMaxValue = TRUE;
       $optionsMaxValueDetails = $priceSetDetails['optionsMaxValueDetails']['fields'];
@@ -1933,7 +1930,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
     if (!$priceSetId ||
       !is_array($priceSet) ||
-      empty($priceSet) || empty($priceSet['optionsMaxValueTotal'])
+      empty($priceSet)
+      || !$this->isMaxValueValidationRequired()
     ) {
       return;
     }
@@ -2006,6 +2004,25 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       //finally get option ids in.
       $field['option_full_ids'] = $optionFullIds;
     }
+  }
+
+  /**
+   * Is there a price field value configured with a maximum value.
+   *
+   * If so there will need to be a check to ensure the number used does not
+   * exceed it.
+   *
+   * @return bool
+   */
+  protected function isMaxValueValidationRequired(): bool {
+    foreach ($this->getPriceFieldMetaData() as $field) {
+      foreach ($field['options'] as $priceValueOption) {
+        if ($priceValueOption['max_value']) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
   }
 
 }
