@@ -91,7 +91,14 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
           // Standalone's session cannot be initialized until CiviCRM is booted,
           // since it is defined in an extension, and we need the session
           // initialized before calling applyLocale.
-          \CRM_Core_Session::singleton()->initialize();
+          $sess = \CRM_Core_Session::singleton();
+          $sess->initialize();
+          if ($sess->getLoggedInContactID()) {
+            // Apply user's timezone.
+            if (is_callable([self::$_singleton->userSystem, 'setMySQLTimeZone'])) {
+              self::$_singleton->userSystem->setMySQLTimeZone();
+            }
+          }
         }
         \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
 
