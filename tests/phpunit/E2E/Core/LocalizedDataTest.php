@@ -19,6 +19,8 @@ class LocalizedDataTest extends \CiviEndToEndTestCase {
    *
    * $ env CIVICRM_LOCALES=en_US,fr_FR,de_DE ./bin/setup.sh -g \
    *   && phpunit6 tests/phpunit/E2E/Core/LocalizedDataTest.php
+   *
+   * @group ornery
    */
   public function testLocalizedData(): void {
     $getSql = $this->getSqlFunc();
