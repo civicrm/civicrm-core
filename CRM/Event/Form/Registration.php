@@ -34,6 +34,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   private CRM_Financial_BAO_Order $order;
 
+  private array $optionsCount;
+
   protected function getOrder(): CRM_Financial_BAO_Order {
     if (!isset($this->order)) {
       $this->initializeOrder();
@@ -892,6 +894,165 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get the array of price field value IDs on the form that 'count' as
+   * full.
+   *
+   * The criteria for full is slightly confusing as it has an exclusion around
+   * select fields if they are the default - or something...
+   *
+   * @param array $field
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getOptionFullPriceFieldValues(array $field): array {
+    $optionFullIds = [];
+    foreach ($field['options'] ?? [] as &$option) {
+      if ($this->isOptionFullID($option, $field)) {
+        $optionFullIds[$option['id']] = $option['id'];
+      }
+    }
+    return $optionFullIds;
+  }
+
+  /**
+   * Is the option a 'full ID'.
+   *
+   * It is not clear why this is different to the is_full calculation
+   * but it is used in a less narrow context, around validation.
+   *
+   * Ideally figure it out & update this doc block.
+   *
+   * @param array $option
+   * @param array $field
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  private function isOptionFullID(array $option, array $field) : bool {
+    $fieldId = $option['price_field_id'];
+    $currentParticipantNo = (int) substr($this->_name, 12);
+    $defaultPricefieldIds = [];
+    if (!empty($this->_values['line_items'])) {
+      foreach ($this->_values['line_items'] as $lineItem) {
+        $defaultPricefieldIds[] = $lineItem['price_field_value_id'];
+      }
+    }
+    $formattedPriceSetDefaults = [];
+    if (!empty($this->_allowConfirmation) && (isset($this->_pId) || isset($this->_additionalParticipantId))) {
+      $participantId = $this->_pId ?? $this->_additionalParticipantId;
+      $pricesetDefaults = CRM_Event_Form_EventFees::setDefaultPriceSet($participantId,
+        $this->getEventID()
+      );
+      // modify options full to respect the selected fields
+      // options on confirmation.
+      $formattedPriceSetDefaults = self::formatPriceSetParams($this, $pricesetDefaults);
+    }
+
+    //get the current price event price set options count.
+    $currentOptionsCount = $this->getPriceSetOptionCount();
+    $optId = $option['id'];
+    $count = $option['count'] ?? 0;
+    $currentTotalCount = $currentOptionsCount[$optId] ?? 0;
+    $isOptionFull = FALSE;
+    $totalCount = $currentTotalCount + $this->getUsedSeatsCount($optId);
+    if ($option['max_value'] &&
+      (($totalCount >= $option['max_value']) &&
+        (empty($this->_lineItem[$currentParticipantNo][$optId]['price_field_id']) || $this->getUsedSeatsCount($optId) >= $option['max_value']))
+    ) {
+      $isOptionFull = TRUE;
+      if ($field['html_type'] === 'Select') {
+        if (!empty($defaultPricefieldIds) && in_array($optId, $defaultPricefieldIds)) {
+          $isOptionFull = FALSE;
+        }
+      }
+    }
+    //here option is not full,
+    //but we don't want to allow participant to increase
+    //seats at the time of re-walking registration.
+    if ($count &&
+      !empty($this->_allowConfirmation) &&
+      !empty($formattedPriceSetDefaults)
+    ) {
+      if (empty($formattedPriceSetDefaults["price_{$fieldId}"]) || empty($formattedPriceSetDefaults["price_{$fieldId}"][$optId])) {
+        $isOptionFull = TRUE;
+      }
+    }
+    return $isOptionFull;
+  }
+
+  /**
+   * Should this option be disabled on the basis of being full.
+   *
+   * Note there is another full calculation that is slightly different for
+   * ... reasons? When we figure out what those are we can update this.
+   *
+   * @param array $option
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  protected function getIsOptionFull(array $option): bool {
+    $isFull = FALSE;
+    $currentParticipantNo = (int) substr($this->_name, 12);
+    $formattedPriceSetDefaults = [];
+    $maxValue = $option['max_value'] ?? 0;
+    $priceFieldValueID = $option['id'];
+    //get the current price event price set options count.
+    $currentOptionsCount = $this->getPriceSetOptionCount();
+    $currentTotalCount = $currentOptionsCount[$priceFieldValueID] ?? 0;
+
+    $totalCount = $currentTotalCount + $this->getUsedSeatsCount($priceFieldValueID);
+    if (!empty($form->_allowConfirmation) && (isset($form->_pId) || isset($form->_additionalParticipantId))) {
+      $participantId = $form->_pId ?? $form->_additionalParticipantId;
+      $pricesetDefaults = CRM_Event_Form_EventFees::setDefaultPriceSet($participantId,
+        $this->getEventID()
+      );
+      // modify options full to respect the selected fields
+      // options on confirmation.
+      $formattedPriceSetDefaults = self::formatPriceSetParams($form, $pricesetDefaults);
+    }
+    $count = $option['count'] ?? 0;
+    if ($maxValue &&
+      (($totalCount >= $maxValue) &&
+        (empty($this->_lineItem[$currentParticipantNo][$priceFieldValueID]['price_field_id']) || $this->getUsedSeatsCount($priceFieldValueID) >= $maxValue))
+    ) {
+      $isFull = TRUE;
+    }
+    //here option is not full,
+    //but we don't want to allow participant to increase
+    //seats at the time of re-walking registration.
+    if ($count &&
+      !empty($this->_allowConfirmation) &&
+      !empty($formattedPriceSetDefaults)
+    ) {
+      if (empty($formattedPriceSetDefaults["price_{$option['price_field_id']}"]) || empty($formattedPriceSetDefaults["price_{$option['price_field_id']}"][$priceFieldValueID])) {
+        $isFull = TRUE;
+      }
+    }
+    return $isFull;
+  }
+
+  /**
+   * Get the used seat count for the price value option
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  protected function getUsedSeatsCount(int $priceFieldValueID) : int {
+    $skipParticipants = [];
+    if (!empty($this->_allowConfirmation) && (isset($this->_pId) || isset($this->_additionalParticipantId))) {
+      // to skip current registered participants fields option count on confirmation.
+      $skipParticipants[] = $this->_participantId;
+      if (!empty($this->_additionalParticipantIds)) {
+        $skipParticipants = array_merge($skipParticipants, $this->_additionalParticipantIds);
+      }
+    }
+    $this->optionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($this->getEventID(), $skipParticipants);
+    return $this->optionsCount[$priceFieldValueID] ?? 0;
+  }
+
+  /**
    * Calculate the total participant count as per params.
    *
    * @param array $params
@@ -1297,13 +1458,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * User should select at least one price field option.
    *
    * @param array $params
-   * @param array $feeBlock
    * @param int $priceSetId
    * @param array $priceSetDetails
    *
    * @return array
    */
-  protected function validatePriceSet(array $params, $feeBlock, $priceSetId, $priceSetDetails) {
+  protected function validatePriceSet(array $params, $priceSetId, $priceSetDetails) {
     $errors = [];
     $hasOptMaxValue = FALSE;
     if (!is_array($params) || empty($params)) {
@@ -1332,10 +1492,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $optionsCountDetails = $priceSetDetails['optionsCountDetails']['fields'];
     }
 
-    if (empty($feeBlock)) {
-      $feeBlock = $priceSetDetails['fields'];
-    }
-
     $optionMaxValues = $fieldSelected = [];
     foreach ($params as $pNum => $values) {
       if (!is_array($values) || $values == 'skip') {
@@ -1348,7 +1504,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         }
         $priceFieldId = substr($valKey, 6);
         $noneOptionValueSelected = FALSE;
-        if (!$feeBlock[$priceFieldId]['is_required'] && $value == 0) {
+        if (!$this->getPriceFieldMetaData()[$priceFieldId]['is_required'] && $value == 0) {
           $noneOptionValueSelected = TRUE;
         }
 
@@ -1366,7 +1522,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         }
 
         foreach ($value as $optId => $optVal) {
-          if (($feeBlock[$priceFieldId]['html_type'] ?? NULL) === 'Text') {
+          if (($this->getPriceFieldMetaData()[$priceFieldId]['html_type'] ?? NULL) === 'Text') {
             $currentMaxValue = $optVal;
           }
           else {
@@ -1394,10 +1550,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     //validate for option max value.
     foreach ($optionMaxValues as $fieldId => $values) {
-      $options = $feeBlock[$fieldId]['options'] ?? [];
       foreach ($values as $optId => $total) {
         $optMax = $optionsMaxValueDetails[$fieldId]['options'][$optId];
-        $opDbCount = $options[$optId]['db_total_count'] ?? 0;
+        $opDbCount = $this->getUsedSeatsCount($optId);
         $total += $opDbCount;
         if ($optMax && ($total > $optMax)) {
           if ($opDbCount && ($opDbCount >= $optMax)) {
@@ -1824,8 +1979,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     //build the priceset fields.
     if ($priceSetID) {
 
-      //format price set fields across option full.
-      $this->formatPriceFieldsForFull($feeFields);
       // This is probably not required now - normally loaded from event ....
       $form->add('hidden', 'priceSetId', $priceSetID);
 
@@ -1864,11 +2017,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             }
           }
 
-          $optionFullIds = CRM_Utils_Array::value('option_full_ids', $field, []);
+          $optionFullIds = $this->getOptionFullPriceFieldValues($field);
 
           //soft suppress required rule when option is full.
           if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {
             $isRequire = FALSE;
+          }
+          foreach ($options as $option) {
+            $options[$option['id']]['is_full'] = $this->getIsOptionFull($option);
           }
           if (!empty($options)) {
             //build the element.
@@ -1910,99 +2066,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       if ($required) {
         $form->addRule('amount', ts('Fee Level is a required field.'), 'required');
       }
-    }
-    // @todo this is temporary while we stop calling it from other places
-    $this->_feeBlock = $feeFields;
-  }
-
-  /**
-   *
-   */
-  protected function formatPriceFieldsForFull(&$feeBlock): void {
-    $form = $this;
-    $priceSet = $form->get('priceSet');
-    $priceSetId = $form->get('priceSetId');
-    $defaultPricefieldIds = [];
-    if (!empty($form->_values['line_items'])) {
-      foreach ($form->_values['line_items'] as $lineItem) {
-        $defaultPricefieldIds[] = $lineItem['price_field_value_id'];
-      }
-    }
-    if (!$priceSetId ||
-      !is_array($priceSet) ||
-      empty($priceSet)
-      || !$this->isMaxValueValidationRequired()
-    ) {
-      return;
-    }
-
-    $skipParticipants = $formattedPriceSetDefaults = [];
-    if (!empty($form->_allowConfirmation) && (isset($form->_pId) || isset($form->_additionalParticipantId))) {
-      $participantId = $form->_pId ?? $form->_additionalParticipantId;
-      $pricesetDefaults = CRM_Event_Form_EventFees::setDefaultPriceSet($participantId,
-        $form->_eventId
-      );
-      // modify options full to respect the selected fields
-      // options on confirmation.
-      $formattedPriceSetDefaults = self::formatPriceSetParams($form, $pricesetDefaults);
-
-      // to skip current registered participants fields option count on confirmation.
-      $skipParticipants[] = $form->_participantId;
-      if (!empty($form->_additionalParticipantIds)) {
-        $skipParticipants = array_merge($skipParticipants, $form->_additionalParticipantIds);
-      }
-    }
-
-    //get the current price event price set options count.
-    $currentOptionsCount = $form->getPriceSetOptionCount();
-    $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($form->_eventId, $skipParticipants);
-
-    $currentParticipantNo = (int) substr($form->_name, 12);
-    foreach ($feeBlock as & $field) {
-      $optionFullIds = [];
-      $fieldId = $field['id'];
-      if (!is_array($field['options'])) {
-        continue;
-      }
-      foreach ($field['options'] as & $option) {
-        $optId = $option['id'];
-        $count = $option['count'] ?? 0;
-        $maxValue = $option['max_value'] ?? 0;
-        $dbTotalCount = $recordedOptionsCount[$optId] ?? 0;
-        $currentTotalCount = $currentOptionsCount[$optId] ?? 0;
-
-        $totalCount = $currentTotalCount + $dbTotalCount;
-        $isFull = FALSE;
-        if ($maxValue &&
-          (($totalCount >= $maxValue) &&
-            (empty($form->_lineItem[$currentParticipantNo][$optId]['price_field_id']) || $dbTotalCount >= $maxValue))
-        ) {
-          $isFull = TRUE;
-          $optionFullIds[$optId] = $optId;
-          if ($field['html_type'] === 'Select') {
-            if (!empty($defaultPricefieldIds) && in_array($optId, $defaultPricefieldIds)) {
-              unset($optionFullIds[$optId]);
-            }
-          }
-        }
-        //here option is not full,
-        //but we don't want to allow participant to increase
-        //seats at the time of re-walking registration.
-        if ($count &&
-          !empty($form->_allowConfirmation) &&
-          !empty($formattedPriceSetDefaults)
-        ) {
-          if (empty($formattedPriceSetDefaults["price_{$field}"]) || empty($formattedPriceSetDefaults["price_{$fieldId}"][$optId])) {
-            $optionFullIds[$optId] = $optId;
-            $isFull = TRUE;
-          }
-        }
-        $option['is_full'] = $isFull;
-        $option['db_total_count'] = $dbTotalCount;
-      }
-
-      //finally get option ids in.
-      $field['option_full_ids'] = $optionFullIds;
     }
   }
 

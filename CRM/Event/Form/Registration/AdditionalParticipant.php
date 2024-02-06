@@ -139,12 +139,12 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
     }
     if ($this->_priceSetId) {
-      foreach ($this->_feeBlock as $key => $val) {
+      foreach ($this->getPriceFieldMetaData() as $key => $val) {
         if (empty($val['options'])) {
           continue;
         }
 
-        $optionsFull = CRM_Utils_Array::value('option_full_ids', $val, []);
+        $optionsFull = $this->getOptionFullPriceFieldValues($val);
         foreach ($val['options'] as $keys => $values) {
           if ($values['is_default'] && !in_array($keys, $optionsFull)) {
             if ($val['html_type'] === 'CheckBox') {
@@ -501,7 +501,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         $totalParticipants = $self->getParticipantCount($allParticipantParams);
 
         //validate price field params.
-        $priceSetErrors = $self->validatePriceSet($allParticipantParams, $self->_feeBlock, $self->get('priceSetId'), $self->get('priceSet'));
+        $priceSetErrors = $self->validatePriceSet($allParticipantParams, $self->get('priceSetId'), $self->get('priceSet'));
         $errors = array_merge($errors, CRM_Utils_Array::value($addParticipantNum, $priceSetErrors, []));
 
         if (!$self->_allowConfirmation &&
