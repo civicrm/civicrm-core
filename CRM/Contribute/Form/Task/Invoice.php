@@ -342,13 +342,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         ];
         CRM_Core_DAO::commonRetrieveAll($daoName, 'id', $pageId, $mailDetails, $mailElements);
 
-        $values['title'] = CRM_Utils_Array::value('title', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
-        $values['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
-        $values['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
-        $values['cc_receipt'] = CRM_Utils_Array::value('cc_receipt', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
-        $values['bcc_receipt'] = CRM_Utils_Array::value('bcc_receipt', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
+        $values['title'] = $mailDetails[$contribution->contribution_page_id]['title'] ?? NULL;
+        $values['receipt_from_name'] = $mailDetails[$contribution->contribution_page_id]['receipt_from_name'] ?? NULL;
+        $values['receipt_from_email'] = $mailDetails[$contribution->contribution_page_id]['receipt_from_email'] ?? NULL;
+        $values['cc_receipt'] = $mailDetails[$contribution->contribution_page_id]['cc_receipt'] ?? NULL;
+        $values['bcc_receipt'] = $mailDetails[$contribution->contribution_page_id]['bcc_receipt'] ?? NULL;
 
-        $title = CRM_Utils_Array::value('title', CRM_Utils_Array::value($contribution->contribution_page_id, $mailDetails));
+        $title = $mailDetails[$contribution->contribution_page_id]['title'] ?? NULL;
       }
       // @todo - use token in template, stop assigning.
       $source = $contribution->source;
@@ -443,16 +443,16 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'is_pay_later' => $contribution->is_pay_later,
         'organization_name' => Contact::get(FALSE)->addSelect('organization_name')->addWhere('id', '=', (int) $contribution->contact_id)->execute()->first()['organization_name'],
         'domain_organization' => $domain->name,
-        'domain_street_address' => CRM_Utils_Array::value('street_address', CRM_Utils_Array::value('1', $locationDefaults['address'])),
-        'domain_supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1', CRM_Utils_Array::value('1', $locationDefaults['address'])),
-        'domain_supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2', CRM_Utils_Array::value('1', $locationDefaults['address'])),
-        'domain_supplemental_address_3' => CRM_Utils_Array::value('supplemental_address_3', CRM_Utils_Array::value('1', $locationDefaults['address'])),
-        'domain_city' => CRM_Utils_Array::value('city', CRM_Utils_Array::value('1', $locationDefaults['address'])),
-        'domain_postal_code' => CRM_Utils_Array::value('postal_code', CRM_Utils_Array::value('1', $locationDefaults['address'])),
+        'domain_street_address' => $locationDefaults['address']['1']['street_address'] ?? NULL,
+        'domain_supplemental_address_1' => $locationDefaults['address']['1']['supplemental_address_1'] ?? NULL,
+        'domain_supplemental_address_2' => $locationDefaults['address']['1']['supplemental_address_2'] ?? NULL,
+        'domain_supplemental_address_3' => $locationDefaults['address']['1']['supplemental_address_3'] ?? NULL,
+        'domain_city' => $locationDefaults['address']['1']['city'] ?? NULL,
+        'domain_postal_code' => $locationDefaults['address']['1']['postal_code'] ?? NULL,
         'domain_state' => $stateProvinceAbbreviationDomain,
         'domain_country' => $countryDomain,
-        'domain_email' => CRM_Utils_Array::value('email', CRM_Utils_Array::value('1', $locationDefaults['email'])),
-        'domain_phone' => CRM_Utils_Array::value('phone', CRM_Utils_Array::value('1', $locationDefaults['phone'])),
+        'domain_email' => $locationDefaults['email']['1']['email'] ?? NULL,
+        'domain_phone' => $locationDefaults['phone']['1']['phone'] ?? NULL,
       ];
 
       if (isset($creditNoteId)) {

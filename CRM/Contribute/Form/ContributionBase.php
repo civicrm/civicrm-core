@@ -1550,7 +1550,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $currency = $this->_values['currency'] ?? NULL;
     // For event forms, currency is in a different spot
     if (empty($currency)) {
-      $currency = CRM_Utils_Array::value('currency', CRM_Utils_Array::value('event', $this->_values));
+      $currency = $this->_values['event']['currency'] ?? NULL;
     }
     if (empty($currency)) {
       $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
