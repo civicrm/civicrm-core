@@ -58,6 +58,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * The group id that we are passing in url.
    *
    * @var int
+   *
+   * @deprecated
+   * @internal
    */
   public $_grid;
 

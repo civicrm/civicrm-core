@@ -841,7 +841,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     // build tags and groups
-    CRM_Contact_Form_Edit_TagsAndGroups::buildQuickForm($this, 0, CRM_Contact_Form_Edit_TagsAndGroups::ALL,
+    CRM_Contact_Form_Edit_TagsAndGroups::buildQuickForm($this, $this->getContactID(), CRM_Contact_Form_Edit_TagsAndGroups::ALL,
       FALSE, NULL, 'Group(s)', 'Tag(s)', NULL, 'select');
 
     // build location blocks.

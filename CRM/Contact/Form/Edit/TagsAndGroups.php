@@ -58,11 +58,11 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     $groupElementType = 'checkbox',
     $public = FALSE
   ) {
-    $tagGroup = [];
     $form->addExpectedSmartyVariable('type');
     $form->addOptionalQuickFormElement('group');
     // NYSS 5670
     if (!$contactId && !empty($form->_contactId)) {
+      CRM_Core_Error::deprecatedWarning('this is thought to be unreachable, should be passed in');
       $contactId = $form->_contactId;
     }
 
@@ -73,8 +73,10 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       if ($fieldName) {
         $fName = $fieldName;
       }
+      // The optional url parameter grid is refers to Group ID.
+      // If it set the group options on the page are limited to that group
+      $groupID = is_numeric(CRM_Utils_Request::retrieve('grid', 'Integer', $form)) ? (int) CRM_Utils_Request::retrieve('grid', 'Integer', $form) : NULL;
 
-      $groupID = $form->_grid ?? NULL;
       if ($groupID && $visibility) {
         $ids = [$groupID => $groupID];
       }
@@ -131,6 +133,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
     $form->assign('groupElementType', $groupElementType ?? NULL);
 
     if ($type & self::TAG) {
+      $tagGroup = [];
       $tags = CRM_Core_BAO_Tag::getColorTags('civicrm_contact');
 
       if (!empty($tags)) {
@@ -141,7 +144,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
       CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', $contactId, FALSE, TRUE);
     }
-    $form->assign('tagGroup', $tagGroup);
+    $form->assign('tagGroup', $tagGroup ?? NULL);
   }
 
   /**
