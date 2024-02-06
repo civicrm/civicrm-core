@@ -2039,6 +2039,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         && 'Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'))) {
         // @todo make users use add payment form.
         civicrm_api3('Payment', 'create', [
+          'is_send_contribution_notification' => FALSE,
           'contribution_id' => $this->getContributionID(),
           'total_amount' => $this->getContributionValue('balance_amount'),
           'currency' => $this->getSubmittedValue('currency'),
@@ -2053,6 +2054,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->invoicingPostProcessHook($submittedValues, $action, $lineItem);
 
       //send receipt mail.
+      //FIXME: 'payment.create' could send a receipt.
       if ($contribution->id && !empty($formValues['is_email_receipt'])) {
         $formValues['contact_id'] = $this->_contactID;
         $formValues['contribution_id'] = $contribution->id;
