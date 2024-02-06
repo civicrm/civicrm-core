@@ -89,7 +89,7 @@ class SubmitFile extends AbstractProcessor {
       ],
     ];
 
-    if ($this->isCustomField($this->fieldName)) {
+    if ($this->isCustomField($apiEntity, $this->fieldName)) {
       $attachmentParams['field_name'] = $this->convertFieldNameToApi3($apiEntity, $this->fieldName);
     }
     else {
@@ -98,7 +98,7 @@ class SubmitFile extends AbstractProcessor {
 
     $file = civicrm_api3('Attachment', 'create', $attachmentParams);
 
-    if (!$this->isCustomField($this->fieldName)) {
+    if (!$this->isCustomField($apiEntity, $this->fieldName)) {
       civicrm_api4($apiEntity, 'update', [
         'values' => [
           $idField => $entityId,
@@ -144,8 +144,9 @@ class SubmitFile extends AbstractProcessor {
     return $fieldName;
   }
 
-  private function isCustomField(string $fieldName): bool {
-    return strpos($fieldName, '.') !== FALSE;
+  private function isCustomField(string $entityName, string $fieldName): bool {
+    $field = static::getEntityField($entityName, $fieldName);
+    return !empty($field['custom_field_id']);
   }
 
 }
