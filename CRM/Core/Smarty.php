@@ -293,6 +293,9 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       return;
     }
 
+    if (!property_exists($this, '_tpl_vars')) {
+      return;
+    }
     foreach (array_keys($this->_tpl_vars) as $key) {
       if ($key == 'config' || $key == 'session') {
         continue;
@@ -383,6 +386,9 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     foreach ($vars as $key => $value) {
       if ($value !== static::$UNDEFINED_VALUE) {
         $this->assign($key, $value);
+      }
+      elseif (method_exists($this, 'clearAssign')) {
+        $this->clearAssign($key);
       }
       else {
         if (method_exists($this, 'clearAssign')) {
