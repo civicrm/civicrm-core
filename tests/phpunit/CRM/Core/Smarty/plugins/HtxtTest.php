@@ -6,20 +6,10 @@
  */
 class CRM_Core_Smarty_plugins_HtxtTest extends CiviUnitTestCase {
 
-  public function setUp(): void {
-    parent::setUp();
-    $this->useTransaction();
-    require_once 'CRM/Core/Smarty.php';
-
-    // Templates should normally be file names, but for unit-testing it's handy to use "string:" notation
-    require_once 'CRM/Core/Smarty/resources/String.php';
-    civicrm_smarty_register_string_resource();
-  }
-
   /**
    * @return array
    */
-  public function supportedCases() {
+  public function supportedCases(): array {
     $cases = [];
     $cases[] = ['yum yum apple_pie!', '{htxt id="apple_pie"}yum yum apple_pie!{/htxt}', ['id' => 'apple_pie']];
     $cases[] = ['yum yum Apple-Pie!', '{htxt id=\'Apple-Pie\'}yum yum Apple-Pie!{/htxt}', ['id' => 'Apple-Pie']];
@@ -32,7 +22,7 @@ class CRM_Core_Smarty_plugins_HtxtTest extends CiviUnitTestCase {
     return $cases;
   }
 
-  public function unsupportedCases() {
+  public function unsupportedCases(): array {
     $cases = [];
     $cases[] = ['{htxt id=$dynamic.zx["$f{b}"]}not supported{/htxt}', []];
     $cases[] = ['{htxt id=\'dragonfruit"}not supported{/htxt}', []];
@@ -47,11 +37,11 @@ class CRM_Core_Smarty_plugins_HtxtTest extends CiviUnitTestCase {
    * @param string $input
    * @param array $vars
    */
-  public function testSupported(string $expected, string $input, array $vars) {
+  public function testSupported(string $expected, string $input, array $vars): void {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->pushScope($vars);
     try {
-      $actual = $smarty->fetch('string:' . $input);
+      $actual = CRM_Utils_String::parseOneOffStringThroughSmarty($input);
       $this->assertEquals($expected, $actual, "Process input=[$input]");
     }
     finally {
@@ -62,12 +52,11 @@ class CRM_Core_Smarty_plugins_HtxtTest extends CiviUnitTestCase {
   /**
    * @dataProvider unsupportedCases
    * @param string $input
-   * @param array $vars
    */
-  public function testUnsupported(string $input, array $vars) {
+  public function testUnsupported(string $input): void {
     $smarty = CRM_Core_Smarty::singleton();
     try {
-      $smarty->fetch('string:' . $input);
+      CRM_Utils_String::parseOneOffStringThroughSmarty($input);
       $this->fail("That should have thrown an error. Are you working on a better parsing rule?");
     }
     catch (Throwable $t) {

@@ -385,6 +385,10 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
         $this->assign($key, $value);
       }
       else {
+        if (method_exists($this, 'clearAssign')) {
+          $this->clearAssign();
+          return $this;
+        }
         $this->clear_assign($key);
       }
     }

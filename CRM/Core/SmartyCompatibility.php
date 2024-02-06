@@ -94,18 +94,10 @@ class CRM_Core_SmartyCompatibility extends Smarty {
     parent::registerPlugin('modifier', $modifier, $modifier_impl);
   }
 
-  public function registerPlugin($type, $name, $callback, $cacheable = TRUE, $cache_attr = NULL) {
-    if (method_exists(get_parent_class(), 'registerPlugin')) {
-      parent::registerPlugin($type, $name, $callback, $cacheable = TRUE, $cache_attr = NULL);
-      return;
-    }
-    if ($type === 'modifier') {
-      parent::register_modifier($name, $callback);
-    }
-  }
-
   /**
    * Registers a resource to fetch a template
+   *
+   * @deprecated
    *
    * @param string $type name of resource
    * @param array $functions array of functions to handle resource
@@ -125,6 +117,8 @@ class CRM_Core_SmartyCompatibility extends Smarty {
   /**
    * Registers custom function to be used in templates
    *
+   * @deprecated
+   *
    * @param string $function the name of the template function
    * @param string $function_impl the name of the PHP function to register
    * @param bool $cacheable
@@ -142,6 +136,8 @@ class CRM_Core_SmartyCompatibility extends Smarty {
 
   /**
    * Returns an array containing template variables
+   *
+   * @deprecated
    *
    * @param string $name
    *

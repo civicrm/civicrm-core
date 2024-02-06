@@ -111,7 +111,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
   * @return string
   */
   public static function getEntityDescription() {ldelim}
-    return {$tsFunctionName}('{$table.description|replace:"'":"\'"}');
+    return {$tsFunctionName}('{$table.description|crmEscapeSingleQuotes}');
   {rdelim}
 {/if}
 
@@ -137,7 +137,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                                                                       'title'     => {$tsFunctionName}('{$field.title}'),
 {/if}
 {if $field.comment}
-                                                                      'description'     => {$tsFunctionName}('{$field.comment|replace:"'":"\'"}'),
+                                                                      'description'     => {$tsFunctionName}('{$field.comment|crmEscapeSingleQuotes}'),
 {/if}
 {if $field.required}
                                         'required'  => {$field.required|strtoupper},
