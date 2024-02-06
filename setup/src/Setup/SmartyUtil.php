@@ -13,7 +13,7 @@ class SmartyUtil {
     require_once 'CRM/Core/I18n.php';
 
     $packagePath = PackageUtil::getPath($srcPath);
-    require_once $packagePath . '/smarty3/vendor/autoload.php';
+    require_once $packagePath . '/smarty4/vendor/autoload.php';
 
     $smarty = new \Smarty();
     $smarty->setTemplateDir(implode(DIRECTORY_SEPARATOR, [$srcPath, 'xml', 'templates']));

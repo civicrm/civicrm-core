@@ -48,7 +48,7 @@ class CRM_Core_CodeGen_Util_Smarty {
   public function createSmarty(): Smarty {
     $base = dirname(__DIR__, 4);
     $pkgs = file_exists(dirname($base) . "/civicrm-packages") ? dirname($base) . "/civicrm-packages" : "$base/packages";
-    require_once $pkgs . '/smarty3/vendor/autoload.php';
+    require_once $pkgs . '/smarty4/vendor/autoload.php';
     $smarty = new Smarty();
     $smarty->setTemplateDir("$base/xml/templates");
     $pluginsDirectory = $smarty->getPluginsDir();
