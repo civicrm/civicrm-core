@@ -2514,13 +2514,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         'id' => $paymentParams['contribution_id'] ?? NULL,
         'contact_id' => $contactID,
         'is_test' => $isTest,
-        'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
+        'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
       ];
 
       // CRM-21200: Don't overwrite contribution details during 'Pay now' payment
       if (empty($form->_params['contribution_id'])) {
         $contributionParams['contribution_page_id'] = $form->_id;
-        $contributionParams['campaign_id'] = CRM_Utils_Array::value('campaign_id', $paymentParams, CRM_Utils_Array::value('campaign_id', $form->_values));
+        $contributionParams['campaign_id'] = $paymentParams['campaign_id'] ?? $form->_values['campaign_id'] ?? NULL;
       }
       // In case of 'Pay now' payment, append the contribution source with new text 'Paid later via page ID: N.'
       else {

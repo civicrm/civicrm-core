@@ -158,7 +158,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
    * @throws \CRM_Core_Exception
    */
   public static function add($params, $ids = []) {
-    $params['id'] = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
+    $params['id'] = $ids['relationship'] ?? $params['id'] ?? NULL;
 
     $hook = 'create';
     if ($params['id']) {

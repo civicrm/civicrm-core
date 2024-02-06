@@ -677,7 +677,7 @@ WHERE li.contribution_id = %1";
       $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
     }
     else {
-      $updatedAmount = CRM_Utils_Array::value('amount', $params, CRM_Utils_Array::value('total_amount', $params));
+      $updatedAmount = $params['amount'] ?? $params['total_amount'] ?? NULL;
     }
     if (strlen($params['tax_amount']) != 0) {
       $taxAmount = $params['tax_amount'];
