@@ -30,9 +30,12 @@ class CRM_Contact_Form_Task_SMSCommon {
   /**
    * Pre process the provider.
    *
+   * @deprecated since 5.71 will be removed around 5.77.
+   *
    * @param CRM_Core_Form $form
    */
   public static function preProcessProvider(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $form->_single = FALSE;
     $className = CRM_Utils_System::getClassName($form);
 

@@ -41,7 +41,19 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
    */
   public function preProcess() {
     parent::preProcess();
-    CRM_Contact_Form_Task_SMSCommon::preProcessProvider($this);
+    $form = $this;
+    $this->bounceOnNoActiveProviders();
+    $activityCheck = 0;
+    foreach ($this->_activityHolderIds as $value) {
+      if (CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $value, 'subject', 'id') != CRM_Contact_Form_Task_SMSCommon::RECIEVED_SMS_ACTIVITY_SUBJECT) {
+        $activityCheck++;
+      }
+    }
+    if ($activityCheck == count($this->_activityHolderIds)) {
+      CRM_Core_Error::statusBounce(ts("The Reply SMS Could only be sent for activities with '%1' subject.",
+        [1 => CRM_Contact_Form_Task_SMSCommon::RECIEVED_SMS_ACTIVITY_SUBJECT]
+      ));
+    }
     $this->assign('single', $this->_single);
   }
 
