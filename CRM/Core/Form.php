@@ -3086,16 +3086,28 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->exportedValues = $this->controller->exportValues($this->_name);
     }
     $value = $this->exportedValues[$fieldName] ?? NULL;
+    return $this->getUnLocalizedSubmittedValue($fieldName, $value);
+  }
+
+  /**
+   * Sanitize by de-formatting any localised money.
+   *
+   * This should never be called from postProcess directly -
+   * getSubmittedValue() & getSubmittedValues() are the go.
+   *
+   * @internal - avoid using outside of core as this could change.
+   *
+   * @return mixed
+   */
+  protected function getUnLocalizedSubmittedValue($fieldName, $value) {
     if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
       return CRM_Utils_Rule::cleanMoney($value);
     }
-    else {
-      // Numeric fields are not in submittableMoneyFields (for now)
-      $fieldRules = $this->_rules[$fieldName] ?? [];
-      foreach ($fieldRules as $rule) {
-        if ('money' === $rule['type']) {
-          return CRM_Utils_Rule::cleanMoney($value);
-        }
+    // Numeric fields are not in submittableMoneyFields (for now)
+    $fieldRules = $this->_rules[$fieldName] ?? [];
+    foreach ($fieldRules as $rule) {
+      if ('money' === $rule['type']) {
+        return CRM_Utils_Rule::cleanMoney($value);
       }
     }
     return $value;
