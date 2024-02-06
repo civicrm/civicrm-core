@@ -43,6 +43,7 @@ class CRM_Core_CodeGen_Util_Smarty {
    * Create a Smarty instance.
    *
    * @return \Smarty
+   * @throws \SmartyException
    */
   public function createSmarty() {
     $base = dirname(dirname(dirname(dirname(__DIR__))));
@@ -50,16 +51,25 @@ class CRM_Core_CodeGen_Util_Smarty {
 
     require_once 'Smarty/Smarty.class.php';
     $smarty = new Smarty();
-    $smarty->template_dir = "$base/xml/templates";
-    $smarty->plugins_dir = ["$pkgs/Smarty/plugins", "$base/CRM/Core/Smarty/plugins"];
-    $smarty->compile_dir = $this->getCompileDir();
-    $smarty->clear_all_cache();
+    $smarty->setTemplateDir("$base/xml/templates");
+    $pluginsDirectory = $smarty->getPluginsDir();
+    $pluginsDirectory[] = "$base/CRM/Core/Smarty/plugins";
+    // Doesn't seem to work very well.... since I still need require_once below
+    $smarty->setPluginsDir($pluginsDirectory);
+    $smarty->setCompileDir($this->getCompileDir());
+    $smarty->clearAllCache();
 
     // CRM-5308 / CRM-3507 - we need {localize} to work in the templates
-
     require_once 'CRM/Core/Smarty/plugins/block.localize.php';
-    $smarty->register_block('localize', 'smarty_block_localize');
-    $smarty->assign('gencodeXmlDir', dirname(dirname(dirname(dirname(__DIR__)))) . '/xml');
+    $smarty->registerPlugin('block', 'localize', 'smarty_block_localize');
+
+    // Use our special replace rather than Smarty's to avoid conflicts while we
+    // transition from Smarty2.
+    require_once 'CRM/Core/Smarty/plugins/modifier.crmEscapeSingleQuotes.php';
+    $smarty->registerPlugin('modifier', 'crmEscapeSingleQuotes', 'smarty_modifier_crmEscapeSingleQuotes');
+
+    require_once 'CRM/Core/Smarty/plugins/modifier.crmCountCharacters.php';
+    $smarty->registerPlugin('modifier', 'crmCountCharacters', 'smarty_modifier_crmCountCharacters');
     return $smarty;
   }
 

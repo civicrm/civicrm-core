@@ -30,10 +30,10 @@ class CRM_Core_Smarty_plugins_CrmRSSPubDateTest extends CiviUnitTestCase {
    * @param string $input
    * @param string $expected
    */
-  public function testRSSPubDate(string $input, string $expected) {
+  public function testRSSPubDate(string $input, string $expected): void {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('the_date', $input);
-    $actual = $smarty->fetch('string:{$the_date|crmRSSPubDate}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{$the_date|crmRSSPubDate}');
     $this->assertEquals($expected, $actual);
   }
 
@@ -60,16 +60,19 @@ class CRM_Core_Smarty_plugins_CrmRSSPubDateTest extends CiviUnitTestCase {
    * Test that invalid inputs return "today"'s date.
    *
    * @dataProvider dateListBad
+   *
    * @param mixed $input
    * @param string $expected
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testRSSPubDateBad($input, string $expected) {
+  public function testRSSPubDateBad($input, string $expected): void {
     putenv('TIME_FUNC=frozen');
     CRM_Utils_Time::setTime(self::FIXED_DATE);
 
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('the_date', $input);
-    $actual = $smarty->fetch('string:{$the_date|crmRSSPubDate}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{$the_date|crmRSSPubDate}');
     $this->assertEquals($expected, $actual);
   }
 
