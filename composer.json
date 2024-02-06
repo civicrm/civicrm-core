@@ -273,9 +273,6 @@
       "pear/db": {
         "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/2ad420c394/tools/scripts/composer/pear_db_civicrm_changes.patch"
       },
-      "pear/log": {
-        "Apply patch for php8.1": "https://gist.githubusercontent.com/totten/d99d47dd9d19a5cb02858954a5577609/raw/0e5e4628a475219c2aec6af76e69894cdec42a55/pear-log-locale.patch"
-      },
       "pear/mail": {
         "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://raw.githubusercontent.com/civicrm/civicrm-core/36319938a5bf26c1e7e2110a26a65db6a5979268/tools/scripts/composer/patches/pear-mail.patch"
       },
