@@ -820,7 +820,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
       $expFields = [];
       // higher preference to bao object
-      $daoOrBaoName = CRM_Utils_Array::value('bao', $table, CRM_Utils_Array::value('dao', $table));
+      $daoOrBaoName = $table['bao'] ?? $table['dao'] ?? NULL;
 
       if ($daoOrBaoName) {
         if (method_exists($daoOrBaoName, 'exportableFields')) {

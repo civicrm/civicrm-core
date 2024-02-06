@@ -1239,7 +1239,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'is_test' => $isTest,
       'campaign_id' => $this->_params['campaign_id'] ?? NULL,
       'contribution_page_id' => $this->_params['contribution_page_id'] ?? NULL,
-      'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
+      'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
       'thankyou_date' => $this->_params['thankyou_date'] ?? NULL,
     ];
     $contributionParams['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
@@ -2016,7 +2016,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $params['line_item'] = $lineItem;
       $params['payment_processor_id'] = $params['payment_processor'] = $this->_paymentProcessor['id'] ?? NULL;
-      $params['tax_amount'] = CRM_Utils_Array::value('tax_amount', $submittedValues, CRM_Utils_Array::value('tax_amount', $this->_values));
+      $params['tax_amount'] = $submittedValues['tax_amount'] ?? $this->_values['tax_amount'] ?? NULL;
       //create contribution.
       if ($isQuickConfig) {
         $params['is_quick_config'] = 1;

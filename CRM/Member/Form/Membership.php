@@ -1063,7 +1063,7 @@ DESC limit 1");
           'line_items' => $this->getLineItemForOrderApi(),
           'is_test' => $this->isTest(),
           'campaign_id' => $this->getSubmittedValue('campaign_id'),
-          'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
+          'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
           'payment_instrument_id' => $this->getPaymentInstrumentID(),
           'financial_type_id' => $this->getFinancialTypeID(),
           'receive_date' => $this->getReceiveDate(),

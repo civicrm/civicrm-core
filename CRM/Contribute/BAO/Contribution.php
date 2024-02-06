@@ -1833,10 +1833,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       }
     }
 
-    $paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $input, CRM_Utils_Array::value(
-      'paymentProcessor',
-      $ids
-    ));
+    $paymentProcessorID = $input['payment_processor_id'] ?? $ids['paymentProcessor'] ?? NULL;
 
     if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $contribution->contribution_page_id) {
       $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
