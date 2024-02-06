@@ -376,7 +376,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $countryDomain = '';
       }
 
-      $invoiceNotes = Civi::settings()->get('invoice_notes') ?? NULL;
+      $invoiceNotes = Civi::settings()->get('invoice_notes');
 
       // parameters to be assign for template
       $tplParams = [
