@@ -50,6 +50,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
   public static function setDefaultValues(&$form) {
     $defaults = [];
     // Retrieve current case status
+    // @todo this var is created as an array below, but the form field is single-valued. See also comment about _oldCaseStatus in endPostProcess.
     $defaults['case_status_id'] = $form->_defaultCaseStatus;
 
     return $defaults;
