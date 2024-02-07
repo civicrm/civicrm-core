@@ -950,6 +950,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $paymentParams['description'] = $this->getSourceText();
       try {
         $paymentParams['invoiceID'] = $this->getInvoiceID();
+        $paymentParams['currency'] = $this->getCurrency();
         $result = $payment->doPayment($paymentParams);
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
