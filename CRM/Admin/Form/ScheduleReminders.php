@@ -25,6 +25,30 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   protected $retrieveMethod = 'api4';
 
   /**
+   * Temporary override to solve https://lab.civicrm.org/dev/core/-/issues/4971
+   * This regressed in https://github.com/civicrm/civicrm-core/pull/27003 which
+   * switched $this->retrieveMethod to 'api' - this had the unintended effect of checking
+   * permissions during retrieveValues(), but the API is not sophisticated enough: we need to add
+   * a `CRM_Core_BAO_ActionSchedule::addSelectWhereClause()` function that can handle the logic
+   * of "if the reminder is for an event, check user has edit permission for that specific event".
+   *
+   * Meanwhile we can skip permission checks in the form layer, because that logic is implemented here,
+   * specifically in `\CRM_Event_ActionMapping::checkAccess()`.
+   *
+   * @return array
+   */
+  protected function retrieveValues(): array {
+    $this->_values = [];
+    if (isset($this->_id) && CRM_Utils_Rule::positiveInteger($this->_id)) {
+      $this->_values = civicrm_api4($this->getDefaultEntity(), 'get', [
+        'checkPermissions' => FALSE,
+        'where' => [['id', '=', $this->_id]],
+      ])->single();
+    }
+    return $this->_values;
+  }
+
+  /**
    * @return string
    */
   public function getDefaultEntity(): string {
