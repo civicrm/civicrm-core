@@ -86,18 +86,18 @@
               <div class="crm-section no-label amount-item-section">
                     {foreach from=$finalAmount item=amount key=level}
                   <div class="content">
-                      {$amount.amount|crmMoney}&nbsp;&nbsp;{$amount.label}
+                      {$amount.amount|crmMoney:$currency}&nbsp;&nbsp;{$amount.label}
                   </div>
                   <div class="clear"></div>
                     {/foreach}
                 </div>
                 {if $totalTaxAmount}
-                  <div class="content bold">{ts}Tax Total{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney}</div>
+                  <div class="content bold">{ts}Tax Total{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney:$currency}</div>
                   <div class="clear"></div>
                 {/if}
                 {if $totalAmount}
                  <div class="crm-section no-label total-amount-section">
-                    <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>
+                    <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney:$currency}</div>
                     <div class="clear"></div>
                   </div>
 
