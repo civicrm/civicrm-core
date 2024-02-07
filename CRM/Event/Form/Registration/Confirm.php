@@ -1141,7 +1141,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Assign Profiles to the template.
    *
-   * @param CRM_Event_Form_Registration_Confirm $form
+   * @param CRM_Event_Form_Registration_Confirm|\CRM_Event_Form_Registration_ThankYou $form
    *
    * @throws \CRM_Core_Exception
    */
