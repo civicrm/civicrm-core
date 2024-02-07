@@ -73,11 +73,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   public function preProcess() {
     parent::preProcess();
     // Pre-selected mapping_id and entity_value for embedded forms
-    if (CRM_Utils_Request::retrieve('mapping_id', 'Alphanumeric', $this, FALSE, NULL, 'GET')) {
-      $this->_values['mapping_id'] = $this->get('mapping_id');
-    }
-    if (CRM_Utils_Request::retrieve('entity_value', 'CommaSeparatedIntegers', $this, FALSE, NULL, 'GET')) {
-      $this->_values['entity_value'] = explode(',', $this->get('entity_value'));
+    if (!$this->_id) {
+      if (CRM_Utils_Request::retrieve('mapping_id', 'Alphanumeric', $this, FALSE, NULL, 'GET')) {
+        $this->_values['mapping_id'] = $this->get('mapping_id');
+      }
+      if (CRM_Utils_Request::retrieve('entity_value', 'CommaSeparatedIntegers', $this, FALSE, NULL, 'GET')) {
+        $this->_values['entity_value'] = explode(',', $this->get('entity_value'));
+      }
     }
     if (!empty($this->_values['mapping_id'])) {
       $mapping = CRM_Core_BAO_ActionSchedule::getMapping($this->_values['mapping_id']);
