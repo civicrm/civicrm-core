@@ -1567,6 +1567,40 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get the submitted value, accessing it from whatever form in the flow it is
+   * submitted on.
+   *
+   * @todo support AdditionalParticipant forms too.
+   *
+   * @param string $fieldName
+   *
+   * @return mixed|null
+   */
+  public function getSubmittedValue(string $fieldName) {
+    $value = parent::getSubmittedValue($fieldName);
+    // Check for value as well in case the field has been added to the Confirm form
+    // I don't quite know how that works but something Matt has worked on.
+    if ($value || !in_array($this->getName(), ['Confirm', 'ThankYou'], TRUE)) {
+      return $value;
+    }
+    // If we are on the Confirm or ThankYou page then the submitted values
+    // were on the Register Page so we return them
+    $value = $this->controller->exportValue('Register', $fieldName);
+    if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
+      return CRM_Utils_Rule::cleanMoney($value);
+    }
+
+    // Numeric fields are not in submittableMoneyFields (for now)
+    $fieldRules = $this->_rules[$fieldName] ?? [];
+    foreach ($fieldRules as $rule) {
+      if ('money' === $rule['type']) {
+        return CRM_Utils_Rule::cleanMoney($value);
+      }
+    }
+    return $value;
+  }
+
+  /**
    * Set the first participant ID if not set.
    *
    * CRM-10032.
