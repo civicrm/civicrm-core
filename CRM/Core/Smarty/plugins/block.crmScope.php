@@ -48,11 +48,8 @@ function smarty_block_crmScope($params, $content, &$smarty, &$repeat) {
       if (array_key_exists($key, $params)) {
         $smarty->assign($key, $value);
       }
-      if (method_exists($smarty, 'clearAssign')) {
-        $smarty->clearAssign($key);
-      }
       else {
-        $smarty->clear_assign($key);
+        $smarty->clearAssign($key);
       }
     }
   }
