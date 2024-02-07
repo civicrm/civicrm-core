@@ -220,6 +220,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
+    // This use of the ts function uses the legacy interpolation of the button name to avoid translations having to be re-done.
+    $this->assign('verifyText', !$this->_totalAmount ? ts('Click <strong>%1</strong> to complete your registration.', [1 => ts('Register')]) : $this->getPaymentProcessorObject()->getText('eventContinueText', []));
 
     if ($this->_values['event']['is_monetary'] &&
       (isset($this->_params[0]['amount']) && is_numeric($this->_params[0]['amount'])) &&
@@ -241,9 +243,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('amounts', $amountArray);
       $this->assign('totalAmount', $this->_totalAmount);
       $this->set('totalAmount', $this->_totalAmount);
-      // This use of the ts function uses the legacy interpolation of the button name to avoid translations having to be re-done.
-      $this->assign('verifyText', !$this->_totalAmount ? ts('Click <strong>%1</strong> to complete your registration.', [1 => ts('Register')]) : $this->getPaymentProcessorObject()->getText('eventContinueText', []));
-
       $showPaymentOnConfirm = (in_array($this->_eventId, \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm')));
       $this->assign('showPaymentOnConfirm', $showPaymentOnConfirm);
       if ($showPaymentOnConfirm) {
