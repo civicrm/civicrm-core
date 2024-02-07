@@ -70,9 +70,11 @@ trait CRM_Custom_Form_CustomDataTrait {
           ]
         );
       }
-      $tables = CRM_Core_DAO::executeQuery(implode(' UNION ', $query));
-      while ($tables->fetch()) {
-        $customGroupSuffixes[$tables->table_name] = '_' . $tables->id;
+      if (!empty($query)) {
+        $tables = CRM_Core_DAO::executeQuery(implode(' UNION ', $query));
+        while ($tables->fetch()) {
+          $customGroupSuffixes[$tables->table_name] = '_' . $tables->id;
+        }
       }
     }
 
