@@ -125,6 +125,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @throws CRM_Core_Exception
    */
   public static function parseParameters(?string $parameters): array {
+    $parameters = trim($parameters ?? '');
     $result = ['version' => 3];
     $lines = $parameters ? explode("\n", $parameters) : [];
 
