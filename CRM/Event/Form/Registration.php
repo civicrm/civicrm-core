@@ -266,12 +266,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
     $this->_availableRegistrations = $this->get('availableRegistrations');
     $this->_participantIDS = $this->get('participantIDs');
+
     // Required for currency formatting in the JS layer
     // this is a temporary fix intended to resolve a regression quickly
     // And assigning moneyFormat for js layer formatting
     // will only work until that is done.
     // https://github.com/civicrm/civicrm-core/pull/19151
-    $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56));
+    $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56, $this->getCurrency()));
 
     //check if participant allow to walk registration wizard.
     $this->_allowConfirmation = $this->get('allowConfirmation');
