@@ -71,6 +71,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @throws \SmartyException
    */
   public function load_filter($type, $name) {
+    CRM_Core_Error::deprecatedWarning('loadFilter');
     if (method_exists(get_parent_class(), 'load_filter')) {
       parent::load_filter($type, $name);
       return;
@@ -91,6 +92,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
       parent::register_modifier($modifier, $modifier_impl);
       return;
     }
+    CRM_Core_Error::deprecatedWarning('registerPlugin');
     parent::registerPlugin('modifier', $modifier, $modifier_impl);
   }
 
