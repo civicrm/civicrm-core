@@ -990,33 +990,35 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // The payment processor object can provide info about the fields it shows.
     if ($isMonetary) {
       $paymentProcessorObject = $this->getPaymentProcessorObject();
-      $this->assign('paymentAgreementTitle', $paymentProcessorObject->getText('agreementTitle', []));
-      $this->assign('paymentAgreementText', $paymentProcessorObject->getText('agreementText', []));
-      $paymentFields = $paymentProcessorObject->getPaymentFormFields();
-      foreach ($paymentFields as $index => $paymentField) {
-        if (!isset($this->_params[$paymentField])) {
-          unset($paymentFields[$index]);
-          continue;
-        }
-        if ($paymentField === 'credit_card_exp_date') {
-          $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
-          $date = CRM_Utils_Date::mysqlToIso($date);
-          $this->assign('credit_card_exp_date', $date);
-        }
-        elseif ($paymentField === 'credit_card_number') {
-          $this->assign('credit_card_number',
-            CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
-          );
-        }
-        elseif ($paymentField === 'credit_card_type') {
-          $this->assign('credit_card_type', CRM_Core_PseudoConstant::getLabel(
-            'CRM_Core_BAO_FinancialTrxn',
-            'card_type_id',
-            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->_params['credit_card_type'])
-          ));
-        }
-        else {
-          $this->assign($paymentField, $this->_params[$paymentField]);
+      if($paymentProcessorObject){
+        $this->assign('paymentAgreementTitle', $paymentProcessorObject->getText('agreementTitle', []));
+        $this->assign('paymentAgreementText', $paymentProcessorObject->getText('agreementText', []));
+        $paymentFields = $paymentProcessorObject->getPaymentFormFields();
+        foreach ($paymentFields as $index => $paymentField) {
+          if (!isset($this->_params[$paymentField])) {
+            unset($paymentFields[$index]);
+            continue;
+          }
+          if ($paymentField === 'credit_card_exp_date') {
+            $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
+            $date = CRM_Utils_Date::mysqlToIso($date);
+            $this->assign('credit_card_exp_date', $date);
+          }
+          elseif ($paymentField === 'credit_card_number') {
+            $this->assign('credit_card_number',
+              CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
+            );
+          }
+          elseif ($paymentField === 'credit_card_type') {
+            $this->assign('credit_card_type', CRM_Core_PseudoConstant::getLabel(
+              'CRM_Core_BAO_FinancialTrxn',
+              'card_type_id',
+              CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->_params['credit_card_type'])
+            ));
+          }
+          else {
+            $this->assign($paymentField, $this->_params[$paymentField]);
+          }
         }
       }
       $this->assign('paymentFieldsetLabel', CRM_Core_Payment_Form::getPaymentLabel($paymentProcessorObject));
