@@ -166,6 +166,9 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     }
     $this->load_filter('pre', 'resetExtScope');
     $this->load_filter('pre', 'htxtFilter');
+    $this->registerPlugin('modifier', 'json_encode', 'json_encode');
+    $this->registerPlugin('modifier', 'count', 'count');
+    $this->registerPlugin('modifier', 'implode', 'implode');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
 
