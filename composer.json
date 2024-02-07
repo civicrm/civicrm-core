@@ -41,7 +41,7 @@
   "include-path": ["vendor/tecnickcom"],
   "config": {
     "platform": {
-      "php": "8.2.0"
+      "php": "7.4.0"
     },
     "allow-plugins": {
       "civicrm/composer-compile-plugin": true,
