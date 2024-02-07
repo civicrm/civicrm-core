@@ -75,7 +75,7 @@
 <div class="vevent crm-event-id-{$event.id} crm-block crm-event-info-form-block">
   <div class="event-info">
   {* Display top buttons only if the page is long enough to merit duplicate buttons *}
-  {if array_key_exists('summary', $event) or array_key_exists('description', $event)}
+  {if (array_key_exists('summary', $event) && $event.summary) or array_key_exists('description', $event) && $event.description}
     <div class="crm-actionlinks-top">
       {crmRegion name="event-page-eventinfo-actionlinks-top"}
         {if $allowRegistration}
@@ -87,12 +87,13 @@
     </div>
   {/if}
 
-  {if array_key_exists('summary', $event)}
+  {if array_key_exists('summary', $event) && $event.summary}
       <div class="crm-section event_summary-section">
         {$event.summary|purify}
       </div>
   {/if}
-  {if array_key_exists('description', $event)}
+
+  {if array_key_exists('description', $event) && $event.description}
       <div class="crm-section event_description-section summary">
           {$event.description|purify}
       </div>
@@ -125,7 +126,7 @@
 
   {if $isShowLocation}
 
-        {if array_key_exists(1, $location.address)}
+        {if array_key_exists(1, $location.address) && $location.address.1}
             <div class="crm-section event_address-section">
                 <div class="label">{ts}Location{/ts}</div>
                 <div class="content">{$location.address.1.display|purify|nl2br}</div>
