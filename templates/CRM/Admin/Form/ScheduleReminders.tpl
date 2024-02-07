@@ -201,8 +201,12 @@
                       $label = $('label[for=' + fieldSpec.name + ']', $form);
                     $label.text(fieldSpec.label);
                     if (fieldSpec.required) {
-                      $label.append(' <span class="crm-marker">*</span>')
+                      $label.append(' <span class="crm-marker">*</span>');
                     }
+                    // 'required' css class gets picked up by jQuery validate (but only in popup mode)
+                    // In full-page mode there is no clientside validation & this doesn't have any effect.
+                    // TODO: Would be nice for those things to be more consistent & also to use real html validation not jQuery.
+                    $field.toggleClass('required', fieldSpec.required);
                     $field.removeClass('loading');
                     // Show field and update option list if applicable
                     if (fieldSpec.options) {
