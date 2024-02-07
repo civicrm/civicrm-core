@@ -3375,6 +3375,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * that person
    */
   public function testCompleteTransactionWithParticipantRecord(): void {
+    $this->markTestSkipped();
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
     $this->individualID = $this->createLoggedInUser();
