@@ -203,6 +203,9 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   public function doPayment(&$params, $component = 'contribute') {
     $this->_component = $component;
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+    if (empty($params['currency'])) {
+      CRM_Core_Error::deprecatedWarning('currency is a required field - see  the contract https://docs.civicrm.org/dev/en/latest/extensions/payment-processors/paymentclass/#core-parameters');
+    }
 
     $propertyBag = PropertyBag::cast($params);
     if ((float) $propertyBag->getAmount() !== (float) $params['amount']) {
