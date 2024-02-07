@@ -1016,6 +1016,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @throws \CRM_Core_Exception
    */
   private function isSuppressPayment(): bool {
+    if (!$this->getPriceSetID()) {
+      return TRUE;
+    }
     if ($this->_allowConfirmation) {
       // They might be paying for a now-confirmed registration.
       return FALSE;
