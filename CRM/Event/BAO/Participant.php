@@ -1000,7 +1000,6 @@ WHERE cpf.price_set_id = %1 AND cpfv.label = (SELECT label from civicrm_price_fi
       $params[2] = [$discountedPriceFieldOptionID, 'Integer'];
     }
     else {
-      $feeLevel = current($feeLevel);
       $query = "SELECT cpfv.amount FROM `civicrm_price_field_value` cpfv
 LEFT JOIN civicrm_price_field cpf ON cpfv.price_field_id = cpf.id
 WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
@@ -1677,6 +1676,10 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel, $discountedPriceFieldOptionID = NULL) {
     $financialTypeID = $contributionParams['contribution']->financial_type_id;
     $total_amount = $contributionParams['total_amount'];
+    if (is_array($feeLevel)) {
+      CRM_Core_Error::deprecatedFunctionWarning('array passed for string value');
+      $feeLevel = (string) current($feeLevel);
+    }
 
     $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID, 'civicrm_event');
     if (!empty($checkDiscount)) {
