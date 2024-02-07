@@ -651,12 +651,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @internal function has had several recent signature changes & is expected to be eventually removed.
    */
   private function initEventFee(): void {
-    $priceSetId = $this->getPriceSetID();
-
     //get the price set fields participant count.
     //get option count info.
-    $this->_priceSet['optionsCountTotal'] = CRM_Price_BAO_PriceSet::getPricesetCount($priceSetId);
-    if ($this->_priceSet['optionsCountTotal']) {
+    if ($this->getOrder()->isUseParticipantCount()) {
       $optionsCountDetails = [];
       if (!empty($this->_priceSet['fields'])) {
         foreach ($this->_priceSet['fields'] as $field) {
@@ -1070,13 +1067,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $priceSetId = $form->get('priceSetId');
     $addParticipantNum = substr($form->_name, 12);
-    $priceSetFields = $priceSetDetails = [];
+    $priceSetFields = [];
     $hasPriceFieldsCount = FALSE;
     if ($priceSetId) {
       $priceSetDetails = $form->get('priceSet');
-      if (isset($priceSetDetails['optionsCountTotal'])
-        && $priceSetDetails['optionsCountTotal']
-      ) {
+      if ($form->getOrder()->isUseParticipantCount()) {
         $hasPriceFieldsCount = TRUE;
         $priceSetFields = $priceSetDetails['optionsCountDetails']['fields'];
       }
@@ -1228,7 +1223,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     $priceSetFields = $priceMaxFieldDetails = [];
-    if (!empty($priceSet['optionsCountTotal'])) {
+    if ($form->getOrder()->isUseParticipantCount()) {
       $priceSetFields = $priceSet['optionsCountDetails']['fields'];
     }
 
@@ -1484,10 +1479,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $hasOptMaxValue = TRUE;
       $optionsMaxValueDetails = $priceSetDetails['optionsMaxValueDetails']['fields'];
     }
-    if (
-      isset($priceSetDetails['optionsCountTotal'])
-      && $priceSetDetails['optionsCountTotal']
-    ) {
+
+    if ($this->getOrder()->isUseParticipantCount()) {
       $hasOptCount = TRUE;
       $optionsCountDetails = $priceSetDetails['optionsCountDetails']['fields'];
     }

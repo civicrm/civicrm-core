@@ -822,6 +822,27 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Is participant count being used.
+   *
+   * This would be true if at least one price field value
+   * has a count value that is not 0 or NULL. In this case
+   * the row value will be used for the participant.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public function isUseParticipantCount(): bool {
+    foreach ($this->getPriceFieldsMetadata() as $fieldMetadata) {
+      foreach ($fieldMetadata['options'] as $option) {
+        if (($option['count'] ?? 0) > 0) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Recalculate the line items.
    *
    * @return void
