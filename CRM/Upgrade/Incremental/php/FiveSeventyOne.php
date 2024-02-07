@@ -27,8 +27,19 @@ class CRM_Upgrade_Incremental_php_FiveSeventyOne extends CRM_Upgrade_Incremental
    * @param string $rev
    *   The version number matching this function name
    */
-  public function upgrade_5_71_alpha1($rev): void {
+  public function upgrade_5_71_alpha1(string $rev): void {
+
+    // It is important the line above run before the sql, which will populate the fields
+    // before they are made required.
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+
+    $this->addTask('Make civicrm_uf_group.name required', 'alterColumn', 'civicrm_uf_group', 'name',
+      "varchar(64) NOT NULL  COMMENT 'Form name.'"
+    );
+    $this->addTask('Make civicrm_uf_group.frontend_title required', 'alterColumn', 'civicrm_uf_group', 'frontend_title',
+      "varchar(64) NOT NULL  COMMENT 'Profile Form Public title'",
+      TRUE
+    );
   }
 
 }

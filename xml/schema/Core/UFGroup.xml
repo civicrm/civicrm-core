@@ -55,8 +55,26 @@
     <add>2.1</add>
   </field>
   <field>
-    <name>title</name>
+    <name>name</name>
     <title>Profile Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
+    <comment>Form name.</comment>
+    <add>5.71</add>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>5.71</add>
+  </index>
+  <field>
+    <name>title</name>
+    <title>Profile Title</title>
     <type>varchar</type>
     <length>64</length>
     <localizable>true</localizable>
@@ -72,6 +90,7 @@
     <title>Public Title</title>
     <type>varchar</type>
     <length>64</length>
+    <required>true</required>
     <localizable>true</localizable>
     <comment>Profile Form Public title</comment>
     <html>
