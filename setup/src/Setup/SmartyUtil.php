@@ -33,6 +33,9 @@ class SmartyUtil {
     require_once 'CRM/Core/Smarty/plugins/modifier.crmCountCharacters.php';
     $smarty->registerPlugin('modifier', 'crmCountCharacters', 'smarty_modifier_crmCountCharacters');
     require_once implode(DIRECTORY_SEPARATOR, [$srcPath, 'CRM', 'Core', 'CodeGen', 'Util', 'MessageTemplates.php']);
+    $smarty->registerPlugin('modifier', 'json_encode', 'json_encode');
+    $smarty->registerPlugin('modifier', 'count', 'count');
+    $smarty->registerPlugin('modifier', 'implode', 'implode');
     \CRM_Core_CodeGen_Util_MessageTemplates::assignSmartyVariables($smarty);
     return $smarty;
   }

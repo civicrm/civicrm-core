@@ -69,6 +69,11 @@ class CRM_Core_CodeGen_Util_Smarty {
 
     require_once 'CRM/Core/Smarty/plugins/modifier.crmCountCharacters.php';
     $smarty->registerPlugin('modifier', 'crmCountCharacters', 'smarty_modifier_crmCountCharacters');
+
+    $smarty->registerPlugin('modifier', 'json_encode', 'json_encode');
+    $smarty->registerPlugin('modifier', 'count', 'count');
+    $smarty->registerPlugin('modifier', 'implode', 'implode');
+
     return $smarty;
   }
 
