@@ -1199,9 +1199,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if ($form->_isPaidEvent) {
         $form->addElement('hidden', 'hidden_feeblock', 1);
       }
-
-      $eventfullMsg = CRM_Event_BAO_Participant::eventFullMessage($form->_eventId, $this->getParticipantID());
-      $form->addElement('hidden', 'hidden_eventFullMsg', $eventfullMsg, ['id' => 'hidden_eventFullMsg']);
+      if ($this->getEventValue('max_participants') !== NULL) {
+        $eventfullMsg = CRM_Event_BAO_Participant::eventFullMessage($form->_eventId, $this->getParticipantID());
+      }
+      $form->addElement('hidden', 'hidden_eventFullMsg', $eventfullMsg ?? NULL, ['id' => 'hidden_eventFullMsg']);
     }
 
     if ($form->_isPaidEvent) {
