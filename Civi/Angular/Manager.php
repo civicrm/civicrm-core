@@ -77,10 +77,9 @@ class Manager {
    *     List of settings to preload.
    */
   public function getModules() {
-    $moduleNames = $this->cache->get('moduleNames');
-    $angularModules = [];
+    $angularModules = $this->cache->get('angularModules') ?? [];
     // Cache not set, fetch fresh list of modules and store in cache
-    if (!$moduleNames) {
+    if (!$angularModules) {
       // Load all modules from CiviCRM core
       $files = (array) glob(\Civi::paths()->getPath('[civicrm.root]/ang/*.ang.php'));
       foreach ($files as $file) {
@@ -94,8 +93,9 @@ class Manager {
       \CRM_Utils_Hook::angularModules($angularModules);
 
       foreach ($angularModules as $module => $info) {
-        // Merge in defaults
-        $angularModules[$module] += ['basePages' => ['civicrm/a']];
+        // This property must be an array. If null, set to the historical default of ['civicrm/a']
+        // (historical default preserved for backward-compat reasons, but a better default would be the more common value of []).
+        $angularModules[$module]['basePages'] ??= ['civicrm/a'];
         if (!empty($info['settings'])) {
           \CRM_Core_Error::deprecatedWarning(sprintf('The Angular file "%s" from extension "%s" must be updated to use "settingsFactory" instead of "settings". See https://github.com/civicrm/civicrm-core/pull/19052', $info['module'], $info['ext']));
         }
@@ -112,16 +112,7 @@ class Manager {
         }
       }
       $angularModules = $this->resolvePatterns($angularModules);
-      $this->cache->set('moduleNames', array_keys($angularModules));
-      foreach ($angularModules as $moduleName => $moduleInfo) {
-        $this->cache->set("module $moduleName", $moduleInfo);
-      }
-    }
-    // Rehydrate modules from cache
-    else {
-      foreach ($moduleNames as $moduleName) {
-        $angularModules[$moduleName] = $this->cache->get("module $moduleName");
-      }
+      $this->cache->set('angularModules', $angularModules);
     }
 
     return $angularModules;
