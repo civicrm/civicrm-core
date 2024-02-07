@@ -72,6 +72,10 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
    */
   private static $UNDEFINED_VALUE;
 
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \SmartyException
+   */
   private function initialize() {
     $config = CRM_Core_Config::singleton();
 
@@ -160,12 +164,12 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       // contribution dashboard from RecentlyViewed.tpl
       require_once 'Smarty/plugins/modifier.escape.php';
       if (!isset($this->_plugins['modifier']['escape'])) {
-        $this->register_modifier('escape', ['CRM_Core_Smarty', 'escape']);
+        $this->registerPlugin('modifier', 'escape', ['CRM_Core_Smarty', 'escape']);
       }
       $this->default_modifiers[] = 'escape:"htmlall"';
     }
-    $this->load_filter('pre', 'resetExtScope');
-    $this->load_filter('pre', 'htxtFilter');
+    $this->loadFilter('pre', 'resetExtScope');
+    $this->loadFilter('pre', 'htxtFilter');
     $this->registerPlugin('modifier', 'json_encode', 'json_encode');
     $this->registerPlugin('modifier', 'count', 'count');
     $this->registerPlugin('modifier', 'implode', 'implode');
