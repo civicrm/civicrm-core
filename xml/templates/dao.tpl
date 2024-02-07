@@ -140,7 +140,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                                                                       'description'     => {$tsFunctionName}('{$field.comment|crmEscapeSingleQuotes}'),
 {/if}
 {if $field.required}
-                                        'required'  => {$field.required|strtoupper},
+                                        'required'  => {$field.required|upper},
 {/if} {* field.required *}
 {if isset($field.length)}
                       'maxlength' => {$field.length},
