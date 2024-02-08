@@ -403,6 +403,9 @@ class Admin {
             $joins[$joinEntity][] = $joinInfo;
           }
         }
+        foreach (_getSearchKitEntityDisplays() as $display) {
+
+        }
       }
     }
     return $joins;

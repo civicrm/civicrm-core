@@ -11,8 +11,10 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
+use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Generic\Traits\SavedSearchInspectorTrait;
 use Civi\Api4\Job;
+use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Civi\Api4\SKEntity;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
@@ -38,6 +40,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       'civi.api4.entityTypes' => 'on_civi_api4_entityTypes',
       'hook_civicrm_pre' => 'onPreSaveDisplay',
       'hook_civicrm_post' => 'onPostSaveDisplay',
+      'api.schema_map.build' => 'on_schema_map_build',
     ];
   }
 
@@ -201,6 +204,33 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       $defn['fk_attributes'] = ' ON DELETE SET NULL';
     }
     return $defn;
+  }
+
+  /**
+   * Register FK joins
+   *
+   * @param \Civi\Api4\Event\SchemaMapBuildEvent $event
+   */
+  public function on_schema_map_build(SchemaMapBuildEvent $event): void {
+    $schema = $event->getSchemaMap();
+    foreach (_getSearchKitEntityDisplays() as $display) {
+      $this->loadSavedSearch($display['saved_search_id']);
+      $table = $schema->getTableByName($display['tableName']);
+      foreach ($display['settings']['columns'] as $column) {
+        $expr = $this->getSelectExpression($column['key']);
+        if (!$expr || $expr['expr']->getType() !== 'SqlField') {
+          continue;
+        }
+        $field = \CRM_Utils_Array::first($expr['fields']);
+        if (!empty($field['fk_entity'])) {
+          $fkTable = CoreUtil::getTableName($field['fk_entity']);
+          $link = new Joinable($fkTable, 'id', $column['spec']['name']);
+          $link->setBaseTable($display['tableName']);
+          $link->setJoinType(Joinable::JOIN_TYPE_ONE_TO_ONE);
+          $table->addTableLink($column['spec']['name'], $link);
+        }
+      }
+    }
   }
 
   /**
