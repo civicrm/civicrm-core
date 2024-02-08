@@ -142,36 +142,26 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Set the default values.
    */
   public function setDefaultValues() {
+    $fields = $this->getProfileCustomFields();
+    // Set defaults for custom fields based on their configured default values.
+    // Note that these will be overridden further down to those relevant to the
+    // specific contact or entity, if one is determined.
+    foreach (array_keys($fields) as $customFieldID) {
+      if ($customFieldID) {
+        CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID, 'custom_' . $customFieldID, $this->_defaults,
+          NULL, CRM_Profile_Form::MODE_REGISTER
+        );
+      }
+    }
     // check if the user is registered and we have a contact ID
     $contactID = $this->getContactID();
-
     if (!empty($contactID)) {
-      $fields = [];
-      $contribFields = CRM_Contribute_BAO_Contribution::getContributionFields();
-
-      // remove component related fields
-      foreach ($this->_fields as $name => $fieldInfo) {
-        //don't set custom data Used for Contribution (CRM-1344)
-        if (substr($name, 0, 7) === 'custom_') {
-          $id = substr($name, 7);
-          if (!CRM_Core_BAO_CustomGroup::checkCustomField($id, ['Contribution', 'Membership'])) {
-            continue;
-          }
-          // ignore component fields
-        }
-        elseif (array_key_exists($name, $contribFields) || (substr($name, 0, 11) === 'membership_') || (substr($name, 0, 13) == 'contribution_')) {
-          continue;
-        }
-        $fields[$name] = $fieldInfo;
-      }
-
-      if (!empty($fields)) {
-        CRM_Core_BAO_UFGroup::setProfileDefaults($contactID, $fields, $this->_defaults);
-      }
-
       $billingDefaults = $this->getProfileDefaults('Billing', $contactID);
       $this->_defaults = array_merge($this->_defaults, $billingDefaults);
+      $fields = $this->getContactProfileFields();
+      CRM_Core_BAO_UFGroup::setProfileDefaults($contactID, $fields, $this->_defaults);
     }
+
     $balance = $this->getContributionBalance();
     if ($balance) {
       $this->_defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($balance);
@@ -233,7 +223,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->_defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
     }
 
-    $entityId = $memtypeID = NULL;
+    $memtypeID = NULL;
     if ($this->_priceSetId) {
       if ($this->isMembershipPriceSet()) {
         $selectedCurrentMemTypes = [];
@@ -265,7 +255,23 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             }
           }
         }
-        $entityId = CRM_Utils_Array::value('id', CRM_Member_BAO_Membership::getContactMembership($contactID, $memtypeID, NULL));
+        $membershipID = CRM_Utils_Array::value('id', CRM_Member_BAO_Membership::getContactMembership($contactID, $memtypeID, NULL));
+        if ($contactID) {
+          // Set the default values for any membership custom fields on the page via a profile.
+          // Note that this will have been done further up if the contact ID was not determined.
+          foreach ($this->_fields as $name => $field) {
+            if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
+              // check if the custom field is on a membership, we only want to load
+              // defaults for membership custom fields here, not contact fields
+              if (!CRM_Core_BAO_CustomGroup::checkCustomField($customFieldID, ['Membership'])
+              ) {
+                CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID, $name, $this->_defaults,
+                  $membershipID, CRM_Profile_Form::MODE_REGISTER
+                );
+              }
+            }
+          }
+        }
       }
       else {
         CRM_Price_BAO_PriceSet::setDefaultPriceSet($this, $this->_defaults);
@@ -277,21 +283,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       //load default campaign from page.
       if (array_key_exists('contribution_campaign_id', $this->_fields)) {
         $this->_defaults['contribution_campaign_id'] = $this->_values['campaign_id'] ?? NULL;
-      }
-
-      //set custom field defaults
-      foreach ($this->_fields as $name => $field) {
-        if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
-          // check if the custom field is on a membership, we only want to load
-          // defaults for membership custom fields here, not contact fields
-          if (!isset($this->_defaults[$name])
-            && !CRM_Core_BAO_CustomGroup::checkCustomField($customFieldID, ['Membership'])
-          ) {
-            CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID, $name, $this->_defaults,
-              $entityId, CRM_Profile_Form::MODE_REGISTER
-            );
-          }
-        }
       }
     }
 
@@ -1901,6 +1892,49 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
     return TRUE;
+  }
+
+  /**
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function getContactProfileFields(): array {
+    $fields = [];
+    $contribFields = CRM_Contribute_BAO_Contribution::getContributionFields();
+
+    // remove component related fields
+    foreach ($this->_fields as $name => $fieldInfo) {
+      //don't set custom data Used for Contribution (CRM-1344)
+      if (substr($name, 0, 7) === 'custom_') {
+        $id = substr($name, 7);
+        if (!CRM_Core_BAO_CustomGroup::checkCustomField($id, [
+          'Contribution',
+          'Membership',
+        ])) {
+          continue;
+        }
+        // ignore component fields
+      }
+      elseif (array_key_exists($name, $contribFields) || (substr($name, 0, 11) === 'membership_') || (substr($name, 0, 13) == 'contribution_')) {
+        continue;
+      }
+      $fields[$name] = $fieldInfo;
+    }
+    return $fields;
+  }
+
+  private function getProfileCustomFields (): array {
+    // remove component related fields
+    $customFields = [];
+    foreach ($this->_fields as $name => $fieldInfo) {
+      //don't set custom data Used for Contribution (CRM-1344)
+      if (str_starts_with($name, 'custom_')) {
+        $id = substr($name, 7);
+        $customFields[(int) $id] = $fieldInfo;
+      }
+    }
+    return $customFields;
+
   }
 
 }
