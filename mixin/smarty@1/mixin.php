@@ -3,13 +3,9 @@
 /**
  * Auto-register "templates/" folder.
  *
- * @mixinName smarty-v2
- * @mixinVersion 1.0.1
- * @since 5.59
- *
- * @deprecated - it turns out that the mixin is not version specific so the 'smarty'
- * mixin is preferred over smarty-v2 (they are the same but not having the version
- * in the name is less misleading.)
+ * @mixinName smarty
+ * @mixinVersion 1.0.0
+ * @since 5.71
  *
  * @param CRM_Extension_MixInfo $mixInfo
  *   On newer deployments, this will be an instance of MixInfo. On older deployments, Civix may polyfill with a work-a-like.
