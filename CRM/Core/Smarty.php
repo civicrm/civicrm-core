@@ -280,12 +280,17 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     }
   }
 
-  public function clearTemplateVars() {
-    foreach (array_keys($this->_tpl_vars) as $key) {
-      if ($key == 'config' || $key == 'session') {
+  public function clearTemplateVars(): void {
+    foreach (array_keys($this->getTemplateVars()) as $key) {
+      if ($key === 'config' || $key === 'session') {
         continue;
       }
-      unset($this->_tpl_vars[$key]);
+      if (method_exists($this, 'clearAssign')) {
+        $this->clearAssign($key);
+      }
+      else {
+        $this->clear_assign($key);
+      }
     }
   }
 
