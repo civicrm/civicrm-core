@@ -294,10 +294,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       // @todo - stop assigning invoiceDate to the template - use
       // {contribution.total_amount} or {domain.now} instead - both of which support
       // formatting via |crmDate
-      $invoiceDate = date("F j, Y");
+      $invoiceDate = $contributionReceiveDate;
       $dueDateSetting = Civi::settings()->get('invoice_due_date');
       $dueDatePeriodSetting = Civi::settings()->get('invoice_due_date_period');
-      $dueDate = date('F j, Y', strtotime($contributionReceiveDate . "+" . $dueDateSetting . "" . $dueDatePeriodSetting));
+      $dueDate = date('F j, Y', strtotime($contributionReceiveDate . '+' . $dueDateSetting . $dueDatePeriodSetting));
       // @todo - use {contribution.balance_amount} & {contribution.amount_paid} in the template
       // - remove these 2
       $amountPaid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionID, TRUE);
