@@ -19,6 +19,8 @@
  */
 class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
 
+  use CRM_Contact_Form_Task_SMSTrait;
+
   /**
    * Are we operating in "single mode", i.e. sending sms to one
    * specific contact?
@@ -50,23 +52,6 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
     // Enable form element.
     $this->assign('SMSTask', TRUE);
     CRM_Contact_Form_Task_SMSCommon::buildQuickForm($this);
-  }
-
-  /**
-   * Process the form after the input has been submitted and validated.
-   */
-  public function postProcess() {
-    CRM_Contact_Form_Task_SMSCommon::postProcess($this);
-  }
-
-  /**
-   * List available tokens for this form.
-   *
-   * @return array
-   */
-  public function listTokens() {
-    $tokens = CRM_Core_SelectValues::contactTokens();
-    return $tokens;
   }
 
 }
