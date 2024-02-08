@@ -1545,15 +1545,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Rather historic - might have unneeded stuff
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
-  public function getCurrency() {
-    $currency = $this->_values['currency'] ?? NULL;
+  public function getCurrency(): string {
+    $currency = $this->getContributionValue('currency');
     if (empty($currency)) {
       $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
     }
-    // @todo If empty there is a problem - we should probably put in a deprecation notice
-    // to warn if that seems to be happening.
-    return (string) $currency;
+    return (string) ($currency ?? \Civi::settings()->get('currency'));
   }
 
 }
