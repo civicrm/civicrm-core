@@ -36,15 +36,20 @@ class CRM_Contact_Form_Task_SMS extends CRM_Contact_Form_Task {
    */
   public $_templates = NULL;
 
-  public function preProcess() {
+  /**
+   * @var float|int|mixed|string|null
+   */
+  public $_context;
+
+  public function preProcess(): void {
 
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE);
 
-    CRM_Contact_Form_Task_SMSCommon::preProcessProvider($this);
-
-    if (!$cid && $this->_context != 'standalone') {
+    $this->_single = $this->_context !== 'search';
+    $this->bounceOnNoActiveProviders();
+    if (!$cid && $this->_context !== 'standalone') {
       parent::preProcess();
     }
 

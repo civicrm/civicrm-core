@@ -28,6 +28,13 @@ trait CRM_Contact_Form_Task_SMSTrait {
     CRM_Contact_Form_Task_SMSCommon::postProcess($this);
   }
 
+  protected function bounceOnNoActiveProviders(): void {
+    $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
+    if (!$providersCount) {
+      CRM_Core_Error::statusBounce(ts('There are no SMS providers configured, or no SMS providers are set active'));
+    }
+  }
+
   /**
    * List available tokens for this form.
    *
