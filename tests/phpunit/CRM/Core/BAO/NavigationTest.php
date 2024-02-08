@@ -29,7 +29,6 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $url = 'civicrm/report/instance/1';
     $url_params = 'reset=1';
     $new_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params);
-    $this->assertObjectHasAttribute('id', $new_nav);
     $this->assertNotNull($new_nav->id);
   }
 
@@ -110,7 +109,6 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     ];
     CRM_Core_BAO_Navigation::add($params);
     $new_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params);
-    $this->assertObjectHasAttribute('id', $new_nav);
     $this->assertNotNull($new_nav->id);
     $new_nav->delete();
   }
@@ -138,7 +136,6 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     ];
     CRM_Core_BAO_Navigation::add($params);
     $new_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, 'reset=1%');
-    $this->assertObjectHasAttribute('id', $new_nav);
     $this->assertNotNull($new_nav->id);
     $new_nav->delete();
   }
