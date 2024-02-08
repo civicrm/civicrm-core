@@ -2311,7 +2311,8 @@ AND      default_value IS NOT NULL";
     $customData = [];
 
     foreach ($params as $key => $value) {
-      if ($customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($key, TRUE)) {
+      $customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($key, TRUE);
+      if ($customFieldInfo[0]) {
 
         // for autocomplete transfer hidden value instead of label
         if ($params[$key] && isset($params[$key . '_id'])) {
