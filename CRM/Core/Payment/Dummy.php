@@ -203,7 +203,6 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   public function doPayment(&$params, $component = 'contribute') {
     $this->_component = $component;
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
-
     $propertyBag = PropertyBag::cast($params);
     if ((float) $propertyBag->getAmount() !== (float) $params['amount']) {
       CRM_Core_Error::deprecatedWarning('amount should be passed through in machine-ready format');
