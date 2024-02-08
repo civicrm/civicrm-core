@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "142449f17c1a3e6d486d398c274352f8",
+    "content-hash": "24c5bbb0853366b9395e78a08c0d0531",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -2071,24 +2071,25 @@
         },
         {
             "name": "pear/log",
-            "version": "1.13.3",
+            "version": "1.14.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Log.git",
-                "reference": "21af0be11669194d72d88b5ee9d5f176dc75d9a3"
+                "reference": "8d270545008a448a4ed7f76819eca5960bce5117"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Log/zipball/21af0be11669194d72d88b5ee9d5f176dc75d9a3",
-                "reference": "21af0be11669194d72d88b5ee9d5f176dc75d9a3",
+                "url": "https://api.github.com/repos/pear/Log/zipball/8d270545008a448a4ed7f76819eca5960bce5117",
+                "reference": "8d270545008a448a4ed7f76819eca5960bce5117",
                 "shasum": ""
             },
             "require": {
                 "pear/pear_exception": "1.0.1 || 1.0.2",
-                "php": ">5.2"
+                "php": ">=7.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "*"
+                "phpunit/phpunit": "*",
+                "rector/rector": "*"
             },
             "suggest": {
                 "pear/db": "Install optionally via your project's composer.json"
@@ -2127,7 +2128,7 @@
                 "issues": "https://github.com/pear/Log/issues",
                 "source": "https://github.com/pear/Log"
             },
-            "time": "2021-05-04T23:51:30+00:00"
+            "time": "2024-02-07T15:05:44+00:00"
         },
         {
             "name": "pear/mail",
