@@ -27,7 +27,7 @@
  * away from supporting.
  *
  * MailingSystemTest checks that overall composition and delivery of
- * CiviMail blasts works. It extends CRM_Mailing_BaseMailingSystemTest
+ * CiviMail blasts works. It extends CRM_Mailing_MailingSystemTestBase
  * which provides the general test scenarios -- but this variation
  * checks that certain internal events/hooks fire.
  *
@@ -37,7 +37,7 @@
  * @group civimail
  * @see \Civi\FlexMailer\FlexMailerSystemTest
  */
-class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
+class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
 
   private $counts;
 
