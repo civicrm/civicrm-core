@@ -291,24 +291,21 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
   }
 
   /**
-   * @deprecated call clearAllAssign().
+   * Clear template variables, except session or config.
    *
    * @return void
    */
-  public function clearTemplateVars() {
-    if (method_exists($this, 'clearAllAssign')) {
-      $this->clearAllAssign();
-      return;
-    }
-
-    if (!property_exists($this, '_tpl_vars')) {
-      return;
-    }
-    foreach (array_keys($this->_tpl_vars) as $key) {
-      if ($key == 'config' || $key == 'session') {
+  public function clearTemplateVars(): void {
+    foreach (array_keys($this->getTemplateVars()) as $key) {
+      if ($key === 'config' || $key === 'session') {
         continue;
       }
-      unset($this->_tpl_vars[$key]);
+      if (method_exists($this, 'clearAssign')) {
+        $this->clearAssign($key);
+      }
+      else {
+        $this->clear_assign($key);
+      }
     }
   }
 
