@@ -180,9 +180,9 @@
       {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
 
-    {if $event.confirm_footer_text}
+    {if array_key_exists('confirm_footer_text', $event) && $event.confirm_footer_text}
         <div id="footer_text" class="crm-section event_confirm_footer-section">
-            <p>{$event.confirm_footer_text}</p>
+            <p>{$event.confirm_footer_text|purify}</p>
         </div>
     {/if}
 </div>

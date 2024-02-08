@@ -186,9 +186,9 @@
       {/crmRegion}
     {/if}
 
-    {if $event.thankyou_footer_text}
+    {if array_key_exists('thankyou_footer_text', $event) && $event.thankyou_footer_text}
         <div id="footer_text" class="crm-section event_thankyou_footer-section">
-            <p>{$event.thankyou_footer_text}</p>
+            <p>{$event.thankyou_footer_text|purify}</p>
         </div>
     {/if}
 
