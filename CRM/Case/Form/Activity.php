@@ -50,6 +50,26 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   public $_caseTypeDefinition;
 
   /**
+   * This is here to avoid php 8 warnings but it should be converted to
+   * some mechanism more local to ChangeCaseStatus. It also doesn't make sense
+   * that it's an array.
+   *
+   * @var array
+   * @internal
+   */
+  public $_oldCaseStatus;
+
+  /**
+   * This is here to avoid php 8 warnings but it should be converted to
+   * some mechanism more local to ChangeCaseStatus. It also doesn't make sense
+   * that it's an array.
+   *
+   * @var array
+   * @internal
+   */
+  public $_defaultCaseStatus;
+
+  /**
    * Build the form object.
    */
   public function preProcess() {

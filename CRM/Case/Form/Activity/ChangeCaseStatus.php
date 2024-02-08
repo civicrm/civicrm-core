@@ -20,12 +20,6 @@
  */
 class CRM_Case_Form_Activity_ChangeCaseStatus {
 
-  public $_caseId;
-
-  public $_defaultCaseStatus;
-
-  public $_oldCaseStatus;
-
   /**
    * @param CRM_Core_Form $form
    *
@@ -56,6 +50,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
   public static function setDefaultValues(&$form) {
     $defaults = [];
     // Retrieve current case status
+    // @todo this var is created as an array below, but the form field is single-valued. See also comment about _oldCaseStatus in endPostProcess.
     $defaults['case_status_id'] = $form->_defaultCaseStatus;
 
     return $defaults;
@@ -70,7 +65,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
 
     $caseTypes = [];
 
-    $form->_caseStatus = CRM_Case_PseudoConstant::caseStatus();
+    $statusLabels = CRM_Case_PseudoConstant::caseStatus();
     $statusNames = CRM_Case_PseudoConstant::caseStatus('name');
 
     // Limit case statuses to allowed types for these case(s)
@@ -81,9 +76,9 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $caseTypes = civicrm_api3('CaseType', 'get', ['id' => ['IN' => $caseTypes]]);
     foreach ($caseTypes['values'] as $ct) {
       if (!empty($ct['definition']['statuses'])) {
-        foreach ($form->_caseStatus as $id => $label) {
+        foreach ($statusLabels as $id => $label) {
           if (!in_array($statusNames[$id], $ct['definition']['statuses'])) {
-            unset($form->_caseStatus[$id]);
+            unset($statusLabels[$id]);
           }
         }
       }
@@ -94,12 +89,12 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     }
 
     foreach ($form->_defaultCaseStatus as $keydefault => $valdefault) {
-      if (!array_key_exists($valdefault, $form->_caseStatus)) {
-        $form->_caseStatus[$valdefault] = CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'status_id', $valdefault);
+      if (!array_key_exists($valdefault, $statusLabels)) {
+        $statusLabels[$valdefault] = CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'status_id', $valdefault);
       }
     }
     $element = $form->add('select', 'case_status_id', ts('Case Status'),
-      $form->_caseStatus, TRUE
+      $statusLabels, TRUE
     );
     // check if the case status id passed in url is a valid one, set as default and freeze
     if (CRM_Utils_Request::retrieve('case_status_id', 'Positive', $form)) {
@@ -197,11 +192,15 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $params['priority_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'priority_id', 'Normal');
     $activity->priority_id = $params['priority_id'];
 
+    // Note here we don't need to do the filtering that happens in buildForm.
+    // All we want is the label for a given id so we can put it in the subject.
+    $statusLabels = CRM_Case_PseudoConstant::caseStatus();
     foreach ($form->_oldCaseStatus as $statusval) {
+      // @todo we store all old statuses but then we only use the first one.
       if ($activity->subject == 'null') {
         $activity->subject = ts('Case status changed from %1 to %2', [
-          1 => $form->_caseStatus[$statusval] ?? NULL,
-          2 => $form->_caseStatus[$params['case_status_id']] ?? NULL,
+          1 => $statusLabels[$statusval] ?? NULL,
+          2 => $statusLabels[$params['case_status_id']] ?? NULL,
         ]);
         $activity->save();
       }
