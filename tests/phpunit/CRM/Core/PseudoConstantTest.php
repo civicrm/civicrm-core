@@ -390,7 +390,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ],
         [
           'fieldName' => 'visibility',
-          'sample' => 'Expose Publicly',
+          'sample' => 'Public Pages',
         ],
       ],
       'CRM_Core_DAO_UFJoin' => [
