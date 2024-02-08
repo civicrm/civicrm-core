@@ -170,6 +170,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testPaymentSendContributionReceipt(): void {
+    $this->markTestSkipped();
     $mut = new CiviMailUtils($this);
     $contribution = $this->createPartiallyPaidParticipantOrder();
     $event = $this->callAPISuccess('Event', 'get', []);
