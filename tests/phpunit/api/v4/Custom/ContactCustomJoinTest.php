@@ -120,4 +120,41 @@ class ContactCustomJoinTest extends CustomTestBase {
     $this->assertCount(2, $results);
   }
 
+  /**
+   * Ensures we can join two entities with a custom field compared to a core field in the ON clause
+   */
+  public function testJoinWithCustomFieldComparedToCoreFieldInOnClause(): void {
+    CustomGroup::create(FALSE)
+      ->addValue('extends', 'Activity')
+      ->addValue('title', 'a_set')
+      ->addChain('field', CustomField::create()
+        ->addValue('custom_group_id', '$id')
+        ->addValue('label', 'a_field')
+        ->addValue('html_type', 'Text')
+      )
+      ->execute();
+    $cid = $this->saveTestRecords('Contact', ['records' => 3])->column('id');
+    $activities = $this->saveTestRecords('Activity', [
+      'records' => [
+        ['source_contact_id' => $cid[0], 'subject' => 'yes match', 'a_set.a_field' => 'yes match'],
+        ['source_contact_id' => $cid[1], 'subject' => 'yes match', 'a_set.a_field' => 'nope no match'],
+        ['source_contact_id' => $cid[2], 'subject' => 'nope no match', 'a_set.a_field' => 'yes match'],
+      ],
+    ]);
+    $result = Contact::get(FALSE)
+      ->addSelect('id', 'activity.id')
+      ->addWhere('id', 'IN', $cid)
+      ->addJoin('Activity AS activity', 'LEFT', 'ActivityContact',
+        ['id', '=', 'activity.contact_id'],
+        ['activity.record_type_id:name', '=', '"Activity Source"'],
+        ['activity.a_set.a_field', '=', 'activity.subject']
+      )
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(3, $result);
+    $this->assertEquals($activities[0]['id'], $result[0]['activity.id']);
+    $this->assertNull($result[1]['activity.id']);
+    $this->assertNull($result[2]['activity.id']);
+  }
+
 }

@@ -99,16 +99,25 @@ class Joinable {
    *
    * @param string $baseTableAlias
    * @param string $targetTableAlias
+   * @param array|null $openJoin
    *
    * @return array
    */
-  public function getConditionsForJoin(string $baseTableAlias, string $targetTableAlias) {
+  public function getConditionsForJoin(string $baseTableAlias, string $targetTableAlias, ?array $openJoin) {
     $conditions = [];
+    $baseColumn = $this->baseColumn;
+    // Joining within a bridge, use the bridge table key instead,
+    // because the custom fields are joined first and the base entity might not be added yet.
+    if (!empty($openJoin['bridgeKey']) && $baseTableAlias === $openJoin['alias']) {
+      $conditions = $openJoin['bridgeCondition'];
+      $baseTableAlias = $openJoin['bridgeAlias'];
+      $baseColumn = $openJoin['bridgeKey'];
+    }
     if ($this->baseColumn && $this->targetColumn) {
       $conditions[] = sprintf(
         '`%s`.`%s` =  `%s`.`%s`',
         $baseTableAlias,
-        $this->baseColumn,
+        $baseColumn,
         $targetTableAlias,
         $this->targetColumn
       );

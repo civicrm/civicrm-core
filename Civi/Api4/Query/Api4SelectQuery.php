@@ -617,6 +617,13 @@ class Api4SelectQuery extends Api4Query {
 
     $acls = array_values($this->getAclClause($alias, $joinEntity, $aclStack));
 
+    // Info needed to attach custom fields to the bridge entity instead of the base entity
+    // because the custom fields are joined first and the base entity might not be added yet.
+    // @see Joinable::getConditionsForJoin
+    $this->openJoin['bridgeAlias'] = $bridgeAlias;
+    $this->openJoin['bridgeKey'] = $joinRef->getReferenceKey();
+    $this->openJoin['bridgeCondition'] = array_intersect_key($linkConditions, [1 => 1]);
+
     $outerConditions = [];
     foreach (array_filter($joinTree) as $clause) {
       $outerConditions[] = $this->treeWalkClauses($clause, 'ON');
@@ -624,7 +631,7 @@ class Api4SelectQuery extends Api4Query {
 
     // Info needed for joining custom fields extending the bridge entity
     $this->explicitJoins[$alias]['bridge_table_alias'] = $bridgeAlias;
-    // Invert the join
+    // Invert the join so all nested joins will link to the bridge entity
     $this->openJoin['table'] = $bridgeTable;
     $this->openJoin['alias'] = $bridgeAlias;
 
@@ -866,7 +873,7 @@ class Api4SelectQuery extends Api4Query {
 
         // Serialized joins are rendered by this::renderSerializedJoin. Don't add their tables.
         if (!$virtualField) {
-          $conditions = $link->getConditionsForJoin($baseTableAlias, $tableAlias);
+          $conditions = $link->getConditionsForJoin($baseTableAlias, $tableAlias, $this->openJoin);
           if ($joinEntity) {
             $conditions = array_merge($conditions, $this->getAclClause($tableAlias, $joinEntity, $joinPath));
           }
