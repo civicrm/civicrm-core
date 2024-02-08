@@ -58,9 +58,9 @@
           {$formElement.label}
         </div>
         <div class="content">
-          {if $profileFieldName|substr:0:3 eq 'im-'}
+          {if $profileFieldName|str_starts_with:'im-'}
             {assign var="provider" value=profileFieldNamen|cat:"-provider_id"}
-            {$form.$provider.html}&nbsp;
+            {if array_key_exists($provider, $form)}{$form.$provider.html}{/if}&nbsp;
           {/if}
 
           {if $profileFieldName eq 'email_greeting' or  $profileFieldName eq 'postal_greeting' or $profileFieldName eq 'addressee'}
@@ -115,10 +115,10 @@
                 </div>
               </div>
             {/if}
-          {elseif $profileFieldName|substr:0:5 eq 'phone'}
+          {elseif $profileFieldName|str_starts_with:'phone'}
             {assign var="phone_ext_field" value=$profileFieldName|replace:'phone':'phone_ext'}
             {$formElement.html}
-            {if $form.$phone_ext_field.html}
+            {if array_key_exists($phone_ext_field, $form)}
               &nbsp;{$form.$phone_ext_field.html}
             {/if}
           {else}
