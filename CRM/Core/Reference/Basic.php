@@ -42,6 +42,9 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
   }
 
   /**
+   * CRM_Core_Reference_Basic returns NULL.
+   * CRM_Core_Reference_Dynamic returns the name of the dynamic column e.g. "entity_table".
+   *
    * @return string|null
    */
   public function getTypeColumn() {

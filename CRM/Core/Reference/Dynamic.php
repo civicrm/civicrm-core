@@ -18,8 +18,12 @@ class CRM_Core_Reference_Dynamic extends CRM_Core_Reference_Basic {
   }
 
   /**
+   * Returns a list of all allowed values for $this->refTypeColumn
+   *
    * @return array
-   *   [table_name => EntityName]
+   *   [option_value => EntityName]
+   *   Keys are the value stored in $this->refTypeColumn,
+   *   Values are the name of the corresponding entity.
    */
   public function getTargetEntities(): array {
     $targetEntities = [];
