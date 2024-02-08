@@ -55,9 +55,9 @@
         {/foreach}
         </td>
     {else}
-        <td class="crm-participant-participant_fee_level">{if !$row.paid && !$row.participant_fee_level} {ts}(no fee){/ts}{else} {$row.participant_fee_level}{/if}</td>
+        <td class="crm-participant-participant_fee_level">{if !$row.paid && (!array_key_exists('participant_fee_level', $row) || !$row.participant_fee_level)} {ts}(no fee){/ts}{elseif array_key_exists('participant_fee_level', $row)}{$row.participant_fee_level}{/if}</td>
     {/if}
-    <td class="right nowrap crm-participant-participant_fee_amount">{$row.participant_fee_amount|crmMoney:$row.participant_fee_currency}</td>
+    <td class="right nowrap crm-participant-participant_fee_amount">{if array_key_exists('participant_fee_amount', $row)}{$row.participant_fee_amount|crmMoney:$row.participant_fee_currency}{/if}</td>
     <td class="crm-participant-participant_register_date">{$row.participant_register_date|truncate:10:''|crmDate}</td>
     <td class="crm-participant-event_start_date">{$row.event_start_date|truncate:10:''|crmDate}
         {if $row.event_end_date && $row.event_end_date|crmDate:"%Y%m%d" NEQ $row.event_start_date|crmDate:"%Y%m%d"}
