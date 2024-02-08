@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06d6d23bb1da44a3159afa71b75ba1aa",
+    "content-hash": "5ef40985f5d63498d99a2ad06beeb56f",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -2071,21 +2071,21 @@
         },
         {
             "name": "pear/log",
-            "version": "1.14.2",
+            "version": "1.14.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Log.git",
-                "reference": "419f8717b85168a51ce22367cc17e49cf8cb289e"
+                "reference": "8d270545008a448a4ed7f76819eca5960bce5117"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Log/zipball/419f8717b85168a51ce22367cc17e49cf8cb289e",
-                "reference": "419f8717b85168a51ce22367cc17e49cf8cb289e",
+                "url": "https://api.github.com/repos/pear/Log/zipball/8d270545008a448a4ed7f76819eca5960bce5117",
+                "reference": "8d270545008a448a4ed7f76819eca5960bce5117",
                 "shasum": ""
             },
             "require": {
                 "pear/pear_exception": "1.0.1 || 1.0.2",
-                "php": ">7.4"
+                "php": ">=7.4"
             },
             "require-dev": {
                 "phpunit/phpunit": "*",
@@ -2128,7 +2128,7 @@
                 "issues": "https://github.com/pear/Log/issues",
                 "source": "https://github.com/pear/Log"
             },
-            "time": "2024-01-21T23:56:38+00:00"
+            "time": "2024-02-07T15:05:44+00:00"
         },
         {
             "name": "pear/mail",
