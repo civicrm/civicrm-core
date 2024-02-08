@@ -26,7 +26,7 @@ use GuzzleHttp\Psr7\Request;
  * @see \Civi\FlexMailer\FlexMailerSystemTest
  * @see CRM_Mailing_MailingSystemTest
  */
-abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
+abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   public $defaultParams = [];

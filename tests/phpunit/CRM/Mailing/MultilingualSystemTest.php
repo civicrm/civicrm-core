@@ -271,7 +271,7 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
   }
 
   /**
-   * (FIXME) De-duplicate BaseMailingSystemTest::createContactsInGroup and MultilingualSystemTest::createContactsInGroup
+   * (FIXME) De-duplicate MailingSystemTestBase::createContactsInGroup and MultilingualSystemTest::createContactsInGroup
    * This should probably be in a trait.
    *
    * Create contacts in group.
