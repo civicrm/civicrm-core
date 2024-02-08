@@ -56,7 +56,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        *
        * @var bool
        */
-      public static $_log = {$table.log|strtoupper};
+      public static $_log = {$table.log|upper};
       {if $table.paths}
      /**
       * Paths for accessing this entity in the UI.
@@ -202,7 +202,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                       'component' => '{$field.component}',
 {/if}
 {if $field.serialize}
-  'serialize' => self::SERIALIZE_{$field.serialize|strtoupper},
+  'serialize' => self::SERIALIZE_{$field.serialize|upper},
 {/if}
 {if $field.uniqueTitle}
   'unique_title' => {$tsFunctionName}('{$field.uniqueTitle}'),
