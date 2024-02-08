@@ -1562,6 +1562,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // be performed yet, so do it now.
       if ($isPaidMembership && !$this->isSeparatePaymentSelected()) {
         $paymentParams['amount'] = $this->getMainContributionAmount();
+        $paymentParams['currency'] = $this->getCurrency();
         $paymentActionResult = $payment->doPayment($paymentParams);
         $paymentResults[] = ['contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult];
       }
@@ -2604,6 +2605,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             // and always calling it first.
             $form->postProcessHook();
           }
+          $paymentParams['currency'] = $this->getCurrency();
           $result = $payment->doPayment($paymentParams);
           $form->_params = array_merge($form->_params, $result);
           $form->assign('trxn_id', $result['trxn_id'] ?? '');
