@@ -506,6 +506,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     else {
       $this->assign('products');
     }
+    // These 2 assigns may be overwritten in buildMembershipBlock.
+    // and they drive the text around reneal selection.
+    $this->assign('auto_renew', $this->getSubmittedValue('auto_renew'));
+    foreach ($this->getLineItems() as $lineItem) {
+      if ($lineItem['auto_renew'] ?? NULL === 2) {
+        $this->assign('auto_renew', TRUE);
+        $this->assign('autoRenewOption', 2);
+      }
+    }
     if (CRM_Core_Component::isEnabled('CiviMember') && empty($this->_ccid)) {
       if (isset($params['selectMembership']) &&
         $params['selectMembership'] !== 'no_thanks'
@@ -514,14 +523,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $this->_membershipContactID,
           $params['selectMembership']
         );
-        if (!empty($params['auto_renew'])) {
-          $this->assign('auto_renew', TRUE);
-        }
       }
       else {
         $this->assign('membershipBlock', FALSE);
       }
     }
+
     if (empty($this->_ccid)) {
       $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
       $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);

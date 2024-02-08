@@ -2665,6 +2665,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
       }
       else {
+        $values['modelProps'] = $input['modelProps'] ?? [];
         return CRM_Contribute_BAO_ContributionPage::sendMail($ids['contact'], $values, $isTest, $returnMessageText);
       }
     }

@@ -24,7 +24,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   /**
    * Define default MembershipType Id.
+   *
    * @var int
+   *
+   * @deprecated unused
    */
   public $_defaultMemTypeId;
 
@@ -56,6 +59,23 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @var array
    */
   private $existingMemberships;
+
+  /**
+   * @param array $fields
+   *
+   * @return string|null
+   * @throws \CRM_Core_Exception
+   */
+  protected function getAutoRenewError(array $fields): ?string {
+    if (empty($fields['payment_processor_id'])) {
+      foreach ($this->getLineItems() as $lineItem) {
+        if ($lineItem['auto_renew'] === 2) {
+          return ts('You cannot have auto-renewal on if you are paying later.');
+        }
+      }
+    }
+    return FALSE;
+  }
 
   /**
    * Get the active UFGroups (profiles) on this form
@@ -222,14 +242,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $memtypeID = NULL;
     if ($this->_priceSetId) {
-      if (($this->isMembershipPriceSet() && !$this->isDefined('CurrentMembership')) || $this->_defaultMemTypeId) {
+      if ($this->isMembershipPriceSet()) {
         $selectedCurrentMemTypes = [];
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
             $opMemTypeId = $values['membership_type_id'] ?? NULL;
             $priceFieldName = 'price_' . $values['price_field_id'];
             $priceFieldValue = CRM_Price_BAO_PriceSet::getPriceFieldValueFromURL($this, $priceFieldName);
-            if (!empty($priceFieldValue)) {
+            if (!empty($priceFieldValue) && !$this->isDefined('RenewableMembership')) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $priceFieldValue, $val['html_type'], $this->_defaults);
               // break here to prevent overwriting of default due to 'is_default'
               // option configuration or setting of current membership or
@@ -237,15 +257,16 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               // The value sent via URL get's higher priority.
               break;
             }
-            elseif ($opMemTypeId &&
-              !empty($this->getExistingMemberships()[$opMemTypeId]) &&
+            if ($opMemTypeId &&
+              // @todo - maybe use the defined renewable membership to avoid lifetime memberships.
+              !empty($this->getExistingMembership($opMemTypeId)) &&
               !in_array($opMemTypeId, $selectedCurrentMemTypes)
             ) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
               $memtypeID = $selectedCurrentMemTypes[] = $values['membership_type_id'];
             }
             elseif (!empty($values['is_default']) && !$opMemTypeId && (!isset($this->_defaults[$priceFieldName]) ||
-              ($val['html_type'] == 'CheckBox' && !isset($this->_defaults[$priceFieldName][$keys])))) {
+              ($val['html_type'] === 'CheckBox' && !isset($this->_defaults[$priceFieldName][$keys])))) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
               $memtypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $this->_defaults[$priceFieldName], 'membership_type_id');
             }
@@ -315,12 +336,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $config = CRM_Core_Config::singleton();
 
     $contactID = $this->getContactID();
+    $this->assign('contact_id', $contactID);
     if ($contactID) {
-      $this->assign('contact_id', $contactID);
       $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
     }
 
     $this->applyFilter('__ALL__', 'trim');
+    $this->assign('showMainEmail', empty($this->_ccid));
     if (empty($this->_ccid)) {
       if ($this->_emailExists == FALSE) {
         $this->add('text', "email-{$this->_bltID}",
@@ -328,7 +350,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           ['size' => 30, 'maxlength' => 60, 'class' => 'email'],
           TRUE
         );
-        $this->assign('showMainEmail', TRUE);
         $this->addRule("email-{$this->_bltID}", ts('Email is not valid.'), 'email');
       }
     }
@@ -494,6 +515,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   private function buildPriceSet($form) {
     $validPriceFieldIds = array_keys($this->getPriceFieldMetaData());
     $form->assign('priceSet', $form->_priceSet);
+    $this->assign('membershipFieldID');
 
     // @todo - this hook wrangling can be done earlier if we set the form on $this->>order.
     $feeBlock = &$form->_values['fee'];
@@ -665,7 +687,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               $this->assign('hasExistingLifetimeMembership', TRUE);
               continue;
             }
-            $this->define('Membership', 'CurrentMembership', $membership);
+            $this->define('Membership', 'RenewableMembership', $membership);
             $memType['current_membership'] = $membership['end_date'];
             if (!$endDate) {
               $endDate = $memType['current_membership'];
@@ -694,12 +716,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->assign('autoRenewOption', $autoRenewOption);
 
       if ((!$this->_values['is_pay_later'] || is_array($this->_paymentProcessors)) && ($allowAutoRenewMembership || $autoRenewOption)) {
-        if ($autoRenewOption == 2) {
-          $this->addElement('hidden', 'auto_renew', ts('Please renew my membership automatically.'));
-        }
-        else {
-          $this->addElement('checkbox', 'auto_renew', ts('Please renew my membership automatically.'));
-        }
+        $this->addElement('checkbox', 'auto_renew', ts('Please renew my membership automatically.'));
       }
 
     }
@@ -799,11 +816,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $self) {
-    $errors = [];
+    $self->resetOrder($fields);
+    $errors = array_filter(['auto_renew' => $self->getAutoRenewError($fields)]);
+    // @todo - should just be $this->getOrder()->getTotalAmount()
     $amount = $self->computeAmount($fields, $self->_values);
-    if (!empty($fields['auto_renew']) && empty($fields['payment_processor_id'])) {
-      $errors['auto_renew'] = ts('You cannot have auto-renewal on if you are paying later.');
-    }
 
     if ((!empty($fields['selectMembership']) &&
         $fields['selectMembership'] != 'no_thanks'
@@ -1149,9 +1165,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->controller->resetPage('Confirm');
     // Update order to the submitted values (in case the back button has been used
     // and the submitted values have changed.
-    $this->set('lineItem', NULL);
-    $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
-    $this->order->recalculateLineItems();
+    // This aleady happens in validate so might be overkill.
+    $this->resetOrder($this->getSubmittedValues());
 
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
@@ -1942,6 +1957,27 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     return $customFields;
 
+  }
+
+  /**
+   * @param array $fields
+   * @param bool $sanitized
+   *   Has Quickform already sanitised the input. If not
+   *   we will de-localize any money fields.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  protected function resetOrder(array $fields, bool $sanitized = TRUE): void {
+    if (!$sanitized) {
+      // This happens in validate.
+      foreach ($fields as $fieldName => $value) {
+        $fields[$fieldName] = $this->getUnLocalizedSubmittedValue($fieldName, $value);
+      }
+    }
+    $this->set('lineItem', NULL);
+    $this->order->setPriceSelectionFromUnfilteredInput($fields);
+    $this->order->recalculateLineItems();
   }
 
 }
