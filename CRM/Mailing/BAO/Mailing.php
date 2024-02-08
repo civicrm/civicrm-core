@@ -936,20 +936,18 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *   ID of the EventQueue.
    * @param string $hash
    *   Hash of the EventQueue.
-   * @param string $email
-   *   Destination address.
    *
    * @return array
    *   (reference) array    array ref that hold array refs to the verp info and urls
    */
-  public static function getVerpAndUrls($job_id, $event_queue_id, $hash, $email) {
+  public static function getVerpAndUrls($job_id, $event_queue_id, $hash) {
     // create a skeleton object and set its properties that are required by getVerpAndUrlsAndHeaders()
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->_domain = CRM_Core_BAO_Domain::getDomain();
     $bao->from_name = $bao->from_email = $bao->subject = '';
 
     // use $bao's instance method to get verp and urls
-    [$verp, $urls, $_] = $bao->getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email);
+    [$verp, $urls, $_] = $bao->getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash);
     return [$verp, $urls];
   }
 
@@ -962,15 +960,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *   ID of the EventQueue.
    * @param string $hash
    *   Hash of the EventQueue.
-   * @param string $email
-   *   Destination address.
-   *
-   * @param bool $isForward
    *
    * @return array
    *   array ref that hold array refs to the verp info, urls, and headers
    */
-  public function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
+  public function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash) {
     $config = CRM_Core_Config::singleton();
 
     /**
@@ -1035,9 +1029,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'List-Unsubscribe' => "<mailto:{$verp['unsubscribe']}>",
     ];
     self::addMessageIdHeader($headers, 'm', $job_id, $event_queue_id, $hash);
-    if ($isForward) {
-      $headers['Subject'] = "[Fwd:{$this->subject}]";
-    }
     return [&$verp, &$urls, &$headers];
   }
 
@@ -1089,9 +1080,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     [$verp, $urls, $headers] = $this->getVerpAndUrlsAndHeaders(
       $job_id,
       $event_queue_id,
-      $hash,
-      $email,
-      $isForward
+      $hash
     );
 
     //set from email who is forwarding it and not original one.

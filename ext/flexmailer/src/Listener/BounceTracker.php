@@ -36,8 +36,7 @@ class BounceTracker extends AutoService {
     foreach ($e->getTasks() as $task) {
       /** @var \Civi\FlexMailer\FlexMailerTask $task */
       list($verp) = $mailing->getVerpAndUrlsAndHeaders(
-        $e->getJob()->id, $task->getEventQueueId(), $task->getHash(),
-        $task->getAddress());
+        $e->getJob()->id, $task->getEventQueueId(), $task->getHash());
 
       if (!$task->getMailParam('Return-Path')) {
         $task->setMailParam('Return-Path', $defaultReturnPath ?? $verp['bounce']);
