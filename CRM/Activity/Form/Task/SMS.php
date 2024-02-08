@@ -61,7 +61,7 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Contact_Form_Task_SMSCommon::buildQuickForm($this);
+    $this->buildSmsForm();
   }
 
 }
