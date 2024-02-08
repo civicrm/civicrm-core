@@ -173,6 +173,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     $this->registerPlugin('modifier', 'json_encode', 'json_encode');
     $this->registerPlugin('modifier', 'count', 'count');
     $this->registerPlugin('modifier', 'implode', 'implode');
+    $this->registerPlugin('modifier', 'str_starts_with', 'str_starts_with');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
 
