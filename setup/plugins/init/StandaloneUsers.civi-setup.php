@@ -3,6 +3,8 @@
  * @file
  *
  * On "Standalone" UF, default policy is to enable `standaloneusers` and create user with admin role.
+ *
+ * Note: we need to enable 'standaloneusers' early, because it provides the session handler
  */
 
 if (!defined('CIVI_SETUP')) {
@@ -31,6 +33,17 @@ if (!defined('CIVI_SETUP')) {
     $e->getModel()->extras['adminPassWasSpecified'] = !empty($e->getModel()->extras['adminPass']);
     $e->getModel()->extras = array_merge($defaults, $e->getModel()->extras);
   });
+
+\Civi\Setup::dispatcher()
+  ->addListener('civi.setup.installDatabase', function (\Civi\Setup\Event\InstallDatabaseEvent $e) {
+    if ($e->getModel()->cms !== 'Standalone') {
+      return;
+    }
+    Civi\Setup::log()->info('Enabling Standaloneusers extension early');
+    \civicrm_api3('Extension', 'enable', array(
+      'keys' => ['standaloneusers'],
+    ));
+  }, \Civi\Setup::PRIORITY_MAIN - 150);
 
 \Civi\Setup::dispatcher()
   ->addListener('civi.setup.installDatabase', function (\Civi\Setup\Event\InstallDatabaseEvent $e) {
