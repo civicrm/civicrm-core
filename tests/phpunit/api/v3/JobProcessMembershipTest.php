@@ -73,6 +73,25 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Creates a membership that is grace and should be updated to expired.
+   */
+  public function createGraceMembershipThatShouldBeExpired(): int {
+    $contactId = $this->individualCreate();
+    $membershipId = $this->contactMembershipCreate([
+      'contact_id' => $contactId,
+      'start_date' => $this->yesterday,
+      'end_date' => $this->yesterday,
+    ]);
+
+    $this->callAPISuccess('Membership', 'create', [
+      'id' => $membershipId,
+      'status_id' => 'Deceased',
+    ]);
+
+    return $membershipId;
+  }
+
+  /**
    * Creates a test membership in `grace` status that should be
    * in `current` status but that won't be updated unless the process
    * is explicitly told not to exclude tests.
@@ -451,6 +470,25 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
     ]);
 
     $this->assertEquals('Current', $this->getMembershipStatus($pendingId));
+  }
+
+  /**
+   * Test that we can explicitly exclude multiple settings by providing a list
+   * of comma separated values (for the Scheduled Job config or command line)
+   */
+  public function testSpecifyingMultipleCommaSeparatedStatusIDs(): void {
+    $graceId = $this->createGraceMembershipThatShouldBeExpired();
+
+    $exclude = [];
+    $exclude[] = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Grace');
+    $exclude[] = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
+
+    $this->callAPISuccess('job', 'process_membership', [
+      // This is on purpose to make sure we test the comma-separated syntax
+      'exclude_membership_status_ids' => implode(',', $exclude),
+    ]);
+
+    $this->assertEquals('Grace', $this->getMembershipStatus($graceId));
   }
 
 }
