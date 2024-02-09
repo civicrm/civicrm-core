@@ -553,8 +553,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * Start a new session.
    */
   public function sessionStart() {
-    $session_handler = new SessionHandler();
-    session_set_save_handler($session_handler);
+    // during installation we can't use the session handler from the extension yet
+    // so we fall back to a default php session
+    if (!defined('CIVI_SETUP')) {
+      $session_handler = new SessionHandler();
+      session_set_save_handler($session_handler);
+    }
 
     $session_max_lifetime = Civi::settings()->get('standaloneusers_session_max_lifetime') ?? 1440;
 
