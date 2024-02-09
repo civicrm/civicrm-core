@@ -1681,8 +1681,6 @@ WHERE  id = $cfID
                   $customVal = $params[$name];
                 }
                 //take the custom field options
-                $returnProperties = [$name => 1];
-                $query = new CRM_Contact_BAO_Query($params, $returnProperties, $fields);
                 if (!$skip) {
                   $displayValue = CRM_Core_BAO_CustomField::displayValue($customVal, $cfID);
                 }
