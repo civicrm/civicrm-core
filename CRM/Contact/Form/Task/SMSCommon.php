@@ -77,6 +77,7 @@ class CRM_Contact_Form_Task_SMSCommon {
    * @deprecated since 5.71 will be removed around 5.77.
    */
   public static function buildQuickForm(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative supported for non-core use');
 
     $toArray = [];
 

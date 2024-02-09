@@ -340,6 +340,11 @@ class FormWrapper {
         $_SESSION['_' . $this->form->controller->_name . '_container']['values']['Preview'] = $formValues;
         return;
 
+      case $class === 'CRM_Contact_Form_Search_Basic':
+        $this->form->controller = new \CRM_Contact_Controller_Search('Basic', TRUE, \CRM_Core_Action::BASIC);
+        $this->form->setAction(\CRM_Core_Action::BASIC);
+        break;
+
       case strpos($class, 'Search') !== FALSE:
         $this->form->controller = new \CRM_Contact_Controller_Search();
         if ($class === 'CRM_Contact_Form_Search_Basic') {

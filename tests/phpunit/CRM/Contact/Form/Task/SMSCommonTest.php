@@ -9,11 +9,15 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Test\FormTrait;
+
 /**
  * Test class for CRM_Contact_Form_Task_SMSCommon.
  * @group headless
  */
 class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
+
+  use FormTrait;
 
   /**
    * Set up SMS recipients.
@@ -97,11 +101,13 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
    * Test to ensure SMS Activity QuickForm displays the right phone numbers.
    */
   public function testQuickFormMobileNumbersDisplay(): void {
-    /** @var CRM_Activity_Form_Task_SMS $form */
-    $form = $this->getFormObject('CRM_Contact_Form_Task_SMS');
-    $form->_contactIds = array_values($this->ids['Contact']);
-    $form->_single = FALSE;
-    CRM_Contact_Form_Task_SMSCommon::buildQuickForm($form);
+    $this->createTestEntity('OptionValue', ['option_group_id:name' => 'sms_provider_name', 'name' => 'dummy sms', 'label' => 'Dummy']);
+    CRM_Core_DAO::executeQuery('INSERT INTO civicrm_sms_provider (name,title, api_type) VALUES ("SMS", "SMS", 1)');
+    $form = $this->getTestForm('CRM_Contact_Form_Search_Basic', ['radio_ts' => 'ts_all'], ['action' => 1])
+      ->addSubsequentForm('CRM_Contact_Form_Task_SMS', [
+        'sms_provider_id' => 1,
+      ]);
+    $form->processForm();
     $contacts = json_decode($form->getTemplateVars('toContact'));
     $smsRecipientsActual = [];
 
