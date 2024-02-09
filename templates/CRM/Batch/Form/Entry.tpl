@@ -112,7 +112,7 @@
       </div>
     {/section}
   </div>
-  <div class="crm-submit-buttons">{if $fields}{$form._qf_Batch_refresh.html}{/if} &nbsp; {$form.buttons.html}</div>
+  <div class="crm-submit-buttons">{if $fields && array_key_exists('_qf_Batch_refresh', $form) && is_array($form._qf_Batch_refresh)}{$form._qf_Batch_refresh.html}{/if} &nbsp; {$form.buttons.html}</div>
 </div>
 {literal}
 <script type="text/javascript">
