@@ -280,21 +280,6 @@ class Security {
   }
 
   /**
-   * Since our User entity contains a FK to a contact, it's not possible for a User to exist without a contact.
-   *
-   * @todo review this (what if contact is deleted?)
-   */
-  public function synchronizeUsers() {
-
-    $userCount = \Civi\Api4\User::get(FALSE)->selectRowCount()->execute()->countMatched();
-    return [
-      'contactCount' => $userCount,
-      'contactMatching' => $userCount,
-      'contactCreated' => 0,
-    ];
-  }
-
-  /**
    * High level function to encrypt password using the site-default mechanism.
    */
   public function hashPassword(string $plaintext): string {
