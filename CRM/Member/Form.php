@@ -551,20 +551,21 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
-   * Get the selected price set id.
+   * Get the price set ID.
    *
-   * @param array $params
-   *   Parameters submitted to the form.
+   * @api Supported for external use.
    *
    * @return int
    */
-  protected function getPriceSetID(array $params): int {
-    $priceSetID = $params['price_set_id'] ?? NULL;
-    if (!$priceSetID) {
-      $priceSetDetails = $this->getPriceSetDetails($params);
-      return (int) key($priceSetDetails);
+  public function getPriceSetID(): int {
+    $this->_priceSetId = $this->getSubmittedValue('price_set_id') ?? NULL;
+    if (!$this->_priceSetId) {
+      $priceSet = CRM_Price_BAO_PriceSet::getDefaultPriceSet('membership');
+      $priceSet = reset($priceSet);
+      $priceSetDetails = CRM_Price_BAO_PriceSet::getSetDetail($priceSet['setID']);
+      $this->_priceSetId = key($priceSetDetails);
     }
-    return (int) $priceSetID;
+    return (int) $this->_priceSetId;
   }
 
   /**
@@ -577,7 +578,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   protected function setPriceSetParameters(array $formValues): array {
     // process price set and get total amount and line items.
-    $this->_priceSetId = $this->getPriceSetID($formValues);
+    $this->getPriceSetID();
     $this->ensurePriceParamsAreSet($formValues);
     $priceSetDetails = $this->getPriceSetDetails($formValues);
     $this->_priceSet = $priceSetDetails[$this->_priceSetId];

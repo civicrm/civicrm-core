@@ -4,6 +4,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\Contribution;
 use Civi\Test\Api3TestTrait;
 use Civi\Test\CiviEnvBuilder;
+use Civi\Test\FormTrait;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\HookInterface;
 use Civi\Test\TransactionalInterface;
@@ -35,6 +36,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
 
   use Api3TestTrait;
   use ContactTestTrait;
+  use FormTrait;
 
   /**
    * Created ids.
@@ -271,17 +273,13 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
     $this->createLoggedInUser();
     $formValues = [
       'contact_id' => $this->ids['contact'][0],
+      'financial_type_id' => 1,
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'),
     ];
-    $form = new CRM_Contribute_Form_Contribution();
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $form->controller = new CRM_Core_Controller();
-    $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
-    $_SESSION['_' . $form->controller->_name . '_container']['values']['Contribution'] = $formValues;
-    $_REQUEST['action'] = 'update';
-    $_REQUEST['id'] = $this->ids['Contribution'][0];
-    $form->buildForm();
-    $form->postProcess();
+    $this->getTestForm('CRM_Contribute_Form_Contribution', $formValues, [
+      'action' => 'update',
+      'id' => $this->ids['Contribution'][0],
+    ])->processForm();
 
     $contribution = Contribution::get()
       ->addWhere('id', '=', $this->ids['Contribution'][0])
