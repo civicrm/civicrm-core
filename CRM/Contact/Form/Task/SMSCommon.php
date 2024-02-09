@@ -77,6 +77,7 @@ class CRM_Contact_Form_Task_SMSCommon {
    * @deprecated since 5.71 will be removed around 5.77.
    */
   public static function buildQuickForm(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative supported for non-core use');
 
     $toArray = [];
 
@@ -290,7 +291,7 @@ class CRM_Contact_Form_Task_SMSCommon {
    */
   public static function formRule($fields, $dontCare, $self) {
     $errors = [];
-
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative supported for non-core use');
     $template = CRM_Core_Smarty::singleton();
 
     if (empty($fields['sms_text_message'])) {

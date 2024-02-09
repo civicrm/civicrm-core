@@ -74,7 +74,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
 
     // when form is submitted recompute contactIds
     $allToSMS = [];
-    if ($to->getValue()) {
+    if ($this->getSubmittedValue('to')) {
       $allToPhone = explode(',', $to->getValue());
 
       $form->_contactIds = [];
@@ -235,9 +235,17 @@ trait CRM_Contact_Form_Task_SMSTrait {
     // format contact details array to handle multiple sms from same contact
     $formattedContactDetails = [];
     $tempPhones = [];
-
-    foreach ($form->_contactIds as $key => $contactId) {
-      $phone = $form->_toContactPhone[$key];
+    $phonesToSendTo = explode(',', $this->getSubmittedValue('to'));
+    $contactIds = $phones = [];
+    foreach ($phonesToSendTo as $phone) {
+      list($contactId, $phone) = explode('::', $phone);
+      if ($contactId) {
+        $contactIds[] = $contactId;
+        $phones[] = $phone;
+      }
+    }
+    foreach ($contactIds as $key => $contactId) {
+      $phone = $phones[$key];
 
       if ($phone) {
         $phoneKey = "{$contactId}::{$phone}";
