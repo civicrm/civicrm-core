@@ -32,7 +32,7 @@ class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndI
       ->installMe(__DIR__)
       ->callback(
         function() {
-          \CRM_Utils_System::synchronizeUsers();
+          \CRM_Utils_System::synchronizeUsersIfAllowed();
         },
         'synchronizeUsers'
       )

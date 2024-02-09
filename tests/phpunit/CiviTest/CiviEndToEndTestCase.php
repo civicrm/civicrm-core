@@ -17,7 +17,7 @@ class CiviEndToEndTestCase extends PHPUnit\Framework\TestCase implements \Civi\T
       'name' => $GLOBALS['_CV']['ADMIN_USER'],
       'pass' => $GLOBALS['_CV']['ADMIN_PASS'],
     ]);
-    CRM_Utils_System::synchronizeUsers();
+    CRM_Utils_System::synchronizeUsersIfAllowed();
 
     parent::setUpBeforeClass();
   }

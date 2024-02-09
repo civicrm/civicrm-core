@@ -24,7 +24,7 @@ abstract class E2E_Cache_CacheTestCase extends CiviSimpleCacheTest implements \C
       'name' => $GLOBALS['_CV']['ADMIN_USER'],
       'pass' => $GLOBALS['_CV']['ADMIN_PASS'],
     ]);
-    CRM_Utils_System::synchronizeUsers();
+    \CRM_Utils_System::synchronizeUsersIfAllowed();
 
     parent::setUpBeforeClass();
   }
