@@ -1,5 +1,17 @@
-<crm-search-display-editable row="row" col="colData" cancel="$ctrl.editing = null;" ng-if="colData.edit && $ctrl.isEditing(rowIndex, colIndex)"></crm-search-display-editable>
-<span ng-if="!colData.links && !$ctrl.isEditing(rowIndex, colIndex)" ng-class="{'crm-editable-enabled': colData.edit && !$ctrl.editing, 'crm-editable-disabled': colData.edit && $ctrl.editing}" ng-click="colData.edit && !$ctrl.editing && ($ctrl.editing = [rowIndex, colIndex])">
+<crm-search-display-editable
+  row="row"
+  col="colData"
+  cancel="$ctrl.lastEdited = $ctrl.editing; $ctrl.editing = null;"
+  ng-if="colData.edit && $ctrl.isEditing(rowIndex, colIndex)">
+</crm-search-display-editable>
+<span
+  ng-if="!colData.links && !$ctrl.isEditing(rowIndex, colIndex)"
+  ng-class="{'crm-editable-enabled': colData.edit && !$ctrl.editing, 'crm-editable-disabled': colData.edit && $ctrl.editing}"
+  ng-click="colData.edit && !$ctrl.editing && ($ctrl.editing = [rowIndex, colIndex])"
+  ng-focus="colData.edit && !$ctrl.editing && !manualFocus && ($ctrl.editing = [rowIndex, colIndex])"
+  ng-attr-tabindex="{{:: $ctrl.zeroIfEditable(colIndex)}}"
+  crm-search-input-focus="colData.edit && $ctrl.wasEditing(rowIndex, colIndex) && !($ctrl.lastEdited = false)"
+>
   <span ng-if="!$ctrl.isArray(colData.val)">
     <i ng-if="colData.icons.left[0]" class="crm-i {{:: colData.icons.left[0] }}"></i>
     {{:: colData.val }}
