@@ -60,12 +60,9 @@ class CryptoJwt {
    * @throws CryptoException
    */
   public function decode($token, $keyTag = 'SIGN') {
-    // Version 6.x+ has 2 parameters, earlier versions had 3
-    $reflection = new \ReflectionMethod('Firebase\JWT\JWT::decode');
-    $useKeyObj = ($reflection->getNumberOfParameters() === 2) ?? FALSE;
-
-    // Composer\InstalledVersions returns 0 if the library has been replaced using "replace" in composer.json
-    // $useKeyObj = version_compare(\Composer\InstalledVersions::getVersion('firebase/php-jwt'), '6', '>=');
+    // TODO: Circa mid-2024, make a hard-requirement on firebase/php-jwt v5.5+.
+    // Then we can remove this guard and simplify the `$keysByAlg` stuff.
+    $useKeyObj = class_exists(Key::class);
     if (!$useKeyObj) {
       \CRM_Core_Error::deprecatedWarning('Using deprecated version of firebase/php-jwt. Upgrade to 6.x+.');
     }
