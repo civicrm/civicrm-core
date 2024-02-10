@@ -1347,13 +1347,25 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return bool
    * @throws CRM_Core_Exception
    */
-  public static function tableHasBeenAdded() {
+  public static function tableHasBeenAdded(): bool {
     if (CRM_Utils_System::version() === CRM_Core_BAO_Domain::version()) {
       return TRUE;
     }
     $daoExt = static::getExtensionName();
-    $daoVersion = defined(static::class . '::TABLE_ADDED') ? constant(static::class . '::TABLE_ADDED') : '1.0';
-    return !($daoExt === 'civicrm' && version_compare(CRM_Core_BAO_Domain::version(), $daoVersion, '<'));
+    if ($daoExt !== 'civicrm') {
+      // FIXME: Check extension tables
+      return TRUE;
+    }
+    $daoVersion = static::getTableAddVersion();
+    return !(version_compare(CRM_Core_BAO_Domain::version(), $daoVersion, '<'));
+  }
+
+  /**
+   * @return string
+   *   Version in which table was added
+   */
+  protected static function getTableAddVersion(): string {
+    return defined(static::class . '::TABLE_ADDED') ? constant(static::class . '::TABLE_ADDED') : '1.0';
   }
 
   /**
