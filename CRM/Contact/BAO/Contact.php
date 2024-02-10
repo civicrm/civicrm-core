@@ -3637,7 +3637,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    *   Id of the contact.
    * @throws CRM_Core_Exception
    */
-  public static function getEntityIcon(string $entityName, int $entityId) {
+  public static function getEntityIcon(string $entityName, int $entityId): ?string {
     $contactTypes = CRM_Contact_BAO_ContactType::getAllContactTypes();
     $subTypes = CRM_Utils_Array::explodePadded(CRM_Core_DAO::getFieldValue(parent::class, $entityId, 'contact_sub_type'));
     foreach ((array) $subTypes as $subType) {

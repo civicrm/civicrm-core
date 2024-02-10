@@ -614,7 +614,7 @@ class CRM_Core_DAO extends DB_DataObject {
 
     // Exclude fields yet not added by pending upgrades
     $dbVer = \CRM_Core_BAO_Domain::version();
-    $daoExt = defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
+    $daoExt = static::getExtensionName();
     if ($fields && $daoExt === 'civicrm' && version_compare($dbVer, \CRM_Utils_System::version()) < 0) {
       $fields = array_filter($fields, function($field) use ($dbVer) {
         $add = $field['add'] ?? '1.0.0';
@@ -633,6 +633,14 @@ class CRM_Core_DAO extends DB_DataObject {
     }
 
     return $fields;
+  }
+
+  /**
+   * Get name of extension in which this DAO is defined.
+   * @return string|null
+   */
+  public static function getExtensionName(): ?string {
+    return defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
   }
 
   /**
@@ -1351,7 +1359,7 @@ class CRM_Core_DAO extends DB_DataObject {
     if (CRM_Utils_System::version() === CRM_Core_BAO_Domain::version()) {
       return TRUE;
     }
-    $daoExt = defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
+    $daoExt = static::getExtensionName();
     $daoVersion = defined(static::class . '::TABLE_ADDED') ? constant(static::class . '::TABLE_ADDED') : '1.0';
     return !($daoExt === 'civicrm' && version_compare(CRM_Core_BAO_Domain::version(), $daoVersion, '<'));
   }
@@ -3473,7 +3481,7 @@ SELECT contact_id
   /**
    * Overridable function to get icon for a particular entity.
    *
-   * Example: `CRM_Contact_BAO_Contact::getIcon('Contact', 123)`
+   * Example: `CRM_Contact_BAO_Contact::getEntityIcon('Contact', 123)`
    *
    * @param string $entityName
    *   Short name of the entity. This may seem redundant because the entity name can usually be inferred
@@ -3482,9 +3490,9 @@ SELECT contact_id
    *   Id of the entity.
    * @throws CRM_Core_Exception
    */
-  public static function getEntityIcon(string $entityName, int $entityId) {
+  public static function getEntityIcon(string $entityName, int $entityId): ?string {
     if (static::class === 'CRM_Core_DAO' || static::class !== CRM_Core_DAO_AllCoreTables::getBAOClassName(static::class)) {
-      throw new CRM_Core_Exception('CRM_Core_DAO::getIcon must be called on a BAO class e.g. CRM_Contact_BAO_Contact::getIcon("Contact", 123).');
+      throw new CRM_Core_Exception('CRM_Core_DAO::getEntityIcon must be called on a BAO class e.g. CRM_Contact_BAO_Contact::getEntityIcon("Contact", 123).');
     }
     // By default, just return the icon representing this entity. If there's more complex lookup to do,
     // the BAO for this entity should override this method.
