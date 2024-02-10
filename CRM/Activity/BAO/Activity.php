@@ -2774,18 +2774,22 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
    *
    * @param string $entityName
    *   Always "Activity".
-   * @param int $entityId
+   * @param int|null $entityId
    *   Id of the activity.
    * @throws CRM_Core_Exception
    */
-  public static function getEntityIcon(string $entityName, int $entityId): ?string {
+  public static function getEntityIcon(string $entityName, int $entityId = NULL): ?string {
+    $default = parent::getEntityIcon($entityName);
+    if (!$entityId) {
+      return $default;
+    }
     $field = Civi\Api4\Activity::getFields(FALSE)
       ->addWhere('name', '=', 'activity_type_id')
       ->setLoadOptions(['id', 'label', 'icon'])
       ->execute()->single();
     $activityTypes = array_column($field['options'], NULL, 'id');
     $activityType = CRM_Core_DAO::getFieldValue(parent::class, $entityId, 'activity_type_id');
-    return $activityTypes[$activityType]['icon'] ?? self::$_icon;
+    return $activityTypes[$activityType]['icon'] ?? $default;
   }
 
 }
