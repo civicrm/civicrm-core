@@ -80,7 +80,6 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
       'edit contributions of type Donation',
       'view all contacts',
     ]);
-    \Civi::settings()->set('acl_financial_type', TRUE);
     $this->createLoggedInUser();
   }
 

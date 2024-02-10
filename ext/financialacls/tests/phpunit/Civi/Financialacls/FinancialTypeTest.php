@@ -2,7 +2,6 @@
 
 namespace Civi\Financialacls;
 
-use Civi;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
@@ -21,7 +20,6 @@ class FinancialTypeTest extends BaseTestClass {
    * financial type.
    */
   public function testChangeFinancialTypeName(): void {
-    Civi::settings()->set('acl_financial_type', TRUE);
     $type = $this->callAPISuccess('FinancialType', 'create', [
       'name' => 'my test',
     ]);
@@ -40,7 +38,6 @@ class FinancialTypeTest extends BaseTestClass {
    * Check method testPermissionedFinancialTypes()
    */
   public function testPermissionedFinancialTypes(): void {
-    Civi::settings()->set('acl_financial_type', TRUE);
     $permissions = \CRM_Core_Permission::basicPermissions(FALSE, TRUE);
     $actions = [
       'add' => ts('add'),
@@ -135,7 +132,6 @@ class FinancialTypeTest extends BaseTestClass {
     ];
 
     $contribution = $this->callAPISuccess('Order', 'create', $contributionParams);
-    Civi::settings()->set('acl_financial_type', TRUE);
 
     $this->setPermissions([
       'view contributions of type Member Dues',
