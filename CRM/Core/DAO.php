@@ -530,11 +530,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return array
    */
   public function keys() {
-    static $keys;
-    if (!isset($keys)) {
-      $keys = ['id'];
-    }
-    return $keys;
+    return $this::getPrimaryKey();
   }
 
   /**
@@ -545,11 +541,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return array
    */
   public function sequenceKey() {
-    static $sequenceKeys;
-    if (!isset($sequenceKeys)) {
-      $sequenceKeys = [$this->getFirstPrimaryKey(), TRUE];
-    }
-    return $sequenceKeys;
+    return [$this->getFirstPrimaryKey(), TRUE];
   }
 
   /**
