@@ -20,18 +20,14 @@ trait CRMTraits_Financial_FinancialACLTrait {
    * Enable financial ACLs.
    */
   protected function enableFinancialACLs() {
-    $this->callAPISuccess('Setting', 'create', [
-      'acl_financial_type' => TRUE,
-    ]);
+    $this->callAPISuccess('extension', 'install', ['key' => 'financialacls']);
   }
 
   /**
    * Disable financial ACLs.
    */
   protected function disableFinancialACLs(): void {
-    $this->callAPISuccess('Setting', 'create', [
-      'acl_financial_type' => FALSE,
-    ]);
+    $this->callAPISuccess('extension', 'disable', ['key' => 'financialacls']);
   }
 
   /**
