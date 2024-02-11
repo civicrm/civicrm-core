@@ -43,13 +43,6 @@ class CRM_Core_DAO extends DB_DataObject {
   public static $_primaryKey = ['id'];
 
   /**
-   * @return string[]
-   */
-  protected function getPrimaryKey(): array {
-    return static::$_primaryKey;
-  }
-
-  /**
    * @return string
    */
   protected function getFirstPrimaryKey(): string {
@@ -58,7 +51,7 @@ class CRM_Core_DAO extends DB_DataObject {
     // keys (which we support in codegen if not many other places) we return 'id'
     // simply because that is what we historically did & we don't want to 'just change'
     // it & break those extensions without doing the work to create an alternative.
-    return count($this->getPrimaryKey()) > 1 ? 'id' : $this->getPrimaryKey()[0];
+    return count($this->keys()) > 1 ? 'id' : $this->keys()[0];
   }
 
   /**
@@ -525,31 +518,24 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Defines the default key as 'id'.
+   * Returns primary keys (usually ['id'])
    *
-   * @return array
+   * @return string[]
    */
   public function keys() {
-    static $keys;
-    if (!isset($keys)) {
-      $keys = ['id'];
-    }
-    return $keys;
+    return static::$_primaryKey;
   }
 
   /**
    * Tells DB_DataObject which keys use autoincrement.
    * 'id' is autoincrementing by default.
    *
+   * FIXME: this should return all autoincrement keys not just the first.
    *
    * @return array
    */
   public function sequenceKey() {
-    static $sequenceKeys;
-    if (!isset($sequenceKeys)) {
-      $sequenceKeys = [$this->getFirstPrimaryKey(), TRUE];
-    }
-    return $sequenceKeys;
+    return [$this->getFirstPrimaryKey(), TRUE];
   }
 
   /**
