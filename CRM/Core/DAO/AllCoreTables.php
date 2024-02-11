@@ -175,11 +175,13 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
+   * @deprecated in 5.72 will be removed in 5.90
    * @return array
    *   Mapping from table-names to class-names.
    *   Ex: $result['civicrm_contact'] == 'CRM_Contact_DAO_Contact'.
    */
   public static function getCoreTables() {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::tables');
     return self::tables();
   }
 
@@ -384,11 +386,10 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
-   * Reinitialise cache.
-   *
-   * @deprecated
+   * @deprecated in 5.54 will be removed in 5.85
    */
   public static function reinitializeCache(): void {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::flush');
     self::flush();
   }
 
