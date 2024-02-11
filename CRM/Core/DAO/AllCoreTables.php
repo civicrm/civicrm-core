@@ -17,8 +17,9 @@
  */
 class CRM_Core_DAO_AllCoreTables {
 
-  private static $tables = NULL;
-  private static $daoToClass = NULL;
+  /**
+   * @var array
+   */
   private static $entityTypes = NULL;
 
   /**
@@ -41,8 +42,6 @@ class CRM_Core_DAO_AllCoreTables {
     CRM_Utils_Hook::entityTypes($entityTypes);
 
     self::$entityTypes = [];
-    self::$tables = [];
-    self::$daoToClass = [];
     foreach ($entityTypes as $entityType) {
       self::registerEntityType(
         $entityType['name'],
@@ -73,8 +72,6 @@ class CRM_Core_DAO_AllCoreTables {
    * @param string $links_callback
    */
   public static function registerEntityType($briefName, $className, $tableName, $fields_callback = NULL, $links_callback = NULL) {
-    self::$daoToClass[$briefName] = $className;
-    self::$tables[$tableName] = $className;
     self::$entityTypes[$briefName] = [
       'name' => $briefName,
       'class' => $className,
@@ -98,8 +95,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   List of SQL table names.
    */
   public static function tables() {
-    self::init();
-    return self::$tables;
+    return array_column(self::get(), 'class', 'table');
   }
 
   /**
@@ -108,8 +104,7 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function indices($localize = TRUE) {
     $indices = [];
-    self::init();
-    foreach (self::$daoToClass as $class) {
+    foreach (self::daoToClass() as $class) {
       if (is_callable([$class, 'indices'])) {
         $indices[$class::getTableName()] = $class::indices($localize);
       }
@@ -170,8 +165,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   Ex: $result['Contact'] == 'CRM_Contact_DAO_Contact'.
    */
   public static function daoToClass() {
-    self::init();
-    return self::$daoToClass;
+    return array_column(self::get(), 'class', 'name');
   }
 
   /**
@@ -283,7 +277,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   List of class names.
    */
   public static function getClasses() {
-    return array_values(self::daoToClass());
+    return array_column(self::get(), 'class');
   }
 
   /**
@@ -327,8 +321,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   Ex: 'CRM_Contact_DAO_Contact'.
    */
   public static function getFullName($briefName) {
-    self::init();
-    return self::$entityTypes[$briefName]['class'] ?? NULL;
+    return self::get()[$briefName]['class'] ?? NULL;
   }
 
   /**
@@ -361,8 +354,7 @@ class CRM_Core_DAO_AllCoreTables {
    * @return string
    */
   public static function getTableForEntityName($briefName): string {
-    self::init();
-    return self::$entityTypes[$briefName]['table'];
+    return self::get()[$briefName]['table'];
   }
 
   /**
@@ -373,14 +365,17 @@ class CRM_Core_DAO_AllCoreTables {
    * @return FALSE|string
    */
   public static function getEntityNameForTable(string $tableName) {
-    self::init();
     // CRM-19677: on multilingual setup, trim locale from $tableName to fetch class name
     if (CRM_Core_I18n::isMultilingual()) {
       global $dbLocale;
       $tableName = str_replace($dbLocale, '', $tableName);
     }
-    $matches = CRM_Utils_Array::findAll(self::$entityTypes, ['table' => $tableName]);
-    return $matches ? $matches[0]['name'] : NULL;
+    foreach (self::get() as $entity) {
+      if ($entity['table'] === $tableName) {
+        return $entity['name'];
+      }
+    }
+    return NULL;
   }
 
   /**
