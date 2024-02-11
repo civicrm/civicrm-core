@@ -232,7 +232,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $op = empty($records[$index]['id']) ? 'create' : 'edit';
       // Theoretically a custom field could have custom fields! Trippy...
       if (!empty($records[$index]['custom']) && is_array($records[$index]['custom'])) {
-        CRM_Core_BAO_CustomValueTable::store($records[$index]['custom'], static::$_tableName, $customField->id, $op);
+        CRM_Core_BAO_CustomValueTable::store($records[$index]['custom'], static::getTableName(), $customField->id, $op);
       }
       CRM_Utils_Hook::post($op, 'CustomField', $customField->id, $customField);
     }

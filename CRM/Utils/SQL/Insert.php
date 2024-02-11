@@ -65,7 +65,7 @@ class CRM_Utils_SQL_Insert {
    * @throws \CRM_Core_Exception
    */
   public static function dao(CRM_Core_DAO $dao) {
-    $table = CRM_Core_DAO::getLocaleTableName($dao->getTableName());
+    $table = $dao::getLocaleTableName();
     $row = [];
     foreach ((array) $dao as $key => $value) {
       if ($value === 'null') {
