@@ -104,9 +104,9 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function indices($localize = TRUE) {
     $indices = [];
-    foreach (self::daoToClass() as $class) {
-      if (is_callable([$class, 'indices'])) {
-        $indices[$class::getTableName()] = $class::indices($localize);
+    foreach (self::get() as $entity) {
+      if (is_callable([$entity['class'], 'indices'])) {
+        $indices[$entity['class']::getTableName()] = $entity['class']::indices($localize);
       }
     }
     return $indices;
@@ -290,10 +290,10 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function getBaoClasses() {
     $r = [];
-    foreach (\CRM_Core_DAO_AllCoreTables::daoToClass() as $entity => $daoClass) {
-      $baoClass = str_replace('_DAO_', '_BAO_', $daoClass);
+    foreach (self::get() as $name => $entity) {
+      $baoClass = str_replace('_DAO_', '_BAO_', $entity['class']);
       if (class_exists($baoClass)) {
-        $r[$entity] = $baoClass;
+        $r[$name] = $baoClass;
       }
     }
     return $r;
@@ -305,13 +305,18 @@ class CRM_Core_DAO_AllCoreTables {
    * @param string $tableName
    * @return string|CRM_Core_DAO|NULL
    */
-  public static function getClassForTable(string $tableName) {
+  public static function getClassForTable(string $tableName): ?string {
     //CRM-19677: on multilingual setup, trim locale from $tableName to fetch class name
     if (CRM_Core_I18n::isMultilingual()) {
       global $dbLocale;
       $tableName = str_replace($dbLocale, '', $tableName);
     }
-    return self::tables()[$tableName] ?? NULL;
+    foreach (self::get() as $entity) {
+      if ($entity['table'] === $tableName) {
+        return $entity['class'];
+      }
+    }
+    return NULL;
   }
 
   /**
@@ -334,9 +339,14 @@ class CRM_Core_DAO_AllCoreTables {
    * @return string|NULL
    *   Ex: 'Contact'.
    */
-  public static function getBriefName($className) {
+  public static function getBriefName($className): ?string {
     $className = self::getCanonicalClassName($className);
-    return array_search($className, self::daoToClass(), TRUE) ?: NULL;
+    foreach (self::get() as $entity) {
+      if ($entity['class'] === $className) {
+        return $entity['name'];
+      }
+    }
+    return NULL;
   }
 
   /**
@@ -344,8 +354,13 @@ class CRM_Core_DAO_AllCoreTables {
    * @return string|FALSE SQL table name
    */
   public static function getTableForClass($className) {
-    return array_search(self::getCanonicalClassName($className),
-      self::tables());
+    $className = self::getCanonicalClassName($className);
+    foreach (self::get() as $entity) {
+      if ($entity['class'] === $className) {
+        return $entity['table'];
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -472,7 +487,6 @@ class CRM_Core_DAO_AllCoreTables {
    * @param mixed $values
    */
   public static function invoke($className, $event, &$values) {
-    self::init();
     $briefName = self::getBriefName($className);
     if (isset(self::$entityTypes[$briefName][$event])) {
       foreach (self::$entityTypes[$briefName][$event] as $filter) {
