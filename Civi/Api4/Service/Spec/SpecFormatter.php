@@ -162,6 +162,7 @@ class SpecFormatter {
     // @see CRM_Utils_Hook::fieldOptions
     // We then supplement the data with additional properties if requested.
     $bao = CoreUtil::getBAOFromApiName($field['entity']);
+    $values['check_permissions'] = $checkPermissions;
     $optionLabels = $bao::buildOptions($fieldName, NULL, $values);
 
     if (!is_array($optionLabels)) {
