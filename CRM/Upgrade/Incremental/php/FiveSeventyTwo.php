@@ -29,6 +29,22 @@ class CRM_Upgrade_Incremental_php_FiveSeventyTwo extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_72_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Remove localized suffixes from civicrm_mailing_group.entity_table', 'fixMailingGroupEntityTable');
+  }
+
+  /**
+   * Remove unwanted dbLocale suffixes from values in civicrm_mailing_group.entity_table.
+   *
+   * @see https://github.com/civicrm/civicrm-core/pull/29366
+   *
+   * @return bool
+   */
+  public static function fixMailingGroupEntityTable(): bool {
+    $updateQuery = 'UPDATE civicrm_mailing_group SET entity_table = "civicrm_mailing" WHERE entity_table LIKE "civicrm_mailing_%"';
+    CRM_Core_DAO::executeQuery($updateQuery, [], TRUE, NULL, FALSE, FALSE);
+    $updateQuery = 'UPDATE civicrm_mailing_group SET entity_table = "civicrm_group" WHERE entity_table LIKE "civicrm_group_%"';
+    CRM_Core_DAO::executeQuery($updateQuery, [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
   }
 
 }
