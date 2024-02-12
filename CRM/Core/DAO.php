@@ -614,7 +614,7 @@ class CRM_Core_DAO extends DB_DataObject {
 
     // Exclude fields yet not added by pending upgrades
     $dbVer = \CRM_Core_BAO_Domain::version();
-    $daoExt = defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
+    $daoExt = static::getExtensionName();
     if ($fields && $daoExt === 'civicrm' && version_compare($dbVer, \CRM_Utils_System::version()) < 0) {
       $fields = array_filter($fields, function($field) use ($dbVer) {
         $add = $field['add'] ?? '1.0.0';
@@ -633,6 +633,14 @@ class CRM_Core_DAO extends DB_DataObject {
     }
 
     return $fields;
+  }
+
+  /**
+   * Get name of extension in which this DAO is defined.
+   * @return string|null
+   */
+  public static function getExtensionName(): ?string {
+    return defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
   }
 
   /**
@@ -1347,13 +1355,25 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return bool
    * @throws CRM_Core_Exception
    */
-  public static function tableHasBeenAdded() {
+  public static function tableHasBeenAdded(): bool {
     if (CRM_Utils_System::version() === CRM_Core_BAO_Domain::version()) {
       return TRUE;
     }
-    $daoExt = defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
-    $daoVersion = defined(static::class . '::TABLE_ADDED') ? constant(static::class . '::TABLE_ADDED') : '1.0';
-    return !($daoExt === 'civicrm' && version_compare(CRM_Core_BAO_Domain::version(), $daoVersion, '<'));
+    $daoExt = static::getExtensionName();
+    if ($daoExt !== 'civicrm') {
+      // FIXME: Check extension tables
+      return TRUE;
+    }
+    $daoVersion = static::getTableAddVersion();
+    return !(version_compare(CRM_Core_BAO_Domain::version(), $daoVersion, '<'));
+  }
+
+  /**
+   * @return string
+   *   Version in which table was added
+   */
+  protected static function getTableAddVersion(): string {
+    return defined(static::class . '::TABLE_ADDED') ? constant(static::class . '::TABLE_ADDED') : '1.0';
   }
 
   /**
