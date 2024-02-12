@@ -303,7 +303,9 @@ class FormattingUtil {
     // Use BAO::buildOptions if possible
     if ($baoName) {
       $fieldName = empty($field['custom_field_id']) ? $field['name'] : 'custom_' . $field['custom_field_id'];
-      $options = $baoName::buildOptions($fieldName, $context, self::filterByPath($values, $fieldPath, $field['name']));
+      $entityValues = self::filterByPath($values, $fieldPath, $field['name']);
+      $entityValues['check_permissions'] = FALSE;
+      $options = $baoName::buildOptions($fieldName, $context, $entityValues);
     }
     // Fallback for option lists that exist in the api but not the BAO
     if (!isset($options) || $options === FALSE) {
