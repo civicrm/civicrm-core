@@ -146,7 +146,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                       'maxlength' => {$field.length},
 {/if} {* field.length *}
 {if isset($field.precision)}
-                      'precision'      => array({$field.precision}),
+                      'precision'      => array({$field.precision},),
 {/if}
 {if isset($field.size)}
                       'size'      => {$field.size},
@@ -158,17 +158,16 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                       'cols'      => {$field.cols},
 {/if} {* field.cols *}
                       'usage'     => array(
-                                       {foreach from=$field.usage key=usage item=isUsed}'{$usage}' => {$isUsed},
+                                       {foreach from=$field.usage key="usage" item="isUsed"}'{$usage}' => {if $isUsed}TRUE{else}FALSE{/if},
                                        {/foreach}),
-{if $field.import === 'TRUE'}
+{if $field.usage.import}
                       'import'    => TRUE,
-
 {/if} {* field.import *}
   'where'     => '{$table.name}.{$field.name}',
   {if $field.headerPattern}'headerPattern' => '{$field.headerPattern}',{/if}
   {if $field.dataPattern}'dataPattern' => '{$field.dataPattern}',{/if}
-{if $field.export === 'TRUE' || ($field.export === 'FALSE' && $field.import === 'TRUE')}
-                      'export'    => {$field.export},
+{if $field.usage.export || (!$field.usage.export && $field.usage.import)}
+                      'export'    => {if $field.usage.export}TRUE{else}FALSE{/if},
 {/if} {* field.export - only show if meaningful, deprecated for usage *}
 {if $field.contactType}
                       'contactType' => {if $field.contactType == 'null'}NULL{else}'{$field.contactType}'{/if},

@@ -314,58 +314,7 @@ class CRM_Core_CodeGen_Specification {
   public function getField(&$fieldXML, &$fields) {
     $name = trim((string ) $fieldXML->name);
     $field = ['name' => $name, 'localizable' => ((bool) $fieldXML->localizable) ? 1 : 0];
-    $type = (string) $fieldXML->type;
-    switch ($type) {
-      case 'varchar':
-      case 'char':
-        $field['length'] = (int) $fieldXML->length;
-        $field['sqlType'] = "$type({$field['length']})";
-        $field['crmType'] = 'CRM_Utils_Type::T_STRING';
-        $field['size'] = $this->getSize($fieldXML);
-        break;
-
-      case 'text':
-        $field['sqlType'] = $type;
-        $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
-        // CRM-13497 see fixme below
-        $field['rows'] = isset($fieldXML->html) ? $this->value('rows', $fieldXML->html) : NULL;
-        $field['cols'] = isset($fieldXML->html) ? $this->value('cols', $fieldXML->html) : NULL;
-        break;
-
-      case 'datetime':
-        $field['sqlType'] = $type;
-        $field['crmType'] = 'CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME';
-        break;
-
-      case 'boolean':
-        // need this case since some versions of mysql do not have boolean as a valid column type and hence it
-        // is changed to tinyint. hopefully after 2 yrs this case can be removed.
-        $field['sqlType'] = 'tinyint';
-        $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
-        break;
-
-      case 'decimal':
-        $length = $fieldXML->length ? $fieldXML->length : '20,2';
-        $field['sqlType'] = 'decimal(' . $length . ')';
-        $field['crmType'] = $this->value('crmType', $fieldXML, 'CRM_Utils_Type::T_MONEY');
-        $field['precision'] = $length . ',';
-        break;
-
-      case 'float':
-        $field['sqlType'] = 'double';
-        $field['crmType'] = 'CRM_Utils_Type::T_FLOAT';
-        break;
-
-      default:
-        $field['sqlType'] = $type;
-        if ($type === 'int unsigned' || $type === 'tinyint') {
-          $field['crmType'] = 'CRM_Utils_Type::T_INT';
-        }
-        else {
-          $field['crmType'] = $this->value('crmType', $fieldXML, 'CRM_Utils_Type::T_' . strtoupper($type));
-        }
-        break;
-    }
+    $field = array_merge($field, \CRM_Utils_Schema::getTypeAttributes($fieldXML));
 
     $field['phpType'] = $this->getPhpType($fieldXML);
     $field['phpNullable'] = $this->getPhpNullable($fieldXML);
@@ -375,32 +324,12 @@ class CRM_Core_CodeGen_Specification {
     $field['comment'] = $this->value('comment', $fieldXML);
     $field['deprecated'] = $this->value('deprecated', $fieldXML, FALSE);
     $field['default'] = $this->value('default', $fieldXML);
-    $import = $this->value('import', $fieldXML) ? strtoupper($this->value('import', $fieldXML)) : 'FALSE';
-    $export = $this->value('export', $fieldXML) ? strtoupper($this->value('export', $fieldXML)) : NULL;
-    if (!isset($fieldXML->usage)) {
-      $usage = [
-        'import' => $import,
-        'export' => $export ?? $import,
-      ];
-    }
-    else {
-      $usage = [];
-      foreach ($fieldXML->usage->children() as $usedFor => $isUsed) {
-        $usage[$usedFor] = strtoupper((string) $isUsed);
-      }
-      $import = $usage['import'] ?? $import;
-    }
-    // Ensure all keys are populated. Import is the historical de-facto default.
-    $field['usage'] = array_merge(array_fill_keys(['import', 'export', 'duplicate_matching'], $import), $usage);
-    // Usage for tokens has not historically been in the metadata so we can default to FALSE.
-    // historically hard-coded lists have been used.
-    $field['usage']['token'] ??= 'FALSE';
-    $field['import'] = $field['usage']['import'];
-    $field['export'] = $export ?? $import;
+
+    $field['usage'] = CRM_Utils_Schema::getFieldUsage($fieldXML);
     $field['rule'] = $this->value('rule', $fieldXML);
     $field['title'] = $this->value('title', $fieldXML);
     if (!$field['title']) {
-      $field['title'] = $this->composeTitle($name);
+      $field['title'] = CRM_Utils_Schema::composeTitle($name);
     }
     $field['headerPattern'] = $this->value('headerPattern', $fieldXML);
     $field['dataPattern'] = $this->value('dataPattern', $fieldXML);
@@ -409,108 +338,13 @@ class CRM_Core_CodeGen_Specification {
     $field['uniqueTitle'] = $this->value('uniqueTitle', $fieldXML);
     $field['serialize'] = $this->value('serialize', $fieldXML);
     $field['component'] = $this->value('component', $fieldXML);
-    $field['html'] = $this->value('html', $fieldXML);
+    $field['html'] = CRM_Utils_Schema::getFieldHtml($fieldXML);
     $field['contactType'] = $this->value('contactType', $fieldXML);
-    if (isset($fieldXML->permission)) {
-      $field['permission'] = trim($this->value('permission', $fieldXML));
-      $field['permission'] = $field['permission'] ? array_filter(array_map('trim', explode(',', $field['permission']))) : [];
-      if (isset($fieldXML->permission->or)) {
-        $field['permission'][] = array_filter(array_map('trim', explode(',', $fieldXML->permission->or)));
-      }
-    }
-    if (!empty($field['html'])) {
-      $validOptions = [
-        'type',
-        'formatType',
-        'label',
-        'controlField',
-        'min',
-        'max',
-        /* Fixme: prior to CRM-13497 these were in a flat structure
-        // CRM-13497 moved them to be nested within 'html' but there's no point
-        // making that change in the DAOs right now since we are in the process of
-        // moving to docrtine anyway.
-        // So translating from nested xml back to flat structure for now.
-        'rows',
-        'cols',
-        'size', */
-      ];
-      $field['html'] = [];
-      foreach ($validOptions as $htmlOption) {
-        if (isset($fieldXML->html->$htmlOption) && $fieldXML->html->$htmlOption !== '') {
-          $field['html'][$htmlOption] = $this->value($htmlOption, $fieldXML->html);
-        }
-      }
-      if (isset($fieldXML->html->filter)) {
-        $field['html']['filter'] = (array) $fieldXML->html->filter;
-      }
-    }
-
-    // in multilingual context popup, we need extra information to create appropriate widget
-    if ($fieldXML->localizable) {
-      if (isset($fieldXML->html)) {
-        $field['widget'] = (array) $fieldXML->html;
-      }
-      else {
-        // default
-        $field['widget'] = ['type' => 'Text'];
-      }
-      if (isset($fieldXML->required)) {
-        $field['widget']['required'] = $this->value('required', $fieldXML);
-      }
-    }
-    if (isset($fieldXML->localize_context)) {
-      $field['localize_context'] = $fieldXML->localize_context;
-    }
+    $field['permission'] = CRM_Utils_Schema::getFieldPermission($fieldXML);
+    $field['widget'] = CRM_Utils_Schema::getFieldWidget($fieldXML);
+    $field['localize_context'] = $this->value('localize_context', $fieldXML);
     $field['add'] = $this->value('add', $fieldXML);
-    $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
-    if (!empty($field['pseudoconstant'])) {
-      //ok this is a bit long-winded but it gets there & is consistent with above approach
-      $field['pseudoconstant'] = [];
-      $validOptions = [
-        // Fields can specify EITHER optionGroupName OR table, not both
-        // (since declaring optionGroupName means we are using the civicrm_option_value table)
-        'optionGroupName',
-        'table',
-        // If table is specified, keyColumn and labelColumn are also required
-        'keyColumn',
-        'labelColumn',
-        // Non-translated machine name for programmatic lookup. Defaults to 'name' if that column exists
-        'nameColumn',
-        // Column to fetch in "abbreviate" context
-        'abbrColumn',
-        // Supported by APIv4 suffixes
-        'colorColumn',
-        'iconColumn',
-        // Where clause snippet (will be joined to the rest of the query with AND operator)
-        'condition',
-        // callback function incase of static arrays
-        'callback',
-        // Path to options edit form
-        'optionEditPath',
-        // Should options for this field be prefetched (for presenting on forms).
-        // The default is TRUE, but adding FALSE helps when there could be many options
-        'prefetch',
-      ];
-      foreach ($validOptions as $pseudoOption) {
-        if (!empty($fieldXML->pseudoconstant->$pseudoOption)) {
-          $field['pseudoconstant'][$pseudoOption] = $this->value($pseudoOption, $fieldXML->pseudoconstant);
-        }
-      }
-      if (!isset($field['pseudoconstant']['optionEditPath']) && !empty($field['pseudoconstant']['optionGroupName'])) {
-        $field['pseudoconstant']['optionEditPath'] = 'civicrm/admin/options/' . $field['pseudoconstant']['optionGroupName'];
-      }
-      // Set suffixes if explicitly declared
-      if (!empty($fieldXML->pseudoconstant->suffixes)) {
-        $field['pseudoconstant']['suffixes'] = explode(',', $this->value('suffixes', $fieldXML->pseudoconstant));
-      }
-      // For now, fields that have option lists that are not in the db can simply
-      // declare an empty pseudoconstant tag and we'll add this placeholder.
-      // That field's BAO::buildOptions fn will need to be responsible for generating the option list
-      if (empty($field['pseudoconstant'])) {
-        $field['pseudoconstant'] = 'not in database';
-      }
-    }
+    $field['pseudoconstant'] = CRM_Utils_Schema::getFieldPseudoconstant($fieldXML);
     $fields[$name] = &$field;
   }
 
@@ -556,31 +390,6 @@ class CRM_Core_CodeGen_Specification {
   private function getPhpNullable($fieldXML) {
     $required = $this->value('required', $fieldXML);
     return !$required;
-  }
-
-  /**
-   * @param string $name
-   *
-   * @return string
-   */
-  public function composeTitle($name) {
-    $substitutions = [
-      'is_active' => 'Enabled',
-    ];
-    if (isset($substitutions[$name])) {
-      return $substitutions[$name];
-    }
-    $names = explode('_', strtolower($name));
-    $allCaps = ['im', 'id'];
-    foreach ($names as $i => $str) {
-      if (in_array($str, $allCaps, TRUE)) {
-        $names[$i] = strtoupper($str);
-      }
-      else {
-        $names[$i] = ucfirst(trim($str));
-      }
-    }
-    return trim(implode(' ', $names));
   }
 
   /**
@@ -806,38 +615,6 @@ class CRM_Core_CodeGen_Specification {
         $str .= $delim . $name;
       }
     }
-  }
-
-  /**
-   * Sets the size property of a textfield.
-   *
-   * @param string $fieldXML
-   *
-   * @return null|string
-   */
-  protected function getSize($fieldXML) {
-    // Extract from <size> tag if supplied
-    if (!empty($fieldXML->html) && $this->value('size', $fieldXML->html)) {
-      return $this->value('size', $fieldXML->html);
-    }
-    // Infer from <length> tag if <size> was not explicitly set or was invalid
-    // This map is slightly different from CRM_Core_Form_Renderer::$_sizeMapper
-    // Because we usually want fields to render as smaller than their maxlength
-    $sizes = [
-      2 => 'TWO',
-      4 => 'FOUR',
-      6 => 'SIX',
-      8 => 'EIGHT',
-      16 => 'TWELVE',
-      32 => 'MEDIUM',
-      64 => 'BIG',
-    ];
-    foreach ($sizes as $length => $name) {
-      if ($fieldXML->length <= $length) {
-        return "CRM_Utils_Type::$name";
-      }
-    }
-    return 'CRM_Utils_Type::HUGE';
   }
 
 }
