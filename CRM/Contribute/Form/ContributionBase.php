@@ -1548,7 +1548,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function getCurrency(): string {
-    $currency = $this->getContributionValue('currency');
+    $currency = $this->getContributionPageValue('currency');
     if (empty($currency)) {
       $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
     }
