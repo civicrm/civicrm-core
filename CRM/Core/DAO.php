@@ -2699,13 +2699,9 @@ SELECT contact_id
   }
 
   /**
-   * List all tables which have hard foreign keys to this table.
-   *
-   * For now, this returns a description of every entity_id/entity_table
-   * reference.
-   * TODO: filter dynamic entity references on the $tableName, based on
-   * schema metadata in dynamicForeignKey which enumerates a restricted
-   * set of possible entity_table's.
+   * List all tables which have either:
+   * - hard foreign keys to this table, or
+   * - a dynamic foreign key that includes this table as a possible target.
    *
    * @param string $tableName
    *   Table referred to.
