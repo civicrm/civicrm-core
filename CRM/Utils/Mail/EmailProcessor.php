@@ -80,9 +80,9 @@ class CRM_Utils_Mail_EmailProcessor {
   private static function _process($civiMail, $dao, $is_create_activities) {
     // 0 = activities; 1 = bounce;
     $isBounceProcessing = $dao->is_default;
-    $targetFields = array_filter(explode(',', $dao->activity_targets));
-    $assigneeFields = array_filter(explode(",", $dao->activity_assignees));
-    $sourceFields = array_filter(explode(",", $dao->activity_source));
+    $targetFields = array_filter(explode(',', (string) $dao->activity_targets));
+    $assigneeFields = array_filter(explode(",", (string) $dao->activity_assignees));
+    $sourceFields = array_filter(explode(",", (string) $dao->activity_source));
     // create an array of all of to, from, cc, bcc that are in use for this Mail Account, so we don't create contacts for emails we aren't adding to the activity.
     $emailFields = array_merge($targetFields, $assigneeFields, $sourceFields);
     $createContact = !($dao->is_contact_creation_disabled_if_no_match) && !$isBounceProcessing;
