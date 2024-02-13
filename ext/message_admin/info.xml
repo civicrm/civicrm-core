@@ -31,7 +31,7 @@
   <mixins>
     <mixin>ang-php@1.0.0</mixin>
     <mixin>menu-xml@1.0.0</mixin>
-    <mixin>smarty-v2@1.0.1</mixin>
+    <mixin>smarty@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/MessageAdmin</namespace>
