@@ -226,14 +226,14 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
 
     // if this is an update of an existing recurring contribution, pass the ID
     $params['contributionRecurID'] = $params['id'] = $this->getContributionRecurID();
-    $message = '';
+    $activityDetails = '';
 
     $params['recurProcessorID'] = $params['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
 
     $updateSubscription = TRUE;
     if ($this->_paymentProcessorObj->supports('changeSubscriptionAmount')) {
       try {
-        $updateSubscription = $this->_paymentProcessorObj->changeSubscriptionAmount($message, $params);
+        $updateSubscription = $this->_paymentProcessorObj->changeSubscriptionAmount($activityDetails, $params);
         if ($updateSubscription instanceof CRM_Core_Error) {
           CRM_Core_Error::deprecatedWarning('An exception should be thrown');
           throw new PaymentProcessorException(ts('Could not update the Recurring contribution details'));
@@ -259,25 +259,25 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
 
       $msgTitle = ts('Update Success');
       $msgType = 'success';
-      $msg = ts('Recurring Contribution Updated');
+      $activitySubject = ts('Recurring Contribution Updated');
       $contactID = $this->_subscriptionDetails->contact_id;
 
       if ($this->_subscriptionDetails->amount != $params['amount']) {
-        $message .= "<br /> " . ts("Recurring contribution amount has been updated from %1 to %2 for this subscription.",
+        $activityDetails .= "<br /> " . ts("Recurring contribution amount has been updated from %1 to %2 for this subscription.",
             [
               1 => CRM_Utils_Money::format($this->_subscriptionDetails->amount, $this->_subscriptionDetails->currency),
               2 => CRM_Utils_Money::format($params['amount'], $this->_subscriptionDetails->currency),
             ]) . ' ';
         if ($this->_subscriptionDetails->amount < $params['amount']) {
-          $msg = ts('Recurring Contribution Updated - increased installment amount');
+          $activitySubject = ts('Recurring Contribution Updated - increased installment amount');
         }
         else {
-          $msg = ts('Recurring Contribution Updated - decreased installment amount');
+          $activitySubject = ts('Recurring Contribution Updated - decreased installment amount');
         }
       }
 
       if ($this->_subscriptionDetails->installments != $params['installments']) {
-        $message .= "<br /> " . ts("Recurring contribution installments have been updated from %1 to %2 for this subscription.", [
+        $activityDetails .= "<br /> " . ts("Recurring contribution installments have been updated from %1 to %2 for this subscription.", [
           1 => $this->_subscriptionDetails->installments,
           2 => $params['installments'],
         ]) . ' ';
@@ -286,8 +286,8 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       $activityParams = [
         'source_contact_id' => $contactID,
         'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Update Recurring Contribution'),
-        'subject' => $msg,
-        'details' => $message,
+        'subject' => $activitySubject,
+        'details' => $activityDetails,
         'activity_date_time' => date('YmdHis'),
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       ];
