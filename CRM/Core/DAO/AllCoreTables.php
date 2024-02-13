@@ -17,32 +17,29 @@
  */
 class CRM_Core_DAO_AllCoreTables {
 
-  private static $tables = NULL;
-  private static $daoToClass = NULL;
-  private static $entityTypes = NULL;
-
   /**
    * Initialise.
    *
    * @param bool $fresh Deprecated parameter, use flush() to flush.
    */
   public static function init(bool $fresh = FALSE): void {
-    if (!empty(Civi::$statics[__CLASS__]['initialised']) && !$fresh) {
+    if (isset(Civi::$statics[__CLASS__]) && !$fresh) {
       return;
     }
     if ($fresh) {
       CRM_Core_Error::deprecatedWarning('Use CRM_Core_DAO_AllCoreTables::flush()');
     }
 
-    Civi::$statics[__CLASS__] = [];
+    Civi::$statics[__CLASS__] = [
+      'entities' => [],
+      'tables' => [],
+      'classes' => [],
+    ];
 
     $file = preg_replace('/\.php$/', '.data.php', __FILE__);
     $entityTypes = require $file;
     CRM_Utils_Hook::entityTypes($entityTypes);
 
-    self::$entityTypes = [];
-    self::$tables = [];
-    self::$daoToClass = [];
     foreach ($entityTypes as $entityType) {
       self::registerEntityType(
         $entityType['name'],
@@ -52,15 +49,13 @@ class CRM_Core_DAO_AllCoreTables {
         $entityType['links_callback'] ?? NULL
       );
     }
-
-    Civi::$statics[__CLASS__]['initialised'] = TRUE;
   }
 
   /**
    * Flush class cache.
    */
   public static function flush(): void {
-    Civi::$statics[__CLASS__]['initialised'] = FALSE;
+    Civi::$statics[__CLASS__] = NULL;
   }
 
   /**
@@ -73,24 +68,63 @@ class CRM_Core_DAO_AllCoreTables {
    * @param string $links_callback
    */
   public static function registerEntityType($briefName, $className, $tableName, $fields_callback = NULL, $links_callback = NULL) {
-    self::$daoToClass[$briefName] = $className;
-    self::$tables[$tableName] = $className;
-    self::$entityTypes[$briefName] = [
-      'name' => $briefName,
+    Civi::$statics[__CLASS__]['tables'][$tableName] = $briefName;
+    Civi::$statics[__CLASS__]['classes'][$className] = $briefName;
+    Civi::$statics[__CLASS__]['entities'][$briefName] = [
       'class' => $className,
       'table' => $tableName,
-      'fields_callback' => $fields_callback,
-      'links_callback' => $links_callback,
     ];
+    if ($fields_callback) {
+      Civi::$statics[__CLASS__]['entities'][$briefName]['fields_callback'] = $fields_callback;
+    }
+    if ($links_callback) {
+      Civi::$statics[__CLASS__]['entities'][$briefName]['links_callback'] = $links_callback;
+    }
   }
 
   /**
+   * @return array[]
+   *   [EntityName => [table => table_name, class => CRM_Core_DAO_EntityName]][]
+   */
+  public static function getEntities(): array {
+    self::init();
+    return Civi::$statics[__CLASS__]['entities'];
+  }
+
+  /**
+   * @return string[]
+   *   [table_name => EntityName][]
+   */
+  private static function getEntitiesByTable(): array {
+    self::init();
+    return Civi::$statics[__CLASS__]['tables'];
+  }
+
+  /**
+   * @return string[]
+   *   [CRM_Core_DAO_ClassName => EntityName][]
+   */
+  private static function getEntitiesByClass(): array {
+    self::init();
+    return Civi::$statics[__CLASS__]['classes'];
+  }
+
+  /**
+   * @deprecated in 5.72 will be removed in 5.90.
    * @return array
    *   Ex: $result['Contact']['table'] == 'civicrm_contact';
    */
   public static function get() {
-    self::init();
-    return self::$entityTypes;
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::getEntities');
+    $entities = [];
+    foreach (self::getEntities() as $name => $entity) {
+      $entities[$name] = $entity + [
+        'name' => $name,
+        'fields_callback' => $entity['fields_callback'] ?? NULL,
+        'links_callback' => $entity['links_callback'] ?? NULL,
+      ];
+    }
+    return $entities;
   }
 
   /**
@@ -98,8 +132,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   List of SQL table names.
    */
   public static function tables() {
-    self::init();
-    return self::$tables;
+    return array_combine(array_keys(self::getEntitiesByTable()), array_keys(self::getEntitiesByClass()));
   }
 
   /**
@@ -108,10 +141,9 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function indices($localize = TRUE) {
     $indices = [];
-    self::init();
-    foreach (self::$daoToClass as $class) {
-      if (is_callable([$class, 'indices'])) {
-        $indices[$class::getTableName()] = $class::indices($localize);
+    foreach (self::getEntities() as $entity) {
+      if (is_callable([$entity['class'], 'indices'])) {
+        $indices[$entity['class']::getTableName()] = $entity['class']::indices($localize);
       }
     }
     return $indices;
@@ -170,16 +202,17 @@ class CRM_Core_DAO_AllCoreTables {
    *   Ex: $result['Contact'] == 'CRM_Contact_DAO_Contact'.
    */
   public static function daoToClass() {
-    self::init();
-    return self::$daoToClass;
+    return array_flip(self::getEntitiesByClass());
   }
 
   /**
+   * @deprecated in 5.72 will be removed in 5.90
    * @return array
    *   Mapping from table-names to class-names.
    *   Ex: $result['civicrm_contact'] == 'CRM_Contact_DAO_Contact'.
    */
   public static function getCoreTables() {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::tables');
     return self::tables();
   }
 
@@ -190,7 +223,7 @@ class CRM_Core_DAO_AllCoreTables {
    * @return bool
    */
   public static function isCoreTable($tableName) {
-    return array_key_exists($tableName, self::tables());
+    return array_key_exists($tableName, self::getEntitiesByTable());
   }
 
   /**
@@ -283,7 +316,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   List of class names.
    */
   public static function getClasses() {
-    return array_values(self::daoToClass());
+    return array_keys(self::getEntitiesByClass());
   }
 
   /**
@@ -294,10 +327,10 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function getBaoClasses() {
     $r = [];
-    foreach (\CRM_Core_DAO_AllCoreTables::daoToClass() as $entity => $daoClass) {
-      $baoClass = str_replace('_DAO_', '_BAO_', $daoClass);
+    foreach (self::getEntities() as $name => $entity) {
+      $baoClass = str_replace('_DAO_', '_BAO_', $entity['class']);
       if (class_exists($baoClass)) {
-        $r[$entity] = $baoClass;
+        $r[$name] = $baoClass;
       }
     }
     return $r;
@@ -315,7 +348,8 @@ class CRM_Core_DAO_AllCoreTables {
       global $dbLocale;
       $tableName = str_replace($dbLocale, '', $tableName);
     }
-    return self::tables()[$tableName] ?? NULL;
+    $entityName = self::getEntitiesByTable()[$tableName] ?? '';
+    return self::getEntities()[$entityName]['class'] ?? NULL;
   }
 
   /**
@@ -327,8 +361,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   Ex: 'CRM_Contact_DAO_Contact'.
    */
   public static function getFullName($briefName) {
-    self::init();
-    return self::$entityTypes[$briefName]['class'] ?? NULL;
+    return self::getEntities()[$briefName]['class'] ?? NULL;
   }
 
   /**
@@ -339,9 +372,9 @@ class CRM_Core_DAO_AllCoreTables {
    * @return string|NULL
    *   Ex: 'Contact'.
    */
-  public static function getBriefName($className) {
+  public static function getBriefName($className): ?string {
     $className = self::getCanonicalClassName($className);
-    return array_search($className, self::daoToClass(), TRUE) ?: NULL;
+    return self::getEntitiesByClass()[$className] ?? NULL;
   }
 
   /**
@@ -349,8 +382,8 @@ class CRM_Core_DAO_AllCoreTables {
    * @return string|FALSE SQL table name
    */
   public static function getTableForClass($className) {
-    return array_search(self::getCanonicalClassName($className),
-      self::tables());
+    $entityName = self::getBriefName($className);
+    return self::getEntities()[$entityName]['table'] ?? FALSE;
   }
 
   /**
@@ -361,8 +394,7 @@ class CRM_Core_DAO_AllCoreTables {
    * @return string
    */
   public static function getTableForEntityName($briefName): string {
-    self::init();
-    return self::$entityTypes[$briefName]['table'];
+    return self::getEntities()[$briefName]['table'];
   }
 
   /**
@@ -373,22 +405,19 @@ class CRM_Core_DAO_AllCoreTables {
    * @return FALSE|string
    */
   public static function getEntityNameForTable(string $tableName) {
-    self::init();
     // CRM-19677: on multilingual setup, trim locale from $tableName to fetch class name
     if (CRM_Core_I18n::isMultilingual()) {
       global $dbLocale;
       $tableName = str_replace($dbLocale, '', $tableName);
     }
-    $matches = CRM_Utils_Array::findAll(self::$entityTypes, ['table' => $tableName]);
-    return $matches ? $matches[0]['name'] : NULL;
+    return self::getEntitiesByTable()[$tableName] ?? NULL;
   }
 
   /**
-   * Reinitialise cache.
-   *
-   * @deprecated
+   * @deprecated in 5.54 will be removed in 5.85
    */
   public static function reinitializeCache(): void {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::flush');
     self::flush();
   }
 
@@ -475,10 +504,10 @@ class CRM_Core_DAO_AllCoreTables {
    * @param mixed $values
    */
   public static function invoke($className, $event, &$values) {
-    self::init();
     $briefName = self::getBriefName($className);
-    if (isset(self::$entityTypes[$briefName][$event])) {
-      foreach (self::$entityTypes[$briefName][$event] as $filter) {
+    $entityTypes = self::getEntities();
+    if (isset($entityTypes[$briefName][$event])) {
+      foreach ($entityTypes[$briefName][$event] as $filter) {
         $args = [$className, &$values];
         \Civi\Core\Resolver::singleton()->call($filter, $args);
       }

@@ -349,10 +349,9 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
    * @dataProvider restrictionCases
    */
   public function testEach($apiRequest, $rules, $expectSuccess) {
-    \CRM_Core_DAO_AllCoreTables::flush();
-
     $recs = $this->getFixtures();
 
+    // FIXME: It would be more realistic to use hook_civicrm_entityTypes() instead of calling this internal function.
     \CRM_Core_DAO_AllCoreTables::registerEntityType('Widget', 'CRM_Fake_DAO_Widget', 'fake_widget');
     $widgetProvider = new \Civi\API\Provider\StaticProvider(3, 'Widget',
       ['id', 'widget_type', 'provider', 'title'],

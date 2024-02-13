@@ -64,14 +64,14 @@ class SchemaMapBuilder extends AutoService {
    */
   private function loadTables(SchemaMap $map) {
     /** @var \CRM_Core_DAO $daoName */
-    foreach (AllCoreTables::get() as $data) {
+    foreach (AllCoreTables::getEntities() as $name => $data) {
       $table = new Table($data['table']);
       foreach ($data['class']::fields() as $fieldData) {
         $this->addJoins($table, $fieldData['name'], $fieldData);
       }
       $map->addTable($table);
-      if (in_array($data['name'], $this->apiEntities)) {
-        $this->addCustomFields($map, $table, $data['name']);
+      if (in_array($name, $this->apiEntities)) {
+        $this->addCustomFields($map, $table, $name);
       }
     }
   }
