@@ -1394,17 +1394,6 @@ LIKE %1
   }
 
   /**
-   * @param $version
-   * @deprecated
-   * @return bool
-   */
-  public function checkVersion($version) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Domain::version');
-    $dbVersion = CRM_Core_BAO_Domain::version();
-    return trim($version) == trim($dbVersion);
-  }
-
-  /**
    * Find a DAO object for the given ID and return it.
    *
    * @param int $id
