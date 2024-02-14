@@ -6,4 +6,4 @@ CREATE TABLE `civicrm_session` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `index_session_id`(session_id)
 )
-ENGINE=InnoDB;
+ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
