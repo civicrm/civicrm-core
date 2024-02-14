@@ -1238,14 +1238,10 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Checks if CONSTRAINT keyword exists for a specified table.
    *
-   * @param array $tables
-   *
-   * @throws CRM_Core_Exception
-   *
-   * @return bool
-   *   true if CONSTRAINT keyword exists, false otherwise
+   * @deprecated in 5.72 will be removed in 5.85
    */
   public static function schemaRequiresRebuilding($tables = ["civicrm_contact"]) {
+    CRM_Core_Error::deprecatedFunctionWarning('No alternative');
     $show = [];
     foreach ($tables as $tableName) {
       if (!array_key_exists($tableName, $show)) {
@@ -1274,15 +1270,10 @@ class CRM_Core_DAO extends DB_DataObject {
    * Checks if the FK constraint name is in the format 'FK_tableName_columnName'
    * for a specified column of a table.
    *
-   * @param string $tableName
-   * @param string $columnName
-   *
-   * @return bool
-   *   true if in format, false otherwise
-   *
-   * @throws \CRM_Core_Exception
+   * @deprecated in 5.72 will be removed in 5.85
    */
   public static function checkFKConstraintInFormat($tableName, $columnName) {
+    CRM_Core_Error::deprecatedFunctionWarning('No alternative');
     static $show = [];
 
     if (!array_key_exists($tableName, $show)) {
@@ -1303,14 +1294,10 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Check whether a specific column in a specific table has always the same value.
    *
-   * @param string $tableName
-   * @param string $columnName
-   * @param string $columnValue
-   *
-   * @return bool
-   *   true if the value is always $columnValue, false otherwise
+   * @deprecated in 5.72 will be removed in 5.85
    */
   public static function checkFieldHasAlwaysValue($tableName, $columnName, $columnValue) {
+    CRM_Core_Error::deprecatedFunctionWarning('APIv4');
     $query = "SELECT * FROM $tableName WHERE $columnName != '$columnValue'";
     $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
@@ -1320,13 +1307,10 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Check whether a specific column in a specific table is always NULL.
    *
-   * @param string $tableName
-   * @param string $columnName
-   *
-   * @return bool
-   *   true if if the value is always NULL, false otherwise
+   * @deprecated in 5.72 will be removed in 5.85
    */
   public static function checkFieldIsAlwaysNull($tableName, $columnName) {
+    CRM_Core_Error::deprecatedFunctionWarning('APIv4');
     $query = "SELECT * FROM $tableName WHERE $columnName IS NOT NULL";
     $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
@@ -1590,15 +1574,11 @@ LIKE %1
   }
 
   /**
-   * Get sort string.
-   *
-   * @param array|object $sort either array or CRM_Utils_Sort
-   * @param string $default
-   *   Default sort value.
-   *
-   * @return string
+   * Unused function.
+   * @deprecated in 5.72 will be removed in 5.85
    */
   public static function getSortString($sort, $default = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('No alternative');
     // check if sort is of type CRM_Utils_Sort
     if (is_a($sort, 'CRM_Utils_Sort')) {
       return $sort->orderBy();
@@ -1650,14 +1630,9 @@ LIKE %1
   }
 
   /**
-   * Delete the object records that are associated with this contact.
+   * Unused function.
    *
-   * @deprecated
-   *
-   * @param string $daoName
-   *   Name of the dao object.
-   * @param int $contactId
-   *   Id of the contact to delete.
+   * @deprecated in 5.47 will be removed in 5.80
    */
   public static function deleteEntityContact($daoName, $contactId) {
     CRM_Core_Error::deprecatedFunctionWarning('APIv4');
