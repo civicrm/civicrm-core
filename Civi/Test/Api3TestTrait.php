@@ -420,7 +420,7 @@ trait Api3TestTrait {
         unset($v3Params['option_group_id']);
       }
       if (isset($field['pseudoconstant'], $v3Params[$name]) && $field['type'] === \CRM_Utils_Type::T_INT && !is_numeric($v3Params[$name]) && is_string($v3Params[$name])) {
-        $v3Params[$name] = \CRM_Core_PseudoConstant::getKey(\CRM_Core_DAO_AllCoreTables::getFullName($v4Entity), $name, $v3Params[$name]);
+        $v3Params[$name] = \CRM_Core_PseudoConstant::getKey(\CRM_Core_DAO_AllCoreTables::getDAONameForEntity($v4Entity), $name, $v3Params[$name]);
       }
     }
 

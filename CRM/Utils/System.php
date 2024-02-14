@@ -1880,7 +1880,7 @@ class CRM_Utils_System {
       $action = strtolower($action);
     }
 
-    $daoClass = isset($crudLinkSpec['entity']) ? CRM_Core_DAO_AllCoreTables::getFullName($crudLinkSpec['entity']) : CRM_Core_DAO_AllCoreTables::getClassForTable($crudLinkSpec['entity_table']);
+    $daoClass = isset($crudLinkSpec['entity']) ? CRM_Core_DAO_AllCoreTables::getDAONameForEntity($crudLinkSpec['entity']) : CRM_Core_DAO_AllCoreTables::getClassForTable($crudLinkSpec['entity_table']);
     $paths = $daoClass ? $daoClass::getEntityPaths() : [];
     $path = $paths[$action] ?? NULL;
     if (!$path) {

@@ -282,7 +282,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
     if ($this->allowedDelegates === NULL || in_array($entityTable, $this->allowedDelegates)) {
       $className = \CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable);
       if ($className) {
-        $entityName = \CRM_Core_DAO_AllCoreTables::getBriefName($className);
+        $entityName = \CRM_Core_DAO_AllCoreTables::getEntityNameForClass($className);
         if ($entityName) {
           return $entityName;
         }

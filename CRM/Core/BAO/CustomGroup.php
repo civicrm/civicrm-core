@@ -370,7 +370,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    */
   public static function validateCustomGroupName(CRM_Core_DAO_CustomGroup $group) {
     $extends = in_array($group->extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE)) ? 'Contact' : $group->extends;
-    $extendsDAO = CRM_Core_DAO_AllCoreTables::getFullName($extends);
+    $extendsDAO = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($extends);
     if ($extendsDAO) {
       $fields = array_column($extendsDAO::fields(), 'name');
       if (in_array($group->name, $fields)) {

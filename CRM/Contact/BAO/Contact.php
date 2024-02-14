@@ -3367,7 +3367,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       !empty($event->object->is_primary) &&
       !empty($event->object->contact_id)
     ) {
-      $daoClass = CRM_Core_DAO_AllCoreTables::getFullName($event->entity);
+      $daoClass = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($event->entity);
       $dao = new $daoClass();
       $dao->contact_id = $event->object->contact_id;
       $dao->is_primary = 1;

@@ -39,7 +39,7 @@ class CoreUtil {
       $dao = \Civi\Api4\CustomValue::getInfo()['dao'];
     }
     else {
-      $dao = AllCoreTables::getFullName($entityName);
+      $dao = AllCoreTables::getDAONameForEntity($entityName);
     }
     if (!$dao && self::isContact($entityName)) {
       $dao = 'CRM_Contact_DAO_Contact';
@@ -56,7 +56,7 @@ class CoreUtil {
    * @return string|null
    */
   public static function getApiNameFromBAO($baoClassName): ?string {
-    $briefName = AllCoreTables::getBriefName($baoClassName);
+    $briefName = AllCoreTables::getEntityNameForClass($baoClassName);
     return $briefName && self::getApiClass($briefName) ? $briefName : NULL;
   }
 

@@ -184,7 +184,7 @@ trait CRM_Core_Form_EntityFormTrait {
     $this->assign('entityFields', $this->entityFields);
     $this->assign('entityID', $this->getEntityId());
     $this->assign('entityInClassFormat', strtolower(str_replace('_', '-', $this->getDefaultEntity())));
-    $this->assign('entityTable', CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($this->getDefaultEntity())));
+    $this->assign('entityTable', CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getDAONameForEntity($this->getDefaultEntity())));
     $this->addCustomDataToForm();
     $this->addFormButtons();
 

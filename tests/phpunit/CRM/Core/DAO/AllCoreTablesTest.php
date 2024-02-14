@@ -216,14 +216,14 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
   }
 
   public function testGetBriefName(): void {
-    $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getBriefName('CRM_Contact_BAO_Contact'));
-    $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getBriefName('CRM_Contact_DAO_Contact'));
-    $this->assertNull(CRM_Core_DAO_AllCoreTables::getBriefName('CRM_Core_DAO_XqZy'));
+    $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getEntityNameForClass('CRM_Contact_BAO_Contact'));
+    $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getEntityNameForClass('CRM_Contact_DAO_Contact'));
+    $this->assertNull(CRM_Core_DAO_AllCoreTables::getEntityNameForClass('CRM_Core_DAO_XqZy'));
   }
 
   public function testGetFullName(): void {
-    $this->assertEquals('CRM_Contact_DAO_Contact', CRM_Core_DAO_AllCoreTables::getFullName('Contact'));
-    $this->assertNull(CRM_Core_DAO_AllCoreTables::getFullName('XqZy'));
+    $this->assertEquals('CRM_Contact_DAO_Contact', CRM_Core_DAO_AllCoreTables::getDAONameForEntity('Contact'));
+    $this->assertNull(CRM_Core_DAO_AllCoreTables::getDAONameForEntity('XqZy'));
   }
 
   public function testGetEntityNameForTable(): void {

@@ -457,7 +457,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag implements \Civi\Cor
       $options = [];
       foreach (self::buildOptions($fieldName) as $tableName => $label) {
         $bao = CRM_Core_DAO_AllCoreTables::getClassForTable($tableName);
-        $apiName = CRM_Core_DAO_AllCoreTables::getBriefName($bao);
+        $apiName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($bao);
         $options[$tableName] = $apiName;
       }
     }
@@ -484,7 +484,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag implements \Civi\Cor
     }
     // This is probably fairly mild in terms of helping performance - a case could be made to check if tags
     // exist before deleting (further down) as delete is a locking action.
-    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($event->object));
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($event->object));
     if ($entity && !isset(Civi::$statics[__CLASS__]['tagged_entities'][$entity])) {
       $tableName = CRM_Core_DAO_AllCoreTables::getTableForEntityName($entity);
       $used_for = CRM_Core_OptionGroup::values('tag_used_for');
