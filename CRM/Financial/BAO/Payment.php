@@ -609,6 +609,16 @@ class CRM_Financial_BAO_Payment {
         $paid += $entityFinancialTrxn['amount'];
       }
     }
+
+    $lineItem = \Civi\Api4\LineItem::get(FALSE)
+      ->addWhere('id', '=', $lineItemID)
+      ->execute()
+      ->first();
+    if (!empty($lineItem['tax_amount']) && $paid > 0) {
+      $total = floatval($lineItem['line_total']);
+      $tax = floatval($lineItem['tax_amount']);
+      $paid = ($total * $paid) / ($tax + $total);
+    }
     return (float) $paid;
   }
 

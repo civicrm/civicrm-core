@@ -73,6 +73,13 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
   protected $paymentProcessorID;
 
   /**
+   * Financial Type ID.
+   *
+   * @var int
+   */
+  protected $_financialTypeID = 1;
+
+  /**
    * Setup function.
    *
    * @throws \CRM_Core_Exception
@@ -86,7 +93,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'currency' => 'USD',
       'contact_id' => $this->_individualId,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->_financialTypeID,
     ];
     $this->_processorParams = [
       'domain_id' => 1,
@@ -340,6 +347,35 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $this->submitPayment(10, 'live');
     $this->checkResults([50, 20, 20, 10], 4);
+  }
+
+  /**
+   * Test that multiple payment has correct line item allocations.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMultiplePaymentForPendingPayLaterContributionHasCorrectionAllocation(): void {
+    $this->enableTaxAndInvoicing();
+    $this->addTaxAccountToFinancialType($this->_financialTypeID, ['tax_rate' => 20]);
+    $this->createPendingOrder(['amount' => 120]);
+
+    $this->submitPayment(60);
+    $this->submitPayment(30);
+    $result = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
+      'version' => 4,
+      'where' => [
+      ['entity_table', '=', 'civicrm_contribution'],
+      ['entity_id', '=', $this->_contributionId],
+      ],
+      'chain' => [
+        'line_items' => ['EntityFinancialTrxn', 'get', ['where' => [['financial_trxn_id', '=', '$financial_trxn_id'], ['id', '!=', '$id']]]],
+      ],
+    ])['values'];
+
+    // Assert that the line items have the correct allocatioins from the paid amount
+    foreach ($result as $entityFnTrxn) {
+      $this->assertEquals(round($entityFnTrxn['amount'], 2), round(array_sum(array_column($entityFnTrxn['line_items'], 'amount')), 2));
+    }
   }
 
   /**
