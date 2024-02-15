@@ -242,7 +242,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $memtypeID = NULL;
     if ($this->_priceSetId) {
-      if ($this->isMembershipPriceSet()) {
+      if ($this->getFormContext() === 'membership') {
         $selectedCurrentMemTypes = [];
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
@@ -926,6 +926,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $errors["price_{$otherAmount}"] = ts('Amount is required field.');
       }
 
+      // @todo - this should probably be $this->getFormContext() === 'membership'
+      // which would make it apply to quick config & non quick config.
+      // See https://lab.civicrm.org/dev/core/-/issues/3314
       if ($self->isMembershipPriceSet() && !empty($check) && $membershipIsActive) {
         $priceFieldIDS = [];
         $priceFieldMemTypes = [];
