@@ -204,15 +204,15 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $last_name = uniqid(__FUNCTION__);
 
     $alice = Contact::create()
-      ->setValues(['first_name' => 'Alice', 'last_name' => $last_name])
+      ->setValues(['first_name' => 'Alice', 'middle_name' => 'Angela', 'last_name' => $last_name])
       ->execute()->first();
 
     $alex = Contact::create()
-      ->setValues(['first_name' => 'Alex', 'last_name' => $last_name])
+      ->setValues(['first_name' => 'Alex', 'middle_name' => 'Zed', 'last_name' => $last_name])
       ->execute()->first();
 
     $jane = Contact::create()
-      ->setValues(['first_name' => 'Jane', 'last_name' => $last_name])
+      ->setValues(['first_name' => 'Jane', 'middle_name' => 'Z', 'last_name' => $last_name])
       ->execute()->first();
 
     $holly = Contact::create()
@@ -287,6 +287,36 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayHasKey($alice['id'], (array) $result);
     $this->assertArrayHasKey($alex['id'], (array) $result);
     $this->assertArrayHasKey($jane['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('middle_name', 'CONTAINS', 'A')
+      ->execute()->indexBy('id');
+    $this->assertCount(1, $result);
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('middle_name', 'NOT CONTAINS', 'Z')
+      ->execute()->indexBy('id');
+    $this->assertCount(5, $result);
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+    $this->assertArrayHasKey($holly['id'], (array) $result);
+    $this->assertArrayHasKey($meg['id'], (array) $result);
+    $this->assertArrayHasKey($jess['id'], (array) $result);
+    $this->assertArrayHasKey($amy['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('middle_name', 'NOT CONTAINS', 'Zed')
+      ->execute()->indexBy('id');
+    $this->assertCount(6, $result);
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+    $this->assertArrayHasKey($jane['id'], (array) $result);
+    $this->assertArrayHasKey($holly['id'], (array) $result);
+    $this->assertArrayHasKey($meg['id'], (array) $result);
+    $this->assertArrayHasKey($jess['id'], (array) $result);
+    $this->assertArrayHasKey($amy['id'], (array) $result);
   }
 
   public function testGetRelatedWithSubType(): void {
