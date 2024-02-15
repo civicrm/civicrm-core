@@ -55,7 +55,7 @@ if (!class_exists('Smarty')) {
 class CRM_Core_SmartyCompatibility extends Smarty {
 
   public function loadFilter($type, $name) {
-    if (method_exists(get_parent_class(), 'load_filter')) {
+    if (method_exists(parent::class, 'load_filter')) {
       parent::load_filter($type, $name);
       return;
     }
