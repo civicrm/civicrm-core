@@ -33,6 +33,8 @@ class CRM_Upgrade_Incremental_php_FiveSeventyOne extends CRM_Upgrade_Incremental
     // before they are made required.
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
+    $this->addTask('Add entity_delete column', 'addColumn', 'civicrm_custom_field', 'fk_entity_on_delete', "VARCHAR(255) NOT NULL DEFAULT 'set_null' COMMENT 'Behavior if referenced entity is deleted.' AFTER `fk_entity`");
+
     $this->addTask('Make civicrm_uf_group.name required', 'alterColumn', 'civicrm_uf_group', 'name',
       "varchar(64) NOT NULL  COMMENT 'Form name.'"
     );
