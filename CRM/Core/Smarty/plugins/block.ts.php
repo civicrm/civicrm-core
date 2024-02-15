@@ -37,14 +37,7 @@
  */
 function smarty_block_ts($params, $text, &$smarty, &$repeat) {
   if (!$repeat) {
-    $extensionKey = '';
-    if (method_exists($smarty, 'getTemplateVars')) {
-      $extensionKey = $smarty->getTemplateVars('extensionKey');
-    }
-    else {
-      // Transitional support for Smarty2 still being used in GenCode.
-      $extensionKey = $smarty->get_template_vars('extensionKey');
-    }
+    $extensionKey = $smarty->getTemplateVars('extensionKey');
     if (!isset($params['domain']) && $extensionKey) {
       $params['domain'] = is_array($extensionKey) ? $extensionKey : [$extensionKey, NULL];
     }

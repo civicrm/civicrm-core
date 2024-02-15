@@ -139,7 +139,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
   /**
    * Returns an array containing template variables
    *
-   * @deprecated
+   * @deprecated since 5.69 will be removed around 5.79
    *
    * @param string $name
    *

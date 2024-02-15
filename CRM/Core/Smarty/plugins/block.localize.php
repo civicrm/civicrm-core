@@ -38,13 +38,13 @@ function smarty_block_localize($params, $text, $smarty, &$repeat) {
     // For opening tag text is always null
     return '';
   }
-  $multiLingual = method_exists($smarty, 'get_template_vars') ? $smarty->get_template_vars('multilingual') : $smarty->getTemplateVars('multilingual');
+  $multiLingual = $smarty->getTemplateVars('multilingual');
   if (!$multiLingual) {
     return $text;
   }
 
   $lines = [];
-  $locales = (array) (method_exists($smarty, 'get_template_vars') ? $smarty->get_template_vars('locales') : $smarty->getTemplateVars('locales'));
+  $locales = (array) $smarty->getTemplateVars('locales');
   foreach ($locales as $locale) {
     $line = $text;
     if (isset($params['field'])) {

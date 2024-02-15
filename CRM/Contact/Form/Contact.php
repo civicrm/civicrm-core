@@ -1296,7 +1296,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if ($this->_contactSubType) {
       $templateFile = "CRM/Contact/Form/Edit/SubType/{$this->_contactSubType}.tpl";
       $template = CRM_Core_Form::getTemplate();
-      if ($template->template_exists($templateFile)) {
+      if ($template->templateExists($templateFile)) {
         return $templateFile;
       }
     }
