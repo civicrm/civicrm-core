@@ -1986,8 +1986,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Get the cache key string for the merge action.
    *
-   * @param int $rule_group_id
-   * @param int $group_id
+   * @param int|null $rule_group_id
+   * @param int|null $group_id
    * @param array $criteria
    *   Additional criteria to narrow down the merge group.
    *   Currently we are only supporting the key 'contact' within it.
@@ -2003,8 +2003,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   public static function getMergeCacheKeyString($rule_group_id, $group_id, $criteria, $checkPermissions, $searchLimit) {
     $contactType = CRM_Dedupe_BAO_DedupeRuleGroup::getContactTypeForRuleGroup($rule_group_id);
     $cacheKeyString = "merge_{$contactType}";
-    $cacheKeyString .= $rule_group_id ? "_{$rule_group_id}" : '_0';
-    $cacheKeyString .= $group_id ? "_{$group_id}" : '_0';
+    $cacheKeyString .= '_' . (int) $rule_group_id;
+    $cacheKeyString .= '_' . (int) $group_id;
     $cacheKeyString .= '_' . (int) $searchLimit;
     $cacheKeyString .= !empty($criteria) ? md5(serialize($criteria)) : '_0';
     if ($checkPermissions) {
