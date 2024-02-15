@@ -31,11 +31,19 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
     $orphans = [];
     foreach ($this->getRemovedFiles() as $file) {
       $path = Civi::paths()->getPath("[civicrm.root]/$file");
-      if (file_exists(rtrim($path, '/*'))) {
-        $orphans[] = [
-          'name' => $file,
-          'path' => $path,
-        ];
+      $path = rtrim($path, '/*');
+      // On case-insensitive filesystems we need to do some more work
+      $actualPath = realpath($path);
+      if ($actualPath !== FALSE) {
+        $actualPath = str_replace(DIRECTORY_SEPARATOR, '/', $actualPath);
+        // At this point we know the file/dir exists because otherwise realpath would have returned false. So we can compare $file to the ending of $actualPath to get a case-sensitive match because realpath has the same sense (sensitivity? bigness of the letters?) as the file in the filesystem.
+        $fileWithoutStar = rtrim($file, '/*');
+        if (substr($actualPath, -1 * strlen($fileWithoutStar)) === $fileWithoutStar) {
+          $orphans[] = [
+            'name' => $file,
+            'path' => $path,
+          ];
+        }
       }
     }
 
