@@ -622,7 +622,11 @@ HERESQL;
     }
     $condition = implode(' AND ', $whereClauses);
 
-    Civi::$statics[__CLASS__]['totalCount'][$type] = $totalCount = CRM_Core_DAO::singleValueQuery(self::getCaseActivityCountQuery($type, $userID, $condition));
+    $totalCount = CRM_Core_DAO::singleValueQuery(self::getCaseActivityCountQuery($type, $userID, $condition));
+    // Allow extensions to modify the list of cases
+    CRM_Utils_Hook::getCasesTotalCount($totalCount, $type, $userID, $condition);
+
+    Civi::$statics[__CLASS__]['totalCount'][$type] = $totalCount;
     if ($getCount) {
       return $totalCount;
     }
@@ -669,7 +673,16 @@ HERESQL;
     $caseTypeTitles = CRM_Case_PseudoConstant::caseType('title', FALSE);
     $activityTypeLabels = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
 
+    // Store the results in an array
+    $cases = [];
     foreach ($result->fetchAll() as $case) {
+        $cases[$case['case_id']] = $case;
+    }
+    
+    // Allow extensions to modify the list of cases
+    CRM_Utils_Hook::getCases($cases, $allCases, $params, $context);
+
+    foreach ($cases as $case) {
       $key = $case['case_id'];
       $casesList[$key] = [];
       $casesList[$key]['DT_RowId'] = $case['case_id'];
