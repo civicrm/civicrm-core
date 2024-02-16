@@ -676,7 +676,7 @@ HERESQL;
     // Store the results in an array
     $cases = [];
     foreach ($result->fetchAll() as $case) {
-        $cases[$case['case_id']] = $case;
+      $cases[$case['case_id']] = $case;
     }
 
     // Allow extensions to modify the list of cases
