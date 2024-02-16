@@ -2608,17 +2608,17 @@ abstract class CRM_Utils_Hook {
 
   /**
    * This hook is called when cases are queried.
-   * 
+   *
    * @param array $cases
    * @param bool $allCases
    * @param array $params
    * @param string $context
-   * 
+   *
    * @return mixed
    */
   public static function getCases(&$cases, $allCases, $params, $context) {
     $null = NULL;
-    return self::singleton()->invoke(['query', 'type', 'userID', 'condition', 'limit', 'order'], $cases, $allCases, $params, $context, 
+    return self::singleton()->invoke(['query', 'type', 'userID', 'condition', 'limit', 'order'], $cases, $allCases, $params, $context,
       $null, $null,
       'civicrm_getCases'
     );
@@ -2626,7 +2626,7 @@ abstract class CRM_Utils_Hook {
 
   /**
    * This hook is called when cases are queried.
-   * 
+   *
    * @param int $totalCount
    * @param string $type
    * @param int $userID
@@ -2634,7 +2634,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function getCasesTotalCount(&$totalCount, $type, $userID, $condition) {
     $null = NULL;
-    return self::singleton()->invoke(['totalCount', 'type', 'userID', 'condition'], $totalCount, $type, $userID, $condition, 
+    return self::singleton()->invoke(['totalCount', 'type', 'userID', 'condition'], $totalCount, $type, $userID, $condition,
       $null, $null,
       'civicrm_getCasesTotalCount'
     );
