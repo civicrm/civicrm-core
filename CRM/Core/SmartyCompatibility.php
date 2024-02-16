@@ -153,15 +153,13 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @deprecated
    * @param string $tpl_var
    * @param mixed $value
-   *
-   * @return mixed|null|void
    */
   public function assign_by_ref($tpl_var, &$value) {
-    if (method_exists(get_parent_class(), 'assign_by_ref')) {
+    if (method_exists(parent::class, 'assign_by_ref')) {
       parent::assign_by_ref($tpl_var, $value);
       return;
     }
-    return parent::assignByRef($tpl_var, $value);
+    $this->assign($tpl_var, $value);
   }
 
   /**
