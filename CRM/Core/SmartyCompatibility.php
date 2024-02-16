@@ -54,14 +54,6 @@ if (!class_exists('Smarty')) {
  */
 class CRM_Core_SmartyCompatibility extends Smarty {
 
-  public function loadFilter($type, $name) {
-    if (method_exists(parent::class, 'load_filter')) {
-      parent::load_filter($type, $name);
-      return;
-    }
-    parent::loadFilter($type, $name);
-  }
-
   /**
    * @deprecated
    *
@@ -71,11 +63,11 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @throws \SmartyException
    */
   public function load_filter($type, $name) {
-    CRM_Core_Error::deprecatedWarning('loadFilter');
-    if (method_exists(get_parent_class(), 'load_filter')) {
+    if (method_exists(parent::class, 'load_filter')) {
       parent::load_filter($type, $name);
       return;
     }
+    CRM_Core_Error::deprecatedWarning('loadFilter');
     parent::loadFilter($type, $name);
   }
 
@@ -88,7 +80,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @param string $modifier_impl name of PHP function to register
    */
   public function register_modifier($modifier, $modifier_impl) {
-    if (method_exists(get_parent_class(), 'register_modifier')) {
+    if (method_exists(parent::class, 'register_modifier')) {
       parent::register_modifier($modifier, $modifier_impl);
       return;
     }
@@ -105,7 +97,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @param array $functions array of functions to handle resource
    */
   public function register_resource($type, $functions) {
-    if (method_exists(get_parent_class(), 'register_resource')) {
+    if (method_exists(parent::class, 'register_resource')) {
       parent::register_resource($type, $functions);
       return;
     }
@@ -113,6 +105,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
       // Not valid / required for Smarty3+
       return;
     }
+    CRM_Core_Error::deprecatedWarning('registerResource');
     parent::registerResource($type, $functions);
   }
 
@@ -129,10 +122,11 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @throws \SmartyException
    */
   public function register_function($function, $function_impl, $cacheable = TRUE, $cache_attrs = NULL) {
-    if (method_exists(get_parent_class(), 'register_function')) {
+    if (method_exists(parent::class, 'register_function')) {
       parent::register_function($function, $function_impl, $cacheable = TRUE, $cache_attrs = NULL);
       return;
     }
+    CRM_Core_Error::deprecatedWarning('registerPlugin');
     parent::registerPlugin('function', $function, $function, $cacheable, $cache_attrs);
   }
 
@@ -146,7 +140,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @return array
    */
   public function &get_template_vars($name = NULL) {
-    if (method_exists(get_parent_class(), 'get_template_vars')) {
+    if (method_exists(parent::class, 'get_template_vars')) {
       return parent::get_template_vars($name);
     }
     $var = parent::getTemplateVars($name);
@@ -179,7 +173,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @return mixed|null|void
    */
   public function clear_assign($tpl_var) {
-    if (method_exists(get_parent_class(), 'clear_assign')) {
+    if (method_exists(parent::class, 'clear_assign')) {
       parent::clear_assign($tpl_var);
       return;
     }
@@ -195,25 +189,10 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @throws \SmartyException
    */
   public function template_exists($tpl_file) {
-    if (method_exists(get_parent_class(), 'template_exists')) {
+    if (method_exists(parent::class, 'template_exists')) {
       return parent::template_exists($tpl_file);
     }
     return parent::templateExists($tpl_file);
-  }
-
-  /**
-   * Check if a template resource exists
-   *
-   * @param string $resource_name template name
-   *
-   * @return bool status
-   * @throws \SmartyException
-   */
-  public function templateExists($resource_name) {
-    if (method_exists(get_parent_class(), 'templateExists')) {
-      return parent::templateExists($resource_name);
-    }
-    return parent::template_exists($resource_name);
   }
 
 }
