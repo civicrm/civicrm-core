@@ -300,12 +300,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       if ($key === 'config' || $key === 'session') {
         continue;
       }
-      if (method_exists($this, 'clearAssign')) {
-        $this->clearAssign($key);
-      }
-      else {
-        $this->clear_assign($key);
-      }
+      $this->clearAssign($key);
     }
   }
 
