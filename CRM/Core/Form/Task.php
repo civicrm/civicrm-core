@@ -391,7 +391,10 @@ SELECT contact_id
    * @return array
    */
   protected function getContactIDs(): array {
-    return $this->_contactIds ?? [];
+    if (!isset($this->_contactIds)) {
+      $this->setContactIDs();
+    }
+    return $this->_contactIds;
   }
 
 }
