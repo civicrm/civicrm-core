@@ -156,6 +156,24 @@ trait CRM_Core_Form_EntityFormTrait {
     if ($this->isSuppressCustomData()) {
       return TRUE;
     }
+
+    /*
+    @todo - this would be the preferred code here to better support
+    php8.2 & take advantage of code improvements
+    Note in this example an additional filter (membership_type_id)
+    is relevant although for most entities it isn't.
+    if ($this->isSubmitted()) {
+    // The custom data fields are added to the form by an ajax form.
+    // However, if they are not present in the element index they will
+    // not be available from `$this->getSubmittedValue()` in post process.
+    // We do not have to set defaults or otherwise render - just add to the element index.
+    $this->addCustomDataFieldsToForm($this->getDefaultEntity(), array_filter([
+    'id' => $this->getEntityId(),
+    'membership_type_id' => $this->getSubmittedValue('membership_type_id')
+    ]));
+    }
+     */
+
     $customisableEntities = CRM_Core_SelectValues::customGroupExtends();
     if (isset($customisableEntities[$this->getDefaultEntity()])) {
       CRM_Custom_Form_CustomData::addToForm($this, $this->getEntitySubTypeId());
