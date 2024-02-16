@@ -678,7 +678,7 @@ HERESQL;
     foreach ($result->fetchAll() as $case) {
         $cases[$case['case_id']] = $case;
     }
-    
+
     // Allow extensions to modify the list of cases
     CRM_Utils_Hook::getCases($cases, $allCases, $params, $context);
 
