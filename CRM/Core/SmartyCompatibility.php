@@ -179,7 +179,6 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @return mixed|null|void
    */
   public function clear_assign($tpl_var) {
-    CRM_Core_Error::deprecatedFunctionWarning('clearAssign');
     if (method_exists(get_parent_class(), 'clear_assign')) {
       parent::clear_assign($tpl_var);
       return;
