@@ -62,8 +62,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
     $this->addAutocomplete('to', ts('Send to'), [
       'entity' => 'Phone',
       'api' => [
-        'fieldName' => 'id',
-        'select' => ['phone_number', 'contact_id.display_name'],
+        'fieldName' => 'Phone.id',
       ],
       'select' => ['multiple' => TRUE],
       'class' => 'select2',
