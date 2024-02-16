@@ -56,7 +56,7 @@ if (!class_exists('Smarty')) {
 class CRM_Core_SmartyCompatibility extends Smarty {
 
   public function loadFilter($type, $name) {
-    if (method_exists(get_parent_class(), 'load_filter')) {
+    if (method_exists(parent::class, 'load_filter')) {
       parent::load_filter($type, $name);
       return;
     }
@@ -72,7 +72,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @throws \SmartyException
    */
   public function load_filter($type, $name) {
-    if (method_exists(get_parent_class(), 'load_filter')) {
+    if (method_exists(parent::class, 'load_filter')) {
       parent::load_filter($type, $name);
       return;
     }
@@ -88,7 +88,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @param string $modifier_impl name of PHP function to register
    */
   public function register_modifier($modifier, $modifier_impl) {
-    if (method_exists(get_parent_class(), 'register_modifier')) {
+    if (method_exists(parent::class, 'register_modifier')) {
       parent::register_modifier($modifier, $modifier_impl);
       return;
     }
@@ -96,7 +96,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
   }
 
   public function registerPlugin($type, $name, $callback, $cacheable = TRUE, $cache_attr = NULL) {
-    if (method_exists(get_parent_class(), 'registerPlugin')) {
+    if (method_exists(parent::class, 'registerPlugin')) {
       parent::registerPlugin($type, $name, $callback, $cacheable = TRUE, $cache_attr = NULL);
       return;
     }
@@ -112,7 +112,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @param array $functions array of functions to handle resource
    */
   public function register_resource($type, $functions) {
-    if (method_exists(get_parent_class(), 'register_resource')) {
+    if (method_exists(parent::class, 'register_resource')) {
       parent::register_resource($type, $functions);
       return;
     }
@@ -130,7 +130,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @throws \SmartyException
    */
   public function register_function($function, $function_impl, $cacheable = TRUE, $cache_attrs = NULL) {
-    if (method_exists(get_parent_class(), 'register_function')) {
+    if (method_exists(parent::class, 'register_function')) {
       parent::register_function($function, $function_impl, $cacheable = TRUE, $cache_attrs = NULL);
       return;
     }
@@ -145,7 +145,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @return array
    */
   public function &get_template_vars($name = NULL) {
-    if (method_exists(get_parent_class(), 'get_template_vars')) {
+    if (method_exists(parent::class, 'get_template_vars')) {
       return parent::get_template_vars($name);
     }
     $var = parent::getTemplateVars($name);
@@ -165,7 +165,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @return mixed variable value or or array of variables
    */
   public function getTemplateVars($varName = NULL, Smarty_Internal_Data $_ptr = NULL, $searchParents = TRUE) {
-    if (method_exists(get_parent_class(), 'getTemplateVars')) {
+    if (method_exists(parent::class, 'getTemplateVars')) {
       return parent::getTemplateVars($varName, $_ptr, $searchParents);
     }
     return parent::get_template_vars($varName);
@@ -181,7 +181,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @return mixed|null|void
    */
   public function assign_by_ref($tpl_var, &$value) {
-    if (method_exists(get_parent_class(), 'assign_by_ref')) {
+    if (method_exists(parent::class, 'assign_by_ref')) {
       parent::assign_by_ref($tpl_var, $value);
       return;
     }
@@ -197,7 +197,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @return mixed|null|void
    */
   public function clear_assign($tpl_var) {
-    if (method_exists(get_parent_class(), 'clear_assign')) {
+    if (method_exists(parent::class, 'clear_assign')) {
       parent::clear_assign($tpl_var);
       return;
     }
@@ -213,7 +213,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @throws \SmartyException
    */
   public function template_exists($tpl_file) {
-    if (method_exists(get_parent_class(), 'template_exists')) {
+    if (method_exists(parent::class, 'template_exists')) {
       return parent::template_exists($tpl_file);
     }
     return parent::templateExists($tpl_file);
@@ -228,7 +228,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @throws \SmartyException
    */
   public function templateExists($resource_name) {
-    if (method_exists(get_parent_class(), 'templateExists')) {
+    if (method_exists(parent::class, 'templateExists')) {
       return parent::templateExists($resource_name);
     }
     return parent::template_exists($resource_name);
