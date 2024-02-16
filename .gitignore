@@ -44,6 +44,7 @@ CRM/Core/DAO/listAll.php
 bin/setup.conf
 civicrm-version.txt
 civicrm.config.php
+mixin/lib/pathload-0.php
 node_modules
 settings_location.php
 sql/case_sample.mysql

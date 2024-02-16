@@ -262,6 +262,10 @@
       "sms-counter": {
         "url": "https://github.com/danxexe/sms-counter/archive/master.zip",
         "ignore": ["examples"]
+      },
+      "pathload": {
+        "url": "https://raw.githubusercontent.com/totten/pathload-poc/f270aa1bda4b83031ec8af8450e12a2fb47c6358/dist/pathload-0.php",
+        "path": "mixin/lib/pathload-0.php"
       }
     },
     "patches-comments": "For information about defining patches via composer.json, see https://docs.civicrm.org/dev/en/latest/core/dependencies/",
