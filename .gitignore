@@ -1,6 +1,7 @@
 *~
 *.bak
 .use-civicrm-setup
+.composer-downloads
 /ext/*
 !/ext/afform
 !/ext/standaloneusers
