@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Phone;
 use Civi\Token\TokenProcessor;
 
 /**
@@ -58,7 +59,16 @@ trait CRM_Contact_Form_Task_SMSTrait {
       $form->_contactIds = [$cid];
     }
 
-    $to = $form->add('text', 'to', ts('To'), ['class' => 'huge'], TRUE);
+    $this->addAutocomplete('to', ts('Send to'), [
+      'entity' => 'Phone',
+      'api' => [
+        'fieldName' => 'id',
+        'select' => ['phone_number', 'contact_id.display_name'],
+      ],
+      'select' => ['multiple' => TRUE],
+      'class' => 'select2',
+    ], TRUE);
+
     $form->add('text', 'activity_subject', ts('Name The SMS'), ['class' => 'huge'], TRUE);
 
     $toSetDefault = TRUE;
@@ -68,12 +78,12 @@ trait CRM_Contact_Form_Task_SMSTrait {
 
     // when form is submitted recompute contactIds
     $allToSMS = [];
-    if ($to->getValue()) {
-      $allToPhone = explode(',', $to->getValue());
+    if ($this->isSubmitted()) {
+      $allToPhone = explode(',', $this->getSubmittedValue('to'));
 
       $form->_contactIds = [];
       foreach ($allToPhone as $value) {
-        list($contactId, $phone) = explode('::', $value);
+        [$contactId, $phone] = explode('::', $value);
         if ($contactId) {
           $form->_contactIds[] = $contactId;
           $form->_toContactPhone[] = $phone;
@@ -126,7 +136,8 @@ trait CRM_Contact_Form_Task_SMSTrait {
       }
     }
 
-    if (is_array($form->_contactIds) && !empty($form->_contactIds) && $toSetDefault) {
+    if (!empty($form->getContactIDs()) && $toSetDefault) {
+      $this->setToDefaults();
       $form->_contactDetails = civicrm_api3('Contact', 'get', [
         'id' => ['IN' => $form->_contactIds],
         'return' => ['sort_name', 'phone', 'do_not_sms', 'is_deceased', 'display_name'],
@@ -234,6 +245,17 @@ trait CRM_Contact_Form_Task_SMSTrait {
     }
 
     $form->addFormRule([__CLASS__, 'formRuleSms'], $form);
+  }
+
+  protected function setToDefaults(): void {
+    $phones = (array) Phone::get()
+      ->addWhere('contact_id', 'IN', $this->getContactIDs())
+      ->addWhere('contact_id.do_not_sms', '=', FALSE)
+      ->addWhere('contact_id.is_deceased', '=', FALSE)
+      ->addWhere('phone_numeric', '>', 0)
+      ->addWhere('is_primary', '=', TRUE)
+      ->execute()->indexBy('id');
+    $this->setDefaults(['to', array_keys($phones)]);
   }
 
   /**
