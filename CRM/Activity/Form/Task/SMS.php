@@ -64,4 +64,17 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
     $this->buildSmsForm();
   }
 
+  /**
+   * Get the relevant activity name.
+   *
+   * This is likely to be further refactored/ clarified.
+   *
+   * @internal
+   *
+   * @return string
+   */
+  protected function getActivityName() {
+    return 'SMS Received';
+  }
+
 }

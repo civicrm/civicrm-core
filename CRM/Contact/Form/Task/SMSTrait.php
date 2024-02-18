@@ -89,7 +89,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
       $validActivities = 0;
       foreach ($form->_activityHolderIds as $key => $id) {
         //valid activity check
-        if (CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $id, 'subject', 'id') != self::RECIEVED_SMS_ACTIVITY_SUBJECT) {
+        if (CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $id, 'subject', 'id') !== $this->getActivityName()) {
           $invalidActivity++;
           continue;
         }
@@ -147,7 +147,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
           //to check for "if the contact id belongs to a specified activity type"
           // @todo use the api instead - function is deprecated.
           $actDetails = CRM_Activity_BAO_Activity::getContactActivity($contactId);
-          if (self::RECIEVED_SMS_ACTIVITY_SUBJECT !=
+          if ($this->getActivityName() !==
             CRM_Utils_Array::retrieveValueRecursive($actDetails, 'subject')
           ) {
             $suppressedSms++;
@@ -333,7 +333,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
         }
         $status = '(' . ts('because no phone number on file or communication preferences specify DO NOT SMS or Contact is deceased');
         if (CRM_Utils_System::getClassName($form) == 'CRM_Activity_Form_Task_SMS') {
-          $status .= ' ' . ts("or the contact is not part of the activity '%1'", [1 => self::RECIEVED_SMS_ACTIVITY_SUBJECT]);
+          $status .= ' ' . ts("or the contact is not part of the activity '%1'", [1 => $this->getActivityName()]);
         }
         $status .= ')<ul><li>' . implode('</li><li>', $not_sent) . '</li></ul>';
         CRM_Core_Session::setStatus($status, ts('One Message Not Sent', [
