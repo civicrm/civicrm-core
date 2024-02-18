@@ -351,15 +351,26 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
   public function testEach($apiRequest, $rules, $expectSuccess) {
     $recs = $this->getFixtures();
 
-    // FIXME: It would be more realistic to use hook_civicrm_entityTypes() instead of calling this internal function.
-    \CRM_Core_DAO_AllCoreTables::registerEntityType('Widget', 'CRM_Fake_DAO_Widget', 'fake_widget');
+    $this->hookClass->setHook('civicrm_entityTypes', function (array &$entityTypes) {
+      $entityTypes['Widget'] = [
+        'name' => 'Widget',
+        'class' => 'CRM_Fake_DAO_Widget',
+        'table' => 'fake_widget',
+      ];
+      $entityTypes['Sprocket'] = [
+        'name' => 'Sprocket',
+        'class' => 'CRM_Fake_DAO_Sprocket',
+        'table' => 'fake_sprocket',
+      ];
+    });
+    \CRM_Core_DAO_AllCoreTables::flush();
+
     $widgetProvider = new \Civi\API\Provider\StaticProvider(3, 'Widget',
       ['id', 'widget_type', 'provider', 'title'],
       [],
       $recs['widget']
     );
 
-    \CRM_Core_DAO_AllCoreTables::registerEntityType('Sprocket', 'CRM_Fake_DAO_Sprocket', 'fake_sprocket');
     $sprocketProvider = new \Civi\API\Provider\StaticProvider(
       3,
       'Sprocket',

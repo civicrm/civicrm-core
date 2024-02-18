@@ -59,7 +59,7 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
-   * (Quasi-Private) Do not call externally (except for unit-testing)
+   * Add entity type to cached array.
    *
    * @param string $briefName
    * @param string $className
@@ -67,7 +67,7 @@ class CRM_Core_DAO_AllCoreTables {
    * @param string $fields_callback
    * @param string $links_callback
    */
-  public static function registerEntityType($briefName, $className, $tableName, $fields_callback = NULL, $links_callback = NULL) {
+  private static function registerEntityType($briefName, $className, $tableName, $fields_callback = NULL, $links_callback = NULL) {
     Civi::$statics[__CLASS__]['tables'][$tableName] = $briefName;
     Civi::$statics[__CLASS__]['classes'][$className] = $briefName;
     Civi::$statics[__CLASS__]['entities'][$briefName] = [
