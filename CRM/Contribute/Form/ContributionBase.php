@@ -928,6 +928,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       ->addSelect('product_id')
       ->addSelect('premiums_id.*')
       ->addWhere('product_id.is_active', '=', TRUE)
+      ->addWhere('premiums_id.premiums_active', '=', TRUE)
       ->addWhere('premiums_id.entity_id', '=', $this->getContributionPageID())
       ->addWhere('premiums_id.entity_table', '=', 'civicrm_contribution_page')
       ->addOrderBy('weight')
