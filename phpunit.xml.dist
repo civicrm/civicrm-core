@@ -10,7 +10,8 @@
          processIsolation="false"
          stopOnFailure="false"
          stderr="true"
-         beStrictAboutTestsThatDoNotTestAnything="false"
+         beStrictAboutTestsThatDoNotTestAnything="true"
+         failOnRisky="true"
          bootstrap="tests/phpunit/CiviTest/bootstrap.php"
          cacheResult="false"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
