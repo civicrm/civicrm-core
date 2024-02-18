@@ -1173,26 +1173,23 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Gets the names of all the tables in the schema.
+   * Gets the names of all enabled schema tables.
+   *
+   * - Includes tables from core, components & enabled extensions.
+   * - Excludes log tables, temp tables, and missing/disabled extensions.
    *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
   public static function getTableNames(): array {
-    $dao = CRM_Core_DAO::executeQuery(
-      "SELECT TABLE_NAME
-       FROM information_schema.TABLES
-       WHERE TABLE_SCHEMA = DATABASE()
-         AND TABLE_NAME LIKE 'civicrm_%'
-         AND TABLE_NAME NOT LIKE '%_tmp%'
-      ");
+    // CRM_Core_DAO_AllCoreTables returns all tables with a dao (core + extensions)
+    $daoTables = array_column(CRM_Core_DAO_AllCoreTables::getEntities(), 'table');
 
-    $values = [];
-    while ($dao->fetch()) {
-      $values[] = $dao->TABLE_NAME;
-    }
-    return $values;
+    // Include custom value tables
+    $customTables = array_column(CRM_Core_BAO_CustomGroup::getAll(), 'table_name');
+
+    return array_merge($daoTables, $customTables);
   }
 
   /**
