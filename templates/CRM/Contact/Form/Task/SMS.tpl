@@ -49,7 +49,7 @@
 
 </table>
 {include file="CRM/Contact/Form/Task/SMSCommon.tpl"}
-{include file="CRM/Mailing/Form/InsertTokens.tpl"}
+{include file="CRM/Mailing/Form/InsertTokens.tpl" templateSelected=false}
 
 <div class="spacer"> </div>
 
