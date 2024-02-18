@@ -158,7 +158,7 @@ abstract class AbstractEntity {
     if ($dao) {
       $info['paths'] = $dao::getEntityPaths();
       $info['primary_key'] = $dao::$_primaryKey;
-      $info['icon'] = $dao::$_icon;
+      $info['icon'] = $dao::getEntityIcon($entityName);
       $info['label_field'] = $dao::$_labelField;
       $info['dao'] = $dao;
       $info['table_name'] = $dao::getTableName();
