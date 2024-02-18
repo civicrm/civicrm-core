@@ -153,7 +153,7 @@ class CRM_Core_DAO extends DB_DataObject {
   public static function getEntityTitle() {
     $className = static::class;
     CRM_Core_Error::deprecatedWarning("$className needs to be regenerated. Missing getEntityTitle method.");
-    return CRM_Core_DAO_AllCoreTables::getBriefName($className);
+    return CRM_Core_DAO_AllCoreTables::getEntityNameForClass($className);
   }
 
   /**
@@ -1032,7 +1032,7 @@ class CRM_Core_DAO extends DB_DataObject {
     if ($className === 'CRM_Core_DAO') {
       throw new CRM_Core_Exception('Function writeRecord must be called on a subclass of CRM_Core_DAO');
     }
-    $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($className);
+    $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($className);
 
     // For legacy reasons, empty values would sometimes be passed around as the string 'null'.
     // The DAO treats 'null' the same as '', and an empty string makes a lot more sense!
@@ -1101,7 +1101,7 @@ class CRM_Core_DAO extends DB_DataObject {
     if ($className === 'CRM_Core_DAO') {
       throw new CRM_Core_Exception('Function deleteRecord must be called on a subclass of CRM_Core_DAO');
     }
-    $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($className);
+    $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($className);
     if (empty($record[$idField])) {
       throw new CRM_Core_Exception("Cannot delete {$entityName} with no $idField.");
     }
@@ -2033,7 +2033,7 @@ LIKE %1
       if (!$blockCopyofCustomValues) {
         $newObject->copyCustomFields($object->id, $newObject->id);
       }
-      CRM_Utils_Hook::post('create', CRM_Core_DAO_AllCoreTables::getBriefName($daoName), $newObject->id, $newObject);
+      CRM_Utils_Hook::post('create', CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoName), $newObject->id, $newObject);
     }
 
     return $newObject;
@@ -2115,7 +2115,7 @@ LIKE %1
    * @param string $parentOperation
    */
   public function copyCustomFields($entityID, $newEntityID, $parentOperation = NULL) {
-    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($this));
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($this));
     $tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(get_class($this));
     // Obtain custom values for the old entity.
     $customParams = $htmlType = [];
@@ -3272,7 +3272,7 @@ SELECT contact_id
   public static function getSelectWhereClause($tableAlias = NULL, $entityName = NULL, $conditions = []) {
     $bao = new static();
     $tableAlias ??= $bao->tableName();
-    $entityName ??= CRM_Core_DAO_AllCoreTables::getBriefName(get_class($bao));
+    $entityName ??= CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($bao));
     $finalClauses = [];
     $fields = static::getSupportedFields();
     $selectWhereClauses = $bao->addSelectWhereClause($entityName, NULL, $conditions);

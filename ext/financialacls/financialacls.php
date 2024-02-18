@@ -58,7 +58,7 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
   }
   if (in_array($objectName, ['LineItem', 'Product'], TRUE) && !empty($params['check_permissions'])) {
     if (empty($params['financial_type_id']) && !empty($params['id'])) {
-      $dao = CRM_Core_DAO_AllCoreTables::getFullName($objectName);
+      $dao = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($objectName);
       $params['financial_type_id'] = CRM_Core_DAO::getFieldValue($dao, $params['id'], 'financial_type_id');
     }
     $operationMap = ['delete' => CRM_Core_Action::DELETE, 'edit' => CRM_Core_Action::UPDATE, 'create' => CRM_Core_Action::ADD];

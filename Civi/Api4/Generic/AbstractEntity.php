@@ -130,7 +130,7 @@ abstract class AbstractEntity {
    * @return \CRM_Core_DAO|string|null
    */
   protected static function getDaoName(): ?string {
-    return \CRM_Core_DAO_AllCoreTables::getFullName(static::getEntityName());
+    return \CRM_Core_DAO_AllCoreTables::getDAONameForEntity(static::getEntityName());
   }
 
   /**

@@ -44,7 +44,7 @@ class CustomEntityProvider extends AutoService implements EventSubscriberInterfa
       $entityName = 'Custom_' . $customGroup['name'];
       $baseEntity = CRM_Core_BAO_CustomGroup::getEntityFromExtends($customGroup['extends']);
       // Lookup base entity info using DAO methods not CoreUtil to avoid early-bootstrap issues
-      $baseEntityDao = \CRM_Core_DAO_AllCoreTables::getFullName($baseEntity);
+      $baseEntityDao = \CRM_Core_DAO_AllCoreTables::getDAONameForEntity($baseEntity);
       $baseEntityTitle = $baseEntityDao ? $baseEntityDao::getEntityTitle(TRUE) : $baseEntity;
       $e->entities[$entityName] = [
         'name' => $entityName,

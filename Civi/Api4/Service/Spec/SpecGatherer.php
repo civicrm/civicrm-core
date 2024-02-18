@@ -191,7 +191,7 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
           $DAOField['html']['controlField'] = $entityTableColumn;
           // If we have a value for entity_table then this field can pretend to be a single FK too.
           if ($spec->hasValue($entityTableColumn) && $DAOField['DFKEntities']) {
-            $DAOField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getFullName($DAOField['DFKEntities'][$spec->getValue($entityTableColumn)]);
+            $DAOField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getDAONameForEntity($DAOField['DFKEntities'][$spec->getValue($entityTableColumn)]);
           }
           break;
         }

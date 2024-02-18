@@ -42,7 +42,7 @@ class CustomValueSpecProvider extends \Civi\Core\Service\AutoService implements 
     $groupName = CoreUtil::getCustomGroupName($spec->getEntity());
     $baseEntity = \CRM_Core_BAO_CustomGroup::getEntityForGroup($groupName);
     // Lookup base entity info using DAO methods not CoreUtil to avoid early-bootstrap issues
-    $baseEntityDao = \CRM_Core_DAO_AllCoreTables::getFullName($baseEntity);
+    $baseEntityDao = \CRM_Core_DAO_AllCoreTables::getDAONameForEntity($baseEntity);
     $baseEntityTitle = $baseEntityDao ? $baseEntityDao::getEntityTitle() : $baseEntity;
 
     $entityField = new FieldSpec('entity_id', $spec->getEntity(), 'Integer');
