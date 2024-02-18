@@ -161,7 +161,7 @@ abstract class AbstractEntity {
       $info['icon'] = $dao::$_icon;
       $info['label_field'] = $dao::$_labelField;
       $info['dao'] = $dao;
-      $info['table_name'] = $dao::$_tableName;
+      $info['table_name'] = $dao::getTableName();
       $info['icon_field'] = (array) ($dao::fields()['icon']['name'] ?? NULL);
       if (method_exists($dao, 'indices')) {
         foreach (\CRM_Utils_Array::findAll($dao::indices(FALSE), ['unique' => TRUE, 'localizable' => FALSE]) as $index) {

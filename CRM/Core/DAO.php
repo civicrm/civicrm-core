@@ -142,7 +142,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function __construct() {
     $this->initialize();
-    $this->__table = $this->getTableName();
+    $this->__table = $this::getLocaleTableName();
   }
 
   /**
@@ -184,10 +184,16 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Returns the name of this table
    *
+   * Name is not localized, which is generally fine because localization happens when executing the query:
+   * @see \CRM_Core_I18n_Schema::rewriteQuery()
+   *
+   * To get the localized name of this table,
+   * @see self::getLocaleTableName()
+   *
    * @return string
    */
   public static function getTableName() {
-    return self::getLocaleTableName(static::$_tableName ?? NULL);
+    return static::$_tableName ?? NULL;
   }
 
   /**
@@ -206,7 +212,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return array
    */
   public static function import($prefix = FALSE) {
-    return CRM_Core_DAO_AllCoreTables::getImports(static::class, substr(static::$_tableName, 8), $prefix);
+    return CRM_Core_DAO_AllCoreTables::getImports(static::class, substr(static::getTableName(), 8), $prefix);
   }
 
   /**
@@ -216,7 +222,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return array
    */
   public static function export($prefix = FALSE) {
-    return CRM_Core_DAO_AllCoreTables::getExports(static::class, substr(static::$_tableName, 8), $prefix);
+    return CRM_Core_DAO_AllCoreTables::getExports(static::class, substr(static::getTableName(), 8), $prefix);
   }
 
   /**
@@ -454,11 +460,20 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * @param string $tableName
+   * Get localized name of this table, if applicable.
+   *
+   * If this is a multi-language installation and the table has localized columns,
+   * will return table name with language string appended, which points to a sql view.
+   * Otherwise, this returns the same output as
+   * @see self::getTableName()
+   *
+   * @param string|null $tableName
+   *  Unnecessary deprecated param
    *
    * @return string
    */
-  public static function getLocaleTableName($tableName) {
+  public static function getLocaleTableName($tableName = NULL) {
+    $tableName ??= static::getTableName();
     global $dbLocale;
     if ($dbLocale) {
       $tables = CRM_Core_I18n_Schema::schemaStructureTables();
@@ -1048,7 +1063,7 @@ class CRM_Core_DAO extends DB_DataObject {
     $instance->save();
 
     if (!empty($record['custom']) && is_array($record['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($record['custom'], static::$_tableName, $instance->$idField, $op);
+      CRM_Core_BAO_CustomValueTable::store($record['custom'], static::getTableName(), $instance->$idField, $op);
     }
 
     \CRM_Utils_Hook::post($op, $entityName, $instance->$idField, $instance, $record);
