@@ -246,7 +246,8 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
   public static function on_civi_search_autocompleteDefault(\Civi\Core\Event\GenericHookEvent $e) {
-    if (!str_contains($e->formName, '_Form_Task_SMS') || !is_array($e->savedSearch) || $e->savedSearch['api_entity'] !== 'Phone') {
+    $formName = $e->formName ?? '';
+    if (!str_contains($formName, '_Form_Task_SMS') || !is_array($e->savedSearch) || $e->savedSearch['api_entity'] !== 'Phone') {
       return;
     }
     $e->savedSearch['api_params'] = [
