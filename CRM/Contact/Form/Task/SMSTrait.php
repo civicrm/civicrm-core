@@ -17,7 +17,6 @@
 use Civi\Api4\Activity;
 use Civi\API\EntityLookupTrait;
 use Civi\Api4\Phone;
-use Civi\Api4\Activity;
 use Civi\Token\TokenProcessor;
 
 /**
@@ -70,6 +69,37 @@ trait CRM_Contact_Form_Task_SMSTrait {
     unset($smsProviderParams['sms_text_message']);
     $smsProviderParams['provider_id'] = $this->getSubmittedValue('sms_provider_id');
     return $smsProviderParams;
+  }
+
+  /**
+   * Get the array of contacts to SMS.
+   *
+   * Eg
+   * [['contact_id' => 3, 'phone' => 911], ['contact_id' => 4, 'phone' => 111]]
+   *
+   * @return array
+   */
+  public function getSMSContactDetails(): array {
+    // format contact details array to handle multiple sms from same contact
+    $formattedContactDetails = [];
+    $tempPhones = [];
+    foreach ($this->_contactIds as $key => $contactId) {
+      $phone = $this->_toContactPhone[$key];
+
+      if ($phone) {
+        $phoneKey = "{$contactId}::{$phone}";
+        if (!in_array($phoneKey, $tempPhones)) {
+          $tempPhones[] = $phoneKey;
+          if (!empty($this->_contactDetails[$contactId])) {
+            $formattedContactDetails[] = [
+              'contact_id' => $contactId,
+              'phone' => $phone
+            ];
+          }
+        }
+      }
+    }
+    return $formattedContactDetails;
   }
 
   protected function bounceOnNoActiveProviders(): void {
@@ -211,7 +241,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
    *
    * @internal likely to change.
    */
-  protected function postProcessSms() {
+  protected function postProcessSms(): void {
     $form = $this;
     $thisValues = $form->controller->exportValues($form->getName());
 
@@ -228,44 +258,17 @@ trait CRM_Contact_Form_Task_SMSTrait {
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
 
-      if (!empty($thisValues['SMStemplate']) && !empty($thisValues['SMSupdateTemplate'])) {
-        $messageTemplate['id'] = $thisValues['SMStemplate'];
+      if ($this->getSubmittedValue('SMStemplate') && $this->getSubmittedValue('SMSupdateTemplate')) {
+        $messageTemplate['id'] = $this->getSubmittedValue('SMStemplate');
         unset($messageTemplate['msg_title']);
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
-      }
-    }
-
-    // format contact details array to handle multiple sms from same contact
-    $formattedContactDetails = $contactIds = [];
-    $tempPhones = [];
-    $phonesToSendTo = explode(',', $this->getSubmittedValue('to'));
-    $contactIds = $phones = [];
-    foreach ($phonesToSendTo as $phone) {
-      [$contactId, $phone] = explode('::', $phone);
-      if ($contactId) {
-        $contactIds[] = $contactId;
-        $phones[] = $phone;
-      }
-    }
-    foreach ($contactIds as $key => $contactId) {
-      $phone = $phones[$key];
-
-      if ($phone) {
-        $phoneKey = "{$contactId}::{$phone}";
-        if (!in_array($phoneKey, $tempPhones)) {
-          $tempPhones[] = $phoneKey;
-          if (!empty($form->_contactDetails[$contactId])) {
-            $formattedContactDetails[] = $form->_contactDetails[$contactId];
-            $contactIds[] = $contactId;
-          }
-        }
       }
     }
 
     $contactIds = array_keys($form->_contactDetails);
     $allContactIds = array_keys($form->_allContactDetails);
 
-    [$errors, $countSuccess] = $this->sendSMS($formattedContactDetails);
+    [$errors, $countSuccess] = $this->sendSMS();
 
     if ($countSuccess > 0) {
       CRM_Core_Session::setStatus(ts('One message was sent successfully.', [
@@ -312,14 +315,12 @@ trait CRM_Contact_Form_Task_SMSTrait {
   }
 
   /**
-   * Send SMS.  Returns: bool $sent, int $activityId, int $success (number of sent SMS)
+   * Send SMS.
    *
-   * @param array $contactDetails
-   *
-   * @return array(bool $sent, int $activityId, int $success)
+   * @return array(array $error, int $successCount)
    * @throws CRM_Core_Exception
    */
-  protected function sendSMS(array $contactDetails) {
+  protected function sendSMS(): array {
 
     // Create the meta level record first ( sms activity )
     $activityID = Activity::create()->setValues([
@@ -333,7 +334,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
 
     $success = 0;
     $errors = [];
-    foreach ($contactDetails as $contact) {
+    foreach ($this->getSMSContactDetails() as $contact) {
       $contactId = $contact['contact_id'];
       $tokenText = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_text' => $this->getSubmittedValue('sms_text_message')], 'contactId' => $contactId, 'disableSmarty' => TRUE])['text'];
       try {
