@@ -61,7 +61,6 @@ trait CRM_Contact_Form_Task_SMSTrait {
   }
 
   /**
-<<<<<<< HEAD
    * Get phones to SMS.
    *
    * @internal
@@ -83,7 +82,9 @@ trait CRM_Contact_Form_Task_SMSTrait {
         ->execute()->indexBy('contact_id');
     }
     return $this->phones;
-=======
+  }
+
+  /**
    * Get the array of contacts to SMS.
    *
    * Eg
@@ -93,26 +94,15 @@ trait CRM_Contact_Form_Task_SMSTrait {
    */
   public function getSMSContactDetails(): array {
     // format contact details array to handle multiple sms from same contact
-    $formattedContactDetails = [];
-    $tempPhones = [];
-    foreach ($this->_contactIds as $key => $contactId) {
-      $phone = $this->_toContactPhone[$key];
-
-      if ($phone) {
-        $phoneKey = "{$contactId}::{$phone}";
-        if (!in_array($phoneKey, $tempPhones)) {
-          $tempPhones[] = $phoneKey;
-          if (!empty($this->_contactDetails[$contactId])) {
-            $formattedContactDetails[] = [
-              'contact_id' => $contactId,
-              'phone' => $phone
-            ];
-          }
-        }
-      }
+    $contactDetails = [];
+    $phonesToSendTo = explode(',', $this->getSubmittedValue('to'));
+    foreach ($phonesToSendTo as $phoneID) {
+      $contactDetails[] = [
+        'contact_id' => $this->lookup('Phone' . $phoneID, 'contact_id'),
+        'phone' => $this->lookup('Phone' . $phoneID, 'phone_numeric'),
+      ];
     }
-    return $formattedContactDetails;
->>>>>>> fe85934372 (Extract function to get Contact details)
+    return $contactDetails;
   }
 
   protected function bounceOnNoActiveProviders(): void {
