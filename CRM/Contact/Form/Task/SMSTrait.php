@@ -57,6 +57,21 @@ trait CRM_Contact_Form_Task_SMSTrait {
       ->execute()->indexBy('id');
   }
 
+
+  /**
+   * Get SMS provider parameters.
+   *
+   * @return array
+   */
+  protected function getSmsProviderParams(): array {
+    // $smsParams carries all the arguments provided on form (or via hooks), to the provider->send() method
+    // this gives flexibility to the users / implementors to add their own args via hooks specific to their sms providers
+    $smsProviderParams = $this->getSubmittedValues();
+    unset($smsProviderParams['sms_text_message']);
+    $smsProviderParams['provider_id'] = $this->getSubmittedValue('sms_provider_id');
+    return $smsProviderParams;
+  }
+
   protected function bounceOnNoActiveProviders(): void {
     $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
     if (!$providersCount) {
@@ -200,8 +215,6 @@ trait CRM_Contact_Form_Task_SMSTrait {
     $form = $this;
     $thisValues = $form->controller->exportValues($form->getName());
 
-    $fromSmsProviderId = $thisValues['sms_provider_id'];
-
     // process message template
     if (!empty($thisValues['SMSsaveTemplate']) || !empty($thisValues['SMSupdateTemplate'])) {
       $messageTemplate = [
@@ -249,13 +262,10 @@ trait CRM_Contact_Form_Task_SMSTrait {
       }
     }
 
-    // $smsParams carries all the arguments provided on form (or via hooks), to the provider->send() method
-    // this gives flexibity to the users / implementors to add their own args via hooks specific to their sms providers
-    $smsParams = $thisValues;
-    unset($smsParams['sms_text_message']);
-    $smsParams['provider_id'] = $fromSmsProviderId;
+    $contactIds = array_keys($form->_contactDetails);
+    $allContactIds = array_keys($form->_allContactDetails);
 
-    [$sent, $countSuccess] = $this->sendSMS($formattedContactDetails, $smsParams);
+    [$sent, $countSuccess] = $this->sendSMS($formattedContactDetails);
 
     if ($countSuccess > 0) {
       CRM_Core_Session::setStatus(ts('One message was sent successfully.', [
@@ -305,15 +315,11 @@ trait CRM_Contact_Form_Task_SMSTrait {
    * Send SMS.  Returns: bool $sent, int $activityId, int $success (number of sent SMS)
    *
    * @param array $contactDetails
-   * @param array $smsProviderParams
    *
    * @return array(bool $sent, int $activityId, int $success)
    * @throws CRM_Core_Exception
    */
-  protected function sendSMS(
-    array $contactDetails,
-    array $smsProviderParams
-  ) {
+  protected function sendSMS(array $contactDetails) {
 
     // Create the meta level record first ( sms activity )
     $activityID = Activity::create()->setValues([
@@ -330,13 +336,11 @@ trait CRM_Contact_Form_Task_SMSTrait {
     foreach ($contactDetails as $contact) {
       $contactId = $contact['contact_id'];
       $tokenText = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_text' => $this->getSubmittedValue('sms_text_message')], 'contactId' => $contactId, 'disableSmarty' => TRUE])['text'];
-
-      $smsProviderParams['To'] = $contact['phone'];
       try {
-        $sendResult = CRM_Activity_BAO_Activity::sendSMSMessage(
+        CRM_Activity_BAO_Activity::sendSMSMessage(
           $contactId,
           $tokenText,
-          $smsProviderParams,
+          $this->getSmsProviderParams() + ['To' => $contact['phone']],
           $activityID,
           CRM_Core_Session::getLoggedInContactID()
         );
