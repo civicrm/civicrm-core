@@ -714,26 +714,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Parse html through Smarty resolving any smarty functions.
-   * @param string $tokenHtml
-   * @param array $entity
-   * @param string $entityType
-   * @return string
-   *   html parsed through smarty
-   * @deprecated
-   */
-  public static function parseThroughSmarty($tokenHtml, $entity, $entityType = 'contact') {
-    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
-    if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
-      $smarty = CRM_Core_Smarty::singleton();
-      // also add the tokens to the template
-      $smarty->assign_by_ref($entityType, $entity);
-      $tokenHtml = $smarty->fetch("string:$tokenHtml");
-    }
-    return $tokenHtml;
-  }
-
-  /**
    * Do not use, unused in core.
    *
    * @deprecated
