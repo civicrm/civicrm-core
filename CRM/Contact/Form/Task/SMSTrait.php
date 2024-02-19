@@ -257,7 +257,6 @@ trait CRM_Contact_Form_Task_SMSTrait {
     [$sent, $countSuccess] = $this->sendSMS($formattedContactDetails,
       $thisValues,
       $smsParams,
-      $contactIds
     );
 
     if ($countSuccess > 0) {
@@ -310,37 +309,15 @@ trait CRM_Contact_Form_Task_SMSTrait {
    * @param array $contactDetails
    * @param array $activityParams
    * @param array $smsProviderParams
-   * @param array $contactIds
    *
    * @return array(bool $sent, int $activityId, int $success)
    * @throws CRM_Core_Exception
    */
   protected function sendSMS(
-    &$contactDetails,
-    &$activityParams,
-    &$smsProviderParams = [],
-    &$contactIds = NULL
+    array $contactDetails,
+    array $activityParams,
+    array $smsProviderParams
   ) {
-
-    if (!isset($contactDetails) && !isset($contactIds)) {
-      throw new CRM_Core_Exception('You must specify either $contactDetails or $contactIds');
-    }
-    // Populate $contactDetails and $contactIds if only one is set
-    if (is_array($contactIds) && !empty($contactIds) && empty($contactDetails)) {
-      foreach ($contactIds as $id) {
-        try {
-          $contactDetails[] = civicrm_api3('Contact', 'getsingle', ['contact_id' => $id]);
-        }
-        catch (Exception $e) {
-          // Contact Id doesn't exist
-        }
-      }
-    }
-    elseif (is_array($contactDetails) && !empty($contactDetails) && empty($contactIds)) {
-      foreach ($contactDetails as $contact) {
-        $contactIds[] = $contact['contact_id'];
-      }
-    }
 
     $text = &$activityParams['sms_text_message'];
 
