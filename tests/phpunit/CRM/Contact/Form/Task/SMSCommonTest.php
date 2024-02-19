@@ -99,6 +99,8 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
 
   /**
    * Test to ensure SMS Activity QuickForm displays the right phone numbers.
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function testQuickFormMobileNumbersDisplay(): void {
     $this->createLoggedInUser();
