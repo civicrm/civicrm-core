@@ -2676,6 +2676,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             'displayName' => $displayName,
             'currentDate' => date('r'),
             'contactLink' => $contactLink,
+            'uf_group_id' => $values['id'],
           ],
           'from' => "$domainEmailName <$domainEmailAddress>",
           'toEmail' => $emailTo,
