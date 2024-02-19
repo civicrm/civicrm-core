@@ -240,4 +240,37 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
     return (bool) self::deleteRecord(['id' => $id]);
   }
 
+  /**
+   * Customize search criteria for SMS autocompletes
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  public static function on_civi_search_autocompleteDefault(\Civi\Core\Event\GenericHookEvent $e) {
+    $formName = $e->formName ?? '';
+    if (!str_contains($formName, '_Form_Task_SMS') || !is_array($e->savedSearch) || $e->savedSearch['api_entity'] !== 'Phone') {
+      return;
+    }
+    $e->savedSearch['api_params'] = [
+      'version' => 4,
+      'select' => [
+        'id',
+        'phone',
+        'phone_numeric',
+        'phone_type_id:label',
+        'location_type_id:label',
+        'contact_id.sort_name',
+      ],
+      'orderBy' => [],
+      'where' => [
+        ['phone_type_id:name', '=', 'Mobile'],
+        ['contact_id.is_deleted', '=', FALSE],
+        ['contact_id.is_deceased', '=', FALSE],
+        ['contact_id.do_not_sms', '=', FALSE],
+      ],
+      'groupBy' => [],
+      'join' => [],
+      'having' => [],
+    ];
+  }
+
 }

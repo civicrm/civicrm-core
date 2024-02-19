@@ -61,9 +61,20 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
-    // Enable form element.
-    $this->assign('SMSTask', TRUE);
-    CRM_Contact_Form_Task_SMSCommon::buildQuickForm($this);
+    $this->buildSmsForm();
+  }
+
+  /**
+   * Get the relevant activity name.
+   *
+   * This is likely to be further refactored/ clarified.
+   *
+   * @internal
+   *
+   * @return string
+   */
+  protected function getActivityName() {
+    return 'SMS Received';
   }
 
 }
