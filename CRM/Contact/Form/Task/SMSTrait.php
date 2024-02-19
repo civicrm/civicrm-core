@@ -362,26 +362,18 @@ trait CRM_Contact_Form_Task_SMSTrait {
       else {
         $smsProviderParams['To'] = '';
       }
-
-      $doNotSms = $contact['do_not_sms'] ?? 0;
-
-      if ($doNotSms) {
-        $errMsgs[] = PEAR::raiseError('Contact Does not accept SMS', NULL, PEAR_ERROR_RETURN);
+      try {
+        $sendResult = CRM_Activity_BAO_Activity::sendSMSMessage(
+          $contactId,
+          $tokenText,
+          $smsProviderParams,
+          $activityID,
+          CRM_Core_Session::getLoggedInContactID()
+        );
+        $success++;
       }
-      else {
-        try {
-          $sendResult = CRM_Activity_BAO_Activity::sendSMSMessage(
-            $contactId,
-            $tokenText,
-            $smsProviderParams,
-            $activityID,
-            CRM_Core_Session::getLoggedInContactID()
-          );
-          $success++;
-        }
-        catch (CRM_Core_Exception $e) {
-          $errMsgs[] = $e->getMessage();
-        }
+      catch (CRM_Core_Exception $e) {
+        $errMsgs[] = $e->getMessage();
       }
     }
 
