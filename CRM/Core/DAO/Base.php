@@ -50,6 +50,10 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
   public static function getEntityDescription(): ?string {
     $definition = static::getEntityDefinition();
     $description = (string) ($definition->comment ?? NULL);
+    if (!$description && static::class === 'CRM_Core_DAO_Email') {
+      print "DEBUG CRM_Core_DAO_Email\n";
+      print_r($definition);
+    }
     return $description ? static::_ts($description) : NULL;
   }
 
