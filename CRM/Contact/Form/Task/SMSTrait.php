@@ -41,6 +41,9 @@ trait CRM_Contact_Form_Task_SMSTrait {
    * @internal - highly likely to change!
    */
   protected function buildSmsForm() {
+    if (!CRM_Core_Permission::check('send SMS')) {
+      throw new CRM_Core_Exception("You do not have the 'send SMS' permission");
+    }
     $form = $this;
     $toArray = [];
 
@@ -293,7 +296,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
     $contactIds = array_keys($form->_contactDetails);
     $allContactIds = array_keys($form->_allContactDetails);
 
-    [$sent, $activityId, $countSuccess] = CRM_Activity_BAO_Activity::sendSMS($formattedContactDetails,
+    [$sent, $activityId, $countSuccess] = $this->sendSMS($formattedContactDetails,
       $thisValues,
       $smsParams,
       $contactIds
@@ -342,6 +345,116 @@ trait CRM_Contact_Form_Task_SMSTrait {
         ]), 'info');
       }
     }
+  }
+
+  /**
+   * Send SMS.  Returns: bool $sent, int $activityId, int $success (number of sent SMS)
+   *
+   * @param array $contactDetails
+   * @param array $activityParams
+   * @param array $smsProviderParams
+   * @param array $contactIds
+   * @param int $sourceContactId This is the source contact Id
+   *
+   * @return array(bool $sent, int $activityId, int $success)
+   * @throws CRM_Core_Exception
+   */
+  protected function sendSMS(
+    &$contactDetails,
+    &$activityParams,
+    &$smsProviderParams = [],
+    &$contactIds = NULL,
+    $sourceContactId = NULL
+  ) {
+
+    if (!isset($contactDetails) && !isset($contactIds)) {
+      throw new CRM_Core_Exception('You must specify either $contactDetails or $contactIds');
+    }
+    // Populate $contactDetails and $contactIds if only one is set
+    if (is_array($contactIds) && !empty($contactIds) && empty($contactDetails)) {
+      foreach ($contactIds as $id) {
+        try {
+          $contactDetails[] = civicrm_api3('Contact', 'getsingle', ['contact_id' => $id]);
+        }
+        catch (Exception $e) {
+          // Contact Id doesn't exist
+        }
+      }
+    }
+    elseif (is_array($contactDetails) && !empty($contactDetails) && empty($contactIds)) {
+      foreach ($contactDetails as $contact) {
+        $contactIds[] = $contact['contact_id'];
+      }
+    }
+
+    // Get logged in User Id
+    if (empty($sourceContactId)) {
+      $sourceContactId = CRM_Core_Session::getLoggedInContactID();
+    }
+
+    $text = &$activityParams['sms_text_message'];
+
+    // Create the meta level record first ( sms activity )
+    $activityParams = [
+      'source_contact_id' => $sourceContactId,
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS'),
+      'activity_date_time' => date('YmdHis'),
+      'subject' => $activityParams['activity_subject'],
+      'details' => $text,
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
+    ];
+    $activity = CRM_Activity_BAO_Activity::create($activityParams);
+    $activityID = $activity->id;
+
+    $success = 0;
+    $errMsgs = [];
+    foreach ($contactDetails as $contact) {
+      $contactId = $contact['contact_id'];
+      $tokenText = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_text' => $text], 'contactId' => $contactId, 'disableSmarty' => TRUE])['text'];
+
+      // Only send if the phone is of type mobile
+      if ($contact['phone_type_id'] == CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile')) {
+        $smsProviderParams['To'] = $contact['phone'];
+      }
+      else {
+        $smsProviderParams['To'] = '';
+      }
+
+      $doNotSms = $contact['do_not_sms'] ?? 0;
+
+      if ($doNotSms) {
+        $errMsgs[] = PEAR::raiseError('Contact Does not accept SMS', NULL, PEAR_ERROR_RETURN);
+      }
+      else {
+        try {
+          $sendResult = CRM_Activity_BAO_Activity::sendSMSMessage(
+            $contactId,
+            $tokenText,
+            $smsProviderParams,
+            $activityID,
+            $sourceContactId
+          );
+          $success++;
+        }
+        catch (CRM_Core_Exception $e) {
+          $errMsgs[] = $e->getMessage();
+        }
+      }
+    }
+
+    // If at least one message was sent and no errors
+    // were generated then return a boolean value of TRUE.
+    // Otherwise, return FALSE (no messages sent) or
+    // and array of 1 or more PEAR_Error objects.
+    $sent = FALSE;
+    if ($success > 0 && count($errMsgs) == 0) {
+      $sent = TRUE;
+    }
+    elseif (count($errMsgs) > 0) {
+      $sent = $errMsgs;
+    }
+
+    return [$sent, $activity->id, $success];
   }
 
   /**
