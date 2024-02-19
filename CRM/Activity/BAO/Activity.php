@@ -1161,6 +1161,12 @@ WHERE entity_id =%1 AND entity_table = %2";
    * @param array $contactIds
    * @param int $sourceContactId This is the source contact Id
    *
+   * @deprecated since 5.71.
+   *
+   * This function has no core usage. There is some non-core usage. At some point
+   * we should add a suitable api & noisily deprecate this / set an tentative
+   * removal date.
+   *
    * @return array(bool $sent, int $activityId, int $success)
    * @throws CRM_Core_Exception
    */
