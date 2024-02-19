@@ -80,7 +80,7 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
   /**
    * @throws \CRM_Core_Exception
    */
-  protected function filterContactIDs(): void {
+  protected function addContactIDs(): void {
     $form = $this;
     if (!empty($this->_activityHolderIds)) {
       $extendTargetContacts = 0;
@@ -103,7 +103,7 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
           continue;
         }
         $validActivities++;
-        $form->_contactIds = empty($form->_contactIds) ? $ids : array_unique(array_merge($form->_contactIds, $ids));
+        $form->_contactIds = array_unique(array_merge((array) $form->_contactIds, $ids));
       }
 
       if (!$validActivities) {
@@ -136,6 +136,17 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
     $actDetails = CRM_Activity_BAO_Activity::getContactActivity($contactID);
     return $this->getActivityName() !==
       CRM_Utils_Array::retrieveValueRecursive($actDetails, 'subject');
+  }
+
+  /**
+   * Get additional form-specific invalid status message.
+   *
+   * @internal
+   *
+   * @return string
+   */
+  protected function getInvalidMessage(): string {
+    return ' ' . ts("or the contact is not part of the activity '%1'", [1 => $this->getActivityName()]);
   }
 
 }
