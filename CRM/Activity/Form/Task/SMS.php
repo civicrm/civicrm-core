@@ -130,4 +130,16 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
     $form->assign('extendTargetContacts', $extendTargetContacts ?? NULL);
   }
 
+  protected function isInvalidRecipient($contactID): bool {
+    //to check for "if the contact id belongs to a specified activity type"
+    // @todo use the api instead - function is deprecated.
+    $actDetails = CRM_Activity_BAO_Activity::getContactActivity($contactID);
+    if ($this->getActivityName() !==
+      CRM_Utils_Array::retrieveValueRecursive($actDetails, 'subject')
+    ) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
