@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Activity;
 use Civi\Api4\ActivityContact;
 use Civi\Api4\Contribution;
 
@@ -1211,8 +1212,7 @@ WHERE entity_id =%1 AND entity_table = %2";
       'details' => $text,
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
     ];
-    $activity = self::create($activityParams);
-    $activityID = $activity->id;
+    $activityID = Activity::create(FALSE)->setValues($activityParams)->execute()->first()['id'];
 
     $success = 0;
     $errMsgs = [];
@@ -1262,7 +1262,7 @@ WHERE entity_id =%1 AND entity_table = %2";
       $sent = $errMsgs;
     }
 
-    return [$sent, $activity->id, $success];
+    return [$sent, $activityID, $success];
   }
 
   /**
