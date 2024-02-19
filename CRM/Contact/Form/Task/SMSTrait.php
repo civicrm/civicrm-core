@@ -28,6 +28,12 @@ trait CRM_Contact_Form_Task_SMSTrait {
     $this->postProcessSms();
   }
 
+  /**
+   */
+  protected function filterContactIDs(): void {
+    // Activity sub class does this.
+  }
+
   protected function bounceOnNoActiveProviders(): void {
     $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
     if (!$providersCount) {
@@ -83,48 +89,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
     }
 
     //get the group of contacts as per selected by user in case of Find Activities
-    if (!empty($form->_activityHolderIds)) {
-      $extendTargetContacts = 0;
-      $invalidActivity = 0;
-      $validActivities = 0;
-      foreach ($form->_activityHolderIds as $key => $id) {
-        //valid activity check
-        if (CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $id, 'subject', 'id') !== $this->getActivityName()) {
-          $invalidActivity++;
-          continue;
-        }
-
-        $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-        $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-        //target contacts limit check
-        $ids = array_keys(CRM_Activity_BAO_ActivityContact::getNames($id, $targetID));
-
-        if (count($ids) > 1) {
-          $extendTargetContacts++;
-          continue;
-        }
-        $validActivities++;
-        $form->_contactIds = empty($form->_contactIds) ? $ids : array_unique(array_merge($form->_contactIds, $ids));
-      }
-
-      if (!$validActivities) {
-        $errorMess = "";
-        if ($extendTargetContacts) {
-          $errorMess = ts('One selected activity consists of more than one target contact.', [
-            'count' => $extendTargetContacts,
-            'plural' => '%count selected activities consist of more than one target contact.',
-          ]);
-        }
-        if ($invalidActivity) {
-          $errorMess = ($errorMess ? ' ' : '');
-          $errorMess .= ts('The selected activity is invalid.', [
-            'count' => $invalidActivity,
-            'plural' => '%count selected activities are invalid.',
-          ]);
-        }
-        CRM_Core_Error::statusBounce(ts("%1: SMS Reply will not be sent.", [1 => $errorMess]));
-      }
-    }
+    $this->filterContactIDs();
 
     if (is_array($form->_contactIds) && !empty($form->_contactIds) && $toSetDefault) {
       $form->_contactDetails = civicrm_api3('Contact', 'get', [
@@ -203,8 +168,8 @@ trait CRM_Contact_Form_Task_SMSTrait {
     }
 
     //activity related variables
-    $form->assign('invalidActivity', $invalidActivity ?? NULL);
-    $form->assign('extendTargetContacts', $extendTargetContacts ?? NULL);
+    $form->addExpectedSmartyVariable('invalidActivity');
+    $form->addExpectedSmartyVariable('extendTargetContacts');
 
     $form->assign('toContact', json_encode($toArray));
     $form->assign('suppressedSms', $suppressedSms);
