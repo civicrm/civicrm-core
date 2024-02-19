@@ -46,17 +46,17 @@
     <td class="crm-participant-event_title"><a href="{crmURL p='civicrm/event/info' q="id=`$row.event_id`&reset=1"}" title="{ts}View event info page{/ts}">{$row.event_title|smarty:nodefaults|purify}</a>
         {if !empty($contactId)}<br /><a href="{crmURL p='civicrm/event/search' q="reset=1&force=1&event=`$row.event_id`"}" title="{ts}List participants for this event (all statuses){/ts}">({ts}participants{/ts})</a>{/if}
     </td>
-    {assign var="participant_id" value=$row.participant_id}
-    {if $lineItems.$participant_id}
-        <td>
+    <td class="crm-participant-participant_fee_level">
+      {assign var="participant_id" value=$row.participant_id}
+      {if $lineItems.$participant_id}
         {foreach from=$lineItems.$participant_id item=line name=lineItemsIter}
-      {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if}: {$line.qty}
-            {if ! $smarty.foreach.lineItemsIter.last}<br />{/if}
+          {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if}: {$line.qty}
+          {if ! $smarty.foreach.lineItemsIter.last}<br />{/if}
         {/foreach}
-        </td>
-    {else}
-        <td class="crm-participant-participant_fee_level">{if !$row.paid && (!array_key_exists('participant_fee_level', $row) || !$row.participant_fee_level)} {ts}(no fee){/ts}{elseif array_key_exists('participant_fee_level', $row)}{$row.participant_fee_level}{/if}</td>
-    {/if}
+      {else}
+        {if !$row.paid && (!array_key_exists('participant_fee_level', $row) || !$row.participant_fee_level)} {ts}(no fee){/ts}{elseif array_key_exists('participant_fee_level', $row)}{$row.participant_fee_level}{/if}
+      {/if}
+    <td>
     <td class="right nowrap crm-participant-participant_fee_amount">{if array_key_exists('participant_fee_amount', $row)}{$row.participant_fee_amount|crmMoney:$row.participant_fee_currency}{/if}</td>
     <td class="crm-participant-participant_register_date">{$row.participant_register_date|truncate:10:''|crmDate}</td>
     <td class="crm-participant-event_start_date">{$row.event_start_date|truncate:10:''|crmDate}
