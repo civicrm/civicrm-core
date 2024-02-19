@@ -201,8 +201,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
         'lat' => (float ) ($maxLat - $minLat),
         'lng' => (float ) ($maxLng - $minLng),
       ];
-      $this->assign_by_ref('center', $center);
-      $this->assign_by_ref('span', $span);
+      $this->assign('center', $center);
+      $this->assign('span', $span);
       if ($action == CRM_Core_Action::PREVIEW) {
         $mapURL = CRM_Utils_System::url('civicrm/contact/map/event',
           "eid={$this->_id}&reset=1&action=preview",
