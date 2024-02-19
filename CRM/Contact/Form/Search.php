@@ -430,7 +430,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
         // set the group title
         $groupValues = ['id' => $this->_groupID, 'title' => $this->_group[$this->_groupID]];
-        $this->assign_by_ref('group', $groupValues);
+        $this->assign('group', $groupValues);
 
         // also set ssID if this is a saved search
         $ssID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_groupID, 'saved_search_id');
@@ -471,7 +471,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->setTitle(ts('Add to Group: %1', [1 => $this->_group[$this->_amtgID]]));
       // also set the group title and freeze the action task with Add Members to Group
       $groupValues = ['id' => $this->_amtgID, 'title' => $this->_group[$this->_amtgID]];
-      $this->assign_by_ref('group', $groupValues);
+      $this->assign('group', $groupValues);
       $this->add('xbutton', $this->_actionButtonName, ts('Add Contacts to %1', [1 => $this->_group[$this->_amtgID]]),
         [
           'type' => 'submit',
@@ -495,7 +495,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $selectedContactIds = array_keys($selectedContactIdsArr[$qfKeyParam]);
     }
 
-    $this->assign_by_ref('selectedContactIds', $selectedContactIds);
+    $this->assign('selectedContactIds', $selectedContactIds);
 
     $rows = $this->get('rows');
 

@@ -319,8 +319,8 @@ class CRM_Core_Selector_Controller {
       }
       else {
         // assign to template and display them.
-        self::$_template->assign_by_ref('rows', $rows);
-        self::$_template->assign_by_ref('columnHeaders', $columnHeaders);
+        self::$_template->assign('rows', $rows);
+        self::$_template->assign('columnHeaders', $columnHeaders);
       }
     }
     else {
@@ -359,11 +359,11 @@ class CRM_Core_Selector_Controller {
         $this->_store->set("{$this->_prefix}summary", $summary);
       }
       else {
-        self::$_template->assign_by_ref("{$this->_prefix}pager", $this->_pager);
-        self::$_template->assign_by_ref("{$this->_prefix}sort", $this->_sort);
+        self::$_template->assign("{$this->_prefix}pager", $this->_pager);
+        self::$_template->assign("{$this->_prefix}sort", $this->_sort);
 
-        self::$_template->assign_by_ref("{$this->_prefix}columnHeaders", $finalColumnHeaders);
-        self::$_template->assign_by_ref("{$this->_prefix}rows", $rows);
+        self::$_template->assign("{$this->_prefix}columnHeaders", $finalColumnHeaders);
+        self::$_template->assign("{$this->_prefix}rows", $rows);
         self::$_template->assign("{$this->_prefix}rowsEmpty", !$rows);
         self::$_template->assign("{$this->_prefix}qill", $qill);
         self::$_template->assign("{$this->_prefix}summary", $summary);
@@ -450,7 +450,7 @@ class CRM_Core_Selector_Controller {
    * @return void
    */
   public function moveFromSessionToTemplate() {
-    self::$_template->assign_by_ref("{$this->_prefix}pager", $this->_pager);
+    self::$_template->assign("{$this->_prefix}pager", $this->_pager);
 
     $rows = $this->_store->get("{$this->_prefix}rows");
 
@@ -464,7 +464,7 @@ class CRM_Core_Selector_Controller {
       );
     }
 
-    self::$_template->assign_by_ref("{$this->_prefix}sort", $this->_sort);
+    self::$_template->assign("{$this->_prefix}sort", $this->_sort);
     $columnHeaders = (array) $this->_store->get("{$this->_prefix}columnHeaders");
     foreach ($columnHeaders as $index => $columnHeader) {
       // Fill out the keys to avoid e-notices.
