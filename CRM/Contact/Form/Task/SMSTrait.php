@@ -330,13 +330,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
       $contactId = $contact['contact_id'];
       $tokenText = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_text' => $this->getSubmittedValue('sms_text_message')], 'contactId' => $contactId, 'disableSmarty' => TRUE])['text'];
 
-      // Only send if the phone is of type mobile
-      if ($contact['phone_type_id'] == CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile')) {
-        $smsProviderParams['To'] = $contact['phone'];
-      }
-      else {
-        $smsProviderParams['To'] = '';
-      }
+      $smsProviderParams['To'] = $contact['phone'];
       try {
         $sendResult = CRM_Activity_BAO_Activity::sendSMSMessage(
           $contactId,
