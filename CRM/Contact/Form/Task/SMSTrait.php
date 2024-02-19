@@ -44,7 +44,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function getPhones(): array {
-    return (array) Phone::get()
+    $phones = (array) Phone::get()
       ->addWhere('contact_id', 'IN', $this->getContactIDs())
       ->addWhere('contact_id.do_not_sms', '=', FALSE)
       ->addWhere('contact_id.is_deceased', '=', FALSE)
@@ -52,8 +52,12 @@ trait CRM_Contact_Form_Task_SMSTrait {
       ->addWhere('phone_type_id:name', '=', 'Mobile')
       ->addOrderBy('is_primary', 'DESC')
       ->addGroupBy('contact_id')
-      ->addSelect('contact_id', 'phone', 'phone_type_id:name', 'contact_id.sort_name', 'phone_type_id', 'contact_id.display_name')
+      ->addSelect('contact_id', 'id', 'phone', 'phone_type_id:name', 'contact_id.sort_name', 'phone_type_id', 'contact_id.display_name')
       ->execute()->indexBy('id');
+    foreach ($phones as $phone) {
+      $this->define('Phone', 'Phone' . $phone['id'], $phone);
+    }
+    return $phones;
   }
 
 
@@ -81,25 +85,15 @@ trait CRM_Contact_Form_Task_SMSTrait {
    */
   public function getSMSContactDetails(): array {
     // format contact details array to handle multiple sms from same contact
-    $formattedContactDetails = [];
-    $tempPhones = [];
-    foreach ($this->_contactIds as $key => $contactId) {
-      $phone = $this->_toContactPhone[$key];
-
-      if ($phone) {
-        $phoneKey = "{$contactId}::{$phone}";
-        if (!in_array($phoneKey, $tempPhones)) {
-          $tempPhones[] = $phoneKey;
-          if (!empty($this->_contactDetails[$contactId])) {
-            $formattedContactDetails[] = [
-              'contact_id' => $contactId,
-              'phone' => $phone
-            ];
-          }
-        }
-      }
+    $contactDetails = [];
+    $phonesToSendTo = explode(',', $this->getSubmittedValue('to'));
+    foreach ($phonesToSendTo as $phoneID) {
+      $contactDetails[] = [
+        'contact_id' => $this->lookup('Phone' . $phoneID, 'contact_id'),
+        'phone' => $this->lookup('Phone' . $phoneID, 'phone_numeric'),
+      ];
     }
-    return $formattedContactDetails;
+    return $contactDetails;
   }
 
   protected function bounceOnNoActiveProviders(): void {
@@ -153,7 +147,6 @@ trait CRM_Contact_Form_Task_SMSTrait {
         [$contactId, $phone] = explode('::', $value);
         if ($contactId) {
           $form->_contactIds[] = $contactId;
-          $form->_toContactPhone[] = $phone;
         }
       }
       $toSetDefault = TRUE;
