@@ -3,3 +3,4 @@
 ##
 ## Major Series : Reference-Point (Tag/Commit)
 5.27:5.27.4
+5.69:5.69.5
