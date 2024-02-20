@@ -1730,10 +1730,16 @@ if (!CRM.vars) CRM.vars = {};
 
   /**
    * Collapse or expand an accordion
+   * @deprecated
    * @param speed
    */
   $.fn.crmAccordionToggle = function (speed) {
     $(this).each(function () {
+      // Backward-compat, for when this older function is used on a newer <details> element
+      if ($(this).is('details')) {
+        this.open = !this.open;
+        return;
+      }
       var action = 'open';
       if ($(this).hasClass('collapsed')) {
         $('.crm-accordion-body', this).first().css('display', 'none').slideDown(speed);
