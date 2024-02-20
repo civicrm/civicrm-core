@@ -1259,8 +1259,12 @@ DESC limit 1");
     $contributionId = $this->ids['Contribution'] ?? CRM_Member_BAO_Membership::getMembershipContributionId($this->getMembershipID());
     $membershipIds = $this->_membershipIDs;
     if ($this->getSubmittedValue('send_receipt') && $contributionId && !empty($membershipIds)) {
-      $contributionDetails = CRM_Contribute_BAO_Contribution::getContributionDetails(CRM_Export_Form_Select::MEMBER_EXPORT, $this->_membershipIDs);
-      if ($contributionDetails[$this->getMembershipID()]['contribution_status'] === 'Completed') {
+      $contributionStatus = \Civi\Api4\Contribution::get(FALSE)
+        ->addSelect('contribution_status_id:name')
+        ->addWhere('id', '=', $contributionId)
+        ->execute()
+        ->first();
+      if ($contributionStatus['contribution_status_id:name'] === 'Completed') {
         $formValues['contact_id'] = $this->_contactID;
         $formValues['contribution_id'] = $contributionId;
         // receipt_text_signup is no longer used in receipts from 5.47
