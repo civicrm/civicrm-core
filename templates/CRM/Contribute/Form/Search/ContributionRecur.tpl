@@ -8,8 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 
-<div class="crm-accordion-wrapper crm-contactDetails-accordion
-   {if empty($contribution_recur_pane_open)} collapsed{/if}" id="contribution_recur">
+<div class="crm-accordion-wrapper crm-contactDetails-accordion {if empty($contribution_recur_pane_open)} collapsed{/if}" id="contribution_recur">
   <div class="crm-accordion-header">
     {ts}Recurring Contributions{/ts}
   </div>
