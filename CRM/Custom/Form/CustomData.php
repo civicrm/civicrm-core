@@ -90,6 +90,15 @@ class CRM_Custom_Form_CustomData {
    * @param bool $isLoadFromCache
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated see https://github.com/civicrm/civicrm-core/pull/29241 for preferred approach - basically
+   * 1) at the tpl layer use CRM/common/customDataBlock.tpl
+   * 2) to make the fields available for postProcess
+   * if ($this->isSubmitted()) {
+   *   $this->addCustomDataFieldsToForm('FinancialAccount');
+   * }
+   * 3) pass getSubmittedValues() to CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'FinancialAccount');
+   *  to ensure any money or number fields are handled for localisation
    */
   public static function preProcess(
     &$form, $extendsEntityColumn = NULL, $subType = NULL,
