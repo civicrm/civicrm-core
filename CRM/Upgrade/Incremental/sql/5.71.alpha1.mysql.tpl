@@ -4,7 +4,7 @@
 {if $multilingual}
   {foreach from=$locales item=locale}
     UPDATE `civicrm_uf_group`
-    SET `frontend_title_{$locale}` = `title_{$locale}`, `name` = CONCAT(`title_{$locale}`, `id`)
+    SET `frontend_title_{$locale}` = `title_{$locale}`
     WHERE `frontend_title_{$locale}` IS NULL OR `frontend_title_{$locale}` = '';
 
     UPDATE `civicrm_uf_group`
@@ -13,7 +13,7 @@
   {/foreach}
 {else}
   UPDATE `civicrm_uf_group`
-  SET `frontend_title` = `title`, `name` = CONCAT(`title`, `id`)
+  SET `frontend_title` = `title`
   WHERE `frontend_title` IS NULL OR `frontend_title` = '';
 
   UPDATE `civicrm_uf_group`
