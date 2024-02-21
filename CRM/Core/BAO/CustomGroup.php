@@ -2110,10 +2110,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
 
   /**
    * Use APIv4 getFields (or self::getExtendsEntityColumnValueOptions) instead of this beast.
-   * @deprecated
+   * @deprecated as of 5.72 use getExtendsEntityColumnValueOptions - will be removed by 5.78
    * @return array
    */
   public static function getSubTypes(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions');
     $sel2 = [];
     $activityType = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'search');
 
