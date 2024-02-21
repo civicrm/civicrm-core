@@ -27,6 +27,24 @@
     </html>
     <add>1.1</add>
   </field>
+  <field>
+    <name>name</name>
+    <title>Profile Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
+    <comment>Name of the UF group for directly addressing it in the codebase</comment>
+    <add>3.0</add>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
+  </index>
   <primaryKey>
     <name>id</name>
     <autoincrement>true</autoincrement>
@@ -243,24 +261,6 @@
     <comment>Is this group reserved for use by some other CiviCRM functionality?</comment>
     <add>3.0</add>
   </field>
-  <field>
-    <name>name</name>
-    <title>Profile Name</title>
-    <type>varchar</type>
-    <length>64</length>
-    <required>true</required>
-    <html>
-      <type>Text</type>
-    </html>
-    <comment>Name of the UF group for directly addressing it in the codebase</comment>
-    <add>3.0</add>
-  </field>
-  <index>
-    <name>UI_name</name>
-    <fieldName>name</fieldName>
-    <unique>true</unique>
-    <add>4.7</add>
-  </index>
   <field>
     <name>created_id</name>
     <title>Created By Contact ID</title>
