@@ -1596,10 +1596,13 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    * @param array $componentIds
    *   Component ids.
    *
+   * @deprecated since 5.72 will be removed around 5.90
+   *
    * @return array
    *   associated array
    */
   public static function getContributionDetails($exportMode, $componentIds) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $paymentDetails = [];
     $componentClause = ' IN ( ' . implode(',', $componentIds) . ' ) ';
 
