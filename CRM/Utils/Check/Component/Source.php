@@ -31,7 +31,10 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
     $orphans = [];
     foreach ($this->getRemovedFiles() as $file) {
       $path = Civi::paths()->getPath("[civicrm.root]/$file");
-      if (file_exists(rtrim($path, '/*'))) {
+      $path = rtrim($path, '/*');
+      // On case-insensitive filesystems we need to do some more work
+      $actualPath = $this->findCorrectCaseForFile($path);
+      if ($actualPath !== NULL) {
         $orphans[] = [
           'name' => $file,
           'path' => $path,
@@ -62,6 +65,27 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
     );
 
     return $messages;
+  }
+
+  /**
+   * Linux is case sensitive, so this will be a no-op.
+   * Windows is case insensitive, Mac is usually insensitive but sometimes
+   * sensitive.
+   * Note that realpath() will return the real casing for a file on windows,
+   * but not on mac, so we need a different method. glob returns the real
+   * casing, but means we need to loop.
+   *
+   * @param string $path
+   * @return string|null
+   */
+  private function findCorrectCaseForFile(string $path): ?string {
+    $fileToFind = basename($path);
+    foreach (glob(dirname($path) . '/*', GLOB_NOSORT) as $theRealFile) {
+      if ($fileToFind === basename($theRealFile)) {
+        return $theRealFile;
+      }
+    }
+    return NULL;
   }
 
 }
