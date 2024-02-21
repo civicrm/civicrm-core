@@ -146,7 +146,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $paymentDetails = [];
     if ($processor->isExportPaymentFields()) {
       // get payment related in for event and members
-      $paymentDetails = CRM_Contribute_BAO_Contribution::getContributionDetails($exportMode, $ids);
+      $paymentDetails = $processor->getContributionDetails();
       //get all payment headers.
       // If we haven't selected specific payment fields, load in all the
       // payment headers.
