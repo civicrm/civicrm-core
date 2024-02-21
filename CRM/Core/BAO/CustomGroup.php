@@ -196,7 +196,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     }
     if (!CRM_Utils_System::isNull($extendsChildType)) {
       $b = self::getMungedEntity($params['extends'], $params['extends_entity_column_id'] ?? NULL);
-      $registeredSubTypes = self::getSubTypes()[$b];
+      $subTypes = self::getExtendsEntityColumnValueOptions('validate', ['values' => $params]);
+      $registeredSubTypes = [];
+      foreach ($subTypes as $subTypeDetail) {
+        $registeredSubTypes[$subTypeDetail['id']] = $subTypeDetail['label'];
+      }
       if (is_array($extendsChildType)) {
         foreach ($extendsChildType as $childType) {
           if (!array_key_exists($childType, $registeredSubTypes) && !in_array($childType, $registeredSubTypes, TRUE)) {
@@ -1984,9 +1988,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
           $fkNameField = isset($fkFields['name']) ? 'name' : 'id';
           $select = [$fkIdField, $fkNameField, $fkLabelField];
           $where = [];
-          if (isset($fkFields['is_active'])) {
-            $where[] = ['is_active', '=', TRUE];
-          }
           $fkEntities = civicrm_api4($field['fk_entity'], 'get', [
             'checkPermissions' => !(isset($params['check_permissions']) && !$params['check_permissions']),
             'select' => $select,
