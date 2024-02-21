@@ -1450,8 +1450,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    *
    * @throws \CRM_Core_Exception
    */
-  public static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '') {
-    $form->assign_by_ref("{$prefix}groupTree", $groupTree);
+  public static function buildQuickForm($form, $groupTree, $inactiveNeeded = FALSE, $prefix = '') {
+    $form->assign("{$prefix}groupTree", $groupTree);
 
     foreach ($groupTree as $id => $group) {
       foreach ($group['fields'] as $field) {
