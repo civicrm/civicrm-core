@@ -349,7 +349,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
             else {
               $contactSubType = $this->_values['contact_sub_type'] ?? NULL;
             }
-            $this->assign('contactType', $this->_contactType);
+            // @todo - check if we need this - was done above
             $this->assign('contactSubType', $contactSubType);
           }
         }
