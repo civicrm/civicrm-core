@@ -16,18 +16,18 @@
   #civicrm-news-feed .crm-news-feed-unread .crm-news-feed-item-title {
     font-weight: bold;
   }
-  #civicrm-news-feed .collapsed .crm-accordion-header {
+  #civicrm-news-feed details:not([open]) .crm-accordion-header {
     text-overflow: ellipsis;
     text-wrap: none;
     white-space: nowrap;
     overflow: hidden;
   }
   #civicrm-news-feed .crm-news-feed-item-preview {
-    color: #8d8d8d;
-    display: none;
-  }
-  #civicrm-news-feed .collapsed .crm-news-feed-item-preview {
     display: inline;
+    color: #8d8d8d;
+  }
+  #civicrm-news-feed details[open] .crm-news-feed-item-preview {
+    display: none;
   }
   #civicrm-news-feed .crm-news-feed-item-link {
     margin-bottom: 0;
@@ -88,7 +88,7 @@
             if ($.inArray(itemKey, opened[key]) < 0) {
               $(this).addClass('crm-news-feed-unread');
               ++count;
-              $(this).one('crmAccordion:open', function () {
+              $(this).one('click', function () {
                 $(this).removeClass('crm-news-feed-unread');
                 $('em', $tab).text(--count || '');
                 opened[key].push(itemKey);
