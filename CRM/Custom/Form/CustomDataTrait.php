@@ -38,6 +38,10 @@ trait CRM_Custom_Form_CustomDataTrait {
    *
    * @param string $entity
    * @param array $filters
+   *   Filters is only needed for entities where CustomDataGroups may be filtered.
+   *   e.g Activity custom data groups might be available for only some entity types.
+   *   In that case the filters would hold the id (if any) of the entity and the
+   *   activity_type_id if known.
    *
    * @throws \CRM_Core_Exception
    */
