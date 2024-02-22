@@ -79,6 +79,10 @@
   </table>
 
   {if $groupId}
+  {else}
+  </div>
+  {/if}
+  {if $groupId}
   </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
   {/if}
