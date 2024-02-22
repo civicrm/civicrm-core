@@ -102,8 +102,11 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
+   * This one is problematic because it's not strictly required to have one class
+   * per table. It's possible for multiple tables to share a class.
+   *
    * @return string[]
-   *   [CRM_DAO_ClassName => EntityName][]
+   *   [CRM_DAO_ClassName => EntityName]
    */
   private static function getEntitiesByClass(): array {
     self::init();
@@ -128,11 +131,11 @@ class CRM_Core_DAO_AllCoreTables {
 
   /**
    * Mapping from table-names to class-names.
-   * @return array
-   *   [table_name => CRM_DAO_ClassName][]
+   * @return string[]
+   *   [table_name => CRM_DAO_ClassName]
    */
   public static function tables() {
-    return array_combine(array_keys(self::getEntitiesByTable()), array_keys(self::getEntitiesByClass()));
+    return array_column(self::getEntities(), 'class', 'table');
   }
 
   /**
@@ -198,11 +201,11 @@ class CRM_Core_DAO_AllCoreTables {
 
   /**
    * Mapping from entity-names to class-names.
-   * @return array
-   *   [EntityName => CRM_DAO_ClassName][]
+   * @return string[]
+   *   [EntityName => CRM_DAO_ClassName]
    */
   public static function daoToClass() {
-    return array_flip(self::getEntitiesByClass());
+    return array_combine(array_keys(self::getEntities()), array_column(self::getEntities(), 'class'));
   }
 
   /**
@@ -319,8 +322,8 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * Get a list of all extant BAO classes, keyed by entityName.
    *
-   * @return array
-   *   [EntityName => CRM_BAO_ClassName][]
+   * @return string[]
+   *   [EntityName => CRM_BAO_ClassName]
    */
   public static function getBaoClasses() {
     $r = [];
