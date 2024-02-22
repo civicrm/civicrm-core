@@ -28,7 +28,7 @@
     <tr class="crm-event-participantview-form-block-displayName">
       <td class="label">{ts}Participant Name{/ts}</td>
       <td>
-        <strong><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contact_id"}" title="{ts}View contact record{/ts}">{$displayName}</a></strong>
+        <strong><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contact_id"}" title="{ts}View contact record{/ts}">{$displayName|escape}</a></strong>
         <div>
             <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/badge' q="reset=1&context=view&id=$id&cid=$contact_id"}"><i class="crm-i fa-print" aria-hidden="true"></i> {ts}Print Name Badge{/ts}</a>
         </div>
@@ -44,8 +44,8 @@
         <tr class="crm-event-participantview-form-block-additionalParticipants">
             <td class="label">{ts}Also Registered by this Participant{/ts}</td>
             <td>
-                {foreach from=$additionalParticipants key=apName item=apURL}
-                    <a href="{$apURL}" title="{ts}view additional participant{/ts}">{$apName}</a><br />
+                {foreach from=$additionalParticipants key=participantName item=participantURL}
+                    <a href="{$participantURL}" title="{ts}view additional participant{/ts}">{$participantName|escape}</a><br />
                 {/foreach}
             </td>
         </tr>
@@ -59,13 +59,13 @@
     {if $campaign}
     <tr class="crm-event-participantview-form-block-campaign">
       <td class="label">{ts}Campaign{/ts}</td>
-      <td>{$campaign}</td>
+      <td>{$campaign|escape}</td>
     </tr>
     {/if}
 
     <tr class="crm-event-participantview-form-block-role">
       <td class="label">{ts}Participant Role{/ts}</td>
-      <td>{$role}</td></tr>
+      <td>{$role|escape}</td></tr>
         <tr class="crm-event-participantview-form-block-register_date">
       <td class="label">{ts}Registration Date{/ts}</td>
       <td>{$register_date|crmDate}&nbsp;</td>
@@ -73,13 +73,13 @@
     <tr class="crm-event-participantview-form-block-status">
       <td class="label">{ts}Status{/ts}</td><td>{$status}&nbsp;
       {if $transferName}
-        {ts}(Transferred to <a href="{crmURL p='civicrm/contact/view/participant' q="action=view&reset=1&id=$pid&cid=$transferId"}" title="{ts}View this Participant{/ts}">{$transferName}</a>){/ts}
+        {ts}(Transferred to <a href="{crmURL p='civicrm/contact/view/participant' q="action=view&reset=1&id=$pid&cid=$transferId"}" title="{ts}View this Participant{/ts}">{$transferName|escape}</a>){/ts}
       {/if}
       </td>
   </tr>
     {if $source}
         <tr class="crm-event-participantview-form-block-event_source">
-        <td class="label">{ts}Participant Source{/ts}</td><td>{$source}&nbsp;</td>
+        <td class="label">{ts}Participant Source{/ts}</td><td>{$source|escape}&nbsp;</td>
       </tr>
     {/if}
     {if $participantId and $hasPayment}
@@ -92,7 +92,7 @@
         <tr class="crm-event-participantview-form-block-fee_amount">
             {if $lineItem}
                 <td class="label">{ts}Selections{/ts}</td>
-                <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event"}
+                <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event" displayLineItemFinancialType=false getTaxDetails=$totalTaxAmount hookDiscount=false}
                 {if call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
                     {if $hasPayment or $parentHasPayment}
                       <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
@@ -106,7 +106,7 @@
                 </td>
             {else}
                 <td class="label">{ts}Event Level{/ts}</td>
-                <td>{$fee_level}&nbsp;{if $fee_amount}- {$fee_amount|crmMoney:$fee_currency}{/if}</td>
+                <td>{$fee_level|escape}&nbsp;{if $fee_amount}- {$fee_amount|crmMoney:$currency}{/if}</td>
             {/if}
         </tr>
     {/if}

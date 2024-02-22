@@ -20,6 +20,7 @@
  *
  */
 class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
+  use CRM_Event_Form_EventFormTrait;
 
   public $useLivePageJS = TRUE;
 
@@ -30,7 +31,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    */
   public function preProcess() {
     $values = $ids = [];
-    $participantID = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $participantID = $this->getParticipantID();
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $params = ['id' => $participantID];
 
@@ -58,9 +59,14 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $this->assign('hasPayment', $paymentId);
     $this->assign('componentId', $participantID);
     $this->assign('component', 'event');
+    $parentParticipantID = $this->getParticipantValue('registered_by_id');
+    $this->assign('participant_registered_by_id', $parentParticipantID);
+    // Check if this is a primaryParticipant (registered for others) and retrieve additional participants if true  (CRM-4859)
+    if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->getParticipantID())) {
+      $additionalParticipants = CRM_Event_BAO_Participant::getAdditionalParticipants($this->getParticipantID());
+    }
+    $this->assign('additionalParticipants', $additionalParticipants ?? NULL);
 
-    $parentParticipantID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
-      $participantID, 'registered_by_id');
     $this->assign('parentHasPayment', !$parentParticipantID ? NULL : CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
       $parentParticipantID, 'id', 'participant_id'
     ));
@@ -159,13 +165,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       $values[$participantID]['event'] = $eventTitle;
     }
 
-    //do check for campaigns
-    $campaignId = $values[$participantID]['campaign_id'] ?? NULL;
-    if ($campaignId) {
-      $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
-      $values[$participantID]['campaign'] = $campaigns[$campaignId];
-    }
-
+    $this->assign('campaign', $this->getParticipantValue('campaign_id:label'));
     $this->assign($values[$participantID]);
 
     // add viewed participant to recent items list
@@ -185,7 +185,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       );
     }
 
-    $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $displayName = CRM_Contact_BAO_Contact::displayName($values[$participantID]['contact_id']);
 
     $participantCount = [];
@@ -196,25 +195,15 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       }
       $totalTaxAmount = $v['tax_amount'] + $totalTaxAmount;
     }
-    if (Civi::settings()->get('invoicing')) {
-      $this->assign('totalTaxAmount', $totalTaxAmount);
-    }
+    $this->assign('currency', $this->getParticipantValue('fee_currency'));
+    $this->assign('totalTaxAmount', $totalTaxAmount ?? NULL);
     $this->assign('pricesetFieldsCount', $participantCount);
     $this->assign('displayName', $displayName);
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
     $this->setTitle(ts('View Event Registration for') . ' ' . $displayName);
-
-    $roleId = $values[$participantID]['role_id'] ?? NULL;
-    $title = $displayName . ' (' . ($participantRoles[$roleId] ?? '') . ' - ' . $eventTitle . ')';
-
-    $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-    $viewRoles = [];
-    foreach (explode($sep, $values[$participantID]['role_id']) as $k => $v) {
-      $viewRoles[] = $participantRoles[$v];
-    }
-    $values[$participantID]['role_id'] = implode(', ', $viewRoles);
-    $this->assign('role', $values[$participantID]['role_id']);
+    $this->assign('role', implode(',', $this->getParticipantValue('role_id:label')));
     // add Participant to Recent Items
+    $title = $displayName . ' (' . implode(',', $this->getParticipantValue('role_id:label')) . ' - ' . $eventTitle . ')';
     CRM_Utils_Recent::add($title,
       $url,
       $values[$participantID]['id'],
@@ -223,6 +212,17 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       NULL,
       $recentOther
     );
+  }
+
+  /**
+   * Get id of participant being acted on.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getParticipantID(): int {
+    return (int) CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
   }
 
   /**
