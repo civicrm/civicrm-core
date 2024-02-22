@@ -77,4 +77,57 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
     return 'SMS Received';
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  protected function filterContactIDs(): void {
+    $form = $this;
+    if (!empty($this->_activityHolderIds)) {
+      $extendTargetContacts = 0;
+      $invalidActivity = 0;
+      $validActivities = 0;
+      foreach ($form->_activityHolderIds as $id) {
+        //valid activity check
+        if (CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $id, 'subject', 'id') !== $this->getActivityName()) {
+          $invalidActivity++;
+          continue;
+        }
+
+        $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
+        $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+        //target contacts limit check
+        $ids = array_keys(CRM_Activity_BAO_ActivityContact::getNames($id, $targetID));
+
+        if (count($ids) > 1) {
+          $extendTargetContacts++;
+          continue;
+        }
+        $validActivities++;
+        $form->_contactIds = empty($form->_contactIds) ? $ids : array_unique(array_merge($form->_contactIds, $ids));
+      }
+
+      if (!$validActivities) {
+        $errorMess = "";
+        if ($extendTargetContacts) {
+          $errorMess = ts('One selected activity consists of more than one target contact.', [
+            'count' => $extendTargetContacts,
+            'plural' => '%count selected activities consist of more than one target contact.',
+          ]);
+        }
+        if ($invalidActivity) {
+          $errorMess = ($errorMess ? ' ' : '');
+          $errorMess .= ts('The selected activity is invalid.', [
+            'count' => $invalidActivity,
+            'plural' => '%count selected activities are invalid.',
+          ]);
+        }
+        CRM_Core_Error::statusBounce(ts("%1: SMS Reply will not be sent.", [1 => $errorMess]));
+      }
+    }
+
+    //activity related variables
+    $form->assign('invalidActivity', $invalidActivity ?? NULL);
+    $form->assign('extendTargetContacts', $extendTargetContacts ?? NULL);
+  }
+
 }
