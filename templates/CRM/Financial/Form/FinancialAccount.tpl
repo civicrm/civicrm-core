@@ -75,9 +75,9 @@
       </td>
     </tr>
   </table>
-  <div id="financial_account_custom_field_extension_section" class="crm-accordion-wrapper crm-financial-account-panel">
+  <details id="financial_account_custom_field_extension_section" class="crm-accordion-wrapper crm-financial-account-panel" open>
   {include file="CRM/Custom/Form/CustomData.tpl"}
-  </div>
+  </details>
 {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
 </div>

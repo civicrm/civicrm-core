@@ -41,10 +41,10 @@
       {* Added Activity Details accordion tab *}
       <tr class="crm-case-activity-form-block-activity-details">
         <td colspan="2">
-          <div id="activity-details" class="crm-accordion-wrapper collapsed">
-            <div class="crm-accordion-header">
+          <details id="activity-details" class="crm-accordion-bold">
+            <summary>
               {ts}Activity Details{/ts}
-            </div><!-- /.crm-accordion-header -->
+            </summary>
             <div class="crm-accordion-body">
     {else}
       <tr class="crm-case-activity-form-block-activity-details">
@@ -161,7 +161,7 @@
         || $activityTypeFile EQ 'ChangeCaseType'
         || $activityTypeFile EQ 'ChangeCaseStartDate'}
           </div><!-- /.crm-accordion-body -->
-        </div><!-- /.crm-accordion-wrapper -->
+        </details>
         {* End of Activity Details accordion tab *}
       {/if}
       </td>
@@ -172,10 +172,10 @@
     {if $searchRows} {* We have got case role rows to display for "Send Copy To" feature *}
       <tr class="crm-case-activity-form-block-send_copy">
         <td colspan="2">
-          <div id="sendcopy" class="crm-accordion-wrapper collapsed">
-            <div class="crm-accordion-header">
+          <details id="sendcopy" class="crm-accordion-bold">
+            <summary>
               {ts}Send a Copy{/ts}
-            </div><!-- /.crm-accordion-header -->
+            </summary>
             <div id="sendcopy-body" class="crm-accordion-body">
 
               <div class="description">{ts}Email a complete copy of this activity record to other people involved with the case. Click the top left box to select all.{/ts}</div>
@@ -202,7 +202,7 @@
                 </table>
               {/strip}
             </div><!-- /.crm-accordion-body -->
-          </div><!-- /.crm-accordion-wrapper -->
+          </details>
         </td>
       </tr>
     {/if}

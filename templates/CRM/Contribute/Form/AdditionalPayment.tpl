@@ -75,11 +75,11 @@
     </tr>
    </table>
 
-    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
+    <details class="crm-accordion-bold crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information" open>
       {if !$contributionMode}
-      <div class="crm-accordion-header">
+      <summary>
         {if $paymentType EQ 'refund'}{ts}Refund Details{/ts}{else}{ts}Payment Details{/ts}{/if}
-      </div>
+      </summary>
       <div class="crm-accordion-body">
         <table class="form-layout-compressed" >
           <tr class="crm-payment-form-block-trxn_date">
@@ -103,7 +103,7 @@
       </div>
       {/if}
       {include file='CRM/Core/BillingBlockWrapper.tpl' currency=false}
-    </div>
+    </details>
 
     {literal}
     <script type="text/javascript">

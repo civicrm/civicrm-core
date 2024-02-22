@@ -8,10 +8,10 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-group-search-form-block">
-  <div class="crm-accordion-wrapper crm-search_builder-accordion">
-    <div class="crm-accordion-header crm-master-accordion-header">
+  <details class="crm-accordion-light crm-search_builder-accordion" open>
+    <summary>
       {ts}Find Groups{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <div id="searchForm">
         <table class="form-layout">
@@ -63,7 +63,7 @@
         </table>
       </div>
     </div>
-  </div>
+  </details>
 <div class="css_right">
   <a class="crm-hover-button action-item" href="{crmURL q="reset=1&update_smart_groups=1"}">{ts}Update Smart Group Counts{/ts}</a> {help id="update_smart_groups"}
 </div>

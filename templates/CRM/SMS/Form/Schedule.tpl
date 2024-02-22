@@ -27,10 +27,10 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 
 {if $preview}
-<div class="crm-accordion-wrapper crm-plain_text_sms-accordion collapsed">
-    <div class="crm-accordion-header">
+<details class="crm-accordion-bold crm-plain_text_sms-accordion">
+    <summary>
         {ts}Preview SMS{/ts}
-    </div><!-- /.crm-accordion-header -->
+    </summary>
     <div class="crm-accordion-body">
         <table class="form-layout">
 
@@ -39,7 +39,7 @@
           {/if}
         </table>
     </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+</details>
 {/if}
 
 </div>

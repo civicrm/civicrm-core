@@ -65,11 +65,11 @@
         <tr>
       </table>
 
-      <div id="msg_html_section" class="crm-accordion-wrapper crm-html_email-accordion ">
-        <div class="crm-accordion-header">
+      <details id="msg_html_section" class="crm-accordion-bold crm-html_email-accordion " open>
+        <summary>
           {ts}HTML Format{/ts}
           {help id="id-message-text" file="CRM/Contact/Form/Task/Email.hlp"}
-        </div><!-- /.crm-accordion-header -->
+        </summary>
         <div class="crm-accordion-body">
           <div class="helpIcon" id="helphtml">
             <input class="crm-token-selector big" data-field="msg_html" />
@@ -80,13 +80,13 @@
             {$form.msg_html.html|crmAddClass:huge}
           </div>
         </div><!-- /.crm-accordion-body -->
-      </div><!-- /.crm-accordion-wrapper -->
+      </details>
 
-      <div id="msg_text_section" class="crm-accordion-wrapper crm-plaint_text_email-accordion ">
-        <div class="crm-accordion-header">
+      <details id="msg_text_section" class="crm-accordion-bold crm-plaint_text_email-accordion " open>
+        <summary>
           {ts}Optional Plain-Text Format{/ts}
           {help id="id-message-plain" file="CRM/Contact/Form/Task/Email.hlp"}
-        </div><!-- /.crm-accordion-header -->
+        </summary>
         <div class="crm-accordion-body">
           <div class="helpIcon" id="helptext">
             <input class="crm-token-selector big" data-field="msg_text" />
@@ -97,12 +97,12 @@
             {$form.msg_text.html|crmAddClass:huge}
           </div>
         </div><!-- /.crm-accordion-body -->
-      </div><!-- /.crm-accordion-wrapper -->
+      </details>
 
-      <div id="pdf_format" class="crm-accordion-wrapper crm-html_email-accordion ">
-        <div class="crm-accordion-header">
+      <details id="pdf_format" class="crm-accordion-bold crm-html_email-accordion " open>
+        <summary>
           {$form.pdf_format_id.label}
-        </div><!-- /.crm-accordion-header -->
+        </summary>
         <div class="crm-accordion-body">
           <div class="spacer"></div>
           <div class='html'>
@@ -111,7 +111,7 @@
             <div class="description">{ts}Page format to use when creating PDF files using this template.{/ts}</div>
           </div>
         </div><!-- /.crm-accordion-body -->
-      </div><!-- /.crm-accordion-wrapper -->
+      </details>
 
       {if !$isWorkflow}
         <table class="form-layout-compressed">

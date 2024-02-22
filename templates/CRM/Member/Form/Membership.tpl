@@ -207,8 +207,8 @@
       </table>
       {include file="CRM/common/customDataBlock.tpl"}
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
-        <div class="crm-accordion-wrapper">
-          <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
+        <details class="crm-accordion-bold" open>
+          <summary>{ts}Related Contributions{/ts}</summary>
           <div class="crm-accordion-body">
             {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
             <script type="text/javascript">
@@ -236,13 +236,13 @@
             </script>
             <div id="membership-recurring-contributions"></div>
           </div>
-        </div>
+        </details>
       {/if}
       {if $softCredit}
-        <div class="crm-accordion-wrapper">
-          <div class="crm-accordion-header">{ts}Related Soft Contributions{/ts}</div>
+        <details class="crm-accordion-bold" open>
+          <summary>{ts}Related Soft Contributions{/ts}</summary>
           <div class="crm-accordion-body">{include file="CRM/Contribute/Page/ContributionSoft.tpl" context="membership"}</div>
-       </div>
+       </details>
       {/if}
     {/if}
 

@@ -10,10 +10,10 @@
 {*this template is used for activity accordion*}
 {assign var=caseid value=$caseID}
 {if $isForm}
-  <div class="crm-accordion-wrapper crm-case_activities-accordion  crm-case-activities-block">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-case_activities-accordion  crm-case-activities-block" open>
+    <summary>
       {ts}Activities{/ts}
-    </div>
+    </summary>
 
     <div id="activities" class="crm-accordion-body padded">
     <div class="crm-collapsible crm-search_filters-accordion collapsed">
@@ -53,7 +53,7 @@
           </tr>
         {/if}
       </table>
-    </div><!-- /.crm-accordion-wrapper -->
+    </div>
 {/if}
 
     <table id="case_id_{$caseid}"  class="nestedActivitySelector crm-ajax-table" data-page-length="10">
@@ -106,5 +106,5 @@
 
 {if $isForm}
     </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+  </details>
 {/if}
