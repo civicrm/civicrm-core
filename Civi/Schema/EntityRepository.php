@@ -33,6 +33,15 @@ class EntityRepository {
 
   /**
    * @internal
+   * @return array{name: string, table: string, class: string, module: string, getInfo: callable, getPaths: callable, getIndices: callable, getFields: callable, metaProvider: callable, storageProvider: callable}
+   */
+  public static function getEntity(string $entityName): ?array {
+    self::loadAll();
+    return self::$entities[$entityName] ?? NULL;
+  }
+
+  /**
+   * @internal
    * @return array
    */
   public static function getTableIndex(): array {

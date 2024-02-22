@@ -303,4 +303,14 @@ class Civi {
     return new \Civi\Core\Url($logicalUri, $flags);
   }
 
+  /**
+   * Get the canonical entityProvider for a given entity type.
+   *
+   * @param string $entityName
+   * @return \Civi\Schema\EntityProvider
+   */
+  public static function entity(string $entityName): \Civi\Schema\EntityProvider {
+    return new \Civi\Schema\EntityProvider($entityName);
+  }
+
 }
