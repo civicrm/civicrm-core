@@ -461,8 +461,8 @@
       {if {event.allow_selfcancelxfer|boolean}}
         <tr>
           <td colspan="2" {$valueStyle}>
-            {capture assign=selfservice_preposition}{if {event.selfcancelxfer_time} > 0}{ts}before{/ts}{else}{ts}after{/ts}{/if}{/capture}
-            {ts 1={event.selfcancelxfer_time} 2=$selfservice_preposition}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts}
+            {capture assign=selfservice_preposition}{if {event.selfcancelxfer_time|boolean} && {event.selfcancelxfer_time} > 0}{ts}before{/ts}{else}{ts}after{/ts}{/if}{/capture}
+            {ts 1="{event.selfcancelxfer_time}" 2="$selfservice_preposition"}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts}
             {if {contribution.paid_amount|boolean}}{ts}Cancellations are not refundable.{/ts}{/if}<br/>
             {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid={participant.id}&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
             <a href="{$selfService}">{ts}Click here to transfer or cancel your registration.{/ts}</a>
