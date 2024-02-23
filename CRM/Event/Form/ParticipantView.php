@@ -99,37 +99,18 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       );
     }
 
-    if ($values[$participantID]['is_test']) {
-      $values[$participantID]['status'] = CRM_Core_TestEntity::appendTestText($values[$participantID]['status']);
-    }
-
-    // Get Note
-    $noteValue = CRM_Core_BAO_Note::getNote($participantID, 'civicrm_participant');
-
-    $values[$participantID]['note'] = array_values($noteValue);
+    $this->assign('status', $this->getParticipantValue('status_id:label') . ($this->getParticipantValue('is_test') ? ' ' . ts('(test)') : ''));
+    $this->assign('note', array_values(CRM_Core_BAO_Note::getNote($participantID, 'civicrm_participant')));
 
     // Get Line Items
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($participantID);
+    $this->assign('lineItem', [$lineItem]);
 
-    if (!CRM_Utils_System::isNull($lineItem)) {
-      $values[$participantID]['lineItem'][] = $lineItem;
-    }
+    $this->assign('totalAmount', $this->getParticipantValue('fee_amount'));
 
-    $values[$participantID]['totalAmount'] = $values[$participantID]['fee_amount'] ?? NULL;
-
-    // Get registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
-    if (!empty($values[$participantID]['participant_registered_by_id'])) {
-      $values[$participantID]['registered_by_contact_id'] = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Participant",
-        $values[$participantID]['participant_registered_by_id'],
-        'contact_id', 'id'
-      );
-      $values[$participantID]['registered_by_display_name'] = CRM_Contact_BAO_Contact::displayName($values[$participantID]['registered_by_contact_id']);
-    }
-
-    // Check if this is a primaryParticipant (registered for others) and retrieve additional participants if true  (CRM-4859)
-    if (CRM_Event_BAO_Participant::isPrimaryParticipant($participantID)) {
-      $values[$participantID]['additionalParticipants'] = CRM_Event_BAO_Participant::getAdditionalParticipants($participantID);
-    }
+    // Assign registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
+    $this->assign('registered_by_display_name', $this->getParticipantValue('registered_by_id.contact_id.display_name'));
+    $this->assign('registered_by_contact_id', $this->getParticipantValue('registered_by_id.contact_id'));
 
     // get the option value for custom data type
     $customDataType = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name');
@@ -161,11 +142,9 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $finalTree, FALSE, NULL, NULL, NULL, $participantID);
     $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $values[$participantID]['event_id'], 'title');
     //CRM-7150, show event name on participant view even if the event is disabled
-    if (empty($values[$participantID]['event'])) {
-      $values[$participantID]['event'] = $eventTitle;
-    }
-
+    $this->assign('event', $eventTitle);
     $this->assign('campaign', $this->getParticipantValue('campaign_id:label'));
+    // @todo - this assign makes it really hard to see what is being assigned - do individual assigns.
     $this->assign($values[$participantID]);
 
     // add viewed participant to recent items list
