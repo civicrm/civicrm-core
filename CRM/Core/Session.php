@@ -74,7 +74,15 @@ class CRM_Core_Session {
    */
   public static function &singleton() {
     if (self::$_singleton === NULL) {
-      self::$_singleton = new CRM_Core_Session();
+      if (defined('CIVI_SETUP') && CIVICRM_UF === 'Standalone') {
+        // always use a fake session during Standalone install, because we might
+        // not have the real session handler yet (because the extension that
+        // provides it hasn't been installed)
+        \CRM_Core_Session::useFakeSession();
+      }
+      else {
+        self::$_singleton = new CRM_Core_Session();
+      }
     }
     return self::$_singleton;
   }
