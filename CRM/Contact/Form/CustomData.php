@@ -84,23 +84,18 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    */
   public function preProcess() {
     $this->_cdType = $_GET['type'] ?? NULL;
-    $this->assign('cdType', FALSE);
+    $isBuildForm = ($_GET['type'] ?? NULL) && CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this);
     $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this);
-    if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
-      if ($this->_cdType) {
-        $this->assign('cdType', TRUE);
-      }
+    $this->assign('cdType', CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this));
+    if ($isBuildForm) {
       // NOTE : group id is not stored in session from within CRM_Custom_Form_CustomData::preProcess func
       // this is due to some condition inside it which restricts it from saving in session
       // so doing this for multi record edit action
       $entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $this);
-      if (!empty($entityId)) {
-        $subType = CRM_Contact_BAO_Contact::getContactSubType($entityId, ',');
-      }
       $this->preProcessCustomData(NULL, CRM_Utils_Request::retrieve('type', 'String', $this), $entityId);
       if ($this->_multiRecordDisplay) {
         $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
-        $this->_tableID = $this->_entityId;
+        $this->_tableID = $entityId;
         $this->_contactType = CRM_Contact_BAO_Contact::getContactType($this->_tableID);
         $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
         $hasReachedMax = CRM_Core_BAO_CustomGroup::hasReachedMaxLimit($this->_groupID, $this->_tableID);
@@ -126,9 +121,13 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
         if (!empty($_POST['hidden_custom'])) {
           $this->assign('postedInfo', TRUE);
+          CRM_Core_Error::deprecatedWarning("I'm kinda confused - how did we get here?");
         }
       }
       return;
+    }
+    else {
+      CRM_Core_Error::deprecatedWarning("I'm so confused - how did we get here?");
     }
     $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
     $this->_tableID = CRM_Utils_Request::retrieve('tableId', 'Positive', $this, TRUE);
