@@ -100,6 +100,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    */
   public static function getList() {
     $printLabel = new CRM_Core_DAO_PrintLabel();
+    $printLabel->is_active = 1;
     $printLabel->find();
 
     $labels = [];
