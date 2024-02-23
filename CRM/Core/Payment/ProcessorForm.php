@@ -122,13 +122,13 @@ class CRM_Core_Payment_ProcessorForm {
   /**
    * Build the payment processor form.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Event_Form_Registration_Register|\CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Confirm|CRM_Financial_Form_Payment $form
    */
-  public static function buildQuickForm(&$form) {
+  public static function buildQuickForm($form): void {
     //@todo document why this addHidden is here
     //CRM-15743 - we should not set/create hidden element for pay later
     // because payment processor is not selected
-    $processorId = $form->getVar('_paymentProcessorID');
+    $processorId = $form->getPaymentProcessorID();
     $billing_profile_id = CRM_Utils_Request::retrieve('billing_profile_id', 'String');
     if (!empty($form->_values) && !empty($form->_values['is_billing_required'])) {
       $billing_profile_id = 'billing';
