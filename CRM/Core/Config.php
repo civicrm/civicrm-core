@@ -91,6 +91,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
           // Standalone's session cannot be initialized until CiviCRM is booted,
           // since it is defined in an extension, and we need the session
           // initialized before calling applyLocale.
+          if (defined('CIVI_SETUP')) {
+            // during Standalone install the extension isn't ready yet so we need a fake session
+            \CRM_Core_Session::useFakeSession();
+          }
           $sess = \CRM_Core_Session::singleton();
           $sess->initialize();
           if ($sess->getLoggedInContactID()) {
