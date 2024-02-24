@@ -17,6 +17,9 @@
   <releaseDate>2023-12-19</releaseDate>
   <version>1.0</version>
   <develStage>alpha</develStage>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
   <compatibility>
     <ver>5.70</ver>
   </compatibility>
