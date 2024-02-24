@@ -248,8 +248,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
     }
 
-    $template = CRM_Core_Smarty::singleton();
-    $template->assign_by_ref('breadcrumb', $breadCrumb);
+    CRM_Core_Smarty::singleton()->assign('breadcrumb', $breadCrumb);
     wp_set_breadcrumb($breadCrumb);
   }
 
