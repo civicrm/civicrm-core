@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<menu>
-  <item>
-    <path>civicrm/admin/oembed/install</path>
-    <page_callback>CRM_Oembed_Page_InstallPage</page_callback>
-    <title>oEmbed Installation</title>
-    <access_arguments>access CiviCRM</access_arguments>
-  </item>
-</menu>

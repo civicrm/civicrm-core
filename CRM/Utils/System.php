@@ -279,7 +279,7 @@ class CRM_Utils_System {
     }
 
     if ($frontend === FALSE && $forceBackend === FALSE && !empty($GLOBALS['civicrm_url_defaults'])) {
-      // Caller appears to want the "current://" scheme. For newer environments (eg web-service/oEmbed;
+      // Caller appears to want the "current://" scheme. For newer environments (eg web-service/iframe;
       // not frontend/backend), we need
       $urlObj = \Civi::url('current://' . $path)
         ->addQuery($query)
