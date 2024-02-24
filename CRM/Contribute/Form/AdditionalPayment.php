@@ -84,11 +84,14 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('component', $this->_component);
     $this->assign('id', $this->_id);
     $this->assign('suppressPaymentFormButtons', $this->isBeingCalledFromSelectorContext());
-
-    if ($this->_view === 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
-      $this->assignPaymentInfoBlock();
+    $isShowPayments = $this->isViewMode();
+    $this->assign('transaction', $isShowPayments);
+    if ($isShowPayments) {
+      $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->getContributionID(), 'contribution', TRUE);
+      $this->assign('payments', $paymentInfo['transaction'] ?? NULL);
+      $this->assign('paymentLinks', $paymentInfo['payment_links']);
       $title = ts('View Payment');
-      if (!empty($this->_component) && $this->_component == 'event') {
+      if (!empty($this->_component) && $this->_component === 'event') {
         $info = CRM_Event_BAO_Participant::participantDetails($this->_id);
         $title .= " - {$info['title']}";
       }
@@ -145,8 +148,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function setDefaultValues() {
-    if ($this->_view === 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
+  public function setDefaultValues(): ?array {
+    if ($this->isViewMode()) {
       return NULL;
     }
     $defaults = [];
@@ -556,6 +559,14 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    */
   public function getPaymentProcessorID(): int {
     return (int) ($this->getSubmittedValue('payment_processor_id') ?: $this->_paymentProcessor['id']);
+  }
+
+  /**
+   * @return bool
+   */
+  public function isViewMode(): bool {
+    $isShowPayments = $this->_view === 'transaction' && ($this->_action & CRM_Core_Action::BROWSE);
+    return $isShowPayments;
   }
 
 }
