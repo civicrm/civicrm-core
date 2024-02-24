@@ -9,11 +9,13 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 /**
  * Download the results of a SearchDisplay as a spreadsheet.
  *
- * Note: unlike other APIs this action will directly output a file
- * if 'format' is set to anything other than 'array'.
+ * Disposition determines whether the output is sent directly to the browser
+ * or returned as a string, except for format=array which is always an array.
  *
  * @method $this setFormat(string $format)
  * @method string getFormat()
+ * @method $this setDisposition(string $disposition)
+ * @method string getDisposition()
  * @package Civi\Api4\Action\SearchDisplay
  */
 class Download extends AbstractRunAction {
@@ -22,7 +24,8 @@ class Download extends AbstractRunAction {
    * Requested file format.
    *
    * 'array' will return a normal api result, with table headers as the first row.
-   * 'csv', etc. will directly output a file to the browser.
+   * 'csv', etc. will directly output a file to the browser, or return as a string
+   * depending on $disposition.
    *
    * @var string
    * @required
@@ -44,6 +47,14 @@ class Download extends AbstractRunAction {
       'mime' => 'application/pdf',
     ],
   ];
+
+  /**
+   * Whether to output to the browser or return a string.
+   *
+   * @var string
+   * @options attachment,inline
+   */
+  protected $disposition = 'attachment';
 
   /**
    * @param \Civi\Api4\Result\SearchDisplayRunResult $result
@@ -112,12 +123,22 @@ class Download extends AbstractRunAction {
         return;
 
       case 'csv':
-        $this->outputCSV($rows, $columns, $fileName);
+        $output = $this->outputCSV($rows, $columns, $fileName);
+        if ($output) {
+          $result[] = $output;
+          return;
+        }
         break;
 
       default:
-        $this->sendHeaders($fileName);
-        $this->outputSpreadsheet($rows, $columns);
+        if ($this->disposition === 'attachment') {
+          $this->sendHeaders($fileName);
+          $this->outputSpreadsheet($rows, $columns);
+        }
+        else {
+          $result[] = $this->outputSpreadsheet($rows, $columns);
+          return;
+        }
     }
 
     \CRM_Utils_System::civiExit();
@@ -141,12 +162,13 @@ class Download extends AbstractRunAction {
   }
 
   /**
-   * Outputs headers and CSV directly to browser for download
+   * Outputs headers and CSV directly to browser for download, or return as a string.
    * @param array $rows
    * @param array $columns
    * @param string $fileName
+   * @return string|null
    */
-  private function outputCSV(array $rows, array $columns, string $fileName) {
+  private function outputCSV(array $rows, array $columns, string $fileName): ?string {
     $csv = Writer::createFromFileObject(new \SplTempFileObject());
     $csv->setOutputBOM(Writer::BOM_UTF8);
 
@@ -162,16 +184,21 @@ class Download extends AbstractRunAction {
       }
       $csv->insertOne($row);
     }
-    // Echo headers and content directly to browser
-    $csv->output($fileName);
+    if ($this->disposition === 'attachment') {
+      // Echo headers and content directly to browser
+      $csv->output($fileName);
+      return NULL;
+    }
+    return $csv->toString();
   }
 
   /**
-   * Create PhpSpreadsheet document and output directly to browser for download
+   * Create PhpSpreadsheet document and output directly to browser for download or return as string
    * @param array $rows
    * @param array $columns
+   * @return string|null
    */
-  private function outputSpreadsheet(array $rows, array $columns) {
+  private function outputSpreadsheet(array $rows, array $columns): ?string {
     $document = new Spreadsheet();
     $document->getProperties()
       ->setTitle($this->display['label']);
@@ -191,7 +218,14 @@ class Download extends AbstractRunAction {
 
     $writer = IOFactory::createWriter($document, $this->formats[$this->format]['writer']);
 
-    $writer->save('php://output');
+    if ($this->disposition === 'attachment') {
+      $writer->save('php://output');
+      return NULL;
+    }
+    $fp = fopen('php://temp', 'r+');
+    $writer->save($fp);
+    rewind($fp);
+    return stream_get_contents($fp);
   }
 
   /**
