@@ -38,8 +38,8 @@ class ScriptManager extends AutoService implements HookInterface {
     if (!class_exists($template)) {
       $messages[] = new \CRM_Utils_Check_Message(
         static::CHECK_NAME,
-        ts('The IFRAME extension cannot be deployed. The template class ("<code>%1</code>") is missing.', [1 => htmlentities($template)]),
-        ts('IFRAME Deployment'),
+        ts('The IFrame Connector cannot be deployed. The template class ("<code>%1</code>") is missing.', [1 => htmlentities($template)]),
+        ts('IFrame Connector: Deployment'),
         \Psr\Log\LogLevel::ERROR,
         'fa-download'
       );
@@ -56,9 +56,9 @@ class ScriptManager extends AutoService implements HookInterface {
     $message = new \CRM_Utils_Check_Message(
       static::CHECK_NAME,
       file_exists($path)
-        ? ts('The IFRAME extension requires a utility script ("<code>%1</code>"). This script needs to be updated.', $tsVars)
-        : ts('The IFRAME extension requires a utility script ("<code>%1</code>"). This script needs to be installed.', $tsVars),
-      ts('IFRAME Deployment'),
+        ? ts('The IFrame Connector requires a utility script ("<code>%1</code>"). This script needs to be updated.', $tsVars)
+        : ts('The IFrame Connector requires a utility script ("<code>%1</code>"). This script needs to be installed.', $tsVars),
+      ts('IFrame Connector: Deployment'),
       \Psr\Log\LogLevel::ERROR,
       'fa-download'
     );
