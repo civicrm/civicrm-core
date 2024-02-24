@@ -104,11 +104,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       }
 
       $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $gid, json_decode($this->criteria, TRUE), TRUE, $this->limit);
-
-      $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
-      $where = "de.id IS NULL";
-
-      $pos = CRM_Core_BAO_PrevNextCache::getPositions($cacheKey, $this->_cid, $this->_oid, $this->_mergeId, $join, $where, $flip);
+      $pos = CRM_Core_BAO_PrevNextCache::getPositions($cacheKey, $flip ? $this->_oid : $this->_cid, $flip ? $this->_cid : $this->_oid, $this->_mergeId);
 
       // get user info of main contact.
       $config = CRM_Core_Config::singleton();
@@ -339,10 +335,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     elseif ($this->next && $this->_mergeId && empty($formValues['_qf_Merge_done'])) {
       $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $this->_gid, json_decode($this->criteria, TRUE), TRUE, $this->limit);
 
-      $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
-      $where = "de.id IS NULL";
-
-      $pos = CRM_Core_BAO_PrevNextCache::getPositions($cacheKey, NULL, NULL, $this->_mergeId, $join, $where);
+      $pos = CRM_Core_BAO_PrevNextCache::getPositions($cacheKey, NULL, NULL, $this->_mergeId);
 
       if (!empty($pos) &&
         $pos['next']['id1'] &&

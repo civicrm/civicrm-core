@@ -204,7 +204,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $select = ['pn.is_selected' => 'is_selected'];
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($dao->id, $this->_groupId, [], TRUE, 0);
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
-    $this->assertEquals(count($foundDupes), count($pnDupePairs), 'Check number of dupe pairs in prev next cache.');
+    $this->assertCount(count($foundDupes), $pnDupePairs, 'Check number of dupe pairs in prev next cache.');
 
     // mark first two pairs as selected
     CRM_Core_DAO::singleValueQuery("UPDATE civicrm_prevnext_cache SET is_selected = 1 WHERE id IN ({$pnDupePairs[0]['prevnext_id']}, {$pnDupePairs[1]['prevnext_id']})");
@@ -408,8 +408,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    * Test results are returned when criteria are passed in.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetMatchesCriteriaMatched(): void {
     $this->setupMatchData();
