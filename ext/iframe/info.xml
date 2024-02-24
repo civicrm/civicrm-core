@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <extension key="iframe" type="module">
   <file>iframe</file>
-  <name>iframe</name>
-  <description>FIXME</description>
+  <name>IFrame Connector</name>
+  <description>Enable external websites to embed CiviCRM pages using an HTML &lt;IFRAME&gt;.</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Tim Otten</author>
     <email>totten@civicrm.org</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://FIXME</url>
-    <url desc="Documentation">http://FIXME</url>
-    <url desc="Support">http://FIXME</url>
+    <url desc="Documentation">https://docs.civicrm.org/</url>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/dev</url>
+    <url desc="Issues">https://lab.civicrm.org/dev/core/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2023-12-19</releaseDate>
